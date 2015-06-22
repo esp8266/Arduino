@@ -27,6 +27,11 @@
 #define ESP8266_DREG(addr) *((volatile uint32_t *)(0x3FF00000+(addr)))
 #define ESP8266_CLOCK 80000000UL
 
+#define i2c_readReg_Mask(block, host_id, reg_add, Msb, Lsb)  rom_i2c_readReg_Mask(block, host_id, reg_add, Msb, Lsb)
+#define i2c_readReg_Mask_def(block, reg_add) i2c_readReg_Mask(block, block##_hostid,  reg_add,  reg_add##_msb,  reg_add##_lsb)
+#define i2c_writeReg_Mask(block, host_id, reg_add, Msb, Lsb, indata)  rom_i2c_writeReg_Mask(block, host_id, reg_add, Msb, Lsb, indata)
+#define i2c_writeReg_Mask_def(block, reg_add, indata) i2c_writeReg_Mask(block, block##_hostid,  reg_add,  reg_add##_msb,  reg_add##_lsb,  indata)
+
 //CPU Register
 #define CPU2X     ESP8266_DREG(0x14) //when bit 0 is set, F_CPU = 160MHz
 
@@ -77,9 +82,6 @@
 #define GPCD   2  //DRIVER 0:normal,1:open drain
 #define GPCS   0  //SOURCE 0:GPIO_DATA,1:SigmaDelta
 
-extern uint8_t esp8266_gpioToFn[16];
-#define GPF(p) ESP8266_REG(0x800 + esp8266_gpioToFn[(p & 0xF)])
-
 #define GPMUX  ESP8266_REG(0x800)
 //GPIO (0-15) PIN Function Registers
 #define GPF0   ESP8266_REG(0x834)
@@ -98,6 +100,9 @@ extern uint8_t esp8266_gpioToFn[16];
 #define GPF13  ESP8266_REG(0x808)
 #define GPF14  ESP8266_REG(0x80C)
 #define GPF15  ESP8266_REG(0x810)
+
+extern uint8_t esp8266_gpioToFn[16];
+#define GPF(p) ESP8266_REG(0x800 + esp8266_gpioToFn[(p & 0xF)])
 
 //GPIO (0-15) PIN Function Bits
 #define GPFSOE 0 //Sleep OE
@@ -578,5 +583,255 @@ extern uint8_t esp8266_gpioToFn[16];
 //SPI EXT3 (SPIxE3)
 #define SPIE2IHEN 0x3 //SPI_INT_HOLD_ENA
 #define SPIE2IHEN_S 0 //SPI_INT_HOLD_ENA_S
+
+
+//SLC (DMA) Registers
+#define SLCC0     ESP8266_REG(0xB00) //SLC_CONF0
+#define SLCIR     ESP8266_REG(0xB04) //SLC_INT_RAW
+#define SLCIS     ESP8266_REG(0xB08) //SLC_INT_STATUS
+#define SLCIE     ESP8266_REG(0xB0C) //SLC_INT_ENA
+#define SLCIC     ESP8266_REG(0xB10) //SLC_INT_CLR
+#define SLCRXS    ESP8266_REG(0xB14) //SLC_RX_STATUS
+#define SLCRXP    ESP8266_REG(0xB18) //SLC_RX_FIFO_PUSH
+#define SLCTXS    ESP8266_REG(0xB1C) //SLC_TX_STATUS
+#define SLCTXP    ESP8266_REG(0xB20) //SLC_TX_FIFO_POP
+#define SLCRXL    ESP8266_REG(0xB24) //SLC_RX_LINK
+#define SLCTXL    ESP8266_REG(0xB28) //SLC_TX_LINK
+#define SLCIVTH   ESP8266_REG(0xB2C) //SLC_INTVEC_TOHOST
+#define SLCT0     ESP8266_REG(0xB30) //SLC_TOKEN0
+#define SLCT1     ESP8266_REG(0xB34) //SLC_TOKEN1
+#define SLCC1     ESP8266_REG(0xB38) //SLC_CONF1
+#define SLCS0     ESP8266_REG(0xB3C) //SLC_STATE0
+#define SLCS1     ESP8266_REG(0xB40) //SLC_STATE1
+#define SLCBC     ESP8266_REG(0xB44) //SLC_BRIDGE_CONF
+#define SLCRXEDA  ESP8266_REG(0xB48) //SLC_RX_EOF_DES_ADDR
+#define SLCTXEDA  ESP8266_REG(0xB4C) //SLC_TX_EOF_DES_ADDR
+#define SLCRXEBDA ESP8266_REG(0xB50) //SLC_RX_EOF_BFR_DES_ADDR
+#define SLCAT     ESP8266_REG(0xB54) //SLC_AHB_TEST
+#define SLCSS     ESP8266_REG(0xB58) //SLC_SDIO_ST
+#define SLCRXDC   ESP8266_REG(0xB5C) //SLC_RX_DSCR_CONF
+#define SLCTXD    ESP8266_REG(0xB60) //SLC_TXLINK_DSCR
+#define SLCTXDB0  ESP8266_REG(0xB64) //SLC_TXLINK_DSCR_BF0
+#define SLCTXDB1  ESP8266_REG(0xB68) //SLC_TXLINK_DSCR_BF1
+#define SLCRXD    ESP8266_REG(0xB6C) //SLC_RXLINK_DSCR
+#define SLCRXDB0  ESP8266_REG(0xB70) //SLC_RXLINK_DSCR_BF0
+#define SLCRXDB1  ESP8266_REG(0xB74) //SLC_RXLINK_DSCR_BF1
+#define SLCDT     ESP8266_REG(0xB78) //SLC_DATE
+#define SLCID     ESP8266_REG(0xB7C) //SLC_ID
+#define SLCHIR    ESP8266_REG(0xB88) //SLC_HOST_INTR_RAW
+#define SLCHC0    ESP8266_REG(0xB94) //SLC_HOST_CONF_W0
+#define SLCHC1    ESP8266_REG(0xB98) //SLC_HOST_CONF_W1
+#define SLCHIS    ESP8266_REG(0xB9C) //SLC_HOST_INTR_ST
+#define SLCHC2    ESP8266_REG(0xBA0) //SLC_HOST_CONF_W2
+#define SLCHC3    ESP8266_REG(0xBA4) //SLC_HOST_CONF_W3
+#define SLCHC4    ESP8266_REG(0xBA8) //SLC_HOST_CONF_W4
+#define SLCHIC    ESP8266_REG(0xBB0) //SLC_HOST_INTR_CLR
+#define SLCHIE    ESP8266_REG(0xBB4) //SLC_HOST_INTR_ENA
+#define SLCHC5    ESP8266_REG(0xBBC) //SLC_HOST_CONF_W5
+
+//SLC (DMA) CONF0
+#define SLCMM     (0x3) //SLC_MODE
+#define SLCM      (12) //SLC_MODE_S
+#define SLCDTBE   (1 << 9) //SLC_DATA_BURST_EN
+#define SLCDBE    (1 << 8) //SLC_DSCR_BURST_EN
+#define SLCRXNRC  (1 << 7) //SLC_RX_NO_RESTART_CLR
+#define SLCRXAW   (1 << 6) //SLC_RX_AUTO_WRBACK
+#define SLCRXLT   (1 << 5) //SLC_RX_LOOP_TEST
+#define SLCTXLT   (1 << 4) //SLC_TX_LOOP_TEST
+#define SLCAR     (1 << 3) //SLC_AHBM_RST
+#define SLCAFR    (1 << 2) //SLC_AHBM_FIFO_RST
+#define SLCRXLR   (1 << 1) //SLC_RXLINK_RST
+#define SLCTXLR   (1 << 0) //SLC_TXLINK_RST
+
+//SLC (DMA) INT
+#define SLCITXDE  (1 << 21) //SLC_TX_DSCR_EMPTY_INT
+#define SLCIRXDER (1 << 20) //SLC_RX_DSCR_ERR_INT
+#define SLCITXDER (1 << 19) //SLC_TX_DSCR_ERR_INT
+#define SLCITH    (1 << 18) //SLC_TOHOST_INT
+#define SLCIRXEOF (1 << 17) //SLC_RX_EOF_INT
+#define SLCIRXD   (1 << 16) //SLC_RX_DONE_INT
+#define SLCITXEOF (1 << 15) //SLC_TX_EOF_INT
+#define SLCITXD   (1 << 14) //SLC_TX_DONE_INT
+#define SLCIT0    (1 << 13) //SLC_TOKEN1_1TO0_INT
+#define SLCIT1    (1 << 12) //SLC_TOKEN0_1TO0_INT
+#define SLCITXO   (1 << 11) //SLC_TX_OVF_INT
+#define SLCIRXU   (1 << 10) //SLC_RX_UDF_INT
+#define SLCITXS   (1 << 9) //SLC_TX_START_INT
+#define SLCIRXS   (1 << 8) //SLC_RX_START_INT
+#define SLCIFH7   (1 << 7) //SLC_FRHOST_BIT7_INT
+#define SLCIFH6   (1 << 6) //SLC_FRHOST_BIT6_INT
+#define SLCIFH5   (1 << 5) //SLC_FRHOST_BIT5_INT
+#define SLCIFH4   (1 << 4) //SLC_FRHOST_BIT4_INT
+#define SLCIFH3   (1 << 3) //SLC_FRHOST_BIT3_INT
+#define SLCIFH2   (1 << 2) //SLC_FRHOST_BIT2_INT
+#define SLCIFH1   (1 << 1) //SLC_FRHOST_BIT1_INT
+#define SLCIFH0   (1 << 0) //SLC_FRHOST_BIT0_INT
+
+//SLC (DMA) RX_STATUS
+#define SLCRXE    (1 << 1) //SLC_RX_EMPTY
+#define SLCRXF    (1 << 0) //SLC_RX_FULL
+
+//SLC (DMA) TX_STATUS
+#define SLCTXE    (1 << 1) //SLC_TX_EMPTY
+#define SLCTXF    (1 << 0) //SLC_TX_FULL
+
+//SLC (DMA) RX_FIFO_PUSH
+#define SLCRXFP   (1 << 16) //SLC_RXFIFO_PUSH
+#define SLCRXWDM  (0x1FF)   //SLC_RXFIFO_WDATA
+#define SLCRXWD   (0)       //SLC_RXFIFO_WDATA_S
+
+//SLC (DMA) TX_FIFO_POP
+#define SLCTXFP   (1 << 16) //SLC_TXFIFO_POP
+#define SLCTXRDM  (0x7FF)   //SLC_TXFIFO_RDATA
+#define SLCTXRD   (0)       //SLC_TXFIFO_RDATA_S
+
+//SLC (DMA) RX_LINK
+#define SLCRXLP   (1 << 31) //SLC_RXLINK_PARK
+#define SLCRXLRS  (1 << 30) //SLC_RXLINK_RESTART
+#define SLCRXLS   (1 << 29) //SLC_RXLINK_START
+#define SLCRXLE   (1 << 28) //SLC_RXLINK_STOP
+#define SLCRXLAM  (0xFFFF)  //SLC_RXLINK_DESCADDR_MASK
+#define SLCRXLA   (0)       //SLC_RXLINK_ADDR_S
+
+//SLC (DMA) TX_LINK
+#define SLCTXLP   (1 << 31) //SLC_TXLINK_PARK
+#define SLCTXLRS  (1 << 30) //SLC_TXLINK_RESTART
+#define SLCTXLS   (1 << 29) //SLC_TXLINK_START
+#define SLCTXLE   (1 << 28) //SLC_TXLINK_STOP
+#define SLCTXLAM  (0xFFFF)  //SLC_TXLINK_DESCADDR_MASK
+#define SLCTXLA   (0)       //SLC_TXLINK_ADDR_S
+
+//SLC (DMA) TOKENx
+#define SLCTM  (0xFFF)   //SLC_TOKENx_MASK
+#define SLCTT  (16)      //SLC_TOKENx_S
+#define SLCTIM (1 << 14) //SLC_TOKENx_LOCAL_INC_MORE
+#define SLCTI  (1 << 13) //SLC_TOKENx_LOCAL_INC
+#define SLCTW  (1 << 12) //SLC_TOKENx_LOCAL_WR
+#define SLCTDM (0xFFF)   //SLC_TOKENx_LOCAL_WDATA
+#define SLCTD  (0)       //SLC_TOKENx_LOCAL_WDATA_S
+
+//SLC (DMA) BRIDGE_CONF
+#define SLCBFMEM  (0xF)   //SLC_FIFO_MAP_ENA
+#define SLCBFME   (8)     //SLC_FIFO_MAP_ENA_S
+#define SLCBTEEM  (0x3F)  //SLC_TXEOF_ENA
+#define SLCBTEE   (0)     //SLC_TXEOF_ENA_S
+
+//SLC (DMA) AHB_TEST
+#define SLCATAM  (0x3)  //SLC_AHB_TESTADDR
+#define SLCATA   (4)    //SLC_AHB_TESTADDR_S
+#define SLCATMM  (0x7)  //SLC_AHB_TESTMODE
+#define SLCATM   (0)    //SLC_AHB_TESTMODE_S
+
+//SLC (DMA) SDIO_ST
+#define SLCSBM  (0x7)     //SLC_BUS_ST
+#define SLCSB   (12)      //SLC_BUS_ST_S
+#define SLCSW   (1 << 8)  //SLC_SDIO_WAKEUP
+#define SLCSFM  (0xF)     //SLC_FUNC_ST
+#define SLCSF   (4)       //SLC_FUNC_ST_S
+#define SLCSCM  (0x7)     //SLC_CMD_ST
+#define SLCSC   (0)       //SLC_CMD_ST_S
+
+//SLC (DMA) RX_DSCR_CONF
+#define SLCBRXFE  (1 << 20) //SLC_RX_FILL_EN
+#define SLCBRXEM  (1 << 19) //SLC_RX_EOF_MODE
+#define SLCBRXFM  (1 << 18) //SLC_RX_FILL_MODE
+#define SLCBINR   (1 << 17) //SLC_INFOR_NO_REPLACE
+#define SLCBTNR   (1 << 16) //SLC_TOKEN_NO_REPLACE
+#define SLCBPICM  (0xFFFF)  //SLC_POP_IDLE_CNT
+#define SLCBPIC   (0)       //SLC_POP_IDLE_CNT_S
+
+
+// I2S Registers
+#define i2c_bbpll                         0x67
+#define i2c_bbpll_hostid                  4
+#define i2c_bbpll_en_audio_clock_out      4
+#define i2c_bbpll_en_audio_clock_out_msb  7
+#define i2c_bbpll_en_audio_clock_out_lsb  7
+#define I2S_CLK_ENABLE()                  i2c_writeReg_Mask_def(i2c_bbpll, i2c_bbpll_en_audio_clock_out, 1)
+#define I2SBASEFREQ                       (12000000L)
+
+#define I2STXF  ESP8266_REG(0xe00) //I2STXFIFO (32bit)
+#define I2SRXF  ESP8266_REG(0xe04) //I2SRXFIFO (32bit)
+#define I2SC    ESP8266_REG(0xe08) //I2SCONF
+#define I2SIR   ESP8266_REG(0xe0C) //I2SINT_RAW
+#define I2SIS   ESP8266_REG(0xe10) //I2SINT_ST
+#define I2SIE   ESP8266_REG(0xe14) //I2SINT_ENA
+#define I2SIC   ESP8266_REG(0xe18) //I2SINT_CLR
+#define I2ST    ESP8266_REG(0xe1C) //I2STIMING
+#define I2SFC   ESP8266_REG(0xe20) //I2S_FIFO_CONF
+#define I2SRXEN ESP8266_REG(0xe24) //I2SRXEOF_NUM (32bit)
+#define I2SCSD  ESP8266_REG(0xe28) //I2SCONF_SIGLE_DATA (32bit)
+#define I2SCC   ESP8266_REG(0xe2C) //I2SCONF_CHAN
+
+// I2S CONF
+#define I2SBDM  (0x3F)    //I2S_BCK_DIV_NUM
+#define I2SBD   (22)      //I2S_BCK_DIV_NUM_S
+#define I2SCDM  (0x3F)    //I2S_CLKM_DIV_NUM
+#define I2SCD   (16)      //I2S_CLKM_DIV_NUM_S
+#define I2SBMM  (0xF)     //I2S_BITS_MOD
+#define I2SBM   (12)      //I2S_BITS_MOD_S
+#define I2SRMS  (1 << 11) //I2S_RECE_MSB_SHIFT
+#define I2STMS  (1 << 10) //I2S_TRANS_MSB_SHIFT
+#define I2SRXS  (1 << 9)  //I2S_I2S_RX_START
+#define I2STXS  (1 << 8)  //I2S_I2S_TX_START
+#define I2SMR   (1 << 7)  //I2S_MSB_RIGHT
+#define I2SRF   (1 << 6)  //I2S_RIGHT_FIRST
+#define I2SRSM  (1 << 5)  //I2S_RECE_SLAVE_MOD
+#define I2STSM  (1 << 4)  //I2S_TRANS_SLAVE_MOD
+#define I2SRXFR (1 << 3)  //I2S_I2S_RX_FIFO_RESET
+#define I2STXFR (1 << 2)  //I2S_I2S_TX_FIFO_RESET
+#define I2SRXR  (1 << 1)  //I2S_I2S_RX_RESET
+#define I2STXR  (1 << 0)  //I2S_I2S_TX_RESET
+#define I2SRST  (0xF)     //I2S_I2S_RESET_MASK
+
+//I2S INT
+#define I2SITXRE  (1 << 5) //I2S_I2S_TX_REMPTY_INT
+#define I2SITXWF  (1 << 4) //I2S_I2S_TX_WFULL_INT
+#define I2SIRXRE  (1 << 3) //I2S_I2S_RX_REMPTY_INT
+#define I2SIRXWF  (1 << 2) //I2S_I2S_RX_WFULL_INT
+#define I2SITXPD  (1 << 1) //I2S_I2S_TX_PUT_DATA_INT
+#define I2SIRXTD  (1 << 0) //I2S_I2S_RX_TAKE_DATA_INT
+
+//I2S TIMING
+#define I2STBII  (1 << 22)  //I2S_TRANS_BCK_IN_INV
+#define I2SRDS   (1 << 21)  //I2S_RECE_DSYNC_SW
+#define I2STDS   (1 << 20)  //I2S_TRANS_DSYNC_SW
+#define I2SRBODM (0x3)      //I2S_RECE_BCK_OUT_DELAY
+#define I2SRBOD  (18)       //I2S_RECE_BCK_OUT_DELAY_S
+#define I2SRWODM (0x3)      //I2S_RECE_WS_OUT_DELAY
+#define I2SRWOD  (16)       //I2S_RECE_WS_OUT_DELAY_S
+#define I2STSODM (0x3)      //I2S_TRANS_SD_OUT_DELAY
+#define I2STSOD  (14)       //I2S_TRANS_SD_OUT_DELAY_S
+#define I2STWODM (0x3)      //I2S_TRANS_WS_OUT_DELAY
+#define I2STWOD  (12)       //I2S_TRANS_WS_OUT_DELAY_S
+#define I2STBODM (0x3)      //I2S_TRANS_BCK_OUT_DELAY
+#define I2STBOD  (10)       //I2S_TRANS_BCK_OUT_DELAY_S
+#define I2SRSIDM (0x3)      //I2S_RECE_SD_IN_DELAY
+#define I2SRSID  (8)        //I2S_RECE_SD_IN_DELAY_S
+#define I2SRWIDM (0x3)      //I2S_RECE_WS_IN_DELAY
+#define I2SRWID  (6)        //I2S_RECE_WS_IN_DELAY_S
+#define I2SRBIDM (0x3)      //I2S_RECE_BCK_IN_DELAY
+#define I2SRBID  (4)        //I2S_RECE_BCK_IN_DELAY_S
+#define I2STWIDM (0x3)      //I2S_TRANS_WS_IN_DELAY
+#define I2STWID  (2)        //I2S_TRANS_WS_IN_DELAY_S
+#define I2STBIDM (0x3)      //I2S_TRANS_BCK_IN_DELAY
+#define I2STBID  (0)        //I2S_TRANS_BCK_IN_DELAY_S
+
+//I2S FIFO CONF
+#define I2SRXFMM (0x7)      //I2S_I2S_RX_FIFO_MOD
+#define I2SRXFM  (16)       //I2S_I2S_RX_FIFO_MOD_S
+#define I2STXFMM (0x7)      //I2S_I2S_TX_FIFO_MOD
+#define I2STXFM  (13)       //I2S_I2S_TX_FIFO_MOD_S
+#define I2SDE    (1 << 12)  //I2S_I2S_DSCR_EN
+#define I2STXDNM (0x3F)     //I2S_I2S_TX_DATA_NUM
+#define I2STXDN  (6)        //I2S_I2S_TX_DATA_NUM_S
+#define I2SRXDNM (0x3F)     //I2S_I2S_RX_DATA_NUM
+#define I2SRXDN  (0)        //I2S_I2S_RX_DATA_NUM_S
+
+//I2S CONF CHAN
+#define I2SRXCMM (0x3)      //I2S_RX_CHAN_MOD
+#define I2SRXCM  (3)        //I2S_RX_CHAN_MOD_S
+#define I2STXCMM (0x7)      //I2S_TX_CHAN_MOD
+#define I2STXCM  (0)        //I2S_TX_CHAN_MOD_S
 
 #endif
