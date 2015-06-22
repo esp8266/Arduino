@@ -1,5 +1,5 @@
 /* 
-  i2s.h - Software I2C library for esp8266
+  i2s.h - Software I2S library for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
@@ -32,7 +32,7 @@ The 32bit samples basically are 2 16-bit signed values (the analog values for
 the left and right channel) concatenated as (Rout<<16)+Lout
 
 i2s_write_sample will block when you're sending data too quickly, so you can just
-generate and push data as fast as you can and I2sPushSample will regulate the
+generate and push data as fast as you can and i2s_write_sample will regulate the
 speed.
 */
 
