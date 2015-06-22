@@ -1,5 +1,5 @@
 /* 
-  i2s.c - Software I2C library for esp8266
+  i2s.c - Software I2S library for esp8266
   
   Code taken and reworked from espessif's I2S example
   
