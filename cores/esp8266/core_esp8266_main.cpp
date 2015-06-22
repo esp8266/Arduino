@@ -114,26 +114,13 @@ static void do_global_ctors(void) {
 }
 
 void init_done() {
+    system_set_os_print(1);
     do_global_ctors();
     esp_schedule();
 }
 
-extern "C" int __get_rf_mode()  __attribute__((weak));
-extern "C" int __get_rf_mode()
-{
-    return 0;  // default mode
-}
-
-extern "C" {
-void user_rf_pre_init() {
-    system_phy_set_rfoption(__get_rf_mode());
-}
-}
-
 extern "C" {
 void user_init(void) {
-    uart_div_modify(0, UART_CLK_FREQ / (74480));
-
     system_rtc_mem_read(0, &resetInfo, sizeof(struct rst_info));
     struct rst_info info = { 0 };
     system_rtc_mem_write(0, &info, sizeof(struct rst_info));
