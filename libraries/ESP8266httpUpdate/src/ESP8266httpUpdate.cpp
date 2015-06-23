@@ -78,12 +78,12 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, 
 
     if(current_version[0] != 0x00) {
         req += "\r\n"
-                "x-ESP8266-version: ";
+               "x-ESP8266-version: ";
         req += current_version;
     }
 
     req += "\r\n"
-            "\r\n";
+           "\r\n";
 
     tcp.write(req.c_str(), req.length());
 

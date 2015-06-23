@@ -36,6 +36,7 @@
 #include "osapi.h"
 #include "mem.h"
 #include "user_interface.h"
+#include "debug.h"
 
 void* malloc(size_t size) {
     size = ((size + 3) & ~((size_t)0x3));
@@ -471,75 +472,7 @@ int isblank(int c) {
 static int errno_var = 0;
 
 int* ICACHE_FLASH_ATTR __errno(void) {
-    os_printf("__errno is called last error: %d (not current)\n", errno_var);
+    DEBUGV("__errno is called last error: %d (not current)\n", errno_var);
     return &errno_var;
-}
-
-// ##########################################################################
-//                     __ieee754  functions
-// ##########################################################################
-
-double ICACHE_FLASH_ATTR __ieee754_sinh(double x) {
-    return sinh(x);
-}
-
-double ICACHE_FLASH_ATTR __ieee754_hypot(double x, double y) {
-    return hypot(x, y);
-}
-
-float ICACHE_FLASH_ATTR __ieee754_hypotf(float x, float y) {
-    return hypotf(x, y);
-}
-
-float ICACHE_FLASH_ATTR __ieee754_logf(float x) {
-    return logf(x);
-}
-
-double ICACHE_FLASH_ATTR __ieee754_log10(double x) {
-    return log10(x);
-}
-
-double ICACHE_FLASH_ATTR __ieee754_exp(double x) {
-    return exp(x);
-}
-
-double ICACHE_FLASH_ATTR __ieee754_cosh(double x) {
-    return cosh(x);
-}
-
-float ICACHE_FLASH_ATTR __ieee754_expf(float x) {
-    return expf(x);
-}
-
-float ICACHE_FLASH_ATTR __ieee754_log10f(float x) {
-    return log10f(x);
-}
-
-double ICACHE_FLASH_ATTR __ieee754_atan2(double x, double y) {
-    return atan2(x, y);
-}
-
-float ICACHE_FLASH_ATTR __ieee754_sqrtf(float x) {
-    return sqrtf(x);
-}
-
-float ICACHE_FLASH_ATTR __ieee754_sinhf(float x) {
-    return sinhf(x);
-}
-
-double ICACHE_FLASH_ATTR __ieee754_log(double x) {
-    return log(x);
-}
-
-double ICACHE_FLASH_ATTR __ieee754_sqrt(double x) {
-    return sqrt(x);
-}
-
-float ICACHE_FLASH_ATTR __ieee754_coshf(float x) {
-    return coshf(x);
-}
-
-float ICACHE_FLASH_ATTR __ieee754_atan2f(float x, float y) {
-    return atan2f(x, y);
 }
 
