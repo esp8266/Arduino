@@ -124,9 +124,10 @@ int WiFiUDP::available() {
 /* Release any resources being used by this WiFiUDP instance */
 void WiFiUDP::stop()
 {
-    if (_ctx)
+    if (_ctx) {
         _ctx->disconnect();
-    _ctx->unref();
+        _ctx->unref();
+    }
     _ctx = 0;
 }
 
@@ -271,6 +272,7 @@ uint16_t WiFiUDP::localPort()
 void WiFiUDP::stopAll()
 {
     for (WiFiUDP* it = _s_first; it; it = it->_next) {
+        DEBUGV("%s %08x %08x\n", __func__, (uint32_t) it, (uint32_t) _s_first);
         it->stop();
     }
 }
