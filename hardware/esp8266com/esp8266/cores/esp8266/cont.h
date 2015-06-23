@@ -33,6 +33,8 @@ typedef struct cont_ {
         unsigned* sp_yield;
 
         unsigned* stack_end;
+        unsigned unused1;
+        unsigned unused2;
         unsigned stack_guard1;
 
         unsigned stack[CONT_STACKSIZE / 4];

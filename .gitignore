@@ -56,6 +56,9 @@ avr-toolchain-*.zip
 /hardware/tools/esp8266/utils/
 /hardware/tools/esp8266/xtensa-lx106-elf
 /hardware/tools/esp8266/esptool.exe
+/hardware/esp8266com/esp8266/tools/xtensa*
+/hardware/esp8266com/esp8266/tools/esptool*
+/hardware/esp8266com/esp8266/tools/utils
 /hardware/tools/avr/
 /hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/
 /hardware/tools/bossac.exe
@@ -72,4 +75,3 @@ nbproject
 build/macosx/esptool-*-osx.zip
 
 build/macosx/dist/osx-xtensa-lx106-elf.tgz
-/hardware/esp8266com/esp8266/tools
