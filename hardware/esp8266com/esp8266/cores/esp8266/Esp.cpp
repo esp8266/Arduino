@@ -32,12 +32,6 @@ extern struct rst_info resetInfo;
 
 // #define DEBUG_SERIAL Serial
 
-//extern "C" void ets_wdt_init(uint32_t val);
-extern "C" void ets_wdt_enable(void);
-extern "C" void ets_wdt_disable(void);
-extern "C" void wdt_feed(void) {
-    
-}
 
 /**
  * User-defined Literals
@@ -85,46 +79,42 @@ unsigned long long operator"" _GB(unsigned long long x) {
 
 EspClass ESP;
 
-EspClass::EspClass()
-{
-
-}
-
 void EspClass::wdtEnable(uint32_t timeout_ms)
 {
-    //todo find doku for ets_wdt_init may set the timeout
-	ets_wdt_enable();
 }
 
 void EspClass::wdtEnable(WDTO_t timeout_ms)
 {
-    wdtEnable((uint32_t) timeout_ms);
 }
 
 void EspClass::wdtDisable(void)
 {
-	ets_wdt_disable();
 }
 
 void EspClass::wdtFeed(void)
 {
-	wdt_feed();
 }
 
 void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
 {
-	system_deep_sleep_set_option(static_cast<int>(mode));
- 	system_deep_sleep(time_us);
+    system_deep_sleep_set_option(static_cast<int>(mode));
+    system_deep_sleep(time_us);
 }
 
+extern "C" void esp_yield();
+extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
 {
-	((void (*)(void))0x40000080)();
+    __real_system_restart_local();
 }
 
 void EspClass::restart(void)
 {
     system_restart();
+    esp_yield();
+    // todo: provide an alternative code path if this was called
+    // from system context, not from continuation
+    // (implement esp_is_cont_ctx()?)
 }
 
 uint16_t EspClass::getVcc(void)

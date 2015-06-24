@@ -71,8 +71,6 @@ typedef enum {
 
 class EspClass {
     public:
-        EspClass();
-
         // TODO: figure out how to set WDT timeout
         void wdtEnable(uint32_t timeout_ms = 0);
         // note: setting the timeout value is not implemented at the moment
