@@ -153,9 +153,7 @@ APIs related to deep sleep and watchdog timer are available in the ```ESP``` obj
 
 ```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_RF_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from deepSleep.)
 
-```ESP.wdtEnable()```, ```ESP.wdtDisable()```, and ```ESP.wdtFeed()``` provide some control over the watchdog timer.
-
-```ESP.reset()``` resets the CPU.
+```ESP.restart()``` restarts the CPU.
 
 ```ESP.getFreeHeap()``` returns the free heap size.
 
