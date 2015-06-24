@@ -61,6 +61,15 @@ enum RFMode {
 #define WAKE_NO_RFCAL    RF_NO_CAL
 #define WAKE_RF_DISABLED RF_DISABLED
 
+enum ADCMode {
+    ADC_TOUT = 33,
+    ADC_TOUT_3V3 = 33,
+    ADC_VCC = 255,
+    ADC_VDD = 255
+};
+
+#define ADC_MODE(mode) extern "C" int __get_adc_mode() { return (int) (mode); }
+
 typedef enum {
      FM_QIO = 0x00,
      FM_QOUT = 0x01,
