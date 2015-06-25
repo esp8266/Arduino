@@ -197,6 +197,12 @@ static uint8_t phy_init_data[128] =
 
     
     // vdd33_const
+    // the voltage of PA_VDD
+    // x=0xff: it can measure VDD33, 
+    // 18<=x<=36: use input voltage,  
+    // the value is voltage*10, 33 is 3.3V, 30 is 3.0V,
+    // x<18 or x>36: default voltage is 3.3V
+    //
     // the value of this byte depend from the TOUT pin usage (1 or 2):
     // 1) 
     // analogRead function (system_adc_read()):
