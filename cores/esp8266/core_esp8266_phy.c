@@ -211,7 +211,7 @@ static uint8_t phy_init_data[128] =
     // 2) 
     // getVcc function (system_get_vdd33):
     // is only available when TOUT pin17 is suspended (floating), this function measure the power voltage of VDD3P3 pin 3 and 4
-    // For this function the vdd33_const must be set as 255.
+    // For this function the vdd33_const must be set to 255 (0xFF).
     [107] = 33,
 
     // disable RF calibration for certain number of times
