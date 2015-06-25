@@ -77,15 +77,15 @@ public:
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
   // content - actual content body
-  void send(int code, const char* content_type = NULL, String content = String(""));
-  void send(int code, char* content_type, String content);
-  void send(int code, String content_type, String content);
+  void send(int code, const char* content_type = NULL, const String& content = String(""));
+  void send(int code, char* content_type, const String& content);
+  void send(int code, const String& content_type, const String& content);
 
   void setContentLength(size_t contentLength) { _contentLength = contentLength; }
-  void sendHeader(String name, String value, bool first = false);
-  void sendContent(String content);
+  void sendHeader(const String& name, const String& value, bool first = false);
+  void sendContent(const String& content);
 
-template<typename T> size_t streamFile(T &file, String contentType){
+template<typename T> size_t streamFile(T &file, const String& contentType){
   setContentLength(file.size());
   if (String(file.name()).endsWith(".gz") && 
       contentType != "application/x-gzip" &&
