@@ -195,7 +195,6 @@ static uint8_t phy_init_data[128] =
     // 5.5m, 11m power index [0~5]
     [98] = 0,
 
-    
     // vdd33_const
     // the voltage of PA_VDD
     // x=0xff: it can measure VDD33,
