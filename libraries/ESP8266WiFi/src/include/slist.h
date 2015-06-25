@@ -9,14 +9,12 @@ public:
 protected:
 
   static void _add(T* self) {
-    DEBUGV("%s %08x %08x\n", __func__, (uint32_t) self, (uint32_t) _s_first);
     T* tmp = _s_first;
     _s_first = self;
     self->_next = tmp;
   }
 
   static void _remove(T* self) {
-    DEBUGV("%s %08x %08x\n", __func__, (uint32_t) self, (uint32_t) _s_first);
     if (_s_first == self) {
       _s_first = self->_next;
       self->_next = 0;
