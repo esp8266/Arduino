@@ -201,6 +201,17 @@ static uint8_t phy_init_data[128] =
     // 18<=x<=36: use input voltage,  
     // the value is voltage*10, 33 is 3.3V, 30 is 3.0V,
     // x<18 or x>36: default voltage is 3.3V
+    //
+    // the value of this byte depend from the TOUT pin usage (1 or 2):
+    // 1) 
+    // analogRead function (system_adc_read()):
+    // is only available when wire TOUT pin17 to external circuitry, Input Voltage Range restricted to 0 ~ 1.0V.
+    // For this function the vdd33_const must be set as real power voltage of VDD3P3 pin 3 and 4
+    // The range of operating voltage of ESP8266 is 1.8V~3.6V，the unit of vdd33_const is 0.1V，so effective value range of vdd33_const is [18,36]
+    // 2) 
+    // getVcc function (system_get_vdd33):
+    // is only available when TOUT pin17 is suspended (floating), this function measure the power voltage of VDD3P3 pin 3 and 4
+    // For this function the vdd33_const must be set to 255 (0xFF).
     [107] = 33,
 
     // disable RF calibration for certain number of times
