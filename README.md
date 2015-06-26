@@ -153,9 +153,7 @@ APIs related to deep sleep and watchdog timer are available in the ```ESP``` obj
 
 ```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_RF_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from deepSleep.)
 
-```ESP.wdtEnable()```, ```ESP.wdtDisable()```, and ```ESP.wdtFeed()``` provide some control over the watchdog timer.
-
-```ESP.reset()``` resets the CPU.
+```ESP.restart()``` restarts the CPU.
 
 ```ESP.getFreeHeap()``` returns the free heap size.
 
@@ -171,6 +169,16 @@ Several APIs may be used to get flash chip info:
 
 ```ESP.getCycleCount()``` returns the cpu instruction cycle count since start as an unsigned 32-bit.  This is useful for accurate timing of very short actions like bit banging.
 
+```ESP.getVcc()``` may be used to measure supply voltage. ESP needs to reconfigure the ADC
+at startup in order for this feature to be available. Add the following line to the top
+of your sketch to use ```getVcc```:
+```
+ADC_MODE(ADC_VCC);
+```
+TOUT pin has to be disconnected in this mode.
+
+Note that by default ADC is configured to read from TOUT pin using ```analogRead(A0)```, and 
+```ESP.getVCC()``` is not available.
 
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 

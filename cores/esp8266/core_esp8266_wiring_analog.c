@@ -17,17 +17,18 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  
+  
+  18/06/2015 analogRead bugfix by Testato
 */
+
 #include "wiring_private.h"
 #include "pins_arduino.h"
 
-extern uint16_t readvdd33(void);
-
-void analogReference(uint8_t mode) {}
 
 extern int __analogRead(uint8_t pin) {
   if(pin == 17){
-    return readvdd33() >> 2; // readvdd33 is 12 bit
+    return system_adc_read();
   }
   return digitalRead(pin) * 1023;
 }
