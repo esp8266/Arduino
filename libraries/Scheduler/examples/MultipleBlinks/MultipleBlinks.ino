@@ -13,7 +13,7 @@
 
  This example code is in the public domain
 
- http://arduino.cc/en/Tutorial/MultipleBlinks
+ http://www.arduino.cc/en/Tutorial/MultipleBlinks
 */
 
 // Include Scheduler since we want to manage multiple tasks.

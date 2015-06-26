@@ -26,11 +26,12 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.ui;
 
-import javax.swing.JProgressBar;
-
 import cc.arduino.utils.Progress;
+
+import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class ProgressJProgressBar extends JProgressBar {

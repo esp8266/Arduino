@@ -31,8 +31,8 @@
     <property environment="env" />
     <property name="java_home" value="${env.JAVA_HOME}" />
 
-    <javac source="1.6"
-           target="1.6"
+    <javac source="1.8"
+           target="1.8"
            encoding="UTF-8"
            includeAntRuntime="false"
            srcdir="src"

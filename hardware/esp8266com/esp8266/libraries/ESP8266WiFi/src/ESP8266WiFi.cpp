@@ -40,7 +40,9 @@ extern "C" void esp_schedule();
 extern "C" void esp_yield();
 
 ESP8266WiFiClass::ESP8266WiFiClass()
-: _useApMode(false)
+: _smartConfigStarted(false)
+, _smartConfigDone(false)
+, _useApMode(false)
 , _useClientMode(false)
 , _useStaticIp(false)
 {
@@ -121,7 +123,7 @@ uint8_t ESP8266WiFiClass::waitForConnectResult(){
 }
 
 
-// You will have to set the DNS-Server manually later since this will not enable DHCP
+// You will have to set the DNS-Server manually later since this will not enable DHCP2
 void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet)
 {
     struct ip_info info;
@@ -358,12 +360,47 @@ void ESP8266WiFiClass::_scanDone(void* result, int status)
         }
 
     }
-    esp_schedule();   
+
+    ESP8266WiFiClass::_scanStarted = false;
+    ESP8266WiFiClass::_scanComplete = true;
+
+    if(!ESP8266WiFiClass::_scanAsync) {
+        esp_schedule();
+    }
 }
 
+int8_t ESP8266WiFiClass::scanComplete() {
 
-int8_t ESP8266WiFiClass::scanNetworks()
+    if(_scanStarted) {
+        return WIFI_SCAN_RUNNING;
+    }
+
+    if(_scanComplete) {
+        return ESP8266WiFiClass::_scanCount;
+    }
+
+    return WIFI_SCAN_FAILD;
+}
+
+void ESP8266WiFiClass::scanDelete()
 {
+    if (ESP8266WiFiClass::_scanResult)
+    {
+        delete[] reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
+        ESP8266WiFiClass::_scanResult = 0;
+        ESP8266WiFiClass::_scanCount = 0;
+    }
+    _scanComplete = false;
+}
+
+int8_t ESP8266WiFiClass::scanNetworks(bool async)
+{
+    if(ESP8266WiFiClass::_scanStarted) {
+        return WIFI_SCAN_RUNNING;
+    }
+
+    ESP8266WiFiClass::_scanAsync = async;
+
     if(_useApMode) {
         // turn on AP+STA mode
         mode(WIFI_AP_STA);
@@ -377,22 +414,29 @@ int8_t ESP8266WiFiClass::scanNetworks()
     {
         disconnect();
     }
-
-    if (ESP8266WiFiClass::_scanResult)
-    {
-        delete[] reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
-        ESP8266WiFiClass::_scanResult = 0;
-        ESP8266WiFiClass::_scanCount = 0;
-    }
     
+    scanDelete();
+
     struct scan_config config;
     config.ssid = 0;
     config.bssid = 0;
     config.channel = 0;
     config.show_hidden = 0;
-    wifi_station_scan(&config, reinterpret_cast<scan_done_cb_t>(&ESP8266WiFiClass::_scanDone));
-    esp_yield();
-    return ESP8266WiFiClass::_scanCount;
+    if(wifi_station_scan(&config, reinterpret_cast<scan_done_cb_t>(&ESP8266WiFiClass::_scanDone))) {
+        ESP8266WiFiClass::_scanComplete = false;
+        ESP8266WiFiClass::_scanStarted = true;
+
+        if(ESP8266WiFiClass::_scanAsync) {
+            delay(0); // time for the OS to trigger the scan
+            return WIFI_SCAN_RUNNING;
+        }
+
+        esp_yield();
+        return ESP8266WiFiClass::_scanCount;
+    } else {
+        return WIFI_SCAN_FAILD;
+    }
+
 }
 
 void * ESP8266WiFiClass::_getScanInfoByIndex(int i)
@@ -644,6 +688,10 @@ void ESP8266WiFiClass::printDiag(Print& p)
     p.println(conf.bssid_set);
 
 }
+
+bool ESP8266WiFiClass::_scanAsync = false;
+bool ESP8266WiFiClass::_scanStarted = false;
+bool ESP8266WiFiClass::_scanComplete = false;
 
 size_t ESP8266WiFiClass::_scanCount = 0;
 void* ESP8266WiFiClass::_scanResult = 0;

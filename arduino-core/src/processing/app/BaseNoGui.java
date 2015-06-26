@@ -8,6 +8,7 @@ import cc.arduino.files.DeleteFilesOnShutdown;
 import cc.arduino.packages.DiscoveryManager;
 import cc.arduino.packages.Uploader;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.apache.commons.logging.impl.NoOpLog;
 import processing.app.debug.Compiler;
@@ -30,9 +31,9 @@ import static processing.app.I18n._;
 public class BaseNoGui {
 
   /** Version string to be used for build */
-  public static final int REVISION = 10605;
+  public static final int REVISION = 10606;
   /** Extended version string displayed on GUI */
-  public static final String VERSION_NAME = "1.6.5";
+  public static final String VERSION_NAME = "1.6.6";
   public static final String VERSION_NAME_LONG;
 
   static {
@@ -315,14 +316,15 @@ public class BaseNoGui {
   static public File getSketchbookLibrariesFolder() {
     File libdir = new File(getSketchbookFolder(), "libraries");
     if (!libdir.exists()) {
+      FileWriter freadme = null;
       try {
         libdir.mkdirs();
-        File readme = new File(libdir, "readme.txt");
-        FileWriter freadme = new FileWriter(readme);
+        freadme = new FileWriter(new File(libdir, "readme.txt"));
         freadme.write(_("For information on installing libraries, see: " +
-                        "http://arduino.cc/en/Guide/Libraries\n"));
-        freadme.close();
+                        "http://www.arduino.cc/en/Guide/Libraries\n"));
       } catch (Exception e) {
+      } finally {
+        IOUtils.closeQuietly(freadme);
       }
     }
     return libdir;
@@ -417,7 +419,7 @@ public class BaseNoGui {
    * within the header files at the top-level).
    */
   static public String[] headerListFromIncludePath(File path) throws IOException {
-    String[] list = path.list(new OnlyFilesWithExtension(".h"));
+    String[] list = path.list(new OnlyFilesWithExtension(".h", ".hh", ".hpp"));
     if (list == null) {
       throw new IOException();
     }
@@ -425,8 +427,9 @@ public class BaseNoGui {
   }
 
   static public void init(String[] args) throws Exception {
-    getPlatform().init();
-  
+    CommandlineParser parser = new CommandlineParser(args);
+    parser.parseArgumentsPhase1();
+
     String sketchbookPath = getSketchbookPath();
   
     // If no path is set, get the default sketchbook folder for this platform
@@ -436,13 +439,13 @@ public class BaseNoGui {
       else
         showError(_("No sketchbook"), _("Sketchbook path not defined"), null);
     }
-  
+
     BaseNoGui.initPackages();
     
     // Setup board-dependent variables.
     onBoardOrPortChange();
-  
-    CommandlineParser parser = CommandlineParser.newCommandlineParser(args);
+
+    parser.parseArgumentsPhase2();
 
     for (String path: parser.getFilenames()) {
       // Correctly resolve relative paths
@@ -570,6 +573,12 @@ public class BaseNoGui {
       System.exit(0);
     }
     else if (parser.isGetPrefMode()) {
+      dumpPrefs(parser);
+    }
+  }
+
+  protected static void dumpPrefs(CommandlineParser parser) {
+    if (parser.getGetPref() != null) {
       String value = PreferencesData.get(parser.getGetPref(), null);
       if (value != null) {
         System.out.println(value);
@@ -577,6 +586,13 @@ public class BaseNoGui {
       } else {
         System.exit(4);
       }
+    } else {
+      System.out.println("#PREFDUMP#");
+      PreferencesMap prefs = PreferencesData.getMap();
+      for (Map.Entry<String, String> entry : prefs.entrySet()) {
+        System.out.println(entry.getKey() + "=" + entry.getValue());
+      }
+      System.exit(0);
     }
   }
 
@@ -586,7 +602,7 @@ public class BaseNoGui {
   }
 
   static public void initPackages() throws Exception {
-    indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder());
+    indexer = new ContributionsIndexer(BaseNoGui.getSettingsFolder(), BaseNoGui.getPlatform());
     File indexFile = indexer.getIndexFile("package_index.json");
     File defaultPackageJsonFile = new File(getContentFile("dist"), "package_index.json");
     if (!indexFile.isFile() || (defaultPackageJsonFile.isFile() && defaultPackageJsonFile.lastModified() > indexFile.lastModified())) {
@@ -597,11 +613,8 @@ public class BaseNoGui {
       try {
         out = new FileOutputStream(indexFile);
         out.write("{ \"packages\" : [ ] }".getBytes());
-        out.close();
       } finally {
-        if (out != null) {
-          out.close();
-        }
+        IOUtils.closeQuietly(out);
       }
     }
 
@@ -624,13 +637,13 @@ public class BaseNoGui {
     }
     indexer.syncWithFilesystem(getHardwareFolder());
 
-    packages = new HashMap<String, TargetPackage>();
+    packages = new LinkedHashMap<String, TargetPackage>();
     loadHardware(getHardwareFolder());
-    loadHardware(getSketchbookHardwareFolder());
     loadContributedHardware(indexer);
+    loadHardware(getSketchbookHardwareFolder());
     createToolPreferences(indexer);
 
-    librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder());
+    librariesIndexer = new LibrariesIndexer(BaseNoGui.getSettingsFolder(), indexer);
     File librariesIndexFile = librariesIndexer.getIndexFile();
     if (!librariesIndexFile.isFile()) {
       File defaultLibraryJsonFile = new File(getContentFile("dist"), "library_index.json");
@@ -645,9 +658,7 @@ public class BaseNoGui {
         } catch (IOException e) {
           e.printStackTrace();
         } finally {
-          if (out != null) {
-            out.close();
-          }
+          IOUtils.closeQuietly(out);
         }
       }
     }
@@ -734,18 +745,45 @@ public class BaseNoGui {
   }
 
   static public void main(String args[]) throws Exception {
-    if (args.length == 0)
+    if (args.length == 0) {
       showError(_("No parameters"), _("No command line parameters found"), null);
+    }
+    System.setProperty("java.net.useSystemProxies", "true");
 
     Runtime.getRuntime().addShutdownHook(new Thread(DeleteFilesOnShutdown.INSTANCE));
 
     initPlatform();
-    
+
+    getPlatform().init();
+
     initPortableFolder();
     
     initParameters(args);
-    
+
+    checkInstallationFolder();
+
     init(args);
+  }
+
+  public static void checkInstallationFolder() {
+    if (isIDEInstalledIntoSettingsFolder()) {
+      showError(_("Incorrect IDE installation folder"), _("Your copy of the IDE is installed in a subfolder of your settings folder.\nPlease move the IDE to another folder."), 10);
+    }
+    if (isIDEInstalledIntoSketchbookFolder()) {
+      showError(_("Incorrect IDE installation folder"), _("Your copy of the IDE is installed in a subfolder of your sketchbook.\nPlease move the IDE to another folder."), 10);
+    }
+  }
+
+  public static boolean isIDEInstalledIntoSketchbookFolder() {
+    return PreferencesData.has("sketchbook.path") && FileUtils.isSubDirectory(new File(PreferencesData.get("sketchbook.path")), new File(PreferencesData.get("runtime.ide.path")));
+  }
+
+  public static boolean isIDEInstalledIntoSettingsFolder() {
+    try {
+      return FileUtils.isSubDirectory(BaseNoGui.getPlatform().getSettingsFolder(), new File(PreferencesData.get("runtime.ide.path")));
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   static public void onBoardOrPortChange() {
@@ -788,7 +826,7 @@ public class BaseNoGui {
     populateImportToLibraryTable();
   }
 
-  static protected void loadContributedHardware(ContributionsIndexer indexer) throws TargetPlatformException {
+  static protected void loadContributedHardware(ContributionsIndexer indexer) {
     for (TargetPackage pack : indexer.createTargetPackages()) {
       packages.put(pack.getId(), pack);
     }
@@ -800,7 +838,7 @@ public class BaseNoGui {
     PreferencesData.removeAllKeysWithPrefix(prefix);
 
     for (ContributedTool tool : indexer.getInstalledTools()) {
-      File installedFolder = tool.getDownloadableContribution().getInstalledFolder();
+      File installedFolder = tool.getDownloadableContribution(getPlatform()).getInstalledFolder();
       if (installedFolder != null) {
         PreferencesData.set(prefix + tool.getName() + ".path", installedFolder.getAbsolutePath());
         PreferencesData.set(prefix + tool.getName() + "-" + tool.getVersion() + ".path", installedFolder.getAbsolutePath());
@@ -956,14 +994,18 @@ public class BaseNoGui {
     if (!dir.exists()) return;
 
     String files[] = dir.list();
-    for (int i = 0; i < files.length; i++) {
-      if (files[i].equals(".") || files[i].equals("..")) continue;
-      File dead = new File(dir, files[i]);
+    if (files == null) {
+      return;
+    }
+
+    for (String file : files) {
+      if (file.equals(".") || file.equals("..")) continue;
+      File dead = new File(dir, file);
       if (!dead.isDirectory()) {
         if (!PreferencesData.getBoolean("compiler.save_build_files")) {
           if (!dead.delete()) {
             // temporarily disabled
-        System.err.println(I18n.format(_("Could not delete {0}"), dead));
+            System.err.println(I18n.format(_("Could not delete {0}"), dead));
           }
         }
       } else {
@@ -1068,10 +1110,11 @@ public class BaseNoGui {
 
   public static void selectSerialPort(String port) {
     PreferencesData.set("serial.port", port);
-    if (port.startsWith("/dev/"))
-      PreferencesData.set("serial.port.file", port.substring(5));
-    else
-      PreferencesData.set("serial.port.file", port);
+    String portFile = port;
+    if (port.startsWith("/dev/")) {
+      portFile = portFile.substring(5);
+    }
+    PreferencesData.set("serial.port.file", portFile);
   }
 
   public static void setBuildFolder(File newBuildFolder) {

@@ -15,7 +15,7 @@
  Created 18 September 2012
  by Scott Fitzgerald
 
- http://arduino.cc/starterKit
+ http://www.arduino.cc/starterKit
 
  This example code is part of the public domain
  */
@@ -55,7 +55,7 @@ void loop() {
  colorMode(HSB, 255);
 
  // load the Arduino logo into the PImage instance
- logo = loadImage("http://arduino.cc/en/pub/skins/arduinoWide/img/logo.png");
+ logo = loadImage("http://www.arduino.cc/en/pub/skins/arduinoWide/img/logo.png");
 
  // make the window the same size as the image
  size(logo.width, logo.height);

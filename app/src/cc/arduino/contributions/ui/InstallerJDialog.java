@@ -26,9 +26,9 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.ui;
 
-import cc.arduino.contributions.packages.ui.ContributionIndexTableModel;
 import cc.arduino.contributions.ui.listeners.AbstractKeyListener;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -44,7 +44,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import static cc.arduino.contributions.packages.ui.ContributionIndexTableModel.DESCRIPTION_COL;
 import static processing.app.I18n._;
@@ -65,9 +64,11 @@ public abstract class InstallerJDialog<T> extends JDialog {
   // Real contribution table
   protected JTable contribTable;
   // Model behind the table
-  protected FilteredAbstractTableModel<T> contribModel;
+  protected final FilteredAbstractTableModel<T> contribModel;
+  private final JButton closeButton;
+  private final JButton dismissErrorMessageButton;
 
-  abstract protected FilteredAbstractTableModel createContribModel();
+  abstract protected FilteredAbstractTableModel<T> createContribModel();
 
   abstract protected InstallerTableCell createCellRenderer();
 
@@ -76,8 +77,8 @@ public abstract class InstallerJDialog<T> extends JDialog {
   // Bottom:
   // - Progress bar
   protected final ProgressJProgressBar progressBar;
-  protected final Box progressBox;
-  protected final Box errorMessageBox;
+  private final Box progressBox;
+  private final Box errorMessageBox;
   private final JLabel errorMessage;
 
   public InstallerJDialog(Frame parent, String title, ModalityType applicationModal, String noConnectionErrorMessage) {
@@ -184,11 +185,20 @@ public abstract class InstallerJDialog<T> extends JDialog {
       progressBox.add(Box.createHorizontalStrut(5));
       progressBox.add(cancelButton);
 
-      JButton dismissErrorMessageButton = new JButton(_("OK"));
+      dismissErrorMessageButton = new JButton(_("OK"));
       dismissErrorMessageButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent arg0) {
           clearErrorMessage();
+          setErrorMessageVisible(false);
+        }
+      });
+
+      closeButton = new JButton(_("Close"));
+      closeButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+          InstallerJDialog.this.dispatchEvent(new WindowEvent(InstallerJDialog.this, WindowEvent.WINDOW_CLOSING));
         }
       });
 
@@ -197,12 +207,13 @@ public abstract class InstallerJDialog<T> extends JDialog {
       errorMessageBox.add(errorMessage);
       errorMessageBox.add(Box.createHorizontalGlue());
       errorMessageBox.add(dismissErrorMessageButton);
+      errorMessageBox.add(closeButton);
       errorMessageBox.setVisible(false);
     }
 
     {
       JPanel progressPanel = new JPanel();
-      progressPanel.setBorder(new EmptyBorder(7, 7, 7, 7));
+      progressPanel.setBorder(new EmptyBorder(7, 10, 7, 10));
       progressPanel.setLayout(new BoxLayout(progressPanel, BoxLayout.Y_AXIS));
       progressPanel.add(progressBox);
       progressPanel.add(errorMessageBox);
@@ -236,12 +247,12 @@ public abstract class InstallerJDialog<T> extends JDialog {
 
   public void setErrorMessage(String message) {
     errorMessage.setText("<html><body>" + message + "</body></html>");
-    errorMessageBox.setVisible(true);
+    setErrorMessageVisible(true);
   }
 
   public void clearErrorMessage() {
     errorMessage.setText("");
-    errorMessageBox.setVisible(false);
+    setErrorMessageVisible(false);
   }
 
   public void setProgressVisible(boolean visible, String status) {
@@ -250,16 +261,23 @@ public abstract class InstallerJDialog<T> extends JDialog {
     } else {
       setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
+    errorMessageBox.setVisible(!visible);
     progressBox.setVisible(visible);
 
     filterField.setEnabled(!visible);
     categoryChooser.setEnabled(!visible);
     contribTable.setEnabled(!visible);
-    errorMessageBox.setVisible(false);
     if (contribTable.getCellEditor() != null) {
       ((InstallerTableCell) contribTable.getCellEditor()).setEnabled(!visible);
       ((InstallerTableCell) contribTable.getCellEditor()).setStatus(status);
     }
+  }
+
+  private void setErrorMessageVisible(boolean visible) {
+    errorMessage.setVisible(visible);
+    dismissErrorMessageButton.setVisible(visible);
+    closeButton.setVisible(!visible);
+    errorMessageBox.setVisible(true);
   }
 
   protected final ActionListener categoryChooserActionListener = new ActionListener() {

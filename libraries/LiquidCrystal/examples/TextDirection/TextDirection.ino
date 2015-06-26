@@ -32,7 +32,7 @@ by Tom Igoe
 
 This example code is in the public domain.
 
-http://arduino.cc/en/Tutorial/LiquidCrystalTextDirection
+http://www.arduino.cc/en/Tutorial/LiquidCrystalTextDirection
 
 */
 

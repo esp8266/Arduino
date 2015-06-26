@@ -69,6 +69,8 @@ class Stream: public Print {
         }
         // returns true if target string is found, false if timed out
 
+        bool find(char target) { return find (&target, 1); }
+
         bool findUntil(const char *target, const char *terminator);   // as find but search ends if the terminator string is found
         bool findUntil(const uint8_t *target, const char *terminator) {
             return findUntil((char *) target, terminator);

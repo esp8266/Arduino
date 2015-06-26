@@ -10,7 +10,7 @@
 
  Created 15 April 2013 by Scott Fitzgerald
 
- http://arduino.cc/en/Tutorial/TFTGraph
+ http://www.arduino.cc/en/Tutorial/TFTGraph
 
  */
 

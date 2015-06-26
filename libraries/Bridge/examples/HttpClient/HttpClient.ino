@@ -11,7 +11,7 @@
 
  This example code is in the public domain.
 
- http://arduino.cc/en/Tutorial/HttpClient
+ http://www.arduino.cc/en/Tutorial/HttpClient
 
  */
 
@@ -37,7 +37,7 @@ void loop() {
   HttpClient client;
 
   // Make a HTTP request:
-  client.get("http://arduino.cc/asciilogo.txt");
+  client.get("http://www.arduino.cc/asciilogo.txt");
 
   // if there are incoming bytes available
   // from the server, read them and print them:

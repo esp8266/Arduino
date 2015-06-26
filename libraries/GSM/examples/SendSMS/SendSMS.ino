@@ -17,7 +17,7 @@
 
  This example is in the public domain.
 
- http://arduino.cc/en/Tutorial/GSMExamplesSendSMS
+ http://www.arduino.cc/en/Tutorial/GSMExamplesSendSMS
 
  */
 

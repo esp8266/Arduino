@@ -3,7 +3,7 @@
 The SD library allows for reading from and writing to SD cards.
 
 For more information about this library please visit us at
-http://arduino.cc/en/Reference/SD
+http://www.arduino.cc/en/Reference/SD
 
 == License ==
 

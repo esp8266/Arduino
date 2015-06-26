@@ -15,7 +15,7 @@
 
  Created 19 April 2013 by Enrico Gueli
 
- http://arduino.cc/en/Tutorial/TFTBitmapLogo
+ http://www.arduino.cc/en/Tutorial/TFTBitmapLogo
 
  */
 

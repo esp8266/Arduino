@@ -26,6 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.utils;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -35,6 +36,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.I18n;
 import processing.app.Platform;
 
@@ -258,9 +260,7 @@ public class ArchiveExtractor {
       }
 
     } finally {
-      if (in != null) {
-        in.close();
-      }
+      IOUtils.closeQuietly(in);
     }
 
     // Set folders timestamps
@@ -294,9 +294,7 @@ public class ArchiveExtractor {
         size -= length;
       }
     } finally {
-      if (fos != null) {
-        fos.close();
-      }
+      IOUtils.closeQuietly(fos);
     }
   }
 

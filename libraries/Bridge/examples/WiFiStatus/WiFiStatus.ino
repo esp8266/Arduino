@@ -14,7 +14,7 @@
 
  This example code is in the public domain.
 
- http://arduino.cc/en/Tutorial/YunWiFiStatus
+ http://www.arduino.cc/en/Tutorial/YunWiFiStatus
 
  */
 

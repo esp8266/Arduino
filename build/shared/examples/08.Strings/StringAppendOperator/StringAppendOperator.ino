@@ -7,7 +7,7 @@
  modified 2 Apr 2012
  by Tom Igoe
 
- http://arduino.cc/en/Tutorial/StringAppendOperator
+ http://www.arduino.cc/en/Tutorial/StringAppendOperator
 
  This example code is in the public domain.
  */

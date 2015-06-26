@@ -13,7 +13,7 @@ hardware/arduino/bootloaders/caterina_LUFA/Caterina.lss
 hardware/arduino/bootloaders/caterina_LUFA/Caterina.elf
 hardware/arduino/bootloaders/caterina_LUFA/Caterina.eep
 hardware/arduino/bootloaders/caterina_LUFA/.dep/
-build/libastylej-*.zip
+build/*.zip
 build/windows/work/
 build/windows/*.zip
 build/windows/*.tgz
@@ -56,6 +56,9 @@ avr-toolchain-*.zip
 /hardware/tools/esp8266/utils/
 /hardware/tools/esp8266/xtensa-lx106-elf
 /hardware/tools/esp8266/esptool.exe
+/hardware/esp8266com/esp8266/tools/xtensa*
+/hardware/esp8266com/esp8266/tools/esptool*
+/hardware/esp8266com/esp8266/tools/utils
 /hardware/tools/avr/
 /hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/
 /hardware/tools/bossac.exe

@@ -50,12 +50,13 @@ public abstract class AbstractGUITest {
 
     FailOnThreadViolationRepaintManager.install();
 
-    Base.initPlatform();
-    Preferences.init(null);
+    BaseNoGui.initPlatform();
+    BaseNoGui.getPlatform().init();
+    PreferencesData.init(null);
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     Theme.init();
-    Base.getPlatform().setLookAndFeel();
-    Base.untitledFolder = Base.createTempFolder("untitled");
+    BaseNoGui.getPlatform().setLookAndFeel();
+    Base.untitledFolder = BaseNoGui.createTempFolder("untitled");
     DeleteFilesOnShutdown.add(Base.untitledFolder);
 
     window = GuiActionRunner.execute(new GuiQuery<ArduinoFrameFixture>() {

@@ -3,7 +3,7 @@
 With the Arduino WiFi Shield, this library allows an Arduino board to connect to the internet.
 
 For more information about this library please visit us at
-http://arduino.cc/en/Reference/WiFi
+http://www.arduino.cc/en/Reference/WiFi
 
 == License ==
 

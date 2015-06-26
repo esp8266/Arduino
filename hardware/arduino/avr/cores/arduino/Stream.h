@@ -64,6 +64,8 @@ class Stream : public Print
   bool find(uint8_t *target, size_t length) { return find ((char *)target, length); }
   // returns true if target string is found, false if timed out
 
+  bool find(char target) { return find (&target, 1); }
+
   bool findUntil(char *target, char *terminator);   // as find but search ends if the terminator string is found
   bool findUntil(uint8_t *target, char *terminator) { return findUntil((char *)target, terminator); }
 
