@@ -14,9 +14,10 @@ using Eclipse with Arduino ESP8266
 - [step 2](http://www.baeyens.it/eclipse/how_to.shtml#/e)
 - go to Window --> preferences --> Arduino
 - add as private hardware path the Part to the ESP8266 
-	example:
-	Windows: C:\Users\username\AppData\Roaming\Arduino15\packages\esp8266\hardware\esp8266
-	Linux: /home/[user name]/.arduino15/packages/esp8266/hardware
+
+###### example private hardware path
+	Windows: C:\Users\[username]\AppData\Roaming\Arduino15\packages\esp8266\hardware
+	Linux: /home/[username]/.arduino15/packages/esp8266/hardware
 
 ### Eclipse wont build ###
 if eclipse dont find the path to the Compiler add to the platform.txt 
