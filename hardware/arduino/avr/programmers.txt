@@ -51,3 +51,28 @@ usbGemma.program.tool=avrdude
 usbGemma.program.extra_params=
 usbGemma.config.path={runtime.platform.path}/bootloaders/gemma/avrdude.conf
 
+# STK500 firmware version v1 and v2 use different serial protocols.
+# Using the 'stk500' protocol tells avrdude to try and autodetect the
+# firmware version. If this leads to problems, we might need to add
+# stk500v1 and stk500v2 entries to allow explicitely selecting the
+# firmware version.
+stk500.name=Atmel STK500 development board
+stk500.communication=serial
+stk500.protocol=stk500
+stk500.program.protocol=stk500
+stk500.program.tool=avrdude
+stk500.program.extra_params=-P{serial.port}
+
+## Notes about Dangerous Prototypes Bus Pirate as ISP
+## Bus Pirate V3 need Firmware v5.10 or later
+## Bus Pirate V4 need Firmware v6.3-r2151 or later
+## Could happen that BP does not have enough current to power an Arduino board 
+## through the ICSP connector. In this case disconnect the +Vcc from ICSP connector
+## and power Arduino board in the normal way.
+buspirate.name=BusPirate as ISP
+buspirate.communication=serial
+buspirate.protocol=buspirate
+buspirate.program.protocol=buspirate
+buspirate.program.tool=avrdude
+buspirate.program.extra_params=-P{serial.port}
+

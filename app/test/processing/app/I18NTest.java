@@ -29,6 +29,7 @@
 
 package processing.app;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -63,9 +64,7 @@ public class I18NTest {
       is = new FileInputStream(file);
       properties.load(is);
     } finally {
-      if (is != null) {
-        is.close();
-      }
+      IOUtils.closeQuietly(is);
     }
     return properties;
   }

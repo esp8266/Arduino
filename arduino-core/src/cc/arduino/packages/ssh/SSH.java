@@ -33,6 +33,7 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import org.apache.commons.compress.utils.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,12 +71,8 @@ public class SSH {
       return exitCode == 0;
 
     } finally {
-      if (stdout != null) {
-        stdout.close();
-      }
-      if (stderr != null) {
-        stderr.close();
-      }
+      IOUtils.closeQuietly(stdout);
+      IOUtils.closeQuietly(stderr);
       if (channel != null) {
         channel.disconnect();
       }

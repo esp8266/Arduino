@@ -20,7 +20,7 @@
  Updated 8 March 2014
  by Scott Fitzgerald
  
- http://arduino.cc/en/Reference/EsploraReadJoystickSwitch
+ http://www.arduino.cc/en/Reference/EsploraReadJoystickSwitch
 
  This example is in the public domain.
  */

@@ -33,6 +33,7 @@ import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Discovery;
 import cc.arduino.packages.discoverers.network.BoardReachabilityFilter;
 import cc.arduino.packages.discoverers.network.NetworkChecker;
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.BaseNoGui;
 import processing.app.helpers.PreferencesMap;
 import processing.app.zeroconf.jmdns.ArduinoDNSTaskStarter;
@@ -199,12 +200,6 @@ public class NetworkDiscovery implements Discovery, ServiceListener, cc.arduino.
   @Override
   public void inetAddressRemoved(InetAddress address) {
     JmDNS jmDNS = mappedJmDNSs.remove(address);
-    if (jmDNS != null) {
-      try {
-        jmDNS.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
+    IOUtils.closeQuietly(jmDNS);
   }
 }

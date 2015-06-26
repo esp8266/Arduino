@@ -26,8 +26,10 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
+
 package cc.arduino.contributions.packages;
 
+import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
 import cc.arduino.contributions.GPGDetachedSignatureVerifier;
 import cc.arduino.contributions.SignatureVerificationFailedException;
@@ -37,14 +39,19 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.BaseNoGui;
+import processing.app.Platform;
 import processing.app.debug.TargetPackage;
 import processing.app.debug.TargetPlatform;
 import processing.app.debug.TargetPlatformException;
+import processing.app.helpers.FileUtils;
 import processing.app.helpers.PreferencesMap;
 
 import java.io.File;
@@ -60,10 +67,12 @@ public class ContributionsIndexer {
   private final File packagesFolder;
   private final File stagingFolder;
   private final File preferencesFolder;
+  private final Platform platform;
   private ContributionsIndex index;
 
-  public ContributionsIndexer(File preferencesFolder) {
+  public ContributionsIndexer(File preferencesFolder, Platform platform) {
     this.preferencesFolder = preferencesFolder;
+    this.platform = platform;
     packagesFolder = new File(preferencesFolder, "packages");
     stagingFolder = new File(preferencesFolder, "staging" + File.separator + "packages");
   }
@@ -83,13 +92,20 @@ public class ContributionsIndexer {
     }
 
     List<ContributedPackage> packages = index.getPackages();
+    Collection<ContributedPackage> packagesWithTools = Collections2.filter(packages, new Predicate<ContributedPackage>() {
+      @Override
+      public boolean apply(ContributedPackage input) {
+        return input.getTools() != null;
+      }
+    });
+
     for (ContributedPackage pack : packages) {
       for (ContributedPlatform platform : pack.getPlatforms()) {
         // Set a reference to parent packages
         platform.setParentPackage(pack);
 
         // Resolve tools dependencies (works also as a check for file integrity)
-        platform.resolveToolsDependencies(packages);
+        platform.resolveToolsDependencies(packagesWithTools);
       }
     }
 
@@ -168,9 +184,7 @@ public class ContributionsIndexer {
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       return mapper.readValue(inputStream, ContributionsIndex.class);
     } finally {
-      if (inputStream != null) {
-        inputStream.close();
-      }
+      IOUtils.closeQuietly(inputStream);
     }
   }
 
@@ -263,7 +277,7 @@ public class ContributionsIndexer {
     if (tool == null) {
       return;
     }
-    DownloadableContribution contrib = tool.getDownloadableContribution();
+    DownloadableContribution contrib = tool.getDownloadableContribution(platform);
     if (contrib == null) {
       System.err.println(tool + " seems to have no downloadable contributions for your operating system, but it is installed in\n" + installationFolder);
       return;
@@ -287,7 +301,7 @@ public class ContributionsIndexer {
     return index.toString();
   }
 
-  public List<TargetPackage> createTargetPackages() throws TargetPlatformException {
+  public List<TargetPackage> createTargetPackages() {
     List<TargetPackage> packages = new ArrayList<TargetPackage>();
 
     if (index == null) {
@@ -304,9 +318,13 @@ public class ContributionsIndexer {
         String arch = platform.getArchitecture();
         File folder = platform.getInstalledFolder();
 
-        TargetPlatform targetPlatform = new ContributedTargetPlatform(arch, folder, targetPackage, index);
-        if (!targetPackage.hasPlatform(targetPlatform)) {
-          targetPackage.addPlatform(targetPlatform);
+        try {
+          TargetPlatform targetPlatform = new ContributedTargetPlatform(arch, folder, targetPackage, index);
+          if (!targetPackage.hasPlatform(targetPlatform)) {
+            targetPackage.addPlatform(targetPlatform);
+          }
+        } catch (TargetPlatformException e) {
+          System.err.println(e.getMessage());
         }
       }
 
@@ -314,6 +332,15 @@ public class ContributionsIndexer {
         packages.add(targetPackage);
       }
     }
+
+    Collections.sort(packages, new Comparator<TargetPackage>() {
+      @Override
+      public int compare(TargetPackage p1, TargetPackage p2) {
+        assert p1.getId() != null && p2.getId() != null;
+        return p1.getId().toLowerCase().compareTo(p2.getId().toLowerCase());
+      }
+    });
+
     return packages;
   }
 
@@ -398,6 +425,29 @@ public class ContributionsIndexer {
     if (index == null) {
       return null;
     }
-    return index.getInstalled(packageName, platformArch);
+    return index.getInstalledPlatform(packageName, platformArch);
+  }
+
+  public List<ContributedPlatform> getInstalledPlatforms() {
+    if (index == null) {
+      return new LinkedList<ContributedPlatform>();
+    }
+    return index.getInstalledPlatforms();
+  }
+
+  public boolean isFolderInsidePlatform(final File folder) {
+    return getPlatformByFolder(folder) != null;
+  }
+
+  public ContributedPlatform getPlatformByFolder(final File folder) {
+    com.google.common.base.Optional<ContributedPlatform> platformOptional = Iterables.tryFind(getInstalledPlatforms(), new Predicate<ContributedPlatform>() {
+      @Override
+      public boolean apply(ContributedPlatform contributedPlatform) {
+        assert contributedPlatform.getInstalledFolder() != null;
+        return FileUtils.isSubDirectory(contributedPlatform.getInstalledFolder(), folder);
+      }
+    });
+
+    return platformOptional.orNull();
   }
 }

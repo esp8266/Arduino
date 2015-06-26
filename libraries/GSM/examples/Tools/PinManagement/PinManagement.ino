@@ -12,7 +12,7 @@
 
  This example code is part of the public domain
 
- http://arduino.cc/en/Tutorial/GSMToolsPinManagement
+ http://www.arduino.cc/en/Tutorial/GSMToolsPinManagement
 
  */
 

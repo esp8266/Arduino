@@ -135,7 +135,7 @@ class OneWire
 #endif
 
   public:
-    OneWire( uint8_t pin);
+    OneWire(uint8_t pin, bool pullup = true);
 
     // Perform a 1-Wire reset cycle. Returns 1 if a device responds
     // with a presence pulse.  Returns 0 if there is no device or the

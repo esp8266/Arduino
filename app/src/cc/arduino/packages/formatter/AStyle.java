@@ -32,6 +32,7 @@
 package cc.arduino.packages.formatter;
 
 import processing.app.Base;
+import processing.app.BaseNoGui;
 import processing.app.Editor;
 import processing.app.helpers.FileUtils;
 import processing.app.syntax.SketchTextArea;
@@ -53,7 +54,7 @@ public class AStyle implements Tool {
 
   public AStyle() {
     this.aStyleInterface = new AStyleInterface();
-    File customFormatterConf = Base.getSettingsFile(FORMATTER_CONF);
+    File customFormatterConf = BaseNoGui.getSettingsFile(FORMATTER_CONF);
     File defaultFormatterConf = new File(Base.getContentFile("lib"), FORMATTER_CONF);
 
     File formatterConf;

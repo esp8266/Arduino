@@ -29,7 +29,7 @@
 
 package cc.arduino.contributions.filters;
 
-import cc.arduino.contributions.packages.DownloadableContribution;
+import cc.arduino.contributions.DownloadableContribution;
 import com.google.common.base.Predicate;
 
 public class DownloadableContributionWithVersionPredicate implements Predicate<DownloadableContribution> {

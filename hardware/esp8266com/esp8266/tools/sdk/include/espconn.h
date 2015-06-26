@@ -23,6 +23,9 @@ typedef void (* espconn_reconnect_callback)(void *arg, sint8 err);
 #define ESPCONN_ARG        -12   /* Illegal argument.        */
 #define ESPCONN_ISCONN     -15   /* Already connected.       */
 
+#define ESPCONN_HANDSHAKE  -28   /* ssl handshake failed	 */
+#define ESPCONN_PROTO_MSG  -61   /* ssl application invalid	 */
+
 /** Protocol family and type of the espconn */
 enum espconn_type {
     ESPCONN_INVALID    = 0,
@@ -454,6 +457,28 @@ bool espconn_secure_set_size(uint8 level, uint16 size);
 *******************************************************************************/
 
 sint16 espconn_secure_get_size(uint8 level);
+
+/******************************************************************************
+ * FunctionName : espconn_secure_ca_enable
+ * Description  : enable the certificate authenticate and set the flash sector
+ * 				  as client or server
+ * Parameters   : level -- set for client or server
+ *				  1: client,2:server,3:client and server
+ *				  flash_sector -- flash sector for save certificate
+ * Returns      : result true or false
+*******************************************************************************/
+
+bool espconn_secure_ca_enable(uint8 level, uint8 flash_sector );
+
+/******************************************************************************
+ * FunctionName : espconn_secure_ca_disable
+ * Description  : disable the certificate authenticate  as client or server
+ * Parameters   : level -- set for client or server
+ *				  1: client,2:server,3:client and server
+ * Returns      : result true or false
+*******************************************************************************/
+
+bool espconn_secure_ca_disable(uint8 level);
 
 /******************************************************************************
  * FunctionName : espconn_secure_accept

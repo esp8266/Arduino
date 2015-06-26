@@ -18,7 +18,7 @@
 
  This example code is part of the public domain
 
- http://arduino.cc/en/Tutorial/Bridge
+ http://www.arduino.cc/en/Tutorial/Bridge
 
  */
 

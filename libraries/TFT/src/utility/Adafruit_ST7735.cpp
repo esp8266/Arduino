@@ -73,6 +73,9 @@ inline void Adafruit_ST7735::spiwrite(uint8_t c) {
 
 
 void Adafruit_ST7735::writecommand(uint8_t c) {
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.beginTransaction(spisettings);
+#endif
   *rsport &= ~rspinmask;
   *csport &= ~cspinmask;
 
@@ -80,10 +83,16 @@ void Adafruit_ST7735::writecommand(uint8_t c) {
   spiwrite(c);
 
   *csport |= cspinmask;
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.endTransaction();
+#endif
 }
 
 
 void Adafruit_ST7735::writedata(uint8_t c) {
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.beginTransaction(spisettings);
+#endif
   *rsport |=  rspinmask;
   *csport &= ~cspinmask;
     
@@ -91,7 +100,10 @@ void Adafruit_ST7735::writedata(uint8_t c) {
   spiwrite(c);
 
   *csport |= cspinmask;
-} 
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.endTransaction();
+#endif
+}
 
 
 // Rather than a bazillion writecommand() and writedata() calls, screen
@@ -331,6 +343,9 @@ void Adafruit_ST7735::commonInit(const uint8_t *cmdList) {
 
   if(hwSPI) { // Using hardware SPI
     SPI.begin();
+#ifdef SPI_HAS_TRANSACTION
+    spisettings = SPISettings(4000000L, MSBFIRST, SPI_MODE0);
+#else
 #if defined(ARDUINO_ARCH_SAM)
     SPI.setClockDivider(24); // 4 MHz (half speed)
 #else
@@ -338,6 +353,7 @@ void Adafruit_ST7735::commonInit(const uint8_t *cmdList) {
 #endif
     SPI.setBitOrder(MSBFIRST);
     SPI.setDataMode(SPI_MODE0);
+#endif // SPI_HAS_TRANSACTION
   } else {
     pinMode(_sclk, OUTPUT);
     pinMode(_sid , OUTPUT);
@@ -413,6 +429,9 @@ void Adafruit_ST7735::setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1,
 
 
 void Adafruit_ST7735::pushColor(uint16_t color) {
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.beginTransaction(spisettings);
+#endif
   *rsport |=  rspinmask;
   *csport &= ~cspinmask;
 
@@ -421,6 +440,9 @@ void Adafruit_ST7735::pushColor(uint16_t color) {
   spiwrite(color);
 
   *csport |= cspinmask;
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.endTransaction();
+#endif
 }
 
 void Adafruit_ST7735::drawPixel(int16_t x, int16_t y, uint16_t color) {
@@ -429,6 +451,9 @@ void Adafruit_ST7735::drawPixel(int16_t x, int16_t y, uint16_t color) {
 
   setAddrWindow(x,y,x+1,y+1);
 
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.beginTransaction(spisettings);
+#endif
   *rsport |=  rspinmask;
   *csport &= ~cspinmask;
 
@@ -438,6 +463,9 @@ void Adafruit_ST7735::drawPixel(int16_t x, int16_t y, uint16_t color) {
   spiwrite(color);
 
   *csport |= cspinmask;
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.endTransaction();
+#endif
 }
 
 
@@ -452,6 +480,9 @@ void Adafruit_ST7735::drawFastVLine(int16_t x, int16_t y, int16_t h,
   if (tabcolor == INITR_BLACKTAB)   color = swapcolor(color);
 
   uint8_t hi = color >> 8, lo = color;
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.beginTransaction(spisettings);
+#endif
   *rsport |=  rspinmask;
   *csport &= ~cspinmask;
   while (h--) {
@@ -459,6 +490,9 @@ void Adafruit_ST7735::drawFastVLine(int16_t x, int16_t y, int16_t h,
     spiwrite(lo);
   }
   *csport |= cspinmask;
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.endTransaction();
+#endif
 }
 
 
@@ -473,6 +507,9 @@ void Adafruit_ST7735::drawFastHLine(int16_t x, int16_t y, int16_t w,
   if (tabcolor == INITR_BLACKTAB)   color = swapcolor(color);
 
   uint8_t hi = color >> 8, lo = color;
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.beginTransaction(spisettings);
+#endif
   *rsport |=  rspinmask;
   *csport &= ~cspinmask;
   while (w--) {
@@ -480,6 +517,9 @@ void Adafruit_ST7735::drawFastHLine(int16_t x, int16_t y, int16_t w,
     spiwrite(lo);
   }
   *csport |= cspinmask;
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.endTransaction();
+#endif
 }
 
 
@@ -504,6 +544,9 @@ void Adafruit_ST7735::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
   setAddrWindow(x, y, x+w-1, y+h-1);
 
   uint8_t hi = color >> 8, lo = color;
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.beginTransaction(spisettings);
+#endif
   *rsport |=  rspinmask;
   *csport &= ~cspinmask;
   for(y=h; y>0; y--) {
@@ -514,6 +557,9 @@ void Adafruit_ST7735::fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
   }
 
   *csport |= cspinmask;
+#ifdef SPI_HAS_TRANSACTION
+  if (hwSPI) SPI.endTransaction();
+#endif
 }
 
 

@@ -12,7 +12,7 @@ The TFT library relies on the SPI library for communication with the screen and 
 
 https://github.com/adafruit/Adafruit-GFX-Library
 https://github.com/adafruit/Adafruit-ST7735-Library
-http://arduino.cc/en/Reference/SD
-http://arduino.cc/en/Reference/SPI
+http://www.arduino.cc/en/Reference/SD
+http://www.arduino.cc/en/Reference/SPI
 
-http://arduino.cc/en/Reference/TFTLibrary
+http://www.arduino.cc/en/Reference/TFTLibrary

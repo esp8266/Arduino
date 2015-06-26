@@ -1,0 +1,24 @@
+203c203
+< #define USB_CFG_VENDOR_ID		0x81, 0x17 /* = 0x16c0 = 5824 = voti.nl */
+---
+> #define USB_CFG_VENDOR_ID		0x41, 0x23 /* = 0x16c0 = 5824 = voti.nl */
+208c208
+< #define USB_CFG_DEVICE_ID		0x9F, 0x0C /* = 0x05dc = 1500 */
+---
+> #define USB_CFG_DEVICE_ID		0x9F, 0x0c /* = 0x05dc = 1500 */
+215c215
+< #define USB_CFG_DEVICE_VERSION	0x05, 0x01
+---
+> #define USB_CFG_DEVICE_VERSION	0x00, 0x01
+218,219c218,219
+< #define USB_CFG_VENDOR_NAME 'A','d','a','f','r','u','i','t'
+< #define USB_CFG_VENDOR_NAME_LEN 8
+---
+> #define USB_CFG_VENDOR_NAME 'A','r','d','u','i','n','o','.','c','c'
+> #define USB_CFG_VENDOR_NAME_LEN 10
+228,229c228,229
+< #define USB_CFG_DEVICE_NAME 'T','r','i','n','k','e','t'
+< #define USB_CFG_DEVICE_NAME_LEN 7
+---
+> #define USB_CFG_DEVICE_NAME 'G','e','m','m','a'
+> #define USB_CFG_DEVICE_NAME_LEN 5

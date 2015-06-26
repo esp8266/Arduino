@@ -3,7 +3,7 @@
 This library enables an Arduino board to communicate with the Arduino TFT LCD screen. It simplifies the process for drawing shapes, lines, images, and text to the screen. 
 
 For more information about this library please visit us at
-http://arduino.cc/en/Reference/TFTLibrary
+http://www.arduino.cc/en/Reference/TFTLibrary
 
 == License ==
 

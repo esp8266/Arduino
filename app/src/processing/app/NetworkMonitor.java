@@ -26,18 +26,13 @@ public class NetworkMonitor extends AbstractMonitor implements MessageConsumer {
 
   private static final int MAX_CONNECTION_ATTEMPTS = 5;
 
-  private final BoardPort port;
-  private final String ipAddress;
-
   private MessageSiphon inputConsumer;
   private Session session;
   private Channel channel;
   private int connectionAttempts;
 
   public NetworkMonitor(BoardPort port) {
-    super(port.getLabel());
-    this.port = port;
-    this.ipAddress = port.getAddress();
+    super(port);
 
     onSendCommand(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
@@ -61,16 +56,17 @@ public class NetworkMonitor extends AbstractMonitor implements MessageConsumer {
 
   @Override
   public String getAuthorizationKey() {
-    return "runtime.pwd." + ipAddress;
+    return "runtime.pwd." + getBoardPort().getAddress();
   }
 
   @Override
   public void open() throws Exception {
+    super.open();
     this.connectionAttempts = 0;
 
     JSch jSch = new JSch();
     SSHClientSetupChainRing sshClientSetupChain = new SSHConfigFileSetup(new SSHPwdSetup());
-    session = sshClientSetupChain.setup(port, jSch);
+    session = sshClientSetupChain.setup(getBoardPort(), jSch);
 
     session.setUserInfo(new NoInteractionUserInfo(PreferencesData.get(getAuthorizationKey())));
     session.connect(30000);
@@ -156,6 +152,8 @@ public class NetworkMonitor extends AbstractMonitor implements MessageConsumer {
 
   @Override
   public void close() throws Exception {
+    super.close();
+
     if (channel != null) {
       inputConsumer.stop();
       channel.disconnect();

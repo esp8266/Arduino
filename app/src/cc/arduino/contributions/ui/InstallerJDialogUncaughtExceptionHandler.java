@@ -29,8 +29,6 @@
 
 package cc.arduino.contributions.ui;
 
-import cc.arduino.contributions.ui.InstallerJDialog;
-
 import javax.swing.*;
 
 import static processing.app.I18n._;

@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.compress.utils.IOUtils;
 import processing.app.*;
 import static processing.app.I18n._;
 
@@ -83,16 +84,19 @@ public class FixEncoding implements Tool {
 
   protected String loadWithLocalEncoding(File file) throws IOException {
     // FileReader uses the default encoding, which is what we want.
-    FileReader fr = new FileReader(file);
-    BufferedReader reader = new BufferedReader(fr);
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader(file));
 
-    StringBuffer buffer = new StringBuffer();
-    String line = null;
-    while ((line = reader.readLine()) != null) {
-      buffer.append(line);
-      buffer.append('\n');
+      StringBuffer buffer = new StringBuffer();
+      String line;
+      while ((line = reader.readLine()) != null) {
+        buffer.append(line);
+        buffer.append('\n');
+      }
+      return buffer.toString();
+    } finally {
+      IOUtils.closeQuietly(reader);
     }
-    reader.close();
-    return buffer.toString();
   }
 }

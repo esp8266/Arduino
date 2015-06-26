@@ -21,7 +21,7 @@
  by Scott Fitzgerald
  Thanks to Federico Vanzati for improvements
 
- http://arduino.cc/starterKit
+ http://www.arduino.cc/starterKit
 
  This example code is part of the public domain
  */
@@ -140,6 +140,8 @@ void loop() {
       digitalWrite(greenLed, HIGH);
       digitalWrite(redLed, LOW);
       Serial.println("the box is unlocked!");
+
+      numberOfKnocks = 0;
     }
   }
 }

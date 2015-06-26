@@ -3,7 +3,7 @@
 This library allows an Arduino board to control RC (hobby) servo motors.
 
 For more information about this library please visit us at
-http://arduino.cc/en/Reference/Servo
+http://www.arduino.cc/en/Reference/Servo
 
 == License ==
 

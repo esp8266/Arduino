@@ -1,3 +1,35 @@
+esp_iot_sdk_v1.1.2_15_06_16_p1 Release Note 
+-------------------------------------------
+Here is a patch based on SDK_v1.1.2 resolved issue that "wifi_station_scan" cause loss of wireless connectivity.
+
+Please replace them in esp_iot_sdk/lib folder.
+
+Sorry for the inconvenience.
+
+
+
+
+esp_iot_sdk_v1.1.2_15_06_12 Release Note 
+-------------------------------------------
+
+Optimization:
+1. support certificate issuer verification for SSL
+2. Update SPI driver, support overlap mode
+
+Add APIs:
+1. wifi_station_set_hostname : set ESP8266 station DHCP hostname
+2. wifi_station_get_hostname : get ESP8266 station DHCP hostname
+3. spi_flash_set_read_func ：set user specified reading SPI function on overlap mode
+4. espconn_secure_ca_disable : disable SSL CA verify
+5. espconn_secure_ca_enable : enable SSL CA verify
+
+Add Documentation:
+1. SPI overlap introduction: \esp_iot_sdk\document, sorry that it has only Chinese version now，we will add English version of this documentation ASAP.
+2. SSL introduction: \esp_iot_sdk\document
+
+
+
+
 esp_iot_sdk_v1.1.1_15_06_05 Release Note 
 -------------------------------------------
 

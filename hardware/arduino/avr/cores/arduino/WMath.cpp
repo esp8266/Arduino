@@ -27,7 +27,7 @@ extern "C" {
   #include "stdlib.h"
 }
 
-void randomSeed(unsigned int seed)
+void randomSeed(unsigned long seed)
 {
   if (seed != 0) {
     srandom(seed);

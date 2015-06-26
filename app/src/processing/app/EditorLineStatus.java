@@ -91,7 +91,7 @@ public class EditorLineStatus extends JComponent {
 
   public void paintComponent(Graphics g) {
     if (name == "" && serialport == "") {
-      PreferencesMap boardPreferences = Base.getBoardPreferences();
+      PreferencesMap boardPreferences = BaseNoGui.getBoardPreferences();
       if (boardPreferences != null)
         setBoardName(boardPreferences.get("name"));
       else

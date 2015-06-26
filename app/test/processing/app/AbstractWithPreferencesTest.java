@@ -37,14 +37,14 @@ public abstract class AbstractWithPreferencesTest {
   @Before
   public void init() throws Exception {
     Runtime.getRuntime().addShutdownHook(new Thread(DeleteFilesOnShutdown.INSTANCE));
-    Base.initPlatform();
-    Base.getPlatform().init();
-    Preferences.init(null);
+    BaseNoGui.initPlatform();
+    BaseNoGui.getPlatform().init();
+    PreferencesData.init(null);
     Theme.init();
 
     BaseNoGui.initPackages();
 
-    Base.untitledFolder = Base.createTempFolder("untitled");
+    Base.untitledFolder = BaseNoGui.createTempFolder("untitled");
     DeleteFilesOnShutdown.add(Base.untitledFolder);
   }
 
