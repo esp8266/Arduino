@@ -60,6 +60,10 @@
 #define SERIAL_7O2 0x3b
 #define SERIAL_8O2 0x3f
 
+#define SERIAL_FULL     0
+#define SERIAL_RX_ONLY  1
+#define SERIAL_TX_ONLY  2
+
 class cbuf;
 
 struct uart_;
@@ -70,9 +74,12 @@ class HardwareSerial: public Stream {
         HardwareSerial(int uart_nr);
 
         void begin(unsigned long baud) {
-            begin(baud, SERIAL_8N1);
+            begin(baud, SERIAL_8N1, SERIAL_FULL);
         }
-        void begin(unsigned long, uint8_t);
+        void begin(unsigned long baud, uint8_t config) {
+            begin(baud, config, SERIAL_FULL);
+        }
+        void begin(unsigned long, uint8_t, uint8_t);
         void end();
         void swap();  //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO1 as RX and TX
         int available(void) override;

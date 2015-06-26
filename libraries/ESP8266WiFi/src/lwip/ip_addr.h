@@ -41,9 +41,11 @@ extern "C" {
 
 /* This is the aligned version of ip_addr_t,
    used as local variable, on the stack, etc. */
+#if !defined(IP2STR)
 struct ip_addr {
   u32_t addr;
 };
+#endif
 
 /* This is the packed version of ip_addr_t,
    used in network headers that are itself packed */
@@ -61,7 +63,9 @@ PACK_STRUCT_END
 
 /** ip_addr_t uses a struct for convenience only, so that the same defines can
  * operate both on ip_addr_t as well as on ip_addr_p_t. */
+#if !defined(IP2STR)
 typedef struct ip_addr ip_addr_t;
+#endif
 typedef struct ip_addr_packed ip_addr_p_t;
 
 /*
@@ -93,11 +97,15 @@ extern const ip_addr_t ip_addr_broadcast;
 #define IP_ADDR_BROADCAST   ((ip_addr_t *)&ip_addr_broadcast)
 
 /** 255.255.255.255 */
+#if !defined(IPADDR_NONE)
 #define IPADDR_NONE         ((u32_t)0xffffffffUL)
+#endif
 /** 127.0.0.1 */
 #define IPADDR_LOOPBACK     ((u32_t)0x7f000001UL)
 /** 0.0.0.0 */
+#if !defined(IPADDR_ANY)
 #define IPADDR_ANY          ((u32_t)0x00000000UL)
+#endif
 /** 255.255.255.255 */
 #define IPADDR_BROADCAST    ((u32_t)0xffffffffUL)
 
@@ -134,6 +142,7 @@ extern const ip_addr_t ip_addr_broadcast;
 #define IP_LOOPBACKNET      127                 /* official! */
 
 
+#if !defined(IP4_ADDR)
 #if BYTE_ORDER == BIG_ENDIAN
 /** Set an IP address given by the four byte-parts */
 #define IP4_ADDR(ipaddr, a,b,c,d) \
@@ -149,6 +158,7 @@ extern const ip_addr_t ip_addr_broadcast;
                          ((u32_t)((c) & 0xff) << 16) | \
                          ((u32_t)((b) & 0xff) << 8)  | \
                           (u32_t)((a) & 0xff)
+#endif
 #endif
 
 /** MEMCPY-like copying of IP addresses where addresses are known to be
@@ -217,6 +227,7 @@ u8_t ip4_addr_netmask_valid(u32_t netmask)ICACHE_FLASH_ATTR;
                       ipaddr != NULL ? ip4_addr4_16(ipaddr) : 0))
 
 /* Get one byte from the 4-byte address */
+#if !defined(IP2STR)
 #define ip4_addr1(ipaddr) (((u8_t*)(ipaddr))[0])
 #define ip4_addr2(ipaddr) (((u8_t*)(ipaddr))[1])
 #define ip4_addr3(ipaddr) (((u8_t*)(ipaddr))[2])
@@ -227,16 +238,20 @@ u8_t ip4_addr_netmask_valid(u32_t netmask)ICACHE_FLASH_ATTR;
 #define ip4_addr2_16(ipaddr) ((u16_t)ip4_addr2(ipaddr))
 #define ip4_addr3_16(ipaddr) ((u16_t)ip4_addr3(ipaddr))
 #define ip4_addr4_16(ipaddr) ((u16_t)ip4_addr4(ipaddr))
+#endif
 
 /** For backwards compatibility */
 #define ip_ntoa(ipaddr)  ipaddr_ntoa(ipaddr)
 
+#if !defined(IP2STR)
 u32_t ipaddr_addr(const char *cp)ICACHE_FLASH_ATTR;
+#endif
 int ipaddr_aton(const char *cp, ip_addr_t *addr)ICACHE_FLASH_ATTR;
 /** returns ptr to static buffer; not reentrant! */
 char *ipaddr_ntoa(const ip_addr_t *addr)ICACHE_FLASH_ATTR;
 char *ipaddr_ntoa_r(const ip_addr_t *addr, char *buf, int buflen)ICACHE_FLASH_ATTR;
 
+#if !defined(IP2STR)
 #define IP2STR(ipaddr) ip4_addr1_16(ipaddr), \
     ip4_addr2_16(ipaddr), \
     ip4_addr3_16(ipaddr), \
@@ -249,6 +264,7 @@ struct ip_info {
     struct ip_addr netmask;
     struct ip_addr gw;
 };
+#endif
 #ifdef __cplusplus
 }
 #endif
