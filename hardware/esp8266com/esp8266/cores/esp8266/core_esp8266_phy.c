@@ -224,6 +224,7 @@ static uint8_t phy_init_data[128] =
 
 extern int __real_register_chipv6_phy(uint8_t* init_data);
 extern int __wrap_register_chipv6_phy(uint8_t* unused) {
+    phy_init_data[107] = __get_adc_mode();
     return __real_register_chipv6_phy(phy_init_data);
 }
 
@@ -243,6 +244,10 @@ extern int __get_rf_mode()
     return 0;  // default mode
 }
 
-
+extern int __get_adc_mode() __attribute__((weak));
+extern int __get_adc_mode()
+{
+    return 33; // default ADC mode
+}
 
 
