@@ -10,16 +10,10 @@ struct ip_addr {
 typedef struct ip_addr ip_addr_t;
 
 struct ip_info {
-    struct ip_addr ip;
-    struct ip_addr netmask;
-    struct ip_addr gw;
+    ip_addr_t ip;
+    ip_addr_t netmask;
+    ip_addr_t gw;
 };
-
-#define IP4_ADDR(ipaddr, a,b,c,d) \
-        (ipaddr)->addr = ((uint32)((d) & 0xff) << 24) | \
-                         ((uint32)((c) & 0xff) << 16) | \
-                         ((uint32)((b) & 0xff) << 8)  | \
-                          (uint32)((a) & 0xff)
 
 /**
  * Determine if two address are on the same network.
