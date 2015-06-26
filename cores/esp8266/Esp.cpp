@@ -32,7 +32,7 @@ extern struct rst_info resetInfo;
 
 // #define DEBUG_SERIAL Serial
 
-
+    
 /**
  * User-defined Literals
  *  usage:
@@ -97,8 +97,8 @@ void EspClass::wdtFeed(void)
 
 void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
 {
-    system_deep_sleep_set_option(static_cast<int>(mode));
-    system_deep_sleep(time_us);
+	system_deep_sleep_set_option(static_cast<int>(mode));
+ 	system_deep_sleep(time_us);
 }
 
 extern "C" void esp_yield();
@@ -280,8 +280,8 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
 
 String EspClass::getResetInfo(void) {
     if(resetInfo.reason != 0) {
-        char buff[150];
-        sprintf(&buff[0], "Fatal exception:%d flag:%d epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
+        char buff[200];
+        sprintf(&buff[0], "Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, (resetInfo.reason == 0 ? "DEFAULT" : resetInfo.reason == 1 ? "WDT" : resetInfo.reason == 2 ? "EXCEPTION" : resetInfo.reason == 3 ? "SOFT_WDT" : resetInfo.reason == 4 ? "SOFT_RESTART" : resetInfo.reason == 5 ? "DEEP_SLEEP_AWAKE" : "???"), resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
         return String(buff);
     }
     return String("flag: 0");
@@ -400,6 +400,13 @@ bool EspClass::updateSketch(Stream& in, uint32_t size) {
             return false;
         }
 
+        if(addr == freeSpaceStart) {
+            // check for valid first magic byte
+            if(*((uint8 *) buffer.get()) != 0xE9) {
+                return false;
+            }
+        }
+
         noInterrupts();
         rc = SPIWrite(addr, buffer.get(), willRead);
         interrupts();
@@ -426,7 +433,7 @@ bool EspClass::updateSketch(Stream& in, uint32_t size) {
     ebcmd.args[1] = 0x00000;
     ebcmd.args[2] = size;
     eboot_command_write(&ebcmd);
-    
+
     ESP.restart();
     return true; // never happens
 }

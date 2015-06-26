@@ -30,4 +30,12 @@ SpiFlashOpResult spi_flash_erase_sector(uint16 sec);
 SpiFlashOpResult spi_flash_write(uint32 des_addr, uint32 *src_addr, uint32 size);
 SpiFlashOpResult spi_flash_read(uint32 src_addr, uint32 *des_addr, uint32 size);
 
+typedef SpiFlashOpResult (* user_spi_flash_read)(
+		SpiFlashChip *spi,
+		uint32 src_addr,
+		uint32 *des_addr,
+        uint32 size);
+
+void spi_flash_set_read_func(user_spi_flash_read read);
+
 #endif

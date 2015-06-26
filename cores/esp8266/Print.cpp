@@ -127,8 +127,7 @@ size_t ICACHE_FLASH_ATTR Print::print(const Printable& x) {
 }
 
 size_t ICACHE_FLASH_ATTR Print::println(void) {
-    size_t n = print("\r\n");
-    return n;
+    return print("\r\n");
 }
 
 size_t ICACHE_FLASH_ATTR Print::println(const String &s) {

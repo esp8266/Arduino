@@ -121,9 +121,10 @@ void init_done() {
 
 extern "C" {
 void user_init(void) {
-    system_rtc_mem_read(0, &resetInfo, sizeof(struct rst_info));
-    struct rst_info info = { 0 };
-    system_rtc_mem_write(0, &info, sizeof(struct rst_info));
+    struct rst_info *rtc_info_ptr = system_get_rst_info();
+
+    memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
+
 
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 

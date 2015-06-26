@@ -21,13 +21,7 @@ generic.build.board=ESP8266_ESP01
 generic.build.core=esp8266
 generic.build.variant=generic
 generic.build.flash_mode=qio
-generic.build.flash_size=512K
-generic.build.flash_freq=40
-generic.build.flash_ld=eagle.flash.512k.ld
-generic.build.spiffs_start=0x6B000
-generic.build.spiffs_end=0x7B000
 generic.build.spiffs_pagesize=256
-generic.build.spiffs_blocksize=4096
 
 generic.menu.CpuFrequency.80=80 MHz
 generic.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -123,10 +117,10 @@ generic.menu.FlashSize.4M.upload.maximum_size=1044464
 # generic.menu.FlashSize.16M.build.spiffs_end=0x1000000
 # generic.menu.FlashSize.16M.build.spiffs_blocksize=8192
 
-# generic.menu.FlashFreq.40=40MHz
-# generic.menu.FlashFreq.40.build.flash_freq=40
-# generic.menu.FlashFreq.80=80MHz
-# generic.menu.FlashFreq.80.build.flash_freq=80
+generic.menu.FlashFreq.40=40MHz
+generic.menu.FlashFreq.40.build.flash_freq=40
+generic.menu.FlashFreq.80=80MHz
+generic.menu.FlashFreq.80.build.flash_freq=80
 
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)

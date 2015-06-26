@@ -620,6 +620,7 @@ size_t HardwareSerial::write(uint8_t c) {
 
     while(_tx_buffer->room() == 0) {
         yield();
+        uart_arm_tx_interrupt(_uart);
     }
 
     _tx_buffer->write(c);
