@@ -72,8 +72,9 @@ public:
      * param ssid: Pointer to the SSID string.
      * param passphrase: Pointer to passphrase, 8 characters min.
      * param channel: WiFi channel number, 1 - 13.
+     * param ssid_hidden: Network cloaking? 0 = broadcast SSID, 1 = hide SSID
      */
-    void softAP(const char* ssid, const char* passphrase, int channel = 1);
+    void softAP(const char* ssid, const char* passphrase, int channel = 1, int ssid_hidden = 0);
 
     /* Change Ip configuration settings disabling the dhcp client
         *
