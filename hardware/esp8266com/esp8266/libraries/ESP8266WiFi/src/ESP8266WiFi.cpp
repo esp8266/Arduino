@@ -171,7 +171,7 @@ void ESP8266WiFiClass::softAP(const char* ssid)
 }
   
 
-void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int channel)
+void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int channel, int ssid_hidden)
 {
     if(_useClientMode) {
         // turn on AP+STA mode
@@ -196,7 +196,7 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int chan
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
     conf.channel = channel;
     conf.ssid_len = strlen(ssid);
-    conf.ssid_hidden = 0;
+    conf.ssid_hidden = ssid_hidden;
     conf.max_connection = 4;
     conf.beacon_interval = 100;
 
