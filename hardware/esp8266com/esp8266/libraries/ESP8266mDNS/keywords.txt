@@ -6,14 +6,17 @@
 # Datatypes (KEYWORD1)
 #######################################
 
+ESP8266mDNS	KEYWORD1
 MDNSResponder	KEYWORD1
+MDNS	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-begin 	KEYWORD2
-update 	KEYWORD2
+begin	KEYWORD2
+update	KEYWORD2
+addService	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
