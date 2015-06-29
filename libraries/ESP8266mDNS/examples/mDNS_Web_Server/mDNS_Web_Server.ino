@@ -23,9 +23,6 @@
 const char* ssid = "............";
 const char* password = "..............";
 
-// multicast DNS responder
-MDNSResponder mdns;
-
 // TCP server at port 80 will respond to HTTP requests
 WiFiServer server(80);
 
@@ -53,7 +50,7 @@ void setup(void)
   //   the fully-qualified domain name is "esp8266.local"
   // - second argument is the IP address to advertise
   //   we send our IP address on the WiFi network
-  if (!mdns.begin("esp8266", WiFi.localIP())) {
+  if (!MDNS.begin("esp8266")) {
     Serial.println("Error setting up MDNS responder!");
     while(1) { 
       delay(1000);
@@ -64,6 +61,9 @@ void setup(void)
   // Start TCP (HTTP) server
   server.begin();
   Serial.println("TCP server started");
+  
+  // Add service to MDNS-SD
+  MDNS.addService("http", "tcp", 80);
 }
 
 void loop(void)
