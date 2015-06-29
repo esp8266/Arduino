@@ -46,29 +46,51 @@ License (MIT license):
 #include "ESP8266WiFi.h"
 #include "WiFiUdp.h"
 
+//this should be defined at build time
+#ifndef ARDUINO_BOARD
+#define ARDUINO_BOARD "generic"
+#endif
 
 class UdpContext;
+
+struct MDNSService {
+  MDNSService* _next;
+  char _name[32];
+  char _proto[3];
+  uint16_t _port;
+};
 
 class MDNSResponder {
 public:
   MDNSResponder();
   ~MDNSResponder();
-  bool begin(const char* domain, IPAddress addr, uint32_t ttlSeconds = 3600);
+  bool begin(const char* hostName);
+  //for compatibility
+  bool begin(const char* hostName, IPAddress ip, uint32_t ttl=120){
+    return begin(hostName);
+  }
   void update();
-
+  
+  void addService(char *service, char *proto, uint16_t port);
+  void addService(const char *service, const char *proto, uint16_t port){
+    addService((char *)service, (char *)proto, port);
+  }
+  void addService(String service, String proto, uint16_t port){
+    addService(service.c_str(), proto.c_str(), port);
+  }
+  
 private:
-  // Expected query values
-  uint8_t* _expected;
-  int _expectedLen;
-  // Current parsing state
-  int _index;
-  // Response data
-  uint8_t* _response;
-  int _responseLen;
-  // Socket for MDNS communication
+  struct MDNSService * _services;
   UdpContext* _conn;
-  // local IP Address
-  IPAddress _localAddr;
+  char _hostName[128];
+  char _boardName[64];
+
+  uint32_t _getOurIp();
+  uint16_t _getServicePort(char *service, char *proto);
+  void _parsePacket();
+  void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port);
 };
+
+extern MDNSResponder MDNS;
 
 #endif //ESP8266MDNS_H
