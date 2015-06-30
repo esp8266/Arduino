@@ -7,6 +7,7 @@
 # on the ESP side you need code like this: https://gist.github.com/igrr/43d5c52328e955bb6b09 to handle the update
 #
  
+from __future__ import print_function
 import socket
 import sys
 import os
@@ -16,16 +17,16 @@ def serve(remoteAddr, filename):
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   serverPort = 48266
   server_address = ('0.0.0.0', serverPort)
-  print >>sys.stderr, 'starting up on %s port %s' % server_address
+  print('starting up on %s port %s' % server_address, file=sys.stderr)
   sock.bind(server_address)
   sock.listen(1)
  
   sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
   remote_address = (remoteAddr, 8266)
   content_size = os.path.getsize(filename)
-  print >>sys.stderr, 'upload size: %d' % content_size
+  print('upload size: %d' % content_size, file=sys.stderr)
   message = '%d %d %d\n' % (0, serverPort, content_size)
-  print >>sys.stderr, 'sending invitation %s' % message
+  print('sending invitation', file=sys.stderr)
   sent = sock2.sendto(message, remote_address)
   sent = sock2.sendto(message, remote_address)
   sent = sock2.sendto(message, remote_address)
@@ -33,23 +34,25 @@ def serve(remoteAddr, filename):
  
   while True:
     # Wait for a connection
-    print >>sys.stderr, 'waiting for connection'
+    print('waiting...', file=sys.stderr)
     connection, client_address = sock.accept()
     try:
-      print >>sys.stderr, 'connection from', client_address
+      print('connection from', client_address, file=sys.stderr)
  
-      print >>sys.stderr, 'opening file %s' % filename
+      print('sending file %s\n' % filename, file=sys.stderr)
       f = open(filename, "rb")
  
       while True:
         chunk = f.read(4096)
         if not chunk:
           break
- 
-        print >>sys.stderr, 'sending %d' % len(chunk)
+          
+        sys.stderr.write('.')
+        sys.stderr.flush()
+        #print('sending %d' % len(chunk), file=sys.stderr)
         connection.sendall(chunk)
  
-      print >>sys.stderr, 'done!'
+      print('\ndone!', file=sys.stderr)
       return 0
         
     finally:
