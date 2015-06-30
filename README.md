@@ -83,7 +83,7 @@ more than 20 milliseconds is not recommended.
 
 By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin```. To enable debug output again, call ```Serial.setDebugOutput(true);```. To redirect debug output to ```Serial1``` instead, call ```Serial1.setDebugOutput(true);```.
 
-You also need to use ```Serial.setDebugOutput(true)``` to enable the Arduinio ```printf()``` function.
+You also need to use ```Serial.setDebugOutput(true)``` to enable output from the Arduino ```printf()``` function.
 
 Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call ```Serial.begin(baudrate, SERIAL_8N1);```, ```Serial.begin(baudrate, SERIAL_6E2);```, etc.
 
