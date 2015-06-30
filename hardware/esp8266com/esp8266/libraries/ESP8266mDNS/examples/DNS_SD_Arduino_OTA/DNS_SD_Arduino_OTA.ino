@@ -29,7 +29,7 @@ void setup() {
 }
 
 void loop() {
-  if (ota_cmd_listener.parsePacket()) {
+  if (listener.parsePacket()) {
     IPAddress remote = listener.remoteIP();
     int cmd  = listener.parseInt();
     int port = listener.parseInt();
