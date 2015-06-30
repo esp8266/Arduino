@@ -93,3 +93,12 @@ tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=-vv
 tools.esptool.upload.params.quiet=
 tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}.bin"
+
+tools.espota.cmd=python
+tools.espota.cmd.windows=python.exe
+tools.espota.path={runtime.platform.path}/tools
+
+tools.espota.upload.protocol=espota
+tools.espota.upload.params.verbose=
+tools.espota.upload.params.quiet=
+tools.espota.upload.pattern="{cmd}" "{path}/espota.py" "{serial.port}" "{build.path}/{build.project_name}.bin"
