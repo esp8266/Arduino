@@ -26,16 +26,16 @@ def serve(remoteAddr, filename):
   content_size = os.path.getsize(filename)
   print('upload size: %d' % content_size, file=sys.stderr)
   message = '%d %d %d\n' % (0, serverPort, content_size)
-  print('sending invitation', file=sys.stderr)
-  sent = sock2.sendto(message, remote_address)
-  sent = sock2.sendto(message, remote_address)
-  sent = sock2.sendto(message, remote_address)
- 
  
   while True:
     # Wait for a connection
+    print('sending invitation', file=sys.stderr)
+    sent = sock2.sendto(message, remote_address)
+    sock.settimeout(10)
     print('waiting...', file=sys.stderr)
     connection, client_address = sock.accept()
+    sock.settimeout(None)
+    connection.settimeout(None)
     try:
       print('connection from', client_address, file=sys.stderr)
  
