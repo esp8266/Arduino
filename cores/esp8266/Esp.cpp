@@ -358,10 +358,12 @@ uint32_t EspClass::getFreeSketchSpace() {
     return freeSpaceEnd - freeSpaceStart;
 }
 
-bool EspClass::updateSketch(Stream& in, uint32_t size) {
+bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail) {
 
-    if (size > getFreeSketchSpace())
+    if (size > getFreeSketchSpace()){
+        if(restartOnFail) ESP.restart();
         return false;
+    }
 
     uint32_t usedSize = getSketchSize();
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
@@ -374,8 +376,10 @@ bool EspClass::updateSketch(Stream& in, uint32_t size) {
     noInterrupts();
     int rc = SPIEraseAreaEx(freeSpaceStart, roundedSize);
     interrupts();
-    if (rc)
+    if (rc){
+        if(restartOnFail) ESP.restart();
         return false;
+    }
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println("erase done");
@@ -397,12 +401,14 @@ bool EspClass::updateSketch(Stream& in, uint32_t size) {
 #ifdef DEBUG_SERIAL
             DEBUG_SERIAL.println("stream read failed");
 #endif
+            if(restartOnFail) ESP.restart();
             return false;
         }
 
         if(addr == freeSpaceStart) {
             // check for valid first magic byte
             if(*((uint8 *) buffer.get()) != 0xE9) {
+                if(restartOnFail) ESP.restart();
                 return false;
             }
         }
@@ -414,6 +420,7 @@ bool EspClass::updateSketch(Stream& in, uint32_t size) {
 #ifdef DEBUG_SERIAL
             DEBUG_SERIAL.println("write failed");
 #endif            
+            if(restartOnFail) ESP.restart();
             return false;
         }
 
