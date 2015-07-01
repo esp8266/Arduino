@@ -42,6 +42,8 @@ import static processing.app.I18n._;
 
 public class SerialUploader extends Uploader {
 
+  private final BoardPort boardPort;
+
   public SerialUploader()
   {
     super();
@@ -50,6 +52,12 @@ public class SerialUploader extends Uploader {
   public SerialUploader(boolean noUploadPort)
   {
     super(noUploadPort);
+  }
+
+  public SerialUploader(BoardPort port)
+  {
+    this.boardPort = port;
+    super();
   }
 
   public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception {
@@ -153,7 +161,15 @@ public class SerialUploader extends Uploader {
 
     boolean uploadResult;
     try {
-      String pattern = prefs.getOrExcept("upload.pattern");
+      String pattern;
+      if(this.boardPort && "network".equals(this.boardPort.getProtocol())){
+        prefs.put("network.port", this.boardPort.getPrefs().get("port"));
+        pattern = prefs.get("network.pattern");
+        if(pattern == null)
+          pattern = prefs.getOrExcept("upload.pattern");
+      } else {
+        pattern = prefs.getOrExcept("upload.pattern");
+      }
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       uploadResult = executeUploadCommand(cmd);
     } catch (RunnerException e) {
