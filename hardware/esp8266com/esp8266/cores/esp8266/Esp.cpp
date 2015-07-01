@@ -399,12 +399,18 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail) {
         size_t rd = in.readBytes(buffer.get(), willRead);
         if (rd != willRead) {
 #ifdef DEBUG_SERIAL
-            DEBUG_SERIAL.println("stream read failed");
+            DEBUG_SERIAL.printf("stream read less: %u/%u\n", rd, willRead);
 #endif
-            if(restartOnFail) ESP.restart();
-            return false;
+            if(rd == 0){ //we got nothing from the client
+              //we should actually give it a bit of a chance to send us something
+              //connection could be slow ;)
+              if(restartOnFail) ESP.restart();
+              return false;
+            }
+            //we at least got some data, lets write it to the flash
+            willRead = rd;
         }
-
+        
         if(addr == freeSpaceStart) {
             // check for valid first magic byte
             if(*((uint8 *) buffer.get()) != 0xE9) {
