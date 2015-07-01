@@ -22,7 +22,7 @@ def serve(remoteAddr, remotePort, filename):
   sock.listen(1)
  
   sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  remote_address = (remoteAddr, remotePort)
+  remote_address = (remoteAddr, int(remotePort))
   content_size = os.path.getsize(filename)
   print('upload size: %d' % content_size, file=sys.stderr)
   message = '%d %d %d\n' % (0, serverPort, content_size)
