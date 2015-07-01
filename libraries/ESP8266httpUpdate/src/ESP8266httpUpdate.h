@@ -29,7 +29,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 
-#define DEBUG_HTTP_UPDATE(...) Serial1.printf( __VA_ARGS__ )
+//#define DEBUG_HTTP_UPDATE(...) Serial1.printf( __VA_ARGS__ )
 
 #ifndef DEBUG_HTTP_UPDATE
 #define DEBUG_HTTP_UPDATE(...)
