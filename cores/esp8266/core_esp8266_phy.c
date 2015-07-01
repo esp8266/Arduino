@@ -56,8 +56,8 @@ static uint8_t phy_init_data[128] =
     [26] = 225, // spur_freq_cfg, spur_freq=spur_freq_cfg/spur_freq_cfg_div
     [27] = 10,  // spur_freq_cfg_div
     // each bit for 1 channel, 1 to select the spur_freq if in band, else 40
-    [28] = 0,   // spur_freq_en_h
-    [29] = 0,   // spur_freq_en_l
+    [28] = 0xff,   // spur_freq_en_h
+    [29] = 0xff,   // spur_freq_en_l
 
     [30] = 0xf8, // Reserved, do not change
     [31] = 0,    // Reserved, do not change
@@ -86,7 +86,7 @@ static uint8_t phy_init_data[128] =
     // 2: 24MHz
     [48] = 1,
 
-    
+
 
     // sdio_configure
     // 0: Auto by pin strapping
@@ -165,7 +165,7 @@ static uint8_t phy_init_data[128] =
     // 0x8: -14db,  
     // 0x4: -17.5, 
     // 0x0: -23
-    [94] = 0x0f,
+    [94] = 0x00,
 
 
     // lp_bb_att_ext
@@ -226,7 +226,7 @@ static uint8_t phy_init_data[128] =
     // 3: auto measure frequency offset and correct it,  bbpll is 160M, it only can correct + frequency offset.
     // 5: use 113 byte force_freq_offset to correct frequency offset, bbpll is 168M, it can correct + and - frequency offset.
     // 7: use 113 byte force_freq_offset to correct frequency offset, bbpll is 160M , it only can correct + frequency offset.
-    [112] = 0,
+    [112] = 3,
 
     // force_freq_offset
     // signed, unit is 8kHz
