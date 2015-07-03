@@ -40,12 +40,12 @@ class UpdaterClass {
       If all bytes are written
       this call will write the config to eboot
       and return true
-      If there is already an update running but is not finished
+      If there is already an update running but is not finished and !evenIfRemainanig
       or there is an error
       this will clear everything and return false
       the last error is available through getError()
     */
-    bool end();
+    bool end(bool evenIfRemaining = false);
     
     /*
       Prints the last error to an output stream
