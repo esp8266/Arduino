@@ -35,11 +35,14 @@ bool UpdaterClass::begin(size_t size){
   _error = 0;
   
   uint32_t usedSize = ESP.getSketchSize();
-  uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-  uint32_t freeSpaceEnd = (uint32_t)&_SPIFFS_start - 0x40200000;
+  uint32_t freeSpaceEnd = (uint32_t)&_SPIFFS_start - 0x40200000 - (5 * FLASH_SECTOR_SIZE);
   uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+  uint32_t freeSpaceStart = freeSpaceEnd - roundedSize;
   
-  if(roundedSize > (freeSpaceEnd - freeSpaceStart)){
+  //new sketch can not be more then half the size or more than the free space
+  //this means that max sketch size is (1MB - 20KB) / 2 for flash 2MB and above
+  //and the current sketch should not be more than that either
+  if(freeSpaceStart < usedSize || roundedSize > (freeSpaceEnd/2)){
     _error = UPDATE_ERROR_SPACE;
 #ifdef DEBUG_UPDATER
     printError(DEBUG_UPDATER);
@@ -64,7 +67,7 @@ bool UpdaterClass::begin(size_t size){
   return true;
 }
 
-bool UpdaterClass::end(){
+bool UpdaterClass::end(bool evenIfRemaining){
   if(_size == 0){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.println("no update");
@@ -72,18 +75,27 @@ bool UpdaterClass::end(){
     return false;
   }
   
-  if(_buffer) os_free(_buffer);
-  _bufferLen = 0;
-  
-  if(hasError() || !isFinished()){
+  if(hasError() || (!isFinished() && !evenIfRemaining)){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf("premature end: res:%u, pos:%u/%u\n", getError(), progress(), _size);
 #endif
+    if(_buffer) os_free(_buffer);
+    _bufferLen = 0;
     _currentAddress = 0;
     _startAddress = 0;
     _size = 0;
     return false;
   }
+  
+  if(evenIfRemaining){
+    if(_bufferLen > 0){
+      _writeBuffer();
+    }
+    _size = progress();
+  }
+  if(_buffer) os_free(_buffer);
+  _bufferLen = 0;
+  _currentAddress = 0;
   
   eboot_command ebcmd;
   ebcmd.action = ACTION_COPY_RAW;
@@ -91,8 +103,11 @@ bool UpdaterClass::end(){
   ebcmd.args[1] = 0x00000;
   ebcmd.args[2] = _size;
   eboot_command_write(&ebcmd);
-
-  _currentAddress = 0;
+  
+#ifdef DEBUG_UPDATER
+    DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08X\n", _startAddress, _size);
+#endif
+  
   _startAddress = 0;
   _size = 0;
   _error = UPDATE_ERROR_OK;
