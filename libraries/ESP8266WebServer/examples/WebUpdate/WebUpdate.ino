@@ -30,15 +30,13 @@ void setup(void){
         Serial.setDebugOutput(true);
         WiFiUDP::stopAll();
         Serial.printf("Update: %s\n", upload.filename.c_str());
-        uint32_t maxSketchSpace = ((ESP.getFreeSketchSpace() + ESP.getSketchSize()) / 2) & 0xFFFFF000;
+        uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
         if(!Update.begin(maxSketchSpace)){//start with max available size
           Update.printError(Serial);
-          return;
         }
       } else if(upload.status == UPLOAD_FILE_WRITE){
         if(Update.write(upload.buf, upload.currentSize) != upload.currentSize){
           Update.printError(Serial);
-          return;
         }
       } else if(upload.status == UPLOAD_FILE_END){
         if(Update.end(true)){ //true to set the size to the current progress
@@ -59,7 +57,7 @@ void setup(void){
     server.begin();
     MDNS.addService("http", "tcp", 80);
   
-    Serial.println("Ready! Open http:\/\/%s.local in your browser\n", host);
+    Serial.printf("Ready! Open http://%s.local in your browser\n", host);
   } else {
     Serial.println("WiFi Failed");
   }
