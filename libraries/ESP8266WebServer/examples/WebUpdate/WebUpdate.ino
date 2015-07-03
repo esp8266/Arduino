@@ -28,6 +28,7 @@ void setup(void){
       HTTPUpload& upload = server.upload();
       if(upload.status == UPLOAD_FILE_START){
         Serial.setDebugOutput(true);
+        WiFiUDP::stopAll();
         Serial.printf("Update: %s\n", upload.filename.c_str());
         uint32_t maxSketchSpace = ((ESP.getFreeSketchSpace() + ESP.getSketchSize()) / 2) & 0xFFFFF000;
         if(!Update.begin(maxSketchSpace)){//start with max available size

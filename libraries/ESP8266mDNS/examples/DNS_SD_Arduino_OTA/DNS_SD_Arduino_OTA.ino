@@ -43,7 +43,9 @@ void loop() {
     Serial.print(remote);
     Serial.printf(", port:%d, size:%d\n", port, size);
     uint32_t startTime = millis();
-  
+    
+    WiFiUDP::stopAll();
+    
     if(!Update.begin(size)){
       Serial.println("Update Begin Error");
       return;
