@@ -108,23 +108,11 @@ bool UpdaterClass::end(bool evenIfRemaining){
 }
 
 bool UpdaterClass::_writeBuffer(){
-  WDT_FEED();
   noInterrupts();
   int rc = SPIEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
+  if(!rc) rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
   interrupts();
   if (rc){
-    _error = UPDATE_ERROR_ERASE;
-#ifdef DEBUG_UPDATER
-    printError(DEBUG_UPDATER);
-#endif
-    return false;
-  }
-  
-  WDT_FEED();
-  noInterrupts();
-  rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
-  interrupts();
-  if (rc) {
     _error = UPDATE_ERROR_WRITE;
     _currentAddress = (_startAddress + _size);
 #ifdef DEBUG_UPDATER
@@ -139,7 +127,7 @@ bool UpdaterClass::_writeBuffer(){
 
 size_t UpdaterClass::write(uint8_t *data, size_t len){
   size_t left = len;
-  if(hasError())
+  if(hasError()||!isRunning())
     return 0;
   
   if(len > remaining())
@@ -170,7 +158,7 @@ size_t UpdaterClass::write(uint8_t *data, size_t len){
 size_t UpdaterClass::writeStream(Stream &data){
   size_t written = 0;
   size_t toRead = 0;
-  if(hasError())
+  if(hasError()||!isRunning())
     return 0;
   
   while(remaining()){
