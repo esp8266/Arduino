@@ -121,6 +121,9 @@ size_t UpdaterClass::write(uint8_t *data, size_t len){
   if(hasError())
     return 0;
   
+  if(len > remaining())
+    len = remaining();
+  
   while((_bufferLen + left) > FLASH_SECTOR_SIZE){
     size_t toBuff = FLASH_SECTOR_SIZE - _bufferLen;
     memcpy(_buffer + _bufferLen, data + (len - left), toBuff);
