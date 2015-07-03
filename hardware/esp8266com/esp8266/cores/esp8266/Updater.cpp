@@ -4,7 +4,7 @@
 extern "C"{
   #include "mem.h"
 }
-#define DEBUG_UPDATER Serial
+//#define DEBUG_UPDATER Serial
 
 extern "C" uint32_t _SPIFFS_start;
 
