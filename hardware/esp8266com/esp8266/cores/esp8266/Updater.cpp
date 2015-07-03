@@ -106,6 +106,7 @@ bool UpdaterClass::_writeBuffer(){
   interrupts();
   if (rc) {
     _error = UPDATE_ERROR_WRITE;
+    _currentAddress = (_startAddress + _size);
 #ifdef DEBUG_UPDATER
     printError(DEBUG_UPDATER);
 #endif
@@ -157,6 +158,7 @@ size_t UpdaterClass::writeStream(Stream &data){
     toRead = data.readBytes(_buffer + _bufferLen, toRead);
     if(toRead == 0){ //Timeout
       _error = UPDATE_ERROR_STREAM;
+      _currentAddress = (_startAddress + _size);
 #ifdef DEBUG_UPDATER
       printError(DEBUG_UPDATER);
 #endif

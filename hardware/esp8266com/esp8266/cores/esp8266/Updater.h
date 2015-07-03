@@ -57,10 +57,10 @@ class UpdaterClass {
     void clearError(){ _error = UPDATE_ERROR_OK; }
     bool hasError(){ return _error != UPDATE_ERROR_OK; }
     bool isRunning(){ return _size > 0; }
-    bool isFinished(){ return hasError()?true:(_currentAddress == (_startAddress + _size)); }
+    bool isFinished(){ return _currentAddress == (_startAddress + _size); }
     size_t size(){ return _size; }
     size_t progress(){ return _currentAddress - _startAddress; }
-    size_t remaining(){ return hasError()?0:(size() - progress()); }
+    size_t remaining(){ return _size - (_currentAddress - _startAddress); }
     
     /*
       Template to write from objects that expose
