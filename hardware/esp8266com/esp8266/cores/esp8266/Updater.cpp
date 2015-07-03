@@ -51,18 +51,6 @@ bool UpdaterClass::begin(size_t size){
     return false;
   }
   
-  //erase the neede space
-  noInterrupts();
-  int rc = SPIEraseAreaEx(updateStartAddress, roundedSize);
-  interrupts();
-  if (rc){
-    _error = UPDATE_ERROR_ERASE;
-#ifdef DEBUG_UPDATER
-    printError(DEBUG_UPDATER);
-#endif
-    return false;
-  }
-  
   //initialize
   _startAddress = updateStartAddress;
   _currentAddress = _startAddress;
@@ -122,7 +110,19 @@ bool UpdaterClass::end(bool evenIfRemaining){
 bool UpdaterClass::_writeBuffer(){
   WDT_FEED();
   noInterrupts();
-  int rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
+  int rc = SPIEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
+  interrupts();
+  if (rc){
+    _error = UPDATE_ERROR_ERASE;
+#ifdef DEBUG_UPDATER
+    printError(DEBUG_UPDATER);
+#endif
+    return false;
+  }
+  
+  WDT_FEED();
+  noInterrupts();
+  rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
   interrupts();
   if (rc) {
     _error = UPDATE_ERROR_WRITE;
