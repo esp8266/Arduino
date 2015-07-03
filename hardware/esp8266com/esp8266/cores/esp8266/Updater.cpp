@@ -27,30 +27,33 @@ bool UpdaterClass::begin(size_t size){
   }
   
   if(_buffer) os_free(_buffer);
-  
   _bufferLen = 0;
   _startAddress = 0;
   _currentAddress = 0;
   _size = 0;
   _error = 0;
   
-  uint32_t usedSize = ESP.getSketchSize();
-  uint32_t freeSpaceEnd = (uint32_t)&_SPIFFS_start - 0x40200000 - (5 * FLASH_SECTOR_SIZE);
+  //size of current sketch rounded to a sector
+  uint32_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+  //address of the end of the space available for sketch and update (5 sectors are for EEPROM and init data)
+  uint32_t updateEndAddress = (uint32_t)&_SPIFFS_start - 0x40200000 - (5 * FLASH_SECTOR_SIZE);
+  //size of the update rounded to a sector
   uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-  uint32_t freeSpaceStart = freeSpaceEnd - roundedSize;
+  //address where we will start writing the update
+  uint32_t updateStartAddress = updateEndAddress - roundedSize;
   
-  //new sketch can not be more then half the size or more than the free space
-  //this means that max sketch size is (1MB - 20KB) / 2 for flash 2MB and above
-  //and the current sketch should not be more than that either
-  if(freeSpaceStart < usedSize || roundedSize > (freeSpaceEnd/2)){
+  //make sure that the size of both sketches is less than the total space (updateEndAddress)
+  if(updateStartAddress < currentSketchSize){
     _error = UPDATE_ERROR_SPACE;
 #ifdef DEBUG_UPDATER
     printError(DEBUG_UPDATER);
 #endif
     return false;
   }
+  
+  //erase the neede space
   noInterrupts();
-  int rc = SPIEraseAreaEx(freeSpaceStart, roundedSize);
+  int rc = SPIEraseAreaEx(updateStartAddress, roundedSize);
   interrupts();
   if (rc){
     _error = UPDATE_ERROR_ERASE;
@@ -59,7 +62,9 @@ bool UpdaterClass::begin(size_t size){
 #endif
     return false;
   }
-  _startAddress = freeSpaceStart;
+  
+  //initialize
+  _startAddress = updateStartAddress;
   _currentAddress = _startAddress;
   _size = size;
   _buffer = (uint8_t*)os_malloc(FLASH_SECTOR_SIZE);
