@@ -17,48 +17,66 @@ def serve(remoteAddr, remotePort, filename):
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   serverPort = 48266
   server_address = ('0.0.0.0', serverPort)
-  print('starting up on %s port %s' % server_address, file=sys.stderr)
-  sock.bind(server_address)
-  sock.listen(1)
+  print('Starting on %s:%s' % server_address, file=sys.stderr)
+  try:
+    sock.bind(server_address)
+    sock.listen(1)
+  except:
+    print('Socket Failed', file=sys.stderr)
+    return 1
  
-  sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  remote_address = (remoteAddr, int(remotePort))
   content_size = os.path.getsize(filename)
-  print('upload size: %d' % content_size, file=sys.stderr)
+  print('Upload size: %d' % content_size, file=sys.stderr)
   message = '%d %d %d\n' % (0, serverPort, content_size)
  
-  while True:
-    # Wait for a connection
-    print('sending invitation', file=sys.stderr)
-    sent = sock2.sendto(message, remote_address)
+  # Wait for a connection
+  print('Sending invitation to:', remoteAddr, file=sys.stderr)
+  sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+  remote_address = (remoteAddr, int(remotePort))
+  sent = sock2.sendto(message, remote_address)
+  sock2.close()
+  
+  print('Waiting for device...\n', file=sys.stderr)
+  try:
     sock.settimeout(10)
-    print('waiting...', file=sys.stderr)
     connection, client_address = sock.accept()
     sock.settimeout(None)
     connection.settimeout(None)
+  except:
+    print('No response from device', file=sys.stderr)
+    sock.close()
+    return 1
+
+  try:
+    f = open(filename, "rb")
+    sys.stderr.write('Uploading')
+    sys.stderr.flush()
+    while True:
+      chunk = f.read(4096)
+      if not chunk: break
+      sys.stderr.write('.')
+      sys.stderr.flush()
+      connection.sendall(chunk)
+
+    print('\nWaiting for result...\n', file=sys.stderr)
     try:
-      print('connection from', client_address, file=sys.stderr)
- 
-      print('sending file %s\n' % filename, file=sys.stderr)
-      f = open(filename, "rb")
- 
-      while True:
-        chunk = f.read(4096)
-        if not chunk:
-          break
-          
-        sys.stderr.write('.')
-        sys.stderr.flush()
-        #print('sending %d' % len(chunk), file=sys.stderr)
-        connection.sendall(chunk)
- 
-      print('\ndone!', file=sys.stderr)
-      return 0
-        
-    finally:
+      connection.settimeout(60)
+      data = connection.recv(32)
+      print('Result: %s' % data, file=sys.stderr)
       connection.close()
       f.close()
-    return 1
+      return 0
+    except:
+      print('Result: No Answer!', file=sys.stderr)
+      connection.close()
+      f.close()
+      return 1
+    
+  finally:
+    connection.close()
+    f.close()
+  sock.close()
+  return 1
  
 def main(args):
   return serve(args[1], args[2], args[3])

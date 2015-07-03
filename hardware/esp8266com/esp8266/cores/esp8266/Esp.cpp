@@ -30,7 +30,7 @@ extern struct rst_info resetInfo;
 }
 
 
-// #define DEBUG_SERIAL Serial
+//#define DEBUG_SERIAL Serial
 
     
 /**
@@ -358,96 +358,38 @@ uint32_t EspClass::getFreeSketchSpace() {
     return freeSpaceEnd - freeSpaceStart;
 }
 
-bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail) {
-
-    if (size > getFreeSketchSpace()){
-        if(restartOnFail) ESP.restart();
-        return false;
-    }
-
-    uint32_t usedSize = getSketchSize();
-    uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-
+bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool restartOnSuccess) {
+  if(!Update.begin(size)){
 #ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.printf("erase @0x%x size=0x%x\r\n", freeSpaceStart, roundedSize);
+    DEBUG_SERIAL.print("Update ");
+    Update.printError(DEBUG_SERIAL);
 #endif
+    if(restartOnFail) ESP.restart();
+    return false;
+  }
 
-    noInterrupts();
-    int rc = SPIEraseAreaEx(freeSpaceStart, roundedSize);
-    interrupts();
-    if (rc){
-        if(restartOnFail) ESP.restart();
-        return false;
-    }
-
+  if(Update.writeStream(in) != size){
 #ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.println("erase done");
+    DEBUG_SERIAL.print("Update ");
+    Update.printError(DEBUG_SERIAL);
 #endif
+    if(restartOnFail) ESP.restart();
+    return false;
+  }
 
-    uint32_t addr = freeSpaceStart;
-    uint32_t left = size;
-
-    const uint32_t bufferSize = FLASH_SECTOR_SIZE;
-    std::unique_ptr<uint8_t> buffer(new uint8_t[bufferSize]);
-
+  if(!Update.end()){
 #ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.println("writing");
+    DEBUG_SERIAL.print("Update ");
+    Update.printError(DEBUG_SERIAL);
 #endif
-    while (left > 0) {
-        size_t willRead = (left < bufferSize) ? left : bufferSize;
-        size_t rd = in.readBytes(buffer.get(), willRead);
-        if (rd != willRead) {
-#ifdef DEBUG_SERIAL
-            DEBUG_SERIAL.printf("stream read less: %u/%u\n", rd, willRead);
-#endif
-            if(rd == 0){ //we got nothing from the client
-              //we should actually give it a bit of a chance to send us something
-              //connection could be slow ;)
-              if(restartOnFail) ESP.restart();
-              return false;
-            }
-            //we at least got some data, lets write it to the flash
-            willRead = rd;
-        }
-        
-        if(addr == freeSpaceStart) {
-            // check for valid first magic byte
-            if(*((uint8 *) buffer.get()) != 0xE9) {
-                if(restartOnFail) ESP.restart();
-                return false;
-            }
-        }
-
-        noInterrupts();
-        rc = SPIWrite(addr, buffer.get(), willRead);
-        interrupts();
-        if (rc) {
-#ifdef DEBUG_SERIAL
-            DEBUG_SERIAL.println("write failed");
-#endif            
-            if(restartOnFail) ESP.restart();
-            return false;
-        }
-
-        addr += willRead;
-        left -= willRead;
-#ifdef DEBUG_SERIAL
-        DEBUG_SERIAL.print(".");
-#endif
-    }
+    if(restartOnFail) ESP.restart();
+    return false;
+  }
 
 #ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.println("\r\nrestarting");
-#endif
-    eboot_command ebcmd;
-    ebcmd.action = ACTION_COPY_RAW;
-    ebcmd.args[0] = freeSpaceStart;
-    ebcmd.args[1] = 0x00000;
-    ebcmd.args[2] = size;
-    eboot_command_write(&ebcmd);
-
-    ESP.restart();
-    return true; // never happens
+    DEBUG_SERIAL.println("Update SUCCESS");
+#endif  
+    if(restartOnSuccess) ESP.restart();
+    return true;
 }
 
