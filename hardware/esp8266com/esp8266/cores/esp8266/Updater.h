@@ -44,6 +44,7 @@ class UpdaterClass {
       or there is an error
       this will clear everything and return false
       the last error is available through getError()
+      evenIfRemaining is helpfull when you update without knowing the final size first
     */
     bool end(bool evenIfRemaining = false);
     
@@ -53,14 +54,14 @@ class UpdaterClass {
     void printError(Stream &out);
     
     //Helpers
-    uint8_t getError(){ return _error; }
-    void clearError(){ _error = UPDATE_ERROR_OK; }
-    bool hasError(){ return _error != UPDATE_ERROR_OK; }
-    bool isRunning(){ return _size > 0; }
-    bool isFinished(){ return _currentAddress == (_startAddress + _size); }
-    size_t size(){ return _size; }
-    size_t progress(){ return _currentAddress - _startAddress; }
-    size_t remaining(){ return _size - (_currentAddress - _startAddress); }
+    inline uint8_t getError(){ return _error; }
+    inline void clearError(){ _error = UPDATE_ERROR_OK; }
+    inline bool hasError(){ return _error != UPDATE_ERROR_OK; }
+    inline bool isRunning(){ return _size > 0; }
+    inline bool isFinished(){ return _currentAddress == (_startAddress + _size); }
+    inline size_t size(){ return _size; }
+    inline size_t progress(){ return _currentAddress - _startAddress; }
+    inline size_t remaining(){ return _size - (_currentAddress - _startAddress); }
     
     /*
       Template to write from objects that expose
