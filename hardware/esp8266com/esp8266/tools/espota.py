@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 #
 # this script will push an OTA update to the ESP
-#
-# use it like: python ota_server.py <ESP_IP_address> <sketch.bin>
-#
-# on the ESP side you need code like this: https://gist.github.com/igrr/43d5c52328e955bb6b09 to handle the update
-#
+# use it like: python espota.py <ESP_IP_address> <sketch.bin>
  
 from __future__ import print_function
 import socket
@@ -22,7 +18,7 @@ def serve(remoteAddr, remotePort, filename):
     sock.bind(server_address)
     sock.listen(1)
   except:
-    print('Socket Failed', file=sys.stderr)
+    print('Listen Failed', file=sys.stderr)
     return 1
  
   content_size = os.path.getsize(filename)
@@ -80,10 +76,11 @@ def serve(remoteAddr, remotePort, filename):
       f.close()
       sock.close()
       return 1
-    
+
   finally:
     connection.close()
     f.close()
+
   sock.close()
   return 1
  
