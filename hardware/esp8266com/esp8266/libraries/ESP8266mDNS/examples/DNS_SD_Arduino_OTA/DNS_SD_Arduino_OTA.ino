@@ -92,5 +92,5 @@ void loop() {
     }
     free(sbuf);
   }
-  delay(100);
+  delay(1);
 }
