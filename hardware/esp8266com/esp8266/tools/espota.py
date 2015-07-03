@@ -56,7 +56,14 @@ def serve(remoteAddr, remotePort, filename):
       if not chunk: break
       sys.stderr.write('.')
       sys.stderr.flush()
-      connection.sendall(chunk)
+      try:
+        connection.sendall(chunk)
+      except:
+        print('\nError Uploading', file=sys.stderr)
+        connection.close()
+        f.close()
+        sock.close()
+        return 1
 
     print('\nWaiting for result...\n', file=sys.stderr)
     try:
@@ -65,11 +72,13 @@ def serve(remoteAddr, remotePort, filename):
       print('Result: %s' % data, file=sys.stderr)
       connection.close()
       f.close()
+      sock.close()
       return 0
     except:
       print('Result: No Answer!', file=sys.stderr)
       connection.close()
       f.close()
+      sock.close()
       return 1
     
   finally:
