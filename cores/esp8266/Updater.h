@@ -15,9 +15,8 @@ class UpdaterClass {
   public:
     UpdaterClass();
     /*
-      Call this to check and erase the space needed for the update
+      Call this to check the space needed for the update
       Will return false if there is not enough space
-      Or the erase of the flash failed
     */
     bool begin(size_t size);
     
@@ -72,7 +71,7 @@ class UpdaterClass {
     template<typename T>
     size_t write(T &data){
       size_t written = 0;
-      if(hasError())
+      if(hasError()||!isRunning())
         return 0;
       size_t available = data.available();
       while(available){
