@@ -81,18 +81,25 @@ EspClass ESP;
 
 void EspClass::wdtEnable(uint32_t timeout_ms)
 {
+    /// This API can only be called if software watchdog is stopped
+    system_soft_wdt_restart();
 }
 
 void EspClass::wdtEnable(WDTO_t timeout_ms)
 {
+    wdtEnable((uint32_t) timeout_ms);
 }
 
 void EspClass::wdtDisable(void)
 {
+    /// Please don’t stop software watchdog too long (less than 6 seconds),
+    /// otherwise it will trigger hardware watchdog reset.
+    system_soft_wdt_stop();
 }
 
 void EspClass::wdtFeed(void)
 {
+
 }
 
 void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
