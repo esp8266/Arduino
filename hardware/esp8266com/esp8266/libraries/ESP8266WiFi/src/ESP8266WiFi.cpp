@@ -599,7 +599,7 @@ void ESP8266WiFiClass::beginSmartConfig()
     _smartConfigDone = false;
 
     //SC_TYPE_ESPTOUCH use ESPTOUCH for smartconfig, or use SC_TYPE_AIRKISS for AIRKISS 
-    smartconfig_start(SC_TYPE_ESPTOUCH, reinterpret_cast<sc_callback_t>(&ESP8266WiFiClass::_smartConfigCallback), 1);
+    smartconfig_start(reinterpret_cast<sc_callback_t>(&ESP8266WiFiClass::_smartConfigCallback), 1);
 }
 
 void ESP8266WiFiClass::stopSmartConfig()
