@@ -582,6 +582,25 @@ int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult)
     return (aResult != 0) ? 1 : 0;
 }
 
+String ESP8266WiFiClass::hostname(void) {
+    return String(wifi_station_get_hostname());
+}
+
+bool ESP8266WiFiClass::hostname(char* aHostname) {
+    if(strlen(aHostname) > 32) {
+        return false;
+    }
+    return wifi_station_set_hostname(aHostname);
+}
+
+bool ESP8266WiFiClass::hostname(const char* aHostname) {
+    return hostname((char*) aHostname);
+}
+
+bool ESP8266WiFiClass::hostname(String aHostname) {
+    return hostname((char*) aHostname.c_str());
+}
+
 void ESP8266WiFiClass::beginSmartConfig()
 {
     if (_smartConfigStarted)
