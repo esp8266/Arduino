@@ -16,6 +16,10 @@ uint32 sntp_get_current_timestamp();
  */
 char* sntp_get_real_time(long t);
 /**
+ * SNTP get time_zone default GMT + 8
+ */
+sint8 sntp_get_timezone(void);
+/**
  * SNTP set time_zone (default GMT + 8)
  */
 bool sntp_set_timezone(sint8 timezone);
