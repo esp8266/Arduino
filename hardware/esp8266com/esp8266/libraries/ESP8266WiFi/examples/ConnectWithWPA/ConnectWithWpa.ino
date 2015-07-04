@@ -3,14 +3,16 @@
  * Then it prints the  MAC address of the ESP8266,
  * the IP address obtained, and other network details.
  * 
- *  created 5 July 2015
- *  by Mohamed Elhariry
+ * created 13 July 2010
+ * by dlf (Metodo2 srl)
+ * modified 5 July 2015
+ * by Mohamed Elhariry
  */
 
 #include <ESP8266WiFi.h>
 
-char ssid[] = "Dlink";
-char password[] = "wireless110249";
+char ssid[] = "yourNetwork";
+char password[] = "secretPassword";
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 void setup() {
@@ -25,12 +27,12 @@ void setup() {
     // Connect to WPA/WPA2 network:
     status = WiFi.begin(ssid, password);
 
-    // wait 1 second for connection:
+    // wait 10 seconds for connection:
     delay(10000);
   }
   
   // you're connected now, so print out the data:
-  Serial.print("You're connected to the network");
+  Serial.print("You're connected to the network ");
   printCurrentNet();
   printWifiData();
 
