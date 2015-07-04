@@ -20,6 +20,7 @@
 */
 
 #include "ESP8266WiFi.h"
+
 extern "C" {
 #include "c_types.h"
 #include "ets_sys.h"
@@ -155,7 +156,7 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
     _useStaticIp = true;
 }
 
-int ESP8266WiFiClass::disconnect()
+int ESP8266WiFiClass::disconnect(bool wifioff)
 {
     struct station_config conf;
     *conf.ssid = 0;
@@ -164,6 +165,19 @@ int ESP8266WiFiClass::disconnect()
     wifi_station_set_config(&conf);
     wifi_station_disconnect();
     ETS_UART_INTR_ENABLE();
+
+    if(wifioff) {
+        _useClientMode = false;
+
+        if(_useApMode) {
+            // turn on AP
+            mode(WIFI_AP);
+        } else {
+            // turn wifi off
+            mode(WIFI_OFF);
+        }
+    }
+
     return 0;
 }
 
@@ -601,6 +615,77 @@ bool ESP8266WiFiClass::hostname(String aHostname) {
     return hostname((char*) aHostname.c_str());
 }
 
+//--------------------------------------------------------------
+
+void wifi_wps_status_cb(WPS_CB_STATUS_t status)
+{
+    DEBUGV("wps cb status: %d\r\n", status);
+    switch (status) {
+        case WPS_CB_ST_SUCCESS:
+            if(!wifi_wps_disable()) {
+                  DEBUGV("wps disable faild\n");
+            }
+            wifi_station_connect();
+            break;
+        case WPS_CB_ST_FAILED:
+            DEBUGV("wps FAILD\n");
+            break;
+        case WPS_CB_ST_TIMEOUT:
+            DEBUGV("wps TIMEOUT\n");
+            break;
+    }
+    // todo user function to get status
+
+    esp_schedule(); // resume the beginWPSConfig function
+}
+
+bool ESP8266WiFiClass::beginWPSConfig(void) {
+
+    _useClientMode = true;
+
+     if(_useApMode) {
+         // turn on AP+STA mode
+         mode(WIFI_AP_STA);
+     } else {
+         // turn on STA mode
+         mode(WIFI_STA);
+     }
+
+    disconnect();
+
+    DEBUGV("wps begin: %d\n", wps_type);
+
+    if(!wifi_wps_disable()) {
+        DEBUGV("wps disable faild\n");
+        return false;
+    }
+
+    // so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
+    if(!wifi_wps_enable(WPS_TYPE_PBC)) {
+        DEBUGV("wps enable faild\n");
+        return false;
+    }
+
+    if(!wifi_set_wps_cb(&wifi_wps_status_cb)) {
+        DEBUGV("wps cb faild\n");
+        return false;
+    }
+
+    if(!wifi_wps_start()) {
+        DEBUGV("wps start faild\n");
+        return false;
+    }
+
+    esp_yield();
+    // will return here when wifi_wps_status_cb fires
+
+    return true;
+}
+
+//--------------------------------------------------------------
+
+
+
 void ESP8266WiFiClass::beginSmartConfig()
 {
     if (_smartConfigStarted)
@@ -654,6 +739,8 @@ void ESP8266WiFiClass::_smartConfigCallback(uint32_t st, void* result)
         WiFi.stopSmartConfig();
     }
 }
+
+//--------------------------------------------------------------
 
 void ESP8266WiFiClass::_eventCallback(void* arg)
 {
