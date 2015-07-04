@@ -300,11 +300,11 @@
 
 #define PIN_PULLUP_DIS(PIN_NAME)                 CLEAR_PERI_REG_MASK(PIN_NAME, PERIPHS_IO_MUX_PULLUP)
 #define PIN_PULLUP_EN(PIN_NAME)                  SET_PERI_REG_MASK(PIN_NAME, PERIPHS_IO_MUX_PULLUP)
-#define PIN_PULLDWN_DIS(PIN_NAME)             CLEAR_PERI_REG_MASK(PIN_NAME, PERIPHS_IO_MUX_PULLDWN)
-#define PIN_PULLDWN_EN(PIN_NAME)              SET_PERI_REG_MASK(PIN_NAME, PERIPHS_IO_MUX_PULLDWN)
 #define PIN_FUNC_SELECT(PIN_NAME, FUNC)  do { \
-        CLEAR_PERI_REG_MASK(PIN_NAME, (PERIPHS_IO_MUX_FUNC<<PERIPHS_IO_MUX_FUNC_S)); \
-        SET_PERI_REG_MASK(PIN_NAME, (((FUNC&BIT2)<<2)|(FUNC&0x3))<<PERIPHS_IO_MUX_FUNC_S); \
+    WRITE_PERI_REG(PIN_NAME,   \
+                                READ_PERI_REG(PIN_NAME) \
+                                     &  (~(PERIPHS_IO_MUX_FUNC<<PERIPHS_IO_MUX_FUNC_S))  \
+                                     |( (((FUNC&BIT2)<<2)|(FUNC&0x3))<<PERIPHS_IO_MUX_FUNC_S) );  \
     } while (0)
 
 //}}
