@@ -1,0 +1,1025 @@
+In archive D:/Coding/avr/Programme/arduino-nightly/hardware/esp8266com/esp8266/tools/sdk/lib/libupgrade.a:
+
+upgrade.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .irom0.text:
+
+00000000 <system_upgrade-0xdc>:
+   0:	001000        	excw
+	...
+  1b:	c11200        	mul16u	a1, a2, a0
+  1e:	1109e0        	slli	a0, a9, 2
+  21:	31d9      	s32i.n	a13, a1, 12
+  23:	21c9      	s32i.n	a12, a1, 8
+  25:	41e9      	s32i.n	a14, a1, 16
+  27:	02cd      	mov.n	a12, a2
+  29:	03ed      	mov.n	a14, a3
+  2b:	04dd      	mov.n	a13, a4
+  2d:	0a2316        	beqz	a3, d3 <system_upgrade-0x9>
+  30:	09f416        	beqz	a4, d3 <system_upgrade-0x9>
+  33:	0a0222        	l8ui	a2, a2, 10
+  36:	224a      	add.n	a2, a2, a4
+  38:	fff301        	l32r	a0, 4 <system_upgrade-0xd8>
+  3b:	0000c0        	callx0	a0
+  3e:	4c29      	s32i.n	a2, a12, 16
+  40:	0a0c42        	l8ui	a4, a12, 10
+  43:	3cbb      	addi.n	a3, a12, 11
+  45:	0139      	s32i.n	a3, a1, 0
+  47:	fff001        	l32r	a0, 8 <system_upgrade-0xd4>
+  4a:	0000c0        	callx0	a0
+  4d:	4c38      	l32i.n	a3, a12, 16
+  4f:	0a0c22        	l8ui	a2, a12, 10
+  52:	0d4d      	mov.n	a4, a13
+  54:	223a      	add.n	a2, a2, a3
+  56:	0e3d      	mov.n	a3, a14
+  58:	ffed01        	l32r	a0, c <system_upgrade-0xd0>
+  5b:	0000c0        	callx0	a0
+  5e:	0128      	l32i.n	a2, a1, 0
+  60:	0a0ce2        	l8ui	a14, a12, 10
+  63:	4c38      	l32i.n	a3, a12, 16
+  65:	deda      	add.n	a13, a14, a13
+  67:	1440d0        	extui	a4, a13, 0, 2
+  6a:	0a4c42        	s8i	a4, a12, 10
+  6d:	c0dd40        	sub	a13, a13, a4
+  70:	f4d0d0        	extui	a13, a13, 0, 16
+  73:	33da      	add.n	a3, a3, a13
+  75:	ffe601        	l32r	a0, 10 <system_upgrade-0xcc>
+  78:	0000c0        	callx0	a0
+  7b:	031c42        	l16ui	a4, a12, 6
+  7e:	0c28      	l32i.n	a2, a12, 0
+  80:	021c32        	l16ui	a3, a12, 4
+  83:	02da      	add.n	a0, a2, a13
+  85:	334a      	add.n	a3, a3, a4
+  87:	113340        	slli	a3, a3, 12
+  8a:	28b037        	bgeu	a0, a3, b6 <system_upgrade-0x26>
+  8d:	ffdc51        	l32r	a5, 0 <system_upgrade-0xdc>
+  90:	410c00        	srli	a0, a0, 12
+  93:	0835d7        	bltu	a5, a13, 9f <system_upgrade-0x3d>
+  96:	041c62        	l16ui	a6, a12, 8
+  99:	021607        	beq	a6, a0, 9f <system_upgrade-0x3d>
+  9c:	045c02        	s16i	a0, a12, 8
+  9f:	4c38      	l32i.n	a3, a12, 16
+  a1:	0d4d      	mov.n	a4, a13
+  a3:	ffdc01        	l32r	a0, 14 <system_upgrade-0xc8>
+  a6:	0000c0        	callx0	a0
+  a9:	92cc      	bnez.n	a2, b6 <system_upgrade-0x26>
+  ab:	0c78      	l32i.n	a7, a12, 0
+  ad:	1e0c      	movi.n	a14, 1
+  af:	77da      	add.n	a7, a7, a13
+  b1:	0c79      	s32i.n	a7, a12, 0
+  b3:	000046        	j	b8 <system_upgrade-0x24>
+  b6:	0e0c      	movi.n	a14, 0
+  b8:	4c28      	l32i.n	a2, a12, 16
+  ba:	ffd701        	l32r	a0, 18 <system_upgrade-0xc4>
+  bd:	0000c0        	callx0	a0
+  c0:	0e2d      	mov.n	a2, a14
+  c2:	080c      	movi.n	a8, 0
+  c4:	4c89      	s32i.n	a8, a12, 16
+  c6:	21c8      	l32i.n	a12, a1, 8
+  c8:	31d8      	l32i.n	a13, a1, 12
+  ca:	41e8      	l32i.n	a14, a1, 16
+  cc:	1108      	l32i.n	a0, a1, 4
+  ce:	20c112        	addi	a1, a1, 32
+  d1:	f00d      	ret.n
+  d3:	120c      	movi.n	a2, 1
+  d5:	fffb46        	j	c6 <system_upgrade-0x16>
+  d8:	000000        	ill
+	...
+
+000000dc <system_upgrade>:
+  dc:	034d      	mov.n	a4, a3
+  de:	f0c112        	addi	a1, a1, -16
+  e1:	023d      	mov.n	a3, a2
+  e3:	fffd21        	l32r	a2, d8 <system_upgrade-0x4>
+  e6:	0109      	s32i.n	a0, a1, 0
+  e8:	0228      	l32i.n	a2, a2, 0
+  ea:	fff305        	call0	1c <system_upgrade-0xc0>
+  ed:	0108      	l32i.n	a0, a1, 0
+  ef:	10c112        	addi	a1, a1, 16
+  f2:	f00d      	ret.n
+	...
+
+00000108 <system_upgrade_init>:
+ 108:	f0c112        	addi	a1, a1, -16
+ 10b:	11c9      	s32i.n	a12, a1, 4
+ 10d:	21d9      	s32i.n	a13, a1, 8
+ 10f:	0109      	s32i.n	a0, a1, 0
+ 111:	fff901        	l32r	a0, f8 <system_upgrade+0x1c>
+ 114:	0000c0        	callx0	a0
+ 117:	fff7c1        	l32r	a12, f4 <system_upgrade+0x18>
+ 11a:	0c08      	l32i.n	a0, a12, 0
+ 11c:	02dd      	mov.n	a13, a2
+ 11e:	80cc      	bnez.n	a0, 12a <system_upgrade_init+0x22>
+ 120:	421c      	movi.n	a2, 20
+ 122:	fff601        	l32r	a0, fc <system_upgrade+0x20>
+ 125:	0000c0        	callx0	a0
+ 128:	0c29      	s32i.n	a2, a12, 0
+ 12a:	020c      	movi.n	a2, 0
+ 12c:	fff501        	l32r	a0, 100 <system_upgrade+0x24>
+ 12f:	0000c0        	callx0	a0
+ 132:	7400d0        	extui	a0, a13, 0, 8
+ 135:	4a2026        	beqi	a0, 2, 183 <system_upgrade_init+0x7b>
+ 138:	473026        	beqi	a0, 3, 183 <system_upgrade_init+0x7b>
+ 13b:	444026        	beqi	a0, 4, 183 <system_upgrade_init+0x7b>
+ 13e:	335026        	beqi	a0, 5, 175 <system_upgrade_init+0x6d>
+ 141:	306026        	beqi	a0, 6, 175 <system_upgrade_init+0x6d>
+ 144:	1d4c      	movi.n	a13, 65
+ 146:	0c38      	l32i.n	a3, a12, 0
+ 148:	b23c      	movi.n	a2, 59
+ 14a:	035322        	s16i	a2, a3, 6
+ 14d:	ffed01        	l32r	a0, 104 <system_upgrade+0x28>
+ 150:	0000c0        	callx0	a0
+ 153:	0108      	l32i.n	a0, a1, 0
+ 155:	f460d0        	extui	a6, a13, 0, 16
+ 158:	140c      	movi.n	a4, 1
+ 15a:	0c58      	l32i.n	a5, a12, 0
+ 15c:	070c      	movi.n	a7, 0
+ 15e:	11c8      	l32i.n	a12, a1, 4
+ 160:	837420        	moveqz	a7, a4, a2
+ 163:	21d8      	l32i.n	a13, a1, 8
+ 165:	934670        	movnez	a4, a6, a7
+ 168:	025542        	s16i	a4, a5, 4
+ 16b:	114440        	slli	a4, a4, 12
+ 16e:	0549      	s32i.n	a4, a5, 0
+ 170:	10c112        	addi	a1, a1, 16
+ 173:	f00d      	ret.n
+ 175:	01a1d2        	movi	a13, 0x101
+ 178:	0c98      	l32i.n	a9, a12, 0
+ 17a:	fba082        	movi	a8, 251
+ 17d:	035982        	s16i	a8, a9, 6
+ 180:	fff246        	j	14d <system_upgrade_init+0x45>
+ 183:	81a0d2        	movi	a13, 129
+ 186:	0cb8      	l32i.n	a11, a12, 0
+ 188:	7ba0a2        	movi	a10, 123
+ 18b:	035ba2        	s16i	a10, a11, 6
+ 18e:	ffeec6        	j	14d <system_upgrade_init+0x45>
+	...
+
+000001a0 <system_upgrade_deinit>:
+ 1a0:	fffd21        	l32r	a2, 194 <system_upgrade_init+0x8c>
+ 1a3:	f0c112        	addi	a1, a1, -16
+ 1a6:	0228      	l32i.n	a2, a2, 0
+ 1a8:	0109      	s32i.n	a0, a1, 0
+ 1aa:	b28c      	beqz.n	a2, 1b9 <system_upgrade_deinit+0x19>
+ 1ac:	fffc01        	l32r	a0, 19c <system_upgrade_init+0x94>
+ 1af:	0000c0        	callx0	a0
+ 1b2:	fff941        	l32r	a4, 198 <system_upgrade_init+0x90>
+ 1b5:	030c      	movi.n	a3, 0
+ 1b7:	0439      	s32i.n	a3, a4, 0
+ 1b9:	0108      	l32i.n	a0, a1, 0
+ 1bb:	10c112        	addi	a1, a1, 16
+ 1be:	f00d      	ret.n
+	...
+ 1cc:	f0c112        	addi	a1, a1, -16
+ 1cf:	11c9      	s32i.n	a12, a1, 4
+ 1d1:	0109      	s32i.n	a0, a1, 0
+ 1d3:	02cd      	mov.n	a12, a2
+ 1d5:	929c      	beqz.n	a2, 1f2 <system_upgrade_deinit+0x52>
+ 1d7:	2228      	l32i.n	a2, a2, 8
+ 1d9:	fffa01        	l32r	a0, 1c4 <system_upgrade_deinit+0x24>
+ 1dc:	0000c0        	callx0	a0
+ 1df:	0c2d      	mov.n	a2, a12
+ 1e1:	000c      	movi.n	a0, 0
+ 1e3:	2c09      	s32i.n	a0, a12, 8
+ 1e5:	fff801        	l32r	a0, 1c8 <system_upgrade_deinit+0x28>
+ 1e8:	0000c0        	callx0	a0
+ 1eb:	fff531        	l32r	a3, 1c0 <system_upgrade_deinit+0x20>
+ 1ee:	020c      	movi.n	a2, 0
+ 1f0:	1329      	s32i.n	a2, a3, 4
+ 1f2:	11c8      	l32i.n	a12, a1, 4
+ 1f4:	0108      	l32i.n	a0, a1, 0
+ 1f6:	10c112        	addi	a1, a1, 16
+ 1f9:	f00d      	ret.n
+ 1fb:	f00d00        	subx8	a0, a13, a0
+ 1fe:	000000        	ill
+ 201:	000000        	ill
+ 204:	f0c112        	addi	a1, a1, -16
+ 207:	0109      	s32i.n	a0, a1, 0
+ 209:	fffd01        	l32r	a0, 200 <system_upgrade_deinit+0x60>
+ 20c:	0000c0        	callx0	a0
+ 20f:	021226        	beqi	a2, 1, 215 <system_upgrade_deinit+0x75>
+ 212:	000005        	call0	214 <system_upgrade_deinit+0x74>
+ 215:	0108      	l32i.n	a0, a1, 0
+ 217:	10c112        	addi	a1, a1, 16
+ 21a:	f00d      	ret.n
+	...
+ 228:	f0c112        	addi	a1, a1, -16
+ 22b:	11c9      	s32i.n	a12, a1, 4
+ 22d:	0109      	s32i.n	a0, a1, 0
+ 22f:	02cd      	mov.n	a12, a2
+ 231:	c29c      	beqz.n	a2, 251 <system_upgrade_deinit+0xb1>
+ 233:	000005        	call0	234 <system_upgrade_deinit+0x94>
+ 236:	2c28      	l32i.n	a2, a12, 8
+ 238:	fffa01        	l32r	a0, 220 <system_upgrade_deinit+0x80>
+ 23b:	0000c0        	callx0	a0
+ 23e:	0c2d      	mov.n	a2, a12
+ 240:	000c      	movi.n	a0, 0
+ 242:	2c09      	s32i.n	a0, a12, 8
+ 244:	fff801        	l32r	a0, 224 <system_upgrade_deinit+0x84>
+ 247:	0000c0        	callx0	a0
+ 24a:	fff431        	l32r	a3, 21c <system_upgrade_deinit+0x7c>
+ 24d:	020c      	movi.n	a2, 0
+ 24f:	1329      	s32i.n	a2, a3, 4
+ 251:	11c8      	l32i.n	a12, a1, 4
+ 253:	0108      	l32i.n	a0, a1, 0
+ 255:	10c112        	addi	a1, a1, 16
+ 258:	f00d      	ret.n
+ 25a:	000000        	ill
+ 25d:	000000        	ill
+ 260:	000010        	excw
+	...
+ 27f:	c11200        	mul16u	a1, a2, a0
+ 282:	11c9f0        	slli	a12, a9, 1
+ 285:	0109      	s32i.n	a0, a1, 0
+ 287:	02cd      	mov.n	a12, a2
+ 289:	fff421        	l32r	a2, 25c <system_upgrade_deinit+0xbc>
+ 28c:	fff701        	l32r	a0, 268 <system_upgrade_deinit+0xc8>
+ 28f:	0000c0        	callx0	a0
+ 292:	fff601        	l32r	a0, 26c <system_upgrade_deinit+0xcc>
+ 295:	0000c0        	callx0	a0
+ 298:	fff201        	l32r	a0, 260 <system_upgrade_deinit+0xc0>
+ 29b:	f0c032        	addi	a3, a0, -16
+ 29e:	292226        	beqi	a2, 2, 2cb <system_upgrade_deinit+0x12b>
+ 2a1:	002d      	mov.n	a2, a0
+ 2a3:	040c      	movi.n	a4, 0
+ 2a5:	2349      	s32i.n	a4, a3, 8
+ 2a7:	3349      	s32i.n	a4, a3, 12
+ 2a9:	fff101        	l32r	a0, 270 <system_upgrade_deinit+0xd0>
+ 2ac:	0000c0        	callx0	a0
+ 2af:	020c      	movi.n	a2, 0
+ 2b1:	fff001        	l32r	a0, 274 <system_upgrade_deinit+0xd4>
+ 2b4:	0000c0        	callx0	a0
+ 2b7:	fff4c5        	call0	204 <system_upgrade_deinit+0x64>
+ 2ba:	060c      	movi.n	a6, 0
+ 2bc:	cc48      	l32i.n	a4, a12, 48
+ 2be:	064c62        	s8i	a6, a12, 6
+ 2c1:	f49c      	beqz.n	a4, 2e4 <system_upgrade_deinit+0x144>
+ 2c3:	0c2d      	mov.n	a2, a12
+ 2c5:	0004c0        	callx0	a4
+ 2c8:	000606        	j	2e4 <system_upgrade_deinit+0x144>
+ 2cb:	002d      	mov.n	a2, a0
+ 2cd:	ffea01        	l32r	a0, 278 <system_upgrade_deinit+0xd8>
+ 2d0:	0000c0        	callx0	a0
+ 2d3:	fff305        	call0	204 <system_upgrade_deinit+0x64>
+ 2d6:	170c      	movi.n	a7, 1
+ 2d8:	cc48      	l32i.n	a4, a12, 48
+ 2da:	064c72        	s8i	a7, a12, 6
+ 2dd:	348c      	beqz.n	a4, 2e4 <system_upgrade_deinit+0x144>
+ 2df:	0c2d      	mov.n	a2, a12
+ 2e1:	0004c0        	callx0	a4
+ 2e4:	ffe021        	l32r	a2, 264 <system_upgrade_deinit+0xc4>
+ 2e7:	11c8      	l32i.n	a12, a1, 4
+ 2e9:	1228      	l32i.n	a2, a2, 4
+ 2eb:	ffe401        	l32r	a0, 27c <system_upgrade_deinit+0xdc>
+ 2ee:	0000c0        	callx0	a0
+ 2f1:	0108      	l32i.n	a0, a1, 0
+ 2f3:	10c112        	addi	a1, a1, 16
+ 2f6:	f00d      	ret.n
+	...
+
+00000308 <system_upgrade_erase_flash>:
+ 308:	f0c112        	addi	a1, a1, -16
+ 30b:	21d9      	s32i.n	a13, a1, 8
+ 30d:	31e9      	s32i.n	a14, a1, 12
+ 30f:	11c9      	s32i.n	a12, a1, 4
+ 311:	0109      	s32i.n	a0, a1, 0
+ 313:	02cd      	mov.n	a12, a2
+ 315:	fff901        	l32r	a0, 2fc <system_upgrade_deinit+0x15c>
+ 318:	0000c0        	callx0	a0
+ 31b:	41dcc0        	srli	a13, a12, 12
+ 31e:	dd1b      	addi.n	a13, a13, 1
+ 320:	f4d0d0        	extui	a13, a13, 0, 16
+ 323:	8d9c      	beqz.n	a13, 33f <system_upgrade_erase_flash+0x37>
+ 325:	fff4e1        	l32r	a14, 2f8 <system_upgrade_deinit+0x158>
+ 328:	0c0c      	movi.n	a12, 0
+ 32a:	0e28      	l32i.n	a2, a14, 0
+ 32c:	021222        	l16ui	a2, a2, 4
+ 32f:	22ca      	add.n	a2, a2, a12
+ 331:	fff301        	l32r	a0, 300 <system_upgrade_deinit+0x160>
+ 334:	0000c0        	callx0	a0
+ 337:	cc1b      	addi.n	a12, a12, 1
+ 339:	74c0c0        	extui	a12, a12, 0, 8
+ 33c:	ea3cd7        	bltu	a12, a13, 32a <system_upgrade_erase_flash+0x22>
+ 33f:	11c8      	l32i.n	a12, a1, 4
+ 341:	21d8      	l32i.n	a13, a1, 8
+ 343:	31e8      	l32i.n	a14, a1, 12
+ 345:	ffef01        	l32r	a0, 304 <system_upgrade_deinit+0x164>
+ 348:	0000c0        	callx0	a0
+ 34b:	0108      	l32i.n	a0, a1, 0
+ 34d:	10c112        	addi	a1, a1, 16
+ 350:	f00d      	ret.n
+ 352:	240000        	extui	a0, a0, 0, 3
+ 355:	000000        	ill
+ 358:	000000        	ill
+ 35b:	000800        	excw
+ 35e:	180000        	excw
+ 361:	000000        	ill
+ 364:	002c      	movi.n	a0, 32
+ 366:	100000        	and	a0, a0, a0
+ 369:	000000        	ill
+ 36c:	0000a0        	jx	a0
+ 36f:	00b000        	excw
+ 372:	040000        	extui	a0, a0, 0, 1
+ 375:	000002        	l8ui	a0, a0, 0
+ 378:	000280        	ret
+ 37b:	005000        	syscall
+ 37e:	000000        	ill
+ 381:	000000        	ill
+ 384:	000070        	excw
+ 387:	009000        	excw
+ 38a:	800000        	add	a0, a0, a0
+ 38d:	000002        	l8ui	a0, a0, 0
+ 390:	000030        	excw
+	...
+ 40b:	a56c00        	extui	a6, a0, 28, 11
+ 40e:	360c      	movi.n	a6, 3
+ 410:	976c      	movi.n	a7, -23
+ 412:	042d      	mov.n	a2, a4
+ 414:	a0c112        	addi	a1, a1, -96
+ 417:	146102        	s32i	a0, a1, 80
+ 41a:	1561c2        	s32i	a12, a1, 84
+ 41d:	440c      	movi.n	a4, 4
+ 41f:	1661d2        	s32i	a13, a1, 88
+ 422:	1761e2        	s32i	a14, a1, 92
+ 425:	03dd      	mov.n	a13, a3
+ 427:	004172        	s8i	a7, a1, 0
+ 42a:	014162        	s8i	a6, a1, 1
+ 42d:	024152        	s8i	a5, a1, 2
+ 430:	ffc9e1        	l32r	a14, 354 <system_upgrade_erase_flash+0x4c>
+ 433:	034142        	s8i	a4, a1, 3
+ 436:	dccec2        	addi	a12, a14, -36
+ 439:	2c08      	l32i.n	a0, a12, 8
+ 43b:	126122        	s32i	a2, a1, 72
+ 43e:	081056        	bnez	a0, 4c3 <system_upgrade_erase_flash+0x1bb>
+ 441:	032d      	mov.n	a2, a3
+ 443:	ffc531        	l32r	a3, 358 <system_upgrade_erase_flash+0x50>
+ 446:	ffd301        	l32r	a0, 394 <system_upgrade_erase_flash+0x8c>
+ 449:	0000c0        	callx0	a0
+ 44c:	071216        	beqz	a2, 4c1 <system_upgrade_erase_flash+0x1b9>
+ 44f:	0d2d      	mov.n	a2, a13
+ 451:	ffc231        	l32r	a3, 35c <system_upgrade_erase_flash+0x54>
+ 454:	ffd101        	l32r	a0, 398 <system_upgrade_erase_flash+0x90>
+ 457:	0000c0        	callx0	a0
+ 45a:	063216        	beqz	a2, 4c1 <system_upgrade_erase_flash+0x1b9>
+ 45d:	0d2d      	mov.n	a2, a13
+ 45f:	ffc031        	l32r	a3, 360 <system_upgrade_erase_flash+0x58>
+ 462:	ffce01        	l32r	a0, 39c <system_upgrade_erase_flash+0x94>
+ 465:	0000c0        	callx0	a0
+ 468:	136122        	s32i	a2, a1, 76
+ 46b:	0f8216        	beqz	a2, 567 <system_upgrade_erase_flash+0x25f>
+ 46e:	ffbd31        	l32r	a3, 364 <system_upgrade_erase_flash+0x5c>
+ 471:	10c222        	addi	a2, a2, 16
+ 474:	106122        	s32i	a2, a1, 64
+ 477:	ffca01        	l32r	a0, 3a0 <system_upgrade_erase_flash+0x98>
+ 47a:	0000c0        	callx0	a0
+ 47d:	116122        	s32i	a2, a1, 68
+ 480:	1b8216        	beqz	a2, 63c <system_upgrade_erase_flash+0x334>
+ 483:	10c122        	addi	a2, a1, 16
+ 486:	030c      	movi.n	a3, 0
+ 488:	042c      	movi.n	a4, 32
+ 48a:	ffc601        	l32r	a0, 3a4 <system_upgrade_erase_flash+0x9c>
+ 48d:	0000c0        	callx0	a0
+ 490:	102132        	l32i	a3, a1, 64
+ 493:	132152        	l32i	a5, a1, 76
+ 496:	112142        	l32i	a4, a1, 68
+ 499:	10c122        	addi	a2, a1, 16
+ 49c:	c04450        	sub	a4, a4, a5
+ 49f:	f0c442        	addi	a4, a4, -16
+ 4a2:	ffc101        	l32r	a0, 3a8 <system_upgrade_erase_flash+0xa0>
+ 4a5:	0000c0        	callx0	a0
+ 4a8:	10c122        	addi	a2, a1, 16
+ 4ab:	ffc001        	l32r	a0, 3ac <system_upgrade_erase_flash+0xa4>
+ 4ae:	0000c0        	callx0	a0
+ 4b1:	023d      	mov.n	a3, a2
+ 4b3:	3c29      	s32i.n	a2, a12, 12
+ 4b5:	ffac21        	l32r	a2, 368 <system_upgrade_erase_flash+0x60>
+ 4b8:	ffbe01        	l32r	a0, 3b0 <system_upgrade_erase_flash+0xa8>
+ 4bb:	0000c0        	callx0	a0
+ 4be:	002b86        	j	570 <system_upgrade_erase_flash+0x268>
+ 4c1:	2c08      	l32i.n	a0, a12, 8
+ 4c3:	122132        	l32i	a3, a1, 72
+ 4c6:	ffa921        	l32r	a2, 36c <system_upgrade_erase_flash+0x64>
+ 4c9:	330a      	add.n	a3, a3, a0
+ 4cb:	2c39      	s32i.n	a3, a12, 8
+ 4cd:	ffb901        	l32r	a0, 3b4 <system_upgrade_erase_flash+0xac>
+ 4d0:	0000c0        	callx0	a0
+ 4d3:	0d2d      	mov.n	a2, a13
+ 4d5:	122132        	l32i	a3, a1, 72
+ 4d8:	000005        	call0	4dc <system_upgrade_erase_flash+0x1d4>
+ 4db:	3c58      	l32i.n	a5, a12, 12
+ 4dd:	2c48      	l32i.n	a4, a12, 8
+ 4df:	0d0c      	movi.n	a13, 0
+ 4e1:	419457        	bne	a4, a5, 526 <system_upgrade_erase_flash+0x21e>
+ 4e4:	ffa321        	l32r	a2, 370 <system_upgrade_erase_flash+0x68>
+ 4e7:	ffb401        	l32r	a0, 3b8 <system_upgrade_erase_flash+0xb0>
+ 4ea:	0000c0        	callx0	a0
+ 4ed:	220c      	movi.n	a2, 2
+ 4ef:	ffb301        	l32r	a0, 3bc <system_upgrade_erase_flash+0xb4>
+ 4f2:	0000c0        	callx0	a0
+ 4f5:	2cd9      	s32i.n	a13, a12, 8
+ 4f7:	1c28      	l32i.n	a2, a12, 4
+ 4f9:	3cd9      	s32i.n	a13, a12, 12
+ 4fb:	6228      	l32i.n	a2, a2, 24
+ 4fd:	ffd805        	call0	280 <system_upgrade_deinit+0xe0>
+ 500:	0e2d      	mov.n	a2, a14
+ 502:	ffaf01        	l32r	a0, 3c0 <system_upgrade_erase_flash+0xb8>
+ 505:	0000c0        	callx0	a0
+ 508:	0e2d      	mov.n	a2, a14
+ 50a:	ff9a31        	l32r	a3, 374 <system_upgrade_erase_flash+0x6c>
+ 50d:	040c      	movi.n	a4, 0
+ 50f:	ffad01        	l32r	a0, 3c4 <system_upgrade_erase_flash+0xbc>
+ 512:	0000c0        	callx0	a0
+ 515:	0e2d      	mov.n	a2, a14
+ 517:	a30c      	movi.n	a3, 10
+ 519:	040c      	movi.n	a4, 0
+ 51b:	150c      	movi.n	a5, 1
+ 51d:	ffaa01        	l32r	a0, 3c8 <system_upgrade_erase_flash+0xc0>
+ 520:	0000c0        	callx0	a0
+ 523:	000bc6        	j	556 <system_upgrade_erase_flash+0x24e>
+ 526:	1c38      	l32i.n	a3, a12, 4
+ 528:	1338      	l32i.n	a3, a3, 4
+ 52a:	285326        	beqi	a3, 5, 556 <system_upgrade_erase_flash+0x24e>
+ 52d:	2cd9      	s32i.n	a13, a12, 8
+ 52f:	3cd9      	s32i.n	a13, a12, 12
+ 531:	0e2d      	mov.n	a2, a14
+ 533:	ffa601        	l32r	a0, 3cc <system_upgrade_erase_flash+0xc4>
+ 536:	0000c0        	callx0	a0
+ 539:	ff8f31        	l32r	a3, 378 <system_upgrade_erase_flash+0x70>
+ 53c:	1c48      	l32i.n	a4, a12, 4
+ 53e:	0e2d      	mov.n	a2, a14
+ 540:	6448      	l32i.n	a4, a4, 24
+ 542:	ffa301        	l32r	a0, 3d0 <system_upgrade_erase_flash+0xc8>
+ 545:	0000c0        	callx0	a0
+ 548:	0e2d      	mov.n	a2, a14
+ 54a:	a30c      	movi.n	a3, 10
+ 54c:	040c      	movi.n	a4, 0
+ 54e:	150c      	movi.n	a5, 1
+ 550:	ffa101        	l32r	a0, 3d4 <system_upgrade_erase_flash+0xcc>
+ 553:	0000c0        	callx0	a0
+ 556:	1521c2        	l32i	a12, a1, 84
+ 559:	1621d2        	l32i	a13, a1, 88
+ 55c:	1721e2        	l32i	a14, a1, 92
+ 55f:	142102        	l32i	a0, a1, 80
+ 562:	60c112        	addi	a1, a1, 96
+ 565:	f00d      	ret.n
+ 567:	ff8521        	l32r	a2, 37c <system_upgrade_erase_flash+0x74>
+ 56a:	ff9b01        	l32r	a0, 3d8 <system_upgrade_erase_flash+0xd0>
+ 56d:	0000c0        	callx0	a0
+ 570:	3c08      	l32i.n	a0, a12, 12
+ 572:	90bc      	beqz.n	a0, 5af <system_upgrade_erase_flash+0x2a7>
+ 574:	415c00        	srli	a5, a0, 12
+ 577:	551b      	addi.n	a5, a5, 1
+ 579:	f45050        	extui	a5, a5, 0, 16
+ 57c:	e159      	s32i.n	a5, a1, 56
+ 57e:	ff9701        	l32r	a0, 3dc <system_upgrade_erase_flash+0xd4>
+ 581:	0000c0        	callx0	a0
+ 584:	e168      	l32i.n	a6, a1, 56
+ 586:	f69c      	beqz.n	a6, 5a9 <system_upgrade_erase_flash+0x2a1>
+ 588:	070c      	movi.n	a7, 0
+ 58a:	f179      	s32i.n	a7, a1, 60
+ 58c:	0c28      	l32i.n	a2, a12, 0
+ 58e:	f138      	l32i.n	a3, a1, 60
+ 590:	021222        	l16ui	a2, a2, 4
+ 593:	223a      	add.n	a2, a2, a3
+ 595:	ff9201        	l32r	a0, 3e0 <system_upgrade_erase_flash+0xd8>
+ 598:	0000c0        	callx0	a0
+ 59b:	f138      	l32i.n	a3, a1, 60
+ 59d:	e148      	l32i.n	a4, a1, 56
+ 59f:	531b      	addi.n	a5, a3, 1
+ 5a1:	743050        	extui	a3, a5, 0, 8
+ 5a4:	f139      	s32i.n	a3, a1, 60
+ 5a6:	e23347        	bltu	a3, a4, 58c <system_upgrade_erase_flash+0x284>
+ 5a9:	ff8e01        	l32r	a0, 3e4 <system_upgrade_erase_flash+0xdc>
+ 5ac:	0000c0        	callx0	a0
+ 5af:	0d2d      	mov.n	a2, a13
+ 5b1:	ff7331        	l32r	a3, 380 <system_upgrade_erase_flash+0x78>
+ 5b4:	ff8d01        	l32r	a0, 3e8 <system_upgrade_erase_flash+0xe0>
+ 5b7:	0000c0        	callx0	a0
+ 5ba:	2c68      	l32i.n	a6, a12, 8
+ 5bc:	c129      	s32i.n	a2, a1, 48
+ 5be:	c08d20        	sub	a8, a13, a2
+ 5c1:	122172        	l32i	a7, a1, 72
+ 5c4:	ff7021        	l32r	a2, 384 <system_upgrade_erase_flash+0x7c>
+ 5c7:	778a      	add.n	a7, a7, a8
+ 5c9:	fcc772        	addi	a7, a7, -4
+ 5cc:	f47070        	extui	a7, a7, 0, 16
+ 5cf:	d179      	s32i.n	a7, a1, 52
+ 5d1:	667a      	add.n	a6, a6, a7
+ 5d3:	2c69      	s32i.n	a6, a12, 8
+ 5d5:	ff8501        	l32r	a0, 3ec <system_upgrade_erase_flash+0xe4>
+ 5d8:	0000c0        	callx0	a0
+ 5db:	c1d8      	l32i.n	a13, a1, 48
+ 5dd:	d198      	l32i.n	a9, a1, 52
+ 5df:	dd4b      	addi.n	a13, a13, 4
+ 5e1:	04d916        	beqz	a9, 632 <system_upgrade_erase_flash+0x32a>
+ 5e4:	0d2d      	mov.n	a2, a13
+ 5e6:	013d      	mov.n	a3, a1
+ 5e8:	240c      	movi.n	a4, 2
+ 5ea:	ff8101        	l32r	a0, 3f0 <system_upgrade_erase_flash+0xe8>
+ 5ed:	0000c0        	callx0	a0
+ 5f0:	03e216        	beqz	a2, 632 <system_upgrade_erase_flash+0x32a>
+ 5f3:	0d2d      	mov.n	a2, a13
+ 5f5:	312b      	addi.n	a3, a1, 2
+ 5f7:	240c      	movi.n	a4, 2
+ 5f9:	ff7e01        	l32r	a0, 3f4 <system_upgrade_erase_flash+0xec>
+ 5fc:	0000c0        	callx0	a0
+ 5ff:	f2ac      	beqz.n	a2, 632 <system_upgrade_erase_flash+0x32a>
+ 601:	ff6121        	l32r	a2, 388 <system_upgrade_erase_flash+0x80>
+ 604:	ff7d01        	l32r	a0, 3f8 <system_upgrade_erase_flash+0xf0>
+ 607:	0000c0        	callx0	a0
+ 60a:	0e2d      	mov.n	a2, a14
+ 60c:	ff7c01        	l32r	a0, 3fc <system_upgrade_erase_flash+0xf4>
+ 60f:	0000c0        	callx0	a0
+ 612:	ff5e31        	l32r	a3, 38c <system_upgrade_erase_flash+0x84>
+ 615:	1c48      	l32i.n	a4, a12, 4
+ 617:	0e2d      	mov.n	a2, a14
+ 619:	6448      	l32i.n	a4, a4, 24
+ 61b:	ff7901        	l32r	a0, 400 <system_upgrade_erase_flash+0xf8>
+ 61e:	0000c0        	callx0	a0
+ 621:	0e2d      	mov.n	a2, a14
+ 623:	a30c      	movi.n	a3, 10
+ 625:	040c      	movi.n	a4, 0
+ 627:	150c      	movi.n	a5, 1
+ 629:	ff7601        	l32r	a0, 404 <system_upgrade_erase_flash+0xfc>
+ 62c:	0000c0        	callx0	a0
+ 62f:	ffc8c6        	j	556 <system_upgrade_erase_flash+0x24e>
+ 632:	0d2d      	mov.n	a2, a13
+ 634:	d138      	l32i.n	a3, a1, 52
+ 636:	000005        	call0	638 <system_upgrade_erase_flash+0x330>
+ 639:	ffa786        	j	4db <system_upgrade_erase_flash+0x1d3>
+ 63c:	ff5521        	l32r	a2, 390 <system_upgrade_erase_flash+0x88>
+ 63f:	ff7201        	l32r	a0, 408 <system_upgrade_erase_flash+0x100>
+ 642:	0000c0        	callx0	a0
+ 645:	ffc9c6        	j	570 <system_upgrade_erase_flash+0x268>
+ 648:	0000e0        	excw
+ 64b:	002400        	excw
+ 64e:	cc0000        	excw
+ 651:	000001        	l32r	a0, fffc0654 <system_upgrade_start+0xfffbfe60>
+ 654:	01fc      	bnez.n	a1, 688 <system_upgrade_erase_flash+0x380>
+ 656:	000000        	ill
+ 659:	000000        	ill
+ 65c:	000100        	excw
+	...
+ 683:	c11200        	mul16u	a1, a2, a0
+ 686:	11c9f0        	slli	a12, a9, 1
+ 689:	0109      	s32i.n	a0, a1, 0
+ 68b:	02cd      	mov.n	a12, a2
+ 68d:	ffee21        	l32r	a2, 648 <system_upgrade_erase_flash+0x340>
+ 690:	fff601        	l32r	a0, 668 <system_upgrade_erase_flash+0x360>
+ 693:	0000c0        	callx0	a0
+ 696:	ffed21        	l32r	a2, 64c <system_upgrade_erase_flash+0x344>
+ 699:	fff401        	l32r	a0, 66c <system_upgrade_erase_flash+0x364>
+ 69c:	0000c0        	callx0	a0
+ 69f:	0c2d      	mov.n	a2, a12
+ 6a1:	ffeb31        	l32r	a3, 650 <system_upgrade_erase_flash+0x348>
+ 6a4:	fff301        	l32r	a0, 670 <system_upgrade_erase_flash+0x368>
+ 6a7:	0000c0        	callx0	a0
+ 6aa:	0c2d      	mov.n	a2, a12
+ 6ac:	ffea31        	l32r	a3, 654 <system_upgrade_erase_flash+0x34c>
+ 6af:	fff101        	l32r	a0, 674 <system_upgrade_erase_flash+0x36c>
+ 6b2:	0000c0        	callx0	a0
+ 6b5:	ffe831        	l32r	a3, 658 <system_upgrade_erase_flash+0x350>
+ 6b8:	e338      	l32i.n	a3, a3, 56
+ 6ba:	43ac      	beqz.n	a3, 6e2 <system_upgrade_erase_flash+0x3da>
+ 6bc:	ffe821        	l32r	a2, 65c <system_upgrade_erase_flash+0x354>
+ 6bf:	ffee01        	l32r	a0, 678 <system_upgrade_erase_flash+0x370>
+ 6c2:	0000c0        	callx0	a0
+ 6c5:	ffe621        	l32r	a2, 660 <system_upgrade_erase_flash+0x358>
+ 6c8:	e228      	l32i.n	a2, a2, 56
+ 6ca:	ffec01        	l32r	a0, 67c <system_upgrade_erase_flash+0x374>
+ 6cd:	0000c0        	callx0	a0
+ 6d0:	024d      	mov.n	a4, a2
+ 6d2:	ffe431        	l32r	a3, 664 <system_upgrade_erase_flash+0x35c>
+ 6d5:	0c2d      	mov.n	a2, a12
+ 6d7:	f44040        	extui	a4, a4, 0, 16
+ 6da:	e338      	l32i.n	a3, a3, 56
+ 6dc:	ffe901        	l32r	a0, 680 <system_upgrade_erase_flash+0x378>
+ 6df:	0000c0        	callx0	a0
+ 6e2:	11c8      	l32i.n	a12, a1, 4
+ 6e4:	0108      	l32i.n	a0, a1, 0
+ 6e6:	10c112        	addi	a1, a1, 16
+ 6e9:	f00d      	ret.n
+ 6eb:	011000        	slli	a1, a0, 32
+ 6ee:	000000        	ill
+ 6f1:	000000        	ill
+ 6f4:	000684        	excw
+ 6f7:	040c00        	extui	a0, a0, 12, 1
+ 6fa:	240000        	extui	a0, a0, 0, 3
+ 6fd:	000000        	ill
+ 700:	000024        	excw
+ 703:	022800        	excw
+ 706:	240000        	extui	a0, a0, 0, 3
+ 709:	000000        	ill
+ 70c:	002710        	excw
+	...
+ 72f:	c11200        	mul16u	a1, a2, a0
+ 732:	21c9f0        	srai	a12, a15, 9
+ 735:	0129      	s32i.n	a2, a1, 0
+ 737:	1109      	s32i.n	a0, a1, 4
+ 739:	ffec21        	l32r	a2, 6ec <system_upgrade_erase_flash+0x3e4>
+ 73c:	fff501        	l32r	a0, 710 <system_upgrade_erase_flash+0x408>
+ 73f:	0000c0        	callx0	a0
+ 742:	ffec31        	l32r	a3, 6f4 <system_upgrade_erase_flash+0x3ec>
+ 745:	ffeac1        	l32r	a12, 6f0 <system_upgrade_erase_flash+0x3e8>
+ 748:	0108      	l32i.n	a0, a1, 0
+ 74a:	1c28      	l32i.n	a2, a12, 4
+ 74c:	b008      	l32i.n	a0, a0, 44
+ 74e:	ec09      	s32i.n	a0, a12, 56
+ 750:	fff101        	l32r	a0, 714 <system_upgrade_erase_flash+0x40c>
+ 753:	0000c0        	callx0	a0
+ 756:	1c28      	l32i.n	a2, a12, 4
+ 758:	ffe831        	l32r	a3, 6f8 <system_upgrade_erase_flash+0x3f0>
+ 75b:	ffef01        	l32r	a0, 718 <system_upgrade_erase_flash+0x410>
+ 75e:	0000c0        	callx0	a0
+ 761:	000005        	call0	764 <system_upgrade_erase_flash+0x45c>
+ 764:	120c      	movi.n	a2, 1
+ 766:	ffed01        	l32r	a0, 71c <system_upgrade_erase_flash+0x414>
+ 769:	0000c0        	callx0	a0
+ 76c:	1c28      	l32i.n	a2, a12, 4
+ 76e:	ffec01        	l32r	a0, 720 <system_upgrade_erase_flash+0x418>
+ 771:	0000c0        	callx0	a0
+ 774:	ffe221        	l32r	a2, 6fc <system_upgrade_erase_flash+0x3f4>
+ 777:	ffeb01        	l32r	a0, 724 <system_upgrade_erase_flash+0x41c>
+ 77a:	0000c0        	callx0	a0
+ 77d:	1c48      	l32i.n	a4, a12, 4
+ 77f:	ffe021        	l32r	a2, 700 <system_upgrade_erase_flash+0x3f8>
+ 782:	ffe031        	l32r	a3, 704 <system_upgrade_erase_flash+0x3fc>
+ 785:	ffe801        	l32r	a0, 728 <system_upgrade_erase_flash+0x420>
+ 788:	0000c0        	callx0	a0
+ 78b:	ffdf21        	l32r	a2, 708 <system_upgrade_erase_flash+0x400>
+ 78e:	ffdf31        	l32r	a3, 70c <system_upgrade_erase_flash+0x404>
+ 791:	040c      	movi.n	a4, 0
+ 793:	150c      	movi.n	a5, 1
+ 795:	21c8      	l32i.n	a12, a1, 8
+ 797:	ffe501        	l32r	a0, 72c <system_upgrade_erase_flash+0x424>
+ 79a:	0000c0        	callx0	a0
+ 79d:	1108      	l32i.n	a0, a1, 4
+ 79f:	10c112        	addi	a1, a1, 16
+ 7a2:	f00d      	ret.n
+ 7a4:	000130        	excw
+	...
+ 7b7:	014000        	slli	a4, a0, 32
+ 7ba:	100000        	and	a0, a0, a0
+ 7bd:	000000        	ill
+ 7c0:	000010        	excw
+ 7c3:	028000        	excw
+ 7c6:	100000        	and	a0, a0, a0
+	...
+
+000007f4 <system_upgrade_start>:
+ 7f4:	f0c112        	addi	a1, a1, -16
+ 7f7:	11c9      	s32i.n	a12, a1, 4
+ 7f9:	0109      	s32i.n	a0, a1, 0
+ 7fb:	02cd      	mov.n	a12, a2
+ 7fd:	fff301        	l32r	a0, 7cc <system_upgrade_erase_flash+0x4c4>
+ 800:	0000c0        	callx0	a0
+ 803:	0a1226        	beqi	a2, 1, 811 <system_upgrade_start+0x1d>
+ 806:	cccc      	bnez.n	a12, 816 <system_upgrade_start+0x22>
+ 808:	ffe721        	l32r	a2, 7a4 <system_upgrade_erase_flash+0x49c>
+ 80b:	fff101        	l32r	a0, 7d0 <system_upgrade_erase_flash+0x4c8>
+ 80e:	0000c0        	callx0	a0
+ 811:	020c      	movi.n	a2, 0
+ 813:	002386        	j	8a5 <system_upgrade_start+0xb1>
+ 816:	ffe421        	l32r	a2, 7a8 <system_upgrade_erase_flash+0x4a0>
+ 819:	1228      	l32i.n	a2, a2, 4
+ 81b:	e2cc      	bnez.n	a2, 82d <system_upgrade_start+0x39>
+ 81d:	c21c      	movi.n	a2, 28
+ 81f:	ffed01        	l32r	a0, 7d4 <system_upgrade_erase_flash+0x4cc>
+ 822:	0000c0        	callx0	a0
+ 825:	ffe131        	l32r	a3, 7ac <system_upgrade_erase_flash+0x4a4>
+ 828:	1329      	s32i.n	a2, a3, 4
+ 82a:	075216        	beqz	a2, 8a3 <system_upgrade_start+0xaf>
+ 82d:	62c9      	s32i.n	a12, a2, 24
+ 82f:	041c      	movi.n	a4, 16
+ 831:	050c      	movi.n	a5, 0
+ 833:	2259      	s32i.n	a5, a2, 8
+ 835:	1259      	s32i.n	a5, a2, 4
+ 837:	0249      	s32i.n	a4, a2, 0
+ 839:	022c      	movi.n	a2, 32
+ 83b:	ffe701        	l32r	a0, 7d8 <system_upgrade_erase_flash+0x4d0>
+ 83e:	0000c0        	callx0	a0
+ 841:	ffdb61        	l32r	a6, 7b0 <system_upgrade_erase_flash+0x4a8>
+ 844:	1668      	l32i.n	a6, a6, 4
+ 846:	2629      	s32i.n	a2, a6, 8
+ 848:	057216        	beqz	a2, 8a3 <system_upgrade_start+0xaf>
+ 84b:	ffe401        	l32r	a0, 7dc <system_upgrade_erase_flash+0x4d4>
+ 84e:	0000c0        	callx0	a0
+ 851:	ffd871        	l32r	a7, 7b4 <system_upgrade_erase_flash+0x4ac>
+ 854:	0c3d      	mov.n	a3, a12
+ 856:	1778      	l32i.n	a7, a7, 4
+ 858:	440c      	movi.n	a4, 4
+ 85a:	2778      	l32i.n	a7, a7, 8
+ 85c:	021c82        	l16ui	a8, a12, 4
+ 85f:	1729      	s32i.n	a2, a7, 4
+ 861:	0789      	s32i.n	a8, a7, 0
+ 863:	27cb      	addi.n	a2, a7, 12
+ 865:	ffde01        	l32r	a0, 7e0 <system_upgrade_erase_flash+0x4d8>
+ 868:	0000c0        	callx0	a0
+ 86b:	ffd321        	l32r	a2, 7b8 <system_upgrade_erase_flash+0x4b0>
+ 86e:	ffdd01        	l32r	a0, 7e4 <system_upgrade_erase_flash+0x4dc>
+ 871:	0000c0        	callx0	a0
+ 874:	0c2d      	mov.n	a2, a12
+ 876:	ffeb85        	call0	730 <system_upgrade_erase_flash+0x428>
+ 879:	cc88      	l32i.n	a8, a12, 48
+ 87b:	48ac      	beqz.n	a8, 8a3 <system_upgrade_start+0xaf>
+ 87d:	ffcf21        	l32r	a2, 7bc <system_upgrade_erase_flash+0x4b4>
+ 880:	ffda01        	l32r	a0, 7e8 <system_upgrade_erase_flash+0x4e0>
+ 883:	0000c0        	callx0	a0
+ 886:	ffce21        	l32r	a2, 7c0 <system_upgrade_erase_flash+0x4b8>
+ 889:	ffce31        	l32r	a3, 7c4 <system_upgrade_erase_flash+0x4bc>
+ 88c:	0c4d      	mov.n	a4, a12
+ 88e:	ffd701        	l32r	a0, 7ec <system_upgrade_erase_flash+0x4e4>
+ 891:	0000c0        	callx0	a0
+ 894:	ffcd21        	l32r	a2, 7c8 <system_upgrade_erase_flash+0x4c0>
+ 897:	ac38      	l32i.n	a3, a12, 40
+ 899:	040c      	movi.n	a4, 0
+ 89b:	150c      	movi.n	a5, 1
+ 89d:	ffd401        	l32r	a0, 7f0 <system_upgrade_erase_flash+0x4e8>
+ 8a0:	0000c0        	callx0	a0
+ 8a3:	120c      	movi.n	a2, 1
+ 8a5:	11c8      	l32i.n	a12, a1, 4
+ 8a7:	0108      	l32i.n	a0, a1, 0
+ 8a9:	10c112        	addi	a1, a1, 16
+ 8ac:	f00d      	ret.n
+
+Disassembly of section .irom.text:
+
+000008b0 <.irom.text>:
+ 8b0:	677075        	excw
+ 8b3:	646172        	s32i	a7, a1, 0x190
+ 8b6:	635f65        	excw
+ 8b9:	6568      	l32i.n	a6, a5, 24
+ 8bb:	0a6b63        	excw
+ 8be:	730000        	excw
+ 8c1:	6c6d75        	excw
+ 8c4:	676e65        	excw
+ 8c7:	206874        	excw
+ 8ca:	203d      	excw
+ 8cc:	206425        	excw
+ 8cf:	000a      	add.n	a0, a0, a0
+	...
+ 8dd:	000000        	ill
+ 8e0:	6d7573        	excw
+ 8e3:	656c      	movi.n	a5, -26
+ 8e5:	6e          	.byte 0x6e
+ 8e6:	687467        	bbci	a4, 22, 952 <.irom.text+0xa2>
+ 8e9:	616620        	excw
+ 8ec:	6c69      	s32i.n	a6, a12, 24
+ 8ee:	0a6465        	excw
+	...
+ 8fd:	000000        	ill
+ 900:	6e6f43        	excw
+ 903:	6e6574        	excw
+ 906:	4c2d74        	excw
+ 909:	676e65        	excw
+ 90c:	3a6874        	excw
+ 90f:	616620        	excw
+ 912:	6c69      	s32i.n	a6, a12, 24
+ 914:	0a6465        	excw
+	...
+ 91f:	707500        	excw
+ 922:	617267        	bbci	a2, 22, 987 <.irom.text+0xd7>
+ 925:	206564        	excw
+ 928:	6c6966        	bnei	a9, 6, 998 <.irom.text+0xe8>
+ 92b:	642065        	excw
+ 92e:	6f          	.byte 0x6f
+ 92f:	6c6e77        	bbci	a14, 7, 99f <.irom.text+0xef>
+ 932:	6f          	.byte 0x6f
+ 933:	206461        	l32r	a6, fffc8ac4 <system_upgrade_start+0xfffc82d0>
+ 936:	617473        	excw
+ 939:	2e7472        	excw
+ 93c:	000a      	add.n	a0, a0, a0
+ 93e:	650000        	extui	a0, a0, 16, 7
+ 941:	6f7272        	excw
+ 944:	622072        	l32i	a7, a0, 0x188
+ 947:	6e69      	s32i.n	a6, a14, 24
+ 949:	696620        	excw
+ 94c:	656c      	movi.n	a5, -26
+ 94e:	000a      	add.n	a0, a0, a0
+ 950:	746f74        	excw
+ 953:	6c6c61        	l32r	a6, fffdbb04 <system_upgrade_start+0xfffdb310>
+ 956:	206e65        	excw
+ 959:	203d      	excw
+ 95b:	0a6425        	excw
+ 95e:	750000        	extui	a0, a0, 16, 8
+ 961:	726770        	excw
+ 964:	656461        	l32r	a6, fffd9ef4 <system_upgrade_start+0xfffd9700>
+ 967:	696620        	excw
+ 96a:	656c      	movi.n	a5, -26
+ 96c:	6f6420        	excw
+ 96f:	6c6e77        	bbci	a14, 7, 9df <.irom.text+0x12f>
+ 972:	6f          	.byte 0x6f
+ 973:	206461        	l32r	a6, fffc8b04 <system_upgrade_start+0xfffc8310>
+ 976:	6e6966        	bnei	a9, 6, 9e8 <.irom.text+0x138>
+ 979:	7369      	s32i.n	a6, a3, 28
+ 97b:	6568      	l32i.n	a6, a5, 24
+ 97d:	0a2e64        	excw
+	...
+ 990:	677075        	excw
+ 993:	646172        	s32i	a7, a1, 0x190
+ 996:	635f65        	excw
+ 999:	6f          	.byte 0x6f
+ 99a:	6e          	.byte 0x6e
+ 99b:	6e          	.byte 0x6e
+ 99c:	746365        	excw
+ 99f:	5f          	.byte 0x5f
+ 9a0:	0a6263        	excw
+	...
+ 9af:	732500        	excw
+	...
+ 9be:	750000        	extui	a0, a0, 16, 8
+ 9c1:	726770        	excw
+ 9c4:	656461        	l32r	a6, fffd9f54 <system_upgrade_start+0xfffd9760>
+ 9c7:	5f          	.byte 0x5f
+ 9c8:	6e6f63        	excw
+ 9cb:	6e          	.byte 0x6e
+ 9cc:	746365        	excw
+ 9cf:	000a      	add.n	a0, a0, a0
+	...
+ 9dd:	000000        	ill
+ 9e0:	726573        	excw
+ 9e3:	726576        	excw
+ 9e6:	736920        	excw
+ 9e9:	554e20        	extui	a4, a2, 30, 6
+ 9ec:	4c4c      	movi.n	a12, 68
+ 9ee:	000a      	add.n	a0, a0, a0
+ 9f0:	737973        	excw
+ 9f3:	6d6574        	excw
+ 9f6:	5f          	.byte 0x5f
+ 9f7:	677075        	excw
+ 9fa:	646172        	s32i	a7, a1, 0x190
+ 9fd:	735f65        	excw
+ a00:	726174        	excw
+ a03:	000a74        	excw
+
+upgrade_lib.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .irom0.text:
+
+00000000 <system_upgrade-0xdc>:
+   0:	001000        	excw
+	...
+  1b:	c11200        	mul16u	a1, a2, a0
+  1e:	1109e0        	slli	a0, a9, 2
+  21:	31d9      	s32i.n	a13, a1, 12
+  23:	21c9      	s32i.n	a12, a1, 8
+  25:	41e9      	s32i.n	a14, a1, 16
+  27:	02cd      	mov.n	a12, a2
+  29:	03ed      	mov.n	a14, a3
+  2b:	04dd      	mov.n	a13, a4
+  2d:	0a2316        	beqz	a3, d3 <system_upgrade-0x9>
+  30:	09f416        	beqz	a4, d3 <system_upgrade-0x9>
+  33:	0a0222        	l8ui	a2, a2, 10
+  36:	224a      	add.n	a2, a2, a4
+  38:	fff301        	l32r	a0, 4 <system_upgrade-0xd8>
+  3b:	0000c0        	callx0	a0
+  3e:	4c29      	s32i.n	a2, a12, 16
+  40:	0a0c42        	l8ui	a4, a12, 10
+  43:	3cbb      	addi.n	a3, a12, 11
+  45:	0139      	s32i.n	a3, a1, 0
+  47:	fff001        	l32r	a0, 8 <system_upgrade-0xd4>
+  4a:	0000c0        	callx0	a0
+  4d:	4c38      	l32i.n	a3, a12, 16
+  4f:	0a0c22        	l8ui	a2, a12, 10
+  52:	0d4d      	mov.n	a4, a13
+  54:	223a      	add.n	a2, a2, a3
+  56:	0e3d      	mov.n	a3, a14
+  58:	ffed01        	l32r	a0, c <system_upgrade-0xd0>
+  5b:	0000c0        	callx0	a0
+  5e:	0128      	l32i.n	a2, a1, 0
+  60:	0a0ce2        	l8ui	a14, a12, 10
+  63:	4c38      	l32i.n	a3, a12, 16
+  65:	deda      	add.n	a13, a14, a13
+  67:	1440d0        	extui	a4, a13, 0, 2
+  6a:	0a4c42        	s8i	a4, a12, 10
+  6d:	c0dd40        	sub	a13, a13, a4
+  70:	f4d0d0        	extui	a13, a13, 0, 16
+  73:	33da      	add.n	a3, a3, a13
+  75:	ffe601        	l32r	a0, 10 <system_upgrade-0xcc>
+  78:	0000c0        	callx0	a0
+  7b:	031c42        	l16ui	a4, a12, 6
+  7e:	0c28      	l32i.n	a2, a12, 0
+  80:	021c32        	l16ui	a3, a12, 4
+  83:	02da      	add.n	a0, a2, a13
+  85:	334a      	add.n	a3, a3, a4
+  87:	113340        	slli	a3, a3, 12
+  8a:	28b037        	bgeu	a0, a3, b6 <system_upgrade-0x26>
+  8d:	ffdc51        	l32r	a5, 0 <system_upgrade-0xdc>
+  90:	410c00        	srli	a0, a0, 12
+  93:	0835d7        	bltu	a5, a13, 9f <system_upgrade-0x3d>
+  96:	041c62        	l16ui	a6, a12, 8
+  99:	021607        	beq	a6, a0, 9f <system_upgrade-0x3d>
+  9c:	045c02        	s16i	a0, a12, 8
+  9f:	4c38      	l32i.n	a3, a12, 16
+  a1:	0d4d      	mov.n	a4, a13
+  a3:	ffdc01        	l32r	a0, 14 <system_upgrade-0xc8>
+  a6:	0000c0        	callx0	a0
+  a9:	92cc      	bnez.n	a2, b6 <system_upgrade-0x26>
+  ab:	0c78      	l32i.n	a7, a12, 0
+  ad:	1e0c      	movi.n	a14, 1
+  af:	77da      	add.n	a7, a7, a13
+  b1:	0c79      	s32i.n	a7, a12, 0
+  b3:	000046        	j	b8 <system_upgrade-0x24>
+  b6:	0e0c      	movi.n	a14, 0
+  b8:	4c28      	l32i.n	a2, a12, 16
+  ba:	ffd701        	l32r	a0, 18 <system_upgrade-0xc4>
+  bd:	0000c0        	callx0	a0
+  c0:	0e2d      	mov.n	a2, a14
+  c2:	080c      	movi.n	a8, 0
+  c4:	4c89      	s32i.n	a8, a12, 16
+  c6:	21c8      	l32i.n	a12, a1, 8
+  c8:	31d8      	l32i.n	a13, a1, 12
+  ca:	41e8      	l32i.n	a14, a1, 16
+  cc:	1108      	l32i.n	a0, a1, 4
+  ce:	20c112        	addi	a1, a1, 32
+  d1:	f00d      	ret.n
+  d3:	120c      	movi.n	a2, 1
+  d5:	fffb46        	j	c6 <system_upgrade-0x16>
+  d8:	000000        	ill
+	...
+
+000000dc <system_upgrade>:
+  dc:	034d      	mov.n	a4, a3
+  de:	f0c112        	addi	a1, a1, -16
+  e1:	023d      	mov.n	a3, a2
+  e3:	fffd21        	l32r	a2, d8 <system_upgrade-0x4>
+  e6:	0109      	s32i.n	a0, a1, 0
+  e8:	0228      	l32i.n	a2, a2, 0
+  ea:	fff305        	call0	1c <system_upgrade-0xc0>
+  ed:	0108      	l32i.n	a0, a1, 0
+  ef:	10c112        	addi	a1, a1, 16
+  f2:	f00d      	ret.n
+	...
+
+00000108 <system_upgrade_init>:
+ 108:	f0c112        	addi	a1, a1, -16
+ 10b:	11c9      	s32i.n	a12, a1, 4
+ 10d:	21d9      	s32i.n	a13, a1, 8
+ 10f:	0109      	s32i.n	a0, a1, 0
+ 111:	fff901        	l32r	a0, f8 <system_upgrade+0x1c>
+ 114:	0000c0        	callx0	a0
+ 117:	fff7c1        	l32r	a12, f4 <system_upgrade+0x18>
+ 11a:	0c08      	l32i.n	a0, a12, 0
+ 11c:	02dd      	mov.n	a13, a2
+ 11e:	80cc      	bnez.n	a0, 12a <system_upgrade_init+0x22>
+ 120:	421c      	movi.n	a2, 20
+ 122:	fff601        	l32r	a0, fc <system_upgrade+0x20>
+ 125:	0000c0        	callx0	a0
+ 128:	0c29      	s32i.n	a2, a12, 0
+ 12a:	020c      	movi.n	a2, 0
+ 12c:	fff501        	l32r	a0, 100 <system_upgrade+0x24>
+ 12f:	0000c0        	callx0	a0
+ 132:	7400d0        	extui	a0, a13, 0, 8
+ 135:	4a2026        	beqi	a0, 2, 183 <system_upgrade_init+0x7b>
+ 138:	473026        	beqi	a0, 3, 183 <system_upgrade_init+0x7b>
+ 13b:	444026        	beqi	a0, 4, 183 <system_upgrade_init+0x7b>
+ 13e:	335026        	beqi	a0, 5, 175 <system_upgrade_init+0x6d>
+ 141:	306026        	beqi	a0, 6, 175 <system_upgrade_init+0x6d>
+ 144:	1d4c      	movi.n	a13, 65
+ 146:	0c38      	l32i.n	a3, a12, 0
+ 148:	b23c      	movi.n	a2, 59
+ 14a:	035322        	s16i	a2, a3, 6
+ 14d:	ffed01        	l32r	a0, 104 <system_upgrade+0x28>
+ 150:	0000c0        	callx0	a0
+ 153:	0108      	l32i.n	a0, a1, 0
+ 155:	f460d0        	extui	a6, a13, 0, 16
+ 158:	140c      	movi.n	a4, 1
+ 15a:	0c58      	l32i.n	a5, a12, 0
+ 15c:	070c      	movi.n	a7, 0
+ 15e:	11c8      	l32i.n	a12, a1, 4
+ 160:	837420        	moveqz	a7, a4, a2
+ 163:	21d8      	l32i.n	a13, a1, 8
+ 165:	934670        	movnez	a4, a6, a7
+ 168:	025542        	s16i	a4, a5, 4
+ 16b:	114440        	slli	a4, a4, 12
+ 16e:	0549      	s32i.n	a4, a5, 0
+ 170:	10c112        	addi	a1, a1, 16
+ 173:	f00d      	ret.n
+ 175:	01a1d2        	movi	a13, 0x101
+ 178:	0c98      	l32i.n	a9, a12, 0
+ 17a:	fba082        	movi	a8, 251
+ 17d:	035982        	s16i	a8, a9, 6
+ 180:	fff246        	j	14d <system_upgrade_init+0x45>
+ 183:	81a0d2        	movi	a13, 129
+ 186:	0cb8      	l32i.n	a11, a12, 0
+ 188:	7ba0a2        	movi	a10, 123
+ 18b:	035ba2        	s16i	a10, a11, 6
+ 18e:	ffeec6        	j	14d <system_upgrade_init+0x45>
+	...
+
+000001a0 <system_upgrade_deinit>:
+ 1a0:	fffd21        	l32r	a2, 194 <system_upgrade_init+0x8c>
+ 1a3:	f0c112        	addi	a1, a1, -16
+ 1a6:	0228      	l32i.n	a2, a2, 0
+ 1a8:	0109      	s32i.n	a0, a1, 0
+ 1aa:	b28c      	beqz.n	a2, 1b9 <system_upgrade_deinit+0x19>
+ 1ac:	fffc01        	l32r	a0, 19c <system_upgrade_init+0x94>
+ 1af:	0000c0        	callx0	a0
+ 1b2:	fff941        	l32r	a4, 198 <system_upgrade_init+0x90>
+ 1b5:	030c      	movi.n	a3, 0
+ 1b7:	0439      	s32i.n	a3, a4, 0
+ 1b9:	0108      	l32i.n	a0, a1, 0
+ 1bb:	10c112        	addi	a1, a1, 16
+ 1be:	f00d      	ret.n

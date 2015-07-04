@@ -1,0 +1,759 @@
+In archive D:/Coding/avr/Programme/arduino-nightly/hardware/esp8266com/esp8266/tools/sdk/lib/libjson.a:
+
+jsonparse.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .irom0.text:
+
+00000000 <jsonparse_setup-0xc0>:
+   0:	150c      	movi.n	a5, 1
+   2:	3268      	l32i.n	a6, a2, 12
+   4:	080c      	movi.n	a8, 0
+   6:	662a      	add.n	a6, a6, a2
+   8:	1a4632        	s8i	a3, a6, 26
+   b:	3248      	l32i.n	a4, a2, 12
+   d:	184282        	s8i	a8, a2, 24
+  10:	441b      	addi.n	a4, a4, 1
+  12:	3249      	s32i.n	a4, a2, 12
+  14:	0194a6        	blti	a4, 10, 19 <jsonparse_setup-0xa7>
+  17:	085d      	mov.n	a5, a8
+  19:	052d      	mov.n	a2, a5
+  1b:	f00d      	ret.n
+  1d:	000000        	ill
+  20:	3248      	l32i.n	a4, a2, 12
+  22:	948c      	beqz.n	a4, 2f <jsonparse_setup-0x91>
+  24:	340b      	addi.n	a3, a4, -1
+  26:	3239      	s32i.n	a3, a2, 12
+  28:	232a      	add.n	a2, a3, a2
+  2a:	1a0222        	l8ui	a2, a2, 26
+  2d:	f00d      	ret.n
+  2f:	020c      	movi.n	a2, 0
+  31:	f00d      	ret.n
+  33:	423200        	excw
+  36:	2c18      	l32i.n	a1, a12, 8
+  38:	982a      	add.n	a9, a8, a2
+  3a:	429912        	l16si	a1, a9, 132
+  3d:	096d      	mov.n	a6, a9
+  3f:	3813a7        	beq	a3, a10, 7b <jsonparse_setup-0x45>
+  42:	e44c      	movi.n	a4, 78
+  44:	331347        	beq	a3, a4, 7b <jsonparse_setup-0x45>
+  47:	053c      	movi.n	a5, 48
+  49:	519357        	bne	a3, a5, 9e <jsonparse_setup-0x22>
+  4c:	9b3c      	movi.n	a11, 57
+  4e:	f82c      	movi.n	a8, 47
+  50:	0278      	l32i.n	a7, a2, 0
+  52:	ea2c      	movi.n	a10, 46
+  54:	797a      	add.n	a7, a9, a7
+  56:	000732        	l8ui	a3, a7, 0
+  59:	02b837        	bgeu	a8, a3, 5f <jsonparse_setup-0x61>
+  5c:	12bb37        	bgeu	a11, a3, 72 <jsonparse_setup-0x4e>
+  5f:	0f13a7        	beq	a3, a10, 72 <jsonparse_setup-0x4e>
+  62:	030c      	movi.n	a3, 0
+  64:	fee356        	bnez	a3, 56 <jsonparse_setup-0x6a>
+  67:	590b      	addi.n	a5, a9, -1
+  69:	4259      	s32i.n	a5, a2, 16
+  6b:	c05650        	sub	a5, a6, a5
+  6e:	5259      	s32i.n	a5, a2, 20
+  70:	f00d      	ret.n
+  72:	771b      	addi.n	a7, a7, 1
+  74:	661b      	addi.n	a6, a6, 1
+  76:	1269      	s32i.n	a6, a2, 4
+  78:	fffa06        	j	64 <jsonparse_setup-0x5c>
+  7b:	cb5c      	movi.n	a11, 92
+  7d:	0288      	l32i.n	a8, a2, 0
+  7f:	000186        	j	89 <jsonparse_setup-0x37>
+  82:	0393b7        	bne	a3, a11, 89 <jsonparse_setup-0x37>
+  85:	672b      	addi.n	a6, a7, 2
+  87:	1269      	s32i.n	a6, a2, 4
+  89:	067d      	mov.n	a7, a6
+  8b:	378a      	add.n	a3, a7, a8
+  8d:	661b      	addi.n	a6, a6, 1
+  8f:	1269      	s32i.n	a6, a2, 4
+  91:	000332        	l8ui	a3, a3, 0
+  94:	138c      	beqz.n	a3, 99 <jsonparse_setup-0x27>
+  96:	e893a7        	bne	a3, a10, 82 <jsonparse_setup-0x3e>
+  99:	c04790        	sub	a4, a7, a9
+  9c:	5249      	s32i.n	a4, a2, 20
+  9e:	f00d      	ret.n
+  a0:	1258      	l32i.n	a5, a2, 4
+  a2:	2268      	l32i.n	a6, a2, 8
+  a4:	13a567        	bge	a5, a6, bb <jsonparse_setup-0x5>
+  a7:	0248      	l32i.n	a4, a2, 0
+  a9:	454a      	add.n	a4, a5, a4
+  ab:	000442        	l8ui	a4, a4, 0
+  ae:	551b      	addi.n	a5, a5, 1
+  b0:	02c426        	beqi	a4, 32, b6 <jsonparse_setup-0xa>
+  b3:	049466        	bnei	a4, 10, bb <jsonparse_setup-0x5>
+  b6:	1259      	s32i.n	a5, a2, 4
+  b8:	fffa06        	j	a4 <jsonparse_setup-0x1c>
+  bb:	f00d      	ret.n
+  bd:	000000        	ill
+
+000000c0 <jsonparse_setup>:
+  c0:	0239      	s32i.n	a3, a2, 0
+  c2:	2249      	s32i.n	a4, a2, 8
+  c4:	050c      	movi.n	a5, 0
+  c6:	1259      	s32i.n	a5, a2, 4
+  c8:	3259      	s32i.n	a5, a2, 12
+  ca:	194252        	s8i	a5, a2, 25
+  cd:	1a4252        	s8i	a5, a2, 26
+  d0:	f00d      	ret.n
+	...
+
+000000d4 <jsonparse_next>:
+  d4:	f0c112        	addi	a1, a1, -16
+  d7:	0109      	s32i.n	a0, a1, 0
+  d9:	11c9      	s32i.n	a12, a1, 4
+  db:	21d9      	s32i.n	a13, a1, 8
+  dd:	02cd      	mov.n	a12, a2
+  df:	06b216        	beqz	a2, 14e <jsonparse_next+0x7a>
+  e2:	1228      	l32i.n	a2, a2, 4
+  e4:	2c08      	l32i.n	a0, a12, 8
+  e6:	642027        	blt	a0, a2, 14e <jsonparse_next+0x7a>
+  e9:	0c2d      	mov.n	a2, a12
+  eb:	fffb45        	call0	a0 <jsonparse_setup-0x20>
+  ee:	1c08      	l32i.n	a0, a12, 4
+  f0:	0cd8      	l32i.n	a13, a12, 0
+  f2:	0c2d      	mov.n	a2, a12
+  f4:	dd0a      	add.n	a13, a13, a0
+  f6:	000dd2        	l8ui	a13, a13, 0
+  f9:	000005        	call0	fc <jsonparse_next+0x28>
+  fc:	a73c      	movi.n	a7, 58
+  fe:	7ba062        	movi	a6, 123
+ 101:	b85c      	movi.n	a8, 91
+ 103:	740020        	extui	a0, a2, 0, 8
+ 106:	1c48      	l32i.n	a4, a12, 4
+ 108:	232c      	movi.n	a3, 34
+ 10a:	441b      	addi.n	a4, a4, 1
+ 10c:	1c49      	s32i.n	a4, a12, 4
+ 10e:	561d37        	beq	a13, a3, 168 <jsonparse_next+0x94>
+ 111:	130c      	movi.n	a3, 1
+ 113:	c52c      	movi.n	a5, 44
+ 115:	5d1d57        	beq	a13, a5, 176 <jsonparse_next+0xa2>
+ 118:	c6cd92        	addi	a9, a13, -58
+ 11b:	0b6916        	beqz	a9, 1d5 <jsonparse_next+0x101>
+ 11e:	651d87        	beq	a13, a8, 187 <jsonparse_next+0xb3>
+ 121:	da5c      	movi.n	a10, 93
+ 123:	761da7        	beq	a13, a10, 19d <jsonparse_next+0xc9>
+ 126:	85cdb2        	addi	a11, a13, -123
+ 129:	0b2b16        	beqz	a11, 1df <jsonparse_next+0x10b>
+ 12c:	7da022        	movi	a2, 125
+ 12f:	751d27        	beq	a13, a2, 1a8 <jsonparse_next+0xd4>
+ 132:	021077        	beq	a0, a7, 138 <jsonparse_next+0x64>
+ 135:	2a9087        	bne	a0, a8, 163 <jsonparse_next+0x8f>
+ 138:	933c      	movi.n	a3, 57
+ 13a:	2533d7        	bltu	a3, a13, 163 <jsonparse_next+0x8f>
+ 13d:	f42c      	movi.n	a4, 47
+ 13f:	20b4d7        	bgeu	a4, a13, 163 <jsonparse_next+0x8f>
+ 142:	0c2d      	mov.n	a2, a12
+ 144:	033c      	movi.n	a3, 48
+ 146:	ffeec5        	call0	34 <jsonparse_setup-0x8c>
+ 149:	0d3c      	movi.n	a13, 48
+ 14b:	000046        	j	150 <jsonparse_next+0x7c>
+ 14e:	ed7c      	movi.n	a13, -2
+ 150:	0108      	l32i.n	a0, a1, 0
+ 152:	0d2d      	mov.n	a2, a13
+ 154:	11c8      	l32i.n	a12, a1, 4
+ 156:	21d8      	l32i.n	a13, a1, 8
+ 158:	10c112        	addi	a1, a1, 16
+ 15b:	f00d      	ret.n
+ 15d:	ef1087        	beq	a0, a8, 150 <jsonparse_next+0x7c>
+ 160:	194c32        	s8i	a3, a12, 25
+ 163:	0d0c      	movi.n	a13, 0
+ 165:	fff9c6        	j	150 <jsonparse_next+0x7c>
+ 168:	7d1067        	beq	a0, a6, 1e9 <jsonparse_next+0x115>
+ 16b:	7a1087        	beq	a0, a8, 1e9 <jsonparse_next+0x115>
+ 16e:	771077        	beq	a0, a7, 1e9 <jsonparse_next+0x115>
+ 171:	530c      	movi.n	a3, 5
+ 173:	fffa46        	j	160 <jsonparse_next+0x8c>
+ 176:	e39077        	bne	a0, a7, 15d <jsonparse_next+0x89>
+ 179:	180c52        	l8ui	a5, a12, 24
+ 17c:	fdd516        	beqz	a5, 15d <jsonparse_next+0x89>
+ 17f:	0c2d      	mov.n	a2, a12
+ 181:	ffe9c5        	call0	20 <jsonparse_setup-0xa0>
+ 184:	fff206        	j	150 <jsonparse_next+0x7c>
+ 187:	721067        	beq	a0, a6, 1fd <jsonparse_next+0x129>
+ 18a:	6f1087        	beq	a0, a8, 1fd <jsonparse_next+0x129>
+ 18d:	6c1077        	beq	a0, a7, 1fd <jsonparse_next+0x129>
+ 190:	200c      	movi.n	a0, 2
+ 192:	000046        	j	197 <jsonparse_next+0xc3>
+ 195:	300c      	movi.n	a0, 3
+ 197:	194c02        	s8i	a0, a12, 25
+ 19a:	fff146        	j	163 <jsonparse_next+0x8f>
+ 19d:	f49087        	bne	a0, a8, 195 <jsonparse_next+0xc1>
+ 1a0:	0c2d      	mov.n	a2, a12
+ 1a2:	ffe7c5        	call0	20 <jsonparse_setup-0xa0>
+ 1a5:	ffe9c6        	j	150 <jsonparse_next+0x7c>
+ 1a8:	189077        	bne	a0, a7, 1c4 <jsonparse_next+0xf0>
+ 1ab:	180c72        	l8ui	a7, a12, 24
+ 1ae:	3139      	s32i.n	a3, a1, 12
+ 1b0:	079c      	beqz.n	a7, 1c4 <jsonparse_next+0xf0>
+ 1b2:	0c2d      	mov.n	a2, a12
+ 1b4:	ffe685        	call0	20 <jsonparse_setup-0xa0>
+ 1b7:	0c2d      	mov.n	a2, a12
+ 1b9:	000005        	call0	1bc <jsonparse_next+0xe8>
+ 1bc:	3138      	l32i.n	a3, a1, 12
+ 1be:	7ba062        	movi	a6, 123
+ 1c1:	740020        	extui	a0, a2, 0, 8
+ 1c4:	079067        	bne	a0, a6, 1cf <jsonparse_next+0xfb>
+ 1c7:	0c2d      	mov.n	a2, a12
+ 1c9:	ffe545        	call0	20 <jsonparse_setup-0xa0>
+ 1cc:	ffe006        	j	150 <jsonparse_next+0x7c>
+ 1cf:	194c32        	s8i	a3, a12, 25
+ 1d2:	ffe346        	j	163 <jsonparse_next+0x8f>
+ 1d5:	0c2d      	mov.n	a2, a12
+ 1d7:	0d3d      	mov.n	a3, a13
+ 1d9:	ffe245        	call0	0 <jsonparse_setup-0xc0>
+ 1dc:	ffdc06        	j	150 <jsonparse_next+0x7c>
+ 1df:	0c2d      	mov.n	a2, a12
+ 1e1:	0d3d      	mov.n	a3, a13
+ 1e3:	ffe1c5        	call0	0 <jsonparse_setup-0xc0>
+ 1e6:	ffd986        	j	150 <jsonparse_next+0x7c>
+ 1e9:	0c2d      	mov.n	a2, a12
+ 1eb:	0d8d      	mov.n	a8, a13
+ 1ed:	85c092        	addi	a9, a0, -123
+ 1f0:	ed4c      	movi.n	a13, 78
+ 1f2:	93d890        	movnez	a13, a8, a9
+ 1f5:	0d3d      	mov.n	a3, a13
+ 1f7:	ffe3c5        	call0	34 <jsonparse_setup-0x8c>
+ 1fa:	ffd486        	j	150 <jsonparse_next+0x7c>
+ 1fd:	0c2d      	mov.n	a2, a12
+ 1ff:	0d3d      	mov.n	a3, a13
+ 201:	ffdfc5        	call0	0 <jsonparse_setup-0xc0>
+ 204:	ffd206        	j	150 <jsonparse_next+0x7c>
+	...
+
+00000208 <jsonparse_copy_value>:
+ 208:	180252        	l8ui	a5, a2, 24
+ 20b:	52a8      	l32i.n	a10, a2, 20
+ 20d:	25cc      	bnez.n	a5, 213 <jsonparse_copy_value+0xb>
+ 20f:	020c      	movi.n	a2, 0
+ 211:	f00d      	ret.n
+ 213:	012a47        	blt	a10, a4, 218 <jsonparse_copy_value+0x10>
+ 216:	a40b      	addi.n	a10, a4, -1
+ 218:	060c      	movi.n	a6, 0
+ 21a:	351aa6        	blti	a10, 1, 253 <jsonparse_copy_value+0x4b>
+ 21d:	cb5c      	movi.n	a11, 92
+ 21f:	090c      	movi.n	a9, 0
+ 221:	080c      	movi.n	a8, 0
+ 223:	040c      	movi.n	a4, 0
+ 225:	4258      	l32i.n	a5, a2, 16
+ 227:	0278      	l32i.n	a7, a2, 0
+ 229:	554a      	add.n	a5, a5, a4
+ 22b:	775a      	add.n	a7, a7, a5
+ 22d:	000772        	l8ui	a7, a7, 0
+ 230:	b8cc      	bnez.n	a8, 23f <jsonparse_copy_value+0x37>
+ 232:	0997b7        	bne	a7, a11, 23f <jsonparse_copy_value+0x37>
+ 235:	180c      	movi.n	a8, 1
+ 237:	991b      	addi.n	a9, a9, 1
+ 239:	749090        	extui	a9, a9, 0, 8
+ 23c:	000246        	j	249 <jsonparse_copy_value+0x41>
+ 23f:	080c      	movi.n	a8, 0
+ 241:	c05490        	sub	a5, a4, a9
+ 244:	535a      	add.n	a5, a3, a5
+ 246:	004572        	s8i	a7, a5, 0
+ 249:	441b      	addi.n	a4, a4, 1
+ 24b:	d69a47        	bne	a10, a4, 225 <jsonparse_copy_value+0x1d>
+ 24e:	0a4d      	mov.n	a4, a10
+ 250:	0000c6        	j	257 <jsonparse_copy_value+0x4f>
+ 253:	040c      	movi.n	a4, 0
+ 255:	090c      	movi.n	a9, 0
+ 257:	c07490        	sub	a7, a4, a9
+ 25a:	737a      	add.n	a7, a3, a7
+ 25c:	004762        	s8i	a6, a7, 0
+ 25f:	180222        	l8ui	a2, a2, 24
+ 262:	f00d      	ret.n
+ 264:	000000        	ill
+	...
+
+00000268 <jsonparse_get_value_as_int>:
+ 268:	f0c112        	addi	a1, a1, -16
+ 26b:	0109      	s32i.n	a0, a1, 0
+ 26d:	180202        	l8ui	a0, a2, 24
+ 270:	033c      	movi.n	a3, 48
+ 272:	041037        	beq	a0, a3, 27a <jsonparse_get_value_as_int+0x12>
+ 275:	020c      	movi.n	a2, 0
+ 277:	0002c6        	j	286 <jsonparse_get_value_as_int+0x1e>
+ 27a:	4238      	l32i.n	a3, a2, 16
+ 27c:	0228      	l32i.n	a2, a2, 0
+ 27e:	223a      	add.n	a2, a2, a3
+ 280:	fff901        	l32r	a0, 264 <jsonparse_copy_value+0x5c>
+ 283:	0000c0        	callx0	a0
+ 286:	0108      	l32i.n	a0, a1, 0
+ 288:	10c112        	addi	a1, a1, 16
+ 28b:	f00d      	ret.n
+ 28d:	000000        	ill
+ 290:	000000        	ill
+	...
+
+00000294 <jsonparse_get_value_as_long>:
+ 294:	f0c112        	addi	a1, a1, -16
+ 297:	0109      	s32i.n	a0, a1, 0
+ 299:	180202        	l8ui	a0, a2, 24
+ 29c:	033c      	movi.n	a3, 48
+ 29e:	041037        	beq	a0, a3, 2a6 <jsonparse_get_value_as_long+0x12>
+ 2a1:	020c      	movi.n	a2, 0
+ 2a3:	0002c6        	j	2b2 <jsonparse_get_value_as_long+0x1e>
+ 2a6:	4238      	l32i.n	a3, a2, 16
+ 2a8:	0228      	l32i.n	a2, a2, 0
+ 2aa:	223a      	add.n	a2, a2, a3
+ 2ac:	fff901        	l32r	a0, 290 <jsonparse_get_value_as_int+0x28>
+ 2af:	0000c0        	callx0	a0
+ 2b2:	0108      	l32i.n	a0, a1, 0
+ 2b4:	10c112        	addi	a1, a1, 16
+ 2b7:	f00d      	ret.n
+ 2b9:	000000        	ill
+ 2bc:	000000        	ill
+	...
+
+000002c0 <jsonparse_get_value_as_ulong>:
+ 2c0:	f0c112        	addi	a1, a1, -16
+ 2c3:	0109      	s32i.n	a0, a1, 0
+ 2c5:	180202        	l8ui	a0, a2, 24
+ 2c8:	033c      	movi.n	a3, 48
+ 2ca:	041037        	beq	a0, a3, 2d2 <jsonparse_get_value_as_ulong+0x12>
+ 2cd:	020c      	movi.n	a2, 0
+ 2cf:	0003c6        	j	2e2 <jsonparse_get_value_as_ulong+0x22>
+ 2d2:	4258      	l32i.n	a5, a2, 16
+ 2d4:	030c      	movi.n	a3, 0
+ 2d6:	0228      	l32i.n	a2, a2, 0
+ 2d8:	040c      	movi.n	a4, 0
+ 2da:	225a      	add.n	a2, a2, a5
+ 2dc:	fff801        	l32r	a0, 2bc <jsonparse_get_value_as_long+0x28>
+ 2df:	0000c0        	callx0	a0
+ 2e2:	0108      	l32i.n	a0, a1, 0
+ 2e4:	10c112        	addi	a1, a1, 16
+ 2e7:	f00d      	ret.n
+ 2e9:	000000        	ill
+ 2ec:	000000        	ill
+	...
+
+000002f0 <jsonparse_strcmp_value>:
+ 2f0:	f0c112        	addi	a1, a1, -16
+ 2f3:	0109      	s32i.n	a0, a1, 0
+ 2f5:	180202        	l8ui	a0, a2, 24
+ 2f8:	026d      	mov.n	a6, a2
+ 2fa:	30cc      	bnez.n	a0, 301 <jsonparse_strcmp_value+0x11>
+ 2fc:	f27c      	movi.n	a2, -1
+ 2fe:	0003c6        	j	311 <jsonparse_strcmp_value+0x21>
+ 301:	4258      	l32i.n	a5, a2, 16
+ 303:	0248      	l32i.n	a4, a2, 0
+ 305:	032d      	mov.n	a2, a3
+ 307:	345a      	add.n	a3, a4, a5
+ 309:	5648      	l32i.n	a4, a6, 20
+ 30b:	fff801        	l32r	a0, 2ec <jsonparse_get_value_as_ulong+0x2c>
+ 30e:	0000c0        	callx0	a0
+ 311:	0108      	l32i.n	a0, a1, 0
+ 313:	10c112        	addi	a1, a1, 16
+ 316:	f00d      	ret.n
+
+00000318 <jsonparse_get_len>:
+ 318:	5228      	l32i.n	a2, a2, 20
+ 31a:	f00d      	ret.n
+
+0000031c <jsonparse_get_type>:
+ 31c:	3248      	l32i.n	a4, a2, 12
+ 31e:	548c      	beqz.n	a4, 327 <jsonparse_get_type+0xb>
+ 320:	242a      	add.n	a2, a4, a2
+ 322:	190222        	l8ui	a2, a2, 25
+ 325:	f00d      	ret.n
+ 327:	020c      	movi.n	a2, 0
+ 329:	f00d      	ret.n
+	...
+
+0000032c <jsonparse_has_next>:
+ 32c:	2248      	l32i.n	a4, a2, 8
+ 32e:	1238      	l32i.n	a3, a2, 4
+ 330:	120c      	movi.n	a2, 1
+ 332:	012347        	blt	a3, a4, 337 <jsonparse_has_next+0xb>
+ 335:	020c      	movi.n	a2, 0
+ 337:	f00d      	ret.n
+
+jsontree.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .irom0.text:
+
+00000000 <jsontree_write_atom>:
+   0:	f0c112        	addi	a1, a1, -16
+   3:	0109      	s32i.n	a0, a1, 0
+   5:	21d9      	s32i.n	a13, a1, 8
+   7:	11c9      	s32i.n	a12, a1, 4
+   9:	02dd      	mov.n	a13, a2
+   b:	03cd      	mov.n	a12, a3
+   d:	83cc      	bnez.n	a3, 19 <jsontree_write_atom+0x19>
+   f:	f208      	l32i.n	a0, a2, 60
+  11:	023c      	movi.n	a2, 48
+  13:	0000c0        	callx0	a0
+  16:	000446        	j	2b <jsontree_write_atom+0x2b>
+  19:	000322        	l8ui	a2, a3, 0
+  1c:	b28c      	beqz.n	a2, 2b <jsontree_write_atom+0x2b>
+  1e:	fd08      	l32i.n	a0, a13, 60
+  20:	cc1b      	addi.n	a12, a12, 1
+  22:	0000c0        	callx0	a0
+  25:	000c22        	l8ui	a2, a12, 0
+  28:	ff2256        	bnez	a2, 1e <jsontree_write_atom+0x1e>
+  2b:	11c8      	l32i.n	a12, a1, 4
+  2d:	21d8      	l32i.n	a13, a1, 8
+  2f:	0108      	l32i.n	a0, a1, 0
+  31:	10c112        	addi	a1, a1, 16
+  34:	f00d      	ret.n
+	...
+
+00000038 <jsontree_write_string>:
+  38:	f0c112        	addi	a1, a1, -16
+  3b:	31e9      	s32i.n	a14, a1, 12
+  3d:	0109      	s32i.n	a0, a1, 0
+  3f:	11c9      	s32i.n	a12, a1, 4
+  41:	21d9      	s32i.n	a13, a1, 8
+  43:	03cd      	mov.n	a12, a3
+  45:	02dd      	mov.n	a13, a2
+  47:	f208      	l32i.n	a0, a2, 60
+  49:	222c      	movi.n	a2, 34
+  4b:	0000c0        	callx0	a0
+  4e:	fc9c      	beqz.n	a12, 71 <jsontree_write_string+0x39>
+  50:	000c22        	l8ui	a2, a12, 0
+  53:	a29c      	beqz.n	a2, 71 <jsontree_write_string+0x39>
+  55:	2e2c      	movi.n	a14, 34
+  57:	0992e7        	bne	a2, a14, 64 <jsontree_write_string+0x2c>
+  5a:	fd08      	l32i.n	a0, a13, 60
+  5c:	c25c      	movi.n	a2, 92
+  5e:	0000c0        	callx0	a0
+  61:	000c22        	l8ui	a2, a12, 0
+  64:	fd08      	l32i.n	a0, a13, 60
+  66:	cc1b      	addi.n	a12, a12, 1
+  68:	0000c0        	callx0	a0
+  6b:	000c22        	l8ui	a2, a12, 0
+  6e:	fe5256        	bnez	a2, 57 <jsontree_write_string+0x1f>
+  71:	222c      	movi.n	a2, 34
+  73:	11c8      	l32i.n	a12, a1, 4
+  75:	31e8      	l32i.n	a14, a1, 12
+  77:	fd08      	l32i.n	a0, a13, 60
+  79:	21d8      	l32i.n	a13, a1, 8
+  7b:	0000c0        	callx0	a0
+  7e:	0108      	l32i.n	a0, a1, 0
+  80:	10c112        	addi	a1, a1, 16
+  83:	f00d      	ret.n
+	...
+
+00000090 <jsontree_write_int>:
+  90:	d0c112        	addi	a1, a1, -48
+  93:	51c9      	s32i.n	a12, a1, 20
+  95:	61d9      	s32i.n	a13, a1, 24
+  97:	4109      	s32i.n	a0, a1, 16
+  99:	71e9      	s32i.n	a14, a1, 28
+  9b:	81f9      	s32i.n	a15, a1, 32
+  9d:	03ed      	mov.n	a14, a3
+  9f:	02fd      	mov.n	a15, a2
+  a1:	0093d6        	bgez	a3, ae <jsontree_write_int+0x1e>
+  a4:	f208      	l32i.n	a0, a2, 60
+  a6:	d22c      	movi.n	a2, 45
+  a8:	0000c0        	callx0	a0
+  ab:	60e0e0        	neg	a14, a14
+  ae:	d19b      	addi.n	a13, a1, 9
+  b0:	9c0c      	movi.n	a12, 9
+  b2:	0e2d      	mov.n	a2, a14
+  b4:	a30c      	movi.n	a3, 10
+  b6:	fff401        	l32r	a0, 88 <jsontree_write_string+0x50>
+  b9:	0000c0        	callx0	a0
+  bc:	cc0b      	addi.n	a12, a12, -1
+  be:	30c222        	addi	a2, a2, 48
+  c1:	a30c      	movi.n	a3, 10
+  c3:	004d22        	s8i	a2, a13, 0
+  c6:	0e2d      	mov.n	a2, a14
+  c8:	dd0b      	addi.n	a13, a13, -1
+  ca:	fff001        	l32r	a0, 8c <jsontree_write_string+0x54>
+  cd:	0000c0        	callx0	a0
+  d0:	02ed      	mov.n	a14, a2
+  d2:	0212a6        	blti	a2, 1, d8 <jsontree_write_int+0x48>
+  d5:	fd9cd6        	bgez	a12, b2 <jsontree_write_int+0x22>
+  d8:	dc1a      	add.n	a13, a12, a1
+  da:	71e8      	l32i.n	a14, a1, 28
+  dc:	0001c6        	j	e7 <jsontree_write_int+0x57>
+  df:	ff08      	l32i.n	a0, a15, 60
+  e1:	000d22        	l8ui	a2, a13, 0
+  e4:	0000c0        	callx0	a0
+  e7:	dd1b      	addi.n	a13, a13, 1
+  e9:	cc1b      	addi.n	a12, a12, 1
+  eb:	f09cb6        	bltui	a12, 10, df <jsontree_write_int+0x4f>
+  ee:	51c8      	l32i.n	a12, a1, 20
+  f0:	61d8      	l32i.n	a13, a1, 24
+  f2:	81f8      	l32i.n	a15, a1, 32
+  f4:	4108      	l32i.n	a0, a1, 16
+  f6:	30c112        	addi	a1, a1, 48
+  f9:	f00d      	ret.n
+	...
+
+000000fc <jsontree_write_int_array>:
+  fc:	e0c112        	addi	a1, a1, -32
+  ff:	31e9      	s32i.n	a14, a1, 12
+ 101:	0109      	s32i.n	a0, a1, 0
+ 103:	41f9      	s32i.n	a15, a1, 16
+ 105:	21d9      	s32i.n	a13, a1, 8
+ 107:	11c9      	s32i.n	a12, a1, 4
+ 109:	02dd      	mov.n	a13, a2
+ 10b:	03cd      	mov.n	a12, a3
+ 10d:	83cc      	bnez.n	a3, 119 <jsontree_write_int_array+0x1d>
+ 10f:	f208      	l32i.n	a0, a2, 60
+ 111:	023c      	movi.n	a2, 48
+ 113:	0000c0        	callx0	a0
+ 116:	000846        	j	13b <jsontree_write_int_array+0x3f>
+ 119:	f40b      	addi.n	a15, a4, -1
+ 11b:	5f9c      	beqz.n	a15, 134 <jsontree_write_int_array+0x38>
+ 11d:	0e0c      	movi.n	a14, 0
+ 11f:	0c38      	l32i.n	a3, a12, 0
+ 121:	0d2d      	mov.n	a2, a13
+ 123:	cc4b      	addi.n	a12, a12, 4
+ 125:	000005        	call0	128 <jsontree_write_int_array+0x2c>
+ 128:	fd08      	l32i.n	a0, a13, 60
+ 12a:	c22c      	movi.n	a2, 44
+ 12c:	0000c0        	callx0	a0
+ 12f:	ee1b      	addi.n	a14, a14, 1
+ 131:	ea9fe7        	bne	a15, a14, 11f <jsontree_write_int_array+0x23>
+ 134:	0d2d      	mov.n	a2, a13
+ 136:	0c38      	l32i.n	a3, a12, 0
+ 138:	000005        	call0	13c <jsontree_write_int_array+0x40>
+ 13b:	11c8      	l32i.n	a12, a1, 4
+ 13d:	21d8      	l32i.n	a13, a1, 8
+ 13f:	31e8      	l32i.n	a14, a1, 12
+ 141:	41f8      	l32i.n	a15, a1, 16
+ 143:	0108      	l32i.n	a0, a1, 0
+ 145:	20c112        	addi	a1, a1, 32
+ 148:	f00d      	ret.n
+	...
+
+0000014c <jsontree_setup>:
+ 14c:	f0c112        	addi	a1, a1, -16
+ 14f:	0239      	s32i.n	a3, a2, 0
+ 151:	0109      	s32i.n	a0, a1, 0
+ 153:	f249      	s32i.n	a4, a2, 60
+ 155:	000c      	movi.n	a0, 0
+ 157:	414202        	s8i	a0, a2, 65
+ 15a:	000005        	call0	15c <jsontree_setup+0x10>
+ 15d:	0108      	l32i.n	a0, a1, 0
+ 15f:	10c112        	addi	a1, a1, 16
+ 162:	f00d      	ret.n
+
+00000164 <jsontree_reset>:
+ 164:	030c      	movi.n	a3, 0
+ 166:	404232        	s8i	a3, a2, 64
+ 169:	145232        	s16i	a3, a2, 40
+ 16c:	f00d      	ret.n
+ 16e:	000000        	ill
+ 171:	000000        	ill
+
+00000174 <jsontree_path_name>:
+ 174:	400242        	l8ui	a4, a2, 64
+ 177:	a06320        	addx4	a6, a3, a2
+ 17a:	0aa347        	bge	a3, a4, 188 <jsontree_path_name+0x14>
+ 17d:	0668      	l32i.n	a6, a6, 0
+ 17f:	000652        	l8ui	a5, a6, 0
+ 182:	7ba072        	movi	a7, 123
+ 185:	041577        	beq	a5, a7, 18d <jsontree_path_name+0x19>
+ 188:	fffa21        	l32r	a2, 170 <jsontree_reset+0xc>
+ 18b:	f00d      	ret.n
+ 18d:	1648      	l32i.n	a4, a6, 4
+ 18f:	902320        	addx2	a2, a3, a2
+ 192:	141222        	l16ui	a2, a2, 40
+ 195:	b02240        	addx8	a2, a2, a4
+ 198:	0228      	l32i.n	a2, a2, 0
+ 19a:	f00d      	ret.n
+ 19c:	000000        	ill
+	...
+
+000001a0 <jsontree_print_next>:
+ 1a0:	e0c112        	addi	a1, a1, -32
+ 1a3:	31e9      	s32i.n	a14, a1, 12
+ 1a5:	11c9      	s32i.n	a12, a1, 4
+ 1a7:	400262        	l8ui	a6, a2, 64
+ 1aa:	21d9      	s32i.n	a13, a1, 8
+ 1ac:	a0d620        	addx4	a13, a6, a2
+ 1af:	0dd8      	l32i.n	a13, a13, 0
+ 1b1:	02cd      	mov.n	a12, a2
+ 1b3:	000d22        	l8ui	a2, a13, 0
+ 1b6:	0109      	s32i.n	a0, a1, 0
+ 1b8:	dec202        	addi	a0, a2, -34
+ 1bb:	0d8016        	beqz	a0, 297 <jsontree_print_next+0xf7>
+ 1be:	000c      	movi.n	a0, 0
+ 1c0:	bdc2e2        	addi	a14, a2, -67
+ 1c3:	0b4e16        	beqz	a14, 27b <jsontree_print_next+0xdb>
+ 1c6:	b7c232        	addi	a3, a2, -73
+ 1c9:	106316        	beqz	a3, 2d3 <jsontree_print_next+0x133>
+ 1cc:	7ba052        	movi	a5, 123
+ 1cf:	b45c      	movi.n	a4, 91
+ 1d1:	161247        	beq	a2, a4, 1eb <jsontree_print_next+0x4b>
+ 1d4:	131257        	beq	a2, a5, 1eb <jsontree_print_next+0x4b>
+ 1d7:	002d      	mov.n	a2, a0
+ 1d9:	000046        	j	1de <jsontree_print_next+0x3e>
+ 1dc:	020c      	movi.n	a2, 0
+ 1de:	11c8      	l32i.n	a12, a1, 4
+ 1e0:	21d8      	l32i.n	a13, a1, 8
+ 1e2:	31e8      	l32i.n	a14, a1, 12
+ 1e4:	0108      	l32i.n	a0, a1, 0
+ 1e6:	20c112        	addi	a1, a1, 32
+ 1e9:	f00d      	ret.n
+ 1eb:	90e6c0        	addx2	a14, a6, a12
+ 1ee:	141ee2        	l16ui	a14, a14, 40
+ 1f1:	aecc      	bnez.n	a14, 1ff <jsontree_print_next+0x5f>
+ 1f3:	fc08      	l32i.n	a0, a12, 60
+ 1f5:	0000c0        	callx0	a0
+ 1f8:	fc08      	l32i.n	a0, a12, 60
+ 1fa:	a20c      	movi.n	a2, 10
+ 1fc:	0000c0        	callx0	a0
+ 1ff:	010d22        	l8ui	a2, a13, 1
+ 202:	132e27        	blt	a14, a2, 219 <jsontree_print_next+0x79>
+ 205:	fc08      	l32i.n	a0, a12, 60
+ 207:	a20c      	movi.n	a2, 10
+ 209:	0000c0        	callx0	a0
+ 20c:	000d22        	l8ui	a2, a13, 0
+ 20f:	fc08      	l32i.n	a0, a12, 60
+ 211:	222b      	addi.n	a2, a2, 2
+ 213:	0000c0        	callx0	a0
+ 216:	002106        	j	29e <jsontree_print_next+0xfe>
+ 219:	0d1ea6        	blti	a14, 1, 22a <jsontree_print_next+0x8a>
+ 21c:	fc08      	l32i.n	a0, a12, 60
+ 21e:	c22c      	movi.n	a2, 44
+ 220:	0000c0        	callx0	a0
+ 223:	fc08      	l32i.n	a0, a12, 60
+ 225:	a20c      	movi.n	a2, 10
+ 227:	0000c0        	callx0	a0
+ 22a:	1d58      	l32i.n	a5, a13, 4
+ 22c:	000d22        	l8ui	a2, a13, 0
+ 22f:	7ba032        	movi	a3, 123
+ 232:	209237        	bne	a2, a3, 256 <jsontree_print_next+0xb6>
+ 235:	0c2d      	mov.n	a2, a12
+ 237:	b03e50        	addx8	a3, a14, a5
+ 23a:	114ed0        	slli	a4, a14, 3
+ 23d:	4149      	s32i.n	a4, a1, 16
+ 23f:	0338      	l32i.n	a3, a3, 0
+ 241:	000005        	call0	244 <jsontree_print_next+0xa4>
+ 244:	41e8      	l32i.n	a14, a1, 16
+ 246:	fc08      	l32i.n	a0, a12, 60
+ 248:	a23c      	movi.n	a2, 58
+ 24a:	0000c0        	callx0	a0
+ 24d:	1d08      	l32i.n	a0, a13, 4
+ 24f:	00ea      	add.n	a0, a0, a14
+ 251:	1008      	l32i.n	a0, a0, 4
+ 253:	000106        	j	25b <jsontree_print_next+0xbb>
+ 256:	a00e50        	addx4	a0, a14, a5
+ 259:	0008      	l32i.n	a0, a0, 0
+ 25b:	400c42        	l8ui	a4, a12, 64
+ 25e:	030c      	movi.n	a3, 0
+ 260:	441b      	addi.n	a4, a4, 1
+ 262:	744040        	extui	a4, a4, 0, 8
+ 265:	404c42        	s8i	a4, a12, 64
+ 268:	9044c0        	addx2	a4, a4, a12
+ 26b:	145432        	s16i	a3, a4, 40
+ 26e:	400c22        	l8ui	a2, a12, 64
+ 271:	a022c0        	addx4	a2, a2, a12
+ 274:	0209      	s32i.n	a0, a2, 0
+ 276:	120c      	movi.n	a2, 1
+ 278:	ffd886        	j	1de <jsontree_print_next+0x3e>
+ 27b:	9056c0        	addx2	a5, a6, a12
+ 27e:	141552        	l16ui	a5, a5, 40
+ 281:	35cc      	bnez.n	a5, 288 <jsontree_print_next+0xe8>
+ 283:	060c      	movi.n	a6, 0
+ 285:	116c62        	s32i	a6, a12, 68
+ 288:	1d58      	l32i.n	a5, a13, 4
+ 28a:	c5ec      	bnez.n	a5, 2ba <jsontree_print_next+0x11a>
+ 28c:	0c2d      	mov.n	a2, a12
+ 28e:	ffc331        	l32r	a3, 19c <jsontree_path_name+0x28>
+ 291:	000005        	call0	294 <jsontree_print_next+0xf4>
+ 294:	000186        	j	29e <jsontree_print_next+0xfe>
+ 297:	1d38      	l32i.n	a3, a13, 4
+ 299:	0c2d      	mov.n	a2, a12
+ 29b:	000005        	call0	29c <jsontree_print_next+0xfc>
+ 29e:	400c62        	l8ui	a6, a12, 64
+ 2a1:	f37616        	beqz	a6, 1dc <jsontree_print_next+0x3c>
+ 2a4:	860b      	addi.n	a8, a6, -1
+ 2a6:	748080        	extui	a8, a8, 0, 8
+ 2a9:	404c82        	s8i	a8, a12, 64
+ 2ac:	9088c0        	addx2	a8, a8, a12
+ 2af:	141872        	l16ui	a7, a8, 40
+ 2b2:	771b      	addi.n	a7, a7, 1
+ 2b4:	145872        	s16i	a7, a8, 40
+ 2b7:	ffeec6        	j	276 <jsontree_print_next+0xd6>
+ 2ba:	0c2d      	mov.n	a2, a12
+ 2bc:	0005c0        	callx0	a5
+ 2bf:	fdb216        	beqz	a2, 29e <jsontree_print_next+0xfe>
+ 2c2:	400ca2        	l8ui	a10, a12, 64
+ 2c5:	90aac0        	addx2	a10, a10, a12
+ 2c8:	141a92        	l16ui	a9, a10, 40
+ 2cb:	991b      	addi.n	a9, a9, 1
+ 2cd:	145a92        	s16i	a9, a10, 40
+ 2d0:	ffe886        	j	276 <jsontree_print_next+0xd6>
+ 2d3:	1d38      	l32i.n	a3, a13, 4
+ 2d5:	0c2d      	mov.n	a2, a12
+ 2d7:	000005        	call0	2d8 <jsontree_print_next+0x138>
+ 2da:	fff006        	j	29e <jsontree_print_next+0xfe>
+ 2dd:	000000        	ill
+ 2e0:	b85c      	movi.n	a8, 91
+ 2e2:	7ba092        	movi	a9, 123
+ 2e5:	400252        	l8ui	a5, a2, 64
+ 2e8:	a07520        	addx4	a7, a5, a2
+ 2eb:	0778      	l32i.n	a7, a7, 0
+ 2ed:	000762        	l8ui	a6, a7, 0
+ 2f0:	1b1687        	beq	a6, a8, 30f <jsontree_print_next+0x16f>
+ 2f3:	181697        	beq	a6, a9, 30f <jsontree_print_next+0x16f>
+ 2f6:	04e516        	beqz	a5, 348 <jsontree_print_next+0x1a8>
+ 2f9:	b50b      	addi.n	a11, a5, -1
+ 2fb:	74b0b0        	extui	a11, a11, 0, 8
+ 2fe:	4042b2        	s8i	a11, a2, 64
+ 301:	90bb20        	addx2	a11, a11, a2
+ 304:	141ba2        	l16ui	a10, a11, 40
+ 307:	aa1b      	addi.n	a10, a10, 1
+ 309:	145ba2        	s16i	a10, a11, 40
+ 30c:	fff546        	j	2e5 <jsontree_print_next+0x145>
+ 30f:	010732        	l8ui	a3, a7, 1
+ 312:	90a520        	addx2	a10, a5, a2
+ 315:	141aa2        	l16ui	a10, a10, 40
+ 318:	daaa37        	bge	a10, a3, 2f6 <jsontree_print_next+0x156>
+ 31b:	1778      	l32i.n	a7, a7, 4
+ 31d:	851b      	addi.n	a8, a5, 1
+ 31f:	748080        	extui	a8, a8, 0, 8
+ 322:	079697        	bne	a6, a9, 32d <jsontree_print_next+0x18d>
+ 325:	b04a70        	addx8	a4, a10, a7
+ 328:	1448      	l32i.n	a4, a4, 4
+ 32a:	000106        	j	332 <jsontree_print_next+0x192>
+ 32d:	a04a70        	addx4	a4, a10, a7
+ 330:	0448      	l32i.n	a4, a4, 0
+ 332:	404282        	s8i	a8, a2, 64
+ 335:	070c      	movi.n	a7, 0
+ 337:	908820        	addx2	a8, a8, a2
+ 33a:	145872        	s16i	a7, a8, 40
+ 33d:	400262        	l8ui	a6, a2, 64
+ 340:	a06620        	addx4	a6, a6, a2
+ 343:	0649      	s32i.n	a4, a6, 0
+ 345:	000046        	j	34a <jsontree_print_next+0x1aa>
+ 348:	040c      	movi.n	a4, 0
+ 34a:	042d      	mov.n	a2, a4
+ 34c:	f00d      	ret.n
+	...
+
+00000350 <jsontree_find_next>:
+ 350:	f0c112        	addi	a1, a1, -16
+ 353:	0109      	s32i.n	a0, a1, 0
+ 355:	11c9      	s32i.n	a12, a1, 4
+ 357:	21d9      	s32i.n	a13, a1, 8
+ 359:	02cd      	mov.n	a12, a2
+ 35b:	03dd      	mov.n	a13, a3
+ 35d:	0c2d      	mov.n	a2, a12
+ 35f:	fff805        	call0	2e0 <jsontree_print_next+0x140>
+ 362:	029c      	beqz.n	a2, 376 <jsontree_find_next+0x26>
+ 364:	000202        	l8ui	a0, a2, 0
+ 367:	0b1d07        	beq	a13, a0, 376 <jsontree_find_next+0x26>
+ 36a:	400c02        	l8ui	a0, a12, 64
+ 36d:	410c32        	l8ui	a3, a12, 65
+ 370:	e93307        	bltu	a3, a0, 35d <jsontree_find_next+0xd>
+ 373:	000086        	j	379 <jsontree_find_next+0x29>
+ 376:	400c02        	l8ui	a0, a12, 64
+ 379:	030c      	movi.n	a3, 0
+ 37b:	410c42        	l8ui	a4, a12, 65
+ 37e:	116c32        	s32i	a3, a12, 68
+ 381:	11c8      	l32i.n	a12, a1, 4
+ 383:	013407        	bltu	a4, a0, 388 <jsontree_find_next+0x38>
+ 386:	032d      	mov.n	a2, a3
+ 388:	21d8      	l32i.n	a13, a1, 8
+ 38a:	0108      	l32i.n	a0, a1, 0
+ 38c:	10c112        	addi	a1, a1, 16
+ 38f:	f00d      	ret.n

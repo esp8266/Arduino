@@ -1,0 +1,518 @@
+In archive D:/Coding/avr/Programme/arduino-nightly/hardware/esp8266com/esp8266/tools/sdk/lib/libssc.a:
+
+ets_console.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .irom0.text:
+
+00000000 <ssc_attach-0x3a0>:
+   0:	000080        	ret
+   3:	000000        	ill
+   6:	040000        	extui	a0, a0, 0, 1
+   9:	000000        	ill
+   c:	000000        	ill
+   f:	c11200        	mul16u	a1, a2, a0
+  12:	0109f0        	slli	a0, a9, 17
+  15:	0208      	l32i.n	a0, a2, 0
+  17:	009c      	beqz.n	a0, 2b <ssc_attach-0x375>
+  19:	181026        	beqi	a0, 1, 35 <ssc_attach-0x36b>
+  1c:	1a2026        	beqi	a0, 2, 3a <ssc_attach-0x366>
+  1f:	0b3066        	bnei	a0, 3, 2e <ssc_attach-0x372>
+  22:	040222        	l8ui	a2, a2, 4
+  25:	002785        	call0	2a0 <ssc_attach-0x100>
+  28:	000086        	j	2e <ssc_attach-0x372>
+  2b:	000405        	call0	6c <ssc_attach-0x334>
+  2e:	0108      	l32i.n	a0, a1, 0
+  30:	10c112        	addi	a1, a1, 16
+  33:	f00d      	ret.n
+  35:	1228      	l32i.n	a2, a2, 4
+  37:	000a45        	call0	dc <ssc_attach-0x2c4>
+  3a:	001505        	call0	18c <ssc_attach-0x214>
+  3d:	fff021        	l32r	a2, 0 <ssc_attach-0x3a0>
+  40:	ffa002        	movi	a0, 255
+  43:	fff131        	l32r	a3, 8 <ssc_attach-0x398>
+  46:	804202        	s8i	a0, a2, 128
+  49:	ffee21        	l32r	a2, 4 <ssc_attach-0x39c>
+  4c:	fff001        	l32r	a0, c <ssc_attach-0x394>
+  4f:	0000c0        	callx0	a0
+  52:	fff606        	j	2e <ssc_attach-0x372>
+  55:	000000        	ill
+  58:	004c      	movi.n	a0, 64
+  5a:	040000        	extui	a0, a0, 0, 1
+  5d:	000001        	l32r	a0, fffc0060 <ssc_param_str+0xfffbfc28>
+	...
+  6c:	f0c112        	addi	a1, a1, -16
+  6f:	fffa21        	l32r	a2, 58 <ssc_attach-0x348>
+  72:	0109      	s32i.n	a0, a1, 0
+  74:	cc0202        	l8ui	a0, a2, 204
+  77:	11c9      	s32i.n	a12, a1, 4
+  79:	70ac      	beqz.n	a0, a4 <ssc_attach-0x2fc>
+  7b:	342202        	l32i	a0, a2, 208
+  7e:	b402c2        	l8ui	a12, a2, 180
+  81:	f09c      	beqz.n	a0, a4 <ssc_attach-0x2fc>
+  83:	11ccc0        	slli	a12, a12, 4
+  86:	c0ca      	add.n	a12, a0, a12
+  88:	8c9c      	beqz.n	a12, a4 <ssc_attach-0x2fc>
+  8a:	2c28      	l32i.n	a2, a12, 8
+  8c:	429c      	beqz.n	a2, a4 <ssc_attach-0x2fc>
+  8e:	0002c0        	callx0	a2
+  91:	040c02        	l8ui	a0, a12, 4
+  94:	156017        	bbci	a0, 1, ad <ssc_attach-0x2f3>
+  97:	050c42        	l8ui	a4, a12, 5
+  9a:	b21c      	movi.n	a2, 27
+  9c:	130c      	movi.n	a3, 1
+  9e:	fff001        	l32r	a0, 60 <ssc_attach-0x340>
+  a1:	0000c0        	callx0	a0
+  a4:	11c8      	l32i.n	a12, a1, 4
+  a6:	0108      	l32i.n	a0, a1, 0
+  a8:	10c112        	addi	a1, a1, 16
+  ab:	f00d      	ret.n
+  ad:	f36007        	bbci	a0, 0, a4 <ssc_attach-0x2fc>
+  b0:	ffebc1        	l32r	a12, 5c <ssc_attach-0x344>
+  b3:	0c2d      	mov.n	a2, a12
+  b5:	ffeb01        	l32r	a0, 64 <ssc_attach-0x33c>
+  b8:	0000c0        	callx0	a0
+  bb:	0c2d      	mov.n	a2, a12
+  bd:	d0a732        	movi	a3, 0x7d0
+  c0:	040c      	movi.n	a4, 0
+  c2:	150c      	movi.n	a5, 1
+  c4:	ffe901        	l32r	a0, 68 <ssc_attach-0x338>
+  c7:	0000c0        	callx0	a0
+  ca:	fff586        	j	a4 <ssc_attach-0x2fc>
+  cd:	000000        	ill
+  d0:	000104        	excw
+  d3:	004c00        	break	12, 0
+  d6:	000000        	ill
+  d9:	000000        	ill
+  dc:	024d      	mov.n	a4, a2
+  de:	e0c112        	addi	a1, a1, -32
+  e1:	fffb21        	l32r	a2, d0 <ssc_attach-0x2d0>
+  e4:	0109      	s32i.n	a0, a1, 0
+  e6:	4149      	s32i.n	a4, a1, 16
+  e8:	fffc01        	l32r	a0, d8 <ssc_attach-0x2c8>
+  eb:	0000c0        	callx0	a0
+  ee:	fff921        	l32r	a2, d4 <ssc_attach-0x2cc>
+  f1:	cc0232        	l8ui	a3, a2, 204
+  f4:	342202        	l32i	a0, a2, 208
+  f7:	a39c      	beqz.n	a3, 115 <ssc_attach-0x28b>
+  f9:	809c      	beqz.n	a0, 115 <ssc_attach-0x28b>
+  fb:	b40242        	l8ui	a4, a2, 180
+  fe:	1144c0        	slli	a4, a4, 4
+ 101:	004a      	add.n	a0, a0, a4
+ 103:	e08c      	beqz.n	a0, 115 <ssc_attach-0x28b>
+ 105:	040052        	l8ui	a5, a0, 4
+ 108:	3048      	l32i.n	a4, a0, 12
+ 10a:	076507        	bbci	a5, 0, 115 <ssc_attach-0x28b>
+ 10d:	448c      	beqz.n	a4, 115 <ssc_attach-0x28b>
+ 10f:	10c122        	addi	a2, a1, 16
+ 112:	0004c0        	callx0	a4
+ 115:	0108      	l32i.n	a0, a1, 0
+ 117:	20c112        	addi	a1, a1, 32
+ 11a:	f00d      	ret.n
+ 11c:	000000        	ill
+ 11f:	ff4100        	excw
+ 122:	ff          	.byte 0xff
+ 123:	ff0422        	l8ui	a2, a4, 255
+ 126:	c28c      	beqz.n	a2, 136 <ssc_attach-0x26a>
+ 128:	320b      	addi.n	a3, a2, -1
+ 12a:	ff4432        	s8i	a3, a4, 255
+ 12d:	012380        	slli	a2, a3, 24
+ 130:	312820        	srai	a2, a2, 24
+ 133:	046377        	bbci	a3, 7, 13b <ssc_attach-0x265>
+ 136:	ffa022        	movi	a2, 255
+ 139:	f00d      	ret.n
+ 13b:	030c      	movi.n	a3, 0
+ 13d:	524a      	add.n	a5, a2, a4
+ 13f:	800522        	l8ui	a2, a5, 128
+ 142:	804532        	s8i	a3, a5, 128
+ 145:	f00d      	ret.n
+ 147:	000000        	ill
+ 14a:	610000        	excw
+ 14d:	ff          	.byte 0xff
+ 14e:	ff          	.byte 0xff
+ 14f:	ff0652        	l8ui	a5, a6, 255
+ 152:	7fa032        	movi	a3, 127
+ 155:	231537        	beq	a5, a3, 17c <ssc_attach-0x224>
+ 158:	014580        	slli	a4, a5, 24
+ 15b:	000232        	l8ui	a3, a2, 0
+ 15e:	314840        	srai	a4, a4, 24
+ 161:	464a      	add.n	a4, a6, a4
+ 163:	804432        	s8i	a3, a4, 128
+ 166:	ff0622        	l8ui	a2, a6, 255
+ 169:	012280        	slli	a2, a2, 24
+ 16c:	312820        	srai	a2, a2, 24
+ 16f:	221b      	addi.n	a2, a2, 1
+ 171:	ff4622        	s8i	a2, a6, 255
+ 174:	012280        	slli	a2, a2, 24
+ 177:	312820        	srai	a2, a2, 24
+ 17a:	f00d      	ret.n
+ 17c:	f27c      	movi.n	a2, -1
+ 17e:	f00d      	ret.n
+ 180:	000080        	ret
+ 183:	004100        	break	1, 0
+ 186:	000000        	ill
+ 189:	000000        	ill
+ 18c:	fffd21        	l32r	a2, 180 <ssc_attach-0x220>
+ 18f:	7fa032        	movi	a3, 127
+ 192:	f0c112        	addi	a1, a1, -16
+ 195:	0109      	s32i.n	a0, a1, 0
+ 197:	fffc01        	l32r	a0, 188 <ssc_attach-0x218>
+ 19a:	0000c0        	callx0	a0
+ 19d:	fff921        	l32r	a2, 184 <ssc_attach-0x21c>
+ 1a0:	000c      	movi.n	a0, 0
+ 1a2:	be4202        	s8i	a0, a2, 190
+ 1a5:	c04202        	s8i	a0, a2, 192
+ 1a8:	0108      	l32i.n	a0, a1, 0
+ 1aa:	10c112        	addi	a1, a1, 16
+ 1ad:	f00d      	ret.n
+ 1af:	004c00        	break	12, 0
+ 1b2:	000000        	ill
+ 1b5:	000000        	ill
+ 1b8:	e0c112        	addi	a1, a1, -32
+ 1bb:	31c9      	s32i.n	a12, a1, 12
+ 1bd:	51e9      	s32i.n	a14, a1, 20
+ 1bf:	fffce1        	l32r	a14, 1b0 <ssc_attach-0x1f0>
+ 1c2:	41d9      	s32i.n	a13, a1, 16
+ 1c4:	b30e22        	l8ui	a2, a14, 179
+ 1c7:	2109      	s32i.n	a0, a1, 8
+ 1c9:	084216        	beqz	a2, 251 <ssc_attach-0x14f>
+ 1cc:	340e02        	l8ui	a0, a14, 52
+ 1cf:	b4ce62        	addi	a6, a14, -76
+ 1d2:	2ac026        	beqi	a0, 32, 200 <ssc_attach-0x1a0>
+ 1d5:	014d      	mov.n	a4, a1
+ 1d7:	0d0c      	movi.n	a13, 0
+ 1d9:	012280        	slli	a2, a2, 24
+ 1dc:	312820        	srai	a2, a2, 24
+ 1df:	3d4a      	add.n	a3, a13, a4
+ 1e1:	004302        	s8i	a0, a3, 0
+ 1e4:	0d5d      	mov.n	a5, a13
+ 1e6:	830c      	movi.n	a3, 8
+ 1e8:	dd1b      	addi.n	a13, a13, 1
+ 1ea:	74d0d0        	extui	a13, a13, 0, 8
+ 1ed:	603357        	bltu	a3, a5, 251 <ssc_attach-0x14f>
+ 1f0:	0e12d7        	beq	a2, a13, 202 <ssc_attach-0x19e>
+ 1f3:	0d6a      	add.n	a0, a13, a6
+ 1f5:	800002        	l8ui	a0, a0, 128
+ 1f8:	3d4a      	add.n	a3, a13, a4
+ 1fa:	e3c066        	bnei	a0, 32, 1e1 <ssc_attach-0x1bf>
+ 1fd:	000046        	j	202 <ssc_attach-0x19e>
+ 200:	0d0c      	movi.n	a13, 0
+ 202:	cc0e02        	l8ui	a0, a14, 204
+ 205:	0c0c      	movi.n	a12, 0
+ 207:	a0ac      	beqz.n	a0, 235 <ssc_attach-0x16b>
+ 209:	342e22        	l32i	a2, a14, 208
+ 20c:	113cc0        	slli	a3, a12, 4
+ 20f:	223a      	add.n	a2, a2, a3
+ 211:	529c      	beqz.n	a2, 22a <ssc_attach-0x176>
+ 213:	0238      	l32i.n	a3, a2, 0
+ 215:	0d4d      	mov.n	a4, a13
+ 217:	012d      	mov.n	a2, a1
+ 219:	ffe601        	l32r	a0, 1b4 <ssc_attach-0x1ec>
+ 21c:	0000c0        	callx0	a0
+ 21f:	42cc      	bnez.n	a2, 227 <ssc_attach-0x179>
+ 221:	cc0e02        	l8ui	a0, a14, 204
+ 224:	0003c6        	j	237 <ssc_attach-0x169>
+ 227:	cc0e02        	l8ui	a0, a14, 204
+ 22a:	cc1b      	addi.n	a12, a12, 1
+ 22c:	74c0c0        	extui	a12, a12, 0, 8
+ 22f:	d63c07        	bltu	a12, a0, 209 <ssc_attach-0x197>
+ 232:	000046        	j	237 <ssc_attach-0x169>
+ 235:	0c0c      	movi.n	a12, 0
+ 237:	1610c7        	beq	a0, a12, 251 <ssc_attach-0x14f>
+ 23a:	020c      	movi.n	a2, 0
+ 23c:	b44ec2        	s8i	a12, a14, 180
+ 23f:	0d1b      	addi.n	a0, a13, 1
+ 241:	b54e02        	s8i	a0, a14, 181
+ 244:	31c8      	l32i.n	a12, a1, 12
+ 246:	41d8      	l32i.n	a13, a1, 16
+ 248:	51e8      	l32i.n	a14, a1, 20
+ 24a:	2108      	l32i.n	a0, a1, 8
+ 24c:	20c112        	addi	a1, a1, 32
+ 24f:	f00d      	ret.n
+ 251:	120c      	movi.n	a2, 1
+ 253:	fffb46        	j	244 <ssc_attach-0x15c>
+ 256:	800000        	add	a0, a0, a0
+ 259:	000000        	ill
+ 25c:	000000        	ill
+ 25f:	000400        	excw
+ 262:	080000        	excw
+ 265:	000000        	ill
+ 268:	000000        	ill
+ 26b:	000400        	excw
+ 26e:	0c0000        	excw
+ 271:	000000        	ill
+ 274:	000000        	ill
+ 277:	000400        	excw
+	...
+ 29e:	120000        	excw
+ 2a1:	51e0c1        	l32r	a12, fffd4a24 <ssc_param_str+0xfffd45ec>
+ 2a4:	ffed      	excw
+ 2a6:	0109      	s32i.n	a0, a1, 0
+ 2a8:	740020        	extui	a0, a2, 0, 8
+ 2ab:	800532        	l8ui	a3, a5, 128
+ 2ae:	ffa022        	movi	a2, 255
+ 2b1:	2d9327        	bne	a3, a2, 2e2 <ssc_attach-0xbe>
+ 2b4:	104102        	s8i	a0, a1, 16
+ 2b7:	f43c      	movi.n	a4, 63
+ 2b9:	2c9047        	bne	a0, a4, 2e9 <ssc_attach-0xb7>
+ 2bc:	7f0572        	l8ui	a7, a5, 127
+ 2bf:	67ec      	bnez.n	a7, 2e9 <ssc_attach-0xb7>
+ 2c1:	282502        	l32i	a0, a5, 160
+ 2c4:	0000c0        	callx0	a0
+ 2c7:	ffe521        	l32r	a2, 25c <ssc_attach-0x144>
+ 2ca:	ffe531        	l32r	a3, 260 <ssc_attach-0x140>
+ 2cd:	ffeb01        	l32r	a0, 27c <ssc_attach-0x124>
+ 2d0:	0000c0        	callx0	a0
+ 2d3:	0002c6        	j	2e2 <ssc_attach-0xbe>
+ 2d6:	ffe321        	l32r	a2, 264 <ssc_attach-0x13c>
+ 2d9:	100132        	l8ui	a3, a1, 16
+ 2dc:	ffe901        	l32r	a0, 280 <ssc_attach-0x120>
+ 2df:	0000c0        	callx0	a0
+ 2e2:	0108      	l32i.n	a0, a1, 0
+ 2e4:	20c112        	addi	a1, a1, 32
+ 2e7:	f00d      	ret.n
+ 2e9:	d40c      	movi.n	a4, 13
+ 2eb:	149047        	bne	a0, a4, 303 <ssc_attach-0x9d>
+ 2ee:	ffec85        	call0	1b8 <ssc_attach-0x1e8>
+ 2f1:	06d256        	bnez	a2, 362 <ssc_attach-0x3e>
+ 2f4:	b21c      	movi.n	a2, 27
+ 2f6:	030c      	movi.n	a3, 0
+ 2f8:	040c      	movi.n	a4, 0
+ 2fa:	ffe201        	l32r	a0, 284 <ssc_attach-0x11c>
+ 2fd:	0000c0        	callx0	a0
+ 300:	fff786        	j	2e2 <ssc_attach-0xbe>
+ 303:	358026        	beqi	a0, 8, 33c <ssc_attach-0x64>
+ 306:	7fa052        	movi	a5, 127
+ 309:	2f1057        	beq	a0, a5, 33c <ssc_attach-0x64>
+ 30c:	20c0b6        	bltui	a0, 32, 330 <ssc_attach-0x70>
+ 30f:	7ea062        	movi	a6, 126
+ 312:	1a3607        	bltu	a6, a0, 330 <ssc_attach-0x70>
+ 315:	10c122        	addi	a2, a1, 16
+ 318:	ffe305        	call0	14c <ssc_attach-0x254>
+ 31b:	b70266        	bnei	a2, -1, 2d6 <ssc_attach-0xca>
+ 31e:	ffe6c5        	call0	18c <ssc_attach-0x214>
+ 321:	ffd121        	l32r	a2, 268 <ssc_attach-0x138>
+ 324:	ffd231        	l32r	a3, 26c <ssc_attach-0x134>
+ 327:	ffd801        	l32r	a0, 288 <ssc_attach-0x118>
+ 32a:	0000c0        	callx0	a0
+ 32d:	ffec46        	j	2e2 <ssc_attach-0xbe>
+ 330:	ffd021        	l32r	a2, 270 <ssc_attach-0x130>
+ 333:	ffd601        	l32r	a0, 28c <ssc_attach-0x114>
+ 336:	0000c0        	callx0	a0
+ 339:	ffe946        	j	2e2 <ssc_attach-0xbe>
+ 33c:	ffde05        	call0	120 <ssc_attach-0x280>
+ 33f:	ffa032        	movi	a3, 255
+ 342:	2e1237        	beq	a2, a3, 374 <ssc_attach-0x2c>
+ 345:	100122        	l8ui	a2, a1, 16
+ 348:	ffd201        	l32r	a0, 290 <ssc_attach-0x110>
+ 34b:	0000c0        	callx0	a0
+ 34e:	022c      	movi.n	a2, 32
+ 350:	ffd101        	l32r	a0, 294 <ssc_attach-0x10c>
+ 353:	0000c0        	callx0	a0
+ 356:	100122        	l8ui	a2, a1, 16
+ 359:	ffcf01        	l32r	a0, 298 <ssc_attach-0x108>
+ 35c:	0000c0        	callx0	a0
+ 35f:	ffdfc6        	j	2e2 <ssc_attach-0xbe>
+ 362:	ffe285        	call0	18c <ssc_attach-0x214>
+ 365:	ffc321        	l32r	a2, 274 <ssc_attach-0x12c>
+ 368:	ffc431        	l32r	a3, 278 <ssc_attach-0x128>
+ 36b:	ffcc01        	l32r	a0, 29c <ssc_attach-0x104>
+ 36e:	0000c0        	callx0	a0
+ 371:	ffdb46        	j	2e2 <ssc_attach-0xbe>
+ 374:	ffe145        	call0	18c <ssc_attach-0x214>
+ 377:	ffd9c6        	j	2e2 <ssc_attach-0xbe>
+ 37a:	400000        	ssr	a0
+ 37d:	000000        	ill
+ 380:	000010        	excw
+ 383:	010400        	slli	a0, a4, 32
+ 386:	500000        	excw
+ 389:	000004        	excw
+ 38c:	000000        	ill
+ 38f:	000400        	excw
+	...
+
+000003a0 <ssc_attach>:
+ 3a0:	fff821        	l32r	a2, 380 <ssc_attach-0x20>
+ 3a3:	b31c      	movi.n	a3, 27
+ 3a5:	fff541        	l32r	a4, 37c <ssc_attach-0x24>
+ 3a8:	ffa052        	movi	a5, 255
+ 3ab:	f0c112        	addi	a1, a1, -16
+ 3ae:	0109      	s32i.n	a0, a1, 0
+ 3b0:	c04452        	s8i	a5, a4, 192
+ 3b3:	c0c442        	addi	a4, a4, -64
+ 3b6:	051c      	movi.n	a5, 16
+ 3b8:	fff701        	l32r	a0, 394 <ssc_attach-0xc>
+ 3bb:	0000c0        	callx0	a0
+ 3be:	fff121        	l32r	a2, 384 <ssc_attach-0x1c>
+ 3c1:	fff131        	l32r	a3, 388 <ssc_attach-0x18>
+ 3c4:	040c      	movi.n	a4, 0
+ 3c6:	fff401        	l32r	a0, 398 <ssc_attach-0x8>
+ 3c9:	0000c0        	callx0	a0
+ 3cc:	fff021        	l32r	a2, 38c <ssc_attach-0x14>
+ 3cf:	fff031        	l32r	a3, 390 <ssc_attach-0x10>
+ 3d2:	fff201        	l32r	a0, 39c <ssc_attach-0x4>
+ 3d5:	0000c0        	callx0	a0
+ 3d8:	0108      	l32i.n	a0, a1, 0
+ 3da:	10c112        	addi	a1, a1, 16
+ 3dd:	f00d      	ret.n
+ 3df:	000000        	ill
+	...
+
+000003e4 <ssc_cmd_done>:
+ 3e4:	114300        	slli	a4, a3, 16
+ 3e7:	f0c112        	addi	a1, a1, -16
+ 3ea:	130c      	movi.n	a3, 1
+ 3ec:	204240        	or	a4, a2, a4
+ 3ef:	0109      	s32i.n	a0, a1, 0
+ 3f1:	b21c      	movi.n	a2, 27
+ 3f3:	fffb01        	l32r	a0, 3e0 <ssc_attach+0x40>
+ 3f6:	0000c0        	callx0	a0
+ 3f9:	0108      	l32i.n	a0, a1, 0
+ 3fb:	10c112        	addi	a1, a1, 16
+ 3fe:	f00d      	ret.n
+ 400:	0098      	l32i.n	a9, a0, 0
+	...
+
+00000404 <ssc_register>:
+ 404:	ffff61        	l32r	a6, 400 <ssc_cmd_done+0x1c>
+ 407:	438c      	beqz.n	a3, 40f <ssc_register+0xb>
+ 409:	804632        	s8i	a3, a6, 128
+ 40c:	216622        	s32i	a2, a6, 132
+ 40f:	226642        	s32i	a4, a6, 136
+ 412:	f00d      	ret.n
+ 414:	000080        	ret
+	...
+
+00000418 <ssc_param_len>:
+ 418:	ffff51        	l32r	a5, 414 <ssc_register+0x10>
+ 41b:	7f0522        	l8ui	a2, a5, 127
+ 41e:	810552        	l8ui	a5, a5, 129
+ 421:	012280        	slli	a2, a2, 24
+ 424:	312820        	srai	a2, a2, 24
+ 427:	042257        	blt	a2, a5, 42f <ssc_param_len+0x17>
+ 42a:	c02250        	sub	a2, a2, a5
+ 42d:	f00d      	ret.n
+ 42f:	020c      	movi.n	a2, 0
+ 431:	f00d      	ret.n
+ 433:	008000        	excw
+	...
+
+00000438 <ssc_param_str>:
+ 438:	ffff31        	l32r	a3, 434 <ssc_param_len+0x1c>
+ 43b:	810322        	l8ui	a2, a3, 129
+ 43e:	223a      	add.n	a2, a2, a3
+ 440:	f00d      	ret.n
+ 442:	800000        	add	a0, a0, a0
+ 445:	000000        	ill
+ 448:	010000        	slli	a0, a0, 32
+ 44b:	000000        	ill
+ 44e:	1c0000        	excw
+ 451:	130cb2        	l8ui	a11, a12, 19
+ 454:	fffd51        	l32r	a5, 448 <ssc_param_str+0x10>
+ 457:	fffb41        	l32r	a4, 444 <ssc_param_str+0xc>
+ 45a:	f0c112        	addi	a1, a1, -16
+ 45d:	800442        	l8ui	a4, a4, 128
+ 460:	0109      	s32i.n	a0, a1, 0
+ 462:	204450        	or	a4, a4, a5
+ 465:	fff901        	l32r	a0, 44c <ssc_param_str+0x14>
+ 468:	0000c0        	callx0	a0
+ 46b:	0108      	l32i.n	a0, a1, 0
+ 46d:	10c112        	addi	a1, a1, 16
+ 470:	f00d      	ret.n
+
+uart.o:     file format elf32-xtensa-le
+
+
+Disassembly of section .text:
+
+00000000 <uart_rx_intr_handler_ssc-0x14>:
+   0:	000000        	ill
+   3:	fe0000        	excw
+   6:	ff          	.byte 0xff
+   7:	5f          	.byte 0x5f
+   8:	000f00        	excw
+   b:	0f0000        	excw
+   e:	000000        	ill
+  11:	000000        	ill
+
+00000014 <uart_rx_intr_handler_ssc>:
+  14:	160c      	movi.n	a6, 1
+  16:	fffb41        	l32r	a4, 4 <uart_rx_intr_handler_ssc-0x10>
+  19:	e0c112        	addi	a1, a1, -32
+  1c:	21d9      	s32i.n	a13, a1, 8
+  1e:	31e9      	s32i.n	a14, a1, 12
+  20:	11c9      	s32i.n	a12, a1, 4
+  22:	41f9      	s32i.n	a15, a1, 16
+  24:	02cd      	mov.n	a12, a2
+  26:	fff621        	l32r	a2, 0 <uart_rx_intr_handler_ssc-0x14>
+  29:	0109      	s32i.n	a0, a1, 0
+  2b:	102222        	l32i	a2, a2, 64
+  2e:	fff601        	l32r	a0, 8 <uart_rx_intr_handler_ssc-0xc>
+  31:	742020        	extui	a2, a2, 0, 8
+  34:	d10200        	mul16s	a0, a2, a0
+  37:	004a      	add.n	a0, a0, a4
+  39:	0020c0        	memw
+  3c:	822032        	l32i	a3, a0, 0x208
+  3f:	5a6307        	bbci	a3, 0, 9d <uart_rx_intr_handler_ssc+0x89>
+  42:	ffa032        	movi	a3, 255
+  45:	0020c0        	memw
+  48:	fff1d1        	l32r	a13, c <uart_rx_intr_handler_ssc-0x8>
+  4b:	846062        	s32i	a6, a0, 0x210
+  4e:	d1dd20        	mul16s	a13, a13, a2
+  51:	dd4a      	add.n	a13, a13, a4
+  53:	0020c0        	memw
+  56:	872d52        	l32i	a5, a13, 0x21c
+  59:	df0c      	movi.n	a15, 13
+  5b:	3e0357        	bnone	a3, a5, 9d <uart_rx_intr_handler_ssc+0x89>
+  5e:	2c08      	l32i.n	a0, a12, 8
+  60:	0020c0        	memw
+  63:	b21c      	movi.n	a2, 27
+  65:	802de2        	l32i	a14, a13, 0x200
+  68:	330c      	movi.n	a3, 3
+  6a:	74e0e0        	extui	a14, a14, 0, 8
+  6d:	0e4d      	mov.n	a4, a14
+  6f:	0040e2        	s8i	a14, a0, 0
+  72:	ffe701        	l32r	a0, 10 <uart_rx_intr_handler_ssc-0x4>
+  75:	0000c0        	callx0	a0
+  78:	1c28      	l32i.n	a2, a12, 4
+  7a:	039ef7        	bne	a14, a15, 81 <uart_rx_intr_handler_ssc+0x6d>
+  7d:	200c      	movi.n	a0, 2
+  7f:	5c09      	s32i.n	a0, a12, 20
+  81:	2c08      	l32i.n	a0, a12, 8
+  83:	01d232        	addmi	a3, a2, 0x100
+  86:	001b      	addi.n	a0, a0, 1
+  88:	2c09      	s32i.n	a0, a12, 8
+  8a:	039037        	bne	a0, a3, 91 <uart_rx_intr_handler_ssc+0x7d>
+  8d:	020d      	mov.n	a0, a2
+  8f:	2c29      	s32i.n	a2, a12, 8
+  91:	0020c0        	memw
+  94:	872d22        	l32i	a2, a13, 0x21c
+  97:	742020        	extui	a2, a2, 0, 8
+  9a:	fc2256        	bnez	a2, 60 <uart_rx_intr_handler_ssc+0x4c>
+  9d:	11c8      	l32i.n	a12, a1, 4
+  9f:	21d8      	l32i.n	a13, a1, 8
+  a1:	31e8      	l32i.n	a14, a1, 12
+  a3:	41f8      	l32i.n	a15, a1, 16
+  a5:	0108      	l32i.n	a0, a1, 0
+  a7:	20c112        	addi	a1, a1, 32
+  aa:	f00d      	ret.n
+
+Disassembly of section .irom0.text:
+
+000000ac <uart_reattach-0x10>:
+	...
+
+000000bc <uart_reattach>:
+  bc:	520c      	movi.n	a2, 5
+  be:	fffb31        	l32r	a3, ac <uart_reattach-0x10>
+  c1:	fffb41        	l32r	a4, b0 <uart_reattach-0xc>
+  c4:	f0c112        	addi	a1, a1, -16
+  c7:	0109      	s32i.n	a0, a1, 0
+  c9:	fffa01        	l32r	a0, b4 <uart_reattach-0x8>
+  cc:	0000c0        	callx0	a0
+  cf:	022c      	movi.n	a2, 32
+  d1:	fff901        	l32r	a0, b8 <uart_reattach-0x4>
+  d4:	0000c0        	callx0	a0
+  d7:	0108      	l32i.n	a0, a1, 0
+  d9:	10c112        	addi	a1, a1, 16
+  dc:	f00d      	ret.n
