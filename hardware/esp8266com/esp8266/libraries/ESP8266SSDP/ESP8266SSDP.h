@@ -35,16 +35,6 @@ License (MIT license):
 
 #define DEBUG_SSDP  Serial
 
-#define SSDP_BASE_SIZE              24
-#define SSDP_FRIENDLY_NAME_SIZE     32
-#define SSDP_SERIAL_NUMBER_SIZE     32
-#define SSDP_PRESENTATION_URL_SIZE  32
-#define SSDP_MODEL_NAME_SIZE        32
-#define SSDP_MODEL_URL_SIZE         32
-#define SSDP_MODEL_VERSION_SIZE     32
-#define SSDP_MANUFACTURER_SIZE      32
-#define SSDP_MANUFACTURER_URL_SIZE  32
-
 typedef enum {
   NONE,
   SEARCH,
@@ -56,7 +46,7 @@ class SSDPClass{
     SSDPClass();
     ~SSDPClass();
 
-    void begin(char *base);
+    void begin();
     uint8_t update();
     void send(ssdp_method_t method);
     void schema(WiFiClient client);
@@ -78,7 +68,7 @@ class SSDPClass{
     unsigned long _notify_time;
     
     uint8_t *_mac;
-    char *_base;
+    char *_uuid;
     char *_friendlyName;
     char *_serialNumber;
     char *_presentationURL;

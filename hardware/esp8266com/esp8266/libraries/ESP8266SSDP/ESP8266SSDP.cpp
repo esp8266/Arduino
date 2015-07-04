@@ -41,6 +41,16 @@ extern "C" {
 #define SSDP_URI_SIZE     2
 #define SSDP_BUFFER_SIZE  64
 
+#define SSDP_UUID_SIZE              37
+#define SSDP_FRIENDLY_NAME_SIZE     64
+#define SSDP_SERIAL_NUMBER_SIZE     32
+#define SSDP_PRESENTATION_URL_SIZE  128
+#define SSDP_MODEL_NAME_SIZE        64
+#define SSDP_MODEL_URL_SIZE         128
+#define SSDP_MODEL_VERSION_SIZE     32
+#define SSDP_MANUFACTURER_SIZE      64
+#define SSDP_MANUFACTURER_URL_SIZE  128
+
 static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
 
 const char* _ssdp_response_template = 
@@ -58,7 +68,7 @@ const char* _ssdp_packet_template =
   "%s" // _ssdp_response_template / _ssdp_notify_template
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
-  "USN: uuid:%s-%02X%02X%02X%02X%02X%02X\r\n" // _base, _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5]
+  "USN: uuid:%s\r\n" // _uuid
   "LOCATION: http://%u.%u.%u.%u/ssdp/schema.xml\r\n" // WiFi.localIP()
   "\r\n";
 
@@ -84,14 +94,13 @@ const char* _ssdp_schema_template =
       "<modelURL>%s</modelURL>"
       "<manufacturer>%s</manufacturer>"
       "<manufacturerURL>%s</manufacturerURL>"
-      "<UDN>%s-%02X%02X%02X%02X%02X%02X</UDN>" //uuid:UUID
+      "<UDN>%s</UDN>"
     "</device>"
   "</root>\r\n"
   "\r\n";
 
 SSDPClass::SSDPClass(){
-  _base = (char*)os_malloc(SSDP_BASE_SIZE);
-  _mac = (byte*)os_malloc(6);
+  _uuid = (char*)os_malloc(SSDP_UUID_SIZE);
   _friendlyName = (char*)os_malloc(SSDP_FRIENDLY_NAME_SIZE);
   _presentationURL = (char*)os_malloc(SSDP_PRESENTATION_URL_SIZE);
   _serialNumber = (char*)os_malloc(SSDP_SERIAL_NUMBER_SIZE);
@@ -101,6 +110,7 @@ SSDPClass::SSDPClass(){
   _manufacturer = (char*)os_malloc(SSDP_MANUFACTURER_SIZE);
   _manufacturerURL = (char*)os_malloc(SSDP_MANUFACTURER_URL_SIZE);
   
+  _uuid[0] = '\0';
   _modelNumber[0] = '\0';
   _friendlyName[0] = '\0';
   _presentationURL[0] = '\0';
@@ -113,8 +123,7 @@ SSDPClass::SSDPClass(){
 }
 
 SSDPClass::~SSDPClass(){
-	os_free(_base);
-  os_free(_mac);
+	os_free(_uuid);
   os_free(_friendlyName);
   os_free(_presentationURL);
   os_free(_serialNumber);
@@ -126,18 +135,26 @@ SSDPClass::~SSDPClass(){
   _pending = false;
 }
 
-void SSDPClass::begin(char *base){
+void SSDPClass::begin(){
   ip_addr_t ifaddr;
   ip_addr_t multicast_addr;
 
   _pending = false;
-  strcpy(_base, base);
 
-  WiFi.macAddress(_mac);
   ifaddr.addr = WiFi.localIP();
   multicast_addr.addr = (uint32_t) SSDP_MULTICAST_ADDR;
   igmp_joingroup(&ifaddr, &multicast_addr);
-  
+
+  uint8_t mac[6];
+  WiFi.macAddress(mac);
+  uint32_t chipId = ESP.getChipId();
+  sprintf(_uuid, "38323636-4558-%04X-%04X-%02X%02X%02X%02X%02X%02X",
+    (chipId >> 16) & 0xFFFF, chipId & 0xFFFF,
+    mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]
+  );
+#ifdef DEBUG_SSDP
+  DEBUG_SSDP.printf("SSDP UUID: %s\n", (char *)_uuid);
+#endif
   _server.begin(SSDP_PORT);
 }
 
@@ -165,7 +182,7 @@ void SSDPClass::send(ssdp_method_t method){
     (method == NONE)?_ssdp_response_template:_ssdp_notify_template,
     SSDP_INTERVAL,
     _modelName, _modelNumber,
-    _base, _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5],
+    _uuid,
     (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF)
   );
     
@@ -182,7 +199,7 @@ void SSDPClass::schema(WiFiClient client){
     _modelURL,
     _manufacturer,
     _manufacturerURL,
-    _base, _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5]
+    _uuid
   );
 }
 
