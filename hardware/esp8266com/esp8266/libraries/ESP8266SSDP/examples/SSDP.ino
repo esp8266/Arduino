@@ -38,7 +38,7 @@ void setup() {
     SSDP.setSerialNumber((char*)"A0123456789");
     SSDP.setURL((char*)"/");
     SSDP.setModelName((char*)"ESP-12e");
-    SSDP.setModelNumber(1, 0);
+    SSDP.setModelNumber((char*)"1.0");
     SSDP.setModelURL((char*)"http://12e.espressif.com");
     SSDP.setManufacturer((char*)"Espressif");
     SSDP.setManufacturerURL((char*)"http://espressif.com");

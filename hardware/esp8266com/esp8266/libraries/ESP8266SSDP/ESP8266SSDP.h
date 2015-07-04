@@ -41,7 +41,7 @@ License (MIT license):
 #define SSDP_PRESENTATION_URL_SIZE  32
 #define SSDP_MODEL_NAME_SIZE        32
 #define SSDP_MODEL_URL_SIZE         32
-#define SSDP_MODEL_VERSION_SIZE     2
+#define SSDP_MODEL_VERSION_SIZE     32
 #define SSDP_MANUFACTURER_SIZE      32
 #define SSDP_MANUFACTURER_URL_SIZE  32
 
@@ -50,12 +50,6 @@ typedef enum {
   SEARCH,
   NOTIFY
 } ssdp_method_t;
-
-typedef struct {
-  uint8_t major;
-  uint8_t minor;
-} ssdp_version_t;
-
 
 class SSDPClass{
   public:
@@ -71,7 +65,7 @@ class SSDPClass{
     void setURL(char *url);
     void setSerialNumber(char *serialNumber);
     void setModelName(char *name);
-    void setModelNumber(uint8_t major, uint8_t minor);
+    void setModelNumber(char *num);
     void setModelURL(char *url);
     void setManufacturer(char *name);
     void setManufacturerURL(char *url);
@@ -92,7 +86,7 @@ class SSDPClass{
     char *_manufacturerURL;
     char *_modelName;
     char *_modelURL;
-    ssdp_version_t *_modelNumber;
+    char *_modelNumber;
 };
 
 extern SSDPClass SSDP;
