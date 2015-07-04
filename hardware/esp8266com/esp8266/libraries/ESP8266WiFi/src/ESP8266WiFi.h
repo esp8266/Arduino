@@ -301,6 +301,19 @@ public:
     int hostByName(const char* aHostname, IPAddress& aResult);
 
     /*
+     * Get ESP8266 station DHCP hostname
+     */
+    String hostname(void);
+
+    /*
+     * Set ESP8266 station DHCP hostname
+     * hostname, max length:32
+     */
+    bool hostname(char* aHostname);
+    bool hostname(const char* aHostname);
+    bool hostname(String aHostname);
+
+    /*
      * Output WiFi settings to an object derived from Print interface (like Serial).
      *
      */
