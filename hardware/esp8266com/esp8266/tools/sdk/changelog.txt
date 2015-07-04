@@ -1,3 +1,62 @@
+esp_iot_sdk_v1.2.0_15_07_03 Release Note 
+-------------------------------------------
+Resolved Issues（Bugs below are eligible for Bug Bounty Program):
+1.TLS server disconnect to ESP8266 may cause crash. [孙新虎]
+
+Optimization:
+1.Update SmartConfig to version 2.4 , corresponding to ESPTOUCH APP v0.3.4 (https://github.com/EspressifApp/), delete parameter "sc_type type" in smartconfig_start, SmartConfig type can be got automatically.
+2.Add parameter "sint16 freq_offset; " in structure "bss_info" to get AP's frequency offset.
+3.Folder "ld" is updated, please use the latest one (\esp_iot_sdk_v1.2.0\ld )
+4.Add UDP transparent transmission example in documentation "4B-ESP8266__AT Command Examples"
+5.Revise the scan issue that may cause Wi-Fi connection break.
+6.Add ESP-NOW function, more details in "Add APIs"
+7.Add WPS function,more details in "Add APIs"
+8.Fixed a DNS fail issue with special router
+9.Optimize espconn,revise issues below:
+(1) enter sent callback late in UDP transmission
+(2) TCP shakehand may fail issue
+(3) SSL connection fail may cause crash
+(4) optimize SSL error handler
+10. Memory optimization
+
+Add APIs:
+1.ESP-NOW APIs
+esp_now_init: init ESP-NOW function
+esp_now_deinit: deinit ESP-NOW function
+esp_now_register_recv_cb: register ESP-NOW receive callback
+esp_now_unregister_recv_cb: unregister ESP-NOW receive callback
+esp_now_send: send ESP-NOW packet
+esp_now_add_peer: add an ESP-NOW peer
+esp_now_del_peer: delete an ESP-NOW peer
+esp_now_set_self_role: set ESP-NOW role of device itself
+esp_now_get_self_role: get ESP-NOW role of device itself
+esp_now_set_peer_role: set ESP-NOW role about another device 
+esp_now_get_peer_role: get ESP-NOW role about another device 
+esp_now_set_peer_key: set ESP-NOW key of a device 
+esp_now_get_peer_key: get ESP-NOW key of a device 
+
+2. WPS APIs
+wifi_wps_enable : enable WPS function
+wifi_wps_disable: disable WPS function
+wifi_wps_start: start WPS communication
+wifi_set_wps_cb: set WPS callback
+
+3.software watchdog APIs
+system_soft_wdt_stop: stop software watchdog
+system_soft_wdt_restart: restart software watchdog
+
+4.sntp_get_timezone: get SNTP timezone 
+
+AT_v0.30 Release Note: 
+Note: For AT firmware to support FOTA, flash size need to be 1024KB or more than that.
+
+1.Command "AT+CWSTARTSMART" need not parameter any more, SmartConfig type can be got automatically.
+2.AP's frequency offset can be got by command "AT+CWLAP"
+3.Memory optimization
+
+
+
+
 esp_iot_sdk_1.1.2_15_06_25_p2 Release Note 
 -------------------------------------------
 
