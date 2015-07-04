@@ -57,7 +57,7 @@ const char* _ssdp_notify_template =
 const char* _ssdp_packet_template = 
   "%s" // _ssdp_response_template / _ssdp_notify_template
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
-  "SERVER: Arduino/1.0 UPNP/1.1 %s/%u.%u\r\n" // _modelName, _modelNumber->major, _modelNumber->minor
+  "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
   "USN: uuid:%s-%02X%02X%02X%02X%02X%02X\r\n" // _base, _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5]
   "LOCATION: http://%u.%u.%u.%u/ssdp/schema.xml\r\n" // WiFi.localIP()
   "\r\n";
@@ -80,7 +80,7 @@ const char* _ssdp_schema_template =
       "<presentationURL>%s</presentationURL>"
       "<serialNumber>%s</serialNumber>"
       "<modelName>%s</modelName>"
-      "<modelNumber>%u.%u</modelNumber>"
+      "<modelNumber>%s</modelNumber>"
       "<modelURL>%s</modelURL>"
       "<manufacturer>%s</manufacturer>"
       "<manufacturerURL>%s</manufacturerURL>"
@@ -96,13 +96,12 @@ SSDPClass::SSDPClass(){
   _presentationURL = (char*)os_malloc(SSDP_PRESENTATION_URL_SIZE);
   _serialNumber = (char*)os_malloc(SSDP_SERIAL_NUMBER_SIZE);
   _modelName = (char*)os_malloc(SSDP_MODEL_NAME_SIZE);
-  _modelNumber = (ssdp_version_t*)os_malloc(SSDP_MODEL_VERSION_SIZE);
+  _modelNumber = (char*)os_malloc(SSDP_MODEL_VERSION_SIZE);
   _modelURL = (char*)os_malloc(SSDP_MODEL_URL_SIZE);
   _manufacturer = (char*)os_malloc(SSDP_MANUFACTURER_SIZE);
   _manufacturerURL = (char*)os_malloc(SSDP_MANUFACTURER_URL_SIZE);
   
-  _modelNumber->major = 0;
-  _modelNumber->minor = 0;
+  _modelNumber[0] = '\0';
   _friendlyName[0] = '\0';
   _presentationURL[0] = '\0';
   _serialNumber[0] = '\0';
@@ -165,7 +164,7 @@ void SSDPClass::send(ssdp_method_t method){
   _server.printf(_ssdp_packet_template,
     (method == NONE)?_ssdp_response_template:_ssdp_notify_template,
     SSDP_INTERVAL,
-    _modelName, _modelNumber->major, _modelNumber->minor,
+    _modelName, _modelNumber,
     _base, _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5],
     (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF)
   );
@@ -179,7 +178,7 @@ void SSDPClass::schema(WiFiClient client){
     _presentationURL,
     _serialNumber,
     _modelName,
-    _modelNumber->major, _modelNumber->minor,
+    _modelNumber,
     _modelURL,
     _manufacturer,
     _manufacturerURL,
@@ -300,9 +299,8 @@ void SSDPClass::setModelName(char *name){
   strcpy(_modelName, name);
 }
 
-void SSDPClass::setModelNumber(uint8_t major, uint8_t minor){
-  _modelNumber->major = major;
-  _modelNumber->minor = minor;
+void SSDPClass::setModelNumber(char *num){
+  strcpy(_modelNumber, num);
 }
 
 void SSDPClass::setModelURL(char *url){
