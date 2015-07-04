@@ -427,20 +427,20 @@ typedef enum wps_type {
 	WPS_TYPE_PBC,
 	WPS_TYPE_PIN,
 	WPS_TYPE_DISPLAY,
-	WPS_TYPE_MAX,
+	WPS_TYPE_MAX
 } WPS_TYPE_t;
 
-enum wps_cb_status {
+typedef enum wps_cb_status {
 	WPS_CB_ST_SUCCESS = 0,
 	WPS_CB_ST_FAILED,
-	WPS_CB_ST_TIMEOUT,
-};
+	WPS_CB_ST_TIMEOUT
+} WPS_CB_STATUS_t;
 
 bool wifi_wps_enable(WPS_TYPE_t wps_type);
 bool wifi_wps_disable(void);
 bool wifi_wps_start(void);
 
-typedef void (*wps_st_cb_t)(int status);
+typedef void (*wps_st_cb_t)(WPS_CB_STATUS_t status);
 bool wifi_set_wps_cb(wps_st_cb_t cb);
 
 #endif
