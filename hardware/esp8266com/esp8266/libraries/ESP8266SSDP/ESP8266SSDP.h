@@ -33,8 +33,6 @@ License (MIT license):
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-#define DEBUG_SSDP  Serial
-
 typedef enum {
   NONE,
   SEARCH,
