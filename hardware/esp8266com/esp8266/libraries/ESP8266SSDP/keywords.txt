@@ -19,6 +19,8 @@ send	KEYWORD2
 schema	KEYWORD2
 setName	KEYWORD2
 setURL	KEYWORD2
+setHTTPPort	KEYWORD2
+setSchemaURL	KEYWORD2
 setSerialNumber	KEYWORD2
 setModelName	KEYWORD2
 setModelNumber	KEYWORD2
