@@ -42,6 +42,7 @@ extern "C" {
 #define SSDP_BUFFER_SIZE  64
 
 #define SSDP_UUID_SIZE              37
+#define SSDP_SCHEMA_URL_SIZE        64
 #define SSDP_FRIENDLY_NAME_SIZE     64
 #define SSDP_SERIAL_NUMBER_SIZE     32
 #define SSDP_PRESENTATION_URL_SIZE  128
@@ -69,7 +70,7 @@ const char* _ssdp_packet_template =
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
   "USN: uuid:%s\r\n" // _uuid
-  "LOCATION: http://%u.%u.%u.%u/ssdp/schema.xml\r\n" // WiFi.localIP()
+  "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _shemaURL
   "\r\n";
 
 const char* _ssdp_schema_template = 
@@ -84,6 +85,7 @@ const char* _ssdp_schema_template =
       "<major>1</major>"
       "<minor>0</minor>"
     "</specVersion>"
+    "<URLBase>http://%u.%u.%u.%u:%u/</URLBase>" // WiFi.localIP(), _port
     "<device>"
       "<deviceType>urn:schemas-upnp-org:device:Basic:1</deviceType>"
       "<friendlyName>%s</friendlyName>"
@@ -94,13 +96,14 @@ const char* _ssdp_schema_template =
       "<modelURL>%s</modelURL>"
       "<manufacturer>%s</manufacturer>"
       "<manufacturerURL>%s</manufacturerURL>"
-      "<UDN>%s</UDN>"
+      "<UDN>uuid:%s</UDN>"
     "</device>"
   "</root>\r\n"
   "\r\n";
 
 SSDPClass::SSDPClass(){
   _uuid = (char*)os_malloc(SSDP_UUID_SIZE);
+  _schemaURL = (char*)os_malloc(SSDP_SCHEMA_URL_SIZE);
   _friendlyName = (char*)os_malloc(SSDP_FRIENDLY_NAME_SIZE);
   _presentationURL = (char*)os_malloc(SSDP_PRESENTATION_URL_SIZE);
   _serialNumber = (char*)os_malloc(SSDP_SERIAL_NUMBER_SIZE);
@@ -119,11 +122,14 @@ SSDPClass::SSDPClass(){
   _modelURL[0] = '\0';
   _manufacturer[0] = '\0';
   _manufacturerURL[0] = '\0';
+  sprintf(_schemaURL, "ssdp/schema.xml");
+  _port = 80;
   _pending = false;
 }
 
 SSDPClass::~SSDPClass(){
 	os_free(_uuid);
+	os_free(_schemaURL);
   os_free(_friendlyName);
   os_free(_presentationURL);
   os_free(_serialNumber);
@@ -183,14 +189,16 @@ void SSDPClass::send(ssdp_method_t method){
     SSDP_INTERVAL,
     _modelName, _modelNumber,
     _uuid,
-    (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF)
+    (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF), _port, _schemaURL
   );
     
   _server.endPacket();
 }
 
 void SSDPClass::schema(WiFiClient client){
+  uint32_t ip = WiFi.localIP();
   client.printf(_ssdp_schema_template,
+    (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF), _port,
     _friendlyName,
     _presentationURL,
     _serialNumber,
@@ -298,6 +306,14 @@ uint8_t SSDPClass::update(){
     _notify_time = millis();
     send(NOTIFY);
   }
+}
+
+void SSDPClass::setSchemaURL(char *url){
+  strcpy(_schemaURL, url);
+}
+
+void SSDPClass::setHTTPPort(uint16_t port){
+  _port = port;
 }
 
 void SSDPClass::setName(char *name){

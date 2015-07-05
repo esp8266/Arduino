@@ -18,24 +18,26 @@ void setup() {
   if(WiFi.waitForConnectResult() == WL_CONNECTED){
   
     Serial.printf("Starting HTTP...\n");
-    HTTP.on("/", HTTP_GET, [](){
+    HTTP.on("/index.html", HTTP_GET, [](){
       HTTP.send(200, "text/plain", "Hello World!");
     });
-    HTTP.on("/ssdp/schema.xml", HTTP_GET, [](){
+    HTTP.on("/description.xml", HTTP_GET, [](){
       SSDP.schema(HTTP.client());
     });
     HTTP.begin();
   
     Serial.printf("Starting SSDP...\n");
     SSDP.begin();
-    SSDP.setName((char*)"ESP8266");
-    SSDP.setSerialNumber((char*)"A0123456789");
-    SSDP.setURL((char*)"/");
-    SSDP.setModelName((char*)"ESP-12e");
-    SSDP.setModelNumber((char*)"1.0");
-    SSDP.setModelURL((char*)"http://12e.espressif.com");
-    SSDP.setManufacturer((char*)"Espressif");
-    SSDP.setManufacturerURL((char*)"http://espressif.com");
+    SSDP.setSchemaURL((char*)"description.xml");
+    SSDP.setHTTPPort(80);
+    SSDP.setName((char*)"Philips hue clone");
+    SSDP.setSerialNumber((char*)"001788102201");
+    SSDP.setURL((char*)"index.html");
+    SSDP.setModelName((char*)"Philips hue bridge 2012");
+    SSDP.setModelNumber((char*)"929000226503");
+    SSDP.setModelURL((char*)"http://www.meethue.com");
+    SSDP.setManufacturer((char*)"Royal Philips Electronics");
+    SSDP.setManufacturerURL((char*)"http://www.philips.com");
     
     Serial.printf("Ready!\n");
   } else {
