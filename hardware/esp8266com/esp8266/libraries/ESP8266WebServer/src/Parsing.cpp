@@ -108,7 +108,12 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   
     if (!isForm){
       if (searchStr != "") searchStr += '&';
-      searchStr += client.readStringUntil('\r');
+      String bodyLine = client.readStringUntil('\r');
+      if(bodyLine.startsWith('{') || bodyLine.startsWith('[') || bodyLine.indexOf('=') == -1){
+        //plain post json or other data
+        searchStr += "plain";
+      }
+      searchStr += bodyLine;
       client.readStringUntil('\n');
     }
     _parseArguments(searchStr);
