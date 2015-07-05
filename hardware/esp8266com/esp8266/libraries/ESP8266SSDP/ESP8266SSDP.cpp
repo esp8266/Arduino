@@ -182,7 +182,7 @@ void SSDPClass::begin(){
   _server.begin(SSDP_PORT);
 }
 
-void SSDPClass::send(ssdp_method_t method){
+void SSDPClass::_send(ssdp_method_t method){
 #ifdef DEBUG_SSDP
   if(method == NONE){
     DEBUG_SSDP.print("Sending Response to ");
@@ -319,10 +319,10 @@ uint8_t SSDPClass::update(){
 
   if(_pending && (millis() - _process_time) > _delay){
     _pending = false; _delay = 0;
-    send(NONE);
+    _send(NONE);
   }else if(_notify_time == 0 || (millis() - _notify_time) > (SSDP_INTERVAL * 1000L)){
     _notify_time = millis();
-    send(NOTIFY);
+    _send(NOTIFY);
   }
 }
 
