@@ -53,6 +53,8 @@ class SSDPClass{
 
     void setName(char *name);
     void setURL(char *url);
+    void setSchemaURL(char *url);
+    void setHTTPPort(uint16_t port);
     void setSerialNumber(char *serialNumber);
     void setModelName(char *name);
     void setModelNumber(char *num);
@@ -67,7 +69,8 @@ class SSDPClass{
     unsigned long _process_time;
     unsigned long _notify_time;
     
-    uint8_t *_mac;
+    uint16_t _port;
+    char *_schemaURL;
     char *_uuid;
     char *_friendlyName;
     char *_serialNumber;
