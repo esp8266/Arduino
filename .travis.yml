@@ -2,7 +2,7 @@ sudo: true
 language: java
 
 jdk:
-  - openjdk6
+  - oraclejdk8
 
 script:
   - sudo apt-get update -qq
