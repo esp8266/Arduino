@@ -35,6 +35,8 @@ extern "C" {
 }
 #include "lwip/igmp.h"
 
+//#define DEBUG_SSDP  Serial
+
 #define SSDP_INTERVAL     1200
 #define SSDP_PORT         1900
 #define SSDP_METHOD_SIZE  10
@@ -70,7 +72,7 @@ const char* _ssdp_packet_template =
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
   "USN: uuid:%s\r\n" // _uuid
-  "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _shemaURL
+  "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
 
 const char* _ssdp_schema_template = 
@@ -98,6 +100,22 @@ const char* _ssdp_schema_template =
       "<manufacturerURL>%s</manufacturerURL>"
       "<UDN>uuid:%s</UDN>"
     "</device>"
+//    "<iconList>"
+//      "<icon>"
+//        "<mimetype>image/png</mimetype>"
+//        "<height>48</height>"
+//        "<width>48</width>"
+//        "<depth>24</depth>"
+//        "<url>icon48.png</url>"
+//      "</icon>"
+//      "<icon>"
+//       "<mimetype>image/png</mimetype>"
+//       "<height>120</height>"
+//       "<width>120</width>"
+//       "<depth>24</depth>"
+//       "<url>icon120.png</url>"
+//      "</icon>"
+//    "</iconList>"
   "</root>\r\n"
   "\r\n";
 
@@ -154,7 +172,7 @@ void SSDPClass::begin(){
   uint8_t mac[6];
   WiFi.macAddress(mac);
   uint32_t chipId = ESP.getChipId();
-  sprintf(_uuid, "38323636-4558-%04X-%04X-%02X%02X%02X%02X%02X%02X",
+  sprintf(_uuid, "38323636-4558-%04x-%04x-%02x%02x%02x%02x%02x%02x",
     (chipId >> 16) & 0xFFFF, chipId & 0xFFFF,
     mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]
   );
