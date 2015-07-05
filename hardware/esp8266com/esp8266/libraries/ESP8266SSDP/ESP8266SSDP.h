@@ -46,7 +46,6 @@ class SSDPClass{
 
     void begin();
     uint8_t update();
-    void send(ssdp_method_t method);
     void schema(WiFiClient client);
 
     void setName(char *name);
@@ -78,6 +77,8 @@ class SSDPClass{
     char *_modelName;
     char *_modelURL;
     char *_modelNumber;
+
+    void _send(ssdp_method_t method);
 };
 
 extern SSDPClass SSDP;
