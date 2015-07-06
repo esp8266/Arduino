@@ -109,7 +109,7 @@ public:
      *
      * return: one value of wl_status_t enum
      */
-    int disconnect(void);
+    int disconnect(bool wifioff = false);
 
     /*
      * Get the station interface MAC address.
@@ -299,6 +299,26 @@ public:
      *          else error code
      */
     int hostByName(const char* aHostname, IPAddress& aResult);
+
+    /*
+     * Get ESP8266 station DHCP hostname
+     */
+    String hostname(void);
+
+    /*
+     * Set ESP8266 station DHCP hostname
+     * hostname, max length:32
+     */
+    bool hostname(char* aHostname);
+    bool hostname(const char* aHostname);
+    bool hostname(String aHostname);
+
+
+    /**
+     * WPS config
+     * so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
+     */
+    bool beginWPSConfig(void);
 
     /*
      * Output WiFi settings to an object derived from Print interface (like Serial).

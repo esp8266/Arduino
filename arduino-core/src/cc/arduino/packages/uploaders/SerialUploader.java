@@ -26,6 +26,7 @@
 
 package cc.arduino.packages.uploaders;
 
+import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
 import processing.app.*;
 import processing.app.debug.RunnerException;
@@ -42,14 +43,24 @@ import static processing.app.I18n._;
 
 public class SerialUploader extends Uploader {
 
+  private final BoardPort boardPort;
+
   public SerialUploader()
   {
     super();
+    this.boardPort = null;
   }
 
   public SerialUploader(boolean noUploadPort)
   {
     super(noUploadPort);
+    this.boardPort = null;
+  }
+
+  public SerialUploader(BoardPort port)
+  {
+    super();
+    this.boardPort = port;
   }
 
   public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception {
@@ -153,7 +164,15 @@ public class SerialUploader extends Uploader {
 
     boolean uploadResult;
     try {
-      String pattern = prefs.getOrExcept("upload.pattern");
+      String pattern;
+      if(this.boardPort != null && "network".equals(this.boardPort.getProtocol())){
+        prefs.put("network.port", this.boardPort.getPrefs().get("port"));
+        pattern = prefs.get("network.pattern");
+        if(pattern == null)
+          pattern = prefs.getOrExcept("upload.pattern");
+      } else {
+        pattern = prefs.getOrExcept("upload.pattern");
+      }
       String[] cmd = StringReplacer.formatAndSplit(pattern, prefs, true);
       uploadResult = executeUploadCommand(cmd);
     } catch (RunnerException e) {

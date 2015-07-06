@@ -1,0 +1,53 @@
+#include <ESP8266WiFi.h>
+#include <WiFiUDP.h>
+#include <ESP8266WebServer.h>
+#include <ESP8266SSDP.h>
+
+const char* ssid = "************";
+const char* password = "***********";
+
+ESP8266WebServer HTTP(80);
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println();
+  Serial.println("Starting WiFi...");
+  
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  if(WiFi.waitForConnectResult() == WL_CONNECTED){
+  
+    Serial.printf("Starting HTTP...\n");
+    HTTP.on("/index.html", HTTP_GET, [](){
+      HTTP.send(200, "text/plain", "Hello World!");
+    });
+    HTTP.on("/description.xml", HTTP_GET, [](){
+      SSDP.schema(HTTP.client());
+    });
+    HTTP.begin();
+  
+    Serial.printf("Starting SSDP...\n");
+    SSDP.begin();
+    SSDP.setSchemaURL((char*)"description.xml");
+    SSDP.setHTTPPort(80);
+    SSDP.setName((char*)"Philips hue clone");
+    SSDP.setSerialNumber((char*)"001788102201");
+    SSDP.setURL((char*)"index.html");
+    SSDP.setModelName((char*)"Philips hue bridge 2012");
+    SSDP.setModelNumber((char*)"929000226503");
+    SSDP.setModelURL((char*)"http://www.meethue.com");
+    SSDP.setManufacturer((char*)"Royal Philips Electronics");
+    SSDP.setManufacturerURL((char*)"http://www.philips.com");
+    
+    Serial.printf("Ready!\n");
+  } else {
+    Serial.printf("WiFi Failed\n");
+    while(1) delay(100);
+  }
+}
+
+void loop() {
+  HTTP.handleClient();
+  SSDP.update();
+  delay(1);
+}

@@ -44,7 +44,7 @@ public class UploaderFactory {
       return new SSHUploader(port);
     }
 
-    return new SerialUploader();
+    return new SerialUploader(port);
   }
 
 }
