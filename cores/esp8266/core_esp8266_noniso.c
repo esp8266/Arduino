@@ -27,7 +27,6 @@
 #include "ets_sys.h"
 
 #define sprintf ets_sprintf
-#define strcpy ets_strcpy
 
 int atoi(const char* s) {
     return (int) atol(s);
