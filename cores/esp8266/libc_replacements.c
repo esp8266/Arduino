@@ -160,13 +160,12 @@ char* ICACHE_FLASH_ATTR strcat(char * dest, const char * src) {
 }
 
 char* ICACHE_FLASH_ATTR strncat(char * dest, const char * src, size_t n) {
-    uint32_t offset = strlen(dest);
-    for(uint32_t i = 0; i < n; i++) {
-        *(dest + i + offset) = *(src + i);
-        if(*(src + i) == 0x00) {
-            break;
-        }
+    size_t i;
+    size_t offset = strlen(dest);
+    for(i = 0; i < n && src[i]; i++) {
+        dest[i + offset] = src[i];
     }
+    dest[i + offset] = 0;
     return dest;
 }
 
