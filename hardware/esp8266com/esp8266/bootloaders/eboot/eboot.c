@@ -125,7 +125,7 @@ void main()
     if (cmd.action == ACTION_COPY_RAW) {
         ets_putc('c'); ets_putc('p'); ets_putc(':');
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2]);
-        ets_putc((char)0x30+res); ets_putc('\n');
+        ets_putc('0'+res); ets_putc('\n');
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];
@@ -136,7 +136,7 @@ void main()
       ets_putc('l'); ets_putc('d'); ets_putc('\n');
       res = load_app_from_flash_raw(cmd.args[0]);
       //we will get to this only on load fail
-      ets_putc('e'); ets_putc(':'); ets_putc((char)0x30+res); ets_putc('\n');
+      ets_putc('e'); ets_putc(':'); ets_putc('0'+res); ets_putc('\n');
     }
 
     if (res) {

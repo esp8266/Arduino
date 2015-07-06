@@ -27,7 +27,7 @@ class UpdaterClass {
     size_t write(uint8_t *data, size_t len);
     
     /*
-      Writes the remaining bytes from the Sream to the flash
+      Writes the remaining bytes from the Stream to the flash
       Uses readBytes() and sets UPDATE_ERROR_STREAM on timeout
       Returns the bytes written
       Should be equal to the remaining bytes when called
@@ -53,32 +53,33 @@ class UpdaterClass {
     void printError(Stream &out);
     
     //Helpers
-    inline uint8_t getError(){ return _error; }
-    inline void clearError(){ _error = UPDATE_ERROR_OK; }
-    inline bool hasError(){ return _error != UPDATE_ERROR_OK; }
-    inline bool isRunning(){ return _size > 0; }
-    inline bool isFinished(){ return _currentAddress == (_startAddress + _size); }
-    inline size_t size(){ return _size; }
-    inline size_t progress(){ return _currentAddress - _startAddress; }
-    inline size_t remaining(){ return _size - (_currentAddress - _startAddress); }
+    uint8_t getError(){ return _error; }
+    void clearError(){ _error = UPDATE_ERROR_OK; }
+    bool hasError(){ return _error != UPDATE_ERROR_OK; }
+    bool isRunning(){ return _size > 0; }
+    bool isFinished(){ return _currentAddress == (_startAddress + _size); }
+    size_t size(){ return _size; }
+    size_t progress(){ return _currentAddress - _startAddress; }
+    size_t remaining(){ return _size - (_currentAddress - _startAddress); }
     
     /*
       Template to write from objects that expose
       available() and read(uint8_t*, size_t) methods
-      faster than the readStream method
+      faster than the writeStream method
       writes only what is available
     */
     template<typename T>
     size_t write(T &data){
       size_t written = 0;
-      if(hasError()||!isRunning())
+      if (hasError() || !isRunning())
         return 0;
+
       size_t available = data.available();
-      while(available){
-        if((_bufferLen + available) > remaining()){
-          available = (remaining() - _bufferLen);
+      while(available) {
+        if(_bufferLen + available > remaining()){
+          available = remaining() - _bufferLen;
         }
-        if((_bufferLen + available) > FLASH_SECTOR_SIZE){
+        if(_bufferLen + available > FLASH_SECTOR_SIZE) {
           size_t toBuff = FLASH_SECTOR_SIZE - _bufferLen;
           data.read(_buffer + _bufferLen, toBuff);
           _bufferLen += toBuff;
@@ -89,8 +90,8 @@ class UpdaterClass {
           data.read(_buffer + _bufferLen, available);
           _bufferLen += available;
           written += available;
-          if(_bufferLen == remaining()){
-            if(!_writeBuffer()){
+          if(_bufferLen == remaining()) {
+            if(!_writeBuffer()) {
               return written;
             }
           }
@@ -104,14 +105,15 @@ class UpdaterClass {
     }
     
   private:
+    void _reset();
+    bool _writeBuffer();
+
     uint8_t *_buffer;
-    uint8_t _error;
     size_t _bufferLen;
     size_t _size;
     uint32_t _startAddress;
     uint32_t _currentAddress;
-    
-    bool _writeBuffer();
+    uint8_t _error;
 };
 
 extern UpdaterClass Update;
