@@ -23,6 +23,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include "stdlib_noniso.h"
 #include "ets_sys.h"
 
