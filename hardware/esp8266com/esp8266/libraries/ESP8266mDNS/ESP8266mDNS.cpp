@@ -32,7 +32,8 @@ License (MIT license):
 // - DNS request and response: http://www.ietf.org/rfc/rfc1035.txt
 // - Multicast DNS: http://www.ietf.org/rfc/rfc6762.txt
 
-#define LWIP_INTERNAL
+#define LWIP_OPEN_SRC
+
 #include "ESP8266mDNS.h"
 #include <functional>
   
@@ -41,7 +42,6 @@ License (MIT license):
 extern "C" {
     #include "osapi.h"
     #include "ets_sys.h"
-    #include "ip_addr.h"
     #include "user_interface.h"
 }
 
