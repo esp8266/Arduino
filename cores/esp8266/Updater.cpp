@@ -1,14 +1,30 @@
 #include "Updater.h"
 #include "Arduino.h"
 #include "eboot_command.h"
-extern "C"{
-  #include "mem.h"
-}
+
 //#define DEBUG_UPDATER Serial
 
 extern "C" uint32_t _SPIFFS_start;
 
-UpdaterClass::UpdaterClass() : _error(0), _buffer(0), _bufferLen(0), _size(0), _startAddress(0), _currentAddress(0) {}
+UpdaterClass::UpdaterClass() 
+: _error(0)
+, _buffer(0)
+, _bufferLen(0)
+, _size(0)
+, _startAddress(0)
+, _currentAddress(0) 
+{
+}
+
+void UpdaterClass::_reset() {
+  if (_buffer)
+    delete[] _buffer;
+  _buffer = 0;
+  _bufferLen = 0;
+  _startAddress = 0;
+  _currentAddress = 0;
+  _size = 0;
+}
 
 bool UpdaterClass::begin(size_t size){
   if(_size > 0){
@@ -26,17 +42,13 @@ bool UpdaterClass::begin(size_t size){
     return false;
   }
   
-  if(_buffer) os_free(_buffer);
-  _bufferLen = 0;
-  _startAddress = 0;
-  _currentAddress = 0;
-  _size = 0;
+  _reset();
   _error = 0;
   
   //size of current sketch rounded to a sector
   uint32_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-  //address of the end of the space available for sketch and update (5 sectors are for EEPROM and init data)
-  uint32_t updateEndAddress = (uint32_t)&_SPIFFS_start - 0x40200000 - (5 * FLASH_SECTOR_SIZE);
+  //address of the end of the space available for sketch and update
+  uint32_t updateEndAddress = (uint32_t)&_SPIFFS_start - 0x40200000;
   //size of the update rounded to a sector
   uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
   //address where we will start writing the update
@@ -55,7 +67,7 @@ bool UpdaterClass::begin(size_t size){
   _startAddress = updateStartAddress;
   _currentAddress = _startAddress;
   _size = size;
-  _buffer = (uint8_t*)os_malloc(FLASH_SECTOR_SIZE);
+  _buffer = new uint8_t[FLASH_SECTOR_SIZE];
   
   return true;
 }
@@ -72,11 +84,8 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf("premature end: res:%u, pos:%u/%u\n", getError(), progress(), _size);
 #endif
-    if(_buffer) os_free(_buffer);
-    _bufferLen = 0;
-    _currentAddress = 0;
-    _startAddress = 0;
-    _size = 0;
+    
+    _reset();
     return false;
   }
   
@@ -86,9 +95,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
     }
     _size = progress();
   }
-  if(_buffer) os_free(_buffer);
-  _bufferLen = 0;
-  _currentAddress = 0;
   
   eboot_command ebcmd;
   ebcmd.action = ACTION_COPY_RAW;
@@ -100,19 +106,19 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08X\n", _startAddress, _size);
 #endif
-  
-  _startAddress = 0;
-  _size = 0;
-  _error = UPDATE_ERROR_OK;
+
+  _reset();
   return true;
 }
 
 bool UpdaterClass::_writeBuffer(){
   noInterrupts();
   int rc = SPIEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
-  if(!rc) rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
+  if (!rc) {
+    rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
+  }
   interrupts();
-  if (rc){
+  if (rc) {
     _error = UPDATE_ERROR_WRITE;
     _currentAddress = (_startAddress + _size);
 #ifdef DEBUG_UPDATER
@@ -125,15 +131,15 @@ bool UpdaterClass::_writeBuffer(){
   return true;
 }
 
-size_t UpdaterClass::write(uint8_t *data, size_t len){
+size_t UpdaterClass::write(uint8_t *data, size_t len) {
   size_t left = len;
-  if(hasError()||!isRunning())
+  if(hasError() || !isRunning())
     return 0;
   
   if(len > remaining())
     len = remaining();
   
-  while((_bufferLen + left) > FLASH_SECTOR_SIZE){
+  while((_bufferLen + left) > FLASH_SECTOR_SIZE) {
     size_t toBuff = FLASH_SECTOR_SIZE - _bufferLen;
     memcpy(_buffer + _bufferLen, data + (len - left), toBuff);
     _bufferLen += toBuff;
@@ -155,13 +161,13 @@ size_t UpdaterClass::write(uint8_t *data, size_t len){
   return len;
 }
 
-size_t UpdaterClass::writeStream(Stream &data){
+size_t UpdaterClass::writeStream(Stream &data) {
   size_t written = 0;
   size_t toRead = 0;
-  if(hasError()||!isRunning())
+  if(hasError() || !isRunning())
     return 0;
   
-  while(remaining()){
+  while(remaining()) {
     toRead = FLASH_SECTOR_SIZE - _bufferLen;
     toRead = data.readBytes(_buffer + _bufferLen, toRead);
     if(toRead == 0){ //Timeout
