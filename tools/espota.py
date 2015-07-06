@@ -12,7 +12,7 @@ import socket
 import sys
 import os
  
-def serve(remoteAddr, filename):
+def serve(remoteAddr, remotePort, filename):
   # Create a TCP/IP socket
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   serverPort = 48266
@@ -22,7 +22,7 @@ def serve(remoteAddr, filename):
   sock.listen(1)
  
   sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  remote_address = (remoteAddr, 8266)
+  remote_address = (remoteAddr, remotePort)
   content_size = os.path.getsize(filename)
   print('upload size: %d' % content_size, file=sys.stderr)
   message = '%d %d %d\n' % (0, serverPort, content_size)
@@ -61,7 +61,7 @@ def serve(remoteAddr, filename):
     return 1
  
 def main(args):
-  return serve(args[1], args[2])
+  return serve(args[1], args[2], args[3])
  
  
  
