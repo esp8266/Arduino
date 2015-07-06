@@ -66,10 +66,15 @@ extern "C" {
 #define MDNS_TYPE_PTR   0x000C
 #define MDNS_TYPE_SRV   0x0021
 #define MDNS_TYPE_TXT   0x0010
-#define MDNS_TYPE_NSEC  0x002F
 
 #define MDNS_CLASS_IN             0x0001
 #define MDNS_CLASS_IN_FLUSH_CACHE 0x8001
+
+#define MDNS_ANSWERS_ALL  0x0F
+#define MDNS_ANSWER_PTR   0x08
+#define MDNS_ANSWER_TXT   0x04
+#define MDNS_ANSWER_SRV   0x02
+#define MDNS_ANSWER_A     0x01
 
 #define _conn_read32() (((uint32_t)_conn->read() << 24) | ((uint32_t)_conn->read() << 16) | ((uint32_t)_conn->read() << 8) | _conn->read())
 #define _conn_read16() (((uint16_t)_conn->read() << 8) | _conn->read())
@@ -341,7 +346,6 @@ void MDNSResponder::_parsePacket(){
     else if(currentType == MDNS_TYPE_PTR) os_printf("  PTR ");
     else if(currentType == MDNS_TYPE_SRV) os_printf("  SRV ");
     else if(currentType == MDNS_TYPE_TXT) os_printf("  TXT ");
-    else if(currentType == MDNS_TYPE_NSEC) os_printf("  NSEC ");
     else os_printf("  0x%04X ", currentType);
 
     if(currentClass == MDNS_CLASS_IN) os_printf("  IN ");
