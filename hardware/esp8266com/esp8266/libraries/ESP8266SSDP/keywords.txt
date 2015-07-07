@@ -14,7 +14,6 @@ SSDP	KEYWORD1
 #######################################
 
 begin	KEYWORD2
-update	KEYWORD2
 schema	KEYWORD2
 setName	KEYWORD2
 setURL	KEYWORD2
