@@ -33,6 +33,17 @@ License (MIT license):
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
+#define SSDP_UUID_SIZE              37
+#define SSDP_SCHEMA_URL_SIZE        64
+#define SSDP_FRIENDLY_NAME_SIZE     64
+#define SSDP_SERIAL_NUMBER_SIZE     32
+#define SSDP_PRESENTATION_URL_SIZE  128
+#define SSDP_MODEL_NAME_SIZE        64
+#define SSDP_MODEL_URL_SIZE         128
+#define SSDP_MODEL_VERSION_SIZE     32
+#define SSDP_MANUFACTURER_SIZE      64
+#define SSDP_MANUFACTURER_URL_SIZE  128
+
 typedef enum {
   NONE,
   SEARCH,
@@ -48,16 +59,25 @@ class SSDPClass{
     uint8_t update();
     void schema(WiFiClient client);
 
-    void setName(char *name);
-    void setURL(char *url);
-    void setSchemaURL(char *url);
+    void setName(const String& name) { setName(name.c_str()); }
+    void setName(const char *name);
+    void setURL(const String& url) { setURL(url.c_str()); }
+    void setURL(const char *url);
+    void setSchemaURL(const String& url) { setSchemaURL(url.c_str()); }
+    void setSchemaURL(const char *url);
+    void setSerialNumber(const String& serialNumber) { setSerialNumber(serialNumber.c_str()); }
+    void setSerialNumber(const char *serialNumber);
+    void setModelName(const String& name) { setModelName(name.c_str()); }
+    void setModelName(const char *name);
+    void setModelNumber(const String& num) { setModelNumber(num.c_str()); }
+    void setModelNumber(const char *num);
+    void setModelURL(const String& url) { setModelURL(url.c_str()); }
+    void setModelURL(const char *url);
+    void setManufacturer(const String& name) { setManufacturer(name.c_str()); }
+    void setManufacturer(const char *name);
+    void setManufacturerURL(const String& url) { setManufacturerURL(url.c_str()); }
+    void setManufacturerURL(const char *url);
     void setHTTPPort(uint16_t port);
-    void setSerialNumber(char *serialNumber);
-    void setModelName(char *name);
-    void setModelNumber(char *num);
-    void setModelURL(char *url);
-    void setManufacturer(char *name);
-    void setManufacturerURL(char *url);
     
   private:
     WiFiUDP _server;
@@ -67,16 +87,16 @@ class SSDPClass{
     unsigned long _notify_time;
     
     uint16_t _port;
-    char *_schemaURL;
-    char *_uuid;
-    char *_friendlyName;
-    char *_serialNumber;
-    char *_presentationURL;
-    char *_manufacturer;
-    char *_manufacturerURL;
-    char *_modelName;
-    char *_modelURL;
-    char *_modelNumber;
+    char _schemaURL[SSDP_SCHEMA_URL_SIZE];
+    char _uuid[SSDP_UUID_SIZE];
+    char _friendlyName[SSDP_FRIENDLY_NAME_SIZE];
+    char _serialNumber[SSDP_SERIAL_NUMBER_SIZE];
+    char _presentationURL[SSDP_PRESENTATION_URL_SIZE];
+    char _manufacturer[SSDP_MANUFACTURER_SIZE];
+    char _manufacturerURL[SSDP_MANUFACTURER_URL_SIZE];
+    char _modelName[SSDP_MODEL_NAME_SIZE];
+    char _modelURL[SSDP_MODEL_URL_SIZE];
+    char _modelNumber[SSDP_MODEL_VERSION_SIZE];
 
     void _send(ssdp_method_t method);
 };
