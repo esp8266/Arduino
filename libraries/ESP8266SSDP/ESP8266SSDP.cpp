@@ -25,14 +25,14 @@ License (MIT license):
   THE SOFTWARE.
 
 */
-
+#define LWIP_OPEN_SRC
 #include "ESP8266SSDP.h"
 
 extern "C" {
-  #include "ip_addr.h"
   #include "user_interface.h"
   #include "mem.h"
 }
+#include "lwip/ip_addr.h"
 #include "lwip/igmp.h"
 
 //#define DEBUG_SSDP  Serial
@@ -43,31 +43,20 @@ extern "C" {
 #define SSDP_URI_SIZE     2
 #define SSDP_BUFFER_SIZE  64
 
-#define SSDP_UUID_SIZE              37
-#define SSDP_SCHEMA_URL_SIZE        64
-#define SSDP_FRIENDLY_NAME_SIZE     64
-#define SSDP_SERIAL_NUMBER_SIZE     32
-#define SSDP_PRESENTATION_URL_SIZE  128
-#define SSDP_MODEL_NAME_SIZE        64
-#define SSDP_MODEL_URL_SIZE         128
-#define SSDP_MODEL_VERSION_SIZE     32
-#define SSDP_MANUFACTURER_SIZE      64
-#define SSDP_MANUFACTURER_URL_SIZE  128
-
 static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
 
-const char* _ssdp_response_template = 
+static const char* _ssdp_response_template = 
   "HTTP/1.1 200 OK\r\n"
   "EXT:\r\n"
   "ST: upnp:rootdevice\r\n";
 
-const char* _ssdp_notify_template = 
+static const char* _ssdp_notify_template = 
   "NOTIFY * HTTP/1.1\r\n"
   "HOST: 239.255.255.250:1900\r\n"
   "NT: upnp:rootdevice\r\n"
   "NTS: ssdp:alive\r\n";
 
-const char* _ssdp_packet_template = 
+static const char* _ssdp_packet_template = 
   "%s" // _ssdp_response_template / _ssdp_notify_template
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
@@ -75,7 +64,7 @@ const char* _ssdp_packet_template =
   "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
 
-const char* _ssdp_schema_template = 
+static const char* _ssdp_schema_template = 
   "HTTP/1.1 200 OK\r\n"
   "Content-Type: text/xml\r\n"
   "Connection: close\r\n"
@@ -120,17 +109,6 @@ const char* _ssdp_schema_template =
   "\r\n";
 
 SSDPClass::SSDPClass(){
-  _uuid = (char*)os_malloc(SSDP_UUID_SIZE);
-  _schemaURL = (char*)os_malloc(SSDP_SCHEMA_URL_SIZE);
-  _friendlyName = (char*)os_malloc(SSDP_FRIENDLY_NAME_SIZE);
-  _presentationURL = (char*)os_malloc(SSDP_PRESENTATION_URL_SIZE);
-  _serialNumber = (char*)os_malloc(SSDP_SERIAL_NUMBER_SIZE);
-  _modelName = (char*)os_malloc(SSDP_MODEL_NAME_SIZE);
-  _modelNumber = (char*)os_malloc(SSDP_MODEL_VERSION_SIZE);
-  _modelURL = (char*)os_malloc(SSDP_MODEL_URL_SIZE);
-  _manufacturer = (char*)os_malloc(SSDP_MANUFACTURER_SIZE);
-  _manufacturerURL = (char*)os_malloc(SSDP_MANUFACTURER_URL_SIZE);
-  
   _uuid[0] = '\0';
   _modelNumber[0] = '\0';
   _friendlyName[0] = '\0';
@@ -146,17 +124,6 @@ SSDPClass::SSDPClass(){
 }
 
 SSDPClass::~SSDPClass(){
-	os_free(_uuid);
-	os_free(_schemaURL);
-  os_free(_friendlyName);
-  os_free(_presentationURL);
-  os_free(_serialNumber);
-  os_free(_modelName);
-  os_free(_modelNumber);
-  os_free(_modelURL);
-  os_free(_manufacturer);
-  os_free(_manufacturerURL);
-  _pending = false;
 }
 
 void SSDPClass::begin(){
@@ -207,7 +174,7 @@ void SSDPClass::_send(ssdp_method_t method){
     SSDP_INTERVAL,
     _modelName, _modelNumber,
     _uuid,
-    (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF), _port, _schemaURL
+    IP2STR(&ip), _port, _schemaURL
   );
     
   _server.endPacket();
@@ -216,7 +183,7 @@ void SSDPClass::_send(ssdp_method_t method){
 void SSDPClass::schema(WiFiClient client){
   uint32_t ip = WiFi.localIP();
   client.printf(_ssdp_schema_template,
-    (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF), _port,
+    IP2STR(&ip), _port,
     _friendlyName,
     _presentationURL,
     _serialNumber,
@@ -259,14 +226,14 @@ uint8_t SSDPClass::update(){
             else state = URI; 
             cursor = 0;
 
-          }else if(cursor < SSDP_METHOD_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
+          } else if(cursor < SSDP_METHOD_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
           break;
         case URI:
           if(c == ' '){
             if(strcmp(buffer, "*")) state = ABORT;
             else state = PROTO; 
             cursor = 0; 
-          }else if(cursor < SSDP_URI_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
+          } else if(cursor < SSDP_URI_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
           break;
         case PROTO:
           if(cr == 2){ state = KEY; cursor = 0; }
@@ -298,7 +265,7 @@ uint8_t SSDPClass::update(){
             }
 
             if(state != ABORT){ state = KEY; header = START; cursor = 0; }
-          }else if(c != '\r' && c != '\n'){
+          } else if(c != '\r' && c != '\n'){
             if(header == START){
               if(strncmp(buffer, "MA", 2) == 0) header = MAN;
               else if(strcmp(buffer, "ST") == 0) header = ST;
@@ -320,50 +287,50 @@ uint8_t SSDPClass::update(){
   if(_pending && (millis() - _process_time) > _delay){
     _pending = false; _delay = 0;
     _send(NONE);
-  }else if(_notify_time == 0 || (millis() - _notify_time) > (SSDP_INTERVAL * 1000L)){
+  } else if(_notify_time == 0 || (millis() - _notify_time) > (SSDP_INTERVAL * 1000L)){
     _notify_time = millis();
     _send(NOTIFY);
   }
 }
 
-void SSDPClass::setSchemaURL(char *url){
-  strcpy(_schemaURL, url);
+void SSDPClass::setSchemaURL(const char *url){
+  strlcpy(_schemaURL, url, sizeof(_schemaURL));
 }
 
 void SSDPClass::setHTTPPort(uint16_t port){
   _port = port;
 }
 
-void SSDPClass::setName(char *name){
-  strcpy(_friendlyName, name);
+void SSDPClass::setName(const char *name){
+  strlcpy(_friendlyName, name, sizeof(_friendlyName));
 }
 
-void SSDPClass::setURL(char *url){
-  strcpy(_presentationURL, url);
+void SSDPClass::setURL(const char *url){
+  strlcpy(_presentationURL, url, sizeof(_presentationURL));
 }
 
-void SSDPClass::setSerialNumber(char *serialNumber){
-  strcpy(_serialNumber, serialNumber);
+void SSDPClass::setSerialNumber(const char *serialNumber){
+  strlcpy(_serialNumber, serialNumber, sizeof(_serialNumber));
 }
 
-void SSDPClass::setModelName(char *name){
-  strcpy(_modelName, name);
+void SSDPClass::setModelName(const char *name){
+  strlcpy(_modelName, name, sizeof(_modelName));
 }
 
-void SSDPClass::setModelNumber(char *num){
-  strcpy(_modelNumber, num);
+void SSDPClass::setModelNumber(const char *num){
+  strlcpy(_modelNumber, num, sizeof(_modelNumber));
 }
 
-void SSDPClass::setModelURL(char *url){
-  strcpy(_modelURL, url);
+void SSDPClass::setModelURL(const char *url){
+  strlcpy(_modelURL, url, sizeof(_modelURL));
 }
 
-void SSDPClass::setManufacturer(char *name){
-  strcpy(_manufacturer, name);
+void SSDPClass::setManufacturer(const char *name){
+  strlcpy(_manufacturer, name, sizeof(_manufacturer));
 }
 
-void SSDPClass::setManufacturerURL(char *url){
-  strcpy(_manufacturerURL, url);
+void SSDPClass::setManufacturerURL(const char *url){
+  strlcpy(_manufacturerURL, url, sizeof(_manufacturerURL));
 }
 
 SSDPClass SSDP;
