@@ -33,6 +33,8 @@ License (MIT license):
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
+class UdpContext;
+
 #define SSDP_UUID_SIZE              37
 #define SSDP_SCHEMA_URL_SIZE        64
 #define SSDP_FRIENDLY_NAME_SIZE     64
@@ -50,13 +52,16 @@ typedef enum {
   NOTIFY
 } ssdp_method_t;
 
+
+struct SSDPTimer;
+
 class SSDPClass{
   public:
     SSDPClass();
     ~SSDPClass();
 
-    void begin();
-    uint8_t update();
+    bool begin();
+
     void schema(WiFiClient client);
 
     void setName(const String& name) { setName(name.c_str()); }
@@ -78,9 +83,19 @@ class SSDPClass{
     void setManufacturerURL(const String& url) { setManufacturerURL(url.c_str()); }
     void setManufacturerURL(const char *url);
     void setHTTPPort(uint16_t port);
-    
-  private:
-    WiFiUDP _server;
+
+  protected:
+    void _send(ssdp_method_t method);
+    void _update();
+    void _startTimer();
+    static void _onTimerStatic(SSDPClass* self);
+
+    UdpContext* _server;
+    SSDPTimer* _timer;
+
+    IPAddress _respondToAddr;
+    uint16_t  _respondToPort;
+
     bool _pending;
     unsigned short _delay;
     unsigned long _process_time;
@@ -97,8 +112,6 @@ class SSDPClass{
     char _modelName[SSDP_MODEL_NAME_SIZE];
     char _modelURL[SSDP_MODEL_URL_SIZE];
     char _modelNumber[SSDP_MODEL_VERSION_SIZE];
-
-    void _send(ssdp_method_t method);
 };
 
 extern SSDPClass SSDP;

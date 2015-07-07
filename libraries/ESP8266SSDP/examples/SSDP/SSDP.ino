@@ -48,6 +48,5 @@ void setup() {
 
 void loop() {
   HTTP.handleClient();
-  SSDP.update();
   delay(1);
 }
