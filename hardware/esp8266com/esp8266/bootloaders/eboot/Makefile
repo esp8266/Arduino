@@ -7,7 +7,7 @@ TARGET_DIR := ./
 TARGET_OBJ_FILES := \
 	eboot.o \
 	eboot_command.o \
-	flash.o \
+	
 
 TARGET_OBJ_PATHS := $(addprefix $(TARGET_DIR)/,$(TARGET_OBJ_FILES))
 
