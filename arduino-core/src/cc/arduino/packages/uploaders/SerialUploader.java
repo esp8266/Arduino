@@ -26,7 +26,6 @@
 
 package cc.arduino.packages.uploaders;
 
-import cc.arduino.packages.BoardPort;
 import cc.arduino.packages.Uploader;
 import processing.app.*;
 import processing.app.debug.RunnerException;
@@ -46,7 +45,6 @@ public class SerialUploader extends Uploader {
   public SerialUploader()
   {
     super();
-    this.boardPort = null;
   }
 
   public SerialUploader(boolean noUploadPort)
