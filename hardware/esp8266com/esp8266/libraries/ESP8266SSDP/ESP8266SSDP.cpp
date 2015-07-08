@@ -25,49 +25,49 @@ License (MIT license):
   THE SOFTWARE.
 
 */
-
+#define LWIP_OPEN_SRC
+#include <functional>
 #include "ESP8266SSDP.h"
+#include "WiFiUdp.h"
+#include "debug.h"
 
 extern "C" {
-  #include "ip_addr.h"
+  #include "osapi.h"
+  #include "ets_sys.h"
   #include "user_interface.h"
-  #include "mem.h"
 }
-#include "lwip/igmp.h"
 
-//#define DEBUG_SSDP  Serial
+#include "lwip/opt.h"
+#include "lwip/udp.h"
+#include "lwip/inet.h"
+#include "lwip/igmp.h"
+#include "lwip/mem.h"
+#include "include/UdpContext.h"
+
+// #define DEBUG_SSDP  Serial
 
 #define SSDP_INTERVAL     1200
 #define SSDP_PORT         1900
 #define SSDP_METHOD_SIZE  10
 #define SSDP_URI_SIZE     2
 #define SSDP_BUFFER_SIZE  64
-
-#define SSDP_UUID_SIZE              37
-#define SSDP_SCHEMA_URL_SIZE        64
-#define SSDP_FRIENDLY_NAME_SIZE     64
-#define SSDP_SERIAL_NUMBER_SIZE     32
-#define SSDP_PRESENTATION_URL_SIZE  128
-#define SSDP_MODEL_NAME_SIZE        64
-#define SSDP_MODEL_URL_SIZE         128
-#define SSDP_MODEL_VERSION_SIZE     32
-#define SSDP_MANUFACTURER_SIZE      64
-#define SSDP_MANUFACTURER_URL_SIZE  128
-
+#define SSDP_MULTICAST_TTL 1
 static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
 
-const char* _ssdp_response_template = 
+
+
+static const char* _ssdp_response_template = 
   "HTTP/1.1 200 OK\r\n"
   "EXT:\r\n"
   "ST: upnp:rootdevice\r\n";
 
-const char* _ssdp_notify_template = 
+static const char* _ssdp_notify_template = 
   "NOTIFY * HTTP/1.1\r\n"
   "HOST: 239.255.255.250:1900\r\n"
   "NT: upnp:rootdevice\r\n"
   "NTS: ssdp:alive\r\n";
 
-const char* _ssdp_packet_template = 
+static const char* _ssdp_packet_template = 
   "%s" // _ssdp_response_template / _ssdp_notify_template
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
@@ -75,7 +75,7 @@ const char* _ssdp_packet_template =
   "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
 
-const char* _ssdp_schema_template = 
+static const char* _ssdp_schema_template = 
   "HTTP/1.1 200 OK\r\n"
   "Content-Type: text/xml\r\n"
   "Connection: close\r\n"
@@ -119,18 +119,17 @@ const char* _ssdp_schema_template =
   "</root>\r\n"
   "\r\n";
 
-SSDPClass::SSDPClass(){
-  _uuid = (char*)os_malloc(SSDP_UUID_SIZE);
-  _schemaURL = (char*)os_malloc(SSDP_SCHEMA_URL_SIZE);
-  _friendlyName = (char*)os_malloc(SSDP_FRIENDLY_NAME_SIZE);
-  _presentationURL = (char*)os_malloc(SSDP_PRESENTATION_URL_SIZE);
-  _serialNumber = (char*)os_malloc(SSDP_SERIAL_NUMBER_SIZE);
-  _modelName = (char*)os_malloc(SSDP_MODEL_NAME_SIZE);
-  _modelNumber = (char*)os_malloc(SSDP_MODEL_VERSION_SIZE);
-  _modelURL = (char*)os_malloc(SSDP_MODEL_URL_SIZE);
-  _manufacturer = (char*)os_malloc(SSDP_MANUFACTURER_SIZE);
-  _manufacturerURL = (char*)os_malloc(SSDP_MANUFACTURER_URL_SIZE);
-  
+
+struct SSDPTimer {
+  ETSTimer timer;
+};
+
+SSDPClass::SSDPClass() :
+_server(0),
+_port(80),
+_pending(false),
+_timer(new SSDPTimer)
+{
   _uuid[0] = '\0';
   _modelNumber[0] = '\0';
   _friendlyName[0] = '\0';
@@ -141,82 +140,101 @@ SSDPClass::SSDPClass(){
   _manufacturer[0] = '\0';
   _manufacturerURL[0] = '\0';
   sprintf(_schemaURL, "ssdp/schema.xml");
-  _port = 80;
-  _pending = false;
 }
 
 SSDPClass::~SSDPClass(){
-	os_free(_uuid);
-	os_free(_schemaURL);
-  os_free(_friendlyName);
-  os_free(_presentationURL);
-  os_free(_serialNumber);
-  os_free(_modelName);
-  os_free(_modelNumber);
-  os_free(_modelURL);
-  os_free(_manufacturer);
-  os_free(_manufacturerURL);
-  _pending = false;
+  delete _timer;
 }
 
-void SSDPClass::begin(){
-  ip_addr_t ifaddr;
-  ip_addr_t multicast_addr;
-
+bool SSDPClass::begin(){
   _pending = false;
-
-  ifaddr.addr = WiFi.localIP();
-  multicast_addr.addr = (uint32_t) SSDP_MULTICAST_ADDR;
-  igmp_joingroup(&ifaddr, &multicast_addr);
-
-  uint8_t mac[6];
-  WiFi.macAddress(mac);
+  
   uint32_t chipId = ESP.getChipId();
-  sprintf(_uuid, "38323636-4558-%04x-%04x-%02x%02x%02x%02x%02x%02x",
-    (chipId >> 16) & 0xFFFF, chipId & 0xFFFF,
-    mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]
-  );
+  sprintf(_uuid, "38323636-4558-4dda-9188-cda0e6%02x%02x%02x",
+    (uint16_t) ((chipId >> 16) & 0xff),
+    (uint16_t) ((chipId >>  8) & 0xff), 
+    (uint16_t)   chipId        & 0xff  );
+
 #ifdef DEBUG_SSDP
   DEBUG_SSDP.printf("SSDP UUID: %s\n", (char *)_uuid);
 #endif
-  _server.begin(SSDP_PORT);
+
+  if (_server) {
+    _server->unref();
+    _server = 0;
+  }
+
+  _server = new UdpContext;
+  _server->ref();
+
+  ip_addr_t ifaddr;
+  ifaddr.addr = WiFi.localIP();
+  ip_addr_t multicast_addr;
+  multicast_addr.addr = (uint32_t) SSDP_MULTICAST_ADDR;
+  if (igmp_joingroup(&ifaddr, &multicast_addr) != ERR_OK ) {
+    DEBUGV("SSDP failed to join igmp group");
+    return false;
+  }
+  
+  if (!_server->listen(*IP_ADDR_ANY, SSDP_PORT)) {
+    return false;
+  }
+
+  _server->setMulticastInterface(ifaddr);
+  _server->setMulticastTTL(SSDP_MULTICAST_TTL);
+  _server->onRx(std::bind(&SSDPClass::_update, this));
+  if (!_server->connect(multicast_addr, SSDP_PORT)) {
+    return false;
+  }
+
+  _startTimer();
+
+  return true;
 }
 
 void SSDPClass::_send(ssdp_method_t method){
-#ifdef DEBUG_SSDP
-  if(method == NONE){
-    DEBUG_SSDP.print("Sending Response to ");
-    DEBUG_SSDP.print(_server.remoteIP());
-    DEBUG_SSDP.print(":");
-    DEBUG_SSDP.println(_server.remotePort());
-  }else if(method == NOTIFY){
-    DEBUG_SSDP.println("Sending Notify to 239.255.255.250:1900");
-  }
-#endif
-  
-  if(method == NONE){
-    _server.beginPacket(_server.remoteIP(), _server.remotePort());
-  } else {
-    _server.beginPacket(SSDP_MULTICAST_ADDR, SSDP_PORT);
-  }
-
+  char buffer[1460];
   uint32_t ip = WiFi.localIP();
   
-  _server.printf(_ssdp_packet_template,
+  int len = snprintf(buffer, sizeof(buffer), 
+    _ssdp_packet_template,
     (method == NONE)?_ssdp_response_template:_ssdp_notify_template,
     SSDP_INTERVAL,
     _modelName, _modelNumber,
     _uuid,
-    (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF), _port, _schemaURL
+    IP2STR(&ip), _port, _schemaURL
   );
-    
-  _server.endPacket();
+
+  _server->append(buffer, len);
+
+  ip_addr_t remoteAddr;
+  uint16_t remotePort;
+  if(method == NONE) {
+    remoteAddr.addr = _respondToAddr;
+    remotePort = _respondToPort;
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.print("Sending Response to ");
+#endif
+  } else {
+    remoteAddr.addr = SSDP_MULTICAST_ADDR;
+    remotePort = SSDP_PORT;
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.println("Sending Notify to ");
+#endif
+  }
+#ifdef DEBUG_SSDP
+  DEBUG_SSDP.print(IPAddress(remoteAddr.addr));
+  DEBUG_SSDP.print(":");
+  DEBUG_SSDP.println(remotePort);
+#endif
+
+  _server->send(&remoteAddr, remotePort);
 }
 
 void SSDPClass::schema(WiFiClient client){
   uint32_t ip = WiFi.localIP();
   client.printf(_ssdp_schema_template,
-    (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF), _port,
+    IP2STR(&ip), _port,
     _friendlyName,
     _presentationURL,
     _serialNumber,
@@ -229,9 +247,12 @@ void SSDPClass::schema(WiFiClient client){
   );
 }
 
-uint8_t SSDPClass::update(){
-  if(!_pending && _server.parsePacket() > 0){
+void SSDPClass::_update(){
+  if(!_pending && _server->next()) {
     ssdp_method_t method = NONE;
+
+    _respondToAddr = _server->getRemoteAddress();
+    _respondToPort = _server->getRemotePort();
 
     typedef enum {METHOD, URI, PROTO, KEY, VALUE, ABORT} states;
     states state = METHOD;
@@ -244,8 +265,8 @@ uint8_t SSDPClass::update(){
 
     char buffer[SSDP_BUFFER_SIZE] = {0};
     
-    while(_server.available() > 0){
-      char c = _server.read();
+    while(_server->getSize() > 0){
+      char c = _server->read();
 
       (c == '\r' || c == '\n') ? cr++ : cr = 0;
 
@@ -259,14 +280,14 @@ uint8_t SSDPClass::update(){
             else state = URI; 
             cursor = 0;
 
-          }else if(cursor < SSDP_METHOD_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
+          } else if(cursor < SSDP_METHOD_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
           break;
         case URI:
           if(c == ' '){
             if(strcmp(buffer, "*")) state = ABORT;
             else state = PROTO; 
             cursor = 0; 
-          }else if(cursor < SSDP_URI_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
+          } else if(cursor < SSDP_URI_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
           break;
         case PROTO:
           if(cr == 2){ state = KEY; cursor = 0; }
@@ -298,7 +319,7 @@ uint8_t SSDPClass::update(){
             }
 
             if(state != ABORT){ state = KEY; header = START; cursor = 0; }
-          }else if(c != '\r' && c != '\n'){
+          } else if(c != '\r' && c != '\n'){
             if(header == START){
               if(strncmp(buffer, "MA", 2) == 0) header = MAN;
               else if(strcmp(buffer, "ST") == 0) header = ST;
@@ -313,57 +334,73 @@ uint8_t SSDPClass::update(){
           break;
       }
     }
-    
-    _server.flush();
   }
 
   if(_pending && (millis() - _process_time) > _delay){
     _pending = false; _delay = 0;
     _send(NONE);
-  }else if(_notify_time == 0 || (millis() - _notify_time) > (SSDP_INTERVAL * 1000L)){
+  } else if(_notify_time == 0 || (millis() - _notify_time) > (SSDP_INTERVAL * 1000L)){
     _notify_time = millis();
     _send(NOTIFY);
   }
+
+  if (_pending) {
+    while (_server->next())
+      _server->flush();
+  }
+
 }
 
-void SSDPClass::setSchemaURL(char *url){
-  strcpy(_schemaURL, url);
+void SSDPClass::setSchemaURL(const char *url){
+  strlcpy(_schemaURL, url, sizeof(_schemaURL));
 }
 
 void SSDPClass::setHTTPPort(uint16_t port){
   _port = port;
 }
 
-void SSDPClass::setName(char *name){
-  strcpy(_friendlyName, name);
+void SSDPClass::setName(const char *name){
+  strlcpy(_friendlyName, name, sizeof(_friendlyName));
 }
 
-void SSDPClass::setURL(char *url){
-  strcpy(_presentationURL, url);
+void SSDPClass::setURL(const char *url){
+  strlcpy(_presentationURL, url, sizeof(_presentationURL));
 }
 
-void SSDPClass::setSerialNumber(char *serialNumber){
-  strcpy(_serialNumber, serialNumber);
+void SSDPClass::setSerialNumber(const char *serialNumber){
+  strlcpy(_serialNumber, serialNumber, sizeof(_serialNumber));
 }
 
-void SSDPClass::setModelName(char *name){
-  strcpy(_modelName, name);
+void SSDPClass::setModelName(const char *name){
+  strlcpy(_modelName, name, sizeof(_modelName));
 }
 
-void SSDPClass::setModelNumber(char *num){
-  strcpy(_modelNumber, num);
+void SSDPClass::setModelNumber(const char *num){
+  strlcpy(_modelNumber, num, sizeof(_modelNumber));
 }
 
-void SSDPClass::setModelURL(char *url){
-  strcpy(_modelURL, url);
+void SSDPClass::setModelURL(const char *url){
+  strlcpy(_modelURL, url, sizeof(_modelURL));
 }
 
-void SSDPClass::setManufacturer(char *name){
-  strcpy(_manufacturer, name);
+void SSDPClass::setManufacturer(const char *name){
+  strlcpy(_manufacturer, name, sizeof(_manufacturer));
 }
 
-void SSDPClass::setManufacturerURL(char *url){
-  strcpy(_manufacturerURL, url);
+void SSDPClass::setManufacturerURL(const char *url){
+  strlcpy(_manufacturerURL, url, sizeof(_manufacturerURL));
+}
+
+void SSDPClass::_onTimerStatic(SSDPClass* self) {
+  self->_update();
+}
+
+void SSDPClass::_startTimer() {
+  ETSTimer* tm = &(_timer->timer);
+  const int interval = 1000;
+  os_timer_disarm(tm);
+  os_timer_setfn(tm, reinterpret_cast<ETSTimerFunc*>(&SSDPClass::_onTimerStatic), reinterpret_cast<void*>(this));
+  os_timer_arm(tm, interval, 1 /* repeat */);
 }
 
 SSDPClass SSDP;
