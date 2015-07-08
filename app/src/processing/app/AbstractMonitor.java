@@ -42,7 +42,6 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
   protected JScrollPane scrollPane;
   protected JTextField textField;
   protected JButton sendButton;
-  protected JButton clearButton;
   protected JCheckBox autoscrollBox;
   protected JComboBox lineEndings;
   protected JComboBox serialRates;
@@ -149,13 +148,6 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     }
 
     serialRates.setMaximumSize(serialRates.getMinimumSize());
-    
-    clearButton = new JButton(_("Clear"));
-    clearButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        textArea.setText("");
-      }
-    });
 
     pane.add(autoscrollBox);
     pane.add(Box.createHorizontalGlue());
@@ -164,8 +156,6 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     pane.add(lineEndings);
     pane.add(Box.createRigidArea(new Dimension(8, 0)));
     pane.add(serialRates);
-    pane.add(Box.createRigidArea(new Dimension(8, 0)));
-    pane.add(clearButton);
 
     this.setMinimumSize(new Dimension(pane.getMinimumSize().width, this.getPreferredSize().height));
 
@@ -204,7 +194,6 @@ public abstract class AbstractMonitor extends JFrame implements ActionListener {
     autoscrollBox.setEnabled(enable);
     lineEndings.setEnabled(enable);
     serialRates.setEnabled(enable);
-    clearButton.setEnabled(enable);
 
     monitorEnabled = enable;
   }
