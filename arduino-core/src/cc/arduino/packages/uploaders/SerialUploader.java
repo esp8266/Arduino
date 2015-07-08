@@ -52,7 +52,6 @@ public class SerialUploader extends Uploader {
   public SerialUploader(boolean noUploadPort)
   {
     super(noUploadPort);
-    this.boardPort = null;
   }
 
   public boolean uploadUsingPreferences(File sourcePath, String buildPath, String className, boolean usingProgrammer, List<String> warningsAccumulator) throws Exception {
