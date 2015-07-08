@@ -114,8 +114,12 @@ bool UpdaterClass::end(bool evenIfRemaining){
 bool UpdaterClass::_writeBuffer(){
   noInterrupts();
   int rc = SPIEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
-  if (!rc) {
+  interrupts();
+  yield();
+  if(!rc){
+    noInterrupts();
     rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
+    interrupts();
   }
   interrupts();
   if (rc) {

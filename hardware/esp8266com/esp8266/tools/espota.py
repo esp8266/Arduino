@@ -48,12 +48,14 @@ def serve(remoteAddr, remotePort, filename):
     sys.stderr.write('Uploading')
     sys.stderr.flush()
     while True:
-      chunk = f.read(4096)
+      chunk = f.read(1460)
       if not chunk: break
       sys.stderr.write('.')
       sys.stderr.flush()
+      connection.settimeout(10)
       try:
         connection.sendall(chunk)
+        res = connection.recv(4)
       except:
         print('\nError Uploading', file=sys.stderr)
         connection.close()
