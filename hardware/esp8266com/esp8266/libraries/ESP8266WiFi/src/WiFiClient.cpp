@@ -110,7 +110,7 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     netif* interface = ip_route(&addr);
     if (!interface) {
         DEBUGV("no route to host\r\n");
-        return 1;
+        return 0;
     }
 
     tcp_pcb* pcb = tcp_new();

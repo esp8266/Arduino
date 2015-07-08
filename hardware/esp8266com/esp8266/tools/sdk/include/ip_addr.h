@@ -10,9 +10,9 @@ struct ip_addr {
 typedef struct ip_addr ip_addr_t;
 
 struct ip_info {
-    ip_addr_t ip;
-    ip_addr_t netmask;
-    ip_addr_t gw;
+    struct ip_addr ip;
+    struct ip_addr netmask;
+    struct ip_addr gw;
 };
 
 /**
