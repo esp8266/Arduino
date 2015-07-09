@@ -23,11 +23,11 @@
  */
 
 #include <stdlib.h>
-#include <string.h>
 #include "stdlib_noniso.h"
 #include "ets_sys.h"
 
 #define sprintf ets_sprintf
+#define strcpy ets_strcpy
 
 int atoi(const char* s) {
     return (int) atol(s);

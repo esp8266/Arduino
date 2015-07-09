@@ -49,7 +49,7 @@ import java.util.List;
 public class Sketch {
   static private File tempBuildFolder;
 
-  private final Editor editor;
+  private Editor editor;
 
   /** true if any of the files have been modified. */
   private boolean modified;
@@ -57,8 +57,11 @@ public class Sketch {
   private SketchCodeDocument current;
   private int currentIndex;
 
-  private final SketchData data;
+  private SketchData data;
   
+  /** Class name for the PApplet, as determined by the preprocessor. */
+  private String appletClassName;
+
   /**
    * path is location of the main .pde file, because this is also
    * simplest to use when opening the file from the finder/explorer.
@@ -83,7 +86,7 @@ public class Sketch {
                         "the application to complete the repair.", null);
     }
     */
-    tempBuildFolder = BaseNoGui.getBuildFolder();
+    tempBuildFolder = Base.getBuildFolder();
     //Base.addBuildFolderToClassPath();
 
     load();
@@ -105,10 +108,6 @@ public class Sketch {
    * in which case the load happens each time "run" is hit.
    */
   protected void load() throws IOException {
-    load(false);
-  }
-
-  protected void load(boolean forceUpdate) throws IOException {
     data.load();
 
     for (SketchCode code : data.getCodes()) {
@@ -118,12 +117,12 @@ public class Sketch {
 
     // set the main file to be the current tab
     if (editor != null) {
-      setCurrentCode(currentIndex, forceUpdate);
+      setCurrentCode(0);
     }
   }
 
 
-  private boolean renamingCode;
+  boolean renamingCode;
 
   /**
    * Handler for the New Code menu option.
@@ -445,7 +444,7 @@ public class Sketch {
     Object[] options = { _("OK"), _("Cancel") };
     String prompt = (currentIndex == 0) ?
       _("Are you sure you want to delete this sketch?") :
-      I18n.format(_("Are you sure you want to delete \"{0}\"?"), current.getCode().getFileNameWithExtensionIfNotIno());
+      I18n.format(_("Are you sure you want to delete \"{0}\"?"), current.getCode().getPrettyName());
     int result = JOptionPane.showOptionDialog(editor,
                                               prompt,
                                               _("Delete"),
@@ -520,7 +519,7 @@ public class Sketch {
   }
 
 
-  private void calcModified() {
+  protected void calcModified() {
     modified = false;
     for (SketchCode code : data.getCodes()) {
       if (code.isModified()) {
@@ -612,7 +611,7 @@ public class Sketch {
   }
 
 
-  private boolean renameCodeToInoExtension(File pdeFile) {
+  protected boolean renameCodeToInoExtension(File pdeFile) {
     for (SketchCode c : data.getCodes()) {
       if (!c.getFile().equals(pdeFile))
         continue;
@@ -637,11 +636,14 @@ public class Sketch {
    * because they can cause trouble.
    */
   protected boolean saveAs() throws IOException {
+    String newParentDir = null;
+    String newName = null;
+
     // get new name for folder
     FileDialog fd = new FileDialog(editor, _("Save sketch folder as..."), FileDialog.SAVE);
     if (isReadOnly() || isUntitled()) {
       // default to the sketchbook folder
-      fd.setDirectory(BaseNoGui.getSketchbookFolder().getAbsolutePath());
+      fd.setDirectory(Base.getSketchbookFolder().getAbsolutePath());
     } else {
       // default to the parent folder of where this was
       // on macs a .getParentFile() method is required
@@ -652,8 +654,8 @@ public class Sketch {
     fd.setFile(oldName);
 
     fd.setVisible(true);
-    String newParentDir = fd.getDirectory();
-    String newName = fd.getFile();
+    newParentDir = fd.getDirectory();
+    newName = fd.getFile();
 
     // user canceled selection
     if (newName == null) return false;
@@ -834,7 +836,7 @@ public class Sketch {
       destFile = new File(data.getCodeFolder(), filename);
 
     } else {
-      for (String extension : SketchData.EXTENSIONS) {
+      for (String extension : data.getExtensions()) {
         String lower = filename.toLowerCase();
         if (lower.endsWith("." + extension)) {
           destFile = new File(data.getFolder(), filename);
@@ -954,10 +956,10 @@ public class Sketch {
     // could also scan the text in the file to see if each import
     // statement is already in there, but if the user has the import
     // commented out, then this will be a problem.
-    StringBuilder buffer = new StringBuilder();
-    for (String aList : list) {
+    StringBuffer buffer = new StringBuffer();
+    for (int i = 0; i < list.length; i++) {
       buffer.append("#include <");
-      buffer.append(aList);
+      buffer.append(list[i]);
       buffer.append(">\n");
     }
     buffer.append('\n');
@@ -977,12 +979,8 @@ public class Sketch {
    * </OL>
    */
   public void setCurrentCode(int which) {
-    setCurrentCode(which, false);
-  }
-
-  public void setCurrentCode(int which, boolean forceUpdate) {
     // if current is null, then this is the first setCurrent(0)
-    if (!forceUpdate && (currentIndex == which) && (current != null)) {
+    if ((currentIndex == which) && (current != null)) {
       return;
     }
 
@@ -1067,13 +1065,68 @@ public class Sketch {
       //handleOpen(sketch);
       //history.lastRecorded = historySaved;
 
+      // set current to null so that the tab gets updated
+      // http://dev.processing.org/bugs/show_bug.cgi?id=515
+      current = null;
       // nuke previous files and settings, just get things loaded
-      load(true);
+      load();
     }
 
 //    // handle preprocessing the main file's code
 //    return build(tempBuildFolder.getAbsolutePath());
   }
+
+
+
+  /**
+   * Map an error from a set of processed .java files back to its location
+   * in the actual sketch.
+   * @param message The error message.
+   * @param filename The .java file where the exception was found.
+   * @param line Line number of the .java file for the exception (1-indexed)
+   * @return A RunnerException to be sent to the editor, or null if it wasn't
+   *         possible to place the exception to the sketch code.
+   */
+//  public RunnerException placeExceptionAlt(String message, 
+//                                        String filename, int line) {
+//    String appletJavaFile = appletClassName + ".java";
+//    SketchCode errorCode = null;
+//    if (filename.equals(appletJavaFile)) {
+//      for (SketchCode code : getCode()) {
+//        if (code.isExtension("ino")) {
+//          if (line >= code.getPreprocOffset()) {
+//            errorCode = code;
+//          }
+//        }
+//      }
+//    } else {
+//      for (SketchCode code : getCode()) {
+//        if (code.isExtension("java")) {
+//          if (filename.equals(code.getFileName())) {
+//            errorCode = code;
+//          }
+//        }
+//      }
+//    }
+//    int codeIndex = getCodeIndex(errorCode);
+//
+//    if (codeIndex != -1) {
+//      //System.out.println("got line num " + lineNumber);
+//      // in case this was a tab that got embedded into the main .java
+//      line -= getCode(codeIndex).getPreprocOffset();
+//
+//      // lineNumber is 1-indexed, but editor wants zero-indexed
+//      line--;
+//
+//      // getMessage() will be what's shown in the editor
+//      RunnerException exception = 
+//        new RunnerException(message, codeIndex, line, -1);
+//      exception.hideStackTrace();
+//      return exception;
+//    }
+//    return null;
+//  }
+
 
   /**
    * Run the build inside the temporary build folder.
@@ -1182,6 +1235,29 @@ public class Sketch {
     return success;
   }
 
+
+  public boolean exportApplicationPrompt() throws IOException, RunnerException {
+    return false;
+  }
+
+
+  /**
+   * Export to application via GUI.
+   */
+  protected boolean exportApplication() throws IOException, RunnerException {
+    return false;
+  }
+
+
+  /**
+   * Export to application without GUI.
+   */
+  public boolean exportApplication(String destPath,
+                                   int exportPlatform) throws IOException, RunnerException {
+    return false;
+  }
+
+
   /**
    * Make sure the sketch hasn't been moved or deleted by some
    * nefarious user. If they did, try to re-create it and save.
@@ -1221,11 +1297,11 @@ public class Sketch {
    */
   public boolean isReadOnly() {
     String apath = data.getFolder().getAbsolutePath();
-    for (File folder : BaseNoGui.getLibrariesPath()) {
+    for (File folder : Base.getLibrariesPath()) {
       if (apath.startsWith(folder.getAbsolutePath()))
         return true;
     }
-    if (apath.startsWith(BaseNoGui.getExamplesPath()) ||
+    if (apath.startsWith(Base.getExamplesPath()) ||
         apath.startsWith(Base.getSketchbookLibrariesPath())) {
       return true;
     }
@@ -1269,7 +1345,7 @@ public class Sketch {
    * extensions.
    */
   public boolean validExtension(String what) {
-    return SketchData.EXTENSIONS.contains(what);
+    return data.getExtensions().contains(what);
   }
 
 
@@ -1280,7 +1356,7 @@ public class Sketch {
     return data.getDefaultExtension();
   }
 
-  static private final List<String> hiddenExtensions = Arrays.asList("ino", "pde");
+  static private List<String> hiddenExtensions = Arrays.asList("ino", "pde");
 
   public List<String> getHiddenExtensions() {
     return hiddenExtensions;
@@ -1373,6 +1449,11 @@ public class Sketch {
 
   public boolean isUntitled() {
     return editor.untitled;
+  }
+
+
+  public String getAppletClassName2() {
+    return appletClassName;
   }
 
 

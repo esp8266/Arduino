@@ -183,15 +183,16 @@ void printDirectory() {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/json", "");
   WiFiClient client = server.client();
-  
-  server.sendContent("[");
+
   for (int cnt = 0; true; ++cnt) {
     File entry = dir.openNextFile();
     if (!entry)
     break;
 
     String output;
-    if (cnt > 0)
+    if (cnt == 0) 
+      output = '[';
+    else 
       output = ',';
 
     output += "{\"type\":\"";

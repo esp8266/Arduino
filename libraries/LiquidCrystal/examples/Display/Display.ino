@@ -33,7 +33,7 @@
 
  This example code is in the public domain.
 
- http://www.arduino.cc/en/Tutorial/LiquidCrystalDisplay
+ http://arduino.cc/en/Tutorial/LiquidCrystalDisplay
 
  */
 

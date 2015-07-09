@@ -17,7 +17,7 @@
 
  This example code is in the public domain.
 
- http://www.arduino.cc/en/Tutorial/ShellCommands
+ http://arduino.cc/en/Tutorial/ShellCommands
 
  */
 

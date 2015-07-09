@@ -42,12 +42,12 @@ extern "C" {
 #define UART_TX_FIFO_SIZE 0x80
 
 struct uart_ {
-    int uart_nr;
+        int uart_nr;
     int baud_rate;
     bool rxEnabled;
     bool txEnabled;
-    uint8_t rxPin;
-    uint8_t txPin;
+        uint8_t rxPin;
+        uint8_t txPin;
 };
 
 static const int UART0 = 0;
@@ -271,7 +271,7 @@ int uart_get_baudrate(uart_t* uart) {
     return uart->baud_rate;
 }
 
-uart_t* uart_init(int uart_nr, int baudrate, byte config, byte mode) {
+uart_t* uart_init(int uart_nr, int baudrate, byte config) {
 
     uint32_t conf1 = 0x00000000;
     uart_t* uart = (uart_t*) os_malloc(sizeof(uart_t));
@@ -284,25 +284,24 @@ uart_t* uart_init(int uart_nr, int baudrate, byte config, byte mode) {
 
     switch(uart->uart_nr) {
         case UART0:
-            uart->rxEnabled = (mode != SERIAL_TX_ONLY);
-            uart->txEnabled = (mode != SERIAL_RX_ONLY);
-            uart->rxPin = (uart->rxEnabled)?3:255;
-            uart->txPin = (uart->txEnabled)?1:255;
-            if(uart->rxEnabled) pinMode(uart->rxPin, SPECIAL);
-            if(uart->txEnabled) pinMode(uart->txPin, SPECIAL);
+            pinMode(1, SPECIAL);
+            pinMode(3, SPECIAL);
+            uart->rxEnabled = true;
+            uart->txEnabled = true;
+            uart->rxPin = 3;
+            uart->txPin = 1;
             break;
         case UART1:
+            pinMode(2, SPECIAL);
             uart->rxEnabled = false;
-            uart->txEnabled = (mode != SERIAL_RX_ONLY);
+            uart->txEnabled = true;
             uart->rxPin = 255;
-            uart->txPin = (uart->txEnabled)?2:255;
-            if(uart->txEnabled) pinMode(uart->txPin, SPECIAL);
+            uart->txPin = 2;
             break;
         case UART_NO:
         default:
             // big fail!
-            os_free(uart);
-            return 0;
+            break;
     }
     uart_set_baudrate(uart, baudrate);
     USC0(uart->uart_nr) = config;
@@ -357,30 +356,22 @@ void uart_swap(uart_t* uart) {
         return;
     switch(uart->uart_nr) {
         case UART0:
-            if((uart->txPin == 1 && uart->txEnabled) || (uart->rxPin == 3 && uart->rxEnabled)) {
-                if(uart->txEnabled) pinMode(15, FUNCTION_4); //TX
-                if(uart->rxEnabled) pinMode(13, FUNCTION_4); //RX
+            if(uart->txPin == 1 && uart->rxPin == 3) {
+                pinMode(15, FUNCTION_4); //TX
+                pinMode(13, FUNCTION_4); //RX
                 IOSWAP |= (1 << IOSWAPU0);
-                if(uart->txEnabled){ //TX
-                  pinMode(1, INPUT);
-                  uart->txPin = 15;
-                }
-                if(uart->rxEnabled){ //RX
-                  pinMode(3, INPUT);
-                  uart->rxPin = 13;
-                }
+                pinMode(1, INPUT); //TX
+                pinMode(3, INPUT); //RX
+                uart->rxPin = 13;
+                uart->txPin = 15;
             } else {
-                if(uart->txEnabled) pinMode(1, SPECIAL); //TX
-                if(uart->rxEnabled) pinMode(3, SPECIAL); //RX
+                pinMode(1, SPECIAL); //TX
+                pinMode(3, SPECIAL); //RX
                 IOSWAP &= ~(1 << IOSWAPU0);
-                if(uart->txEnabled){ //TX
-                  pinMode(15, INPUT);
-                  uart->txPin = 1;
-                }
-                if(uart->rxEnabled){ //RX
-                  pinMode(13, INPUT); //RX
-                  uart->rxPin = 3;
-                }
+                pinMode(15, INPUT); //TX
+                pinMode(13, INPUT); //RX
+                uart->rxPin = 3;
+                uart->txPin = 1;
             }
 
             break;
@@ -480,14 +471,14 @@ HardwareSerial::HardwareSerial(int uart_nr) :
         _uart_nr(uart_nr), _uart(0), _tx_buffer(0), _rx_buffer(0), _written(false) {
 }
 
-void HardwareSerial::begin(unsigned long baud, byte config, byte mode) {
+void HardwareSerial::begin(unsigned long baud, byte config) {
 
     // disable debug for this interface
     if(uart_get_debug() == _uart_nr) {
         uart_set_debug(UART_NO);
     }
 
-    _uart = uart_init(_uart_nr, baud, config, mode);
+    _uart = uart_init(_uart_nr, baud, config);
 
     if(_uart == 0) {
         return;
@@ -527,10 +518,7 @@ void HardwareSerial::setDebugOutput(bool en) {
     if(_uart == 0)
         return;
     if(en) {
-        if(_uart->txEnabled)
-          uart_set_debug(_uart->uart_nr);
-        else
-          uart_set_debug(UART_NO);
+        uart_set_debug(_uart->uart_nr);
     } else {
         // disable debug for this interface
         if(uart_get_debug() == _uart_nr) {
@@ -620,7 +608,6 @@ size_t HardwareSerial::write(uint8_t c) {
 
     while(_tx_buffer->room() == 0) {
         yield();
-        uart_arm_tx_interrupt(_uart);
     }
 
     _tx_buffer->write(c);

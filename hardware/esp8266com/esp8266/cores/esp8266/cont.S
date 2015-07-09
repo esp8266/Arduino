@@ -106,7 +106,7 @@ cont_resume:
 
 cont_norm:
 	/* calculate pointer to cont_ctx.struct_start from sp */
-	l32i	a2,	a1, 4
+	l32i	a2,	a1, 8
 	/* sp <- cont_ctx.sp_ret */
 	l32i	a1, a2, 4
 

@@ -40,22 +40,14 @@ extern "C"
 #include "lwip/mem.h"
 #include "include/UdpContext.h"
 
-
-template<>
-WiFiUDP* SList<WiFiUDP>::_s_first = 0;
-
 /* Constructor */
-WiFiUDP::WiFiUDP() : _ctx(0) 
-{
-    WiFiUDP::_add(this);
-}
+WiFiUDP::WiFiUDP() : _ctx(0) {}
 
 WiFiUDP::WiFiUDP(const WiFiUDP& other)
 {
     _ctx = other._ctx;
     if (_ctx)
         _ctx->ref();
-    WiFiUDP::_add(this);
 }
 
 WiFiUDP& WiFiUDP::operator=(const WiFiUDP& rhs)
@@ -68,7 +60,6 @@ WiFiUDP& WiFiUDP::operator=(const WiFiUDP& rhs)
 
 WiFiUDP::~WiFiUDP()
 {
-    WiFiUDP::_remove(this);
     if (_ctx)
         _ctx->unref();
 }
@@ -124,10 +115,9 @@ int WiFiUDP::available() {
 /* Release any resources being used by this WiFiUDP instance */
 void WiFiUDP::stop()
 {
-    if (_ctx) {
+    if (_ctx)
         _ctx->disconnect();
-        _ctx->unref();
-    }
+    _ctx->unref();
     _ctx = 0;
 }
 
@@ -268,12 +258,3 @@ uint16_t WiFiUDP::localPort()
 
     return _ctx->getLocalPort();
 }
-
-void WiFiUDP::stopAll()
-{
-    for (WiFiUDP* it = _s_first; it; it = it->_next) {
-        DEBUGV("%s %08x %08x\n", __func__, (uint32_t) it, (uint32_t) _s_first);
-        it->stop();
-    }
-}
-

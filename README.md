@@ -83,8 +83,6 @@ more than 20 milliseconds is not recommended.
 
 By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin```. To enable debug output again, call ```Serial.setDebugOutput(true);```. To redirect debug output to ```Serial1``` instead, call ```Serial1.setDebugOutput(true);```.
 
-You also need to use ```Serial.setDebugOutput(true)``` to enable output from the Arduino ```printf()``` function.
-
 Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call ```Serial.begin(baudrate, SERIAL_8N1);```, ```Serial.begin(baudrate, SERIAL_6E2);```, etc.
 
 #### Progmem ####
@@ -104,9 +102,9 @@ This is mostly similar to WiFi shield library. Differences include:
 - ```WiFi.RSSI()``` doesn't work
 - ```WiFi.printDiag(Serial);``` will print out some diagnostic info
 - ```WiFiUDP``` class supports sending and receiving multicast packets on STA interface.
-When sending a multicast packet, replace ```udp.beginPacket(addr, port)``` with
+When sending a multicast packet, replace ```udp.beginPacket(addr, port)``` with 
 ```udp.beginPacketMulticast(addr, port, WiFi.localIP())```.
-When listening to multicast packets, replace ```udp.begin(port)``` with
+When listening to multicast packets, replace ```udp.begin(port)``` with 
 ```udp.beginMulticast(WiFi.localIP(), multicast_ip_addr, port)```.
 You can use ```udp.destinationIP()``` to tell whether the packet received was
 sent to the multicast or unicast address.
@@ -120,7 +118,7 @@ You can see more commands here: [http://www.arduino.cc/en/Reference/WiFi](http:/
 
 Library for calling functions repeatedly with a certain period. Two examples included.
 
-It is currently not recommended to do blocking IO operations (network, serial, file) from Ticker
+It is currently not recommended to do blocking IO operations (network, serial, file) from Ticker 
 callback functions. Instead, set a flag inside the ticker callback and check for that flag inside the loop function.
 
 #### EEPROM ####
@@ -155,7 +153,9 @@ APIs related to deep sleep and watchdog timer are available in the ```ESP``` obj
 
 ```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_RF_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from deepSleep.)
 
-```ESP.restart()``` restarts the CPU.
+```ESP.wdtEnable()```, ```ESP.wdtDisable()```, and ```ESP.wdtFeed()``` provide some control over the watchdog timer.
+
+```ESP.reset()``` resets the CPU.
 
 ```ESP.getFreeHeap()``` returns the free heap size.
 
@@ -171,16 +171,6 @@ Several APIs may be used to get flash chip info:
 
 ```ESP.getCycleCount()``` returns the cpu instruction cycle count since start as an unsigned 32-bit.  This is useful for accurate timing of very short actions like bit banging.
 
-```ESP.getVcc()``` may be used to measure supply voltage. ESP needs to reconfigure the ADC
-at startup in order for this feature to be available. Add the following line to the top
-of your sketch to use ```getVcc```:
-```
-ADC_MODE(ADC_VCC);
-```
-TOUT pin has to be disconnected in this mode.
-
-Note that by default ADC is configured to read from TOUT pin using ```analogRead(A0)```, and
-```ESP.getVCC()``` is not available.
 
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 
@@ -193,11 +183,6 @@ instead of the one that comes with this package.
 Allows the sketch to respond to multicast DNS queries for domain names like "foo.local".
 Currently the library only works on STA interface, AP interface is not supported.
 See attached example and library README file for details.
-
-#### DNS server (DNSServer library) ####
-
-Implements a simple DNS server that can be used in both STA and AP modes. The DNS server currently supports only one domain (for all other domains it will reply with NXDOMAIN or custom status code). With it clients can open a web server running on ESP8266 using a domain name, not an IP address.
-See attached example for details.
 
 #### Servo ####
 
@@ -212,7 +197,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [aREST](https://github.com/marcoschwartz/aREST) REST API handler library.
 - [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
-- [DHT11](https://github.com/adafruit/DHT-sensor-library) - Download latest v1.1.0 library and no changes are necessary.  Older versions should initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
+- [DHT11](https://github.com/adafruit/DHT-sensor-library) - initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266.
 - [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
 - [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with esp8266.
@@ -227,10 +212,10 @@ You need to put ESP8266 into bootloader mode before uploading code.
 For stable use of the ESP8266 a power supply with 3V3 and >= 250mA is required.
 
 * Note
- - using Power from USB to Serial is may unstable, they not deliver enough current.
-
+ - using Power from USB to Serial is may unstable, they not deliver enough current. 
+ 
 #### Serial Adapter ####
-
+ 
 There are many different USB to Serial adapters / boards.
 
 * Note
@@ -239,17 +224,17 @@ There are many different USB to Serial adapters / boards.
  - not all board have all pins of the ICs as breakout (check before order)
  - CTS and DSR are not useful for upload (they are Inputs)
 
-* Working ICs
+* Working ICs 
  - FT232RL
  - CP2102
  - may others (drop a comment)
-
+  
 #### Minimal hardware Setup for Bootloading and usage ####
 
 ESPxx Hardware
 
 | PIN           | Resistor | Serial Adapter |
-| ------------- | -------- | -------------- |
+| ------------- | -------- | -------------- | 
 | VCC           |          | VCC (3.3V)     |
 | GND           |          | GND            |
 | TX or GPIO2*  |          | RX             |
@@ -259,11 +244,11 @@ ESPxx Hardware
 | GPIO15*       | PullDown |                |
 | CH_PD         | PullUp   |                |
 
-* Note
+* Note 
  - GPIO15 is also named MTDO
  - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
  - GPIO2 is alternative TX for the boot loader mode
-
+ 
 ###### esp to Serial
 ![ESP to Serial](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_to_serial.png)
 
@@ -271,7 +256,7 @@ ESPxx Hardware
 ESPxx Hardware
 
 | PIN           | Resistor | Serial Adapter  |
-| ------------- | -------- | --------------- |
+| ------------- | -------- | --------------- | 
 | VCC           |          | VCC (3.3V)      |
 | GND           |          | GND             |
 | TX or GPIO2   |          | RX              |
@@ -281,15 +266,15 @@ ESPxx Hardware
 | GPIO15        | PullDown |                 |
 | CH_PD         | PullUp   |                 |
 
-* Note
+* Note 
 	- if no RTS is used a manual power toggle is needed
-
+	 
 #### Minimal hardware Setup for running only ####
 
 ESPxx Hardware
 
 | PIN           | Resistor | Power supply    |
-| ------------- | -------- | --------------- |
+| ------------- | -------- | --------------- | 
 | VCC           |          | VCC (3.3V)      |
 | GND           |          | GND             |
 | GPIO0         | PullUp   |                 |
@@ -300,7 +285,7 @@ ESPxx Hardware
 ![ESP min](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_min.png)
 
 ###### improved stability
-![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)
+![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)	
 
 ### Issues and support ###
 
@@ -321,3 +306,5 @@ Esptool written by Christian Klippel is licensed under GPLv2, currently maintain
 ESP8266 core support, ESP8266WiFi, Ticker, ESP8266WebServer libraries were written by Ivan Grokhotkov, ivan@esp8266.com.
 
 [SPI Flash File System (SPIFFS)](https://github.com/pellepl/spiffs) written by Peter Andersson is used in this project. It is distributed under MIT license.
+
+

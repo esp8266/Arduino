@@ -84,6 +84,13 @@ public class Preferences {
 
   static final int GUI_SMALL = 6;
 
+  static protected void init(File file) {
+    PreferencesData.init(file);
+
+    // other things that have to be set explicitly for the defaults
+    PreferencesHelper.putColor(PreferencesData.prefs, "run.window.bgcolor", SystemColor.control);
+  }
+
   @Deprecated
   protected static void save() {
     PreferencesData.save();

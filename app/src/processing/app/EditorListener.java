@@ -1,7 +1,7 @@
 package processing.app;
 
 import java.awt.Toolkit;
-import java.awt.event.InputEvent;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -17,9 +17,12 @@ public class EditorListener implements KeyListener {
   }
   
   /** ctrl-alt on windows and linux, cmd-alt on mac os x */
-  private static final int CTRL = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-  private static final int CTRL_ALT = InputEvent.ALT_MASK | CTRL;
-  private static final int CTRL_SHIFT = InputEvent.SHIFT_MASK | CTRL;
+  static final int CTRL_ALT = ActionEvent.ALT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
+  static final int CTRL_SHIFT = ActionEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+  
+  static final int CTRL = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+  
 
   public void keyTyped(KeyEvent event) {
     char c = event.getKeyChar();
@@ -34,7 +37,7 @@ public class EditorListener implements KeyListener {
 
   @Override
   public void keyPressed(KeyEvent event) {
-
+    
     SketchTextArea textarea = editor.getTextArea();
     
     if (!textarea.isEditable()) return;
@@ -50,7 +53,8 @@ public class EditorListener implements KeyListener {
 
     // Navigation..
     // FIXME: not working on LINUX !!!
-    if ((event.getModifiers() & CTRL_SHIFT) == CTRL_SHIFT && code == KeyEvent.VK_TAB) {
+    if (((event.getModifiers() & CTRL_SHIFT) == CTRL_SHIFT)) {
+      if(code == KeyEvent.VK_TAB)
         sketch.handlePrevCode();
     }
     

@@ -30,7 +30,3 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout) {
   while(digitalRead(pin) == state && (micros() - start) < timeout);
   return micros() - start;
 }
-
-unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout) {
-    return pulseIn(pin, state, timeout);
-}

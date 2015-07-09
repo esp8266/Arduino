@@ -28,7 +28,7 @@
 
 int SPIEraseAreaEx(const uint32_t start, const uint32_t size)
 {
-    if ((start & (FLASH_SECTOR_SIZE - 1)) != 0) {
+    if (start & (FLASH_SECTOR_SIZE - 1) != 0) {
         return 1;
     }
 

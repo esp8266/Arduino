@@ -26,10 +26,7 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
-
 package cc.arduino.utils;
-
-import org.apache.commons.compress.utils.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,7 +68,9 @@ public class FileHash {
       }
       return algorithm + ":" + res;
     } finally {
-      IOUtils.closeQuietly(in);
+      if (in != null) {
+        in.close();
+      }
     }
   }
 }

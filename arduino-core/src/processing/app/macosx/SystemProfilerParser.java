@@ -55,7 +55,7 @@ public class SystemProfilerParser {
 
       if ((matcher = serialNumberRegex.matcher(line)).matches()) {
         device.put(SERIAL_NUMBER, matcher.group(1));
-        if (serial.startsWith(DEV_TTY_USBSERIAL) || serial.startsWith(DEV_CU_USBSERIAL)) {
+        if ((serial.startsWith(DEV_TTY_USBSERIAL) || serial.startsWith(DEV_CU_USBSERIAL))) {
           String devicePath = devicePrefix + matcher.group(1);
           device.put(DEVICE_PATH, devicePath);
         }
@@ -65,24 +65,17 @@ public class SystemProfilerParser {
         device.put(DEVICE_PATH, devicePath);
       } else if ((matcher = pidRegex.matcher(line)).matches()) {
         String pid = matcher.group(1);
-        if (pid.indexOf(" ") > 0) {
+        if (pid.indexOf(" ") > 0)
           pid = pid.substring(0, pid.indexOf(" ")); // Remove any text after the hex number
-        }
         device.put(PID, pid);
       } else if ((matcher = vidRegex.matcher(line)).matches()) {
         String vid = matcher.group(1);
-        if (vid.indexOf(" ") > 0) {
+        if (vid.indexOf(" ") > 0)
           vid = vid.substring(0, vid.indexOf(" ")); // Remove any text after the hex number
-        }
         device.put(VID, vid);
       } else if (line.equals("")) {
-        if (device.containsKey(DEVICE_PATH)) {
-          String computedDevicePath = device.get(DEVICE_PATH);
-          String computedDevicePathMinusChar = computedDevicePath.substring(0, computedDevicePath.length() - 1);
-          String serialMinusChar = serial.substring(0, serial.length() - 1);
-          if (computedDevicePath.equals(serial) || computedDevicePathMinusChar.equals(serialMinusChar)) {
-            return (device.get(VID) + "_" + device.get(PID)).toUpperCase();
-          }
+        if (device.containsKey(DEVICE_PATH) && device.get(DEVICE_PATH).equals(serial)) {
+          return (device.get(VID) + "_" + device.get(PID)).toUpperCase();
         }
         device = new HashMap<String, String>();
       }

@@ -16,7 +16,7 @@
  Modified 4 Feb 2013
  by Scott Fitzgerald
 
- http://www.arduino.cc/en/Tutorial/GSMToolsGsmScanNetworks
+ http://arduino.cc/en/Tutorial/GSMToolsGsmScanNetworks
 
  This example code is part of the public domain
  */

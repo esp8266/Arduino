@@ -3,7 +3,7 @@
 The Audio library enables an Arduino Due board to play back .wav files from a storage device like an SD card.
 
 For more information about this library please visit us at
-http://www.arduino.cc/en/Reference/Audio
+http://arduino.cc/en/Reference/Audio
 
 == License ==
 

@@ -52,24 +52,6 @@
 
   <property name="MACOSX_BUNDLED_JVM" value="${java.home}/../"/>
   <property name="WINDOWS_BUNDLED_JVM" value="${java.home}"/>
-  <property name="LINUX32_BUNDLED_JVM" value="none"/>
-  <property name="LINUX64_BUNDLED_JVM" value="none"/>
-  <condition property="linux-bundle-jvm-task" value="noop">
-    <and>
-      <equals arg1="${LINUX32_BUNDLED_JVM}" arg2="none"/>
-      <equals arg1="${LINUX64_BUNDLED_JVM}" arg2="none"/>
-    </and>
-  </condition>
-  <condition property="linux-bundle-jvm-task" value="bundle">
-    <or>
-      <not>
-        <equals arg1="${LINUX32_BUNDLED_JVM}" arg2="none"/>
-      </not>
-      <not>
-        <equals arg1="${LINUX64_BUNDLED_JVM}" arg2="none"/>
-      </not>
-    </or>
-  </condition>
 
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
@@ -182,20 +164,6 @@
         <exclude name="**/USBHost/**"/>
       </fileset>
     </copy>
-    <antcall target="unzip">
-      <param name="archive_file" value="Firmata-2.4.3.zip" />
-      <param name="archive_url" value="https://github.com/arduino-libraries/Firmata/archive/v2.4.3.zip" />
-      <param name="final_folder" value="${target.path}/libraries/Firmata-2.4.3" />
-      <param name="dest_folder" value="${target.path}/libraries" />
-    </antcall>
-    <move file="${target.path}/libraries/Firmata-2.4.3" tofile="${target.path}/libraries/Firmata" />
-    <antcall target="unzip">
-      <param name="archive_file" value="Temboo-1.1.2.zip" />
-      <param name="archive_url" value="https://github.com/temboo/Temboo/archive/1.1.2.zip" />
-      <param name="final_folder" value="${target.path}/libraries/Temboo-1.1.2" />
-      <param name="dest_folder" value="${target.path}/libraries" />
-    </antcall>
-    <move file="${target.path}/libraries/Temboo-1.1.2" tofile="${target.path}/libraries/Temboo" />
   </target>
 
   <!-- copy hardware folder -->
@@ -673,10 +641,6 @@
   </target>
 
   <target name="linux32-build" depends="linux-build" description="Build linux (32-bit) version">
-    <antcall target="linux-jvm-${linux-bundle-jvm-task}">
-      <param name="JVM" value="${LINUX32_BUNDLED_JVM}"/>
-    </antcall>
-
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-i686-pc-linux-gnu.tar.bz2"/>
@@ -689,10 +653,6 @@
   </target>
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
-    <antcall target="linux-jvm-${linux-bundle-jvm-task}">
-      <param name="JVM" value="${LINUX64_BUNDLED_JVM}"/>
-    </antcall>
-
     <antcall target="avr-toolchain-bundle">
       <param name="unpack_target" value="untar"/>
       <param name="gcc_archive_file" value="avr-gcc-4.8.1-arduino5-x86_64-pc-linux-gnu.tar.bz2"/>
@@ -721,18 +681,6 @@
     <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.5-linux64/esptool" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool" />
     <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.5-linux64/" />
 
-  </target>
-
-  <target name="linux-jvm-noop"/>
-
-  <target name="linux-jvm-bundle">
-    <mkdir dir="${staging_folder}/work/java" />
-
-    <exec executable="rsync">
-      <arg value="-a"/>
-      <arg value="${JVM}"/>
-      <arg value="${staging_folder}/work/java/"/>
-    </exec>
   </target>
 
   <target name="linux32-run" depends="build" description="Run Linux (32-bit) version">
@@ -933,8 +881,8 @@
       <fileset dir="windows/launcher"
 	       includes="application.ico, config.xml, config_debug.xml, arduino.l4j.ini"/>
     </copy>
-    <launch4j configFile="windows/work/config.xml" fileVersion="${revision}.0" txtFileVersion="${revision}" productVersion="${revision}.0" txtProductVersion="${revision}"/>
-    <launch4j configFile="windows/work/config_debug.xml" fileVersion="${revision}.0" txtFileVersion="${revision}" productVersion="${revision}.0" txtProductVersion="${revision}"/>
+    <launch4j configFile="windows/work/config.xml" />
+    <launch4j configFile="windows/work/config_debug.xml" />
     <delete dir="windows/work" includes="application.ico, config.xml, config_debug.xml" />
     <copy file="windows/work/arduino.l4j.ini" tofile="windows/work/arduino_debug.l4j.ini" />
 

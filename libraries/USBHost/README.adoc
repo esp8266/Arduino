@@ -3,7 +3,7 @@
 The USBHost library allows an Arduino Due board to appear as a USB host, enabling it to communicate with peripherals like USB mice and keyboards.
 
 For more information about this library please visit us at
-http://www.arduino.cc/en/Reference/USBHost
+http://arduino.cc/en/Reference/USBHost
 
 == License ==
 

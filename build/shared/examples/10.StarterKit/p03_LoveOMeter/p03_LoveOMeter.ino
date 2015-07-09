@@ -13,7 +13,7 @@
  Created 13 September 2012
  by Scott Fitzgerald
 
- http://www.arduino.cc/starterKit
+ http://arduino.cc/starterKit
 
  This example code is part of the public domain
  */
@@ -60,7 +60,7 @@ void loop() {
 
   // if the current temperature is lower than the baseline
   // turn off all LEDs
-  if (temperature < baselineTemp + 2) {
+  if (temperature < baselineTemp) {
     digitalWrite(2, LOW);
     digitalWrite(3, LOW);
     digitalWrite(4, LOW);

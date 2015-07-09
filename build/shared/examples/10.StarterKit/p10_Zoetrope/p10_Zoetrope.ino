@@ -17,7 +17,7 @@
  by Scott Fitzgerald
  Thanks to Federico Vanzati for improvements
 
- http://www.arduino.cc/starterKit
+ http://arduino.cc/starterKit
 
  This example code is part of the public domain
  */

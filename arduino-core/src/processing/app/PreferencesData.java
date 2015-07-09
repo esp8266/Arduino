@@ -1,22 +1,22 @@
 package processing.app;
 
-import com.google.common.base.Joiner;
-import org.apache.commons.compress.utils.IOUtils;
+import static processing.app.I18n._;
+
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.MissingResourceException;
+
 import processing.app.helpers.PreferencesHelper;
 import processing.app.helpers.PreferencesMap;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.MissingResourceException;
-
-import static processing.app.I18n._;
 
 
 public class PreferencesData {
@@ -50,14 +50,14 @@ public class PreferencesData {
       prefs.load(new File(BaseNoGui.getContentFile("lib"), PREFS_FILE));
     } catch (IOException e) {
       BaseNoGui.showError(null, _("Could not read default settings.\n" +
-        "You'll need to reinstall Arduino."), e);
+              "You'll need to reinstall Arduino."), e);
     }
 
     // set some runtime constants (not saved on preferences file)
     File hardwareFolder = BaseNoGui.getHardwareFolder();
     prefs.put("runtime.ide.path", hardwareFolder.getParentFile().getAbsolutePath());
     prefs.put("runtime.ide.version", "" + BaseNoGui.REVISION);
-
+    
     // clone the hash table
     defaults = new PreferencesMap(prefs);
 
@@ -67,10 +67,10 @@ public class PreferencesData {
         prefs.load(preferencesFile);
       } catch (IOException ex) {
         BaseNoGui.showError(_("Error reading preferences"),
-          I18n.format(_("Error reading the preferences file. "
-              + "Please delete (or move)\n"
-              + "{0} and restart Arduino."),
-            preferencesFile.getAbsolutePath()), ex);
+                            I18n.format(_("Error reading the preferences file. "
+                                            + "Please delete (or move)\n"
+                                            + "{0} and restart Arduino."),
+                                        preferencesFile.getAbsolutePath()), ex);
       }
     }
 
@@ -124,7 +124,9 @@ public class PreferencesData {
 
       writer.flush();
     } finally {
-      IOUtils.closeQuietly(writer);
+      if (writer != null) {
+        writer.close();
+      }
     }
 
     try {
@@ -196,7 +198,8 @@ public class PreferencesData {
   }
 
   // get a copy of the Preferences
-  static public PreferencesMap getMap() {
+  static public PreferencesMap getMap() 
+  {
     return new PreferencesMap(prefs);
   }
 
@@ -209,7 +212,8 @@ public class PreferencesData {
 
   // Decide wether changed preferences will be saved. When value is
   // false, Preferences.save becomes a no-op.
-  static public void setDoSave(boolean value) {
+  static public void setDoSave(boolean value)
+  {
     doSave = value;
   }
 
@@ -221,14 +225,5 @@ public class PreferencesData {
       font = PreferencesHelper.getFont(prefs, attr);
     }
     return font;
-  }
-
-  public static Collection<String> getCollection(String key) {
-    return Arrays.asList(get(key, "").split(","));
-  }
-
-  public static void setCollection(String key, Collection<String> values) {
-    String value = Joiner.on(',').join(values);
-    set(key, value);
   }
 }

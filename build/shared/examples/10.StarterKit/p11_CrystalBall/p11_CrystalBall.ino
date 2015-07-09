@@ -16,7 +16,7 @@
  Created 13 September 2012
  by Scott Fitzgerald
 
- http://www.arduino.cc/starterKit
+ http://arduino.cc/starterKit
 
  This example code is part of the public domain
  */

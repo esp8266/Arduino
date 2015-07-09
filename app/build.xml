@@ -73,7 +73,7 @@
     <echo message="override ${env.JAVA_HOME}/lib/tools.jar" />
     <fail />
 -->
-    <javac source="1.8" target="1.8"
+    <javac source="1.6" target="1.6"
 	   srcdir="src"
 	   destdir="bin"
 	   encoding="UTF-8"
@@ -85,7 +85,7 @@
   <target name="test" depends="compile" description="Runs the test">
     <mkdir dir="test-bin"/>
 
-    <javac source="1.8" target="1.8"
+    <javac source="1.6" target="1.6"
            srcdir="test"
            destdir="test-bin"
            encoding="UTF-8"

@@ -10,7 +10,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.compress.utils.IOUtils;
 import processing.app.helpers.FileUtils;
 
 public class ZipDeflater {
@@ -55,8 +54,12 @@ public class ZipDeflater {
             fos.write(buffer, 0, len);
           }
         } finally {
-          IOUtils.closeQuietly(fos);
-          IOUtils.closeQuietly(zipInputStream);
+          if (fos != null) {
+            fos.close();
+          }
+          if (zipInputStream != null) {
+            zipInputStream.close();
+          }
         }
       }
     }

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 CURDIR=`pwd`
 APPDIR="$(dirname -- "$(readlink -f -- "${0}")" )"
@@ -28,9 +28,5 @@ fi
 
 export JAVA_TOOL_OPTIONS=`echo $JAVA_TOOL_OPTIONS | sed 's|-javaagent:/usr/share/java/jayatanaag.jar||g'`
 
-JAVA=java
-if [ -x ./java/bin/java ]; then
-  JAVA=./java/bin/java
-fi
+java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel $SPLASH processing.app.Base --curdir $CURDIR "$@"
 
-$JAVA -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel $SPLASH processing.app.Base --curdir "$CURDIR" "$@"

@@ -3,44 +3,15 @@
 
   Demonstrates sending an email via a Google Gmail account using Temboo from an Arduino Yún.
 
-  Check out the latest Arduino & Temboo examples and tutorials at http://www.temboo.com/arduino
+  Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
 
   A Temboo account and application key are necessary to run all Temboo examples. 
   If you don't already have one, you can register for a free Temboo account at 
   http://www.temboo.com
 
- Instructions:
- 
-  1. Create a Temboo account: http://www.temboo.com
-  
-  2. Retrieve your Temboo application details: http://www.temboo.com/account/applications
-  
-  3. Replace the values in the TembooAccount.h tab with your Temboo application details
- 
-  4. You'll also need a Gmail account. Update the placeholder Gmail address in the code 
-     below with your own details.
-     
-     https://www.gmail.com
- 
-  5. Once you have a Gmail account, turn on 2-step authentication, and create an application-specific 
-     password to allow Temboo to access your Google account: https://www.google.com/landing/2step/.
-     
-  6. After you've enabled 2-Step authentication, you'll need to create an App Password:
-     https://security.google.com/settings/security/apppasswords
-  
-  7. In the "Select app" dropdown menu, choose "Other", and give your app a name (e.g., TembooApp).
-  
-  8. Click "Generate". You'll be given a 16-digit passcode that can be used to access your Google Account from Temboo.
- 
-  9. Copy and paste this password into the code below, updating the GMAIL_APP_PASSWORD variable
- 
-  10. Upload the sketch to your Arduino Yún and open the serial monitor
-  
-  NOTE: You can test this Choreo and find the latest instructions on our website: 
-  https://temboo.com/library/Library/Google/Gmail/SendEmail
-  
-  You can also find an in-depth version of this example here:
-  https://temboo.com/arduino/yun/send-an-email
+  Since this sketch uses Gmail to send the email, you'll also need a valid 
+  Google Gmail account. The sketch needs the username and password you use 
+  to log into your Gmail account - substitute the placeholders below for these values.
 
   This example assumes basic familiarity with Arduino sketches, and that your Yún is connected
   to the Internet.
@@ -63,8 +34,8 @@
 // your Gmail username, formatted as a complete email address, eg "bob.smith@gmail.com"
 const String GMAIL_USER_NAME = "xxxxxxxxxx";
 
-// your application specific password (see instructions above)
-const String GMAIL_APP_PASSWORD = "xxxxxxxxxx";
+// your Gmail password
+const String GMAIL_PASSWORD = "xxxxxxxxxx";
 
 // the email address you want to send the email to, eg "jane.doe@temboo.com"
 const String TO_EMAIL_ADDRESS = "xxxxxxxxxx";
@@ -111,8 +82,8 @@ void loop()
 
     // the first input is your Gmail email address.     
     SendEmailChoreo.addInput("Username", GMAIL_USER_NAME);
-    // next is your application specific password
-    SendEmailChoreo.addInput("Password", GMAIL_APP_PASSWORD);
+    // next is your Gmail password.
+    SendEmailChoreo.addInput("Password", GMAIL_PASSWORD);
     // who to send the email to
     SendEmailChoreo.addInput("ToAddress", TO_EMAIL_ADDRESS);
     // then a subject line

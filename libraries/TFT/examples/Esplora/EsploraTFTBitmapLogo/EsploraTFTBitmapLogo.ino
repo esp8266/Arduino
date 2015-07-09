@@ -17,7 +17,7 @@
 
  Created 19 April 2013 by Enrico Gueli
 
- http://www.arduino.cc/en/Tutorial/EsploraTFTBitmapLogo
+ http://arduino.cc/en/Tutorial/EsploraTFTBitmapLogo
 
  */
 

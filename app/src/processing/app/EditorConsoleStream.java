@@ -1,7 +1,6 @@
 package processing.app;
 
 import cc.arduino.files.DeleteFilesOnShutdown;
-import org.apache.commons.compress.utils.IOUtils;
 
 import static processing.app.I18n._;
 
@@ -35,7 +34,7 @@ class EditorConsoleStream extends OutputStream {
       // sister IDEs) might collide with the file causing permissions problems.
       // The files and folders are not deleted on exit because they may be
       // needed for debugging or bug reporting.
-      tempFolder = BaseNoGui.createTempFolder("console");
+      tempFolder = Base.createTempFolder("console");
       DeleteFilesOnShutdown.add(tempFolder);
       try {
         String outFileName = PreferencesData.get("console.output.file");
@@ -83,13 +82,17 @@ class EditorConsoleStream extends OutputStream {
     System.setErr(systemErr);
 
     // close the PrintStream
-    IOUtils.closeQuietly(consoleOut);
-    IOUtils.closeQuietly(consoleErr);
+    consoleOut.close();
+    consoleErr.close();
 
     // also have to close the original FileOutputStream
     // otherwise it won't be shut down completely
-    IOUtils.closeQuietly(stdoutFile);
-    IOUtils.closeQuietly(stderrFile);
+    try {
+      stdoutFile.close();
+      stderrFile.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
     outFile.delete();
     errFile.delete();

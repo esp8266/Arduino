@@ -32,6 +32,8 @@ package processing.app.syntax;
 
 import org.fife.ui.rsyntaxtextarea.modes.CPlusPlusTokenMaker;
 
+import java.util.Arrays;
+
 /**
  * Controls the syntax highlighting of {@link SketchTextArea} based on the {@link PdeKeywords}
  *
@@ -49,11 +51,6 @@ public class SketchTokenMaker extends CPlusPlusTokenMaker {
 
   @Override
   public void addToken(char[] array, int start, int end, int tokenType, int startOffset, boolean hyperlink) {
-    if (start > end) {
-      super.addToken(array, start, end, tokenType, startOffset, hyperlink);
-      return;
-    }
-
     // This assumes all of your extra tokens would normally be scanned as IDENTIFIER.
     int newType = pdeKeywords.getTokenType(array, start, end);
     if (newType > -1) {

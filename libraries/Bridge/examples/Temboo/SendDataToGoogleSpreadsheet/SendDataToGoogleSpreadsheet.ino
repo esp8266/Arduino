@@ -3,49 +3,31 @@
 
   Demonstrates appending a row of data to a Google spreadsheet using Temboo from an Arduino Yún.
 
-  Check out the latest Arduino & Temboo examples and tutorials at http://www.temboo.com/arduino
+  Check out the latest Arduino & Temboo examples and support docs at http://www.temboo.com/arduino
 
   A Temboo account and application key are necessary to run all Temboo examples. 
   If you don't already have one, you can register for a free Temboo account at 
   http://www.temboo.com
 
- Instructions:
- 
-  1. Create a Temboo account: http://www.temboo.com
+  Since this sketch uses a Google spreadsheet, you'll also need a 
+  Google account: substitute the placeholders below for your Google account values.
+
+  This example assumes basic familiarity with Arduino sketches, and that your 
+  Yún is connected to the Internet.
+
+  The columns in your spreadsheet must have labels for the Choreo to
+  work properly. It doesn't matter what the column labels actually are,
+  but there must be text in the first row of each column. This example
+  assumes there are two columns. The first column is the time (in milliseconds)
+  that the row was appended, and the second column is a sensor value.
+  In other words, your spreadsheet should look like:
   
-  2. Retrieve your Temboo application details: http://www.temboo.com/account/applications
+  Time  |  Sensor Value  |     
+  ------+-----------------
+        |                |
   
-  3. Replace the values in the TembooAccount.h tab with your Temboo application details
-  
-  4. You'll also need a Google Spreadsheet that includes a title in the first row 
-     of each column that data will be written to. This example assumes there are two columns. 
-     The first column is the time (in milliseconds) that the row was appended, and the second 
-     column is a sensor value. In other words, your spreadsheet should look like:
-  
-      Time  |  Sensor Value  |     
-      ------+-----------------
-            |                |  
- 
-  5. Google Spreadsheets requires you to authenticate via OAuth. Follow the steps
-     in the link below to find your ClientID, ClientSecret, and RefreshToken, and then 
-     use those values to overwrite the placeholders in the code below. 
-     
-     https://temboo.com/library/Library/Google/OAuth/
-     
-     For the scope field, you need to use: https://spreadsheets.google.com/feeds/
-     
-     Here's a video outlines how Temboo helps with the OAuth process: 
-     
-     https://www.temboo.com/videos#oauthchoreos
-     
-     And here's a more in-depth version of this example on our website: 
-     
-     https://temboo.com/arduino/yun/update-google-spreadsheet
- 
-  6. Next, upload the sketch to your Arduino Yún and open the serial monitor
- 
-  Note: you can test this Choreo and find the latest instructions on our website:
-  https://temboo.com/library/Library/Google/Spreadsheets/AppendRow/
+  NOTE that the first time you run this sketch, you may receive a warning from
+  Google, prompting you to authorize access from a 3rd party system.
   
   Looking for another API to use with your Arduino Yún? We've got over 100 in our Library!
 
@@ -64,14 +46,8 @@
 // Note that for additional security and reusability, you could
 // use #define statements to specify these values in a .h file.
 
-// the clientID found in Google's Developer Console under APIs & Auth > Credentials
-const String CLIENT_ID = "your-client-id";
-
-// the clientSecret found in Google's Developer Console under APIs & Auth > Credentials
-const String CLIENT_SECRET = "your-client-secret";
-
-// returned after running FinalizeOAuth
-const String REFRESH_TOKEN = "your-oauth-refresh-token";
+const String GOOGLE_USERNAME = "your-google-username";
+const String GOOGLE_PASSWORD = "your-google-password";
 
 // the title of the spreadsheet you want to send data to
 // (Note that this must actually be the title of a Google spreadsheet
@@ -136,12 +112,11 @@ void loop()
     // see https://www.temboo.com/library/Library/Google/Spreadsheets/AppendRow/ 
     // for complete details about the inputs for this Choreo
     
-    // your Google application client ID
-    AppendRowChoreo.addInput("ClientID", CLIENT_ID);
-    // your Google application client secert
-    AppendRowChoreo.addInput("ClientSecret", CLIENT_SECRET);
-    // your Google OAuth refresh token
-    AppendRowChoreo.addInput("RefreshToken", REFRESH_TOKEN);
+    // your Google username (usually your email address)
+    AppendRowChoreo.addInput("Username", GOOGLE_USERNAME);
+
+    // your Google account password
+    AppendRowChoreo.addInput("Password", GOOGLE_PASSWORD);
 
     // the title of the spreadsheet you want to append to
     // NOTE: substitute your own value, retaining the "SpreadsheetTitle:" prefix.

@@ -1,9 +1,7 @@
 menu.UploadSpeed=Upload Speed
 menu.CpuFrequency=CPU Frequency
 menu.FlashSize=Flash Size
-menu.FlashMode=Flash Mode
 menu.FlashFreq=Flash Frequency
-menu.UploadTool=Upload Using
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -23,27 +21,18 @@ generic.build.board=ESP8266_ESP01
 generic.build.core=esp8266
 generic.build.variant=generic
 generic.build.flash_mode=qio
+generic.build.flash_size=512K
+generic.build.flash_freq=40
+generic.build.flash_ld=eagle.flash.512k.ld
+generic.build.spiffs_start=0x6B000
+generic.build.spiffs_end=0x7B000
 generic.build.spiffs_pagesize=256
-
-generic.menu.UploadTool.esptool=Serial
-generic.menu.UploadTool.esptool.upload.tool=esptool
-generic.menu.UploadTool.espota=OTA
-generic.menu.UploadTool.espota.upload.tool=espota
+generic.build.spiffs_blocksize=4096
 
 generic.menu.CpuFrequency.80=80 MHz
 generic.menu.CpuFrequency.80.build.f_cpu=80000000L
 generic.menu.CpuFrequency.160=160 MHz
 generic.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-generic.menu.FlashFreq.40=40MHz
-generic.menu.FlashFreq.40.build.flash_freq=40
-generic.menu.FlashFreq.80=80MHz
-generic.menu.FlashFreq.80.build.flash_freq=80
-
-generic.menu.FlashMode.dio=DIO
-generic.menu.FlashMode.dio.build.flash_mode=dio
-generic.menu.FlashMode.qio=QIO
-generic.menu.FlashMode.qio.build.flash_mode=qio
 
 generic.menu.UploadSpeed.115200=115200
 generic.menu.UploadSpeed.115200.upload.speed=115200
@@ -133,6 +122,11 @@ generic.menu.FlashSize.4M.upload.maximum_size=1044464
 # generic.menu.FlashSize.16M.build.spiffs_start=0x100000
 # generic.menu.FlashSize.16M.build.spiffs_end=0x1000000
 # generic.menu.FlashSize.16M.build.spiffs_blocksize=8192
+
+# generic.menu.FlashFreq.40=40MHz
+# generic.menu.FlashFreq.40.build.flash_freq=40
+# generic.menu.FlashFreq.80=80MHz
+# generic.menu.FlashFreq.80.build.flash_freq=80
 
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
@@ -329,54 +323,6 @@ huzzah.menu.UploadSpeed.256000=256000
 huzzah.menu.UploadSpeed.256000.upload.speed=256000
 huzzah.menu.UploadSpeed.921600=921600
 huzzah.menu.UploadSpeed.921600.upload.speed=921600
-
-##############################################################
-esp210.name=SweetPea ESP-210
-
-esp210.upload.tool=esptool
-esp210.upload.speed=115200
-esp210.upload.resetmethod=ck
-esp210.upload.maximum_size=1044464
-esp210.upload.wait_for_upload_port=true
-esp210.serial.disableDTR=true
-esp210.serial.disableRTS=true
-
-esp210.build.mcu=esp8266
-esp210.build.f_cpu=80000000L
-esp210.build.board=ESP8266_ESP210
-esp210.build.core=esp8266
-esp210.build.variant=generic
-esp210.build.flash_mode=qio
-esp210.build.flash_size=4M
-esp210.build.flash_freq=40
-esp210.build.flash_ld=eagle.flash.4m.ld
-esp210.build.spiffs_start=0x100000
-esp210.build.spiffs_end=0x3FB000
-esp210.build.spiffs_pagesize=256
-esp210.build.spiffs_blocksize=8192
-
-esp210.menu.CpuFrequency.80=80 MHz
-esp210.menu.CpuFrequency.80.build.f_cpu=80000000L
-esp210.menu.CpuFrequency.160=160 MHz
-esp210.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-esp210.menu.UploadSpeed.57600=57600
-esp210.menu.UploadSpeed.57600.upload.speed=57600
-esp210.menu.UploadSpeed.115200=115200
-esp210.menu.UploadSpeed.115200.upload.speed=115200
-esp210.menu.UploadSpeed.256000.windows=256000
-esp210.menu.UploadSpeed.256000.upload.speed=256000
-esp210.menu.UploadSpeed.230400.linux=230400
-esp210.menu.UploadSpeed.230400.macosx=230400
-esp210.menu.UploadSpeed.230400.macosx=230400
-esp210.menu.UploadSpeed.230400.upload.speed=230400
-esp210.menu.UploadSpeed.460800.linux=460800
-esp210.menu.UploadSpeed.460800.macosx=460800
-esp210.menu.UploadSpeed.460800.upload.speed=460800
-esp210.menu.UploadSpeed.512000.windows=512000
-esp210.menu.UploadSpeed.512000.upload.speed=512000
-esp210.menu.UploadSpeed.921600=921600
-esp210.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
 # wifio.name=Wifio

@@ -29,7 +29,9 @@
 
 package cc.arduino.view.preferences;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import processing.app.Base;
 
@@ -51,7 +53,13 @@ public class AdditionalBoardsManagerURLTextArea extends javax.swing.JDialog {
     initComponents();
     setLocationRelativeTo(parent);
 
-    Base.registerWindowCloseKeys(getRootPane(), this::cancelActionPerformed);
+    Base.registerWindowCloseKeys(getRootPane(), new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        cancelActionPerformed(e);
+      }
+    });
+
   }
 
   /**
@@ -67,7 +75,6 @@ public class AdditionalBoardsManagerURLTextArea extends javax.swing.JDialog {
     javax.swing.JButton cancel = new javax.swing.JButton();
     javax.swing.JButton ok = new javax.swing.JButton();
     javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
-    unofficialListURLLabel = new javax.swing.JLabel();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle(_("Additional Boards Manager URLs"));
@@ -95,22 +102,6 @@ public class AdditionalBoardsManagerURLTextArea extends javax.swing.JDialog {
 
     jLabel1.setText(_("Enter additional URLs, one for each row"));
 
-    unofficialListURLLabel.setText(_("Click for a list of unofficial boards support URLs"));
-    unofficialListURLLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-    unofficialListURLLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-      public void mouseClicked(java.awt.event.MouseEvent evt) {
-        unofficialListURLLabelMouseClicked(evt);
-      }
-
-      public void mouseExited(java.awt.event.MouseEvent evt) {
-        unofficialListURLLabelMouseExited(evt);
-      }
-
-      public void mouseEntered(java.awt.event.MouseEvent evt) {
-        unofficialListURLLabelMouseEntered(evt);
-      }
-    });
-
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
@@ -118,16 +109,14 @@ public class AdditionalBoardsManagerURLTextArea extends javax.swing.JDialog {
         .addGroup(layout.createSequentialGroup()
           .addContainerGap()
           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-              .addGap(0, 0, Short.MAX_VALUE)
-              .addComponent(ok)
-              .addGap(7, 7, 7)
-              .addComponent(cancel))
             .addGroup(layout.createSequentialGroup()
-              .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(unofficialListURLLabel)
-                .addComponent(jLabel1))
+              .addGap(0, 332, Short.MAX_VALUE)
+              .addComponent(ok)
+              .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+              .addComponent(cancel))
+            .addComponent(jScrollPane1)
+            .addGroup(layout.createSequentialGroup()
+              .addComponent(jLabel1)
               .addGap(0, 0, Short.MAX_VALUE)))
           .addContainerGap())
     );
@@ -137,13 +126,11 @@ public class AdditionalBoardsManagerURLTextArea extends javax.swing.JDialog {
           .addContainerGap()
           .addComponent(jLabel1)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addComponent(jScrollPane1)
-          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addComponent(unofficialListURLLabel)
+          .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-            .addComponent(ok)
-            .addComponent(cancel))
+            .addComponent(cancel)
+            .addComponent(ok))
           .addContainerGap())
     );
 
@@ -160,18 +147,6 @@ public class AdditionalBoardsManagerURLTextArea extends javax.swing.JDialog {
     cancelActionPerformed(evt);
   }//GEN-LAST:event_okActionPerformed
 
-  private void unofficialListURLLabelMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_unofficialListURLLabelMouseEntered
-    unofficialListURLLabel.setForeground(new Color(0, 0, 140));
-  }//GEN-LAST:event_unofficialListURLLabelMouseEntered
-
-  private void unofficialListURLLabelMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_unofficialListURLLabelMouseExited
-    unofficialListURLLabel.setForeground(new Color(76, 76, 76));
-  }//GEN-LAST:event_unofficialListURLLabelMouseExited
-
-  private void unofficialListURLLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_unofficialListURLLabelMouseClicked
-    Base.openURL("https://github.com/arduino/Arduino/wiki/Unofficial-list-of-3rd-party-boards-support-urls");
-  }//GEN-LAST:event_unofficialListURLLabelMouseClicked
-
   public void setText(String text) {
     Collection<String> urls = splitAndTrim(text, ",");
     additionalBoardsManagerURLs.setText(Joiner.on("\n").skipNulls().join(urls));
@@ -179,7 +154,17 @@ public class AdditionalBoardsManagerURLTextArea extends javax.swing.JDialog {
 
   private Collection<String> splitAndTrim(String text, String separator) {
     Collection<String> urls = Arrays.asList(text.split(separator));
-    return FluentIterable.from(urls).transform(String::trim).filter(url -> !url.isEmpty()).toList();
+    return FluentIterable.from(urls).transform(new Function<String, String>() {
+      @Override
+      public String apply(String input) {
+        return input.trim();
+      }
+    }).filter(new Predicate<String>() {
+      @Override
+      public boolean apply(String input) {
+        return !input.isEmpty();
+      }
+    }).toList();
   }
 
   public String getText() {
@@ -189,7 +174,6 @@ public class AdditionalBoardsManagerURLTextArea extends javax.swing.JDialog {
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private final javax.swing.JTextArea additionalBoardsManagerURLs = new javax.swing.JTextArea();
-  private javax.swing.JLabel unofficialListURLLabel;
   // End of variables declaration//GEN-END:variables
 
   public void onOk(ActionListener listener) {

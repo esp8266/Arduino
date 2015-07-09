@@ -30,11 +30,14 @@ import static processing.app.I18n._;
 @SuppressWarnings("serial")
 public class SerialMonitor extends AbstractMonitor {
 
+  private final String port;
   private Serial serial;
   private int serialRate;
 
   public SerialMonitor(BoardPort port) {
-    super(port);
+    super(port.getLabel());
+
+    this.port = port.getAddress();
 
     serialRate = PreferencesData.getInteger("serial.debug_rate");
     serialRates.setSelectedItem(serialRate + " " + _("baud"));
@@ -86,11 +89,9 @@ public class SerialMonitor extends AbstractMonitor {
   }
 
   public void open() throws Exception {
-    super.open();
-
     if (serial != null) return;
 
-    serial = new Serial(getBoardPort().getAddress(), serialRate) {
+    serial = new Serial(port, serialRate) {
       @Override
       protected void message(char buff[], int n) {
         addToUpdateBuffer(buff, n);
@@ -99,7 +100,6 @@ public class SerialMonitor extends AbstractMonitor {
   }
 
   public void close() throws Exception {
-    super.close();
     if (serial != null) {
       int[] location = getPlacement();
       String locationStr = PApplet.join(PApplet.str(location), ",");

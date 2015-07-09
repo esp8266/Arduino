@@ -7,7 +7,7 @@
  modified 2 Apr 2012
  by Tom Igoe
 
- http://www.arduino.cc/en/Tutorial/StringLengthTrim
+ http://arduino.cc/en/Tutorial/StringLengthTrim
 
  This example code is in the public domain.
  */

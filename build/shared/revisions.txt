@@ -1,11 +1,4 @@
-ARDUINO 1.6.6
-
-ARDUINO 1.6.5-r2 - 2015.06.17
-
-[ide]
-* Windows: fixed a problem that prevented opening the IDE when double clicking a .ino file
-
-ARDUINO 1.6.5 - 2015.06.15
+ARDUINO 1.6.5
 
 [ide]
 * File, Sketch and Tools menu items are properly handled when switching between different windows
@@ -13,41 +6,12 @@ ARDUINO 1.6.5 - 2015.06.15
 * New editor, based on RSyntaxTextArea. Thanks @ricardojlrufino
 * New keywords. Thanks @Chris--A
 * Easier "additional boards manager url" field: a wide text area opens by clicking the added button (right side of the text field)
-* Rewritten code of Preferences window: its content is now correctly drawn on every OS
-* Fixed a bug that made the IDE notify users of invalid libraries too many times. Thanks @Chris--A
-* Removed JNA. Less native stuff and less chances of incurring into an UnsatisfiedLinkError
-* Many new and old issues closed. Thanks to many, and @Chris--A in particular
-* Faster libraries list update
-* Serial monitor stays opened during upload, disabled. Thanks @avishorp and @Wackerbarth
-* CLI: --get-pref can now be called without a pref name. If pref name is missing, IDE dumps all preferences
-* Holding SHIFT when hovering the save icon will trigger a "Save As"
-* Removed proxy settings from File > Preferences: IDE will use system settings
-* Linux versions bundle the latest JVM, 1.8.0_45
-* Local docs: if your sketch has a "docs" folder, you can add local links to it. For example file://./docs/index.html
-  will use your browser to open file index.html from the "docs" folder of your sketch
-* When using "external editor" mode, sketch code is updated when the IDE gets focused
-* Added keyboard shortcuts to IDE menus: ALT+F for File, ALT+E for Edit and so on
-* Added support for Dangerous Prototypes Bus Pirate as ISP
-* Added "Close" button to Boards/Libs Managers, in order to help linux people with weird Window Managers
-* Added File > Open Recent menu, showing the last 5 opened sketches
-* Windows: added Arduino Zero drivers
-* Tons of minor fixes
 
 [libraries]
 * LiquidCrystal fixes. Thanks @newbie15
-* Added SPI Transactions to TFT lib
-* Stepper: support for 5-phase/5-wires motors. Thanks @rdodesigns
-* Stepper: increased precision in timing calculations. Thanks @ekozlenko
-* Firmata and Temboo: dropped our vesions, tagged released are downloaded from their respective git repos
 
 [core]
-* AVR: delayMicroseconds(..) doesn't hang if called with 0. Thanks @cano64
-* AVR: delayMicroseconds(..), added support for 1Mhz, 12Mhz and 24Mhz. Thanks @cano64
-* AVR: added missing case in detachInterrupt(). Thanks @leres, @vicatcu
-* SAM: added watchdog routine for Due. Thanks @bobc
-* AVR+SAM: reworked pulseIn() function to become GCC agnostic
-* AVR+SAM: added pulseInLong() (based on micros()) to help getting good results in interrupt-prone environments
-* AVR: fixed regression in HardwareSerial.flush(). Thanks @chromhelm
+* SAM: added watchdog routing for Due. Thanks @bobc
 
 ARDUINO 1.6.4 - 2015.05.06
 
@@ -99,7 +63,6 @@ ARDUINO 1.6.2 - 2015.03.28
 * Introduced starting splashscreen with progress status: will be used for notifying user of long running startup tasks
 * Available ports list is now generated in background: hence "tools" menu is much faster
 * MacOSX: appbundler merged our contribution, switching to upstream version https://bitbucket.org/infinitekind/appbundler/
-* MacOSX: filtering /dev/cu* was not a good idea. Filtering /dev/tty* instead
 
 [core]
 * Stream: fixed bug in findUntil routine #2591 @Xuth
@@ -530,7 +493,7 @@ ARDUINO 1.5 BETA - 2012.10.22
 * Everything is in beta, most features or libraries are still  missing 
   or incomplete.
 * For more info refer to this press release:
-  http://www.arduino.cc/blog/2012/10/22/arduino-1-5-support-for-the-due-and-other-processors-easier-library-installation-simplified-board-menu-etc/
+  http://arduino.cc/blog/2012/10/22/arduino-1-5-support-for-the-due-and-other-processors-easier-library-installation-simplified-board-menu-etc/
 
 ARDUINO 1.0.7
 
@@ -762,7 +725,7 @@ ARDUINO 1.0.1 - 2012.05.21
 * The IDE has been internationalized and translated into multiple languages.
   Thanks to Shigeru Kanemoto for the internationalization and Japanese
   translation and many others for the other translations.  For more
-  information, see: http://www.arduino.cc/playground/Main/LanguagesIDE
+  information, see: http://arduino.cc/playground/Main/LanguagesIDE
 
 * Added preference for selecting the language in which to display the
   Arduino software.  Defaults to the operating system locale.  
@@ -1017,7 +980,7 @@ ARDUINO 0022 - 2010.12.24
 
 * Adding an SD card library based on sdfatlib by Bill Greiman and the
   MemoryCard library by Philip Lindsay (follower) for SparkFun.
-  http://www.arduino.cc/en/Reference/SD
+  http://arduino.cc/en/Reference/SD
 
 * Added character manipulation macros (from Wiring): isAlphaNumeric(),
   isAlpha(), isAscii(), isWhitespace(), isControl(), isDigit(), isGraph(),

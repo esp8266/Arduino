@@ -30,9 +30,15 @@ extern struct rst_info resetInfo;
 }
 
 
-//#define DEBUG_SERIAL Serial
+// #define DEBUG_SERIAL Serial
 
+//extern "C" void ets_wdt_init(uint32_t val);
+extern "C" void ets_wdt_enable(void);
+extern "C" void ets_wdt_disable(void);
+extern "C" void wdt_feed(void) {
     
+}
+
 /**
  * User-defined Literals
  *  usage:
@@ -79,10 +85,15 @@ unsigned long long operator"" _GB(unsigned long long x) {
 
 EspClass ESP;
 
+EspClass::EspClass()
+{
+
+}
+
 void EspClass::wdtEnable(uint32_t timeout_ms)
 {
-    /// This API can only be called if software watchdog is stopped
-    system_soft_wdt_restart();
+    //todo find doku for ets_wdt_init may set the timeout
+	ets_wdt_enable();
 }
 
 void EspClass::wdtEnable(WDTO_t timeout_ms)
@@ -92,14 +103,12 @@ void EspClass::wdtEnable(WDTO_t timeout_ms)
 
 void EspClass::wdtDisable(void)
 {
-    /// Please don’t stop software watchdog too long (less than 6 seconds),
-    /// otherwise it will trigger hardware watchdog reset.
-    system_soft_wdt_stop();
+	ets_wdt_disable();
 }
 
 void EspClass::wdtFeed(void)
 {
-
+	wdt_feed();
 }
 
 void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
@@ -108,20 +117,14 @@ void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
  	system_deep_sleep(time_us);
 }
 
-extern "C" void esp_yield();
-extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
 {
-    __real_system_restart_local();
+	((void (*)(void))0x40000080)();
 }
 
 void EspClass::restart(void)
 {
     system_restart();
-    esp_yield();
-    // todo: provide an alternative code path if this was called
-    // from system context, not from continuation
-    // (implement esp_is_cont_ctx()?)
 }
 
 uint16_t EspClass::getVcc(void)
@@ -287,8 +290,8 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
 
 String EspClass::getResetInfo(void) {
     if(resetInfo.reason != 0) {
-        char buff[200];
-        sprintf(&buff[0], "Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, (resetInfo.reason == 0 ? "DEFAULT" : resetInfo.reason == 1 ? "WDT" : resetInfo.reason == 2 ? "EXCEPTION" : resetInfo.reason == 3 ? "SOFT_WDT" : resetInfo.reason == 4 ? "SOFT_RESTART" : resetInfo.reason == 5 ? "DEEP_SLEEP_AWAKE" : "???"), resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
+        char buff[150];
+        sprintf(&buff[0], "Fatal exception:%d flag:%d epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
         return String(buff);
     }
     return String("flag: 0");
@@ -365,38 +368,76 @@ uint32_t EspClass::getFreeSketchSpace() {
     return freeSpaceEnd - freeSpaceStart;
 }
 
-bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool restartOnSuccess) {
-  if(!Update.begin(size)){
-#ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.print("Update ");
-    Update.printError(DEBUG_SERIAL);
-#endif
-    if(restartOnFail) ESP.restart();
-    return false;
-  }
+bool EspClass::updateSketch(Stream& in, uint32_t size) {
 
-  if(Update.writeStream(in) != size){
-#ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.print("Update ");
-    Update.printError(DEBUG_SERIAL);
-#endif
-    if(restartOnFail) ESP.restart();
-    return false;
-  }
+    if (size > getFreeSketchSpace())
+        return false;
 
-  if(!Update.end()){
-#ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.print("Update ");
-    Update.printError(DEBUG_SERIAL);
-#endif
-    if(restartOnFail) ESP.restart();
-    return false;
-  }
+    uint32_t usedSize = getSketchSize();
+    uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+    uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
 
 #ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.println("Update SUCCESS");
-#endif  
-    if(restartOnSuccess) ESP.restart();
-    return true;
+    DEBUG_SERIAL.printf("erase @0x%x size=0x%x\r\n", freeSpaceStart, roundedSize);
+#endif
+
+    noInterrupts();
+    int rc = SPIEraseAreaEx(freeSpaceStart, roundedSize);
+    interrupts();
+    if (rc)
+        return false;
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.println("erase done");
+#endif
+
+    uint32_t addr = freeSpaceStart;
+    uint32_t left = size;
+
+    const uint32_t bufferSize = FLASH_SECTOR_SIZE;
+    std::unique_ptr<uint8_t> buffer(new uint8_t[bufferSize]);
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.println("writing");
+#endif
+    while (left > 0) {
+        size_t willRead = (left < bufferSize) ? left : bufferSize;
+        size_t rd = in.readBytes(buffer.get(), willRead);
+        if (rd != willRead) {
+#ifdef DEBUG_SERIAL
+            DEBUG_SERIAL.println("stream read failed");
+#endif
+            return false;
+        }
+
+        noInterrupts();
+        rc = SPIWrite(addr, buffer.get(), willRead);
+        interrupts();
+        if (rc) {
+#ifdef DEBUG_SERIAL
+            DEBUG_SERIAL.println("write failed");
+#endif            
+            return false;
+        }
+
+        addr += willRead;
+        left -= willRead;
+#ifdef DEBUG_SERIAL
+        DEBUG_SERIAL.print(".");
+#endif
+    }
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.println("\r\nrestarting");
+#endif
+    eboot_command ebcmd;
+    ebcmd.action = ACTION_COPY_RAW;
+    ebcmd.args[0] = freeSpaceStart;
+    ebcmd.args[1] = 0x00000;
+    ebcmd.args[2] = size;
+    eboot_command_write(&ebcmd);
+    
+    ESP.restart();
+    return true; // never happens
 }
 

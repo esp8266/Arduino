@@ -8,7 +8,7 @@
  modified 2 Apr 2012
  by Tom Igoe
 
- http://www.arduino.cc/en/Tutorial/StringAdditionOperator
+ http://arduino.cc/en/Tutorial/StringAdditionOperator
 
  This example code is in the public domain.
  */

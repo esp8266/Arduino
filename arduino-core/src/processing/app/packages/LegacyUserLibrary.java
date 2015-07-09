@@ -32,6 +32,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import cc.arduino.contributions.libraries.ContributedLibraryReference;
+
 public class LegacyUserLibrary extends UserLibrary {
 
   private String name;
@@ -43,8 +45,6 @@ public class LegacyUserLibrary extends UserLibrary {
     res.setInstalled(true);
     res.layout = LibraryLayout.FLAT;
     res.name = libFolder.getName();
-    res.setTypes(Arrays.asList("Contributed"));
-    res.setCategory("Uncategorized");
     return res;
   }
 
@@ -56,6 +56,66 @@ public class LegacyUserLibrary extends UserLibrary {
   @Override
   public List<String> getArchitectures() {
     return Arrays.asList("*");
+  }
+
+  @Override
+  public String getAuthor() {
+    return null;
+  }
+
+  @Override
+  public String getParagraph() {
+    return null;
+  }
+
+  @Override
+  public String getSentence() {
+    return null;
+  }
+
+  @Override
+  public String getWebsite() {
+    return null;
+  }
+
+  @Override
+  public String getCategory() {
+    return "Uncategorized";
+  }
+
+  @Override
+  public String getLicense() {
+    return null;
+  }
+
+  @Override
+  public String getVersion() {
+    return null;
+  }
+
+  @Override
+  public String getMaintainer() {
+    return null;
+  }
+
+  @Override
+  public String getChecksum() {
+    return null;
+  }
+
+  @Override
+  public long getSize() {
+    return 0;
+  }
+
+  @Override
+  public String getUrl() {
+    return null;
+  }
+
+  @Override
+  public List<ContributedLibraryReference> getRequires() {
+    return null;
   }
 
   @Override

@@ -1,5 +1,4 @@
-XTENSA_TOOLCHAIN ?= ../../tools/xtensa-lx106-elf/bin/
-ESPTOOL ?= ../../tools/esptool
+XTENSA_TOOLCHAIN ?=
 
 BIN_DIR := ./
 TARGET_DIR := ./
@@ -7,7 +6,7 @@ TARGET_DIR := ./
 TARGET_OBJ_FILES := \
 	eboot.o \
 	eboot_command.o \
-	
+	flash.o \
 
 TARGET_OBJ_PATHS := $(addprefix $(TARGET_DIR)/,$(TARGET_OBJ_FILES))
 

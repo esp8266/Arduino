@@ -131,17 +131,12 @@ void EthernetClient::stop() {
   disconnect(_sock);
   unsigned long start = millis();
 
-  // wait up to a second for the connection to close
-  uint8_t s;
-  do {
-    s = status();
-    if (s == SnSR::CLOSED)
-      break; // exit the loop
+  // wait a second for the connection to close
+  while (status() != SnSR::CLOSED && millis() - start < 1000)
     delay(1);
-  } while (millis() - start < 1000);
 
   // if it hasn't closed, close it forcefully
-  if (s != SnSR::CLOSED)
+  if (status() != SnSR::CLOSED)
     close(_sock);
 
   EthernetClass::_server_port[_sock] = 0;

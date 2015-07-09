@@ -4,7 +4,7 @@
 
  modified on 8 Nov 2013
  by Scott Fitzgerald
- http://www.arduino.cc/en/Tutorial/Knob
+ http://arduino.cc/en/Tutorial/Knob
 */
 
 #include <Servo.h>

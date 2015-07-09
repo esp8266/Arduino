@@ -31,7 +31,7 @@
 
  This example code is in the public domain.
 
- http://www.arduino.cc/en/Tutorial/TemperatureWebPanel
+ http://arduino.cc/en/Tutorial/TemperatureWebPanel
 
  */
 
@@ -98,9 +98,9 @@ void loop() {
       Serial.println(timeString);
       int sensorValue = analogRead(A1);
       // convert the reading to millivolts:
-      float voltage = sensorValue * (5000.0f / 1024.0f);
+      float voltage = sensorValue *  (5000 / 1024);
       // convert the millivolts to temperature celsius:
-      float temperature = (voltage - 500.0f) / 10.0f;
+      float temperature = (voltage - 500) / 10;
       // print the temperature:
       client.print("Current time on the Y&uacute;n: ");
       client.println(timeString);

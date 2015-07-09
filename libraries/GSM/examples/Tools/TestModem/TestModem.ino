@@ -12,7 +12,7 @@
  modified 21 Nov 2012
  by Tom Igoe
 
- http://www.arduino.cc/en/Tutorial/GSMToolsTestModem
+ http://arduino.cc/en/Tutorial/GSMToolsTestModem
 
  This sample code is part of the public domain
 

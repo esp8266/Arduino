@@ -8,10 +8,6 @@
 name=Arduino AVR Boards
 version=1.6.7
 
-
-runtime.tools.avr-gcc.path={runtime.platform.path}/../../tools/avr
-runtime.tools.avrdude.path={runtime.platform.path}/../../tools/avr
-
 # AVR compile variables
 # --------------------- 
 

@@ -13,7 +13,7 @@
 
  This example code is part of the public domain
 
- http://www.arduino.cc/en/Tutorial/GSMToolsTestGPRS
+ http://arduino.cc/en/Tutorial/GSMToolsTestGPRS
 
  */
 
@@ -34,7 +34,7 @@ String errortext = "ERROR";
 
 // URL and path (for example: arduino.cc)
 char url[] = "arduino.cc";
-char urlproxy[] = "http://www.arduino.cc";
+char urlproxy[] = "http://arduino.cc";
 char path[] = "/";
 
 // variable for save response obtained
