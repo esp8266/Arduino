@@ -30,7 +30,10 @@
 extern void __real_system_restart_local();
 extern cont_t g_cont;
 
+
+static void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
+static void uart1_write_char_d(char c);
 static void print_stack(uint32_t start, uint32_t end);
 static void print_pcs(uint32_t start, uint32_t end);
 
@@ -46,7 +49,7 @@ void __wrap_system_restart_local() {
         return;
     }
 
-    ets_install_putc1(&uart0_write_char_d);
+    ets_install_putc1(&uart_write_char_d);
 
     if (rst_info.reason == REASON_EXCEPTION_RST) {
         ets_printf("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n", 
@@ -120,6 +123,11 @@ static void print_pcs(uint32_t start, uint32_t end) {
     ets_printf("<<<pc<<<\n");
 }
 
+void uart_write_char_d(char c) {
+    uart0_write_char_d(c);
+    uart1_write_char_d(c);
+}
+
 void uart0_write_char_d(char c) {
     while (((USS(0) >> USTXC) & 0xff) >= 0x7e) { }
 
@@ -127,4 +135,13 @@ void uart0_write_char_d(char c) {
         USF(0) = '\r';
     }
     USF(0) = c;
+}
+
+void uart1_write_char_d(char c) {
+    while (((USS(1) >> USTXC) & 0xff) >= 0x7e) { }
+
+    if (c == '\n') {
+        USF(1) = '\r';
+    }
+    USF(1) = c;
 }
