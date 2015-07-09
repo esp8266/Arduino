@@ -26,7 +26,6 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
-
 package cc.arduino.contributions.packages;
 
 import cc.arduino.contributions.DownloadableContributionBuiltInAtTheBottomComparator;
@@ -84,11 +83,7 @@ public abstract class ContributionsIndex {
     return platforms.iterator().next();
   }
 
-  public List<ContributedPlatform> getInstalledPlatforms() {
-    return Lists.newLinkedList(Collections2.filter(getPlatforms(), new InstalledPredicate()));
-  }
-
-  public ContributedPlatform getInstalledPlatform(String packageName, String platformArch) {
+  public ContributedPlatform getInstalled(String packageName, String platformArch) {
     List<ContributedPlatform> installedPlatforms = new LinkedList<ContributedPlatform>(Collections2.filter(findPlatforms(packageName, platformArch), new InstalledPredicate()));
     Collections.sort(installedPlatforms, new DownloadableContributionBuiltInAtTheBottomComparator());
 

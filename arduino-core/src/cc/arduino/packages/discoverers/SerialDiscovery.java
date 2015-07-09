@@ -37,6 +37,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 
+import static processing.app.I18n._;
+
 public class SerialDiscovery implements Discovery {
 
   private Timer serialBoardsListerTimer;

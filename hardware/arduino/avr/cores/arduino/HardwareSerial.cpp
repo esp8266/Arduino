@@ -213,7 +213,6 @@ void HardwareSerial::flush()
 
 size_t HardwareSerial::write(uint8_t c)
 {
-  _written = true;
   // If the buffer and the data register is empty, just write the byte
   // to the data register and be done. This shortcut helps
   // significantly improve the effective datarate at high (>
@@ -244,8 +243,10 @@ size_t HardwareSerial::write(uint8_t c)
   _tx_buffer_head = i;
 	
   sbi(*_ucsrb, UDRIE0);
+  _written = true;
   
   return 1;
 }
+
 
 #endif // whole file

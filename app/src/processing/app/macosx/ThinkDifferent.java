@@ -83,7 +83,7 @@ public class ThinkDifferent {
       @Override
       public void handleQuitRequestWith(AppEvent.QuitEvent quitEvent, QuitResponse quitResponse) {
         if (waitForBase()) {
-          if (Base.INSTANCE.handleQuit()) {
+          if (Base.INSTANCE.handleClose(Base.INSTANCE.getActiveEditor())) {
             quitResponse.performQuit();
           } else {
             quitResponse.cancelQuit();
@@ -107,7 +107,7 @@ public class ThinkDifferent {
 
   private static void sleep(int millis) {
     try {
-      Thread.sleep(millis);
+      Thread.sleep(100);
     } catch (InterruptedException e) {
       //ignore
     }

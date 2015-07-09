@@ -2,7 +2,7 @@
   Web client
 
  This sketch connects to a website through a GSM shield. Specifically,
- this example downloads the URL "http://www.arduino.cc/asciilogo.txt" and
+ this example downloads the URL "http://arduino.cc/asciilogo.txt" and
  prints it to the Serial monitor.
 
  Circuit:
@@ -12,7 +12,7 @@
  created 8 Mar 2012
  by Tom Igoe
 
- http://www.arduino.cc/en/Tutorial/GSMExamplesWebClient
+ http://arduino.cc/en/Tutorial/GSMExamplesWebClient
 
  */
 

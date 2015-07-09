@@ -26,11 +26,10 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
-
 package cc.arduino.contributions.ui;
 
-import cc.arduino.contributions.DownloadableContribution;
 import cc.arduino.contributions.VersionComparator;
+import cc.arduino.contributions.packages.DownloadableContribution;
 import com.google.common.base.Predicate;
 
 import javax.swing.table.AbstractTableModel;

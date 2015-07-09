@@ -9,7 +9,7 @@
 
  This example code is in the public domain.
 
- http://www.arduino.cc/en/Tutorial/Process
+ http://arduino.cc/en/Tutorial/Process
 
  */
 
@@ -39,7 +39,7 @@ void runCurl() {
   // curl is command line program for transferring data using different internet protocols
   Process p;		// Create a process and call it "p"
   p.begin("curl");	// Process that launch the "curl" command
-  p.addParameter("http://www.arduino.cc/asciilogo.txt"); // Add the URL parameter to "curl"
+  p.addParameter("http://arduino.cc/asciilogo.txt"); // Add the URL parameter to "curl"
   p.run();		// Run the process and wait for its termination
 
   // Print arduino logo over the Serial

@@ -9,7 +9,10 @@ import processing.app.debug.TargetPlatform;
 import processing.app.legacy.PApplet;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static processing.app.I18n._;
 
@@ -29,8 +32,6 @@ public class CommandlineParser {
     }
   }
 
-  private final String[] args;
-  private final Map<String, ACTION> actions;
   private ACTION action = ACTION.GUI;
   private boolean doVerboseBuild = false;
   private boolean doVerboseUpload = false;
@@ -43,32 +44,39 @@ public class CommandlineParser {
   private String libraryToInstall;
   private List<String> filenames = new LinkedList<String>();
 
-  public CommandlineParser(String[] args) {
-    this.args = args;
+  public static CommandlineParser newCommandlineParser(String[] args) {
+    return new CommandlineParser(args);
+  }
 
-    actions = new HashMap<String, ACTION>();
+  private CommandlineParser(String[] args) {
+    parseArguments(args);
+    checkAction();
+  }
+
+  private void parseArguments(String[] args) {
+    // Map of possible actions and corresponding options
+    final Map<String, ACTION> actions = new HashMap<String, ACTION>();
     actions.put("--verify", ACTION.VERIFY);
     actions.put("--upload", ACTION.UPLOAD);
     actions.put("--get-pref", ACTION.GET_PREF);
     actions.put("--install-boards", ACTION.INSTALL_BOARD);
     actions.put("--install-library", ACTION.INSTALL_LIBRARY);
-  }
 
-  public void parseArgumentsPhase1() {
+    // Check if any files were passed in on the command line
     for (int i = 0; i < args.length; i++) {
       ACTION a = actions.get(args[i]);
       if (a != null) {
         if (action != ACTION.GUI && action != ACTION.NOOP) {
-          Set<String> strings = actions.keySet();
-          String[] valid = strings.toArray(new String[strings.size()]);
+          String[] valid = actions.keySet().toArray(new String[0]);
           String mess = I18n.format(_("Can only pass one of: {0}"), PApplet.join(valid, ", "));
           BaseNoGui.showError(null, mess, 3);
         }
         if (a == ACTION.GET_PREF) {
           i++;
-          if (i < args.length) {
-            getPref = args[i];
+          if (i >= args.length) {
+            BaseNoGui.showError(null, I18n.format(_("Argument required for {0}"), a.value), 3);
           }
+          getPref = args[i];
         }
         if (a == ACTION.INSTALL_BOARD) {
           i++;
@@ -132,6 +140,7 @@ public class CommandlineParser {
         i++;
         if (i >= args.length)
           BaseNoGui.showError(null, _("Argument required for --board"), 3);
+        processBoardArgument(args[i]);
         if (action == ACTION.GUI)
           action = ACTION.NOOP;
         continue;
@@ -191,23 +200,6 @@ public class CommandlineParser {
         BaseNoGui.showError(null, I18n.format(_("unknown option: {0}"), args[i]), 3);
 
       filenames.add(args[i]);
-    }
-
-    checkAction();
-  }
-
-  public void parseArgumentsPhase2() {
-    for (int i = 0; i < args.length; i++) {
-      if (args[i].equals("--board")) {
-        i++;
-        if (i >= args.length) {
-          BaseNoGui.showError(null, _("Argument required for --board"), 3);
-        }
-        processBoardArgument(args[i]);
-        if (action == ACTION.GUI) {
-          action = ACTION.NOOP;
-        }
-      }
     }
   }
 

@@ -13,7 +13,7 @@
 
  This example is in the public domain.
 
- http://www.arduino.cc/en/Tutorial/GSMExamplesReceiveSMS
+ http://arduino.cc/en/Tutorial/GSMExamplesReceiveSMS
 
 */
 

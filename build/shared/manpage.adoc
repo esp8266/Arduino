@@ -27,7 +27,7 @@ SYNOPSIS
 
 *arduino* [*--verify*|*--upload*] [*--board* __package__:__arch__:__board__[:__parameters__]] [*--port* __portname__] [*--pref* __name__=__value__] [*-v*|*--verbose*] [--preserve-temp-files] [__FILE.ino__]
 
-*arduino* [*--get-pref* [__preference__]]
+*arduino* [*--get-pref* __preference__]
 
 *arduino* [*--install-boards* __package name__:__platform architecture__[:__version__]]
 
@@ -63,11 +63,10 @@ ACTIONS
 *--upload*::
 	Build and upload the sketch.
 
-*--get-pref* [__preference__]::
+*--get-pref* __preference__::
 	Prints the value of the given preference to the standard output
 	stream. When the value does not exist, nothing is printed and
 	the exit status is set (see EXIT STATUS below).
-	If no preference is given as parameter, it prints all preferences.
 
 *--install-boards* __package name__:__platform architecture__[:__version__]::
 	Fetches available board support (platform) list and install the specified one, along with its related tools. If __version__ is omitted, the latest is installed. If a platform with the same version is already installed, nothing is installed and program exits with exit code 1. If a platform with a different version is already installed, it's replaced.
@@ -334,7 +333,7 @@ HISTORY
 
 RESOURCES
 ---------
-Web site: <http://www.arduino.cc/>
+Web site: <http://arduino.cc/>
 
 Help on projects and programming: <http://forum.arduino.cc/>
 

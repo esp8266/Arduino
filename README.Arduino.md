@@ -7,18 +7,9 @@ language. Arduino can be used to develop stand-alone interactive objects or
 can be connected to software on your computer (e.g. Flash, Processing, MaxMSP).
 The boards can be assembled by hand or purchased preassembled; the open-source
 IDE can be downloaded for free at http://arduino.cc/en/Main/Software
-* Arduino is an open-source physical computing platform based on a simple i/o
-board and a development environment that implements the Processing/Wiring
-language. Arduino can be used to develop stand-alone interactive objects or
-can be connected to software on your computer (e.g. Flash, Processing, MaxMSP).
-The boards can be assembled by hand or purchased preassembled; the open-source
-IDE can be downloaded for free at http://www.arduino.cc/en/Main/Software
 
 * For more information, see the website at: http://www.arduino.cc/
 or the forums at: http://arduino.cc/forum/  
-You can also follow Arduino on twitter at: https://twitter.com/arduino or like Arduino on Facebook at: https://www.facebook.com/official.arduino
-* For more information, see the website at: http://www.arduino.cc/
-or the forums at: http://www.arduino.cc/forum/  
 You can also follow Arduino on twitter at: https://twitter.com/arduino or like Arduino on Facebook at: https://www.facebook.com/official.arduino
 
 * To report a *bug* in the software or to request *a simple enhancement* go to:
@@ -51,3 +42,4 @@ Arduino uses the [GNU avr-gcc toolchain](http://gcc.gnu.org/wiki/avr-gcc), [avrd
 [Processing](http://www.processing.org) and [Wiring](http://wiring.org.co).
 
 Icon and about image designed by [ToDo](http://www.todo.to.it/)
+

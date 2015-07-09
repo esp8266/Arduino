@@ -1,0 +1,31 @@
+#######################################
+# Syntax Coloring Map Temboo
+#######################################
+
+#######################################
+# Class (KEYWORD1)
+#######################################
+
+Temboo	KEYWORD1
+
+#######################################
+# Datatypes (KEYWORD2)
+#######################################
+
+TembooChoreo	KEYWORD2
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+setAccountName	KEYWORD2
+setAppKeyName	KEYWORD2
+setAppKey	KEYWORD2
+setChoreo	KEYWORD2
+setCredential	KEYWORD2
+setSavedInputs	KEYWORD2
+addInput	KEYWORD2
+addOutputFilter	KEYWORD2
+setSettingsFileToWrite	KEYWORD2
+setSettingsFileToRead	KEYWORD2

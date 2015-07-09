@@ -12,7 +12,7 @@
 
 This example code is in the public domain.
 
- http://www.arduino.cc/en/Tutorial/Tone4
+ http://arduino.cc/en/Tutorial/Tone4
 
  */
 

@@ -22,7 +22,6 @@
 
 package processing.app;
 
-import org.apache.commons.compress.utils.IOUtils;
 import processing.app.legacy.PApplet;
 
 import javax.swing.*;
@@ -134,7 +133,9 @@ public class UpdateCheck implements Runnable {
       reader = new BufferedReader(new InputStreamReader(url.openStream()));
       return Integer.parseInt(reader.readLine());
     } finally {
-      IOUtils.closeQuietly(reader);
+      if (reader != null) {
+        reader.close();
+      }
     }
   }
 }

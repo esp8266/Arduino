@@ -21,7 +21,6 @@
  */
 package processing.app.helpers;
 
-import org.apache.commons.compress.utils.IOUtils;
 import processing.app.legacy.PApplet;
 
 import java.io.*;
@@ -73,7 +72,9 @@ public class PreferencesMap extends LinkedHashMap<String, String> {
       fileInputStream = new FileInputStream(file);
       load(fileInputStream);
     } finally {
-      IOUtils.closeQuietly(fileInputStream);
+      if (fileInputStream != null) {
+        fileInputStream.close();
+      }
     }
   }
 

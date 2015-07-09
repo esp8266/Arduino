@@ -36,7 +36,6 @@
 #include "osapi.h"
 #include "mem.h"
 #include "user_interface.h"
-#include "debug.h"
 
 void* malloc(size_t size) {
     size = ((size + 3) & ~((size_t)0x3));
@@ -87,11 +86,47 @@ int vsnprintf(char * buffer, size_t size, const char * format, va_list arg) {
     return ets_vsnprintf(buffer, size, format, arg);
 }
 
+int memcmp(const void *s1, const void *s2, size_t n) {
+    return ets_memcmp(s1, s2, n);
+}
+
+void* memcpy(void *dest, const void *src, size_t n) {
+    return ets_memcpy(dest, src, n);
+}
+
+void* memset(void *s, int c, size_t n) {
+    return ets_memset(s, c, n);
+}
+
+int strcmp(const char *s1, const char *s2) {
+    return ets_strcmp(s1, s2);
+}
+
+char* strcpy(char *dest, const char *src) {
+    return ets_strcpy(dest, src);
+}
+
+size_t strlen(const char *s) {
+    return ets_strlen(s);
+}
+
+int strncmp(const char *s1, const char *s2, size_t len) {
+    return ets_strncmp(s1, s2, len);
+}
+
+char* strncpy(char * dest, const char * src, size_t n) {
+    return ets_strncpy(dest, src, n);
+}
+
 size_t ICACHE_FLASH_ATTR strnlen(const char *s, size_t len) {
     // there is no ets_strnlen
     const char *cp;
     for (cp = s; len != 0 && *cp != '\0'; cp++, len--);
     return (size_t)(cp - s);
+}
+
+char* strstr(const char *haystack, const char *needle) {
+    return ets_strstr(haystack, needle);
 }
 
 char* ICACHE_FLASH_ATTR strchr(const char * str, int character) {
@@ -124,12 +159,13 @@ char* ICACHE_FLASH_ATTR strcat(char * dest, const char * src) {
 }
 
 char* ICACHE_FLASH_ATTR strncat(char * dest, const char * src, size_t n) {
-    size_t i;
-    size_t offset = strlen(dest);
-    for(i = 0; i < n && src[i]; i++) {
-        dest[i + offset] = src[i];
+    uint32_t offset = strlen(dest);
+    for(uint32_t i = 0; i < n; i++) {
+        *(dest + i + offset) = *(src + i);
+        if(*(src + i) == 0x00) {
+            break;
+        }
     }
-    dest[i + offset] = 0;
     return dest;
 }
 
@@ -435,60 +471,75 @@ int isblank(int c) {
 static int errno_var = 0;
 
 int* ICACHE_FLASH_ATTR __errno(void) {
-    DEBUGV("__errno is called last error: %d (not current)\n", errno_var);
+    os_printf("__errno is called last error: %d (not current)\n", errno_var);
     return &errno_var;
 }
 
+// ##########################################################################
+//                     __ieee754  functions
+// ##########################################################################
 
-/*
- * begin newlib/string/strlcpy.c
- * 
- * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-size_t ICACHE_FLASH_ATTR strlcpy(char* dst, const char* src, size_t size) {
-    const char *s = src;
-    size_t n = size;
-
-    if (n != 0 && --n != 0) {
-        do {
-            if ((*dst++ = *s++) == 0)
-                break;
-        } while (--n != 0);
-    }
-    
-    if (n == 0) {
-        if (size != 0)
-            *dst = 0;
-        while (*s++);
-    }
-    
-    return(s - src - 1);
+double ICACHE_FLASH_ATTR __ieee754_sinh(double x) {
+    return sinh(x);
 }
-/*
- * end of newlib/string/strlcpy.c
- */
+
+double ICACHE_FLASH_ATTR __ieee754_hypot(double x, double y) {
+    return hypot(x, y);
+}
+
+float ICACHE_FLASH_ATTR __ieee754_hypotf(float x, float y) {
+    return hypotf(x, y);
+}
+
+float ICACHE_FLASH_ATTR __ieee754_logf(float x) {
+    return logf(x);
+}
+
+double ICACHE_FLASH_ATTR __ieee754_log10(double x) {
+    return log10(x);
+}
+
+double ICACHE_FLASH_ATTR __ieee754_exp(double x) {
+    return exp(x);
+}
+
+double ICACHE_FLASH_ATTR __ieee754_cosh(double x) {
+    return cosh(x);
+}
+
+float ICACHE_FLASH_ATTR __ieee754_expf(float x) {
+    return expf(x);
+}
+
+float ICACHE_FLASH_ATTR __ieee754_log10f(float x) {
+    return log10f(x);
+}
+
+double ICACHE_FLASH_ATTR __ieee754_atan2(double x, double y) {
+    return atan2(x, y);
+}
+
+float ICACHE_FLASH_ATTR __ieee754_sqrtf(float x) {
+    return sqrtf(x);
+}
+
+float ICACHE_FLASH_ATTR __ieee754_sinhf(float x) {
+    return sinhf(x);
+}
+
+double ICACHE_FLASH_ATTR __ieee754_log(double x) {
+    return log(x);
+}
+
+double ICACHE_FLASH_ATTR __ieee754_sqrt(double x) {
+    return sqrt(x);
+}
+
+float ICACHE_FLASH_ATTR __ieee754_coshf(float x) {
+    return coshf(x);
+}
+
+float ICACHE_FLASH_ATTR __ieee754_atan2f(float x, float y) {
+    return atan2f(x, y);
+}
 

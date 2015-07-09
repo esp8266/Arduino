@@ -4,8 +4,6 @@ ESP8266 Multicast DNS (port of CC3000 Multicast DNS library)
 Version 1.1
 Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
 ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
-MDNS-SD Suport 2015 Hristo Gochkov
-
 
 License (MIT license):
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,18 +30,17 @@ License (MIT license):
 // - DNS request and response: http://www.ietf.org/rfc/rfc1035.txt
 // - Multicast DNS: http://www.ietf.org/rfc/rfc6762.txt
 
-#define LWIP_OPEN_SRC
-
+#define LWIP_INTERNAL
 #include "ESP8266mDNS.h"
 #include <functional>
   
-#include "debug.h"
-
-extern "C" {
+extern "C" 
+{
     #include "osapi.h"
     #include "ets_sys.h"
-    #include "user_interface.h"
 }
+
+#include "debug.h"
 
 #include "WiFiUdp.h"
 #include "lwip/opt.h"
@@ -55,63 +52,131 @@ extern "C" {
 
 
 
-//#define MDNS_DEBUG_ERR
-//#define MDNS_DEBUG_TX
-//#define MDNS_DEBUG_RX
 
-#define MDNS_NAME_REF   0xC000
+// #define MDNS_DEBUG
 
-#define MDNS_TYPE_AAAA  0x001C
-#define MDNS_TYPE_A     0x0001
-#define MDNS_TYPE_PTR   0x000C
-#define MDNS_TYPE_SRV   0x0021
-#define MDNS_TYPE_TXT   0x0010
-
-#define MDNS_CLASS_IN             0x0001
-#define MDNS_CLASS_IN_FLUSH_CACHE 0x8001
-
-#define MDNS_ANSWERS_ALL  0x0F
-#define MDNS_ANSWER_PTR   0x08
-#define MDNS_ANSWER_TXT   0x04
-#define MDNS_ANSWER_SRV   0x02
-#define MDNS_ANSWER_A     0x01
-
-#define _conn_read32() (((uint32_t)_conn->read() << 24) | ((uint32_t)_conn->read() << 16) | ((uint32_t)_conn->read() << 8) | _conn->read())
-#define _conn_read16() (((uint16_t)_conn->read() << 8) | _conn->read())
-#define _conn_read8() _conn->read()
-#define _conn_readS(b,l) _conn->read((char*)(b),l);
+#define HEADER_SIZE 12
+#define QDCOUNT_OFFSET 4
+#define A_RECORD_SIZE 14
+#define NSEC_RECORD_SIZE 20
+#define TTL_OFFSET 4
+#define IP_OFFSET 10
 
 static const IPAddress MDNS_MULTICAST_ADDR(224, 0, 0, 251);
 static const int MDNS_MULTICAST_TTL = 1;
 static const int MDNS_PORT = 5353;
 
-MDNSResponder::MDNSResponder() : _conn(0) { _services = 0; }
-MDNSResponder::~MDNSResponder() {}
 
-bool MDNSResponder::begin(const char* domain){ 
-  // Open the MDNS socket if it isn't already open.
-  
+MDNSResponder::MDNSResponder()
+  : _expected(NULL)
+  , _expectedLen(0)
+  , _response(NULL)
+  , _responseLen(0)
+  , _index(0)
+  , _conn(0)
+{ }
+
+MDNSResponder::~MDNSResponder() {
+  if (_expected) {
+    delete[] _expected;
+  }
+  if (_response) {
+    delete[] _response;
+  }
+}
+
+bool MDNSResponder::begin(const char* domain, IPAddress addr, uint32_t ttlSeconds)
+{ 
+  _localAddr = addr;
+  // Construct DNS request/response fully qualified domain name of form:
+  // <domain length>, <domain characters>, 5, "local"
   size_t n = strlen(domain);
-  if (n > 255) { // Can only handle domains that are 255 chars in length.
+  if (n > 255) {
+    // Can only handle domains that are 255 chars in length.
     return false;
   }
-  
+  _expectedLen = 12 + n;
+  if (_expected) {
+    delete[] _expected;
+  }
+  _expected = new uint8_t[_expectedLen];
+  _expected[0] = (uint8_t)n;
+
   // Copy in domain characters as lowercase
-  for (int i = 0; i < n; ++i)
-    _hostName[i] = tolower(domain[i]);
-  _hostName[n] = '\0';
-  
-  os_strcpy(_boardName, ARDUINO_BOARD);
+  for (int i = 0; i < n; ++i) {
+    _expected[1+i] = tolower(domain[i]);
+  }
+
+  // Values for: 
+  //  - 5 (length) 
+  //  - "local"
+  //  - 0x00 (end of domain)
+  //  - 0x00 0x01 (A record query)
+  //  - 0x00 0x01 (Class IN)
+  const uint8_t local[] = { 0x05, 0x6C, 0x6F, 0x63, 0x61, 0x6C, 0x00, 0x00, 0x01, 0x00, 0x01 };
+  memcpy(&_expected[1+n], local, 11);
+
+  // Construct DNS query response
+  // TODO: Move these to flash or just construct in code.
+  const uint8_t respHeader[] = { 0x00, 0x00,   // ID = 0
+                           0x84, 0x00,   // Flags = response + authoritative answer
+                           0x00, 0x00,   // Question count = 0
+                           0x00, 0x01,   // Answer count = 1
+                           0x00, 0x00,   // Name server records = 0
+                           0x00, 0x01    // Additional records = 1
+  };
+  // Generate positive response for IPV4 address
+  const uint8_t aRecord[] = { 0x00, 0x01,                // Type = 1, A record/IPV4 address
+                        0x80, 0x01,                // Class = Internet, with cache flush bit
+                        0x00, 0x00, 0x00, 0x00,    // TTL in seconds, to be filled in later
+                        0x00, 0x04,                // Length of record
+                        0x00, 0x00, 0x00, 0x00     // IP address, to be filled in later
+  };
+  // Generate negative response for IPV6 address (CC3000 doesn't support IPV6)
+  const uint8_t nsecRecord[] = {  0xC0, 0x0C,                // Name offset
+                            0x00, 0x2F,                // Type = 47, NSEC (overloaded by MDNS)
+                            0x80, 0x01,                // Class = Internet, with cache flush bit
+                            0x00, 0x00, 0x00, 0x00,    // TTL in seconds, to be filled in later
+                            0x00, 0x08,                // Length of record
+                            0xC0, 0x0C,                // Next domain = offset to FQDN
+                            0x00,                      // Block number = 0
+                            0x04,                      // Length of bitmap = 4 bytes
+                            0x40, 0x00, 0x00, 0x00     // Bitmap value = Only first bit (A record/IPV4) is set
+  }; 
+
+  // Allocate memory for response.
+  int queryFQDNLen = _expectedLen - 4;
+  _responseLen = HEADER_SIZE + queryFQDNLen + A_RECORD_SIZE + NSEC_RECORD_SIZE;
+  if (_response) {
+    delete[] _response;
+  }
+  _response = new uint8_t[_responseLen];
+
+  // Copy data into response.
+  memcpy(_response, respHeader, HEADER_SIZE);
+  memcpy(_response + HEADER_SIZE, _expected, queryFQDNLen);
+  uint8_t* records = _response + HEADER_SIZE + queryFQDNLen;
+  memcpy(records, aRecord, A_RECORD_SIZE);
+  memcpy(records + A_RECORD_SIZE, nsecRecord, NSEC_RECORD_SIZE);
+
+  // Add TTL to records.
+  uint8_t ttl[4] = { (uint8_t)(ttlSeconds >> 24), (uint8_t)(ttlSeconds >> 16), (uint8_t)(ttlSeconds >> 8), (uint8_t)ttlSeconds };
+  memcpy(records + TTL_OFFSET, ttl, 4);
+  memcpy(records + A_RECORD_SIZE + 2 + TTL_OFFSET, ttl, 4);
+
+  // Add IP address to response
+
+  uint32_t ipAddress = (uint32_t) addr;
+
+  records[IP_OFFSET + 3] = (uint8_t)(ipAddress >> 24);
+  records[IP_OFFSET + 2] = (uint8_t)(ipAddress >> 16);
+  records[IP_OFFSET + 1] = (uint8_t)(ipAddress >> 8);
+  records[IP_OFFSET + 0] = (uint8_t) ipAddress;
   
   // Open the MDNS socket if it isn't already open.
   if (!_conn) {
-    uint32_t ourIp = _getOurIp();
-    if(ourIp == 0){
-      return false;
-    }
-    
     ip_addr_t ifaddr;
-    ifaddr.addr = ourIp;
+    ifaddr.addr = (uint32_t) addr;
     ip_addr_t multicast_addr;
     multicast_addr.addr = (uint32_t) MDNS_MULTICAST_ADDR;
 
@@ -137,368 +202,55 @@ void MDNSResponder::update() {
   if (!_conn->next()) {
     return; 
   }
-  _parsePacket();
-}
 
-void MDNSResponder::addService(char *name, char *proto, uint16_t port){
-  if(_getServicePort(name, proto) != 0) return;
-  if(os_strlen(name) > 32 || os_strlen(proto) != 3) return; //bad arguments
-  struct MDNSService *srv = (struct MDNSService*)(os_malloc(sizeof(struct MDNSService)));
-  os_strcpy(srv->_name, name);
-  os_strcpy(srv->_proto, proto);
-  srv->_port = port;
-  srv->_next = 0;
-  if(_services) _services->_next = srv;
-  else _services = srv;
-}
+  // Read available data.
+  int n = _conn->getSize();
 
-uint16_t MDNSResponder::_getServicePort(char *name, char *proto){
-  MDNSService* servicePtr;
-  for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
-    if(servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
-      return servicePtr->_port;
-    }
-  }
-  return 0;
-}
+  _index = 0;
 
-uint32_t MDNSResponder::_getOurIp(){
-  if(wifi_get_opmode() & STATION_MODE){
-    struct ip_info staIpInfo;
-    wifi_get_ip_info(STATION_IF, &staIpInfo);
-    return staIpInfo.ip.addr;
-  }
-#ifdef MDNS_DEBUG_ERR
-    os_printf("ERR_NO_LOCAL_IP\n");
+#ifdef MDNS_DEBUG
+  Serial.println("{");
 #endif
-  return 0;
-}
+  // Look for domain name in request and respond with canned response if found.
+  for (int i = 0; i < n; ++i) {
+    uint8_t ch = tolower(_conn->read());
 
-void MDNSResponder::_parsePacket(){
-  int i;
-  char tmp;
-  bool serviceParsed = false;
-  bool protoParsed = false;
-  bool localParsed = false;
-  
-  char hostName[255];
-  uint8_t hostNameLen;
-  
-  char serviceName[32];
-  uint8_t serviceNameLen;
-  uint16_t servicePort;
-  
-  char protoName[32];
-  uint8_t protoNameLen;
-  
-  uint16_t packetHeader[6];
-  
-  for(i=0; i<6; i++) packetHeader[i] = _conn_read16();
+#ifdef MDNS_DEBUG
+    String str(ch, 16);
+    Serial.print("0x");
+    Serial.print(str);
+    Serial.print(", ");
+#endif
+    // Check character matches expected.
+    if (ch == _expected[_index]) 
+    {
+      _index++;
+      // Check if domain name was found and send a response.
+      if (_index == _expectedLen) {
+        // Send response to multicast address.
+#ifdef MDNS_DEBUG
+        Serial.print("responding, i=");
+        Serial.println(i);
+#endif
+        ip_addr_t multicast_addr;
+        multicast_addr.addr = (uint32_t) MDNS_MULTICAST_ADDR;
 
-  if((packetHeader[1] & 0x8000) != 0){ //not parsing responses yet
-    _conn->flush();
-    return;
-  }
-  
-  // PARSE REQUEST NAME
-  
-  hostNameLen = _conn_read8();
-  _conn_readS(hostName, hostNameLen);
-  hostName[hostNameLen] = '\0';
-  
-  if(hostName[0] == '_'){
-    serviceParsed = true;
-    memcpy(serviceName, hostName+1, hostNameLen);
-    serviceNameLen = hostNameLen-1;
-    hostNameLen = 0;
-  }
-  
-  if(hostNameLen > 0 && strcmp(_hostName, hostName) != 0){
-#ifdef MDNS_DEBUG_ERR
-    os_printf("ERR_NO_HOST: %s\n", hostName);
-#endif
-    _conn->flush();
-    return;
-  }
-  
-  if(!serviceParsed){
-    serviceNameLen = _conn_read8();
-    _conn_readS(serviceName, serviceNameLen);
-    serviceName[serviceNameLen] = '\0';
-    
-    if(serviceName[0] == '_'){
-      memcpy(serviceName, serviceName+1, serviceNameLen);
-      serviceNameLen--;
-      serviceParsed = true;
-    } else if(serviceNameLen == 5 && strcmp("local", serviceName) == 0){
-      tmp = _conn_read8();
-      if(tmp == 0){
-        serviceParsed = true;
-        serviceNameLen = 0;
-        protoParsed = true;
-        protoNameLen = 0;
-        localParsed = true;
-      } else {
-#ifdef MDNS_DEBUG_ERR
-        os_printf("ERR_FQDN: %s\n", serviceName);
-#endif
-        _conn->flush();
-        return;
-      }
-    } else {
-#ifdef MDNS_DEBUG_ERR
-      os_printf("ERR_SERVICE: %s\n", serviceName);
-#endif
-      _conn->flush();
-      return;
-    }
-  }
-  
-  if(!protoParsed){
-    protoNameLen = _conn_read8();
-    _conn_readS(protoName, protoNameLen);
-    protoName[protoNameLen] = '\0';
-    if(protoNameLen == 4 && protoName[0] == '_'){
-      memcpy(protoName, protoName+1, protoNameLen);
-      protoNameLen--;
-      protoParsed = true;
-    } else {
-#ifdef MDNS_DEBUG_ERR
-      os_printf("ERR_PROTO: %s\n", protoName);
-#endif
-      _conn->flush();
-      return;
-    }
-  }
-  
-  if(!localParsed){
-    char localName[32];
-    uint8_t localNameLen = _conn_read8();
-    _conn_readS(localName, localNameLen);
-    localName[localNameLen] = '\0';
-    tmp = _conn_read8();
-    if(localNameLen == 5 && strcmp("local", localName) == 0 && tmp == 0){
-      localParsed = true;
-    } else {
-#ifdef MDNS_DEBUG_ERR
-      os_printf("ERR_FQDN: %s\n", localName);
-#endif
-      _conn->flush();
-      return;
-    }
-  }
-  
-  if(serviceNameLen > 0 && protoNameLen > 0){
-    servicePort = _getServicePort(serviceName, protoName);
-    if(servicePort == 0){
-#ifdef MDNS_DEBUG_ERR
-      os_printf("ERR_NO_SERVICE: %s\n", serviceName);
-#endif
-      _conn->flush();
-      return;
-    }
-  } else if(serviceNameLen > 0 || protoNameLen > 0){
-#ifdef MDNS_DEBUG_ERR
-    os_printf("ERR_SERVICE_PROTO: %s\n", serviceName);
-#endif
-    _conn->flush();
-    return;
-  }
-  
-  // RESPOND
-  
-#ifdef MDNS_DEBUG_RX
-  os_printf("RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
-#endif
+        _conn->append(reinterpret_cast<const char*>(_response), _responseLen);
+        _conn->send();
 
-  uint16_t currentType;
-  uint16_t currentClass;
-  
-  int numQuestions = packetHeader[2];
-  if(numQuestions > 4) numQuestions = 4;
-  uint16_t questions[4];
-  int question = 0;
-
-  while(numQuestions--){
-    currentType = _conn_read16();
-    if(currentType & MDNS_NAME_REF){ //new header handle it better!
-      currentType = _conn_read16();
-    }
-    currentClass = _conn_read16();
-    if(currentClass & MDNS_CLASS_IN) questions[question++] = currentType;
-    
-    if(numQuestions > 0){
-      if(_conn_read16() != 0xC00C){//new question but for another host/service
-        _conn->flush();
-        numQuestions = 0;
+        _index = 0;
       }
     }
-    
-#ifdef MDNS_DEBUG_RX
-    os_printf("REQ: ");
-    if(hostNameLen > 0) os_printf("%s.", hostName);
-    if(serviceNameLen > 0) os_printf("_%s.", serviceName);
-    if(protoNameLen > 0) os_printf("_%s.", protoName);
-    os_printf("local. ");
-  
-    if(currentType == MDNS_TYPE_AAAA) os_printf("  AAAA ");
-    else if(currentType == MDNS_TYPE_A) os_printf("  A ");
-    else if(currentType == MDNS_TYPE_PTR) os_printf("  PTR ");
-    else if(currentType == MDNS_TYPE_SRV) os_printf("  SRV ");
-    else if(currentType == MDNS_TYPE_TXT) os_printf("  TXT ");
-    else os_printf("  0x%04X ", currentType);
-
-    if(currentClass == MDNS_CLASS_IN) os_printf("  IN ");
-    else if(currentClass == MDNS_CLASS_IN_FLUSH_CACHE) os_printf("  IN[F] ");
-    else os_printf("  0x%04X ", currentClass);
-  
-    os_printf("\n");
+    else if (ch == _expected[0]) {
+      // Found a character that doesn't match, but does match the start of the domain.
+      _index = 1;
+    }
+    else {
+      // Found a character that doesn't match the expected character or start of domain.
+      _index = 0;
+    }
+  }
+#ifdef MDNS_DEBUG
+  Serial.println("}");
 #endif
-  }
-  uint8_t responseMask = 0;
-  for(i=0;i<question;i++){
-    if(questions[i] == MDNS_TYPE_A) responseMask |= 0x1;
-    else if(questions[i] == MDNS_TYPE_SRV) responseMask |= 0x3;
-    else if(questions[i] == MDNS_TYPE_TXT) responseMask |= 0x4;
-    else if(questions[i] == MDNS_TYPE_PTR) responseMask |= 0xF;
-  }
-  
-  return _reply(responseMask, (serviceName), (protoName), servicePort);
 }
-
-
-
-void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint16_t port){
-  int i;
-  if(replyMask == 0) return;
-  
-#ifdef MDNS_DEBUG_TX
-    os_printf("TX: mask:%01X, service:%s, proto:%s, port:%u\n", replyMask, service, proto, port);
-#endif
-  
-  char nameLen = os_strlen(_hostName);
-  size_t serviceLen = os_strlen(service);
-  
-  uint8_t answerCount = 0;
-  for(i=0;i<4;i++){
-    if(replyMask & (1 << i)) answerCount++;
-  }
-
-  _conn->flush();
-  uint8_t head[12] = {
-    0x00, 0x00, //ID = 0
-    0x84, 0x00, //Flags = response + authoritative answer
-    0x00, 0x00, //Question count
-    0x00, answerCount, //Answer count
-    0x00, 0x00, //Name server records
-    0x00, 0x00, //Additional records
-  };
-  _conn->append(reinterpret_cast<const char*>(head), 12);
-  
-  if((replyMask & 0x8) == 0){
-    _conn->append(reinterpret_cast<const char*>(&nameLen), 1);
-    _conn->append(reinterpret_cast<const char*>(_hostName), nameLen);
-  }
-  
-  if(replyMask & 0xE){
-    uint8_t servHead[2] = {(uint8_t)(serviceLen+1), '_'};
-    uint8_t protoHead[2] = {0x4, '_'};
-    _conn->append(reinterpret_cast<const char*>(servHead), 2);
-    _conn->append(reinterpret_cast<const char*>(service), serviceLen);
-    _conn->append(reinterpret_cast<const char*>(protoHead), 2);
-    _conn->append(reinterpret_cast<const char*>(proto), 3);
-  }
-  
-  uint8_t local[7] = {
-    0x05, //strlen(_local)
-    0x6C, 0x6F, 0x63, 0x61, 0x6C, //local
-    0x00, //End of domain
-  };
-  _conn->append(reinterpret_cast<const char*>(local), 7);
-  
-  // PTR Response
-  if(replyMask & 0x8){
-    uint8_t ptr[10] = {
-      0x00, 0x0c, //PTR record query
-      0x00, 0x01, //Class IN
-      0x00, 0x00, 0x11, 0x94, //TTL 4500
-      0x00, (uint8_t)(3 + nameLen), //***DATA LEN (3 + strlen(host))
-    };
-    _conn->append(reinterpret_cast<const char*>(ptr), 10);
-    _conn->append(reinterpret_cast<const char*>(&nameLen), 1);
-    _conn->append(reinterpret_cast<const char*>(_hostName), nameLen);
-    uint8_t ptrTail[2] = {0xC0, 0x0C};
-    _conn->append(reinterpret_cast<const char*>(ptrTail), 2);
-  }
-  
-  // TXT Response
-  if(replyMask & 0x4){
-    if(replyMask & 0x8){//send the name
-      uint8_t txtHead[2] = {0xC0, (uint8_t)(36 + serviceLen)};
-      _conn->append(reinterpret_cast<const char*>(txtHead), 2);
-    }
-    
-    uint8_t boardNameLen = os_strlen(_boardName);
-    
-    uint8_t txt[24] = {
-      0x00, 0x10, //Type TXT
-      0x80, 0x01, //Class IN, with cache flush
-      0x00, 0x00, 0x11, 0x94, //TTL 4500
-      0x00, 0x0e, //DATA LEN
-      (uint8_t)(6 + boardNameLen), //strlen(board=) + strlen(boardName)
-      0x62, 0x6f, 0x61, 0x72, 0x64, 0x3d //board=
-    };
-    _conn->append(reinterpret_cast<const char*>(txt), 17);
-    _conn->append(reinterpret_cast<const char*>(_boardName), boardNameLen);
-    
-  }
-  
-  // SRV Response
-  if(replyMask & 0x2){
-    if(replyMask & 0xC){//send the name
-      uint8_t srvHead[2] = {0xC0, 0x0C};
-      if(replyMask & 0x8)
-        srvHead[1] = 36 + serviceLen;
-      _conn->append(reinterpret_cast<const char*>(srvHead), 2);
-    }
-    
-    uint8_t srv[16] = {
-      0x00, 0x21, //Type SRV
-      0x80, 0x01, //Class IN, with cache flush
-      0x00, 0x00, 0x00, 0x78, //TTL 120
-      0x00, (uint8_t)(9 + nameLen), //DATA LEN (9 + strlen(host))
-      0x00, 0x00, //Priority 0
-      0x00, 0x00, //Weight 0
-      (uint8_t)((port >> 8) & 0xFF), (uint8_t)(port & 0xFF)
-    };
-    _conn->append(reinterpret_cast<const char*>(srv), 16);
-    _conn->append(reinterpret_cast<const char*>(&nameLen), 1);
-    _conn->append(reinterpret_cast<const char*>(_hostName), nameLen);
-    uint8_t srvTail[2] = {0xC0, (uint8_t)(20 + serviceLen + nameLen)};
-    if(replyMask & 0x8)
-      srvTail[1] = 19 + serviceLen;
-    _conn->append(reinterpret_cast<const char*>(srvTail), 2);
-  }
-  
-  // A Response
-  if(replyMask & 0x1){
-    uint32_t ip = _getOurIp();
-    if(replyMask & 0x2){//send the name (no compression for now)
-      _conn->append(reinterpret_cast<const char*>(&nameLen), 1);
-      _conn->append(reinterpret_cast<const char*>(_hostName), nameLen);
-      _conn->append(reinterpret_cast<const char*>(local), 7);
-    }
-    
-    uint8_t aaa[14] = {
-      0x00, 0x01, //TYPE A
-      0x80, 0x01, //Class IN, with cache flush
-      0x00, 0x00, 0x00, 0x78, //TTL 120
-      0x00, 0x04, //DATA LEN
-      (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF)
-    };
-    _conn->append(reinterpret_cast<const char*>(aaa), 14);
-  }
-  _conn->send();
-}
-
-MDNSResponder MDNS = MDNSResponder();

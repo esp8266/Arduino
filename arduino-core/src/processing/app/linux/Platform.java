@@ -23,12 +23,11 @@
 package processing.app.linux;
 
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
-import org.apache.commons.exec.PumpStreamHandler;
 import processing.app.PreferencesData;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PConstants;
+import processing.app.tools.CollectStdOutExecutor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -125,8 +124,7 @@ public class Platform extends processing.app.Platform {
   public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
     assert packages != null;
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new DefaultExecutor();
-    executor.setStreamHandler(new PumpStreamHandler(baos, null));
+    Executor executor = new CollectStdOutExecutor(baos);
 
     try {
       CommandLine toDevicePath = CommandLine.parse("udevadm info -q path -n " + serial);

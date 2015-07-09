@@ -7,7 +7,7 @@
  Circuit:
  * GSM shield
  * Voice circuit. Refer to to the GSM shield getting started guide
-   at http://www.arduino.cc/en/Guide/ArduinoGSMShield#toc11
+   at http://arduino.cc/en/Guide/ArduinoGSMShield#toc11
  * SIM card that can accept voice calls
 
  With no voice circuit the call will connect, but will not send or receive sound
@@ -17,7 +17,7 @@
 
  This example is in the public domain.
 
- http://www.arduino.cc/en/Tutorial/GSMExamplesReceiveVoiceCall
+ http://arduino.cc/en/Tutorial/GSMExamplesReceiveVoiceCall
 
  */
 

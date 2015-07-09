@@ -74,9 +74,5 @@ public class SystemProfilerParserTest {
     assertEquals("0X2341_0X8036", new SystemProfilerParser().extractVIDAndPID(output, "/dev/tty.usbmodem24131"));
     assertEquals("0X0403_0X6015", new SystemProfilerParser().extractVIDAndPID(output, "/dev/cu.usbserial-DN0031EV"));
     assertEquals("0X0403_0X6015", new SystemProfilerParser().extractVIDAndPID(output, "/dev/tty.usbserial-DN0031EV"));
-
-    output = TestHelper.inputStreamToString(SystemProfilerParserTest.class.getResourceAsStream("system_profiler_output8.txt"));
-
-    assertEquals("0X03EB_0X2157", new SystemProfilerParser().extractVIDAndPID(output, "/dev/tty.usbmodemfd132"));
   }
 }

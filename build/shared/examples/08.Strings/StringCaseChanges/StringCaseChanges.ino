@@ -7,7 +7,7 @@
  modified 2 Apr 2012
  by Tom Igoe
 
- http://www.arduino.cc/en/Tutorial/StringCaseChanges
+ http://arduino.cc/en/Tutorial/StringCaseChanges
 
  This example code is in the public domain.
  */

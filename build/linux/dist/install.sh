@@ -13,5 +13,5 @@ rm arduino.desktop-bak
 cp arduino.desktop ~/.local/share/applications/arduino.desktop
 cp arduino.desktop ~/Desktop/arduino.desktop
 
-echo "Installed Arduino IDE icons on menu and desktop !"
+echo "Instaled Arduino IDE icons on menu and desktop !"
 

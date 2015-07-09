@@ -28,7 +28,6 @@ void setup() {
 }
 
 void loop() {
-  serialEvent(); //call the function
   // print the string when a newline arrives:
   if (stringComplete) {
     Serial.println(inputString);

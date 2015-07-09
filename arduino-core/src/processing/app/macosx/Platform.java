@@ -25,23 +25,19 @@ package processing.app.macosx;
 import cc.arduino.packages.BoardPort;
 import com.apple.eio.FileManager;
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
-import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.StringUtils;
 import processing.app.debug.TargetPackage;
 import processing.app.legacy.PApplet;
 import processing.app.legacy.PConstants;
+import processing.app.tools.CollectStdOutExecutor;
 
 import java.awt.*;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -61,8 +57,6 @@ public class Platform extends processing.app.Platform {
   }
 
   public void init() throws IOException {
-    super.init();
-
     System.setProperty("apple.laf.useScreenMenuBar", "true");
 
     discoverRealOsArch();
@@ -71,8 +65,7 @@ public class Platform extends processing.app.Platform {
   private void discoverRealOsArch() throws IOException {
     CommandLine uname = CommandLine.parse("uname -m");
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new DefaultExecutor();
-    executor.setStreamHandler(new PumpStreamHandler(baos, null));
+    CollectStdOutExecutor executor = new CollectStdOutExecutor(baos);
     executor.execute(uname);
     osArch = StringUtils.trim(new String(baos.toByteArray()));
   }
@@ -101,13 +94,45 @@ public class Platform extends processing.app.Platform {
 
 
   public void openURL(String url) throws Exception {
-    Desktop desktop = Desktop.getDesktop();
-    if (url.startsWith("http") || url.startsWith("file:")) {
-      desktop.browse(new URI(url));
+    if (PApplet.javaVersion < 1.6f) {
+      if (url.startsWith("http")) {
+        // formerly com.apple.eio.FileManager.openURL(url);
+        // but due to deprecation, instead loading dynamically
+        try {
+          Class<?> eieio = Class.forName("com.apple.eio.FileManager");
+          Method openMethod =
+            eieio.getMethod("openURL", new Class[] { String.class });
+          openMethod.invoke(null, new Object[] { url });
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      } else {
+      // Assume this is a file instead, and just open it.
+      // Extension of http://dev.processing.org/bugs/show_bug.cgi?id=1010
+      PApplet.open(url);
+      }
     } else {
-      desktop.open(new File(url));
+      try {
+        Class<?> desktopClass = Class.forName("java.awt.Desktop");
+        Method getMethod = desktopClass.getMethod("getDesktop");
+        Object desktop = getMethod.invoke(null, new Object[] { });
+
+        // for Java 1.6, replacing with java.awt.Desktop.browse() 
+        // and java.awt.Desktop.open()
+        if (url.startsWith("http")) {  // browse to a location
+          Method browseMethod =
+            desktopClass.getMethod("browse", new Class[] { URI.class });
+          browseMethod.invoke(desktop, new Object[] { new URI(url) });
+        } else {  // open a file
+          Method openMethod =
+            desktopClass.getMethod("open", new Class[] { File.class });
+          openMethod.invoke(desktop, new Object[] { new File(url) });
+          }
+      } catch (Exception e) {
+        e.printStackTrace();
+        }
+      }
     }
-  }
 
 
   public boolean openFolderAvailable() {
@@ -127,13 +152,13 @@ public class Platform extends processing.app.Platform {
   // Some of these are supposedly constants in com.apple.eio.FileManager,
   // however they don't seem to link properly from Eclipse.
 
-  private static final int kDocumentsFolderType =
+  static final int kDocumentsFolderType =
     ('d' << 24) | ('o' << 16) | ('c' << 8) | 's';
   //static final int kPreferencesFolderType =
   //  ('p' << 24) | ('r' << 16) | ('e' << 8) | 'f';
-  private static final int kDomainLibraryFolderType =
+  static final int kDomainLibraryFolderType =
     ('d' << 24) | ('l' << 16) | ('i' << 8) | 'b';
-  private static final short kUserDomain = -32763;
+  static final short kUserDomain = -32763;
 
 
   // apple java extensions documentation
@@ -150,12 +175,12 @@ public class Platform extends processing.app.Platform {
   //   /Versions/Current/Frameworks/CarbonCore.framework/Headers/
 
 
-  private String getLibraryFolder() throws FileNotFoundException {
+  protected String getLibraryFolder() throws FileNotFoundException {
     return FileManager.findFolder(kUserDomain, kDomainLibraryFolderType);
   }
 
 
-  private String getDocumentsFolder() throws FileNotFoundException {
+  protected String getDocumentsFolder() throws FileNotFoundException {
     return FileManager.findFolder(kUserDomain, kDocumentsFolderType);
   }
 
@@ -168,7 +193,7 @@ public class Platform extends processing.app.Platform {
   public Map<String, Object> resolveDeviceAttachedTo(String serial, Map<String, TargetPackage> packages, String devicesListOutput) {
     assert packages != null;
     if (devicesListOutput == null) {
-      return super.resolveDeviceAttachedTo(serial, packages, null);
+      return super.resolveDeviceAttachedTo(serial, packages, devicesListOutput);
     }
 
     try {
@@ -187,8 +212,7 @@ public class Platform extends processing.app.Platform {
   @Override
   public String preListAllCandidateDevices() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    Executor executor = new DefaultExecutor();
-    executor.setStreamHandler(new PumpStreamHandler(baos, null));
+    Executor executor = new CollectStdOutExecutor(baos);
 
     try {
       CommandLine toDevicePath = CommandLine.parse("/usr/sbin/system_profiler SPUSBDataType");

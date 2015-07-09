@@ -7,7 +7,7 @@
  modified 2 Apr 2012
  by Zach Eveland
 
- http://www.arduino.cc/en/Tutorial/StringSubstring
+ http://arduino.cc/en/Tutorial/StringSubstring
 
  This example code is in the public domain.
  */

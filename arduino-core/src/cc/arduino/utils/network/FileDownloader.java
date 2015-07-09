@@ -26,17 +26,18 @@
  * invalidate any other reasons why the executable file might be covered by
  * the GNU General Public License.
  */
-
 package cc.arduino.utils.network;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.compress.utils.IOUtils;
+import processing.app.PreferencesData;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.Observable;
 
 public class FileDownloader extends Observable {
@@ -120,9 +121,29 @@ public class FileDownloader extends Observable {
 
       setStatus(Status.CONNECTING);
 
-      Proxy proxy = ProxySelector.getDefault().select(downloadUrl.toURI()).get(0);
+      System.getProperties().remove("http.proxyHost");
+      System.getProperties().remove("http.proxyPort");
+      System.getProperties().remove("https.proxyHost");
+      System.getProperties().remove("https.proxyPort");
+      System.getProperties().remove("http.proxyUser");
+      System.getProperties().remove("http.proxyPassword");
 
-      HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection(proxy);
+      if (PreferencesData.has("proxy.http.server") && PreferencesData.get("proxy.http.server") != null && !PreferencesData.get("proxy.http.server").equals("")) {
+        System.getProperties().put("http.proxyHost", PreferencesData.get("proxy.http.server"));
+        System.getProperties().put("http.proxyPort", PreferencesData.get("proxy.http.port"));
+      }
+      if (PreferencesData.has("proxy.https.server") && PreferencesData.get("proxy.https.server") != null && !PreferencesData.get("proxy.https.server").equals("")) {
+        System.getProperties().put("https.proxyHost", PreferencesData.get("proxy.https.server"));
+        System.getProperties().put("https.proxyPort", PreferencesData.get("proxy.https.port"));
+      }
+      if (PreferencesData.has("proxy.user") && PreferencesData.get("proxy.user") != null && !PreferencesData.get("proxy.user").equals("")) {
+        System.getProperties().put("http.proxyUser", PreferencesData.get("proxy.user"));
+        System.getProperties().put("http.proxyPassword", PreferencesData.get("proxy.password"));
+        System.getProperties().put("https.proxyUser", PreferencesData.get("proxy.user"));
+        System.getProperties().put("https.proxyPassword", PreferencesData.get("proxy.password"));
+      }
+
+      HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
 
       if (downloadUrl.getUserInfo() != null) {
         String auth = "Basic " + new String(new Base64().encode(downloadUrl.getUserInfo().getBytes()));
@@ -138,12 +159,10 @@ public class FileDownloader extends Observable {
       int resp = connection.getResponseCode();
 
       if (resp == HttpURLConnection.HTTP_MOVED_PERM || resp == HttpURLConnection.HTTP_MOVED_TEMP) {
-        URL newUrl = new URL(connection.getHeaderField("Location"));
-
-        proxy = ProxySelector.getDefault().select(newUrl.toURI()).get(0);
+        String newUrl = connection.getHeaderField("Location");
 
         // open the new connnection again
-        connection = (HttpURLConnection) newUrl.openConnection(proxy);
+        connection = (HttpURLConnection) new URL(newUrl).openConnection();
         if (downloadUrl.getUserInfo() != null) {
           String auth = "Basic " + new String(new Base64().encode(downloadUrl.getUserInfo().getBytes()));
           connection.setRequestProperty("Authorization", auth);
@@ -157,7 +176,7 @@ public class FileDownloader extends Observable {
       }
 
       if (resp < 200 || resp >= 300) {
-        throw new IOException("Received invalid http status code from server: " + resp);
+        throw new IOException("Recevied invalid http status code from server: " + resp);
       }
 
       // Check for valid content length.
@@ -202,10 +221,22 @@ public class FileDownloader extends Observable {
       setError(e);
 
     } finally {
-      IOUtils.closeQuietly(file);
+      if (file != null) {
+        try {
+          file.close();
+        } catch (Exception e) {
+          //ignore
+        }
+      }
 
       synchronized (this) {
-        IOUtils.closeQuietly(stream);
+        if (stream != null) {
+          try {
+            stream.close();
+          } catch (Exception e) {
+            //ignore
+          }
+        }
       }
     }
   }

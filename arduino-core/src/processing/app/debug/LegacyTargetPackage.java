@@ -51,7 +51,7 @@ public class LegacyTargetPackage implements TargetPackage {
         TargetPlatform platform = new LegacyTargetPlatform(arch, subFolder, this);
         platforms.put(arch, platform);
       } catch (TargetPlatformException e) {
-        System.err.println(e.getMessage());
+        System.out.println(e.getMessage());
       }
     }
 

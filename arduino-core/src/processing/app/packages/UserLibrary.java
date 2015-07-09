@@ -56,13 +56,13 @@ public class UserLibrary extends ContributedLibrary {
   private List<String> declaredTypes;
 
   private static final List<String> MANDATORY_PROPERTIES = Arrays
-    .asList("name", "version", "author", "maintainer",
-      "sentence", "paragraph", "url");
+          .asList(new String[]{"name", "version", "author", "maintainer",
+                  "sentence", "paragraph", "url"});
 
-  private static final List<String> CATEGORIES = Arrays.asList(
-    "Display", "Communication", "Signal Input/Output", "Sensors",
-    "Device Control", "Timing", "Data Storage", "Data Processing", "Other",
-    "Uncategorized");
+  private static final List<String> CATEGORIES = Arrays.asList(new String[]{
+          "Display", "Communication", "Signal Input/Output", "Sensors",
+          "Device Control", "Timing", "Data Storage", "Data Processing", "Other",
+          "Uncategorized"});
 
   public static UserLibrary create(File libFolder) throws IOException {
     // Parse metadata
@@ -83,7 +83,8 @@ public class UserLibrary extends ContributedLibrary {
     // "arch" folder no longer supported
     File archFolder = new File(libFolder, "arch");
     if (archFolder.isDirectory())
-      throw new IOException("'arch' folder is no longer supported! See http://goo.gl/gfFJzU for more information");
+      throw new IOException("'arch' folder is no longer supported! See "
+              + "http://goo.gl/gfFJzU for more information");
 
     // Check mandatory properties
     for (String p : MANDATORY_PROPERTIES)
@@ -100,7 +101,8 @@ public class UserLibrary extends ContributedLibrary {
 
       File utilFolder = new File(libFolder, "utility");
       if (utilFolder.exists() && utilFolder.isDirectory()) {
-        throw new IOException("Library can't use both 'src' and 'utility' folders.");
+        throw new IOException(
+                "Library can't use both 'src' and 'utility' folders.");
       }
     } else {
       // Layout with source code on library's root and "utility" folders
@@ -108,14 +110,11 @@ public class UserLibrary extends ContributedLibrary {
     }
 
     // Warn if root folder contains development leftovers
-    File[] files = libFolder.listFiles();
-    if (files == null) {
-      throw new IOException("Unable to list files of library in " + libFolder);
-    }
-    for (File file : files) {
-      if (file.isDirectory() && FileUtils.isSCCSOrHiddenFile(file)) {
-        if (!FileUtils.isSCCSFolder(file) && FileUtils.isHiddenFile(file)) {
+    for (File file : libFolder.listFiles()) {
+      if (file.isDirectory()) {
+        if (FileUtils.isSCCSOrHiddenFile(file)) {
           System.out.println("WARNING: Spurious " + file.getName() + " folder in '" + properties.get("name") + "' library");
+          continue;
         }
       }
     }
@@ -132,7 +131,8 @@ public class UserLibrary extends ContributedLibrary {
     if (category == null)
       category = "Uncategorized";
     if (!CATEGORIES.contains(category)) {
-      System.out.println("WARNING: Category '" + category + "' in library " + properties.get("name") + " is not valid. Setting to 'Uncategorized'");
+      System.out.println("WARNING: Category '" + category + "' in library " +
+              properties.get("name") + " is not valid. Setting to 'Uncategorized'");
       category = "Uncategorized";
     }
 

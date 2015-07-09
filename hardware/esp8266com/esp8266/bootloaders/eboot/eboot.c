@@ -76,31 +76,38 @@ int copy_raw(const uint32_t src_addr,
              const uint32_t dst_addr, 
              const uint32_t size)
 {
+    ets_putc('\n');
+    ets_putc('c');
+    ets_putc('p');
+    ets_putc('\n');
     // require regions to be aligned
     if (src_addr & 0xfff != 0 ||
         dst_addr & 0xfff != 0) {
         return 1;
     }
 
-    const uint32_t buffer_size = FLASH_SECTOR_SIZE;
+    if (SPIEraseAreaEx(dst_addr, size)) {
+        return 2;
+    }
+
+    const uint32_t buffer_size = 4096;
     uint8_t buffer[buffer_size];
-    uint32_t left = ((size+buffer_size-1) & ~(buffer_size-1));
+
+    const uint32_t end = src_addr + size;
     uint32_t saddr = src_addr;
     uint32_t daddr = dst_addr;
-    
-    while (left) {
-      if (SPIEraseSector(daddr/buffer_size)) {
-          return 2;
-      }
-      if (SPIRead(saddr, buffer, buffer_size)) {
-        return 3;
-      }
-      if (SPIWrite(daddr, buffer, buffer_size)) {
-        return 4;
-      }
-      saddr += buffer_size;
-      daddr += buffer_size;
-      left  -= buffer_size;
+    uint32_t left = size;
+    while (saddr < end) {
+        uint32_t will_copy = (left < buffer_size) ? left : buffer_size;
+        if (SPIRead(saddr, buffer, will_copy)) {
+            return 3;
+        }
+        if (SPIWrite(daddr, buffer, will_copy)) {
+            return 4;
+        }
+        saddr += will_copy;
+        daddr += will_copy;
+        left  -= will_copy;
     }
 
     return 0;
@@ -116,16 +123,14 @@ void main()
     if (eboot_command_read(&cmd)) {
         cmd.action = ACTION_LOAD_APP;
         cmd.args[0] = 0;
-        ets_putc('~');
+        ets_putc('e');
     } else {
         ets_putc('@');
     }
     eboot_command_clear();
-    
+
     if (cmd.action == ACTION_COPY_RAW) {
-        ets_putc('c'); ets_putc('p'); ets_putc(':');
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2]);
-        ets_putc('0'+res); ets_putc('\n');
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
             cmd.args[0] = cmd.args[1];
@@ -133,14 +138,15 @@ void main()
     }
 
     if (cmd.action == ACTION_LOAD_APP) {
-      ets_putc('l'); ets_putc('d'); ets_putc('\n');
-      res = load_app_from_flash_raw(cmd.args[0]);
-      //we will get to this only on load fail
-      ets_putc('e'); ets_putc(':'); ets_putc('0'+res); ets_putc('\n');
+        res = load_app_from_flash_raw(cmd.args[0]);
     }
 
     if (res) {
-      SWRST;
+        ets_putc('\n');
+        ets_putc('#');
+        ets_putc('0' + res);
+        ets_putc('\n');
+        SWRST;
     }
 
     while(true){}

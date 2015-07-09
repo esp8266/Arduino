@@ -77,8 +77,12 @@ public class GPGDetachedSignatureVerifier {
 
       return pgpSignature.verify();
     } finally {
-      IOUtils.closeQuietly(signatureInputStream);
-      IOUtils.closeQuietly(signedFileInputStream);
+      if (signatureInputStream != null) {
+        signatureInputStream.close();
+      }
+      if (signedFileInputStream != null) {
+        signedFileInputStream.close();
+      }
     }
   }
 
@@ -88,7 +92,9 @@ public class GPGDetachedSignatureVerifier {
       keyIn = new BufferedInputStream(new FileInputStream(file));
       return readPublicKey(keyIn, keyId);
     } finally {
-      IOUtils.closeQuietly(keyIn);
+      if (keyIn != null) {
+        keyIn.close();
+      }
     }
   }
 

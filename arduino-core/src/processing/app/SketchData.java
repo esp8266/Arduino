@@ -1,18 +1,16 @@
 package processing.app;
 
-import com.google.common.collect.FluentIterable;
-
 import static processing.app.I18n._;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class SketchData {
-
-  public static final List<String> SKETCH_EXTENSIONS = Arrays.asList("ino", "pde");
-  public static final List<String> OTHER_ALLOWED_EXTENSIONS = Arrays.asList("c", "cpp", "h", "s");
-  public static final List<String> EXTENSIONS = new LinkedList<String>(FluentIterable.from(SKETCH_EXTENSIONS).append(OTHER_ALLOWED_EXTENSIONS).toList());
 
   /** main pde file for this sketch. */
   private File primaryFile;
@@ -97,9 +95,6 @@ public class SketchData {
 
     // get list of files in the sketch folder
     String list[] = folder.list();
-    if (list == null) {
-      throw new IOException("Unable to list files from " + folder);
-    }
 
     // reset these because load() may be called after an
     // external editor event. (fix for 0099)
@@ -107,6 +102,8 @@ public class SketchData {
     clearCodeDocs();
 //    data.setCodeDocs(codeDocs);
     
+    List<String> extensions = getExtensions();
+
     for (String filename : list) {
       // Ignoring the dot prefix files is especially important to avoid files
       // with the ._ prefix on Mac OS X. (You'll see this with Mac files on
@@ -119,7 +116,7 @@ public class SketchData {
       // figure out the name without any extension
       String base = filename;
       // now strip off the .pde and .java extensions
-      for (String extension : EXTENSIONS) {
+      for (String extension : extensions) {
         if (base.toLowerCase().endsWith("." + extension)) {
           base = base.substring(0, base.length() - (extension.length() + 1));
 
@@ -171,6 +168,13 @@ public class SketchData {
    */
   public String getDefaultExtension() {
     return "ino";
+  }
+
+  /**
+   * Returns a String[] array of proper extensions.
+   */
+  public List<String> getExtensions() {
+    return Arrays.asList("ino", "pde", "c", "cpp", "h");
   }
 
   /**

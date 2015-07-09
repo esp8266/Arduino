@@ -26,12 +26,11 @@
 #include "Client.h"
 #include "IPAddress.h"
 #include <memory>
-#include "include/slist.h"
 
 class ClientContext;
 class WiFiServer;
 
-class WiFiClient : public Client, public SList<WiFiClient> {
+class WiFiClient : public Client {
 protected:
   WiFiClient(ClientContext* client);
 
@@ -90,8 +89,6 @@ public:
 
   using Print::write;
 
-  static void stopAll();
-
 private:
 
   static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
@@ -102,6 +99,7 @@ private:
 
   ClientContext* _client;
   static uint16_t _localPort;
+
 };
 
 

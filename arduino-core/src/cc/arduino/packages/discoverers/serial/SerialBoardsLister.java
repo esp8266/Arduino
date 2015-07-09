@@ -41,6 +41,8 @@ import java.util.*;
 
 public class SerialBoardsLister extends TimerTask {
 
+  private static final int MAX_TIME_AWAITING_FOR_PACKAGES = 5000;
+
   private final SerialDiscovery serialDiscovery;
 
   public SerialBoardsLister(SerialDiscovery serialDiscovery) {
@@ -53,11 +55,13 @@ public class SerialBoardsLister extends TimerTask {
 
   @Override
   public void run() {
-    while (BaseNoGui.packages == null) {
+    int sleptFor = 0;
+    while (BaseNoGui.packages == null && sleptFor <= MAX_TIME_AWAITING_FOR_PACKAGES) {
       try {
         Thread.sleep(1000);
+        sleptFor += 1000;
       } catch (InterruptedException e) {
-        // noop
+        e.printStackTrace();
       }
     }
 

@@ -32,7 +32,6 @@ package cc.arduino.packages.ssh;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.Session;
-import org.apache.commons.compress.utils.IOUtils;
 
 import java.io.*;
 
@@ -62,8 +61,12 @@ public class SCP extends SSH {
   }
 
   public void close() throws IOException {
-    IOUtils.closeQuietly(out);
-    IOUtils.closeQuietly(in);
+    if (out != null) {
+      out.close();
+    }
+    if (in != null) {
+      in.close();
+    }
     if (channel != null) {
       channel.disconnect();
     }
@@ -115,7 +118,9 @@ public class SCP extends SSH {
       buf[0] = 0;
       out.write(buf, 0, 1);
     } finally {
-      IOUtils.closeQuietly(fis);
+      if (fis != null) {
+        fis.close();
+      }
     }
 
     ensureAcknowledged();

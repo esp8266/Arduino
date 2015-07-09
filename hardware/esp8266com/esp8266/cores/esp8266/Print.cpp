@@ -47,8 +47,8 @@ size_t ICACHE_FLASH_ATTR Print::write(const uint8_t *buffer, size_t size) {
 size_t Print::printf(const char *format, ...) {
   va_list arg;
   va_start(arg, format);
-  char temp[1460];
-  size_t len = ets_vsnprintf(temp, 1460, format, arg);
+  char temp[256];
+  size_t len = ets_vsnprintf(temp, 256, format, arg);
   len = print(temp);
   va_end(arg);
   return len;
@@ -127,7 +127,8 @@ size_t ICACHE_FLASH_ATTR Print::print(const Printable& x) {
 }
 
 size_t ICACHE_FLASH_ATTR Print::println(void) {
-    return print("\r\n");
+    size_t n = print("\r\n");
+    return n;
 }
 
 size_t ICACHE_FLASH_ATTR Print::println(const String &s) {

@@ -10,7 +10,7 @@
 
  Created 15 April 2013 by Scott Fitzgerald
 
- http://www.arduino.cc/en/Tutorial/TFTEtchASketch
+ http://arduino.cc/en/Tutorial/TFTEtchASketch
 
  */
 

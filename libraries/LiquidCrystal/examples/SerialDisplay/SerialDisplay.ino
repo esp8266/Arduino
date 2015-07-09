@@ -32,7 +32,7 @@
 
  This example code is in the public domain.
 
- http://www.arduino.cc/en/Tutorial/LiquidCrystalSerial
+ http://arduino.cc/en/Tutorial/LiquidCrystalSerial
  */
 
 // include the library code:

@@ -32,9 +32,6 @@ extern "C" {
 #include "WiFiClient.h"
 #include "WiFiServer.h"
 
-#define WIFI_SCAN_RUNNING   (-1)
-#define WIFI_SCAN_FAILD     (-2)
-
 enum WiFiMode { WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3 };
 
 class ESP8266WiFiClass
@@ -75,9 +72,8 @@ public:
      * param ssid: Pointer to the SSID string.
      * param passphrase: Pointer to passphrase, 8 characters min.
      * param channel: WiFi channel number, 1 - 13.
-     * param ssid_hidden: Network cloaking? 0 = broadcast SSID, 1 = hide SSID
      */
-    void softAP(const char* ssid, const char* passphrase, int channel = 1, int ssid_hidden = 0);
+    void softAP(const char* ssid, const char* passphrase, int channel = 1);
 
     /* Change Ip configuration settings disabling the dhcp client
         *
@@ -109,7 +105,7 @@ public:
      *
      * return: one value of wl_status_t enum
      */
-    int disconnect(bool wifioff = false);
+    int disconnect(void);
 
     /*
      * Get the station interface MAC address.
@@ -193,26 +189,12 @@ public:
 
     int32_t RSSI();
 
-
-    /*
-     * called to get the scan state in Async mode
-     *
-     * return -1 if scan not fin
-     * return -2 if scan not triggered
-     */
-    int8_t scanComplete();
-
-    /*
-     * delete last scan result from RAM
-     */
-    void scanDelete();
-
     /*
      * Start scan WiFi networks available
      *
      * return: Number of discovered networks
      */
-    int8_t scanNetworks(bool async = false);
+    int8_t scanNetworks();
 
     /*
      * Return the SSID discovered during the network scan.
@@ -301,26 +283,6 @@ public:
     int hostByName(const char* aHostname, IPAddress& aResult);
 
     /*
-     * Get ESP8266 station DHCP hostname
-     */
-    String hostname(void);
-
-    /*
-     * Set ESP8266 station DHCP hostname
-     * hostname, max length:32
-     */
-    bool hostname(char* aHostname);
-    bool hostname(const char* aHostname);
-    bool hostname(String aHostname);
-
-
-    /**
-     * WPS config
-     * so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
-     */
-    bool beginWPSConfig(void);
-
-    /*
      * Output WiFi settings to an object derived from Print interface (like Serial).
      *
      */
@@ -351,18 +313,13 @@ protected:
     static void _scanDone(void* result, int status);
     void * _getScanInfoByIndex(int i);
     static void _smartConfigCallback(uint32_t status, void* result);
-    static void _eventCallback(void *event);
-    bool _smartConfigStarted;
-    bool _smartConfigDone;
+    bool _smartConfigStarted = false;
+    bool _smartConfigDone = false;
 
     bool _useApMode;
     bool _useClientMode;
 	bool _useStaticIp;
 	
-	static bool _scanAsync;
-	static bool _scanStarted;
-	static bool _scanComplete;
-
     static size_t _scanCount;
     static void* _scanResult;
 

@@ -22,16 +22,16 @@
 
 package processing.app;
 
-import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
-import jssc.SerialPortException;
+import static processing.app.I18n._;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static processing.app.I18n._;
+import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
 
 
 public class Serial implements SerialPortEventListener {
@@ -45,14 +45,19 @@ public class Serial implements SerialPortEventListener {
   // for the classloading problem.. because if code ran again,
   // the static class would have an object that could be closed
 
-  private SerialPort port;
+  SerialPort port;
+
+  int rate;
+  int parity;
+  int databits;
+  int stopbits;
 
   public Serial() throws SerialException {
     this(PreferencesData.get("serial.port"),
             PreferencesData.getInteger("serial.debug_rate"),
             PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-			Float.parseFloat(PreferencesData.get("serial.stopbits")),
+            new Float(PreferencesData.get("serial.stopbits")).floatValue(),
 			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
 			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
@@ -61,7 +66,7 @@ public class Serial implements SerialPortEventListener {
     this(PreferencesData.get("serial.port"), irate,
             PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            Float.parseFloat(PreferencesData.get("serial.stopbits")),
+            new Float(PreferencesData.get("serial.stopbits")).floatValue(),
 			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
 			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
@@ -69,7 +74,7 @@ public class Serial implements SerialPortEventListener {
   public Serial(String iname, int irate) throws SerialException {
     this(iname, irate, PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            Float.parseFloat(PreferencesData.get("serial.stopbits")),
+            new Float(PreferencesData.get("serial.stopbits")).floatValue(),
 			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
 			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
@@ -78,7 +83,7 @@ public class Serial implements SerialPortEventListener {
     this(iname, PreferencesData.getInteger("serial.debug_rate"),
             PreferencesData.get("serial.parity").charAt(0),
             PreferencesData.getInteger("serial.databits"),
-            Float.parseFloat(PreferencesData.get("serial.stopbits")),
+            new Float(PreferencesData.get("serial.stopbits")).floatValue(),
 			BaseNoGui.getBoardPreferences().get("serial.disableRTS") == null,
 			BaseNoGui.getBoardPreferences().get("serial.disableDTR") == null);
   }
@@ -104,28 +109,29 @@ public class Serial implements SerialPortEventListener {
     }
   }
 
-  private Serial(String iname, int irate, char iparity, int idatabits, float istopbits, boolean setRTS, boolean setDTR) throws SerialException {
+  public Serial(String iname, int irate, char iparity, int idatabits, float istopbits, boolean setRTS, boolean setDTR) throws SerialException {
     //if (port != null) port.close();
     //this.parent = parent;
     //parent.attach(this);
 
-    int parity = SerialPort.PARITY_NONE;
+    this.rate = irate;
+
+    parity = SerialPort.PARITY_NONE;
     if (iparity == 'E') parity = SerialPort.PARITY_EVEN;
     if (iparity == 'O') parity = SerialPort.PARITY_ODD;
 
-    int stopbits = SerialPort.STOPBITS_1;
+    this.databits = idatabits;
+
+    stopbits = SerialPort.STOPBITS_1;
     if (istopbits == 1.5f) stopbits = SerialPort.STOPBITS_1_5;
     if (istopbits == 2) stopbits = SerialPort.STOPBITS_2;
 
     try {
       port = new SerialPort(iname);
       port.openPort();
-      port.setParams(irate, idatabits, stopbits, parity, setRTS, setDTR);
+      port.setParams(rate, databits, stopbits, parity, setRTS, setDTR);
       port.addEventListener(this);
-    } catch (SerialPortException e) {
-      if (e.getPortName().startsWith("/dev") && SerialPortException.TYPE_PERMISSION_DENIED.equals(e.getExceptionType())) {
-        throw new SerialException(I18n.format(_("Error opening serial port ''{0}''. Try consulting the documentation at http://playground.arduino.cc/Linux/All#Permission"), iname));
-      }
+    } catch (Exception e) {
       throw new SerialException(I18n.format(_("Error opening serial port ''{0}''."), iname), e);
     }
 
@@ -170,6 +176,9 @@ public class Serial implements SerialPortEventListener {
   /**
    * This method is intented to be extended to receive messages
    * coming from serial port.
+   *
+   * @param chars
+   * @param length
    */
   protected void message(char[] chars, int length) {
 	// Empty
@@ -188,7 +197,7 @@ public class Serial implements SerialPortEventListener {
   }
 
 
-  private void write(byte bytes[]) {
+  public void write(byte bytes[]) {
     try {
       port.writeBytes(bytes);
     } catch (SerialPortException e) {
@@ -204,7 +213,7 @@ public class Serial implements SerialPortEventListener {
    * (most often the case for networking and serial i/o) and
    * will only use the bottom 8 bits of each char in the string.
    * (Meaning that internally it uses String.getBytes)
-   * <p>
+   * <p/>
    * If you want to move Unicode data, you can first convert the
    * String to a byte stream in the representation of your choice
    * (i.e. UTF8 or two-byte Unicode data), and send it as a byte array.
@@ -238,8 +247,92 @@ public class Serial implements SerialPortEventListener {
    * General error reporting, all corraled here just in case
    * I think of something slightly more intelligent to do.
    */
-  private static void errorMessage(String where, Throwable e) {
+  static public void errorMessage(String where, Throwable e) {
     System.err.println(I18n.format(_("Error inside Serial.{0}()"), where));
     e.printStackTrace();
   }
 }
+
+
+  /*
+  class SerialMenuListener implements ItemListener {
+    //public SerialMenuListener() { }
+
+    public void itemStateChanged(ItemEvent e) {
+      int count = serialMenu.getItemCount();
+      for (int i = 0; i < count; i++) {
+        ((CheckboxMenuItem)serialMenu.getItem(i)).setState(false);
+      }
+      CheckboxMenuItem item = (CheckboxMenuItem)e.getSource();
+      item.setState(true);
+      String name = item.getLabel();
+      //System.out.println(item.getLabel());
+      PdeBase.properties.put("serial.port", name);
+      //System.out.println("set to " + get("serial.port"));
+    }
+  }
+  */
+
+
+  /*
+  protected Vector buildPortList() {
+    // get list of names for serial ports
+    // have the default port checked (if present)
+    Vector list = new Vector();
+
+    //SerialMenuListener listener = new SerialMenuListener();
+    boolean problem = false;
+
+    // if this is failing, it may be because
+    // lib/javax.comm.properties is missing.
+    // java is weird about how it searches for java.comm.properties
+    // so it tends to be very fragile. i.e. quotes in the CLASSPATH
+    // environment variable will hose things.
+    try {
+      //System.out.println("building port list");
+      Enumeration portList = CommPortIdentifier.getPortIdentifiers();
+      while (portList.hasMoreElements()) {
+        CommPortIdentifier portId = 
+          (CommPortIdentifier) portList.nextElement();
+        //System.out.println(portId);
+
+        if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+          //if (portId.getName().equals(port)) {
+          String name = portId.getName();
+          //CheckboxMenuItem mi = 
+          //new CheckboxMenuItem(name, name.equals(defaultName));
+
+          //mi.addItemListener(listener);
+          //serialMenu.add(mi);
+          list.addElement(name);
+        }
+      }
+    } catch (UnsatisfiedLinkError e) {
+      e.printStackTrace();
+      problem = true;
+
+    } catch (Exception e) {
+      System.out.println("exception building serial menu");
+      e.printStackTrace();
+    }
+
+    //if (serialMenu.getItemCount() == 0) {
+      //System.out.println("dimming serial menu");
+    //serialMenu.setEnabled(false);
+    //}
+
+    // only warn them if this is the first time
+    if (problem && PdeBase.firstTime) {
+      JOptionPane.showMessageDialog(this, //frame,
+                                    "Serial port support not installed.\n" +
+                                    "Check the readme for instructions\n" +
+                                    "if you need to use the serial port.    ",
+                                    "Serial Port Warning",
+                                    JOptionPane.WARNING_MESSAGE);
+    }
+    return list;
+  }
+  */
+
+
+ 

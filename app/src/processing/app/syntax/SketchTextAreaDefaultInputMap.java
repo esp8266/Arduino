@@ -1,7 +1,6 @@
 package processing.app.syntax;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaDefaultInputMap;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaEditorKit;
 import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.RTextAreaEditorKit;
 import processing.app.PreferencesData;
@@ -16,7 +15,6 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
   public SketchTextAreaDefaultInputMap() {
     int defaultModifier = getDefaultModifier();
     int alt = InputEvent.ALT_MASK;
-    int shift = InputEvent.SHIFT_MASK;
     boolean isOSX = RTextArea.isOSX();
     int moveByWordMod = isOSX ? alt : defaultModifier;
 
@@ -39,24 +37,7 @@ public class SketchTextAreaDefaultInputMap extends RSyntaxTextAreaDefaultInputMa
       put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, defaultModifier), DefaultEditorKit.beginAction);
       put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, defaultModifier), DefaultEditorKit.endAction);
 
-      put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, defaultModifier | shift), DefaultEditorKit.selectionBeginLineAction);
-      put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, defaultModifier | shift), DefaultEditorKit.selectionEndLineAction);
-
       remove(KeyStroke.getKeyStroke(KeyEvent.VK_J, defaultModifier));
-
-      put(KeyStroke.getKeyStroke(KeyEvent.VK_OPEN_BRACKET, defaultModifier), DefaultEditorKit.insertTabAction);
-      put(KeyStroke.getKeyStroke(KeyEvent.VK_CLOSE_BRACKET, defaultModifier), RSyntaxTextAreaEditorKit.rstaDecreaseIndentAction);
-
-      put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, defaultModifier | shift), DefaultEditorKit.selectionBeginAction);
-      put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, defaultModifier | shift), DefaultEditorKit.selectionEndAction);
     }
-
-    put(KeyStroke.getKeyStroke(KeyEvent.VK_DIVIDE, defaultModifier), RSyntaxTextAreaEditorKit.rstaToggleCommentAction);
-
-    put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0), DefaultEditorKit.backwardAction);
-    put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0), DefaultEditorKit.forwardAction);
-    put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0), DefaultEditorKit.downAction);
-    put(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0), DefaultEditorKit.upAction);
-
   }
 }
