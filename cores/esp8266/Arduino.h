@@ -233,6 +233,7 @@ void loop(void);
 
 #include "HardwareSerial.h"
 #include "Esp.h"
+#include "Updater.h"
 #include "debug.h"
 
 #define min(a,b) ((a)<(b)?(a):(b))
