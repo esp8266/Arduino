@@ -213,6 +213,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
 - [DHT11](https://github.com/adafruit/DHT-sensor-library) - Download latest v1.1.0 library and no changes are necessary.  Older versions should initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
+- [NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) - Adafruit's NeoPixel libray, now with support for the ESP8266 (use version 1.0.2 or higher from Arduino's library manager).
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266.
 - [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
 - [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with esp8266.
