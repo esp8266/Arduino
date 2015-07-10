@@ -77,11 +77,13 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
 }
 
 extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
+  if (pin == 16) {
     if(val == LOW) {
 	  GP16O &= ~1;
 	} else {
 	  GP16O |= 1;
 	}
+  } else if ((pin >= 0) && (pin <= 15)) {
     if(val == LOW) {
       GPOC = digitalPinToBitMask(pin);
 	} else {
