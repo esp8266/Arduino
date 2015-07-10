@@ -73,6 +73,15 @@ void SPIClass::setHwCs(bool use) {
     useHwCs = use;
 }
 
+void SPIClass::setTxMode(bool tmode) {
+    if(tmode) {
+	    SPI1U |= SPIUMOSI;
+		SPI1U &= ~(SPIUDUPLEX | SPIUSSE);
+	} else {
+	    SPI1U |= SPIUMOSI | SPIUDUPLEX | SPIUSSE;
+	}
+}
+
 void SPIClass::beginTransaction(SPISettings settings) {
     while(SPI1CMD & SPIBUSY) {}
     setFrequency(settings._clock);
