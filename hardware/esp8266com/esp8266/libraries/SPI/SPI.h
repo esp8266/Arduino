@@ -36,10 +36,6 @@
 #define SPI_CLOCK_DIV64 	0x027c1001 //250 KHz
 #define SPI_CLOCK_DIV128 	0x04fc1001 //125 KHz
 
-// setTxMode possible values, set SPI_TX_ONLY to disable MISO, enables re-use of GPIO12 for projects that don't need the ESP8266 to recieve SPI data.
-#define SPI_TX_ONLY true
-#define SPI_DUPLEX false
-
 const uint8_t SPI_MODE0 = 0x00; ///<  CPOL: 0  CPHA: 0
 const uint8_t SPI_MODE1 = 0x01; ///<  CPOL: 0  CPHA: 1
 const uint8_t SPI_MODE2 = 0x10; ///<  CPOL: 1  CPHA: 0
@@ -60,7 +56,6 @@ public:
   void begin();
   void end();
   void setHwCs(bool use);
-  void setTxMode(bool tmode = SPI_DUPLEX);
   void setBitOrder(uint8_t bitOrder);  
   void setDataMode(uint8_t dataMode);
   void setFrequency(uint32_t freq);
