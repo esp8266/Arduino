@@ -78,7 +78,6 @@ void SPIClass::setTxMode(bool tmode) {
 	    SPI1U |= SPIUMOSI;
 		SPI1U &= ~(SPIUDUPLEX | SPIUSSE);
 	} else {
-	    pinMode(MISO, SPECIAL); ///< GPIO12
 	    SPI1U |= SPIUMOSI | SPIUDUPLEX | SPIUSSE;
 	}
 }
