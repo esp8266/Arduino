@@ -2,7 +2,7 @@
  * This example connects to a WPA encrypted Wifi network.
  * Then it prints the  MAC address of the ESP8266,
  * the IP address obtained, and other network details.
- * 
+ *
  * created 13 July 2010
  * by dlf (Metodo2 srl)
  * modified 5 July 2015
@@ -18,19 +18,21 @@ int status = WL_IDLE_STATUS;     // the Wifi radio's status
 void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(115200);
-  delay(10);
-  
+
   // attempt to connect to Wifi network:
-  while (status != WL_CONNECTED) {
+  while (true) {
     Serial.print("Attempting to connect to WPA SSID: ");
     Serial.println(ssid);
-    // Connect to WPA/WPA2 network:
-    status = WiFi.begin(ssid, password);
 
+    // Connect to WEP/WPA/WPA2 network:
+    WiFi.begin(ssid, password);
+    if (WiFi.waitForConnectResult() == WL_CONNECTED) {
+      break;
+    }
     // wait 10 seconds for connection:
     delay(10000);
   }
-  
+
   // you're connected now, so print out the data:
   Serial.print("You're connected to the network ");
   printCurrentNet();
@@ -50,7 +52,7 @@ void printWifiData() {
   IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
-  
+
   // print your MAC address:
   byte mac[6];
   WiFi.macAddress(mac);
@@ -73,6 +75,5 @@ void printCurrentNet() {
   // print the SSID of the network you're attached to:
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
-  
-}
 
+}
