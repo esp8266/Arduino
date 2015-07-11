@@ -1,3 +1,35 @@
+esp_iot_sdk_v1.2.0_15_07_09_p3 Release Note 
+-------------------------------------------
+
+Here is a patch based on SDK_v1.2.0 solved problem that if AP’s SSID is hidden，ESPTOUCH may get wrong BSSID of AP and cause connection fail.
+Please replace the lib in \esp_iot_sdk_v1.2.0\lib
+
+Sorry for the inconvenience.
+
+
+
+
+esp_iot_sdk_v1.2.0_15_07_09_p2 Release Note 
+-------------------------------------------
+
+Updated libssl again. To support SHA-256 and SHA-512.
+
+Thanks for your interest in Espressif Systems and ESP8266 !
+
+
+
+
+esp_iot_sdk_v1.2.0_15_07_08_p1 Release Note 
+-------------------------------------------
+
+Here is a patch based on SDK_v1.2.0 solved problem that abnormal SSL disconnection may cause reset.
+Please replace the lib in \esp_iot_sdk_v1.2.0\lib
+
+Sorry for the inconvenience.
+
+
+
+
 esp_iot_sdk_v1.2.0_15_07_03 Release Note 
 -------------------------------------------
 Resolved Issues（Bugs below are eligible for Bug Bounty Program):
