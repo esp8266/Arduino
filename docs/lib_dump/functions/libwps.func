@@ -1,161 +1,161 @@
-00000000 <eap_hdr_len_valid-0xc>:
-0000000c <eap_hdr_len_valid>:
-00000054 <eap_hdr_validate>:
-00000128 <eap_msg_alloc>:
-000001e8 <eap_update_len>:
-00000208 <eap_get_id>:
-00000224 <eap_get_type>:
-00000000 <uuid_str2bin-0x14>:
-00000014 <uuid_str2bin>:
-000000a4 <uuid_bin2str>:
-00000120 <is_nil_uuid>:
-00000000 <.text>:
-000000ac <wps_build_public_key-0x5c>:
-00000108 <wps_build_public_key>:
-00000268 <wps_build_req_type>:
-000002b0 <wps_build_resp_type>:
-000002f8 <wps_build_config_methods>:
-0000033c <wps_build_uuid_e>:
-00000384 <wps_build_dev_password_id>:
-000003c8 <wps_build_config_error>:
-00000418 <wps_build_authenticator>:
-000004a4 <wps_build_version>:
-00000518 <wps_build_wfa_ext>:
-00000614 <wps_build_msg_type>:
-0000065c <wps_build_enrollee_nonce>:
-000006a8 <wps_build_registrar_nonce>:
-000006f4 <wps_build_auth_type_flags>:
-00000738 <wps_build_encr_type_flags>:
-0000077c <wps_build_conn_type_flags>:
-000007c0 <wps_build_assoc_state>:
-0000080c <wps_build_key_wrap_auth>:
-0000088c <wps_build_encr_settings>:
-00000950 <wps_ie_encapsulate>:
-00000ab0 <.irom.text>:
-00000000 <wps_parse_msg-0x4f4>:
-000004f4 <wps_parse_msg>:
-00000000 <wps_process_authenticator-0x8>:
-00000008 <wps_process_authenticator>:
-00000078 <wps_process_key_wrap_auth>:
-0000021c <wps_process_cred>:
-000002cc <wps_process_ap_settings>:
-00000000 <wifi_wps_start-0xb4>:
-000000b4 <wifi_wps_start>:
-0000010c <show_buf>:
-00000244 <wps_sm_alloc_eapol>:
-000002a8 <wps_init>:
-0000036c <wps_deinit>:
-000003d4 <wps_process_msg>:
-000003fc <wps_get_msg>:
-0000042c <wps_is_selected_pbc_registrar>:
-000004ac <wps_is_addr_authorized>:
-00000544 <wps_ap_priority_compar>:
-000005b8 <wps_get_uuid_e>:
-000005dc <wps_is_20>:
-00000628 <wps_build_assoc_req_ie>:
-000006d0 <wps_build_assoc_resp_ie>:
-0000079c <wps_build_probe_req_ie>:
-00000914 <wps_attr_text>:
-00000e1c <wps_send_eap_identity_rsp>:
-00000eb8 <wps_process_wps_mX_req>:
-00000f4c <wps_send_wps_mX_rsp>:
-0000102c <wps_txStart>:
-00001080 <wps_start_pending>:
-000010f0 <wps_sm_rx_eapol>:
-000012e4 <wps_dev_init>:
-00001448 <wps_dev_deinit>:
-000014a8 <wifi_station_wps_timeout>:
-000014e4 <wifi_station_wps_success>:
-00001570 <wifi_station_wps_init>:
-000016fc <wifi_station_wps_deinit>:
-000017c0 <wps_station_wps_register_cb>:
-000017d8 <wps_sm_get>:
-00001800 <wps_key_save>:
-00001894 <wifi_station_wps_start>:
-00001910 <wifi_wps_enable>:
-000019a0 <wifi_wps_disable>:
-00001a1c <wifi_set_wps_cb>:
-00007050 <.irom.text>:
-00000000 <wps_kdf-0x10>:
-00000010 <wps_kdf>:
-00000108 <wps_derive_keys>:
-00000228 <wps_derive_psk>:
-000002ac <wps_decrypt_encr_settings>:
-0000036c <wps_fail_event>:
-000003b4 <wps_success_event>:
-000003d4 <wps_pwd_auth_fail_event>:
-00000414 <wps_pbc_overlap_event>:
-00000430 <wps_pbc_timeout_event>:
-00000468 <wps_dev_type_str2bin>:
-000004ec <wps_dev_type_bin2str>:
-0000056c <uuid_gen_mac_addr>:
-00000648 <wps_config_methods_str2bin>:
-0000078c <wps_build_wsc_ack>:
-0000081c <wps_build_wsc_nack>:
-00000000 <.text>:
-00000084 <wps_build_manufacturer-0x14>:
-00000098 <wps_build_manufacturer>:
-00000100 <wps_build_model_name>:
-00000168 <wps_build_model_number>:
-00000234 <wps_build_primary_dev_type>:
-00000280 <wps_build_secondary_dev_type>:
-000002e0 <wps_build_req_dev_type>:
-00000340 <wps_build_dev_name>:
-00000394 <wps_build_device_attrs>:
-000003fc <wps_build_os_version>:
-00000468 <wps_build_vendor_ext_m1>:
-000004c4 <wps_build_rf_bands>:
-0000051c <wps_build_vendor_ext>:
-00000750 <wps_process_device_attrs>:
-000007b8 <wps_process_os_version>:
-000007e8 <wps_process_rf_bands>:
-00000814 <wps_device_data_dup>:
-00000898 <wps_device_data_free>:
-00000000 <.text>:
-00000068 <wps_enrollee_get_msg-0x9f0>:
-00000a58 <wps_enrollee_get_msg>:
-00001830 <wps_enrollee_process_msg>:
-00001940 <.irom.text>:
-00000000 <.text>:
-000000ac <wps_device_store-0x270>:
-0000031c <wps_device_store>:
-00000500 <wps_registrar_pbc_overlap>:
-00000824 <wps_authorized_macs>:
-00000880 <wps_registrar_init>:
-00000924 <wps_registrar_deinit>:
-000009f4 <wps_registrar_button_pushed>:
-00000ab4 <wps_registrar_complete>:
-00000b00 <wps_registrar_wps_cancel>:
-00000b40 <wps_registrar_probe_req_rx>:
-00001408 <wps_build_credential_wrap>:
-000014d0 <wps_build_cred>:
-00001e64 <wps_registrar_get_msg>:
-00002cd8 <wps_registrar_process_msg>:
-00002d64 <wps_registrar_update_ie>:
-00002d9c <wps_registrar_selected_registrar_changed>:
-00002e2c <wps_registrar_get_info>:
-00002ec0 <wps_registrar_config_ap>:
-00000000 <wps_validate_beacon-0x604>:
-00000604 <wps_validate_beacon>:
-000006b4 <wps_validate_beacon_probe_resp>:
-000007dc <wps_validate_probe_req>:
-000008e0 <wps_validate_assoc_req>:
-00000930 <wps_validate_assoc_resp>:
-00000980 <wps_validate_m1>:
-00000ac0 <wps_validate_m2>:
-00000bf4 <wps_validate_m2d>:
-00000d04 <wps_validate_m3>:
-00000d7c <wps_validate_m4>:
-00000e04 <wps_validate_m4_encr>:
-00000e48 <wps_validate_m5>:
-00000eb8 <wps_validate_m5_encr>:
-00000efc <wps_validate_m6>:
-00000f6c <wps_validate_m6_encr>:
-00000fb0 <wps_validate_m7>:
-0000102c <wps_validate_m7_encr>:
-000010d0 <wps_validate_m8>:
-00001140 <wps_validate_m8_encr>:
-000011d0 <wps_validate_wsc_ack>:
-00001234 <wps_validate_wsc_nack>:
-000012a0 <wps_validate_wsc_done>:
-00001304 <wps_validate_upnp_set_selected_registrar>:
+eap_hdr_len_valid-0xc
+eap_hdr_len_valid
+eap_hdr_validate
+eap_msg_alloc
+eap_update_len
+eap_get_id
+eap_get_type
+uuid_str2bin-0x14
+uuid_str2bin
+uuid_bin2str
+is_nil_uuid
+.text
+wps_build_public_key-0x5c
+wps_build_public_key
+wps_build_req_type
+wps_build_resp_type
+wps_build_config_methods
+wps_build_uuid_e
+wps_build_dev_password_id
+wps_build_config_error
+wps_build_authenticator
+wps_build_version
+wps_build_wfa_ext
+wps_build_msg_type
+wps_build_enrollee_nonce
+wps_build_registrar_nonce
+wps_build_auth_type_flags
+wps_build_encr_type_flags
+wps_build_conn_type_flags
+wps_build_assoc_state
+wps_build_key_wrap_auth
+wps_build_encr_settings
+wps_ie_encapsulate
+.irom.text
+wps_parse_msg-0x4f4
+wps_parse_msg
+wps_process_authenticator-0x8
+wps_process_authenticator
+wps_process_key_wrap_auth
+wps_process_cred
+wps_process_ap_settings
+wifi_wps_start-0xb4
+wifi_wps_start
+show_buf
+wps_sm_alloc_eapol
+wps_init
+wps_deinit
+wps_process_msg
+wps_get_msg
+wps_is_selected_pbc_registrar
+wps_is_addr_authorized
+wps_ap_priority_compar
+wps_get_uuid_e
+wps_is_20
+wps_build_assoc_req_ie
+wps_build_assoc_resp_ie
+wps_build_probe_req_ie
+wps_attr_text
+wps_send_eap_identity_rsp
+wps_process_wps_mX_req
+wps_send_wps_mX_rsp
+wps_txStart
+wps_start_pending
+wps_sm_rx_eapol
+wps_dev_init
+wps_dev_deinit
+wifi_station_wps_timeout
+wifi_station_wps_success
+wifi_station_wps_init
+wifi_station_wps_deinit
+wps_station_wps_register_cb
+wps_sm_get
+wps_key_save
+wifi_station_wps_start
+wifi_wps_enable
+wifi_wps_disable
+wifi_set_wps_cb
+.irom.text
+wps_kdf-0x10
+wps_kdf
+wps_derive_keys
+wps_derive_psk
+wps_decrypt_encr_settings
+wps_fail_event
+wps_success_event
+wps_pwd_auth_fail_event
+wps_pbc_overlap_event
+wps_pbc_timeout_event
+wps_dev_type_str2bin
+wps_dev_type_bin2str
+uuid_gen_mac_addr
+wps_config_methods_str2bin
+wps_build_wsc_ack
+wps_build_wsc_nack
+.text
+wps_build_manufacturer-0x14
+wps_build_manufacturer
+wps_build_model_name
+wps_build_model_number
+wps_build_primary_dev_type
+wps_build_secondary_dev_type
+wps_build_req_dev_type
+wps_build_dev_name
+wps_build_device_attrs
+wps_build_os_version
+wps_build_vendor_ext_m1
+wps_build_rf_bands
+wps_build_vendor_ext
+wps_process_device_attrs
+wps_process_os_version
+wps_process_rf_bands
+wps_device_data_dup
+wps_device_data_free
+.text
+wps_enrollee_get_msg-0x9f0
+wps_enrollee_get_msg
+wps_enrollee_process_msg
+.irom.text
+.text
+wps_device_store-0x270
+wps_device_store
+wps_registrar_pbc_overlap
+wps_authorized_macs
+wps_registrar_init
+wps_registrar_deinit
+wps_registrar_button_pushed
+wps_registrar_complete
+wps_registrar_wps_cancel
+wps_registrar_probe_req_rx
+wps_build_credential_wrap
+wps_build_cred
+wps_registrar_get_msg
+wps_registrar_process_msg
+wps_registrar_update_ie
+wps_registrar_selected_registrar_changed
+wps_registrar_get_info
+wps_registrar_config_ap
+wps_validate_beacon-0x604
+wps_validate_beacon
+wps_validate_beacon_probe_resp
+wps_validate_probe_req
+wps_validate_assoc_req
+wps_validate_assoc_resp
+wps_validate_m1
+wps_validate_m2
+wps_validate_m2d
+wps_validate_m3
+wps_validate_m4
+wps_validate_m4_encr
+wps_validate_m5
+wps_validate_m5_encr
+wps_validate_m6
+wps_validate_m6_encr
+wps_validate_m7
+wps_validate_m7_encr
+wps_validate_m8
+wps_validate_m8_encr
+wps_validate_wsc_ack
+wps_validate_wsc_nack
+wps_validate_wsc_done
+wps_validate_upnp_set_selected_registrar

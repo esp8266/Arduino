@@ -1,137 +1,137 @@
-00000000 <.literal>:
-00000000 <xthal_set_region_attribute>:
-00000000 <xthal_cache_coherence_optout>:
-00000000 <xthal_get_ccount>:
-00000008 <xthal_set_ccompare>:
-00000014 <xthal_get_ccompare>:
-00000000 <.literal>:
-00000000 <xthal_set_soft_break>:
-00000050 <xthal_remove_soft_break>:
-00000000 <.literal>:
-00000000 <xthal_disassemble_size>:
-00000010 <xthal_disassemble>:
-00000000 <xthal_debugexc_defhndlr_nw>:
-00000000 <.literal>:
-00000000 <xthal_bcopy>:
-0000003c <xthal_memcpy>:
-000000c8 <xthal_copy123>:
-000000f9 <oneword>:
-0000010d <cdone>:
-00000000 <xthal_static_v2p>:
-00000008 <xthal_static_p2v>:
-00000000 <xthal_compare_and_set>:
-0000000c <done>:
-00000014 <xthal_get_prid>:
-00000000 <xthal_spill_registers_into_stack_nw>:
-00000004 <xthal_window_spill>:
-00000000 <xthal_cache_coherence_off>:
-00000000 <xthal_cache_coherence_on>:
-00000000 <xthal_dcache_all_invalidate>:
-00000000 <xthal_dcache_all_unlock>:
-00000000 <xthal_dcache_all_writeback>:
-00000000 <xthal_dcache_all_writeback_inv>:
-00000000 <.literal>:
-00000000 <xthal_dcache_is_enabled>:
-00000000 <xthal_dcache_line_invalidate>:
-00000000 <xthal_dcache_line_lock>:
-00000000 <xthal_dcache_line_unlock>:
-00000000 <xthal_dcache_line_writeback>:
-00000000 <xthal_dcache_line_writeback_inv>:
-00000000 <xthal_dcache_region_invalidate>:
-00000000 <xthal_dcache_region_lock>:
-00000000 <xthal_dcache_region_unlock>:
-00000000 <xthal_dcache_region_writeback>:
-00000000 <xthal_dcache_region_writeback_inv>:
-00000000 <xthal_dcache_sync>:
-00000000 <xthal_get_cache_prefetch>:
-00000000 <.literal>:
-00000000 <xthal_get_cacheattr>:
-00000000 <.literal>:
-00000000 <xthal_get_icacheattr>:
-00000000 <xthal_icache_all_invalidate>:
-00000000 <xthal_icache_all_unlock>:
-00000000 <.literal>:
-00000000 <xthal_icache_is_enabled>:
-00000000 <xthal_icache_line_invalidate>:
-00000000 <xthal_icache_line_lock>:
-00000000 <xthal_icache_line_unlock>:
-00000000 <xthal_icache_region_invalidate>:
-00000000 <xthal_icache_region_lock>:
-00000000 <xthal_icache_region_unlock>:
-00000000 <xthal_icache_sync>:
-00000000 <xthal_set_cache_prefetch>:
-00000000 <.literal>:
-00000000 <xthal_set_cacheattr>:
-00000000 <.literal>:
-00000000 <xthal_set_dcacheattr>:
-00000000 <.literal>:
-00000000 <xthal_set_icacheattr>:
-00000000 <xthal_get_intenable>:
-00000000 <xthal_get_interrupt>:
-00000000 <.literal>:
-00000000 <xthal_get_vpri>:
-00000000 <xthal_set_intclear>:
-00000000 <xthal_set_intenable>:
-00000000 <xthal_set_intset>:
-00000000 <.literal>:
-00000000 <xthal_set_vpri>:
-00000010 <xthal_set_vpri_common1>:
-00000034 <xthal_set_vpri_intlevel>:
-00000040 <xthal_set_vpri_lock>:
-00000000 <.literal>:
-00000000 <xthal_vpri_lock>:
-0000001c <xthal_vpri_lock_done>:
-00000000 <.literal>:
-00000000 <xthal_vpri_unlock>:
-00000000 <.literal>:
-00000000 <xthal_get_int_vpri>:
-00000000 <.literal>:
-00000000 <xthal_get_vpri_locklevel>:
-00000000 <xthal_intlevel_to_vpri>:
-00000000 <.literal>:
-00000000 <xthal_set_int_vpri>:
-00000000 <.literal>:
-00000000 <xthal_set_vpri_locklevel>:
-00000000 <.literal>:
-00000000 <xthal_set_tram_trigger_func>:
-0000000c <xthal_tram_set_sync>:
-00000040 <xthal_tram_pending_to_service>:
-00000060 <xthal_tram_done>:
-00000000 <xthal_null_func>:
-00000000 <.literal>:
-00000000 <xthal_int_disable>:
-00000000 <.literal>:
-00000000 <xthal_int_enable>:
-00000000 <xthal_vpri_to_intlevel>:
-00000000 <xthal_memep_inject_error>:
-00000000 <.literal>:
-00000000 <xthal_init_mem_cp>:
-00000000 <.literal>:
-00000000 <xthal_init_mem_extra>:
-00000000 <xthal_get_cpenable>:
-00000000 <xthal_invalidate_cp>:
-00000000 <xthal_restore_cp0>:
-00000000 <xthal_restore_cp1>:
-00000000 <xthal_restore_cp2>:
-00000000 <xthal_restore_cp3>:
-00000000 <xthal_restore_cp4>:
-00000000 <xthal_restore_cp5>:
-00000000 <xthal_restore_cp6>:
-00000000 <xthal_restore_cp7>:
-00000000 <xthal_restore_cpregs>:
-00000000 <xthal_restore_extra>:
-00000000 <xthal_save_cp0>:
-00000000 <xthal_save_cp1>:
-00000000 <xthal_save_cp2>:
-00000000 <xthal_save_cp3>:
-00000000 <xthal_save_cp4>:
-00000000 <xthal_save_cp5>:
-00000000 <xthal_save_cp6>:
-00000000 <xthal_save_cp7>:
-00000000 <xthal_save_cpregs>:
-00000000 <xthal_save_extra>:
-00000000 <xthal_set_cpenable>:
-00000000 <xthal_validate_cp>:
-00000000 <.literal>:
-00000000 <xthal_get_intpending_nw>:
-0000006c <gipfail>:
+.literal
+xthal_set_region_attribute
+xthal_cache_coherence_optout
+xthal_get_ccount
+xthal_set_ccompare
+xthal_get_ccompare
+.literal
+xthal_set_soft_break
+xthal_remove_soft_break
+.literal
+xthal_disassemble_size
+xthal_disassemble
+xthal_debugexc_defhndlr_nw
+.literal
+xthal_bcopy
+xthal_memcpy
+xthal_copy123
+oneword
+cdone
+xthal_static_v2p
+xthal_static_p2v
+xthal_compare_and_set
+done
+xthal_get_prid
+xthal_spill_registers_into_stack_nw
+xthal_window_spill
+xthal_cache_coherence_off
+xthal_cache_coherence_on
+xthal_dcache_all_invalidate
+xthal_dcache_all_unlock
+xthal_dcache_all_writeback
+xthal_dcache_all_writeback_inv
+.literal
+xthal_dcache_is_enabled
+xthal_dcache_line_invalidate
+xthal_dcache_line_lock
+xthal_dcache_line_unlock
+xthal_dcache_line_writeback
+xthal_dcache_line_writeback_inv
+xthal_dcache_region_invalidate
+xthal_dcache_region_lock
+xthal_dcache_region_unlock
+xthal_dcache_region_writeback
+xthal_dcache_region_writeback_inv
+xthal_dcache_sync
+xthal_get_cache_prefetch
+.literal
+xthal_get_cacheattr
+.literal
+xthal_get_icacheattr
+xthal_icache_all_invalidate
+xthal_icache_all_unlock
+.literal
+xthal_icache_is_enabled
+xthal_icache_line_invalidate
+xthal_icache_line_lock
+xthal_icache_line_unlock
+xthal_icache_region_invalidate
+xthal_icache_region_lock
+xthal_icache_region_unlock
+xthal_icache_sync
+xthal_set_cache_prefetch
+.literal
+xthal_set_cacheattr
+.literal
+xthal_set_dcacheattr
+.literal
+xthal_set_icacheattr
+xthal_get_intenable
+xthal_get_interrupt
+.literal
+xthal_get_vpri
+xthal_set_intclear
+xthal_set_intenable
+xthal_set_intset
+.literal
+xthal_set_vpri
+xthal_set_vpri_common1
+xthal_set_vpri_intlevel
+xthal_set_vpri_lock
+.literal
+xthal_vpri_lock
+xthal_vpri_lock_done
+.literal
+xthal_vpri_unlock
+.literal
+xthal_get_int_vpri
+.literal
+xthal_get_vpri_locklevel
+xthal_intlevel_to_vpri
+.literal
+xthal_set_int_vpri
+.literal
+xthal_set_vpri_locklevel
+.literal
+xthal_set_tram_trigger_func
+xthal_tram_set_sync
+xthal_tram_pending_to_service
+xthal_tram_done
+xthal_null_func
+.literal
+xthal_int_disable
+.literal
+xthal_int_enable
+xthal_vpri_to_intlevel
+xthal_memep_inject_error
+.literal
+xthal_init_mem_cp
+.literal
+xthal_init_mem_extra
+xthal_get_cpenable
+xthal_invalidate_cp
+xthal_restore_cp0
+xthal_restore_cp1
+xthal_restore_cp2
+xthal_restore_cp3
+xthal_restore_cp4
+xthal_restore_cp5
+xthal_restore_cp6
+xthal_restore_cp7
+xthal_restore_cpregs
+xthal_restore_extra
+xthal_save_cp0
+xthal_save_cp1
+xthal_save_cp2
+xthal_save_cp3
+xthal_save_cp4
+xthal_save_cp5
+xthal_save_cp6
+xthal_save_cp7
+xthal_save_cpregs
+xthal_save_extra
+xthal_set_cpenable
+xthal_validate_cp
+.literal
+xthal_get_intpending_nw
+gipfail

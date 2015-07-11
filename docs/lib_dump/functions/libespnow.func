@@ -1,40 +1,40 @@
-00000000 <esp_now_init-0xc>:
-0000000c <esp_now_init>:
-00000040 <esp_now_deinit>:
-00000074 <esp_now_register_recv_cb>:
-0000009c <esp_now_unregister_recv_cb>:
-000000d4 <esp_now_send>:
-00000134 <esp_now_add_peer>:
-0000016c <esp_now_del_peer>:
-0000019c <esp_now_set_self_role>:
-000001c8 <esp_now_get_self_role>:
-000001f0 <esp_now_get_peer_role>:
-00000218 <esp_now_set_peer_role>:
-00000240 <esp_now_set_peer_channel>:
-00000268 <esp_now_get_peer_channel>:
-00000290 <esp_now_set_peer_key>:
-000002b8 <esp_now_get_peer_key>:
-000002e0 <esp_now_is_peer_exist>:
-0000030c <esp_now_fetch_peer>:
-00000334 <esp_now_get_cnt_info>:
-00000000 <mt_send_self_protocol-0x24>:
-00000024 <mt_send_self_protocol>:
-000000cc <mt_is_peer_exist>:
-0000010c <mt_set_self_role>:
-00000118 <mt_get_self_role>:
-00000128 <mt_set_peer_role>:
-00000180 <mt_get_peer_role>:
-000001c8 <mt_set_peer_channel>:
-00000218 <mt_get_peer_channel>:
-000002a0 <mt_set_peer_key>:
-00000448 <mt_get_peer_key>:
-00000528 <mt_add_peer>:
-0000075c <mt_del_peer>:
-00000830 <mt_fetch_peer>:
-00000850 <mt_register_recv_self_protocol_cb>:
-00000868 <mt_unregister_recv_self_protocol_cb>:
-00000878 <mt_recv_action_cb>:
-000008d8 <mt_get_cnt_info>:
-00000914 <mt_init>:
-000009a4 <mt_deinit>:
-00000a90 <.irom.text>:
+esp_now_init-0xc
+esp_now_init
+esp_now_deinit
+esp_now_register_recv_cb
+esp_now_unregister_recv_cb
+esp_now_send
+esp_now_add_peer
+esp_now_del_peer
+esp_now_set_self_role
+esp_now_get_self_role
+esp_now_get_peer_role
+esp_now_set_peer_role
+esp_now_set_peer_channel
+esp_now_get_peer_channel
+esp_now_set_peer_key
+esp_now_get_peer_key
+esp_now_is_peer_exist
+esp_now_fetch_peer
+esp_now_get_cnt_info
+mt_send_self_protocol-0x24
+mt_send_self_protocol
+mt_is_peer_exist
+mt_set_self_role
+mt_get_self_role
+mt_set_peer_role
+mt_get_peer_role
+mt_set_peer_channel
+mt_get_peer_channel
+mt_set_peer_key
+mt_get_peer_key
+mt_add_peer
+mt_del_peer
+mt_fetch_peer
+mt_register_recv_self_protocol_cb
+mt_unregister_recv_self_protocol_cb
+mt_recv_action_cb
+mt_get_cnt_info
+mt_init
+mt_deinit
+.irom.text
