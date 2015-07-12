@@ -33,7 +33,7 @@ $ ant dist
 
 #### Basic Wiring functions ####
 
-```pinMode```, ```digitalRead```, ```digitalWrite```, ```analogWrite``` work as usual.
+```pinMode()```, ```digitalRead()```, ```digitalWrite()```, ```analogWrite()``` work as usual.
 
 Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2,
 call ```digitalRead(2)```
@@ -46,7 +46,7 @@ GPIO16 can be ```INPUT```, ```OUTPUT``` or ```INPUT_PULLDOWN```.
 ```analogWrite(pin, value)``` enables software PWM on the given pin. PWM may be used on pins 0 to 15.
 Call ```analogWrite(pin, 0)``` to disable PWM on the pin. ```value``` may be in range from 0 to ```PWMRANGE```, which is currently equal to 1023.
 
-Pin interrupts are supported through ```attachInterrupt```, ```detachInterrupt``` functions.
+Pin interrupts are supported through ```attachInterrupt()``` and ```detachInterrupt()``` functions.
 Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt
 types are supported: ```CHANGE```, ```RISING```, ```FALLING```.
 
@@ -57,19 +57,19 @@ The most usable pin functions are mapped to the macro ```SPECIAL```, so calling 
 will switch that pin in the most usable FUNCTION_X. Those are UART RX/TX on pins 1 - 3, HSPI for pins 12-15 and CLK functions for pins 0, 4 and 5.
 
 #### Timing and delays ####
-```millis``` and ```micros``` return the number of milliseconds and microseconds elapsed after reset, respectively.
+```millis()``` and ```micros()``` return the number of milliseconds and microseconds elapsed after reset, respectively.
 
-```delay``` pauses the sketch for a given number of milliseconds and allows WiFi and TCP/IP tasks to run.
-```delayMicroseconds``` pauses for a given number of microseconds.
+```delay()``` pauses the sketch for a given number of milliseconds and allows WiFi and TCP/IP tasks to run.
+```delayMicroseconds()``` pauses for a given number of microseconds.
 
 Remember that there is a lot of code that needs to run on the chip besides the sketch
 when WiFi is connected. WiFi and TCP/IP libraries get a chance to handle any pending
-events each time the ```loop()``` function completes, OR when ```delay(...)``` is called.
+events each time the ```loop()``` function completes, OR when ```delay()``` is called.
 If you have a loop somewhere in your sketch that takes a lot of time (>50ms) without
 calling ```delay()```, you might consider adding a call to delay function to keep the WiFi
 stack running smoothly.
 
-There is also a ```yield()``` function which is equivalent to ```delay(0)```. The delayMicroseconds
+There is also a ```yield()``` function which is equivalent to ```delay(0)```. The ```delayMicroseconds()```
 function, on the other hand, does not yield to other tasks, so using it for delays
 more than 20 milliseconds is not recommended.
 
@@ -77,11 +77,11 @@ more than 20 milliseconds is not recommended.
 
 ```Serial``` object works much the same way as on a regular Arduino. Apart from hardware FIFO (128 bytes for TX and RX) HardwareSerial has additional 256-byte TX and RX buffers. Both transmit and receive is interrupt-driven. Write and read functions only block the sketch execution when the respective FIFO/buffers are full/empty.
 
-```Serial``` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling ```Serial.swap()``` after ```Serial.begin()```. Calling ```swap``` again maps UART0 back to GPIO1 and GPIO3.
+```Serial``` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling ```Serial.swap()``` after ```Serial.begin()```. Calling ```Serial.swap()``` again maps UART0 back to GPIO1 and GPIO3.
 
-```Serial1``` uses UART1 which is a transmit-only UART. UART1 TX pin is GPIO2. To use ```Serial1```, call ```Serial1.begin```.
+```Serial1``` uses UART1 which is a transmit-only UART. UART1 TX pin is GPIO2. To use ```Serial1```, call ```Serial1.begin()```.
 
-By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin```. To enable debug output again, call ```Serial.setDebugOutput(true)```. To redirect debug output to ```Serial1``` instead, call ```Serial1.setDebugOutput(true)```.
+By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin()```. To enable debug output again, call ```Serial.setDebugOutput(true)```. To redirect debug output to ```Serial1``` instead, call ```Serial1.setDebugOutput(true)```.
 
 You also need to use ```Serial.setDebugOutput(true)``` to enable output from the Arduino ```printf()``` function.
 
@@ -129,7 +129,7 @@ This is a bit different from standard EEPROM class. You need to call ```EEPROM.b
 before you start reading or writing, size being the number of bytes you want to use.
 Size can be anywhere between 4 and 4096 bytes.
 
-```EEPROM.write``` does not write to flash immediately, instead you must call ```EEPROM.commit()```
+```EEPROM.write()``` does not write to flash immediately, instead you must call ```EEPROM.commit()```
 whenever you wish to save changes to flash. ```EEPROM.end()``` will also commit, and will
 release the RAM copy of EEPROM contents.
 
@@ -153,7 +153,7 @@ Setting the Clock polarity (CPOL) is not supported, yet (SPI_MODE2 and SPI_MODE3
 
 APIs related to deep sleep and watchdog timer are available in the ```ESP``` object, only available in Alpha version.
 
-```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_RF_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from deepSleep.)
+```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_RF_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from ```ESP.deepSleep()```.)
 
 ```ESP.restart()``` restarts the CPU.
 
@@ -173,14 +173,14 @@ Several APIs may be used to get flash chip info:
 
 ```ESP.getVcc()``` may be used to measure supply voltage. ESP needs to reconfigure the ADC
 at startup in order for this feature to be available. Add the following line to the top
-of your sketch to use ```getVcc```:
+of your sketch to use ```ESP.getVcc()```:
 ```
 ADC_MODE(ADC_VCC);
 ```
 TOUT pin has to be disconnected in this mode.
 
 Note that by default ADC is configured to read from TOUT pin using ```analogRead(A0)```, and
-```ESP.getVCC()``` is not available.
+```ESP.getVcc()``` is not available.
 
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 
