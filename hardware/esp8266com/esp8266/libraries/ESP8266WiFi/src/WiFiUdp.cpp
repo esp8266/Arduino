@@ -40,6 +40,7 @@ extern "C"
 #include "lwip/mem.h"
 #include "include/UdpContext.h"
 
+extern "C" uint32_t esp_micros_at_task_start();
 
 template<>
 WiFiUDP* SList<WiFiUDP>::_s_first = 0;
@@ -116,9 +117,13 @@ uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, ui
 /* return number of bytes available in the current packet,
    will return zero if parsePacket hasn't been called yet */
 int WiFiUDP::available() {
-    if (!_ctx)
-        return 0;
-    return static_cast<int>(_ctx->getSize());
+    int isAvailable = (_ctx != NULL) ? static_cast<int>(_ctx->getSize()) : 0
+
+    if (!isAvailable && (micros() - esp_micros_at_task_start()) > 10000) {
+        yield();
+    }
+
+    return isAvailable;
 }
 
 /* Release any resources being used by this WiFiUDP instance */
