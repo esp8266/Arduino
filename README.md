@@ -35,8 +35,7 @@ $ ant dist
 
 ```pinMode()```, ```digitalRead()```, ```digitalWrite()```, ```analogWrite()``` work as usual.
 
-Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2,
-call ```digitalRead(2)```
+Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2, call ```digitalRead(2)```.
 
 GPIO0-GPIO15 can be ```INPUT```, ```OUTPUT```, ```INPUT_PULLUP```, and ```INPUT_PULLDOWN```.
 GPIO16 can be ```INPUT```, ```OUTPUT``` or ```INPUT_PULLDOWN```.
