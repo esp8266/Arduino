@@ -112,7 +112,7 @@ You can use ```udp.destinationIP()``` to tell whether the packet received was
 sent to the multicast or unicast address.
 Also note that multicast doesn't work on softAP interface.
 
-WiFiServer, WiFiClient, and WiFiUDP behave mostly the same way as with WiFi shield library.
+```WiFiServer```, ```WiFiClient```, and ```WiFiUDP``` behave mostly the same way as with WiFi shield library.
 Four samples are provided for this library.
 You can see more commands here: [http://www.arduino.cc/en/Reference/WiFi](http://www.arduino.cc/en/Reference/WiFi)
 
