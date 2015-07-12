@@ -54,8 +54,11 @@ void loop() {
     WiFiClient client;
     if (client.connect(remote, port)) {
     
-      Serial.setDebugOutput(true);
-      while(!Update.isFinished()) Update.write(client);
+      uint32_t written;
+      while(!Update.isFinished()){
+        written = Update.write(client);
+        if(written > 0) client.print(written, DEC);
+      }
       Serial.setDebugOutput(false);
     
       if(Update.end()){
