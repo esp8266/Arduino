@@ -36,7 +36,7 @@ $ ant dist
 ```pinMode```, ```digitalRead```, ```digitalWrite```, ```analogWrite``` work as usual.
 
 Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2,
-call ```digitalRead(2);```
+call ```digitalRead(2)```
 
 GPIO0-GPIO15 can be ```INPUT```, ```OUTPUT```, ```INPUT_PULLUP```, and ```INPUT_PULLDOWN```.
 GPIO16 can be ```INPUT```, ```OUTPUT``` or ```INPUT_PULLDOWN```.
@@ -77,15 +77,15 @@ more than 20 milliseconds is not recommended.
 
 ```Serial``` object works much the same way as on a regular Arduino. Apart from hardware FIFO (128 bytes for TX and RX) HardwareSerial has additional 256-byte TX and RX buffers. Both transmit and receive is interrupt-driven. Write and read functions only block the sketch execution when the respective FIFO/buffers are full/empty.
 
-```Serial``` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling ```Serial.swap();``` after ```Serial.begin();```. Calling ```swap``` again maps UART0 back to GPIO1 and GPIO3.
+```Serial``` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling ```Serial.swap()``` after ```Serial.begin()```. Calling ```swap``` again maps UART0 back to GPIO1 and GPIO3.
 
 ```Serial1``` uses UART1 which is a transmit-only UART. UART1 TX pin is GPIO2. To use ```Serial1```, call ```Serial1.begin```.
 
-By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin```. To enable debug output again, call ```Serial.setDebugOutput(true);```. To redirect debug output to ```Serial1``` instead, call ```Serial1.setDebugOutput(true);```.
+By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin```. To enable debug output again, call ```Serial.setDebugOutput(true)```. To redirect debug output to ```Serial1``` instead, call ```Serial1.setDebugOutput(true)```.
 
 You also need to use ```Serial.setDebugOutput(true)``` to enable output from the Arduino ```printf()``` function.
 
-Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call ```Serial.begin(baudrate, SERIAL_8N1);```, ```Serial.begin(baudrate, SERIAL_6E2);```, etc.
+Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call ```Serial.begin(baudrate, SERIAL_8N1)```, ```Serial.begin(baudrate, SERIAL_6E2)```, etc.
 
 #### Progmem ####
 
@@ -102,7 +102,7 @@ This is mostly similar to WiFi shield library. Differences include:
 - ```WiFi.macAddress(mac)``` is for STA, ```WiFi.softAPmacAddress(mac)``` is for AP.
 - ```WiFi.localIP()``` is for STA, ```WiFi.softAPIP()``` is for AP.
 - ```WiFi.RSSI()``` doesn't work
-- ```WiFi.printDiag(Serial);``` will print out some diagnostic info
+- ```WiFi.printDiag(Serial)``` will print out some diagnostic info
 - ```WiFiUDP``` class supports sending and receiving multicast packets on STA interface.
 When sending a multicast packet, replace ```udp.beginPacket(addr, port)``` with
 ```udp.beginPacketMulticast(addr, port, WiFi.localIP())```.
@@ -141,7 +141,7 @@ Three examples included.
 
 Wire library currently supports master mode up to approximately 450KHz.
 Before using I2C, pins for SDA and SCL need to be set by calling
-```Wire.begin(int sda, int scl)```, i.e. ```Wire.begin(0, 2);``` on ESP-01,
+```Wire.begin(int sda, int scl)```, i.e. ```Wire.begin(0, 2)``` on ESP-01,
 else they default to pins 4(SDA) and 5(SCL).
 
 #### SPI ####
@@ -212,7 +212,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [aREST](https://github.com/marcoschwartz/aREST) REST API handler library.
 - [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
-- [DHT11](https://github.com/adafruit/DHT-sensor-library) - Download latest v1.1.0 library and no changes are necessary.  Older versions should initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
+- [DHT11](https://github.com/adafruit/DHT-sensor-library) - Download latest v1.1.0 library and no changes are necessary.  Older versions should initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15)```
 - [NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) - Adafruit's NeoPixel library, now with support for the ESP8266 (use version 1.0.2 or higher from Arduino's library manager).
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266. Use the "NeoPixelAnimator" branch for esp8266 to get HSL color support and more.
 - [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
