@@ -149,58 +149,49 @@ char* ultoa(unsigned long value, char* result, int base) {
 
 char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
 
-    if (isnan(number)) {
+    if(isnan(number)) {
         strcpy(s, "nan");
         return s;
     }
-    if (isinf(number)) {
+    if(isinf(number)) {
         strcpy(s, "inf");
         return s;
     }
 
-    if (number > 4294967040.0 || number < -4294967040.0) {
+    if(number > 4294967040.0 || number < -4294967040.0) {
         strcpy(s, "ovf");
         return s;
     }
-
     char* out = s;
-    int signInt_Part = 1;
-
     // Handle negative numbers
-    if (number < 0.0) {
-        signInt_Part = -1;
+    if(number < 0.0) {
+        *out = '-';
+        ++out;
         number = -number;
-    }
-
-    // calc left over digits 
-    if (prec > 0)
-    {
-        width -= (prec + 1);
     }
 
     // Round correctly so that print(1.999, 2) prints as "2.00"
     double rounding = 0.5;
-    for (uint8_t i = 0; i < prec; ++i)
+    for(uint8_t i = 0; i < prec; ++i)
         rounding /= 10.0;
 
     number += rounding;
 
     // Extract the integer part of the number and print it
-    unsigned long int_part = (unsigned long)number;
-    double remainder = number - (double)int_part;
-    out += sprintf(out, "%*ld", width, int_part * signInt_Part);
+    unsigned long int_part = (unsigned long) number;
+    double remainder = number - (double) int_part;
+    out += sprintf(out, "%ld", int_part);
 
     // Print the decimal point, but only if there are digits beyond
-    if (prec > 0) {
+    if(prec > 0) {
         *out = '.';
         ++out;
-
-
-        for (unsigned char decShift = prec; decShift > 0; decShift--) {
-            remainder *= 10.0;
-        }
-        sprintf(out, "%0*d", prec, (int)remainder);
     }
+
+    for (unsigned char decShift = prec; decShift > 0; decShift--) {
+        remainder *= 10.0;
+    }
+    sprintf(out, "%0*d", prec, (int)remainder);
 
     return s;
 }

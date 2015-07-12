@@ -135,17 +135,6 @@ int printf_P(const char* formatP, ...) {
     return ret;
 }
 
-int sprintf_P(char* str, const char* formatP, ...) {
-    int ret;
-    va_list arglist;
-    va_start(arglist, formatP);
-
-    ret = vsnprintf_P(str, SIZE_IRRELEVANT, formatP, arglist);
-
-    va_end(arglist);
-    return ret;
-}
-
 int snprintf_P(char* str, size_t strSize, const char* formatP, ...) {
     int ret;
     va_list arglist;
