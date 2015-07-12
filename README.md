@@ -202,7 +202,7 @@ See attached example for details.
 #### Servo ####
 
 This library exposes the ability to control RC (hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support.  Servo counts above 12 will use Timer1 and features that use it will be effected.
-While many RC servo motors will accept the 3.3v IO data pin from a esp8266, most will not be able to run off 3.3v and will require another power source that matches their specifications.  Make sure to connect the grounds between the esp8266 and the servo motor power supply.
+While many RC servo motors will accept the 3.3V IO data pin from a esp8266, most will not be able to run off 3.3v and will require another power source that matches their specifications.  Make sure to connect the grounds between the esp8266 and the servo motor power supply.
 
 #### Other libraries (not included with the IDE)
 
@@ -226,7 +226,7 @@ You need to put ESP8266 into bootloader mode before uploading code.
 
 #### Power Supply ####
 
-For stable use of the ESP8266 a power supply with 3V3 and >= 250mA is required.
+For stable use of the ESP8266 a power supply with 3.3V and >= 250mA is required.
 
 * Note
  - using Power from USB to Serial is may unstable, they not deliver enough current.
@@ -237,7 +237,7 @@ There are many different USB to Serial adapters / boards.
 
 * Note
  - for full upload management you need RTS and DTR
- - the chip need to have 3V3 TTL (5V may damage the chip)
+ - the chip need to have 3.3V TTL (5V may damage the chip)
  - not all board have all pins of the ICs as breakout (check before order)
  - CTS and DSR are not useful for upload (they are Inputs)
 
