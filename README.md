@@ -174,9 +174,9 @@ Several APIs may be used to get flash chip info:
 ```ESP.getVcc()``` may be used to measure supply voltage. ESP needs to reconfigure the ADC
 at startup in order for this feature to be available. Add the following line to the top
 of your sketch to use ```getVcc```:
-```
-ADC_MODE(ADC_VCC);
-```
+
+    ADC_MODE(ADC_VCC);
+
 TOUT pin has to be disconnected in this mode.
 
 Note that by default ADC is configured to read from TOUT pin using ```analogRead(A0)```, and
