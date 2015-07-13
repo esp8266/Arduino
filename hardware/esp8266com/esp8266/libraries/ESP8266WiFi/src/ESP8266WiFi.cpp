@@ -55,6 +55,30 @@ void ESP8266WiFiClass::mode(WiFiMode m)
     if(wifi_get_opmode() == (uint8)m) {
         return;
     }
+
+    if((m & WIFI_AP)) {
+        _useApMode = true;
+    } else {
+        _useApMode = false;
+    }
+
+    if((m & WIFI_STA)) {
+        _useClientMode = true;
+    } else {
+        _useClientMode = false;
+    }
+
+    ETS_UART_INTR_DISABLE();
+    wifi_set_opmode(m);
+    ETS_UART_INTR_ENABLE();
+}
+
+void ESP8266WiFiClass::_mode(WiFiMode m)
+{
+    if(wifi_get_opmode() == (uint8)m) {
+        return;
+    }
+
     ETS_UART_INTR_DISABLE();
     wifi_set_opmode(m);
     ETS_UART_INTR_ENABLE();
@@ -69,10 +93,10 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t ch
 
     if(_useApMode) {
         // turn on AP+STA mode
-        mode(WIFI_AP_STA);
+        _mode(WIFI_AP_STA);
     } else {
         // turn on STA mode
-        mode(WIFI_STA);
+        _mode(WIFI_STA);
     }
 
     if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
@@ -156,6 +180,31 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
     _useStaticIp = true;
 }
 
+int ESP8266WiFiClass::softAPdisconnect(bool wifioff)
+{
+    struct softap_config conf;
+    *conf.ssid = 0;
+    *conf.password = 0;
+    ETS_UART_INTR_DISABLE();
+    wifi_softap_set_config(&conf);
+    wifi_station_disconnect();
+    ETS_UART_INTR_ENABLE();
+
+    if(wifioff) {
+        _useApMode = false;
+
+        if( _useClientMode) {
+            // turn on AP
+            _mode(WIFI_STA);
+        } else {
+            // turn wifi off
+            _mode(WIFI_OFF);
+        }
+    }
+
+    return 0;
+}
+
 int ESP8266WiFiClass::disconnect(bool wifioff)
 {
     struct station_config conf;
@@ -171,10 +220,10 @@ int ESP8266WiFiClass::disconnect(bool wifioff)
 
         if(_useApMode) {
             // turn on AP
-            mode(WIFI_AP);
+            _mode(WIFI_AP);
         } else {
             // turn wifi off
-            mode(WIFI_OFF);
+            _mode(WIFI_OFF);
         }
     }
 
@@ -192,10 +241,10 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int chan
     _useApMode = true;
     if(_useClientMode) {
         // turn on AP+STA mode
-        mode(WIFI_AP_STA);
+        _mode(WIFI_AP_STA);
     } else {
         // turn on STA mode
-        mode(WIFI_AP);
+        _mode(WIFI_AP);
     }
 
     if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
@@ -417,10 +466,10 @@ int8_t ESP8266WiFiClass::scanNetworks(bool async)
 
     if(_useApMode) {
         // turn on AP+STA mode
-        mode(WIFI_AP_STA);
+        _mode(WIFI_AP_STA);
     } else {
         // turn on STA mode
-        mode(WIFI_STA);
+        _mode(WIFI_STA);
     }
 
     int status = wifi_station_get_connect_status();
@@ -645,10 +694,10 @@ bool ESP8266WiFiClass::beginWPSConfig(void) {
 
      if(_useApMode) {
          // turn on AP+STA mode
-         mode(WIFI_AP_STA);
+         _mode(WIFI_AP_STA);
      } else {
          // turn on STA mode
-         mode(WIFI_STA);
+         _mode(WIFI_STA);
      }
 
     disconnect();
@@ -693,10 +742,10 @@ void ESP8266WiFiClass::beginSmartConfig()
 
     if(_useApMode) {
         // turn on AP+STA mode
-        mode(WIFI_AP_STA);
+        _mode(WIFI_AP_STA);
     } else {
         // turn on STA mode
-        mode(WIFI_STA);
+        _mode(WIFI_STA);
     }
 
     _smartConfigStarted = true;
