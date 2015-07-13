@@ -160,8 +160,16 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity){
   return quantity;
 }
 
+extern "C" void optimistic_yield();
+
 int TwoWire::available(void){
-  return rxBufferLength - rxBufferIndex;
+    int result = rxBufferLength - rxBufferIndex;
+
+    if (!result) {
+        optimistic_yield();
+    }
+
+    return result;
 }
 
 int TwoWire::read(void){

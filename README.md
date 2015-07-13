@@ -218,6 +218,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
 - [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with esp8266.
 - [Souliss, Smart Home](https://github.com/souliss/souliss) - Framework for Smart Home based on Arduino, Android and openHAB.
+- [ST7735](https://github.com/nzmichaelh/Adafruit-ST7735-Library) - Adafruit's ST7735 library modified to be compatible with esp8266.  Just make sure to modify the pins in the examples as they are still AVR specific.
 
 #### Upload via serial port ####
 Pick the correct serial port.

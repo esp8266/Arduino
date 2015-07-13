@@ -551,14 +551,20 @@ bool HardwareSerial::isRxEnabled(void) {
     return _uart->rxEnabled;
 }
 
+extern "C" void optimistic_yield();
+
 int HardwareSerial::available(void) {
-    if(_uart == 0)
-        return 0;
-    if(_uart->rxEnabled) {
-        return static_cast<int>(_rx_buffer->getSize());
-    } else {
-        return 0;
+    int result = 0;
+
+    if (_uart != NULL && _uart->rxEnabled) {
+        result = static_cast<int>(_rx_buffer->getSize());
     }
+
+    if (!result) {
+        optimistic_yield();
+    }
+
+    return result;
 }
 
 int HardwareSerial::peek(void) {

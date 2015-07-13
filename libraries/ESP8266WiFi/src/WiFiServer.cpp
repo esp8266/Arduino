@@ -84,17 +84,15 @@ bool WiFiServer::getNoDelay(){
   return tcp_nagle_disabled(_pcb);
 }
 
-extern "C" uint32_t esp_micros_at_task_start();
-
 bool WiFiServer::hasClient(){
   if (_unclaimed) return true;
   return false;
 }
 
+extern "C" void optimistic_yield();
+
 WiFiClient WiFiServer::available(byte* status)
 {
-    static uint32_t lastPollTime = 0;
-
     if (_unclaimed)
     {
         WiFiClient result(_unclaimed);
@@ -103,9 +101,7 @@ WiFiClient WiFiServer::available(byte* status)
         return result;
     }
 
-    if (lastPollTime > esp_micros_at_task_start())
-        yield();
-    lastPollTime = micros();
+    optimistic_yield();
 
     return WiFiClient();
 }
