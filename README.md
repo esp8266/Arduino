@@ -33,10 +33,9 @@ $ ant dist
 
 #### Basic Wiring functions ####
 
-```pinMode```, ```digitalRead```, ```digitalWrite```, ```analogWrite``` work as usual.
+```pinMode()```, ```digitalRead()```, ```digitalWrite()```, ```analogWrite()``` work as usual.
 
-Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2,
-call ```digitalRead(2);```
+Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2, call ```digitalRead(2)```.
 
 GPIO0-GPIO15 can be ```INPUT```, ```OUTPUT```, ```INPUT_PULLUP```, and ```INPUT_PULLDOWN```.
 GPIO16 can be ```INPUT```, ```OUTPUT``` or ```INPUT_PULLDOWN```.
@@ -46,7 +45,7 @@ GPIO16 can be ```INPUT```, ```OUTPUT``` or ```INPUT_PULLDOWN```.
 ```analogWrite(pin, value)``` enables software PWM on the given pin. PWM may be used on pins 0 to 15.
 Call ```analogWrite(pin, 0)``` to disable PWM on the pin. ```value``` may be in range from 0 to ```PWMRANGE```, which is currently equal to 1023.
 
-Pin interrupts are supported through ```attachInterrupt```, ```detachInterrupt``` functions.
+Pin interrupts are supported through ```attachInterrupt()``` and ```detachInterrupt()``` functions.
 Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt
 types are supported: ```CHANGE```, ```RISING```, ```FALLING```.
 
@@ -57,19 +56,19 @@ The most usable pin functions are mapped to the macro ```SPECIAL```, so calling 
 will switch that pin in the most usable FUNCTION_X. Those are UART RX/TX on pins 1 - 3, HSPI for pins 12-15 and CLK functions for pins 0, 4 and 5.
 
 #### Timing and delays ####
-```millis``` and ```micros``` return the number of milliseconds and microseconds elapsed after reset, respectively.
+```millis()``` and ```micros()``` return the number of milliseconds and microseconds elapsed after reset, respectively.
 
-```delay``` pauses the sketch for a given number of milliseconds and allows WiFi and TCP/IP tasks to run.
-```delayMicroseconds``` pauses for a given number of microseconds.
+```delay()``` pauses the sketch for a given number of milliseconds and allows WiFi and TCP/IP tasks to run.
+```delayMicroseconds()``` pauses for a given number of microseconds.
 
 Remember that there is a lot of code that needs to run on the chip besides the sketch
 when WiFi is connected. WiFi and TCP/IP libraries get a chance to handle any pending
-events each time the ```loop()``` function completes, OR when ```delay(...)``` is called.
+events each time the ```loop()``` function completes, OR when ```delay()``` is called.
 If you have a loop somewhere in your sketch that takes a lot of time (>50ms) without
 calling ```delay()```, you might consider adding a call to delay function to keep the WiFi
 stack running smoothly.
 
-There is also a ```yield()``` function which is equivalent to ```delay(0)```. The delayMicroseconds
+There is also a ```yield()``` function which is equivalent to ```delay(0)```. The ```delayMicroseconds()```
 function, on the other hand, does not yield to other tasks, so using it for delays
 more than 20 milliseconds is not recommended.
 
@@ -77,15 +76,15 @@ more than 20 milliseconds is not recommended.
 
 ```Serial``` object works much the same way as on a regular Arduino. Apart from hardware FIFO (128 bytes for TX and RX) HardwareSerial has additional 256-byte TX and RX buffers. Both transmit and receive is interrupt-driven. Write and read functions only block the sketch execution when the respective FIFO/buffers are full/empty.
 
-```Serial``` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling ```Serial.swap();``` after ```Serial.begin();```. Calling ```swap``` again maps UART0 back to GPIO1 and GPIO3.
+```Serial``` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling ```Serial.swap()``` after ```Serial.begin()```. Calling ```Serial.swap()``` again maps UART0 back to GPIO1 and GPIO3.
 
-```Serial1``` uses UART1 which is a transmit-only UART. UART1 TX pin is GPIO2. To use ```Serial1```, call ```Serial1.begin```.
+```Serial1``` uses UART1 which is a transmit-only UART. UART1 TX pin is GPIO2. To use ```Serial1```, call ```Serial1.begin()```.
 
-By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin```. To enable debug output again, call ```Serial.setDebugOutput(true);```. To redirect debug output to ```Serial1``` instead, call ```Serial1.setDebugOutput(true);```.
+By default the diagnostic output from WiFi libraries is disabled when you call ```Serial.begin()```. To enable debug output again, call ```Serial.setDebugOutput(true)```. To redirect debug output to ```Serial1``` instead, call ```Serial1.setDebugOutput(true)```.
 
 You also need to use ```Serial.setDebugOutput(true)``` to enable output from the Arduino ```printf()``` function.
 
-Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call ```Serial.begin(baudrate, SERIAL_8N1);```, ```Serial.begin(baudrate, SERIAL_6E2);```, etc.
+Both ```Serial``` and ```Serial1``` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call ```Serial.begin(baudrate, SERIAL_8N1)```, ```Serial.begin(baudrate, SERIAL_6E2)```, etc.
 
 #### Progmem ####
 
@@ -102,7 +101,7 @@ This is mostly similar to WiFi shield library. Differences include:
 - ```WiFi.macAddress(mac)``` is for STA, ```WiFi.softAPmacAddress(mac)``` is for AP.
 - ```WiFi.localIP()``` is for STA, ```WiFi.softAPIP()``` is for AP.
 - ```WiFi.RSSI()``` doesn't work
-- ```WiFi.printDiag(Serial);``` will print out some diagnostic info
+- ```WiFi.printDiag(Serial)``` will print out some diagnostic info
 - ```WiFiUDP``` class supports sending and receiving multicast packets on STA interface.
 When sending a multicast packet, replace ```udp.beginPacket(addr, port)``` with
 ```udp.beginPacketMulticast(addr, port, WiFi.localIP())```.
@@ -112,7 +111,7 @@ You can use ```udp.destinationIP()``` to tell whether the packet received was
 sent to the multicast or unicast address.
 Also note that multicast doesn't work on softAP interface.
 
-WiFiServer, WiFiClient, and WiFiUDP behave mostly the same way as with WiFi shield library.
+```WiFiServer```, ```WiFiClient```, and ```WiFiUDP``` behave mostly the same way as with WiFi shield library.
 Four samples are provided for this library.
 You can see more commands here: [http://www.arduino.cc/en/Reference/WiFi](http://www.arduino.cc/en/Reference/WiFi)
 
@@ -129,7 +128,7 @@ This is a bit different from standard EEPROM class. You need to call ```EEPROM.b
 before you start reading or writing, size being the number of bytes you want to use.
 Size can be anywhere between 4 and 4096 bytes.
 
-```EEPROM.write``` does not write to flash immediately, instead you must call ```EEPROM.commit()```
+```EEPROM.write()``` does not write to flash immediately, instead you must call ```EEPROM.commit()```
 whenever you wish to save changes to flash. ```EEPROM.end()``` will also commit, and will
 release the RAM copy of EEPROM contents.
 
@@ -141,7 +140,7 @@ Three examples included.
 
 Wire library currently supports master mode up to approximately 450KHz.
 Before using I2C, pins for SDA and SCL need to be set by calling
-```Wire.begin(int sda, int scl)```, i.e. ```Wire.begin(0, 2);``` on ESP-01,
+```Wire.begin(int sda, int scl)```, i.e. ```Wire.begin(0, 2)``` on ESP-01,
 else they default to pins 4(SDA) and 5(SCL).
 
 #### SPI ####
@@ -153,7 +152,7 @@ Setting the Clock polarity (CPOL) is not supported, yet (SPI_MODE2 and SPI_MODE3
 
 APIs related to deep sleep and watchdog timer are available in the ```ESP``` object, only available in Alpha version.
 
-```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_RF_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from deepSleep.)
+```ESP.deepSleep(microseconds, mode)``` will put the chip into deep sleep. ```mode``` is one of ```WAKE_RF_DEFAULT```, ```WAKE_RFCAL```, ```WAKE_NO_RFCAL```, ```WAKE_RF_DISABLED```. (GPIO16 needs to be tied to RST to wake from ```ESP.deepSleep()```.)
 
 ```ESP.restart()``` restarts the CPU.
 
@@ -173,14 +172,14 @@ Several APIs may be used to get flash chip info:
 
 ```ESP.getVcc()``` may be used to measure supply voltage. ESP needs to reconfigure the ADC
 at startup in order for this feature to be available. Add the following line to the top
-of your sketch to use ```getVcc```:
-```
-ADC_MODE(ADC_VCC);
-```
+of your sketch to use ```ESP.getVcc()```:
+
+    ADC_MODE(ADC_VCC);
+
 TOUT pin has to be disconnected in this mode.
 
 Note that by default ADC is configured to read from TOUT pin using ```analogRead(A0)```, and
-```ESP.getVCC()``` is not available.
+```ESP.getVcc()``` is not available.
 
 #### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
 
@@ -202,7 +201,7 @@ See attached example for details.
 #### Servo ####
 
 This library exposes the ability to control RC (hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support.  Servo counts above 12 will use Timer1 and features that use it will be effected.
-While many RC servo motors will accept the 3.3v IO data pin from a esp8266, most will not be able to run off 3.3v and will require another power source that matches their specifications.  Make sure to connect the grounds between the esp8266 and the servo motor power supply.
+While many RC servo motors will accept the 3.3V IO data pin from a esp8266, most will not be able to run off 3.3v and will require another power source that matches their specifications.  Make sure to connect the grounds between the esp8266 and the servo motor power supply.
 
 #### Other libraries (not included with the IDE)
 
@@ -212,7 +211,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [aREST](https://github.com/marcoschwartz/aREST) REST API handler library.
 - [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
-- [DHT11](https://github.com/adafruit/DHT-sensor-library) - Download latest v1.1.0 library and no changes are necessary.  Older versions should initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15);```
+- [DHT11](https://github.com/adafruit/DHT-sensor-library) - Download latest v1.1.0 library and no changes are necessary.  Older versions should initialize DHT as follows: ```DHT dht(DHTPIN, DHTTYPE, 15)```
 - [NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) - Adafruit's NeoPixel libray, now with support for the ESP8266 (use version 1.0.2 or higher from Arduino's library manager).
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266.
 - [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
@@ -225,7 +224,7 @@ You need to put ESP8266 into bootloader mode before uploading code.
 
 #### Power Supply ####
 
-For stable use of the ESP8266 a power supply with 3V3 and >= 250mA is required.
+For stable use of the ESP8266 a power supply with 3.3V and >= 250mA is required.
 
 * Note
  - using Power from USB to Serial is may unstable, they not deliver enough current.
@@ -236,7 +235,7 @@ There are many different USB to Serial adapters / boards.
 
 * Note
  - for full upload management you need RTS and DTR
- - the chip need to have 3V3 TTL (5V may damage the chip)
+ - the chip need to have 3.3V TTL (5V may damage the chip)
  - not all board have all pins of the ICs as breakout (check before order)
  - CTS and DSR are not useful for upload (they are Inputs)
 
