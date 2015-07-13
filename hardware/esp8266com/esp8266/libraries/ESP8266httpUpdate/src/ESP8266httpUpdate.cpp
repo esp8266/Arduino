@@ -23,7 +23,7 @@
  *
  */
 
-#include "ESP8266HTTPUpdate.h"
+#include "ESP8266httpUpdate.h"
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void) {
 

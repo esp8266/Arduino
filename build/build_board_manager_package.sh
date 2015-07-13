@@ -162,9 +162,12 @@ cat << EOF > package_esp8266com_index.json
 }
 EOF
 
+
 if [ ! -z "$upload" ]; then
-    scp $outdir.zip dl:apps/download_files/download/$path
-    scp package_esp8266com_index.json dl:apps/download_files/download/$path
+    remote_path=dl:apps/download_files/download/$path
+    scp $outdir.zip $remote_path
+    scp package_esp8266com_index.json $remote_path
+    scp -r $srcdir/doc $remote_path
 else
     python -m SimpleHTTPServer 
 fi

@@ -985,7 +985,7 @@
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.5-win32" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
-    <move file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.5-win32/esptool.exe" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool.exe" />
+    <copy file="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.5-win32/esptool.exe" tofile="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool.exe" />
     <delete dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/esptool-0.4.5-win32/" />
  
   </target>
