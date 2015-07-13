@@ -30,6 +30,8 @@ extern "C" {
 #include "twi.h"
 #include "Wire.h"
 
+extern "C" uint32_t esp_micros_at_task_start();
+
 // Initialize Class Variables //////////////////////////////////////////////////
 
 uint8_t TwoWire::rxBuffer[BUFFER_LENGTH];
@@ -161,7 +163,13 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity){
 }
 
 int TwoWire::available(void){
-  return rxBufferLength - rxBufferIndex;
+    int isAvailable = rxBufferLength - rxBufferIndex;
+
+    if (!isAvailable && (micros() - esp_micros_at_task_start()) > 10000) {
+        yield();
+    }
+
+    return isAvailable;
 }
 
 int TwoWire::read(void){

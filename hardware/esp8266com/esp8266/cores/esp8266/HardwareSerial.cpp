@@ -39,6 +39,8 @@ extern "C" {
 
 #include "HardwareSerial.h"
 
+extern "C" uint32_t esp_micros_at_task_start();
+
 #define UART_TX_FIFO_SIZE 0x80
 
 struct uart_ {
@@ -552,13 +554,20 @@ bool HardwareSerial::isRxEnabled(void) {
 }
 
 int HardwareSerial::available(void) {
-    if(_uart == 0)
-        return 0;
-    if(_uart->rxEnabled) {
-        return static_cast<int>(_rx_buffer->getSize());
-    } else {
-        return 0;
+    int isAvailable;
+
+    if (_uart != NULL && _uart->rxEnabled) {
+        isAvailable = static_cast<int>(_rx_buffer->getSize());
     }
+    else {
+        isAvailable = 0;
+    }
+
+    if (!isAvailable && (micros() - esp_micros_at_task_start()) > 10000) {
+        yield();
+    }
+
+    return isAvailable;
 }
 
 int HardwareSerial::peek(void) {
