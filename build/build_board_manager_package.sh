@@ -27,15 +27,27 @@ size=`/bin/ls -l $outdir.zip | awk '{print $5}'`
 echo Size: $size
 echo SHA-256: $sha
 
-if [ "$upload" == "prod" ]; then
-    remote="http://arduino.esp8266.com"
+if [ "$upload" == "stable" ]; then
+    badge_title="stable"
+    badge_color="blue"
     path=""
-elif [ "$upload" == "stag" ]; then
-    remote="http://arduino.esp8266.com"
+elif [ "$upload" == "staging" ]; then
+    badge_title="staging"
+    badge_color="yellow"
     path="staging/"
+elif [ "$upload" == "test" ]; then
+    badge_title="test"
+    badge_color="red"
+    path="test/"
 else
     upload=""
     remote="http://localhost:8000"
+fi
+
+if [ ! -z "$upload" ]; then
+  remote="http://arduino.esp8266.com"
+  release_date=$(date "+%b_%d,_%Y")
+  wget -O badge.svg https://img.shields.io/badge/$badge_title-$release_date-$badge_color.svg
 fi
 
 cat << EOF > package_esp8266com_index.json
@@ -120,7 +132,7 @@ cat << EOF > package_esp8266com_index.json
             "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-linux32.tar.gz",
             "archiveFileName":"esptool-0.4.5-linux32.tar.gz",
             "checksum":"SHA-256:4aa81b97a470641771cf371e5d470ac92d3b177adbe8263c4aae66e607b67755",
-            "size":"12044"  
+            "size":"12044"
         }
       ]
     },
@@ -168,9 +180,7 @@ if [ ! -z "$upload" ]; then
     scp $outdir.zip $remote_path
     scp package_esp8266com_index.json $remote_path
     scp -r $srcdir/doc $remote_path
+    scp badge.svg $remote_path
 else
-    python -m SimpleHTTPServer 
+    python -m SimpleHTTPServer
 fi
-
-
-

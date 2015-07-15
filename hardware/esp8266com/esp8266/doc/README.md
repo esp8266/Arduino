@@ -1,17 +1,35 @@
 ### ESP8266 Arduino Core Reference
 
-#### [Change log](hardware/esp8266com/esp8266/changes.md)
+#### [Change log](changes.md)
 
-#### GPIO functions ####
+#### Digital IO ####
 
-`pinMode`, `digitalRead`, `digitalWrite`, `analogWrite` functions work as usual.
+Pin numbers in Arduino correspond directly to the ESP8266 GPIO pin numbers. `pinMode`, `digitalRead`, and `digitalWrite` functions work as usual, so to read GPIO2, call `digitalRead(2)`.
 
-Pin numbers correspond directly to the esp8266 GPIO pin numbers. To read GPIO2, call `digitalRead(2)`.
+Digital pins 0—15 can be `INPUT`, `OUTPUT`, or `INPUT_PULLUP`.
+Pin 16 can be `INPUT`, `OUTPUT` or `INPUT_PULLDOWN`. At startup, pins are configured as `INPUT`.
 
-GPIO0 — GPIO15 can be `INPUT`, `OUTPUT`, or `INPUT_PULLUP`.
-GPIO16 can be `INPUT`, `OUTPUT` or `INPUT_PULLDOWN`.
+Pins may also serve other functions, like Serial, I2C, SPI. These functions are normally activated by the corresponding library. The diagram below shows pin mapping for the popular ESP-12 module.
 
-`analogRead(A0)` reads the value of the ADC channel connected to the TOUT pin.
+![Pin Functions](esp12.svg)
+
+Digital pins 6—11 are not shown on this diagram because they are used to connect flash memory chip on most modules. Trying to use these pins as IOs will likely cause the program to crash.
+
+Note that some boards and modules (ESP-12ED, NodeMCU 1.0) also break out pins 9 and 11. These may be used as IO if flash chip works in DIO mode (as opposed to QIO, which is the default one).
+
+#### Analog input
+
+ESP8266 has a single ADC channel available to users. It may be used either to read voltage at ADC pin, or to read module supply voltage (VCC).
+
+To read external voltage applied to ADC pin, use `analogRead(A0)`. Input voltage range is 0 — 1.0V, and the reference voltage is derived from VCC, which is assumed to be 3.3V.
+
+To read VCC voltage, ADC pin must be kept unconnected. Additionally, the following line has to be added to the sketch:
+```C++
+ADC_MODE(ADC_VCC);
+```
+This line has to appear outside of any functions, for instance right after the `#include ` lines of your sketch.
+
+#### Analog output
 
 `analogWrite(pin, value)` enables software PWM on the given pin. PWM may be used on pins 0 to 15.
 Call `analogWrite(pin, 0)` to disable PWM on the pin. `value` may be in range from 0 to `PWMRANGE`, which is currently equal to 1023.
@@ -20,11 +38,6 @@ Pin interrupts are supported through `attachInterrupt`, `detachInterrupt` functi
 Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt
 types are supported: `CHANGE`, `RISING`, `FALLING`.
 
-#### Pin Functions ####
-
-![Pin Functions](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/pin_functions.png)
-The most usable pin functions are mapped to the macro `SPECIAL`, so calling `pinMode(pin, SPECIAL)`
-will switch that pin in the most usable `FUNCTION_X`. Those are UART RX/TX on pins 1 - 3, HSPI for pins 12-15 and CLK functions for pins 0, 4 and 5.
 
 #### Timing and delays ####
 `millis()` and `micros()` return the number of milliseconds and microseconds elapsed after reset, respectively.
@@ -49,7 +62,7 @@ more than 20 milliseconds is not recommended.
 
 `Serial` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling `Serial.swap()` after `Serial.begin`. Calling `swap` again maps UART0 back to GPIO1 and GPIO3.
 
-`Serial1` uses UART1 which is a transmit-only UART. UART1 TX pin is GPIO2. To use `Serial1`, call `Serial1.begin(baudrate)`.
+`Serial1` uses UART1, TX pin is GPIO2. UART1 can not be used to receive data because normally it's RX pin is occupied for flash chip connection. To use `Serial1`, call `Serial1.begin(baudrate)`.
 
 By default the diagnostic output from WiFi libraries is disabled when you call `Serial.begin`. To enable debug output again, call `Serial.setDebugOutput(true)`. To redirect debug output to `Serial1` instead, call `Serial1.setDebugOutput(true)`.
 
@@ -60,7 +73,7 @@ Both `Serial` and `Serial1` objects support 5, 6, 7, 8 data bits, odd (O), even 
 #### Progmem ####
 
 The Program memory features work much the same way as on a regular Arduino; placing read only data and strings in read only memory and freeing heap for your application.
-The important difference is that on the esp8266 the literal strings are not pooled.  This means that the same literal string defined inside a `F("")` and/or `PSTR("")` will take up space for each instance in the code. So you will need to manage the duplicate strings yourself.
+The important difference is that on the ESP8266 the literal strings are not pooled.  This means that the same literal string defined inside a `F("")` and/or `PSTR("")` will take up space for each instance in the code. So you will need to manage the duplicate strings yourself.
 
 #### WiFi(ESP8266WiFi library) ####
 
@@ -172,21 +185,21 @@ See attached example for details.
 #### Servo ####
 
 This library exposes the ability to control RC (hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support.  Servo counts above 12 will use Timer1 and features that use it will be effected.
-While many RC servo motors will accept the 3.3V IO data pin from a esp8266, most will not be able to run off 3.3v and will require another power source that matches their specifications.  Make sure to connect the grounds between the esp8266 and the servo motor power supply.
+While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most will not be able to run off 3.3v and will require another power source that matches their specifications.  Make sure to connect the grounds between the ESP8266 and the servo motor power supply.
 
 #### Other libraries (not included with the IDE)
 
 Libraries that don't rely on low-level access to AVR registers should work well. Here are a few libraries that were verified to work:
 
-- [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) - WebSocket Server and Client compatible with esp8266 (RFC6455)
+- [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) - WebSocket Server and Client compatible with ESP8266 (RFC6455)
 - [aREST](https://github.com/marcoschwartz/aREST) REST API handler library.
 - [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
 - [DHT11](https://github.com/adafruit/DHT-sensor-library) - Download latest v1.1.0 library and no changes are necessary.  Older versions should initialize DHT as follows: `DHT dht(DHTPIN, DHTTYPE, 15)`
 - [NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) - Adafruit's NeoPixel library, now with support for the ESP8266 (use version 1.0.2 or higher from Arduino's library manager).
-- [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with esp8266. Use the "NeoPixelAnimator" branch for esp8266 to get HSL color support and more.
+- [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with ESP8266. Use the "NeoPixelAnimator" branch for ESP8266 to get HSL color support and more.
 - [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
-- [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with esp8266.
+- [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with ESP8266.
 - [Souliss, Smart Home](https://github.com/souliss/souliss) - Framework for Smart Home based on Arduino, Android and openHAB.
 
 #### Upload via serial port ####
