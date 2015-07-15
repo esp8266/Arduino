@@ -2,7 +2,6 @@ Arduino-compatible IDE with ESP8266 support
 ===========================================
 
 [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino)
-[![Donate](http://img.shields.io/paypal/donate.png?color=yellow)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
 
 This project brings support for ESP8266 chip to the Arduino environment. ESP8266WiFi library bundled with this project has the same interface as the WiFi Shield library, making it easy to re-use existing code and libraries.
 
@@ -10,10 +9,17 @@ This project brings support for ESP8266 chip to the Arduino environment. ESP8266
 
 Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
 
-- Install Arduino 1.6.4 from the [Arduino website](http://www.arduino.cc/en/main/software).
+- Install Arduino 1.6.5 from the [Arduino website](http://www.arduino.cc/en/main/software).
 - Start Arduino and open Perferences window.
 - Enter ```http://arduino.esp8266.com/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
+
+#### Available versions
+Release | URL | Documentation
+----|----|----
+![](http://arduino.esp8266.com/badge.svg) |  http://arduino.esp8266.com/package_esp8266com_index.json | [Reference](http://arduino.esp8266.com/doc)
+![](http://arduino.esp8266.com/staging/badge.svg) |  http://arduino.esp8266.com/staging/package_esp8266com_index.json | [Reference](http://arduino.esp8266.com/staging/doc)
+
 
 ### Building latest version from source ###
 ```
@@ -26,7 +32,7 @@ $ ant dist
 Latest development version: [Reference](hardware/esp8266com/esp8266/doc/README.md)
 
 ### Supported boards ###
-- Generic esp8266 modules (without auto-reset support)
+- Generic ESP8266 modules (without auto-reset support)
 - NodeMCU 0.9
 - NodeMCU 1.0
 - Olimex MOD-WIFI-ESP8266
@@ -37,6 +43,14 @@ Latest development version: [Reference](hardware/esp8266com/esp8266/doc/README.m
 Forum: http://www.esp8266.com/arduino
 
 Submit issues on Github: https://github.com/esp8266/Arduino/issues
+
+### Contributing
+
+For minor fixes of code and documentation, go ahead and submit a pull request.
+
+Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed first [in the chat](https://gitter.im/esp8266/Arduino).
+
+Feature branches with lots of small commits (especially titled "oops", "fix typo", "forgot to add file", etc.) should be squashed before opening a pull request. At the same time, please refrain from putting multiple unrelated changes into a single pull request.
 
 ### License and credits ###
 
