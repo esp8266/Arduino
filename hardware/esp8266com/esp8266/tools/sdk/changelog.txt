@@ -1,3 +1,18 @@
+esp_iot_sdk_v1.2.0_15_07_13_p4 Release Note 
+-------------------------------------------
+
+Here is a patch of memory optimization based on SDK_v1.2.0 
+1. It saved about 8KBytes memory.
+2. It revised problem that change mode may cause memory leak.
+3. Update SmartConfig to version 2.4.3
+
+Please replace the lib in \esp_iot_sdk_v1.2.0\lib
+
+Thanks for your interest in Espressif Systems and ESP8266 !
+
+
+
+
 esp_iot_sdk_v1.2.0_15_07_09_p3 Release Note 
 -------------------------------------------
 
