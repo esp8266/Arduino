@@ -89,8 +89,6 @@ bool WiFiServer::hasClient(){
   return false;
 }
 
-extern "C" void optimistic_yield();
-
 WiFiClient WiFiServer::available(byte* status)
 {
     if (_unclaimed)

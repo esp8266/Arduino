@@ -551,8 +551,6 @@ bool HardwareSerial::isRxEnabled(void) {
     return _uart->rxEnabled;
 }
 
-extern "C" void optimistic_yield();
-
 int HardwareSerial::available(void) {
     int result = 0;
 
