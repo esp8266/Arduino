@@ -177,8 +177,6 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     return _client->write(reinterpret_cast<const char*>(buf), size);
 }
 
-extern "C" void optimistic_yield();
-
 int WiFiClient::available()
 {
     int result = 0;

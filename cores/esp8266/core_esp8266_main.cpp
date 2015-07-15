@@ -87,7 +87,7 @@ extern "C" void __yield() {
 }
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
-extern "C" void optimistic_yield() {
+extern "C" void optimistic_yield(void) {
     if (!ETS_INTR_WITHINISR() && 
         (system_get_time() - g_micros_at_last_task_yield) > OPTIMISTIC_YIELD_TIME_US)
     {
