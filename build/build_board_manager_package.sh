@@ -88,6 +88,9 @@ cat << EOF > package_esp8266com_index.json
         },
         {
           "name":"Adafruit HUZZAH ESP8266 (ESP-12)"
+        },
+        {
+          "name":"SweetPea ESP-210"
         }
       ],
       "toolsDependencies":[ {
