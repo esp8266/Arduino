@@ -108,6 +108,10 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   
     if (!isForm){
       if (searchStr != "") searchStr += '&';
+      //some clients send headers first and data after (like we do)
+      //give them a chance
+      int tries = 100;//100ms max wait
+      while(!client.available() && tries--)delay(1);
       size_t plainLen = client.available();
       char *plainBuf = (char*)malloc(plainLen+1);
       client.readBytes(plainBuf, plainLen);
