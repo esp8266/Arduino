@@ -1,8 +1,6 @@
 Arduino-compatible IDE with ESP8266 support
 ===========================================
 
-[![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino)
-
 This project brings support for ESP8266 chip to the Arduino environment. ESP8266WiFi library bundled with this project has the same interface as the WiFi Shield library, making it easy to re-use existing code and libraries.
 
 ### Installing with Boards Manager ###
@@ -15,13 +13,20 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 
 #### Available versions
-Release | URL | Documentation
-----|----|----
-![](http://arduino.esp8266.com/badge.svg) |  http://arduino.esp8266.com/package_esp8266com_index.json | [Reference](http://arduino.esp8266.com/doc)
-![](http://arduino.esp8266.com/staging/badge.svg) |  http://arduino.esp8266.com/staging/package_esp8266com_index.json | [Reference](http://arduino.esp8266.com/staging/doc)
+
+##### Stable version ![](http://arduino.esp8266.com/badge.svg)
+Boards manager link: `http://arduino.esp8266.com/package_esp8266com_index.json`
+
+Documentation: [Reference](http://arduino.esp8266.com/doc)
+
+##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
+Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
+
+Documentation: [Reference](http://arduino.esp8266.com/staging/doc)
 
 
-### Building latest version from source ###
+### Building latest version from source [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino)
+
 ```
 $ git clone https://github.com/esp8266/Arduino.git
 $ cd Arduino/build
@@ -48,7 +53,7 @@ Submit issues on Github: https://github.com/esp8266/Arduino/issues
 
 For minor fixes of code and documentation, go ahead and submit a pull request.
 
-Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed first [in the chat](https://gitter.im/esp8266/Arduino).
+Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed [in the chat](https://gitter.im/esp8266/Arduino) first.
 
 Feature branches with lots of small commits (especially titled "oops", "fix typo", "forgot to add file", etc.) should be squashed before opening a pull request. At the same time, please refrain from putting multiple unrelated changes into a single pull request.
 
