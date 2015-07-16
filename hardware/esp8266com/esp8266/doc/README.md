@@ -239,7 +239,7 @@ ESPxx Hardware
 | TX or GPIO2*  |          | RX             |
 | RX            |          | TX             |
 | GPIO0         | PullUp   | DTR            |
-| Reset*        |          | RTS            |
+| Reset*        | PullUp   | RTS            |
 | GPIO15*       | PullDown |                |
 | CH_PD         | PullUp   |                |
 
