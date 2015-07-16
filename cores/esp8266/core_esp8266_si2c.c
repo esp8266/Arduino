@@ -37,9 +37,9 @@ static unsigned char twi_sda, twi_scl;
 #endif
 
 #if F_CPU == FCPU80
-#define TWI_CLOCK_STRETCH 200
+#define TWI_CLOCK_STRETCH 800
 #else
-#define TWI_CLOCK_STRETCH 400
+#define TWI_CLOCK_STRETCH 1600
 #endif
 
 void twi_setClock(unsigned int freq){
