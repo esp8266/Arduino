@@ -11,7 +11,7 @@ Pin 16 can be `INPUT`, `OUTPUT` or `INPUT_PULLDOWN`. At startup, pins are config
 
 Pins may also serve other functions, like Serial, I2C, SPI. These functions are normally activated by the corresponding library. The diagram below shows pin mapping for the popular ESP-12 module.
 
-![Pin Functions](esp12.svg)
+![Pin Functions](https://cdn.rawgit.com/esp8266/Arduino/doc-update/hardware/esp8266com/esp8266/doc/esp12.svg)
 
 Digital pins 6—11 are not shown on this diagram because they are used to connect flash memory chip on most modules. Trying to use these pins as IOs will likely cause the program to crash.
 
