@@ -11,7 +11,7 @@ Pin 16 can be `INPUT`, `OUTPUT` or `INPUT_PULLDOWN`. At startup, pins are config
 
 Pins may also serve other functions, like Serial, I2C, SPI. These functions are normally activated by the corresponding library. The diagram below shows pin mapping for the popular ESP-12 module.
 
-![Pin Functions](esp12.svg)
+![Pin Functions](https://cdn.rawgit.com/esp8266/Arduino/doc-update/hardware/esp8266com/esp8266/doc/esp12.svg)
 
 Digital pins 6—11 are not shown on this diagram because they are used to connect flash memory chip on most modules. Trying to use these pins as IOs will likely cause the program to crash.
 
@@ -211,7 +211,7 @@ You need to put ESP8266 into bootloader mode before uploading code.
 For stable use of the ESP8266 a power supply with 3.3V and >= 250mA is required.
 
 * Note
- - using Power from USB to Serial is may unstable, they not deliver enough current.
+ - Using the Power available from the USB to Serial adapter is not reccomended, these adapters typically do not supply enough current to run the ESP8266 reliably in every situation, an external supply or regulator is preferred.
 
 #### Serial Adapter ####
 
@@ -228,7 +228,7 @@ There are many different USB to Serial adapters / boards.
  - CP2102
  - may others (drop a comment)
 
-#### Minimal hardware Setup for Bootloading and usage ####
+#### Minimal Hardware Setup for Bootloading and Usage ####
 
 ESPxx Hardware
 
@@ -239,7 +239,7 @@ ESPxx Hardware
 | TX or GPIO2*  |          | RX             |
 | RX            |          | TX             |
 | GPIO0         | PullUp   | DTR            |
-| Reset*        |          | RTS            |
+| Reset*        | PullUp   | RTS            |
 | GPIO15*       | PullDown |                |
 | CH_PD         | PullUp   |                |
 
@@ -247,11 +247,12 @@ ESPxx Hardware
  - GPIO15 is also named MTDO
  - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
  - GPIO2 is alternative TX for the boot loader mode
+ - **Directly connecting a pin to VCC or GND is not a substitute for a PullUp or PullDown resistor, doing this can break upload management and the serial console, instability has also been noted in some cases.**
 
-###### esp to Serial
+###### ESP to Serial
 ![ESP to Serial](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_to_serial.png)
 
-#### Minimal hardware Setup for Bootloading only ####
+#### Minimal Hardware Setup for Bootloading only ####
 ESPxx Hardware
 
 | PIN           | Resistor | Serial Adapter  |
@@ -268,7 +269,7 @@ ESPxx Hardware
 * Note
 	- if no RTS is used a manual power toggle is needed
 
-#### Minimal hardware Setup for running only ####
+#### Minimal Hardware Setup for Running only ####
 
 ESPxx Hardware
 
@@ -283,5 +284,5 @@ ESPxx Hardware
 ###### Minimal
 ![ESP min](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_min.png)
 
-###### Improved stability
+###### Improved Stability
 ![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)
