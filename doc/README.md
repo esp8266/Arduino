@@ -247,6 +247,7 @@ ESPxx Hardware
  - GPIO15 is also named MTDO
  - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
  - GPIO2 is alternative TX for the boot loader mode
+ - **Directly connecting a pin to VCC or GND is not a substitute for a PullUp or PullDown resistor, doing this can break upload management and the serial console, instability has also been noted in some cases.**
 
 ###### ESP to Serial
 ![ESP to Serial](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_to_serial.png)
