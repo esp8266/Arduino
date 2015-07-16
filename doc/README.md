@@ -211,7 +211,7 @@ You need to put ESP8266 into bootloader mode before uploading code.
 For stable use of the ESP8266 a power supply with 3.3V and >= 250mA is required.
 
 * Note
- - using Power from USB to Serial is may unstable, they not deliver enough current.
+ - Using the Power available from the USB to Serial adapter is not reccomended, these adapters typically do not supply enough current to run the ESP8266 reliably in every situation, an external supply or regulator is preferred.
 
 #### Serial Adapter ####
 
