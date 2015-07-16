@@ -50,7 +50,8 @@ size_t strnlen_P(const char *s, size_t size);
 #define strlen_P(strP)          strnlen_P((strP), SIZE_IRRELEVANT)
 
 int	printf_P(const char *formatP, ...) __attribute__ ((format (printf, 1, 2)));
-int	snprintf_P(char *str, size_t strSize, const char *formatP, ...) __attribute__ ((format (printf, 3, 4)));
+int	sprintf_P(char *str, const char *formatP, ...) __attribute__((format(printf, 2, 3)));
+int	snprintf_P(char *str, size_t strSize, const char *formatP, ...) __attribute__((format(printf, 3, 4)));
 int	vsnprintf_P(char *str, size_t strSize, const char *formatP, va_list ap) __attribute__ ((format (printf, 3, 0)));
 
 // flash memory must be read using 32 bit aligned addresses else a processor
