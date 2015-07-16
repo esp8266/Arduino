@@ -130,10 +130,10 @@ cat << EOF > package_esp8266com_index.json
       "systems": [
         {
            "host":"i686-mingw32",
-           "url":"http://arduino.esp8266.com/win32-xtensa-lx106-elf-gb404fb9.tar.gz",
-           "archiveFileName":"win32-xtensa-lx106-elf-gb404fb9.tar.gz",
-           "checksum":"SHA-256:1561ec85cc58cab35cc48bfdb0d0087809f89c043112a2c36b54251a13bf781f",
-           "size":"153807368"
+           "url":"http://arduino.esp8266.com/win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+           "archiveFileName":"win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+           "checksum":"SHA-256:10476b9c11a7a90f40883413ddfb409f505b20692e316c4e597c4c175b4be09c",
+           "size":"153527527"
         },
         {
            "host":"x86_64-apple-darwin",
@@ -162,9 +162,12 @@ cat << EOF > package_esp8266com_index.json
 }
 EOF
 
+
 if [ ! -z "$upload" ]; then
-    scp $outdir.zip dl:apps/download_files/download/$path
-    scp package_esp8266com_index.json dl:apps/download_files/download/$path
+    remote_path=dl:apps/download_files/download/$path
+    scp $outdir.zip $remote_path
+    scp package_esp8266com_index.json $remote_path
+    scp -r $srcdir/doc $remote_path
 else
     python -m SimpleHTTPServer 
 fi
