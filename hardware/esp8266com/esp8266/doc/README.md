@@ -228,7 +228,7 @@ There are many different USB to Serial adapters / boards.
  - CP2102
  - may others (drop a comment)
 
-#### Minimal hardware Setup for Bootloading and usage ####
+#### Minimal Hardware Setup for Bootloading and Usage ####
 
 ESPxx Hardware
 
@@ -248,10 +248,10 @@ ESPxx Hardware
  - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
  - GPIO2 is alternative TX for the boot loader mode
 
-###### esp to Serial
+###### ESP to Serial
 ![ESP to Serial](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_to_serial.png)
 
-#### Minimal hardware Setup for Bootloading only ####
+#### Minimal Hardware Setup for Bootloading only ####
 ESPxx Hardware
 
 | PIN           | Resistor | Serial Adapter  |
@@ -268,7 +268,7 @@ ESPxx Hardware
 * Note
 	- if no RTS is used a manual power toggle is needed
 
-#### Minimal hardware Setup for running only ####
+#### Minimal Hardware Setup for Running only ####
 
 ESPxx Hardware
 
@@ -283,5 +283,5 @@ ESPxx Hardware
 ###### Minimal
 ![ESP min](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_min.png)
 
-###### Improved stability
+###### Improved Stability
 ![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)
