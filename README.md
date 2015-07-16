@@ -17,12 +17,12 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 ##### Stable version ![](http://arduino.esp8266.com/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/package_esp8266com_index.json`
 
-Documentation: [Reference](http://arduino.esp8266.com/doc)
+Documentation: [Reference](http://arduino.esp8266.com/doc/README.md)
 
 ##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
 
-Documentation: [Reference](http://arduino.esp8266.com/staging/doc)
+Documentation: [Reference](http://arduino.esp8266.com/staging/doc/README.md)
 
 
 ### Building latest version from source [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino)
@@ -42,7 +42,7 @@ Latest development version: [Reference](hardware/esp8266com/esp8266/doc/README.m
 - NodeMCU 1.0
 - Olimex MOD-WIFI-ESP8266
 - Adafruit HUZZAH ESP8266 (ESP-12)
-- [ST7735](https://github.com/nzmichaelh/Adafruit-ST7735-Library) - Adafruit's ST7735 library modified to be compatible with esp8266.  Just make sure to modify the pins in the examples as they are still AVR specific.
+- SweetPea ESP-210
 
 ### Issues and support ###
 
@@ -60,7 +60,7 @@ Feature branches with lots of small commits (especially titled "oops", "fix typo
 
 ### License and credits ###
 
-Arduino IDE is based on Wiring and Processing. It is developed and maintained by the Arduino team. The IDE is licensed under GPL.
+Arduino IDE is developed and maintained by the Arduino team. The IDE is licensed under GPL.
 
 ESP8266 core includes an xtensa gcc toolchain, which is also under GPL.
 
