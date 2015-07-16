@@ -177,20 +177,17 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     return _client->write(reinterpret_cast<const char*>(buf), size);
 }
 
-extern "C" uint32_t esp_micros_at_task_start();
-
 int WiFiClient::available()
 {
-    static uint32_t lastPollTime = 0;
-    if (!_client)
-        return 0;
+    int result = 0;
 
-    if (lastPollTime > esp_micros_at_task_start())
-        yield();
+    if (_client) {
+        result = _client->getSize();
+    }
 
-    lastPollTime = micros();
-
-    int result = _client->getSize();
+    if (!result) {
+        optimistic_yield();
+    }
     return result;
 }
 
