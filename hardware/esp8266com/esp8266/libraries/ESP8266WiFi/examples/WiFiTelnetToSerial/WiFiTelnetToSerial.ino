@@ -25,7 +25,7 @@
 const char* ssid = "**********";
 const char* password = "**********";
 
-WiFiServer server(21);
+WiFiServer server(23);
 WiFiClient serverClients[MAX_SRV_CLIENTS];
 
 void setup() {
@@ -45,7 +45,7 @@ void setup() {
   
   Serial1.print("Ready! Use 'telnet ");
   Serial1.print(WiFi.localIP());
-  Serial1.println(" 21' to connect");
+  Serial1.println(" 23' to connect");
 }
 
 void loop() {

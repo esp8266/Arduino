@@ -1,9 +1,9 @@
-/* 
+/*
   si2c.c - Software I2C library for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -26,10 +26,10 @@ unsigned char twi_dcount = 18;
 static unsigned char twi_sda, twi_scl;
 
 #define SDA_LOW()   (GPES = (1 << twi_sda)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
-#define SDA_HIGH()  (GPEC = (1 << twi_sda)) //Disable SDA (becomes input and since it has pullup it will go high) 
+#define SDA_HIGH()  (GPEC = (1 << twi_sda)) //Disable SDA (becomes input and since it has pullup it will go high)
 #define SDA_READ()  ((GPI & (1 << twi_sda)) != 0)
-#define SCL_LOW()   (GPES = (1 << twi_scl)) 
-#define SCL_HIGH()  (GPEC = (1 << twi_scl)) 
+#define SCL_LOW()   (GPES = (1 << twi_scl))
+#define SCL_HIGH()  (GPEC = (1 << twi_scl))
 #define SCL_READ()  ((GPI & (1 << twi_scl)) != 0)
 
 #ifndef FCPU80
@@ -37,9 +37,9 @@ static unsigned char twi_sda, twi_scl;
 #endif
 
 #if F_CPU == FCPU80
-#define TWI_CLOCK_STRETCH 200
+#define TWI_CLOCK_STRETCH 800
 #else
-#define TWI_CLOCK_STRETCH 400
+#define TWI_CLOCK_STRETCH 1600
 #endif
 
 void twi_setClock(unsigned int freq){
@@ -99,7 +99,7 @@ static bool twi_write_stop(void){
   twi_delay(twi_dcount);
   SDA_HIGH();
   twi_delay(twi_dcount);
-  
+
   return true;
 }
 
@@ -166,7 +166,8 @@ unsigned char twi_readFrom(unsigned char address, unsigned char* buf, unsigned i
   unsigned int i;
   if(!twi_write_start()) return 4;//line busy
   if(!twi_write_byte(((address << 1) | 1) & 0xFF)) return 2;//received NACK on transmit of address
-  for(i=0; i<len; i++) buf[i] = twi_read_byte(false);
+  for(i=0; i<(len-1); i++) buf[i] = twi_read_byte(false);
+  buf[len-1] = twi_read_byte(true);
   if(sendStop) twi_write_stop();
   i = 0;
   while(SDA_READ() == 0 && (i++) < 10){

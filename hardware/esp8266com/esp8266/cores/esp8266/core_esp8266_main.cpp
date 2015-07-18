@@ -34,6 +34,8 @@ extern "C" {
 #define LOOP_TASK_PRIORITY 0
 #define LOOP_QUEUE_SIZE    1
 
+#define OPTIMISTIC_YIELD_TIME_US 16000
+
 struct rst_info resetInfo;
 
 int atexit(void (*func)()) {
@@ -62,11 +64,8 @@ extern void (*__init_array_end)(void);
 cont_t g_cont __attribute__ ((aligned (16)));
 static os_event_t g_loop_queue[LOOP_QUEUE_SIZE];
 
-static uint32_t g_micros_at_task_start;
+static uint32_t g_micros_at_last_task_yield;
 
-extern "C" uint32_t esp_micros_at_task_start() {
-    return g_micros_at_task_start;
-}
 
 extern "C" void abort() {
     while(1) {
@@ -74,6 +73,7 @@ extern "C" void abort() {
 }
 
 extern "C" void esp_yield() {
+    g_micros_at_last_task_yield = system_get_time();
     cont_yield(&g_cont);
 }
 
@@ -87,6 +87,14 @@ extern "C" void __yield() {
 }
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
+extern "C" void optimistic_yield(void) {
+    if (!ETS_INTR_WITHINISR() && 
+        (system_get_time() - g_micros_at_last_task_yield) > OPTIMISTIC_YIELD_TIME_US)
+    {
+        __yield();
+    }
+}
+
 static void loop_wrapper() {
     static bool setup_done = false;
     if(!setup_done) {
@@ -99,7 +107,7 @@ static void loop_wrapper() {
 }
 
 static void loop_task(os_event_t *events) {
-    g_micros_at_task_start = system_get_time();
+    g_micros_at_last_task_yield = system_get_time();
     cont_run(&g_cont, &loop_wrapper);
     if(cont_check(&g_cont) != 0) {
         ets_printf("\r\nheap collided with sketch stack\r\n");
