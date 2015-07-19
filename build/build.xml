@@ -972,8 +972,8 @@
     <mkdir dir="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools" />
 	
   	<antcall target="untar">
-      <param name="archive_file" value="${staging_folder}/dist/win32-xtensa-lx106-elf-gb404fb9.tgz" />
-      <param name="archive_url" value="http://download.igrr.me/win32-xtensa-lx106-elf-gb404fb9.tgz" />
+      <param name="archive_file" value="${staging_folder}/dist/win32-xtensa-lx106-elf-gb404fb9-2.tgz" />
+      <param name="archive_url" value="http://download.igrr.me/win32-xtensa-lx106-elf-gb404fb9-2.tgz" />
       <param name="final_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/xtensa-lx106-elf" />
       <param name="dest_folder" value="${staging_folder}/work/${staging_hardware_folder}/esp8266com/esp8266/tools/" />
     </antcall>
