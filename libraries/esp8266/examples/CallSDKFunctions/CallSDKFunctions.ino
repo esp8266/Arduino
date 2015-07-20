@@ -1,7 +1,7 @@
 
 /*
  * NativeSdk by Simon Peter
- * Access functionality from the ESP8266 SDK
+ * Access functionality from the Espressif ESP8266 SDK
  * This example code is in the public domain
  * 
  * This is for advanced users.
@@ -10,7 +10,7 @@
  * where possible instead, in order to abstract away the hardware dependency.
  */
 
-// Expose Expressif SDK functionality - wrapped in ifdef so that it still
+// Expose Espressif SDK functionality - wrapped in ifdef so that it still
 // compiles on other platforms
 #ifdef ESP8266
 extern "C" {
@@ -23,7 +23,7 @@ void setup() {
 }
 
 void loop() {
-  // Call Expressif SDK functionality - wrapped in ifdef so that it still
+  // Call Espressif SDK functionality - wrapped in ifdef so that it still
   // compiles on other platforms
 #ifdef ESP8266
   Serial.print("wifi_station_get_hostname: ");
