@@ -26,6 +26,18 @@ size_t strnlen_P(PGM_P s, size_t size) {
     return (size_t) (cp - s);
 }
 
+void* memcpy_P(void* dest, PGM_VOID_P src, size_t count) {
+    const uint8_t* read = reinterpret_cast<const uint8_t*>(src);
+    uint8_t* write = reinterpret_cast<uint8_t*>(dest);
+
+    while (count)
+    {
+        *write++ = pgm_read_byte(read++);
+        count--;
+    }
+
+    return dest;
+}
 
 int memcmp_P(const void* buf1, PGM_VOID_P buf2P, size_t size) {
     int result = 0;
