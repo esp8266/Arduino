@@ -165,9 +165,6 @@ uint8_t Servo::attach(int pin, int minUs, int maxUs)
 {
     ServoTimerSequence timerId;
 
-    Serial.print("_servoIndex ");
-    Serial.println(_servoIndex);
-
     if (_servoIndex < MAX_SERVOS) {
         pinMode(pin, OUTPUT);       // set servo pin to output
         digitalWrite(pin, LOW);
