@@ -1,8 +1,8 @@
-/* 
+/*
  cont_util.s - continuations support for Xtensa call0 ABI
  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -19,6 +19,9 @@
  */
 
 #include "cont.h"
+#include <stddef.h>
+#include "ets_sys.h"
+
 
 #define CONT_STACKGUARD 0xfeefeffe
 
@@ -33,4 +36,9 @@ int cont_check(cont_t* cont) {
     if(cont->stack_guard1 != CONT_STACKGUARD || cont->stack_guard2 != CONT_STACKGUARD) return 1;
 
     return 0;
+}
+
+bool cont_can_yield(cont_t* cont) {
+    return !ETS_INTR_WITHINISR() &&
+           cont->pc_ret != 0 && cont->pc_yield == 0;
 }

@@ -38,9 +38,6 @@ extern "C" {
 #include "esp8266_peri.h"
 #include "twi.h"
 
-void yield(void);
-void optimistic_yield(void);
-
 #define HIGH 0x1
 #define LOW  0x0
 
@@ -140,8 +137,8 @@ void timer0_detachInterrupt(void);
 void ets_intr_lock();
 void ets_intr_unlock();
 
-// level (0-15), 
-// level 15 will disable ALL interrupts, 
+// level (0-15),
+// level 15 will disable ALL interrupts,
 // level 0 will disable most software interrupts
 //
 #define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state))
@@ -206,6 +203,9 @@ void detachInterrupt(uint8_t);
 
 void setup(void);
 void loop(void);
+
+void yield(void);
+void optimistic_yield(uint32_t interval_us);
 
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.

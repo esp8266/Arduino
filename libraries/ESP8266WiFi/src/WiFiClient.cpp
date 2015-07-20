@@ -1,10 +1,10 @@
-/* 
+/*
   WiFiClient.cpp - TCP/IP client for esp8266, mostly compatible
                    with Arduino WiFi shield library
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -22,7 +22,7 @@
 
 #define LWIP_INTERNAL
 
-extern "C" 
+extern "C"
 {
     #include "include/wl_definitions.h"
     #include "osapi.h"
@@ -48,7 +48,7 @@ template<>
 WiFiClient* SList<WiFiClient>::_s_first = 0;
 
 
-WiFiClient::WiFiClient() 
+WiFiClient::WiFiClient()
 : _client(0)
 {
     WiFiClient::_add(this);
@@ -78,7 +78,7 @@ WiFiClient::WiFiClient(const WiFiClient& other)
 WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 {
    if (_client)
-        _client->unref(); 
+        _client->unref();
     _client = other._client;
     if (_client)
         _client->ref();
@@ -86,7 +86,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 }
 
 
-int WiFiClient::connect(const char* host, uint16_t port) 
+int WiFiClient::connect(const char* host, uint16_t port)
 {
     IPAddress remote_addr;
     if (WiFi.hostByName(host, remote_addr))
@@ -96,7 +96,7 @@ int WiFiClient::connect(const char* host, uint16_t port)
     return 0;
 }
 
-int WiFiClient::connect(IPAddress ip, uint16_t port) 
+int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
     ip_addr_t addr;
     addr.addr = ip;
@@ -162,12 +162,12 @@ bool WiFiClient::getNoDelay() {
     return _client->getNoDelay();
 }
 
-size_t WiFiClient::write(uint8_t b) 
+size_t WiFiClient::write(uint8_t b)
 {
     return write(&b, 1);
 }
 
-size_t WiFiClient::write(const uint8_t *buf, size_t size) 
+size_t WiFiClient::write(const uint8_t *buf, size_t size)
 {
     if (!_client || !size)
     {
@@ -179,19 +179,18 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
 
 int WiFiClient::available()
 {
-    int result = 0;
+    if (!_client)
+        return false;
 
-    if (_client) {
-        result = _client->getSize();
-    }
+    int result = _client->getSize();
 
     if (!result) {
-        optimistic_yield();
+        optimistic_yield(100);
     }
     return result;
 }
 
-int WiFiClient::read() 
+int WiFiClient::read()
 {
     if (!available())
         return -1;
@@ -200,12 +199,12 @@ int WiFiClient::read()
 }
 
 
-int WiFiClient::read(uint8_t* buf, size_t size) 
+int WiFiClient::read(uint8_t* buf, size_t size)
 {
     return (int) _client->read(reinterpret_cast<char*>(buf), size);
 }
 
-int WiFiClient::peek() 
+int WiFiClient::peek()
 {
     if (!available())
         return -1;
@@ -213,13 +212,13 @@ int WiFiClient::peek()
     return _client->peek();
 }
 
-void WiFiClient::flush() 
+void WiFiClient::flush()
 {
     if (_client)
         _client->flush();
 }
 
-void WiFiClient::stop() 
+void WiFiClient::stop()
 {
     if (!_client)
         return;
@@ -228,7 +227,7 @@ void WiFiClient::stop()
     _client = 0;
 }
 
-uint8_t WiFiClient::connected() 
+uint8_t WiFiClient::connected()
 {
     if (!_client)
         return 0;
@@ -236,14 +235,14 @@ uint8_t WiFiClient::connected()
     return _client->state() == ESTABLISHED || available();
 }
 
-uint8_t WiFiClient::status() 
+uint8_t WiFiClient::status()
 {
     if (!_client)
         return CLOSED;
     return _client->state();
 }
 
- WiFiClient::operator bool() 
+ WiFiClient::operator bool()
 {
     return _client != 0;
 }
