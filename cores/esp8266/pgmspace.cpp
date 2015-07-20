@@ -20,26 +20,90 @@
 #include <ctype.h>
 #include "pgmspace.h"
 
-size_t strnlen_P(const char* s, size_t size) {
+size_t strnlen_P(PGM_P s, size_t size) {
     const char* cp;
     for (cp = s; size != 0 && pgm_read_byte(cp) != '\0'; cp++, size--);
     return (size_t) (cp - s);
 }
 
-void* memcpy_P(void* dest, const void* src, size_t count) {
-    const uint8_t* read = reinterpret_cast<const uint8_t*>(src);
-    uint8_t* write = reinterpret_cast<uint8_t*>(dest);
 
-    while (count)
-    {
-        *write++ = pgm_read_byte(read++);
-        count--;
+int memcmp_P(const void* buf1, PGM_VOID_P buf2P, size_t size) {
+    int result = 0;
+    const uint8_t* read1 = (const uint8_t*)buf1;
+    const uint8_t* read2 = (const uint8_t*)buf2P;
+
+    while (size > 0) {
+        uint8_t ch2 = pgm_read_byte(read2);
+        uint8_t ch1 = *read1;
+        if (ch1 != ch2) {
+            result = (int)(ch1)-(int)(ch2);
+            break;
+        }
+
+        read1++;
+        read2++;
+        size--;
     }
 
-    return dest;
+    return result;
 }
 
-char* strncpy_P(char* dest, const char* src, size_t size) {
+void* memccpy_P(void* dest, PGM_VOID_P src, int c, size_t count) {
+    uint8_t* read = (uint8_t*)src;
+    uint8_t* write = (uint8_t*)dest;
+    void* result = NULL;
+
+    while (count > 0) {
+        uint8_t ch = pgm_read_byte(read++);
+        *write++ = ch;
+        count--;
+        if (c == ch) {
+            return write; // the value after the found c
+        }
+    }
+
+    return result;
+}
+
+void* memmem_P(const void* buf, size_t bufSize, PGM_VOID_P findP, size_t findPSize) {
+    const uint8_t* read = (const uint8_t*)buf;
+    const uint8_t* find = (uint8_t*)findP;
+    uint8_t first = pgm_read_byte(find++);
+
+    findPSize--;
+
+    while (bufSize > 0) {
+        if (*read == first) {
+            size_t findSize = findPSize;
+            const uint8_t* tag = read + 1;
+            size_t tagBufSize = bufSize - 1;
+            const uint8_t* findTag = find;
+
+            while (tagBufSize > 0 && findSize > 0) {
+                uint8_t ch = pgm_read_byte(findTag++);
+                if (ch != *tag) {
+                    bufSize--;
+                    read++;
+                    break;
+                }
+                findSize--;
+                tagBufSize--;
+                tag++;
+            }
+            if (findSize == 0) {
+                return (void*)read;
+            }
+        }
+        else {
+            bufSize--;
+            read++;
+        }
+    }
+    return NULL;
+}
+
+
+char* strncpy_P(char* dest, PGM_P src, size_t size) {
     const char* read = src;
     char* write = dest;
     char ch = '.';
@@ -53,7 +117,7 @@ char* strncpy_P(char* dest, const char* src, size_t size) {
     return dest;
 }
 
-char* strncat_P(char* dest, const char* src, size_t size) {
+char* strncat_P(char* dest, PGM_P src, size_t size) {
     char* write = dest;
 
     while (*write != '\0')
@@ -80,7 +144,7 @@ char* strncat_P(char* dest, const char* src, size_t size) {
     return dest;
 }
 
-int strncmp_P(const char* str1, const char* str2P, size_t size) {
+int strncmp_P(const char* str1, PGM_P str2P, size_t size) {
     int result = 0;
 
     while (size > 0)
@@ -99,7 +163,7 @@ int strncmp_P(const char* str1, const char* str2P, size_t size) {
     return result;
 }
 
-int strncasecmp_P(const char* str1, const char* str2P, size_t size) {
+int strncasecmp_P(const char* str1, PGM_P str2P, size_t size) {
     int result = 0;
 
     while (size > 0)
@@ -118,7 +182,7 @@ int strncasecmp_P(const char* str1, const char* str2P, size_t size) {
     return result;
 }
 
-int printf_P(const char* formatP, ...) {
+int printf_P(PGM_P formatP, ...) {
     int ret;
     va_list arglist;
     va_start(arglist, formatP);
@@ -135,7 +199,7 @@ int printf_P(const char* formatP, ...) {
     return ret;
 }
 
-int sprintf_P(char* str, const char* formatP, ...) {
+int sprintf_P(char* str, PGM_P formatP, ...) {
     int ret;
     va_list arglist;
     va_start(arglist, formatP);
@@ -146,7 +210,7 @@ int sprintf_P(char* str, const char* formatP, ...) {
     return ret;
 }
 
-int snprintf_P(char* str, size_t strSize, const char* formatP, ...) {
+int snprintf_P(char* str, size_t strSize, PGM_P formatP, ...) {
     int ret;
     va_list arglist;
     va_start(arglist, formatP);
@@ -157,7 +221,7 @@ int snprintf_P(char* str, size_t strSize, const char* formatP, ...) {
     return ret;
 }
 
-int vsnprintf_P(char* str, size_t strSize, const char* formatP, va_list ap) {
+int vsnprintf_P(char* str, size_t strSize, PGM_P formatP, va_list ap) {
     int ret;
 
     size_t fmtLen = strlen_P(formatP);
