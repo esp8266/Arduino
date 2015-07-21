@@ -331,6 +331,51 @@ huzzah.menu.UploadSpeed.921600=921600
 huzzah.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
+thing.name=SparkFun ESP8266 Thing
+
+thing.upload.tool=esptool
+thing.upload.speed=921600
+thing.upload.resetmethod=ck
+thing.upload.maximum_size=524288
+thing.upload.wait_for_upload_port=true
+thing.serial.disableDTR=true
+thing.serial.disableRTS=true
+
+thing.build.mcu=esp8266
+thing.build.f_cpu=80000000L
+thing.build.board=ESP8266_ESP01
+thing.build.core=esp8266
+thing.build.variant=thing
+thing.build.flash_mode=qio
+thing.build.flash_size=4M
+thing.build.flash_freq=40
+thing.build.flash_ld=eagle.flash.4m.ld
+thing.build.spiffs_start=0x100000
+thing.build.spiffs_end=0x3FB000
+
+thing.menu.CpuFrequency.80=80 MHz
+thing.menu.CpuFrequency.80.build.f_cpu=80000000L
+
+thing.menu.UploadSpeed.115200=115200
+thing.menu.UploadSpeed.115200.upload.speed=115200
+thing.menu.UploadSpeed.9600=9600
+thing.menu.UploadSpeed.9600.upload.speed=9600
+thing.menu.UploadSpeed.57600=57600
+thing.menu.UploadSpeed.57600.upload.speed=57600
+thing.menu.UploadSpeed.256000.windows=256000
+thing.menu.UploadSpeed.256000.upload.speed=256000
+thing.menu.UploadSpeed.230400.linux=230400
+thing.menu.UploadSpeed.230400.macosx=230400
+thing.menu.UploadSpeed.230400.upload.speed=230400
+thing.menu.UploadSpeed.460800.linux=460800
+thing.menu.UploadSpeed.460800.macosx=460800
+thing.menu.UploadSpeed.460800.upload.speed=460800
+thing.menu.UploadSpeed.512000.windows=512000
+thing.menu.UploadSpeed.512000.upload.speed=512000
+thing.menu.UploadSpeed.921600=921600
+thing.menu.UploadSpeed.921600.upload.speed=921600
+
+##############################################################
 esp210.name=SweetPea ESP-210
 
 esp210.upload.tool=esptool
