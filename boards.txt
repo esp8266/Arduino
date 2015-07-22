@@ -229,7 +229,7 @@ nodemcu.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
- 
+
 nodemcuv2.upload.tool=esptool
 nodemcuv2.upload.speed=115200
 nodemcuv2.upload.resetmethod=ck
@@ -238,7 +238,7 @@ nodemcuv2.upload.maximum_data_size=81920
 nodemcuv2.upload.wait_for_upload_port=true
 nodemcuv2.serial.disableDTR=true
 nodemcuv2.serial.disableRTS=true
- 
+
 nodemcuv2.build.mcu=esp8266
 nodemcuv2.build.f_cpu=80000000L
 nodemcuv2.build.board=ESP8266_ESP12
@@ -252,12 +252,12 @@ nodemcuv2.build.spiffs_start=0x100000
 nodemcuv2.build.spiffs_end=0x3FB000
 nodemcuv2.build.spiffs_pagesize=256
 nodemcuv2.build.spiffs_blocksize=8192
- 
+
 nodemcuv2.menu.CpuFrequency.80=80 MHz
 nodemcuv2.menu.CpuFrequency.80.build.f_cpu=80000000L
 nodemcuv2.menu.CpuFrequency.160=160 MHz
 nodemcuv2.menu.CpuFrequency.160.build.f_cpu=160000000L
- 
+
 nodemcuv2.menu.UploadSpeed.115200=115200
 nodemcuv2.menu.UploadSpeed.115200.upload.speed=115200
 nodemcuv2.menu.UploadSpeed.9600=9600
@@ -336,25 +336,30 @@ thing.name=SparkFun ESP8266 Thing
 thing.upload.tool=esptool
 thing.upload.speed=921600
 thing.upload.resetmethod=ck
-thing.upload.maximum_size=524288
+thing.upload.maximum_size=434160
+thing.upload.maximum_data_size=81920
 thing.upload.wait_for_upload_port=true
 thing.serial.disableDTR=true
 thing.serial.disableRTS=true
 
 thing.build.mcu=esp8266
 thing.build.f_cpu=80000000L
-thing.build.board=ESP8266_ESP01
+thing.build.board=ESP8266_THING
 thing.build.core=esp8266
 thing.build.variant=thing
 thing.build.flash_mode=qio
-thing.build.flash_size=4M
+# flash chip: AT25SF041 (512 kbyte, 4Mbit)
+thing.build.flash_size=512K
+thing.build.flash_ld=eagle.flash.512k.ld
 thing.build.flash_freq=40
-thing.build.flash_ld=eagle.flash.4m.ld
-thing.build.spiffs_start=0x100000
-thing.build.spiffs_end=0x3FB000
+thing.build.spiffs_start=0x6B000
+thing.build.spiffs_end=0x7B000
+thing.build.spiffs_blocksize=4096
 
 thing.menu.CpuFrequency.80=80 MHz
 thing.menu.CpuFrequency.80.build.f_cpu=80000000L
+thing.menu.CpuFrequency.160=160 MHz
+thing.menu.CpuFrequency.160.build.f_cpu=160000000L
 
 thing.menu.UploadSpeed.115200=115200
 thing.menu.UploadSpeed.115200.upload.speed=115200
@@ -382,6 +387,7 @@ esp210.upload.tool=esptool
 esp210.upload.speed=115200
 esp210.upload.resetmethod=ck
 esp210.upload.maximum_size=1044464
+esp210.upload.maximum_data_size=81920
 esp210.upload.wait_for_upload_port=true
 esp210.serial.disableDTR=true
 esp210.serial.disableRTS=true

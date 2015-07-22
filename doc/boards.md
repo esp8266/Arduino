@@ -1,12 +1,12 @@
 ---
 title: Supported Hardware
-layout: page
 ---
 
 - [Adafruit HUZZAH ESP8266 (ESP-12)](#adafruit-huzzah-esp8266-esp-12)
 - [NodeMCU 0.9](#nodemcu-0-9)
 - [NodeMCU 1.0](#nodemcu-1-0)
 - [Olimex MOD-WIFI-ESP8266](#olimex-mod-wifi-esp8266)
+- [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
 - [SweetPea ESP-210](#sweetpea-esp-210)
 - [Generic ESP8266 modules](#generic-esp8266-modules)
 
@@ -41,6 +41,12 @@ If you want to use NodeMCU pin 5, use D5 for pin number, and it will be translat
 *TODO: add notes*
 
 ### Olimex MOD-WIFI-ESP8266
+
+*TODO: add notes*
+
+### SparkFun ESP8266 Thing ###
+
+Product page: https://www.sparkfun.com/products/13231
 
 *TODO: add notes*
 
