@@ -1,8 +1,8 @@
-### ESP8266 Arduino Core Reference
+---
+title: Reference
+---
 
-#### [Change log](changes.md)
-
-#### Digital IO ####
+## Digital IO
 
 Pin numbers in Arduino correspond directly to the ESP8266 GPIO pin numbers. `pinMode`, `digitalRead`, and `digitalWrite` functions work as usual, so to read GPIO2, call `digitalRead(2)`.
 
@@ -17,19 +17,21 @@ Digital pins 6—11 are not shown on this diagram because they are used to conne
 
 Note that some boards and modules (ESP-12ED, NodeMCU 1.0) also break out pins 9 and 11. These may be used as IO if flash chip works in DIO mode (as opposed to QIO, which is the default one).
 
-#### Analog input
+## Analog input
 
 ESP8266 has a single ADC channel available to users. It may be used either to read voltage at ADC pin, or to read module supply voltage (VCC).
 
 To read external voltage applied to ADC pin, use `analogRead(A0)`. Input voltage range is 0 — 1.0V, and the reference voltage is derived from VCC, which is assumed to be 3.3V.
 
 To read VCC voltage, ADC pin must be kept unconnected. Additionally, the following line has to be added to the sketch:
-```C++
+
+```c++
 ADC_MODE(ADC_VCC);
 ```
+
 This line has to appear outside of any functions, for instance right after the `#include ` lines of your sketch.
 
-#### Analog output
+## Analog output
 
 `analogWrite(pin, value)` enables software PWM on the given pin. PWM may be used on pins 0 to 15.
 Call `analogWrite(pin, 0)` to disable PWM on the pin. `value` may be in range from 0 to `PWMRANGE`, which is currently equal to 1023.
@@ -39,7 +41,7 @@ Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino inte
 types are supported: `CHANGE`, `RISING`, `FALLING`.
 
 
-#### Timing and delays ####
+## Timing and delays
 `millis()` and `micros()` return the number of milliseconds and microseconds elapsed after reset, respectively.
 
 `delay(ms)` pauses the sketch for a given number of milliseconds and allows WiFi and TCP/IP tasks to run.
@@ -56,7 +58,7 @@ There is also a `yield()` function which is equivalent to `delay(0)`. The `delay
 function, on the other hand, does not yield to other tasks, so using it for delays
 more than 20 milliseconds is not recommended.
 
-#### Serial ####
+## Serial
 
 `Serial` object works much the same way as on a regular Arduino. Apart from hardware FIFO (128 bytes for TX and RX) HardwareSerial has additional 256-byte TX and RX buffers. Both transmit and receive is interrupt-driven. Write and read functions only block the sketch execution when the respective FIFO/buffers are full/empty.
 
@@ -70,12 +72,12 @@ You also need to use `Serial.setDebugOutput(true)` to enable output from `printf
 
 Both `Serial` and `Serial1` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call `Serial.begin(baudrate, SERIAL_8N1)`, `Serial.begin(baudrate, SERIAL_6E2)`, etc.
 
-#### Progmem ####
+## Progmem
 
 The Program memory features work much the same way as on a regular Arduino; placing read only data and strings in read only memory and freeing heap for your application.
 The important difference is that on the ESP8266 the literal strings are not pooled.  This means that the same literal string defined inside a `F("")` and/or `PSTR("")` will take up space for each instance in the code. So you will need to manage the duplicate strings yourself.
 
-#### WiFi(ESP8266WiFi library) ####
+## WiFi(ESP8266WiFi library)
 
 This is mostly similar to WiFi shield library. Differences include:
 
@@ -99,14 +101,14 @@ Also note that multicast doesn't work on softAP interface.
 Four samples are provided for this library.
 You can see more commands here: [http://www.arduino.cc/en/Reference/WiFi](http://www.arduino.cc/en/Reference/WiFi)
 
-#### Ticker ####
+## Ticker
 
 Library for calling functions repeatedly with a certain period. Two examples included.
 
 It is currently not recommended to do blocking IO operations (network, serial, file) from Ticker
 callback functions. Instead, set a flag inside the ticker callback and check for that flag inside the loop function.
 
-#### EEPROM ####
+## EEPROM
 
 This is a bit different from standard EEPROM class. You need to call `EEPROM.begin(size)`
 before you start reading or writing, size being the number of bytes you want to use.
@@ -120,19 +122,19 @@ EEPROM library uses one sector of flash located at 0x7b000 for storage.
 
 Three examples included.
 
-#### I2C (Wire library) ####
+## I2C (Wire library)
 
 Wire library currently supports master mode up to approximately 450KHz.
 Before using I2C, pins for SDA and SCL need to be set by calling
 `Wire.begin(int sda, int scl)`, i.e. `Wire.begin(0, 2)` on ESP-01,
 else they default to pins 4(SDA) and 5(SCL).
 
-#### SPI ####
+## SPI
 
 SPI library supports the entire Arduino SPI API including transactions, including setting phase (CPHA).
 Setting the Clock polarity (CPOL) is not supported, yet (SPI_MODE2 and SPI_MODE3 not working).
 
-#### ESP-specific APIs ####
+## ESP-specific APIs
 
 APIs related to deep sleep and watchdog timer are available in the `ESP` object, only available in Alpha version.
 
@@ -158,36 +160,38 @@ Several APIs may be used to get flash chip info:
 at startup in order for this feature to be available. Add the following line to the top
 of your sketch to use `getVcc`:
 
-    ADC_MODE(ADC_VCC);
+```c++
+ADC_MODE(ADC_VCC);
+```
 
 TOUT pin has to be disconnected in this mode.
 
 Note that by default ADC is configured to read from TOUT pin using `analogRead(A0)`, and
 `ESP.getVCC()` is not available.
 
-#### OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html) ####
+## OneWire (from https://www.pjrc.com/teensy/td_libs_OneWire.html)
 
 Library was adapted to work with ESP8266 by including register definitions into OneWire.h
 Note that if you already have OneWire library in your Arduino/libraries folder, it will be used
 instead of the one that comes with this package.
 
-#### mDNS responder (ESP8266mDNS library) ####
+## mDNS responder (ESP8266mDNS library)
 
 Allows the sketch to respond to multicast DNS queries for domain names like "foo.local".
 Currently the library only works on STA interface, AP interface is not supported.
 See attached example and library README file for details.
 
-#### DNS server (DNSServer library) ####
+## DNS server (DNSServer library)
 
 Implements a simple DNS server that can be used in both STA and AP modes. The DNS server currently supports only one domain (for all other domains it will reply with NXDOMAIN or custom status code). With it clients can open a web server running on ESP8266 using a domain name, not an IP address.
 See attached example for details.
 
-#### Servo ####
+## Servo
 
 This library exposes the ability to control RC (hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support.  Servo counts above 12 will use Timer1 and features that use it will be effected.
 While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most will not be able to run off 3.3v and will require another power source that matches their specifications.  Make sure to connect the grounds between the ESP8266 and the servo motor power supply.
 
-#### Other libraries (not included with the IDE)
+## Other libraries (not included with the IDE)
 
 Libraries that don't rely on low-level access to AVR registers should work well. Here are a few libraries that were verified to work:
 
@@ -201,88 +205,3 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [PubSubClient](https://github.com/Imroy/pubsubclient) MQTT library by @Imroy.
 - [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with ESP8266.
 - [Souliss, Smart Home](https://github.com/souliss/souliss) - Framework for Smart Home based on Arduino, Android and openHAB.
-
-#### Upload via serial port ####
-Pick the correct serial port.
-You need to put ESP8266 into bootloader mode before uploading code.
-
-#### Power Supply ####
-
-For stable use of the ESP8266 a power supply with 3.3V and >= 250mA is required.
-
-* Note
- - Using the Power available from the USB to Serial adapter is not reccomended, these adapters typically do not supply enough current to run the ESP8266 reliably in every situation, an external supply or regulator is preferred.
-
-#### Serial Adapter ####
-
-There are many different USB to Serial adapters / boards.
-
-* Note
- - for full upload management you need RTS and DTR
- - the chip need to have 3.3V TTL (5V may damage the chip)
- - not all board have all pins of the ICs as breakout (check before order)
- - CTS and DSR are not useful for upload (they are Inputs)
-
-* Working ICs
- - FT232RL
- - CP2102
- - may others (drop a comment)
-
-#### Minimal Hardware Setup for Bootloading and Usage ####
-
-ESPxx Hardware
-
-| PIN           | Resistor | Serial Adapter |
-| ------------- | -------- | -------------- |
-| VCC           |          | VCC (3.3V)     |
-| GND           |          | GND            |
-| TX or GPIO2*  |          | RX             |
-| RX            |          | TX             |
-| GPIO0         | PullUp   | DTR            |
-| Reset*        | PullUp   | RTS            |
-| GPIO15*       | PullDown |                |
-| CH_PD         | PullUp   |                |
-
-* Note
- - GPIO15 is also named MTDO
- - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
- - GPIO2 is alternative TX for the boot loader mode
- - **Directly connecting a pin to VCC or GND is not a substitute for a PullUp or PullDown resistor, doing this can break upload management and the serial console, instability has also been noted in some cases.**
-
-###### ESP to Serial
-![ESP to Serial](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_to_serial.png)
-
-#### Minimal Hardware Setup for Bootloading only ####
-ESPxx Hardware
-
-| PIN           | Resistor | Serial Adapter  |
-| ------------- | -------- | --------------- |
-| VCC           |          | VCC (3.3V)      |
-| GND           |          | GND             |
-| TX or GPIO2   |          | RX              |
-| RX            |          | TX              |
-| GPIO0         |          | GND             |
-| Reset         |          | RTS*            |
-| GPIO15        | PullDown |                 |
-| CH_PD         | PullUp   |                 |
-
-* Note
-	- if no RTS is used a manual power toggle is needed
-
-#### Minimal Hardware Setup for Running only ####
-
-ESPxx Hardware
-
-| PIN           | Resistor | Power supply    |
-| ------------- | -------- | --------------- |
-| VCC           |          | VCC (3.3V)      |
-| GND           |          | GND             |
-| GPIO0         | PullUp   |                 |
-| GPIO15        | PullDown |                 |
-| CH_PD         | PullUp   |                 |
-
-###### Minimal
-![ESP min](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_min.png)
-
-###### Improved Stability
-![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)
