@@ -1,6 +1,8 @@
-# Change log
+---
+title: Change log
+---
 
-## Current version
+
 
 ### Core
 
@@ -8,7 +10,7 @@
 
 ### Libraries
 
-- ESP8266WebServer: add gzip streaming, fix sendContent behaviour, 
+- ESP8266WebServer: add gzip streaming, fix sendContent behaviour,
   add setContentSize method.
 - ESP8266WiFi: add BSSID, channel, isHidden methods, fix AP/STA mode
   selection (#28).
@@ -31,8 +33,8 @@ May 22, 2015
 - Better connection handling in ESP8266WebServer.
   The server now sends Content-Length and Connection: close headers,
   then waits for the client to disconnect. By not closing the connection
-  actively, server avoids TIME_WAIT TCP state, and TCP stack is able to 
-  release the memory immediately, without waiting for 2xMSL period. 
+  actively, server avoids TIME_WAIT TCP state, and TCP stack is able to
+  release the memory immediately, without waiting for 2xMSL period.
   If the client doesn't disconnect in 2000ms, the server closes the connection
   actively.
 - Add Hash library, which has a function to calculate SHA1 hash.
@@ -45,4 +47,3 @@ May 22, 2015
 May 19, 2015
 
 - Initial release of Boards Manager package for ESP8266 platform.
-
