@@ -1,8 +1,8 @@
-/* 
+/*
  cont.h - continuations support for Xtensa call0 ABI
  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -20,6 +20,8 @@
 
 #ifndef CONT_H_
 #define CONT_H_
+
+#include <stdbool.h>
 
 #ifndef CONT_STACKSIZE
 #define CONT_STACKSIZE 4096
@@ -57,5 +59,9 @@ void cont_yield(cont_t*);
 // Check guard bytes around the stack. Return 0 in case everything is ok,
 // return 1 if guard bytes were overwritten.
 int cont_check(cont_t* cont);
+
+// Check if yield() may be called. Returns true if we are running inside
+// continuation stack
+bool cont_can_yield(cont_t* cont);
 
 #endif /* CONT_H_ */
