@@ -21,7 +21,7 @@ Note that some boards and modules (ESP-12ED, NodeMCU 1.0) also break out pins 9 
 
 ESP8266 has a single ADC channel available to users. It may be used either to read voltage at ADC pin, or to read module supply voltage (VCC).
 
-To read external voltage applied to ADC pin, use `analogRead(A0)`. Input voltage range is 0 — 1.0V, and the reference voltage is derived from VCC, which is assumed to be 3.3V.
+To read external voltage applied to ADC pin, use `analogRead(A0)`. Input voltage range is 0 — 1.0V.
 
 To read VCC voltage, ADC pin must be kept unconnected. Additionally, the following line has to be added to the sketch:
 
@@ -33,7 +33,7 @@ This line has to appear outside of any functions, for instance right after the `
 
 ## Analog output
 
-`analogWrite(pin, value)` enables software PWM on the given pin. PWM may be used on pins 0 to 15.
+`analogWrite(pin, value)` enables software PWM on the given pin. PWM may be used on pins 0 to 16.
 Call `analogWrite(pin, 0)` to disable PWM on the pin. `value` may be in range from 0 to `PWMRANGE`, which is currently equal to 1023.
 
 Pin interrupts are supported through `attachInterrupt`, `detachInterrupt` functions.
@@ -175,11 +175,15 @@ Library was adapted to work with ESP8266 by including register definitions into 
 Note that if you already have OneWire library in your Arduino/libraries folder, it will be used
 instead of the one that comes with this package.
 
-## mDNS responder (ESP8266mDNS library)
+## mDNS and DNS-SD responder (ESP8266mDNS library)
 
-Allows the sketch to respond to multicast DNS queries for domain names like "foo.local".
+Allows the sketch to respond to multicast DNS queries for domain names like "foo.local", and DNS-SD (service dicovery) queries.
 Currently the library only works on STA interface, AP interface is not supported.
-See attached example and library README file for details.
+See attached example for details.
+
+## SSDP responder (ESP8266SSDP)
+
+SSDP is another service discovery protocol, supported on Windows out of the box. See attached example for reference.
 
 ## DNS server (DNSServer library)
 
