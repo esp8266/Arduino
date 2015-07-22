@@ -25,7 +25,7 @@ Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_inde
 Documentation: [Reference](http://arduino.esp8266.com/staging/doc/reference.html)
 
 
-### Building latest version from source [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/igrr/Arduino)
+### Building latest version from source [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
 ```
 $ git clone https://github.com/esp8266/Arduino.git
