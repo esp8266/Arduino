@@ -9,20 +9,20 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 
 - Install Arduino 1.6.5 from the [Arduino website](http://www.arduino.cc/en/main/software).
 - Start Arduino and open Perferences window.
-- Enter ```http://arduino.esp8266.com/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
+- Enter ```http://arduino.esp8266.com/stable/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 
 #### Available versions
 
-##### Stable version ![](http://arduino.esp8266.com/badge.svg)
-Boards manager link: `http://arduino.esp8266.com/package_esp8266com_index.json`
+##### Stable version ![](http://arduino.esp8266.com/stable/badge.svg)
+Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [Reference](http://arduino.esp8266.com/doc/README.md)
+Documentation: [Reference](http://arduino.esp8266.com/stable/doc/reference.html)
 
 ##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
 
-Documentation: [Reference](http://arduino.esp8266.com/staging/doc/README.md)
+Documentation: [Reference](http://arduino.esp8266.com/staging/doc/reference.html)
 
 
 ### Building latest version from source [![Linux build status](http://img.shields.io/travis/igrr/Arduino.svg)](https://travis-ci.org/igrr/Arduino)
@@ -34,15 +34,11 @@ $ ant dist
 ```
 
 ### Documentation ###
-Latest development version: [Reference](hardware/esp8266com/esp8266/doc/README.md)
+Latest development version:
 
-### Supported boards ###
-- Generic ESP8266 modules (without auto-reset support)
-- NodeMCU 0.9
-- NodeMCU 1.0
-- Olimex MOD-WIFI-ESP8266
-- Adafruit HUZZAH ESP8266 (ESP-12)
-- SweetPea ESP-210
+- [Reference](hardware/esp8266com/esp8266/doc/reference.md)
+- [Supported boards](hardware/esp8266com/esp8266/doc/boards.md)
+- [Change log](hardware/esp8266com/esp8266/doc/changes.md)
 
 ### Issues and support ###
 
