@@ -122,6 +122,12 @@ int WiFiUDP::available() {
         result = static_cast<int>(_ctx->getSize());
     }
 
+    if (!result) {
+        // yielding here will not make more data "available",
+        // but it will prevent the system from going into WDT reset
+        optimistic_yield(1000);
+    }
+
     return result;
 }
 
