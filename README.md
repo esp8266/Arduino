@@ -33,8 +33,7 @@ $ cd Arduino/build
 $ ant dist
 ```
 
-### Documentation ###
-Latest development version:
+Documentation for latest development version:
 
 - [Reference](hardware/esp8266com/esp8266/doc/reference.md)
 - [Supported boards](hardware/esp8266com/esp8266/doc/boards.md)
