@@ -17,6 +17,10 @@ Digital pins 6—11 are not shown on this diagram because they are used to conne
 
 Note that some boards and modules (ESP-12ED, NodeMCU 1.0) also break out pins 9 and 11. These may be used as IO if flash chip works in DIO mode (as opposed to QIO, which is the default one).
 
+Pin interrupts are supported through `attachInterrupt`, `detachInterrupt` functions.
+Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt
+types are supported: `CHANGE`, `RISING`, `FALLING`.
+
 ## Analog input
 
 ESP8266 has a single ADC channel available to users. It may be used either to read voltage at ADC pin, or to read module supply voltage (VCC).
@@ -34,12 +38,9 @@ This line has to appear outside of any functions, for instance right after the `
 ## Analog output
 
 `analogWrite(pin, value)` enables software PWM on the given pin. PWM may be used on pins 0 to 16.
-Call `analogWrite(pin, 0)` to disable PWM on the pin. `value` may be in range from 0 to `PWMRANGE`, which is currently equal to 1023.
+Call `analogWrite(pin, 0)` to disable PWM on the pin. `value` may be in range from 0 to `PWMRANGE`, which is equal to 1023 by default. PWM range may be changed by calling `analogWriteRange(new_range)`.
 
-Pin interrupts are supported through `attachInterrupt`, `detachInterrupt` functions.
-Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt
-types are supported: `CHANGE`, `RISING`, `FALLING`.
-
+PWM frequency is 1kHz by default. Call `analogWriteFreq(new_frequency)` to change the frequency.
 
 ## Timing and delays
 `millis()` and `micros()` return the number of milliseconds and microseconds elapsed after reset, respectively.
