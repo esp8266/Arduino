@@ -1,9 +1,9 @@
-/* 
+/*
   ESP8266WiFi.cpp - WiFi library for esp8266
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -158,7 +158,7 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
 
     wifi_station_dhcpc_stop();
     wifi_set_ip_info(STATION_IF, &info);
-    
+
     _useStaticIp = true;
 }
 
@@ -176,7 +176,7 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
     ip_addr_t d;
     d.addr = static_cast<uint32_t>(dns);
     dns_setserver(0,&d);
-    
+
     _useStaticIp = true;
 }
 
@@ -234,7 +234,7 @@ void ESP8266WiFiClass::softAP(const char* ssid)
 {
     softAP(ssid, 0);
 }
-  
+
 
 void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int channel, int ssid_hidden)
 {
@@ -314,7 +314,7 @@ uint8_t* ESP8266WiFiClass::softAPmacAddress(uint8_t* mac)
     wifi_get_macaddr(SOFTAP_IF, mac);
     return mac;
 }
-   
+
 String ESP8266WiFiClass::softAPmacAddress(void)
 {
     uint8_t mac[6];
@@ -336,7 +336,7 @@ IPAddress ESP8266WiFiClass::softAPIP()
 {
     struct ip_info ip;
     wifi_get_ip_info(SOFTAP_IF, &ip);
-    return IPAddress(ip.ip.addr);    
+    return IPAddress(ip.ip.addr);
 }
 
 IPAddress ESP8266WiFiClass::subnetMask()
@@ -400,7 +400,7 @@ void ESP8266WiFiClass::_scanDone(void* result, int status)
     }
     else
     {
-      
+
         int i = 0;
         bss_info_head_t* head = reinterpret_cast<bss_info_head_t*>(result);
 
@@ -477,7 +477,7 @@ int8_t ESP8266WiFiClass::scanNetworks(bool async)
     {
         disconnect();
     }
-    
+
     scanDelete();
 
     struct scan_config config;
@@ -641,7 +641,7 @@ int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult)
         esp_yield();
         // will return here when dns_found_callback fires
     }
-    
+
     return (aResult != 0) ? 1 : 0;
 }
 
@@ -702,7 +702,7 @@ bool ESP8266WiFiClass::beginWPSConfig(void) {
 
     disconnect();
 
-    DEBUGV("wps begin: %d\n", wps_type);
+    DEBUGV("wps begin\n");
 
     if(!wifi_wps_disable()) {
         DEBUGV("wps disable faild\n");
@@ -751,7 +751,7 @@ void ESP8266WiFiClass::beginSmartConfig()
     _smartConfigStarted = true;
     _smartConfigDone = false;
 
-    //SC_TYPE_ESPTOUCH use ESPTOUCH for smartconfig, or use SC_TYPE_AIRKISS for AIRKISS 
+    //SC_TYPE_ESPTOUCH use ESPTOUCH for smartconfig, or use SC_TYPE_AIRKISS for AIRKISS
     smartconfig_start(reinterpret_cast<sc_callback_t>(&ESP8266WiFiClass::_smartConfigCallback), 1);
 }
 
@@ -777,7 +777,7 @@ void ESP8266WiFiClass::_smartConfigCallback(uint32_t st, void* result)
     sc_status status = (sc_status) st;
     if (status == SC_STATUS_LINK) {
         station_config* sta_conf = reinterpret_cast<station_config*>(result);
-      
+
         wifi_station_set_config(sta_conf);
         wifi_station_disconnect();
         wifi_station_connect();
@@ -826,7 +826,7 @@ void ESP8266WiFiClass::printDiag(Print& p)
 
     static struct station_config conf;
     wifi_station_get_config(&conf);
-    
+
     const char* ssid = reinterpret_cast<const char*>(conf.ssid);
     p.print("SSID (");
     p.print(strlen(ssid));

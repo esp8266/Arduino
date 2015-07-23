@@ -1,12 +1,12 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <WiFiUDP.h>
- 
+#include <WiFiUdp.h>
+
 const char* host = "esp8266-ota";
 const char* ssid = "**********";
 const char* pass = "**********";
 const uint16_t aport = 8266;
- 
+
 WiFiServer TelnetServer(aport);
 WiFiClient Telnet;
 WiFiUDP OTA;
@@ -15,10 +15,10 @@ void setup() {
   Serial.begin(115200);
   Serial.println("");
   Serial.println("Arduino OTA Test");
-  
+
   Serial.printf("Sketch size: %u\n", ESP.getSketchSize());
   Serial.printf("Free size: %u\n", ESP.getFreeSketchSpace());
-  
+
   WiFi.begin(ssid, pass);
   if(WiFi.waitForConnectResult() == WL_CONNECTED){
     MDNS.begin(host);
@@ -43,24 +43,24 @@ void loop() {
     Serial.print(remote);
     Serial.printf(", port:%d, size:%d\n", port, size);
     uint32_t startTime = millis();
-    
+
     WiFiUDP::stopAll();
-    
+
     if(!Update.begin(size)){
       Serial.println("Update Begin Error");
       return;
     }
-  
+
     WiFiClient client;
     if (client.connect(remote, port)) {
-    
+
       uint32_t written;
       while(!Update.isFinished()){
         written = Update.write(client);
         if(written > 0) client.print(written, DEC);
       }
       Serial.setDebugOutput(false);
-    
+
       if(Update.end()){
         client.println("OK");
         Serial.printf("Update Success: %u\nRebooting...\n", millis() - startTime);

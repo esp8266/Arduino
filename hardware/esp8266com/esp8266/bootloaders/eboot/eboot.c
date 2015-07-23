@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 Ivan Grokhotkov. All rights reserved. 
+/* Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
  * This file is part of eboot bootloader.
  *
  * Redistribution and use is permitted according to the conditions of the
@@ -14,6 +14,8 @@
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
+extern void ets_wdt_enable(void);
+extern void ets_wdt_disable(void);
 
 int load_app_from_flash_raw(const uint32_t flash_addr)
 {
@@ -24,10 +26,10 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
         return 1;
     }
     pos += sizeof(image_header);
-    
+
 
     for (uint32_t section_index = 0;
-        section_index < image_header.num_segments; 
+        section_index < image_header.num_segments;
         ++section_index)
     {
         section_header_t section_header = {0};
@@ -72,8 +74,8 @@ int load_app_from_flash_raw(const uint32_t flash_addr)
 
 
 
-int copy_raw(const uint32_t src_addr, 
-             const uint32_t dst_addr, 
+int copy_raw(const uint32_t src_addr,
+             const uint32_t dst_addr,
              const uint32_t size)
 {
     // require regions to be aligned
@@ -87,20 +89,20 @@ int copy_raw(const uint32_t src_addr,
     uint32_t left = ((size+buffer_size-1) & ~(buffer_size-1));
     uint32_t saddr = src_addr;
     uint32_t daddr = dst_addr;
-    
+
     while (left) {
-      if (SPIEraseSector(daddr/buffer_size)) {
-          return 2;
-      }
-      if (SPIRead(saddr, buffer, buffer_size)) {
-        return 3;
-      }
-      if (SPIWrite(daddr, buffer, buffer_size)) {
-        return 4;
-      }
-      saddr += buffer_size;
-      daddr += buffer_size;
-      left  -= buffer_size;
+        if (SPIEraseSector(daddr/buffer_size)) {
+            return 2;
+        }
+        if (SPIRead(saddr, buffer, buffer_size)) {
+            return 3;
+        }
+        if (SPIWrite(daddr, buffer, buffer_size)) {
+            return 4;
+        }
+        saddr += buffer_size;
+        daddr += buffer_size;
+        left  -= buffer_size;
     }
 
     return 0;
@@ -121,10 +123,12 @@ void main()
         ets_putc('@');
     }
     eboot_command_clear();
-    
+
     if (cmd.action == ACTION_COPY_RAW) {
         ets_putc('c'); ets_putc('p'); ets_putc(':');
+        ets_wdt_disable();
         res = copy_raw(cmd.args[0], cmd.args[1], cmd.args[2]);
+        ets_wdt_enable();
         ets_putc('0'+res); ets_putc('\n');
         if (res == 0) {
             cmd.action = ACTION_LOAD_APP;
@@ -133,14 +137,14 @@ void main()
     }
 
     if (cmd.action == ACTION_LOAD_APP) {
-      ets_putc('l'); ets_putc('d'); ets_putc('\n');
-      res = load_app_from_flash_raw(cmd.args[0]);
-      //we will get to this only on load fail
-      ets_putc('e'); ets_putc(':'); ets_putc('0'+res); ets_putc('\n');
+        ets_putc('l'); ets_putc('d'); ets_putc('\n');
+        res = load_app_from_flash_raw(cmd.args[0]);
+        //we will get to this only on load fail
+        ets_putc('e'); ets_putc(':'); ets_putc('0'+res); ets_putc('\n');
     }
 
     if (res) {
-      SWRST;
+        SWRST;
     }
 
     while(true){}

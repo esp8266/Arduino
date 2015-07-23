@@ -19,12 +19,12 @@ Usage
 -----
 1. Download this repository as a zip (button on the right) and follow [these instructions to install into Arduino](http://arduino.cc/en/Guide/Libraries).
 2. Include the ESP8266mDNS library in the sketch.
-3. Create an instance of the MDNSResponder class.
-4. Call the begin method in the sketch's setup and provide a domain name (without
-   the '.local' suffix, i.e. just provide 'foo' to resolve 'foo.local'), and the 
-   IP address to advertise.  Optionally provide a time to live (in seconds) 
-   for the DNS record--the default is 1 hour.
-5. Call the update method in each iteration of the sketch's loop function.
+3. Call MDNS.begin method in the sketch's setup and provide a domain name (without
+   the '.local' suffix, i.e. just provide 'foo' to resolve 'foo.local').  Optionally provide
+   the IP address to advertise and time to live (in seconds) for the DNS record -- the default is 1 hour.
+4. To advertise DNS-SD services, call MDNS.addService(service, proto, port), where service and proto
+   are strings with service and protocol name (e.g. "http", "tcp"), and port is an integer port number
+   for this service (e.g. 80).
 
 See the included MDNS + HTTP server sketch for a full example.
 
