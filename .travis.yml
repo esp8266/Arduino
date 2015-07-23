@@ -1,35 +1,38 @@
-sudo: true
+sudo: false
+
 language: java
 
 os:
   - linux
-  - osx
+
+addons:
+  apt:
+    packages:
+    - ant
 
 jdk:
   - oraclejdk8
 
 script:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get update -qq; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get install -qq ant; fi
   - pushd build
-  - echo "" | ant dist
+  - echo "" | ant build
   - popd
-#- bash -x ./generate-appimage
-
-deploy:
-  provider: releases
-  api_key:
-    secure: eKHcAMuC58JZKRsn1QwbiYE4aL/9dZsybDqqHTo1dUo8x9+3fGed/Dci76ItFFS7SmFfIdl6ej8/Uj0nPK/sIE21blKBe3+L0KAJm0TTq3m0ig1suCmMipCsSW+srWYM0hl58+OKagM4FoHKDjsEnzRDv9Z4xtxyvG+7/XLD1dE=
-  skip_cleanup: true
-  file_glob: true
-  file:
-    - '$TRAVIS_BUILD_DIR/build/linux/arduino-*.tar.xz'
-#    - '$TRAVIS_BUILD_DIR/Arduino.AppImage'
-  on:
-    tags: true
-    all_branches: true
+  - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
+  - sleep 3
+  - export DISPLAY=:1.0
+  - export PATH="$PWD/build/linux/work:$PATH"
+  - which arduino
+  - source hardware/esp8266com/esp8266/tests/common.sh
+  - arduino --board esp8266com:esp8266:generic --save-prefs
+  - build_sketches arduino $PWD/hardware/esp8266com/esp8266
 
 notifications:
   email:
     on_success: change
     on_failure: change
+  webhooks:
+    urls:
+      - secure: "dnSY+KA7NK+KD+Z71copmANDUsyVePrZ0iXvXxmqMEQv+lp3j2Z87G5pHn7j0WNcNZrejJqOdbElJ9Q4QESRaAYxTR7cA6ameJeEKHiFJrQtN/4abvoXb9E1CxpL8aNON/xgnqCk+fycOK3nbWWXlJBodzBm7KN64vrcHO7et+M="
+    on_success: change  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: false     # default: false
