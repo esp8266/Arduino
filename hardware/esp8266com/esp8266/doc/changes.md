@@ -4,6 +4,11 @@ title: Change log
 
 *Current release*
 
+
+---
+## 1.6.5-947-g39819f0
+July 23, 2015
+
 ### Core
 
 - I2C library updated to better handle repeated start for certain devices,
