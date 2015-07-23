@@ -2,7 +2,7 @@
 title: Change log
 ---
 
-*Future release*
+*Current release*
 
 ### Core
 
@@ -37,6 +37,7 @@ title: Change log
 - Servo library support
 - Add ESP8266WiFiMesh library
 - Add ESP8266SSDP library
+- Add DNS-SD support to ESP8266mDNS library
 
 ### Tools
 
