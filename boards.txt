@@ -135,56 +135,46 @@ generic.menu.FlashSize.4M.upload.maximum_size=1044464
 # generic.menu.FlashSize.16M.build.spiffs_blocksize=8192
 
 ##############################################################
-modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
+huzzah.name=Adafruit HUZZAH ESP8266
 
-modwifi.upload.tool=esptool
-modwifi.upload.speed=115200
-modwifi.upload.resetmethod=ck
-modwifi.upload.maximum_size=1044464
-modwifi.upload.maximum_data_size=81920
-modwifi.upload.wait_for_upload_port=true
-modwifi.serial.disableDTR=true
-modwifi.serial.disableRTS=true
+huzzah.upload.tool=esptool
+huzzah.upload.speed=115200
+huzzah.upload.resetmethod=ck
+huzzah.upload.maximum_size=1044464
+huzzah.upload.maximum_data_size=81920
+huzzah.upload.wait_for_upload_port=true
+huzzah.serial.disableDTR=true
+huzzah.serial.disableRTS=true
 
-modwifi.build.mcu=esp8266
-modwifi.build.f_cpu=80000000L
-modwifi.build.board=MOD_WIFI_ESP8266
-modwifi.build.core=esp8266
-modwifi.build.variant=generic
-# Winbond W25Q16 flash
-modwifi.build.flash_mode=qio
-modwifi.build.flash_size=2M
-modwifi.build.flash_freq=40
-modwifi.build.flash_ld=eagle.flash.2m.ld
-modwifi.build.spiffs_start=0x100000
-modwifi.build.spiffs_end=0x1FB000
-modwifi.build.spiffs_pagesize=256
-modwifi.build.spiffs_blocksize=8192
+huzzah.build.mcu=esp8266
+huzzah.build.f_cpu=80000000L
+huzzah.build.board=ESP8266_ESP12
+huzzah.build.core=esp8266
+huzzah.build.variant=adafruit
+huzzah.build.flash_mode=qio
+huzzah.build.flash_size=4M
+huzzah.build.flash_freq=40
+huzzah.build.flash_ld=eagle.flash.4m.ld
+huzzah.build.spiffs_start=0x100000
+huzzah.build.spiffs_end=0x3FB000
+huzzah.build.spiffs_pagesize=256
+huzzah.build.spiffs_blocksize=8192
 
-modwifi.menu.CpuFrequency.80=80 MHz
-modwifi.menu.CpuFrequency.80.build.f_cpu=80000000L
-modwifi.menu.CpuFrequency.160=160 MHz
-modwifi.menu.CpuFrequency.160.build.f_cpu=160000000L
+huzzah.menu.CpuFrequency.80=80 MHz
+huzzah.menu.CpuFrequency.80.build.f_cpu=80000000L
+huzzah.menu.CpuFrequency.160=160 MHz
+huzzah.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-modwifi.menu.UploadSpeed.115200=115200
-modwifi.menu.UploadSpeed.115200.upload.speed=115200
-modwifi.menu.UploadSpeed.9600=9600
-modwifi.menu.UploadSpeed.9600.upload.speed=9600
-modwifi.menu.UploadSpeed.57600=57600
-modwifi.menu.UploadSpeed.57600.upload.speed=57600
-modwifi.menu.UploadSpeed.256000.windows=256000
-modwifi.menu.UploadSpeed.256000.upload.speed=256000
-modwifi.menu.UploadSpeed.230400.linux=230400
-modwifi.menu.UploadSpeed.230400.macosx=230400
-modwifi.menu.UploadSpeed.230400.macosx=230400
-modwifi.menu.UploadSpeed.230400.upload.speed=230400
-modwifi.menu.UploadSpeed.460800.linux=460800
-modwifi.menu.UploadSpeed.460800.macosx=460800
-modwifi.menu.UploadSpeed.460800.upload.speed=460800
-modwifi.menu.UploadSpeed.512000.windows=512000
-modwifi.menu.UploadSpeed.512000.upload.speed=512000
-modwifi.menu.UploadSpeed.921600=921600
-modwifi.menu.UploadSpeed.921600.upload.speed=921600
+huzzah.menu.UploadSpeed.115200=115200
+huzzah.menu.UploadSpeed.115200.upload.speed=115200
+huzzah.menu.UploadSpeed.9600=9600
+huzzah.menu.UploadSpeed.9600.upload.speed=9600
+huzzah.menu.UploadSpeed.57600=57600
+huzzah.menu.UploadSpeed.57600.upload.speed=57600
+huzzah.menu.UploadSpeed.256000=256000
+huzzah.menu.UploadSpeed.256000.upload.speed=256000
+huzzah.menu.UploadSpeed.921600=921600
+huzzah.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
@@ -239,7 +229,7 @@ nodemcu.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
- 
+
 nodemcuv2.upload.tool=esptool
 nodemcuv2.upload.speed=115200
 nodemcuv2.upload.resetmethod=ck
@@ -248,7 +238,7 @@ nodemcuv2.upload.maximum_data_size=81920
 nodemcuv2.upload.wait_for_upload_port=true
 nodemcuv2.serial.disableDTR=true
 nodemcuv2.serial.disableRTS=true
- 
+
 nodemcuv2.build.mcu=esp8266
 nodemcuv2.build.f_cpu=80000000L
 nodemcuv2.build.board=ESP8266_ESP12
@@ -262,12 +252,12 @@ nodemcuv2.build.spiffs_start=0x100000
 nodemcuv2.build.spiffs_end=0x3FB000
 nodemcuv2.build.spiffs_pagesize=256
 nodemcuv2.build.spiffs_blocksize=8192
- 
+
 nodemcuv2.menu.CpuFrequency.80=80 MHz
 nodemcuv2.menu.CpuFrequency.80.build.f_cpu=80000000L
 nodemcuv2.menu.CpuFrequency.160=160 MHz
 nodemcuv2.menu.CpuFrequency.160.build.f_cpu=160000000L
- 
+
 nodemcuv2.menu.UploadSpeed.115200=115200
 nodemcuv2.menu.UploadSpeed.115200.upload.speed=115200
 nodemcuv2.menu.UploadSpeed.9600=9600
@@ -289,46 +279,106 @@ nodemcuv2.menu.UploadSpeed.921600=921600
 nodemcuv2.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
-huzzah.name=Adafruit HUZZAH ESP8266
+modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
 
-huzzah.upload.tool=esptool
-huzzah.upload.speed=115200
-huzzah.upload.resetmethod=ck
-huzzah.upload.maximum_size=1044464
-huzzah.upload.maximum_data_size=81920
-huzzah.upload.wait_for_upload_port=true
-huzzah.serial.disableDTR=true
-huzzah.serial.disableRTS=true
+modwifi.upload.tool=esptool
+modwifi.upload.speed=115200
+modwifi.upload.resetmethod=ck
+modwifi.upload.maximum_size=1044464
+modwifi.upload.maximum_data_size=81920
+modwifi.upload.wait_for_upload_port=true
+modwifi.serial.disableDTR=true
+modwifi.serial.disableRTS=true
 
-huzzah.build.mcu=esp8266
-huzzah.build.f_cpu=80000000L
-huzzah.build.board=ESP8266_ESP12
-huzzah.build.core=esp8266
-huzzah.build.variant=adafruit
-huzzah.build.flash_mode=qio
-huzzah.build.flash_size=4M
-huzzah.build.flash_freq=40
-huzzah.build.flash_ld=eagle.flash.4m.ld
-huzzah.build.spiffs_start=0x100000
-huzzah.build.spiffs_end=0x3FB000
-huzzah.build.spiffs_pagesize=256
-huzzah.build.spiffs_blocksize=8192
+modwifi.build.mcu=esp8266
+modwifi.build.f_cpu=80000000L
+modwifi.build.board=MOD_WIFI_ESP8266
+modwifi.build.core=esp8266
+modwifi.build.variant=generic
+# Winbond W25Q16 flash
+modwifi.build.flash_mode=qio
+modwifi.build.flash_size=2M
+modwifi.build.flash_freq=40
+modwifi.build.flash_ld=eagle.flash.2m.ld
+modwifi.build.spiffs_start=0x100000
+modwifi.build.spiffs_end=0x1FB000
+modwifi.build.spiffs_pagesize=256
+modwifi.build.spiffs_blocksize=8192
 
-huzzah.menu.CpuFrequency.80=80 MHz
-huzzah.menu.CpuFrequency.80.build.f_cpu=80000000L
-huzzah.menu.CpuFrequency.160=160 MHz
-huzzah.menu.CpuFrequency.160.build.f_cpu=160000000L
+modwifi.menu.CpuFrequency.80=80 MHz
+modwifi.menu.CpuFrequency.80.build.f_cpu=80000000L
+modwifi.menu.CpuFrequency.160=160 MHz
+modwifi.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-huzzah.menu.UploadSpeed.115200=115200
-huzzah.menu.UploadSpeed.115200.upload.speed=115200
-huzzah.menu.UploadSpeed.9600=9600
-huzzah.menu.UploadSpeed.9600.upload.speed=9600
-huzzah.menu.UploadSpeed.57600=57600
-huzzah.menu.UploadSpeed.57600.upload.speed=57600
-huzzah.menu.UploadSpeed.256000=256000
-huzzah.menu.UploadSpeed.256000.upload.speed=256000
-huzzah.menu.UploadSpeed.921600=921600
-huzzah.menu.UploadSpeed.921600.upload.speed=921600
+modwifi.menu.UploadSpeed.115200=115200
+modwifi.menu.UploadSpeed.115200.upload.speed=115200
+modwifi.menu.UploadSpeed.9600=9600
+modwifi.menu.UploadSpeed.9600.upload.speed=9600
+modwifi.menu.UploadSpeed.57600=57600
+modwifi.menu.UploadSpeed.57600.upload.speed=57600
+modwifi.menu.UploadSpeed.256000.windows=256000
+modwifi.menu.UploadSpeed.256000.upload.speed=256000
+modwifi.menu.UploadSpeed.230400.linux=230400
+modwifi.menu.UploadSpeed.230400.macosx=230400
+modwifi.menu.UploadSpeed.230400.macosx=230400
+modwifi.menu.UploadSpeed.230400.upload.speed=230400
+modwifi.menu.UploadSpeed.460800.linux=460800
+modwifi.menu.UploadSpeed.460800.macosx=460800
+modwifi.menu.UploadSpeed.460800.upload.speed=460800
+modwifi.menu.UploadSpeed.512000.windows=512000
+modwifi.menu.UploadSpeed.512000.upload.speed=512000
+modwifi.menu.UploadSpeed.921600=921600
+modwifi.menu.UploadSpeed.921600.upload.speed=921600
+
+##############################################################
+thing.name=SparkFun ESP8266 Thing
+
+thing.upload.tool=esptool
+thing.upload.speed=921600
+thing.upload.resetmethod=ck
+thing.upload.maximum_size=434160
+thing.upload.maximum_data_size=81920
+thing.upload.wait_for_upload_port=true
+thing.serial.disableDTR=true
+thing.serial.disableRTS=true
+
+thing.build.mcu=esp8266
+thing.build.f_cpu=80000000L
+thing.build.board=ESP8266_THING
+thing.build.core=esp8266
+thing.build.variant=thing
+thing.build.flash_mode=qio
+# flash chip: AT25SF041 (512 kbyte, 4Mbit)
+thing.build.flash_size=512K
+thing.build.flash_ld=eagle.flash.512k.ld
+thing.build.flash_freq=40
+thing.build.spiffs_start=0x6B000
+thing.build.spiffs_end=0x7B000
+thing.build.spiffs_blocksize=4096
+
+thing.menu.CpuFrequency.80=80 MHz
+thing.menu.CpuFrequency.80.build.f_cpu=80000000L
+thing.menu.CpuFrequency.160=160 MHz
+thing.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+thing.menu.UploadSpeed.115200=115200
+thing.menu.UploadSpeed.115200.upload.speed=115200
+thing.menu.UploadSpeed.9600=9600
+thing.menu.UploadSpeed.9600.upload.speed=9600
+thing.menu.UploadSpeed.57600=57600
+thing.menu.UploadSpeed.57600.upload.speed=57600
+thing.menu.UploadSpeed.256000.windows=256000
+thing.menu.UploadSpeed.256000.upload.speed=256000
+thing.menu.UploadSpeed.230400.linux=230400
+thing.menu.UploadSpeed.230400.macosx=230400
+thing.menu.UploadSpeed.230400.upload.speed=230400
+thing.menu.UploadSpeed.460800.linux=460800
+thing.menu.UploadSpeed.460800.macosx=460800
+thing.menu.UploadSpeed.460800.upload.speed=460800
+thing.menu.UploadSpeed.512000.windows=512000
+thing.menu.UploadSpeed.512000.upload.speed=512000
+thing.menu.UploadSpeed.921600=921600
+thing.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
 esp210.name=SweetPea ESP-210
@@ -337,6 +387,7 @@ esp210.upload.tool=esptool
 esp210.upload.speed=115200
 esp210.upload.resetmethod=ck
 esp210.upload.maximum_size=1044464
+esp210.upload.maximum_data_size=81920
 esp210.upload.wait_for_upload_port=true
 esp210.serial.disableDTR=true
 esp210.serial.disableRTS=true
