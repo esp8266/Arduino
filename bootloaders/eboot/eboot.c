@@ -14,6 +14,8 @@
 
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
+extern void ets_wdt_enable(void);
+extern void ets_wdt_disable(void);
 
 int load_app_from_flash_raw(const uint32_t flash_addr)
 {
@@ -87,7 +89,9 @@ int copy_raw(const uint32_t src_addr,
     uint32_t left = ((size+buffer_size-1) & ~(buffer_size-1));
     uint32_t saddr = src_addr;
     uint32_t daddr = dst_addr;
-    
+
+    ets_wdt_disable();
+
     while (left) {
       if (SPIEraseSector(daddr/buffer_size)) {
           return 2;
@@ -102,6 +106,8 @@ int copy_raw(const uint32_t src_addr,
       daddr += buffer_size;
       left  -= buffer_size;
     }
+
+    ets_wdt_enable();
 
     return 0;
 }
