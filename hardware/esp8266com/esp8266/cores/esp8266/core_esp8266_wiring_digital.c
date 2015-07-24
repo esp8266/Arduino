@@ -113,7 +113,7 @@ void interrupt_handler(void *arg) {
   uint32_t status = GPIE;
   GPIEC = status;//clear them interrupts
   if(status == 0 || interrupt_reg == 0) return;
-  ETS_GPIO_INTR_DISABLE();
+  noInterrupts();
   int i = 0;
   uint32_t changedbits = status & interrupt_reg;
   while(changedbits){
@@ -126,7 +126,7 @@ void interrupt_handler(void *arg) {
       handler->fn();
     }
   }
-  ETS_GPIO_INTR_ENABLE();
+  interrupts();
 }
 
 extern void __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode) {
