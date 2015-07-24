@@ -129,30 +129,51 @@ void ESP8266WebServer::sendHeader(const String& name, const String& value, bool 
   }
 }
 
-void ESP8266WebServer::send(int code, const char* content_type, const String& content) {
-  String response = "HTTP/1.1 ";
-  response += String(code);
-  response += " ";
-  response += _responseCodeToString(code);
-  response += "\r\n";
 
-  if (!content_type)
-    content_type = "text/html";
-  
-  sendHeader("Content-Type", content_type, true);
-  if (_contentLength != CONTENT_LENGTH_UNKNOWN && _contentLength != CONTENT_LENGTH_NOT_SET) {
-    sendHeader("Content-Length", String(_contentLength).c_str());
-  } else if(content.length() > 0){
-    sendHeader("Content-Length", String(content.length()).c_str());
-  }
-  sendHeader("Connection", "close");
-  sendHeader("Access-Control-Allow-Origin", "*");
-  
-  response += _responseHeaders;
-  response += "\r\n";
-  response += content;
-  _responseHeaders = String();
-  sendContent(response);
+void ESP8266WebServer::_prepareHeader(String& response, int code, const char* content_type, size_t contentLength) {
+    response = "HTTP/1.1 ";
+    response += String(code);
+    response += " ";
+    response += _responseCodeToString(code);
+    response += "\r\n";
+
+    if (!content_type)
+        content_type = "text/html";
+
+    sendHeader("Content-Type", content_type, true);
+    if (_contentLength != CONTENT_LENGTH_UNKNOWN && _contentLength != CONTENT_LENGTH_NOT_SET) {
+        sendHeader("Content-Length", String(_contentLength).c_str());
+    }
+    else if (contentLength > 0){
+        sendHeader("Content-Length", String(contentLength).c_str());
+    }
+    sendHeader("Connection", "close");
+    sendHeader("Access-Control-Allow-Origin", "*");
+
+    response += _responseHeaders;
+    response += "\r\n";
+    _responseHeaders = String();
+}
+
+void ESP8266WebServer::send(int code, const char* content_type, const String& content) {
+    String header;
+    _prepareHeader(header, code, content_type, content.length());
+    sendContent(header);
+
+    sendContent(content);
+}
+
+void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
+    size_t contentLength = 0;
+
+    if (content != NULL) {
+        contentLength = strlen_P(content);
+    }
+
+    String header;
+    _prepareHeader(header, code, String(FPSTR(content_type)).c_str(), contentLength);
+    sendContent(header);
+    sendContent_P(content);
 }
 
 void ESP8266WebServer::send(int code, char* content_type, const String& content) {
@@ -176,6 +197,34 @@ void ESP8266WebServer::sendContent(const String& content) {
       break;
     }
   }
+}
+
+void ESP8266WebServer::sendContent_P(PGM_P content) {
+    char contentUnit[HTTP_DOWNLOAD_UNIT_SIZE + 1];
+
+    contentUnit[HTTP_DOWNLOAD_UNIT_SIZE] = '\0';
+
+    while (content != NULL) {
+        size_t contentUnitLen;
+        PGM_P contentNext;
+
+        // due to the memccpy signature, lots of casts are needed
+        contentNext = (PGM_P)memccpy_P((void*)contentUnit, (PGM_VOID_P)content, 0, HTTP_DOWNLOAD_UNIT_SIZE);
+
+        if (contentNext == NULL) {
+            // no terminator, more data available
+            content += HTTP_DOWNLOAD_UNIT_SIZE;
+            contentUnitLen = HTTP_DOWNLOAD_UNIT_SIZE;
+        }
+        else {
+            // reached terminator
+            contentUnitLen = contentNext - content;
+            content = NULL;
+        }
+
+        // write is so overloaded, had to use the cast to get it pick the right one
+        _currentClient.write((const char*)contentUnit, contentUnitLen);
+    }
 }
 
 String ESP8266WebServer::arg(const char* name) {
