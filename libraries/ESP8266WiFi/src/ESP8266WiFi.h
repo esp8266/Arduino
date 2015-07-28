@@ -105,6 +105,13 @@ public:
     void softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
 
     /*
+      * Disconnect from the network (close AP)
+      *
+      * return: one value of wl_status_t enum
+      */
+    int softAPdisconnect(bool wifioff = false);
+
+    /*
      * Disconnect from the network
      *
      * return: one value of wl_status_t enum
@@ -348,6 +355,7 @@ public:
     friend class WiFiServer;
 
 protected:
+    void _mode(WiFiMode);
     static void _scanDone(void* result, int status);
     void * _getScanInfoByIndex(int i);
     static void _smartConfigCallback(uint32_t status, void* result);
