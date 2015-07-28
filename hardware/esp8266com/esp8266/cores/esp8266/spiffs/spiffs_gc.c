@@ -556,4 +556,3 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
 
   return res;
 }
-
