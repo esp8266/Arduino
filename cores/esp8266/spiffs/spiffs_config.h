@@ -8,15 +8,16 @@
 #ifndef SPIFFS_CONFIG_H_
 #define SPIFFS_CONFIG_H_
 
-#include "mem.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 #include "c_types.h"
-#include "stddef.h"
-#include "osapi.h"
 #include "ets_sys.h"
 
-#define c_memcpy os_memcpy
-#define c_printf os_printf
-#define c_memset os_memset
+
+#define c_memcpy memcpy
+#define c_printf ets_printf
+#define c_memset memset
 
 typedef signed short file_t;
 typedef int32_t s32_t;
@@ -65,7 +66,7 @@ typedef uint8_t u8_t;
 // for filedescriptor and cache buffers. Once decided for a configuration,
 // this can be disabled to reduce flash.
 #ifndef SPIFFS_BUFFER_HELP
-#define SPIFFS_BUFFER_HELP              0
+#define SPIFFS_BUFFER_HELP              1
 #endif
 
 // Enables/disable memory read caching of nucleus file system operations.
@@ -140,7 +141,7 @@ typedef uint8_t u8_t;
 // not on mount point. If not, SPIFFS_format must be called prior to mounting
 // again.
 #ifndef SPIFFS_USE_MAGIC
-#define SPIFFS_USE_MAGIC                (0)
+#define SPIFFS_USE_MAGIC                (1)
 #endif
 
 // SPIFFS_LOCK and SPIFFS_UNLOCK protects spiffs from reentrancy on api level
