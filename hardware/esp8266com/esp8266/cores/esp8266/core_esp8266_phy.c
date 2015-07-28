@@ -247,18 +247,26 @@ void user_rf_pre_init() {
     rtc_reg[30] = 0;
 
     system_set_os_print(0);
+    __run_user_rf_pre_init();
 }
 
-extern int __get_rf_mode()  __attribute__((weak));
-extern int __get_rf_mode()
+extern int __get_rf_mode(void)  __attribute__((weak));
+extern int __get_rf_mode(void)
 {
     return 0;  // default mode
 }
 
-extern int __get_adc_mode() __attribute__((weak));
-extern int __get_adc_mode()
+extern int __get_adc_mode(void) __attribute__((weak));
+extern int __get_adc_mode(void)
 {
     return 33; // default ADC mode
 }
+
+extern void __run_user_rf_pre_init(void) __attribute__((weak));
+extern void __run_user_rf_pre_init(void)
+{
+    return; // default do noting
+}
+
 
 

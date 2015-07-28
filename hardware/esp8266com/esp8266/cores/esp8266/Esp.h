@@ -68,7 +68,7 @@ enum ADCMode {
     ADC_VDD = 255
 };
 
-#define ADC_MODE(mode) extern "C" int __get_adc_mode() { return (int) (mode); }
+#define ADC_MODE(mode) extern "C" int __get_adc_mode(void) { return (int) (mode); }
 
 typedef enum {
      FM_QIO = 0x00,
