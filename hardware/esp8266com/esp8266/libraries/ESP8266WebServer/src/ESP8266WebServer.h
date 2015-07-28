@@ -80,10 +80,12 @@ public:
   void send(int code, const char* content_type = NULL, const String& content = String(""));
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
+  void send_P(int code, PGM_P content_type, PGM_P content);
 
   void setContentLength(size_t contentLength) { _contentLength = contentLength; }
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
+  void sendContent_P(PGM_P content);
 
 template<typename T> size_t streamFile(T &file, const String& contentType){
   setContentLength(file.size());
@@ -104,7 +106,8 @@ protected:
   void _parseForm(WiFiClient& client, String boundary, uint32_t len);
   void _uploadWriteByte(uint8_t b);
   uint8_t _uploadReadByte(WiFiClient& client);
-  
+  void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
+
   struct RequestHandler;
   struct RequestArgument {
     String key;
