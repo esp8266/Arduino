@@ -364,6 +364,9 @@ static int send_cert_verify(SSL *ssl)
     RSA_CTX *rsa_ctx = ssl->ssl_ctx->rsa_ctx;
     int n = 0, ret;
 
+    if (rsa_ctx == NULL)
+        return SSL_OK;
+
     DISPLAY_RSA(ssl, rsa_ctx);
 
     buf[0] = HS_CERT_VERIFY;
