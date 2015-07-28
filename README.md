@@ -1,7 +1,9 @@
-Arduino-compatible IDE with ESP8266 support
+Arduino core for ESP8266 WiFi chip
 ===========================================
 
-This project brings support for ESP8266 chip to the Arduino environment. ESP8266WiFi library bundled with this project has the same interface as the WiFi Shield library, making it easy to re-use existing code and libraries.
+This project brings support for ESP8266 chip to the Arduino environment. It lets you write sketches using familiar Arduino functions and libraries, and run them directly on ESP8266, no external microcontroller required.
+
+ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, work with SD cards, servos, SPI and I2C peripherals.
 
 ### Installing with Boards Manager ###
 
@@ -41,9 +43,12 @@ Documentation for latest development version:
 
 ### Issues and support ###
 
-Forum: http://www.esp8266.com/arduino
+The best place to ask questions related to this core is ESP8266 community forum: http://www.esp8266.com/arduino.
+If you find the forum useful, please consider supporting it with a donation.
+[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
 
-Submit issues on Github: https://github.com/esp8266/Arduino/issues
+If you encounter an issue, you are welcome to submit it here on Github: https://github.com/esp8266/Arduino/issues.
+Please provide as much context as possible: version which you are using (you can check it in Boards Manager), your sketch code, serial output, board model, IDE settings (board selection, flash size, etc).
 
 ### Contributing
 

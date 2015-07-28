@@ -4,6 +4,20 @@ title: Change log
 
 *Current release*
 
+### Core
+
+- Add first batch of file system APIs
+- Allow user to run code in user_rf_pre_init
+
+
+### Libraries
+
+- ESP8266WebServer: support for sending of PROGMEM strings
+- ESP8266WiFi: fix mode selection (#529)
+
+### Tools
+
+- Update SDK to 1.2.0_15_07_13_p4
 
 ---
 ## 1.6.5-947-g39819f0
