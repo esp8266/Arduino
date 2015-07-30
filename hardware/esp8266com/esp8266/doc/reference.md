@@ -7,7 +7,7 @@ title: Reference
 Pin numbers in Arduino correspond directly to the ESP8266 GPIO pin numbers. `pinMode`, `digitalRead`, and `digitalWrite` functions work as usual, so to read GPIO2, call `digitalRead(2)`.
 
 Digital pins 0—15 can be `INPUT`, `OUTPUT`, or `INPUT_PULLUP`.
-Pin 16 can be `INPUT`, `OUTPUT` or `INPUT_PULLDOWN`. At startup, pins are configured as `INPUT`.
+Pin 16 can be `INPUT`, `OUTPUT` or `INPUT_PULLDOWN_16`. At startup, pins are configured as `INPUT`.
 
 Pins may also serve other functions, like Serial, I2C, SPI. These functions are normally activated by the corresponding library. The diagram below shows pin mapping for the popular ESP-12 module.
 
