@@ -24,6 +24,9 @@
 #include <Arduino.h>
 #include <memory>
 
+class File;
+class Dir;
+
 class FileImpl;
 typedef std::shared_ptr<FileImpl> FileImplPtr;
 class FSImpl;
@@ -82,25 +85,26 @@ class FS
 {
 public:
     FS(FSImplPtr impl) : _impl(impl) { }
+
+    bool begin();
+
     File open(const char* path, const char* mode);
     File open(const String& path, const char* mode);
+
     Dir openDir(const char* path);
     Dir openDir(const String& path);
+
+    bool remove(const char* path);
+    bool remove(const String& path);
+
+    bool rename(const char* pathFrom, const char* pathTo);
+    bool rename(const String& pathFrom, const String& pathTo);
 
 protected:
     FSImplPtr _impl;
 
-    template <typename Tfs>
-    friend bool mount(Tfs& fs, const char* mountPoint);
 };
 
 extern FS SPIFFS;
-
-template<>
-bool mount<FS>(FS& fs, const char* mountPoint);
-
-File open(const char* path, const char* mode);
-
-Dir openDir(const char* path);
 
 #endif //FS_H

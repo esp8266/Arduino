@@ -143,7 +143,16 @@ bool Dir::next() {
     return _impl->next();
 }
 
+bool FS::begin() {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->begin();
+}
 
+File FS::open(const String& path, const char* mode) {
+    return open(path.c_str(), mode);
+}
 
 File FS::open(const char* path, const char* mode) {
     if (!_impl) {
@@ -160,45 +169,39 @@ File FS::open(const char* path, const char* mode) {
     return File(_impl->open(path, om, am));
 }
 
-File FS::open(const String& path, const char* mode) {
-    return FS::open(path.c_str(), mode);
-}
-
 Dir FS::openDir(const char* path) {
     if (!_impl) {
         return Dir();
     }
-
     return Dir(_impl->openDir(path));
 }
 
 Dir FS::openDir(const String& path) {
-    return FS::openDir(path.c_str());
+    return openDir(path.c_str());
 }
 
-struct MountEntry {
-    FSImplPtr fs;
-    String    path;
-    MountEntry* next;
-};
-
-static MountEntry* s_mounted = nullptr;
-
-template<>
-bool mount<FS>(FS& fs, const char* mountPoint) {
-    FSImplPtr p = fs._impl;
-    if (!p || !p->mount()) {
-        DEBUGV("FSImpl mount failed\r\n");
+bool FS::remove(const char* path) {
+    if (!_impl) {
         return false;
     }
-
-    MountEntry* entry = new MountEntry;
-    entry->fs = p;
-    entry->path = mountPoint;
-    entry->next = s_mounted;
-    s_mounted = entry;
-    return true;
+    return _impl->remove(path);
 }
+
+bool FS::remove(const String& path) {
+    return remove(path.c_str());
+}
+
+bool FS::rename(const char* pathFrom, const char* pathTo) {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->rename(pathFrom, pathTo);
+}
+
+bool FS::rename(const String& pathFrom, const String& pathTo) {
+    return rename(pathFrom.c_str(), pathTo.c_str());
+}
+
 
 static bool sflags(const char* mode, OpenMode& om, AccessMode& am) {
     switch (mode[0]) {
@@ -228,3 +231,80 @@ static bool sflags(const char* mode, OpenMode& om, AccessMode& am) {
     }
     return true;
 }
+
+
+#if defined(FS_FREESTANDING_FUNCTIONS)
+
+/*
+TODO: move these functions to public API:
+*/
+File open(const char* path, const char* mode);
+File open(String& path, const char* mode);
+
+Dir openDir(const char* path);
+Dir openDir(String& path);
+
+template<>
+bool mount<FS>(FS& fs, const char* mountPoint);
+/*
+*/
+
+
+struct MountEntry {
+    FSImplPtr fs;
+    String    path;
+    MountEntry* next;
+};
+
+static MountEntry* s_mounted = nullptr;
+
+template<>
+bool mount<FS>(FS& fs, const char* mountPoint) {
+    FSImplPtr p = fs._impl;
+    if (!p || !p->mount()) {
+        DEBUGV("FSImpl mount failed\r\n");
+        return false;
+    }
+
+    !make sure mountPoint has trailing '/' here
+
+    MountEntry* entry = new MountEntry;
+    entry->fs = p;
+    entry->path = mountPoint;
+    entry->next = s_mounted;
+    s_mounted = entry;
+    return true;
+}
+
+
+/*
+    iterate over MountEntries and look for the ones which match the path
+*/
+File open(const char* path, const char* mode) {
+    OpenMode om;
+    AccessMode am;
+    if (!sflags(mode, om, am)) {
+        DEBUGV("open: invalid mode `%s`\r\n", mode);
+        return File();
+    }
+
+    for (MountEntry* entry = s_mounted; entry; entry = entry->next) {
+        size_t offset = entry->path.length();
+        if (strstr(path, entry->path.c_str())) {
+            File result = entry->fs->open(path + offset);
+            if (result)
+                return result;
+        }
+    }
+
+    return File();
+}
+
+File open(const String& path, const char* mode) {
+    return FS::open(path.c_str(), mode);
+}
+
+Dir openDir(const String& path) {
+    return openDir(path.c_str());
+}
+#endif
