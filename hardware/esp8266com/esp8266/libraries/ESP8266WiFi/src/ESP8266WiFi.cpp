@@ -194,7 +194,7 @@ int ESP8266WiFiClass::softAPdisconnect(bool wifioff)
         _useApMode = false;
 
         if( _useClientMode) {
-            // turn on AP
+            // turn on STA
             _mode(WIFI_STA);
         } else {
             // turn wifi off
