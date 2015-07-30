@@ -57,21 +57,43 @@ public:
 
     DirImplPtr openDir(const char* path) override;
 
-    bool mount() override {
+    bool rename(const char* pathFrom, const char* pathTo) override {
+        char tmpNameFrom[SPIFFS_OBJ_NAME_LEN];
+        strlcpy(tmpNameFrom, pathFrom, sizeof(tmpNameFrom));
+        char tmpNameTo[SPIFFS_OBJ_NAME_LEN];
+        strlcpy(tmpNameTo, pathTo, sizeof(tmpNameTo));
+        auto rc = SPIFFS_rename(&_fs, tmpNameFrom, tmpNameTo);
+        if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFS_rename: rc=%d, from=`%s`, to=`%s`\r\n", rc,
+                pathFrom, pathTo);
+            return false;
+        }
+        return true;
+    }
+
+    bool remove(const char* path) override {
+        char tmpName[SPIFFS_OBJ_NAME_LEN];
+        strlcpy(tmpName, path, sizeof(tmpName));
+        auto rc = SPIFFS_remove(&_fs, tmpName);
+        if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFS_remove: rc=%d path=`%s`\r\n", rc, path);
+            return false;
+        }
+        return true;
+    }
+
+    bool begin() override {
         if (SPIFFS_mounted(&_fs) != 0) {
             return true;
         }
-
         if (_tryMount()) {
             return true;
         }
-
         auto rc = SPIFFS_format(&_fs);
         if (rc != SPIFFS_OK) {
             DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
             return false;
         }
-
         return _tryMount();
     }
 
@@ -250,6 +272,10 @@ public:
     , _dir(dir)
     , _valid(false)
     {
+    }
+
+    ~SPIFFSDirImpl() override {
+        SPIFFS_closedir(&_dir);
     }
 
     FileImplPtr openFile(OpenMode openMode, AccessMode accessMode) override {
