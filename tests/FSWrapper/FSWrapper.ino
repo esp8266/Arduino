@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include "FS.h"
 
+
 void fail(const char* msg) {
   Serial.println(msg);
   while(true) {
@@ -14,8 +15,8 @@ void setup() {
   WiFi.mode(WIFI_OFF);
   Serial.println("\n\nFS test\n");
 
-  if (!mount(SPIFFS, "/")) {
-    fail("mount failed");
+  if (!SPIFFS.begin()) {
+    fail("SPIFFS init failed");
   }
 
   String text = "write test";
@@ -62,12 +63,38 @@ void setup() {
   {
     Dir root = SPIFFS.openDir("/");
     while (root.next()) {
-      String fileName = root.fileName();
-      File f = root.openFile("r");
-      Serial.printf("%s: %d\r\n", fileName.c_str(), f.size());
+        String fileName = root.fileName();
+        File f = root.openFile("r");
+        Serial.printf("%s: %d\r\n", fileName.c_str(), f.size());
     }
   }
 
+  {
+    Dir root = SPIFFS.openDir("/");
+    while(root.next()) {
+      String fileName = root.fileName();
+      Serial.print("deleting ");
+      Serial.println(fileName);
+      if (!SPIFFS.remove(fileName)) {
+        fail("remove failed");
+      }
+    }
+  }
+
+  {
+    File tmp = SPIFFS.open("/tmp1.txt", "w");
+    tmp.println("rename test");
+  }
+
+  {
+    if (!SPIFFS.rename("/tmp1.txt", "/tmp2.txt")) {
+      fail("rename failed");
+    }
+    File tmp2 = SPIFFS.open("/tmp2.txt", "r");
+    if (!tmp2) {
+      fail("open tmp2 failed");
+    }
+  }
 
   Serial.println("success");
 }
