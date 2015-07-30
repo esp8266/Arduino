@@ -135,6 +135,7 @@ void init_done() {
 
 
 extern "C" void user_init(void) {
+    system_timer_reinit();
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
 
