@@ -23,6 +23,8 @@ title: Change log
 ## 1.6.5-947-g39819f0
 July 23, 2015
 
+Package link: `http://arduino.esp8266.com/versions/1.6.5-947-g39819f0/package_esp8266com_index.json`.
+
 ### Core
 
 - I2C library updated to better handle repeated start for certain devices,
@@ -68,6 +70,8 @@ July 23, 2015
 
 ## 1.6.4-673-g8cd3697
 May 22, 2015
+
+Package link: `http://arduino.esp8266.com/versions/1.6.4-673-g8cd3697/package_esp8266com_index.json`.
 
 ### Tools
 
