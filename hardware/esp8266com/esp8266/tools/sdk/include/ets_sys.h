@@ -65,8 +65,8 @@ inline bool ETS_INTR_WITHINISR()
 {
     uint32_t ps;
     __asm__ __volatile__("rsr %0,ps":"=a" (ps));
-    // PS.EXCM and PS.UM bit checks
-    return ((ps & ((1 << 4) | (1 << 5))) > 0);
+    // PS.EXCM bit check
+    return ((ps & (1 << 4)) != 0);
 }
 
 inline uint32_t ETS_INTR_ENABLED(void)

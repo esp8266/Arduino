@@ -161,13 +161,15 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity){
 }
 
 int TwoWire::available(void){
-    int result = rxBufferLength - rxBufferIndex;
+  int result = rxBufferLength - rxBufferIndex;
 
-    if (!result) {
-        optimistic_yield();
-    }
+  if (!result) {
+    // yielding here will not make more data "available",
+    // but it will prevent the system from going into WDT reset
+    optimistic_yield(1000);
+  }
 
-    return result;
+  return result;
 }
 
 int TwoWire::read(void){
@@ -209,7 +211,7 @@ void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
   // // copy twi rx buffer into local read buffer
   // // this enables new reads to happen in parallel
   // for(uint8_t i = 0; i < numBytes; ++i){
-  //   rxBuffer[i] = inBytes[i];    
+  //   rxBuffer[i] = inBytes[i];
   // }
   // // set rx iterator vars
   // rxBufferIndex = 0;
@@ -242,4 +244,3 @@ void TwoWire::onRequest( void (*function)(void) ){
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
 TwoWire Wire = TwoWire();
-
