@@ -1,9 +1,9 @@
-/* 
+/*
   SDWebServer - Example WebServer with SD Card backend for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the ESP8266WebServer library for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -23,7 +23,7 @@
   File extensions with more than 3 charecters are not supported by the SD Library
   File Names longer than 8 charecters will be truncated by the SD library, so keep filenames shorter
   index.htm is the default index (works on subfolders as well)
-  
+
   upload the contents of SdRoot to the root of the SDcard and access the editor by going to http://esp8266sd.local/edit
 
 */
@@ -38,9 +38,8 @@
 
 const char* ssid = "**********";
 const char* password = "**********";
-const char* hostname = "esp8266sd";
+const char* host = "esp8266sd";
 
-MDNSResponder mdns;
 ESP8266WebServer server(80);
 
 static bool hasSD = false;
@@ -62,7 +61,7 @@ void returnFail(String msg) {
 bool loadFromSdCard(String path){
   String dataType = "text/plain";
   if(path.endsWith("/")) path += "index.htm";
-  
+
   if(path.endsWith(".src")) path = path.substring(0, path.lastIndexOf("."));
   else if(path.endsWith(".htm")) dataType = "text/html";
   else if(path.endsWith(".css")) dataType = "text/css";
@@ -74,7 +73,7 @@ bool loadFromSdCard(String path){
   else if(path.endsWith(".xml")) dataType = "text/xml";
   else if(path.endsWith(".pdf")) dataType = "application/pdf";
   else if(path.endsWith(".zip")) dataType = "application/zip";
-  
+
   File dataFile = SD.open(path.c_str());
   if(dataFile.isDirectory()){
     path += "/index.htm";
@@ -84,9 +83,9 @@ bool loadFromSdCard(String path){
 
   if (!dataFile)
     return false;
-  
+
   if (server.hasArg("download")) dataType = "application/octet-stream";
-  
+
   if (server.streamFile(dataFile, dataType) != dataFile.size()) {
     DBG_OUTPUT_PORT.println("Sent less data than expected!");
   }
@@ -152,7 +151,7 @@ void handleDelete(){
 void handleCreate(){
   if(server.args() == 0) return returnFail("BAD ARGS");
   String path = server.arg(0);
-  if(path == "/" || SD.exists((char *)path.c_str())) { 
+  if(path == "/" || SD.exists((char *)path.c_str())) {
     returnFail("BAD PATH");
     return;
   }
@@ -183,7 +182,7 @@ void printDirectory() {
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   server.send(200, "text/json", "");
   WiFiClient client = server.client();
-  
+
   server.sendContent("[");
   for (int cnt = 0; true; ++cnt) {
     File entry = dir.openNextFile();
@@ -244,25 +243,26 @@ void setup(void){
   }
   DBG_OUTPUT_PORT.print("Connected! IP address: ");
   DBG_OUTPUT_PORT.println(WiFi.localIP());
-  
-  if (mdns.begin(hostname, WiFi.localIP())) {
+
+  if (MDNS.begin(host)) {
+    MDNS.addService("http", "tcp", 80);
     DBG_OUTPUT_PORT.println("MDNS responder started");
     DBG_OUTPUT_PORT.print("You can now connect to http://");
-    DBG_OUTPUT_PORT.print(hostname);
+    DBG_OUTPUT_PORT.print(host);
     DBG_OUTPUT_PORT.println(".local");
   }
-  
-  
+
+
   server.on("/list", HTTP_GET, printDirectory);
   server.on("/edit", HTTP_DELETE, handleDelete);
   server.on("/edit", HTTP_PUT, handleCreate);
   server.on("/edit", HTTP_POST, [](){ returnOK(); });
   server.onNotFound(handleNotFound);
   server.onFileUpload(handleFileUpload);
-  
+
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");
-  
+
   if (SD.begin(SS)){
      DBG_OUTPUT_PORT.println("SD Card initialized.");
      hasSD = true;

@@ -1,9 +1,9 @@
-/* 
+/*
  phy.c - ESP8266 PHY initialization data
 
  Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -24,7 +24,7 @@
  #include <stddef.h>
  #include <stdbool.h>
 
-static uint8_t phy_init_data[128] = 
+static uint8_t phy_init_data[128] =
 {
     [0] = 5,  // Reserved, do not change
     [1] = 0,  // Reserved, do not change
@@ -157,28 +157,28 @@ static uint8_t phy_init_data[128] =
 
     // lp_rf_stg10
     // the attenuation of RF gain stage 0 and 1,
-    // 0xf: 0db,  
-    // 0xe: -2.5db,  
-    // 0xd: -6db,  
-    // 0x9: -8.5db, 
-    // 0xc: -11.5db,  
-    // 0x8: -14db,  
-    // 0x4: -17.5, 
+    // 0xf: 0db,
+    // 0xe: -2.5db,
+    // 0xd: -6db,
+    // 0x9: -8.5db,
+    // 0xc: -11.5db,
+    // 0x8: -14db,
+    // 0x4: -17.5,
     // 0x0: -23
     [94] = 0x00,
 
 
     // lp_bb_att_ext
     // the attenuation of BB gain,
-    // 0: 0db,  
-    // 1: -0.25db, 
-    // 2: -0.5db, 
-    // 3: -0.75db, 
-    // 4: -1db, 
-    // 5: -1.25db, 
-    // 6: -1.5db, 
-    // 7: -1.75db, 
-    // 8: -2db  
+    // 0: 0db,
+    // 1: -0.25db,
+    // 2: -0.5db,
+    // 3: -0.75db,
+    // 4: -1db,
+    // 5: -1.25db,
+    // 6: -1.5db,
+    // 7: -1.75db,
+    // 8: -2db
     // max valve is 24(-6db)
     [95] = 0,
 
@@ -198,17 +198,17 @@ static uint8_t phy_init_data[128] =
     // vdd33_const
     // the voltage of PA_VDD
     // x=0xff: it can measure VDD33,
-    // 18<=x<=36: use input voltage,  
+    // 18<=x<=36: use input voltage,
     // the value is voltage*10, 33 is 3.3V, 30 is 3.0V,
     // x<18 or x>36: default voltage is 3.3V
     //
     // the value of this byte depend from the TOUT pin usage (1 or 2):
-    // 1) 
+    // 1)
     // analogRead function (system_adc_read()):
     // is only available when wire TOUT pin17 to external circuitry, Input Voltage Range restricted to 0 ~ 1.0V.
     // For this function the vdd33_const must be set as real power voltage of VDD3P3 pin 3 and 4
     // The range of operating voltage of ESP8266 is 1.8V~3.6V，the unit of vdd33_const is 0.1V，so effective value range of vdd33_const is [18,36]
-    // 2) 
+    // 2)
     // getVcc function (system_get_vdd33):
     // is only available when TOUT pin17 is suspended (floating), this function measure the power voltage of VDD3P3 pin 3 and 4
     // For this function the vdd33_const must be set to 255 (0xFF).
@@ -220,7 +220,7 @@ static uint8_t phy_init_data[128] =
     // freq_correct_en
     // bit[0]:0->do not correct frequency offset, 1->correct frequency offset.
     // bit[1]:0->bbpll is 168M, it can correct + and - frequency offset,  1->bbpll is 160M, it only can correct + frequency offset
-    // bit[2]:0->auto measure frequency offset and correct it, 1->use 113 byte force_freq_offset to correct frequency offset. 
+    // bit[2]:0->auto measure frequency offset and correct it, 1->use 113 byte force_freq_offset to correct frequency offset.
     // 0: do not correct frequency offset.
     // 1: auto measure frequency offset and correct it,  bbpll is 168M, it can correct + and - frequency offset.
     // 3: auto measure frequency offset and correct it,  bbpll is 160M, it only can correct + frequency offset.
@@ -239,6 +239,23 @@ extern int __wrap_register_chipv6_phy(uint8_t* unused) {
     return __real_register_chipv6_phy(phy_init_data);
 }
 
+extern int __get_rf_mode(void)  __attribute__((weak));
+extern int __get_rf_mode(void)
+{
+    return 0;  // default mode
+}
+
+extern int __get_adc_mode(void) __attribute__((weak));
+extern int __get_adc_mode(void)
+{
+    return 33; // default ADC mode
+}
+
+extern void __run_user_rf_pre_init(void) __attribute__((weak));
+extern void __run_user_rf_pre_init(void)
+{
+    return; // default do noting
+}
 
 void user_rf_pre_init() {
     // *((volatile uint32_t*) 0x60000710) = 0;
@@ -247,18 +264,5 @@ void user_rf_pre_init() {
     rtc_reg[30] = 0;
 
     system_set_os_print(0);
+    __run_user_rf_pre_init();
 }
-
-extern int __get_rf_mode()  __attribute__((weak));
-extern int __get_rf_mode()
-{
-    return 0;  // default mode
-}
-
-extern int __get_adc_mode() __attribute__((weak));
-extern int __get_adc_mode()
-{
-    return 33; // default ADC mode
-}
-
-
