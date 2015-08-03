@@ -232,7 +232,7 @@ nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
 
 nodemcuv2.upload.tool=esptool
 nodemcuv2.upload.speed=115200
-nodemcuv2.upload.resetmethod=ck
+nodemcuv2.upload.resetmethod=nodemcu
 nodemcuv2.upload.maximum_size=1044464
 nodemcuv2.upload.maximum_data_size=81920
 nodemcuv2.upload.wait_for_upload_port=true
