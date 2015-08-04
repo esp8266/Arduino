@@ -47,20 +47,28 @@ extern "C" {
 
 #define beget16(addr) (*addr * 256 + *(addr+1))
 
-ESP8266AVRISP::ESP8266AVRISP(uint16_t port, uint8_t reset_pin, uint32_t spi_freq):
-    _reset_pin(reset_pin), _server(WiFiServer(port)), _state(AVRISP_STATE_IDLE),
-    _spi_freq(spi_freq)
+ESP8266AVRISP::ESP8266AVRISP(uint16_t port, uint8_t reset_pin, uint32_t spi_freq, bool reset_state):
+    _reset_pin(reset_pin), _reset_state(reset_state), _spi_freq(spi_freq),
+    _server(WiFiServer(port)), _state(AVRISP_STATE_IDLE)
 {
+    pinMode(_reset_pin, OUTPUT);
+    setReset(_reset_state);
 }
 
 void ESP8266AVRISP::begin() {
-    pinMode(_reset_pin, OUTPUT);
-    digitalWrite(_reset_pin, AVRISP_RESET_OFF);
     _server.begin();
 }
 
+void ESP8266AVRISP::setSpiFrequency(uint32_t freq) {
+    _spi_freq = freq;
+    if (_state == AVRISP_STATE_ACTIVE) {
+        SPI.setFrequency(freq);
+    }
+}
+
 void ESP8266AVRISP::setReset(bool rst) {
-    if (rst) {
+    _reset_state = rst;
+    if (_reset_state) {
         digitalWrite(_reset_pin, AVRISP_RESET_ON);
     } else {
         digitalWrite(_reset_pin, AVRISP_RESET_OFF);
@@ -88,9 +96,14 @@ AVRISPState_t ESP8266AVRISP::update() {
             if (!_client.connected()) {
                 _client.stop();
                 AVRISP_DEBUG("client disconnect");
-                SPI.end();
-                digitalWrite(_reset_pin, AVRISP_RESET_OFF);
+                if (pmode) {
+                    SPI.end();
+                    pmode = 0;
+                }
+                setReset(_reset_state);
                 _state = AVRISP_STATE_IDLE;
+            } else {
+                _reject_incoming();
             }
             break;
         }
@@ -104,11 +117,6 @@ AVRISPState_t ESP8266AVRISP::serve() {
             // should not be called when idle, error?
             break;
         case AVRISP_STATE_PENDING: {
-            // enter reset, setup SPI
-            SPI.begin();
-            SPI.setFrequency(_spi_freq);
-            SPI.setHwCs(false);
-            digitalWrite(_reset_pin, AVRISP_RESET_ON);
             _state = AVRISP_STATE_ACTIVE;
         // fallthrough
         }
@@ -213,31 +221,14 @@ void ESP8266AVRISP::set_parameters() {
                     + buff[17] * 0x00010000
                     + buff[18] * 0x00000100
                     + buff[19];
-
-    // AVRISP_DEBUG("devicecode = %d", param.devicecode);
-    // AVRISP_DEBUG("revision   = %d", param.revision);
-    // AVRISP_DEBUG("progtype   = %d", param.progtype);
-    // AVRISP_DEBUG("parmode    = %d", param.parmode);
-    // AVRISP_DEBUG("polling    = %d", param.polling);
-    // AVRISP_DEBUG("selftimed  = %d", param.selftimed);
-    // AVRISP_DEBUG("lockbytes  = %d", param.lockbytes);
-    // AVRISP_DEBUG("fusebytes  = %d", param.fusebytes);
-    // AVRISP_DEBUG("flashpoll  = %d", param.flashpoll);
-    // AVRISP_DEBUG("eeprompoll = %d", param.eeprompoll);
-    // AVRISP_DEBUG("pagesize   = %d", param.pagesize);
-    // AVRISP_DEBUG("eepromsize = %d", param.eepromsize);
-
-    // AVRISP_DEBUG("flashsize = %d", param.flashsize);
-
 }
 
 void ESP8266AVRISP::start_pmode() {
+    SPI.begin();
+    SPI.setFrequency(_spi_freq);
+    SPI.setHwCs(false);
 
-    // SPI already begun when entering ACTIVE state
-    //SPI.begin();
-    //SPI.setFrequency(AVRISP_SPI_FREQ);
-
-    // following delays may not work on all targets...
+    // try to sync the bus
     SPI.transfer(0x00);
     digitalWrite(_reset_pin, AVRISP_RESET_OFF);
     delayMicroseconds(50);
@@ -250,7 +241,7 @@ void ESP8266AVRISP::start_pmode() {
 
 void ESP8266AVRISP::end_pmode() {
     SPI.end();
-    digitalWrite(_reset_pin, AVRISP_RESET_OFF);
+    setReset(_reset_state);
     pmode = 0;
 }
 
