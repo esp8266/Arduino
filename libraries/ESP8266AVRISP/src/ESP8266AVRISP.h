@@ -14,9 +14,8 @@ Original version:
 
 #include <Arduino.h>
 
-// active-high reset if you use an n-mos to level-shift
-// comment if hooked directly
-#define AVRISP_ACTIVE_HIGH_RESET
+// uncomment if you use an n-mos to level-shift the reset line
+// #define AVRISP_ACTIVE_HIGH_RESET
 
 // SPI clock frequency in Hz
 #define AVRISP_SPI_FREQ   1e6
