@@ -24,7 +24,7 @@ extern "C" {
 class InterruptLock {
 public:
     InterruptLock() {
-        _state = = xt_rsil(15);
+        _state = xt_rsil(15);
     }
 
     ~InterruptLock() {
