@@ -133,13 +133,16 @@ public class ESP8266FS implements Tool {
 
     TargetPlatform platform = BaseNoGui.getTargetPlatform();
 
+    String esptoolCmd = platform.getTool("esptool").get("cmd");
     File esptool;
-    if(!PreferencesData.get("runtime.os").contentEquals("windows")) esptool = new File(platform.getFolder()+"/tools", "esptool");
-    else esptool = new File(platform.getFolder()+"/tools", "esptool.exe");
+    esptool = new File(platform.getFolder()+"/tools", esptoolCmd);
     if(!esptool.exists()){
-      System.err.println();
-      editor.statusError("SPIFFS Error: esptool not found!");
-      return;
+        esptool = new File(PreferencesData.get("runtime.tools.esptool.path"), esptoolCmd);
+        if (!esptool.exists()) {
+            System.err.println();
+            editor.statusError("SPIFFS Error: esptool not found!");
+            return;
+        }
     }
 
     File tool;
