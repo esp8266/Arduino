@@ -123,7 +123,11 @@ void interrupt_handler(void *arg) {
     if (handler->fn && 
         (handler->mode == CHANGE || 
          (handler->mode & 1) == digitalRead(i))) {
+      // to make ISR compatible to Arduino AVR model where interrupts are disabled
+      // we disable them before we call the client ISR
+      uint32_t savedPS = xt_rsil(15); // stop other interrupts 
       handler->fn();
+      xt_wsr_ps(savedPS);
     }
   }
   ETS_GPIO_INTR_ENABLE();
@@ -151,9 +155,6 @@ extern void __detachInterrupt(uint8_t pin) {
     handler->fn = 0;
   }
 }
-
-// stored state for the noInterrupts/interrupts methods
-uint32_t interruptsState = 0;
 
 void initPins() {
   //Disable UART interrupts
