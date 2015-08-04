@@ -18,7 +18,7 @@ Original version:
 // #define AVRISP_ACTIVE_HIGH_RESET
 
 // SPI clock frequency in Hz
-#define AVRISP_SPI_FREQ   1e6
+#define AVRISP_SPI_FREQ   300e3
 
 // programmer states
 typedef enum {
@@ -47,9 +47,12 @@ typedef struct {
 
 class ESP8266AVRISP {
 public:
-    ESP8266AVRISP(uint16_t port, uint8_t reset_pin, uint32_t spi_freq=AVRISP_SPI_FREQ);
+    ESP8266AVRISP(uint16_t port, uint8_t reset_pin, uint32_t spi_freq=AVRISP_SPI_FREQ, bool reset_state=false);
 
     void begin();
+
+    // set the SPI clock frequency
+    void setSpiFrequency(uint32_t);
 
     // control the state of the RESET pin of the target
     // see AVRISP_ACTIVE_HIGH_RESET
@@ -104,6 +107,7 @@ protected:
     WiFiClient _client;
     AVRISPState_t _state;
     uint8_t _reset_pin;
+    bool _reset_state;
 
     // programmer settings, set by remote end
     AVRISP_parameter_t param;
