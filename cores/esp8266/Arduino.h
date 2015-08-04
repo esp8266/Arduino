@@ -160,27 +160,6 @@ void ets_intr_unlock();
 #define interrupts() xt_rsil(0)
 #define noInterrupts() xt_rsil(15)
 
-// this auto class wraps up xt_rsil so your code can be simplier, but can only be
-// used in an ino or cpp files. A normal use pattern is like
-//
-//{
-//    {
-//      InterruptLock(1); // this routine will allow level 2 and above
-//      // do work within interrupt lock here
-//    }
-//    do work outside of interrupt lock here outside its scope
-//}
-//
-#define InterruptLock(intrLevel) \
-class _AutoDisableIntr { \
-public: \
-    _AutoDisableIntr() { _savedPS = xt_rsil(intrLevel);  } \
-    ~_AutoDisableIntr() { xt_wsr_ps(_savedPS); } \
-private: \
-    uint32_t _savedPS; \
-    }; \
-_AutoDisableIntr _autoDisableIntr 
-
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
