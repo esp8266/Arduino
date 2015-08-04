@@ -32,7 +32,13 @@ static volatile timercallback timer1_user_cb = NULL;
 void timer1_isr_handler(void *para){
     if ((T1C & ((1 << TCAR) | (1 << TCIT))) == 0) TEIE &= ~TEIE1;//edge int disable
     T1I = 0;
-    if (timer1_user_cb) timer1_user_cb();
+    if (timer1_user_cb) {
+        // to make ISR compatible to Arduino AVR model where interrupts are disabled
+        // we disable them before we call the client ISR
+        uint32_t savedPS = xt_rsil(15); // stop other interrupts 
+        timer1_user_cb();
+        xt_wsr_ps(savedPS);
+    }
 }
 
 void timer1_isr_init(){
@@ -72,7 +78,11 @@ static volatile timercallback timer0_user_cb = NULL;
 
 void timer0_isr_handler(void* para){
     if (timer0_user_cb) {
+        // to make ISR compatible to Arduino AVR model where interrupts are disabled
+        // we disable them before we call the client ISR
+        uint32_t savedPS = xt_rsil(15); // stop other interrupts
         timer0_user_cb();
+        xt_wsr_ps(savedPS);
     }
 }
 
