@@ -259,6 +259,12 @@ public:
         DEBUGV("SPIFFS_close: fd=%d\r\n", _fd);
     }
 
+    const char* name() const override {
+        CHECKFD();
+
+        return (const char*) _stat.name;
+    }
+
 protected:
     SPIFFSImpl* _fs;
     spiffs_file _fd;
@@ -283,10 +289,11 @@ public:
             return FileImplPtr();
         }
         int mode = getSpiffsMode(openMode, accessMode);
-        spiffs_file fd = SPIFFS_open_by_dirent(_fs->getFs(), &_dirent, mode, 0);
+        auto fs = _fs->getFs();
+        spiffs_file fd = SPIFFS_open_by_dirent(fs, &_dirent, mode, 0);
         if (fd < 0) {
             DEBUGV("SPIFFSDirImpl::openFile: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n",
-                fd, _dirent.name, openMode, accessMode, _fs.err_code);
+                fd, _dirent.name, openMode, accessMode, fs->err_code);
             return FileImplPtr();
         }
         return std::make_shared<SPIFFSFileImpl>(_fs, fd);

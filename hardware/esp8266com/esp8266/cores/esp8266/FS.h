@@ -64,6 +64,7 @@ public:
     size_t size() const;
     void close();
     operator bool() const;
+    const char* name() const;
 
 protected:
     FileImplPtr _p;
