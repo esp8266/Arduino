@@ -21,6 +21,8 @@
 #include "FS.h"
 #include "FSImpl.h"
 
+using namespace fs;
+
 static bool sflags(const char* mode, OpenMode& om, AccessMode& am);
 
 size_t File::write(uint8_t c) {

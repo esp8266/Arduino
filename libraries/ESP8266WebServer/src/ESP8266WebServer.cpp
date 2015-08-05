@@ -24,6 +24,7 @@
 #include <Arduino.h>
 #include "WiFiServer.h"
 #include "WiFiClient.h"
+#include "FS.h"
 #include "ESP8266WebServer.h"
 #include "detail/RequestHandler.h"
 // #define DEBUG
@@ -77,7 +78,7 @@ void ESP8266WebServer::_addRequestHandler(RequestHandler* handler) {
     }
 }
 
-void ESP8266WebServer::serveStatic(const char* uri, FS fs, const char* path) {
+void ESP8266WebServer::serveStatic(const char* uri, FS& fs, const char* path) {
     _addRequestHandler(new StaticRequestHandler(fs, uri));
 }
 

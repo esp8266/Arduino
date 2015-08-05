@@ -23,6 +23,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+namespace fs {
+
 class FileImpl {
 public:
     virtual ~FileImpl() { }
@@ -67,5 +69,6 @@ public:
 
 };
 
+} // namespace fs
 
 #endif //FSIMPL_H

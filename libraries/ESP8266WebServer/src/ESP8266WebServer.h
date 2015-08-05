@@ -25,7 +25,6 @@
 #define ESP8266WEBSERVER_H
 
 #include <functional>
-#include <FS.h>
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
@@ -39,6 +38,7 @@ enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
 
 class RequestHandler;
+class FS;
 
 typedef struct {
   HTTPUploadStatus status;
@@ -62,7 +62,7 @@ public:
   typedef std::function<void(void)> THandlerFunction;
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);
-  void serveStatic(const char* uri, FS fs, const char* path);
+  void serveStatic(const char* uri, FS& fs, const char* path);
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
 

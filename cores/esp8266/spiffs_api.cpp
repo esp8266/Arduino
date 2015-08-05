@@ -32,6 +32,8 @@ extern "C" {
 #include "spi_flash.h"
 }
 
+using namespace fs;
+
 extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
 extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size);
 extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst);
