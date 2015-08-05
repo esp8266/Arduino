@@ -108,7 +108,7 @@ const char HTTP[] PROGMEM = "http:";
 
 This is mostly similar to WiFi shield library. Differences include:
 
-- `WiFi.mode(m)`: set mode to `WIFI_AP`, `WIFI_STA`, or `WIFI_AP_STA`.
+- `WiFi.mode(m)`: set mode to `WIFI_AP`, `WIFI_STA`, `WIFI_AP_STA` or `WIFI_OFF`.
 - call `WiFi.softAP(ssid)` to set up an open network
 - call `WiFi.softAP(ssid, password)` to set up a WPA2-PSK network (password should be at least 8 characters)
 - `WiFi.macAddress(mac)` is for STA, `WiFi.softAPmacAddress(mac)` is for AP.
