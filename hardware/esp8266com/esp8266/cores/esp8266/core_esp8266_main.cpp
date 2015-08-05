@@ -74,7 +74,9 @@ extern "C" void abort() {
 }
 
 extern "C" void esp_yield() {
-    cont_yield(&g_cont);
+    if (cont_can_yield(&g_cont)) {
+        cont_yield(&g_cont);
+    }
 }
 
 extern "C" void esp_schedule() {
