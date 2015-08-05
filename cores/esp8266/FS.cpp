@@ -41,7 +41,7 @@ int File::available() {
     if (!_p)
         return false;
 
-    return _p->position() < _p->size();
+    return _p->size() - _p->position();
 }
 
 int File::read() {
@@ -110,6 +110,13 @@ void File::close() {
 
 File::operator bool() const {
     return !!_p;
+}
+
+const char* File::name() const {
+    if (!_p)
+        return nullptr;
+
+    return _p->name();
 }
 
 File Dir::openFile(const char* mode) {

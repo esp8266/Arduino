@@ -33,6 +33,7 @@ public:
     virtual size_t position() const = 0;
     virtual size_t size() const = 0;
     virtual void close() = 0;
+    virtual const char* name() const = 0;
 };
 
 enum OpenMode {
