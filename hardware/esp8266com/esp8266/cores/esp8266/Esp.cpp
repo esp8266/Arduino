@@ -22,6 +22,7 @@
 #include "flash_utils.h"
 #include "eboot_command.h"
 #include <memory>
+#include "interrupts.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -125,6 +126,7 @@ void EspClass::restart(void)
 
 uint16_t EspClass::getVcc(void)
 {
+    InterruptLock lock;
     return system_get_vdd33();
 }
 
