@@ -1,9 +1,9 @@
-/* 
+/*
   EEPROM.cpp - esp8266 EEPROM emulation
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -34,7 +34,7 @@ EEPROMClass::EEPROMClass(uint32_t sector)
 : _sector(sector)
 , _data(0)
 , _size(0)
-, _dirty(false) 
+, _dirty(false)
 {
 }
 
@@ -43,6 +43,8 @@ void EEPROMClass::begin(size_t size) {
     return;
   if (size > SPI_FLASH_SEC_SIZE)
     size = SPI_FLASH_SEC_SIZE;
+
+  size = (size + 3) & (~3);
 
   if (_data) {
     delete[] _data;
