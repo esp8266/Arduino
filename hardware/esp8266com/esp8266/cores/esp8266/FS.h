@@ -24,6 +24,8 @@
 #include <Arduino.h>
 #include <memory>
 
+namespace fs {
+
 class File;
 class Dir;
 
@@ -105,6 +107,12 @@ protected:
     FSImplPtr _impl;
 
 };
+
+} // namespace fs
+
+using fs::FS;
+using fs::File;
+using fs::Dir;
 
 extern FS SPIFFS;
 
