@@ -1,9 +1,9 @@
-/* 
+/*
   ESP8266WebServer.cpp - Dead simple web-server.
   Supports only one simultaneous client, knows how to handle GET and POST.
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -25,25 +25,10 @@
 #include "WiFiServer.h"
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
-
+#include "detail/RequestHandler.h"
 // #define DEBUG
 #define DEBUG_OUTPUT Serial
 
-struct ESP8266WebServer::RequestHandler {
-  RequestHandler(ESP8266WebServer::THandlerFunction fn, const char* uri, HTTPMethod method)
-  : fn(fn)
-  , uri(uri)
-  , method(method)
-  , next(NULL)
-  {
-  }
-
-  ESP8266WebServer::THandlerFunction fn;
-  String uri;
-  HTTPMethod method;
-  RequestHandler* next;
-
-};
 
 ESP8266WebServer::ESP8266WebServer(int port)
 : _server(port)
@@ -78,15 +63,22 @@ void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction ha
 
 void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn)
 {
-  RequestHandler* handler = new RequestHandler(fn, uri, method);
-  if (!_lastHandler) {
-    _firstHandler = handler;
-    _lastHandler = handler;
-  }
-  else {
-    _lastHandler->next = handler;
-    _lastHandler = handler;
-  }
+  _addRequestHandler(new FunctionRequestHandler(fn, uri, method));
+}
+
+void ESP8266WebServer::_addRequestHandler(RequestHandler* handler) {
+    if (!_lastHandler) {
+      _firstHandler = handler;
+      _lastHandler = handler;
+    }
+    else {
+      _lastHandler->next = handler;
+      _lastHandler = handler;
+    }
+}
+
+void ESP8266WebServer::serveStatic(const char* uri, FS fs, const char* path) {
+    _addRequestHandler(new StaticRequestHandler(fs, uri));
 }
 
 void ESP8266WebServer::handleClient()
@@ -269,16 +261,9 @@ void ESP8266WebServer::onNotFound(THandlerFunction fn) {
 
 void ESP8266WebServer::_handleRequest() {
   RequestHandler* handler;
-  for (handler = _firstHandler; handler; handler = handler->next)
-  {
-    if (handler->method != HTTP_ANY && handler->method != _currentMethod)
-      continue;
-
-    if (handler->uri != _currentUri)
-      continue;
-
-    handler->fn();
-    break;
+  for (handler = _firstHandler; handler; handler = handler->next) {
+    if (handler->handle(*this, _currentMethod, _currentUri))
+      break;
   }
 
   if (!handler){
