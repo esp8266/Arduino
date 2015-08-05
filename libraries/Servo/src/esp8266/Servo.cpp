@@ -59,8 +59,6 @@ static uint8_t s_servoCount = 0;            // the total number of attached s_se
 //------------------------------------------------------------------------------
 template <class T> void Servo_Handler(T* timer)
 {
-    noInterrupts();
-    
     uint8_t servoIndex;
 
     // clear interrupt
@@ -101,8 +99,6 @@ template <class T> void Servo_Handler(T* timer)
         
         timer->setEndOfCycle();
     }
-    
-    interrupts();
 }
 
 static void initISR(ServoTimerSequence timerId)
