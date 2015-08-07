@@ -225,7 +225,7 @@ long int ICACHE_FLASH_ATTR strtol(const char* str, char** endptr, int base) {
 
     if(*str == 0x00) {
         // only space in str?
-        *endptr = (char*) str;
+        if (endptr) *endptr = (char*) str;
         return result;
     }
 
@@ -262,7 +262,7 @@ long int ICACHE_FLASH_ATTR strtol(const char* str, char** endptr, int base) {
             break;
 
     }
-    *endptr = (char*) str;
+    if (endptr) *endptr = (char*) str;
     return sign * result;
 }
 
@@ -280,7 +280,7 @@ double ICACHE_FLASH_ATTR strtod(const char* str, char** endptr) {
 
     if(*str == 0x00) {
         // only space in str?
-        *endptr = (char*) str;
+        if (endptr) *endptr = (char*) str;
         return result;
     }
 
@@ -310,7 +310,7 @@ double ICACHE_FLASH_ATTR strtod(const char* str, char** endptr) {
 
         str++;
     }
-    *endptr = (char*) str;
+    if (endptr) *endptr = (char*) str;
     return result * factor;
 }
 
