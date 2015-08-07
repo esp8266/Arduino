@@ -165,8 +165,7 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     char* out = s;
     // Handle negative numbers
     if (number < 0.0) {
-        *out = '-';
-        ++out;
+        *out++ = '-';
         number = -number;
     }
 
@@ -186,9 +185,12 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
 
     // Print the decimal point, but only if there are digits beyond
     if (prec > 0) {
-        *out = '.';
-        ++out;
+        *out++ = '.';
     }
+    // make sure the string is terminated before mesuring it length
+    *out = 0;
+    // Reduce minimum width accordingly
+    width -= strlen(s);
 
     // Print the digits after the decimal point
     int8_t digit = 0;
@@ -196,10 +198,13 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
         remainder *= 10.0;
         digit = (int8_t)remainder;
         if (digit > 9) digit = 9; // insurance
-        *out = (char)('0' | digit);
-        ++out;
+        *out++ = (char)('0' | digit);
+        width--;
         remainder -= digit;
     }
+    // add '0' to fill minimum width requirement
+    while (width-- > 0) *out++ = '0';
+    // make sure the string is terminated
     *out = 0;
     return s;
 }
