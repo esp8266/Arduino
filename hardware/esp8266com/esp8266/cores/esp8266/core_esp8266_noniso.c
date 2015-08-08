@@ -203,7 +203,7 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
         remainder -= digit;
     }
     // add '0' to fill minimum width requirement
-    while (width-- > 0) *out++ = '0';
+    while (width-- > 0) *out++ = ' ';
     // make sure the string is terminated
     *out = 0;
     return s;
