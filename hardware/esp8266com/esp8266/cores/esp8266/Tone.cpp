@@ -35,10 +35,12 @@
 #include "Arduino.h"
 #include "pins_arduino.h"
 
+/*
 static int8_t toneBegin(uint8_t _pin) {
     //TODO implement tone
     return 0;
 }
+*/
 
 void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
     //TODO implement tone
