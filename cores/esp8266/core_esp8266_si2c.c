@@ -75,8 +75,11 @@ void twi_stop(void){
 
 static void twi_delay(unsigned char v){
   unsigned int i;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
   unsigned int reg;
   for(i=0;i<v;i++) reg = GPI;
+#pragma GCC diagnostic pop
 }
 
 static bool twi_write_start(void) {
