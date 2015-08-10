@@ -23,8 +23,9 @@ function build_sketches()
 
 function install_libraries()
 {
-    pushd libraries
-
+    mkdir -p $HOME/Arduino/libraries
+    pushd $HOME/Arduino/libraries
+    
     # install ArduinoJson library
     wget https://github.com/bblanchon/ArduinoJson/releases/download/v4.6.1/ArduinoJson-v4.6.1.zip && unzip ArduinoJson-v4.6.1.zip
 
