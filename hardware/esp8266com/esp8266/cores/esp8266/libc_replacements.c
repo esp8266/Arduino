@@ -483,7 +483,7 @@ size_t ICACHE_FLASH_ATTR strlcpy(char* dst, const char* src, size_t size) {
  * SUCH DAMAGE.
  */
 
-long strtol(const char *nptr, char **endptr, int base) {
+long ICACHE_FLASH_ATTR strtol(const char *nptr, char **endptr, int base) {
 	const unsigned char *s = (const unsigned char *)nptr;
 	unsigned long acc;
 	int c;
@@ -559,7 +559,7 @@ long strtol(const char *nptr, char **endptr, int base) {
 	return (acc);
 }
 
-unsigned long strtoul(const char *nptr, char **endptr, int base)
+unsigned long ICACHE_FLASH_ATTR strtoul(const char *nptr, char **endptr, int base)
 {
 	const unsigned char *s = (const unsigned char *)nptr;
 	unsigned long acc;
