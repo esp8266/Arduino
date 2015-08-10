@@ -13,12 +13,16 @@ enum esp_now_role {
 	ESP_NOW_ROLE_MAX,
 };
 
-typedef void (*esp_now_cb_t)(u8 *mac_addr, u8 *data, u8 len);
+typedef void (*esp_now_recv_cb_t)(u8 *mac_addr, u8 *data, u8 len);
+typedef void (*esp_now_send_cb_t)(u8 *mac_addr, u8 status);
 
 int esp_now_init(void);
 int esp_now_deinit(void);
 
-int esp_now_register_recv_cb(esp_now_cb_t cb);
+int esp_now_register_send_cb(esp_now_send_cb_t cb);
+int esp_now_unregister_send_cb(void);
+
+int esp_now_register_recv_cb(esp_now_recv_cb_t cb);
 int esp_now_unregister_recv_cb(void);
 
 int esp_now_send(u8 *da, u8 *data, int len);
@@ -43,5 +47,7 @@ u8 *esp_now_fetch_peer(bool restart);
 int esp_now_is_peer_exist(u8 *mac_addr);
 
 int esp_now_get_cnt_info(u8 *all_cnt, u8 *encrypt_cnt);
+
+int esp_now_set_kok(u8 *key, u8 len);
 
 #endif

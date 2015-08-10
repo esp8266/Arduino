@@ -44,7 +44,7 @@ public:
     ESP8266WiFiClass();
 
     void mode(WiFiMode);
-        
+
     /**
      * Start Wifi connection
      * if passphrase is set the most secure supported mode will be automatically selected
@@ -95,7 +95,7 @@ public:
 		* param dns: 		Defined DNS
         */
     void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns);
-	
+
     /* Configure access point
      *
      * param local_ip: access point IP
@@ -336,19 +336,19 @@ public:
     /*
      * Start SmartConfig
      *
-     */ 
+     */
     void beginSmartConfig();
-    
+
     /*
      * Query SmartConfig status, to decide when stop config
      *
-     */    
+     */
     bool smartConfigDone();
 
     /*
      * Stop SmartConfig
      *
-     */ 
+     */
     void stopSmartConfig();
 
     friend class WiFiClient;
@@ -366,7 +366,7 @@ protected:
     bool _useApMode;
     bool _useClientMode;
 	bool _useStaticIp;
-	
+
 	static bool _scanAsync;
 	static bool _scanStarted;
 	static bool _scanComplete;
