@@ -1,3 +1,15 @@
+esp_iot_sdk_v1.3.0_15_08_10_p1 Release Note
+----------------------------------------
+
+Here is a patch based on esp_iot_sdk_v1.3.0 (non-OS SDK) resolved issue that if there are 2 connections, one is normal TCP connection, the other is SSL connection, it may cause memory leak.
+
+Download and unzip the attachment, replace the lib in esp_iot_sdk/lib folder.
+
+Please do not set the same priority for two different tasks when using system_os_task.
+
+Sorry for the inconvenience.
+
+
 esp_iot_sdk_v1.3.0_15_08_08 Release Note
 ----------------------------------------
 
