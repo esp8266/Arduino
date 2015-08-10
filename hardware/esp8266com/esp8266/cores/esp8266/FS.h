@@ -105,7 +105,6 @@ public:
 
 protected:
     FSImplPtr _impl;
-
 };
 
 } // namespace fs
@@ -113,6 +112,10 @@ protected:
 using fs::FS;
 using fs::File;
 using fs::Dir;
+using fs::SeekMode;
+using fs::SeekSet;
+using fs::SeekCur;
+using fs::SeekEnd;
 
 extern FS SPIFFS;
 
