@@ -229,7 +229,7 @@ double ICACHE_FLASH_ATTR strtod(const char* str, char** endptr) {
 
     if(*str == 0x00) {
         // only space in str?
-        *endptr = (char*) str;
+        if (endptr) *endptr = (char*) str;
         return result;
     }
 
@@ -259,7 +259,7 @@ double ICACHE_FLASH_ATTR strtod(const char* str, char** endptr) {
 
         str++;
     }
-    *endptr = (char*) str;
+    if (endptr) *endptr = (char*) str;
     return result * factor;
 }
 
