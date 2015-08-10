@@ -290,7 +290,6 @@ When listening to multicast packets, replace `udp.begin(port)` with
 `udp.beginMulticast(WiFi.localIP(), multicast_ip_addr, port)`.
 You can use `udp.destinationIP()` to tell whether the packet received was
 sent to the multicast or unicast address.
-Also note that multicast doesn't work on softAP interface.
 
 `WiFiServer`, `WiFiClient`, and `WiFiUDP` behave mostly the same way as with WiFi shield library.
 Four samples are provided for this library.
@@ -373,7 +372,6 @@ instead of the one that comes with this package.
 ## mDNS and DNS-SD responder (ESP8266mDNS library)
 
 Allows the sketch to respond to multicast DNS queries for domain names like "foo.local", and DNS-SD (service dicovery) queries.
-Currently the library only works on STA interface, AP interface is not supported.
 See attached example for details.
 
 ## SSDP responder (ESP8266SSDP)
