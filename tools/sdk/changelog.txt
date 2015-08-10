@@ -1,7 +1,53 @@
-esp_iot_sdk_v1.2.0_15_07_13_p4 Release Note 
+esp_iot_sdk_v1.3.0_15_08_08 Release Note
+----------------------------------------
+
+Resolved Issues（Bugs below are eligible for Bug Bounty Program):
+1.Device can't connect to router after it gets ssid and password when using ESPTOUCH with router's ssid hidden. [冯智]
+2.Format string of os_random can't be supported by atoi. [杨朝位]
+3.Optimized os_printf seems to have an issue on 4 bytes aligned and other valuable suggestions. [Andrey Filimonov]
+4.SmartConfig can’t get IP address after connected to router. [孙大明]
+
+Optimization:
+1.Memory optimization to save 12KBytes.
+2.Optimize RF calibration to short the booting time,more details in documentation "2A-ESP8266__IOT_SDK_User_Manual" chapter "Appendix".
+3.Optimize Wi-Fi function to solve issue that ESP8266 may fail to connect to a special router.
+4.Optimize software timer to solve the a connecting problem.Please do not call "os_delay_us" or "while" or "for" to occupy CPU more than 10 ms in timer callback.
+5.Optimize system_get_rst_info to obtain more accurate information about the start-up.
+6.Optimize function of Wi-Fi scanning to be more reliable.
+7.Optimize function of changing Wi-Fi mode to be more reliable.
+8.Optimize WPS to improve connectivity.And WPS does not support WEP, it will return status "WPS_CB_ST_WEP".
+9.Optimize Wi-Fi function to solve softAP multiple stations DHCP issue.
+10.Optimize TCP in LAST_ACK status.
+11.Optimize TLS to support SHA256, SHA384, SHA512.
+12.Memory optimization during TLS hand-shaking.
+13.Optimize OTA funtion to download big chunk of data.
+14.Add CRC32 in OTA function.Folder "tools" in esp_iot_sdk has to be updated, otherwise OTA will fail.
+15.Optimize mDNS to support both softAP and station interfaces.
+16.Optimize ESP-NOW, more details in "Add APIs"
+17.Update SmartConfig to version 2.4.7
+18.Remove "-O2" from makefile.
+19.Optimize header files to improve compatibility, will not affect compilation.
+
+Add APIs:
+1.system_soft_wdt_feed : feed software watchdog
+2.wifi_softap_get_dhcps_lease：get IP range of ESP8266 softAP DHCP server
+3.ESP-NOW APIs
+esp_now_set_kok: set the secure key to encrypt ESP-NOW communication key
+esp_now_register_send_cb: register ESP-NOW send callback
+esp_now_unregister_send_cb: unregister ESP-NOW send callback
+
+AT_v0.40 Release Note:
+Note: For AT firmware to support FOTA, flash size need to be 1024KB or more than that.
+
+1.Add parameter <max conn> in command "AT+CWSAP" to set the maximum number of connections allowed.
+
+
+
+
+esp_iot_sdk_v1.2.0_15_07_13_p4 Release Note
 -------------------------------------------
 
-Here is a patch of memory optimization based on SDK_v1.2.0 
+Here is a patch of memory optimization based on SDK_v1.2.0
 1. It saved about 8KBytes memory.
 2. It revised problem that change mode may cause memory leak.
 3. Update SmartConfig to version 2.4.3
@@ -13,7 +59,7 @@ Thanks for your interest in Espressif Systems and ESP8266 !
 
 
 
-esp_iot_sdk_v1.2.0_15_07_09_p3 Release Note 
+esp_iot_sdk_v1.2.0_15_07_09_p3 Release Note
 -------------------------------------------
 
 Here is a patch based on SDK_v1.2.0 solved problem that if AP’s SSID is hidden，ESPTOUCH may get wrong BSSID of AP and cause connection fail.
@@ -24,7 +70,7 @@ Sorry for the inconvenience.
 
 
 
-esp_iot_sdk_v1.2.0_15_07_09_p2 Release Note 
+esp_iot_sdk_v1.2.0_15_07_09_p2 Release Note
 -------------------------------------------
 
 Updated libssl again. To support SHA-256 and SHA-512.
@@ -34,7 +80,7 @@ Thanks for your interest in Espressif Systems and ESP8266 !
 
 
 
-esp_iot_sdk_v1.2.0_15_07_08_p1 Release Note 
+esp_iot_sdk_v1.2.0_15_07_08_p1 Release Note
 -------------------------------------------
 
 Here is a patch based on SDK_v1.2.0 solved problem that abnormal SSL disconnection may cause reset.
@@ -45,7 +91,7 @@ Sorry for the inconvenience.
 
 
 
-esp_iot_sdk_v1.2.0_15_07_03 Release Note 
+esp_iot_sdk_v1.2.0_15_07_03 Release Note
 -------------------------------------------
 Resolved Issues（Bugs below are eligible for Bug Bounty Program):
 1.TLS server disconnect to ESP8266 may cause crash. [孙新虎]
@@ -77,10 +123,10 @@ esp_now_add_peer: add an ESP-NOW peer
 esp_now_del_peer: delete an ESP-NOW peer
 esp_now_set_self_role: set ESP-NOW role of device itself
 esp_now_get_self_role: get ESP-NOW role of device itself
-esp_now_set_peer_role: set ESP-NOW role about another device 
-esp_now_get_peer_role: get ESP-NOW role about another device 
-esp_now_set_peer_key: set ESP-NOW key of a device 
-esp_now_get_peer_key: get ESP-NOW key of a device 
+esp_now_set_peer_role: set ESP-NOW role about another device
+esp_now_get_peer_role: get ESP-NOW role about another device
+esp_now_set_peer_key: set ESP-NOW key of a device
+esp_now_get_peer_key: get ESP-NOW key of a device
 
 2. WPS APIs
 wifi_wps_enable : enable WPS function
@@ -92,9 +138,9 @@ wifi_set_wps_cb: set WPS callback
 system_soft_wdt_stop: stop software watchdog
 system_soft_wdt_restart: restart software watchdog
 
-4.sntp_get_timezone: get SNTP timezone 
+4.sntp_get_timezone: get SNTP timezone
 
-AT_v0.30 Release Note: 
+AT_v0.30 Release Note:
 Note: For AT firmware to support FOTA, flash size need to be 1024KB or more than that.
 
 1.Command "AT+CWSTARTSMART" need not parameter any more, SmartConfig type can be got automatically.
@@ -104,15 +150,15 @@ Note: For AT firmware to support FOTA, flash size need to be 1024KB or more than
 
 
 
-esp_iot_sdk_1.1.2_15_06_25_p2 Release Note 
+esp_iot_sdk_1.1.2_15_06_25_p2 Release Note
 -------------------------------------------
 
-Here is a patch based on SDK_v1.1.2 solved problem of abnormal current during modem-sleep. 
+Here is a patch based on SDK_v1.1.2 solved problem of abnormal current during modem-sleep.
 Please replace the lib in \esp_iot_sdk_v1.1.2\lib
 
 Sorry for the inconvenience.
 
-esp_iot_sdk_v1.1.2_15_06_24_p1.1 Release Note 
+esp_iot_sdk_v1.1.2_15_06_24_p1.1 Release Note
 -------------------------------------------
 
 Here is a patch for AT firmware based on SDK_v1.1.2 resolved issue that AT user parameter area was located in wrong address，it may cause WiFi configuration goes wrong.
@@ -133,7 +179,7 @@ can not FOTA upgrade，please don‘t call “AT+CIPUPDATE”
 
 So sorry for the inconvenience.
 
-esp_iot_sdk_v1.1.2_15_06_16_p1 Release Note 
+esp_iot_sdk_v1.1.2_15_06_16_p1 Release Note
 -------------------------------------------
 Here is a patch based on SDK_v1.1.2 resolved issue that "wifi_station_scan" cause loss of wireless connectivity.
 
@@ -144,7 +190,7 @@ Sorry for the inconvenience.
 
 
 
-esp_iot_sdk_v1.1.2_15_06_12 Release Note 
+esp_iot_sdk_v1.1.2_15_06_12 Release Note
 -------------------------------------------
 
 Optimization:
@@ -165,7 +211,7 @@ Add Documentation:
 
 
 
-esp_iot_sdk_v1.1.1_15_06_05 Release Note 
+esp_iot_sdk_v1.1.1_15_06_05 Release Note
 -------------------------------------------
 
 Resolved Issues（Bugs below are eligible for Bug Bounty Program):
@@ -175,7 +221,7 @@ Resolved Issues（Bugs below are eligible for Bug Bounty Program):
 
 Optimization:
 1.Update JSON parser to handle with illegal parameter and illegal calling progress.
-2.Add parameter of user_esp_platform_check_ip in user_websever.c which in IOT_Demo. 
+2.Add parameter of user_esp_platform_check_ip in user_websever.c which in IOT_Demo.
 3.Update UART driver to solve the problem that if send data through UART while ESP8266 startup may cause UART invalid.
 4.Update smartconfig to version 2.2, corresponding phone APP v0.3.2. And update the description and example of smartconfig_start in document "2C_ESP8266__Programming Guide"
 5.Update code in iram to solve the problem that space for text is not enough.
@@ -185,12 +231,12 @@ Optimization:
 9.Remove useless driver code in IOT_Demo
 10.Update IOT_Demo to use the latest PWM driver in light demo.
 11.Provide liblwip_536.a of which MSS size is 536
-12.Revised issue that boot may fail when 80Mhz SPI clock selected 
-13.Update esp_init_data_default.bin about RF option in \esp_iot_sdk\bin 
+12.Revised issue that boot may fail when 80Mhz SPI clock selected
+13.Update esp_init_data_default.bin about RF option in \esp_iot_sdk\bin
 
 Added APIs：
-1.PWM APIs： 
-Updated： pwm_init，add parameter to set PWM channel and GPIO pin 
+1.PWM APIs：
+Updated： pwm_init，add parameter to set PWM channel and GPIO pin
 Added：
 （1）get_pwm_version：get version information of PWM driver
 （2）pwm_set_period：set PWM period
@@ -200,23 +246,23 @@ Deleted：
 （2）pwm_get_freq：get PWM frequency
 2.Read/write flash with protection
 （1）system_param_save_with_protect：write data into flash with backup protection
-（2）system_param_load：read data which saved into flash with backup protection 
+（2）system_param_load：read data which saved into flash with backup protection
 3.system_get_rst_info：get information about current startup，it is a normal startup or watch dog reset
 4.at_response：set AT response
 5.at_register_response_func：register a callback for user-define AT response.
-6.Update document "2C_ESP8266__Programming Guide" to add description of interrupt definition in ets_sys.h 
+6.Update document "2C_ESP8266__Programming Guide" to add description of interrupt definition in ets_sys.h
 
-AT_v0.25 Release Note: 
+AT_v0.25 Release Note:
 Note: For AT firmware to support FOTA, flash size need to be 1024KB or more than that.
 Optimization:
 1.Add parameter about UDP local port in command "AT+SAVETRANSLINK"
 
-Added AT command： 
+Added AT command：
 1.AT+CIPDINFO：set configuration whether show remote IP and remote port with “+IPD” or not
 
 
 
-esp_iot_sdk_v1.1.0_15_05_27_p1 Release Note 
+esp_iot_sdk_v1.1.0_15_05_27_p1 Release Note
 -------------------------------------------
 
 Here is a patch based on SDK_v1.1.0 resolved issues below:
@@ -226,7 +272,7 @@ Here is a patch based on SDK_v1.1.0 resolved issues below:
 
 Sorry for the inconvenience.
 
-esp_iot_sdk_v1.1.0_15_05_22 Release Note 
+esp_iot_sdk_v1.1.0_15_05_22 Release Note
 ----------------------------------------
 Resolved Issues（Bugs below are eligible for Bug Bounty Program):
 1.Predictable TLS random values leads to insecure connections [projectgus]
@@ -257,26 +303,26 @@ Added APIs：
 3.system_uart_de_swap : disable UART0 swap
 4.system_get_flash_size_map: get flash size and flash map
 5.system_phy_set_max_tpw : set maximum RF TX power
-6.system_phy_set_tpw_via_vdd33 ：set RF TX power according to VDD33 
+6.system_phy_set_tpw_via_vdd33 ：set RF TX power according to VDD33
 7.system_phy_set_rfoption : set RF option
 8.wifi_station_get_rssi：get rssi of AP which ESP8266 station connected to 　
 9.wifi_softap_get_station_num ：get number count of stations connected to ESP8266 soft-AP
 
-AT_v0.24 Release Note: 
+AT_v0.24 Release Note:
 Note: For AT firmware to support FOTA, flash size need to be 1024KB or more than that.
 Optimization:
 1.Disable data echo of command "AT+CIPSEND"
 2.Optimized "AT+CWJAP?" to get channel and rssi
 3.ESP8266 station IP can only be got and inquiried after ESP8266 station connected to AP
 
-Added AT command： 
+Added AT command：
 1.AT+RFPOWER ：set maximum RF TX power
-2.AT+RFVDD ： set RF TX power according to VDD33 
+2.AT+RFVDD ： set RF TX power according to VDD33
 
 
 自从乐鑫信息科技于 2015-03-20 启动 Bug 赏金计划以来，我们收到了一些重要问题反馈及建议，感谢世界各地的开发者对 ESP8266的关注，推动我们的软件更进一步，技术支持团队也得到迅速地成长。我们将在如下发布日志中点名感谢您的帮助。
 
-esp_iot_sdk_v1.1.0_15_05_22 Release Note 
+esp_iot_sdk_v1.1.0_15_05_22 Release Note
 修正问题（符合乐鑫 Bug 赏金计划）:
 1.随机值的生成可以被预测，完善随机数的产生机制 [projectgus]
 2.softAP+station 模式下，可能连接 ESP8266 soft-AP 失败 [智捷通]
@@ -307,11 +353,11 @@ esp_iot_sdk_v1.1.0_15_05_22 Release Note
 4.system_get_flash_size_map: 查询 flash size 和 flash map
 5.system_phy_set_max_tpw : 设置 RF TX power 最大值
 6.system_phy_set_tpw_via_vdd33 ：根据 VDD33 设置 RF TX power
-7.system_phy_set_rfoption : 设置 RF 
+7.system_phy_set_rfoption : 设置 RF
 8.wifi_station_get_rssi：查询 ESP8266 station 连接的 AP 的信号强度 　
 9.wifi_softap_get_station_num ：查询连接到 ESP8266 soft-AP 的 station 数目
 
-AT_v0.24 Release Note: 
+AT_v0.24 Release Note:
 注意：运行 AT 固件，支持云端升级，请使用 1024KB 或以上容量的 flash
 
 优化:
@@ -319,7 +365,7 @@ AT_v0.24 Release Note:
 2.优化"AT+CWJAP?" 可获得信道和信号强度
 3.必须在 ESP8266 station 连接到 AP 后，才能查询到 ESP8266 station IP
 
-新增 AT command： 
+新增 AT command：
 1.AT+RFPOWER ：设置 RF TX power 最大值
 2.AT+RFVDD ： 根据 VDD33 设置 RF TX power
 
@@ -327,68 +373,68 @@ Thanks for your interest in ESP8266 !
 
 esp_iot_sdk_v1.0.1_15_05_04_p1
 -------------------------------------------
-Here is a patch for station+softAP issue that users may have, based on SDK_v1.0.1, 
+Here is a patch for station+softAP issue that users may have, based on SDK_v1.0.1,
 solved problem that connect to ESP8266 softAP may fail in station+softAP mode.
 
 Sorry for the inconvenience.
 
-esp_iot_sdk_v1.0.1_15_04_24 Release Note 
+esp_iot_sdk_v1.0.1_15_04_24 Release Note
 -------------------------------------------
 
 Resolved Issues(Bugs below are eligible for Bug Bounty Program):
-1. SSL connection may fail if SSL packet size larger than 2kBytes [PeteW ] 
-2. UDP remote IP to be 0.0.0.0 may cause reset [Jerry S] 
-3. Optimize wifi_get_ip_info to fix loss of wireless connectivity problem 
-4. Air-Kiss restart [Orgmar] 
+1. SSL connection may fail if SSL packet size larger than 2kBytes [PeteW ]
+2. UDP remote IP to be 0.0.0.0 may cause reset [Jerry S]
+3. Optimize wifi_get_ip_info to fix loss of wireless connectivity problem
+4. Air-Kiss restart [Orgmar]
 
 Optimization:
-1. Optimized IOT_Espressif_EspTouch.APK (apply for access from Espressif) for improved compatibility. [???] 
-2. TCP server can not open again immediately with the same port [624908539] 
-3. Update UART driver for parity bit value may be incorrect [1062583993] 
-4. Add define of “ICACHE_RODATA_ATTR” for Symbol 'ICACHE_RODATA_ATTR' could not be resolved. [???] 
-5. Add API wifi_softap_dhcps_set_offer_option to enable/disable ESP8266 softAP DHCP server default gateway. [xyz769] 
-6. AT register_uart_rx_intr may enter callback twice. [???] 
-7.optimize document that WPA password length range : 8 ~ 64 bytes [785057041] 
-8. ESP8266 softAP DHCP server record 8 DHCP client's IP at most [ygjeon] 
-9. To set static IP (wifi_set_ip_info) has to disable DHCP first(wifi_softap_dhcps_stop or wifi_station_dhcpc_stop) 
+1. Optimized IOT_Espressif_EspTouch.APK (apply for access from Espressif) for improved compatibility. [???]
+2. TCP server can not open again immediately with the same port [624908539]
+3. Update UART driver for parity bit value may be incorrect [1062583993]
+4. Add define of “ICACHE_RODATA_ATTR” for Symbol 'ICACHE_RODATA_ATTR' could not be resolved. [???]
+5. Add API wifi_softap_dhcps_set_offer_option to enable/disable ESP8266 softAP DHCP server default gateway. [xyz769]
+6. AT register_uart_rx_intr may enter callback twice. [???]
+7.optimize document that WPA password length range : 8 ~ 64 bytes [785057041]
+8. ESP8266 softAP DHCP server record 8 DHCP client's IP at most [ygjeon]
+9. To set static IP (wifi_set_ip_info) has to disable DHCP first(wifi_softap_dhcps_stop or wifi_station_dhcpc_stop)
 10.Add example of wifi_softap_set_dhcps_lease
-11. smartconfig_start can only be called in ESP8266 station mode 
+11. smartconfig_start can only be called in ESP8266 station mode
 
-Added APIs: 
-1. Wi-Fi related APIs: 
-wifi_station_set_reconnect_policy: enable/disable reconnect when ESP8266 disconnect from router,default to be enable reconnect. 
-wifi_set_event_handler_cb: set event handler of ESP8266 softAP or station status change. 
-wifi_softap_dhcps_set_offer_option: enable/disable get router information from ESP8266 softAP, default to be enable. 
-2. SNTP APIs: 
-sntp_get_current_timestamp: get current timestamp from Jan 01, 1970, 00:00 (GMT) 
-sntp_get_real_time: char,get real time (GTM + 8 time zone) 
-sntp_init: initialize SNTP 
-sntp_stop: stop SNTP 
-sntp_setserver: set SNTP server by IP 
-sntp_getserver: get SNTP server IP 
-sntp_setservername: set SNTP server by domain name 
-sntp_getservername: get domain name of SNTP server set by sntp_setservername 
-3. MDNS APIs: 
-espconn_mdns_init: initialize mDNS 
-espconn_mdns_close: close mDNS 
-espconn_mdns_server_register: register mDNS server 
-espconn_mdns_server_unregister: unregister mDNS server 
-espconn_mdns_get_servername: get mDNS server name 
-espconn_mdns_set_servername: set mDNS server name 
-espconn_mdns_set_hostname: get mDNS host name 
-espconn_mdns_get_hostname: set mDNS host name 
-espconn_mdns_disable: disable mDNS 
-espconn_mdns_enable: endisable mDNS 
+Added APIs:
+1. Wi-Fi related APIs:
+wifi_station_set_reconnect_policy: enable/disable reconnect when ESP8266 disconnect from router,default to be enable reconnect.
+wifi_set_event_handler_cb: set event handler of ESP8266 softAP or station status change.
+wifi_softap_dhcps_set_offer_option: enable/disable get router information from ESP8266 softAP, default to be enable.
+2. SNTP APIs:
+sntp_get_current_timestamp: get current timestamp from Jan 01, 1970, 00:00 (GMT)
+sntp_get_real_time: char,get real time (GTM + 8 time zone)
+sntp_init: initialize SNTP
+sntp_stop: stop SNTP
+sntp_setserver: set SNTP server by IP
+sntp_getserver: get SNTP server IP
+sntp_setservername: set SNTP server by domain name
+sntp_getservername: get domain name of SNTP server set by sntp_setservername
+3. MDNS APIs:
+espconn_mdns_init: initialize mDNS
+espconn_mdns_close: close mDNS
+espconn_mdns_server_register: register mDNS server
+espconn_mdns_server_unregister: unregister mDNS server
+espconn_mdns_get_servername: get mDNS server name
+espconn_mdns_set_servername: set mDNS server name
+espconn_mdns_set_hostname: get mDNS host name
+espconn_mdns_get_hostname: set mDNS host name
+espconn_mdns_disable: disable mDNS
+espconn_mdns_enable: endisable mDNS
 
-AT_v0.23 Release Note: 
-Optimized: 
-1.AT+CWJAP add parameter "bssid", for several APs may have the same SSID 
+AT_v0.23 Release Note:
+Optimized:
+1.AT+CWJAP add parameter "bssid", for several APs may have the same SSID
 
-New AT commands: 
-1. AT+CIPSENDBUF: write data into TCP-send-buffer; non-blocking. Background task automatically handles transmission. Has much higher throughput. 
-2. AT+CIPBUFRESET: resets segment count in TCP-send-buffer 
-3. AT+CIPBUFSTATUS: checks status of TCP-send-buffer 
-4. AT+CIPCHECKSEGID: checks if a specific segment in TCP-send-buffer has sent successfully 
+New AT commands:
+1. AT+CIPSENDBUF: write data into TCP-send-buffer; non-blocking. Background task automatically handles transmission. Has much higher throughput.
+2. AT+CIPBUFRESET: resets segment count in TCP-send-buffer
+3. AT+CIPBUFSTATUS: checks status of TCP-send-buffer
+4. AT+CIPCHECKSEGID: checks if a specific segment in TCP-send-buffer has sent successfully
 
 
 
@@ -396,7 +442,7 @@ esp_iot_sdk_v1.0.1_b2_15_04_10 release note
 -------------------------------------------
 
 Fix bugs:
-1.Call espconn_sent to send UDP packet in user_init cause reset.[BBP#2 reporter (????)] 
+1.Call espconn_sent to send UDP packet in user_init cause reset.[BBP#2 reporter (????)]
 2.UART & FlowControl issue: send data to FIFO without CTS flag will cause WDT [BBP#11 reporter (pvxx)]
 3.SSL issue,add an API (espconn_secure_set_size) to set SSL buffer size [BBP#29 reporter (PeteW)]
 4.UDP broadcast issue in WEP
@@ -485,21 +531,21 @@ Add AT commands:
    XXX_DEF: default, set configuration and save it to Flash
 2. Add SmartConfig in AT:
    AT+CWSTARTSMART/AT+CWSTOPSMART: start / stop SmartConfig
-   Notice: please refer to the document, call  "AT+CWSTOPSMART" to stop SmartConfig first since "AT+CWSTARTSMART", then call other AT commands. Don't call any other AT commands during SmartConfig. 
+   Notice: please refer to the document, call  "AT+CWSTOPSMART" to stop SmartConfig first since "AT+CWSTARTSMART", then call other AT commands. Don't call any other AT commands during SmartConfig.
 2. AT+SAVETRANSLINK: save transparent transmission link to Flash;
    Note:AT+CIPMODE=1 set to enter transparent transmission mode, won't save to Flash.
 
 
 Add AT APIs
-1. at_customLinkMax: set the max link that allowed, most can be 10; if you want to set it, please set it before at_init; if you didn't set it, the max link allowed is 5 by default. 
-2. at_enter_special_state/ at_leave_special_state:Enter/leave AT processing state. In processing state, AT core will return "busy" for any further AT commands. 
+1. at_customLinkMax: set the max link that allowed, most can be 10; if you want to set it, please set it before at_init; if you didn't set it, the max link allowed is 5 by default.
+2. at_enter_special_state/ at_leave_special_state:Enter/leave AT processing state. In processing state, AT core will return "busy" for any further AT commands.
 3. at_set_custom_info:set custom version information of AT which can be got by AT+GMR;
 4. at_get_version:get version information of AT lib .
 
 Optimize
 1. Add UDP remote ip and remote port is allowed to be parameters of "AT+CIPSEND"
 2. Move "AT+CIUPDATE" from lib to AT "demo\esp_iot_sdk\examples\at", AT demo shows how to upgrade AT firmware from a local server. Notice that AT upgrade the bin files name have to be "user1.bin" and "user2.bin".
-3. Optimize "AT+CIPSTA", add gateway and netmask as parameters 
+3. Optimize "AT+CIPSTA", add gateway and netmask as parameters
 4. Optimize transparent transmission.
 
 esp_iot_sdk_v0.9.5_15_01_22 Release Note
@@ -532,7 +578,7 @@ Optimize:
 6. update to boot v1.2 to support new format user.bin;
 7. update ARP
 8. update SSL
-9. revised system_deep_sleep,system_deep_sleep(0),set no wake up timer,connect a GPIO to pin RST, the chip will wake up by a falling-edge on pin RST 
+9. revised system_deep_sleep,system_deep_sleep(0),set no wake up timer,connect a GPIO to pin RST, the chip will wake up by a falling-edge on pin RST
 
 esp_iot_sdk_v0.9.4_14_12_19 Release Note
 ----------------------------------------

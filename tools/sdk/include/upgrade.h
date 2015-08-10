@@ -2,6 +2,7 @@
 #define __UPGRADE_H__
 
 #define SPI_FLASH_SEC_SIZE      4096
+#define LIMIT_ERASE_SIZE		0x10000
 
 #define USER_BIN1               0x00
 #define USER_BIN2               0x01
@@ -37,14 +38,12 @@ struct upgrade_server_info {
 #define UPGRADE_FLAG_START      0x01
 #define UPGRADE_FLAG_FINISH     0x02
 
-//bool system_upgrade_start(struct upgrade_server_info *server);
-bool system_upgrade_start_ssl(struct upgrade_server_info *server);
 void system_upgrade_init();
 void system_upgrade_deinit();
 bool system_upgrade(uint8 *data, uint16 len);
 
 #ifdef UPGRADE_SSL_ENABLE
-bool system_upgrade_start_ssl(struct upgrade_server_info *server);
+bool system_upgrade_start_ssl(struct upgrade_server_info *server);	// not supported now
 #else
 bool system_upgrade_start(struct upgrade_server_info *server);
 #endif
