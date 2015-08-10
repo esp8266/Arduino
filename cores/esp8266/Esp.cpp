@@ -100,7 +100,7 @@ void EspClass::wdtDisable(void)
 
 void EspClass::wdtFeed(void)
 {
-
+    system_soft_wdt_feed();
 }
 
 extern "C" void esp_yield();
