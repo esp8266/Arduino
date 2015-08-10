@@ -108,12 +108,12 @@ class UpdaterClass {
     void _reset();
     bool _writeBuffer();
 
+    uint8_t _error;
     uint8_t *_buffer;
     size_t _bufferLen;
     size_t _size;
     uint32_t _startAddress;
     uint32_t _currentAddress;
-    uint8_t _error;
 };
 
 extern UpdaterClass Update;
