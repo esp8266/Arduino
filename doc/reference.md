@@ -281,7 +281,6 @@ This is mostly similar to WiFi shield library. Differences include:
 - call `WiFi.softAP(ssid, password)` to set up a WPA2-PSK network (password should be at least 8 characters)
 - `WiFi.macAddress(mac)` is for STA, `WiFi.softAPmacAddress(mac)` is for AP.
 - `WiFi.localIP()` is for STA, `WiFi.softAPIP()` is for AP.
-- `WiFi.RSSI()` doesn't work
 - `WiFi.printDiag(Serial)` will print out some diagnostic info
 - `WiFiUDP` class supports sending and receiving multicast packets on STA interface.
 When sending a multicast packet, replace `udp.beginPacket(addr, port)` with
