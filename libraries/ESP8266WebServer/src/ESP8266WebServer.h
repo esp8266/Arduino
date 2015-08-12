@@ -38,7 +38,10 @@ enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
 
 class RequestHandler;
+
+namespace fs {
 class FS;
+}
 
 typedef struct {
   HTTPUploadStatus status;
@@ -62,7 +65,7 @@ public:
   typedef std::function<void(void)> THandlerFunction;
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);
-  void serveStatic(const char* uri, FS& fs, const char* path);
+  void serveStatic(const char* uri, fs::FS& fs, const char* path);
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
 
