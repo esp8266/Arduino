@@ -1,5 +1,5 @@
 SPIFFS (SPI Flash File System)
-V0.3.0
+V0.3.2
 
 Copyright (c) 2013-2015 Peter Andersson (pelleplutt1976<at>gmail.com)
 
@@ -57,6 +57,30 @@ For use and design, see the docs/TECH_SPEC file.
 For testing and contributions, see the docs/IMPLEMENTING file.
 
 * HISTORY
+
+0.3.2
+  Limit cache size if too much cache is given (thanks pgeiem)
+  New feature - Controlled erase. #23
+  SPIFFS_rename leaks file descriptors #28 (thanks benpicco)
+  moved dbg print defines in test framework to params_test.h
+  lseek should return the resulting offset (thanks hefloryd)
+  fixed type on dbg ifdefs
+  silence warning about signed/unsigned comparison when spiffs_obj_id is 32 bit (thanks benpicco)
+  Possible error in test_spiffs.c #21 (thanks yihcdaso-yeskela)
+  Cache might writethrough too often #16
+  even moar testrunner updates
+  Test framework update and some added tests
+  Some thoughts for next gen
+  Test sigsevs when having too many sectors #13  (thanks alonewolfx2)
+  GC might be suboptimal #11
+  Fix eternal readdir when objheader at last block, last entry
+  
+  New API functions:
+    SPIFFS_gc_quick - call a nonintrusive gc
+    SPIFFS_gc - call a full-scale intrusive gc
+
+0.3.1
+  Removed two return warnings, was too triggerhappy on release
 
 0.3.0
   Added existing namecheck when creating files

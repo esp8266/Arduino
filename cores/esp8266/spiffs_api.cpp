@@ -239,7 +239,7 @@ public:
     size_t position() const override {
         CHECKFD();
 
-        auto result = SPIFFS_tell(_fs->getFs(), _fd);
+        auto result = SPIFFS_lseek(_fs->getFs(), _fd, 0, SPIFFS_SEEK_CUR);
         if (result < 0) {
             DEBUGV("SPIFFS_tell rc=%d\r\n", result);
             return 0;
