@@ -308,6 +308,13 @@ public:
         return (const char*) _dirent.name;
     }
 
+    size_t fileSize() override {
+        if (!_valid)
+            return 0;
+
+        return _dirent.size;
+    }
+
     bool next() override {
         spiffs_dirent* result = SPIFFS_readdir(&_dir, &_dirent);
         _valid = (result != nullptr);
