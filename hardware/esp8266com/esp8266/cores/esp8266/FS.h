@@ -78,6 +78,7 @@ public:
 
     File openFile(const char* mode);
     String fileName();
+    size_t fileSize();
     bool next();
 
 protected:
