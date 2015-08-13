@@ -124,7 +124,7 @@
 #define SPIFFS_EV_IX_NEW                1
 #define SPIFFS_EV_IX_DEL                2
 
-#define SPIFFS_OBJ_ID_IX_FLAG           (1<<(8*sizeof(spiffs_obj_id)-1))
+#define SPIFFS_OBJ_ID_IX_FLAG           ((spiffs_obj_id)(1<<(8*sizeof(spiffs_obj_id)-1)))
 
 #define SPIFFS_UNDEFINED_LEN            (u32_t)(-1)
 
@@ -311,6 +311,26 @@
 // stop searching at end of all look up pages
 #define SPIFFS_VIS_NO_WRAP      (1<<2)
 
+#if SPIFFS_HAL_CALLBACK_EXTRA
+
+#define SPIFFS_HAL_WRITE(_fs, _paddr, _len, _src) \
+  (_fs)->cfg.hal_write_f((_fs), (_paddr), (_len), (_src))
+#define SPIFFS_HAL_READ(_fs, _paddr, _len, _dst) \
+  (_fs)->cfg.hal_read_f((_fs), (_paddr), (_len), (_dst))
+#define SPIFFS_HAL_ERASE(_fs, _paddr, _len) \
+  (_fs)->cfg.hal_erase_f((_fs), (_paddr), (_len))
+
+#else // SPIFFS_HAL_CALLBACK_EXTRA
+
+#define SPIFFS_HAL_WRITE(_fs, _paddr, _len, _src) \
+  (_fs)->cfg.hal_write_f((_paddr), (_len), (_src))
+#define SPIFFS_HAL_READ(_fs, _paddr, _len, _dst) \
+  (_fs)->cfg.hal_read_f((_paddr), (_len), (_dst))
+#define SPIFFS_HAL_ERASE(_fs, _paddr, _len) \
+  (_fs)->cfg.hal_erase_f((_paddr), (_len))
+
+#endif // SPIFFS_HAL_CALLBACK_EXTRA
+
 #if SPIFFS_CACHE
 
 #define SPIFFS_CACHE_FLAG_DIRTY       (1<<0)
@@ -423,7 +443,7 @@ typedef struct __attribute(( packed ))
   // common page header
   spiffs_page_header p_hdr;
   // alignment
-  u8_t _align[4 - (sizeof(spiffs_page_header)&3)==0 ? 4 : (sizeof(spiffs_page_header)&3)];
+  u8_t _align[4 - ((sizeof(spiffs_page_header)&3)==0 ? 4 : (sizeof(spiffs_page_header)&3))];
   // size of object
   u32_t size;
   // type of object
@@ -435,7 +455,7 @@ typedef struct __attribute(( packed ))
 // object index page header
 typedef struct __attribute(( packed )) {
  spiffs_page_header p_hdr;
- u8_t _align[4 - (sizeof(spiffs_page_header)&3)==0 ? 4 : (sizeof(spiffs_page_header)&3)];
+ u8_t _align[4 - ((sizeof(spiffs_page_header)&3)==0 ? 4 : (sizeof(spiffs_page_header)&3))];
 } spiffs_page_object_ix;
 
 // callback func for object lookup visitor
@@ -665,7 +685,7 @@ s32_t spiffs_gc_clean(
     spiffs_block_ix bix);
 
 s32_t spiffs_gc_quick(
-    spiffs *fs);
+    spiffs *fs, u16_t max_free_pages);
 
 // ---------------
 

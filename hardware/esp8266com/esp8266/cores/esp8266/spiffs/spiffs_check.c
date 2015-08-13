@@ -22,6 +22,19 @@
 #include "spiffs.h"
 #include "spiffs_nucleus.h"
 
+
+#if SPIFFS_HAL_CALLBACK_EXTRA
+#define CHECK_CB(_fs, _type, _rep, _arg1, _arg2) \
+  do { \
+    if ((_fs)->check_cb_f) (_fs)->check_cb_f((_fs), (_type), (_rep), (_arg1), (_arg2)); \
+  } while (0)
+#else
+#define CHECK_CB(_fs, _type, _rep, _arg1, _arg2) \
+  do { \
+    if ((_fs)->check_cb_f) (_fs)->check_cb_f((_type), (_rep), (_arg1), (_arg2)); \
+  } while (0)
+#endif
+
 //---------------------------------------
 // Look up consistency
 
@@ -190,13 +203,13 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
           res = spiffs_rewrite_index(fs, p_hdr->obj_id, p_hdr->span_ix, new_pix, objix_pix);
           if (res <= _SPIFFS_ERR_CHECK_FIRST && res > _SPIFFS_ERR_CHECK_LAST) {
             // index bad also, cannot mend this file
-            SPIFFS_CHECK_DBG("LU: FIXUP: index bad %d, cannot mend!\n", res);
+            SPIFFS_CHECK_DBG("LU: FIXUP: index bad %i, cannot mend!\n", res);
             res = spiffs_page_delete(fs, new_pix);
             SPIFFS_CHECK_RES(res);
             res = spiffs_delete_obj_lazy(fs, p_hdr->obj_id);
-            if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr->obj_id, 0);
+            CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr->obj_id, 0);
           } else {
-            if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_INDEX, p_hdr->obj_id, p_hdr->span_ix);
+            CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_INDEX, p_hdr->obj_id, p_hdr->span_ix);
           }
           SPIFFS_CHECK_RES(res);
         }
@@ -216,7 +229,7 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
           SPIFFS_CHECK_DBG("LU: FIXUP: ix page with data not found elsewhere, rewriting %04x to new page %04x\n", cur_pix, new_pix);
           SPIFFS_CHECK_RES(res);
           *reload_lu = 1;
-          if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, p_hdr->obj_id, p_hdr->span_ix);
+          CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, p_hdr->obj_id, p_hdr->span_ix);
         }
       } else {
         SPIFFS_CHECK_RES(res);
@@ -249,12 +262,12 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
               res = spiffs_rewrite_index(fs, p_hdr->obj_id, p_hdr->span_ix, new_pix, objix_pix);
               if (res <= _SPIFFS_ERR_CHECK_FIRST && res > _SPIFFS_ERR_CHECK_LAST) {
                 // index bad also, cannot mend this file
-                SPIFFS_CHECK_DBG("LU: FIXUP: index bad %d, cannot mend!\n", res);
+                SPIFFS_CHECK_DBG("LU: FIXUP: index bad %i, cannot mend!\n", res);
                 res = spiffs_page_delete(fs, new_pix);
                 SPIFFS_CHECK_RES(res);
                 res = spiffs_delete_obj_lazy(fs, p_hdr->obj_id);
                 *reload_lu = 1;
-                if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr->obj_id, 0);
+                CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr->obj_id, 0);
               }
               SPIFFS_CHECK_RES(res);
             }
@@ -306,7 +319,7 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
               new_ph.obj_id = p_hdr->obj_id | SPIFFS_OBJ_ID_IX_FLAG;
               res = spiffs_rewrite_page(fs, cur_pix, &new_ph, &new_pix);
               SPIFFS_CHECK_DBG("LU: FIXUP: rewrite page %04x as %04x to pix %04x\n", cur_pix, new_ph.obj_id, new_pix);
-              if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, p_hdr->obj_id, p_hdr->span_ix);
+              CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, p_hdr->obj_id, p_hdr->span_ix);
               SPIFFS_CHECK_RES(res);
               *reload_lu = 1;
             } else if ((objix_pix_ph && data_pix_ph && data_pix_lu && objix_pix_lu == 0) ||
@@ -315,7 +328,7 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
               //   rewrite as obj_id_lu
               new_ph.obj_id =  lu_obj_id | SPIFFS_OBJ_ID_IX_FLAG;
               SPIFFS_CHECK_DBG("LU: FIXUP: rewrite page %04x as %04x\n", cur_pix, new_ph.obj_id);
-              if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, p_hdr->obj_id, p_hdr->span_ix);
+              CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, p_hdr->obj_id, p_hdr->span_ix);
               res = spiffs_rewrite_page(fs, cur_pix, &new_ph, &new_pix);
               SPIFFS_CHECK_RES(res);
               *reload_lu = 1;
@@ -353,7 +366,7 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
       // if only data page exists, make this page index
       if (data_pix && objix_pix_d == 0) {
         SPIFFS_CHECK_DBG("LU: FIXUP: other data page exists, make this index\n");
-        if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_INDEX, lu_obj_id, p_hdr->span_ix);
+        CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_INDEX, lu_obj_id, p_hdr->span_ix);
         spiffs_page_header new_ph;
         spiffs_page_ix new_pix;
         new_ph.flags = 0xff & ~(SPIFFS_PH_FLAG_USED | SPIFFS_PH_FLAG_FINAL | SPIFFS_PH_FLAG_INDEX);
@@ -369,7 +382,7 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
       // if only index exists, make data page
       if (data_pix == 0 && objix_pix_d) {
         SPIFFS_CHECK_DBG("LU: FIXUP: other index page exists, make this data\n");
-        if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, lu_obj_id, p_hdr->span_ix);
+        CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, lu_obj_id, p_hdr->span_ix);
         spiffs_page_header new_ph;
         spiffs_page_ix new_pix;
         new_ph.flags = 0xff & ~(SPIFFS_PH_FLAG_USED | SPIFFS_PH_FLAG_FINAL);
@@ -406,7 +419,7 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
           // page referenced by object index but not final
           // just finalize
           SPIFFS_CHECK_DBG("LU: FIXUP: unfinalized page is referred, finalizing\n");
-          if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, p_hdr->obj_id, p_hdr->span_ix);
+          CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_LOOKUP, p_hdr->obj_id, p_hdr->span_ix);
           u8_t flags = 0xff & ~SPIFFS_PH_FLAG_FINAL;
           res = _spiffs_wr(fs, SPIFFS_OP_T_OBJ_DA | SPIFFS_OP_C_UPDT,
               0, SPIFFS_PAGE_TO_PADDR(fs, cur_pix) + offsetof(spiffs_page_header, flags),
@@ -418,7 +431,7 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
 
   if (delete_page) {
     SPIFFS_CHECK_DBG("LU: FIXUP: deleting page %04x\n", cur_pix);
-    if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_DELETE_PAGE, cur_pix, 0);
+    CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_DELETE_PAGE, cur_pix, 0);
     res = spiffs_page_delete(fs, cur_pix);
     SPIFFS_CHECK_RES(res);
   }
@@ -434,7 +447,7 @@ static s32_t spiffs_lookup_check_v(spiffs *fs, spiffs_obj_id obj_id, spiffs_bloc
   spiffs_page_header p_hdr;
   spiffs_page_ix cur_pix = SPIFFS_OBJ_LOOKUP_ENTRY_TO_PIX(fs, cur_block, cur_entry);
 
-  if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_PROGRESS,
+  CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_PROGRESS,
       (cur_block * 256)/fs->block_count, 0);
 
   // load header
@@ -460,7 +473,7 @@ s32_t spiffs_lookup_consistency_check(spiffs *fs, u8_t check_all_objects) {
   (void)check_all_objects;
   s32_t res = SPIFFS_OK;
 
-  if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_PROGRESS, 0, 0);
+  CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_PROGRESS, 0, 0);
 
   res = spiffs_obj_lu_find_entry_visitor(fs, 0, 0, 0, 0, spiffs_lookup_check_v, 0, 0, 0, 0);
 
@@ -469,10 +482,10 @@ s32_t spiffs_lookup_consistency_check(spiffs *fs, u8_t check_all_objects) {
   }
 
   if (res != SPIFFS_OK) {
-    if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_ERROR, res, 0);
+    CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_ERROR, res, 0);
   }
 
-  if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_PROGRESS, 256, 0);
+  CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_PROGRESS, 256, 0);
 
   return res;
 }
@@ -501,19 +514,22 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
   while (pix_offset < SPIFFS_PAGES_PER_BLOCK(fs) * fs->block_count) {
     // set this flag to abort all checks and rescan the page range
     u8_t restart = 0;
-    c_memset(fs->work, 0, SPIFFS_CFG_LOG_PAGE_SZ(fs));
+    memset(fs->work, 0, SPIFFS_CFG_LOG_PAGE_SZ(fs));
 
     spiffs_block_ix cur_block = 0;
     // build consistency bitmap for id range traversing all blocks
     while (!restart && cur_block < fs->block_count) {
-      if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_PROGRESS,
+      CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_PROGRESS,
           (pix_offset*256)/(SPIFFS_PAGES_PER_BLOCK(fs) * fs->block_count) +
           ((((cur_block * pages_per_scan * 256)/ (SPIFFS_PAGES_PER_BLOCK(fs) * fs->block_count))) / fs->block_count),
           0);
-
       // traverse each page except for lookup pages
       spiffs_page_ix cur_pix = SPIFFS_OBJ_LOOKUP_PAGES(fs) + SPIFFS_PAGES_PER_BLOCK(fs) * cur_block;
       while (!restart && cur_pix < SPIFFS_PAGES_PER_BLOCK(fs) * (cur_block+1)) {
+        //if ((cur_pix & 0xff) == 0)
+        //  SPIFFS_CHECK_DBG("PA: processing pix %08x, block %08x of pix %08x, block %08x\n",
+        //      cur_pix, cur_block, SPIFFS_PAGES_PER_BLOCK(fs) * fs->block_count, fs->block_count);
+
         // read header
         spiffs_page_header p_hdr;
         res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
@@ -597,12 +613,12 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
                   data_spix_offset + i, data_pix, cur_pix);
               if (res <= _SPIFFS_ERR_CHECK_FIRST && res > _SPIFFS_ERR_CHECK_LAST) {
                 // index bad also, cannot mend this file
-                SPIFFS_CHECK_DBG("PA: FIXUP: index bad %d, cannot mend - delete object\n", res);
-                if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, objix_p_hdr->obj_id, 0);
+                SPIFFS_CHECK_DBG("PA: FIXUP: index bad %i, cannot mend - delete object\n", res);
+                CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, objix_p_hdr->obj_id, 0);
                 // delete file
                 res = spiffs_page_delete(fs, cur_pix);
               } else {
-                if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_FIX_INDEX, objix_p_hdr->obj_id, objix_p_hdr->span_ix);
+                CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_FIX_INDEX, objix_p_hdr->obj_id, objix_p_hdr->span_ix);
               }
               SPIFFS_CHECK_RES(res);
               restart = 1;
@@ -636,7 +652,7 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
                if (data_pix == 0) {
                  // not found, this index is badly borked
                  SPIFFS_CHECK_DBG("PA: FIXUP: index bad, delete object id %04x\n", p_hdr.obj_id);
-                 if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr.obj_id, 0);
+                 CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr.obj_id, 0);
                  res = spiffs_delete_obj_lazy(fs, p_hdr.obj_id);
                  SPIFFS_CHECK_RES(res);
                  break;
@@ -647,11 +663,11 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
                  res = spiffs_rewrite_index(fs, p_hdr.obj_id, data_spix_offset + i, data_pix, cur_pix);
                  if (res <= _SPIFFS_ERR_CHECK_FIRST && res > _SPIFFS_ERR_CHECK_LAST) {
                    // index bad also, cannot mend this file
-                   SPIFFS_CHECK_DBG("PA: FIXUP: index bad %d, cannot mend!\n", res);
-                   if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr.obj_id, 0);
+                   SPIFFS_CHECK_DBG("PA: FIXUP: index bad %i, cannot mend!\n", res);
+                   CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr.obj_id, 0);
                    res = spiffs_delete_obj_lazy(fs, p_hdr.obj_id);
                  } else {
-                   if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_FIX_INDEX, p_hdr.obj_id, p_hdr.span_ix);
+                   CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_FIX_INDEX, p_hdr.obj_id, p_hdr.span_ix);
                  }
                  SPIFFS_CHECK_RES(res);
                  restart = 1;
@@ -669,7 +685,7 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
                   // the object which is referring to this page
                   SPIFFS_CHECK_DBG("PA: FIXUP: removing object %04x and page %04x\n",
                       p_hdr.obj_id, cur_pix);
-                  if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr.obj_id, 0);
+                  CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr.obj_id, 0);
                   res = spiffs_delete_obj_lazy(fs, p_hdr.obj_id);
                   SPIFFS_CHECK_RES(res);
                   // extra precaution, delete this page also
@@ -763,20 +779,20 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
               res = spiffs_rewrite_index(fs, p_hdr.obj_id, p_hdr.span_ix, cur_pix, objix_pix);
               if (res <= _SPIFFS_ERR_CHECK_FIRST && res > _SPIFFS_ERR_CHECK_LAST) {
                 // index bad also, cannot mend this file
-                SPIFFS_CHECK_DBG("PA: FIXUP: index bad %d, cannot mend!\n", res);
-                if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr.obj_id, 0);
+                SPIFFS_CHECK_DBG("PA: FIXUP: index bad %i, cannot mend!\n", res);
+                CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr.obj_id, 0);
                 res = spiffs_page_delete(fs, cur_pix);
                 SPIFFS_CHECK_RES(res);
                 res = spiffs_delete_obj_lazy(fs, p_hdr.obj_id);
               } else {
-                if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_FIX_INDEX, p_hdr.obj_id, p_hdr.span_ix);
+                CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_FIX_INDEX, p_hdr.obj_id, p_hdr.span_ix);
               }
               SPIFFS_CHECK_RES(res);
               restart = 1;
               continue;
             } else if (delete_page) {
               SPIFFS_CHECK_DBG("PA: FIXUP: deleting page %04x\n", cur_pix);
-              if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_PAGE, cur_pix, 0);
+              CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_DELETE_PAGE, cur_pix, 0);
               res = spiffs_page_delete(fs, cur_pix);
             }
             SPIFFS_CHECK_RES(res);
@@ -818,6 +834,8 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
         }
       }
     }
+
+    SPIFFS_CHECK_DBG("PA: processed %04x, restart %i\n", pix_offset, restart);
     // next page range
     if (!restart) {
       pix_offset += pages_per_scan;
@@ -828,12 +846,12 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs) {
 
 // Checks consistency amongst all pages and fixes irregularities
 s32_t spiffs_page_consistency_check(spiffs *fs) {
-  if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_PROGRESS, 0, 0);
+  CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_PROGRESS, 0, 0);
   s32_t res = spiffs_page_consistency_check_i(fs);
   if (res != SPIFFS_OK) {
-    if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_ERROR, res, 0);
+    CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_ERROR, res, 0);
   }
-  if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_PAGE, SPIFFS_CHECK_PROGRESS, 256, 0);
+  CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_PROGRESS, 256, 0);
   return res;
 }
 
@@ -862,7 +880,7 @@ static s32_t spiffs_object_index_consistency_check_v(spiffs *fs, spiffs_obj_id o
   u32_t *log_ix = (u32_t *)user_p;
   spiffs_obj_id *obj_table = (spiffs_obj_id *)fs->work;
 
-  if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_INDEX, SPIFFS_CHECK_PROGRESS,
+  CHECK_CB(fs, SPIFFS_CHECK_INDEX, SPIFFS_CHECK_PROGRESS,
       (cur_block * 256)/fs->block_count, 0);
 
   if (obj_id != SPIFFS_OBJ_ID_FREE && obj_id != SPIFFS_OBJ_ID_DELETED && (obj_id & SPIFFS_OBJ_ID_IX_FLAG)) {
@@ -879,7 +897,7 @@ static s32_t spiffs_object_index_consistency_check_v(spiffs *fs, spiffs_obj_id o
         (SPIFFS_PH_FLAG_DELET)) {
       SPIFFS_CHECK_DBG("IX: pix %04x, obj id:%04x spix:%04x header not fully deleted - deleting\n",
           cur_pix, obj_id, p_hdr.span_ix);
-      if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_INDEX, SPIFFS_CHECK_DELETE_PAGE, cur_pix, obj_id);
+      CHECK_CB(fs, SPIFFS_CHECK_INDEX, SPIFFS_CHECK_DELETE_PAGE, cur_pix, obj_id);
       res = spiffs_page_delete(fs, cur_pix);
       SPIFFS_CHECK_RES(res);
       return res_c;
@@ -935,7 +953,7 @@ static s32_t spiffs_object_index_consistency_check_v(spiffs *fs, spiffs_obj_id o
       if (delete) {
         SPIFFS_CHECK_DBG("IX: FIXUP: pix %04x, obj id:%04x spix:%04x is orphan index - deleting\n",
             cur_pix, obj_id, p_hdr.span_ix);
-        if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_INDEX, SPIFFS_CHECK_DELETE_ORPHANED_INDEX, cur_pix, obj_id);
+        CHECK_CB(fs, SPIFFS_CHECK_INDEX, SPIFFS_CHECK_DELETE_ORPHANED_INDEX, cur_pix, obj_id);
         res = spiffs_page_delete(fs, cur_pix);
         SPIFFS_CHECK_RES(res);
       }
@@ -956,18 +974,18 @@ s32_t spiffs_object_index_consistency_check(spiffs *fs) {
   // indicating whether they can be reached or not. Acting as a fifo if object ids cannot fit.
   // In the temporary object index memory, SPIFFS_OBJ_ID_IX_FLAG bit is used to indicate
   // a reachable/unreachable object id.
-  c_memset(fs->work, 0, SPIFFS_CFG_LOG_PAGE_SZ(fs));
+  memset(fs->work, 0, SPIFFS_CFG_LOG_PAGE_SZ(fs));
   u32_t obj_id_log_ix = 0;
-  if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_INDEX, SPIFFS_CHECK_PROGRESS, 0, 0);
+  CHECK_CB(fs, SPIFFS_CHECK_INDEX, SPIFFS_CHECK_PROGRESS, 0, 0);
   res = spiffs_obj_lu_find_entry_visitor(fs, 0, 0, 0, 0, spiffs_object_index_consistency_check_v, 0, &obj_id_log_ix,
       0, 0);
   if (res == SPIFFS_VIS_END) {
     res = SPIFFS_OK;
   }
   if (res != SPIFFS_OK) {
-    if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_INDEX, SPIFFS_CHECK_ERROR, res, 0);
+    CHECK_CB(fs, SPIFFS_CHECK_INDEX, SPIFFS_CHECK_ERROR, res, 0);
   }
-  if (fs->check_cb_f) fs->check_cb_f(SPIFFS_CHECK_INDEX, SPIFFS_CHECK_PROGRESS, 256, 0);
+  CHECK_CB(fs, SPIFFS_CHECK_INDEX, SPIFFS_CHECK_PROGRESS, 256, 0);
   return res;
 }
 
