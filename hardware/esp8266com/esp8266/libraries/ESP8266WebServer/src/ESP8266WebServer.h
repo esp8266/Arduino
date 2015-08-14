@@ -80,6 +80,8 @@ public:
   int args();                     // get arguments count
   bool hasArg(const char* name);  // check if argument exists
 
+  String hostHeader();            // get request host header if available or empty String if not
+
   // send response to the client
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
@@ -133,6 +135,8 @@ protected:
 
   size_t           _contentLength;
   String           _responseHeaders;
+
+  String           _hostHeader;
 
   RequestHandler*  _firstHandler;
   RequestHandler*  _lastHandler;

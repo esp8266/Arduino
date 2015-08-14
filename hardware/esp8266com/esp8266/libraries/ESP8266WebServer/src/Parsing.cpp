@@ -94,6 +94,14 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       }
       headerName = req.substring(0, headerDiv);
       headerValue = req.substring(headerDiv + 2);
+	  
+	  #ifdef DEBUG
+	  DEBUG_OUTPUT.print("headerName: ");
+	  DEBUG_OUTPUT.println(headerName);
+	  DEBUG_OUTPUT.print("headerValue: ");
+	  DEBUG_OUTPUT.println(headerValue);
+	  #endif
+	  
       if (headerName == "Content-Type"){
         if (headerValue.startsWith("text/plain")){
           isForm = false;
@@ -103,6 +111,8 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         }
       } else if (headerName == "Content-Length"){
         contentLength = headerValue.toInt();
+      } else if (headerName == "Host"){
+        _hostHeader = headerValue;
       }
     }
   
@@ -134,6 +144,31 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       _parseForm(client, boundaryStr, contentLength);
     }
   } else {
+    String headerName;
+    String headerValue;
+    //parse headers
+    while(1){
+      req = client.readStringUntil('\r');
+      client.readStringUntil('\n');
+      if (req == "") break;//no moar headers
+      int headerDiv = req.indexOf(':');
+      if (headerDiv == -1){
+        break;
+      }
+      headerName = req.substring(0, headerDiv);
+      headerValue = req.substring(headerDiv + 2);
+	  
+	  #ifdef DEBUG
+	  DEBUG_OUTPUT.print("headerName: ");
+	  DEBUG_OUTPUT.println(headerName);
+	  DEBUG_OUTPUT.print("headerValue: ");
+	  DEBUG_OUTPUT.println(headerValue);
+	  #endif
+	  
+	  if (headerName == "Host"){
+        _hostHeader = headerValue;
+      }
+    }
     _parseArguments(searchStr);
   }
   client.flush();
