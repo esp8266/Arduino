@@ -144,6 +144,14 @@ String Dir::fileName() {
     return _impl->fileName();
 }
 
+size_t Dir::fileSize() {
+    if (!_impl) {
+        return 0;
+    }
+
+    return _impl->fileSize();
+}
+
 bool Dir::next() {
     if (!_impl) {
         return false;

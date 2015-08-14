@@ -56,6 +56,7 @@ public:
     virtual ~DirImpl() { }
     virtual FileImplPtr openFile(OpenMode openMode, AccessMode accessMode) = 0;
     virtual const char* fileName() = 0;
+    virtual size_t fileSize() = 0;
     virtual bool next() = 0;
 };
 
