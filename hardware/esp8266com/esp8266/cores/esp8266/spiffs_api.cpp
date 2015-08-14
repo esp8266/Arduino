@@ -239,7 +239,7 @@ public:
     size_t position() const override {
         CHECKFD();
 
-        auto result = SPIFFS_tell(_fs->getFs(), _fd);
+        auto result = SPIFFS_lseek(_fs->getFs(), _fd, 0, SPIFFS_SEEK_CUR);
         if (result < 0) {
             DEBUGV("SPIFFS_tell rc=%d\r\n", result);
             return 0;
@@ -306,6 +306,13 @@ public:
             return nullptr;
 
         return (const char*) _dirent.name;
+    }
+
+    size_t fileSize() override {
+        if (!_valid)
+            return 0;
+
+        return _dirent.size;
     }
 
     bool next() override {
