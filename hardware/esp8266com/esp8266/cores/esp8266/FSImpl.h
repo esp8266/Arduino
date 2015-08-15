@@ -23,6 +23,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+namespace fs {
+
 class FileImpl {
 public:
     virtual ~FileImpl() { }
@@ -33,6 +35,7 @@ public:
     virtual size_t position() const = 0;
     virtual size_t size() const = 0;
     virtual void close() = 0;
+    virtual const char* name() const = 0;
 };
 
 enum OpenMode {
@@ -53,6 +56,7 @@ public:
     virtual ~DirImpl() { }
     virtual FileImplPtr openFile(OpenMode openMode, AccessMode accessMode) = 0;
     virtual const char* fileName() = 0;
+    virtual size_t fileSize() = 0;
     virtual bool next() = 0;
 };
 
@@ -66,5 +70,6 @@ public:
 
 };
 
+} // namespace fs
 
 #endif //FSIMPL_H

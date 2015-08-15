@@ -15,7 +15,7 @@ fi
 set -e
 
 mkdir -p bin
-javac -target 1.7 -cp "$pde_path:$core_path" \
+javac -target 1.8 -cp "$pde_path:$core_path" \
       -d bin src/ESP8266FS.java
 
 pushd bin

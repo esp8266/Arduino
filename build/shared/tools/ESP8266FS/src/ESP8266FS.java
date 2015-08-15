@@ -35,6 +35,7 @@ import javax.swing.JOptionPane;
 import processing.app.PreferencesData;
 import processing.app.Editor;
 import processing.app.Base;
+import processing.app.BaseNoGui;
 import processing.app.Platform;
 import processing.app.Sketch;
 import processing.app.tools.Tool;
@@ -57,7 +58,7 @@ public class ESP8266FS implements Tool {
   public String getMenuTitle() {
     return "ESP8266 Sketch Data Upload";
   }
-  
+
   private int listenOnProcess(String[] arguments){
     try {
       final Process p = ProcessUtils.exec(arguments);
@@ -79,7 +80,7 @@ public class ESP8266FS implements Tool {
       return -1;
     }
   }
-  
+
   private void sysExec(final String[] arguments){
     Thread thread = new Thread() {
       public void run() {
@@ -96,25 +97,25 @@ public class ESP8266FS implements Tool {
     };
     thread.start();
   }
-  
-  
+
+
   private long getIntPref(String name){
-    String data = Base.getBoardPreferences().get(name);
+    String data = BaseNoGui.getBoardPreferences().get(name);
     if(data == null || data.contentEquals("")) return 0;
     if(data.startsWith("0x")) return Long.parseLong(data.substring(2), 16);
     else return Integer.parseInt(data);
   }
-  
+
   private void createAndUpload(){
     if(!PreferencesData.get("target_platform").contentEquals("esp8266")){
       System.err.println();
       editor.statusError("SPIFFS Not Supported on "+PreferencesData.get("target_platform"));
       return;
     }
-    
-    if(!Base.getBoardPreferences().containsKey("build.spiffs_start") || !Base.getBoardPreferences().containsKey("build.spiffs_end")){
+
+    if(!BaseNoGui.getBoardPreferences().containsKey("build.spiffs_start") || !BaseNoGui.getBoardPreferences().containsKey("build.spiffs_end")){
       System.err.println();
-      editor.statusError("SPIFFS Not Defined for "+Base.getBoardPreferences().get("name"));
+      editor.statusError("SPIFFS Not Defined for "+BaseNoGui.getBoardPreferences().get("name"));
       return;
     }
     long spiStart, spiEnd, spiPage, spiBlock;
@@ -129,18 +130,21 @@ public class ESP8266FS implements Tool {
       editor.statusError(e);
       return;
     }
-    
-    TargetPlatform platform = Base.getTargetPlatform();
-    
+
+    TargetPlatform platform = BaseNoGui.getTargetPlatform();
+
+    String esptoolCmd = platform.getTool("esptool").get("cmd");
     File esptool;
-    if(!PreferencesData.get("runtime.os").contentEquals("windows")) esptool = new File(platform.getFolder()+"/tools", "esptool");
-    else esptool = new File(platform.getFolder()+"/tools", "esptool.exe");
+    esptool = new File(platform.getFolder()+"/tools", esptoolCmd);
     if(!esptool.exists()){
-      System.err.println();
-      editor.statusError("SPIFFS Error: esptool not found!");
-      return;
+        esptool = new File(PreferencesData.get("runtime.tools.esptool.path"), esptoolCmd);
+        if (!esptool.exists()) {
+            System.err.println();
+            editor.statusError("SPIFFS Error: esptool not found!");
+            return;
+        }
     }
-    
+
     File tool;
     if(!PreferencesData.get("runtime.os").contentEquals("windows")) tool = new File(platform.getFolder()+"/tools", "mkspiffs");
     else tool = new File(platform.getFolder()+"/tools", "mkspiffs.exe");
@@ -160,34 +164,34 @@ public class ESP8266FS implements Tool {
         }
       }
     }
-    
+
     String dataPath = dataFolder.getAbsolutePath();
     String toolPath = tool.getAbsolutePath();
     String esptoolPath = esptool.getAbsolutePath();
     String sketchName = editor.getSketch().getName();
-    String buildPath = Base.getBuildFolder().getAbsolutePath();
+    String buildPath = BaseNoGui.getBuildFolder().getAbsolutePath();
     String imagePath = buildPath+"/"+sketchName+".spiffs.bin";
     String serialPort = PreferencesData.get("serial.port");
-    String resetMethod = Base.getBoardPreferences().get("upload.resetmethod");
-    String uploadSpeed = Base.getBoardPreferences().get("upload.speed");
-    String uploadAddress = Base.getBoardPreferences().get("build.spiffs_start");
-    
+    String resetMethod = BaseNoGui.getBoardPreferences().get("upload.resetmethod");
+    String uploadSpeed = BaseNoGui.getBoardPreferences().get("upload.speed");
+    String uploadAddress = BaseNoGui.getBoardPreferences().get("build.spiffs_start");
+
     Object[] options = { "Yes", "No" };
     String title = "SPIFFS Create";
     String message = "No files have been found in your data folder!\nAre you sure you want to create an empty SPIFFS image?";
-    
+
     if(fileCount == 0 && JOptionPane.showOptionDialog(editor, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]) != JOptionPane.YES_OPTION){
       System.err.println();
       editor.statusError("SPIFFS Warning: mkspiffs canceled!");
       return;
     }
-    
+
     editor.statusNotice("SPIFFS Creating Image...");
     System.out.println("[SPIFFS] data   : "+dataPath);
     System.out.println("[SPIFFS] size   : "+((spiEnd - spiStart)/1024));
     System.out.println("[SPIFFS] page   : "+spiPage);
     System.out.println("[SPIFFS] block  : "+spiBlock);
-    
+
     try {
       if(listenOnProcess(new String[]{toolPath, "-c", dataPath, "-p", spiPage+"", "-b", spiBlock+"", "-s", (spiEnd - spiStart)+"", imagePath}) != 0){
         System.err.println();
@@ -199,7 +203,7 @@ public class ESP8266FS implements Tool {
       editor.statusError("SPIFFS Create Failed!");
       return;
     }
-    
+
     editor.statusNotice("SPIFFS Uploading Image...");
     System.out.println("[SPIFFS] upload : "+imagePath);
     System.out.println("[SPIFFS] reset  : "+resetMethod);
@@ -207,10 +211,10 @@ public class ESP8266FS implements Tool {
     System.out.println("[SPIFFS] speed  : "+uploadSpeed);
     System.out.println("[SPIFFS] address: "+uploadAddress);
     System.out.println();
-    
+
     sysExec(new String[]{esptoolPath, "-cd", resetMethod, "-cb", uploadSpeed, "-cp", serialPort, "-ca", uploadAddress, "-cf", imagePath});
   }
-  
+
   public void run() {
     createAndUpload();
   }

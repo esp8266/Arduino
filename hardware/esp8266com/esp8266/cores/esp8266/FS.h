@@ -24,6 +24,8 @@
 #include <Arduino.h>
 #include <memory>
 
+namespace fs {
+
 class File;
 class Dir;
 
@@ -64,6 +66,7 @@ public:
     size_t size() const;
     void close();
     operator bool() const;
+    const char* name() const;
 
 protected:
     FileImplPtr _p;
@@ -75,6 +78,7 @@ public:
 
     File openFile(const char* mode);
     String fileName();
+    size_t fileSize();
     bool next();
 
 protected:
@@ -102,8 +106,17 @@ public:
 
 protected:
     FSImplPtr _impl;
-
 };
+
+} // namespace fs
+
+using fs::FS;
+using fs::File;
+using fs::Dir;
+using fs::SeekMode;
+using fs::SeekSet;
+using fs::SeekCur;
+using fs::SeekEnd;
 
 extern FS SPIFFS;
 

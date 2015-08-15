@@ -9,7 +9,7 @@
 
 #ifndef SPIFFS_H_
 #define SPIFFS_H_
-#ifdef __cplusplus
+#if defined(__cplusplus)
 extern "C" {
 #endif
 
@@ -47,6 +47,9 @@ extern "C" {
 #define SPIFFS_ERR_ERASE_FAIL           -10027
 #define SPIFFS_ERR_MAGIC_NOT_POSSIBLE   -10028
 
+#define SPIFFS_ERR_NO_DELETED_BLOCKS    -10029
+
+#define SPIFFS_ERR_FILE_EXISTS          -10030
 
 #define SPIFFS_ERR_INTERNAL             -10050
 
@@ -62,12 +65,25 @@ typedef u16_t spiffs_mode;
 // object type
 typedef u8_t spiffs_obj_type;
 
+#if SPIFFS_HAL_CALLBACK_EXTRA
+struct spiffs_t;
+
+/* spi read call function type */
+typedef s32_t (*spiffs_read)(struct spiffs_t *fs, u32_t addr, u32_t size, u8_t *dst);
+/* spi write call function type */
+typedef s32_t (*spiffs_write)(struct spiffs_t *fs, u32_t addr, u32_t size, u8_t *src);
+/* spi erase call function type */
+typedef s32_t (*spiffs_erase)(struct spiffs_t *fs, u32_t addr, u32_t size);
+
+#else // SPIFFS_HAL_CALLBACK_EXTRA
+
 /* spi read call function type */
 typedef s32_t (*spiffs_read)(u32_t addr, u32_t size, u8_t *dst);
 /* spi write call function type */
 typedef s32_t (*spiffs_write)(u32_t addr, u32_t size, u8_t *src);
 /* spi erase call function type */
 typedef s32_t (*spiffs_erase)(u32_t addr, u32_t size);
+#endif // SPIFFS_HAL_CALLBACK_EXTRA
 
 /* file system check callback report operation */
 typedef enum {
@@ -88,21 +104,26 @@ typedef enum {
 } spiffs_check_report;
 
 /* file system check callback function */
+#if SPIFFS_HAL_CALLBACK_EXTRA
+typedef void (*spiffs_check_callback)(struct spiffs_t *fs, spiffs_check_type type, spiffs_check_report report,
+    u32_t arg1, u32_t arg2);
+#else // SPIFFS_HAL_CALLBACK_EXTRA
 typedef void (*spiffs_check_callback)(spiffs_check_type type, spiffs_check_report report,
     u32_t arg1, u32_t arg2);
+#endif // SPIFFS_HAL_CALLBACK_EXTRA
 
 #ifndef SPIFFS_DBG
 #define SPIFFS_DBG(...) \
     print(__VA_ARGS__)
 #endif
 #ifndef SPIFFS_GC_DBG
-#define SPIFFS_GC_DBG(...) c_printf(__VA_ARGS__)
+#define SPIFFS_GC_DBG(...) printf(__VA_ARGS__)
 #endif
 #ifndef SPIFFS_CACHE_DBG
-#define SPIFFS_CACHE_DBG(...) c_printf(__VA_ARGS__)
+#define SPIFFS_CACHE_DBG(...) printf(__VA_ARGS__)
 #endif
 #ifndef SPIFFS_CHECK_DBG
-#define SPIFFS_CHECK_DBG(...) c_printf(__VA_ARGS__)
+#define SPIFFS_CHECK_DBG(...) printf(__VA_ARGS__)
 #endif
 
 /* Any write to the filehandle is appended to end of the file */
@@ -119,6 +140,8 @@ typedef void (*spiffs_check_callback)(spiffs_check_type type, spiffs_check_repor
 #define SPIFFS_RDWR                     (SPIFFS_RDONLY | SPIFFS_WRONLY)
 /* Any writes to the filehandle will never be cached */
 #define SPIFFS_DIRECT                   (1<<5)
+/* If SPIFFS_CREAT and SPIFFS_EXCL are set, SPIFFS_open() shall fail if the file exists */
+#define SPIFFS_EXCL                     (1<<6)
 
 #define SPIFFS_SEEK_SET                 (0)
 #define SPIFFS_SEEK_CUR                 (1)
@@ -166,7 +189,7 @@ typedef struct {
 #endif
 } spiffs_config;
 
-typedef struct {
+typedef struct spiffs_t {
   // file system configuration
   spiffs_config cfg;
   // number of logical blocks
@@ -224,6 +247,8 @@ typedef struct {
 
   // mounted flag
   u8_t mounted;
+  // user data
+  void *user_data;
   // config magic
   u32_t config_magic;
 } spiffs;
@@ -387,7 +412,7 @@ s32_t SPIFFS_fflush(spiffs *fs, spiffs_file fh);
  * @param fs            the file system struct
  * @param fh            the filehandle of the file to close
  */
-void SPIFFS_close(spiffs *fs, spiffs_file fh);
+s32_t SPIFFS_close(spiffs *fs, spiffs_file fh);
 
 /**
  * Renames a file
@@ -440,7 +465,6 @@ struct spiffs_dirent *SPIFFS_readdir(spiffs_DIR *d, struct spiffs_dirent *e);
  */
 s32_t SPIFFS_check(spiffs *fs);
 
-
 /**
  * Returns number of total bytes available and number of used bytes.
  * This is an estimation, and depends on if there a many files with little
@@ -465,27 +489,60 @@ s32_t SPIFFS_info(spiffs *fs, u32_t *total, u32_t *used);
  * SPIFFS_format.
  * If SPIFFS_mount fails, SPIFFS_format can be called directly without calling
  * SPIFFS_unmount first.
+ *
+ * @param fs            the file system struct
  */
 s32_t SPIFFS_format(spiffs *fs);
 
 /**
  * Returns nonzero if spiffs is mounted, or zero if unmounted.
+ * @param fs            the file system struct
  */
 u8_t SPIFFS_mounted(spiffs *fs);
 
 /**
- * Check if EOF reached.
- * @param fs            the file system struct
- * @param fh            the filehandle of the file to check
+ * Tries to find a block where most or all pages are deleted, and erase that
+ * block if found. Does not care for wear levelling. Will not move pages
+ * around.
+ * If parameter max_free_pages are set to 0, only blocks with only deleted
+ * pages will be selected.
+ *
+ * NB: the garbage collector is automatically called when spiffs needs free
+ * pages. The reason for this function is to give possibility to do background
+ * tidying when user knows the system is idle.
+ *
+ * Use with care.
+ *
+ * Setting max_free_pages to anything larger than zero will eventually wear
+ * flash more as a block containing free pages can be erased.
+ *
+ * Will set err_no to SPIFFS_OK if a block was found and erased,
+ * SPIFFS_ERR_NO_DELETED_BLOCK if no matching block was found,
+ * or other error.
+ *
+ * @param fs             the file system struct
+ * @param max_free_pages maximum number allowed free pages in block
  */
-s32_t SPIFFS_eof(spiffs *fs, spiffs_file fh);
+s32_t SPIFFS_gc_quick(spiffs *fs, u16_t max_free_pages);
 
 /**
- * Get the current position of the data pointer.
+ * Will try to make room for given amount of bytes in the filesystem by moving
+ * pages and erasing blocks.
+ * If it is physically impossible, err_no will be set to SPIFFS_ERR_FULL. If
+ * there already is this amount (or more) of free space, SPIFFS_gc will
+ * silently return. It is recommended to call SPIFFS_info before invoking
+ * this method in order to determine what amount of bytes to give.
+ *
+ * NB: the garbage collector is automatically called when spiffs needs free
+ * pages. The reason for this function is to give possibility to do background
+ * tidying when user knows the system is idle.
+ *
+ * Use with care.
+ *
  * @param fs            the file system struct
- * @param fh            the filehandle of the open file
+ * @param size          amount of bytes that should be freed
  */
-s32_t SPIFFS_tell(spiffs *fs, spiffs_file fh);
+s32_t SPIFFS_gc(spiffs *fs, u32_t size);
 
 #if SPIFFS_TEST_VISUALISATION
 /**
@@ -511,8 +568,9 @@ u32_t SPIFFS_buffer_bytes_for_cache(spiffs *fs, u32_t num_pages);
 #endif
 #endif
 
-
-#ifdef __cplusplus
+#if SPIFFS_CACHE
+#endif
+#if defined(__cplusplus)
 }
 #endif
 

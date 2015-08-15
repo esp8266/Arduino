@@ -5,6 +5,7 @@ title: Supported Hardware
 - [Adafruit HUZZAH ESP8266 (ESP-12)](#adafruit-huzzah-esp8266-esp-12)
 - [NodeMCU 0.9](#nodemcu-0-9)
 - [NodeMCU 1.0](#nodemcu-1-0)
+- [Olimex MOD-WIFI-ESP8266-DEV](#olimex-mod-wifi-esp8266-dev)
 - [Olimex MOD-WIFI-ESP8266](#olimex-mod-wifi-esp8266)
 - [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
 - [SweetPea ESP-210](#sweetpea-esp-210)
@@ -38,11 +39,33 @@ If you want to use NodeMCU pin 5, use D5 for pin number, and it will be translat
 
 ### NodeMCU 1.0 <a name="nodemcu-1-0"></a>
 
-*TODO: add notes*
+This module is sold under many names for around $6.50 on AliExpress and it's one of the cheapest, fully integrated ESP8266 solutions.
+
+It's an open hardware design with an ESP-12E core and 4 MB of SPI flash.
+
+Acording to the manufacturer, "with a micro USB cable, you can connect NodeMCU devkit to your laptop and flash it without any trouble". This is more or less true: the board comes with a CP2102 onboard USB to serial adapter which just works, well, the majority of the time. Sometimes flashing fails and you have to reset the board by holding down FLASH + RST, then releasing FLASH, then releasing RST. This forces the CP2102 device to power cycle and to be re-numbered by Linux.
+
+The board also features a NCP1117 voltage regulator, a blue LED on GPIO16 and a 220k/100k Ohm voltage divider on the ADC input pin.
+
+Full pinout and PDF schematics can be found [here](https://github.com/nodemcu/nodemcu-devkit-v1.0)
+
+### Olimex MOD-WIFI-ESP8266-DEV
+
+This board comes with 2 MB of SPI flash and optional accessories (e.g. evaluation board ESP8266-EVB or BAT-BOX for batteries).
+
+The basic module has three solder jumpers that allow you to switch the operating mode between SDIO, UART and FLASH.
+
+The board is shipped for FLASH operation mode, with jumpers TD0JP=0, IO0JP=1, IO2JP=1.
+
+Since jumper IO0JP is tied to GPIO0, which is PIN 21, you'll have to ground it before programming with a USB to serial adapter and reset the board by power cycling it.
+
+UART pins for programming and serial I/O are GPIO1 (TXD, pin 3) and GPIO3 (RXD, pin 4).
+
+Get the board schematics [here](https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf)
 
 ### Olimex MOD-WIFI-ESP8266
 
-*TODO: add notes*
+This is a stripped down version of the above. Behaves identically in terms of jumpers but has less pins readily available for I/O. Still 2 MB of SPI flash.
 
 ### SparkFun ESP8266 Thing ###
 

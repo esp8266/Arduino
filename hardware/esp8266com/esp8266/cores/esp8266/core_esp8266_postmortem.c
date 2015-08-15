@@ -35,7 +35,7 @@ static void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
 static void uart1_write_char_d(char c);
 static void print_stack(uint32_t start, uint32_t end);
-static void print_pcs(uint32_t start, uint32_t end);
+//static void print_pcs(uint32_t start, uint32_t end);
 
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
@@ -108,6 +108,7 @@ static void print_stack(uint32_t start, uint32_t end) {
     ets_printf("<<<stack<<<\n");
 }
 
+/*
 static void print_pcs(uint32_t start, uint32_t end) {
     uint32_t n = 0;
     ets_printf("\n>>>pc>>>\n");
@@ -122,6 +123,7 @@ static void print_pcs(uint32_t start, uint32_t end) {
     }
     ets_printf("<<<pc<<<\n");
 }
+*/
 
 void uart_write_char_d(char c) {
     uart0_write_char_d(c);

@@ -1,13 +1,16 @@
 #!/bin/bash
 #
-# for platform in windows linux macosx; do pushd $platform; ls -l esptool-*; shasum -a 256 esptool-*; popd; done;
-#
-#
 
 ver=`git describe --tags`
-outdir=esp8266-$ver
-srcdir=../hardware/esp8266com/esp8266/
+package_name=esp8266-$ver
+echo "Version: $ver"
+echo "Package name: $package_name"
+outdir=versions/$ver/$package_name
+srcdir=$PWD/../hardware/esp8266com/esp8266/
+
+rm -rf versions/$ver
 mkdir -p $outdir
+
 cp -R $srcdir/* $outdir/
 
 cp -R ../libraries/SD $outdir/libraries/
@@ -20,36 +23,21 @@ gsed 's/runtime.tools.esptool.path={runtime.platform.path}\/tools//g' | \
 gsed 's/tools.esptool.path={runtime.platform.path}\/tools/tools.esptool.path=\{runtime.tools.esptool.path\}/g' \
  > $outdir/platform.txt
 
-zip -r $outdir.zip $outdir
-rm -rf $outdir
-sha=`shasum -a 256 $outdir.zip | cut -f 1 -d ' '`
-size=`/bin/ls -l $outdir.zip | awk '{print $5}'`
+pushd versions/$ver
+echo "Making $package_name.zip"
+zip -qr $package_name.zip $package_name
+rm -rf $package_name
+sha=`shasum -a 256 $package_name.zip | cut -f 1 -d ' '`
+size=`/bin/ls -l $package_name.zip | awk '{print $5}'`
 echo Size: $size
 echo SHA-256: $sha
 
-if [ "$upload" == "stable" ]; then
-    badge_title="stable"
-    badge_color="blue"
-    path=""
-elif [ "$upload" == "staging" ]; then
-    badge_title="staging"
-    badge_color="yellow"
-    path="staging/"
-elif [ "$upload" == "test" ]; then
-    badge_title="test"
-    badge_color="red"
-    path="test/"
-else
-    upload=""
-    remote="http://localhost:8000"
+if [ -z "$REMOTE_URL" ]; then
+    REMOTE_URL="http://localhost:8000"
+    echo "REMOTE_URL not defined, using default: $REMOTE_URL"
 fi
 
-if [ ! -z "$upload" ]; then
-  remote="http://arduino.esp8266.com"
-  release_date=$(date "+%b_%d,_%Y")
-  wget -O badge.svg https://img.shields.io/badge/$badge_title-$release_date-$badge_color.svg
-fi
-
+echo "Making package_esp8266com_index.json"
 cat << EOF > package_esp8266com_index.json
 {
   "packages": [ {
@@ -58,7 +46,7 @@ cat << EOF > package_esp8266com_index.json
     "websiteURL":"https://github.com/esp8266/Arduino",
     "email":"ivan@esp8266.com",
     "help":{
-      "online":"http://esp8266.com"
+      "online":"$REMOTE_URL/versions/$ver/doc/reference.html"
     },
 
     "platforms": [ {
@@ -66,12 +54,12 @@ cat << EOF > package_esp8266com_index.json
       "architecture":"esp8266",
       "version":"$ver",
       "category":"ESP8266",
-      "url":"$remote/$path/$outdir.zip",
-      "archiveFileName":"$outdir.zip",
+      "url":"$REMOTE_URL/versions/$ver/$package_name.zip",
+      "archiveFileName":"$package_name.zip",
       "checksum":"SHA-256:$sha",
       "size":"$size",
       "help":{
-        "online":"http://esp8266.com"
+        "online":"$REMOTE_URL/versions/$ver/doc/reference.html"
       },
       "boards":[
         {
@@ -90,68 +78,85 @@ cat << EOF > package_esp8266com_index.json
           "name":"Adafruit HUZZAH ESP8266 (ESP-12)"
         },
         {
+          "name":"SparkFun Thing"
+        },
+        {
           "name":"SweetPea ESP-210"
         }
       ],
       "toolsDependencies":[ {
         "packager":"esp8266",
         "name":"esptool",
-        "version":"0.4.5"
+        "version":"0.4.6"
       },
       {
         "packager":"esp8266",
         "name":"xtensa-lx106-elf-gcc",
-        "version":"1.20.0-26-gb404fb9"
+        "version":"1.20.0-26-gb404fb9-2"
       } ]
     } ],
 
     "tools": [ {
       "name":"esptool",
-      "version":"0.4.5",
+      "version":"0.4.6",
       "systems": [
         {
             "host":"i686-mingw32",
-            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-win32.zip",
-            "archiveFileName":"esptool-0.4.5-win32.zip",
-            "checksum":"SHA-256:1b0a7d254e74942d820a09281aa5dc2af1c8314ae5ee1a5abb0653d0580e531b",
-            "size":"17408"
+            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-win32.zip",
+            "archiveFileName":"esptool-0.4.6-win32.zip",
+            "checksum":"SHA-256:0248bf78514a3195f583e29218ca7828a66e13c6e5545a078f1c1257033e4927",
+            "size":"17481"
         },
         {
             "host":"x86_64-apple-darwin",
-            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-osx.tar.gz",
-            "archiveFileName":"esptool-0.4.5-osx.tar.gz",
-            "checksum":"SHA-256:924d31c64f4bb9f748e70806dafbabb15e5eb80afcdde33715f3ec884be1652d",
-            "size":"11359"
+            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-osx.tar.gz",
+            "archiveFileName":"esptool-0.4.6-osx.tar.gz",
+            "checksum":"SHA-256:0fe87ba7e29ee90a9fc72492aada8c0796f9e8f8a1c594b6b26cee2610d09bb3",
+            "size":"20926"
+        },
+        {
+            "host":"i386-apple-darwin",
+            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-osx.tar.gz",
+            "archiveFileName":"esptool-0.4.6-osx.tar.gz",
+            "checksum":"SHA-256:0fe87ba7e29ee90a9fc72492aada8c0796f9e8f8a1c594b6b26cee2610d09bb3",
+            "size":"20926"
         },
         {
             "host":"x86_64-pc-linux-gnu",
-            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-linux64.tar.gz",
-            "archiveFileName":"esptool-0.4.5-linux64.tar.gz",
-            "checksum":"SHA-256:4ce799e13fbd89f8a8f08a08db77dc3b1362c4486306fe1b3801dee80cfa3203",
-            "size":"12789"
+            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-linux64.tar.gz",
+            "archiveFileName":"esptool-0.4.6-linux64.tar.gz",
+            "checksum":"SHA-256:f9f456e9a42bb2597126c513cb8865f923fb978865d4838b9623d322216b74d0",
+            "size":"12885"
         },
         {
             "host":"i686-pc-linux-gnu",
-            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.5/esptool-0.4.5-linux32.tar.gz",
-            "archiveFileName":"esptool-0.4.5-linux32.tar.gz",
-            "checksum":"SHA-256:4aa81b97a470641771cf371e5d470ac92d3b177adbe8263c4aae66e607b67755",
-            "size":"12044"
+            "url":"https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-linux32.tar.gz",
+            "archiveFileName":"esptool-0.4.6-linux32.tar.gz",
+            "checksum":"SHA-256:85275ca03a82bfc456f5a84e86962ca1e470ea2e168829c38ca29ee668831d93",
+            "size":"13417"
         }
       ]
     },
     {
       "name":"xtensa-lx106-elf-gcc",
-      "version":"1.20.0-26-gb404fb9",
+      "version":"1.20.0-26-gb404fb9-2",
       "systems": [
         {
-           "host":"i686-mingw32",
-           "url":"http://arduino.esp8266.com/win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-           "archiveFileName":"win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-           "checksum":"SHA-256:10476b9c11a7a90f40883413ddfb409f505b20692e316c4e597c4c175b4be09c",
-           "size":"153527527"
+          "host":"i686-mingw32",
+          "url":"http://arduino.esp8266.com/win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+          "archiveFileName":"win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+          "checksum":"SHA-256:10476b9c11a7a90f40883413ddfb409f505b20692e316c4e597c4c175b4be09c",
+          "size":"153527527"
         },
         {
            "host":"x86_64-apple-darwin",
+           "url":"http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+           "archiveFileName":"osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+           "checksum":"SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
+           "size":"35385382"
+        },
+        {
+           "host":"i386-apple-darwin",
            "url":"http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
            "archiveFileName":"osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
            "checksum":"SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
@@ -177,13 +182,4 @@ cat << EOF > package_esp8266com_index.json
 }
 EOF
 
-
-if [ ! -z "$upload" ]; then
-    remote_path=dl:apps/download_files/download/$path
-    scp $outdir.zip $remote_path
-    scp package_esp8266com_index.json $remote_path
-    scp -r $srcdir/doc $remote_path
-    scp badge.svg $remote_path
-else
-    python -m SimpleHTTPServer
-fi
+popd
