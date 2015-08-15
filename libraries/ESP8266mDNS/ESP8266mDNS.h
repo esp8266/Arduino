@@ -13,10 +13,9 @@ Requirements:
 
 Usage:
 - Include the ESP8266 Multicast DNS library in the sketch.
-- Create an instance of the MDNSResponder class.
 - Call the begin method in the sketch's setup and provide a domain name (without
-  the '.local' suffix, i.e. just provide 'foo' to resolve 'foo.local'), and the 
-  Adafruit CC3000 class instance.  Optionally provide a time to live (in seconds) 
+  the '.local' suffix, i.e. just provide 'foo' to resolve 'foo.local'), and the
+  Adafruit CC3000 class instance.  Optionally provide a time to live (in seconds)
   for the DNS record--the default is 1 hour.
 - Call the update method in each iteration of the sketch's loop function.
 
@@ -70,7 +69,7 @@ public:
     return begin(hostName);
   }
   void update();
-  
+
   void addService(char *service, char *proto, uint16_t port);
   void addService(const char *service, const char *proto, uint16_t port){
     addService((char *)service, (char *)proto, port);
@@ -78,7 +77,7 @@ public:
   void addService(String service, String proto, uint16_t port){
     addService(service.c_str(), proto.c_str(), port);
   }
-  
+
 private:
   struct MDNSService * _services;
   UdpContext* _conn;

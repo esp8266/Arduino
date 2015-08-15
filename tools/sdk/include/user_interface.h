@@ -28,10 +28,11 @@ enum rst_reason {
 	REASON_EXCEPTION_RST	= 2,
 	REASON_SOFT_WDT_RST   	= 3,
 	REASON_SOFT_RESTART 	= 4,
-	REASON_DEEP_SLEEP_AWAKE	= 5
+	REASON_DEEP_SLEEP_AWAKE	= 5,
+	REASON_EXT_SYS_RST      = 6
 };
 
-struct rst_info {
+struct rst_info{
 	uint32 reason;
 	uint32 exccause;
 	uint32 epc1;
@@ -137,6 +138,7 @@ bool system_param_load(uint16 start_sec, uint16 offset, void *param, uint16 len)
 
 void system_soft_wdt_stop(void);
 void system_soft_wdt_restart(void);
+void system_soft_wdt_feed(void);
 
 #define NULL_MODE       0x00
 #define STATION_MODE    0x01
@@ -283,6 +285,7 @@ void wifi_softap_free_station_info(void);
 bool wifi_softap_dhcps_start(void);
 bool wifi_softap_dhcps_stop(void);
 bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
+bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
 enum dhcp_status wifi_softap_dhcps_status(void);
 bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg);
 
@@ -430,17 +433,18 @@ typedef enum wps_type {
 	WPS_TYPE_MAX
 } WPS_TYPE_t;
 
-typedef enum wps_cb_status {
+enum wps_cb_status {
 	WPS_CB_ST_SUCCESS = 0,
 	WPS_CB_ST_FAILED,
-	WPS_CB_ST_TIMEOUT
-} WPS_CB_STATUS_t;
+	WPS_CB_ST_TIMEOUT,
+	WPS_CB_ST_WEP,
+};
 
 bool wifi_wps_enable(WPS_TYPE_t wps_type);
 bool wifi_wps_disable(void);
 bool wifi_wps_start(void);
 
-typedef void (*wps_st_cb_t)(WPS_CB_STATUS_t status);
+typedef void (*wps_st_cb_t)(int status);
 bool wifi_set_wps_cb(wps_st_cb_t cb);
 
 #endif

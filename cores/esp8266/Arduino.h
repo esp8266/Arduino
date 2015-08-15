@@ -137,17 +137,29 @@ void timer0_detachInterrupt(void);
 void ets_intr_lock();
 void ets_intr_unlock();
 
-// level (0-15),
-// level 15 will disable ALL interrupts,
-// level 0 will disable most software interrupts
+#ifndef __STRINGIFY
+#define __STRINGIFY(a) #a
+#endif
+
+// these low level routines provide a replacement for SREG interrupt save that AVR uses
+// but are esp8266 specific. A normal use pattern is like
 //
-#define xt_disable_interrupts(state, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state))
-#define xt_enable_interrupts(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
+//{
+//    uint32_t savedPS = xt_rsil(1); // this routine will allow level 2 and above
+//    // do work here
+//    xt_wsr_ps(savedPS); // restore the state
+//}
+//
+// level (0-15), interrupts of the given level and above will be active
+// level 15 will disable ALL interrupts,
+// level 0 will enable ALL interrupts,
+// 
+#define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state)); state;}))
+#define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
 
-extern uint32_t interruptsState;
+#define interrupts() xt_rsil(0)
+#define noInterrupts() xt_rsil(15)
 
-#define interrupts() xt_enable_interrupts(interruptsState)
-#define noInterrupts() __asm__ __volatile__("rsil %0,15" : "=a" (interruptsState))
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
@@ -179,12 +191,12 @@ void initVariant(void);
 
 int atexit(void (*func)()) __attribute__((weak));
 
-void pinMode(uint8_t, uint8_t);
-void digitalWrite(uint8_t, uint8_t);
-int digitalRead(uint8_t);
-int analogRead(uint8_t);
+void pinMode(uint8_t pin, uint8_t mode);
+void digitalWrite(uint8_t pin, uint8_t val);
+int digitalRead(uint8_t pin);
+int analogRead(uint8_t pin);
 void analogReference(uint8_t mode);
-void analogWrite(uint8_t, int);
+void analogWrite(uint8_t pin, int val);
 void analogWriteFreq(uint32_t freq);
 void analogWriteRange(uint32_t range);
 
@@ -198,8 +210,8 @@ unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
 void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
 uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
 
-void attachInterrupt(uint8_t, void (*)(void), int mode);
-void detachInterrupt(uint8_t);
+void attachInterrupt(uint8_t pin, void (*)(void), int mode);
+void detachInterrupt(uint8_t pin);
 
 void setup(void);
 void loop(void);

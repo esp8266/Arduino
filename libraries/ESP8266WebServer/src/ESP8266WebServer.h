@@ -1,9 +1,9 @@
-/* 
+/*
   ESP8266WebServer.h - Dead simple web-server.
   Supports only one simultaneous client, knows how to handle GET and POST.
 
   Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -37,6 +37,12 @@ enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
 
+class RequestHandler;
+
+namespace fs {
+class FS;
+}
+
 typedef struct {
   HTTPUploadStatus status;
   String  filename;
@@ -59,6 +65,7 @@ public:
   typedef std::function<void(void)> THandlerFunction;
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);
+  void serveStatic(const char* uri, fs::FS& fs, const char* path);
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
 
@@ -66,13 +73,13 @@ public:
   HTTPMethod method() { return _currentMethod; }
   WiFiClient client() { return _currentClient; }
   HTTPUpload& upload() { return _currentUpload; }
-  
+
   String arg(const char* name);   // get request argument value by name
   String arg(int i);              // get request argument value by number
   String argName(int i);          // get request argument name by number
   int args();                     // get arguments count
   bool hasArg(const char* name);  // check if argument exists
-  
+
   // send response to the client
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
@@ -89,7 +96,7 @@ public:
 
 template<typename T> size_t streamFile(T &file, const String& contentType){
   setContentLength(file.size());
-  if (String(file.name()).endsWith(".gz") && 
+  if (String(file.name()).endsWith(".gz") &&
       contentType != "application/x-gzip" &&
       contentType != "application/octet-stream"){
     sendHeader("Content-Encoding", "gzip");
@@ -97,8 +104,9 @@ template<typename T> size_t streamFile(T &file, const String& contentType){
   send(200, contentType, "");
   return _currentClient.write(file, HTTP_DOWNLOAD_UNIT_SIZE);
 }
-  
+
 protected:
+  void _addRequestHandler(RequestHandler* handler);
   void _handleRequest();
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(String data);
@@ -108,7 +116,6 @@ protected:
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
 
-  struct RequestHandler;
   struct RequestArgument {
     String key;
     String value;

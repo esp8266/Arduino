@@ -21,6 +21,8 @@
 #include "FS.h"
 #include "FSImpl.h"
 
+using namespace fs;
+
 static bool sflags(const char* mode, OpenMode& om, AccessMode& am);
 
 size_t File::write(uint8_t c) {
@@ -41,7 +43,7 @@ int File::available() {
     if (!_p)
         return false;
 
-    return _p->position() < _p->size();
+    return _p->size() - _p->position();
 }
 
 int File::read() {
@@ -112,6 +114,13 @@ File::operator bool() const {
     return !!_p;
 }
 
+const char* File::name() const {
+    if (!_p)
+        return nullptr;
+
+    return _p->name();
+}
+
 File Dir::openFile(const char* mode) {
     if (!_impl) {
         return File();
@@ -133,6 +142,14 @@ String Dir::fileName() {
     }
 
     return _impl->fileName();
+}
+
+size_t Dir::fileSize() {
+    if (!_impl) {
+        return 0;
+    }
+
+    return _impl->fileSize();
 }
 
 bool Dir::next() {

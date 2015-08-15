@@ -666,7 +666,7 @@ bool ESP8266WiFiClass::hostname(String aHostname) {
 
 //--------------------------------------------------------------
 
-void wifi_wps_status_cb(WPS_CB_STATUS_t status)
+void wifi_wps_status_cb(wps_cb_status status)
 {
     DEBUGV("wps cb status: %d\r\n", status);
     switch (status) {
@@ -681,6 +681,9 @@ void wifi_wps_status_cb(WPS_CB_STATUS_t status)
             break;
         case WPS_CB_ST_TIMEOUT:
             DEBUGV("wps TIMEOUT\n");
+            break;
+        case WPS_CB_ST_WEP:
+            DEBUGV("wps WEP\n");
             break;
     }
     // todo user function to get status
@@ -715,7 +718,7 @@ bool ESP8266WiFiClass::beginWPSConfig(void) {
         return false;
     }
 
-    if(!wifi_set_wps_cb(&wifi_wps_status_cb)) {
+    if(!wifi_set_wps_cb((wps_st_cb_t) &wifi_wps_status_cb)) {
         DEBUGV("wps cb faild\n");
         return false;
     }

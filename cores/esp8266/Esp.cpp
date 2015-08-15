@@ -1,8 +1,8 @@
-/* 
+/*
  Esp.cpp - ESP8266-specific APIs
  Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -22,6 +22,7 @@
 #include "flash_utils.h"
 #include "eboot_command.h"
 #include <memory>
+#include "interrupts.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -32,7 +33,7 @@ extern struct rst_info resetInfo;
 
 //#define DEBUG_SERIAL Serial
 
-    
+
 /**
  * User-defined Literals
  *  usage:
@@ -92,23 +93,25 @@ void EspClass::wdtEnable(WDTO_t timeout_ms)
 
 void EspClass::wdtDisable(void)
 {
-    /// Please don’t stop software watchdog too long (less than 6 seconds),
+    /// Please don't stop software watchdog too long (less than 6 seconds),
     /// otherwise it will trigger hardware watchdog reset.
     system_soft_wdt_stop();
 }
 
 void EspClass::wdtFeed(void)
 {
-
-}
-
-void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
-{
-	system_deep_sleep_set_option(static_cast<int>(mode));
- 	system_deep_sleep(time_us);
+    system_soft_wdt_feed();
 }
 
 extern "C" void esp_yield();
+
+void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
+{
+    system_deep_sleep_set_option(static_cast<int>(mode));
+    system_deep_sleep(time_us);
+    esp_yield();
+}
+
 extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
 {
@@ -119,13 +122,11 @@ void EspClass::restart(void)
 {
     system_restart();
     esp_yield();
-    // todo: provide an alternative code path if this was called
-    // from system context, not from continuation
-    // (implement esp_is_cont_ctx()?)
 }
 
 uint16_t EspClass::getVcc(void)
 {
+    InterruptLock lock;
     return system_get_vdd33();
 }
 
@@ -333,7 +334,7 @@ uint32_t EspClass::getSketchSize() {
     DEBUG_SERIAL.printf("num_segments=%u\r\n", image_header.num_segments);
 #endif
     for (uint32_t section_index = 0;
-        section_index < image_header.num_segments; 
+        section_index < image_header.num_segments;
         ++section_index)
     {
         section_header_t section_header = {0};
@@ -395,8 +396,7 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println("Update SUCCESS");
-#endif  
+#endif
     if(restartOnSuccess) ESP.restart();
     return true;
 }
-

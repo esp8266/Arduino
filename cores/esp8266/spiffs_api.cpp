@@ -32,6 +32,8 @@ extern "C" {
 #include "spi_flash.h"
 }
 
+using namespace fs;
+
 extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
 extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size);
 extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst);
@@ -237,7 +239,7 @@ public:
     size_t position() const override {
         CHECKFD();
 
-        auto result = SPIFFS_tell(_fs->getFs(), _fd);
+        auto result = SPIFFS_lseek(_fs->getFs(), _fd, 0, SPIFFS_SEEK_CUR);
         if (result < 0) {
             DEBUGV("SPIFFS_tell rc=%d\r\n", result);
             return 0;
@@ -257,6 +259,12 @@ public:
 
         SPIFFS_close(_fs->getFs(), _fd);
         DEBUGV("SPIFFS_close: fd=%d\r\n", _fd);
+    }
+
+    const char* name() const override {
+        CHECKFD();
+
+        return (const char*) _stat.name;
     }
 
 protected:
@@ -283,10 +291,11 @@ public:
             return FileImplPtr();
         }
         int mode = getSpiffsMode(openMode, accessMode);
-        spiffs_file fd = SPIFFS_open_by_dirent(_fs->getFs(), &_dirent, mode, 0);
+        auto fs = _fs->getFs();
+        spiffs_file fd = SPIFFS_open_by_dirent(fs, &_dirent, mode, 0);
         if (fd < 0) {
             DEBUGV("SPIFFSDirImpl::openFile: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n",
-                fd, _dirent.name, openMode, accessMode, _fs.err_code);
+                fd, _dirent.name, openMode, accessMode, fs->err_code);
             return FileImplPtr();
         }
         return std::make_shared<SPIFFSFileImpl>(_fs, fd);
@@ -297,6 +306,13 @@ public:
             return nullptr;
 
         return (const char*) _dirent.name;
+    }
+
+    size_t fileSize() override {
+        if (!_valid)
+            return 0;
+
+        return _dirent.size;
     }
 
     bool next() override {

@@ -11,7 +11,7 @@ Pin 16 can be `INPUT`, `OUTPUT` or `INPUT_PULLDOWN_16`. At startup, pins are con
 
 Pins may also serve other functions, like Serial, I2C, SPI. These functions are normally activated by the corresponding library. The diagram below shows pin mapping for the popular ESP-12 module.
 
-![Pin Functions](https://cdn.rawgit.com/esp8266/Arduino/doc-update/hardware/esp8266com/esp8266/doc/esp12.svg)
+![Pin Functions](esp12.png)
 
 Digital pins 6—11 are not shown on this diagram because they are used to connect flash memory chip on most modules. Trying to use these pins as IOs will likely cause the program to crash.
 
@@ -103,17 +103,184 @@ const char HTTP[] PROGMEM = "http:";
 }
 ```
 
+## File system
+
+Even though file system is stored on the same flash chip as the program, programming new sketch will not modify file system contents. This allows to use file system to store sketch data, configuration files, or content for Web server.
+
+The following diagram illustrates flash layout used in Arduino environment:
+
+    |--------------|-------|---------------|--|--|--|--|--|
+    ^              ^       ^               ^     ^
+    Sketch    OTA update   File system   EEPROM  WiFi config (SDK)
+
+File system size depends on the flash chip size. Depending on the board which is selected in IDE, you have the following options for flash size:
+
+Board | Flash chip size, bytes | File system size, bytes
+------|-----------------|-----------------
+Generic module | 512k | 64k
+Generic module | 1M | 64k, 128k, 256k, 512k
+Generic module | 2M | 1M
+Generic module | 4M | 3M
+Adafruit HUZZAH | 4M | 3M
+NodeMCU 0.9    | 4M | 3M
+NodeMCU 1.0    | 4M | 3M
+Olimex MOD-WIFI-ESP8266(-DEV)| 2M | 1M
+SparkFun Thing | 512k | 64k
+SweetPea ESP-210 | 4M | 3M
+
+**Note:** to use any of file system functions in the sketch, add the following include to the sketch:
+
+```c++
+#include "FS.h"
+```
+
+### File system object (SPIFFS)
+
+#### begin
+
+```c++
+SPIFFS.begin()
+```
+
+This method mounts SPIFFS file system. It must be called before any other
+FS APIs are used. Returns *true* if file system was mounted successfully, false
+otherwise.
+
+#### open
+
+```c++
+SPIFFS.open(path, mode)
+```
+
+Opens a file. `path` should be an absolute path starting with a slash
+(e.g. `/dir/filename.txt`). `mode` is a string specifying access mode. It can be
+one of "r", "w", "a", "r+", "w+", "a+". Meaning of these modes is the same as
+for `fopen` C function.
+
+Returns *File* object. To check whether the file was opened successfully, use
+the boolean operator.
+
+```c++
+File f = SPIFFS.open("/f.txt", "w");
+if (!f) {
+    Serial.println("file open failed");
+}
+```
+
+#### openDir
+
+```c++
+SPIFFS.openDir(path)
+```
+
+Opens a directory given its absolute path. Returns a *Dir* object. To check if
+directory was opened successfully, use the boolean operator, similar to opening
+a file.
+
+#### remove
+
+```c++
+SPIFFS.remove(path)
+```
+
+Deletes the file given its absolute path. Returns *true* if file was deleted successfully.
+
+#### rename
+
+```c++
+SPIFFS.rename(pathFrom, pathTo)
+```
+
+Renames file from `pathFrom` to `pathTo`. Paths must be absolute. Returns *true*
+if file was renamed successfully.
+
+### Directory object (Dir)
+
+The purpose of *Dir* object is to iterate over files inside a directory.
+It provides three methods: `next()`, `fileName()`, and `openFile(mode)`.
+
+The following example shows how it should be used:
+
+```c++
+Dir dir = SPIFFS.openDir("/data");
+while (dir.next()) {
+    Serial.print(dir.fileName());
+    File f = dir.openFile("r");
+    Serial.println(f.size());
+}
+```
+
+`dir.next()` returns true while there are files in the directory to iterate over.
+It must be called before calling `fileName` and `openFile` functions.
+
+`openFile` method takes *mode* argument which has the same meaning as for `SPIFFS.open` function.
+
+### File object
+
+`SPIFFS.open` and `dir.openFile` functions return a *File* object. This object
+supports all the functions of *Stream*, so you can use `readBytes`, `findUntil`,
+`parseInt`, `println`, and all other *Stream* methods.
+
+There are also some functions which are specific to *File* object.
+
+#### seek
+
+```c++
+file.seek(offset, mode)
+```
+
+This function behaves like `fseek` C function. Depending on the value of `mode`,
+it moves current position in a file as follows:
+
+- if `mode` is `SeekSet`, position is set to `offset` bytes from the beginning.
+- if `mode` is `SeekCur`, current position is moved by `offset` bytes.
+- if `mode` is `SeekEnd`, position is set to `offset` bytes from the end of the
+file.
+
+Returns *true* if position was set successfully.
+
+#### position
+
+```c++
+file.position()
+```
+
+Returns the current position inside the file, in bytes.
+
+#### size
+
+```c++
+file.size()
+```
+
+Returns file size, in bytes.
+
+
+#### name
+
+```c++
+String name = file.name();
+```
+
+Returns file name, as `const char*`. Convert it to *String* for storage.
+
+#### close
+
+```c++
+file.close()
+```
+
+Close the file. No other operations should be performed on *File* object after `close` function was called.
 
 ## WiFi(ESP8266WiFi library)
 
 This is mostly similar to WiFi shield library. Differences include:
 
-- `WiFi.mode(m)`: set mode to `WIFI_AP`, `WIFI_STA`, or `WIFI_AP_STA`.
+- `WiFi.mode(m)`: set mode to `WIFI_AP`, `WIFI_STA`, `WIFI_AP_STA` or `WIFI_OFF`.
 - call `WiFi.softAP(ssid)` to set up an open network
 - call `WiFi.softAP(ssid, password)` to set up a WPA2-PSK network (password should be at least 8 characters)
 - `WiFi.macAddress(mac)` is for STA, `WiFi.softAPmacAddress(mac)` is for AP.
 - `WiFi.localIP()` is for STA, `WiFi.softAPIP()` is for AP.
-- `WiFi.RSSI()` doesn't work
 - `WiFi.printDiag(Serial)` will print out some diagnostic info
 - `WiFiUDP` class supports sending and receiving multicast packets on STA interface.
 When sending a multicast packet, replace `udp.beginPacket(addr, port)` with
@@ -122,7 +289,6 @@ When listening to multicast packets, replace `udp.begin(port)` with
 `udp.beginMulticast(WiFi.localIP(), multicast_ip_addr, port)`.
 You can use `udp.destinationIP()` to tell whether the packet received was
 sent to the multicast or unicast address.
-Also note that multicast doesn't work on softAP interface.
 
 `WiFiServer`, `WiFiClient`, and `WiFiUDP` behave mostly the same way as with WiFi shield library.
 Four samples are provided for this library.
@@ -205,7 +371,6 @@ instead of the one that comes with this package.
 ## mDNS and DNS-SD responder (ESP8266mDNS library)
 
 Allows the sketch to respond to multicast DNS queries for domain names like "foo.local", and DNS-SD (service dicovery) queries.
-Currently the library only works on STA interface, AP interface is not supported.
 See attached example for details.
 
 ## SSDP responder (ESP8266SSDP)
