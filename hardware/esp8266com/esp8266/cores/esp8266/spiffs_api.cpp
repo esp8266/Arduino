@@ -23,9 +23,12 @@
  */
 
 #include "FS.h"
+#undef max
+#undef min
 #include "FSImpl.h"
 #include "spiffs/spiffs.h"
 #include "debug.h"
+#include <limits>
 
 extern "C" {
 #include "c_types.h"
@@ -118,6 +121,27 @@ protected:
         config.phys_erase_block = SPI_FLASH_SEC_SIZE;
         config.log_block_size   = _blockSize;
         config.log_page_size    = _pageSize;
+
+
+        if (((uint32_t) std::numeric_limits<spiffs_block_ix>::max()) < (_size / _blockSize)) {
+            DEBUGV("spiffs_block_ix type too small");
+            abort();
+        }
+
+        if (((uint32_t) std::numeric_limits<spiffs_page_ix>::max()) < (_size / _pageSize)) {
+            DEBUGV("spiffs_page_ix type too small");
+            abort();
+        }
+
+        if (((uint32_t) std::numeric_limits<spiffs_obj_id>::max()) < (2 + (_size / (2*_pageSize))*2)) {
+            DEBUGV("spiffs_obj_id type too small");
+            abort();
+        }
+
+        if (((uint32_t) std::numeric_limits<spiffs_span_ix>::max()) < (_size / _pageSize - 1)) {
+            DEBUGV("spiffs_span_ix type too small");
+            abort();
+        }
 
         // hack: even though fs is not initialized at this point,
         // SPIFFS_buffer_bytes_for_cache uses only fs->config.log_page_size
@@ -381,8 +405,8 @@ extern "C" uint32_t _SPIFFS_page;
 extern "C" uint32_t _SPIFFS_block;
 
 static SPIFFSImpl s_defaultFs(
-    (uint32_t) &_SPIFFS_start - 0x40200000,
-    (uint32_t) (&_SPIFFS_end - &_SPIFFS_start),
+    (uint32_t) (&_SPIFFS_start) - 0x40200000,
+    (uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start),
     (uint32_t) &_SPIFFS_page,
     (uint32_t) &_SPIFFS_block,
     5);
