@@ -31,18 +31,20 @@ extern "C" {
 }
 
 static int spi_flash_read_locked(uint32_t addr, uint32_t* dst, uint32_t size) {
-    InterruptLock lock;
+    optimistic_yield(10000);
+    AutoInterruptLock(5);
     return spi_flash_read(addr, dst, size);
 }
 
 static int spi_flash_write_locked(uint32_t addr, const uint32_t* src, uint32_t size) {
-    InterruptLock lock;
+    optimistic_yield(10000);
+    AutoInterruptLock(5);
     return spi_flash_write(addr, (uint32_t*) src, size);
 }
 
 static int spi_flash_erase_sector_locked(uint32_t sector) {
     optimistic_yield(10000);
-    InterruptLock lock;
+    AutoInterruptLock(5);
     return spi_flash_erase_sector(sector);
 }
 
