@@ -209,6 +209,15 @@ int WiFiClient::available()
     return result;
 }
 
+int WiFiClient::available_nb()
+{
+    if (!_client)
+        return false;
+
+    return _client->getSize();
+
+}
+
 int WiFiClient::read()
 {
     if (!available())

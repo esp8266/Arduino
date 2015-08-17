@@ -52,6 +52,7 @@ public:
   size_t write(T& source, size_t unitSize);
 
   virtual int available();
+  virtual int available_nb();
   virtual int read();
   virtual int read(uint8_t *buf, size_t size);
   virtual int peek();
