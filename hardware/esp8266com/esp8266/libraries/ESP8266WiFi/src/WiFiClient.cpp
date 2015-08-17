@@ -100,6 +100,7 @@ int WiFiClient::connectex(IPAddress ip, uint16_t port,bool block)
 {
     ip_addr_t addr;
     addr.addr = ip;
+    connecterr=0;
 
     if (_client)
         stop();
@@ -122,8 +123,8 @@ int WiFiClient::connectex(IPAddress ip, uint16_t port,bool block)
     }
 
     tcp_arg(pcb, this);
-    tcp_err(pcb, &WiFiClient::_s_err);
     if (block) {
+        tcp_err(pcb, &WiFiClient::_s_err);
         tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
 
         esp_yield();
@@ -133,6 +134,7 @@ int WiFiClient::connectex(IPAddress ip, uint16_t port,bool block)
         // tcp_abort(pcb);
         return 0;
     } else {
+        tcp_err(pcb, &WiFiClient::_s_err_nb);
         tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected_nb));
         return -1;
     }
@@ -159,6 +161,11 @@ void WiFiClient::_err(int8_t err)
 {
     DEBUGV(":err %d\r\n", err);
     esp_schedule();
+}
+void WiFiClient::_err_nb(int8_t err)
+{
+    connecterr=err;
+    DEBUGV(":err %d\r\n", err);
 }
 
 
@@ -288,6 +295,10 @@ int8_t WiFiClient::_s_connected_nb(void* arg, void* tpcb, int8_t err)
 void WiFiClient::_s_err(void* arg, int8_t err)
 {
     reinterpret_cast<WiFiClient*>(arg)->_err(err);
+}
+void WiFiClient::_s_err_nb(void* arg, int8_t err)
+{
+    reinterpret_cast<WiFiClient*>(arg)->_err_nb(err);
 }
 
 void WiFiClient::stopAll()

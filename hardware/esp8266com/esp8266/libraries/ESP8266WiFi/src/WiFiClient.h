@@ -91,7 +91,7 @@ public:
   friend class WiFiServer;
 
   using Print::write;
-
+  int8_t connecterr;
   static void stopAll();
 
 private:
@@ -99,10 +99,12 @@ private:
   static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
   static int8_t _s_connected_nb(void* arg, void* tpcb, int8_t err);
   static void _s_err(void* arg, int8_t err);
+  static void _s_err_nb(void* arg, int8_t err);
 
   int8_t _connected(void* tpcb, int8_t err);
   int8_t _connected_nb(void* tpcb, int8_t err);
   void _err(int8_t err);
+  void _err_nb(int8_t err);
 
   ClientContext* _client;
   static uint16_t _localPort;
