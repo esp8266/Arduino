@@ -86,17 +86,17 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 }
 
 
-int WiFiClient::connect(const char* host, uint16_t port)
+int WiFiClient::connectex(const char* host, uint16_t port,bool block)
 {
     IPAddress remote_addr;
     if (WiFi.hostByName(host, remote_addr))
     {
-        return connect(remote_addr, port);
+        return connectex(remote_addr, port,block);
     }
     return 0;
 }
 
-int WiFiClient::connect(IPAddress ip, uint16_t port)
+int WiFiClient::connectex(IPAddress ip, uint16_t port,bool block)
 {
     ip_addr_t addr;
     addr.addr = ip;
@@ -123,15 +123,19 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
 
     tcp_arg(pcb, this);
     tcp_err(pcb, &WiFiClient::_s_err);
-    tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
+    if (block) {
+        tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
 
-    esp_yield();
-    if (_client)
-        return 1;
-
-    //  if tcp_error was called, pcb has already been destroyed.
-    // tcp_abort(pcb);
-    return 0;
+        esp_yield();
+        if (_client)
+            return 1;
+        //  if tcp_error was called, pcb has already been destroyed.
+        // tcp_abort(pcb);
+        return 0;
+    } else {
+        tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected_nb));
+        return -1;
+    }
 }
 
 int8_t WiFiClient::_connected(void* pcb, int8_t err)
@@ -140,6 +144,14 @@ int8_t WiFiClient::_connected(void* pcb, int8_t err)
     _client = new ClientContext(tpcb, 0, 0);
     _client->ref();
     esp_schedule();
+    return ERR_OK;
+}
+
+int8_t WiFiClient::_connected_nb(void* pcb, int8_t err)
+{
+    tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
+    _client = new ClientContext(tpcb, 0, 0);
+    _client->ref();
     return ERR_OK;
 }
 
@@ -266,6 +278,11 @@ uint16_t WiFiClient::remotePort()
 int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
 {
     return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);
+}
+
+int8_t WiFiClient::_s_connected_nb(void* arg, void* tpcb, int8_t err)
+{
+    return reinterpret_cast<WiFiClient*>(arg)->_connected_nb(tpcb, err);
 }
 
 void WiFiClient::_s_err(void* arg, int8_t err)

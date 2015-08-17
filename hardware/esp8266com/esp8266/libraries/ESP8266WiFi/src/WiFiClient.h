@@ -42,8 +42,10 @@ public:
   WiFiClient& operator=(const WiFiClient&);
 
   uint8_t status();
-  virtual int connect(IPAddress ip, uint16_t port);
-  virtual int connect(const char *host, uint16_t port);
+  virtual int connect(IPAddress ip, uint16_t port) {return connectex(ip,port,true);}
+  virtual int connectex(IPAddress ip, uint16_t port, bool block);
+  virtual int connect(const char *host, uint16_t port) {return connectex(host,port,true);}
+  virtual int connectex(const char *host, uint16_t port, bool block);
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
   template <typename T>
@@ -95,9 +97,11 @@ public:
 private:
 
   static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
+  static int8_t _s_connected_nb(void* arg, void* tpcb, int8_t err);
   static void _s_err(void* arg, int8_t err);
 
   int8_t _connected(void* tpcb, int8_t err);
+  int8_t _connected_nb(void* tpcb, int8_t err);
   void _err(int8_t err);
 
   ClientContext* _client;
