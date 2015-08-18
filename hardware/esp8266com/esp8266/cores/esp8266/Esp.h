@@ -117,6 +117,10 @@ class EspClass {
         FlashMode_t getFlashChipMode();
         uint32_t getFlashChipSizeByChipId();
 
+        bool flashEraseSector(uint32_t sector);
+        bool flashWrite(uint32_t offset, uint32_t *data, size_t size);
+        bool flashRead(uint32_t offset, uint32_t *data, size_t size);
+
         uint32_t getSketchSize();
         uint32_t getFreeSketchSpace();
         bool updateSketch(Stream& in, uint32_t size, bool restartOnFail = false, bool restartOnSuccess = true);
