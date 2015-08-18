@@ -400,3 +400,26 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
     if(restartOnSuccess) ESP.restart();
     return true;
 }
+
+static const int FLASH_INT_MASK = ((B10 << 8) | B00111010);
+
+bool EspClass::flashEraseSector(uint32_t sector) {
+    ets_isr_mask(FLASH_INT_MASK);
+    int rc = spi_flash_erase_sector(sector);
+    ets_isr_unmask(FLASH_INT_MASK);
+    return rc == 0;
+}
+
+bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
+    ets_isr_mask(FLASH_INT_MASK);
+    int rc = spi_flash_write(offset, (uint32_t*) data, size);
+    ets_isr_unmask(FLASH_INT_MASK);
+    return rc == 0;
+}
+
+bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
+    ets_isr_mask(FLASH_INT_MASK);
+    int rc = spi_flash_read(offset, (uint32_t*) data, size);
+    ets_isr_unmask(FLASH_INT_MASK);
+    return rc == 0;
+}
