@@ -111,7 +111,7 @@ protected:
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(String data);
   static const char* _responseCodeToString(int code);
-  void _parseForm(WiFiClient& client, String boundary, uint32_t len);
+  bool _parseForm(WiFiClient& client, String boundary, uint32_t len);
   void _uploadWriteByte(uint8_t b);
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
