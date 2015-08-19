@@ -291,6 +291,22 @@ uint16_t WiFiClient::remotePort()
     return _client->getRemotePort();
 }
 
+IPAddress WiFiClient::localIP()
+{
+    if (!_client)
+        return IPAddress(0U);
+
+    return IPAddress(_client->getLocalAddress());
+}
+
+uint16_t WiFiClient::localPort()
+{
+    if (!_client)
+        return 0;
+
+    return _client->getLocalPort();
+}
+
 int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
 {
     return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);

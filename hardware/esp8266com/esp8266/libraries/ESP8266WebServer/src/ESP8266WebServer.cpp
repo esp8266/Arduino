@@ -253,6 +253,10 @@ bool ESP8266WebServer::hasArg(const char* name) {
   return false;
 }
 
+String ESP8266WebServer::hostHeader() {
+  return _hostHeader;
+}
+
 void ESP8266WebServer::onFileUpload(THandlerFunction fn) {
   _fileUploadHandler = fn;
 }
