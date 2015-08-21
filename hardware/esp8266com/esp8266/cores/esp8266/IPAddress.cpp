@@ -64,3 +64,17 @@ size_t IPAddress::printTo(Print& p) const {
     return n;
 }
 
+char *IPAddress::toCharArray()
+{
+    static char szRet[20];
+    String str = String(_address.bytes[0]);
+    str += ".";
+    str += String(_address.bytes[1]);
+    str += ".";
+    str += String(_address.bytes[2]);
+    str += ".";
+    str += String(_address.bytes[3]);
+    str.toCharArray(szRet, 20);
+    return szRet;
+}
+
