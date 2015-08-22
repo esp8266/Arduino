@@ -177,6 +177,38 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     return _client->write(reinterpret_cast<const char*>(buf), size);
 }
 
+size_t WiFiClient::write_P(PGM_P buf, size_t size)
+{
+    if (!_client || !size)
+    {
+        return 0;
+    }
+
+    char chunkUnit[WIFICLIENT_MAX_PACKET_SIZE + 1];
+    chunkUnit[WIFICLIENT_MAX_PACKET_SIZE] = '\0';
+    while (buf != NULL) 
+    {
+        size_t chunkUnitLen;
+        PGM_P chunkNext;
+        chunkNext = (PGM_P)memccpy_P((void*)chunkUnit, (PGM_VOID_P)buf, 0, WIFICLIENT_MAX_PACKET_SIZE);
+        if (chunkNext == NULL) 
+        {
+            // no terminator, more data available
+            buf += WIFICLIENT_MAX_PACKET_SIZE;
+            chunkUnitLen = WIFICLIENT_MAX_PACKET_SIZE;
+        }
+        else 
+        {
+            // reached terminator
+            chunkUnitLen = chunkNext - buf;
+            buf = NULL;
+        }
+        if (size < WIFICLIENT_MAX_PACKET_SIZE) chunkUnitLen = size;
+        _client->write((const char*)chunkUnit, chunkUnitLen);
+    }
+    return size;
+}
+
 int WiFiClient::available()
 {
     if (!_client)
