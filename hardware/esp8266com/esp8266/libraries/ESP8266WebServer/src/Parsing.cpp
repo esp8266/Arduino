@@ -24,7 +24,7 @@
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
 
-#define DEBUG
+//#define DEBUG
 #define DEBUG_OUTPUT Serial
 
 bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
