@@ -86,38 +86,44 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 }
 
 
-int WiFiClient::connectex(const char* host, uint16_t port,bool block)
+int WiFiClient::_connect(const char* host, uint16_t port,bool block)
 {
+    _asyncerr=false;
     IPAddress remote_addr;
     if (WiFi.hostByName(host, remote_addr))
     {
-        return connectex(remote_addr, port,block);
+        return _connect(remote_addr, port,block);
     }
+    _asyncerr=true;
     return 0;
 }
 
-int WiFiClient::connectex(IPAddress ip, uint16_t port,bool block)
+int WiFiClient::_connect(IPAddress ip, uint16_t port,bool block)
 {
+    _asyncerr=false;
     ip_addr_t addr;
     addr.addr = ip;
-    connecterr=0;
 
-    if (_client)
+    if (_client) {
+        _asyncerr=true;
         stop();
-
+    }
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
     // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
     netif* interface = ip_route(&addr);
     if (!interface) {
+        _asyncerr=true;
         DEBUGV("no route to host\r\n");
         return 0;
     }
 
     tcp_pcb* pcb = tcp_new();
-    if (!pcb)
+    if (!pcb) {
+        _asyncerr=true;
         return 0;
-
+    }
+    
     if (_localPort > 0) {
         pcb->local_port = _localPort++;
     }
@@ -164,7 +170,7 @@ void WiFiClient::_err(int8_t err)
 }
 void WiFiClient::_err_nb(int8_t err)
 {
-    connecterr=err;
+    _asyncerr=true;
     DEBUGV(":err %d\r\n", err);
 }
 

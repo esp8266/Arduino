@@ -21,7 +21,7 @@
 
 #ifndef wificlient_h
 #define wificlient_h
-#include "Arduino.h"	
+#include "Arduino.h"
 #include "Print.h"
 #include "Client.h"
 #include "IPAddress.h"
@@ -34,7 +34,10 @@ class WiFiServer;
 class WiFiClient : public Client, public SList<WiFiClient> {
 protected:
   WiFiClient(ClientContext* client);
-
+  
+  virtual int _connect(const char *host, uint16_t port, bool block);
+  virtual int _connect(IPAddress ip, uint16_t port, bool block);
+  
 public:
   WiFiClient();
   virtual ~WiFiClient();
@@ -42,10 +45,11 @@ public:
   WiFiClient& operator=(const WiFiClient&);
 
   uint8_t status();
-  virtual int connect(IPAddress ip, uint16_t port) {return connectex(ip,port,true);}
-  virtual int connectex(IPAddress ip, uint16_t port, bool block);
-  virtual int connect(const char *host, uint16_t port) {return connectex(host,port,true);}
-  virtual int connectex(const char *host, uint16_t port, bool block);
+  virtual int connect(IPAddress ip, uint16_t port) {return _connect(ip,port,true);}
+  virtual int connectAsync(IPAddress ip, uint16_t port) {return _connect(ip,port,false);}
+  virtual int connect(const char *host, uint16_t port) {return _connect(host,port,true);}
+  virtual int connectAsync(const char *host, uint16_t port) {return _connect(host,port,false);}
+  
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
   template <typename T>
@@ -94,11 +98,10 @@ public:
   friend class WiFiServer;
 
   using Print::write;
-  int8_t connecterr;
   static void stopAll();
-
+  bool asyncerr() {return _asyncerr;}
 private:
-
+  bool _asyncerr;
   static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
   static int8_t _s_connected_nb(void* arg, void* tpcb, int8_t err);
   static void _s_err(void* arg, int8_t err);
