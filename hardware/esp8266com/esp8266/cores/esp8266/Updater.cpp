@@ -12,13 +12,13 @@ extern "C" {
 
 extern "C" uint32_t _SPIFFS_start;
 
-UpdaterClass::UpdaterClass() 
+UpdaterClass::UpdaterClass()
 : _error(0)
 , _buffer(0)
 , _bufferLen(0)
 , _size(0)
 , _startAddress(0)
-, _currentAddress(0) 
+, _currentAddress(0)
 {
 }
 
@@ -39,7 +39,7 @@ bool UpdaterClass::begin(size_t size){
 #endif
     return false;
   }
-  
+
   if(size == 0){
     _error = UPDATE_ERROR_SIZE;
 #ifdef DEBUG_UPDATER
@@ -47,10 +47,10 @@ bool UpdaterClass::begin(size_t size){
 #endif
     return false;
   }
-  
+
   _reset();
   _error = 0;
-  
+
   //size of current sketch rounded to a sector
   uint32_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
   //address of the end of the space available for sketch and update
@@ -59,7 +59,7 @@ bool UpdaterClass::begin(size_t size){
   uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
   //address where we will start writing the update
   uint32_t updateStartAddress = updateEndAddress - roundedSize;
-  
+
   //make sure that the size of both sketches is less than the total space (updateEndAddress)
   if(updateStartAddress < currentSketchSize){
     _error = UPDATE_ERROR_SPACE;
@@ -68,13 +68,13 @@ bool UpdaterClass::begin(size_t size){
 #endif
     return false;
   }
-  
+
   //initialize
   _startAddress = updateStartAddress;
   _currentAddress = _startAddress;
   _size = size;
   _buffer = new uint8_t[FLASH_SECTOR_SIZE];
-  
+
   return true;
 }
 
@@ -85,30 +85,30 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     return false;
   }
-  
+
   if(hasError() || (!isFinished() && !evenIfRemaining)){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf("premature end: res:%u, pos:%u/%u\n", getError(), progress(), _size);
 #endif
-    
+
     _reset();
     return false;
   }
-  
+
   if(evenIfRemaining){
     if(_bufferLen > 0){
       _writeBuffer();
     }
     _size = progress();
   }
-  
+
   eboot_command ebcmd;
   ebcmd.action = ACTION_COPY_RAW;
   ebcmd.args[0] = _startAddress;
   ebcmd.args[1] = 0x00000;
   ebcmd.args[2] = _size;
   eboot_command_write(&ebcmd);
-  
+
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08X\n", _startAddress, _size);
 #endif
@@ -126,23 +126,23 @@ bool UpdaterClass::_writeBuffer(){
     _error = UPDATE_ERROR_WRITE;
     _currentAddress = (_startAddress + _size);
 #ifdef DEBUG_UPDATER
-        printError(DEBUG_UPDATER);
+    printError(DEBUG_UPDATER);
 #endif
-        return false;
-    }
-    _currentAddress += _bufferLen;
-    _bufferLen = 0;
-    return true;
+    return false;
+  }
+  _currentAddress += _bufferLen;
+  _bufferLen = 0;
+  return true;
 }
 
 size_t UpdaterClass::write(uint8_t *data, size_t len) {
   size_t left = len;
   if(hasError() || !isRunning())
     return 0;
-  
+
   if(len > remaining())
     len = remaining();
-  
+
   while((_bufferLen + left) > FLASH_SECTOR_SIZE) {
     size_t toBuff = FLASH_SECTOR_SIZE - _bufferLen;
     memcpy(_buffer + _bufferLen, data + (len - left), toBuff);
@@ -170,7 +170,7 @@ size_t UpdaterClass::writeStream(Stream &data) {
   size_t toRead = 0;
   if(hasError() || !isRunning())
     return 0;
-  
+
   while(remaining()) {
     toRead = FLASH_SECTOR_SIZE - _bufferLen;
     toRead = data.readBytes(_buffer + _bufferLen, toRead);
