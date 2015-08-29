@@ -130,7 +130,7 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, 
                 } else {
 
                     WiFiUDP::stopAll();
-                    WiFiClient::stopAllexcepted(&tcp);
+                    WiFiClient::stopAllExcept(&tcp);
 
                     delay(100);
 
