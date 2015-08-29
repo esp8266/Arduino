@@ -128,10 +128,17 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, 
                     ret = HTTP_UPDATE_FAILD;
                     DEBUG_HTTP_UPDATE("[httpUpdate] FreeSketchSpace to low (%d) needed: %d\n", ESP.getFreeSketchSpace(), len);
                 } else {
-                    if(ESP.updateSketch(tcp, len)) {
-                        // may never reached!
+
+                    WiFiUDP::stopAll();
+                    WiFiClient::stopAllexcepted(&tcp);
+
+                    delay(100);
+
+                    if(ESP.updateSketch(tcp, len, false, false)) {
                         ret = HTTP_UPDATE_OK;
                         DEBUG_HTTP_UPDATE("[httpUpdate] Update ok\n");
+                        tcp.stop();
+                        ESP.restart();
                     } else {
                         ret = HTTP_UPDATE_FAILD;
                         DEBUG_HTTP_UPDATE("[httpUpdate] Update failed\n");
