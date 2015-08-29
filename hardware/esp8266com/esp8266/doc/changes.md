@@ -6,18 +6,30 @@ title: Change log
 
 ### Core
 
-- Add first batch of file system APIs
+- Add file system APIs and documentation
+- Add ConfigFile example
 - Allow user to run code in user_rf_pre_init
+- Add strtoul and strtol, fix strtod
+- Update documentation for NodeMCU and Olimex boards
+- Disable interrupts inside ESP.getVcc (#567)
+- Erase RTC RAM only if RF mode looks invalid (#619)
 
 
 ### Libraries
 
 - ESP8266WebServer: support for sending of PROGMEM strings
+- ESP8266WebServer: support for serving files from file system
 - ESP8266WiFi: fix mode selection (#529)
+- ESP8266mDNS: allow to work on SoftAP interface
+- EEPROM: round requested size to 4 bytes (#659)
+- Add ESP8266AVRISP library
 
 ### Tools
 
-- Update SDK to 1.2.0_15_07_13_p4
+- Update SDK to 1.3.0_15_08_10_p1
+- Update esptool to 0.4.6
+- Bump toolchain version to force libm update on Windows
+- ESP8266FS tool update
 
 ---
 ## 1.6.5-947-g39819f0

@@ -5,6 +5,11 @@
 
 //#define DEBUG_UPDATER Serial
 
+extern "C" {
+    #include "c_types.h"
+    #include "spi_flash.h"
+}
+
 extern "C" uint32_t _SPIFFS_start;
 
 UpdaterClass::UpdaterClass() 
@@ -112,28 +117,14 @@ bool UpdaterClass::end(bool evenIfRemaining){
   return true;
 }
 
-bool UpdaterClass::_writeBuffer() {
-    int rc = 0;
-    delay(2); // give the rtos some time to handle TCP
-    {
-        AutoInterruptLock(15);
-        rc = SPIEraseSector(_currentAddress / FLASH_SECTOR_SIZE);
-    }
+bool UpdaterClass::_writeBuffer(){
+  yield();
+  bool result = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE) &&
+                ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
 
-    delay(2); // give the rtos some time to handle TCP
-
-    if(!rc) {
-        {
-            AutoInterruptLock(15);
-            rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
-        }
-    }
-
-    delay(2); // give the rtos some time to handle TCP
-
-    if(rc) {
-        _error = UPDATE_ERROR_WRITE;
-        _currentAddress = (_startAddress + _size);
+  if (!result) {
+    _error = UPDATE_ERROR_WRITE;
+    _currentAddress = (_startAddress + _size);
 #ifdef DEBUG_UPDATER
         printError(DEBUG_UPDATER);
 #endif

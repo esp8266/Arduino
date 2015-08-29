@@ -125,6 +125,12 @@ class ClientContext {
             return _pcb->remote_port;
         }
 
+        uint32_t getLocalAddress() {
+            if(!_pcb) return 0;
+
+            return _pcb->local_ip.addr;
+        }
+
         uint16_t getLocalPort() {
             if(!_pcb) return 0;
 

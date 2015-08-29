@@ -23,30 +23,11 @@
 #include <algorithm>
 #include "spiffs/spiffs.h"
 #include "debug.h"
-#include "interrupts.h"
 
 extern "C" {
 #include "c_types.h"
 #include "spi_flash.h"
 }
-
-static int spi_flash_read_locked(uint32_t addr, uint32_t* dst, uint32_t size) {
-    InterruptLock lock;
-    return spi_flash_read(addr, dst, size);
-}
-
-static int spi_flash_write_locked(uint32_t addr, const uint32_t* src, uint32_t size) {
-    InterruptLock lock;
-    return spi_flash_write(addr, (uint32_t*) src, size);
-}
-
-static int spi_flash_erase_sector_locked(uint32_t sector) {
-    optimistic_yield(10000);
-    InterruptLock lock;
-    return spi_flash_erase_sector(sector);
-}
-
-
 /*
  spi_flash_read function requires flash address to be aligned on word boundary.
  We take care of this by reading first and last words separately and memcpy
@@ -62,6 +43,8 @@ alignedEnd:                      ^
 */
 
 int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
+    optimistic_yield(10000);
+
     uint32_t result = SPIFFS_OK;
     uint32_t alignedBegin = (addr + 3) & (~3);
     uint32_t alignedEnd = (addr + size) & (~3);
@@ -69,7 +52,7 @@ int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
     if (addr < alignedBegin) {
         uint32_t nb = alignedBegin - addr;
         uint32_t tmp;
-        if (spi_flash_read_locked(alignedBegin - 4, &tmp, 4) != SPI_FLASH_RESULT_OK) {
+        if (!ESP.flashRead(alignedBegin - 4, &tmp, 4)) {
             DEBUGV("_spif_read(%d) addr=%x size=%x ab=%x ae=%x\r\n",
                 __LINE__, addr, size, alignedBegin, alignedEnd);
             return SPIFFS_ERR_INTERNAL;
@@ -78,8 +61,8 @@ int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
     }
 
     if (alignedEnd != alignedBegin) {
-        if (spi_flash_read_locked(alignedBegin, (uint32_t*) (dst + alignedBegin - addr),
-                alignedEnd - alignedBegin) != SPI_FLASH_RESULT_OK) {
+        if (!ESP.flashRead(alignedBegin, (uint32_t*) (dst + alignedBegin - addr),
+                alignedEnd - alignedBegin)) {
             DEBUGV("_spif_read(%d) addr=%x size=%x ab=%x ae=%x\r\n",
                 __LINE__, addr, size, alignedBegin, alignedEnd);
             return SPIFFS_ERR_INTERNAL;
@@ -89,7 +72,7 @@ int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
     if (addr + size > alignedEnd) {
         uint32_t nb = addr + size - alignedEnd;
         uint32_t tmp;
-        if (spi_flash_read_locked(alignedEnd, &tmp, 4) != SPI_FLASH_RESULT_OK) {
+        if (!ESP.flashRead(alignedEnd, &tmp, 4)) {
             DEBUGV("_spif_read(%d) addr=%x size=%x ab=%x ae=%x\r\n",
                 __LINE__, addr, size, alignedBegin, alignedEnd);
             return SPIFFS_ERR_INTERNAL;
@@ -114,6 +97,8 @@ int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
 static const int UNALIGNED_WRITE_BUFFER_SIZE = 512;
 
 int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
+    optimistic_yield(10000);
+
     uint32_t alignedBegin = (addr + 3) & (~3);
     uint32_t alignedEnd = (addr + size) & (~3);
 
@@ -121,7 +106,7 @@ int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
         uint32_t nb = alignedBegin - addr;
         uint32_t tmp = 0xffffffff;
         memcpy(((uint8_t* )&tmp) + 4 - nb, src, nb);
-        if (spi_flash_write_locked(alignedBegin - 4, &tmp, 4) != SPI_FLASH_RESULT_OK) {
+        if (!ESP.flashWrite(alignedBegin - 4, &tmp, 4)) {
             DEBUGV("_spif_write(%d) addr=%x size=%x ab=%x ae=%x\r\n",
                 __LINE__, addr, size, alignedBegin, alignedEnd);
             return SPIFFS_ERR_INTERNAL;
@@ -132,8 +117,8 @@ int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
         uint32_t* srcLeftover = (uint32_t*) (src + alignedBegin - addr);
         uint32_t srcAlign = ((uint32_t) srcLeftover) & 3;
         if (!srcAlign) {
-            if (spi_flash_write_locked(alignedBegin, (uint32_t*) srcLeftover,
-                    alignedEnd - alignedBegin) != SPI_FLASH_RESULT_OK) {
+            if (!ESP.flashWrite(alignedBegin, (uint32_t*) srcLeftover,
+                    alignedEnd - alignedBegin)) {
                 DEBUGV("_spif_write(%d) addr=%x size=%x ab=%x ae=%x\r\n",
                     __LINE__, addr, size, alignedBegin, alignedEnd);
                 return SPIFFS_ERR_INTERNAL;
@@ -145,8 +130,7 @@ int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
                 size_t willCopy = std::min(sizeLeft, sizeof(buf));
                 memcpy(buf, srcLeftover, willCopy);
 
-                if (spi_flash_write_locked(alignedBegin, (uint32_t*) buf,
-                        willCopy) != SPI_FLASH_RESULT_OK) {
+                if (!ESP.flashWrite(alignedBegin, (uint32_t*) buf, willCopy)) {
                     DEBUGV("_spif_write(%d) addr=%x size=%x ab=%x ae=%x\r\n",
                         __LINE__, addr, size, alignedBegin, alignedEnd);
                     return SPIFFS_ERR_INTERNAL;
@@ -164,7 +148,7 @@ int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
         uint32_t tmp = 0xffffffff;
         memcpy(&tmp, src + size - nb, nb);
 
-        if (spi_flash_write_locked(alignedEnd, &tmp, 4) != SPI_FLASH_RESULT_OK) {
+        if (!ESP.flashWrite(alignedEnd, &tmp, 4)) {
             DEBUGV("_spif_write(%d) addr=%x size=%x ab=%x ae=%x\r\n",
                 __LINE__, addr, size, alignedBegin, alignedEnd);
             return SPIFFS_ERR_INTERNAL;
@@ -183,7 +167,8 @@ int32_t spiffs_hal_erase(uint32_t addr, uint32_t size) {
     const uint32_t sector = addr / SPI_FLASH_SEC_SIZE;
     const uint32_t sectorCount = size / SPI_FLASH_SEC_SIZE;
     for (uint32_t i = 0; i < sectorCount; ++i) {
-        if (spi_flash_erase_sector_locked(sector + i) != 0) {
+        optimistic_yield(10000);
+        if (!ESP.flashEraseSector(sector + i)) {
             DEBUGV("_spif_erase addr=%x size=%d i=%d\r\n", addr, size, i);
             return SPIFFS_ERR_INTERNAL;
         }
