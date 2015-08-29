@@ -1,6 +1,7 @@
 #include "Updater.h"
 #include "Arduino.h"
 #include "eboot_command.h"
+#include "interrupts.h"
 
 //#define DEBUG_UPDATER Serial
 
@@ -111,28 +112,36 @@ bool UpdaterClass::end(bool evenIfRemaining){
   return true;
 }
 
-bool UpdaterClass::_writeBuffer(){
-  noInterrupts();
-  int rc = SPIEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
-  interrupts();
-  yield();
-  if(!rc){
-    noInterrupts();
-    rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
-    interrupts();
-  }
-  interrupts();
-  if (rc) {
-    _error = UPDATE_ERROR_WRITE;
-    _currentAddress = (_startAddress + _size);
+bool UpdaterClass::_writeBuffer() {
+    int rc = 0;
+    delay(2); // give the rtos some time to handle TCP
+    {
+        AutoInterruptLock(15);
+        rc = SPIEraseSector(_currentAddress / FLASH_SECTOR_SIZE);
+    }
+
+    delay(2); // give the rtos some time to handle TCP
+
+    if(!rc) {
+        {
+            AutoInterruptLock(15);
+            rc = SPIWrite(_currentAddress, _buffer, _bufferLen);
+        }
+    }
+
+    delay(2); // give the rtos some time to handle TCP
+
+    if(rc) {
+        _error = UPDATE_ERROR_WRITE;
+        _currentAddress = (_startAddress + _size);
 #ifdef DEBUG_UPDATER
-    printError(DEBUG_UPDATER);
+        printError(DEBUG_UPDATER);
 #endif
-    return false;
-  }
-  _currentAddress += _bufferLen;
-  _bufferLen = 0;
-  return true;
+        return false;
+    }
+    _currentAddress += _bufferLen;
+    _bufferLen = 0;
+    return true;
 }
 
 size_t UpdaterClass::write(uint8_t *data, size_t len) {

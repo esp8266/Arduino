@@ -125,6 +125,12 @@ class ClientContext {
             return _pcb->remote_port;
         }
 
+        uint16_t getLocalPort() {
+            if(!_pcb) return 0;
+
+            return _pcb->local_port;
+        }
+
         size_t getSize() const {
             if(!_rx_buf) return 0;
 
