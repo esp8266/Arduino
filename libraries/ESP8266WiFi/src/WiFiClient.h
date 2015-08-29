@@ -60,6 +60,8 @@ public:
 
   IPAddress remoteIP();
   uint16_t  remotePort();
+  IPAddress localIP();
+  uint16_t  localPort();
   bool getNoDelay();
   void setNoDelay(bool nodelay);
   static void setLocalPortStart(uint16_t port) { _localPort = port; }

@@ -24,8 +24,8 @@
 #include <Arduino.h>
 #include "WiFiServer.h"
 #include "WiFiClient.h"
-#include "FS.h"
 #include "ESP8266WebServer.h"
+#include "FS.h"
 #include "detail/RequestHandler.h"
 // #define DEBUG
 #define DEBUG_OUTPUT Serial
@@ -181,7 +181,7 @@ void ESP8266WebServer::sendContent(const String& content) {
   const size_t unit_size = HTTP_DOWNLOAD_UNIT_SIZE;
   size_t size_to_send = content.length();
   const char* send_start = content.c_str();
-  
+
   while (size_to_send) {
     size_t will_send = (size_to_send < unit_size) ? size_to_send : unit_size;
     size_t sent = _currentClient.write(send_start, will_send);
@@ -251,6 +251,10 @@ bool ESP8266WebServer::hasArg(const char* name) {
       return true;
   }
   return false;
+}
+
+String ESP8266WebServer::hostHeader() {
+  return _hostHeader;
 }
 
 void ESP8266WebServer::onFileUpload(THandlerFunction fn) {

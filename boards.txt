@@ -181,7 +181,7 @@ nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
 
 nodemcu.upload.tool=esptool
 nodemcu.upload.speed=115200
-nodemcu.upload.resetmethod=ck
+nodemcu.upload.resetmethod=nodemcu
 nodemcu.upload.maximum_size=1044464
 nodemcu.upload.maximum_data_size=81920
 nodemcu.upload.wait_for_upload_port=true
