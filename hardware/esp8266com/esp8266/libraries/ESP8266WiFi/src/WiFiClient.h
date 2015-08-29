@@ -70,8 +70,7 @@ public:
     uint8_t obuf[1460];
     size_t doneLen = 0;
     size_t sentLen;
-    int i;
-    
+
     while (src.available() > 1460){
       src.read(obuf, 1460);
       sentLen = write(obuf, 1460);
