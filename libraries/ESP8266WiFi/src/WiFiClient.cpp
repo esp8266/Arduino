@@ -302,22 +302,11 @@ void WiFiClient::stopAll()
 }
 
 
-void WiFiClient::stopAllexcepted(WiFiClient * exC) {
+void WiFiClient::stopAllExcept(WiFiClient * exC) {
     for (WiFiClient* it = _s_first; it; it = it->_next) {
         ClientContext* c = it->_client;
 
-        if(c && exC->_client) {
-            if(exC->_client->getRemoteAddress() == c->getRemoteAddress()) {
-                if(exC->_client->getRemotePort() == c->getRemotePort()) {
-                    if(exC->_client->getLocalPort() == c->getLocalPort()) {
-                        // ignore this
-                        c = NULL;
-                    }
-                }
-            }
-        }
-
-        if (c) {
+        if (c && c != exC->_client) {
             c->abort();
             c->unref();
             it->_client = 0;
