@@ -1,0 +1,3 @@
+# Set this to SDK path and save as Makefile.local
+SDK_BASE := $(HOME)/esp8266/sdk
+
