@@ -1,4 +1,4 @@
-# __This fork is no longer being maintained!__
+# _This fork is no longer being maintained!_
 
 # Please use the upstream version: https://github.com/esp8266/Arduino
 
