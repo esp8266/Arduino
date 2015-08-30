@@ -1,3 +1,9 @@
+# __This fork is no longer being maintained!__
+
+# Please use the upstream version: https://github.com/esp8266/Arduino
+
+* * *
+
 ESP8266 Arduino add-on
 ===========================================
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sandeepmistry/esp8266-Arduino?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
