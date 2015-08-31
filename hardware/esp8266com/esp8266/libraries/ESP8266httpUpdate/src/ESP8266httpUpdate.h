@@ -28,6 +28,8 @@
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
+#include <WiFiClient.h>
 
 //#define DEBUG_HTTP_UPDATE(...) Serial1.printf( __VA_ARGS__ )
 

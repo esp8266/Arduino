@@ -46,7 +46,7 @@
 
 #ifdef USE_OPTIMIZE_PRINTF
 #define os_printf(fmt, ...) do {	\
-	static const char flash_str[] ICACHE_RODATA_ATTR = fmt;	\
+	static const char flash_str[] ICACHE_RODATA_ATTR __attribute__((aligned(4))) = fmt;	\
 	os_printf_plus(flash_str, ##__VA_ARGS__);	\
 	} while(0)
 #else

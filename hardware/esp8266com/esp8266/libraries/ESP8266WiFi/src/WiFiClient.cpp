@@ -332,3 +332,16 @@ void WiFiClient::stopAll()
         }
     }
 }
+
+
+void WiFiClient::stopAllExcept(WiFiClient * exC) {
+    for (WiFiClient* it = _s_first; it; it = it->_next) {
+        ClientContext* c = it->_client;
+
+        if (c && c != exC->_client) {
+            c->abort();
+            c->unref();
+            it->_client = 0;
+        }
+    }
+}
