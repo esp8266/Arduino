@@ -29,14 +29,14 @@ size_t File::write(uint8_t c) {
     if (!_p)
         return 0;
 
-    _p->write(&c, 1);
+    return _p->write(&c, 1);
 }
 
 size_t File::write(const uint8_t *buf, size_t size) {
     if (!_p)
         return 0;
 
-    _p->write(buf, size);
+    return _p->write(buf, size);
 }
 
 int File::available() {
