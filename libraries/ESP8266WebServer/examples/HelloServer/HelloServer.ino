@@ -2,10 +2,9 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
- 
+
 const char* ssid = "........";
 const char* password = "........";
-MDNSResponder mdns;
 
 ESP8266WebServer server(80);
 
@@ -33,7 +32,7 @@ void handleNotFound(){
   server.send(404, "text/plain", message);
   digitalWrite(led, 0);
 }
- 
+
 void setup(void){
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
@@ -51,23 +50,23 @@ void setup(void){
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-  
-  if (mdns.begin("esp8266", WiFi.localIP())) {
+
+  if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
   }
-  
+
   server.on("/", handleRoot);
-  
+
   server.on("/inline", [](){
     server.send(200, "text/plain", "this works as well");
   });
 
   server.onNotFound(handleNotFound);
-  
+
   server.begin();
   Serial.println("HTTP server started");
 }
- 
+
 void loop(void){
   server.handleClient();
-} 
+}
