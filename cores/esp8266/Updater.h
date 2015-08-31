@@ -11,6 +11,8 @@
 #define UPDATE_ERROR_SIZE   4
 #define UPDATE_ERROR_STREAM 5
 
+//#define DEBUG_UPDATER Serial1
+
 class UpdaterClass {
   public:
     UpdaterClass();

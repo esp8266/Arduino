@@ -1,6 +1,8 @@
 #include "Updater.h"
 #include "Arduino.h"
 #include "eboot_command.h"
+#include "interrupts.h"
+
 //#define DEBUG_UPDATER Serial
 
 extern "C" {

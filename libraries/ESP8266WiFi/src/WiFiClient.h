@@ -96,6 +96,7 @@ public:
   using Print::write;
 
   static void stopAll();
+  static void stopAllExcept(WiFiClient * c);
 
 private:
 
