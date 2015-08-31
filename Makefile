@@ -28,17 +28,17 @@ OBJ_FILES := \
 	ssl/tls1_clnt.o \
 	ssl/tls1_svr.o \
 	ssl/x509.o \
-	crypto/crypto_misc.o \
+#	crypto/crypto_misc.o \
 
 
 CPPFLAGS += -I$(XTENSA_LIBS)/include \
-		-I$(SDK_BASE)/include \
 		-Icrypto \
-		-Issl
+		-Issl \
+		-I.
 
 LDFLAGS  += 	-L$(XTENSA_LIBS)/lib \
 		-L$(XTENSA_LIBS)/arch/lib \
-		-L$(SDK_BASE)/lib
+
 
 CFLAGS+=-std=c99 -DESP8266
 

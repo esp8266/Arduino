@@ -943,6 +943,7 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt)
     return NULL;    /* its all gone wrong */
 }
 
+#ifndef ESP8266
 /**
  * Send a packet over the socket.
  */
@@ -1004,6 +1005,7 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
 
     return ret;
 }
+#endif
 
 /**
  * Send an encrypted packet with padding bytes if necessary.
@@ -1190,6 +1192,7 @@ static int set_key_block(SSL *ssl, int is_write)
     return 0;
 }
 
+#ifndef ESP8266
 /**
  * Read the SSL connection.
  */
@@ -1385,6 +1388,7 @@ error:
 
     return ret;
 }
+#endif
 
 /**
  * Do some basic checking of data and then perform the appropriate handshaking.
