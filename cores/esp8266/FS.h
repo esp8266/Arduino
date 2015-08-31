@@ -92,6 +92,8 @@ public:
 
     bool begin();
 
+    bool format();
+
     File open(const char* path, const char* mode);
     File open(const String& path, const char* mode);
 

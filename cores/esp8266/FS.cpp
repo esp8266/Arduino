@@ -167,6 +167,13 @@ bool FS::begin() {
     return _impl->begin();
 }
 
+bool FS::format() {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->format();
+}
+
 File FS::open(const String& path, const char* mode) {
     return open(path.c_str(), mode);
 }
