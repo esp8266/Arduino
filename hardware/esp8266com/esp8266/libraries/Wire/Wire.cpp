@@ -45,9 +45,6 @@ uint8_t TwoWire::transmitting = 0;
 void (*TwoWire::user_onRequest)(void);
 void (*TwoWire::user_onReceive)(int);
 
-static int default_sda_pin = SDA;
-static int default_scl_pin = SCL;
-
 // Constructors ////////////////////////////////////////////////////////////////
 
 TwoWire::TwoWire(){}
@@ -55,19 +52,17 @@ TwoWire::TwoWire(){}
 // Public Methods //////////////////////////////////////////////////////////////
 
 void TwoWire::begin(int sda, int scl){
-  default_sda_pin = sda;
-  default_scl_pin = scl;
-  twi_init(sda, scl);
+  twi_init(&twi, sda, scl);
   flush();
 }
 
 void TwoWire::pins(int sda, int scl){
-  default_sda_pin = sda;
-  default_scl_pin = scl;
+  twi.sda = sda;
+  twi.scl = scl;
 }
 
 void TwoWire::begin(void){
-  begin(default_sda_pin, default_scl_pin);
+  begin(twi.sda, twi.scl);
 }
 
 void TwoWire::begin(uint8_t address){
@@ -82,14 +77,14 @@ void TwoWire::begin(int address){
 }
 
 void TwoWire::setClock(uint32_t frequency){
-  twi_setClock(frequency);
+  twi_setClock(&twi, frequency);
 }
 
 size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop){
   if(size > BUFFER_LENGTH){
     size = BUFFER_LENGTH;
   }
-  size_t read = (twi_readFrom(address, rxBuffer, size, sendStop) == 0)?size:0;
+  size_t read = (twi_readFrom(&twi, address, rxBuffer, size, sendStop) == 0)?size:0;
   rxBufferIndex = 0;
   rxBufferLength = read;
   return read;
@@ -123,7 +118,7 @@ void TwoWire::beginTransmission(int address){
 }
 
 uint8_t TwoWire::endTransmission(uint8_t sendStop){
-  int8_t ret = twi_writeTo(txAddress, txBuffer, txBufferLength, sendStop);
+  int8_t ret = twi_writeTo(&twi, txAddress, txBuffer, txBufferLength, sendStop);
   txBufferIndex = 0;
   txBufferLength = 0;
   transmitting = 0;

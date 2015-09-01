@@ -25,12 +25,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+typedef struct {
+    unsigned char dcount, sda, scl;
+} TwiConfig;
 
-void twi_init(unsigned char sda, unsigned char scl);
-void twi_stop(void);
-void twi_setClock(unsigned int freq);
-uint8_t twi_writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop);
-uint8_t twi_readFrom(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop);
+void twi_init(TwiConfig* twi, unsigned char sda, unsigned char scl);
+void twi_stop(TwiConfig* twi);
+void twi_setClock(TwiConfig* twi, unsigned int freq);
+uint8_t twi_writeTo(TwiConfig* twi, unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop);
+uint8_t twi_readFrom(TwiConfig* twi, unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop);
 
 #ifdef __cplusplus
 }

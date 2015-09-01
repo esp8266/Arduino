@@ -26,6 +26,7 @@
 
 #include <inttypes.h>
 #include "Stream.h"
+#include "twi.h"
 
 
 
@@ -34,6 +35,8 @@
 class TwoWire : public Stream
 {
   private:
+    TwiConfig twi;
+      
     static uint8_t rxBuffer[];
     static uint8_t rxBufferIndex;
     static uint8_t rxBufferLength;

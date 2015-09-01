@@ -22,15 +22,12 @@
 #include "pins_arduino.h"
 #include "wiring_private.h"
 
-unsigned char twi_dcount = 18;
-static unsigned char twi_sda, twi_scl;
-
-#define SDA_LOW()   (GPES = (1 << twi_sda)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
-#define SDA_HIGH()  (GPEC = (1 << twi_sda)) //Disable SDA (becomes input and since it has pullup it will go high)
-#define SDA_READ()  ((GPI & (1 << twi_sda)) != 0)
-#define SCL_LOW()   (GPES = (1 << twi_scl))
-#define SCL_HIGH()  (GPEC = (1 << twi_scl))
-#define SCL_READ()  ((GPI & (1 << twi_scl)) != 0)
+#define SDA_LOW()   (GPES = (1 << twi->sda)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
+#define SDA_HIGH()  (GPEC = (1 << twi->sda)) //Disable SDA (becomes input and since it has pullup it will go high)
+#define SDA_READ()  ((GPI & (1 << twi->sda)) != 0)
+#define SCL_LOW()   (GPES = (1 << twi->scl))
+#define SCL_HIGH()  (GPEC = (1 << twi->scl))
+#define SCL_READ()  ((GPI & (1 << twi->scl)) != 0)
 
 #ifndef FCPU80
 #define FCPU80 80000000L
@@ -42,35 +39,35 @@ static unsigned char twi_sda, twi_scl;
 #define TWI_CLOCK_STRETCH 1600
 #endif
 
-void twi_setClock(unsigned int freq){
+void twi_setClock(TwiConfig* twi, unsigned int freq){
 #if F_CPU == FCPU80
-  if(freq <= 100000) twi_dcount = 19;//about 100KHz
-  else if(freq <= 200000) twi_dcount = 8;//about 200KHz
-  else if(freq <= 300000) twi_dcount = 3;//about 300KHz
-  else if(freq <= 400000) twi_dcount = 1;//about 400KHz
-  else twi_dcount = 1;//about 400KHz
+  if(freq <= 100000) twi->dcount = 19;//about 100KHz
+  else if(freq <= 200000) twi->dcount = 8;//about 200KHz
+  else if(freq <= 300000) twi->dcount = 3;//about 300KHz
+  else if(freq <= 400000) twi->dcount = 1;//about 400KHz
+  else twi->dcount = 1;//about 400KHz
 #else
-  if(freq <= 100000) twi_dcount = 32;//about 100KHz
-  else if(freq <= 200000) twi_dcount = 14;//about 200KHz
-  else if(freq <= 300000) twi_dcount = 8;//about 300KHz
-  else if(freq <= 400000) twi_dcount = 5;//about 400KHz
-  else if(freq <= 500000) twi_dcount = 3;//about 500KHz
-  else if(freq <= 600000) twi_dcount = 2;//about 600KHz
-  else twi_dcount = 1;//about 700KHz
+  if(freq <= 100000) twi->dcount = 32;//about 100KHz
+  else if(freq <= 200000) twi->dcount = 14;//about 200KHz
+  else if(freq <= 300000) twi->dcount = 8;//about 300KHz
+  else if(freq <= 400000) twi->dcount = 5;//about 400KHz
+  else if(freq <= 500000) twi->dcount = 3;//about 500KHz
+  else if(freq <= 600000) twi->dcount = 2;//about 600KHz
+  else twi->dcount = 1;//about 700KHz
 #endif
 }
 
-void twi_init(unsigned char sda, unsigned char scl){
-  twi_sda = sda;
-  twi_scl = scl;
-  pinMode(twi_sda, INPUT_PULLUP);
-  pinMode(twi_scl, INPUT_PULLUP);
-  twi_setClock(100000);
+void twi_init(TwiConfig* twi, unsigned char sda, unsigned char scl){
+  twi->sda = sda;
+  twi->scl = scl;
+  pinMode(twi->sda, INPUT_PULLUP);
+  pinMode(twi->scl, INPUT_PULLUP);
+  twi_setClock(twi, 100000);
 }
 
-void twi_stop(void){
-  pinMode(twi_sda, INPUT);
-  pinMode(twi_scl, INPUT);
+void twi_stop(TwiConfig* twi){
+  pinMode(twi->sda, INPUT);
+  pinMode(twi->scl, INPUT);
 }
 
 static void twi_delay(unsigned char v){
@@ -82,102 +79,102 @@ static void twi_delay(unsigned char v){
 #pragma GCC diagnostic pop
 }
 
-static bool twi_write_start(void) {
+static bool twi_write_start(TwiConfig* twi) {
   SCL_HIGH();
   SDA_HIGH();
   if (SDA_READ() == 0) return false;
-  twi_delay(twi_dcount);
+  twi_delay(twi->dcount);
   SDA_LOW();
-  twi_delay(twi_dcount);
+  twi_delay(twi->dcount);
   return true;
 }
 
-static bool twi_write_stop(void){
+static bool twi_write_stop(TwiConfig* twi){
   unsigned int i = 0;
   SCL_LOW();
   SDA_LOW();
-  twi_delay(twi_dcount);
+  twi_delay(twi->dcount);
   SCL_HIGH();
   while (SCL_READ() == 0 && (i++) < TWI_CLOCK_STRETCH);// Clock stretching (up to 100us)
-  twi_delay(twi_dcount);
+  twi_delay(twi->dcount);
   SDA_HIGH();
-  twi_delay(twi_dcount);
+  twi_delay(twi->dcount);
 
   return true;
 }
 
-static bool twi_write_bit(bool bit) {
+static bool twi_write_bit(TwiConfig* twi, bool bit) {
   unsigned int i = 0;
   SCL_LOW();
   if (bit) SDA_HIGH();
   else SDA_LOW();
-  twi_delay(twi_dcount+1);
+  twi_delay(twi->dcount+1);
   SCL_HIGH();
   while (SCL_READ() == 0 && (i++) < TWI_CLOCK_STRETCH);// Clock stretching (up to 100us)
-  twi_delay(twi_dcount);
+  twi_delay(twi->dcount);
   return true;
 }
 
-static bool twi_read_bit(void) {
+static bool twi_read_bit(TwiConfig* twi) {
   unsigned int i = 0;
   SCL_LOW();
   SDA_HIGH();
-  twi_delay(twi_dcount+2);
+  twi_delay(twi->dcount+2);
   SCL_HIGH();
   while (SCL_READ() == 0 && (i++) < TWI_CLOCK_STRETCH);// Clock stretching (up to 100us)
   bool bit = SDA_READ();
-  twi_delay(twi_dcount);
+  twi_delay(twi->dcount);
   return bit;
 }
 
-static bool twi_write_byte(unsigned char byte) {
+static bool twi_write_byte(TwiConfig* twi, unsigned char byte) {
   unsigned char bit;
   for (bit = 0; bit < 8; bit++) {
-    twi_write_bit(byte & 0x80);
+    twi_write_bit(twi, byte & 0x80);
     byte <<= 1;
   }
-  return !twi_read_bit();//NACK/ACK
+  return !twi_read_bit(twi);//NACK/ACK
 }
 
-static unsigned char twi_read_byte(bool nack) {
+static unsigned char twi_read_byte(TwiConfig* twi, bool nack) {
   unsigned char byte = 0;
   unsigned char bit;
-  for (bit = 0; bit < 8; bit++) byte = (byte << 1) | twi_read_bit();
-  twi_write_bit(nack);
+  for (bit = 0; bit < 8; bit++) byte = (byte << 1) | twi_read_bit(twi);
+  twi_write_bit(twi, nack);
   return byte;
 }
 
-unsigned char twi_writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop){
+unsigned char twi_writeTo(TwiConfig* twi, unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop){
   unsigned int i;
-  if(!twi_write_start()) return 4;//line busy
-  if(!twi_write_byte(((address << 1) | 0) & 0xFF)) return 2;//received NACK on transmit of address
+  if(!twi_write_start(twi)) return 4;//line busy
+  if(!twi_write_byte(twi, ((address << 1) | 0) & 0xFF)) return 2;//received NACK on transmit of address
   for(i=0; i<len; i++){
-    if(!twi_write_byte(buf[i])) return 3;//received NACK on transmit of data
+    if(!twi_write_byte(twi, buf[i])) return 3;//received NACK on transmit of data
   }
-  if(sendStop) twi_write_stop();
+  if(sendStop) twi_write_stop(twi);
   i = 0;
   while(SDA_READ() == 0 && (i++) < 10){
     SCL_LOW();
-    twi_delay(twi_dcount);
+    twi_delay(twi->dcount);
     SCL_HIGH();
-    twi_delay(twi_dcount);
+    twi_delay(twi->dcount);
   }
   return 0;
 }
 
-unsigned char twi_readFrom(unsigned char address, unsigned char* buf, unsigned int len, unsigned char sendStop){
+unsigned char twi_readFrom(TwiConfig* twi, unsigned char address, unsigned char* buf, unsigned int len, unsigned char sendStop){
   unsigned int i;
-  if(!twi_write_start()) return 4;//line busy
-  if(!twi_write_byte(((address << 1) | 1) & 0xFF)) return 2;//received NACK on transmit of address
-  for(i=0; i<(len-1); i++) buf[i] = twi_read_byte(false);
-  buf[len-1] = twi_read_byte(true);
-  if(sendStop) twi_write_stop();
+  if(!twi_write_start(twi)) return 4;//line busy
+  if(!twi_write_byte(twi, ((address << 1) | 1) & 0xFF)) return 2;//received NACK on transmit of address
+  for(i=0; i<(len-1); i++) buf[i] = twi_read_byte(twi, false);
+  buf[len-1] = twi_read_byte(twi, true);
+  if(sendStop) twi_write_stop(twi);
   i = 0;
   while(SDA_READ() == 0 && (i++) < 10){
     SCL_LOW();
-    twi_delay(twi_dcount);
+    twi_delay(twi->dcount);
     SCL_HIGH();
-    twi_delay(twi_dcount);
+    twi_delay(twi->dcount);
   }
   return 0;
 }
