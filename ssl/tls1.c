@@ -647,7 +647,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
     int hmac_len = buf_len + 8 + SSL_RECORD_SIZE;
-    uint8_t *t_buf = (uint8_t *)alloca(hmac_len+10);
+    uint8_t *t_buf = (uint8_t *)malloc(hmac_len+10);
 
     memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ? 
                     ssl->write_sequence : ssl->read_sequence, 8);
@@ -659,6 +659,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
                 ssl->server_mac : ssl->client_mac, 
             ssl->cipher_info->digest_size, hmac_buf);
 
+    free(t_buf);
 #if 0
     print_blob("record", hmac_header, SSL_RECORD_SIZE);
     print_blob("buf", buf, buf_len);
@@ -943,7 +944,6 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt)
     return NULL;    /* its all gone wrong */
 }
 
-#ifndef ESP8266
 /**
  * Send a packet over the socket.
  */
@@ -980,7 +980,7 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
 #endif
                 return SSL_ERROR_CONN_LOST;
         }
-
+#ifndef ESP8266
         /* keep going until the write buffer has some space */
         if (sent != pkt_size)
         {
@@ -992,6 +992,7 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
             if (select(ssl->client_fd + 1, NULL, &wfds, NULL, NULL) < 0)
                 return SSL_ERROR_CONN_LOST;
         }
+#endif
     }
 
     SET_SSL_FLAG(SSL_NEED_RECORD);  /* reset for next time */
@@ -1005,7 +1006,6 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
 
     return ret;
 }
-#endif
 
 /**
  * Send an encrypted packet with padding bytes if necessary.
@@ -1075,11 +1075,12 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
                         ssl->cipher_info->iv_size)
         {
             uint8_t iv_size = ssl->cipher_info->iv_size;
-            uint8_t *t_buf = alloca(msg_length + iv_size);
+            uint8_t *t_buf = malloc(msg_length + iv_size);
             memcpy(t_buf + iv_size, ssl->bm_data, msg_length);
             get_random(iv_size, t_buf);
             msg_length += iv_size;
             memcpy(ssl->bm_data, t_buf, msg_length);
+            free(t_buf);
         }
 
         /* now encrypt the packet */
@@ -1192,7 +1193,6 @@ static int set_key_block(SSL *ssl, int is_write)
     return 0;
 }
 
-#ifndef ESP8266
 /**
  * Read the SSL connection.
  */
@@ -1388,7 +1388,6 @@ error:
 
     return ret;
 }
-#endif
 
 /**
  * Do some basic checking of data and then perform the appropriate handshaking.

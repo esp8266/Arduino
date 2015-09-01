@@ -270,7 +270,7 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
     int i, size;
     bigint *decrypted_bi, *dat_bi;
     bigint *bir = NULL;
-    uint8_t *block = (uint8_t *)alloca(sig_len);
+    uint8_t *block = (uint8_t *)malloc(sig_len);
 
     /* decrypt */
     dat_bi = bi_import(ctx, sig, sig_len);
@@ -297,7 +297,7 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
             bir = bi_import(ctx, sig_ptr, len);
         }
     }
-
+    free(block);
     /* save a few bytes of memory */
     bi_clear_cache(ctx);
     return bir;

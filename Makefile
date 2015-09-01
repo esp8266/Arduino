@@ -28,7 +28,7 @@ OBJ_FILES := \
 	ssl/tls1_clnt.o \
 	ssl/tls1_svr.o \
 	ssl/x509.o \
-#	crypto/crypto_misc.o \
+	crypto/crypto_misc.o \
 
 
 CPPFLAGS += -I$(XTENSA_LIBS)/include \
@@ -63,7 +63,7 @@ $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
 clean:
-	rm -rf $(OBJ_FILES) $(LWIP_AR)
+	rm -rf $(OBJ_FILES) $(AXTLS_AR)
 
 
 .PHONY: all clean

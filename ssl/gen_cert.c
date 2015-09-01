@@ -214,14 +214,14 @@ static void gen_utc_time(uint8_t *buf, int *offset)
 
 static void gen_pub_key2(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
 {
-    static const uint8_t pub_key_seq[] = 
+    static const uint8_t pub_key_seq[] =
     {
         ASN1_INTEGER, 0x03, 0x01, 0x00, 0x01 /* INTEGER 65537 */
     };
 
     int seq_offset;
     int pub_key_size = rsa_ctx->num_octets;
-    uint8_t *block = (uint8_t *)alloca(pub_key_size);
+    uint8_t *block = (uint8_t *)malloc(pub_key_size);
     int seq_size = pre_adjust_with_size(
                             ASN1_SEQUENCE, &seq_offset, buf, offset);
     buf[(*offset)++] = ASN1_INTEGER;
@@ -236,6 +236,7 @@ static void gen_pub_key2(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
         set_gen_length(pub_key_size, buf, offset);
 
     memcpy(&buf[*offset], block, pub_key_size);
+    free(block);
     *offset += pub_key_size;
     memcpy(&buf[*offset], pub_key_seq, sizeof(pub_key_seq));
     *offset += sizeof(pub_key_seq);
@@ -282,8 +283,8 @@ static void gen_signature(const RSA_CTX *rsa_ctx, const uint8_t *sha_dgst,
         ASN1_NULL, 0x00, ASN1_OCTET_STRING, 0x14 
     };
 
-    uint8_t *enc_block = (uint8_t *)alloca(rsa_ctx->num_octets);
-    uint8_t *block = (uint8_t *)alloca(sizeof(asn1_sig) + SHA1_SIZE);
+    uint8_t *enc_block = (uint8_t *)malloc(rsa_ctx->num_octets);
+    uint8_t *block = (uint8_t *)malloc(sizeof(asn1_sig) + SHA1_SIZE);
     int sig_size;
 
     /* add the digest as an embedded asn.1 sequence */
@@ -297,6 +298,8 @@ static void gen_signature(const RSA_CTX *rsa_ctx, const uint8_t *sha_dgst,
     set_gen_length(sig_size+1, buf, offset);
     buf[(*offset)++] = 0;   /* bit string is multiple of 8 */
     memcpy(&buf[*offset], enc_block, sig_size);
+    free(enc_block);
+    free(block);
     *offset += sig_size;
 }
 
@@ -342,7 +345,7 @@ EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, uint32_t options, const c
 {
     int ret = X509_OK, offset = 0, seq_offset;
     /* allocate enough space to load a new certificate */
-    uint8_t *buf = (uint8_t *)alloca(ssl_ctx->rsa_ctx->num_octets*2 + 512);
+    uint8_t *buf = (uint8_t *)malloc(ssl_ctx->rsa_ctx->num_octets*2 + 512);
     uint8_t sha_dgst[SHA1_SIZE];
     int seq_size = pre_adjust_with_size(ASN1_SEQUENCE, 
                                     &seq_offset, buf, &offset);
@@ -357,6 +360,7 @@ EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, uint32_t options, const c
     memcpy(*cert_data, buf, offset);
 
 error:
+    free(buf);
     return ret < 0 ? ret : offset;
 }
 
