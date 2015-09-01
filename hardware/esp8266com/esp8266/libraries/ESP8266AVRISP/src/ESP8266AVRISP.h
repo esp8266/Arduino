@@ -47,7 +47,7 @@ typedef struct {
 
 class ESP8266AVRISP {
 public:
-    ESP8266AVRISP(uint16_t port, uint8_t reset_pin, uint32_t spi_freq=AVRISP_SPI_FREQ, bool reset_state=false);
+    ESP8266AVRISP(uint16_t port, uint8_t reset_pin, uint32_t spi_freq=AVRISP_SPI_FREQ, bool reset_state=false, bool reset_activehigh=false);
 
     void begin();
 
@@ -100,7 +100,7 @@ protected:
     void start_pmode(void);     // enter program mode
     void end_pmode(void);       // exit program mode
 
-
+    inline bool _resetLevel(bool reset_state) { return reset_state == _reset_activehigh; }
 
     uint32_t _spi_freq;
     WiFiServer _server;
@@ -108,6 +108,7 @@ protected:
     AVRISPState_t _state;
     uint8_t _reset_pin;
     bool _reset_state;
+    bool _reset_activehigh;
 
     // programmer settings, set by remote end
     AVRISP_parameter_t param;
