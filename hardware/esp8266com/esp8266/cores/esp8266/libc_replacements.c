@@ -1,10 +1,10 @@
-/* 
+/*
  libc_replacements.c - replaces libc functions with functions
  from Espressif SDK
 
  Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -83,6 +83,10 @@ int snprintf(char* buffer, size_t size, const char* format, ...) {
     return ret;
 }
 
+int vprintf(const char * format, va_list arg) {
+    return ets_vprintf(format, arg);
+}
+
 int vsnprintf(char * buffer, size_t size, const char * format, va_list arg) {
     return ets_vsnprintf(buffer, size, format, arg);
 }
@@ -144,7 +148,7 @@ char* ICACHE_FLASH_ATTR strtok_r(char* s, const char* delim, char** last) {
     }
 
 
-    // Skip (span) leading delimiters 
+    // Skip (span) leading delimiters
     //
 cont:
     c = *s++;
@@ -164,7 +168,7 @@ cont:
     tok = s - 1;
 
 
-    // Scan token 
+    // Scan token
     // Note that delim must have one NUL; we stop if we see that, too.
     //
     for (;;) {
@@ -384,14 +388,31 @@ int isblank(int c) {
 static int errno_var = 0;
 
 int* ICACHE_FLASH_ATTR __errno(void) {
-    DEBUGV("__errno is called last error: %d (not current)\n", errno_var);
+    // DEBUGV("__errno is called last error: %d (not current)\n", errno_var);
     return &errno_var;
+}
+
+
+char * ctime(const time_t *clock) {
+    return 0;
+}
+
+time_t time(time_t * t) {
+    return 0;
+}
+
+int gettimeofday(void *tp, void *tzp) {
+    return 0;
+}
+
+time_t mktime(struct tm *timp) {
+    return 0;
 }
 
 
 /*
  * begin newlib/string/strlcpy.c
- * 
+ *
  * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
  * All rights reserved.
  *

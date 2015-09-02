@@ -102,6 +102,25 @@ public:
         return _tryMount();
     }
 
+    bool format() override {
+        bool wasMounted = (SPIFFS_mounted(&_fs) != 0);
+
+        if (_tryMount()) {
+            SPIFFS_unmount(&_fs);
+        }
+        auto rc = SPIFFS_format(&_fs);
+        if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+            return false;
+        }
+
+        if (wasMounted) {
+            return _tryMount();
+        }
+
+        return true;
+    }
+
 protected:
     friend class SPIFFSFileImpl;
     friend class SPIFFSDirImpl;

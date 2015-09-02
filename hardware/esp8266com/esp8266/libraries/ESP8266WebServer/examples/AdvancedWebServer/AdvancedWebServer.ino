@@ -1,21 +1,21 @@
 /*
  * Copyright (c) 2015, Majenko Technologies
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- * 
+ *
  * * Redistributions of source code must retain the above copyright notice, this
  *   list of conditions and the following disclaimer.
- * 
+ *
  * * Redistributions in binary form must reproduce the above copyright notice, this
  *   list of conditions and the following disclaimer in the documentation and/or
  *   other materials provided with the distribution.
- * 
+ *
  * * Neither the name of Majenko Technologies nor the names of its
  *   contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -35,7 +35,6 @@
 
 const char *ssid = "YourSSIDHere";
 const char *password = "YourPSKHere";
-MDNSResponder mdns;
 
 ESP8266WebServer server ( 80 );
 
@@ -109,7 +108,7 @@ void setup ( void ) {
 	Serial.print ( "IP address: " );
 	Serial.println ( WiFi.localIP() );
 
-	if ( mdns.begin ( "esp8266", WiFi.localIP() ) ) {
+	if ( MDNS.begin ( "esp8266" ) ) {
 		Serial.println ( "MDNS responder started" );
 	}
 
@@ -124,7 +123,6 @@ void setup ( void ) {
 }
 
 void loop ( void ) {
-	mdns.update();
 	server.handleClient();
 }
 

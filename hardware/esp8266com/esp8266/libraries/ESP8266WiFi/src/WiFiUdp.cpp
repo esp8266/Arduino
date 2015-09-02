@@ -290,3 +290,12 @@ void WiFiUDP::stopAll()
         it->stop();
     }
 }
+
+void WiFiUDP::stopAllExcept(WiFiUDP * exC) {
+    for (WiFiUDP* it = _s_first; it; it = it->_next) {
+        if (it->_ctx != exC->_ctx) {
+            DEBUGV("%s %08x %08x\n", __func__, (uint32_t) it, (uint32_t) _s_first);
+            it->stop();
+        }
+    }
+}

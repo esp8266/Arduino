@@ -88,6 +88,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 
 int WiFiClient::_connect(const char* host, uint16_t port,bool block)
 {
+    _blocking=block;
     _asyncerr=false;
     IPAddress remote_addr;
     if (WiFi.hostByName(host, remote_addr))
@@ -100,6 +101,7 @@ int WiFiClient::_connect(const char* host, uint16_t port,bool block)
 
 int WiFiClient::_connect(IPAddress ip, uint16_t port,bool block)
 {
+    _blocking=block;
     _asyncerr=false;
     ip_addr_t addr;
     addr.addr = ip;
@@ -129,10 +131,9 @@ int WiFiClient::_connect(IPAddress ip, uint16_t port,bool block)
     }
 
     tcp_arg(pcb, this);
+    tcp_err(pcb, &WiFiClient::_s_err);
+    tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
     if (block) {
-        tcp_err(pcb, &WiFiClient::_s_err);
-        tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
-
         esp_yield();
         if (_client)
             return 1;
@@ -140,8 +141,6 @@ int WiFiClient::_connect(IPAddress ip, uint16_t port,bool block)
         // tcp_abort(pcb);
         return 0;
     } else {
-        tcp_err(pcb, &WiFiClient::_s_err_nb);
-        tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected_nb));
         return -1;
     }
 }
@@ -151,27 +150,19 @@ int8_t WiFiClient::_connected(void* pcb, int8_t err)
     tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
     _client = new ClientContext(tpcb, 0, 0);
     _client->ref();
-    esp_schedule();
+    if (!_blocking) esp_schedule();
     return ERR_OK;
 }
 
-int8_t WiFiClient::_connected_nb(void* pcb, int8_t err)
-{
-    tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
-    _client = new ClientContext(tpcb, 0, 0);
-    _client->ref();
-    return ERR_OK;
-}
 
 void WiFiClient::_err(int8_t err)
 {
     DEBUGV(":err %d\r\n", err);
-    esp_schedule();
-}
-void WiFiClient::_err_nb(int8_t err)
-{
-    _asyncerr=true;
-    DEBUGV(":err %d\r\n", err);
+    if (_blocking){
+        esp_schedule();
+    } else {
+        _asyncerr=true;
+    }
 }
 
 
@@ -202,6 +193,38 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     return _client->write(reinterpret_cast<const char*>(buf), size);
 }
 
+size_t WiFiClient::write_P(PGM_P buf, size_t size)
+{
+    if (!_client || !size)
+    {
+        return 0;
+    }
+
+    char chunkUnit[WIFICLIENT_MAX_PACKET_SIZE + 1];
+    chunkUnit[WIFICLIENT_MAX_PACKET_SIZE] = '\0';
+    while (buf != NULL) 
+    {
+        size_t chunkUnitLen;
+        PGM_P chunkNext;
+        chunkNext = (PGM_P)memccpy_P((void*)chunkUnit, (PGM_VOID_P)buf, 0, WIFICLIENT_MAX_PACKET_SIZE);
+        if (chunkNext == NULL) 
+        {
+            // no terminator, more data available
+            buf += WIFICLIENT_MAX_PACKET_SIZE;
+            chunkUnitLen = WIFICLIENT_MAX_PACKET_SIZE;
+        }
+        else 
+        {
+            // reached terminator
+            chunkUnitLen = chunkNext - buf;
+            buf = NULL;
+        }
+        if (size < WIFICLIENT_MAX_PACKET_SIZE) chunkUnitLen = size;
+        _client->write((const char*)chunkUnit, chunkUnitLen);
+    }
+    return size;
+}
+
 int WiFiClient::available()
 {
     if (!_client)
@@ -209,20 +232,12 @@ int WiFiClient::available()
 
     int result = _client->getSize();
 
-    if (!result) {
+    if (!result && _blocking) {
         optimistic_yield(100);
     }
     return result;
 }
 
-int WiFiClient::available_nb()
-{
-    if (!_client)
-        return false;
-
-    return _client->getSize();
-
-}
 
 int WiFiClient::read()
 {
@@ -327,16 +342,25 @@ void WiFiClient::_s_err(void* arg, int8_t err)
 {
     reinterpret_cast<WiFiClient*>(arg)->_err(err);
 }
-void WiFiClient::_s_err_nb(void* arg, int8_t err)
-{
-    reinterpret_cast<WiFiClient*>(arg)->_err_nb(err);
-}
 
 void WiFiClient::stopAll()
 {
     for (WiFiClient* it = _s_first; it; it = it->_next) {
         ClientContext* c = it->_client;
         if (c) {
+            c->abort();
+            c->unref();
+            it->_client = 0;
+        }
+    }
+}
+
+
+void WiFiClient::stopAllExcept(WiFiClient * exC) {
+    for (WiFiClient* it = _s_first; it; it = it->_next) {
+        ClientContext* c = it->_client;
+
+        if (c && c != exC->_client) {
             c->abort();
             c->unref();
             it->_client = 0;

@@ -146,6 +146,15 @@ This method mounts SPIFFS file system. It must be called before any other
 FS APIs are used. Returns *true* if file system was mounted successfully, false
 otherwise.
 
+#### format
+
+```c++
+SPIFFS.format()
+```
+
+Formats the file system. May be called either before or after calling `begin`.
+Returns *true* if formatting was successful.
+
 #### open
 
 ```c++

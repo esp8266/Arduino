@@ -4,7 +4,7 @@
 
 void fail(const char* msg) {
   Serial.println(msg);
-  while(true) {
+  while (true) {
     yield();
   }
 }
@@ -14,6 +14,21 @@ void setup() {
   Serial.setDebugOutput(true);
   WiFi.mode(WIFI_OFF);
   Serial.println("\n\nFS test\n");
+
+  {
+    if (!SPIFFS.format()) {
+      fail("format failed");
+    }
+    Dir root = SPIFFS.openDir("/");
+    int count = 0;
+    while (root.next()) {
+      ++count;
+    }
+    if (count > 0) {
+      fail("some files left after format");
+    }
+  }
+
 
   if (!SPIFFS.begin()) {
     fail("SPIFFS init failed");
@@ -63,15 +78,15 @@ void setup() {
   {
     Dir root = SPIFFS.openDir("/");
     while (root.next()) {
-        String fileName = root.fileName();
-        File f = root.openFile("r");
-        Serial.printf("%s: %d\r\n", fileName.c_str(), f.size());
+      String fileName = root.fileName();
+      File f = root.openFile("r");
+      Serial.printf("%s: %d\r\n", fileName.c_str(), f.size());
     }
   }
 
   {
     Dir root = SPIFFS.openDir("/");
-    while(root.next()) {
+    while (root.next()) {
       String fileName = root.fileName();
       Serial.print("deleting ");
       Serial.println(fileName);
@@ -93,6 +108,20 @@ void setup() {
     File tmp2 = SPIFFS.open("/tmp2.txt", "r");
     if (!tmp2) {
       fail("open tmp2 failed");
+    }
+  }
+
+  {
+    if (!SPIFFS.format()) {
+      fail("format failed");
+    }
+    Dir root = SPIFFS.openDir("/");
+    int count = 0;
+    while (root.next()) {
+      ++count;
+    }
+    if (count > 0) {
+      fail("some files left after format");
     }
   }
 

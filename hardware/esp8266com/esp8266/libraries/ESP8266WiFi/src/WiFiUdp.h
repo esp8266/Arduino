@@ -105,6 +105,7 @@ public:
   uint16_t localPort();
 
   static void stopAll();
+  static void stopAllExcept(WiFiUDP * exC);
 
 };
 
