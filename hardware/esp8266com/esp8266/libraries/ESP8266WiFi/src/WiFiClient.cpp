@@ -333,10 +333,6 @@ int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
     return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);
 }
 
-int8_t WiFiClient::_s_connected_nb(void* arg, void* tpcb, int8_t err)
-{
-    return reinterpret_cast<WiFiClient*>(arg)->_connected_nb(tpcb, err);
-}
 
 void WiFiClient::_s_err(void* arg, int8_t err)
 {
