@@ -169,6 +169,13 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     sendContent_P(content);
 }
 
+void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
+    String header;
+    _prepareHeader(header, code, String(FPSTR(content_type)).c_str(), contentLength);
+    sendContent(header);
+    sendContent_P(content, contentLength);
+}
+
 void ESP8266WebServer::send(int code, char* content_type, const String& content) {
   send(code, (const char*)content_type, content);
 }

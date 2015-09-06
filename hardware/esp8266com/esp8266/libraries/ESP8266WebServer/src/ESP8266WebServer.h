@@ -90,6 +90,7 @@ public:
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
   void send_P(int code, PGM_P content_type, PGM_P content);
+  void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
   void setContentLength(size_t contentLength) { _contentLength = contentLength; }
   void sendHeader(const String& name, const String& value, bool first = false);
