@@ -95,6 +95,7 @@ public:
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
+  void sendContent_P(PGM_P content, size_t size);
 
 template<typename T> size_t streamFile(T &file, const String& contentType){
   setContentLength(file.size());
