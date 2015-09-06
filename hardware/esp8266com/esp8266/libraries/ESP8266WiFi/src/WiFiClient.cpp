@@ -190,7 +190,7 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
     {
         size_t chunkUnitLen;
         PGM_P chunkNext;
-        chunkNext = (PGM_P)memccpy_P((void*)chunkUnit, (PGM_VOID_P)buf, 0, WIFICLIENT_MAX_PACKET_SIZE);
+        chunkNext = (PGM_P)memcpy_P((void*)chunkUnit, (PGM_VOID_P)buf, WIFICLIENT_MAX_PACKET_SIZE);
         if (chunkNext == NULL) 
         {
             // no terminator, more data available
