@@ -223,28 +223,19 @@ void ESP8266WebServer::sendContent_P(PGM_P content) {
 
 void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
     char contentUnit[HTTP_DOWNLOAD_UNIT_SIZE + 1];
-
     contentUnit[HTTP_DOWNLOAD_UNIT_SIZE] = '\0';
+    size_t remaining_size = size;
 
-    while (content != NULL) {
-        size_t contentUnitLen;
-        PGM_P contentNext;
+    while (content != NULL && remaining_size > 0) {
+        size_t contentUnitLen = HTTP_DOWNLOAD_UNIT_SIZE;
 
+        if (remaining_size < HTTP_DOWNLOAD_UNIT_SIZE) contentUnitLen = remaining_size;
         // due to the memcpy signature, lots of casts are needed
-        contentNext = (PGM_P)memcpy_P((void*)contentUnit, (PGM_VOID_P)content, HTTP_DOWNLOAD_UNIT_SIZE);
+        memcpy_P((void*)contentUnit, (PGM_VOID_P)content, contentUnitLen);
 
-        if (contentNext == NULL) {
-            // no terminator, more data available
-            content += HTTP_DOWNLOAD_UNIT_SIZE;
-            contentUnitLen = HTTP_DOWNLOAD_UNIT_SIZE;
-        }
-        else {
-            // reached terminator
-            contentUnitLen = contentNext - content;
-            content = NULL;
-        }
+        content += contentUnitLen;
+        remaining_size -= contentUnitLen;
 
-        if (size < WIFICLIENT_MAX_PACKET_SIZE) contentUnitLen = size;
         // write is so overloaded, had to use the cast to get it pick the right one
         _currentClient.write((const char*)contentUnit, contentUnitLen);
     }
