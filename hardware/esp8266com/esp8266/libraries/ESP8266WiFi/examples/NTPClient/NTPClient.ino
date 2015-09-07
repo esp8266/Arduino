@@ -11,7 +11,7 @@
  by Michael Margolis
  modified 9 Apr 2012
  by Tom Igoe
- updated for the ESP8266 12 Apr 2015 
+ updated for the ESP8266 12 Apr 2015
  by Ivan Grokhotkov
 
  This code is in the public domain.
@@ -50,13 +50,13 @@ void setup()
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, pass);
-  
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println("");
-  
+
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
@@ -67,20 +67,39 @@ void setup()
   Serial.println(udp.localPort());
 }
 
+
+
 void loop()
 {
+  // this will keep track of answers we get. If we don't get answers, one reasion might be that the udp receiver 
+  // might not be working any more (for example due to interrupted and restored WIFI connection)
+  static int udperrorcounter = 0;
+
   //get a random server from the pool
-  WiFi.hostByName(ntpServerName, timeServerIP); 
+  if (!WiFi.hostByName(ntpServerName, timeServerIP)) {
+    Serial.println("Hostname lookup failed");
+    return;
+  }
 
   sendNTPpacket(timeServerIP); // send an NTP packet to a time server
   // wait to see if a reply is available
+  udperrorcounter++;
   delay(1000);
-  
+
   int cb = udp.parsePacket();
   if (!cb) {
     Serial.println("no packet yet");
+
+    if (udperrorcounter > 3) { // 3 is just randomly choosen. in case of lot packet drops...
+      // restore the udp receiver
+      udp.stopAll();
+      udp.begin(localPort);
+      udperrorcounter=0;
+    }
   }
   else {
+    udperrorcounter--;
+
     Serial.print("packet received, length=");
     Serial.println(cb);
     // We've received a packet, read the data from it
