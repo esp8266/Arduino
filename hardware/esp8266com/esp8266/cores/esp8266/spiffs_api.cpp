@@ -318,8 +318,9 @@ protected:
 
 class SPIFFSDirImpl : public DirImpl {
 public:
-    SPIFFSDirImpl(SPIFFSImpl* fs, spiffs_DIR& dir)
-    : _fs(fs)
+    SPIFFSDirImpl(const String& pattern, SPIFFSImpl* fs, spiffs_DIR& dir)
+    : _pattern(pattern)
+    , _fs(fs)
     , _dir(dir)
     , _valid(false)
     {
@@ -359,12 +360,16 @@ public:
     }
 
     bool next() override {
-        spiffs_dirent* result = SPIFFS_readdir(&_dir, &_dirent);
-        _valid = (result != nullptr);
+        const int n = _pattern.length();
+        do {
+            spiffs_dirent* result = SPIFFS_readdir(&_dir, &_dirent);
+            _valid = (result != nullptr);
+        } while(_valid && strncmp((const char*) _dirent.name, _pattern.c_str(), n) != 0);
         return _valid;
     }
 
 protected:
+    String _pattern;
     SPIFFSImpl* _fs;
     spiffs_DIR  _dir;
     spiffs_dirent _dirent;
@@ -394,7 +399,7 @@ DirImplPtr SPIFFSImpl::openDir(const char* path) {
         DEBUGV("SPIFFSImpl::openDir: path=`%s` err=%d\r\n", path, _fs.err_code);
         return DirImplPtr();
     }
-    return std::make_shared<SPIFFSDirImpl>(this, dir);
+    return std::make_shared<SPIFFSDirImpl>(path, this, dir);
 }
 
 int getSpiffsMode(OpenMode openMode, AccessMode accessMode) {
