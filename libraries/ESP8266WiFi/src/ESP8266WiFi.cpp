@@ -43,10 +43,11 @@ extern "C" void esp_yield();
 ESP8266WiFiClass::ESP8266WiFiClass()
 : _smartConfigStarted(false)
 , _smartConfigDone(false)
-, _useApMode(false)
-, _useClientMode(false)
 , _useStaticIp(false)
 {
+    uint8 m = wifi_get_opmode();
+    _useClientMode = (m & WIFI_STA);
+    _useApMode = (m & WIFI_AP_STA);
     wifi_set_event_handler_cb((wifi_event_handler_cb_t)&ESP8266WiFiClass::_eventCallback);
 }
 
