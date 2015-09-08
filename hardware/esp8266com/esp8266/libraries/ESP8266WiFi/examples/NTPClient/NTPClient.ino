@@ -91,8 +91,13 @@ void loop()
     Serial.println("no packet yet");
 
     if (udperrorcounter > 3) { // 3 is just randomly choosen. in case of lot packet drops...
+      // Not receiving packets can have several reasons: send packets lost, return packets lost or receiver 
+      // in esp8266 disconnected due to WIFI reset. Only thing we can check: udp still alive? Restart it anyway. 
+      if (! udp) { 
+        Serial.println("udp receiver is down, restarting it.");
+        }
+      udp.stop();
       // restore the udp receiver
-      udp.stopAll();
       udp.begin(localPort);
       udperrorcounter=0;
     }
@@ -170,3 +175,5 @@ unsigned long sendNTPpacket(IPAddress& address)
   udp.write(packetBuffer, NTP_PACKET_SIZE);
   udp.endPacket();
 }
+
+
