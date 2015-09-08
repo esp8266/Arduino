@@ -48,6 +48,9 @@ int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
     uint32_t result = SPIFFS_OK;
     uint32_t alignedBegin = (addr + 3) & (~3);
     uint32_t alignedEnd = (addr + size) & (~3);
+    if (alignedEnd < alignedBegin) {
+        alignedEnd = alignedBegin;
+    }
 
     if (addr < alignedBegin) {
         uint32_t nb = alignedBegin - addr;
@@ -101,6 +104,9 @@ int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
 
     uint32_t alignedBegin = (addr + 3) & (~3);
     uint32_t alignedEnd = (addr + size) & (~3);
+    if (alignedEnd < alignedBegin) {
+        alignedEnd = alignedBegin;
+    }
 
     if (addr < alignedBegin) {
         uint32_t nb = alignedBegin - addr;
