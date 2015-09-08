@@ -60,26 +60,27 @@ public class ESP8266FS implements Tool {
   }
 
   private int listenOnProcess(String[] arguments){
-    try {
-      final Process p = ProcessUtils.exec(arguments);
-      Thread thread = new Thread() {
-        public void run() {
-          try {
-            String line;
-            BufferedReader input = new BufferedReader (new InputStreamReader(p.getInputStream()));
-            while ((line = input.readLine()) != null) System.out.println(line);
-            input.close();
-          } catch (Exception e){}
-        }
-      };
-      thread.start();
-      int res = p.waitFor();
-      thread.join();
-      return res;
-    } catch (Exception e){
-      return -1;
+      try {
+        final Process p = ProcessUtils.exec(arguments);
+        Thread thread = new Thread() {
+          public void run() {
+            try {
+              InputStreamReader reader = new InputStreamReader(p.getInputStream());
+              int c;
+              while ((c = reader.read()) != -1)
+                  System.out.print((char) c);
+              reader.close();
+            } catch (Exception e){}
+          }
+        };
+        thread.start();
+        int res = p.waitFor();
+        thread.join();
+        return res;
+      } catch (Exception e){
+        return -1;
+      }
     }
-  }
 
   private void sysExec(final String[] arguments){
     Thread thread = new Thread() {
