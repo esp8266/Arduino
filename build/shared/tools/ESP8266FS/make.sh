@@ -25,6 +25,9 @@ mkdir -p $INSTALLDIR/tools/ESP8266FS/tool
 zip -r $INSTALLDIR/tools/ESP8266FS/tool/esp8266fs.jar *
 popd
 
-#pushd $INSTALLDIR/tools
-#zip -r ESP8266FS-$(git describe --tags).zip ESP8266FS/
-#popd
+dist=$PWD/dist
+rev=$(git describe --tags)
+mkdir -p $dist
+pushd $INSTALLDIR/tools
+zip -r $dist/ESP8266FS-$rev.zip ESP8266FS/
+popd
