@@ -164,14 +164,18 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     }
 
     String header;
-    _prepareHeader(header, code, String(FPSTR(content_type)).c_str(), contentLength);
+    char type[64];
+    memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
+    _prepareHeader(header, code, (const char* )type, contentLength);
     sendContent(header);
     sendContent_P(content);
 }
 
 void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
     String header;
-    _prepareHeader(header, code, String(FPSTR(content_type)).c_str(), contentLength);
+    char type[64];
+    memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
+    _prepareHeader(header, code, (const char* )type, contentLength);
     sendContent(header);
     sendContent_P(content, contentLength);
 }
