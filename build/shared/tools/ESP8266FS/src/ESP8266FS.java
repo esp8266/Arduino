@@ -145,14 +145,20 @@ public class ESP8266FS implements Tool {
             return;
         }
     }
-
-    File tool;
-    if(!PreferencesData.get("runtime.os").contentEquals("windows")) tool = new File(platform.getFolder()+"/tools", "mkspiffs");
-    else tool = new File(platform.getFolder()+"/tools", "mkspiffs.exe");
-    if(!tool.exists()){
-      System.err.println();
-      editor.statusError("SPIFFS Error: mkspiffs not found!");
-      return;
+    String mkspiffsCmd;
+    if(PreferencesData.get("runtime.os").contentEquals("windows"))
+        mkspiffsCmd = "mkspiffs.exe";
+    else
+        mkspiffsCmd = "mkspiffs";
+    
+    File tool = new File(platform.getFolder() + "/tools", mkspiffsCmd);
+    if (!tool.exists()) {
+        tool = new File(PreferencesData.get("runtime.tools.mkspiffs.path"), mkspiffsCmd);
+        if (!tool.exists()) {
+            System.err.println();
+            editor.statusError("SPIFFS Error: mkspiffs not found!");
+            return;
+        }
     }
 
     int fileCount = 0;
