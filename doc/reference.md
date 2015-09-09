@@ -121,12 +121,12 @@ Generic module | 512k | 64k
 Generic module | 1M | 64k, 128k, 256k, 512k
 Generic module | 2M | 1M
 Generic module | 4M | 3M
-Adafruit HUZZAH | 4M | 3M
-NodeMCU 0.9    | 4M | 3M
-NodeMCU 1.0    | 4M | 3M
+Adafruit HUZZAH | 4M | 1M, 3M
+NodeMCU 0.9    | 4M | 1M, 3M
+NodeMCU 1.0    | 4M | 1M, 3M
 Olimex MOD-WIFI-ESP8266(-DEV)| 2M | 1M
 SparkFun Thing | 512k | 64k
-SweetPea ESP-210 | 4M | 3M
+SweetPea ESP-210 | 4M | 1M, 3M
 
 **Note:** to use any of file system functions in the sketch, add the following include to the sketch:
 
