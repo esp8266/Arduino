@@ -221,13 +221,9 @@ public:
     : _fs(fs)
     , _fd(fd)
     , _stat({0})
+    , _written(false)
     {
-        CHECKFD();
-        auto rc = SPIFFS_fstat(_fs->getFs(), _fd, &_stat);
-        if (rc != SPIFFS_OK) {
-            DEBUGV("SPIFFS_fstat rc=%d\r\n", rc);
-            _stat = {0};
-        }
+        _getStat();
     }
 
     ~SPIFFSFileImpl() override {
@@ -242,7 +238,7 @@ public:
             DEBUGV("SPIFFS_write rc=%d\r\n", result);
             return 0;
         }
-
+        _written = true;
         return result;
     }
 
@@ -265,11 +261,16 @@ public:
         if (rc < 0) {
             DEBUGV("SPIFFS_fflush rc=%d\r\n", rc);
         }
+        _written = true;
     }
 
     bool seek(uint32_t pos, SeekMode mode) override {
         CHECKFD();
 
+        int32_t offset = static_cast<int32_t>(pos);
+        if (mode == SeekEnd) {
+            offset = -offset;
+        }
         auto rc = SPIFFS_lseek(_fs->getFs(), _fd, pos, (int) mode);
         if (rc < 0) {
             DEBUGV("SPIFFS_lseek rc=%d\r\n", rc);
@@ -293,7 +294,9 @@ public:
 
     size_t size() const override {
         CHECKFD();
-
+        if (_written) {
+            _getStat();
+        }
         return _stat.size;
     }
 
@@ -311,9 +314,20 @@ public:
     }
 
 protected:
+    void _getStat() const{
+        CHECKFD();
+        auto rc = SPIFFS_fstat(_fs->getFs(), _fd, &_stat);
+        if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFS_fstat rc=%d\r\n", rc);
+            _stat = {0};
+        }
+        _written = false;
+    }
+
     SPIFFSImpl* _fs;
     spiffs_file _fd;
-    spiffs_stat _stat;
+    mutable spiffs_stat _stat;
+    mutable bool        _written;
 };
 
 class SPIFFSDirImpl : public DirImpl {
