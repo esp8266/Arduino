@@ -290,6 +290,7 @@ uart_t* uart_init(int uart_nr, int baudrate, byte config, byte mode) {
             uart->txPin = (uart->txEnabled)?1:255;
             if(uart->rxEnabled) pinMode(uart->rxPin, SPECIAL);
             if(uart->txEnabled) pinMode(uart->txPin, SPECIAL);
+            IOSWAP &= ~(1 << IOSWAPU0);
             break;
         case UART1:
             uart->rxEnabled = false;
