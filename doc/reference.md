@@ -138,7 +138,7 @@ SweetPea ESP-210 | 4M | 1M, 3M
 
 *ESP8266FS* is a tool which integrates into the Arduino IDE. It adds a menu item to *Tools* menu for uploading the contents of sketch data directory into ESP8266 flash file system.
 
-- Download the tool: http://arduino.esp8266.com/ESP8266FS-1.6.5-1092-g6c7557b.zip
+- Download the tool: http://arduino.esp8266.com/ESP8266FS-1.6.5-1105-g98d2458.zip
 - In your Arduino sketchbook directory, create `tools` directory if it doesn't exist yet
 - Unpack the tool into `tools` directory (the path will look like `<home_dir>/Arduino/tools/ESP8266FS/tool/esp8266fs.jar`)
 - Restart Arduino IDE
