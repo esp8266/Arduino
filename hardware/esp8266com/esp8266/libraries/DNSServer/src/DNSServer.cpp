@@ -2,8 +2,6 @@
 #include <lwip/def.h>
 #include <Arduino.h>
 
-#define DEBUG
-#define DEBUG_OUTPUT Serial
 
 DNSServer::DNSServer()
 {
