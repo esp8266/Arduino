@@ -186,7 +186,7 @@ huzzah.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 huzzah.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 huzzah.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 huzzah.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
-huzzah.menu.FlashSize.4M3M.build.spiffs_pagesize=256
+huzzah.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
