@@ -62,8 +62,7 @@ public:
         if (!requestUri.startsWith(uri))
             return false;
 
-        auto prefixLength = uri.length();
-        String path = requestUri.substring(0, prefixLength);
+        String path = uri;
         DEBUGV("StaticRequestHandler::handle: %d %s\r\n", prefixLength, path.c_str());
         File f = fs.open(path, "r");
         if (!f)
