@@ -77,3 +77,4 @@ build/macosx/esptool-*-osx.zip
 build/macosx/dist/osx-xtensa-lx106-elf.tgz
 /docs/lib_dump/full
 /docs/lib_dump
+doxygen
