@@ -60,26 +60,27 @@ public class ESP8266FS implements Tool {
   }
 
   private int listenOnProcess(String[] arguments){
-    try {
-      final Process p = ProcessUtils.exec(arguments);
-      Thread thread = new Thread() {
-        public void run() {
-          try {
-            String line;
-            BufferedReader input = new BufferedReader (new InputStreamReader(p.getInputStream()));
-            while ((line = input.readLine()) != null) System.out.println(line);
-            input.close();
-          } catch (Exception e){}
-        }
-      };
-      thread.start();
-      int res = p.waitFor();
-      thread.join();
-      return res;
-    } catch (Exception e){
-      return -1;
+      try {
+        final Process p = ProcessUtils.exec(arguments);
+        Thread thread = new Thread() {
+          public void run() {
+            try {
+              InputStreamReader reader = new InputStreamReader(p.getInputStream());
+              int c;
+              while ((c = reader.read()) != -1)
+                  System.out.print((char) c);
+              reader.close();
+            } catch (Exception e){}
+          }
+        };
+        thread.start();
+        int res = p.waitFor();
+        thread.join();
+        return res;
+      } catch (Exception e){
+        return -1;
+      }
     }
-  }
 
   private void sysExec(final String[] arguments){
     Thread thread = new Thread() {
@@ -144,14 +145,20 @@ public class ESP8266FS implements Tool {
             return;
         }
     }
-
-    File tool;
-    if(!PreferencesData.get("runtime.os").contentEquals("windows")) tool = new File(platform.getFolder()+"/tools", "mkspiffs");
-    else tool = new File(platform.getFolder()+"/tools", "mkspiffs.exe");
-    if(!tool.exists()){
-      System.err.println();
-      editor.statusError("SPIFFS Error: mkspiffs not found!");
-      return;
+    String mkspiffsCmd;
+    if(PreferencesData.get("runtime.os").contentEquals("windows"))
+        mkspiffsCmd = "mkspiffs.exe";
+    else
+        mkspiffsCmd = "mkspiffs";
+    
+    File tool = new File(platform.getFolder() + "/tools", mkspiffsCmd);
+    if (!tool.exists()) {
+        tool = new File(PreferencesData.get("runtime.tools.mkspiffs.path"), mkspiffsCmd);
+        if (!tool.exists()) {
+            System.err.println();
+            editor.statusError("SPIFFS Error: mkspiffs not found!");
+            return;
+        }
     }
 
     int fileCount = 0;
