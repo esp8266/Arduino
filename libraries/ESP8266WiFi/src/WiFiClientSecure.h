@@ -40,6 +40,9 @@ public:
 
   size_t write(const uint8_t *buf, size_t size) override;
   int read(uint8_t *buf, size_t size) override;
+  int available() override;
+  int read() override;
+  int peek() override;
   void stop() override;
 
 protected:
