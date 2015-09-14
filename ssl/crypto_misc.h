@@ -76,6 +76,7 @@ struct _x509_ctx
     uint8_t sig_type;
     RSA_CTX *rsa_ctx;
     bigint *digest;
+    bigint *fingerprint;
     struct _x509_ctx *next;
 };
 
