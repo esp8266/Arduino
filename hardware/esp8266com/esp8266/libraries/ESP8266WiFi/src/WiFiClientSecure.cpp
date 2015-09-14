@@ -242,6 +242,50 @@ void WiFiClientSecure::stop() {
     return WiFiClient::stop();
 }
 
+static bool parseHexNibble(char pb, uint8_t* res) {
+    if (pb >= '0' && pb <= '9') {
+        *res = (uint8_t) (pb - '0'); return true;
+    }
+    else if (pb >= 'a' && pb <= 'f') {
+        *res = (uint8_t) (pb - 'a' + 10); return true;
+    }
+    else if (pb >= 'A' && pb <= 'F') {
+        *res = (uint8_t) (pb - 'A' + 10); return true;
+    }
+    return false;
+}
+
+bool WiFiClientSecure::verify(const char* fp, const char* url) {
+    uint8_t sha1[20];
+    int len = strlen(fp);
+    int pos = 0;
+    for (int i = 0; i < sizeof(sha1); ++i) {
+        while (pos < len && fp[pos] == ' ') {
+            ++pos;
+        }
+        DEBUGV("pos:%d ", pos);
+        if (pos > len - 2) {
+            DEBUGV("fingerprint too short\r\n");
+            return false;
+        }
+        uint8_t high, low;
+        if (!parseHexNibble(fp[pos], &high) || !parseHexNibble(fp[pos+1], &low)) {
+            DEBUGV("invalid hex sequence: %c%c\r\n", fp[pos], fp[pos+1]);
+            return false;
+        }
+        pos += 2;
+        sha1[i] = low | (high << 4);
+    }
+    if (ssl_match_fingerprint(*_ssl, sha1) != 0) {
+        DEBUGV("fingerprint doesn't match\r\n");
+        return false;
+    }
+
+    //TODO: check URL against certificate
+
+    return true;
+}
+
 extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {
     ClientContext* _client = reinterpret_cast<ClientContext*>(fd);
     if (_client->state() != ESTABLISHED && !_client->getSize()) {

@@ -20,6 +20,10 @@ const char* password = "........";
 const char* host = "api.github.com";
 const int httpsPort = 443;
 
+// Use web browser to view and copy
+// SHA1 fingerprint of the certificate
+const char* fingerprint = "CF 05 98 89 CA FF 8E D8 5E 5C E0 C2 E4 F7 E6 C3 C7 50 DD 5C";
+
 void setup() {
   Serial.begin(115200);
   Serial.println();
@@ -35,15 +39,19 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-
   // Use WiFiClientSecure class to create TLS connection
-
   WiFiClientSecure client;
   Serial.print("connecting to ");
   Serial.println(host);
   if (!client.connect(host, httpsPort)) {
     Serial.println("connection failed");
     return;
+  }
+
+  if (client.verify(fingerprint, host)) {
+    Serial.println("certificate matches");
+  } else {
+    Serial.println("certificate doesn't match");
   }
 
   String url = "/repos/esp8266/Arduino/commits/esp8266/status";
