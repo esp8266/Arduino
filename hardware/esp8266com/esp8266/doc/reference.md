@@ -2,9 +2,7 @@
 title: Reference
 ---
 
-# Table of Contents
-
- * [title: Reference](#title-reference)
+## Table of Contents
  * [Digital IO](#digital-io)
  * [Analog input](#analog-input)
  * [Analog output](#analog-output)
