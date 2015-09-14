@@ -95,7 +95,7 @@ class cbuf {
             size_t bytes_available = room();
             size_t size_to_write = (size < bytes_available) ? size : bytes_available;
             size_t size_written = size_to_write;
-            if(_end > _begin && size_to_write > (size_t)(_bufend - _end)) {
+            if(_end >= _begin && size_to_write > (size_t)(_bufend - _end)) {
                 size_t top_size = _bufend - _end;
                 memcpy(_end, src, top_size);
                 _end = _buf;
