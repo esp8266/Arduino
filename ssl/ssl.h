@@ -372,6 +372,15 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code);
 EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl);
 
 /**
+ * @brief Check if certificate fingerprint (SHA1) matches the one given.
+ *
+ * @param ssl [in] An SSL object reference.
+ * @param fp [in] SHA1 fingerprint to match against
+ * @return SSL_OK if the certificate is verified.
+ */
+EXP_FUNC int STDCALL ssl_match_fingerprint(const SSL *ssl, const uint8_t* fp);
+
+/**
  * @brief Retrieve an X.509 distinguished name component.
  * 
  * When a handshake is complete and a certificate has been exchanged, then the
