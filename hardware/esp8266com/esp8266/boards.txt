@@ -16,6 +16,7 @@ generic.upload.maximum_data_size=81920
 generic.upload.wait_for_upload_port=true
 generic.serial.disableDTR=true
 generic.serial.disableRTS=true
+generic.upload.verbose=-v
 
 generic.build.mcu=esp8266
 generic.build.f_cpu=80000000L
@@ -154,6 +155,7 @@ huzzah.upload.maximum_data_size=81920
 huzzah.upload.wait_for_upload_port=true
 huzzah.serial.disableDTR=true
 huzzah.serial.disableRTS=true
+huzzah.upload.verbose=-v
 
 huzzah.build.mcu=esp8266
 huzzah.build.f_cpu=80000000L
@@ -207,6 +209,7 @@ nodemcu.upload.maximum_data_size=81920
 nodemcu.upload.wait_for_upload_port=true
 nodemcu.serial.disableDTR=true
 nodemcu.serial.disableRTS=true
+nodemcu.upload.verbose=-v
 
 nodemcu.build.mcu=esp8266
 nodemcu.build.f_cpu=80000000L
@@ -269,6 +272,7 @@ nodemcuv2.upload.maximum_data_size=81920
 nodemcuv2.upload.wait_for_upload_port=true
 nodemcuv2.serial.disableDTR=true
 nodemcuv2.serial.disableRTS=true
+nodemcuv2.upload.verbose=-v
 
 nodemcuv2.build.mcu=esp8266
 nodemcuv2.build.f_cpu=80000000L
@@ -384,6 +388,7 @@ thing.upload.maximum_data_size=81920
 thing.upload.wait_for_upload_port=true
 thing.serial.disableDTR=true
 thing.serial.disableRTS=true
+thing.upload.verbose=-v
 
 thing.build.mcu=esp8266
 thing.build.f_cpu=80000000L
@@ -435,6 +440,7 @@ esp210.upload.maximum_data_size=81920
 esp210.upload.wait_for_upload_port=true
 esp210.serial.disableDTR=true
 esp210.serial.disableRTS=true
+esp210.upload.verbose=-v
 
 esp210.build.mcu=esp8266
 esp210.build.f_cpu=80000000L
