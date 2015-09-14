@@ -17,6 +17,7 @@ title: Reference
      * [begin](#begin)
      * [format](#format)
      * [open](#open)
+     * [exists](#exists)
      * [openDir](#opendir)
      * [remove](#remove)
      * [rename](#rename)
