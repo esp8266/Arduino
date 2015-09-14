@@ -193,6 +193,17 @@ File FS::open(const char* path, const char* mode) {
     return File(_impl->open(path, om, am));
 }
 
+bool FS::exists(const char* path) {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->exists(path);
+}
+
+bool FS::exists(const String& path) {
+    return exists(path.c_str());
+}
+
 Dir FS::openDir(const char* path) {
     if (!_impl) {
         return Dir();
