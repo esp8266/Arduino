@@ -2,6 +2,47 @@
 title: Reference
 ---
 
+# Table of Contents
+
+ * [title: Reference](#title-reference)
+ * [Digital IO](#digital-io)
+ * [Analog input](#analog-input)
+ * [Analog output](#analog-output)
+ * [Timing and delays](#timing-and-delays)
+ * [Serial](#serial)
+ * [Progmem](#progmem)
+ * [File system](#file-system)
+   * [Uploading files to file system](#uploading-files-to-file-system)
+   * [File system object (SPIFFS)](#file-system-object-spiffs)
+     * [begin](#begin)
+     * [format](#format)
+     * [open](#open)
+     * [exists](#exists)
+     * [openDir](#opendir)
+     * [remove](#remove)
+     * [rename](#rename)
+   * [Directory object (Dir)](#directory-object-dir)
+   * [File object](#file-object)
+     * [seek](#seek)
+     * [position](#position)
+     * [size](#size)
+     * [name](#name)
+     * [close](#close)
+  * [WiFi(ESP8266WiFi library)](#wifiesp8266wifi-library)
+ * [Ticker](#ticker)
+ * [EEPROM](#eeprom)
+ * [I2C (Wire library)](#i2c-wire-library)
+ * [SPI](#spi)
+ * [ESP-specific APIs](#esp-specific-apis)
+ * [OneWire (from <a href="https://www.pjrc.com/teensy/td_libs_OneWire.html">https://www.pjrc.com/teensy/td_libs_OneWire.html</a>)](#onewire-from-httpswwwpjrccomteensytd_libs_onewirehtml)
+ * [mDNS and DNS-SD responder (ESP8266mDNS library)](#mdns-and-dns-sd-responder-esp8266mdns-library)
+ * [SSDP responder (ESP8266SSDP)](#ssdp-responder-esp8266ssdp)
+ * [DNS server (DNSServer library)](#dns-server-dnsserver-library)
+ * [Servo](#servo)
+ * [Other libraries (not included with the IDE)](#other-libraries-not-included-with-the-ide)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 ## Digital IO
 
 Pin numbers in Arduino correspond directly to the ESP8266 GPIO pin numbers. `pinMode`, `digitalRead`, and `digitalWrite` functions work as usual, so to read GPIO2, call `digitalRead(2)`.
