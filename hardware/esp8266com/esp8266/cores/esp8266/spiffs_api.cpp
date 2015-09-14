@@ -59,7 +59,7 @@ public:
     }
 
     FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) override;
-
+    bool exists(const char* path) override;
     DirImplPtr openDir(const char* path) override;
 
     bool rename(const char* pathFrom, const char* pathTo) override {
@@ -402,6 +402,14 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
         return FileImplPtr();
     }
     return std::make_shared<SPIFFSFileImpl>(this, fd);
+}
+
+bool SPIFFSImpl::exists(const char* path) {
+    char tmpName[SPIFFS_OBJ_NAME_LEN];
+    strlcpy(tmpName, path, sizeof(tmpName));
+    spiffs_stat stat;
+    int rc = SPIFFS_stat(&_fs, tmpName, &stat);
+    return rc == SPIFFS_OK;
 }
 
 DirImplPtr SPIFFSImpl::openDir(const char* path) {

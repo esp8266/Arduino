@@ -231,6 +231,14 @@ if (!f) {
 }
 ```
 
+#### exists
+
+```c++
+SPIFFS.exists(path)
+```
+
+Returns *true* if a file with given path exists, *false* otherwise.
+
 #### openDir
 
 ```c++

@@ -16,6 +16,7 @@ WiFi	KEYWORD1
 WiFiClient	KEYWORD1
 WiFiServer	KEYWORD1
 WiFiUDP	KEYWORD1
+WiFiClientSecure	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -64,4 +65,3 @@ scanNetworks	KEYWORD2
 WIFI_AP	LITERAL1
 WIFI_STA	LITERAL1
 WIFI_AP_STA	LITERAL1
-

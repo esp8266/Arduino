@@ -38,8 +38,13 @@ public:
   int connect(IPAddress ip, uint16_t port) override;
   int connect(const char* name, uint16_t port) override;
 
+  bool verify(const char* fingerprint, const char* url);
+
   size_t write(const uint8_t *buf, size_t size) override;
   int read(uint8_t *buf, size_t size) override;
+  int available() override;
+  int read() override;
+  int peek() override;
   void stop() override;
 
 protected:
