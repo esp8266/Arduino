@@ -47,7 +47,7 @@ ESP8266WiFiClass::ESP8266WiFiClass()
 {
     uint8 m = wifi_get_opmode();
     _useClientMode = (m & WIFI_STA);
-    _useApMode = (m & WIFI_AP_STA);
+    _useApMode = (m & WIFI_AP);
     wifi_set_event_handler_cb((wifi_event_handler_cb_t)&ESP8266WiFiClass::_eventCallback);
 }
 
