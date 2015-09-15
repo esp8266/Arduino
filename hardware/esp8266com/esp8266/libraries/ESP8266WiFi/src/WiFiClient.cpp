@@ -86,37 +86,46 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 }
 
 
-int WiFiClient::connect(const char* host, uint16_t port)
+int WiFiClient::_connect(const char* host, uint16_t port,bool block)
 {
+    _blocking=block;
+    _asyncerr=false;
     IPAddress remote_addr;
     if (WiFi.hostByName(host, remote_addr))
     {
-        return connect(remote_addr, port);
+        return _connect(remote_addr, port,block);
     }
+    _asyncerr=true;
     return 0;
 }
 
-int WiFiClient::connect(IPAddress ip, uint16_t port)
+int WiFiClient::_connect(IPAddress ip, uint16_t port,bool block)
 {
+    _blocking=block;
+    _asyncerr=false;
     ip_addr_t addr;
     addr.addr = ip;
 
-    if (_client)
+    if (_client) {
+        _asyncerr=true;
         stop();
-
+    }
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
     // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
     netif* interface = ip_route(&addr);
     if (!interface) {
+        _asyncerr=true;
         DEBUGV("no route to host\r\n");
         return 0;
     }
 
     tcp_pcb* pcb = tcp_new();
-    if (!pcb)
+    if (!pcb) {
+        _asyncerr=true;
         return 0;
-
+    }
+    
     if (_localPort > 0) {
         pcb->local_port = _localPort++;
     }
@@ -124,14 +133,16 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     tcp_arg(pcb, this);
     tcp_err(pcb, &WiFiClient::_s_err);
     tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
-
-    esp_yield();
-    if (_client)
-        return 1;
-
-    //  if tcp_error was called, pcb has already been destroyed.
-    // tcp_abort(pcb);
-    return 0;
+    if (block) {
+        esp_yield();
+        if (_client)
+            return 1;
+        //  if tcp_error was called, pcb has already been destroyed.
+        // tcp_abort(pcb);
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 int8_t WiFiClient::_connected(void* pcb, int8_t err)
@@ -139,14 +150,19 @@ int8_t WiFiClient::_connected(void* pcb, int8_t err)
     tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
     _client = new ClientContext(tpcb, 0, 0);
     _client->ref();
-    esp_schedule();
+    if (!_blocking) esp_schedule();
     return ERR_OK;
 }
+
 
 void WiFiClient::_err(int8_t err)
 {
     DEBUGV(":err %d\r\n", err);
-    esp_schedule();
+    if (_blocking){
+        esp_schedule();
+    } else {
+        _asyncerr=true;
+    }
 }
 
 
@@ -216,11 +232,12 @@ int WiFiClient::available()
 
     int result = _client->getSize();
 
-    if (!result) {
+    if (!result && _blocking) {
         optimistic_yield(100);
     }
     return result;
 }
+
 
 int WiFiClient::read()
 {
@@ -315,6 +332,7 @@ int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
 {
     return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);
 }
+
 
 void WiFiClient::_s_err(void* arg, int8_t err)
 {

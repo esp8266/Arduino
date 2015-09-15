@@ -36,7 +36,10 @@ class WiFiServer;
 class WiFiClient : public Client, public SList<WiFiClient> {
 protected:
   WiFiClient(ClientContext* client);
-
+  
+  virtual int _connect(const char *host, uint16_t port, bool block);
+  virtual int _connect(IPAddress ip, uint16_t port, bool block);
+  
 public:
   WiFiClient();
   virtual ~WiFiClient();
@@ -44,8 +47,11 @@ public:
   WiFiClient& operator=(const WiFiClient&);
 
   uint8_t status();
-  virtual int connect(IPAddress ip, uint16_t port);
-  virtual int connect(const char *host, uint16_t port);
+  virtual int connect(IPAddress ip, uint16_t port) {return _connect(ip,port,true);}
+  virtual int connectAsync(IPAddress ip, uint16_t port) {return _connect(ip,port,false);}
+  virtual int connect(const char *host, uint16_t port) {return _connect(host,port,true);}
+  virtual int connectAsync(const char *host, uint16_t port) {return _connect(host,port,false);}
+  
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
   size_t write_P(PGM_P buf, size_t size);
@@ -94,10 +100,12 @@ public:
   friend class WiFiServer;
 
   using Print::write;
-
   static void stopAll();
+  bool asyncerr() {return _asyncerr;}
   static void stopAllExcept(WiFiClient * c);
-
+private:
+  bool _asyncerr;
+  bool _blocking;
 protected:
 
   static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
