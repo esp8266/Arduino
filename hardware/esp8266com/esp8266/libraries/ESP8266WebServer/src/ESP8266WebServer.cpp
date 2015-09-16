@@ -40,8 +40,7 @@ ESP8266WebServer::ESP8266WebServer(int port)
 {
 }
 
-ESP8266WebServer::~ESP8266WebServer()
-{
+ESP8266WebServer::~ESP8266WebServer() {
   if (!_firstHandler)
     return;
   RequestHandler* handler = _firstHandler;
@@ -56,14 +55,11 @@ void ESP8266WebServer::begin() {
   _server.begin();
 }
 
-
-void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction handler)
-{
+void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction handler) {
   on(uri, HTTP_ANY, handler);
 }
 
-void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn)
-{
+void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn) {
   _addRequestHandler(new FunctionRequestHandler(fn, uri, method));
 }
 
@@ -79,11 +75,10 @@ void ESP8266WebServer::_addRequestHandler(RequestHandler* handler) {
 }
 
 void ESP8266WebServer::serveStatic(const char* uri, FS& fs, const char* path) {
-    _addRequestHandler(new StaticRequestHandler(fs, uri));
+    _addRequestHandler(new StaticRequestHandler(fs, path, uri));
 }
 
-void ESP8266WebServer::handleClient()
-{
+void ESP8266WebServer::handleClient() {
   WiFiClient client = _server.available();
   if (!client) {
     return;

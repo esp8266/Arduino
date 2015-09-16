@@ -4,8 +4,8 @@
 class RequestHandler {
 public:
   RequestHandler(const char* uri, HTTPMethod method)
-  : uri(uri)
-  , method(method)
+  : _uri(uri)
+  , _method(method)
   , next(NULL)
   {
   }
@@ -15,8 +15,8 @@ public:
   RequestHandler* next;
 
 protected:
-  String uri;
-  HTTPMethod method;
+  String _uri;
+  HTTPMethod _method;
 };
 
 
@@ -25,47 +25,59 @@ class FunctionRequestHandler : public RequestHandler {
 
 public:
     FunctionRequestHandler(ESP8266WebServer::THandlerFunction fn, const char* uri, HTTPMethod method)
-    : fn(fn)
+    : _fn(fn)
     , base(uri, method)
     {
     }
 
     bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
-        if (method != HTTP_ANY && method != requestMethod)
+        if (_method != HTTP_ANY && _method != requestMethod)
             return false;
 
-        if (requestUri != uri)
+        if (requestUri != _uri)
             return false;
 
-        fn();
+        _fn();
         return true;
     }
 
 protected:
-    ESP8266WebServer::THandlerFunction fn;
+    ESP8266WebServer::THandlerFunction _fn;
 };
 
 class StaticRequestHandler : public RequestHandler {
     typedef RequestHandler base;
 
 public:
-    StaticRequestHandler(FS& fs, const char* uri)
-    : fs(fs)
+    StaticRequestHandler(FS& fs, const char* path, const char* uri)
+    : _fs(fs)
     , base(uri, HTTP_GET)
+    , _path(path)
     {
+        _isFile = fs.exists(path);
+        DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d\r\n", path, uri, _isFile);
+        _baseUriLength = _uri.length();
     }
 
     bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
-        if (requestMethod != method)
+        if (requestMethod != _method)
             return false;
-        DEBUGV("StaticRequestHandler::handle: %s\r\n", requestUri.c_str());
-        if (!requestUri.startsWith(uri))
+        DEBUGV("StaticRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), _uri.c_str());
+        if (!requestUri.startsWith(_uri))
             return false;
 
-        auto prefixLength = uri.length() - 1;
-        String path = requestUri.substring(prefixLength);
-        DEBUGV("StaticRequestHandler::handle: %d %s\r\n", prefixLength, path.c_str());
-        File f = fs.open(path, "r");
+        String path(_path);
+        if (!_isFile) {
+            // Base URI doesn't point to a file. Append whatever follows this
+            // URI in request to get the file path.
+            path += requestUri.substring(_baseUriLength);
+        }
+        else if (requestUri != _uri) {
+            // Base URI points to a file but request doesn't match this URI exactly
+            return false;
+        }
+        DEBUGV("StaticRequestHandler::handle: path=%s, isFile=%d\r\n", path.c_str(), _isFile);
+        File f = _fs.open(path, "r");
         if (!f)
             return false;
 
@@ -90,7 +102,10 @@ public:
     }
 
 protected:
-    FS fs;
+    FS _fs;
+    String _path;
+    bool _isFile;
+    size_t _baseUriLength;
 };
 
 #endif //REQUESTHANDLER_H
