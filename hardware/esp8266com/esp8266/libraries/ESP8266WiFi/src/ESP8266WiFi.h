@@ -44,6 +44,7 @@ public:
     ESP8266WiFiClass();
 
     void mode(WiFiMode);
+    uint8 getMode();
 
     /**
      * Start Wifi connection
