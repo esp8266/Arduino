@@ -50,6 +50,8 @@ extern "C"
 #define SSL_DEBUG_OPTS 0
 #endif
 
+#define SSL_RX_BUF_SIZE 1536
+
 class SSLContext {
 public:
     SSLContext() {
@@ -58,7 +60,7 @@ public:
         }
         ++_ssl_ctx_refcnt;
 
-        _rxbuf = new cbuf(1536);
+        _rxbuf = new cbuf(SSL_RX_BUF_SIZE);
     }
 
     ~SSLContext() {
@@ -112,8 +114,14 @@ public:
     }
 
     int available() {
-        optimistic_yield(100);
-        return _rxbuf->getSize();
+        auto rc = _rxbuf->getSize();
+        if (rc == 0) {
+            _readAll();
+            rc = _rxbuf->getSize();
+        } else {
+            optimistic_yield(100);
+        }
+        return rc;
     }
 
     operator SSL*() {
@@ -297,7 +305,7 @@ extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {
         errno = EAGAIN;
     }
     if (cb == 0) {
-        yield();
+        optimistic_yield(100);
         return -1;
     }
     return cb;
