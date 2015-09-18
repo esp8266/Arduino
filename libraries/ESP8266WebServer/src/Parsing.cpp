@@ -59,6 +59,8 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     method = HTTP_POST;
   } else if (methodStr == "DELETE") {
     method = HTTP_DELETE;
+  } else if (methodStr == "OPTIONS") {
+    method = HTTP_OPTIONS;
   } else if (methodStr == "PUT") {
     method = HTTP_PUT;
   } else if (methodStr == "PATCH") {
