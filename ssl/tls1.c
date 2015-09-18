@@ -1892,8 +1892,7 @@ EXP_FUNC int STDCALL ssl_match_fingerprint(const SSL *ssl, const uint8_t* fp)
     uint8_t cert_fp[SHA1_SIZE];
     X509_CTX* x509 = ssl->x509_ctx;
 
-    bi_export(x509->rsa_ctx->bi_ctx, x509->fingerprint, cert_fp, SHA1_SIZE);
-    return memcmp(cert_fp, fp, SHA1_SIZE);
+    return memcmp(x509->fingerprint, fp, SHA1_SIZE);
 }
 
 #endif /* CONFIG_SSL_CERT_VERIFICATION */

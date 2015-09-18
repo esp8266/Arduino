@@ -119,12 +119,11 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
 
     bi_ctx = x509_ctx->rsa_ctx->bi_ctx;
 
+    x509_ctx->fingerprint = malloc(SHA1_SIZE);
     SHA1_CTX sha_fp_ctx;
-    uint8_t sha_fp_dgst[SHA1_SIZE];
     SHA1_Init(&sha_fp_ctx);
     SHA1_Update(&sha_fp_ctx, &cert[0], cert_size);
-    SHA1_Final(sha_fp_dgst, &sha_fp_ctx);
-    x509_ctx->fingerprint = bi_import(bi_ctx, sha_fp_dgst, SHA1_SIZE);
+    SHA1_Final(x509_ctx->fingerprint, &sha_fp_ctx);
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION /* only care if doing verification */
     /* use the appropriate signature algorithm (SHA1/MD5/MD2) */
@@ -254,7 +253,7 @@ void x509_free(X509_CTX *x509_ctx)
 
     if (x509_ctx->fingerprint)
     {
-        bi_free(x509_ctx->rsa_ctx->bi_ctx, x509_ctx->fingerprint);
+        free(x509_ctx->fingerprint);
     }
 
     if (x509_ctx->subject_alt_dnsnames)
