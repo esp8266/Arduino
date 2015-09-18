@@ -186,24 +186,19 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
 
     char chunkUnit[WIFICLIENT_MAX_PACKET_SIZE + 1];
     chunkUnit[WIFICLIENT_MAX_PACKET_SIZE] = '\0';
-    while (buf != NULL) 
-    {
-        size_t chunkUnitLen;
-        PGM_P chunkNext;
-        chunkNext = (PGM_P)memccpy_P((void*)chunkUnit, (PGM_VOID_P)buf, 0, WIFICLIENT_MAX_PACKET_SIZE);
-        if (chunkNext == NULL) 
-        {
-            // no terminator, more data available
-            buf += WIFICLIENT_MAX_PACKET_SIZE;
-            chunkUnitLen = WIFICLIENT_MAX_PACKET_SIZE;
-        }
-        else 
-        {
-            // reached terminator
-            chunkUnitLen = chunkNext - buf;
-            buf = NULL;
-        }
-        if (size < WIFICLIENT_MAX_PACKET_SIZE) chunkUnitLen = size;
+    size_t remaining_size = size;
+
+    while (buf != NULL && remaining_size > 0) {
+        size_t chunkUnitLen = WIFICLIENT_MAX_PACKET_SIZE;
+
+        if (remaining_size < WIFICLIENT_MAX_PACKET_SIZE) chunkUnitLen = remaining_size;
+        // due to the memcpy signature, lots of casts are needed
+        memcpy_P((void*)chunkUnit, (PGM_VOID_P)buf, chunkUnitLen);
+
+        buf += chunkUnitLen;
+        remaining_size -= chunkUnitLen;
+
+        // write is so overloaded, had to use the cast to get it pick the right one
         _client->write((const char*)chunkUnit, chunkUnitLen);
     }
     return size;
