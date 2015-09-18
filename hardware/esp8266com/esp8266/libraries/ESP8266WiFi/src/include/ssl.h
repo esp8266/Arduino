@@ -67,8 +67,6 @@
 extern "C" {
 #endif
 
-#include <time.h>
-
 /* need to predefine before ssl_lib.h gets to it */
 #define SSL_SESSION_ID_SIZE                     32
 
