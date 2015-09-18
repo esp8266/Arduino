@@ -74,6 +74,11 @@ void ESP8266WiFiClass::mode(WiFiMode m)
     ETS_UART_INTR_ENABLE();
 }
 
+WiFiMode ESP8266WiFiClass::getMode()
+{
+    return (WiFiMode)wifi_get_opmode();
+}
+
 void ESP8266WiFiClass::_mode(WiFiMode m)
 {
     if(wifi_get_opmode() == (uint8)m) {
