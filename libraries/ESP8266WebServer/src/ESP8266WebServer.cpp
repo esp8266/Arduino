@@ -159,9 +159,20 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     }
 
     String header;
-    _prepareHeader(header, code, String(FPSTR(content_type)).c_str(), contentLength);
+    char type[64];
+    memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
+    _prepareHeader(header, code, (const char* )type, contentLength);
     sendContent(header);
     sendContent_P(content);
+}
+
+void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
+    String header;
+    char type[64];
+    memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
+    _prepareHeader(header, code, (const char* )type, contentLength);
+    sendContent(header);
+    sendContent_P(content, contentLength);
 }
 
 void ESP8266WebServer::send(int code, char* content_type, const String& content) {
@@ -210,6 +221,26 @@ void ESP8266WebServer::sendContent_P(PGM_P content) {
             contentUnitLen = contentNext - content;
             content = NULL;
         }
+
+        // write is so overloaded, had to use the cast to get it pick the right one
+        _currentClient.write((const char*)contentUnit, contentUnitLen);
+    }
+}
+
+void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
+    char contentUnit[HTTP_DOWNLOAD_UNIT_SIZE + 1];
+    contentUnit[HTTP_DOWNLOAD_UNIT_SIZE] = '\0';
+    size_t remaining_size = size;
+
+    while (content != NULL && remaining_size > 0) {
+        size_t contentUnitLen = HTTP_DOWNLOAD_UNIT_SIZE;
+
+        if (remaining_size < HTTP_DOWNLOAD_UNIT_SIZE) contentUnitLen = remaining_size;
+        // due to the memcpy signature, lots of casts are needed
+        memcpy_P((void*)contentUnit, (PGM_VOID_P)content, contentUnitLen);
+
+        content += contentUnitLen;
+        remaining_size -= contentUnitLen;
 
         // write is so overloaded, had to use the cast to get it pick the right one
         _currentClient.write((const char*)contentUnit, contentUnitLen);

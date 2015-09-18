@@ -280,6 +280,8 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
             return (2_MB);
         case 0x1440EF: // W25Q80
             return (1_MB);
+        case 0x1340EF: // W25Q40
+            return (512_kB);
 
         default:
             return 0;
