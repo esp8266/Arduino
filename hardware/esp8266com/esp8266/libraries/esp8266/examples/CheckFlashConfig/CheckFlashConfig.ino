@@ -5,8 +5,6 @@
  
  */
 
-#include <ESP.h>
-
 void setup(void) {
     Serial.begin(115200);
 }
@@ -22,7 +20,7 @@ void loop() {
 
     Serial.printf("Flash ide  size: %u\n", ideSize);
     Serial.printf("Flash ide speed: %u\n", ESP.getFlashChipSpeed());
-    DEBUG_SERIAL.printf("Flash ide mode:  %s\n", (ideMode == FM_QIO ? "QIO" : ideMode == FM_QOUT ? "QOUT" : ideMode == FM_DIO ? "DIO" : ideMode == FM_DOUT ? "DOUT" : "UNKNOWN"));
+    Serial.printf("Flash ide mode:  %s\n", (ideMode == FM_QIO ? "QIO" : ideMode == FM_QOUT ? "QOUT" : ideMode == FM_DIO ? "DIO" : ideMode == FM_DOUT ? "DOUT" : "UNKNOWN"));
 
     if(ideSize != realSize) {
         Serial.println("Flash Chip configuration wrong!\n");
