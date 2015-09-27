@@ -262,13 +262,15 @@ uint16_t Adafruit_ILI9341::getWidth(void){
 // establish settings and protect from interference from other
 // libraries.  Otherwise, they simply do nothing.
 #ifdef SPI_HAS_TRANSACTION
-
+#ifndef ILI9341_SPEED
 #ifdef ESP8266
 SPISettings spiSettings = SPISettings(ESP8266_CLOCK, MSBFIRST, SPI_MODE0);
 #else
 SPISettings spiSettings =  SPISettings(8000000, MSBFIRST, SPI_MODE0);
 #endif
-
+#else
+SPISettings spiSettings =  SPISettings(ILI9341_SPEED, MSBFIRST, SPI_MODE0);
+#endif
 static inline void spi_begin(void) __attribute__((always_inline));
 static inline void spi_begin(void) {
   SPI.beginTransaction(spiSettings);
