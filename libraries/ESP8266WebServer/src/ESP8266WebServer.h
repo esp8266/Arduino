@@ -27,7 +27,8 @@
 #include <functional>
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
-enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
+enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
+                        UPLOAD_FILE_ABORTED };
 
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
 #define HTTP_UPLOAD_BUFLEN 2048
@@ -116,6 +117,7 @@ protected:
   void _parseArguments(String data);
   static const char* _responseCodeToString(int code);
   bool _parseForm(WiFiClient& client, String boundary, uint32_t len);
+  bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
