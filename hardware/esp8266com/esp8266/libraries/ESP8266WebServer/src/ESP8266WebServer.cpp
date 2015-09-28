@@ -130,10 +130,10 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
 
     sendHeader("Content-Type", content_type, true);
     if (_contentLength != CONTENT_LENGTH_UNKNOWN && _contentLength != CONTENT_LENGTH_NOT_SET) {
-        sendHeader("Content-Length", String(_contentLength).c_str());
+        sendHeader("Content-Length", String(_contentLength));
     }
     else if (contentLength > 0){
-        sendHeader("Content-Length", String(contentLength).c_str());
+        sendHeader("Content-Length", String(contentLength));
     }
     sendHeader("Connection", "close");
     sendHeader("Access-Control-Allow-Origin", "*");
