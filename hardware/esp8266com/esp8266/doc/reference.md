@@ -26,7 +26,7 @@ title: Reference
      * [size](#size)
      * [name](#name)
      * [close](#close)
-  * [WiFi(ESP8266WiFi library)](#wifiesp8266wifi-library)
+ * [WiFi(ESP8266WiFi library)](#wifiesp8266wifi-library)
  * [Ticker](#ticker)
  * [EEPROM](#eeprom)
  * [I2C (Wire library)](#i2c-wire-library)
@@ -382,7 +382,7 @@ Size can be anywhere between 4 and 4096 bytes.
 whenever you wish to save changes to flash. `EEPROM.end()` will also commit, and will
 release the RAM copy of EEPROM contents.
 
-EEPROM library uses one sector of flash located at 0x7b000 for storage.
+EEPROM library uses one sector of flash located just after the SPIFFS.
 
 Three examples included.
 
