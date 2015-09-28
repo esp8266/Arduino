@@ -145,6 +145,17 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t ch
     return status();
 }
 
+int ESP8266WiFiClass::begin()
+{
+    ETS_UART_INTR_DISABLE();
+    wifi_station_connect();
+    ETS_UART_INTR_ENABLE();
+
+    if(!_useStaticIp)
+        wifi_station_dhcpc_start();
+    return status();
+}
+
 uint8_t ESP8266WiFiClass::waitForConnectResult(){
   if ((wifi_get_opmode() & 1) == 0)//1 and 3 have STA enabled
       return WL_DISCONNECTED;
@@ -364,6 +375,13 @@ char* ESP8266WiFiClass::SSID()
     static struct station_config conf;
     wifi_station_get_config(&conf);
     return reinterpret_cast<char*>(conf.ssid);
+}
+
+const char* ESP8266WiFiClass::psk()
+{
+    static struct station_config conf;
+    wifi_station_get_config(&conf);
+    return reinterpret_cast<const char*>(conf.password);
 }
 
 uint8_t* ESP8266WiFiClass::BSSID(void)
