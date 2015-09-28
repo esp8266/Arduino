@@ -26,7 +26,7 @@ title: Reference
      * [size](#size)
      * [name](#name)
      * [close](#close)
-  * [WiFi(ESP8266WiFi library)](#wifiesp8266wifi-library)
+ * [WiFi(ESP8266WiFi library)](#wifiesp8266wifi-library)
  * [Ticker](#ticker)
  * [EEPROM](#eeprom)
  * [I2C (Wire library)](#i2c-wire-library)
