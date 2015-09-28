@@ -118,7 +118,7 @@ ICACHE_FLASH_ATTR String::String(double value, unsigned char decimalPlaces) {
 }
 
 ICACHE_FLASH_ATTR String::~String() {
-    os_free(buffer);
+    free(buffer);
 }
 
 // /*********************************************/
@@ -133,7 +133,7 @@ inline void String::init(void) {
 
 void ICACHE_FLASH_ATTR String::invalidate(void) {
     if(buffer)
-        os_free(buffer);
+        free(buffer);
     buffer = NULL;
     capacity = len = 0;
 }
@@ -150,12 +150,18 @@ unsigned char ICACHE_FLASH_ATTR String::reserve(unsigned int size) {
 }
 
 unsigned char ICACHE_FLASH_ATTR String::changeBuffer(unsigned int maxStrLen) {
-    char *newbuffer = (char *) os_realloc(buffer, maxStrLen + 1);
+    size_t newSize = (maxStrLen + 16) & (~0xf);
+    char *newbuffer = (char *) malloc(newSize);
     if(newbuffer) {
+        memset(newbuffer, 0, newSize);
+        memcpy(newbuffer, buffer, len);
+        if (buffer)
+            free(buffer);
+        capacity = newSize - 1;
         buffer = newbuffer;
-        capacity = maxStrLen;
         return 1;
     }
+    buffer = newbuffer;
     return 0;
 }
 
@@ -192,7 +198,7 @@ void ICACHE_FLASH_ATTR String::move(String &rhs) {
             rhs.len = 0;
             return;
         } else {
-            os_free(buffer);
+            free(buffer);
         }
     }
     buffer = rhs.buffer;
