@@ -58,6 +58,9 @@ public:
     int begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, uint8_t bssid[6] = NULL);
     int begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, uint8_t bssid[6] = NULL);
 
+    // Use sdk config to connect.
+    int begin();
+
 
    /* Wait for Wifi connection to reach a result
     * returns the status reached or disconnect if STA is off
@@ -171,6 +174,13 @@ public:
      * return: ssid string
      */
     char* SSID();
+
+    /*
+     * Return the current pre shared key associated with the network
+     *
+     * return: psk string
+     */
+    const char* psk();
 
     /*
      * Return the current bssid / mac associated with the network if configured
