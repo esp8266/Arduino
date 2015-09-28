@@ -130,10 +130,19 @@ public:
 
 protected:
     int _readAll() {
+        if (!_ssl)
+            return 0;
+
         uint8_t* data;
         int rc = ssl_read(_ssl, &data);
-        if (rc <= 0)
+        if (rc <= 0) {
+            if (rc < SSL_OK && rc != SSL_CLOSE_NOTIFY && rc != SSL_ERROR_CONN_LOST) {
+                ssl_free(_ssl);
+                _ssl = nullptr;
+            }
             return 0;
+        }
+
 
         if (rc > _rxbuf->room()) {
             DEBUGV("WiFiClientSecure rx overflow");
@@ -219,6 +228,9 @@ int WiFiClientSecure::_connectSSL() {
 }
 
 size_t WiFiClientSecure::write(const uint8_t *buf, size_t size) {
+    if (!_ssl)
+        return 0;
+
     int rc = ssl_write(*_ssl, buf, size);
     if (rc >= 0)
         return rc;
@@ -227,19 +239,41 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size) {
 }
 
 int WiFiClientSecure::read(uint8_t *buf, size_t size) {
+    if (!_ssl)
+        return 0;
+
     return _ssl->read(buf, size);
 }
 
 int WiFiClientSecure::read() {
+    if (!_ssl)
+        return -1;
+
     return _ssl->read();
 }
 
 int WiFiClientSecure::peek() {
+    if (!_ssl)
+        return -1;
+
     return _ssl->peek();
 }
 
 int WiFiClientSecure::available() {
+    if (!_ssl)
+        return 0;
+
     return _ssl->available();
+}
+
+uint8_t WiFiClientSecure::connected() {
+    if (_client->state() == ESTABLISHED)
+        return 1;
+
+    if (!_ssl)
+        return 0;
+
+    return _ssl->available() > 0;
 }
 
 void WiFiClientSecure::stop() {
@@ -264,6 +298,9 @@ static bool parseHexNibble(char pb, uint8_t* res) {
 }
 
 bool WiFiClientSecure::verify(const char* fp, const char* url) {
+    if (!_ssl)
+        return false;
+
     uint8_t sha1[20];
     int len = strlen(fp);
     int pos = 0;
