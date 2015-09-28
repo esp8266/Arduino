@@ -31,6 +31,7 @@ title: Reference
  * [EEPROM](#eeprom)
  * [I2C (Wire library)](#i2c-wire-library)
  * [SPI](#spi)
+ * [SoftwareSerial](#softwareserial)
  * [ESP-specific APIs](#esp-specific-apis)
  * [OneWire (from <a href="https://www.pjrc.com/teensy/td_libs_OneWire.html">https://www.pjrc.com/teensy/td_libs_OneWire.html</a>)](#onewire-from-httpswwwpjrccomteensytd_libs_onewirehtml)
  * [mDNS and DNS-SD responder (ESP8266mDNS library)](#mdns-and-dns-sd-responder-esp8266mdns-library)
@@ -397,6 +398,10 @@ else they default to pins 4(SDA) and 5(SCL).
 
 SPI library supports the entire Arduino SPI API including transactions, including setting phase (CPHA).
 Setting the Clock polarity (CPOL) is not supported, yet (SPI_MODE2 and SPI_MODE3 not working).
+
+## SoftwareSerial
+
+An ESP8266 port of SoftwareSerial library done by Peter Lerup (@plerup) supports baud rate up to 115200 and multiples SoftwareSerial instances. See the https://github.com/plerup/espsoftwareserial if you want to suggest an improvement or open an issue related to SoftwareSerial.
 
 ## ESP-specific APIs
 
