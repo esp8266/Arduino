@@ -17,6 +17,12 @@ cp -R ../libraries/SD $outdir/libraries/
 cp -R ../libraries/Adafruit_ILI9341 $outdir/libraries/
 cp -R ../libraries/OneWire $outdir/libraries/
 
+wget -O SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/38259afcab9c291dbb6216f827d9a3738abf1868.zip
+unzip SoftwareSerial.zip
+rm -rf SoftwareSerial.zip
+mv espsoftwareserial-* SoftwareSerial
+mv SoftwareSerial $outdir/libraries
+
 cat $srcdir/platform.txt | \
 gsed 's/runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}\/tools\/xtensa-lx106-elf//g' | \
 gsed 's/runtime.tools.esptool.path={runtime.platform.path}\/tools//g' | \
