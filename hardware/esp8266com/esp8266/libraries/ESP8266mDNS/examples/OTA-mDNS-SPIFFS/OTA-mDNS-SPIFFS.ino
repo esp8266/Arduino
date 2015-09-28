@@ -32,12 +32,6 @@ const char* ap_default_psk = "esp8266esp8266"; ///< Default PSK.
 /// OTA Update UDP server handle.
 WiFiUDP OTA;
 
-/// Global WiFi SSID.
-String g_ssid = "";
-
-/// Global WiFi PSK.
-String g_pass = "";
-
 
 /**
  * @brief Read WiFi connection information from file system.
@@ -79,10 +73,6 @@ bool loadConfig(String *ssid, String *pass)
   // Store SSID and PSK into string vars.
   *ssid = content.substring(0, pos);
   *pass = content.substring(pos + 2);
-
-  // Print SSID.
-  Serial.print("ssid: ");
-  Serial.println(*ssid);
 
   return true;
 } // loadConfig
@@ -205,16 +195,22 @@ static inline void ota_handle(void)
  */
 void setup()
 {
-  g_ssid = "";
-  g_pass = "";
+  String station_ssid = "";
+  String station_psk = "";
 
   Serial.begin(115200);
   
   delay(100);
 
   Serial.println("\r\n");
-  Serial.print("Chip ID: ");
+  Serial.print("Chip ID: 0x");
   Serial.println(ESP.getChipId(), HEX);
+
+  // Set Hostname.
+  WiFi.hostname(HOSTNAME);
+  Serial.print("hostname: ");
+  Serial.println(WiFi.hostname());
+
 
   // Initialize file system.
   if (!SPIFFS.begin())
@@ -224,44 +220,71 @@ void setup()
   }
 
   // Load wifi connection information.
-  if (! loadConfig(&g_ssid, &g_pass))
+  if (! loadConfig(&station_ssid, &station_psk))
   {
-    g_ssid = "";
-    g_pass = "";
+    station_ssid = "";
+    station_psk = "";
 
     Serial.println("No WiFi connection information available.");
   }
 
-  // Set Hostname.
-  WiFi.hostname(HOSTNAME);
+  // Check WiFi connection
+  // ... check mode
+  if (WiFi.getMode() != WIFI_STA)
+  {
+    WiFi.mode(WIFI_STA);
+    delay(10);
+  }
+
+  // ... Load sdk config.
+  String ssid(WiFi.SSID());
+  String psk(WiFi.psk());
+
+  // ... Compare fiel config with sdk config.
+  if (ssid != station_ssid || psk != station_psk)
+  {
+    Serial.println("WiFi config changed.");
+
+    // ... Try to connect to WiFi station.
+    WiFi.begin(station_ssid.c_str(), station_psk.c_str());
+
+    // ... Pritn new SSID
+    Serial.print("new SSID: ");
+    Serial.println(WiFi.SSID());
+
+    // ... Uncomment this for debugging output.
+    //WiFi.printDiag(Serial);
+  }
+  else
+  {
+    // ... Begin with sdk config.
+    WiFi.begin();
+  }
 
   Serial.println("Wait for WiFi connection.");
 
-  // Try to connect to WiFi AP.
-  WiFi.mode(WIFI_STA);
-  delay(10);
-  WiFi.begin(g_ssid.c_str(), g_pass.c_str());
-
-  // Give ESP 10 seconds to connect to ap.
+  // ... Give ESP 10 seconds to connect to station.
   unsigned long startTime = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000)
   {
     Serial.write('.');
+    //Serial.print(WiFi.status());
     delay(500);
   }
   Serial.println();
 
-  // check connection
+  // Check connection
   if(WiFi.status() == WL_CONNECTED)
   {
+    // ... print IP Address
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
   }
   else
   {
-    Serial.println("Can not connect. Go into AP mode.");
+    Serial.println("Can not connect to WiFi station. Go into AP mode.");
     
-    // Go into AP mode.
+    // Go into software AP mode.
     WiFi.mode(WIFI_AP);
 
     delay(10);
