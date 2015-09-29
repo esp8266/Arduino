@@ -17,7 +17,7 @@
  * @brief mDNS and OTA Constants
  * @{
  */
-#define HOSTNAME "ESP8266-ota" ///< Hostename 
+#define HOSTNAME "ESP8266-OTA-" ///< Hostename. The setup function adds the Chip ID at the end.
 #define APORT 8266 ///< Port for OTA update
 /// @}
 
@@ -207,7 +207,11 @@ void setup()
   Serial.println(ESP.getChipId(), HEX);
 
   // Set Hostname.
-  WiFi.hostname(HOSTNAME);
+  String hostname(HOSTNAME);
+  hostname += String(ESP.getChipId(), HEX);
+  WiFi.hostname(hostname);
+
+  // Print hostname.
   Serial.print("hostname: ");
   Serial.println(WiFi.hostname());
 
@@ -296,7 +300,7 @@ void setup()
   }
 
   // Initialize mDNS service.
-  MDNS.begin(HOSTNAME);
+  MDNS.begin(hostname.c_str());
 
   // ... Add OTA service.
   MDNS.addService("arduino", "tcp", APORT);

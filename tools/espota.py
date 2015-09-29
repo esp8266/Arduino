@@ -123,7 +123,7 @@ def parser():
 	group.add_option("-p", "--port",
 		dest = "esp_port",
 		type = "int",
-		help = "ESP8266 ota Port.",
+		help = "ESP8266 ota Port. Default 8266",
 		default = 8266
 	)
 	parser.add_option_group(group)
