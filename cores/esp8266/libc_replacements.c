@@ -30,6 +30,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 
 #include "ets_sys.h"
 #include "os_type.h"
