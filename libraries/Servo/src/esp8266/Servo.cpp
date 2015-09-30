@@ -146,6 +146,10 @@ Servo::Servo()
         _servoIndex = s_servoCount++;
         // store default values
         s_servos[_servoIndex].usPulse = DEFAULT_PULSE_WIDTH;
+
+        // set default _minUs and _maxUs incase write() is called before attach()
+        _minUs = MIN_PULSE_WIDTH;
+        _maxUs = MAX_PULSE_WIDTH;
     }
     else {
         _servoIndex = INVALID_SERVO;  // too many servos
