@@ -173,21 +173,21 @@ public:
      *
      * return: ssid string
      */
-    char* SSID();
+    String SSID() const;
 
     /*
      * Return the current pre shared key associated with the network
      *
      * return: psk string
      */
-    const char* psk();
+    String psk() const;
 
     /*
      * Return the current bssid / mac associated with the network if configured
      *
      * return: bssid uint8_t *
      */
-    uint8_t * BSSID(void);
+    uint8_t *BSSID(void);
 
     /*
      * Return the current bssid / mac associated with the network if configured
