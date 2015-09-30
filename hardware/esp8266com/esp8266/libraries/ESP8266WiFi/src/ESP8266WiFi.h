@@ -113,7 +113,7 @@ public:
       *
       * return: one value of wl_status_t enum
       */
-    int softAPdisconnect(bool wifioff = false);
+    int softAPdisconnect(bool wifioff = true);
 
     /*
      * Disconnect from the network
