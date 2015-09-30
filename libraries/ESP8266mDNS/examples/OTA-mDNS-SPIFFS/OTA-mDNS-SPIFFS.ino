@@ -240,12 +240,8 @@ void setup()
     delay(10);
   }
 
-  // ... Load sdk config.
-  String ssid(WiFi.SSID());
-  String psk(WiFi.psk());
-
-  // ... Compare fiel config with sdk config.
-  if (ssid != station_ssid || psk != station_psk)
+  // ... Compare file config with sdk config.
+  if (WiFi.SSID() != station_ssid || WiFi.psk() != station_psk)
   {
     Serial.println("WiFi config changed.");
 
