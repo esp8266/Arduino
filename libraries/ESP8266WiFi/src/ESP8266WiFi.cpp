@@ -370,18 +370,18 @@ IPAddress ESP8266WiFiClass::gatewayIP()
     return IPAddress(ip.gw.addr);
 }
 
-char* ESP8266WiFiClass::SSID()
+String ESP8266WiFiClass::SSID() const
 {
     static struct station_config conf;
     wifi_station_get_config(&conf);
-    return reinterpret_cast<char*>(conf.ssid);
+    return String(reinterpret_cast<char*>(conf.ssid));
 }
 
-const char* ESP8266WiFiClass::psk()
+String ESP8266WiFiClass::psk() const
 {
     static struct station_config conf;
     wifi_station_get_config(&conf);
-    return reinterpret_cast<const char*>(conf.password);
+		return String(reinterpret_cast<char*>(conf.password));
 }
 
 uint8_t* ESP8266WiFiClass::BSSID(void)
