@@ -12,7 +12,7 @@ runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx1
 runtime.tools.esptool.path={runtime.platform.path}/tools
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
-compiler.sdk.path={runtime.platform.path}/tools/sdk/
+compiler.sdk.path={runtime.platform.path}/tools/sdk
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include"
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
