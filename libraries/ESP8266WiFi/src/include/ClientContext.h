@@ -1,9 +1,9 @@
-/* 
+/*
  ClientContext.h - TCP connection handling on top of lwIP
 
  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -39,7 +39,7 @@ class ClientContext {
             tcp_sent(pcb, &_s_sent);
             tcp_err(pcb, &_s_error);
         }
-        
+
         err_t abort(){
           if(_pcb) {
               DEBUGV(":abort\r\n");
@@ -52,7 +52,7 @@ class ClientContext {
           }
           return ERR_ABRT;
         }
-        
+
         err_t close(){
           err_t err = ERR_OK;
           if(_pcb) {
@@ -71,7 +71,7 @@ class ClientContext {
           }
           return err;
         }
-        
+
         ~ClientContext() {
         }
 
@@ -101,18 +101,18 @@ class ClientContext {
                 }
             }
         }
-        
+
         void setNoDelay(bool nodelay){
           if(!_pcb) return;
           if(nodelay) tcp_nagle_disable(_pcb);
           else tcp_nagle_enable(_pcb);
         }
-        
+
         bool getNoDelay(){
           if(!_pcb) return false;
           return tcp_nagle_disabled(_pcb);
         }
-        
+
         uint32_t getRemoteAddress() {
             if(!_pcb) return 0;
 
@@ -123,6 +123,18 @@ class ClientContext {
             if(!_pcb) return 0;
 
             return _pcb->remote_port;
+        }
+
+        uint32_t getLocalAddress() {
+            if(!_pcb) return 0;
+
+            return _pcb->local_ip.addr;
+        }
+
+        uint16_t getLocalPort() {
+            if(!_pcb) return 0;
+
+            return _pcb->local_port;
         }
 
         size_t getSize() const {
@@ -265,16 +277,11 @@ class ClientContext {
 
         void _error(err_t err) {
             DEBUGV(":er %d %d %d\r\n", err, _size_sent, _send_waiting);
-            if (err != ERR_ABRT) {
-                abort();
-            }
-            else {
-              tcp_arg(_pcb, NULL);
-              tcp_sent(_pcb, NULL);
-              tcp_recv(_pcb, NULL);
-              tcp_err(_pcb, NULL);
-              _pcb = NULL;
-            }
+            tcp_arg(_pcb, NULL);
+            tcp_sent(_pcb, NULL);
+            tcp_recv(_pcb, NULL);
+            tcp_err(_pcb, NULL);
+            _pcb = NULL;
             if(_size_sent && _send_waiting) {
                 esp_schedule();
             }

@@ -2,6 +2,7 @@
 #include <lwip/def.h>
 #include <Arduino.h>
 
+
 DNSServer::DNSServer()
 {
   _ttl = htonl(60);
@@ -110,16 +111,43 @@ void DNSServer::replyWithIP()
 {
   _dnsHeader->QR = DNS_QR_RESPONSE;
   _dnsHeader->ANCount = _dnsHeader->QDCount;
-  _dnsHeader->QDCount = 0;
+  _dnsHeader->QDCount = _dnsHeader->QDCount; 
+  //_dnsHeader->RA = 1;  
 
   _udp.beginPacket(_udp.remoteIP(), _udp.remotePort());
   _udp.write(_buffer, _currentPacketSize);
+
+  _udp.write((uint8_t)192); //  answer name is a pointer
+  _udp.write((uint8_t)12);  // pointer to offset at 0x00c
+
+  _udp.write((uint8_t)0);   // 0x0001  answer is type A query (host address)
+  _udp.write((uint8_t)1);
+
+  _udp.write((uint8_t)0);   //0x0001 answer is class IN (internet address)
+  _udp.write((uint8_t)1);
+ 
   _udp.write((unsigned char*)&_ttl, 4);
+
   // Length of RData is 4 bytes (because, in this case, RData is IPv4)
   _udp.write((uint8_t)0);
   _udp.write((uint8_t)4);
   _udp.write(_resolvedIP, sizeof(_resolvedIP));
   _udp.endPacket();
+
+
+
+  #ifdef DEBUG
+    DEBUG_OUTPUT.print("DNS responds: ");
+    DEBUG_OUTPUT.print(_resolvedIP[0]);
+    DEBUG_OUTPUT.print(".");
+    DEBUG_OUTPUT.print(_resolvedIP[1]);
+    DEBUG_OUTPUT.print(".");
+    DEBUG_OUTPUT.print(_resolvedIP[2]);
+    DEBUG_OUTPUT.print(".");
+    DEBUG_OUTPUT.print(_resolvedIP[3]);
+    DEBUG_OUTPUT.print(" for ");
+    DEBUG_OUTPUT.println(getDomainNameWithoutWwwPrefix());
+  #endif
 }
 
 void DNSServer::replyWithCustomCode()

@@ -26,7 +26,7 @@
 
 #include <functional>
 
-enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE };
+enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
 
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
@@ -80,6 +80,8 @@ public:
   int args();                     // get arguments count
   bool hasArg(const char* name);  // check if argument exists
 
+  String hostHeader();            // get request host header if available or empty String if not
+
   // send response to the client
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
@@ -88,11 +90,13 @@ public:
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
   void send_P(int code, PGM_P content_type, PGM_P content);
+  void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
   void setContentLength(size_t contentLength) { _contentLength = contentLength; }
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
+  void sendContent_P(PGM_P content, size_t size);
 
 template<typename T> size_t streamFile(T &file, const String& contentType){
   setContentLength(file.size());
@@ -111,7 +115,7 @@ protected:
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(String data);
   static const char* _responseCodeToString(int code);
-  void _parseForm(WiFiClient& client, String boundary, uint32_t len);
+  bool _parseForm(WiFiClient& client, String boundary, uint32_t len);
   void _uploadWriteByte(uint8_t b);
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
@@ -133,6 +137,8 @@ protected:
 
   size_t           _contentLength;
   String           _responseHeaders;
+
+  String           _hostHeader;
 
   RequestHandler*  _firstHandler;
   RequestHandler*  _lastHandler;

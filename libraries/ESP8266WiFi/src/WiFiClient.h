@@ -21,12 +21,14 @@
 
 #ifndef wificlient_h
 #define wificlient_h
-#include "Arduino.h"	
+#include "Arduino.h"
 #include "Print.h"
 #include "Client.h"
 #include "IPAddress.h"
 #include <memory>
 #include "include/slist.h"
+
+#define WIFICLIENT_MAX_PACKET_SIZE 1460
 
 class ClientContext;
 class WiFiServer;
@@ -46,6 +48,7 @@ public:
   virtual int connect(const char *host, uint16_t port);
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
+  size_t write_P(PGM_P buf, size_t size);
   template <typename T>
   size_t write(T& source, size_t unitSize);
 
@@ -60,25 +63,27 @@ public:
 
   IPAddress remoteIP();
   uint16_t  remotePort();
+  IPAddress localIP();
+  uint16_t  localPort();
   bool getNoDelay();
   void setNoDelay(bool nodelay);
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
   template<typename T> size_t write(T &src){
-    uint8_t obuf[1460];
+    uint8_t obuf[WIFICLIENT_MAX_PACKET_SIZE];
     size_t doneLen = 0;
     size_t sentLen;
     int i;
-    
-    while (src.available() > 1460){
-      src.read(obuf, 1460);
-      sentLen = write(obuf, 1460);
+
+    while (src.available() > WIFICLIENT_MAX_PACKET_SIZE){
+      src.read(obuf, WIFICLIENT_MAX_PACKET_SIZE);
+      sentLen = write(obuf, WIFICLIENT_MAX_PACKET_SIZE);
       doneLen = doneLen + sentLen;
-      if(sentLen != 1460){
+      if(sentLen != WIFICLIENT_MAX_PACKET_SIZE){
         return doneLen;
       }
     }
-      
+
     uint16_t leftLen = src.available();
     src.read(obuf, leftLen);
     sentLen = write(obuf, leftLen);
@@ -91,8 +96,9 @@ public:
   using Print::write;
 
   static void stopAll();
+  static void stopAllExcept(WiFiClient * c);
 
-private:
+protected:
 
   static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
   static void _s_err(void* arg, int8_t err);

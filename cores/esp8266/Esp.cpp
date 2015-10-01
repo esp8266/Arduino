@@ -280,6 +280,8 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
             return (2_MB);
         case 0x1440EF: // W25Q80
             return (1_MB);
+        case 0x1340EF: // W25Q40
+            return (512_kB);
 
         default:
             return 0;
@@ -289,7 +291,7 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
 String EspClass::getResetInfo(void) {
     if(resetInfo.reason != 0) {
         char buff[200];
-        sprintf(&buff[0], "Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, (resetInfo.reason == 0 ? "DEFAULT" : resetInfo.reason == 1 ? "WDT" : resetInfo.reason == 2 ? "EXCEPTION" : resetInfo.reason == 3 ? "SOFT_WDT" : resetInfo.reason == 4 ? "SOFT_RESTART" : resetInfo.reason == 5 ? "DEEP_SLEEP_AWAKE" : "???"), resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
+        sprintf(&buff[0], "Fatal exception:%d flag:%d (%s) epc1:0x%08x epc2:0x%08x epc3:0x%08x excvaddr:0x%08x depc:0x%08x", resetInfo.exccause, resetInfo.reason, (resetInfo.reason == 0 ? "DEFAULT" : resetInfo.reason == 1 ? "WDT" : resetInfo.reason == 2 ? "EXCEPTION" : resetInfo.reason == 3 ? "SOFT_WDT" : resetInfo.reason == 4 ? "SOFT_RESTART" : resetInfo.reason == 5 ? "DEEP_SLEEP_AWAKE" : resetInfo.reason == 6 ? "EXT_SYS_RST" : "???"), resetInfo.epc1, resetInfo.epc2, resetInfo.epc3, resetInfo.excvaddr, resetInfo.depc);
         return String(buff);
     }
     return String("flag: 0");
@@ -399,4 +401,27 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
 #endif
     if(restartOnSuccess) ESP.restart();
     return true;
+}
+
+static const int FLASH_INT_MASK = ((B10 << 8) | B00111010);
+
+bool EspClass::flashEraseSector(uint32_t sector) {
+    ets_isr_mask(FLASH_INT_MASK);
+    int rc = spi_flash_erase_sector(sector);
+    ets_isr_unmask(FLASH_INT_MASK);
+    return rc == 0;
+}
+
+bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
+    ets_isr_mask(FLASH_INT_MASK);
+    int rc = spi_flash_write(offset, (uint32_t*) data, size);
+    ets_isr_unmask(FLASH_INT_MASK);
+    return rc == 0;
+}
+
+bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
+    ets_isr_mask(FLASH_INT_MASK);
+    int rc = spi_flash_read(offset, (uint32_t*) data, size);
+    ets_isr_unmask(FLASH_INT_MASK);
+    return rc == 0;
 }

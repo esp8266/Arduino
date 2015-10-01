@@ -44,6 +44,7 @@ public:
     ESP8266WiFiClass();
 
     void mode(WiFiMode);
+    WiFiMode getMode();
 
     /**
      * Start Wifi connection
@@ -56,6 +57,9 @@ public:
      */
     int begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, uint8_t bssid[6] = NULL);
     int begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, uint8_t bssid[6] = NULL);
+
+    // Use sdk config to connect.
+    int begin();
 
 
    /* Wait for Wifi connection to reach a result
@@ -169,14 +173,21 @@ public:
      *
      * return: ssid string
      */
-    char* SSID();
+    String SSID() const;
+
+    /*
+     * Return the current pre shared key associated with the network
+     *
+     * return: psk string
+     */
+    String psk() const;
 
     /*
      * Return the current bssid / mac associated with the network if configured
      *
      * return: bssid uint8_t *
      */
-    uint8_t * BSSID(void);
+    uint8_t *BSSID(void);
 
     /*
      * Return the current bssid / mac associated with the network if configured
