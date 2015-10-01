@@ -40,8 +40,7 @@ ESP8266WebServer::ESP8266WebServer(int port)
 {
 }
 
-ESP8266WebServer::~ESP8266WebServer()
-{
+ESP8266WebServer::~ESP8266WebServer() {
   if (!_firstHandler)
     return;
   RequestHandler* handler = _firstHandler;
@@ -56,14 +55,11 @@ void ESP8266WebServer::begin() {
   _server.begin();
 }
 
-
-void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction handler)
-{
+void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction handler) {
   on(uri, HTTP_ANY, handler);
 }
 
-void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn)
-{
+void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn) {
   _addRequestHandler(new FunctionRequestHandler(fn, uri, method));
 }
 
@@ -79,11 +75,10 @@ void ESP8266WebServer::_addRequestHandler(RequestHandler* handler) {
 }
 
 void ESP8266WebServer::serveStatic(const char* uri, FS& fs, const char* path) {
-    _addRequestHandler(new StaticRequestHandler(fs, uri));
+    _addRequestHandler(new StaticRequestHandler(fs, path, uri));
 }
 
-void ESP8266WebServer::handleClient()
-{
+void ESP8266WebServer::handleClient() {
   WiFiClient client = _server.available();
   if (!client) {
     return;
@@ -135,10 +130,10 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
 
     sendHeader("Content-Type", content_type, true);
     if (_contentLength != CONTENT_LENGTH_UNKNOWN && _contentLength != CONTENT_LENGTH_NOT_SET) {
-        sendHeader("Content-Length", String(_contentLength).c_str());
+        sendHeader("Content-Length", String(_contentLength));
     }
     else if (contentLength > 0){
-        sendHeader("Content-Length", String(contentLength).c_str());
+        sendHeader("Content-Length", String(contentLength));
     }
     sendHeader("Connection", "close");
     sendHeader("Access-Control-Allow-Origin", "*");
@@ -164,9 +159,20 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     }
 
     String header;
-    _prepareHeader(header, code, String(FPSTR(content_type)).c_str(), contentLength);
+    char type[64];
+    memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
+    _prepareHeader(header, code, (const char* )type, contentLength);
     sendContent(header);
     sendContent_P(content);
+}
+
+void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
+    String header;
+    char type[64];
+    memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
+    _prepareHeader(header, code, (const char* )type, contentLength);
+    sendContent(header);
+    sendContent_P(content, contentLength);
 }
 
 void ESP8266WebServer::send(int code, char* content_type, const String& content) {
@@ -221,6 +227,26 @@ void ESP8266WebServer::sendContent_P(PGM_P content) {
     }
 }
 
+void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
+    char contentUnit[HTTP_DOWNLOAD_UNIT_SIZE + 1];
+    contentUnit[HTTP_DOWNLOAD_UNIT_SIZE] = '\0';
+    size_t remaining_size = size;
+
+    while (content != NULL && remaining_size > 0) {
+        size_t contentUnitLen = HTTP_DOWNLOAD_UNIT_SIZE;
+
+        if (remaining_size < HTTP_DOWNLOAD_UNIT_SIZE) contentUnitLen = remaining_size;
+        // due to the memcpy signature, lots of casts are needed
+        memcpy_P((void*)contentUnit, (PGM_VOID_P)content, contentUnitLen);
+
+        content += contentUnitLen;
+        remaining_size -= contentUnitLen;
+
+        // write is so overloaded, had to use the cast to get it pick the right one
+        _currentClient.write((const char*)contentUnit, contentUnitLen);
+    }
+}
+
 String ESP8266WebServer::arg(const char* name) {
   for (int i = 0; i < _currentArgCount; ++i) {
     if (_currentArgs[i].key == name)
@@ -251,6 +277,10 @@ bool ESP8266WebServer::hasArg(const char* name) {
       return true;
   }
   return false;
+}
+
+String ESP8266WebServer::hostHeader() {
+  return _hostHeader;
 }
 
 void ESP8266WebServer::onFileUpload(THandlerFunction fn) {

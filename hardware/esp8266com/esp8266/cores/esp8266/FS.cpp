@@ -29,14 +29,14 @@ size_t File::write(uint8_t c) {
     if (!_p)
         return 0;
 
-    _p->write(&c, 1);
+    return _p->write(&c, 1);
 }
 
 size_t File::write(const uint8_t *buf, size_t size) {
     if (!_p)
         return 0;
 
-    _p->write(buf, size);
+    return _p->write(buf, size);
 }
 
 int File::available() {
@@ -167,6 +167,13 @@ bool FS::begin() {
     return _impl->begin();
 }
 
+bool FS::format() {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->format();
+}
+
 File FS::open(const String& path, const char* mode) {
     return open(path.c_str(), mode);
 }
@@ -184,6 +191,17 @@ File FS::open(const char* path, const char* mode) {
     }
 
     return File(_impl->open(path, om, am));
+}
+
+bool FS::exists(const char* path) {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->exists(path);
+}
+
+bool FS::exists(const String& path) {
+    return exists(path.c_str());
 }
 
 Dir FS::openDir(const char* path) {

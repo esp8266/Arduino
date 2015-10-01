@@ -43,10 +43,11 @@ extern "C" void esp_yield();
 ESP8266WiFiClass::ESP8266WiFiClass()
 : _smartConfigStarted(false)
 , _smartConfigDone(false)
-, _useApMode(false)
-, _useClientMode(false)
 , _useStaticIp(false)
 {
+    uint8 m = wifi_get_opmode();
+    _useClientMode = (m & WIFI_STA);
+    _useApMode = (m & WIFI_AP);
     wifi_set_event_handler_cb((wifi_event_handler_cb_t)&ESP8266WiFiClass::_eventCallback);
 }
 
@@ -71,6 +72,11 @@ void ESP8266WiFiClass::mode(WiFiMode m)
     ETS_UART_INTR_DISABLE();
     wifi_set_opmode(m);
     ETS_UART_INTR_ENABLE();
+}
+
+WiFiMode ESP8266WiFiClass::getMode()
+{
+    return (WiFiMode)wifi_get_opmode();
 }
 
 void ESP8266WiFiClass::_mode(WiFiMode m)
@@ -133,6 +139,17 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t ch
     if(channel > 0 && channel <= 13) {
         wifi_set_channel(channel);
     }
+
+    if(!_useStaticIp)
+        wifi_station_dhcpc_start();
+    return status();
+}
+
+int ESP8266WiFiClass::begin()
+{
+    ETS_UART_INTR_DISABLE();
+    wifi_station_connect();
+    ETS_UART_INTR_ENABLE();
 
     if(!_useStaticIp)
         wifi_station_dhcpc_start();
@@ -353,11 +370,18 @@ IPAddress ESP8266WiFiClass::gatewayIP()
     return IPAddress(ip.gw.addr);
 }
 
-char* ESP8266WiFiClass::SSID()
+String ESP8266WiFiClass::SSID() const
 {
     static struct station_config conf;
     wifi_station_get_config(&conf);
-    return reinterpret_cast<char*>(conf.ssid);
+    return String(reinterpret_cast<char*>(conf.ssid));
+}
+
+String ESP8266WiFiClass::psk() const
+{
+    static struct station_config conf;
+    wifi_station_get_config(&conf);
+		return String(reinterpret_cast<char*>(conf.password));
 }
 
 uint8_t* ESP8266WiFiClass::BSSID(void)

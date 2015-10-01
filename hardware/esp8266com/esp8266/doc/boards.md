@@ -95,22 +95,18 @@ In order to use these modules, make sure to observe the following:
 ### Serial Adapter
 
 There are many different USB to Serial adapters / boards.
+To be able to put ESP8266 into bootloader mode using serial handshaking lines, you need the adapter which breaks out RTS and DTR outputs. CTS and DSR are not useful for upload (they are inputs). Make sure the adapter can work with 3.3V IO voltage: it should have a jumper or a switch to select between 5V and 3.3V, or be marked as 3.3V only. 
 
-* Note
- - for full upload management you need RTS and DTR
- - the chip need to have 3.3V TTL (5V may damage the chip)
- - not all board have all pins of the ICs as breakout (check before order)
- - CTS and DSR are not useful for upload (they are Inputs)
+Adapters based around the following ICs should work:
 
-* Working ICs
  - FT232RL
  - CP2102
  - CH340G
- - maybe others (drop a comment)
+
+PL2303-based adapters are known not to work on Mac OS X. See https://github.com/igrr/esptool-ck/issues/9 for more info.
 
 ### Minimal Hardware Setup for Bootloading and Usage
 
-ESPxx Hardware
 
 | PIN           | Resistor | Serial Adapter |
 | ------------- | -------- | -------------- |
@@ -125,12 +121,12 @@ ESPxx Hardware
 
 * Note
  - GPIO15 is also named MTDO
- - Reset is also named RSBT or REST (adding PullUp improves the stability of the Module)
+ - Reset is also named RSBT or REST (adding PullUp improves the stability of the module)
  - GPIO2 is alternative TX for the boot loader mode
  - **Directly connecting a pin to VCC or GND is not a substitute for a PullUp or PullDown resistor, doing this can break upload management and the serial console, instability has also been noted in some cases.**
 
 ### ESP to Serial
-![ESP to Serial](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_to_serial.png)
+![ESP to Serial](https://raw.githubusercontent.com/esp8266/Arduino/esp8266/docs/ESP_to_serial.png)
 
 #### Minimal Hardware Setup for Bootloading only ##
 ESPxx Hardware

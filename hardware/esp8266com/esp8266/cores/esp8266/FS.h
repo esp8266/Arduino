@@ -92,8 +92,13 @@ public:
 
     bool begin();
 
+    bool format();
+
     File open(const char* path, const char* mode);
     File open(const String& path, const char* mode);
+
+    bool exists(const char* path);
+    bool exists(const String& path);
 
     Dir openDir(const char* path);
     Dir openDir(const String& path);

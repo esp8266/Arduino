@@ -59,7 +59,7 @@ public:
     }
 
     FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) override;
-
+    bool exists(const char* path) override;
     DirImplPtr openDir(const char* path) override;
 
     bool rename(const char* pathFrom, const char* pathTo) override {
@@ -100,6 +100,25 @@ public:
             return false;
         }
         return _tryMount();
+    }
+
+    bool format() override {
+        bool wasMounted = (SPIFFS_mounted(&_fs) != 0);
+
+        if (_tryMount()) {
+            SPIFFS_unmount(&_fs);
+        }
+        auto rc = SPIFFS_format(&_fs);
+        if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+            return false;
+        }
+
+        if (wasMounted) {
+            return _tryMount();
+        }
+
+        return true;
     }
 
 protected:
@@ -202,13 +221,9 @@ public:
     : _fs(fs)
     , _fd(fd)
     , _stat({0})
+    , _written(false)
     {
-        CHECKFD();
-        auto rc = SPIFFS_fstat(_fs->getFs(), _fd, &_stat);
-        if (rc != SPIFFS_OK) {
-            DEBUGV("SPIFFS_fstat rc=%d\r\n", rc);
-            _stat = {0};
-        }
+        _getStat();
     }
 
     ~SPIFFSFileImpl() override {
@@ -223,7 +238,7 @@ public:
             DEBUGV("SPIFFS_write rc=%d\r\n", result);
             return 0;
         }
-
+        _written = true;
         return result;
     }
 
@@ -246,11 +261,16 @@ public:
         if (rc < 0) {
             DEBUGV("SPIFFS_fflush rc=%d\r\n", rc);
         }
+        _written = true;
     }
 
     bool seek(uint32_t pos, SeekMode mode) override {
         CHECKFD();
 
+        int32_t offset = static_cast<int32_t>(pos);
+        if (mode == SeekEnd) {
+            offset = -offset;
+        }
         auto rc = SPIFFS_lseek(_fs->getFs(), _fd, pos, (int) mode);
         if (rc < 0) {
             DEBUGV("SPIFFS_lseek rc=%d\r\n", rc);
@@ -274,7 +294,9 @@ public:
 
     size_t size() const override {
         CHECKFD();
-
+        if (_written) {
+            _getStat();
+        }
         return _stat.size;
     }
 
@@ -292,15 +314,27 @@ public:
     }
 
 protected:
+    void _getStat() const{
+        CHECKFD();
+        auto rc = SPIFFS_fstat(_fs->getFs(), _fd, &_stat);
+        if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFS_fstat rc=%d\r\n", rc);
+            _stat = {0};
+        }
+        _written = false;
+    }
+
     SPIFFSImpl* _fs;
     spiffs_file _fd;
-    spiffs_stat _stat;
+    mutable spiffs_stat _stat;
+    mutable bool        _written;
 };
 
 class SPIFFSDirImpl : public DirImpl {
 public:
-    SPIFFSDirImpl(SPIFFSImpl* fs, spiffs_DIR& dir)
-    : _fs(fs)
+    SPIFFSDirImpl(const String& pattern, SPIFFSImpl* fs, spiffs_DIR& dir)
+    : _pattern(pattern)
+    , _fs(fs)
     , _dir(dir)
     , _valid(false)
     {
@@ -340,12 +374,16 @@ public:
     }
 
     bool next() override {
-        spiffs_dirent* result = SPIFFS_readdir(&_dir, &_dirent);
-        _valid = (result != nullptr);
+        const int n = _pattern.length();
+        do {
+            spiffs_dirent* result = SPIFFS_readdir(&_dir, &_dirent);
+            _valid = (result != nullptr);
+        } while(_valid && strncmp((const char*) _dirent.name, _pattern.c_str(), n) != 0);
         return _valid;
     }
 
 protected:
+    String _pattern;
     SPIFFSImpl* _fs;
     spiffs_DIR  _dir;
     spiffs_dirent _dirent;
@@ -366,6 +404,14 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
     return std::make_shared<SPIFFSFileImpl>(this, fd);
 }
 
+bool SPIFFSImpl::exists(const char* path) {
+    char tmpName[SPIFFS_OBJ_NAME_LEN];
+    strlcpy(tmpName, path, sizeof(tmpName));
+    spiffs_stat stat;
+    int rc = SPIFFS_stat(&_fs, tmpName, &stat);
+    return rc == SPIFFS_OK;
+}
+
 DirImplPtr SPIFFSImpl::openDir(const char* path) {
     spiffs_DIR dir;
     char tmpName[SPIFFS_OBJ_NAME_LEN];
@@ -375,7 +421,7 @@ DirImplPtr SPIFFSImpl::openDir(const char* path) {
         DEBUGV("SPIFFSImpl::openDir: path=`%s` err=%d\r\n", path, _fs.err_code);
         return DirImplPtr();
     }
-    return std::make_shared<SPIFFSDirImpl>(this, dir);
+    return std::make_shared<SPIFFSDirImpl>(path, this, dir);
 }
 
 int getSpiffsMode(OpenMode openMode, AccessMode accessMode) {

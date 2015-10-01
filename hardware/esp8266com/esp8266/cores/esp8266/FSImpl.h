@@ -63,7 +63,9 @@ public:
 class FSImpl {
 public:
     virtual bool begin() = 0;
+    virtual bool format() = 0;
     virtual FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) = 0;
+    virtual bool exists(const char* path) = 0;
     virtual DirImplPtr openDir(const char* path) = 0;
     virtual bool rename(const char* pathFrom, const char* pathTo) = 0;
     virtual bool remove(const char* path) = 0;

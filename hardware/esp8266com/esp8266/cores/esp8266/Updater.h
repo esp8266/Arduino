@@ -11,6 +11,11 @@
 #define UPDATE_ERROR_SIZE   4
 #define UPDATE_ERROR_STREAM 5
 
+#define U_FLASH   0
+#define U_SPIFFS  100
+
+//#define DEBUG_UPDATER Serial1
+
 class UpdaterClass {
   public:
     UpdaterClass();
@@ -18,7 +23,7 @@ class UpdaterClass {
       Call this to check the space needed for the update
       Will return false if there is not enough space
     */
-    bool begin(size_t size);
+    bool begin(size_t size, int = U_FLASH);
     
     /*
       Writes a buffer to the flash and increments the address
@@ -114,6 +119,7 @@ class UpdaterClass {
     size_t _size;
     uint32_t _startAddress;
     uint32_t _currentAddress;
+    uint32_t _command;
 };
 
 extern UpdaterClass Update;

@@ -2,6 +2,46 @@
 title: Reference
 ---
 
+## Table of Contents
+ * [Digital IO](#digital-io)
+ * [Analog input](#analog-input)
+ * [Analog output](#analog-output)
+ * [Timing and delays](#timing-and-delays)
+ * [Serial](#serial)
+ * [Progmem](#progmem)
+ * [File system](#file-system)
+   * [Uploading files to file system](#uploading-files-to-file-system)
+   * [File system object (SPIFFS)](#file-system-object-spiffs)
+     * [begin](#begin)
+     * [format](#format)
+     * [open](#open)
+     * [exists](#exists)
+     * [openDir](#opendir)
+     * [remove](#remove)
+     * [rename](#rename)
+   * [Directory object (Dir)](#directory-object-dir)
+   * [File object](#file-object)
+     * [seek](#seek)
+     * [position](#position)
+     * [size](#size)
+     * [name](#name)
+     * [close](#close)
+ * [WiFi(ESP8266WiFi library)](#wifiesp8266wifi-library)
+ * [Ticker](#ticker)
+ * [EEPROM](#eeprom)
+ * [I2C (Wire library)](#i2c-wire-library)
+ * [SPI](#spi)
+ * [SoftwareSerial](#softwareserial)
+ * [ESP-specific APIs](#esp-specific-apis)
+ * [OneWire (from <a href="https://www.pjrc.com/teensy/td_libs_OneWire.html">https://www.pjrc.com/teensy/td_libs_OneWire.html</a>)](#onewire-from-httpswwwpjrccomteensytd_libs_onewirehtml)
+ * [mDNS and DNS-SD responder (ESP8266mDNS library)](#mdns-and-dns-sd-responder-esp8266mdns-library)
+ * [SSDP responder (ESP8266SSDP)](#ssdp-responder-esp8266ssdp)
+ * [DNS server (DNSServer library)](#dns-server-dnsserver-library)
+ * [Servo](#servo)
+ * [Other libraries (not included with the IDE)](#other-libraries-not-included-with-the-ide)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 ## Digital IO
 
 Pin numbers in Arduino correspond directly to the ESP8266 GPIO pin numbers. `pinMode`, `digitalRead`, and `digitalWrite` functions work as usual, so to read GPIO2, call `digitalRead(2)`.
@@ -121,18 +161,33 @@ Generic module | 512k | 64k
 Generic module | 1M | 64k, 128k, 256k, 512k
 Generic module | 2M | 1M
 Generic module | 4M | 3M
-Adafruit HUZZAH | 4M | 3M
-NodeMCU 0.9    | 4M | 3M
-NodeMCU 1.0    | 4M | 3M
+Adafruit HUZZAH | 4M | 1M, 3M
+NodeMCU 0.9    | 4M | 1M, 3M
+NodeMCU 1.0    | 4M | 1M, 3M
 Olimex MOD-WIFI-ESP8266(-DEV)| 2M | 1M
 SparkFun Thing | 512k | 64k
-SweetPea ESP-210 | 4M | 3M
+SweetPea ESP-210 | 4M | 1M, 3M
 
 **Note:** to use any of file system functions in the sketch, add the following include to the sketch:
 
 ```c++
 #include "FS.h"
 ```
+
+### Uploading files to file system
+
+*ESP8266FS* is a tool which integrates into the Arduino IDE. It adds a menu item to *Tools* menu for uploading the contents of sketch data directory into ESP8266 flash file system.
+
+- Download the tool: http://arduino.esp8266.com/ESP8266FS-1.6.5-1105-g98d2458.zip
+- In your Arduino sketchbook directory, create `tools` directory if it doesn't exist yet
+- Unpack the tool into `tools` directory (the path will look like `<home_dir>/Arduino/tools/ESP8266FS/tool/esp8266fs.jar`)
+- Restart Arduino IDE
+- Open a sketch (or create a new one and save it)
+- Go to sketch directory (choose Sketch > Show Sketch Folder)
+- Create a directory named `data` and any files you want in the file system there
+- Make sure you have selected a board, port, and closed Serial Monitor
+- Select Tools > ESP8266 Sketch Data Upload. This should start uploading the files into ESP8266 flash file system. When done, IDE status bar will display `SPIFFS Image Uploaded` message.
+
 
 ### File system object (SPIFFS)
 
@@ -145,6 +200,15 @@ SPIFFS.begin()
 This method mounts SPIFFS file system. It must be called before any other
 FS APIs are used. Returns *true* if file system was mounted successfully, false
 otherwise.
+
+#### format
+
+```c++
+SPIFFS.format()
+```
+
+Formats the file system. May be called either before or after calling `begin`.
+Returns *true* if formatting was successful.
 
 #### open
 
@@ -166,6 +230,14 @@ if (!f) {
     Serial.println("file open failed");
 }
 ```
+
+#### exists
+
+```c++
+SPIFFS.exists(path)
+```
+
+Returns *true* if a file with given path exists, *false* otherwise.
 
 #### openDir
 
@@ -311,7 +383,7 @@ Size can be anywhere between 4 and 4096 bytes.
 whenever you wish to save changes to flash. `EEPROM.end()` will also commit, and will
 release the RAM copy of EEPROM contents.
 
-EEPROM library uses one sector of flash located at 0x7b000 for storage.
+EEPROM library uses one sector of flash located just after the SPIFFS.
 
 Three examples included.
 
@@ -326,6 +398,10 @@ else they default to pins 4(SDA) and 5(SCL).
 
 SPI library supports the entire Arduino SPI API including transactions, including setting phase (CPHA).
 Setting the Clock polarity (CPOL) is not supported, yet (SPI_MODE2 and SPI_MODE3 not working).
+
+## SoftwareSerial
+
+An ESP8266 port of SoftwareSerial library done by Peter Lerup (@plerup) supports baud rate up to 115200 and multiples SoftwareSerial instances. See the https://github.com/plerup/espsoftwareserial if you want to suggest an improvement or open an issue related to SoftwareSerial.
 
 ## ESP-specific APIs
 
