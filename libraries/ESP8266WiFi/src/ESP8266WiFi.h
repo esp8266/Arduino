@@ -239,7 +239,7 @@ public:
 	 *
      * return: ssid string of the specified item on the networks scanned list
      */
-    const char*	SSID(uint8_t networkItem);
+    String SSID(uint8_t networkItem);
 
     /*
      * Return the encryption type of the networks discovered during the scanNetworks
