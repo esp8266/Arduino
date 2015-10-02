@@ -274,7 +274,7 @@ void ESP8266WebServer::_uploadWriteByte(uint8_t b){
 uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
   int res = client.read();
   if(res == -1){
-    while(!client.available())
+    while(!client.available() && client.connected())
       yield();
     res = client.read();
   }
@@ -387,13 +387,16 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             uint8_t argByte = _uploadReadByte(client);
 readfile:
             while(argByte != 0x0D){
+              if (!client.connected()) return _parseFormUploadAborted();
               _uploadWriteByte(argByte);
               argByte = _uploadReadByte(client);
             }
 
             argByte = _uploadReadByte(client);
+            if (!client.connected()) return _parseFormUploadAborted();
             if (argByte == 0x0A){
               argByte = _uploadReadByte(client);
+              if (!client.connected()) return _parseFormUploadAborted();
               if ((char)argByte != '-'){
                 //continue reading the file
                 _uploadWriteByte(0x0D);
@@ -401,6 +404,7 @@ readfile:
                 goto readfile;
               } else {
                 argByte = _uploadReadByte(client);
+                if (!client.connected()) return _parseFormUploadAborted();
                 if ((char)argByte != '-'){
                   //continue reading the file
                   _uploadWriteByte(0x0D);
@@ -479,5 +483,11 @@ readfile:
   DEBUG_OUTPUT.print("Error: line: ");
   DEBUG_OUTPUT.println(line);
 #endif
+  return false;
+}
+
+bool ESP8266WebServer::_parseFormUploadAborted(){
+  _currentUpload.status = UPLOAD_FILE_ABORTED;
+  if (_fileUploadHandler) _fileUploadHandler();
   return false;
 }
