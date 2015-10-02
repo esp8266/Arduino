@@ -536,13 +536,13 @@ void * ESP8266WiFiClass::_getScanInfoByIndex(int i)
     return reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult) + i;
 }
 
-const char* ESP8266WiFiClass::SSID(uint8_t i)
+String ESP8266WiFiClass::SSID(uint8_t i)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
-        return 0;
+        return "";
 
-    return reinterpret_cast<const char*>(it->ssid);
+    return String(reinterpret_cast<const char*>(it->ssid));
 }
 
 uint8_t * ESP8266WiFiClass::BSSID(uint8_t i)
