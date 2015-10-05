@@ -150,12 +150,11 @@ SECTIONS
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
-    *core_esp8266_*.o(.literal*, .text*)
-    *spiffs*.o(.literal*, .text*)
+    *.c.o(.literal*, .text*)
     *.cpp.o(.literal*, .text*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)
-    *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text)
+    *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text .irom.text.*)
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);
   } >irom0_0_seg :irom0_0_phdr
@@ -192,6 +191,8 @@ SECTIONS
     *(.init.literal)
     *(.init)
     *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+    *.cpp.o(.iram.text)
+    *.c.o(.iram.text)
     *(.fini.literal)
     *(.fini)
     *(.gnu.version)
