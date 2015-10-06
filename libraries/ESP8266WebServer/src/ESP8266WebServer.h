@@ -38,7 +38,9 @@ enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
 
-class RequestHandler;
+class ESP8266WebServer;
+
+#include "detail/RequestHandler.h"
 
 namespace fs {
 class FS;
@@ -66,6 +68,7 @@ public:
   typedef std::function<void(void)> THandlerFunction;
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);
+  void addHandler(RequestHandler* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path);
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
