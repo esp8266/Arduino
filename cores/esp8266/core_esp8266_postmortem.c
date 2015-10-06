@@ -31,7 +31,7 @@ extern void __real_system_restart_local();
 extern cont_t g_cont;
 
 
-static void uart_write_char_d(char c);
+void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
 static void uart1_write_char_d(char c);
 static void print_stack(uint32_t start, uint32_t end);
@@ -133,8 +133,8 @@ void uart_write_char_d(char c) {
     uart1_write_char_d(c);
 }
 
-void uart0_write_char_d(char c) {
-    while (((USS(0) >> USTXC) & 0xff) >= 0x7e) { }
+static void uart0_write_char_d(char c) {
+    while (((USS(0) >> USTXC) & 0xff)) { }
 
     if (c == '\n') {
         USF(0) = '\r';
@@ -142,7 +142,7 @@ void uart0_write_char_d(char c) {
     USF(0) = c;
 }
 
-void uart1_write_char_d(char c) {
+static void uart1_write_char_d(char c) {
     while (((USS(1) >> USTXC) & 0xff) >= 0x7e) { }
 
     if (c == '\n') {
