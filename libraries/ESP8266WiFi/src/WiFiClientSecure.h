@@ -51,7 +51,7 @@ public:
 protected:
     int _connectSSL();
 
-    SSLContext* _ssl;
+    SSLContext* _ssl = nullptr;
 };
 
 #endif //wificlientsecure_h
