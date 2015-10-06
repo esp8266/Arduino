@@ -16,6 +16,7 @@ HTTPMethod	KEYWORD1
 begin	KEYWORD2
 handleClient	KEYWORD2
 on	KEYWORD2
+addHandler	KEYWORD2
 uri	KEYWORD2
 method	KEYWORD2
 client	KEYWORD2
