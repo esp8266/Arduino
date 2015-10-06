@@ -25,20 +25,20 @@
 
 #define CONT_STACKGUARD 0xfeefeffe
 
-void cont_init(cont_t* cont) {
+void ICACHE_RAM_ATTR cont_init(cont_t* cont) {
     cont->stack_guard1 = CONT_STACKGUARD;
     cont->stack_guard2 = CONT_STACKGUARD;
     cont->stack_end = cont->stack + (sizeof(cont->stack) / 4);
     cont->struct_start = (unsigned*) cont;
 }
 
-int cont_check(cont_t* cont) {
+int ICACHE_RAM_ATTR cont_check(cont_t* cont) {
     if(cont->stack_guard1 != CONT_STACKGUARD || cont->stack_guard2 != CONT_STACKGUARD) return 1;
 
     return 0;
 }
 
-bool cont_can_yield(cont_t* cont) {
+bool ICACHE_RAM_ATTR cont_can_yield(cont_t* cont) {
     return !ETS_INTR_WITHINISR() &&
            cont->pc_ret != 0 && cont->pc_yield == 0;
 }
