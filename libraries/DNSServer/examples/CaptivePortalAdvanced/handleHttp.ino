@@ -73,7 +73,7 @@ void handleWifi() {
   Serial.println("scan done");
   if (n > 0) {
     for (int i = 0; i < n; i++) {
-      server.sendContent(String() + "\r\n<tr><td>SSID " + String(WiFi.SSID(i)) + String((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":" *") + " (" + WiFi.RSSI(i) + ")</td></tr>");
+      server.sendContent(String() + "\r\n<tr><td>SSID " + WiFi.SSID(i) + String((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":" *") + " (" + WiFi.RSSI(i) + ")</td></tr>");
     }
   } else {
     server.sendContent(String() + "<tr><td>No WLAN found</td></tr>");
