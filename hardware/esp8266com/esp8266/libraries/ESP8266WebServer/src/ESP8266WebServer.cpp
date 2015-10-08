@@ -26,7 +26,7 @@
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
 #include "FS.h"
-#include "detail/RequestHandler.h"
+#include "detail/RequestHandlersImpl.h"
 // #define DEBUG
 #define DEBUG_OUTPUT Serial
 
@@ -45,7 +45,7 @@ ESP8266WebServer::~ESP8266WebServer() {
     return;
   RequestHandler* handler = _firstHandler;
   while (handler) {
-    RequestHandler* next = handler->next;
+    RequestHandler* next = handler->next();
     delete handler;
     handler = next;
   }
@@ -63,13 +63,17 @@ void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::
   _addRequestHandler(new FunctionRequestHandler(fn, uri, method));
 }
 
+void ESP8266WebServer::addHandler(RequestHandler* handler) {
+    _addRequestHandler(handler);
+}
+
 void ESP8266WebServer::_addRequestHandler(RequestHandler* handler) {
     if (!_lastHandler) {
       _firstHandler = handler;
       _lastHandler = handler;
     }
     else {
-      _lastHandler->next = handler;
+      _lastHandler->next(handler);
       _lastHandler = handler;
     }
 }
@@ -293,7 +297,7 @@ void ESP8266WebServer::onNotFound(THandlerFunction fn) {
 
 void ESP8266WebServer::_handleRequest() {
   RequestHandler* handler;
-  for (handler = _firstHandler; handler; handler = handler->next) {
+  for (handler = _firstHandler; handler; handler = handler->next()) {
     if (handler->handle(*this, _currentMethod, _currentUri))
       break;
   }

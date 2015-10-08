@@ -1,9 +1,9 @@
-/* 
+/*
   timer.c - Timer1 library for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -29,13 +29,13 @@
 
 static volatile timercallback timer1_user_cb = NULL;
 
-void timer1_isr_handler(void *para){
+void ICACHE_RAM_ATTR timer1_isr_handler(void *para){
     if ((T1C & ((1 << TCAR) | (1 << TCIT))) == 0) TEIE &= ~TEIE1;//edge int disable
     T1I = 0;
     if (timer1_user_cb) {
         // to make ISR compatible to Arduino AVR model where interrupts are disabled
         // we disable them before we call the client ISR
-        uint32_t savedPS = xt_rsil(15); // stop other interrupts 
+        uint32_t savedPS = xt_rsil(15); // stop other interrupts
         timer1_user_cb();
         xt_wsr_ps(savedPS);
     }
@@ -61,7 +61,7 @@ void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload){
     T1I = 0;
 }
 
-void timer1_write(uint32_t ticks){
+void ICACHE_RAM_ATTR timer1_write(uint32_t ticks){
     T1L = ((ticks)& 0x7FFFFF);
     if ((T1C & (1 << TCIT)) == 0) TEIE |= TEIE1;//edge int enable
 }
@@ -76,7 +76,7 @@ void timer1_disable(){
 
 static volatile timercallback timer0_user_cb = NULL;
 
-void timer0_isr_handler(void* para){
+void ICACHE_RAM_ATTR timer0_isr_handler(void* para){
     if (timer0_user_cb) {
         // to make ISR compatible to Arduino AVR model where interrupts are disabled
         // we disable them before we call the client ISR
@@ -99,6 +99,3 @@ void timer0_detachInterrupt() {
     timer0_user_cb = NULL;
     ETS_CCOMPARE0_DISABLE();
 }
-
-
-

@@ -1,9 +1,9 @@
-/* 
+/*
   pwm.c - analogWrite implementation for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -88,7 +88,7 @@ void prep_pwm_steps(){
 	ETS_FRC1_INTR_ENABLE();
 }
 
-void pwm_timer_isr(){
+void ICACHE_RAM_ATTR pwm_timer_isr(){
 	static uint8_t current_step = 0;
 	static uint8_t stepcount = 0;
 	static uint16_t steps[17];

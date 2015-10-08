@@ -27,7 +27,8 @@
 #include <functional>
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
-enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
+enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
+                        UPLOAD_FILE_ABORTED };
 
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
 #define HTTP_UPLOAD_BUFLEN 2048
@@ -37,7 +38,9 @@ enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END };
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
 
-class RequestHandler;
+class ESP8266WebServer;
+
+#include "detail/RequestHandler.h"
 
 namespace fs {
 class FS;
@@ -65,6 +68,7 @@ public:
   typedef std::function<void(void)> THandlerFunction;
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);
+  void addHandler(RequestHandler* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path);
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
@@ -116,6 +120,7 @@ protected:
   void _parseArguments(String data);
   static const char* _responseCodeToString(int code);
   bool _parseForm(WiFiClient& client, String boundary, uint32_t len);
+  bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
