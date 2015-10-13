@@ -283,6 +283,38 @@ bool ESP8266WebServer::hasArg(const char* name) {
   return false;
 }
 
+String ESP8266WebServer::header(const char* name) {
+  for (int i = 0; i < _currentHeaderCount; ++i) {
+    if (_currentHeaders[i].key == name)
+      return _currentHeaders[i].value;
+  }
+  return String();
+}
+
+String ESP8266WebServer::header(int i) {
+  if (i < _currentHeaderCount)
+    return _currentHeaders[i].value;
+  return String();
+}
+
+String ESP8266WebServer::headerName(int i) {
+  if (i < _currentHeaderCount)
+    return _currentHeaders[i].key;
+  return String();
+}
+
+int ESP8266WebServer::headers() {
+  return _currentHeaderCount;
+}
+
+bool ESP8266WebServer::hasHeader(const char* name) {
+  for (int i = 0; i < _currentHeaderCount; ++i) {
+    if (_currentHeaders[i].key == name)
+      return true;
+  }
+  return false;
+}
+
 String ESP8266WebServer::hostHeader() {
   return _hostHeader;
 }
