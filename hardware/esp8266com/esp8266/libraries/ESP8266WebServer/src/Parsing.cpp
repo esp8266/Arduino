@@ -31,7 +31,12 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
   client.readStringUntil('\n');
-
+  
+  if (_currentHeaders)
+    delete[] _currentHeaders;
+  _currentHeaders = 0;
+  _currentHeaderCount = 0;
+  
   // First line of HTTP request looks like "GET /path HTTP/1.1"
   // Retrieve the "/path" part by finding the spaces
   int addr_start = req.indexOf(' ');
@@ -96,6 +101,17 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       }
       headerName = req.substring(0, headerDiv);
       headerValue = req.substring(headerDiv + 2);
+      
+      RequestArgument* _newHeaders = new RequestArgument[_currentHeaderCount+1];
+      for (int i = 0; i < _currentHeaderCount; i++) {
+        _newHeaders[i] = _currentHeaders[i];
+      }
+      RequestArgument& arg = _newHeaders[_currentHeaderCount];
+      arg.key = headerName;
+      arg.value = headerValue;
+      _currentHeaderCount++;
+      if (_currentHeaders) delete[] _currentHeaders;
+      _currentHeaders = _newHeaders;
 	  
 	  #ifdef DEBUG
 	  DEBUG_OUTPUT.print("headerName: ");
@@ -161,6 +177,17 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       }
       headerName = req.substring(0, headerDiv);
       headerValue = req.substring(headerDiv + 2);
+      
+      RequestArgument* _newHeaders = new RequestArgument[_currentHeaderCount+1];
+      for (int i = 0; i < _currentHeaderCount; i++) {
+        _newHeaders[i] = _currentHeaders[i];
+      }
+      RequestArgument& arg = _newHeaders[_currentHeaderCount];
+      arg.key = headerName;
+      arg.value = headerValue;
+      _currentHeaderCount++;
+      if (_currentHeaders) delete[] _currentHeaders;
+      _currentHeaders = _newHeaders;
 	  
 	  #ifdef DEBUG
 	  DEBUG_OUTPUT.print("headerName: ");
