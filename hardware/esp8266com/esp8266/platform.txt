@@ -90,7 +90,6 @@ tools.esptool.cmd.windows=esptool.exe
 tools.esptool.path={runtime.platform.path}/tools
 
 tools.esptool.upload.protocol=esp
-upload.verbose=-vv
 tools.esptool.upload.params.verbose=-vv
 tools.esptool.upload.params.quiet=
 tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}.bin"
