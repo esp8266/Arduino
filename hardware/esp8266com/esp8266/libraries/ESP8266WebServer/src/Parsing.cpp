@@ -34,7 +34,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   
   if (_currentHeaders)
     delete[] _currentHeaders;
-  _currentHeaders = 0;
+  _currentHeaders = new RequestArgument[_headerKeysCount];
   _currentHeaderCount = 0;
   
   // First line of HTTP request looks like "GET /path HTTP/1.1"
@@ -102,16 +102,12 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       headerName = req.substring(0, headerDiv);
       headerValue = req.substring(headerDiv + 2);
       
-      RequestArgument* _newHeaders = new RequestArgument[_currentHeaderCount+1];
-      for (int i = 0; i < _currentHeaderCount; i++) {
-        _newHeaders[i] = _currentHeaders[i];
+      if (_collectHeader(headerName.c_str())) {
+        RequestArgument& arg = _currentHeaders[_currentHeaderCount];
+        arg.key = headerName;
+        arg.value = headerValue;
+        _currentHeaderCount++;
       }
-      RequestArgument& arg = _newHeaders[_currentHeaderCount];
-      arg.key = headerName;
-      arg.value = headerValue;
-      _currentHeaderCount++;
-      if (_currentHeaders) delete[] _currentHeaders;
-      _currentHeaders = _newHeaders;
 	  
 	  #ifdef DEBUG
 	  DEBUG_OUTPUT.print("headerName: ");
@@ -178,16 +174,12 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       headerName = req.substring(0, headerDiv);
       headerValue = req.substring(headerDiv + 2);
       
-      RequestArgument* _newHeaders = new RequestArgument[_currentHeaderCount+1];
-      for (int i = 0; i < _currentHeaderCount; i++) {
-        _newHeaders[i] = _currentHeaders[i];
+      if (_collectHeader(headerName.c_str())) {
+        RequestArgument& arg = _currentHeaders[_currentHeaderCount];
+        arg.key = headerName;
+        arg.value = headerValue;
+        _currentHeaderCount++;
       }
-      RequestArgument& arg = _newHeaders[_currentHeaderCount];
-      arg.key = headerName;
-      arg.value = headerValue;
-      _currentHeaderCount++;
-      if (_currentHeaders) delete[] _currentHeaders;
-      _currentHeaders = _newHeaders;
 	  
 	  #ifdef DEBUG
 	  DEBUG_OUTPUT.print("headerName: ");
@@ -214,6 +206,12 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   return true;
 }
 
+bool ESP8266WebServer::_collectHeader(const char* headerName) {
+  for (size_t i = 0; i < _headerKeysCount; i++) {
+    if (strcmp(headerName, _headerKeys[i]) == 0) return true;
+  }
+  return false;
+}
 
 void ESP8266WebServer::_parseArguments(String data) {
 #ifdef DEBUG
