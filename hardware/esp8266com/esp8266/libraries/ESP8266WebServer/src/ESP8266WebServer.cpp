@@ -41,6 +41,10 @@ ESP8266WebServer::ESP8266WebServer(int port)
 }
 
 ESP8266WebServer::~ESP8266WebServer() {
+  if (_headerKeys) {
+    free(_headerKeys);
+    _headerKeys = 0;
+  }
   if (!_firstHandler)
     return;
   RequestHandler* handler = _firstHandler;
@@ -289,6 +293,14 @@ String ESP8266WebServer::header(const char* name) {
       return _currentHeaders[i].value;
   }
   return String();
+}
+
+void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
+  _headerKeysCount = headerKeysCount;
+  _headerKeys = (const char**)malloc(_headerKeysCount*sizeof(char*));
+  for (int i = 0; i < _headerKeysCount; i++){
+    _headerKeys[i] = headerKeys[i];
+  }
 }
 
 String ESP8266WebServer::header(int i) {
