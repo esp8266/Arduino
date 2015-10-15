@@ -41,10 +41,10 @@ ESP8266WebServer::ESP8266WebServer(int port)
 }
 
 ESP8266WebServer::~ESP8266WebServer() {
-  if (_headerKeys) {
+  if (_headerKeys)
     free(_headerKeys);
-    _headerKeys = 0;
-  }
+  _headerKeys = 0;
+  _headerKeysCount = 0;
   if (!_firstHandler)
     return;
   RequestHandler* handler = _firstHandler;
