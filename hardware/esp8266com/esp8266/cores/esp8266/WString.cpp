@@ -118,7 +118,9 @@ ICACHE_FLASH_ATTR String::String(double value, unsigned char decimalPlaces) {
 }
 
 ICACHE_FLASH_ATTR String::~String() {
-    free(buffer);
+    if(buffer) {
+        free(buffer);
+    }
 }
 
 // /*********************************************/
