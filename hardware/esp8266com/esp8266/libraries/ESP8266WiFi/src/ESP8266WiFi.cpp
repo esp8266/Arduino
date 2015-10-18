@@ -370,9 +370,9 @@ IPAddress ESP8266WiFiClass::gatewayIP()
     return IPAddress(ip.gw.addr);
 }
 
-IPAddress ESP8266WiFiClass::dnsIP()
+IPAddress ESP8266WiFiClass::dnsIP(int dns_no)
 {
-    ip_addr_t dns_ip = dns_getserver(0);
+    ip_addr_t dns_ip = dns_getserver(dns_no);
     return IPAddress(dns_ip.addr);
 }
 

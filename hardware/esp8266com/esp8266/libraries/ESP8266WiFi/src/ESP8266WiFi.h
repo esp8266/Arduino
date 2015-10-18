@@ -173,7 +173,7 @@ public:
      *
      * return: DNS ip address value
      */
-   IPAddress dnsIP();
+   IPAddress dnsIP(int dns_no = 0);
 
     /*
      * Return the current SSID associated with the network
