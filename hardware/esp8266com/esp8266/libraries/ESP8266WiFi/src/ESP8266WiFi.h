@@ -169,6 +169,13 @@ public:
    IPAddress gatewayIP();
 
     /*
+     * Get the DNS ip address.
+     *
+     * return: DNS ip address value
+     */
+   IPAddress dnsIP();
+
+    /*
      * Return the current SSID associated with the network
      *
      * return: ssid string
