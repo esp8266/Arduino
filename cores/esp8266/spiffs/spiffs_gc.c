@@ -36,7 +36,7 @@ s32_t spiffs_gc_quick(
   int cur_entry = 0;
   spiffs_obj_id *obj_lu_buf = (spiffs_obj_id *)fs->lu_work;
 
-  SPIFFS_GC_DBG("gc_quick: running\n", cur_block);
+  SPIFFS_GC_DBG("gc_quick: running\n");
 #if SPIFFS_GC_STATS
   fs->stats_gc_runs++;
 #endif
@@ -255,7 +255,7 @@ s32_t spiffs_gc_find_candidate(
    // align cand_scores on s32_t boundary
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-  cand_scores = (s32_t*)(((u32_t)cand_scores + sizeof(s32_t) - 1) & ~(sizeof(s32_t) - 1));
+  cand_scores = (s32_t*)(((ptrdiff_t)cand_scores + sizeof(ptrdiff_t) - 1) & ~(sizeof(ptrdiff_t) - 1));
 #pragma GCC diagnostic pop
 
   *block_candidates = cand_blocks;
