@@ -28,7 +28,7 @@ const uint32_t c_CycleCompensation = 4;  // compensation us to trim adjust for d
 
 struct ServoInfo  {
     uint8_t pin : 6;             // a pin number from 0 to 63
-    uint8_t isActive : 1;        // true if this channel is enabled, pin not pulsed if false 
+    uint8_t isActive : 1;        // true if this channel is enabled, pin not pulsed if false
 };
 
 struct ServoState {
@@ -57,7 +57,11 @@ static uint8_t s_servoCount = 0;            // the total number of attached s_se
 // Interrupt handler template method that takes a class that implements
 // a standard set of methods for the timer abstraction
 //------------------------------------------------------------------------------
-template <class T> void Servo_Handler(T* timer)
+template <class T>
+static void Servo_Handler(T* timer) ICACHE_RAM_ATTR;
+
+template <class T>
+static void Servo_Handler(T* timer)
 {
     uint8_t servoIndex;
 
@@ -75,7 +79,7 @@ template <class T> void Servo_Handler(T* timer)
         }
         timer->nextChannel();
     }
-    
+
     servoIndex = SERVO_INDEX(timer->timerId(), timer->getCurrentChannel());
 
     if (servoIndex < s_servoCount && timer->getCurrentChannel() < SERVOS_PER_TIMER) {
@@ -96,20 +100,32 @@ template <class T> void Servo_Handler(T* timer)
             // at least REFRESH_INTERVAL has elapsed
             timer->SetCycleCompare(timer->GetCycleCount() + c_CycleCompensation * 2);
         }
-        
+
         timer->setEndOfCycle();
     }
+}
+
+static void handler0() ICACHE_RAM_ATTR;
+static void handler0()
+{
+    Servo_Handler<ServoTimer0>(&s_servoTimer0);
+}
+
+static void handler1() ICACHE_RAM_ATTR;
+static void handler1()
+{
+    Servo_Handler<ServoTimer1>(&s_servoTimer1);
 }
 
 static void initISR(ServoTimerSequence timerId)
 {
 #if !defined (SERVO_EXCLUDE_TIMER0)
     if (timerId == ServoTimerSequence_Timer0)
-        s_servoTimer0.InitInterrupt([]() {Servo_Handler<ServoTimer0>(&s_servoTimer0); });
+        s_servoTimer0.InitInterrupt(&handler0);
 #endif
 #if !defined (SERVO_EXCLUDE_TIMER1)
     if (timerId == ServoTimerSequence_Timer1)
-        s_servoTimer1.InitInterrupt([]() {Servo_Handler<ServoTimer1>(&s_servoTimer1); });
+        s_servoTimer1.InitInterrupt(&handler1);
 #endif
 }
 
@@ -169,13 +185,13 @@ uint8_t Servo::attach(int pin, int minUs, int maxUs)
         pinMode(pin, OUTPUT);       // set servo pin to output
         digitalWrite(pin, LOW);
         s_servos[_servoIndex].info.pin = pin;
-        
+
         // keep the min and max within 200-3000 us, these are extreme
-        // ranges and should support extreme servos while maintaining 
+        // ranges and should support extreme servos while maintaining
         // reasonable ranges
         _maxUs = max(250, min(3000, maxUs));
         _minUs = max(200, min(_maxUs, minUs));
-        
+
         // initialize the timerId if it has not already been initialized
         timerId = SERVO_INDEX_TO_TIMER(_servoIndex);
         if (!isTimerActive(timerId)) {
@@ -242,5 +258,4 @@ bool Servo::attached()
     return s_servos[_servoIndex].info.isActive;
 }
 
-#endif 
-
+#endif
