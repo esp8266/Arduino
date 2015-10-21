@@ -222,7 +222,7 @@ void ESP8266WebServer::sendContent_P(PGM_P content) {
         }
         else {
             // reached terminator
-            contentUnitLen = contentNext - content;
+            contentUnitLen = contentNext - contentUnit;
             content = NULL;
         }
 

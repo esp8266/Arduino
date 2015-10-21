@@ -27,6 +27,7 @@ generic.build.spiffs_pagesize=256
 
 generic.menu.UploadTool.esptool=Serial
 generic.menu.UploadTool.esptool.upload.tool=esptool
+generic.menu.UploadTool.esptool.upload.verbose=-vv
 generic.menu.UploadTool.espota=OTA
 generic.menu.UploadTool.espota.upload.tool=espota
 
@@ -169,6 +170,10 @@ huzzah.menu.CpuFrequency.80.build.f_cpu=80000000L
 huzzah.menu.CpuFrequency.160=160 MHz
 huzzah.menu.CpuFrequency.160.build.f_cpu=160000000L
 
+huzzah.menu.UploadTool.esptool=Serial
+huzzah.menu.UploadTool.esptool.upload.tool=esptool
+huzzah.menu.UploadTool.esptool.upload.verbose=-vv
+
 huzzah.menu.UploadSpeed.115200=115200
 huzzah.menu.UploadSpeed.115200.upload.speed=115200
 huzzah.menu.UploadSpeed.9600=9600
@@ -221,6 +226,10 @@ nodemcu.menu.CpuFrequency.80=80 MHz
 nodemcu.menu.CpuFrequency.80.build.f_cpu=80000000L
 nodemcu.menu.CpuFrequency.160=160 MHz
 nodemcu.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+nodemcu.menu.UploadTool.esptool=Serial
+nodemcu.menu.UploadTool.esptool.upload.tool=esptool
+nodemcu.menu.UploadTool.esptool.upload.verbose=-vv
 
 nodemcu.menu.UploadSpeed.115200=115200
 nodemcu.menu.UploadSpeed.115200.upload.speed=115200
@@ -283,6 +292,10 @@ nodemcuv2.menu.CpuFrequency.80=80 MHz
 nodemcuv2.menu.CpuFrequency.80.build.f_cpu=80000000L
 nodemcuv2.menu.CpuFrequency.160=160 MHz
 nodemcuv2.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+nodemcuv2.menu.UploadTool.esptool=Serial
+nodemcuv2.menu.UploadTool.esptool.upload.tool=esptool
+nodemcuv2.menu.UploadTool.esptool.upload.verbose=-vv
 
 nodemcuv2.menu.UploadSpeed.115200=115200
 nodemcuv2.menu.UploadSpeed.115200.upload.speed=115200
@@ -353,6 +366,10 @@ modwifi.menu.CpuFrequency.80.build.f_cpu=80000000L
 modwifi.menu.CpuFrequency.160=160 MHz
 modwifi.menu.CpuFrequency.160.build.f_cpu=160000000L
 
+modwifi.menu.UploadTool.esptool=Serial
+modwifi.menu.UploadTool.esptool.upload.tool=esptool
+modwifi.menu.UploadTool.esptool.upload.verbose=-vv
+
 modwifi.menu.UploadSpeed.115200=115200
 modwifi.menu.UploadSpeed.115200.upload.speed=115200
 modwifi.menu.UploadSpeed.9600=9600
@@ -405,6 +422,10 @@ thing.menu.CpuFrequency.80.build.f_cpu=80000000L
 thing.menu.CpuFrequency.160=160 MHz
 thing.menu.CpuFrequency.160.build.f_cpu=160000000L
 
+thing.menu.UploadTool.esptool=Serial
+thing.menu.UploadTool.esptool.upload.tool=esptool
+thing.menu.UploadTool.esptool.upload.verbose=-vv
+
 thing.menu.UploadSpeed.115200=115200
 thing.menu.UploadSpeed.115200.upload.speed=115200
 thing.menu.UploadSpeed.9600=9600
@@ -449,6 +470,10 @@ esp210.menu.CpuFrequency.80=80 MHz
 esp210.menu.CpuFrequency.80.build.f_cpu=80000000L
 esp210.menu.CpuFrequency.160=160 MHz
 esp210.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+esp210.menu.UploadTool.esptool=Serial
+esp210.menu.UploadTool.esptool.upload.tool=esptool
+esp210.menu.UploadTool.esptool.upload.verbose=-vv
 
 esp210.menu.UploadSpeed.57600=57600
 esp210.menu.UploadSpeed.57600.upload.speed=57600

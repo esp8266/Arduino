@@ -18,7 +18,7 @@
 
 //
 // Defines for timer abstractions used with  Servo library
-// 
+//
 // ServoTimerSequence enumerates the sequence that the timers should be allocated
 // ServoTimerSequence_COUNT indicates how many timers are available.
 //
@@ -47,7 +47,7 @@ public:
     }
 
 
-    uint32_t usToTicks(uint32_t us) const 
+    uint32_t usToTicks(uint32_t us) const
     {
         return (clockCyclesPerMicrosecond() * us);     // converts microseconds to tick
     }
@@ -56,7 +56,7 @@ public:
         return (ticks / clockCyclesPerMicrosecond()); // converts from ticks back to microseconds
     }
 
-    void InitInterrupt(timercallback handler) 
+    void InitInterrupt(timercallback handler)
     {
         timer0_isr_init();
         timer0_attachInterrupt(handler);
@@ -64,7 +64,7 @@ public:
 
     void ResetInterrupt() {}; // timer0 doesn't have a clear interrupt
 
-    void StopInterrupt() 
+    void StopInterrupt()
     {
         timer0_detachInterrupt();
     }
@@ -74,7 +74,7 @@ public:
         timer0_write(ESP.getCycleCount() + value);
     }
 
-    void SetCycleCompare(uint32_t value) 
+    void SetCycleCompare(uint32_t value)
     {
         timer0_write(_cycleStart + value);
     }
@@ -96,12 +96,12 @@ public:
         return _currentChannel;
     }
 
-    void nextChannel() 
+    void nextChannel()
     {
         _currentChannel++;
     }
 
-    void setEndOfCycle() 
+    void setEndOfCycle()
     {
         _currentChannel = -1;
     }
@@ -111,7 +111,7 @@ public:
         return (_currentChannel == -1);
     }
 
-    ServoTimerSequence timerId() const 
+    ServoTimerSequence timerId() const
     {
         return ServoTimerSequence_Timer0;
     }
@@ -221,7 +221,3 @@ private:
 };
 
 #endif
-
-
-
-
