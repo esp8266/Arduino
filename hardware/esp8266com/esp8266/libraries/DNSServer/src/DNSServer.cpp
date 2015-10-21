@@ -13,6 +13,7 @@ bool DNSServer::start(const uint16_t &port, const String &domainName,
                      const IPAddress &resolvedIP)
 {
   _port = port;
+  _buffer=NULL;
   _domainName = domainName;
   _resolvedIP[0] = resolvedIP[0];
   _resolvedIP[1] = resolvedIP[1];
@@ -35,6 +36,8 @@ void DNSServer::setTTL(const uint32_t &ttl)
 void DNSServer::stop()
 {
   _udp.stop();
+  free(_buffer);
+  _buffer=NULL;
 }
 
 void DNSServer::downcaseAndRemoveWwwPrefix(String &domainName)
@@ -48,7 +51,9 @@ void DNSServer::processNextRequest()
   _currentPacketSize = _udp.parsePacket();
   if (_currentPacketSize)
   {
+    if (_buffer!=NULL)free(_buffer);
     _buffer = (unsigned char*)malloc(_currentPacketSize * sizeof(char));
+    if (_buffer!=NULL){
     _udp.read(_buffer, _currentPacketSize);
     _dnsHeader = (DNSHeader*) _buffer;
 
@@ -66,6 +71,8 @@ void DNSServer::processNextRequest()
     }
 
     free(_buffer);
+    _buffer=NULL;
+    }
   }
 }
 
@@ -80,6 +87,7 @@ bool DNSServer::requestIncludesOnlyOneQuestion()
 String DNSServer::getDomainNameWithoutWwwPrefix()
 {
   String parsedDomainName = "";
+  if (_buffer==NULL) return parsedDomainName;
   unsigned char *start = _buffer + 12;
   if (*start == 0)
   {
@@ -109,6 +117,7 @@ String DNSServer::getDomainNameWithoutWwwPrefix()
 
 void DNSServer::replyWithIP()
 {
+    if (_buffer!=NULL){
   _dnsHeader->QR = DNS_QR_RESPONSE;
   _dnsHeader->ANCount = _dnsHeader->QDCount;
   _dnsHeader->QDCount = _dnsHeader->QDCount; 
@@ -149,9 +158,11 @@ void DNSServer::replyWithIP()
     DEBUG_OUTPUT.println(getDomainNameWithoutWwwPrefix());
   #endif
 }
+}
 
 void DNSServer::replyWithCustomCode()
 {
+  if (_buffer!=NULL){
   _dnsHeader->QR = DNS_QR_RESPONSE;
   _dnsHeader->RCode = (unsigned char)_errorReplyCode;
   _dnsHeader->QDCount = 0;
@@ -159,4 +170,5 @@ void DNSServer::replyWithCustomCode()
   _udp.beginPacket(_udp.remoteIP(), _udp.remotePort());
   _udp.write(_buffer, sizeof(DNSHeader));
   _udp.endPacket();
+  }
 }
