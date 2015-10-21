@@ -134,7 +134,7 @@ bool MDNSResponder::begin(const char* domain){
 }
 
 void MDNSResponder::update() {
-  if (!_conn->next()) {
+  if (!_conn || !_conn->next()) {
     return;
   }
   _parsePacket();
