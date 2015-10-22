@@ -2,15 +2,22 @@
  * @file OTA-mDNS-SPIFFS.ino
  * 
  * @author Pascal Gollor (http://www.pgollor.de/cms/)
- * @data 2015-09-18
+ * @date 2015-09-18
+ * 
+ * changelog:
+ * 2015-10-22: 
+ * - Use new ArduinoOTA library.
+ * - loadConfig function can handle different line endings
+ * - remove mDNS studd. ArduinoOTA handle it.
  * 
  */
 
-
+// includes
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <FS.h>
+#include <ArduinoOTA.h>
 
 
 /**
@@ -18,7 +25,6 @@
  * @{
  */
 #define HOSTNAME "ESP8266-OTA-" ///< Hostename. The setup function adds the Chip ID at the end.
-#define APORT 8266 ///< Port for OTA update
 /// @}
 
 /**
@@ -29,8 +35,11 @@ const char* ap_default_ssid = "esp8266"; ///< Default SSID.
 const char* ap_default_psk = "esp8266esp8266"; ///< Default PSK.
 /// @}
 
-/// OTA Update UDP server handle.
-WiFiUDP OTA;
+/// Uncomment the next line for verbose output over UART.
+//#define SERIAL_VERBOSE
+
+/// OTA server handle.
+ArduinoOTA ota_server;
 
 
 /**
@@ -41,7 +50,7 @@ WiFiUDP OTA;
  * 
  * The config file have to containt the WiFi SSID in the first line
  * and the WiFi PSK in the second line.
- * Line seperator have to be \r\n (CR LF).
+ * Line seperator can be \r\n (CR LF) \r or \n.
  */
 bool loadConfig(String *ssid, String *pass)
 {
@@ -61,8 +70,21 @@ bool loadConfig(String *ssid, String *pass)
   content.trim();
 
   // Check if ther is a second line available.
-  uint8_t pos = content.indexOf("\r\n");
-  if (pos == 0)
+  int8_t pos = content.indexOf("\r\n");
+  uint8_t le = 2;
+  // check for linux and mac line ending.
+  if (pos == -1)
+  {
+    le = 1;
+    pos = content.indexOf("\n");
+    if (pos == -1)
+    {
+      pos = content.indexOf("\r");
+    }
+  }
+
+  // If there is no second line: Some information is missing.
+  if (pos == -1)
   {
     Serial.println("Infvalid content.");
     Serial.println(content);
@@ -72,7 +94,18 @@ bool loadConfig(String *ssid, String *pass)
 
   // Store SSID and PSK into string vars.
   *ssid = content.substring(0, pos);
-  *pass = content.substring(pos + 2);
+  *pass = content.substring(pos + le);
+
+  ssid->trim();
+  pass->trim();
+
+#ifdef SERIAL_VERBOSE
+  Serial.println("----- file content -----");
+  Serial.println(content);
+  Serial.println("----- file content -----");
+  Serial.println("ssid: " + *ssid);
+  Serial.println("psk:  " + *pass);
+#endif
 
   return true;
 } // loadConfig
@@ -106,91 +139,6 @@ bool saveConfig(String *ssid, String *pass)
 
 
 /**
- * @brief Handle OTA update stuff.
- * 
- * This function comes from ESP8266 Arduino example:
- * https://github.com/esp8266/Arduino/blob/esp8266/hardware/esp8266com/esp8266/libraries/ESP8266mDNS/examples/DNS_SD_Arduino_OTA/DNS_SD_Arduino_OTA.ino
- * 
- * Modification for uploading SPIFFS images from Pascal Gollor.
- *
- */
-static inline void ota_handle(void)
-{
-  bool spiffs = false;
-  
-  if (! OTA.parsePacket())
-  {
-    return;
-  }
-
-  // Get remote IP
-  IPAddress remote = OTA.remoteIP();
-
-  // Get command
-  int cmd = OTA.parseInt();
-  Serial.print("command: ");
-  Serial.println(cmd);
-  if (cmd == U_SPIFFS)
-  {
-    spiffs = true;
-    Serial.println("Get SPIFFS image.");
-  }
-
-  // Get remote port
-  int port = OTA.parseInt();
-
-  // Get sketch size.
-  int sketch_size = OTA.parseInt();
-
-  // Output stuff
-  Serial.print("Update Start: ip:");
-  Serial.print(remote);
-  Serial.printf(", port:%d, size:%d\r\n", port, sketch_size);
-
-  // Stop all UDP connections.
-  WiFiUDP::stopAll();
-  
-  // OTA start Time
-  uint32_t startTime = millis();
-
-  // Start Updateing.
-  if(!Update.begin(sketch_size, cmd))
-  {
-    Serial.println("Update Begin Error");
-    return;
-  }
-
-  WiFiClient client;
-  if (client.connect(remote, port))
-  {
-    uint32_t written;
-    while(!Update.isFinished())
-    {
-      written = Update.write(client);
-      if(written > 0) client.print(written, DEC);
-    }
-    Serial.setDebugOutput(false);
-
-    if(Update.end())
-    {
-      client.println("OK");
-      Serial.printf("Update Success: %u\nRebooting...\n", (unsigned int)(millis() - startTime));
-      ESP.restart();
-    }
-    else
-    {
-      Update.printError(client);
-      Update.printError(Serial);
-    }
-  }
-  else
-  {
-    Serial.printf("Connect Failed: %u\n", (unsigned int)(millis() - startTime));
-  }
-} // ota_handle
-
-
-/**
  * @brief Arduino setup function.
  */
 void setup()
@@ -212,8 +160,8 @@ void setup()
   WiFi.hostname(hostname);
 
   // Print hostname.
-  Serial.print("hostname: ");
-  Serial.println(WiFi.hostname());
+  Serial.println("Hostname: " + hostname);
+  //Serial.println(WiFi.hostname());
 
 
   // Initialize file system.
@@ -295,14 +243,8 @@ void setup()
     Serial.println(WiFi.softAPIP());
   }
 
-  // Initialize mDNS service.
-  MDNS.begin(hostname.c_str());
-
-  // ... Add OTA service.
-  MDNS.addService("arduino", "tcp", APORT);
-
-  // Open OTA Server.
-  OTA.begin(APORT);
+  // Start OTA server.
+  ota_server.setup();
 }
 
 
@@ -311,7 +253,8 @@ void setup()
  */
 void loop()
 {
-  // Handle OTA update.
-  ota_handle();
+  // Handle OTA server.
+  ota_server.handle();
+  yield();
 }
 
