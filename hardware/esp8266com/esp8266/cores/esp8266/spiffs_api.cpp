@@ -76,6 +76,15 @@ public:
         return true;
     }
 
+    bool info(uint32_t *total, uint32_t *used) override{
+    auto rc = SPIFFS_info(&_fs, total, used);
+     if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+            return false;
+        }
+        return true;
+    }
+
     bool remove(const char* path) override {
         char tmpName[SPIFFS_OBJ_NAME_LEN];
         strlcpy(tmpName, path, sizeof(tmpName));

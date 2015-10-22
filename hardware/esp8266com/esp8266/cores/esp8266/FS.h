@@ -93,6 +93,7 @@ public:
     bool begin();
 
     bool format();
+    bool info(uint32_t *total, uint32_t *used);
 
     File open(const char* path, const char* mode);
     File open(const String& path, const char* mode);
