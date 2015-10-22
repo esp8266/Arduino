@@ -174,6 +174,13 @@ bool FS::format() {
     return _impl->format();
 }
 
+bool FS::info(uint32_t *total, uint32_t *used){
+    if (!_impl) {
+        return false;
+    }
+    return _impl->info(total,used);
+}
+
 File FS::open(const String& path, const char* mode) {
     return open(path.c_str(), mode);
 }
