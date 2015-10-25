@@ -110,6 +110,8 @@ int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
 
     if (addr < alignedBegin) {
         uint32_t nb = alignedBegin - addr;
+        if (nb > size)
+            nb = size;
         uint32_t tmp = 0xffffffff;
         memcpy(((uint8_t* )&tmp) + 4 - nb, src, nb);
         if (!ESP.flashWrite(alignedBegin - 4, &tmp, 4)) {
