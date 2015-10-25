@@ -100,6 +100,10 @@ public:
         if (SPIFFS_mounted(&_fs) != 0) {
             return true;
         }
+        if (_size == 0) {
+            DEBUGV("SPIFFS size is zero");
+            return false;
+        }
         if (_tryMount()) {
             return true;
         }
@@ -112,6 +116,11 @@ public:
     }
 
     bool format() override {
+        if (_size == 0) {
+            DEBUGV("SPIFFS size is zero");
+            return false;
+        }
+
         bool wasMounted = (SPIFFS_mounted(&_fs) != 0);
 
         if (_tryMount()) {
