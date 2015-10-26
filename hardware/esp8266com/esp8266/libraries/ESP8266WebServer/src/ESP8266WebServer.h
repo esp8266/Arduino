@@ -83,6 +83,13 @@ public:
   String argName(int i);          // get request argument name by number
   int args();                     // get arguments count
   bool hasArg(const char* name);  // check if argument exists
+  
+  void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
+  String header(const char* name);   // get request header value by name
+  String header(int i);              // get request header value by number
+  String headerName(int i);          // get request header name by number
+  int headers();                     // get header count
+  bool hasHeader(const char* name);  // check if header exists
 
   String hostHeader();            // get request host header if available or empty String if not
 
@@ -124,6 +131,7 @@ protected:
   void _uploadWriteByte(uint8_t b);
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
+  bool _collectHeader(const char* headerName);
 
   struct RequestArgument {
     String key;
@@ -139,6 +147,11 @@ protected:
   size_t           _currentArgCount;
   RequestArgument* _currentArgs;
   HTTPUpload       _currentUpload;
+  
+  size_t           _currentHeaderCount;
+  RequestArgument* _currentHeaders;
+  size_t           _headerKeysCount;
+  const char**     _headerKeys;
 
   size_t           _contentLength;
   String           _responseHeaders;
