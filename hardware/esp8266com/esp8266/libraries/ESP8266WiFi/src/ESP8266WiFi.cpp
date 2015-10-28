@@ -204,7 +204,6 @@ int ESP8266WiFiClass::softAPdisconnect(bool wifioff)
     *conf.password = 0;
     ETS_UART_INTR_DISABLE();
     wifi_softap_set_config(&conf);
-    wifi_station_disconnect();
     ETS_UART_INTR_ENABLE();
 
     if(wifioff) {
