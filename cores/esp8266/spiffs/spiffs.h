@@ -5,8 +5,6 @@
  *      Author: petera
  */
 
-
-
 #ifndef SPIFFS_H_
 #define SPIFFS_H_
 #if defined(__cplusplus)
@@ -186,6 +184,11 @@ typedef struct {
   // logical size of a page, must be at least
   // log_block_size / 8
   u32_t log_page_size;
+
+#endif
+#if SPIFFS_FILEHDL_OFFSET
+  // an integer offset added to each file handle
+  u16_t fh_ix_offset;
 #endif
 } spiffs_config;
 
@@ -310,7 +313,7 @@ void SPIFFS_unmount(spiffs *fs);
  * @param path          the path of the new file
  * @param mode          ignored, for posix compliance
  */
-s32_t SPIFFS_creat(spiffs *fs, char *path, spiffs_mode mode);
+s32_t SPIFFS_creat(spiffs *fs, const char *path, spiffs_mode mode);
 
 /**
  * Opens/creates a file.
@@ -321,7 +324,7 @@ s32_t SPIFFS_creat(spiffs *fs, char *path, spiffs_mode mode);
  *                      SPIFFS_WR_ONLY, SPIFFS_RDWR, SPIFFS_DIRECT
  * @param mode          ignored, for posix compliance
  */
-spiffs_file SPIFFS_open(spiffs *fs, char *path, spiffs_flags flags, spiffs_mode mode);
+spiffs_file SPIFFS_open(spiffs *fs, const char *path, spiffs_flags flags, spiffs_mode mode);
 
 
 /**
@@ -360,13 +363,14 @@ s32_t SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len);
 s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len);
 
 /**
- * Moves the read/write file offset
+ * Moves the read/write file offset. Resulting offset is returned or negative if error.
+ * lseek(fs, fd, 0, SPIFFS_SEEK_CUR) will thus return current offset.
  * @param fs            the file system struct
  * @param fh            the filehandle
  * @param offs          how much/where to move the offset
  * @param whence        if SPIFFS_SEEK_SET, the file offset shall be set to offset bytes
  *                      if SPIFFS_SEEK_CUR, the file offset shall be set to its current location plus offset
- *                      if SPIFFS_SEEK_END, the file offset shall be set to the size of the file plus offset
+ *                      if SPIFFS_SEEK_END, the file offset shall be set to the size of the file plus offse, which should be negative
  */
 s32_t SPIFFS_lseek(spiffs *fs, spiffs_file fh, s32_t offs, int whence);
 
@@ -375,7 +379,7 @@ s32_t SPIFFS_lseek(spiffs *fs, spiffs_file fh, s32_t offs, int whence);
  * @param fs            the file system struct
  * @param path          the path of the file to remove
  */
-s32_t SPIFFS_remove(spiffs *fs, char *path);
+s32_t SPIFFS_remove(spiffs *fs, const char *path);
 
 /**
  * Removes a file by filehandle
@@ -390,7 +394,7 @@ s32_t SPIFFS_fremove(spiffs *fs, spiffs_file fh);
  * @param path          the path of the file to stat
  * @param s             the stat struct to populate
  */
-s32_t SPIFFS_stat(spiffs *fs, char *path, spiffs_stat *s);
+s32_t SPIFFS_stat(spiffs *fs, const char *path, spiffs_stat *s);
 
 /**
  * Gets file status by filehandle
@@ -420,7 +424,7 @@ s32_t SPIFFS_close(spiffs *fs, spiffs_file fh);
  * @param old           path of file to rename
  * @param newPath       new path of file
  */
-s32_t SPIFFS_rename(spiffs *fs, char *old, char *newPath);
+s32_t SPIFFS_rename(spiffs *fs, const char *old, const char *newPath);
 
 /**
  * Returns last error of last file operation.
@@ -443,7 +447,7 @@ void SPIFFS_clearerr(spiffs *fs);
  * @param name          the name of the directory
  * @param d             pointer the directory stream to be populated
  */
-spiffs_DIR *SPIFFS_opendir(spiffs *fs, char *name, spiffs_DIR *d);
+spiffs_DIR *SPIFFS_opendir(spiffs *fs, const char *name, spiffs_DIR *d);
 
 /**
  * Closes a directory stream
@@ -543,6 +547,20 @@ s32_t SPIFFS_gc_quick(spiffs *fs, u16_t max_free_pages);
  * @param size          amount of bytes that should be freed
  */
 s32_t SPIFFS_gc(spiffs *fs, u32_t size);
+
+/**
+ * Check if EOF reached.
+ * @param fs            the file system struct
+ * @param fh            the filehandle of the file to check
+ */
+s32_t SPIFFS_eof(spiffs *fs, spiffs_file fh);
+
+/**
+ * Get position in file.
+ * @param fs            the file system struct
+ * @param fh            the filehandle of the file to check
+ */
+s32_t SPIFFS_tell(spiffs *fs, spiffs_file fh);
 
 #if SPIFFS_TEST_VISUALISATION
 /**
