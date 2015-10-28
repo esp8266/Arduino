@@ -67,7 +67,7 @@ void ArduinoOTA::handle() {
 
   WiFiUDP::stopAll();
 
-  if(!Update.begin(size)){
+  if(!Update.begin(size, cmd)){
     if (_serial_debug)
         Serial.println("Update Begin Error");
     if (_error_callback) _error_callback();
