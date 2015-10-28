@@ -63,11 +63,7 @@ public:
     DirImplPtr openDir(const char* path) override;
 
     bool rename(const char* pathFrom, const char* pathTo) override {
-        char tmpNameFrom[SPIFFS_OBJ_NAME_LEN];
-        strlcpy(tmpNameFrom, pathFrom, sizeof(tmpNameFrom));
-        char tmpNameTo[SPIFFS_OBJ_NAME_LEN];
-        strlcpy(tmpNameTo, pathTo, sizeof(tmpNameTo));
-        auto rc = SPIFFS_rename(&_fs, tmpNameFrom, tmpNameTo);
+        auto rc = SPIFFS_rename(&_fs, pathFrom, pathTo);
         if (rc != SPIFFS_OK) {
             DEBUGV("SPIFFS_rename: rc=%d, from=`%s`, to=`%s`\r\n", rc,
                 pathFrom, pathTo);
@@ -86,9 +82,7 @@ public:
     }
 
     bool remove(const char* path) override {
-        char tmpName[SPIFFS_OBJ_NAME_LEN];
-        strlcpy(tmpName, path, sizeof(tmpName));
-        auto rc = SPIFFS_remove(&_fs, tmpName);
+        auto rc = SPIFFS_remove(&_fs, path);
         if (rc != SPIFFS_OK) {
             DEBUGV("SPIFFS_remove: rc=%d path=`%s`\r\n", rc, path);
             return false;
@@ -411,9 +405,7 @@ protected:
 
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode) {
     int mode = getSpiffsMode(openMode, accessMode);
-    char tmpName[SPIFFS_OBJ_NAME_LEN];
-    strlcpy(tmpName, path, sizeof(tmpName));
-    int fd = SPIFFS_open(&_fs, tmpName, mode, 0);
+    int fd = SPIFFS_open(&_fs, path, mode, 0);
     if (fd < 0) {
         DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n",
             fd, path, openMode, accessMode, _fs.err_code);
@@ -423,18 +415,14 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
 }
 
 bool SPIFFSImpl::exists(const char* path) {
-    char tmpName[SPIFFS_OBJ_NAME_LEN];
-    strlcpy(tmpName, path, sizeof(tmpName));
     spiffs_stat stat;
-    int rc = SPIFFS_stat(&_fs, tmpName, &stat);
+    int rc = SPIFFS_stat(&_fs, path, &stat);
     return rc == SPIFFS_OK;
 }
 
 DirImplPtr SPIFFSImpl::openDir(const char* path) {
     spiffs_DIR dir;
-    char tmpName[SPIFFS_OBJ_NAME_LEN];
-    strlcpy(tmpName, path, sizeof(tmpName));
-    spiffs_DIR* result = SPIFFS_opendir(&_fs, tmpName, &dir);
+    spiffs_DIR* result = SPIFFS_opendir(&_fs, path, &dir);
     if (!result) {
         DEBUGV("SPIFFSImpl::openDir: path=`%s` err=%d\r\n", path, _fs.err_code);
         return DirImplPtr();
