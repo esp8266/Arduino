@@ -54,6 +54,16 @@ static uint32_t i2s_slc_queue[SLC_BUF_CNT-1];
 static uint8_t i2s_slc_queue_len;
 static uint32_t *i2s_slc_buf_pntr[SLC_BUF_CNT]; //Pointer to the I2S DMA buffer data
 static struct slc_queue_item i2s_slc_items[SLC_BUF_CNT]; //I2S DMA buffer descriptors
+static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
+static int i2s_curr_slc_buf_pos=0; //position in the current buffer
+
+bool ICACHE_FLASH_ATTR i2s_is_full(){
+  return (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) && (i2s_slc_queue_len == 0);
+}
+
+bool ICACHE_FLASH_ATTR i2s_is_empty(){
+  return (i2s_slc_queue_len >= SLC_BUF_CNT-1);
+}
 
 uint32_t ICACHE_FLASH_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
   uint8_t i;
@@ -73,7 +83,7 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
   if (slc_intr_status & SLCIRXEOF) {
     ETS_SLC_INTR_DISABLE();
     struct slc_queue_item *finished_item = (struct slc_queue_item*)SLCRXEDA;
-
+    memset((void *)finished_item->buf_ptr, 0x00, SLC_BUF_LEN * 4);//zero the buffer so it is mute in case of underflow
     if (i2s_slc_queue_len >= SLC_BUF_CNT-1) { //All buffers are empty. This means we have an underflow
       i2s_slc_queue_next_item(); //free space for finished_item
     }
@@ -142,8 +152,6 @@ void ICACHE_FLASH_ATTR i2s_slc_end(){
 //at least the current sample rate. You can also call it quicker: it will suspend the calling
 //thread if the buffer is full and resume when there's room again.
 
-static uint32_t *i2s_curr_slc_buf=NULL;
-static int i2s_curr_slc_buf_pos=0;
 bool ICACHE_FLASH_ATTR i2s_write_sample(uint32_t sample) {
   if (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) {
     if(i2s_slc_queue_len == 0){
@@ -155,6 +163,20 @@ bool ICACHE_FLASH_ATTR i2s_write_sample(uint32_t sample) {
           ets_wdt_enable();
         }
       }
+    }
+    ETS_SLC_INTR_DISABLE();
+    i2s_curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item();
+    ETS_SLC_INTR_ENABLE();
+    i2s_curr_slc_buf_pos=0;
+  }
+  i2s_curr_slc_buf[i2s_curr_slc_buf_pos++]=sample;
+  return true;
+}
+
+bool ICACHE_FLASH_ATTR i2s_write_sample_nb(uint32_t sample) {
+  if (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) {
+    if(i2s_slc_queue_len == 0){
+      return false;
     }
     ETS_SLC_INTR_DISABLE();
     i2s_curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item();
