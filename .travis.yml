@@ -1,32 +1,28 @@
 sudo: false
 
-language: java
-
 os:
   - linux
 
-addons:
-  apt:
-    packages:
-    - ant
-
-jdk:
-  - oraclejdk8
-
 script:
-  - pushd build
-  - echo "" | ant build
-  - popd
+  - wget http://downloads.arduino.cc/arduino-1.6.5-linux64.tar.xz
+  - tar xf arduino-1.6.5-linux64.tar.xz
+  - mv arduino-1.6.5 $HOME/arduino_ide
+  - cd $HOME/arduino_ide/hardware
+  - mkdir esp8266com
+  - ln -s $TRAVIS_BUILD_DIR esp8266
+  - cd esp8266/tools
+  - python get.py
   - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
   - sleep 3
   - export DISPLAY=:1.0
-  - export PATH="$PWD/build/linux/work:$PATH"
+  - export PATH="$HOME/arduino_ide:$PATH"
   - which arduino
-  - source hardware/esp8266com/esp8266/tests/common.sh
+  - cd $TRAVIS_BUILD_DIR
+  - source tests/common.sh
   - arduino --board esp8266com:esp8266:generic --save-prefs
   - arduino --get-pref sketchbook.path
   - install_libraries
-  - build_sketches arduino $PWD/hardware/esp8266com/esp8266
+  - build_sketches arduino $TRAVIS_BUILD_DIR
 
 notifications:
   email:
