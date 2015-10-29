@@ -65,13 +65,18 @@ generic.menu.UploadSpeed.512000.upload.speed=512000
 generic.menu.UploadSpeed.921600=921600
 generic.menu.UploadSpeed.921600.upload.speed=921600
 
-generic.menu.FlashSize.512K=512K (64K SPIFFS)
-generic.menu.FlashSize.512K.build.flash_size=512K
-generic.menu.FlashSize.512K.build.flash_ld=eagle.flash.512k.ld
-generic.menu.FlashSize.512K.build.spiffs_start=0x6B000
-generic.menu.FlashSize.512K.build.spiffs_end=0x7B000
-generic.menu.FlashSize.512K.build.spiffs_blocksize=4096
-generic.menu.FlashSize.512K.upload.maximum_size=434160
+generic.menu.FlashSize.512K64=512K (64K SPIFFS)
+generic.menu.FlashSize.512K64.build.flash_size=512K
+generic.menu.FlashSize.512K64.build.flash_ld=eagle.flash.512k64.ld
+generic.menu.FlashSize.512K64.build.spiffs_start=0x6B000
+generic.menu.FlashSize.512K64.build.spiffs_end=0x7B000
+generic.menu.FlashSize.512K64.build.spiffs_blocksize=4096
+generic.menu.FlashSize.512K64.upload.maximum_size=434160
+
+generic.menu.FlashSize.512K0=512K (no SPIFFS)
+generic.menu.FlashSize.512K0.build.flash_size=512K
+generic.menu.FlashSize.512K0.build.flash_ld=eagle.flash.512k0.ld
+generic.menu.FlashSize.512K0.upload.maximum_size=499696
 
 generic.menu.FlashSize.1M512=1M (512K SPIFFS)
 generic.menu.FlashSize.1M512.build.flash_size=1M
@@ -410,7 +415,7 @@ thing.build.variant=thing
 thing.build.flash_mode=qio
 # flash chip: AT25SF041 (512 kbyte, 4Mbit)
 thing.build.flash_size=512K
-thing.build.flash_ld=eagle.flash.512k.ld
+thing.build.flash_ld=eagle.flash.512k64.ld
 thing.build.flash_freq=40
 thing.build.spiffs_start=0x6B000
 thing.build.spiffs_end=0x7B000
@@ -526,7 +531,7 @@ esp210.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 # wifio.build.flash_mode=qio
 # wifio.build.flash_size=512K
 # wifio.build.flash_freq=40
-# wifio.build.flash_ld=eagle.flash.512k.ld
+# wifio.build.flash_ld=eagle.flash.512k64.ld
 # wifio.build.spiffs_start=0x6B000
 # wifio.build.spiffs_end=0x7B000
 #
