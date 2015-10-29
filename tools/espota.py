@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 #
-# Original espoty.py comes from ...?
+# Original espota.py by Ivan Grokhotkov:
+# https://gist.github.com/igrr/d35ab8446922179dc58c
 #
 # Modified since 2015-09-18 from Pascal Gollor (https://github.com/pgollor)
 #
 # This script will push an OTA update to the ESP
 # use it like: python espota.py -i <ESP_IP_address> -p <ESP_port> -f <sketch.bin>
+# Or to upload SPIFFS image:
+# python espota.py -i <ESP_IP_address> -p <ESP_port> -s <spiffs.bin>
 #
 # Changes
 # 2015-09-18:
@@ -13,7 +16,7 @@
 # - Add logging.
 # - Send command to controller to differ between flashing and transmitting SPIFFS image.
 #
- 
+
 from __future__ import print_function
 import socket
 import sys
@@ -25,7 +28,7 @@ import logging
 FLASH = 0
 SPIFFS = 100
 
- 
+
 def serve(remoteAddr, remotePort, filename, command = FLASH):
   # Create a TCP/IP socket
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,18 +41,18 @@ def serve(remoteAddr, remotePort, filename, command = FLASH):
   except:
     logging.error("Listen Failed")
     return 1
- 
+
   content_size = os.path.getsize(filename)
   logging.info('Upload size: %d', content_size)
   message = '%d %d %d\n' % (command, serverPort, content_size)
- 
+
   # Wait for a connection
   logging.info('Sending invitation to: %s', remoteAddr)
   sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
   remote_address = (remoteAddr, int(remotePort))
   sent = sock2.sendto(message, remote_address)
   sock2.close()
-  
+
   logging.info('Waiting for device...\n')
   try:
     sock.settimeout(10)
