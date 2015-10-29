@@ -1,5 +1,5 @@
 sudo: false
-
+language: bash
 os:
   - linux
 
@@ -9,6 +9,7 @@ script:
   - mv arduino-1.6.5 $HOME/arduino_ide
   - cd $HOME/arduino_ide/hardware
   - mkdir esp8266com
+  - cd esp8266com
   - ln -s $TRAVIS_BUILD_DIR esp8266
   - cd esp8266/tools
   - python get.py
