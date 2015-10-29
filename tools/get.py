@@ -6,6 +6,7 @@
 from __future__ import print_function
 import urllib
 import os
+import errno
 import os.path
 import hashlib
 import json
@@ -23,6 +24,13 @@ def sha256sum(filename, blocksize=65536):
         for block in iter(lambda: f.read(blocksize), b""):
             hash.update(block)
     return hash.hexdigest()
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno != errno.EEXIST or not os.path.isdir(path):
+            raise
 
 def report_progress(count, blockSize, totalSize):
     percent = int(count*blockSize*100/totalSize)
@@ -90,5 +98,6 @@ def identify_platform():
 if __name__ == '__main__':
     print('Platform: {0}'.format(identify_platform()))
     tools_to_download = load_tools_list('tools.json', identify_platform())
+    mkdir_p(dist_dir)
     for tool in tools_to_download:
         get_tool(tool)

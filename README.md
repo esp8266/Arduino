@@ -27,19 +27,29 @@ Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_inde
 Documentation: [Reference](http://arduino.esp8266.com/staging/doc/reference.html)
 
 
-### Building latest version from source [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
+### Using git version [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
+- Install Arduino 1.6.5
+- Go to Arduino directory
+- Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
+```bash
+cd hardware
+mkdir esp8266com
+cd esp8266com
+git clone https://github.com/esp8266/Arduino.git esp8266
 ```
-$ git clone https://github.com/esp8266/Arduino.git
-$ cd Arduino/build
-$ ant dist
+- Download binary tools (you need Python 2.7)
+```bash
+cd esp8266/tools
+python get.py
 ```
+- Restart Arduino
 
 Documentation for latest development version:
 
-- [Reference](hardware/esp8266com/esp8266/doc/reference.md)
-- [Supported boards](hardware/esp8266com/esp8266/doc/boards.md)
-- [Change log](hardware/esp8266com/esp8266/doc/changes.md)
+- [Reference](doc/reference.md)
+- [Supported boards](doc/boards.md)
+- [Change log](doc/changes.md)
 
 ### Issues and support ###
 

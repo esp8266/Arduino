@@ -9,7 +9,7 @@ name=ESP8266 Modules
 version=1.6.4
 
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
-runtime.tools.esptool.path={runtime.platform.path}/tools
+runtime.tools.esptool.path={runtime.platform.path}/tools/esptool
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
@@ -91,7 +91,13 @@ recipe.size.regex.data=^(?:\.data|\.rodata|\.bss)\s+([0-9]+).*
 
 tools.esptool.cmd=esptool
 tools.esptool.cmd.windows=esptool.exe
-tools.esptool.path={runtime.platform.path}/tools
+tools.esptool.path={runtime.platform.path}/tools/esptool
+#runtime.tools.esptool.path
+
+tools.mkspiffs.cmd=mkspiffs
+tools.mkspiffs.cmd.windows=mkspiffs.exe
+tools.mkspiffs.path={runtime.platform.path}/tools/mkspiffs
+#runtime.tools.mkspiffs.path
 
 tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=-vv
