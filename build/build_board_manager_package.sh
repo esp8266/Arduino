@@ -103,7 +103,7 @@ cat << EOF > package_esp8266com_index.json
       {
         "packager":"esp8266",
         "name":"mkspiffs",
-        "version":"0.1.1"
+        "version":"0.1.2"
       } ]
     } ],
 
@@ -191,42 +191,42 @@ cat << EOF > package_esp8266com_index.json
     },
     {
       "name":"mkspiffs",
-      "version":"0.1.1",
+      "version":"0.1.2",
       "systems": [
         {
             "host":"i686-mingw32",
-            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.1/mkspiffs-0.1.1-windows.zip",
-            "archiveFileName":"mkspiffs-0.1.1-windows.zip",
-            "checksum":"SHA-256:421532b415f2227c15ea8b7c633b50a15bdcb40b61d1d223b155b9b5cff886a7",
-            "size":"228989"
+            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-windows.zip",
+            "archiveFileName":"mkspiffs-0.1.2-windows.zip",
+            "checksum":"SHA-256:0a29119b8458b61a877408f7995e4944623a712e0d313a2c2f76af9ab55cc9f2",
+            "size":"230802"
         },
         {
             "host":"x86_64-apple-darwin",
-            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.1/mkspiffs-0.1.1-osx.tar.gz",
-            "archiveFileName":"mkspiffs-0.1.1-osx.tar.gz",
-            "checksum":"SHA-256:673cbc3027ca461f6b928bb910953b4e78cec2d4b638c872410461296c54aeaf",
-            "size":"123544"
+            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-osx.tar.gz",
+            "archiveFileName":"mkspiffs-0.1.2-osx.tar.gz",
+            "checksum":"SHA-256:df656fae21a41c1269ea50cb53752dcaf6a4e1437255f3a9fb50b4025549b58e",
+            "size":"115091"
         },
         {
             "host":"i386-apple-darwin",
-            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.1/mkspiffs-0.1.1-osx.tar.gz",
-            "archiveFileName":"mkspiffs-0.1.1-osx.tar.gz",
-            "checksum":"SHA-256:673cbc3027ca461f6b928bb910953b4e78cec2d4b638c872410461296c54aeaf",
-            "size":"123544"
+            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-osx.tar.gz",
+            "archiveFileName":"mkspiffs-0.1.2-osx.tar.gz",
+            "checksum":"SHA-256:df656fae21a41c1269ea50cb53752dcaf6a4e1437255f3a9fb50b4025549b58e",
+            "size":"115091"
         },
         {
             "host":"x86_64-pc-linux-gnu",
-            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.1/mkspiffs-0.1.1-linux64.tar.gz",
-            "archiveFileName":"mkspiffs-0.1.1-linux64.tar.gz",
-            "checksum":"SHA-256:afea5786cf60c8cfdae5d2665323ce281c05c0516590ba2bf6282e396e3fa76a",
-            "size":"44373"
+            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-linux64.tar.gz",
+            "archiveFileName":"mkspiffs-0.1.2-linux64.tar.gz",
+            "checksum":"SHA-256:1a1dd81b51daf74c382db71b42251757ca4136e8762107e69feaa8617bac315f",
+            "size":"46281"
         },
         {
             "host":"i686-pc-linux-gnu",
-            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.1/mkspiffs-0.1.1-linux32.tar.gz",
-            "archiveFileName":"mkspiffs-0.1.1-linux32.tar.gz",
-            "checksum":"SHA-256:46a646a9e9070912234c9a7d5618d9787047b07b44a4aef5e05f16f9100d37ce",
-            "size":"43304"
+            "url":"https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-linux32.tar.gz",
+            "archiveFileName":"mkspiffs-0.1.2-linux32.tar.gz",
+            "checksum":"SHA-256:e990d545dfcae308aabaac5fa9e1db734cc2b08167969e7eedac88bd0839667c",
+            "size":"45272"
         }
       ]
     } ]
