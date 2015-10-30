@@ -8,7 +8,7 @@
 # This script will push an OTA update to the ESP
 # use it like: python espota.py -i <ESP_IP_address> -p <ESP_port> -f <sketch.bin>
 # Or to upload SPIFFS image:
-# python espota.py -i <ESP_IP_address> -p <ESP_port> -s <spiffs.bin>
+# python espota.py -i <ESP_IP_address> -p <ESP_port> -s -f <spiffs.bin>
 #
 # Changes
 # 2015-09-18:
