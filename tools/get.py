@@ -57,7 +57,8 @@ def unpack(filename, destination):
     rename_to = re.match(r'^([a-z][^\-]*\-*)+', dirname).group(0).encode('ascii').strip('-')
     if rename_to != dirname:
         print('Renaming {0} to {1}'.format(dirname, rename_to))
-        shutil.rmtree(rename_to)
+        if os.path.isdir(rename_to):
+            shutil.rmtree(rename_to)
         shutil.move(dirname, rename_to)
 
 def get_tool(tool):
