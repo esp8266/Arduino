@@ -6,6 +6,7 @@
 from __future__ import print_function
 import urllib
 import os
+import shutil
 import errno
 import os.path
 import hashlib
@@ -56,7 +57,8 @@ def unpack(filename, destination):
     rename_to = re.match(r'^([a-z][^\-]*\-*)+', dirname).group(0).encode('ascii').strip('-')
     if rename_to != dirname:
         print('Renaming {0} to {1}'.format(dirname, rename_to))
-        os.rename(dirname, rename_to)
+        shutil.rmtree(rename_to)
+        shutil.move(dirname, rename_to)
 
 def get_tool(tool):
     archive_name = tool['archiveFileName']
@@ -77,7 +79,7 @@ def get_tool(tool):
     unpack(local_path, '.')
 
 def load_tools_list(filename, platform):
-    tools_info = json.load(open(filename))
+    tools_info = json.load(open(filename))['packages'][0]['tools']
     tools_to_download = []
     for t in tools_info:
         tool_platform = [p for p in t['systems'] if p['host'] == platform]
@@ -97,7 +99,7 @@ def identify_platform():
 
 if __name__ == '__main__':
     print('Platform: {0}'.format(identify_platform()))
-    tools_to_download = load_tools_list('tools.json', identify_platform())
+    tools_to_download = load_tools_list('../package/package_esp8266com_index.template.json', identify_platform())
     mkdir_p(dist_dir)
     for tool in tools_to_download:
         get_tool(tool)

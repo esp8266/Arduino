@@ -17,17 +17,16 @@ echo "Package name: $package_name"
 
 # Create directory for the package
 outdir=versions/$ver/$package_name
-srcdir=$PWD
+srcdir=$PWD/..
 rm -rf versions/$ver
 mkdir -p $outdir
 
 # Some files should be excluded from the package
 cat << EOF > exclude.txt
-versions
 .git
 .gitignore
 .travis.yml
-build_boards_manager_package.sh
+package
 EOF
 # Also include all files which are ignored by git
 git ls-files --other --ignored --exclude-standard --directory >> exclude.txt
@@ -71,76 +70,13 @@ echo Size: $size
 echo SHA-256: $sha
 
 echo "Making package_esp8266com_index.json"
-cat << EOF > package_esp8266com_index.json
-{
-  "packages": [ {
-    "name":"esp8266",
-    "maintainer":"ESP8266 Community",
-    "websiteURL":"https://github.com/esp8266/Arduino",
-    "email":"ivan@esp8266.com",
-    "help":{
-      "online":"$REMOTE_URL/versions/$ver/doc/reference.html"
-    },
-
-    "platforms": [ {
-      "name":"esp8266",
-      "architecture":"esp8266",
-      "version":"$ver",
-      "category":"ESP8266",
-      "url":"$REMOTE_URL/versions/$ver/$package_name.zip",
-      "archiveFileName":"$package_name.zip",
-      "checksum":"SHA-256:$sha",
-      "size":"$size",
-      "help":{
-        "online":"$REMOTE_URL/versions/$ver/doc/reference.html"
-      },
-      "boards":[
-        {
-          "name":"Generic ESP8266 Module"
-        },
-        {
-          "name":"Olimex MOD-WIFI-ESP8266(-DEV)"
-        },
-        {
-          "name":"NodeMCU 0.9 (ESP-12 Module)"
-        },
-        {
-          "name":"NodeMCU 1.0 (ESP-12E Module)"
-        },
-        {
-          "name":"Adafruit HUZZAH ESP8266 (ESP-12)"
-        },
-        {
-          "name":"SparkFun Thing"
-        },
-        {
-          "name":"SweetPea ESP-210"
-        }
-      ],
-      "toolsDependencies":[ {
-        "packager":"esp8266",
-        "name":"esptool",
-        "version":"0.4.6"
-      },
-      {
-        "packager":"esp8266",
-        "name":"xtensa-lx106-elf-gcc",
-        "version":"1.20.0-26-gb404fb9-2"
-      },
-      {
-        "packager":"esp8266",
-        "name":"mkspiffs",
-        "version":"0.1.2"
-      } ]
-    } ],
-    "tools":
-EOF
-
-cat $srcdir/tools/tools.json >> package_esp8266com_index.json
-
-cat << EOF >> package_esp8266com_index.json
-  } ]
-}
-EOF
+cat $srcdir/package/package_esp8266com_index.template.json | \
+jq ".packages[0].platforms[0].version = \"$ver\" | \
+    .packages[0].platforms[0].url = \"$REMOTE_URL/versions/$ver/$package_name.zip\" |\
+    .packages[0].platforms[0].archiveFileName = \"$package_name.zip\" |\
+    .packages[0].platforms[0].checksum = \"SHA-256:$sha\" |\
+    .packages[0].platforms[0].size = \"$size\" |\
+    .packages[0].platforms[0].help.online = \"$REMOTE_URL/versions/$ver/doc/reference.html\"" \
+    > package_esp8266com_index.json
 
 popd

@@ -3,5 +3,5 @@ tools/dist/
 tools/xtensa-lx106-elf/
 tools/esptool/
 tools/mkspiffs/
-versions/
+package/versions/
 exclude.txt
