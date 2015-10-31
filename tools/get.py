@@ -96,7 +96,10 @@ def identify_platform():
     bits = 32
     if sys.maxsize > 2**32:
         bits = 64
-    return arduino_platform_names[platform.system()][bits]
+    sys_name = platform.system()
+    if 'CYGWIN_NT' in sys_name:
+        sys_name = 'Windows'
+    return arduino_platform_names[sys_name][bits]
 
 if __name__ == '__main__':
     print('Platform: {0}'.format(identify_platform()))
