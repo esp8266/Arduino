@@ -22,11 +22,12 @@
 
 
 # some variable definitions
-arduinoESP_src=$PWD"/../"
+tmp_path=$1
+arduinoESP_src="$tmp_path/arduino"
 version="$(git --work-tree=$arduinoESP_src describe --tags --always)"
 release_date=$(date "+%b_%d,_%Y") # format for badge link
 build_date=$(date "+%b %d, %Y")
-destinaton_path="/tmp/doc"
+destination_path="$tmp_path/doc"
 doc_template_url="https://github.com/pgollor/esp8266-arduino-docs.git"
 url="http://pgollor.github.io/Arduino"
 
@@ -35,7 +36,7 @@ echo "Arduino ESP8266 source dir: "$arduinoESP_src
 echo "                   version: "$version
 echo "              release date: "$release_date
 echo "                build date: "$build_date
-echo "    put documentation into: "$destinaton_path
+echo "    put documentation into: "$destination_path
 echo "documentatino template url: "$doc_template_url
 echo "                       url: "$url
 
@@ -50,22 +51,45 @@ fi
 
 
 # delete old doc dir
-rm -fR $destinaton_path
+rm -fR $destination_path
 
 # create destination directories
-mkdir -p $destinaton_path/src
-mkdir -p $destinaton_path/$version
+mkdir -p $destination_path/src
+mkdir -p $destination_path/$version
 
 # copy doc files to destination soruce dir
-cp -R $arduinoESP_src/doc/* $destinaton_path/src
+cp -R $arduinoESP_src/doc/* $destination_path/src
 
 # download doc template
-git clone $doc_template_url $destinaton_path/build
+git clone $doc_template_url $destination_path/build
+
+# create versions.html file
+
+# ... read verions
+pushd $arduinoESP_src
+old_versions=$(git ls-tree -d --name-only remotes/origin/gh-pages versions/ | sed -e 's/versions\///g')
+popd
+
+echo -e "\nREAD old versions:"
+
+found_current_version="false"
+case "${old_versions[@]}" in *"$version"*) found_current_version="true" ;; esac
+
+if [ "$found_current_version" = "false" ]; then
+	old_versions=$version" "$old_versions
+fi
+
+# ... fill versions.html
+for VER in $old_versions
+do
+	echo $VER
+	echo "<li><a href=\"versions/$VER\">$VER</a></li>" >> $destination_path/build/_includes/versions.html
+done
+echo ""
 
 
-#cur_dir=$PWD
-#cd $destinaton_path/build
-pushd $destinaton_path/build
+# into build dir
+pushd $destination_path/build
 
 # link documentation source
 ln -s ../src doc
@@ -82,9 +106,8 @@ echo "baseurl: /Arduino/versions/$version" >> _config_local.yml
 jekyll build --config _config.yml,_config_local.yml
 
 popd
-#cd $cur_dir
 
 
 # grab badge
-wget -q -O $destinaton_path/$version/badge.svg "https://img.shields.io/badge/updated-$release_date-blue.svg"
+wget -q -O $destination_path/$version/badge.svg "https://img.shields.io/badge/updated-$release_date-blue.svg"
 
