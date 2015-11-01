@@ -8,7 +8,7 @@ if [ -z "$REMOTE_URL" ]; then
     echo "REMOTE_URL not defined, using default"
 fi
 echo "Remote: $REMOTE_URL"
-
+pushd ..
 # Figure out how will the package be called
 ver=`git describe --tags --always`
 package_name=esp8266-$ver
@@ -16,9 +16,9 @@ echo "Version: $ver"
 echo "Package name: $package_name"
 
 # Create directory for the package
-outdir=versions/$ver/$package_name
-srcdir=$PWD/..
-rm -rf versions/$ver
+outdir=package/versions/$ver/$package_name
+srcdir=$PWD
+rm -rf package/versions/$ver
 mkdir -p $outdir
 
 # Some files should be excluded from the package
@@ -58,7 +58,7 @@ $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspi
  > $outdir/platform.txt
 
 # Zip the package
-pushd versions/$ver
+pushd package/versions/$ver
 echo "Making $package_name.zip"
 zip -qr $package_name.zip $package_name
 rm -rf $package_name
@@ -79,4 +79,5 @@ jq ".packages[0].platforms[0].version = \"$ver\" | \
     .packages[0].platforms[0].help.online = \"$REMOTE_URL/versions/$ver/doc/reference.html\"" \
     > package_esp8266com_index.json
 
+popd
 popd
