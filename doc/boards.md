@@ -37,7 +37,7 @@ static const uint8_t D10  = 1;
 
 If you want to use NodeMCU pin 5, use D5 for pin number, and it will be translated to 'real' GPIO pin 14.
 
-### NodeMCU 1.0 <a name="nodemcu-1-0"></a>
+### NodeMCU 1.0
 
 This module is sold under many names for around $6.50 on AliExpress and it's one of the cheapest, fully integrated ESP8266 solutions.
 
@@ -126,7 +126,7 @@ PL2303-based adapters are known not to work on Mac OS X. See https://github.com/
  - **Directly connecting a pin to VCC or GND is not a substitute for a PullUp or PullDown resistor, doing this can break upload management and the serial console, instability has also been noted in some cases.**
 
 ### ESP to Serial
-![ESP to Serial](https://raw.githubusercontent.com/esp8266/Arduino/esp8266/docs/ESP_to_serial.png)
+![ESP to Serial](ESP_to_serial.png)
 
 #### Minimal Hardware Setup for Bootloading only ##
 ESPxx Hardware
@@ -158,7 +158,7 @@ ESPxx Hardware
 | CH_PD         | PullUp   |                 |
 
 ### Minimal
-![ESP min](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_min.png)
+![ESP min](ESP_min.png)
 
 ### Improved Stability
-![ESP improved stability](https://raw.githubusercontent.com/Links2004/Arduino/esp8266/docs/ESP_improved_stability.png)
+![ESP improved stability](ESP_improved_stability.png)
