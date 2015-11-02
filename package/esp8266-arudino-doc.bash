@@ -28,8 +28,8 @@ version="$(git --work-tree=$arduinoESP_src describe --tags --always)"
 release_date=$(date "+%b_%d,_%Y") # format for badge link
 build_date=$(date "+%b %d, %Y")
 destination_path="$tmp_path/doc"
-doc_template_url="https://github.com/pgollor/esp8266-arduino-docs.git"
-url="http://pgollor.github.io/Arduino"
+doc_template_url="https://github.com/igrr/esp8266-arduino-docs.git"
+url="http://esp8266.github.io/Arduino"
 
 # control output
 echo "Arduino ESP8266 source dir: "$arduinoESP_src
