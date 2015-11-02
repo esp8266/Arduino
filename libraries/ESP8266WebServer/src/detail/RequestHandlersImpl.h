@@ -77,10 +77,11 @@ public:
         else if (path.endsWith(".gif")) return "image/gif";
         else if (path.endsWith(".jpg")) return "image/jpeg";
         else if (path.endsWith(".ico")) return "image/x-icon";
+        else if (path.endsWith(".svg")) return "image/svg+xml";
         else if (path.endsWith(".xml")) return "text/xml";
         else if (path.endsWith(".pdf")) return "application/pdf";
         else if (path.endsWith(".zip")) return "application/zip";
-        return "text/plain";
+        return "application/octet-stream";
     }
 
 protected:
