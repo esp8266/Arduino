@@ -51,6 +51,11 @@ void ArduinoOTA::setup() {
 }
 
 void ArduinoOTA::handle() {
+    
+  if (!*_udp_ota) {
+    _udp_ota->begin(_port); 
+    Serial.println(F("OTA restarted")); 
+  }
 
   if (!_udp_ota->parsePacket()) return;
 
