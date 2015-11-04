@@ -145,11 +145,9 @@ inline uint32_t ETS_INTR_PENDING(void)
     ETS_INTR_DISABLE(ETS_SLC_INUM)
 
 
-void *pvPortMalloc(size_t xWantedSize) __attribute__((malloc, alloc_size(1)));
-void *pvPortRealloc(void* ptr, size_t xWantedSize) __attribute__((alloc_size(2)));
-void pvPortFree(void *ptr);
-void *vPortMalloc(size_t xWantedSize) __attribute__((malloc, alloc_size(1)));
-void vPortFree(void *ptr);
+void *pvPortMalloc(size_t xWantedSize, const char* file, int line) __attribute__((malloc, alloc_size(1)));
+void *pvPortRealloc(void* ptr, size_t xWantedSize, const char* file, int line) __attribute__((alloc_size(2)));
+void vPortFree(void *ptr, const char* file, int line);
 void *ets_memcpy(void *dest, const void *src, size_t n);
 void *ets_memset(void *s, int c, size_t n);
 void ets_timer_arm_new(ETSTimer *a, int b, int c, int isMstimer);
@@ -174,5 +172,8 @@ void ets_intr_lock();
 void ets_intr_unlock();
 int ets_vsnprintf(char * s, size_t n, const char * format, va_list arg)  __attribute__ ((format (printf, 3, 0)));
 int ets_vprintf(const char * format, va_list arg) __attribute__ ((format (printf, 1, 0)));
+bool ets_task(ETSTask task, uint8 prio, ETSEvent *queue, uint8 qlen);
+bool ets_post(uint8 prio, ETSSignal sig, ETSParam par);
+
 
 #endif /* _ETS_SYS_H */
