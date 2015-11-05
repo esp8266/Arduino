@@ -8,9 +8,15 @@ uint8_t EthernetClass::_state[MAX_SOCK_NUM] = {
 uint16_t EthernetClass::_server_port[MAX_SOCK_NUM] = { 
   0, 0, 0, 0 };
 
+#ifdef ESP8266
+static DhcpClass s_dhcp;
+#endif
+
 int EthernetClass::begin(uint8_t *mac_address)
 {
+#ifndef ESP8266
   static DhcpClass s_dhcp;
+#endif
   _dhcp = &s_dhcp;
 
 

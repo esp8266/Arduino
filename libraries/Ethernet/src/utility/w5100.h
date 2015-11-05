@@ -16,6 +16,8 @@
 
 #if defined(ARDUINO_ARCH_AVR)
 #define SPI_ETHERNET_SETTINGS SPISettings(4000000, MSBFIRST, SPI_MODE0)
+#elif defined(ESP8266)
+#define SPI_ETHERNET_SETTINGS SPISettings(14000000, MSBFIRST, SPI_MODE0)
 #else
 #define SPI_ETHERNET_SETTINGS SPI_CS,SPISettings(4000000, MSBFIRST, SPI_MODE0)
 #endif
@@ -348,6 +350,10 @@ private:
   inline static void setSS()     { PORTB &= ~_BV(2); };
   inline static void resetSS()   { PORTB |=  _BV(2); };
 #endif
+#elif defined(ESP8266)
+  inline static void initSS()    { pinMode(SS, OUTPUT); };
+  inline static void setSS()     { GPOC = digitalPinToBitMask(SS); };
+  inline static void resetSS()   { GPOS = digitalPinToBitMask(SS); };
 #endif // ARDUINO_ARCH_AVR
 };
 
