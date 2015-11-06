@@ -52,8 +52,8 @@ or it return header 304 to notify the ESP that no Update is needed.
 ```cpp
 t_httpUpdate_return ret = ESPhttpUpdate.update("192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
 switch(ret) {
-	case HTTP_UPDATE_FAILD:
-		Serial.println("[update] Update fail.");
+	case HTTP_UPDATE_FAILED:
+		Serial.println("[update] Update failed.");
 		break;
 	case HTTP_UPDATE_NO_UPDATES:
 		Serial.println("[update] Update no Update.");

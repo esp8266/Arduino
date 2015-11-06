@@ -472,7 +472,7 @@ int8_t ESP8266WiFiClass::scanComplete() {
         return ESP8266WiFiClass::_scanCount;
     }
 
-    return WIFI_SCAN_FAILD;
+    return WIFI_SCAN_FAILED;
 }
 
 void ESP8266WiFiClass::scanDelete()
@@ -527,7 +527,7 @@ int8_t ESP8266WiFiClass::scanNetworks(bool async)
         esp_yield();
         return ESP8266WiFiClass::_scanCount;
     } else {
-        return WIFI_SCAN_FAILD;
+        return WIFI_SCAN_FAILED;
     }
 
 }
@@ -702,12 +702,12 @@ void wifi_wps_status_cb(wps_cb_status status)
     switch (status) {
         case WPS_CB_ST_SUCCESS:
             if(!wifi_wps_disable()) {
-                  DEBUGV("wps disable faild\n");
+                  DEBUGV("wps disable failed\n");
             }
             wifi_station_connect();
             break;
         case WPS_CB_ST_FAILED:
-            DEBUGV("wps FAILD\n");
+            DEBUGV("wps FAILED\n");
             break;
         case WPS_CB_ST_TIMEOUT:
             DEBUGV("wps TIMEOUT\n");
@@ -738,23 +738,23 @@ bool ESP8266WiFiClass::beginWPSConfig(void) {
     DEBUGV("wps begin\n");
 
     if(!wifi_wps_disable()) {
-        DEBUGV("wps disable faild\n");
+        DEBUGV("wps disable failed\n");
         return false;
     }
 
     // so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
     if(!wifi_wps_enable(WPS_TYPE_PBC)) {
-        DEBUGV("wps enable faild\n");
+        DEBUGV("wps enable failed\n");
         return false;
     }
 
     if(!wifi_set_wps_cb((wps_st_cb_t) &wifi_wps_status_cb)) {
-        DEBUGV("wps cb faild\n");
+        DEBUGV("wps cb failed\n");
         return false;
     }
 
     if(!wifi_wps_start()) {
-        DEBUGV("wps start faild\n");
+        DEBUGV("wps start failed\n");
         return false;
     }
 

@@ -38,7 +38,7 @@
 #endif
 
 typedef enum {
-    HTTP_UPDATE_FAILD,
+    HTTP_UPDATE_FAILED,
     HTTP_UPDATE_NO_UPDATES,
     HTTP_UPDATE_OK
 } t_httpUpdate_return;

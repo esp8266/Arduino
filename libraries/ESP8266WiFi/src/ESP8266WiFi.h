@@ -33,7 +33,7 @@ extern "C" {
 #include "WiFiServer.h"
 
 #define WIFI_SCAN_RUNNING   (-1)
-#define WIFI_SCAN_FAILD     (-2)
+#define WIFI_SCAN_FAILED     (-2)
 
 enum WiFiMode { WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3 };
 
