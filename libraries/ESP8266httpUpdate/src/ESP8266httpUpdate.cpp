@@ -35,12 +35,12 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void) {
 
 t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, const char * url, const char * current_version) {
 
-    t_httpUpdate_return ret = HTTP_UPDATE_FAILD;
+    t_httpUpdate_return ret = HTTP_UPDATE_FAILED;
     WiFiClient tcp;
     DEBUG_HTTP_UPDATE("[httpUpdate] connected to %s:%u %s .... ", host, port, url);
 
     if(!tcp.connect(host, port)) {
-        DEBUG_HTTP_UPDATE("faild.\n");
+        DEBUG_HTTP_UPDATE("failed.\n");
         return ret;
     }
     DEBUG_HTTP_UPDATE("ok.\n");
@@ -125,7 +125,7 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, 
         case 200:  ///< OK (Start Update)
             if(len > 0) {
                 if(len > ESP.getFreeSketchSpace()) {
-                    ret = HTTP_UPDATE_FAILD;
+                    ret = HTTP_UPDATE_FAILED;
                     DEBUG_HTTP_UPDATE("[httpUpdate] FreeSketchSpace to low (%d) needed: %d\n", ESP.getFreeSketchSpace(), len);
                 } else {
 
@@ -140,13 +140,13 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, 
                         tcp.stop();
                         ESP.restart();
                     } else {
-                        ret = HTTP_UPDATE_FAILD;
+                        ret = HTTP_UPDATE_FAILED;
                         DEBUG_HTTP_UPDATE("[httpUpdate] Update failed\n");
                     }
                 }
             } else {
-                ret = HTTP_UPDATE_FAILD;
-                DEBUG_HTTP_UPDATE("[httpUpdate]Content-Length is 0?!\n");
+                ret = HTTP_UPDATE_FAILED;
+                DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length is 0?!\n");
             }
             break;
         case 304:
@@ -157,7 +157,7 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, 
             ///< Forbidden
             // todo handle login
         default:
-            ret = HTTP_UPDATE_FAILD;
+            ret = HTTP_UPDATE_FAILED;
             DEBUG_HTTP_UPDATE("[httpUpdate] Code is (%d)\n", code);
             break;
     }

@@ -133,13 +133,13 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                         DEBUG_WIFI_MULTI("[WIFI] Channel: %d\n", WiFi.channel());
                         break;
                     case WL_NO_SSID_AVAIL:
-                        DEBUG_WIFI_MULTI("[WIFI] Connecting Faild AP not found.\n");
+                        DEBUG_WIFI_MULTI("[WIFI] Connecting Failed AP not found.\n");
                         break;
                     case WL_CONNECT_FAILED:
-                        DEBUG_WIFI_MULTI("[WIFI] Connecting Faild.\n");
+                        DEBUG_WIFI_MULTI("[WIFI] Connecting Failed.\n");
                         break;
                     default:
-                        DEBUG_WIFI_MULTI("[WIFI] Connecting Faild (%d).\n", status);
+                        DEBUG_WIFI_MULTI("[WIFI] Connecting Failed (%d).\n", status);
                         break;
                 }
             } else {
