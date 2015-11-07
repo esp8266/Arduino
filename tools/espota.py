@@ -29,7 +29,7 @@ FLASH = 0
 SPIFFS = 100
 
 
-def serve(remoteAddr, remotePort, filename, command = FLASH):
+def serve(remoteAddr, remotePort, password, filename, command = FLASH):
   # Create a TCP/IP socket
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   serverPort = 48266
@@ -44,7 +44,7 @@ def serve(remoteAddr, remotePort, filename, command = FLASH):
 
   content_size = os.path.getsize(filename)
   logging.info('Upload size: %d', content_size)
-  message = '%d %d %d\n' % (command, serverPort, content_size)
+  message = '%s %d %d %d\n' % (password, command, serverPort, content_size)
 
   # Wait for a connection
   logging.info('Sending invitation to: %s', remoteAddr)
@@ -131,6 +131,16 @@ def parser():
 	)
 	parser.add_option_group(group)
 
+	# auth
+	group = optparse.OptionGroup(parser, "Authentication")
+	group.add_option("-a", "--auth",
+		dest = "auth",
+		help = "Set authentication password.",
+		action = "store",
+		default = ""
+	)
+	parser.add_option_group(group)
+
 	# image
 	group = optparse.OptionGroup(parser, "Image")
 	group.add_option("-f", "--file",
@@ -190,7 +200,7 @@ def main(args):
 		command = SPIFFS
 	# end if
 
-	return serve(options.esp_ip, options.esp_port, options.image, command)
+	return serve(options.esp_ip, options.esp_port, options.auth, options.image, command)
 # end main
 
 

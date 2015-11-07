@@ -77,12 +77,14 @@ public:
   void addService(String service, String proto, uint16_t port){
     addService(service.c_str(), proto.c_str(), port);
   }
+  
+  void enableArduino(uint16_t port, bool auth=false);
 
 private:
   struct MDNSService * _services;
   UdpContext* _conn;
   char _hostName[128];
-  char _boardName[64];
+  bool _arduinoAuth;
 
   uint32_t _getOurIp();
   uint16_t _getServicePort(char *service, char *proto);
