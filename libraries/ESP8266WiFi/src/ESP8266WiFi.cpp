@@ -831,7 +831,6 @@ void ESP8266WiFiClass::_eventCallback(void* arg)
 
     if (event->event == EVENT_STAMODE_DISCONNECTED) {
         WiFiClient::stopAll();
-        WiFiUDP::stopAll();
     }
 }
 
