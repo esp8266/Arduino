@@ -13,8 +13,8 @@ title: OTA Update
 OTA (Over the Air) update is the process of loading the firmware to ESP module using WiFi connection rather that a serial port. Such functionality became extremely useful in case of limited or no physical access to the module. There is no imposed protection on OTA update process. Such protection should be implemented by developer to ensure that updates are allowed only from legitimate / trusted source.
 
 OTA may be done from:
- - Arduino IDE
- - HTTP server
+ - [Arduino IDE](#arduino-ide)
+ - [HTTP server](#http-server)
 
 In any case first firmware upload have to be done over a serial port. If OTA routines are correctly implemented in sketch, then all subsequent uploads may be done over the air.
 
