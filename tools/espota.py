@@ -34,6 +34,7 @@ import hashlib
 # Commands
 FLASH = 0
 SPIFFS = 100
+AUTH = 200
 
 
 def serve(remoteAddr, remotePort, password, filename, command = FLASH):
@@ -78,7 +79,7 @@ def serve(remoteAddr, remotePort, password, filename, command = FLASH):
       result = hashlib.md5(result_text).hexdigest()
       sys.stderr.write('Authenticating...')
       sys.stderr.flush()
-      message = '%s %s\n' % (cnonce, result)
+      message = '%d %s %s\n' % (AUTH, cnonce, result)
       sock2.sendto(message, remote_address)
       sock2.settimeout(10)
       try:

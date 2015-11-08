@@ -6,6 +6,8 @@
 
 //#define OTA_DEBUG 1
 
+#define U_AUTH 200
+
 ArduinoOTAClass::ArduinoOTAClass()
 {
     _udp_ota = new WiFiUDP();
@@ -169,12 +171,17 @@ void ArduinoOTAClass::handle() {
   if (!_udp_ota->parsePacket()) return;
 
   if(_state == OTA_IDLE){
+    int cmd = _udp_ota->parseInt();
+    if(cmd != U_FLASH && cmd != U_SPIFFS)
+      return;
     _ota_ip = _udp_ota->remoteIP();
-    _cmd  = _udp_ota->parseInt();
+    _cmd  = cmd;
     _ota_port = _udp_ota->parseInt();
     _size = _udp_ota->parseInt();
     _udp_ota->read();
     sprintf(_md5, "%s", _udp_ota->readStringUntil('\n').c_str());
+    if(strlen(_md5) != 32)
+      return;
 
 #if OTA_DEBUG
     Serial.print("Update Start: ip:");
@@ -199,8 +206,18 @@ void ArduinoOTAClass::handle() {
       _state = OTA_RUNUPDATE;
     }
   } else if(_state == OTA_WAITAUTH){
+    int cmd = _udp_ota->parseInt();
+    if(cmd != U_AUTH){
+      _state = OTA_IDLE;
+      return;
+    }
+    _udp_ota->read();
     String cnonce = _udp_ota->readStringUntil(' ');
     String response = _udp_ota->readStringUntil('\n');
+    if(cnonce.length() != 32 || response.length() != 32){
+      _state = OTA_IDLE;
+      return;
+    }
     
     MD5Builder _passmd5;
     _passmd5.begin();
