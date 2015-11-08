@@ -301,6 +301,8 @@ nodemcuv2.menu.CpuFrequency.160.build.f_cpu=160000000L
 nodemcuv2.menu.UploadTool.esptool=Serial
 nodemcuv2.menu.UploadTool.esptool.upload.tool=esptool
 nodemcuv2.menu.UploadTool.esptool.upload.verbose=-vv
+nodemcuv2.menu.UploadTool.espota=OTA
+nodemcuv2.menu.UploadTool.espota.upload.tool=espota
 
 nodemcuv2.menu.UploadSpeed.115200=115200
 nodemcuv2.menu.UploadSpeed.115200.upload.speed=115200
