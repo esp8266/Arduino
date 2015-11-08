@@ -142,6 +142,7 @@ if(isset($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']])) {
 	} else {
 		header($_SERVER["SERVER_PROTOCOL"].' 304 Not Modified', true, 304);
 	}
+	exit();
 }
 
 header($_SERVER["SERVER_PROTOCOL"].' 500 no version for ESP MAC', true, 500);
