@@ -8,16 +8,82 @@ title: OTA Update
  * [HTTP Server](#http-server)
  * [Stream Interface](#stream-interface)
 
+## Introduction
+
+OTA (Over the Air) update is the process of loading the firmware to ESP module using WiFi connection rather that a serial port. Such functionality became extremely useful in case of limited or no physical access to the module. There is no imposed protection on OTA update process. Such protection should be implemented by developer to ensure that updates are allowed only from legitimate / trusted source.
+
+OTA may be done from:
+ - Arduino IDE
+ - HTTP server
+
+In any case first firmware upload have to be done over a serial port. If OTA routines are correctly implemented in sketch, then all subsequent uploads may be done over the air.
+
+The following chapters provide more details and both methods of doing OTA.
+
+
 ## Basic Requirements
 
 - Flash chip size is 2x the size of the sketch.
 
 ## Arduino IDE
 
-TODO describe Arduino IDE OTA process
+Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios:
+- during firmware development as a quicker alternative to loading over a serial
+- for updating small quantity of modules
+- only if modules are available on the same network as the computer with Arduino IDE
 
 #### Requirements
  - The ESP and the computer must be connected to the same network.
+
+#### Let Us Do It
+
+OTA process will be demonstrated using:
+- DNS_SD_Arduino_OTA.ino  sketch available from Arduino IDE
+- NodeMCU 1.0 board with ESP-12E module
+
+1. Before you begin, please make sure that you have the following installed:
+ - Arduino IDE and ESP8266 board support as described under https://github.com/esp8266/Arduino#installing-with-boards-manager
+ - Python 2.7.10 (do not install Python 3.5.0 that is not supported):
+    1. Upload Python from https://www.python.org/
+    2. Start installer
+    3. Select “Add python.exe to Path” (see below – that option is not selected by default)
+    4. Complete remaining steps of installation
+
+
+2. Now prepare the sketch and configuration for the upload over a serial port.
+
+ - Start Arduino IDE and load sketch DNS_SD_Arduino_OTA.ino  available under File >  Examples > ESP8266mDNS
+
+ [PICTURE]
+
+ - Update ssid and pass in the sketch  so the module can join your WiFi network
+
+ [PICTURE]
+
+ - Configure upload parameters as below (you may need to adjust configuration if you are using a different module):
+
+ [PICTURE]
+
+3. Upload the sketch (Ctrl+U). Once done open Serial Monitor (Ctrl+Shift+M) and check if the module has joined your WiFi network. 
+
+ [PICTURE]
+
+4. Only if module is connected, after a dozen (or two dozens) of seconds the esp8266-ota port will show up in Arduino IDE:
+
+ [PICTURE]
+
+5. Now get ready for your first OTA upload by changing configuration settings as follows:
+
+ [PICTURE]
+
+6. If you have successfully completed all the above steps, you can upload (Ctrl+U) the same (or any other) sketch over OTA:
+
+ [PICTURE]
+
+**Note**
+
+To be able to upload your sketch over and over again using OTA, you need to embed inside OTA routines. Please use DNS_SD_Arduino_OTA.ino as an example.
+
 
 ## HTTP Server
 
