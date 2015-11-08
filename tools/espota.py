@@ -53,7 +53,7 @@ def serve(remoteAddr, remotePort, password, filename, command = FLASH):
   sent = sock2.sendto(message, remote_address)
   sock2.close()
 
-  logging.info('Waiting for device...\n')
+  logging.info('Waiting for device...')
   try:
     sock.settimeout(10)
     connection, client_address = sock.accept()
@@ -78,13 +78,15 @@ def serve(remoteAddr, remotePort, password, filename, command = FLASH):
         connection.sendall(chunk)
         res = connection.recv(4)
       except:
-        logging.error('\nError Uploading')
+        sys.stderr.write('\n')
+        logging.error('Error Uploading')
         connection.close()
         f.close()
         sock.close()
         return 1
 
-    logging.info('\nWaiting for result...\n')
+    sys.stderr.write('\n')
+    logging.info('Waiting for result...')
     try:
       connection.settimeout(60)
       data = connection.recv(32)

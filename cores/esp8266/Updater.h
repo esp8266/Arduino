@@ -103,7 +103,7 @@ class UpdaterClass {
         }
         if(remaining() == 0)
           return written;
-        yield();
+        delay(1);
         available = data.available();
       }
       return written;
