@@ -7,47 +7,45 @@ title: OTA Update
  * [Arduino IDE](#arduino-ide)
  * [HTTP Server](#http-server)
  * [Stream Interface](#stream-interface)
- 
+
 ## Basic Requirements
 
-- Flash chip size is 2x the size of the sketch
- 
+- Flash chip size is 2x the size of the sketch.
+
 ## Arduino IDE
 
 TODO describe Arduino IDE OTA process
 
 #### Requirements
- - The ESP and the Computer must be connected to the Same network.
-
+ - The ESP and the computer must be connected to the same network.
 
 ## HTTP Server
 
-the ```ESPhttpUpdate``` class can check for updates and download a binary file form a HTTP web server.
-It is possible to download updates from every IP or domain address on the Network or Internet.
-
+```ESPhttpUpdate``` class can check for updates and download a binary file from HTTP web server.
+It is possible to download updates from every IP or domain address on the network or Internet.
 
 #### Requirements
  - web server
 
-
 #### Arduino code
 
-##### simple updater
+##### Simple updater
 
-the Simple Updater downloads the File every time the function is called.
+Simple updater downloads the file every time the function is called.
 
 ```cpp
 ESPhttpUpdate.update("192.168.0.2", 80, "/arduino.bin");
 ```
 
-##### advanced updater
+##### Advanced updater
 
-Its possible to point to a script at the server.
-If a version String is delivered to the Function this String will be send to the server.
-A Server side Update check is now possible.
+Its possible to point update function to a script at the server.
+If version string argument is given, it will be sent to the server.
+Server side script can use this to check if update should be performed.
 
-the Server can return a binary file for update (Header 200)
-or it return header 304 to notify the ESP that no Update is needed.
+Server side script can respond as follows:
+- response code 200, and send the firmware image,
+- or response code 304 to notify ESP that no update is required.
 
 ```cpp
 t_httpUpdate_return ret = ESPhttpUpdate.update("192.168.0.2", 80, "/esp/update/arduino.php", "optional current version string here");
@@ -59,23 +57,23 @@ switch(ret) {
 		Serial.println("[update] Update no Update.");
 		break;
 	case HTTP_UPDATE_OK:
-		Serial.println("[update] Update ok."); // may not called we reboot the ESP 
+		Serial.println("[update] Update ok."); // may not called we reboot the ESP
 		break;
 }
 ```
 
 #### Server request handling
 
-##### simple updater
+##### Simple updater
 
-for the simple Updater the Server only needs to deliver the binary file for update.
+For the simple updater the server only needs to deliver the binary file for update.
 
-##### advanced updater
+##### Advanced updater
 
-for advanced update management a Script needs to run at the Server side, for example a PHP script.
-at every Update request the the ESP sends some informations in the Header to the Server
+For advanced update management a script needs to run at the server side, for example a PHP script.
+At every update request the the ESP sends some information in HTTP headers to the server.
 
-example Header data:
+Example header data:
 ```
 	[HTTP_USER_AGENT] => ESP8266-http-Update
     [HTTP_X_ESP8266_STA_MAC] => 18:FE:AA:AA:AA:AA
@@ -87,10 +85,9 @@ example Header data:
     [HTTP_X_ESP8266_VERSION] => DOOR-7-g14f53a19
 ```
 
-with this information the script now can check if a update is needed.
-It is also possible to deliver different binary´s based on the MAC address for example.
+With this information the script now can check if a update is needed. It is also possible to deliver different binaries based on the MAC address for example.
 
-script example:
+Script example:
 ```php
 <?PHP
 
@@ -118,10 +115,10 @@ if(!check_header('HTTP_USER_AGENT', 'ESP8266-http-Update')) {
 	header($_SERVER["SERVER_PROTOCOL"].' 403 Forbidden', true, 403);
 	echo "only for ESP8266 updater!\n";
 	exit();
-} 
+}
 
 if(
-	!check_header('HTTP_X_ESP8266_STA_MAC') || 
+	!check_header('HTTP_X_ESP8266_STA_MAC') ||
 	!check_header('HTTP_X_ESP8266_AP_MAC') ||
 	!check_header('HTTP_X_ESP8266_FREE_SPACE') ||
 	!check_header('HTTP_X_ESP8266_SKETCH_SIZE') ||
@@ -152,11 +149,6 @@ header($_SERVER["SERVER_PROTOCOL"].' 500 no version for ESP MAC', true, 500);
 ```
 
 
-## Stream Interface
+## Updater class
 
-TODO describe Stream Interface update proccess
-
-```cpp
-	ESP.updateSketch(client, length);
-```
- 
+TODO describe Updater class
