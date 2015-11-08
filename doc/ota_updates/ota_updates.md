@@ -81,9 +81,7 @@ OTA process will be demonstrated using:
 
  ![OTA upload complete](ota-ide-ota-upload-complete.png)
 
-**Note**
-
-To be able to upload your sketch over and over again using OTA, you need to embed inside OTA routines. Please use DNS_SD_Arduino_OTA.ino as an example.
+**Note** To be able to upload your sketch over and over again using OTA, you need to embed OTA routines inside. Please use DNS_SD_Arduino_OTA.ino as an example.
 
 
 ## HTTP Server
