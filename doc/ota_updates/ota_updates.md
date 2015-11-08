@@ -35,7 +35,7 @@ Uploading modules wirelessly from Arduino IDE is intended for the following typi
 #### Requirements
  - The ESP and the computer must be connected to the same network.
 
-#### Let Us Do It
+#### Let's Do It
 
 OTA process will be demonstrated using:
 - DNS_SD_Arduino_OTA.ino  sketch available from Arduino IDE
