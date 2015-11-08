@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "flash_utils.h"
+#include "MD5Builder.h"
 
 #define UPDATE_ERROR_OK     0
 #define UPDATE_ERROR_WRITE  1
@@ -10,11 +11,12 @@
 #define UPDATE_ERROR_SPACE  3
 #define UPDATE_ERROR_SIZE   4
 #define UPDATE_ERROR_STREAM 5
+#define UPDATE_ERROR_MD5    6
 
 #define U_FLASH   0
 #define U_SPIFFS  100
 
-//#define DEBUG_UPDATER Serial1
+//#define DEBUG_UPDATER Serial
 
 class UpdaterClass {
   public:
@@ -56,7 +58,22 @@ class UpdaterClass {
       Prints the last error to an output stream
     */
     void printError(Stream &out);
+  
+    /*
+      sets the expected MD5 for the firmware (hexString)
+    */
+    void setMD5(const char * expected_md5);
     
+    /*
+      returns the MD5 String of the sucessfully ended firmware
+    */
+    String md5String(void){ return _md5.toString(); }
+  
+    /*
+      populated the result with the md5 bytes of the sucessfully ended firmware
+    */
+    void md5(uint8_t * result){ return _md5.getBytes(result); }
+  
     //Helpers
     uint8_t getError(){ return _error; }
     void clearError(){ _error = UPDATE_ERROR_OK; }
@@ -120,6 +137,9 @@ class UpdaterClass {
     uint32_t _startAddress;
     uint32_t _currentAddress;
     uint32_t _command;
+    
+    char *_target_md5;
+    MD5Builder _md5;
 };
 
 extern UpdaterClass Update;

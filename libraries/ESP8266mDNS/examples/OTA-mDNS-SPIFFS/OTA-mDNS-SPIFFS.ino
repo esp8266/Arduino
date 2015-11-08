@@ -38,10 +38,6 @@ const char* ap_default_psk = "esp8266esp8266"; ///< Default PSK.
 /// Uncomment the next line for verbose output over UART.
 //#define SERIAL_VERBOSE
 
-/// OTA server handle.
-ArduinoOTA ota_server;
-
-
 /**
  * @brief Read WiFi connection information from file system.
  * @param ssid String pointer for storing SSID.
@@ -244,7 +240,8 @@ void setup()
   }
 
   // Start OTA server.
-  ota_server.setup();
+  ArduinoOTA.setHostname((const char *)hostname.c_str());
+  ArduinoOTA.begin();
 }
 
 
@@ -254,7 +251,7 @@ void setup()
 void loop()
 {
   // Handle OTA server.
-  ota_server.handle();
+  ArduinoOTA.handle();
   yield();
 }
 

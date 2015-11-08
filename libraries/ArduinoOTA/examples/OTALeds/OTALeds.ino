@@ -5,9 +5,7 @@
 
 const char* ssid = "...";
 const char* password = "...";
-const char* host_prefix = "OTA-LEDS-";
-
-ArduinoOTA ota_server(host_prefix, 8266, /* debug_serial= */ true);
+const char* host = "OTA-LEDS";
 
 int led_pin = 13;
 #define N_DIMMERS 3
@@ -23,8 +21,7 @@ void setup() {
    Serial.println("Booting");
    WiFi.mode(WIFI_STA);
 
-   /* try the flash stored password first */
-   WiFi.begin();
+   WiFi.begin(ssid, password);
 
    while (WiFi.waitForConnectResult() != WL_CONNECTED){
      WiFi.begin(ssid, password);
@@ -32,10 +29,6 @@ void setup() {
   }
   /* switch off led */
   digitalWrite(led_pin, HIGH);
-
-  /* setup the OTA server */
-  ota_server.setup();
-  Serial.println("Ready");
 
   /* configure dimmers, and OTA server events */
   analogWriteRange(1000);
@@ -47,13 +40,14 @@ void setup() {
     analogWrite(dimmer_pin[i],50);
   }
 
-  ota_server.onStart([]() { // switch off all the PWMs during upgrade
+  ArduinoOTA.setHostname(host);
+  ArduinoOTA.onStart([]() { // switch off all the PWMs during upgrade
                         for(int i=0; i<N_DIMMERS;i++)
                           analogWrite(dimmer_pin[i], 0);
                           analogWrite(led_pin,0);
                     });
 
-  ota_server.onEnd([]() { // do a fancy thing with our board led at end
+  ArduinoOTA.onEnd([]() { // do a fancy thing with our board led at end
                           for (int i=0;i<30;i++)
                           {
                             analogWrite(led_pin,(i*100) % 1001);
@@ -61,11 +55,14 @@ void setup() {
                           }
                         });
 
-   ota_server.onError([]() { ESP.restart(); });
+   ArduinoOTA.onError([](ota_error_t error) { ESP.restart(); });
+
+   /* setup the OTA server */
+   ArduinoOTA.begin();
+   Serial.println("Ready");
 
 }
 
 void loop() {
-  ota_server.handle();
-  yield();
+  ArduinoOTA.handle();
 }
