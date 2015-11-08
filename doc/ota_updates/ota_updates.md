@@ -48,37 +48,38 @@ OTA process will be demonstrated using:
     2. Start installer
     3. Select “Add python.exe to Path” (see below – that option is not selected by default)
     4. Complete remaining steps of installation
-
+ 
+    ![Python installation set up](ota-ide-python-configuration.png)
 
 2. Now prepare the sketch and configuration for the upload over a serial port.
 
  - Start Arduino IDE and load sketch DNS_SD_Arduino_OTA.ino  available under File >  Examples > ESP8266mDNS
 
- [PICTURE]
+ ![OTA sketch selection](ota-ide-sketch-selection.png)
 
  - Update ssid and pass in the sketch  so the module can join your WiFi network
 
- [PICTURE]
+ ![ssid and pass entry](ota-ide-ssid-pass-entry.png)
 
  - Configure upload parameters as below (you may need to adjust configuration if you are using a different module):
 
- [PICTURE]
+ ![configuration of serial upload](ota-ide-serial-upload-configuration.png)
 
 3. Upload the sketch (Ctrl+U). Once done open Serial Monitor (Ctrl+Shift+M) and check if the module has joined your WiFi network. 
 
- [PICTURE]
+ ![check if module joined network](ota-ide-module-joined-wifi.png)
 
 4. Only if module is connected, after a dozen (or two dozens) of seconds the esp8266-ota port will show up in Arduino IDE:
 
- [PICTURE]
+ ![selection og OTA port](ota-ide-ota-port-selection.png)
 
 5. Now get ready for your first OTA upload by changing configuration settings as follows:
 
- [PICTURE]
+ ![configuration of OTA upload](ota-ide-ota-upload-configuration.png)
 
 6. If you have successfully completed all the above steps, you can upload (Ctrl+U) the same (or any other) sketch over OTA:
 
- [PICTURE]
+ ![OTA upload complete](ota-ide-ota-upload-complete.png)
 
 **Note**
 
