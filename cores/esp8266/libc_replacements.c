@@ -393,24 +393,6 @@ int* __errno(void) {
     return &errno_var;
 }
 
-
-char * ctime(const time_t *clock) {
-    return 0;
-}
-
-time_t time(time_t * t) {
-    return 0;
-}
-
-int gettimeofday(void *tp, void *tzp) {
-    return 0;
-}
-
-time_t mktime(struct tm *timp) {
-    return 0;
-}
-
-
 /*
  * begin newlib/string/strlcpy.c
  *

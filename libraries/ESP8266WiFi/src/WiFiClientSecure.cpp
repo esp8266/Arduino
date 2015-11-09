@@ -267,6 +267,9 @@ int WiFiClientSecure::available() {
 }
 
 uint8_t WiFiClientSecure::connected() {
+    if (!_client)
+        return 0;
+        
     if (_client->state() == ESTABLISHED)
         return 1;
 
