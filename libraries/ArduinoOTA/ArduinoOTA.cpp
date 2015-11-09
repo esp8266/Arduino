@@ -144,6 +144,8 @@ void ArduinoOTAClass::_runUpdate(){
 
   if(Update.end()){
     client.print("OK");
+    client.stop();
+    delay(10);
 #if OTA_DEBUG
     Serial.printf("Update Success\nRebooting...\n");
 #endif
