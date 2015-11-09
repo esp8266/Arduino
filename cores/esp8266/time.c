@@ -35,7 +35,7 @@ extern struct tm* sntp_localtime(const time_t *clock);
 #define DIFF1900TO1970 2208988800UL
 
 static int s_daylightOffset_sec = 0;
-static int s_timezone_sec = 0;
+static long s_timezone_sec = 0;
 static time_t s_bootTime = 0;
 
 // calculate offset used in gettimeofday
@@ -46,7 +46,7 @@ static void ensureBootTimeIsSet()
         time_t now = sntp_get_current_timestamp();
         if (now)
         {
-            s_bootTime =  - millis() / 1000;
+            s_bootTime =  now - millis() / 1000;
         }
     }
 }
@@ -56,7 +56,7 @@ static void setServer(int id, const char* name_or_ip)
     if (name_or_ip)
     {
         //TODO: check whether server is given by name or IP
-        sntp_setservername(0, (char*) name_or_ip);
+        sntp_setservername(id, (char*) name_or_ip);
     }
 }
 
@@ -92,7 +92,6 @@ time_t mktime(struct tm *t)
 time_t time(time_t * t)
 {
     time_t seconds = sntp_get_current_timestamp();
-    ensureBootTimeIsSet();
     if (t)
     {
         *t = seconds;
