@@ -226,8 +226,8 @@ void ESP8266WebServer::sendContent_P(PGM_P content) {
             contentUnitLen = HTTP_DOWNLOAD_UNIT_SIZE;
         }
         else {
-            // reached terminator
-            contentUnitLen = contentNext - contentUnit;
+            // reached terminator. Do not send the terminator
+            contentUnitLen = contentNext - contentUnit - 1;
             content = NULL;
         }
 
