@@ -271,7 +271,7 @@ long random(long, long);
 void randomSeed(unsigned long);
 long map(long, long, long, long, long);
 
-extern "C" void configTime(int timezone, int daylightOffset_sec,
+extern "C" void configTime(long timezone, int daylightOffset_sec,
     const char* server1, const char* server2 = nullptr, const char* server3 = nullptr);
 
 #endif
