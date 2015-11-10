@@ -15,6 +15,7 @@
 
 #define U_FLASH   0
 #define U_SPIFFS  100
+#define U_AUTH    200
 
 //#define DEBUG_UPDATER Serial
 
@@ -26,13 +27,13 @@ class UpdaterClass {
       Will return false if there is not enough space
     */
     bool begin(size_t size, int = U_FLASH);
-    
+
     /*
       Writes a buffer to the flash and increments the address
       Returns the amount written
     */
     size_t write(uint8_t *data, size_t len);
-    
+
     /*
       Writes the remaining bytes from the Stream to the flash
       Uses readBytes() and sets UPDATE_ERROR_STREAM on timeout
@@ -41,7 +42,7 @@ class UpdaterClass {
       Usable for slow streams like Serial
     */
     size_t writeStream(Stream &data);
-    
+
     /*
       If all bytes are written
       this call will write the config to eboot
@@ -53,27 +54,27 @@ class UpdaterClass {
       evenIfRemaining is helpfull when you update without knowing the final size first
     */
     bool end(bool evenIfRemaining = false);
-    
+
     /*
       Prints the last error to an output stream
     */
     void printError(Stream &out);
-  
+
     /*
       sets the expected MD5 for the firmware (hexString)
     */
     void setMD5(const char * expected_md5);
-    
+
     /*
       returns the MD5 String of the sucessfully ended firmware
     */
     String md5String(void){ return _md5.toString(); }
-  
+
     /*
       populated the result with the md5 bytes of the sucessfully ended firmware
     */
     void md5(uint8_t * result){ return _md5.getBytes(result); }
-  
+
     //Helpers
     uint8_t getError(){ return _error; }
     void clearError(){ _error = UPDATE_ERROR_OK; }
@@ -83,7 +84,7 @@ class UpdaterClass {
     size_t size(){ return _size; }
     size_t progress(){ return _currentAddress - _startAddress; }
     size_t remaining(){ return _size - (_currentAddress - _startAddress); }
-    
+
     /*
       Template to write from objects that expose
       available() and read(uint8_t*, size_t) methods
@@ -125,7 +126,7 @@ class UpdaterClass {
       }
       return written;
     }
-    
+
   private:
     void _reset();
     bool _writeBuffer();
@@ -137,8 +138,8 @@ class UpdaterClass {
     uint32_t _startAddress;
     uint32_t _currentAddress;
     uint32_t _command;
-    
-    char *_target_md5;
+
+    String _target_md5;
     MD5Builder _md5;
 };
 

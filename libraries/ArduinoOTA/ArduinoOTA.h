@@ -23,26 +23,6 @@ typedef enum {
 
 class ArduinoOTAClass
 {
-  private:
-    int _port;
-    char *_password;
-    char * _hostname;
-    char * _nonce;
-    WiFiUDP* _udp_ota;
-    bool _initialized;
-    
-    ota_state_t _state;
-    int _size, _cmd, _ota_port;
-    IPAddress _ota_ip;
-    char * _md5;
-
-    OTA_CALLBACK(_start_callback);
-    OTA_CALLBACK(_end_callback);
-    OTA_CALLBACK_ERROR(_error_callback);
-    OTA_CALLBACK_PROGRESS(_progress_callback);
-    
-    void _runUpdate(void);
-
   public:
     ArduinoOTAClass();
     ~ArduinoOTAClass();
@@ -55,6 +35,27 @@ class ArduinoOTAClass
     void onError(OTA_CALLBACK_ERROR (fn));
     void begin();
     void handle();
+
+  private:
+    int _port;
+    String _password;
+    String _hostname;
+    String _nonce;
+    WiFiUDP _udp_ota;
+    bool _initialized;
+    ota_state_t _state;
+    int _size;
+    int _cmd;
+    int _ota_port;
+    IPAddress _ota_ip;
+    String _md5;
+
+    OTA_CALLBACK(_start_callback);
+    OTA_CALLBACK(_end_callback);
+    OTA_CALLBACK_ERROR(_error_callback);
+    OTA_CALLBACK_PROGRESS(_progress_callback);
+
+    void _runUpdate(void);
 };
 
 extern ArduinoOTAClass ArduinoOTA;
