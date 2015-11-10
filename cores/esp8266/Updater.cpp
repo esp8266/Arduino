@@ -32,6 +32,7 @@ void UpdaterClass::_reset() {
   _currentAddress = 0;
   _size = 0;
   _command = U_FLASH;
+  _target_md5 = 0;
 }
 
 bool UpdaterClass::begin(size_t size, int command) {
@@ -96,8 +97,15 @@ bool UpdaterClass::begin(size_t size, int command) {
   _size = size;
   _buffer = new uint8_t[FLASH_SECTOR_SIZE];
   _command = command;
-
+  
+  _target_md5 = new char[64];
+  _md5.begin();
   return true;
+}
+
+void UpdaterClass::setMD5(const char * expected_md5){
+  if(strlen(expected_md5) != 32) return;
+  strcpy(_target_md5, expected_md5);
 }
 
 bool UpdaterClass::end(bool evenIfRemaining){
@@ -123,7 +131,21 @@ bool UpdaterClass::end(bool evenIfRemaining){
     }
     _size = progress();
   }
-
+  
+  _md5.calculate();
+  if(_target_md5 && strlen(_target_md5) == 32){
+    if(strcmp(_target_md5, _md5.toString().c_str()) != 0){
+      _error = UPDATE_ERROR_MD5;
+#ifdef DEBUG_UPDATER
+      DEBUG_UPDATER.printf("MD5 Failed: expected:%s, calculated:%s\n", _target_md5, _md5.toString().c_str());
+#endif
+      return false;
+    }
+#ifdef DEBUG_UPDATER
+    else DEBUG_UPDATER.printf("MD5 Success: %s\n", _md5.toString().c_str());
+#endif
+  }
+  
   if (_command == U_FLASH) {
     eboot_command ebcmd;
     ebcmd.action = ACTION_COPY_RAW;
@@ -157,6 +179,7 @@ bool UpdaterClass::_writeBuffer(){
 #endif
     return false;
   }
+  _md5.add(_buffer, _bufferLen);
   _currentAddress += _bufferLen;
   _bufferLen = 0;
   return true;
@@ -232,6 +255,8 @@ void UpdaterClass::printError(Stream &out){
     out.println("Bad Size Given");
   } else if(_error == UPDATE_ERROR_STREAM){
     out.println("Stream Read Timeout");
+  } else if(_error == UPDATE_ERROR_MD5){
+    out.println("MD5 Check Failed");
   } else {
     out.println("UNKNOWN");
   }

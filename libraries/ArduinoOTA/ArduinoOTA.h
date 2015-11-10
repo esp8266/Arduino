@@ -5,31 +5,58 @@ class WiFiUDP;
 
 #define OTA_CALLBACK(callback) void (*callback)()
 #define OTA_CALLBACK_PROGRESS(callback)  void (*callback)(unsigned int, unsigned int)
+#define OTA_CALLBACK_ERROR(callback)  void (*callback)(ota_error_t)
 
-class ArduinoOTA
+typedef enum {
+  OTA_IDLE,
+  OTA_WAITAUTH,
+  OTA_RUNUPDATE
+} ota_state_t;
+
+typedef enum {
+  OTA_AUTH_ERROR,
+  OTA_BEGIN_ERROR,
+  OTA_CONNECT_ERROR,
+  OTA_RECIEVE_ERROR,
+  OTA_END_ERROR
+} ota_error_t;
+
+class ArduinoOTAClass
 {
+  private:
     int _port;
-    String* _mdns_host;
+    char *_password;
+    char * _hostname;
+    char * _nonce;
     WiFiUDP* _udp_ota;
-    bool _serial_debug;
+    bool _initialized;
+    
+    ota_state_t _state;
+    int _size, _cmd, _ota_port;
+    IPAddress _ota_ip;
+    char * _md5;
 
     OTA_CALLBACK(_start_callback);
     OTA_CALLBACK(_end_callback);
-    OTA_CALLBACK(_error_callback);
-
+    OTA_CALLBACK_ERROR(_error_callback);
     OTA_CALLBACK_PROGRESS(_progress_callback);
+    
+    void _runUpdate(void);
 
-    public:
-        ArduinoOTA(const char *mdns_host="ESP8266-OTA-",
-                   int port=8266,
-                   bool serial_debug=true);
-        ~ArduinoOTA();
-        void setup();
-        void handle();
-        void onStart(OTA_CALLBACK(fn));
-        void onEnd(OTA_CALLBACK(fn));
-        void onProgress(OTA_CALLBACK_PROGRESS(fn));
-        void onError(OTA_CALLBACK (fn));
+  public:
+    ArduinoOTAClass();
+    ~ArduinoOTAClass();
+    void setPort(uint16_t port);
+    void setHostname(const char *hostname);
+    void setPassword(const char *password);
+    void onStart(OTA_CALLBACK(fn));
+    void onEnd(OTA_CALLBACK(fn));
+    void onProgress(OTA_CALLBACK_PROGRESS(fn));
+    void onError(OTA_CALLBACK_ERROR (fn));
+    void begin();
+    void handle();
 };
+
+extern ArduinoOTAClass ArduinoOTA;
 
 #endif /* __ARDUINO_OTA_H */

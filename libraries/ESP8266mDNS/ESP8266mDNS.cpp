@@ -85,7 +85,7 @@ static const IPAddress MDNS_MULTICAST_ADDR(224, 0, 0, 251);
 static const int MDNS_MULTICAST_TTL = 1;
 static const int MDNS_PORT = 5353;
 
-MDNSResponder::MDNSResponder() : _conn(0) { _services = 0; }
+MDNSResponder::MDNSResponder() : _conn(0) { _services = 0; _arduinoAuth = false; }
 MDNSResponder::~MDNSResponder() {}
 
 bool MDNSResponder::begin(const char* domain){
@@ -100,8 +100,6 @@ bool MDNSResponder::begin(const char* domain){
   for (int i = 0; i < n; ++i)
     _hostName[i] = tolower(domain[i]);
   _hostName[n] = '\0';
-
-  os_strcpy(_boardName, ARDUINO_BOARD);
 
   // Open the MDNS socket if it isn't already open.
   if (!_conn) {
@@ -372,7 +370,10 @@ void MDNSResponder::_parsePacket(){
   return _reply(responseMask, (serviceName), (protoName), servicePort);
 }
 
-
+void MDNSResponder::enableArduino(uint16_t port, bool auth){
+  _arduinoAuth = auth;
+  addService("arduino", "tcp", port);
+}
 
 void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint16_t port){
   int i;
@@ -439,24 +440,53 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
 
   // TXT Response
   if(replyMask & 0x4){
-    if(replyMask & 0x8){//send the name
-      uint8_t txtHead[2] = {0xC0, (uint8_t)(36 + serviceLen)};
-      _conn->append(reinterpret_cast<const char*>(txtHead), 2);
+    if(replyMask & 0x8){
+      uint8_t txtHead[10] = {
+        0xC0, (uint8_t)(36 + serviceLen),//send the name
+        0x00, 0x10, //Type TXT
+        0x80, 0x01, //Class IN, with cache flush
+        0x00, 0x00, 0x11, 0x94, //TTL 4500
+      };
+      _conn->append(reinterpret_cast<const char*>(txtHead), 10);
     }
 
-    uint8_t boardNameLen = os_strlen(_boardName);
+    if(strcmp(reinterpret_cast<const char*>("arduino"), service) == 0){
+      //arduino
+      //arduino service dependance should be removed and properties abstracted
+      const char *tcpCheckExtra = "tcp_check=no";
+      uint8_t tcpCheckExtraLen = os_strlen(tcpCheckExtra);
+      
+      const char *sshUploadExtra = "ssh_upload=no";
+      uint8_t sshUploadExtraLen = os_strlen(sshUploadExtra);
+      
+      char boardName[64];
+      const char *boardExtra = "board=";
+      os_sprintf(boardName, "%s%s\0", boardExtra, ARDUINO_BOARD);
+      uint8_t boardNameLen = os_strlen(boardName);
 
-    uint8_t txt[24] = {
-      0x00, 0x10, //Type TXT
-      0x80, 0x01, //Class IN, with cache flush
-      0x00, 0x00, 0x11, 0x94, //TTL 4500
-      0x00, 0x0e, //DATA LEN
-      (uint8_t)(6 + boardNameLen), //strlen(board=) + strlen(boardName)
-      0x62, 0x6f, 0x61, 0x72, 0x64, 0x3d //board=
-    };
-    _conn->append(reinterpret_cast<const char*>(txt), 17);
-    _conn->append(reinterpret_cast<const char*>(_boardName), boardNameLen);
-
+      char authUpload[16];
+      const char *authUploadExtra = "auth_upload=";
+      os_sprintf(authUpload, "%s%s\0", authUploadExtra, reinterpret_cast<const char*>((_arduinoAuth)?"yes":"no"));
+      uint8_t authUploadLen = os_strlen(authUpload);
+    
+      uint16_t textDataLen = (1 + boardNameLen) + (1 + tcpCheckExtraLen) + (1 + sshUploadExtraLen) + (1 + authUploadLen);
+      uint8_t txt[2] = {(uint8_t)(textDataLen >> 8), (uint8_t)(textDataLen)}; //DATA LEN
+      _conn->append(reinterpret_cast<const char*>(txt), 2);
+      
+      _conn->append(reinterpret_cast<const char*>(&boardNameLen), 1);
+      _conn->append(reinterpret_cast<const char*>(boardName), boardNameLen);
+      _conn->append(reinterpret_cast<const char*>(&authUploadLen), 1);
+      _conn->append(reinterpret_cast<const char*>(authUpload), authUploadLen);
+      _conn->append(reinterpret_cast<const char*>(&tcpCheckExtraLen), 1);
+      _conn->append(reinterpret_cast<const char*>(tcpCheckExtra), tcpCheckExtraLen);
+      _conn->append(reinterpret_cast<const char*>(&sshUploadExtraLen), 1);
+      _conn->append(reinterpret_cast<const char*>(sshUploadExtra), sshUploadExtraLen);
+    } else {
+      //not arduino
+      //we should figure out an API so TXT properties can be added for services
+      uint8_t txt[2] = {0,0};
+      _conn->append(reinterpret_cast<const char*>(txt), 2);
+    }
   }
 
   // SRV Response
