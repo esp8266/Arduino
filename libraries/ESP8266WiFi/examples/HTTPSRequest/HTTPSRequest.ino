@@ -14,15 +14,23 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 
-const char* ssid = "........";
-const char* password = "........";
+const char* ssid = "SKY";
+const char* password = "wellcometrust";
 
-const char* host = "api.github.com";
-const int httpsPort = 443;
+//const char* host = "api.github.com";
+//const char* host = "raw.githubusercontent.com";
+//const char * host = "www.google.co.uk";
+const char * host = "test2.tls-o-matic.com"; 
+
+const int httpsPort = 402;
 
 // Use web browser to view and copy
 // SHA1 fingerprint of the certificate
-const char* fingerprint = "CF 05 98 89 CA FF 8E D8 5E 5C E0 C2 E4 F7 E6 C3 C7 50 DD 5C";
+// const char* fingerprint = "CF 05 98 89 CA FF 8E D8 5E 5C E0 C2 E4 F7 E6 C3 C7 50 DD 5C"; // git api
+//const char * fingerprint = "E2 11 20 48 85 00 92 5B F9 56 EE 20 41 AF FC 52 D4 CC 39 1E"; // google
+//const char * fingerprint = "B0 74 BB EF 10 C2 DD 70 89 C8 EA 58 A2 F9 E1 41 00 D3 38 82"; //git raw
+  const char * fingerprint = "B9 1D 9E A7 57 8A 43 BF 8E 15 26 93 09 09 8F E9 3A 5D EE 52";
+
 
 void setup() {
   Serial.begin(115200);
@@ -54,7 +62,10 @@ void setup() {
     Serial.println("certificate doesn't match");
   }
 
-  String url = "/repos/esp8266/Arduino/commits/esp8266/status";
+  //String url = "/repos/esp8266/Arduino/commits/esp8266/status";
+  //String url = "/sticilface/ESPmanager/fixcrashing/examples/Settingsmanager-example/data/jquery.mobile-1.4.5.min.js.gz";
+    String url = ""; 
+  
   Serial.print("requesting URL: ");
   Serial.println(url);
 
@@ -64,22 +75,41 @@ void setup() {
                "Connection: close\r\n\r\n");
 
   Serial.println("request sent");
-  while (client.connected()) {
-    String line = client.readStringUntil('\n');
-    if (line == "\r") {
-      Serial.println("headers received");
-      break;
-    }
-  }
-  String line = client.readStringUntil('\n');
-  if (line.startsWith("{\"state\":\"success\"")) {
-    Serial.println("esp8266/Arduino CI successfull!");
-  } else {
-    Serial.println("esp8266/Arduino CI has failed");
-  }
+
+  
+//  while (client.connected()) {
+//    String line = client.readStringUntil('\n');
+//    if (line == "\r") {
+//      Serial.println("headers received");
+//      break;
+//    }
+//  }
+
+    size_t buf_size = 1024; 
+    uint8_t buf[buf_size];
+    
   Serial.println("reply was:");
   Serial.println("==========");
-  Serial.println(line);
+  
+  
+  
+     String line = client.readStringUntil('\r\n\r\n');
+
+     Serial.print(line);
+     
+//            while (client.available()) {
+//              Serial.print(client.read()); 
+//    
+//            }
+
+//  String line = client.readStringUntil('\n');
+//  if (line.startsWith("{\"state\":\"success\"")) {
+//    Serial.println("esp8266/Arduino CI successfull!");
+//  } else {
+//    Serial.println("esp8266/Arduino CI has failed");
+//  }
+
+  //Serial.println(line);
   Serial.println("==========");
   Serial.println("closing connection");
 }

@@ -83,8 +83,8 @@ void ESP8266WebServer::_addRequestHandler(RequestHandler* handler) {
     }
 }
 
-void ESP8266WebServer::serveStatic(const char* uri, FS& fs, const char* path) {
-    _addRequestHandler(new StaticRequestHandler(fs, path, uri));
+void ESP8266WebServer::serveStatic(const char* uri, FS& fs, const char* path, const char* cache_header) {
+    _addRequestHandler(new StaticRequestHandler(fs, path, uri, cache_header));
 }
 
 void ESP8266WebServer::handleClient() {
