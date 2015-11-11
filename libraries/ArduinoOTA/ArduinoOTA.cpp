@@ -63,7 +63,7 @@ void ArduinoOTAClass::begin() {
 
   if (!_hostname.length()) {
     char tmp[15];
-    sprintf(tmp, "esp8266-%02x", ESP.getChipId());
+    sprintf(tmp, "esp8266-%06x", ESP.getChipId());
     _hostname = tmp;
   }
   if (!_port) {

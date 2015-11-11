@@ -35,7 +35,33 @@ import hashlib
 FLASH = 0
 SPIFFS = 100
 AUTH = 200
-
+PROGRESS = 0
+# update_progress() : Displays or updates a console progress bar
+## Accepts a float between 0 and 1. Any int will be converted to a float.
+## A value under 0 represents a 'halt'.
+## A value at 1 or bigger represents 100%
+def update_progress(progress):
+  if (PROGRESS == 1):
+    barLength = 60 # Modify this to change the length of the progress bar
+    status = ""
+    if isinstance(progress, int):
+      progress = float(progress)
+    if not isinstance(progress, float):
+      progress = 0
+      status = "error: progress var must be float\r\n"
+    if progress < 0:
+      progress = 0
+      status = "Halt...\r\n"
+    if progress >= 1:
+      progress = 1
+      status = "Done...\r\n"
+    block = int(round(barLength*progress))
+    text = "\rUploading: [{0}] {1}% {2}".format( "="*block + " "*(barLength-block), int(progress*100), status)
+    sys.stderr.write(text)
+    sys.stderr.flush()
+  else:
+    sys.stderr.write('.')
+    sys.stderr.flush()
 
 def serve(remoteAddr, remotePort, password, filename, command = FLASH):
   # Create a TCP/IP socket
@@ -115,13 +141,17 @@ def serve(remoteAddr, remotePort, password, filename, command = FLASH):
 
   try:
     f = open(filename, "rb")
-    sys.stderr.write('Uploading')
-    sys.stderr.flush()
+    if (PROGRESS == 0):
+      sys.stderr.write('Uploading')
+      sys.stderr.flush()
+    else:
+      update_progress(0)
+    offset = 0
     while True:
       chunk = f.read(1460)
       if not chunk: break
-      sys.stderr.write('.')
-      sys.stderr.flush()
+      offset += len(chunk)
+      update_progress(offset/float(content_size))
       connection.settimeout(10)
       try:
         connection.sendall(chunk)
@@ -220,6 +250,12 @@ def parser():
 		action = "store_true",
 		default = False
 	)
+	group.add_option("-r", "--progress",
+		dest = "progress",
+		help = "Show progress output. Does not work for ArduinoIDE",
+		action = "store_true",
+		default = False
+	)
 	parser.add_option_group(group)
 
 	(options, args) = parser.parse_args()
@@ -244,6 +280,8 @@ def main(args):
 	logging.debug("Options: %s", str(options))
 
 	# check options
+	if (options.progress):
+		PROGRESS = 1
 	if (not options.esp_ip or not options.image):
 		logging.critical("Not enough arguments.")
 
