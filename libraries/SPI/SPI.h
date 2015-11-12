@@ -74,6 +74,7 @@ public:
   void endTransaction(void);
 private:
   bool useHwCs;
+  bool inTransaction;
   void writeBytes_(uint8_t * data, uint8_t size);
   void writePattern_(uint8_t * data, uint8_t size, uint8_t repeat);
   void transferBytes_(uint8_t * out, uint8_t * in, uint8_t size);
