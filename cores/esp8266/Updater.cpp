@@ -8,6 +8,7 @@
 extern "C" {
     #include "c_types.h"
     #include "spi_flash.h"
+    #include "user_interface.h"
 }
 
 extern "C" uint32_t _SPIFFS_start;
@@ -58,6 +59,8 @@ bool UpdaterClass::begin(size_t size, int command) {
 
   _reset();
   _error = 0;
+
+  wifi_set_sleep_type(NONE_SLEEP_T);
 
   uint32_t updateStartAddress = 0;
   if (command == U_FLASH) {
