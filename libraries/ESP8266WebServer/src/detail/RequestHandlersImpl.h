@@ -31,39 +31,57 @@ protected:
 
 class StaticRequestHandler : public RequestHandler {
 public:
-    StaticRequestHandler(FS& fs, const char* path, const char* uri)
+    StaticRequestHandler(FS& fs, const char* path, const char* uri, const char* cache_header)
     : _fs(fs)
     , _uri(uri)
     , _path(path)
+    , _cache_header(cache_header)
     {
         _isFile = fs.exists(path);
-        DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d\r\n", path, uri, _isFile);
-        _baseUriLength = _uri.length();
+        DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header);
+        _baseUriLength = _uri.length(); 
     }
-
     bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
         if (requestMethod != HTTP_GET)
             return false;
         DEBUGV("StaticRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), _uri.c_str());
         if (!requestUri.startsWith(_uri))
-            return false;
+            return false; 
 
-        String path(_path);
-        if (!_isFile) {
+        String path(_path); 
+
+        if(path.endsWith("/")) path += "index.htm";
+
+        if (!_isFile) { 
             // Base URI doesn't point to a file. Append whatever follows this
             // URI in request to get the file path.
-            path += requestUri.substring(_baseUriLength);
+            path += requestUri.substring(_baseUriLength); 
         }
+
         else if (requestUri != _uri) {
             // Base URI points to a file but request doesn't match this URI exactly
             return false;
         }
         DEBUGV("StaticRequestHandler::handle: path=%s, isFile=%d\r\n", path.c_str(), _isFile);
+
+        String contentType = getContentType(path);
+        
+        // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
+        // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc... 
+        if (!path.endsWith(".gz") && !SPIFFS.exists(path))  { 
+            String pathWithGz = path + ".gz";
+            if(SPIFFS.exists(pathWithGz))
+                path += ".gz";
+        }
+
         File f = _fs.open(path, "r");
         if (!f)
             return false;
 
-        server.streamFile(f, getContentType(path));
+        if (_cache_header.length() != 0) 
+            server.sendHeader("Cache-Control", _cache_header);
+        
+        server.streamFile(f, contentType);
         return true;
     }
 
@@ -81,6 +99,7 @@ public:
         else if (path.endsWith(".xml")) return "text/xml";
         else if (path.endsWith(".pdf")) return "application/pdf";
         else if (path.endsWith(".zip")) return "application/zip";
+        else if(path.endsWith(".gz")) return "application/x-gzip";
         return "application/octet-stream";
     }
 
@@ -88,6 +107,7 @@ protected:
     FS _fs;
     String _uri;
     String _path;
+    String _cache_header; 
     bool _isFile;
     size_t _baseUriLength;
 };
