@@ -30,17 +30,44 @@ import os
 import optparse
 import logging
 import hashlib
+import random
 
 # Commands
 FLASH = 0
 SPIFFS = 100
 AUTH = 200
-
+PROGRESS = False
+# update_progress() : Displays or updates a console progress bar
+## Accepts a float between 0 and 1. Any int will be converted to a float.
+## A value under 0 represents a 'halt'.
+## A value at 1 or bigger represents 100%
+def update_progress(progress):
+  if (PROGRESS):
+    barLength = 60 # Modify this to change the length of the progress bar
+    status = ""
+    if isinstance(progress, int):
+      progress = float(progress)
+    if not isinstance(progress, float):
+      progress = 0
+      status = "error: progress var must be float\r\n"
+    if progress < 0:
+      progress = 0
+      status = "Halt...\r\n"
+    if progress >= 1:
+      progress = 1
+      status = "Done...\r\n"
+    block = int(round(barLength*progress))
+    text = "\rUploading: [{0}] {1}% {2}".format( "="*block + " "*(barLength-block), int(progress*100), status)
+    sys.stderr.write(text)
+    sys.stderr.flush()
+  else:
+    sys.stderr.write('.')
+    sys.stderr.flush()
 
 def serve(remoteAddr, remotePort, password, filename, command = FLASH):
   # Create a TCP/IP socket
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  serverPort = 48266
+  serverPort = random.randint(10000,60000)
   server_address = ('0.0.0.0', serverPort)
   logging.info('Starting on %s:%s', str(server_address[0]), str(server_address[1]))
   try:
@@ -115,13 +142,17 @@ def serve(remoteAddr, remotePort, password, filename, command = FLASH):
 
   try:
     f = open(filename, "rb")
-    sys.stderr.write('Uploading')
-    sys.stderr.flush()
+    if (PROGRESS):
+      update_progress(0)
+    else:
+      sys.stderr.write('Uploading')
+      sys.stderr.flush()
+    offset = 0
     while True:
       chunk = f.read(1460)
       if not chunk: break
-      sys.stderr.write('.')
-      sys.stderr.flush()
+      offset += len(chunk)
+      update_progress(offset/float(content_size))
       connection.settimeout(10)
       try:
         connection.sendall(chunk)
@@ -165,100 +196,108 @@ def serve(remoteAddr, remotePort, password, filename, command = FLASH):
 
 
 def parser():
-	parser = optparse.OptionParser(
-		usage = "%prog [options]",
-		description = "Transmit image over the air to the esp8266 module with OTA support."
-	)
+  parser = optparse.OptionParser(
+    usage = "%prog [options]",
+    description = "Transmit image over the air to the esp8266 module with OTA support."
+  )
 
-	# destination ip and port
-	group = optparse.OptionGroup(parser, "Destination")
-	group.add_option("-i", "--ip",
-		dest = "esp_ip",
-		action = "store",
-		help = "ESP8266 IP Address.",
-		default = False
-	)
-	group.add_option("-p", "--port",
-		dest = "esp_port",
-		type = "int",
-		help = "ESP8266 ota Port. Default 8266",
-		default = 8266
-	)
-	parser.add_option_group(group)
+  # destination ip and port
+  group = optparse.OptionGroup(parser, "Destination")
+  group.add_option("-i", "--ip",
+    dest = "esp_ip",
+    action = "store",
+    help = "ESP8266 IP Address.",
+    default = False
+  )
+  group.add_option("-p", "--port",
+    dest = "esp_port",
+    type = "int",
+    help = "ESP8266 ota Port. Default 8266",
+    default = 8266
+  )
+  parser.add_option_group(group)
 
-	# auth
-	group = optparse.OptionGroup(parser, "Authentication")
-	group.add_option("-a", "--auth",
-		dest = "auth",
-		help = "Set authentication password.",
-		action = "store",
-		default = ""
-	)
-	parser.add_option_group(group)
+  # auth
+  group = optparse.OptionGroup(parser, "Authentication")
+  group.add_option("-a", "--auth",
+    dest = "auth",
+    help = "Set authentication password.",
+    action = "store",
+    default = ""
+  )
+  parser.add_option_group(group)
 
-	# image
-	group = optparse.OptionGroup(parser, "Image")
-	group.add_option("-f", "--file",
-		dest = "image",
-		help = "Image file.",
-		metavar="FILE",
-		default = None
-	)
-	group.add_option("-s", "--spiffs",
-		dest = "spiffs",
-		action = "store_true",
-		help = "Use this option to transmit a SPIFFS image and do not flash the module.",
-		default = False
-	)
-	parser.add_option_group(group)
+  # image
+  group = optparse.OptionGroup(parser, "Image")
+  group.add_option("-f", "--file",
+    dest = "image",
+    help = "Image file.",
+    metavar="FILE",
+    default = None
+  )
+  group.add_option("-s", "--spiffs",
+    dest = "spiffs",
+    action = "store_true",
+    help = "Use this option to transmit a SPIFFS image and do not flash the module.",
+    default = False
+  )
+  parser.add_option_group(group)
 
-	# output group
-	group = optparse.OptionGroup(parser, "Output")
-	group.add_option("-d", "--debug",
-		dest = "debug",
-		help = "Show debug output. And override loglevel with debug.",
-		action = "store_true",
-		default = False
-	)
-	parser.add_option_group(group)
+  # output group
+  group = optparse.OptionGroup(parser, "Output")
+  group.add_option("-d", "--debug",
+    dest = "debug",
+    help = "Show debug output. And override loglevel with debug.",
+    action = "store_true",
+    default = False
+  )
+  group.add_option("-r", "--progress",
+    dest = "progress",
+    help = "Show progress output. Does not work for ArduinoIDE",
+    action = "store_true",
+    default = False
+  )
+  parser.add_option_group(group)
 
-	(options, args) = parser.parse_args()
+  (options, args) = parser.parse_args()
 
-	return options
+  return options
 # end parser
 
 
 def main(args):
-	# get options
-	options = parser()
+  # get options
+  options = parser()
 
-	# adapt log level
-	loglevel = logging.WARNING
-	if (options.debug):
-		loglevel = logging.DEBUG
-	# end if
+  # adapt log level
+  loglevel = logging.WARNING
+  if (options.debug):
+    loglevel = logging.DEBUG
+  # end if
 
-	# logging
-	logging.basicConfig(level = loglevel, format = '%(asctime)-8s [%(levelname)s]: %(message)s', datefmt = '%H:%M:%S')
+  # logging
+  logging.basicConfig(level = loglevel, format = '%(asctime)-8s [%(levelname)s]: %(message)s', datefmt = '%H:%M:%S')
 
-	logging.debug("Options: %s", str(options))
+  logging.debug("Options: %s", str(options))
 
-	# check options
-	if (not options.esp_ip or not options.image):
-		logging.critical("Not enough arguments.")
+  # check options
+  global PROGRESS
+  PROGRESS = options.progress
+  if (not options.esp_ip or not options.image):
+    logging.critical("Not enough arguments.")
 
-		return 1
-	# end if
+    return 1
+  # end if
 
-	command = FLASH
-	if (options.spiffs):
-		command = SPIFFS
-	# end if
+  command = FLASH
+  if (options.spiffs):
+    command = SPIFFS
+  # end if
 
-	return serve(options.esp_ip, options.esp_port, options.auth, options.image, command)
+  return serve(options.esp_ip, options.esp_port, options.auth, options.image, command)
 # end main
 
 
 if __name__ == '__main__':
-	sys.exit(main(sys.argv))
+  sys.exit(main(sys.argv))
 # end if

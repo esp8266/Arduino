@@ -63,7 +63,7 @@ void ArduinoOTAClass::begin() {
 
   if (!_hostname.length()) {
     char tmp[15];
-    sprintf(tmp, "esp8266-%02x", ESP.getChipId());
+    sprintf(tmp, "esp8266-%06x", ESP.getChipId());
     _hostname = tmp;
   }
   if (!_port) {
@@ -199,7 +199,7 @@ void ArduinoOTAClass::handle() {
 #endif
 
     _udp_ota.beginPacket(_ota_ip, _udp_ota.remotePort());
-    if (_password){
+    if (_password.length()){
       MD5Builder nonce_md5;
       nonce_md5.begin();
       nonce_md5.add(String(micros()));
