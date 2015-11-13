@@ -85,6 +85,15 @@ protected:
     DirImplPtr _impl;
 };
 
+struct FSInfo {
+    size_t totalBytes;
+    size_t usedBytes;
+    size_t blockSize;
+    size_t pageSize;
+    size_t maxOpenFiles;
+    size_t maxPathLength;
+};
+
 class FS
 {
 public:
@@ -93,7 +102,7 @@ public:
     bool begin();
 
     bool format();
-    bool info(uint32_t *total, uint32_t *used);
+    bool info(FSInfo& info);
 
     File open(const char* path, const char* mode);
     File open(const String& path, const char* mode);
@@ -123,6 +132,7 @@ using fs::SeekMode;
 using fs::SeekSet;
 using fs::SeekCur;
 using fs::SeekEnd;
+using fs::FSInfo;
 
 extern FS SPIFFS;
 

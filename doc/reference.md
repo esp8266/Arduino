@@ -266,6 +266,32 @@ SPIFFS.rename(pathFrom, pathTo)
 Renames file from `pathFrom` to `pathTo`. Paths must be absolute. Returns *true*
 if file was renamed successfully.
 
+#### info
+
+```c++
+FSInfo fs_info;
+SPIFFS.info(fs_info);
+```
+
+Fills [FSInfo structure](#filesystem-information-structure) with information about
+the file system. Returns `true` is successful, `false` otherwise.
+
+### Filesystem information structure
+
+```c++
+struct FSInfo {
+    size_t totalBytes;
+    size_t usedBytes;
+    size_t blockSize;
+    size_t pageSize;
+    size_t maxOpenFiles;
+    size_t maxPathLength;
+};
+```
+
+This is the structure which may be filled using FS::info method. Field names
+are self-explanatory.
+
 ### Directory object (Dir)
 
 The purpose of *Dir* object is to iterate over files inside a directory.

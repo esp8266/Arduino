@@ -112,6 +112,21 @@ void setup() {
   }
 
   {
+    FSInfo info;
+    if (!SPIFFS.info(info)) {
+      fail("info failed");
+    }
+    Serial.printf("Total: %u\nUsed: %u\nBlock: %u\nPage: %u\nMax open files: %u\nMax path len: %u\n",
+                  info.totalBytes,
+                  info.usedBytes,
+                  info.blockSize,
+                  info.pageSize,
+                  info.maxOpenFiles,
+                  info.maxPathLength
+                 );
+  }
+
+  {
     if (!SPIFFS.format()) {
       fail("format failed");
     }
