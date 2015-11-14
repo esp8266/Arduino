@@ -4,6 +4,7 @@ menu.FlashSize=Flash Size
 menu.FlashMode=Flash Mode
 menu.FlashFreq=Flash Frequency
 menu.UploadTool=Upload Using
+menu.ResetMethod=Reset Method
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -134,6 +135,11 @@ generic.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 generic.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 generic.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
 generic.menu.FlashSize.4M3M.upload.maximum_size=1044464
+
+generic.menu.ResetMethod.ck=ck
+generic.menu.ResetMethod.ck.upload.resetmethod=ck
+generic.menu.ResetMethod.nodemcu=nodemcu
+generic.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 
 # disabled because espressif's bootloader refuses to write above 4M
 # generic.menu.FlashSize.8M=8M (7M SPIFFS)
