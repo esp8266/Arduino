@@ -180,6 +180,9 @@ at startup the ESP prints out the current boot mode example:
 rst cause:2, boot mode:(3,6)
 ```
 
+note: 
+ - GPIO2 is used as TX output and the internal Pullup is enabled on boot.
+
 #### rst cause
 
 | Number | Description            |
@@ -206,8 +209,7 @@ the first value respects the pin setup of the Pins 0, 2 and 15.
 | 6      | 3.3V   | 3.3V  | 0V    | SDIO       |
 | 7      | 3.3V   | 3.3V  | 3.3V  | SDIO       |
 
-Note:
-
-number = ((GPIO15 << 2) | (GPIO0 << 1) | GPIO2);
+note:
+ - number = ((GPIO15 << 2) | (GPIO0 << 1) | GPIO2);
 
 
