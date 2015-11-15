@@ -42,6 +42,12 @@
             },
             {
               "name": "SweetPea ESP-210"
+            },
+			{
+              "name": "WeMos D1"
+            },
+			{
+              "name": "WeMos D1 mini"
             }
           ],
           "toolsDependencies": [
