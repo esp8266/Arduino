@@ -53,8 +53,6 @@ The following chapters provide more details and specific methods of doing OTA.
 
 - Flash chip size is 2x the size of the sketch.
 
-Two separate, same size memory locations are used alternately. While existing sketch is executed from one location, the new sketch is saved to the other. After reset the new sketch is executed directly from where saved. Location of old sketch will be used for next OTA upload.
-
 
 ## Arduino IDE
 
