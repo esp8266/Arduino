@@ -50,7 +50,7 @@ extern "C"
 #define SSL_DEBUG_OPTS 0
 #endif
 
-#define SSL_RX_BUF_SIZE 1536
+#define SSL_RX_BUF_SIZE 4096
 
 class SSLContext {
 public:
@@ -92,10 +92,12 @@ public:
     }
 
     int read(uint8_t* dst, size_t size) {
-        if (size > _rxbuf->getSize()) {
+        if (!_rxbuf->getSize()) {
             _readAll();
         }
-        return _rxbuf->read(reinterpret_cast<char*>(dst), size);
+        size_t available = _rxbuf->getSize();
+        size_t will_read = (available < size) ? available : size;
+        return _rxbuf->read(reinterpret_cast<char*>(dst), will_read);
     }
 
     int read() {
