@@ -31,6 +31,7 @@ extern "C" {
 #include "IPAddress.h"
 #include "WiFiClient.h"
 #include "WiFiServer.h"
+#include "WiFiClientSecure.h"
 
 #define WIFI_SCAN_RUNNING   (-1)
 #define WIFI_SCAN_FAILED     (-2)
