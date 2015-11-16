@@ -59,6 +59,7 @@ typedef struct {
 class ESP8266WebServer
 {
 public:
+  ESP8266WebServer(IPAddress addr, int port = 80);
   ESP8266WebServer(int port = 80);
   ~ESP8266WebServer();
 
@@ -69,7 +70,7 @@ public:
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);
   void addHandler(RequestHandler* handler);
-  void serveStatic(const char* uri, fs::FS& fs, const char* path);
+  void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
 

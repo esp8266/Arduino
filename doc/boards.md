@@ -10,6 +10,8 @@ title: Supported Hardware
 - [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
 - [SweetPea ESP-210](#sweetpea-esp-210)
 - [Generic ESP8266 modules](#generic-esp8266-modules)
+- [WeMos D1](#wemos-d1)
+- [WeMos D1 mini](#wemos-d1-mini)
 
 ### Adafruit HUZZAH ESP8266 (ESP-12)
 
@@ -162,3 +164,57 @@ ESPxx Hardware
 
 ### Improved Stability
 ![ESP improved stability](ESP_improved_stability.png)
+
+### Boot Messages and Modes
+
+The ESP module checks at every boot the Pins 0, 2 and 15.
+based on them its boots in different modes:
+
+| GPIO15 | GPIO0 | GPIO2 | Mode                             |
+| ------ | ----- | ----- | -------------------------------- |
+| 0V     | 0V    | 3.3V  | Uart Bootloader                  |
+| 0V     | 3.3V  | 3.3V  | Boot sketch (SPI flash)          |
+| 3.3V   | x     | x     | SDIO mode (not used for Arduino) |
+
+
+at startup the ESP prints out the current boot mode example:
+```
+rst cause:2, boot mode:(3,6)
+```
+
+note: 
+ - GPIO2 is used as TX output and the internal Pullup is enabled on boot.
+
+#### rst cause
+
+| Number | Description            |
+| ------ | ---------------------- |
+| 0      | unknown                |
+| 1      | normal boot            |
+| 2      | reset pin              |
+| 3      | software reset         |
+| 4      | watchdog reset         | 
+
+
+#### boot mode
+
+the first value respects the pin setup of the Pins 0, 2 and 15.
+
+| Number | GPIO15 | GPIO0 | GPIO2 | Mode       |
+| ------ | ------ | ----- | ----- | ---------- |
+| 0      | 0V     | 0V    | 0V    | Not valid  |
+| 1      | 0V     | 0V    | 3.3V  | Uart       |
+| 2      | 0V     | 3.3V  | 0V    | Not valid  |
+| 3      | 0V     | 3.3V  | 3.3V  | Flash      |
+| 4      | 3.3V   | 0V    | 0V    | SDIO       |
+| 5      | 3.3V   | 0V    | 3.3V  | SDIO       |
+| 6      | 3.3V   | 3.3V  | 0V    | SDIO       |
+| 7      | 3.3V   | 3.3V  | 3.3V  | SDIO       |
+
+note:
+ - number = ((GPIO15 << 2) | (GPIO0 << 1) | GPIO2);
+
+### WeMos D1
+Product page: http://wemos.cc
+### WeMos D1 mini
+Product page: http://wemos.cc

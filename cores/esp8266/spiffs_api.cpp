@@ -71,11 +71,15 @@ public:
         }
         return true;
     }
-
-    bool info(uint32_t *total, uint32_t *used) override{
-    auto rc = SPIFFS_info(&_fs, total, used);
-     if (rc != SPIFFS_OK) {
-            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+    bool info(FSInfo& info) override {
+        info.maxOpenFiles = _maxOpenFds;
+        info.blockSize = _blockSize;
+        info.pageSize = _pageSize;
+        info.maxOpenFiles = _maxOpenFds;
+        info.maxPathLength = SPIFFS_OBJ_NAME_LEN;
+        auto rc = SPIFFS_info(&_fs, &info.totalBytes, &info.usedBytes);
+        if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFS_info: rc=%d, err=%d\r\n", rc, _fs.err_code);
             return false;
         }
         return true;
