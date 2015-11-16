@@ -119,7 +119,10 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 
         case HS_FINISHED:
             ret = process_finished(ssl, buf, hs_len);
+            ssl->fingerprint = ssl->x509_ctx->fingerprint;
+            ssl->x509_ctx->fingerprint = 0;
             disposable_free(ssl);   /* free up some memory */
+            increase_bm_data_size(ssl);
             /* note: client renegotiation is not allowed after this */
             break;
 

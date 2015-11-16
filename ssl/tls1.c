@@ -273,10 +273,8 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
     free(ssl->encrypt_ctx);
     free(ssl->decrypt_ctx);
     disposable_free(ssl);
-#ifdef CONFIG_SSL_CERT_VERIFICATION
-    x509_free(ssl->x509_ctx);
-#endif
-
+    free(ssl->bm_all_data);
+    free(ssl->fingerprint);
     free(ssl);
 }
 
@@ -315,8 +313,8 @@ EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
     {
         nw = n;
 
-        if (nw > RT_MAX_PLAIN_LENGTH)    /* fragment if necessary */
-            nw = RT_MAX_PLAIN_LENGTH;
+        if (nw > ssl->max_plain_length)    /* fragment if necessary */
+            nw = ssl->max_plain_length;
 
         if ((i = send_packet(ssl, PT_APP_PROTOCOL_DATA, 
                                             &out_data[tot], nw)) <= 0)
@@ -564,15 +562,18 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
 {
     SSL *ssl = (SSL *)calloc(1, sizeof(SSL));
     ssl->ssl_ctx = ssl_ctx;
+    ssl->max_plain_length = 1460*4;
+    ssl->bm_all_data = (uint8_t*) calloc(1, ssl->max_plain_length + RT_EXTRA);
     ssl->need_bytes = SSL_RECORD_SIZE;      /* need a record */
     ssl->client_fd = client_fd;
     ssl->flag = SSL_NEED_RECORD;
-    ssl->bm_data = ssl->bm_all_data+BM_RECORD_OFFSET; /* space at the start */
+    ssl->bm_data = ssl->bm_all_data + BM_RECORD_OFFSET; /* space at the start */
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
 #ifdef CONFIG_ENABLE_VERIFICATION
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
 #endif
     disposable_new(ssl);
+    ssl->fingerprint = 0;
 
     /* a bit hacky but saves a few bytes of memory */
     ssl->flag |= ssl_ctx->options;
@@ -646,20 +647,36 @@ static void increment_write_sequence(SSL *ssl)
 static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
-    int hmac_len = buf_len + 8 + SSL_RECORD_SIZE;
-    uint8_t *t_buf = (uint8_t *)malloc(hmac_len+10);
+    const prefix_size = 8 + SSL_RECORD_SIZE;
+    bool hmac_inplace = (uint32_t)buf - (uint32_t)ssl->bm_data >= prefix_size;
+    uint8_t tmp[prefix_size];
+    int hmac_len = buf_len + prefix_size;
+    uint8_t *t_buf;
+    if (hmac_inplace) {
+        t_buf = buf - prefix_size;
+        memcpy(tmp, t_buf, prefix_size);
+    } else {
+        t_buf = (uint8_t *)malloc(hmac_len+10);
+    }
 
-    memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ? 
+    memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ?
                     ssl->write_sequence : ssl->read_sequence, 8);
     memcpy(&t_buf[8], hmac_header, SSL_RECORD_SIZE);
-    memcpy(&t_buf[8+SSL_RECORD_SIZE], buf, buf_len);
+    if (!hmac_inplace) {
+        memcpy(&t_buf[8+SSL_RECORD_SIZE], buf, buf_len);
+    }
 
-    ssl->cipher_info->hmac(t_buf, hmac_len, 
-            (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_READ) ? 
-                ssl->server_mac : ssl->client_mac, 
+    ssl->cipher_info->hmac(t_buf, hmac_len,
+            (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_READ) ?
+                ssl->server_mac : ssl->client_mac,
             ssl->cipher_info->digest_size, hmac_buf);
 
-    free(t_buf);
+    if (hmac_inplace) {
+        memcpy(t_buf, tmp, prefix_size);
+    }
+    else {
+        free(t_buf);
+    }
 #if 0
     print_blob("record", hmac_header, SSL_RECORD_SIZE);
     print_blob("buf", buf, buf_len);
@@ -1272,9 +1289,10 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         ssl->need_bytes = (buf[3] << 8) + buf[4];
 
         /* do we violate the spec with the message size?  */
-        if (ssl->need_bytes > RT_MAX_PLAIN_LENGTH+RT_EXTRA-BM_RECORD_OFFSET)
+        if (ssl->need_bytes > ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET)
         {
             ret = SSL_ERROR_INVALID_PROT_MSG;              
+            printf("ssl->need_bytes=%d > %d\r\n", ssl->need_bytes, ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET);
             goto error;
         }
 
@@ -1387,6 +1405,19 @@ error:
         *in_data = NULL;
 
     return ret;
+}
+
+void increase_bm_data_size(SSL *ssl)
+{
+    uint8_t* pr = (uint8_t*) realloc(ssl->bm_all_data, RT_MAX_PLAIN_LENGTH + RT_EXTRA);
+    if (pr) {
+        ssl->max_plain_length = RT_MAX_PLAIN_LENGTH;
+        ssl->bm_all_data = pr;
+        ssl->bm_data = pr + BM_RECORD_OFFSET;
+    }
+    else {
+        printf("failed to grow plain buffer\r\n");
+    }
 }
 
 /**
@@ -1643,7 +1674,12 @@ void disposable_free(SSL *ssl)
         free(ssl->dc);
         ssl->dc = NULL;
     }
-
+#ifdef CONFIG_SSL_CERT_VERIFICATION
+    if (ssl->x509_ctx) {
+        x509_free(ssl->x509_ctx);
+        ssl->x509_ctx = 0;
+    }
+#endif
 }
 
 #ifndef CONFIG_SSL_SKELETON_MODE     /* no session resumption in this mode */
@@ -1889,10 +1925,9 @@ error:
 
 EXP_FUNC int STDCALL ssl_match_fingerprint(const SSL *ssl, const uint8_t* fp)
 {
-    uint8_t cert_fp[SHA1_SIZE];
-    X509_CTX* x509 = ssl->x509_ctx;
-
-    return memcmp(x509->fingerprint, fp, SHA1_SIZE);
+    if (!ssl->fingerprint)
+        return 1;
+    return memcmp(ssl->fingerprint, fp, SHA1_SIZE);
 }
 
 #endif /* CONFIG_SSL_CERT_VERIFICATION */

@@ -75,7 +75,7 @@ extern "C" {
 #define IS_SET_SSL_FLAG(A)          (ssl->flag & A)
 
 #define MAX_KEY_BYTE_SIZE           512     /* for a 4096 bit key */
-#define RT_MAX_PLAIN_LENGTH         4096
+#define RT_MAX_PLAIN_LENGTH         16384
 #define RT_EXTRA                    1024
 #define BM_RECORD_OFFSET            5
 
@@ -175,10 +175,11 @@ struct _SSL
     const cipher_info_t *cipher_info;
     void *encrypt_ctx;
     void *decrypt_ctx;
-    uint8_t bm_all_data[RT_MAX_PLAIN_LENGTH+RT_EXTRA];
+    uint8_t *bm_all_data;
     uint8_t *bm_data;
     uint16_t bm_index;
     uint16_t bm_read_index;
+    size_t max_plain_length;
     struct _SSL *next;                  /* doubly linked list */
     struct _SSL *prev;
     struct _SSL_CTX *ssl_ctx;           /* back reference to a clnt/svr ctx */
@@ -189,6 +190,7 @@ struct _SSL
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     X509_CTX *x509_ctx;
 #endif
+    uint8_t* fingerprint;
 
     uint8_t session_id[SSL_SESSION_ID_SIZE]; 
     uint8_t client_mac[SHA1_SIZE];  /* for HMAC verification */
@@ -260,6 +262,7 @@ void remove_ca_certs(CA_CERT_CTX *ca_cert_ctx);
 #ifdef CONFIG_SSL_ENABLE_CLIENT
 int do_client_connect(SSL *ssl);
 #endif
+void increase_bm_data_size(SSL *ssl);
 
 #ifdef CONFIG_SSL_FULL_MODE
 void DISPLAY_STATE(SSL *ssl, int is_send, uint8_t state, int not_ok);
