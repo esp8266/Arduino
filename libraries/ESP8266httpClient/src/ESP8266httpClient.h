@@ -43,20 +43,38 @@ class httpClient {
 
         bool connected(void);
 
-        bool GET();
-        bool POST(uint8_t * payload, size_t size);
-        bool POST(String payload);
+        /// request handling
+        int GET();
+        int POST(uint8_t * payload, size_t size);
+        int POST(String payload);
 
         void addHeader(const String& name, const String& value, bool first = false);
 
+        /// Response handling
+        void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
+        String header(const char* name);   // get request header value by name
+        String header(int i);              // get request header value by number
+        String headerName(int i);          // get request header name by number
+        int headers();                     // get header count
+        bool hasHeader(const char* name);  // check if header exists
 
+
+        size_t getSize(void);
 
         WiFiClient & getStream(void);
 
     protected:
+
+        struct RequestArgument {
+          String key;
+          String value;
+        };
+
+
         WiFiClient * _tcp;
         WiFiClientSecure * _tcps;
 
+        /// request handling
         String _host;
         uint16_t _port;
 
@@ -66,10 +84,17 @@ class httpClient {
 
         String  _Headers;
 
+        /// Response handling
+        RequestArgument* _currentHeaders;
+        size_t           _headerKeysCount;
+
+        int _returnCode;
+        size_t _size;
+
+
         bool connect(void);
-
         bool sendHeader(const char * type);
-
+        int handleHeaderResponse();
 
 };
 

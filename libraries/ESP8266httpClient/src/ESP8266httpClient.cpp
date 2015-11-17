@@ -31,19 +31,29 @@
 httpClient::httpClient() {
     _tcp = NULL;
     _tcps = NULL;
+
+    _headerKeysCount = 0;
+    _currentHeaders = NULL;
+
+    _returnCode = 0;
+    _size = 0;
 }
 
 httpClient::~httpClient() {
     if(connected()) {
         _tcp->stop();
     }
-}
 
+    if(_currentHeaders) {
+        delete[] _currentHeaders;
+    }
+    _headerKeysCount = 0;
+}
 
 void httpClient::begin(const char *host, uint16_t port, const char * url, bool https, const char * httpsFingerprint) {
     _host = host;
     _port = port;
-    _url  = url;
+    _url = url;
     _https = https;
     _httpsFingerprint = httpsFingerprint;
 }
@@ -63,7 +73,11 @@ bool httpClient::connected() {
     return false;
 }
 
-bool httpClient::GET() {
+/**
+ * send a GET request
+ * @return http code
+ */
+int httpClient::GET() {
 
     bool status;
     status = connect();
@@ -71,16 +85,20 @@ bool httpClient::GET() {
         status = sendHeader("GET");
     }
 
-    return status;
+    if(status) {
+        return handleHeaderResponse();
+    }
+
+    return 0;
 }
 
 /**
  * sends a post request to the server
  * @param payload uint8_t *
  * @param size size_t
- * @return status
+ * @return http code
  */
-bool httpClient::POST(uint8_t * payload, size_t size) {
+int httpClient::POST(uint8_t * payload, size_t size) {
 
     bool status;
     status = connect();
@@ -93,10 +111,13 @@ bool httpClient::POST(uint8_t * payload, size_t size) {
         status = _tcp->write(&payload[0], size);
     }
 
-    return status;
+    if(status) {
+        return handleHeaderResponse();
+    }
+    return 0;
 }
 
-bool httpClient::POST(String payload) {
+int httpClient::POST(String payload) {
     return POST((uint8_t *) payload.c_str(), payload.length());
 }
 
@@ -131,6 +152,56 @@ void httpClient::addHeader(const String& name, const String& value, bool first) 
     }
 }
 
+void httpClient::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
+    _headerKeysCount = headerKeysCount;
+    if(_currentHeaders)
+        delete[] _currentHeaders;
+    _currentHeaders = new RequestArgument[_headerKeysCount];
+    for(int i = 0; i < _headerKeysCount; i++) {
+        _currentHeaders[i].key = headerKeys[i];
+    }
+}
+
+String httpClient::header(const char* name) {
+    for(int i = 0; i < _headerKeysCount; ++i) {
+        if(_currentHeaders[i].key == name)
+            return _currentHeaders[i].value;
+    }
+    return String();
+}
+
+String httpClient::header(int i) {
+    if(i < _headerKeysCount)
+        return _currentHeaders[i].value;
+    return String();
+}
+
+String httpClient::headerName(int i) {
+    if(i < _headerKeysCount)
+        return _currentHeaders[i].key;
+    return String();
+}
+
+int httpClient::headers() {
+    return _headerKeysCount;
+}
+
+bool httpClient::hasHeader(const char* name) {
+    for(int i = 0; i < _headerKeysCount; ++i) {
+        if((_currentHeaders[i].key == name) && (_currentHeaders[i].value.length() > 0))
+            return true;
+    }
+    return false;
+}
+
+/**
+ * size of message body / payload
+ * @return 0 if no info or > 0 when Content-Length is set by server
+ */
+size_t httpClient::getSize(void) {
+    return _size;
+}
+
 /**
  * init TCP connection and handle ssl verify if needed
  * @return true if connection is ok
@@ -150,7 +221,6 @@ bool httpClient::connect(void) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect...\n");
         _tcp = new WiFiClient();
     }
-
 
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u.\n", _host.c_str(), _port);
@@ -184,12 +254,64 @@ bool httpClient::connect(void) {
  * @return status
  */
 bool httpClient::sendHeader(const char * type) {
+    if(!connected()) {
+        return false;
+    }
     String header = String(type) + " " + _url + " HTTP/1.1\r\n"
             "Host: " + _host + "\r\n"
             "User-Agent: ESP8266httpClient\r\n"
-            "Connection: close\r\n" +
-            _Headers +
-            "\r\n";
+            "Connection: close\r\n" + _Headers + "\r\n";
 
     return _tcp->write(header.c_str(), header.length());
+}
+
+/**
+ * reads the respone from the server
+ * @return int http code
+ */
+int httpClient::handleHeaderResponse() {
+
+    if(!connected()) {
+        return false;
+    }
+
+    while(connected()) {
+        size_t len = _tcp->available();
+        if(len > 0) {
+            String headerLine = _tcp->readStringUntil('\n');
+            headerLine.trim(); // remove \r
+
+            DEBUG_HTTPCLIENT("[HTTP][handleHeaderResponse] RX: '%s'\n", headerLine.c_str());
+
+            if(headerLine.startsWith("HTTP/1.")) {
+                _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
+            } else if(headerLine.indexOf(':')) {
+                String headerName = headerLine.substring(0, headerLine.indexOf(':'));
+                String headerValue = headerLine.substring(headerLine.indexOf(':') + 2);
+
+                if(headerName.equalsIgnoreCase("Content-Length")) {
+                    _size = headerValue.toInt();
+                }
+
+                for(size_t i = 0; i < _headerKeysCount; i++) {
+                    if(_currentHeaders[i].key == headerName) {
+                        _currentHeaders[i].value = headerValue;
+                        return true;
+                    }
+                }
+
+            }
+
+            if(headerLine == "") {
+                DEBUG_HTTPCLIENT("[HTTP][handleHeaderResponse] code: '%s'\n", String(_returnCode).c_str());
+                if(_size) {
+                    DEBUG_HTTPCLIENT("[HTTP][handleHeaderResponse] size: '%s'\n", String(_size).c_str());
+                }
+                return _returnCode;
+            }
+
+        } else {
+            delay(0);
+        }
+    }
 }
