@@ -15,7 +15,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 
 The best place to ask questions related to this core is ESP8266 community forum: http://www.esp8266.com/arduino.
-If you find this ESP8266 board manager useful, please consider supporting it with a donation. ESP8266 Community and IGRR have made this wonderful port available.
+If you find this ESP8266 board manager useful, please consider supporting it with a donation. The ESP8266 Community Forum and IGRR have made this wonderful port available.
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
 
 #### Available versions
