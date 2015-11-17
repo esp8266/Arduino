@@ -34,17 +34,19 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void) {
 }
 
 t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, const char * url, const char * current_version) {
-
-    t_httpUpdate_return ret = HTTP_UPDATE_FAILED;
     WiFiClient tcp;
     DEBUG_HTTP_UPDATE("[httpUpdate] connected to %s:%u %s .... ", host, port, url);
 
     if(!tcp.connect(host, port)) {
         DEBUG_HTTP_UPDATE("failed.\n");
-        return ret;
+        return HTTP_UPDATE_FAILED;
     }
     DEBUG_HTTP_UPDATE("ok.\n");
+    return update(tcp, host, url, current_version);
+}
 
+t_httpUpdate_return ESP8266HTTPUpdate::update(WiFiClient& tcp, const char* host, const char* url, const char * current_version) {
+    t_httpUpdate_return ret = HTTP_UPDATE_FAILED;
     // set Timeout for readBytesUntil and readStringUntil
     tcp.setTimeout(2000);
     tcp.setNoDelay(true);
