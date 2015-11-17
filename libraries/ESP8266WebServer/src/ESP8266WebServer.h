@@ -59,6 +59,7 @@ typedef struct {
 class ESP8266WebServer
 {
 public:
+  ESP8266WebServer(IPAddress addr, int port = 80);
   ESP8266WebServer(int port = 80);
   ~ESP8266WebServer();
 
