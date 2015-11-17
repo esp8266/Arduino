@@ -10,6 +10,8 @@ title: Supported Hardware
 - [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
 - [SweetPea ESP-210](#sweetpea-esp-210)
 - [Generic ESP8266 modules](#generic-esp8266-modules)
+- [WeMos D1](#wemos-d1)
+- [WeMos D1 mini](#wemos-d1-mini)
 
 ### Adafruit HUZZAH ESP8266 (ESP-12)
 
@@ -212,4 +214,7 @@ the first value respects the pin setup of the Pins 0, 2 and 15.
 note:
  - number = ((GPIO15 << 2) | (GPIO0 << 1) | GPIO2);
 
-
+### WeMos D1
+Product page: http://wemos.cc
+### WeMos D1 mini
+Product page: http://wemos.cc

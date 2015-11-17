@@ -50,6 +50,7 @@ class ESP8266HTTPUpdate {
 
         t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "");
         t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "");
+        t_httpUpdate_return update(WiFiClient& client, const char* host, const char* url = "/", const char * current_version = "");
 };
 
 extern ESP8266HTTPUpdate ESPhttpUpdate;

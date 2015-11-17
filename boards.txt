@@ -584,6 +584,8 @@ d1.menu.UploadTool.esptool.upload.verbose=-vv
 d1.menu.UploadTool.espota=OTA
 d1.menu.UploadTool.espota.upload.tool=espota
 
+d1.menu.UploadSpeed.921600=921600
+d1.menu.UploadSpeed.921600.upload.speed=921600
 d1.menu.UploadSpeed.115200=115200
 d1.menu.UploadSpeed.115200.upload.speed=115200
 d1.menu.UploadSpeed.9600=9600
@@ -601,8 +603,7 @@ d1.menu.UploadSpeed.460800.macosx=460800
 d1.menu.UploadSpeed.460800.upload.speed=460800
 d1.menu.UploadSpeed.512000.windows=512000
 d1.menu.UploadSpeed.512000.upload.speed=512000
-d1.menu.UploadSpeed.921600=921600
-d1.menu.UploadSpeed.921600.upload.speed=921600
+
 
 d1.menu.FlashSize.4M3M=4M (3M SPIFFS)
 d1.menu.FlashSize.4M3M.build.flash_size=4M
@@ -654,6 +655,8 @@ d1_mini.menu.UploadTool.esptool.upload.verbose=-vv
 d1_mini.menu.UploadTool.espota=OTA
 d1_mini.menu.UploadTool.espota.upload.tool=espota
 
+d1_mini.menu.UploadSpeed.921600=921600
+d1_mini.menu.UploadSpeed.921600.upload.speed=921600
 d1_mini.menu.UploadSpeed.115200=115200
 d1_mini.menu.UploadSpeed.115200.upload.speed=115200
 d1_mini.menu.UploadSpeed.9600=9600
@@ -671,8 +674,7 @@ d1_mini.menu.UploadSpeed.460800.macosx=460800
 d1_mini.menu.UploadSpeed.460800.upload.speed=460800
 d1_mini.menu.UploadSpeed.512000.windows=512000
 d1_mini.menu.UploadSpeed.512000.upload.speed=512000
-d1_mini.menu.UploadSpeed.921600=921600
-d1_mini.menu.UploadSpeed.921600.upload.speed=921600
+
 
 d1_mini.menu.FlashSize.4M3M=4M (3M SPIFFS)
 d1_mini.menu.FlashSize.4M3M.build.flash_size=4M

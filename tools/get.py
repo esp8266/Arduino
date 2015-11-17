@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# This script will download and extract required tools into the current directory
-# Tools list is obtained from tools.json file
-# Written by Ivan Grokhotkov, 2015
+# This script will download and extract required tools into the current directory.
+# Tools list is obtained from package/package_esp8266com_index.template.json file.
+# Written by Ivan Grokhotkov, 2015.
 #
 from __future__ import print_function
 import urllib
