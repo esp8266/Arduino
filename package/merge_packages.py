@@ -10,8 +10,8 @@ import sys
 
 def load_package(filename):
     pkg = json.load(open(filename))['packages'][0]
-    print("Loaded package {0} from {1}".format(pkg['name'], filename))
-    print("{0} platform(s), {1} tools".format(len(pkg['platforms']), len(pkg['tools'])))
+    print("Loaded package {0} from {1}".format(pkg['name'], filename), file=sys.stderr)
+    print("{0} platform(s), {1} tools".format(len(pkg['platforms']), len(pkg['tools'])), file=sys.stderr)
     return pkg
 
 def merge_objects(versions, obj):
@@ -19,17 +19,17 @@ def merge_objects(versions, obj):
         name = o['name'].encode('ascii')
         ver = o['version'].encode('ascii')
         if not name in versions:
-            print("found new object, {0}".format(name))
+            print("found new object, {0}".format(name), file=sys.stderr)
             versions[name] = {}
         if not ver in versions[name]:
-            print("found new version {0} for object {1}".format(ver, name))
+            print("found new version {0} for object {1}".format(ver, name), file=sys.stderr)
             versions[name][ver] = o
     return versions
 
 
 def main(args):
     if len(args) < 3:
-        print("Usage: {0} <package1> <package2>".format(args[0]))
+        print("Usage: {0} <package1> <package2>".format(args[0]), file=sys.stderr)
         return 1
 
     tools = {}
@@ -46,12 +46,12 @@ def main(args):
 
     for name in tools:
         for version in tools[name]:
-            print("Adding tool {0}-{1}".format(name, version))
+            print("Adding tool {0}-{1}".format(name, version), file=sys.stderr)
             pkg1['tools'].append(tools[name][version])
 
     for name in platforms:
         for version in platforms[name]:
-            print("Adding platform {0}-{1}".format(name, version))
+            print("Adding platform {0}-{1}".format(name, version), file=sys.stderr)
             pkg1['platforms'].append(platforms[name][version])
 
     json.dump({'packages':[pkg1]}, sys.stdout, indent=2)
