@@ -29,6 +29,7 @@ extern "C" {
 }
 
 #include "Server.h"
+#include "IPAddress.h"
 
 class ClientContext;
 class WiFiClient;
@@ -36,12 +37,14 @@ class WiFiClient;
 class WiFiServer : public Server {
 private:
   uint16_t _port;
+  IPAddress _addr;
   tcp_pcb* _pcb;
 
   ClientContext* _unclaimed;
   ClientContext* _discarded;
 
 public:
+  WiFiServer(IPAddress addr, uint16_t port);
   WiFiServer(uint16_t port);
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
@@ -56,7 +59,7 @@ public:
 
 protected:
   int8_t _accept(tcp_pcb* newpcb, int8_t err);
-  void   _discard(ClientContext* client);  
+  void   _discard(ClientContext* client);
 
   static int8_t _s_accept(void *arg, tcp_pcb* newpcb, int8_t err);
   static void _s_discard(void* server, ClientContext* ctx);

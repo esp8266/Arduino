@@ -31,23 +31,32 @@
 #define DEBUG_OUTPUT Serial
 
 
+ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
+: _server(addr, port)
+, _firstHandler(0)
+, _lastHandler(0)
+, _currentArgCount(0)
+, _currentArgs(0)
+, _headerKeysCount(0)
+, _currentHeaders(0)
+{
+}
+
 ESP8266WebServer::ESP8266WebServer(int port)
 : _server(port)
 , _firstHandler(0)
 , _lastHandler(0)
 , _currentArgCount(0)
 , _currentArgs(0)
-,_headerKeysCount(0)
-,_currentHeaders(0)
+, _headerKeysCount(0)
+, _currentHeaders(0)
 {
 }
 
 ESP8266WebServer::~ESP8266WebServer() {
-   if (_currentHeaders)
-     delete[]_currentHeaders;
+  if (_currentHeaders)
+    delete[]_currentHeaders;
   _headerKeysCount = 0;
-  if (!_firstHandler)
-    return;
   RequestHandler* handler = _firstHandler;
   while (handler) {
     RequestHandler* next = handler->next();

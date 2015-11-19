@@ -37,6 +37,11 @@ static void uart1_write_char_d(char c);
 static void print_stack(uint32_t start, uint32_t end);
 //static void print_pcs(uint32_t start, uint32_t end);
 
+extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) {
+}
+
+extern void custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) __attribute__ ((weak, alias("__custom_crash_callback")));
+
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
 
@@ -92,6 +97,9 @@ void __wrap_system_restart_local() {
 
     // print_pcs(sp + offset, stack_end);
     print_stack(sp + offset, stack_end);
+
+    custom_crash_callback( &rst_info, sp + offset, stack_end );
+
     delayMicroseconds(10000);
     __real_system_restart_local();
 }

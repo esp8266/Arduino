@@ -38,33 +38,41 @@ extern "C" {
 #include "cbuf.h"
 #include "include/ClientContext.h"
 
-WiFiServer::WiFiServer(uint16_t port)
+WiFiServer::WiFiServer(IPAddress addr, uint16_t port)
+: _port(port)
+, _addr(addr)
+, _pcb(nullptr)
+, _unclaimed(nullptr)
+, _discarded(nullptr)
 {
-    _port = port;
-    _pcb = 0;
-    _unclaimed = 0;
-    _discarded = 0;
 }
 
-void WiFiServer::begin()
+WiFiServer::WiFiServer(uint16_t port)
+: _port(port)
+, _addr((uint32_t) IPADDR_ANY)
+, _pcb(nullptr)
+, _unclaimed(nullptr)
+, _discarded(nullptr)
 {
-    err_t err;
+}
 
+void WiFiServer::begin() {
+    err_t err;
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
         return;
 
-    err = tcp_bind(pcb, INADDR_ANY, _port);
+    ip_addr_t local_addr;
+    local_addr.addr = (uint32_t) _addr;
+    err = tcp_bind(pcb, &local_addr, _port);
 
-    if (err != ERR_OK)
-    {
+    if (err != ERR_OK) {
         tcp_close(pcb);
         return;
     }
 
     tcp_pcb* listen_pcb = tcp_listen(pcb);
-    if (!listen_pcb)
-    {
+    if (!listen_pcb) {
         tcp_close(pcb);
         return;
     }
@@ -73,26 +81,30 @@ void WiFiServer::begin()
     tcp_arg(listen_pcb, (void*) this);
 }
 
-void WiFiServer::setNoDelay(bool nodelay){
-  if(!_pcb) return;
-  if(nodelay) tcp_nagle_disable(_pcb);
-  else tcp_nagle_enable(_pcb);
+void WiFiServer::setNoDelay(bool nodelay) {
+    if (!_pcb)
+      return;
+
+    if (nodelay)
+        tcp_nagle_disable(_pcb);
+    else
+        tcp_nagle_enable(_pcb);
 }
 
-bool WiFiServer::getNoDelay(){
-  if(!_pcb) return false;
-  return tcp_nagle_disabled(_pcb);
+bool WiFiServer::getNoDelay() {
+    if (!_pcb)
+        return false;
+    return tcp_nagle_disabled(_pcb);
 }
 
-bool WiFiServer::hasClient(){
-  if (_unclaimed) return true;
-  return false;
-}
-
-WiFiClient WiFiServer::available(byte* status)
-{
+bool WiFiServer::hasClient() {
     if (_unclaimed)
-    {
+        return true;
+    return false;
+}
+
+WiFiClient WiFiServer::available(byte* status) {
+    if (_unclaimed) {
         WiFiClient result(_unclaimed);
         _unclaimed = _unclaimed->next();
         DEBUGV("WS:av\r\n");
@@ -100,32 +112,28 @@ WiFiClient WiFiServer::available(byte* status)
     }
 
     optimistic_yield(1000);
-
     return WiFiClient();
 }
 
-uint8_t WiFiServer::status() {
+uint8_t WiFiServer::status()  {
     if (!_pcb)
         return CLOSED;
     return _pcb->state;
 }
 
 
-size_t WiFiServer::write(uint8_t b)
-{
+size_t WiFiServer::write(uint8_t b) {
     return write(&b, 1);
 }
 
-size_t WiFiServer::write(const uint8_t *buffer, size_t size)
-{
+size_t WiFiServer::write(const uint8_t *buffer, size_t size) {
     // write to all clients
     // not implemented
     return 0;
 }
 
 template<typename T>
-T* slist_append_tail(T* head, T* item)
-{
+T* slist_append_tail(T* head, T* item) {
     if (!head)
         return item;
     T* last = head;
@@ -135,29 +143,23 @@ T* slist_append_tail(T* head, T* item)
     return head;
 }
 
-int8_t WiFiServer::_accept(tcp_pcb* apcb, int8_t err)
-{
+int8_t WiFiServer::_accept(tcp_pcb* apcb, int8_t err) {
     DEBUGV("WS:ac\r\n");
     ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
     _unclaimed = slist_append_tail(_unclaimed, client);
     tcp_accepted(_pcb);
-    // printf("WiFiServer::_accept\r\n");
     return ERR_OK;
 }
 
-void WiFiServer::_discard(ClientContext* client)
-{
+void WiFiServer::_discard(ClientContext* client) {
     // _discarded = slist_append_tail(_discarded, client);
     DEBUGV("WS:dis\r\n");
-    // printf("WiFiServer::_discard\r\n");
 }
 
-int8_t WiFiServer::_s_accept(void *arg, tcp_pcb* newpcb, int8_t err)
-{
+int8_t WiFiServer::_s_accept(void *arg, tcp_pcb* newpcb, int8_t err) {
     return reinterpret_cast<WiFiServer*>(arg)->_accept(newpcb, err);
 }
 
-void WiFiServer::_s_discard(void* server, ClientContext* ctx)
-{
+void WiFiServer::_s_discard(void* server, ClientContext* ctx) {
     reinterpret_cast<WiFiServer*>(server)->_discard(ctx);
 }
