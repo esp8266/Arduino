@@ -44,6 +44,8 @@ public:
 
     ESP8266WiFiClass();
 
+    void persistent(bool persistent);
+
     void mode(WiFiMode);
     WiFiMode getMode();
 
@@ -56,8 +58,8 @@ public:
      * @param channel                   Optional. Channel of AP
      * @return
      */
-    int begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, uint8_t bssid[6] = NULL);
-    int begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, uint8_t bssid[6] = NULL);
+    int begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
+    int begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
 
     // Use sdk config to connect.
     int begin();
@@ -385,6 +387,7 @@ protected:
     bool _useApMode;
     bool _useClientMode;
 	bool _useStaticIp;
+    bool _persistent;
 
 	static bool _scanAsync;
 	static bool _scanStarted;
