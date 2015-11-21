@@ -328,7 +328,7 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int chan
         _mode(WIFI_AP);
     }
 
-    if(!ssid || strlen(ssid) || strlen(ssid) > 31) {
+    if(!ssid || *ssid == 0 || strlen(ssid) > 31) {
         // fail SSID too long or missing!
         return;
     }
