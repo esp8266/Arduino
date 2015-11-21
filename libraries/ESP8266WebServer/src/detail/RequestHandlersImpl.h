@@ -70,9 +70,6 @@ public:
         if (!requestUri.startsWith(_uri))
             return false; 
 
-        if (requestUri != _uri)
-            return false;
-
         return true;
     }
 
@@ -90,6 +87,11 @@ public:
             // Base URI doesn't point to a file. Append whatever follows this
             // URI in request to get the file path.
             path += requestUri.substring(_baseUriLength); 
+        }
+        
+        else if (requestUri != _uri) {
+            // Base URI points to a file but request doesn't match this URI exactly
+            return false;
         }
         DEBUGV("StaticRequestHandler::handle: path=%s, isFile=%d\r\n", path.c_str(), _isFile);
 
