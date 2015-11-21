@@ -17,13 +17,15 @@
  */
 
 #include <stdlib.h>
+#include <assert.h>
+#include <debug.h>
 extern "C" {
 #include "ets_sys.h"
 #include "os_type.h"
 #include "osapi.h"
 #include "mem.h"
-#include "user_interface.h"
 }
+
 
 void *operator new(size_t size) {
     size = ((size + 3) & ~((size_t)0x3));
@@ -47,27 +49,26 @@ extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
 void __cxa_pure_virtual(void) {
-    abort();
+    panic();
 }
 
 void __cxa_deleted_virtual(void) {
-    abort();
+    panic();
 }
 
 namespace std {
 void __throw_bad_function_call() {
-    abort();
+    panic();
 }
 
 void __throw_length_error(char const*) {
-	abort();
+    panic();
 }
 
 void __throw_bad_alloc() {
-	abort();
+    panic();
 }
 }
 
 // TODO: rebuild windows toolchain to make this unnecessary:
 void* __dso_handle;
-
