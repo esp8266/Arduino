@@ -34,6 +34,13 @@ ArduinoOTAClass::ArduinoOTAClass()
 {
 }
 
+ArduinoOTAClass::~ArduinoOTAClass(){
+  if(_udp_ota){
+    _udp_ota->unref();
+    _udp_ota = 0;
+  }
+}
+
 void ArduinoOTAClass::onStart(OTA_CALLBACK(fn)) {
     _start_callback = fn;
 }
@@ -48,9 +55,6 @@ void ArduinoOTAClass::onProgress(OTA_CALLBACK_PROGRESS(fn)) {
 
 void ArduinoOTAClass::onError(OTA_CALLBACK_ERROR(fn)) {
     _error_callback = fn;
-}
-
-ArduinoOTAClass::~ArduinoOTAClass() {
 }
 
 void ArduinoOTAClass::setPort(uint16_t port) {
@@ -82,6 +86,11 @@ void ArduinoOTAClass::begin() {
   }
   if (!_port) {
     _port = 8266;
+  }
+
+  if(_udp_ota){
+    _udp_ota->unref();
+    _udp_ota = 0;
   }
 
   _udp_ota = new UdpContext;
