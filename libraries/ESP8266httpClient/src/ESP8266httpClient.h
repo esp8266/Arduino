@@ -40,6 +40,7 @@
 #define HTTPC_ERROR_NOT_CONNECTED       (-4)
 #define HTTPC_ERROR_CONNECTION_LOST     (-5)
 #define HTTPC_ERROR_NO_STREAM           (-6)
+#define HTTPC_ERROR_NO_HTTP_SERVER      (-7)
 
 
 class httpClient {

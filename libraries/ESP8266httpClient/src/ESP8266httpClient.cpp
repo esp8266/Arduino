@@ -386,6 +386,9 @@ int httpClient::handleHeaderResponse() {
         return HTTPC_ERROR_NOT_CONNECTED;
     }
 
+    _returnCode = -1;
+    _size = -1;
+
     while(connected()) {
         size_t len = _tcp->available();
         if(len > 0) {
@@ -421,7 +424,12 @@ int httpClient::handleHeaderResponse() {
                 if(_size) {
                     DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] size: %d\n", _size);
                 }
-                return _returnCode;
+                if(_returnCode) {
+                    return _returnCode;
+                } else {
+                    DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] Remote host is not an HTTP Server!");
+                    return HTTPC_ERROR_NO_HTTP_SERVER;
+                }
             }
 
         } else {
