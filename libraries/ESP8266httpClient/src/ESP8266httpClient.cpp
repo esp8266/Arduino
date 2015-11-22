@@ -28,6 +28,9 @@
 
 #include "ESP8266httpClient.h"
 
+/**
+ * constractor
+ */
 httpClient::httpClient() {
     _tcp = NULL;
     _tcps = NULL;
@@ -43,17 +46,35 @@ httpClient::httpClient() {
 
 }
 
+/**
+ * deconstractor
+ */
 httpClient::~httpClient() {
-    if(connected()) {
+
+    if(_tcps) {
+        _tcps->stop();
+        _tcps->~WiFiClientSecure();
+        _tcps = NULL;
+        _tcp = NULL;
+    } else if(_tcp) {
         _tcp->stop();
+        _tcp->~WiFiClient();
+        _tcp = NULL;
     }
 
     if(_currentHeaders) {
         delete[] _currentHeaders;
     }
-    _headerKeysCount = 0;
 }
 
+/**
+ * begin
+ * @param host const char *
+ * @param port uint16_t
+ * @param url  const char *
+ * @param https bool
+ * @param httpsFingerprint const char *
+ */
 void httpClient::begin(const char *host, uint16_t port, const char * url, bool https, const char * httpsFingerprint) {
 
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port:%d url: %s https: %d httpsFingerprint: %s\n", host, port, url, https, httpsFingerprint);
@@ -98,7 +119,7 @@ void httpClient::end(void) {
  */
 bool httpClient::connected() {
     if(_tcp) {
-        return _tcp->connected();
+        return (_tcp->connected() || (_tcp->available() > 0));
     }
     return false;
 }
@@ -317,12 +338,22 @@ bool httpClient::connect(void) {
         return true;
     }
 
+
     if(_https) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect https...\n");
+        if(_tcps) {
+            _tcps->~WiFiClient();
+            _tcps = NULL;
+            _tcp = NULL;
+        }
         _tcps = new WiFiClientSecure();
         _tcp = _tcps;
     } else {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect http...\n");
+        if(_tcp) {
+            _tcp->~WiFiClient();
+            _tcp = NULL;
+        }
         _tcp = new WiFiClient();
     }
 
