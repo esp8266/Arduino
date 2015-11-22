@@ -33,6 +33,7 @@
 
 ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 : _server(addr, port)
+, _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
 , _currentArgCount(0)
@@ -44,6 +45,7 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 
 ESP8266WebServer::ESP8266WebServer(int port)
 : _server(port)
+, _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
 , _currentArgCount(0)
@@ -74,7 +76,11 @@ void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction ha
 }
 
 void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn) {
-  _addRequestHandler(new FunctionRequestHandler(fn, uri, method));
+  on(uri, method, fn, _fileUploadHandler);
+}
+
+void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn) {
+  _addRequestHandler(new FunctionRequestHandler(fn, ufn, uri, method));
 }
 
 void ESP8266WebServer::addHandler(RequestHandler* handler) {
@@ -352,13 +358,7 @@ void ESP8266WebServer::onNotFound(THandlerFunction fn) {
 }
 
 void ESP8266WebServer::_handleRequest() {
-  RequestHandler* handler;
-  for (handler = _firstHandler; handler; handler = handler->next()) {
-    if (handler->handle(*this, _currentMethod, _currentUri))
-      break;
-  }
-
-  if (!handler){
+  if (!_currentHandler){
 #ifdef DEBUG
     DEBUG_OUTPUT.println("request handler not found");
 #endif
@@ -369,6 +369,8 @@ void ESP8266WebServer::_handleRequest() {
     else {
       send(404, "text/plain", String("Not found: ") + _currentUri);
     }
+  } else {
+    _currentHandler->handle(*this, _currentMethod, _currentUri);
   }
 
   uint16_t maxWait = HTTP_MAX_CLOSE_WAIT;

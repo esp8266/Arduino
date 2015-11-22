@@ -27,8 +27,12 @@ void setup(void){
       server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/html", serverIndex);
     });
-    server.onFileUpload([](){
-      if(server.uri() != "/update") return;
+    server.on("/update", HTTP_POST, [](){
+      server.sendHeader("Connection", "close");
+      server.sendHeader("Access-Control-Allow-Origin", "*");
+      server.send(200, "text/plain", (Update.hasError())?"FAIL":"OK");
+      ESP.restart();
+    },[](){
       HTTPUpload& upload = server.upload();
       if(upload.status == UPLOAD_FILE_START){
         Serial.setDebugOutput(true);
@@ -51,12 +55,6 @@ void setup(void){
         Serial.setDebugOutput(false);
       }
       yield();
-    });
-    server.on("/update", HTTP_POST, [](){
-      server.sendHeader("Connection", "close");
-      server.sendHeader("Access-Control-Allow-Origin", "*");
-      server.send(200, "text/plain", (Update.hasError())?"FAIL":"OK");
-      ESP.restart();
     });
     server.begin();
     MDNS.addService("http", "tcp", 80);

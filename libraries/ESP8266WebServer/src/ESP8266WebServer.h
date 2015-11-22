@@ -40,12 +40,6 @@ enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
 
 class ESP8266WebServer;
 
-#include "detail/RequestHandler.h"
-
-namespace fs {
-class FS;
-}
-
 typedef struct {
   HTTPUploadStatus status;
   String  filename;
@@ -55,6 +49,12 @@ typedef struct {
   size_t  currentSize;  // size of data currently in buf
   uint8_t buf[HTTP_UPLOAD_BUFLEN];
 } HTTPUpload;
+
+#include "detail/RequestHandler.h"
+
+namespace fs {
+class FS;
+}
 
 class ESP8266WebServer
 {
@@ -69,6 +69,7 @@ public:
   typedef std::function<void(void)> THandlerFunction;
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);
+  void on(const char* uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
   void addHandler(RequestHandler* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
@@ -155,6 +156,7 @@ protected:
 
   String           _hostHeader;
 
+  RequestHandler*  _currentHandler;
   RequestHandler*  _firstHandler;
   RequestHandler*  _lastHandler;
   THandlerFunction _notFoundHandler;
