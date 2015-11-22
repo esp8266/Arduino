@@ -39,6 +39,7 @@
 #define HTTPC_ERROR_SEND_PAYLOAD_FAILD  (-3)
 #define HTTPC_ERROR_NOT_CONNECTED       (-4)
 #define HTTPC_ERROR_CONNECTION_LOST     (-5)
+#define HTTPC_ERROR_NO_STREAM           (-6)
 
 
 class httpClient {

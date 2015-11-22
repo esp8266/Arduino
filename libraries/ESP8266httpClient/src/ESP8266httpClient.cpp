@@ -80,11 +80,15 @@ void httpClient::begin(String host, uint16_t port, String url, bool https, Strin
  * called after the payload is handeld
  */
 void httpClient::end(void) {
-    if((!_reuse || !_canReuse) && connected()) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp stop \n");
-        _tcp->stop();
+    if(connected()) {
+        if(_reuse && _canReuse) {
+            DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
+        } else {
+            DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp stop\n");
+            _tcp->stop();
+        }
     } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
+        DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp is closed\n");
     }
 }
 
@@ -189,12 +193,16 @@ WiFiClient & httpClient::getStream(void) {
 /**
  * write all  message body / payload to Stream
  * @param stream Stream *
- * @return bytes written
+ * @return bytes written ( negative values are error codes )
  */
 int httpClient::writeToStream(Stream * stream) {
 
     if(!stream) {
-        return -1;
+        return HTTPC_ERROR_NO_STREAM;
+    }
+
+    if(!connected()) {
+        return HTTPC_ERROR_NOT_CONNECTED;
     }
 
     // get lenght of document (is -1 when Server sends no Content-Length header)
@@ -219,14 +227,17 @@ int httpClient::writeToStream(Stream * stream) {
             if(len > 0) {
                 len -= c;
             }
+
+            delay(0);
+        } else {
+            delay(1);
         }
-        delay(1);
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client] connection closed or file end.\n");
+    DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] connection closed or file end (written: %d).\n", bytesWritten);
 
     if(_size && _size != bytesWritten) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] bytesWritten %d and size %d  missmatch!.\n", bytesWritten, _size);
+        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] bytesWritten %d and size %d missmatch!.\n", bytesWritten, _size);
     }
 
     end();
