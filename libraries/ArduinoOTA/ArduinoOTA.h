@@ -1,7 +1,10 @@
 #ifndef __ARDUINO_OTA_H
 #define __ARDUINO_OTA_H
 
-class WiFiUDP;
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
+
+class UdpContext;
 
 #define OTA_CALLBACK(callback) void (*callback)()
 #define OTA_CALLBACK_PROGRESS(callback)  void (*callback)(unsigned int, unsigned int)
@@ -41,7 +44,7 @@ class ArduinoOTAClass
     String _password;
     String _hostname;
     String _nonce;
-    WiFiUDP _udp_ota;
+    UdpContext *_udp_ota;
     bool _initialized;
     ota_state_t _state;
     int _size;
@@ -56,6 +59,9 @@ class ArduinoOTAClass
     OTA_CALLBACK_PROGRESS(_progress_callback);
 
     void _runUpdate(void);
+    void _onRx(void);
+    int parseInt(void);
+    String readStringUntil(char end);
 };
 
 extern ArduinoOTAClass ArduinoOTA;
