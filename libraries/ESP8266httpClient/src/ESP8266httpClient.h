@@ -48,8 +48,11 @@ class httpClient {
 
         void begin(const char *host, uint16_t port, const char * url  = "/", bool https = false, const char * httpsFingerprint = "");
         void begin(String host, uint16_t port, String url = "/", bool https = false, String httpsFingerprint = "");
+        void end(void);
 
         bool connected(void);
+
+        void setReuse(bool reuse); /// keep-alive
 
         /// request handling
         int GET();
@@ -71,6 +74,7 @@ class httpClient {
         int getSize(void);
 
         WiFiClient & getStream(void);
+        int writeToStream(Stream * stream);
 
     protected:
 
@@ -86,6 +90,8 @@ class httpClient {
         /// request handling
         String _host;
         uint16_t _port;
+        bool _reuse;
+
 
         String _url;
         bool _https;
@@ -99,7 +105,7 @@ class httpClient {
 
         int _returnCode;
         int _size;
-
+        bool _canReuse;
 
         bool connect(void);
         bool sendHeader(const char * type);

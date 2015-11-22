@@ -32,11 +32,15 @@ httpClient::httpClient() {
     _tcp = NULL;
     _tcps = NULL;
 
+    _reuse = false;
+
     _headerKeysCount = 0;
     _currentHeaders = NULL;
 
     _returnCode = 0;
     _size = -1;
+    _canReuse = false;
+
 }
 
 httpClient::~httpClient() {
@@ -51,6 +55,8 @@ httpClient::~httpClient() {
 }
 
 void httpClient::begin(const char *host, uint16_t port, const char * url, bool https, const char * httpsFingerprint) {
+
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port:%d url: %s https: %d httpsFingerprint: %s\n", host, port, url, https, httpsFingerprint);
 
     _host = host;
     _port = port;
@@ -70,6 +76,19 @@ void httpClient::begin(String host, uint16_t port, String url, bool https, Strin
 }
 
 /**
+ * end
+ * called after the payload is handeld
+ */
+void httpClient::end(void) {
+    if((!_reuse || !_canReuse) && connected()) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp stop \n");
+        _tcp->stop();
+    } else {
+        DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
+    }
+}
+
+/**
  * connected
  * @return connected status
  */
@@ -78,6 +97,16 @@ bool httpClient::connected() {
         return _tcp->connected();
     }
     return false;
+}
+
+
+/**
+ * try to reuse the connection to the server
+ * keep-alive
+ * @param reuse bool
+ */
+void httpClient::setReuse(bool reuse) {
+    _reuse = reuse;
 }
 
 /**
@@ -158,6 +187,53 @@ WiFiClient & httpClient::getStream(void) {
 }
 
 /**
+ * write all  message body / payload to Stream
+ * @param stream Stream *
+ * @return bytes written
+ */
+int httpClient::writeToStream(Stream * stream) {
+
+    if(!stream) {
+        return -1;
+    }
+
+    // get lenght of document (is -1 when Server sends no Content-Length header)
+    int len = _size;
+    int bytesWritten = 0;
+
+    // create buffer for read
+    uint8_t buff[1460] = { 0 };
+
+    // read all data from server
+    while(connected() && (len > 0 || len == -1)) {
+
+        // get available data size
+        size_t size = _tcp->available();
+
+        if(size) {
+            int c = _tcp->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+
+            // write it to Stream
+            bytesWritten += stream->write(buff, c);
+
+            if(len > 0) {
+                len -= c;
+            }
+        }
+        delay(1);
+    }
+
+    DEBUG_HTTPCLIENT("[HTTP-Client] connection closed or file end.\n");
+
+    if(_size && _size != bytesWritten) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] bytesWritten %d and size %d  missmatch!.\n", bytesWritten, _size);
+    }
+
+    end();
+    return bytesWritten;
+}
+
+/**
  * adds Headder to the request
  * @param name
  * @param value
@@ -226,7 +302,7 @@ bool httpClient::hasHeader(const char* name) {
 bool httpClient::connect(void) {
 
     if(connected()) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, reuse!\n");
+        DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, try reuse!\n");
         return true;
     }
 
@@ -235,7 +311,7 @@ bool httpClient::connect(void) {
         _tcps = new WiFiClientSecure();
         _tcp = _tcps;
     } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect...\n");
+        DEBUG_HTTPCLIENT("[HTTP-Client] connect http...\n");
         _tcp = new WiFiClient();
     }
 
@@ -277,7 +353,14 @@ bool httpClient::sendHeader(const char * type) {
     String header = String(type) + " " + _url + " HTTP/1.1\r\n"
             "Host: " + _host + "\r\n"
             "User-Agent: ESP8266httpClient\r\n"
-            "Connection: close\r\n" + _Headers + "\r\n";
+            "Connection: ";
+
+    if(_reuse) {
+        header += "keep-alive";
+    } else {
+        header += "close";
+    }
+    header += "\r\n" + _Headers + "\r\n";
 
     return _tcp->write(header.c_str(), header.length());
 }
@@ -310,19 +393,22 @@ int httpClient::handleHeaderResponse() {
                     _size = headerValue.toInt();
                 }
 
+                if(headerName.equalsIgnoreCase("Connection")) {
+                    _canReuse = headerValue.equalsIgnoreCase("keep-alive");
+                }
+
                 for(size_t i = 0; i < _headerKeysCount; i++) {
-                    if(_currentHeaders[i].key == headerName) {
+                    if(_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
                         _currentHeaders[i].value = headerValue;
                         break;
                     }
                 }
-
             }
 
             if(headerLine == "") {
-                DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] code: '%s'\n", String(_returnCode).c_str());
+                DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] code: %d\n", _returnCode);
                 if(_size) {
-                    DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] size: '%s'\n", String(_size).c_str());
+                    DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] size: %d\n", _size);
                 }
                 return _returnCode;
             }
