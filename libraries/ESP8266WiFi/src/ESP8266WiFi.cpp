@@ -36,6 +36,7 @@ extern "C" {
 
 #include "WiFiClient.h"
 #include "WiFiUdp.h"
+#include "debug.h"
 
 extern "C" void esp_schedule();
 extern "C" void esp_yield();
@@ -44,12 +45,19 @@ ESP8266WiFiClass::ESP8266WiFiClass()
 : _smartConfigStarted(false)
 , _smartConfigDone(false)
 , _useStaticIp(false)
+, _persistent(true)
 {
     uint8 m = wifi_get_opmode();
     _useClientMode = (m & WIFI_STA);
     _useApMode = (m & WIFI_AP);
     wifi_set_event_handler_cb((wifi_event_handler_cb_t)&ESP8266WiFiClass::_eventCallback);
 }
+
+void ESP8266WiFiClass::persistent(bool persistent)
+{
+    _persistent = persistent;
+}
+
 
 void ESP8266WiFiClass::mode(WiFiMode m)
 {
@@ -69,9 +77,7 @@ void ESP8266WiFiClass::mode(WiFiMode m)
         _useClientMode = false;
     }
 
-    ETS_UART_INTR_DISABLE();
-    wifi_set_opmode(m);
-    ETS_UART_INTR_ENABLE();
+    _mode(m);
 }
 
 WiFiMode ESP8266WiFiClass::getMode()
@@ -86,15 +92,44 @@ void ESP8266WiFiClass::_mode(WiFiMode m)
     }
 
     ETS_UART_INTR_DISABLE();
-    wifi_set_opmode(m);
+    if (_persistent)
+        wifi_set_opmode(m);
+    else
+        wifi_set_opmode_current(m);
     ETS_UART_INTR_ENABLE();
+
 }
 
-int ESP8266WiFiClass::begin(char* ssid, char *passphrase, int32_t channel, uint8_t bssid[6]){
+static bool sta_config_equal(const station_config& lhs, const station_config& rhs)
+{
+    if (strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0)
+        return false;
+
+    if (strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0)
+        return false;
+
+    if (lhs.bssid_set) {
+        if (!rhs.bssid_set)
+            return false;
+
+        if (memcmp(lhs.bssid, rhs.bssid, 6) != 0)
+            return false;
+    }
+    else {
+        if (rhs.bssid_set)
+            return false;
+    }
+
+    return true;
+}
+
+int ESP8266WiFiClass::begin(char* ssid, char *passphrase, int32_t channel, const uint8_t* bssid)
+{
     return begin((const char*) ssid, (const char*) passphrase, channel, bssid);
 }
 
-int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t channel, uint8_t bssid[6]){
+int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t channel, const uint8_t* bssid)
+{
     _useClientMode = true;
 
     if(_useApMode) {
@@ -106,12 +141,12 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t ch
     }
 
     if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
-        // fail SSID to long or missing!
+        // fail SSID too long or missing!
         return WL_CONNECT_FAILED;
     }
 
     if(passphrase && strlen(passphrase) > 63) {
-        // fail passphrase to long!
+        // fail passphrase too long!
         return WL_CONNECT_FAILED;
     }
 
@@ -131,8 +166,18 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t ch
         conf.bssid_set = 0;
     }
 
+    struct station_config current_conf;
+    wifi_station_get_config(&current_conf);
+    if (sta_config_equal(current_conf, conf)) {
+        DEBUGV("sta config unchanged");
+        return status();
+    }
+
     ETS_UART_INTR_DISABLE();
-    wifi_station_set_config(&conf);
+    if (_persistent)
+        wifi_station_set_config(&conf);
+    else
+        wifi_station_set_config_current(&conf);
     wifi_station_connect();
     ETS_UART_INTR_ENABLE();
 
@@ -203,8 +248,10 @@ int ESP8266WiFiClass::softAPdisconnect(bool wifioff)
     *conf.ssid = 0;
     *conf.password = 0;
     ETS_UART_INTR_DISABLE();
-    wifi_softap_set_config(&conf);
-    wifi_station_disconnect();
+    if (_persistent)
+        wifi_softap_set_config(&conf);
+    else
+        wifi_softap_set_config_current(&conf);
     ETS_UART_INTR_ENABLE();
 
     if(wifioff) {
@@ -228,7 +275,10 @@ int ESP8266WiFiClass::disconnect(bool wifioff)
     *conf.ssid = 0;
     *conf.password = 0;
     ETS_UART_INTR_DISABLE();
-    wifi_station_set_config(&conf);
+    if (_persistent)
+        wifi_station_set_config(&conf);
+    else
+        wifi_station_set_config_current(&conf);
     wifi_station_disconnect();
     ETS_UART_INTR_ENABLE();
 
@@ -247,6 +297,20 @@ int ESP8266WiFiClass::disconnect(bool wifioff)
     return 0;
 }
 
+static bool softap_config_equal(const softap_config& lhs, const softap_config& rhs)
+{
+    if (strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0)
+        return false;
+    if (strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0)
+        return false;
+    if (lhs.channel != rhs.channel)
+        return false;
+    if (lhs.ssid_hidden != rhs.ssid_hidden)
+        return false;
+    return true;
+}
+
+
 void ESP8266WiFiClass::softAP(const char* ssid)
 {
     softAP(ssid, 0);
@@ -264,8 +328,8 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int chan
         _mode(WIFI_AP);
     }
 
-    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
-        // fail SSID to long or missing!
+    if(!ssid || *ssid == 0 || strlen(ssid) > 31) {
+        // fail SSID too long or missing!
         return;
     }
 
@@ -294,8 +358,19 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int chan
         strcpy(reinterpret_cast<char*>(conf.password), passphrase);
     }
 
+    struct softap_config conf_current;
+    wifi_softap_get_config(&conf_current);
+    if (!softap_config_equal(conf, conf_current))
+    {
+        DEBUGV("softap config unchanged");
+        return;
+    }
+
     ETS_UART_INTR_DISABLE();
-    wifi_softap_set_config(&conf);
+    if (_persistent)
+        wifi_softap_set_config(&conf);
+    else
+        wifi_softap_set_config_current(&conf);
     ETS_UART_INTR_ENABLE();
 }
 

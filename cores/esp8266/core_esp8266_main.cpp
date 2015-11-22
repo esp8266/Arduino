@@ -66,13 +66,6 @@ static os_event_t g_loop_queue[LOOP_QUEUE_SIZE];
 
 static uint32_t g_micros_at_task_start;
 
-
-extern "C" void abort() {
-    do {
-        *((int*)0) = 0;
-    } while(true);
-}
-
 extern "C" void esp_yield() {
     if (cont_can_yield(&g_cont)) {
         cont_yield(&g_cont);
@@ -89,7 +82,7 @@ extern "C" void __yield() {
         esp_yield();
     }
     else {
-        abort();
+        panic();
     }
 }
 
@@ -117,9 +110,8 @@ static void loop_wrapper() {
 static void loop_task(os_event_t *events) {
     g_micros_at_task_start = system_get_time();
     cont_run(&g_cont, &loop_wrapper);
-    if(cont_check(&g_cont) != 0) {
-        ets_printf("\r\nsketch stack overflow detected\r\n");
-        abort();
+    if (cont_check(&g_cont) != 0) {
+        panic();
     }
 }
 

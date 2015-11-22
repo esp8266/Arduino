@@ -1,6 +1,12 @@
 #!/bin/bash
 #
 
+# Figure out how will the package be called
+ver=`git describe --tags --always`
+package_name=esp8266-$ver
+echo "Version: $ver"
+echo "Package name: $package_name"
+
 # Set REMOTE_URL environment variable to the address where the package will be
 # available for download. This gets written into package json file.
 if [ -z "$REMOTE_URL" ]; then
@@ -8,13 +14,17 @@ if [ -z "$REMOTE_URL" ]; then
     echo "REMOTE_URL not defined, using default"
 fi
 echo "Remote: $REMOTE_URL"
-pushd ..
-# Figure out how will the package be called
-ver=`git describe --tags --always`
-package_name=esp8266-$ver
-echo "Version: $ver"
-echo "Package name: $package_name"
 
+if [ -z "$PKG_URL" ]; then
+    PKG_URL="$REMOTE_URL/versions/$ver/$package_name.zip"
+fi
+echo "Package: $PKG_URL"
+
+if [ -z "$DOC_URL" ]; then
+    DOC_URL="$REMOTE_URL/versions/$ver/doc/reference.html"
+fi
+echo "Docs: $DOC_URL"
+pushd ..
 # Create directory for the package
 outdir=package/versions/$ver/$package_name
 srcdir=$PWD
@@ -72,11 +82,11 @@ echo SHA-256: $sha
 echo "Making package_esp8266com_index.json"
 cat $srcdir/package/package_esp8266com_index.template.json | \
 jq ".packages[0].platforms[0].version = \"$ver\" | \
-    .packages[0].platforms[0].url = \"$REMOTE_URL/versions/$ver/$package_name.zip\" |\
+    .packages[0].platforms[0].url = \"$PKG_URL\" |\
     .packages[0].platforms[0].archiveFileName = \"$package_name.zip\" |\
     .packages[0].platforms[0].checksum = \"SHA-256:$sha\" |\
     .packages[0].platforms[0].size = \"$size\" |\
-    .packages[0].platforms[0].help.online = \"$REMOTE_URL/versions/$ver/doc/reference.html\"" \
+    .packages[0].platforms[0].help.online = \"$DOC_URL\"" \
     > package_esp8266com_index.json
 
 popd
