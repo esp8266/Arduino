@@ -182,26 +182,26 @@ void httpClient::collectHeaders(const char* headerKeys[], const size_t headerKey
     if(_currentHeaders)
         delete[] _currentHeaders;
     _currentHeaders = new RequestArgument[_headerKeysCount];
-    for(int i = 0; i < _headerKeysCount; i++) {
+    for(size_t i = 0; i < _headerKeysCount; i++) {
         _currentHeaders[i].key = headerKeys[i];
     }
 }
 
 String httpClient::header(const char* name) {
-    for(int i = 0; i < _headerKeysCount; ++i) {
+    for(size_t i = 0; i < _headerKeysCount; ++i) {
         if(_currentHeaders[i].key == name)
             return _currentHeaders[i].value;
     }
     return String();
 }
 
-String httpClient::header(int i) {
+String httpClient::header(size_t i) {
     if(i < _headerKeysCount)
         return _currentHeaders[i].value;
     return String();
 }
 
-String httpClient::headerName(int i) {
+String httpClient::headerName(size_t i) {
     if(i < _headerKeysCount)
         return _currentHeaders[i].key;
     return String();
@@ -212,7 +212,7 @@ int httpClient::headers() {
 }
 
 bool httpClient::hasHeader(const char* name) {
-    for(int i = 0; i < _headerKeysCount; ++i) {
+    for(size_t i = 0; i < _headerKeysCount; ++i) {
         if((_currentHeaders[i].key == name) && (_currentHeaders[i].value.length() > 0))
             return true;
     }

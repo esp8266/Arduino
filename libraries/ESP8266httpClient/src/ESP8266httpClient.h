@@ -62,8 +62,8 @@ class httpClient {
         /// Response handling
         void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
         String header(const char* name);   // get request header value by name
-        String header(int i);              // get request header value by number
-        String headerName(int i);          // get request header name by number
+        String header(size_t i);              // get request header value by number
+        String headerName(size_t i);          // get request header name by number
         int headers();                     // get header count
         bool hasHeader(const char* name);  // check if header exists
 
