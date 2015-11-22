@@ -36,7 +36,7 @@ httpClient::httpClient() {
     _currentHeaders = NULL;
 
     _returnCode = 0;
-    _size = 0;
+    _size = -1;
 }
 
 httpClient::~httpClient() {
@@ -51,11 +51,18 @@ httpClient::~httpClient() {
 }
 
 void httpClient::begin(const char *host, uint16_t port, const char * url, bool https, const char * httpsFingerprint) {
+
     _host = host;
     _port = port;
     _url = url;
     _https = https;
     _httpsFingerprint = httpsFingerprint;
+
+    _returnCode = 0;
+    _size = -1;
+
+    _Headers = "";
+
 }
 
 void httpClient::begin(String host, uint16_t port, String url, bool https, String httpsFingerprint) {
@@ -119,6 +126,15 @@ int httpClient::POST(uint8_t * payload, size_t size) {
 
 int httpClient::POST(String payload) {
     return POST((uint8_t *) payload.c_str(), payload.length());
+}
+
+
+/**
+ * size of message body / payload
+ * @return -1 if no info or > 0 when Content-Length is set by server
+ */
+int httpClient::getSize(void) {
+    return _size;
 }
 
 /**
@@ -194,13 +210,7 @@ bool httpClient::hasHeader(const char* name) {
     return false;
 }
 
-/**
- * size of message body / payload
- * @return 0 if no info or > 0 when Content-Length is set by server
- */
-size_t httpClient::getSize(void) {
-    return _size;
-}
+
 
 /**
  * init TCP connection and handle ssl verify if needed
@@ -209,7 +219,7 @@ size_t httpClient::getSize(void) {
 bool httpClient::connect(void) {
 
     if(connected()) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected!\n");
+        DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, reuse!\n");
         return true;
     }
 
@@ -229,7 +239,7 @@ bool httpClient::connect(void) {
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u.\n", _host.c_str(), _port);
 
-    if(_https) {
+    if(_https && _httpsFingerprint.length() > 0) {
         if(_tcps->verify(_httpsFingerprint.c_str(), _host.c_str())) {
             DEBUG_HTTPCLIENT("[HTTP-Client] https certificate matches\n");
         } else {

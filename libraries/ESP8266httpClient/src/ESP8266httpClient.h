@@ -59,7 +59,7 @@ class httpClient {
         bool hasHeader(const char* name);  // check if header exists
 
 
-        size_t getSize(void);
+        int getSize(void);
 
         WiFiClient & getStream(void);
 
@@ -89,7 +89,7 @@ class httpClient {
         size_t           _headerKeysCount;
 
         int _returnCode;
-        size_t _size;
+        int _size;
 
 
         bool connect(void);
