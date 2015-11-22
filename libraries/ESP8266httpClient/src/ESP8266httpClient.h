@@ -33,6 +33,14 @@
 
 #define HTTPCLIENT_TCP_TIMEOUT (1000)
 
+/// HTTP client errors
+#define HTTPC_ERROR_CONNECTION_REFUSED  (-1)
+#define HTTPC_ERROR_SEND_HEADER_FAILD   (-2)
+#define HTTPC_ERROR_SEND_PAYLOAD_FAILD  (-3)
+#define HTTPC_ERROR_NOT_CONNECTED       (-4)
+#define HTTPC_ERROR_CONNECTION_LOST     (-5)
+
+
 class httpClient {
     public:
         httpClient();
@@ -47,6 +55,7 @@ class httpClient {
         int GET();
         int POST(uint8_t * payload, size_t size);
         int POST(String payload);
+        int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
 
         void addHeader(const String& name, const String& value, bool first = false);
 

@@ -85,18 +85,7 @@ bool httpClient::connected() {
  * @return http code
  */
 int httpClient::GET() {
-
-    bool status;
-    status = connect();
-    if(status) {
-        status = sendHeader("GET");
-    }
-
-    if(status) {
-        return handleHeaderResponse();
-    }
-
-    return 0;
+    return sendRequest("GET");
 }
 
 /**
@@ -106,28 +95,45 @@ int httpClient::GET() {
  * @return http code
  */
 int httpClient::POST(uint8_t * payload, size_t size) {
-
-    bool status;
-    status = connect();
-    if(status) {
-        addHeader("Content-Length", String(size));
-        status = sendHeader("POST");
-    }
-
-    if(status) {
-        status = _tcp->write(&payload[0], size);
-    }
-
-    if(status) {
-        return handleHeaderResponse();
-    }
-    return 0;
+    return sendRequest("POST", payload, size);
 }
 
 int httpClient::POST(String payload) {
     return POST((uint8_t *) payload.c_str(), payload.length());
 }
 
+/**
+ * sendRequest
+ * @param type const char *     "GET", "POST", ....
+ * @param payload uint8_t *     data for the message body if null not send
+ * @param size size_t           size for the message body if 0 not send
+ * @return -1 if no info or > 0 when Content-Length is set by server
+ */
+int httpClient::sendRequest(const char * type, uint8_t * payload, size_t size) {
+    // connect ro server
+    if(!connect()) {
+        return HTTPC_ERROR_CONNECTION_REFUSED;
+    }
+
+    if(payload && size > 0) {
+        addHeader("Content-Length", String(size));
+    }
+
+    // send Header
+    if(!sendHeader(type)) {
+        return HTTPC_ERROR_SEND_HEADER_FAILD;
+    }
+
+    // send Payload if needed
+    if(payload && size > 0) {
+        if(_tcp->write(&payload[0], size) != size) {
+            return HTTPC_ERROR_SEND_PAYLOAD_FAILD;
+        }
+    }
+
+    // handle Server Response (Header)
+    return handleHeaderResponse();
+}
 
 /**
  * size of message body / payload
@@ -145,6 +151,9 @@ WiFiClient & httpClient::getStream(void) {
     if(connected()) {
         return *_tcp;
     }
+
+    DEBUG_HTTPCLIENT("[HTTP-Client] no stream to return!?\n");
+
     // todo return error?
 }
 
@@ -209,8 +218,6 @@ bool httpClient::hasHeader(const char* name) {
     }
     return false;
 }
-
-
 
 /**
  * init TCP connection and handle ssl verify if needed
@@ -282,7 +289,7 @@ bool httpClient::sendHeader(const char * type) {
 int httpClient::handleHeaderResponse() {
 
     if(!connected()) {
-        return false;
+        return HTTPC_ERROR_NOT_CONNECTED;
     }
 
     while(connected()) {
@@ -291,7 +298,7 @@ int httpClient::handleHeaderResponse() {
             String headerLine = _tcp->readStringUntil('\n');
             headerLine.trim(); // remove \r
 
-            DEBUG_HTTPCLIENT("[HTTP][handleHeaderResponse] RX: '%s'\n", headerLine.c_str());
+            DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] RX: '%s'\n", headerLine.c_str());
 
             if(headerLine.startsWith("HTTP/1.")) {
                 _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
@@ -306,16 +313,16 @@ int httpClient::handleHeaderResponse() {
                 for(size_t i = 0; i < _headerKeysCount; i++) {
                     if(_currentHeaders[i].key == headerName) {
                         _currentHeaders[i].value = headerValue;
-                        return true;
+                        break;
                     }
                 }
 
             }
 
             if(headerLine == "") {
-                DEBUG_HTTPCLIENT("[HTTP][handleHeaderResponse] code: '%s'\n", String(_returnCode).c_str());
+                DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] code: '%s'\n", String(_returnCode).c_str());
                 if(_size) {
-                    DEBUG_HTTPCLIENT("[HTTP][handleHeaderResponse] size: '%s'\n", String(_size).c_str());
+                    DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] size: '%s'\n", String(_size).c_str());
                 }
                 return _returnCode;
             }
@@ -324,4 +331,6 @@ int httpClient::handleHeaderResponse() {
             delay(0);
         }
     }
+
+    return HTTPC_ERROR_CONNECTION_LOST;
 }
