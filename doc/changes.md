@@ -1,5 +1,5 @@
 ---
-title: Change log
+title: Change Log
 ---
 
 *Current release*

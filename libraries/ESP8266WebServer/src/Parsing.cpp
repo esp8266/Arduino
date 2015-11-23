@@ -81,6 +81,14 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   DEBUG_OUTPUT.println(searchStr);
 #endif
 
+  //attach handler
+  RequestHandler* handler;
+  for (handler = _firstHandler; handler; handler = handler->next()) {
+    if (handler->canHandle(_currentMethod, _currentUri))
+      break;
+  }
+  _currentHandler = handler;
+
   String formData;
   // below is needed only when POST type request
   if (method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH || method == HTTP_DELETE){
@@ -279,7 +287,8 @@ void ESP8266WebServer::_parseArguments(String data) {
 
 void ESP8266WebServer::_uploadWriteByte(uint8_t b){
   if (_currentUpload.currentSize == HTTP_UPLOAD_BUFLEN){
-    if (_fileUploadHandler) _fileUploadHandler();
+    if(_currentHandler && _currentHandler->canUpload(_currentUri))
+      _currentHandler->upload(*this, _currentUri, _currentUpload);
     _currentUpload.totalSize += _currentUpload.currentSize;
     _currentUpload.currentSize = 0;
   }
@@ -397,7 +406,8 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             DEBUG_OUTPUT.print(" Type: ");
             DEBUG_OUTPUT.println(_currentUpload.type);
 #endif
-            if (_fileUploadHandler) _fileUploadHandler();
+            if(_currentHandler && _currentHandler->canUpload(_currentUri))
+              _currentHandler->upload(*this, _currentUri, _currentUpload);
             _currentUpload.status = UPLOAD_FILE_WRITE;
             uint8_t argByte = _uploadReadByte(client);
 readfile:
@@ -433,10 +443,12 @@ readfile:
               client.readBytes(endBuf, boundary.length());
 
               if (strstr((const char*)endBuf, boundary.c_str()) != NULL){
-                if (_fileUploadHandler) _fileUploadHandler();
+                if(_currentHandler && _currentHandler->canUpload(_currentUri))
+                  _currentHandler->upload(*this, _currentUri, _currentUpload);
                 _currentUpload.totalSize += _currentUpload.currentSize;
                 _currentUpload.status = UPLOAD_FILE_END;
-                if (_fileUploadHandler) _fileUploadHandler();
+                if(_currentHandler && _currentHandler->canUpload(_currentUri))
+                  _currentHandler->upload(*this, _currentUri, _currentUpload);
 #ifdef DEBUG
                 DEBUG_OUTPUT.print("End File: ");
                 DEBUG_OUTPUT.print(_currentUpload.filename);
@@ -534,6 +546,7 @@ String ESP8266WebServer::urlDecode(const String& text)
 
 bool ESP8266WebServer::_parseFormUploadAborted(){
   _currentUpload.status = UPLOAD_FILE_ABORTED;
-  if (_fileUploadHandler) _fileUploadHandler();
+  if(_currentHandler && _currentHandler->canUpload(_currentUri))
+    _currentHandler->upload(*this, _currentUri, _currentUpload);
   return false;
 }
