@@ -3,22 +3,29 @@ title: OTA Update
 ---
 
 ## Table of Contents
-* [Introduction](#introduction)
-  * [Security](#security)
-  * [Safety](#safety)
-  * [Basic Requirements](#basic-requirements)
-* [Arduino IDE](#arduino-ide)
-  * [Requirements](#requirements)
-  * [Application Example](#application-example)
-    * [Classic OTA](#classic-ota)
-    * [ArduinoOTA](#arduinoota)
-* [Web Browser](#web-browser)
-  * [Requirements](#requirements-1)
-  * [Implementation Overview](#implementation-overview)
-  * [Application Example](#application-example-1)
-* [HTTP Server](#http-server)
-* [Stream Interface](#stream-interface)
-* [Updater class](#updater-class)
+    * [Introduction](#introduction)
+      * [Security](#security)
+      * [Safety](#safety)
+      * [Basic Requirements](#basic-requirements)
+    * [Arduino IDE](#arduino-ide)
+      * [Requirements](#requirements)
+      * [Application Example](#application-example)
+        * [Classic OTA](#classic-ota)
+        * [ArduinoOTA](#arduinoota)
+    * [Web Browser](#web-browser)
+      * [Requirements](#requirements-1)
+      * [Implementation Overview](#implementation-overview)
+      * [Application Example](#application-example-1)
+    * [HTTP Server](#http-server)
+        * [Requirements](#requirements-2)
+        * [Arduino code](#arduino-code)
+          * [Simple updater](#simple-updater)
+          * [Advanced updater](#advanced-updater)
+        * [Server request handling](#server-request-handling)
+          * [Simple updater](#simple-updater-1)
+          * [Advanced updater](#advanced-updater-1)
+    * [Stream Interface](#stream-interface)
+    * [Updater class](#updater-class)
 
 
 ## Introduction
@@ -26,11 +33,12 @@ title: OTA Update
 OTA (Over the Air) update is the process of loading the firmware to ESP module using Wi-Fi connection rather that a serial port. Such functionality became extremely useful in case of limited or no physical access to the module.
 
 OTA may be done using:
+
 * [Arduino IDE](#arduino-ide)
 * [Web Browser](#web-browser)
 * [HTTP Server](#http-server)
 
-Arduino IDE option is intended primarily for software development phase. The two other options would be more useful after deployment, to provide module with application updates manually with a web browser or automatically using a http server. 
+Arduino IDE option is intended primarily for software development phase. The two other options would be more useful after deployment, to provide module with application updates manually with a web browser or automatically using a http server.
 
 In any case first firmware upload have to be done over a serial port. If OTA routines are correctly implemented in a sketch, then all subsequent uploads may be done over the air.
 
@@ -39,14 +47,16 @@ There is no imposed security on OTA process from being hacked. It is up to devel
 
 ### Security
 
-Module has to be exposed wirelessly to get it updated with a new sketch. That poses chances of module being violently hacked and loaded with some other code. To reduce likelihood of being hacked consider protecting your uploads with a password, selecting certain OTA port, etc. 
+Module has to be exposed wirelessly to get it updated with a new sketch. That poses chances of module being violently hacked and loaded with some other code. To reduce likelihood of being hacked consider protecting your uploads with a password, selecting certain OTA port, etc.
 
 Check functionality provided with [ArduinoOTA](https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA) library that may improve security:
+
 ```cpp
 void setPort(uint16_t port);
-void setHostname(const char *hostname);
-void setPassword(const char *password);
+void setHostname(const char* hostname);
+void setPassword(const char* password);
 ```
+
 Certain protection functionality is already built in and do not require any additional coding by developer. [ArduinoOTA](https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA) and espota.py use [Digest-MD5](https://en.wikipedia.org/wiki/Digest_access_authentication) to authenticate upload. Integrity of transferred data is verified on ESP side using [MD5](https://en.wikipedia.org/wiki/MD5) checksum.
 
 Make your own risk analysis and depending on application decide what library functions to implement. If required consider implementation of other means of protection from being hacked, e.g. exposing module for uploads only according to specific schedule, trigger OTA only be user pressing dedicated “Update” button, etc.
@@ -54,11 +64,12 @@ Make your own risk analysis and depending on application decide what library fun
 
 ### Safety
 
-OTA process takes ESP’s resources and bandwidth during upload. Then module is restarted and a new sketch executed. Analyse and test how it affects functionality of your existing and new sketch. 
+OTA process takes ESP’s resources and bandwidth during upload. Then module is restarted and a new sketch executed. Analyse and test how it affects functionality of your existing and new sketch.
 
 If ESP is placed in remote location and controlling some equipment, you should put additional attention what happens if operation of this equipment is suddenly interrupted by update process. Therefore decide how to put this equipment into safe state before starting the update.  For instance your module may be controlling a garden watering system in a sequence. If this sequence is not properly shut down and a water valve left open, your garden may be flooded if this valve is not closed after OTA is finished and module restarts.  
 
-The following functions are provided with [ArduinoOTA](https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA) library and intended to handle functionality of your application during specific stages of OTA on or on an OTA error:
+The following functions are provided with [ArduinoOTA](https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA) library and intended to handle functionality of your application during specific stages of OTA or on an OTA error:
+
 ```cpp
 void onStart(OTA_CALLBACK(fn));
 void onEnd(OTA_CALLBACK(fn));
@@ -88,8 +99,10 @@ Uploading modules wirelessly from Arduino IDE is intended for the following typi
 
 ### Application Example
 
-Currently there are two software configurations that support OTA updates
-- [Classic OTA](#classic-ota-configuration): Arduino IDE 1.6.5 and 1.6.5-947-g39819f0 (of July 23, 2015) or 1.6.5-1160-gef26c5f (of Sep 30, 2015) version of platform package that provides first OTA implementation, yet without support for [ArduinoOTA](https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA) library. This particular configuration is easier to configure in Arduino IDE and therefore suggested for less experienced users. It soon will be depreciated once implementation below is fully released. 
+Currently there are two software configurations that support OTA updates.
+
+- [Classic OTA](#classic-ota-configuration): Arduino IDE 1.6.5 and 1.6.5-947-g39819f0 (of July 23, 2015) or 1.6.5-1160-gef26c5f (of Sep 30, 2015) version of platform package that provides first OTA implementation, yet without support for [ArduinoOTA](https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA) library. This particular configuration is easier to configure in Arduino IDE and therefore suggested for less experienced users. It soon will be depreciated once implementation below is fully released.
+
 - [ArduinoOTA](#arduinoota-configuration): Arduino-PR-4107-BUILD-421 and latest git version of platform package that includes [ArduinoOTA](https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA) library. This configuration features preliminary build of Arduino IDE and is intended for more experienced users. Please mid your step.
 
 Instructions below demonstrate how to configure both [Classic OTA](#classic-ota-configuration) and [ArduinoOTA](#arduinoota-configuration) using NodeMCU 1.0 (ESP-12E Module) board.
@@ -98,46 +111,39 @@ Instructions below demonstrate how to configure both [Classic OTA](#classic-ota-
 #### Classic OTA
 
 1. Before you begin, please make sure that you have the following installed:
-  - Arduino IDE and ESP8266 board support as described under https://github.com/esp8266/Arduino#installing-with-boards-manager
-  - [Python](https://www.python.org/) 2.7 (do not install Python 3.5 that is not supported):
+    - Arduino IDE and ESP8266 board support as described under https://github.com/esp8266/Arduino#installing-with-boards-manager
+    - [Python](https://www.python.org/) 2.7 (do not install Python 3.5 that is not supported):
 
-    **Note:** Windows users should select “Add python.exe to Path” (see below – this option is not selected by default).
+        **Note:** Windows users should select “Add python.exe to Path” (see below – this option is not selected by default).
 
-    ![Python installation set up](ota-ide-python-configuration.png)
+        ![Python installation set up](ota-ide-python-configuration.png)
 
 2. Now prepare the sketch and configuration for the upload over a serial port.
+    - Start Arduino IDE and load sketch DNS_SD_Arduino_OTA.ino  available under File >  Examples > ESP8266mDNS
+        ![OTA sketch selection](ota-ide-sketch-selection.png)
+         **Note:** This sketch is available only for 1.6.5-947-g39819f0 (of July 23, 2015) and 1.6.5-1160-gef26c5f (of Sep 30, 2015) versions of platform packages installed in Arduino IDE using https://github.com/esp8266/Arduino#installing-with-boards-manager. It was removed in [#980](https://github.com/esp8266/Arduino/pull/980) from GitHub repository.
+    - Update ssid and pass in the sketch  so the module can join your Wi-Fi network
+        ![ssid and pass entry](ota-ide-ssid-pass-entry.png)
+    - Configure upload parameters as below (you may need to adjust configuration if you are using a different module):
+        ![configuration of serial upload](ota-ide-serial-upload-configuration.png)
 
-  - Start Arduino IDE and load sketch DNS_SD_Arduino_OTA.ino  available under File >  Examples > ESP8266mDNS
+3. Upload the sketch (Ctrl+U). Once done open Serial Monitor (Ctrl+Shift+M) and check if module has joined your Wi-Fi network.
 
-    ![OTA sketch selection](ota-ide-sketch-selection.png)
-
-    **Note:** This sketch is available only for 1.6.5-947-g39819f0 (of July 23, 2015) and 1.6.5-1160-gef26c5f (of Sep 30, 2015) versions of platform packages installed in Arduino IDE using https://github.com/esp8266/Arduino#installing-with-boards-manager. It was removed in [#980](https://github.com/esp8266/Arduino/pull/980) from GitHub repository.
-
-  - Update ssid and pass in the sketch  so the module can join your Wi-Fi network
-
-    ![ssid and pass entry](ota-ide-ssid-pass-entry.png)
-
-  - Configure upload parameters as below (you may need to adjust configuration if you are using a different module):
-
-    ![configuration of serial upload](ota-ide-serial-upload-configuration.png)
-
-3. Upload the sketch (Ctrl+U). Once done open Serial Monitor (Ctrl+Shift+M) and check if module has joined your Wi-Fi network. 
-
-  ![check if module joined network](ota-ide-module-joined-wifi.png)
+    ![check if module joined network](ota-ide-module-joined-wifi.png)
 
 4. Only if module is connected to network, after a couple of seconds, the esp8266-ota port will show up in Arduino IDE:
 
-  ![selection og OTA port](ota-ide-ota-port-selection.png)
+    ![selection og OTA port](ota-ide-ota-port-selection.png)
 
 5. Now get ready for your first OTA upload by changing configuration settings as follows:
 
-  ![configuration of OTA upload](ota-ide-ota-upload-configuration.png)
+    ![configuration of OTA upload](ota-ide-ota-upload-configuration.png)
 
-  **Note:** If you do not see “Upload Using: OTA” option available for “NodeMCU 1.0 (ESP-12E Module)” board, please upload the latest [boards.txt](https://github.com/esp8266/Arduino/blob/master/boards.txt) file from GitHub repository, replace existing file and restart Arduino IDE.
+    **Note:** If you do not see “Upload Using: OTA” option available for “NodeMCU 1.0 (ESP-12E Module)” board, please upload the latest [boards.txt](https://github.com/esp8266/Arduino/blob/master/boards.txt) file from GitHub repository, replace existing file and restart Arduino IDE.
 
 6. If you have successfully completed all the above steps, you can upload (Ctrl+U) the same (or any other) sketch over OTA:
 
-  ![OTA upload complete](ota-ide-ota-upload-complete.png)
+    ![OTA upload complete](ota-ide-ota-upload-complete.png)
 
 **Note** To be able to upload your sketch over and over again using OTA, you need to embed OTA routines inside. Please use DNS_SD_Arduino_OTA.ino as an example.
 
@@ -157,6 +163,7 @@ Instructions below demonstrate how to configure both [Classic OTA](#classic-ota-
 ## Web Browser
 
 Updates described in this chapter are done with a web browser that can be useful in the following typical scenarios:
+
 - after application deployment if loading directly from Arduino IDE is inconvenient or not possible
 - after deployment if user is unable to expose module for OTA from external update server
 - to provide updates after deployment to small quantity of modules when setting an update server is not practicable
@@ -200,46 +207,39 @@ You can use another module if it meets “Flash chip size is 2x the size of the 
 
 
 1. Before you begin, please make sure that you have the following software installed:
-
-  - Arduino IDE and 2.0.0-rc1 (of Nov 17, 2015) version of platform package as described under https://github.com/esp8266/Arduino#installing-with-boards-manager
-  - Host software depending on O/S you use:
-    1. Avahi http://avahi.org/ for Linux
-    2. Bonjour http://www.apple.com/support/bonjour/ for Windows
-    3. Mac OSX and iOS - support is already built in / no any extra s/w is required
+    - Arduino IDE and 2.0.0-rc1 (of Nov 17, 2015) version of platform package as described under https://github.com/esp8266/Arduino#installing-with-boards-manager
+    - Host software depending on O/S you use:
+        1. Avahi http://avahi.org/ for Linux
+        2. Bonjour http://www.apple.com/support/bonjour/ for Windows
+        3. Mac OSX and iOS - support is already built in / no any extra s/w is required
 
 2. Prepare the sketch and configuration for initial upload with a serial port.
-  - Start Arduino IDE and load sketch WebUpdater.ino available under File > Examples > ESP8266HTTPUpdateServer.
-  - Update ssid and pass in the sketch so the module can join your Wi-Fi network.
-  - Open File > Preferences, look for “Show verbose output during:” and check out “compilation” option. 
+    - Start Arduino IDE and load sketch WebUpdater.ino available under File > Examples > ESP8266HTTPUpdateServer.
+    - Update ssid and pass in the sketch so the module can join your Wi-Fi network.
+    - Open File > Preferences, look for “Show verbose output during:” and check out “compilation” option.
+        ![Preferences - enablig verbose output during compilation](ota-web-show-verbose-compilation.png)
+        **Note:** This setting will be required in step 5 below. You can uncheck this setting afterwards.
 
-    ![Preferences - enablig verbose output during compilation](ota-web-show-verbose-compilation.png)
-
-    **Note:** This setting will be required in step 5 below. You can uncheck this setting it afterwards.
-
-3. Upload sketch (Ctrl+U). Once done open Serial Monitor (Ctrl+Shift+M) and check if you see the following message displayed, that contains url for OTA update. 
-
-  ![Serial Monitor - after first load using serial](ota-web-serial-monitor-ready.png)
-
-  **Note:** Such message will be shown only after module successfully joins network and is ready for an OTA upload:
+3. Upload sketch (Ctrl+U). Once done open Serial Monitor (Ctrl+Shift+M) and check if you see the following message displayed, that contains url for OTA update.
+    ![Serial Monitor - after first load using serial](ota-web-serial-monitor-ready.png)
+    **Note:** Such message will be shown only after module successfully joins network and is ready for an OTA upload:
 
 4. Now open web browser and enter the url provided on Serial Monitor, i.e. http://esp8266-webupdate.local/update. Once entered, browser should display a form like below that has been served by your module. The form invites you to choose a file for update.
-
-  ![OTA update form in web browser](ota-web-browser-form.png)
-
-  **Note:** If entering “http://esp8266-webupdate.local/update” does not work, try replacing “esp8266-webupdate” with module’s IP address. For example, if your module IP is “192.168.1.100” then url should be “http://192.168.1.100/update”. This workaround is useful in case the host software installed in step 2 does not work. If still nothing works and there are no clues on Serial Monitor, try to diagnose issue by opening provided url in Google Chrome, pressing F12 and checking contents of “Console” and “Network” tabs. Chrome provides some advanced logging on these tabs.
+    ![OTA update form in web browser](ota-web-browser-form.png)
+    **Note:** If entering “http://esp8266-webupdate.local/update” does not work, try replacing “esp8266-webupdate” with module’s IP address. For example, if your module IP is “192.168.1.100” then url should be “http://192.168.1.100/update”. This workaround is useful in case the host software installed in step 2 does not work. If still nothing works and there are no clues on Serial Monitor, try to diagnose issue by opening provided url in Google Chrome, pressing F12 and checking contents of “Console” and “Network” tabs. Chrome provides some advanced logging on these tabs.
 
 
-5. To obtain the file navigate to directory used by Arduino IDE to store results of compilation. You can check the path to this file in compilation log shown in IDE debug window as marked below. 
+5. To obtain the file navigate to directory used by Arduino IDE to store results of compilation. You can check the path to this file in compilation log shown in IDE debug window as marked below.
 
-  ![Compilation complete - path to binary file](ota-web-path-to-binary.png)
+    ![Compilation complete - path to binary file](ota-web-path-to-binary.png)
 
 6. Now press “Choose File” in web browser, go to directory identified in step 5 above, find the file “WebUpdater.cpp.bin” and upload it. If upload is successful you will see “OK” on web browser like below.
 
-  ![OTA update complete](ota-web-browser-form-ok.png)
+    ![OTA update complete](ota-web-browser-form-ok.png)
 
-  Module will reboot that should be visible on Serial Monitor:
+    Module will reboot that should be visible on Serial Monitor:
 
-  ![Serial Monitor - after OTA update](ota-web-serial-monitor-reboot.png)
+    ![Serial Monitor - after OTA update](ota-web-serial-monitor-reboot.png)
 
 Just after reboot you should see exactly the same message “HTTPUpdateServer ready! Open http:// esp8266-webupdate.local /update in your browser” like in step 3. This is because module has been loaded again with the same code – first using serial port, and then using OTA.
 
@@ -319,6 +319,7 @@ Example header data:
 With this information the script now can check if a update is needed. It is also possible to deliver different binaries based on the MAC address for example.
 
 Script example:
+
 ```php
 <?PHP
 
@@ -385,7 +386,7 @@ header($_SERVER["SERVER_PROTOCOL"].' 500 no version for ESP MAC', true, 500);
 
 TODO describe Stream Interface
 
-The Stream Interface is the base for all other update modes like OTA, http Server / client. 
+The Stream Interface is the base for all other update modes like OTA, http Server / client.
 
 
 ## Updater class
@@ -393,4 +394,3 @@ The Stream Interface is the base for all other update modes like OTA, http Serve
 TODO describe Updater class
 
 Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader to load the new firmware on the next boot.
-
