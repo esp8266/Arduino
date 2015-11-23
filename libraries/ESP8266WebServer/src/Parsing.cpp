@@ -107,7 +107,8 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         break;
       }
       headerName = req.substring(0, headerDiv);
-      headerValue = req.substring(headerDiv + 2);
+      headerValue = req.substring(headerDiv + 1);
+      headerValue.trim();
        _collectHeader(headerName.c_str(),headerValue.c_str());
 	  
 	  #ifdef DEBUG
