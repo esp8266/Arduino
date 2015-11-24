@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Supported Hardware &middot; ESP8266 Arduino Core
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0-rc2/public/css/poole.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0-rc2/public/css/syntax.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0-rc2/public/css/hyde.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0-rc2/public/css/icons.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <!-- Icons -->
+  <link rel="shortcut icon" href="/Arduino/versions/2.0.0-rc2/public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="/Arduino/versions/2.0.0-rc2/public/js/toc.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        $('#toc').toc({ listType: 'ul', showSpeed: 0, title: '', headers: 'h1, h2', minimumHeaders: 2 });
+    });
+  </script>
+</head>
+
+
+  <body>
+
+    <div class="version-bar">
+  This documentation is for version 2.0.0-rc2. <a href="http://esp8266.github.io/Arduino/versions">Other versions.</a>
+</div>
+
+<div class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <h2>
+        <a href="http://esp8266.github.io/Arduino">
+          ESP8266 Arduino Core
+        </a>
+      </h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0-rc2/doc/installing.html">Installation</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0-rc2/doc/reference.html">Reference</a>
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0-rc2/doc/libraries.html">Libraries</a>
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0-rc2/doc/filesystem.html">File System</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0-rc2/doc/ota_updates/ota_updates.html">OTA Update</a>
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0-rc2/doc/boards.html">Supported Hardware</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+            <div id="toc"></div>
+        
+      
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0-rc2/doc/changes.html">Change Log</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+    </nav>
+  <p>
+    <a href="https://github.com/esp8266/Arduino"><div id="gh-icon"></div>esp8266/Arduino</a>
+  </p>
+  <p class="lead">Documentation for ESP8266 Arduino Core. Installation instructions, functions and classes reference.
+</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <h2 id="table-of-contents">Table of contents</h2>
+<div class="highlight"><pre><code class="language-text" data-lang="text">* [Adafruit HUZZAH ESP8266 (ESP\-12)](#adafruit-huzzah-esp8266-esp-12)
+* [NodeMCU 0\.9 &lt;a name=&quot;user\-content\-nodemcu\-0\-9&quot;&gt;&lt;/a&gt;](#nodemcu-09-)
+  * [Pin mapping](#pin-mapping)
+* [NodeMCU 1\.0](#nodemcu-10)
+* [Olimex MOD\-WIFI\-ESP8266\-DEV](#olimex-mod-wifi-esp8266-dev)
+* [Olimex MOD\-WIFI\-ESP8266](#olimex-mod-wifi-esp8266)
+* [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
+* [SweetPea ESP\-210](#sweetpea-esp-210)
+* [Generic ESP8266 modules](#generic-esp8266-modules)
+* [Serial Adapter](#serial-adapter)
+* [Minimal Hardware Setup for Bootloading and Usage](#minimal-hardware-setup-for-bootloading-and-usage)
+* [ESP to Serial](#esp-to-serial)
+  * [Minimal Hardware Setup for Bootloading only](#minimal-hardware-setup-for-bootloading-only)
+  * [Minimal Hardware Setup for Running only](#minimal-hardware-setup-for-running-only)
+* [Minimal](#minimal)
+* [Improved Stability](#improved-stability)
+* [Boot Messages and Modes](#boot-messages-and-modes)
+  * [rst cause](#rst-cause)
+  * [boot mode](#boot-mode)
+* [WeMos D1](#wemos-d1)
+* [WeMos D1 mini](#wemos-d1-mini)
+</code></pre></div>
+<h2 id="adafruit-huzzah-esp8266-esp-12">Adafruit HUZZAH ESP8266 (ESP-12)</h2>
+
+<p><em>TODO: add notes</em></p>
+
+<h2 id="nodemcu-0-9">NodeMCU 0.9</h2>
+
+<h3 id="pin-mapping">Pin mapping</h3>
+
+<p>Pin numbers written on the board itself do not correspond to ESP8266 GPIO pin numbers. Constants are defined to make using this board easier:</p>
+<div class="highlight"><pre><code class="language-C++" data-lang="C++"><span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D0</span>   <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D1</span>   <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D2</span>   <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D3</span>   <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D4</span>   <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D5</span>   <span class="o">=</span> <span class="mi">14</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D6</span>   <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D7</span>   <span class="o">=</span> <span class="mi">13</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D8</span>   <span class="o">=</span> <span class="mi">15</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D9</span>   <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="k">static</span> <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">D10</span>  <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+<p>If you want to use NodeMCU pin 5, use D5 for pin number, and it will be translated to &#39;real&#39; GPIO pin 14.</p>
+
+<h2 id="nodemcu-1-0">NodeMCU 1.0</h2>
+
+<p>This module is sold under many names for around $6.50 on AliExpress and it&#39;s one of the cheapest, fully integrated ESP8266 solutions.</p>
+
+<p>It&#39;s an open hardware design with an ESP-12E core and 4 MB of SPI flash.</p>
+
+<p>Acording to the manufacturer, &quot;with a micro USB cable, you can connect NodeMCU devkit to your laptop and flash it without any trouble&quot;. This is more or less true: the board comes with a CP2102 onboard USB to serial adapter which just works, well, the majority of the time. Sometimes flashing fails and you have to reset the board by holding down FLASH + RST, then releasing FLASH, then releasing RST. This forces the CP2102 device to power cycle and to be re-numbered by Linux.</p>
+
+<p>The board also features a NCP1117 voltage regulator, a blue LED on GPIO16 and a 220k/100k Ohm voltage divider on the ADC input pin.</p>
+
+<p>Full pinout and PDF schematics can be found <a href="https://github.com/nodemcu/nodemcu-devkit-v1.0">here</a></p>
+
+<h2 id="olimex-mod-wifi-esp8266-dev">Olimex MOD-WIFI-ESP8266-DEV</h2>
+
+<p>This board comes with 2 MB of SPI flash and optional accessories (e.g. evaluation board ESP8266-EVB or BAT-BOX for batteries).</p>
+
+<p>The basic module has three solder jumpers that allow you to switch the operating mode between SDIO, UART and FLASH.</p>
+
+<p>The board is shipped for FLASH operation mode, with jumpers TD0JP=0, IO0JP=1, IO2JP=1.</p>
+
+<p>Since jumper IO0JP is tied to GPIO0, which is PIN 21, you&#39;ll have to ground it before programming with a USB to serial adapter and reset the board by power cycling it.</p>
+
+<p>UART pins for programming and serial I/O are GPIO1 (TXD, pin 3) and GPIO3 (RXD, pin 4).</p>
+
+<p>Get the board schematics <a href="https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf">here</a></p>
+
+<h2 id="olimex-mod-wifi-esp8266">Olimex MOD-WIFI-ESP8266</h2>
+
+<p>This is a stripped down version of the above. Behaves identically in terms of jumpers but has less pins readily available for I/O. Still 2 MB of SPI flash.</p>
+
+<h2 id="sparkfun-esp8266-thing">SparkFun ESP8266 Thing</h2>
+
+<p>Product page: <a href="https://www.sparkfun.com/products/13231">https://www.sparkfun.com/products/13231</a></p>
+
+<p><em>TODO: add notes</em></p>
+
+<h2 id="sweetpea-esp-210">SweetPea ESP-210</h2>
+
+<p><em>TODO: add notes</em></p>
+
+<h2 id="generic-esp8266-modules">Generic ESP8266 modules</h2>
+
+<p>These modules come in different form factors and pinouts. See the page at ESP8266 community wiki for more info:
+<a href="http://www.esp8266.com/wiki/doku.php?id=esp8266-module-family">ESP8266 Module Family</a>.</p>
+
+<p>Usually these modules have no bootstapping resistors on board, insufficient decoupling capacitors, no voltage regulator, no reset circuit, and no USB-serial adapter. This makes using them somewhat tricky, compared to development boards which add these features.</p>
+
+<p>In order to use these modules, make sure to observe the following:</p>
+
+<ul>
+<li><p><strong>Provide sufficient power to the module.</strong> For stable use of the ESP8266 a power supply with 3.3V and &gt;= 250mA is required. Using the power available from USB to Serial adapter is not recommended, these adapters typically do not supply enough current to run ESP8266 reliably in every situation. An external supply or regulator along with filtering capacitors is preferred.</p></li>
+<li><p><strong>Connect bootstapping resistors</strong> to GPIO0, GPIO2, GPIO15 according to the schematics below.</p></li>
+<li><p><strong>Put ESP8266 into bootloader mode</strong> before uploading code.</p></li>
+</ul>
+
+<h2 id="serial-adapter">Serial Adapter</h2>
+
+<p>There are many different USB to Serial adapters / boards.
+To be able to put ESP8266 into bootloader mode using serial handshaking lines, you need the adapter which breaks out RTS and DTR outputs. CTS and DSR are not useful for upload (they are inputs). Make sure the adapter can work with 3.3V IO voltage: it should have a jumper or a switch to select between 5V and 3.3V, or be marked as 3.3V only.</p>
+
+<p>Adapters based around the following ICs should work:</p>
+
+<ul>
+<li>FT232RL</li>
+<li>CP2102</li>
+<li>CH340G</li>
+</ul>
+
+<p>PL2303-based adapters are known not to work on Mac OS X. See <a href="https://github.com/igrr/esptool-ck/issues/9">https://github.com/igrr/esptool-ck/issues/9</a> for more info.</p>
+
+<h2 id="minimal-hardware-setup-for-bootloading-and-usage">Minimal Hardware Setup for Bootloading and Usage</h2>
+
+<table><thead>
+<tr>
+<th>PIN</th>
+<th>Resistor</th>
+<th>Serial Adapter</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>VCC</td>
+<td></td>
+<td>VCC (3.3V)</td>
+</tr>
+<tr>
+<td>GND</td>
+<td></td>
+<td>GND</td>
+</tr>
+<tr>
+<td>TX or GPIO2*</td>
+<td></td>
+<td>RX</td>
+</tr>
+<tr>
+<td>RX</td>
+<td></td>
+<td>TX</td>
+</tr>
+<tr>
+<td>GPIO0</td>
+<td>PullUp</td>
+<td>DTR</td>
+</tr>
+<tr>
+<td>Reset*</td>
+<td>PullUp</td>
+<td>RTS</td>
+</tr>
+<tr>
+<td>GPIO15*</td>
+<td>PullDown</td>
+<td></td>
+</tr>
+<tr>
+<td>CH_PD</td>
+<td>PullUp</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<ul>
+<li>Note
+
+<ul>
+<li>GPIO15 is also named MTDO</li>
+<li>Reset is also named RSBT or REST (adding PullUp improves the stability of the module)</li>
+<li>GPIO2 is alternative TX for the boot loader mode</li>
+<li><strong>Directly connecting a pin to VCC or GND is not a substitute for a PullUp or PullDown resistor, doing this can break upload management and the serial console, instability has also been noted in some cases.</strong></li>
+</ul></li>
+</ul>
+
+<h2 id="esp-to-serial">ESP to Serial</h2>
+
+<p><img src="ESP_to_serial.png" alt="ESP to Serial"></p>
+
+<h3 id="minimal-hardware-setup-for-bootloading-only">Minimal Hardware Setup for Bootloading only</h3>
+
+<p>ESPxx Hardware</p>
+
+<table><thead>
+<tr>
+<th>PIN</th>
+<th>Resistor</th>
+<th>Serial Adapter</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>VCC</td>
+<td></td>
+<td>VCC (3.3V)</td>
+</tr>
+<tr>
+<td>GND</td>
+<td></td>
+<td>GND</td>
+</tr>
+<tr>
+<td>TX or GPIO2</td>
+<td></td>
+<td>RX</td>
+</tr>
+<tr>
+<td>RX</td>
+<td></td>
+<td>TX</td>
+</tr>
+<tr>
+<td>GPIO0</td>
+<td></td>
+<td>GND</td>
+</tr>
+<tr>
+<td>Reset</td>
+<td></td>
+<td>RTS*</td>
+</tr>
+<tr>
+<td>GPIO15</td>
+<td>PullDown</td>
+<td></td>
+</tr>
+<tr>
+<td>CH_PD</td>
+<td>PullUp</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<ul>
+<li>Note
+
+<ul>
+<li>if no RTS is used a manual power toggle is needed</li>
+</ul></li>
+</ul>
+
+<h3 id="minimal-hardware-setup-for-running-only">Minimal Hardware Setup for Running only</h3>
+
+<p>ESPxx Hardware</p>
+
+<table><thead>
+<tr>
+<th>PIN</th>
+<th>Resistor</th>
+<th>Power supply</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>VCC</td>
+<td></td>
+<td>VCC (3.3V)</td>
+</tr>
+<tr>
+<td>GND</td>
+<td></td>
+<td>GND</td>
+</tr>
+<tr>
+<td>GPIO0</td>
+<td>PullUp</td>
+<td></td>
+</tr>
+<tr>
+<td>GPIO15</td>
+<td>PullDown</td>
+<td></td>
+</tr>
+<tr>
+<td>CH_PD</td>
+<td>PullUp</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h2 id="minimal">Minimal</h2>
+
+<p><img src="ESP_min.png" alt="ESP min"></p>
+
+<h2 id="improved-stability">Improved Stability</h2>
+
+<p><img src="ESP_improved_stability.png" alt="ESP improved stability"></p>
+
+<h2 id="boot-messages-and-modes">Boot Messages and Modes</h2>
+
+<p>The ESP module checks at every boot the Pins 0, 2 and 15.
+based on them its boots in different modes:</p>
+
+<table><thead>
+<tr>
+<th>GPIO15</th>
+<th>GPIO0</th>
+<th>GPIO2</th>
+<th>Mode</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>0V</td>
+<td>0V</td>
+<td>3.3V</td>
+<td>Uart Bootloader</td>
+</tr>
+<tr>
+<td>0V</td>
+<td>3.3V</td>
+<td>3.3V</td>
+<td>Boot sketch (SPI flash)</td>
+</tr>
+<tr>
+<td>3.3V</td>
+<td>x</td>
+<td>x</td>
+<td>SDIO mode (not used for Arduino)</td>
+</tr>
+</tbody></table>
+
+<p>at startup the ESP prints out the current boot mode example:
+<code>
+rst cause:2, boot mode:(3,6)
+</code></p>
+
+<p>note:
+ - GPIO2 is used as TX output and the internal Pullup is enabled on boot.</p>
+
+<h3 id="rst-cause">rst cause</h3>
+
+<table><thead>
+<tr>
+<th>Number</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>0</td>
+<td>unknown</td>
+</tr>
+<tr>
+<td>1</td>
+<td>normal boot</td>
+</tr>
+<tr>
+<td>2</td>
+<td>reset pin</td>
+</tr>
+<tr>
+<td>3</td>
+<td>software reset</td>
+</tr>
+<tr>
+<td>4</td>
+<td>watchdog reset</td>
+</tr>
+</tbody></table>
+
+<h3 id="boot-mode">boot mode</h3>
+
+<p>the first value respects the pin setup of the Pins 0, 2 and 15.</p>
+
+<table><thead>
+<tr>
+<th>Number</th>
+<th>GPIO15</th>
+<th>GPIO0</th>
+<th>GPIO2</th>
+<th>Mode</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>0</td>
+<td>0V</td>
+<td>0V</td>
+<td>0V</td>
+<td>Not valid</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0V</td>
+<td>0V</td>
+<td>3.3V</td>
+<td>Uart</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0V</td>
+<td>3.3V</td>
+<td>0V</td>
+<td>Not valid</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0V</td>
+<td>3.3V</td>
+<td>3.3V</td>
+<td>Flash</td>
+</tr>
+<tr>
+<td>4</td>
+<td>3.3V</td>
+<td>0V</td>
+<td>0V</td>
+<td>SDIO</td>
+</tr>
+<tr>
+<td>5</td>
+<td>3.3V</td>
+<td>0V</td>
+<td>3.3V</td>
+<td>SDIO</td>
+</tr>
+<tr>
+<td>6</td>
+<td>3.3V</td>
+<td>3.3V</td>
+<td>0V</td>
+<td>SDIO</td>
+</tr>
+<tr>
+<td>7</td>
+<td>3.3V</td>
+<td>3.3V</td>
+<td>3.3V</td>
+<td>SDIO</td>
+</tr>
+</tbody></table>
+
+<p>note:
+ - number = ((GPIO15 &lt;&lt; 2) | (GPIO0 &lt;&lt; 1) | GPIO2);</p>
+
+<h2 id="wemos-d1">WeMos D1</h2>
+
+<p>Product page: <a href="http://wemos.cc">http://wemos.cc</a></p>
+
+<h2 id="wemos-d1-mini">WeMos D1 mini</h2>
+
+<p>Product page: <a href="http://wemos.cc">http://wemos.cc</a></p>
+
+    </div>
+  </body>
+</html>
