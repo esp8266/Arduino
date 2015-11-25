@@ -1,5 +1,5 @@
 /**
- * BasicHttpClient.ino
+ * StreamHttpClient.ino
  *
  *  Created on: 24.05.2015
  *
@@ -12,7 +12,7 @@
 
 #include <ESP8266httpClient.h>
 
-#define USE_SERIAL Serial1
+#define USE_SERIAL Serial
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -43,20 +43,50 @@ void loop() {
 
         USE_SERIAL.print("[HTTP] begin...\n");
         // configure traged server and url
-        //http.begin("192.168.1.12", 443, "/test.html", true, "7a 9c f4 db 40 d3 62 5a 6e 21 bc 5c cc 66 c8 3e a1 45 59 38"); //HTTPS
-        http.begin("192.168.1.12", 80, "/test.html"); //HTTP
+        http.begin("192.168.1.12", 80, "/test.html");
 
         USE_SERIAL.print("[HTTP] GET...\n");
         // start connection and send HTTP header
         int httpCode = http.GET();
         if(httpCode) {
             // HTTP header has been send and Server response header has been handled
+
             USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
 
             // file found at server
             if(httpCode == 200) {
-                String payload = http.getString();
-                USE_SERIAL.println(payload);
+
+                // get lenght of document (is -1 when Server sends no Content-Length header)
+                int len = http.getSize();
+
+                // create buffer for read
+                uint8_t buff[128] = { 0 };
+
+                // get tcp stream
+                WiFiClient * stream = http.getStream();
+
+                // read all data from server
+                while(http.connected() && (len > 0 || len == -1)) {
+                    // get available data size
+                    size_t size = stream->available();
+
+                    if(size) {
+                        // read up to 128 byte
+                        int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+
+                        // write it to Serial
+                        USE_SERIAL.write(buff, c);
+
+                        if(len > 0) {
+                            len -= c;
+                        }
+                    }
+                    delay(1);
+                }
+
+                USE_SERIAL.println();
+                USE_SERIAL.print("[HTTP] connection closed or file end.\n");
+
             }
         } else {
             USE_SERIAL.print("[HTTP] GET... faild, no connection or no HTTP server\n");
