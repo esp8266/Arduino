@@ -13,7 +13,7 @@
 
 #include <ESP8266httpClient.h>
 
-#define USE_SERIAL Serial1
+#define USE_SERIAL Serial
 
 ESP8266WiFiMulti WiFiMulti;
 
@@ -54,7 +54,7 @@ void loop() {
                 http.writeToStream(&USE_SERIAL);
             }
         } else {
-            USE_SERIAL.print("[HTTP] GET... faild, no connection or no HTTP server\n");
+            USE_SERIAL.print("[HTTP] GET... failed, no connection or no HTTP server\n");
         }
     }
 

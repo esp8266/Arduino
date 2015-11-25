@@ -89,7 +89,7 @@ void loop() {
 
             }
         } else {
-            USE_SERIAL.print("[HTTP] GET... faild, no connection or no HTTP server\n");
+            USE_SERIAL.print("[HTTP] GET... failed, no connection or no HTTP server\n");
         }
     }
 

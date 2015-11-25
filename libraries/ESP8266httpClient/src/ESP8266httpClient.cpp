@@ -99,7 +99,7 @@ void httpClient::begin(String host, uint16_t port, String url, bool https, Strin
 
 /**
  * end
- * called after the payload is handeld
+ * called after the payload is handled
  */
 void httpClient::end(void) {
     if(connected()) {
@@ -176,13 +176,13 @@ int httpClient::sendRequest(const char * type, uint8_t * payload, size_t size) {
 
     // send Header
     if(!sendHeader(type)) {
-        return HTTPC_ERROR_SEND_HEADER_FAILD;
+        return HTTPC_ERROR_SEND_HEADER_FAILED;
     }
 
     // send Payload if needed
     if(payload && size > 0) {
         if(_tcp->write(&payload[0], size) != size) {
-            return HTTPC_ERROR_SEND_PAYLOAD_FAILD;
+            return HTTPC_ERROR_SEND_PAYLOAD_FAILED;
         }
     }
 
@@ -200,7 +200,7 @@ int httpClient::getSize(void) {
 
 /**
  * deprecated Note: this is not working with https!
- * returns the stram of the tcp connection
+ * returns the stream of the tcp connection
  * @return WiFiClient
  */
 WiFiClient & httpClient::getStream(void) {
@@ -214,7 +214,7 @@ WiFiClient & httpClient::getStream(void) {
 }
 
 /**
- * returns the stram of the tcp connection
+ * returns the stream of the tcp connection
  * @return WiFiClient *
  */
 WiFiClient * httpClient::getStreamPtr(void) {
@@ -242,7 +242,7 @@ int httpClient::writeToStream(Stream * stream) {
         return HTTPC_ERROR_NOT_CONNECTED;
     }
 
-    // get lenght of document (is -1 when Server sends no Content-Length header)
+    // get length of document (is -1 when Server sends no Content-Length header)
     int len = _size;
     int bytesWritten = 0;
 
@@ -282,7 +282,7 @@ int httpClient::writeToStream(Stream * stream) {
 }
 
 /**
- * return all payload as String (may need lot of ram or trigger out of memmory!)
+ * return all payload as String (may need lot of ram or trigger out of memory!)
  * @return String
  */
 String httpClient::getString(void) {
@@ -300,8 +300,9 @@ String httpClient::getString(void) {
     return sstring;
 }
 
+
 /**
- * adds Headder to the request
+ * adds Header to the request
  * @param name
  * @param value
  * @param first
@@ -443,7 +444,7 @@ bool httpClient::sendHeader(const char * type) {
 }
 
 /**
- * reads the respone from the server
+ * reads the response from the server
  * @return int http code
  */
 int httpClient::handleHeaderResponse() {
