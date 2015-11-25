@@ -25,6 +25,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
+#include <StreamString.h>
 
 #include "ESP8266httpClient.h"
 
@@ -198,6 +199,7 @@ int httpClient::getSize(void) {
 }
 
 /**
+ * deprecated Note: this is not working with https!
  * returns the stram of the tcp connection
  * @return WiFiClient
  */
@@ -211,6 +213,20 @@ WiFiClient & httpClient::getStream(void) {
     // todo return error?
 }
 
+/**
+ * returns the stram of the tcp connection
+ * @return WiFiClient *
+ */
+WiFiClient * httpClient::getStreamPtr(void) {
+    if(connected()) {
+        return _tcp;
+    }
+
+    DEBUG_HTTPCLIENT("[HTTP-Client] no stream to return!?\n");
+    return NULL;
+}
+
+WiFiClient * getStreamPtr(void);
 /**
  * write all  message body / payload to Stream
  * @param stream Stream *
@@ -263,6 +279,25 @@ int httpClient::writeToStream(Stream * stream) {
 
     end();
     return bytesWritten;
+}
+
+/**
+ * return all payload as String (may need lot of ram or trigger out of memmory!)
+ * @return String
+ */
+String httpClient::getString(void) {
+    StreamString sstring;
+
+    if(_size) {
+        // try to reserve needed memmory
+        if(!sstring.reserve((_size + 1))) {
+            DEBUG_HTTPCLIENT("[HTTP-Client][getString] too less memory to resive as string! need: %d\n", (_size + 1));
+            return String("--too less memory--");
+        }
+    }
+
+    writeToStream(&sstring);
+    return sstring;
 }
 
 /**

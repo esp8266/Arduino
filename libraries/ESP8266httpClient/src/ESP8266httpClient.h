@@ -75,8 +75,10 @@ class httpClient {
 
         int getSize(void);
 
-        WiFiClient & getStream(void);
+        WiFiClient & getStream(void)  __attribute__ ((deprecated)) ;
+        WiFiClient * getStreamPtr(void);
         int writeToStream(Stream * stream);
+        String getString(void);
 
     protected:
 
