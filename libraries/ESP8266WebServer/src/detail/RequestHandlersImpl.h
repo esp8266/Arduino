@@ -44,10 +44,10 @@ public:
     }
 
 protected:
-    String _uri;
-    HTTPMethod _method;
     ESP8266WebServer::THandlerFunction _fn;
     ESP8266WebServer::THandlerFunction _ufn;
+    String _uri;
+    HTTPMethod _method;
 };
 
 class StaticRequestHandler : public RequestHandler {
@@ -67,7 +67,7 @@ public:
         if (requestMethod != HTTP_GET)
             return false;
 
-        if (_isFile && requestUri != _uri || !requestUri.startsWith(_uri))
+        if ((_isFile && requestUri != _uri) || !requestUri.startsWith(_uri))
             return false;
 
         return true;

@@ -146,22 +146,22 @@ protected:
   HTTPMethod  _currentMethod;
   String      _currentUri;
 
-  size_t           _currentArgCount;
-  RequestArgument* _currentArgs;
-  HTTPUpload       _currentUpload;
-
-  RequestArgument* _currentHeaders;
-  size_t           _headerKeysCount;
-  size_t           _contentLength;
-  String           _responseHeaders;
-
-  String           _hostHeader;
-
   RequestHandler*  _currentHandler;
   RequestHandler*  _firstHandler;
   RequestHandler*  _lastHandler;
   THandlerFunction _notFoundHandler;
   THandlerFunction _fileUploadHandler;
+
+  int              _currentArgCount;
+  RequestArgument* _currentArgs;
+  HTTPUpload       _currentUpload;
+
+  int              _headerKeysCount;
+  RequestArgument* _currentHeaders;
+  size_t           _contentLength;
+  String           _responseHeaders;
+
+  String           _hostHeader;
 
 };
 

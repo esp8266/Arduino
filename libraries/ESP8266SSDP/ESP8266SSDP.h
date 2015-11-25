@@ -92,6 +92,7 @@ class SSDPClass{
 
     UdpContext* _server;
     SSDPTimer* _timer;
+    uint16_t _port;
 
     IPAddress _respondToAddr;
     uint16_t  _respondToPort;
@@ -101,7 +102,6 @@ class SSDPClass{
     unsigned long _process_time;
     unsigned long _notify_time;
     
-    uint16_t _port;
     char _schemaURL[SSDP_SCHEMA_URL_SIZE];
     char _uuid[SSDP_UUID_SIZE];
     char _friendlyName[SSDP_FRIENDLY_NAME_SIZE];

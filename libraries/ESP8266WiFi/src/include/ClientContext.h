@@ -309,9 +309,6 @@ class ClientContext {
         }
 
     private:
-        ClientContext* _next;
-        int _refcnt;
-
         tcp_pcb* _pcb;
 
         pbuf* _rx_buf;
@@ -319,6 +316,9 @@ class ClientContext {
 
         discard_cb_t _discard_cb;
         void* _discard_cb_arg;
+
+        int _refcnt;
+        ClientContext* _next;
 
         size_t _size_sent;
         bool _send_waiting;

@@ -203,7 +203,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 }
 
 bool ESP8266WebServer::_collectHeader(const char* headerName, const char* headerValue) {
-  for (size_t i = 0; i < _headerKeysCount; i++) {
+  for (int i = 0; i < _headerKeysCount; i++) {
     if (_currentHeaders[i].key==headerName) {
             _currentHeaders[i].value=headerValue;
             return true;
@@ -226,7 +226,7 @@ void ESP8266WebServer::_parseArguments(String data) {
   }
   _currentArgCount = 1;
 
-  for (int i = 0; i < data.length(); ) {
+  for (int i = 0; i < (int)data.length(); ) {
     i = data.indexOf('&', i);
     if (i == -1)
       break;

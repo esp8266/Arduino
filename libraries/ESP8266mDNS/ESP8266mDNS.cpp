@@ -97,7 +97,7 @@ bool MDNSResponder::begin(const char* domain){
   }
 
   // Copy in domain characters as lowercase
-  for (int i = 0; i < n; ++i)
+  for (size_t i = 0; i < n; ++i)
     _hostName[i] = tolower(domain[i]);
   _hostName[n] = '\0';
 
@@ -190,7 +190,7 @@ void MDNSResponder::_parsePacket(){
 
   char serviceName[32];
   uint8_t serviceNameLen;
-  uint16_t servicePort;
+  uint16_t servicePort = 0;
 
   char protoName[32];
   uint8_t protoNameLen;
@@ -367,7 +367,7 @@ void MDNSResponder::_parsePacket(){
     else if(questions[i] == MDNS_TYPE_PTR) responseMask |= 0xF;
   }
 
-  return _reply(responseMask, (serviceName), (protoName), servicePort);
+  return _reply(responseMask, serviceName, protoName, servicePort);
 }
 
 void MDNSResponder::enableArduino(uint16_t port, bool auth){
@@ -461,12 +461,12 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
       
       char boardName[64];
       const char *boardExtra = "board=";
-      os_sprintf(boardName, "%s%s\0", boardExtra, ARDUINO_BOARD);
+      os_sprintf(boardName, "%s%s", boardExtra, ARDUINO_BOARD);
       uint8_t boardNameLen = os_strlen(boardName);
 
       char authUpload[16];
       const char *authUploadExtra = "auth_upload=";
-      os_sprintf(authUpload, "%s%s\0", authUploadExtra, reinterpret_cast<const char*>((_arduinoAuth)?"yes":"no"));
+      os_sprintf(authUpload, "%s%s", authUploadExtra, reinterpret_cast<const char*>((_arduinoAuth)?"yes":"no"));
       uint8_t authUploadLen = os_strlen(authUpload);
     
       uint16_t textDataLen = (1 + boardNameLen) + (1 + tcpCheckExtraLen) + (1 + sshUploadExtraLen) + (1 + authUploadLen);
