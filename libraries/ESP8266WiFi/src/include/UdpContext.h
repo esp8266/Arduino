@@ -365,22 +365,17 @@ private:
     }
 
 private:
-    int _refcnt;
     udp_pcb* _pcb;
-
-    ip_addr_t _dest_addr;
-    uint16_t _dest_port;
-
-    uint16_t _multicast_ttl;
-
-    bool _first_buf_taken;
     pbuf* _rx_buf;
+    bool _first_buf_taken;
     size_t _rx_buf_offset;
-
+    int _refcnt;
     pbuf* _tx_buf_head;
     pbuf* _tx_buf_cur;
     size_t _tx_buf_offset;
-
+    uint16_t _multicast_ttl;
+    uint16_t _dest_port;
+    ip_addr_t _dest_addr;
     rxhandler_t _on_rx;
 };
 

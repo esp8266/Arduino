@@ -33,6 +33,7 @@
 
 ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 : _server(addr, port)
+, _currentMethod(HTTP_ANY)
 , _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
@@ -40,11 +41,13 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 , _currentArgs(0)
 , _headerKeysCount(0)
 , _currentHeaders(0)
+, _contentLength(0)
 {
 }
 
 ESP8266WebServer::ESP8266WebServer(int port)
 : _server(port)
+, _currentMethod(HTTP_ANY)
 , _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
@@ -52,6 +55,7 @@ ESP8266WebServer::ESP8266WebServer(int port)
 , _currentArgs(0)
 , _headerKeysCount(0)
 , _currentHeaders(0)
+, _contentLength(0)
 {
 }
 
