@@ -36,12 +36,9 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server)
       _server->sendHeader("Access-Control-Allow-Origin", "*");
       _server->send(200, "text/plain", (Update.hasError())?"FAIL":"OK");
       ESP.restart();
-    });
-
-    // handler for the file upload, get's the sketch bytes, and writes
-    // them through the Update object.
-    _server->onFileUpload([&](){
-      if(_server->uri() != "/update") return;
+    },[&](){
+      // handler for the file upload, get's the sketch bytes, and writes
+      // them through the Update object
       HTTPUpload& upload = _server->upload();
       if(upload.status == UPLOAD_FILE_START){
         if (_serial_output)
@@ -70,6 +67,6 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server)
         Update.end();
         if (_serial_output) Serial.println("Update was aborted");
       }
-      yield();
+      delay(0);
     });
 }

@@ -81,6 +81,14 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   DEBUG_OUTPUT.println(searchStr);
 #endif
 
+  //attach handler
+  RequestHandler* handler;
+  for (handler = _firstHandler; handler; handler = handler->next()) {
+    if (handler->canHandle(_currentMethod, _currentUri))
+      break;
+  }
+  _currentHandler = handler;
+
   String formData;
   // below is needed only when POST type request
   if (method == HTTP_POST || method == HTTP_PUT || method == HTTP_PATCH || method == HTTP_DELETE){
@@ -99,7 +107,8 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         break;
       }
       headerName = req.substring(0, headerDiv);
-      headerValue = req.substring(headerDiv + 2);
+      headerValue = req.substring(headerDiv + 1);
+      headerValue.trim();
        _collectHeader(headerName.c_str(),headerValue.c_str());
 	  
 	  #ifdef DEBUG
@@ -255,7 +264,7 @@ void ESP8266WebServer::_parseArguments(String data) {
     }
     RequestArgument& arg = _currentArgs[iarg];
     arg.key = data.substring(pos, equal_sign_index);
-    arg.value = data.substring(equal_sign_index + 1, next_arg_index);
+	arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
 #ifdef DEBUG
     DEBUG_OUTPUT.print("arg ");
     DEBUG_OUTPUT.print(iarg);
@@ -279,7 +288,8 @@ void ESP8266WebServer::_parseArguments(String data) {
 
 void ESP8266WebServer::_uploadWriteByte(uint8_t b){
   if (_currentUpload.currentSize == HTTP_UPLOAD_BUFLEN){
-    if (_fileUploadHandler) _fileUploadHandler();
+    if(_currentHandler && _currentHandler->canUpload(_currentUri))
+      _currentHandler->upload(*this, _currentUri, _currentUpload);
     _currentUpload.totalSize += _currentUpload.currentSize;
     _currentUpload.currentSize = 0;
   }
@@ -397,7 +407,8 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             DEBUG_OUTPUT.print(" Type: ");
             DEBUG_OUTPUT.println(_currentUpload.type);
 #endif
-            if (_fileUploadHandler) _fileUploadHandler();
+            if(_currentHandler && _currentHandler->canUpload(_currentUri))
+              _currentHandler->upload(*this, _currentUri, _currentUpload);
             _currentUpload.status = UPLOAD_FILE_WRITE;
             uint8_t argByte = _uploadReadByte(client);
 readfile:
@@ -433,10 +444,12 @@ readfile:
               client.readBytes(endBuf, boundary.length());
 
               if (strstr((const char*)endBuf, boundary.c_str()) != NULL){
-                if (_fileUploadHandler) _fileUploadHandler();
+                if(_currentHandler && _currentHandler->canUpload(_currentUri))
+                  _currentHandler->upload(*this, _currentUri, _currentUpload);
                 _currentUpload.totalSize += _currentUpload.currentSize;
                 _currentUpload.status = UPLOAD_FILE_END;
-                if (_fileUploadHandler) _fileUploadHandler();
+                if(_currentHandler && _currentHandler->canUpload(_currentUri))
+                  _currentHandler->upload(*this, _currentUri, _currentUpload);
 #ifdef DEBUG
                 DEBUG_OUTPUT.print("End File: ");
                 DEBUG_OUTPUT.print(_currentUpload.filename);
@@ -501,8 +514,40 @@ readfile:
   return false;
 }
 
+String ESP8266WebServer::urlDecode(const String& text)
+{
+	String decoded = "";
+	char temp[] = "0x00";
+	unsigned int len = text.length();
+	unsigned int i = 0;
+	while (i < len)
+	{
+		char decodedChar;
+		char encodedChar = text.charAt(i++);
+		if ((encodedChar == '%') && (i + 1 < len))
+		{
+			temp[2] = text.charAt(i++);
+			temp[3] = text.charAt(i++);
+
+			decodedChar = strtol(temp, NULL, 16);
+		}
+		else {
+			if (encodedChar == '+')
+			{
+				decodedChar = ' ';
+			}
+			else {
+				decodedChar = encodedChar;  // normal ascii char
+			}
+		}
+		decoded += decodedChar;
+	}
+	return decoded;
+}
+
 bool ESP8266WebServer::_parseFormUploadAborted(){
   _currentUpload.status = UPLOAD_FILE_ABORTED;
-  if (_fileUploadHandler) _fileUploadHandler();
+  if(_currentHandler && _currentHandler->canUpload(_currentUri))
+    _currentHandler->upload(*this, _currentUri, _currentUpload);
   return false;
 }

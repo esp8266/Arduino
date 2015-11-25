@@ -273,7 +273,7 @@ int WiFiClientSecure::available() {
 uint8_t WiFiClientSecure::connected() {
     if (!_client)
         return 0;
-        
+
     if (_client->state() == ESTABLISHED)
         return 1;
 
@@ -384,8 +384,7 @@ extern "C" void* ax_port_malloc(size_t size, const char* file, int line) {
 
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
-
-        while(true){}
+        panic();
     }
     if (size >= 1024)
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());
@@ -402,7 +401,7 @@ extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int l
     void* result = realloc(ptr, size);
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
-        while(true){}
+        panic();
     }
     if (size >= 1024)
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());

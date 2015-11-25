@@ -97,6 +97,7 @@ class ClientContext {
                     close();
                     if(_discard_cb)
                         _discard_cb(_discard_cb_arg, this);
+                    DEBUGV(":del\r\n");
                     delete this;
                 }
             }

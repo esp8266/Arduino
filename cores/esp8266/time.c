@@ -124,4 +124,5 @@ int gettimeofday(struct timeval *tp, void *tzp)
         tp->tv_sec  = (s_bootTime + millis()) / 1000;
         tp->tv_usec = micros() * 1000;
     }
+    return 0;
 }
