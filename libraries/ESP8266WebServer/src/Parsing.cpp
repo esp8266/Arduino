@@ -263,7 +263,7 @@ void ESP8266WebServer::_parseArguments(String data) {
     }
     RequestArgument& arg = _currentArgs[iarg];
     arg.key = data.substring(pos, equal_sign_index);
-    arg.value = data.substring(equal_sign_index + 1, next_arg_index);
+	arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
 #ifdef DEBUG
     DEBUG_OUTPUT.print("arg ");
     DEBUG_OUTPUT.print(iarg);
@@ -511,6 +511,37 @@ readfile:
   DEBUG_OUTPUT.println(line);
 #endif
   return false;
+}
+
+String ESP8266WebServer::urlDecode(const String& text)
+{
+	String decoded = "";
+	char temp[] = "0x00";
+	unsigned int len = text.length();
+	unsigned int i = 0;
+	while (i < len)
+	{
+		char decodedChar;
+		char encodedChar = text.charAt(i++);
+		if ((encodedChar == '%') && (i + 1 < len))
+		{
+			temp[2] = text.charAt(i++);
+			temp[3] = text.charAt(i++);
+
+			decodedChar = strtol(temp, NULL, 16);
+		}
+		else {
+			if (encodedChar == '+')
+			{
+				decodedChar = ' ';
+			}
+			else {
+				decodedChar = encodedChar;  // normal ascii char
+			}
+		}
+		decoded += decodedChar;
+	}
+	return decoded;
 }
 
 bool ESP8266WebServer::_parseFormUploadAborted(){

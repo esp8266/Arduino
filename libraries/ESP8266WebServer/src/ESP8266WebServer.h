@@ -133,6 +133,7 @@ protected:
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
+  String urlDecode(const String& text);
 
   struct RequestArgument {
     String key;
