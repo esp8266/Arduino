@@ -283,6 +283,16 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
         case 0x1340EF: // W25Q40
             return (512_kB);
 
+        // BergMicro
+        case 0x1640E0: // BG25Q32
+            return (4_MB);
+        case 0x1540E0: // BG25Q16
+            return (2_MB);
+        case 0x1440E0: // BG25Q80
+            return (1_MB);
+        case 0x1340E0: // BG25Q40
+            return (512_kB);
+
         default:
             return 0;
     }
