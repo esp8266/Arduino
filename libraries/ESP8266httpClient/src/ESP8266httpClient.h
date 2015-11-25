@@ -48,8 +48,12 @@ class httpClient {
         httpClient();
         ~httpClient();
 
+        void begin(const char *url, const char * httpsFingerprint = "");
+        void begin(String url, String httpsFingerprint = "");
+
         void begin(const char *host, uint16_t port, const char * url  = "/", bool https = false, const char * httpsFingerprint = "");
         void begin(String host, uint16_t port, String url = "/", bool https = false, String httpsFingerprint = "");
+
         void end(void);
 
         bool connected(void);

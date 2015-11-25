@@ -54,18 +54,90 @@ httpClient::~httpClient() {
 
     if(_tcps) {
         _tcps->stop();
-        _tcps->~WiFiClientSecure();
+        delete _tcps;
         _tcps = NULL;
         _tcp = NULL;
     } else if(_tcp) {
         _tcp->stop();
-        _tcp->~WiFiClient();
+        delete _tcp;
         _tcp = NULL;
     }
 
     if(_currentHeaders) {
         delete[] _currentHeaders;
     }
+}
+
+/**
+ * phasing the url for all needed informations
+ * @param url const char *
+ * @param httpsFingerprint const char *
+ */
+void httpClient::begin(const char *url, const char * httpsFingerprint) {
+      begin(String(url), String(httpsFingerprint));
+}
+
+/**
+ * phasing the url for all needed informations
+ * @param url String
+ * @param httpsFingerprint String
+ */
+void httpClient::begin(String url, String httpsFingerprint) {
+
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
+
+    _httpsFingerprint = httpsFingerprint;
+    _returnCode = 0;
+    _size = -1;
+
+    _Headers = "";
+
+    String protocol;
+    // check for : (http: or https:
+    int index = url.indexOf(':');
+    int index2;
+    bool hasPort = false;
+    if(index) {
+        protocol = url.substring(0, index);
+        url.remove(0, (index + 3)); // remove http:// or https://
+
+        index = url.indexOf(':');
+        index2 = url.indexOf('/');
+
+        if(index >= 0 && ((index2 >= 0 && index < index2) || index2 == 0)) { // do we have a port?
+            _host = url.substring(0, index); // hostname
+            url.remove(0, (index + 1)); // remove hostname + :
+
+            index =  url.indexOf('/');
+            _port = url.substring(0, index).toInt(); // get port
+            url.remove(0, index); // remove port
+            hasPort = true;
+        } else {
+            index = index2;
+            _host = url.substring(0, index);
+            url.remove(0, index); // remove hostname
+        }
+
+        _url = url;
+
+        if(protocol.equalsIgnoreCase("http")) {
+            _https = false;
+            if(!hasPort) {
+                _port = 80;
+            }
+        } else if(protocol.equalsIgnoreCase("https")) {
+            _https = true;
+            if(!hasPort) {
+                _port = 443;
+            }
+        } else {
+            DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", protocol.c_str());
+            return;
+        }
+    }
+
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s https: %d httpsFingerprint: %s\n", _host.c_str(), _port, _url.c_str(), _https, _httpsFingerprint.c_str());
+
 }
 
 /**
@@ -226,7 +298,6 @@ WiFiClient * httpClient::getStreamPtr(void) {
     return NULL;
 }
 
-WiFiClient * getStreamPtr(void);
 /**
  * write all  message body / payload to Stream
  * @param stream Stream *
@@ -378,7 +449,7 @@ bool httpClient::connect(void) {
     if(_https) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect https...\n");
         if(_tcps) {
-            _tcps->~WiFiClient();
+            delete _tcps;
             _tcps = NULL;
             _tcp = NULL;
         }
@@ -387,18 +458,18 @@ bool httpClient::connect(void) {
     } else {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect http...\n");
         if(_tcp) {
-            _tcp->~WiFiClient();
+            delete _tcp;
             _tcp = NULL;
         }
         _tcp = new WiFiClient();
     }
 
     if(!_tcp->connect(_host.c_str(), _port)) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u.\n", _host.c_str(), _port);
+        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
         return false;
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u.\n", _host.c_str(), _port);
+    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
     if(_https && _httpsFingerprint.length() > 0) {
         if(_tcps->verify(_httpsFingerprint.c_str(), _host.c_str())) {
