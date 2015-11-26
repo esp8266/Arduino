@@ -81,7 +81,7 @@ public:
 
         String path(_path); 
 
-        if(path.endsWith("/")) path += "index.htm";
+        if(requestUri.endsWith("/")) requestUri += "index.htm";
 
         if (!_isFile) { 
             // Base URI doesn't point to a file. Append whatever follows this
