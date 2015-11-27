@@ -340,6 +340,7 @@ function sendFile($path) {
 	header('Content-Type: application/octet-stream', true);
 	header('Content-Disposition: attachment; filename='.basename($path));
 	header('Content-Length: '.filesize($path), true);
+	header('x-MD5: '.md5_file($path), true);
 	readfile($path);
 }
 

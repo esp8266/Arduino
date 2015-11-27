@@ -28,8 +28,9 @@
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <WiFiUdp.h>
 #include <WiFiClient.h>
+#include <WiFiUdp.h>
+#include <ESP8266httpClient.h>
 
 //#define DEBUG_HTTP_UPDATE(...) Serial1.printf( __VA_ARGS__ )
 
@@ -48,9 +49,13 @@ class ESP8266HTTPUpdate {
         ESP8266HTTPUpdate(void);
         ~ESP8266HTTPUpdate(void);
 
-        t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "");
-        t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "");
-        t_httpUpdate_return update(WiFiClient& client, const char* host, const char* url = "/", const char * current_version = "");
+        t_httpUpdate_return update(const char * url, const char * current_version = "", const char * httpsFingerprint = "");
+        t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "", bool https = false, const char * httpsFingerprint = "");
+        t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "", bool https = false, String httpsFingerprint = "");
+
+    protected:
+        t_httpUpdate_return handleUpdate(httpClient * http, const char * current_version);
+        bool runUpdate(Stream& in, uint32_t size, String md5);
 };
 
 extern ESP8266HTTPUpdate ESPhttpUpdate;

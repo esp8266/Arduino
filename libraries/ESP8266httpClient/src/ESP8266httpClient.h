@@ -59,12 +59,14 @@ class httpClient {
         bool connected(void);
 
         void setReuse(bool reuse); /// keep-alive
+        void setUserAgent(const char * userAgent);
 
         /// request handling
         int GET();
         int POST(uint8_t * payload, size_t size);
         int POST(String payload);
         int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
+        int sendRequest(const char * type, Stream * stream, size_t size = 0);
 
         void addHeader(const String& name, const String& value, bool first = false);
 
@@ -105,7 +107,8 @@ class httpClient {
         bool _https;
         String _httpsFingerprint;
 
-        String  _Headers;
+        String _Headers;
+        String _userAgent;
 
         /// Response handling
         RequestArgument* _currentHeaders;
