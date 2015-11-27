@@ -25,7 +25,7 @@
 #ifndef ESP8266HTTPCLIENT_H_
 #define ESP8266HTTPCLIENT_H_
 
-#define DEBUG_HTTPCLIENT(...) Serial1.printf( __VA_ARGS__ )
+//#define DEBUG_HTTPCLIENT(...) Serial1.printf( __VA_ARGS__ )
 
 #ifndef DEBUG_HTTPCLIENT
 #define DEBUG_HTTPCLIENT(...)
@@ -59,6 +59,7 @@ class httpClient {
         bool connected(void);
 
         void setReuse(bool reuse); /// keep-alive
+        void setUserAgent(const char * userAgent);
 
         /// request handling
         int GET();
@@ -105,7 +106,8 @@ class httpClient {
         bool _https;
         String _httpsFingerprint;
 
-        String  _Headers;
+        String _Headers;
+        String _userAgent;
 
         /// Response handling
         RequestArgument* _currentHeaders;

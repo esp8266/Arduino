@@ -41,6 +41,8 @@ httpClient::httpClient() {
     _reuse = false;
     _https = false;
 
+    _userAgent = "ESP8266httpClient";
+
     _headerKeysCount = 0;
     _currentHeaders = NULL;
 
@@ -209,6 +211,15 @@ bool httpClient::connected() {
 void httpClient::setReuse(bool reuse) {
     _reuse = reuse;
 }
+
+/**
+ * set User Agent
+ * @param userAgent const char *
+ */
+void httpClient::setUserAgent(const char * userAgent) {
+    _userAgent = userAgent;
+}
+
 
 /**
  * send a GET request
@@ -502,9 +513,10 @@ bool httpClient::sendHeader(const char * type) {
     if(!connected()) {
         return false;
     }
+
     String header = String(type) + " " + _url + " HTTP/1.1\r\n"
             "Host: " + _host + "\r\n"
-            "User-Agent: ESP8266httpClient\r\n"
+            "User-Agent: " + _userAgent + "\r\n"
             "Connection: ";
 
     if(_reuse) {
