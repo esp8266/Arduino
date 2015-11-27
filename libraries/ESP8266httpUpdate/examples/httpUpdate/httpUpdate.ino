@@ -49,7 +49,7 @@ void loop() {
                 break;
 
             case HTTP_UPDATE_NO_UPDATES:
-                SeriUSE_SERIALal.println("HTTP_UPDATE_NO_UPDATES");
+                USE_SERIAL.println("HTTP_UPDATE_NO_UPDATES");
                 break;
 
             case HTTP_UPDATE_OK:

@@ -112,6 +112,10 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(httpClient * http, const cha
     DEBUG_HTTP_UPDATE("[httpUpdate]  - free Space: %d\n", ESP.getFreeSketchSpace());
     DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch Size: %d\n", ESP.getSketchSize());
 
+    if(current_version && current_version[0] != 0x00) {
+        DEBUG_HTTP_UPDATE("[httpUpdate]  - current version: %s\n", current_version);
+    }
+
     switch(code) {
         case 200:  ///< OK (Start Update)
             if(len > 0) {
@@ -139,7 +143,7 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(httpClient * http, const cha
                 }
             } else {
                 ret = HTTP_UPDATE_FAILED;
-                DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length is 0 or net set by Server?!\n");
+                DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length is 0 or not set by Server?!\n");
             }
             break;
         case 304:
