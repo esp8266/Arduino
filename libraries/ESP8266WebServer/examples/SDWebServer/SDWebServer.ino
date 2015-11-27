@@ -47,14 +47,10 @@ File uploadFile;
 
 
 void returnOK() {
-  server.sendHeader("Connection", "close");
-  server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "text/plain", "");
 }
 
 void returnFail(String msg) {
-  server.sendHeader("Connection", "close");
-  server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(500, "text/plain", msg + "\r\n");
 }
 
