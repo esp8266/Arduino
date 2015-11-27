@@ -126,9 +126,13 @@ struct SSDPTimer {
 
 SSDPClass::SSDPClass() :
 _server(0),
+_timer(new SSDPTimer),
 _port(80),
+_respondToPort(0),
 _pending(false),
-_timer(new SSDPTimer)
+_delay(0),
+_process_time(0),
+_notify_time(0)
 {
   _uuid[0] = '\0';
   _modelNumber[0] = '\0';
@@ -300,6 +304,8 @@ void SSDPClass::_update(){
         case VALUE:
           if(cr == 2){
             switch(header){
+            case START:
+            	break;
               case MAN:
 #ifdef DEBUG_SSDP
                 DEBUG_SSDP.printf("MAN: %s\n", (char *)buffer);

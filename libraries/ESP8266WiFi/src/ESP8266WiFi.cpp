@@ -360,7 +360,7 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int chan
 
     struct softap_config conf_current;
     wifi_softap_get_config(&conf_current);
-    if (!softap_config_equal(conf, conf_current))
+    if (softap_config_equal(conf, conf_current))
     {
         DEBUGV("softap config unchanged");
         return;
