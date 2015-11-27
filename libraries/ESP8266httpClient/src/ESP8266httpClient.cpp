@@ -36,7 +36,10 @@ httpClient::httpClient() {
     _tcp = NULL;
     _tcps = NULL;
 
+    _port = 0;
+
     _reuse = false;
+    _https = false;
 
     _headerKeysCount = 0;
     _currentHeaders = NULL;
@@ -345,7 +348,7 @@ int httpClient::writeToStream(Stream * stream) {
     DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] connection closed or file end (written: %d).\n", bytesWritten);
 
     if(_size && _size != bytesWritten) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] bytesWritten %d and size %d missmatch!.\n", bytesWritten, _size);
+        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] bytesWritten %d and size %d mismatch!.\n", bytesWritten, _size);
     }
 
     end();
@@ -362,7 +365,7 @@ String httpClient::getString(void) {
     if(_size) {
         // try to reserve needed memmory
         if(!sstring.reserve((_size + 1))) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][getString] too less memory to resive as string! need: %d\n", (_size + 1));
+            DEBUG_HTTPCLIENT("[HTTP-Client][getString] too less memory to reserve as string! need: %d\n", (_size + 1));
             return String("--too less memory--");
         }
     }
@@ -511,7 +514,7 @@ bool httpClient::sendHeader(const char * type) {
     }
     header += "\r\n" + _Headers + "\r\n";
 
-    return _tcp->write(header.c_str(), header.length());
+    return (_tcp->write(header.c_str(), header.length()) == header.length());
 }
 
 /**
