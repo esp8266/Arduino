@@ -196,6 +196,7 @@ File FS::open(const char* path, const char* mode) {
         DEBUGV("FS::open: invalid mode `%s`\r\n", mode);
         return File();
     }
+    if (strlen(path) > 31) return File(); 
 
     return File(_impl->open(path, om, am));
 }
