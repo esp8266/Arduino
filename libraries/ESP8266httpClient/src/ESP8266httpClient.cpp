@@ -79,7 +79,7 @@ httpClient::~httpClient() {
  * @param httpsFingerprint const char *
  */
 void httpClient::begin(const char *url, const char * httpsFingerprint) {
-      begin(String(url), String(httpsFingerprint));
+    begin(String(url), String(httpsFingerprint));
 }
 
 /**
@@ -113,7 +113,7 @@ void httpClient::begin(String url, String httpsFingerprint) {
             _host = url.substring(0, index); // hostname
             url.remove(0, (index + 1)); // remove hostname + :
 
-            index =  url.indexOf('/');
+            index = url.indexOf('/');
             _port = url.substring(0, index).toInt(); // get port
             url.remove(0, index); // remove port
             hasPort = true;
@@ -202,7 +202,6 @@ bool httpClient::connected() {
     return false;
 }
 
-
 /**
  * try to reuse the connection to the server
  * keep-alive
@@ -219,7 +218,6 @@ void httpClient::setReuse(bool reuse) {
 void httpClient::setUserAgent(const char * userAgent) {
     _userAgent = userAgent;
 }
-
 
 /**
  * send a GET request
@@ -251,7 +249,7 @@ int httpClient::POST(String payload) {
  * @return -1 if no info or > 0 when Content-Length is set by server
  */
 int httpClient::sendRequest(const char * type, uint8_t * payload, size_t size) {
-    // connect ro server
+    // connect to server
     if(!connect()) {
         return HTTPC_ERROR_CONNECTION_REFUSED;
     }
@@ -270,6 +268,77 @@ int httpClient::sendRequest(const char * type, uint8_t * payload, size_t size) {
         if(_tcp->write(&payload[0], size) != size) {
             return HTTPC_ERROR_SEND_PAYLOAD_FAILED;
         }
+    }
+
+    // handle Server Response (Header)
+    return handleHeaderResponse();
+}
+
+/**
+ * sendRequest
+ * @param type const char *     "GET", "POST", ....
+ * @param stream Stream *       data stream for the message body
+ * @param size size_t           size for the message body if 0 not Content-Length is send
+ * @return -1 if no info or > 0 when Content-Length is set by server
+ */
+int httpClient::sendRequest(const char * type, Stream * stream, size_t size) {
+
+    if(!stream) {
+        return HTTPC_ERROR_NO_STREAM;
+    }
+
+    // connect to server
+    if(!connect()) {
+        return HTTPC_ERROR_CONNECTION_REFUSED;
+    }
+
+    if(size > 0) {
+        addHeader("Content-Length", String(size));
+    }
+
+    // send Header
+    if(!sendHeader(type)) {
+        return HTTPC_ERROR_SEND_HEADER_FAILED;
+    }
+
+    // create buffer for read
+    uint8_t buff[1460] = { 0 };
+
+    int len = size;
+    int bytesWritten = 0;
+
+    if(len == 0) {
+        len = -1;
+    }
+
+    // read all data from stream and send it to server
+    while(connected() && stream->available() && (len > 0 || len == -1)) {
+
+        // get available data size
+        size_t s = stream->available();
+
+        if(s) {
+            int c = stream->readBytes(buff, ((s > sizeof(buff)) ? sizeof(buff) : s));
+
+            // write it to Stream
+            bytesWritten += _tcp->write((const uint8_t *)buff, c);
+
+            if(len > 0) {
+                len -= c;
+            }
+
+            delay(0);
+        } else {
+            delay(1);
+        }
+    }
+
+    if(size && (int)size != bytesWritten) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.\n", bytesWritten, _size);
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!");
+        return HTTPC_ERROR_SEND_PAYLOAD_FAILED;
+    } else {
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload written: %d\n", bytesWritten);
     }
 
     // handle Server Response (Header)
@@ -385,7 +454,6 @@ String httpClient::getString(void) {
     return sstring;
 }
 
-
 /**
  * adds Header to the request
  * @param name
@@ -394,16 +462,20 @@ String httpClient::getString(void) {
  */
 void httpClient::addHeader(const String& name, const String& value, bool first) {
 
-    String headerLine = name;
-    headerLine += ": ";
-    headerLine += value;
-    headerLine += "\r\n";
+    // not allow set of Header handled by code
+    if(!name.equalsIgnoreCase("Connection") && !name.equalsIgnoreCase("User-Agent") && !name.equalsIgnoreCase("Host")) {
+        String headerLine = name;
+        headerLine += ": ";
+        headerLine += value;
+        headerLine += "\r\n";
 
-    if(first) {
-        _Headers = headerLine + _Headers;
-    } else {
-        _Headers += headerLine;
+        if(first) {
+            _Headers = headerLine + _Headers;
+        } else {
+            _Headers += headerLine;
+        }
     }
+
 }
 
 void httpClient::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
@@ -458,7 +530,6 @@ bool httpClient::connect(void) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, try reuse!\n");
         return true;
     }
-
 
     if(_https) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect https...\n");
