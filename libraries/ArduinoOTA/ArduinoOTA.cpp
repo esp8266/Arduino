@@ -266,11 +266,11 @@ void ArduinoOTAClass::_runUpdate() {
       delay(1);
     if (!waited){
 #if OTA_DEBUG
-      Serial.printf("Recieve Failed\n");
+      Serial.printf("Receive Failed\n");
 #endif
       _udp_ota->listen(*IP_ADDR_ANY, _port);
       if (_error_callback) {
-        _error_callback(OTA_RECIEVE_ERROR);
+        _error_callback(OTA_RECEIVE_ERROR);
       }
       _state = OTA_IDLE;
     }
