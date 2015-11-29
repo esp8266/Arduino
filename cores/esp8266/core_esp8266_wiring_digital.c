@@ -109,7 +109,7 @@ typedef struct {
 static interrupt_handler_t interrupt_handlers[16];
 static uint32_t interrupt_reg = 0;
 
-void interrupt_handler(void *arg) {
+void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
   uint32_t status = GPIE;
   GPIEC = status;//clear them interrupts
   if(status == 0 || interrupt_reg == 0) return;
