@@ -111,6 +111,7 @@ static uint32_t interrupt_reg = 0;
 
 void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
   uint32_t status = GPIE;
+  uint32_t levels = GPI;
   GPIEC = status;//clear them interrupts
   if(status == 0 || interrupt_reg == 0) return;
   ETS_GPIO_INTR_DISABLE();
@@ -122,7 +123,7 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
     interrupt_handler_t *handler = &interrupt_handlers[i];
     if (handler->fn && 
         (handler->mode == CHANGE || 
-         (handler->mode & 1) == digitalRead(i))) {
+         (handler->mode & 1) == !!(levels & (1 << i)))) {
       // to make ISR compatible to Arduino AVR model where interrupts are disabled
       // we disable them before we call the client ISR
       uint32_t savedPS = xt_rsil(15); // stop other interrupts 
