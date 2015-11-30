@@ -13,6 +13,26 @@ title: Change Log
 - Update documentation for NodeMCU and Olimex boards
 - Disable interrupts inside ESP.getVcc (#567)
 - Erase RTC RAM only if RF mode looks invalid (#619)
+- Get pin levels at time of interrupt, rather than the time of calling the handler.
+- Move interrupt handlers to ram.
+- Improve debug output on critical errors
+- Add ArduinoOTA library and docs
+- Add WeMos D1 & D1 mini boards
+- Add documentation about boot messages and mode meaning
+- Disable sleep mode before doing OTA (#1005)
+- Add the ability to be called back when the device is about to reset
+- Add "Reset Method" menu
+- Add MD5 to core
+- I2C: generate STOP in case of NACK (fix #698, #254)
+- Add libc time functions
+- Fix linker script for 512k(no SPIFFS) variant (#966)
+- I2S optimizations
+- Support Sketch > Export compiled binary
+- Update SPIFFS wrapper for 0.3.3
+- Fix placement of code into RAM, enable gc-sections
+- Make soft wdt reset more obvious
+- Force disable IOSWAP for UART0 in HardwareSerial initialization (#744)
+- Add IPAddress::toString()
 
 
 ### Libraries
@@ -23,6 +43,30 @@ title: Change Log
 - ESP8266mDNS: allow to work on SoftAP interface
 - EEPROM: round requested size to 4 bytes (#659)
 - Add ESP8266AVRISP library
+- Add ESP8266HTTPUpdate library
+- Add HTTPClient library
+- Add WiFiClientSecure
+- ESP8266WiFi library: add persistent option, fix #1054
+- Make RequestHandler handle uploads
+- Add Digest Authentication to OTA and espota.py
+- Don't close UDP pcbs when WiFi connection drops (#969)
+- Add espsoftwareserial library
+- Add HTTP Updater library
+- Add Ethernet library for W5100
+- Add SPIFFS WebServer Example
+- add dnsIP() to ESP8266WiFi class
+- OTA support encapsulated to ArduinoOTA class
+- Add gdb stub library
+- Extracted the WebUpdate example into a library.
+- Fix to Servo allowing write() to be called before attach()
+- ESP9266WiFi: add function `begin` without any parameters and add `psk` function to return current PSK form sdk config
+- Fix a crash due to abort() called from TCP error callback (#428)
+- Adding support for OPTIONS requests to ESP8266WebServer
+- Add HTTPS request sample (#43)
+- Fix _useClientMode & _useApMode in SDK auto connect mode (#754)
+- Add ESP8266WebServer::sendContent_P with 'size_t size' argument for binary content
+- Fix bug in WiFiClient::write_P when content was binary
+- Add WiFiClient::write_P to be used with PROGMEM
 
 ### Tools
 
