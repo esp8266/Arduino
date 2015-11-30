@@ -31,7 +31,7 @@
 #define DEBUG_HTTPCLIENT(...)
 #endif
 
-#define HTTPClient_TCP_TIMEOUT (1000)
+#define HTTPCLIENT_TCP_TIMEOUT (1000)
 
 /// HTTP client errors
 #define HTTPC_ERROR_CONNECTION_REFUSED  (-1)
