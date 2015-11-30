@@ -2,7 +2,19 @@
 title: Change Log
 ---
 
-*Current release*
+## Current version
+
+### Core
+
+### Libraries
+
+### Tools
+
+---
+## 2.0.0
+November 30, 2015
+
+Package link: `http://arduino.esp8266.com/versions/2.0.0/package_esp8266com_index.json`.
 
 ### Core
 
