@@ -41,7 +41,7 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void) {
  * @return t_httpUpdate_return
  */
 t_httpUpdate_return ESP8266HTTPUpdate::update(const char * url, const char * current_version, const char * httpsFingerprint) {
-    httpClient http;
+    HTTPClient http;
     http.begin(url, httpsFingerprint);
     return handleUpdate(&http, current_version);
 }
@@ -56,24 +56,24 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(const char * url, const char * cur
  * @return
  */
 t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, const char * url, const char * current_version, bool https, const char * httpsFingerprint) {
-    httpClient http;
+    HTTPClient http;
     http.begin(host, port, url, https, httpsFingerprint);
     return handleUpdate(&http, current_version);
 }
 
 t_httpUpdate_return ESP8266HTTPUpdate::update(String host, uint16_t port, String url, String current_version, bool https, String httpsFingerprint) {
-    httpClient http;
+    HTTPClient http;
     http.begin(host, port, url, https, httpsFingerprint);
     return handleUpdate(&http, current_version.c_str());
 }
 
 /**
  *
- * @param http httpClient *
+ * @param http HTTPClient *
  * @param current_version const char *
  * @return t_httpUpdate_return
  */
-t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(httpClient * http, const char * current_version) {
+t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const char * current_version) {
 
     t_httpUpdate_return ret = HTTP_UPDATE_FAILED;
 

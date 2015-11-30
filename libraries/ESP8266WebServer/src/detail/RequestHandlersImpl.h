@@ -60,7 +60,7 @@ public:
     {
         _isFile = fs.exists(path);
         DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header);
-        _baseUriLength = _uri.length(); 
+        _baseUriLength = _uri.length();
     }
 
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
@@ -75,26 +75,27 @@ public:
 
     bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
         if (!canHandle(requestMethod, requestUri))
-            return false; 
-        
+            return false;
+
         DEBUGV("StaticRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), _uri.c_str());
 
-        String path(_path); 
+        String path(_path);
 
-        if(path.endsWith("/")) path += "index.htm";
+        if (!_isFile) {
+            // Base URI doesn't point to a file.
+            // If a directory is requested, look for index file.
+            if (requestUri.endsWith("/")) requestUri += "index.htm";
 
-        if (!_isFile) { 
-            // Base URI doesn't point to a file. Append whatever follows this
-            // URI in request to get the file path.
-            path += requestUri.substring(_baseUriLength); 
+            // Append whatever follows this URI in request to get the file path.
+            path += requestUri.substring(_baseUriLength);
         }
         DEBUGV("StaticRequestHandler::handle: path=%s, isFile=%d\r\n", path.c_str(), _isFile);
 
         String contentType = getContentType(path);
-        
+
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
-        // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc... 
-        if (!path.endsWith(".gz") && !SPIFFS.exists(path))  { 
+        // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
+        if (!path.endsWith(".gz") && !SPIFFS.exists(path))  {
             String pathWithGz = path + ".gz";
             if(SPIFFS.exists(pathWithGz))
                 path += ".gz";
@@ -104,9 +105,9 @@ public:
         if (!f)
             return false;
 
-        if (_cache_header.length() != 0) 
+        if (_cache_header.length() != 0)
             server.sendHeader("Cache-Control", _cache_header);
-        
+
         server.streamFile(f, contentType);
         return true;
     }
@@ -133,7 +134,7 @@ protected:
     FS _fs;
     String _uri;
     String _path;
-    String _cache_header; 
+    String _cache_header;
     bool _isFile;
     size_t _baseUriLength;
 };
