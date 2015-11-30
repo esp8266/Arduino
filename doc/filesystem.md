@@ -127,9 +127,7 @@ Returns *true* if a file with given path exists, *false* otherwise.
 SPIFFS.openDir(path)
 ```
 
-Opens a directory given its absolute path. Returns a *Dir* object. To check if
-directory was opened successfully, use the boolean operator, similar to opening
-a file.
+Opens a directory given its absolute path. Returns a *Dir* object.
 
 ### remove
 
