@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Reference &middot; ESP8266 Arduino Core
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/poole.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/syntax.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/hyde.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/icons.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <!-- Icons -->
+  <link rel="shortcut icon" href="/Arduino/versions/2.0.0/public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="/Arduino/versions/2.0.0/public/js/toc.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        $('#toc').toc({ listType: 'ul', showSpeed: 0, title: '', headers: 'h1, h2', minimumHeaders: 2 });
+    });
+  </script>
+</head>
+
+
+  <body>
+
+    <div class="version-bar">
+  This documentation is for version 2.0.0. <a href="http://esp8266.github.io/Arduino/versions">Other versions.</a>
+</div>
+
+<div class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <h2>
+        <a href="http://esp8266.github.io/Arduino">
+          ESP8266 Arduino Core
+        </a>
+      </h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/installing.html">Installation</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/reference.html">Reference</a>
+          
+        
+          
+        
+        
+            <div id="toc"></div>
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/libraries.html">Libraries</a>
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/filesystem.html">File System</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/ota_updates/ota_updates.html">OTA Update</a>
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/boards.html">Supported Hardware</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/changes.html">Change Log</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+    </nav>
+  <p>
+    <a href="https://github.com/esp8266/Arduino"><div id="gh-icon"></div>esp8266/Arduino</a>
+  </p>
+  <p class="lead">Documentation for ESP8266 Arduino Core. Installation instructions, functions and classes reference.
+</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+<li><a href="#table-of-contents">Table of Contents</a></li>
+<li><a href="#digital-io">Digital IO</a></li>
+<li><a href="#analog-input">Analog input</a></li>
+<li><a href="#analog-output">Analog output</a></li>
+<li><a href="#timing-and-delays">Timing and delays</a></li>
+<li><a href="#serial">Serial</a></li>
+<li><a href="#progmem">Progmem</a></li>
+</ul>
+
+<h2 id="digital-io">Digital IO</h2>
+
+<p>Pin numbers in Arduino correspond directly to the ESP8266 GPIO pin numbers. <code>pinMode</code>, <code>digitalRead</code>, and <code>digitalWrite</code> functions work as usual, so to read GPIO2, call <code>digitalRead(2)</code>.</p>
+
+<p>Digital pins 0—15 can be <code>INPUT</code>, <code>OUTPUT</code>, or <code>INPUT_PULLUP</code>.
+Pin 16 can be <code>INPUT</code>, <code>OUTPUT</code> or <code>INPUT_PULLDOWN_16</code>. At startup, pins are configured as <code>INPUT</code>.</p>
+
+<p>Pins may also serve other functions, like Serial, I2C, SPI. These functions are normally activated by the corresponding library. The diagram below shows pin mapping for the popular ESP-12 module.</p>
+
+<p><img src="esp12.png" alt="Pin Functions"></p>
+
+<p>Digital pins 6—11 are not shown on this diagram because they are used to connect flash memory chip on most modules. Trying to use these pins as IOs will likely cause the program to crash.</p>
+
+<p>Note that some boards and modules (ESP-12ED, NodeMCU 1.0) also break out pins 9 and 11. These may be used as IO if flash chip works in DIO mode (as opposed to QIO, which is the default one).</p>
+
+<p>Pin interrupts are supported through <code>attachInterrupt</code>, <code>detachInterrupt</code> functions.
+Interrupts may be attached to any GPIO pin, except GPIO16. Standard Arduino interrupt
+types are supported: <code>CHANGE</code>, <code>RISING</code>, <code>FALLING</code>.</p>
+
+<h2 id="analog-input">Analog input</h2>
+
+<p>ESP8266 has a single ADC channel available to users. It may be used either to read voltage at ADC pin, or to read module supply voltage (VCC).</p>
+
+<p>To read external voltage applied to ADC pin, use <code>analogRead(A0)</code>. Input voltage range is 0 — 1.0V.</p>
+
+<p>To read VCC voltage, ADC pin must be kept unconnected. Additionally, the following line has to be added to the sketch:</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">ADC_MODE</span><span class="p">(</span><span class="n">ADC_VCC</span><span class="p">);</span>
+</code></pre></div>
+<p>This line has to appear outside of any functions, for instance right after the <code>#include</code> lines of your sketch.</p>
+
+<h2 id="analog-output">Analog output</h2>
+
+<p><code>analogWrite(pin, value)</code> enables software PWM on the given pin. PWM may be used on pins 0 to 16.
+Call <code>analogWrite(pin, 0)</code> to disable PWM on the pin. <code>value</code> may be in range from 0 to <code>PWMRANGE</code>, which is equal to 1023 by default. PWM range may be changed by calling <code>analogWriteRange(new_range)</code>.</p>
+
+<p>PWM frequency is 1kHz by default. Call <code>analogWriteFreq(new_frequency)</code> to change the frequency.</p>
+
+<h2 id="timing-and-delays">Timing and delays</h2>
+
+<p><code>millis()</code> and <code>micros()</code> return the number of milliseconds and microseconds elapsed after reset, respectively.</p>
+
+<p><code>delay(ms)</code> pauses the sketch for a given number of milliseconds and allows WiFi and TCP/IP tasks to run.
+<code>delayMicroseconds(us)</code> pauses for a given number of microseconds.</p>
+
+<p>Remember that there is a lot of code that needs to run on the chip besides the sketch
+when WiFi is connected. WiFi and TCP/IP libraries get a chance to handle any pending
+events each time the <code>loop()</code> function completes, OR when <code>delay</code> is called.
+If you have a loop somewhere in your sketch that takes a lot of time (&gt;50ms) without
+calling <code>delay</code>, you might consider adding a call to <code>delay</code> function to keep the WiFi
+stack running smoothly.</p>
+
+<p>There is also a <code>yield()</code> function which is equivalent to <code>delay(0)</code>. The <code>delayMicroseconds</code>
+function, on the other hand, does not yield to other tasks, so using it for delays
+more than 20 milliseconds is not recommended.</p>
+
+<h2 id="serial">Serial</h2>
+
+<p><code>Serial</code> object works much the same way as on a regular Arduino. Apart from hardware FIFO (128 bytes for TX and RX) HardwareSerial has additional 256-byte TX and RX buffers. Both transmit and receive is interrupt-driven. Write and read functions only block the sketch execution when the respective FIFO/buffers are full/empty.</p>
+
+<p><code>Serial</code> uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling <code>Serial.swap()</code> after <code>Serial.begin</code>. Calling <code>swap</code> again maps UART0 back to GPIO1 and GPIO3.</p>
+
+<p><code>Serial1</code> uses UART1, TX pin is GPIO2. UART1 can not be used to receive data because normally it&#39;s RX pin is occupied for flash chip connection. To use <code>Serial1</code>, call <code>Serial1.begin(baudrate)</code>.</p>
+
+<p>By default the diagnostic output from WiFi libraries is disabled when you call <code>Serial.begin</code>. To enable debug output again, call <code>Serial.setDebugOutput(true)</code>. To redirect debug output to <code>Serial1</code> instead, call <code>Serial1.setDebugOutput(true)</code>.</p>
+
+<p>You also need to use <code>Serial.setDebugOutput(true)</code> to enable output from <code>printf()</code> function.</p>
+
+<p>Both <code>Serial</code> and <code>Serial1</code> objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call <code>Serial.begin(baudrate, SERIAL_8N1)</code>, <code>Serial.begin(baudrate, SERIAL_6E2)</code>, etc.</p>
+
+<h2 id="progmem">Progmem</h2>
+
+<p>The Program memory features work much the same way as on a regular Arduino; placing read only data and strings in read only memory and freeing heap for your application.
+The important difference is that on the ESP8266 the literal strings are not pooled.  This means that the same literal string defined inside a <code>F(&quot;&quot;)</code> and/or <code>PSTR(&quot;&quot;)</code> will take up space for each instance in the code. So you will need to manage the duplicate strings yourself.</p>
+
+<p>There is one additional helper macro to make it easier to pass <code>const PROGMEM</code> strings to methods that take a <code>__FlashStringHelper</code> called <code>FPSTR()</code>.  The use of this will help make it easier to pool strings.
+Not pooling strings...</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">String</span> <span class="n">response1</span><span class="p">;</span>
+<span class="n">response1</span> <span class="o">+=</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;http:&quot;</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">String</span> <span class="n">response2</span><span class="p">;</span>
+<span class="n">response2</span> <span class="o">+=</span> <span class="n">F</span><span class="p">(</span><span class="s">&quot;http:&quot;</span><span class="p">);</span>
+</code></pre></div>
+<p>using FPSTR would become...</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="k">const</span> <span class="kt">char</span> <span class="n">HTTP</span><span class="p">[]</span> <span class="n">PROGMEM</span> <span class="o">=</span> <span class="s">&quot;http:&quot;</span><span class="p">;</span>
+<span class="p">...</span>
+<span class="p">{</span>
+    <span class="n">String</span> <span class="n">response1</span><span class="p">;</span>
+    <span class="n">response1</span> <span class="o">+=</span> <span class="n">FPSTR</span><span class="p">(</span><span class="n">HTTP</span><span class="p">);</span>
+    <span class="p">...</span>
+    <span class="n">String</span> <span class="n">response2</span><span class="p">;</span>
+    <span class="n">response2</span> <span class="o">+=</span> <span class="n">FPSTR</span><span class="p">(</span><span class="n">HTTP</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+    </div>
+  </body>
+</html>

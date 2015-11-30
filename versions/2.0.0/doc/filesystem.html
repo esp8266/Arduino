@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      File System &middot; ESP8266 Arduino Core
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/poole.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/syntax.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/hyde.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/icons.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <!-- Icons -->
+  <link rel="shortcut icon" href="/Arduino/versions/2.0.0/public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="/Arduino/versions/2.0.0/public/js/toc.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        $('#toc').toc({ listType: 'ul', showSpeed: 0, title: '', headers: 'h1, h2', minimumHeaders: 2 });
+    });
+  </script>
+</head>
+
+
+  <body>
+
+    <div class="version-bar">
+  This documentation is for version 2.0.0. <a href="http://esp8266.github.io/Arduino/versions">Other versions.</a>
+</div>
+
+<div class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <h2>
+        <a href="http://esp8266.github.io/Arduino">
+          ESP8266 Arduino Core
+        </a>
+      </h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/installing.html">Installation</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/reference.html">Reference</a>
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/libraries.html">Libraries</a>
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/filesystem.html">File System</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+            <div id="toc"></div>
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/ota_updates/ota_updates.html">OTA Update</a>
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/boards.html">Supported Hardware</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/changes.html">Change Log</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+    </nav>
+  <p>
+    <a href="https://github.com/esp8266/Arduino"><div id="gh-icon"></div>esp8266/Arduino</a>
+  </p>
+  <p class="lead">Documentation for ESP8266 Arduino Core. Installation instructions, functions and classes reference.
+</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+<li><a href="#flash-layout">Flash layout</a></li>
+<li><a href="#uploading-files-to-file-system">Uploading files to file system</a></li>
+<li><a href="#file-system-object-spiffs">File system object (SPIFFS)</a>
+
+<ul>
+<li><a href="#begin">begin</a></li>
+<li><a href="#format">format</a></li>
+<li><a href="#open">open</a></li>
+<li><a href="#exists">exists</a></li>
+<li><a href="#opendir">openDir</a></li>
+<li><a href="#remove">remove</a></li>
+<li><a href="#rename">rename</a></li>
+<li><a href="#info">info</a></li>
+</ul></li>
+<li><a href="#filesystem-information-structure">Filesystem information structure</a></li>
+<li><a href="#directory-object-dir">Directory object (Dir)</a></li>
+<li><a href="#file-object">File object</a>
+
+<ul>
+<li><a href="#seek">seek</a></li>
+<li><a href="#position">position</a></li>
+<li><a href="#size">size</a></li>
+<li><a href="#name">name</a></li>
+<li><a href="#close">close</a></li>
+</ul></li>
+</ul>
+
+<h2 id="flash-layout">Flash layout</h2>
+
+<p>Even though file system is stored on the same flash chip as the program, programming new sketch will not modify file system contents. This allows to use file system to store sketch data, configuration files, or content for Web server.</p>
+
+<p>The following diagram illustrates flash layout used in Arduino environment:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">|--------------|-------|---------------|--|--|--|--|--|
+^              ^       ^               ^     ^
+Sketch    OTA update   File system   EEPROM  WiFi config (SDK)
+</code></pre></div>
+<p>File system size depends on the flash chip size. Depending on the board which is selected in IDE, you have the following options for flash size:</p>
+
+<table><thead>
+<tr>
+<th>Board</th>
+<th>Flash chip size, bytes</th>
+<th>File system size, bytes</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Generic module</td>
+<td>512k</td>
+<td>64k</td>
+</tr>
+<tr>
+<td>Generic module</td>
+<td>1M</td>
+<td>64k, 128k, 256k, 512k</td>
+</tr>
+<tr>
+<td>Generic module</td>
+<td>2M</td>
+<td>1M</td>
+</tr>
+<tr>
+<td>Generic module</td>
+<td>4M</td>
+<td>3M</td>
+</tr>
+<tr>
+<td>Adafruit HUZZAH</td>
+<td>4M</td>
+<td>1M, 3M</td>
+</tr>
+<tr>
+<td>NodeMCU 0.9</td>
+<td>4M</td>
+<td>1M, 3M</td>
+</tr>
+<tr>
+<td>NodeMCU 1.0</td>
+<td>4M</td>
+<td>1M, 3M</td>
+</tr>
+<tr>
+<td>Olimex MOD-WIFI-ESP8266(-DEV)</td>
+<td>2M</td>
+<td>1M</td>
+</tr>
+<tr>
+<td>SparkFun Thing</td>
+<td>512k</td>
+<td>64k</td>
+</tr>
+<tr>
+<td>SweetPea ESP-210</td>
+<td>4M</td>
+<td>1M, 3M</td>
+</tr>
+<tr>
+<td>WeMos D1 &amp; D1 mini</td>
+<td>4M</td>
+<td>1M, 3M</td>
+</tr>
+</tbody></table>
+
+<p><strong>Note:</strong> to use any of file system functions in the sketch, add the following include to the sketch:</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="cp">#include &quot;FS.h&quot;</span>
+</code></pre></div>
+<h2 id="uploading-files-to-file-system">Uploading files to file system</h2>
+
+<p><em>ESP8266FS</em> is a tool which integrates into the Arduino IDE. It adds a menu item to <em>Tools</em> menu for uploading the contents of sketch data directory into ESP8266 flash file system.</p>
+
+<ul>
+<li>Download the tool: <a href="https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.1.3/ESP8266FS-0.1.3.zip">https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.1.3/ESP8266FS-0.1.3.zip</a>.</li>
+<li>In your Arduino sketchbook directory, create <code>tools</code> directory if it doesn&#39;t exist yet</li>
+<li>Unpack the tool into <code>tools</code> directory (the path will look like <code>&lt;home_dir&gt;/Arduino/tools/ESP8266FS/tool/esp8266fs.jar</code>)</li>
+<li>Restart Arduino IDE</li>
+<li>Open a sketch (or create a new one and save it)</li>
+<li>Go to sketch directory (choose Sketch &gt; Show Sketch Folder)</li>
+<li>Create a directory named <code>data</code> and any files you want in the file system there</li>
+<li>Make sure you have selected a board, port, and closed Serial Monitor</li>
+<li>Select Tools &gt; ESP8266 Sketch Data Upload. This should start uploading the files into ESP8266 flash file system. When done, IDE status bar will display <code>SPIFFS Image Uploaded</code> message.</li>
+</ul>
+
+<h2 id="file-system-object-spiffs">File system object (SPIFFS)</h2>
+
+<h3 id="begin">begin</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">SPIFFS</span><span class="p">.</span><span class="n">begin</span><span class="p">()</span>
+</code></pre></div>
+<p>This method mounts SPIFFS file system. It must be called before any other
+FS APIs are used. Returns <em>true</em> if file system was mounted successfully, false
+otherwise.</p>
+
+<h3 id="format">format</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">SPIFFS</span><span class="p">.</span><span class="n">format</span><span class="p">()</span>
+</code></pre></div>
+<p>Formats the file system. May be called either before or after calling <code>begin</code>.
+Returns <em>true</em> if formatting was successful.</p>
+
+<h3 id="open">open</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">SPIFFS</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+</code></pre></div>
+<p>Opens a file. <code>path</code> should be an absolute path starting with a slash
+(e.g. <code>/dir/filename.txt</code>). <code>mode</code> is a string specifying access mode. It can be
+one of &quot;r&quot;, &quot;w&quot;, &quot;a&quot;, &quot;r+&quot;, &quot;w+&quot;, &quot;a+&quot;. Meaning of these modes is the same as
+for <code>fopen</code> C function.</p>
+
+<p>Returns <em>File</em> object. To check whether the file was opened successfully, use
+the boolean operator.</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">File</span> <span class="n">f</span> <span class="o">=</span> <span class="n">SPIFFS</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;/f.txt&quot;</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">f</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">&quot;file open failed&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="exists">exists</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">SPIFFS</span><span class="p">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+<p>Returns <em>true</em> if a file with given path exists, <em>false</em> otherwise.</p>
+
+<h3 id="opendir">openDir</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">SPIFFS</span><span class="p">.</span><span class="n">openDir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+<p>Opens a directory given its absolute path. Returns a <em>Dir</em> object.</p>
+
+<h3 id="remove">remove</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">SPIFFS</span><span class="p">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+<p>Deletes the file given its absolute path. Returns <em>true</em> if file was deleted successfully.</p>
+
+<h3 id="rename">rename</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">SPIFFS</span><span class="p">.</span><span class="n">rename</span><span class="p">(</span><span class="n">pathFrom</span><span class="p">,</span> <span class="n">pathTo</span><span class="p">)</span>
+</code></pre></div>
+<p>Renames file from <code>pathFrom</code> to <code>pathTo</code>. Paths must be absolute. Returns <em>true</em>
+if file was renamed successfully.</p>
+
+<h3 id="info">info</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">FSInfo</span> <span class="n">fs_info</span><span class="p">;</span>
+<span class="n">SPIFFS</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="n">fs_info</span><span class="p">);</span>
+</code></pre></div>
+<p>Fills <a href="#filesystem-information-structure">FSInfo structure</a> with information about
+the file system. Returns <code>true</code> is successful, <code>false</code> otherwise.</p>
+
+<h2 id="filesystem-information-structure">Filesystem information structure</h2>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="k">struct</span> <span class="n">FSInfo</span> <span class="p">{</span>
+    <span class="kt">size_t</span> <span class="n">totalBytes</span><span class="p">;</span>
+    <span class="kt">size_t</span> <span class="n">usedBytes</span><span class="p">;</span>
+    <span class="kt">size_t</span> <span class="n">blockSize</span><span class="p">;</span>
+    <span class="kt">size_t</span> <span class="n">pageSize</span><span class="p">;</span>
+    <span class="kt">size_t</span> <span class="n">maxOpenFiles</span><span class="p">;</span>
+    <span class="kt">size_t</span> <span class="n">maxPathLength</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p>This is the structure which may be filled using FS::info method. Field names
+are self-explanatory.</p>
+
+<h2 id="directory-object-dir">Directory object (Dir)</h2>
+
+<p>The purpose of <em>Dir</em> object is to iterate over files inside a directory.
+It provides three methods: <code>next()</code>, <code>fileName()</code>, and <code>openFile(mode)</code>.</p>
+
+<p>The following example shows how it should be used:</p>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">Dir</span> <span class="n">dir</span> <span class="o">=</span> <span class="n">SPIFFS</span><span class="p">.</span><span class="n">openDir</span><span class="p">(</span><span class="s">&quot;/data&quot;</span><span class="p">);</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">dir</span><span class="p">.</span><span class="n">next</span><span class="p">())</span> <span class="p">{</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">dir</span><span class="p">.</span><span class="n">fileName</span><span class="p">());</span>
+    <span class="n">File</span> <span class="n">f</span> <span class="o">=</span> <span class="n">dir</span><span class="p">.</span><span class="n">openFile</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">);</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">f</span><span class="p">.</span><span class="n">size</span><span class="p">());</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><code>dir.next()</code> returns true while there are files in the directory to iterate over.
+It must be called before calling <code>fileName</code> and <code>openFile</code> functions.</p>
+
+<p><code>openFile</code> method takes <em>mode</em> argument which has the same meaning as for <code>SPIFFS.open</code> function.</p>
+
+<h2 id="file-object">File object</h2>
+
+<p><code>SPIFFS.open</code> and <code>dir.openFile</code> functions return a <em>File</em> object. This object
+supports all the functions of <em>Stream</em>, so you can use <code>readBytes</code>, <code>findUntil</code>,
+<code>parseInt</code>, <code>println</code>, and all other <em>Stream</em> methods.</p>
+
+<p>There are also some functions which are specific to <em>File</em> object.</p>
+
+<h3 id="seek">seek</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">file</span><span class="p">.</span><span class="n">seek</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+</code></pre></div>
+<p>This function behaves like <code>fseek</code> C function. Depending on the value of <code>mode</code>,
+it moves current position in a file as follows:</p>
+
+<ul>
+<li>if <code>mode</code> is <code>SeekSet</code>, position is set to <code>offset</code> bytes from the beginning.</li>
+<li>if <code>mode</code> is <code>SeekCur</code>, current position is moved by <code>offset</code> bytes.</li>
+<li>if <code>mode</code> is <code>SeekEnd</code>, position is set to <code>offset</code> bytes from the end of the
+file.</li>
+</ul>
+
+<p>Returns <em>true</em> if position was set successfully.</p>
+
+<h3 id="position">position</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">file</span><span class="p">.</span><span class="n">position</span><span class="p">()</span>
+</code></pre></div>
+<p>Returns the current position inside the file, in bytes.</p>
+
+<h3 id="size">size</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">file</span><span class="p">.</span><span class="n">size</span><span class="p">()</span>
+</code></pre></div>
+<p>Returns file size, in bytes.</p>
+
+<h3 id="name">name</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">file</span><span class="p">.</span><span class="n">name</span><span class="p">();</span>
+</code></pre></div>
+<p>Returns file name, as <code>const char*</code>. Convert it to <em>String</em> for storage.</p>
+
+<h3 id="close">close</h3>
+<div class="highlight"><pre><code class="language-c++" data-lang="c++"><span class="n">file</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
+<p>Close the file. No other operations should be performed on <em>File</em> object after <code>close</code> function was called.</p>
+
+    </div>
+  </body>
+</html>

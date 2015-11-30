@@ -1,0 +1,32 @@
+#gh-icon {
+    background: url("/Arduino/versions/2.0.0/public/gh.png") no-repeat top left;
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+ @media
+(-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+    #gh-icon {
+        background-image: url("/Arduino/versions/2.0.0/public/gh@2.png");
+        background-size: 100%;
+    }
+}
+
+.clickable-header {
+  cursor:pointer;
+}
+.clickable-header:hover {
+  text-decoration:underline;
+}
+.top-level-header {
+  display:inline;
+}
+.back-to-top {
+  margin-left:5px;
+  cursor:pointer;
+  vertical-align: top;
+}

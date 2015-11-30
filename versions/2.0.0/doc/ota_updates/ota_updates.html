@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      OTA Update &middot; ESP8266 Arduino Core
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/poole.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/syntax.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/hyde.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.0.0/public/css/icons.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <!-- Icons -->
+  <link rel="shortcut icon" href="/Arduino/versions/2.0.0/public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="/Arduino/versions/2.0.0/public/js/toc.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        $('#toc').toc({ listType: 'ul', showSpeed: 0, title: '', headers: 'h1, h2', minimumHeaders: 2 });
+    });
+  </script>
+</head>
+
+
+  <body>
+
+    <div class="version-bar">
+  This documentation is for version 2.0.0. <a href="http://esp8266.github.io/Arduino/versions">Other versions.</a>
+</div>
+
+<div class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <h2>
+        <a href="http://esp8266.github.io/Arduino">
+          ESP8266 Arduino Core
+        </a>
+      </h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/installing.html">Installation</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/reference.html">Reference</a>
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/libraries.html">Libraries</a>
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/filesystem.html">File System</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/ota_updates/ota_updates.html">OTA Update</a>
+          
+        
+          
+        
+          
+        
+        
+            <div id="toc"></div>
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/boards.html">Supported Hardware</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.0.0/doc/changes.html">Change Log</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+    </nav>
+  <p>
+    <a href="https://github.com/esp8266/Arduino"><div id="gh-icon"></div>esp8266/Arduino</a>
+  </p>
+  <p class="lead">Documentation for ESP8266 Arduino Core. Installation instructions, functions and classes reference.
+</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+<li><a href="#introduction">Introduction</a>
+
+<ul>
+<li><a href="#security">Security</a></li>
+<li><a href="#safety">Safety</a></li>
+<li><a href="#basic-requirements">Basic Requirements</a></li>
+</ul></li>
+<li><a href="#arduino-ide">Arduino IDE</a>
+
+<ul>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#application-example">Application Example</a>
+
+<ul>
+<li><a href="#classic-ota">Classic OTA</a></li>
+<li><a href="#arduinoota">ArduinoOTA</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#web-browser">Web Browser</a>
+
+<ul>
+<li><a href="#requirements-1">Requirements</a></li>
+<li><a href="#implementation-overview">Implementation Overview</a></li>
+<li><a href="#application-example-1">Application Example</a></li>
+</ul></li>
+<li><a href="#http-server">HTTP Server</a>
+
+<ul>
+<li><a href="#requirements-2">Requirements</a></li>
+<li><a href="#arduino-code">Arduino code</a>
+
+<ul>
+<li><a href="#simple-updater">Simple updater</a></li>
+<li><a href="#advanced-updater">Advanced updater</a></li>
+</ul></li>
+<li><a href="#server-request-handling">Server request handling</a>
+
+<ul>
+<li><a href="#simple-updater-1">Simple updater</a></li>
+<li><a href="#advanced-updater-1">Advanced updater</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#stream-interface">Stream Interface</a></li>
+<li><a href="#updater-class">Updater class</a></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>OTA (Over the Air) update is the process of loading the firmware to ESP module using Wi-Fi connection rather that a serial port. Such functionality became extremely useful in case of limited or no physical access to the module.</p>
+
+<p>OTA may be done using:</p>
+
+<ul>
+<li><a href="#arduino-ide">Arduino IDE</a></li>
+<li><a href="#web-browser">Web Browser</a></li>
+<li><a href="#http-server">HTTP Server</a></li>
+</ul>
+
+<p>Arduino IDE option is intended primarily for software development phase. The two other options would be more useful after deployment, to provide module with application updates manually with a web browser or automatically using a http server.</p>
+
+<p>In any case first firmware upload have to be done over a serial port. If OTA routines are correctly implemented in a sketch, then all subsequent uploads may be done over the air.</p>
+
+<p>There is no imposed security on OTA process from being hacked. It is up to developer to ensure that updates are allowed only from legitimate / trusted source. Once update is complete, module restarts and new code is executed. Developer should ensure that application running on module is shut down and restarted in a safe manner. Chapters below provide additional information  regarding security and safety of OTA process.</p>
+
+<h3 id="security">Security</h3>
+
+<p>Module has to be exposed wirelessly to get it updated with a new sketch. That poses chances of module being violently hacked and loaded with some other code. To reduce likelihood of being hacked consider protecting your uploads with a password, selecting certain OTA port, etc.</p>
+
+<p>Check functionality provided with <a href="https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA">ArduinoOTA</a> library that may improve security:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="kt">void</span> <span class="nf">setPort</span><span class="p">(</span><span class="kt">uint16_t</span> <span class="n">port</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">setHostname</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">hostname</span><span class="p">);</span>
+<span class="kt">void</span> <span class="nf">setPassword</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">password</span><span class="p">);</span>
+</code></pre></div>
+<p>Certain protection functionality is already built in and do not require any additional coding by developer. <a href="https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA">ArduinoOTA</a> and espota.py use <a href="https://en.wikipedia.org/wiki/Digest_access_authentication">Digest-MD5</a> to authenticate upload. Integrity of transferred data is verified on ESP side using <a href="https://en.wikipedia.org/wiki/MD5">MD5</a> checksum.</p>
+
+<p>Make your own risk analysis and depending on application decide what library functions to implement. If required consider implementation of other means of protection from being hacked, e.g. exposing module for uploads only according to specific schedule, trigger OTA only be user pressing dedicated “Update” button, etc.</p>
+
+<h3 id="safety">Safety</h3>
+
+<p>OTA process takes ESP’s resources and bandwidth during upload. Then module is restarted and a new sketch executed. Analyse and test how it affects functionality of your existing and new sketch.</p>
+
+<p>If ESP is placed in remote location and controlling some equipment, you should put additional attention what happens if operation of this equipment is suddenly interrupted by update process. Therefore decide how to put this equipment into safe state before starting the update.  For instance your module may be controlling a garden watering system in a sequence. If this sequence is not properly shut down and a water valve left open, your garden may be flooded if this valve is not closed after OTA is finished and module restarts.  </p>
+
+<p>The following functions are provided with <a href="https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA">ArduinoOTA</a> library and intended to handle functionality of your application during specific stages of OTA or on an OTA error:</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="kt">void</span> <span class="nf">onStart</span><span class="p">(</span><span class="n">OTA_CALLBACK</span><span class="p">(</span><span class="n">fn</span><span class="p">));</span>
+<span class="kt">void</span> <span class="nf">onEnd</span><span class="p">(</span><span class="n">OTA_CALLBACK</span><span class="p">(</span><span class="n">fn</span><span class="p">));</span>
+<span class="kt">void</span> <span class="nf">onProgress</span><span class="p">(</span><span class="n">OTA_CALLBACK_PROGRESS</span><span class="p">(</span><span class="n">fn</span><span class="p">));</span>
+<span class="kt">void</span> <span class="nf">onError</span><span class="p">(</span><span class="n">OTA_CALLBACK_ERROR</span> <span class="p">(</span><span class="n">fn</span><span class="p">));</span>
+</code></pre></div>
+<h3 id="basic-requirements">Basic Requirements</h3>
+
+<ul>
+<li>Flash chip size is 2x the size of the sketch.</li>
+</ul>
+
+<p>The following chapters provide more details and specific methods of doing OTA.</p>
+
+<h2 id="arduino-ide">Arduino IDE</h2>
+
+<p>Uploading modules wirelessly from Arduino IDE is intended for the following typical scenarios:
+- during firmware development as a quicker alternative to loading over a serial
+- for updating small quantity of modules
+- only if modules are available on the same network as the computer with Arduino IDE</p>
+
+<h3 id="requirements">Requirements</h3>
+
+<ul>
+<li>The ESP and the computer must be connected to the same network.</li>
+</ul>
+
+<h3 id="application-example">Application Example</h3>
+
+<p>Currently there are two software configurations that support OTA updates.</p>
+
+<ul>
+<li><p><a href="#classic-ota-configuration">Classic OTA</a>: Arduino IDE 1.6.5 and 1.6.5-947-g39819f0 (of July 23, 2015) or 1.6.5-1160-gef26c5f (of Sep 30, 2015) version of platform package that provides first OTA implementation, yet without support for <a href="https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA">ArduinoOTA</a> library. This particular configuration is easier to configure in Arduino IDE and therefore suggested for less experienced users. It soon will be depreciated once implementation below is fully released.</p></li>
+<li><p><a href="#arduinoota-configuration">ArduinoOTA</a>: Arduino-PR-4107-BUILD-421 and latest git version of platform package that includes <a href="https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA">ArduinoOTA</a> library. This configuration features preliminary build of Arduino IDE and is intended for more experienced users. Please mid your step.</p></li>
+</ul>
+
+<p>Instructions below demonstrate how to configure both <a href="#classic-ota-configuration">Classic OTA</a> and <a href="#arduinoota-configuration">ArduinoOTA</a> using NodeMCU 1.0 (ESP-12E Module) board.</p>
+
+<h4 id="classic-ota">Classic OTA</h4>
+
+<ol>
+<li><p>Before you begin, please make sure that you have the following installed:</p>
+
+<ul>
+<li>Arduino IDE and ESP8266 board support as described under <a href="https://github.com/esp8266/Arduino#installing-with-boards-manager">https://github.com/esp8266/Arduino#installing-with-boards-manager</a></li>
+<li><p><a href="https://www.python.org/">Python</a> 2.7 (do not install Python 3.5 that is not supported):</p>
+
+<p><strong>Note:</strong> Windows users should select “Add python.exe to Path” (see below – this option is not selected by default).</p>
+
+<p><img src="ota-ide-python-configuration.png" alt="Python installation set up"></p></li>
+</ul></li>
+<li><p>Now prepare the sketch and configuration for the upload over a serial port.</p>
+
+<ul>
+<li><p>Start Arduino IDE and load sketch DNS_SD_Arduino_OTA.ino  available under File &gt;  Examples &gt; ESP8266mDNS
+<img src="ota-ide-sketch-selection.png" alt="OTA sketch selection"></p>
+
+<p><strong>Note:</strong> This sketch is available only for 1.6.5-947-g39819f0 (of July 23, 2015) and 1.6.5-1160-gef26c5f (of Sep 30, 2015) versions of platform packages installed in Arduino IDE using <a href="https://github.com/esp8266/Arduino#installing-with-boards-manager">https://github.com/esp8266/Arduino#installing-with-boards-manager</a>. It was removed in <a href="https://github.com/esp8266/Arduino/pull/980">#980</a> from GitHub repository.</p></li>
+<li><p>Update SSID and password in the sketch  so the module can join your Wi-Fi network
+<img src="ota-ide-ssid-pass-entry.png" alt="ssid and pass entry"></p></li>
+<li><p>Configure upload parameters as below (you may need to adjust configuration if you are using a different module):
+<img src="ota-ide-serial-upload-configuration.png" alt="configuration of serial upload"></p></li>
+</ul></li>
+<li><p>Upload the sketch (Ctrl+U). Once done open Serial Monitor (Ctrl+Shift+M) and check if module has joined your Wi-Fi network.</p>
+
+<p><img src="ota-ide-module-joined-wifi.png" alt="check if module joined network"></p></li>
+<li><p>Only if module is connected to network, after a couple of seconds, the esp8266-ota port will show up in Arduino IDE:</p>
+
+<p><img src="ota-ide-ota-port-selection.png" alt="selection of OTA port"></p></li>
+<li><p>Now get ready for your first OTA upload by changing configuration settings as follows:</p>
+
+<p><img src="ota-ide-ota-upload-configuration.png" alt="configuration of OTA upload"></p>
+
+<p><strong>Note:</strong> If you do not see “Upload Using: OTA” option available for “NodeMCU 1.0 (ESP-12E Module)” board, please upload the latest <a href="https://github.com/esp8266/Arduino/blob/master/boards.txt">boards.txt</a> file from GitHub repository, replace existing file and restart Arduino IDE.</p></li>
+<li><p>If you have successfully completed all the above steps, you can upload (Ctrl+U) the same (or any other) sketch over OTA:</p>
+
+<p><img src="ota-ide-ota-upload-complete.png" alt="OTA upload complete"></p></li>
+</ol>
+
+<p><strong>Note:</strong> To be able to upload your sketch over and over again using OTA, you need to embed OTA routines inside. Please use DNS_SD_Arduino_OTA.ino as an example.</p>
+
+<h4 id="arduinoota">ArduinoOTA</h4>
+
+<ol>
+<li><p>Upload and install the following software:</p>
+
+<ul>
+<li>Arduino-PR-4107-BUILD-421 - <a href="https://github.com/esp8266/Arduino/pull/984#issuecomment-155905800">https://github.com/esp8266/Arduino/pull/984#issuecomment-155905800</a></li>
+<li>Latest git version of platform package - <a href="https://github.com/esp8266/Arduino#using-git-version-">https://github.com/esp8266/Arduino#using-git-version-</a></li>
+<li>Python 2.7</li>
+</ul></li>
+<li><p>Proceed to step 2 under <a href="#classic-ota-configuration">Classic OTA Configuration</a> using BasicOTA.ino or OTALeds.ino sketch instead.</p></li>
+<li><p>Carry on with remaining steps.</p></li>
+</ol>
+
+<h2 id="web-browser">Web Browser</h2>
+
+<p>Updates described in this chapter are done with a web browser that can be useful in the following typical scenarios:</p>
+
+<ul>
+<li>after application deployment if loading directly from Arduino IDE is inconvenient or not possible</li>
+<li>after deployment if user is unable to expose module for OTA from external update server</li>
+<li>to provide updates after deployment to small quantity of modules when setting an update server is not practicable</li>
+</ul>
+
+<h3 id="requirements">Requirements</h3>
+
+<ul>
+<li>The ESP and the computer must be connected to the same network.</li>
+</ul>
+
+<h3 id="implementation-overview">Implementation Overview</h3>
+
+<p>Updates with a web browswer are implemented using <code>ESP8266HTTPUpdateServer</code> class together with <code>ESP8266WebServer</code> and <code>ESP8266mDNS</code> classes. The following code is required to get it work:</p>
+
+<p>setup()</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">    <span class="n">MDNS</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="n">host</span><span class="p">);</span>
+
+    <span class="n">httpUpdater</span><span class="p">.</span><span class="n">setup</span><span class="p">(</span><span class="o">&amp;</span><span class="n">httpServer</span><span class="p">);</span>
+    <span class="n">httpServer</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+
+    <span class="n">MDNS</span><span class="p">.</span><span class="n">addService</span><span class="p">(</span><span class="s">&quot;http&quot;</span><span class="p">,</span> <span class="s">&quot;tcp&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
+</code></pre></div>
+<p>loop()</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp">    <span class="n">httpServer</span><span class="p">.</span><span class="n">handleClient</span><span class="p">();</span>
+</code></pre></div>
+<h3 id="application-example">Application Example</h3>
+
+<p>The sample implementation provided below has been done using:</p>
+
+<ul>
+<li>example sketch WebUpdater.ino available in ESP8266HTTPUpdateServer library</li>
+<li>NodeMCU 1.0 (ESP-12E Module)</li>
+</ul>
+
+<p>You can use another module if it meets “Flash chip size is 2x the size of the sketch” requirement.</p>
+
+<ol>
+<li><p>Before you begin, please make sure that you have the following software installed:</p>
+
+<ul>
+<li>Arduino IDE and 2.0.0-rc1 (of Nov 17, 2015) version of platform package as described under <a href="https://github.com/esp8266/Arduino#installing-with-boards-manager">https://github.com/esp8266/Arduino#installing-with-boards-manager</a></li>
+<li>Host software depending on O/S you use:
+
+<ol>
+<li>Avahi <a href="http://avahi.org/">http://avahi.org/</a> for Linux</li>
+<li>Bonjour <a href="http://www.apple.com/support/bonjour/">http://www.apple.com/support/bonjour/</a> for Windows</li>
+<li>Mac OSX and iOS - support is already built in / no any extra s/w is required</li>
+</ol></li>
+</ul></li>
+<li><p>Prepare the sketch and configuration for initial upload with a serial port.</p>
+
+<ul>
+<li>Start Arduino IDE and load sketch WebUpdater.ino available under File &gt; Examples &gt; ESP8266HTTPUpdateServer.</li>
+<li>Update ssid and pass in the sketch so the module can join your Wi-Fi network.</li>
+<li><p>Open File &gt; Preferences, look for “Show verbose output during:” and check out “compilation” option.</p>
+
+<p><img src="ota-web-show-verbose-compilation.png" alt="Preferences - enablig verbose output during compilation"></p>
+
+<p><strong>Note:</strong> This setting will be required in step 5 below. You can uncheck this setting afterwards.</p></li>
+</ul></li>
+<li><p>Upload sketch (Ctrl+U). Once done open Serial Monitor (Ctrl+Shift+M) and check if you see the following message displayed, that contains url for OTA update.</p>
+
+<p><img src="ota-web-serial-monitor-ready.png" alt="Serial Monitor - after first load using serial"></p>
+
+<p><strong>Note:</strong> Such message will be shown only after module successfully joins network and is ready for an OTA upload.</p></li>
+<li><p>Now open web browser and enter the url provided on Serial Monitor, i.e. <a href="http://esp8266-webupdate.local/update">http://esp8266-webupdate.local/update</a>. Once entered, browser should display a form like below that has been served by your module. The form invites you to choose a file for update.</p>
+
+<p><img src="ota-web-browser-form.png" alt="OTA update form in web browser"></p>
+
+<p><strong>Note:</strong> If entering “<a href="http://esp8266-webupdate.local/update%E2%80%9D">http://esp8266-webupdate.local/update”</a> does not work, try replacing “esp8266-webupdate” with module’s IP address. For example, if your module IP is “192.168.1.100” then url should be “<a href="http://192.168.1.100/update%E2%80%9D">http://192.168.1.100/update”</a>. This workaround is useful in case the host software installed in step 2 does not work. If still nothing works and there are no clues on Serial Monitor, try to diagnose issue by opening provided url in Google Chrome, pressing F12 and checking contents of “Console” and “Network” tabs. Chrome provides some advanced logging on these tabs.</p></li>
+<li><p>To obtain the file navigate to directory used by Arduino IDE to store results of compilation. You can check the path to this file in compilation log shown in IDE debug window as marked below.</p>
+
+<p><img src="ota-web-path-to-binary.png" alt="Compilation complete - path to binary file"></p></li>
+<li><p>Now press “Choose File” in web browser, go to directory identified in step 5 above, find the file “WebUpdater.cpp.bin” and upload it. If upload is successful you will see “OK” on web browser like below.</p>
+
+<p><img src="ota-web-browser-form-ok.png" alt="OTA update complete"></p>
+
+<p>Module will reboot that should be visible on Serial Monitor:</p>
+
+<p><img src="ota-web-serial-monitor-reboot.png" alt="Serial Monitor - after OTA update"></p>
+
+<p>Just after reboot you should see exactly the same message “HTTPUpdateServer ready! Open http:// esp8266-webupdate.local /update in your browser” like in step 3. This is because module has been loaded again with the same code – first using serial port, and then using OTA.</p></li>
+</ol>
+
+<p>Once you are comfortable with this procedure go ahead and modify WebUpdater.ino sketch to print some additional messages, compile it, locate new binary file and upload it using web browser to see entered changes on a Serial Monitor.</p>
+
+<p>You can also add OTA routines to your own sketch following guidelines in <a href="#implementation-overview">Implementation Overview</a> above. If this is done correctly you should be always able to upload new sketch over the previous one using a web browser.</p>
+
+<p>In case OTA update fails dead after entering modifications in your sketch, you can always recover module by loading it over a serial port. Then diagnose the issue with sketch using Serial Monitor. Once the issue is fixed try OTA again.</p>
+
+<h2 id="http-server">HTTP Server</h2>
+
+<p><code>ESPhttpUpdate</code> class can check for updates and download a binary file from HTTP web server.
+It is possible to download updates from every IP or domain address on the network or Internet.</p>
+
+<h4 id="requirements">Requirements</h4>
+
+<ul>
+<li>web server</li>
+</ul>
+
+<h4 id="arduino-code">Arduino code</h4>
+
+<h5 id="simple-updater">Simple updater</h5>
+
+<p>Simple updater downloads the file every time the function is called.</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="n">ESPhttpUpdate</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="s">&quot;192.168.0.2&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="s">&quot;/arduino.bin&quot;</span><span class="p">);</span>
+</code></pre></div>
+<h5 id="advanced-updater">Advanced updater</h5>
+
+<p>Its possible to point update function to a script at the server.
+If version string argument is given, it will be sent to the server.
+Server side script can use this to check if update should be performed.</p>
+
+<p>Server side script can respond as follows:
+- response code 200, and send the firmware image,
+- or response code 304 to notify ESP that no update is required.</p>
+<div class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="n">t_httpUpdate_return</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">ESPhttpUpdate</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="s">&quot;192.168.0.2&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="s">&quot;/esp/update/arduino.php&quot;</span><span class="p">,</span> <span class="s">&quot;optional current version string here&quot;</span><span class="p">);</span>
+<span class="k">switch</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="nl">HTTP_UPDATE_FAILED</span><span class="p">:</span>
+        <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">&quot;[update] Update failed.&quot;</span><span class="p">);</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">HTTP_UPDATE_NO_UPDATES</span><span class="p">:</span>
+        <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">&quot;[update] Update no Update.&quot;</span><span class="p">);</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="nl">HTTP_UPDATE_OK</span><span class="p">:</span>
+        <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">&quot;[update] Update ok.&quot;</span><span class="p">);</span> <span class="c1">// may not called we reboot the ESP</span>
+        <span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="server-request-handling">Server request handling</h4>
+
+<h5 id="simple-updater">Simple updater</h5>
+
+<p>For the simple updater the server only needs to deliver the binary file for update.</p>
+
+<h5 id="advanced-updater">Advanced updater</h5>
+
+<p>For advanced update management a script needs to run at the server side, for example a PHP script.
+At every update request the the ESP sends some information in HTTP headers to the server.</p>
+
+<p>Example header data:
+<code>
+    [HTTP_USER_AGENT] =&gt; ESP8266-http-Update
+    [HTTP_X_ESP8266_STA_MAC] =&gt; 18:FE:AA:AA:AA:AA
+    [HTTP_X_ESP8266_AP_MAC] =&gt; 1A:FE:AA:AA:AA:AA
+    [HTTP_X_ESP8266_FREE_SPACE] =&gt; 671744
+    [HTTP_X_ESP8266_SKETCH_SIZE] =&gt; 373940
+    [HTTP_X_ESP8266_CHIP_SIZE] =&gt; 524288
+    [HTTP_X_ESP8266_SDK_VERSION] =&gt; 1.3.0
+    [HTTP_X_ESP8266_VERSION] =&gt; DOOR-7-g14f53a19
+</code></p>
+
+<p>With this information the script now can check if a update is needed. It is also possible to deliver different binaries based on the MAC address for example.</p>
+
+<p>Script example:</p>
+<div class="highlight"><pre><code class="language-php" data-lang="php"><span class="cp">&lt;?PHP</span>
+
+<span class="nb">header</span><span class="p">(</span><span class="s1">&#39;Content-type: text/plain; charset=utf8&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+
+<span class="k">function</span> <span class="nf">check_header</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$value</span> <span class="o">=</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="nv">$name</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span><span class="p">(</span><span class="nv">$value</span> <span class="o">&amp;&amp;</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="nv">$name</span><span class="p">]</span> <span class="o">!=</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="nf">sendFile</span><span class="p">(</span><span class="nv">$path</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">header</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">&quot;SERVER_PROTOCOL&quot;</span><span class="p">]</span><span class="o">.</span><span class="s1">&#39; 200 OK&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="mi">200</span><span class="p">);</span>
+    <span class="nb">header</span><span class="p">(</span><span class="s1">&#39;Content-Type: application/octet-stream&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+    <span class="nb">header</span><span class="p">(</span><span class="s1">&#39;Content-Disposition: attachment; filename=&#39;</span><span class="o">.</span><span class="nb">basename</span><span class="p">(</span><span class="nv">$path</span><span class="p">));</span>
+    <span class="nb">header</span><span class="p">(</span><span class="s1">&#39;Content-Length: &#39;</span><span class="o">.</span><span class="nb">filesize</span><span class="p">(</span><span class="nv">$path</span><span class="p">),</span> <span class="k">true</span><span class="p">);</span>
+    <span class="nb">header</span><span class="p">(</span><span class="s1">&#39;x-MD5: &#39;</span><span class="o">.</span><span class="nb">md5_file</span><span class="p">(</span><span class="nv">$path</span><span class="p">),</span> <span class="k">true</span><span class="p">);</span>
+    <span class="nb">readfile</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">check_header</span><span class="p">(</span><span class="s1">&#39;HTTP_USER_AGENT&#39;</span><span class="p">,</span> <span class="s1">&#39;ESP8266-http-Update&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nb">header</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">&quot;SERVER_PROTOCOL&quot;</span><span class="p">]</span><span class="o">.</span><span class="s1">&#39; 403 Forbidden&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="mi">403</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="s2">&quot;only for ESP8266 updater!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="k">exit</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">if</span><span class="p">(</span>
+    <span class="o">!</span><span class="nx">check_header</span><span class="p">(</span><span class="s1">&#39;HTTP_X_ESP8266_STA_MAC&#39;</span><span class="p">)</span> <span class="o">||</span>
+    <span class="o">!</span><span class="nx">check_header</span><span class="p">(</span><span class="s1">&#39;HTTP_X_ESP8266_AP_MAC&#39;</span><span class="p">)</span> <span class="o">||</span>
+    <span class="o">!</span><span class="nx">check_header</span><span class="p">(</span><span class="s1">&#39;HTTP_X_ESP8266_FREE_SPACE&#39;</span><span class="p">)</span> <span class="o">||</span>
+    <span class="o">!</span><span class="nx">check_header</span><span class="p">(</span><span class="s1">&#39;HTTP_X_ESP8266_SKETCH_SIZE&#39;</span><span class="p">)</span> <span class="o">||</span>
+    <span class="o">!</span><span class="nx">check_header</span><span class="p">(</span><span class="s1">&#39;HTTP_X_ESP8266_CHIP_SIZE&#39;</span><span class="p">)</span> <span class="o">||</span>
+    <span class="o">!</span><span class="nx">check_header</span><span class="p">(</span><span class="s1">&#39;HTTP_X_ESP8266_SDK_VERSION&#39;</span><span class="p">)</span> <span class="o">||</span>
+    <span class="o">!</span><span class="nx">check_header</span><span class="p">(</span><span class="s1">&#39;HTTP_X_ESP8266_VERSION&#39;</span><span class="p">)</span>
+<span class="p">)</span> <span class="p">{</span>
+    <span class="nb">header</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">&quot;SERVER_PROTOCOL&quot;</span><span class="p">]</span><span class="o">.</span><span class="s1">&#39; 403 Forbidden&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="mi">403</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="s2">&quot;only for ESP8266 updater! (header)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="k">exit</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nv">$db</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s2">&quot;18:FE:AA:AA:AA:AA&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;DOOR-7-g14f53a19&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;18:FE:AA:AA:AA:BB&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;TEMP-1.0.0&quot;</span>
+<span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$db</span><span class="p">[</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_ESP8266_STA_MAC&#39;</span><span class="p">]]))</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nv">$db</span><span class="p">[</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_ESP8266_STA_MAC&#39;</span><span class="p">]]</span> <span class="o">!=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_ESP8266_VERSION&#39;</span><span class="p">])</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="nx">sendFile</span><span class="p">(</span><span class="s2">&quot;./bin/&quot;</span><span class="o">.</span><span class="nv">$db</span><span class="p">[</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_X_ESP8266_STA_MAC&#39;</span><span class="p">]]</span><span class="o">.</span><span class="s2">&quot;bin&quot;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nb">header</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">&quot;SERVER_PROTOCOL&quot;</span><span class="p">]</span><span class="o">.</span><span class="s1">&#39; 304 Not Modified&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="mi">304</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">exit</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="nb">header</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">&quot;SERVER_PROTOCOL&quot;</span><span class="p">]</span><span class="o">.</span><span class="s1">&#39; 500 no version for ESP MAC&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="mi">500</span><span class="p">);</span>
+</code></pre></div>
+<h2 id="stream-interface">Stream Interface</h2>
+
+<p>TODO describe Stream Interface</p>
+
+<p>The Stream Interface is the base for all other update modes like OTA, http Server / client.</p>
+
+<h2 id="updater-class">Updater class</h2>
+
+<p>TODO describe Updater class</p>
+
+<p>Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader to load the new firmware on the next boot.</p>
+
+    </div>
+  </body>
+</html>
