@@ -362,19 +362,28 @@ void ESP8266WebServer::onNotFound(THandlerFunction fn) {
 }
 
 void ESP8266WebServer::_handleRequest() {
+  bool handled = false;
   if (!_currentHandler){
 #ifdef DEBUG
     DEBUG_OUTPUT.println("request handler not found");
 #endif
+  }
+  else {
+    handled = _currentHandler->handle(*this, _currentMethod, _currentUri);
+#ifdef DEBUG
+    if (!handled) {
+      DEBUG_OUTPUT.println("request handler failed to handle request");
+    }
+#endif
+  }
 
+  if (!handled) {
     if(_notFoundHandler) {
       _notFoundHandler();
     }
     else {
       send(404, "text/plain", String("Not found: ") + _currentUri);
     }
-  } else {
-    _currentHandler->handle(*this, _currentMethod, _currentUri);
   }
 
   uint16_t maxWait = HTTP_MAX_CLOSE_WAIT;
