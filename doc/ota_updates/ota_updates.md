@@ -3,29 +3,29 @@ title: OTA Update
 ---
 
 ## Table of Contents
-    * [Introduction](#introduction)
-      * [Security](#security)
-      * [Safety](#safety)
-      * [Basic Requirements](#basic-requirements)
-    * [Arduino IDE](#arduino-ide)
-      * [Requirements](#requirements)
-      * [Application Example](#application-example)
-        * [Classic OTA](#classic-ota)
-        * [ArduinoOTA](#arduinoota)
-    * [Web Browser](#web-browser)
-      * [Requirements](#requirements-1)
-      * [Implementation Overview](#implementation-overview)
-      * [Application Example](#application-example-1)
-    * [HTTP Server](#http-server)
-        * [Requirements](#requirements-2)
-        * [Arduino code](#arduino-code)
-          * [Simple updater](#simple-updater)
-          * [Advanced updater](#advanced-updater)
-        * [Server request handling](#server-request-handling)
-          * [Simple updater](#simple-updater-1)
-          * [Advanced updater](#advanced-updater-1)
-    * [Stream Interface](#stream-interface)
-    * [Updater class](#updater-class)
+  * [Introduction](#introduction)
+    * [Security](#security)
+    * [Safety](#safety)
+    * [Basic Requirements](#basic-requirements)
+  * [Arduino IDE](#arduino-ide)
+    * [Requirements](#requirements)
+    * [Application Example](#application-example)
+      * [Classic OTA](#classic-ota)
+      * [ArduinoOTA](#arduinoota)
+  * [Web Browser](#web-browser)
+    * [Requirements](#requirements-1)
+    * [Implementation Overview](#implementation-overview)
+    * [Application Example](#application-example-1)
+  * [HTTP Server](#http-server)
+      * [Requirements](#requirements-2)
+      * [Arduino code](#arduino-code)
+        * [Simple updater](#simple-updater)
+        * [Advanced updater](#advanced-updater)
+      * [Server request handling](#server-request-handling)
+        * [Simple updater](#simple-updater-1)
+        * [Advanced updater](#advanced-updater-1)
+  * [Stream Interface](#stream-interface)
+  * [Updater class](#updater-class)
 
 
 ## Introduction
@@ -121,8 +121,9 @@ Instructions below demonstrate how to configure both [Classic OTA](#classic-ota-
 2. Now prepare the sketch and configuration for the upload over a serial port.
     - Start Arduino IDE and load sketch DNS_SD_Arduino_OTA.ino  available under File >  Examples > ESP8266mDNS
         ![OTA sketch selection](ota-ide-sketch-selection.png)
+
          **Note:** This sketch is available only for 1.6.5-947-g39819f0 (of July 23, 2015) and 1.6.5-1160-gef26c5f (of Sep 30, 2015) versions of platform packages installed in Arduino IDE using https://github.com/esp8266/Arduino#installing-with-boards-manager. It was removed in [#980](https://github.com/esp8266/Arduino/pull/980) from GitHub repository.
-    - Update ssid and pass in the sketch  so the module can join your Wi-Fi network
+    - Update SSID and password in the sketch  so the module can join your Wi-Fi network
         ![ssid and pass entry](ota-ide-ssid-pass-entry.png)
     - Configure upload parameters as below (you may need to adjust configuration if you are using a different module):
         ![configuration of serial upload](ota-ide-serial-upload-configuration.png)
@@ -133,7 +134,7 @@ Instructions below demonstrate how to configure both [Classic OTA](#classic-ota-
 
 4. Only if module is connected to network, after a couple of seconds, the esp8266-ota port will show up in Arduino IDE:
 
-    ![selection og OTA port](ota-ide-ota-port-selection.png)
+    ![selection of OTA port](ota-ide-ota-port-selection.png)
 
 5. Now get ready for your first OTA upload by changing configuration settings as follows:
 
@@ -145,7 +146,7 @@ Instructions below demonstrate how to configure both [Classic OTA](#classic-ota-
 
     ![OTA upload complete](ota-ide-ota-upload-complete.png)
 
-**Note** To be able to upload your sketch over and over again using OTA, you need to embed OTA routines inside. Please use DNS_SD_Arduino_OTA.ino as an example.
+**Note:** To be able to upload your sketch over and over again using OTA, you need to embed OTA routines inside. Please use DNS_SD_Arduino_OTA.ino as an example.
 
 
 #### ArduinoOTA
@@ -217,15 +218,21 @@ You can use another module if it meets “Flash chip size is 2x the size of the 
     - Start Arduino IDE and load sketch WebUpdater.ino available under File > Examples > ESP8266HTTPUpdateServer.
     - Update ssid and pass in the sketch so the module can join your Wi-Fi network.
     - Open File > Preferences, look for “Show verbose output during:” and check out “compilation” option.
+
         ![Preferences - enablig verbose output during compilation](ota-web-show-verbose-compilation.png)
+
         **Note:** This setting will be required in step 5 below. You can uncheck this setting afterwards.
 
 3. Upload sketch (Ctrl+U). Once done open Serial Monitor (Ctrl+Shift+M) and check if you see the following message displayed, that contains url for OTA update.
+
     ![Serial Monitor - after first load using serial](ota-web-serial-monitor-ready.png)
-    **Note:** Such message will be shown only after module successfully joins network and is ready for an OTA upload:
+
+    **Note:** Such message will be shown only after module successfully joins network and is ready for an OTA upload.
 
 4. Now open web browser and enter the url provided on Serial Monitor, i.e. http://esp8266-webupdate.local/update. Once entered, browser should display a form like below that has been served by your module. The form invites you to choose a file for update.
+
     ![OTA update form in web browser](ota-web-browser-form.png)
+
     **Note:** If entering “http://esp8266-webupdate.local/update” does not work, try replacing “esp8266-webupdate” with module’s IP address. For example, if your module IP is “192.168.1.100” then url should be “http://192.168.1.100/update”. This workaround is useful in case the host software installed in step 2 does not work. If still nothing works and there are no clues on Serial Monitor, try to diagnose issue by opening provided url in Google Chrome, pressing F12 and checking contents of “Console” and “Network” tabs. Chrome provides some advanced logging on these tabs.
 
 
@@ -241,7 +248,7 @@ You can use another module if it meets “Flash chip size is 2x the size of the 
 
     ![Serial Monitor - after OTA update](ota-web-serial-monitor-reboot.png)
 
-Just after reboot you should see exactly the same message “HTTPUpdateServer ready! Open http:// esp8266-webupdate.local /update in your browser” like in step 3. This is because module has been loaded again with the same code – first using serial port, and then using OTA.
+    Just after reboot you should see exactly the same message “HTTPUpdateServer ready! Open http:// esp8266-webupdate.local /update in your browser” like in step 3. This is because module has been loaded again with the same code – first using serial port, and then using OTA.
 
 Once you are comfortable with this procedure go ahead and modify WebUpdater.ino sketch to print some additional messages, compile it, locate new binary file and upload it using web browser to see entered changes on a Serial Monitor.
 

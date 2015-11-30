@@ -30,7 +30,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiUdp.h>
-#include <ESP8266httpClient.h>
+#include <ESP8266HTTPClient.h>
 
 //#define DEBUG_HTTP_UPDATE(...) Serial1.printf( __VA_ARGS__ )
 
@@ -54,7 +54,7 @@ class ESP8266HTTPUpdate {
         t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "", bool https = false, String httpsFingerprint = "");
 
     protected:
-        t_httpUpdate_return handleUpdate(httpClient * http, const char * current_version);
+        t_httpUpdate_return handleUpdate(HTTPClient * http, const char * current_version);
         bool runUpdate(Stream& in, uint32_t size, String md5);
 };
 
