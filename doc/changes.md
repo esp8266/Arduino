@@ -59,7 +59,7 @@ title: Change Log
 - Add gdb stub library
 - Extracted the WebUpdate example into a library.
 - Fix to Servo allowing write() to be called before attach()
-- ESP9266WiFi: add function `begin` without any parameters and add `psk` function to return current PSK form sdk config
+- ESP8266WiFi: add function `begin` without any parameters and add `psk` function to return current PSK form sdk config
 - Fix a crash due to abort() called from TCP error callback (#428)
 - Adding support for OPTIONS requests to ESP8266WebServer
 - Add HTTPS request sample (#43)
