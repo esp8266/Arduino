@@ -95,9 +95,9 @@ public:
 
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
         // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
-        if (!path.endsWith(".gz") && !SPIFFS.exists(path))  {
+        if (!path.endsWith(".gz") && !_fs.exists(path))  {
             String pathWithGz = path + ".gz";
-            if(SPIFFS.exists(pathWithGz))
+            if(_fs.exists(pathWithGz))
                 path += ".gz";
         }
 
