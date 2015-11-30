@@ -567,7 +567,7 @@ bool HTTPClient::connect(void) {
     }
 
     // set Timeout for readBytesUntil and readStringUntil
-    _tcp->setTimeout(HTTPClient_TCP_TIMEOUT);
+    _tcp->setTimeout(HTTPCLIENT_TCP_TIMEOUT);
 
 #ifdef ESP8266
     _tcp->setNoDelay(true);
