@@ -87,17 +87,25 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
       char *toencode = new char[toencodeLen];
-      if(toencode == NULL)
+      if(toencode == NULL){
+        authReq = String();
         return false;
+      }
       char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
-      if(encoded == NULL)
+      if(encoded == NULL){
+        authReq = String();
+        delete[] toencode;
         return false;
-
+      }
       sprintf(toencode, "%s:%s", username, password);
       if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equals(encoded)){
         authReq = String();
+        delete[] toencode;
+        delete[] encoded;
         return true;
       }
+      delete[] toencode;
+      delete[] encoded;
     }
     authReq = String();
   }
