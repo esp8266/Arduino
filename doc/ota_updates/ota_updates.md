@@ -80,7 +80,7 @@ void onError(OTA_CALLBACK_ERROR (fn));
 ### Basic Requirements
 
 Flash chip size needs a size thats is able to hold the old sketch (currently running) and the new sketch (OTA) at the same time.
-keep in mind that the File system and EEPROM for example needs space too (one time) see [flash layout](https://github.com/esp8266/Arduino/blob/master/doc/filesystem.md#flash-layout).
+keep in mind that the File system and EEPROM for example needs space too (one time) see [flash layout](../filesystem.md#flash-layout).
 ```cpp
 ESP.getFreeSketchSpace();
 ```
