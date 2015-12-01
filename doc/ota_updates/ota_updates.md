@@ -79,7 +79,13 @@ void onError(OTA_CALLBACK_ERROR (fn));
 
 ### Basic Requirements
 
-- Flash chip size is 2x the size of the sketch.
+Flash chip size needs a size thats is able to hold the old sketch (currently running) and the new sketch (OTA) at the same time.
+keep in mind that the File system and EEPROM for example needs space too (one time) see [flash layout](https://github.com/esp8266/Arduino/blob/master/doc/filesystem.md#flash-layout).
+```cpp
+ESP.getFreeSketchSpace();
+```
+can be used for checking the free space for the new sketch.
+
 
 
 The following chapters provide more details and specific methods of doing OTA.
@@ -318,7 +324,7 @@ Example header data:
     [HTTP_X_ESP8266_AP_MAC] => 1A:FE:AA:AA:AA:AA
     [HTTP_X_ESP8266_FREE_SPACE] => 671744
     [HTTP_X_ESP8266_SKETCH_SIZE] => 373940
-    [HTTP_X_ESP8266_CHIP_SIZE] => 524288
+    [HTTP_X_ESP8266_CHIP_SIZE] => 4194304
     [HTTP_X_ESP8266_SDK_VERSION] => 1.3.0
     [HTTP_X_ESP8266_VERSION] => DOOR-7-g14f53a19
 ```
