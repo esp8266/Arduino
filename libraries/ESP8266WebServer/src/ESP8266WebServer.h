@@ -65,7 +65,10 @@ public:
 
   void begin();
   void handleClient();
-
+  
+  bool authenticate(const char * username, const char * password);
+  void requestAuthentication();
+  
   typedef std::function<void(void)> THandlerFunction;
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);

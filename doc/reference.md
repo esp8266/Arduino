@@ -3,13 +3,13 @@ title: Reference
 ---
 
 ## Table of Contents
-    * [Table of Contents](#table-of-contents)
-    * [Digital IO](#digital-io)
-    * [Analog input](#analog-input)
-    * [Analog output](#analog-output)
-    * [Timing and delays](#timing-and-delays)
-    * [Serial](#serial)
-    * [Progmem](#progmem)
+  * [Table of Contents](#table-of-contents)
+  * [Digital IO](#digital-io)
+  * [Analog input](#analog-input)
+  * [Analog output](#analog-output)
+  * [Timing and delays](#timing-and-delays)
+  * [Serial](#serial)
+  * [Progmem](#progmem)
 
 ## Digital IO
 

@@ -3,25 +3,25 @@ title: File System
 ---
 
 ## Table of Contents
-    * [Flash layout](#flash-layout)
-    * [Uploading files to file system](#uploading-files-to-file-system)
-    * [File system object (SPIFFS)](#file-system-object-spiffs)
-      * [begin](#begin)
-      * [format](#format)
-      * [open](#open)
-      * [exists](#exists)
-      * [openDir](#opendir)
-      * [remove](#remove)
-      * [rename](#rename)
-      * [info](#info)
-    * [Filesystem information structure](#filesystem-information-structure)
-    * [Directory object (Dir)](#directory-object-dir)
-    * [File object](#file-object)
-      * [seek](#seek)
-      * [position](#position)
-      * [size](#size)
-      * [name](#name)
-      * [close](#close)
+  * [Flash layout](#flash-layout)
+  * [Uploading files to file system](#uploading-files-to-file-system)
+  * [File system object (SPIFFS)](#file-system-object-spiffs)
+    * [begin](#begin)
+    * [format](#format)
+    * [open](#open)
+    * [exists](#exists)
+    * [openDir](#opendir)
+    * [remove](#remove)
+    * [rename](#rename)
+    * [info](#info)
+  * [Filesystem information structure](#filesystem-information-structure)
+  * [Directory object (Dir)](#directory-object-dir)
+  * [File object](#file-object)
+    * [seek](#seek)
+    * [position](#position)
+    * [size](#size)
+    * [name](#name)
+    * [close](#close)
 
 
 ## Flash layout
@@ -127,9 +127,7 @@ Returns *true* if a file with given path exists, *false* otherwise.
 SPIFFS.openDir(path)
 ```
 
-Opens a directory given its absolute path. Returns a *Dir* object. To check if
-directory was opened successfully, use the boolean operator, similar to opening
-a file.
+Opens a directory given its absolute path. Returns a *Dir* object.
 
 ### remove
 

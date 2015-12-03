@@ -3,19 +3,19 @@ title: Libraries
 ---
 
 ## Table of Contents
-    * [WiFi(ESP8266WiFi library)](#wifiesp8266wifi-library)
-    * [Ticker](#ticker)
-    * [EEPROM](#eeprom)
-    * [I2C (Wire library)](#i2c-wire-library)
-    * [SPI](#spi)
-    * [SoftwareSerial](#softwareserial)
-    * [ESP\-specific APIs](#esp-specific-apis)
-    * [OneWire](#onewire)
-    * [mDNS and DNS\-SD responder (ESP8266mDNS library)](#mdns-and-dns-sd-responder-esp8266mdns-library)
-    * [SSDP responder (ESP8266SSDP)](#ssdp-responder-esp8266ssdp)
-    * [DNS server (DNSServer library)](#dns-server-dnsserver-library)
-    * [Servo](#servo)
-    * [Other libraries (not included with the IDE)](#other-libraries-not-included-with-the-ide)
+  * [WiFi(ESP8266WiFi library)](#wifiesp8266wifi-library)
+  * [Ticker](#ticker)
+  * [EEPROM](#eeprom)
+  * [I2C (Wire library)](#i2c-wire-library)
+  * [SPI](#spi)
+  * [SoftwareSerial](#softwareserial)
+  * [ESP\-specific APIs](#esp-specific-apis)
+  * [OneWire](#onewire)
+  * [mDNS and DNS\-SD responder (ESP8266mDNS library)](#mdns-and-dns-sd-responder-esp8266mdns-library)
+  * [SSDP responder (ESP8266SSDP)](#ssdp-responder-esp8266ssdp)
+  * [DNS server (DNSServer library)](#dns-server-dnsserver-library)
+  * [Servo](#servo)
+  * [Other libraries (not included with the IDE)](#other-libraries-not-included-with-the-ide)
 
 ## WiFi(ESP8266WiFi library)
 
@@ -151,3 +151,4 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [RTC](https://github.com/Makuna/Rtc) - Arduino Library for Ds1307 & Ds3231 compatible with ESP8266.
 - [Souliss, Smart Home](https://github.com/souliss/souliss) - Framework for Smart Home based on Arduino, Android and openHAB.
 - [ST7735](https://github.com/nzmichaelh/Adafruit-ST7735-Library) - Adafruit's ST7735 library modified to be compatible with ESP8266.  Just make sure to modify the pins in the examples as they are still AVR specific.
+- [UTFT-ESP8266](https://github.com/gnulabis/UTFT-ESP8266) - UTFT display library with support for ESP8266. Only serial interface (SPI) displays are supported for now (no 8-bit parallel mode, etc). Also includes support for the hardware SPI controller of the ESP8266.

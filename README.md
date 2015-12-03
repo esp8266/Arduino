@@ -23,12 +23,12 @@ If you find this ESP8266 board manager useful, please consider supporting it wit
 ##### Stable version ![](http://arduino.esp8266.com/stable/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [Reference](http://arduino.esp8266.com/stable/doc/reference.html)
+Documentation: [http://esp8266.github.io/Arduino/versions/2.0.0/](http://esp8266.github.io/Arduino/versions/2.0.0/)
 
 ##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
 
-Documentation: [Reference](http://arduino.esp8266.com/staging/doc/reference.html)
+Documentation: [http://esp8266.github.io/Arduino/versions/2.0.0-rc2/](http://esp8266.github.io/Arduino/versions/2.0.0-rc2/)
 
 ### Using git version [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
@@ -51,9 +51,11 @@ python get.py
 Documentation for latest development version:
 
 - [Reference](doc/reference.md)
+- [Libraries](doc/libraries.md)
+- [File system](doc/filesystem.md)
+- [OTA update](doc/ota_updates/ota_updates.md)
 - [Supported boards](doc/boards.md)
 - [Change log](doc/changes.md)
-- [OTA Update](doc/ota_updates/ota_updates.md)
 
 ### Issues and support ###
 
