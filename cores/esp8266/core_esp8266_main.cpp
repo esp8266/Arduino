@@ -98,11 +98,11 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
 
 static void loop_wrapper() {
     static bool setup_done = false;
+    preloop_update_frequency();
     if(!setup_done) {
         setup();
         setup_done = true;
     }
-    preloop_update_frequency();
     loop();
     esp_schedule();
 }
