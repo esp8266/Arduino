@@ -650,13 +650,13 @@ static void increment_write_sequence(SSL *ssl)
 static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
-    const prefix_size = 8 + SSL_RECORD_SIZE;
+    const size_t prefix_size = 8 + SSL_RECORD_SIZE;
     bool hmac_inplace = (uint32_t)buf - (uint32_t)ssl->bm_data >= prefix_size;
     uint8_t tmp[prefix_size];
     int hmac_len = buf_len + prefix_size;
     uint8_t *t_buf;
     if (hmac_inplace) {
-        t_buf = buf - prefix_size;
+        t_buf = ((uint8_t*)buf) - prefix_size;
         memcpy(tmp, t_buf, prefix_size);
     } else {
         t_buf = (uint8_t *)malloc(hmac_len+10);
