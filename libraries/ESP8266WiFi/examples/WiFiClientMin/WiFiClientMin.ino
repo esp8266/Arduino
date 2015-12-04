@@ -37,8 +37,8 @@ void loop() {
     const uint16_t port = 80;
     const char * host = "192.168.1.1"; // ip or dns
 
-	
-	
+    
+    
     Serial.print("connecting to ");
     Serial.println(host);
 
@@ -47,8 +47,8 @@ void loop() {
 
     if (!client.connect(host, port)) {
         Serial.println("connection failed");
-		Serial.println("wait 5 sec...");
-		delay(5000);
+        Serial.println("wait 5 sec...");
+        delay(5000);
         return;
     }
 
@@ -61,8 +61,8 @@ void loop() {
 
     Serial.println("closing connection");
     client.stop();
-	
+    
     Serial.println("wait 5 sec...");
-	delay(5000);
+    delay(5000);
 }
 
