@@ -50,6 +50,17 @@ extern "C"
 #define SSL_DEBUG_OPTS 0
 #endif
 
+uint8_t* default_private_key = 0;
+uint32_t default_private_key_len = 0;
+static bool default_private_key_dynamic = false;
+//
+uint8_t* default_certificate = 0;
+uint32_t default_certificate_len = 0;
+static bool default_certificate_dynamic = false;
+
+static void clear_private_key();
+static void clear_certificate();
+
 
 class SSLContext {
 public:
@@ -70,6 +81,9 @@ public:
         if (_ssl_ctx_refcnt == 0) {
             ssl_ctx_free(_ssl_ctx);
         }
+
+        clear_private_key();
+        clear_certificate();
     }
 
     void ref() {
@@ -335,6 +349,66 @@ bool WiFiClientSecure::verify(const char* fp, const char* url) {
     //TODO: check URL against certificate
 
     return true;
+}
+
+void WiFiClientSecure::setCertificate(const uint8_t* cert_data, size_t size) {
+  clear_certificate();
+  default_certificate = (uint8_t*) cert_data;
+  default_certificate_len = size;
+}
+
+void WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size) {
+  clear_private_key();
+  default_private_key = (uint8_t*) pk;
+  default_private_key_len = size;
+}
+
+bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size) {
+  clear_certificate();
+  default_certificate = new uint8_t[size];
+  if (!default_certificate) {
+    return false;
+  }
+  if (stream.readBytes(default_certificate, size) != size) {
+    delete[] default_certificate;
+    return false;
+  }
+  default_certificate_dynamic = true;
+  default_certificate_len = size;
+  return true;
+}
+
+bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
+  clear_private_key();
+  default_private_key = new uint8_t[size];
+  if (!default_private_key) {
+    return false;
+  }
+  if (stream.readBytes(default_private_key, size) != size) {
+    delete[] default_private_key;
+    return false;
+  }
+  default_private_key_dynamic = true;
+  default_private_key_len = size;
+  return true;
+}
+
+static void clear_private_key() {
+  if (default_private_key && default_private_key_dynamic) {
+    delete[] default_private_key;
+    default_private_key_dynamic = false;
+  }
+  default_private_key = 0;
+  default_private_key_len = 0;
+}
+
+static void clear_certificate() {
+  if (default_certificate && default_certificate_dynamic) {
+    delete[] default_certificate;
+    default_certificate_dynamic = false;
+  }
+  default_certificate = 0;
+  default_certificate_len = 0;
 }
 
 extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {

@@ -48,6 +48,22 @@ public:
   int peek() override;
   void stop() override;
 
+  void setCertificate(const uint8_t* cert_data, size_t size);
+  void setPrivateKey(const uint8_t* pk, size_t size);
+
+  bool loadCertificate(Stream& stream, size_t size);
+  bool loadPrivateKey(Stream& stream, size_t size);
+
+  template<typename TFile>
+  bool loadCertificate(TFile& file) {
+    return loadCertificate(file, file.size());
+  }
+
+  template<typename TFile>
+  bool loadPrivateKey(TFile& file) {
+    return loadPrivateKey(file, file.size());
+  }
+
 protected:
     int _connectSSL();
 
