@@ -143,7 +143,7 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
                 if(spiffs) {
                     size_t spiffsSize = ((size_t) &_SPIFFS_end - (size_t) &_SPIFFS_start);
                     if(len > (int) spiffsSize) {
-                        DEBUG_HTTP_UPDATE("[httpUpdate] spiffsSize to low (%d) needed: %d\n", ESP.getFreeSketchSpace(), len);
+                        DEBUG_HTTP_UPDATE("[httpUpdate] spiffsSize to low (%d) needed: %d\n", spiffsSize, len);
                     }
                 } else {
                     if(len > (int) ESP.getFreeSketchSpace()) {
