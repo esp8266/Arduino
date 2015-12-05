@@ -494,7 +494,7 @@ extern uint8_t esp8266_gpioToFn[16];
 
 //SPI Phase Length Locations
 #define SPILCOMMAND	28 //4 bit in SPIxU2 default 7 (8bit)
-#define SPILADDR	16 //6 bit in SPIxU1 default:23 (24bit)
+#define SPILADDR	26 //6 bit in SPIxU1 default:23 (24bit)
 #define SPILDUMMY	0  //8 bit in SPIxU1 default:0 (0 cycles)
 #define SPILMISO	8  //9 bit in SPIxU1 default:0 (1bit)
 #define SPILMOSI	17 //9 bit in SPIxU1 default:0 (1bit)
