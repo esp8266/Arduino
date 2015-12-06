@@ -71,6 +71,7 @@ void loop() {
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
                "Host: " + host + "\r\n" + 
                "Connection: close\r\n\r\n");
+  int timeout = millis() + 5000;
   while (client.available() == 0) {
     if (timeout - millis() < 0) {
       Serial.println(">>> Client Timeout !");
