@@ -24,6 +24,7 @@
  */
 
 #include "ESP8266httpUpdate.h"
+#include <StreamString.h>
 
 extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
@@ -218,8 +219,12 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
  */
 bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int command) {
 
+    StreamString error;
+
     if(!Update.begin(size, command)) {
-        DEBUG_HTTP_UPDATE("[httpUpdate] Update.begin failed!\n");
+        Update.printError(error);
+        error.trim(); // remove line ending
+        DEBUG_HTTP_UPDATE("[httpUpdate] Update.begin failed! (%s)\n", error.c_str());
         return false;
     }
 
@@ -228,12 +233,16 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int com
     }
 
     if(Update.writeStream(in) != size) {
-        DEBUG_HTTP_UPDATE("[httpUpdate] Update.writeStream failed!\n");
+        Update.printError(error);
+        error.trim(); // remove line ending
+        DEBUG_HTTP_UPDATE("[httpUpdate] Update.writeStream failed! (%s)\n", error.c_str());
         return false;
     }
 
     if(!Update.end()) {
-        DEBUG_HTTP_UPDATE("[httpUpdate] Update.end failed!\n");
+        Update.printError(error);
+        error.trim(); // remove line ending
+        DEBUG_HTTP_UPDATE("[httpUpdate] Update.end failed! (%s)\n", error.c_str());
         return false;
     }
 
