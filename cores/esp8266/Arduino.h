@@ -219,14 +219,12 @@ void loop(void);
 void yield(void);
 void optimistic_yield(uint32_t interval_us);
 
-// Get the bit location within the hardware port of the given virtual pin.
-// This comes from the pins_*.c file for the active board configuration.
 #define digitalPinToPort(pin)       (0)
 #define digitalPinToBitMask(pin)    (1UL << (pin))
 #define digitalPinToTimer(pin)      (0)
-#define portOutputRegister(port)    ((volatile uint32_t*) GPO)
-#define portInputRegister(port)     ((volatile uint32_t*) GPI)
-#define portModeRegister(port)      ((volatile uint32_t*) GPE)
+#define portOutputRegister(port)    ((volatile uint32_t*) &GPO)
+#define portInputRegister(port)     ((volatile uint32_t*) &GPI)
+#define portModeRegister(port)      ((volatile uint32_t*) &GPE)
 
 #define NOT_A_PIN -1
 #define NOT_A_PORT -1
