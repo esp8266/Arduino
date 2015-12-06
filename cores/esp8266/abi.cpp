@@ -68,6 +68,10 @@ void __throw_length_error(char const*) {
 void __throw_bad_alloc() {
     panic();
 }
+
+void __throw_logic_error(const char* str) {
+    panic();
+}
 }
 
 // TODO: rebuild windows toolchain to make this unnecessary:
