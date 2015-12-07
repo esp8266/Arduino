@@ -62,7 +62,7 @@ class cbuf {
             if(getSize() == 0) return -1;
 
             char result = *_begin;
-            if(++_begin == _bufend) _begin = _buf;
+            _begin = wrap_if_bufend(_begin + 1);
             return static_cast<int>(result);
         }
 
@@ -78,8 +78,7 @@ class cbuf {
                 dst += top_size;
             }
             memcpy(dst, _begin, size_to_read);
-            _begin += size_to_read;
-            if(_begin == _bufend) _begin = _buf;
+            _begin = wrap_if_bufend(_begin + size_to_read);
             return size_read;
         }
 
@@ -87,7 +86,7 @@ class cbuf {
             if(room() == 0) return 0;
 
             *_end = c;
-            if(++_end == _bufend) _end = _buf;
+            _end = wrap_if_bufend(_end + 1);
             return 1;
         }
 
@@ -103,8 +102,7 @@ class cbuf {
                 src += top_size;
             }
             memcpy(_end, src, size_to_write);
-            _end += size_to_write;
-            if(_end == _bufend) _end = _buf;
+            _end = wrap_if_bufend(_end + size_to_write);
             return size_written;
         }
 
@@ -114,6 +112,10 @@ class cbuf {
         }
 
     private:
+        inline char* wrap_if_bufend(char* ptr) {
+            return (ptr == _bufend) ? _buf : ptr;
+        }
+
         size_t _size;
         char* _buf;
         char* _bufend;
