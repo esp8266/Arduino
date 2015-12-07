@@ -726,11 +726,6 @@ espino.menu.CpuFrequency.80.build.f_cpu=80000000L
 espino.menu.CpuFrequency.160=160 MHz
 espino.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-espino.menu.FlashFreq.40=40MHz
-espino.menu.FlashFreq.40.build.flash_freq=40
-espino.menu.FlashFreq.80=80MHz
-espino.menu.FlashFreq.80.build.flash_freq=80
-
 espino.menu.FlashMode.dio=DIO
 espino.menu.FlashMode.dio.build.flash_mode=dio
 espino.menu.FlashMode.qio=QIO
