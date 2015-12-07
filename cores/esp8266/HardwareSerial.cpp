@@ -617,18 +617,15 @@ size_t HardwareSerial::write(uint8_t c) {
     size_t room = uart_get_tx_fifo_room(_uart);
     if(room > 0 && _tx_buffer->empty()) {
         uart_transmit_char(_uart, c);
-        if(room < 10) {
-            uart_arm_tx_interrupt(_uart);
-        }
         return 1;
     }
 
     while(_tx_buffer->room() == 0) {
         yield();
-        uart_arm_tx_interrupt(_uart);
     }
 
     _tx_buffer->write(c);
+    uart_arm_tx_interrupt(_uart);
     return 1;
 }
 
