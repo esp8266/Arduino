@@ -834,4 +834,10 @@ extern uint8_t esp8266_gpioToFn[16];
 #define I2STXCMM (0x7)      //I2S_TX_CHAN_MOD
 #define I2STXCM  (0)        //I2S_TX_CHAN_MOD_S
 
+/**
+ Random Number Generator 32bit
+ http://esp8266-re.foogod.com/wiki/Random_Number_Generator
+**/
+#define RANDOM_REG32  ESP8266_DREG(0x20E44)
+
 #endif
