@@ -53,7 +53,7 @@ extern "C"
 uint8_t* default_private_key = 0;
 uint32_t default_private_key_len = 0;
 static bool default_private_key_dynamic = false;
-//
+static int s_pk_refcnt = 0;
 uint8_t* default_certificate = 0;
 uint32_t default_certificate_len = 0;
 static bool default_certificate_dynamic = false;
@@ -81,9 +81,6 @@ public:
         if (_ssl_ctx_refcnt == 0) {
             ssl_ctx_free(_ssl_ctx);
         }
-
-        clear_private_key();
-        clear_certificate();
     }
 
     void ref() {
@@ -186,11 +183,16 @@ int SSLContext::_ssl_ctx_refcnt = 0;
 
 
 WiFiClientSecure::WiFiClientSecure() {
+    ++s_pk_refcnt;
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
     if (_ssl) {
         _ssl->unref();
+    }
+    if (--s_pk_refcnt == 0) {
+        clear_private_key();
+        clear_certificate();
     }
 }
 
