@@ -26,8 +26,10 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <StreamString.h>
+#include <base64.h>
 
 #include "ESP8266HTTPClient.h"
+
 
 /**
  * constractor
@@ -217,6 +219,20 @@ void HTTPClient::setReuse(bool reuse) {
  */
 void HTTPClient::setUserAgent(const char * userAgent) {
     _userAgent = userAgent;
+}
+
+/**
+ * set the Authorizatio for the http request
+ * @param user const char *
+ * @param password const char *
+ */
+void HTTPClient::setAuthorization(const char * user, const char * password) {
+    if(user && password) {
+        String auth = user;
+        auth += ":";
+        auth += password;
+        _base64Authorization = base64::encode(auth);
+    }
 }
 
 /**
@@ -490,7 +506,7 @@ String HTTPClient::errorToString(int error) {
 void HTTPClient::addHeader(const String& name, const String& value, bool first) {
 
     // not allow set of Header handled by code
-    if(!name.equalsIgnoreCase("Connection") && !name.equalsIgnoreCase("User-Agent") && !name.equalsIgnoreCase("Host")) {
+    if(!name.equalsIgnoreCase("Connection") && !name.equalsIgnoreCase("User-Agent") && !name.equalsIgnoreCase("Host") && !(_base64Authorization.length() && name.equalsIgnoreCase("Authorization"))) {
         String headerLine = name;
         headerLine += ": ";
         headerLine += value;
@@ -622,7 +638,13 @@ bool HTTPClient::sendHeader(const char * type) {
     } else {
         header += "close";
     }
-    header += "\r\n" + _Headers + "\r\n";
+    header += "\r\n";
+
+    if(_base64Authorization.length()) {
+        header += "Authorization: Basic " + _base64Authorization + "\r\n";
+    }
+
+    header += _Headers + "\r\n";
 
     return (_tcp->write(header.c_str(), header.length()) == header.length());
 }
