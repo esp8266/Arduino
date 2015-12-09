@@ -102,27 +102,34 @@ void HTTPClient::begin(String url, String httpsFingerprint) {
     String protocol;
     // check for : (http: or https:
     int index = url.indexOf(':');
-    int index2;
+    //int index2;
     bool hasPort = false;
     if(index) {
         protocol = url.substring(0, index);
         url.remove(0, (index + 3)); // remove http:// or https://
 
-        index = url.indexOf(':');
-        index2 = url.indexOf('/');
+        index = url.indexOf('/');
+        String host = url.substring(0, index);
+        url.remove(0, index); // remove host part
 
-        if(index >= 0 && ((index2 >= 0 && index < index2) || index2 == 0)) { // do we have a port?
-            _host = url.substring(0, index); // hostname
-            url.remove(0, (index + 1)); // remove hostname + :
+        // get Authorization
+        index = host.indexOf('@');
+        if(index >= 0) {
+            // auth info
+            String auth = host.substring(0, index);
+            host.remove(0, index +1); // remove auth part including @
+            _base64Authorization = base64::encode(auth);
+        }
 
-            index = url.indexOf('/');
-            _port = url.substring(0, index).toInt(); // get port
-            url.remove(0, index); // remove port
+        // get port
+        index = host.indexOf(':');
+        if(index >= 0) {
+            _host = host.substring(0, index); // hostname
+            host.remove(0, (index + 1)); // remove hostname + :
+            _port = host.toInt(); // get port
             hasPort = true;
         } else {
-            index = index2;
-            _host = url.substring(0, index);
-            url.remove(0, index); // remove hostname
+            _host = host;
         }
 
         _url = url;
@@ -141,6 +148,7 @@ void HTTPClient::begin(String url, String httpsFingerprint) {
             DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", protocol.c_str());
             return;
         }
+
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s https: %d httpsFingerprint: %s\n", _host.c_str(), _port, _url.c_str(), _https, _httpsFingerprint.c_str());
@@ -232,6 +240,16 @@ void HTTPClient::setAuthorization(const char * user, const char * password) {
         auth += ":";
         auth += password;
         _base64Authorization = base64::encode(auth);
+    }
+}
+
+/**
+ * set the Authorizatio for the http request
+ * @param auth const char * base64
+ */
+void HTTPClient::setAuthorization(const char * auth) {
+    if(auth) {
+        _base64Authorization = auth;
     }
 }
 

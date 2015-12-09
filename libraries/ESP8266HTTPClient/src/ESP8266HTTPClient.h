@@ -25,7 +25,7 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
-#define DEBUG_HTTPCLIENT(...) Serial1.printf( __VA_ARGS__ )
+//#define DEBUG_HTTPCLIENT(...) Serial1.printf( __VA_ARGS__ )
 
 #ifndef DEBUG_HTTPCLIENT
 #define DEBUG_HTTPCLIENT(...)
@@ -122,6 +122,7 @@ class HTTPClient {
         void setReuse(bool reuse); /// keep-alive
         void setUserAgent(const char * userAgent);
         void setAuthorization(const char * user, const char * password);
+        void setAuthorization(const char * auth);
 
         /// request handling
         int GET();
