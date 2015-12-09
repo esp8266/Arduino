@@ -455,6 +455,33 @@ String HTTPClient::getString(void) {
 }
 
 /**
+ * converts error code to String
+ * @param error int
+ * @return String
+ */
+String HTTPClient::errorToString(int error) {
+    switch(error) {
+        case HTTPC_ERROR_CONNECTION_REFUSED:
+            return String("connection refused");
+        case HTTPC_ERROR_SEND_HEADER_FAILED:
+            return String("send header failed");
+        case HTTPC_ERROR_SEND_PAYLOAD_FAILED:
+            return String("send payload failed");
+        case HTTPC_ERROR_NOT_CONNECTED:
+            return String("not connected");
+        case HTTPC_ERROR_CONNECTION_LOST:
+            return String("connection lost");
+        case HTTPC_ERROR_NO_STREAM:
+            return String("no stream");
+        case HTTPC_ERROR_NO_HTTP_SERVER:
+            return String("no HTTP server");
+        default:
+            return String();
+    }
+}
+
+
+/**
  * adds Header to the request
  * @param name
  * @param value

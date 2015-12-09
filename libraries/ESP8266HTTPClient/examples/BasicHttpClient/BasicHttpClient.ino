@@ -61,7 +61,7 @@ void loop() {
                 USE_SERIAL.println(payload);
             }
         } else {
-            USE_SERIAL.print("[HTTP] GET... failed, no connection or no HTTP server\n");
+            USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
         }
 
         http.end();

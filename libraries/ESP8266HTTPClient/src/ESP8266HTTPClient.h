@@ -147,6 +147,8 @@ class HTTPClient {
         int writeToStream(Stream * stream);
         String getString(void);
 
+        String errorToString(int error);
+
     protected:
 
         struct RequestArgument {
