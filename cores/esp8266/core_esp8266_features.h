@@ -26,6 +26,7 @@
 
 
 #define CORE_HAS_LIBB64
+#define CORE_HAS_BASE64_CLASS
 
 
 #endif

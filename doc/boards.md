@@ -11,6 +11,7 @@ title: Supported Hardware
   * [Olimex MOD\-WIFI\-ESP8266](#olimex-mod-wifi-esp8266)
   * [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
   * [SweetPea ESP\-210](#sweetpea-esp-210)
+  * [ESPino](#espino)
   * [Generic ESP8266 modules](#generic-esp8266-modules)
   * [Serial Adapter](#serial-adapter)
   * [Minimal Hardware Setup for Bootloading and Usage](#minimal-hardware-setup-for-bootloading-and-usage)
@@ -90,6 +91,14 @@ Product page: https://www.sparkfun.com/products/13231
 ## SweetPea ESP-210
 
 *TODO: add notes*
+
+## ESPino
+
+ESPino integrates the ESP-12 module with a 3.3v regulator, CP2104 USB-Serial bridge and a micro USB connector for easy programming. It is designed for fitting in a breadboard and has an RGB Led and two buttons for easy prototyping.
+
+For more information about the hardware, pinout diagram and programming procedures, please see the [datasheet](https://github.com/makerlabmx/ESPino-tools/raw/master/Docs/ESPino-Datasheet-EN.pdf).
+
+Product page: http://www.espino.io/en
 
 ## Generic ESP8266 modules
 
