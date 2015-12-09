@@ -36,26 +36,31 @@ void setup() {
 
     WiFiMulti.addAP("SSID", "PASSWORD");
 
-
+    // allow reuse (if server supports it)
+    http.setReuse(true);
 }
 
 void loop() {
     // wait for WiFi connection
     if((WiFiMulti.run() == WL_CONNECTED)) {
 
-        http.begin("192.168.1.12", 80, "/test.html");
+        http.begin("http://192.168.1.12/test.html");
+        //http.begin("192.168.1.12", 80, "/test.html");
 
         int httpCode = http.GET();
         if(httpCode) {
             USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
 
             // file found at server
-            if(httpCode == 200) {
+            if(httpCode == HTTP_CODE_OK) {
                 http.writeToStream(&USE_SERIAL);
             }
         } else {
             USE_SERIAL.print("[HTTP] GET... failed, no connection or no HTTP server\n");
         }
+
+        http.end();
+
     }
 
     delay(1000);
