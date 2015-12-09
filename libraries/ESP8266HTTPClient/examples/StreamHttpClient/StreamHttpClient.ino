@@ -42,19 +42,20 @@ void loop() {
         HTTPClient http;
 
         USE_SERIAL.print("[HTTP] begin...\n");
-        // configure traged server and url
-        http.begin("192.168.1.12", 80, "/test.html");
+
+        // configure server and url
+        http.begin("http://192.168.1.12/test.html");
+        //http.begin("192.168.1.12", 80, "/test.html");
 
         USE_SERIAL.print("[HTTP] GET...\n");
         // start connection and send HTTP header
         int httpCode = http.GET();
         if(httpCode) {
             // HTTP header has been send and Server response header has been handled
-
             USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
 
             // file found at server
-            if(httpCode == 200) {
+            if(httpCode == HTTP_CODE_OK) {
 
                 // get lenght of document (is -1 when Server sends no Content-Length header)
                 int len = http.getSize();
@@ -89,8 +90,10 @@ void loop() {
 
             }
         } else {
-            USE_SERIAL.print("[HTTP] GET... failed, no connection or no HTTP server\n");
+            USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
         }
+
+        http.end();
     }
 
     delay(10000);

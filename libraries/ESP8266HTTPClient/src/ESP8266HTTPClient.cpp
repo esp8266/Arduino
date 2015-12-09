@@ -26,8 +26,10 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <StreamString.h>
+#include <base64.h>
 
 #include "ESP8266HTTPClient.h"
+
 
 /**
  * constractor
@@ -100,27 +102,34 @@ void HTTPClient::begin(String url, String httpsFingerprint) {
     String protocol;
     // check for : (http: or https:
     int index = url.indexOf(':');
-    int index2;
+    //int index2;
     bool hasPort = false;
     if(index) {
         protocol = url.substring(0, index);
         url.remove(0, (index + 3)); // remove http:// or https://
 
-        index = url.indexOf(':');
-        index2 = url.indexOf('/');
+        index = url.indexOf('/');
+        String host = url.substring(0, index);
+        url.remove(0, index); // remove host part
 
-        if(index >= 0 && ((index2 >= 0 && index < index2) || index2 == 0)) { // do we have a port?
-            _host = url.substring(0, index); // hostname
-            url.remove(0, (index + 1)); // remove hostname + :
+        // get Authorization
+        index = host.indexOf('@');
+        if(index >= 0) {
+            // auth info
+            String auth = host.substring(0, index);
+            host.remove(0, index +1); // remove auth part including @
+            _base64Authorization = base64::encode(auth);
+        }
 
-            index = url.indexOf('/');
-            _port = url.substring(0, index).toInt(); // get port
-            url.remove(0, index); // remove port
+        // get port
+        index = host.indexOf(':');
+        if(index >= 0) {
+            _host = host.substring(0, index); // hostname
+            host.remove(0, (index + 1)); // remove hostname + :
+            _port = host.toInt(); // get port
             hasPort = true;
         } else {
-            index = index2;
-            _host = url.substring(0, index);
-            url.remove(0, index); // remove hostname
+            _host = host;
         }
 
         _url = url;
@@ -139,6 +148,7 @@ void HTTPClient::begin(String url, String httpsFingerprint) {
             DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", protocol.c_str());
             return;
         }
+
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s https: %d httpsFingerprint: %s\n", _host.c_str(), _port, _url.c_str(), _https, _httpsFingerprint.c_str());
@@ -217,6 +227,30 @@ void HTTPClient::setReuse(bool reuse) {
  */
 void HTTPClient::setUserAgent(const char * userAgent) {
     _userAgent = userAgent;
+}
+
+/**
+ * set the Authorizatio for the http request
+ * @param user const char *
+ * @param password const char *
+ */
+void HTTPClient::setAuthorization(const char * user, const char * password) {
+    if(user && password) {
+        String auth = user;
+        auth += ":";
+        auth += password;
+        _base64Authorization = base64::encode(auth);
+    }
+}
+
+/**
+ * set the Authorizatio for the http request
+ * @param auth const char * base64
+ */
+void HTTPClient::setAuthorization(const char * auth) {
+    if(auth) {
+        _base64Authorization = auth;
+    }
 }
 
 /**
@@ -455,6 +489,33 @@ String HTTPClient::getString(void) {
 }
 
 /**
+ * converts error code to String
+ * @param error int
+ * @return String
+ */
+String HTTPClient::errorToString(int error) {
+    switch(error) {
+        case HTTPC_ERROR_CONNECTION_REFUSED:
+            return String("connection refused");
+        case HTTPC_ERROR_SEND_HEADER_FAILED:
+            return String("send header failed");
+        case HTTPC_ERROR_SEND_PAYLOAD_FAILED:
+            return String("send payload failed");
+        case HTTPC_ERROR_NOT_CONNECTED:
+            return String("not connected");
+        case HTTPC_ERROR_CONNECTION_LOST:
+            return String("connection lost");
+        case HTTPC_ERROR_NO_STREAM:
+            return String("no stream");
+        case HTTPC_ERROR_NO_HTTP_SERVER:
+            return String("no HTTP server");
+        default:
+            return String();
+    }
+}
+
+
+/**
  * adds Header to the request
  * @param name
  * @param value
@@ -463,7 +524,7 @@ String HTTPClient::getString(void) {
 void HTTPClient::addHeader(const String& name, const String& value, bool first) {
 
     // not allow set of Header handled by code
-    if(!name.equalsIgnoreCase("Connection") && !name.equalsIgnoreCase("User-Agent") && !name.equalsIgnoreCase("Host")) {
+    if(!name.equalsIgnoreCase("Connection") && !name.equalsIgnoreCase("User-Agent") && !name.equalsIgnoreCase("Host") && !(_base64Authorization.length() && name.equalsIgnoreCase("Authorization"))) {
         String headerLine = name;
         headerLine += ": ";
         headerLine += value;
@@ -595,7 +656,13 @@ bool HTTPClient::sendHeader(const char * type) {
     } else {
         header += "close";
     }
-    header += "\r\n" + _Headers + "\r\n";
+    header += "\r\n";
+
+    if(_base64Authorization.length()) {
+        header += "Authorization: Basic " + _base64Authorization + "\r\n";
+    }
+
+    header += _Headers + "\r\n";
 
     return (_tcp->write(header.c_str(), header.length()) == header.length());
 }
