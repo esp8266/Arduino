@@ -82,7 +82,7 @@ extern "C" {
 #ifdef CONFIG_SSL_SKELETON_MODE
 #define NUM_PROTOCOLS               1
 #else
-#define NUM_PROTOCOLS               4
+#define NUM_PROTOCOLS               2
 #endif
 
 #define PARANOIA_CHECK(A, B)        if (A < B) { \

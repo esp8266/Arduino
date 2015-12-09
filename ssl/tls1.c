@@ -58,18 +58,18 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol);
  * ciphers are listed. This order is defined at compile time.
  */
 #ifdef CONFIG_SSL_SKELETON_MODE
-const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
+const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] =
 { SSL_RC4_128_SHA };
 #else
 static void session_free(SSL_SESSION *ssl_sessions[], int sess_index);
 
-const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
+const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] =
 #ifdef CONFIG_SSL_PROT_LOW                  /* low security, fast speed */
-{ SSL_RC4_128_SHA, SSL_AES128_SHA, SSL_AES256_SHA, SSL_RC4_128_MD5 };
+{ SSL_AES128_SHA, SSL_AES256_SHA};
 #elif CONFIG_SSL_PROT_MEDIUM                /* medium security, medium speed */
-{ SSL_AES128_SHA, SSL_AES256_SHA, SSL_RC4_128_SHA, SSL_RC4_128_MD5 };    
+{ SSL_AES128_SHA, SSL_AES256_SHA};
 #else /* CONFIG_SSL_PROT_HIGH */            /* high security, low speed */
-{ SSL_AES256_SHA, SSL_AES128_SHA, SSL_RC4_128_SHA, SSL_RC4_128_MD5 };
+{ SSL_AES256_SHA, SSL_AES128_SHA};
 #endif
 #endif /* CONFIG_SSL_SKELETON_MODE */
 
@@ -108,40 +108,14 @@ static const cipher_info_t cipher_info[NUM_PROTOCOLS] =
     {   /* AES256-SHA */
         SSL_AES256_SHA,                 /* AES256-SHA */
         32,                             /* key size */
-        16,                             /* iv size */ 
+        16,                             /* iv size */
         2*(SHA1_SIZE+32+16),            /* key block size */
         16,                             /* block padding size */
         SHA1_SIZE,                      /* digest size */
         hmac_sha1,                      /* hmac algorithm */
         (crypt_func)AES_cbc_encrypt,    /* encrypt */
         (crypt_func)AES_cbc_decrypt     /* decrypt */
-    },       
-    {   /* RC4-SHA */
-        SSL_RC4_128_SHA,                /* RC4-SHA */
-        16,                             /* key size */
-        0,                              /* iv size */ 
-        2*(SHA1_SIZE+16),               /* key block size */
-        0,                              /* no padding */
-        SHA1_SIZE,                      /* digest size */
-        hmac_sha1,                      /* hmac algorithm */
-        (crypt_func)RC4_crypt,          /* encrypt */
-        (crypt_func)RC4_crypt           /* decrypt */
-    },
-    /*
-     * This protocol is from SSLv2 days and is unlikely to be used - but was
-     * useful for testing different possible digest algorithms.
-     */
-    {   /* RC4-MD5 */
-        SSL_RC4_128_MD5,                /* RC4-MD5 */
-        16,                             /* key size */
-        0,                              /* iv size */ 
-        2*(MD5_SIZE+16),                /* key block size */
-        0,                              /* no padding */
-        MD5_SIZE,                       /* digest size */
-        hmac_md5,                       /* hmac algorithm */
-        (crypt_func)RC4_crypt,          /* encrypt */
-        (crypt_func)RC4_crypt           /* decrypt */
-    },
+    }
 };
 #endif
 
