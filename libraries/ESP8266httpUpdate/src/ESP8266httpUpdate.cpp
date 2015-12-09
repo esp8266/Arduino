@@ -120,6 +120,12 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
     int code = http->GET();
     int len = http->getSize();
 
+    if(code <= 0) {
+        DEBUG_HTTP_UPDATE("[httpUpdate] HTTP error: %s\n", http->errorToString(code).c_str());
+        http->end();
+        return HTTP_UPDATE_FAILED;
+    }
+
     DEBUG_HTTP_UPDATE("[httpUpdate] Header read fin.\n");
     DEBUG_HTTP_UPDATE("[httpUpdate] Server header:\n");
     DEBUG_HTTP_UPDATE("[httpUpdate]  - code: %d\n", code);
@@ -138,7 +144,7 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
     }
 
     switch(code) {
-        case 200:  ///< OK (Start Update)
+        case HTTP_CODE_OK:  ///< OK (Start Update)
             if(len > 0) {
                 bool startUpdate = false;
                 if(spiffs) {
@@ -192,18 +198,17 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
                 DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length is 0 or not set by Server?!\n");
             }
             break;
-        case 304:
+        case HTTP_CODE_NOT_MODIFIED:
             ///< Not Modified (No updates)
             ret = HTTP_UPDATE_NO_UPDATES;
             break;
-        case 403:
-            ///< Forbidden
-            // todo handle login
         default:
             ret = HTTP_UPDATE_FAILED;
-            DEBUG_HTTP_UPDATE("[httpUpdate] Code is (%d)\n", code);
+            DEBUG_HTTP_UPDATE("[httpUpdate] HTTP Code is (%d)\n", code);
+            //http->writeToStream(&Serial1);
             break;
     }
+
 
     http->end();
 
