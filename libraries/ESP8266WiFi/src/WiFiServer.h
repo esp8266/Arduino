@@ -54,6 +54,8 @@ public:
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
   uint8_t status();
+  void close();
+  void stop();
 
   using Print::write;
 
