@@ -113,9 +113,9 @@ class cbuf {
             return (ptr == _bufend) ? _buf : ptr;
         }
 
-        size_t _size;
+        const size_t _size;
         char* _buf;
-        char* _bufend;
+        const char* const _bufend;
         char* _begin;
         char* _end;
 };
