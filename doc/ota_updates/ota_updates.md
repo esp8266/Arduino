@@ -405,6 +405,15 @@ The Stream Interface is the base for all other update modes like OTA, http Serve
 
 ## Updater class
 
-TODO describe Updater class
+Updater is in the Core and deals with writing the firmware to the flash, 
+checking its integrity and telling the bootloader to load the new firmware on the next boot.
 
-Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader to load the new firmware on the next boot.
+### Update process - memory view
+
+ - The new sketch will be stored in the space between the old sketch and the spiff.
+ - on the next reboot the "eboot" bootloader check for commands.
+ - the new sketch is now copied "over" the old one.
+ - the new sketch is started.
+
+![Memory Copy](update_memory_copy.png)
+
