@@ -71,6 +71,7 @@ ESP8266WebServer::~ESP8266WebServer() {
     delete handler;
     handler = next;
   }
+  close();
 }
 
 void ESP8266WebServer::begin() {
@@ -171,6 +172,14 @@ void ESP8266WebServer::handleClient() {
   _currentClient = client;
   _contentLength = CONTENT_LENGTH_NOT_SET;
   _handleRequest();
+}
+
+void ESP8266WebServer::close() {
+  _server.close();
+}
+
+void ESP8266WebServer::stop() {
+  close();
 }
 
 void ESP8266WebServer::sendHeader(const String& name, const String& value, bool first) {

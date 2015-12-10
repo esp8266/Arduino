@@ -66,6 +66,9 @@ public:
   void begin();
   void handleClient();
   
+  void close();
+  void stop();
+
   bool authenticate(const char * username, const char * password);
   void requestAuthentication();
   
