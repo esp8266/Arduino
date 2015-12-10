@@ -53,9 +53,11 @@ class ESP8266HTTPUpdate {
         t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "", bool https = false, const char * httpsFingerprint = "");
         t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "", bool https = false, String httpsFingerprint = "");
 
+        t_httpUpdate_return updateSpiffs(const char * url, const char * current_version = "", const char * httpsFingerprint = "");
+
     protected:
-        t_httpUpdate_return handleUpdate(HTTPClient * http, const char * current_version);
-        bool runUpdate(Stream& in, uint32_t size, String md5);
+        t_httpUpdate_return handleUpdate(HTTPClient * http, const char * current_version, bool reboot = true, bool spiffs = false);
+        bool runUpdate(Stream& in, uint32_t size, String md5, int command = U_FLASH);
 };
 
 extern ESP8266HTTPUpdate ESPhttpUpdate;
