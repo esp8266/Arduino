@@ -38,14 +38,14 @@ void UpdaterClass::_reset() {
 bool UpdaterClass::begin(size_t size, int command) {
   if(_size > 0){
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.println("already running");
+    DEBUG_UPDATER.println("[begin] already running");
 #endif
     return false;
   }
 
 #ifdef DEBUG_UPDATER
   if (command == U_SPIFFS) {
-    DEBUG_UPDATER.println("Update SPIFFS.");
+    DEBUG_UPDATER.println("[begin] Update SPIFFS.");
   }
 #endif
 
@@ -73,6 +73,12 @@ bool UpdaterClass::begin(size_t size, int command) {
     //address where we will start writing the update
     updateStartAddress = updateEndAddress - roundedSize;
 
+#ifdef DEBUG_UPDATER
+        DEBUG_UPDATER.printf("[begin] roundedSize:       0x%08X (%d)\n", roundedSize, roundedSize);
+        DEBUG_UPDATER.printf("[begin] updateEndAddress:  0x%08X (%d)\n", updateEndAddress, updateEndAddress);
+        DEBUG_UPDATER.printf("[begin] currentSketchSize: 0x%08X (%d)\n", currentSketchSize, currentSketchSize);
+#endif
+
     //make sure that the size of both sketches is less than the total space (updateEndAddress)
     if(updateStartAddress < currentSketchSize) {
       _error = UPDATE_ERROR_SPACE;
@@ -88,7 +94,7 @@ bool UpdaterClass::begin(size_t size, int command) {
   else {
     // unknown command
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.println("Unknown update command.");
+    DEBUG_UPDATER.println("[begin] Unknown update command.");
 #endif
     return false;
   }
@@ -99,6 +105,12 @@ bool UpdaterClass::begin(size_t size, int command) {
   _size = size;
   _buffer = new uint8_t[FLASH_SECTOR_SIZE];
   _command = command;
+
+#ifdef DEBUG_UPDATER
+  DEBUG_UPDATER.printf("[begin] _startAddress:     0x%08X (%d)\n", _startAddress, _startAddress);
+  DEBUG_UPDATER.printf("[begin] _currentAddress:   0x%08X (%d)\n", _currentAddress, _currentAddress);
+  DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", _size, _size);
+#endif
 
   _md5.begin();
   return true;
