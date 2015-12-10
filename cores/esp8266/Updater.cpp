@@ -168,9 +168,14 @@ bool UpdaterClass::end(bool evenIfRemaining){
 }
 
 bool UpdaterClass::_writeBuffer(){
+
   yield();
-  bool result = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE) &&
-                ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+  bool result = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
+  yield();
+  if (result) {
+      result = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+  }
+  yield();
 
   if (!result) {
     _error = UPDATE_ERROR_WRITE;
@@ -217,29 +222,32 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
 }
 
 size_t UpdaterClass::writeStream(Stream &data) {
-  size_t written = 0;
-  size_t toRead = 0;
-  if(hasError() || !isRunning())
-    return 0;
+    size_t written = 0;
+    size_t toRead = 0;
+    if(hasError() || !isRunning())
+        return 0;
 
-  while(remaining()) {
-    toRead = FLASH_SECTOR_SIZE - _bufferLen;
-    toRead = data.readBytes(_buffer + _bufferLen, toRead);
-    if(toRead == 0){ //Timeout
-      _error = UPDATE_ERROR_STREAM;
-      _currentAddress = (_startAddress + _size);
+    while(remaining()) {
+        toRead = data.readBytes(_buffer + _bufferLen,  (FLASH_SECTOR_SIZE - _bufferLen));
+        if(toRead == 0) { //Timeout
+            delay(100);
+            toRead = data.readBytes(_buffer + _bufferLen, (FLASH_SECTOR_SIZE - _bufferLen));
+            if(toRead == 0) { //Timeout
+                _error = UPDATE_ERROR_STREAM;
+                _currentAddress = (_startAddress + _size);
 #ifdef DEBUG_UPDATER
-      printError(DEBUG_UPDATER);
+                printError(DEBUG_UPDATER);
 #endif
-      return written;
+            }
+            return written;
+        }
+        _bufferLen += toRead;
+        if((_bufferLen == remaining() || _bufferLen == FLASH_SECTOR_SIZE) && !_writeBuffer())
+            return written;
+        written += toRead;
+        yield();
     }
-    _bufferLen += toRead;
-    if((_bufferLen == remaining() || _bufferLen == FLASH_SECTOR_SIZE) && !_writeBuffer())
-      return written;
-    written += toRead;
-    yield();
-  }
-  return written;
+    return written;
 }
 
 void UpdaterClass::printError(Stream &out){
