@@ -29,7 +29,6 @@ extern "C"
 }
 #include <errno.h>
 #include "debug.h"
-#include "cbuf.h"
 #include "ESP8266WiFi.h"
 #include "WiFiClientSecure.h"
 #include "WiFiClient.h"
