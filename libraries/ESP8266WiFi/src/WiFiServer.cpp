@@ -121,6 +121,16 @@ uint8_t WiFiServer::status()  {
     return _pcb->state;
 }
 
+void WiFiServer::close() {
+    if (!_pcb) {
+      return;
+    }
+    tcp_close(_pcb);
+}
+
+void WiFiServer::stop() {
+    close();
+}
 
 size_t WiFiServer::write(uint8_t b) {
     return write(&b, 1);
