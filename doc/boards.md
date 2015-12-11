@@ -12,6 +12,7 @@ title: Supported Hardware
   * [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
   * [SweetPea ESP\-210](#sweetpea-esp-210)
   * [ESPino](#espino)
+  * [WifInfo](#WifInfo)
   * [Generic ESP8266 modules](#generic-esp8266-modules)
   * [Serial Adapter](#serial-adapter)
   * [Minimal Hardware Setup for Bootloading and Usage](#minimal-hardware-setup-for-bootloading-and-usage)
@@ -99,6 +100,12 @@ ESPino integrates the ESP-12 module with a 3.3v regulator, CP2104 USB-Serial bri
 For more information about the hardware, pinout diagram and programming procedures, please see the [datasheet](https://github.com/makerlabmx/ESPino-tools/raw/master/Docs/ESPino-Datasheet-EN.pdf).
 
 Product page: http://www.espino.io/en
+
+## WifInfo
+
+WifInfo integrates the ESP-12 or ESP-07+Ext antenna module with a 3.3v regulator and the hardware to be able to measure French telemetry issue from ERDF powering meter serial output. It has a USB connector for powering, an RGB WS2812 Led, 4 pins I2C connector to fit OLED or sensor, and two buttons + FTDI connector and auto reset feature.
+
+For more information, please see WifInfo related [blog](http://hallard.me/category/wifinfo/) entries, [github](https://github.com/hallard/WifInfo) and [community](https://community.hallard.me/category/16/wifinfo) forum.
 
 ## Generic ESP8266 modules
 
