@@ -712,14 +712,59 @@ wifinfo.build.variant=wifinfo
 wifinfo.build.flash_mode=qio
 wifinfo.build.spiffs_pagesize=256
 
-wifinfo.menu.ESPModule.ESP07=ESP07 (1M/512K SPIFFS)
-wifinfo.menu.ESPModule.ESP07.build.board=ESP8266_ESP07
-wifinfo.menu.ESPModule.ESP07.build.flash_size=1M
-wifinfo.menu.ESPModule.ESP07.build.flash_ld=eagle.flash.1m512.ld
-wifinfo.menu.ESPModule.ESP07.build.spiffs_start=0x7B000
-wifinfo.menu.ESPModule.ESP07.build.spiffs_end=0xFB000
-wifinfo.menu.ESPModule.ESP07.build.spiffs_blocksize=8192
-wifinfo.menu.ESPModule.ESP07.upload.maximum_size=499696
+#wifinfo.menu.ESPModule.ESP07512=ESP07 (1M/512K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07512.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07512.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07512.build.flash_ld=eagle.flash.1m512.ld
+#wifinfo.menu.ESPModule.ESP07512.build.spiffs_start=0x7B000
+#wifinfo.menu.ESPModule.ESP07512.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07512.build.spiffs_blocksize=8192
+#wifinfo.menu.ESPModule.ESP07512.upload.maximum_size=499696
+
+#wifinfo.menu.ESPModule.ESP07256=ESP07 (1M/256K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07256.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07256.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07256.build.flash_ld=eagle.flash.1m256.ld
+#wifinfo.menu.ESPModule.ESP07256.build.spiffs_start=0xBB000
+#wifinfo.menu.ESPModule.ESP07256.build.spiffs_end=0xFB000
+##wifinfo.menu.ESPModule.ESP07256.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07256.upload.maximum_size=761840
+
+wifinfo.menu.ESPModule.ESP07192=ESP07 (1M/192K SPIFFS)
+wifinfo.menu.ESPModule.ESP07192.build.board=ESP8266_ESP07
+wifinfo.menu.ESPModule.ESP07192.build.flash_size=1M
+wifinfo.menu.ESPModule.ESP07192.build.flash_ld=eagle.flash.1m192.ld
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_start=0xCB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_end=0xFB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_blocksize=4096
+wifinfo.menu.ESPModule.ESP07192.upload.maximum_size=827376
+
+#wifinfo.menu.ESPModule.ESP07160=ESP07 (1M/160K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07160.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07160.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07160.build.flash_ld=eagle.flash.1m160.ld
+#wifinfo.menu.ESPModule.ESP07160.build.spiffs_start=0xD3000
+#wifinfo.menu.ESPModule.ESP07160.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07160.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07160.upload.maximum_size=860144
+#
+#wifinfo.menu.ESPModule.ESP07144=ESP07 (1M/144K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07144.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07144.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07144.build.flash_ld=eagle.flash.1m144.ld
+#wifinfo.menu.ESPModule.ESP07144.build.spiffs_start=0xD7000
+#wifinfo.menu.ESPModule.ESP07144.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07144.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07144.upload.maximum_size=876528
+#
+#wifinfo.menu.ESPModule.ESP07=ESP07 (1M/64K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07.build.flash_ld=eagle.flash.1m64.ld
+#wifinfo.menu.ESPModule.ESP07.build.spiffs_start=0xEB000
+#wifinfo.menu.ESPModule.ESP07.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07.upload.maximum_size=958448
 
 wifinfo.menu.ESPModule.ESP12=ESP12 (4M/1M SPIFFS)
 wifinfo.menu.ESPModule.ESP12.build.board=ESP8266_ESP12
