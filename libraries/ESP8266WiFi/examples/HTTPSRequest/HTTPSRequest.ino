@@ -4,7 +4,7 @@
  *  This example demonstrates how to use
  *  WiFiClientSecure class to access HTTPS API.
  *  We fetch and display the status of
- *  esp8266/Arduino project continous integration
+ *  esp8266/Arduino project continuous integration
  *  build.
  *
  *  Created by Ivan Grokhotkov, 2015.
@@ -54,7 +54,7 @@ void setup() {
     Serial.println("certificate doesn't match");
   }
 
-  String url = "/repos/esp8266/Arduino/commits/esp8266/status";
+  String url = "/repos/esp8266/Arduino/commits/master/status";
   Serial.print("requesting URL: ");
   Serial.println(url);
 

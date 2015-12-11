@@ -79,7 +79,13 @@ void onError(OTA_CALLBACK_ERROR (fn));
 
 ### Basic Requirements
 
-- Flash chip size is 2x the size of the sketch.
+Flash chip size needs a size thats is able to hold the old sketch (currently running) and the new sketch (OTA) at the same time.
+keep in mind that the File system and EEPROM for example needs space too (one time) see [flash layout](../filesystem.md#flash-layout).
+```cpp
+ESP.getFreeSketchSpace();
+```
+can be used for checking the free space for the new sketch.
+
 
 
 The following chapters provide more details and specific methods of doing OTA.
@@ -318,7 +324,7 @@ Example header data:
     [HTTP_X_ESP8266_AP_MAC] => 1A:FE:AA:AA:AA:AA
     [HTTP_X_ESP8266_FREE_SPACE] => 671744
     [HTTP_X_ESP8266_SKETCH_SIZE] => 373940
-    [HTTP_X_ESP8266_CHIP_SIZE] => 524288
+    [HTTP_X_ESP8266_CHIP_SIZE] => 4194304
     [HTTP_X_ESP8266_SDK_VERSION] => 1.3.0
     [HTTP_X_ESP8266_VERSION] => DOOR-7-g14f53a19
 ```
@@ -399,6 +405,15 @@ The Stream Interface is the base for all other update modes like OTA, http Serve
 
 ## Updater class
 
-TODO describe Updater class
+Updater is in the Core and deals with writing the firmware to the flash, 
+checking its integrity and telling the bootloader to load the new firmware on the next boot.
 
-Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader to load the new firmware on the next boot.
+### Update process - memory view
+
+ - The new sketch will be stored in the space between the old sketch and the spiff.
+ - on the next reboot the "eboot" bootloader check for commands.
+ - the new sketch is now copied "over" the old one.
+ - the new sketch is started.
+
+![Memory Copy](update_memory_copy.png)
+

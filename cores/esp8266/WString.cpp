@@ -121,6 +121,7 @@ ICACHE_FLASH_ATTR String::~String() {
     if(buffer) {
         free(buffer);
     }
+    init();
 }
 
 // /*********************************************/
@@ -136,8 +137,7 @@ inline void String::init(void) {
 void ICACHE_FLASH_ATTR String::invalidate(void) {
     if(buffer)
         free(buffer);
-    buffer = NULL;
-    capacity = len = 0;
+    init();
 }
 
 unsigned char ICACHE_FLASH_ATTR String::reserve(unsigned int size) {
