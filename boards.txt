@@ -5,6 +5,7 @@ menu.FlashMode=Flash Mode
 menu.FlashFreq=Flash Frequency
 menu.UploadTool=Upload Using
 menu.ResetMethod=Reset Method
+menu.ESPModule=Module
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -94,6 +95,30 @@ generic.menu.FlashSize.1M256.build.spiffs_start=0xBB000
 generic.menu.FlashSize.1M256.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M256.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M256.upload.maximum_size=761840
+
+generic.menu.FlashSize.1M192=1M (192K SPIFFS)
+generic.menu.FlashSize.1M192.build.flash_size=1M
+generic.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
+generic.menu.FlashSize.1M192.build.spiffs_start=0xCB000
+generic.menu.FlashSize.1M192.build.spiffs_end=0xFB000
+generic.menu.FlashSize.1M192.build.spiffs_blocksize=4096
+generic.menu.FlashSize.1M192.upload.maximum_size=827376
+
+generic.menu.FlashSize.1M160=1M (160K SPIFFS)
+generic.menu.FlashSize.1M160.build.flash_size=1M
+generic.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
+generic.menu.FlashSize.1M160.build.spiffs_start=0xD3000
+generic.menu.FlashSize.1M160.build.spiffs_end=0xFB000
+generic.menu.FlashSize.1M160.build.spiffs_blocksize=4096
+generic.menu.FlashSize.1M160.upload.maximum_size=860144
+
+generic.menu.FlashSize.1M144=1M (144K SPIFFS)
+generic.menu.FlashSize.1M144.build.flash_size=1M
+generic.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
+generic.menu.FlashSize.1M144.build.spiffs_start=0xD7000
+generic.menu.FlashSize.1M144.build.spiffs_end=0xFB000
+generic.menu.FlashSize.1M144.build.spiffs_blocksize=4096
+generic.menu.FlashSize.1M144.upload.maximum_size=876528
 
 generic.menu.FlashSize.1M128=1M (128K SPIFFS)
 generic.menu.FlashSize.1M128.build.flash_size=1M
@@ -771,3 +796,126 @@ espino.menu.ResetMethod.ck=ck
 espino.menu.ResetMethod.ck.upload.resetmethod=ck
 espino.menu.ResetMethod.nodemcu=nodemcu
 espino.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+
+##############################################################
+wifinfo.name=WifInfo
+
+wifinfo.upload.tool=esptool
+wifinfo.upload.speed=115200
+wifinfo.upload.resetmethod=nodemcu
+wifinfo.upload.maximum_size=434160
+wifinfo.upload.maximum_data_size=81920
+wifinfo.upload.wait_for_upload_port=true
+wifinfo.serial.disableDTR=true
+wifinfo.serial.disableRTS=true
+
+wifinfo.build.mcu=esp8266
+wifinfo.build.f_cpu=80000000L
+wifinfo.build.core=esp8266
+wifinfo.build.variant=wifinfo
+wifinfo.build.flash_mode=qio
+wifinfo.build.spiffs_pagesize=256
+
+#wifinfo.menu.ESPModule.ESP07512=ESP07 (1M/512K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07512.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07512.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07512.build.flash_ld=eagle.flash.1m512.ld
+#wifinfo.menu.ESPModule.ESP07512.build.spiffs_start=0x7B000
+#wifinfo.menu.ESPModule.ESP07512.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07512.build.spiffs_blocksize=8192
+#wifinfo.menu.ESPModule.ESP07512.upload.maximum_size=499696
+
+#wifinfo.menu.ESPModule.ESP07256=ESP07 (1M/256K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07256.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07256.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07256.build.flash_ld=eagle.flash.1m256.ld
+#wifinfo.menu.ESPModule.ESP07256.build.spiffs_start=0xBB000
+#wifinfo.menu.ESPModule.ESP07256.build.spiffs_end=0xFB000
+##wifinfo.menu.ESPModule.ESP07256.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07256.upload.maximum_size=761840
+
+wifinfo.menu.ESPModule.ESP07192=ESP07 (1M/192K SPIFFS)
+wifinfo.menu.ESPModule.ESP07192.build.board=ESP8266_ESP07
+wifinfo.menu.ESPModule.ESP07192.build.flash_size=1M
+wifinfo.menu.ESPModule.ESP07192.build.flash_ld=eagle.flash.1m192.ld
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_start=0xCB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_end=0xFB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_blocksize=4096
+wifinfo.menu.ESPModule.ESP07192.upload.maximum_size=827376
+
+#wifinfo.menu.ESPModule.ESP07160=ESP07 (1M/160K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07160.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07160.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07160.build.flash_ld=eagle.flash.1m160.ld
+#wifinfo.menu.ESPModule.ESP07160.build.spiffs_start=0xD3000
+#wifinfo.menu.ESPModule.ESP07160.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07160.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07160.upload.maximum_size=860144
+#
+#wifinfo.menu.ESPModule.ESP07144=ESP07 (1M/144K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07144.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07144.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07144.build.flash_ld=eagle.flash.1m144.ld
+#wifinfo.menu.ESPModule.ESP07144.build.spiffs_start=0xD7000
+#wifinfo.menu.ESPModule.ESP07144.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07144.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07144.upload.maximum_size=876528
+#
+#wifinfo.menu.ESPModule.ESP07=ESP07 (1M/64K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07.build.flash_ld=eagle.flash.1m64.ld
+#wifinfo.menu.ESPModule.ESP07.build.spiffs_start=0xEB000
+#wifinfo.menu.ESPModule.ESP07.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07.upload.maximum_size=958448
+
+wifinfo.menu.ESPModule.ESP12=ESP12 (4M/1M SPIFFS)
+wifinfo.menu.ESPModule.ESP12.build.board=ESP8266_ESP12
+wifinfo.menu.ESPModule.ESP12.build.flash_size=4M
+wifinfo.menu.ESPModule.ESP12.build.flash_ld=eagle.flash.4m1m.ld
+wifinfo.menu.ESPModule.ESP12.build.spiffs_start=0x300000
+wifinfo.menu.ESPModule.ESP12.build.spiffs_end=0x3FB000
+wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
+wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
+wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
+
+wifinfo.menu.UploadTool.esptool=Serial
+wifinfo.menu.UploadTool.esptool.upload.tool=esptool
+wifinfo.menu.UploadTool.esptool.upload.verbose=-vv
+wifinfo.menu.UploadTool.espota=OTA
+wifinfo.menu.UploadTool.espota.upload.tool=espota
+
+wifinfo.menu.CpuFrequency.80=80 MHz
+wifinfo.menu.CpuFrequency.80.build.f_cpu=80000000L
+wifinfo.menu.CpuFrequency.160=160 MHz
+wifinfo.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+wifinfo.menu.FlashFreq.40=40MHz
+wifinfo.menu.FlashFreq.40.build.flash_freq=40
+wifinfo.menu.FlashFreq.80=80MHz
+wifinfo.menu.FlashFreq.80.build.flash_freq=80
+
+wifinfo.menu.FlashMode.dio=DIO
+wifinfo.menu.FlashMode.dio.build.flash_mode=dio
+wifinfo.menu.FlashMode.qio=QIO
+wifinfo.menu.FlashMode.qio.build.flash_mode=qio
+
+wifinfo.menu.UploadSpeed.115200=115200
+wifinfo.menu.UploadSpeed.115200.upload.speed=115200
+wifinfo.menu.UploadSpeed.9600=9600
+wifinfo.menu.UploadSpeed.9600.upload.speed=9600
+wifinfo.menu.UploadSpeed.57600=57600
+wifinfo.menu.UploadSpeed.57600.upload.speed=57600
+wifinfo.menu.UploadSpeed.256000.windows=256000
+wifinfo.menu.UploadSpeed.256000.upload.speed=256000
+wifinfo.menu.UploadSpeed.230400.linux=230400
+wifinfo.menu.UploadSpeed.230400.macosx=230400
+wifinfo.menu.UploadSpeed.230400.upload.speed=230400
+wifinfo.menu.UploadSpeed.460800.linux=460800
+wifinfo.menu.UploadSpeed.460800.macosx=460800
+wifinfo.menu.UploadSpeed.460800.upload.speed=460800
+wifinfo.menu.UploadSpeed.512000.windows=512000
+wifinfo.menu.UploadSpeed.512000.upload.speed=512000
+wifinfo.menu.UploadSpeed.921600=921600
+wifinfo.menu.UploadSpeed.921600.upload.speed=921600
