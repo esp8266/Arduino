@@ -52,7 +52,7 @@ python get.py
 
 [PlatformIO](http://platformio.org) is a cross-platform code-builder and library manager for embedded development with no external dependencies. Works on the popular host OS: Mac OS X, Windows, Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard). More details in documentation [What is PlatformIO? How does it work?](http://docs.platformio.org/en/latest/faq.html#general).
 
-See [detailed instructions on how to use Espressif platform with PlatformIO](docs/platformio.md).
+See [detailed instructions on how to use Espressif platform with PlatformIO](doc/platformio.md).
 
 ### Documentation
 
