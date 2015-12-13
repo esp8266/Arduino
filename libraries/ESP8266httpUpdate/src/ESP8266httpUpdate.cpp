@@ -42,10 +42,10 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void) {
  * @param httpsFingerprint const char *
  * @return t_httpUpdate_return
  */
-t_httpUpdate_return ESP8266HTTPUpdate::update(const char * url, const char * current_version, const char * httpsFingerprint) {
+t_httpUpdate_return ESP8266HTTPUpdate::update(const char * url, const char * current_version, const char * httpsFingerprint, bool reboot) {
     HTTPClient http;
     http.begin(url, httpsFingerprint);
-    return handleUpdate(&http, current_version);
+    return handleUpdate(&http, current_version, reboot, false);
 }
 
 /**
@@ -55,10 +55,10 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(const char * url, const char * cur
  * @param httpsFingerprint const char *
  * @return t_httpUpdate_return
  */
-t_httpUpdate_return ESP8266HTTPUpdate::updateSpiffs(const char * url, const char * current_version, const char * httpsFingerprint) {
+t_httpUpdate_return ESP8266HTTPUpdate::updateSpiffs(const char * url, const char * current_version, const char * httpsFingerprint, bool reboot) {
     HTTPClient http;
     http.begin(url, httpsFingerprint);
-    return handleUpdate(&http, current_version, false, true);
+    return handleUpdate(&http, current_version, reboot, true);
 }
 
 /**
@@ -70,16 +70,16 @@ t_httpUpdate_return ESP8266HTTPUpdate::updateSpiffs(const char * url, const char
  * @param httpsFingerprint const char *
  * @return
  */
-t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, const char * url, const char * current_version, bool https, const char * httpsFingerprint) {
+t_httpUpdate_return ESP8266HTTPUpdate::update(const char * host, uint16_t port, const char * url, const char * current_version, bool https, const char * httpsFingerprint, bool reboot) {
     HTTPClient http;
     http.begin(host, port, url, https, httpsFingerprint);
-    return handleUpdate(&http, current_version);
+    return handleUpdate(&http, current_version, reboot, false);
 }
 
-t_httpUpdate_return ESP8266HTTPUpdate::update(String host, uint16_t port, String url, String current_version, bool https, String httpsFingerprint) {
+t_httpUpdate_return ESP8266HTTPUpdate::update(String host, uint16_t port, String url, String current_version, bool https, String httpsFingerprint, bool reboot) {
     HTTPClient http;
     http.begin(host, port, url, https, httpsFingerprint);
-    return handleUpdate(&http, current_version.c_str());
+    return handleUpdate(&http, current_version.c_str(), reboot, false);
 }
 
 /**

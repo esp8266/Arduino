@@ -49,11 +49,11 @@ class ESP8266HTTPUpdate {
         ESP8266HTTPUpdate(void);
         ~ESP8266HTTPUpdate(void);
 
-        t_httpUpdate_return update(const char * url, const char * current_version = "", const char * httpsFingerprint = "");
-        t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "", bool https = false, const char * httpsFingerprint = "");
-        t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "", bool https = false, String httpsFingerprint = "");
+        t_httpUpdate_return update(const char * url, const char * current_version = "", const char * httpsFingerprint = "", bool reboot = true);
+        t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "", bool https = false, const char * httpsFingerprint = "", bool reboot = true);
+        t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "", bool https = false, String httpsFingerprint = "", bool reboot = true);
 
-        t_httpUpdate_return updateSpiffs(const char * url, const char * current_version = "", const char * httpsFingerprint = "");
+        t_httpUpdate_return updateSpiffs(const char * url, const char * current_version = "", const char * httpsFingerprint = "", bool reboot = false);
 
     protected:
         t_httpUpdate_return handleUpdate(HTTPClient * http, const char * current_version, bool reboot = true, bool spiffs = false);
