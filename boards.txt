@@ -185,7 +185,7 @@ huzzah.name=Adafruit HUZZAH ESP8266
 
 huzzah.upload.tool=esptool
 huzzah.upload.speed=115200
-huzzah.upload.resetmethod=ck
+huzzah.upload.resetmethod=nodemcu
 huzzah.upload.maximum_size=1044464
 huzzah.upload.maximum_data_size=81920
 huzzah.upload.wait_for_upload_port=true
