@@ -29,6 +29,7 @@
 #include <inttypes.h>
 #include "Arduino.h"
 #include "cbuf.h"
+#include "interrupts.h"
 
 extern "C" {
 #include "osapi.h"
@@ -556,6 +557,7 @@ int HardwareSerial::available(void) {
     int result = 0;
 
     if (_uart != NULL && _uart->rxEnabled) {
+        InterruptLock il;
         result = static_cast<int>(_rx_buffer->getSize());
     }
 
@@ -570,6 +572,7 @@ int HardwareSerial::peek(void) {
     if(_uart == 0)
         return -1;
     if(_uart->rxEnabled) {
+        InterruptLock il;
         return _rx_buffer->peek();
     } else {
         return -1;
@@ -580,6 +583,7 @@ int HardwareSerial::read(void) {
     if(_uart == 0)
         return -1;
     if(_uart->rxEnabled) {
+        InterruptLock il;
         return _rx_buffer->read();
     } else {
         return -1;
@@ -590,6 +594,7 @@ int HardwareSerial::availableForWrite(void) {
     if(_uart == 0)
         return 0;
     if(_uart->txEnabled) {
+        InterruptLock il;
         return static_cast<int>(_tx_buffer->room());
     } else {
         return 0;
@@ -604,9 +609,16 @@ void HardwareSerial::flush() {
     if(!_written)
         return;
 
-    while(_tx_buffer->getSize() || uart_get_tx_fifo_room(_uart) < UART_TX_FIFO_SIZE)
+    while(true) {
+        {
+            InterruptLock il;
+            if(_tx_buffer->getSize() == 0 &&
+               uart_get_tx_fifo_room(_uart) >= UART_TX_FIFO_SIZE) {
+                break;
+            }
+        }
         yield();
-
+    }
     _written = false;
 }
 
@@ -614,18 +626,24 @@ size_t HardwareSerial::write(uint8_t c) {
     if(_uart == 0 || !_uart->txEnabled)
         return 0;
     _written = true;
-    size_t room = uart_get_tx_fifo_room(_uart);
-    if(room > 0 && _tx_buffer->empty()) {
-        uart_transmit_char(_uart, c);
-        return 1;
-    }
 
-    while(_tx_buffer->room() == 0) {
+    while(true) {
+        {
+            InterruptLock il;
+            if(_tx_buffer->empty()) {
+                if(uart_get_tx_fifo_room(_uart) > 0) {
+                    uart_transmit_char(_uart, c);
+                } else {
+                    _tx_buffer->write(c);
+                    uart_arm_tx_interrupt(_uart);
+                }
+                break;
+            } else if(_tx_buffer->write(c)) {
+                break;
+            }
+        }
         yield();
     }
-
-    _tx_buffer->write(c);
-    uart_arm_tx_interrupt(_uart);
     return 1;
 }
 
