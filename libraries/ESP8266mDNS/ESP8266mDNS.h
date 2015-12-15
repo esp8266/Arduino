@@ -85,12 +85,12 @@ public:
     addService(service.c_str(), proto.c_str(), port);
   }
   
-  bool addServiceTxt(char *name, char *proto, char *txt);
-  void addServiceTxt(const char *name, const char *proto, const char *txt){
-    addServiceTxt((char *)name, (char *)proto, (char *)txt);
+  bool addServiceTxt(char *name, char *proto, char * key, char * value);
+  void addServiceTxt(const char *name, const char *proto, const char *key,const char * value){
+    addServiceTxt((char *)name, (char *)proto, (char *)key, (char *)value);
   }
-  void addServiceTxt(String name, String proto, String txt){
-    addServiceTxt(name.c_str(), proto.c_str(), txt.c_str());
+  void addServiceTxt(String name, String proto, String key, String value){
+    addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
   }
   
 void enableArduino(uint16_t port, bool auth=false);

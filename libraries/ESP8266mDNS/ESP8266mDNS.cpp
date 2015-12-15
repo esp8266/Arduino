@@ -145,12 +145,13 @@ void MDNSResponder::update() {
 
 
 
-bool MDNSResponder::addServiceTxt(char *name, char *proto, char *txt){
+bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *value){
   MDNSService* servicePtr;
   
   //DEBUG Serial.printf("Starting addServiceTxt(name=%s,proto=%s,txt=%s)\n", name,proto,txt);
   //DEBUG delay(20); 
-  uint8_t txtLen = os_strlen(txt) + 1; //One accounts for length byte added when building the txt responce
+  uint8_t txtLen = os_strlen(key) + os_strlen(value) + 1; // Add one for equals sign 
+  txtLen+=1; //accounts for length byte added when building the txt responce
   if ( txtLen > 128) return false;
   //Find the service
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
@@ -161,7 +162,9 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *txt){
       //DEBUG Serial.printf("found match service name=%s,proto=%s\n", servicePtr->_name,servicePtr->_proto);
       //DEBUG delay(20);
       struct MDNSTxt *newtxt = (struct MDNSTxt*)(os_malloc(sizeof(struct MDNSTxt)));
-      os_strcpy(newtxt->_txt, txt);
+      os_strcpy(newtxt->_txt, key);
+      os_strcat(newtxt->_txt, "=");
+      os_strcat(newtxt->_txt, value);
       newtxt->_next = 0;
       if(servicePtr->_txts == 0) { //no services have been added
         servicePtr->_txts = newtxt;
@@ -469,19 +472,19 @@ void MDNSResponder::_parsePacket(){
 
 void MDNSResponder::enableArduino(uint16_t port, bool auth){
 
-  char boardName[64];
-  const char *boardExtra = "board=";
-  os_sprintf(boardName, "%s%s", boardExtra, ARDUINO_BOARD);
+//  char boardName[64];
+//  const char *boardExtra = "board=";
+//  os_sprintf(boardName, "%s%s", boardExtra, ARDUINO_BOARD);
 
-  char authUpload[16];
-  const char *authUploadExtra = "auth_upload=";
-  os_sprintf(authUpload, "%s%s", authUploadExtra, (auth) ? "yes":"no");
+//  char authUpload[16];
+//  const char *authUploadExtra = "auth_upload=";
+//  os_sprintf(authUpload, "%s%s", authUploadExtra, (auth) ? "yes":"no");
 
   addService("arduino", "tcp", port);
-  addServiceTxt("arduino", "tcp", "tcp_check=no");
-  addServiceTxt("arduino", "tcp", "ssh_upload=no");
-  addServiceTxt("arduino", "tcp", (const char*)boardName);
-  addServiceTxt("arduino", "tcp", (const char*)authUpload);
+  addServiceTxt("arduino", "tcp", "tcp_check", "no");
+  addServiceTxt("arduino", "tcp", "ssh_upload", "no");
+  addServiceTxt("arduino", "tcp", "board", ARDUINO_BOARD);
+  addServiceTxt("arduino", "tcp", "auth_upload", (auth) ? "yes":"no");
 }
 
 void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint16_t port){
