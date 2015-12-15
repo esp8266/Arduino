@@ -85,7 +85,7 @@ static const IPAddress MDNS_MULTICAST_ADDR(224, 0, 0, 251);
 static const int MDNS_MULTICAST_TTL = 1;
 static const int MDNS_PORT = 5353;
 
-MDNSResponder::MDNSResponder() : _conn(0) { _services = 0; _arduinoAuth = false; }
+MDNSResponder::MDNSResponder() : _conn(0) { _services = 0; }
 MDNSResponder::~MDNSResponder() {}
 
 bool MDNSResponder::begin(const char* domain){
@@ -138,6 +138,58 @@ void MDNSResponder::update() {
   _parsePacket();
 }
 
+
+
+
+
+
+
+
+bool MDNSResponder::addServiceTxt(char *name, char *proto, char *txt){
+  MDNSService* servicePtr;
+  
+  //DEBUG Serial.printf("Starting addServiceTxt(name=%s,proto=%s,txt=%s)\n", name,proto,txt);
+  //DEBUG delay(20); 
+  uint8_t txtLen = os_strlen(txt) + 1; //One accounts for length byte added when building the txt responce
+  if ( txtLen > 128) return false;
+  //Find the service
+  for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
+    //DEBUG Serial.printf("Checking service name=%s,proto=%s\n", servicePtr->_name,servicePtr->_proto);
+    //DEBUG delay(20); 
+    if(strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
+      if (servicePtr->_txtLen + txtLen > 1300) return false;  //max txt record size
+      //DEBUG Serial.printf("found match service name=%s,proto=%s\n", servicePtr->_name,servicePtr->_proto);
+      //DEBUG delay(20);
+      struct MDNSTxt *newtxt = (struct MDNSTxt*)(os_malloc(sizeof(struct MDNSTxt)));
+      os_strcpy(newtxt->_txt, txt);
+      newtxt->_next = 0;
+      if(servicePtr->_txts == 0) { //no services have been added
+        servicePtr->_txts = newtxt;
+        servicePtr->_txtLen += txtLen;
+        //DEBUG Serial.printf("Adding First TXT of %s to service %s and proto %s\n", newtxt->_txt,servicePtr->_name,servicePtr->_proto);
+        //DEBUG Serial.printf("New txt length: %d\n",servicePtr->_txtLen);
+        return true;
+      }
+      else{
+        MDNSTxt * txtPtr = servicePtr->_txts;
+        while(txtPtr->_next !=0) {
+          txtPtr = txtPtr->_next;
+          //DEBUG Serial.println("Incramenting txt pointer");     
+        }
+        txtPtr->_next = newtxt;
+        servicePtr->_txtLen += txtLen;
+        //DEBUG Serial.printf("Adding Another TXT of %s to service %s and proto %s\n", newtxt->_txt,servicePtr->_name,servicePtr->_proto);
+        //DEBUG Serial.printf("New txt length: %d\n",servicePtr->_txtLen);
+        return true;
+      }
+      /*
+      */
+    }
+  }
+  return false;
+  //DEBUG Serial.println("No Service Found When adding a txt");
+}
+
 void MDNSResponder::addService(char *name, char *proto, uint16_t port){
   if(_getServicePort(name, proto) != 0) return;
   if(os_strlen(name) > 32 || os_strlen(proto) != 3) return; //bad arguments
@@ -146,14 +198,54 @@ void MDNSResponder::addService(char *name, char *proto, uint16_t port){
   os_strcpy(srv->_proto, proto);
   srv->_port = port;
   srv->_next = 0;
-
+  srv->_txts = 0;
+  srv->_txtLen = 0;
+  
   if(_services == 0) _services = srv;
   else{
     MDNSService* servicePtr = _services;
     while(servicePtr->_next !=0) servicePtr = servicePtr->_next;
     servicePtr->_next = srv;
   }
+  
 }
+
+MDNSTxt * MDNSResponder::_getServiceTxt(char *name, char *proto){
+  MDNSService* servicePtr;
+  for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
+    if(servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
+      if (servicePtr->_txts == 0) return false;
+      else{
+        return servicePtr->_txts;
+      }
+    }
+  }
+  return 0;
+}
+
+uint16_t MDNSResponder::_getServiceTxtLen(char *name, char *proto){
+  MDNSService* servicePtr;
+  for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
+    if(servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
+      if (servicePtr->_txts == 0) return false;
+      else{
+        return servicePtr->_txtLen;
+      }
+    }
+  }
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 uint16_t MDNSResponder::_getServicePort(char *name, char *proto){
   MDNSService* servicePtr;
@@ -177,7 +269,7 @@ uint32_t MDNSResponder::_getOurIp(){
     return staIpInfo.ip.addr;
   } else {
 #ifdef MDNS_DEBUG_ERR
-    os_printf("ERR_NO_LOCAL_IP\n");
+    Serial.printf("ERR_NO_LOCAL_IP\n");
 #endif
     return 0;
   }
@@ -224,7 +316,7 @@ void MDNSResponder::_parsePacket(){
 
   if(hostNameLen > 0 && strcmp(_hostName, hostName) != 0){
 #ifdef MDNS_DEBUG_ERR
-    os_printf("ERR_NO_HOST: %s\n", hostName);
+    Serial.printf("ERR_NO_HOST: %s\n", hostName);
 #endif
     _conn->flush();
     return;
@@ -249,14 +341,14 @@ void MDNSResponder::_parsePacket(){
         localParsed = true;
       } else {
 #ifdef MDNS_DEBUG_ERR
-        os_printf("ERR_FQDN: %s\n", serviceName);
+        Serial.printf("ERR_FQDN: %s\n", serviceName);
 #endif
         _conn->flush();
         return;
       }
     } else {
 #ifdef MDNS_DEBUG_ERR
-      os_printf("ERR_SERVICE: %s\n", serviceName);
+      Serial.printf("ERR_SERVICE: %s\n", serviceName);
 #endif
       _conn->flush();
       return;
@@ -273,7 +365,7 @@ void MDNSResponder::_parsePacket(){
       protoParsed = true;
     } else {
 #ifdef MDNS_DEBUG_ERR
-      os_printf("ERR_PROTO: %s\n", protoName);
+      Serial.printf("ERR_PROTO: %s\n", protoName);
 #endif
       _conn->flush();
       return;
@@ -290,7 +382,7 @@ void MDNSResponder::_parsePacket(){
       localParsed = true;
     } else {
 #ifdef MDNS_DEBUG_ERR
-      os_printf("ERR_FQDN: %s\n", localName);
+      Serial.printf("ERR_FQDN: %s\n", localName);
 #endif
       _conn->flush();
       return;
@@ -301,14 +393,14 @@ void MDNSResponder::_parsePacket(){
     servicePort = _getServicePort(serviceName, protoName);
     if(servicePort == 0){
 #ifdef MDNS_DEBUG_ERR
-      os_printf("ERR_NO_SERVICE: %s\n", serviceName);
+      Serial.printf("ERR_NO_SERVICE: %s\n", serviceName);
 #endif
       _conn->flush();
       return;
     }
   } else if(serviceNameLen > 0 || protoNameLen > 0){
 #ifdef MDNS_DEBUG_ERR
-    os_printf("ERR_SERVICE_PROTO: %s\n", serviceName);
+    Serial.printf("ERR_SERVICE_PROTO: %s\n", serviceName);
 #endif
     _conn->flush();
     return;
@@ -317,7 +409,7 @@ void MDNSResponder::_parsePacket(){
   // RESPOND
 
 #ifdef MDNS_DEBUG_RX
-  os_printf("RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
+  Serial.printf("RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
 #endif
 
   uint16_t currentType;
@@ -344,24 +436,24 @@ void MDNSResponder::_parsePacket(){
     }
 
 #ifdef MDNS_DEBUG_RX
-    os_printf("REQ: ");
-    if(hostNameLen > 0) os_printf("%s.", hostName);
-    if(serviceNameLen > 0) os_printf("_%s.", serviceName);
-    if(protoNameLen > 0) os_printf("_%s.", protoName);
-    os_printf("local. ");
+    Serial.printf("REQ: ");
+    if(hostNameLen > 0) Serial.printf("%s.", hostName);
+    if(serviceNameLen > 0) Serial.printf("_%s.", serviceName);
+    if(protoNameLen > 0) Serial.printf("_%s.", protoName);
+    Serial.printf("local. ");
 
-    if(currentType == MDNS_TYPE_AAAA) os_printf("  AAAA ");
-    else if(currentType == MDNS_TYPE_A) os_printf("  A ");
-    else if(currentType == MDNS_TYPE_PTR) os_printf("  PTR ");
-    else if(currentType == MDNS_TYPE_SRV) os_printf("  SRV ");
-    else if(currentType == MDNS_TYPE_TXT) os_printf("  TXT ");
-    else os_printf("  0x%04X ", currentType);
+    if(currentType == MDNS_TYPE_AAAA) Serial.printf("  AAAA ");
+    else if(currentType == MDNS_TYPE_A) Serial.printf("  A ");
+    else if(currentType == MDNS_TYPE_PTR) Serial.printf("  PTR ");
+    else if(currentType == MDNS_TYPE_SRV) Serial.printf("  SRV ");
+    else if(currentType == MDNS_TYPE_TXT) Serial.printf("  TXT ");
+    else Serial.printf("  0x%04X ", currentType);
 
-    if(currentClass == MDNS_CLASS_IN) os_printf("  IN ");
-    else if(currentClass == MDNS_CLASS_IN_FLUSH_CACHE) os_printf("  IN[F] ");
-    else os_printf("  0x%04X ", currentClass);
+    if(currentClass == MDNS_CLASS_IN) Serial.printf("  IN ");
+    else if(currentClass == MDNS_CLASS_IN_FLUSH_CACHE) Serial.printf("  IN[F] ");
+    else Serial.printf("  0x%04X ", currentClass);
 
-    os_printf("\n");
+    Serial.printf("\n");
 #endif
   }
   uint8_t responseMask = 0;
@@ -376,8 +468,20 @@ void MDNSResponder::_parsePacket(){
 }
 
 void MDNSResponder::enableArduino(uint16_t port, bool auth){
-  _arduinoAuth = auth;
+
+  char boardName[64];
+  const char *boardExtra = "board=";
+  os_sprintf(boardName, "%s%s", boardExtra, ARDUINO_BOARD);
+
+  char authUpload[16];
+  const char *authUploadExtra = "auth_upload=";
+  os_sprintf(authUpload, "%s%s", authUploadExtra, (auth) ? "yes":"no");
+
   addService("arduino", "tcp", port);
+  addServiceTxt("arduino", "tcp", "tcp_check=no");
+  addServiceTxt("arduino", "tcp", "ssh_upload=no");
+  addServiceTxt("arduino", "tcp", (const char*)boardName);
+  addServiceTxt("arduino", "tcp", (const char*)authUpload);
 }
 
 void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint16_t port){
@@ -477,7 +581,7 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
     _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
 
     //Send the type, class, ttl and rdata length
-    uint8_t txtDataLen = 0;
+    uint8_t txtDataLen = _getServiceTxtLen(service,proto);
     uint8_t txtAttrs[10] = {
       0x00, 0x10,             //TXT record query
       0x00, 0x01,             //Class IN
@@ -487,7 +591,15 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
     _conn->append(reinterpret_cast<const char*>(txtAttrs), 10);
 
     //Send the RData
-    //TODO - Build TXT Redords
+    MDNSTxt * txtPtr = _getServiceTxt(service,proto);
+    while(txtPtr !=0){
+      uint8_t txtLen = os_strlen(txtPtr->_txt);
+      _conn->append(reinterpret_cast<const char*>(&txtLen), 1);                 // lenght of txt
+      _conn->append(reinterpret_cast<const char*>(txtPtr->_txt), txtLen);       // the txt
+      //DEBUG Serial.print("We have txts: ");
+      //DEBUG Serial.println(txtPtr->_txt);
+      txtPtr = txtPtr->_next;    
+    }
   }
 
 
