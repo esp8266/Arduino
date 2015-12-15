@@ -380,17 +380,40 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
   if(replyMask == 0) return;
 
 #ifdef MDNS_DEBUG_TX
-    os_printf("TX: mask:%01X, service:%s, proto:%s, port:%u\n", replyMask, service, proto, port);
+    Serial.printf("TX: mask:%01X, service:%s, proto:%s, port:%u\n", replyMask, service, proto, port);
 #endif
 
-  char nameLen = os_strlen(_hostName);
-  size_t serviceLen = os_strlen(service);
+  char * hostName = _hostName;
+  size_t hostNameLen = os_strlen(hostName);
+
+  char underscore[]  = "_";
+
+  // build service name with _
+  char serviceName[os_strlen(service)+2];
+  os_strcpy(serviceName,underscore);
+  os_strcat(serviceName, service);
+  size_t serviceNameLen = os_strlen(serviceName);
+
+  //build proto name with _
+  char protoName[5];
+  os_strcpy(protoName,underscore);
+  os_strcat(protoName, proto);
+  size_t protoNameLen = 4; 
+  
+  //local string
+  char localName[] = "local";
+  size_t localNameLen = 5; 
+  
+  //terminator
+  char terminator[] = "\0";
 
   uint8_t answerCount = 0;
   for(i=0;i<4;i++){
     if(replyMask & (1 << i)) answerCount++;
   }
 
+
+ //Write the header
   _conn->flush();
   uint8_t head[12] = {
     0x00, 0x00, //ID = 0
@@ -402,139 +425,136 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
   };
   _conn->append(reinterpret_cast<const char*>(head), 12);
 
-  if((replyMask & 0x8) == 0){
-    _conn->append(reinterpret_cast<const char*>(&nameLen), 1);
-    _conn->append(reinterpret_cast<const char*>(_hostName), nameLen);
-  }
-
-  if(replyMask & 0xE){
-    uint8_t servHead[2] = {(uint8_t)(serviceLen+1), '_'};
-    uint8_t protoHead[2] = {0x4, '_'};
-    _conn->append(reinterpret_cast<const char*>(servHead), 2);
-    _conn->append(reinterpret_cast<const char*>(service), serviceLen);
-    _conn->append(reinterpret_cast<const char*>(protoHead), 2);
-    _conn->append(reinterpret_cast<const char*>(proto), 3);
-  }
-
-  uint8_t local[7] = {
-    0x05, //strlen(_local)
-    0x6C, 0x6F, 0x63, 0x61, 0x6C, //local
-    0x00, //End of domain
-  };
-  _conn->append(reinterpret_cast<const char*>(local), 7);
-
   // PTR Response
   if(replyMask & 0x8){
-    uint8_t ptr[10] = {
-      0x00, 0x0c, //PTR record query
-      0x00, 0x01, //Class IN
-      0x00, 0x00, 0x11, 0x94, //TTL 4500
-      0x00, (uint8_t)(3 + nameLen), //***DATA LEN (3 + strlen(host))
-    };
-    _conn->append(reinterpret_cast<const char*>(ptr), 10);
-    _conn->append(reinterpret_cast<const char*>(&nameLen), 1);
-    _conn->append(reinterpret_cast<const char*>(_hostName), nameLen);
-    uint8_t ptrTail[2] = {0xC0, 0x0C};
-    _conn->append(reinterpret_cast<const char*>(ptrTail), 2);
-  }
-
-  // TXT Response
-  if(replyMask & 0x4){
-    if(replyMask & 0x8){
-      uint8_t txtHead[10] = {
-        0xC0, (uint8_t)(36 + serviceLen),//send the name
-        0x00, 0x10, //Type TXT
-        0x80, 0x01, //Class IN, with cache flush
-        0x00, 0x00, 0x11, 0x94, //TTL 4500
-      };
-      _conn->append(reinterpret_cast<const char*>(txtHead), 10);
-    }
-
-    if(strcmp(reinterpret_cast<const char*>("arduino"), service) == 0){
-      //arduino
-      //arduino service dependance should be removed and properties abstracted
-      const char *tcpCheckExtra = "tcp_check=no";
-      uint8_t tcpCheckExtraLen = os_strlen(tcpCheckExtra);
-      
-      const char *sshUploadExtra = "ssh_upload=no";
-      uint8_t sshUploadExtraLen = os_strlen(sshUploadExtra);
-      
-      char boardName[64];
-      const char *boardExtra = "board=";
-      os_sprintf(boardName, "%s%s", boardExtra, ARDUINO_BOARD);
-      uint8_t boardNameLen = os_strlen(boardName);
-
-      char authUpload[16];
-      const char *authUploadExtra = "auth_upload=";
-      os_sprintf(authUpload, "%s%s", authUploadExtra, reinterpret_cast<const char*>((_arduinoAuth)?"yes":"no"));
-      uint8_t authUploadLen = os_strlen(authUpload);
+    // Send the Name field (ie. "_http._tcp.local")
+    _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_http"
+    _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
+    _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_tcp"
+    _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_tcp"
+    _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght "local"
+    _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+    _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
     
-      uint16_t textDataLen = (1 + boardNameLen) + (1 + tcpCheckExtraLen) + (1 + sshUploadExtraLen) + (1 + authUploadLen);
-      uint8_t txt[2] = {(uint8_t)(textDataLen >> 8), (uint8_t)(textDataLen)}; //DATA LEN
-      _conn->append(reinterpret_cast<const char*>(txt), 2);
-      
-      _conn->append(reinterpret_cast<const char*>(&boardNameLen), 1);
-      _conn->append(reinterpret_cast<const char*>(boardName), boardNameLen);
-      _conn->append(reinterpret_cast<const char*>(&authUploadLen), 1);
-      _conn->append(reinterpret_cast<const char*>(authUpload), authUploadLen);
-      _conn->append(reinterpret_cast<const char*>(&tcpCheckExtraLen), 1);
-      _conn->append(reinterpret_cast<const char*>(tcpCheckExtra), tcpCheckExtraLen);
-      _conn->append(reinterpret_cast<const char*>(&sshUploadExtraLen), 1);
-      _conn->append(reinterpret_cast<const char*>(sshUploadExtra), sshUploadExtraLen);
-    } else {
-      //not arduino
-      //we should figure out an API so TXT properties can be added for services
-      uint8_t txt[2] = {0,0};
-      _conn->append(reinterpret_cast<const char*>(txt), 2);
-    }
+    //Send the type, class, ttl and rdata length
+    uint8_t ptrDataLen = hostNameLen + serviceNameLen + protoNameLen + localNameLen + 5; // 5 is four label sizes and the terminator
+    uint8_t ptrAttrs[10] = {
+      0x00, 0x0c,             //PTR record query
+      0x00, 0x01,             //Class IN
+      0x00, 0x00, 0x11, 0x94, //TTL 4500
+      0x00, ptrDataLen,       //RData length
+    };
+    _conn->append(reinterpret_cast<const char*>(ptrAttrs), 10);
+    
+    //Send the RData (ie. "esp8266._http._tcp.local")
+    _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);             // lenght of "esp8266"
+    _conn->append(reinterpret_cast<const char*>(hostName), hostNameLen);       // "esp8266"
+    _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_http"
+    _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
+    _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_tcp"
+    _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_tcp"
+    _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght "local"
+    _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+    _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
   }
 
-  // SRV Response
-  if(replyMask & 0x2){
-    if(replyMask & 0xC){//send the name
-      uint8_t srvHead[2] = {0xC0, 0x0C};
-      if(replyMask & 0x8)
-        srvHead[1] = 36 + serviceLen;
-      _conn->append(reinterpret_cast<const char*>(srvHead), 2);
-    }
+  //TXT Responce
+  if(replyMask & 0x4){
+    //Send the name field (ie. "esp8266._http._tcp.local")
+    _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);             // lenght of "esp8266"
+    _conn->append(reinterpret_cast<const char*>(hostName), hostNameLen);       // "esp8266"
+    _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_http"
+    _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
+    _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_tcp"
+    _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_tcp"
+    _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght "local"
+    _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+    _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
 
-    uint8_t srv[16] = {
-      0x00, 0x21, //Type SRV
-      0x80, 0x01, //Class IN, with cache flush
-      0x00, 0x00, 0x00, 0x78, //TTL 120
-      0x00, (uint8_t)(9 + nameLen), //DATA LEN (9 + strlen(host))
-      0x00, 0x00, //Priority 0
-      0x00, 0x00, //Weight 0
-      (uint8_t)((port >> 8) & 0xFF), (uint8_t)(port & 0xFF)
+    //Send the type, class, ttl and rdata length
+    uint8_t txtDataLen = 0;
+    uint8_t txtAttrs[10] = {
+      0x00, 0x10,             //TXT record query
+      0x00, 0x01,             //Class IN
+      0x00, 0x00, 0x11, 0x94, //TTL 4500
+      0x00, txtDataLen,       //RData length
     };
-    _conn->append(reinterpret_cast<const char*>(srv), 16);
-    _conn->append(reinterpret_cast<const char*>(&nameLen), 1);
-    _conn->append(reinterpret_cast<const char*>(_hostName), nameLen);
-    uint8_t srvTail[2] = {0xC0, (uint8_t)(20 + serviceLen + nameLen)};
-    if(replyMask & 0x8)
-      srvTail[1] = 19 + serviceLen;
-    _conn->append(reinterpret_cast<const char*>(srvTail), 2);
+    _conn->append(reinterpret_cast<const char*>(txtAttrs), 10);
+
+    //Send the RData
+    //TODO - Build TXT Redords
+  }
+
+
+  //SRV Responce
+  if(replyMask & 0x2){
+    //Send the name field (ie. "esp8266._http._tcp.local")
+    _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);             // lenght of "esp8266"
+    _conn->append(reinterpret_cast<const char*>(hostName), hostNameLen);       // "esp8266"
+    _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_http"
+    _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
+    _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_tcp"
+    _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_tcp"
+    _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght "local"
+    _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+    _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
+
+    //Send the type, class, ttl, rdata length, priority and weight
+    uint8_t srvDataSize = hostNameLen + localNameLen + 3; // 3 is 2 lable size bytes and the terminator
+    srvDataSize += 6; // Size of Priority, weight and port
+    uint8_t srvAttrs[10] = {
+      0x00, 0x21,             //Type SRV
+      0x80, 0x01,             //Class IN, with cache flush
+      0x00, 0x00, 0x00, 0x78, //TTL 120
+      0x00, srvDataSize,      //RData length
+    };
+    _conn->append(reinterpret_cast<const char*>(srvAttrs), 10);
+    
+    //Send the RData Priority weight and port
+    uint8_t srvRData[6] = {
+      0x00, 0x00,             //Priority 0
+      0x00, 0x00,             //Weight 0
+      (uint8_t)((port >> 8) & 0xFF), (uint8_t)(port & 0xFF) 
+    };
+    _conn->append(reinterpret_cast<const char*>(srvRData), 6);
+    //Send the RData (ie. "esp8266.local")
+    _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);             // lenght of "esp8266"
+    _conn->append(reinterpret_cast<const char*>(hostName), hostNameLen);       // "esp8266"
+    _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght "local"
+    _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+    _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
+
   }
 
   // A Response
   if(replyMask & 0x1){
-    uint32_t ip = _getOurIp();
-    if(replyMask & 0x2){//send the name (no compression for now)
-      _conn->append(reinterpret_cast<const char*>(&nameLen), 1);
-      _conn->append(reinterpret_cast<const char*>(_hostName), nameLen);
-      _conn->append(reinterpret_cast<const char*>(local), 7);
-    }
+    //Send the RData (ie. "esp8266.local")
+    _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);             // lenght of "esp8266"
+    _conn->append(reinterpret_cast<const char*>(hostName), hostNameLen);       // "esp8266"
+    _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght "local"
+    _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+    _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
 
-    uint8_t aaa[14] = {
-      0x00, 0x01, //TYPE A
-      0x80, 0x01, //Class IN, with cache flush
+    uint32_t ip = _getOurIp();
+    uint8_t aaaAttrs[10] = {
+      0x00, 0x01,             //TYPE A
+      0x80, 0x01,             //Class IN, with cache flush
       0x00, 0x00, 0x00, 0x78, //TTL 120
-      0x00, 0x04, //DATA LEN
-      (uint8_t)(ip & 0xFF), (uint8_t)((ip >> 8) & 0xFF), (uint8_t)((ip >> 16) & 0xFF), (uint8_t)((ip >> 24) & 0xFF)
+      0x00, 0x04,             //DATA LEN
     };
-    _conn->append(reinterpret_cast<const char*>(aaa), 14);
+    _conn->append(reinterpret_cast<const char*>(aaaAttrs), 10);
+
+    // Send RData
+    uint8_t aaaRData[4] = {
+      (uint8_t)(ip & 0xFF),         //IP first octet 
+      (uint8_t)((ip >> 8) & 0xFF),  //IP second octet
+      (uint8_t)((ip >> 16) & 0xFF), //IP third octet
+      (uint8_t)((ip >> 24) & 0xFF)  //IP fourth octet
+    };
+    _conn->append(reinterpret_cast<const char*>(aaaRData), 4);
   }
-  _conn->send();
+
+ _conn->send();
 }
 
 MDNSResponder MDNS = MDNSResponder();
