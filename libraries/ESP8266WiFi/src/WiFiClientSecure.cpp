@@ -327,7 +327,7 @@ bool WiFiClientSecure::verify(const char* fp, const char* url) {
     int len = strlen(fp);
     int pos = 0;
     for (size_t i = 0; i < sizeof(sha1); ++i) {
-        while (pos < len && fp[pos] == ' ') {
+        while (pos < len && ((fp[pos] == ' ') || (fp[pos] == ':'))) {
             ++pos;
         }
         if (pos > len - 2) {
