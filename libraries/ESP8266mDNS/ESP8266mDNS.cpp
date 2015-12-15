@@ -55,9 +55,9 @@ extern "C" {
 
 
 
-//#define MDNS_DEBUG_ERR
-//#define MDNS_DEBUG_TX
-//#define MDNS_DEBUG_RX
+#define MDNS_DEBUG_ERR
+#define MDNS_DEBUG_TX
+#define MDNS_DEBUG_RX
 
 #define MDNS_NAME_REF   0xC000
 
@@ -88,18 +88,21 @@ static const int MDNS_PORT = 5353;
 MDNSResponder::MDNSResponder() : _conn(0) { _services = 0; }
 MDNSResponder::~MDNSResponder() {}
 
-bool MDNSResponder::begin(const char* domain){
+bool MDNSResponder::begin(const char* hostname){
   // Open the MDNS socket if it isn't already open.
 
-  size_t n = strlen(domain);
-  if (n > 255) { // Can only handle domains that are 255 chars in length.
+  size_t n = strlen(hostname);
+  if (n > 63) { // max size for a single label.
     return false;
   }
 
-  // Copy in domain characters as lowercase
+  // Copy in hostname characters as lowercase
   for (size_t i = 0; i < n; ++i)
-    _hostName[i] = tolower(domain[i]);
+    _hostName[i] = tolower(hostname[i]);
   _hostName[n] = '\0';
+
+  // Copy hostname to default instance name
+  os_strcpy(_instanceName,hostname);
 
   // Open the MDNS socket if it isn't already open.
   if (!_conn) {
@@ -139,10 +142,10 @@ void MDNSResponder::update() {
 }
 
 
-
-
-
-
+void MDNSResponder::setInstanceName(char * name){
+  if (os_strlen(name) > 63) return;
+  else os_strcpy(_instanceName,name);
+}
 
 
 bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *value){
@@ -317,9 +320,11 @@ void MDNSResponder::_parsePacket(){
     hostNameLen = 0;
   }
 
-  if(hostNameLen > 0 && strcmp(_hostName, hostName) != 0){
+  if(hostNameLen > 0 && strcmp(_hostName, hostName) != 0 && strcmp(_instanceName, hostName) != 0 ){
 #ifdef MDNS_DEBUG_ERR
     Serial.printf("ERR_NO_HOST: %s\n", hostName);
+    Serial.printf("hostname: %s\n", hostName);
+    Serial.printf("instance: %s\n", _instanceName);
 #endif
     _conn->flush();
     return;
@@ -495,6 +500,9 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
     Serial.printf("TX: mask:%01X, service:%s, proto:%s, port:%u\n", replyMask, service, proto, port);
 #endif
 
+  char * instanceName = _instanceName;
+  size_t instanceNameLen = os_strlen(instanceName);
+
   char * hostName = _hostName;
   size_t hostNameLen = os_strlen(hostName);
 
@@ -549,7 +557,7 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
     _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
     
     //Send the type, class, ttl and rdata length
-    uint8_t ptrDataLen = hostNameLen + serviceNameLen + protoNameLen + localNameLen + 5; // 5 is four label sizes and the terminator
+    uint8_t ptrDataLen = instanceNameLen + serviceNameLen + protoNameLen + localNameLen + 5; // 5 is four label sizes and the terminator
     uint8_t ptrAttrs[10] = {
       0x00, 0x0c,             //PTR record query
       0x00, 0x01,             //Class IN
@@ -558,9 +566,9 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
     };
     _conn->append(reinterpret_cast<const char*>(ptrAttrs), 10);
     
-    //Send the RData (ie. "esp8266._http._tcp.local")
-    _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);             // lenght of "esp8266"
-    _conn->append(reinterpret_cast<const char*>(hostName), hostNameLen);       // "esp8266"
+    //Send the RData (ie. "My IOT device._http._tcp.local")
+    _conn->append(reinterpret_cast<const char*>(&instanceNameLen), 1);         // lenght of "My IOT device"
+    _conn->append(reinterpret_cast<const char*>(instanceName), instanceNameLen);// "My IOT device"
     _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_http"
     _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
     _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_tcp"
@@ -572,9 +580,9 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
 
   //TXT Responce
   if(replyMask & 0x4){
-    //Send the name field (ie. "esp8266._http._tcp.local")
-    _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);             // lenght of "esp8266"
-    _conn->append(reinterpret_cast<const char*>(hostName), hostNameLen);       // "esp8266"
+    //Send the name field (ie. "My IOT device._http._tcp.local")
+    _conn->append(reinterpret_cast<const char*>(&instanceNameLen), 1);         // lenght of "My IOT device"
+    _conn->append(reinterpret_cast<const char*>(instanceName), instanceNameLen);// "My IOT device"
     _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_http"
     _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
     _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_tcp"
@@ -608,9 +616,9 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
 
   //SRV Responce
   if(replyMask & 0x2){
-    //Send the name field (ie. "esp8266._http._tcp.local")
-    _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);             // lenght of "esp8266"
-    _conn->append(reinterpret_cast<const char*>(hostName), hostNameLen);       // "esp8266"
+    //Send the name field (ie. "My IOT device._http._tcp.local")
+    _conn->append(reinterpret_cast<const char*>(&instanceNameLen), 1);         // lenght of "My IOT device"
+    _conn->append(reinterpret_cast<const char*>(instanceName), instanceNameLen);// "My IOT device"
     _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_http"
     _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
     _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_tcp"

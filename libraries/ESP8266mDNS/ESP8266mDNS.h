@@ -93,12 +93,21 @@ public:
     addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
   }
   
-void enableArduino(uint16_t port, bool auth=false);
+  void enableArduino(uint16_t port, bool auth=false);
+
+  void setInstanceName(char * name);
+  void setInstanceName(const char * name){
+    setInstanceName((char*) name);
+  }
+  void setInstanceName(String name){
+    setInstanceName(name.c_str());
+  }
 
 private:
   struct MDNSService * _services;
   UdpContext* _conn;
-  char _hostName[128];
+  char _hostName[63];
+  char _instanceName[63];
 
   uint32_t _getOurIp();
   uint16_t _getServicePort(char *service, char *proto);
