@@ -28,6 +28,8 @@ platformio boards espressif
 # Initialise base project
 #
 platformio init --board %TYPE%(see above)
+# for example, initialise project for ESP8266 ESP-12E board (NodeMCU)
+platformio init --board esp12e
 
 # The next files/directories will be created in myproject
 # platformio.ini - Project Configuration File. |-> PLEASE EDIT ME <-|
@@ -39,15 +41,27 @@ platformio init --board %TYPE%(see above)
 - Place your source code to `src` directory
 - Build/Upload project
 
-```
+```bash
 # process/build project
 platformio run
 
 # build+upload firmware
 platformio run --target upload
+```
 
-# build+upload firmware via OTA
+## OTA firmware uploading
+
+There are 2 options:
+
+1. Directly specify `--upoad-port` in command line
+```bash
 platformio run --target upload --upload-port IP_ADDRESS_HERE
+```
+2. Specify [upload_port](http://docs.platformio.org/en/latest/projectconf.html#upload-port) option in `platformio.ini`
+```ini
+[env:***]
+...
+upload_port = IP_ADDRESS_HERE
 ```
 
 ## IDE Integration
