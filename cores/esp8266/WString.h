@@ -76,7 +76,11 @@ class String {
         // invalid string (i.e., "if (s)" will be true afterwards)
         unsigned char reserve(unsigned int size);
         inline unsigned int length(void) const {
-            return len;
+            if(buffer) {
+                return len;
+            } else {
+                return 0;
+            }
         }
 
         // creates a copy of the assigned value.  if the value is null or

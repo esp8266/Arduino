@@ -11,6 +11,7 @@ title: OTA Update
     * [Requirements](#requirements)
     * [Application Example](#application-example)
       * [Classic OTA](#classic-ota)
+      * [Troubleshooting](#troubleshooting)
       * [ArduinoOTA](#arduinoota)
   * [Web Browser](#web-browser)
     * [Requirements](#requirements-1)
@@ -42,7 +43,7 @@ Arduino IDE option is intended primarily for software development phase. The two
 
 In any case first firmware upload have to be done over a serial port. If OTA routines are correctly implemented in a sketch, then all subsequent uploads may be done over the air.
 
-There is no imposed security on OTA process from being hacked. It is up to developer to ensure that updates are allowed only from legitimate / trusted source. Once update is complete, module restarts and new code is executed. Developer should ensure that application running on module is shut down and restarted in a safe manner. Chapters below provide additional information  regarding security and safety of OTA process.
+There is no imposed security on OTA process from being hacked. It is up to developer to ensure that updates are allowed only from legitimate / trusted source. Once update is complete, module restarts and new code is executed. Developer should ensure that application running on module is shut down and restarted in a safe manner. Chapters below provide additional information regarding security and safety of OTA process.
 
 
 ### Security
@@ -79,13 +80,14 @@ void onError(OTA_CALLBACK_ERROR (fn));
 
 ### Basic Requirements
 
-Flash chip size needs a size thats is able to hold the old sketch (currently running) and the new sketch (OTA) at the same time.
-keep in mind that the File system and EEPROM for example needs space too (one time) see [flash layout](../filesystem.md#flash-layout).
+Flash chip size needs a size that is able to hold the old sketch (currently running) and the new sketch (OTA) at the same time.
+Keep in mind that the File system and EEPROM for example needs space too (one time) see [flash layout](../filesystem.md#flash-layout).
 ```cpp
 ESP.getFreeSketchSpace();
 ```
 can be used for checking the free space for the new sketch.
 
+For overview of memory layout, where new sketch is stored and how it is copied during OTA process see [Update process - memory view]( https://github.com/esp8266/Arduino/blob/master/doc/ota_updates/ota_updates.md#update-process---memory-view).
 
 
 The following chapters provide more details and specific methods of doing OTA.
@@ -125,11 +127,11 @@ Instructions below demonstrate how to configure both [Classic OTA](#classic-ota-
         ![Python installation set up](ota-ide-python-configuration.png)
 
 2. Now prepare the sketch and configuration for the upload over a serial port.
-    - Start Arduino IDE and load sketch DNS_SD_Arduino_OTA.ino  available under File >  Examples > ESP8266mDNS
+    - Start Arduino IDE and load sketch DNS_SD_Arduino_OTA.ino available under File >  Examples > ESP8266mDNS
         ![OTA sketch selection](ota-ide-sketch-selection.png)
 
          **Note:** This sketch is available only for 1.6.5-947-g39819f0 (of July 23, 2015) and 1.6.5-1160-gef26c5f (of Sep 30, 2015) versions of platform packages installed in Arduino IDE using https://github.com/esp8266/Arduino#installing-with-boards-manager. It was removed in [#980](https://github.com/esp8266/Arduino/pull/980) from GitHub repository.
-    - Update SSID and password in the sketch  so the module can join your Wi-Fi network
+    - Update SSID and password in the sketch so the module can join your Wi-Fi network
         ![ssid and pass entry](ota-ide-ssid-pass-entry.png)
     - Configure upload parameters as below (you may need to adjust configuration if you are using a different module):
         ![configuration of serial upload](ota-ide-serial-upload-configuration.png)
@@ -153,6 +155,57 @@ Instructions below demonstrate how to configure both [Classic OTA](#classic-ota-
     ![OTA upload complete](ota-ide-ota-upload-complete.png)
 
 **Note:** To be able to upload your sketch over and over again using OTA, you need to embed OTA routines inside. Please use DNS_SD_Arduino_OTA.ino as an example.
+
+
+#### Troubleshooting
+
+If OTA update fails, first step is to check for error messages that may be shown in upload window of Arduino IDE. If this is not providing any useful hints try to upload again while checking what is shown by ESP on serial port. Serial Monitor from IDE will not be useful in that case. When attempting to open it, you will likely see the following:
+
+![Arduino IDE network terminal window](ota-ide-network-terminal.png)
+   
+This window is for Arduino Yún and not yet implemented for esp8266/Arduino. It shows up because IDE is attempting to open Serial Monitor using network port you have selected for OTA upload.
+
+Instead you need an external serial monitor. If you are a Windows user check out [Termite](http://www.compuphase.com/software_termite.htm). This is handy, slick and simple RS232 terminal that does not impose RTS or DTR flow control. Such flow control may cause issues if you are using respective lines to toggle GPIO0 and RESET pins on ESP for upload. 
+
+Select COM port and baud rate on external terminal program as if you were using Arduino Serial Monitor. Please see typical settings for [Termite](http://www.compuphase.com/software_termite.htm) below:
+
+![Termite settings](termite-configuration.png)
+
+Then run OTA from IDE and look what is displayed on terminal. Successful OTA process looks like below (sketch and free memory sizes as well as IP addresses depend on your particular s/w and h/w configuration):
+
+```
+Arduino OTA Test
+Sketch size: 346664
+Free size: 700416
+IP address: 192.168.1.100
+Update Start: ip:192.168.1.10, port:48266, size:346672
+Update Success: 6113
+Rebooting...
+
+ ets Jan  8 2013,rst cause:1, boot mode:(3,7)
+
+load 0x4010f000, len 1264, room 16 
+tail 0
+chksum 0x42
+csum 0x42
+@cp:0
+ld
+
+Arduino OTA Test
+Sketch size: 346664
+Free size: 700416
+IP address: 192.168.1.100
+```
+
+If upload fails you will likely see errors caught by the uploader, exception and the stack dump, or both. 
+
+The most common causes of OTA failure are as follows:
+* not enough physical memory on the chip (e.g. ESP01 with 512K flash memory is not enough for OTA),
+* too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see  [Update process - memory view]( https://github.com/esp8266/Arduino/blob/master/doc/ota_updates/ota_updates.md#update-process---memory-view),
+* too little memory declared in Arduino IDE for your selected board (i.e. less than physical size). 
+
+For more details regarding flash memory layout please check [File system]( https://github.com/esp8266/Arduino/blob/master/doc/filesystem.md).
+For overview where new sketch is stored, how it is copied and how memory is organized for the purpose of OTA see [Update process - memory view]( https://github.com/esp8266/Arduino/blob/master/doc/ota_updates/ota_updates.md#update-process---memory-view).
 
 
 #### ArduinoOTA
@@ -183,7 +236,7 @@ Updates described in this chapter are done with a web browser that can be useful
 
 ### Implementation Overview
 
-Updates with a web browswer are implemented using ```ESP8266HTTPUpdateServer``` class together with ```ESP8266WebServer``` and ```ESP8266mDNS``` classes. The following code is required to get it work:
+Updates with a web browser are implemented using ```ESP8266HTTPUpdateServer``` class together with ```ESP8266WebServer``` and ```ESP8266mDNS``` classes. The following code is required to get it work:
 
 setup()
 
@@ -222,10 +275,10 @@ You can use another module if it meets “Flash chip size is 2x the size of the 
 
 2. Prepare the sketch and configuration for initial upload with a serial port.
     - Start Arduino IDE and load sketch WebUpdater.ino available under File > Examples > ESP8266HTTPUpdateServer.
-    - Update ssid and pass in the sketch so the module can join your Wi-Fi network.
+    - Update SSID and password in the sketch so the module can join your Wi-Fi network.
     - Open File > Preferences, look for “Show verbose output during:” and check out “compilation” option.
 
-        ![Preferences - enablig verbose output during compilation](ota-web-show-verbose-compilation.png)
+        ![Preferences - enabling verbose output during compilation](ota-web-show-verbose-compilation.png)
 
         **Note:** This setting will be required in step 5 below. You can uncheck this setting afterwards.
 
@@ -315,7 +368,7 @@ For the simple updater the server only needs to deliver the binary file for upda
 ##### Advanced updater
 
 For advanced update management a script needs to run at the server side, for example a PHP script.
-At every update request the the ESP sends some information in HTTP headers to the server.
+At every update request the ESP sends some information in HTTP headers to the server.
 
 Example header data:
 ```
@@ -329,7 +382,7 @@ Example header data:
     [HTTP_X_ESP8266_VERSION] => DOOR-7-g14f53a19
 ```
 
-With this information the script now can check if a update is needed. It is also possible to deliver different binaries based on the MAC address for example.
+With this information the script now can check if an update is needed. It is also possible to deliver different binaries based on the MAC address for example.
 
 Script example:
 
@@ -405,6 +458,15 @@ The Stream Interface is the base for all other update modes like OTA, http Serve
 
 ## Updater class
 
-TODO describe Updater class
+Updater is in the Core and deals with writing the firmware to the flash, 
+checking its integrity and telling the bootloader to load the new firmware on the next boot.
 
-Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader to load the new firmware on the next boot.
+### Update process - memory view
+
+ - The new sketch will be stored in the space between the old sketch and the spiff.
+ - on the next reboot the "eboot" bootloader check for commands.
+ - the new sketch is now copied "over" the old one.
+ - the new sketch is started.
+
+![Memory Copy](update_memory_copy.png)
+
