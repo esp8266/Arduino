@@ -433,7 +433,7 @@ thing.name=SparkFun ESP8266 Thing
 
 thing.upload.tool=esptool
 thing.upload.speed=921600
-thing.upload.resetmethod=ck
+thing.upload.resetmethod=nodemcu
 thing.upload.maximum_size=434160
 thing.upload.maximum_data_size=81920
 thing.upload.wait_for_upload_port=true
