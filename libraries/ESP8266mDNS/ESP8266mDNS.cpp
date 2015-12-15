@@ -146,8 +146,13 @@ void MDNSResponder::addService(char *name, char *proto, uint16_t port){
   os_strcpy(srv->_proto, proto);
   srv->_port = port;
   srv->_next = 0;
-  if(_services) _services->_next = srv;
-  else _services = srv;
+
+  if(_services == 0) _services = srv;
+  else{
+    MDNSService* servicePtr = _services;
+    while(servicePtr->_next !=0) servicePtr = servicePtr->_next;
+    servicePtr->_next = srv;
+  }
 }
 
 uint16_t MDNSResponder::_getServicePort(char *name, char *proto){
