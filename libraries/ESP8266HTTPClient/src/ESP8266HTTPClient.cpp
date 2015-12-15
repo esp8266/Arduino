@@ -30,7 +30,6 @@
 
 #include "ESP8266HTTPClient.h"
 
-
 /**
  * constractor
  */
@@ -117,7 +116,7 @@ void HTTPClient::begin(String url, String httpsFingerprint) {
         if(index >= 0) {
             // auth info
             String auth = host.substring(0, index);
-            host.remove(0, index +1); // remove auth part including @
+            host.remove(0, index + 1); // remove auth part including @
             _base64Authorization = base64::encode(auth);
         }
 
@@ -336,7 +335,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
     }
 
     // create buffer for read
-    uint8_t buff[1460] = { 0 };
+    uint8_t * buff = (uint8_t *) malloc(HTTP_TCP_BUFFER_SIZE);
 
     int len = size;
     int bytesWritten = 0;
@@ -345,34 +344,40 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
         len = -1;
     }
 
-    // read all data from stream and send it to server
-    while(connected() && stream->available() && (len > 0 || len == -1)) {
+    if(buff) {
+        // read all data from stream and send it to server
+        while(connected() && stream->available() && (len > 0 || len == -1)) {
 
-        // get available data size
-        size_t s = stream->available();
+            // get available data size
+            size_t s = stream->available();
 
-        if(s) {
-            int c = stream->readBytes(buff, ((s > sizeof(buff)) ? sizeof(buff) : s));
+            if(s) {
+                int c = stream->readBytes(buff, ((s > HTTP_TCP_BUFFER_SIZE) ? HTTP_TCP_BUFFER_SIZE : s));
 
-            // write it to Stream
-            bytesWritten += _tcp->write((const uint8_t *)buff, c);
+                // write it to Stream
+                bytesWritten += _tcp->write((const uint8_t *) buff, c);
 
-            if(len > 0) {
-                len -= c;
+                if(len > 0) {
+                    len -= c;
+                }
+
+                delay(0);
+            } else {
+                delay(1);
             }
-
-            delay(0);
-        } else {
-            delay(1);
         }
-    }
 
-    if(size && (int)size != bytesWritten) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.\n", bytesWritten, _size);
-        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!");
-        return HTTPC_ERROR_SEND_PAYLOAD_FAILED;
+        if(size && (int) size != bytesWritten) {
+            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.\n", bytesWritten, _size); DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!");
+            free(buff);
+            return HTTPC_ERROR_SEND_PAYLOAD_FAILED;
+        } else {
+            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload written: %d\n", bytesWritten);
+        }
+        free(buff);
     } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload written: %d\n", bytesWritten);
+        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] too less ram! need " HTTP_TCP_BUFFER_SIZE);
+        return HTTPC_ERROR_TOO_LESS_RAM;
     }
 
     // handle Server Response (Header)
@@ -434,37 +439,44 @@ int HTTPClient::writeToStream(Stream * stream) {
     int len = _size;
     int bytesWritten = 0;
 
+
     // create buffer for read
-    uint8_t buff[1460] = { 0 };
+    uint8_t * buff = (uint8_t *) malloc(HTTP_TCP_BUFFER_SIZE);
 
-    // read all data from server
-    while(connected() && (len > 0 || len == -1)) {
+    if(buff) {
+        // read all data from server
+        while(connected() && (len > 0 || len == -1)) {
 
-        // get available data size
-        size_t size = _tcp->available();
+            // get available data size
+            size_t size = _tcp->available();
 
-        if(size) {
-            int c = _tcp->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+            if(size) {
+                int c = _tcp->readBytes(buff, ((size > HTTP_TCP_BUFFER_SIZE) ? HTTP_TCP_BUFFER_SIZE : size));
 
-            // write it to Stream
-            bytesWritten += stream->write(buff, c);
+                // write it to Stream
+                bytesWritten += stream->write(buff, c);
 
-            if(len > 0) {
-                len -= c;
+                if(len > 0) {
+                    len -= c;
+                }
+
+                delay(0);
+            } else {
+                delay(1);
             }
-
-            delay(0);
-        } else {
-            delay(1);
         }
+
+        free(buff);
+
+        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] connection closed or file end (written: %d).\n", bytesWritten);
+
+        if(_size && _size != bytesWritten) {
+            DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] bytesWritten %d and size %d mismatch!.\n", bytesWritten, _size);
+        }
+
+    } else {
+        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] too less ram! need " HTTP_TCP_BUFFER_SIZE);
     }
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] connection closed or file end (written: %d).\n", bytesWritten);
-
-    if(_size && _size != bytesWritten) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] bytesWritten %d and size %d mismatch!.\n", bytesWritten, _size);
-    }
-
     end();
     return bytesWritten;
 }
@@ -509,11 +521,12 @@ String HTTPClient::errorToString(int error) {
             return String("no stream");
         case HTTPC_ERROR_NO_HTTP_SERVER:
             return String("no HTTP server");
+        case HTTPC_ERROR_TOO_LESS_RAM:
+            return String("too less ram");
         default:
             return String();
     }
 }
-
 
 /**
  * adds Header to the request
