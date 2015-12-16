@@ -561,7 +561,7 @@ void ESP8266WiFiClass::scanDelete()
     _scanComplete = false;
 }
 
-int8_t ESP8266WiFiClass::scanNetworks(bool async)
+int8_t ESP8266WiFiClass::scanNetworks(bool async, bool show_hidden)
 {
     if(ESP8266WiFiClass::_scanStarted) {
         return WIFI_SCAN_RUNNING;
@@ -589,7 +589,7 @@ int8_t ESP8266WiFiClass::scanNetworks(bool async)
     config.ssid = 0;
     config.bssid = 0;
     config.channel = 0;
-    config.show_hidden = 0;
+    config.show_hidden = show_hidden;
     if(wifi_station_scan(&config, reinterpret_cast<scan_done_cb_t>(&ESP8266WiFiClass::_scanDone))) {
         ESP8266WiFiClass::_scanComplete = false;
         ESP8266WiFiClass::_scanStarted = true;
