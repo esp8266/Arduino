@@ -38,6 +38,13 @@
 #define DEBUG_HTTP_UPDATE(...)
 #endif
 
+/// note we use HTTP client errors too so we start at 100
+#define HTTP_UE_TOO_LESS_SPACE          (-100)
+#define HTTP_UE_SERVER_NOT_REPORT_SIZE  (-101)
+#define HTTP_UE_SERVER_FILE_NOT_FOUND   (-102)
+#define HTTP_UE_SERVER_FORBIDDEN        (-103)
+#define HTTP_UE_SERVER_WRONG_HTTP_CODE  (-104)
+
 typedef enum {
     HTTP_UPDATE_FAILED,
     HTTP_UPDATE_NO_UPDATES,
@@ -55,9 +62,14 @@ class ESP8266HTTPUpdate {
 
         t_httpUpdate_return updateSpiffs(const char * url, const char * current_version = "", const char * httpsFingerprint = "", bool reboot = false);
 
+        int getLastError(void);
+        String getLastErrorString(void);
+
     protected:
         t_httpUpdate_return handleUpdate(HTTPClient * http, const char * current_version, bool reboot = true, bool spiffs = false);
         bool runUpdate(Stream& in, uint32_t size, String md5, int command = U_FLASH);
+
+        int lastError;
 };
 
 extern ESP8266HTTPUpdate ESPhttpUpdate;

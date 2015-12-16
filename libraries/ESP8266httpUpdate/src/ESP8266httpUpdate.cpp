@@ -83,6 +83,54 @@ t_httpUpdate_return ESP8266HTTPUpdate::update(String host, uint16_t port, String
 }
 
 /**
+ * return error code as int
+ * @return int error code
+ */
+int ESP8266HTTPUpdate::getLastError(void){
+   return lastError;
+}
+
+/**
+ * return error code as String
+ * @return String error
+ */
+String ESP8266HTTPUpdate::getLastErrorString(void) {
+
+    if(lastError == 0) {
+        return String(); // no error
+    }
+
+    // error from Update class
+    if(lastError > 0) {
+        StreamString error;
+        Update.printError(error);
+        error.trim(); // remove line ending
+        return "Update error: " + error;
+    }
+
+    // error from http client
+    if(lastError > -100) {
+        return "HTTP error: " + HTTPClient::errorToString(lastError);
+    }
+
+    switch(lastError) {
+        case HTTP_UE_TOO_LESS_SPACE:
+            return String("To less space");
+        case HTTP_UE_SERVER_NOT_REPORT_SIZE:
+            return String("Server not Report Size");
+        case HTTP_UE_SERVER_FILE_NOT_FOUND:
+            return String("File not Found (404)");
+        case HTTP_UE_SERVER_FORBIDDEN:
+            return String("Forbidden (403)");
+        case HTTP_UE_SERVER_WRONG_HTTP_CODE:
+            return String("Wrong HTTP code");
+    }
+
+    return String();
+}
+
+
+/**
  *
  * @param http HTTPClient *
  * @param current_version const char *
@@ -122,9 +170,11 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
 
     if(code <= 0) {
         DEBUG_HTTP_UPDATE("[httpUpdate] HTTP error: %s\n", http->errorToString(code).c_str());
+        lastError = code;
         http->end();
         return HTTP_UPDATE_FAILED;
     }
+
 
     DEBUG_HTTP_UPDATE("[httpUpdate] Header read fin.\n");
     DEBUG_HTTP_UPDATE("[httpUpdate] Server header:\n");
@@ -161,6 +211,7 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
                 }
 
                 if(!startUpdate) {
+                    lastError = HTTP_UE_TOO_LESS_SPACE;
                     ret = HTTP_UPDATE_FAILED;
                 } else {
 
@@ -196,6 +247,7 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
                     }
                 }
             } else {
+                lastError = HTTP_UE_SERVER_NOT_REPORT_SIZE;
                 ret = HTTP_UPDATE_FAILED;
                 DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length is 0 or not set by Server?!\n");
             }
@@ -204,16 +256,23 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
             ///< Not Modified (No updates)
             ret = HTTP_UPDATE_NO_UPDATES;
             break;
+        case HTTP_CODE_NOT_FOUND:
+            lastError = HTTP_UE_SERVER_FILE_NOT_FOUND;
+            ret = HTTP_UPDATE_FAILED;
+            break;
+        case HTTP_CODE_FORBIDDEN:
+            lastError = HTTP_UE_SERVER_FORBIDDEN;
+            ret = HTTP_UPDATE_FAILED;
+            break;
         default:
+            lastError = HTTP_UE_SERVER_WRONG_HTTP_CODE;
             ret = HTTP_UPDATE_FAILED;
             DEBUG_HTTP_UPDATE("[httpUpdate] HTTP Code is (%d)\n", code);
             //http->writeToStream(&Serial1);
             break;
     }
 
-
     http->end();
-
     return ret;
 }
 
@@ -229,6 +288,7 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int com
     StreamString error;
 
     if(!Update.begin(size, command)) {
+        lastError = Update.getError();
         Update.printError(error);
         error.trim(); // remove line ending
         DEBUG_HTTP_UPDATE("[httpUpdate] Update.begin failed! (%s)\n", error.c_str());
@@ -240,6 +300,7 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int com
     }
 
     if(Update.writeStream(in) != size) {
+        lastError = Update.getError();
         Update.printError(error);
         error.trim(); // remove line ending
         DEBUG_HTTP_UPDATE("[httpUpdate] Update.writeStream failed! (%s)\n", error.c_str());
@@ -247,6 +308,7 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int com
     }
 
     if(!Update.end()) {
+        lastError = Update.getError();
         Update.printError(error);
         error.trim(); // remove line ending
         DEBUG_HTTP_UPDATE("[httpUpdate] Update.end failed! (%s)\n", error.c_str());
