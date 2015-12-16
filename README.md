@@ -5,6 +5,16 @@ This project brings support for ESP8266 chip to the Arduino environment. It lets
 
 ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, work with SD cards, servos, SPI and I2C peripherals.
 
+# Contents
+- Installing options:
+  - [Using Boards Manager](#installing-with-boards-manager)
+  - [Using git version](#using-git-version-)
+  - [Using stable version with PlatformIO](#using-stable-version-with-platformio)
+- [Documentation](#documentation)
+- [Issues and support](#issues-and-support) 
+- [Contributing](#contributing)  
+- [License and credits](#license-and-credits)   
+
 ### Installing with Boards Manager ###
 
 Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
