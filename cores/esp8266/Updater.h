@@ -5,13 +5,15 @@
 #include "flash_utils.h"
 #include "MD5Builder.h"
 
-#define UPDATE_ERROR_OK     0
-#define UPDATE_ERROR_WRITE  1
-#define UPDATE_ERROR_ERASE  2
-#define UPDATE_ERROR_SPACE  3
-#define UPDATE_ERROR_SIZE   4
-#define UPDATE_ERROR_STREAM 5
-#define UPDATE_ERROR_MD5    6
+#define UPDATE_ERROR_OK             (0)
+#define UPDATE_ERROR_WRITE          (1)
+#define UPDATE_ERROR_ERASE          (2)
+#define UPDATE_ERROR_SPACE          (3)
+#define UPDATE_ERROR_SIZE           (4)
+#define UPDATE_ERROR_STREAM         (5)
+#define UPDATE_ERROR_MD5            (6)
+#define UPDATE_ERROR_FLASH_CONFIG   (7)
+
 
 #define U_FLASH   0
 #define U_SPIFFS  100
