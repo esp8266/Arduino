@@ -41,6 +41,10 @@
 #define HTTPC_ERROR_CONNECTION_LOST     (-5)
 #define HTTPC_ERROR_NO_STREAM           (-6)
 #define HTTPC_ERROR_NO_HTTP_SERVER      (-7)
+#define HTTPC_ERROR_TOO_LESS_RAM        (-8)
+
+/// size for the stream handling
+#define HTTP_TCP_BUFFER_SIZE (1460)
 
 /// HTTP codes see RFC7231
 typedef enum {
