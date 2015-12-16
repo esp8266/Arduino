@@ -240,7 +240,7 @@ public:
      *
      * return: Number of discovered networks
      */
-    int8_t scanNetworks(bool async = false);
+    int8_t scanNetworks(bool async = false, bool show_hidden = false);
 
     /*
      * Return the SSID discovered during the network scan.
