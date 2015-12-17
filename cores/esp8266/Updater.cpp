@@ -57,7 +57,7 @@ bool UpdaterClass::begin(size_t size, int command) {
     return false;
   }
 
-  if(ESP.getFlashChipRealSize() != ESP.getFlashChipSize()) {
+  if(ESP.checkFlashConfig(false)) {
     _error = UPDATE_ERROR_FLASH_CONFIG;
 #ifdef DEBUG_UPDATER
     printError(DEBUG_UPDATER);
