@@ -85,7 +85,10 @@ static const IPAddress MDNS_MULTICAST_ADDR(224, 0, 0, 251);
 static const int MDNS_MULTICAST_TTL = 1;
 static const int MDNS_PORT = 5353;
 
-MDNSResponder::MDNSResponder() : _conn(0) { _services = 0; }
+MDNSResponder::MDNSResponder() : _conn(0) { 
+  _services = 0;
+  _instanceName[0] = 0; 
+}
 MDNSResponder::~MDNSResponder() {}
 
 bool MDNSResponder::begin(const char* hostname){
@@ -101,8 +104,8 @@ bool MDNSResponder::begin(const char* hostname){
     _hostName[i] = tolower(hostname[i]);
   _hostName[n] = '\0';
 
-  // Copy hostname to default instance name
-  os_strcpy(_instanceName,hostname);
+  // If instance name is not already set copy hostname to instance name
+  if (os_strlen(_instanceName) == 0) os_strcpy(_instanceName,hostname);
 
   // Open the MDNS socket if it isn't already open.
   if (!_conn) {
