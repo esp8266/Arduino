@@ -1,3 +1,36 @@
+esp_iot_sdk_v1.5.0_15_11_27 Release Note
+----------------------------------------
+Resolved Issues (Bugs listed below apply to Bug Bounty Program):
+1. Returned value of system_get_rst_info is wrong.
+
+Optimization:
+1. Optimize espconn_regist_recvcb for UDP transmission.
+2. Print information will prompt errors if the input parameters of os_time_arm excess the upper limit.
+3. Optimize memory management.
+4. Optimize RF frequency offset.
+5. Print information will prompt errors if the size of bin file is too large in OTA.
+6. Optimize mDNS.
+7. Revise UART output print error when powered on again after call system_uart_swap.
+8. Revise errors during multiple UDP transmissions.
+9. Revise the error when wifi_station_set_config_default is called and the same AP is set as before, while information cannot be stored in the Flash.
+10. Optimize the error of packet loss during UDP transmission process under single station mode.
+11. Add new function, WPA2 Enterprise is supported.
+12. SmartConfig version is upgraded to V2.5.3.
+13. Mesh version is upgraded to V0.2.3.
+14. User application needs to add "-lcrypto" in LINKFLAGS_eagle.app.v6 of Makefile.
+
+Added APIs:
+1.espconn_abort: bread TCP connection compulsively.
+2.espconn_secure_delete: delete the SSL server when ESP8266 runs as SSL server.
+3.wifi_station_set_cert_key: set certificate and private key for WPA2 Enterprise.
+4.wifi_station_clear_cert_key: release the resource of connecting to WPA2 Enterprise AP, and clear the status.
+
+
+AT_v0.51 release note:
+1.Revise the error of the first byte in AT command when UART RX interrupt handler is implemented.
+2.Revise the malfunction of display when AT+CWLAP is invoked to scan a specific AP.
+
+
 esp_iot_sdk_v1.4.0_15_09_18 Release Note
 ----------------------------------------
 Resolved Issues(Bugs below are eligible for Bug Bounty Program):
