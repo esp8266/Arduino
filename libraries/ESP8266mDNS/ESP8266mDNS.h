@@ -57,6 +57,13 @@ struct MDNSService {
   char _name[32];
   char _proto[3];
   uint16_t _port;
+  struct MDNSTxt * _txts;
+  uint16_t _txtLen; // length of all txts 
+};
+
+struct MDNSTxt{
+  MDNSTxt * _next;
+  char _txt[128];
 };
 
 class MDNSResponder {
@@ -78,16 +85,34 @@ public:
     addService(service.c_str(), proto.c_str(), port);
   }
   
+  bool addServiceTxt(char *name, char *proto, char * key, char * value);
+  void addServiceTxt(const char *name, const char *proto, const char *key,const char * value){
+    addServiceTxt((char *)name, (char *)proto, (char *)key, (char *)value);
+  }
+  void addServiceTxt(String name, String proto, String key, String value){
+    addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
+  }
+  
   void enableArduino(uint16_t port, bool auth=false);
+
+  void setInstanceName(char * name);
+  void setInstanceName(const char * name){
+    setInstanceName((char*) name);
+  }
+  void setInstanceName(String name){
+    setInstanceName(name.c_str());
+  }
 
 private:
   struct MDNSService * _services;
   UdpContext* _conn;
-  char _hostName[128];
-  bool _arduinoAuth;
+  char _hostName[63];
+  char _instanceName[63];
 
   uint32_t _getOurIp();
   uint16_t _getServicePort(char *service, char *proto);
+  MDNSTxt * _getServiceTxt(char *name, char *proto);
+  uint16_t _getServiceTxtLen(char *name, char *proto);
   void _parsePacket();
   void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port);
 };
