@@ -55,9 +55,9 @@ extern "C" {
 
 
 
-#define MDNS_DEBUG_ERR
-#define MDNS_DEBUG_TX
-#define MDNS_DEBUG_RX
+//#define MDNS_DEBUG_ERR
+//#define MDNS_DEBUG_TX
+//#define MDNS_DEBUG_RX
 
 #define MDNS_NAME_REF   0xC000
 
@@ -151,49 +151,39 @@ void MDNSResponder::setInstanceName(char * name){
 bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *value){
   MDNSService* servicePtr;
   
-  //DEBUG Serial.printf("Starting addServiceTxt(name=%s,proto=%s,txt=%s)\n", name,proto,txt);
-  //DEBUG delay(20); 
   uint8_t txtLen = os_strlen(key) + os_strlen(value) + 1; // Add one for equals sign 
   txtLen+=1; //accounts for length byte added when building the txt responce
   if ( txtLen > 128) return false;
   //Find the service
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
-    //DEBUG Serial.printf("Checking service name=%s,proto=%s\n", servicePtr->_name,servicePtr->_proto);
-    //DEBUG delay(20); 
+    //Checking Service names
     if(strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
       if (servicePtr->_txtLen + txtLen > 1300) return false;  //max txt record size
-      //DEBUG Serial.printf("found match service name=%s,proto=%s\n", servicePtr->_name,servicePtr->_proto);
-      //DEBUG delay(20);
-      struct MDNSTxt *newtxt = (struct MDNSTxt*)(os_malloc(sizeof(struct MDNSTxt)));
-      os_strcpy(newtxt->_txt, key);
-      os_strcat(newtxt->_txt, "=");
-      os_strcat(newtxt->_txt, value);
-      newtxt->_next = 0;
-      if(servicePtr->_txts == 0) { //no services have been added
-        servicePtr->_txts = newtxt;
-        servicePtr->_txtLen += txtLen;
-        //DEBUG Serial.printf("Adding First TXT of %s to service %s and proto %s\n", newtxt->_txt,servicePtr->_name,servicePtr->_proto);
-        //DEBUG Serial.printf("New txt length: %d\n",servicePtr->_txtLen);
-        return true;
-      }
-      else{
-        MDNSTxt * txtPtr = servicePtr->_txts;
-        while(txtPtr->_next !=0) {
-          txtPtr = txtPtr->_next;
-          //DEBUG Serial.println("Incramenting txt pointer");     
+        //found a service name match
+        struct MDNSTxt *newtxt = (struct MDNSTxt*)(os_malloc(sizeof(struct MDNSTxt)));
+        os_strcpy(newtxt->_txt, key);
+        os_strcat(newtxt->_txt, "=");
+        os_strcat(newtxt->_txt, value);
+        newtxt->_next = 0;
+        if(servicePtr->_txts == 0) { //no services have been added
+          //Adding First TXT to service
+          servicePtr->_txts = newtxt;
+          servicePtr->_txtLen += txtLen;
+          return true;
         }
+        else{
+          MDNSTxt * txtPtr = servicePtr->_txts;
+          while(txtPtr->_next !=0) {
+            txtPtr = txtPtr->_next;
+          }
+        //adding another TXT to service
         txtPtr->_next = newtxt;
         servicePtr->_txtLen += txtLen;
-        //DEBUG Serial.printf("Adding Another TXT of %s to service %s and proto %s\n", newtxt->_txt,servicePtr->_name,servicePtr->_proto);
-        //DEBUG Serial.printf("New txt length: %d\n",servicePtr->_txtLen);
         return true;
       }
-      /*
-      */
     }
   }
   return false;
-  //DEBUG Serial.println("No Service Found When adding a txt");
 }
 
 void MDNSResponder::addService(char *name, char *proto, uint16_t port){
@@ -241,17 +231,6 @@ uint16_t MDNSResponder::_getServiceTxtLen(char *name, char *proto){
   }
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 uint16_t MDNSResponder::_getServicePort(char *name, char *proto){
   MDNSService* servicePtr;
@@ -476,14 +455,6 @@ void MDNSResponder::_parsePacket(){
 }
 
 void MDNSResponder::enableArduino(uint16_t port, bool auth){
-
-//  char boardName[64];
-//  const char *boardExtra = "board=";
-//  os_sprintf(boardName, "%s%s", boardExtra, ARDUINO_BOARD);
-
-//  char authUpload[16];
-//  const char *authUploadExtra = "auth_upload=";
-//  os_sprintf(authUpload, "%s%s", authUploadExtra, (auth) ? "yes":"no");
 
   addService("arduino", "tcp", port);
   addServiceTxt("arduino", "tcp", "tcp_check", "no");
