@@ -298,6 +298,24 @@ uint32_t EspClass::getFlashChipSizeByChipId(void) {
     }
 }
 
+/**
+ * check the Flash settings from IDE against the Real flash size
+ * @param needsEquals (return only true it equals)
+ * @return ok or not
+ */
+bool EspClass::checkFlashConfig(bool needsEquals) {
+    if(needsEquals) {
+        if(getFlashChipRealSize() == getFlashChipSize()) {
+            return true;
+        }
+    } else {
+        if(getFlashChipRealSize() >= getFlashChipSize()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 String EspClass::getResetInfo(void) {
     if(resetInfo.reason != 0) {
         char buff[200];

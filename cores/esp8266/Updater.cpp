@@ -57,6 +57,14 @@ bool UpdaterClass::begin(size_t size, int command) {
     return false;
   }
 
+  if(ESP.checkFlashConfig(false)) {
+    _error = UPDATE_ERROR_FLASH_CONFIG;
+#ifdef DEBUG_UPDATER
+    printError(DEBUG_UPDATER);
+#endif
+    return false;
+  }
+
   _reset();
   _error = 0;
 
@@ -278,6 +286,8 @@ void UpdaterClass::printError(Stream &out){
     out.println("Stream Read Timeout");
   } else if(_error == UPDATE_ERROR_MD5){
     out.println("MD5 Check Failed");
+  } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
+    out.printf("Flash config wrong real: %d IDE: %d\n", ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
   } else {
     out.println("UNKNOWN");
   }
