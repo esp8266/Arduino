@@ -19,17 +19,24 @@ platformio boards espressif
 # --------------------------------------------------------------------------------------------------------
 # Type                  MCU            Frequency  Flash   RAM    Name
 # --------------------------------------------------------------------------------------------------------
-# esp01                 esp8266        80Mhz     512Kb   32Kb   Espressif ESP8266 ESP-01 board
-# esp01_1m              esp8266        80Mhz     1024Kb  32Kb   Espressif ESP8266 ESP-01-1MB board
-# esp12e                esp8266        80Mhz     4096Kb  32Kb   Espressif ESP8266 ESP-12E board (NodeMCU)
+# huzzah                esp8266        80Mhz     1024Kb  80Kb   Adafruit HUZZAH ESP8266
+# espino                esp8266        80Mhz     1024Kb  80Kb   ESPino
+# esp12e                esp8266        80Mhz     1024Kb  80Kb   Espressif ESP8266 ESP-12E
+# esp01                 esp8266        80Mhz     512Kb   80Kb   Espressif Generic ESP8266 ESP-01
+# nodemcu               esp8266        80Mhz     1024Kb  80Kb   NodeMCU 0.9 & 1.0
+# modwifi               esp8266        80Mhz     1024Kb  80Kb   Olimex MOD-WIFI-ESP8266(-DEV)
+# thing                 esp8266        80Mhz     512Kb   80Kb   SparkFun ESP8266 Thing
+# esp210                esp8266        80Mhz     1024Kb  80Kb   SweetPea ESP-210
+# d1                    esp8266        80Mhz     1024Kb  80Kb   WeMos D1
+# d1_mini               esp8266        80Mhz     1024Kb  80Kb   WeMos D1 mini
 # ...
 
 #
 # Initialise base project
 #
 platformio init --board %TYPE%(see above)
-# for example, initialise project for ESP8266 ESP-12E board (NodeMCU)
-platformio init --board esp12e
+# for example, initialise project for Espressif Generic ESP8266 ESP-01
+platformio init --board esp01
 
 # The next files/directories will be created in myproject
 # platformio.ini - Project Configuration File. |-> PLEASE EDIT ME <-|
@@ -49,43 +56,14 @@ platformio run
 platformio run --target upload
 ```
 
-## OTA firmware uploading
+## Advanced documentation
 
-There are 2 options:
+- [OTA update](http://docs.platformio.org/en/latest/platforms/espressif.html#ota-update)
+  * [Authentication and upload options](http://docs.platformio.org/en/latest/platforms/espressif.html#authentication-and-upload-options)
+- [Custom CPU Frequency and Upload Speed](http://docs.platformio.org/en/latest/platforms/espressif.html#custom-cpu-frequency-and-upload-speed)
+- [Custom Flash Size](http://docs.platformio.org/en/latest/platforms/espressif.html#custom-flash-size)
+- [IDE Integration](http://docs.platformio.org/en/latest/ide.html) (Atom, CLion, Eclipse, Qt Creator, Sublime Text, VIM, Visual Studio)
+- [Project Examples](http://docs.platformio.org/en/latest/platforms/espressif.html#examples)
 
-- Directly specify `--upoad-port` in command line
-```bash
-platformio run --target upload --upload-port IP_ADDRESS_HERE
-```
-- Specify [upload_port](http://docs.platformio.org/en/latest/projectconf.html#upload-port) option in `platformio.ini`
-```ini
-[env:***]
-...
-upload_port = IP_ADDRESS_HERE
-```
-
-### Authentication and upload options
-
-You can pass additional options/flags to OTA uploader using [upload_flags](http://docs.platformio.org/en/latest/projectconf.html#upload-flags)  option in `platformio.ini`
-```ini
-[env:***]
-upload_flags = --port=8266
-```
-
-Availalbe flags
-- `--port=ESP_PORT` ESP8266 ota Port. Default 8266
-- `--auth=AUTH` Set authentication password
-- `--spiffs` Use this option to transmit a SPIFFS image and do not flash the module
-
-For the full list with availalbe options please run this command `~/.platformio/packages/framework-arduinoespressif/tools/espota.py -h`.
-
-
-## IDE Integration
-In addition, PlatformIO [can be integrated into the popular IDEs](http://docs.platformio.org/en/latest/ide.html). For example, initialise project for Espressif ESP8266 ESP-01 board and Eclipse IDE
-```
-platformio init --board esp01 --ide eclipse
-```
-Then [import project](http://docs.platformio.org/en/latest/ide/eclipse.html) using `Eclipse Menu: File > Import... > General > Existing Projects into Workspace`.
-
-## Demo of OTA firmware uploading
+## Demo of OTA update
 [![PlatformIO and OTA firmware uploading to Espressif ESP8266 ESP-01](http://img.youtube.com/vi/W8wWjvQ8ZQs/0.jpg)](http://www.youtube.com/watch?v=W8wWjvQ8ZQs "PlatformIO and OTA firmware uploading to Espressif ESP8266 ESP-01")
