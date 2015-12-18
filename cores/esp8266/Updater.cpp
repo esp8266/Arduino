@@ -124,9 +124,13 @@ bool UpdaterClass::begin(size_t size, int command) {
   return true;
 }
 
-void UpdaterClass::setMD5(const char * expected_md5){
-  if(strlen(expected_md5) != 32) return;
+bool UpdaterClass::setMD5(const char * expected_md5){
+  if(strlen(expected_md5) != 32)
+  {
+    return false;
+  }
   _target_md5 = expected_md5;
+  return true;
 }
 
 bool UpdaterClass::end(bool evenIfRemaining){
@@ -160,6 +164,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
       DEBUG_UPDATER.printf("MD5 Failed: expected:%s, calculated:%s\n", _target_md5.c_str(), _md5.toString().c_str());
 #endif
+      _reset();
       return false;
     }
 #ifdef DEBUG_UPDATER

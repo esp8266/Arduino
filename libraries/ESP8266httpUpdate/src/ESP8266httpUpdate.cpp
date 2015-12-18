@@ -296,7 +296,11 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int com
     }
 
     if(md5.length()) {
-        Update.setMD5(md5.c_str());
+        if(!Update.setMD5(md5.c_str())) {
+            lastError = HTTP_UE_SERVER_FAULTY_MD5;
+            DEBUG_HTTP_UPDATE("[httpUpdate] Update.setMD5 failed! (%s)\n", md5.c_str());
+            return false;
+        }
     }
 
     if(Update.writeStream(in) != size) {
