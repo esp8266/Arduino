@@ -11,10 +11,13 @@ Change port and baud rate as necessary. This command requires python and pyseria
 ```
     nc localhost 9980
 ```
-- When crash happens, `Trap %d: pc=%p va=%p` line will appear in serial output.
-- Close nc and start gdb:
+- Once crash happens, close nc and start gdb:
 ```
     xtensa-lx106-elf-gdb /path/to/Sketch.cpp.elf -ex "target remote :9980"
+```
+Or, using the provided gdbcmds file:
+```
+    xtensa-lx106-elf-gdb /path/to/Sketch.cpp.elf -x gdbcmds
 ```
 - Use gdb to inspect program state at the point of an exception.
 
@@ -28,22 +31,4 @@ at the top of `__wrap_system_restart_local` in core_esp8266_postmortem.c.
 
 ## License
 
-GDB Server stub by Marko Mikulicic was taken from Cesanta's smart.js
-
-https://github.com/cesanta/smart.js
-
-Copyright (c) 2013-2014 Cesanta Software Limited
-All rights reserved
-
-This software is dual-licensed: you can redistribute it and/or modify
-it under the terms of the GNU General Public License version 2 as
-published by the Free Software Foundation. For the terms of this
-license, see <http://www.gnu.org/licenses>.
-
-You are free to use this software under the terms of the GNU General
-Public License, but WITHOUT ANY WARRANTY; without even the implied
-warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
-
-Alternatively, you can license this software under a commercial
-license, as set out in <https://www.cesanta.com/license>.
+Espressif MIT License. See License file.
