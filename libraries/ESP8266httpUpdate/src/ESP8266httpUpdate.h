@@ -44,6 +44,7 @@
 #define HTTP_UE_SERVER_FILE_NOT_FOUND   (-102)
 #define HTTP_UE_SERVER_FORBIDDEN        (-103)
 #define HTTP_UE_SERVER_WRONG_HTTP_CODE  (-104)
+#define HTTP_UE_SERVER_FAULTY_MD5       (-105)
 
 typedef enum {
     HTTP_UPDATE_FAILED,
