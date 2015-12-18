@@ -231,6 +231,13 @@ static uint8_t phy_init_data[128] =
     // force_freq_offset
     // signed, unit is 8kHz
     [113] = 0,
+
+    // rf_cal_use_flash
+    // 0: RF init no RF CAL, using all RF CAL data in flash, it takes about 2ms for RF init
+    // 1: RF init only do TX power control CAL, others using RF CAL data in flash , it takes about 20ms for RF init
+    // 2: RF init no RF CAL, using all RF CAL data in flash, it takes about 2ms for RF init  (same as 0?!)
+    // 3: RF init do all RF CAL, it takes about 200ms for RF init
+    [114] = 2
 };
 
 extern int __real_register_chipv6_phy(uint8_t* init_data);
