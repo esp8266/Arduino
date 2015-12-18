@@ -19,7 +19,7 @@ compiler.c.cmd=xtensa-lx106-elf-gcc
 compiler.c.flags=-c -Os -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -std=gnu99 -ffunction-sections -fdata-sections
 
 compiler.S.cmd=xtensa-lx106-elf-gcc
-compiler.S.flags=-c -g -x assembler-with-cpp -MMD
+compiler.S.flags=-c -g -x assembler-with-cpp -MMD -mlongcalls
 
 compiler.c.elf.flags=-g -Os -nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/ld" "-T{build.flash_ld}" -Wl,--gc-sections -Wl,-wrap,system_restart_local -Wl,-wrap,register_chipv6_phy
 
