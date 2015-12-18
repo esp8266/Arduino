@@ -52,19 +52,8 @@ License (MIT license):
 
 class UdpContext;
 
-struct MDNSService {
-  MDNSService* _next;
-  char _name[32];
-  char _proto[3];
-  uint16_t _port;
-  struct MDNSTxt * _txts;
-  uint16_t _txtLen; // length of all txts 
-};
-
-struct MDNSTxt{
-  MDNSTxt * _next;
-  char _txt[128];
-};
+struct MDNSService;
+struct MDNSTxt;
 
 class MDNSResponder {
 public:
@@ -95,19 +84,19 @@ public:
   
   void enableArduino(uint16_t port, bool auth=false);
 
-  void setInstanceName(char * name);
+  void setInstanceName(String name);
   void setInstanceName(const char * name){
-    setInstanceName((char*) name);
+    setInstanceName(String(name));
   }
-  void setInstanceName(String name){
-    setInstanceName(name.c_str());
+  void setInstanceName(char * name){
+    setInstanceName(String(name));
   }
 
 private:
   struct MDNSService * _services;
   UdpContext* _conn;
-  char _hostName[63];
-  char _instanceName[63];
+  String _hostName;
+  String _instanceName;
 
   uint32_t _getOurIp();
   uint16_t _getServicePort(char *service, char *proto);
