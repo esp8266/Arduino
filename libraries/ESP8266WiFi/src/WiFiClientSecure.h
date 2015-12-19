@@ -46,6 +46,7 @@ public:
   int available() override;
   int read() override;
   int peek() override;
+  size_t peekBytes(uint8_t *buffer, size_t length) override;
   void stop() override;
 
   void setCertificate(const uint8_t* cert_data, size_t size);

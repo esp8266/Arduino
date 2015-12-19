@@ -56,6 +56,10 @@ public:
   virtual int read();
   virtual int read(uint8_t *buf, size_t size);
   virtual int peek();
+  virtual size_t peekBytes(uint8_t *buffer, size_t length);
+  size_t peekBytes(char *buffer, size_t length) {
+    return peekBytes((uint8_t *) buffer, length);
+  }
   virtual void flush();
   virtual void stop();
   virtual uint8_t connected();
