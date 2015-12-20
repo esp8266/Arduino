@@ -814,6 +814,7 @@ wifinfo.build.f_cpu=80000000L
 wifinfo.build.core=esp8266
 wifinfo.build.variant=wifinfo
 wifinfo.build.flash_mode=qio
+wifinfo.build.board=ESP8266_ESP12
 wifinfo.build.spiffs_pagesize=256
 
 #wifinfo.menu.ESPModule.ESP07512=ESP07 (1M/512K SPIFFS)
