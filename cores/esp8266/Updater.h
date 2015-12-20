@@ -13,6 +13,7 @@
 #define UPDATE_ERROR_STREAM         (5)
 #define UPDATE_ERROR_MD5            (6)
 #define UPDATE_ERROR_FLASH_CONFIG   (7)
+#define UPDATE_ERROR_MAGIC_BYTE     (8)
 
 
 #define U_FLASH   0

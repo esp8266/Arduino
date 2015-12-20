@@ -252,6 +252,16 @@ size_t UpdaterClass::writeStream(Stream &data) {
     if(hasError() || !isRunning())
         return 0;
 
+    // check for valid first magic byte (is always 0xE9)
+    if(data.peek() != 0xE9) {
+        _error = UPDATE_ERROR_MAGIC_BYTE;
+        _currentAddress = (_startAddress + _size);
+#ifdef DEBUG_UPDATER
+        printError(DEBUG_UPDATER);
+#endif
+        return 0;
+    }
+
     while(remaining()) {
         toRead = data.readBytes(_buffer + _bufferLen,  (FLASH_SECTOR_SIZE - _bufferLen));
         if(toRead == 0) { //Timeout
@@ -293,6 +303,8 @@ void UpdaterClass::printError(Stream &out){
     out.println("MD5 Check Failed");
   } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
     out.printf("Flash config wrong real: %d IDE: %d\n", ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
+  } else if(_error == UPDATE_ERROR_MAGIC_BYTE){
+    out.println("Magic byte is wrong, not 0xE9");
   } else {
     out.println("UNKNOWN");
   }
