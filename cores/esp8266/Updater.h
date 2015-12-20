@@ -5,15 +5,17 @@
 #include "flash_utils.h"
 #include "MD5Builder.h"
 
-#define UPDATE_ERROR_OK             (0)
-#define UPDATE_ERROR_WRITE          (1)
-#define UPDATE_ERROR_ERASE          (2)
-#define UPDATE_ERROR_SPACE          (3)
-#define UPDATE_ERROR_SIZE           (4)
-#define UPDATE_ERROR_STREAM         (5)
-#define UPDATE_ERROR_MD5            (6)
-#define UPDATE_ERROR_FLASH_CONFIG   (7)
-#define UPDATE_ERROR_MAGIC_BYTE     (8)
+#define UPDATE_ERROR_OK                 (0)
+#define UPDATE_ERROR_WRITE              (1)
+#define UPDATE_ERROR_ERASE              (2)
+#define UPDATE_ERROR_READ               (3)
+#define UPDATE_ERROR_SPACE              (4)
+#define UPDATE_ERROR_SIZE               (5)
+#define UPDATE_ERROR_STREAM             (6)
+#define UPDATE_ERROR_MD5                (7)
+#define UPDATE_ERROR_FLASH_CONFIG       (8)
+#define UPDATE_ERROR_NEW_FLASH_CONFIG   (9)
+#define UPDATE_ERROR_MAGIC_BYTE         (10)
 
 
 #define U_FLASH   0
@@ -133,6 +135,9 @@ class UpdaterClass {
   private:
     void _reset();
     bool _writeBuffer();
+
+    bool _verifyHeader(uint8_t data);
+    bool _verifyEnd();
 
     uint8_t _error;
     uint8_t *_buffer;
