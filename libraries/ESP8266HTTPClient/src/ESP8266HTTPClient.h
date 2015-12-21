@@ -153,7 +153,7 @@ class HTTPClient {
         int writeToStream(Stream * stream);
         String getString(void);
 
-        String errorToString(int error);
+        static String errorToString(int error);
 
     protected:
 

@@ -179,6 +179,20 @@ class ClientContext {
             return reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
         }
 
+        size_t peekBytes(char *dst, size_t size) {
+            if(!_rx_buf) return 0;
+
+            size_t max_size = _rx_buf->tot_len - _rx_buf_offset;
+            size = (size < max_size) ? size : max_size;
+
+            DEBUGV(":pd %d, %d, %d\r\n", size, _rx_buf->tot_len, _rx_buf_offset);
+            size_t buf_size = _rx_buf->len - _rx_buf_offset;
+            size_t copy_size = (size < buf_size) ? size : buf_size;
+            DEBUGV(":rpi %d, %d\r\n", buf_size, copy_size);
+            os_memcpy(dst, reinterpret_cast<char*>(_rx_buf->payload) + _rx_buf_offset, copy_size);
+            return copy_size;
+        }
+
         void flush() {
             if(!_rx_buf) {
                 return;

@@ -31,7 +31,7 @@ extern "C" {
 #include "user_interface.h"
 #include "cont.h"
 }
-#define LOOP_TASK_PRIORITY 0
+#define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
 
 #define OPTIMISTIC_YIELD_TIME_US 16000
@@ -73,7 +73,7 @@ extern "C" void esp_yield() {
 }
 
 extern "C" void esp_schedule() {
-    system_os_post(LOOP_TASK_PRIORITY, 0, 0);
+    ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 extern "C" void __yield() {
@@ -144,7 +144,7 @@ extern "C" void user_init(void) {
 
     cont_init(&g_cont);
 
-    system_os_task(loop_task,
+    ets_task(loop_task,
         LOOP_TASK_PRIORITY, g_loop_queue,
         LOOP_QUEUE_SIZE);
 

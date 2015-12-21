@@ -14,6 +14,7 @@ typedef void (* espconn_reconnect_callback)(void *arg, sint8 err);
 #define ESPCONN_TIMEOUT    -3    /* Timeout.                 */
 #define ESPCONN_RTE        -4    /* Routing problem.         */
 #define ESPCONN_INPROGRESS  -5    /* Operation in progress    */
+#define ESPCONN_MAXNUM		-7	 /* Total number exceeds the set maximum*/
 
 #define ESPCONN_ABRT       -8    /* Connection aborted.      */
 #define ESPCONN_RST        -9    /* Connection reset.        */
@@ -21,6 +22,7 @@ typedef void (* espconn_reconnect_callback)(void *arg, sint8 err);
 #define ESPCONN_CONN       -11   /* Not connected.           */
 
 #define ESPCONN_ARG        -12   /* Illegal argument.        */
+#define ESPCONN_IF		   -14	 /* UDP send error			 */
 #define ESPCONN_ISCONN     -15   /* Already connected.       */
 
 #define ESPCONN_HANDSHAKE  -28   /* ssl handshake failed	 */
@@ -290,6 +292,17 @@ sint8 espconn_send(struct espconn *espconn, uint8 *psent, uint16 length);
 sint8 espconn_sent(struct espconn *espconn, uint8 *psent, uint16 length);
 
 /******************************************************************************
+ * FunctionName : espconn_sendto
+ * Description  : send data for UDP
+ * Parameters   : espconn -- espconn to set for UDP
+ *                psent -- data to send
+ *                length -- length of data to send
+ * Returns      : error
+*******************************************************************************/
+
+sint16 espconn_sendto(struct espconn *espconn, uint8 *psent, uint16 length);
+
+/******************************************************************************
  * FunctionName : espconn_regist_connectcb
  * Description  : used to specify the function that should be called when
  *                connects to host.
@@ -420,6 +433,15 @@ typedef void (*dns_found_callback)(const char *name, ip_addr_t *ipaddr, void *ca
 err_t espconn_gethostbyname(struct espconn *pespconn, const char *hostname, ip_addr_t *addr, dns_found_callback found);
 
 /******************************************************************************
+ * FunctionName : espconn_abort
+ * Description  : Forcely abort with host
+ * Parameters   : espconn -- the espconn used to connect with the host
+ * Returns      : result
+*******************************************************************************/
+
+sint8 espconn_abort(struct espconn *espconn);
+
+/******************************************************************************
  * FunctionName : espconn_encry_connect
  * Description  : The function given as connection
  * Parameters   : espconn -- the espconn used to connect with the host
@@ -502,14 +524,68 @@ bool espconn_secure_ca_enable(uint8 level, uint8 flash_sector );
 
 bool espconn_secure_ca_disable(uint8 level);
 
+
+/******************************************************************************
+ * FunctionName : espconn_secure_cert_req_enable
+ * Description  : enable the client certificate authenticate and set the flash sector
+ * 				  as client or server
+ * Parameters   : level -- set for client or server
+ *				  1: client,2:server,3:client and server
+ *				  flash_sector -- flash sector for save certificate
+ * Returns      : result true or false
+*******************************************************************************/
+
+bool espconn_secure_cert_req_enable(uint8 level, uint8 flash_sector );
+
+/******************************************************************************
+ * FunctionName : espconn_secure_ca_disable
+ * Description  : disable the client certificate authenticate  as client or server
+ * Parameters   : level -- set for client or server
+ *				  1: client,2:server,3:client and server
+ * Returns      : result true or false
+*******************************************************************************/
+
+bool espconn_secure_cert_req_disable(uint8 level);
+
+/******************************************************************************
+ * FunctionName : espconn_secure_set_default_certificate
+ * Description  : Load the certificates in memory depending on compile-time
+ * 				  and user options.
+ * Parameters   : certificate -- Load the certificate
+ *				  length -- Load the certificate length
+ * Returns      : result true or false
+*******************************************************************************/
+
+bool espconn_secure_set_default_certificate(const uint8* certificate, uint16 length);
+
+/******************************************************************************
+ * FunctionName : espconn_secure_set_default_private_key
+ * Description  : Load the key in memory depending on compile-time
+ * 				  and user options.
+ * Parameters   : private_key -- Load the key
+ *				  length -- Load the key length
+ * Returns      : result true or false
+*******************************************************************************/
+
+bool espconn_secure_set_default_private_key(const uint8* private_key, uint16 length);
+
 /******************************************************************************
  * FunctionName : espconn_secure_accept
  * Description  : The function given as the listen
  * Parameters   : espconn -- the espconn used to listen the connection
- * Returns      : none
+ * Returns      : result
 *******************************************************************************/
 
 sint8 espconn_secure_accept(struct espconn *espconn);
+
+/******************************************************************************
+ * FunctionName : espconn_secure_accepts
+ * Description  : delete the secure server host
+ * Parameters   : espconn -- the espconn used to listen the connection
+ * Returns      : result
+*******************************************************************************/
+
+sint8 espconn_secure_delete(struct espconn *espconn);
 
 /******************************************************************************
  * FunctionName : espconn_igmp_join

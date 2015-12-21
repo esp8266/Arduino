@@ -133,6 +133,17 @@ public:
         return _read_ptr[0];
     }
 
+    size_t peekBytes(char *dst, size_t size) {
+        if(!_available) {
+            if(!_readAll())
+                return -1;
+        }
+
+        size_t will_copy = (_available < size) ? _available : size;
+        memcpy(dst, _read_ptr, will_copy);
+        return will_copy;
+    }
+
     int available() {
         auto cb = _available;
         if (cb == 0) {
@@ -278,6 +289,27 @@ int WiFiClientSecure::peek() {
     return _ssl->peek();
 }
 
+size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length) {
+    size_t count = 0;
+
+    if(!_ssl) {
+        return 0;
+    }
+
+    _startMillis = millis();
+    while((available() < (int) length) && ((millis() - _startMillis) < _timeout)) {
+        yield();
+    }
+
+    if(available() < (int) length) {
+        count = available();
+    } else {
+        count = length;
+    }
+
+    return _ssl->peekBytes((char *)buffer, count);
+}
+
 int WiFiClientSecure::available() {
     if (!_ssl)
         return 0;
@@ -327,7 +359,7 @@ bool WiFiClientSecure::verify(const char* fp, const char* url) {
     int len = strlen(fp);
     int pos = 0;
     for (size_t i = 0; i < sizeof(sha1); ++i) {
-        while (pos < len && fp[pos] == ' ') {
+        while (pos < len && ((fp[pos] == ' ') || (fp[pos] == ':'))) {
             ++pos;
         }
         if (pos > len - 2) {

@@ -117,6 +117,12 @@ class EspClass {
         FlashMode_t getFlashChipMode();
         uint32_t getFlashChipSizeByChipId();
 
+        uint32_t magicFlashChipSize(uint8_t byte);
+        uint32_t magicFlashChipSpeed(uint8_t byte);
+        FlashMode_t magicFlashChipMode(uint8_t byte);
+
+        bool checkFlashConfig(bool needsEquals = false);
+
         bool flashEraseSector(uint32_t sector);
         bool flashWrite(uint32_t offset, uint32_t *data, size_t size);
         bool flashRead(uint32_t offset, uint32_t *data, size_t size);

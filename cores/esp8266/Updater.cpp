@@ -57,6 +57,14 @@ bool UpdaterClass::begin(size_t size, int command) {
     return false;
   }
 
+  if(!ESP.checkFlashConfig(false)) {
+    _error = UPDATE_ERROR_FLASH_CONFIG;
+#ifdef DEBUG_UPDATER
+    printError(DEBUG_UPDATER);
+#endif
+    return false;
+  }
+
   _reset();
   _error = 0;
 
@@ -116,9 +124,13 @@ bool UpdaterClass::begin(size_t size, int command) {
   return true;
 }
 
-void UpdaterClass::setMD5(const char * expected_md5){
-  if(strlen(expected_md5) != 32) return;
+bool UpdaterClass::setMD5(const char * expected_md5){
+  if(strlen(expected_md5) != 32)
+  {
+    return false;
+  }
   _target_md5 = expected_md5;
+  return true;
 }
 
 bool UpdaterClass::end(bool evenIfRemaining){
@@ -152,11 +164,20 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
       DEBUG_UPDATER.printf("MD5 Failed: expected:%s, calculated:%s\n", _target_md5.c_str(), _md5.toString().c_str());
 #endif
+      _reset();
       return false;
     }
 #ifdef DEBUG_UPDATER
     else DEBUG_UPDATER.printf("MD5 Success: %s\n", _target_md5.c_str());
 #endif
+  }
+
+  if(!_verifyEnd()) {
+#ifdef DEBUG_UPDATER
+    printError(DEBUG_UPDATER);
+#endif
+    _reset();
+    return false;
   }
 
   if (_command == U_FLASH) {
@@ -233,11 +254,69 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
   return len;
 }
 
+bool UpdaterClass::_verifyHeader(uint8_t data) {
+    if(_command == U_FLASH) {
+        // check for valid first magic byte (is always 0xE9)
+        if(data != 0xE9) {
+            _error = UPDATE_ERROR_MAGIC_BYTE;
+            _currentAddress = (_startAddress + _size);
+            return false;
+        }
+        return true;
+    } else if(_command == U_SPIFFS) {
+        // no check of SPIFFS possible with first byte.
+        return true;
+    }
+    return false;
+}
+
+bool UpdaterClass::_verifyEnd() {
+    if(_command == U_FLASH) {
+
+        uint8_t buf[4];
+        if(!ESP.flashRead(_startAddress, (uint32_t *) &buf[0], 4)) {
+            _error = UPDATE_ERROR_READ;
+            _currentAddress = (_startAddress);
+            return false;
+        }
+
+        // check for valid first magic byte
+        if(buf[0] != 0xE9) {
+            _error = UPDATE_ERROR_MAGIC_BYTE;
+            _currentAddress = (_startAddress);
+            return false;
+        }
+
+        uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
+
+        // check if new bin fits to SPI flash
+        if(bin_flash_size > ESP.getFlashChipRealSize()) {
+            _error = UPDATE_ERROR_NEW_FLASH_CONFIG;
+            _currentAddress = (_startAddress);
+            return false;
+        }
+
+        return true;
+    } else if(_command == U_SPIFFS) {
+        // SPIFFS is already over written checks make no sense any more.
+        return true;
+    }
+    return false;
+}
+
 size_t UpdaterClass::writeStream(Stream &data) {
     size_t written = 0;
     size_t toRead = 0;
     if(hasError() || !isRunning())
         return 0;
+
+    if(!_verifyHeader(data.peek())) {
+#ifdef DEBUG_UPDATER
+        printError(DEBUG_UPDATER);
+#endif
+        _reset();
+        return 0;
+    }
 
     while(remaining()) {
         toRead = data.readBytes(_buffer + _bufferLen,  (FLASH_SECTOR_SIZE - _bufferLen));
@@ -250,8 +329,9 @@ size_t UpdaterClass::writeStream(Stream &data) {
 #ifdef DEBUG_UPDATER
                 printError(DEBUG_UPDATER);
 #endif
+                _reset();
+                return written;
             }
-            return written;
         }
         _bufferLen += toRead;
         if((_bufferLen == remaining() || _bufferLen == FLASH_SECTOR_SIZE) && !_writeBuffer())
@@ -270,6 +350,8 @@ void UpdaterClass::printError(Stream &out){
     out.println("Flash Write Failed");
   } else if(_error == UPDATE_ERROR_ERASE){
     out.println("Flash Erase Failed");
+  } else if(_error == UPDATE_ERROR_READ){
+    out.println("Flash Read Failed");
   } else if(_error == UPDATE_ERROR_SPACE){
     out.println("Not Enough Space");
   } else if(_error == UPDATE_ERROR_SIZE){
@@ -278,6 +360,12 @@ void UpdaterClass::printError(Stream &out){
     out.println("Stream Read Timeout");
   } else if(_error == UPDATE_ERROR_MD5){
     out.println("MD5 Check Failed");
+  } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
+    out.printf("Flash config wrong real: %d IDE: %d\n", ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
+  } else if(_error == UPDATE_ERROR_NEW_FLASH_CONFIG){
+    out.printf("new Flash config wrong real: %d\n", ESP.getFlashChipRealSize());
+  } else if(_error == UPDATE_ERROR_MAGIC_BYTE){
+    out.println("Magic byte is wrong, not 0xE9");
   } else {
     out.println("UNKNOWN");
   }
