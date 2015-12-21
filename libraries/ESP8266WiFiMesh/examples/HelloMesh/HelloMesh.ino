@@ -17,9 +17,9 @@ String manageRequest(String request)
 	Serial.println(request);
 
 	/* return a string to send back */
-	char message[50];
-	sprintf(message, "Hello world response from %d.", ESP.getChipId());
-	return message;
+	char response[50];
+	sprintf(response, "Hello world response from %d.", ESP.getChipId());
+	return response;
 }
 
 void setup()
@@ -41,8 +41,8 @@ void loop()
 	mesh_node.acceptRequest();
 
 	/* Scan for other nodes and send them a message */
-	char message[50];
-	sprintf(message, "Hello world request from %d.", ESP.getChipId());
-	mesh_node.attemptScan(message);
+	char request[50];
+	sprintf(request, "Hello world request from %d.", ESP.getChipId());
+	mesh_node.attemptScan(request);
 	delay(1000);
 }
