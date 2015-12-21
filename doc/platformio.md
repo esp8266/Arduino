@@ -32,7 +32,7 @@ platformio boards espressif
 # d1_mini               esp8266        80Mhz     4096Kb  80Kb   WeMos D1 mini
 # ...
 #
-# The rest of Board/MCU varioations with the different Flash/SPIFFS can be customized using extra LD Script.
+# The rest of Board/MCU variations with the different Flash/SPIFFS can be customized using extra LD Script.
 # PlatformIO contains the popular LD scripts.
 # See http://docs.platformio.org/en/latest/platforms/espressif.html#custom-flash-size
 #
