@@ -51,19 +51,19 @@ typedef size_t mem_size_t;
  * allow these defines to be overridden.
  */
 #ifndef mem_free
-#define mem_free(p) vPortFree(p, "", 0)
+#define mem_free(p) vPortFree(p)
 #endif
 #ifndef mem_malloc
-#define mem_malloc(s) pvPortMalloc(s, "", 0)
+#define mem_malloc(s) pvPortMalloc(s)
 #endif
 #ifndef mem_calloc
-#define mem_calloc(s) pvPortCalloc(s, "", 0)
+#define mem_calloc(s) pvPortCalloc(s)
 #endif
 #ifndef mem_realloc
-#define mem_realloc(p, s) pvPortRealloc(p, s, "", 0)
+#define mem_realloc(p, s) pvPortRealloc(p, s)
 #endif
 #ifndef mem_zalloc
-#define mem_zalloc(s) pvPortZalloc(s, "", 0)
+#define mem_zalloc(s) pvPortZalloc(s)
 #endif
 
 #ifndef os_malloc
