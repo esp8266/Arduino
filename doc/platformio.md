@@ -19,17 +19,23 @@ platformio boards espressif
 # --------------------------------------------------------------------------------------------------------
 # Type                  MCU            Frequency  Flash   RAM    Name
 # --------------------------------------------------------------------------------------------------------
-# huzzah                esp8266        80Mhz     1024Kb  80Kb   Adafruit HUZZAH ESP8266
-# espino                esp8266        80Mhz     1024Kb  80Kb   ESPino
-# esp12e                esp8266        80Mhz     1024Kb  80Kb   Espressif ESP8266 ESP-12E
-# esp01                 esp8266        80Mhz     512Kb   80Kb   Espressif Generic ESP8266 ESP-01
-# nodemcu               esp8266        80Mhz     1024Kb  80Kb   NodeMCU 0.9 & 1.0
-# modwifi               esp8266        80Mhz     1024Kb  80Kb   Olimex MOD-WIFI-ESP8266(-DEV)
+# huzzah                esp8266        80Mhz     4096Kb  80Kb   Adafruit HUZZAH ESP8266
+# espino                esp8266        80Mhz     4096Kb  80Kb   ESPino
+# esp12e                esp8266        80Mhz     4096Kb  80Kb   Espressif ESP8266 ESP-12E
+# esp01_1m              esp8266        80Mhz     1024Kb  80Kb   Espressif Generic ESP8266 ESP-01 1M
+# esp01                 esp8266        80Mhz     512Kb   80Kb   Espressif Generic ESP8266 ESP-01 512k
+# nodemcu               esp8266        80Mhz     4096Kb  80Kb   NodeMCU 0.9 & 1.0
+# modwifi               esp8266        80Mhz     2048Kb  80Kb   Olimex MOD-WIFI-ESP8266(-DEV)
 # thing                 esp8266        80Mhz     512Kb   80Kb   SparkFun ESP8266 Thing
-# esp210                esp8266        80Mhz     1024Kb  80Kb   SweetPea ESP-210
-# d1                    esp8266        80Mhz     1024Kb  80Kb   WeMos D1
-# d1_mini               esp8266        80Mhz     1024Kb  80Kb   WeMos D1 mini
+# esp210                esp8266        80Mhz     4096Kb  80Kb   SweetPea ESP-210
+# d1                    esp8266        80Mhz     4096Kb  80Kb   WeMos D1
+# d1_mini               esp8266        80Mhz     4096Kb  80Kb   WeMos D1 mini
 # ...
+#
+# The rest of Board/MCU variations with the different Flash/SPIFFS can be customized using extra LD Script.
+# PlatformIO contains the popular LD scripts.
+# See http://docs.platformio.org/en/latest/platforms/espressif.html#custom-flash-size
+#
 
 #
 # Initialise base project
