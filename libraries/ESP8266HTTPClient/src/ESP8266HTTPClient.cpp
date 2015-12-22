@@ -354,10 +354,14 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
 
     if(buff) {
         // read all data from stream and send it to server
-        while(connected() && stream->available() && (len > 0 || len == -1)) {
+        while(connected() && (stream->available() != -1) && (len > 0 || len == -1)) {
 
             // get available data size
             size_t s = stream->available();
+
+            if(len) {
+                s = ((s > len) ? len : s);
+            }
 
             if(s) {
                 int c = stream->readBytes(buff, ((s > buff_size) ? buff_size : s));
