@@ -24,7 +24,9 @@
  #include <stddef.h>
  #include <stdbool.h>
 
-static const uint8_t phy_init_data[128] =
+#include "c_types.h"
+
+static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 {
     [0] = 5,  // Reserved, do not change
     [1] = 0,  // Reserved, do not change
