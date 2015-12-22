@@ -39,6 +39,16 @@
 #include "user_interface.h"
 #include "debug.h"
 
+extern void *__real_pvPortMalloc(size_t xWantedSize, const char* file, int line);
+extern void *__wrap_pvPortMalloc(size_t xWantedSize, const char* file, int line){
+  return __real_pvPortMalloc(((xWantedSize + 3) & ~((size_t)0x3)), file, line);
+}
+
+extern void *__real_pvPortRealloc(void* ptr, size_t xWantedSize, const char* file, int line);
+extern void *__wrap_pvPortRealloc(void* ptr, size_t xWantedSize, const char* file, int line){
+  return __real_pvPortRealloc(ptr, ((xWantedSize + 3) & ~((size_t)0x3)), file, line);
+}
+
 void* ICACHE_RAM_ATTR malloc(size_t size) {
     size = ((size + 3) & ~((size_t)0x3));
     return os_malloc(size);
