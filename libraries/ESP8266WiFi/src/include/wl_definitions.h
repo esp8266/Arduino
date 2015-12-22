@@ -68,4 +68,22 @@ enum wl_enc_type {  /* Values map to 802.11 encryption suites... */
         ENC_TYPE_AUTO = 8
 };
 
+#ifndef __LWIP_TCP_H__
+#ifndef LWIP_INTERNAL
+enum wl_tcp_state {
+  CLOSED      = 0,
+  LISTEN      = 1,
+  SYN_SENT    = 2,
+  SYN_RCVD    = 3,
+  ESTABLISHED = 4,
+  FIN_WAIT_1  = 5,
+  FIN_WAIT_2  = 6,
+  CLOSE_WAIT  = 7,
+  CLOSING     = 8,
+  LAST_ACK    = 9,
+  TIME_WAIT   = 10
+};
+#endif
+#endif
+
 #endif /* WL_DEFINITIONS_H_ */
