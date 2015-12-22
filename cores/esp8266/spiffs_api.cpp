@@ -495,7 +495,7 @@ static bool isSpiffsFilenameValid(const char* name) {
     if (name == nullptr)
         return false;
     auto len = strlen(name);
-    return len > 0 && len <= SPIFFS_OBJ_NAME_LEN;
+    return len > 0 && len < SPIFFS_OBJ_NAME_LEN;
 }
 
 // these symbols should be defined in the linker script for each flash layout

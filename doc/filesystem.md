@@ -169,8 +169,14 @@ struct FSInfo {
 };
 ```
 
-This is the structure which may be filled using FS::info method. Field names
-are self-explanatory.
+This is the structure which may be filled using FS::info method.
+- `totalBytes` — total size of useful data on the file system
+- `usedBytes` — number of bytes used by files
+- `blockSize` — SPIFFS block size
+- `pageSize` — SPIFFS logical page size
+- `maxOpenFiles` — max number of files which may be open simultaneously
+- `maxPathLength` — max file name length (including one byte for zero termination)
+
 
 ## Directory object (Dir)
 
