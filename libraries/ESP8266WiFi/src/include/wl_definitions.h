@@ -83,6 +83,5 @@ enum wl_tcp_state {
   TIME_WAIT   = 10
 };
 #endif
-#endif
 
 #endif /* WL_DEFINITIONS_H_ */
