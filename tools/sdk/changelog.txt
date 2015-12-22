@@ -1,3 +1,9 @@
+esp_iot_sdk_v1.5.0_15_12_15_p1 Release Note
+----------------------------------------
+Here is a patch based on ESP8266_NONOS_SDK_V1.5.0 solved a problem that calling espconn_abort may cause unexpected reset.
+
+Sorry for the inconvenience.
+
 esp_iot_sdk_v1.5.0_15_11_27 Release Note
 ----------------------------------------
 Resolved Issues (Bugs listed below apply to Bug Bounty Program):

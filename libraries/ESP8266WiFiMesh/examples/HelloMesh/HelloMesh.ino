@@ -1,6 +1,9 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMesh.h>
 
+unsigned int request_i = 0;
+unsigned int response_i = 0;
+
 /* Create the mesh node object */
 ESP8266WiFiMesh mesh_node = ESP8266WiFiMesh(ESP.getChipId(), manageRequest);
 
@@ -17,7 +20,9 @@ String manageRequest(String request)
 	Serial.println(request);
 
 	/* return a string to send back */
-	return String("Hello world response.");
+	char response[60];
+	sprintf(response, "Hello world response #%d from Mesh_Node%d.", response_i++, ESP.getChipId());
+	return response;
 }
 
 void setup()
@@ -39,6 +44,8 @@ void loop()
 	mesh_node.acceptRequest();
 
 	/* Scan for other nodes and send them a message */
-	mesh_node.attemptScan("Hello world request.");
+	char request[60];
+	sprintf(request, "Hello world request #%d from Mesh_Node%d.", request_i++, ESP.getChipId());
+	mesh_node.attemptScan(request);
 	delay(1000);
 }

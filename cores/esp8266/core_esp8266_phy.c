@@ -24,7 +24,9 @@
  #include <stddef.h>
  #include <stdbool.h>
 
-static uint8_t phy_init_data[128] =
+#include "c_types.h"
+
+static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 {
     [0] = 5,  // Reserved, do not change
     [1] = 0,  // Reserved, do not change
@@ -241,9 +243,12 @@ static uint8_t phy_init_data[128] =
 };
 
 extern int __real_register_chipv6_phy(uint8_t* init_data);
-extern int __wrap_register_chipv6_phy(uint8_t* unused) {
-    phy_init_data[107] = __get_adc_mode();
-    return __real_register_chipv6_phy(phy_init_data);
+extern int __wrap_register_chipv6_phy(uint8_t* init_data) {
+    if (init_data != NULL) {
+      memcpy(init_data, phy_init_data, sizeof(phy_init_data));
+      init_data[107] = __get_adc_mode();
+    }
+    return __real_register_chipv6_phy(init_data);
 }
 
 extern int __get_rf_mode(void)  __attribute__((weak));
