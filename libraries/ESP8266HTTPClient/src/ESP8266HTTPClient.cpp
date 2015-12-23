@@ -386,7 +386,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
         }
 
     } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] too less ram! need " HTTP_TCP_BUFFER_SIZE);
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] too less ram! need %d\n", HTTP_TCP_BUFFER_SIZE);
         return HTTPC_ERROR_TOO_LESS_RAM;
     }
 
@@ -491,7 +491,7 @@ int HTTPClient::writeToStream(Stream * stream) {
         }
 
     } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] too less ram! need " HTTP_TCP_BUFFER_SIZE);
+        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] too less ram! need %d\n", HTTP_TCP_BUFFER_SIZE);
         return HTTPC_ERROR_TOO_LESS_RAM;
     }
 
