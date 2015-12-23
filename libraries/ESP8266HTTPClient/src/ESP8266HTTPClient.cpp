@@ -368,11 +368,11 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
 
                 // write it to Stream
                 int w = _tcp->write((const uint8_t *) buff, c);
+                bytesWritten += w;
                 if(w != c) {
                     DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] short write asked for %d but got %d\n", c, w);
                     break;
                 }
-                bytesWritten += c;
 
                 if(len > 0) {
                     len -= c;
@@ -480,11 +480,11 @@ int HTTPClient::writeToStream(Stream * stream) {
 
                 // write it to Stream
                 int w = stream->write(buff, c);
+                bytesWritten += w;
                 if(w != c) {
                     DEBUG_HTTPCLIENT("[HTTP-Client][writeToStream] short write asked for %d but got %d\n", c, w);
                     break;
                 }
-                bytesWritten += c;
 
                 if(len > 0) {
                     len -= c;
