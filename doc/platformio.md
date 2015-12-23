@@ -71,5 +71,8 @@ platformio run --target upload
 - [IDE Integration](http://docs.platformio.org/en/latest/ide.html) (Atom, CLion, Eclipse, Qt Creator, Sublime Text, VIM, Visual Studio)
 - [Project Examples](http://docs.platformio.org/en/latest/platforms/espressif.html#examples)
 
-## Demo of OTA update
-[![PlatformIO and OTA firmware uploading to Espressif ESP8266 ESP-01](http://img.youtube.com/vi/W8wWjvQ8ZQs/0.jpg)](http://www.youtube.com/watch?v=W8wWjvQ8ZQs "PlatformIO and OTA firmware uploading to Espressif ESP8266 ESP-01")
+## Demo of Over-the-Air (OTA) ESP8266 programming using PlatformIO
+
+http://www.penninkhof.com/2015/12/1610-over-the-air-esp8266-programming-using-platformio/
+
+[![Over-the-Air ESP8266 programming using PlatformIO](http://img.youtube.com/vi/lXchL3hpDO4/0.jpg)](http://www.youtube.com/watch?v=lXchL3hpDO4 "Over-the-Air ESP8266 programming using PlatformIO")

@@ -60,6 +60,10 @@ void cont_yield(cont_t*);
 // return 1 if guard bytes were overwritten.
 int cont_check(cont_t* cont);
 
+// Go through stack and check how many bytes are most probably still unchanged
+// and thus weren't used by the user code. i.e. that stack space is free. (high water mark)
+int cont_get_free_stack(cont_t* cont);
+
 // Check if yield() may be called. Returns true if we are running inside
 // continuation stack
 bool cont_can_yield(cont_t* cont);
