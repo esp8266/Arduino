@@ -3,6 +3,7 @@
 
 class RequestHandler {
 public:
+    virtual ~RequestHandler() { }
     virtual bool canHandle(HTTPMethod method, String uri) { return false; }
     virtual bool canUpload(String uri) { return false; }
     virtual bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) { return false; }
