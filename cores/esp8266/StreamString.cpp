@@ -25,14 +25,10 @@
 
 size_t StreamString::write(const uint8_t *buffer, size_t size) {
     if(reserve(length() + size + 1)) {
-        for(size_t i = 0; i < size; i++) {
-            if(write(*buffer)) {
-                buffer++;
-            } else {
-                return i;
-            }
-        }
-
+        const uint8_t *s = buffer;
+        const uint8_t *end = buffer + size;
+        while(write(*s++) && s < end);
+        return s - buffer;
     }
     return 0;
 }
