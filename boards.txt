@@ -810,7 +810,7 @@ wifinfo.serial.disableDTR=true
 wifinfo.serial.disableRTS=true
 
 wifinfo.build.mcu=esp8266
-wifinfo.build.f_cpu=80000000L
+wifinfo.build.f_cpu=160000000L
 wifinfo.build.core=esp8266
 wifinfo.build.variant=wifinfo
 wifinfo.build.flash_mode=qio
