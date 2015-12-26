@@ -897,6 +897,43 @@ void ESP8266WiFiClass::_smartConfigCallback(uint32_t st, void* result)
     }
 }
 
+
+//--------------------------------------------------------------
+
+/**
+ * set Sleep mode
+ * @param type sleep_type_t
+ * @return bool
+ */
+bool ESP8266WiFiClass::setSleepMode(WiFiSleepType_t type) {
+    return wifi_set_sleep_type((sleep_type_t)type);
+}
+
+/**
+ * get Sleep mode
+ * @return sleep_type_t
+ */
+WiFiSleepType_t ESP8266WiFiClass::getSleepMode() {
+    return (WiFiSleepType_t)wifi_get_sleep_type();
+}
+
+/**
+ * set phy Mode
+ * @param mode phy_mode_t
+ * @return bool
+ */
+bool ESP8266WiFiClass::setPhyMode(WiFiPhyMode_t mode) {
+    return wifi_set_phy_mode((phy_mode_t)mode);
+}
+
+/**
+ * get phy Mode
+ * @return phy_mode_t
+ */
+WiFiPhyMode_t ESP8266WiFiClass::getPhyMode() {
+    return (WiFiPhyMode_t)wifi_get_phy_mode();
+}
+
 //--------------------------------------------------------------
 
 void ESP8266WiFiClass::_eventCallback(void* arg)
