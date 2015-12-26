@@ -36,7 +36,20 @@ extern "C" {
 #define WIFI_SCAN_RUNNING   (-1)
 #define WIFI_SCAN_FAILED     (-2)
 
+
+// Note:
+// this enums need to be in sync with the SDK!
+
 enum WiFiMode { WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3 };
+
+typedef enum {
+    WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
+} WiFiPhyMode_t;
+
+typedef enum {
+    WIFI_NONE_SLEEP = 0, WIFI_LIGHT_SLEEP = 2, WIFI_MODEM_SLEEP = 3
+} WiFiSleepType_t;
+
 
 class ESP8266WiFiClass
 {
@@ -374,6 +387,32 @@ public:
 
     friend class WiFiClient;
     friend class WiFiServer;
+
+    /**
+     * set Sleep mode
+     * @param type WiFiPhyMode_t
+     * @return bool
+     */
+    bool setSleepMode(WiFiSleepType_t type);
+
+    /**
+     * get Sleep mode
+     * @return sleep_type_t
+     */
+    WiFiSleepType_t getSleepMode();
+
+    /**
+     * set phy Mode
+     * @param mode phy_mode_t
+     * @return bool
+     */
+    bool setPhyMode(WiFiPhyMode_t mode);
+
+    /**
+     * get phy Mode
+     * @return phy_mode_t
+     */
+    WiFiPhyMode_t getPhyMode();
 
 protected:
     void _mode(WiFiMode);
