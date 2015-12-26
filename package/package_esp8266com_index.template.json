@@ -55,6 +55,9 @@
             {
               "name": "WifInfo"
             }
+            {
+              "name": "ESPDuino"
+            },
           ],
           "toolsDependencies": [
             {
