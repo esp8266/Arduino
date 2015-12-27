@@ -31,7 +31,7 @@
 #define DEBUG_HTTPCLIENT(...)
 #endif
 
-#define HTTPCLIENT_TCP_TIMEOUT (1000)
+#define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (1000)
 
 /// HTTP client errors
 #define HTTPC_ERROR_CONNECTION_REFUSED  (-1)
@@ -127,6 +127,7 @@ class HTTPClient {
         void setUserAgent(const char * userAgent);
         void setAuthorization(const char * user, const char * password);
         void setAuthorization(const char * auth);
+        void setTimeout(uint16_t timeout);
 
         /// request handling
         int GET();
@@ -170,7 +171,7 @@ class HTTPClient {
         String _host;
         uint16_t _port;
         bool _reuse;
-
+        uint16_t _tcpTimeout;
 
         String _url;
         bool _https;
