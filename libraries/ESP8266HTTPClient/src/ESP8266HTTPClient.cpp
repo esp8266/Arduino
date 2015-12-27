@@ -259,6 +259,9 @@ void HTTPClient::setAuthorization(const char * auth) {
  */
 void HTTPClient::setTimeout(uint16_t timeout) {
     _tcpTimeout = timeout;
+    if(connected()) {
+        _tcp->setTimeout(timeout);
+    }
 }
 
 /**
