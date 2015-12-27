@@ -333,30 +333,30 @@ void wifi_set_promiscuous_rx_cb(wifi_promiscuous_cb_t cb);
 
 void wifi_promiscuous_set_mac(const uint8_t *address);
 
-enum phy_mode {
+typedef enum {
 	PHY_MODE_11B	= 1,
 	PHY_MODE_11G	= 2,
 	PHY_MODE_11N    = 3
-};
+} phy_mode_t;
 
-enum phy_mode wifi_get_phy_mode(void);
-bool wifi_set_phy_mode(enum phy_mode mode);
+phy_mode_t wifi_get_phy_mode(void);
+bool wifi_set_phy_mode(phy_mode_t mode);
 
-enum sleep_type {
+typedef enum {
 	NONE_SLEEP_T	= 0,
 	LIGHT_SLEEP_T,
 	MODEM_SLEEP_T
-};
+} sleep_type_t;
 
-bool wifi_set_sleep_type(enum sleep_type type);
-enum sleep_type wifi_get_sleep_type(void);
+bool wifi_set_sleep_type(sleep_type_t type);
+sleep_type_t wifi_get_sleep_type(void);
 
 void wifi_fpm_open(void);
 void wifi_fpm_close(void);
 void wifi_fpm_do_wakeup(void);
 sint8 wifi_fpm_do_sleep(uint32 sleep_time_in_us);
-void wifi_fpm_set_sleep_type(enum sleep_type type);
-enum sleep_type wifi_fpm_get_sleep_type(void);
+void wifi_fpm_set_sleep_type(sleep_type_t type);
+sleep_type_t wifi_fpm_get_sleep_type(void);
 
 enum {
     EVENT_STAMODE_CONNECTED = 0,
