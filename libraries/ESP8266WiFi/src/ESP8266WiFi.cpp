@@ -106,12 +106,21 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
 // ---------------------------------------------------- ESP8266WiFiClass -------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-ESP8266WiFiClass::ESP8266WiFiClass() :
-        _smartConfigStarted(false), _smartConfigDone(false), _useStaticIp(false), _persistent(true) {
+ESP8266WiFiClass::ESP8266WiFiClass()  {
+
+    _useStaticIp = false;
+
     uint8 m = wifi_get_opmode();
-    _useClientMode = (m & WIFI_STA);
     _useApMode = (m & WIFI_AP);
+    _useClientMode = (m & WIFI_STA);
+
+    _persistent = true;
+
+    _smartConfigStarted = false;
+    _smartConfigDone = false;
+
     wifi_set_event_handler_cb((wifi_event_handler_cb_t) &ESP8266WiFiClass::_eventCallback);
+
 }
 
 /**

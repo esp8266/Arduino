@@ -52,12 +52,25 @@ typedef enum {
 } WiFiSleepType_t;
 
 class ESP8266WiFiClass {
+
+        // ----------------------------------------------------------------------------------------------
+        // -------------------------------------- ESP8266WiFiClass --------------------------------------
+        // ----------------------------------------------------------------------------------------------
+
     public:
+
         ESP8266WiFiClass();
+
+    protected:
+
+        static void _eventCallback(void *event);
 
         // ----------------------------------------------------------------------------------------------
         // ---------------------------------------- STA function ----------------------------------------
         // ----------------------------------------------------------------------------------------------
+
+    public:
+
         int begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
         int begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
         int begin();
@@ -94,9 +107,16 @@ class ESP8266WiFiClass {
 
         int32_t RSSI();
 
+    protected:
+
+        bool _useStaticIp;
+
         // ----------------------------------------------------------------------------------------------
         // ----------------------------------------- AP function ----------------------------------------
         // ----------------------------------------------------------------------------------------------
+
+    public:
+
         void softAP(const char* ssid, const char* passphrase = NULL, int channel = 1, int ssid_hidden = 0);
         void softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
         int softAPdisconnect(bool wifioff = false);
@@ -106,9 +126,13 @@ class ESP8266WiFiClass {
         uint8_t* softAPmacAddress(uint8_t* mac);
         String softAPmacAddress(void);
 
+    protected:
+
         // ----------------------------------------------------------------------------------------------
         // ----------------------------------------- scan function --------------------------------------
         // ----------------------------------------------------------------------------------------------
+
+    public:
 
         int8_t scanNetworks(bool async = false, bool show_hidden = false);
 
@@ -126,9 +150,23 @@ class ESP8266WiFiClass {
         int32_t channel(uint8_t networkItem);
         bool isHidden(uint8_t networkItem);
 
+    protected:
+
+        static bool _scanAsync;
+        static bool _scanStarted;
+        static bool _scanComplete;
+
+        static size_t _scanCount;
+        static void* _scanResult;
+
+        static void _scanDone(void* result, int status);
+        void * _getScanInfoByIndex(int i);
+
         // ----------------------------------------------------------------------------------------------
         // -------------------------------------- Generic WiFi function ---------------------------------
         // ----------------------------------------------------------------------------------------------
+
+    public:
 
         int32_t channel(void);
 
@@ -142,16 +180,27 @@ class ESP8266WiFiClass {
         void mode(WiFiMode);
         WiFiMode getMode();
 
+    protected:
+        bool _useApMode;
+        bool _useClientMode;
+        bool _persistent;
+        void _mode(WiFiMode);
+
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------ Generic Network function --------------------------------
         // ----------------------------------------------------------------------------------------------
 
+    public:
+
         int hostByName(const char* aHostname, IPAddress& aResult);
 
+    protected:
 
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------ STA remote configure  -----------------------------------
         // ----------------------------------------------------------------------------------------------
+
+    public:
 
         bool beginWPSConfig(void);
 
@@ -159,31 +208,22 @@ class ESP8266WiFiClass {
         bool smartConfigDone();
         void stopSmartConfig();
 
+    protected:
+
+        bool _smartConfigStarted;
+        bool _smartConfigDone;
+        static void _smartConfigCallback(uint32_t status, void* result);
 
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------------- Debug --------------------------------------------
         // ----------------------------------------------------------------------------------------------
 
+    public:
+
         void printDiag(Print& dest);
 
         friend class WiFiClient;
         friend class WiFiServer;
-
-    protected:
-        void _mode(WiFiMode);
-        static void _scanDone(void* result, int status);
-        void * _getScanInfoByIndex(int i);
-        static void _smartConfigCallback(uint32_t status, void* result);
-        static void _eventCallback(void *event);bool _smartConfigStarted;bool _smartConfigDone;
-
-        bool _useApMode;bool _useClientMode;bool _useStaticIp;bool _persistent;
-
-        static bool _scanAsync;
-        static bool _scanStarted;
-        static bool _scanComplete;
-
-        static size_t _scanCount;
-        static void* _scanResult;
 
 };
 
