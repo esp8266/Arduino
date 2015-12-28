@@ -112,6 +112,15 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
     return true;
 }
 
+/**
+ * Start Wifi connection
+ * if passphrase is set the most secure supported mode will be automatically selected
+ * @param ssid const char*          Pointer to the SSID string.
+ * @param passphrase const char *   Optional. Passphrase. Valid characters in a passphrase must be between ASCII 32-126 (decimal).
+ * @param bssid uint8_t[6]          Optional. BSSID / MAC of AP
+ * @param channel                   Optional. Channel of AP
+ * @return
+ */
 int ESP8266WiFiClass::begin(char* ssid, char *passphrase, int32_t channel, const uint8_t* bssid) {
     return begin((const char*) ssid, (const char*) passphrase, channel, bssid);
 }
@@ -177,16 +186,26 @@ int ESP8266WiFiClass::begin(const char* ssid, const char *passphrase, int32_t ch
     return status();
 }
 
+/**
+ * Use to connect to SDK config.
+ * @return wl_status_t
+ */
 int ESP8266WiFiClass::begin() {
     ETS_UART_INTR_DISABLE();
     wifi_station_connect();
     ETS_UART_INTR_ENABLE();
 
+    // TODO is static ip not stored in SDK?
     if(!_useStaticIp)
         wifi_station_dhcpc_start();
     return status();
 }
 
+/**
+ * Wait for WiFi connection to reach a result
+ * returns the status reached or disconnect if STA is off
+ * @return wl_status_t
+ */
 uint8_t ESP8266WiFiClass::waitForConnectResult() {
     if((wifi_get_opmode() & 1) == 0) //1 and 3 have STA enabled
         return WL_DISCONNECTED;
@@ -195,7 +214,12 @@ uint8_t ESP8266WiFiClass::waitForConnectResult() {
     return status();
 }
 
-// You will have to set the DNS-Server manually later since this will not enable DHCP2
+/**
+ * Change IP configuration settings disabling the dhcp client
+ * @param local_ip  Static ip configuration
+ * @param gateway   Static gateway configuration
+ * @param subnet    Static Subnet mask
+ */
 void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
     struct ip_info info;
     info.ip.addr = static_cast<uint32_t>(local_ip);
@@ -208,6 +232,13 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
     _useStaticIp = true;
 }
 
+/**
+ * Change IP configuration settings disabling the dhcp client
+ * @param local_ip   Static ip configuration
+ * @param gateway    Static gateway configuration
+ * @param subnet     Static Subnet mask
+ * @param dns        Static DNS server
+ */
 void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns) {
     struct ip_info info;
     info.ip.addr = static_cast<uint32_t>(local_ip);
@@ -225,6 +256,11 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
     _useStaticIp = true;
 }
 
+/**
+ * Disconnect from the network (close AP)
+ * @param wifioff disable mode?
+ * @return one value of wl_status_t enum
+ */
 int ESP8266WiFiClass::softAPdisconnect(bool wifioff) {
     struct softap_config conf;
     *conf.ssid = 0;
@@ -248,9 +284,15 @@ int ESP8266WiFiClass::softAPdisconnect(bool wifioff) {
         }
     }
 
+    //TODO return with more meaning ?
     return 0;
 }
 
+/**
+ * Disconnect from the network
+ * @param wifioff
+ * @return  one value of wl_status_t enum
+ */
 int ESP8266WiFiClass::disconnect(bool wifioff) {
     struct station_config conf;
     *conf.ssid = 0;
@@ -274,7 +316,7 @@ int ESP8266WiFiClass::disconnect(bool wifioff) {
             _mode(WIFI_OFF);
         }
     }
-
+    //TODO return with more meaning ?
     return 0;
 }
 
@@ -290,10 +332,13 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
     return true;
 }
 
-void ESP8266WiFiClass::softAP(const char* ssid) {
-    softAP(ssid, 0);
-}
-
+/**
+ * Set up an access point
+ * @param ssid          Pointer to the SSID (max 63 char).
+ * @param passphrase    (for WPA2 min 8 char, for open use NULL)
+ * @param channel       WiFi channel number, 1 - 13.
+ * @param ssid_hidden   Network cloaking (0 = broadcast SSID, 1 = hide SSID)
+ */
 void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int channel, int ssid_hidden) {
     _useApMode = true;
     if(_useClientMode) {
@@ -346,6 +391,12 @@ void ESP8266WiFiClass::softAP(const char* ssid, const char* passphrase, int chan
     ETS_UART_INTR_ENABLE();
 }
 
+/**
+ * Configure access point
+ * @param local_ip      access point IP
+ * @param gateway       gateway IP
+ * @param subnet        subnet mask
+ */
 void ESP8266WiFiClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
     struct ip_info info;
     info.ip.addr = static_cast<uint32_t>(local_ip);
@@ -356,11 +407,20 @@ void ESP8266WiFiClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAdd
     wifi_softap_dhcps_start();
 }
 
+/**
+ * Get the station interface MAC address.
+ * @param mac   pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+ * @return      pointer to uint8_t *
+ */
 uint8_t* ESP8266WiFiClass::macAddress(uint8_t* mac) {
     wifi_get_macaddr(STATION_IF, mac);
     return mac;
 }
 
+/**
+ * Get the station interface MAC address.
+ * @return String mac
+ */
 String ESP8266WiFiClass::macAddress(void) {
     uint8_t mac[6];
     char macStr[18] = { 0 };
@@ -370,11 +430,21 @@ String ESP8266WiFiClass::macAddress(void) {
     return String(macStr);
 }
 
+
+/**
+ * Get the softAP interface MAC address.
+ * @param mac   pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
+ * @return      pointer to uint8_t*
+ */
 uint8_t* ESP8266WiFiClass::softAPmacAddress(uint8_t* mac) {
     wifi_get_macaddr(SOFTAP_IF, mac);
     return mac;
 }
 
+/**
+ * Get the softAP interface MAC address.
+ * @return String mac
+ */
 String ESP8266WiFiClass::softAPmacAddress(void) {
     uint8_t mac[6];
     char macStr[18] = { 0 };
@@ -384,53 +454,93 @@ String ESP8266WiFiClass::softAPmacAddress(void) {
     return String(macStr);
 }
 
+/**
+ * Get the station interface IP address.
+ * @return IPAddress station IP
+ */
 IPAddress ESP8266WiFiClass::localIP() {
     struct ip_info ip;
     wifi_get_ip_info(STATION_IF, &ip);
     return IPAddress(ip.ip.addr);
 }
 
+/**
+ * Get the softAP interface IP address.
+ * @return IPAddress softAP IP
+ */
 IPAddress ESP8266WiFiClass::softAPIP() {
     struct ip_info ip;
     wifi_get_ip_info(SOFTAP_IF, &ip);
     return IPAddress(ip.ip.addr);
 }
 
+/**
+ * Get the interface subnet mask address.
+ * @return IPAddress subnetMask
+ */
 IPAddress ESP8266WiFiClass::subnetMask() {
     struct ip_info ip;
     wifi_get_ip_info(STATION_IF, &ip);
     return IPAddress(ip.netmask.addr);
 }
 
+/**
+ * Get the gateway ip address.
+ * @return IPAddress gatewayIP
+ */
 IPAddress ESP8266WiFiClass::gatewayIP() {
     struct ip_info ip;
     wifi_get_ip_info(STATION_IF, &ip);
     return IPAddress(ip.gw.addr);
 }
 
-IPAddress ESP8266WiFiClass::dnsIP(int dns_no) {
+/**
+ * Get the DNS ip address.
+ * @param dns_no
+ * @return IPAddress DNS Server IP
+ */
+IPAddress ESP8266WiFiClass::dnsIP(uint8_t dns_no) {
     ip_addr_t dns_ip = dns_getserver(dns_no);
     return IPAddress(dns_ip.addr);
 }
 
+
+/**
+ * Return the current SSID associated with the network
+ * @return SSID
+ */
 String ESP8266WiFiClass::SSID() const {
+    // TODO why static, needs RAM for nothing?
     static struct station_config conf;
     wifi_station_get_config(&conf);
     return String(reinterpret_cast<char*>(conf.ssid));
 }
 
+/**
+ * Return the current pre shared key associated with the network
+ * @return  psk string
+ */
 String ESP8266WiFiClass::psk() const {
     static struct station_config conf;
     wifi_station_get_config(&conf);
     return String(reinterpret_cast<char*>(conf.password));
 }
 
+
+/**
+ * Return the current bssid / mac associated with the network if configured
+ * @return bssid uint8_t *
+ */
 uint8_t* ESP8266WiFiClass::BSSID(void) {
     static struct station_config conf;
     wifi_station_get_config(&conf);
     return reinterpret_cast<uint8_t*>(conf.bssid);
 }
 
+/**
+ * Return the current bssid / mac associated with the network if configured
+ * @return String bssid mac
+ */
 String ESP8266WiFiClass::BSSIDstr(void) {
     static struct station_config conf;
     char mac[18] = { 0 };
@@ -439,10 +549,18 @@ String ESP8266WiFiClass::BSSIDstr(void) {
     return String(mac);
 }
 
+/**
+ * Return the current channel associated with the network
+ * @return channel (1-13)
+ */
 int32_t ESP8266WiFiClass::channel(void) {
     return wifi_get_channel();
 }
 
+/**
+ * Return the current network RSSI.
+ * @return  RSSI value
+ */
 int32_t ESP8266WiFiClass::RSSI(void) {
     return wifi_station_get_rssi();
 }
@@ -486,6 +604,12 @@ void ESP8266WiFiClass::_scanDone(void* result, int status) {
     }
 }
 
+/**
+ * called to get the scan state in Async mode
+ * @return scan result or status
+ *          -1 if scan not fin
+ *          -2 if scan not triggered
+ */
 int8_t ESP8266WiFiClass::scanComplete() {
 
     if(_scanStarted) {
@@ -499,6 +623,9 @@ int8_t ESP8266WiFiClass::scanComplete() {
     return WIFI_SCAN_FAILED;
 }
 
+/**
+ * delete last scan result from RAM
+ */
 void ESP8266WiFiClass::scanDelete() {
     if(ESP8266WiFiClass::_scanResult) {
         delete[] reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult);
@@ -508,6 +635,12 @@ void ESP8266WiFiClass::scanDelete() {
     _scanComplete = false;
 }
 
+/**
+ * Start scan WiFi networks available
+ * @param async         run in async mode
+ * @param show_hidden   show hidden networks
+ * @return Number of discovered networks
+ */
 int8_t ESP8266WiFiClass::scanNetworks(bool async, bool show_hidden) {
     if(ESP8266WiFiClass::_scanStarted) {
         return WIFI_SCAN_RUNNING;
@@ -560,6 +693,11 @@ void * ESP8266WiFiClass::_getScanInfoByIndex(int i) {
     return reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult) + i;
 }
 
+/**
+ * Return the SSID discovered during the network scan.
+ * @param i     specify from which network item want to get the information
+ * @return       ssid string of the specified item on the networks scanned list
+ */
 String ESP8266WiFiClass::SSID(uint8_t i) {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if(!it)
@@ -568,6 +706,11 @@ String ESP8266WiFiClass::SSID(uint8_t i) {
     return String(reinterpret_cast<const char*>(it->ssid));
 }
 
+/**
+ * return MAC / BSSID of scanned wifi
+ * @param i specify from which network item want to get the information
+ * @return uint8_t * MAC / BSSID of scanned wifi
+ */
 uint8_t * ESP8266WiFiClass::BSSID(uint8_t i) {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if(!it)
@@ -576,6 +719,11 @@ uint8_t * ESP8266WiFiClass::BSSID(uint8_t i) {
     return it->bssid;
 }
 
+/**
+ * return MAC / BSSID of scanned wifi
+ * @param networkItem specify from which network item want to get the information
+ * @return String MAC / BSSID of scanned wifi
+ */
 String ESP8266WiFiClass::BSSIDstr(uint8_t i) {
     char mac[18] = { 0 };
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
@@ -594,6 +742,11 @@ int32_t ESP8266WiFiClass::channel(uint8_t i) {
     return it->channel;
 }
 
+/**
+ * return if the scanned wifi is Hidden (no SSID)
+ * @param networkItem specify from which network item want to get the information
+ * @return bool (true == hidden)
+ */
 bool ESP8266WiFiClass::isHidden(uint8_t i) {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if(!it)
@@ -602,6 +755,17 @@ bool ESP8266WiFiClass::isHidden(uint8_t i) {
     return (it->is_hidden != 0);
 }
 
+/**
+ * loads all infos from a scanned wifi in to the ptr parameters
+ * @param networkItem uint8_t
+ * @param ssid  const char**
+ * @param encryptionType uint8_t *
+ * @param RSSI int32_t *
+ * @param BSSID uint8_t **
+ * @param channel int32_t *
+ * @param isHidden bool *
+ * @return (true if ok)
+ */
 bool ESP8266WiFiClass::getNetworkInfo(uint8_t i, String &ssid, uint8_t &encType, int32_t &rssi, uint8_t* &bssid, int32_t &channel, bool &isHidden) {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if(!it)
@@ -617,6 +781,11 @@ bool ESP8266WiFiClass::getNetworkInfo(uint8_t i, String &ssid, uint8_t &encType,
     return true;
 }
 
+/**
+ * Return the RSSI of the networks discovered during the scanNetworks
+ * @param i specify from which network item want to get the information
+ * @return  signed value of RSSI of the specified item on the networks scanned list
+ */
 int32_t ESP8266WiFiClass::RSSI(uint8_t i) {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if(!it)
@@ -625,6 +794,11 @@ int32_t ESP8266WiFiClass::RSSI(uint8_t i) {
     return it->rssi;
 }
 
+/**
+ * Return the encryption type of the networks discovered during the scanNetworks
+ * @param i specify from which network item want to get the information
+ * @return  encryption type (enum wl_enc_type) of the specified item on the networks scanned list
+ */
 uint8_t ESP8266WiFiClass::encryptionType(uint8_t i) {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if(!it)
@@ -644,6 +818,11 @@ uint8_t ESP8266WiFiClass::encryptionType(uint8_t i) {
     return -1;
 }
 
+/**
+ * Return Connection status.
+ * @return one of the value defined in wl_status_t
+ *
+ */
 wl_status_t ESP8266WiFiClass::status() {
     int status = wifi_station_get_connect_status();
 
@@ -665,6 +844,13 @@ void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback
     esp_schedule(); // resume the hostByName function
 }
 
+/**
+ * Resolve the given hostname to an IP address.
+ * @param aHostname     Name to be resolved
+ * @param aResult       IPAddress structure to store the returned IP address
+ * @return 1 if aIPAddrString was successfully converted to an IP address,
+ *          else error code
+ */
 int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult) {
     ip_addr_t addr;
     aResult = static_cast<uint32_t>(0);
@@ -679,10 +865,20 @@ int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult) {
     return (aResult != 0) ? 1 : 0;
 }
 
+/**
+ * Get ESP8266 station DHCP hostname
+ * @return hostname
+ */
 String ESP8266WiFiClass::hostname(void) {
     return String(wifi_station_get_hostname());
 }
 
+
+/**
+ * Set ESP8266 station DHCP hostname
+ * @param aHostname max length:32
+ * @return ok
+ */
 bool ESP8266WiFiClass::hostname(char* aHostname) {
     if(strlen(aHostname) > 32) {
         return false;
@@ -690,10 +886,20 @@ bool ESP8266WiFiClass::hostname(char* aHostname) {
     return wifi_station_set_hostname(aHostname);
 }
 
+/**
+ * Set ESP8266 station DHCP hostname
+ * @param aHostname max length:32
+ * @return ok
+ */
 bool ESP8266WiFiClass::hostname(const char* aHostname) {
     return hostname((char*) aHostname);
 }
 
+/**
+ * Set ESP8266 station DHCP hostname
+ * @param aHostname max length:32
+ * @return ok
+ */
 bool ESP8266WiFiClass::hostname(String aHostname) {
     return hostname((char*) aHostname.c_str());
 }
@@ -724,6 +930,11 @@ void wifi_wps_status_cb(wps_cb_status status) {
     esp_schedule(); // resume the beginWPSConfig function
 }
 
+/**
+ * WPS config
+ * so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
+ * @return ok
+ */
 bool ESP8266WiFiClass::beginWPSConfig(void) {
 
     _useClientMode = true;
@@ -769,6 +980,9 @@ bool ESP8266WiFiClass::beginWPSConfig(void) {
 
 //--------------------------------------------------------------
 
+/**
+ * Start SmartConfig
+ */
 void ESP8266WiFiClass::beginSmartConfig() {
     if(_smartConfigStarted)
         return;
@@ -788,6 +1002,10 @@ void ESP8266WiFiClass::beginSmartConfig() {
     smartconfig_start(reinterpret_cast<sc_callback_t>(&ESP8266WiFiClass::_smartConfigCallback), 1);
 }
 
+
+/**
+ *  Stop SmartConfig
+ */
 void ESP8266WiFiClass::stopSmartConfig() {
     if(!_smartConfigStarted)
         return;
@@ -796,6 +1014,10 @@ void ESP8266WiFiClass::stopSmartConfig() {
     _smartConfigStarted = false;
 }
 
+/**
+ * Query SmartConfig status, to decide when stop config
+ * @return smartConfig Done
+ */
 bool ESP8266WiFiClass::smartConfigDone() {
     if(!_smartConfigStarted)
         return false;
@@ -865,6 +1087,11 @@ void ESP8266WiFiClass::_eventCallback(void* arg) {
     }
 }
 
+
+/**
+ * Output WiFi settings to an object derived from Print interface (like Serial).
+ * @param p Print interface
+ */
 void ESP8266WiFiClass::printDiag(Print& p) {
     const char* modes[] = { "NULL", "STA", "AP", "STA+AP" };
     p.print("Mode: ");
