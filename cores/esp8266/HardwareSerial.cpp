@@ -627,12 +627,13 @@ size_t HardwareSerial::write(uint8_t c) {
         return 0;
     _written = true;
 
+    bool tx_now = false;
     while(true) {
         {
             InterruptLock il;
             if(_tx_buffer->empty()) {
                 if(uart_get_tx_fifo_room(_uart) > 0) {
-                    uart_transmit_char(_uart, c);
+                    tx_now = true;
                 } else {
                     _tx_buffer->write(c);
                     uart_arm_tx_interrupt(_uart);
@@ -643,6 +644,9 @@ size_t HardwareSerial::write(uint8_t c) {
             }
         }
         yield();
+    }
+    if (tx_now) {
+        uart_transmit_char(_uart, c);
     }
     return 1;
 }
