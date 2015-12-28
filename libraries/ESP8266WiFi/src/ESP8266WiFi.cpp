@@ -725,7 +725,7 @@ wl_status_t ESP8266WiFiClass::status()
       return WL_DISCONNECTED;
 }
 
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg)
+static void wifi_dns_found_callback(const char *, ip_addr_t *ipaddr, void *callback_arg)
 {
     if (ipaddr)
         (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
