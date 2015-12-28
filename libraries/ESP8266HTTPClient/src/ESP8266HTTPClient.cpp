@@ -50,6 +50,7 @@ HTTPClient::HTTPClient() {
     _returnCode = 0;
     _size = -1;
     _canReuse = false;
+	_tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
 
 }
 
@@ -249,6 +250,17 @@ void HTTPClient::setAuthorization(const char * user, const char * password) {
 void HTTPClient::setAuthorization(const char * auth) {
     if(auth) {
         _base64Authorization = auth;
+    }
+}
+
+/**
+ * set the timeout for the TCP connection
+  * @param timeout unsigned int
+ */
+void HTTPClient::setTimeout(uint16_t timeout) {
+    _tcpTimeout = timeout;
+    if(connected()) {
+        _tcp->setTimeout(timeout);
     }
 }
 
@@ -673,7 +685,7 @@ bool HTTPClient::connect(void) {
     }
 
     // set Timeout for readBytesUntil and readStringUntil
-    _tcp->setTimeout(HTTPCLIENT_TCP_TIMEOUT);
+    _tcp->setTimeout(_tcpTimeout);
 
 #ifdef ESP8266
     _tcp->setNoDelay(true);
