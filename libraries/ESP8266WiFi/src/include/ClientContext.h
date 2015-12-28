@@ -241,7 +241,7 @@ class ClientContext {
 
     private:
 
-        err_t _sent(tcp_pcb* pcb, uint16_t len) {
+        err_t _sent(tcp_pcb*, uint16_t len) {
             DEBUGV(":sent %d\r\n", len);
             _size_sent -= len;
             if(_size_sent == 0 && _send_waiting) esp_schedule();
@@ -269,7 +269,7 @@ class ClientContext {
             }
         }
 
-        err_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err) {
+        err_t _recv(tcp_pcb*, pbuf* pb, err_t DEBUGV(err)) {
 
             if(pb == 0) // connection closed
             {
@@ -290,7 +290,7 @@ class ClientContext {
             return ERR_OK;
         }
 
-        void _error(err_t err) {
+        void _error(err_t DEBUGV(err)) {
             DEBUGV(":er %d %d %d\r\n", err, _size_sent, _send_waiting);
             tcp_arg(_pcb, NULL);
             tcp_sent(_pcb, NULL);
@@ -302,7 +302,7 @@ class ClientContext {
             }
         }
 
-        err_t _poll(tcp_pcb* pcb) {
+        err_t _poll(tcp_pcb*) {
             return ERR_OK;
         }
 

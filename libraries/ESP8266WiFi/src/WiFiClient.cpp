@@ -134,7 +134,7 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     return 0;
 }
 
-int8_t WiFiClient::_connected(void* pcb, int8_t err)
+int8_t WiFiClient::_connected(void* pcb, int8_t)
 {
     tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
     _client = new ClientContext(tpcb, 0, 0);
@@ -143,7 +143,7 @@ int8_t WiFiClient::_connected(void* pcb, int8_t err)
     return ERR_OK;
 }
 
-void WiFiClient::_err(int8_t err)
+void WiFiClient::_err(int8_t DEBUGV(err))
 {
     DEBUGV(":err %d\r\n", err);
     esp_schedule();
