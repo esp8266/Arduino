@@ -61,102 +61,116 @@ class ESP8266WiFiClass {
         void mode(WiFiMode);
         WiFiMode getMode();
 
+        // ----------------------------------------------------------------------------------------------
+        // ---------------------------------------- STA function ----------------------------------------
+        // ----------------------------------------------------------------------------------------------
         int begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
         int begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
         int begin();
 
-        uint8_t waitForConnectResult();
-
-        void softAP(const char* ssid, const char* passphrase = NULL, int channel = 1, int ssid_hidden = 0);
-
-
         void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
         void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns);
 
-        void softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
-
-
-        int softAPdisconnect(bool wifioff = false);
         int disconnect(bool wifioff = false);
 
+        uint8_t waitForConnectResult();
+
+        // STA network info
+        IPAddress localIP();
 
         uint8_t* macAddress(uint8_t* mac);
         String macAddress(void);
 
-        uint8_t* softAPmacAddress(uint8_t* mac);
-        String softAPmacAddress(void);
-
-
-        IPAddress localIP();
-        IPAddress softAPIP();
-
-
         IPAddress subnetMask();
         IPAddress gatewayIP();
         IPAddress dnsIP(uint8_t dns_no = 0);
-
-
-        String SSID() const;
-        String psk() const;
-
-
-        uint8_t *BSSID(void);
-        String BSSIDstr(void);
-        int32_t channel(void);
-
-
-        int32_t RSSI();
-
-
-        int8_t scanComplete();
-        void scanDelete();
-
-
-        int8_t scanNetworks(bool async = false, bool show_hidden = false);
-
-
-        String SSID(uint8_t networkItem);
-        uint8_t encryptionType(uint8_t networkItem);
-        int32_t RSSI(uint8_t networkItem);
-        uint8_t * BSSID(uint8_t networkItem);
-
-
-        String BSSIDstr(uint8_t networkItem);
-        int32_t channel(uint8_t networkItem);
-        bool isHidden(uint8_t networkItem);
-        bool getNetworkInfo(uint8_t networkItem, String &ssid, uint8_t &encryptionType, int32_t &RSSI, uint8_t* &BSSID, int32_t &channel, bool &isHidden);
-
-
-        wl_status_t status();
-
-
-        int hostByName(const char* aHostname, IPAddress& aResult);
-
 
         String hostname(void);
         bool hostname(char* aHostname);
         bool hostname(const char* aHostname);
         bool hostname(String aHostname);
 
+        // STA WiFi info
+        wl_status_t status();
+        String SSID() const;
+        String psk() const;
 
-        bool beginWPSConfig(void);
+        uint8_t *BSSID(void);
+        String BSSIDstr(void);
 
-        void printDiag(Print& dest);
+        int32_t RSSI();
 
+        // ----------------------------------------------------------------------------------------------
+        // ----------------------------------------- AP function ----------------------------------------
+        // ----------------------------------------------------------------------------------------------
+        void softAP(const char* ssid, const char* passphrase = NULL, int channel = 1, int ssid_hidden = 0);
+        void softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
+        int softAPdisconnect(bool wifioff = false);
 
-        void beginSmartConfig();
-        bool smartConfigDone();
-        void stopSmartConfig();
+        IPAddress softAPIP();
 
-        friend class WiFiClient;
-        friend class WiFiServer;
+        uint8_t* softAPmacAddress(uint8_t* mac);
+        String softAPmacAddress(void);
 
+        // ----------------------------------------------------------------------------------------------
+        // ----------------------------------------- scan function --------------------------------------
+        // ----------------------------------------------------------------------------------------------
+
+        int8_t scanNetworks(bool async = false, bool show_hidden = false);
+
+        int8_t scanComplete();
+        void scanDelete();
+
+        // scan result
+        bool getNetworkInfo(uint8_t networkItem, String &ssid, uint8_t &encryptionType, int32_t &RSSI, uint8_t* &BSSID, int32_t &channel, bool &isHidden);
+
+        String SSID(uint8_t networkItem);
+        uint8_t encryptionType(uint8_t networkItem);
+        int32_t RSSI(uint8_t networkItem);
+        uint8_t * BSSID(uint8_t networkItem);
+        String BSSIDstr(uint8_t networkItem);
+        int32_t channel(uint8_t networkItem);
+        bool isHidden(uint8_t networkItem);
+
+        // ----------------------------------------------------------------------------------------------
+        // -------------------------------------- Generic WiFi function ---------------------------------
+        // ----------------------------------------------------------------------------------------------
+
+        int32_t channel(void);
 
         bool setSleepMode(WiFiSleepType_t type);
         WiFiSleepType_t getSleepMode();
 
         bool setPhyMode(WiFiPhyMode_t mode);
         WiFiPhyMode_t getPhyMode();
+
+
+        // ----------------------------------------------------------------------------------------------
+        // ------------------------------------ Generic Network function --------------------------------
+        // ----------------------------------------------------------------------------------------------
+
+        int hostByName(const char* aHostname, IPAddress& aResult);
+
+
+        // ----------------------------------------------------------------------------------------------
+        // ------------------------------------ STA remote configure  -----------------------------------
+        // ----------------------------------------------------------------------------------------------
+
+        bool beginWPSConfig(void);
+
+        void beginSmartConfig();
+        bool smartConfigDone();
+        void stopSmartConfig();
+
+
+        // ----------------------------------------------------------------------------------------------
+        // ------------------------------------------- Debug --------------------------------------------
+        // ----------------------------------------------------------------------------------------------
+
+        void printDiag(Print& dest);
+
+        friend class WiFiClient;
+        friend class WiFiServer;
 
     protected:
         void _mode(WiFiMode);
