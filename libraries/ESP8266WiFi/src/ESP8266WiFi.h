@@ -53,13 +53,7 @@ typedef enum {
 
 class ESP8266WiFiClass {
     public:
-
         ESP8266WiFiClass();
-
-        void persistent(bool persistent);
-
-        void mode(WiFiMode);
-        WiFiMode getMode();
 
         // ----------------------------------------------------------------------------------------------
         // ---------------------------------------- STA function ----------------------------------------
@@ -144,6 +138,9 @@ class ESP8266WiFiClass {
         bool setPhyMode(WiFiPhyMode_t mode);
         WiFiPhyMode_t getPhyMode();
 
+        void persistent(bool persistent);
+        void mode(WiFiMode);
+        WiFiMode getMode();
 
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------ Generic Network function --------------------------------

@@ -41,6 +41,71 @@ extern "C" {
 extern "C" void esp_schedule();
 extern "C" void esp_yield();
 
+
+
+extern "C" {
+typedef STAILQ_HEAD(, bss_info)
+bss_info_head_t;
+}
+
+
+// -----------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------- Private functions ------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------
+
+static bool sta_config_equal(const station_config& lhs, const station_config& rhs);
+static bool softap_config_equal(const softap_config& lhs, const softap_config& rhs);
+
+
+/**
+ * compare two STA configurations
+ * @param lhs station_config
+ * @param rhs station_config
+ * @return equal
+ */
+static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
+    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0)
+        return false;
+
+    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0)
+        return false;
+
+    if(lhs.bssid_set) {
+        if(!rhs.bssid_set)
+            return false;
+
+        if(memcmp(lhs.bssid, rhs.bssid, 6) != 0)
+            return false;
+    } else {
+        if(rhs.bssid_set)
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * compare two AP configurations
+ * @param lhs softap_config
+ * @param rhs softap_config
+ * @return equal
+ */
+static bool softap_config_equal(const softap_config& lhs, const softap_config& rhs) {
+    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0)
+        return false;
+    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0)
+        return false;
+    if(lhs.channel != rhs.channel)
+        return false;
+    if(lhs.ssid_hidden != rhs.ssid_hidden)
+        return false;
+    return true;
+}
+
+// -----------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------- ESP8266WiFiClass -------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------
+
 ESP8266WiFiClass::ESP8266WiFiClass() :
         _smartConfigStarted(false), _smartConfigDone(false), _useStaticIp(false), _persistent(true) {
     uint8 m = wifi_get_opmode();
@@ -48,6 +113,22 @@ ESP8266WiFiClass::ESP8266WiFiClass() :
     _useApMode = (m & WIFI_AP);
     wifi_set_event_handler_cb((wifi_event_handler_cb_t) &ESP8266WiFiClass::_eventCallback);
 }
+
+/**
+ * callback for WiFi events
+ * @param arg
+ */
+void ESP8266WiFiClass::_eventCallback(void* arg) {
+    System_Event_t* event = reinterpret_cast<System_Event_t*>(arg);
+    DEBUGV("wifi evt: %d\r\n", event->event);
+
+    if(event->event == EVENT_STAMODE_DISCONNECTED) {
+        WiFiClient::stopAll();
+    }
+
+    //TODO allow user to hook this event
+}
+
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- STA function -----------------------------------------------------
@@ -563,6 +644,12 @@ String ESP8266WiFiClass::softAPmacAddress(void) {
 // ----------------------------------------------------- scan function ---------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
+bool ESP8266WiFiClass::_scanAsync = false;
+bool ESP8266WiFiClass::_scanStarted = false;
+bool ESP8266WiFiClass::_scanComplete = false;
+
+size_t ESP8266WiFiClass::_scanCount = 0;
+void* ESP8266WiFiClass::_scanResult = 0;
 
 /**
  * Start scan WiFi networks available
@@ -741,7 +828,7 @@ uint8_t * ESP8266WiFiClass::BSSID(uint8_t i) {
 
 /**
  * return MAC / BSSID of scanned wifi
- * @param networkItem specify from which network item want to get the information
+ * @param i specify from which network item want to get the information
  * @return String MAC / BSSID of scanned wifi
  */
 String ESP8266WiFiClass::BSSIDstr(uint8_t i) {
@@ -774,6 +861,60 @@ bool ESP8266WiFiClass::isHidden(uint8_t i) {
 
     return (it->is_hidden != 0);
 }
+
+/**
+ * private
+ * scan callback
+ * @param result  void *arg
+ * @param status STATUS
+ */
+void ESP8266WiFiClass::_scanDone(void* result, int status) {
+    if(status != OK) {
+        ESP8266WiFiClass::_scanCount = 0;
+        ESP8266WiFiClass::_scanResult = 0;
+    } else {
+
+        int i = 0;
+        bss_info_head_t* head = reinterpret_cast<bss_info_head_t*>(result);
+
+        for(bss_info* it = STAILQ_FIRST(head); it; it = STAILQ_NEXT(it, next), ++i)
+            ;
+        ESP8266WiFiClass::_scanCount = i;
+        if(i == 0) {
+            ESP8266WiFiClass::_scanResult = 0;
+        } else {
+            bss_info* copied_info = new bss_info[i];
+            i = 0;
+            for(bss_info* it = STAILQ_FIRST(head); it; it = STAILQ_NEXT(it, next), ++i) {
+                memcpy(copied_info + i, it, sizeof(bss_info));
+            }
+
+            ESP8266WiFiClass::_scanResult = copied_info;
+        }
+
+    }
+
+    ESP8266WiFiClass::_scanStarted = false;
+    ESP8266WiFiClass::_scanComplete = true;
+
+    if(!ESP8266WiFiClass::_scanAsync) {
+        esp_schedule();
+    }
+}
+
+/**
+ *
+ * @param i specify from which network item want to get the information
+ * @return bss_info *
+ */
+void * ESP8266WiFiClass::_getScanInfoByIndex(int i) {
+    //TODO why its void * and not bss_info * ?
+    if(!ESP8266WiFiClass::_scanResult || (size_t) i > ESP8266WiFiClass::_scanCount) {
+        return 0;
+    }
+    return reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult) + i;
+}
+
 
 
 // -----------------------------------------------------------------------------------------------------------------------
@@ -823,10 +964,72 @@ WiFiPhyMode_t ESP8266WiFiClass::getPhyMode() {
     return (WiFiPhyMode_t) wifi_get_phy_mode();
 }
 
+/**
+ * store WiFi condif in SDK config area in flash
+ * @param persistent
+ */
+void ESP8266WiFiClass::persistent(bool persistent) {
+    _persistent = persistent;
+}
+
+
+/**
+ * set new mode
+ * @param m WiFiMode
+ */
+void ESP8266WiFiClass::mode(WiFiMode m) {
+    if(wifi_get_opmode() == (uint8) m) {
+        return;
+    }
+
+    if((m & WIFI_AP)) {
+        _useApMode = true;
+    } else {
+        _useApMode = false;
+    }
+
+    if((m & WIFI_STA)) {
+        _useClientMode = true;
+    } else {
+        _useClientMode = false;
+    }
+
+    _mode(m);
+}
+
+/**
+ * get WiFi mode
+ * @return WiFiMode
+ */
+WiFiMode ESP8266WiFiClass::getMode() {
+    return (WiFiMode) wifi_get_opmode();
+}
+
+
+/**
+ * private
+ * internal mode handling.
+ * @param m WiFiMode
+ */
+void ESP8266WiFiClass::_mode(WiFiMode m) {
+    if(wifi_get_opmode() == (uint8) m) {
+        return;
+    }
+
+    ETS_UART_INTR_DISABLE();
+    if(_persistent)
+        wifi_set_opmode(m);
+    else
+        wifi_set_opmode_current(m);
+    ETS_UART_INTR_ENABLE();
+
+}
+
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
+void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg);
 
 /**
  * Resolve the given hostname to an IP address.
@@ -849,11 +1052,24 @@ int ESP8266WiFiClass::hostByName(const char* aHostname, IPAddress& aResult) {
     return (aResult != 0) ? 1 : 0;
 }
 
+/**
+ * DNS callback
+ * @param name
+ * @param ipaddr
+ * @param callback_arg
+ */
+void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg) {
+    if(ipaddr)
+        (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
+    esp_schedule(); // resume the hostByName function
+}
+
 
 // -----------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------- STA remote configure -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
+void wifi_wps_status_cb(wps_cb_status status);
 
 /**
  * WPS config
@@ -903,6 +1119,33 @@ bool ESP8266WiFiClass::beginWPSConfig(void) {
     return true;
 }
 
+/**
+ * WPS callback
+ * @param status wps_cb_status
+ */
+void wifi_wps_status_cb(wps_cb_status status) {
+    DEBUGV("wps cb status: %d\r\n", status);
+    switch(status) {
+        case WPS_CB_ST_SUCCESS:
+            if(!wifi_wps_disable()) {
+                DEBUGV("wps disable failed\n");
+            }
+            wifi_station_connect();
+            break;
+        case WPS_CB_ST_FAILED:
+            DEBUGV("wps FAILED\n");
+            break;
+        case WPS_CB_ST_TIMEOUT:
+            DEBUGV("wps TIMEOUT\n");
+            break;
+        case WPS_CB_ST_WEP:
+            DEBUGV("wps WEP\n");
+            break;
+    }
+    // TODO user function to get status
+
+    esp_schedule(); // resume the beginWPSConfig function
+}
 
 /**
  * Start SmartConfig
@@ -947,6 +1190,27 @@ bool ESP8266WiFiClass::smartConfigDone() {
         return false;
 
     return _smartConfigDone;
+}
+
+
+/**
+ * _smartConfigCallback
+ * @param st
+ * @param result
+ */
+void ESP8266WiFiClass::_smartConfigCallback(uint32_t st, void* result) {
+    sc_status status = (sc_status) st;
+    if(status == SC_STATUS_LINK) {
+        station_config* sta_conf = reinterpret_cast<station_config*>(result);
+
+        wifi_station_set_config(sta_conf);
+        wifi_station_disconnect();
+        wifi_station_connect();
+
+        WiFi._smartConfigDone = true;
+    } else if(status == SC_STATUS_LINK_OVER) {
+        WiFi.stopSmartConfig();
+    }
 }
 
 
@@ -999,262 +1263,5 @@ void ESP8266WiFiClass::printDiag(Print& p) {
     p.println(conf.bssid_set);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void ESP8266WiFiClass::persistent(bool persistent) {
-    _persistent = persistent;
-}
-
-void ESP8266WiFiClass::mode(WiFiMode m) {
-    if(wifi_get_opmode() == (uint8) m) {
-        return;
-    }
-
-    if((m & WIFI_AP)) {
-        _useApMode = true;
-    } else {
-        _useApMode = false;
-    }
-
-    if((m & WIFI_STA)) {
-        _useClientMode = true;
-    } else {
-        _useClientMode = false;
-    }
-
-    _mode(m);
-}
-
-WiFiMode ESP8266WiFiClass::getMode() {
-    return (WiFiMode) wifi_get_opmode();
-}
-
-void ESP8266WiFiClass::_mode(WiFiMode m) {
-    if(wifi_get_opmode() == (uint8) m) {
-        return;
-    }
-
-    ETS_UART_INTR_DISABLE();
-    if(_persistent)
-        wifi_set_opmode(m);
-    else
-        wifi_set_opmode_current(m);
-    ETS_UART_INTR_ENABLE();
-
-}
-
-static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
-    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0)
-        return false;
-
-    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0)
-        return false;
-
-    if(lhs.bssid_set) {
-        if(!rhs.bssid_set)
-            return false;
-
-        if(memcmp(lhs.bssid, rhs.bssid, 6) != 0)
-            return false;
-    } else {
-        if(rhs.bssid_set)
-            return false;
-    }
-
-    return true;
-}
-
-
-
-
-static bool softap_config_equal(const softap_config& lhs, const softap_config& rhs) {
-    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0)
-        return false;
-    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0)
-        return false;
-    if(lhs.channel != rhs.channel)
-        return false;
-    if(lhs.ssid_hidden != rhs.ssid_hidden)
-        return false;
-    return true;
-}
-
-
-
-
-
-
-
-
-
-
-
-extern "C" {
-typedef STAILQ_HEAD(, bss_info)
-bss_info_head_t;
-}
-
-void ESP8266WiFiClass::_scanDone(void* result, int status) {
-    if(status != OK) {
-        ESP8266WiFiClass::_scanCount = 0;
-        ESP8266WiFiClass::_scanResult = 0;
-    } else {
-
-        int i = 0;
-        bss_info_head_t* head = reinterpret_cast<bss_info_head_t*>(result);
-
-        for(bss_info* it = STAILQ_FIRST(head); it; it = STAILQ_NEXT(it, next), ++i)
-            ;
-        ESP8266WiFiClass::_scanCount = i;
-        if(i == 0) {
-            ESP8266WiFiClass::_scanResult = 0;
-        } else {
-            bss_info* copied_info = new bss_info[i];
-            i = 0;
-            for(bss_info* it = STAILQ_FIRST(head); it; it = STAILQ_NEXT(it, next), ++i) {
-                memcpy(copied_info + i, it, sizeof(bss_info));
-            }
-
-            ESP8266WiFiClass::_scanResult = copied_info;
-        }
-
-    }
-
-    ESP8266WiFiClass::_scanStarted = false;
-    ESP8266WiFiClass::_scanComplete = true;
-
-    if(!ESP8266WiFiClass::_scanAsync) {
-        esp_schedule();
-    }
-}
-
-
-void * ESP8266WiFiClass::_getScanInfoByIndex(int i) {
-    if(!ESP8266WiFiClass::_scanResult || (size_t) i > ESP8266WiFiClass::_scanCount) {
-        return 0;
-    }
-
-    return reinterpret_cast<bss_info*>(ESP8266WiFiClass::_scanResult) + i;
-}
-
-
-
-
-
-
-
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg) {
-    if(ipaddr)
-        (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
-    esp_schedule(); // resume the hostByName function
-}
-
-
-
-//--------------------------------------------------------------
-
-void wifi_wps_status_cb(wps_cb_status status) {
-    DEBUGV("wps cb status: %d\r\n", status);
-    switch(status) {
-        case WPS_CB_ST_SUCCESS:
-            if(!wifi_wps_disable()) {
-                DEBUGV("wps disable failed\n");
-            }
-            wifi_station_connect();
-            break;
-        case WPS_CB_ST_FAILED:
-            DEBUGV("wps FAILED\n");
-            break;
-        case WPS_CB_ST_TIMEOUT:
-            DEBUGV("wps TIMEOUT\n");
-            break;
-        case WPS_CB_ST_WEP:
-            DEBUGV("wps WEP\n");
-            break;
-    }
-    // todo user function to get status
-
-    esp_schedule(); // resume the beginWPSConfig function
-}
-
-
-//--------------------------------------------------------------
-
-
-void ESP8266WiFiClass::_smartConfigCallback(uint32_t st, void* result) {
-    sc_status status = (sc_status) st;
-    if(status == SC_STATUS_LINK) {
-        station_config* sta_conf = reinterpret_cast<station_config*>(result);
-
-        wifi_station_set_config(sta_conf);
-        wifi_station_disconnect();
-        wifi_station_connect();
-
-        WiFi._smartConfigDone = true;
-    } else if(status == SC_STATUS_LINK_OVER) {
-        WiFi.stopSmartConfig();
-    }
-}
-
-//--------------------------------------------------------------
-
-
-//--------------------------------------------------------------
-
-void ESP8266WiFiClass::_eventCallback(void* arg) {
-    System_Event_t* event = reinterpret_cast<System_Event_t*>(arg);
-    DEBUGV("wifi evt: %d\r\n", event->event);
-
-    if(event->event == EVENT_STAMODE_DISCONNECTED) {
-        WiFiClient::stopAll();
-    }
-}
-
-
-
-bool ESP8266WiFiClass::_scanAsync = false;
-bool ESP8266WiFiClass::_scanStarted = false;
-bool ESP8266WiFiClass::_scanComplete = false;
-
-size_t ESP8266WiFiClass::_scanCount = 0;
-void* ESP8266WiFiClass::_scanResult = 0;
 
 ESP8266WiFiClass WiFi;
