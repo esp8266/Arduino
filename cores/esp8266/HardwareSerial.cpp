@@ -133,13 +133,7 @@ void ICACHE_RAM_ATTR uart_interrupt_handler(uart_t* uart) {
     }
 
     // -------------- UART 1 --------------
-
-    if(Serial1.isRxEnabled()) {
-        while(U1IS & (1 << UIFF)) {
-            Serial1._rx_complete_irq((char) (U1F & 0xff));
-            U1IC = (1 << UIFF);
-        }
-    }
+    // Note: only TX is supported on UART 1.
     if(Serial1.isTxEnabled()) {
         if(U1IS & (1 << UIFE)) {
             U1IC = (1 << UIFE);
@@ -294,6 +288,7 @@ uart_t* uart_init(int uart_nr, int baudrate, byte config, byte mode) {
             IOSWAP &= ~(1 << IOSWAPU0);
             break;
         case UART1:
+            // Note: uart_interrupt_handler does not support RX on UART 1.
             uart->rxEnabled = false;
             uart->txEnabled = (mode != SERIAL_RX_ONLY);
             uart->rxPin = 255;
