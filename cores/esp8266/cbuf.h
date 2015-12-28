@@ -45,18 +45,22 @@ class cbuf {
             return _begin - _end - 1;
         }
 
-        bool empty() const {
+        inline bool empty() const {
             return _begin == _end;
         }
 
+        inline bool full() const {
+            return wrap_if_bufend(_end + 1) == _begin;
+        }
+
         int peek() {
-            if(_end == _begin) return -1;
+            if(empty()) return -1;
 
             return static_cast<int>(*_begin);
         }
 
         int read() {
-            if(getSize() == 0) return -1;
+            if(empty()) return -1;
 
             char result = *_begin;
             _begin = wrap_if_bufend(_begin + 1);
@@ -80,7 +84,7 @@ class cbuf {
         }
 
         size_t write(char c) {
-            if(room() == 0) return 0;
+            if(full()) return 0;
 
             *_end = c;
             _end = wrap_if_bufend(_end + 1);
@@ -109,7 +113,7 @@ class cbuf {
         }
 
     private:
-        inline char* wrap_if_bufend(char* ptr) {
+        inline char* wrap_if_bufend(char* ptr) const {
             return (ptr == _bufend) ? _buf : ptr;
         }
 
