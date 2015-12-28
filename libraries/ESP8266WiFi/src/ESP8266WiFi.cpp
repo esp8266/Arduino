@@ -230,7 +230,6 @@ int ESP8266WiFiClass::begin() {
     wifi_station_connect();
     ETS_UART_INTR_ENABLE();
 
-    // TODO is static ip not stored in SDK?
     if(!_useStaticIp) {
         wifi_station_dhcpc_start();
     }
@@ -600,10 +599,11 @@ int ESP8266WiFiClass::softAPdisconnect(bool wifioff) {
     *conf.ssid = 0;
     *conf.password = 0;
     ETS_UART_INTR_DISABLE();
-    if(_persistent)
+    if(_persistent) {
         wifi_softap_set_config(&conf);
-    else
+    } else {
         wifi_softap_set_config_current(&conf);
+    }
     ETS_UART_INTR_ENABLE();
 
     if(wifioff) {
@@ -1266,7 +1266,7 @@ void ESP8266WiFiClass::printDiag(Print& p) {
     p.print("Auto connect: ");
     p.println(wifi_station_get_auto_connect());
 
-    static struct station_config conf;
+    struct station_config conf;
     wifi_station_get_config(&conf);
 
     const char* ssid = reinterpret_cast<const char*>(conf.ssid);

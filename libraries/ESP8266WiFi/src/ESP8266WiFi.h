@@ -179,6 +179,7 @@ class ESP8266WiFiClass {
         WiFiPhyMode_t getPhyMode();
 
         void persistent(bool persistent);
+
         bool mode(WiFiMode_t);
         WiFiMode_t getMode();
 
