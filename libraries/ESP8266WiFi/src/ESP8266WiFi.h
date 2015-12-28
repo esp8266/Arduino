@@ -80,6 +80,8 @@ class ESP8266WiFiClass {
         void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
         void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns);
 
+
+        bool reconnect();
         int disconnect(bool wifioff = false);
 
         uint8_t waitForConnectResult();

@@ -284,6 +284,18 @@ void ESP8266WiFiClass::config(IPAddress local_ip, IPAddress gateway, IPAddress s
     _useStaticIp = true;
 }
 
+/**
+ * will force a disconnect an then start reconnecting to AP
+ * @return ok
+ */
+bool ESP8266WiFiClass::reconnect() {
+    if((getMode() & WIFI_STA) != 0) {
+        if(wifi_station_disconnect()) {
+            return wifi_station_connect();
+        }
+    }
+    return false;
+}
 
 /**
  * Disconnect from the network
