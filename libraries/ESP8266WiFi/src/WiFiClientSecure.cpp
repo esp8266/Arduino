@@ -493,8 +493,9 @@ extern "C" void* ax_port_malloc(size_t size, const char* file, int line) {
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
         panic();
     }
-    if (size >= 1024)
+    if (size >= 1024) {
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());
+    }
     return result;
 }
 
@@ -510,8 +511,9 @@ extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int l
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
         panic();
     }
-    if (size >= 1024)
+    if (size >= 1024) {
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());
+    }
     return result;
 }
 
@@ -519,6 +521,7 @@ extern "C" void ax_port_free(void* ptr) {
     free(ptr);
     uint32_t *p = (uint32_t*) ptr;
     size_t size = p[-3];
-    if (size >= 1024)
+    if (size >= 1024) {
         DEBUG_TLS_MEM_PRINT("free %d, left %d\r\n", p[-3], ESP.getFreeHeap());
+    }
 }
