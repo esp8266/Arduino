@@ -43,6 +43,8 @@ enum WiFiMode {
     WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3
 };
 
+typedef enum WiFiMode WiFiMode_t;
+
 typedef enum {
     WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
 } WiFiPhyMode_t;
@@ -177,14 +179,14 @@ class ESP8266WiFiClass {
         WiFiPhyMode_t getPhyMode();
 
         void persistent(bool persistent);
-        void mode(WiFiMode);
-        WiFiMode getMode();
+        bool mode(WiFiMode_t);
+        WiFiMode_t getMode();
+
+        bool enableSTA(bool enable);
+        bool enableAP(bool enable);
 
     protected:
-        bool _useApMode;
-        bool _useClientMode;
         bool _persistent;
-        void _mode(WiFiMode);
 
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------ Generic Network function --------------------------------
