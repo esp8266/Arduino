@@ -299,7 +299,7 @@ static void ATTR_GDBFN sendReason() {
 	} else if (gdbstub_savedRegs.reason&0x80) {
 		//We stopped because of an exception. Convert exception code to a signal number and send it.
 		i=gdbstub_savedRegs.reason&0x7f;
-		if (i<sizeof(exceptionSignal)) return gdbPacketHex(exceptionSignal[i], 8); else gdbPacketHex(11, 8);
+		if (i<sizeof(exceptionSignal)) gdbPacketHex(exceptionSignal[i], 8); else gdbPacketHex(11, 8);
 	} else {
 		//We stopped because of a debugging exception.
 		gdbPacketHex(5, 8); //sigtrap

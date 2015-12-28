@@ -66,11 +66,11 @@ public:
 
     bool rename(const char* pathFrom, const char* pathTo) override {
         if (!isSpiffsFilenameValid(pathFrom)) {
-            DEBUGV("SPIFFSImpl::rename: invalid pathFrom=`%s`\r\n", path);
+            DEBUGV("SPIFFSImpl::rename: invalid pathFrom=`%s`\r\n", pathFrom);
             return false;
         }
         if (!isSpiffsFilenameValid(pathTo)) {
-            DEBUGV("SPIFFSImpl::rename: invalid pathTo=`%s` \r\n", path);
+            DEBUGV("SPIFFSImpl::rename: invalid pathTo=`%s` \r\n", pathTo);
             return false;
         }
         auto rc = SPIFFS_rename(&_fs, pathFrom, pathTo);

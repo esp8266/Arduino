@@ -30,12 +30,31 @@ void ICACHE_RAM_ATTR cont_init(cont_t* cont) {
     cont->stack_guard2 = CONT_STACKGUARD;
     cont->stack_end = cont->stack + (sizeof(cont->stack) / 4);
     cont->struct_start = (unsigned*) cont;
+    
+    // fill stack with magic values to check high water mark
+    for(int pos = 0; pos < sizeof(cont->stack) / 4; pos++)
+    {
+        cont->stack[pos] = CONT_STACKGUARD;
+    }
 }
 
 int ICACHE_RAM_ATTR cont_check(cont_t* cont) {
     if(cont->stack_guard1 != CONT_STACKGUARD || cont->stack_guard2 != CONT_STACKGUARD) return 1;
 
     return 0;
+}
+
+int ICACHE_RAM_ATTR cont_get_free_stack(cont_t* cont) {
+    uint32_t *head = cont->stack;
+    int freeWords = 0;
+
+    while(*head == CONT_STACKGUARD)
+    {
+        head++;
+        freeWords++;
+    }
+    
+    return freeWords * 4;
 }
 
 bool ICACHE_RAM_ATTR cont_can_yield(cont_t* cont) {
