@@ -43,6 +43,10 @@ extern "C" {
 
 #include "debug.h"
 
+#undef min
+#undef max
+#include <vector>
+
 extern "C" void esp_schedule();
 extern "C" void esp_yield();
 
@@ -50,8 +54,10 @@ extern "C" void esp_yield();
 // ------------------------------------------------- Generic WiFi function -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
+// arduino dont like std::vectors move static here
+static std::vector<WiFiEventCbList_t> cbEventList;
+
 bool ESP8266WiFiGenericClass::_persistent = true;
-WiFiEventCb ESP8266WiFiGenericClass::_cbEvent = NULL;
 WiFiMode_t ESP8266WiFiGenericClass::_forceSleepLastMode = WIFI_OFF;
 
 ESP8266WiFiGenericClass::ESP8266WiFiGenericClass()  {
@@ -61,9 +67,34 @@ ESP8266WiFiGenericClass::ESP8266WiFiGenericClass()  {
 /**
  * set callback function
  * @param cbEvent WiFiEventCb
+ * @param event optional filter (WIFI_EVENT_MAX is all events)
  */
-void ESP8266WiFiGenericClass::onEvent(WiFiEventCb cbEvent) {
-    _cbEvent = cbEvent;
+void ESP8266WiFiGenericClass::onEvent(WiFiEventCb cbEvent, WiFiEvent_t event) {
+    if(!cbEvent) {
+        return;
+    }
+    WiFiEventCbList_t newEventHandler;
+    newEventHandler.cb = cbEvent;
+    newEventHandler.event = event;
+    cbEventList.push_back(newEventHandler);
+}
+
+/**
+ * removes a callback form event handler
+ * @param cbEvent WiFiEventCb
+ * @param event optional filter (WIFI_EVENT_MAX is all events)
+ */
+void ESP8266WiFiGenericClass::removeEvent(WiFiEventCb cbEvent, WiFiEvent_t event) {
+    if(!cbEvent) {
+        return;
+    }
+
+    for(uint32_t i = 0; i < cbEventList.size(); i++) {
+        WiFiEventCbList_t entry = cbEventList[i];
+        if(entry.cb == cbEvent && entry.event == event) {
+            cbEventList.erase(cbEventList.begin() + i);
+        }
+    }
 }
 
 /**
@@ -78,8 +109,13 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg) {
         WiFiClient::stopAll();
     }
 
-    if(_cbEvent) {
-        _cbEvent((WiFiEvent_t) event->event);
+    for(uint32_t i = 0; i < cbEventList.size(); i++) {
+        WiFiEventCbList_t entry = cbEventList[i];
+        if(entry.cb) {
+            if(entry.event == (WiFiEvent_t) event->event || entry.event == WIFI_EVENT_MAX) {
+                entry.cb((WiFiEvent_t) event->event);
+            }
+        }
     }
 }
 

@@ -27,6 +27,11 @@
 
 typedef void (*WiFiEventCb)(WiFiEvent_t event);
 
+typedef struct {
+        WiFiEventCb cb;
+        WiFiEvent_t event;
+} WiFiEventCbList_t;
+
 class ESP8266WiFiGenericClass {
         // ----------------------------------------------------------------------------------------------
         // -------------------------------------- Generic WiFi function ---------------------------------
@@ -36,7 +41,8 @@ class ESP8266WiFiGenericClass {
 
         ESP8266WiFiGenericClass();
 
-        void onEvent(WiFiEventCb cbEvent);
+        void onEvent(WiFiEventCb cbEvent, WiFiEvent_t event = WIFI_EVENT_MAX);
+        void removeEvent(WiFiEventCb cbEvent, WiFiEvent_t event = WIFI_EVENT_MAX);
 
         int32_t channel(void);
 
@@ -61,7 +67,6 @@ class ESP8266WiFiGenericClass {
 
     protected:
         static bool _persistent;
-        static WiFiEventCb _cbEvent;
         static WiFiMode_t _forceSleepLastMode;
 
         static void _eventCallback(void *event);
