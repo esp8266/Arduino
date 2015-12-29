@@ -46,6 +46,8 @@ class ESP8266WiFiGenericClass {
         bool setPhyMode(WiFiPhyMode_t mode);
         WiFiPhyMode_t getPhyMode();
 
+        void setOutputPower(float_t dBm);
+
         void persistent(bool persistent);
 
         bool mode(WiFiMode_t);
