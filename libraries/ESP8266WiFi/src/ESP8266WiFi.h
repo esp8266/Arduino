@@ -29,195 +29,35 @@ extern "C" {
 }
 
 #include "IPAddress.h"
+
+#include "ESP8266WiFiType.h"
+#include "ESP8266WiFiSTA.h"
+#include "ESP8266WiFiAP.h"
+#include "ESP8266WiFiScan.h"
+#include "ESP8266WiFiGeneric.h"
+
 #include "WiFiClient.h"
 #include "WiFiServer.h"
 #include "WiFiClientSecure.h"
 
-#define WIFI_SCAN_RUNNING   (-1)
-#define WIFI_SCAN_FAILED     (-2)
-
-// Note:
-// this enums need to be in sync with the SDK!
-
-enum WiFiMode {
-    WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3
-};
-
-typedef enum WiFiMode WiFiMode_t;
-
-typedef enum {
-    WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
-} WiFiPhyMode_t;
-
-typedef enum {
-    WIFI_NONE_SLEEP = 0, WIFI_LIGHT_SLEEP = 2, WIFI_MODEM_SLEEP = 3
-} WiFiSleepType_t;
-
-class ESP8266WiFiClass {
-
-        // ----------------------------------------------------------------------------------------------
-        // -------------------------------------- ESP8266WiFiClass --------------------------------------
-        // ----------------------------------------------------------------------------------------------
-
+class ESP8266WiFiClass : public ESP8266WiFiGenericClass, public ESP8266WiFiSTAClass, public ESP8266WiFiScanClass, public ESP8266WiFiAPClass {
     public:
 
-        ESP8266WiFiClass();
+        // workaround same function name with different signature
+        using ESP8266WiFiGenericClass::channel;
 
-    protected:
+        using ESP8266WiFiSTAClass::SSID;
+        using ESP8266WiFiSTAClass::RSSI;
+        using ESP8266WiFiSTAClass::BSSID;
+        using ESP8266WiFiSTAClass::BSSIDstr;
 
-        static void _eventCallback(void *event);
-
-        // ----------------------------------------------------------------------------------------------
-        // ---------------------------------------- STA function ----------------------------------------
-        // ----------------------------------------------------------------------------------------------
-
-    public:
-
-        int begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
-        int begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
-        int begin();
-
-        void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
-        void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns);
-
-
-        bool reconnect();
-        int disconnect(bool wifioff = false);
-
-        uint8_t waitForConnectResult();
-
-        // STA network info
-        IPAddress localIP();
-
-        uint8_t* macAddress(uint8_t* mac);
-        String macAddress(void);
-
-        IPAddress subnetMask();
-        IPAddress gatewayIP();
-        IPAddress dnsIP(uint8_t dns_no = 0);
-
-        String hostname(void);
-        bool hostname(char* aHostname);
-        bool hostname(const char* aHostname);
-        bool hostname(String aHostname);
-
-        // STA WiFi info
-        wl_status_t status();
-        String SSID() const;
-        String psk() const;
-
-        uint8_t *BSSID(void);
-        String BSSIDstr(void);
-
-        int32_t RSSI();
-
-    protected:
-
-        bool _useStaticIp;
-
-        // ----------------------------------------------------------------------------------------------
-        // ----------------------------------------- AP function ----------------------------------------
-        // ----------------------------------------------------------------------------------------------
-
-    public:
-
-        void softAP(const char* ssid, const char* passphrase = NULL, int channel = 1, int ssid_hidden = 0);
-        void softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
-        int softAPdisconnect(bool wifioff = false);
-
-        IPAddress softAPIP();
-
-        uint8_t* softAPmacAddress(uint8_t* mac);
-        String softAPmacAddress(void);
-
-    protected:
-
-        // ----------------------------------------------------------------------------------------------
-        // ----------------------------------------- scan function --------------------------------------
-        // ----------------------------------------------------------------------------------------------
-
-    public:
-
-        int8_t scanNetworks(bool async = false, bool show_hidden = false);
-
-        int8_t scanComplete();
-        void scanDelete();
-
-        // scan result
-        bool getNetworkInfo(uint8_t networkItem, String &ssid, uint8_t &encryptionType, int32_t &RSSI, uint8_t* &BSSID, int32_t &channel, bool &isHidden);
-
-        String SSID(uint8_t networkItem);
-        uint8_t encryptionType(uint8_t networkItem);
-        int32_t RSSI(uint8_t networkItem);
-        uint8_t * BSSID(uint8_t networkItem);
-        String BSSIDstr(uint8_t networkItem);
-        int32_t channel(uint8_t networkItem);
-        bool isHidden(uint8_t networkItem);
-
-    protected:
-
-        static bool _scanAsync;
-        static bool _scanStarted;
-        static bool _scanComplete;
-
-        static size_t _scanCount;
-        static void* _scanResult;
-
-        static void _scanDone(void* result, int status);
-        void * _getScanInfoByIndex(int i);
-
-        // ----------------------------------------------------------------------------------------------
-        // -------------------------------------- Generic WiFi function ---------------------------------
-        // ----------------------------------------------------------------------------------------------
-
-    public:
-
-        int32_t channel(void);
-
-        bool setSleepMode(WiFiSleepType_t type);
-        WiFiSleepType_t getSleepMode();
-
-        bool setPhyMode(WiFiPhyMode_t mode);
-        WiFiPhyMode_t getPhyMode();
-
-        void persistent(bool persistent);
-
-        bool mode(WiFiMode_t);
-        WiFiMode_t getMode();
-
-        bool enableSTA(bool enable);
-        bool enableAP(bool enable);
-
-    protected:
-        bool _persistent;
-
-        // ----------------------------------------------------------------------------------------------
-        // ------------------------------------ Generic Network function --------------------------------
-        // ----------------------------------------------------------------------------------------------
-
-    public:
-
-        int hostByName(const char* aHostname, IPAddress& aResult);
-
-    protected:
-
-        // ----------------------------------------------------------------------------------------------
-        // ------------------------------------ STA remote configure  -----------------------------------
-        // ----------------------------------------------------------------------------------------------
-
-    public:
-
-        bool beginWPSConfig(void);
-
-        void beginSmartConfig();
-        bool smartConfigDone();
-        void stopSmartConfig();
-
-    protected:
-
-        bool _smartConfigStarted;
-        bool _smartConfigDone;
-        static void _smartConfigCallback(uint32_t status, void* result);
+        using ESP8266WiFiScanClass::SSID;
+        using ESP8266WiFiScanClass::encryptionType;
+        using ESP8266WiFiScanClass::RSSI;
+        using ESP8266WiFiScanClass::BSSID;
+        using ESP8266WiFiScanClass::BSSIDstr;
+        using ESP8266WiFiScanClass::channel;
+        using ESP8266WiFiScanClass::isHidden;
 
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------------- Debug --------------------------------------------
