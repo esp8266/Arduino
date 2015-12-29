@@ -33,7 +33,6 @@ int ICACHE_RAM_ATTR cbuf::read() {
 
     char result = *_begin;
     _begin = wrap_if_bufend(_begin + 1);
-    return result; 
     return static_cast<int>(result);
 }
 
