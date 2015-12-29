@@ -40,6 +40,8 @@ class ESP8266WiFiAPClass {
         bool softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
         bool softAPdisconnect(bool wifioff = false);
 
+        uint8_t softAPgetStationNum();
+
         IPAddress softAPIP();
 
         uint8_t* softAPmacAddress(uint8_t* mac);

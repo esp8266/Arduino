@@ -186,6 +186,15 @@ bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
     return ret;
 }
 
+
+/**
+ * Get the count of the Station / client that are connected to the softAP interface
+ * @return Stations count
+ */
+uint8_t ESP8266WiFiAPClass::softAPgetStationNum() {
+    return wifi_softap_get_station_num();
+}
+
 /**
  * Get the softAP interface IP address.
  * @return IPAddress softAP IP
