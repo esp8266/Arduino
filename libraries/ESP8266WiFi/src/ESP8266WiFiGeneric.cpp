@@ -51,11 +51,18 @@ extern "C" void esp_yield();
 // -----------------------------------------------------------------------------------------------------------------------
 
 bool ESP8266WiFiGenericClass::_persistent = true;
-
-
+WiFiEventCb ESP8266WiFiGenericClass::_cbEvent = NULL;
 
 ESP8266WiFiGenericClass::ESP8266WiFiGenericClass()  {
     wifi_set_event_handler_cb((wifi_event_handler_cb_t) &ESP8266WiFiGenericClass::_eventCallback);
+}
+
+/**
+ * set callback function
+ * @param cbEvent WiFiEventCb
+ */
+void ESP8266WiFiGenericClass::onEvent(WiFiEventCb cbEvent) {
+    _cbEvent = cbEvent;
 }
 
 /**
@@ -70,10 +77,10 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg) {
         WiFiClient::stopAll();
     }
 
-    //TODO allow user to hook this event
+    if(_cbEvent) {
+        _cbEvent((WiFiEvent_t) event->event);
+    }
 }
-
-
 
 /**
  * Return the current channel associated with the network
@@ -236,8 +243,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param callback_arg
  */
 void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg) {
-    if(ipaddr)
+    if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
+    }
     esp_schedule(); // resume the hostByName function
 }
 

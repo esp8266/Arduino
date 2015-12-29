@@ -60,9 +60,7 @@ class ESP8266WiFiScanClass {
         static void* _scanResult;
 
         static void _scanDone(void* result, int status);
-        void * _getScanInfoByIndex(int i);
-
-        friend class ESP8266WiFiClass;
+        static void * _getScanInfoByIndex(int i);
 
 };
 

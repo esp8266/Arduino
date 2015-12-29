@@ -25,13 +25,18 @@
 
 #include "ESP8266WiFiType.h"
 
+typedef void (*WiFiEventCb)(WiFiEvent_t event);
+
 class ESP8266WiFiGenericClass {
         // ----------------------------------------------------------------------------------------------
         // -------------------------------------- Generic WiFi function ---------------------------------
         // ----------------------------------------------------------------------------------------------
 
     public:
+
         ESP8266WiFiGenericClass();
+
+        void onEvent(WiFiEventCb cbEvent);
 
         int32_t channel(void);
 
@@ -50,9 +55,10 @@ class ESP8266WiFiGenericClass {
         bool enableAP(bool enable);
 
     protected:
-       static bool _persistent;
+        static bool _persistent;
+        static WiFiEventCb _cbEvent;
 
-       static void _eventCallback(void *event);
+        static void _eventCallback(void *event);
 
         // ----------------------------------------------------------------------------------------------
         // ------------------------------------ Generic Network function --------------------------------
@@ -68,6 +74,5 @@ class ESP8266WiFiGenericClass {
         friend class ESP8266WiFiScanClass;
         friend class ESP8266WiFiAPClass;
 };
-
 
 #endif /* ESP8266WIFIGENERIC_H_ */
