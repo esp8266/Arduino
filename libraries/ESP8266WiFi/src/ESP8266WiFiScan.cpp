@@ -314,7 +314,6 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status) {
  * @return bss_info *
  */
 void * ESP8266WiFiScanClass::_getScanInfoByIndex(int i) {
-    //TODO why its void * and not bss_info * ?
     if(!ESP8266WiFiScanClass::_scanResult || (size_t) i > ESP8266WiFiScanClass::_scanCount) {
         return 0;
     }

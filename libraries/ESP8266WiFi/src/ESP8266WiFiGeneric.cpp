@@ -71,7 +71,7 @@ void ESP8266WiFiGenericClass::onEvent(WiFiEventCb cbEvent) {
  */
 void ESP8266WiFiGenericClass::_eventCallback(void* arg) {
     System_Event_t* event = reinterpret_cast<System_Event_t*>(arg);
-    DEBUGV("wifi evt: %d\r\n", event->event);
+    DEBUGV("wifi evt: %d\n", event->event);
 
     if(event->event == EVENT_STAMODE_DISCONNECTED) {
         WiFiClient::stopAll();
@@ -170,7 +170,7 @@ WiFiMode_t ESP8266WiFiGenericClass::getMode() {
  */
 bool ESP8266WiFiGenericClass::enableSTA(bool enable) {
 
-    WiFiMode_t currentMode = (WiFiMode_t) wifi_get_opmode();
+    WiFiMode_t currentMode = getMode();
     bool isEnabled = ((currentMode & WIFI_STA) != 0);
 
     if(isEnabled != enable) {
@@ -191,7 +191,7 @@ bool ESP8266WiFiGenericClass::enableSTA(bool enable) {
  */
 bool ESP8266WiFiGenericClass::enableAP(bool enable){
 
-    WiFiMode_t currentMode = (WiFiMode_t) wifi_get_opmode();
+    WiFiMode_t currentMode = getMode();
     bool isEnabled = ((currentMode & WIFI_AP) != 0);
 
     if(isEnabled != enable) {

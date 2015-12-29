@@ -57,21 +57,22 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
  * @return equal
  */
 static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
-    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0)
+    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0) {
         return false;
+    }
 
-    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0)
+    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0) {
         return false;
+    }
+
+    if(lhs.bssid_set != rhs.bssid_set) {
+        return false;
+    }
 
     if(lhs.bssid_set) {
-        if(!rhs.bssid_set)
+        if(memcmp(lhs.bssid, rhs.bssid, 6) != 0) {
             return false;
-
-        if(memcmp(lhs.bssid, rhs.bssid, 6) != 0)
-            return false;
-    } else {
-        if(rhs.bssid_set)
-            return false;
+        }
     }
 
     return true;
@@ -180,37 +181,13 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
 
 /**
  * Change IP configuration settings disabling the dhcp client
- * @param local_ip  Static ip configuration
- * @param gateway   Static gateway configuration
- * @param subnet    Static Subnet mask
- */
-bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
-
-    if(!WiFi.enableSTA(true)) {
-        return false;
-    }
-
-    struct ip_info info;
-    info.ip.addr = static_cast<uint32_t>(local_ip);
-    info.gw.addr = static_cast<uint32_t>(gateway);
-    info.netmask.addr = static_cast<uint32_t>(subnet);
-
-    wifi_station_dhcpc_stop();
-    if(wifi_set_ip_info(STATION_IF, &info)) {
-        _useStaticIp = true;
-        return true;
-    }
-    return false;
-}
-
-/**
- * Change IP configuration settings disabling the dhcp client
  * @param local_ip   Static ip configuration
  * @param gateway    Static gateway configuration
  * @param subnet     Static Subnet mask
- * @param dns        Static DNS server
+ * @param dns1       Static DNS server 1
+ * @param dns2       Static DNS server 2
  */
-bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns) {
+bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1, IPAddress dns2) {
 
     if(!WiFi.enableSTA(true)) {
         return false;
@@ -227,11 +204,19 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddres
     } else {
         return false;
     }
-
-    // Set DNS-Server
     ip_addr_t d;
-    d.addr = static_cast<uint32_t>(dns);
-    dns_setserver(0, &d);
+
+    if(dns1 != (uint32_t)0x00000000) {
+        // Set DNS1-Server
+        d.addr = static_cast<uint32_t>(dns1);
+        dns_setserver(0, &d);
+    }
+
+    if(dns2 != (uint32_t)0x00000000) {
+        // Set DNS2-Server
+        d.addr = static_cast<uint32_t>(dns2);
+        dns_setserver(1, &d);
+    }
 
     return true;
 }
@@ -617,7 +602,7 @@ void ESP8266WiFiSTAClass::_smartConfigCallback(uint32_t st, void* result) {
         wifi_station_disconnect();
         wifi_station_connect();
 
-        WiFi._smartConfigDone = true;
+        _smartConfigDone = true;
     } else if(status == SC_STATUS_LINK_OVER) {
         WiFi.stopSmartConfig();
     }

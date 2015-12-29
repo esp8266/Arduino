@@ -54,14 +54,18 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
  * @return equal
  */
 static bool softap_config_equal(const softap_config& lhs, const softap_config& rhs) {
-    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0)
+    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0) {
         return false;
-    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0)
+    }
+    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0) {
         return false;
-    if(lhs.channel != rhs.channel)
+    }
+    if(lhs.channel != rhs.channel) {
         return false;
-    if(lhs.ssid_hidden != rhs.ssid_hidden)
+    }
+    if(lhs.ssid_hidden != rhs.ssid_hidden) {
         return false;
+    }
     return true;
 }
 
@@ -89,8 +93,8 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         return false;
     }
 
-    if(passphrase && strlen(passphrase) > 63) {
-        // fail passphrase to long!
+    if(passphrase && (strlen(passphrase) > 63 || strlen(passphrase) < 8)) {
+        // fail passphrase to long or short!
         return false;
     }
 

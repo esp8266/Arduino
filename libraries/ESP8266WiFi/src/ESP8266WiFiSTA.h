@@ -39,8 +39,7 @@ class ESP8266WiFiSTAClass {
         wl_status_t begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
         wl_status_t begin();
 
-        bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
-        bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns);
+        bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = (uint32_t)0x00000000, IPAddress dns2 = (uint32_t)0x00000000);
 
         bool reconnect();
         bool disconnect(bool wifioff = false);
@@ -92,6 +91,7 @@ class ESP8266WiFiSTAClass {
 
         static bool _smartConfigStarted;
         static bool _smartConfigDone;
+
         static void _smartConfigCallback(uint32_t status, void* result);
 
 };
