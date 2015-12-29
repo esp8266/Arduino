@@ -636,6 +636,9 @@ void HardwareSerial::flush() {
             if(_tx_buffer->getSize() == 0 &&
                UART_GET_TX_FIFO_ROOM(uart_nr) >= UART_TX_FIFO_SIZE) {
                 break;
+            } else if(il.savedInterruptLevel() > 0) {
+                _tx_empty_irq();
+                continue;
             }
         }
         yield();
@@ -663,6 +666,9 @@ size_t HardwareSerial::write(uint8_t c) {
                 break;
             } else if(_tx_buffer->write(c)) {
                 break;
+            } else if(il.savedInterruptLevel() > 0) {
+                _tx_empty_irq();
+                continue;
             }
         }
         yield();
