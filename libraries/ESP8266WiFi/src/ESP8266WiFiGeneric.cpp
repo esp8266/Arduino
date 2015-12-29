@@ -52,6 +52,7 @@ extern "C" void esp_yield();
 
 bool ESP8266WiFiGenericClass::_persistent = true;
 WiFiEventCb ESP8266WiFiGenericClass::_cbEvent = NULL;
+WiFiMode_t ESP8266WiFiGenericClass::_forceSleepLastMode = WIFI_OFF;
 
 ESP8266WiFiGenericClass::ESP8266WiFiGenericClass()  {
     wifi_set_event_handler_cb((wifi_event_handler_cb_t) &ESP8266WiFiGenericClass::_eventCallback);
@@ -128,7 +129,7 @@ WiFiPhyMode_t ESP8266WiFiGenericClass::getPhyMode() {
  * set the output power of WiFi
  * @param dBm max: +20.5dBm  min: 0dBm
  */
-void ESP8266WiFiGenericClass::setOutputPower(float_t dBm) {
+void ESP8266WiFiGenericClass::setOutputPower(float dBm) {
 
     if(dBm > 20.5) {
         dBm = 20.5;
@@ -223,7 +224,43 @@ bool ESP8266WiFiGenericClass::enableAP(bool enable){
 }
 
 
+/**
+ * Disable WiFi for x us when value is not 0
+ * @param sleep_time_in_us
+ * @return ok
+ */
+bool ESP8266WiFiGenericClass::forceSleepBegin(uint32 sleepUs) {
+    _forceSleepLastMode = getMode();
+    if(!mode(WIFI_OFF)) {
+        return false;
+    }
 
+    if(sleepUs == 0) {
+        sleepUs = 0xFFFFFFF;
+    }
+
+    wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
+    wifi_fpm_open();
+    return (wifi_fpm_do_sleep(sleepUs) == 0);
+}
+
+/**
+ * wake up WiFi Modem
+ * @return ok
+ */
+bool ESP8266WiFiGenericClass::forceSleepWake() {
+    wifi_fpm_do_wakeup();
+    wifi_fpm_close();
+
+    // restore last mode
+    if(mode(_forceSleepLastMode)) {
+        if((_forceSleepLastMode & WIFI_STA) != 0){
+            wifi_station_connect();
+        }
+        return true;
+    }
+    return false;
+}
 
 
 // -----------------------------------------------------------------------------------------------------------------------

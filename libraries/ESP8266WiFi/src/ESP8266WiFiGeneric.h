@@ -46,7 +46,7 @@ class ESP8266WiFiGenericClass {
         bool setPhyMode(WiFiPhyMode_t mode);
         WiFiPhyMode_t getPhyMode();
 
-        void setOutputPower(float_t dBm);
+        void setOutputPower(float dBm);
 
         void persistent(bool persistent);
 
@@ -56,9 +56,13 @@ class ESP8266WiFiGenericClass {
         bool enableSTA(bool enable);
         bool enableAP(bool enable);
 
+        bool forceSleepBegin(uint32 sleepUs = 0);
+        bool forceSleepWake();
+
     protected:
         static bool _persistent;
         static WiFiEventCb _cbEvent;
+        static WiFiMode_t _forceSleepLastMode;
 
         static void _eventCallback(void *event);
 
