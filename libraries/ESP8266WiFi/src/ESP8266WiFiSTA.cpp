@@ -91,9 +91,10 @@ bool ESP8266WiFiSTAClass::_useStaticIp = false;
  * @param passphrase const char *   Optional. Passphrase. Valid characters in a passphrase must be between ASCII 32-126 (decimal).
  * @param bssid uint8_t[6]          Optional. BSSID / MAC of AP
  * @param channel                   Optional. Channel of AP
+ * @param connect                   Optional. call connect
  * @return
  */
-wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_t channel, const uint8_t* bssid) {
+wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_t channel, const uint8_t* bssid, bool connect) {
 
     if(!WiFi.enableSTA(true)) {
         // enable STA failed
@@ -134,12 +135,17 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     ETS_UART_INTR_DISABLE();
+
     if(WiFi._persistent) {
         wifi_station_set_config(&conf);
     } else {
         wifi_station_set_config_current(&conf);
     }
-    wifi_station_connect();
+
+    if(connect) {
+        wifi_station_connect();
+    }
+
     ETS_UART_INTR_ENABLE();
 
     if(channel > 0 && channel <= 13) {
@@ -153,8 +159,8 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     return status();
 }
 
-wl_status_t ESP8266WiFiSTAClass::begin(char* ssid, char *passphrase, int32_t channel, const uint8_t* bssid) {
-    return begin((const char*) ssid, (const char*) passphrase, channel, bssid);
+wl_status_t ESP8266WiFiSTAClass::begin(char* ssid, char *passphrase, int32_t channel, const uint8_t* bssid, bool connect) {
+    return begin((const char*) ssid, (const char*) passphrase, channel, bssid, connect);
 }
 
 /**
@@ -259,6 +265,38 @@ bool ESP8266WiFiSTAClass::disconnect(bool wifioff) {
     }
 
     return ret;
+}
+
+/**
+ * Setting the ESP8266 station to connect to the AP (which is recorded)
+ * automatically or not when powered on. Enable auto-connect by default.
+ * @param autoConnect bool
+ * @return if saved
+ */
+bool ESP8266WiFiSTAClass::setAutoConnect(bool autoConnect) {
+    bool ret;
+    ETS_UART_INTR_DISABLE();
+    ret = wifi_station_set_auto_connect(autoConnect);
+    ETS_UART_INTR_ENABLE();
+    return ret;
+}
+
+/**
+ * Checks if ESP8266 station mode will connect to AP
+ * automatically or not when it is powered on.
+ * @return auto connect
+ */
+bool ESP8266WiFiSTAClass::getAutoConnect() {
+    return (wifi_station_get_auto_connect() != 0);
+}
+
+/**
+ * Set whether reconnect or not when the ESP8266 station is disconnected from AP.
+ * @param autoReconnect
+ * @return
+ */
+bool ESP8266WiFiSTAClass::setAutoReconnect(bool autoReconnect) {
+    return wifi_station_set_reconnect_policy(autoReconnect);
 }
 
 /**
