@@ -117,7 +117,6 @@ class HardwareSerial: public Stream {
         uart_t* _uart;
         cbuf* _tx_buffer;
         cbuf* _rx_buffer;
-        bool _written;
 };
 
 extern HardwareSerial Serial;

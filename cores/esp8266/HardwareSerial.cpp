@@ -485,7 +485,7 @@ int uart_get_debug() {
 // ####################################################################################################
 
 HardwareSerial::HardwareSerial(int uart_nr) :
-        _uart_nr(uart_nr), _uart(0), _tx_buffer(0), _rx_buffer(0), _written(false) {
+        _uart_nr(uart_nr), _uart(0), _tx_buffer(0), _rx_buffer(0) {
 }
 
 void HardwareSerial::begin(unsigned long baud, byte config, byte mode) {
@@ -519,7 +519,6 @@ void HardwareSerial::begin(unsigned long baud, byte config, byte mode) {
             _uart->txEnabled = false;
         }
     }
-    _written = false;
     delay(1);
 
     uart_finish_init(_uart);
@@ -626,8 +625,6 @@ void HardwareSerial::flush() {
         return;
     if(!_uart->txEnabled)
         return;
-    if(!_written)
-        return;
 
     const int uart_nr = _uart->uart_nr;
     while(true) {
@@ -643,13 +640,11 @@ void HardwareSerial::flush() {
         }
         yield();
     }
-    _written = false;
 }
 
 size_t HardwareSerial::write(uint8_t c) {
     if(_uart == 0 || !_uart->txEnabled)
         return 0;
-    _written = true;
 
     bool tx_now = false;
     const int uart_nr = _uart->uart_nr;
