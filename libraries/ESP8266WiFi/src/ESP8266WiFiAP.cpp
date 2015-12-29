@@ -77,25 +77,24 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
  * @param channel       WiFi channel number, 1 - 13.
  * @param ssid_hidden   Network cloaking (0 = broadcast SSID, 1 = hide SSID)
  */
-void ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int channel, int ssid_hidden) {
+bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int channel, int ssid_hidden) {
 
     if(!WiFi.enableAP(true)) {
         // enable AP failed
-        return;
+        return false;
     }
 
     if(!ssid || *ssid == 0 || strlen(ssid) > 31) {
         // fail SSID too long or missing!
-        return;
+        return false;
     }
 
     if(passphrase && strlen(passphrase) > 63) {
         // fail passphrase to long!
-        return;
+        return false;
     }
 
     struct softap_config conf;
-    wifi_softap_get_config(&conf);
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
     conf.channel = channel;
     conf.ssid_len = strlen(ssid);
@@ -115,15 +114,20 @@ void ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     wifi_softap_get_config(&conf_current);
     if(softap_config_equal(conf, conf_current)) {
         DEBUGV("softap config unchanged");
-        return;
+        return true;
     }
 
+    bool ret;
+
     ETS_UART_INTR_DISABLE();
-    if(WiFi._persistent)
-        wifi_softap_set_config(&conf);
-    else
-        wifi_softap_set_config_current(&conf);
+    if(WiFi._persistent) {
+        ret = wifi_softap_set_config(&conf);
+    } else {
+        ret = wifi_softap_set_config_current(&conf);
+    }
     ETS_UART_INTR_ENABLE();
+
+    return ret;
 }
 
 
@@ -133,11 +137,11 @@ void ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
  * @param gateway       gateway IP
  * @param subnet        subnet mask
  */
-void ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
+bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
 
     if(!WiFi.enableAP(true)) {
         // enable AP failed
-        return;
+        return false;
     }
 
     struct ip_info info;
@@ -145,8 +149,10 @@ void ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     info.gw.addr = static_cast<uint32_t>(gateway);
     info.netmask.addr = static_cast<uint32_t>(subnet);
     wifi_softap_dhcps_stop();
-    wifi_set_ip_info(SOFTAP_IF, &info);
-    wifi_softap_dhcps_start();
+    if(wifi_set_ip_info(SOFTAP_IF, &info)) {
+        return wifi_softap_dhcps_start();
+    }
+    return false;
 }
 
 
@@ -156,24 +162,24 @@ void ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
  * @param wifioff disable mode?
  * @return one value of wl_status_t enum
  */
-int ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
+bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
+    bool ret;
     struct softap_config conf;
     *conf.ssid = 0;
     *conf.password = 0;
     ETS_UART_INTR_DISABLE();
     if(WiFi._persistent) {
-        wifi_softap_set_config(&conf);
+        ret = wifi_softap_set_config(&conf);
     } else {
-        wifi_softap_set_config_current(&conf);
+        ret = wifi_softap_set_config_current(&conf);
     }
     ETS_UART_INTR_ENABLE();
 
     if(wifioff) {
-        WiFi.enableAP(false);
+        ret = WiFi.enableAP(false);
     }
 
-    //TODO return with more meaning ?
-    return 0;
+    return ret;
 }
 
 /**

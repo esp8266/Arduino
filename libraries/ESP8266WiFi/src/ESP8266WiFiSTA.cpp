@@ -92,7 +92,7 @@ bool ESP8266WiFiSTAClass::_useStaticIp = false;
  * @param channel                   Optional. Channel of AP
  * @return
  */
-int ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_t channel, const uint8_t* bssid) {
+wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_t channel, const uint8_t* bssid) {
 
     if(!WiFi.enableSTA(true)) {
         // enable STA failed
@@ -152,7 +152,7 @@ int ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_t
     return status();
 }
 
-int ESP8266WiFiSTAClass::begin(char* ssid, char *passphrase, int32_t channel, const uint8_t* bssid) {
+wl_status_t ESP8266WiFiSTAClass::begin(char* ssid, char *passphrase, int32_t channel, const uint8_t* bssid) {
     return begin((const char*) ssid, (const char*) passphrase, channel, bssid);
 }
 
@@ -160,7 +160,7 @@ int ESP8266WiFiSTAClass::begin(char* ssid, char *passphrase, int32_t channel, co
  * Use to connect to SDK config.
  * @return wl_status_t
  */
-int ESP8266WiFiSTAClass::begin() {
+wl_status_t ESP8266WiFiSTAClass::begin() {
 
     if(!WiFi.enableSTA(true)) {
         // enable STA failed
@@ -184,10 +184,10 @@ int ESP8266WiFiSTAClass::begin() {
  * @param gateway   Static gateway configuration
  * @param subnet    Static Subnet mask
  */
-void ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
+bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
 
     if(!WiFi.enableSTA(true)) {
-        return;
+        return false;
     }
 
     struct ip_info info;
@@ -196,9 +196,11 @@ void ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddres
     info.netmask.addr = static_cast<uint32_t>(subnet);
 
     wifi_station_dhcpc_stop();
-    wifi_set_ip_info(STATION_IF, &info);
-
-    _useStaticIp = true;
+    if(wifi_set_ip_info(STATION_IF, &info)) {
+        _useStaticIp = true;
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -208,21 +210,30 @@ void ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddres
  * @param subnet     Static Subnet mask
  * @param dns        Static DNS server
  */
-void ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns) {
+bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns) {
+
+    if(!WiFi.enableSTA(true)) {
+        return false;
+    }
+
     struct ip_info info;
     info.ip.addr = static_cast<uint32_t>(local_ip);
     info.gw.addr = static_cast<uint32_t>(gateway);
     info.netmask.addr = static_cast<uint32_t>(subnet);
 
     wifi_station_dhcpc_stop();
-    wifi_set_ip_info(STATION_IF, &info);
+    if(wifi_set_ip_info(STATION_IF, &info)) {
+        _useStaticIp = true;
+    } else {
+        return false;
+    }
 
     // Set DNS-Server
     ip_addr_t d;
     d.addr = static_cast<uint32_t>(dns);
     dns_setserver(0, &d);
 
-    _useStaticIp = true;
+    return true;
 }
 
 /**
@@ -243,7 +254,8 @@ bool ESP8266WiFiSTAClass::reconnect() {
  * @param wifioff
  * @return  one value of wl_status_t enum
  */
-int ESP8266WiFiSTAClass::disconnect(bool wifioff) {
+bool ESP8266WiFiSTAClass::disconnect(bool wifioff) {
+    bool ret;
     struct station_config conf;
     *conf.ssid = 0;
     *conf.password = 0;
@@ -254,15 +266,14 @@ int ESP8266WiFiSTAClass::disconnect(bool wifioff) {
     } else {
         wifi_station_set_config_current(&conf);
     }
-    wifi_station_disconnect();
+    ret = wifi_station_disconnect();
     ETS_UART_INTR_ENABLE();
 
     if(wifioff) {
         WiFi.enableSTA(false);
     }
 
-    //TODO return with more meaning ?
-    return 0;
+    return ret;
 }
 
 /**
@@ -391,18 +402,20 @@ bool ESP8266WiFiSTAClass::hostname(String aHostname) {
  *
  */
 wl_status_t ESP8266WiFiSTAClass::status() {
-    int status = wifi_station_get_connect_status();
+    station_status_t status = wifi_station_get_connect_status();
 
-    if(status == STATION_GOT_IP) {
-        return WL_CONNECTED;
-    } else if(status == STATION_NO_AP_FOUND) {
-        return WL_NO_SSID_AVAIL;
-    } else if(status == STATION_CONNECT_FAIL || status == STATION_WRONG_PASSWORD) {
-        return WL_CONNECT_FAILED;
-    } else if(status == STATION_IDLE) {
-        return WL_IDLE_STATUS;
-    } else {
-        return WL_DISCONNECTED;
+    switch(status) {
+        case STATION_GOT_IP:
+            return WL_CONNECTED;
+        case STATION_NO_AP_FOUND:
+            return WL_NO_SSID_AVAIL;
+        case STATION_CONNECT_FAIL:
+        case STATION_WRONG_PASSWORD:
+            return WL_CONNECT_FAILED;
+        case STATION_IDLE:
+            return WL_IDLE_STATUS;
+        default:
+            return WL_DISCONNECTED;
     }
 }
 
@@ -543,32 +556,38 @@ bool ESP8266WiFiSTAClass::_smartConfigDone = false;
 /**
  * Start SmartConfig
  */
-void ESP8266WiFiSTAClass::beginSmartConfig() {
-    if(_smartConfigStarted)
-        return;
+bool ESP8266WiFiSTAClass::beginSmartConfig() {
+    if(_smartConfigStarted) {
+        return false;
+    }
 
     if(!WiFi.enableSTA(true)) {
         // enable STA failed
-        return;
+        return false;
     }
 
-    _smartConfigStarted = true;
-    _smartConfigDone = false;
-
-    smartconfig_start(reinterpret_cast<sc_callback_t>(&ESP8266WiFiSTAClass::_smartConfigCallback), 1);
+    if(smartconfig_start(reinterpret_cast<sc_callback_t>(&ESP8266WiFiSTAClass::_smartConfigCallback), 1)) {
+        _smartConfigStarted = true;
+        _smartConfigDone = false;
+        return true;
+    }
+    return false;
 }
 
 
 /**
  *  Stop SmartConfig
  */
-void ESP8266WiFiSTAClass::stopSmartConfig() {
+bool ESP8266WiFiSTAClass::stopSmartConfig() {
     if(!_smartConfigStarted) {
-        return;
+        return true;
     }
 
-    smartconfig_stop();
-    _smartConfigStarted = false;
+    if(smartconfig_stop()) {
+        _smartConfigStarted = false;
+        return true;
+    }
+    return false;
 }
 
 /**

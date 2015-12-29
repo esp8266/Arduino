@@ -35,15 +35,15 @@ class ESP8266WiFiSTAClass {
 
     public:
 
-        int begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
-        int begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
-        int begin();
+        wl_status_t begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
+        wl_status_t begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL);
+        wl_status_t begin();
 
-        void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
-        void config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns);
+        bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
+        bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns);
 
         bool reconnect();
-        int disconnect(bool wifioff = false);
+        bool disconnect(bool wifioff = false);
 
         uint8_t waitForConnectResult();
 
@@ -84,10 +84,9 @@ class ESP8266WiFiSTAClass {
 
         bool beginWPSConfig(void);
 
-        void beginSmartConfig();
+        bool beginSmartConfig();
+        bool stopSmartConfig();
         bool smartConfigDone();
-        void stopSmartConfig();
-
 
     protected:
 
