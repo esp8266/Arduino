@@ -106,6 +106,7 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg) {
     DEBUGV("wifi evt: %d\n", event->event);
 
     if(event->event == EVENT_STAMODE_DISCONNECTED) {
+        DEBUGV("STA disconnect: %d\n", event->event_info.disconnected.reason);
         WiFiClient::stopAll();
     }
 

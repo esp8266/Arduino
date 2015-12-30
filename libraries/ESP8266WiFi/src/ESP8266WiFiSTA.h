@@ -44,6 +44,8 @@ class ESP8266WiFiSTAClass {
         bool reconnect();
         bool disconnect(bool wifioff = false);
 
+        bool isConnected();
+
         bool setAutoConnect(bool autoConnect);
         bool getAutoConnect();
 

@@ -268,6 +268,15 @@ bool ESP8266WiFiSTAClass::disconnect(bool wifioff) {
 }
 
 /**
+ * is STA interface connected?
+ * @return true if STA is connected to an AD
+ */
+bool ESP8266WiFiSTAClass::isConnected() {
+    return (status() == WL_CONNECTED);
+}
+
+
+/**
  * Setting the ESP8266 station to connect to the AP (which is recorded)
  * automatically or not when powered on. Enable auto-connect by default.
  * @param autoConnect bool
