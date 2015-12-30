@@ -181,6 +181,73 @@ generic.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 # generic.menu.FlashSize.16M.build.spiffs_blocksize=8192
 
 ##############################################################
+espduino.name=ESPDuino (ESP-13 Module)
+
+espduino.upload.tool=esptool
+espduino.upload.speed=115200
+espduino.upload.resetmethod=ck
+espduino.upload.maximum_size=1044464
+espduino.upload.maximum_data_size=81920
+espduino.upload.wait_for_upload_port=true
+espduino.serial.disableDTR=true
+espduino.serial.disableRTS=true
+
+espduino.build.mcu=esp8266
+espduino.build.f_cpu=80000000L
+espduino.build.board=ESP8266_ESP13
+espduino.build.core=esp8266
+espduino.build.variant=espduino
+espduino.build.flash_mode=dio
+espduino.build.flash_size=4M
+espduino.build.flash_freq=40
+
+espduino.menu.CpuFrequency.80=80 MHz
+espduino.menu.CpuFrequency.80.build.f_cpu=80000000L
+espduino.menu.CpuFrequency.160=160 MHz
+espduino.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+espduino.menu.UploadTool.esptool=Serial
+espduino.menu.UploadTool.esptool.upload.tool=esptool
+espduino.menu.UploadTool.esptool.upload.verbose=-vv
+espduino.menu.UploadTool.espota=OTA
+espduino.menu.UploadTool.espota.upload.tool=espota
+
+espduino.menu.UploadSpeed.115200=115200
+espduino.menu.UploadSpeed.115200.upload.speed=115200
+espduino.menu.UploadSpeed.9600=9600
+espduino.menu.UploadSpeed.9600.upload.speed=9600
+espduino.menu.UploadSpeed.57600=57600
+espduino.menu.UploadSpeed.57600.upload.speed=57600
+espduino.menu.UploadSpeed.256000.windows=256000
+espduino.menu.UploadSpeed.256000.upload.speed=256000
+espduino.menu.UploadSpeed.230400.linux=230400
+espduino.menu.UploadSpeed.230400.macosx=230400
+espduino.menu.UploadSpeed.230400.macosx=230400
+espduino.menu.UploadSpeed.230400.upload.speed=230400
+espduino.menu.UploadSpeed.460800.linux=460800
+espduino.menu.UploadSpeed.460800.macosx=460800
+espduino.menu.UploadSpeed.460800.upload.speed=460800
+espduino.menu.UploadSpeed.512000.windows=512000
+espduino.menu.UploadSpeed.512000.upload.speed=512000
+espduino.menu.UploadSpeed.921600=921600
+espduino.menu.UploadSpeed.921600.upload.speed=921600
+
+espduino.menu.FlashSize.4M3M=4M (3M SPIFFS)
+espduino.menu.FlashSize.4M3M.build.flash_size=4M
+espduino.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+espduino.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+espduino.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+espduino.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+espduino.menu.FlashSize.4M3M.build.spiffs_pagesize=256
+
+espduino.menu.FlashSize.4M1M=4M (1M SPIFFS)
+espduino.menu.FlashSize.4M1M.build.flash_size=4M
+espduino.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+espduino.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+espduino.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+espduino.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+espduino.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+##############################################################
 huzzah.name=Adafruit HUZZAH ESP8266
 
 huzzah.upload.tool=esptool
