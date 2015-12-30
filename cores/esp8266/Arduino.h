@@ -37,6 +37,7 @@ extern "C" {
 #include "binary.h"
 #include "esp8266_peri.h"
 #include "twi.h"
+#include "core_esp8266_features.h"
 
 #define HIGH 0x1
 #define LOW  0x0
@@ -247,8 +248,12 @@ void optimistic_yield(uint32_t interval_us);
 #include "Updater.h"
 #include "debug.h"
 
+#ifndef _GLIBCXX_VECTOR
+// arduino is not compatible with std::vector
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
+#endif
+
 #define _min(a,b) ((a)<(b)?(a):(b))
 #define _max(a,b) ((a)>(b)?(a):(b))
 
