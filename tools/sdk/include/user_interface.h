@@ -164,7 +164,7 @@ bool wifi_set_opmode_current(uint8 opmode);
 uint8 wifi_get_broadcast_if(void);
 bool wifi_set_broadcast_if(uint8 interface);
 
-struct bss_info {
+typedef struct bss_info {
     STAILQ_ENTRY(bss_info)     next;
 
     uint8 bssid[6];
@@ -177,7 +177,7 @@ struct bss_info {
     sint16 freq_offset;
     sint16 freqcal_val;
 	uint8 *esp_mesh_ie;
-};
+} bss_info_t;
 
 typedef struct _scaninfo {
     STAILQ_HEAD(, bss_info) *pbss;
@@ -222,21 +222,21 @@ bool wifi_station_set_auto_connect(uint8 set);
 
 bool wifi_station_set_reconnect_policy(bool set);
 
-enum {
+typedef enum {
     STATION_IDLE = 0,
     STATION_CONNECTING,
     STATION_WRONG_PASSWORD,
     STATION_NO_AP_FOUND,
     STATION_CONNECT_FAIL,
     STATION_GOT_IP
-};
+} station_status_t;
 
 enum dhcp_status {
 	DHCP_STOPPED,
 	DHCP_STARTED
 };
 
-uint8 wifi_station_get_connect_status(void);
+station_status_t wifi_station_get_connect_status(void);
 
 uint8 wifi_station_get_current_ap_id(void);
 bool wifi_station_ap_change(uint8 current_ap_id);

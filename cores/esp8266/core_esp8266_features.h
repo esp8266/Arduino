@@ -28,6 +28,8 @@
 #define CORE_HAS_LIBB64
 #define CORE_HAS_BASE64_CLASS
 
+#define WIFI_HAS_EVENT_CALLBACK
+
 
 #endif
 
