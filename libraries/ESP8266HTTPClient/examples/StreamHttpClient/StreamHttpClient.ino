@@ -50,7 +50,7 @@ void loop() {
         USE_SERIAL.print("[HTTP] GET...\n");
         // start connection and send HTTP header
         int httpCode = http.GET();
-        if(httpCode) {
+        if(httpCode > 0) {
             // HTTP header has been send and Server response header has been handled
             USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
 

@@ -48,7 +48,7 @@ void loop() {
         //http.begin("192.168.1.12", 80, "/test.html");
 
         int httpCode = http.GET();
-        if(httpCode) {
+        if(httpCode > 0) {
             USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
 
             // file found at server

@@ -51,7 +51,7 @@ void loop() {
         int httpCode = http.GET();
 
         // httpCode will be negative on error
-        if(httpCode) {
+        if(httpCode > 0) {
             // HTTP header has been send and Server response header has been handled
             USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
 
