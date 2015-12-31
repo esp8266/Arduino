@@ -137,6 +137,8 @@ class HTTPClient {
         void setAuthorization(const char * auth);
         void setTimeout(uint16_t timeout);
 
+        void useHTTP10(bool usehttp10 = true);
+
         /// request handling
         int GET();
         int POST(uint8_t * payload, size_t size);
@@ -180,6 +182,7 @@ class HTTPClient {
         uint16_t _port;
         bool _reuse;
         uint16_t _tcpTimeout;
+        bool _useHTTP10;
 
         String _url;
         bool _https;

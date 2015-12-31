@@ -41,6 +41,7 @@ HTTPClient::HTTPClient() {
 
     _reuse = false;
     _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
+    _useHTTP10 = false;
 
     _https = false;
 
@@ -264,6 +265,16 @@ void HTTPClient::setTimeout(uint16_t timeout) {
     if(connected()) {
         _tcp->setTimeout(timeout);
     }
+}
+
+
+
+/**
+ * use HTTP1.0
+ * @param timeout
+ */
+void HTTPClient::useHTTP10(bool useHTTP10) {
+     _useHTTP10 = useHTTP10;
 }
 
 /**
@@ -757,10 +768,17 @@ bool HTTPClient::sendHeader(const char * type) {
         return false;
     }
 
-    String header = String(type) + " " + _url + " HTTP/1.1\r\n"
+    String header = String(type) + " " + _url + " HTTP/1.";
+
+    if(_useHTTP10) {
+        header += "0";
+    } else {
+        header += "1";
+    }
+
+    header += "\r\n"
             "Host: " + _host + "\r\n"
             "User-Agent: " + _userAgent + "\r\n"
-            "Accept-Encoding: identity;q=1 chunked;q=0.1 *;q=0\r\n"
             "Connection: ";
 
     if(_reuse) {
@@ -769,6 +787,10 @@ bool HTTPClient::sendHeader(const char * type) {
         header += "close";
     }
     header += "\r\n";
+
+    if(!_useHTTP10) {
+        header += "Accept-Encoding: identity;q=1 chunked;q=0.1 *;q=0\r\n";
+    }
 
     if(_base64Authorization.length()) {
         header += "Authorization: Basic " + _base64Authorization + "\r\n";
