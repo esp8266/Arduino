@@ -864,10 +864,10 @@ int HTTPClient::handleHeaderResponse() {
 
 
 /**
- *
- * @param stream
- * @param len
- * @return
+ * write one Data Block to Stream
+ * @param stream Stream *
+ * @param size int
+ * @return < 0 = error >= 0 = size written
  */
 int HTTPClient::writeToStreamDataBlock(Stream * stream, int size) {
     int buff_size = HTTP_TCP_BUFFER_SIZE;
