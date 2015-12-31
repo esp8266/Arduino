@@ -146,6 +146,9 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
 
     t_httpUpdate_return ret = HTTP_UPDATE_FAILED;
 
+    // use HTTP/1.0 for update since the update handler not support any transfer Encoding
+    http->useHTTP10(true);
+    http->setTimeout(8000);
     http->setUserAgent("ESP8266-http-Update");
     http->addHeader("x-ESP8266-STA-MAC", WiFi.macAddress());
     http->addHeader("x-ESP8266-AP-MAC", WiFi.softAPmacAddress());
