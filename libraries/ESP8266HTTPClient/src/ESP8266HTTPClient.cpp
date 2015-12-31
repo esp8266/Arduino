@@ -985,6 +985,7 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size) {
 
         if((size > 0) && (size != bytesWritten)) {
             DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] bytesWritten %d and size %d mismatch!.\n", bytesWritten, size);
+            return HTTPC_ERROR_STREAM_WRITE;
         }
 
     } else {
