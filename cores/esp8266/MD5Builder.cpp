@@ -23,6 +23,21 @@ void MD5Builder::addHexString(const char * data){
   free(tmp);
 }
 
+void MD5Builder::addStream(Stream & stream, const size_t total_len){
+  const int buf_size = 512;
+  size_t len = total_len;
+  uint8_t * buf = (uint8_t*)malloc(buf_size);
+  while (len > 0) {
+    size_t i = 0;
+    while (i < buf_size && len > 0) {
+      buf[i++] = (uint8_t)stream.read();
+      len--;
+    }
+    MD5Update(&_ctx, buf, i);
+  }
+  free(buf); 
+}
+
 void MD5Builder::calculate(void){
   MD5Final(_buf, &_ctx);
 }

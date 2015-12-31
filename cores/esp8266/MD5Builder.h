@@ -37,6 +37,7 @@ class MD5Builder {
     void addHexString(const char * data);
     void addHexString(char * data){ addHexString((const char*)data); }
     void addHexString(String data){ addHexString(data.c_str()); }
+    void addStream(Stream & stream, size_t len);
     void calculate(void);
     void getBytes(uint8_t * output);
     void getChars(char * output);
