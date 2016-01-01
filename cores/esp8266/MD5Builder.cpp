@@ -26,7 +26,6 @@ void MD5Builder::addHexString(const char * data){
 bool MD5Builder::addStream(Stream & stream, const int total_len) {
     const int buf_size = 512;
     int bytesleft = total_len;
-    int bytestoread;
     uint8_t * buf = (uint8_t*) malloc(buf_size);
     if(buf) {
         while((stream.available() > -1) && (bytesleft > 0)) {
