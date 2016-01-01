@@ -495,7 +495,7 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
   size_t hostNameLen = hostName.length();
 
   char underscore[]  = "_";
-
+ 
   // build service name with _
   char serviceName[os_strlen(service)+2];
   os_strcpy(serviceName,underscore);
