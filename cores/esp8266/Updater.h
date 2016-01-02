@@ -22,7 +22,11 @@
 #define U_SPIFFS  100
 #define U_AUTH    200
 
-//#define DEBUG_UPDATER Serial
+#ifdef DEBUG_ESP_UPDATER
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_UPDATER DEBUG_ESP_PORT
+#endif
+#endif
 
 class UpdaterClass {
   public:
