@@ -25,7 +25,11 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
-//#define DEBUG_HTTPCLIENT(...) Serial1.printf( __VA_ARGS__ )
+#ifdef DEBUG_ESP_HTTP_CLIENT
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_HTTPCLIENT(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#endif
+#endif
 
 #ifndef DEBUG_HTTPCLIENT
 #define DEBUG_HTTPCLIENT(...)

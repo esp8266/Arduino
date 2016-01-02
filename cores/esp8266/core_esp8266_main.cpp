@@ -101,6 +101,9 @@ static void loop_wrapper() {
     preloop_update_frequency();
     if(!setup_done) {
         setup();
+#ifdef DEBUG_ESP_PORT
+        DEBUG_ESP_PORT.setDebugOutput(true);
+#endif
         setup_done = true;
     }
     loop();

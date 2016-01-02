@@ -41,7 +41,9 @@ extern "C"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
-//#define DEBUG_SSL
+#ifdef DEBUG_ESP_SSL
+#define DEBUG_SSL
+#endif
 
 #ifdef DEBUG_SSL
 #define SSL_DEBUG_OPTS SSL_DISPLAY_STATES

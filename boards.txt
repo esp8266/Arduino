@@ -6,6 +6,8 @@ menu.FlashFreq=Flash Frequency
 menu.UploadTool=Upload Using
 menu.ResetMethod=Reset Method
 menu.ESPModule=Module
+menu.Debug=Debug port
+menu.DebugLevel=Debug Level
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -26,6 +28,8 @@ generic.build.core=esp8266
 generic.build.variant=generic
 generic.build.flash_mode=qio
 generic.build.spiffs_pagesize=256
+generic.build.debug_port=
+generic.build.debug_level=
 
 generic.menu.UploadTool.esptool=Serial
 generic.menu.UploadTool.esptool.upload.tool=esptool
@@ -165,6 +169,28 @@ generic.menu.ResetMethod.ck=ck
 generic.menu.ResetMethod.ck.upload.resetmethod=ck
 generic.menu.ResetMethod.nodemcu=nodemcu
 generic.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+
+generic.menu.Debug.Disabled=Disabled
+generic.menu.Debug.Disabled.build.debug_port=
+generic.menu.Debug.Serial=Serial
+generic.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+generic.menu.Debug.Serial1=Serial1
+generic.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+generic.menu.DebugLevel.None=None
+generic.menu.DebugLevel.None.build.debug_level=
+generic.menu.DebugLevel.Core=Core
+generic.menu.DebugLevel.Core.build.debug_level=-DDEBUG_ESP_CORE
+generic.menu.DebugLevel.SSL=Core + SSL
+generic.menu.DebugLevel.SSL.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+generic.menu.DebugLevel.HTTPClient=HTTPClient
+generic.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+generic.menu.DebugLevel.HTTPUpdate=HTTPUpdate
+generic.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
+generic.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
+generic.menu.DebugLevel.HTTPUpdate2.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE
+generic.menu.DebugLevel.HTTPServer=HTTPServer
+generic.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
 
 # disabled because espressif's bootloader refuses to write above 4M
 # generic.menu.FlashSize.8M=8M (7M SPIFFS)
