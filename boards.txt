@@ -197,10 +197,14 @@ generic.menu.DebugLevel.HTTPUpdate3=HTTPClient + HTTPUpdate + Updater
 generic.menu.DebugLevel.HTTPUpdate3.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER
 generic.menu.DebugLevel.HTTPServer=HTTPServer
 generic.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
-generic.menu.DebugLevel.UPDATER=Updater (OTA)
+generic.menu.DebugLevel.UPDATER=Updater
 generic.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
+generic.menu.DebugLevel.OTA=OTA
+generic.menu.DebugLevel.OTA.build.debug_level=-DDEBUG_ESP_OTA
+generic.menu.DebugLevel.OTA2=OTA + Updater
+generic.menu.DebugLevel.OTA2.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
 generic.menu.DebugLevel.all=All
-generic.menu.DebugLevel.all.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER
+generic.menu.DebugLevel.all.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
 
 # disabled because espressif's bootloader refuses to write above 4M
 # generic.menu.FlashSize.8M=8M (7M SPIFFS)

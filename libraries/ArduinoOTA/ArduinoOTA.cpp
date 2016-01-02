@@ -18,7 +18,12 @@ extern "C" {
 #include "include/UdpContext.h"
 #include <ESP8266mDNS.h>
 
-//#define OTA_DEBUG 1
+
+#ifdef DEBUG_ESP_OTA
+#ifdef DEBUG_ESP_PORT
+#define OTA_DEBUG DEBUG_ESP_PORT
+#endif
+#endif
 
 ArduinoOTAClass::ArduinoOTAClass()
 : _port(0)
@@ -109,8 +114,8 @@ void ArduinoOTAClass::begin() {
   }
   _initialized = true;
   _state = OTA_IDLE;
-#if OTA_DEBUG
-  Serial.printf("OTA server at: %s.local:%u\n", _hostname.c_str(), _port);
+#ifdef OTA_DEBUG
+  OTA_DEBUG.printf("OTA server at: %s.local:%u\n", _hostname.c_str(), _port);
 #endif
 }
 
@@ -226,8 +231,8 @@ void ArduinoOTAClass::_onRx(){
 
 void ArduinoOTAClass::_runUpdate() {
   if (!Update.begin(_size, _cmd)) {
-#if OTA_DEBUG
-    Serial.println("Update Begin Error");
+#ifdef OTA_DEBUG
+    OTA_DEBUG.println("Update Begin Error");
 #endif
     if (_error_callback) {
       _error_callback(OTA_BEGIN_ERROR);
@@ -249,8 +254,8 @@ void ArduinoOTAClass::_runUpdate() {
 
   WiFiClient client;
   if (!client.connect(_ota_ip, _ota_port)) {
-#if OTA_DEBUG
-    Serial.printf("Connect Failed\n");
+#ifdef OTA_DEBUG
+    OTA_DEBUG.printf("Connect Failed\n");
 #endif
     _udp_ota->listen(*IP_ADDR_ANY, _port);
     if (_error_callback) {
@@ -265,8 +270,8 @@ void ArduinoOTAClass::_runUpdate() {
     while (!client.available() && waited--)
       delay(1);
     if (!waited){
-#if OTA_DEBUG
-      Serial.printf("Receive Failed\n");
+#ifdef OTA_DEBUG
+      OTA_DEBUG.printf("Receive Failed\n");
 #endif
       _udp_ota->listen(*IP_ADDR_ANY, _port);
       if (_error_callback) {
@@ -288,8 +293,8 @@ void ArduinoOTAClass::_runUpdate() {
     client.print("OK");
     client.stop();
     delay(10);
-#if OTA_DEBUG
-    Serial.printf("Update Success\nRebooting...\n");
+#ifdef OTA_DEBUG
+    OTA_DEBUG.printf("Update Success\nRebooting...\n");
 #endif
     if (_end_callback) {
       _end_callback();
@@ -301,8 +306,8 @@ void ArduinoOTAClass::_runUpdate() {
       _error_callback(OTA_END_ERROR);
     }
     Update.printError(client);
-#if OTA_DEBUG
-    Update.printError(Serial);
+#ifdef OTA_DEBUG
+    Update.printError(OTA_DEBUG);
 #endif
     _state = OTA_IDLE;
   }
