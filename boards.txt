@@ -240,6 +240,8 @@ espduino.build.variant=espduino
 espduino.build.flash_mode=dio
 espduino.build.flash_size=4M
 espduino.build.flash_freq=40
+espduino.build.debug_port=
+espduino.build.debug_level=
 
 espduino.menu.CpuFrequency.80=80 MHz
 espduino.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -307,6 +309,8 @@ huzzah.build.variant=adafruit
 huzzah.build.flash_mode=qio
 huzzah.build.flash_size=4M
 huzzah.build.flash_freq=40
+huzzah.build.debug_port=
+huzzah.build.debug_level=
 
 huzzah.menu.CpuFrequency.80=80 MHz
 huzzah.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -364,6 +368,8 @@ nodemcu.build.variant=nodemcu
 nodemcu.build.flash_mode=qio
 nodemcu.build.flash_size=4M
 nodemcu.build.flash_freq=40
+nodemcu.build.debug_port=
+nodemcu.build.debug_level=
 
 nodemcu.menu.CpuFrequency.80=80 MHz
 nodemcu.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -430,6 +436,8 @@ nodemcuv2.build.variant=nodemcu
 nodemcuv2.build.flash_mode=dio
 nodemcuv2.build.flash_size=4M
 nodemcuv2.build.flash_freq=40
+nodemcuv2.build.debug_port=
+nodemcuv2.build.debug_level=
 
 nodemcuv2.menu.CpuFrequency.80=80 MHz
 nodemcuv2.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -505,6 +513,8 @@ modwifi.build.spiffs_start=0x100000
 modwifi.build.spiffs_end=0x1FB000
 modwifi.build.spiffs_pagesize=256
 modwifi.build.spiffs_blocksize=8192
+modwifi.build.debug_port=
+modwifi.build.debug_level=
 
 modwifi.menu.CpuFrequency.80=80 MHz
 modwifi.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -561,6 +571,8 @@ thing.build.spiffs_start=0x6B000
 thing.build.spiffs_end=0x7B000
 thing.build.spiffs_blocksize=4096
 thing.build.spiffs_pagesize=256
+thing.build.debug_port=
+thing.build.debug_level=
 
 thing.menu.CpuFrequency.80=80 MHz
 thing.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -610,6 +622,8 @@ esp210.build.variant=generic
 esp210.build.flash_mode=qio
 esp210.build.flash_size=4M
 esp210.build.flash_freq=40
+esp210.build.debug_port=
+esp210.build.debug_level=
 
 esp210.menu.CpuFrequency.80=80 MHz
 esp210.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -703,6 +717,8 @@ d1_mini.build.variant=d1_mini
 d1_mini.build.flash_mode=dio
 d1_mini.build.flash_size=4M
 d1_mini.build.flash_freq=40
+d1_mini.build.debug_port=
+d1_mini.build.debug_level=
 
 d1_mini.menu.CpuFrequency.80=80 MHz
 d1_mini.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -774,6 +790,8 @@ d1.build.variant=d1
 d1.build.flash_mode=dio
 d1.build.flash_size=4M
 d1.build.flash_freq=40
+d1.build.debug_port=
+d1.build.debug_level=
 
 d1.menu.CpuFrequency.80=80 MHz
 d1.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -847,6 +865,8 @@ espino.build.flash_mode=qio
 espino.build.flash_size=4M
 espino.build.flash_freq=40
 espino.build.spiffs_pagesize=256
+espino.build.debug_port=
+espino.build.debug_level=
 
 espino.menu.UploadTool.esptool=Serial
 espino.menu.UploadTool.esptool.upload.tool=esptool
@@ -924,6 +944,8 @@ wifinfo.build.variant=wifinfo
 wifinfo.build.flash_mode=qio
 wifinfo.build.board=ESP8266_ESP12
 wifinfo.build.spiffs_pagesize=256
+wifinfo.build.debug_port=
+wifinfo.build.debug_level=
 
 #wifinfo.menu.ESPModule.ESP07512=ESP07 (1M/512K SPIFFS)
 #wifinfo.menu.ESPModule.ESP07512.build.board=ESP8266_ESP07
