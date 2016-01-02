@@ -32,7 +32,11 @@
 #include <WiFiUdp.h>
 #include <ESP8266HTTPClient.h>
 
-//#define DEBUG_HTTP_UPDATE(...) Serial1.printf( __VA_ARGS__ )
+#ifdef DEBUG_ESP_HTTP_UPDATE
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_HTTP_UPDATE(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#endif
+#endif
 
 #ifndef DEBUG_HTTP_UPDATE
 #define DEBUG_HTTP_UPDATE(...)
