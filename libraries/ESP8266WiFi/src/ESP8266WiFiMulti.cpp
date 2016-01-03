@@ -127,7 +127,7 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                         ip = WiFi.localIP();
                         mac = WiFi.BSSID();
                         DEBUG_WIFI_MULTI("[WIFI] Connecting done.\n");
-                        DEBUG_WIFI_MULTI("[WIFI] SSID: %s\n", WiFi.SSID());
+                        DEBUG_WIFI_MULTI("[WIFI] SSID: %s\n", WiFi.SSID().c_str());
                         DEBUG_WIFI_MULTI("[WIFI] IP: %d.%d.%d.%d\n", ip[0], ip[1], ip[2], ip[3]);
                         DEBUG_WIFI_MULTI("[WIFI] MAC: %02X:%02X:%02X:%02X:%02X:%02X\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
                         DEBUG_WIFI_MULTI("[WIFI] Channel: %d\n", WiFi.channel());
