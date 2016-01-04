@@ -39,7 +39,7 @@ cat << EOF > exclude.txt
 package
 EOF
 # Also include all files which are ignored by git
-git ls-files --other --ignored --exclude-standard --directory >> exclude.txt
+git ls-files --other --directory >> exclude.txt
 # Now copy files to $outdir
 rsync -a --exclude-from 'exclude.txt' $srcdir/ $outdir/
 rm exclude.txt
