@@ -21,7 +21,10 @@
 #ifndef __cbuf_h
 #define __cbuf_h
 
+#include <stddef.h>
 #include <stdint.h>
+#include <string.h>
+
 class cbuf {
     public:
         cbuf(size_t size) :
@@ -32,11 +35,7 @@ class cbuf {
             delete[] _buf;
         }
 
-        size_t getSize() const {
-            if(_end >= _begin) return _end - _begin;
-
-            return _size - (_begin - _end);
-        }
+        size_t getSize() const;
 
         size_t room() const {
             if(_end >= _begin) {
@@ -45,23 +44,21 @@ class cbuf {
             return _begin - _end - 1;
         }
 
-        bool empty() const {
+        inline bool empty() const {
             return _begin == _end;
         }
 
+        inline bool full() const {
+            return wrap_if_bufend(_end + 1) == _begin;
+        }
+
         int peek() {
-            if(_end == _begin) return -1;
+            if(empty()) return -1;
 
             return static_cast<int>(*_begin);
         }
 
-        int read() {
-            if(getSize() == 0) return -1;
-
-            char result = *_begin;
-            _begin = wrap_if_bufend(_begin + 1);
-            return static_cast<int>(result);
-        }
+        int read();
 
         size_t read(char* dst, size_t size) {
             size_t bytes_available = getSize();
@@ -79,13 +76,7 @@ class cbuf {
             return size_read;
         }
 
-        size_t write(char c) {
-            if(room() == 0) return 0;
-
-            *_end = c;
-            _end = wrap_if_bufend(_end + 1);
-            return 1;
-        }
+        size_t write(char c);
 
         size_t write(const char* src, size_t size) {
             size_t bytes_available = room();
@@ -109,7 +100,7 @@ class cbuf {
         }
 
     private:
-        inline char* wrap_if_bufend(char* ptr) {
+        inline char* wrap_if_bufend(char* ptr) const {
             return (ptr == _bufend) ? _buf : ptr;
         }
 

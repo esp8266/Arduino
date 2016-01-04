@@ -31,6 +31,10 @@ public:
         xt_wsr_ps(_state);
     }
 
+    uint32_t savedInterruptLevel() const {
+        return _state & 0x0f;
+    }
+
 protected:
     uint32_t _state;
 };
