@@ -4,7 +4,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-//#define DEBUGV(...) ets_printf(__VA_ARGS__)
+#ifdef DEBUG_ESP_CORE
+#define DEBUGV(...) ets_printf(__VA_ARGS__)
+#endif
 
 #ifndef DEBUGV
 #define DEBUGV(...)

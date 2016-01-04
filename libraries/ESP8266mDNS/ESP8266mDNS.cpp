@@ -290,7 +290,8 @@ void MDNSResponder::_parsePacket(){
   uint16_t servicePort = 0;
 
   char protoName[32];
-  uint8_t protoNameLen;
+  protoName[0] = 0;
+  uint8_t protoNameLen = 0;
 
   uint16_t packetHeader[6];
 
@@ -330,7 +331,7 @@ void MDNSResponder::_parsePacket(){
     serviceName[serviceNameLen] = '\0';
 
     if(serviceName[0] == '_'){
-      memcpy(serviceName, serviceName+1, serviceNameLen);
+      memmove(serviceName, serviceName+1, serviceNameLen);
       serviceNameLen--;
       serviceParsed = true;
     } else if(serviceNameLen == 5 && strcmp("local", serviceName) == 0){
@@ -362,7 +363,7 @@ void MDNSResponder::_parsePacket(){
     _conn_readS(protoName, protoNameLen);
     protoName[protoNameLen] = '\0';
     if(protoNameLen == 4 && protoName[0] == '_'){
-      memcpy(protoName, protoName+1, protoNameLen);
+      memmove(protoName, protoName+1, protoNameLen);
       protoNameLen--;
       protoParsed = true;
     } else {
@@ -494,7 +495,7 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
   size_t hostNameLen = hostName.length();
 
   char underscore[]  = "_";
-
+ 
   // build service name with _
   char serviceName[os_strlen(service)+2];
   os_strcpy(serviceName,underscore);
