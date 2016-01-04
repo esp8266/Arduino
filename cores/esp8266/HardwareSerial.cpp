@@ -101,7 +101,8 @@ void uart_disarm_tx_interrupt(uart_t* uart);
 void uart_set_baudrate(uart_t* uart, int baud_rate);
 int uart_get_baudrate(uart_t* uart);
 
-uart_t* uart_init(int uart_nr, int baudrate, byte config);
+uart_t* uart_start_init(int uart_nr, int baudrate, byte config);
+void uart_finish_init(uart_t* uart);
 void uart_uninit(uart_t* uart);
 void uart_swap(uart_t* uart);
 
@@ -115,6 +116,13 @@ int uart_get_debug();
 // ####################################################################################################
 // ####################################################################################################
 // ####################################################################################################
+
+// These function internals can be used from interrupt handlers to ensure they
+// are in instruction RAM, or anywhere that the uart_nr has been validated.
+#define UART_GET_TX_FIFO_ROOM(uart_nr)     (UART_TX_FIFO_SIZE - ((USS(uart_nr) >> USTXC) & 0xff))
+#define UART_TRANSMIT_CHAR(uart_nr, c)     do { USF(uart_nr) = (c); } while(0)
+#define UART_ARM_TX_INTERRUPT(uart_nr)     do { USIE(uart_nr) |= (1 << UIFE); } while(0)
+#define UART_DISARM_TX_INTERRUPT(uart_nr)  do { USIE(uart_nr) &= ~(1 << UIFE); } while(0)
 
 void ICACHE_RAM_ATTR uart_interrupt_handler(uart_t* uart) {
 
@@ -133,13 +141,7 @@ void ICACHE_RAM_ATTR uart_interrupt_handler(uart_t* uart) {
     }
 
     // -------------- UART 1 --------------
-
-    if(Serial1.isRxEnabled()) {
-        while(U1IS & (1 << UIFF)) {
-            Serial1._rx_complete_irq((char) (U1F & 0xff));
-            U1IC = (1 << UIFF);
-        }
-    }
+    // Note: only TX is supported on UART 1.
     if(Serial1.isTxEnabled()) {
         if(U1IS & (1 << UIFE)) {
             U1IC = (1 << UIFE);
@@ -166,7 +168,7 @@ size_t uart_get_tx_fifo_room(uart_t* uart) {
     if(uart == 0)
         return 0;
     if(uart->txEnabled) {
-        return UART_TX_FIFO_SIZE - ((USS(uart->uart_nr) >> USTXC) & 0xff);
+        return UART_GET_TX_FIFO_ROOM(uart->uart_nr);
     }
     return 0;
 }
@@ -183,7 +185,7 @@ void uart_transmit_char(uart_t* uart, char c) {
     if(uart == 0)
         return;
     if(uart->txEnabled) {
-        USF(uart->uart_nr) = c;
+        UART_TRANSMIT_CHAR(uart->uart_nr, c);
     }
 }
 
@@ -247,7 +249,7 @@ void uart_arm_tx_interrupt(uart_t* uart) {
     if(uart == 0)
         return;
     if(uart->txEnabled) {
-        USIE(uart->uart_nr) |= (1 << UIFE);
+        UART_ARM_TX_INTERRUPT(uart->uart_nr);
     }
 }
 
@@ -255,7 +257,7 @@ void uart_disarm_tx_interrupt(uart_t* uart) {
     if(uart == 0)
         return;
     if(uart->txEnabled) {
-        USIE(uart->uart_nr) &= ~(1 << UIFE);
+        UART_DISARM_TX_INTERRUPT(uart->uart_nr);
     }
 }
 
@@ -272,9 +274,8 @@ int uart_get_baudrate(uart_t* uart) {
     return uart->baud_rate;
 }
 
-uart_t* uart_init(int uart_nr, int baudrate, byte config, byte mode) {
+uart_t* uart_start_init(int uart_nr, int baudrate, byte config, byte mode) {
 
-    uint32_t conf1 = 0x00000000;
     uart_t* uart = (uart_t*) os_malloc(sizeof(uart_t));
 
     if(uart == 0) {
@@ -294,6 +295,7 @@ uart_t* uart_init(int uart_nr, int baudrate, byte config, byte mode) {
             IOSWAP &= ~(1 << IOSWAPU0);
             break;
         case UART1:
+            // Note: uart_interrupt_handler does not support RX on UART 1.
             uart->rxEnabled = false;
             uart->txEnabled = (mode != SERIAL_RX_ONLY);
             uart->rxPin = 255;
@@ -309,6 +311,12 @@ uart_t* uart_init(int uart_nr, int baudrate, byte config, byte mode) {
     uart_set_baudrate(uart, baudrate);
     USC0(uart->uart_nr) = config;
 
+    return uart;
+}
+
+void uart_finish_init(uart_t* uart) {
+    uint32_t conf1 = 0x00000000;
+
     uart_flush(uart);
     uart_interrupt_enable(uart);
 
@@ -321,8 +329,6 @@ uart_t* uart_init(int uart_nr, int baudrate, byte config, byte mode) {
     }
 
     USC1(uart->uart_nr) = conf1;
-
-    return uart;
 }
 
 void uart_uninit(uart_t* uart) {
@@ -479,35 +485,48 @@ int uart_get_debug() {
 // ####################################################################################################
 
 HardwareSerial::HardwareSerial(int uart_nr) :
-        _uart_nr(uart_nr), _uart(0), _tx_buffer(0), _rx_buffer(0), _written(false) {
+        _uart_nr(uart_nr), _uart(0), _tx_buffer(0), _rx_buffer(0) {
 }
 
 void HardwareSerial::begin(unsigned long baud, byte config, byte mode) {
+    InterruptLock il;
 
     // disable debug for this interface
     if(uart_get_debug() == _uart_nr) {
         uart_set_debug(UART_NO);
     }
 
-    _uart = uart_init(_uart_nr, baud, config, mode);
+    if (_uart) {
+        os_free(_uart);
+    }
+    _uart = uart_start_init(_uart_nr, baud, config, mode);
 
     if(_uart == 0) {
         return;
     }
 
-    if(_uart->rxEnabled) {
-        if(!_rx_buffer)
-            _rx_buffer = new cbuf(SERIAL_RX_BUFFER_SIZE);
+    // Disable the RX and/or TX functions if we fail to allocate circular buffers.
+    // The user can confirm they are enabled with isRxEnabled() and isTxEnabled().
+    if(_uart->rxEnabled && !_rx_buffer) {
+        _rx_buffer = new cbuf(SERIAL_RX_BUFFER_SIZE);
+        if(!_rx_buffer) {
+            _uart->rxEnabled = false;
+        }
     }
-    if(_uart->txEnabled) {
-        if(!_tx_buffer)
-            _tx_buffer = new cbuf(SERIAL_TX_BUFFER_SIZE);
+    if(_uart->txEnabled && !_tx_buffer) {
+        _tx_buffer = new cbuf(SERIAL_TX_BUFFER_SIZE);
+        if(!_tx_buffer) {
+            _uart->txEnabled = false;
+        }
     }
-    _written = false;
     delay(1);
+
+    uart_finish_init(_uart);
 }
 
 void HardwareSerial::end() {
+    InterruptLock il;
+
     if(uart_get_debug() == _uart_nr) {
         uart_set_debug(UART_NO);
     }
@@ -541,13 +560,13 @@ void HardwareSerial::setDebugOutput(bool en) {
     }
 }
 
-bool HardwareSerial::isTxEnabled(void) {
+bool ICACHE_RAM_ATTR HardwareSerial::isTxEnabled(void) {
     if(_uart == 0)
         return false;
     return _uart->txEnabled;
 }
 
-bool HardwareSerial::isRxEnabled(void) {
+bool ICACHE_RAM_ATTR HardwareSerial::isRxEnabled(void) {
     if(_uart == 0)
         return false;
     return _uart->rxEnabled;
@@ -606,43 +625,51 @@ void HardwareSerial::flush() {
         return;
     if(!_uart->txEnabled)
         return;
-    if(!_written)
-        return;
 
+    const int uart_nr = _uart->uart_nr;
     while(true) {
         {
             InterruptLock il;
             if(_tx_buffer->getSize() == 0 &&
-               uart_get_tx_fifo_room(_uart) >= UART_TX_FIFO_SIZE) {
+               UART_GET_TX_FIFO_ROOM(uart_nr) >= UART_TX_FIFO_SIZE) {
                 break;
+            } else if(il.savedInterruptLevel() > 0) {
+                _tx_empty_irq();
+                continue;
             }
         }
         yield();
     }
-    _written = false;
 }
 
 size_t HardwareSerial::write(uint8_t c) {
     if(_uart == 0 || !_uart->txEnabled)
         return 0;
-    _written = true;
 
+    bool tx_now = false;
+    const int uart_nr = _uart->uart_nr;
     while(true) {
         {
             InterruptLock il;
             if(_tx_buffer->empty()) {
-                if(uart_get_tx_fifo_room(_uart) > 0) {
-                    uart_transmit_char(_uart, c);
+                if(UART_GET_TX_FIFO_ROOM(uart_nr) > 0) {
+                    tx_now = true;
                 } else {
                     _tx_buffer->write(c);
-                    uart_arm_tx_interrupt(_uart);
+                    UART_ARM_TX_INTERRUPT(uart_nr);
                 }
                 break;
             } else if(_tx_buffer->write(c)) {
                 break;
+            } else if(il.savedInterruptLevel() > 0) {
+                _tx_empty_irq();
+                continue;
             }
         }
         yield();
+    }
+    if (tx_now) {
+        UART_TRANSMIT_CHAR(uart_nr, c);
     }
     return 1;
 }
@@ -651,26 +678,21 @@ HardwareSerial::operator bool() const {
     return _uart != 0;
 }
 
-void HardwareSerial::_rx_complete_irq(char c) {
-    if(_rx_buffer) {
-        _rx_buffer->write(c);
-    }
+void ICACHE_RAM_ATTR HardwareSerial::_rx_complete_irq(char c) {
+    _rx_buffer->write(c);
 }
 
-void HardwareSerial::_tx_empty_irq(void) {
-    if(_uart == 0)
-        return;
-    if(_tx_buffer == 0)
-        return;
+void ICACHE_RAM_ATTR HardwareSerial::_tx_empty_irq(void) {
+    const int uart_nr = _uart->uart_nr;
     size_t queued = _tx_buffer->getSize();
     if(!queued) {
-        uart_disarm_tx_interrupt(_uart);
+        UART_DISARM_TX_INTERRUPT(uart_nr);
         return;
     }
 
-    size_t room = uart_get_tx_fifo_room(_uart);
+    size_t room = UART_GET_TX_FIFO_ROOM(uart_nr);
     int n = static_cast<int>((queued < room) ? queued : room);
     while(n--) {
-        uart_transmit_char(_uart, _tx_buffer->read());
+        UART_TRANSMIT_CHAR(uart_nr, _tx_buffer->read());
     }
 }

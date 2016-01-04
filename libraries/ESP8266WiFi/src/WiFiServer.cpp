@@ -35,7 +35,6 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
-#include "cbuf.h"
 #include "include/ClientContext.h"
 
 WiFiServer::WiFiServer(IPAddress addr, uint16_t port)
