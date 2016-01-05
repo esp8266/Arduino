@@ -11,7 +11,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
   - [Using git version](#using-git-version-)
   - [Using stable version with PlatformIO](#using-stable-version-with-platformio)
 - [Documentation](#documentation)
-- [Issues and support](#issues-and-support) 
+- [Issues and support](#issues-and-support)
 - [Contributing](#contributing)  
 - [License and credits](#license-and-credits)   
 
@@ -25,7 +25,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 
 The best place to ask questions related to this core is ESP8266 community forum: http://www.esp8266.com/arduino.
-If you find this ESP8266 board manager useful, please consider supporting it with a donation. The ESP8266 Community Forum and IGRR have made this wonderful port available.
+If you find this forum or the ESP8266 Boards Manager package useful, please consider supporting it with a donation.
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
 
 #### Available versions
@@ -38,11 +38,11 @@ Documentation: [http://esp8266.github.io/Arduino/versions/2.0.0/](http://esp8266
 ##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.0.0-rc2/](http://esp8266.github.io/Arduino/versions/2.0.0-rc2/)
+Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0-rc1/](http://esp8266.github.io/Arduino/versions/2.1.0-rc1/)
 
 ### Using git version [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
-- Install Arduino 1.6.5
+- Install Arduino 1.6.7
 - Go to Arduino directory
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash
