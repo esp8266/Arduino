@@ -321,6 +321,10 @@ void SSDPClass::_update(){
                   DEBUG_SSDP.printf("REJECT: %s\n", (char *)buffer);
 #endif
                 }
+                if(strcmp(buffer, "ssdp:discovery")){
+                  _send(NONE);
+                  state = ABORT;
+                }
                 break;
               case MX:
                 _delay = random(0, atoi(buffer)) * 1000L;
