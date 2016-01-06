@@ -389,7 +389,7 @@ void SSDPClass::setSerialNumber(const char *serialNumber){
 }
 
 void SSDPClass::setSerialNumber(const uint32_t serialNumber){
-  snprintf(_serialNumber, sizeof(uint32_t), "%08X", serialNumber);
+  snprintf(_serialNumber, sizeof(uint32_t)*2+1, "%08X", serialNumber);
 }
 
 void SSDPClass::setModelName(const char *name){
