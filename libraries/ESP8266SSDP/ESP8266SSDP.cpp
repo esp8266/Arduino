@@ -51,7 +51,7 @@ extern "C" {
 #define SSDP_METHOD_SIZE  10
 #define SSDP_URI_SIZE     2
 #define SSDP_BUFFER_SIZE  64
-#define SSDP_MULTICAST_TTL 1
+#define SSDP_MULTICAST_TTL 2
 static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
 
 
