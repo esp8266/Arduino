@@ -307,8 +307,8 @@ void SSDPClass::_update(){
         case VALUE:
           if(cr == 2){
             switch(header){
-            case START:
-            	break;
+              case START:
+                break;
               case MAN:
 #ifdef DEBUG_SSDP
                 DEBUG_SSDP.printf("MAN: %s\n", (char *)buffer);
@@ -321,9 +321,12 @@ void SSDPClass::_update(){
                   DEBUG_SSDP.printf("REJECT: %s\n", (char *)buffer);
 #endif
                 }
-                if(strcmp(buffer, "ssdp:discovery")){
-                  _send(NONE);
-                  state = ABORT;
+                // if the search type matches our type, we should respond
+                if(strcmp(buffer, _deviceType)){
+                  _pending = true;
+                  _process_time = millis();
+                  state = KEY;
+                  cursor += strlen(_deviceType);
                 }
                 break;
               case MX:
