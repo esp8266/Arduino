@@ -141,6 +141,7 @@ While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most
 Libraries that don't rely on low-level access to AVR registers should work well. Here are a few libraries that were verified to work:
 
 - [Adafruit_ILI9341](https://github.com/Links2004/Adafruit_ILI9341) - Port of the Adafruit ILI9341 for the ESP8266 
+- [arduinoVNC](https://github.com/Links2004/arduinoVNC) - VNC Client for Arduino
 - [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) - WebSocket Server and Client compatible with ESP8266 (RFC6455)
 - [aREST](https://github.com/marcoschwartz/aREST) - REST API handler library.
 - [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
