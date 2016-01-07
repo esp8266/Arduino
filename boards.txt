@@ -189,6 +189,8 @@ generic.menu.DebugLevel.WiFi=WiFi
 generic.menu.DebugLevel.WiFi.build.debug_level=-DDEBUG_ESP_WIFI
 generic.menu.DebugLevel.HTTPClient=HTTPClient
 generic.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+generic.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+generic.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
 generic.menu.DebugLevel.HTTPUpdate=HTTPUpdate
 generic.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
 generic.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
@@ -944,8 +946,20 @@ wifinfo.build.variant=wifinfo
 wifinfo.build.flash_mode=qio
 wifinfo.build.board=ESP8266_ESP12
 wifinfo.build.spiffs_pagesize=256
-wifinfo.build.debug_port=
-wifinfo.build.debug_level=
+wifinfo.build.debug_port=Serial1
+wifinfo.build.debug_level=Wifinfo
+
+wifinfo.menu.Debug.Disabled=Disabled
+wifinfo.menu.Debug.Disabled.build.debug_port=
+wifinfo.menu.Debug.Serial=Serial
+wifinfo.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+wifinfo.menu.Debug.Serial1=Serial1
+wifinfo.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+wifinfo.menu.DebugLevel.None=None
+wifinfo.menu.DebugLevel.None.build.debug_level=
+wifinfo.menu.DebugLevel.Wifinfo=Wifinfo
+wifinfo.menu.DebugLevel.Wifinfo.build.debug_level=-DDEBUG_ESP_WIFINFO
 
 #wifinfo.menu.ESPModule.ESP07512=ESP07 (1M/512K SPIFFS)
 #wifinfo.menu.ESPModule.ESP07512.build.board=ESP8266_ESP07
