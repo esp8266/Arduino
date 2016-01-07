@@ -47,14 +47,10 @@ File uploadFile;
 
 
 void returnOK() {
-  server.sendHeader("Connection", "close");
-  server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "text/plain", "");
 }
 
 void returnFail(String msg) {
-  server.sendHeader("Connection", "close");
-  server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(500, "text/plain", msg + "\r\n");
 }
 
@@ -256,9 +252,8 @@ void setup(void){
   server.on("/list", HTTP_GET, printDirectory);
   server.on("/edit", HTTP_DELETE, handleDelete);
   server.on("/edit", HTTP_PUT, handleCreate);
-  server.on("/edit", HTTP_POST, [](){ returnOK(); });
+  server.on("/edit", HTTP_POST, [](){ returnOK(); }, handleFileUpload);
   server.onNotFound(handleNotFound);
-  server.onFileUpload(handleFileUpload);
 
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");

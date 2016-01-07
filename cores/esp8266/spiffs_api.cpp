@@ -41,10 +41,12 @@ extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
 extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size);
 extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst);
 
-int getSpiffsMode(OpenMode openMode, AccessMode accessMode);
+static int getSpiffsMode(OpenMode openMode, AccessMode accessMode);
+static bool isSpiffsFilenameValid(const char* name);
 
 class SPIFFSFileImpl;
 class SPIFFSDirImpl;
+
 
 class SPIFFSImpl : public FSImpl {
 public:
@@ -63,6 +65,14 @@ public:
     DirImplPtr openDir(const char* path) override;
 
     bool rename(const char* pathFrom, const char* pathTo) override {
+        if (!isSpiffsFilenameValid(pathFrom)) {
+            DEBUGV("SPIFFSImpl::rename: invalid pathFrom=`%s`\r\n", pathFrom);
+            return false;
+        }
+        if (!isSpiffsFilenameValid(pathTo)) {
+            DEBUGV("SPIFFSImpl::rename: invalid pathTo=`%s` \r\n", pathTo);
+            return false;
+        }
         auto rc = SPIFFS_rename(&_fs, pathFrom, pathTo);
         if (rc != SPIFFS_OK) {
             DEBUGV("SPIFFS_rename: rc=%d, from=`%s`, to=`%s`\r\n", rc,
@@ -86,6 +96,10 @@ public:
     }
 
     bool remove(const char* path) override {
+        if (!isSpiffsFilenameValid(path)) {
+            DEBUGV("SPIFFSImpl::remove: invalid path=`%s`\r\n", path);
+            return false;
+        }
         auto rc = SPIFFS_remove(&_fs, path);
         if (rc != SPIFFS_OK) {
             DEBUGV("SPIFFS_remove: rc=%d path=`%s`\r\n", rc, path);
@@ -229,7 +243,7 @@ protected:
     std::unique_ptr<uint8_t[]> _cacheBuf;
 };
 
-#define CHECKFD() while (_fd == 0) { DEBUGV("SPIFFSFileImpl(%d) _fd == 0\r\n", __LINE__); abort(); }
+#define CHECKFD() while (_fd == 0) { panic(); }
 
 class SPIFFSFileImpl : public FileImpl {
 public:
@@ -408,8 +422,23 @@ protected:
 
 
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode) {
+    if (!isSpiffsFilenameValid(path)) {
+        DEBUGV("SPIFFSImpl::open: invalid path=`%s` \r\n", path);
+        return FileImplPtr();
+    }
     int mode = getSpiffsMode(openMode, accessMode);
     int fd = SPIFFS_open(&_fs, path, mode, 0);
+    if (fd < 0 && _fs.err_code == SPIFFS_ERR_DELETED && (openMode & OM_CREATE)) {
+        DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d, trying to remove\r\n",
+            fd, path, openMode, accessMode, _fs.err_code);
+        auto rc = SPIFFS_remove(&_fs, path);
+        if (rc != SPIFFS_OK) {
+            DEBUGV("SPIFFSImpl::open: SPIFFS_ERR_DELETED, but failed to remove path=`%s` openMode=%d accessMode=%d err=%d\r\n",
+                path, openMode, accessMode, _fs.err_code);
+            return FileImplPtr();
+        }
+        fd = SPIFFS_open(&_fs, path, mode, 0);
+    }
     if (fd < 0) {
         DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n",
             fd, path, openMode, accessMode, _fs.err_code);
@@ -419,12 +448,20 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
 }
 
 bool SPIFFSImpl::exists(const char* path) {
+    if (!isSpiffsFilenameValid(path)) {
+        DEBUGV("SPIFFSImpl::exists: invalid path=`%s` \r\n", path);
+        return false;
+    }
     spiffs_stat stat;
     int rc = SPIFFS_stat(&_fs, path, &stat);
     return rc == SPIFFS_OK;
 }
 
 DirImplPtr SPIFFSImpl::openDir(const char* path) {
+    if (!isSpiffsFilenameValid(path)) {
+        DEBUGV("SPIFFSImpl::openDir: invalid path=`%s` \r\n", path);
+        return DirImplPtr();
+    }
     spiffs_DIR dir;
     spiffs_DIR* result = SPIFFS_opendir(&_fs, path, &dir);
     if (!result) {
@@ -434,7 +471,7 @@ DirImplPtr SPIFFSImpl::openDir(const char* path) {
     return std::make_shared<SPIFFSDirImpl>(path, this, dir);
 }
 
-int getSpiffsMode(OpenMode openMode, AccessMode accessMode) {
+static int getSpiffsMode(OpenMode openMode, AccessMode accessMode) {
     int mode = 0;
     if (openMode & OM_CREATE) {
         mode |= SPIFFS_CREAT;
@@ -452,6 +489,13 @@ int getSpiffsMode(OpenMode openMode, AccessMode accessMode) {
         mode |= SPIFFS_WRONLY;
     }
     return mode;
+}
+
+static bool isSpiffsFilenameValid(const char* name) {
+    if (name == nullptr)
+        return false;
+    auto len = strlen(name);
+    return len > 0 && len < SPIFFS_OBJ_NAME_LEN;
 }
 
 // these symbols should be defined in the linker script for each flash layout

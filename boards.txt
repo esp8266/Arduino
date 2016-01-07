@@ -5,6 +5,9 @@ menu.FlashMode=Flash Mode
 menu.FlashFreq=Flash Frequency
 menu.UploadTool=Upload Using
 menu.ResetMethod=Reset Method
+menu.ESPModule=Module
+menu.Debug=Debug port
+menu.DebugLevel=Debug Level
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -25,6 +28,8 @@ generic.build.core=esp8266
 generic.build.variant=generic
 generic.build.flash_mode=qio
 generic.build.spiffs_pagesize=256
+generic.build.debug_port=
+generic.build.debug_level=
 
 generic.menu.UploadTool.esptool=Serial
 generic.menu.UploadTool.esptool.upload.tool=esptool
@@ -95,6 +100,30 @@ generic.menu.FlashSize.1M256.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M256.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M256.upload.maximum_size=761840
 
+generic.menu.FlashSize.1M192=1M (192K SPIFFS)
+generic.menu.FlashSize.1M192.build.flash_size=1M
+generic.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
+generic.menu.FlashSize.1M192.build.spiffs_start=0xCB000
+generic.menu.FlashSize.1M192.build.spiffs_end=0xFB000
+generic.menu.FlashSize.1M192.build.spiffs_blocksize=4096
+generic.menu.FlashSize.1M192.upload.maximum_size=827376
+
+generic.menu.FlashSize.1M160=1M (160K SPIFFS)
+generic.menu.FlashSize.1M160.build.flash_size=1M
+generic.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
+generic.menu.FlashSize.1M160.build.spiffs_start=0xD3000
+generic.menu.FlashSize.1M160.build.spiffs_end=0xFB000
+generic.menu.FlashSize.1M160.build.spiffs_blocksize=4096
+generic.menu.FlashSize.1M160.upload.maximum_size=860144
+
+generic.menu.FlashSize.1M144=1M (144K SPIFFS)
+generic.menu.FlashSize.1M144.build.flash_size=1M
+generic.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
+generic.menu.FlashSize.1M144.build.spiffs_start=0xD7000
+generic.menu.FlashSize.1M144.build.spiffs_end=0xFB000
+generic.menu.FlashSize.1M144.build.spiffs_blocksize=4096
+generic.menu.FlashSize.1M144.upload.maximum_size=876528
+
 generic.menu.FlashSize.1M128=1M (128K SPIFFS)
 generic.menu.FlashSize.1M128.build.flash_size=1M
 generic.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
@@ -141,6 +170,44 @@ generic.menu.ResetMethod.ck.upload.resetmethod=ck
 generic.menu.ResetMethod.nodemcu=nodemcu
 generic.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 
+generic.menu.Debug.Disabled=Disabled
+generic.menu.Debug.Disabled.build.debug_port=
+generic.menu.Debug.Serial=Serial
+generic.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+generic.menu.Debug.Serial1=Serial1
+generic.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+generic.menu.DebugLevel.None=None
+generic.menu.DebugLevel.None.build.debug_level=
+generic.menu.DebugLevel.Core=Core
+generic.menu.DebugLevel.Core.build.debug_level=-DDEBUG_ESP_CORE
+generic.menu.DebugLevel.SSL=Core + SSL
+generic.menu.DebugLevel.SSL.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+generic.menu.DebugLevel.WiFic=Core + WiFi
+generic.menu.DebugLevel.WiFic.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+generic.menu.DebugLevel.WiFi=WiFi
+generic.menu.DebugLevel.WiFi.build.debug_level=-DDEBUG_ESP_WIFI
+generic.menu.DebugLevel.HTTPClient=HTTPClient
+generic.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+generic.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+generic.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
+generic.menu.DebugLevel.HTTPUpdate=HTTPUpdate
+generic.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
+generic.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
+generic.menu.DebugLevel.HTTPUpdate2.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE
+generic.menu.DebugLevel.HTTPUpdate3=HTTPClient + HTTPUpdate + Updater
+generic.menu.DebugLevel.HTTPUpdate3.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER
+generic.menu.DebugLevel.HTTPServer=HTTPServer
+generic.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
+generic.menu.DebugLevel.UPDATER=Updater
+generic.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
+generic.menu.DebugLevel.OTA=OTA
+generic.menu.DebugLevel.OTA.build.debug_level=-DDEBUG_ESP_OTA
+generic.menu.DebugLevel.OTA2=OTA + Updater
+generic.menu.DebugLevel.OTA2.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
+generic.menu.DebugLevel.all=All
+generic.menu.DebugLevel.all.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+
 # disabled because espressif's bootloader refuses to write above 4M
 # generic.menu.FlashSize.8M=8M (7M SPIFFS)
 # generic.menu.FlashSize.8M.build.flash_size=1M
@@ -156,11 +223,80 @@ generic.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 # generic.menu.FlashSize.16M.build.spiffs_blocksize=8192
 
 ##############################################################
+espduino.name=ESPDuino (ESP-13 Module)
+
+espduino.upload.tool=esptool
+espduino.upload.speed=115200
+espduino.upload.resetmethod=ck
+espduino.upload.maximum_size=1044464
+espduino.upload.maximum_data_size=81920
+espduino.upload.wait_for_upload_port=true
+espduino.serial.disableDTR=true
+espduino.serial.disableRTS=true
+
+espduino.build.mcu=esp8266
+espduino.build.f_cpu=80000000L
+espduino.build.board=ESP8266_ESP13
+espduino.build.core=esp8266
+espduino.build.variant=espduino
+espduino.build.flash_mode=dio
+espduino.build.flash_size=4M
+espduino.build.flash_freq=40
+espduino.build.debug_port=
+espduino.build.debug_level=
+
+espduino.menu.CpuFrequency.80=80 MHz
+espduino.menu.CpuFrequency.80.build.f_cpu=80000000L
+espduino.menu.CpuFrequency.160=160 MHz
+espduino.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+espduino.menu.UploadTool.esptool=Serial
+espduino.menu.UploadTool.esptool.upload.tool=esptool
+espduino.menu.UploadTool.esptool.upload.verbose=-vv
+espduino.menu.UploadTool.espota=OTA
+espduino.menu.UploadTool.espota.upload.tool=espota
+
+espduino.menu.UploadSpeed.115200=115200
+espduino.menu.UploadSpeed.115200.upload.speed=115200
+espduino.menu.UploadSpeed.9600=9600
+espduino.menu.UploadSpeed.9600.upload.speed=9600
+espduino.menu.UploadSpeed.57600=57600
+espduino.menu.UploadSpeed.57600.upload.speed=57600
+espduino.menu.UploadSpeed.256000.windows=256000
+espduino.menu.UploadSpeed.256000.upload.speed=256000
+espduino.menu.UploadSpeed.230400.linux=230400
+espduino.menu.UploadSpeed.230400.macosx=230400
+espduino.menu.UploadSpeed.230400.macosx=230400
+espduino.menu.UploadSpeed.230400.upload.speed=230400
+espduino.menu.UploadSpeed.460800.linux=460800
+espduino.menu.UploadSpeed.460800.macosx=460800
+espduino.menu.UploadSpeed.460800.upload.speed=460800
+espduino.menu.UploadSpeed.512000.windows=512000
+espduino.menu.UploadSpeed.512000.upload.speed=512000
+espduino.menu.UploadSpeed.921600=921600
+espduino.menu.UploadSpeed.921600.upload.speed=921600
+
+espduino.menu.FlashSize.4M3M=4M (3M SPIFFS)
+espduino.menu.FlashSize.4M3M.build.flash_size=4M
+espduino.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+espduino.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+espduino.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+espduino.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+espduino.menu.FlashSize.4M3M.build.spiffs_pagesize=256
+
+espduino.menu.FlashSize.4M1M=4M (1M SPIFFS)
+espduino.menu.FlashSize.4M1M.build.flash_size=4M
+espduino.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+espduino.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+espduino.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+espduino.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+espduino.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+##############################################################
 huzzah.name=Adafruit HUZZAH ESP8266
 
 huzzah.upload.tool=esptool
 huzzah.upload.speed=115200
-huzzah.upload.resetmethod=ck
+huzzah.upload.resetmethod=nodemcu
 huzzah.upload.maximum_size=1044464
 huzzah.upload.maximum_data_size=81920
 huzzah.upload.wait_for_upload_port=true
@@ -175,6 +311,8 @@ huzzah.build.variant=adafruit
 huzzah.build.flash_mode=qio
 huzzah.build.flash_size=4M
 huzzah.build.flash_freq=40
+huzzah.build.debug_port=
+huzzah.build.debug_level=
 
 huzzah.menu.CpuFrequency.80=80 MHz
 huzzah.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -232,6 +370,8 @@ nodemcu.build.variant=nodemcu
 nodemcu.build.flash_mode=qio
 nodemcu.build.flash_size=4M
 nodemcu.build.flash_freq=40
+nodemcu.build.debug_port=
+nodemcu.build.debug_level=
 
 nodemcu.menu.CpuFrequency.80=80 MHz
 nodemcu.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -298,6 +438,8 @@ nodemcuv2.build.variant=nodemcu
 nodemcuv2.build.flash_mode=dio
 nodemcuv2.build.flash_size=4M
 nodemcuv2.build.flash_freq=40
+nodemcuv2.build.debug_port=
+nodemcuv2.build.debug_level=
 
 nodemcuv2.menu.CpuFrequency.80=80 MHz
 nodemcuv2.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -373,6 +515,8 @@ modwifi.build.spiffs_start=0x100000
 modwifi.build.spiffs_end=0x1FB000
 modwifi.build.spiffs_pagesize=256
 modwifi.build.spiffs_blocksize=8192
+modwifi.build.debug_port=
+modwifi.build.debug_level=
 
 modwifi.menu.CpuFrequency.80=80 MHz
 modwifi.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -408,7 +552,7 @@ thing.name=SparkFun ESP8266 Thing
 
 thing.upload.tool=esptool
 thing.upload.speed=921600
-thing.upload.resetmethod=ck
+thing.upload.resetmethod=nodemcu
 thing.upload.maximum_size=434160
 thing.upload.maximum_data_size=81920
 thing.upload.wait_for_upload_port=true
@@ -429,6 +573,8 @@ thing.build.spiffs_start=0x6B000
 thing.build.spiffs_end=0x7B000
 thing.build.spiffs_blocksize=4096
 thing.build.spiffs_pagesize=256
+thing.build.debug_port=
+thing.build.debug_level=
 
 thing.menu.CpuFrequency.80=80 MHz
 thing.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -478,6 +624,8 @@ esp210.build.variant=generic
 esp210.build.flash_mode=qio
 esp210.build.flash_size=4M
 esp210.build.flash_freq=40
+esp210.build.debug_port=
+esp210.build.debug_level=
 
 esp210.menu.CpuFrequency.80=80 MHz
 esp210.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -552,7 +700,80 @@ esp210.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 #
 
 ##############################################################
-d1.name=WeMos D1
+d1_mini.name=WeMos D1 R2 & mini
+
+d1_mini.upload.tool=esptool
+d1_mini.upload.speed=460800
+d1_mini.upload.resetmethod=nodemcu
+d1_mini.upload.maximum_size=1044464
+d1_mini.upload.maximum_data_size=81920
+d1_mini.upload.wait_for_upload_port=true
+d1_mini.serial.disableDTR=true
+d1_mini.serial.disableRTS=true
+
+d1_mini.build.mcu=esp8266
+d1_mini.build.f_cpu=80000000L
+d1_mini.build.board=ESP8266_ESP12
+d1_mini.build.core=esp8266
+d1_mini.build.variant=d1_mini
+d1_mini.build.flash_mode=dio
+d1_mini.build.flash_size=4M
+d1_mini.build.flash_freq=40
+d1_mini.build.debug_port=
+d1_mini.build.debug_level=
+
+d1_mini.menu.CpuFrequency.80=80 MHz
+d1_mini.menu.CpuFrequency.80.build.f_cpu=80000000L
+d1_mini.menu.CpuFrequency.160=160 MHz
+d1_mini.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+d1_mini.menu.UploadTool.esptool=Serial
+d1_mini.menu.UploadTool.esptool.upload.tool=esptool
+d1_mini.menu.UploadTool.esptool.upload.verbose=-vv
+
+d1_mini.menu.UploadTool.espota=OTA
+d1_mini.menu.UploadTool.espota.upload.tool=espota
+
+d1_mini.menu.UploadSpeed.921600=921600
+d1_mini.menu.UploadSpeed.921600.upload.speed=921600
+d1_mini.menu.UploadSpeed.115200=115200
+d1_mini.menu.UploadSpeed.115200.upload.speed=115200
+d1_mini.menu.UploadSpeed.9600=9600
+d1_mini.menu.UploadSpeed.9600.upload.speed=9600
+d1_mini.menu.UploadSpeed.57600=57600
+d1_mini.menu.UploadSpeed.57600.upload.speed=57600
+d1_mini.menu.UploadSpeed.256000.windows=256000
+d1_mini.menu.UploadSpeed.256000.upload.speed=256000
+d1_mini.menu.UploadSpeed.230400.linux=230400
+d1_mini.menu.UploadSpeed.230400.macosx=230400
+d1_mini.menu.UploadSpeed.230400.macosx=230400
+d1_mini.menu.UploadSpeed.230400.upload.speed=230400
+d1_mini.menu.UploadSpeed.460800.linux=460800
+d1_mini.menu.UploadSpeed.460800.macosx=460800
+d1_mini.menu.UploadSpeed.460800.upload.speed=460800
+d1_mini.menu.UploadSpeed.512000.windows=512000
+d1_mini.menu.UploadSpeed.512000.upload.speed=512000
+
+
+d1_mini.menu.FlashSize.4M3M=4M (3M SPIFFS)
+d1_mini.menu.FlashSize.4M3M.build.flash_size=4M
+d1_mini.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+d1_mini.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+d1_mini.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+d1_mini.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+d1_mini.menu.FlashSize.4M3M.build.spiffs_pagesize=256
+
+d1_mini.menu.FlashSize.4M1M=4M (1M SPIFFS)
+d1_mini.menu.FlashSize.4M1M.build.flash_size=4M
+d1_mini.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+d1_mini.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+d1_mini.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+d1_mini.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+d1_mini.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+
+
+##############################################################
+d1.name=WeMos D1(Retired)
 
 d1.upload.tool=esptool
 d1.upload.speed=460800
@@ -571,6 +792,8 @@ d1.build.variant=d1
 d1.build.flash_mode=dio
 d1.build.flash_size=4M
 d1.build.flash_freq=40
+d1.build.debug_port=
+d1.build.debug_level=
 
 d1.menu.CpuFrequency.80=80 MHz
 d1.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -623,71 +846,221 @@ d1.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
 
 ##############################################################
-d1_mini.name=WeMos D1 mini
 
-d1_mini.upload.tool=esptool
-d1_mini.upload.speed=460800
-d1_mini.upload.resetmethod=nodemcu
-d1_mini.upload.maximum_size=1044464
-d1_mini.upload.maximum_data_size=81920
-d1_mini.upload.wait_for_upload_port=true
-d1_mini.serial.disableDTR=true
-d1_mini.serial.disableRTS=true
+espino.name=ESPino
 
-d1_mini.build.mcu=esp8266
-d1_mini.build.f_cpu=80000000L
-d1_mini.build.board=ESP8266_ESP12
-d1_mini.build.core=esp8266
-d1_mini.build.variant=d1_mini
-d1_mini.build.flash_mode=dio
-d1_mini.build.flash_size=4M
-d1_mini.build.flash_freq=40
+espino.upload.tool=esptool
+espino.upload.speed=115200
+espino.upload.resetmethod=ck
+espino.upload.maximum_size=1044464
+espino.upload.maximum_data_size=81920
+espino.upload.wait_for_upload_port=true
+espino.serial.disableDTR=true
+espino.serial.disableRTS=true
 
-d1_mini.menu.CpuFrequency.80=80 MHz
-d1_mini.menu.CpuFrequency.80.build.f_cpu=80000000L
-d1_mini.menu.CpuFrequency.160=160 MHz
-d1_mini.menu.CpuFrequency.160.build.f_cpu=160000000L
+espino.build.mcu=esp8266
+espino.build.f_cpu=80000000L
+espino.build.board=ESP8266_ESP12
+espino.build.core=esp8266
+espino.build.variant=espino
+espino.build.flash_mode=qio
+espino.build.flash_size=4M
+espino.build.flash_freq=40
+espino.build.spiffs_pagesize=256
+espino.build.debug_port=
+espino.build.debug_level=
 
-d1_mini.menu.UploadTool.esptool=Serial
-d1_mini.menu.UploadTool.esptool.upload.tool=esptool
-d1_mini.menu.UploadTool.esptool.upload.verbose=-vv
+espino.menu.UploadTool.esptool=Serial
+espino.menu.UploadTool.esptool.upload.tool=esptool
+espino.menu.UploadTool.esptool.upload.verbose=-vv
+espino.menu.UploadTool.espota=OTA
+espino.menu.UploadTool.espota.upload.tool=espota
 
-d1_mini.menu.UploadTool.espota=OTA
-d1_mini.menu.UploadTool.espota.upload.tool=espota
+espino.menu.CpuFrequency.80=80 MHz
+espino.menu.CpuFrequency.80.build.f_cpu=80000000L
+espino.menu.CpuFrequency.160=160 MHz
+espino.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-d1_mini.menu.UploadSpeed.921600=921600
-d1_mini.menu.UploadSpeed.921600.upload.speed=921600
-d1_mini.menu.UploadSpeed.115200=115200
-d1_mini.menu.UploadSpeed.115200.upload.speed=115200
-d1_mini.menu.UploadSpeed.9600=9600
-d1_mini.menu.UploadSpeed.9600.upload.speed=9600
-d1_mini.menu.UploadSpeed.57600=57600
-d1_mini.menu.UploadSpeed.57600.upload.speed=57600
-d1_mini.menu.UploadSpeed.256000.windows=256000
-d1_mini.menu.UploadSpeed.256000.upload.speed=256000
-d1_mini.menu.UploadSpeed.230400.linux=230400
-d1_mini.menu.UploadSpeed.230400.macosx=230400
-d1_mini.menu.UploadSpeed.230400.macosx=230400
-d1_mini.menu.UploadSpeed.230400.upload.speed=230400
-d1_mini.menu.UploadSpeed.460800.linux=460800
-d1_mini.menu.UploadSpeed.460800.macosx=460800
-d1_mini.menu.UploadSpeed.460800.upload.speed=460800
-d1_mini.menu.UploadSpeed.512000.windows=512000
-d1_mini.menu.UploadSpeed.512000.upload.speed=512000
+espino.menu.FlashMode.dio=DIO
+espino.menu.FlashMode.dio.build.flash_mode=dio
+espino.menu.FlashMode.qio=QIO
+espino.menu.FlashMode.qio.build.flash_mode=qio
 
+espino.menu.UploadSpeed.115200=115200
+espino.menu.UploadSpeed.115200.upload.speed=115200
+espino.menu.UploadSpeed.9600=9600
+espino.menu.UploadSpeed.9600.upload.speed=9600
+espino.menu.UploadSpeed.57600=57600
+espino.menu.UploadSpeed.57600.upload.speed=57600
+espino.menu.UploadSpeed.256000.windows=256000
+espino.menu.UploadSpeed.256000.upload.speed=256000
+espino.menu.UploadSpeed.230400.linux=230400
+espino.menu.UploadSpeed.230400.macosx=230400
+espino.menu.UploadSpeed.230400.upload.speed=230400
+espino.menu.UploadSpeed.460800.linux=460800
+espino.menu.UploadSpeed.460800.macosx=460800
+espino.menu.UploadSpeed.460800.upload.speed=460800
+espino.menu.UploadSpeed.512000.windows=512000
+espino.menu.UploadSpeed.512000.upload.speed=512000
+espino.menu.UploadSpeed.921600=921600
+espino.menu.UploadSpeed.921600.upload.speed=921600
 
-d1_mini.menu.FlashSize.4M3M=4M (3M SPIFFS)
-d1_mini.menu.FlashSize.4M3M.build.flash_size=4M
-d1_mini.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
-d1_mini.menu.FlashSize.4M3M.build.spiffs_start=0x100000
-d1_mini.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
-d1_mini.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-d1_mini.menu.FlashSize.4M3M.build.spiffs_pagesize=256
+espino.menu.FlashSize.4M1M=4M (1M SPIFFS)
+espino.menu.FlashSize.4M1M.build.flash_size=4M
+espino.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+espino.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+espino.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+espino.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+espino.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+espino.menu.FlashSize.4M1M.upload.maximum_size=1044464
 
-d1_mini.menu.FlashSize.4M1M=4M (1M SPIFFS)
-d1_mini.menu.FlashSize.4M1M.build.flash_size=4M
-d1_mini.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
-d1_mini.menu.FlashSize.4M1M.build.spiffs_start=0x300000
-d1_mini.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
-d1_mini.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
-d1_mini.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+espino.menu.FlashSize.4M3M=4M (3M SPIFFS)
+espino.menu.FlashSize.4M3M.build.flash_size=4M
+espino.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+espino.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+espino.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+espino.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+espino.menu.FlashSize.4M3M.upload.maximum_size=1044464
+
+espino.menu.ResetMethod.ck=ck
+espino.menu.ResetMethod.ck.upload.resetmethod=ck
+espino.menu.ResetMethod.nodemcu=nodemcu
+espino.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+
+##############################################################
+wifinfo.name=WifInfo
+
+wifinfo.upload.tool=esptool
+wifinfo.upload.speed=115200
+wifinfo.upload.resetmethod=nodemcu
+wifinfo.upload.maximum_size=434160
+wifinfo.upload.maximum_data_size=81920
+wifinfo.upload.wait_for_upload_port=true
+wifinfo.serial.disableDTR=true
+wifinfo.serial.disableRTS=true
+
+wifinfo.build.mcu=esp8266
+wifinfo.build.f_cpu=160000000L
+wifinfo.build.core=esp8266
+wifinfo.build.variant=wifinfo
+wifinfo.build.flash_mode=qio
+wifinfo.build.board=ESP8266_ESP12
+wifinfo.build.spiffs_pagesize=256
+wifinfo.build.debug_port=Serial1
+wifinfo.build.debug_level=Wifinfo
+
+wifinfo.menu.Debug.Disabled=Disabled
+wifinfo.menu.Debug.Disabled.build.debug_port=
+wifinfo.menu.Debug.Serial=Serial
+wifinfo.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+wifinfo.menu.Debug.Serial1=Serial1
+wifinfo.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+wifinfo.menu.DebugLevel.None=None
+wifinfo.menu.DebugLevel.None.build.debug_level=
+wifinfo.menu.DebugLevel.Wifinfo=Wifinfo
+wifinfo.menu.DebugLevel.Wifinfo.build.debug_level=-DDEBUG_ESP_WIFINFO
+
+#wifinfo.menu.ESPModule.ESP07512=ESP07 (1M/512K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07512.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07512.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07512.build.flash_ld=eagle.flash.1m512.ld
+#wifinfo.menu.ESPModule.ESP07512.build.spiffs_start=0x7B000
+#wifinfo.menu.ESPModule.ESP07512.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07512.build.spiffs_blocksize=8192
+#wifinfo.menu.ESPModule.ESP07512.upload.maximum_size=499696
+
+#wifinfo.menu.ESPModule.ESP07256=ESP07 (1M/256K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07256.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07256.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07256.build.flash_ld=eagle.flash.1m256.ld
+#wifinfo.menu.ESPModule.ESP07256.build.spiffs_start=0xBB000
+#wifinfo.menu.ESPModule.ESP07256.build.spiffs_end=0xFB000
+##wifinfo.menu.ESPModule.ESP07256.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07256.upload.maximum_size=761840
+
+wifinfo.menu.ESPModule.ESP07192=ESP07 (1M/192K SPIFFS)
+wifinfo.menu.ESPModule.ESP07192.build.board=ESP8266_ESP07
+wifinfo.menu.ESPModule.ESP07192.build.flash_size=1M
+wifinfo.menu.ESPModule.ESP07192.build.flash_ld=eagle.flash.1m192.ld
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_start=0xCB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_end=0xFB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_blocksize=4096
+wifinfo.menu.ESPModule.ESP07192.upload.maximum_size=827376
+
+#wifinfo.menu.ESPModule.ESP07160=ESP07 (1M/160K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07160.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07160.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07160.build.flash_ld=eagle.flash.1m160.ld
+#wifinfo.menu.ESPModule.ESP07160.build.spiffs_start=0xD3000
+#wifinfo.menu.ESPModule.ESP07160.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07160.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07160.upload.maximum_size=860144
+#
+#wifinfo.menu.ESPModule.ESP07144=ESP07 (1M/144K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07144.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07144.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07144.build.flash_ld=eagle.flash.1m144.ld
+#wifinfo.menu.ESPModule.ESP07144.build.spiffs_start=0xD7000
+#wifinfo.menu.ESPModule.ESP07144.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07144.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07144.upload.maximum_size=876528
+#
+#wifinfo.menu.ESPModule.ESP07=ESP07 (1M/64K SPIFFS)
+#wifinfo.menu.ESPModule.ESP07.build.board=ESP8266_ESP07
+#wifinfo.menu.ESPModule.ESP07.build.flash_size=1M
+#wifinfo.menu.ESPModule.ESP07.build.flash_ld=eagle.flash.1m64.ld
+#wifinfo.menu.ESPModule.ESP07.build.spiffs_start=0xEB000
+#wifinfo.menu.ESPModule.ESP07.build.spiffs_end=0xFB000
+#wifinfo.menu.ESPModule.ESP07.build.spiffs_blocksize=4096
+#wifinfo.menu.ESPModule.ESP07.upload.maximum_size=958448
+
+wifinfo.menu.ESPModule.ESP12=ESP12 (4M/1M SPIFFS)
+wifinfo.menu.ESPModule.ESP12.build.board=ESP8266_ESP12
+wifinfo.menu.ESPModule.ESP12.build.flash_size=4M
+wifinfo.menu.ESPModule.ESP12.build.flash_ld=eagle.flash.4m1m.ld
+wifinfo.menu.ESPModule.ESP12.build.spiffs_start=0x300000
+wifinfo.menu.ESPModule.ESP12.build.spiffs_end=0x3FB000
+wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
+wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
+wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
+
+wifinfo.menu.UploadTool.esptool=Serial
+wifinfo.menu.UploadTool.esptool.upload.tool=esptool
+wifinfo.menu.UploadTool.esptool.upload.verbose=-vv
+wifinfo.menu.UploadTool.espota=OTA
+wifinfo.menu.UploadTool.espota.upload.tool=espota
+
+wifinfo.menu.CpuFrequency.80=80 MHz
+wifinfo.menu.CpuFrequency.80.build.f_cpu=80000000L
+wifinfo.menu.CpuFrequency.160=160 MHz
+wifinfo.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+wifinfo.menu.FlashFreq.40=40MHz
+wifinfo.menu.FlashFreq.40.build.flash_freq=40
+wifinfo.menu.FlashFreq.80=80MHz
+wifinfo.menu.FlashFreq.80.build.flash_freq=80
+
+wifinfo.menu.FlashMode.dio=DIO
+wifinfo.menu.FlashMode.dio.build.flash_mode=dio
+wifinfo.menu.FlashMode.qio=QIO
+wifinfo.menu.FlashMode.qio.build.flash_mode=qio
+
+wifinfo.menu.UploadSpeed.115200=115200
+wifinfo.menu.UploadSpeed.115200.upload.speed=115200
+wifinfo.menu.UploadSpeed.9600=9600
+wifinfo.menu.UploadSpeed.9600.upload.speed=9600
+wifinfo.menu.UploadSpeed.57600=57600
+wifinfo.menu.UploadSpeed.57600.upload.speed=57600
+wifinfo.menu.UploadSpeed.256000.windows=256000
+wifinfo.menu.UploadSpeed.256000.upload.speed=256000
+wifinfo.menu.UploadSpeed.230400.linux=230400
+wifinfo.menu.UploadSpeed.230400.macosx=230400
+wifinfo.menu.UploadSpeed.230400.upload.speed=230400
+wifinfo.menu.UploadSpeed.460800.linux=460800
+wifinfo.menu.UploadSpeed.460800.macosx=460800
+wifinfo.menu.UploadSpeed.460800.upload.speed=460800
+wifinfo.menu.UploadSpeed.512000.windows=512000
+wifinfo.menu.UploadSpeed.512000.upload.speed=512000
+wifinfo.menu.UploadSpeed.921600=921600
+wifinfo.menu.UploadSpeed.921600.upload.speed=921600

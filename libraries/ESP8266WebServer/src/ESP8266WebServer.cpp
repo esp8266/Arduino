@@ -22,34 +22,47 @@
 
 
 #include <Arduino.h>
+#include <libb64/cencode.h>
 #include "WiFiServer.h"
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
 #include "FS.h"
 #include "detail/RequestHandlersImpl.h"
-// #define DEBUG
-#define DEBUG_OUTPUT Serial
 
+//#define DEBUG_ESP_HTTP_SERVER
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_OUTPUT DEBUG_ESP_PORT
+#else
+#define DEBUG_OUTPUT Serial
+#endif
+
+const char * AUTHORIZATION_HEADER = "Authorization";
 
 ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 : _server(addr, port)
+, _currentMethod(HTTP_ANY)
+, _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
 , _currentArgCount(0)
 , _currentArgs(0)
 , _headerKeysCount(0)
 , _currentHeaders(0)
+, _contentLength(0)
 {
 }
 
 ESP8266WebServer::ESP8266WebServer(int port)
 : _server(port)
+, _currentMethod(HTTP_ANY)
+, _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
 , _currentArgCount(0)
 , _currentArgs(0)
 , _headerKeysCount(0)
 , _currentHeaders(0)
+, _contentLength(0)
 {
 }
 
@@ -63,10 +76,51 @@ ESP8266WebServer::~ESP8266WebServer() {
     delete handler;
     handler = next;
   }
+  close();
 }
 
 void ESP8266WebServer::begin() {
   _server.begin();
+  if(!_headerKeysCount)
+    collectHeaders(0, 0);
+}
+
+bool ESP8266WebServer::authenticate(const char * username, const char * password){
+  if(hasHeader(AUTHORIZATION_HEADER)){
+    String authReq = header(AUTHORIZATION_HEADER);
+    if(authReq.startsWith("Basic")){
+      authReq = authReq.substring(6);
+      authReq.trim();
+      char toencodeLen = strlen(username)+strlen(password)+1;
+      char *toencode = new char[toencodeLen];
+      if(toencode == NULL){
+        authReq = String();
+        return false;
+      }
+      char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
+      if(encoded == NULL){
+        authReq = String();
+        delete[] toencode;
+        return false;
+      }
+      sprintf(toencode, "%s:%s", username, password);
+      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equals(encoded)){
+        authReq = String();
+        delete[] toencode;
+        delete[] encoded;
+        return true;
+      }
+      delete[] toencode;
+      delete[] encoded;
+    }
+    authReq = String();
+  }
+  return false;
+}
+
+void ESP8266WebServer::requestAuthentication(){
+  sendHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
+  send(401);
 }
 
 void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction handler) {
@@ -74,7 +128,11 @@ void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction ha
 }
 
 void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn) {
-  _addRequestHandler(new FunctionRequestHandler(fn, uri, method));
+  on(uri, method, fn, _fileUploadHandler);
+}
+
+void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn) {
+  _addRequestHandler(new FunctionRequestHandler(fn, ufn, uri, method));
 }
 
 void ESP8266WebServer::addHandler(RequestHandler* handler) {
@@ -102,7 +160,7 @@ void ESP8266WebServer::handleClient() {
     return;
   }
 
-#ifdef DEBUG
+#ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.println("New client");
 #endif
 
@@ -119,6 +177,14 @@ void ESP8266WebServer::handleClient() {
   _currentClient = client;
   _contentLength = CONTENT_LENGTH_NOT_SET;
   _handleRequest();
+}
+
+void ESP8266WebServer::close() {
+  _server.close();
+}
+
+void ESP8266WebServer::stop() {
+  close();
 }
 
 void ESP8266WebServer::sendHeader(const String& name, const String& value, bool first) {
@@ -306,12 +372,13 @@ String ESP8266WebServer::header(const char* name) {
 }
 
 void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
-  _headerKeysCount = headerKeysCount;
+  _headerKeysCount = headerKeysCount + 1;
   if (_currentHeaders)
      delete[]_currentHeaders;
   _currentHeaders = new RequestArgument[_headerKeysCount];
-  for (int i = 0; i < _headerKeysCount; i++){
-    _currentHeaders[i].key = headerKeys[i];
+  _currentHeaders[0].key = AUTHORIZATION_HEADER;
+  for (int i = 1; i < _headerKeysCount; i++){
+    _currentHeaders[i].key = headerKeys[i-1];
   }
 }
 
@@ -352,17 +419,22 @@ void ESP8266WebServer::onNotFound(THandlerFunction fn) {
 }
 
 void ESP8266WebServer::_handleRequest() {
-  RequestHandler* handler;
-  for (handler = _firstHandler; handler; handler = handler->next()) {
-    if (handler->handle(*this, _currentMethod, _currentUri))
-      break;
-  }
-
-  if (!handler){
-#ifdef DEBUG
+  bool handled = false;
+  if (!_currentHandler){
+#ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.println("request handler not found");
 #endif
+  }
+  else {
+    handled = _currentHandler->handle(*this, _currentMethod, _currentUri);
+#ifdef DEBUG_ESP_HTTP_SERVER
+    if (!handled) {
+      DEBUG_OUTPUT.println("request handler failed to handle request");
+    }
+#endif
+  }
 
+  if (!handled) {
     if(_notFoundHandler) {
       _notFoundHandler();
     }

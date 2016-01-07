@@ -31,7 +31,7 @@ extern "C" {
 #include "user_interface.h"
 #include "cont.h"
 }
-#define LOOP_TASK_PRIORITY 0
+#define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
 
 #define OPTIMISTIC_YIELD_TIME_US 16000
@@ -66,13 +66,6 @@ static os_event_t g_loop_queue[LOOP_QUEUE_SIZE];
 
 static uint32_t g_micros_at_task_start;
 
-
-extern "C" void abort() {
-    do {
-        *((int*)0) = 0;
-    } while(true);
-}
-
 extern "C" void esp_yield() {
     if (cont_can_yield(&g_cont)) {
         cont_yield(&g_cont);
@@ -80,7 +73,7 @@ extern "C" void esp_yield() {
 }
 
 extern "C" void esp_schedule() {
-    system_os_post(LOOP_TASK_PRIORITY, 0, 0);
+    ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
 extern "C" void __yield() {
@@ -89,7 +82,7 @@ extern "C" void __yield() {
         esp_yield();
     }
     else {
-        abort();
+        panic();
     }
 }
 
@@ -105,11 +98,14 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
 
 static void loop_wrapper() {
     static bool setup_done = false;
+    preloop_update_frequency();
     if(!setup_done) {
         setup();
+#ifdef DEBUG_ESP_PORT
+        DEBUG_ESP_PORT.setDebugOutput(true);
+#endif
         setup_done = true;
     }
-    preloop_update_frequency();
     loop();
     esp_schedule();
 }
@@ -117,9 +113,8 @@ static void loop_wrapper() {
 static void loop_task(os_event_t *events) {
     g_micros_at_task_start = system_get_time();
     cont_run(&g_cont, &loop_wrapper);
-    if(cont_check(&g_cont) != 0) {
-        ets_printf("\r\nsketch stack overflow detected\r\n");
-        abort();
+    if (cont_check(&g_cont) != 0) {
+        panic();
     }
 }
 
@@ -152,7 +147,7 @@ extern "C" void user_init(void) {
 
     cont_init(&g_cont);
 
-    system_os_task(loop_task,
+    ets_task(loop_task,
         LOOP_TASK_PRIORITY, g_loop_queue,
         LOOP_QUEUE_SIZE);
 

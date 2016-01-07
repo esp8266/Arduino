@@ -132,6 +132,7 @@ enum flash_size_map system_get_flash_size_map(void);
 void system_phy_set_max_tpw(uint8 max_tpw);
 void system_phy_set_tpw_via_vdd33(uint16 vdd33);
 void system_phy_set_rfoption(uint8 option);
+void system_phy_set_powerup_option(uint8 option);
 
 bool system_param_save_with_protect(uint16 start_sec, void *param, uint16 len);
 bool system_param_load(uint16 start_sec, uint16 offset, void *param, uint16 len);
@@ -139,6 +140,8 @@ bool system_param_load(uint16 start_sec, uint16 offset, void *param, uint16 len)
 void system_soft_wdt_stop(void);
 void system_soft_wdt_restart(void);
 void system_soft_wdt_feed(void);
+
+void system_show_malloc(void);
 
 #define NULL_MODE       0x00
 #define STATION_MODE    0x01
@@ -161,17 +164,20 @@ bool wifi_set_opmode_current(uint8 opmode);
 uint8 wifi_get_broadcast_if(void);
 bool wifi_set_broadcast_if(uint8 interface);
 
-struct bss_info {
+typedef struct bss_info {
     STAILQ_ENTRY(bss_info)     next;
 
     uint8 bssid[6];
     uint8 ssid[32];
+    uint8 ssid_len;
     uint8 channel;
     sint8 rssi;
     AUTH_MODE authmode;
     uint8 is_hidden;
     sint16 freq_offset;
-};
+    sint16 freqcal_val;
+	uint8 *esp_mesh_ie;
+} bss_info_t;
 
 typedef struct _scaninfo {
     STAILQ_HEAD(, bss_info) *pbss;
@@ -216,21 +222,21 @@ bool wifi_station_set_auto_connect(uint8 set);
 
 bool wifi_station_set_reconnect_policy(bool set);
 
-enum {
+typedef enum {
     STATION_IDLE = 0,
     STATION_CONNECTING,
     STATION_WRONG_PASSWORD,
     STATION_NO_AP_FOUND,
     STATION_CONNECT_FAIL,
     STATION_GOT_IP
-};
+} station_status_t;
 
 enum dhcp_status {
 	DHCP_STOPPED,
 	DHCP_STARTED
 };
 
-uint8 wifi_station_get_connect_status(void);
+station_status_t wifi_station_get_connect_status(void);
 
 uint8 wifi_station_get_current_ap_id(void);
 bool wifi_station_ap_change(uint8 current_ap_id);
@@ -240,9 +246,15 @@ uint8 wifi_station_get_ap_info(struct station_config config[]);
 bool wifi_station_dhcpc_start(void);
 bool wifi_station_dhcpc_stop(void);
 enum dhcp_status wifi_station_dhcpc_status(void);
+bool wifi_station_dhcpc_set_maxtry(uint8 num);
 
 char* wifi_station_get_hostname(void);
 bool wifi_station_set_hostname(char *name);
+
+int wifi_station_set_cert_key(uint8 *client_cert, int client_cert_len,
+    uint8 *private_key, int private_key_len,
+    uint8 *private_key_passwd, int private_key_passwd_len);
+void wifi_station_clear_cert_key(void);
 
 struct softap_config {
     uint8 ssid[32];
@@ -268,6 +280,7 @@ struct station_info {
 };
 
 struct dhcps_lease {
+	bool enable;
 	struct ip_addr start_ip;
 	struct ip_addr end_ip;
 };
@@ -284,8 +297,13 @@ void wifi_softap_free_station_info(void);
 
 bool wifi_softap_dhcps_start(void);
 bool wifi_softap_dhcps_stop(void);
+
 bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please);
 bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
+uint32 wifi_softap_get_dhcps_lease_time(void);
+bool wifi_softap_set_dhcps_lease_time(uint32 minute);
+bool wifi_softap_reset_dhcps_lease_time(void);
+
 enum dhcp_status wifi_softap_dhcps_status(void);
 bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg);
 
@@ -315,31 +333,40 @@ void wifi_set_promiscuous_rx_cb(wifi_promiscuous_cb_t cb);
 
 void wifi_promiscuous_set_mac(const uint8_t *address);
 
-enum phy_mode {
+typedef enum {
 	PHY_MODE_11B	= 1,
 	PHY_MODE_11G	= 2,
 	PHY_MODE_11N    = 3
-};
+} phy_mode_t;
 
-enum phy_mode wifi_get_phy_mode(void);
-bool wifi_set_phy_mode(enum phy_mode mode);
+phy_mode_t wifi_get_phy_mode(void);
+bool wifi_set_phy_mode(phy_mode_t mode);
 
-enum sleep_type {
+typedef enum {
 	NONE_SLEEP_T	= 0,
 	LIGHT_SLEEP_T,
 	MODEM_SLEEP_T
-};
+} sleep_type_t;
 
-bool wifi_set_sleep_type(enum sleep_type type);
-enum sleep_type wifi_get_sleep_type(void);
+bool wifi_set_sleep_type(sleep_type_t type);
+sleep_type_t wifi_get_sleep_type(void);
+
+void wifi_fpm_open(void);
+void wifi_fpm_close(void);
+void wifi_fpm_do_wakeup(void);
+sint8 wifi_fpm_do_sleep(uint32 sleep_time_in_us);
+void wifi_fpm_set_sleep_type(sleep_type_t type);
+sleep_type_t wifi_fpm_get_sleep_type(void);
 
 enum {
     EVENT_STAMODE_CONNECTED = 0,
     EVENT_STAMODE_DISCONNECTED,
     EVENT_STAMODE_AUTHMODE_CHANGE,
     EVENT_STAMODE_GOT_IP,
+    EVENT_STAMODE_DHCP_TIMEOUT,
     EVENT_SOFTAPMODE_STACONNECTED,
 	EVENT_SOFTAPMODE_STADISCONNECTED,
+	EVENT_SOFTAPMODE_PROBEREQRECVED,
     EVENT_MAX
 };
 
@@ -370,6 +397,9 @@ enum {
 
 	REASON_BEACON_TIMEOUT           = 200,
 	REASON_NO_AP_FOUND              = 201,
+	REASON_AUTH_FAIL				= 202,
+	REASON_ASSOC_FAIL				= 203,
+	REASON_HANDSHAKE_TIMEOUT		= 204,
 };
 
 typedef struct {
@@ -407,6 +437,11 @@ typedef struct {
 	uint8 aid;
 } Event_SoftAPMode_StaDisconnected_t;
 
+typedef struct {
+	int rssi;
+	uint8 mac[6];
+} Event_SoftAPMode_ProbeReqRecved_t;
+
 typedef union {
 	Event_StaMode_Connected_t			connected;
 	Event_StaMode_Disconnected_t		disconnected;
@@ -414,6 +449,7 @@ typedef union {
 	Event_StaMode_Got_IP_t				got_ip;
 	Event_SoftAPMode_StaConnected_t		sta_connected;
 	Event_SoftAPMode_StaDisconnected_t	sta_disconnected;
+	Event_SoftAPMode_ProbeReqRecved_t   ap_probereqrecved;
 } Event_Info_u;
 
 typedef struct _esp_event {
@@ -430,7 +466,7 @@ typedef enum wps_type {
 	WPS_TYPE_PBC,
 	WPS_TYPE_PIN,
 	WPS_TYPE_DISPLAY,
-	WPS_TYPE_MAX
+	WPS_TYPE_MAX,
 } WPS_TYPE_t;
 
 enum wps_cb_status {
@@ -446,5 +482,120 @@ bool wifi_wps_start(void);
 
 typedef void (*wps_st_cb_t)(int status);
 bool wifi_set_wps_cb(wps_st_cb_t cb);
+
+typedef void (*freedom_outside_cb_t)(uint8 status);
+int wifi_register_send_pkt_freedom_cb(freedom_outside_cb_t cb);
+void wifi_unregister_send_pkt_freedom_cb(void);
+int wifi_send_pkt_freedom(uint8 *buf, int len, bool sys_seq);
+
+int wifi_rfid_locp_recv_open(void);
+void wifi_rfid_locp_recv_close(void);
+
+typedef void (*rfid_locp_cb_t)(uint8 *frm, int len, int rssi);
+int wifi_register_rfid_locp_recv_cb(rfid_locp_cb_t cb);
+void wifi_unregister_rfid_locp_recv_cb(void);
+
+enum FIXED_RATE {
+        PHY_RATE_48       = 0x8,
+        PHY_RATE_24       = 0x9,
+        PHY_RATE_12       = 0xA,
+        PHY_RATE_6        = 0xB,
+        PHY_RATE_54       = 0xC,
+        PHY_RATE_36       = 0xD,
+        PHY_RATE_18       = 0xE,
+        PHY_RATE_9        = 0xF,
+};
+
+#define FIXED_RATE_MASK_NONE	0x00
+#define FIXED_RATE_MASK_STA		0x01
+#define FIXED_RATE_MASK_AP		0x02
+#define FIXED_RATE_MASK_ALL		0x03
+
+int wifi_set_user_fixed_rate(uint8 enable_mask, uint8 rate);
+int wifi_get_user_fixed_rate(uint8 *enable_mask, uint8 *rate);
+
+enum support_rate {
+	RATE_11B5M	= 0,
+	RATE_11B11M	= 1,
+	RATE_11B1M	= 2,
+	RATE_11B2M	= 3,
+	RATE_11G6M	= 4,
+	RATE_11G12M	= 5,
+	RATE_11G24M	= 6,
+	RATE_11G48M	= 7,
+	RATE_11G54M	= 8,
+	RATE_11G9M	= 9,
+	RATE_11G18M	= 10,
+	RATE_11G36M	= 11,
+};
+
+int wifi_set_user_sup_rate(uint8 min, uint8 max);
+
+enum RATE_11B_ID {
+	RATE_11B_B11M	= 0,
+	RATE_11B_B5M	= 1,
+	RATE_11B_B2M	= 2,
+	RATE_11B_B1M	= 3,
+};
+
+enum RATE_11G_ID {
+	RATE_11G_G54M	= 0,
+	RATE_11G_G48M	= 1,
+	RATE_11G_G36M	= 2,
+	RATE_11G_G24M	= 3,
+	RATE_11G_G18M	= 4,
+	RATE_11G_G12M	= 5,
+	RATE_11G_G9M	= 6,
+	RATE_11G_G6M	= 7,
+	RATE_11G_B5M	= 8,
+	RATE_11G_B2M	= 9,
+	RATE_11G_B1M	= 10
+};
+
+enum RATE_11N_ID {
+	RATE_11N_MCS7S	= 0,
+	RATE_11N_MCS7	= 1,
+	RATE_11N_MCS6	= 2,
+	RATE_11N_MCS5	= 3,
+	RATE_11N_MCS4	= 4,
+	RATE_11N_MCS3	= 5,
+	RATE_11N_MCS2	= 6,
+	RATE_11N_MCS1	= 7,
+	RATE_11N_MCS0	= 8,
+	RATE_11N_B5M	= 9,
+	RATE_11N_B2M	= 10,
+	RATE_11N_B1M	= 11
+};
+
+#define RC_LIMIT_11B		0
+#define RC_LIMIT_11G		1
+#define RC_LIMIT_11N		2
+#define RC_LIMIT_P2P_11G	3
+#define RC_LIMIT_P2P_11N	4
+#define RC_LIMIT_NUM		5
+
+#define LIMIT_RATE_MASK_NONE	0x00
+#define LIMIT_RATE_MASK_STA		0x01
+#define LIMIT_RATE_MASK_AP		0x02
+#define LIMIT_RATE_MASK_ALL		0x03
+
+bool wifi_set_user_rate_limit(uint8 mode, uint8 ifidx, uint8 max, uint8 min);
+uint8 wifi_get_user_limit_rate_mask(void);
+bool wifi_set_user_limit_rate_mask(uint8 enable_mask);
+
+enum {
+	USER_IE_BEACON = 0,
+	USER_IE_PROBE_REQ,
+	USER_IE_PROBE_RESP,
+	USER_IE_ASSOC_REQ,
+	USER_IE_ASSOC_RESP,
+	USER_IE_MAX
+};
+
+typedef void (*user_ie_manufacturer_recv_cb_t)(uint8 type, const uint8 sa[6], const uint8 m_oui[3], uint8 *ie, uint8 ie_len, int rssi);
+
+bool wifi_set_user_ie(bool enable, uint8 *m_oui, uint8 type, uint8 *user_ie, uint8 len);
+int wifi_register_user_ie_manufacturer_recv_cb(user_ie_manufacturer_recv_cb_t cb);
+void wifi_unregister_user_ie_manufacturer_recv_cb(void);
 
 #endif

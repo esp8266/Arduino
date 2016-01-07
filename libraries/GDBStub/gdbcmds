@@ -1,0 +1,3 @@
+set remote hardware-breakpoint-limit 1
+set remote hardware-watchpoint-limit 1
+target remote :9980

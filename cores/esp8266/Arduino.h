@@ -37,6 +37,7 @@ extern "C" {
 #include "binary.h"
 #include "esp8266_peri.h"
 #include "twi.h"
+#include "core_esp8266_features.h"
 
 #define HIGH 0x1
 #define LOW  0x0
@@ -219,14 +220,12 @@ void loop(void);
 void yield(void);
 void optimistic_yield(uint32_t interval_us);
 
-// Get the bit location within the hardware port of the given virtual pin.
-// This comes from the pins_*.c file for the active board configuration.
 #define digitalPinToPort(pin)       (0)
 #define digitalPinToBitMask(pin)    (1UL << (pin))
 #define digitalPinToTimer(pin)      (0)
-#define portOutputRegister(port)    ((volatile uint32_t*) GPO)
-#define portInputRegister(port)     ((volatile uint32_t*) GPI)
-#define portModeRegister(port)      ((volatile uint32_t*) GPE)
+#define portOutputRegister(port)    ((volatile uint32_t*) &GPO)
+#define portInputRegister(port)     ((volatile uint32_t*) &GPI)
+#define portModeRegister(port)      ((volatile uint32_t*) &GPE)
 
 #define NOT_A_PIN -1
 #define NOT_A_PORT -1
@@ -249,8 +248,12 @@ void optimistic_yield(uint32_t interval_us);
 #include "Updater.h"
 #include "debug.h"
 
+#ifndef _GLIBCXX_VECTOR
+// arduino is not compatible with std::vector
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
+#endif
+
 #define _min(a,b) ((a)<(b)?(a):(b))
 #define _max(a,b) ((a)>(b)?(a):(b))
 

@@ -35,7 +35,6 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
-#include "cbuf.h"
 #include "include/ClientContext.h"
 
 WiFiServer::WiFiServer(IPAddress addr, uint16_t port)
@@ -121,6 +120,16 @@ uint8_t WiFiServer::status()  {
     return _pcb->state;
 }
 
+void WiFiServer::close() {
+    if (!_pcb) {
+      return;
+    }
+    tcp_close(_pcb);
+}
+
+void WiFiServer::stop() {
+    close();
+}
 
 size_t WiFiServer::write(uint8_t b) {
     return write(&b, 1);

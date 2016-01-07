@@ -5,19 +5,28 @@
 #include "flash_utils.h"
 #include "MD5Builder.h"
 
-#define UPDATE_ERROR_OK     0
-#define UPDATE_ERROR_WRITE  1
-#define UPDATE_ERROR_ERASE  2
-#define UPDATE_ERROR_SPACE  3
-#define UPDATE_ERROR_SIZE   4
-#define UPDATE_ERROR_STREAM 5
-#define UPDATE_ERROR_MD5    6
+#define UPDATE_ERROR_OK                 (0)
+#define UPDATE_ERROR_WRITE              (1)
+#define UPDATE_ERROR_ERASE              (2)
+#define UPDATE_ERROR_READ               (3)
+#define UPDATE_ERROR_SPACE              (4)
+#define UPDATE_ERROR_SIZE               (5)
+#define UPDATE_ERROR_STREAM             (6)
+#define UPDATE_ERROR_MD5                (7)
+#define UPDATE_ERROR_FLASH_CONFIG       (8)
+#define UPDATE_ERROR_NEW_FLASH_CONFIG   (9)
+#define UPDATE_ERROR_MAGIC_BYTE         (10)
+
 
 #define U_FLASH   0
 #define U_SPIFFS  100
 #define U_AUTH    200
 
-//#define DEBUG_UPDATER Serial
+#ifdef DEBUG_ESP_UPDATER
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_UPDATER DEBUG_ESP_PORT
+#endif
+#endif
 
 class UpdaterClass {
   public:
@@ -26,7 +35,7 @@ class UpdaterClass {
       Call this to check the space needed for the update
       Will return false if there is not enough space
     */
-    bool begin(size_t size, int = U_FLASH);
+    bool begin(size_t size, int command = U_FLASH);
 
     /*
       Writes a buffer to the flash and increments the address
@@ -63,7 +72,7 @@ class UpdaterClass {
     /*
       sets the expected MD5 for the firmware (hexString)
     */
-    void setMD5(const char * expected_md5);
+    bool setMD5(const char * expected_md5);
 
     /*
       returns the MD5 String of the sucessfully ended firmware
@@ -130,6 +139,9 @@ class UpdaterClass {
   private:
     void _reset();
     bool _writeBuffer();
+
+    bool _verifyHeader(uint8_t data);
+    bool _verifyEnd();
 
     uint8_t _error;
     uint8_t *_buffer;

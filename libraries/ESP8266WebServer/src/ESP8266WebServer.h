@@ -40,12 +40,6 @@ enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
 
 class ESP8266WebServer;
 
-#include "detail/RequestHandler.h"
-
-namespace fs {
-class FS;
-}
-
 typedef struct {
   HTTPUploadStatus status;
   String  filename;
@@ -56,6 +50,12 @@ typedef struct {
   uint8_t buf[HTTP_UPLOAD_BUFLEN];
 } HTTPUpload;
 
+#include "detail/RequestHandler.h"
+
+namespace fs {
+class FS;
+}
+
 class ESP8266WebServer
 {
 public:
@@ -65,10 +65,17 @@ public:
 
   void begin();
   void handleClient();
+  
+  void close();
+  void stop();
 
+  bool authenticate(const char * username, const char * password);
+  void requestAuthentication();
+  
   typedef std::function<void(void)> THandlerFunction;
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);
+  void on(const char* uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
   void addHandler(RequestHandler* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
@@ -132,6 +139,7 @@ protected:
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
+  String urlDecode(const String& text);
 
   struct RequestArgument {
     String key;
@@ -144,21 +152,22 @@ protected:
   HTTPMethod  _currentMethod;
   String      _currentUri;
 
-  size_t           _currentArgCount;
-  RequestArgument* _currentArgs;
-  HTTPUpload       _currentUpload;
-
-  RequestArgument* _currentHeaders;
-  size_t           _headerKeysCount;
-  size_t           _contentLength;
-  String           _responseHeaders;
-
-  String           _hostHeader;
-
+  RequestHandler*  _currentHandler;
   RequestHandler*  _firstHandler;
   RequestHandler*  _lastHandler;
   THandlerFunction _notFoundHandler;
   THandlerFunction _fileUploadHandler;
+
+  int              _currentArgCount;
+  RequestArgument* _currentArgs;
+  HTTPUpload       _currentUpload;
+
+  int              _headerKeysCount;
+  RequestArgument* _currentHeaders;
+  size_t           _contentLength;
+  String           _responseHeaders;
+
+  String           _hostHeader;
 
 };
 

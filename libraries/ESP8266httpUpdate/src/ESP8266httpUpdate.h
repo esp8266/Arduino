@@ -28,14 +28,29 @@
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <WiFiUdp.h>
 #include <WiFiClient.h>
+#include <WiFiUdp.h>
+#include <ESP8266HTTPClient.h>
 
-//#define DEBUG_HTTP_UPDATE(...) Serial1.printf( __VA_ARGS__ )
+#ifdef DEBUG_ESP_HTTP_UPDATE
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_HTTP_UPDATE(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#endif
+#endif
 
 #ifndef DEBUG_HTTP_UPDATE
 #define DEBUG_HTTP_UPDATE(...)
 #endif
+
+/// note we use HTTP client errors too so we start at 100
+#define HTTP_UE_TOO_LESS_SPACE              (-100)
+#define HTTP_UE_SERVER_NOT_REPORT_SIZE      (-101)
+#define HTTP_UE_SERVER_FILE_NOT_FOUND       (-102)
+#define HTTP_UE_SERVER_FORBIDDEN            (-103)
+#define HTTP_UE_SERVER_WRONG_HTTP_CODE      (-104)
+#define HTTP_UE_SERVER_FAULTY_MD5           (-105)
+#define HTTP_UE_BIN_VERIFY_HEADER_FAILED    (-106)
+#define HTTP_UE_BIN_FOR_WRONG_FLASH         (-107)
 
 typedef enum {
     HTTP_UPDATE_FAILED,
@@ -48,8 +63,20 @@ class ESP8266HTTPUpdate {
         ESP8266HTTPUpdate(void);
         ~ESP8266HTTPUpdate(void);
 
-        t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "");
-        t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "");
+        t_httpUpdate_return update(const char * url, const char * current_version = "", const char * httpsFingerprint = "", bool reboot = true);
+        t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "", bool https = false, const char * httpsFingerprint = "", bool reboot = true);
+        t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "", bool https = false, String httpsFingerprint = "", bool reboot = true);
+
+        t_httpUpdate_return updateSpiffs(const char * url, const char * current_version = "", const char * httpsFingerprint = "", bool reboot = false);
+
+        int getLastError(void);
+        String getLastErrorString(void);
+
+    protected:
+        t_httpUpdate_return handleUpdate(HTTPClient * http, const char * current_version, bool reboot = true, bool spiffs = false);
+        bool runUpdate(Stream& in, uint32_t size, String md5, int command = U_FLASH);
+
+        int lastError;
 };
 
 extern ESP8266HTTPUpdate ESPhttpUpdate;

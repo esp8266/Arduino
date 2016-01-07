@@ -38,7 +38,6 @@ extern "C"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include "lwip/netif.h"
-#include "cbuf.h"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
@@ -237,6 +236,27 @@ int WiFiClient::peek()
         return -1;
 
     return _client->peek();
+}
+
+size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
+    size_t count = 0;
+
+    if(!_client) {
+        return 0;
+    }
+
+    _startMillis = millis();
+    while((available() < (int) length) && ((millis() - _startMillis) < _timeout)) {
+        yield();
+    }
+
+    if(available() < (int) length) {
+        count = available();
+    } else {
+        count = length;
+    }
+
+    return _client->peekBytes((char *)buffer, count);
 }
 
 void WiFiClient::flush()

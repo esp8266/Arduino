@@ -97,6 +97,7 @@ class ClientContext {
                     close();
                     if(_discard_cb)
                         _discard_cb(_discard_cb_arg, this);
+                    DEBUGV(":del\r\n");
                     delete this;
                 }
             }
@@ -176,6 +177,20 @@ class ClientContext {
             if(!_rx_buf) return 0;
 
             return reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
+        }
+
+        size_t peekBytes(char *dst, size_t size) {
+            if(!_rx_buf) return 0;
+
+            size_t max_size = _rx_buf->tot_len - _rx_buf_offset;
+            size = (size < max_size) ? size : max_size;
+
+            DEBUGV(":pd %d, %d, %d\r\n", size, _rx_buf->tot_len, _rx_buf_offset);
+            size_t buf_size = _rx_buf->len - _rx_buf_offset;
+            size_t copy_size = (size < buf_size) ? size : buf_size;
+            DEBUGV(":rpi %d, %d\r\n", buf_size, copy_size);
+            os_memcpy(dst, reinterpret_cast<char*>(_rx_buf->payload) + _rx_buf_offset, copy_size);
+            return copy_size;
         }
 
         void flush() {
@@ -308,9 +323,6 @@ class ClientContext {
         }
 
     private:
-        ClientContext* _next;
-        int _refcnt;
-
         tcp_pcb* _pcb;
 
         pbuf* _rx_buf;
@@ -318,6 +330,9 @@ class ClientContext {
 
         discard_cb_t _discard_cb;
         void* _discard_cb_arg;
+
+        int _refcnt;
+        ClientContext* _next;
 
         size_t _size_sent;
         bool _send_waiting;

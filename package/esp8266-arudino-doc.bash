@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # @file esp8266-arudino-doc.bash
@@ -11,20 +11,22 @@
 # Packages needed by this script:
 # * linux commands: ln, cp, mkdir, rm, wget
 # * git
-# * jekyll
 #
-# ruby libraries:
+# ruby gems:
+# * jekyll
 # * redcarpet
 # * rb-pygments
 #
 # gem install [lib]
 #
 
+set -e
 
 # some variable definitions
 tmp_path=$1
-arduinoESP_src="$tmp_path/arduino"
-version="$(git --work-tree=$arduinoESP_src describe --tags --always)"
+doc_src_path=$2
+arduinoESP_src=$(cd $PWD/..; pwd)
+version="$(git --work-tree=$arduinoESP_src --git-dir=$arduinoESP_src/.git describe --tags --always)"
 release_date=$(date "+%b_%d,_%Y") # format for badge link
 build_date=$(date "+%b %d, %Y")
 destination_path="$tmp_path/doc"
@@ -37,11 +39,11 @@ echo "                   version: "$version
 echo "              release date: "$release_date
 echo "                build date: "$build_date
 echo "    put documentation into: "$destination_path
-echo "documentatino template url: "$doc_template_url
+echo "documentation template url: "$doc_template_url
 echo "                       url: "$url
 
 # continue?
-read -e -p "Dou you wish to continue (y/n)? " -n 1 -i "y" decision
+read -e -p "Dou you wish to continue (y/n)? " -n 1 decision
 if echo "$decision" | grep -iq "^y" ;then
 	echo "okay"
 else
@@ -61,7 +63,8 @@ mkdir -p $destination_path/$version
 cp -R $arduinoESP_src/doc/* $destination_path/src
 
 # download doc template
-git clone $doc_template_url $destination_path/build
+rsync -av $doc_src_path/ $destination_path/build/
+# git clone $doc_template_url $destination_path/build
 
 # create versions.html file
 
@@ -99,8 +102,10 @@ ln -s ../$version _site
 
 # add subtitle and basurl
 echo "url: \"$url\"" > _config_local.yml
-echo "subtitle: \"ver. $version, built on $build_date\"" >> _config_local.yml
+echo "version: $version"  >> _config_local.yml
+echo "build_date: $build_date" >> _config_local.yml
 echo "baseurl: /Arduino/versions/$version" >> _config_local.yml
+mv doc/reference_items.yml _data/reference_items.yml
 
 # build with jekyll
 jekyll build --config _config.yml,_config_local.yml
@@ -110,4 +115,3 @@ popd
 
 # grab badge
 wget -q -O $destination_path/$version/badge.svg "https://img.shields.io/badge/updated-$release_date-blue.svg"
-

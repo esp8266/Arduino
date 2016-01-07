@@ -24,7 +24,9 @@
  #include <stddef.h>
  #include <stdbool.h>
 
-static uint8_t phy_init_data[128] =
+#include "c_types.h"
+
+static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 {
     [0] = 5,  // Reserved, do not change
     [1] = 0,  // Reserved, do not change
@@ -231,12 +233,22 @@ static uint8_t phy_init_data[128] =
     // force_freq_offset
     // signed, unit is 8kHz
     [113] = 0,
+
+    // rf_cal_use_flash
+    // 0: RF init no RF CAL, using all RF CAL data in flash, it takes about 2ms for RF init
+    // 1: RF init only do TX power control CAL, others using RF CAL data in flash , it takes about 20ms for RF init
+    // 2: RF init no RF CAL, using all RF CAL data in flash, it takes about 2ms for RF init  (same as 0?!)
+    // 3: RF init do all RF CAL, it takes about 200ms for RF init
+    [114] = 2
 };
 
 extern int __real_register_chipv6_phy(uint8_t* init_data);
-extern int __wrap_register_chipv6_phy(uint8_t* unused) {
-    phy_init_data[107] = __get_adc_mode();
-    return __real_register_chipv6_phy(phy_init_data);
+extern int __wrap_register_chipv6_phy(uint8_t* init_data) {
+    if (init_data != NULL) {
+      memcpy(init_data, phy_init_data, sizeof(phy_init_data));
+      init_data[107] = __get_adc_mode();
+    }
+    return __real_register_chipv6_phy(init_data);
 }
 
 extern int __get_rf_mode(void)  __attribute__((weak));

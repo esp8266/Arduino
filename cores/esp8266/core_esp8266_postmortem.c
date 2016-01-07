@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "debug.h"
 #include "ets_sys.h"
 #include "user_interface.h"
 #include "esp8266_peri.h"
@@ -30,6 +31,11 @@
 extern void __real_system_restart_local();
 extern cont_t g_cont;
 
+static const char* s_panic_file = 0;
+static int s_panic_line = 0;
+static const char* s_panic_func = 0;
+
+static bool s_abort_called = false;
 
 void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
@@ -56,7 +62,13 @@ void __wrap_system_restart_local() {
 
     ets_install_putc1(&uart_write_char_d);
 
-    if (rst_info.reason == REASON_EXCEPTION_RST) {
+    if (s_panic_line) {
+        ets_printf("\nPanic %s:%d %s\n", s_panic_file, s_panic_line, s_panic_func);
+    }
+    else if (s_abort_called) {
+        ets_printf("Abort called\n");
+    }
+    else if (rst_info.reason == REASON_EXCEPTION_RST) {
         ets_printf("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n",
             rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
@@ -157,4 +169,26 @@ static void uart1_write_char_d(char c) {
         USF(1) = '\r';
     }
     USF(1) = c;
+}
+void abort() __attribute__((noreturn));
+
+void abort(){
+    // cause exception
+    s_abort_called = true;
+    do {
+        *((int*)0) = 0;
+    } while(true);
+}
+
+void __assert_func(const char *file, int line, const char *func, const char *what) {
+    s_panic_file = file;
+    s_panic_line = line;
+    s_panic_func = func;
+}
+
+void __panic_func(const char* file, int line, const char* func) {
+    s_panic_file = file;
+    s_panic_line = line;
+    s_panic_func = func;
+    abort();
 }

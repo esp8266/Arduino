@@ -5,28 +5,49 @@
 
 class FunctionRequestHandler : public RequestHandler {
 public:
-    FunctionRequestHandler(ESP8266WebServer::THandlerFunction fn, const char* uri, HTTPMethod method)
+    FunctionRequestHandler(ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn, const char* uri, HTTPMethod method)
     : _fn(fn)
+    , _ufn(ufn)
     , _uri(uri)
     , _method(method)
     {
     }
 
-    bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+    bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
         if (_method != HTTP_ANY && _method != requestMethod)
             return false;
 
         if (requestUri != _uri)
             return false;
 
+        return true;
+    }
+
+    bool canUpload(String requestUri) override  {
+        if (!_ufn || !canHandle(HTTP_POST, requestUri))
+            return false;
+
+        return true;
+    }
+
+    bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+        if (!canHandle(requestMethod, requestUri))
+            return false;
+
         _fn();
         return true;
     }
 
+    void upload(ESP8266WebServer& server, String requestUri, HTTPUpload& upload) override {
+        if (canUpload(requestUri))
+            _ufn();
+    }
+
 protected:
+    ESP8266WebServer::THandlerFunction _fn;
+    ESP8266WebServer::THandlerFunction _ufn;
     String _uri;
     HTTPMethod _method;
-    ESP8266WebServer::THandlerFunction _fn;
 };
 
 class StaticRequestHandler : public RequestHandler {
@@ -39,38 +60,44 @@ public:
     {
         _isFile = fs.exists(path);
         DEBUGV("StaticRequestHandler: path=%s uri=%s isFile=%d, cache_header=%s\r\n", path, uri, _isFile, cache_header);
-        _baseUriLength = _uri.length(); 
+        _baseUriLength = _uri.length();
     }
-    bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+
+    bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
         if (requestMethod != HTTP_GET)
             return false;
-        DEBUGV("StaticRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), _uri.c_str());
-        if (!requestUri.startsWith(_uri))
-            return false; 
 
-        String path(_path); 
-
-        if(path.endsWith("/")) path += "index.htm";
-
-        if (!_isFile) { 
-            // Base URI doesn't point to a file. Append whatever follows this
-            // URI in request to get the file path.
-            path += requestUri.substring(_baseUriLength); 
-        }
-
-        else if (requestUri != _uri) {
-            // Base URI points to a file but request doesn't match this URI exactly
+        if ((_isFile && requestUri != _uri) || !requestUri.startsWith(_uri))
             return false;
+
+        return true;
+    }
+
+    bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+        if (!canHandle(requestMethod, requestUri))
+            return false;
+
+        DEBUGV("StaticRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), _uri.c_str());
+
+        String path(_path);
+
+        if (!_isFile) {
+            // Base URI doesn't point to a file.
+            // If a directory is requested, look for index file.
+            if (requestUri.endsWith("/")) requestUri += "index.htm";
+
+            // Append whatever follows this URI in request to get the file path.
+            path += requestUri.substring(_baseUriLength);
         }
         DEBUGV("StaticRequestHandler::handle: path=%s, isFile=%d\r\n", path.c_str(), _isFile);
 
         String contentType = getContentType(path);
-        
+
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
-        // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc... 
-        if (!path.endsWith(".gz") && !SPIFFS.exists(path))  { 
+        // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
+        if (!path.endsWith(".gz") && !_fs.exists(path))  {
             String pathWithGz = path + ".gz";
-            if(SPIFFS.exists(pathWithGz))
+            if(_fs.exists(pathWithGz))
                 path += ".gz";
         }
 
@@ -78,9 +105,9 @@ public:
         if (!f)
             return false;
 
-        if (_cache_header.length() != 0) 
+        if (_cache_header.length() != 0)
             server.sendHeader("Cache-Control", _cache_header);
-        
+
         server.streamFile(f, contentType);
         return true;
     }
@@ -107,7 +134,7 @@ protected:
     FS _fs;
     String _uri;
     String _path;
-    String _cache_header; 
+    String _cache_header;
     bool _isFile;
     size_t _baseUriLength;
 };

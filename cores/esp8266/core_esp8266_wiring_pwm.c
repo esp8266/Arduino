@@ -94,18 +94,19 @@ void ICACHE_RAM_ATTR pwm_timer_isr(){
 	static uint16_t steps[17];
 	static uint32_t masks[17];
 	if(current_step < stepcount){
-		GPOC = masks[current_step] & 0xFFFF;
-		if(masks[current_step] & 0x10000) GP16O &= ~1;
+		T1L = (pwm_steps[current_step+1] * pwm_multiplier);
+		TEIE |= TEIE1;
+		if(masks[current_step] & 0xFFFF) GPOC = masks[current_step] & 0xFFFF;
+		if(masks[current_step] & 0x10000) GP16O = 0;
 		current_step++;
-		timer1_write(pwm_steps[current_step] * pwm_multiplier);
 	} else {
-
 		current_step = 0;
 		stepcount = 0;
 		if(pwm_mask == 0) return;
-		GPOS = pwm_mask & 0xFFFF;
-		if(pwm_mask & 0x10000) GP16O |= 1;
-		timer1_write(pwm_steps[0] * pwm_multiplier);
+		T1L = (pwm_steps[current_step+1] * pwm_multiplier);
+		TEIE |= TEIE1;
+		if(pwm_mask & 0xFFFF) GPOS = pwm_mask & 0xFFFF;
+		if(pwm_mask & 0x10000) GP16O = 1;
 		stepcount = pwm_steps_len;
 		memcpy(steps, pwm_steps, (stepcount + 1) * 2);
 		memcpy(masks, pwm_steps_mask, stepcount * 4);

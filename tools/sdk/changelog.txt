@@ -1,3 +1,122 @@
+esp_iot_sdk_v1.5.0_15_12_15_p1 Release Note
+----------------------------------------
+Here is a patch based on ESP8266_NONOS_SDK_V1.5.0 solved a problem that calling espconn_abort may cause unexpected reset.
+
+Sorry for the inconvenience.
+
+esp_iot_sdk_v1.5.0_15_11_27 Release Note
+----------------------------------------
+Resolved Issues (Bugs listed below apply to Bug Bounty Program):
+1. Returned value of system_get_rst_info is wrong.
+
+Optimization:
+1. Optimize espconn_regist_recvcb for UDP transmission.
+2. Print information will prompt errors if the input parameters of os_time_arm excess the upper limit.
+3. Optimize memory management.
+4. Optimize RF frequency offset.
+5. Print information will prompt errors if the size of bin file is too large in OTA.
+6. Optimize mDNS.
+7. Revise UART output print error when powered on again after call system_uart_swap.
+8. Revise errors during multiple UDP transmissions.
+9. Revise the error when wifi_station_set_config_default is called and the same AP is set as before, while information cannot be stored in the Flash.
+10. Optimize the error of packet loss during UDP transmission process under single station mode.
+11. Add new function, WPA2 Enterprise is supported.
+12. SmartConfig version is upgraded to V2.5.3.
+13. Mesh version is upgraded to V0.2.3.
+14. User application needs to add "-lcrypto" in LINKFLAGS_eagle.app.v6 of Makefile.
+
+Added APIs:
+1.espconn_abort: bread TCP connection compulsively.
+2.espconn_secure_delete: delete the SSL server when ESP8266 runs as SSL server.
+3.wifi_station_set_cert_key: set certificate and private key for WPA2 Enterprise.
+4.wifi_station_clear_cert_key: release the resource of connecting to WPA2 Enterprise AP, and clear the status.
+
+
+AT_v0.51 release note:
+1.Revise the error of the first byte in AT command when UART RX interrupt handler is implemented.
+2.Revise the malfunction of display when AT+CWLAP is invoked to scan a specific AP.
+
+
+esp_iot_sdk_v1.4.0_15_09_18 Release Note
+----------------------------------------
+Resolved Issues(Bugs below are eligible for Bug Bounty Program):
+1.Espconn may fail to download big chunk of data(FOTA).
+2.Invalid TCP data sent issue.
+3.Fatal exceptions occur when change WiFi mode in WiFi scan callback.
+4.WiFi compatibility problem of special network card.
+5.Deep sleep may appear high current under certain circumstances.
+
+Optimization:
+1. Add a new method to check memory leaks (API : system_show_malloc).
+2. Add print information when exception happens.
+3. Resolve the problem of os_timer_disarm.
+4. Optimize  DHCP server, add API to set up the lease time of DHCP server. More details are in the “Added APIs”.
+5. Add event “EVENT_STAMODE_DHCP_TIMEOUT” for the DHCP timeout handling mechanism.
+6. Optimize handling of the reception of data and ZWP message.
+7. Add new APIs to support SSL bidirectional authentication. More details are in the “Added APIs”.
+8. Add new APIs to set up SSL certificates and encryption keys.   API espconn_secure_set_default_certificate  and  espconn_secure_set_default_private_key should be called to set SSL certificate and secure key, if ESP8266 runs as SSL server. More details are in the “Added APIs”.
+9. Optimize the process of FOTA (firmware upgrade through WiFi.
+10. Optimize mDNS, and resolve the problem that in certain case the ESP8266 softAP can not work in the sta+AP mode.
+11. Release mesh as a lib in the esp_iot_sdk, and do not provide SDK of the mesh version any more.
+12. Optimize mesh’s handling of UDP packets.
+13. Optimize checking of the validity of the mesh API’s parameters.
+14. Add an API to set up the largest hop of mesh. For detailed information, go to mesh instructions.
+15. Optimize the process of powering up and booting to shorten booting time by 20 ms.
+16. Optimize the function of automatic frequency offset calibration.
+17. Optimize the function of sniffer.
+18. Strengthen reliability of the checking of beacon timeout.
+19.Optimize Wi-Fi event mechanism, and add event “ EVENT_SOFTAPMODE_PROBEREQRECVED”, and reason for a failed connection.
+20. Optimize Wi-Fi callback function and strengthen reliability of the software.
+21. Add the function of data transferring between stations in the soft-AP mode.
+22. Update SmartConfig to the version of 2.5.1.
+
+23.Update esp_init_data_default.bin. Please use the newest esp_init_data_default.bin when burning.
+
+24.Modify the espconn pointer in the receive callback of UDP. Parameters  remote_ip and remote_port in it are the remote IP and port set by espconn_create. If users want to obtain IP and ports of the current sender, please call espconn_get_connection_info to get relevant information.
+
+
+Added APIs:
+1.System API
+system_show_malloc : for checking memory leak, to print the memory usage.
+2.DHCP server lease time related APIs
+wifi_softap_set_dhcps_lease_time：set ESP8266 softAP DHCP server lease time.
+wifi_softap_get_dhcps_lease_time：check ESP8266 softAP DHCP server lease time.
+wifi_softap_reset_dhcps_lease_time：reset ESP8266 softAP DHCP server lease time which is 120 minutes by default.
+3.wifi_station_dhcpc_set_maxtry：set the maximum number that ESP8266 station DHCP client will try to reconnect to the AP.
+4.Force sleep APIs
+wifi_fpm_open：enable force sleep function.
+wifi_fpm_close：disable force sleep function.
+wifi_fpm_do_sleep：force ESP8266 enter sleep mode.
+wifi_fpm_do_wakeup：wake ESP8266 up from force sleep.
+wifi_fpm_set_sleep_type：set sleep type of force sleep function.
+wifi_fpm_get_sleep_type：get sleep type of force sleep function.
+5.Send packet freedom APIs (to send user-define 802.11 packets)
+wifi_register_send_pkt_freedom_cb：register a callback for sending user-define 802.11 packets.
+wifi_unregister_send_pkt_freedom_cb：unregister the callback for sending user-define 802.11 packets.
+wifi_send_pkt_freedom：send user-define 802.11 packet.
+6.RFID LOCP APIs
+wifi_rfid_locp_recv_open：enable RFID LOCP to receive WDS packets.
+wifi_rfid_locp_recv_close：disable RFID LOCP.
+wifi_register_rfid_locp_recv_cb：register a callback of receiving WDS packets.
+wifi_unregister_rfid_locp_recv_cb：unregister the callback of receiving WDS packets.
+7.Rate Control APIs
+wifi_set_user_fixed_rate：set the fixed rate and mask of sending data from ESP8266
+wifi_get_user_fixed_rate：check the fixed rate and mask of ESP8266
+wifi_set_user_sup_rate：set the rate range supported by ESP8266 to limit the rate of sending packets from other devices.
+wifi_set_user_rate_limit：limit the rate of sending data from ESP8266.
+wifi_set_user_limit_rate_mask：set the interfaces of ESP8266 whose rate of sending packets is limited by wifi_set_user_rate_limit.
+wifi_get_user_limit_rate_mask：get the interfaces of ESP8266 whose rate of sending packets is limited by wifi_set_user_rate_limit.
+8.Espconn APIs
+espconn_sendto：send UDP data.
+espconn_secure_cert_req_enable：enable certificates verification function when ESP8266 runs as SSL client.
+espconn_secure_cert_req_disable：disable certificates verification function when ESP8266 runs as SSL client.
+espconn_secure_set_default_certificate：set the certificate when ESP8266 runs as SSL server.
+espconn_secure_set_default_private_key：set the encryption key when ESP8266 runs as SSL server.
+9.SmartConfig API
+smartconfig_set_type: set the protocol type of SmartConfig.
+
+
+
 esp_iot_sdk_v1.3.0_15_08_10_p1 Release Note
 ----------------------------------------
 

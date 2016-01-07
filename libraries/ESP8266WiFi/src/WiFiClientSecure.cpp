@@ -29,7 +29,6 @@ extern "C"
 }
 #include <errno.h>
 #include "debug.h"
-#include "cbuf.h"
 #include "ESP8266WiFi.h"
 #include "WiFiClientSecure.h"
 #include "WiFiClient.h"
@@ -38,11 +37,12 @@ extern "C"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include "lwip/netif.h"
-#include "cbuf.h"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
-//#define DEBUG_SSL
+#ifdef DEBUG_ESP_SSL
+#define DEBUG_SSL
+#endif
 
 #ifdef DEBUG_SSL
 #define SSL_DEBUG_OPTS SSL_DISPLAY_STATES
@@ -50,7 +50,17 @@ extern "C"
 #define SSL_DEBUG_OPTS 0
 #endif
 
-#define SSL_RX_BUF_SIZE 4096
+uint8_t* default_private_key = 0;
+uint32_t default_private_key_len = 0;
+static bool default_private_key_dynamic = false;
+static int s_pk_refcnt = 0;
+uint8_t* default_certificate = 0;
+uint32_t default_certificate_len = 0;
+static bool default_certificate_dynamic = false;
+
+static void clear_private_key();
+static void clear_certificate();
+
 
 class SSLContext {
 public:
@@ -59,8 +69,6 @@ public:
             _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS, 0);
         }
         ++_ssl_ctx_refcnt;
-
-        _rxbuf = new cbuf(SSL_RX_BUF_SIZE);
     }
 
     ~SSLContext() {
@@ -73,8 +81,6 @@ public:
         if (_ssl_ctx_refcnt == 0) {
             ssl_ctx_free(_ssl_ctx);
         }
-
-        delete _rxbuf;
     }
 
     void ref() {
@@ -92,38 +98,61 @@ public:
     }
 
     int read(uint8_t* dst, size_t size) {
-        if (!_rxbuf->getSize()) {
-            _readAll();
+        if (!_available) {
+            if (!_readAll())
+                return 0;
         }
-        size_t available = _rxbuf->getSize();
-        size_t will_read = (available < size) ? available : size;
-        return _rxbuf->read(reinterpret_cast<char*>(dst), will_read);
+        size_t will_copy = (_available < size) ? _available : size;
+        memcpy(dst, _read_ptr, will_copy);
+        _read_ptr += will_copy;
+        _available -= will_copy;
+        if (_available == 0) {
+            _read_ptr = nullptr;
+        }
+        return will_copy;
     }
 
     int read() {
-        optimistic_yield(100);
-        if (!_rxbuf->getSize()) {
-            _readAll();
+        if (!_available) {
+            if (!_readAll())
+                return -1;
         }
-        return _rxbuf->read();
+        int result = _read_ptr[0];
+        ++_read_ptr;
+        --_available;
+        if (_available == 0) {
+            _read_ptr = nullptr;
+        }
+        return result;
     }
 
     int peek() {
-        if (!_rxbuf->getSize()) {
-            _readAll();
+        if (!_available) {
+            if (!_readAll())
+                return -1;
         }
-        return _rxbuf->peek();
+        return _read_ptr[0];
+    }
+
+    size_t peekBytes(char *dst, size_t size) {
+        if(!_available) {
+            if(!_readAll())
+                return -1;
+        }
+
+        size_t will_copy = (_available < size) ? _available : size;
+        memcpy(dst, _read_ptr, will_copy);
+        return will_copy;
     }
 
     int available() {
-        auto rc = _rxbuf->getSize();
-        if (rc == 0) {
-            _readAll();
-            rc = _rxbuf->getSize();
+        auto cb = _available;
+        if (cb == 0) {
+            cb = _readAll();
         } else {
             optimistic_yield(100);
         }
-        return rc;
+        return cb;
     }
 
     operator SSL*() {
@@ -135,6 +164,8 @@ protected:
         if (!_ssl)
             return 0;
 
+        optimistic_yield(100);
+
         uint8_t* data;
         int rc = ssl_read(_ssl, &data);
         if (rc <= 0) {
@@ -144,25 +175,18 @@ protected:
             }
             return 0;
         }
-
-
-        if (rc > _rxbuf->room()) {
-            DEBUGV("WiFiClientSecure rx overflow");
-            rc = _rxbuf->room();
-        }
-        int result = 0;
-        size_t sizeBefore = _rxbuf->getSize();
-        if (rc)
-            result = _rxbuf->write(reinterpret_cast<const char*>(data), rc);
-        DEBUGV("*** rb: %d + %d = %d\r\n", sizeBefore, rc, _rxbuf->getSize());
-        return result;
+        DEBUGV(":wcs ra %d", rc);
+        _read_ptr = data;
+        _available = rc;
+        return _available;
     }
 
     static SSL_CTX* _ssl_ctx;
     static int _ssl_ctx_refcnt;
     SSL* _ssl = nullptr;
     int _refcnt = 0;
-    cbuf* _rxbuf;
+    const uint8_t* _read_ptr = nullptr;
+    size_t _available = 0;
 };
 
 SSL_CTX* SSLContext::_ssl_ctx = nullptr;
@@ -170,11 +194,16 @@ int SSLContext::_ssl_ctx_refcnt = 0;
 
 
 WiFiClientSecure::WiFiClientSecure() {
+    ++s_pk_refcnt;
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
     if (_ssl) {
         _ssl->unref();
+    }
+    if (--s_pk_refcnt == 0) {
+        clear_private_key();
+        clear_certificate();
     }
 }
 
@@ -261,6 +290,27 @@ int WiFiClientSecure::peek() {
     return _ssl->peek();
 }
 
+size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length) {
+    size_t count = 0;
+
+    if(!_ssl) {
+        return 0;
+    }
+
+    _startMillis = millis();
+    while((available() < (int) length) && ((millis() - _startMillis) < _timeout)) {
+        yield();
+    }
+
+    if(available() < (int) length) {
+        count = available();
+    } else {
+        count = length;
+    }
+
+    return _ssl->peekBytes((char *)buffer, count);
+}
+
 int WiFiClientSecure::available() {
     if (!_ssl)
         return 0;
@@ -271,7 +321,7 @@ int WiFiClientSecure::available() {
 uint8_t WiFiClientSecure::connected() {
     if (!_client)
         return 0;
-        
+
     if (_client->state() == ESTABLISHED)
         return 1;
 
@@ -309,18 +359,17 @@ bool WiFiClientSecure::verify(const char* fp, const char* url) {
     uint8_t sha1[20];
     int len = strlen(fp);
     int pos = 0;
-    for (int i = 0; i < sizeof(sha1); ++i) {
-        while (pos < len && fp[pos] == ' ') {
+    for (size_t i = 0; i < sizeof(sha1); ++i) {
+        while (pos < len && ((fp[pos] == ' ') || (fp[pos] == ':'))) {
             ++pos;
         }
-        DEBUGV("pos:%d ", pos);
         if (pos > len - 2) {
-            DEBUGV("fingerprint too short\r\n");
+            DEBUGV("pos:%d len:%d fingerprint too short\r\n", pos, len);
             return false;
         }
         uint8_t high, low;
         if (!parseHexNibble(fp[pos], &high) || !parseHexNibble(fp[pos+1], &low)) {
-            DEBUGV("invalid hex sequence: %c%c\r\n", fp[pos], fp[pos+1]);
+            DEBUGV("pos:%d len:%d invalid hex sequence: %c%c\r\n", pos, len, fp[pos], fp[pos+1]);
             return false;
         }
         pos += 2;
@@ -334,6 +383,66 @@ bool WiFiClientSecure::verify(const char* fp, const char* url) {
     //TODO: check URL against certificate
 
     return true;
+}
+
+void WiFiClientSecure::setCertificate(const uint8_t* cert_data, size_t size) {
+  clear_certificate();
+  default_certificate = (uint8_t*) cert_data;
+  default_certificate_len = size;
+}
+
+void WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size) {
+  clear_private_key();
+  default_private_key = (uint8_t*) pk;
+  default_private_key_len = size;
+}
+
+bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size) {
+  clear_certificate();
+  default_certificate = new uint8_t[size];
+  if (!default_certificate) {
+    return false;
+  }
+  if (stream.readBytes(default_certificate, size) != size) {
+    delete[] default_certificate;
+    return false;
+  }
+  default_certificate_dynamic = true;
+  default_certificate_len = size;
+  return true;
+}
+
+bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
+  clear_private_key();
+  default_private_key = new uint8_t[size];
+  if (!default_private_key) {
+    return false;
+  }
+  if (stream.readBytes(default_private_key, size) != size) {
+    delete[] default_private_key;
+    return false;
+  }
+  default_private_key_dynamic = true;
+  default_private_key_len = size;
+  return true;
+}
+
+static void clear_private_key() {
+  if (default_private_key && default_private_key_dynamic) {
+    delete[] default_private_key;
+    default_private_key_dynamic = false;
+  }
+  default_private_key = 0;
+  default_private_key_len = 0;
+}
+
+static void clear_certificate() {
+  if (default_certificate && default_certificate_dynamic) {
+    delete[] default_certificate;
+    default_certificate_dynamic = false;
+  }
+  default_certificate = 0;
+  default_certificate_len = 0;
 }
 
 extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {
@@ -383,11 +492,11 @@ extern "C" void* ax_port_malloc(size_t size, const char* file, int line) {
 
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
-
-        while(true){}
+        panic();
     }
-    if (size >= 1024)
+    if (size >= 1024) {
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());
+    }
     return result;
 }
 
@@ -401,10 +510,11 @@ extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int l
     void* result = realloc(ptr, size);
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
-        while(true){}
+        panic();
     }
-    if (size >= 1024)
+    if (size >= 1024) {
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());
+    }
     return result;
 }
 
@@ -412,6 +522,7 @@ extern "C" void ax_port_free(void* ptr) {
     free(ptr);
     uint32_t *p = (uint32_t*) ptr;
     size_t size = p[-3];
-    if (size >= 1024)
+    if (size >= 1024) {
         DEBUG_TLS_MEM_PRINT("free %d, left %d\r\n", p[-3], ESP.getFreeHeap());
+    }
 }

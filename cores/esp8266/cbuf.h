@@ -21,7 +21,10 @@
 #ifndef __cbuf_h
 #define __cbuf_h
 
+#include <stddef.h>
 #include <stdint.h>
+#include <string.h>
+
 class cbuf {
     public:
         cbuf(size_t size) :
@@ -32,39 +35,30 @@ class cbuf {
             delete[] _buf;
         }
 
-        size_t getSize() const {
-            if(_end >= _begin) return _end - _begin;
-
-            return _size - (_begin - _end);
-        }
+        size_t getSize() const;
 
         size_t room() const {
             if(_end >= _begin) {
                 return _size - (_end - _begin) - 1;
             }
-            if(_begin == _end) {
-                return _size;
-            }
             return _begin - _end - 1;
         }
 
-        bool empty() const {
+        inline bool empty() const {
             return _begin == _end;
         }
 
+        inline bool full() const {
+            return wrap_if_bufend(_end + 1) == _begin;
+        }
+
         int peek() {
-            if(_end == _begin) return -1;
+            if(empty()) return -1;
 
             return static_cast<int>(*_begin);
         }
 
-        int read() {
-            if(getSize() == 0) return -1;
-
-            char result = *_begin;
-            if(++_begin == _bufend) _begin = _buf;
-            return static_cast<int>(result);
-        }
+        int read();
 
         size_t read(char* dst, size_t size) {
             size_t bytes_available = getSize();
@@ -78,18 +72,11 @@ class cbuf {
                 dst += top_size;
             }
             memcpy(dst, _begin, size_to_read);
-            _begin += size_to_read;
-            if(_begin == _bufend) _begin = _buf;
+            _begin = wrap_if_bufend(_begin + size_to_read);
             return size_read;
         }
 
-        size_t write(char c) {
-            if(room() == 0) return 0;
-
-            *_end = c;
-            if(++_end == _bufend) _end = _buf;
-            return 1;
-        }
+        size_t write(char c);
 
         size_t write(const char* src, size_t size) {
             size_t bytes_available = room();
@@ -103,8 +90,7 @@ class cbuf {
                 src += top_size;
             }
             memcpy(_end, src, size_to_write);
-            _end += size_to_write;
-            if(_end == _bufend) _end = _buf;
+            _end = wrap_if_bufend(_end + size_to_write);
             return size_written;
         }
 
@@ -114,9 +100,13 @@ class cbuf {
         }
 
     private:
-        size_t _size;
+        inline char* wrap_if_bufend(char* ptr) const {
+            return (ptr == _bufend) ? _buf : ptr;
+        }
+
+        const size_t _size;
         char* _buf;
-        char* _bufend;
+        const char* const _bufend;
         char* _begin;
         char* _end;
 };

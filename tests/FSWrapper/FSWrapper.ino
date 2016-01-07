@@ -139,7 +139,15 @@ void setup() {
       fail("some files left after format");
     }
   }
-
+  {
+    File tmp = SPIFFS.open("/tmp.txt", "w");
+  }
+  {
+    File tmp = SPIFFS.open("/tmp.txt", "w");
+    if (!tmp) {
+      fail("failed to re-open empty file");
+    }
+  }
   Serial.println("success");
 }
 
