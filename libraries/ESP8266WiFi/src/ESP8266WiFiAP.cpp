@@ -85,16 +85,19 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
 
     if(!WiFi.enableAP(true)) {
         // enable AP failed
+        DEBUG_WIFI("[AP] enableAP failed!");
         return false;
     }
 
     if(!ssid || *ssid == 0 || strlen(ssid) > 31) {
         // fail SSID too long or missing!
+        DEBUG_WIFI("[AP] SSID too long or missing!");
         return false;
     }
 
     if(passphrase && (strlen(passphrase) > 63 || strlen(passphrase) < 8)) {
         // fail passphrase to long or short!
+        DEBUG_WIFI("[AP] fail passphrase to long or short!");
         return false;
     }
 
@@ -117,7 +120,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     struct softap_config conf_current;
     wifi_softap_get_config(&conf_current);
     if(softap_config_equal(conf, conf_current)) {
-        DEBUGV("softap config unchanged");
+        DEBUG_WIFI("[AP] softap config unchanged");
         return true;
     }
 
@@ -131,6 +134,9 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     }
     ETS_UART_INTR_ENABLE();
 
+    if(!ret) {
+        DEBUG_WIFI("[AP] set_config faild!");
+    }
     return ret;
 }
 
@@ -145,6 +151,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
 
     if(!WiFi.enableAP(true)) {
         // enable AP failed
+        DEBUG_WIFI("[AP] enableAP failed!");
         return false;
     }
 
@@ -155,6 +162,8 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     wifi_softap_dhcps_stop();
     if(wifi_set_ip_info(SOFTAP_IF, &info)) {
         return wifi_softap_dhcps_start();
+    } else {
+        DEBUG_WIFI("[AP] wifi_set_ip_info failed!");
     }
     return false;
 }
