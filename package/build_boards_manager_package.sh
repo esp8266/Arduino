@@ -45,7 +45,7 @@ rsync -a --exclude-from 'exclude.txt' $srcdir/ $outdir/
 rm exclude.txt
 
 # Get additional libraries (TODO: add them as git submodule or subtree?)
-wget -q -O SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/2aebc169192fc2031319ad9ad066d5f7aef17caf.zip
+wget -q -O SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/master.zip
 unzip -q SoftwareSerial.zip
 rm -rf SoftwareSerial.zip
 mv espsoftwareserial-* SoftwareSerial
