@@ -101,7 +101,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         return false;
     }
 
-    bool ret = false;
+    bool ret = true;
 
     struct softap_config conf;
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
