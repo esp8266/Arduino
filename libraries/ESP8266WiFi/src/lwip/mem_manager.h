@@ -69,7 +69,7 @@ static const unsigned short heapSTRUCT_SIZE	= ( sizeof( xBlockLink ) + portBYTE_
 
 void vApplicationMallocFailedHook( void ) ;//ICACHE_FLASH_ATTR;
 
-void *pvPortMalloc( size_t xWantedSize, const char* file, int line ) ;//ICACHE_FLASH_ATTR;
+void *pvPortMalloc( size_t xWantedSize, const char* file, int line ) __attribute__((malloc, alloc_size(1)));//ICACHE_FLASH_ATTR;
 
 void vPortFree( void *pv, const char* file, int line ) ;//ICACHE_FLASH_ATTR;
 
