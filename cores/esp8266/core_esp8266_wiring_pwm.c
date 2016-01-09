@@ -103,7 +103,7 @@ void ICACHE_RAM_ATTR pwm_timer_isr(){
 		current_step = 0;
 		stepcount = 0;
 		if(pwm_mask == 0) return;
-		T1L = (pwm_steps[current_step+1] * pwm_multiplier);
+		T1L = (pwm_steps[current_step] * pwm_multiplier);
 		TEIE |= TEIE1;
 		if(pwm_mask & 0xFFFF) GPOS = pwm_mask & 0xFFFF;
 		if(pwm_mask & 0x10000) GP16O = 1;
