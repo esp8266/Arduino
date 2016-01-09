@@ -234,15 +234,15 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     // check config
     if(wifi_get_ip_info(SOFTAP_IF, &info)) {
         if(info.ip.addr == 0x00000000) {
-            DEBUG_WIFI("[AP] IP config Invalid?!\n");
+            DEBUG_WIFI("[APConfig] IP config Invalid?!\n");
             ret = false;
         } else if(local_ip != info.ip.addr) {
             ip = info.ip.addr;
-            DEBUG_WIFI("[AP] IP config not set correct?! new IP: %s\n", ip.toString().c_str());
+            DEBUG_WIFI("[APConfig] IP config not set correct?! new IP: %s\n", ip.toString().c_str());
             ret = false;
         }
     } else {
-        DEBUG_WIFI("[AP] wifi_get_ip_info failed!\n");
+        DEBUG_WIFI("[APConfig] wifi_get_ip_info failed!\n");
         ret = false;
     }
 
