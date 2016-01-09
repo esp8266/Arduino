@@ -24,8 +24,9 @@ set -e
 
 # some variable definitions
 tmp_path=$1
-arduinoESP_src="$tmp_path/arduino"
-version="$(git --work-tree=$arduinoESP_src describe --tags --always)"
+doc_src_path=$2
+arduinoESP_src=$(cd $PWD/..; pwd)
+version="$(git --work-tree=$arduinoESP_src --git-dir=$arduinoESP_src/.git describe --tags --always)"
 release_date=$(date "+%b_%d,_%Y") # format for badge link
 build_date=$(date "+%b %d, %Y")
 destination_path="$tmp_path/doc"
@@ -62,7 +63,8 @@ mkdir -p $destination_path/$version
 cp -R $arduinoESP_src/doc/* $destination_path/src
 
 # download doc template
-git clone $doc_template_url $destination_path/build
+rsync -av $doc_src_path/ $destination_path/build/
+# git clone $doc_template_url $destination_path/build
 
 # create versions.html file
 
@@ -113,4 +115,3 @@ popd
 
 # grab badge
 wget -q -O $destination_path/$version/badge.svg "https://img.shields.io/badge/updated-$release_date-blue.svg"
-
