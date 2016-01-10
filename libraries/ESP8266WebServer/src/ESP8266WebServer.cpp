@@ -213,11 +213,10 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
         content_type = "text/html";
 
     sendHeader("Content-Type", content_type, true);
-    if (_contentLength != CONTENT_LENGTH_UNKNOWN && _contentLength != CONTENT_LENGTH_NOT_SET) {
-        sendHeader("Content-Length", String(_contentLength));
-    }
-    else if (contentLength > 0){
+    if (_contentLength == CONTENT_LENGTH_NOT_SET) {
         sendHeader("Content-Length", String(contentLength));
+    } else if (_contentLength != CONTENT_LENGTH_UNKNOWN) {
+        sendHeader("Content-Length", String(_contentLength));
     }
     sendHeader("Connection", "close");
     sendHeader("Access-Control-Allow-Origin", "*");
