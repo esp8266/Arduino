@@ -321,12 +321,11 @@ void SSDPClass::_update(){
                   DEBUG_SSDP.printf("REJECT: %s\n", (char *)buffer);
 #endif
                 }
-                // if the search type matches our type, we should respond
-                if(strcmp(buffer, _deviceType)){
+                // if the search type matches our type, we should respond instead of ABORT
+                if(strcmp(buffer, _deviceType) == 0){
                   _pending = true;
                   _process_time = millis();
                   state = KEY;
-                  cursor += strlen(_deviceType);
                 }
                 break;
               case MX:
