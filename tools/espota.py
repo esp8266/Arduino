@@ -202,7 +202,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
 
 def parser():
   parser = optparse.OptionParser(
-    usage = "%prog [-d][-r][-e][-s][-p <esp-port>][-I <pc-ip>][-P <pc-port>][-a <password>] -i <esp-ip> -f <spiffs-img>",
+    usage = "%prog [-d][-r][-e][-s][-p <esp-port>][-I <pc-ip>][-P <pc-port>][-a <password>] -i <esp-ip> -f <image>",
     description = "Transmit image over the air to the esp8266 module with OTA support."
   )
 
