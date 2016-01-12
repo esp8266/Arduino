@@ -51,23 +51,23 @@ extern "C" {
 #define SSDP_METHOD_SIZE  10
 #define SSDP_URI_SIZE     2
 #define SSDP_BUFFER_SIZE  64
-#define SSDP_MULTICAST_TTL 1
+#define SSDP_MULTICAST_TTL 2
 static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
 
 
 
-static const char* _ssdp_response_template = 
+static const char* _ssdp_response_template =
   "HTTP/1.1 200 OK\r\n"
   "EXT:\r\n"
   "ST: upnp:rootdevice\r\n";
 
-static const char* _ssdp_notify_template = 
+static const char* _ssdp_notify_template =
   "NOTIFY * HTTP/1.1\r\n"
   "HOST: 239.255.255.250:1900\r\n"
   "NT: upnp:rootdevice\r\n"
   "NTS: ssdp:alive\r\n";
 
-static const char* _ssdp_packet_template = 
+static const char* _ssdp_packet_template =
   "%s" // _ssdp_response_template / _ssdp_notify_template
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
@@ -75,7 +75,7 @@ static const char* _ssdp_packet_template =
   "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
 
-static const char* _ssdp_schema_template = 
+static const char* _ssdp_schema_template =
   "HTTP/1.1 200 OK\r\n"
   "Content-Type: text/xml\r\n"
   "Connection: close\r\n"
@@ -89,7 +89,7 @@ static const char* _ssdp_schema_template =
     "</specVersion>"
     "<URLBase>http://%u.%u.%u.%u:%u/</URLBase>" // WiFi.localIP(), _port
     "<device>"
-      "<deviceType>urn:schemas-upnp-org:device:Basic:1</deviceType>"
+      "<deviceType>%s</deviceType>"
       "<friendlyName>%s</friendlyName>"
       "<presentationURL>%s</presentationURL>"
       "<serialNumber>%s</serialNumber>"
@@ -128,6 +128,7 @@ SSDPClass::SSDPClass() :
 _server(0),
 _timer(new SSDPTimer),
 _port(80),
+_ttl(SSDP_MULTICAST_TTL),
 _respondToPort(0),
 _pending(false),
 _delay(0),
@@ -136,6 +137,7 @@ _notify_time(0)
 {
   _uuid[0] = '\0';
   _modelNumber[0] = '\0';
+  sprintf(_deviceType, "urn:schemas-upnp-org:device:Basic:1");
   _friendlyName[0] = '\0';
   _presentationURL[0] = '\0';
   _serialNumber[0] = '\0';
@@ -152,11 +154,11 @@ SSDPClass::~SSDPClass(){
 
 bool SSDPClass::begin(){
   _pending = false;
-  
+
   uint32_t chipId = ESP.getChipId();
   sprintf(_uuid, "38323636-4558-4dda-9188-cda0e6%02x%02x%02x",
     (uint16_t) ((chipId >> 16) & 0xff),
-    (uint16_t) ((chipId >>  8) & 0xff), 
+    (uint16_t) ((chipId >>  8) & 0xff),
     (uint16_t)   chipId        & 0xff  );
 
 #ifdef DEBUG_SSDP
@@ -179,13 +181,13 @@ bool SSDPClass::begin(){
     DEBUGV("SSDP failed to join igmp group");
     return false;
   }
-  
+
   if (!_server->listen(*IP_ADDR_ANY, SSDP_PORT)) {
     return false;
   }
 
   _server->setMulticastInterface(ifaddr);
-  _server->setMulticastTTL(SSDP_MULTICAST_TTL);
+  _server->setMulticastTTL(_ttl);
   _server->onRx(std::bind(&SSDPClass::_update, this));
   if (!_server->connect(multicast_addr, SSDP_PORT)) {
     return false;
@@ -199,8 +201,8 @@ bool SSDPClass::begin(){
 void SSDPClass::_send(ssdp_method_t method){
   char buffer[1460];
   uint32_t ip = WiFi.localIP();
-  
-  int len = snprintf(buffer, sizeof(buffer), 
+
+  int len = snprintf(buffer, sizeof(buffer),
     _ssdp_packet_template,
     (method == NONE)?_ssdp_response_template:_ssdp_notify_template,
     SSDP_INTERVAL,
@@ -239,6 +241,7 @@ void SSDPClass::schema(WiFiClient client){
   uint32_t ip = WiFi.localIP();
   client.printf(_ssdp_schema_template,
     IP2STR(&ip), _port,
+    _deviceType,
     _friendlyName,
     _presentationURL,
     _serialNumber,
@@ -268,7 +271,7 @@ void SSDPClass::_update(){
     uint8_t cr = 0;
 
     char buffer[SSDP_BUFFER_SIZE] = {0};
-    
+
     while(_server->getSize() > 0){
       char c = _server->read();
 
@@ -279,9 +282,9 @@ void SSDPClass::_update(){
           if(c == ' '){
             if(strcmp(buffer, "M-SEARCH") == 0) method = SEARCH;
             else if(strcmp(buffer, "NOTIFY") == 0) method = NOTIFY;
-            
+
             if(method == NONE) state = ABORT;
-            else state = URI; 
+            else state = URI;
             cursor = 0;
 
           } else if(cursor < SSDP_METHOD_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
@@ -289,8 +292,8 @@ void SSDPClass::_update(){
         case URI:
           if(c == ' '){
             if(strcmp(buffer, "*")) state = ABORT;
-            else state = PROTO; 
-            cursor = 0; 
+            else state = PROTO;
+            cursor = 0;
           } else if(cursor < SSDP_URI_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
           break;
         case PROTO:
@@ -304,8 +307,8 @@ void SSDPClass::_update(){
         case VALUE:
           if(cr == 2){
             switch(header){
-            case START:
-            	break;
+              case START:
+                break;
               case MAN:
 #ifdef DEBUG_SSDP
                 DEBUG_SSDP.printf("MAN: %s\n", (char *)buffer);
@@ -317,6 +320,12 @@ void SSDPClass::_update(){
 #ifdef DEBUG_SSDP
                   DEBUG_SSDP.printf("REJECT: %s\n", (char *)buffer);
 #endif
+                }
+                // if the search type matches our type, we should respond instead of ABORT
+                if(strcmp(buffer, _deviceType) == 0){
+                  _pending = true;
+                  _process_time = millis();
+                  state = KEY;
                 }
                 break;
               case MX:
@@ -331,7 +340,7 @@ void SSDPClass::_update(){
               else if(strcmp(buffer, "ST") == 0) header = ST;
               else if(strcmp(buffer, "MX") == 0) header = MX;
             }
-            
+
             if(cursor < SSDP_BUFFER_SIZE - 1){ buffer[cursor++] = c; buffer[cursor] = '\0'; }
           }
           break;
@@ -365,6 +374,10 @@ void SSDPClass::setHTTPPort(uint16_t port){
   _port = port;
 }
 
+void SSDPClass::setDeviceType(const char *deviceType){
+  strlcpy(_deviceType, deviceType, sizeof(_deviceType));
+}
+
 void SSDPClass::setName(const char *name){
   strlcpy(_friendlyName, name, sizeof(_friendlyName));
 }
@@ -375,6 +388,10 @@ void SSDPClass::setURL(const char *url){
 
 void SSDPClass::setSerialNumber(const char *serialNumber){
   strlcpy(_serialNumber, serialNumber, sizeof(_serialNumber));
+}
+
+void SSDPClass::setSerialNumber(const uint32_t serialNumber){
+  snprintf(_serialNumber, sizeof(uint32_t)*2+1, "%08X", serialNumber);
 }
 
 void SSDPClass::setModelName(const char *name){
@@ -395,6 +412,10 @@ void SSDPClass::setManufacturer(const char *name){
 
 void SSDPClass::setManufacturerURL(const char *url){
   strlcpy(_manufacturerURL, url, sizeof(_manufacturerURL));
+}
+
+void SSDPClass::setTTL(const uint8_t ttl){
+  _ttl = ttl;
 }
 
 void SSDPClass::_onTimerStatic(SSDPClass* self) {

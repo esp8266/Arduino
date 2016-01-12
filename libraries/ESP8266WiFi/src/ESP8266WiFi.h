@@ -40,6 +40,17 @@ extern "C" {
 #include "WiFiServer.h"
 #include "WiFiClientSecure.h"
 
+#ifdef DEBUG_ESP_WIFI
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_WIFI(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#endif
+#endif
+
+#ifndef DEBUG_WIFI
+#define DEBUG_WIFI(...)
+#endif
+
+
 class ESP8266WiFiClass : public ESP8266WiFiGenericClass, public ESP8266WiFiSTAClass, public ESP8266WiFiScanClass, public ESP8266WiFiAPClass {
     public:
 

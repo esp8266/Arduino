@@ -3,7 +3,7 @@
 
 #include "c_types.h"
 
-/*------------------------±äÁ¿¶¨Òå------------------------*/
+/*------------------------ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½------------------------*/
 
 #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 #ifndef IOT_SIP_MODE
@@ -61,7 +61,7 @@ static const unsigned short heapSTRUCT_SIZE	= ( sizeof( xBlockLink ) + portBYTE_
 //static size_t xFreeBytesRemaining = ( ( size_t ) configADJUSTED_HEAP_SIZE ) & ( ( size_t ) ~portBYTE_ALIGNMENT_MASK );
 
 
-/*------------------------º¯ÊýÉùÃ÷-----------------------------------*/
+/*------------------------ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½-----------------------------------*/
 
 //static void prvInsertBlockIntoFreeList( xBlockLink *pxBlockToInsert ) ;//ICACHE_FLASH_ATTR;
 
@@ -69,9 +69,9 @@ static const unsigned short heapSTRUCT_SIZE	= ( sizeof( xBlockLink ) + portBYTE_
 
 void vApplicationMallocFailedHook( void ) ;//ICACHE_FLASH_ATTR;
 
-void *pvPortMalloc( size_t xWantedSize ) ;//ICACHE_FLASH_ATTR;
+void *pvPortMalloc( size_t xWantedSize, const char* file, int line ) __attribute__((malloc, alloc_size(1)));//ICACHE_FLASH_ATTR;
 
-void vPortFree( void *pv ) ;//ICACHE_FLASH_ATTR;
+void vPortFree( void *pv, const char* file, int line ) ;//ICACHE_FLASH_ATTR;
 
 size_t xPortGetFreeHeapSize( void ) ;//ICACHE_FLASH_ATTR;
 

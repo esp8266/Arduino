@@ -177,18 +177,20 @@ generic.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
 generic.menu.Debug.Serial1=Serial1
 generic.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 
-generic.menu.DebugLevel.None=None
-generic.menu.DebugLevel.None.build.debug_level=
-generic.menu.DebugLevel.Core=Core
-generic.menu.DebugLevel.Core.build.debug_level=-DDEBUG_ESP_CORE
-generic.menu.DebugLevel.SSL=Core + SSL
-generic.menu.DebugLevel.SSL.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
-generic.menu.DebugLevel.WiFic=Core + WiFi
-generic.menu.DebugLevel.WiFic.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
-generic.menu.DebugLevel.WiFi=WiFi
-generic.menu.DebugLevel.WiFi.build.debug_level=-DDEBUG_ESP_WIFI
+generic.menu.DebugLevel.None____=None
+generic.menu.DebugLevel.None____.build.debug_level=
+generic.menu.DebugLevel.Core____=Core
+generic.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
+generic.menu.DebugLevel.SSL_____=Core + SSL
+generic.menu.DebugLevel.SSL_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+generic.menu.DebugLevel.WiFic___=Core + WiFi
+generic.menu.DebugLevel.WiFic___.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+generic.menu.DebugLevel.WiFi____=WiFi
+generic.menu.DebugLevel.WiFi____.build.debug_level=-DDEBUG_ESP_WIFI
 generic.menu.DebugLevel.HTTPClient=HTTPClient
 generic.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+generic.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+generic.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
 generic.menu.DebugLevel.HTTPUpdate=HTTPUpdate
 generic.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
 generic.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
@@ -199,12 +201,12 @@ generic.menu.DebugLevel.HTTPServer=HTTPServer
 generic.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
 generic.menu.DebugLevel.UPDATER=Updater
 generic.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
-generic.menu.DebugLevel.OTA=OTA
-generic.menu.DebugLevel.OTA.build.debug_level=-DDEBUG_ESP_OTA
-generic.menu.DebugLevel.OTA2=OTA + Updater
-generic.menu.DebugLevel.OTA2.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
-generic.menu.DebugLevel.all=All
-generic.menu.DebugLevel.all.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+generic.menu.DebugLevel.OTA_____=OTA
+generic.menu.DebugLevel.OTA_____.build.debug_level=-DDEBUG_ESP_OTA
+generic.menu.DebugLevel.OTA2____=OTA + Updater
+generic.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
+generic.menu.DebugLevel.all_____=All
+generic.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
 
 # disabled because espressif's bootloader refuses to write above 4M
 # generic.menu.FlashSize.8M=8M (7M SPIFFS)
@@ -944,8 +946,20 @@ wifinfo.build.variant=wifinfo
 wifinfo.build.flash_mode=qio
 wifinfo.build.board=ESP8266_ESP12
 wifinfo.build.spiffs_pagesize=256
-wifinfo.build.debug_port=
-wifinfo.build.debug_level=
+wifinfo.build.debug_port=Serial1
+wifinfo.build.debug_level=Wifinfo
+
+wifinfo.menu.Debug.Disabled=Disabled
+wifinfo.menu.Debug.Disabled.build.debug_port=
+wifinfo.menu.Debug.Serial=Serial
+wifinfo.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+wifinfo.menu.Debug.Serial1=Serial1
+wifinfo.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+wifinfo.menu.DebugLevel.None=None
+wifinfo.menu.DebugLevel.None.build.debug_level=
+wifinfo.menu.DebugLevel.Wifinfo=Wifinfo
+wifinfo.menu.DebugLevel.Wifinfo.build.debug_level=-DDEBUG_ESP_WIFINFO
 
 #wifinfo.menu.ESPModule.ESP07512=ESP07 (1M/512K SPIFFS)
 #wifinfo.menu.ESPModule.ESP07512.build.board=ESP8266_ESP07

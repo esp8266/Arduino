@@ -107,7 +107,7 @@ void HTTPClient::begin(String url, String httpsFingerprint) {
     int index = url.indexOf(':');
     //int index2;
     bool hasPort = false;
-    if(index) {
+    if(index >= 0) {
         protocol = url.substring(0, index);
         url.remove(0, (index + 3)); // remove http:// or https://
 

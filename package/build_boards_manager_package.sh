@@ -39,13 +39,15 @@ cat << EOF > exclude.txt
 package
 EOF
 # Also include all files which are ignored by git
-git ls-files --other --ignored --exclude-standard --directory >> exclude.txt
+git ls-files --other --directory >> exclude.txt
 # Now copy files to $outdir
 rsync -a --exclude-from 'exclude.txt' $srcdir/ $outdir/
 rm exclude.txt
 
 # Get additional libraries (TODO: add them as git submodule or subtree?)
-wget -q -O SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/2aebc169192fc2031319ad9ad066d5f7aef17caf.zip
+
+# SoftwareSerial version 2.2
+wget -q -O SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/306b3f640296f3105a79bcc11d0fd185c95be1c9.zip
 unzip -q SoftwareSerial.zip
 rm -rf SoftwareSerial.zip
 mv espsoftwareserial-* SoftwareSerial
