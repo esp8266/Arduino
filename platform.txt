@@ -105,7 +105,7 @@ tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=-vv
 tools.esptool.upload.params.quiet=
 tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" -ca 0x00000 -cf "{build.path}/{build.project_name}.bin"
-tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
+tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/tools/espota.py" -e -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
 
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe
@@ -118,4 +118,4 @@ tools.espota.path={runtime.platform.path}/tools
 tools.espota.upload.protocol=espota
 tools.espota.upload.params.verbose=
 tools.espota.upload.params.quiet=
-tools.espota.upload.pattern="{cmd}" "{path}/espota.py" -i "{serial.port}" -p 8266 -f "{build.path}/{build.project_name}.bin"
+tools.espota.upload.pattern="{cmd}" "{path}/espota.py" -e -i "{serial.port}" -p 8266 -f "{build.path}/{build.project_name}.bin"
