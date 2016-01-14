@@ -74,14 +74,25 @@ class HardwareSerial: public Stream {
         HardwareSerial(int uart_nr);
 
         void begin(unsigned long baud) {
-            begin(baud, SERIAL_8N1, SERIAL_FULL);
+            begin(baud, SERIAL_8N1, SERIAL_FULL, false);
         }
         void begin(unsigned long baud, uint8_t config) {
-            begin(baud, config, SERIAL_FULL);
+            begin(baud, config, SERIAL_FULL, false);
         }
-        void begin(unsigned long, uint8_t, uint8_t);
+        void begin(unsigned long baud, uint8_t config, uint8_t mode) {
+            begin(baud, config, mode, false);
+        }
+        void begin(unsigned long, uint8_t, uint8_t, bool);
         void end();
-        void swap();  //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO1 as RX and TX
+        void swap() {
+            swap(false);
+        }
+        void swap(bool alternate_tx);    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
+        /*
+         * Toggle between use of GPIO1 and GPIO2 as TX on UART 0.
+         * Note: UART 1 can't be used if GPIO2 is used with UART 0!
+         */
+        void set_tx(bool alternate_tx);
         int available(void) override;
         int peek(void) override;
         int read(void) override;
