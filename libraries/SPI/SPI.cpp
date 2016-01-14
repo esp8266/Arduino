@@ -37,7 +37,6 @@ SPIClass SPI;
 
 SPIClass::SPIClass() {
     useHwCs = false;
-    inTransaction = false;
 }
 
 void SPIClass::begin() {
@@ -75,17 +74,13 @@ void SPIClass::setHwCs(bool use) {
 }
 
 void SPIClass::beginTransaction(SPISettings settings) {
-    while(inTransaction || SPI1CMD & SPIBUSY) {
-        yield();
-    }
-    inTransaction = true;
+    while(SPI1CMD & SPIBUSY) {}
     setFrequency(settings._clock);
     setBitOrder(settings._bitOrder);
     setDataMode(settings._dataMode);
 }
 
 void SPIClass::endTransaction() {
-    inTransaction = false;
 }
 
 void SPIClass::setDataMode(uint8_t dataMode) {
