@@ -74,25 +74,33 @@ class HardwareSerial: public Stream {
         HardwareSerial(int uart_nr);
 
         void begin(unsigned long baud) {
-            begin(baud, SERIAL_8N1, SERIAL_FULL, false);
+            begin(baud, SERIAL_8N1, SERIAL_FULL, 1);
         }
         void begin(unsigned long baud, uint8_t config) {
-            begin(baud, config, SERIAL_FULL, false);
+            begin(baud, config, SERIAL_FULL, 1);
         }
         void begin(unsigned long baud, uint8_t config, uint8_t mode) {
-            begin(baud, config, mode, false);
+            begin(baud, config, mode, 1);
         }
-        void begin(unsigned long, uint8_t, uint8_t, bool);
+        void begin(unsigned long, uint8_t, uint8_t, uint8_t);
         void end();
         void swap() {
-            swap(false);
+            swap(1);
         }
-        void swap(bool alternate_tx);    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
+        void swap(uint8_t use_tx);    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
+
         /*
          * Toggle between use of GPIO1 and GPIO2 as TX on UART 0.
          * Note: UART 1 can't be used if GPIO2 is used with UART 0!
          */
-        void set_tx(bool alternate_tx);
+        void set_tx(uint8_t use_tx);
+
+        /*
+         * UART 0 possible options are (1, 3), (2, 3) or (15, 13)
+         * UART 1 allows only TX on 2 if UART 0 is not (2, 3)
+         */
+        void pins(uint8_t tx, uint8_t rx);
+
         int available(void) override;
         int peek(void) override;
         int read(void) override;

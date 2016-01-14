@@ -101,11 +101,12 @@ void uart_disarm_tx_interrupt(uart_t* uart);
 void uart_set_baudrate(uart_t* uart, int baud_rate);
 int uart_get_baudrate(uart_t* uart);
 
-uart_t* uart_start_init(int uart_nr, int baudrate, byte config, bool alternate_tx);
+uart_t* uart_start_init(int uart_nr, int baudrate, byte config, uint8_t use_tx);
 void uart_finish_init(uart_t* uart);
 void uart_uninit(uart_t* uart);
-void uart_swap(uart_t* uart, bool alternate_tx);
-void uart_set_tx(uart_t* uart, bool alternate_tx);
+void uart_swap(uart_t* uart, uint8_t use_tx);
+void uart_set_tx(uart_t* uart, uint8_t use_tx);
+void uart_set_pins(uart_t* uart, uint8_t tx, uint8_t rx);
 
 void uart_ignore_char(char c);
 void uart0_write_char(char c);
@@ -275,7 +276,7 @@ int uart_get_baudrate(uart_t* uart) {
     return uart->baud_rate;
 }
 
-uart_t* uart_start_init(int uart_nr, int baudrate, byte config, byte mode, bool alternate_tx) {
+uart_t* uart_start_init(int uart_nr, int baudrate, byte config, byte mode, uint8_t use_tx) {
 
     uart_t* uart = (uart_t*) os_malloc(sizeof(uart_t));
 
@@ -291,7 +292,7 @@ uart_t* uart_start_init(int uart_nr, int baudrate, byte config, byte mode, bool 
             uart->txEnabled = (mode != SERIAL_RX_ONLY);
             uart->rxPin = (uart->rxEnabled)?3:255;
             if(uart->rxEnabled) {
-              if (alternate_tx) {
+              if (use_tx == 2) {
                 uart->txPin = 2;
                 pinMode(uart->rxPin, FUNCTION_4);
               } else {
@@ -368,7 +369,7 @@ void uart_uninit(uart_t* uart) {
     os_free(uart);
 }
 
-void uart_swap(uart_t* uart, bool alternate_tx) {
+void uart_swap(uart_t* uart, uint8_t use_tx) {
     if(uart == 0)
         return;
     switch(uart->uart_nr) {
@@ -388,13 +389,13 @@ void uart_swap(uart_t* uart, bool alternate_tx) {
             } else {
                 if(uart->txEnabled){ //TX
                   pinMode(uart->txPin, INPUT);
-                  uart->txPin = (alternate_tx)?2:1;
+                  uart->txPin = (use_tx == 2)?2:1;
                 }
                 if(uart->rxEnabled){ //RX
                   pinMode(uart->rxPin, INPUT);
                   uart->rxPin = 3;
                 }
-                if(uart->txEnabled) pinMode(uart->txPin, (alternate_tx)?FUNCTION_4:SPECIAL); //TX
+                if(uart->txEnabled) pinMode(uart->txPin, (use_tx == 2)?FUNCTION_4:SPECIAL); //TX
                 if(uart->rxEnabled) pinMode(3, SPECIAL); //RX
                 IOSWAP &= ~(1 << IOSWAPU0);
             }
@@ -408,17 +409,17 @@ void uart_swap(uart_t* uart, bool alternate_tx) {
     }
 }
 
-void uart_set_tx(uart_t* uart, bool alternate_tx) {
+void uart_set_tx(uart_t* uart, uint8_t use_tx) {
     if(uart == 0)
         return;
     switch(uart->uart_nr) {
         case UART0:
             if(uart->txEnabled) {
-                if (uart->txPin == 1 && alternate_tx) {
+                if (uart->txPin == 1 && use_tx == 2) {
                   pinMode(uart->txPin, INPUT);
                   uart->txPin = 2;
                   pinMode(uart->txPin, FUNCTION_4);
-                } else if (uart->txPin == 2 && !alternate_tx) {
+                } else if (uart->txPin == 2 && use_tx != 2) {
                   pinMode(uart->txPin, INPUT);
                   uart->txPin = 1;
                   pinMode(uart->txPin, SPECIAL);
@@ -431,6 +432,25 @@ void uart_set_tx(uart_t* uart, bool alternate_tx) {
             break;
         default:
             break;
+    }
+}
+
+void uart_set_pins(uart_t* uart, uint8_t tx, uint8_t rx) {
+    if(uart == 0)
+        return;
+
+    if(uart->uart_nr == UART0) { // Only UART0 allows pin changes
+        if(uart->txEnabled && uart->txPin != tx) {
+            if( rx == 13 && tx == 15) {
+                uart_swap(uart, 15);
+            } else if (rx == 3 && (tx == 1 || tx == 2)) {
+                if (uart->rxPin != rx) uart_swap(uart, tx);
+                else uart_set_tx(uart, tx);
+            }
+        }
+        if(uart->rxEnabled && uart->rxPin != rx && rx == 13 && tx == 15) {
+            uart_swap(uart, 15);
+        }
     }
 }
 
@@ -522,7 +542,7 @@ HardwareSerial::HardwareSerial(int uart_nr) :
         _uart_nr(uart_nr), _uart(0), _tx_buffer(0), _rx_buffer(0) {
 }
 
-void HardwareSerial::begin(unsigned long baud, byte config, byte mode, bool alternate_tx) {
+void HardwareSerial::begin(unsigned long baud, byte config, byte mode, uint8_t use_tx) {
     InterruptLock il;
 
     // disable debug for this interface
@@ -533,7 +553,7 @@ void HardwareSerial::begin(unsigned long baud, byte config, byte mode, bool alte
     if (_uart) {
         os_free(_uart);
     }
-    _uart = uart_start_init(_uart_nr, baud, config, mode, alternate_tx);
+    _uart = uart_start_init(_uart_nr, baud, config, mode, use_tx);
 
     if(_uart == 0) {
         return;
@@ -572,16 +592,22 @@ void HardwareSerial::end() {
     _tx_buffer = 0;
 }
 
-void HardwareSerial::swap(bool alternate_tx) {
+void HardwareSerial::swap(uint8_t use_tx) {
     if(_uart == 0)
         return;
-    uart_swap(_uart, alternate_tx);
+    uart_swap(_uart, use_tx);
 }
 
-void HardwareSerial::set_tx(bool alternate_tx) {
+void HardwareSerial::set_tx(uint8_t use_tx) {
     if(_uart == 0)
         return;
-    uart_set_tx(_uart, alternate_tx);
+    uart_set_tx(_uart, use_tx);
+}
+
+void HardwareSerial::pins(uint8_t tx, uint8_t rx) {
+    if(_uart == 0)
+        return;
+    uart_set_pins(_uart, tx, rx);
 }
 
 void HardwareSerial::setDebugOutput(bool en) {
