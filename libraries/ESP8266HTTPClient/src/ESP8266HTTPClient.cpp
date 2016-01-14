@@ -107,7 +107,7 @@ void HTTPClient::begin(String url, String httpsFingerprint) {
     int index = url.indexOf(':');
     //int index2;
     bool hasPort = false;
-    if(index) {
+    if(index >= 0) {
         protocol = url.substring(0, index);
         url.remove(0, (index + 3)); // remove http:// or https://
 
@@ -789,7 +789,7 @@ bool HTTPClient::sendHeader(const char * type) {
     header += "\r\n";
 
     if(!_useHTTP10) {
-        header += "Accept-Encoding: identity;q=1 chunked;q=0.1 *;q=0\r\n";
+        header += "Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n";
     }
 
     if(_base64Authorization.length()) {

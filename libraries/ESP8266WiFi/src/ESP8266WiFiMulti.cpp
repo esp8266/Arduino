@@ -119,7 +119,7 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                     delay(10);
                     status = WiFi.status();
                 }
-
+#ifdef DEBUG_ESP_WIFI
                 IPAddress ip;
                 uint8_t * mac;
                 switch(status) {
@@ -142,6 +142,7 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                         DEBUG_WIFI_MULTI("[WIFI] Connecting Failed (%d).\n", status);
                         break;
                 }
+#endif
             } else {
                 DEBUG_WIFI_MULTI("[WIFI] no matching wifi found!\n");
             }
