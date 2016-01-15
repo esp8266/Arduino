@@ -21,11 +21,11 @@
 
 #ifndef wificlient_h
 #define wificlient_h
+#include <memory>
 #include "Arduino.h"
 #include "Print.h"
 #include "Client.h"
 #include "IPAddress.h"
-#include <memory>
 #include "include/slist.h"
 
 #define WIFICLIENT_MAX_PACKET_SIZE 1460
