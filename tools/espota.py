@@ -42,6 +42,7 @@ FLASH = 0
 SPIFFS = 100
 AUTH = 200
 PROGRESS = False
+OUTPIPE = sys.stdout
 # update_progress() : Displays or updates a console progress bar
 ## Accepts a float between 0 and 1. Any int will be converted to a float.
 ## A value under 0 represents a 'halt'.
@@ -63,11 +64,11 @@ def update_progress(progress):
       status = "Done...\r\n"
     block = int(round(barLength*progress))
     text = "\rUploading: [{0}] {1}% {2}".format( "="*block + " "*(barLength-block), int(progress*100), status)
-    sys.stderr.write(text)
-    sys.stderr.flush()
+    sys.stdout.write(text)
+    sys.stdout.flush()
   else:
-    sys.stderr.write('.')
-    sys.stderr.flush()
+    OUTPIPE.write('.')
+    OUTPIPE.flush()
 
 def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, command = FLASH):
   # Create a TCP/IP socket
@@ -108,8 +109,8 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
       passmd5 = hashlib.md5(password).hexdigest()
       result_text = '%s:%s:%s' % (passmd5 ,nonce, cnonce)
       result = hashlib.md5(result_text).hexdigest()
-      sys.stderr.write('Authenticating...')
-      sys.stderr.flush()
+      OUTPIPE.write('Authenticating...')
+      OUTPIPE.flush()
       message = '%d %s %s\n' % (AUTH, cnonce, result)
       sock2.sendto(message, remote_address)
       sock2.settimeout(10)
@@ -126,7 +127,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
         sock2.close()
         sys.exit(1);
         return 1
-      sys.stderr.write('OK\n')
+      OUTPIPE.write('OK\n')
     else:
       logging.error('Bad Answer: %s', data)
       sock2.close()
@@ -149,8 +150,8 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     if (PROGRESS):
       update_progress(0)
     else:
-      sys.stderr.write('Uploading')
-      sys.stderr.flush()
+      OUTPIPE.write('Uploading')
+      OUTPIPE.flush()
     offset = 0
     while True:
       chunk = f.read(1460)
@@ -162,14 +163,14 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
         connection.sendall(chunk)
         res = connection.recv(4)
       except:
-        sys.stderr.write('\n')
+        OUTPIPE.write('\n')
         logging.error('Error Uploading')
         connection.close()
         f.close()
         sock.close()
         return 1
 
-    sys.stderr.write('\n')
+    OUTPIPE.write('\n')
     logging.info('Waiting for result...')
     try:
       connection.settimeout(60)
@@ -179,7 +180,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
       f.close()
       sock.close()
       if (data != "OK"):
-        sys.stderr.write('\n')
+        OUTPIPE.write('\n')
         logging.error('%s', data)
         return 1;
       return 0
@@ -201,7 +202,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
 
 def parser():
   parser = optparse.OptionParser(
-    usage = "%prog [options]",
+    usage = "%prog [-d][-r][-e][-s][-p <esp-port>][-I <pc-ip>][-P <pc-port>][-a <password>] -i <esp-ip> -f <image>",
     description = "Transmit image over the air to the esp8266 module with OTA support."
   )
 
@@ -273,10 +274,20 @@ def parser():
     action = "store_true",
     default = False
   )
+  group.add_option("-e", "--stderr",
+    dest = "tostderr",
+    help = "Forwards STDOUT info messages to STDERR so ArduinoIDE can display them while uploading",
+    action = "store_true",
+    default = False
+  )
   parser.add_option_group(group)
 
   (options, args) = parser.parse_args()
 
+  if (not options.esp_ip or not options.image):
+    sys.stderr.write("ERROR:Not enough arguments.\n")
+    parser.print_help()
+  
   return options
 # end parser
 
@@ -284,6 +295,8 @@ def parser():
 def main(args):
   # get options
   options = parser()
+  if (not options.esp_ip or not options.image):
+    return 1
 
   # adapt log level
   loglevel = logging.WARNING
@@ -297,13 +310,13 @@ def main(args):
   logging.debug("Options: %s", str(options))
 
   # check options
+  global OUTPIPE
+  if (options.tostderr):
+    OUTPIPE = sys.stderr
   global PROGRESS
   PROGRESS = options.progress
-  if (not options.esp_ip or not options.image):
-    logging.critical("Not enough arguments.")
-
-    return 1
   # end if
+
 
   command = FLASH
   if (options.spiffs):
