@@ -86,8 +86,13 @@ void EEPROMClass::write(int address, uint8_t value) {
   if(!_data)
     return;
 
-  _data[address] = value;
-  _dirty = true;
+  // Optimise _dirty. Only flagged if data written is different.
+  uint8_t* pData = &_data[address];
+  if (*pData != value)
+  {
+    *pData = value;
+    _dirty = true;
+  }
 }
 
 bool EEPROMClass::commit() {
