@@ -193,6 +193,12 @@ void HTTPClient::begin(String host, uint16_t port, String url, bool https, Strin
  */
 void HTTPClient::end(void) {
     if(connected()) {
+        if(_tcp->available() > 0) {
+            DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _tcp->available());
+            while(_tcp->available() > 0) {
+                _tcp->read();
+            }
+        }
         if(_reuse && _canReuse) {
             DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
         } else {
@@ -711,6 +717,9 @@ bool HTTPClient::connect(void) {
 
     if(connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, try reuse!\n");
+        while(_tcp->available() > 0) {
+            _tcp->read();
+        }
         return true;
     }
 
