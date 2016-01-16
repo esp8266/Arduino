@@ -83,6 +83,7 @@ public:
   }
   
   void enableArduino(uint16_t port, bool auth=false);
+  size_t advertiseServices(); // advertise all hosted services
 
   void setInstanceName(String name);
   void setInstanceName(const char * name){
