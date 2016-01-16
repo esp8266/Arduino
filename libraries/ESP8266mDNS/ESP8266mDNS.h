@@ -83,7 +83,6 @@ public:
   }
   
   void enableArduino(uint16_t port, bool auth=false);
-  size_t advertiseServices(); // advertise all hosted services
 
   void setInstanceName(String name);
   void setInstanceName(const char * name){
@@ -105,6 +104,7 @@ private:
   uint16_t _getServiceTxtLen(char *name, char *proto);
   void _parsePacket();
   void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port);
+  size_t advertiseServices(); // advertise all hosted services
 };
 
 extern MDNSResponder MDNS;
