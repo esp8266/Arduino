@@ -366,6 +366,10 @@ void MDNSResponder::_parsePacket(){
       memmove(protoName, protoName+1, protoNameLen);
       protoNameLen--;
       protoParsed = true;
+    } else if(strcmp("services", serviceName) == 0 && strcmp("_dns-sd", protoName) == 0){
+      _conn->flush();
+      advertiseServices();
+      return;
     } else {
 #ifdef MDNS_DEBUG_ERR
       Serial.printf("ERR_PROTO: %s\n", protoName);
@@ -477,6 +481,18 @@ void MDNSResponder::enableArduino(uint16_t port, bool auth){
   addServiceTxt("arduino", "tcp", "ssh_upload", "no");
   addServiceTxt("arduino", "tcp", "board", ARDUINO_BOARD);
   addServiceTxt("arduino", "tcp", "auth_upload", (auth) ? "yes":"no");
+}
+
+size_t MDNSResponder::advertiseServices(){
+  MDNSService* servicePtr;
+  size_t i = 0;
+  for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
+    if(servicePtr->_port > 0){
+      _reply(0x0F, servicePtr->_name, servicePtr->_proto, servicePtr->_port);
+      i++;
+    }
+  }
+  return i;
 }
 
 void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint16_t port){
