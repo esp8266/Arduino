@@ -798,7 +798,7 @@ bool HTTPClient::sendHeader(const char * type) {
     header += "\r\n";
 
     if(!_useHTTP10) {
-        header += "Accept-Encoding: identity;q=1 chunked;q=0.1 *;q=0\r\n";
+        header += "Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n";
     }
 
     if(_base64Authorization.length()) {
