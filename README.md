@@ -46,8 +46,8 @@ Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0-rc1/](http://esp
 - Clone this repository into hardware/esp8266com/esp8266 directory and download binary tools (you need Python 2.7)
 - Note: This has been tested on Linux; on other systems you might have to adjust the path to the `hardware` directory
 ```
-git clone https://github.com/esp8266/Arduino.git ~/Arduino/hardware/esp8266/git/ 
-python ~/Arduino/hardware/esp8266/git/tools/get.py
+git clone https://github.com/esp8266/Arduino.git ~/Arduino/hardware/esp8266/esp8266/ 
+python ~/Arduino/hardware/esp8266/esp8266/tools/get.py
 ```
 - Restart Arduino
 
