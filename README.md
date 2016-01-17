@@ -43,18 +43,11 @@ Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0-rc1/](http://esp
 ### Using git version [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
 - Install Arduino 1.6.7
-- Go to Arduino directory
-- Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
-```bash
-cd hardware
-mkdir esp8266com
-cd esp8266com
-git clone https://github.com/esp8266/Arduino.git esp8266
+- Clone this repository into hardware/esp8266com/esp8266 directory and download binary tools (you need Python 2.7)
+- Note: This has been tested on Linux; on other systems you might have to adjust the path to the `hardware` directory
 ```
-- Download binary tools (you need Python 2.7)
-```bash
-cd esp8266/tools
-python get.py
+git clone https://github.com/esp8266/Arduino.git ~/Arduino/hardware/esp8266/git/ 
+python ~/Arduino/hardware/esp8266/git/tools/get.py
 ```
 - Restart Arduino
 
