@@ -39,6 +39,7 @@ title: Change Log
 - Fix link-time dependency of ESP8266WebServer on SPIFFS (#862)
 - Allow setting client side TLS key and certificate
 - Replace chain of UDP pbufs with a single pbuf before sending (#1009)
+- Remove bundled OneWire - ESP8266 support has been merged in the official OneWire sources
 
 ### Tools
 

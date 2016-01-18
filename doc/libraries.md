@@ -10,7 +10,6 @@ title: Libraries
   * [SPI](#spi)
   * [SoftwareSerial](#softwareserial)
   * [ESP\-specific APIs](#esp-specific-apis)
-  * [OneWire](#onewire)
   * [mDNS and DNS\-SD responder (ESP8266mDNS library)](#mdns-and-dns-sd-responder-esp8266mdns-library)
   * [SSDP responder (ESP8266SSDP)](#ssdp-responder-esp8266ssdp)
   * [DNS server (DNSServer library)](#dns-server-dnsserver-library)
@@ -110,12 +109,6 @@ TOUT pin has to be disconnected in this mode.
 
 Note that by default ADC is configured to read from TOUT pin using `analogRead(A0)`, and
 `ESP.getVCC()` is not available.
-
-## OneWire
-
-Library was adapted to work with ESP8266 by including register definitions into OneWire.h
-Note that if you already have OneWire library in your Arduino/libraries folder, it will be used
-instead of the one that comes with this package.
 
 ## mDNS and DNS-SD responder (ESP8266mDNS library)
 
