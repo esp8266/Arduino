@@ -80,6 +80,7 @@ ESP8266WebServer::~ESP8266WebServer() {
 }
 
 void ESP8266WebServer::begin() {
+  _currentStatus = HC_NONE;
   _server.begin();
   if(!_headerKeysCount)
     collectHeaders(0, 0);
@@ -155,28 +156,67 @@ void ESP8266WebServer::serveStatic(const char* uri, FS& fs, const char* path, co
 }
 
 void ESP8266WebServer::handleClient() {
-  WiFiClient client = _server.available();
-  if (!client) {
-    return;
-  }
+  if (_currentStatus == HC_NONE) {
+    WiFiClient client = _server.available();
+    if (!client) {
+      return;
+    }
 
 #ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.println("New client");
+    DEBUG_OUTPUT.println("New client");
 #endif
 
-  // Wait for data from client to become available
-  uint16_t maxWait = HTTP_MAX_DATA_WAIT;
-  while(client.connected() && !client.available() && maxWait--){
-    delay(1);
+    _currentClient = client;
+    _currentStatus = HC_WAIT_READ;
+    _statusChange = millis();
   }
 
-  if (!_parseRequest(client)) {
+  if (!_currentClient.connected()) {
+    _currentClient = WiFiClient();
+    _currentStatus = HC_NONE;
     return;
   }
 
-  _currentClient = client;
-  _contentLength = CONTENT_LENGTH_NOT_SET;
-  _handleRequest();
+  // Wait for data from client to become available
+  if (_currentStatus == HC_WAIT_READ) {
+    if (!_currentClient.available()) {
+      if (millis() - _statusChange > HTTP_MAX_DATA_WAIT) {
+        _currentClient = WiFiClient();
+        _currentStatus = HC_NONE;
+      }
+      yield();
+      return;
+    }
+
+    if (!_parseRequest(_currentClient)) {
+      _currentClient = WiFiClient();
+      _currentStatus = HC_NONE;
+      return;
+    }
+
+    _contentLength = CONTENT_LENGTH_NOT_SET;
+    _handleRequest();
+
+    if (!_currentClient.connected()) {
+      _currentClient = WiFiClient();
+      _currentStatus = HC_NONE;
+      return;
+    } else {
+      _currentStatus = HC_WAIT_CLOSE;
+      _statusChange = millis();
+      return;
+    }
+  }
+
+  if (_currentStatus == HC_WAIT_CLOSE) {
+    if (millis() - _statusChange > HTTP_MAX_CLOSE_WAIT) {
+      _currentClient = WiFiClient();
+      _currentStatus = HC_NONE;
+    } else {
+      yield();
+      return;
+    }
+  }
 }
 
 void ESP8266WebServer::close() {
@@ -442,12 +482,7 @@ void ESP8266WebServer::_handleRequest() {
     }
   }
 
-  uint16_t maxWait = HTTP_MAX_CLOSE_WAIT;
-  while(_currentClient.connected() && maxWait--) {
-    delay(1);
-  }
-  _currentClient   = WiFiClient();
-  _currentUri      = String();
+  _currentUri = String();
 }
 
 const char* ESP8266WebServer::_responseCodeToString(int code) {
