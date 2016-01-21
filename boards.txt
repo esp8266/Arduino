@@ -183,6 +183,8 @@ generic.menu.DebugLevel.Core____=Core
 generic.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
 generic.menu.DebugLevel.SSL_____=Core + SSL
 generic.menu.DebugLevel.SSL_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+generic.menu.DebugLevel.SSL_MEM_=Core + SSL + TLS Mem
+generic.menu.DebugLevel.SSL_MEM_.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_TLS_MEM
 generic.menu.DebugLevel.WiFic___=Core + WiFi
 generic.menu.DebugLevel.WiFic___.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
 generic.menu.DebugLevel.WiFi____=WiFi
@@ -206,7 +208,7 @@ generic.menu.DebugLevel.OTA_____.build.debug_level=-DDEBUG_ESP_OTA
 generic.menu.DebugLevel.OTA2____=OTA + Updater
 generic.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
 generic.menu.DebugLevel.all_____=All
-generic.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+generic.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
 
 # disabled because espressif's bootloader refuses to write above 4M
 # generic.menu.FlashSize.8M=8M (7M SPIFFS)
