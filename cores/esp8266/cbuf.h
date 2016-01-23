@@ -27,22 +27,14 @@
 
 class cbuf {
     public:
-        cbuf(size_t size) :
-                _size(size), _buf(new char[size]), _bufend(_buf + size), _begin(_buf), _end(_begin) {
-        }
+        cbuf(size_t size);
+        ~cbuf();
 
-        ~cbuf() {
-            delete[] _buf;
-        }
-
+        size_t resizeAdd(size_t addSize);
+        size_t resize(size_t newSize);
         size_t getSize() const;
 
-        size_t room() const {
-            if(_end >= _begin) {
-                return _size - (_end - _begin) - 1;
-            }
-            return _begin - _end - 1;
-        }
+        size_t room() const;
 
         inline bool empty() const {
             return _begin == _end;
@@ -52,61 +44,26 @@ class cbuf {
             return wrap_if_bufend(_end + 1) == _begin;
         }
 
-        int peek() {
-            if(empty()) return -1;
-
-            return static_cast<int>(*_begin);
-        }
+        int peek();
+        size_t peek(char *dst, size_t size);
 
         int read();
-
-        size_t read(char* dst, size_t size) {
-            size_t bytes_available = getSize();
-            size_t size_to_read = (size < bytes_available) ? size : bytes_available;
-            size_t size_read = size_to_read;
-            if(_end < _begin && size_to_read > (size_t)(_bufend - _begin)) {
-                size_t top_size = _bufend - _begin;
-                memcpy(dst, _begin, top_size);
-                _begin = _buf;
-                size_to_read -= top_size;
-                dst += top_size;
-            }
-            memcpy(dst, _begin, size_to_read);
-            _begin = wrap_if_bufend(_begin + size_to_read);
-            return size_read;
-        }
+        size_t read(char* dst, size_t size);
 
         size_t write(char c);
+        size_t write(const char* src, size_t size);
 
-        size_t write(const char* src, size_t size) {
-            size_t bytes_available = room();
-            size_t size_to_write = (size < bytes_available) ? size : bytes_available;
-            size_t size_written = size_to_write;
-            if(_end >= _begin && size_to_write > (size_t)(_bufend - _end)) {
-                size_t top_size = _bufend - _end;
-                memcpy(_end, src, top_size);
-                _end = _buf;
-                size_to_write -= top_size;
-                src += top_size;
-            }
-            memcpy(_end, src, size_to_write);
-            _end = wrap_if_bufend(_end + size_to_write);
-            return size_written;
-        }
-
-        void flush() {
-            _begin = _buf;
-            _end = _buf;
-        }
+        void flush();
+        size_t remove(size_t size);
 
     private:
         inline char* wrap_if_bufend(char* ptr) const {
             return (ptr == _bufend) ? _buf : ptr;
         }
 
-        const size_t _size;
+        size_t _size;
         char* _buf;
-        const char* const _bufend;
+        const char* _bufend;
         char* _begin;
         char* _end;
 };
