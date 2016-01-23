@@ -64,14 +64,13 @@
 #define SERIAL_RX_ONLY  1
 #define SERIAL_TX_ONLY  2
 
-class cbuf;
-
 struct uart_;
 typedef struct uart_ uart_t;
 
 class HardwareSerial: public Stream {
     public:
         HardwareSerial(int uart_nr);
+        virtual ~HardwareSerial(){}
 
         void begin(unsigned long baud) {
             begin(baud, SERIAL_8N1, SERIAL_FULL, 1);
@@ -127,15 +126,10 @@ class HardwareSerial: public Stream {
         bool isRxEnabled(void);
 
     protected:
-        friend void uart_interrupt_handler(uart_t* uart);
-        void _rx_complete_irq(char c);
-        void _tx_empty_irq(void);
 
     protected:
         int _uart_nr;
         uart_t* _uart;
-        cbuf* _tx_buffer;
-        cbuf* _rx_buffer;
 };
 
 extern HardwareSerial Serial;
