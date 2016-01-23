@@ -37,7 +37,9 @@ size_t cbuf::resize(size_t newSize) {
 
     size_t available = getSize();
 
-    if((available > newSize) || (newSize == _size)) {
+	// not lose any data
+	// if data can be lost use remove or flush before resize
+    if((newSize < available) || (newSize == _size)) {
         return _size;
     }
 
