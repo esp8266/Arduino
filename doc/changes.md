@@ -13,7 +13,6 @@ title: Change Log
 - Add espduino board
 - Rework StreamString::write to use String internal buffer directly (#1289)
 - Add function to measure stack high water mark
-- Update SDK to esp_iot_sdk_v1.5.0_15_12_15_p1
 - Fix RAM corruption caused by our hook of register_chipv6_phy(init_data*).
 - Optimize PWM interrupt handler for better precision
 - Add warning levels configurable through Preferences
@@ -22,6 +21,9 @@ title: Change Log
 - Set CPU frequency before running setup
 - Add core_esp8266_features.h to be able to detect the features and libraries included in the ESP core
 - Added ESPino to supported boards
+- Fix pwm first step getting skipped
+- Update SDK to 1.5.1_16_01_08
+- HardwareSerial: allow mapping of UART0 TX to GPIO2
 
 ### Libraries
 
@@ -40,6 +42,14 @@ title: Change Log
 - Allow setting client side TLS key and certificate
 - Replace chain of UDP pbufs with a single pbuf before sending (#1009)
 - Remove bundled OneWire - ESP8266 support has been merged in the official OneWire sources
+- Unique Built-In libraries library.properties name
+- Improvements for MD5Builder with Stream
+- ESP8266SSDP: fixing TTL to 2 per spec
+- ESP8266WebServer: a content length of zero should also be sent
+- Use SoftwareSerial version 2.2
+- EEPROM: optimised _dirty flag
+- ESP8266mDNS: advertise all hosted services
+- Removed OneWire library
 
 ### Tools
 
