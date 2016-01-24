@@ -38,7 +38,7 @@ Documentation: [http://esp8266.github.io/Arduino/versions/2.0.0/](http://esp8266
 ##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0-rc1/](http://esp8266.github.io/Arduino/versions/2.1.0-rc1/)
+Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0-rc2/](http://esp8266.github.io/Arduino/versions/2.1.0-rc2/)
 
 ### Using git version [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
