@@ -83,6 +83,8 @@ APIs related to deep sleep and watchdog timer are available in the `ESP` object,
 
 `ESP.restart()` restarts the CPU.
 
+`ESP.getResetReason()` returns String containing the last reset resaon in human readable format.
+
 `ESP.getFreeHeap()` returns the free heap size.
 
 `ESP.getChipId()` returns the ESP8266 chip ID as a 32-bit integer.

@@ -6,6 +6,7 @@ title: Change Log
 
 ### Core
 
+- Add function to know last reset resaon.
 - Allow control of enabling debug and debug level from IDE
 - Make HardwareSerial::begin() and end() interrupt safe
 - Put HardwareSerial and cbuf methods called from interrupt context in RAM
