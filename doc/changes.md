@@ -41,15 +41,14 @@ title: Change Log
 - Fix link-time dependency of ESP8266WebServer on SPIFFS (#862)
 - Allow setting client side TLS key and certificate
 - Replace chain of UDP pbufs with a single pbuf before sending (#1009)
-- Remove bundled OneWire - ESP8266 support has been merged in the official OneWire sources
 - Unique Built-In libraries library.properties name
 - Improvements for MD5Builder with Stream
 - ESP8266SSDP: fixing TTL to 2 per spec
 - ESP8266WebServer: a content length of zero should also be sent
 - Use SoftwareSerial version 2.2
-- EEPROM: optimised _dirty flag
+- EEPROM: optimised `_dirty` flag
 - ESP8266mDNS: advertise all hosted services
-- Removed OneWire library
+- Remove bundled OneWire - ESP8266 support has been merged in the official OneWire sources
 
 ### Tools
 
