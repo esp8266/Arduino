@@ -28,108 +28,115 @@
 #define HardwareSerial_h
 
 #include <inttypes.h>
-
 #include "Stream.h"
+#include "uart.h"
 
-#define SERIAL_TX_BUFFER_SIZE 256
-#define SERIAL_RX_BUFFER_SIZE 256
+enum SerialConfig {
+    SERIAL_5N1 = UART_5N1,
+    SERIAL_6N1 = UART_6N1,
+    SERIAL_7N1 = UART_7N1,
+    SERIAL_8N1 = UART_8N1,
+    SERIAL_5N2 = UART_5N2,
+    SERIAL_6N2 = UART_6N2,
+    SERIAL_7N2 = UART_7N2,
+    SERIAL_8N2 = UART_8N2,
+    SERIAL_5E1 = UART_5E1,
+    SERIAL_6E1 = UART_6E1,
+    SERIAL_7E1 = UART_7E1,
+    SERIAL_8E1 = UART_8E1,
+    SERIAL_5E2 = UART_5E2,
+    SERIAL_6E2 = UART_6E2,
+    SERIAL_7E2 = UART_7E2,
+    SERIAL_8E2 = UART_8E2,
+    SERIAL_5O1 = UART_5O1,
+    SERIAL_6O1 = UART_6O1,
+    SERIAL_7O1 = UART_7O1,
+    SERIAL_8O1 = UART_8O1,
+    SERIAL_5O2 = UART_5O2,
+    SERIAL_6O2 = UART_6O2,
+    SERIAL_7O2 = UART_7O2,
+    SERIAL_8O2 = UART_8O2,
+};
 
-// Define config for Serial.begin(baud, config);
-#define SERIAL_5N1 0x10
-#define SERIAL_6N1 0x14
-#define SERIAL_7N1 0x18
-#define SERIAL_8N1 0x1c
-#define SERIAL_5N2 0x30
-#define SERIAL_6N2 0x34
-#define SERIAL_7N2 0x38
-#define SERIAL_8N2 0x3c
-#define SERIAL_5E1 0x12
-#define SERIAL_6E1 0x16
-#define SERIAL_7E1 0x1a
-#define SERIAL_8E1 0x1e
-#define SERIAL_5E2 0x32
-#define SERIAL_6E2 0x36
-#define SERIAL_7E2 0x3a
-#define SERIAL_8E2 0x3e
-#define SERIAL_5O1 0x13
-#define SERIAL_6O1 0x17
-#define SERIAL_7O1 0x1b
-#define SERIAL_8O1 0x1f
-#define SERIAL_5O2 0x33
-#define SERIAL_6O2 0x37
-#define SERIAL_7O2 0x3b
-#define SERIAL_8O2 0x3f
+enum SerialMode {
+    SERIAL_FULL = UART_FULL,
+    SERIAL_RX_ONLY = UART_RX_ONLY,
+    SERIAL_TX_ONLY = UART_TX_ONLY
+};
 
-#define SERIAL_FULL     0
-#define SERIAL_RX_ONLY  1
-#define SERIAL_TX_ONLY  2
+class HardwareSerial: public Stream
+{
+public:
+    HardwareSerial(int uart_nr);
+    virtual ~HardwareSerial() {}
 
-struct uart_;
-typedef struct uart_ uart_t;
+    void begin(unsigned long baud)
+    {
+        begin(baud, SERIAL_8N1, SERIAL_FULL, 1);
+    }
+    void begin(unsigned long baud, SerialConfig config)
+    {
+        begin(baud, config, SERIAL_FULL, 1);
+    }
+    void begin(unsigned long baud, SerialConfig config, SerialMode mode)
+    {
+        begin(baud, config, mode, 1);
+    }
 
-class HardwareSerial: public Stream {
-    public:
-        HardwareSerial(int uart_nr);
-        virtual ~HardwareSerial(){}
+    void begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin);
 
-        void begin(unsigned long baud) {
-            begin(baud, SERIAL_8N1, SERIAL_FULL, 1);
-        }
-        void begin(unsigned long baud, uint8_t config) {
-            begin(baud, config, SERIAL_FULL, 1);
-        }
-        void begin(unsigned long baud, uint8_t config, uint8_t mode) {
-            begin(baud, config, mode, 1);
-        }
-        void begin(unsigned long, uint8_t, uint8_t, uint8_t);
-        void end();
-        void swap() {
-            swap(1);
-        }
-        void swap(uint8_t use_tx);    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
+    void end();
 
-        /*
-         * Toggle between use of GPIO1 and GPIO2 as TX on UART 0.
-         * Note: UART 1 can't be used if GPIO2 is used with UART 0!
-         */
-        void set_tx(uint8_t use_tx);
+    void swap()
+    {
+        swap(1);
+    }
+    void swap(uint8_t tx_pin);    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
 
-        /*
-         * UART 0 possible options are (1, 3), (2, 3) or (15, 13)
-         * UART 1 allows only TX on 2 if UART 0 is not (2, 3)
-         */
-        void pins(uint8_t tx, uint8_t rx);
+    /*
+     * Toggle between use of GPIO1 and GPIO2 as TX on UART 0.
+     * Note: UART 1 can't be used if GPIO2 is used with UART 0!
+     */
+    void set_tx(uint8_t tx_pin);
 
-        int available(void) override;
-        int peek(void) override;
-        int read(void) override;
-        int availableForWrite(void);
-        void flush(void) override;
-        size_t write(uint8_t) override;
-        inline size_t write(unsigned long n) {
-            return write((uint8_t) n);
-        }
-        inline size_t write(long n) {
-            return write((uint8_t) n);
-        }
-        inline size_t write(unsigned int n) {
-            return write((uint8_t) n);
-        }
-        inline size_t write(int n) {
-            return write((uint8_t) n);
-        }
-        using Print::write; // pull in write(str) and write(buf, size) from Print
-        operator bool() const;
+    /*
+     * UART 0 possible options are (1, 3), (2, 3) or (15, 13)
+     * UART 1 allows only TX on 2 if UART 0 is not (2, 3)
+     */
+    void pins(uint8_t tx, uint8_t rx);
 
-        void setDebugOutput(bool);
-        bool isTxEnabled(void);
-        bool isRxEnabled(void);
+    int available(void) override;
+    int peek(void) override;
+    int read(void) override;
+    int availableForWrite(void);
+    void flush(void) override;
+    size_t write(uint8_t) override;
+    inline size_t write(unsigned long n)
+    {
+        return write((uint8_t) n);
+    }
+    inline size_t write(long n)
+    {
+        return write((uint8_t) n);
+    }
+    inline size_t write(unsigned int n)
+    {
+        return write((uint8_t) n);
+    }
+    inline size_t write(int n)
+    {
+        return write((uint8_t) n);
+    }
+    using Print::write; // pull in write(str) and write(buf, size) from Print
+    operator bool() const;
 
-    protected:
+    void setDebugOutput(bool);
+    bool isTxEnabled(void);
+    bool isRxEnabled(void);
 
-    protected:
-        int _uart_nr;
-        uart_t* _uart;
+protected:
+    int _uart_nr;
+    uart_t* _uart;
 };
 
 extern HardwareSerial Serial;
