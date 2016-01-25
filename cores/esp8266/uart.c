@@ -80,6 +80,9 @@ int uart_read_char(uart_t* uart)
     if(uart == NULL || !uart->rx_enabled) {
         return -1;
     }
+    if (!uart_rx_available(uart)) {
+        return -1;
+    }
     return USF(uart->uart_nr) & 0xff;
 }
 

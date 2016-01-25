@@ -33,7 +33,6 @@
 
 HardwareSerial::HardwareSerial(int uart_nr)
     : _uart_nr(uart_nr)
-    , _uart(0)
 {}
 
 void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin)
@@ -47,6 +46,7 @@ void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode m
     }
 
     _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin);
+    _peek_char = -1;
 }
 
 void HardwareSerial::end()
@@ -118,6 +118,9 @@ int HardwareSerial::available(void)
     }
 
     int result = static_cast<int>(uart_rx_available(_uart));
+    if (_peek_char != -1) {
+        result += 1;
+    }
     if (!result) {
         optimistic_yield(USD(_uart_nr) / 128);
     }
@@ -126,7 +129,12 @@ int HardwareSerial::available(void)
 
 int HardwareSerial::peek(void)
 {
-    return -1;
+    if (_peek_char != -1) {
+        return _peek_char;
+    }
+    // this may return -1, but that's okay
+    _peek_char = uart_read_char(_uart);
+    return _peek_char;
 }
 
 int HardwareSerial::read(void)
@@ -135,6 +143,11 @@ int HardwareSerial::read(void)
         return -1;
     }
 
+    if (_peek_char != -1) {
+        auto tmp = _peek_char;
+        _peek_char = -1;
+        return tmp;
+    }
     return uart_read_char(_uart);
 }
 

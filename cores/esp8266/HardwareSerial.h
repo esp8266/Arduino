@@ -136,7 +136,8 @@ public:
 
 protected:
     int _uart_nr;
-    uart_t* _uart;
+    uart_t* _uart = nullptr;
+    int _peek_char = -1;
 };
 
 extern HardwareSerial Serial;
