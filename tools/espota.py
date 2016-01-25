@@ -92,10 +92,10 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   logging.info('Sending invitation to: %s', remoteAddr)
   sock2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
   remote_address = (remoteAddr, int(remotePort))
-  sent = sock2.sendto(message, remote_address)
+  sent = sock2.sendto(message.encode(), remote_address)
   sock2.settimeout(10)
   try:
-    data = sock2.recv(37)
+    data = sock2.recv(37).decode()
   except:
     logging.error('No Answer')
     sock2.close()
@@ -111,10 +111,10 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
       sys.stderr.write('Authenticating...')
       sys.stderr.flush()
       message = '%d %s %s\n' % (AUTH, cnonce, result)
-      sock2.sendto(message, remote_address)
+      sock2.sendto(message.encode(), remote_address)
       sock2.settimeout(10)
       try:
-        data = sock2.recv(32)
+        data = sock2.recv(32).decode()
       except:
         sys.stderr.write('FAIL\n')
         logging.error('No Answer to our Authentication')
@@ -173,7 +173,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     logging.info('Waiting for result...')
     try:
       connection.settimeout(60)
-      data = connection.recv(32)
+      data = connection.recv(32).decode()
       logging.info('Result: %s' ,data)
       connection.close()
       f.close()

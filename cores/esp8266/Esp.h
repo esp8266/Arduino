@@ -131,6 +131,7 @@ class EspClass {
         uint32_t getFreeSketchSpace();
         bool updateSketch(Stream& in, uint32_t size, bool restartOnFail = false, bool restartOnSuccess = true);
 
+        String getResetReason();
         String getResetInfo();
         struct rst_info * getResetInfoPtr();
 
