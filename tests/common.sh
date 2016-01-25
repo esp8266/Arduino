@@ -12,7 +12,7 @@ function build_sketches()
             continue
         fi
         echo -e "\n\n ------------ Building $sketch ------------ \n\n";
-        $arduino --verify --verbose $sketch;
+        $arduino --verify $sketch;
         local result=$?
         if [ $result -ne 0 ]; then
             echo "Build failed ($1)"
