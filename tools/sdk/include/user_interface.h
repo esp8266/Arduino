@@ -23,13 +23,13 @@
 #endif
 
 enum rst_reason {
-	REASON_DEFAULT_RST		= 0,
-	REASON_WDT_RST			= 1,
-	REASON_EXCEPTION_RST	= 2,
-	REASON_SOFT_WDT_RST   	= 3,
-	REASON_SOFT_RESTART 	= 4,
-	REASON_DEEP_SLEEP_AWAKE	= 5,
-	REASON_EXT_SYS_RST      = 6
+	REASON_DEFAULT_RST		= 0,	/* normal startup by power on */
+	REASON_WDT_RST			= 1,	/* hardware watch dog reset */
+	REASON_EXCEPTION_RST	= 2,	/* exception reset, GPIO status won’t change */
+	REASON_SOFT_WDT_RST   	= 3,	/* software watch dog reset, GPIO status won’t change */
+	REASON_SOFT_RESTART 	= 4,	/* software restart ,system_restart , GPIO status won’t change */
+	REASON_DEEP_SLEEP_AWAKE	= 5,	/* wake up from deep-sleep */
+	REASON_EXT_SYS_RST      = 6		/* external system reset */
 };
 
 struct rst_info{
