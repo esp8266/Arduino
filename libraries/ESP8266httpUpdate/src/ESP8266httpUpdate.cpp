@@ -241,31 +241,33 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
                         DEBUG_HTTP_UPDATE("[httpUpdate] runUpdate flash...\n");
                     }
 
-                    uint8_t buf[4];
-                    if(tcp->peekBytes(&buf[0], 4) != 4) {
-                        DEBUG_HTTP_UPDATE("[httpUpdate] peekBytes magic header failed\n");
-                        lastError = HTTP_UE_BIN_VERIFY_HEADER_FAILED;
-                        http->end();
-                        return HTTP_UPDATE_FAILED;
-                    }
+                    if(!spiffs) {
+                        uint8_t buf[4];
+                        if(tcp->peekBytes(&buf[0], 4) != 4) {
+                            DEBUG_HTTP_UPDATE("[httpUpdate] peekBytes magic header failed\n");
+                            lastError = HTTP_UE_BIN_VERIFY_HEADER_FAILED;
+                            http->end();
+                            return HTTP_UPDATE_FAILED;
+                        }
 
-                    // check for valid first magic byte
-                    if(buf[0] != 0xE9) {
-                        DEBUG_HTTP_UPDATE("[httpUpdate] magic header not starts with 0xE9\n");
-                        lastError = HTTP_UE_BIN_VERIFY_HEADER_FAILED;
-                        http->end();
-                        return HTTP_UPDATE_FAILED;
+                        // check for valid first magic byte
+                        if(buf[0] != 0xE9) {
+                            DEBUG_HTTP_UPDATE("[httpUpdate] magic header not starts with 0xE9\n");
+                            lastError = HTTP_UE_BIN_VERIFY_HEADER_FAILED;
+                            http->end();
+                            return HTTP_UPDATE_FAILED;
 
-                    }
+                        }
 
-                    uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
+                        uint32_t bin_flash_size = ESP.magicFlashChipSize((buf[3] & 0xf0) >> 4);
 
-                    // check if new bin fits to SPI flash
-                    if(bin_flash_size > ESP.getFlashChipRealSize()) {
-                        DEBUG_HTTP_UPDATE("[httpUpdate] magic header, new bin not fits SPI Flash\n");
-                        lastError = HTTP_UE_BIN_FOR_WRONG_FLASH;
-                        http->end();
-                        return HTTP_UPDATE_FAILED;
+                        // check if new bin fits to SPI flash
+                        if(bin_flash_size > ESP.getFlashChipRealSize()) {
+                            DEBUG_HTTP_UPDATE("[httpUpdate] magic header, new bin not fits SPI Flash\n");
+                            lastError = HTTP_UE_BIN_FOR_WRONG_FLASH;
+                            http->end();
+                            return HTTP_UPDATE_FAILED;
+                        }
                     }
 
                     if(runUpdate(*tcp, len, http->header("x-MD5"), command)) {
