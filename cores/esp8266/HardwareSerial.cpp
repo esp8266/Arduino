@@ -122,7 +122,7 @@ int HardwareSerial::available(void)
         result += 1;
     }
     if (!result) {
-        optimistic_yield(USD(_uart_nr) / 128);
+        optimistic_yield(10000);
     }
     return result;
 }
