@@ -56,6 +56,21 @@ static uint8_t s_servoCount = 0;            // the total number of attached s_se
 #define SERVO_INDEX_TO_TIMER(servoIndex) ((ServoTimerSequence)(servoIndex / SERVOS_PER_TIMER)) // returns the timer controlling this servo
 #define SERVO_INDEX(timerId, channel)  ((timerId * SERVOS_PER_TIMER) + channel)     // macro to access servo index by timer and channel
 
+// similiar to map but will have increased accuracy that provides a more
+// symetric api (call it and use result to reverse will provide the original value)
+// 
+int improved_map(int value, int minIn, int maxIn, int minOut, int maxOut)
+{
+    const int rangeIn = maxIn - minIn;
+    const int rangeOut = maxOut - minOut;
+    const int deltaIn = value - minIn;
+    // fixed point math constants to improve accurancy of divide and rounding
+    const int fixedHalfDecimal = 1;
+    const int fixedDecimal = fixedHalfDecimal * 2;
+
+    return ((deltaIn * rangeOut * fixedDecimal) / (rangeIn) + fixedHalfDecimal) / fixedDecimal + minOut;
+}
+
 //------------------------------------------------------------------------------
 // Interrupt handler template method that takes a class that implements
 // a standard set of methods for the timer abstraction
@@ -246,8 +261,10 @@ void Servo::write(int value)
     // treat values less than 544 as angles in degrees (valid values in microseconds are handled as microseconds)
     if (value < MIN_PULSE_WIDTH) {
         // assumed to be 0-180 degrees servo
-        value = max(0, min(180, value));
-        value = map(value, 0, 180, _minUs, _maxUs);
+        value = constrain(value, 0, 180);
+        // writeMicroseconds will contrain the calculated value for us
+        // for any user defined min and max, but we must use default min max
+        value = improved_map(value, 0, 180, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
     }
     writeMicroseconds(value);
 }
@@ -257,7 +274,7 @@ void Servo::writeMicroseconds(int value)
     // ensure channel is valid
     if ((_servoIndex < MAX_SERVOS)) {
         // ensure pulse width is valid
-        value = max(_minUs, min(_maxUs, value));
+        value = constrain(value, _minUs, _maxUs);
 
         s_servos[_servoIndex].usPulse = value;
     }
@@ -265,7 +282,9 @@ void Servo::writeMicroseconds(int value)
 
 int Servo::read() // return the value as degrees
 {
-    return map(readMicroseconds(), _minUs, _maxUs, 0, 180);
+    // read returns the angle for an assumed 0-180, so we calculate using 
+    // the normal min/max constants and not user defined ones
+    return improved_map(readMicroseconds(), MIN_PULSE_WIDTH, MAX_PULSE_WIDTH, 0, 180);
 }
 
 int Servo::readMicroseconds()
