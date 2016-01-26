@@ -32,7 +32,8 @@ class cbuf {
 
         size_t resizeAdd(size_t addSize);
         size_t resize(size_t newSize);
-        size_t getSize() const;
+        size_t available() const;
+        size_t size();
 
         size_t room() const;
 

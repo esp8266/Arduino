@@ -643,7 +643,7 @@ int HardwareSerial::available(void) {
 
     if (_uart != NULL && _uart->rxEnabled) {
         InterruptLock il;
-        result = static_cast<int>(_rx_buffer->getSize());
+        result = static_cast<int>(_rx_buffer->available());
     }
 
     if (!result) {
@@ -696,7 +696,7 @@ void HardwareSerial::flush() {
     while(true) {
         {
             InterruptLock il;
-            if(_tx_buffer->getSize() == 0 &&
+            if(_tx_buffer->available() == 0 &&
                UART_GET_TX_FIFO_ROOM(uart_nr) >= UART_TX_FIFO_SIZE) {
                 break;
             } else if(il.savedInterruptLevel() > 0) {
@@ -750,7 +750,7 @@ void ICACHE_RAM_ATTR HardwareSerial::_rx_complete_irq(char c) {
 
 void ICACHE_RAM_ATTR HardwareSerial::_tx_empty_irq(void) {
     const int uart_nr = _uart->uart_nr;
-    size_t queued = _tx_buffer->getSize();
+    size_t queued = _tx_buffer->available();
     if(!queued) {
         UART_DISARM_TX_INTERRUPT(uart_nr);
         return;
