@@ -22,7 +22,7 @@
 #include "c_types.h"
 
 cbuf::cbuf(size_t size) :
-        _size(size), _buf(new char[size]), _bufend(_buf + size), _begin(_buf), _end(_begin) {
+    next(NULL), _size(size), _buf(new char[size]), _bufend(_buf + size), _begin(_buf), _end(_begin) {
 }
 
 cbuf::~cbuf() {

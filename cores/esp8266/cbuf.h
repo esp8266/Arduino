@@ -56,6 +56,8 @@ class cbuf {
         void flush();
         size_t remove(size_t size);
 
+        cbuf *next;
+
     private:
         inline char* wrap_if_bufend(char* ptr) const {
             return (ptr == _bufend) ? _buf : ptr;
@@ -66,6 +68,7 @@ class cbuf {
         const char* _bufend;
         char* _begin;
         char* _end;
+
 };
 
 #endif//__cbuf_h
