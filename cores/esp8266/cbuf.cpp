@@ -22,7 +22,7 @@
 #include "c_types.h"
 
 cbuf::cbuf(size_t size) :
-        _size(size), _buf(new char[size]), _bufend(_buf + size), _begin(_buf), _end(_begin) {
+    next(NULL), _size(size), _buf(new char[size]), _bufend(_buf + size), _begin(_buf), _end(_begin) {
 }
 
 cbuf::~cbuf() {
@@ -35,11 +35,11 @@ size_t cbuf::resizeAdd(size_t addSize) {
 
 size_t cbuf::resize(size_t newSize) {
 
-    size_t available = getSize();
+    size_t bytes_available = available();
 
 	// not lose any data
 	// if data can be lost use remove or flush before resize
-    if((newSize < available) || (newSize == _size)) {
+    if((newSize < bytes_available) || (newSize == _size)) {
         return _size;
     }
 
@@ -51,12 +51,12 @@ size_t cbuf::resize(size_t newSize) {
     }
 
     if(_buf) {
-        read(newbuf, available);
-        memset((newbuf + available), 0x00, (newSize - available));
+        read(newbuf, bytes_available);
+        memset((newbuf + bytes_available), 0x00, (newSize - bytes_available));
     }
 
     _begin = newbuf;
-    _end = newbuf + available;
+    _end = newbuf + bytes_available;
     _bufend = newbuf + newSize;
     _size = newSize;
 
@@ -66,11 +66,15 @@ size_t cbuf::resize(size_t newSize) {
     return _size;
 }
 
-size_t ICACHE_RAM_ATTR cbuf::getSize() const {
+size_t ICACHE_RAM_ATTR cbuf::available() const {
     if(_end >= _begin) {
         return _end - _begin;
     }
     return _size - (_begin - _end);
+}
+
+size_t cbuf::size() {
+    return _size;
 }
 
 size_t cbuf::room() const {
@@ -88,7 +92,7 @@ int cbuf::peek() {
 }
 
 size_t cbuf::peek(char *dst, size_t size) {
-    size_t bytes_available = getSize();
+    size_t bytes_available = available();
     size_t size_to_read = (size < bytes_available) ? size : bytes_available;
     size_t size_read = size_to_read;
     char * begin = _begin;
@@ -113,7 +117,7 @@ int ICACHE_RAM_ATTR cbuf::read() {
 }
 
 size_t cbuf::read(char* dst, size_t size) {
-    size_t bytes_available = getSize();
+    size_t bytes_available = available();
     size_t size_to_read = (size < bytes_available) ? size : bytes_available;
     size_t size_read = size_to_read;
     if(_end < _begin && size_to_read > (size_t) (_bufend - _begin)) {
@@ -159,7 +163,7 @@ void cbuf::flush() {
 }
 
 size_t cbuf::remove(size_t size) {
-    size_t bytes_available = getSize();
+    size_t bytes_available = available();
     if(size >= bytes_available) {
         flush();
         return 0;
@@ -171,5 +175,5 @@ size_t cbuf::remove(size_t size) {
         size_to_remove -= top_size;
     }
     _begin = wrap_if_bufend(_begin + size_to_remove);
-    return getSize();
+    return available();
 }
