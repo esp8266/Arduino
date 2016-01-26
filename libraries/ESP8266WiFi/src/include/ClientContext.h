@@ -35,7 +35,7 @@ class ClientContext {
                 _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0), _send_waiting(false) {
             tcp_setprio(pcb, TCP_PRIO_MIN);
             tcp_arg(pcb, this);
-            tcp_recv(pcb, &_s_recv);
+            tcp_recv(pcb, (tcp_recv_fn) &_s_recv);
             tcp_sent(pcb, &_s_sent);
             tcp_err(pcb, &_s_error);
         }
@@ -269,12 +269,13 @@ class ClientContext {
             }
         }
 
-        err_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err) {
+        int32_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err) {
 
             if(pb == 0) // connection closed
             {
-                DEBUGV(":rcla\r\n");
-                return abort();
+                DEBUGV(":rcl\r\n");
+                abort();
+                return ERR_ABRT;
             }
 
             if(_rx_buf) {
@@ -306,7 +307,7 @@ class ClientContext {
             return ERR_OK;
         }
 
-        static err_t _s_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *pb, err_t err) {
+        static int32_t _s_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *pb, err_t err) {
             return reinterpret_cast<ClientContext*>(arg)->_recv(tpcb, pb, err);
         }
 
