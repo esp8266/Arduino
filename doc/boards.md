@@ -9,6 +9,7 @@ title: Supported Hardware
   * [NodeMCU 1\.0](#nodemcu-10)
   * [Olimex MOD\-WIFI\-ESP8266\-DEV](#olimex-mod-wifi-esp8266-dev)
   * [Olimex MOD\-WIFI\-ESP8266](#olimex-mod-wifi-esp8266)
+  * [Olimex ESP8266\-EVB](#olimex-esp8266-evb)
   * [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
   * [SweetPea ESP\-210](#sweetpea-esp-210)
   * [ESPino](#espino)
@@ -77,11 +78,27 @@ Since jumper IO0JP is tied to GPIO0, which is PIN 21, you'll have to ground it b
 
 UART pins for programming and serial I/O are GPIO1 (TXD, pin 3) and GPIO3 (RXD, pin 4).
 
-Get the board schematics [here](https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf)
+You can find the board schematics [here](https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf)
 
 ## Olimex MOD-WIFI-ESP8266
 
 This is a stripped down version of the above. Behaves identically in terms of jumpers but has less pins readily available for I/O. Still 2 MB of SPI flash.
+
+## Olimex ESP8266-EVB
+
+It's a Olimex MOD-WIFI-ESP8266-DEV module installed on the headers of a development board which features some breakout connectors, a button (GPIO0) and a relay (GPIO5).
+
+Programming is pretty straightforward: the board is supported in the Arduino IDE after adding the [board manager URL](http://arduino.esp8266.com/versions/2.0.0/package_esp8266com_index.json). To download a program you just have to connect GND/RX/TX from a serial/USB adapter to the UEXT connector and press the only button before applying power to enter UART mode.
+
+Don't connect 5V from the serial/USB adapter to the board or you won't be able to power cycle it for UART mode.
+
+You can find the board schematics [here](https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/ESP8266-EVB/ESP8266-EVB_Rev_A.pdf).
+
+[This guide](https://www.olimex.com/Products/IoT/ESP8266-EVB/resources/ESP8266-EVB-how-to-use-Arduino.pdf) is also useful for the first setup, since it contains the UEXT connector pinout.
+
+Board variants include:
+ * ESP8266-EVB-BAT: comes with built-in LiPo charger and step-up converter
+ * ESP8266-EVB-BAT-BOX: as above, but enclosd in a plastic box (non-weatherproof)
 
 ## SparkFun ESP8266 Thing ###
 
