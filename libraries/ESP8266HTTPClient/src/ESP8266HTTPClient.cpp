@@ -80,15 +80,6 @@ HTTPClient::~HTTPClient() {
 
 /**
  * phasing the url for all needed informations
- * @param url const char *
- * @param httpsFingerprint const char *
- */
-void HTTPClient::begin(const char *url, const char * httpsFingerprint) {
-    begin(String(url), String(httpsFingerprint));
-}
-
-/**
- * phasing the url for all needed informations
  * @param url String
  * @param httpsFingerprint String
  */
@@ -158,18 +149,7 @@ void HTTPClient::begin(String url, String httpsFingerprint) {
 
 }
 
-/**
- * begin
- * @param host const char *
- * @param port uint16_t
- * @param url  const char *
- * @param https bool
- * @param httpsFingerprint const char *
- */
-void HTTPClient::begin(const char *host, uint16_t port, const char * url, bool https, const char * httpsFingerprint) {
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port:%d url: %s https: %d httpsFingerprint: %s\n", host, port, url, https, httpsFingerprint);
-
+void HTTPClient::begin(String host, uint16_t port, String url, bool https, String httpsFingerprint) {
     _host = host;
     _port = port;
     _url = url;
@@ -181,10 +161,7 @@ void HTTPClient::begin(const char *host, uint16_t port, const char * url, bool h
 
     _Headers = "";
 
-}
-
-void HTTPClient::begin(String host, uint16_t port, String url, bool https, String httpsFingerprint) {
-    begin(host.c_str(), port, url.c_str(), https, httpsFingerprint.c_str());
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port:%d url: %s https: %d httpsFingerprint: %s\n", host, port, url, https, httpsFingerprint);
 }
 
 /**
