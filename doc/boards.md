@@ -88,7 +88,7 @@ This is a stripped down version of the above. Behaves identically in terms of ju
 
 It's a Olimex MOD-WIFI-ESP8266-DEV module installed on the headers of a development board which features some breakout connectors, a button (GPIO0) and a relay (GPIO5).
 
-Programming is pretty straightforward: the board is supported in the Arduino IDE after [installing it via the Board Manager](https://github.com/lcafaro/Arduino#installing-with-boards-manager). To download a program you just have to connect GND/RX/TX from a serial/USB adapter to the UEXT connector and press the only button before applying power to enter UART mode.
+Programming is pretty straightforward: the board is supported in the Arduino IDE after [installing it via the Board Manager](https://github.com/esp8266/Arduino#installing-with-boards-manager). To download a program you just have to connect GND/RX/TX from a serial/USB adapter to the UEXT connector and press the only button before applying power to enter UART mode.
 
 Don't connect 5V from the serial/USB adapter to the board or you won't be able to power cycle it for UART mode.
 
