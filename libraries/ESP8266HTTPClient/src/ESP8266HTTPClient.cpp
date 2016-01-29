@@ -308,6 +308,16 @@ int HTTPClient::POST(String payload) {
 /**
  * sendRequest
  * @param type const char *     "GET", "POST", ....
+ * @param payload String        data for the message body
+ * @return
+ */
+int HTTPClient::sendRequest(const char * type, String payload) {
+    return sendRequest(type, (uint8_t *) payload.c_str(), payload.length());
+}
+
+/**
+ * sendRequest
+ * @param type const char *     "GET", "POST", ....
  * @param payload uint8_t *     data for the message body if null not send
  * @param size size_t           size for the message body if 0 not send
  * @return -1 if no info or > 0 when Content-Length is set by server
