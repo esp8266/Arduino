@@ -24,43 +24,42 @@ void MD5Builder::addHexString(const char * data){
 }
 
 bool MD5Builder::addStream(Stream & stream, const size_t total_len) {
-    const int buf_size = 512;
-    int bytesleft = total_len;
-    uint8_t * buf = (uint8_t*) malloc(buf_size);
-    if(buf) {
-        while((stream.available() > -1) && (bytesleft > 0)) {
+  const int buf_size = 512;
+  int bytesleft = total_len;
+  uint8_t * buf = (uint8_t*) malloc(buf_size);
+  if(buf) {
+    while((stream.available() > -1) && (bytesleft > 0)) {
+      // get available data size
+      int sizeAvailable = stream.available();
+      if(sizeAvailable) {
+        int readBytes = sizeAvailable;
 
-            // get available data size
-            int sizeAvailable = stream.available();
-            if(sizeAvailable) {
-                int readBytes = sizeAvailable;
-
-                // read only the asked bytes
-                if(readBytes > bytesleft) {
-                    readBytes = bytesleft ;
-                }
-
-                // not read more the buffer can handle
-                if(readBytes > buf_size) {
-                    readBytes = buf_size;
-                }
-
-                // read data  
-                int bytesread = stream.readBytes(buf, readBytes);
-                bytesleft -= bytesread;
-                if(bytesread > 0) {
-                    MD5Update(&_ctx, buf, bytesread);
-                }
-            }
-            // time for network streams
-            delay(0);
+        // read only the asked bytes
+        if(readBytes > bytesleft) {
+          readBytes = bytesleft ;
         }
-        // not free null ptr
-        free(buf);
-        return (bytesleft == 0);
-    } else {
-        return false;
+
+        // not read more the buffer can handle
+        if(readBytes > buf_size) {
+          readBytes = buf_size;
+        }
+
+        // read data
+        int bytesread = stream.readBytes(buf, readBytes);
+        bytesleft -= bytesread;
+        if(bytesread > 0) {
+          MD5Update(&_ctx, buf, bytesread);
+        }
+      }
+      // time for network streams
+      delay(0);
     }
+    // guaranteed not null
+    free(buf);
+    return (bytesleft == 0);
+  } else {
+    return false;
+  }
 }
 
 void MD5Builder::calculate(void){
@@ -77,7 +76,7 @@ void MD5Builder::getChars(char * output){
 }
 
 String MD5Builder::toString(void){
-  char out[32];
+  char out[33];
   getChars(out);
   return String(out);
 }
