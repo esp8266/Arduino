@@ -554,7 +554,7 @@ thing.name=SparkFun ESP8266 Thing
 
 thing.upload.tool=esptool
 thing.upload.speed=921600
-thing.upload.resetmethod=nodemcu
+thing.upload.resetmethod=ck
 thing.upload.maximum_size=434160
 thing.upload.maximum_data_size=81920
 thing.upload.wait_for_upload_port=true
@@ -605,6 +605,59 @@ thing.menu.UploadSpeed.512000.windows=512000
 thing.menu.UploadSpeed.512000.upload.speed=512000
 thing.menu.UploadSpeed.921600=921600
 thing.menu.UploadSpeed.921600.upload.speed=921600
+
+##############################################################
+thingdev.name=SparkFun ESP8266 Thing Dev
+
+thingdev.upload.tool=esptool
+thingdev.upload.speed=921600
+thingdev.upload.resetmethod=nodemcu
+thingdev.upload.maximum_size=434160
+thingdev.upload.maximum_data_size=81920
+thingdev.upload.wait_for_upload_port=true
+thingdev.serial.disableDTR=true
+thingdev.serial.disableRTS=true
+
+thingdev.build.mcu=esp8266
+thingdev.build.f_cpu=80000000L
+thingdev.build.board=ESP8266_THING_DEV
+thingdev.build.core=esp8266
+thingdev.build.variant=thing
+thingdev.build.flash_mode=dio
+# flash chip: AT25SF041 (512 kbyte, 4Mbit)
+thingdev.build.flash_size=512K
+thingdev.build.flash_ld=eagle.flash.512k64.ld
+thingdev.build.flash_freq=40
+thingdev.build.debug_port=
+thingdev.build.debug_level=
+
+thingdev.menu.CpuFrequency.80=80 MHz
+thingdev.menu.CpuFrequency.80.build.f_cpu=80000000L
+thingdev.menu.CpuFrequency.160=160 MHz
+thingdev.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+thingdev.menu.UploadTool.esptool=Serial
+thingdev.menu.UploadTool.esptool.upload.tool=esptool
+thingdev.menu.UploadTool.esptool.upload.verbose=-vv
+
+thingdev.menu.UploadSpeed.115200=115200
+thingdev.menu.UploadSpeed.115200.upload.speed=115200
+thingdev.menu.UploadSpeed.9600=9600
+thingdev.menu.UploadSpeed.9600.upload.speed=9600
+thingdev.menu.UploadSpeed.57600=57600
+thingdev.menu.UploadSpeed.57600.upload.speed=57600
+thingdev.menu.UploadSpeed.256000.windows=256000
+thingdev.menu.UploadSpeed.256000.upload.speed=256000
+thingdev.menu.UploadSpeed.230400.linux=230400
+thingdev.menu.UploadSpeed.230400.macosx=230400
+thingdev.menu.UploadSpeed.230400.upload.speed=230400
+thingdev.menu.UploadSpeed.460800.linux=460800
+thingdev.menu.UploadSpeed.460800.macosx=460800
+thingdev.menu.UploadSpeed.460800.upload.speed=460800
+thingdev.menu.UploadSpeed.512000.windows=512000
+thingdev.menu.UploadSpeed.512000.upload.speed=512000
+thingdev.menu.UploadSpeed.921600=921600
+thingdev.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
 esp210.name=SweetPea ESP-210
