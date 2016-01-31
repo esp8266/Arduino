@@ -26,10 +26,11 @@
 extern "C" {
 #include <stdlib.h>
 }
+#include "esp8266_peri.h"
 
 void randomSeed(unsigned long seed) {
     if(seed != 0) {
-        srand(seed);
+        srand((seed ^ RANDOM_REG32));
     }
 }
 
@@ -37,7 +38,7 @@ long random(long howbig) {
     if(howbig == 0) {
         return 0;
     }
-    return rand() % howbig;
+    return (rand() ^ RANDOM_REG32) % howbig;
 }
 
 long random(long howsmall, long howbig) {
