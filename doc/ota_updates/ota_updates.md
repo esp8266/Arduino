@@ -12,6 +12,7 @@ title: OTA Update
     * [Application Example](#application-example)
       * [Classic OTA](#classic-ota)
       * [ArduinoOTA](#arduinoota)
+      * [Password Protection](#password-protection)
       * [Troubleshooting](#troubleshooting)
   * [Web Browser](#web-browser)
     * [Requirements](#requirements-1)
@@ -226,6 +227,40 @@ IP address: 192.168.1.100
     ![OTA upload complete](a-ota-ota-upload-complete.png)
 
 **Note:** To be able to upload your sketch over and over again using OTA, you need to embed OTA routines inside. Please use BasicOTA.ino as an example.
+
+
+#### Password Protection
+
+Protecting your OTA uploads with password is really straightforward. All you need to do, is to include the following statement in your code:
+
+```cpp
+ArduinoOTA.setPassword((const char *)"123");
+
+```
+
+Where ``` 123 ``` is a sample password that you should replace with your own.
+
+Before implementing it in your sketch, it is a good idea to check how it works using *BasicOTA.ino* sketch available under *File > Examples > ArduinoOTA*.  Go ahead, open *BasicOTA.ino*, uncomment the above statement that is already there, and upload the sketch. To make troubleshooting easier, do not modify example sketch besides what is absolutely required. This is including original simple ``` 123 ``` OTA password. Then attempt to upload sketch again (using OTA). After compilation is complete, once upload is about to begin, you should see prompt for password as follows:
+ 
+![Password prompt for OTA upload](a-ota-upload-password-prompt.png)
+
+Enter the password and upload should be initiated as usual with the only difference being ``` Authenticating...OK ``` message visible in upload log.
+
+![ Authenticating...OK during OTA upload](a-ota-upload-password-authenticating-ok.png)
+
+You will not be prompted for a reentering the same password next time. Arduino IDE will remember it for you. You will see prompt for password only after reopening IDE, or if you change it in your sketch, upload the sketch and then try to upload it again.
+
+Please note, it is possible to reveal password entered previously in Arduino IDE, if IDE has not been closed since last upload. This can be done by enabling *Show verbose output during: upload* in *File > Preferences* and attempting to upload the module.
+
+![Verbose upload output with password passing in plan text](a-ota-upload-password-passing-upload-ok.png)
+
+The picture above shows that the password is visible in log as it is passed to *espota.py* upload script.
+
+Another example below shows situation when password is changed between uploads. 
+
+![Verbose output when OTA password has been changed between uploads](a-ota-upload-password-passing-again-upload-ok.png)
+
+When uploading, Arduino IDE used previously entered password, so the upload failed and that has been clearly reported by IDE. Only then IDE prompted for a new password. That was entered correctly and second attempt to upload has been successful.
 
 
 #### Troubleshooting
