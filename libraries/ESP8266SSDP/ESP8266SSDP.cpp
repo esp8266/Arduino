@@ -354,7 +354,7 @@ void SSDPClass::_update(){
   if(_pending && ((long)millis() - (long)_process_time) > _delay){
     _pending = false; _delay = 0;
     _send(NONE);
-  } else if(_notify_time == 0 || ((long)millis() - (long)_process_time) > (SSDP_INTERVAL * 1000L)){
+  } else if(_notify_time == 0 || ((long)millis() - (long)_notify_time) > (SSDP_INTERVAL * 1000L)){
     _notify_time = millis();
     _send(NOTIFY);
   }
