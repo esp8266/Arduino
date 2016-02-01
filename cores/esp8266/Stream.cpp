@@ -37,7 +37,7 @@ int ICACHE_FLASH_ATTR Stream::timedRead() {
         if(c >= 0)
             return c;
         yield();
-    } while(millis() - _startMillis < _timeout);
+    } while(((long)millis() - (long)_startMillis) < _timeout);
     return -1;     // -1 indicates timeout
 }
 
@@ -50,7 +50,7 @@ int ICACHE_FLASH_ATTR Stream::timedPeek() {
         if(c >= 0)
             return c;
         yield();
-    } while(millis() - _startMillis < _timeout);
+    } while(((long)millis() - (long)_startMillis) < _timeout);
     return -1;     // -1 indicates timeout
 }
 

@@ -895,7 +895,7 @@ int HTTPClient::handleHeaderResponse() {
             }
 
         } else {
-            if((millis() - lastDataTime) > _tcpTimeout) {
+            if(((long)millis() - (long)lastDataTime) > _tcpTimeout) {
                 return HTTPC_ERROR_READ_TIMEOUT;
             }
             delay(0);

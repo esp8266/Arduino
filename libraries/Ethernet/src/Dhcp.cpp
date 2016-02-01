@@ -62,12 +62,12 @@ int DhcpClass::request_DHCP_lease(){
         {
             _dhcpTransactionId++;
             
-            send_DHCP_MESSAGE(DHCP_DISCOVER, ((millis() - startTime) / 1000));
+            send_DHCP_MESSAGE(DHCP_DISCOVER, (((long)millis() - (long)startTime) / 1000));
             _dhcp_state = STATE_DHCP_DISCOVER;
         }
         else if(_dhcp_state == STATE_DHCP_REREQUEST){
             _dhcpTransactionId++;
-            send_DHCP_MESSAGE(DHCP_REQUEST, ((millis() - startTime)/1000));
+            send_DHCP_MESSAGE(DHCP_REQUEST, (((long)millis() - (long)startTime)/1000));
             _dhcp_state = STATE_DHCP_REQUEST;
         }
         else if(_dhcp_state == STATE_DHCP_DISCOVER)
@@ -79,7 +79,7 @@ int DhcpClass::request_DHCP_lease(){
                 // We'll use the transaction ID that the offer came with,
                 // rather than the one we were up to
                 _dhcpTransactionId = respId;
-                send_DHCP_MESSAGE(DHCP_REQUEST, ((millis() - startTime) / 1000));
+                send_DHCP_MESSAGE(DHCP_REQUEST, (((long)millis() - (long)startTime) / 1000));
                 _dhcp_state = STATE_DHCP_REQUEST;
             }
         }
@@ -117,7 +117,7 @@ int DhcpClass::request_DHCP_lease(){
             _dhcp_state = STATE_DHCP_START;
         }
         
-        if(result != 1 && ((millis() - startTime) > _timeout))
+        if(result != 1 && (((long)millis() - (long)startTime) > _timeout))
             break;
     }
     
@@ -259,7 +259,7 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t& tr
 
     while(_dhcpUdpSocket.parsePacket() <= 0)
     {
-        if((millis() - startTime) > responseTimeout)
+        if(((long)millis() - (long)startTime) > responseTimeout)
         {
             return 255;
         }

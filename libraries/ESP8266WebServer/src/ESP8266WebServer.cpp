@@ -180,7 +180,7 @@ void ESP8266WebServer::handleClient() {
   // Wait for data from client to become available
   if (_currentStatus == HC_WAIT_READ) {
     if (!_currentClient.available()) {
-      if (millis() - _statusChange > HTTP_MAX_DATA_WAIT) {
+      if (((long)millis() - (long)_statusChange) > HTTP_MAX_DATA_WAIT) {
         _currentClient = WiFiClient();
         _currentStatus = HC_NONE;
       }
@@ -209,7 +209,7 @@ void ESP8266WebServer::handleClient() {
   }
 
   if (_currentStatus == HC_WAIT_CLOSE) {
-    if (millis() - _statusChange > HTTP_MAX_CLOSE_WAIT) {
+    if (((long)millis() - (long)_statusChange) > HTTP_MAX_CLOSE_WAIT) {
       _currentClient = WiFiClient();
       _currentStatus = HC_NONE;
     } else {
