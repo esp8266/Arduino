@@ -246,7 +246,7 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
     }
 
     _startMillis = millis();
-    while((available() < (int) length) && ((millis() - _startMillis) < _timeout)) {
+    while((available() < (int) length) && (((long)millis() - (long)_startMillis) < _timeout)) {
         yield();
     }
 

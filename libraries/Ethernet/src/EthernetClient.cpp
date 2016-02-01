@@ -138,7 +138,7 @@ void EthernetClient::stop() {
     if (s == SnSR::CLOSED)
       break; // exit the loop
     delay(1);
-  } while (millis() - start < 1000);
+  } while (((long)millis() - (long)start) < 1000);
 
   // if it hasn't closed, close it forcefully
   if (s != SnSR::CLOSED)
