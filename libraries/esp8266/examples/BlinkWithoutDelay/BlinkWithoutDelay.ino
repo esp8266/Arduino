@@ -28,6 +28,6 @@ void loop()
       ledState = HIGH;  // Note that this switches the LED *off*
     else
       ledState = LOW;   // Note that this switches the LED *on*
-    digitalWrite(BUILTIN_LED, ledState);
+    digitalWrite(LED_BUILTIN, ledState);
   }
 }
