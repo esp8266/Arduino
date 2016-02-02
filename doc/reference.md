@@ -36,7 +36,7 @@ ESP8266 has a single ADC channel available to users. It may be used either to re
 
 To read external voltage applied to ADC pin, use `analogRead(A0)`. Input voltage range is 0 — 1.0V.
 
-To read VCC voltage, ADC pin must be kept unconnected. Additionally, the following line has to be added to the sketch:
+To read VCC voltage, use `ESP.getVcc()` and ADC pin must be kept unconnected. Additionally, the following line has to be added to the sketch:
 
 ```c++
 ADC_MODE(ADC_VCC);
