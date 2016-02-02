@@ -274,7 +274,6 @@ public:
 
     size_t read(uint8_t* buf, size_t size) override {
         CHECKFD();
-
         auto result = SPIFFS_read(_fs->getFs(), _fd, (void*) buf, size);
         if (result < 0) {
             DEBUGV("SPIFFS_read rc=%d\r\n", result);
