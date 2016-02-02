@@ -16,7 +16,7 @@ unsigned long previousMillis = 0;
 const long interval = 1000;
 
 void setup() {
-  pinMode(BUILTIN_LED, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop()
