@@ -24,6 +24,7 @@
 
 unsigned char twi_dcount = 18;
 static unsigned char twi_sda, twi_scl;
+static uint32_t twi_clockStretchLimit;
 
 #define SDA_LOW()   (GPES = (1 << twi_sda)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
 #define SDA_HIGH()  (GPEC = (1 << twi_sda)) //Disable SDA (becomes input and since it has pullup it will go high)
@@ -37,9 +38,9 @@ static unsigned char twi_sda, twi_scl;
 #endif
 
 #if F_CPU == FCPU80
-#define TWI_CLOCK_STRETCH 800
+#define TWI_CLOCK_STRETCH_MULTIPLIER 3
 #else
-#define TWI_CLOCK_STRETCH 1600
+#define TWI_CLOCK_STRETCH_MULTIPLIER 6
 #endif
 
 void twi_setClock(unsigned int freq){
@@ -60,13 +61,19 @@ void twi_setClock(unsigned int freq){
 #endif
 }
 
+void twi_setClockStretchLimit(uint32_t limit){
+  twi_clockStretchLimit = limit * TWI_CLOCK_STRETCH_MULTIPLIER;
+}
+
 void twi_init(unsigned char sda, unsigned char scl){
   twi_sda = sda;
   twi_scl = scl;
   pinMode(twi_sda, INPUT_PULLUP);
   pinMode(twi_scl, INPUT_PULLUP);
   twi_setClock(100000);
+  twi_setClockStretchLimit(230); // default value is 230 uS
 }
+
 
 void twi_stop(void){
   pinMode(twi_sda, INPUT);
@@ -93,12 +100,12 @@ static bool twi_write_start(void) {
 }
 
 static bool twi_write_stop(void){
-  unsigned int i = 0;
+  uint32_t i = 0;
   SCL_LOW();
   SDA_LOW();
   twi_delay(twi_dcount);
   SCL_HIGH();
-  while (SCL_READ() == 0 && (i++) < TWI_CLOCK_STRETCH);// Clock stretching (up to 100us)
+  while (SCL_READ() == 0 && (i++) < twi_clockStretchLimit); // Clock stretching
   twi_delay(twi_dcount);
   SDA_HIGH();
   twi_delay(twi_dcount);
@@ -107,24 +114,24 @@ static bool twi_write_stop(void){
 }
 
 static bool twi_write_bit(bool bit) {
-  unsigned int i = 0;
+  uint32_t i = 0;
   SCL_LOW();
   if (bit) SDA_HIGH();
   else SDA_LOW();
   twi_delay(twi_dcount+1);
   SCL_HIGH();
-  while (SCL_READ() == 0 && (i++) < TWI_CLOCK_STRETCH);// Clock stretching (up to 100us)
+  while (SCL_READ() == 0 && (i++) < twi_clockStretchLimit);// Clock stretching
   twi_delay(twi_dcount);
   return true;
 }
 
 static bool twi_read_bit(void) {
-  unsigned int i = 0;
+  uint32_t i = 0;
   SCL_LOW();
   SDA_HIGH();
   twi_delay(twi_dcount+2);
   SCL_HIGH();
-  while (SCL_READ() == 0 && (i++) < TWI_CLOCK_STRETCH);// Clock stretching (up to 100us)
+  while (SCL_READ() == 0 && (i++) < twi_clockStretchLimit);// Clock stretching
   bool bit = SDA_READ();
   twi_delay(twi_dcount);
   return bit;
