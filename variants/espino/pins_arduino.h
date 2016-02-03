@@ -46,6 +46,11 @@ static const uint8_t LED_BUILTIN = 2;
 static const uint8_t LED_BUILTIN_R = 2;
 static const uint8_t LED_BUILTIN_G = 4;
 static const uint8_t LED_BUILTIN_B = 5;
+
+static const uint8_t BUILTIN_LED = 2;
+static const uint8_t BUILTIN_LEDR = 2;
+static const uint8_t BUILTIN_LEDG = 4;
+static const uint8_t BUILTIN_LEDB = 5;
 static const uint8_t BUILTIN_BUTTON = 0;
 
 static const uint8_t A0 = 17;
