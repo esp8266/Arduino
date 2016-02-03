@@ -43,6 +43,8 @@ static const uint8_t SCK   = 14;
 
 static const uint8_t LED_BUILTIN = 16;
 
+static const uint8_t BUILTIN_LED = 16;
+
 static const uint8_t A0 = 17;
 
 // These serial port names are intended to allow libraries and architecture-neutral
