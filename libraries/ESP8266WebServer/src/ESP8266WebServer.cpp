@@ -378,6 +378,15 @@ String ESP8266WebServer::arg(const char* name) {
   return String();
 }
 
+String ESP8266WebServer::arg_P(PGM_P name) {
+  String argname = name; // Copy to RAM, avoid loop search compare from flash
+  for (int i = 0; i < _currentArgCount; ++i) {
+    if ( _currentArgs[i].key == argname ) 
+      return _currentArgs[i].value;
+  }
+  return String();
+}
+
 String ESP8266WebServer::arg(int i) {
   if (i < _currentArgCount)
     return _currentArgs[i].value;
@@ -397,6 +406,15 @@ int ESP8266WebServer::args() {
 bool ESP8266WebServer::hasArg(const char* name) {
   for (int i = 0; i < _currentArgCount; ++i) {
     if (_currentArgs[i].key == name)
+      return true;
+  }
+  return false;
+}
+
+bool ESP8266WebServer::hasArg_P(PGM_P name) {
+  String argname = name; // Copy to RAM, avoid loop search compare from flash
+  for (int i = 0; i < _currentArgCount; ++i) {
+    if ( _currentArgs[i].key == argname )
       return true;
   }
   return false;
@@ -444,6 +462,16 @@ bool ESP8266WebServer::hasHeader(const char* name) {
   }
   return false;
 }
+
+bool ESP8266WebServer::hasHeader_P(PGM_P name) {
+  String argname = name; // Copy to RAM, avoid loop search compare from flash
+  for (int i = 0; i < _headerKeysCount; ++i) {
+    if ((_currentHeaders[i].key == argname ) && (_currentHeaders[i].value.length() > 0))
+      return true;
+  }
+  return false;
+}
+
 
 String ESP8266WebServer::hostHeader() {
   return _hostHeader;
