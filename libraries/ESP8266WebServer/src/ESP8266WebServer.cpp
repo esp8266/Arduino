@@ -404,7 +404,7 @@ bool ESP8266WebServer::hasArg(String  name) {
 }
 
 
-String ESP8266WebServer::header(const char* name) {
+String ESP8266WebServer::header(String name) {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if (_currentHeaders[i].key == name)
       return _currentHeaders[i].value;
