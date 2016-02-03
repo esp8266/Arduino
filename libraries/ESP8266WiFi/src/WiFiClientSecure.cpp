@@ -39,6 +39,7 @@ extern "C"
 #include "lwip/netif.h"
 #include "include/ClientContext.h"
 #include "c_types.h"
+#include "include/DataStrategyImpl.h"
 
 #ifdef DEBUG_ESP_SSL
 #define DEBUG_SSL
@@ -468,7 +469,10 @@ extern "C" int ax_port_write(int fd, uint8_t* buffer, size_t count) {
         errno = EIO;
         return -1;
     }
-    size_t cb = _client->write((const char*) buffer, count);
+
+    // TODO: add a way to pass timeout here (e.g. through ClientContext?)
+    BufferStrategy strategy(buffer, count, 5000);
+    size_t cb = _client->write(strategy);
     if (cb != count) {
         errno = EAGAIN;
     }

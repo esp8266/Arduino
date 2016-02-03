@@ -125,7 +125,7 @@ template<typename T> size_t streamFile(T &file, const String& contentType){
     sendHeader("Content-Encoding", "gzip");
   }
   send(200, contentType, "");
-  return _currentClient.write(file, HTTP_DOWNLOAD_UNIT_SIZE);
+  return _currentClient.write(file);
 }
 
 protected:

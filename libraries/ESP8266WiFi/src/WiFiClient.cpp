@@ -40,6 +40,7 @@ extern "C"
 #include "lwip/netif.h"
 #include "include/ClientContext.h"
 #include "c_types.h"
+#include "include/DataStrategyImpl.h"
 
 uint16_t WiFiClient::_localPort = 0;
 
@@ -172,8 +173,23 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     {
         return 0;
     }
+    BufferStrategy strategy(buf, size, _timeout);
+    return _client->write(strategy);
+}
 
-    return _client->write(reinterpret_cast<const char*>(buf), size);
+size_t WiFiClient::write(Stream& stream, size_t unused)
+{
+    return WiFiClient::write(stream);
+}
+
+size_t WiFiClient::write(Stream& stream)
+{
+    if (!_client || !stream.available())
+    {
+        return 0;
+    }
+    ChunkedStrategy<Stream> strategy(stream, stream.available(), _timeout);
+    return _client->write(strategy);
 }
 
 size_t WiFiClient::write_P(PGM_P buf, size_t size)
@@ -182,25 +198,9 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
     {
         return 0;
     }
-
-    char chunkUnit[WIFICLIENT_MAX_PACKET_SIZE + 1];
-    chunkUnit[WIFICLIENT_MAX_PACKET_SIZE] = '\0';
-    size_t remaining_size = size;
-
-    while (buf != NULL && remaining_size > 0) {
-        size_t chunkUnitLen = WIFICLIENT_MAX_PACKET_SIZE;
-
-        if (remaining_size < WIFICLIENT_MAX_PACKET_SIZE) chunkUnitLen = remaining_size;
-        // due to the memcpy signature, lots of casts are needed
-        memcpy_P((void*)chunkUnit, (PGM_VOID_P)buf, chunkUnitLen);
-
-        buf += chunkUnitLen;
-        remaining_size -= chunkUnitLen;
-
-        // write is so overloaded, had to use the cast to get it pick the right one
-        _client->write((const char*)chunkUnit, chunkUnitLen);
-    }
-    return size;
+    ProgmemSource ps(buf, size);
+    ChunkedStrategy<ProgmemSource> strategy(ps, size, _timeout);
+    return _client->write(strategy);
 }
 
 int WiFiClient::available()

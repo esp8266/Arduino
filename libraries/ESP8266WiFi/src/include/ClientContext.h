@@ -29,15 +29,18 @@ typedef void (*discard_cb_t)(void*, ClientContext*);
 extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
+#include "DataStrategy.h"
+
 class ClientContext {
     public:
         ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
-                _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0), _send_waiting(false) {
+                _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0) {
             tcp_setprio(pcb, TCP_PRIO_MIN);
             tcp_arg(pcb, this);
             tcp_recv(pcb, (tcp_recv_fn) &_s_recv);
             tcp_sent(pcb, &_s_sent);
             tcp_err(pcb, &_s_error);
+            tcp_poll(pcb, &_s_poll, 1);
         }
 
         err_t abort(){
@@ -47,6 +50,7 @@ class ClientContext {
               tcp_sent(_pcb, NULL);
               tcp_recv(_pcb, NULL);
               tcp_err(_pcb, NULL);
+              tcp_poll(_pcb, NULL, 0);
               tcp_abort(_pcb);
               _pcb = 0;
           }
@@ -61,6 +65,7 @@ class ClientContext {
               tcp_sent(_pcb, NULL);
               tcp_recv(_pcb, NULL);
               tcp_err(_pcb, NULL);
+              tcp_poll(_pcb, NULL, 0);
               err = tcp_close(_pcb);
               if(err != ERR_OK) {
                   DEBUGV(":tc err %d\r\n", err);
@@ -211,40 +216,38 @@ class ClientContext {
             return _pcb->state;
         }
 
-        size_t write(const char* data, size_t size) {
-            if(!_pcb) {
-                DEBUGV(":wr !_pcb\r\n");
+        size_t getSendBufferSize()
+        {
+            if (!_pcb) {
                 return 0;
             }
+            return tcp_sndbuf(_pcb);
+        }
 
-            if(size == 0) {
-                return 0;
+        bool write(const uint8_t* data, size_t size)
+        {
+            if (!_pcb) {
+                return false;
             }
+            err_t err = tcp_write(_pcb, data, size, 0);
+            tcp_output(_pcb);
+            return err == ERR_OK;
+        }
 
-            size_t room = tcp_sndbuf(_pcb);
-            size_t will_send = (room < size) ? room : size;
-            err_t err = tcp_write(_pcb, data, will_send, 0);
-            if(err != ERR_OK) {
-                DEBUGV(":wr !ERR_OK\r\n");
-                return 0;
-            }
-
-            _size_sent = will_send;
-            DEBUGV(":wr\r\n");
-            tcp_output( _pcb );
-            _send_waiting = true;
-            delay(5000); // max send timeout
-            _send_waiting = false;
-            DEBUGV(":ww\r\n");
-            return will_send - _size_sent;
+        size_t write(DataStrategy& strategy) {
+            _strategy = &strategy;
+            auto ret = strategy.write(*this);
+            _strategy = nullptr;
+            return ret;
         }
 
     private:
 
         err_t _sent(tcp_pcb* pcb, uint16_t len) {
             DEBUGV(":sent %d\r\n", len);
-            _size_sent -= len;
-            if(_size_sent == 0 && _send_waiting) esp_schedule();
+            if (_strategy) {
+                _strategy->on_sent(*this, len);
+            }
             return ERR_OK;
         }
 
@@ -279,8 +282,6 @@ class ClientContext {
             }
 
             if(_rx_buf) {
-                // there is some unread data
-                // chain the new pbuf to the existing one
                 DEBUGV(":rch %d, %d\r\n", _rx_buf->tot_len, pb->tot_len);
                 pbuf_cat(_rx_buf, pb);
             } else {
@@ -292,18 +293,21 @@ class ClientContext {
         }
 
         void _error(err_t err) {
-            DEBUGV(":er %d %d %d\r\n", err, _size_sent, _send_waiting);
+            DEBUGV(":er %d %08x\r\n", err, (uint32_t) _strategy);
             tcp_arg(_pcb, NULL);
             tcp_sent(_pcb, NULL);
             tcp_recv(_pcb, NULL);
             tcp_err(_pcb, NULL);
             _pcb = NULL;
-            if(_size_sent && _send_waiting) {
-                esp_schedule();
+            if (_strategy) {
+                _strategy->on_error(*this);
             }
         }
 
         err_t _poll(tcp_pcb* pcb) {
+            if (_strategy) {
+                _strategy->on_poll(*this);
+            }
             return ERR_OK;
         }
 
@@ -335,8 +339,7 @@ class ClientContext {
         int _refcnt;
         ClientContext* _next;
 
-        size_t _size_sent;
-        bool _send_waiting;
+        DataStrategy* _strategy = nullptr;
 };
 
 #endif//CLIENTCONTEXT_H
