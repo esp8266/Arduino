@@ -60,6 +60,7 @@ static const uint8_t E14 = ESP_PINS_OFFSET + 14;
 static const uint8_t E15 = ESP_PINS_OFFSET + 15;
 static const uint8_t E16 = ESP_PINS_OFFSET + 16;
 
+static const uint8_t LED_BUILTIN_LED = 2;
 static const uint8_t BUILTIN_LED = 2;
 
 #define SERIAL_PORT_MONITOR        Serial
