@@ -241,6 +241,9 @@ void ESP8266WebServer::sendHeader(const String& name, const String& value, bool 
   }
 }
 
+void ESP8266WebServer::setContentLength(size_t contentLength) {
+    _contentLength = contentLength;
+}
 
 void ESP8266WebServer::_prepareHeader(String& response, int code, const char* content_type, size_t contentLength) {
     response = "HTTP/1.1 ";
