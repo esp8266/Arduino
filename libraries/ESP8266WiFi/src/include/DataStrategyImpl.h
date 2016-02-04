@@ -136,6 +136,8 @@ public:
     {
         size_t will_read = (_left < size) ? _left : size;
         memcpy_P((void*)dst, (PGM_VOID_P)_buf, will_read);
+        _left -= will_read;
+        _buf  += will_read;
         return will_read;
     }
 

@@ -112,7 +112,7 @@ public:
   void send_P(int code, PGM_P content_type, PGM_P content);
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
-  void setContentLength(size_t contentLength) { _contentLength = contentLength; }
+  void setContentLength(size_t contentLength);
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
