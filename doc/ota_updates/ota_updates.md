@@ -507,7 +507,7 @@ $db = array(
 );
 
 if(isset($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']])) {
-	if($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']] != $_SERVER['HTTP_X_ESP8266_VERSION']) ) {
+	if($db[$_SERVER['HTTP_X_ESP8266_STA_MAC']] != $_SERVER['HTTP_X_ESP8266_VERSION']) {
 		sendFile("./bin/".$db[$_SERVER['HTTP_X_ESP8266_STA_MAC']]."bin");
 	} else {
 		header($_SERVER["SERVER_PROTOCOL"].' 304 Not Modified', true, 304);
