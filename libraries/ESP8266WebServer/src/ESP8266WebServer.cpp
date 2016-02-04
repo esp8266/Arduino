@@ -193,7 +193,7 @@ void ESP8266WebServer::handleClient() {
       _currentStatus = HC_NONE;
       return;
     }
-
+    _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
     _contentLength = CONTENT_LENGTH_NOT_SET;
     _handleRequest();
 
@@ -273,7 +273,6 @@ void ESP8266WebServer::send(int code, const char* content_type, const String& co
     String header;
     _prepareHeader(header, code, content_type, content.length());
     sendContent(header);
-
     sendContent(content);
 }
 
