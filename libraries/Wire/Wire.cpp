@@ -85,6 +85,10 @@ void TwoWire::setClock(uint32_t frequency){
   twi_setClock(frequency);
 }
 
+void TwoWire::setClockStretchLimit(uint32_t limit){
+  twi_setClockStretchLimit(limit);
+}
+
 size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop){
   if(size > BUFFER_LENGTH){
     size = BUFFER_LENGTH;
