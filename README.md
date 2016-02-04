@@ -101,3 +101,5 @@ Espressif SDK included in this build is under Espressif MIT License.
 ESP8266 core files are licensed under LGPL.
 
 [SPI Flash File System (SPIFFS)](https://github.com/pellepl/spiffs) written by Peter Andersson is used in this project. It is distributed under MIT license.
+
+[umm_malloc](https://github.com/rhempel/umm_malloc) memory management library written by Ralph Hempel is used in this project. It is distributed under MIT license.

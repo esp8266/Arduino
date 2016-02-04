@@ -150,7 +150,8 @@ SECTIONS
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
-    *.c.o(.literal*, .text*)
+    *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, \
+           EXCLUDE_FILE (umm_malloc.c.o) .text*)
     *.cpp.o(.literal*, .text*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)

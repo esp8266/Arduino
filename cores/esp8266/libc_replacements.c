@@ -39,22 +39,8 @@
 #include "user_interface.h"
 #include "debug.h"
 
-void* ICACHE_RAM_ATTR malloc(size_t size) {
-    size = ((size + 3) & ~((size_t)0x3));
-    return os_malloc(size);
-}
-
-void ICACHE_RAM_ATTR free(void* ptr) {
-    os_free(ptr);
-}
-
-void* ICACHE_RAM_ATTR realloc(void* ptr, size_t size) {
-    size = ((size + 3) & ~((size_t)0x3));
-    return os_realloc(ptr, size);
-}
-
 int ICACHE_RAM_ATTR puts(const char * str) {
-    return os_printf("%s", str);
+    return ets_printf("%s", str);
 }
 
 int ICACHE_RAM_ATTR printf(const char* format, ...) {
