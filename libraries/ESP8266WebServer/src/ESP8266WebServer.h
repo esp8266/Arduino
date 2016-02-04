@@ -34,6 +34,7 @@ enum HTTPClientStatus { HC_NONE, HC_WAIT_READ, HC_WAIT_CLOSE };
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
 #define HTTP_UPLOAD_BUFLEN 2048
 #define HTTP_MAX_DATA_WAIT 1000 //ms to wait for the client to send the request
+#define HTTP_MAX_SEND_WAIT 5000 //ms to wait for data chunk to be ACKed
 #define HTTP_MAX_CLOSE_WAIT 2000 //ms to wait for the client to close the connection
 
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
