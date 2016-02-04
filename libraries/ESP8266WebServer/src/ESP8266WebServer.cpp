@@ -310,67 +310,15 @@ void ESP8266WebServer::send(int code, const String& content_type, const String& 
 }
 
 void ESP8266WebServer::sendContent(const String& content) {
-  const size_t unit_size = HTTP_DOWNLOAD_UNIT_SIZE;
-  size_t size_to_send = content.length();
-  const char* send_start = content.c_str();
-
-  while (size_to_send) {
-    size_t will_send = (size_to_send < unit_size) ? size_to_send : unit_size;
-    size_t sent = _currentClient.write(send_start, will_send);
-    if (sent == 0) {
-      break;
-    }
-    size_to_send -= sent;
-    send_start += sent;
-  }
+  _currentClient.write(content.c_str(), content.length());
 }
 
 void ESP8266WebServer::sendContent_P(PGM_P content) {
-    char contentUnit[HTTP_DOWNLOAD_UNIT_SIZE + 1];
-
-    contentUnit[HTTP_DOWNLOAD_UNIT_SIZE] = '\0';
-
-    while (content != NULL) {
-        size_t contentUnitLen;
-        PGM_P contentNext;
-
-        // due to the memccpy signature, lots of casts are needed
-        contentNext = (PGM_P)memccpy_P((void*)contentUnit, (PGM_VOID_P)content, 0, HTTP_DOWNLOAD_UNIT_SIZE);
-
-        if (contentNext == NULL) {
-            // no terminator, more data available
-            content += HTTP_DOWNLOAD_UNIT_SIZE;
-            contentUnitLen = HTTP_DOWNLOAD_UNIT_SIZE;
-        }
-        else {
-            // reached terminator. Do not send the terminator
-            contentUnitLen = contentNext - contentUnit - 1;
-            content = NULL;
-        }
-
-        // write is so overloaded, had to use the cast to get it pick the right one
-        _currentClient.write((const char*)contentUnit, contentUnitLen);
-    }
+  _currentClient.write_P(content, strlen_P(content));
 }
 
 void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
-    char contentUnit[HTTP_DOWNLOAD_UNIT_SIZE + 1];
-    contentUnit[HTTP_DOWNLOAD_UNIT_SIZE] = '\0';
-    size_t remaining_size = size;
-
-    while (content != NULL && remaining_size > 0) {
-        size_t contentUnitLen = HTTP_DOWNLOAD_UNIT_SIZE;
-
-        if (remaining_size < HTTP_DOWNLOAD_UNIT_SIZE) contentUnitLen = remaining_size;
-        // due to the memcpy signature, lots of casts are needed
-        memcpy_P((void*)contentUnit, (PGM_VOID_P)content, contentUnitLen);
-
-        content += contentUnitLen;
-        remaining_size -= contentUnitLen;
-
-        // write is so overloaded, had to use the cast to get it pick the right one
-        _currentClient.write((const char*)contentUnit, contentUnitLen);
-    }
+  _currentClient.write_P(content, size);
 }
 
 
