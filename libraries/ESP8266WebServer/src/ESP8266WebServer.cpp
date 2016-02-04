@@ -370,9 +370,10 @@ void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
     }
 }
 
-String ESP8266WebServer::arg(const char* name) {
+
+String ESP8266WebServer::arg(String name) {
   for (int i = 0; i < _currentArgCount; ++i) {
-    if (_currentArgs[i].key == name)
+    if ( _currentArgs[i].key == name ) 
       return _currentArgs[i].value;
   }
   return String();
@@ -394,7 +395,7 @@ int ESP8266WebServer::args() {
   return _currentArgCount;
 }
 
-bool ESP8266WebServer::hasArg(const char* name) {
+bool ESP8266WebServer::hasArg(String  name) {
   for (int i = 0; i < _currentArgCount; ++i) {
     if (_currentArgs[i].key == name)
       return true;
@@ -402,7 +403,8 @@ bool ESP8266WebServer::hasArg(const char* name) {
   return false;
 }
 
-String ESP8266WebServer::header(const char* name) {
+
+String ESP8266WebServer::header(String name) {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if (_currentHeaders[i].key == name)
       return _currentHeaders[i].value;
@@ -437,7 +439,7 @@ int ESP8266WebServer::headers() {
   return _headerKeysCount;
 }
 
-bool ESP8266WebServer::hasHeader(const char* name) {
+bool ESP8266WebServer::hasHeader(String name) {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if ((_currentHeaders[i].key == name) &&  (_currentHeaders[i].value.length() > 0))
       return true;

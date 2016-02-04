@@ -87,17 +87,17 @@ public:
   WiFiClient client() { return _currentClient; }
   HTTPUpload& upload() { return _currentUpload; }
 
-  String arg(const char* name);   // get request argument value by name
+  String arg(String name);        // get request argument value by name
   String arg(int i);              // get request argument value by number
   String argName(int i);          // get request argument name by number
   int args();                     // get arguments count
-  bool hasArg(const char* name);  // check if argument exists
+  bool hasArg(String name);       // check if argument exists
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
-  String header(const char* name);   // get request header value by name
+  String header(String name);      // get request header value by name
   String header(int i);              // get request header value by number
   String headerName(int i);          // get request header name by number
   int headers();                     // get header count
-  bool hasHeader(const char* name);  // check if header exists
+  bool hasHeader(String name);       // check if header exists
 
   String hostHeader();            // get request host header if available or empty String if not
 
