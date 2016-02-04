@@ -19,7 +19,4 @@ public:
     virtual void on_poll(ClientContext& ctx) = 0;
 };
 
-/// in DataStrategyImpl.h
-
-
 #endif//DATASTRATEGY_H

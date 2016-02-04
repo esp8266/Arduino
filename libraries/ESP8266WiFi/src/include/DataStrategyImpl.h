@@ -22,19 +22,46 @@ public:
 
     size_t write(ClientContext& ctx) override
     {
-        write_some(ctx);
+        _write_some(ctx);
         while (!_done) {
             esp_yield();
         }
         return _written;
     }
 
-    void write_some(ClientContext& ctx)
+    void on_sent(ClientContext& ctx, size_t size) override
+    {
+        if (_size > 0) {
+            _write_some(ctx);
+        }
+        _queued -= size;
+        _written += size;
+        if (_queued == 0) {
+            _end();
+        }
+    }
+
+    void on_error(ClientContext& ctx) override
+    {
+        if (_queued > 0) {
+            _end();
+        }
+    }
+
+    void on_poll(ClientContext& ctx) override
+    {
+        if (millis() > _timeout && _queued > 0) {
+            _end();
+        }
+    }
+
+protected:
+    void _write_some(ClientContext& ctx)
     {
         size_t can_write = ctx.getSendBufferSize();
         size_t will_write = (can_write < _size) ? can_write : _size;
         if (!ctx.write(_buf, will_write)) {
-            end();
+            _end();
             return;
         }
         _buf += will_write;
@@ -42,33 +69,7 @@ public:
         _queued += will_write;
     }
 
-    void on_sent(ClientContext& ctx, size_t size) override
-    {
-        if (_size > 0) {
-            write_some(ctx);
-        }
-        _queued -= size;
-        _written += size;
-        if (_queued == 0) {
-            end();
-        }
-    }
-
-    void on_error(ClientContext& ctx) override
-    {
-        if (_queued > 0) {
-            end();
-        }
-    }
-
-    void on_poll(ClientContext& ctx) override
-    {
-        if (millis() > _timeout && _queued > 0) {
-            end();
-        }
-    }
-
-    void end()
+    void _end()
     {
         if (!_done) {
             _done = true;
@@ -168,40 +169,17 @@ public:
 
     size_t write(ClientContext& ctx) override
     {
-        write_some(ctx);
+        _write_some(ctx);
         while (!_done) {
             esp_yield();
         }
         return _written;
     }
 
-    void write_some(ClientContext& ctx)
-    {
-        size_t can_write = ctx.getSendBufferSize();
-        size_t will_write = (can_write < _size) ? can_write : _size;
-
-        BufferLink* new_buf = new BufferLink(will_write, _buffers_tail);
-        if (!_buffers_head) {
-            _buffers_head = new_buf;
-        }
-        _buffers_tail = new_buf;
-        size_t cb = _source.readBytes((char*) new_buf->data(), will_write);
-        if (cb < will_write) {
-            end();
-            return;
-        }
-        if (!ctx.write(new_buf->data(), will_write)) {
-            end();
-            return;
-        }
-        _size -= will_write;
-        _last_write_time = millis();
-    }
-
     void on_sent(ClientContext& ctx, size_t size) override
     {
         if (_size > 0) {
-            write_some(ctx);
+            _write_some(ctx);
         }
         auto size_to_remove = size;
         while (size_to_remove) {
@@ -219,14 +197,14 @@ public:
         }
         _written += size;
         if (_buffers_head == nullptr) {
-            end();
+            _end();
         }
     }
 
     void on_error(ClientContext& ctx) override
     {
         if (_buffers_head != nullptr) {
-            end();
+            _end();
         }
     }
 
@@ -235,11 +213,34 @@ public:
         if (_last_write_time != 0 &&
                 millis() - _last_write_time > _timeout &&
                 _buffers_head != nullptr) {
-            end();
+            _end();
         }
     }
 
-    void end()
+protected:
+    void _write_some(ClientContext& ctx)
+    {
+        size_t can_write = ctx.getSendBufferSize();
+        size_t will_write = (can_write < _size) ? can_write : _size;
+        BufferLink* new_buf = new BufferLink(will_write, _buffers_tail);
+        if (!_buffers_head) {
+            _buffers_head = new_buf;
+        }
+        _buffers_tail = new_buf;
+        size_t cb = _source.readBytes((char*) new_buf->data(), will_write);
+        if (cb < will_write) {
+            _end();
+            return;
+        }
+        if (!ctx.write(new_buf->data(), will_write)) {
+            _end();
+            return;
+        }
+        _size -= will_write;
+        _last_write_time = millis();
+    }
+
+    void _end()
     {
         if (!_done) {
             _done = true;
