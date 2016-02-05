@@ -19,43 +19,41 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <debug.h>
-extern "C" {
-#include "ets_sys.h"
-#include "os_type.h"
-#include "osapi.h"
-#include "mem.h"
-}
 #include <Arduino.h>
 #include <cxxabi.h>
 
 using __cxxabiv1::__guard;
 
-void *operator new(size_t size) {
-    size = ((size + 3) & ~((size_t)0x3));
-    return os_malloc(size);
+void *operator new(size_t size)
+{
+    return malloc(size);
 }
 
-void *operator new[](size_t size) {
-    size = ((size + 3) & ~((size_t)0x3));
-    return os_malloc(size);
+void *operator new[](size_t size)
+{
+    return malloc(size);
 }
 
-void operator delete(void * ptr) {
-    os_free(ptr);
+void operator delete(void * ptr)
+{
+    free(ptr);
 }
 
-void operator delete[](void * ptr) {
-    os_free(ptr);
+void operator delete[](void * ptr)
+{
+    free(ptr);
 }
 
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
-void __cxa_pure_virtual(void) {
+void __cxa_pure_virtual(void)
+{
     panic();
 }
 
-void __cxa_deleted_virtual(void) {
+void __cxa_deleted_virtual(void)
+{
     panic();
 }
 
@@ -87,20 +85,25 @@ extern "C" void __cxa_guard_abort(__guard* pg)
 }
 
 
-namespace std {
-void __throw_bad_function_call() {
+namespace std
+{
+void __throw_bad_function_call()
+{
     panic();
 }
 
-void __throw_length_error(char const*) {
+void __throw_length_error(char const*)
+{
     panic();
 }
 
-void __throw_bad_alloc() {
+void __throw_bad_alloc()
+{
     panic();
 }
 
-void __throw_logic_error(const char* str) {
+void __throw_logic_error(const char* str)
+{
     panic();
 }
 }
