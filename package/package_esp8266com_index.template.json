@@ -50,7 +50,10 @@
               "name": "WeMos D1 mini"
             },
             {
-              "name": "ESPino"
+              "name": "ESPino (ESP-12 Module)"
+            },
+            {
+              "name": "ESPino (WROOM-02 Module)"
             },
             {
               "name": "WifInfo"
