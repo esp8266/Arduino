@@ -154,3 +154,4 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [WiFiManager](https://github.com/tzapu/WiFiManager) - WiFi Connection manager with web captive portal. If it can't connect, it starts AP mode and a configuration portal so you can choose and enter WiFi credentials.
 - [OneWire](https://github.com/PaulStoffregen/OneWire) - Library for Dallas/Maxim 1-Wire Chips.
 - [Adafruit-PCD8544-Nokia-5110-LCD-Library](https://github.com/WereCatf/Adafruit-PCD8544-Nokia-5110-LCD-library) - Port of the Adafruit PCD8544 - library for the ESP8266.
+- [PCF8574_ESP](https://github.com/WereCatf/PCF8574_ESP) - A very simplistic library for using the PCF8574/PCF8574A I2C 8-pin GPIO-expander.
