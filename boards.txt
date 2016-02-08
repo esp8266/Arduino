@@ -983,7 +983,7 @@ espino.menu.ResetMethod.nodemcu=nodemcu
 espino.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 
 ##############################################################
-espinotee.name=ESPino (WROOM-02 Module)
+espinotee.name=ThaiEasyElec's ESPino
 
 espinotee.upload.tool=esptool
 espinotee.upload.speed=115200
