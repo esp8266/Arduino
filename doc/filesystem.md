@@ -43,6 +43,8 @@ Generic module | 1M | 64k, 128k, 256k, 512k
 Generic module | 2M | 1M
 Generic module | 4M | 3M
 Adafruit HUZZAH | 4M | 1M, 3M
+ESPresso Lite 1.0 | 4M | 1M, 3M
+ESPresso Lite 2.0 | 4M | 1M, 3M
 NodeMCU 0.9    | 4M | 1M, 3M
 NodeMCU 1.0    | 4M | 1M, 3M
 Olimex MOD-WIFI-ESP8266(-DEV)| 2M | 1M

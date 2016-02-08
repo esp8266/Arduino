@@ -4,6 +4,8 @@ title: Supported Hardware
 
 ## Table of contents
   * [Adafruit HUZZAH ESP8266 (ESP\-12)](#adafruit-huzzah-esp8266-esp-12)
+  * [ESPresso Lite 1.0](#espresso-lite)
+  * [ESPresso Lite 2.0](#espresso-lite)
   * [NodeMCU 0\.9 <a name="user\-content\-nodemcu\-0\-9"></a>](#nodemcu-09-)
     * [Pin mapping](#pin-mapping)
   * [NodeMCU 1\.0](#nodemcu-10)
@@ -31,6 +33,11 @@ title: Supported Hardware
 ## Adafruit HUZZAH ESP8266 (ESP-12)
 
 *TODO: add notes*
+
+## ESPresso Lite
+
+The latest Arduino-compatible ESP8266 Wi-Fi development board for makers and novice learners to build their very own Internet-of-Things (IoT) projects.
+
 
 ## NodeMCU 0.9
 
@@ -190,7 +197,7 @@ ESPxx Hardware
 | CH_PD         | PullUp   |                 |
 
 * Note
-	- if no RTS is used a manual power toggle is needed
+  - if no RTS is used a manual power toggle is needed
 
 ### Minimal Hardware Setup for Running only ##
 
