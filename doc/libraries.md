@@ -142,6 +142,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [Blynk](https://github.com/blynkkk/blynk-library) - easy IoT framework for Makers (check out the [Kickstarter page](http://tiny.cc/blynk-kick)).
 - [DallasTemperature](https://github.com/milesburton/Arduino-Temperature-Control-Library.git)
 - [DHT-sensor-library](https://github.com/adafruit/DHT-sensor-library) - Arduino library for the DHT11/DHT22 temperature and humidity sensors. Download latest v1.1.1 library and no changes are necessary.  Older versions should initialize DHT as follows: `DHT dht(DHTPIN, DHTTYPE, 15)`
+- [DimSwitch](https://github.com/krzychb/DimSwitch) - Control electronic dimmable ballasts for fluorescent light tubes remotely as if using a wall switch.
 - [Encoder](https://github.com/PaulStoffregen/Encoder) - Arduino library for rotary encoders. Version 1.4 supports ESP8266.
 - [esp8266_mdns](https://github.com/mrdunk/esp8266_mdns) - mDNS queries and responses on esp8266. Or to describe it another way: An mDNS Client or Bonjour Client library for the esp8266.
 - [NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) - Adafruit's NeoPixel library, now with support for the ESP8266 (use version 1.0.2 or higher from Arduino's library manager).
