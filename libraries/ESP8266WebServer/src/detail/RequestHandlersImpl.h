@@ -127,6 +127,7 @@ public:
         else if (path.endsWith(".pdf")) return "application/pdf";
         else if (path.endsWith(".zip")) return "application/zip";
         else if(path.endsWith(".gz")) return "application/x-gzip";
+        else if (path.endsWith(".appcache")) return "text/cache-manifest";
         return "application/octet-stream";
     }
 
