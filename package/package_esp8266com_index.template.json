@@ -38,6 +38,12 @@
               "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
             },
             {
+              "name": "ESPresso Lite 1.0"
+            },
+            {
+              "name": "ESPresso Lite 2.0"
+            },            
+            {
               "name": "SparkFun Thing"
             },
             {
