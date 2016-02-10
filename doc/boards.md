@@ -29,6 +29,7 @@ title: Supported Hardware
     * [boot mode](#boot-mode)
   * [WeMos D1](#wemos-d1)
   * [WeMos D1 mini](#wemos-d1-mini)
+  * [ESPino by ThaiEasyElec](#espinotee)
 
 ## Adafruit HUZZAH ESP8266 (ESP-12)
 
@@ -271,3 +272,16 @@ Product page: http://wemos.cc
 
 ## WeMos D1 mini
 Product page: http://wemos.cc
+
+## ESPino (WROOM-02 Module) by ThaiEasyElec
+ESPino by ThaiEasyElec using WROOM-02 module from Espressif Systems with 4 MB Flash.
+
+We will update an English description soon.
+- Product page: http://thaieasyelec.com/products/wireless-modules/wifi-modules/espino-wifi-development-board-detail.html
+- Schematics: www.thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_Schematic.pdf
+- Dimensions: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_Dimension.pdf
+- Pinouts: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_User_Manual_TH_v1_0_20160204.pdf (Please see pg. 8)
+
+
+
+

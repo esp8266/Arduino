@@ -1041,7 +1041,7 @@ d1.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
 ##############################################################
 
-espino.name=ESPino
+espino.name=ESPino (ESP-12 Module)
 
 espino.upload.tool=esptool
 espino.upload.speed=115200
@@ -1120,6 +1120,74 @@ espino.menu.ResetMethod.ck=ck
 espino.menu.ResetMethod.ck.upload.resetmethod=ck
 espino.menu.ResetMethod.nodemcu=nodemcu
 espino.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+
+##############################################################
+espinotee.name=ThaiEasyElec's ESPino
+
+espinotee.upload.tool=esptool
+espinotee.upload.speed=115200
+espinotee.upload.resetmethod=nodemcu
+espinotee.upload.maximum_size=1044464
+espinotee.upload.maximum_data_size=81920
+espinotee.upload.wait_for_upload_port=true
+espinotee.serial.disableDTR=true
+espinotee.serial.disableRTS=true
+
+espinotee.build.mcu=esp8266
+espinotee.build.f_cpu=80000000L
+espinotee.build.board=ESP8266_ESP13
+espinotee.build.core=esp8266
+espinotee.build.variant=espinotee
+espinotee.build.flash_mode=qio
+espinotee.build.flash_size=4M
+espinotee.build.flash_freq=40
+
+espinotee.menu.CpuFrequency.80=80 MHz
+espinotee.menu.CpuFrequency.80.build.f_cpu=80000000L
+espinotee.menu.CpuFrequency.160=160 MHz
+espinotee.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+espinotee.menu.UploadTool.esptool=Serial
+espinotee.menu.UploadTool.esptool.upload.tool=esptool
+espinotee.menu.UploadTool.esptool.upload.verbose=-vv
+espinotee.menu.UploadTool.espota=OTA
+espinotee.menu.UploadTool.espota.upload.tool=espota
+
+espinotee.menu.UploadSpeed.115200=115200
+espinotee.menu.UploadSpeed.115200.upload.speed=115200
+espinotee.menu.UploadSpeed.9600=9600
+espinotee.menu.UploadSpeed.9600.upload.speed=9600
+espinotee.menu.UploadSpeed.57600=57600
+espinotee.menu.UploadSpeed.57600.upload.speed=57600
+espinotee.menu.UploadSpeed.256000.windows=256000
+espinotee.menu.UploadSpeed.256000.upload.speed=256000
+espinotee.menu.UploadSpeed.230400.linux=230400
+espinotee.menu.UploadSpeed.230400.macosx=230400
+espinotee.menu.UploadSpeed.230400.macosx=230400
+espinotee.menu.UploadSpeed.230400.upload.speed=230400
+espinotee.menu.UploadSpeed.460800.linux=460800
+espinotee.menu.UploadSpeed.460800.macosx=460800
+espinotee.menu.UploadSpeed.460800.upload.speed=460800
+espinotee.menu.UploadSpeed.512000.windows=512000
+espinotee.menu.UploadSpeed.512000.upload.speed=512000
+espinotee.menu.UploadSpeed.921600=921600
+espinotee.menu.UploadSpeed.921600.upload.speed=921600
+
+espinotee.menu.FlashSize.4M3M=4M (3M SPIFFS)
+espinotee.menu.FlashSize.4M3M.build.flash_size=4M
+espinotee.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+espinotee.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+espinotee.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+espinotee.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+espinotee.menu.FlashSize.4M3M.build.spiffs_pagesize=256
+
+espinotee.menu.FlashSize.4M1M=4M (1M SPIFFS)
+espinotee.menu.FlashSize.4M1M.build.flash_size=4M
+espinotee.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+espinotee.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+espinotee.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+espinotee.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+espinotee.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
 ##############################################################
 wifinfo.name=WifInfo
