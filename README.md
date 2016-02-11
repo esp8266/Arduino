@@ -10,6 +10,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
   - [Using Boards Manager](#installing-with-boards-manager)
   - [Using git version](#using-git-version-)
   - [Using stable version with PlatformIO](#using-stable-version-with-platformio)
+  - [Building with make](#building-with-make)
 - [Documentation](#documentation)
 - [Issues and support](#issues-and-support)
 - [Contributing](#contributing)  
@@ -63,6 +64,12 @@ python get.py
 [PlatformIO](http://platformio.org) is a cross-platform code-builder and library manager for embedded development with no external dependencies. Works on the popular host OS: Mac OS X, Windows, Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard). More details in documentation [What is PlatformIO? How does it work?](http://docs.platformio.org/en/latest/faq.html#general).
 
 See [detailed instructions on how to use Espressif platform with PlatformIO](doc/platformio.md).
+
+### Building with make
+
+[makeEspArduino](https://github.com/plerup/makeEspArduino) is a generic makefile for any ESP8266 Arduino project.
+Using make instead of the Arduino IDE makes it easier to do automated and production builds.
+
 
 ### Documentation
 
