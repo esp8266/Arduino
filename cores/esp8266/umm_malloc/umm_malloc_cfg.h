@@ -6,8 +6,6 @@
 #define _UMM_MALLOC_CFG_H
 
 #include <debug.h>
-#include <ets_sys.h>
-#define printf ets_printf
 /*
  * There are a number of defines you can set at compile time that affect how
  * the memory allocator will operate.
