@@ -45,6 +45,8 @@ Library for calling functions repeatedly with a certain period. Two examples inc
 It is currently not recommended to do blocking IO operations (network, serial, file) from Ticker
 callback functions. Instead, set a flag inside the ticker callback and check for that flag inside the loop function.
 
+Here is library to simplificate `Ticker` usage and avoid WDT reset: [TickerScheduler](https://github.com/Toshik/TickerScheduler)
+
 ## EEPROM
 
 This is a bit different from standard EEPROM class. You need to call `EEPROM.begin(size)`
@@ -152,6 +154,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [Souliss, Smart Home](https://github.com/souliss/souliss) - Framework for Smart Home based on Arduino, Android and openHAB.
 - [ST7735](https://github.com/nzmichaelh/Adafruit-ST7735-Library) - Adafruit's ST7735 library modified to be compatible with ESP8266.  Just make sure to modify the pins in the examples as they are still AVR specific.
 - [Task](https://github.com/Makuna/Task) - Arduino Nonpreemptive multitasking library.  While similiar to the included Ticker library in the functionality provided, this library was meant for cross Arduino compatibility.
+- [TickerScheduler](https://github.com/Toshik/TickerScheduler) - Library provides simple scheduler for `Ticker` to avoid WDT reset
 - [Teleinfo](https://github.com/hallard/LibTeleinfo) - Generic French Power Meter library to read Teleinfo energy monitoring data such as consuption, contract, power, period, ... This library is cross platform, ESP8266, Arduino, Particle, and simple C++. French dedicated [post](https://hallard.me/libteleinfo/) on author's blog and all related information about [Teleinfo](https://hallard.me/category/tinfo/) also available.
 - [UTFT-ESP8266](https://github.com/gnulabis/UTFT-ESP8266) - UTFT display library with support for ESP8266. Only serial interface (SPI) displays are supported for now (no 8-bit parallel mode, etc). Also includes support for the hardware SPI controller of the ESP8266.
 - [WiFiManager](https://github.com/tzapu/WiFiManager) - WiFi Connection manager with web captive portal. If it can't connect, it starts AP mode and a configuration portal so you can choose and enter WiFi credentials.
