@@ -19,57 +19,91 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <debug.h>
-extern "C" {
-#include "ets_sys.h"
-#include "os_type.h"
-#include "osapi.h"
-#include "mem.h"
+#include <Arduino.h>
+#include <cxxabi.h>
+
+using __cxxabiv1::__guard;
+
+void *operator new(size_t size)
+{
+    return malloc(size);
 }
 
-
-void *operator new(size_t size) {
-    size = ((size + 3) & ~((size_t)0x3));
-    return os_malloc(size);
+void *operator new[](size_t size)
+{
+    return malloc(size);
 }
 
-void *operator new[](size_t size) {
-    size = ((size + 3) & ~((size_t)0x3));
-    return os_malloc(size);
+void operator delete(void * ptr)
+{
+    free(ptr);
 }
 
-void operator delete(void * ptr) {
-    os_free(ptr);
-}
-
-void operator delete[](void * ptr) {
-    os_free(ptr);
+void operator delete[](void * ptr)
+{
+    free(ptr);
 }
 
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 extern "C" void __cxa_deleted_virtual(void) __attribute__ ((__noreturn__));
 
-void __cxa_pure_virtual(void) {
+void __cxa_pure_virtual(void)
+{
     panic();
 }
 
-void __cxa_deleted_virtual(void) {
+void __cxa_deleted_virtual(void)
+{
     panic();
 }
 
-namespace std {
-void __throw_bad_function_call() {
+typedef struct {
+    uint8_t guard;
+    uint8_t ps;
+} guard_t;
+
+extern "C" int __cxa_guard_acquire(__guard* pg)
+{
+    uint8_t ps = xt_rsil(15);
+    if (reinterpret_cast<guard_t*>(pg)->guard) {
+        xt_wsr_ps(ps);
+        return 0;
+    }
+    reinterpret_cast<guard_t*>(pg)->ps = ps;
+    return 1;
+}
+
+extern "C" void __cxa_guard_release(__guard* pg)
+{
+    reinterpret_cast<guard_t*>(pg)->guard = 1;
+    xt_wsr_ps(reinterpret_cast<guard_t*>(pg)->ps);
+}
+
+extern "C" void __cxa_guard_abort(__guard* pg)
+{
+    xt_wsr_ps(reinterpret_cast<guard_t*>(pg)->ps);
+}
+
+
+namespace std
+{
+void __throw_bad_function_call()
+{
     panic();
 }
 
-void __throw_length_error(char const*) {
+void __throw_length_error(char const*)
+{
     panic();
 }
 
-void __throw_bad_alloc() {
+void __throw_bad_alloc()
+{
     panic();
 }
 
-void __throw_logic_error(const char* str) {
+void __throw_logic_error(const char* str)
+{
     panic();
 }
 }
