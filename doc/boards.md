@@ -4,8 +4,8 @@ title: Supported Hardware
 
 ## Table of contents
   * [Adafruit HUZZAH ESP8266 (ESP\-12)](#adafruit-huzzah-esp8266-esp-12)
-  * [ESPresso Lite 1.0](#espresso-lite)
-  * [ESPresso Lite 2.0](#espresso-lite)
+  * [ESPresso Lite 1\.0](#espresso-lite-10)
+  * [ESPresso Lite 2\.0](#espresso-lite-20)
   * [NodeMCU 0\.9 <a name="user\-content\-nodemcu\-0\-9"></a>](#nodemcu-09-)
     * [Pin mapping](#pin-mapping)
   * [NodeMCU 1\.0](#nodemcu-10)
@@ -35,9 +35,13 @@ title: Supported Hardware
 
 *TODO: add notes*
 
-## ESPresso Lite
+## ESPresso Lite 1.0
 
-The latest Arduino-compatible ESP8266 Wi-Fi development board for makers and novice learners to build their very own Internet-of-Things (IoT) projects.
+ESPresso Lite 1.0 (beta version) is an Arduino-compatible Wi-Fi development board powered by Espressif System's own ESP8266 WROOM-02 module. It has breadboard-friendly breakout pins with in-built LED, two reset/flash buttons and a user programmable button . The operating voltage is 3.3VDC, regulated with 800mA maximum current. Special distinctive features include on-board I2C pads that allow direct connection to OLED LCD and sensor boards. (Only 500? units were produced for beta testing before it was retired to make way for the improved V2.0 - i presumed we wont be using this design?)
+
+## ESPresso Lite 2.0
+
+ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an earlier V1 (beta version). Re-designed together with Cytron Technologies, the newly-revised ESPresso Lite V2.0 features the auto-load/auto-program function, eliminating the previous need to reset the board manually before flashing a new program. It also feature two user programmable side buttons and a reset button. The special distinctive features of on-board pads for I2C sensor and actuator is retained.
 
 
 ## NodeMCU 0.9
