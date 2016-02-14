@@ -498,6 +498,12 @@
 
 #include "umm_malloc_cfg.h"   /* user-dependent */
 
+#ifdef ESP8266
+#include "osapi.h"
+#define printf os_printf
+#endif
+
+
 #ifndef UMM_FIRST_FIT
 #  ifndef UMM_BEST_FIT
 #    define UMM_BEST_FIT
