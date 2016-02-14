@@ -52,12 +52,24 @@ void * ICACHE_RAM_ATTR __wrap_mem_malloc(size_t size) {
     return malloc(size);
 }
 
+void * ICACHE_RAM_ATTR __wrap_mem_calloc(size_t num, size_t size) {
+    return calloc(num, size);
+}
+
 void * ICACHE_RAM_ATTR __wrap_mem_realloc(void *ptr, size_t size) {
     return realloc(ptr, size);
 }
 
 void * ICACHE_RAM_ATTR __wrap_mem_zalloc(size_t size) {
     return calloc(1, size);
+}
+
+void ICACHE_RAM_ATTR __wrap_mem_init(void) {
+    umm_init();
+}
+
+void * ICACHE_RAM_ATTR __wrap_mem_trim(void *ptr, size_t size) {
+    return ptr;
 }
 
 size_t ICACHE_RAM_ATTR __wrap_xPortGetFreeHeapSize(void) {
