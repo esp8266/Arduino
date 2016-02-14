@@ -37,6 +37,11 @@ size_t ICACHE_RAM_ATTR xPortGetFreeHeapSize(void)
     return umm_free_heap_size();
 }
 
+size_t ICACHE_RAM_ATTR xPortWantedSizeAlign(size_t size)
+{
+    return (size + 3) & ~((size_t) 3);
+}
+
 void system_show_malloc(void)
 {
     umm_info(NULL, 1);
