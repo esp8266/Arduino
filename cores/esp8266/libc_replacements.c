@@ -44,6 +44,13 @@ int ICACHE_RAM_ATTR puts(const char * str) {
     return ets_printf("%s", str);
 }
 
+// newlib has 'putchar' defined to a big scary construct
+#undef putchar
+
+int ICACHE_RAM_ATTR putchar(int c) {
+    return ets_putc(c);
+}
+
 int ICACHE_RAM_ATTR printf(const char* format, ...) {
     int ret;
     va_list arglist;
