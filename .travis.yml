@@ -4,9 +4,9 @@ os:
   - linux
 
 script:
-  - wget http://downloads.arduino.cc/arduino-1.6.5-linux64.tar.xz
-  - tar xf arduino-1.6.5-linux64.tar.xz
-  - mv arduino-1.6.5 $HOME/arduino_ide
+  - wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+  - tar xf arduino.tar.xz
+  - mv arduino-nightly $HOME/arduino_ide
   - cd $HOME/arduino_ide/hardware
   - mkdir esp8266com
   - cd esp8266com

@@ -4,6 +4,8 @@
 unsigned int request_i = 0;
 unsigned int response_i = 0;
 
+String manageRequest(String request);
+
 /* Create the mesh node object */
 ESP8266WiFiMesh mesh_node = ESP8266WiFiMesh(ESP.getChipId(), manageRequest);
 
