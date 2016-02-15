@@ -255,6 +255,8 @@ int wifi_station_set_cert_key(uint8 *client_cert, int client_cert_len,
     uint8 *private_key, int private_key_len,
     uint8 *private_key_passwd, int private_key_passwd_len);
 void wifi_station_clear_cert_key(void);
+int wifi_station_set_username(unsigned char*, int);
+void wifi_station_clear_username(void);
 
 struct softap_config {
     uint8 ssid[32];
