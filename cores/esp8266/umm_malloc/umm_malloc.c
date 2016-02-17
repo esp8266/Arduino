@@ -967,7 +967,7 @@ static void *get_unpoisoned( unsigned char *ptr ) {
 
 UMM_HEAP_INFO ummHeapInfo;
 
-void *umm_info( void *ptr, int force ) {
+void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
 
   unsigned short int blockNo = 0;
 
@@ -1728,7 +1728,7 @@ void umm_free( void *ptr ) {
 
 /* ------------------------------------------------------------------------ */
 
-size_t umm_free_heap_size( void ) {
+size_t ICACHE_FLASH_ATTR umm_free_heap_size( void ) {
   umm_info(NULL, 0);
   return (size_t)ummHeapInfo.freeBlocks * sizeof(umm_block);
 }

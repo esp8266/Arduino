@@ -32,7 +32,7 @@ void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
     return calloc(1, size);
 }
 
-size_t ICACHE_RAM_ATTR xPortGetFreeHeapSize(void)
+size_t xPortGetFreeHeapSize(void)
 {
     return umm_free_heap_size();
 }
