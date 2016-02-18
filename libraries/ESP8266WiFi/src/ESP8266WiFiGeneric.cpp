@@ -316,15 +316,32 @@ void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult) {
     ip_addr_t addr;
     aResult = static_cast<uint32_t>(0);
+
+    if(aResult.fromString(aHostname)) {
+        // Host name is a IP address use it!
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
+        return 1;
+    }
+
+    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
     if(err == ERR_OK) {
         aResult = addr.addr;
     } else if(err == ERR_INPROGRESS) {
         esp_yield();
         // will return here when dns_found_callback fires
+        if(aResult != 0) {
+            err = ERR_OK;
+        }
     }
 
-    return (aResult != 0) ? 1 : 0;
+    if(err != 0) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, err);
+    } else {
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
+    }
+
+    return (err == ERR_OK) ? 1 : 0;
 }
 
 /**

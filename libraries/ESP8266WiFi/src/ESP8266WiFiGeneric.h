@@ -25,6 +25,16 @@
 
 #include "ESP8266WiFiType.h"
 
+#ifdef DEBUG_ESP_WIFI
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_WIFI_GENERIC(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#endif
+#endif
+
+#ifndef DEBUG_WIFI_GENERIC
+#define DEBUG_WIFI_GENERIC(...)
+#endif
+
 typedef void (*WiFiEventCb)(WiFiEvent_t event);
 
 typedef struct {
