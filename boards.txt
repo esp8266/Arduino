@@ -421,6 +421,9 @@ espresso_lite_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 espresso_lite_v1.menu.ResetMethod.ck=ck
 espresso_lite_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 
+espresso_lite_v1.build.debug_port=
+espresso_lite_v1.build.debug_level=
+
 ##############################################################
 espresso_lite_v2.name=ESPresso Lite 2.0
 espresso_lite_v2.upload.tool=esptool
@@ -490,6 +493,9 @@ espresso_lite_v2.menu.ResetMethod.ck=ck
 espresso_lite_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v2.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+
+espresso_lite_v2.build.debug_port=
+espresso_lite_v2.build.debug_level=
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
