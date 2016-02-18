@@ -27,8 +27,12 @@
 
 #define CORE_HAS_LIBB64
 #define CORE_HAS_BASE64_CLASS
+#define CORE_HAS_CXA_GUARD
+#define CORE_HAS_UMM
 
 #define WIFI_HAS_EVENT_CALLBACK
+
+
 
 
 #endif
