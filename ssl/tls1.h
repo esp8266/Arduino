@@ -198,6 +198,7 @@ struct _SSL
     uint8_t read_sequence[8];       /* 64 bit sequence number */
     uint8_t write_sequence[8];      /* 64 bit sequence number */
     uint8_t hmac_header[SSL_RECORD_SIZE];    /* rx hmac */
+    const char host_name[255]; /* Needed for the SNI support */
 };
 
 typedef struct _SSL SSL;

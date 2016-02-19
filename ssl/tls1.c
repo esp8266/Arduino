@@ -1849,6 +1849,19 @@ EXP_FUNC int STDCALL ssl_get_config(int offset)
     }
 }
 
+/**
+ * Sets the SNI hostname
+ */
+EXP_FUNC int STDCALL ssl_set_hostname(const SSL *ssl, const char* host_name) {
+	if(host_name == NULL || strlen(host_name) == 0 || strlen(host_name) > 255 ) {
+		return 0;
+	}
+
+	strncpy((char*)&ssl->host_name, host_name, strlen(host_name));
+
+	return 1;
+}
+
 #ifdef CONFIG_SSL_CERT_VERIFICATION
 /**
  * Authenticate a received certificate.
