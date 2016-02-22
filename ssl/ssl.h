@@ -360,7 +360,7 @@ EXP_FUNC int STDCALL ssl_get_config(int offset);
  * - 1 on success
  * - 0 on failure
  */
-EXP_FUNC int STDCALL ssl_set_hostname(const SSL *ssl, const char* host_name);
+EXP_FUNC int STDCALL ssl_set_hostname(SSL *ssl, const char* host_name);
 
 /**
  * @brief Display why the handshake failed.
