@@ -220,6 +220,26 @@ static int send_client_hello(SSL *ssl)
 
     buf[offset++] = 1;              /* no compression */
     buf[offset++] = 0;
+
+    if (ssl->host_name != NULL) {
+        unsigned int host_len = strlen(ssl->host_name);
+
+        buf[offset++] = 0;
+        buf[offset++] = host_len+9;     /* extensions length */
+
+        buf[offset++] = 0;
+        buf[offset++] = 0;              /* server_name(0) (65535) */
+        buf[offset++] = 0;
+        buf[offset++] = host_len+5;     /* server_name length */
+        buf[offset++] = 0;
+        buf[offset++] = host_len+3;     /* server_list length */
+        buf[offset++] = 0;              /* host_name(0) (255) */
+        buf[offset++] = 0;
+        buf[offset++] = host_len;       /* host_name length */
+        strncpy((char*) &buf[offset], ssl->host_name, host_len);
+        offset += host_len;
+    }
+
     buf[3] = offset - 4;            /* handshake size */
 
     return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, offset);

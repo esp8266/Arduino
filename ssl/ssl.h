@@ -353,6 +353,16 @@ EXP_FUNC int STDCALL ssl_handshake_status(const SSL *ssl);
 EXP_FUNC int STDCALL ssl_get_config(int offset);
 
 /**
+ * @brief Sets the hostname to be used for SNI
+ * @see https://en.wikipedia.org/wiki/Server_Name_Indication
+ * @param char* hostname
+ * @return success from the operation
+ * - 1 on success
+ * - 0 on failure
+ */
+EXP_FUNC int STDCALL ssl_set_hostname(SSL *ssl, const char* host_name);
+
+/**
  * @brief Display why the handshake failed.
  *
  * This call is only useful in a 'full mode' build. The output is to stdout.

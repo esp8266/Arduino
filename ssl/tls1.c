@@ -568,6 +568,8 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
     ssl->encrypt_ctx = malloc(sizeof(AES_CTX));
     ssl->decrypt_ctx = malloc(sizeof(AES_CTX));
 
+    ssl->host_name = NULL;
+
     SSL_CTX_UNLOCK(ssl_ctx->mutex);
     return ssl;
 }
@@ -1847,6 +1849,29 @@ EXP_FUNC int STDCALL ssl_get_config(int offset)
         default:
             return 0;
     }
+}
+
+/**
+ * Sets the SNI hostname
+ */
+EXP_FUNC int STDCALL ssl_set_hostname(SSL *ssl, const char* host_name) {
+    if(host_name == NULL || strlen(host_name) == 0 || strlen(host_name) > 255 ) {
+        return 0;
+    }
+
+    if(ssl->host_name != NULL) {
+        free(ssl->host_name);
+    }
+
+    ssl->host_name = (char *)malloc(strlen(host_name)+1);
+    if(ssl->host_name == NULL) {
+        // most probably there was no memory available
+        return 0;
+    }
+
+    strcpy(ssl->host_name, host_name);
+
+    return 1;
 }
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
