@@ -6,6 +6,8 @@
  */
 #include "lwipr_compat.h"
 
+AxlTcpDataArray axlFdArray;
+
 #include <stdlib.h>
 
 /* High Level "public" functions */
@@ -22,6 +24,34 @@ void axl_init(int capacity) {
  */
 int axl_append(struct tcp_pcb *tcp) {
 	return ax_fd_append(&axlFdArray, tcp);
+}
+
+/**
+ * Frees  the internal mapping from this tcp. Returns the number of occurrences of the tcp
+ */
+int axl_free(struct tcp_pcb *tcp) {
+	int i;
+	int occurances = 0;
+
+	if(tcp == NULL) {
+		return 0;
+	}
+
+	AxlTcpDataArray *vector = &axlFdArray;
+	AXL_DEBUG("AXL: Freeing %d tcp item", vector->size);
+	for (i = 0; i < vector->size; i++) {
+		if (vector->data[i].tcp == tcp) {
+			if(vector->data[i].tcp_pbuf != NULL) {
+				pbuf_free(vector->data[i].tcp_pbuf);
+				vector->data[i].tcp_pbuf = NULL;
+			}
+			vector->data[i].tcp = NULL;
+			vector->data[i].pbuf_offset = 0;
+			occurances++;
+		}
+	}
+
+	return occurances;
 }
 
 /**
@@ -63,9 +93,13 @@ int axl_ssl_read(SSL *ssl, uint8_t **in_data, struct tcp_pcb *tcp, struct pbuf *
 		data->pbuf_offset = 0;
 	}
 
+	AXL_DEBUG("READY TO READ SOME DATA\n");
+
 	tcp_recved(tcp, p->tot_len);
 	do {
+		WATCHDOG_FEED();
 		read_bytes = ssl_read(ssl, in_data);
+		AXL_DEBUG("axl_ssl_read: Read bytes: %d\n", read_bytes);
 		if(read_bytes < SSL_OK) {
 			/* An error has occurred. Give it back for further processing */
 			total_bytes = read_bytes;
@@ -97,6 +131,7 @@ int ax_port_write(int clientfd, uint8_t *buf, uint16_t bytes_needed) {
 	}
 
 	if (data == NULL || data->tcp == NULL || buf == NULL || bytes_needed == 0) {
+		AXL_DEBUG("Return Zero.\n");
 		return 0;
 	}
 
@@ -116,16 +151,17 @@ int ax_port_write(int clientfd, uint8_t *buf, uint16_t bytes_needed) {
 	}
 
 	do {
-		err = tcp_write(data->tcp, buf, tcp_len, TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE);
+		err = tcp_write(data->tcp, buf, tcp_len, TCP_WRITE_FLAG_COPY);
 		if(err < SSL_OK) {
 			AXL_DEBUG("Got error: %d\n", err);
 		}
 
 		if (err == ERR_MEM) {
+			AXL_DEBUG("Not enough memory to write data with length: %d (%d)\n", tcp_len, bytes_needed);
 			tcp_len /= 2;
 		}
 	} while (err == ERR_MEM && tcp_len > 1);
-	AXL_DEBUG("send_raw_packet length %d\n", tcp_len);
+	AXL_DEBUG("send_raw_packet length %d(%d)\n", tcp_len, bytes_needed);
 	if (err == ERR_OK) {
 		err = tcp_output(data->tcp);
 		if(err != ERR_OK) {
@@ -174,6 +210,11 @@ int ax_port_read(int clientfd, uint8_t *buf, int bytes_needed) {
 	pread_buf = NULL;
 
 	return recv_len;
+}
+
+int ax_get_file(const char *filename, uint8_t **buf) {
+    *buf = 0;
+    return 0;
 }
 
 /*

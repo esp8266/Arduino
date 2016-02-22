@@ -3,7 +3,7 @@ If you are using [LWIP raw tcp mode](http://lwip.wikia.com/wiki/Raw/TCP) and wan
 First you have to include the `lwipr_compat.h` header.
 
 ```C
-#include "util/lwipr_compat.h"
+#include "compat/lwipr_compat.h"
 ```
 
 Then in the code block where you initialize the tcp raw connection you should call `axl_init`.

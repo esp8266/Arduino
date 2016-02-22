@@ -8,14 +8,16 @@
 #ifndef LWIPR_COMPAT_H
 #define LWIPR_COMPAT_H
 
-#include <stdint.h>
-
 /*
  * All those functions will run only if LWIP tcp raw mode is used
  */
 #if LWIP_RAW==1
 
-#include "lwip/tcp.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "lwipr_platform.h"
 #include "ssl/ssl.h"
 #include "ssl/tls1.h"
 
@@ -31,7 +33,14 @@
  * Define the AXL_DEBUG function to add debug functionality
  */
 #ifndef AXL_DEBUG
-#define AXL_DEBUG printf
+	#define AXL_DEBUG(...)
+#endif
+
+/**
+ * Define watchdog function to be called during CPU intensive operations.
+ */
+#ifndef WATCHDOG_FEED
+	#define WATCHDOG_FEED()
 #endif
 
 typedef struct {
@@ -47,14 +56,13 @@ typedef struct {
   AxlTcpData *data;     /* array of TcpData objects */
 } AxlTcpDataArray;
 
-AxlTcpDataArray axlFdArray;
-
 /*
  * High Level Functions - these are the ones that should be used directly
  */
 
 void axl_init(int capacity);
 int axl_append(struct tcp_pcb *tcp);
+int axl_free(struct tcp_pcb *tcp);
 
 #define axl_ssl_write(A, B, C) ssl_write(A, B, C)
 int axl_ssl_read(SSL *sslObj, uint8_t **in_data, struct tcp_pcb *tcp, struct pbuf *p);
@@ -77,6 +85,11 @@ void ax_fd_set(AxlTcpDataArray *vector, int index, struct tcp_pcb *tcp);
 void ax_fd_double_capacity_if_full(AxlTcpDataArray *vector);
 void ax_fd_free(AxlTcpDataArray *vector);
 
+
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* LWIP_RAW==1 */
 
 #endif /* LWIPR_COMPAT_H */
