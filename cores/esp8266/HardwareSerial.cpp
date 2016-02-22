@@ -56,6 +56,7 @@ void HardwareSerial::end()
     }
 
     uart_uninit(_uart);
+    _uart = NULL;
 }
 
 void HardwareSerial::swap(uint8_t tx_pin)
