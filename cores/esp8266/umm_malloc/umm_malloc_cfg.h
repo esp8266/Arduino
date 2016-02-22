@@ -7,7 +7,7 @@
 
 #include <debug.h>
 #ifdef __cplusplus
-#extern "C" {
+extern "C" {
 #endif
 #include "c_types.h"
 #ifdef __cplusplus

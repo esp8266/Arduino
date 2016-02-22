@@ -12,6 +12,10 @@
 
 #include "umm_malloc_cfg.h"   /* user-dependent */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct UMM_HEAP_INFO_t {
   unsigned short int totalEntries;
   unsigned short int usedEntries;
@@ -38,6 +42,9 @@ void umm_free( void *ptr );
 
 size_t umm_free_heap_size( void );
 
+#ifdef __cplusplus
+}
+#endif
 
 /* ------------------------------------------------------------------------ */
 
