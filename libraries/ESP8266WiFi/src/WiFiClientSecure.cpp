@@ -352,7 +352,33 @@ static bool parseHexNibble(char pb, uint8_t* res) {
     return false;
 }
 
-bool WiFiClientSecure::verify(const char* fp, const char* url) {
+// Compare a name from certificate and domain name, return true if they match
+static bool matchName(const String& name, const String& domainName)
+{
+    int wildcardPos = name.indexOf('*');
+    if (wildcardPos == -1) {
+        // Not a wildcard, expect an exact match
+        return name == domainName;
+    }
+    int firstDotPos = name.indexOf('.');
+    if (wildcardPos > firstDotPos) {
+        // Wildcard is not part of leftmost component of domain name
+        // Do not attempt to match (rfc6125 6.4.3.1)
+        return false;
+    }
+    if (wildcardPos != 0 || firstDotPos != 1) {
+        // Matching of wildcards such as baz*.example.com and b*z.example.com
+        // is optional. Maybe implement this in the future?
+        return false;
+    }
+    int domainNameFirstDotPos = domainName.indexOf('.');
+    if (domainNameFirstDotPos < 0) {
+        return false;
+    }
+    return domainName.substring(domainNameFirstDotPos) == name.substring(firstDotPos);
+}
+
+bool WiFiClientSecure::verify(const char* fp, const char* domain_name) {
     if (!_ssl)
         return false;
 
@@ -380,9 +406,26 @@ bool WiFiClientSecure::verify(const char* fp, const char* url) {
         return false;
     }
 
-    //TODO: check URL against certificate
+    DEBUGV("domain name: '%s'\r\n", (domain_name)?domain_name:"(null)");
+    String domain_name_str(domain_name);
+    domain_name_str.toLowerCase();
 
-    return true;
+    const char* san = NULL;
+    int i = 0;
+    while((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != NULL) {
+        if (matchName(String(san), domain_name_str)) {
+            return true;
+        }
+        DEBUGV("SAN %d: '%s', no match\r\n", i, san);
+        ++i;
+    }
+    const char* common_name = ssl_get_cert_dn(*_ssl, SSL_X509_CERT_COMMON_NAME);
+    if (common_name && matchName(String(common_name), domain_name_str)) {
+        return true;
+    }
+    DEBUGV("CN: '%s', no match\r\n", (common_name)?common_name:"(null)");
+
+    return false;
 }
 
 void WiFiClientSecure::setCertificate(const uint8_t* cert_data, size_t size) {
