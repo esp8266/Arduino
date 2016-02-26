@@ -190,8 +190,6 @@ struct _SSL
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     X509_CTX *x509_ctx;
 #endif
-    uint8_t* fingerprint;
-
     uint8_t session_id[SSL_SESSION_ID_SIZE]; 
     uint8_t client_mac[SHA1_SIZE];  /* for HMAC verification */
     uint8_t server_mac[SHA1_SIZE];  /* for HMAC verification */

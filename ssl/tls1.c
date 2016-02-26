@@ -52,6 +52,7 @@ static int set_key_block(SSL *ssl, int is_write);
 static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len);
 static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt, void* cached);
 static int send_raw_packet(SSL *ssl, uint8_t protocol);
+static void certificate_free(SSL* ssl);
 
 /**
  * The server will pick the cipher based on the order that the order that the
@@ -247,8 +248,8 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
     free(ssl->encrypt_ctx);
     free(ssl->decrypt_ctx);
     disposable_free(ssl);
+    certificate_free(ssl);
     free(ssl->bm_all_data);
-    free(ssl->fingerprint);
     free(ssl);
 }
 
@@ -257,6 +258,9 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
  */
 EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 {
+    if (ssl->hs_status == SSL_OK) {
+        certificate_free(ssl);
+    }
     int ret = basic_read(ssl, in_data);
 
     /* check for return code so we can send an alert */
@@ -281,7 +285,9 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
 {
     int n = out_len, nw, i, tot = 0;
-
+    if (ssl->hs_status == SSL_OK) {
+        certificate_free(ssl);
+    }
     /* maximum size of a TLS packet is around 16kB, so fragment */
     do 
     {
@@ -547,7 +553,6 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
 #endif
     disposable_new(ssl);
-    ssl->fingerprint = 0;
 
     /* a bit hacky but saves a few bytes of memory */
     ssl->flag |= ssl_ctx->options;
@@ -1671,12 +1676,17 @@ void disposable_free(SSL *ssl)
         free(ssl->dc);
         ssl->dc = NULL;
     }
+}
+
+static void certificate_free(SSL* ssl)
+{
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     if (ssl->x509_ctx) {
         x509_free(ssl->x509_ctx);
         ssl->x509_ctx = 0;
     }
 #endif
+    increase_bm_data_size(ssl);
 }
 
 #ifndef CONFIG_SSL_SKELETON_MODE     /* no session resumption in this mode */
@@ -1945,9 +1955,21 @@ error:
 
 EXP_FUNC int STDCALL ssl_match_fingerprint(const SSL *ssl, const uint8_t* fp)
 {
-    if (!ssl->fingerprint)
+    if (ssl->x509_ctx == NULL || ssl->x509_ctx->fingerprint == NULL)
         return 1;
-    return memcmp(ssl->fingerprint, fp, SHA1_SIZE);
+    int res = memcmp(ssl->x509_ctx->fingerprint, fp, SHA1_SIZE);
+    if (res != 0) {
+        printf("cert FP: ");
+        for (int i = 0; i < SHA1_SIZE; ++i) {
+            printf("%02X ", ssl->x509_ctx->fingerprint[i]);
+        }
+        printf("\r\ntest FP: ");
+        for (int i = 0; i < SHA1_SIZE; ++i) {
+            printf("%02X ", fp[i]);
+        }
+        printf("\r\n");
+    }
+    return res;
 }
 
 #endif /* CONFIG_SSL_CERT_VERIFICATION */
