@@ -45,13 +45,26 @@ size_t ICACHE_FLASH_ATTR Print::write(const uint8_t *buffer, size_t size) {
 }
 
 size_t Print::printf(const char *format, ...) {
-  va_list arg;
-  va_start(arg, format);
-  char temp[1460];
-  size_t len = ets_vsnprintf(temp, 1460, format, arg);
-  len = print(temp);
-  va_end(arg);
-  return len;
+    va_list arg;
+    va_start(arg, format);
+    char temp[64];
+    char* buffer = temp;
+    size_t len = vsnprintf(temp, sizeof(temp), format, arg);
+    va_end(arg);
+    if (len > sizeof(temp) - 1) {
+        buffer = new char[len + 1];
+        if (!buffer) {
+            return 0;
+        }
+        va_start(arg, format);
+        vsnprintf(buffer, len + 1, format, arg);
+        va_end(arg);
+    }
+    len = write((const uint8_t*) buffer, len);
+    if (buffer != temp) {
+        delete[] buffer;
+    }
+    return len;
 }
 
 size_t ICACHE_FLASH_ATTR Print::print(const __FlashStringHelper *ifsh) {
