@@ -30,7 +30,7 @@ compiler.S.flags=-c -g -x assembler-with-cpp -MMD -mlongcalls
 compiler.c.elf.flags=-g {compiler.warning_flags} -Os -nostdlib -Wl,--no-check-sections -u call_user_start -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/ld" "-T{build.flash_ld}" -Wl,--gc-sections -Wl,-wrap,system_restart_local -Wl,-wrap,register_chipv6_phy
 
 compiler.c.elf.cmd=xtensa-lx106-elf-gcc
-compiler.c.elf.libs=-lm -lgcc -lhal -lphy -lpp -lnet80211 -llwip -lwpa -lcrypto -lmain -lwps -laxtls -lsmartconfig -lmesh
+compiler.c.elf.libs=-lm -lgcc -lhal -lphy -lpp -lnet80211 -llwip -lwpa -lcrypto -lmain -lwps -laxtls -lsmartconfig -lmesh -lwpa2
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
 compiler.cpp.flags=-c {compiler.warning_flags} -Os -g -mlongcalls -mtext-section-literals -fno-exceptions -fno-rtti -falign-functions=4 -std=c++11 -MMD -ffunction-sections -fdata-sections
