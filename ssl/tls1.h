@@ -189,6 +189,7 @@ struct _SSL
 #endif
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     X509_CTX *x509_ctx;
+    bool can_increase_data_size;
 #endif
     uint8_t session_id[SSL_SESSION_ID_SIZE]; 
     uint8_t client_mac[SHA1_SIZE];  /* for HMAC verification */
@@ -261,7 +262,6 @@ void remove_ca_certs(CA_CERT_CTX *ca_cert_ctx);
 #ifdef CONFIG_SSL_ENABLE_CLIENT
 int do_client_connect(SSL *ssl);
 #endif
-void increase_bm_data_size(SSL *ssl);
 
 #ifdef CONFIG_SSL_FULL_MODE
 void DISPLAY_STATE(SSL *ssl, int is_send, uint8_t state, int not_ok);

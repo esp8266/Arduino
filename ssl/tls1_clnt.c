@@ -119,6 +119,7 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 
         case HS_FINISHED:
             ret = process_finished(ssl, buf, hs_len);
+            ssl->can_increase_data_size = true;
             disposable_free(ssl);
             /* note: client renegotiation is not allowed after this */
             break;

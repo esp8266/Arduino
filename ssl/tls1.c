@@ -53,6 +53,7 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len);
 static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt, void* cached);
 static int send_raw_packet(SSL *ssl, uint8_t protocol);
 static void certificate_free(SSL* ssl);
+static int increase_bm_data_size(SSL *ssl);
 
 /**
  * The server will pick the cipher based on the order that the order that the
@@ -258,10 +259,11 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
  */
 EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 {
-    if (ssl->hs_status == SSL_OK) {
-        certificate_free(ssl);
+    int ret = increase_bm_data_size(ssl);
+    if (ret != SSL_OK) {
+        return ret;
     }
-    int ret = basic_read(ssl, in_data);
+    ret = basic_read(ssl, in_data);
 
     /* check for return code so we can send an alert */
     if (ret < SSL_OK && ret != SSL_CLOSE_NOTIFY)
@@ -285,8 +287,9 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
 {
     int n = out_len, nw, i, tot = 0;
-    if (ssl->hs_status == SSL_OK) {
-        certificate_free(ssl);
+    int ret = increase_bm_data_size(ssl);
+    if (ret != SSL_OK) {
+        return ret;
     }
     /* maximum size of a TLS packet is around 16kB, so fragment */
     do 
@@ -549,6 +552,7 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
     ssl->flag = SSL_NEED_RECORD;
     ssl->bm_data = ssl->bm_all_data + BM_RECORD_OFFSET; /* space at the start */
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
+    ssl->can_increase_data_size = false;
 #ifdef CONFIG_ENABLE_VERIFICATION
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
 #endif
@@ -1405,21 +1409,25 @@ error:
     return ret;
 }
 
-void increase_bm_data_size(SSL *ssl)
+int increase_bm_data_size(SSL *ssl)
 {
-    if (ssl->max_plain_length == RT_MAX_PLAIN_LENGTH) {
-        return;
+    if (!ssl->can_increase_data_size ||
+        ssl->max_plain_length == RT_MAX_PLAIN_LENGTH) {
+        return SSL_OK;
     }
-
+    ssl->can_increase_data_size = false;
+    certificate_free(ssl);
     free(ssl->bm_all_data);
     ssl->bm_data = 0;
     ssl->bm_all_data = malloc(RT_MAX_PLAIN_LENGTH + RT_EXTRA);
     if (!ssl->bm_all_data) {
         printf("failed to grow plain buffer\r\n");
-        return;
+        ssl->hs_status == SSL_ERROR_DEAD;
+        return SSL_ERROR_CONN_LOST;
     }
     ssl->max_plain_length = RT_MAX_PLAIN_LENGTH;
     ssl->bm_data = ssl->bm_all_data + BM_RECORD_OFFSET;
+    return SSL_OK;
 }
 
 /**
@@ -1686,7 +1694,6 @@ static void certificate_free(SSL* ssl)
         ssl->x509_ctx = 0;
     }
 #endif
-    increase_bm_data_size(ssl);
 }
 
 #ifndef CONFIG_SSL_SKELETON_MODE     /* no session resumption in this mode */
