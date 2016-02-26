@@ -1,0 +1,43 @@
+sudo: false
+language: bash
+os:
+  - linux
+
+script:
+  # Download Arduino IDE
+  - wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+  - tar xf arduino.tar.xz
+  - mv arduino-nightly $HOME/arduino_ide
+  # Download ESP8266 Arduino core
+  - cd $HOME/arduino_ide/hardware
+  - mkdir esp8266com
+  - cd esp8266com
+  - git clone https://github.com/esp8266/Arduino.git esp8266
+  - cd esp8266
+  - export ESP8266_ARDUINO_DIR="$PWD"
+  # Download toolchain and esptool
+  - cd tools
+  - python get.py
+  - export PATH="$PATH:$PWD/xtensa-lx106-elf/bin"
+  # Build axTLS
+  - cd $TRAVIS_BUILD_DIR
+  - make
+  # Copy the library into Arduino core
+  - cp bin/libaxtls.a $ESP8266_ARDUINO_DIR/tools/sdk/lib/libaxtls.a
+  # Try building examples in ESP8266WiFi library from the ESP8266 Arduino core
+  - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
+  - sleep 3
+  - export DISPLAY=:1.0
+  - export PATH="$HOME/arduino_ide:$PATH"
+  - which arduino
+  - cd $ESP8266_ARDUINO_DIR
+  - source tests/common.sh
+  - arduino --board esp8266com:esp8266:generic --save-prefs
+  - arduino --get-pref sketchbook.path
+  - build_sketches arduino $ESP8266_ARDUINO_DIR/libraries/ESP8266WiFi/examples/HTTPSRequest
+  # Feel free to add more test cases (for other environments) here
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change

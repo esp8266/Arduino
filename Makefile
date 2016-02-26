@@ -1,5 +1,3 @@
-include Makefile.local
-
 TOOLCHAIN_PREFIX := xtensa-lx106-elf-
 CC := $(TOOLCHAIN_PREFIX)gcc
 AR := $(TOOLCHAIN_PREFIX)ar
