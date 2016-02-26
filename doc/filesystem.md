@@ -38,7 +38,7 @@ File system size depends on the flash chip size. Depending on the board which is
 
 Board | Flash chip size, bytes | File system size, bytes
 ------|-----------------|-----------------
-Generic module | 512k | 64k
+Generic module | 512k | 64k, 128k
 Generic module | 1M | 64k, 128k, 256k, 512k
 Generic module | 2M | 1M
 Generic module | 4M | 3M
