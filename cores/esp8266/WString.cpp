@@ -156,9 +156,11 @@ unsigned char ICACHE_FLASH_ATTR String::changeBuffer(unsigned int maxStrLen) {
     char *newbuffer = (char *) malloc(newSize);
     if(newbuffer) {
         memset(newbuffer, 0, newSize);
-        memcpy(newbuffer, buffer, len);
         if (buffer)
+        {
+            memcpy(newbuffer, buffer, len);
             free(buffer);
+        }
         capacity = newSize - 1;
         buffer = newbuffer;
         return 1;
