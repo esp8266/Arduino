@@ -1402,15 +1402,19 @@ error:
 
 void increase_bm_data_size(SSL *ssl)
 {
-    uint8_t* pr = (uint8_t*) realloc(ssl->bm_all_data, RT_MAX_PLAIN_LENGTH + RT_EXTRA);
-    if (pr) {
-        ssl->max_plain_length = RT_MAX_PLAIN_LENGTH;
-        ssl->bm_all_data = pr;
-        ssl->bm_data = pr + BM_RECORD_OFFSET;
+    if (ssl->max_plain_length == RT_MAX_PLAIN_LENGTH) {
+        return;
     }
-    else {
+
+    free(ssl->bm_all_data);
+    ssl->bm_data = 0;
+    ssl->bm_all_data = malloc(RT_MAX_PLAIN_LENGTH + RT_EXTRA);
+    if (!ssl->bm_all_data) {
         printf("failed to grow plain buffer\r\n");
+        return;
     }
+    ssl->max_plain_length = RT_MAX_PLAIN_LENGTH;
+    ssl->bm_data = ssl->bm_all_data + BM_RECORD_OFFSET;
 }
 
 /**
