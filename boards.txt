@@ -71,6 +71,14 @@ generic.menu.UploadSpeed.512000.upload.speed=512000
 generic.menu.UploadSpeed.921600=921600
 generic.menu.UploadSpeed.921600.upload.speed=921600
 
+generic.menu.FlashSize.512K128=512K (128K SPIFFS)
+generic.menu.FlashSize.512K128.build.flash_size=512K
+generic.menu.FlashSize.512K128.build.flash_ld=eagle.flash.512k128.ld
+generic.menu.FlashSize.512K128.build.spiffs_start=0x5B000
+generic.menu.FlashSize.512K128.build.spiffs_end=0x7B000
+generic.menu.FlashSize.512K128.build.spiffs_blocksize=4096
+generic.menu.FlashSize.512K128.upload.maximum_size=368624
+
 generic.menu.FlashSize.512K64=512K (64K SPIFFS)
 generic.menu.FlashSize.512K64.build.flash_size=512K
 generic.menu.FlashSize.512K64.build.flash_ld=eagle.flash.512k64.ld
