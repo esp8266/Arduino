@@ -111,8 +111,8 @@ static uint32_t interrupt_reg = 0;
 
 void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
   uint32_t status = GPIE;
-  uint32_t levels = GPI;
   GPIEC = status;//clear them interrupts
+  uint32_t levels = GPI;
   if(status == 0 || interrupt_reg == 0) return;
   ETS_GPIO_INTR_DISABLE();
   int i = 0;
