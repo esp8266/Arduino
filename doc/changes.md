@@ -25,6 +25,14 @@ title: Change Log
 - Fix pwm first step getting skipped
 - Update SDK to 1.5.1_16_01_08
 - HardwareSerial: allow mapping of UART0 TX to GPIO2
+- Add 128K SPIFFS for 512KB modules
+- Reduce stack usage by Print::printf
+- Fix a crash in String::changeBuffer()
+- Implement static initialization guards (#500)
+- Implementation of Tone API using timer1
+- Use umm_malloc for heap management
+- Configurable I2C clock stretching limit
+- Add a new board entry for the SparkFun Thing Dev
 
 ### Libraries
 
@@ -50,10 +58,18 @@ title: Change Log
 - EEPROM: optimised `_dirty` flag
 - ESP8266mDNS: advertise all hosted services
 - Remove bundled OneWire - ESP8266 support has been merged in the official OneWire sources
+- WiFiClientSecure: don't panic if memory allocation fails
+- Verify domain name in WiFiClientSecure::verify
+- Speed up WiFi.hostByName when the hostname is actually an IP
+- Fix WiFi scan issue (#1355)
+- Workaround for LwIP not handling ERR_ABRT
+- Servo value read and write fixes
 
 ### Tools
 
 - espota.py: add support for manually selecting ip and port for host side
+- Update esptool to 0.4.7
+- Make espota compatible with python 3.5
 
 ---
 ## 2.0.0
