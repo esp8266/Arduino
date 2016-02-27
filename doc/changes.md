@@ -77,7 +77,7 @@ Package link: `http://arduino.esp8266.com/versions/2.1.0/package_esp8266com_inde
 ### Tools
 
 - espota.py: add support for manually selecting ip and port for host side
-- Update esptool to 0.4.7
+- Update esptool to 0.4.8
 - Make espota compatible with python 3.5
 
 ---
