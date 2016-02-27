@@ -6,24 +6,33 @@ title: Change Log
 
 ### Core
 
-- Add function to know last reset resaon.
+### Libraries
+
+### Tools
+
+---
+## 2.1.0
+February 27, 2016
+
+Package link: `http://arduino.esp8266.com/versions/2.1.0/package_esp8266com_index.json`.
+
+### Core
+
+- Add function to know last reset reason.
 - Allow control of enabling debug and debug level from IDE
-- Make HardwareSerial::begin() and end() interrupt safe
-- Put HardwareSerial and cbuf methods called from interrupt context in RAM
-- Re-enable interrupts before directly enqueuing characters in the UART FIFO
 - Add espduino board
 - Rework StreamString::write to use String internal buffer directly (#1289)
 - Add function to measure stack high water mark
 - Fix RAM corruption caused by our hook of register_chipv6_phy(init_data*).
 - Optimize PWM interrupt handler for better precision
 - Add warning levels configurable through Preferences
-- Protect HardwareSerial's cbuf usage with InterruptLock
 - SPIFFS: check if path length is valid (#1089)
 - Set CPU frequency before running setup
 - Add core_esp8266_features.h to be able to detect the features and libraries included in the ESP core
-- Added ESPino to supported boards
+- Add ESPino to supported boards
 - Fix pwm first step getting skipped
 - Update SDK to 1.5.1_16_01_08
+- Bufferless and interruptless HardwareSerial
 - HardwareSerial: allow mapping of UART0 TX to GPIO2
 - Add 128K SPIFFS for 512KB modules
 - Reduce stack usage by Print::printf
