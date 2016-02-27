@@ -34,7 +34,7 @@ If you find this forum or the ESP8266 Boards Manager package useful, please cons
 ##### Stable version ![](http://arduino.esp8266.com/stable/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.0.0/](http://esp8266.github.io/Arduino/versions/2.0.0/)
+Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0/](http://esp8266.github.io/Arduino/versions/2.1.0/)
 
 ##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
