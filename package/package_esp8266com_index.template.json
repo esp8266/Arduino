@@ -72,7 +72,7 @@
             {
               "packager": "esp8266",
               "name": "esptool",
-              "version": "0.4.7"
+              "version": "0.4.8"
             },
             {
               "packager": "esp8266",
@@ -90,42 +90,42 @@
       "tools": [
         {
           "name": "esptool",
-          "version": "0.4.7",
+          "version": "0.4.8",
           "systems": [
             {
               "host": "i686-mingw32",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.7/esptool-0.4.7-win32.zip",
-              "archiveFileName": "esptool-0.4.7-win32.zip",
-              "checksum": "SHA-256:27f149ab180b5faf597e464aecd4202a48f2a78c2262a79aec0cf09d0d834f96",
-              "size": "32195"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-win32.zip",
+              "archiveFileName": "esptool-0.4.8-win32.zip",
+              "checksum": "SHA-256:8d09cb0df6234c2a0562389ceedd11482b44a3f538695f9a4df80f9f10411ece",
+              "size": "32192"
             },
             {
               "host": "x86_64-apple-darwin",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.7/esptool-0.4.7-osx.tar.gz",
-              "archiveFileName": "esptool-0.4.7-osx.tar.gz",
-              "checksum": "SHA-256:a242137d4b173d6843f2584ac0bd9353214fdcf674d7306d5f81defe4d17ba6f",
-              "size": "28774"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-osx.tar.gz",
+              "archiveFileName": "esptool-0.4.8-osx.tar.gz",
+              "checksum": "SHA-256:2bcbf19934543fb06c505b2a595b68a76e4cab8e3d8968a4d1802195c87126cf",
+              "size": "28798"
             },
             {
               "host": "i386-apple-darwin",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.7/esptool-0.4.7-osx.tar.gz",
-              "archiveFileName": "esptool-0.4.7-osx.tar.gz",
-              "checksum": "SHA-256:a242137d4b173d6843f2584ac0bd9353214fdcf674d7306d5f81defe4d17ba6f",
-              "size": "28774"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-osx.tar.gz",
+              "archiveFileName": "esptool-0.4.8-osx.tar.gz",
+              "checksum": "SHA-256:2bcbf19934543fb06c505b2a595b68a76e4cab8e3d8968a4d1802195c87126cf",
+              "size": "28798"
             },
             {
               "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.7/esptool-0.4.7-linux64.tar.gz",
-              "archiveFileName": "esptool-0.4.7-linux64.tar.gz",
-              "checksum": "SHA-256:259f6897a9506a90d96acf007148f5087bf281f9bf4b8ff743ea1dd18a1b4152",
-              "size": "15469"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux64.tar.gz",
+              "archiveFileName": "esptool-0.4.8-linux64.tar.gz",
+              "checksum": "SHA-256:1cd9a6014bbbc37ba6dc249f4fc027f0ca9bbc6dd0e203ebc7d146dfd78a6e78",
+              "size": "15479"
             },
             {
               "host": "i686-pc-linux-gnu",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.7/esptool-0.4.7-linux32.tar.gz",
-              "archiveFileName": "esptool-0.4.7-linux32.tar.gz",
-              "checksum": "SHA-256:2e003bc121727057c760bb43e1987636936276c478aefa6c5740a644e7ae5844",
-              "size": "15450"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux32.tar.gz",
+              "archiveFileName": "esptool-0.4.8-linux32.tar.gz",
+              "checksum": "SHA-256:b0d6e71e6f41d4ed7e167bb4b3f4f0b1b3e49d69af50ab7fbe952cbfed83f164",
+              "size": "15444"
             }
           ]
         },
