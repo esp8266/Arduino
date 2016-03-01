@@ -91,6 +91,8 @@ Please provide as much context as possible: version which you are using (you can
 
 For minor fixes of code and documentation, go ahead and submit a pull request.
 
+Check out the list of issues which are easy to fix — [easy issues for 2.2.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.2.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
+
 Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed [in the chat](https://gitter.im/esp8266/Arduino) first.
 
 Feature branches with lots of small commits (especially titled "oops", "fix typo", "forgot to add file", etc.) should be squashed before opening a pull request. At the same time, please refrain from putting multiple unrelated changes into a single pull request.
