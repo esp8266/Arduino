@@ -1,9 +1,9 @@
-/* 
+/*
  core_esp8266_noniso.c - nonstandard (but usefull) conversion functions
 
  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
@@ -24,10 +24,11 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <math.h>
 #include "stdlib_noniso.h"
-#include "ets_sys.h"
 
-#define sprintf ets_sprintf
 
 int atoi(const char* s) {
     return (int) atol(s);
@@ -149,7 +150,7 @@ char* ultoa(unsigned long value, char* result, int base) {
 
 char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     bool negative = false;
-    
+
     if (isnan(number)) {
         strcpy(s, "nan");
         return s;
@@ -160,12 +161,12 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     }
 
     char* out = s;
-   
+
     int fillme = width; // how many cells to fill for the integer part
     if (prec > 0) {
         fillme -= (prec+1);
-    } 
-   
+    }
+
     // Handle negative numbers
     if (number < 0.0) {
         negative = true;
@@ -177,40 +178,40 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     // I optimized out most of the divisions
     double rounding = 2.0;
     for (uint8_t i = 0; i < prec; ++i)
-        rounding *= 10.0;     
-    rounding = 1.0 / rounding; 
+        rounding *= 10.0;
+    rounding = 1.0 / rounding;
 
     number += rounding;
-   
+
     // Figure out how big our number really is
     double tenpow = 1.0;
     int digitcount = 1;
     while (number >= 10.0 * tenpow) {
-        tenpow *= 10.0;   
+        tenpow *= 10.0;
         digitcount++;
     }
-   
+
     number /= tenpow;
     fillme -= digitcount;
-   
+
     // Pad unused cells with spaces
     while (fillme-- > 0) {
         *out++ = ' ';
     }
-    
+
     // Handle negative sign
     if (negative) *out++ = '-';
-   
+
     // Print the digits, and if necessary, the decimal point
     digitcount += prec;
     int8_t digit = 0;
-    while (digitcount-- > 0) {       
+    while (digitcount-- > 0) {
         digit = (int8_t)number;
         if (digit > 9) digit = 9; // insurance
         *out++ = (char)('0' | digit);
         if ((digitcount == prec) && (prec > 0)) {
             *out++ = '.';
-        }   
+        }
         number -= digit;
         number *= 10.0;
     }
@@ -219,5 +220,3 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
     *out = 0;
     return s;
 }
-
-

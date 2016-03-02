@@ -21,8 +21,8 @@
 #ifndef FS_H
 #define FS_H
 
-#include <Arduino.h>
 #include <memory>
+#include <Arduino.h>
 
 namespace fs {
 
