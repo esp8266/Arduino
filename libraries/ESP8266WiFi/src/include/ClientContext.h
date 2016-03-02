@@ -274,6 +274,9 @@ class ClientContext {
             if(pb == 0) // connection closed
             {
                 DEBUGV(":rcl\r\n");
+                if (_send_waiting) {
+                    esp_schedule();
+                }
                 abort();
                 return ERR_ABRT;
             }
