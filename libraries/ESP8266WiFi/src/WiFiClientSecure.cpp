@@ -66,7 +66,7 @@ class SSLContext {
 public:
     SSLContext() {
         if (_ssl_ctx_refcnt == 0) {
-            _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS, 0);
+            _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS, 0);
         }
         ++_ssl_ctx_refcnt;
     }
@@ -93,8 +93,21 @@ public:
         }
     }
 
-    void connect(ClientContext* ctx) {
+    void connect(ClientContext* ctx, uint32_t timeout_ms) {
         _ssl = ssl_client_new(_ssl_ctx, reinterpret_cast<int>(ctx), nullptr, 0);
+        uint32_t t = millis();
+
+        while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
+            uint8_t* data;
+            int rc = ssl_read(_ssl, &data);
+            if (rc < SSL_OK) {
+                break;
+            }
+        }
+    }
+
+    bool connected() {
+        return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
     }
 
     int read(uint8_t* dst, size_t size) {
@@ -246,7 +259,7 @@ int WiFiClientSecure::_connectSSL() {
 
     _ssl = new SSLContext;
     _ssl->ref();
-    _ssl->connect(_client);
+    _ssl->connect(_client, 5000);
 
     auto status = ssl_handshake_status(*_ssl);
     if (status != SSL_OK) {
@@ -265,6 +278,11 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size) {
     int rc = ssl_write(*_ssl, buf, size);
     if (rc >= 0)
         return rc;
+
+    if (rc != SSL_CLOSE_NOTIFY) {
+        _ssl->unref();
+        _ssl = nullptr;
+    }
 
     return 0;
 }
@@ -318,17 +336,25 @@ int WiFiClientSecure::available() {
     return _ssl->available();
 }
 
+
+/*
+SSL     TCP     RX data     connected
+null    x       x           N
+!null   x       Y           Y
+Y       Y       x           Y
+x       N       N           N
+err     x       N           N
+*/
 uint8_t WiFiClientSecure::connected() {
-    if (!_client)
-        return 0;
-
-    if (_client->state() == ESTABLISHED)
-        return 1;
-
-    if (!_ssl)
-        return 0;
-
-    return _ssl->available() > 0;
+    if (_ssl) {
+        if (_ssl->available()) {
+            return true;
+        }
+        if (_client && _client->state() == ESTABLISHED && _ssl->connected()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void WiFiClientSecure::stop() {
