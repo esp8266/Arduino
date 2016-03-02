@@ -257,7 +257,7 @@ public:
         return size;
     }
 
-    void send(ip_addr_t* addr = 0, uint16_t port = 0)
+    bool send(ip_addr_t* addr = 0, uint16_t port = 0)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
@@ -284,9 +284,13 @@ public:
             _pcb->ttl = _multicast_ttl;
         }
 
-        udp_sendto(_pcb, tx_copy, addr, port);
+        err_t err = udp_sendto(_pcb, tx_copy, addr, port);
+        if (err != ERR_OK) {
+            DEBUGV(":ust rc=%d\r\n", err);
+        }
         _pcb->ttl = old_ttl;
         pbuf_free(tx_copy);
+        return err == ERR_OK;
     }
 
 private:
