@@ -1415,16 +1415,16 @@ int increase_bm_data_size(SSL *ssl)
         ssl->max_plain_length == RT_MAX_PLAIN_LENGTH) {
         return SSL_OK;
     }
-    ssl->can_increase_data_size = false;
     certificate_free(ssl);
     free(ssl->bm_all_data);
     ssl->bm_data = 0;
     ssl->bm_all_data = malloc(RT_MAX_PLAIN_LENGTH + RT_EXTRA);
     if (!ssl->bm_all_data) {
         printf("failed to grow plain buffer\r\n");
-        ssl->hs_status == SSL_ERROR_DEAD;
+        ssl->hs_status = SSL_ERROR_DEAD;
         return SSL_ERROR_CONN_LOST;
     }
+    ssl->can_increase_data_size = false;
     ssl->max_plain_length = RT_MAX_PLAIN_LENGTH;
     ssl->bm_data = ssl->bm_all_data + BM_RECORD_OFFSET;
     return SSL_OK;
