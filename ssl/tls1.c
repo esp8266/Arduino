@@ -259,11 +259,7 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
  */
 EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 {
-    int ret = increase_bm_data_size(ssl);
-    if (ret != SSL_OK) {
-        return ret;
-    }
-    ret = basic_read(ssl, in_data);
+    int ret = basic_read(ssl, in_data);
 
     /* check for return code so we can send an alert */
     if (ret < SSL_OK && ret != SSL_CLOSE_NOTIFY)
@@ -287,10 +283,6 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
 {
     int n = out_len, nw, i, tot = 0;
-    int ret = increase_bm_data_size(ssl);
-    if (ret != SSL_OK) {
-        return ret;
-    }
     /* maximum size of a TLS packet is around 16kB, so fragment */
     do 
     {
@@ -1293,9 +1285,21 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         /* do we violate the spec with the message size?  */
         if (ssl->need_bytes > ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET)
         {
-            ret = SSL_ERROR_INVALID_PROT_MSG;              
             printf("ssl->need_bytes=%d > %d\r\n", ssl->need_bytes, ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET);
-            goto error;
+            if (ssl->can_increase_data_size)
+            {
+                ret = increase_bm_data_size(ssl);
+                if (ret != SSL_OK)
+                {
+                    ret = SSL_ERROR_INVALID_PROT_MSG;
+                    goto error;
+                }
+            }
+            else
+            {
+                ret = SSL_ERROR_INVALID_PROT_MSG;
+                goto error;
+            }
         }
 
         CLR_SSL_FLAG(SSL_NEED_RECORD);
