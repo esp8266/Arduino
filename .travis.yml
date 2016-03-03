@@ -12,9 +12,9 @@ addons:
 
 script:
   - set -e
-  - export CXX="g++-4.8" CC="gcc-4.8"
+  - export CXX="g++-4.8" CC="gcc-4.8" GCOV="gcov-4.8"
   - pushd $TRAVIS_BUILD_DIR/tests/host
-  - make test gcov
+  - make
   - bash <(curl -s https://codecov.io/bash) -X gcov
   - make clean
   - popd

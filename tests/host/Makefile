@@ -8,6 +8,7 @@ ifeq ($(shell uname -s),Darwin)
 CC  := gcc
 CXX := g++
 endif
+GCOV ?= gcov
 
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	StreamString.cpp \
@@ -56,7 +57,7 @@ CPP_OBJECTS = $(CPP_SOURCE_FILES:.cpp=.cpp.o)
 OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS)
 COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 
-all: $(OUTPUT_BINARY) test
+all: build-info $(OUTPUT_BINARY) test gcov
 
 test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
@@ -67,7 +68,17 @@ clean:
 	rm -rf $(COVERAGE_FILES) *.gcov
 
 gcov: test
-	find $(CORE_PATH) -name "*.gcno" -exec gcov -r -pb {} +
+	find $(CORE_PATH) -name "*.gcno" -exec $(GCOV) -r -pb {} +
+
+build-info:
+	echo "-------- build tools info --------"
+	echo "CC: " $(CC)
+	$(CC) -v
+	echo "CXX: " $(CXX)
+	$(CXX) -v
+	echo "GCOV: " $(GCOV)
+	$(GCOV) -v
+	echo "----------------------------------"
 
 $(BINARY_DIRECTORY):
 	mkdir -p $@
