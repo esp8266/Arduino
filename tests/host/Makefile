@@ -3,6 +3,9 @@ BINARY_DIRECTORY := bin
 OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
 CORE_PATH := ../../cores/esp8266
 
+CC  := gcc
+CXX := g++
+
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	StreamString.cpp \
 	Stream.cpp \
@@ -35,8 +38,9 @@ INC_PATHS += $(addprefix -I, \
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
 
-CXXFLAGS += -std=c++11 -Wall
-CFLAGS += -std=c99 -Wall
+CXXFLAGS += -std=c++11 -Wall -coverage -O0
+CFLAGS += -std=c99 -Wall -coverage -O0
+LDFLAGS += -coverage -O0
 
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
@@ -50,7 +54,6 @@ CPP_SOURCE_FILE_NAMES = $(notdir $(CPP_SOURCE_FILES))
 CPP_PATHS = $(call remduplicates, $(dir $(CPP_SOURCE_FILES) ))
 CPP_OBJECTS = $(addprefix $(OBJECT_DIRECTORY)/, $(CPP_SOURCE_FILE_NAMES:.cpp=.cpp.o) )
 
-$(warning $(call remduplicates, $(dir $(CPP_SOURCE_FILES) )))
 vpath %.c $(C_PATHS)
 vpath %.cpp $(CPP_PATHS)
 
@@ -61,7 +64,15 @@ all: $(OUTPUT_BINARY) test
 test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
 
+clean:
+	rm -rf $(OBJECT_DIRECTORY)
+	rm -rf $(BINARY_DIRECTORY)
+
 $(OBJECT_DIRECTORY):
+	which gcc
+	echo $(CC)
+	echo $(CXX)
+	$(CC) -v
 	mkdir -p $@
 
 $(BINARY_DIRECTORY):
@@ -73,7 +84,5 @@ $(C_OBJECTS): $(OBJECT_DIRECTORY)/%.c.o: %.c
 $(CPP_OBJECTS): $(OBJECT_DIRECTORY)/%.cpp.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
 
-
-# Link
 $(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(OBJECT_DIRECTORY) $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $(OUTPUT_BINARY)

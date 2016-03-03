@@ -15,6 +15,7 @@ script:
   - export CXX="g++-4.8" CC="gcc-4.8"
   - pushd $TRAVIS_BUILD_DIR/tests/host
   - make
+  - bash <(curl -s https://codecov.io/bash)
   - popd
   - wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
   - tar xf arduino.tar.xz
