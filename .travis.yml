@@ -3,8 +3,16 @@ language: bash
 os:
   - linux
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+
 script:
   - set -e
+  - export CXX="g++-4.8" CC="gcc-4.8"
   - pushd $TRAVIS_BUILD_DIR/tests/host
   - make
   - popd
