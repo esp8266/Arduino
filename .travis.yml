@@ -3,7 +3,20 @@ language: bash
 os:
   - linux
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+
 script:
+  - set -e
+  - export CXX="g++-4.8" CC="gcc-4.8" GCOV="gcov-4.8"
+  - pushd $TRAVIS_BUILD_DIR/tests/host
+  - make
+  - make clean-objects
+  - popd
   - wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
   - tar xf arduino.tar.xz
   - mv arduino-nightly $HOME/arduino_ide
@@ -20,10 +33,12 @@ script:
   - which arduino
   - cd $TRAVIS_BUILD_DIR
   - source tests/common.sh
-  - arduino --board esp8266com:esp8266:generic --save-prefs
-  - arduino --get-pref sketchbook.path
   - install_libraries
-  - build_sketches arduino $TRAVIS_BUILD_DIR
+  - build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR "python tools/build.py -l $HOME/Arduino/libraries -b generic -v"
+
+after_success:
+    - pushd $TRAVIS_BUILD_DIR/tests/host
+    - bash <(curl -s https://codecov.io/bash) -X gcov
 
 notifications:
   email:
