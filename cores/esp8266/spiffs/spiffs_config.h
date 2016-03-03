@@ -11,12 +11,10 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include "c_types.h"
-#include "ets_sys.h"
-
+#include <stdio.h>
 
 #define c_memcpy memcpy
-#define c_printf ets_printf
+#define c_printf printf
 #define c_memset memset
 
 typedef int16_t file_t;
