@@ -3,8 +3,11 @@ BINARY_DIRECTORY := bin
 OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
 CORE_PATH := ../../cores/esp8266
 
+# I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
+ifeq ($(UNAME_S),Darwin)
 CC  := gcc
 CXX := g++
+endif
 
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	StreamString.cpp \
