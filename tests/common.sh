@@ -17,18 +17,21 @@ function build_sketches()
             continue
         fi;
         if [[ -f "$sketchdir/.test.skip" ]]; then
-            echo -e "\n\n ------------ Skipping $sketch ------------ \n\n";
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
             continue
         fi
-        echo -e "\n\n ------------ Building $sketch ------------ \n\n";
+        echo -e "\n ------------ Building $sketch ------------ \n";
         # $arduino --verify $sketch;
         echo "$build_cmd $sketch"
-        time $build_cmd $sketch
+        time ($build_cmd $sketch >build.log)
         local result=$?
         if [ $result -ne 0 ]; then
             echo "Build failed ($1)"
+            echo "Build log:"
+            cat build.log
             return $result
         fi
+        rm build.log
     done
 }
 
