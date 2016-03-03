@@ -62,9 +62,13 @@ all: build-info $(OUTPUT_BINARY) test gcov
 test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
 
-clean:
+clean: clean-objects clean-coverage
 	rm -rf $(BINARY_DIRECTORY)
+
+clean-objects:
 	rm -rf $(OBJECTS)
+
+clean-coverage:
 	rm -rf $(COVERAGE_FILES) *.gcov
 
 gcov: test

@@ -4,7 +4,10 @@ function build_sketches()
 {
     local arduino=$1
     local srcpath=$2
+    local build_cmd=$3
+    echo $build_cmd
     local sketches=$(find $srcpath -name *.ino)
+    export ARDUINO_IDE_PATH=$arduino
     for sketch in $sketches; do
         local sketchdir=$(dirname $sketch)
         if [[ -f "$sketchdir/.test.skip" ]]; then
@@ -12,7 +15,9 @@ function build_sketches()
             continue
         fi
         echo -e "\n\n ------------ Building $sketch ------------ \n\n";
-        $arduino --verify $sketch;
+        # $arduino --verify $sketch;
+        echo "$build_cmd $sketch"
+        time $build_cmd $sketch
         local result=$?
         if [ $result -ne 0 ]; then
             echo "Build failed ($1)"
@@ -25,7 +30,7 @@ function install_libraries()
 {
     mkdir -p $HOME/Arduino/libraries
     pushd $HOME/Arduino/libraries
-    
+
     # install ArduinoJson library
     wget https://github.com/bblanchon/ArduinoJson/releases/download/v4.6.1/ArduinoJson-v4.6.1.zip && unzip ArduinoJson-v4.6.1.zip
 
