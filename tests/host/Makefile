@@ -4,7 +4,7 @@ OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
 CORE_PATH := ../../cores/esp8266
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
-ifeq ($(UNAME_S),Darwin)
+ifeq ($(shell uname -s),Darwin)
 CC  := gcc
 CXX := g++
 endif
@@ -49,18 +49,12 @@ remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-ou
 
 C_SOURCE_FILES = $(CORE_C_FILES)
 CPP_SOURCE_FILES = $(MOCK_CPP_FILES) $(CORE_CPP_FILES) $(TEST_CPP_FILES)
-C_SOURCE_FILE_NAMES = $(notdir $(C_SOURCE_FILES))
-C_PATHS = $(call remduplicates, $(dir $(C_SOURCE_FILES) ) )
-C_OBJECTS = $(addprefix $(OBJECT_DIRECTORY)/, $(C_SOURCE_FILE_NAMES:.c=.c.o) )
+C_OBJECTS = $(C_SOURCE_FILES:.c=.c.o)
 
-CPP_SOURCE_FILE_NAMES = $(notdir $(CPP_SOURCE_FILES))
-CPP_PATHS = $(call remduplicates, $(dir $(CPP_SOURCE_FILES) ))
-CPP_OBJECTS = $(addprefix $(OBJECT_DIRECTORY)/, $(CPP_SOURCE_FILE_NAMES:.cpp=.cpp.o) )
-
-vpath %.c $(C_PATHS)
-vpath %.cpp $(CPP_PATHS)
+CPP_OBJECTS = $(CPP_SOURCE_FILES:.cpp=.cpp.o)
 
 OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS)
+COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 
 all: $(OUTPUT_BINARY) test
 
@@ -68,24 +62,21 @@ test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
 
 clean:
-	rm -rf $(OBJECT_DIRECTORY)
 	rm -rf $(BINARY_DIRECTORY)
+	rm -rf $(OBJECTS)
+	rm -rf $(COVERAGE_FILES) *.gcov
 
-$(OBJECT_DIRECTORY):
-	which gcc
-	echo $(CC)
-	echo $(CXX)
-	$(CC) -v
-	mkdir -p $@
+gcov: test
+	find $(CORE_PATH) -name "*.gcno" -exec gcov -r -pb {} +
 
 $(BINARY_DIRECTORY):
 	mkdir -p $@
 
-$(C_OBJECTS): $(OBJECT_DIRECTORY)/%.c.o: %.c
+$(C_OBJECTS): %.c.o: %.c
 	$(CC) $(CFLAGS) $(INC_PATHS) -c -o $@ $<
 
-$(CPP_OBJECTS): $(OBJECT_DIRECTORY)/%.cpp.o: %.cpp
+$(CPP_OBJECTS): %.cpp.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
 
-$(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(OBJECT_DIRECTORY) $(OBJECTS)
+$(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $(OUTPUT_BINARY)
