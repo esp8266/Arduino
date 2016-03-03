@@ -10,6 +10,12 @@ function build_sketches()
     export ARDUINO_IDE_PATH=$arduino
     for sketch in $sketches; do
         local sketchdir=$(dirname $sketch)
+        local sketchdirname=$(basename $sketchdir)
+        local sketchname=$(basename $sketch)
+        if [[ "${sketchdirname}.ino" != "$sketchname" ]]; then
+            echo "Skipping $sketch, beacause it is not the main sketch file";
+            continue
+        fi;
         if [[ -f "$sketchdir/.test.skip" ]]; then
             echo -e "\n\n ------------ Skipping $sketch ------------ \n\n";
             continue
