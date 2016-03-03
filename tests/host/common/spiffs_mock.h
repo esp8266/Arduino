@@ -24,11 +24,15 @@
 class SpiffsMock {
 public:
     SpiffsMock(size_t fs_size, size_t fs_block, size_t fs_page);
+    void reset();
     ~SpiffsMock();
     
 protected:
     std::vector<uint8_t> m_fs;
 };
+
+#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b) SpiffsMock spiffs_mock(size_kb * 1024, block_kb * 1024, page_b)
+#define SPIFFS_MOCK_RESET() spiffs_mock.reset()
 
 
 #endif /* spiffs_mock_hpp */

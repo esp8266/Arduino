@@ -17,10 +17,6 @@
 #include <FS.h>
 #include "../common/spiffs_mock.h"
 
-#define SPIFFS_SIZE (64*1024)
-#define SPIFFS_BLOCK (2*4096)
-#define SPIFFS_PAGE (512)
-#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b) SpiffsMock mock(size_kb * 1024, block_kb * 1024, page_b)
 
 TEST_CASE("FS can begin","[fs]")
 {
@@ -45,8 +41,8 @@ TEST_CASE("Files can be written and appended to","[fs]")
     REQUIRE(SPIFFS.begin());
     {
         File f = SPIFFS.open("config1.txt", "w");
-        f.println("file 1");
         REQUIRE(f);
+        f.println("file 1");
     }
     {
         File f = SPIFFS.open("config1.txt", "a");
@@ -60,6 +56,24 @@ TEST_CASE("Files can be written and appended to","[fs]")
         size_t len = f.read((uint8_t*)buf, sizeof(buf));
         buf[len] = 0;
         REQUIRE(strcmp(buf, "file 1\r\nfile 1 again\r\n") == 0);
+    }
+}
+
+TEST_CASE("Files persist after reset", "[fs]")
+{
+    SPIFFS_MOCK_DECLARE(1024, 8, 512);
+    REQUIRE(SPIFFS.begin());
+    {
+        File f = SPIFFS.open("config1.txt", "w");
+        REQUIRE(f);
+        f.println("file 1");
+    }
+    SPIFFS_MOCK_RESET();
+    REQUIRE(SPIFFS.begin());
+    {
+        File f = SPIFFS.open("config1.txt", "r");
+        REQUIRE(f);
+        REQUIRE(f.readString() == "file 1\r\n");
     }
 }
 

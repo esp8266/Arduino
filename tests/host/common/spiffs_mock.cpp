@@ -24,69 +24,48 @@
 
 extern "C"
 {
-    uint32_t mock_spiffs_phys_addr = 0;
-    uint32_t mock_spiffs_phys_size = 0;
-    uint32_t mock_spiffs_phys_page = 0;
-    uint32_t mock_spiffs_phys_block = 0;
-    uint8_t* mock_spiffs_phys_data = nullptr;
+    static uint32_t s_phys_addr = 0;
+    uint32_t s_phys_size = 0;
+    uint32_t s_phys_page = 0;
+    uint32_t s_phys_block = 0;
+    uint8_t* s_phys_data = nullptr;
 }
 
 FS SPIFFS(nullptr);
 
-
-
 SpiffsMock::SpiffsMock(size_t fs_size, size_t fs_block, size_t fs_page)
 {
     m_fs.resize(fs_size, 0xff);
-    mock_spiffs_phys_addr  = 0;
-    mock_spiffs_phys_size  = fs_size;
-    mock_spiffs_phys_page  = fs_page;
-    mock_spiffs_phys_block = fs_block;
-    mock_spiffs_phys_data  = m_fs.data();
-    SPIFFS = FS(FSImplPtr(new SPIFFSImpl(0, fs_size, fs_page, fs_block, 5)));
+    s_phys_addr  = 0;
+    s_phys_size  = static_cast<uint32_t>(fs_size);
+    s_phys_page  = static_cast<uint32_t>(fs_page);
+    s_phys_block = static_cast<uint32_t>(fs_block);
+    s_phys_data  = m_fs.data();
+    reset();
+}
+
+void SpiffsMock::reset()
+{
+    SPIFFS = FS(FSImplPtr(new SPIFFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
 }
     
 SpiffsMock::~SpiffsMock()
 {
-    mock_spiffs_phys_addr  = 0;
-    mock_spiffs_phys_size  = 0;
-    mock_spiffs_phys_page  = 0;
-    mock_spiffs_phys_block = 0;
-    mock_spiffs_phys_data  = nullptr;
+    s_phys_addr  = 0;
+    s_phys_size  = 0;
+    s_phys_page  = 0;
+    s_phys_block = 0;
+    s_phys_data  = nullptr;
     SPIFFS = FS(FSImplPtr(nullptr));
 }
 
-/*
- spi_flash_read function requires flash address to be aligned on word boundary.
- We take care of this by reading first and last words separately and memcpy
- relevant bytes into result buffer.
- 
- alignment:       012301230123012301230123
- bytes requested: -------***********------
- read directly:   --------xxxxxxxx--------
- read pre:        ----aaaa----------------
- read post:       ----------------bbbb----
- alignedBegin:            ^
- alignedEnd:                      ^
- */
-
 int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
-    memcpy(dst, mock_spiffs_phys_data + addr, size);
+    memcpy(dst, s_phys_data + addr, size);
     return SPIFFS_OK;
 }
 
-/*
- Like spi_flash_read, spi_flash_write has a requirement for flash address to be
- aligned. However it also requires RAM address to be aligned as it reads data
- in 32-bit words. Flash address (mis-)alignment is handled much the same way
- as for reads, but for RAM alignment we have to copy data into a temporary
- buffer. The size of this buffer is a tradeoff between number of writes required
- and amount of stack required. This is chosen to be 512 bytes here, but might
- be adjusted in the future if there are good reasons to do so.
- */
-
 int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
-    memcpy(mock_spiffs_phys_data + addr, src, size);
+    memcpy(s_phys_data + addr, src, size);
     return SPIFFS_OK;
 }
 
@@ -98,7 +77,7 @@ int32_t spiffs_hal_erase(uint32_t addr, uint32_t size) {
     const uint32_t sector = addr / FLASH_SECTOR_SIZE;
     const uint32_t sectorCount = size / FLASH_SECTOR_SIZE;
     for (uint32_t i = 0; i < sectorCount; ++i) {
-        memset(mock_spiffs_phys_data + (sector + i) * FLASH_SECTOR_SIZE, 0xff, FLASH_SECTOR_SIZE);
+        memset(s_phys_data + (sector + i) * FLASH_SECTOR_SIZE, 0xff, FLASH_SECTOR_SIZE);
     }
     return SPIFFS_OK;
 }
