@@ -9,7 +9,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
   - [Using git version](#using-git-version)
-  - [Using stable version with PlatformIO](#using-stable-version-with-platformio)
+  - [Using PlatformIO](#using-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
 - [Issues and support](#issues-and-support)
@@ -41,7 +41,7 @@ Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_inde
 
 Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0-rc2/](http://esp8266.github.io/Arduino/versions/2.1.0-rc2/)
 
-### Using git version 
+### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino) [![codecov.io](https://codecov.io/github/esp8266/Arduino/coverage.svg?branch=master)](https://codecov.io/github/esp8266/Arduino?branch=master)
 
 - Install Arduino 1.6.7
@@ -60,11 +60,20 @@ python get.py
 ```
 - Restart Arduino
 
-### Using stable version with PlatformIO
+### Using PlatformIO
 
-[PlatformIO](http://platformio.org) is a cross-platform code-builder and library manager for embedded development with no external dependencies. Works on the popular host OS: Mac OS X, Windows, Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard). More details in documentation [What is PlatformIO? How does it work?](http://docs.platformio.org/en/latest/faq.html#general).
+[PlatformIO](http://platformio.org) is an open source ecosystem for IoT
+development with cross platform build system, library manager and full support
+for Espressif (ESP8266) development. It works on the popular host OS: Mac OS X, Windows,
+Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-See [detailed instructions on how to use Espressif platform with PlatformIO](doc/platformio.md).
+- [PlatformIO.Org](http://platformio.org)
+- [What is PlatformIO?](http://docs.platformio.org/en/latest/what-is-platformio.html)
+- [Advanced using](http://docs.platformio.org/en/latest/platforms/espressif.html) -
+  custom settings, uploading to SPIFFS, Over-the-Air (OTA)
+- [IDE Integration](http://docs.platformio.org/en/latest/ide.html) -
+  Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
+- [Project Examples](http://docs.platformio.org/en/latest/platforms/espressif.html#examples)
 
 ### Building with make
 
