@@ -332,6 +332,8 @@ huzzah.menu.CpuFrequency.160.build.f_cpu=160000000L
 huzzah.menu.UploadTool.esptool=Serial
 huzzah.menu.UploadTool.esptool.upload.tool=esptool
 huzzah.menu.UploadTool.esptool.upload.verbose=-vv
+huzzah.menu.UploadTool.espota=OTA
+huzzah.menu.UploadTool.espota.upload.tool=espota
 
 huzzah.menu.UploadSpeed.115200=115200
 huzzah.menu.UploadSpeed.115200.upload.speed=115200
