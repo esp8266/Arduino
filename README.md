@@ -67,11 +67,12 @@ development with cross platform build system, library manager and full support
 for Espressif (ESP8266) development. It works on the popular host OS: Mac OS X, Windows,
 Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-- [PlatformIO.Org](http://platformio.org)
 - [What is PlatformIO?](http://docs.platformio.org/en/latest/what-is-platformio.html)
+- [PlatformIO IDE](http://platformio.org/#!/platformio-ide)
+- Quick Start with [PlatformIO IDE](http://docs.platformio.org/en/latest/ide/atom.html#quick-start) or [PlatformIO CLI](http://docs.platformio.org/en/latest/quickstart.html)
 - [Advanced using](http://docs.platformio.org/en/latest/platforms/espressif.html) -
   custom settings, uploading to SPIFFS, Over-the-Air (OTA)
-- [IDE Integration](http://docs.platformio.org/en/latest/ide.html) -
+- [Integration with other IDE](http://docs.platformio.org/en/latest/ide.html) -
   Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
 - [Project Examples](http://docs.platformio.org/en/latest/platforms/espressif.html#examples)
 
