@@ -55,6 +55,7 @@ class UdpContext;
 
 struct MDNSService;
 struct MDNSTxt;
+struct MDNSAnswer;
 
 class MDNSResponder {
 public:
@@ -83,13 +84,16 @@ public:
     addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
   }
   
-  void queryService(char *service, void(*p_answer_function)(const char*));
-  void queryService(const char *service, void(*p_answer_function)(const char*)){
-    queryService((char *)service, p_answer_function);
+  int queryService(char *service, char *proto);
+  int queryService(const char *service, const char *proto){
+    return queryService((char *)service, (char *)proto);
   }
-  void queryService(String service, void(*p_answer_function)(const char*)){
-    queryService(service.c_str(), p_answer_function);
+  int queryService(String service, String proto){
+    return queryService(service.c_str(), proto.c_str());
   }
+  String hostname(int idx);
+  IPAddress IP(int idx);
+  uint16_t port(int idx);
   
   void enableArduino(uint16_t port, bool auth=false);
 
@@ -106,8 +110,11 @@ private:
   UdpContext* _conn;
   String _hostName;
   String _instanceName;
-  // Pointer to function that gets called for every incoming answer.
-  void(*p_answer_function_)(const char*);
+  struct MDNSAnswer * _answers;
+  struct MDNSQuery * _query;
+  bool _newQuery;
+  bool _waitingForAnswers;
+  
 
   uint32_t _getOurIp();
   uint16_t _getServicePort(char *service, char *proto);
