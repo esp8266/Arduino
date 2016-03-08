@@ -10,10 +10,8 @@ title: OTA Update
   * [Arduino IDE](#arduino-ide)
     * [Requirements](#requirements)
     * [Application Example](#application-example)
-      * [Classic OTA](#classic-ota)
-      * [ArduinoOTA](#arduinoota)
-      * [Password Protection](#password-protection)
-      * [Troubleshooting](#troubleshooting)
+    * [Password Protection](#password-protection)
+    * [Troubleshooting](#troubleshooting)
   * [Web Browser](#web-browser)
     * [Requirements](#requirements-1)
     * [Implementation Overview](#implementation-overview)
@@ -108,88 +106,10 @@ Uploading modules wirelessly from Arduino IDE is intended for the following typi
 
 ### Application Example
 
-Currently there are two software configurations that support OTA updates.
-
-- [Classic OTA](#classic-ota-configuration): Arduino IDE 1.6.5 and 1.6.5-947-g39819f0 (of July 23, 2015) version of ESP8266 board support platform package that provides first OTA implementation, yet without support for [ArduinoOTA](https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA) library. This particular configuration soon will be depreciated in favor of new implementation described below.
-
-- [ArduinoOTA](#arduinoota-configuration): Arduino IDE 1.6.7 and 2.0.0 version of platform package. Arduino IDE 1.6.7 is the first release that provides support for [ArduinoOTA](https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA) library.
-
-For information how to install ESP8266 board support in Arduino IDE please refer to https://github.com/esp8266/Arduino#installing-with-boards-manager. Once installed, it is possible to switch between available versions of platform package using Boards Manager:
-
-![Selecion of ESP8266 package version](selection-of-package-version.png)
-
-Instructions below demonstrate how to configure both [Classic OTA](#classic-ota-configuration) and [ArduinoOTA](#arduinoota-configuration) using NodeMCU 1.0 (ESP-12E Module) board. You can use other boards assuming that they meet [requirements](#basic-requirements) described above.
-
-
-#### Classic OTA
+Instructions below demonstrate configuration of OTA on NodeMCU 1.0 (ESP-12E Module) board. You can use any other board assuming that it meets [requirements](#basic-requirements) described above. Screen captures have been made on Windows 7 and this instruction is valid for all operating systems supported by Arduino IDE. Differnces are minor like for instance name of serial port on Linux and MacOS.
 
 1. Before you begin, please make sure that you have the following installed:
-    - Arduino IDE 1.6.5 and 1.6.5-947-g39819f0 version of platform package,
-    - [Python](https://www.python.org/) 2.7 (do not install Python 3.5 that is not supported).
-
-2. Now prepare the sketch and configuration for the upload over a serial port.
-    - Start Arduino IDE and load sketch DNS_SD_Arduino_OTA.ino available under File >  Examples > ESP8266mDNS
-        ![OTA sketch selection](ota-ide-sketch-selection.png)
-
-         **Note:** This sketch is available only for 1.6.5-947-g39819f0 (of July 23, 2015) platform package. It was removed in [#980](https://github.com/esp8266/Arduino/pull/980) from GitHub repository.
-    - Update SSID and password in the sketch so the module can join your Wi-Fi network
-        ![SSID and password entry](ota-ide-ssid-pass-entry.png)
-        
-    - Configure upload parameters as below (you may need to adjust configuration if you are using a different module):
-        ![configuration of serial upload](ota-ide-serial-upload-configuration.png)
-
-3. Upload the sketch (Ctrl+U). Once done, open Serial Monitor (Ctrl+Shift+M) and check if module has joined your Wi-Fi network.
-
-    ![check if module joined network](ota-ide-module-joined-wifi.png)
-
-4. Only if module is connected to network, after a couple of seconds, the esp8266-ota port will show up in Arduino IDE:
-
-    ![selection of OTA port](ota-ide-ota-port-selection.png)
-
-5. Now get ready for your first OTA upload by changing configuration settings as follows:
-
-    ![configuration of OTA upload](ota-ide-ota-upload-configuration.png)
-
-    **Note:** If you do not see “Upload Using: OTA” option available for “NodeMCU 1.0 (ESP-12E Module)” board, please upload the latest [boards.txt](https://github.com/esp8266/Arduino/blob/master/boards.txt) file from GitHub repository, replace existing file and restart Arduino IDE.
-
-6. If you have successfully completed all the above steps, you can upload (Ctrl+U) the same (or any other) sketch over OTA:
-
-    ![OTA upload complete](ota-ide-ota-upload-complete.png)
-
-**Note:** To be able to upload your sketch over and over again using OTA, you need to embed OTA routines inside. Please use DNS_SD_Arduino_OTA.ino as an example.
-
-In case of issues please refer to information provided in section [Troubleshooting](#troubleshooting). Successful OTA process looks like below on serial terminal:
-
-```
-Arduino OTA Test
-Sketch size: 346664
-Free size: 700416
-IP address: 192.168.1.100
-Update Start: ip:192.168.1.10, port:48266, size:346672
-Update Success: 6113
-Rebooting...
-
- ets Jan  8 2013,rst cause:1, boot mode:(3,7)
-
-load 0x4010f000, len 1264, room 16 
-tail 0
-chksum 0x42
-csum 0x42
-@cp:0
-ld
-
-Arduino OTA Test
-Sketch size: 346664
-Free size: 700416
-IP address: 192.168.1.100
-```
-**Note:** Sketch and free memory sizes as well as IP addresses depend on your particular s/w and h/w configuration.
-
-
-#### ArduinoOTA
-
-1. Before you begin, please make sure that you have the following installed:
-    - Arduino IDE 1.6.7 and 2.0.0 version of platform package following the process described under https://github.com/esp8266/Arduino#installing-with-boards-manager
+    - Arduino IDE 1.6.7 or newer and 2.0.0 or newer version of platform package following the process described under https://github.com/esp8266/Arduino#installing-with-boards-manager
     - [Python](https://www.python.org/) 2.7 (do not install Python 3.5 that is not supported):
 
         **Note:** Windows users should select “Add python.exe to Path” (see below – this option is not selected by default).
