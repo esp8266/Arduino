@@ -71,7 +71,7 @@ Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 - [PlatformIO IDE](http://platformio.org/#!/platformio-ide)
 - Quick Start with [PlatformIO IDE](http://docs.platformio.org/en/latest/ide/atom.html#quick-start) or [PlatformIO CLI](http://docs.platformio.org/en/latest/quickstart.html)
 - [Advanced using](http://docs.platformio.org/en/latest/platforms/espressif.html) -
-  custom settings, uploading to SPIFFS, Over-the-Air (OTA)
+  custom settings, uploading to SPIFFS, Over-the-Air (OTA) or using stage version
 - [Integration with other IDE](http://docs.platformio.org/en/latest/ide.html) -
   Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
 - [Project Examples](http://docs.platformio.org/en/latest/platforms/espressif.html#examples)
