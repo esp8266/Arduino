@@ -971,6 +971,10 @@ void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
 
   unsigned short int blockNo = 0;
 
+  if (umm_heap == NULL) {
+      umm_init();
+  }
+
   /* Protect the critical section... */
   UMM_CRITICAL_ENTRY();
 
