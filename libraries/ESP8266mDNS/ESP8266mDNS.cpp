@@ -5,7 +5,7 @@ Version 1.1
 Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
 ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
 MDNS-SD Suport 2015 Hristo Gochkov
-Extended MDNS-SD support 2016 Lars Englund
+Extended MDNS-SD support 2016 Lars Englund (lars.englund@gmail.com)
 
 
 License (MIT license):
@@ -32,6 +32,7 @@ License (MIT license):
 // Important RFC's for reference:
 // - DNS request and response: http://www.ietf.org/rfc/rfc1035.txt
 // - Multicast DNS: http://www.ietf.org/rfc/rfc6762.txt
+// - MDNS-SD: https://tools.ietf.org/html/rfc6763
 
 #define LWIP_OPEN_SRC
 
@@ -111,8 +112,6 @@ struct MDNSQuery {
   char _service[32];
   char _proto[4];
 };
-
-
 
 
 MDNSResponder::MDNSResponder() : _conn(0) { 
@@ -240,19 +239,9 @@ void MDNSResponder::addService(char *name, char *proto, uint16_t port){
 }
 
 int MDNSResponder::queryService(char *service, char *proto) {
-  Serial.print("queryService: ");
-  Serial.print(service);
-  Serial.print(" ");
-  Serial.println(proto);
-  
-  // Relevant RFCs
-  // https://tools.ietf.org/html/rfc1035
-  // https://tools.ietf.org/html/rfc6762
-  // https://tools.ietf.org/html/rfc6763
-  // Example query sent for _lalala._tcp.local  
-  //0000   00 00 00 00 00 01 00 00 00 00 00 00 07 5f 6c 61  ............._la
-  //0010   6c 61 6c 61 04 5f 74 63 70 05 6c 6f 63 61 6c 00  lala._tcp.local.
-  //0020   00 0c 00 01                                      ....
+#ifdef MDNS_DEBUG_TX
+  Serial.printf("queryService %s %s\n", service, proto);
+#endif  
   
   if (_query != 0) {
     os_free(_query);
@@ -262,10 +251,7 @@ int MDNSResponder::queryService(char *service, char *proto) {
   os_strcpy(_query->_service, service);
   os_strcpy(_query->_proto, proto);
   _newQuery = true;
-  _waitingForAnswers = true;
   
-  //Serial.println("building strings");
-
   char underscore[] = "_";
 
   // build service name with _
@@ -292,8 +278,6 @@ int MDNSResponder::queryService(char *service, char *proto) {
 
   // Write the header
   _conn->flush();
-  //Serial.println("a");
-
   uint8_t head[12] = {
     0x00, 0x00, //ID = 0
     0x00, 0x00, //Flags = response + authoritative answer
@@ -302,18 +286,7 @@ int MDNSResponder::queryService(char *service, char *proto) {
     0x00, 0x00, //Name server records
     0x00, 0x00 //Additional records
   };
-  Serial.print("serviceName ");
-  Serial.print(serviceNameLen);
-  Serial.print(" ");
-  Serial.println(serviceName);
-
-  Serial.print("protoName ");
-  Serial.print(protoNameLen);
-  Serial.print(" ");
-  Serial.println(protoName);
-
   _conn->append(reinterpret_cast<const char*>(head), 12);
-  //Serial.println("c");
 
   // Only supports sending one PTR query
   // Send the Name field (eg. "_http._tcp.local")
@@ -331,11 +304,14 @@ int MDNSResponder::queryService(char *service, char *proto) {
     0x00, 0x01 //Class IN
   };
   _conn->append(reinterpret_cast<const char*>(ptrAttrs), 4);
+  _waitingForAnswers = true;
   _conn->send();
 
-  //Serial.println("Waiting for answers..");
+#ifdef MDNS_DEBUG_TX
+  Serial.println("Waiting for answers..");
+#endif
   delay(1000);
-  
+
   _waitingForAnswers = false;
 
   int numAnswers = 0;
@@ -367,7 +343,7 @@ IPAddress MDNSResponder::IP(int idx) {
   while (answer != 0 && idx-- > 0) {
     answer = answer->next;
   }
-  return answer->ip;
+  return IPAddress(answer->ip);
 }
 
 uint16_t MDNSResponder::port(int idx) {
@@ -457,45 +433,36 @@ void MDNSResponder::_parsePacket(){
 
   for(i=0; i<6; i++) packetHeader[i] = _conn_read16();
 
-  if ((packetHeader[1] & 0x8000) != 0) {
-    Serial.printf("Parsing answers RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
+  if ((packetHeader[1] & 0x8000) != 0) { // Read answers
+#ifdef MDNS_DEBUG_RX
+    Serial.printf("Reading answers RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
+#endif
+
     if (!_waitingForAnswers) {
-      Serial.println("Not waiting for answers, returning");
+#ifdef MDNS_DEBUG_RX
+      Serial.println("Not expecting any answers right now, returning");
+#endif
       _conn->flush();
       return;
     }
 
     int numAnswers = packetHeader[3];
-
-    // Assumes that the PTR answer always comes first and that it is always accompanied by a TXT, SRV and A answer in the same packet.
+    // Assume that the PTR answer always comes first and that it is always accompanied by a TXT, SRV and A answer in the same packet.
     if (numAnswers != 4) {
-      Serial.println("Expecting a packet with 4 answers");
+#ifdef MDNS_DEBUG_RX
+      Serial.println("Expected a packet with 4 answers, returning");
+#endif
       _conn->flush();
       return;
     }
-
-    // TODO: parse answers and call p_answer_function_ with host (.local), IP, port,  
-    // http://www.ietf.org/rfc/rfc1035.txt
-    
-    // TODO: Parse 4 answers in 1 packet (that's what this library sends out, check if node.js mqtt advertisment sends out different answers (use esp8266_mdns to check)): 
-    // 1. PTR - ignore for now (gives domain name (instance.service) (ex. Domain Name: ESP_81CC47._lalala._tcp.local))
-    // 2. TXT - ignore for now
-    // 3. SRV - gives service name, protocol, port and target host
-    // 4. A   - gives ip addr of target host
-  
-/*
-PTR
-0000   07 5f 6c 61 6c 61 6c 61 04 5f 74 63 70 05 6c 6f  ._lalala._tcp.lo
-0010   63 61 6c 00 00 0c 00 01 00 00 11 94 00 1f 0a 45  cal............E
-0020   53 50 5f 38 31 43 43 34 37 07 5f 6c 61 6c 61 6c  SP_81CC47._lalal
-0030   61 04 5f 74 63 70 05 6c 6f 63 61 6c 00           a._tcp.local.
-*/
     
     uint8_t tmp8;
-    uint16_t tmp16;
-    uint32_t tmp32;
-    bool serviceMatch;
+    uint16_t answerPort = 0;
+    uint8_t answerIp[4] = { 0,0,0,0 };
+    char answerHostName[255];
+    bool serviceMatch = false;
     MDNSAnswer *answer;
+    uint8_t partsCollected = 0;
 
     // Clear answer list
     if (_newQuery) {
@@ -515,159 +482,133 @@ PTR
     }
 
     while (numAnswers--) {
-      Serial.print("Parsing answer ");
-      Serial.println(numAnswers);
-
-      serviceMatch = false;
-
       // Read name
       do {
         tmp8 = _conn_read8();
-        if (tmp8 & 0xC0) { // Compressed pointer
+        if (tmp8 & 0xC0) { // Compressed pointer (not supported)
           tmp8 = _conn_read8();
           break;
         }
-        if (tmp8 == 0x00) { // End of name (not compressed)
+        if (tmp8 == 0x00) { // Énd of name
           break;
         }
-        Serial.print(" ");
-        Serial.print(tmp8);
-        Serial.print(" ");
-        _conn_readS(hostName, tmp8);
-        hostName[tmp8] = '\0';
+        _conn_readS(serviceName, tmp8);
+        serviceName[tmp8] = '\0';
+#ifdef MDNS_DEBUG_RX
+        Serial.printf(" %d ", tmp8);
         for (int n = 0; n < tmp8; n++) {
-          Serial.printf("%02x ", hostName[n]);
+          Serial.printf("%02x ", serviceName[n]);
         }
         Serial.println();
-        //Serial.printf(" %s ", hostName);
-        if (hostName[0] == '_') {
-          if (strcmp(&hostName[1], _query->_service) == 0) {
+#endif
+        if (serviceName[0] == '_') {
+          if (strcmp(&serviceName[1], _query->_service) == 0) {
             serviceMatch = true;
-            Serial.print("Got a ");
-            Serial.print(_query->_service);
-            Serial.println(" answer!");
+#ifdef MDNS_DEBUG_RX
+            Serial.printf("found matching service: %s\n", _query->_service);
+#endif
           }
         }
       } while (true);
 
-      uint16_t type = _conn_read16(); // Read type
-      Serial.print("Type: ");
-      Serial.printf("%04x\n", type);
-      tmp16 = _conn_read16(); // Read class
-      tmp32 = _conn_read32(); // Read ttl
-      uint16_t rdlength = _conn_read16(); // Read rdlength
+      uint16_t answerType = _conn_read16(); // Read type
+      uint16_t answerClass = _conn_read16(); // Read class
+      uint32_t answerTtl = _conn_read32(); // Read ttl
+      uint16_t answerRdlength = _conn_read16(); // Read rdlength
 
-      if (type == MDNS_TYPE_PTR) {
-        Serial.println("Got a PTR answer!");
+#ifdef MDNS_DEBUG_RX
+      Serial.printf("type: %04x rdlength: %d\n", answerType, answerRdlength);
+#endif
 
-        Serial.print(rdlength);
-        Serial.print(" ");
-        _conn_readS(hostName, rdlength); // Skip rdata
-        for (int n = 0; n < rdlength; n++) {
+      if (answerType == MDNS_TYPE_PTR) {
+        partsCollected |= 0x01;
+        _conn_readS(hostName, answerRdlength); // Read rdata
+#ifdef MDNS_DEBUG_RX
+        for (int n = 0; n < answerRdlength; n++) {
           Serial.printf("%02x ", hostName[n]);
         }
         Serial.println();
-
-        if (serviceMatch) {
-          // Add new answer to answer list
-          if (_answers == 0) {
-            _answers = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
-            answer = _answers;
-          }
-          else {
-            answer = _answers;
-            while (answer->next != 0) {
-              answer = _answers->next;
-            }
-            answer->next = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
-            answer = answer->next;
-          }
-          answer->next = 0;
-          answer->hostname = 0;
-        }
+#endif
       }
 
-      if (type == MDNS_TYPE_TXT) {
-        Serial.println("Got a TXT answer!");
-
-        Serial.print(rdlength);
-        Serial.print(" ");
-        _conn_readS(hostName, rdlength); // Skip rdata
-        for (int n = 0; n < rdlength; n++) {
+      if (answerType == MDNS_TYPE_TXT) {
+        partsCollected |= 0x02;
+        _conn_readS(hostName, answerRdlength); // Read rdata
+#ifdef MDNS_DEBUG_RX
+        for (int n = 0; n < answerRdlength; n++) {
           Serial.printf("%02x ", hostName[n]);
         }
         Serial.println();
+#endif
       }
 
-      if (type == MDNS_TYPE_SRV) {
-        Serial.println("Got a SRV answer!");
-        tmp16 = _conn_read16(); // Read priority
-        tmp16 = _conn_read16(); // Read weight
-        answer->port = _conn_read16(); // Read port
+      if (answerType == MDNS_TYPE_SRV) {
+        partsCollected |= 0x04;
+        uint16_t answerPrio = _conn_read16(); // Read priority
+        uint16_t answerWeight = _conn_read16(); // Read weight
+        answerPort = _conn_read16(); // Read port
 
         // Read hostname
         tmp8 = _conn_read8();
-        if (tmp8 & 0xC0) { // Compressed pointer
+        if (tmp8 & 0xC0) { // Compressed pointer (not supported)
           Serial.println("Skipping compressed pointer");
           tmp8 = _conn_read8();
         }
         else {
-          Serial.print(" ");
-          Serial.print(tmp8);
-          Serial.print(" ");
-          answer->hostname = (char *)os_malloc(tmp8 + 1);
-          _conn_readS(answer->hostname, tmp8);
-          answer->hostname[tmp8] = '\0';
+          _conn_readS(answerHostName, tmp8);
+          answerHostName[tmp8] = '\0';
+#ifdef MDNS_DEBUG_RX
+          Serial.printf(" %d ", tmp8);
           for (int n = 0; n < tmp8; n++) {
-            Serial.printf("%02x ", answer->hostname[n]);
+            Serial.printf("%02x ", answerHostName[n]);
           }
-          Serial.println();
-          Serial.println(answer->hostname);
-          if (rdlength - (6 + 1 + tmp8) > 0) { // Skip remaining rdata
-            _conn_readS(hostName, rdlength - (6 + 1 + tmp8)); 
+          Serial.printf("\n%s\n", answerHostName);
+#endif
+          if (answerRdlength - (6 + 1 + tmp8) > 0) { // Skip any remaining rdata
+            _conn_readS(hostName, answerRdlength - (6 + 1 + tmp8));
           }
         }
       }
 
-      if (type == MDNS_TYPE_A) {
-        Serial.println("Got a A answer!");
-        answer->ip[0] = _conn_read8();
-        answer->ip[1] = _conn_read8();
-        answer->ip[2] = _conn_read8();
-        answer->ip[3] = _conn_read8();
+      if (answerType == MDNS_TYPE_A) {
+        partsCollected |= 0x08;
+        for (int i = 0; i < 4; i++) {
+          answerIp[i] = _conn_read8();
+        }
       }
 
-      if (serviceMatch) {
-        // Populate answer
-        // TODO: assign all strings to local variables and populate answer here
-        //answer->port = answerPort;
-        //answer->ip = ;
-        //answer->hostname = ;
+      Serial.printf("Parts collected: %02x\n", partsCollected);
+
+      if ((partsCollected == 0x0F) && serviceMatch) {
+#ifdef MDNS_DEBUG_RX
+        Serial.println("All answers parsed, adding to _answers list..");
+#endif
+        // Add new answer to answer list
+        if (_answers == 0) {
+          _answers = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
+          answer = _answers;
+        }
+        else {
+          answer = _answers;
+          while (answer->next != 0) {
+            answer = _answers->next;
+          }
+          answer->next = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
+          answer = answer->next;
+        }
+        answer->next = 0;
+        answer->hostname = 0;
+
+        // Populate new answer
+        answer->port = answerPort;
+        for (int i = 0; i < 4; i++) {
+          answer->ip[i] = answerIp[i];
+        }
+        answer->hostname = (char *)os_malloc(strlen(answerHostName) + 1);
+        os_strcpy(answer->hostname, answerHostName);
       }
     }
-    Serial.println("All answers parsed!");
     
-/*
-TXT
-0000   0a 45 53 50 5f 38 31 43 43 34 37 07 5f 6c 61 6c  .ESP_81CC47._lal
-0010   61 6c 61 04 5f 74 63 70 05 6c 6f 63 61 6c 00 00  ala._tcp.local..
-0020   10 00 01 00 00 11 94 00 00                       .........
-*/
-
-/*
-SRV
-0000   0a 45 53 50 5f 38 31 43 43 34 37 07 5f 6c 61 6c  .ESP_81CC47._lal
-0010   61 6c 61 04 5f 74 63 70 05 6c 6f 63 61 6c 00 00  ala._tcp.local..
-0020   21 80 01 00 00 00 78 00 18 00 00 00 00 1f 90 0a  !.....x.........
-0030   65 73 70 5f 38 31 63 63 34 37 05 6c 6f 63 61 6c  esp_81cc47.local
-0040   00                                               .
-*/
-/*
-A
-0000   0a 65 73 70 5f 38 31 63 63 34 37 05 6c 6f 63 61  .esp_81cc47.loca
-0010   6c 00 00 01 80 01 00 00 00 78 00 04 c0 a8 01 0c  l........x......
-*/
-
     _conn->flush();
     return;
   }
