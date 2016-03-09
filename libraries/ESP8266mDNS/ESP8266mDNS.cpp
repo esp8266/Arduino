@@ -314,14 +314,7 @@ int MDNSResponder::queryService(char *service, char *proto) {
 
   _waitingForAnswers = false;
 
-  int numAnswers = 0;
-  MDNSAnswer *answer = _answers;
-  while (answer != 0) {
-    numAnswers++;
-    answer = answer->next;
-  }
-
-  return numAnswers;
+  return _getNumAnswers();
 }
 
 String MDNSResponder::hostname(int idx) {
@@ -357,6 +350,16 @@ MDNSAnswer* MDNSResponder::_getAnswerFromIdx(int idx) {
     return 0;
   }
   return answer;
+}
+
+int MDNSResponder::_getNumAnswers() {
+  int numAnswers = 0;
+  MDNSAnswer *answer = _answers;
+  while (answer != 0) {
+    numAnswers++;
+    answer = answer->next;
+  }
+  return numAnswers;
 }
 
 MDNSTxt * MDNSResponder::_getServiceTxt(char *name, char *proto){
@@ -468,18 +471,14 @@ void MDNSResponder::_parsePacket(){
 
     // Clear answer list
     if (_newQuery) {
-      answer = _answers;
-      while (answer != 0) {
-        while (answer->next != 0) {
-          answer = answer->next;
-        }
-        if (answer == _answers) {
-          _answers = 0;
-        }
+      int numAnswers = _getNumAnswers();
+      for (int n = numAnswers - 1; n >= 0; n--) {
+        answer = _getAnswerFromIdx(n);
         os_free(answer->hostname);
         os_free(answer);
-        answer = _answers;
+        answer = 0;
       }
+      _answers = 0;
       _newQuery = false;
     }
 
