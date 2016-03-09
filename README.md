@@ -8,7 +8,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
-  - [Using git version](#using-git-version-)
+  - [Using git version](#using-git-version)
   - [Using stable version with PlatformIO](#using-stable-version-with-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
@@ -41,7 +41,8 @@ Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_inde
 
 Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0-rc2/](http://esp8266.github.io/Arduino/versions/2.1.0-rc2/)
 
-### Using git version [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
+### Using git version 
+[![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino) [![codecov.io](https://codecov.io/github/esp8266/Arduino/coverage.svg?branch=master)](https://codecov.io/github/esp8266/Arduino?branch=master)
 
 - Install Arduino 1.6.7
 - Go to Arduino directory
