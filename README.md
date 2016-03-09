@@ -79,7 +79,7 @@ Documentation for latest development version:
 - [Reference](doc/reference.md)
 - [Libraries](doc/libraries.md)
 - [File system](doc/filesystem.md)
-- [OTA update](doc/ota_updates/ota_updates.md)
+- [OTA update](doc/ota_updates/readme.md)
 - [Supported boards](doc/boards.md)
 - [Change log](doc/changes.md)
 

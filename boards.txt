@@ -3,7 +3,6 @@ menu.CpuFrequency=CPU Frequency
 menu.FlashSize=Flash Size
 menu.FlashMode=Flash Mode
 menu.FlashFreq=Flash Frequency
-menu.UploadTool=Upload Using
 menu.ResetMethod=Reset Method
 menu.ESPModule=Module
 menu.Debug=Debug port
@@ -30,12 +29,6 @@ generic.build.flash_mode=qio
 generic.build.spiffs_pagesize=256
 generic.build.debug_port=
 generic.build.debug_level=
-
-generic.menu.UploadTool.esptool=Serial
-generic.menu.UploadTool.esptool.upload.tool=esptool
-generic.menu.UploadTool.esptool.upload.verbose=-vv
-generic.menu.UploadTool.espota=OTA
-generic.menu.UploadTool.espota.upload.tool=espota
 
 generic.menu.CpuFrequency.80=80 MHz
 generic.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -260,12 +253,6 @@ espduino.menu.CpuFrequency.80.build.f_cpu=80000000L
 espduino.menu.CpuFrequency.160=160 MHz
 espduino.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-espduino.menu.UploadTool.esptool=Serial
-espduino.menu.UploadTool.esptool.upload.tool=esptool
-espduino.menu.UploadTool.esptool.upload.verbose=-vv
-espduino.menu.UploadTool.espota=OTA
-espduino.menu.UploadTool.espota.upload.tool=espota
-
 espduino.menu.UploadSpeed.115200=115200
 espduino.menu.UploadSpeed.115200.upload.speed=115200
 espduino.menu.UploadSpeed.9600=9600
@@ -329,10 +316,6 @@ huzzah.menu.CpuFrequency.80.build.f_cpu=80000000L
 huzzah.menu.CpuFrequency.160=160 MHz
 huzzah.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-huzzah.menu.UploadTool.esptool=Serial
-huzzah.menu.UploadTool.esptool.upload.tool=esptool
-huzzah.menu.UploadTool.esptool.upload.verbose=-vv
-
 huzzah.menu.UploadSpeed.115200=115200
 huzzah.menu.UploadSpeed.115200.upload.speed=115200
 huzzah.menu.UploadSpeed.9600=9600
@@ -381,13 +364,6 @@ espresso_lite_v1.menu.CpuFrequency.80=80 MHz
 espresso_lite_v1.menu.CpuFrequency.80.build.f_cpu=80000000L
 espresso_lite_v1.menu.CpuFrequency.160=160 MHz
 espresso_lite_v1.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-espresso_lite_v1.menu.UploadTool.esptool=Serial
-espresso_lite_v1.menu.UploadTool.esptool.upload.tool=esptool
-espresso_lite_v1.menu.UploadTool.esptool.upload.verbose=-vv
-
-espresso_lite_v1.menu.UploadTool.espota=OTA
-espresso_lite_v1.menu.UploadTool.espota.upload.tool=espota
 
 espresso_lite_v1.menu.UploadSpeed.115200=115200
 espresso_lite_v1.menu.UploadSpeed.115200.upload.speed=115200
@@ -453,14 +429,6 @@ espresso_lite_v2.menu.CpuFrequency.80=80 MHz
 espresso_lite_v2.menu.CpuFrequency.80.build.f_cpu=80000000L
 espresso_lite_v2.menu.CpuFrequency.160=160 MHz
 espresso_lite_v2.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-espresso_lite_v2.menu.UploadTool.esptool=Serial
-espresso_lite_v2.menu.UploadTool.esptool.upload.tool=esptool
-espresso_lite_v2.menu.UploadTool.esptool.upload.verbose=-vv
-
-espresso_lite_v2.menu.UploadTool.espota=OTA
-espresso_lite_v2.menu.UploadTool.espota.upload.tool=espota
-
 
 espresso_lite_v2.menu.UploadSpeed.115200=115200
 espresso_lite_v2.menu.UploadSpeed.115200.upload.speed=115200
@@ -533,10 +501,6 @@ nodemcu.menu.CpuFrequency.80.build.f_cpu=80000000L
 nodemcu.menu.CpuFrequency.160=160 MHz
 nodemcu.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-nodemcu.menu.UploadTool.esptool=Serial
-nodemcu.menu.UploadTool.esptool.upload.tool=esptool
-nodemcu.menu.UploadTool.esptool.upload.verbose=-vv
-
 nodemcu.menu.UploadSpeed.115200=115200
 nodemcu.menu.UploadSpeed.115200.upload.speed=115200
 nodemcu.menu.UploadSpeed.9600=9600
@@ -600,12 +564,6 @@ nodemcuv2.menu.CpuFrequency.80=80 MHz
 nodemcuv2.menu.CpuFrequency.80.build.f_cpu=80000000L
 nodemcuv2.menu.CpuFrequency.160=160 MHz
 nodemcuv2.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-nodemcuv2.menu.UploadTool.esptool=Serial
-nodemcuv2.menu.UploadTool.esptool.upload.tool=esptool
-nodemcuv2.menu.UploadTool.esptool.upload.verbose=-vv
-nodemcuv2.menu.UploadTool.espota=OTA
-nodemcuv2.menu.UploadTool.espota.upload.tool=espota
 
 nodemcuv2.menu.UploadSpeed.115200=115200
 nodemcuv2.menu.UploadSpeed.115200.upload.speed=115200
@@ -678,10 +636,6 @@ modwifi.menu.CpuFrequency.80.build.f_cpu=80000000L
 modwifi.menu.CpuFrequency.160=160 MHz
 modwifi.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-modwifi.menu.UploadTool.esptool=Serial
-modwifi.menu.UploadTool.esptool.upload.tool=esptool
-modwifi.menu.UploadTool.esptool.upload.verbose=-vv
-
 modwifi.menu.UploadSpeed.115200=115200
 modwifi.menu.UploadSpeed.115200.upload.speed=115200
 modwifi.menu.UploadSpeed.9600=9600
@@ -736,10 +690,6 @@ thing.menu.CpuFrequency.80.build.f_cpu=80000000L
 thing.menu.CpuFrequency.160=160 MHz
 thing.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-thing.menu.UploadTool.esptool=Serial
-thing.menu.UploadTool.esptool.upload.tool=esptool
-thing.menu.UploadTool.esptool.upload.verbose=-vv
-
 thing.menu.UploadSpeed.115200=115200
 thing.menu.UploadSpeed.115200.upload.speed=115200
 thing.menu.UploadSpeed.9600=9600
@@ -789,10 +739,6 @@ thingdev.menu.CpuFrequency.80.build.f_cpu=80000000L
 thingdev.menu.CpuFrequency.160=160 MHz
 thingdev.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-thingdev.menu.UploadTool.esptool=Serial
-thingdev.menu.UploadTool.esptool.upload.tool=esptool
-thingdev.menu.UploadTool.esptool.upload.verbose=-vv
-
 thingdev.menu.UploadSpeed.115200=115200
 thingdev.menu.UploadSpeed.115200.upload.speed=115200
 thingdev.menu.UploadSpeed.9600=9600
@@ -839,10 +785,6 @@ esp210.menu.CpuFrequency.80=80 MHz
 esp210.menu.CpuFrequency.80.build.f_cpu=80000000L
 esp210.menu.CpuFrequency.160=160 MHz
 esp210.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-esp210.menu.UploadTool.esptool=Serial
-esp210.menu.UploadTool.esptool.upload.tool=esptool
-esp210.menu.UploadTool.esptool.upload.verbose=-vv
 
 esp210.menu.UploadSpeed.57600=57600
 esp210.menu.UploadSpeed.57600.upload.speed=57600
@@ -935,13 +877,6 @@ d1_mini.menu.CpuFrequency.80.build.f_cpu=80000000L
 d1_mini.menu.CpuFrequency.160=160 MHz
 d1_mini.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-d1_mini.menu.UploadTool.esptool=Serial
-d1_mini.menu.UploadTool.esptool.upload.tool=esptool
-d1_mini.menu.UploadTool.esptool.upload.verbose=-vv
-
-d1_mini.menu.UploadTool.espota=OTA
-d1_mini.menu.UploadTool.espota.upload.tool=espota
-
 d1_mini.menu.UploadSpeed.921600=921600
 d1_mini.menu.UploadSpeed.921600.upload.speed=921600
 d1_mini.menu.UploadSpeed.115200=115200
@@ -1008,10 +943,6 @@ d1.menu.CpuFrequency.80.build.f_cpu=80000000L
 d1.menu.CpuFrequency.160=160 MHz
 d1.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-d1.menu.UploadTool.esptool=Serial
-d1.menu.UploadTool.esptool.upload.tool=esptool
-d1.menu.UploadTool.esptool.upload.verbose=-vv
-
 d1.menu.UploadTool.espota=OTA
 d1.menu.UploadTool.espota.upload.tool=espota
 
@@ -1077,12 +1008,6 @@ espino.build.flash_freq=40
 espino.build.spiffs_pagesize=256
 espino.build.debug_port=
 espino.build.debug_level=
-
-espino.menu.UploadTool.esptool=Serial
-espino.menu.UploadTool.esptool.upload.tool=esptool
-espino.menu.UploadTool.esptool.upload.verbose=-vv
-espino.menu.UploadTool.espota=OTA
-espino.menu.UploadTool.espota.upload.tool=espota
 
 espino.menu.CpuFrequency.80=80 MHz
 espino.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -1160,12 +1085,6 @@ espinotee.menu.CpuFrequency.80=80 MHz
 espinotee.menu.CpuFrequency.80.build.f_cpu=80000000L
 espinotee.menu.CpuFrequency.160=160 MHz
 espinotee.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-espinotee.menu.UploadTool.esptool=Serial
-espinotee.menu.UploadTool.esptool.upload.tool=esptool
-espinotee.menu.UploadTool.esptool.upload.verbose=-vv
-espinotee.menu.UploadTool.espota=OTA
-espinotee.menu.UploadTool.espota.upload.tool=espota
 
 espinotee.menu.UploadSpeed.115200=115200
 espinotee.menu.UploadSpeed.115200.upload.speed=115200
@@ -1300,12 +1219,6 @@ wifinfo.menu.ESPModule.ESP12.build.spiffs_end=0x3FB000
 wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
 wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
 wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
-
-wifinfo.menu.UploadTool.esptool=Serial
-wifinfo.menu.UploadTool.esptool.upload.tool=esptool
-wifinfo.menu.UploadTool.esptool.upload.verbose=-vv
-wifinfo.menu.UploadTool.espota=OTA
-wifinfo.menu.UploadTool.espota.upload.tool=espota
 
 wifinfo.menu.CpuFrequency.80=80 MHz
 wifinfo.menu.CpuFrequency.80.build.f_cpu=80000000L
