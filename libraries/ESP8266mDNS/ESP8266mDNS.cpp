@@ -325,36 +325,38 @@ int MDNSResponder::queryService(char *service, char *proto) {
 }
 
 String MDNSResponder::hostname(int idx) {
-  if (_answers == 0) {
+  MDNSAnswer *answer = _getAnswerFromIdx(idx);
+  if (answer == 0) {
     return String();
-  }
-  MDNSAnswer *answer = _answers;
-  while (answer != 0 && idx-- > 0) {
-    answer = answer->next;
   }
   return answer->hostname;
 }
 
 IPAddress MDNSResponder::IP(int idx) {
-  if (_answers == 0) {
+  MDNSAnswer *answer = _getAnswerFromIdx(idx);
+  if (answer == 0) {
     return IPAddress();
-  }
-  MDNSAnswer *answer = _answers;
-  while (answer != 0 && idx-- > 0) {
-    answer = answer->next;
   }
   return IPAddress(answer->ip);
 }
 
 uint16_t MDNSResponder::port(int idx) {
-  if (_answers == 0) {
+  MDNSAnswer *answer = _getAnswerFromIdx(idx);
+  if (answer == 0) {
     return 0;
   }
+  return answer->port;
+}
+
+MDNSAnswer* MDNSResponder::_getAnswerFromIdx(int idx) {
   MDNSAnswer *answer = _answers;
   while (answer != 0 && idx-- > 0) {
     answer = answer->next;
   }
-  return answer->port;
+  if (idx > 0) {
+    return 0;
+  }
+  return answer;
 }
 
 MDNSTxt * MDNSResponder::_getServiceTxt(char *name, char *proto){
@@ -576,8 +578,6 @@ void MDNSResponder::_parsePacket(){
           answerIp[i] = _conn_read8();
         }
       }
-
-      Serial.printf("Parts collected: %02x\n", partsCollected);
 
       if ((partsCollected == 0x0F) && serviceMatch) {
 #ifdef MDNS_DEBUG_RX

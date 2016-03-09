@@ -123,6 +123,7 @@ private:
   void _parsePacket();
   void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port);
   size_t advertiseServices(); // advertise all hosted services
+  MDNSAnswer* _getAnswerFromIdx(int idx);
 };
 
 extern MDNSResponder MDNS;
