@@ -114,7 +114,7 @@ Instructions below demonstrate configuration of OTA on NodeMCU 1.0 (ESP-12E Modu
 
         **Note:** Windows users should select “Add python.exe to Path” (see below – this option is not selected by default).
 
-        ![Python installation set up](ota-ide-python-configuration.png)
+        ![Python installation set up](a-ota-python-configuration.png)
 
 2. Now prepare the sketch and configuration for the upload over a serial port.
     - Start Arduino IDE and load sketch BasicOTA.ino available under File >  Examples > ArduinoOTA
@@ -187,7 +187,7 @@ When uploading, Arduino IDE used previously entered password, so the upload fail
 
 If OTA update fails, first step is to check for error messages that may be shown in upload window of Arduino IDE. If this is not providing any useful hints try to upload again while checking what is shown by ESP on serial port. Serial Monitor from IDE will not be useful in that case. When attempting to open it, you will likely see the following:
 
-![Arduino IDE network terminal window](ota-ide-network-terminal.png)
+![Arduino IDE network terminal window](a-ota-network-terminal.png)
    
 This window is for Arduino Yún and not yet implemented for esp8266/Arduino. It shows up because IDE is attempting to open Serial Monitor using network port you have selected for OTA upload.
 
@@ -205,11 +205,11 @@ If upload fails you will likely see errors caught by the uploader, exception and
 
 The most common causes of OTA failure are as follows:
 * not enough physical memory on the chip (e.g. ESP01 with 512K flash memory is not enough for OTA),
-* too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see  [Update process - memory view]( https://github.com/esp8266/Arduino/blob/master/doc/ota_updates/ota_updates.md#update-process---memory-view),
+* too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see  [Update process - memory view](#update-process---memory-view),
 * too little memory declared in Arduino IDE for your selected board (i.e. less than physical size). 
 
 For more details regarding flash memory layout please check [File system]( https://github.com/esp8266/Arduino/blob/master/doc/filesystem.md).
-For overview where new sketch is stored, how it is copied and how memory is organized for the purpose of OTA see [Update process - memory view]( https://github.com/esp8266/Arduino/blob/master/doc/ota_updates/ota_updates.md#update-process---memory-view).
+For overview where new sketch is stored, how it is copied and how memory is organized for the purpose of OTA see [Update process - memory view](#update-process---memory-view).
 
 
 ## Web Browser
