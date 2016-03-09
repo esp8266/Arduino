@@ -106,11 +106,12 @@ Uploading modules wirelessly from Arduino IDE is intended for the following typi
 
 ### Application Example
 
-Instructions below demonstrate configuration of OTA on NodeMCU 1.0 (ESP-12E Module) board. You can use any other board assuming that it meets [requirements](#basic-requirements) described above. Screen captures have been made on Windows 7 and this instruction is valid for all operating systems supported by Arduino IDE. Differnces are minor like for instance name of serial port on Linux and MacOS.
+Instructions below show configuration of OTA on NodeMCU 1.0 (ESP-12E Module) board. You can use any other board assuming that it meets [requirements](#basic-requirements) described above. This instruction is valid for all operating systems supported by Arduino IDE. Screen captures have been made on Windows 7 and you may see small differences (like name of serial port) if you are using Linux and MacOS.
 
-1. Before you begin, please make sure that you have the following installed:
-    - Arduino IDE 1.6.7 or newer and 2.0.0 or newer version of platform package following the process described under https://github.com/esp8266/Arduino#installing-with-boards-manager
-    - [Python](https://www.python.org/) 2.7 (do not install Python 3.5 that is not supported):
+1. Before you begin, please make sure that you have the following s/w installed:
+    - Arduino IDE 1.6.7 or newer - https://www.arduino.cc/en/Main/Software
+    - esp8266/Arduino platform package 2.0.0 or newer - for instructions follow https://github.com/esp8266/Arduino#installing-with-boards-manager
+    - Python 2.7 (do not install Python 3.5 that is not supported) - https://www.python.org/
 
         **Note:** Windows users should select “Add python.exe to Path” (see below – this option is not selected by default).
 
@@ -126,21 +127,23 @@ Instructions below demonstrate configuration of OTA on NodeMCU 1.0 (ESP-12E Modu
     - Configure upload parameters as below (you may need to adjust configuration if you are using a different module):
         ![configuration of serial upload](a-ota-serial-upload-configuration.png)
 
+        **Note:** Depending on version of platform package and board you have, you may see ``` Upload Using: ``` in the menu above. This option is inactive and it does not matter what you select. It has been left for compatibility with older implementation of OTA and is targeted for removal in platform package version 2.2.0.
+ 
 3. Upload the sketch (Ctrl+U). Once done, open Serial Monitor (Ctrl+Shift+M) and check if module has joined your Wi-Fi network:
 
     ![check if module joined network](a-ota-upload-complete-and-joined-wifi.png)
 
-4. Only if module is connected to network, after a couple of seconds, the esp8266-ota port will show up in Arduino IDE:
+4. Only if module is connected to network, after a couple of seconds, the esp8266-ota port will show up in Arduino IDE. Select port with IP adress shown in Serial Monitor in previus step:
 
     ![selection of OTA port](a-ota-ota-port-selection.png)
     
-    **Note:** If OTA port does not show up, try to exit Arduino IDE, open it again and check if port is there.
+    **Note:** If OTA port does not show up, exit Arduino IDE, open it again and check if port is there. If it does not help check your firewall settings.
 
 5. Now get ready for your first OTA upload by selecting the OTA port:
 
     ![configuration of OTA upload](a-ota-ota-upload-configuration.png)
     
-    There is no need to change ``` Upload Using: ``` or ``` Upload Speed: ```.
+    **Note:** The menu entry  ``` Upload Speed: ``` does not matter at this point as it concerns the serial port. Just left it unchanged.
 
 6. If you have successfully completed all the above steps, you can upload (Ctrl+U) the same (or any other) sketch over OTA:
 
