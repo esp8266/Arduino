@@ -30,6 +30,8 @@
 #define NUM_DIGITAL_PINS        17
 #define NUM_ANALOG_INPUTS       1
 
+#define ESPRESSO_LITE_VERSION   2
+
 #define analogInputToDigitalPin(p)  ((p > 0)?NOT_A_PIN:0)
 #define digitalPinToInterrupt(p)  	(((p) < EXTERNAL_NUM_INTERRUPTS)?p:NOT_A_PIN)
 #define digitalPinHasPWM(p)         (((p) < NUM_DIGITAL_PINS)?p:NOT_A_PIN)
