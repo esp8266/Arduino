@@ -26,7 +26,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 
 The best place to ask questions related to this core is ESP8266 community forum: http://www.esp8266.com/arduino.
-If you find this forum or the ESP8266 Boards Manager package useful, please consider supporting it with a donation.
+If you find this forum or the ESP8266 Boards Manager package useful, please consider supporting it with a donation. <br />
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)
 
 #### Available versions
@@ -87,6 +87,8 @@ Documentation for latest development version:
 
 If you encounter an issue, you are welcome to submit it here on Github: https://github.com/esp8266/Arduino/issues.
 Please provide as much context as possible: version which you are using (you can check it in Boards Manager), your sketch code, serial output, board model, IDE settings (board selection, flash size, etc).
+
+If you can not find the answers above, you can also try [ESP8266 Community Forum](http://www.esp8266.com/arduino)
 
 ### Contributing
 
