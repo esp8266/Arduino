@@ -2,6 +2,7 @@
 
 function build_sketches()
 {
+    set +e
     local arduino=$1
     local srcpath=$2
     local build_cmd=$3
@@ -33,6 +34,7 @@ function build_sketches()
         fi
         rm build.log
     done
+    set -e
 }
 
 function install_libraries()
