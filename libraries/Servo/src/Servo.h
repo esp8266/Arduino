@@ -23,7 +23,7 @@
 //   The servos are pulsed in the background using the value most recently
 //   written using the write() method.
 //
-//   This library uses time0 and timer1.
+//   This library uses timer0 and timer1.
 //   Note that timer0 may be repurposed when the first servo is attached.
 //
 //   Timers are seized as needed in groups of 12 servos - 24 servos use two
