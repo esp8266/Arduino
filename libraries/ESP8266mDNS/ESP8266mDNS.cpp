@@ -122,7 +122,23 @@ MDNSResponder::MDNSResponder() : _conn(0) {
   _newQuery = false;
   _waitingForAnswers = false;
 }
-MDNSResponder::~MDNSResponder() {}
+MDNSResponder::~MDNSResponder() {
+  if (_query != 0) {
+    os_free(_query);
+    _query = 0;
+  }
+
+  // Clear answer list
+  MDNSAnswer *answer;
+  int numAnswers = _getNumAnswers();
+  for (int n = numAnswers - 1; n >= 0; n--) {
+    answer = _getAnswerFromIdx(n);
+    os_free(answer->hostname);
+    os_free(answer);
+    answer = 0;
+  }
+  _answers = 0;
+}
 
 bool MDNSResponder::begin(const char* hostname){
   // Open the MDNS socket if it isn't already open.
