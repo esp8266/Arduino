@@ -1077,6 +1077,8 @@ espinotee.build.variant=espinotee
 espinotee.build.flash_mode=qio
 espinotee.build.flash_size=4M
 espinotee.build.flash_freq=40
+espinotee.build.debug_port=
+espinotee.build.debug_level=
 
 espinotee.menu.CpuFrequency.80=80 MHz
 espinotee.menu.CpuFrequency.80.build.f_cpu=80000000L
