@@ -75,14 +75,14 @@ gcov: test
 	find $(CORE_PATH) -name "*.gcno" -exec $(GCOV) -r -pb {} +
 
 build-info:
-	echo "-------- build tools info --------"
-	echo "CC: " $(CC)
+	@echo "-------- build tools info --------"
+	@echo "CC: " $(CC)
 	$(CC) -v
-	echo "CXX: " $(CXX)
+	@echo "CXX: " $(CXX)
 	$(CXX) -v
-	echo "GCOV: " $(GCOV)
+	@echo "GCOV: " $(GCOV)
 	$(GCOV) -v
-	echo "----------------------------------"
+	@echo "----------------------------------"
 
 $(BINARY_DIRECTORY):
 	mkdir -p $@
