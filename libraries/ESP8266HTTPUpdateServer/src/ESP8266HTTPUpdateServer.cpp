@@ -34,7 +34,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server)
     _server->on("/update", HTTP_POST, [&](){
       _server->sendHeader("Connection", "close");
       _server->sendHeader("Access-Control-Allow-Origin", "*");
-      _server->send(200, "text/plain", (Update.hasError())?"FAIL":"OK");
+      _server->send(200, "text/html", (Update.hasError())?"FAIL":"<META http-equiv=\"refresh\" content=\"15;URL=/update\">OK");
       ESP.restart();
     },[&](){
       // handler for the file upload, get's the sketch bytes, and writes
