@@ -19,9 +19,11 @@
  *      Author: petera
  */
 
+
 #include "spiffs.h"
 #include "spiffs_nucleus.h"
 
+#if !SPIFFS_READ_ONLY
 
 #if SPIFFS_HAL_CALLBACK_EXTRA
 #define CHECK_CB(_fs, _type, _rep, _arg1, _arg2) \
@@ -106,6 +108,7 @@ static s32_t spiffs_rewrite_index(spiffs *fs, spiffs_obj_id obj_id, spiffs_span_
   } else {
     // calc entry in index
     entry = SPIFFS_OBJ_IX_ENTRY(fs, data_spix);
+
   }
   // load index
   res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
@@ -989,3 +992,4 @@ s32_t spiffs_object_index_consistency_check(spiffs *fs) {
   return res;
 }
 
+#endif // !SPIFFS_READ_ONLY
