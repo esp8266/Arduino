@@ -40,7 +40,6 @@ def compile(tmp_dir, sketch, tools_dir, hardware_dir, ide_path, f, args):
     cmd += '-tools "' +  ide_path + '/tools-builder" '
     # Debug=Serial,DebugLevel=Core____
     cmd += '-fqbn=esp8266com:esp8266:{board_name}:' \
-            'UploadTool=esptool,' \
             'CpuFrequency={cpu_freq},' \
             'FlashFreq={flash_freq},' \
             'FlashMode={flash_mode},' \
