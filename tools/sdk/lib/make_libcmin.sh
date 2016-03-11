@@ -140,7 +140,7 @@ lib_a-getopt.o
 lib_a-getreent.o
 lib_a-gets.o
 lib_a-getsubopt.o
-lib_a-gettimeofdayr.o
+# lib_a-gettimeofdayr.o
 lib_a-gettzinfo.o
 lib_a-getw.o
 lib_a-getwc.o
@@ -410,7 +410,7 @@ lib_a-syswrite.o
 lib_a-tdelete.o
 lib_a-tdestroy.o
 lib_a-tfind.o
-lib_a-time.o
+# lib_a-time.o
 lib_a-timelocal.o
 lib_a-timesr.o
 lib_a-tmpfile.o
