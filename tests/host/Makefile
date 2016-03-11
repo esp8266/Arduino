@@ -17,6 +17,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	Print.cpp \
 	FS.cpp \
 	spiffs_api.cpp \
+	pgmspace.cpp \
 )
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
@@ -41,6 +42,7 @@ INC_PATHS += $(addprefix -I, \
 
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
+	core/test_pgmspace.cpp \
 
 CXXFLAGS += -std=c++11 -Wall -coverage -O0
 CFLAGS += -std=c99 -Wall -coverage -O0

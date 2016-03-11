@@ -32,8 +32,9 @@ import shutil
 def compile(tmp_dir, sketch, tools_dir, hardware_dir, ide_path, f, args):
     cmd = ide_path + '/arduino-builder '
     cmd += '-compile -logger=human '
-    for lib_dir in args.library_path:
-        cmd += '-libraries "' + lib_dir + '" '
+    if args.library_path:
+        for lib_dir in args.library_path:
+            cmd += '-libraries "' + lib_dir + '" '
     cmd += '-build-path "' + tmp_dir + '" '
     cmd += '-hardware "' + ide_path + '/hardware" '
     cmd += '-hardware ' + hardware_dir + ' '
