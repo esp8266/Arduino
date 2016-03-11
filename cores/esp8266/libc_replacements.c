@@ -66,7 +66,7 @@ int ICACHE_RAM_ATTR _fstat_r(struct _reent* unused, int file, struct stat *st) {
     return 0;
 }
 
-int _lseek_r(struct _reent* unused, int file, int ptr, int dir) {
+int ICACHE_RAM_ATTR _lseek_r(struct _reent* unused, int file, int ptr, int dir) {
     (void)unused;
     (void)file;
     (void)ptr;
@@ -74,7 +74,7 @@ int _lseek_r(struct _reent* unused, int file, int ptr, int dir) {
     return 0;
 }
 
-int _read_r(struct _reent* unused, int file, char *ptr, int len) {
+int ICACHE_RAM_ATTR _read_r(struct _reent* unused, int file, char *ptr, int len) {
     (void)unused;
     (void)file;
     (void)ptr;
@@ -82,26 +82,33 @@ int _read_r(struct _reent* unused, int file, char *ptr, int len) {
     return 0;
 }
 
-int _write_r(struct _reent* unused, int file, char *ptr, int len) {
-    (void)unused;
-    (void)file;
-    (void)ptr;
+int ICACHE_RAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
+    if (file == STDOUT_FILENO) {
+        while(len--) {
+            ets_putc(*ptr);
+            ++ptr;
+        }
+    }
     return len;
 }
 
-// newlib has 'putchar' defined to a big scary construct
-#undef putchar
-
-int ICACHE_RAM_ATTR putchar(int c) {
-    return ets_putc(c);
+int ICACHE_RAM_ATTR puts(const char * str) {
+    char c;
+    while((c = *str) != 0) {
+        ets_putc(c);
+        ++str;
+    }
+    ets_putc('\n');
+    return true;
 }
 
+#undef putchar
+int ICACHE_RAM_ATTR putchar(int c) {
+    ets_putc(c);
+    return c;
+}
 
 #if 0
-int ICACHE_RAM_ATTR puts(const char * str) {
-    return ets_printf("%s", str);
-}
-
 
 int ICACHE_RAM_ATTR printf(const char* format, ...) {
     va_list arglist;

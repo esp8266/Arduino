@@ -259,7 +259,7 @@ lib_a-psignal.o
 # lib_a-putchar_u.o
 lib_a-putenv.o
 lib_a-putenv_r.o
-lib_a-puts.o
+# lib_a-puts.o
 lib_a-putw.o
 lib_a-putwc.o
 lib_a-putwchar.o
