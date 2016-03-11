@@ -18,12 +18,43 @@
  */
 
 #include <ctype.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdarg.h>
 #include "pgmspace.h"
 
 size_t strnlen_P(PGM_P s, size_t size) {
     const char* cp;
     for (cp = s; size != 0 && pgm_read_byte(cp) != '\0'; cp++, size--);
     return (size_t) (cp - s);
+}
+
+char* strstr_P(const char* haystack, PGM_P needle)
+{
+    const char* pn = reinterpret_cast<const char*>(needle);
+    if (haystack[0] == 0) {
+        if (pgm_read_byte(pn)) {
+	        return NULL;
+        }
+        return (char*) haystack;
+    }
+
+    while (*haystack) {
+        size_t i = 0;
+        while (true) {
+            char n = pgm_read_byte(pn + i);
+            if (n == 0) {
+                return (char *) haystack;
+            }
+            if (n != haystack[i]) {
+                break;
+            }
+            ++i;
+        }
+        ++haystack;
+    }
+    return NULL;
 }
 
 void* memcpy_P(void* dest, PGM_VOID_P src, size_t count) {
@@ -203,7 +234,7 @@ int printf_P(PGM_P formatP, ...) {
     char* format = new char[fmtLen + 1];
     strcpy_P(format, formatP);
 
-    ret = os_printf(format, arglist);
+    ret = printf(format, arglist);
 
     delete[] format;
 
@@ -240,7 +271,7 @@ int vsnprintf_P(char* str, size_t strSize, PGM_P formatP, va_list ap) {
     char* format = new char[fmtLen + 1];
     strcpy_P(format, formatP);
 
-    ret = ets_vsnprintf(str, strSize, format, ap);
+    ret = vsnprintf(str, strSize, format, ap);
 
     delete[] format;
 

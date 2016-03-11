@@ -1,11 +1,14 @@
 #ifndef __PGMSPACE_H_
 #define __PGMSPACE_H_
 
+#include <stdint.h>
+#include <stdio.h>
+
+#ifdef __ets__
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <stdint.h>
-#include <stdio.h>
 #include "ets_sys.h"
 #include "osapi.h"
 #ifdef __cplusplus
@@ -16,6 +19,13 @@ extern "C" {
 #define PGM_P  		const char *
 #define PGM_VOID_P  const void *
 #define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
+#else //__ets__
+#define PROGMEM
+#define PGM_P  		const char *
+#define PGM_VOID_P  const void *
+#define PSTR(s)     (s)
+
+#endif // __ets__
 
 
 #define _SFR_BYTE(n) (n)
@@ -62,6 +72,8 @@ int strncasecmp_P(const char* str1, PGM_P str2P, size_t size);
 size_t strnlen_P(PGM_P s, size_t size);
 #define strlen_P(strP)          strnlen_P((strP), SIZE_IRRELEVANT)
 
+char* strstr_P(const char* haystack, PGM_P needle);
+
 int	printf_P(PGM_P formatP, ...) __attribute__((format(printf, 1, 2)));
 int	sprintf_P(char *str, PGM_P formatP, ...) __attribute__((format(printf, 2, 3)));
 int	snprintf_P(char *str, size_t strSize, PGM_P formatP, ...) __attribute__((format(printf, 3, 4)));
@@ -74,6 +86,7 @@ int	vsnprintf_P(char *str, size_t strSize, PGM_P formatP, va_list ap) __attribut
 // b3, b2, b1, b0
 //     w1,     w0
 
+#ifdef __ets__
 #define pgm_read_byte(addr) 		                                           \
 (__extension__({                                                               \
     PGM_P __local = (PGM_P)(addr);  /* isolate varible for macro expansion */         \
@@ -91,6 +104,10 @@ int	vsnprintf_P(char *str, size_t strSize, PGM_P formatP, va_list ap) __attribut
     uint16_t __result = ((*__addr32) >> (__offset * 8));                       \
     __result;                                                                  \
 }))	
+#else //__ets__
+#define pgm_read_byte(addr)     (*reinterpret_cast<const uint8_t*>(addr))
+#define pgm_read_word(addr)     (*reinterpret_cast<const uint16_t*>(addr))
+#endif //__ets__
 
 #define pgm_read_dword(addr) 		(*reinterpret_cast<const uint32_t*>(addr))
 #define pgm_read_float(addr) 		(*reinterpret_cast<const float*>(addr))
