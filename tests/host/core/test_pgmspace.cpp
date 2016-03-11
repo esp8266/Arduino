@@ -20,8 +20,8 @@
 TEST_CASE("strstr_P works as strstr", "[core][pgmspace]")
 {
     auto t = [](const char* h, const char* n) {
-        char* strstr_P_result = strstr_P(h, n);
-        char* strstr_result = strstr(h, n);
+        const char* strstr_P_result = strstr_P(h, n);
+        const char* strstr_result = strstr(h, n);
         REQUIRE(strstr_P_result == strstr_result);
     };
 
