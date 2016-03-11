@@ -466,15 +466,7 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
     return true;
 }
 
-// Interrupts which are masked by flash access routines
-static const int FLASH_INT_MASK =
-    (1 << ETS_SLC_INUM) |
-    (1 << ETS_SPI_INUM) |
-    (1 << ETS_GPIO_INUM) |
-    (1 << ETS_UART_INUM) |
-    (1 << ETS_CCOMPARE0_INUM) |
-    (1 << ETS_FRC_TIMER1_INUM);
-    
+static const int FLASH_INT_MASK = ((B10 << 8) | B00111010);
 
 bool EspClass::flashEraseSector(uint32_t sector) {
     ets_isr_mask(FLASH_INT_MASK);
