@@ -29,7 +29,7 @@ script:
   - ln -s $TRAVIS_BUILD_DIR esp8266
   - cd esp8266/tools
   - python get.py
-  - export PATH="$HOME/arduino_ide:$PATH"
+  - export PATH="$HOME/arduino_ide:$TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf/bin:$PATH"
   - which arduino
   - cd $TRAVIS_BUILD_DIR
   - source tests/common.sh
