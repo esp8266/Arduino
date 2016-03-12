@@ -113,7 +113,7 @@ void noTone(uint8_t _pin) {
   digitalWrite(_pin, LOW);
 }
 
-void t1IntHandler() {
+ICACHE_RAM_ATTR void t1IntHandler() {
   if (toggle_counts[T1INDEX] != 0){
     // toggle the pin
     digitalWrite(tone_pins[T1INDEX], toggle_counts[T1INDEX] % 2);
