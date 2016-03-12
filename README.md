@@ -20,7 +20,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 
 Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
 
-- Install Arduino 1.6.5 from the [Arduino website](http://www.arduino.cc/en/main/software).
+- Install Arduino 1.6.8 from the [Arduino website](http://www.arduino.cc/en/main/software).
 - Start Arduino and open Preferences window.
 - Enter ```http://arduino.esp8266.com/stable/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
@@ -44,7 +44,7 @@ Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0-rc2/](http://esp
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino) [![codecov.io](https://codecov.io/github/esp8266/Arduino/coverage.svg?branch=master)](https://codecov.io/github/esp8266/Arduino?branch=master)
 
-- Install Arduino 1.6.7
+- Install Arduino 1.6.8
 - Go to Arduino directory
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash
