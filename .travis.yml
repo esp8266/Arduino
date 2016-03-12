@@ -26,15 +26,12 @@ script:
   - ln -s $TRAVIS_BUILD_DIR esp8266
   - cd esp8266/tools
   - python get.py
-  - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
-  - sleep 3
-  - export DISPLAY=:1.0
   - export PATH="$HOME/arduino_ide:$PATH"
   - which arduino
   - cd $TRAVIS_BUILD_DIR
   - source tests/common.sh
   - install_libraries
-  - build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR "python tools/build.py -l $HOME/Arduino/libraries -b generic -v"
+  - build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR "-l $HOME/Arduino/libraries"
 
 after_success:
     - pushd $TRAVIS_BUILD_DIR/tests/host
