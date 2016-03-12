@@ -72,9 +72,6 @@ function build_sketches()
         print_size_info $build_dir/*.elf >>size.log
     done
     set -e
-    echo -e "\n ------------ Size report ------------ \n"
-    cat size.log
-    echo -e "\n ------------------------------------- \n"
 }
 
 function install_libraries()
