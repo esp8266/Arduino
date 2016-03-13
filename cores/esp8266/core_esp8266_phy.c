@@ -287,5 +287,6 @@ void user_rf_pre_init() {
     }
 
     system_set_os_print(0);
+    system_phy_set_rfoption(__get_rf_mode());
     __run_user_rf_pre_init();
 }
