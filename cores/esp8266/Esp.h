@@ -55,7 +55,8 @@ enum RFMode {
     RF_DISABLED = 4 // disable RF after deep-sleep wake up, just like modem sleep, there will be the smallest current.
 };
 
-#define RF_MODE(mode) extern "C" int __get_rf_mode() { return mode; }
+#define RF_MODE(mode) int __get_rf_mode() { return mode; }
+#define RF_PRE_INIT() void __run_user_rf_pre_init()
 
 // compatibility definitions
 #define WakeMode RFMode
@@ -71,7 +72,7 @@ enum ADCMode {
     ADC_VDD = 255
 };
 
-#define ADC_MODE(mode) extern "C" int __get_adc_mode(void) { return (int) (mode); }
+#define ADC_MODE(mode) int __get_adc_mode(void) { return (int) (mode); }
 
 typedef enum {
      FM_QIO = 0x00,
