@@ -113,11 +113,15 @@ void noTone(uint8_t _pin) {
   digitalWrite(_pin, LOW);
 }
 
-void t1IntHandler() {
-  if (toggle_counts[T1INDEX] > 0){
+ICACHE_RAM_ATTR void t1IntHandler() {
+  if (toggle_counts[T1INDEX] != 0){
     // toggle the pin
     digitalWrite(tone_pins[T1INDEX], toggle_counts[T1INDEX] % 2);
     toggle_counts[T1INDEX]--;
+    // handle the case of indefinite duration
+    if (toggle_counts[T1INDEX] < -2){
+      toggle_counts[T1INDEX] = -1;
+    }
   }else{
     disableTimer(T1INDEX);
     digitalWrite(tone_pins[T1INDEX], LOW);
