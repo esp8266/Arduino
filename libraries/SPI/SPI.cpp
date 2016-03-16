@@ -102,7 +102,10 @@ void SPIClass::setDataMode(uint8_t dataMode) {
     }
 
     if(CPOL) {
-        //todo How set CPOL???
+        SPI1P |= 1<<29;
+    } else {
+        SPI1P &= ~(1<<29);
+        //todo test whether it is correct to set CPOL like this.
     }
 
 }
