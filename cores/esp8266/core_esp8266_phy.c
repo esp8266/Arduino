@@ -242,6 +242,14 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     [114] = 2
 };
 
+// These functions will be overriden from C++ code.
+// Unfortunately, we can't use extern "C" because Arduino preprocessor
+// doesn't generate forward declarations for extern "C" functions correctly,
+// so we use mangled names here.
+#define __get_adc_mode _Z14__get_adc_modev
+#define __get_rf_mode _Z13__get_rf_modev
+#define __run_user_rf_pre_init _Z22__run_user_rf_pre_initv
+
 extern int __real_register_chipv6_phy(uint8_t* init_data);
 extern int __wrap_register_chipv6_phy(uint8_t* init_data) {
     if (init_data != NULL) {
@@ -279,5 +287,6 @@ void user_rf_pre_init() {
     }
 
     system_set_os_print(0);
+    system_phy_set_rfoption(__get_rf_mode());
     __run_user_rf_pre_init();
 }

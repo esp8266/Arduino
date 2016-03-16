@@ -7,7 +7,7 @@ title: Installation
 This is the suggested installation method for end users.
 
 ### Prerequisites
-- Arduino 1.6.5, get it from [Arduino website](https://www.arduino.cc/en/Main/OldSoftwareReleases#previous). Arduino 1.6.6 has several issues, so we recommend to stick with 1.6.5 for now.
+- Arduino 1.6.8, get it from [Arduino website](https://www.arduino.cc/en/Main/OldSoftwareReleases#previous).
 - Internet connection
 
 ### Instructions
@@ -27,7 +27,7 @@ This is the suggested installation method for contributors and library developer
 
 ### Prerequisites
 
-- Arduino 1.6.5 (or newer, if you know what you are doing)
+- Arduino 1.6.8 (or newer, if you know what you are doing)
 - git
 - python 2.7
 - terminal, console, or command prompt (depending on you OS)
