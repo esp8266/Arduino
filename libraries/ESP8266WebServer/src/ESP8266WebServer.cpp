@@ -22,7 +22,7 @@
 
 
 #include <Arduino.h>
-#include <libb64/cencode.h>
+#include "base64.h"
 #include "WiFiServer.h"
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
@@ -92,29 +92,15 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
     if(authReq.startsWith("Basic")){
       authReq = authReq.substring(6);
       authReq.trim();
-      char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new char[toencodeLen];
-      if(toencode == NULL){
-        authReq = String();
-        return false;
-      }
-      char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
-      if(encoded == NULL){
-        authReq = String();
-        delete[] toencode;
-        return false;
-      }
-      sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equals(encoded)){
-        authReq = String();
-        delete[] toencode;
-        delete[] encoded;
+      size_t toencodeLen = strlen(username) + strlen(password) + 2;
+      char toencode[toencodeLen];
+      memset(toencode, 0, toencodeLen);
+      snprintf(toencode, toencodeLen, "%s:%s", username, password);
+      String encoded = base64::encode((uint8_t*)toencode, toencodeLen-1);
+      if(authReq.equals(encoded)){
         return true;
       }
-      delete[] toencode;
-      delete[] encoded;
     }
-    authReq = String();
   }
   return false;
 }
