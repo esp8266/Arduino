@@ -93,7 +93,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       authReq = authReq.substring(6);
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new char[toencodeLen];
+      char *toencode = new char[toencodeLen + 1];
       if(toencode == NULL){
         authReq = String();
         return false;
