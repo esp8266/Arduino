@@ -236,7 +236,7 @@ int WiFiUDP::read(unsigned char* buffer, size_t len)
 int WiFiUDP::peek()
 {
     if (!_ctx)
-        return 0;
+        return -1;
 
     return _ctx->peek();
 }

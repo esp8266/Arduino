@@ -190,7 +190,7 @@ public:
 
     int read()
     {
-        if (!_rx_buf || _rx_buf->len == _rx_buf_offset)
+        if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
             return -1;
 
         char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
@@ -215,8 +215,8 @@ public:
 
     char peek()
     {
-        if (!_rx_buf)
-            return 0;
+        if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
+            return -1;
 
         return reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
     }
