@@ -126,6 +126,8 @@ private:
 
 #if !defined (SERVO_EXCLUDE_TIMER1)
 
+#define TIMER1_TICKS_PER_US (APB_CLK_FREQ / 1000000L)
+
 struct ServoTimer1
 {
 public:
@@ -137,11 +139,11 @@ public:
 
     uint32_t usToTicks(uint32_t us) const
     {
-        return (clockCyclesPerMicrosecond() / 16 * us);     // converts microseconds to tick
+        return (TIMER1_TICKS_PER_US / 16 * us);     // converts microseconds to tick
     }
     uint32_t ticksToUs(uint32_t ticks) const
     {
-        return (ticks / clockCyclesPerMicrosecond() * 16); // converts from ticks back to microseconds
+        return (ticks / TIMER1_TICKS_PER_US * 16); // converts from ticks back to microseconds
     }
 
     void InitInterrupt(timercallback handler)
