@@ -42,6 +42,7 @@ private:
 
   ClientContext* _unclaimed;
   ClientContext* _discarded;
+  bool _noDelay = false;
 
 public:
   WiFiServer(IPAddress addr, uint16_t port);
