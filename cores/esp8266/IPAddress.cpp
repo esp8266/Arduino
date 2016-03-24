@@ -112,3 +112,4 @@ String IPAddress::toString()
     return String(szRet);
 }
 
+const IPAddress INADDR_NONE(0, 0, 0, 0);
