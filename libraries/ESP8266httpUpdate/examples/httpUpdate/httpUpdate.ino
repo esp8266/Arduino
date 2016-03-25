@@ -17,6 +17,10 @@
 
 ESP8266WiFiMulti WiFiMulti;
 
+void update_starting(void) {
+    Serial.println("Update starting");
+}
+
 void setup() {
 
     USE_SERIAL.begin(115200);
@@ -40,6 +44,7 @@ void loop() {
     // wait for WiFi connection
     if((WiFiMulti.run() == WL_CONNECTED)) {
 
+        ESPhttpUpdate.onStart(update_starting);
         t_httpUpdate_return ret = ESPhttpUpdate.update("http://server/file.bin");
         //t_httpUpdate_return  ret = ESPhttpUpdate.update("https://server/file.bin");
 

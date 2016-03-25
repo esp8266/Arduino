@@ -173,7 +173,6 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
     // track these headers
     http->collectHeaders(headerkeys, headerkeyssize);
 
-
     int code = http->GET();
     int len = http->getSize();
 
@@ -223,7 +222,7 @@ t_httpUpdate_return ESP8266HTTPUpdate::handleUpdate(HTTPClient * http, const cha
                     lastError = HTTP_UE_TOO_LESS_SPACE;
                     ret = HTTP_UPDATE_FAILED;
                 } else {
-
+                    http_update_start();
                     WiFiClient * tcp = http->getStreamPtr();
 
                     WiFiUDP::stopAll();

@@ -52,6 +52,8 @@
 #define HTTP_UE_BIN_VERIFY_HEADER_FAILED    (-106)
 #define HTTP_UE_BIN_FOR_WRONG_FLASH         (-107)
 
+#define HTTP_UPDATE_START_CALLBACK(callback) void (*callback)()
+
 typedef enum {
     HTTP_UPDATE_FAILED,
     HTTP_UPDATE_NO_UPDATES,
@@ -71,12 +73,14 @@ class ESP8266HTTPUpdate {
 
         int getLastError(void);
         String getLastErrorString(void);
+        void onStart(HTTP_UPDATE_START_CALLBACK(callback)) { http_update_start = callback; }
 
     protected:
         t_httpUpdate_return handleUpdate(HTTPClient * http, const char * current_version, bool reboot = true, bool spiffs = false);
         bool runUpdate(Stream& in, uint32_t size, String md5, int command = U_FLASH);
 
         int lastError;
+        HTTP_UPDATE_START_CALLBACK(http_update_start);
 };
 
 extern ESP8266HTTPUpdate ESPhttpUpdate;
