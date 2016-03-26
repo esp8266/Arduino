@@ -405,6 +405,46 @@ espresso_lite_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 espresso_lite_v1.menu.ResetMethod.ck=ck
 espresso_lite_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 
+espresso_lite_v1.menu.Debug.Disabled=Disabled
+espresso_lite_v1.menu.Debug.Disabled.build.debug_port=
+espresso_lite_v1.menu.Debug.Serial=Serial
+espresso_lite_v1.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+espresso_lite_v1.menu.Debug.Serial1=Serial1
+espresso_lite_v1.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+espresso_lite_v1.menu.DebugLevel.None____=None
+espresso_lite_v1.menu.DebugLevel.None____.build.debug_level=
+espresso_lite_v1.menu.DebugLevel.Core____=Core
+espresso_lite_v1.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
+espresso_lite_v1.menu.DebugLevel.SSL_____=Core + SSL
+espresso_lite_v1.menu.DebugLevel.SSL_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+espresso_lite_v1.menu.DebugLevel.SSL_MEM_=Core + SSL + TLS Mem
+espresso_lite_v1.menu.DebugLevel.SSL_MEM_.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_TLS_MEM
+espresso_lite_v1.menu.DebugLevel.WiFic___=Core + WiFi
+espresso_lite_v1.menu.DebugLevel.WiFic___.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+espresso_lite_v1.menu.DebugLevel.WiFi____=WiFi
+espresso_lite_v1.menu.DebugLevel.WiFi____.build.debug_level=-DDEBUG_ESP_WIFI
+espresso_lite_v1.menu.DebugLevel.HTTPClient=HTTPClient
+espresso_lite_v1.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+espresso_lite_v1.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+espresso_lite_v1.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
+espresso_lite_v1.menu.DebugLevel.HTTPUpdate=HTTPUpdate
+espresso_lite_v1.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
+espresso_lite_v1.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
+espresso_lite_v1.menu.DebugLevel.HTTPUpdate2.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE
+espresso_lite_v1.menu.DebugLevel.HTTPUpdate3=HTTPClient + HTTPUpdate + Updater
+espresso_lite_v1.menu.DebugLevel.HTTPUpdate3.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER
+espresso_lite_v1.menu.DebugLevel.HTTPServer=HTTPServer
+espresso_lite_v1.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
+espresso_lite_v1.menu.DebugLevel.UPDATER=Updater
+espresso_lite_v1.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
+espresso_lite_v1.menu.DebugLevel.OTA_____=OTA
+espresso_lite_v1.menu.DebugLevel.OTA_____.build.debug_level=-DDEBUG_ESP_OTA
+espresso_lite_v1.menu.DebugLevel.OTA2____=OTA + Updater
+espresso_lite_v1.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
+espresso_lite_v1.menu.DebugLevel.all_____=All
+espresso_lite_v1.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
+
 espresso_lite_v1.build.debug_port=
 espresso_lite_v1.build.debug_level=
 
@@ -469,6 +509,46 @@ espresso_lite_v2.menu.ResetMethod.ck=ck
 espresso_lite_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v2.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+
+espresso_lite_v2.menu.Debug.Disabled=Disabled
+espresso_lite_v2.menu.Debug.Disabled.build.debug_port=
+espresso_lite_v2.menu.Debug.Serial=Serial
+espresso_lite_v2.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+espresso_lite_v2.menu.Debug.Serial1=Serial1
+espresso_lite_v2.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+espresso_lite_v2.menu.DebugLevel.None____=None
+espresso_lite_v2.menu.DebugLevel.None____.build.debug_level=
+espresso_lite_v2.menu.DebugLevel.Core____=Core
+espresso_lite_v2.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
+espresso_lite_v2.menu.DebugLevel.SSL_____=Core + SSL
+espresso_lite_v2.menu.DebugLevel.SSL_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+espresso_lite_v2.menu.DebugLevel.SSL_MEM_=Core + SSL + TLS Mem
+espresso_lite_v2.menu.DebugLevel.SSL_MEM_.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_TLS_MEM
+espresso_lite_v2.menu.DebugLevel.WiFic___=Core + WiFi
+espresso_lite_v2.menu.DebugLevel.WiFic___.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+espresso_lite_v2.menu.DebugLevel.WiFi____=WiFi
+espresso_lite_v2.menu.DebugLevel.WiFi____.build.debug_level=-DDEBUG_ESP_WIFI
+espresso_lite_v2.menu.DebugLevel.HTTPClient=HTTPClient
+espresso_lite_v2.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+espresso_lite_v2.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+espresso_lite_v2.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
+espresso_lite_v2.menu.DebugLevel.HTTPUpdate=HTTPUpdate
+espresso_lite_v2.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
+espresso_lite_v2.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
+espresso_lite_v2.menu.DebugLevel.HTTPUpdate2.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE
+espresso_lite_v2.menu.DebugLevel.HTTPUpdate3=HTTPClient + HTTPUpdate + Updater
+espresso_lite_v2.menu.DebugLevel.HTTPUpdate3.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER
+espresso_lite_v2.menu.DebugLevel.HTTPServer=HTTPServer
+espresso_lite_v2.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
+espresso_lite_v2.menu.DebugLevel.UPDATER=Updater
+espresso_lite_v2.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
+espresso_lite_v2.menu.DebugLevel.OTA_____=OTA
+espresso_lite_v2.menu.DebugLevel.OTA_____.build.debug_level=-DDEBUG_ESP_OTA
+espresso_lite_v2.menu.DebugLevel.OTA2____=OTA + Updater
+espresso_lite_v2.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
+espresso_lite_v2.menu.DebugLevel.all_____=All
+espresso_lite_v2.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
 
 espresso_lite_v2.build.debug_port=
 espresso_lite_v2.build.debug_level=
