@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+/* Copyright (c) 2015-2016 Ivan Grokhotkov. All rights reserved.
  * This file is part of eboot bootloader.
  *
  * Redistribution and use is permitted according to the conditions of the
@@ -115,14 +115,16 @@ void main()
     int res = 9;
     struct eboot_command cmd;
 
-    if (eboot_command_read(&cmd)) {
+    if (eboot_command_read(&cmd) == 0) {
+        // valid command was passed via RTC_MEM
+        eboot_command_clear();
+        ets_putc('@');
+    } else {
+        // no valid command found
         cmd.action = ACTION_LOAD_APP;
         cmd.args[0] = 0;
         ets_putc('~');
-    } else {
-        ets_putc('@');
     }
-    eboot_command_clear();
 
     if (cmd.action == ACTION_COPY_RAW) {
         ets_putc('c'); ets_putc('p'); ets_putc(':');
