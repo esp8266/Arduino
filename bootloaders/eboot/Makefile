@@ -1,5 +1,5 @@
 XTENSA_TOOLCHAIN ?= ../../tools/xtensa-lx106-elf/bin/
-ESPTOOL ?= ../../tools/esptool
+ESPTOOL ?= ../../tools/esptool/esptool
 
 BIN_DIR := ./
 TARGET_DIR := ./
@@ -7,7 +7,7 @@ TARGET_DIR := ./
 TARGET_OBJ_FILES := \
 	eboot.o \
 	eboot_command.o \
-	
+
 
 TARGET_OBJ_PATHS := $(addprefix $(TARGET_DIR)/,$(TARGET_OBJ_FILES))
 
@@ -50,4 +50,3 @@ clean:
 
 
 .PHONY: all clean default
-
