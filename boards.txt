@@ -458,7 +458,7 @@ espresso_lite_v2.upload.wait_for_upload_port=true
 
 espresso_lite_v2.build.mcu=esp8266
 espresso_lite_v2.build.f_cpu=80000000L
-espresso_lite_v2.build.board=ESP8266_espresso_lite_v2
+espresso_lite_v2.build.board=ESP8266_ESPRESSO_LITE_V2
 espresso_lite_v2.build.core=esp8266
 espresso_lite_v2.build.variant=espresso_lite_v2
 espresso_lite_v2.build.flash_mode=dio
