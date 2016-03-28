@@ -43,6 +43,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server)
       if(upload.status == UPLOAD_FILE_START){
         if (_serial_output)
           Serial.setDebugOutput(true);
+        timer0_detachInterrupt();
         WiFiUDP::stopAll();
         if (_serial_output)
           Serial.printf("Update: %s\n", upload.filename.c_str());
