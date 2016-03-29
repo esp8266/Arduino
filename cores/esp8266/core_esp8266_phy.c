@@ -236,10 +236,10 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 
     // rf_cal_use_flash
     // 0: RF init no RF CAL, using all RF CAL data in flash, it takes about 2ms for RF init
-    // 1: RF init only do TX power control CAL, others using RF CAL data in flash , it takes about 20ms for RF init
+    // 1: RF init only do TX power control CAL, others using RF CAL data in flash, it takes about 20ms for RF init
     // 2: RF init no RF CAL, using all RF CAL data in flash, it takes about 2ms for RF init  (same as 0?!)
     // 3: RF init do all RF CAL, it takes about 200ms for RF init
-    [114] = 2
+    [114] = 1
 };
 
 // These functions will be overriden from C++ code.

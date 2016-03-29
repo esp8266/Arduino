@@ -40,6 +40,7 @@ typedef struct _ETSTIMER_ {
 typedef void (*int_handler_t)(void*);
 
 #define ETS_SLC_INUM        1
+#define ETS_SDIO_INUM       1
 #define ETS_SPI_INUM        2
 #define ETS_GPIO_INUM       4
 #define ETS_UART_INUM       5
@@ -144,6 +145,16 @@ inline uint32_t ETS_INTR_PENDING(void)
 #define ETS_SLC_INTR_DISABLE() \
     ETS_INTR_DISABLE(ETS_SLC_INUM)
 
+
+#define ETS_SDIO_INTR_ATTACH(func, arg) \
+    ets_isr_attach(ETS_SDIO_INUM, (int_handler_t)(func), (void *)(arg))
+
+#define ETS_SDIO_INTR_ENABLE() \
+    ETS_INTR_ENABLE(ETS_SDIO_INUM)
+
+#define ETS_SDIO_INTR_DISABLE() \
+    ETS_INTR_DISABLE(ETS_SDIO_INUM)
+    
 
 void *pvPortMalloc(size_t xWantedSize, const char* file, int line) __attribute__((malloc, alloc_size(1)));
 void *pvPortRealloc(void* ptr, size_t xWantedSize, const char* file, int line) __attribute__((alloc_size(2)));
