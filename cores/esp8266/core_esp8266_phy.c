@@ -251,7 +251,8 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 #define __run_user_rf_pre_init _Z22__run_user_rf_pre_initv
 
 extern int __real_register_chipv6_phy(uint8_t* init_data);
-extern int __wrap_register_chipv6_phy(uint8_t* init_data) {
+extern int __wrap_register_chipv6_phy(uint8_t* init_data)
+{
     if (init_data != NULL) {
       memcpy(init_data, phy_init_data, sizeof(phy_init_data));
       init_data[107] = __get_adc_mode();
@@ -262,7 +263,7 @@ extern int __wrap_register_chipv6_phy(uint8_t* init_data) {
 extern int __get_rf_mode(void)  __attribute__((weak));
 extern int __get_rf_mode(void)
 {
-    return 0;  // default mode
+    return -1;  // mode not set
 }
 
 extern int __get_adc_mode(void) __attribute__((weak));
@@ -277,7 +278,8 @@ extern void __run_user_rf_pre_init(void)
     return; // default do noting
 }
 
-void user_rf_pre_init() {
+void user_rf_pre_init()
+{
     // *((volatile uint32_t*) 0x60000710) = 0;
 
     volatile uint32_t* rtc_reg = (volatile uint32_t*) 0x60001000;
@@ -287,6 +289,9 @@ void user_rf_pre_init() {
     }
 
     system_set_os_print(0);
-    system_phy_set_rfoption(__get_rf_mode());
+    int rf_mode = __get_rf_mode();
+    if (rf_mode >= 0) {
+        system_phy_set_rfoption(rf_mode);
+    }
     __run_user_rf_pre_init();
 }
