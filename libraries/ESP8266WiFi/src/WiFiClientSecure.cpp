@@ -50,6 +50,8 @@ extern "C"
 #define SSL_DEBUG_OPTS 0
 #endif
 
+#ifndef DISABLE_SSL
+
 uint8_t* default_private_key = 0;
 uint32_t default_private_key_len = 0;
 static bool default_private_key_dynamic = false;
@@ -587,3 +589,5 @@ extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int l
 extern "C" void ax_port_free(void* ptr) {
     free(ptr);
 }
+
+#endif // DISABLE_SSL

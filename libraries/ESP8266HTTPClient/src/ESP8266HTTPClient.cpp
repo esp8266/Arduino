@@ -142,11 +142,13 @@ void HTTPClient::begin(String url, String httpsFingerprint) {
             if(!hasPort) {
                 _port = 80;
             }
+#ifndef DISABLE_SSL
         } else if(protocol.equalsIgnoreCase("https")) {
             _https = true;
             if(!hasPort) {
                 _port = 443;
             }
+#endif /* DISABLE_SSL */
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", protocol.c_str());
             return;
@@ -729,6 +731,7 @@ bool HTTPClient::connect(void) {
         return true;
     }
 
+#ifndef DISABLE_SSL
     if(_https) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect https...\n");
         if(_tcps) {
@@ -739,13 +742,16 @@ bool HTTPClient::connect(void) {
         _tcps = new WiFiClientSecure();
         _tcp = _tcps;
     } else {
+#endif /* DISABLE_SSL */
         DEBUG_HTTPCLIENT("[HTTP-Client] connect http...\n");
         if(_tcp) {
             delete _tcp;
             _tcp = NULL;
         }
         _tcp = new WiFiClient();
+#ifndef DISABLE_SSL
     }
+#endif /* DISABLE_SSL */
 
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
@@ -754,6 +760,7 @@ bool HTTPClient::connect(void) {
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
+#ifndef DISABLE_SSL
     if(_https && _httpsFingerprint.length() > 0) {
         if(_tcps->verify(_httpsFingerprint.c_str(), _host.c_str())) {
             DEBUG_HTTPCLIENT("[HTTP-Client] https certificate matches\n");
@@ -763,6 +770,7 @@ bool HTTPClient::connect(void) {
             return false;
         }
     }
+#endif /* DISABLE_SSL */
 
     // set Timeout for readBytesUntil and readStringUntil
     _tcp->setTimeout(_tcpTimeout);
