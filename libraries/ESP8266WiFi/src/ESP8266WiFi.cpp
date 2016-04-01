@@ -89,4 +89,12 @@ void ESP8266WiFiClass::printDiag(Print& p) {
 
 }
 
+String ESP8266WiFiClass::passphrase()
+{
+    struct station_config conf;
+    wifi_station_get_config(&conf);
+    const char* ssid = reinterpret_cast<const char*>(conf.password);
+    return String(ssid);
+}
+
 ESP8266WiFiClass WiFi;
