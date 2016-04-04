@@ -125,31 +125,31 @@ String ESP8266HTTPUpdate::getLastErrorString(void)
         StreamString error;
         Update.printError(error);
         error.trim(); // remove line ending
-        return "Update error: " + error;
+        return String(F("Update error: ")) + error;
     }
 
     // error from http client
     if(_lastError > -100) {
-        return "HTTP error: " + HTTPClient::errorToString(_lastError);
+        return String(F("HTTP error: ")) + HTTPClient::errorToString(_lastError);
     }
 
     switch(_lastError) {
     case HTTP_UE_TOO_LESS_SPACE:
-        return String("To less space");
+        return F("To less space");
     case HTTP_UE_SERVER_NOT_REPORT_SIZE:
-        return String("Server not Report Size");
+        return F("Server not Report Size");
     case HTTP_UE_SERVER_FILE_NOT_FOUND:
-        return String("File not Found (404)");
+        return F("File not Found (404)");
     case HTTP_UE_SERVER_FORBIDDEN:
-        return String("Forbidden (403)");
+        return F("Forbidden (403)");
     case HTTP_UE_SERVER_WRONG_HTTP_CODE:
-        return String("Wrong HTTP code");
+        return F("Wrong HTTP code");
     case HTTP_UE_SERVER_FAULTY_MD5:
-        return String("Faulty MD5");
+        return F("Faulty MD5");
     case HTTP_UE_BIN_VERIFY_HEADER_FAILED:
-        return String("Verify bin header failed");
+        return F("Verify bin header failed");
     case HTTP_UE_BIN_FOR_WRONG_FLASH:
-        return String("bin for wrong flash size");
+        return F("bin for wrong flash size");
     }
 
     return String();
@@ -170,22 +170,22 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     // use HTTP/1.0 for update since the update handler not support any transfer Encoding
     http.useHTTP10(true);
     http.setTimeout(8000);
-    http.setUserAgent("ESP8266-http-Update");
-    http.addHeader("x-ESP8266-STA-MAC", WiFi.macAddress());
-    http.addHeader("x-ESP8266-AP-MAC", WiFi.softAPmacAddress());
-    http.addHeader("x-ESP8266-free-space", String(ESP.getFreeSketchSpace()));
-    http.addHeader("x-ESP8266-sketch-size", String(ESP.getSketchSize()));
-    http.addHeader("x-ESP8266-chip-size", String(ESP.getFlashChipRealSize()));
-    http.addHeader("x-ESP8266-sdk-version", ESP.getSdkVersion());
+    http.setUserAgent(F("ESP8266-http-Update"));
+    http.addHeader(F("x-ESP8266-STA-MAC"), WiFi.macAddress());
+    http.addHeader(F("x-ESP8266-AP-MAC"), WiFi.softAPmacAddress());
+    http.addHeader(F("x-ESP8266-free-space"), String(ESP.getFreeSketchSpace()));
+    http.addHeader(F("x-ESP8266-sketch-size"), String(ESP.getSketchSize()));
+    http.addHeader(F("x-ESP8266-chip-size"), String(ESP.getFlashChipRealSize()));
+    http.addHeader(F("x-ESP8266-sdk-version"), ESP.getSdkVersion());
 
     if(spiffs) {
-        http.addHeader("x-ESP8266-mode", "spiffs");
+        http.addHeader(F("x-ESP8266-mode"), F("spiffs"));
     } else {
-        http.addHeader("x-ESP8266-mode", "sketch");
+        http.addHeader(F("x-ESP8266-mode"), F("sketch"));
     }
 
     if(currentVersion && currentVersion[0] != 0x00) {
-        http.addHeader("x-ESP8266-version", currentVersion);
+        http.addHeader(F("x-ESP8266-version"), currentVersion);
     }
 
     const char * headerkeys[] = { "x-MD5" };

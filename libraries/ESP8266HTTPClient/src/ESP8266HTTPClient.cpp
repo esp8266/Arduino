@@ -256,7 +256,7 @@ void HTTPClient::setReuse(bool reuse)
  * set User Agent
  * @param userAgent const char *
  */
-void HTTPClient::setUserAgent(const char * userAgent)
+void HTTPClient::setUserAgent(const String& userAgent)
 {
     _userAgent = userAgent;
 }
@@ -359,7 +359,7 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
     }
 
     if(payload && size > 0) {
-        addHeader("Content-Length", String(size));
+        addHeader(F("Content-Length"), String(size));
     }
 
     // send Header
@@ -644,8 +644,8 @@ String HTTPClient::getString(void)
     if(_size) {
         // try to reserve needed memmory
         if(!sstring.reserve((_size + 1))) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][getString] too less memory to reserve as string! need: %d\n", (_size + 1));
-            return String("--too less memory--");
+            DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
+            return "";
         }
     }
 
@@ -662,27 +662,27 @@ String HTTPClient::errorToString(int error)
 {
     switch(error) {
     case HTTPC_ERROR_CONNECTION_REFUSED:
-        return String("connection refused");
+        return F("connection refused");
     case HTTPC_ERROR_SEND_HEADER_FAILED:
-        return String("send header failed");
+        return F("send header failed");
     case HTTPC_ERROR_SEND_PAYLOAD_FAILED:
-        return String("send payload failed");
+        return F("send payload failed");
     case HTTPC_ERROR_NOT_CONNECTED:
-        return String("not connected");
+        return F("not connected");
     case HTTPC_ERROR_CONNECTION_LOST:
-        return String("connection lost");
+        return F("connection lost");
     case HTTPC_ERROR_NO_STREAM:
-        return String("no stream");
+        return F("no stream");
     case HTTPC_ERROR_NO_HTTP_SERVER:
-        return String("no HTTP server");
+        return F("no HTTP server");
     case HTTPC_ERROR_TOO_LESS_RAM:
-        return String("too less ram");
+        return F("too less ram");
     case HTTPC_ERROR_ENCODING:
-        return String("Transfer-Encoding not supported");
+        return F("Transfer-Encoding not supported");
     case HTTPC_ERROR_STREAM_WRITE:
-        return String("Stream write error");
+        return F("Stream write error");
     case HTTPC_ERROR_READ_TIMEOUT:
-        return String("read Timeout");
+        return F("read Timeout");
     default:
         return String();
     }
@@ -698,7 +698,10 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first)
 {
 
     // not allow set of Header handled by code
-    if(!name.equalsIgnoreCase("Connection") && !name.equalsIgnoreCase("User-Agent") && !name.equalsIgnoreCase("Host") && !(_base64Authorization.length() && name.equalsIgnoreCase("Authorization"))) {
+    if(!name.equalsIgnoreCase(F("Connection")) &&
+       !name.equalsIgnoreCase(F("User-Agent")) &&
+       !name.equalsIgnoreCase(F("Host")) &&
+       !(name.equalsIgnoreCase(F("Authorization")) && _base64Authorization.length())){
         String headerLine = name;
         headerLine += ": ";
         headerLine += value;
@@ -821,7 +824,7 @@ bool HTTPClient::sendHeader(const char * type)
         return false;
     }
 
-    String header = String(type) + " " + _uri + " HTTP/1.";
+    String header = String(type) + " " + _uri + F(" HTTP/1.");
 
     if(_useHTTP10) {
         header += "0";
@@ -829,24 +832,25 @@ bool HTTPClient::sendHeader(const char * type)
         header += "1";
     }
 
-    header += "\r\n"
-              "Host: " + _host + "\r\n"
-              "User-Agent: " + _userAgent + "\r\n"
-              "Connection: ";
+    header += String(F("\r\nHost: ")) + _host +
+              F("\r\nUser-Agent: ") + _userAgent +
+              F("\r\nConnection: ");
 
     if(_reuse) {
-        header += "keep-alive";
+        header += F("keep-alive");
     } else {
-        header += "close";
+        header += F("close");
     }
     header += "\r\n";
 
     if(!_useHTTP10) {
-        header += "Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n";
+        header += F("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n");
     }
 
     if(_base64Authorization.length()) {
-        header += "Authorization: Basic " + _base64Authorization + "\r\n";
+        header += F("Authorization: Basic ");
+        header += _base64Authorization;
+        header += "\r\n";
     }
 
     header += _headers + "\r\n";
