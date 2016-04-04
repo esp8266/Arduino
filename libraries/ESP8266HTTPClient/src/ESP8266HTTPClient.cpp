@@ -30,138 +30,178 @@
 
 #include "ESP8266HTTPClient.h"
 
+class TransportTraits {
+public:
+    virtual std::unique_ptr<WiFiClient> create()
+    {
+        return std::unique_ptr<WiFiClient>(new WiFiClient());
+    }
+
+    virtual bool verify(WiFiClient& client, const char* host)
+    {
+        return true;
+    }
+};
+
+class TLSTraits : public TransportTraits {
+public:
+    TLSTraits(const String& fingerprint) :
+        _fingerprint(fingerprint)
+    {
+    }
+
+    std::unique_ptr<WiFiClient> create() override
+    {
+        return std::unique_ptr<WiFiClient>(new WiFiClientSecure());
+    }
+
+    bool verify(WiFiClient& client, const char* host) override
+    {
+        auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
+        return wcs.verify(_fingerprint.c_str(), host);
+    }
+
+protected:
+    String _fingerprint;
+};
+
 /**
- * constractor
+ * constructor
  */
-HTTPClient::HTTPClient() {
-    _tcp = NULL;
-    _tcps = NULL;
-
-    _port = 0;
-
-    _reuse = false;
-    _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
-    _useHTTP10 = false;
-
-    _https = false;
-
-    _userAgent = "ESP8266HTTPClient";
-
-    _headerKeysCount = 0;
-    _currentHeaders = NULL;
-
-    _returnCode = 0;
-    _size = -1;
-    _canReuse = false;
-    _transferEncoding = HTTPC_TE_IDENTITY;
-
+HTTPClient::HTTPClient()
+{
 }
 
 /**
- * deconstractor
+ * destructor
  */
-HTTPClient::~HTTPClient() {
-
-    if(_tcps) {
-        _tcps->stop();
-        delete _tcps;
-        _tcps = NULL;
-        _tcp = NULL;
-    } else if(_tcp) {
+HTTPClient::~HTTPClient()
+{
+    if(_tcp) {
         _tcp->stop();
-        delete _tcp;
-        _tcp = NULL;
     }
-
     if(_currentHeaders) {
         delete[] _currentHeaders;
     }
 }
 
-/**
- * phasing the url for all needed informations
- * @param url String
- * @param httpsFingerprint String
- */
-void HTTPClient::begin(String url, String httpsFingerprint) {
 
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
-
-    _httpsFingerprint = httpsFingerprint;
-    _returnCode = 0;
-    _size = -1;
-
-    _Headers = "";
-
-    String protocol;
-    // check for : (http: or https:
-    int index = url.indexOf(':');
-    //int index2;
-    bool hasPort = false;
-    if(index >= 0) {
-        protocol = url.substring(0, index);
-        url.remove(0, (index + 3)); // remove http:// or https://
-
-        index = url.indexOf('/');
-        String host = url.substring(0, index);
-        url.remove(0, index); // remove host part
-
-        // get Authorization
-        index = host.indexOf('@');
-        if(index >= 0) {
-            // auth info
-            String auth = host.substring(0, index);
-            host.remove(0, index + 1); // remove auth part including @
-            _base64Authorization = base64::encode(auth);
-        }
-
-        // get port
-        index = host.indexOf(':');
-        if(index >= 0) {
-            _host = host.substring(0, index); // hostname
-            host.remove(0, (index + 1)); // remove hostname + :
-            _port = host.toInt(); // get port
-            hasPort = true;
-        } else {
-            _host = host;
-        }
-
-        _url = url;
-
-        if(protocol.equalsIgnoreCase("http")) {
-            _https = false;
-            if(!hasPort) {
-                _port = 80;
-            }
-        } else if(protocol.equalsIgnoreCase("https")) {
-            _https = true;
-            if(!hasPort) {
-                _port = 443;
-            }
-        } else {
-            DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", protocol.c_str());
-            return;
-        }
-
+bool HTTPClient::begin(String url, String httpsFingerprint) {
+    if (httpsFingerprint.length() == 0) {
+        return false;
     }
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s https: %d httpsFingerprint: %s\n", _host.c_str(), _port, _url.c_str(), _https, _httpsFingerprint.c_str());
-
+    if (!begin(url)) {
+        return false;
+    }
+    _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
+    return true;
 }
 
-void HTTPClient::begin(String host, uint16_t port, String url, bool https, String httpsFingerprint) {
-    _host = host;
-    _port = port;
-    _url = url;
-    _https = https;
-    _httpsFingerprint = httpsFingerprint;
-
+void HTTPClient::clear()
+{
     _returnCode = 0;
     _size = -1;
+    _headers = "";
+}
 
-    _Headers = "";
 
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port:%d url: %s https: %d httpsFingerprint: %s\n", host, port, url, https, httpsFingerprint);
+/**
+ * parsing the url for all needed parameters
+ * @param url String
+ */
+bool HTTPClient::begin(String url)
+{
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
+    bool hasPort = false;
+    clear();
+
+    // check for : (http: or https:
+    int index = url.indexOf(':');
+    if(index < 0) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] failed to parse protocol\n");
+        return false;
+    }
+
+    _protocol = url.substring(0, index);
+    url.remove(0, (index + 3)); // remove http:// or https://
+
+    index = url.indexOf('/');
+    String host = url.substring(0, index);
+    url.remove(0, index); // remove host part
+
+    // get Authorization
+    index = host.indexOf('@');
+    if(index >= 0) {
+        // auth info
+        String auth = host.substring(0, index);
+        host.remove(0, index + 1); // remove auth part including @
+        _base64Authorization = base64::encode(auth);
+    }
+
+    // get port
+    index = host.indexOf(':');
+    if(index >= 0) {
+        _host = host.substring(0, index); // hostname
+        host.remove(0, (index + 1)); // remove hostname + :
+        _port = host.toInt(); // get port
+        hasPort = true;
+    } else {
+        _host = host;
+    }
+    _uri = url;
+
+    if(_protocol.equalsIgnoreCase("http")) {
+        if(!hasPort) {
+            _port = 80;
+        }
+    } else if(_protocol.equalsIgnoreCase("https")) {
+        if(!hasPort) {
+            _port = 443;
+        }
+    } else {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", protocol.c_str());
+        return false;
+    }
+    _transportTraits = TransportTraitsPtr(new TransportTraits());
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s\n", _host.c_str(), _port, _uri.c_str());
+    return true;
+}
+
+bool HTTPClient::begin(String host, uint16_t port, String uri)
+{
+    clear();
+    _host = host;
+    _port = port;
+    _uri = uri;
+    _transportTraits = TransportTraitsPtr(new TransportTraits());
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d uri: %s\n", host.c_str(), port, uri.c_str());
+    return true;
+}
+
+bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)
+{
+    if (https) {
+        return begin(host, port, uri, httpsFingerprint);
+    }
+    else {
+        return begin(host, port, uri);
+    }
+}
+
+bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFingerprint)
+{
+    clear();
+    _host = host;
+    _port = port;
+    _uri = uri;
+
+    if (httpsFingerprint.length() == 0) {
+        return false;
+    }
+    _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s httpsFingerprint: %s\n", host.c_str(), port, uri.c_str(), httpsFingerprint.c_str());
+    return true;
 }
 
 /**
@@ -469,31 +509,30 @@ int HTTPClient::getSize(void) {
 }
 
 /**
- * deprecated Note: this is not working with https!
  * returns the stream of the tcp connection
  * @return WiFiClient
  */
-WiFiClient & HTTPClient::getStream(void) {
+WiFiClient& HTTPClient::getStream(void) {
     if(connected()) {
         return *_tcp;
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client] no stream to return!?\n");
-
-    // todo return error?
+    DEBUG_HTTPCLIENT("[HTTP-Client] getStream: not connected\n");
+    static WiFiClient empty;
+    return empty;
 }
 
 /**
  * returns the stream of the tcp connection
  * @return WiFiClient *
  */
-WiFiClient * HTTPClient::getStreamPtr(void) {
+WiFiClient* HTTPClient::getStreamPtr(void) {
     if(connected()) {
-        return _tcp;
+        return _tcp.get();
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client] no stream to return!?\n");
-    return NULL;
+    DEBUG_HTTPCLIENT("[HTTP-Client] getStreamPtr: not connected\n");
+    return nullptr;
 }
 
 /**
@@ -642,9 +681,9 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first) 
         headerLine += "\r\n";
 
         if(first) {
-            _Headers = headerLine + _Headers;
+            _headers = headerLine + _headers;
         } else {
-            _Headers += headerLine;
+            _headers += headerLine;
         }
     }
 
@@ -706,23 +745,12 @@ bool HTTPClient::connect(void) {
         return true;
     }
 
-    if(_https) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect https...\n");
-        if(_tcps) {
-            delete _tcps;
-            _tcps = NULL;
-            _tcp = NULL;
-        }
-        _tcps = new WiFiClientSecure();
-        _tcp = _tcps;
-    } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect http...\n");
-        if(_tcp) {
-            delete _tcp;
-            _tcp = NULL;
-        }
-        _tcp = new WiFiClient();
+    if (!_transportTraits) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] _transportTraits is null (HTTPClient::begin not called?)\n");
+        return false;
     }
+
+    _tcp = _transportTraits->create();
 
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
@@ -731,14 +759,10 @@ bool HTTPClient::connect(void) {
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
-    if(_https && _httpsFingerprint.length() > 0) {
-        if(_tcps->verify(_httpsFingerprint.c_str(), _host.c_str())) {
-            DEBUG_HTTPCLIENT("[HTTP-Client] https certificate matches\n");
-        } else {
-            DEBUG_HTTPCLIENT("[HTTP-Client] https certificate doesn't match!\n");
-            _tcp->stop();
-            return false;
-        }
+    if (!_transportTraits->verify(*_tcp, _host.c_str())) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
+        _tcp->stop();
+        return false;
     }
 
     // set Timeout for readBytesUntil and readStringUntil
@@ -760,7 +784,7 @@ bool HTTPClient::sendHeader(const char * type) {
         return false;
     }
 
-    String header = String(type) + " " + _url + " HTTP/1.";
+    String header = String(type) + " " + _uri + " HTTP/1.";
 
     if(_useHTTP10) {
         header += "0";
@@ -788,7 +812,7 @@ bool HTTPClient::sendHeader(const char * type) {
         header += "Authorization: Basic " + _base64Authorization + "\r\n";
     }
 
-    header += _Headers + "\r\n";
+    header += _headers + "\r\n";
 
     return (_tcp->write(header.c_str(), header.length()) == header.length());
 }

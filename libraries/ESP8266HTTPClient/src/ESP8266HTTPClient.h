@@ -25,6 +25,10 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
+#include <memory>
+#include <Arduino.h>
+#include <WiFiClient.h>
+
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
 #define DEBUG_HTTPCLIENT(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
@@ -120,16 +124,23 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
+class TransportTraits;
+typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
+
 class HTTPClient {
     public:
         HTTPClient();
         ~HTTPClient();
 
-        void begin(String url, String httpsFingerprint = "");
-        void begin(String host, uint16_t port, String url = "/", bool https = false, String httpsFingerprint = "");
+        bool begin(String url);
+        bool begin(String url, String httpsFingerprint);
+        bool begin(String host, uint16_t port, String uri = "/");
+        bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
+        // deprecated, use the overload above instead
+        bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
 
         void end(void);
-        
+
         bool connected(void);
 
         void setReuse(bool reuse); /// keep-alive
@@ -161,53 +172,51 @@ class HTTPClient {
 
         int getSize(void);
 
-        WiFiClient & getStream(void)  __attribute__ ((deprecated)) ;
-        WiFiClient * getStreamPtr(void);
-        int writeToStream(Stream * stream);
+        WiFiClient& getStream(void);
+        WiFiClient* getStreamPtr(void);
+        int writeToStream(Stream* stream);
         String getString(void);
 
         static String errorToString(int error);
 
     protected:
-
         struct RequestArgument {
-          String key;
-          String value;
+            String key;
+            String value;
         };
 
-
-        WiFiClient * _tcp;
-        WiFiClientSecure * _tcps;
-
-        /// request handling
-        String _host;
-        uint16_t _port;
-        bool _reuse;
-        uint16_t _tcpTimeout;
-        bool _useHTTP10;
-
-        String _url;
-        bool _https;
-        String _httpsFingerprint;
-
-        String _Headers;
-        String _userAgent;
-        String _base64Authorization;
-
-        /// Response handling
-        RequestArgument* _currentHeaders;
-        size_t           _headerKeysCount;
-
-        int _returnCode;
-        int _size;
-        bool _canReuse;
-        transferEncoding_t _transferEncoding;
-
+        void clear();
         int returnError(int error);
         bool connect(void);
         bool sendHeader(const char * type);
         int handleHeaderResponse();
         int writeToStreamDataBlock(Stream * stream, int len);
+
+
+        TransportTraitsPtr _transportTraits;
+        std::unique_ptr<WiFiClient> _tcp;
+
+        /// request handling
+        String _host;
+        uint16_t _port = 0;
+        bool _reuse = false;
+        uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
+        bool _useHTTP10 = false;
+
+        String _uri;
+        String _protocol;
+        String _headers;
+        String _userAgent = "ESP8266HTTPClient";
+        String _base64Authorization;
+
+        /// Response handling
+        RequestArgument* _currentHeaders = nullptr;
+        size_t           _headerKeysCount = 0;
+
+        int _returnCode = 0;
+        int _size = -1;
+        bool _canReuse = false;
+        transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
 };
 
 
