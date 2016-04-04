@@ -127,96 +127,97 @@ typedef enum {
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 
-class HTTPClient {
-    public:
-        HTTPClient();
-        ~HTTPClient();
+class HTTPClient
+{
+public:
+    HTTPClient();
+    ~HTTPClient();
 
-        bool begin(String url);
-        bool begin(String url, String httpsFingerprint);
-        bool begin(String host, uint16_t port, String uri = "/");
-        bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
-        // deprecated, use the overload above instead
-        bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
+    bool begin(String url);
+    bool begin(String url, String httpsFingerprint);
+    bool begin(String host, uint16_t port, String uri = "/");
+    bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
+    // deprecated, use the overload above instead
+    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
 
-        void end(void);
+    void end(void);
 
-        bool connected(void);
+    bool connected(void);
 
-        void setReuse(bool reuse); /// keep-alive
-        void setUserAgent(const char * userAgent);
-        void setAuthorization(const char * user, const char * password);
-        void setAuthorization(const char * auth);
-        void setTimeout(uint16_t timeout);
+    void setReuse(bool reuse); /// keep-alive
+    void setUserAgent(const char * userAgent);
+    void setAuthorization(const char * user, const char * password);
+    void setAuthorization(const char * auth);
+    void setTimeout(uint16_t timeout);
 
-        void useHTTP10(bool usehttp10 = true);
+    void useHTTP10(bool usehttp10 = true);
 
-        /// request handling
-        int GET();
-        int POST(uint8_t * payload, size_t size);
-        int POST(String payload);
-        int sendRequest(const char * type, String payload);
-        int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
-        int sendRequest(const char * type, Stream * stream, size_t size = 0);
+    /// request handling
+    int GET();
+    int POST(uint8_t * payload, size_t size);
+    int POST(String payload);
+    int sendRequest(const char * type, String payload);
+    int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
+    int sendRequest(const char * type, Stream * stream, size_t size = 0);
 
-        void addHeader(const String& name, const String& value, bool first = false);
+    void addHeader(const String& name, const String& value, bool first = false);
 
-        /// Response handling
-        void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
-        String header(const char* name);   // get request header value by name
-        String header(size_t i);              // get request header value by number
-        String headerName(size_t i);          // get request header name by number
-        int headers();                     // get header count
-        bool hasHeader(const char* name);  // check if header exists
-
-
-        int getSize(void);
-
-        WiFiClient& getStream(void);
-        WiFiClient* getStreamPtr(void);
-        int writeToStream(Stream* stream);
-        String getString(void);
-
-        static String errorToString(int error);
-
-    protected:
-        struct RequestArgument {
-            String key;
-            String value;
-        };
-
-        void clear();
-        int returnError(int error);
-        bool connect(void);
-        bool sendHeader(const char * type);
-        int handleHeaderResponse();
-        int writeToStreamDataBlock(Stream * stream, int len);
+    /// Response handling
+    void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
+    String header(const char* name);   // get request header value by name
+    String header(size_t i);              // get request header value by number
+    String headerName(size_t i);          // get request header name by number
+    int headers();                     // get header count
+    bool hasHeader(const char* name);  // check if header exists
 
 
-        TransportTraitsPtr _transportTraits;
-        std::unique_ptr<WiFiClient> _tcp;
+    int getSize(void);
 
-        /// request handling
-        String _host;
-        uint16_t _port = 0;
-        bool _reuse = false;
-        uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
-        bool _useHTTP10 = false;
+    WiFiClient& getStream(void);
+    WiFiClient* getStreamPtr(void);
+    int writeToStream(Stream* stream);
+    String getString(void);
 
-        String _uri;
-        String _protocol;
-        String _headers;
-        String _userAgent = "ESP8266HTTPClient";
-        String _base64Authorization;
+    static String errorToString(int error);
 
-        /// Response handling
-        RequestArgument* _currentHeaders = nullptr;
-        size_t           _headerKeysCount = 0;
+protected:
+    struct RequestArgument {
+        String key;
+        String value;
+    };
 
-        int _returnCode = 0;
-        int _size = -1;
-        bool _canReuse = false;
-        transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
+    void clear();
+    int returnError(int error);
+    bool connect(void);
+    bool sendHeader(const char * type);
+    int handleHeaderResponse();
+    int writeToStreamDataBlock(Stream * stream, int len);
+
+
+    TransportTraitsPtr _transportTraits;
+    std::unique_ptr<WiFiClient> _tcp;
+
+    /// request handling
+    String _host;
+    uint16_t _port = 0;
+    bool _reuse = false;
+    uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
+    bool _useHTTP10 = false;
+
+    String _uri;
+    String _protocol;
+    String _headers;
+    String _userAgent = "ESP8266HTTPClient";
+    String _base64Authorization;
+
+    /// Response handling
+    RequestArgument* _currentHeaders = nullptr;
+    size_t           _headerKeysCount = 0;
+
+    int _returnCode = 0;
+    int _size = -1;
+    bool _canReuse = false;
+    transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
 };
 
 

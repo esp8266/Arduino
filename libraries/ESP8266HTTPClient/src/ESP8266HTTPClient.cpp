@@ -30,7 +30,8 @@
 
 #include "ESP8266HTTPClient.h"
 
-class TransportTraits {
+class TransportTraits
+{
 public:
     virtual std::unique_ptr<WiFiClient> create()
     {
@@ -43,7 +44,8 @@ public:
     }
 };
 
-class TLSTraits : public TransportTraits {
+class TLSTraits : public TransportTraits
+{
 public:
     TLSTraits(const String& fingerprint) :
         _fingerprint(fingerprint)
@@ -86,7 +88,8 @@ HTTPClient::~HTTPClient()
 }
 
 
-bool HTTPClient::begin(String url, String httpsFingerprint) {
+bool HTTPClient::begin(String url, String httpsFingerprint)
+{
     if (httpsFingerprint.length() == 0) {
         return false;
     }
@@ -183,8 +186,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, Strin
 {
     if (https) {
         return begin(host, port, uri, httpsFingerprint);
-    }
-    else {
+    } else {
         return begin(host, port, uri);
     }
 }
@@ -208,7 +210,8 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
  * end
  * called after the payload is handled
  */
-void HTTPClient::end(void) {
+void HTTPClient::end(void)
+{
     if(connected()) {
         if(_tcp->available() > 0) {
             DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _tcp->available());
@@ -231,7 +234,8 @@ void HTTPClient::end(void) {
  * connected
  * @return connected status
  */
-bool HTTPClient::connected() {
+bool HTTPClient::connected()
+{
     if(_tcp) {
         return (_tcp->connected() || (_tcp->available() > 0));
     }
@@ -243,7 +247,8 @@ bool HTTPClient::connected() {
  * keep-alive
  * @param reuse bool
  */
-void HTTPClient::setReuse(bool reuse) {
+void HTTPClient::setReuse(bool reuse)
+{
     _reuse = reuse;
 }
 
@@ -251,7 +256,8 @@ void HTTPClient::setReuse(bool reuse) {
  * set User Agent
  * @param userAgent const char *
  */
-void HTTPClient::setUserAgent(const char * userAgent) {
+void HTTPClient::setUserAgent(const char * userAgent)
+{
     _userAgent = userAgent;
 }
 
@@ -260,7 +266,8 @@ void HTTPClient::setUserAgent(const char * userAgent) {
  * @param user const char *
  * @param password const char *
  */
-void HTTPClient::setAuthorization(const char * user, const char * password) {
+void HTTPClient::setAuthorization(const char * user, const char * password)
+{
     if(user && password) {
         String auth = user;
         auth += ":";
@@ -273,7 +280,8 @@ void HTTPClient::setAuthorization(const char * user, const char * password) {
  * set the Authorizatio for the http request
  * @param auth const char * base64
  */
-void HTTPClient::setAuthorization(const char * auth) {
+void HTTPClient::setAuthorization(const char * auth)
+{
     if(auth) {
         _base64Authorization = auth;
     }
@@ -283,7 +291,8 @@ void HTTPClient::setAuthorization(const char * auth) {
  * set the timeout for the TCP connection
  * @param timeout unsigned int
  */
-void HTTPClient::setTimeout(uint16_t timeout) {
+void HTTPClient::setTimeout(uint16_t timeout)
+{
     _tcpTimeout = timeout;
     if(connected()) {
         _tcp->setTimeout(timeout);
@@ -294,7 +303,8 @@ void HTTPClient::setTimeout(uint16_t timeout) {
  * use HTTP1.0
  * @param timeout
  */
-void HTTPClient::useHTTP10(bool useHTTP10) {
+void HTTPClient::useHTTP10(bool useHTTP10)
+{
     _useHTTP10 = useHTTP10;
 }
 
@@ -302,7 +312,8 @@ void HTTPClient::useHTTP10(bool useHTTP10) {
  * send a GET request
  * @return http code
  */
-int HTTPClient::GET() {
+int HTTPClient::GET()
+{
     return sendRequest("GET");
 }
 
@@ -312,11 +323,13 @@ int HTTPClient::GET() {
  * @param size size_t
  * @return http code
  */
-int HTTPClient::POST(uint8_t * payload, size_t size) {
+int HTTPClient::POST(uint8_t * payload, size_t size)
+{
     return sendRequest("POST", payload, size);
 }
 
-int HTTPClient::POST(String payload) {
+int HTTPClient::POST(String payload)
+{
     return POST((uint8_t *) payload.c_str(), payload.length());
 }
 
@@ -326,7 +339,8 @@ int HTTPClient::POST(String payload) {
  * @param payload String        data for the message body
  * @return
  */
-int HTTPClient::sendRequest(const char * type, String payload) {
+int HTTPClient::sendRequest(const char * type, String payload)
+{
     return sendRequest(type, (uint8_t *) payload.c_str(), payload.length());
 }
 
@@ -337,7 +351,8 @@ int HTTPClient::sendRequest(const char * type, String payload) {
  * @param size size_t           size for the message body if 0 not send
  * @return -1 if no info or > 0 when Content-Length is set by server
  */
-int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size) {
+int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
+{
     // connect to server
     if(!connect()) {
         return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
@@ -370,7 +385,8 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size) {
  * @param size size_t           size for the message body if 0 not Content-Length is send
  * @return -1 if no info or > 0 when Content-Length is set by server
  */
-int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
+int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
+{
 
     if(!stream) {
         return returnError(HTTPC_ERROR_NO_STREAM);
@@ -485,7 +501,8 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
         free(buff);
 
         if(size && (int) size != bytesWritten) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.\n", bytesWritten, size); DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!");
+            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.\n", bytesWritten, size);
+            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!");
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload written: %d\n", bytesWritten);
@@ -504,7 +521,8 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
  * size of message body / payload
  * @return -1 if no info or > 0 when Content-Length is set by server
  */
-int HTTPClient::getSize(void) {
+int HTTPClient::getSize(void)
+{
     return _size;
 }
 
@@ -512,7 +530,8 @@ int HTTPClient::getSize(void) {
  * returns the stream of the tcp connection
  * @return WiFiClient
  */
-WiFiClient& HTTPClient::getStream(void) {
+WiFiClient& HTTPClient::getStream(void)
+{
     if(connected()) {
         return *_tcp;
     }
@@ -526,7 +545,8 @@ WiFiClient& HTTPClient::getStream(void) {
  * returns the stream of the tcp connection
  * @return WiFiClient *
  */
-WiFiClient* HTTPClient::getStreamPtr(void) {
+WiFiClient* HTTPClient::getStreamPtr(void)
+{
     if(connected()) {
         return _tcp.get();
     }
@@ -540,7 +560,8 @@ WiFiClient* HTTPClient::getStreamPtr(void) {
  * @param stream Stream *
  * @return bytes written ( negative values are error codes )
  */
-int HTTPClient::writeToStream(Stream * stream) {
+int HTTPClient::writeToStream(Stream * stream)
+{
 
     if(!stream) {
         return returnError(HTTPC_ERROR_NO_STREAM);
@@ -616,7 +637,8 @@ int HTTPClient::writeToStream(Stream * stream) {
  * return all payload as String (may need lot of ram or trigger out of memory!)
  * @return String
  */
-String HTTPClient::getString(void) {
+String HTTPClient::getString(void)
+{
     StreamString sstring;
 
     if(_size) {
@@ -636,32 +658,33 @@ String HTTPClient::getString(void) {
  * @param error int
  * @return String
  */
-String HTTPClient::errorToString(int error) {
+String HTTPClient::errorToString(int error)
+{
     switch(error) {
-        case HTTPC_ERROR_CONNECTION_REFUSED:
-            return String("connection refused");
-        case HTTPC_ERROR_SEND_HEADER_FAILED:
-            return String("send header failed");
-        case HTTPC_ERROR_SEND_PAYLOAD_FAILED:
-            return String("send payload failed");
-        case HTTPC_ERROR_NOT_CONNECTED:
-            return String("not connected");
-        case HTTPC_ERROR_CONNECTION_LOST:
-            return String("connection lost");
-        case HTTPC_ERROR_NO_STREAM:
-            return String("no stream");
-        case HTTPC_ERROR_NO_HTTP_SERVER:
-            return String("no HTTP server");
-        case HTTPC_ERROR_TOO_LESS_RAM:
-            return String("too less ram");
-        case HTTPC_ERROR_ENCODING:
-            return String("Transfer-Encoding not supported");
-        case HTTPC_ERROR_STREAM_WRITE:
-            return String("Stream write error");
-        case HTTPC_ERROR_READ_TIMEOUT:
-            return String("read Timeout");
-        default:
-            return String();
+    case HTTPC_ERROR_CONNECTION_REFUSED:
+        return String("connection refused");
+    case HTTPC_ERROR_SEND_HEADER_FAILED:
+        return String("send header failed");
+    case HTTPC_ERROR_SEND_PAYLOAD_FAILED:
+        return String("send payload failed");
+    case HTTPC_ERROR_NOT_CONNECTED:
+        return String("not connected");
+    case HTTPC_ERROR_CONNECTION_LOST:
+        return String("connection lost");
+    case HTTPC_ERROR_NO_STREAM:
+        return String("no stream");
+    case HTTPC_ERROR_NO_HTTP_SERVER:
+        return String("no HTTP server");
+    case HTTPC_ERROR_TOO_LESS_RAM:
+        return String("too less ram");
+    case HTTPC_ERROR_ENCODING:
+        return String("Transfer-Encoding not supported");
+    case HTTPC_ERROR_STREAM_WRITE:
+        return String("Stream write error");
+    case HTTPC_ERROR_READ_TIMEOUT:
+        return String("read Timeout");
+    default:
+        return String();
     }
 }
 
@@ -671,7 +694,8 @@ String HTTPClient::errorToString(int error) {
  * @param value
  * @param first
  */
-void HTTPClient::addHeader(const String& name, const String& value, bool first) {
+void HTTPClient::addHeader(const String& name, const String& value, bool first)
+{
 
     // not allow set of Header handled by code
     if(!name.equalsIgnoreCase("Connection") && !name.equalsIgnoreCase("User-Agent") && !name.equalsIgnoreCase("Host") && !(_base64Authorization.length() && name.equalsIgnoreCase("Authorization"))) {
@@ -689,44 +713,55 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first) 
 
 }
 
-void HTTPClient::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
+void HTTPClient::collectHeaders(const char* headerKeys[], const size_t headerKeysCount)
+{
     _headerKeysCount = headerKeysCount;
-    if(_currentHeaders)
+    if(_currentHeaders) {
         delete[] _currentHeaders;
+    }
     _currentHeaders = new RequestArgument[_headerKeysCount];
     for(size_t i = 0; i < _headerKeysCount; i++) {
         _currentHeaders[i].key = headerKeys[i];
     }
 }
 
-String HTTPClient::header(const char* name) {
+String HTTPClient::header(const char* name)
+{
     for(size_t i = 0; i < _headerKeysCount; ++i) {
-        if(_currentHeaders[i].key == name)
+        if(_currentHeaders[i].key == name) {
             return _currentHeaders[i].value;
+        }
     }
     return String();
 }
 
-String HTTPClient::header(size_t i) {
-    if(i < _headerKeysCount)
+String HTTPClient::header(size_t i)
+{
+    if(i < _headerKeysCount) {
         return _currentHeaders[i].value;
+    }
     return String();
 }
 
-String HTTPClient::headerName(size_t i) {
-    if(i < _headerKeysCount)
+String HTTPClient::headerName(size_t i)
+{
+    if(i < _headerKeysCount) {
         return _currentHeaders[i].key;
+    }
     return String();
 }
 
-int HTTPClient::headers() {
+int HTTPClient::headers()
+{
     return _headerKeysCount;
 }
 
-bool HTTPClient::hasHeader(const char* name) {
+bool HTTPClient::hasHeader(const char* name)
+{
     for(size_t i = 0; i < _headerKeysCount; ++i) {
-        if((_currentHeaders[i].key == name) && (_currentHeaders[i].value.length() > 0))
+        if((_currentHeaders[i].key == name) && (_currentHeaders[i].value.length() > 0)) {
             return true;
+        }
     }
     return false;
 }
@@ -735,7 +770,8 @@ bool HTTPClient::hasHeader(const char* name) {
  * init TCP connection and handle ssl verify if needed
  * @return true if connection is ok
  */
-bool HTTPClient::connect(void) {
+bool HTTPClient::connect(void)
+{
 
     if(connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, try reuse!\n");
@@ -779,7 +815,8 @@ bool HTTPClient::connect(void) {
  * @param type (GET, POST, ...)
  * @return status
  */
-bool HTTPClient::sendHeader(const char * type) {
+bool HTTPClient::sendHeader(const char * type)
+{
     if(!connected()) {
         return false;
     }
@@ -793,9 +830,9 @@ bool HTTPClient::sendHeader(const char * type) {
     }
 
     header += "\r\n"
-            "Host: " + _host + "\r\n"
-            "User-Agent: " + _userAgent + "\r\n"
-            "Connection: ";
+              "Host: " + _host + "\r\n"
+              "User-Agent: " + _userAgent + "\r\n"
+              "Connection: ";
 
     if(_reuse) {
         header += "keep-alive";
@@ -821,7 +858,8 @@ bool HTTPClient::sendHeader(const char * type) {
  * reads the response from the server
  * @return int http code
  */
-int HTTPClient::handleHeaderResponse() {
+int HTTPClient::handleHeaderResponse()
+{
 
     if(!connected()) {
         return HTTPC_ERROR_NOT_CONNECTED;
@@ -912,7 +950,8 @@ int HTTPClient::handleHeaderResponse() {
  * @param size int
  * @return < 0 = error >= 0 = size written
  */
-int HTTPClient::writeToStreamDataBlock(Stream * stream, int size) {
+int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
+{
     int buff_size = HTTP_TCP_BUFFER_SIZE;
     int len = size;
     int bytesWritten = 0;
@@ -1022,7 +1061,8 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size) {
  * @param error
  * @return error
  */
-int HTTPClient::returnError(int error) {
+int HTTPClient::returnError(int error)
+{
     if(error < 0) {
         DEBUG_HTTPCLIENT("[HTTP-Client][returnError] error(%d): %s\n", error, errorToString(error).c_str());
         if(connected()) {
