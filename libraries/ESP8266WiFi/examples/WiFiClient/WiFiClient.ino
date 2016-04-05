@@ -73,7 +73,7 @@ void loop() {
                "Connection: close\r\n\r\n");
   unsigned long timeout = millis();
   while (client.available() == 0) {
-    if (millis() - timeout < 5000) {
+    if (millis() - timeout > 5000) {
       Serial.println(">>> Client Timeout !");
       client.stop();
       return;
