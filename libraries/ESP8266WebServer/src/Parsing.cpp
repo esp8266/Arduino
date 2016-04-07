@@ -138,14 +138,21 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 
     if (!isForm){
       if (searchStr != "") searchStr += '&';
-      //some clients send headers first and data after (like we do)
-      //give them a chance
-      int tries = 100;//100ms max wait
-      while(!client.available() && tries--)delay(1);
-      size_t plainLen = client.available();
-      char *plainBuf = (char*)malloc(plainLen+1);
-      client.readBytes(plainBuf, plainLen);
-      plainBuf[plainLen] = '\0';
+      char *plainBuf = NULL;
+      size_t plainLen = 0;
+      while ( (plainLen == 0) || (plainLen < contentLength))
+      {
+        //some clients send headers first and data after (like we do)
+        //give them a chance
+        int tries = 100;//100ms max wait
+        while(!client.available() && tries--)delay(1);
+        size_t newLen = client.available();
+        if (!newLen) break;
+        plainBuf = (plainBuf == NULL) ?  (char *) malloc(newLen + 1) : (char *) realloc(plainBuf, plainLen + newLen + 1);
+        client.readBytes(&plainBuf[plainLen], newLen);
+        plainLen += newLen;
+        plainBuf[plainLen] = '\0';
+      }
 #ifdef DEBUG_ESP_HTTP_SERVER
       DEBUG_OUTPUT.print("Plain: ");
       DEBUG_OUTPUT.println(plainBuf);
