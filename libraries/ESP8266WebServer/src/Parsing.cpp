@@ -138,7 +138,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 
     if (!isForm){
       if (searchStr != "") searchStr += '&';
-      char *plainBuf = NULL;
+      char *plainBuf = nullptr;
       size_t plainLen = 0;
       while ( (plainLen == 0) || (plainLen < contentLength))
       {
@@ -148,7 +148,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         while(!client.available() && tries--)delay(1);
         size_t newLen = client.available();
         if (!newLen) break;
-        plainBuf = (plainBuf == NULL) ?  (char *) malloc(newLen + 1) : (char *) realloc(plainBuf, plainLen + newLen + 1);
+        plainBuf = (plainBuf == nullptr) ?  (char *) malloc(newLen + 1) : (char *) realloc(plainBuf, plainLen + newLen + 1);
         client.readBytes(&plainBuf[plainLen], newLen);
         plainLen += newLen;
         plainBuf[plainLen] = '\0';
