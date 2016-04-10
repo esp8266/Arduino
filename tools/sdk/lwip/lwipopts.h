@@ -35,15 +35,11 @@
  * Author: Adam Dunkels <adam@sics.se>
  *
  */
-#ifndef __LWIP_OPT_H__
-#define __LWIP_OPT_H__
+#ifndef __LWIPOPTS_H__
+#define __LWIPOPTS_H__
 
-/*
- * Include user defined options first. Anything not defined in these files
- * will be set to standard values. Override anything you dont like!
- */
-#include "include/lwipopts.h"
-#include "lwip/debug.h"
+#define PBUF_RSV_FOR_WLAN
+#define EBUF_LWIP
 
 /*
    -----------------------------------------------
@@ -73,7 +69,7 @@
  * Mainly for compatibility to old versions.
  */
 #ifndef NO_SYS_NO_TIMERS
-#define NO_SYS_NO_TIMERS                1
+#define NO_SYS_NO_TIMERS                0
 #endif
 
 /**
@@ -81,7 +77,7 @@
  * one included in your C library
  */
 #ifndef MEMCPY
-#define MEMCPY(dst,src,len)             memcpy(dst,src,len)
+#define MEMCPY(dst,src,len)             os_memcpy(dst,src,len)
 #endif
 
 /**
@@ -89,7 +85,7 @@
  * call to memcpy() if the length is known at compile time and is small.
  */
 #ifndef SMEMCPY
-#define SMEMCPY(dst,src,len)            memcpy(dst,src,len)
+#define SMEMCPY(dst,src,len)            os_memcpy(dst,src,len)
 #endif
 
 /*
@@ -103,7 +99,7 @@
  * already use it.
  */
 #ifndef MEM_LIBC_MALLOC
-#define MEM_LIBC_MALLOC                 0
+#define MEM_LIBC_MALLOC                 1
 #endif
 
 /**
@@ -112,7 +108,7 @@
 * speed and usage from interrupts!
 */
 #ifndef MEMP_MEM_MALLOC
-#define MEMP_MEM_MALLOC                 0
+#define MEMP_MEM_MALLOC                 1
 #endif
 
 /**
@@ -121,7 +117,7 @@
  *    2 byte alignment -> #define MEM_ALIGNMENT 2
  */
 #ifndef MEM_ALIGNMENT
-#define MEM_ALIGNMENT                   1
+#define MEM_ALIGNMENT                   4
 #endif
 
 /**
@@ -129,7 +125,7 @@
  * a lot of data that needs to be copied, this should be set high.
  */
 #ifndef MEM_SIZE
-#define MEM_SIZE                        1600
+#define MEM_SIZE                        16000
 #endif
 
 /**
@@ -138,7 +134,7 @@
  * Default is one big array for all pools
  */
 #ifndef MEMP_SEPARATE_POOLS
-#define MEMP_SEPARATE_POOLS             0
+#define MEMP_SEPARATE_POOLS             1
 #endif
 
 /**
@@ -159,7 +155,7 @@
  * sure that there are no cycles in the linked lists.
  */
 #ifndef MEMP_SANITY_CHECK
-#define MEMP_SANITY_CHECK               0
+#define MEMP_SANITY_CHECK               1
 #endif
 
 /**
@@ -223,7 +219,7 @@
  * this should be set high.
  */
 #ifndef MEMP_NUM_PBUF
-#define MEMP_NUM_PBUF                   16
+#define MEMP_NUM_PBUF                   10
 #endif
 
 /**
@@ -248,7 +244,7 @@
  * (requires the LWIP_TCP option)
  */
 #ifndef MEMP_NUM_TCP_PCB
-#define MEMP_NUM_TCP_PCB                5
+#define MEMP_NUM_TCP_PCB                (*(volatile uint32*)0x600011FC)
 #endif
 
 /**
@@ -256,7 +252,7 @@
  * (requires the LWIP_TCP option)
  */
 #ifndef MEMP_NUM_TCP_PCB_LISTEN
-#define MEMP_NUM_TCP_PCB_LISTEN         8
+#define MEMP_NUM_TCP_PCB_LISTEN         2
 #endif
 
 /**
@@ -268,11 +264,11 @@
 #endif
 
 /**
- * MEMP_NUM_REASSDATA: the number of IP packets simultaneously queued for
+ * MEMP_NUM_REASSDATA: the number of simultaneously IP packets queued for
  * reassembly (whole packets, not fragments!)
  */
 #ifndef MEMP_NUM_REASSDATA
-#define MEMP_NUM_REASSDATA              5
+#define MEMP_NUM_REASSDATA              0
 #endif
 
 /**
@@ -283,7 +279,7 @@
  * where the packet is not yet sent when netif->output returns.
  */
 #ifndef MEMP_NUM_FRAG_PBUF
-#define MEMP_NUM_FRAG_PBUF              15
+#define MEMP_NUM_FRAG_PBUF              0
 #endif
 
 /**
@@ -293,7 +289,7 @@
  * (requires the ARP_QUEUEING option)
  */
 #ifndef MEMP_NUM_ARP_QUEUE
-#define MEMP_NUM_ARP_QUEUE              30
+#define MEMP_NUM_ARP_QUEUE              10
 #endif
 
 /**
@@ -311,7 +307,7 @@
  * (requires NO_SYS==0)
  */
 #ifndef MEMP_NUM_SYS_TIMEOUT
-#define MEMP_NUM_SYS_TIMEOUT            3
+#define MEMP_NUM_SYS_TIMEOUT            8
 #endif
 
 /**
@@ -319,7 +315,7 @@
  * (only needed if you use the sequential API, like api_lib.c)
  */
 #ifndef MEMP_NUM_NETBUF
-#define MEMP_NUM_NETBUF                 2
+#define MEMP_NUM_NETBUF                 0
 #endif
 
 /**
@@ -327,7 +323,7 @@
  * (only needed if you use the sequential API, like api_lib.c)
  */
 #ifndef MEMP_NUM_NETCONN
-#define MEMP_NUM_NETCONN                4
+#define MEMP_NUM_NETCONN                0
 #endif
 
 /**
@@ -336,7 +332,7 @@
  * (only needed if you use tcpip.c)
  */
 #ifndef MEMP_NUM_TCPIP_MSG_API
-#define MEMP_NUM_TCPIP_MSG_API          8
+#define MEMP_NUM_TCPIP_MSG_API          4
 #endif
 
 /**
@@ -345,14 +341,14 @@
  * (only needed if you use tcpip.c)
  */
 #ifndef MEMP_NUM_TCPIP_MSG_INPKT
-#define MEMP_NUM_TCPIP_MSG_INPKT        8
+#define MEMP_NUM_TCPIP_MSG_INPKT        4
 #endif
 
 /**
  * MEMP_NUM_SNMP_NODE: the number of leafs in the SNMP tree.
  */
 #ifndef MEMP_NUM_SNMP_NODE
-#define MEMP_NUM_SNMP_NODE              50
+#define MEMP_NUM_SNMP_NODE              0
 #endif
 
 /**
@@ -360,7 +356,7 @@
  * Every branch has one leaf (MEMP_NUM_SNMP_NODE) at least!
  */
 #ifndef MEMP_NUM_SNMP_ROOTNODE
-#define MEMP_NUM_SNMP_ROOTNODE          30
+#define MEMP_NUM_SNMP_ROOTNODE          0
 #endif
 
 /**
@@ -369,7 +365,7 @@
  * 1 for output)
  */
 #ifndef MEMP_NUM_SNMP_VARBIND
-#define MEMP_NUM_SNMP_VARBIND           2
+#define MEMP_NUM_SNMP_VARBIND           0
 #endif
 
 /**
@@ -378,7 +374,7 @@
  * (1 for the value read and 2 for OIDs - input and output)
  */
 #ifndef MEMP_NUM_SNMP_VALUE
-#define MEMP_NUM_SNMP_VALUE             3
+#define MEMP_NUM_SNMP_VALUE             0
 #endif
 
 /**
@@ -386,7 +382,7 @@
  * (before freeing the corresponding memory using lwip_freeaddrinfo()).
  */
 #ifndef MEMP_NUM_NETDB
-#define MEMP_NUM_NETDB                  1
+#define MEMP_NUM_NETDB                  0
 #endif
 
 /**
@@ -394,7 +390,7 @@
  * if DNS_LOCAL_HOSTLIST_IS_DYNAMIC==1.
  */
 #ifndef MEMP_NUM_LOCALHOSTLIST
-#define MEMP_NUM_LOCALHOSTLIST          1
+#define MEMP_NUM_LOCALHOSTLIST          0
 #endif
 
 /**
@@ -402,14 +398,14 @@
  * interfaces (only used with PPPOE_SUPPORT==1)
  */
 #ifndef MEMP_NUM_PPPOE_INTERFACES
-#define MEMP_NUM_PPPOE_INTERFACES       1
+#define MEMP_NUM_PPPOE_INTERFACES       0
 #endif
 
 /**
  * PBUF_POOL_SIZE: the number of buffers in the pbuf pool. 
  */
 #ifndef PBUF_POOL_SIZE
-#define PBUF_POOL_SIZE                  16
+#define PBUF_POOL_SIZE                  10
 #endif
 
 /*
@@ -439,7 +435,7 @@
  * packet in a row to an IP address that is not in the ARP cache.
  */
 #ifndef ARP_QUEUEING
-#define ARP_QUEUEING                    0
+#define ARP_QUEUEING                    1
 #endif
 
 /**
@@ -453,7 +449,7 @@
  * Also notice that this slows down input processing of every IP packet!
  */
 #ifndef ETHARP_TRUST_IP_MAC
-#define ETHARP_TRUST_IP_MAC             0
+#define ETHARP_TRUST_IP_MAC             1
 #endif
 
 /**
@@ -528,7 +524,7 @@
  * controlled via IP_REASSEMBLY.
  */
 #ifndef IP_FRAG
-#define IP_FRAG                         1
+#define IP_FRAG                         0
 #endif
 
 /**
@@ -558,7 +554,7 @@
  * ATTENTION: IP_FRAG_USES_STATIC_BUF==1 may not be used for DMA-enabled MACs!
  */
 #ifndef IP_FRAG_USES_STATIC_BUF
-#define IP_FRAG_USES_STATIC_BUF         0
+#define IP_FRAG_USES_STATIC_BUF         1
 #endif
 
 /**
@@ -655,7 +651,7 @@
  * LWIP_DHCP==1: Enable DHCP module.
  */
 #ifndef LWIP_DHCP
-#define LWIP_DHCP                       0
+#define LWIP_DHCP                       1
 #endif
 
 /**
@@ -663,6 +659,13 @@
  */
 #ifndef DHCP_DOES_ARP_CHECK
 #define DHCP_DOES_ARP_CHECK             ((LWIP_DHCP) && (LWIP_ARP))
+#endif
+
+/**
+ * DHCP_MAXRTX: Maximum number of retries of current request.
+ */
+#ifndef DHCP_MAXRTX
+#define DHCP_MAXRTX						(*(volatile uint32*)0x600011E0)
 #endif
 
 /*
@@ -711,11 +714,10 @@
 
 /**
  * SNMP_CONCURRENT_REQUESTS: Number of concurrent requests the module will
- * allow. At least one request buffer is required.
- * Does not have to be changed unless external MIBs answer request asynchronously
+ * allow. At least one request buffer is required. 
  */
 #ifndef SNMP_CONCURRENT_REQUESTS
-#define SNMP_CONCURRENT_REQUESTS        1
+#define SNMP_CONCURRENT_REQUESTS        0
 #endif
 
 /**
@@ -723,13 +725,11 @@
  * destination is required
  */
 #ifndef SNMP_TRAP_DESTINATIONS
-#define SNMP_TRAP_DESTINATIONS          1
+#define SNMP_TRAP_DESTINATIONS          0
 #endif
 
 /**
  * SNMP_PRIVATE_MIB: 
- * When using a private MIB, you have to create a file 'private_mib.h' that contains
- * a 'struct mib_array_node mib_private' which contains your MIB.
  */
 #ifndef SNMP_PRIVATE_MIB
 #define SNMP_PRIVATE_MIB                0
@@ -741,7 +741,7 @@
  * Unsafe requests are disabled by default!
  */
 #ifndef SNMP_SAFE_REQUESTS
-#define SNMP_SAFE_REQUESTS              1
+#define SNMP_SAFE_REQUESTS              0
 #endif
 
 /**
@@ -778,7 +778,18 @@
  * LWIP_IGMP==1: Turn on IGMP module. 
  */
 #ifndef LWIP_IGMP
-#define LWIP_IGMP                       0
+#define LWIP_IGMP                       1
+#endif
+/*
+   ----------------------------------
+   ---------- MDNS options ----------
+   ----------------------------------
+*/
+/**
+ * LWIP_MDNS==1: Turn on MDNS module.
+ */
+#ifndef LWIP_MDNS
+#define LWIP_MDNS                      1
 #endif
 
 /*
@@ -791,7 +802,7 @@
  * transport.
  */
 #ifndef LWIP_DNS
-#define LWIP_DNS                        0
+#define LWIP_DNS                        1
 #endif
 
 /** DNS maximum number of entries to maintain locally. */
@@ -896,21 +907,35 @@
  * (2 * TCP_MSS) for things to work well
  */
 #ifndef TCP_WND
-#define TCP_WND                         (4 * TCP_MSS)
+#define TCP_WND                         (*(volatile uint32*)0x600011F0)
 #endif 
 
 /**
  * TCP_MAXRTX: Maximum number of retransmissions of data segments.
  */
 #ifndef TCP_MAXRTX
-#define TCP_MAXRTX                      12
+#define TCP_MAXRTX                      (*(volatile uint32*)0x600011E8)
 #endif
 
 /**
  * TCP_SYNMAXRTX: Maximum number of retransmissions of SYN segments.
  */
 #ifndef TCP_SYNMAXRTX
-#define TCP_SYNMAXRTX                   6
+#define TCP_SYNMAXRTX                   (*(volatile uint32*)0x600011E4)
+#endif
+
+/**
+ * TCP_MAXRTO: Maximum retransmission timeout of data segments.
+ */
+#ifndef TCP_MAXRTO
+#define TCP_MAXRTO                      10
+#endif
+
+/**
+ * TCP_MINRTO: Minimum retransmission timeout of data segments.
+ */
+#ifndef TCP_MINRTO
+#define TCP_MINRTO                      2
 #endif
 
 /**
@@ -918,9 +943,10 @@
  * Define to 0 if your device is low on memory.
  */
 #ifndef TCP_QUEUE_OOSEQ
-#define TCP_QUEUE_OOSEQ                 (LWIP_TCP)
+#define TCP_QUEUE_OOSEQ                 1
 #endif
 
+#if 1
 /**
  * TCP_MSS: TCP Maximum segment size. (default is 536, a conservative default,
  * you might want to increase this.)
@@ -929,7 +955,8 @@
  * an upper limit on the MSS advertised by the remote host.
  */
 #ifndef TCP_MSS
-#define TCP_MSS                         536
+#define TCP_MSS                         1460
+#endif
 #endif
 
 /**
@@ -949,7 +976,7 @@
  * TCP_SND_BUF: TCP sender buffer space (bytes). 
  */
 #ifndef TCP_SND_BUF
-#define TCP_SND_BUF                     256
+#define TCP_SND_BUF                     2 * TCP_MSS
 #endif
 
 /**
@@ -975,7 +1002,7 @@
  * this number, select returns writable (combined with TCP_SNDLOWAT).
  */
 #ifndef TCP_SNDQUEUELOWAT
-#define TCP_SNDQUEUELOWAT               ((TCP_SND_QUEUELEN)/2)
+#define TCP_SNDQUEUELOWAT               LWIP_MAX(((TCP_SND_QUEUELEN)/2), 5)
 #endif
 
 /**
@@ -1034,13 +1061,13 @@
  *     LWIP_CALLBACK_API==1: The PCB callback function is called directly
  *         for the event.
  */
-//#ifndef LWIP_EVENT_API
-//#define LWIP_EVENT_API                  0
-//#define LWIP_CALLBACK_API               1
-//#else 
-//#define LWIP_EVENT_API                  1
-//#define LWIP_CALLBACK_API               0
-//#endif
+#ifndef LWIP_EVENT_API
+#define LWIP_EVENT_API                  0
+#define LWIP_CALLBACK_API               1
+#else 
+#define LWIP_EVENT_API                  1
+#define LWIP_CALLBACK_API               0
+#endif
 
 
 /*
@@ -1076,7 +1103,7 @@
  * field.
  */
 #ifndef LWIP_NETIF_HOSTNAME
-#define LWIP_NETIF_HOSTNAME             0
+#define LWIP_NETIF_HOSTNAME             1
 #endif
 
 /**
@@ -1118,7 +1145,7 @@
  * address equal to the netif IP address, looping them back up the stack.
  */
 #ifndef LWIP_NETIF_LOOPBACK
-#define LWIP_NETIF_LOOPBACK             1
+#define LWIP_NETIF_LOOPBACK             0
 #endif
 
 /**
@@ -1156,7 +1183,7 @@
  * @todo: TCP and IP-frag do not work with this, yet:
  */
 #ifndef LWIP_NETIF_TX_SINGLE_PBUF
-#define LWIP_NETIF_TX_SINGLE_PBUF             0
+#define LWIP_NETIF_TX_SINGLE_PBUF             1
 #endif /* LWIP_NETIF_TX_SINGLE_PBUF */
 
 /*
@@ -1168,7 +1195,7 @@
  * LWIP_HAVE_LOOPIF==1: Support loop interface (127.0.0.1) and loopif.c
  */
 #ifndef LWIP_HAVE_LOOPIF
-#define LWIP_HAVE_LOOPIF                1
+#define LWIP_HAVE_LOOPIF                0
 #endif
 
 /*
@@ -1385,7 +1412,7 @@
  * (only used if you use sockets.c)
  */
 #ifndef LWIP_COMPAT_SOCKETS
-#define LWIP_COMPAT_SOCKETS             1
+#define LWIP_COMPAT_SOCKETS             0
 #endif
 
 /**
@@ -1394,7 +1421,7 @@
  * names (read, write & close). (only used if you use sockets.c)
  */
 #ifndef LWIP_POSIX_SOCKETS_IO_NAMES
-#define LWIP_POSIX_SOCKETS_IO_NAMES     1
+#define LWIP_POSIX_SOCKETS_IO_NAMES     0
 #endif
 
 /**
@@ -1403,7 +1430,7 @@
  * in seconds. (does not require sockets.c, and will affect tcp.c)
  */
 #ifndef LWIP_TCP_KEEPALIVE
-#define LWIP_TCP_KEEPALIVE              0
+#define LWIP_TCP_KEEPALIVE              1
 #endif
 
 /**
@@ -1452,7 +1479,7 @@
  * LWIP_STATS==1: Enable statistics collection in lwip_stats.
  */
 #ifndef LWIP_STATS
-#define LWIP_STATS                      1
+#define LWIP_STATS                      0
 #endif
 
 #if LWIP_STATS
@@ -1545,7 +1572,7 @@
 #endif
 
 #else
-
+#define ETHARP_STATS                    0
 #define LINK_STATS                      0
 #define IP_STATS                        0
 #define IPFRAG_STATS                    0
@@ -1798,7 +1825,7 @@
  * debug messages of certain types.
  */
 #ifndef LWIP_DBG_TYPES_ON
-#define LWIP_DBG_TYPES_ON               LWIP_DBG_ON
+#define LWIP_DBG_TYPES_ON               LWIP_DBG_OFF
 #endif
 
 /**
