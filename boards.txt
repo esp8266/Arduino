@@ -1368,7 +1368,7 @@ wifinfo.menu.UploadSpeed.921600.upload.speed=921600
 
 
 ##############################################################
-coredev.name=Generic ESP8266 Module
+coredev.name=Core Development Module
 
 coredev.upload.tool=esptool
 coredev.upload.speed=115200
@@ -1391,18 +1391,17 @@ coredev.build.debug_level=
 coredev.build.lwip_lib=-llwip
 coredev.build.lwip_flags=
 
+
 coredev.menu.LwIPVariant.Espressif=Espressif (xcc)
 coredev.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
 coredev.menu.LwIPVariant.Espressif.build.lwip_flags=
-coredev.menu.LwIPVariant.Espressif.build.variant=generic
 coredev.menu.LwIPVariant.Prebuilt=Prebuilt Source (gcc)
 coredev.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 coredev.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-coredev.menu.LwIPVariant.Prebuilt.build.variant=generic
 coredev.menu.LwIPVariant.OpenSource=Open Source (gcc)
-coredev.menu.LwIPVariant.OpenSource.build.lwip_lib=
+coredev.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 coredev.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
-coredev.menu.LwIPVariant.OpenSource.build.variant=lwip
+coredev.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 
 coredev.menu.CpuFrequency.80=80 MHz
 coredev.menu.CpuFrequency.80.build.f_cpu=80000000L
