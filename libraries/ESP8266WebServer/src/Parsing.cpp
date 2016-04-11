@@ -144,15 +144,16 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       {
         //some clients send headers first and data after (like we do)
         //give them a chance
-        int tries = 100;//100ms max wait
-        while(!client.available() && tries--)delay(1);
-        size_t newLen = client.available();
+        int tries = 1000;//1000ms max wait
+        size_t newLen;
+        while( !(newLen = client.available()) && tries--) delay(1);
         if (!newLen) break;
         plainBuf = (plainBuf == nullptr) ?  (char *) malloc(newLen + 1) : (char *) realloc(plainBuf, plainLen + newLen + 1);
         client.readBytes(&plainBuf[plainLen], newLen);
         plainLen += newLen;
         plainBuf[plainLen] = '\0';
       } while (plainLen < contentLength);
+      if (plainBuf == nullptr) return false;
 #ifdef DEBUG_ESP_HTTP_SERVER
       DEBUG_OUTPUT.print("Plain: ");
       DEBUG_OUTPUT.println(plainBuf);
