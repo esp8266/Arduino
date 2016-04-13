@@ -163,7 +163,7 @@ bool HTTPClient::begin(String url)
             _port = 443;
         }
     } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", protocol.c_str());
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", _protocol.c_str());
         return false;
     }
     _transportTraits = TransportTraitsPtr(new TransportTraits());
