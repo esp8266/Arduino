@@ -164,3 +164,4 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [PCF8574_ESP](https://github.com/WereCatf/PCF8574_ESP) - A very simplistic library for using the PCF8574/PCF8574A I2C 8-pin GPIO-expander.
 - [Dot Matrix Display Library 2](https://github.com/freetronics/DMD2) - Freetronics DMD & Generic 16 x 32 P10 style Dot Matrix Display Library
 - [SdFat-beta](https://github.com/greiman/SdFat-beta) - SD-card library with support for long filenames, software- and hardware-based SPI and lots more.
+- [FastLED](https://github.com/FastLED/FastLED) - a library for easily & efficiently controlling a wide variety of LED chipsets, like the Neopixel (WS2812B), DotStar, LPD8806 and many more. Includes fading, gradient, color conversion functions.
