@@ -578,7 +578,7 @@ nodemcu.serial.disableRTS=true
 
 nodemcu.build.mcu=esp8266
 nodemcu.build.f_cpu=80000000L
-nodemcu.build.board=ESP8266_ESP12
+nodemcu.build.board=ESP8266_NODEMCU
 nodemcu.build.core=esp8266
 nodemcu.build.variant=nodemcu
 nodemcu.build.flash_mode=qio
@@ -644,7 +644,7 @@ nodemcuv2.serial.disableRTS=true
 
 nodemcuv2.build.mcu=esp8266
 nodemcuv2.build.f_cpu=80000000L
-nodemcuv2.build.board=ESP8266_ESP12
+nodemcuv2.build.board=ESP8266_NODEMCU
 nodemcuv2.build.core=esp8266
 nodemcuv2.build.variant=nodemcu
 nodemcuv2.build.flash_mode=dio
@@ -966,7 +966,7 @@ d1_mini.serial.disableRTS=true
 
 d1_mini.build.mcu=esp8266
 d1_mini.build.f_cpu=80000000L
-d1_mini.build.board=ESP8266_ESP12
+d1_mini.build.board=ESP8266_NODEMCU
 d1_mini.build.core=esp8266
 d1_mini.build.variant=d1_mini
 d1_mini.build.flash_mode=dio
@@ -1034,7 +1034,7 @@ d1.serial.disableRTS=true
 
 d1.build.mcu=esp8266
 d1.build.f_cpu=80000000L
-d1.build.board=ESP8266_ESP12
+d1.build.board=ESP8266_NODEMCU
 d1.build.core=esp8266
 d1.build.variant=d1
 d1.build.flash_mode=dio
@@ -1249,7 +1249,7 @@ wifinfo.build.f_cpu=160000000L
 wifinfo.build.core=esp8266
 wifinfo.build.variant=wifinfo
 wifinfo.build.flash_mode=qio
-wifinfo.build.board=ESP8266_ESP12
+wifinfo.build.board=ESP8266_NODEMCU
 wifinfo.build.spiffs_pagesize=256
 wifinfo.build.debug_port=Serial1
 wifinfo.build.debug_level=Wifinfo
