@@ -855,7 +855,7 @@ bool HTTPClient::sendHeader(const char * type)
 
     header += _headers + "\r\n";
 
-    return (_tcp->write(header.c_str(), header.length()) == header.length());
+    return (_tcp->write((const uint8_t *) header.c_str(), header.length()) == header.length());
 }
 
 /**
