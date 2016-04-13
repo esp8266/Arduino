@@ -153,7 +153,13 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         plainLen += newLen;
         plainBuf[plainLen] = '\0';
       } while (plainLen < contentLength);
+      /* if data loss,  exit */
       if (plainBuf == nullptr) return false;
+      if (plainLen < contentLength)
+      {
+      	free(plainBuf);
+      	return false;
+      }
 #ifdef DEBUG_ESP_HTTP_SERVER
       DEBUG_OUTPUT.print("Plain: ");
       DEBUG_OUTPUT.println(plainBuf);
