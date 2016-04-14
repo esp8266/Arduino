@@ -90,13 +90,16 @@ def load_tools_list(filename, platform):
     return tools_to_download
 
 def identify_platform():
-    arduino_platform_names = {'Darwin'  : {32 : 'i386-apple-darwin', 64 : 'x86_64-apple-darwin'},
-                              'Linux'   : {32 : 'i686-pc-linux-gnu', 64 : 'x86_64-pc-linux-gnu'},
-                              'Windows' : {32 : 'i686-mingw32',      64 : 'i686-mingw32'}}
+    arduino_platform_names = {'Darwin'  : {32 : 'i386-apple-darwin',   64 : 'x86_64-apple-darwin'},
+                              'Linux'   : {32 : 'i686-pc-linux-gnu',   64 : 'x86_64-pc-linux-gnu'},
+                              'LinuxARM': {32 : 'arm-linux-gnueabihf', 64 : 'aarch64-linux-gnu'},
+                              'Windows' : {32 : 'i686-mingw32',        64 : 'i686-mingw32'}}
     bits = 32
     if sys.maxsize > 2**32:
         bits = 64
     sys_name = platform.system()
+    if 'Linux' in sys_name and platform.platform().find('arm') > 0:
+        sys_name = 'LinuxARM'
     if 'CYGWIN_NT' in sys_name:
         sys_name = 'Windows'
     return arduino_platform_names[sys_name][bits]

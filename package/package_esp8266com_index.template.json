@@ -126,6 +126,13 @@
               "archiveFileName": "esptool-0.4.8-linux32.tar.gz",
               "checksum": "SHA-256:b0d6e71e6f41d4ed7e167bb4b3f4f0b1b3e49d69af50ab7fbe952cbfed83f164",
               "size": "15444"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux-armhf.tar.gz",
+              "archiveFileName": "esptool-0.4.8-linux-armhf.tar.gz",
+              "checksum": "SHA-256:e9c4dfb81781610556a6af0377c8efc7cde359e0e2cda2fd48e0a32bae10f506",
+              "size": "13630"
             }
           ]
         },
@@ -167,6 +174,13 @@
               "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz",
               "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a",
               "size": "32734156"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://arduino.esp8266.com/linuxarm-xtensa-lx106-elf-g46f160f.tar.gz",
+              "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f.tar.gz",
+              "checksum": "SHA-256:1ac752bac7fff6be95ce10f56689f155fefea09e4ef710dbd75cb573798ff9c0",
+              "size": "34929527"
             }
           ]
         },
@@ -208,6 +222,13 @@
               "archiveFileName": "mkspiffs-0.1.2-linux32.tar.gz",
               "checksum": "SHA-256:e990d545dfcae308aabaac5fa9e1db734cc2b08167969e7eedac88bd0839667c",
               "size": "45272"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-linux-armhf.tar.gz",
+              "archiveFileName": "mkspiffs-0.1.2-linux-armhf.tar.gz",
+              "checksum": "SHA-256:5a8836932cd24325d69054cebdd46359eba02919ffaa87b130c54acfecc13f46",
+              "size": "41685"
             }
           ]
         }
