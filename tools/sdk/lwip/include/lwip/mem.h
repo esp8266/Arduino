@@ -33,7 +33,7 @@
 #define __LWIP_MEM_H__
 
 #include "lwip/opt.h"
-#include "mem_manager.h"
+//#include "mem_manager.h"
 
 #ifdef __cplusplus
 extern "C" {

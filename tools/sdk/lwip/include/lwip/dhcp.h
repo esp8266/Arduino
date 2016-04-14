@@ -207,6 +207,15 @@ void dhcp_fine_tmr(void);
 #define DHCP_OPTION_TCP_TTL 37
 #define DHCP_OPTION_END 255
 
+/**add options for support more router by liuHan**/
+#define DHCP_OPTION_DOMAIN_NAME 15
+#define DHCP_OPTION_PRD 31
+#define DHCP_OPTION_STATIC_ROUTER 33
+#define DHCP_OPTION_VSN 43
+#define DHCP_OPTION_NB_TINS 44
+#define DHCP_OPTION_NB_TINT 46
+#define DHCP_OPTION_NB_TIS 47
+#define DHCP_OPTION_CLASSLESS_STATIC_ROUTER 121
 /** DHCP options */
 #define DHCP_OPTION_REQUESTED_IP 50 /* RFC 2132 9.1, requested IP address */
 #define DHCP_OPTION_LEASE_TIME 51 /* RFC 2132 9.2, time in seconds, in 4 bytes */

@@ -34,7 +34,9 @@ License (MIT license):
 // - Multicast DNS: http://www.ietf.org/rfc/rfc6762.txt
 // - MDNS-SD: https://tools.ietf.org/html/rfc6763
 
+#ifndef LWIP_OPEN_SRC
 #define LWIP_OPEN_SRC
+#endif
 
 #include "ESP8266mDNS.h"
 #include <functional>

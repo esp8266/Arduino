@@ -246,13 +246,13 @@ uint16_t SPIClass::transfer16(uint16_t data) {
     in.val = data;
 
     if((SPI1C & (SPICWBO | SPICRBO))) {
-        //MSBFIRST
-        out.msb = transfer(in.msb);
-        out.lsb = transfer(in.lsb);
-    } else {
         //LSBFIRST
         out.lsb = transfer(in.lsb);
         out.msb = transfer(in.msb);
+    } else {
+        //MSBFIRST
+        out.msb = transfer(in.msb);
+        out.lsb = transfer(in.lsb);
     }
     return out.val;
 }

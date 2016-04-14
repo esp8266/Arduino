@@ -10,6 +10,7 @@
 
 #include "c_types.h"
 #include "eagle_soc.h"
+#include <stddef.h>
 
 typedef uint32_t ETSSignal;
 typedef uint32_t ETSParam;
