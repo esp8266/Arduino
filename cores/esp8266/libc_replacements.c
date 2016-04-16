@@ -52,10 +52,9 @@ int ICACHE_RAM_ATTR putchar(int c) {
 }
 
 int ICACHE_RAM_ATTR printf(const char* format, ...) {
-    int ret;
     va_list arglist;
     va_start(arglist, format);
-    ret = ets_vprintf(format, arglist);
+    int ret = ets_vprintf(ets_putc, format, arglist);
     va_end(arglist);
     return ret;
 }
@@ -79,7 +78,7 @@ int ICACHE_RAM_ATTR snprintf(char* buffer, size_t size, const char* format, ...)
 }
 
 int ICACHE_RAM_ATTR vprintf(const char * format, va_list arg) {
-    return ets_vprintf(format, arg);
+    return ets_vprintf(ets_putc, format, arg);
 }
 
 int ICACHE_RAM_ATTR vsnprintf(char * buffer, size_t size, const char * format, va_list arg) {
