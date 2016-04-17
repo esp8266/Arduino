@@ -350,11 +350,7 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
 }
 
-
 /**
- * Note:
- *  data need to be aligned to 32Bit
- *  or you get an Fatal exception (9)
  * @param data uint8_t *
  * @param size uint8_t  max for size is 64Byte
  * @param repeat uint32_t
@@ -362,37 +358,46 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
 void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
     if(size > 64) return; //max Hardware FIFO
 
-    uint32_t byte = (size * repeat);
-    uint8_t r = (64 / size);
+    while(SPI1CMD & SPIBUSY) {}
 
-    while(byte) {
-        if(byte > 64) {
-            writePattern_(data, size, r);
-            byte -= 64;
-        } else {
-            writePattern_(data, size, (byte / size));
-            byte = 0;
-        }
-    }
-}
+    uint32_t buffer[16];
+    uint8_t *bufferPtr=(uint8_t *)&buffer;
+    uint8_t *dataPtr = data;
+    volatile uint32_t * fifoPtr = &SPI1W0;
+    uint8_t r = 64 / size;
+    uint32_t repeatRem = repeat % r;
+    repeat = repeat / r;
 
-void SPIClass::writePattern_(uint8_t * data, uint8_t size, uint8_t repeat) {
-    uint8_t bytes = (size * repeat);
-    uint8_t buffer[64];
-    uint8_t * bufferPtr = &buffer[0];
-    uint8_t * dataPtr;
-    uint8_t dataSize = bytes;
-    for(uint8_t i = 0; i < repeat; i++) {
-        dataSize = size;
+    while(r--){
         dataPtr = data;
-        while(dataSize--) {
+        for(uint8_t i=0; i<size; i++){
             *bufferPtr = *dataPtr;
-            dataPtr++;
             bufferPtr++;
+            dataPtr++;
         }
     }
 
-    writeBytes(&buffer[0], bytes);
+    fifoPtr = &SPI1W0;
+    for(uint8_t i=0; i<16; i++){
+        *fifoPtr = buffer[i];
+        fifoPtr++;
+    }
+
+    r = 64 / size;
+
+    SPI1U = SPIUMOSI | SPIUSSE;
+    //Fill fifo with data
+    setDataBits(r * size * 8);
+    while(repeat--){
+        SPI1CMD |= SPIBUSY;
+        while(SPI1CMD & SPIBUSY) {}
+    }
+
+    setDataBits(repeatRem * size * 8);
+    SPI1CMD |= SPIBUSY;
+    while(SPI1CMD & SPIBUSY) {}
+
+    SPI1U = SPIUMOSI | SPIUDUPLEX | SPIUSSE;
 }
 
 /**
