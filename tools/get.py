@@ -4,7 +4,6 @@
 # Written by Ivan Grokhotkov, 2015.
 #
 from __future__ import print_function
-import urllib
 import os
 import shutil
 import errno
@@ -16,6 +15,11 @@ import sys
 import tarfile
 import zipfile
 import re
+if sys.version_info[0] == 3:
+    from urllib.request import urlretrieve
+else:
+    # Not Python 3 - today, it is most likely to be Python 2
+    from urllib import urlretrieve
 
 dist_dir = 'dist/'
 
@@ -54,7 +58,7 @@ def unpack(filename, destination):
         raise NotImplementedError('Unsupported archive type')
 
     # a little trick to rename tool directories so they don't contain version number
-    rename_to = re.match(r'^([a-z][^\-]*\-*)+', dirname).group(0).encode('ascii').strip('-')
+    rename_to = re.match(r'^([a-z][^\-]*\-*)+', dirname).group(0).strip('-')
     if rename_to != dirname:
         print('Renaming {0} to {1}'.format(dirname, rename_to))
         if os.path.isdir(rename_to):
@@ -68,7 +72,7 @@ def get_tool(tool):
     real_hash = tool['checksum'].split(':')[1]
     if not os.path.isfile(local_path):
         print('Downloading ' + archive_name);
-        urllib.urlretrieve(url, local_path, report_progress)
+        urlretrieve(url, local_path, report_progress)
         sys.stdout.write("\rDone\n")
         sys.stdout.flush()
     else:
