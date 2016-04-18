@@ -24,6 +24,8 @@ title: Change Log
 - Clean up variants, fix digitalPinHasPWM definition (#1831)
 - Don't set RF mode on boot unless it was overridden
 - Change build.board property for boards which renumber pins like NodeMCU (#1878)
+- Fix Exception 2 when using printf or vprintf
+- Add ARM tools (#269)
 
 ### Libraries
 - Update axTLS to 5b4be7d
@@ -45,9 +47,11 @@ title: Change Log
 - ESP8266WiFi: Allow PSK instead of passphrase in WiFiSTA::begin
 - SPI: Fix SPI.transfer16() using wrong endianness
 - HTTPClient: decouple transport layer handling + save some RAM
-ESP8266httpUpdate: decouple HTTPS overloads + save some RAM
-- Update and move lwIP headers, add options to use different lwIP build for generic device
+- ESP8266httpUpdate: decouple HTTPS overloads + save some RAM
+- Update and move lwIP headers, add options to use different lwIP build
 - ESP8266WebServer: wait for data to arrive
+- ESP8266WebServer: save RAM by moving response strings to flash (#1732)
+- SPI: Speed up SPI.writePattern()
 
 
 ### Tools
