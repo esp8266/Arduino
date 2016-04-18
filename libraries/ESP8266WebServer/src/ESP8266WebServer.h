@@ -134,7 +134,7 @@ protected:
   void _handleRequest();
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(String data);
-  static const char* _responseCodeToString(int code);
+  static String _responseCodeToString(int code);
   bool _parseForm(WiFiClient& client, String boundary, uint32_t len);
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
