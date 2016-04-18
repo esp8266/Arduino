@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Change Log &middot; ESP8266 Arduino Core
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/Arduino/versions/2.2.0-rc1/public/css/poole.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.2.0-rc1/public/css/syntax.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.2.0-rc1/public/css/hyde.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.2.0-rc1/public/css/icons.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <!-- Icons -->
+  <link rel="shortcut icon" href="/Arduino/versions/2.2.0-rc1/public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="/Arduino/versions/2.2.0-rc1/public/js/toc.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        $('#toc').toc({ listType: 'ul', showSpeed: 0, title: '', headers: 'h1, h2', minimumHeaders: 2 });
+    });
+  </script>
+</head>
+
+
+  <body>
+
+    <div class="version-bar">
+  This documentation is for version 2.2.0-rc1. <a href="http://esp8266.github.io/Arduino/versions">Other versions.</a>
+</div>
+
+<div class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <h2>
+        <a href="http://esp8266.github.io/Arduino">
+          ESP8266 Arduino Core
+        </a>
+      </h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0-rc1/doc/installing.html">Installation</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0-rc1/doc/reference.html">Reference</a>
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0-rc1/doc/libraries.html">Libraries</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0-rc1/doc/filesystem.html">File System</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0-rc1/doc/ota_updates/readme.html">OTA Update</a>
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0-rc1/doc/boards.html">Supported Hardware</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0-rc1/doc/changes.html">Change Log</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+            <div id="toc"></div>
+        
+      
+    </nav>
+  <p>
+    <a href="https://github.com/esp8266/Arduino"><div id="gh-icon"></div>esp8266/Arduino</a>
+  </p>
+  <p class="lead">Documentation for ESP8266 Arduino Core. Installation instructions, functions and classes reference.
+</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <h2 id="current-version">Current version</h2>
+
+<h3 id="core">Core</h3>
+
+<ul>
+<li>Leverage realloc() in String::changeBuffer()</li>
+<li>Clean up core files</li>
+<li>Add host side tests</li>
+<li>Fix possible null pointer in umm_malloc</li>
+<li>Remove &quot;Upload Using&quot; option from Tools menu</li>
+<li>Move attachInterrupt and detachInterrupt into IRAM (#1734)</li>
+<li>Implement strstr_P</li>
+<li>Allow indefinite duration for tone()</li>
+<li>Fix crashes when using tone()</li>
+<li>Fix RF_MODE and ADC_MODE</li>
+<li>Move micros, delayMicroseconds, millis to IRAM (#1326)</li>
+<li>Fix pulseIn (#1072, #1149)</li>
+<li>Accept both named constant and ADC channel number in analogRead (#1766)</li>
+<li>Enable heap poisoning only when debug options are enabled (#1800)</li>
+<li>Bootloader: don&#39;t touch RTC memory if it doesn&#39;t contain a valid command (#619)</li>
+<li>Update SDK to 1.5.2 (#1653)</li>
+<li>Clean up variants, fix digitalPinHasPWM definition (#1831)</li>
+<li>Don&#39;t set RF mode on boot unless it was overridden</li>
+<li>Change build.board property for boards which renumber pins like NodeMCU (#1878)</li>
+</ul>
+
+<h3 id="libraries">Libraries</h3>
+
+<ul>
+<li>Update axTLS to 5b4be7d</li>
+<li>WiFiClientSecure: implement connection timeout, fix connected method behavior</li>
+<li>WiFiClient: fix write behavior when connection is closed by remote side</li>
+<li>ESP8266HTTPServer: add font MIME types, fix #1601</li>
+<li>ESP8266mDNS: add client support</li>
+<li>Update SPIFFS to 82aeac6</li>
+<li>Servo: move some functions into IRAM (#1742)</li>
+<li>Update SoftwareSerial to version 3.1.0</li>
+<li>ESP8266SSDP: change templates to include deviceType</li>
+<li>ESP8266WebServer: handle more file types</li>
+<li>SPI: add CPOL setting</li>
+<li>ESP8266WebServer: Fix buffer overflow in ESP8266WebServer::authenticate (#1790)</li>
+<li>ESP8266WiFi: fix undefined behavior in WiFiServer::setNoDelay (#1695)</li>
+<li>Servo: use peripheral clock frequency when calculating FRC1 tick count (#1789)</li>
+<li>ESP8266WiFi: avoid multiple instances of INADDR_NONE</li>
+<li>Add LwIP binary built with gcc</li>
+<li>ESP8266WiFi: Allow PSK instead of passphrase in WiFiSTA::begin</li>
+<li>SPI: Fix SPI.transfer16() using wrong endianness</li>
+<li>HTTPClient: decouple transport layer handling + save some RAM
+ESP8266httpUpdate: decouple HTTPS overloads + save some RAM</li>
+<li>Update and move lwIP headers, add options to use different lwIP build for generic device</li>
+<li>ESP8266WebServer: wait for data to arrive</li>
+</ul>
+
+<h3 id="tools">Tools</h3>
+
+<hr>
+
+<h2 id="2-1-0">2.1.0</h2>
+
+<p>February 27, 2016</p>
+
+<p>Package link: <code>http://arduino.esp8266.com/versions/2.1.0/package_esp8266com_index.json</code>.</p>
+
+<h3 id="core">Core</h3>
+
+<ul>
+<li>Add function to know last reset reason.</li>
+<li>Allow control of enabling debug and debug level from IDE</li>
+<li>Add espduino board</li>
+<li>Rework StreamString::write to use String internal buffer directly (#1289)</li>
+<li>Add function to measure stack high water mark</li>
+<li>Fix RAM corruption caused by our hook of register_chipv6_phy(init_data*).</li>
+<li>Optimize PWM interrupt handler for better precision</li>
+<li>Add warning levels configurable through Preferences</li>
+<li>SPIFFS: check if path length is valid (#1089)</li>
+<li>Set CPU frequency before running setup</li>
+<li>Add core_esp8266_features.h to be able to detect the features and libraries included in the ESP core</li>
+<li>Add ESPino to supported boards</li>
+<li>Fix pwm first step getting skipped</li>
+<li>Update SDK to 1.5.1_16_01_08</li>
+<li>Bufferless and interruptless HardwareSerial</li>
+<li>HardwareSerial: allow mapping of UART0 TX to GPIO2</li>
+<li>Add 128K SPIFFS for 512KB modules</li>
+<li>Reduce stack usage by Print::printf</li>
+<li>Fix a crash in String::changeBuffer()</li>
+<li>Implement static initialization guards (#500)</li>
+<li>Implementation of Tone API using timer1</li>
+<li>Use umm_malloc for heap management</li>
+<li>Configurable I2C clock stretching limit</li>
+<li>Add a new board entry for the SparkFun Thing Dev</li>
+</ul>
+
+<h3 id="libraries">Libraries</h3>
+
+<ul>
+<li>ESP8266HTTPClient: add CHUNKED encoding support (#1324)</li>
+<li>Fixed crash bug with mDNS where a string buffer could be used uninitialized</li>
+<li>Add WiFi TX power control</li>
+<li>Add WiFi sleep management</li>
+<li>Allow to hook into WiFi events from sketch</li>
+<li>Allow setting TCP timeout</li>
+<li>Add setSleepMode + getSleepMode and setPhyMode + getPhyMode to WiFi</li>
+<li>Update GDBStub library with the source of esp-gdbstub</li>
+<li>Servo: fix detach and attach</li>
+<li>ESP8266mDNS: refactoring, add TXT support</li>
+<li>Add HTTP Basic Auth to WebServer and libb64 (base64) to core</li>
+<li>Fix link-time dependency of ESP8266WebServer on SPIFFS (#862)</li>
+<li>Allow setting client side TLS key and certificate</li>
+<li>Replace chain of UDP pbufs with a single pbuf before sending (#1009)</li>
+<li>Unique Built-In libraries library.properties name</li>
+<li>Improvements for MD5Builder with Stream</li>
+<li>ESP8266SSDP: fixing TTL to 2 per spec</li>
+<li>ESP8266WebServer: a content length of zero should also be sent</li>
+<li>Use SoftwareSerial version 2.2</li>
+<li>EEPROM: optimised <code>_dirty</code> flag</li>
+<li>ESP8266mDNS: advertise all hosted services</li>
+<li>Remove bundled OneWire - ESP8266 support has been merged in the official OneWire sources</li>
+<li>WiFiClientSecure: don&#39;t panic if memory allocation fails</li>
+<li>Verify domain name in WiFiClientSecure::verify</li>
+<li>Speed up WiFi.hostByName when the hostname is actually an IP</li>
+<li>Fix WiFi scan issue (#1355)</li>
+<li>Workaround for LwIP not handling ERR_ABRT</li>
+<li>Servo value read and write fixes</li>
+</ul>
+
+<h3 id="tools">Tools</h3>
+
+<ul>
+<li>espota.py: add support for manually selecting ip and port for host side</li>
+<li>Update esptool to 0.4.8</li>
+<li>Make espota compatible with python 3.5</li>
+</ul>
+
+<hr>
+
+<h2 id="2-0-0">2.0.0</h2>
+
+<p>November 30, 2015</p>
+
+<p>Package link: <code>http://arduino.esp8266.com/versions/2.0.0/package_esp8266com_index.json</code>.</p>
+
+<h3 id="core">Core</h3>
+
+<ul>
+<li>Add file system APIs and documentation</li>
+<li>Add ConfigFile example</li>
+<li>Allow user to run code in user_rf_pre_init</li>
+<li>Add strtoul and strtol, fix strtod</li>
+<li>Update documentation for NodeMCU and Olimex boards</li>
+<li>Disable interrupts inside ESP.getVcc (#567)</li>
+<li>Erase RTC RAM only if RF mode looks invalid (#619)</li>
+<li>Get pin levels at time of interrupt, rather than the time of calling the handler.</li>
+<li>Move interrupt handlers to ram.</li>
+<li>Improve debug output on critical errors</li>
+<li>Add ArduinoOTA library and docs</li>
+<li>Add WeMos D1 &amp; D1 mini boards</li>
+<li>Add documentation about boot messages and mode meaning</li>
+<li>Disable sleep mode before doing OTA (#1005)</li>
+<li>Add the ability to be called back when the device is about to reset</li>
+<li>Add &quot;Reset Method&quot; menu</li>
+<li>Add MD5 to core</li>
+<li>I2C: generate STOP in case of NACK (fix #698, #254)</li>
+<li>Add libc time functions</li>
+<li>Fix linker script for 512k(no SPIFFS) variant (#966)</li>
+<li>I2S optimizations</li>
+<li>Support Sketch &gt; Export compiled binary</li>
+<li>Update SPIFFS wrapper for 0.3.3</li>
+<li>Fix placement of code into RAM, enable gc-sections</li>
+<li>Make soft wdt reset more obvious</li>
+<li>Force disable IOSWAP for UART0 in HardwareSerial initialization (#744)</li>
+<li>Add IPAddress::toString()</li>
+</ul>
+
+<h3 id="libraries">Libraries</h3>
+
+<ul>
+<li>ESP8266WebServer: support for sending of PROGMEM strings</li>
+<li>ESP8266WebServer: support for serving files from file system</li>
+<li>ESP8266WiFi: fix mode selection (#529)</li>
+<li>ESP8266mDNS: allow to work on SoftAP interface</li>
+<li>EEPROM: round requested size to 4 bytes (#659)</li>
+<li>Add ESP8266AVRISP library</li>
+<li>Add ESP8266HTTPUpdate library</li>
+<li>Add HTTPClient library</li>
+<li>Add WiFiClientSecure</li>
+<li>ESP8266WiFi library: add persistent option, fix #1054</li>
+<li>Make RequestHandler handle uploads</li>
+<li>Add Digest Authentication to OTA and espota.py</li>
+<li>Don&#39;t close UDP pcbs when WiFi connection drops (#969)</li>
+<li>Add espsoftwareserial library</li>
+<li>Add HTTP Updater library</li>
+<li>Add Ethernet library for W5100</li>
+<li>Add SPIFFS WebServer Example</li>
+<li>add dnsIP() to ESP8266WiFi class</li>
+<li>OTA support encapsulated to ArduinoOTA class</li>
+<li>Add gdb stub library</li>
+<li>Extracted the WebUpdate example into a library.</li>
+<li>Fix to Servo allowing write() to be called before attach()</li>
+<li>ESP8266WiFi: add function <code>begin</code> without any parameters and add <code>psk</code> function to return current PSK form sdk config</li>
+<li>Fix a crash due to abort() called from TCP error callback (#428)</li>
+<li>Adding support for OPTIONS requests to ESP8266WebServer</li>
+<li>Add HTTPS request sample (#43)</li>
+<li>Fix _useClientMode &amp; _useApMode in SDK auto connect mode (#754)</li>
+<li>Add ESP8266WebServer::sendContent_P with &#39;size_t size&#39; argument for binary content</li>
+<li>Fix bug in WiFiClient::write_P when content was binary</li>
+<li>Add WiFiClient::write_P to be used with PROGMEM</li>
+</ul>
+
+<h3 id="tools">Tools</h3>
+
+<ul>
+<li>Update SDK to 1.3.0_15_08_10_p1</li>
+<li>Update esptool to 0.4.6</li>
+<li>Bump toolchain version to force libm update on Windows</li>
+<li>ESP8266FS tool update</li>
+</ul>
+
+<hr>
+
+<h2 id="1-6-5-947-g39819f0">1.6.5-947-g39819f0</h2>
+
+<p>July 23, 2015</p>
+
+<p>Package link: <code>http://arduino.esp8266.com/versions/1.6.5-947-g39819f0/package_esp8266com_index.json</code>.</p>
+
+<h3 id="core">Core</h3>
+
+<ul>
+<li>I2C library updated to better handle repeated start for certain devices,
+improved waveforms, higher frequencies for 160MHz core clock, fix case where
+using different pins would not work with libs calling begin internally.</li>
+<li>Add Adafruit HUZZAH board</li>
+<li>Add SparkFun Thing board</li>
+<li>Add SweetPea ESP-210 board</li>
+<li>Add eboot bootloader</li>
+<li>Timer0 support</li>
+<li>Add PWM range and frequency control</li>
+<li>Add ESP.eraseConfig method</li>
+<li>Fix pin change interrupt handling (#322)</li>
+<li>Add SLC and I2S register definitions</li>
+<li>Fix math functions calling themselves recursively (#233, #354)</li>
+<li>Print stack on exception and soft WDT reset</li>
+<li>Add Updater class</li>
+<li>Remove implementations of WDT-related functions</li>
+<li>Provide selection between A0 and VCC (#443, #338)</li>
+</ul>
+
+<h3 id="libraries">Libraries</h3>
+
+<ul>
+<li>ESP8266WebServer: add gzip streaming, fix sendContent behaviour,
+add setContentSize method.</li>
+<li>ESP8266WiFi: add BSSID, channel, isHidden methods, fix AP/STA mode
+selection (#28).</li>
+<li>Better handling of WiFi disconnect (#231)</li>
+<li>Add API to set the beginning of local ports range for WiFiClient.</li>
+<li>Add RSSI function</li>
+<li>Add function to get the MAC / BSSID as String</li>
+<li>Servo library support</li>
+<li>Add ESP8266WiFiMesh library</li>
+<li>Add ESP8266SSDP library</li>
+<li>Add DNS-SD support to ESP8266mDNS library</li>
+</ul>
+
+<h3 id="tools">Tools</h3>
+
+<ul>
+<li>Update SDK to v1.2.0_15_07_03</li>
+<li>Better sketch size reporting (#314)</li>
+<li>Update esptool to 0.4.5</li>
+</ul>
+
+<hr>
+
+<h2 id="1-6-4-673-g8cd3697">1.6.4-673-g8cd3697</h2>
+
+<p>May 22, 2015</p>
+
+<p>Package link: <code>http://arduino.esp8266.com/versions/1.6.4-673-g8cd3697/package_esp8266com_index.json</code>.</p>
+
+<h3 id="tools">Tools</h3>
+
+<ul>
+<li>Add 32-bit Linux toolchain.</li>
+<li>Rebuild toolchain and esptool with support for OS X down to 10.6.</li>
+</ul>
+
+<h3 id="libraries">Libraries</h3>
+
+<ul>
+<li>Better connection handling in ESP8266WebServer.
+The server now sends Content-Length and Connection: close headers,
+then waits for the client to disconnect. By not closing the connection
+actively, server avoids TIME_WAIT TCP state, and TCP stack is able to
+release the memory immediately, without waiting for 2xMSL period.
+If the client doesn&#39;t disconnect in 2000ms, the server closes the connection
+actively.</li>
+<li>Add Hash library, which has a function to calculate SHA1 hash.</li>
+<li>SD, Adafruit_ILI9341, and OneWire libraries are now bundled.</li>
+<li>Fix incorrect sector calculation in EEPROM library.</li>
+</ul>
+
+<hr>
+
+<h2 id="1-6-4-628-g545ffde">1.6.4-628-g545ffde</h2>
+
+<p>May 19, 2015</p>
+
+<ul>
+<li>Initial release of Boards Manager package for ESP8266 platform.</li>
+</ul>
+
+    </div>
+  </body>
+</html>

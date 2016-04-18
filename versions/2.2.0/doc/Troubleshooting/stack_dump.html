@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Debugging &middot; ESP8266 Arduino Core
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/Arduino/versions/2.2.0/public/css/poole.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.2.0/public/css/syntax.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.2.0/public/css/hyde.css">
+  <link rel="stylesheet" href="/Arduino/versions/2.2.0/public/css/icons.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <!-- Icons -->
+  <link rel="shortcut icon" href="/Arduino/versions/2.2.0/public/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="/Arduino/versions/2.2.0/public/js/toc.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        $('#toc').toc({ listType: 'ul', showSpeed: 0, title: '', headers: 'h1, h2', minimumHeaders: 2 });
+    });
+  </script>
+</head>
+
+
+  <body>
+
+    <div class="version-bar">
+  This documentation is for version 2.2.0. <a href="http://esp8266.github.io/Arduino/versions">Other versions.</a>
+</div>
+
+<div class="sidebar">
+  <div class="container">
+    <div class="sidebar-about">
+      <h2>
+        <a href="http://esp8266.github.io/Arduino">
+          ESP8266 Arduino Core
+        </a>
+      </h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0/doc/installing.html">Installation</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0/doc/reference.html">Reference</a>
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0/doc/libraries.html">Libraries</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0/doc/filesystem.html">File System</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0/doc/ota_updates/readme.html">OTA Update</a>
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0/doc/boards.html">Supported Hardware</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+        
+          
+        
+          
+            <a class="sidebar-nav-item" href="/Arduino/versions/2.2.0/doc/changes.html">Change Log</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        
+      
+    </nav>
+  <p>
+    <a href="https://github.com/esp8266/Arduino"><div id="gh-icon"></div>esp8266/Arduino</a>
+  </p>
+  <p class="lead">Documentation for ESP8266 Arduino Core. Installation instructions, functions and classes reference.
+</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+<li><a href="#introduction">Introduction</a>
+
+<ul>
+<li><a href="#Decode">Decode</a></li>
+</ul></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>If the ESP crash the Exception Cause will be shown and the current stack will be dumped.</p>
+
+<p>example:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">Exception (0): epc1=0x402103f4 epc2=0x00000000 epc3=0x00000000 excvaddr=0x00000000 depc=0x00000000
+
+ctx: sys 
+sp: 3ffffc10 end: 3fffffb0 offset: 01a0
+
+&gt;&gt;&gt;stack&gt;&gt;&gt;
+3ffffdb0:  40223e00 3fff6f50 00000010 60000600  
+3ffffdc0:  00000001 4021f774 3fffc250 4000050c  
+3ffffdd0:  400043d5 00000030 00000016 ffffffff  
+3ffffde0:  400044ab 3fffc718 3ffffed0 08000000  
+3ffffdf0:  60000200 08000000 00000003 00000000  
+3ffffe00:  0000ffff 00000001 04000002 003fd000  
+3ffffe10:  3fff7188 000003fd 3fff2564 00000030  
+3ffffe20:  40101709 00000008 00000008 00000020  
+3ffffe30:  c1948db3 394c5e70 7f2060f2 c6ba0c87  
+3ffffe40:  3fff7058 00000001 40238d41 3fff6ff0  
+3ffffe50:  3fff6f50 00000010 60000600 00000020  
+3ffffe60:  402301a8 3fff7098 3fff7014 40238c77  
+3ffffe70:  4022fb6c 40230ebe 3fff1a5b 3fff6f00  
+3ffffe80:  3ffffec8 00000010 40231061 3fff0f90  
+3ffffe90:  3fff6848 3ffed0c0 60000600 3fff6ae0  
+3ffffea0:  3fff0f90 3fff0f90 3fff6848 3fff6d40  
+3ffffeb0:  3fff28e8 40101233 d634fe1a fffeffff  
+3ffffec0:  00000001 00000000 4022d5d6 3fff6848  
+3ffffed0:  00000002 4000410f 3fff2394 3fff6848  
+3ffffee0:  3fffc718 40004a3c 000003fd 3fff7188  
+3ffffef0:  3fffc718 40101510 00000378 3fff1a5b  
+3fffff00:  000003fd 4021d2e7 00000378 000003ff  
+3fffff10:  00001000 4021d37d 3fff2564 000003ff  
+3fffff20:  000003fd 60000600 003fd000 3fff2564  
+3fffff30:  ffffff00 55aa55aa 00000312 0000001c  
+3fffff40:  0000001c 0000008a 0000006d 000003ff  
+3fffff50:  4021d224 3ffecf90 00000000 3ffed0c0  
+3fffff60:  00000001 4021c2e9 00000003 3fff1238  
+3fffff70:  4021c071 3ffecf84 3ffecf30 0026a2b0  
+3fffff80:  4021c0b6 3fffdab0 00000000 3fffdcb0  
+3fffff90:  3ffecf40 3fffdab0 00000000 3fffdcc0  
+3fffffa0:  40000f49 40000f49 3fffdab0 40000f49  
+&lt;&lt;&lt;stack&lt;&lt;&lt;
+</code></pre></div>
+<p>the first number after <code>Exception</code> gives the cause of the reset.
+a full ist of all causes can be found <a href="../exception_causes.html">here</a>
+the hex after are the stack dump.</p>
+
+<h3 id="decode">Decode</h3>
+
+<p>it&#39;s possible to decode the Stack to readable information.
+more info see <a href="https://github.com/me-no-dev/EspExceptionDecoder">Esp Exception Decoder</a> tool </p>
+
+<p><img src="ESP_Exception_Decoderp.png" alt="ESP Exception Decoder"></p>
+
+    </div>
+  </body>
+</html>
