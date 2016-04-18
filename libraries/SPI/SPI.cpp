@@ -364,36 +364,62 @@ void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
     uint8_t *bufferPtr=(uint8_t *)&buffer;
     uint8_t *dataPtr = data;
     volatile uint32_t * fifoPtr = &SPI1W0;
-    uint8_t r = 64 / size;
-    uint32_t repeatRem = repeat % r;
-    repeat = repeat / r;
+    uint8_t r;
+    uint32_t repeatRem;
+    uint8_t i;
 
-    while(r--){
-        dataPtr = data;
-        for(uint8_t i=0; i<size; i++){
-            *bufferPtr = *dataPtr;
-            bufferPtr++;
-            dataPtr++;
+    if((repeat * size) <= 64){
+        repeatRem = repeat * size;
+        r = repeat;
+        while(r--){
+            dataPtr = data;
+            for(i=0; i<size; i++){
+                *bufferPtr = *dataPtr;
+                bufferPtr++;
+                dataPtr++;
+            }
+        }
+
+        r = repeatRem;
+        if(r & 3) r = r / 4 + 1;
+        else r = r / 4;
+        for(i=0; i<r; i++){
+            *fifoPtr = buffer[i];
+            fifoPtr++;
+        }
+        SPI1U = SPIUMOSI | SPIUSSE;
+    } else {
+        //Orig
+        r = 64 / size;
+        repeatRem = repeat % r * size;
+        repeat = repeat / r;
+
+        while(r--){
+            dataPtr = data;
+            for(i=0; i<size; i++){
+                *bufferPtr = *dataPtr;
+                bufferPtr++;
+                dataPtr++;
+            }
+        }
+
+        //Fill fifo with data
+        for(i=0; i<16; i++){
+            *fifoPtr = buffer[i];
+            fifoPtr++;
+        }
+
+        r = 64 / size;
+
+        SPI1U = SPIUMOSI | SPIUSSE;
+        setDataBits(r * size * 8);
+        while(repeat--){
+            SPI1CMD |= SPIBUSY;
+            while(SPI1CMD & SPIBUSY) {}
         }
     }
-
-    fifoPtr = &SPI1W0;
-    for(uint8_t i=0; i<16; i++){
-        *fifoPtr = buffer[i];
-        fifoPtr++;
-    }
-
-    r = 64 / size;
-
-    SPI1U = SPIUMOSI | SPIUSSE;
-    //Fill fifo with data
-    setDataBits(r * size * 8);
-    while(repeat--){
-        SPI1CMD |= SPIBUSY;
-        while(SPI1CMD & SPIBUSY) {}
-    }
-
-    setDataBits(repeatRem * size * 8);
+    //End orig
+    setDataBits(repeatRem * 8);
     SPI1CMD |= SPIBUSY;
     while(SPI1CMD & SPIBUSY) {}
 
