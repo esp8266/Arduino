@@ -92,6 +92,13 @@ int ICACHE_RAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
     return len;
 }
 
+int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) {
+    if (file->_file == STDOUT_FILENO) {
+        return ets_putc(c);
+    }
+    return EOF;
+}
+
 int ICACHE_RAM_ATTR puts(const char * str) {
     char c;
     while((c = *str) != 0) {
