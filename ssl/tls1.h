@@ -189,7 +189,7 @@ struct _SSL
 #endif
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     X509_CTX *x509_ctx;
-    bool can_increase_data_size;
+    bool can_free_certificates;
 #endif
     uint8_t session_id[SSL_SESSION_ID_SIZE]; 
     uint8_t client_mac[SHA1_SIZE];  /* for HMAC verification */

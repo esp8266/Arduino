@@ -66,7 +66,7 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
         SET_SSL_FLAG(SSL_SESSION_RESUME);   /* just flag for later */
     }
 
-    if(host_name != NULL && strlen(host_name) > 0 || strlen(host_name) < 255 ) {
+    if(host_name != NULL && strlen(host_name) > 0) {
         ssl->host_name = (char *)strdup(host_name);
     }
 
@@ -123,7 +123,6 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 
         case HS_FINISHED:
             ret = process_finished(ssl, buf, hs_len);
-            ssl->can_increase_data_size = true;
             disposable_free(ssl);
             /* note: client renegotiation is not allowed after this */
             break;

@@ -53,7 +53,7 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len);
 static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt, void* cached);
 static int send_raw_packet(SSL *ssl, uint8_t protocol);
 static void certificate_free(SSL* ssl);
-static int increase_bm_data_size(SSL *ssl);
+static int increase_bm_data_size(SSL *ssl, size_t size);
 
 /**
  * The server will pick the cipher based on the order that the order that the
@@ -285,6 +285,11 @@ EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
 {
     int n = out_len, nw, i, tot = 0;
     /* maximum size of a TLS packet is around 16kB, so fragment */
+
+    if (ssl->can_free_certificates) {
+        certificate_free(ssl);
+    }
+
     do 
     {
         nw = n;
@@ -545,9 +550,9 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
     ssl->flag = SSL_NEED_RECORD;
     ssl->bm_data = ssl->bm_all_data + BM_RECORD_OFFSET; /* space at the start */
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
-    ssl->can_increase_data_size = false;
 #ifdef CONFIG_ENABLE_VERIFICATION
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
+    ssl->can_free_certificates = false;
 #endif
     disposable_new(ssl);
 
@@ -1214,6 +1219,10 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     int read_len, is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     uint8_t *buf = ssl->bm_data;
 
+    if (ssl->can_free_certificates) {
+        certificate_free(ssl);
+    }
+
     read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_read_index], 
                             ssl->need_bytes-ssl->got_bytes);
 
@@ -1287,16 +1296,8 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         if (ssl->need_bytes > ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET)
         {
             printf("ssl->need_bytes=%d > %d\r\n", ssl->need_bytes, ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET);
-            if (ssl->can_increase_data_size)
-            {
-                ret = increase_bm_data_size(ssl);
-                if (ret != SSL_OK)
-                {
-                    ret = SSL_ERROR_INVALID_PROT_MSG;
-                    goto error;
-                }
-            }
-            else
+            ret = increase_bm_data_size(ssl, ssl->need_bytes + BM_RECORD_OFFSET - RT_EXTRA);
+            if (ret != SSL_OK)
             {
                 ret = SSL_ERROR_INVALID_PROT_MSG;
                 goto error;
@@ -1414,24 +1415,22 @@ error:
     return ret;
 }
 
-int increase_bm_data_size(SSL *ssl)
+int increase_bm_data_size(SSL *ssl, size_t size)
 {
-    if (!ssl->can_increase_data_size ||
-        ssl->max_plain_length == RT_MAX_PLAIN_LENGTH) {
+    if (ssl->max_plain_length == RT_MAX_PLAIN_LENGTH) {
         return SSL_OK;
     }
-    certificate_free(ssl);
-    free(ssl->bm_all_data);
-    ssl->bm_data = 0;
-    ssl->bm_all_data = malloc(RT_MAX_PLAIN_LENGTH + RT_EXTRA);
-    if (!ssl->bm_all_data) {
+    size_t required = (size + 1023) & ~(1023); // round up to 1k
+    required = (required < RT_MAX_PLAIN_LENGTH) ? required : RT_MAX_PLAIN_LENGTH;
+    uint8_t* new_bm_all_data = (uint8_t*) realloc(ssl->bm_all_data, required + RT_EXTRA);
+    if (!new_bm_all_data) {
         printf("failed to grow plain buffer\r\n");
         ssl->hs_status = SSL_ERROR_DEAD;
         return SSL_ERROR_CONN_LOST;
     }
-    ssl->can_increase_data_size = false;
-    ssl->max_plain_length = RT_MAX_PLAIN_LENGTH;
+    ssl->bm_all_data = new_bm_all_data;
     ssl->bm_data = ssl->bm_all_data + BM_RECORD_OFFSET;
+    ssl->max_plain_length = required;
     return SSL_OK;
 }
 
@@ -1689,6 +1688,7 @@ void disposable_free(SSL *ssl)
         free(ssl->dc);
         ssl->dc = NULL;
     }
+    ssl->can_free_certificates = true;
 }
 
 static void certificate_free(SSL* ssl)
@@ -1698,6 +1698,7 @@ static void certificate_free(SSL* ssl)
         x509_free(ssl->x509_ctx);
         ssl->x509_ctx = 0;
     }
+    ssl->can_free_certificates = false;
 #endif
 }
 
