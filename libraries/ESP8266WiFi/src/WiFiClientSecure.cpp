@@ -93,8 +93,8 @@ public:
         }
     }
 
-    void connect(ClientContext* ctx, uint32_t timeout_ms) {
-        _ssl = ssl_client_new(_ssl_ctx, reinterpret_cast<int>(ctx), nullptr, 0);
+    void connect(ClientContext* ctx, const char* hostName, uint32_t timeout_ms) {
+        _ssl = ssl_client_new(_ssl_ctx, reinterpret_cast<int>(ctx), nullptr, 0, hostName);
         uint32_t t = millis();
 
         while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
@@ -242,16 +242,21 @@ int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
     if (!WiFiClient::connect(ip, port))
         return 0;
 
-    return _connectSSL();
+    return _connectSSL(nullptr);
 }
 
 int WiFiClientSecure::connect(const char* name, uint16_t port) {
-    if (!WiFiClient::connect(name, port))
+    IPAddress remote_addr;
+    if (!WiFi.hostByName(name, remote_addr)) {
         return 0;
-    return 1;
+    }
+    if (!WiFiClient::connect(remote_addr, port)) {
+        return 0;
+    }
+    return _connectSSL(name);
 }
 
-int WiFiClientSecure::_connectSSL() {
+int WiFiClientSecure::_connectSSL(const char* hostName) {
     if (_ssl) {
         _ssl->unref();
         _ssl = nullptr;
@@ -259,7 +264,7 @@ int WiFiClientSecure::_connectSSL() {
 
     _ssl = new SSLContext;
     _ssl->ref();
-    _ssl->connect(_client, 5000);
+    _ssl->connect(_client, hostName, 5000);
 
     auto status = ssl_handshake_status(*_ssl);
     if (status != SSL_OK) {
