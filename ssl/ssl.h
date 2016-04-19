@@ -241,10 +241,11 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
  * can be null if no session resumption is being used or required. This option
  * is not used in skeleton mode.
  * @param sess_id_size The size of the session id (max 32)
+ * @param host_name If non-zero, host name to be sent to server for SNI support
  * @return An SSL object reference. Use ssl_handshake_status() to check 
  * if a handshake succeeded.
  */
-EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id, uint8_t sess_id_size);
+EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id, uint8_t sess_id_size, const char* host_name);
 
 /**
  * @brief Free any used resources on this connection. 
@@ -351,16 +352,6 @@ EXP_FUNC int STDCALL ssl_handshake_status(const SSL *ssl);
  * @return The value of the requested parameter.
  */
 EXP_FUNC int STDCALL ssl_get_config(int offset);
-
-/**
- * @brief Sets the hostname to be used for SNI
- * @see https://en.wikipedia.org/wiki/Server_Name_Indication
- * @param char* hostname
- * @return success from the operation
- * - 1 on success
- * - 0 on failure
- */
-EXP_FUNC int STDCALL ssl_set_hostname(SSL *ssl, const char* host_name);
 
 /**
  * @brief Display why the handshake failed.

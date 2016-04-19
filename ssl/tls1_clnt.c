@@ -48,7 +48,7 @@ static int send_cert_verify(SSL *ssl);
  * Establish a new SSL connection to an SSL server.
  */
 EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
-        uint8_t *session_id, uint8_t sess_id_size)
+        uint8_t *session_id, uint8_t sess_id_size, const char* host_name)
 {
     SSL *ssl = ssl_new(ssl_ctx, client_fd);
     ssl->version = SSL_PROTOCOL_VERSION_MAX; /* try top version first */
@@ -64,6 +64,10 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
         memcpy(ssl->session_id, session_id, sess_id_size);
         ssl->sess_id_size = sess_id_size;
         SET_SSL_FLAG(SSL_SESSION_RESUME);   /* just flag for later */
+    }
+
+    if(host_name != NULL && strlen(host_name) > 0 || strlen(host_name) < 255 ) {
+        ssl->host_name = (char *)strdup(host_name);
     }
 
     SET_SSL_FLAG(SSL_IS_CLIENT);
