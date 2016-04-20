@@ -220,7 +220,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch Size: %d\n", ESP.getSketchSize());
 
     if(currentVersion && currentVersion[0] != 0x00) {
-        DEBUG_HTTP_UPDATE("[httpUpdate]  - current version: %s\n", currentVersion);
+        DEBUG_HTTP_UPDATE("[httpUpdate]  - current version: %s\n", currentVersion.c_str() );
     }
 
     switch(code) {
