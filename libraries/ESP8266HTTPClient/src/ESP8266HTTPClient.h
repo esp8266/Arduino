@@ -186,6 +186,7 @@ protected:
         String value;
     };
 
+    bool beginInternal(String url, const char* expectedProtocol);
     void clear();
     int returnError(int error);
     bool connect(void);
