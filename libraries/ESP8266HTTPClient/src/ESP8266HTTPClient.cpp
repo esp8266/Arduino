@@ -98,6 +98,7 @@ void HTTPClient::clear()
 bool HTTPClient::begin(String url, String httpsFingerprint)
 {
     _transportTraits.reset(nullptr);
+    _port = 443;
     if (httpsFingerprint.length() == 0) {
         return false;
     }
@@ -116,6 +117,7 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
 bool HTTPClient::begin(String url)
 {
     _transportTraits.reset(nullptr);
+    _port = 80;
     if (!beginInternal(url, "http")) {
         return false;
     }
