@@ -206,9 +206,9 @@ void SSDPClass::_send(ssdp_method_t method){
     (method == NONE)?_ssdp_response_template:_ssdp_notify_template,
     SSDP_INTERVAL,
     _modelName, _modelNumber,
+    _uuid,
     (method == NONE)?"ST":"NT",
     _deviceType,
-    _uuid,
     IP2STR(&ip), _port, _schemaURL
   );
 
