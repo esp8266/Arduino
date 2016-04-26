@@ -33,6 +33,10 @@
 class TransportTraits
 {
 public:
+    virtual ~TransportTraits() 
+    {
+    }
+
     virtual std::unique_ptr<WiFiClient> create()
     {
         return std::unique_ptr<WiFiClient>(new WiFiClient());
