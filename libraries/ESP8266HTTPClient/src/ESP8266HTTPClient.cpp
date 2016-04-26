@@ -33,6 +33,10 @@
 class TransportTraits
 {
 public:
+    virtual ~TransportTraits() 
+    {
+    }
+
     virtual std::unique_ptr<WiFiClient> create()
     {
         return std::unique_ptr<WiFiClient>(new WiFiClient());
@@ -622,6 +626,13 @@ int HTTPClient::writeToStream(Stream * stream)
                     return returnError(HTTPC_ERROR_STREAM_WRITE);
                 }
                 break;
+            }
+
+            // read trailing \r\n at the end of the chunk
+            char buf[2];
+            auto trailing_seq_len = _tcp->readBytes((uint8_t*)buf, 2);
+            if (trailing_seq_len != 2 || buf[0] != '\r' || buf[1] != '\n') {
+                return returnError(HTTPC_ERROR_READ_TIMEOUT);
             }
 
             delay(0);

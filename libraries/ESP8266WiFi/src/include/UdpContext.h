@@ -213,7 +213,7 @@ public:
         return size;
     }
 
-    char peek()
+    int peek()
     {
         if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
             return -1;
