@@ -33,6 +33,10 @@
 class TransportTraits
 {
 public:
+    virtual ~TransportTraits() 
+    {
+    }
+
     virtual std::unique_ptr<WiFiClient> create()
     {
         return std::unique_ptr<WiFiClient>(new WiFiClient());
@@ -87,20 +91,6 @@ HTTPClient::~HTTPClient()
     }
 }
 
-
-bool HTTPClient::begin(String url, String httpsFingerprint)
-{
-    if (httpsFingerprint.length() == 0) {
-        return false;
-    }
-    if (!begin(url)) {
-        return false;
-    }
-    _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
-    return true;
-}
-
 void HTTPClient::clear()
 {
     _returnCode = 0;
@@ -109,11 +99,37 @@ void HTTPClient::clear()
 }
 
 
+bool HTTPClient::begin(String url, String httpsFingerprint)
+{
+    _transportTraits.reset(nullptr);
+    _port = 443;
+    if (httpsFingerprint.length() == 0) {
+        return false;
+    }
+    if (!beginInternal(url, "https")) {
+        return false;
+    }
+    _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
+    return true;
+}
+
 /**
  * parsing the url for all needed parameters
  * @param url String
  */
 bool HTTPClient::begin(String url)
+{
+    _transportTraits.reset(nullptr);
+    _port = 80;
+    if (!beginInternal(url, "http")) {
+        return false;
+    }
+    _transportTraits = TransportTraitsPtr(new TransportTraits());
+    return true;
+}
+
+bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 {
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
     bool hasPort = false;
@@ -148,25 +164,14 @@ bool HTTPClient::begin(String url)
         _host = host.substring(0, index); // hostname
         host.remove(0, (index + 1)); // remove hostname + :
         _port = host.toInt(); // get port
-        hasPort = true;
     } else {
         _host = host;
     }
     _uri = url;
-
-    if(_protocol.equalsIgnoreCase("http")) {
-        if(!hasPort) {
-            _port = 80;
-        }
-    } else if(_protocol.equalsIgnoreCase("https")) {
-        if(!hasPort) {
-            _port = 443;
-        }
-    } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", _protocol.c_str());
+    if (_protocol != expectedProtocol) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
         return false;
     }
-    _transportTraits = TransportTraitsPtr(new TransportTraits());
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s\n", _host.c_str(), _port, _uri.c_str());
     return true;
 }
@@ -623,6 +628,13 @@ int HTTPClient::writeToStream(Stream * stream)
                 break;
             }
 
+            // read trailing \r\n at the end of the chunk
+            char buf[2];
+            auto trailing_seq_len = _tcp->readBytes((uint8_t*)buf, 2);
+            if (trailing_seq_len != 2 || buf[0] != '\r' || buf[1] != '\n') {
+                return returnError(HTTPC_ERROR_READ_TIMEOUT);
+            }
+
             delay(0);
         }
     } else {
@@ -785,7 +797,7 @@ bool HTTPClient::connect(void)
     }
 
     if (!_transportTraits) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] _transportTraits is null (HTTPClient::begin not called?)\n");
+        DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
         return false;
     }
 
