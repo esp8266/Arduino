@@ -31,6 +31,13 @@
 #include <WiFiClient.h>
 #include <WiFiUdp.h>
 #include <ESP8266HTTPClient.h>
+//ADDED DJO
+
+#include <stdio.h>
+
+#include <FS.h>
+
+//ADDED DJO
 
 #ifdef DEBUG_ESP_HTTP_UPDATE
 #ifdef DEBUG_ESP_PORT
