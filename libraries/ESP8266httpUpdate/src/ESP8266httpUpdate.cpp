@@ -25,9 +25,23 @@
 
 #include "ESP8266httpUpdate.h"
 #include <StreamString.h>
+//ADDED DJO
+#
+#include <FS.h>
+
+//ADDED DJO
 
 extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
+
+void saveMD5(String s) {
+  File md5 = SPIFFS.open("/md5.txt", "w");
+  if (!md5) {
+    Serial.println("Failed to open config file for writing");
+  }
+  md5.println(s.c_str());
+  md5.close();
+}
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
 {
