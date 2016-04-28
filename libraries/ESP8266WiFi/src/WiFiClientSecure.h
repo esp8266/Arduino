@@ -66,7 +66,7 @@ public:
   }
 
 protected:
-    int _connectSSL();
+    int _connectSSL(const char* hostName);
 
     SSLContext* _ssl = nullptr;
 };

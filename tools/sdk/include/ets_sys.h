@@ -10,6 +10,7 @@
 
 #include "c_types.h"
 #include "eagle_soc.h"
+#include <stddef.h>
 
 typedef uint32_t ETSSignal;
 typedef uint32_t ETSParam;
@@ -154,7 +155,7 @@ inline uint32_t ETS_INTR_PENDING(void)
 
 #define ETS_SDIO_INTR_DISABLE() \
     ETS_INTR_DISABLE(ETS_SDIO_INUM)
-    
+
 
 void *pvPortMalloc(size_t xWantedSize, const char* file, int line) __attribute__((malloc, alloc_size(1)));
 void *pvPortRealloc(void* ptr, size_t xWantedSize, const char* file, int line) __attribute__((alloc_size(2)));
@@ -182,7 +183,8 @@ void ets_isr_attach(int intr, int_handler_t handler, void *arg);
 void ets_intr_lock();
 void ets_intr_unlock();
 int ets_vsnprintf(char * s, size_t n, const char * format, va_list arg)  __attribute__ ((format (printf, 3, 0)));
-int ets_vprintf(const char * format, va_list arg) __attribute__ ((format (printf, 1, 0)));
+int ets_vprintf(int (*print_function)(int), const char * format, va_list arg) __attribute__ ((format (printf, 2, 0)));
+int ets_putc(int);
 bool ets_task(ETSTask task, uint8 prio, ETSEvent *queue, uint8 qlen);
 bool ets_post(uint8 prio, ETSSignal sig, ETSParam par);
 

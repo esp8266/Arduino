@@ -113,7 +113,7 @@ u32_t            tcp_update_rcv_ann_wnd(struct tcp_pcb *pcb)ICACHE_FLASH_ATTR;
 #define TCP_HLEN 20
 
 #ifndef TCP_TMR_INTERVAL
-#define TCP_TMR_INTERVAL       250  /* The TCP timer interval in milliseconds. */
+#define TCP_TMR_INTERVAL       125  /* The TCP timer interval in milliseconds. */
 #endif /* TCP_TMR_INTERVAL */
 
 #ifndef TCP_FAST_INTERVAL
@@ -135,15 +135,15 @@ u32_t            tcp_update_rcv_ann_wnd(struct tcp_pcb *pcb)ICACHE_FLASH_ATTR;
 
 /* Keepalive values, compliant with RFC 1122. Don't change this unless you know what you're doing */
 #ifndef  TCP_KEEPIDLE_DEFAULT
-#define  TCP_KEEPIDLE_DEFAULT     3000UL /* Default KEEPALIVE timer in milliseconds */
+#define  TCP_KEEPIDLE_DEFAULT     120000UL /* Default KEEPALIVE timer in milliseconds */
 #endif
 
 #ifndef  TCP_KEEPINTVL_DEFAULT
-#define  TCP_KEEPINTVL_DEFAULT    1000UL   /* Default Time between KEEPALIVE probes in milliseconds */
+#define  TCP_KEEPINTVL_DEFAULT    10000UL   /* Default Time between KEEPALIVE probes in milliseconds */
 #endif
 
 #ifndef  TCP_KEEPCNT_DEFAULT
-#define  TCP_KEEPCNT_DEFAULT      3U        /* Default Counter for KEEPALIVE probes */
+#define  TCP_KEEPCNT_DEFAULT      9U        /* Default Counter for KEEPALIVE probes */
 #endif
 
 #define  TCP_MAXIDLE              TCP_KEEPCNT_DEFAULT * TCP_KEEPINTVL_DEFAULT  /* Maximum KEEPALIVE probe time */
@@ -156,14 +156,14 @@ u32_t            tcp_update_rcv_ann_wnd(struct tcp_pcb *pcb)ICACHE_FLASH_ATTR;
 #endif
 PACK_STRUCT_BEGIN
 struct tcp_hdr {
-  PACK_STRUCT_FIELD(u16_t src);				//Ô´¶Ë¿Ú
-  PACK_STRUCT_FIELD(u16_t dest);				//Ä¿µÄ¶Ë¿Ú
-  PACK_STRUCT_FIELD(u32_t seqno);			//ÐòºÅ
-  PACK_STRUCT_FIELD(u32_t ackno);			//Ó¦´ðÐòºÅ
-  PACK_STRUCT_FIELD(u16_t _hdrlen_rsvd_flags);//Ê×²¿³¤¶È+±£ÁôÎ»+±êÖ¾Î»
-  PACK_STRUCT_FIELD(u16_t wnd);				//´°¿Ú´óÐ¡
-  PACK_STRUCT_FIELD(u16_t chksum);			//Ð£ÑéºÍ
-  PACK_STRUCT_FIELD(u16_t urgp);				//½ô¼±Ö¸Õë
+  PACK_STRUCT_FIELD(u16_t src);				//Ô´ï¿½Ë¿ï¿½
+  PACK_STRUCT_FIELD(u16_t dest);				//Ä¿ï¿½Ä¶Ë¿ï¿½
+  PACK_STRUCT_FIELD(u32_t seqno);			//ï¿½ï¿½ï¿½
+  PACK_STRUCT_FIELD(u32_t ackno);			//Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½
+  PACK_STRUCT_FIELD(u16_t _hdrlen_rsvd_flags);//ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½+ï¿½ï¿½ï¿½ï¿½Î»+ï¿½ï¿½Ö¾Î»
+  PACK_STRUCT_FIELD(u16_t wnd);				//ï¿½ï¿½ï¿½Ú´ï¿½Ð¡
+  PACK_STRUCT_FIELD(u16_t chksum);			//Ð£ï¿½ï¿½ï¿½
+  PACK_STRUCT_FIELD(u16_t urgp);				//ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
 } PACK_STRUCT_STRUCT;
 PACK_STRUCT_END
 #ifdef PACK_STRUCT_USE_INCLUDES

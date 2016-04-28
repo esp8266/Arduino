@@ -147,6 +147,8 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [DimSwitch](https://github.com/krzychb/DimSwitch) - Control electronic dimmable ballasts for fluorescent light tubes remotely as if using a wall switch.
 - [Encoder](https://github.com/PaulStoffregen/Encoder) - Arduino library for rotary encoders. Version 1.4 supports ESP8266.
 - [esp8266_mdns](https://github.com/mrdunk/esp8266_mdns) - mDNS queries and responses on esp8266. Or to describe it another way: An mDNS Client or Bonjour Client library for the esp8266.
+- [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP) - Asynchronous TCP Library for ESP8266 and ESP32/31B
+- [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer) - Asynchronous Web Server Library for ESP8266 and ESP32/31B
 - [Homie for ESP8266](https://github.com/marvinroger/homie-esp8266) - Arduino framework for ESP8266 implementing Homie, an MQTT convention for the IoT.
 - [NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) - Adafruit's NeoPixel library, now with support for the ESP8266 (use version 1.0.2 or higher from Arduino's library manager).
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with ESP8266. Use the "DmaDriven" or "UartDriven" branches for ESP8266. Includes HSL color support and more.
@@ -163,3 +165,6 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [Adafruit-PCD8544-Nokia-5110-LCD-Library](https://github.com/WereCatf/Adafruit-PCD8544-Nokia-5110-LCD-library) - Port of the Adafruit PCD8544 - library for the ESP8266.
 - [PCF8574_ESP](https://github.com/WereCatf/PCF8574_ESP) - A very simplistic library for using the PCF8574/PCF8574A I2C 8-pin GPIO-expander.
 - [Dot Matrix Display Library 2](https://github.com/freetronics/DMD2) - Freetronics DMD & Generic 16 x 32 P10 style Dot Matrix Display Library
+- [SdFat-beta](https://github.com/greiman/SdFat-beta) - SD-card library with support for long filenames, software- and hardware-based SPI and lots more.
+- [FastLED](https://github.com/FastLED/FastLED) - a library for easily & efficiently controlling a wide variety of LED chipsets, like the Neopixel (WS2812B), DotStar, LPD8806 and many more. Includes fading, gradient, color conversion functions.
+- [OLED](https://github.com/klarsys/esp8266-OLED) - a library for controlling I2C connected OLED displays. Tested with 0.96 inch OLED graphics display.

@@ -52,31 +52,57 @@
 #define HTTP_UE_BIN_VERIFY_HEADER_FAILED    (-106)
 #define HTTP_UE_BIN_FOR_WRONG_FLASH         (-107)
 
-typedef enum {
+enum HTTPUpdateResult {
     HTTP_UPDATE_FAILED,
     HTTP_UPDATE_NO_UPDATES,
     HTTP_UPDATE_OK
-} t_httpUpdate_return;
+};
 
-class ESP8266HTTPUpdate {
-    public:
-        ESP8266HTTPUpdate(void);
-        ~ESP8266HTTPUpdate(void);
+typedef HTTPUpdateResult t_httpUpdate_return; // backward compatibility
 
-        t_httpUpdate_return update(const char * url, const char * current_version = "", const char * httpsFingerprint = "", bool reboot = true);
-        t_httpUpdate_return update(const char * host, uint16_t port, const char * url = "/", const char * current_version = "", bool https = false, const char * httpsFingerprint = "", bool reboot = true);
-        t_httpUpdate_return update(String host, uint16_t port, String url = "/", String current_version = "", bool https = false, String httpsFingerprint = "", bool reboot = true);
+class ESP8266HTTPUpdate
+{
+public:
+    ESP8266HTTPUpdate(void);
+    ~ESP8266HTTPUpdate(void);
 
-        t_httpUpdate_return updateSpiffs(const char * url, const char * current_version = "", const char * httpsFingerprint = "", bool reboot = false);
+    void rebootOnUpdate(bool reboot)
+    {
+        _rebootOnUpdate = reboot;
+    }
 
-        int getLastError(void);
-        String getLastErrorString(void);
+    // This function is deprecated, use rebootOnUpdate and the next one instead
+    t_httpUpdate_return update(const String& url, const String& currentVersion,
+                               const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
+    t_httpUpdate_return update(const String& url, const String& currentVersion = "");
+    t_httpUpdate_return update(const String& url, const String& currentVersion,
+                               const String& httpsFingerprint);
 
-    protected:
-        t_httpUpdate_return handleUpdate(HTTPClient * http, const char * current_version, bool reboot = true, bool spiffs = false);
-        bool runUpdate(Stream& in, uint32_t size, String md5, int command = U_FLASH);
+    // This function is deprecated, use one of the overloads below along with rebootOnUpdate
+    t_httpUpdate_return update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
+                               bool https, const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
 
-        int lastError;
+    t_httpUpdate_return update(const String& host, uint16_t port, const String& uri = "/",
+                               const String& currentVersion = "");
+    t_httpUpdate_return update(const String& host, uint16_t port, const String& url,
+                               const String& currentVersion, const String& httpsFingerprint);
+
+    // This function is deprecated, use rebootOnUpdate and the next one instead
+    t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion,
+                                     const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
+    t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion = "");
+    t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint);
+
+
+    int getLastError(void);
+    String getLastErrorString(void);
+
+protected:
+    t_httpUpdate_return handleUpdate(HTTPClient& http, const String& currentVersion, bool spiffs = false);
+    bool runUpdate(Stream& in, uint32_t size, String md5, int command = U_FLASH);
+
+    int _lastError;
+    bool _rebootOnUpdate = true;
 };
 
 extern ESP8266HTTPUpdate ESPhttpUpdate;

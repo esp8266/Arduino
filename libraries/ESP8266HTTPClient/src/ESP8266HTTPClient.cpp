@@ -30,168 +30,193 @@
 
 #include "ESP8266HTTPClient.h"
 
+class TransportTraits
+{
+public:
+    virtual ~TransportTraits() 
+    {
+    }
+
+    virtual std::unique_ptr<WiFiClient> create()
+    {
+        return std::unique_ptr<WiFiClient>(new WiFiClient());
+    }
+
+    virtual bool verify(WiFiClient& client, const char* host)
+    {
+        return true;
+    }
+};
+
+class TLSTraits : public TransportTraits
+{
+public:
+    TLSTraits(const String& fingerprint) :
+        _fingerprint(fingerprint)
+    {
+    }
+
+    std::unique_ptr<WiFiClient> create() override
+    {
+        return std::unique_ptr<WiFiClient>(new WiFiClientSecure());
+    }
+
+    bool verify(WiFiClient& client, const char* host) override
+    {
+        auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
+        return wcs.verify(_fingerprint.c_str(), host);
+    }
+
+protected:
+    String _fingerprint;
+};
+
 /**
- * constractor
+ * constructor
  */
-HTTPClient::HTTPClient() {
-    _tcp = NULL;
-    _tcps = NULL;
-
-    _port = 0;
-
-    _reuse = false;
-    _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
-    _useHTTP10 = false;
-
-    _https = false;
-
-    _userAgent = "ESP8266HTTPClient";
-
-    _headerKeysCount = 0;
-    _currentHeaders = NULL;
-
-    _returnCode = 0;
-    _size = -1;
-    _canReuse = false;
-    _transferEncoding = HTTPC_TE_IDENTITY;
-
+HTTPClient::HTTPClient()
+{
 }
 
 /**
- * deconstractor
+ * destructor
  */
-HTTPClient::~HTTPClient() {
-
-    if(_tcps) {
-        _tcps->stop();
-        delete _tcps;
-        _tcps = NULL;
-        _tcp = NULL;
-    } else if(_tcp) {
+HTTPClient::~HTTPClient()
+{
+    if(_tcp) {
         _tcp->stop();
-        delete _tcp;
-        _tcp = NULL;
     }
-
     if(_currentHeaders) {
         delete[] _currentHeaders;
     }
 }
 
-/**
- * phasing the url for all needed informations
- * @param url const char *
- * @param httpsFingerprint const char *
- */
-void HTTPClient::begin(const char *url, const char * httpsFingerprint) {
-    begin(String(url), String(httpsFingerprint));
+void HTTPClient::clear()
+{
+    _returnCode = 0;
+    _size = -1;
+    _headers = "";
+}
+
+
+bool HTTPClient::begin(String url, String httpsFingerprint)
+{
+    _transportTraits.reset(nullptr);
+    _port = 443;
+    if (httpsFingerprint.length() == 0) {
+        return false;
+    }
+    if (!beginInternal(url, "https")) {
+        return false;
+    }
+    _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
+    return true;
 }
 
 /**
- * phasing the url for all needed informations
+ * parsing the url for all needed parameters
  * @param url String
- * @param httpsFingerprint String
  */
-void HTTPClient::begin(String url, String httpsFingerprint) {
+bool HTTPClient::begin(String url)
+{
+    _transportTraits.reset(nullptr);
+    _port = 80;
+    if (!beginInternal(url, "http")) {
+        return false;
+    }
+    _transportTraits = TransportTraitsPtr(new TransportTraits());
+    return true;
+}
 
+bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
+{
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
+    bool hasPort = false;
+    clear();
 
-    _httpsFingerprint = httpsFingerprint;
-    _returnCode = 0;
-    _size = -1;
-
-    _Headers = "";
-
-    String protocol;
     // check for : (http: or https:
     int index = url.indexOf(':');
-    //int index2;
-    bool hasPort = false;
-    if(index >= 0) {
-        protocol = url.substring(0, index);
-        url.remove(0, (index + 3)); // remove http:// or https://
-
-        index = url.indexOf('/');
-        String host = url.substring(0, index);
-        url.remove(0, index); // remove host part
-
-        // get Authorization
-        index = host.indexOf('@');
-        if(index >= 0) {
-            // auth info
-            String auth = host.substring(0, index);
-            host.remove(0, index + 1); // remove auth part including @
-            _base64Authorization = base64::encode(auth);
-        }
-
-        // get port
-        index = host.indexOf(':');
-        if(index >= 0) {
-            _host = host.substring(0, index); // hostname
-            host.remove(0, (index + 1)); // remove hostname + :
-            _port = host.toInt(); // get port
-            hasPort = true;
-        } else {
-            _host = host;
-        }
-
-        _url = url;
-
-        if(protocol.equalsIgnoreCase("http")) {
-            _https = false;
-            if(!hasPort) {
-                _port = 80;
-            }
-        } else if(protocol.equalsIgnoreCase("https")) {
-            _https = true;
-            if(!hasPort) {
-                _port = 443;
-            }
-        } else {
-            DEBUG_HTTPCLIENT("[HTTP-Client][begin] protocol: %s unknown?!\n", protocol.c_str());
-            return;
-        }
-
+    if(index < 0) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] failed to parse protocol\n");
+        return false;
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s https: %d httpsFingerprint: %s\n", _host.c_str(), _port, _url.c_str(), _https, _httpsFingerprint.c_str());
+    _protocol = url.substring(0, index);
+    url.remove(0, (index + 3)); // remove http:// or https://
 
+    index = url.indexOf('/');
+    String host = url.substring(0, index);
+    url.remove(0, index); // remove host part
+
+    // get Authorization
+    index = host.indexOf('@');
+    if(index >= 0) {
+        // auth info
+        String auth = host.substring(0, index);
+        host.remove(0, index + 1); // remove auth part including @
+        _base64Authorization = base64::encode(auth);
+    }
+
+    // get port
+    index = host.indexOf(':');
+    if(index >= 0) {
+        _host = host.substring(0, index); // hostname
+        host.remove(0, (index + 1)); // remove hostname + :
+        _port = host.toInt(); // get port
+    } else {
+        _host = host;
+    }
+    _uri = url;
+    if (_protocol != expectedProtocol) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
+        return false;
+    }
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s\n", _host.c_str(), _port, _uri.c_str());
+    return true;
 }
 
-/**
- * begin
- * @param host const char *
- * @param port uint16_t
- * @param url  const char *
- * @param https bool
- * @param httpsFingerprint const char *
- */
-void HTTPClient::begin(const char *host, uint16_t port, const char * url, bool https, const char * httpsFingerprint) {
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port:%d url: %s https: %d httpsFingerprint: %s\n", host, port, url, https, httpsFingerprint);
-
+bool HTTPClient::begin(String host, uint16_t port, String uri)
+{
+    clear();
     _host = host;
     _port = port;
-    _url = url;
-    _https = https;
-    _httpsFingerprint = httpsFingerprint;
-
-    _returnCode = 0;
-    _size = -1;
-
-    _Headers = "";
-
+    _uri = uri;
+    _transportTraits = TransportTraitsPtr(new TransportTraits());
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d uri: %s\n", host.c_str(), port, uri.c_str());
+    return true;
 }
 
-void HTTPClient::begin(String host, uint16_t port, String url, bool https, String httpsFingerprint) {
-    begin(host.c_str(), port, url.c_str(), https, httpsFingerprint.c_str());
+bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)
+{
+    if (https) {
+        return begin(host, port, uri, httpsFingerprint);
+    } else {
+        return begin(host, port, uri);
+    }
+}
+
+bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFingerprint)
+{
+    clear();
+    _host = host;
+    _port = port;
+    _uri = uri;
+
+    if (httpsFingerprint.length() == 0) {
+        return false;
+    }
+    _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s httpsFingerprint: %s\n", host.c_str(), port, uri.c_str(), httpsFingerprint.c_str());
+    return true;
 }
 
 /**
  * end
  * called after the payload is handled
  */
-void HTTPClient::end(void) {
+void HTTPClient::end(void)
+{
     if(connected()) {
         if(_tcp->available() > 0) {
             DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _tcp->available());
@@ -214,7 +239,8 @@ void HTTPClient::end(void) {
  * connected
  * @return connected status
  */
-bool HTTPClient::connected() {
+bool HTTPClient::connected()
+{
     if(_tcp) {
         return (_tcp->connected() || (_tcp->available() > 0));
     }
@@ -226,7 +252,8 @@ bool HTTPClient::connected() {
  * keep-alive
  * @param reuse bool
  */
-void HTTPClient::setReuse(bool reuse) {
+void HTTPClient::setReuse(bool reuse)
+{
     _reuse = reuse;
 }
 
@@ -234,7 +261,8 @@ void HTTPClient::setReuse(bool reuse) {
  * set User Agent
  * @param userAgent const char *
  */
-void HTTPClient::setUserAgent(const char * userAgent) {
+void HTTPClient::setUserAgent(const String& userAgent)
+{
     _userAgent = userAgent;
 }
 
@@ -243,7 +271,8 @@ void HTTPClient::setUserAgent(const char * userAgent) {
  * @param user const char *
  * @param password const char *
  */
-void HTTPClient::setAuthorization(const char * user, const char * password) {
+void HTTPClient::setAuthorization(const char * user, const char * password)
+{
     if(user && password) {
         String auth = user;
         auth += ":";
@@ -256,7 +285,8 @@ void HTTPClient::setAuthorization(const char * user, const char * password) {
  * set the Authorizatio for the http request
  * @param auth const char * base64
  */
-void HTTPClient::setAuthorization(const char * auth) {
+void HTTPClient::setAuthorization(const char * auth)
+{
     if(auth) {
         _base64Authorization = auth;
     }
@@ -266,7 +296,8 @@ void HTTPClient::setAuthorization(const char * auth) {
  * set the timeout for the TCP connection
  * @param timeout unsigned int
  */
-void HTTPClient::setTimeout(uint16_t timeout) {
+void HTTPClient::setTimeout(uint16_t timeout)
+{
     _tcpTimeout = timeout;
     if(connected()) {
         _tcp->setTimeout(timeout);
@@ -277,7 +308,8 @@ void HTTPClient::setTimeout(uint16_t timeout) {
  * use HTTP1.0
  * @param timeout
  */
-void HTTPClient::useHTTP10(bool useHTTP10) {
+void HTTPClient::useHTTP10(bool useHTTP10)
+{
     _useHTTP10 = useHTTP10;
 }
 
@@ -285,7 +317,8 @@ void HTTPClient::useHTTP10(bool useHTTP10) {
  * send a GET request
  * @return http code
  */
-int HTTPClient::GET() {
+int HTTPClient::GET()
+{
     return sendRequest("GET");
 }
 
@@ -295,11 +328,13 @@ int HTTPClient::GET() {
  * @param size size_t
  * @return http code
  */
-int HTTPClient::POST(uint8_t * payload, size_t size) {
+int HTTPClient::POST(uint8_t * payload, size_t size)
+{
     return sendRequest("POST", payload, size);
 }
 
-int HTTPClient::POST(String payload) {
+int HTTPClient::POST(String payload)
+{
     return POST((uint8_t *) payload.c_str(), payload.length());
 }
 
@@ -309,7 +344,8 @@ int HTTPClient::POST(String payload) {
  * @param payload String        data for the message body
  * @return
  */
-int HTTPClient::sendRequest(const char * type, String payload) {
+int HTTPClient::sendRequest(const char * type, String payload)
+{
     return sendRequest(type, (uint8_t *) payload.c_str(), payload.length());
 }
 
@@ -320,14 +356,15 @@ int HTTPClient::sendRequest(const char * type, String payload) {
  * @param size size_t           size for the message body if 0 not send
  * @return -1 if no info or > 0 when Content-Length is set by server
  */
-int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size) {
+int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
+{
     // connect to server
     if(!connect()) {
         return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
     }
 
     if(payload && size > 0) {
-        addHeader("Content-Length", String(size));
+        addHeader(F("Content-Length"), String(size));
     }
 
     // send Header
@@ -353,7 +390,8 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size) {
  * @param size size_t           size for the message body if 0 not Content-Length is send
  * @return -1 if no info or > 0 when Content-Length is set by server
  */
-int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
+int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
+{
 
     if(!stream) {
         return returnError(HTTPC_ERROR_NO_STREAM);
@@ -468,7 +506,8 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
         free(buff);
 
         if(size && (int) size != bytesWritten) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.\n", bytesWritten, size); DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!");
+            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.\n", bytesWritten, size);
+            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!");
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload written: %d\n", bytesWritten);
@@ -487,36 +526,38 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size) {
  * size of message body / payload
  * @return -1 if no info or > 0 when Content-Length is set by server
  */
-int HTTPClient::getSize(void) {
+int HTTPClient::getSize(void)
+{
     return _size;
 }
 
 /**
- * deprecated Note: this is not working with https!
  * returns the stream of the tcp connection
  * @return WiFiClient
  */
-WiFiClient & HTTPClient::getStream(void) {
+WiFiClient& HTTPClient::getStream(void)
+{
     if(connected()) {
         return *_tcp;
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client] no stream to return!?\n");
-
-    // todo return error?
+    DEBUG_HTTPCLIENT("[HTTP-Client] getStream: not connected\n");
+    static WiFiClient empty;
+    return empty;
 }
 
 /**
  * returns the stream of the tcp connection
  * @return WiFiClient *
  */
-WiFiClient * HTTPClient::getStreamPtr(void) {
+WiFiClient* HTTPClient::getStreamPtr(void)
+{
     if(connected()) {
-        return _tcp;
+        return _tcp.get();
     }
 
-    DEBUG_HTTPCLIENT("[HTTP-Client] no stream to return!?\n");
-    return NULL;
+    DEBUG_HTTPCLIENT("[HTTP-Client] getStreamPtr: not connected\n");
+    return nullptr;
 }
 
 /**
@@ -524,7 +565,8 @@ WiFiClient * HTTPClient::getStreamPtr(void) {
  * @param stream Stream *
  * @return bytes written ( negative values are error codes )
  */
-int HTTPClient::writeToStream(Stream * stream) {
+int HTTPClient::writeToStream(Stream * stream)
+{
 
     if(!stream) {
         return returnError(HTTPC_ERROR_NO_STREAM);
@@ -586,6 +628,13 @@ int HTTPClient::writeToStream(Stream * stream) {
                 break;
             }
 
+            // read trailing \r\n at the end of the chunk
+            char buf[2];
+            auto trailing_seq_len = _tcp->readBytes((uint8_t*)buf, 2);
+            if (trailing_seq_len != 2 || buf[0] != '\r' || buf[1] != '\n') {
+                return returnError(HTTPC_ERROR_READ_TIMEOUT);
+            }
+
             delay(0);
         }
     } else {
@@ -600,14 +649,15 @@ int HTTPClient::writeToStream(Stream * stream) {
  * return all payload as String (may need lot of ram or trigger out of memory!)
  * @return String
  */
-String HTTPClient::getString(void) {
+String HTTPClient::getString(void)
+{
     StreamString sstring;
 
     if(_size) {
         // try to reserve needed memmory
         if(!sstring.reserve((_size + 1))) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][getString] too less memory to reserve as string! need: %d\n", (_size + 1));
-            return String("--too less memory--");
+            DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
+            return "";
         }
     }
 
@@ -620,32 +670,33 @@ String HTTPClient::getString(void) {
  * @param error int
  * @return String
  */
-String HTTPClient::errorToString(int error) {
+String HTTPClient::errorToString(int error)
+{
     switch(error) {
-        case HTTPC_ERROR_CONNECTION_REFUSED:
-            return String("connection refused");
-        case HTTPC_ERROR_SEND_HEADER_FAILED:
-            return String("send header failed");
-        case HTTPC_ERROR_SEND_PAYLOAD_FAILED:
-            return String("send payload failed");
-        case HTTPC_ERROR_NOT_CONNECTED:
-            return String("not connected");
-        case HTTPC_ERROR_CONNECTION_LOST:
-            return String("connection lost");
-        case HTTPC_ERROR_NO_STREAM:
-            return String("no stream");
-        case HTTPC_ERROR_NO_HTTP_SERVER:
-            return String("no HTTP server");
-        case HTTPC_ERROR_TOO_LESS_RAM:
-            return String("too less ram");
-        case HTTPC_ERROR_ENCODING:
-            return String("Transfer-Encoding not supported");
-        case HTTPC_ERROR_STREAM_WRITE:
-            return String("Stream write error");
-        case HTTPC_ERROR_READ_TIMEOUT:
-            return String("read Timeout");
-        default:
-            return String();
+    case HTTPC_ERROR_CONNECTION_REFUSED:
+        return F("connection refused");
+    case HTTPC_ERROR_SEND_HEADER_FAILED:
+        return F("send header failed");
+    case HTTPC_ERROR_SEND_PAYLOAD_FAILED:
+        return F("send payload failed");
+    case HTTPC_ERROR_NOT_CONNECTED:
+        return F("not connected");
+    case HTTPC_ERROR_CONNECTION_LOST:
+        return F("connection lost");
+    case HTTPC_ERROR_NO_STREAM:
+        return F("no stream");
+    case HTTPC_ERROR_NO_HTTP_SERVER:
+        return F("no HTTP server");
+    case HTTPC_ERROR_TOO_LESS_RAM:
+        return F("too less ram");
+    case HTTPC_ERROR_ENCODING:
+        return F("Transfer-Encoding not supported");
+    case HTTPC_ERROR_STREAM_WRITE:
+        return F("Stream write error");
+    case HTTPC_ERROR_READ_TIMEOUT:
+        return F("read Timeout");
+    default:
+        return String();
     }
 }
 
@@ -655,62 +706,77 @@ String HTTPClient::errorToString(int error) {
  * @param value
  * @param first
  */
-void HTTPClient::addHeader(const String& name, const String& value, bool first) {
+void HTTPClient::addHeader(const String& name, const String& value, bool first)
+{
 
     // not allow set of Header handled by code
-    if(!name.equalsIgnoreCase("Connection") && !name.equalsIgnoreCase("User-Agent") && !name.equalsIgnoreCase("Host") && !(_base64Authorization.length() && name.equalsIgnoreCase("Authorization"))) {
+    if(!name.equalsIgnoreCase(F("Connection")) &&
+       !name.equalsIgnoreCase(F("User-Agent")) &&
+       !name.equalsIgnoreCase(F("Host")) &&
+       !(name.equalsIgnoreCase(F("Authorization")) && _base64Authorization.length())){
         String headerLine = name;
         headerLine += ": ";
         headerLine += value;
         headerLine += "\r\n";
 
         if(first) {
-            _Headers = headerLine + _Headers;
+            _headers = headerLine + _headers;
         } else {
-            _Headers += headerLine;
+            _headers += headerLine;
         }
     }
 
 }
 
-void HTTPClient::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
+void HTTPClient::collectHeaders(const char* headerKeys[], const size_t headerKeysCount)
+{
     _headerKeysCount = headerKeysCount;
-    if(_currentHeaders)
+    if(_currentHeaders) {
         delete[] _currentHeaders;
+    }
     _currentHeaders = new RequestArgument[_headerKeysCount];
     for(size_t i = 0; i < _headerKeysCount; i++) {
         _currentHeaders[i].key = headerKeys[i];
     }
 }
 
-String HTTPClient::header(const char* name) {
+String HTTPClient::header(const char* name)
+{
     for(size_t i = 0; i < _headerKeysCount; ++i) {
-        if(_currentHeaders[i].key == name)
+        if(_currentHeaders[i].key == name) {
             return _currentHeaders[i].value;
+        }
     }
     return String();
 }
 
-String HTTPClient::header(size_t i) {
-    if(i < _headerKeysCount)
+String HTTPClient::header(size_t i)
+{
+    if(i < _headerKeysCount) {
         return _currentHeaders[i].value;
+    }
     return String();
 }
 
-String HTTPClient::headerName(size_t i) {
-    if(i < _headerKeysCount)
+String HTTPClient::headerName(size_t i)
+{
+    if(i < _headerKeysCount) {
         return _currentHeaders[i].key;
+    }
     return String();
 }
 
-int HTTPClient::headers() {
+int HTTPClient::headers()
+{
     return _headerKeysCount;
 }
 
-bool HTTPClient::hasHeader(const char* name) {
+bool HTTPClient::hasHeader(const char* name)
+{
     for(size_t i = 0; i < _headerKeysCount; ++i) {
-        if((_currentHeaders[i].key == name) && (_currentHeaders[i].value.length() > 0))
+        if((_currentHeaders[i].key == name) && (_currentHeaders[i].value.length() > 0)) {
             return true;
+        }
     }
     return false;
 }
@@ -719,7 +785,8 @@ bool HTTPClient::hasHeader(const char* name) {
  * init TCP connection and handle ssl verify if needed
  * @return true if connection is ok
  */
-bool HTTPClient::connect(void) {
+bool HTTPClient::connect(void)
+{
 
     if(connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, try reuse!\n");
@@ -729,23 +796,12 @@ bool HTTPClient::connect(void) {
         return true;
     }
 
-    if(_https) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect https...\n");
-        if(_tcps) {
-            delete _tcps;
-            _tcps = NULL;
-            _tcp = NULL;
-        }
-        _tcps = new WiFiClientSecure();
-        _tcp = _tcps;
-    } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect http...\n");
-        if(_tcp) {
-            delete _tcp;
-            _tcp = NULL;
-        }
-        _tcp = new WiFiClient();
+    if (!_transportTraits) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
+        return false;
     }
+
+    _tcp = _transportTraits->create();
 
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
@@ -754,14 +810,10 @@ bool HTTPClient::connect(void) {
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
-    if(_https && _httpsFingerprint.length() > 0) {
-        if(_tcps->verify(_httpsFingerprint.c_str(), _host.c_str())) {
-            DEBUG_HTTPCLIENT("[HTTP-Client] https certificate matches\n");
-        } else {
-            DEBUG_HTTPCLIENT("[HTTP-Client] https certificate doesn't match!\n");
-            _tcp->stop();
-            return false;
-        }
+    if (!_transportTraits->verify(*_tcp, _host.c_str())) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
+        _tcp->stop();
+        return false;
     }
 
     // set Timeout for readBytesUntil and readStringUntil
@@ -778,12 +830,13 @@ bool HTTPClient::connect(void) {
  * @param type (GET, POST, ...)
  * @return status
  */
-bool HTTPClient::sendHeader(const char * type) {
+bool HTTPClient::sendHeader(const char * type)
+{
     if(!connected()) {
         return false;
     }
 
-    String header = String(type) + " " + _url + " HTTP/1.";
+    String header = String(type) + " " + _uri + F(" HTTP/1.");
 
     if(_useHTTP10) {
         header += "0";
@@ -791,36 +844,38 @@ bool HTTPClient::sendHeader(const char * type) {
         header += "1";
     }
 
-    header += "\r\n"
-            "Host: " + _host + "\r\n"
-            "User-Agent: " + _userAgent + "\r\n"
-            "Connection: ";
+    header += String(F("\r\nHost: ")) + _host +
+              F("\r\nUser-Agent: ") + _userAgent +
+              F("\r\nConnection: ");
 
     if(_reuse) {
-        header += "keep-alive";
+        header += F("keep-alive");
     } else {
-        header += "close";
+        header += F("close");
     }
     header += "\r\n";
 
     if(!_useHTTP10) {
-        header += "Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n";
+        header += F("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n");
     }
 
     if(_base64Authorization.length()) {
-        header += "Authorization: Basic " + _base64Authorization + "\r\n";
+        header += F("Authorization: Basic ");
+        header += _base64Authorization;
+        header += "\r\n";
     }
 
-    header += _Headers + "\r\n";
+    header += _headers + "\r\n";
 
-    return (_tcp->write(header.c_str(), header.length()) == header.length());
+    return (_tcp->write((const uint8_t *) header.c_str(), header.length()) == header.length());
 }
 
 /**
  * reads the response from the server
  * @return int http code
  */
-int HTTPClient::handleHeaderResponse() {
+int HTTPClient::handleHeaderResponse()
+{
 
     if(!connected()) {
         return HTTPC_ERROR_NOT_CONNECTED;
@@ -911,7 +966,8 @@ int HTTPClient::handleHeaderResponse() {
  * @param size int
  * @return < 0 = error >= 0 = size written
  */
-int HTTPClient::writeToStreamDataBlock(Stream * stream, int size) {
+int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
+{
     int buff_size = HTTP_TCP_BUFFER_SIZE;
     int len = size;
     int bytesWritten = 0;
@@ -1021,7 +1077,8 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size) {
  * @param error
  * @return error
  */
-int HTTPClient::returnError(int error) {
+int HTTPClient::returnError(int error)
+{
     if(error < 0) {
         DEBUG_HTTPCLIENT("[HTTP-Client][returnError] error(%d): %s\n", error, errorToString(error).c_str());
         if(connected()) {

@@ -130,6 +130,9 @@ typedef void (*netif_status_callback_fn)(struct netif *netif);
 typedef err_t (*netif_igmp_mac_filter_fn)(struct netif *netif,
        ip_addr_t *group, u8_t action);
 
+/*add DHCP event processing by LiuHan*/
+typedef void (*dhcp_event_fn)(void);
+
 /** Generic data structure used for all lwIP network interfaces.
  *  The following fields should be filled in by the initialization
  *  function for the device driver: hwaddr_len, hwaddr[], mtu, flags */
@@ -169,6 +172,8 @@ struct netif {
 #if LWIP_DHCP
   /** the DHCP client state information for this netif */
   struct dhcp *dhcp;
+  struct udp_pcb *dhcps_pcb;	//dhcps
+  dhcp_event_fn dhcp_event;
 #endif /* LWIP_DHCP */
 #if LWIP_AUTOIP
   /** the AutoIP client state information for this netif */

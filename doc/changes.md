@@ -5,8 +5,54 @@ title: Change Log
 ## Current version
 
 ### Core
+- Leverage realloc() in String::changeBuffer()
+- Clean up core files
+- Add host side tests
+- Fix possible null pointer in umm_malloc
+- Remove "Upload Using" option from Tools menu
+- Move attachInterrupt and detachInterrupt into IRAM (#1734)
+- Implement strstr_P
+- Allow indefinite duration for tone()
+- Fix crashes when using tone()
+- Fix RF_MODE and ADC_MODE
+- Move micros, delayMicroseconds, millis to IRAM (#1326)
+- Fix pulseIn (#1072, #1149)
+- Accept both named constant and ADC channel number in analogRead (#1766)
+- Enable heap poisoning only when debug options are enabled (#1800)
+- Bootloader: don't touch RTC memory if it doesn't contain a valid command (#619)
+- Update SDK to 1.5.2 (#1653)
+- Clean up variants, fix digitalPinHasPWM definition (#1831)
+- Don't set RF mode on boot unless it was overridden
+- Change build.board property for boards which renumber pins like NodeMCU (#1878)
+- Fix Exception 2 when using printf or vprintf
+- Add ARM tools (#269)
 
 ### Libraries
+- Update axTLS to 5b4be7d
+- WiFiClientSecure: implement connection timeout, fix connected method behavior
+- WiFiClient: fix write behavior when connection is closed by remote side
+- ESP8266HTTPServer: add font MIME types, fix #1601
+- ESP8266mDNS: add client support
+- Update SPIFFS to 82aeac6
+- Servo: move some functions into IRAM (#1742)
+- Update SoftwareSerial to version 3.1.0
+- ESP8266SSDP: change templates to include deviceType
+- ESP8266WebServer: handle more file types
+- SPI: add CPOL setting
+- ESP8266WebServer: Fix buffer overflow in ESP8266WebServer::authenticate (#1790)
+- ESP8266WiFi: fix undefined behavior in WiFiServer::setNoDelay (#1695)
+- Servo: use peripheral clock frequency when calculating FRC1 tick count (#1789)
+- ESP8266WiFi: avoid multiple instances of INADDR_NONE
+- Add LwIP binary built with gcc
+- ESP8266WiFi: Allow PSK instead of passphrase in WiFiSTA::begin
+- SPI: Fix SPI.transfer16() using wrong endianness
+- HTTPClient: decouple transport layer handling + save some RAM
+- ESP8266httpUpdate: decouple HTTPS overloads + save some RAM
+- Update and move lwIP headers, add options to use different lwIP build
+- ESP8266WebServer: wait for data to arrive
+- ESP8266WebServer: save RAM by moving response strings to flash (#1732)
+- SPI: Speed up SPI.writePattern()
+
 
 ### Tools
 
