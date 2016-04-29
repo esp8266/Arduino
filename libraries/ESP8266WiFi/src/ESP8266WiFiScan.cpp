@@ -162,6 +162,9 @@ bool ESP8266WiFiScanClass::getNetworkInfo(uint8_t i, String &ssid, uint8_t &encT
     return true;
 }
 
+int8_t ESP8266WiFiScanClass::getScanCount() {
+    return _scanCount;
+};
 
 /**
  * Return the SSID discovered during the network scan.

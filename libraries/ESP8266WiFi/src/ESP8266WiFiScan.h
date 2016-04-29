@@ -41,6 +41,7 @@ class ESP8266WiFiScanClass {
 
         // scan result
         bool getNetworkInfo(uint8_t networkItem, String &ssid, uint8_t &encryptionType, int32_t &RSSI, uint8_t* &BSSID, int32_t &channel, bool &isHidden);
+        int8_t getScanCount();
 
         String SSID(uint8_t networkItem);
         uint8_t encryptionType(uint8_t networkItem);
