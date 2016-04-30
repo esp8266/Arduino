@@ -11,8 +11,8 @@
 // Date: 17.04.2016
 // Author: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu>
 
-#include "KMPDinoWiFiESP.h"
-#include "KMPCommon.h"
+#include <KMPDinoWiFiESP.h>
+#include <KMPCommon.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -36,7 +36,7 @@ void setup(void)
 	// Serial connection from ESP-01 via 3.3v console cable
 	Serial.begin(57600);
 	// Init KMP Dino WiFi board.
-	KMPDinoWiFi.init();
+	KMPDinoWiFiESP.init();
 
 	// Connect to WiFi network
 	WiFi.begin(SSID, PASSWORD);
@@ -67,7 +67,7 @@ void loop(void)
 
 void handle_root()
 {
-	//KMPDinoWiFi.LedOn();
+	//KMPDinoWiFiESP.LedOn();
 
 	// Read POST request.
 	// Have only one argument. r1=On ...
@@ -94,7 +94,7 @@ void handle_root()
 
 				if (argValue == W_ON || argValue == W_OFF)
 				{
-					KMPDinoWiFi.SetRelayState((uint8_t)relayNumber, argValue == W_ON);
+					KMPDinoWiFiESP.SetRelayState((uint8_t)relayNumber, argValue == W_ON);
 				}
 			}
 		}
@@ -102,7 +102,7 @@ void handle_root()
 
 	_server.send(200, TEXT_HTML, BuildPage());
 
-	//KMPDinoWiFi.LedOff();
+	//KMPDinoWiFiESP.LedOff();
 }
 
 String BuildPage()
@@ -127,7 +127,7 @@ String BuildPage()
 		char* cellColor;
 		char* cellStatus;
 		char* nextRelayStatus;
-		if (KMPDinoWiFi.GetRelayState(i))
+		if (KMPDinoWiFiESP.GetRelayState(i))
 		{
 			cellColor = (char*)RED;
 			cellStatus = (char*)W_ON;

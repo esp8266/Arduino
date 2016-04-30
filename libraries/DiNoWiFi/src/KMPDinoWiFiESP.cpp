@@ -1,4 +1,4 @@
-// KMPDinoWiFi.cpp
+// KMPDinoWiFiESP.cpp
 // Company: KMP Electronics Ltd, Bulgaria
 // Web: http://kmpelectronics.eu/
 // License: See the GNU General Public License for more details at http://www.gnu.org/copyleft/gpl.html
@@ -7,10 +7,10 @@
 // Description:
 //		Header for KMP Dino WiFi board.
 // Version: 1.0.0
-// Date: 17.04.2016
+// Date: 30.04.2016
 // Author: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu> & Dimitar Antonov <d.antonov@kmpelectronics.eu>
 
-#include "KMPDinoWiFi.h"
+#include "KMPDinoWiFiESP.h"
 
 #define CS 15
 
@@ -60,7 +60,7 @@ const int OPTOIN_PINS[OPTOIN_COUNT] =
 uint8_t  _expTxData[16];
 uint8_t  _expRxData[16];
 
-KMPDinoWiFiClass KMPDinoWiFi;
+KMPDinoWiFiESPClass KMPDinoWiFiESP;
 
 /**
  * @brief Initialize KMP Dino WiFi board.
@@ -68,7 +68,7 @@ KMPDinoWiFiClass KMPDinoWiFi;
  *
  * @return void
  */
-void KMPDinoWiFiClass::init()
+void KMPDinoWiFiESPClass::init()
 {
 	// Expander setings.
 	SPI.begin();
@@ -97,7 +97,7 @@ void KMPDinoWiFiClass::init()
  *
  * @return void
  */
-void KMPDinoWiFiClass::SetRelayState(uint8_t relayNumber, bool state)
+void KMPDinoWiFiESPClass::SetRelayState(uint8_t relayNumber, bool state)
 {
 	// Check if relayNumber is out of range - return.
 	if (relayNumber > RELAY_COUNT - 1)
@@ -116,7 +116,7 @@ void KMPDinoWiFiClass::SetRelayState(uint8_t relayNumber, bool state)
  *
  * @return void
  */
-void KMPDinoWiFiClass::SetRelayState(Relay relay, bool state)
+void KMPDinoWiFiESPClass::SetRelayState(Relay relay, bool state)
 {
 	SetRelayState((uint8_t)relay, state);
 }
@@ -128,7 +128,7 @@ void KMPDinoWiFiClass::SetRelayState(Relay relay, bool state)
  *
  * @return void
  */
-void KMPDinoWiFiClass::SetAllRelaysState(bool state)
+void KMPDinoWiFiESPClass::SetAllRelaysState(bool state)
 {
 	for (uint8_t i = 0; i < RELAY_COUNT; i++)
 	{
@@ -141,7 +141,7 @@ void KMPDinoWiFiClass::SetAllRelaysState(bool state)
  *
  * @return void
  */
-void KMPDinoWiFiClass::SetAllRelaysOn()
+void KMPDinoWiFiESPClass::SetAllRelaysOn()
 {
 	SetAllRelaysState(true);
 }
@@ -151,7 +151,7 @@ void KMPDinoWiFiClass::SetAllRelaysOn()
  *
  * @return void
  */
-void KMPDinoWiFiClass::SetAllRelaysOff()
+void KMPDinoWiFiESPClass::SetAllRelaysOff()
 {
 	SetAllRelaysState(false);
 }
@@ -163,7 +163,7 @@ void KMPDinoWiFiClass::SetAllRelaysOff()
  *
  * @return bool true relay is On, false is Off. If number is out ot range - return false.
  */
-bool KMPDinoWiFiClass::GetRelayState(uint8_t relayNumber)
+bool KMPDinoWiFiESPClass::GetRelayState(uint8_t relayNumber)
 {
 	// Check if relayNumber is out of range - return false.
 	if (relayNumber > RELAY_COUNT - 1)
@@ -181,7 +181,7 @@ bool KMPDinoWiFiClass::GetRelayState(uint8_t relayNumber)
  *
  * @return bool true relay is On, false is Off. If number is out ot range - return false.
  */
-bool KMPDinoWiFiClass::GetRelayState(Relay relay)
+bool KMPDinoWiFiESPClass::GetRelayState(Relay relay)
 {
 	return GetRelayState((uint8_t)relay);
 }
@@ -197,7 +197,7 @@ bool KMPDinoWiFiClass::GetRelayState(Relay relay)
  *
  * @return bool true - opto in is On, false is Off. If number is out ot range - return false.
  */
-bool KMPDinoWiFiClass::GetOptoInState(uint8_t optoInNumber)
+bool KMPDinoWiFiESPClass::GetOptoInState(uint8_t optoInNumber)
 {
 	// Check if optoInNumber is out of range - return false.
 	if (optoInNumber >= OPTOIN_COUNT - 1)
@@ -215,7 +215,7 @@ bool KMPDinoWiFiClass::GetOptoInState(uint8_t optoInNumber)
  *
  * @return bool true - opto in is On, false is Off. If number is out ot range - return false.
  */
-bool KMPDinoWiFiClass::GetOptoInState(OptoIn optoIn)
+bool KMPDinoWiFiESPClass::GetOptoInState(OptoIn optoIn)
 {
 	return GetOptoInState((uint8_t)optoIn);
 }
@@ -232,7 +232,7 @@ bool KMPDinoWiFiClass::GetOptoInState(OptoIn optoIn)
  *
  * @return void
  */
-void KMPDinoWiFiClass::ExpanderSetPin(uint8_t pinNumber, bool state)
+void KMPDinoWiFiESPClass::ExpanderSetPin(uint8_t pinNumber, bool state)
 {
 	uint8_t registerData = ExpanderReadRegister(OLAT);
 
@@ -255,7 +255,7 @@ void KMPDinoWiFiClass::ExpanderSetPin(uint8_t pinNumber, bool state)
  *
  * @return State true - 1, false - 0.
  */
-bool KMPDinoWiFiClass::ExpanderGetPin(uint8_t pinNumber)
+bool KMPDinoWiFiESPClass::ExpanderGetPin(uint8_t pinNumber)
 {
 	uint8_t registerData = ExpanderReadRegister(GPIO);
 
@@ -269,7 +269,7 @@ bool KMPDinoWiFiClass::ExpanderGetPin(uint8_t pinNumber)
  *
  * @return Data from register.
  */
-uint8_t KMPDinoWiFiClass::ExpanderReadRegister(uint8_t address)
+uint8_t KMPDinoWiFiESPClass::ExpanderReadRegister(uint8_t address)
 {
 	_expTxData[0] = READ_CMD;
 	_expTxData[1] = address;
@@ -289,7 +289,7 @@ uint8_t KMPDinoWiFiClass::ExpanderReadRegister(uint8_t address)
  *
  * @return void.
  */
-void KMPDinoWiFiClass::ExpanderWriteRegister(uint8_t address, uint8_t data)
+void KMPDinoWiFiESPClass::ExpanderWriteRegister(uint8_t address, uint8_t data)
 {
 	_expTxData[0] = WRITE_CMD;
 	_expTxData[1] = address;
@@ -308,7 +308,7 @@ void KMPDinoWiFiClass::ExpanderWriteRegister(uint8_t address, uint8_t data)
  *
  * @return void
  */
-void KMPDinoWiFiClass::ExpanderSetDirection(uint8_t pinNumber, uint8_t mode)
+void KMPDinoWiFiESPClass::ExpanderSetDirection(uint8_t pinNumber, uint8_t mode)
 {
 	uint8_t registerData = ExpanderReadRegister(IODIR);
 
@@ -332,7 +332,7 @@ void KMPDinoWiFiClass::ExpanderSetDirection(uint8_t pinNumber, uint8_t mode)
  *
  * @return void.
  */
-void KMPDinoWiFiClass::ExpanderInitGPIO()
+void KMPDinoWiFiESPClass::ExpanderInitGPIO()
 {
 	// Relays.
 	for (uint8_t i = 0; i < RELAY_COUNT; i++)
@@ -352,7 +352,7 @@ void KMPDinoWiFiClass::ExpanderInitGPIO()
  *
  * @return bool If result equal - true LED On, else Off.
  */
-bool KMPDinoWiFiClass::GetLedState()
+bool KMPDinoWiFiESPClass::GetLedState()
 {
 	return !digitalRead(LED_PIN);
 }
@@ -364,7 +364,7 @@ bool KMPDinoWiFiClass::GetLedState()
  *
  * @return void
  */
-void KMPDinoWiFiClass::SetLedState(bool on)
+void KMPDinoWiFiESPClass::SetLedState(bool on)
 {
 	digitalWrite(LED_PIN, on ? LOW : HIGH);
 }
@@ -374,7 +374,7 @@ void KMPDinoWiFiClass::SetLedState(bool on)
  *
  * @return void
  */
-void KMPDinoWiFiClass::LedOn()
+void KMPDinoWiFiESPClass::LedOn()
 {
 	SetLedState(true);
 }
@@ -384,7 +384,7 @@ void KMPDinoWiFiClass::LedOn()
  *
  * @return void
  */
-void KMPDinoWiFiClass::LedOff()
+void KMPDinoWiFiESPClass::LedOff()
 {
 	SetLedState(false);
 }
