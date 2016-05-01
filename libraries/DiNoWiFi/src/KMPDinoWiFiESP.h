@@ -46,8 +46,8 @@ enum OptoIn {
 };
 
 const char TEXT_HTML[] = "text/html; charset=utf-8";
-const char DINO_WIFI[] = "DiNo WiFi";
-const char URL_KMPELECTRONICS_EU_DINO_WIFI[] = "http://kmpelectronics.eu/en-us/products/dinowifi.aspx";
+const char DINO_WIFI[] = "DiNo WiFi ESP";
+const char URL_KMPELECTRONICS_EU_DINO_WIFI[] = "http://kmpelectronics.eu/en-us/products/dinowifiesp.aspx";
 
 class KMPDinoWiFiESPClass
 {

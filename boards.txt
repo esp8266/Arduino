@@ -1588,8 +1588,8 @@ coredev.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_
 dinowifi.name=KMP Dino WiFi ESP
 
 dinowifi.upload.tool=esptool
-dinowifi.upload.speed=921600
-dinowifi.upload.resetmethod=ck
+dinowifi.upload.speed=115200
+dinowifi.upload.resetmethod=nodemcu
 dinowifi.upload.maximum_size=434160
 dinowifi.upload.maximum_data_size=81920
 dinowifi.upload.wait_for_upload_port=true
@@ -1618,6 +1618,12 @@ dinowifi.build.lwip_flags=
 dinowifi.menu.CpuFrequency.80=80 MHz
 dinowifi.menu.CpuFrequency.80.build.f_cpu=80000000L
 
+dinowifi.menu.FlashFreq.40=40MHz
+dinowifi.menu.FlashFreq.40.build.flash_freq=40
+
+generic.menu.FlashMode.qio=QIO
+generic.menu.FlashMode.qio.build.flash_mode=qio
+
 dinowifi.menu.UploadSpeed.115200=115200
 dinowifi.menu.UploadSpeed.115200.upload.speed=115200
 dinowifi.menu.UploadSpeed.9600=9600
@@ -1636,3 +1642,14 @@ dinowifi.menu.UploadSpeed.512000.windows=512000
 dinowifi.menu.UploadSpeed.512000.upload.speed=512000
 dinowifi.menu.UploadSpeed.921600=921600
 dinowifi.menu.UploadSpeed.921600.upload.speed=921600
+
+dinowifi.menu.FlashSize.512K64=512K (64K SPIFFS)
+dinowifi.menu.FlashSize.512K64.build.flash_size=512K
+dinowifi.menu.FlashSize.512K64.build.flash_ld=eagle.flash.512k64.ld
+dinowifi.menu.FlashSize.512K64.build.spiffs_start=0x6B000
+dinowifi.menu.FlashSize.512K64.build.spiffs_end=0x7B000
+dinowifi.menu.FlashSize.512K64.build.spiffs_blocksize=4096
+dinowifi.menu.FlashSize.512K64.upload.maximum_size=434160
+
+dinowifi.menu.ResetMethod.nodemcu=nodemcu
+dinowifi.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu

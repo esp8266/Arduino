@@ -8,7 +8,7 @@
 //		Web server relay manipulation example. 
 // Example link: http://www.kmpelectronics.eu/en-us/examples/dinowifiesp/wifiwebrelayserver.aspx
 // Version: 1.0.0
-// Date: 17.04.2016
+// Date: 30.04.2016
 // Author: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu>
 
 #include <KMPDinoWiFiESP.h>
@@ -30,11 +30,16 @@ const char RED[] = "#FF4500"; // OrangeRed
 String BuildPage();
 void handle_root();
 
+/**
+ * @brief Execute first after start device. Initialize hardware.
+ *
+ * @return void
+ */
 void setup(void)
 {
 	// You can open the Arduino IDE Serial Monitor window to see what the code is doing
 	// Serial connection from ESP-01 via 3.3v console cable
-	Serial.begin(57600);
+	Serial.begin(115200);
 	// Init KMP Dino WiFi board.
 	KMPDinoWiFiESP.init();
 
@@ -54,24 +59,34 @@ void setup(void)
 	Serial.print("IP address: ");
 	Serial.println(WiFi.localIP());
 
-	_server.on("/", handle_root);
+	_server.on("/", HandleRootPage);
 	_server.begin();
 
 	Serial.println("HTTP server started");
 }
 
+/**
+* @brief Main metod.
+*
+* @return void
+*/
 void loop(void)
 {
 	_server.handleClient();
 }
 
-void handle_root()
+/**
+ * @brief Handle root page "/". 
+ *
+ * @return void
+ */
+void HandleRootPage()
 {
 	//KMPDinoWiFiESP.LedOn();
 
 	// Read POST request.
 	// Have only one argument. r1=On ...
-	if (_server.args() == 1)
+	if (_server.method() == HTTP_POST && _server.args() == 1)
 	{
 		// Check argument name
 		String argName = _server.argName(0);
@@ -84,8 +99,6 @@ void handle_root()
 			Serial.println(relayNumber);
 			if (relayNumber >= 0 && relayNumber < RELAY_COUNT)
 			{
-				Serial.print("Relay number valid.");
-
 				// Get value first argument.
 				String argValue = _server.arg(0);
 
