@@ -64,13 +64,13 @@ KMPDinoWiFiESPClass KMPDinoWiFiESP;
 
 /**
  * @brief Initialize KMP Dino WiFi board.
- *		   WiFi modul ESP8266, Expander MCP23S17, relays, opto inputs and LED.
+ *		   WiFi module ESP8266, Expander MCP23S17, relays, opto inputs and LED.
  *
  * @return void
  */
 void KMPDinoWiFiESPClass::init()
 {
-	// Expander setings.
+	// Expander settings.
 	SPI.begin();
 	SPI.setHwCs(CS);
 	SPI.setFrequency(1000000);
@@ -161,7 +161,7 @@ void KMPDinoWiFiESPClass::SetAllRelaysOff()
  *
  * @param relayNumber Relay number from 0 to RELAY_COUNT - 1
  *
- * @return bool true relay is On, false is Off. If number is out ot range - return false.
+ * @return bool true relay is On, false is Off. If number is out of range - return false.
  */
 bool KMPDinoWiFiESPClass::GetRelayState(uint8_t relayNumber)
 {
@@ -179,7 +179,7 @@ bool KMPDinoWiFiESPClass::GetRelayState(uint8_t relayNumber)
  *
  * @param relay Relay1, Relay2 ...
  *
- * @return bool true relay is On, false is Off. If number is out ot range - return false.
+ * @return bool true relay is On, false is Off. If number is out of range - return false.
  */
 bool KMPDinoWiFiESPClass::GetRelayState(Relay relay)
 {
@@ -195,12 +195,12 @@ bool KMPDinoWiFiESPClass::GetRelayState(Relay relay)
  *
  * @param optoInNumber OptoIn number from 0 to OPTOIN_COUNT - 1
  *
- * @return bool true - opto in is On, false is Off. If number is out ot range - return false.
+ * @return bool true - opto in is On, false is Off. If number is out of range - return false.
  */
 bool KMPDinoWiFiESPClass::GetOptoInState(uint8_t optoInNumber)
 {
 	// Check if optoInNumber is out of range - return false.
-	if (optoInNumber >= OPTOIN_COUNT - 1)
+	if (optoInNumber > OPTOIN_COUNT - 1)
 	{
 		return false;
 	}
@@ -213,7 +213,7 @@ bool KMPDinoWiFiESPClass::GetOptoInState(uint8_t optoInNumber)
  *
  * @param relay OptoIn1, OptoIn2 ...
  *
- * @return bool true - opto in is On, false is Off. If number is out ot range - return false.
+ * @return bool true - opto in is On, false is Off. If number is out of range - return false.
  */
 bool KMPDinoWiFiESPClass::GetOptoInState(OptoIn optoIn)
 {
@@ -259,7 +259,7 @@ bool KMPDinoWiFiESPClass::ExpanderGetPin(uint8_t pinNumber)
 {
 	uint8_t registerData = ExpanderReadRegister(GPIO);
 
-	return registerData & (1 << pinNumber) ? true : false;
+	return registerData & (1 << pinNumber) ? false : true;
 }
 
 /**

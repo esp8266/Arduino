@@ -8,7 +8,7 @@
 //		Header for KMP Dino WiFi board.
 // Version: 1.0.0
 // Date: 30.04.2016
-// Author: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu> & Dimitar Antonov <d.antonov@kmpelectronics.eu>
+// Authors: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu> & Dimitar Antonov <d.antonov@kmpelectronics.eu>
 
 #ifndef _KMPDINOWIFIESP_H
 #define _KMPDINOWIFIESP_H
