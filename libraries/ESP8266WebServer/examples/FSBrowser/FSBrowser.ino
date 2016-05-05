@@ -30,8 +30,8 @@
 
 #define DBG_OUTPUT_PORT Serial
 
-const char* ssid = "wifi-ssid";
-const char* password = "wifi-password";
+const char* ssid = "*wifi-ssid*";
+const char* password = "*wifi-password*";
 const char* host = "esp8266fs";
 
 ESP8266WebServer server(80);
@@ -178,14 +178,21 @@ void setup(void){
 
   //WIFI INIT
   DBG_OUTPUT_PORT.printf("Connecting to %s\n", ssid);
-  if (String(WiFi.SSID()) != String(ssid)) {
+  // If sketch as no default SSID and PSK (both start with *)
+  // it should try to connect to SDK saved one (if any)
+  if (String(WiFi.SSID())!= String(ssid) && *ssid!='*' && *password!='*') {
     WiFi.begin(ssid, password);
   }
   
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    DBG_OUTPUT_PORT.print(".");
+  while (WiFi.waitForConnectResult() != WL_CONNECTED){
+    // If sketch as no default SSID and PSK (both start with *)
+    // it should try to connect to SDK saved one (if any)
+    if (String(WiFi.SSID())!= String(ssid) && *ssid!='*' && *password!='*')
+      WiFi.begin(ssid, password);
+    
+    Serial.println("Retrying connection...");
   }
+
   DBG_OUTPUT_PORT.println("");
   DBG_OUTPUT_PORT.print("Connected! IP address: ");
   DBG_OUTPUT_PORT.println(WiFi.localIP());

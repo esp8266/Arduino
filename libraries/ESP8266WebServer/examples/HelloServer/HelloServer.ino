@@ -3,8 +3,8 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 
-const char* ssid = "........";
-const char* password = "........";
+const char* ssid = "********";
+const char* password = "********";
 
 ESP8266WebServer server(80);
 
@@ -37,14 +37,21 @@ void setup(void){
   pinMode(led, OUTPUT);
   digitalWrite(led, 0);
   Serial.begin(115200);
-  WiFi.begin(ssid, password);
-  Serial.println("");
+  
+  // If sketch as no default SSID and PSK (both start with *)
+  // it should try to connect to SDK saved one (if any)
+  if (*ssid!='*' && *password!='*')
+    WiFi.begin(ssid, password);
 
-  // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  while (WiFi.waitForConnectResult() != WL_CONNECTED){
+    // If sketch as no default SSID and PSK (both start with *)
+    // it should try to connect to SDK saved one (if any)
+    if (*ssid!='*' && *password!='*')
+      WiFi.begin(ssid, password);
+    
+    Serial.println("Retrying connection...");
   }
+
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);

@@ -26,11 +26,21 @@ void setup() {
   Serial.println(hostString);
   WiFi.hostname(hostString);
 
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+  // If sketch as no default SSID and PSK (both start with *)
+  // it should try to connect to SDK saved one (if any)
+  if (*ssid!='*' && *password!='*')
+    WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED){
     delay(250);
     Serial.print(".");
+    // If sketch as no default SSID and PSK (both start with *)
+    // it should try to connect to SDK saved one (if any)
+    if (*ssid!='*' && *password!='*')
+      WiFi.begin(ssid, password);
   }
+
+
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);

@@ -13,7 +13,21 @@ void setup() {
   Serial.println("Starting WiFi...");
 
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  
+  // If sketch as no default SSID and PSK (both start with *)
+  // it should try to connect to SDK saved one (if any)
+  if (*ssid!='*' && *password!='*')
+    WiFi.begin(ssid, password);
+
+  while (WiFi.waitForConnectResult() != WL_CONNECTED){
+    // If sketch as no default SSID and PSK (both start with *)
+    // it should try to connect to SDK saved one (if any)
+    if (*ssid!='*' && *password!='*')
+      WiFi.begin(ssid, password);
+    
+    Serial.println("WiFi Failed");
+  }
+
   if(WiFi.waitForConnectResult() == WL_CONNECTED){
 
     Serial.printf("Starting HTTP...\n");
@@ -39,9 +53,6 @@ void setup() {
     SSDP.begin();
 
     Serial.printf("Ready!\n");
-  } else {
-    Serial.printf("WiFi Failed\n");
-    while(1) delay(100);
   }
 }
 

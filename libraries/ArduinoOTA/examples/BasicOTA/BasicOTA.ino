@@ -3,14 +3,20 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 
-const char* ssid = "..........";
-const char* password = "..........";
+// Put your own Wifi Router SSID/KEY here
+const char* ssid = "**********";
+const char* password = "**********";
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Booting");
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+
+  // If sketch as no default SSID and PSK (both start with *)
+  // it should try to connect to SDK saved one (if any)
+  if (*ssid!='*' && *password!='*')
+    WiFi.begin(ssid, password);
+
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     Serial.println("Connection Failed! Rebooting...");
     delay(5000);
