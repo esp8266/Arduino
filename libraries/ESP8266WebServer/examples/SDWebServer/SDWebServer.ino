@@ -223,21 +223,22 @@ void setup(void){
   DBG_OUTPUT_PORT.begin(115200);
   DBG_OUTPUT_PORT.setDebugOutput(true);
   DBG_OUTPUT_PORT.print("\n");
-  // If sketch as no default SSID and PSK (both start with *)
+  // If sketch as no default SSID and bad PSK (len <8)
   // it should try to connect to SDK saved one (if any)
-  if (*ssid!='*' && *password!='*') {
-    DBG_OUTPUT_PORT.print("Connecting to ");
-    DBG_OUTPUT_PORT.println(ssid);
+  DBG_OUTPUT_PORT.print(F("Connecting with SSID of "));
+  if ( strlen(password)<8 ) {
+    DBG_OUTPUT_PORT.printf( "SDK '%s'\r\n", WiFi.SSID().c_str() );
+    // If autoconnect is disabled force connection
+    if (!WiFi.getAutoConnect()) 
+      WiFi.begin();
+  } else {
+    DBG_OUTPUT_PORT.printf( "Sketch '%s'\r\n", ssid ); 
     WiFi.begin(ssid, password);
   }
-
+  // Will be blocked in this while loop until connected
   while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
-    Serial.println("Retrying connection...");
+    delay(1000);
+    DBG_OUTPUT_PORT.printf("%4ld sec : ...\n", millis()/1000);
   }
   DBG_OUTPUT_PORT.print("Connected! IP address: ");
   DBG_OUTPUT_PORT.println(WiFi.localIP());

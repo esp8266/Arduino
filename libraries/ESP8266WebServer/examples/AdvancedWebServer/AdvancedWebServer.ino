@@ -33,8 +33,12 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 
-const char *ssid = "*YourSSIDHere*";
-const char *password = "*YourPSKHere*";
+// Put your own Wifi Router SSID/KEY here
+// remember that password len should be >7 to get it working
+// If you leave this wrong default values, ESP will try to connect
+// to last SSID/PASS that worked on this device (if any of course)
+const char* ssid = "******";
+const char* password = "******";
 
 ESP8266WebServer server ( 80 );
 
@@ -94,20 +98,24 @@ void setup ( void ) {
 	digitalWrite ( led, 0 );
 	Serial.begin ( 115200 );
 
-  // If sketch as no default SSID and PSK (both start with *)
+  // If sketch as no default SSID and bad PSK (len <8)
   // it should try to connect to SDK saved one (if any)
-  if (*ssid!='*' && *password!='*')
+  Serial.print(F("Connecting with SSID of "));
+  if ( strlen(password)<8 ) {
+    Serial.printf( "SDK '%s'\r\n", WiFi.SSID().c_str() );
+    // If autoconnect is disabled force connection
+    if (!WiFi.getAutoConnect()) 
+      WiFi.begin();
+  } else {
+    Serial.printf( "Sketch '%s'\r\n", ssid ); 
     WiFi.begin(ssid, password);
-
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
-    Serial.println("Retrying connection...");
   }
-
+  // Will be blocked in this while loop until connected
+  while (WiFi.waitForConnectResult() != WL_CONNECTED){
+    delay(1000);
+    Serial.printf("%4ld sec : ...\n", millis()/1000);
+  }
+  
 	Serial.println ( "" );
 	Serial.print ( "Connected to " );
 	Serial.println ( ssid );
