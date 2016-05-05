@@ -21,9 +21,10 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-char ssid[] = "*************";  //  your network SSID (name)
-char pass[] = "********";       // your network password
 
+// Put your own Wifi Router SSID/KEY here
+const char* ssid = "**********";
+const char* password = "**********";
 
 unsigned int localPort = 2390;      // local port to listen for UDP packets
 
@@ -56,11 +57,7 @@ void setup()
     WiFi.begin(ssid, password);
 
   while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
+    delay(1000);
     Serial.println("Retrying connection...");
   }
 
