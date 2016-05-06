@@ -109,7 +109,7 @@ ping_prepare_echo( struct icmp_echo_hdr *iecho, u16_t len)
 
   iecho->chksum = inet_chksum(iecho, len);
 }
-/*
+
 static void ICACHE_FLASH_ATTR
 ping_prepare_er(struct icmp_echo_hdr *iecho, u16_t len)
 {
@@ -120,7 +120,7 @@ ping_prepare_er(struct icmp_echo_hdr *iecho, u16_t len)
 
 	iecho->chksum = inet_chksum(iecho, len);
 }
-*/
+
 /* Ping using the raw ip */
 static u8_t ICACHE_FLASH_ATTR
 ping_recv(void *arg, struct raw_pcb *pcb, struct pbuf *p, ip_addr_t *addr)

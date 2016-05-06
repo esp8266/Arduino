@@ -285,6 +285,7 @@ espconn_udp_recv(void *arg, struct udp_pcb *upcb, struct pbuf *p,
                  struct ip_addr *addr, u16_t port)
 {
     espconn_msg *precv = arg;
+    struct pbuf *q = NULL;
     u8_t *pdata = NULL;
     u16_t length = 0;
     struct ip_info ipconfig;
@@ -320,7 +321,7 @@ espconn_udp_recv(void *arg, struct udp_pcb *upcb, struct pbuf *p,
         pbuf_free(p);
 		if (length != 0) {
 			if (precv->pespconn->recv_callback != NULL) {
-				precv->pespconn->recv_callback(precv->pespconn, (char *)pdata, length);
+				precv->pespconn->recv_callback(precv->pespconn, pdata, length);
 			}
 		}
 		os_free(pdata);

@@ -37,6 +37,8 @@ typedef void (*at_custom_uart_rx_intr)(uint8* data,int32 len);
 
 typedef void (*at_custom_response_func_type)(const char *str);
 
+typedef void (*at_fake_uart_tx_func_type)(const uint8*data,uint32 length);
+
 extern uint8 at_customLinkMax;
 
 /**
@@ -140,4 +142,27 @@ uint32 at_get_version(void);
   * @retval None
   */
 void at_register_uart_rx_intr(at_custom_uart_rx_intr rx_func);
+/**
+  * @brief notify at module that has receive data
+  * @param  data: data buffer.
+  * @param  length: data length
+  * @retval data len,if ok len == length
+  */
+uint32 at_fake_uart_rx(uint8* data,uint32 length);
+
+/**
+  * @brief enable fake uart,and register fake uart tx
+  * @param  enable: enable fake uart.
+  * @param  at_fake_uart_tx_func: 
+  * @retval data len,if ok len == length
+  */
+bool at_fake_uart_enable(bool enable,at_fake_uart_tx_func_type at_fake_uart_tx_func);
+
+/**
+  * @brief set at escape character
+  * @param  ch: escape character.
+  * @retval TRUE,if set ok,otherwize FALSE.
+  */
+bool at_set_escape_character(uint8 ch);
+
 #endif

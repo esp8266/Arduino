@@ -711,6 +711,17 @@ igmp_start_timer(struct igmp_group *group, u8_t max_time)
 }
 
 /**
+ * Stop a timer for an igmp_group
+ *
+ * @param group the igmp_group for which to stop the timer
+ */
+static void
+igmp_stop_timer(struct igmp_group *group)
+{
+  group->timer = 0;
+}
+
+/**
  * Delaying membership report for a group if necessary
  *
  * @param group the igmp_group for which "delaying" membership report

@@ -450,26 +450,25 @@ dns_local_addhost(const char *hostname, const ip_addr_t *addr)
  *         better check for failure: != IPADDR_NONE) or IPADDR_NONE if the hostname
  *         was not found in the cached dns_table.
  */
-/*
 static u32_t ICACHE_FLASH_ATTR
 dns_lookup(const char *name)
 {
   u8_t i;
 #if DNS_LOCAL_HOSTLIST || defined(DNS_LOOKUP_LOCAL_EXTERN)
   u32_t addr;
-#endif
+#endif /* DNS_LOCAL_HOSTLIST || defined(DNS_LOOKUP_LOCAL_EXTERN) */
 #if DNS_LOCAL_HOSTLIST
   if ((addr = dns_lookup_local(name)) != IPADDR_NONE) {
     return addr;
   }
-#endif
+#endif /* DNS_LOCAL_HOSTLIST */
 #ifdef DNS_LOOKUP_LOCAL_EXTERN
   if((addr = DNS_LOOKUP_LOCAL_EXTERN(name)) != IPADDR_NONE) {
     return addr;
   }
-#endif
+#endif /* DNS_LOOKUP_LOCAL_EXTERN */
 
-  // Walk through name list, return entry if found. If not, return NULL.
+  /* Walk through name list, return entry if found. If not, return NULL. */
   for (i = 0; i < DNS_TABLE_SIZE; ++i) {
     if ((dns_table[i].state == DNS_STATE_DONE) &&
         (strcmp(name, dns_table[i].name) == 0)) {
@@ -482,7 +481,7 @@ dns_lookup(const char *name)
 
   return IPADDR_NONE;
 }
-*/
+
 #if DNS_DOES_NAME_CHECK
 /**
  * Compare the "dotted" name "query" with the encoded name "response"
@@ -775,9 +774,7 @@ dns_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p, ip_addr_t *addr, u16_t 
     if (i < DNS_TABLE_SIZE) {
       pEntry = &dns_table[i];
       if(pEntry->state == DNS_STATE_ASKING) {
-        /* This entry is now completed. */
-        pEntry->state = DNS_STATE_DONE;
-        pEntry->err   = hdr->flags2 & DNS_FLAG2_ERR_MASK;
+        pEntry->err = hdr->flags2 & DNS_FLAG2_ERR_MASK;
 
         /* We only care about the question(s) and the answers. The authrr
            and the extrarr are simply discarded. */
@@ -788,8 +785,11 @@ dns_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p, ip_addr_t *addr, u16_t 
         if (((hdr->flags1 & DNS_FLAG1_RESPONSE) == 0) || (pEntry->err != 0) || (nquestions != 1)) {
           LWIP_DEBUGF(DNS_DEBUG, ("dns_recv: \"%s\": error in flags\n", pEntry->name));
           /* call callback to indicate error, clean up memory and return */
-          goto responseerr;
+          //goto responseerr;
+          goto memerr;
         }
+        /* This entry is now completed. */
+        pEntry->state = DNS_STATE_DONE;
 
 #if DNS_DOES_NAME_CHECK
         /* Check if the name in the "question" part match with the name in the entry. */

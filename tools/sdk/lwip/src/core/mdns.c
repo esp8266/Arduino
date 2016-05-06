@@ -900,11 +900,27 @@ mdns_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p, struct ip_addr *addr,
 void ICACHE_FLASH_ATTR
 mdns_close(void)
 {
-	if (mdns_pcb != NULL && ms_info != NULL)
+	uint8 text_index = 0;
+	if (mdns_pcb != NULL && ms_info != NULL) {
 		udp_remove(mdns_pcb);
+		for(text_index = 0;text_index < 10;text_index++) {
+				if(ms_info->txt_data[text_index] != NULL) {
+					os_free(ms_info->txt_data[text_index]);
+					ms_info->txt_data[text_index] = NULL;
+				}
+		}
+		if (ms_info->host_name != NULL) {
+			os_free(ms_info->host_name);
+			ms_info->host_name = NULL;
+		}
+		if (ms_info->server_name != NULL) {
+			os_free(ms_info->server_name);
+			ms_info->server_name = NULL;
+		}
 		os_free(ms_info);
 		mdns_pcb = NULL;
 		ms_info = NULL;
+	}
 
 }
 
@@ -1034,9 +1050,24 @@ mdns_init(struct mdns_info *info) {
 	multicast_addr.addr = DNS_MULTICAST_ADDRESS;
 	struct ip_addr ap_host_addr;
 	struct ip_info ipconfig;
+	uint8 text_index = 0;
 	ms_info = (struct mdns_info *)os_zalloc(sizeof(struct mdns_info));
 	if (ms_info != NULL) {
 		os_memcpy(ms_info,info,sizeof(struct mdns_info));
+		ms_info->host_name = (char *)os_zalloc(os_strlen(info->host_name)+1);
+		os_memcpy(ms_info->host_name,info->host_name,os_strlen(info->host_name));
+		ms_info->server_name = (char *)os_zalloc(os_strlen(info->server_name)+1);
+		os_memcpy(ms_info->server_name,info->server_name,os_strlen(info->server_name));
+		for(text_index = 0;text_index < 10;text_index++) {
+			if(info->txt_data[text_index] != NULL) {
+				ms_info->txt_data[text_index] = (char *)os_zalloc(os_strlen(info->txt_data[text_index])+1);
+				os_memcpy(ms_info->txt_data[text_index],info->txt_data[text_index],os_strlen(info->txt_data[text_index]));
+			} else {
+				break;
+			}
+
+		}
+
 	} else {
 		os_printf("ms_info alloc failed\n");
 		return;

@@ -114,7 +114,7 @@ tcp_timer_needed(void)
  *
  * @param arg unused argument
  */
-/*
+
 static void ICACHE_FLASH_ATTR
 tcp_timer_coarse(void *arg)
 {
@@ -123,7 +123,7 @@ tcp_timer_coarse(void *arg)
   tcp_tmr();
   sys_timeout(TCP_TMR_INTERVAL, tcp_timer_coarse, NULL);
 }
-*/
+
 #endif /* LWIP_TCP */
 
 #if IP_REASSEMBLY
