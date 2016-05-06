@@ -40,7 +40,7 @@ typedef enum {
 } WiFiPhyMode_t;
 
 typedef enum {
-    WIFI_NONE_SLEEP = 0, WIFI_LIGHT_SLEEP = 2, WIFI_MODEM_SLEEP = 3
+    WIFI_NONE_SLEEP = 0, WIFI_LIGHT_SLEEP =1, WIFI_MODEM_SLEEP = 2
 } WiFiSleepType_t;
 
 
