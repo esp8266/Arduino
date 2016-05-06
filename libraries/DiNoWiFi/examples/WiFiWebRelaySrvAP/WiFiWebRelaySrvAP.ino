@@ -1,4 +1,4 @@
-// WiFiWebRelaySrv.ino
+// WiFiWebRelaySrvAP.ino
 // Company: KMP Electronics Ltd, Bulgaria
 // Web: http://kmpelectronics.eu/
 // License: See the GNU General Public License for more details at http://www.gnu.org/copyleft/gpl.html
@@ -6,7 +6,7 @@
 //		KMP ProDino WiFi-ESP with ESP8266 V1.1 (http://www.kmpelectronics.eu/en-us/products/prodinowifi-esp.aspx)
 // Description:
 //		Web server relay manipulation example. 
-// Example link: http://www.kmpelectronics.eu/en-us/examples/dinowifiesp/wifiwebrelayserver.aspx
+// Example link: http://www.kmpelectronics.eu/en-us/examples/prodinowifi-esp/wifiwebrelayserver.aspx
 // Version: 1.0.0
 // Date: 30.04.2016
 // Author: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu>
@@ -17,8 +17,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
-const char SSID[] = "******";
-const char PASSWORD[] = "******";
+const char WI_FI_APPSK[] = "kmp12345";
 const uint8_t HTTP_PORT = 80;
 
 ESP8266WebServer _server(HTTP_PORT);
@@ -40,36 +39,38 @@ void setup(void)
 	// You can open the Arduino IDE Serial Monitor window to see what the code is doing
 	// Serial connection from ESP-01 via 3.3v console cable
 	Serial.begin(115200);
-	// Init KMP Dino WiFi board.
+	// Init KMP ProDino WiFi-ESP board.
 	KMPDinoWiFiESP.init();
 
-	// Connect to WiFi network
-	WiFi.begin(SSID, PASSWORD);
-	Serial.print("\n\r \n\rWorking to connect");
+	Serial.println("KMP Relay Server Access Point");
 
-	// Wait for connection
-	while (WiFi.status() != WL_CONNECTED) {
-		delay(500);
-		Serial.print(".");
-	}
-	Serial.println("");
-	Serial.println("KMP Relay Server");
-	Serial.print("Connected to ");
-	Serial.println(SSID);
-	Serial.print("IP address: ");
-	Serial.println(WiFi.localIP());
+	// Setup WiFi AP.
+	WiFi.mode(WIFI_AP);
+
+	// Get a unique name, append the last two bytes of the MAC (HEX'd) to device name.
+	String mac = WiFi.softAPmacAddress(); // 5E:CF:7F:81:70:3E
+	String apName = "KMP ProDino WiFi-ESP "
+		+ mac.substring(12);
+
+	Serial.print("AP name: ");
+	Serial.println(apName);
+
+	WiFi.softAP(apName.c_str(), WI_FI_APPSK);
+
+	Serial.print("AP IP address: ");
+	Serial.println(WiFi.softAPIP());
 
 	_server.on("/", HandleRootPage);
 	_server.begin();
 
-	Serial.println("HTTP server started");
+	Serial.println("AP HTTP server started");
 }
 
 /**
-* @brief Main method.
-*
-* @return void
-*/
+ * @brief Main method.
+ *
+ * @return void
+ */
 void loop(void)
 {
 	_server.handleClient();
@@ -121,10 +122,10 @@ void HandleRootPage()
 String BuildPage()
 {
 	String page =
-		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(DINO_WIFI) + " - Web Relay</title></head>"
+		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(DINO_WIFI) + " - Web Relay AP</title></head>"
 		+ "<body><div style='text-align: center'>"
 		+ "<br><hr />"
-		+ "<h1 style = 'color: #0066FF;'>" + String(DINO_WIFI) + " - Web Relay example</h1>"
+		+ "<h1 style = 'color: #0066FF;'>" + String(DINO_WIFI) + " - Web Relay AP example</h1>"
 		+ "<hr /><br><br>"
 		+ "<form method='post'>"
 		+ "<table border='1' width='300' cellpadding='5' cellspacing='0' align='center' style='text-align:center; font-size:large; font-family:Arial,Helvetica,sans-serif;'>";

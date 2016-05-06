@@ -26,6 +26,16 @@
 #define OPTOIN_COUNT 4
 
 /**
+ * @brief Grove connector first pin GPIO4/SDA.
+ */
+#define	GROVE_PIN1	4 
+
+/**
+ * @brief Grove connector first pin GPIO5/SCL.
+ */
+#define	GROVE_PIN2	5 
+
+/**
  * @brief Relays.
  */
 enum Relay {
@@ -46,7 +56,7 @@ enum OptoIn {
 };
 
 const char TEXT_HTML[] = "text/html; charset=utf-8";
-const char DINO_WIFI[] = "DiNo WiFi ESP";
+const char DINO_WIFI[] = "ProDino WiFi-ESP";
 const char URL_KMPELECTRONICS_EU_DINO_WIFI[] = "http://kmpelectronics.eu/en-us/products/dinowifiesp.aspx";
 
 class KMPDinoWiFiESPClass
@@ -73,10 +83,10 @@ class KMPDinoWiFiESPClass
 	bool GetOptoInState(uint8_t optoInNumber);
 	bool GetOptoInState(OptoIn optoIn);
 
-	bool GetLedState();
-	void SetLedState(bool on);
-	void LedOn();
-	void LedOff();
+	//bool GetLedState();
+	//void SetLedState(bool on);
+	//void LedOn();
+	//void LedOff();
 };
 
 extern KMPDinoWiFiESPClass KMPDinoWiFiESP;

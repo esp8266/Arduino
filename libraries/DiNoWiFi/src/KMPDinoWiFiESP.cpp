@@ -14,7 +14,10 @@
 
 #define CS 15
 
-#define LED_PIN 16
+// DiNo board led.
+//#define LED_PIN 16
+// ESP12-E Led
+//#define LED_PIN 14 
 
 #define READ_CMD  0x41
 #define WRITE_CMD 0x40
@@ -81,8 +84,8 @@ void KMPDinoWiFiESPClass::init()
 	ExpanderInitGPIO();
 
 	// Initialize the LED_BUILTIN pin as an output.
-	pinMode(LED_PIN, OUTPUT);     
-	LedOff();
+	//pinMode(LED_PIN, OUTPUT);
+	//LedOff();
 }
 
 /* ----------------------------------------------------------------------- */
@@ -205,7 +208,7 @@ bool KMPDinoWiFiESPClass::GetOptoInState(uint8_t optoInNumber)
 		return false;
 	}
 
-	return ExpanderGetPin(OPTOIN_PINS[optoInNumber]);
+	return !ExpanderGetPin(OPTOIN_PINS[optoInNumber]);
 }
 
 /**
@@ -259,7 +262,7 @@ bool KMPDinoWiFiESPClass::ExpanderGetPin(uint8_t pinNumber)
 {
 	uint8_t registerData = ExpanderReadRegister(GPIO);
 
-	return registerData & (1 << pinNumber) ? false : true;
+	return registerData & (1 << pinNumber);
 }
 
 /**
@@ -347,44 +350,44 @@ void KMPDinoWiFiESPClass::ExpanderInitGPIO()
 	}
 }
 
-/**
- * @brief Get current state LED.
- *
- * @return bool If result equal - true LED On, else Off.
- */
-bool KMPDinoWiFiESPClass::GetLedState()
-{
-	return !digitalRead(LED_PIN);
-}
-
-/**
- * @brief Set status LED.
- *
- * @param on. Status LED true - On, false - Off.
- *
- * @return void
- */
-void KMPDinoWiFiESPClass::SetLedState(bool on)
-{
-	digitalWrite(LED_PIN, on ? LOW : HIGH);
-}
-
-/**
- * @brief Set status LED On.
- *
- * @return void
- */
-void KMPDinoWiFiESPClass::LedOn()
-{
-	SetLedState(true);
-}
-
-/**
- * @brief Set status LED On.
- *
- * @return void
- */
-void KMPDinoWiFiESPClass::LedOff()
-{
-	SetLedState(false);
-}
+///**
+// * @brief Get current state LED.
+// *
+// * @return bool If result equal - true LED On, else Off.
+// */
+//bool KMPDinoWiFiESPClass::GetLedState()
+//{
+//	return !digitalRead(LED_PIN);
+//}
+//
+///**
+// * @brief Set status LED.
+// *
+// * @param on. Status LED true - On, false - Off.
+// *
+// * @return void
+// */
+//void KMPDinoWiFiESPClass::SetLedState(bool on)
+//{
+//	digitalWrite(LED_PIN, on ? LOW : HIGH);
+//}
+//
+///**
+// * @brief Set status LED On.
+// *
+// * @return void
+// */
+//void KMPDinoWiFiESPClass::LedOn()
+//{
+//	SetLedState(true);
+//}
+//
+///**
+// * @brief Set status LED On.
+// *
+// * @return void
+// */
+//void KMPDinoWiFiESPClass::LedOff()
+//{
+//	SetLedState(false);
+//}
