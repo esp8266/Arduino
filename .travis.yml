@@ -36,7 +36,7 @@ script:
   - install_libraries
   - echo -e "travis_fold:end:sketch_test_env_prepare"
   - echo -e "travis_fold:start:sketch_test"
-  - build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR "-l $HOME/Arduino/libraries"
+  - build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries"
   - echo -e "travis_fold:end:sketch_test"
   - echo -e "travis_fold:start:size_report"
   - cat size.log
