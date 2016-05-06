@@ -151,10 +151,10 @@ void HandleRootPage()
 String BuildPage()
 {
 	String page =
-		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(DINO_WIFI) + " - Web Relay</title></head>"
+		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(PRODINO_WIFI) + " - Web Relay</title></head>"
 		+ "<body><div style='text-align: center'>"
 		+ "<br><hr />"
-		+ "<h1 style = 'color: #0066FF;'>" + String(DINO_WIFI) + " - Web DHT example</h1>"
+		+ "<h1 style = 'color: #0066FF;'>" + String(PRODINO_WIFI) + " - Web DHT example</h1>"
 		+ "<hr /><br><br>"
 		+ "<table border='1' width='450' cellpadding='5' cellspacing='0' align='center' style='text-align:center; font-size:large; font-family:Arial,Helvetica,sans-serif;'>"
 		+ "<thead><tr><th style='width:30%'></th><th style='width:35%'>Temperature C&deg;</th><th>Humidity</th></tr></thead>";
@@ -177,7 +177,7 @@ String BuildPage()
 
 	return page + tableBody
 		+ "</table><br><br><hr /><h1><a href='" + String(URL_KMPELECTRONICS_EU) + "' target='_blank'>Visit " + String(KMP_ELECTRONICS_LTD) + "</a></h1>"
-		+ "<h3><a href='" + String(URL_KMPELECTRONICS_EU_DINO_WIFI) + "' target='_blank'>Information about DiNo WiFi board</a></h3>"
+		+ "<h3><a href='" + String(URL_KMPELECTRONICS_EU_DINO_WIFI) + "' target='_blank'>Information about " + String(PRODINO_WIFI) + " board</a></h3>"
 		+ "<hr /></div></body></html>";
 }
 

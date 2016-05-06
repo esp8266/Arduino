@@ -37,6 +37,8 @@ const char WHITE[] = "white";
 const char BLUE[] = "blue";
 const char GREEN[] = "green";
 const char RED[] = "red";
+const char GRAY[] = "#808080";
+
 const char NA[] = "N/A";
 const char DEGREE_SYMBOL[] = "&deg;";
 
@@ -58,8 +60,6 @@ int _oneWireDeviceCount;
 // Temp device address.
 DeviceAddress _tempDeviceAddress;
 
-// Gray color.
-const char GRAY[] = "#808080";
 // Check sensor data, interval in milliseconds.
 const long CHECK_HT_INTERVAL_MS = 5000;
 // Store last measure time.
@@ -70,7 +70,7 @@ const uint8_t GET_DEVICE_COUNT_AFTER = 10;
 uint8_t _getDeviceCount;
 
 // Buffer to Hex bytes.
-char _buffer[8];
+char _buffer[8*2 + 1];
 
 ESP8266WebServer _server(HTTP_PORT);
 
@@ -161,10 +161,10 @@ void HandleRootPage()
 String BuildPage()
 {
 	String page =
-		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(DINO_WIFI) + " - Web Relay</title></head>"
+		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(PRODINO_WIFI) + " - Web Relay</title></head>"
 		+ "<body><div style='text-align: center'>"
 		+ "<br><hr />"
-		+ "<h1 style = 'color: #0066FF;'>" + String(DINO_WIFI) + " - Web DHT example</h1>"
+		+ "<h1 style = 'color: #0066FF;'>" + String(PRODINO_WIFI) + " - Web 1Wire example</h1>"
 		+ "<hr /><br><br>"
 		+ "<table border='1' width='450' cellpadding='5' cellspacing='0' align='center' style='text-align:center; font-size:large; font-family:Arial,Helvetica,sans-serif;'>"
 		+ "<thead><tr><th></th><th>C&deg;</th><th>F&deg;</th></tr></thead>";
@@ -174,9 +174,11 @@ String BuildPage()
 	for (int i = 0; i < _oneWireDeviceCount; i++)
 	{
 		// Default color.
-		const char* cellColor = WHITE;
+		const char* cellColor = GRAY;
 		float temp = 0;
 		bool sensorAvaible = _sensors.getAddress(_tempDeviceAddress, i);
+		String sensorName = "Ghost device";
+		String sensorId = NA;
 		if (sensorAvaible)
 		{
 			// Get temperature in Celsius.
@@ -204,10 +206,14 @@ String BuildPage()
 			{
 				cellColor = RED;
 			}
-		}
 
+			sensorName = "Sensor " + String(IntToChar(i + 1));
+			BytesToHexStr(_tempDeviceAddress, 8, _buffer);
+			sensorId = _buffer;
+		}
+		
 		// Row i, cell 1
-		tableBody += "<tr><td>Sensor " + String(IntToChar(i + 1)) + "</td>";
+		tableBody += "<tr><td>" + sensorName + "<br><font size='2'>Id: " + sensorId + "</font></td>";
 
 		// Add cell i,2
 		tableBody += AddTemperatureCell(sensorAvaible, temp, cellColor);
@@ -223,7 +229,7 @@ String BuildPage()
 
 	return page + tableBody
 		+ "</table><br><br><hr /><h1><a href='" + String(URL_KMPELECTRONICS_EU) + "' target='_blank'>Visit " + String(KMP_ELECTRONICS_LTD) + "</a></h1>"
-		+ "<h3><a href='" + String(URL_KMPELECTRONICS_EU_DINO_WIFI) + "' target='_blank'>Information about DiNo WiFi board</a></h3>"
+		+ "<h3><a href='" + String(URL_KMPELECTRONICS_EU_DINO_WIFI) + "' target='_blank'>Information about " + String(PRODINO_WIFI) + " board</a></h3>"
 		+ "<hr /></div></body></html>";
 }
 
@@ -278,11 +284,11 @@ void GetDataFromSensors()
 }
 
 /**
-* \brief Get all available One Wire devices.
-*
-*
-* \return void
-*/
+ * @brief Get all available One Wire devices.
+ *
+ *
+ * @return void
+ */
 void GethOneWireDevices()
 {
 	// Grab a count of devices on the wire.
@@ -315,19 +321,15 @@ void GethOneWireDevices()
 
 #ifdef DEBUG
 /**
- * \brief Print device address to Serial.
+ * @brief Print device address to Serial.
  *
- * \param deviceAddress Device address.
+ * @param deviceAddress Device address.
  *
- * \return void
+ * @return void
  */
 void PrintAddress(DeviceAddress deviceAddress)
 {
-	for (uint8_t i = 0; i < 8; i++)
-	{
-		ByteToHexStr(deviceAddress[i], _buffer);
-		Serial.print(_buffer);
-	}
-	Serial.println();
+	BytesToHexStr(deviceAddress, 8, _buffer);
+	Serial.println(_buffer);
 }
 #endif
