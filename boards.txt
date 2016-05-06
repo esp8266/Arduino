@@ -30,8 +30,6 @@ generic.build.flash_mode=qio
 generic.build.spiffs_pagesize=256
 generic.build.debug_port=
 generic.build.debug_level=
-generic.build.lwip_lib=-llwip
-generic.build.lwip_flags=
 
 generic.menu.CpuFrequency.80=80 MHz
 generic.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -250,8 +248,6 @@ espduino.build.flash_size=4M
 espduino.build.flash_freq=40
 espduino.build.debug_port=
 espduino.build.debug_level=
-espduino.build.lwip_lib=-llwip
-espduino.build.lwip_flags=
 
 espduino.menu.CpuFrequency.80=80 MHz
 espduino.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -315,8 +311,6 @@ huzzah.build.flash_size=4M
 huzzah.build.flash_freq=40
 huzzah.build.debug_port=
 huzzah.build.debug_level=
-huzzah.build.lwip_lib=-llwip
-huzzah.build.lwip_flags=
 
 huzzah.menu.CpuFrequency.80=80 MHz
 huzzah.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -366,8 +360,6 @@ espresso_lite_v1.build.variant=espresso_lite_v1
 espresso_lite_v1.build.flash_mode=dio
 espresso_lite_v1.build.flash_size=4M
 espresso_lite_v1.build.flash_freq=40
-espresso_lite_v1.build.lwip_lib=-llwip
-espresso_lite_v1.build.lwip_flags=
 
 espresso_lite_v1.menu.CpuFrequency.80=80 MHz
 espresso_lite_v1.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -473,8 +465,6 @@ espresso_lite_v2.build.variant=espresso_lite_v2
 espresso_lite_v2.build.flash_mode=dio
 espresso_lite_v2.build.flash_size=4M
 espresso_lite_v2.build.flash_freq=40
-espresso_lite_v2.build.lwip_lib=-llwip
-espresso_lite_v2.build.lwip_flags=
 
 espresso_lite_v2.menu.CpuFrequency.80=80 MHz
 espresso_lite_v2.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -586,8 +576,6 @@ nodemcu.build.flash_size=4M
 nodemcu.build.flash_freq=40
 nodemcu.build.debug_port=
 nodemcu.build.debug_level=
-nodemcu.build.lwip_lib=-llwip
-nodemcu.build.lwip_flags=
 
 nodemcu.menu.CpuFrequency.80=80 MHz
 nodemcu.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -652,8 +640,6 @@ nodemcuv2.build.flash_size=4M
 nodemcuv2.build.flash_freq=40
 nodemcuv2.build.debug_port=
 nodemcuv2.build.debug_level=
-nodemcuv2.build.lwip_lib=-llwip
-nodemcuv2.build.lwip_flags=
 
 nodemcuv2.menu.CpuFrequency.80=80 MHz
 nodemcuv2.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -725,8 +711,6 @@ modwifi.build.spiffs_pagesize=256
 modwifi.build.spiffs_blocksize=8192
 modwifi.build.debug_port=
 modwifi.build.debug_level=
-modwifi.build.lwip_lib=-llwip
-modwifi.build.lwip_flags=
 
 modwifi.menu.CpuFrequency.80=80 MHz
 modwifi.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -781,8 +765,6 @@ thing.build.spiffs_blocksize=4096
 thing.build.spiffs_pagesize=256
 thing.build.debug_port=
 thing.build.debug_level=
-thing.build.lwip_lib=-llwip
-thing.build.lwip_flags=
 
 thing.menu.CpuFrequency.80=80 MHz
 thing.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -832,8 +814,6 @@ thingdev.build.flash_ld=eagle.flash.512k64.ld
 thingdev.build.flash_freq=40
 thingdev.build.debug_port=
 thingdev.build.debug_level=
-thingdev.build.lwip_lib=-llwip
-thingdev.build.lwip_flags=
 
 thingdev.menu.CpuFrequency.80=80 MHz
 thingdev.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -881,8 +861,6 @@ esp210.build.flash_size=4M
 esp210.build.flash_freq=40
 esp210.build.debug_port=
 esp210.build.debug_level=
-esp210.build.lwip_lib=-llwip
-esp210.build.lwip_flags=
 
 esp210.menu.CpuFrequency.80=80 MHz
 esp210.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -974,8 +952,6 @@ d1_mini.build.flash_size=4M
 d1_mini.build.flash_freq=40
 d1_mini.build.debug_port=
 d1_mini.build.debug_level=
-d1_mini.build.lwip_lib=-llwip
-d1_mini.build.lwip_flags=
 
 d1_mini.menu.CpuFrequency.80=80 MHz
 d1_mini.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -1042,8 +1018,6 @@ d1.build.flash_size=4M
 d1.build.flash_freq=40
 d1.build.debug_port=
 d1.build.debug_level=
-d1.build.lwip_lib=-llwip
-d1.build.lwip_flags=
 
 d1.menu.CpuFrequency.80=80 MHz
 d1.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -1112,8 +1086,6 @@ espino.build.flash_freq=40
 espino.build.spiffs_pagesize=256
 espino.build.debug_port=
 espino.build.debug_level=
-espino.build.lwip_lib=-llwip
-espino.build.lwip_flags=
 
 espino.menu.CpuFrequency.80=80 MHz
 espino.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -1188,8 +1160,6 @@ espinotee.build.flash_size=4M
 espinotee.build.flash_freq=40
 espinotee.build.debug_port=
 espinotee.build.debug_level=
-espinotee.build.lwip_lib=-llwip
-espinotee.build.lwip_flags=
 
 espinotee.menu.CpuFrequency.80=80 MHz
 espinotee.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -1253,8 +1223,6 @@ wifinfo.build.board=ESP8266_NODEMCU
 wifinfo.build.spiffs_pagesize=256
 wifinfo.build.debug_port=Serial1
 wifinfo.build.debug_level=Wifinfo
-wifinfo.build.lwip_lib=-llwip
-wifinfo.build.lwip_flags=
 
 wifinfo.menu.Debug.Disabled=Disabled
 wifinfo.menu.Debug.Disabled.build.debug_port=

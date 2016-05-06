@@ -1,0 +1,6 @@
+junit-xml==1.6
+pexpect==4.0.1
+ptyprocess==0.5.1
+pyserial==3.0.1
+six==1.10.0
+wheel==0.24.0

@@ -703,11 +703,33 @@ static void
 igmp_start_timer(struct igmp_group *group, u8_t max_time)
 {
   /* ensure the input value is > 0 */
+#ifdef LWIP_RAND
   if (max_time == 0) {
     max_time = 1;
   }
   /* ensure the random value is > 0 */
-  group->timer = (LWIP_RAND() % (max_time - 1)) + 1;
+  group->timer = (LWIP_RAND() % max_time);
+  if (group->timer == 0) {
+    group->timer = 1;
+  }
+#else /* LWIP_RAND */
+  /* ATTENTION: use this only if absolutely necessary! */
+  group->timer = max_time / 2;
+  if (group->timer == 0) {
+    group->timer = 1;
+  }
+#endif /* LWIP_RAND */
+}
+
+/**
+ * Stop a timer for an igmp_group
+ *
+ * @param group the igmp_group for which to stop the timer
+ */
+static void
+igmp_stop_timer(struct igmp_group *group)
+{
+  group->timer = 0;
 }
 
 /**
