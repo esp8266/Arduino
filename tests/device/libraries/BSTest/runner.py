@@ -8,14 +8,18 @@ import time
 import argparse
 import serial
 import subprocess
+import imp
 from urlparse import urlparse
 from junit_xml import TestSuite, TestCase
 try:
     from cStringIO import StringIO
 except:
     from StringIO import StringIO
+import mock_decorators
 
 debug = False
+
+sys.path.append(os.path.abspath(__file__))
 
 def debug_print(*args, **kwargs):
     if not debug:
@@ -29,17 +33,18 @@ class BSTestRunner(object):
     TIMEOUT = 2
     CRASH = 3
 
-    def __init__(self, spawn_obj, name):
+    def __init__(self, spawn_obj, name, mocks):
         self.sp = spawn_obj
         self.tests = []
         self.reset_timeout = 2
         self.name = name
+        self.mocks = mocks
 
     def get_test_list(self):
         self.sp.sendline('-1')
         timeout = 10
         while timeout > 0:
-            res = self.sp.expect(['>>>>>bs_test_menu_begin', EOF])
+            res = self.sp.expect(['>>>>>bs_test_menu_begin', EOF, TIMEOUT])
             if res == 0:
                 break
             timeout-=1
@@ -49,7 +54,7 @@ class BSTestRunner(object):
         while True:
             res = self.sp.expect(['>>>>>bs_test_item id\=(\d+) name\="([^\"]*?)" desc="([^"]*?)"',
                                   '>>>>>bs_test_menu_end',
-                                  EOF])
+                                  EOF, TIMEOUT])
             if res == 0:
                 m = self.sp.match
                 t = {'id': m.group(1), 'name': m.group(2), 'desc': m.group(3)}
@@ -57,7 +62,7 @@ class BSTestRunner(object):
                 debug_print('added test', t)
             elif res == 1:
                 break
-            elif res == 2:
+            elif res >= 2:
                 time.sleep(0.1)
 
         debug_print('got {} tests'.format(len(self.tests)))
@@ -75,8 +80,14 @@ class BSTestRunner(object):
             else:
                 test_output = StringIO()
                 self.sp.logfile = test_output
+                if name in self.mocks:
+                    print('setting up mocks')
+                    self.mocks[name]['setup']()
                 t_start = time.time()
                 result = self.run_test(index)
+                if name in self.mocks:
+                    print('tearing down mocks')
+                    self.mocks[name]['teardown']()
                 t_stop = time.time()
                 self.sp.logfile = None
                 test_case.elapsed_sec = t_stop - t_start
@@ -96,7 +107,7 @@ class BSTestRunner(object):
         self.sp.sendline('{}'.format(index))
         timeout = 10
         while timeout > 0:
-            res = self.sp.expect(['>>>>>bs_test_start', EOF])
+            res = self.sp.expect(['>>>>>bs_test_start', EOF, TIMEOUT])
             if res == 0:
                 break
             time.sleep(0.1)
@@ -147,8 +158,8 @@ def spawn_port(port_name, baudrate=115200):
 def spawn_exec(name):
     return pexpect.spawn(name, timeout=0)
 
-def run_tests(spawn, name):
-    tw = BSTestRunner(spawn, name)
+def run_tests(spawn, name, mocks):
+    tw = BSTestRunner(spawn, name, mocks)
     tw.get_test_list()
     return tw.run_tests()
 
@@ -159,6 +170,7 @@ def parse_args():
     parser.add_argument('-e', '--executable', help='Talk to the test executable')
     parser.add_argument('-n', '--name', help='Test run name')
     parser.add_argument('-o', '--output', help='Output JUnit format test report')
+    parser.add_argument('-m', '--mock', help='Set python script to use for mocking purposes')
     return parser.parse_args()
 
 def main():
@@ -178,8 +190,12 @@ def main():
     if spawn_func is None:
         debug_print("Please specify port or executable", file=sys.stderr)
         return 1
+    mocks = {}
+    if args.mock is not None:
+        mocks_mod = imp.load_source('mocks', args.mock)
+        mocks = mock_decorators.env
     with spawn_func(spawn_arg) as sp:
-        ts = run_tests(sp, name)
+        ts = run_tests(sp, name, mocks)
         if args.output:
             with open(args.output, "w") as f:
                 TestSuite.to_file(f, [ts])
