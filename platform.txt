@@ -110,12 +110,3 @@ tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/to
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe
 tools.mkspiffs.path={runtime.platform.path}/tools/mkspiffs
-
-tools.espota.cmd=python
-tools.espota.cmd.windows=python.exe
-tools.espota.path={runtime.platform.path}/tools
-
-tools.espota.upload.protocol=espota
-tools.espota.upload.params.verbose=
-tools.espota.upload.params.quiet=
-tools.espota.upload.pattern="{cmd}" "{path}/espota.py" -i "{serial.port}" -p 8266 -f "{build.path}/{build.project_name}.bin"
