@@ -844,8 +844,13 @@ bool HTTPClient::sendHeader(const char * type)
         header += "1";
     }
 
-    header += String(F("\r\nHost: ")) + _host +
-              F("\r\nUser-Agent: ") + _userAgent +
+    header += String(F("\r\nHost: ")) + _host;
+    if (_port != 80 && _port != 443)
+    {
+        header += ':';
+        header += String(_port);
+    }
+    header += String(F("\r\nUser-Agent: ")) + _userAgent +
               F("\r\nConnection: ");
 
     if(_reuse) {
