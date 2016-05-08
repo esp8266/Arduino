@@ -17,6 +17,9 @@ compiler.warning_flags.default=
 compiler.warning_flags.more=-Wall
 compiler.warning_flags.all=-Wall -Wextra
 
+build.lwip_lib=-llwip_gcc
+build.lwip_flags=-DLWIP_OPEN_SRC
+
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/lwip/include"
@@ -110,12 +113,3 @@ tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/to
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe
 tools.mkspiffs.path={runtime.platform.path}/tools/mkspiffs
-
-tools.espota.cmd=python
-tools.espota.cmd.windows=python.exe
-tools.espota.path={runtime.platform.path}/tools
-
-tools.espota.upload.protocol=espota
-tools.espota.upload.params.verbose=
-tools.espota.upload.params.quiet=
-tools.espota.upload.pattern="{cmd}" "{path}/espota.py" -i "{serial.port}" -p 8266 -f "{build.path}/{build.project_name}.bin"

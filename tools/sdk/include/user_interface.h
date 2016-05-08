@@ -356,6 +356,9 @@ sleep_type_t wifi_get_sleep_type(void);
 void wifi_fpm_open(void);
 void wifi_fpm_close(void);
 void wifi_fpm_do_wakeup(void);
+typedef void (*fpm_wakeup_cb)(void);
+void wifi_fpm_set_wakeup_cb(fpm_wakeup_cb cb);
+
 sint8 wifi_fpm_do_sleep(uint32 sleep_time_in_us);
 void wifi_fpm_set_sleep_type(sleep_type_t type);
 sleep_type_t wifi_fpm_get_sleep_type(void);

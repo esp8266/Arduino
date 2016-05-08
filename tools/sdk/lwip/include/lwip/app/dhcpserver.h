@@ -35,10 +35,23 @@ enum dhcps_offer_option{
 };
 #endif
 
+typedef enum {
+    DHCPS_TYPE_DYNAMIC,
+    DHCPS_TYPE_STATIC
+} dhcps_type_t;
+
+typedef enum {
+    DHCPS_STATE_ONLINE,
+    DHCPS_STATE_OFFLINE
+} dhcps_state_t;
+
 struct dhcps_pool{
 	struct ip_addr ip;
 	uint8 mac[6];
 	uint32 lease_timer;
+    dhcps_type_t type;
+    dhcps_state_t state;
+
 };
 
 typedef struct _list_node{

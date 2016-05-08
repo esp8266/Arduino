@@ -264,6 +264,7 @@ espconn_connect(struct espconn *espconn)
 	uint8 connect_status = 0;
 	sint8 value = ESPCONN_OK;
 	espconn_msg *plist = NULL;
+	remot_info *pinfo = NULL;
 
     if (espconn == NULL) {
         return ESPCONN_ARG;
@@ -448,6 +449,7 @@ espconn_sendto(struct espconn *espconn, uint8 *psent, uint16 length)
 {
 	espconn_msg *pnode = NULL;
 	bool value = false;
+	err_t error = ESPCONN_OK;
 
 	if (espconn == NULL || psent == NULL || length == 0) {
 		return ESPCONN_ARG;
@@ -674,7 +676,8 @@ sint8 ICACHE_FLASH_ATTR espconn_tcp_set_buf_count(struct espconn *espconn, uint8
 		}
 	}
 
-	return ESPCONN_ARG;
+	if (plist == NULL)
+		return ESPCONN_ARG;
 }
 
 /******************************************************************************
@@ -951,7 +954,7 @@ espconn_disconnect(struct espconn *espconn)
 
     if (value){
     	/*protect for redisconnection*/
-    	if (espconn->state == ESPCONN_CLOSE)
+    	if (pnode->preverse == NULL && espconn->state == ESPCONN_CLOSE)
     		return ESPCONN_INPROGRESS;
     	espconn_tcp_disconnect(pnode,0);	//1 force, 0 normal
     	return ESPCONN_OK;

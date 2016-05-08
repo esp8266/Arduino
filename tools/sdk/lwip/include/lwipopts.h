@@ -569,7 +569,7 @@
  * IP_DEFAULT_TTL: Default value for Time-To-Live used by transport layers.
  */
 #ifndef IP_DEFAULT_TTL
-#define IP_DEFAULT_TTL                  255
+#define IP_DEFAULT_TTL                  128
 #endif
 
 /**

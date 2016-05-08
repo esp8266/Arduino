@@ -1,3 +1,41 @@
+ESP8266_NONOS_SDK_V1.5.3_16_04_16 Release Note
+----------------------------------------------
+Optimization:
+1. Supported ISSI flash.
+2. SmartConfig updated to version 2.5.4, solved the issue that AirKiss may fail in certain cases.
+3. libphy.a updated to version 9281.
+4. AT updated to version 1.00.
+5. Added lwip_open_src_template_proj in ESP8266_NONOS_SDK\examples for open source LWIP.
+6. Added peripheral_test in ESP8266_NONOS_SDK\examples.
+7. Moved driver_lib folder to be as ESP8266_NONOS_SDK\driver_lib.
+8. Added SPI driver, refer to ESP8266_NONOS_SDK\driver_lib\driver\spi_interface.c.
+9. Optimized espconn.
+10. Optimized DNS function.
+11. Optimized mDNS function.
+12. Optimized the disconnection when ESP8266 runs as TCP server.
+13. Optimized DHCP server: after DHCP release, it will assign the first unused IP to next DHCP client.
+14. Removed the limitation of freedom sending unencrypted beacon/probe req/probe resp.
+15. Resolved the issue that wifi_station_get_connect_status returned incorrect status when some router restarted.
+16. Revised the SSL server crash issue.
+
+Added APIs: 
+1. WPA2-Enterprise APIs 
+wifi_station_set_username : set user name for WPA2-Enterprise
+wifi_station_clear_username : clear user name for WPA2-Enterprise
+2. AT APIs 
+at_set_escape_character : set escape character for AT commands
+
+AT_V1.0 Release Note:
+Optimization: 
+1. Revised the flash map of AT firmware in no bootmode, please download the bin files according to at\readme.
+2. Revised the problem that AT+PING may fail when using some special router.
+3. Optimized AT firmware when receiving TCP data with UART flow control.
+
+Added AT commands
+1. AT+CIPDOMAIN: for DNS function.
+
+
+
 ESP8266_NONOS_SDK_V1.5.2_16_01_29 Release Note
 ----------------------------------------------
 
