@@ -66,7 +66,7 @@ class SSLContext {
 public:
     SSLContext() {
         if (_ssl_ctx_refcnt == 0) {
-            _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS, 0);
+            _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING, 0);
         }
         ++_ssl_ctx_refcnt;
     }
@@ -591,4 +591,8 @@ extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int l
 
 extern "C" void ax_port_free(void* ptr) {
     free(ptr);
+}
+
+extern "C" void ax_wdt_feed() {
+    optimistic_yield(10000);
 }
