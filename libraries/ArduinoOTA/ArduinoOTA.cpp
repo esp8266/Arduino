@@ -49,19 +49,19 @@ ArduinoOTAClass::~ArduinoOTAClass(){
   }
 }
 
-void ArduinoOTAClass::onStart(OTA_CALLBACK(fn)) {
+void ArduinoOTAClass::onStart(THandlerFunction fn) {
     _start_callback = fn;
 }
 
-void ArduinoOTAClass::onEnd(OTA_CALLBACK(fn)) {
+void ArduinoOTAClass::onEnd(THandlerFunction fn) {
     _end_callback = fn;
 }
 
-void ArduinoOTAClass::onProgress(OTA_CALLBACK_PROGRESS(fn)) {
+void ArduinoOTAClass::onProgress(THandlerFunction_progress fn) {
     _progress_callback = fn;
 }
 
-void ArduinoOTAClass::onError(OTA_CALLBACK_ERROR(fn)) {
+void ArduinoOTAClass::onError(THandlerFunction_error fn) {
     _error_callback = fn;
 }
 
