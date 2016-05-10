@@ -841,6 +841,7 @@ static int check_poison_block( umm_block *pblock ) {
 
     pc_cur = pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE);
     if (!check_poison(pc_cur, UMM_POISON_SIZE_BEFORE, "before")) {
+      printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
       UMM_HEAP_CORRUPTION_CB();
       ok = 0;
       goto clean;
@@ -848,6 +849,7 @@ static int check_poison_block( umm_block *pblock ) {
 
     pc_cur = pc + *((UMM_POISONED_BLOCK_LEN_TYPE *)pc) - UMM_POISON_SIZE_AFTER;
     if (!check_poison(pc_cur, UMM_POISON_SIZE_AFTER, "after")) {
+	  printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
       UMM_HEAP_CORRUPTION_CB();
       ok = 0;
       goto clean;
