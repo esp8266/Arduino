@@ -81,6 +81,8 @@ extern "C" {
 #define hmac_sha1 ax_hmac_sha1
 #define hmac_md5 ax_hmac_md5
 
+void ax_wdt_feed();
+
 #elif defined(WIN32)
 
 /* Windows CE stuff */

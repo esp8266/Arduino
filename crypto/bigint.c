@@ -1218,6 +1218,7 @@ bigint *bi_mont(BI_CTX *ctx, bigint *bixy)
 
     check(bixy);
 
+    ax_wdt_feed();
     if (ctx->use_classical)     /* just use classical instead */
     {
         return bi_mod(ctx, bixy);
@@ -1274,6 +1275,7 @@ bigint *bi_barrett(BI_CTX *ctx, bigint *bi)
     check(bi);
     check(bim);
 
+    ax_wdt_feed();
     /* use Classical method instead  - Barrett cannot help here */
     if (bi->size > k*2)
     {

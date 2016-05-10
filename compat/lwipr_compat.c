@@ -217,6 +217,9 @@ int ax_get_file(const char *filename, uint8_t **buf) {
     return 0;
 }
 
+void ax_wdt_feed() {
+}
+
 /*
  * Utility functions
  */
