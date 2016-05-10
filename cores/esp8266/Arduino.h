@@ -250,6 +250,8 @@ void optimistic_yield(uint32_t interval_us);
 
 using std::min;
 using std::max;
+using std::isinf;
+using std::isnan;
 
 #define _min(a,b) ((a)<(b)?(a):(b))
 #define _max(a,b) ((a)>(b)?(a):(b))
