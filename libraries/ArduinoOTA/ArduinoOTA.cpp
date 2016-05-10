@@ -57,11 +57,11 @@ void ArduinoOTAClass::onEnd(THandlerFunction fn) {
     _end_callback = fn;
 }
 
-void ArduinoOTAClass::onProgress(THandlerFunction_progress fn) {
+void ArduinoOTAClass::onProgress(THandlerFunction_Progress fn) {
     _progress_callback = fn;
 }
 
-void ArduinoOTAClass::onError(THandlerFunction_error fn) {
+void ArduinoOTAClass::onError(THandlerFunction_Error fn) {
     _error_callback = fn;
 }
 
