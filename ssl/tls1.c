@@ -260,21 +260,23 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
  */
 EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 {
-    int ret = basic_read(ssl, in_data);
+    int ret = SSL_OK;
+    do {
+        ret= basic_read(ssl, in_data);
 
-    /* check for return code so we can send an alert */
-    if (ret < SSL_OK && ret != SSL_CLOSE_NOTIFY)
-    {
-        if (ret != SSL_ERROR_CONN_LOST)
+        /* check for return code so we can send an alert */
+        if (ret < SSL_OK && ret != SSL_CLOSE_NOTIFY)
         {
-            send_alert(ssl, ret);
-#ifndef CONFIG_SSL_SKELETON_MODE
-            /* something nasty happened, so get rid of this session */
-            kill_ssl_session(ssl->ssl_ctx->ssl_sessions, ssl);
-#endif
+            if (ret != SSL_ERROR_CONN_LOST)
+            {
+                send_alert(ssl, ret);
+    #ifndef CONFIG_SSL_SKELETON_MODE
+                /* something nasty happened, so get rid of this session */
+                kill_ssl_session(ssl->ssl_ctx->ssl_sessions, ssl);
+    #endif
+            }
         }
-    }
-
+    } while (IS_SET_SSL_FLAG(SSL_READ_BLOCKING) && (ssl->got_bytes < ssl->need_bytes) && ret == 0 && !IS_SET_SSL_FLAG(SSL_NEED_RECORD));
     return ret;
 }
 
@@ -558,6 +560,9 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
 
     /* a bit hacky but saves a few bytes of memory */
     ssl->flag |= ssl_ctx->options;
+    if (IS_SET_SSL_FLAG(SSL_CONNECT_IN_PARTS) && IS_SET_SSL_FLAG(SSL_READ_BLOCKING)) {
+        CLR_SSL_FLAG(SSL_READ_BLOCKING);
+    }
     SSL_CTX_LOCK(ssl_ctx->mutex);
 
     if (ssl_ctx->head == NULL)
@@ -1293,6 +1298,14 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         ssl->need_bytes = (buf[3] << 8) + buf[4];
 
         /* do we violate the spec with the message size?  */
+        if (ssl->need_bytes > RT_MAX_PLAIN_LENGTH+RT_EXTRA-BM_RECORD_OFFSET)
+        {
+            printf("ssl->need_bytes=%d violates spec\r\n", ssl->need_bytes, RT_MAX_PLAIN_LENGTH+RT_EXTRA-BM_RECORD_OFFSET);
+            ret = SSL_ERROR_INVALID_PROT_MSG;
+            goto error;
+        }
+
+        /* is the allocated buffer large enough to handle all the data? if not, increase its size*/
         if (ssl->need_bytes > ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET)
         {
             printf("ssl->need_bytes=%d > %d\r\n", ssl->need_bytes, ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET);

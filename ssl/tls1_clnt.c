@@ -124,6 +124,9 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
         case HS_FINISHED:
             ret = process_finished(ssl, buf, hs_len);
             disposable_free(ssl);
+            if (ssl->ssl_ctx->options & SSL_READ_BLOCKING) {
+                ssl->flag |= SSL_READ_BLOCKING;
+            }
             /* note: client renegotiation is not allowed after this */
             break;
 
