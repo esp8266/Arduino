@@ -33,10 +33,10 @@ class ArduinoOTAClass
     void setPort(uint16_t port);
     void setHostname(const char *hostname);
     void setPassword(const char *password);
-  	void onStart(THandlerFunction fn);
-  	void onEnd(THandlerFunction fn);
-  	void onError(THandlerFunction_Error fn);
-  	void onProgress(THandlerFunction_Progress fn);
+    void onStart(THandlerFunction fn);
+    void onEnd(THandlerFunction fn);
+    void onError(THandlerFunction_Error fn);
+    void onProgress(THandlerFunction_Progress fn);
     void begin();
     void handle();
 
@@ -55,9 +55,9 @@ class ArduinoOTAClass
     String _md5;
 
     THandlerFunction _start_callback;
-	  THandlerFunction _end_callback;
-	  THandlerFunction_Error _error_callback;
-	  THandlerFunction_Progress _progress_callback;
+    THandlerFunction _end_callback;
+    THandlerFunction_Error _error_callback;
+    THandlerFunction_Progress _progress_callback;
 
     void _runUpdate(void);
     void _onRx(void);
