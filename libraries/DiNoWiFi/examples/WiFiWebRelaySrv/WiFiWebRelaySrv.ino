@@ -26,10 +26,6 @@ ESP8266WebServer _server(HTTP_PORT);
 const char GREEN[] = "#90EE90"; // LightGreen
 const char RED[] = "#FF4500"; // OrangeRed 
 
-// Function prototypes.
-String BuildPage();
-void HandleRootPage();
-
 /**
  * @brief Execute first after start device. Initialize hardware.
  *
@@ -118,6 +114,11 @@ void HandleRootPage()
 	//KMPDinoWiFiESP.LedOff();
 }
 
+/**
+ * @brief Build HTML page.
+ *
+ * @return void
+ */
 String BuildPage()
 {
 	String page =

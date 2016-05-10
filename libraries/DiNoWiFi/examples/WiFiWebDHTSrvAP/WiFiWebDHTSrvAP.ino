@@ -5,8 +5,8 @@
 // Supported boards:
 //		KMP ProDino WiFi-ESP with ESP8266 V1.1 (http://www.kmpelectronics.eu/en-us/products/prodinowifi-esp.aspx)
 // Description:
-//		Web server DHT example.
-// Example link: http://www.kmpelectronics.eu/en-us/examples/prodinowifi-esp/wifiwebdhtserver.aspx
+//		Web server AP DHT example.
+// Example link: http://www.kmpelectronics.eu/en-us/examples/prodinowifi-esp/wifiwebdhtserverap.aspx
 // Version: 1.0.0
 // Date: 05.05.2016
 // Author: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu>
@@ -153,10 +153,10 @@ void HandleRootPage()
 String BuildPage()
 {
 	String page =
-		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(PRODINO_WIFI) + " - Web Relay</title></head>"
+		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(PRODINO_WIFI) + " - Web DHT AP</title></head>"
 		+ "<body><div style='text-align: center'>"
 		+ "<br><hr />"
-		+ "<h1 style = 'color: #0066FF;'>" + String(PRODINO_WIFI) + " - Web DHT example</h1>"
+		+ "<h1 style = 'color: #0066FF;'>" + String(PRODINO_WIFI) + " - Web DHT AP example</h1>"
 		+ "<hr /><br><br>"
 		+ "<table border='1' width='450' cellpadding='5' cellspacing='0' align='center' style='text-align:center; font-size:large; font-family:Arial,Helvetica,sans-serif;'>"
 		+ "<thead><tr><th style='width:30%'></th><th style='width:35%'>Temperature C&deg;</th><th>Humidity</th></tr></thead>";

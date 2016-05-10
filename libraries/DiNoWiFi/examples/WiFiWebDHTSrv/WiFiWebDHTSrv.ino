@@ -151,7 +151,7 @@ void HandleRootPage()
 String BuildPage()
 {
 	String page =
-		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(PRODINO_WIFI) + " - Web Relay</title></head>"
+		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(PRODINO_WIFI) + " - Web DHT</title></head>"
 		+ "<body><div style='text-align: center'>"
 		+ "<br><hr />"
 		+ "<h1 style = 'color: #0066FF;'>" + String(PRODINO_WIFI) + " - Web DHT example</h1>"

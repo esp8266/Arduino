@@ -6,18 +6,18 @@
 //		KMP ProDino WiFi-ESP with ESP8266 V1.1 (http://www.kmpelectronics.eu/en-us/products/prodinowifi-esp.aspx)
 // Description:
 //		Web server 1 Wire measure temperature with DS18B20 example.
-// Example link: http://www.kmpelectronics.eu/en-us/examples/prodinowifi-esp/wifiwebdhtserver.aspx
+// Example link: http://www.kmpelectronics.eu/en-us/examples/prodinowifi-esp/wifiweb1wiresrv.aspx
 // Version: 1.0.0
 // Date: 05.05.2016
 // Author: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu>
 
 // --------------------------------------------------------------------------------
 // Prerequisites:
-//		Before start this example you need to install folowing libraries:
+//		Before start this example you need to install following libraries:
 //			- One wire: https://github.com/PaulStoffregen/OneWire
 //			- DallasTemperature library: https://github.com/milesburton/Arduino-Temperature-Control-Library
 //		Connect DS18B20 sensor(s) to GROVE connector. Use pins: 
-//			- GROVE_PIN1, Vcc+, Gnd(-);
+//			- GROVE_PIN1, VCC+, GND(-);
 
 #include <KMPDinoWiFiESP.h>
 #include <KMPCommon.h>
@@ -54,18 +54,13 @@ OneWire _oneWire(SENSORS_PIN);
 // Pass our oneWire reference to Dallas Temperature. 
 DallasTemperature _sensors(&_oneWire);
 
-// Number of one wire temperature devices found.
-int _oneWireDeviceCount;
-
 // Temp device address.
 DeviceAddress _tempDeviceAddress;
 
 // Check sensor data, interval in milliseconds.
-const long CHECK_HT_INTERVAL_MS = 5000;
+const long CHECK_DEVICE_INTERVAL_MS = 30000;
 // Store last measure time.
-unsigned long _mesureTimeout;				
-// Get device count after N time measure.
-const uint8_t GET_DEVICE_COUNT_AFTER = 10;
+unsigned long _checkDeviceTimeout;				
 
 uint8_t _getDeviceCount;
 
@@ -113,19 +108,10 @@ void setup(void)
 
 	Serial.println("HTTP server started");
 
-	_mesureTimeout = 0;
-
-	// Force get device.
-	_getDeviceCount = GET_DEVICE_COUNT_AFTER;
-
-	// Start the One Wire library.
-	_sensors.begin();
-
-	// Set precision.
-	_sensors.setResolution(10/*TEMPERATURE_PRECISION*/);
+	_checkDeviceTimeout = 0;
 
 	// Select available connected to board One Wire devices.
-	GethOneWireDevices();
+	GetOneWireDevices();
 }
 
 /**
@@ -136,7 +122,7 @@ void setup(void)
 void loop(void)
 {
 	_server.handleClient();
-	GetDataFromSensors();
+	CheckDevices();
 }
 
 /**
@@ -161,7 +147,7 @@ void HandleRootPage()
 String BuildPage()
 {
 	String page =
-		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(PRODINO_WIFI) + " - Web Relay</title></head>"
+		"<html><head><title>" + String(KMP_ELECTRONICS_LTD) + " " + String(PRODINO_WIFI) + " - Web 1Wire</title></head>"
 		+ "<body><div style='text-align: center'>"
 		+ "<br><hr />"
 		+ "<h1 style = 'color: #0066FF;'>" + String(PRODINO_WIFI) + " - Web 1Wire example</h1>"
@@ -171,7 +157,7 @@ String BuildPage()
 
 	// Add table rows.
 	String tableBody = "<tbody>";
-	for (int i = 0; i < _oneWireDeviceCount; i++)
+	for (int i = 0; i < _sensors.getDeviceCount(); i++)
 	{
 		// Default color.
 		const char* cellColor = GRAY;
@@ -183,15 +169,6 @@ String BuildPage()
 		{
 			// Get temperature in Celsius.
 			temp = _sensors.getTempC(_tempDeviceAddress);
-
-#ifdef DEBUG
-			Serial.print("Device ");
-			Serial.print(i);
-			Serial.print(" with address: ");
-			PrintAddress(_tempDeviceAddress);
-			Serial.print("Temperature in C: ");
-			Serial.println(temp);
-#endif
 
 			// Select cell background.
 			if (0.0 >= temp)
@@ -237,10 +214,10 @@ String BuildPage()
 * @brief Add cell in table, include temperature data.
 *
 * @param sensorAvaible Sensor available. If true - available, else not available.
-* @param temperature Temperature.
+* @param temperature To add.
 * @param cellColor Cell background color in text.
 *
-* \return String formated cell.
+* @return String formated cell.
 */
 String AddTemperatureCell(bool sensorAvaible, double temperature, const char* cellColor)
 {
@@ -265,71 +242,27 @@ String AddTemperatureCell(bool sensorAvaible, double temperature, const char* ce
  *
  * @return void
  */
-void GetDataFromSensors()
+void CheckDevices()
 {
-	if (millis() > _mesureTimeout)
+	if (millis() > _checkDeviceTimeout)
 	{
-		_getDeviceCount++;
-		
-		if (_getDeviceCount > GET_DEVICE_COUNT_AFTER)
-		{
-			GethOneWireDevices();
-			
-			_getDeviceCount = 0;
-		}
+		GetOneWireDevices();
 
 		// Set next time to read data.
-		_mesureTimeout = millis() + CHECK_HT_INTERVAL_MS;
+		_checkDeviceTimeout = millis() + CHECK_DEVICE_INTERVAL_MS;
 	}
 }
 
 /**
  * @brief Get all available One Wire devices.
  *
- *
  * @return void
  */
-void GethOneWireDevices()
+void GetOneWireDevices()
 {
-	// Grab a count of devices on the wire.
-	_oneWireDeviceCount = _sensors.getDeviceCount();
+	// Start the One Wire library. Get one wire devices.
+	_sensors.begin();
 
-#ifdef DEBUG
-	Serial.print("Number of One Wire devices: ");
-	Serial.println(_oneWireDeviceCount);
-
-	// Loop through each device, print out address
-	for (int i = 0; i < _oneWireDeviceCount; i++)
-	{
-		// Search the wire for address
-		if (_sensors.getAddress(_tempDeviceAddress, i))
-		{
-			Serial.print("Device ");
-			Serial.print(i);
-			Serial.print(" with address: ");
-			PrintAddress(_tempDeviceAddress);
-		}
-		else
-		{
-			Serial.print("Found ghost device at ");
-			Serial.print(i);
-			Serial.print(" but could not detect address. Check power and cabling");
-		}
-	}
-#endif
+	// Set precision.
+	_sensors.setResolution(TEMPERATURE_PRECISION);
 }
-
-#ifdef DEBUG
-/**
- * @brief Print device address to Serial.
- *
- * @param deviceAddress Device address.
- *
- * @return void
- */
-void PrintAddress(DeviceAddress deviceAddress)
-{
-	BytesToHexStr(deviceAddress, 8, _buffer);
-	Serial.println(_buffer);
-}
-#endif
