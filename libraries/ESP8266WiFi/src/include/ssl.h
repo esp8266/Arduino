@@ -85,6 +85,7 @@ typedef struct SSL_ SSL;
 #define SSL_DISPLAY_CERTS                       0x00200000
 #define SSL_DISPLAY_RSA                         0x00400000
 #define SSL_CONNECT_IN_PARTS                    0x00800000
+#define SSL_READ_BLOCKING                       0x01000000
 
 /* errors that can be generated */
 #define SSL_OK                                  0
