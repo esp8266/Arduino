@@ -1,3 +1,5 @@
+#ifndef RFC1305_H
+#define RFC1305_H
 /*
  * see https://www.eecis.udel.edu/~mills/database/rfc/rfc1305/rfc1305c.pdf
  * https://tools.ietf.org/html/rfc1305
@@ -44,4 +46,5 @@ struct sRFC1305 {
 
 #define ENDIAN_SWAP_32(l) ((l>>24) |((l>>16)<<8)&0xff00 | ((l>>8)<<16)&0xff0000 | (l << 24)) 
 #define ENDIAN_SWAP_16(l) ((l>>8) | (l << 8)) 
+#endif
 
