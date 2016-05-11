@@ -5,6 +5,40 @@ title: Change Log
 ## Current version
 
 ### Core
+- Fix NMI interrupt handler alignment
+- Update SDK to 1.5.3
+- umm_malloc: print block start address before heap corruption callback is triggered
+- If GDBStub library is used, break into gdb on assert and panic
+
+### Libraries
+
+- SNI support in WiFiClientSecure (#1285)
+- Update axTLS to 139914f
+- HTTPClient: return error when HTTPClient::begin is called with HTTPS URL without certificate fingerprint (#1941)
+- HTTPClient: fix default port not being set
+- HTTPClient: fix handling of chunked transfer encoding (#1975)
+- ESP8266SSDP: switch SSDP send arguments around
+- ESP8266WiFi: fix UdpContext::peek to return int (#1946)
+- ESP8266WiFi: fix WiFiSleepType_t values to match SDK ones
+- LwIP: use gcc-built LwIP by default (#1926)
+- LwIP: fix crash in igmp_start_timer (#1826)
+- HTTPClient: include non-standard ports in Host: header
+- ESP8266WiFi: Prevent WiFi config corruption (#1997 #1856 #1699 #1675)
+- GDBStub: fix section attribute for core gdbstub functions
+
+### Tools
+
+- Python 3 compatibility for get.py
+- Device side test library and test runner
+- Fix ARM toolchain files permissions (#2004)
+
+
+## 2.2.0
+April 18, 2016
+
+Package link: `http://arduino.esp8266.com/versions/2.2.0/package_esp8266com_index.json`.
+
+### Core
 - Leverage realloc() in String::changeBuffer()
 - Clean up core files
 - Add host side tests
@@ -25,7 +59,6 @@ title: Change Log
 - Don't set RF mode on boot unless it was overridden
 - Change build.board property for boards which renumber pins like NodeMCU (#1878)
 - Fix Exception 2 when using printf or vprintf
-- Add ARM tools (#269)
 
 ### Libraries
 - Update axTLS to 5b4be7d
@@ -55,6 +88,7 @@ title: Change Log
 
 
 ### Tools
+- Add ARM tools (#269)
 
 ---
 ## 2.1.0
