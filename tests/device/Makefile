@@ -71,7 +71,8 @@ ifneq ("$(NO_RUN)","1")
 			$(RUNNER_DEBUG_FLAG) \
 			-p $(UPLOAD_PORT) \
 			-n $(basename $(notdir $@)) \
-			-o $(LOCAL_BUILD_DIR)/test_result.xml
+			-o $(LOCAL_BUILD_DIR)/test_result.xml \
+			`test -f $(addsuffix .py, $(basename $@)) && echo "-m $(addsuffix .py, $(basename $@))" || echo ""`
 endif
 
 $(BUILD_DIR):

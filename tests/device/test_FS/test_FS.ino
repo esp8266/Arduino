@@ -90,7 +90,7 @@ TEST_CASE("files can be renamed", "[fs]")
     }
 }
 
-TEST_CASE("FS::info works")
+TEST_CASE("FS::info works","[fs]")
 {
     REQUIRE(SPIFFS.begin());
     FSInfo info;

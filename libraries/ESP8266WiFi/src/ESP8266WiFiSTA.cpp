@@ -140,6 +140,11 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     ETS_UART_INTR_DISABLE();
 
     if(WiFi._persistent) {
+        // workaround for #1997: make sure the value of ap_number is updated and written to flash
+        // to be removed after SDK update
+        wifi_station_ap_number_set(2);
+        wifi_station_ap_number_set(1);
+
         wifi_station_set_config(&conf);
     } else {
         wifi_station_set_config_current(&conf);
