@@ -117,7 +117,6 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 static int process_client_hello(SSL *ssl)
 {
     uint8_t *buf = ssl->bm_data;
-    uint8_t *record_buf = ssl->hmac_header;
     int pkt_size = ssl->bm_index;
     int i, j, cs_len, id_len, offset = 6 + SSL_RANDOM_SIZE;
     int ret = SSL_OK;
@@ -199,13 +198,13 @@ int process_sslv23_client_hello(SSL *ssl)
 
     DISPLAY_BYTES(ssl, "received %d bytes", buf, read_len, read_len);
     
-    add_packet(ssl, buf, read_len);
-
     /* connection has gone, so die */
-    if (bytes_needed < 0)
+    if (read_len < 0)
     {
         return SSL_ERROR_CONN_LOST;
     }
+
+    add_packet(ssl, buf, read_len);
 
     /* now work out what cipher suite we are going to use */
     for (j = 0; j < NUM_PROTOCOLS; j++)
@@ -311,7 +310,9 @@ static int send_server_hello(SSL *ssl)
     buf[5] = ssl->version & 0x0f;
 
     /* server random value */
-    get_random(SSL_RANDOM_SIZE, &buf[6]);
+    if (get_random(SSL_RANDOM_SIZE, &buf[6]) < 0)
+        return SSL_NOT_OK;
+
     memcpy(ssl->dc->server_random, &buf[6], SSL_RANDOM_SIZE);
     offset = 6 + SSL_RANDOM_SIZE;
 
@@ -392,7 +393,8 @@ static int process_client_key_xchg(SSL *ssl)
 
     /* rsa_ctx->bi_ctx is not thread-safe */
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    premaster_size = RSA_decrypt(rsa_ctx, &buf[offset], premaster_secret, 1);
+    premaster_size = RSA_decrypt(rsa_ctx, &buf[offset], premaster_secret,
+            sizeof(premaster_secret), 1);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (premaster_size != SSL_SECRET_SIZE || 
@@ -401,7 +403,9 @@ static int process_client_key_xchg(SSL *ssl)
                 premaster_secret[1] != (ssl->client_version & 0x0f))
     {
         /* guard against a Bleichenbacher attack */
-        get_random(SSL_SECRET_SIZE, premaster_secret);
+        if (get_random(SSL_SECRET_SIZE, premaster_secret) < 0)
+            return SSL_NOT_OK;
+
         /* and continue - will die eventually when checking the mac */
     }
 
@@ -454,7 +458,7 @@ static int process_cert_verify(SSL *ssl)
 
     /* rsa_ctx->bi_ctx is not thread-safe */
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[6], dgst_buf, 0);
+    n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[6], dgst_buf, sizeof(dgst_buf), 0);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (n != SHA1_SIZE + MD5_SIZE)

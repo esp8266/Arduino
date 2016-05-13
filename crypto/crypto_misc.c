@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2007, Cameron Rich
- *
+ * Copyright (c) 2007-2015, Cameron Rich
+ * 
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -162,11 +162,12 @@ EXP_FUNC void STDCALL RNG_terminate(void)
 /**
  * Set a series of bytes with a random number. Individual bytes can be 0
  */
-EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
-{
+EXP_FUNC int STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
+{   
 #if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
-    /* use the Linux default */
-    read(rng_fd, rand_data, num_rand_bytes);    /* read from /dev/urandom */
+    /* use the Linux default - read from /dev/urandom */
+    if (read(rng_fd, rand_data, num_rand_bytes) < 0) 
+        return -1;
 #elif defined(WIN32) && defined(CONFIG_WIN32_USE_CRYPTO_LIB)
     /* use Microsoft Crypto Libraries */
     CryptGenRandom(gCryptProv, num_rand_bytes, rand_data);
@@ -211,15 +212,17 @@ EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
     /* insert the digest at the start of the entropy pool */
     memcpy(entropy_pool, digest, MD5_SIZE);
 #endif
+    return 0;
 }
 
 /**
  * Set a series of bytes with a random number. Individual bytes are not zero.
  */
-void get_random_NZ(int num_rand_bytes, uint8_t *rand_data)
+int get_random_NZ(int num_rand_bytes, uint8_t *rand_data)
 {
     int i;
-    get_random(num_rand_bytes, rand_data);
+    if (get_random(num_rand_bytes, rand_data))
+        return -1;
 
     for (i = 0; i < num_rand_bytes; i++)
     {
@@ -227,6 +230,8 @@ void get_random_NZ(int num_rand_bytes, uint8_t *rand_data)
             get_random(1, rand_data + i);
         }
     }
+
+    return 0;
 }
 
 /**
