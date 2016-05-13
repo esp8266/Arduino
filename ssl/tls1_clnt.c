@@ -48,7 +48,7 @@ static int send_cert_verify(SSL *ssl);
  * Establish a new SSL connection to an SSL server.
  */
 EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
-        uint8_t *session_id, uint8_t sess_id_size)
+        uint8_t *session_id, uint8_t sess_id_size, const char* host_name)
 {
     SSL *ssl = ssl_new(ssl_ctx, client_fd);
     ssl->version = SSL_PROTOCOL_VERSION_MAX; /* try top version first */
@@ -64,6 +64,10 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
         memcpy(ssl->session_id, session_id, sess_id_size);
         ssl->sess_id_size = sess_id_size;
         SET_SSL_FLAG(SSL_SESSION_RESUME);   /* just flag for later */
+    }
+
+    if(host_name != NULL && strlen(host_name) > 0) {
+        ssl->host_name = (char *)strdup(host_name);
     }
 
     SET_SSL_FLAG(SSL_IS_CLIENT);
@@ -119,7 +123,10 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 
         case HS_FINISHED:
             ret = process_finished(ssl, buf, hs_len);
-            disposable_free(ssl);   /* free up some memory */
+            disposable_free(ssl);
+            if (ssl->ssl_ctx->options & SSL_READ_BLOCKING) {
+                ssl->flag |= SSL_READ_BLOCKING;
+            }
             /* note: client renegotiation is not allowed after this */
             break;
 
@@ -217,6 +224,26 @@ static int send_client_hello(SSL *ssl)
 
     buf[offset++] = 1;              /* no compression */
     buf[offset++] = 0;
+
+    if (ssl->host_name != NULL) {
+        unsigned int host_len = strlen(ssl->host_name);
+
+        buf[offset++] = 0;
+        buf[offset++] = host_len+9;     /* extensions length */
+
+        buf[offset++] = 0;
+        buf[offset++] = 0;              /* server_name(0) (65535) */
+        buf[offset++] = 0;
+        buf[offset++] = host_len+5;     /* server_name length */
+        buf[offset++] = 0;
+        buf[offset++] = host_len+3;     /* server_list length */
+        buf[offset++] = 0;              /* host_name(0) (255) */
+        buf[offset++] = 0;
+        buf[offset++] = host_len;       /* host_name length */
+        strncpy((char*) &buf[offset], ssl->host_name, host_len);
+        offset += host_len;
+    }
+
     buf[3] = offset - 4;            /* handshake size */
 
     return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, offset);

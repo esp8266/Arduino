@@ -82,7 +82,7 @@ extern "C" {
 #ifdef CONFIG_SSL_SKELETON_MODE
 #define NUM_PROTOCOLS               1
 #else
-#define NUM_PROTOCOLS               4
+#define NUM_PROTOCOLS               2
 #endif
 
 #define PARANOIA_CHECK(A, B)        if (A < B) { \
@@ -175,10 +175,11 @@ struct _SSL
     const cipher_info_t *cipher_info;
     void *encrypt_ctx;
     void *decrypt_ctx;
-    uint8_t bm_all_data[RT_MAX_PLAIN_LENGTH+RT_EXTRA];
+    uint8_t *bm_all_data;
     uint8_t *bm_data;
     uint16_t bm_index;
     uint16_t bm_read_index;
+    size_t max_plain_length;
     struct _SSL *next;                  /* doubly linked list */
     struct _SSL *prev;
     struct _SSL_CTX *ssl_ctx;           /* back reference to a clnt/svr ctx */
@@ -188,14 +189,15 @@ struct _SSL
 #endif
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     X509_CTX *x509_ctx;
+    bool can_free_certificates;
 #endif
-
     uint8_t session_id[SSL_SESSION_ID_SIZE]; 
     uint8_t client_mac[SHA1_SIZE];  /* for HMAC verification */
     uint8_t server_mac[SHA1_SIZE];  /* for HMAC verification */
     uint8_t read_sequence[8];       /* 64 bit sequence number */
     uint8_t write_sequence[8];      /* 64 bit sequence number */
     uint8_t hmac_header[SSL_RECORD_SIZE];    /* rx hmac */
+    char *host_name; /* Needed for the SNI support */
 };
 
 typedef struct _SSL SSL;

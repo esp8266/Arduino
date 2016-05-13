@@ -83,6 +83,7 @@ extern "C" {
 #define SSL_DISPLAY_CERTS                       0x00200000
 #define SSL_DISPLAY_RSA                         0x00400000
 #define SSL_CONNECT_IN_PARTS                    0x00800000
+#define SSL_READ_BLOCKING                       0x01000000
 
 /* errors that can be generated */
 #define SSL_OK                                  0
@@ -241,10 +242,11 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
  * can be null if no session resumption is being used or required. This option
  * is not used in skeleton mode.
  * @param sess_id_size The size of the session id (max 32)
+ * @param host_name If non-zero, host name to be sent to server for SNI support
  * @return An SSL object reference. Use ssl_handshake_status() to check 
  * if a handshake succeeded.
  */
-EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id, uint8_t sess_id_size);
+EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id, uint8_t sess_id_size, const char* host_name);
 
 /**
  * @brief Free any used resources on this connection. 
@@ -370,6 +372,15 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code);
  * @return SSL_OK if the certificate is verified.
  */
 EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl);
+
+/**
+ * @brief Check if certificate fingerprint (SHA1) matches the one given.
+ *
+ * @param ssl [in] An SSL object reference.
+ * @param fp [in] SHA1 fingerprint to match against
+ * @return SSL_OK if the certificate is verified.
+ */
+EXP_FUNC int STDCALL ssl_match_fingerprint(const SSL *ssl, const uint8_t* fp);
 
 /**
  * @brief Retrieve an X.509 distinguished name component.

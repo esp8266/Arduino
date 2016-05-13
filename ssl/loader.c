@@ -434,11 +434,11 @@ int load_key_certs(SSL_CTX *ssl_ctx)
     else if (!(options & SSL_NO_DEFAULT_KEY))
     {
 #if defined(CONFIG_SSL_USE_DEFAULT_KEY) || defined(CONFIG_SSL_SKELETON_MODE)
-        static const    /* saves a few more bytes */
-#include "private_key.h"
-
-        ssl_obj_memory_load(ssl_ctx, SSL_OBJ_RSA_KEY, default_private_key,
-                default_private_key_len, NULL); 
+        extern const unsigned char* default_private_key;
+        extern const unsigned int default_private_key_len;
+        if (default_private_key != NULL && default_private_key_len > 0)
+            ssl_obj_memory_load(ssl_ctx, SSL_OBJ_RSA_KEY, default_private_key,
+                default_private_key_len, NULL);
 #endif
     }
 
@@ -462,9 +462,10 @@ int load_key_certs(SSL_CTX *ssl_ctx)
     else if (!(options & SSL_NO_DEFAULT_KEY))
     {
 #if defined(CONFIG_SSL_USE_DEFAULT_KEY) || defined(CONFIG_SSL_SKELETON_MODE)
-        static const    /* saves a few bytes and RAM */
-#include "cert.h"
-        ssl_obj_memory_load(ssl_ctx, SSL_OBJ_X509_CERT, 
+        extern const unsigned char* default_certificate;
+        extern const unsigned int default_certificate_len;
+        if (default_certificate != NULL && default_certificate_len > 0)
+            ssl_obj_memory_load(ssl_ctx, SSL_OBJ_X509_CERT,
                     default_certificate, default_certificate_len, NULL);
 #endif
     }

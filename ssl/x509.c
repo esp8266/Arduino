@@ -119,6 +119,12 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
 
     bi_ctx = x509_ctx->rsa_ctx->bi_ctx;
 
+    x509_ctx->fingerprint = malloc(SHA1_SIZE);
+    SHA1_CTX sha_fp_ctx;
+    SHA1_Init(&sha_fp_ctx);
+    SHA1_Update(&sha_fp_ctx, &cert[0], cert_size);
+    SHA1_Final(x509_ctx->fingerprint, &sha_fp_ctx);
+
 #ifdef CONFIG_SSL_CERT_VERIFICATION /* only care if doing verification */
     /* use the appropriate signature algorithm (SHA1/MD5/MD2) */
     if (x509_ctx->sig_type == SIG_TYPE_MD5)
@@ -245,6 +251,11 @@ void x509_free(X509_CTX *x509_ctx)
         bi_free(x509_ctx->rsa_ctx->bi_ctx, x509_ctx->digest);
     }
 
+    if (x509_ctx->fingerprint)
+    {
+        free(x509_ctx->fingerprint);
+    }
+
     if (x509_ctx->subject_alt_dnsnames)
     {
         for (i = 0; x509_ctx->subject_alt_dnsnames[i]; ++i)
@@ -270,7 +281,7 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
     int i, size;
     bigint *decrypted_bi, *dat_bi;
     bigint *bir = NULL;
-    uint8_t *block = (uint8_t *)alloca(sig_len);
+    uint8_t *block = (uint8_t *)malloc(sig_len);
 
     /* decrypt */
     dat_bi = bi_import(ctx, sig, sig_len);
@@ -297,7 +308,7 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
             bir = bi_import(ctx, sig_ptr, len);
         }
     }
-
+    free(block);
     /* save a few bytes of memory */
     bi_clear_cache(ctx);
     return bir;

@@ -50,26 +50,28 @@ static const char * client_finished = "client finished";
 static int do_handshake(SSL *ssl, uint8_t *buf, int read_len);
 static int set_key_block(SSL *ssl, int is_write);
 static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len);
-static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt);
+static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt, void* cached);
 static int send_raw_packet(SSL *ssl, uint8_t protocol);
+static void certificate_free(SSL* ssl);
+static int increase_bm_data_size(SSL *ssl, size_t size);
 
 /**
  * The server will pick the cipher based on the order that the order that the
  * ciphers are listed. This order is defined at compile time.
  */
 #ifdef CONFIG_SSL_SKELETON_MODE
-const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
+const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] =
 { SSL_RC4_128_SHA };
 #else
 static void session_free(SSL_SESSION *ssl_sessions[], int sess_index);
 
-const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
+const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] =
 #ifdef CONFIG_SSL_PROT_LOW                  /* low security, fast speed */
-{ SSL_RC4_128_SHA, SSL_AES128_SHA, SSL_AES256_SHA, SSL_RC4_128_MD5 };
+{ SSL_AES128_SHA, SSL_AES256_SHA};
 #elif CONFIG_SSL_PROT_MEDIUM                /* medium security, medium speed */
-{ SSL_AES128_SHA, SSL_AES256_SHA, SSL_RC4_128_SHA, SSL_RC4_128_MD5 };    
+{ SSL_AES128_SHA, SSL_AES256_SHA};
 #else /* CONFIG_SSL_PROT_HIGH */            /* high security, low speed */
-{ SSL_AES256_SHA, SSL_AES128_SHA, SSL_RC4_128_SHA, SSL_RC4_128_MD5 };
+{ SSL_AES256_SHA, SSL_AES128_SHA};
 #endif
 #endif /* CONFIG_SSL_SKELETON_MODE */
 
@@ -108,40 +110,14 @@ static const cipher_info_t cipher_info[NUM_PROTOCOLS] =
     {   /* AES256-SHA */
         SSL_AES256_SHA,                 /* AES256-SHA */
         32,                             /* key size */
-        16,                             /* iv size */ 
+        16,                             /* iv size */
         2*(SHA1_SIZE+32+16),            /* key block size */
         16,                             /* block padding size */
         SHA1_SIZE,                      /* digest size */
         hmac_sha1,                      /* hmac algorithm */
         (crypt_func)AES_cbc_encrypt,    /* encrypt */
         (crypt_func)AES_cbc_decrypt     /* decrypt */
-    },       
-    {   /* RC4-SHA */
-        SSL_RC4_128_SHA,                /* RC4-SHA */
-        16,                             /* key size */
-        0,                              /* iv size */ 
-        2*(SHA1_SIZE+16),               /* key block size */
-        0,                              /* no padding */
-        SHA1_SIZE,                      /* digest size */
-        hmac_sha1,                      /* hmac algorithm */
-        (crypt_func)RC4_crypt,          /* encrypt */
-        (crypt_func)RC4_crypt           /* decrypt */
-    },
-    /*
-     * This protocol is from SSLv2 days and is unlikely to be used - but was
-     * useful for testing different possible digest algorithms.
-     */
-    {   /* RC4-MD5 */
-        SSL_RC4_128_MD5,                /* RC4-MD5 */
-        16,                             /* key size */
-        0,                              /* iv size */ 
-        2*(MD5_SIZE+16),                /* key block size */
-        0,                              /* no padding */
-        MD5_SIZE,                       /* digest size */
-        hmac_md5,                       /* hmac algorithm */
-        (crypt_func)RC4_crypt,          /* encrypt */
-        (crypt_func)RC4_crypt           /* decrypt */
-    },
+    }
 };
 #endif
 
@@ -273,10 +249,9 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
     free(ssl->encrypt_ctx);
     free(ssl->decrypt_ctx);
     disposable_free(ssl);
-#ifdef CONFIG_SSL_CERT_VERIFICATION
-    x509_free(ssl->x509_ctx);
-#endif
-
+    certificate_free(ssl);
+    free(ssl->bm_all_data);
+    free(ssl->host_name);
     free(ssl);
 }
 
@@ -285,21 +260,23 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
  */
 EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 {
-    int ret = basic_read(ssl, in_data);
+    int ret = SSL_OK;
+    do {
+        ret= basic_read(ssl, in_data);
 
-    /* check for return code so we can send an alert */
-    if (ret < SSL_OK && ret != SSL_CLOSE_NOTIFY)
-    {
-        if (ret != SSL_ERROR_CONN_LOST)
+        /* check for return code so we can send an alert */
+        if (ret < SSL_OK && ret != SSL_CLOSE_NOTIFY)
         {
-            send_alert(ssl, ret);
-#ifndef CONFIG_SSL_SKELETON_MODE
-            /* something nasty happened, so get rid of this session */
-            kill_ssl_session(ssl->ssl_ctx->ssl_sessions, ssl);
-#endif
+            if (ret != SSL_ERROR_CONN_LOST)
+            {
+                send_alert(ssl, ret);
+    #ifndef CONFIG_SSL_SKELETON_MODE
+                /* something nasty happened, so get rid of this session */
+                kill_ssl_session(ssl->ssl_ctx->ssl_sessions, ssl);
+    #endif
+            }
         }
-    }
-
+    } while (IS_SET_SSL_FLAG(SSL_READ_BLOCKING) && (ssl->got_bytes < ssl->need_bytes) && ret == 0 && !IS_SET_SSL_FLAG(SSL_NEED_RECORD));
     return ret;
 }
 
@@ -309,14 +286,18 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
 {
     int n = out_len, nw, i, tot = 0;
-
     /* maximum size of a TLS packet is around 16kB, so fragment */
+
+    if (ssl->can_free_certificates) {
+        certificate_free(ssl);
+    }
+
     do 
     {
         nw = n;
 
-        if (nw > RT_MAX_PLAIN_LENGTH)    /* fragment if necessary */
-            nw = RT_MAX_PLAIN_LENGTH;
+        if (nw > ssl->max_plain_length)    /* fragment if necessary */
+            nw = ssl->max_plain_length;
 
         if ((i = send_packet(ssl, PT_APP_PROTOCOL_DATA, 
                                             &out_data[tot], nw)) <= 0)
@@ -564,18 +545,24 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
 {
     SSL *ssl = (SSL *)calloc(1, sizeof(SSL));
     ssl->ssl_ctx = ssl_ctx;
+    ssl->max_plain_length = 1460*4;
+    ssl->bm_all_data = (uint8_t*) calloc(1, ssl->max_plain_length + RT_EXTRA);
     ssl->need_bytes = SSL_RECORD_SIZE;      /* need a record */
     ssl->client_fd = client_fd;
     ssl->flag = SSL_NEED_RECORD;
-    ssl->bm_data = ssl->bm_all_data+BM_RECORD_OFFSET; /* space at the start */
+    ssl->bm_data = ssl->bm_all_data + BM_RECORD_OFFSET; /* space at the start */
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
 #ifdef CONFIG_ENABLE_VERIFICATION
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
+    ssl->can_free_certificates = false;
 #endif
     disposable_new(ssl);
 
     /* a bit hacky but saves a few bytes of memory */
     ssl->flag |= ssl_ctx->options;
+    if (IS_SET_SSL_FLAG(SSL_CONNECT_IN_PARTS) && IS_SET_SSL_FLAG(SSL_READ_BLOCKING)) {
+        CLR_SSL_FLAG(SSL_READ_BLOCKING);
+    }
     SSL_CTX_LOCK(ssl_ctx->mutex);
 
     if (ssl_ctx->head == NULL)
@@ -589,6 +576,11 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
         ssl_ctx->tail->next = ssl;
         ssl_ctx->tail = ssl;
     }
+
+    ssl->encrypt_ctx = malloc(sizeof(AES_CTX));
+    ssl->decrypt_ctx = malloc(sizeof(AES_CTX));
+
+    ssl->host_name = NULL;
 
     SSL_CTX_UNLOCK(ssl_ctx->mutex);
     return ssl;
@@ -646,19 +638,36 @@ static void increment_write_sequence(SSL *ssl)
 static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
-    int hmac_len = buf_len + 8 + SSL_RECORD_SIZE;
-    uint8_t *t_buf = (uint8_t *)alloca(hmac_len+10);
+    const size_t prefix_size = 8 + SSL_RECORD_SIZE;
+    bool hmac_inplace = (uint32_t)buf - (uint32_t)ssl->bm_data >= prefix_size;
+    uint8_t tmp[prefix_size];
+    int hmac_len = buf_len + prefix_size;
+    uint8_t *t_buf;
+    if (hmac_inplace) {
+        t_buf = ((uint8_t*)buf) - prefix_size;
+        memcpy(tmp, t_buf, prefix_size);
+    } else {
+        t_buf = (uint8_t *)malloc(hmac_len+10);
+    }
 
-    memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ? 
+    memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ?
                     ssl->write_sequence : ssl->read_sequence, 8);
     memcpy(&t_buf[8], hmac_header, SSL_RECORD_SIZE);
-    memcpy(&t_buf[8+SSL_RECORD_SIZE], buf, buf_len);
+    if (!hmac_inplace) {
+        memcpy(&t_buf[8+SSL_RECORD_SIZE], buf, buf_len);
+    }
 
-    ssl->cipher_info->hmac(t_buf, hmac_len, 
-            (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_READ) ? 
-                ssl->server_mac : ssl->client_mac, 
+    ssl->cipher_info->hmac(t_buf, hmac_len,
+            (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_READ) ?
+                ssl->server_mac : ssl->client_mac,
             ssl->cipher_info->digest_size, hmac_buf);
 
+    if (hmac_inplace) {
+        memcpy(t_buf, tmp, prefix_size);
+    }
+    else {
+        free(t_buf);
+    }
 #if 0
     print_blob("record", hmac_header, SSL_RECORD_SIZE);
     print_blob("buf", buf, buf_len);
@@ -899,14 +908,18 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 /**
  * Retrieve (and initialise) the context of a cipher.
  */
-static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt)
+static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt, void* cached)
 {
     switch (ssl->cipher)
     {
 #ifndef CONFIG_SSL_SKELETON_MODE
         case SSL_AES128_SHA:
             {
-                AES_CTX *aes_ctx = (AES_CTX *)malloc(sizeof(AES_CTX));
+                AES_CTX *aes_ctx;
+                if (cached)
+                    aes_ctx = (AES_CTX*) cached;
+                else
+                    aes_ctx = (AES_CTX*) malloc(sizeof(AES_CTX));
                 AES_set_key(aes_ctx, key, iv, AES_MODE_128);
 
                 if (is_decrypt)
@@ -919,7 +932,12 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt)
 
         case SSL_AES256_SHA:
             {
-                AES_CTX *aes_ctx = (AES_CTX *)malloc(sizeof(AES_CTX));
+                AES_CTX *aes_ctx;
+                if (cached)
+                    aes_ctx = (AES_CTX*) cached;
+                else
+                    aes_ctx = (AES_CTX*) malloc(sizeof(AES_CTX));
+
                 AES_set_key(aes_ctx, key, iv, AES_MODE_256);
 
                 if (is_decrypt)
@@ -934,7 +952,12 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt)
 #endif
         case SSL_RC4_128_SHA:
             {
-                RC4_CTX *rc4_ctx = (RC4_CTX *)malloc(sizeof(RC4_CTX));
+                RC4_CTX* rc4_ctx;
+                if (cached)
+                    rc4_ctx = (RC4_CTX*) cached;
+                else
+                    rc4_ctx = (RC4_CTX*) malloc(sizeof(RC4_CTX));
+
                 RC4_setup(rc4_ctx, key, 16);
                 return (void *)rc4_ctx;
             }
@@ -979,7 +1002,7 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
 #endif
                 return SSL_ERROR_CONN_LOST;
         }
-
+#ifndef ESP8266
         /* keep going until the write buffer has some space */
         if (sent != pkt_size)
         {
@@ -991,6 +1014,7 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
             if (select(ssl->client_fd + 1, NULL, &wfds, NULL, NULL) < 0)
                 return SSL_ERROR_CONN_LOST;
         }
+#endif
     }
 
     SET_SSL_FLAG(SSL_NEED_RECORD);  /* reset for next time */
@@ -1073,11 +1097,12 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
                         ssl->cipher_info->iv_size)
         {
             uint8_t iv_size = ssl->cipher_info->iv_size;
-            uint8_t *t_buf = alloca(msg_length + iv_size);
+            uint8_t *t_buf = malloc(msg_length + iv_size);
             memcpy(t_buf + iv_size, ssl->bm_data, msg_length);
             get_random(iv_size, t_buf);
             msg_length += iv_size;
             memcpy(ssl->bm_data, t_buf, msg_length);
+            free(t_buf);
         }
 
         /* now encrypt the packet */
@@ -1164,7 +1189,7 @@ static int set_key_block(SSL *ssl, int is_write)
     }
 #endif
 
-    free(is_write ? ssl->encrypt_ctx : ssl->decrypt_ctx);
+    // free(is_write ? ssl->encrypt_ctx : ssl->decrypt_ctx);
 
     /* now initialise the ciphers */
     if (is_client)
@@ -1172,18 +1197,18 @@ static int set_key_block(SSL *ssl, int is_write)
         finished_digest(ssl, server_finished, ssl->dc->final_finish_mac);
 
         if (is_write)
-            ssl->encrypt_ctx = crypt_new(ssl, client_key, client_iv, 0);
+            ssl->encrypt_ctx = crypt_new(ssl, client_key, client_iv, 0, ssl->encrypt_ctx);
         else
-            ssl->decrypt_ctx = crypt_new(ssl, server_key, server_iv, 1);
+            ssl->decrypt_ctx = crypt_new(ssl, server_key, server_iv, 1, ssl->decrypt_ctx);
     }
     else
     {
         finished_digest(ssl, client_finished, ssl->dc->final_finish_mac);
 
         if (is_write)
-            ssl->encrypt_ctx = crypt_new(ssl, server_key, server_iv, 0);
+            ssl->encrypt_ctx = crypt_new(ssl, server_key, server_iv, 0, ssl->encrypt_ctx);
         else
-            ssl->decrypt_ctx = crypt_new(ssl, client_key, client_iv, 1);
+            ssl->decrypt_ctx = crypt_new(ssl, client_key, client_iv, 1, ssl->decrypt_ctx);
     }
 
     ssl->cipher_info = ciph_info;
@@ -1198,6 +1223,10 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     int ret = SSL_OK;
     int read_len, is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     uint8_t *buf = ssl->bm_data;
+
+    if (ssl->can_free_certificates) {
+        certificate_free(ssl);
+    }
 
     read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_read_index], 
                             ssl->need_bytes-ssl->got_bytes);
@@ -1271,8 +1300,21 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         /* do we violate the spec with the message size?  */
         if (ssl->need_bytes > RT_MAX_PLAIN_LENGTH+RT_EXTRA-BM_RECORD_OFFSET)
         {
-            ret = SSL_ERROR_INVALID_PROT_MSG;              
+            printf("ssl->need_bytes=%d violates spec\r\n", ssl->need_bytes, RT_MAX_PLAIN_LENGTH+RT_EXTRA-BM_RECORD_OFFSET);
+            ret = SSL_ERROR_INVALID_PROT_MSG;
             goto error;
+        }
+
+        /* is the allocated buffer large enough to handle all the data? if not, increase its size*/
+        if (ssl->need_bytes > ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET)
+        {
+            printf("ssl->need_bytes=%d > %d\r\n", ssl->need_bytes, ssl->max_plain_length+RT_EXTRA-BM_RECORD_OFFSET);
+            ret = increase_bm_data_size(ssl, ssl->need_bytes + BM_RECORD_OFFSET - RT_EXTRA);
+            if (ret != SSL_OK)
+            {
+                ret = SSL_ERROR_INVALID_PROT_MSG;
+                goto error;
+            }
         }
 
         CLR_SSL_FLAG(SSL_NEED_RECORD);
@@ -1384,6 +1426,25 @@ error:
         *in_data = NULL;
 
     return ret;
+}
+
+int increase_bm_data_size(SSL *ssl, size_t size)
+{
+    if (ssl->max_plain_length == RT_MAX_PLAIN_LENGTH) {
+        return SSL_OK;
+    }
+    size_t required = (size + 1023) & ~(1023); // round up to 1k
+    required = (required < RT_MAX_PLAIN_LENGTH) ? required : RT_MAX_PLAIN_LENGTH;
+    uint8_t* new_bm_all_data = (uint8_t*) realloc(ssl->bm_all_data, required + RT_EXTRA);
+    if (!new_bm_all_data) {
+        printf("failed to grow plain buffer\r\n");
+        ssl->hs_status = SSL_ERROR_DEAD;
+        return SSL_ERROR_CONN_LOST;
+    }
+    ssl->bm_all_data = new_bm_all_data;
+    ssl->bm_data = ssl->bm_all_data + BM_RECORD_OFFSET;
+    ssl->max_plain_length = required;
+    return SSL_OK;
 }
 
 /**
@@ -1640,7 +1701,18 @@ void disposable_free(SSL *ssl)
         free(ssl->dc);
         ssl->dc = NULL;
     }
+    ssl->can_free_certificates = true;
+}
 
+static void certificate_free(SSL* ssl)
+{
+#ifdef CONFIG_SSL_CERT_VERIFICATION
+    if (ssl->x509_ctx) {
+        x509_free(ssl->x509_ctx);
+        ssl->x509_ctx = 0;
+    }
+    ssl->can_free_certificates = false;
+#endif
 }
 
 #ifndef CONFIG_SSL_SKELETON_MODE     /* no session resumption in this mode */
@@ -1882,6 +1954,25 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
     ssl->dc->bm_proc_index += offset;
 error:
     return ret;
+}
+
+EXP_FUNC int STDCALL ssl_match_fingerprint(const SSL *ssl, const uint8_t* fp)
+{
+    if (ssl->x509_ctx == NULL || ssl->x509_ctx->fingerprint == NULL)
+        return 1;
+    int res = memcmp(ssl->x509_ctx->fingerprint, fp, SHA1_SIZE);
+    if (res != 0) {
+        printf("cert FP: ");
+        for (int i = 0; i < SHA1_SIZE; ++i) {
+            printf("%02X ", ssl->x509_ctx->fingerprint[i]);
+        }
+        printf("\r\ntest FP: ");
+        for (int i = 0; i < SHA1_SIZE; ++i) {
+            printf("%02X ", fp[i]);
+        }
+        printf("\r\n");
+    }
+    return res;
 }
 
 #endif /* CONFIG_SSL_CERT_VERIFICATION */
