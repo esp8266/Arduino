@@ -44,7 +44,10 @@ extern "C" {
 #include "os_int.h"
 #include <stdio.h>
 
-#if defined(WIN32)
+
+
+
+#ifdef WIN32
 #define STDCALL                 __stdcall
 #define EXP_FUNC                __declspec(dllexport)
 #else
@@ -57,7 +60,12 @@ extern "C" {
 #define WIN32
 #endif
 
-#ifdef WIN32
+#if defined(ESP8266)
+
+
+
+
+#elif defined(WIN32)
 
 /* Windows CE stuff */
 #if defined(_WIN32_WCE)
