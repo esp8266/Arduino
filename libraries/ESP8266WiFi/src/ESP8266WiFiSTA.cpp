@@ -111,6 +111,13 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         return WL_CONNECT_FAILED;
     }
 
+    // If sketch as uninitialized SSID and PSK "*******" 7 stars
+    if(passphrase && ssid && strlen(passphrase)==7 && strlen(ssid)==7 ) {
+      if (strncmp(ssid,"*******",7)==0 && strncmp(passphrase,"*******",7)==0)
+        // it should try to connect to SDK saved one (if any)
+        return begin();
+    }
+
     struct station_config conf;
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
 
