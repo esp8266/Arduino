@@ -177,8 +177,8 @@
             },
             {
               "host": "arm-linux-gnueabihf",
-              "url": "http://arduino.esp8266.com/linuxarm-xtensa-lx106-elf-g46f160f.tar.gz",
-              "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f.tar.gz",
+              "url": "http://arduino.esp8266.com/linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
+              "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
               "checksum": "SHA-256:1ac752bac7fff6be95ce10f56689f155fefea09e4ef710dbd75cb573798ff9c0",
               "size": "34929527"
             }

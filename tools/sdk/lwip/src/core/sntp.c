@@ -268,10 +268,7 @@ struct sntp_server {
 };
 static struct sntp_server sntp_servers[SNTP_MAX_SERVERS];
 
-#if SNTP_GET_SERVERS_FROM_DHCP
 static u8_t sntp_set_servers_from_dhcp;
-#endif
-
 #if SNTP_SUPPORT_MULTIPLE_SERVERS
 /** The currently used server (initialized to 0) */
 static u8_t sntp_current_server;
@@ -364,6 +361,7 @@ sntp_mktm_r(const time_t * tim_p ,struct tm *res ,int is_gmtime)
 {
   long days, rem;
   time_t lcltime;
+  int i;
   int y;
   int yleap;
   const int *ip;

@@ -127,6 +127,14 @@ enum espconn_level{
 	ESPCONN_KEEPCNT
 };
 
+enum espconn_mode{
+	ESPCONN_NOMODE,
+	ESPCONN_TCPSERVER_MODE,
+	ESPCONN_TCPCLIENT_MODE,
+	ESPCONN_UDP_MODE,
+	ESPCONN_NUM_MODE
+};
+
 struct espconn_packet{
 	uint16 sent_length;		/* sent length successful*/
 	uint16 snd_buf_size;	/* Available buffer size for sending  */
@@ -169,6 +177,7 @@ typedef struct _espconn_msg{
 	struct espconn *pespconn;
 	comon_pkt pcommon;
 	uint8 count_opt;
+	uint8 espconn_mode;
 	sint16_t hs_status;	//the status of the handshake
 	void *preverse;
 	void *pssl;
