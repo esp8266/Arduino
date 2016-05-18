@@ -344,13 +344,6 @@ huzzah.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 huzzah.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 huzzah.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
-huzzah.menu.Debug.Disabled=Disabled
-huzzah.menu.Debug.Disabled.build.debug_port=
-huzzah.menu.Debug.Serial=Serial
-huzzah.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
-huzzah.menu.Debug.Serial1=Serial1
-huzzah.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
-
 ##############################################################
 espresso_lite_v1.name=ESPresso Lite 1.0
 espresso_lite_v1.upload.tool=esptool
@@ -625,13 +618,6 @@ nodemcu.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 nodemcu.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 nodemcu.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
-nodemcu.menu.Debug.Disabled=Disabled
-nodemcu.menu.Debug.Disabled.build.debug_port=
-nodemcu.menu.Debug.Serial=Serial
-nodemcu.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
-nodemcu.menu.Debug.Serial1=Serial1
-nodemcu.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
-
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
 
@@ -696,12 +682,6 @@ nodemcuv2.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 nodemcuv2.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 nodemcuv2.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
-nodemcuv2.menu.Debug.Disabled=Disabled
-nodemcuv2.menu.Debug.Disabled.build.debug_port=
-nodemcuv2.menu.Debug.Serial=Serial
-nodemcuv2.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
-nodemcuv2.menu.Debug.Serial1=Serial1
-nodemcuv2.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
@@ -810,13 +790,6 @@ thing.menu.UploadSpeed.512000.upload.speed=512000
 thing.menu.UploadSpeed.921600=921600
 thing.menu.UploadSpeed.921600.upload.speed=921600
 
-thing.menu.Debug.Disabled=Disabled
-thing.menu.Debug.Disabled.build.debug_port=
-thing.menu.Debug.Serial=Serial
-thing.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
-thing.menu.Debug.Serial1=Serial1
-thing.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
-
 ##############################################################
 thingdev.name=SparkFun ESP8266 Thing Dev
 
@@ -865,13 +838,6 @@ thingdev.menu.UploadSpeed.512000.windows=512000
 thingdev.menu.UploadSpeed.512000.upload.speed=512000
 thingdev.menu.UploadSpeed.921600=921600
 thingdev.menu.UploadSpeed.921600.upload.speed=921600
-
-thingdev.menu.Debug.Disabled=Disabled
-thingdev.menu.Debug.Disabled.build.debug_port=
-thingdev.menu.Debug.Serial=Serial
-thingdev.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
-thingdev.menu.Debug.Serial1=Serial1
-thingdev.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 
 ##############################################################
 esp210.name=SweetPea ESP-210
@@ -934,13 +900,6 @@ esp210.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 esp210.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 esp210.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 esp210.menu.FlashSize.4M1M.build.spiffs_pagesize=256
-
-esp210.menu.Debug.Disabled=Disabled
-esp210.menu.Debug.Disabled.build.debug_port=
-esp210.menu.Debug.Serial=Serial
-esp210.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
-esp210.menu.Debug.Serial1=Serial1
-esp210.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 
 ##############################################################
 # wifio.name=Wifio
@@ -1036,12 +995,6 @@ d1_mini.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 d1_mini.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1_mini.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
-d1_mini.menu.Debug.Disabled=Disabled
-d1_mini.menu.Debug.Disabled.build.debug_port=
-d1_mini.menu.Debug.Serial=Serial
-d1_mini.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
-d1_mini.menu.Debug.Serial1=Serial1
-d1_mini.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 
 ##############################################################
 d1.name=WeMos D1(Retired)
@@ -1108,12 +1061,6 @@ d1.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 d1.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
-d1.menu.Debug.Disabled=Disabled
-d1.menu.Debug.Disabled.build.debug_port=
-d1.menu.Debug.Serial=Serial
-d1.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
-d1.menu.Debug.Serial1=Serial1
-d1.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 
 ##############################################################
 
