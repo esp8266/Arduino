@@ -22,13 +22,8 @@
 
 //how many clients should be able to telnet to this ESP8266
 #define MAX_SRV_CLIENTS 1
-
-// Put your own Wifi Router SSID/KEY here
-// remember that password len should be >7 to get it working
-// If you leave this wrong default values, ESP will try to connect
-// to last SSID/PASS that worked on this device (if any of course)
-const char* ssid = "******";
-const char* password = "******";
+const char* ssid = "**********";
+const char* password = "**********";
 
 WiFiServer server(23);
 WiFiClient serverClients[MAX_SRV_CLIENTS];
@@ -36,25 +31,19 @@ WiFiClient serverClients[MAX_SRV_CLIENTS];
 void setup() {
   Serial1.begin(115200);
   
-  // If sketch as no default SSID and bad PSK (len <8)
+  // If sketch as no default SSID and PSK (both start with *)
   // it should try to connect to SDK saved one (if any)
-  Serial1.print(F("Connecting with SSID of "));
-  if ( strlen(password)<8 ) {
-    Serial1.printf( "SDK '%s'\r\n", WiFi.SSID().c_str() );
-    // If autoconnect is disabled force connection
-    if (!WiFi.getAutoConnect()) 
-      WiFi.begin();
-  } else {
-    Serial1.printf( "Sketch '%s'\r\n", ssid ); 
+  if (*ssid!='*' && *password!='*'){
     WiFi.begin(ssid, password);
   }
-  // Will be blocked in this while loop until connected
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    delay(1000);
-    Serial1.printf("%4ld sec : ...\n", millis()/1000);
-  }
 
-  
+  Serial1.print("\nConnecting to "); Serial1.println(ssid);
+  uint8_t i = 0;
+  while (WiFi.status() != WL_CONNECTED && i++ < 20) delay(500);
+  if(i == 21){
+    Serial1.print("Could not connect to"); Serial1.println(ssid);
+    while(1) delay(500);
+  }
   //start UART and the server
   Serial.begin(115200);
   server.begin();

@@ -30,12 +30,8 @@
 
 #define DBG_OUTPUT_PORT Serial
 
-// Put your own Wifi Router SSID/KEY here
-// remember that password len should be >7 to get it working
-// If you leave this wrong default values, ESP will try to connect
-// to last SSID/PASS that worked on this device (if any of course)
-const char* ssid = "******";
-const char* password = "******";
+const char* ssid = "*wifi-ssid*";
+const char* password = "*wifi-password*";
 const char* host = "esp8266fs";
 
 ESP8266WebServer server(80);
@@ -179,27 +175,24 @@ void setup(void){
     DBG_OUTPUT_PORT.printf("\n");
   }
   
+
   //WIFI INIT
   DBG_OUTPUT_PORT.printf("Connecting to %s\n", ssid);
-
-  // If sketch as no default SSID and bad PSK (len <8)
+  // If sketch as no default SSID and PSK (both start with *)
   // it should try to connect to SDK saved one (if any)
-  DBG_OUTPUT_PORT.print(F("Connecting with SSID of "));
-  if ( strlen(password)<8 ) {
-    DBG_OUTPUT_PORT.printf( "SDK '%s'\r\n", WiFi.SSID().c_str() );
-    // If autoconnect is disabled force connection
-    if (!WiFi.getAutoConnect()) 
-      WiFi.begin();
-  } else {
-    DBG_OUTPUT_PORT.printf( "Sketch '%s'\r\n", ssid ); 
+  if (String(WiFi.SSID())!= String(ssid) && *ssid!='*' && *password!='*') {
     WiFi.begin(ssid, password);
   }
-  // Will be blocked in this while loop until connected
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    delay(1000);
-    DBG_OUTPUT_PORT.printf("%4ld sec : ...\n", millis()/1000);
-  }
   
+  while (WiFi.waitForConnectResult() != WL_CONNECTED){
+    // If sketch as no default SSID and PSK (both start with *)
+    // it should try to connect to SDK saved one (if any)
+    if (String(WiFi.SSID())!= String(ssid) && *ssid!='*' && *password!='*')
+      WiFi.begin(ssid, password);
+    
+    Serial.println("Retrying connection...");
+  }
+
   DBG_OUTPUT_PORT.println("");
   DBG_OUTPUT_PORT.print("Connected! IP address: ");
   DBG_OUTPUT_PORT.println(WiFi.localIP());
