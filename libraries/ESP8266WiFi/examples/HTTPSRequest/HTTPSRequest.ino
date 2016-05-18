@@ -14,8 +14,8 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 
-const char* ssid = "********";
-const char* password = "********";
+const char* ssid = "........";
+const char* password = "........";
 
 const char* host = "api.github.com";
 const int httpsPort = 443;
@@ -29,22 +29,11 @@ void setup() {
   Serial.println();
   Serial.print("connecting to ");
   Serial.println(ssid);
-
-
-  // If sketch as no default SSID and PSK (both start with *)
-  // it should try to connect to SDK saved one (if any)
-  if (*ssid!='*' && *password!='*')
-    WiFi.begin(ssid, password);
-
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
-    Serial.println("Retrying connection...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
   }
-  
   Serial.println("");
   Serial.println("WiFi connected");
   Serial.println("IP address: ");

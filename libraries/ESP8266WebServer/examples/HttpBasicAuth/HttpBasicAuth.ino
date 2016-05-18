@@ -3,8 +3,8 @@
 #include <ArduinoOTA.h>
 #include <ESP8266WebServer.h>
 
-const char* ssid = "********";
-const char* password = "********";
+const char* ssid = "........";
+const char* password = "........";
 
 ESP8266WebServer server(80);
 
@@ -14,21 +14,12 @@ const char* www_password = "esp8266";
 void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-
-  // If sketch as no default SSID and PSK (both start with *)
-  // it should try to connect to SDK saved one (if any)
-  if (*ssid!='*' && *password!='*')
-    WiFi.begin(ssid, password);
-
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
-    Serial.println("Retrying connection...");
+  WiFi.begin(ssid, password);
+  if(WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("WiFi Connect Failed! Rebooting...");
+    delay(1000);
+    ESP.restart();
   }
-
   ArduinoOTA.begin();
 
   server.on("/", [](){

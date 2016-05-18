@@ -3,10 +3,8 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 
-
-// Put your own Wifi Router SSID/KEY here
-const char* ssid = "**********";
-const char* password = "**********";
+const char* ssid = "...";
+const char* password = "...";
 const char* host = "OTA-LEDS";
 
 int led_pin = 13;
@@ -23,20 +21,12 @@ void setup() {
    Serial.println("Booting");
    WiFi.mode(WIFI_STA);
 
-  // If sketch as no default SSID and PSK (both start with *)
-  // it should try to connect to SDK saved one (if any)
-  if (*ssid!='*' && *password!='*')
-    WiFi.begin(ssid, password);
+   WiFi.begin(ssid, password);
 
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
-    Serial.println("Retrying connection...");
+   while (WiFi.waitForConnectResult() != WL_CONNECTED){
+     WiFi.begin(ssid, password);
+     Serial.println("Retrying connection...");
   }
-  
   /* switch off led */
   digitalWrite(led_pin, HIGH);
 

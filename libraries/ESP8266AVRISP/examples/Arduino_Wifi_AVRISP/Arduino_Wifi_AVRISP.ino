@@ -17,20 +17,8 @@ void setup() {
     Serial.println("Arduino AVR-ISP over TCP");
     avrprog.setReset(false); // let the AVR run
 
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *pass!='*')
-      WiFi.begin(ssid, pass);
-    
-    while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *pass!='*')
-      WiFi.begin(ssid, pass);
-    
-    Serial.println("Retrying connection...");
-  }
-  
+    WiFi.begin(ssid, pass);
+    while (WiFi.waitForConnectResult() != WL_CONNECTED);
 
     MDNS.begin(host);
     MDNS.addService("avrisp", "tcp", port);

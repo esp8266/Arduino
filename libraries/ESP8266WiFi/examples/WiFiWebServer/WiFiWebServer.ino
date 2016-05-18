@@ -9,8 +9,8 @@
 
 #include <ESP8266WiFi.h>
 
-const char* ssid = "*your-ssid*";
-const char* password = "*your-password*";
+const char* ssid = "your-ssid";
+const char* password = "your-password";
 
 // Create an instance of the server
 // specify the port to listen on as an argument
@@ -27,24 +27,15 @@ void setup() {
   // Connect to WiFi network
   Serial.println();
   Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
   
-  // If sketch as no default SSID and PSK (both start with *)
-  // it should try to connect to SDK saved one (if any)
-  if (*ssid!='*' && *password!='*') {
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
-    WiFi.begin(ssid, password);
-  }
-
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
-    Serial.println("Retrying connection...");
-  }
+  WiFi.begin(ssid, password);
   
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
   Serial.println("");
   Serial.println("WiFi connected");
   

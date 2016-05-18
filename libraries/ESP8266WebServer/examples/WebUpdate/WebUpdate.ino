@@ -8,8 +8,8 @@
 #include <ESP8266mDNS.h>
 
 const char* host = "esp8266-webupdate";
-const char* ssid = "********";
-const char* password = "********";
+const char* ssid = "........";
+const char* password = "........";
 
 ESP8266WebServer server(80);
 const char* serverIndex = "<form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
@@ -19,21 +19,7 @@ void setup(void){
   Serial.println();
   Serial.println("Booting Sketch...");
   WiFi.mode(WIFI_AP_STA);
-
-  // If sketch as no default SSID and PSK (both start with *)
-  // it should try to connect to SDK saved one (if any)
-  if (*ssid!='*' && *password!='*')
-    WiFi.begin(ssid, password);
-
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
-    Serial.println("Retrying connection...");
-  }
-
+  WiFi.begin(ssid, password);
   if(WiFi.waitForConnectResult() == WL_CONNECTED){
     MDNS.begin(host);
     server.on("/", HTTP_GET, [](){

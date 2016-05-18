@@ -9,8 +9,8 @@
 #include <ESP8266HTTPUpdateServer.h>
 
 const char* host = "esp8266-webupdate";
-const char* ssid = "********";
-const char* password = "********";
+const char* ssid = "........";
+const char* password = "........";
 
 ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
@@ -21,18 +21,10 @@ void setup(void){
   Serial.println();
   Serial.println("Booting Sketch...");
   WiFi.mode(WIFI_AP_STA);
+  WiFi.begin(ssid, password);
 
-  // If sketch as no default SSID and PSK (both start with *)
-  // it should try to connect to SDK saved one (if any)
-  if (*ssid!='*' && *password!='*')
+  while(WiFi.waitForConnectResult() != WL_CONNECTED){
     WiFi.begin(ssid, password);
-
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
     Serial.println("WiFi failed, retrying.");
   }
 

@@ -20,8 +20,8 @@
 #include <ESP8266mDNS.h>
 #include <WiFiClient.h>
 
-const char* ssid = "********";
-const char* password = "********";
+const char* ssid = "............";
+const char* password = "..............";
 
 // TCP server at port 80 will respond to HTTP requests
 WiFiServer server(80);
@@ -30,22 +30,15 @@ void setup(void)
 {  
   Serial.begin(115200);
   
-  // If sketch as no default SSID and PSK (both start with *)
-  // it should try to connect to SDK saved one (if any)
-  if (*ssid!='*' && *password!='*')
-    WiFi.begin(ssid, password);
-
+  // Connect to WiFi network
+  WiFi.begin(ssid, password);
   Serial.println("");  
   
-  while (WiFi.waitForConnectResult() != WL_CONNECTED){
-    // If sketch as no default SSID and PSK (both start with *)
-    // it should try to connect to SDK saved one (if any)
-    if (*ssid!='*' && *password!='*')
-      WiFi.begin(ssid, password);
-    
-    Serial.println("Retrying connection...");
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
   }
-
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);
