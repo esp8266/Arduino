@@ -65,13 +65,14 @@ void twi_setClockStretchLimit(uint32_t limit){
   twi_clockStretchLimit = limit * TWI_CLOCK_STRETCH_MULTIPLIER;
 }
 
-void twi_init(unsigned char sda, unsigned char scl){
+int twi_init(unsigned char sda, unsigned char scl){
   twi_sda = sda;
   twi_scl = scl;
   pinMode(twi_sda, INPUT_PULLUP);
   pinMode(twi_scl, INPUT_PULLUP);
   twi_setClock(100000);
   twi_setClockStretchLimit(230); // default value is 230 uS
+  return twi_mediate();
 }
 
 
@@ -197,3 +198,19 @@ unsigned char twi_readFrom(unsigned char address, unsigned char* buf, unsigned i
   }
   return 0;
 }
+
+int twi_mediate(){           
+	if (SCL_READ()==0)     return 1;       //SCL held low by another device, no procedure available to recover
+	int clockCount = 20;                   
+	
+	while (SDA_READ()==0 && clockCount>0){ //if SDA low, read the bits slaves have to sent to a max
+		twi_read_bit();                    
+		if (SCL_READ()==0) return 2;       //I2C bus error. SCL held low beyond slave clock stretch time
+	}
+	
+	if (SDA_READ()==0)     return 3;       //I2C bus error. SDA line held low by slave/another_master after n bits.
+	
+	if(!twi_write_start()) return 4;       //line busy. SDA again held low by another device. 2nd master?
+	else                   return 0;       //all ok 
+}
+
