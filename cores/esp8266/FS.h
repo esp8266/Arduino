@@ -102,7 +102,8 @@ public:
     FS(FSImplPtr impl) : _impl(impl) { }
 
     bool begin();
-
+    void end();
+    
     bool format();
     bool info(FSInfo& info);
 

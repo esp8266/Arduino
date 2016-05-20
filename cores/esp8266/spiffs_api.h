@@ -132,6 +132,14 @@ public:
         return _tryMount();
     }
 
+    void end() override
+    {
+        if (SPIFFS_mounted(&_fs) == 0) {
+            return;
+        }
+        SPIFFS_unmount(&_fs);
+    }
+
     bool format() override
     {
         if (_size == 0) {

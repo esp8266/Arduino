@@ -167,6 +167,12 @@ bool FS::begin() {
     return _impl->begin();
 }
 
+void FS::end() {
+    if (_impl) {
+        _impl->end();
+    }
+}
+
 bool FS::format() {
     if (!_impl) {
         return false;
