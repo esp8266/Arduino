@@ -1450,8 +1450,6 @@ int send_change_cipher_spec(SSL *ssl)
     
     if (ssl->cipher_info)
         SET_SSL_FLAG(SSL_TX_ENCRYPTED);
-    if (ssl->cipher_info)
-        SET_SSL_FLAG(SSL_TX_ENCRYPTED);
 
     memset(ssl->write_sequence, 0, 8);
     return ret;
