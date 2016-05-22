@@ -77,6 +77,10 @@ void ArduinoOTAClass::setHostname(const char * hostname) {
   }
 }
 
+String ArduinoOTAClass::getHostname() {
+  return _hostname;
+}
+
 void ArduinoOTAClass::setPassword(const char * password) {
   if (!_initialized && !_password.length() && password) {
     _password = password;
