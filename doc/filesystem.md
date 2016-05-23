@@ -7,6 +7,7 @@ title: File System
   * [Uploading files to file system](#uploading-files-to-file-system)
   * [File system object (SPIFFS)](#file-system-object-spiffs)
     * [begin](#begin)
+    * [end](#end)
     * [format](#format)
     * [open](#open)
     * [exists](#exists)
@@ -85,6 +86,14 @@ SPIFFS.begin()
 This method mounts SPIFFS file system. It must be called before any other
 FS APIs are used. Returns *true* if file system was mounted successfully, false
 otherwise.
+
+### end
+
+```c++
+SPIFFS.end()
+```
+
+This method unmounts SPIFFS file system. Use this method before updating SPIFFS using OTA.
 
 ### format
 
