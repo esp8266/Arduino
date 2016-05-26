@@ -77,6 +77,10 @@ void TwoWire::begin(uint8_t address){
   begin();
 }
 
+uint8_t TwoWire::status(){
+	return twi_status();
+}
+
 void TwoWire::begin(int address){
   begin((uint8_t)address);
 }
