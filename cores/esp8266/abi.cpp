@@ -107,7 +107,7 @@ void __throw_logic_error(const char* str)
     panic();
 }
 
-void __throw_out_of_range(const ohar* str)
+void __throw_out_of_range(const char* str)
 {
     panic();
 }
