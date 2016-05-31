@@ -119,9 +119,9 @@ static void loop_task(os_event_t *events) {
 }
 
 static void do_global_ctors(void) {
-    void (**p)(void);
-    for(p = &__init_array_start; p != &__init_array_end; ++p)
-        (*p)();
+    void (**p)(void) = &__init_array_end;
+    while (p != &__init_array_start)
+        (*--p)();
 }
 
 extern "C" void __gdb_init() {}
