@@ -168,3 +168,4 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [SdFat-beta](https://github.com/greiman/SdFat-beta) - SD-card library with support for long filenames, software- and hardware-based SPI and lots more.
 - [FastLED](https://github.com/FastLED/FastLED) - a library for easily & efficiently controlling a wide variety of LED chipsets, like the Neopixel (WS2812B), DotStar, LPD8806 and many more. Includes fading, gradient, color conversion functions.
 - [OLED](https://github.com/klarsys/esp8266-OLED) - a library for controlling I2C connected OLED displays. Tested with 0.96 inch OLED graphics display.
+- [MFRC522](https://github.com/miguelbalboa/rfid) - A library for using the Mifare RC522 RFID-tag reader/writer.
