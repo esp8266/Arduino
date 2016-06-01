@@ -45,6 +45,10 @@ generic.menu.FlashMode.dio=DIO
 generic.menu.FlashMode.dio.build.flash_mode=dio
 generic.menu.FlashMode.qio=QIO
 generic.menu.FlashMode.qio.build.flash_mode=qio
+generic.menu.FlashMode.dout=DOUT
+generic.menu.FlashMode.dout.build.flash_mode=dout
+generic.menu.FlashMode.qout=QOUT
+generic.menu.FlashMode.qout.build.flash_mode=qout
 
 generic.menu.UploadSpeed.115200=115200
 generic.menu.UploadSpeed.115200.upload.speed=115200
@@ -1382,6 +1386,10 @@ coredev.menu.FlashMode.dio=DIO
 coredev.menu.FlashMode.dio.build.flash_mode=dio
 coredev.menu.FlashMode.qio=QIO
 coredev.menu.FlashMode.qio.build.flash_mode=qio
+coredev.menu.FlashMode.dout=DOUT
+coredev.menu.FlashMode.dout.build.flash_mode=dout
+coredev.menu.FlashMode.qout=QOUT
+coredev.menu.FlashMode.qout.build.flash_mode=qout
 
 coredev.menu.UploadSpeed.115200=115200
 coredev.menu.UploadSpeed.115200.upload.speed=115200
