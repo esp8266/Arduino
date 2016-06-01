@@ -31,6 +31,7 @@ class ArduinoOTAClass
     ~ArduinoOTAClass();
     void setPort(uint16_t port);
     void setHostname(const char *hostname);
+    String getHostname();
     void setPassword(const char *password);
     void onStart(OTA_CALLBACK(fn));
     void onEnd(OTA_CALLBACK(fn));
