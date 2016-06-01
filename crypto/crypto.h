@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2015, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -39,7 +39,6 @@
 extern "C" {
 #endif
 
-#include "config.h"
 #include "bigint_impl.h"
 #include "bigint.h"
 
@@ -124,22 +123,58 @@ void SHA1_Update(SHA1_CTX *, const uint8_t * msg, int len);
 void SHA1_Final(uint8_t *digest, SHA1_CTX *);
 
 /**************************************************************************
- * MD2 declarations 
+ * SHA256 declarations 
  **************************************************************************/
 
-#define MD2_SIZE 16
+#define SHA256_SIZE   32
 
 typedef struct
 {
-    unsigned char cksum[16];    /* checksum of the data block */
-    unsigned char state[48];    /* intermediate digest state */
-    unsigned char buffer[16];   /* data block being processed */
-    int left;                   /* amount of data in buffer */
-} MD2_CTX;
+    uint32_t total[2];
+    uint32_t state[8];
+    uint8_t buffer[64];
+} SHA256_CTX;
 
-EXP_FUNC void STDCALL MD2_Init(MD2_CTX *ctx);
-EXP_FUNC void STDCALL MD2_Update(MD2_CTX *ctx, const uint8_t *input, int ilen);
-EXP_FUNC void STDCALL MD2_Final(uint8_t *digest, MD2_CTX *ctx);
+void SHA256_Init(SHA256_CTX *c);
+void SHA256_Update(SHA256_CTX *, const uint8_t *input, int len);
+void SHA256_Final(uint8_t *digest, SHA256_CTX *);
+
+/**************************************************************************
+ * SHA512 declarations 
+ **************************************************************************/
+
+#define SHA512_SIZE   64
+
+typedef struct
+{
+    union
+    {
+        uint64_t h[8];
+        uint8_t digest[64];
+    } h_dig;
+    union
+    {
+        uint64_t w[80];
+        uint8_t buffer[128];
+    } w_buf;
+    size_t size;
+    uint64_t totalSize;
+} SHA512_CTX;
+
+void SHA512_Init(SHA512_CTX *c);
+void SHA512_Update(SHA512_CTX *, const uint8_t *input, int len);
+void SHA512_Final(uint8_t *digest, SHA512_CTX *);
+
+/**************************************************************************
+ * SHA384 declarations 
+ **************************************************************************/
+
+#define SHA384_SIZE   48
+
+typedef SHA512_CTX SHA384_CTX;
+void SHA384_Init(SHA384_CTX *c);
+void SHA384_Update(SHA384_CTX *, const uint8_t *input, int len);
+void SHA384_Final(uint8_t *digest, SHA384_CTX *);
 
 /**************************************************************************
  * MD5 declarations 
@@ -203,7 +238,7 @@ void RSA_pub_key_new(RSA_CTX **rsa_ctx,
         const uint8_t *pub_exp, int pub_len);
 void RSA_free(RSA_CTX *ctx);
 int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint8_t *out_data,
-        int is_decryption);
+        int out_len, int is_decryption);
 bigint *RSA_private(const RSA_CTX *c, bigint *bi_msg);
 #if defined(CONFIG_SSL_CERT_VERIFICATION) || defined(CONFIG_SSL_GENERATE_X509_CERT)
 bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
@@ -220,8 +255,8 @@ void RSA_print(const RSA_CTX *ctx);
 EXP_FUNC void STDCALL RNG_initialize(void);
 EXP_FUNC void STDCALL RNG_custom_init(const uint8_t *seed_buf, int size);
 EXP_FUNC void STDCALL RNG_terminate(void);
-EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data);
-void get_random_NZ(int num_rand_bytes, uint8_t *rand_data);
+EXP_FUNC int STDCALL get_random(int num_rand_bytes, uint8_t *rand_data);
+int get_random_NZ(int num_rand_bytes, uint8_t *rand_data);
 
 #ifdef __cplusplus
 }

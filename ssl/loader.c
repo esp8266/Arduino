@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2014, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -82,7 +82,7 @@ EXP_FUNC int STDCALL ssl_obj_load(SSL_CTX *ssl_ctx, int obj_type,
 #ifdef CONFIG_SSL_HAS_PEM
         ret = ssl_obj_PEM_load(ssl_ctx, obj_type, ssl_obj, password);
 #else
-        printf(unsupported_str);
+        printf("%s", unsupported_str);
         ret = SSL_ERROR_NOT_SUPPORTED;
 #endif
     }
@@ -93,7 +93,7 @@ error:
     ssl_obj_free(ssl_obj);
     return ret;
 #else
-    printf(unsupported_str);
+    printf("%s", unsupported_str);
     return SSL_ERROR_NOT_SUPPORTED;
 #endif /* CONFIG_SSL_SKELETON_MODE */
 }
@@ -150,7 +150,7 @@ static int do_obj(SSL_CTX *ssl_ctx, int obj_type,
             break;
 #endif
         default:
-            printf(unsupported_str);
+            printf("%s", unsupported_str);
             ret = SSL_ERROR_NOT_SUPPORTED;
             break;
     }

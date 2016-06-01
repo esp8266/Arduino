@@ -12,11 +12,13 @@ OBJ_FILES := \
 	crypto/aes.o \
 	crypto/bigint.o \
 	crypto/hmac.o \
-	crypto/md2.o \
 	crypto/md5.o \
 	crypto/rc4.o \
 	crypto/rsa.o \
 	crypto/sha1.o \
+	crypto/sha256.o \
+	crypto/sha384.o \
+	crypto/sha512.o \
 	ssl/asn1.o \
 	ssl/gen_cert.o \
 	ssl/loader.o \
