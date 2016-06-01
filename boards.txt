@@ -944,7 +944,7 @@ d1_mini.serial.disableRTS=true
 
 d1_mini.build.mcu=esp8266
 d1_mini.build.f_cpu=80000000L
-d1_mini.build.board=ESP8266_NODEMCU
+d1_mini.build.board=ESP8266_WEMOS_D1MINI
 d1_mini.build.core=esp8266
 d1_mini.build.variant=d1_mini
 d1_mini.build.flash_mode=dio
@@ -995,7 +995,6 @@ d1_mini.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 d1_mini.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1_mini.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
-
 ##############################################################
 d1.name=WeMos D1(Retired)
 
@@ -1010,7 +1009,7 @@ d1.serial.disableRTS=true
 
 d1.build.mcu=esp8266
 d1.build.f_cpu=80000000L
-d1.build.board=ESP8266_NODEMCU
+d1.build.board=ESP8266_WEMOS_D1MINI
 d1.build.core=esp8266
 d1.build.variant=d1
 d1.build.flash_mode=dio
@@ -1215,11 +1214,9 @@ wifinfo.serial.disableDTR=true
 wifinfo.serial.disableRTS=true
 
 wifinfo.build.mcu=esp8266
-wifinfo.build.f_cpu=160000000L
 wifinfo.build.core=esp8266
 wifinfo.build.variant=wifinfo
-wifinfo.build.flash_mode=qio
-wifinfo.build.board=ESP8266_NODEMCU
+wifinfo.build.board=WIFINFO
 wifinfo.build.spiffs_pagesize=256
 wifinfo.build.debug_port=Serial1
 wifinfo.build.debug_level=Wifinfo
@@ -1300,20 +1297,20 @@ wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
 wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
 wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
 
-wifinfo.menu.CpuFrequency.80=80 MHz
-wifinfo.menu.CpuFrequency.80.build.f_cpu=80000000L
 wifinfo.menu.CpuFrequency.160=160 MHz
 wifinfo.menu.CpuFrequency.160.build.f_cpu=160000000L
+wifinfo.menu.CpuFrequency.80=80 MHz
+wifinfo.menu.CpuFrequency.80.build.f_cpu=80000000L
 
 wifinfo.menu.FlashFreq.40=40MHz
 wifinfo.menu.FlashFreq.40.build.flash_freq=40
 wifinfo.menu.FlashFreq.80=80MHz
 wifinfo.menu.FlashFreq.80.build.flash_freq=80
 
-wifinfo.menu.FlashMode.dio=DIO
-wifinfo.menu.FlashMode.dio.build.flash_mode=dio
 wifinfo.menu.FlashMode.qio=QIO
 wifinfo.menu.FlashMode.qio.build.flash_mode=qio
+wifinfo.menu.FlashMode.dio=DIO
+wifinfo.menu.FlashMode.dio.build.flash_mode=dio
 
 wifinfo.menu.UploadSpeed.115200=115200
 wifinfo.menu.UploadSpeed.115200.upload.speed=115200
