@@ -84,6 +84,18 @@ You also need to use `Serial.setDebugOutput(true)` to enable output from `printf
 
 Both `Serial` and `Serial1` objects support 5, 6, 7, 8 data bits, odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the desired mode, call `Serial.begin(baudrate, SERIAL_8N1)`, `Serial.begin(baudrate, SERIAL_6E2)`, etc.
 
+A new method has been implemented on both `Serial` and `Serial1` to get current baud rate setting. To get the current baud rate, call `Serial.baudRate()`, `Serial1.baudRate()`. Return a `int` of current speed. For example
+```cpp
+// Set Baud rate to 57600
+Serial.begin(57600);
+
+// Get current baud rate
+int br = Serial.baudRate();
+
+// Will print "Serial is 57600 bps"
+Serial.printf("Serial is %d bps", br);
+```
+
 ## Progmem
 
 The Program memory features work much the same way as on a regular Arduino; placing read only data and strings in read only memory and freeing heap for your application.
