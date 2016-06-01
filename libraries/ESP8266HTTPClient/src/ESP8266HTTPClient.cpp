@@ -865,6 +865,7 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     if(_base64Authorization.length()) {
+        _base64Authorization.replace("\n", "");
         header += F("Authorization: Basic ");
         header += _base64Authorization;
         header += "\r\n";
@@ -906,7 +907,8 @@ int HTTPClient::handleHeaderResponse()
                 _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
             } else if(headerLine.indexOf(':')) {
                 String headerName = headerLine.substring(0, headerLine.indexOf(':'));
-                String headerValue = headerLine.substring(headerLine.indexOf(':') + 2);
+                String headerValue = headerLine.substring(headerLine.indexOf(':') + 1);
+                headerValue.trim();
 
                 if(headerName.equalsIgnoreCase("Content-Length")) {
                     _size = headerValue.toInt();
