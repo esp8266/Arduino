@@ -944,7 +944,7 @@ d1_mini.serial.disableRTS=true
 
 d1_mini.build.mcu=esp8266
 d1_mini.build.f_cpu=80000000L
-d1_mini.build.board=WEMOS_D1_MINI
+d1_mini.build.board=ESP8266_WEMOS_D1MINI
 d1_mini.build.core=esp8266
 d1_mini.build.variant=d1_mini
 d1_mini.build.flash_mode=dio
@@ -1009,7 +1009,7 @@ d1.serial.disableRTS=true
 
 d1.build.mcu=esp8266
 d1.build.f_cpu=80000000L
-d1.build.board=WEMOS_D1
+d1.build.board=ESP8266_WEMOS_D1MINI
 d1.build.core=esp8266
 d1.build.variant=d1
 d1.build.flash_mode=dio
