@@ -1,5 +1,5 @@
 Replacement for Espressif's libssl, kept as close as possible to [axTLS](http://axtls.sourceforge.net/) source.
-Currently based on axTLS 1.4.9, will be upgraded to 1.5.3.
+Currently based on axTLS 1.5.3+.
 
 [![Build status](https://travis-ci.org/igrr/axtls-8266.svg)](https://travis-ci.org/igrr/axtls-8266)
 
