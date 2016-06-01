@@ -1794,8 +1794,8 @@ SSL_SESSION *ssl_session_update(int max_sessions, SSL_SESSION *ssl_sessions[],
 
     /* ok, we've used up all of our sessions. So blow the oldest session away */
     oldest_sess->conn_time = tm;
-    memset(oldest_sess->session_id, 0, sizeof(SSL_SESSION_ID_SIZE));
-    memset(oldest_sess->master_secret, 0, sizeof(SSL_SECRET_SIZE));
+    memset(oldest_sess->session_id, 0, SSL_SESSION_ID_SIZE);
+    memset(oldest_sess->master_secret, 0, SSL_SECRET_SIZE);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
     return oldest_sess;
 }
