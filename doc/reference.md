@@ -96,6 +96,9 @@ int br = Serial.baudRate();
 Serial.printf("Serial is %d bps", br);
 ```
 
+I've done this also for official ESP8266 [Software Serial](https://github.com/esp8266/Arduino/blob/master/doc/libraries.md#softwareserial) library, see this [pull request](https://github.com/plerup/espsoftwareserial/pull/22).    
+Note that this implementation is **only for ESP8266 based boards**, and will not works with other Arduino boards.
+
 ## Progmem
 
 The Program memory features work much the same way as on a regular Arduino; placing read only data and strings in read only memory and freeing heap for your application.
