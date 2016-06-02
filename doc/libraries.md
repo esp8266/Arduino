@@ -83,7 +83,7 @@ APIs related to deep sleep and watchdog timer are available in the `ESP` object,
 
 `ESP.deepSleep(microseconds, mode)` will put the chip into deep sleep. `mode` is one of `WAKE_RF_DEFAULT`, `WAKE_RFCAL`, `WAKE_NO_RFCAL`, `WAKE_RF_DISABLED`. (GPIO16 needs to be tied to RST to wake from deepSleep.)
 
-`ESP.rtcUserMemoryWrite(&data, sizeof(data))` and `ESP.rtcUserMemoryRead(&data, sizeof(data))` allow struct data with the maximum size of 512 bytes to be stored and retrieved from the RTC user memory of the chip respectively. The stored data can be retained between deep sleep cycles. However, the data might be lost after power cycling the chip.
+`ESP.rtcUserMemoryWrite(offset, &data, sizeof(data))` and `ESP.rtcUserMemoryRead(offset, &data, sizeof(data))` allow data to be stored in and retrieved from the RTC user memory of the chip respectively. Total size of RTC user memory is 512 bytes, so offset + sizeof(data) shouldn't exceed 512. Data should be 4-byte aligned. The stored data can be retained between deep sleep cycles. However, the data might be lost after power cycling the chip.
 
 `ESP.restart()` restarts the CPU.
 
