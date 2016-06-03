@@ -5,7 +5,7 @@ import urllib2
 import os
 import ssl
 
-@setup('HTTP GET request')
+@setup('HTTP GET & POST requests')
 def setup_http_get(e):
     app = Flask(__name__)
     def shutdown_server():
@@ -17,8 +17,9 @@ def setup_http_get(e):
     def shutdown():
         shutdown_server()
         return 'Server shutting down...'
-    @app.route("/")
+    @app.route("/", methods = ['GET', 'POST'])
     def root():
+        print('Got data: ' + request.data);
         return 'hello!!!'
     @app.route("/data")
     def get_data():
@@ -29,7 +30,7 @@ def setup_http_get(e):
     th = Thread(target=flaskThread)
     th.start()
 
-@teardown('HTTP GET request')
+@teardown('HTTP GET & POST requests')
 def teardown_http_get(e):
     response = urllib2.urlopen('http://localhost:8088/shutdown')
     html = response.read()
