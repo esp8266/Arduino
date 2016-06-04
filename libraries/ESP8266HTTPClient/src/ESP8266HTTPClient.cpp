@@ -706,19 +706,27 @@ String HTTPClient::errorToString(int error)
  * @param value
  * @param first
  */
-void HTTPClient::addHeader(const String& name, const String& value, bool first)
+void HTTPClient::addHeader(const String& name, const String& value, bool first, bool replace)
 {
-
     // not allow set of Header handled by code
     if(!name.equalsIgnoreCase(F("Connection")) &&
        !name.equalsIgnoreCase(F("User-Agent")) &&
        !name.equalsIgnoreCase(F("Host")) &&
        !(name.equalsIgnoreCase(F("Authorization")) && _base64Authorization.length())){
+
         String headerLine = name;
         headerLine += ": ";
+
+        if (replace) {
+            int headerStart = _headers.indexOf(headerLine);
+            if (headerStart != -1) {
+                int headerEnd = _headers.indexOf('\n', headerStart);
+                _headers = _headers.substring(0, headerStart) + _headers.substring(headerEnd + 1);
+            }
+        }
+
         headerLine += value;
         headerLine += "\r\n";
-
         if(first) {
             _headers = headerLine + _headers;
         } else {
@@ -865,6 +873,7 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     if(_base64Authorization.length()) {
+        _base64Authorization.replace("\n", "");
         header += F("Authorization: Basic ");
         header += _base64Authorization;
         header += "\r\n";
@@ -906,7 +915,8 @@ int HTTPClient::handleHeaderResponse()
                 _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
             } else if(headerLine.indexOf(':')) {
                 String headerName = headerLine.substring(0, headerLine.indexOf(':'));
-                String headerValue = headerLine.substring(headerLine.indexOf(':') + 2);
+                String headerValue = headerLine.substring(headerLine.indexOf(':') + 1);
+                headerValue.trim();
 
                 if(headerName.equalsIgnoreCase("Content-Length")) {
                     _size = headerValue.toInt();
