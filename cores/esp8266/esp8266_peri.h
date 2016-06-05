@@ -169,6 +169,8 @@ extern uint8_t esp8266_gpioToFn[16];
 #define RTCIC     ESP8266_REG(0x724) //RTC INT Clear
 #define RTCIE     ESP8266_REG(0x728) //RTC INT Enable
 
+#define RTC_USER_MEM ((volatile uint32_t*)0x60001200)
+
 //IO SWAP Register
 #define IOSWAP    ESP8266_DREG(0x28)
 #define IOSWAPU   0 //Swaps UART

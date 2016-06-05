@@ -112,21 +112,21 @@ void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
     esp_yield();
 }
 
-bool EspClass::rtcUserMemoryRead(uint32_t *data, size_t size)
+bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
 {
-    if (size > 512) {
+    if (size + offset > 512) {
         return false;
     } else {
-        return system_rtc_mem_read(64, data, size);
+        return system_rtc_mem_read(64 + offset, data, size);
     }
 }
 
-bool EspClass::rtcUserMemoryWrite(uint32_t *data, size_t size)
+bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
 {
-    if (size > 512) {
+    if (size + offset > 512) {
         return false;
     } else {
-        return system_rtc_mem_write(64, data, size);
+        return system_rtc_mem_write(64 + offset, data, size);
     }
 }
 

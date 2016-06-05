@@ -17,6 +17,7 @@ title: Supported Hardware
   * [ESPino](#espino)
   * [WifInfo](#WifInfo)
   * [Generic ESP8266 modules](#generic-esp8266-modules)
+  * [Generic ESP8285 modules](#generic-esp8285-modules)
   * [Serial Adapter](#serial-adapter)
   * [Minimal Hardware Setup for Bootloading and Usage](#minimal-hardware-setup-for-bootloading-and-usage)
   * [ESP to Serial](#esp-to-serial)
@@ -270,6 +271,13 @@ the first value respects the pin setup of the Pins 0, 2 and 15.
 
 note:
  - number = ((GPIO15 << 2) | (GPIO0 << 1) | GPIO2);
+
+## Generic ESP8285 modules
+
+ESP8285 ([datasheet](http://espressif.com/sites/default/files/documentation/0a-esp8285_datasheet_en_v1.0_20160422.pdf)) is a multi-chip package which contains ESP8266 and 1MB flash.
+All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.
+
+Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.
 
 ## WeMos D1
 Product page: http://wemos.cc

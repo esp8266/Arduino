@@ -21,7 +21,7 @@ void setup()
 
 const char* fp = "40 A3 6C E3 8A DF A2 D4 13 B0 32 5C 87 44 54 28 0B CE C5 A4";
 
-TEST_CASE("HTTP GET request", "[HTTPClient]")
+TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
 {
     {
         // small request
@@ -47,7 +47,20 @@ TEST_CASE("HTTP GET request", "[HTTPClient]")
             }
         }
     }
+    {
+        // can do two POST requests with one HTTPClient object (#1902)
+        HTTPClient http;
+        http.begin(SERVER_IP, 8088, "/");
+        http.addHeader("Content-Type", "text/plain");
+        auto httpCode = http.POST("foo");
+        Serial.println(httpCode);
+        REQUIRE(httpCode == HTTP_CODE_OK);
+        http.end();
 
+        httpCode = http.POST("bar");
+        REQUIRE(httpCode == HTTP_CODE_OK);
+        http.end();
+    }
 }
 
 
@@ -79,57 +92,6 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
     }
 
 }
-// TEST_CASE("HTTP GET request", "[HTTPClient]")
-// {
-//     const int repeatCount = 10;
-
-//     String url = createBin(false);
-//     int heapBefore = ESP.getFreeHeap();
-//     for (int i = 0; i < repeatCount; ++i) {
-//         HTTPClient http;
-//         http.begin(url);
-//         auto httpCode = http.GET();
-//         REQUIRE(httpCode == HTTP_CODE_OK);
-//         String payload = http.getString();
-//         payload.replace("\n", "\\n");
-//         String quotedPayload;
-//         quotedPayload.reserve(payload.length() + 3);
-//         quotedPayload += "\"";
-//         quotedPayload += payload;
-//         quotedPayload += "\"";
-//         Serial.println("----payload:");
-//         Serial.println(quotedPayload);
-//         Serial.println("----");
-//         Serial.println("----test_payload:");
-//         Serial.println(test_payload);
-//         Serial.println("----");
-//         CHECK(quotedPayload == test_payload);
-//         http.end();
-//         delay(100);
-//     }
-//     int heapAfter = ESP.getFreeHeap();
-//     CHECK(heapBefore - heapAfter <= 8);
-// }
-
-// TEST_CASE("HTTPS GET request", "[HTTPClient]")
-// {
-//     const int repeatCount = 10;
-
-//     String url = createBin(true);
-//     int heapBefore = ESP.getFreeHeap();
-//     for (int i = 0; i < repeatCount; ++i) {
-//         HTTPClient http;
-//         http.begin(url, mockbin_fingerprint);
-//         auto httpCode = http.GET();
-//         REQUIRE(httpCode == HTTP_CODE_OK);
-//         String payload = http.getString();
-//         CHECK(payload == test_payload);
-//         http.end();
-//         delay(100);
-//     }
-//     int heapAfter = ESP.getFreeHeap();
-//     CHECK(heapBefore - heapAfter <= 8);
-// }
 
 void loop()
 {
