@@ -38,6 +38,11 @@ class UpdaterClass {
     bool begin(size_t size, int command = U_FLASH);
 
     /*
+      Run Updater from asynchronous callbacs
+    */
+    void runAsync(bool async){ _async = async; }
+
+    /*
       Writes a buffer to the flash and increments the address
       Returns the amount written
     */
@@ -143,6 +148,7 @@ class UpdaterClass {
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
 
+    bool _async;
     uint8_t _error;
     uint8_t *_buffer;
     size_t _bufferLen;
