@@ -42,5 +42,4 @@ void setup(void){
 
 void loop(void){
   httpServer.handleClient();
-  delay(1);
 }
