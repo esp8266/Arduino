@@ -25,9 +25,23 @@
 
 #include "ESP8266httpUpdate.h"
 #include <StreamString.h>
+//ADDED DJO
+#
+#include <FS.h>
+
+//ADDED DJO
 
 extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
+
+void saveMD5(String s) {
+  File md5 = SPIFFS.open("/md5.txt", "w");
+  if (!md5) {
+    Serial.println("Failed to open config file for writing");
+  }
+  md5.println(s.c_str());
+  md5.close();
+}
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
 {
@@ -177,6 +191,9 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     http.addHeader(F("x-ESP8266-sketch-size"), String(ESP.getSketchSize()));
     http.addHeader(F("x-ESP8266-chip-size"), String(ESP.getFlashChipRealSize()));
     http.addHeader(F("x-ESP8266-sdk-version"), ESP.getSdkVersion());
+	//ADDED DJO
+	http.addHeader("authorization", "Basic ZGpvZWxlOkBqUDZBcTAz");
+	//ADDED DJO
 
     if(spiffs) {
         http.addHeader(F("x-ESP8266-mode"), F("spiffs"));
@@ -297,7 +314,10 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                     http.end();
 
                     if(_rebootOnUpdate) {
-                        ESP.restart();
+                        //ADDED DJO
+                        saveMD5(http.header("x-MD5").c_str());
+                        ESP.reset();
+						//ADDED DJO
                     }
 
                 } else {
