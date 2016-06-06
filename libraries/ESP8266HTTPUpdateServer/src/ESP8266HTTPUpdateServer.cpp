@@ -12,8 +12,8 @@ R"(<html><body><form method='POST' action='' enctype='multipart/form-data'>
                   <input type='submit' value='Update'>
                </form>
          </body></html>)";
-const char* ESP8266HTTPUpdateServer::_failedResponse = R("Update Failed!");
-const char* ESP8266HTTPUpdateServer::_successResponse = R("<META http-equiv=\"refresh\" content=\"15;URL=\">Update Success! Rebooting...");
+const char* ESP8266HTTPUpdateServer::_failedResponse = R"(Update Failed!)";
+const char* ESP8266HTTPUpdateServer::_successResponse = "<META http-equiv=\"refresh\" content=\"15;URL=\">Update Success! Rebooting...";
 
 ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
 {
