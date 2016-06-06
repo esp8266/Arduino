@@ -14,7 +14,23 @@ class ESP8266HTTPUpdateServer
     bool _authenticated;
   public:
     ESP8266HTTPUpdateServer(bool serial_debug=false);
-    void setup(ESP8266WebServer *server, const char * path="/update", const char * username=NULL, const char * password=NULL);
+
+    void setup(ESP8266WebServer *server)
+    {
+      setup(server, NULL, NULL);
+    }
+
+    void setup(ESP8266WebServer *server, const char * path)
+    {
+      setup(server, path, NULL, NULL);
+    }
+
+    void setup(ESP8266WebServer *server, const char * username, const char * password)
+    {
+      setup(server, "/update", username, password);
+    }
+    
+    void setup(ESP8266WebServer *server, const char * path, const char * username, const char * password);
 };
 
 
