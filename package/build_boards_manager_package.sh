@@ -46,8 +46,7 @@ rm exclude.txt
 
 # Get additional libraries (TODO: add them as git submodule or subtree?)
 
-# SoftwareSerial version 2.2
-wget -q -O SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/097712eb07f5b3a70ef419b6e7a7ed2ada5aab85.zip
+wget -q -O SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/3.1.0.zip
 unzip -q SoftwareSerial.zip
 rm -rf SoftwareSerial.zip
 mv espsoftwareserial-* SoftwareSerial
