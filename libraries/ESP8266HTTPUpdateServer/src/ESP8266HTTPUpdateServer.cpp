@@ -12,6 +12,8 @@ R"(<html><body><form method='POST' action='' enctype='multipart/form-data'>
                   <input type='submit' value='Update'>
                </form>
          </body></html>)";
+const char* ESP8266HTTPUpdateServer::_failedResponse = R("Update Failed!");
+const char* ESP8266HTTPUpdateServer::_successResponse = R("<META http-equiv=\"refresh\" content=\"15;URL=\">Update Success! Rebooting...");
 
 ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
 {
@@ -39,7 +41,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
     _server->on(path, HTTP_POST, [&](){
       if(!_authenticated)
         return _server->requestAuthentication();
-      _server->send(200, "text/html", (Update.hasError())?"FAIL":"<META http-equiv=\"refresh\" content=\"15;URL=\">OK");
+      _server->send(200, "text/html", Update.hasError() ? _failedResponse : _successResponse);
       ESP.restart();
     },[&](){
       // handler for the file upload, get's the sketch bytes, and writes

@@ -9,6 +9,8 @@ class ESP8266HTTPUpdateServer
     bool _serial_output;
     ESP8266WebServer *_server;
     static const char *_serverIndex;
+    static const char *_failedResponse;
+    static const char *_successResponse;
     char * _username;
     char * _password;
     bool _authenticated;
@@ -29,7 +31,7 @@ class ESP8266HTTPUpdateServer
     {
       setup(server, "/update", username, password);
     }
-    
+
     void setup(ESP8266WebServer *server, const char * path, const char * username, const char * password);
 };
 
