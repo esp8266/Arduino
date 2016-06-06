@@ -66,7 +66,8 @@ cat $srcdir/platform.txt | \
 $SED 's/runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}\/tools\/xtensa-lx106-elf//g' | \
 $SED 's/runtime.tools.esptool.path={runtime.platform.path}\/tools\/esptool//g' | \
 $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool.path=\{runtime.tools.esptool.path\}/g' | \
-$SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' \
+$SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
+$SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' \
  > $outdir/platform.txt
 
 # Put core version and short hash of git version into core_version.h
