@@ -158,6 +158,19 @@ uint32_t EspClass::getChipId(void)
     return system_get_chip_id();
 }
 
+extern "C" uint32_t core_version;
+extern "C" const char* core_release;
+
+String EspClass::getCoreVersion()
+{
+    if (core_release != NULL) {
+        return String(core_release);
+    }
+    char buf[12];
+    snprintf(buf, sizeof(buf), "%08x", core_version);
+    return String(buf);
+}
+
 const char * EspClass::getSdkVersion(void)
 {
     return system_get_sdk_version();

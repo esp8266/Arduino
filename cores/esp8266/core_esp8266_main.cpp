@@ -31,12 +31,24 @@ extern "C" {
 #include "user_interface.h"
 #include "cont.h"
 }
+#include <core_version.h>
+
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
 
 #define OPTIMISTIC_YIELD_TIME_US 16000
 
 struct rst_info resetInfo;
+
+extern "C" {
+extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
+const char* core_release = 
+#ifdef ARDUINO_ESP8266_RELEASE
+    ARDUINO_ESP8266_RELEASE;
+#else
+    NULL;
+#endif
+} // extern "C"
 
 int atexit(void (*func)()) {
     return 0;
@@ -134,6 +146,7 @@ void init_done() {
     system_set_os_print(1);
     gdb_init();
     do_global_ctors();
+    printf("\n%08x\n", core_version);
     esp_schedule();
 }
 
