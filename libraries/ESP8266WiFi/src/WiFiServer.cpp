@@ -56,6 +56,7 @@ WiFiServer::WiFiServer(uint16_t port)
 }
 
 void WiFiServer::begin() {
+    close();
     err_t err;
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
@@ -118,6 +119,7 @@ void WiFiServer::close() {
       return;
     }
     tcp_close(_pcb);
+    _pcb = nullptr;
 }
 
 void WiFiServer::stop() {
