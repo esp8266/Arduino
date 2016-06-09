@@ -23,40 +23,35 @@ void MD5Builder::addHexString(const char * data){
   free(tmp);
 }
 
-bool MD5Builder::addStream(Stream & stream, const size_t total_len) {
+bool MD5Builder::addStream(Stream & stream, const size_t maxLen) {
   const int buf_size = 512;
-  int bytesleft = total_len;
+  int maxLengthLeft = maxLen;
   uint8_t * buf = (uint8_t*) malloc(buf_size);
+
   if(buf) {
-    while((stream.available() > -1) && (bytesleft > 0)) {
-      // get available data size
-      int sizeAvailable = stream.available();
-      if(sizeAvailable) {
-        int readBytes = sizeAvailable;
+    int bytesAvailable = stream.available();
+    while((bytesAvailable > 0) && (maxLengthLeft > 0)) {
 
-        // read only the asked bytes
-        if(readBytes > bytesleft) {
-          readBytes = bytesleft ;
-        }
+        // determine number of bytes to read
+        int readBytes = bytesAvailable;
+        if(readBytes > maxLengthLeft) readBytes = maxLengthLeft ;       // read only until max_len
+        if(readBytes > buf_size)  readBytes = buf_size;                 // not read more the buffer can handle
 
-        // not read more the buffer can handle
-        if(readBytes > buf_size) {
-          readBytes = buf_size;
-        }
+        // read data and check if we got something
+        int numBytesRead = stream.readBytes(buf, readBytes);
+        if(numBytesRead< 1)  return false;
 
-        // read data
-        int bytesread = stream.readBytes(buf, readBytes);
-        bytesleft -= bytesread;
-        if(bytesread > 0) {
-          MD5Update(&_ctx, buf, bytesread);
-        }
-      }
-      // time for network streams
-      delay(0);
+        // Update MD5 with buffer payload
+        MD5Update(&_ctx, buf, numBytesRead);
+
+        delay(0);      // time for network streams
+
+        // update available number of bytes
+        maxLengthLeft -= numBytesRead;
+        bytesAvailable = stream.available();
     }
-    // guaranteed not null
     free(buf);
-    return (bytesleft == 0);
+    return true;
   } else {
     return false;
   }
