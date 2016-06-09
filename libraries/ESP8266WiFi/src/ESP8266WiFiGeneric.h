@@ -24,6 +24,8 @@
 #define ESP8266WIFIGENERIC_H_
 
 #include "ESP8266WiFiType.h"
+#include <functional>
+#include <memory>
 
 #ifdef DEBUG_ESP_WIFI
 #ifdef DEBUG_ESP_PORT
@@ -35,12 +37,10 @@
 #define DEBUG_WIFI_GENERIC(...)
 #endif
 
-typedef void (*WiFiEventCb)(WiFiEvent_t event);
+struct WiFiEventHandlerOpaque;
+typedef std::shared_ptr<WiFiEventHandlerOpaque> WiFiEventHandler;
 
-typedef struct {
-        WiFiEventCb cb;
-        WiFiEvent_t event;
-} WiFiEventCbList_t;
+typedef void (*WiFiEventCb)(WiFiEvent_t);
 
 class ESP8266WiFiGenericClass {
         // ----------------------------------------------------------------------------------------------
@@ -48,11 +48,20 @@ class ESP8266WiFiGenericClass {
         // ----------------------------------------------------------------------------------------------
 
     public:
-
         ESP8266WiFiGenericClass();
 
-        void onEvent(WiFiEventCb cbEvent, WiFiEvent_t event = WIFI_EVENT_MAX);
-        void removeEvent(WiFiEventCb cbEvent, WiFiEvent_t event = WIFI_EVENT_MAX);
+        // Note: this function is deprecated. Use one of the functions below instead.
+        void onEvent(WiFiEventCb cb, WiFiEvent_t event = WIFI_EVENT_ANY) __attribute__((deprecated));
+
+        // Subscribe to specific event and get event information as an argument to the callback
+        WiFiEventHandler onStationModeConnected(std::function<void(const WiFiEventStationModeConnected&)>);
+        WiFiEventHandler onStationModeDisconnected(std::function<void(const WiFiEventStationModeDisconnected&)>);
+        WiFiEventHandler onStationModeAuthModeChanged(std::function<void(const WiFiEventStationModeAuthModeChanged&)>);
+        WiFiEventHandler onStationModeGotIP(std::function<void(const WiFiEventStationModeGotIP&)>);
+        WiFiEventHandler onStationModeDHCPTimeout(std::function<void(void)>);
+        WiFiEventHandler onSoftAPModeStationConnected(std::function<void(const WiFiEventSoftAPModeStationConnected&)>);
+        WiFiEventHandler onSoftAPModeStationDisconnected(std::function<void(const WiFiEventSoftAPModeStationDisconnected&)>);
+        // WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
 
         int32_t channel(void);
 
