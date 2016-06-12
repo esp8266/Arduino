@@ -79,11 +79,7 @@ extern "C" {
 #define RT_EXTRA                    1024
 #define BM_RECORD_OFFSET            5
 
-#ifdef CONFIG_SSL_SKELETON_MODE
-#define NUM_PROTOCOLS               1
-#else
 #define NUM_PROTOCOLS               2
-#endif
 
 #define PARANOIA_CHECK(A, B)        if (A < B) { \
     ret = SSL_ERROR_INVALID_HANDSHAKE; goto error; }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -177,77 +177,6 @@ do_state:
 error:
     return ret;
 }
-
-#ifdef CONFIG_SSL_ENABLE_V23_HANDSHAKE
-/*
- * Some browsers use a hybrid SSLv2 "client hello" 
- */
-int process_sslv23_client_hello(SSL *ssl)
-{
-    uint8_t *buf = ssl->bm_data;
-    int bytes_needed = ((buf[0] & 0x7f) << 8) + buf[1];
-    int ret = SSL_OK;
-
-    /* we have already read 3 extra bytes so far */
-    int read_len = SOCKET_READ(ssl->client_fd, buf, bytes_needed-3);
-    int cs_len = buf[1];
-    int id_len = buf[3];
-    int ch_len = buf[5];
-    int i, j, offset = 8;   /* start at first cipher */
-    int random_offset = 0;
-
-    DISPLAY_BYTES(ssl, "received %d bytes", buf, read_len, read_len);
-    
-    /* connection has gone, so die */
-    if (read_len < 0)
-    {
-        return SSL_ERROR_CONN_LOST;
-    }
-
-    add_packet(ssl, buf, read_len);
-
-    /* now work out what cipher suite we are going to use */
-    for (j = 0; j < NUM_PROTOCOLS; j++)
-    {
-        for (i = 0; i < cs_len; i += 3)
-        {
-            if (ssl_prot_prefs[j] == buf[offset+i])
-            {
-                ssl->cipher = ssl_prot_prefs[j];
-                goto server_hello;
-            }
-        }
-    }
-
-    /* ouch! protocol is not supported */
-    ret = SSL_ERROR_NO_CIPHER;
-    goto error;
-
-server_hello:
-    /* get the session id */
-    offset += cs_len - 2;   /* we've gone 2 bytes past the end */
-#ifndef CONFIG_SSL_SKELETON_MODE
-    ssl->session = ssl_session_update(ssl->ssl_ctx->num_sessions,
-            ssl->ssl_ctx->ssl_sessions, ssl, id_len ? &buf[offset] : NULL);
-#endif
-
-    /* get the client random data */
-    offset += id_len;
-
-    /* random can be anywhere between 16 and 32 bytes long - so it is padded
-     * with 0's to the left */
-    if (ch_len == 0x10)
-    {
-        random_offset += 0x10;
-    }
-
-    memcpy(&ssl->dc->client_random[random_offset], &buf[offset], ch_len);
-    ret = send_server_hello_sequence(ssl);
-
-error:
-    return ret;
-}
-#endif
 
 /*
  * Send the entire server hello sequence
