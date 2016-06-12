@@ -143,8 +143,6 @@ MDNSResponder::~MDNSResponder() {
 }
 
 bool MDNSResponder::begin(const char* hostname){
-  // Open the MDNS socket if it isn't already open.
-
   size_t n = strlen(hostname);
   if (n > 63) { // max size for a single label.
     return false;
@@ -155,15 +153,41 @@ bool MDNSResponder::begin(const char* hostname){
   _hostName.toLowerCase();
 
   // If instance name is not already set copy hostname to instance name
-  if (_instanceName.equals("") ) _instanceName=hostname; 
+  if (_instanceName.equals("") ) _instanceName=hostname;
 
+  _gotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& event){
+    _restart();
+  });
+
+  _disconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& event) {
+    _restart();
+  });
+
+  return _listen();
+}
+
+void MDNSResponder::_restart() {
+  if (_conn) {
+    _conn->unref();
+    _conn = nullptr;
+  }
+  _listen();
+}
+
+bool MDNSResponder::_listen() {
   // Open the MDNS socket if it isn't already open.
   if (!_conn) {
     uint32_t ourIp = _getOurIp();
     if(ourIp == 0){
+      #ifdef MDNS_DEBUG_RX
+      Serial.println("MDNS: no IP address to listen on");
+      #endif
       return false;
     }
-
+    #ifdef MDNS_DEBUG_RX
+    Serial.print("MDNS listening on IP: ");
+    Serial.println(IPAddress(ourIp));
+    #endif
     ip_addr_t ifaddr;
     ifaddr.addr = ourIp;
     ip_addr_t multicast_addr;
