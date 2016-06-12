@@ -212,6 +212,12 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddres
     info.gw.addr = static_cast<uint32_t>(gateway);
     info.netmask.addr = static_cast<uint32_t>(subnet);
 
+    if (local_ip == 0U && gateway == 0U && subnet == 0U) {
+        _useStaticIp = false;
+        wifi_station_dhcpc_start();
+        return true;
+    }
+
     wifi_station_dhcpc_stop();
     if(wifi_set_ip_info(STATION_IF, &info)) {
         _useStaticIp = true;

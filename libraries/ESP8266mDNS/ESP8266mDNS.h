@@ -114,6 +114,8 @@ private:
   struct MDNSQuery * _query;
   bool _newQuery;
   bool _waitingForAnswers;
+  WiFiEventHandler _disconnectedHandler;
+  WiFiEventHandler _gotIPHandler;
   
 
   uint32_t _getOurIp();
@@ -125,6 +127,8 @@ private:
   size_t advertiseServices(); // advertise all hosted services
   MDNSAnswer* _getAnswerFromIdx(int idx);
   int _getNumAnswers();
+  bool _listen();
+  void _restart();
 };
 
 extern MDNSResponder MDNS;
