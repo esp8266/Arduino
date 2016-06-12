@@ -288,10 +288,6 @@ EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
     int n = out_len, nw, i, tot = 0;
     /* maximum size of a TLS packet is around 16kB, so fragment */
 
-    if (ssl->can_free_certificates) {
-        certificate_free(ssl);
-    }
-
     do 
     {
         nw = n;
@@ -1226,10 +1222,6 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     int read_len, is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     uint8_t *buf = ssl->bm_data;
 
-    if (ssl->can_free_certificates) {
-        certificate_free(ssl);
-    }
-
     read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_read_index], 
                             ssl->need_bytes-ssl->got_bytes);
 
@@ -1435,6 +1427,9 @@ int increase_bm_data_size(SSL *ssl, size_t size)
 {
     if (ssl->max_plain_length == RT_MAX_PLAIN_LENGTH) {
         return SSL_OK;
+    }
+    if (ssl->can_free_certificates) {
+        certificate_free(ssl);
     }
     size_t required = (size + 1023) & ~(1023); // round up to 1k
     required = (required < RT_MAX_PLAIN_LENGTH) ? required : RT_MAX_PLAIN_LENGTH;
