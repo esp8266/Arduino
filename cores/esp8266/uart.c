@@ -230,7 +230,7 @@ void uart_uninit(uart_t* uart)
         break;
     }
 
-    os_free(uart);
+    free(uart);
 }
 
 void uart_swap(uart_t* uart, int tx_pin)

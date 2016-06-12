@@ -29,6 +29,7 @@ static s32_t spiffs_page_data_check(spiffs *fs, spiffs_fd *fd, spiffs_page_ix pi
   return res;
 }
 
+#if !SPIFFS_READ_ONLY
 static s32_t spiffs_page_index_check(spiffs *fs, spiffs_fd *fd, spiffs_page_ix pix, spiffs_span_ix spix) {
   s32_t res = SPIFFS_OK;
   if (pix == (spiffs_page_ix)-1) {
@@ -56,6 +57,7 @@ static s32_t spiffs_page_index_check(spiffs *fs, spiffs_fd *fd, spiffs_page_ix p
 #endif
   return res;
 }
+#endif // !SPIFFS_READ_ONLY
 
 #if !SPIFFS_CACHE
 
@@ -77,6 +79,7 @@ s32_t spiffs_phys_wr(
 
 #endif
 
+#if !SPIFFS_READ_ONLY
 s32_t spiffs_phys_cpy(
     spiffs *fs,
     spiffs_file fh,
@@ -98,6 +101,7 @@ s32_t spiffs_phys_cpy(
   }
   return SPIFFS_OK;
 }
+#endif // !SPIFFS_READ_ONLY
 
 // Find object lookup entry containing given id with visitor.
 // Iterate over object lookup pages in each block until a given object id entry is found.
@@ -218,6 +222,7 @@ s32_t spiffs_obj_lu_find_entry_visitor(
   return SPIFFS_VIS_END;
 }
 
+#if !SPIFFS_READ_ONLY
 s32_t spiffs_erase_block(
     spiffs *fs,
     spiffs_block_ix bix) {
@@ -243,7 +248,7 @@ s32_t spiffs_erase_block(
 
 #if SPIFFS_USE_MAGIC
   // finally, write magic
-  spiffs_obj_id magic = SPIFFS_MAGIC(fs);
+  spiffs_obj_id magic = SPIFFS_MAGIC(fs, bix);
   res = _spiffs_wr(fs, SPIFFS_OP_C_WRTHRU | SPIFFS_OP_T_OBJ_LU2, 0,
       SPIFFS_MAGIC_PADDR(fs, bix),
       sizeof(spiffs_obj_id), (u8_t *)&magic);
@@ -257,6 +262,59 @@ s32_t spiffs_erase_block(
 
   return res;
 }
+#endif // !SPIFFS_READ_ONLY
+
+#if SPIFFS_USE_MAGIC && SPIFFS_USE_MAGIC_LENGTH && SPIFFS_SINGLETON==0
+s32_t spiffs_probe(
+    spiffs_config *cfg) {
+  s32_t res;
+  u32_t paddr;
+  spiffs dummy_fs; // create a dummy fs struct just to be able to use macros
+  memcpy(&dummy_fs.cfg, cfg, sizeof(spiffs_config));
+  dummy_fs.block_count = 0;
+
+  // Read three magics, as one block may be in an aborted erase state.
+  // At least two of these must contain magic and be in decreasing order.
+  spiffs_obj_id magic[3];
+  spiffs_obj_id bix_count[3];
+
+  spiffs_block_ix bix;
+  for (bix = 0; bix < 3; bix++) {
+    paddr = SPIFFS_MAGIC_PADDR(&dummy_fs, bix);
+#if SPIFFS_HAL_CALLBACK_EXTRA
+    // not any proper fs to report here, so callback with null
+    // (cross fingers that no-one gets angry)
+    res = cfg->hal_read_f((void *)0, paddr, sizeof(spiffs_obj_id), (u8_t *)&magic[bix]);
+#else
+    res = cfg->hal_read_f(paddr, sizeof(spiffs_obj_id), (u8_t *)&magic[bix]);
+#endif
+    bix_count[bix] = magic[bix] ^ SPIFFS_MAGIC(&dummy_fs, 0);
+    SPIFFS_CHECK_RES(res);
+  }
+
+  // check that we have sane number of blocks
+  if (bix_count[0] < 3) return SPIFFS_ERR_PROBE_TOO_FEW_BLOCKS;
+  // check that the order is correct, take aborted erases in calculation
+  // first block aborted erase
+  if (magic[0] == (spiffs_obj_id)(-1) && bix_count[1] - bix_count[2] == 1) {
+    return (bix_count[1]+1) * cfg->log_block_size;
+  }
+  // second block aborted erase
+  if (magic[1] == (spiffs_obj_id)(-1) && bix_count[0] - bix_count[2] == 2) {
+    return bix_count[0] * cfg->log_block_size;
+  }
+  // third block aborted erase
+  if (magic[2] == (spiffs_obj_id)(-1) && bix_count[0] - bix_count[1] == 1) {
+    return bix_count[0] * cfg->log_block_size;
+  }
+  // no block has aborted erase
+  if (bix_count[0] - bix_count[1] == 1 && bix_count[1] - bix_count[2] == 1) {
+    return bix_count[0] * cfg->log_block_size;
+  }
+
+  return SPIFFS_ERR_PROBE_NOT_A_FS;
+}
+#endif // SPIFFS_USE_MAGIC && SPIFFS_USE_MAGIC_LENGTH && SPIFFS_SINGLETON==0
 
 
 static s32_t spiffs_obj_lu_scan_v(
@@ -311,7 +369,7 @@ s32_t spiffs_obj_lu_scan(
         sizeof(spiffs_obj_id), (u8_t *)&magic);
 
     SPIFFS_CHECK_RES(res);
-    if (magic != SPIFFS_MAGIC(fs)) {
+    if (magic != SPIFFS_MAGIC(fs, bix)) {
       if (unerased_bix == (spiffs_block_ix)-1) {
         // allow one unerased block as it might be powered down during an erase
         unerased_bix = bix;
@@ -350,7 +408,11 @@ s32_t spiffs_obj_lu_scan(
   if (unerased_bix != (spiffs_block_ix)-1) {
     // found one unerased block, remedy
     SPIFFS_DBG("mount: erase block %i\n", bix);
+#if SPIFFS_READ_ONLY
+    res = SPIFFS_ERR_RO_ABORTED_OPERATION;
+#else
     res = spiffs_erase_block(fs, unerased_bix);
+#endif // SPIFFS_READ_ONLY
     SPIFFS_CHECK_RES(res);
   }
 #endif
@@ -381,6 +443,7 @@ s32_t spiffs_obj_lu_scan(
   return res;
 }
 
+#if !SPIFFS_READ_ONLY
 // Find free object lookup entry
 // Iterate over object lookup pages in each block until a free object id entry is found
 s32_t spiffs_obj_lu_find_free(
@@ -415,6 +478,7 @@ s32_t spiffs_obj_lu_find_free(
 
   return res;
 }
+#endif // !SPIFFS_READ_ONLY
 
 // Find object lookup entry containing given id
 // Iterate over object lookup pages in each block until a given object id entry is found
@@ -536,6 +600,7 @@ s32_t spiffs_obj_lu_find_id_and_span_by_phdr(
   return res;
 }
 
+#if !SPIFFS_READ_ONLY
 // Allocates a free defined page with given obj_id
 // Occupies object lookup entry and page
 // data may be NULL; where only page header is stored, len and page_offs is ignored
@@ -593,7 +658,9 @@ s32_t spiffs_page_allocate_data(
 
   return res;
 }
+#endif // !SPIFFS_READ_ONLY
 
+#if !SPIFFS_READ_ONLY
 // Moves a page from src to a free page and finalizes it. Updates page index. Page data is given in param page.
 // If page data is null, provided header is used for metainfo and page data is physically copied.
 s32_t spiffs_page_move(
@@ -656,7 +723,9 @@ s32_t spiffs_page_move(
   res = spiffs_page_delete(fs, src_pix);
   return res;
 }
+#endif // !SPIFFS_READ_ONLY
 
+#if !SPIFFS_READ_ONLY
 // Deletes a page and removes it from object lookup.
 s32_t spiffs_page_delete(
     spiffs *fs,
@@ -685,7 +754,9 @@ s32_t spiffs_page_delete(
 
   return res;
 }
+#endif // !SPIFFS_READ_ONLY
 
+#if !SPIFFS_READ_ONLY
 // Create an object index header page with empty index and undefined length
 s32_t spiffs_object_create(
     spiffs *fs,
@@ -737,7 +808,9 @@ s32_t spiffs_object_create(
 
   return res;
 }
+#endif // !SPIFFS_READ_ONLY
 
+#if !SPIFFS_READ_ONLY
 // update object index header with any combination of name/size/index
 // new_objix_hdr_data may be null, if so the object index header page is loaded
 // name may be null, if so name is not changed
@@ -792,18 +865,19 @@ s32_t spiffs_object_update_index_hdr(
 
   return res;
 }
+#endif // !SPIFFS_READ_ONLY
 
 void spiffs_cb_object_event(
     spiffs *fs,
     spiffs_fd *fd,
     int ev,
-    spiffs_obj_id obj_id,
+    spiffs_obj_id obj_id_raw,
     spiffs_span_ix spix,
     spiffs_page_ix new_pix,
     u32_t new_size) {
   (void)fd;
   // update index caches in all file descriptors
-  obj_id &= ~SPIFFS_OBJ_ID_IX_FLAG;
+  spiffs_obj_id obj_id = obj_id_raw & ~SPIFFS_OBJ_ID_IX_FLAG;
   u32_t i;
   spiffs_fd *fds = (spiffs_fd *)fs->fd_space;
   for (i = 0; i < fs->fd_count; i++) {
@@ -829,6 +903,22 @@ void spiffs_cb_object_event(
         cur_fd->cursor_objix_pix = 0;
       }
     }
+  }
+
+  // callback to user if object index header
+  if (fs->file_cb_f && spix == 0 && (obj_id_raw & SPIFFS_OBJ_ID_IX_FLAG)) {
+    spiffs_fileop_type op;
+    if (ev == SPIFFS_EV_IX_NEW) {
+      op = SPIFFS_CB_CREATED;
+    } else if (ev == SPIFFS_EV_IX_UPD) {
+      op = SPIFFS_CB_UPDATED;
+    } else if (ev == SPIFFS_EV_IX_DEL) {
+      op = SPIFFS_CB_DELETED;
+    } else {
+      SPIFFS_DBG("       callback: WARNING unknown callback event %02x\n", ev);
+      return; // bail out
+    }
+    fs->file_cb_f(fs, op, obj_id, new_pix);
   }
 }
 
@@ -888,6 +978,7 @@ s32_t spiffs_object_open_by_page(
   return res;
 }
 
+#if !SPIFFS_READ_ONLY
 // Append to object
 // keep current object index (header) page in fs->work buffer
 s32_t spiffs_object_append(spiffs_fd *fd, u32_t offset, u8_t *data, u32_t len) {
@@ -1127,8 +1218,10 @@ s32_t spiffs_object_append(spiffs_fd *fd, u32_t offset, u8_t *data, u32_t len) {
   }
 
   return res;
-}
+} // spiffs_object_append
+#endif // !SPIFFS_READ_ONLY
 
+#if !SPIFFS_READ_ONLY
 // Modify object
 // keep current object index (header) page in fs->work buffer
 s32_t spiffs_object_modify(spiffs_fd *fd, u32_t offset, u8_t *data, u32_t len) {
@@ -1328,7 +1421,8 @@ s32_t spiffs_object_modify(spiffs_fd *fd, u32_t offset, u8_t *data, u32_t len) {
   }
 
   return res;
-}
+} // spiffs_object_modify
+#endif // !SPIFFS_READ_ONLY
 
 static s32_t spiffs_object_find_object_index_header_by_name_v(
     spiffs *fs,
@@ -1394,6 +1488,7 @@ s32_t spiffs_object_find_object_index_header_by_name(
   return res;
 }
 
+#if !SPIFFS_READ_ONLY
 // Truncates object to new size. If new size is null, object may be removed totally
 s32_t spiffs_object_truncate(
     spiffs_fd *fd,
@@ -1401,6 +1496,11 @@ s32_t spiffs_object_truncate(
     u8_t remove) {
   s32_t res = SPIFFS_OK;
   spiffs *fs = fd->fs;
+
+  if ((fd->size == SPIFFS_UNDEFINED_LEN || fd->size == 0) && !remove) {
+    // no op
+    return res;
+  }
 
   // need 2 pages if not removing: object index page + possibly chopped data page
   res = spiffs_gc_check(fs, remove ? 0 : SPIFFS_DATA_PAGE_SIZE(fs) * 2);
@@ -1614,7 +1714,8 @@ s32_t spiffs_object_truncate(
   fd->size = cur_size;
 
   return res;
-}
+} // spiffs_object_truncate
+#endif // !SPIFFS_READ_ONLY
 
 s32_t spiffs_object_read(
     spiffs_fd *fd,
@@ -1694,6 +1795,7 @@ s32_t spiffs_object_read(
   return res;
 }
 
+#if !SPIFFS_READ_ONLY
 typedef struct {
   spiffs_obj_id min_obj_id;
   spiffs_obj_id max_obj_id;
@@ -1861,6 +1963,7 @@ s32_t spiffs_obj_lu_find_free_obj_id(spiffs *fs, spiffs_obj_id *obj_id, const u8
 
   return res;
 }
+#endif // !SPIFFS_READ_ONLY
 
 s32_t spiffs_fd_find_new(spiffs *fs, spiffs_fd **fd) {
   u32_t i;

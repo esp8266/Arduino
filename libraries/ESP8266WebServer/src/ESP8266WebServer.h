@@ -25,6 +25,7 @@
 #define ESP8266WEBSERVER_H
 
 #include <functional>
+#include <ESP8266WiFi.h>
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
@@ -34,6 +35,7 @@ enum HTTPClientStatus { HC_NONE, HC_WAIT_READ, HC_WAIT_CLOSE };
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
 #define HTTP_UPLOAD_BUFLEN 2048
 #define HTTP_MAX_DATA_WAIT 1000 //ms to wait for the client to send the request
+#define HTTP_MAX_POST_WAIT 1000 //ms to wait for POST data to arrive
 #define HTTP_MAX_CLOSE_WAIT 2000 //ms to wait for the client to close the connection
 
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
@@ -66,13 +68,13 @@ public:
 
   void begin();
   void handleClient();
-  
+
   void close();
   void stop();
 
   bool authenticate(const char * username, const char * password);
   void requestAuthentication();
-  
+
   typedef std::function<void(void)> THandlerFunction;
   void on(const char* uri, THandlerFunction handler);
   void on(const char* uri, HTTPMethod method, THandlerFunction fn);
@@ -87,17 +89,17 @@ public:
   WiFiClient client() { return _currentClient; }
   HTTPUpload& upload() { return _currentUpload; }
 
-  String arg(const char* name);   // get request argument value by name
+  String arg(String name);        // get request argument value by name
   String arg(int i);              // get request argument value by number
   String argName(int i);          // get request argument name by number
   int args();                     // get arguments count
-  bool hasArg(const char* name);  // check if argument exists
+  bool hasArg(String name);       // check if argument exists
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
-  String header(const char* name);   // get request header value by name
+  String header(String name);      // get request header value by name
   String header(int i);              // get request header value by number
   String headerName(int i);          // get request header name by number
   int headers();                     // get header count
-  bool hasHeader(const char* name);  // check if header exists
+  bool hasHeader(String name);       // check if header exists
 
   String hostHeader();            // get request host header if available or empty String if not
 
@@ -133,7 +135,7 @@ protected:
   void _handleRequest();
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(String data);
-  static const char* _responseCodeToString(int code);
+  static String _responseCodeToString(int code);
   bool _parseForm(WiFiClient& client, String boundary, uint32_t len);
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);

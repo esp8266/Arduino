@@ -31,6 +31,38 @@
 #define DEBUG_OUTPUT Serial
 #endif
 
+static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& dataLength, int timeout_ms)
+{
+  char *buf = nullptr;
+  dataLength = 0;
+  while (dataLength < maxLength) {
+    int tries = timeout_ms;
+    size_t newLength;
+    while (!(newLength = client.available()) && tries--) delay(1);
+    if (!newLength) {
+      break;
+    }
+    if (!buf) {
+      buf = (char *) malloc(newLength + 1);
+      if (!buf) {
+        return nullptr;
+      }
+    }
+    else {
+      char* newBuf = (char *) realloc(buf, dataLength + newLength + 1);
+      if (!newBuf) {
+        free(buf);
+        return nullptr;
+      }
+      buf = newBuf;
+    }
+    client.readBytes(buf + dataLength, newLength);
+    dataLength += newLength;
+    buf[dataLength] = '\0';
+  }
+  return buf;
+}
+
 bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
@@ -114,14 +146,14 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       headerValue = req.substring(headerDiv + 1);
       headerValue.trim();
        _collectHeader(headerName.c_str(),headerValue.c_str());
-	  
+
 	  #ifdef DEBUG_ESP_HTTP_SERVER
 	  DEBUG_OUTPUT.print("headerName: ");
 	  DEBUG_OUTPUT.println(headerName);
 	  DEBUG_OUTPUT.print("headerValue: ");
 	  DEBUG_OUTPUT.println(headerValue);
 	  #endif
-	  
+
       if (headerName == "Content-Type"){
         if (headerValue.startsWith("text/plain")){
           isForm = false;
@@ -137,27 +169,27 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     }
 
     if (!isForm){
-      if (searchStr != "") searchStr += '&';
-      //some clients send headers first and data after (like we do)
-      //give them a chance
-      int tries = 100;//100ms max wait
-      while(!client.available() && tries--)delay(1);
-      size_t plainLen = client.available();
-      char *plainBuf = (char*)malloc(plainLen+1);
-      client.readBytes(plainBuf, plainLen);
-      plainBuf[plainLen] = '\0';
+      size_t plainLength;
+      char* plainBuf = readBytesWithTimeout(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
+      if (plainLength < contentLength) {
+      	free(plainBuf);
+      	return false;
+      }
 #ifdef DEBUG_ESP_HTTP_SERVER
       DEBUG_OUTPUT.print("Plain: ");
       DEBUG_OUTPUT.println(plainBuf);
 #endif
-      if(plainBuf[0] == '{' || plainBuf[0] == '[' || strstr(plainBuf, "=") == NULL){
-        //plain post json or other data
-        searchStr += "plain=";
-        searchStr += plainBuf;
-      } else {
-        searchStr += plainBuf;
+      if (contentLength > 0) {
+        if (searchStr != "") searchStr += '&';
+        if(plainBuf[0] == '{' || plainBuf[0] == '[' || strstr(plainBuf, "=") == NULL){
+          //plain post json or other data
+          searchStr += "plain=";
+          searchStr += plainBuf;
+        } else {
+          searchStr += plainBuf;
+        }
+        free(plainBuf);
       }
-      free(plainBuf);
     }
     _parseArguments(searchStr);
     if (isForm){
@@ -180,14 +212,14 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       headerName = req.substring(0, headerDiv);
       headerValue = req.substring(headerDiv + 2);
       _collectHeader(headerName.c_str(),headerValue.c_str());
-	  
+
 	  #ifdef DEBUG_ESP_HTTP_SERVER
 	  DEBUG_OUTPUT.print("headerName: ");
 	  DEBUG_OUTPUT.println(headerName);
 	  DEBUG_OUTPUT.print("headerValue: ");
 	  DEBUG_OUTPUT.println(headerValue);
 	  #endif
-	  
+
 	  if (headerName == "Host"){
         _hostHeader = headerValue;
       }

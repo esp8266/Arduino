@@ -188,8 +188,7 @@ int WiFiUDP::endPacket()
     if (!_ctx)
         return 0;
 
-    _ctx->send();
-    return 1;
+    return (_ctx->send()) ? 1 : 0;
 }
 
 size_t WiFiUDP::write(uint8_t byte)
@@ -237,7 +236,7 @@ int WiFiUDP::read(unsigned char* buffer, size_t len)
 int WiFiUDP::peek()
 {
     if (!_ctx)
-        return 0;
+        return -1;
 
     return _ctx->peek();
 }

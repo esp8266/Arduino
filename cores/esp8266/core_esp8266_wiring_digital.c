@@ -111,8 +111,8 @@ static uint32_t interrupt_reg = 0;
 
 void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
   uint32_t status = GPIE;
-  uint32_t levels = GPI;
   GPIEC = status;//clear them interrupts
+  uint32_t levels = GPI;
   if(status == 0 || interrupt_reg == 0) return;
   ETS_GPIO_INTR_DISABLE();
   int i = 0;
@@ -134,7 +134,7 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
   ETS_GPIO_INTR_ENABLE();
 }
 
-extern void __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode) {
+extern void ICACHE_RAM_ATTR __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode) {
   if(pin < 16) {
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = mode;
@@ -146,7 +146,7 @@ extern void __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode) {
   }
 }
 
-extern void __detachInterrupt(uint8_t pin) {
+extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
   if(pin < 16) {
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
     GPIEC = (1 << pin); //Clear Interrupt for this pin

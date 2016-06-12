@@ -1,51 +1,129 @@
-/* Tone.cpp
+/*
+  Tone.cpp
 
- A Tone Generator Library
+  A Tone Generator Library for the ESP8266
 
- Written by Brett Hagman
+  Copyright (c) 2016 Ben Pirt. All rights reserved.
+  This file is part of the esp8266 core for Arduino environment.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
- Version Modified By Date     Comments
- ------- ----------- -------- --------
- 0001    B Hagman    09/08/02 Initial coding
- 0002    B Hagman    09/08/18 Multiple pins
- 0003    B Hagman    09/08/18 Moved initialization from constructor to begin()
- 0004    B Hagman    09/09/26 Fixed problems with ATmega8
- 0005    B Hagman    09/11/23 Scanned prescalars for best fit on 8 bit timers
- 09/11/25 Changed pin toggle method to XOR
- 09/11/25 Fixed timer0 from being excluded
- 0006    D Mellis    09/12/29 Replaced objects with functions
- 0007    M Sproul    10/08/29 Changed #ifdefs from cpu to register
- 0008    S Kanemoto  12/06/22 Fixed for Leonardo by @maris_HY
- *************************************************/
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #include "Arduino.h"
 #include "pins_arduino.h"
 
-/*
-static int8_t toneBegin(uint8_t _pin) {
-    //TODO implement tone
-    return 0;
-}
-*/
+#define AVAILABLE_TONE_PINS 1
+const uint8_t tone_timers[] = { 1 };
+static uint8_t tone_pins[AVAILABLE_TONE_PINS] = { 255, };
+static long toggle_counts[AVAILABLE_TONE_PINS] = { 0, };
+#define T1INDEX 0
 
+void t1IntHandler();
+
+static int8_t toneBegin(uint8_t _pin) {
+  int8_t _index = -1;
+
+  // if we're already using the pin, reuse it.
+  for (int i = 0; i < AVAILABLE_TONE_PINS; i++) {
+    if (tone_pins[i] == _pin) {
+      return i;
+    }
+  }
+
+  // search for an unused timer.
+  for (int i = 0; i < AVAILABLE_TONE_PINS; i++) {
+    if (tone_pins[i] == 255) {
+      tone_pins[i] = _pin;
+      _index = i;
+      break;
+    }
+  }
+
+  return _index;
+}
+
+// frequency (in hertz) and duration (in milliseconds).
 void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
-    //TODO implement tone
+  int8_t _index;
+
+  _index = toneBegin(_pin);
+
+  if (_index >= 0) {
+    // Set the pinMode as OUTPUT
+    pinMode(_pin, OUTPUT);
+
+    // Calculate the toggle count
+    if (duration > 0) {
+      toggle_counts[_index] = 2 * frequency * duration / 1000;
+    } else {
+      toggle_counts[_index] = -1;
+    }
+
+    // set up the interrupt frequency
+    switch (tone_timers[_index]) {
+      case 0:
+        // Not currently supported
+        break;
+
+      case 1:
+        timer1_disable();
+        timer1_isr_init();
+        timer1_attachInterrupt(t1IntHandler);
+        timer1_enable(TIM_DIV1, TIM_EDGE, TIM_LOOP);
+        timer1_write((clockCyclesPerMicrosecond() * 500000) / frequency);
+        break;
+    }
+  }
+}
+
+void disableTimer(uint8_t _index) {
+  tone_pins[_index] = 255;
+
+  switch (tone_timers[_index]) {
+    case 0:
+      // Not currently supported
+      break;
+
+    case 1:
+      timer1_disable();
+      break;
+  }
 }
 
 void noTone(uint8_t _pin) {
-    //TODO implement tone
+  for (int i = 0; i < AVAILABLE_TONE_PINS; i++) {
+    if (tone_pins[i] == _pin) {
+      tone_pins[i] = 255;
+      disableTimer(i);
+      break;
+    }
+  }
+  digitalWrite(_pin, LOW);
+}
+
+ICACHE_RAM_ATTR void t1IntHandler() {
+  if (toggle_counts[T1INDEX] != 0){
+    // toggle the pin
+    digitalWrite(tone_pins[T1INDEX], toggle_counts[T1INDEX] % 2);
+    toggle_counts[T1INDEX]--;
+    // handle the case of indefinite duration
+    if (toggle_counts[T1INDEX] < -2){
+      toggle_counts[T1INDEX] = -1;
+    }
+  }else{
+    disableTimer(T1INDEX);
+    digitalWrite(tone_pins[T1INDEX], LOW);
+  }
 }

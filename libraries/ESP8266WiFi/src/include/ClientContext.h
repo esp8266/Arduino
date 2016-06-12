@@ -29,6 +29,12 @@ typedef void (*discard_cb_t)(void*, ClientContext*);
 extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
+#ifdef LWIP_OPEN_SRC
+typedef err_t recv_ret_t;
+#else
+typedef int32_t recv_ret_t;
+#endif
+
 class ClientContext {
     public:
         ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
@@ -269,11 +275,14 @@ class ClientContext {
             }
         }
 
-        int32_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err) {
+        recv_ret_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err) {
 
             if(pb == 0) // connection closed
             {
                 DEBUGV(":rcl\r\n");
+                if (_send_waiting) {
+                    esp_schedule();
+                }
                 abort();
                 return ERR_ABRT;
             }
@@ -307,7 +316,7 @@ class ClientContext {
             return ERR_OK;
         }
 
-        static int32_t _s_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *pb, err_t err) {
+        static recv_ret_t _s_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *pb, err_t err) {
             return reinterpret_cast<ClientContext*>(arg)->_recv(tpcb, pb, err);
         }
 

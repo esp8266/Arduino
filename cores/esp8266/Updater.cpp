@@ -14,7 +14,8 @@ extern "C" {
 extern "C" uint32_t _SPIFFS_start;
 
 UpdaterClass::UpdaterClass()
-: _error(0)
+: _async(false)
+, _error(0)
 , _buffer(0)
 , _bufferLen(0)
 , _size(0)
@@ -202,13 +203,13 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
 bool UpdaterClass::_writeBuffer(){
 
-  yield();
+  if(!_async) yield();
   bool result = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
-  yield();
+  if(!_async) yield();
   if (result) {
       result = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
   }
-  yield();
+  if(!_async) yield();
 
   if (!result) {
     _error = UPDATE_ERROR_WRITE;
@@ -240,7 +241,7 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
       return len - left;
     }
     left -= toBuff;
-    yield();
+    if(!_async) yield();
   }
   //lets see whats left
   memcpy(_buffer + _bufferLen, data + (len - left), left);

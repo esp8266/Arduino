@@ -112,6 +112,24 @@ void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
     esp_yield();
 }
 
+bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
+{
+    if (size + offset > 512) {
+        return false;
+    } else {
+        return system_rtc_mem_read(64 + offset, data, size);
+    }
+}
+
+bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
+{
+    if (size + offset > 512) {
+        return false;
+    } else {
+        return system_rtc_mem_write(64 + offset, data, size);
+    }
+}
+
 extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
 {
@@ -138,6 +156,19 @@ uint32_t EspClass::getFreeHeap(void)
 uint32_t EspClass::getChipId(void)
 {
     return system_get_chip_id();
+}
+
+extern "C" uint32_t core_version;
+extern "C" const char* core_release;
+
+String EspClass::getCoreVersion()
+{
+    if (core_release != NULL) {
+        return String(core_release);
+    }
+    char buf[12];
+    snprintf(buf, sizeof(buf), "%08x", core_version);
+    return String(buf);
 }
 
 const char * EspClass::getSdkVersion(void)

@@ -355,8 +355,8 @@
           var divContext = document.createElement("div");
           var scrollTop = document.body.scrollTop ? document.body.scrollTop : document.documentElement.scrollTop;
           var scrollLeft = document.body.scrollLeft ? document.body.scrollLeft : document.documentElement.scrollLeft;
-          var left = event.clientX + scrollLeft;
-          var top = event.clientY + scrollTop;
+          var left = e.clientX + scrollLeft;
+          var top = e.clientY + scrollTop;
           divContext.className = 'contextMenu';
           divContext.style.display = 'block';
           divContext.style.left = left + 'px';
@@ -451,8 +451,11 @@
             switch(ext){
               case "txt":
               case "htm":
+              case "html":
               case "js":
+              case "json":
               case "c":
+              case "h":
               case "cpp":
               case "css":
               case "xml":
@@ -469,6 +472,7 @@
               case "png":
               case "jpg":
               case "gif":
+              case "ico":
                 return true;
             }
           }

@@ -58,13 +58,11 @@ static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
 
 static const char* _ssdp_response_template =
   "HTTP/1.1 200 OK\r\n"
-  "EXT:\r\n"
-  "ST: upnp:rootdevice\r\n";
+  "EXT:\r\n";
 
 static const char* _ssdp_notify_template =
   "NOTIFY * HTTP/1.1\r\n"
   "HOST: 239.255.255.250:1900\r\n"
-  "NT: upnp:rootdevice\r\n"
   "NTS: ssdp:alive\r\n";
 
 static const char* _ssdp_packet_template =
@@ -72,6 +70,7 @@ static const char* _ssdp_packet_template =
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
   "USN: uuid:%s\r\n" // _uuid
+  "%s: %s\r\n"  // "NT" or "ST", _deviceType
   "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
 
@@ -208,6 +207,8 @@ void SSDPClass::_send(ssdp_method_t method){
     SSDP_INTERVAL,
     _modelName, _modelNumber,
     _uuid,
+    (method == NONE)?"ST":"NT",
+    _deviceType,
     IP2STR(&ip), _port, _schemaURL
   );
 

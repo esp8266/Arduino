@@ -28,23 +28,28 @@
 #define WIFI_SCAN_RUNNING   (-1)
 #define WIFI_SCAN_FAILED    (-2)
 
-// Note:
-// this enums need to be in sync with the SDK!
+// Note: these enums need to be in sync with the SDK!
 
-typedef enum WiFiMode {
+// TODO: replace/deprecate/remove enum typedefs ending with _t below
+
+typedef enum WiFiMode 
+{
     WIFI_OFF = 0, WIFI_STA = 1, WIFI_AP = 2, WIFI_AP_STA = 3
 } WiFiMode_t;
 
-typedef enum {
+typedef enum WiFiPhyMode
+{
     WIFI_PHY_MODE_11B = 1, WIFI_PHY_MODE_11G = 2, WIFI_PHY_MODE_11N = 3
 } WiFiPhyMode_t;
 
-typedef enum {
-    WIFI_NONE_SLEEP = 0, WIFI_LIGHT_SLEEP = 2, WIFI_MODEM_SLEEP = 3
+typedef enum WiFiSleepType
+{
+    WIFI_NONE_SLEEP = 0, WIFI_LIGHT_SLEEP = 1, WIFI_MODEM_SLEEP = 2
 } WiFiSleepType_t;
 
 
-typedef enum {
+typedef enum WiFiEvent 
+{
     WIFI_EVENT_STAMODE_CONNECTED = 0,
     WIFI_EVENT_STAMODE_DISCONNECTED,
     WIFI_EVENT_STAMODE_AUTHMODE_CHANGE,
@@ -53,9 +58,94 @@ typedef enum {
     WIFI_EVENT_SOFTAPMODE_STACONNECTED,
     WIFI_EVENT_SOFTAPMODE_STADISCONNECTED,
     WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED,
-    WIFI_EVENT_MAX
+    WIFI_EVENT_MAX,
+    WIFI_EVENT_ANY = WIFI_EVENT_MAX,
+    WIFI_EVENT_MODE_CHANGE
 } WiFiEvent_t;
 
+enum WiFiDisconnectReason 
+{
+    WIFI_DISCONNECT_REASON_UNSPECIFIED              = 1,
+    WIFI_DISCONNECT_REASON_AUTH_EXPIRE              = 2,
+    WIFI_DISCONNECT_REASON_AUTH_LEAVE               = 3,
+    WIFI_DISCONNECT_REASON_ASSOC_EXPIRE             = 4,
+    WIFI_DISCONNECT_REASON_ASSOC_TOOMANY            = 5,
+    WIFI_DISCONNECT_REASON_NOT_AUTHED               = 6,
+    WIFI_DISCONNECT_REASON_NOT_ASSOCED              = 7,
+    WIFI_DISCONNECT_REASON_ASSOC_LEAVE              = 8,
+    WIFI_DISCONNECT_REASON_ASSOC_NOT_AUTHED         = 9,
+    WIFI_DISCONNECT_REASON_DISASSOC_PWRCAP_BAD      = 10,  /* 11h */
+    WIFI_DISCONNECT_REASON_DISASSOC_SUPCHAN_BAD     = 11,  /* 11h */
+    WIFI_DISCONNECT_REASON_IE_INVALID               = 13,  /* 11i */
+    WIFI_DISCONNECT_REASON_MIC_FAILURE              = 14,  /* 11i */
+    WIFI_DISCONNECT_REASON_4WAY_HANDSHAKE_TIMEOUT   = 15,  /* 11i */
+    WIFI_DISCONNECT_REASON_GROUP_KEY_UPDATE_TIMEOUT = 16,  /* 11i */
+    WIFI_DISCONNECT_REASON_IE_IN_4WAY_DIFFERS       = 17,  /* 11i */
+    WIFI_DISCONNECT_REASON_GROUP_CIPHER_INVALID     = 18,  /* 11i */
+    WIFI_DISCONNECT_REASON_PAIRWISE_CIPHER_INVALID  = 19,  /* 11i */
+    WIFI_DISCONNECT_REASON_AKMP_INVALID             = 20,  /* 11i */
+    WIFI_DISCONNECT_REASON_UNSUPP_RSN_IE_VERSION    = 21,  /* 11i */
+    WIFI_DISCONNECT_REASON_INVALID_RSN_IE_CAP       = 22,  /* 11i */
+    WIFI_DISCONNECT_REASON_802_1X_AUTH_FAILED       = 23,  /* 11i */
+    WIFI_DISCONNECT_REASON_CIPHER_SUITE_REJECTED    = 24,  /* 11i */
+
+    WIFI_DISCONNECT_REASON_BEACON_TIMEOUT           = 200,
+    WIFI_DISCONNECT_REASON_NO_AP_FOUND              = 201,
+    WIFI_DISCONNECT_REASON_AUTH_FAIL                = 202,
+    WIFI_DISCONNECT_REASON_ASSOC_FAIL               = 203,
+    WIFI_DISCONNECT_REASON_HANDSHAKE_TIMEOUT        = 204,
+};
+
+struct WiFiEventModeChange
+{
+    WiFiMode oldMode;
+    WiFiMode newMode;
+};
+
+struct WiFiEventStationModeConnected
+{
+    String ssid;
+    uint8 bssid[6];
+    uint8 channel;
+};
+
+struct WiFiEventStationModeDisconnected
+{
+    String ssid;
+    uint8 bssid[6];
+    WiFiDisconnectReason reason;
+};
+
+struct WiFiEventStationModeAuthModeChanged
+{
+    uint8 oldMode;
+    uint8 newMode;
+};
+
+struct WiFiEventStationModeGotIP
+{
+    IPAddress ip;
+    IPAddress mask;
+    IPAddress gw;
+};
+
+struct WiFiEventSoftAPModeStationConnected
+{
+    uint8 mac[6];
+    uint8 aid;
+};
+
+struct WiFiEventSoftAPModeStationDisconnected
+{
+    uint8 mac[6];
+    uint8 aid;
+};
+
+struct WiFiEventSoftAPModeProbeRequestReceived
+{
+    int rssi;
+    uint8 mac[6];
+};
 
 
 extern "C" {

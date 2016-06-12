@@ -23,6 +23,7 @@
 //This may be used to change user task stack size:
 //#define CONT_STACKSIZE 4096
 #include <Arduino.h>
+#include "Schedule.h"
 extern "C" {
 #include "ets_sys.h"
 #include "os_type.h"
@@ -31,12 +32,24 @@ extern "C" {
 #include "user_interface.h"
 #include "cont.h"
 }
+#include <core_version.h>
+
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
 
 #define OPTIMISTIC_YIELD_TIME_US 16000
 
 struct rst_info resetInfo;
+
+extern "C" {
+extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
+const char* core_release = 
+#ifdef ARDUINO_ESP8266_RELEASE
+    ARDUINO_ESP8266_RELEASE;
+#else
+    NULL;
+#endif
+} // extern "C"
 
 int atexit(void (*func)()) {
     return 0;
@@ -107,6 +120,7 @@ static void loop_wrapper() {
         setup_done = true;
     }
     loop();
+    run_scheduled_functions();
     esp_schedule();
 }
 
@@ -119,18 +133,22 @@ static void loop_task(os_event_t *events) {
 }
 
 static void do_global_ctors(void) {
-    void (**p)(void);
-    for(p = &__init_array_start; p != &__init_array_end; ++p)
-        (*p)();
+    void (**p)(void) = &__init_array_end;
+    while (p != &__init_array_start)
+        (*--p)();
 }
 
 extern "C" void __gdb_init() {}
 extern "C" void gdb_init(void) __attribute__ ((weak, alias("__gdb_init")));
 
+extern "C" void __gdb_do_break(){}
+extern "C" void gdb_do_break(void) __attribute__ ((weak, alias("__gdb_do_break")));
+
 void init_done() {
     system_set_os_print(1);
     gdb_init();
     do_global_ctors();
+    printf("\n%08x\n", core_version);
     esp_schedule();
 }
 

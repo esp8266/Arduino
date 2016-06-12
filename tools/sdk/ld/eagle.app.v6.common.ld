@@ -78,6 +78,8 @@ SECTIONS
     *(.sdata2.*)
     *(.gnu.linkonce.s2.*)
     *(.jcr)
+    . = ALIGN(4);
+    _Pri_3_HandlerAddress = ABSOLUTE(.);
     _data_end = ABSOLUTE(.);
   } >dram0_0_seg :dram0_0_phdr
 
@@ -150,9 +152,13 @@ SECTIONS
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
-    *.c.o(.literal*, .text*)
+    *(.ver_number)
+    *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, \
+           EXCLUDE_FILE (umm_malloc.c.o) .text*)
     *.cpp.o(.literal*, .text*)
     *libm.a:(.literal .text .literal.* .text.*)
+    *libgcc.a:_umoddi3.o(.literal .text)
+    *libgcc.a:_udivdi3.o(.literal .text)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text .irom.text.*)
     _irom0_text_end = ABSOLUTE(.);

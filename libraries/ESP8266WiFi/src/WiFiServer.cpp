@@ -56,6 +56,7 @@ WiFiServer::WiFiServer(uint16_t port)
 }
 
 void WiFiServer::begin() {
+    close();
     err_t err;
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
@@ -81,19 +82,11 @@ void WiFiServer::begin() {
 }
 
 void WiFiServer::setNoDelay(bool nodelay) {
-    if (!_pcb)
-      return;
-
-    if (nodelay)
-        tcp_nagle_disable(_pcb);
-    else
-        tcp_nagle_enable(_pcb);
+    _noDelay = nodelay;
 }
 
 bool WiFiServer::getNoDelay() {
-    if (!_pcb)
-        return false;
-    return tcp_nagle_disabled(_pcb);
+    return _noDelay;
 }
 
 bool WiFiServer::hasClient() {
@@ -106,6 +99,7 @@ WiFiClient WiFiServer::available(byte* status) {
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
         _unclaimed = _unclaimed->next();
+        result.setNoDelay(_noDelay);
         DEBUGV("WS:av\r\n");
         return result;
     }
@@ -125,6 +119,7 @@ void WiFiServer::close() {
       return;
     }
     tcp_close(_pcb);
+    _pcb = nullptr;
 }
 
 void WiFiServer::stop() {

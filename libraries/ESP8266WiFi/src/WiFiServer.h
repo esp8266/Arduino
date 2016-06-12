@@ -42,10 +42,12 @@ private:
 
   ClientContext* _unclaimed;
   ClientContext* _discarded;
+  bool _noDelay = false;
 
 public:
   WiFiServer(IPAddress addr, uint16_t port);
   WiFiServer(uint16_t port);
+  virtual ~WiFiServer() {}
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
   void begin();

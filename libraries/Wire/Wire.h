@@ -56,11 +56,13 @@ class TwoWire : public Stream
     void begin(uint8_t);
     void begin(int);
     void setClock(uint32_t);
+    void setClockStretchLimit(uint32_t);
     void beginTransmission(uint8_t);
     void beginTransmission(int);
     uint8_t endTransmission(void);
     uint8_t endTransmission(uint8_t);
     size_t requestFrom(uint8_t address, size_t size, bool sendStop);
+	uint8_t status();
 
     uint8_t requestFrom(uint8_t, uint8_t);
     uint8_t requestFrom(uint8_t, uint8_t, uint8_t);

@@ -1,4 +1,6 @@
+#ifndef LWIP_OPEN_SRC
 #define LWIP_OPEN_SRC
+#endif
 #include <functional>
 #include <WiFiUdp.h>
 #include "ArduinoOTA.h"
@@ -47,19 +49,19 @@ ArduinoOTAClass::~ArduinoOTAClass(){
   }
 }
 
-void ArduinoOTAClass::onStart(OTA_CALLBACK(fn)) {
+void ArduinoOTAClass::onStart(THandlerFunction fn) {
     _start_callback = fn;
 }
 
-void ArduinoOTAClass::onEnd(OTA_CALLBACK(fn)) {
+void ArduinoOTAClass::onEnd(THandlerFunction fn) {
     _end_callback = fn;
 }
 
-void ArduinoOTAClass::onProgress(OTA_CALLBACK_PROGRESS(fn)) {
+void ArduinoOTAClass::onProgress(THandlerFunction_Progress fn) {
     _progress_callback = fn;
 }
 
-void ArduinoOTAClass::onError(OTA_CALLBACK_ERROR(fn)) {
+void ArduinoOTAClass::onError(THandlerFunction_Error fn) {
     _error_callback = fn;
 }
 
@@ -73,6 +75,10 @@ void ArduinoOTAClass::setHostname(const char * hostname) {
   if (!_initialized && !_hostname.length() && hostname) {
     _hostname = hostname;
   }
+}
+
+String ArduinoOTAClass::getHostname() {
+  return _hostname;
 }
 
 void ArduinoOTAClass::setPassword(const char * password) {

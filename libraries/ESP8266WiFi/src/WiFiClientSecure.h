@@ -38,7 +38,7 @@ public:
   int connect(IPAddress ip, uint16_t port) override;
   int connect(const char* name, uint16_t port) override;
 
-  bool verify(const char* fingerprint, const char* url);
+  bool verify(const char* fingerprint, const char* domain_name);
 
   uint8_t connected() override;
   size_t write(const uint8_t *buf, size_t size) override;
@@ -66,7 +66,7 @@ public:
   }
 
 protected:
-    int _connectSSL();
+    int _connectSSL(const char* hostName);
 
     SSLContext* _ssl = nullptr;
 };

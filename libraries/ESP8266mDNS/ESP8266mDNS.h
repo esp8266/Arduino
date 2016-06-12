@@ -3,6 +3,7 @@ ESP8266 Multicast DNS (port of CC3000 Multicast DNS library)
 Version 1.1
 Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
 ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
+Extended MDNS-SD support 2016 Lars Englund (lars.englund@gmail.com)
 
 This is a simple implementation of multicast DNS query support for an Arduino
 running on ESP8266 chip. Only support for resolving address queries is currently
@@ -54,6 +55,7 @@ class UdpContext;
 
 struct MDNSService;
 struct MDNSTxt;
+struct MDNSAnswer;
 
 class MDNSResponder {
 public:
@@ -82,6 +84,17 @@ public:
     addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
   }
   
+  int queryService(char *service, char *proto);
+  int queryService(const char *service, const char *proto){
+    return queryService((char *)service, (char *)proto);
+  }
+  int queryService(String service, String proto){
+    return queryService(service.c_str(), proto.c_str());
+  }
+  String hostname(int idx);
+  IPAddress IP(int idx);
+  uint16_t port(int idx);
+  
   void enableArduino(uint16_t port, bool auth=false);
 
   void setInstanceName(String name);
@@ -97,6 +110,13 @@ private:
   UdpContext* _conn;
   String _hostName;
   String _instanceName;
+  struct MDNSAnswer * _answers;
+  struct MDNSQuery * _query;
+  bool _newQuery;
+  bool _waitingForAnswers;
+  WiFiEventHandler _disconnectedHandler;
+  WiFiEventHandler _gotIPHandler;
+  
 
   uint32_t _getOurIp();
   uint16_t _getServicePort(char *service, char *proto);
@@ -105,6 +125,10 @@ private:
   void _parsePacket();
   void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port);
   size_t advertiseServices(); // advertise all hosted services
+  MDNSAnswer* _getAnswerFromIdx(int idx);
+  int _getNumAnswers();
+  bool _listen();
+  void _restart();
 };
 
 extern MDNSResponder MDNS;

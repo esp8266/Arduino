@@ -66,7 +66,7 @@ class SSLContext {
 public:
     SSLContext() {
         if (_ssl_ctx_refcnt == 0) {
-            _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS, 0);
+            _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING, 0);
         }
         ++_ssl_ctx_refcnt;
     }
@@ -93,8 +93,21 @@ public:
         }
     }
 
-    void connect(ClientContext* ctx) {
-        _ssl = ssl_client_new(_ssl_ctx, reinterpret_cast<int>(ctx), nullptr, 0);
+    void connect(ClientContext* ctx, const char* hostName, uint32_t timeout_ms) {
+        _ssl = ssl_client_new(_ssl_ctx, reinterpret_cast<int>(ctx), nullptr, 0, hostName);
+        uint32_t t = millis();
+
+        while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
+            uint8_t* data;
+            int rc = ssl_read(_ssl, &data);
+            if (rc < SSL_OK) {
+                break;
+            }
+        }
+    }
+
+    bool connected() {
+        return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
     }
 
     int read(uint8_t* dst, size_t size) {
@@ -229,16 +242,21 @@ int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
     if (!WiFiClient::connect(ip, port))
         return 0;
 
-    return _connectSSL();
+    return _connectSSL(nullptr);
 }
 
 int WiFiClientSecure::connect(const char* name, uint16_t port) {
-    if (!WiFiClient::connect(name, port))
+    IPAddress remote_addr;
+    if (!WiFi.hostByName(name, remote_addr)) {
         return 0;
-    return 1;
+    }
+    if (!WiFiClient::connect(remote_addr, port)) {
+        return 0;
+    }
+    return _connectSSL(name);
 }
 
-int WiFiClientSecure::_connectSSL() {
+int WiFiClientSecure::_connectSSL(const char* hostName) {
     if (_ssl) {
         _ssl->unref();
         _ssl = nullptr;
@@ -246,7 +264,7 @@ int WiFiClientSecure::_connectSSL() {
 
     _ssl = new SSLContext;
     _ssl->ref();
-    _ssl->connect(_client);
+    _ssl->connect(_client, hostName, 5000);
 
     auto status = ssl_handshake_status(*_ssl);
     if (status != SSL_OK) {
@@ -265,6 +283,11 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size) {
     int rc = ssl_write(*_ssl, buf, size);
     if (rc >= 0)
         return rc;
+
+    if (rc != SSL_CLOSE_NOTIFY) {
+        _ssl->unref();
+        _ssl = nullptr;
+    }
 
     return 0;
 }
@@ -318,17 +341,25 @@ int WiFiClientSecure::available() {
     return _ssl->available();
 }
 
+
+/*
+SSL     TCP     RX data     connected
+null    x       x           N
+!null   x       Y           Y
+Y       Y       x           Y
+x       N       N           N
+err     x       N           N
+*/
 uint8_t WiFiClientSecure::connected() {
-    if (!_client)
-        return 0;
-
-    if (_client->state() == ESTABLISHED)
-        return 1;
-
-    if (!_ssl)
-        return 0;
-
-    return _ssl->available() > 0;
+    if (_ssl) {
+        if (_ssl->available()) {
+            return true;
+        }
+        if (_client && _client->state() == ESTABLISHED && _ssl->connected()) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void WiFiClientSecure::stop() {
@@ -352,7 +383,33 @@ static bool parseHexNibble(char pb, uint8_t* res) {
     return false;
 }
 
-bool WiFiClientSecure::verify(const char* fp, const char* url) {
+// Compare a name from certificate and domain name, return true if they match
+static bool matchName(const String& name, const String& domainName)
+{
+    int wildcardPos = name.indexOf('*');
+    if (wildcardPos == -1) {
+        // Not a wildcard, expect an exact match
+        return name == domainName;
+    }
+    int firstDotPos = name.indexOf('.');
+    if (wildcardPos > firstDotPos) {
+        // Wildcard is not part of leftmost component of domain name
+        // Do not attempt to match (rfc6125 6.4.3.1)
+        return false;
+    }
+    if (wildcardPos != 0 || firstDotPos != 1) {
+        // Matching of wildcards such as baz*.example.com and b*z.example.com
+        // is optional. Maybe implement this in the future?
+        return false;
+    }
+    int domainNameFirstDotPos = domainName.indexOf('.');
+    if (domainNameFirstDotPos < 0) {
+        return false;
+    }
+    return domainName.substring(domainNameFirstDotPos) == name.substring(firstDotPos);
+}
+
+bool WiFiClientSecure::verify(const char* fp, const char* domain_name) {
     if (!_ssl)
         return false;
 
@@ -380,9 +437,26 @@ bool WiFiClientSecure::verify(const char* fp, const char* url) {
         return false;
     }
 
-    //TODO: check URL against certificate
+    DEBUGV("domain name: '%s'\r\n", (domain_name)?domain_name:"(null)");
+    String domain_name_str(domain_name);
+    domain_name_str.toLowerCase();
 
-    return true;
+    const char* san = NULL;
+    int i = 0;
+    while((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != NULL) {
+        if (matchName(String(san), domain_name_str)) {
+            return true;
+        }
+        DEBUGV("SAN %d: '%s', no match\r\n", i, san);
+        ++i;
+    }
+    const char* common_name = ssl_get_cert_dn(*_ssl, SSL_X509_CERT_COMMON_NAME);
+    if (common_name && matchName(String(common_name), domain_name_str)) {
+        return true;
+    }
+    DEBUGV("CN: '%s', no match\r\n", (common_name)?common_name:"(null)");
+
+    return false;
 }
 
 void WiFiClientSecure::setCertificate(const uint8_t* cert_data, size_t size) {
@@ -489,10 +563,8 @@ extern "C" int ax_get_file(const char *filename, uint8_t **buf) {
 
 extern "C" void* ax_port_malloc(size_t size, const char* file, int line) {
     void* result = malloc(size);
-
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
-        panic();
     }
     if (size >= 1024) {
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());
@@ -510,7 +582,6 @@ extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int l
     void* result = realloc(ptr, size);
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
-        panic();
     }
     if (size >= 1024) {
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());
@@ -520,9 +591,8 @@ extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int l
 
 extern "C" void ax_port_free(void* ptr) {
     free(ptr);
-    uint32_t *p = (uint32_t*) ptr;
-    size_t size = p[-3];
-    if (size >= 1024) {
-        DEBUG_TLS_MEM_PRINT("free %d, left %d\r\n", p[-3], ESP.getFreeHeap());
-    }
+}
+
+extern "C" void ax_wdt_feed() {
+    optimistic_yield(10000);
 }

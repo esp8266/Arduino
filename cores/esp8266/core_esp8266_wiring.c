@@ -59,17 +59,17 @@ void micros_overflow_tick(void* arg) {
     micros_at_last_overflow_tick = m;
 }
 
-unsigned long millis() {
+unsigned long ICACHE_RAM_ATTR millis() {
     uint32_t m = system_get_time();
     uint32_t c = micros_overflow_count + ((m < micros_at_last_overflow_tick) ? 1 : 0);
     return c * 4294967 + m / 1000;
 }
 
-unsigned long micros() {
+unsigned long ICACHE_RAM_ATTR micros() {
     return system_get_time();
 }
 
-void delayMicroseconds(unsigned int us) {
+void ICACHE_RAM_ATTR delayMicroseconds(unsigned int us) {
     os_delay_us(us);
 }
 

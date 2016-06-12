@@ -123,10 +123,17 @@ public:
         else if (path.endsWith(".jpg")) return "image/jpeg";
         else if (path.endsWith(".ico")) return "image/x-icon";
         else if (path.endsWith(".svg")) return "image/svg+xml";
+        else if (path.endsWith(".ttf")) return "application/x-font-ttf";
+        else if (path.endsWith(".otf")) return "application/x-font-opentype";
+        else if (path.endsWith(".woff")) return "application/font-woff";
+        else if (path.endsWith(".woff2")) return "application/font-woff2";
+        else if (path.endsWith(".eot")) return "application/vnd.ms-fontobject";
+        else if (path.endsWith(".sfnt")) return "application/font-sfnt";
         else if (path.endsWith(".xml")) return "text/xml";
         else if (path.endsWith(".pdf")) return "application/pdf";
         else if (path.endsWith(".zip")) return "application/zip";
         else if(path.endsWith(".gz")) return "application/x-gzip";
+        else if (path.endsWith(".appcache")) return "text/cache-manifest";
         return "application/octet-stream";
     }
 

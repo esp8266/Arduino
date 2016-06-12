@@ -4,16 +4,22 @@ title: Supported Hardware
 
 ## Table of contents
   * [Adafruit HUZZAH ESP8266 (ESP\-12)](#adafruit-huzzah-esp8266-esp-12)
+  * [ESPresso Lite 1\.0](#espresso-lite-10)
+  * [ESPresso Lite 2\.0](#espresso-lite-20)
   * [NodeMCU 0\.9 <a name="user\-content\-nodemcu\-0\-9"></a>](#nodemcu-09-)
     * [Pin mapping](#pin-mapping)
   * [NodeMCU 1\.0](#nodemcu-10)
   * [Olimex MOD\-WIFI\-ESP8266\-DEV](#olimex-mod-wifi-esp8266-dev)
   * [Olimex MOD\-WIFI\-ESP8266](#olimex-mod-wifi-esp8266)
+  * [Olimex ESP8266\-EVB](#olimex-esp8266-evb)
+  * [Phoenix 1\.0](#phoenix-10)
+  * [Phoenix 2\.0](#phoenix-20)
   * [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
   * [SweetPea ESP\-210](#sweetpea-esp-210)
   * [ESPino](#espino)
   * [WifInfo](#WifInfo)
   * [Generic ESP8266 modules](#generic-esp8266-modules)
+  * [Generic ESP8285 modules](#generic-esp8285-modules)
   * [Serial Adapter](#serial-adapter)
   * [Minimal Hardware Setup for Bootloading and Usage](#minimal-hardware-setup-for-bootloading-and-usage)
   * [ESP to Serial](#esp-to-serial)
@@ -26,10 +32,27 @@ title: Supported Hardware
     * [boot mode](#boot-mode)
   * [WeMos D1](#wemos-d1)
   * [WeMos D1 mini](#wemos-d1-mini)
+  * [ESPino by ThaiEasyElec](#espinotee)
 
 ## Adafruit HUZZAH ESP8266 (ESP-12)
 
 *TODO: add notes*
+
+## ESPresso Lite 1.0
+
+ESPresso Lite 1.0 (beta version) is an Arduino-compatible Wi-Fi development board powered by Espressif System's own ESP8266 WROOM-02 module. It has breadboard-friendly breakout pins with in-built LED, two reset/flash buttons and a user programmable button . The operating voltage is 3.3VDC, regulated with 800mA maximum current. Special distinctive features include on-board I2C pads that allow direct connection to OLED LCD and sensor boards.
+
+## ESPresso Lite 2.0
+
+ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an earlier V1 (beta version). Re-designed together with Cytron Technologies, the newly-revised ESPresso Lite V2.0 features the auto-load/auto-program function, eliminating the previous need to reset the board manually before flashing a new program. It also feature two user programmable side buttons and a reset button. The special distinctive features of on-board pads for I2C sensor and actuator is retained.
+
+## Phoenix 1.0
+
+Product page: http://www.espert.co
+
+## Phoenix 2.0
+
+Product page: http://www.espert.co
 
 ## NodeMCU 0.9
 
@@ -77,11 +100,27 @@ Since jumper IO0JP is tied to GPIO0, which is PIN 21, you'll have to ground it b
 
 UART pins for programming and serial I/O are GPIO1 (TXD, pin 3) and GPIO3 (RXD, pin 4).
 
-Get the board schematics [here](https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf)
+You can find the board schematics [here](https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf)
 
 ## Olimex MOD-WIFI-ESP8266
 
 This is a stripped down version of the above. Behaves identically in terms of jumpers but has less pins readily available for I/O. Still 2 MB of SPI flash.
+
+## Olimex ESP8266-EVB
+
+It's a Olimex MOD-WIFI-ESP8266-DEV module installed on the headers of a development board which features some breakout connectors, a button (GPIO0) and a relay (GPIO5).
+
+Programming is pretty straightforward: the board is supported in the Arduino IDE after [installing it via the Board Manager](https://github.com/esp8266/Arduino#installing-with-boards-manager). To download a program you just have to connect GND/RX/TX from a serial/USB adapter to the UEXT connector and press the only button before applying power to enter UART mode.
+
+Don't connect 5V from the serial/USB adapter to the board or you won't be able to power cycle it for UART mode.
+
+You can find the board schematics [here](https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/ESP8266-EVB/ESP8266-EVB_Rev_A.pdf).
+
+[This guide](https://www.olimex.com/Products/IoT/ESP8266-EVB/resources/ESP8266-EVB-how-to-use-Arduino.pdf) is also useful for the first setup, since it contains the UEXT connector pinout.
+
+Board variants include:
+ * ESP8266-EVB-BAT: comes with built-in LiPo charger and step-up converter
+ * ESP8266-EVB-BAT-BOX: as above, but enclosd in a plastic box (non-weatherproof)
 
 ## SparkFun ESP8266 Thing ###
 
@@ -173,7 +212,7 @@ ESPxx Hardware
 | CH_PD         | PullUp   |                 |
 
 * Note
-	- if no RTS is used a manual power toggle is needed
+  - if no RTS is used a manual power toggle is needed
 
 ### Minimal Hardware Setup for Running only ##
 
@@ -242,8 +281,28 @@ the first value respects the pin setup of the Pins 0, 2 and 15.
 note:
  - number = ((GPIO15 << 2) | (GPIO0 << 1) | GPIO2);
 
+## Generic ESP8285 modules
+
+ESP8285 ([datasheet](http://espressif.com/sites/default/files/documentation/0a-esp8285_datasheet_en_v1.0_20160422.pdf)) is a multi-chip package which contains ESP8266 and 1MB flash.
+All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.
+
+Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.
+
 ## WeMos D1
 Product page: http://wemos.cc
 
 ## WeMos D1 mini
 Product page: http://wemos.cc
+
+## ESPino (WROOM-02 Module) by ThaiEasyElec
+ESPino by ThaiEasyElec using WROOM-02 module from Espressif Systems with 4 MB Flash.
+
+We will update an English description soon.
+- Product page: http://thaieasyelec.com/products/wireless-modules/wifi-modules/espino-wifi-development-board-detail.html
+- Schematics: www.thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_Schematic.pdf
+- Dimensions: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_Dimension.pdf
+- Pinouts: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_User_Manual_TH_v1_0_20160204.pdf (Please see pg. 8)
+
+
+
+

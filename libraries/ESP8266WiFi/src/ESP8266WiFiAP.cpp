@@ -89,13 +89,13 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         return false;
     }
 
-    if(!ssid || *ssid == 0 || strlen(ssid) > 31) {
+    if(!ssid || strlen(ssid) == 0 || strlen(ssid) > 31) {
         // fail SSID too long or missing!
         DEBUG_WIFI("[AP] SSID too long or missing!\n");
         return false;
     }
 
-    if(passphrase && (strlen(passphrase) > 63 || strlen(passphrase) < 8)) {
+    if(passphrase && strlen(passphrase) > 0 && (strlen(passphrase) > 63 || strlen(passphrase) < 8)) {
         // fail passphrase to long or short!
         DEBUG_WIFI("[AP] fail passphrase to long or short!\n");
         return false;

@@ -77,12 +77,20 @@ void TwoWire::begin(uint8_t address){
   begin();
 }
 
+uint8_t TwoWire::status(){
+	return twi_status();
+}
+
 void TwoWire::begin(int address){
   begin((uint8_t)address);
 }
 
 void TwoWire::setClock(uint32_t frequency){
   twi_setClock(frequency);
+}
+
+void TwoWire::setClockStretchLimit(uint32_t limit){
+  twi_setClockStretchLimit(limit);
 }
 
 size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop){

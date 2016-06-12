@@ -131,7 +131,15 @@
 #define SPIFFS_OBJ_ID_DELETED           ((spiffs_obj_id)0)
 #define SPIFFS_OBJ_ID_FREE              ((spiffs_obj_id)-1)
 
-#define SPIFFS_MAGIC(fs)                ((spiffs_obj_id)(0x20140529 ^ SPIFFS_CFG_LOG_PAGE_SZ(fs)))
+#if SPIFFS_USE_MAGIC
+#if !SPIFFS_USE_MAGIC_LENGTH
+#define SPIFFS_MAGIC(fs, bix)           \
+  ((spiffs_obj_id)(0x20140529 ^ SPIFFS_CFG_LOG_PAGE_SZ(fs)))
+#else // SPIFFS_USE_MAGIC_LENGTH
+#define SPIFFS_MAGIC(fs, bix)           \
+  ((spiffs_obj_id)(0x20140529 ^ SPIFFS_CFG_LOG_PAGE_SZ(fs) ^ ((fs)->block_count - (bix))))
+#endif // SPIFFS_USE_MAGIC_LENGTH
+#endif // SPIFFS_USE_MAGIC
 
 #define SPIFFS_CONFIG_MAGIC             (0x20090315)
 
@@ -529,6 +537,11 @@ s32_t spiffs_obj_lu_find_entry_visitor(
 s32_t spiffs_erase_block(
     spiffs *fs,
     spiffs_block_ix bix);
+
+#if SPIFFS_USE_MAGIC && SPIFFS_USE_MAGIC_LENGTH
+s32_t spiffs_probe(
+    spiffs_config *cfg);
+#endif // SPIFFS_USE_MAGIC && SPIFFS_USE_MAGIC_LENGTH
 
 // ---------------
 

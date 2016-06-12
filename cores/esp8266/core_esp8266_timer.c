@@ -50,7 +50,7 @@ void timer1_attachInterrupt(timercallback userFunc) {
     ETS_FRC1_INTR_ENABLE();
 }
 
-void timer1_detachInterrupt() {
+void ICACHE_RAM_ATTR timer1_detachInterrupt() {
     timer1_user_cb = 0;
     TEIE &= ~TEIE1;//edge int disable
     ETS_FRC1_INTR_DISABLE();
@@ -95,7 +95,7 @@ void timer0_attachInterrupt(timercallback userFunc) {
     ETS_CCOMPARE0_ENABLE();
 }
 
-void timer0_detachInterrupt() {
+void ICACHE_RAM_ATTR timer0_detachInterrupt() {
     timer0_user_cb = NULL;
     ETS_CCOMPARE0_DISABLE();
 }

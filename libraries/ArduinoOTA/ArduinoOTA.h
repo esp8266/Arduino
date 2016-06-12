@@ -3,12 +3,9 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <functional>
 
 class UdpContext;
-
-#define OTA_CALLBACK(callback) void (*callback)()
-#define OTA_CALLBACK_PROGRESS(callback)  void (*callback)(unsigned int, unsigned int)
-#define OTA_CALLBACK_ERROR(callback)  void (*callback)(ota_error_t)
 
 typedef enum {
   OTA_IDLE,
@@ -27,15 +24,20 @@ typedef enum {
 class ArduinoOTAClass
 {
   public:
+	typedef std::function<void(void)> THandlerFunction;
+	typedef std::function<void(ota_error_t)> THandlerFunction_Error;
+	typedef std::function<void(unsigned int, unsigned int)> THandlerFunction_Progress;
+
     ArduinoOTAClass();
     ~ArduinoOTAClass();
     void setPort(uint16_t port);
     void setHostname(const char *hostname);
+    String getHostname();
     void setPassword(const char *password);
-    void onStart(OTA_CALLBACK(fn));
-    void onEnd(OTA_CALLBACK(fn));
-    void onProgress(OTA_CALLBACK_PROGRESS(fn));
-    void onError(OTA_CALLBACK_ERROR (fn));
+    void onStart(THandlerFunction fn);
+    void onEnd(THandlerFunction fn);
+    void onError(THandlerFunction_Error fn);
+    void onProgress(THandlerFunction_Progress fn);
     void begin();
     void handle();
 
@@ -53,10 +55,10 @@ class ArduinoOTAClass
     IPAddress _ota_ip;
     String _md5;
 
-    OTA_CALLBACK(_start_callback);
-    OTA_CALLBACK(_end_callback);
-    OTA_CALLBACK_ERROR(_error_callback);
-    OTA_CALLBACK_PROGRESS(_progress_callback);
+    THandlerFunction _start_callback;
+    THandlerFunction _end_callback;
+    THandlerFunction_Error _error_callback;
+    THandlerFunction_Progress _progress_callback;
 
     void _runUpdate(void);
     void _onRx(void);

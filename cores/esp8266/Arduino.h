@@ -73,7 +73,6 @@ extern "C" {
 #define MSBFIRST 1
 
 //Interrupt Modes
-#define DISABLED  0x00
 #define RISING    0x01
 #define FALLING   0x02
 #define CHANGE    0x03

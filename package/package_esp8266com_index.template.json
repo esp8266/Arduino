@@ -38,6 +38,18 @@
               "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
             },
             {
+              "name": "ESPresso Lite 1.0"
+            },
+            {
+              "name": "ESPresso Lite 2.0"
+            },
+            {
+              "name": "Phoenix 1.0"
+            },
+            {
+              "name": "Phoenix 2.0"
+            },                        
+            {
               "name": "SparkFun Thing"
             },
             {
@@ -50,7 +62,10 @@
               "name": "WeMos D1 mini"
             },
             {
-              "name": "ESPino"
+              "name": "ESPino (ESP-12 Module)"
+            },
+            {
+              "name": "ESPino (WROOM-02 Module)"
             },
             {
               "name": "WifInfo"
@@ -63,7 +78,7 @@
             {
               "packager": "esp8266",
               "name": "esptool",
-              "version": "0.4.6"
+              "version": "0.4.8"
             },
             {
               "packager": "esp8266",
@@ -81,42 +96,49 @@
       "tools": [
         {
           "name": "esptool",
-          "version": "0.4.6",
+          "version": "0.4.8",
           "systems": [
             {
               "host": "i686-mingw32",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-win32.zip",
-              "archiveFileName": "esptool-0.4.6-win32.zip",
-              "checksum": "SHA-256:0248bf78514a3195f583e29218ca7828a66e13c6e5545a078f1c1257033e4927",
-              "size": "17481"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-win32.zip",
+              "archiveFileName": "esptool-0.4.8-win32.zip",
+              "checksum": "SHA-256:8d09cb0df6234c2a0562389ceedd11482b44a3f538695f9a4df80f9f10411ece",
+              "size": "32192"
             },
             {
               "host": "x86_64-apple-darwin",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-osx.tar.gz",
-              "archiveFileName": "esptool-0.4.6-osx.tar.gz",
-              "checksum": "SHA-256:0fe87ba7e29ee90a9fc72492aada8c0796f9e8f8a1c594b6b26cee2610d09bb3",
-              "size": "20926"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-osx.tar.gz",
+              "archiveFileName": "esptool-0.4.8-osx.tar.gz",
+              "checksum": "SHA-256:2bcbf19934543fb06c505b2a595b68a76e4cab8e3d8968a4d1802195c87126cf",
+              "size": "28798"
             },
             {
               "host": "i386-apple-darwin",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-osx.tar.gz",
-              "archiveFileName": "esptool-0.4.6-osx.tar.gz",
-              "checksum": "SHA-256:0fe87ba7e29ee90a9fc72492aada8c0796f9e8f8a1c594b6b26cee2610d09bb3",
-              "size": "20926"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-osx.tar.gz",
+              "archiveFileName": "esptool-0.4.8-osx.tar.gz",
+              "checksum": "SHA-256:2bcbf19934543fb06c505b2a595b68a76e4cab8e3d8968a4d1802195c87126cf",
+              "size": "28798"
             },
             {
               "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-linux64.tar.gz",
-              "archiveFileName": "esptool-0.4.6-linux64.tar.gz",
-              "checksum": "SHA-256:f9f456e9a42bb2597126c513cb8865f923fb978865d4838b9623d322216b74d0",
-              "size": "12885"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux64.tar.gz",
+              "archiveFileName": "esptool-0.4.8-linux64.tar.gz",
+              "checksum": "SHA-256:1cd9a6014bbbc37ba6dc249f4fc027f0ca9bbc6dd0e203ebc7d146dfd78a6e78",
+              "size": "15479"
             },
             {
               "host": "i686-pc-linux-gnu",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.6/esptool-0.4.6-linux32.tar.gz",
-              "archiveFileName": "esptool-0.4.6-linux32.tar.gz",
-              "checksum": "SHA-256:85275ca03a82bfc456f5a84e86962ca1e470ea2e168829c38ca29ee668831d93",
-              "size": "13417"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux32.tar.gz",
+              "archiveFileName": "esptool-0.4.8-linux32.tar.gz",
+              "checksum": "SHA-256:b0d6e71e6f41d4ed7e167bb4b3f4f0b1b3e49d69af50ab7fbe952cbfed83f164",
+              "size": "15444"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.8/esptool-0.4.8-linux-armhf.tar.gz",
+              "archiveFileName": "esptool-0.4.8-linux-armhf.tar.gz",
+              "checksum": "SHA-256:e9c4dfb81781610556a6af0377c8efc7cde359e0e2cda2fd48e0a32bae10f506",
+              "size": "13630"
             }
           ]
         },
@@ -156,8 +178,15 @@
               "host": "i686-pc-linux-gnu",
               "url": "http://arduino.esp8266.com/linux32-xtensa-lx106-elf.tar.gz",
               "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz",
-              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a",
+              "checksum": "SHA-256:f693946288f2ffa17288ef75ae16fa08573993f2b0a2a5e6bc35a68dc6087443",
               "size": "32734156"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "http://arduino.esp8266.com/linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
+              "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
+              "checksum": "SHA-256:1ac752bac7fff6be95ce10f56689f155fefea09e4ef710dbd75cb573798ff9c0",
+              "size": "34938475"
             }
           ]
         },
@@ -199,6 +228,13 @@
               "archiveFileName": "mkspiffs-0.1.2-linux32.tar.gz",
               "checksum": "SHA-256:e990d545dfcae308aabaac5fa9e1db734cc2b08167969e7eedac88bd0839667c",
               "size": "45272"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://github.com/igrr/mkspiffs/releases/download/0.1.2/mkspiffs-0.1.2-linux-armhf.tar.gz",
+              "archiveFileName": "mkspiffs-0.1.2-linux-armhf.tar.gz",
+              "checksum": "SHA-256:5a8836932cd24325d69054cebdd46359eba02919ffaa87b130c54acfecc13f46",
+              "size": "41685"
             }
           ]
         }

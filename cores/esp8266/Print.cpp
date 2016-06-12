@@ -1,21 +1,21 @@
 /*
  Print.cpp - Base class that provides print() and println()
  Copyright (c) 2008 David A. Mellis.  All right reserved.
- 
+
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
  License as published by the Free Software Foundation; either
  version 2.1 of the License, or (at your option) any later version.
- 
+
  This library is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public
  License along with this library; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- 
+
  Modified 23 November 2006 by David A. Mellis
  Modified December 2014 by Ivan Grokhotkov
  Modified May 2015 by Michael C. Miller - esp8266 progmem support
@@ -25,18 +25,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "Arduino.h"
+#include <Arduino.h>
 
 #include "Print.h"
-extern "C" {
-#include "c_types.h"
-#include "ets_sys.h"
-}
 
 // Public Methods //////////////////////////////////////////////////////////////
 
 /* default implementation: may be overridden */
-size_t ICACHE_FLASH_ATTR Print::write(const uint8_t *buffer, size_t size) {
+size_t Print::write(const uint8_t *buffer, size_t size) {
     size_t n = 0;
     while(size--) {
         n += write(*buffer++);
@@ -45,16 +41,29 @@ size_t ICACHE_FLASH_ATTR Print::write(const uint8_t *buffer, size_t size) {
 }
 
 size_t Print::printf(const char *format, ...) {
-  va_list arg;
-  va_start(arg, format);
-  char temp[1460];
-  size_t len = ets_vsnprintf(temp, 1460, format, arg);
-  len = print(temp);
-  va_end(arg);
-  return len;
+    va_list arg;
+    va_start(arg, format);
+    char temp[64];
+    char* buffer = temp;
+    size_t len = vsnprintf(temp, sizeof(temp), format, arg);
+    va_end(arg);
+    if (len > sizeof(temp) - 1) {
+        buffer = new char[len + 1];
+        if (!buffer) {
+            return 0;
+        }
+        va_start(arg, format);
+        vsnprintf(buffer, len + 1, format, arg);
+        va_end(arg);
+    }
+    len = write((const uint8_t*) buffer, len);
+    if (buffer != temp) {
+        delete[] buffer;
+    }
+    return len;
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(const __FlashStringHelper *ifsh) {
+size_t Print::print(const __FlashStringHelper *ifsh) {
     PGM_P p = reinterpret_cast<PGM_P>(ifsh);
 
     size_t n = 0;
@@ -66,31 +75,31 @@ size_t ICACHE_FLASH_ATTR Print::print(const __FlashStringHelper *ifsh) {
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(const String &s) {
+size_t Print::print(const String &s) {
     return write(s.c_str(), s.length());
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(const char str[]) {
+size_t Print::print(const char str[]) {
     return write(str);
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(char c) {
+size_t Print::print(char c) {
     return write(c);
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(unsigned char b, int base) {
+size_t Print::print(unsigned char b, int base) {
     return print((unsigned long) b, base);
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(int n, int base) {
+size_t Print::print(int n, int base) {
     return print((long) n, base);
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(unsigned int n, int base) {
+size_t Print::print(unsigned int n, int base) {
     return print((unsigned long) n, base);
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(long n, int base) {
+size_t Print::print(long n, int base) {
     if(base == 0) {
         return write(n);
     } else if(base == 10) {
@@ -105,86 +114,86 @@ size_t ICACHE_FLASH_ATTR Print::print(long n, int base) {
     }
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(unsigned long n, int base) {
+size_t Print::print(unsigned long n, int base) {
     if(base == 0)
         return write(n);
     else
         return printNumber(n, base);
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(double n, int digits) {
+size_t Print::print(double n, int digits) {
     return printFloat(n, digits);
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(const __FlashStringHelper *ifsh) {
+size_t Print::println(const __FlashStringHelper *ifsh) {
     size_t n = print(ifsh);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::print(const Printable& x) {
+size_t Print::print(const Printable& x) {
     return x.printTo(*this);
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(void) {
+size_t Print::println(void) {
     return print("\r\n");
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(const String &s) {
+size_t Print::println(const String &s) {
     size_t n = print(s);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(const char c[]) {
+size_t Print::println(const char c[]) {
     size_t n = print(c);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(char c) {
+size_t Print::println(char c) {
     size_t n = print(c);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(unsigned char b, int base) {
+size_t Print::println(unsigned char b, int base) {
     size_t n = print(b, base);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(int num, int base) {
+size_t Print::println(int num, int base) {
     size_t n = print(num, base);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(unsigned int num, int base) {
+size_t Print::println(unsigned int num, int base) {
     size_t n = print(num, base);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(long num, int base) {
+size_t Print::println(long num, int base) {
     size_t n = print(num, base);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(unsigned long num, int base) {
+size_t Print::println(unsigned long num, int base) {
     size_t n = print(num, base);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(double num, int digits) {
+size_t Print::println(double num, int digits) {
     size_t n = print(num, digits);
     n += println();
     return n;
 }
 
-size_t ICACHE_FLASH_ATTR Print::println(const Printable& x) {
+size_t Print::println(const Printable& x) {
     size_t n = print(x);
     n += println();
     return n;
@@ -192,7 +201,7 @@ size_t ICACHE_FLASH_ATTR Print::println(const Printable& x) {
 
 // Private Methods /////////////////////////////////////////////////////////////
 
-size_t ICACHE_FLASH_ATTR Print::printNumber(unsigned long n, uint8_t base) {
+size_t Print::printNumber(unsigned long n, uint8_t base) {
     char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
     char *str = &buf[sizeof(buf) - 1];
 
@@ -212,7 +221,7 @@ size_t ICACHE_FLASH_ATTR Print::printNumber(unsigned long n, uint8_t base) {
     return write(str);
 }
 
-size_t ICACHE_FLASH_ATTR Print::printFloat(double number, uint8_t digits) {
+size_t Print::printFloat(double number, uint8_t digits) {
     size_t n = 0;
 
     if(isnan(number))
