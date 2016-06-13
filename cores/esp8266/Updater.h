@@ -1,9 +1,9 @@
 #ifndef ESP8266UPDATER_H
 #define ESP8266UPDATER_H
 
-#include "Arduino.h"
-#include "flash_utils.h"
-#include "MD5Builder.h"
+#include <Arduino.h>
+#include <flash_utils.h>
+#include <MD5Builder.h>
 
 #define UPDATE_ERROR_OK                 (0)
 #define UPDATE_ERROR_WRITE              (1)

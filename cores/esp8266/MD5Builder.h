@@ -21,7 +21,8 @@
 #ifndef __ESP8266_MD5_BUILDER__
 #define __ESP8266_MD5_BUILDER__
 
-#include "Arduino.h"
+#include <WString.h>
+#include <Stream.h>
 #include "md5.h"
 
 class MD5Builder {
