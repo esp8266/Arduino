@@ -63,14 +63,12 @@ bool SPIFFSImpl::exists(const char* path)
     return rc == SPIFFS_OK;
 }
 
-DirImplPtr SPIFFSImpl::openDir(const char* path) {
-    if (strlen(path) > 0) {
-        if (!isSpiffsFilenameValid(path)) {
-            DEBUGV("SPIFFSImpl::openDir: invalid path=`%s` \r\n", path);
-            return DirImplPtr();
-        }
+DirImplPtr SPIFFSImpl::openDir(const char* path) 
+{
+    if (strlen(path) > 0 && !isSpiffsFilenameValid(path)) {
+        DEBUGV("SPIFFSImpl::openDir: invalid path=`%s` \r\n", path);
+        return DirImplPtr();
     }
-
     spiffs_DIR dir;
     spiffs_DIR* result = SPIFFS_opendir(&_fs, path, &dir);
     if (!result) {
