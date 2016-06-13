@@ -5,7 +5,7 @@ uint8_t hex_char_to_byte(uint8_t c)
 {
     return  (c >= 'a' && c <= 'f') ? (c - ((uint8_t)'a' - 0xa)) :
             (c >= 'A' && c <= 'F') ? (c - ((uint8_t)'A' - 0xA)) :
-            (c >= '0'&&  c<= '9') ? (c - (uint8_t)'0') : 0;
+            (c >= '0' &&  c<= '9') ? (c - (uint8_t)'0') : 0;
 }
 
 void MD5Builder::begin(void)
@@ -72,7 +72,6 @@ bool MD5Builder::addStream(Stream & stream, const size_t maxLen)
         maxLengthLeft -= numBytesRead;
         bytesAvailable = stream.available();
     }
-    printf("ba: %d mll: %d\n", bytesAvailable, maxLengthLeft);
     free(buf);
     return true;
 }
