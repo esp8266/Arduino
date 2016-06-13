@@ -64,6 +64,7 @@ void WiFiServer::begin() {
 
     ip_addr_t local_addr;
     local_addr.addr = (uint32_t) _addr;
+    pcb->so_options |= SOF_REUSEADDR;
     err = tcp_bind(pcb, &local_addr, _port);
 
     if (err != ERR_OK) {
