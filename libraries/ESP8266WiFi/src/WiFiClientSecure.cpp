@@ -57,6 +57,7 @@ static int s_pk_refcnt = 0;
 uint8_t* default_certificate = 0;
 uint32_t default_certificate_len = 0;
 static bool default_certificate_dynamic = false;
+static ClientContext* s_io_ctx = nullptr;
 
 static void clear_private_key();
 static void clear_certificate();
@@ -94,7 +95,7 @@ public:
     }
 
     void connect(ClientContext* ctx, const char* hostName, uint32_t timeout_ms) {
-        _ssl = ssl_client_new(_ssl_ctx, reinterpret_cast<int>(ctx), nullptr, 0, hostName);
+        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, hostName);
         uint32_t t = millis();
 
         while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
@@ -211,6 +212,7 @@ WiFiClientSecure::WiFiClientSecure() {
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
+    s_io_ctx = nullptr;
     if (_ssl) {
         _ssl->unref();
     }
@@ -261,6 +263,8 @@ int WiFiClientSecure::_connectSSL(const char* hostName) {
         _ssl->unref();
         _ssl = nullptr;
     }
+
+    s_io_ctx = _client;
 
     _ssl = new SSLContext;
     _ssl->ref();
@@ -325,6 +329,10 @@ size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length) {
         yield();
     }
 
+    if(!_ssl) {
+        return 0;
+    }
+
     if(available() < (int) length) {
         count = available();
     } else {
@@ -363,11 +371,8 @@ uint8_t WiFiClientSecure::connected() {
 }
 
 void WiFiClientSecure::stop() {
-    if (_ssl) {
-        _ssl->unref();
-        _ssl = nullptr;
-    }
-    return WiFiClient::stop();
+    s_io_ctx = nullptr;
+    WiFiClient::stop();
 }
 
 static bool parseHexNibble(char pb, uint8_t* res) {
@@ -520,10 +525,10 @@ static void clear_certificate() {
 }
 
 extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {
-    ClientContext* _client = reinterpret_cast<ClientContext*>(fd);
-    if (_client->state() != ESTABLISHED && !_client->getSize()) {
-        return -1;
+    ClientContext* _client = s_io_ctx;
+    if (!_client || _client->state() != ESTABLISHED && !_client->getSize()) {
         errno = EIO;
+        return -1;
     }
     size_t cb = _client->read((char*) buffer, count);
     if (cb != count) {
@@ -537,8 +542,8 @@ extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {
 }
 
 extern "C" int ax_port_write(int fd, uint8_t* buffer, size_t count) {
-    ClientContext* _client = reinterpret_cast<ClientContext*>(fd);
-    if (_client->state() != ESTABLISHED) {
+    ClientContext* _client = s_io_ctx;
+    if (!_client || _client->state() != ESTABLISHED) {
         errno = EIO;
         return -1;
     }
