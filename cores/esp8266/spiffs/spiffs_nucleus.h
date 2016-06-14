@@ -272,26 +272,26 @@
 #define SPIFFS_API_CHECK_MOUNT(fs) \
   if (!SPIFFS_CHECK_MOUNT((fs))) { \
     (fs)->err_code = SPIFFS_ERR_NOT_MOUNTED; \
-    return -1; \
+    return SPIFFS_ERR_NOT_MOUNTED; \
   }
 
 #define SPIFFS_API_CHECK_CFG(fs) \
   if (!SPIFFS_CHECK_CFG((fs))) { \
     (fs)->err_code = SPIFFS_ERR_NOT_CONFIGURED; \
-    return -1; \
+    return SPIFFS_ERR_NOT_CONFIGURED; \
   }
 
 #define SPIFFS_API_CHECK_RES(fs, res) \
   if ((res) < SPIFFS_OK) { \
     (fs)->err_code = (res); \
-    return -1; \
+    return (res); \
   }
 
 #define SPIFFS_API_CHECK_RES_UNLOCK(fs, res) \
   if ((res) < SPIFFS_OK) { \
     (fs)->err_code = (res); \
     SPIFFS_UNLOCK(fs); \
-    return -1; \
+    return (res); \
   }
 
 #define SPIFFS_VALIDATE_OBJIX(ph, objid, spix) \
