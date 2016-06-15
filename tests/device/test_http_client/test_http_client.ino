@@ -19,7 +19,7 @@ void setup()
     BS_RUN(Serial);
 }
 
-const char* fp = "40 A3 6C E3 8A DF A2 D4 13 B0 32 5C 87 44 54 28 0B CE C5 A4";
+const char* fp = "44 40 9E 34 92 2D E4 61 A4 89 A8 D5 7F 71 B7 62 B3 FD DD E1";
 
 TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
 {

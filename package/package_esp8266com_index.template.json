@@ -178,7 +178,7 @@
               "host": "i686-pc-linux-gnu",
               "url": "http://arduino.esp8266.com/linux32-xtensa-lx106-elf.tar.gz",
               "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz",
-              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a",
+              "checksum": "SHA-256:f693946288f2ffa17288ef75ae16fa08573993f2b0a2a5e6bc35a68dc6087443",
               "size": "32734156"
             },
             {
@@ -186,7 +186,7 @@
               "url": "http://arduino.esp8266.com/linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
               "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
               "checksum": "SHA-256:1ac752bac7fff6be95ce10f56689f155fefea09e4ef710dbd75cb573798ff9c0",
-              "size": "34929527"
+              "size": "34938475"
             }
           ]
         },

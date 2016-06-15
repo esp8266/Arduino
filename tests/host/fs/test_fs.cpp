@@ -160,11 +160,10 @@ TEST_CASE("File names which are too long are rejected", "[fs]")
     REQUIRE(SPIFFS.open(longName_31, "w"));
     REQUIRE(SPIFFS.open(longName_31, "r"));
     REQUIRE(SPIFFS.exists(longName_31));
-    auto files = listDir("");
-    REQUIRE(files.empty());
 }
 
-TEST_CASE("#1685 Duplicate files", "[fs][bugreport]") {
+TEST_CASE("#1685 Duplicate files", "[fs][bugreport]")
+{
     SPIFFS_MOCK_DECLARE(64, 8, 512);
     REQUIRE(SPIFFS.begin());
     createFile("/config", "some text");
@@ -172,4 +171,16 @@ TEST_CASE("#1685 Duplicate files", "[fs][bugreport]") {
     readFile("/config");
     createFile("/data", "more text");
     listDir("/");
+}
+
+TEST_CASE("#1819 Can list all files with openDir(\"\")", "[fs][bugreport]")
+{
+    SPIFFS_MOCK_DECLARE(64, 8, 512);
+    REQUIRE(SPIFFS.begin());
+    createFile("/file1", "some text");
+    createFile("/file2", "other text");
+    createFile("file3", "more text");
+    createFile("sorta-dir/file4", "\n");
+    auto files = listDir("");
+    REQUIRE(files.size() == 4);
 }

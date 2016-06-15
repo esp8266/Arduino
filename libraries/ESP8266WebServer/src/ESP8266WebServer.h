@@ -119,6 +119,8 @@ public:
   void sendContent_P(PGM_P content);
   void sendContent_P(PGM_P content, size_t size);
 
+  static String urlDecode(const String& text);
+
 template<typename T> size_t streamFile(T &file, const String& contentType){
   setContentLength(file.size());
   if (String(file.name()).endsWith(".gz") &&
@@ -142,7 +144,6 @@ protected:
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
-  String urlDecode(const String& text);
 
   struct RequestArgument {
     String key;

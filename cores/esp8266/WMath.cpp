@@ -28,9 +28,12 @@ extern "C" {
 }
 #include "esp8266_peri.h"
 
+static bool s_randomSeedCalled = false;
+
 void randomSeed(unsigned long seed) {
     if(seed != 0) {
-        srand((seed ^ RANDOM_REG32));
+        srand(seed);
+        s_randomSeedCalled = true;
     }
 }
 
@@ -38,7 +41,9 @@ long random(long howbig) {
     if(howbig == 0) {
         return 0;
     }
-    return (rand() ^ RANDOM_REG32) % howbig;
+    // if randomSeed was called, fall back to software PRNG
+    uint32_t val = (s_randomSeedCalled) ? rand() : RANDOM_REG32;
+    return val % howbig;
 }
 
 long random(long howsmall, long howbig) {
@@ -47,6 +52,21 @@ long random(long howsmall, long howbig) {
     }
     long diff = howbig - howsmall;
     return random(diff) + howsmall;
+}
+
+long secureRandom(long howbig) {
+    if(howbig == 0) {
+        return 0;
+    }
+    return RANDOM_REG32 % howbig;
+}
+
+long secureRandom(long howsmall, long howbig) {
+    if(howsmall >= howbig) {
+        return howsmall;
+    }
+    long diff = howbig - howsmall;
+    return secureRandom(diff) + howsmall;
 }
 
 long map(long x, long in_min, long in_max, long out_min, long out_max) {
