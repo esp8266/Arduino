@@ -180,6 +180,13 @@ size_t HardwareSerial::write(uint8_t c)
     return 1;
 }
 
+int HardwareSerial::baudRate(void)
+{
+    // Null pointer on _uart is checked by SDK
+    return uart_get_baudrate(_uart);
+}
+
+
 HardwareSerial::operator bool() const
 {
     return _uart != 0;
