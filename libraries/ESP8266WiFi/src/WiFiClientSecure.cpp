@@ -57,7 +57,6 @@ static int s_pk_refcnt = 0;
 uint8_t* default_certificate = 0;
 uint32_t default_certificate_len = 0;
 static bool default_certificate_dynamic = false;
-static ClientContext* s_io_ctx = nullptr;
 
 static void clear_private_key();
 static void clear_certificate();
@@ -82,6 +81,8 @@ public:
         if (_ssl_ctx_refcnt == 0) {
             ssl_ctx_free(_ssl_ctx);
         }
+
+        s_io_ctx = nullptr;
     }
 
     void ref() {
@@ -95,6 +96,7 @@ public:
     }
 
     void connect(ClientContext* ctx, const char* hostName, uint32_t timeout_ms) {
+        s_io_ctx = ctx;
         _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, hostName);
         uint32_t t = millis();
 
@@ -105,6 +107,10 @@ public:
                 break;
             }
         }
+    }
+
+    void stop() {
+        s_io_ctx = nullptr;
     }
 
     bool connected() {
@@ -173,6 +179,10 @@ public:
         return _ssl;
     }
 
+    static ClientContext* getIOContext(int fd) {
+        return s_io_ctx;
+    }
+
 protected:
     int _readAll() {
         if (!_ssl)
@@ -201,18 +211,18 @@ protected:
     int _refcnt = 0;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
+    static ClientContext* s_io_ctx;
 };
 
 SSL_CTX* SSLContext::_ssl_ctx = nullptr;
 int SSLContext::_ssl_ctx_refcnt = 0;
-
+ClientContext* SSLContext::s_io_ctx = nullptr;
 
 WiFiClientSecure::WiFiClientSecure() {
     ++s_pk_refcnt;
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
-    s_io_ctx = nullptr;
     if (_ssl) {
         _ssl->unref();
     }
@@ -263,8 +273,6 @@ int WiFiClientSecure::_connectSSL(const char* hostName) {
         _ssl->unref();
         _ssl = nullptr;
     }
-
-    s_io_ctx = _client;
 
     _ssl = new SSLContext;
     _ssl->ref();
@@ -371,7 +379,9 @@ uint8_t WiFiClientSecure::connected() {
 }
 
 void WiFiClientSecure::stop() {
-    s_io_ctx = nullptr;
+    if (_ssl) {
+        _ssl->stop();
+    }
     WiFiClient::stop();
 }
 
@@ -525,7 +535,7 @@ static void clear_certificate() {
 }
 
 extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {
-    ClientContext* _client = s_io_ctx;
+    ClientContext* _client = SSLContext::getIOContext(fd);
     if (!_client || _client->state() != ESTABLISHED && !_client->getSize()) {
         errno = EIO;
         return -1;
@@ -542,7 +552,7 @@ extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {
 }
 
 extern "C" int ax_port_write(int fd, uint8_t* buffer, size_t count) {
-    ClientContext* _client = s_io_ctx;
+    ClientContext* _client = SSLContext::getIOContext(fd);
     if (!_client || _client->state() != ESTABLISHED) {
         errno = EIO;
         return -1;
