@@ -23,6 +23,7 @@
 #include "eboot_command.h"
 #include <memory>
 #include "interrupts.h"
+#include "MD5Builder.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -443,7 +444,22 @@ uint32_t EspClass::getSketchSize() {
         DEBUG_SERIAL.printf("section=%u size=%u pos=%u\r\n", section_index, section_header.size, pos);
 #endif
     }
-    result = pos;
+    uint8_t buff[16] = {0};
+
+    if (spi_flash_read(pos, (uint32_t*) buff, 16)) {
+        return 0;
+    }
+    uint8_t index = 0; 
+    for (index = 0; index < 16; index++) {
+        if (buff[index] == 255) { break; }
+    }
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.printf("Last 16bytes: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\r\n", 
+        buff[0],buff[1],buff[2],buff[3],buff[4],buff[5],buff[6],buff[7],
+        buff[8],buff[9],buff[10],buff[11],buff[12],buff[13],buff[14],buff[15]); 
+        DEBUG_SERIAL.printf("end offset index = %u\r\n", index );
+#endif
+    result = pos + index;
     return result;
 }
 
@@ -519,3 +535,53 @@ bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
     ets_isr_unmask(FLASH_INT_MASK);
     return rc == 0;
 }
+
+
+
+String EspClass::getSketchMD5()
+{
+
+    const int buf_size = 512;
+    uint32_t offset = 0; 
+    uint32_t maxLengthLeft = getSketchSize();
+    uint8_t * buf = (uint8_t*) malloc(buf_size);
+    uint8_t remainder = 0; 
+
+    if(!buf) {
+        return "0";
+    }
+
+    MD5Builder md5;
+    md5.begin();
+
+    while( maxLengthLeft > 0) {
+        
+        size_t readBytes = maxLengthLeft; 
+
+        if (readBytes > buf_size) {
+            readBytes = buf_size; 
+        }
+
+        if (readBytes < 4) {
+            remainder = readBytes;
+            readBytes = 4; 
+        }
+
+        if ( flashRead(offset, (uint32_t*)buf, readBytes) ) {
+            if (!remainder) {
+            md5.add(buf, readBytes);
+        } else {
+            md5.add(buf, remainder); 
+        }
+            offset += readBytes;
+            maxLengthLeft -= readBytes; 
+
+        }
+
+    }
+
+    md5.calculate();
+
+    return md5.toString(); 
+} 
+
