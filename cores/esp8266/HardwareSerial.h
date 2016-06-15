@@ -133,6 +133,7 @@ public:
     void setDebugOutput(bool);
     bool isTxEnabled(void);
     bool isRxEnabled(void);
+    int  baudRate(void);
 
 protected:
     int _uart_nr;
