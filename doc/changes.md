@@ -9,6 +9,26 @@ title: Change Log
 - Update SDK to 1.5.3
 - umm_malloc: print block start address before heap corruption callback is triggered
 - If GDBStub library is used, break into gdb on assert and panic
+- Add option to keep FS classes in namespace (#2030)
+- Add SPIFFS::end (#1657)
+- Add ArduinoOTA::getHostname() interface
+- Add __throw_out_of_range
+- Add support for RTC user memory in ESP-specific APIs. (#1836)
+- Expose RTC_USER_MEM in esp8266_peri.h
+- Remove DISABLED macro (#2072)
+- Execute global constructors in correct order (#2074)
+- Real board name available in Sketch/MDNS/OTA (#2054)
+- Add DOUT/QOUT flash modes
+- Add ESP8285 entry in boards menu
+- Move timer detachInterrupt functions into IRAM (#2083)
+- Make Updater be able to run inside async callbacks (#2096)
+- Add new boards Phoenix 1.0 & Phoenix 2.0 (#2088)
+- Store git version of the core in the compiled binary (#2099)
+- Rebuild libstdc++ with mlongcalls and link against it (#1983)
+- Add mechanism for posting functions to the main loop (#2082)
+- MD5Builder::addStream: fixed falsy calculated hash for len > filelength (#2126)
+- Fix SPIFFS.openDir("") (#2143)
+- Bring back old semantics to random and randomSeed, add secureRandom (#1710) (#2142)
 
 ### Libraries
 
@@ -25,6 +45,25 @@ title: Change Log
 - HTTPClient: include non-standard ports in Host: header
 - ESP8266WiFi: Prevent WiFi config corruption (#1997 #1856 #1699 #1675)
 - GDBStub: fix section attribute for core gdbstub functions
+- Wire: I2C bus reset with info to user
+- ESP8266HTTPClient: allow HTTP header value without LWS
+- ESP8266mDNS: Fix mDNS doesn't accept queryService responses from avahi-daemon (#2015)
+- Add MFRC522 to supported libraries (#2044)
+- Update axTLS to ab516f7 (1.5.3+)
+- Mention ESP8266Ping library
+- ESP8266HTTPClient: fix duplicate Content-Length headers (#1902)
+- ESP8266HTTPUpdateServer: make HTTP Update Server more secure (#2104)
+- ESP8266WiFi: add virtual destructor to WiFiServer class (#2116)
+- ESP8266WiFi: fix error when calling `WiFiServer::close` more than once
+- ESP8266WiFi: WiFi event handling refactoring (#2119)
+- ESP8266mDNS: restart listening when WiFi STA is connected/disconnected (#1828)
+- ESP8266WiFi: allow DHCP client to be re-enabled using WiFi.config(0U, 0U, 0U) (#1896)
+- ESP8266WiFi: enable SO_REUSE in LwIP and WiFiServer (#1431)
+- ESP8266WebServer: make ESP8266WebServer::urlDecode public (#1419)
+- LwIP: sntp_localtime: return -1 in tm_isdst field (#2010)
+- ESP8266WiFi: fix for crash in WiFiClientSecure when WiFi is disconnected (#2139)
+- SD: Prevent WDT resets in SD library (#1815)
+- ESP8266WiFi: Fix issue when WiFi.begin(ssid, pass) is called right after WiFi.mode(WIFI_OFF)
 
 ### Tools
 
