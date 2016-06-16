@@ -202,12 +202,14 @@ bool UpdaterClass::end(bool evenIfRemaining){
 }
 
 bool UpdaterClass::_writeBuffer(){
-
   if(!_async) yield();
   bool result = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
   if(!_async) yield();
   if (result) {
       result = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+      if (result) {
+        result = ESP.flashRead(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+      }
   }
   if(!_async) yield();
 
