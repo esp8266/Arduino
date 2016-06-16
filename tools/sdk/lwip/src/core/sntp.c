@@ -438,7 +438,7 @@ sntp_mktm_r(const time_t * tim_p ,struct tm *res ,int is_gmtime)
 //	    res->tm_isdst = -1;
 //	}
 //      else
-	res->tm_isdst = 0;
+      res->tm_isdst = -1;
 
       offset = (res->tm_isdst == 1 ? sntp__tzrule[1].offset : sntp__tzrule[0].offset);
 

@@ -92,6 +92,7 @@ void ESP8266WiFiGenericClass::onEvent(WiFiEventCb f, WiFiEvent_t event)
         (*f)(static_cast<WiFiEvent>(e->event));
     });
     handler->mCanExpire = false;
+    sCbEventList.push_back(handler);
 }
 
 WiFiEventHandler ESP8266WiFiGenericClass::onStationModeConnected(std::function<void(const WiFiEventStationModeConnected&)> f)

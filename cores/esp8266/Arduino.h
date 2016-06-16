@@ -271,6 +271,8 @@ void noTone(uint8_t _pin);
 long random(long);
 long random(long, long);
 void randomSeed(unsigned long);
+long secureRandom(long);
+long secureRandom(long, long);
 long map(long, long, long, long, long);
 
 extern "C" void configTime(long timezone, int daylightOffset_sec,

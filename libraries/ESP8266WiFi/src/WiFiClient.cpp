@@ -339,24 +339,16 @@ void WiFiClient::_s_err(void* arg, int8_t err)
 void WiFiClient::stopAll()
 {
     for (WiFiClient* it = _s_first; it; it = it->_next) {
-        ClientContext* c = it->_client;
-        if (c) {
-            c->abort();
-            c->unref();
-            it->_client = 0;
-        }
+        it->stop();
     }
 }
 
 
-void WiFiClient::stopAllExcept(WiFiClient * exC) {
+void WiFiClient::stopAllExcept(WiFiClient* except) 
+{
     for (WiFiClient* it = _s_first; it; it = it->_next) {
-        ClientContext* c = it->_client;
-
-        if (c && c != exC->_client) {
-            c->abort();
-            c->unref();
-            it->_client = 0;
+        if (it != except) {
+            it->stop();
         }
     }
 }
