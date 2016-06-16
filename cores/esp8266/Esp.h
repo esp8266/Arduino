@@ -133,6 +133,7 @@ class EspClass {
         bool flashRead(uint32_t offset, uint32_t *data, size_t size);
 
         uint32_t getSketchSize();
+        String getSketchMD5();
         uint32_t getFreeSketchSpace();
         bool updateSketch(Stream& in, uint32_t size, bool restartOnFail = false, bool restartOnSuccess = true);
 
