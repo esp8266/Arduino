@@ -120,11 +120,15 @@ extern "C" uint32_t _SPIFFS_block;
 #define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
 #define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
 
+#ifndef SPIFFS_MAX_OPEN_FILES
+#define SPIFFS_MAX_OPEN_FILES 5
+#endif
+
 FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(
                              SPIFFS_PHYS_ADDR,
                              SPIFFS_PHYS_SIZE,
                              SPIFFS_PHYS_PAGE,
                              SPIFFS_PHYS_BLOCK,
-                             5)));
+                             SPIFFS_MAX_OPEN_FILES)));
 
 #endif
