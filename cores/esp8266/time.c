@@ -111,8 +111,9 @@ struct tm* localtime(const time_t *clock)
 
 char* ctime(const time_t *t)
 {
+    static char *result = NULL;
     struct tm* p_tm = localtime(t);
-    static char* result = asctime(p_tm);
+    result = asctime(p_tm);
     return result;
 }
 
