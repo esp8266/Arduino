@@ -162,19 +162,19 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin)
         uart->rx_enabled = (mode != UART_TX_ONLY);
         uart->tx_enabled = (mode != UART_RX_ONLY);
         uart->rx_pin = (uart->rx_enabled)?3:255;
-        if(uart->rx_enabled) {
+        if(uart->tx_enabled) {
             if (tx_pin == 2) {
                 uart->tx_pin = 2;
-                pinMode(uart->rx_pin, FUNCTION_4);
+                pinMode(uart->tx_pin, FUNCTION_4);
             } else {
                 uart->tx_pin = 1;
-                pinMode(uart->rx_pin, SPECIAL);
+                pinMode(uart->tx_pin, FUNCTION_0);
             }
         } else {
             uart->tx_pin = 255;
         }
-        if(uart->tx_enabled) {
-            pinMode(uart->tx_pin, SPECIAL);
+        if(uart->rx_enabled) {
+            pinMode(uart->rx_pin, SPECIAL);
         }
         IOSWAP &= ~(1 << IOSWAPU0);
         break;
