@@ -512,7 +512,7 @@ sint16 espconn_secure_get_size(uint8 level);
  * Returns      : result true or false
 *******************************************************************************/
 
-bool espconn_secure_ca_enable(uint8 level, uint8 flash_sector );
+bool espconn_secure_ca_enable(uint8 level, uint32 flash_sector );
 
 /******************************************************************************
  * FunctionName : espconn_secure_ca_disable
@@ -535,7 +535,7 @@ bool espconn_secure_ca_disable(uint8 level);
  * Returns      : result true or false
 *******************************************************************************/
 
-bool espconn_secure_cert_req_enable(uint8 level, uint8 flash_sector );
+bool espconn_secure_cert_req_enable(uint8 level, uint32 flash_sector );
 
 /******************************************************************************
  * FunctionName : espconn_secure_ca_disable

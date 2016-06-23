@@ -74,6 +74,8 @@ typedef enum {
 #define ICACHE_RODATA_ATTR
 #endif /* ICACHE_FLASH */
 
+#define STORE_ATTR __attribute__((aligned(4)))
+
 #ifndef __cplusplus
 #define BOOL            bool
 #define TRUE            true
