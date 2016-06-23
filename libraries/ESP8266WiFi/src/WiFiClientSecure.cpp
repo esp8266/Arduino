@@ -557,7 +557,8 @@ extern "C" int ax_port_write(int fd, uint8_t* buffer, size_t count) {
         errno = EIO;
         return -1;
     }
-    size_t cb = _client->write((const char*) buffer, count);
+
+    size_t cb = _client->write(buffer, count);
     if (cb != count) {
         errno = EAGAIN;
     }
