@@ -54,6 +54,8 @@ extern "C" {
 #define SPIFFS_ERR_RO_ABORTED_OPERATION -10033
 #define SPIFFS_ERR_PROBE_TOO_FEW_BLOCKS -10034
 #define SPIFFS_ERR_PROBE_NOT_A_FS       -10035
+#define SPIFFS_ERR_NAME_TOO_LONG        -10036
+
 #define SPIFFS_ERR_INTERNAL             -10050
 
 #define SPIFFS_ERR_TEST                 -10100
@@ -104,7 +106,7 @@ typedef enum {
   SPIFFS_CHECK_FIX_LOOKUP,
   SPIFFS_CHECK_DELETE_ORPHANED_INDEX,
   SPIFFS_CHECK_DELETE_PAGE,
-  SPIFFS_CHECK_DELETE_BAD_FILE,
+  SPIFFS_CHECK_DELETE_BAD_FILE
 } spiffs_check_report;
 
 /* file system check callback function */
@@ -123,7 +125,7 @@ typedef enum {
   /* the file has been updated or moved to another page */
   SPIFFS_CB_UPDATED,
   /* the file has been deleted */
-  SPIFFS_CB_DELETED,
+  SPIFFS_CB_DELETED
 } spiffs_fileop_type;
 
 /* file system listener callback function */
@@ -145,20 +147,28 @@ typedef void (*spiffs_file_callback)(struct spiffs_t *fs, spiffs_fileop_type op,
 
 /* Any write to the filehandle is appended to end of the file */
 #define SPIFFS_APPEND                   (1<<0)
+#define SPIFFS_O_APPEND                 SPIFFS_APPEND
 /* If the opened file exists, it will be truncated to zero length before opened */
 #define SPIFFS_TRUNC                    (1<<1)
+#define SPIFFS_O_TRUNC                  SPIFFS_TRUNC
 /* If the opened file does not exist, it will be created before opened */
 #define SPIFFS_CREAT                    (1<<2)
+#define SPIFFS_O_CREAT                  SPIFFS_CREAT
 /* The opened file may only be read */
 #define SPIFFS_RDONLY                   (1<<3)
-/* The opened file may only be writted */
+#define SPIFFS_O_RDONLY                 SPIFFS_RDONLY
+/* The opened file may only be written */
 #define SPIFFS_WRONLY                   (1<<4)
-/* The opened file may be both read and writted */
+#define SPIFFS_O_WRONLY                 SPIFFS_WRONLY
+/* The opened file may be both read and written */
 #define SPIFFS_RDWR                     (SPIFFS_RDONLY | SPIFFS_WRONLY)
-/* Any writes to the filehandle will never be cached */
+#define SPIFFS_O_RDWR                   SPIFFS_RDWR
+/* Any writes to the filehandle will never be cached but flushed directly */
 #define SPIFFS_DIRECT                   (1<<5)
-/* If SPIFFS_CREAT and SPIFFS_EXCL are set, SPIFFS_open() shall fail if the file exists */
+#define SPIFFS_O_DIRECT                 SPIFFS_DIRECT
+/* If SPIFFS_O_CREAT and SPIFFS_O_EXCL are set, SPIFFS_open() shall fail if the file exists */
 #define SPIFFS_EXCL                     (1<<6)
+#define SPIFFS_O_EXCL                   SPIFFS_EXCL
 
 #define SPIFFS_SEEK_SET                 (0)
 #define SPIFFS_SEEK_CUR                 (1)
@@ -375,8 +385,8 @@ s32_t SPIFFS_creat(spiffs *fs, const char *path, spiffs_mode mode);
  * @param fs            the file system struct
  * @param path          the path of the new file
  * @param flags         the flags for the open command, can be combinations of
- *                      SPIFFS_APPEND, SPIFFS_TRUNC, SPIFFS_CREAT, SPIFFS_RD_ONLY,
- *                      SPIFFS_WR_ONLY, SPIFFS_RDWR, SPIFFS_DIRECT
+ *                      SPIFFS_O_APPEND, SPIFFS_O_TRUNC, SPIFFS_O_CREAT, SPIFFS_O_RDONLY,
+ *                      SPIFFS_O_WRONLY, SPIFFS_O_RDWR, SPIFFS_O_DIRECT, SPIFFS_O_EXCL
  * @param mode          ignored, for posix compliance
  */
 spiffs_file SPIFFS_open(spiffs *fs, const char *path, spiffs_flags flags, spiffs_mode mode);

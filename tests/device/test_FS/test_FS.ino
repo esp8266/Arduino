@@ -36,11 +36,20 @@ TEST_CASE("read-write test","[fs]")
 TEST_CASE("A bunch of files show up in openDir, and can be removed", "[fs]")
 {
     REQUIRE(SPIFFS.begin());
-    const int n = 10;
-    int found[n] = {0};
+    
+    // remove everything
+    {
+        Dir root = SPIFFS.openDir("");
+        while (root.next()) {
+            String fileName = root.fileName();
+            CHECK(SPIFFS.remove(fileName));
+        }
+    }
 
+    // create 10 files
+    const int n = 10;
     for (int i = 0; i < n; ++i) {
-        String name = "seq_";
+        String name = "/seq_";
         name += i;
         name += ".txt";
 
@@ -50,12 +59,14 @@ TEST_CASE("A bunch of files show up in openDir, and can be removed", "[fs]")
         out.println(i);
     }
 
+    // check that files are listed 
+    int found[n] = {0};
     {
         Dir root = SPIFFS.openDir("/");
         while (root.next()) {
             String fileName = root.fileName();
-            CHECK(fileName.indexOf("seq_") == 0);
-            int i = fileName.substring(4).toInt();
+            CHECK(fileName.indexOf("/seq_") == 0);
+            int i = fileName.substring(5).toInt();
             CHECK(i >= 0 && i < n);
             found[i]++;
         }
@@ -65,6 +76,7 @@ TEST_CASE("A bunch of files show up in openDir, and can be removed", "[fs]")
         }
     }
 
+    // remove them
     {
         Dir root = SPIFFS.openDir("/");
         while (root.next()) {
@@ -93,6 +105,14 @@ TEST_CASE("files can be renamed", "[fs]")
 TEST_CASE("FS::info works","[fs]")
 {
     REQUIRE(SPIFFS.begin());
+
+    {
+        Dir root = SPIFFS.openDir("");
+        while (root.next()) {
+            CHECK(SPIFFS.remove(root.fileName()));
+        }
+    }
+
     FSInfo info;
     CHECK(SPIFFS.info(info));
 
@@ -104,6 +124,28 @@ TEST_CASE("FS::info works","[fs]")
                   info.maxOpenFiles,
                   info.maxPathLength
                  );
+    
+    CHECK(info.usedBytes == 0);
+    SPIFFS.end();
+    REQUIRE(SPIFFS.begin());
+
+    {
+        File tmp = SPIFFS.open("/tmp.txt", "w");
+        tmp.println("size test");
+    }
+
+    FSInfo info2;
+    CHECK(SPIFFS.info(info2));
+    Serial.printf("Total: %u\nUsed: %u\nBlock: %u\nPage: %u\nMax open files: %u\nMax path len: %u\n",
+                  info2.totalBytes,
+                  info2.usedBytes,
+                  info2.blockSize,
+                  info2.pageSize,
+                  info2.maxOpenFiles,
+                  info2.maxPathLength
+                 );
+
+    CHECK(info2.usedBytes > 0 && info2.usedBytes <= 2 * info2.pageSize);
 }
 
 TEST_CASE("FS is empty after format","[fs]")

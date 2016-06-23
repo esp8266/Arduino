@@ -142,7 +142,7 @@ s32_t spiffs_obj_lu_find_entry_visitor(
   int entries_per_page = (SPIFFS_CFG_LOG_PAGE_SZ(fs) / sizeof(spiffs_obj_id));
 
   // wrap initial
-  if (cur_entry >= (int)SPIFFS_OBJ_LOOKUP_MAX_ENTRIES(fs) - 1) {
+  if (cur_entry > (int)SPIFFS_OBJ_LOOKUP_MAX_ENTRIES(fs) - 1) {
     cur_entry = 0;
     cur_block++;
     cur_block_addr = cur_block * SPIFFS_CFG_LOG_BLOCK_SZ(fs);
@@ -467,7 +467,7 @@ s32_t spiffs_obj_lu_find_free(
       SPIFFS_OBJ_ID_FREE, block_ix, lu_entry);
   if (res == SPIFFS_OK) {
     fs->free_cursor_block_ix = *block_ix;
-    fs->free_cursor_obj_lu_entry = *lu_entry;
+    fs->free_cursor_obj_lu_entry = (*lu_entry) + 1;
     if (*lu_entry == 0) {
       fs->free_blocks--;
     }
@@ -1503,8 +1503,10 @@ s32_t spiffs_object_truncate(
   }
 
   // need 2 pages if not removing: object index page + possibly chopped data page
-  res = spiffs_gc_check(fs, remove ? 0 : SPIFFS_DATA_PAGE_SIZE(fs) * 2);
-  SPIFFS_CHECK_RES(res);
+  if (remove == 0) {
+    res = spiffs_gc_check(fs, SPIFFS_DATA_PAGE_SIZE(fs) * 2);
+    SPIFFS_CHECK_RES(res);
+  }
 
   spiffs_page_ix objix_pix = fd->objix_hdr_pix;
   spiffs_span_ix data_spix = (fd->size > 0 ? fd->size-1 : 0) / SPIFFS_DATA_PAGE_SIZE(fs);
@@ -1543,11 +1545,18 @@ s32_t spiffs_object_truncate(
         SPIFFS_CHECK_RES(res);
         spiffs_cb_object_event(fs, fd, SPIFFS_EV_IX_DEL, fd->obj_id, objix->p_hdr.span_ix, objix_pix, 0);
         if (prev_objix_spix > 0) {
-          // update object index header page
-          SPIFFS_DBG("truncate: update objix hdr page %04x:%04x to size %i\n", fd->objix_hdr_pix, prev_objix_spix, cur_size);
-          res = spiffs_object_update_index_hdr(fs, fd, fd->obj_id,
-              fd->objix_hdr_pix, 0, 0, cur_size, &new_objix_hdr_pix);
-          SPIFFS_CHECK_RES(res);
+          // Update object index header page, unless we totally want to remove the file.
+          // If fully removing, we're not keeping consistency as good as when storing the header between chunks,
+          // would we be aborted. But when removing full files, a crammed system may otherwise
+          // report ERR_FULL a la windows. We cannot have that.
+          // Hence, take the risk - if aborted, a file check would free the lost pages and mend things
+          // as the file is marked as fully deleted in the beginning.
+          if (remove == 0) {
+            SPIFFS_DBG("truncate: update objix hdr page %04x:%04x to size %i\n", fd->objix_hdr_pix, prev_objix_spix, cur_size);
+            res = spiffs_object_update_index_hdr(fs, fd, fd->obj_id,
+                fd->objix_hdr_pix, 0, 0, cur_size, &new_objix_hdr_pix);
+            SPIFFS_CHECK_RES(res);
+          }
           fd->size = cur_size;
         }
       }
