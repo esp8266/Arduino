@@ -78,12 +78,12 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
     {
         // request which returns 8000 bytes
         HTTPClient http;
-        http.begin(SERVER_IP, 8088, "/data?size=8000", fp);
+        http.begin(SERVER_IP, 8088, "/data?size=4000", fp);
         auto httpCode = http.GET();
         REQUIRE(httpCode == HTTP_CODE_OK);
         String payload = http.getString();
         auto len = payload.length();
-        REQUIRE(len == 8000);
+        REQUIRE(len == 4000);
         for (int i = 0; i < len; ++i) {
             if (payload[i] != 'a') {
                 REQUIRE(false);
