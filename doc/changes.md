@@ -2,7 +2,10 @@
 title: Change Log
 ---
 
-## Current version
+## 2.3.0
+June 23, 2016
+
+Package link: `http://arduino.esp8266.com/versions/2.3.0/package_esp8266com_index.json`.
 
 ### Core
 - Fix NMI interrupt handler alignment
@@ -29,6 +32,11 @@ title: Change Log
 - MD5Builder::addStream: fixed falsy calculated hash for len > filelength (#2126)
 - Fix SPIFFS.openDir("") (#2143)
 - Bring back old semantics to random and randomSeed, add secureRandom (#1710) (#2142)
+- Add missing pgm_read_ptr{_near/_far} macros (#2160)
+- Add macro for maximum open SPIFFS files, settings it to 1 saves about 1k heap. (#2167)
+- Fix UART pins setting (#2098)
+- Fix ESP.getSketchSize, add ESP.getSketchMD5 (#2158)
+- Add Serial.baudRate() to get current baud rate (#2079)
 
 ### Libraries
 
@@ -70,7 +78,7 @@ title: Change Log
 - Python 3 compatibility for get.py
 - Device side test library and test runner
 - Fix ARM toolchain files permissions (#2004)
-
+- Update esptool to 0.4.9
 
 ## 2.2.0
 April 18, 2016
