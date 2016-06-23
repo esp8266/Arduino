@@ -17,6 +17,7 @@
  */
 
 #include <time.h>
+#include <sys/reent.h>
 #include "sntp.h"
 
 
@@ -81,14 +82,6 @@ int clock_gettime(clockid_t unused, struct timespec *tp)
     return 0;
 }
 
-// seconds since 1970
-time_t mktime(struct tm *t)
-{
-    // system_mktime expects month in range 1..12
-    #define START_MONTH 1
-    return DIFF1900TO1970 + system_mktime(t->tm_year, t->tm_mon + START_MONTH, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
-}
-
 time_t time(time_t * t)
 {
     time_t seconds = sntp_get_current_timestamp();
@@ -99,24 +92,7 @@ time_t time(time_t * t)
     return seconds;
 }
 
-char* asctime(const struct tm *t)
-{
-    return sntp_asctime(t);
-}
-
-struct tm* localtime(const time_t *clock)
-{
-    return sntp_localtime(clock);
-}
-
-char* ctime(const time_t *t)
-{
-    struct tm* p_tm = localtime(t);
-    char* result = asctime(p_tm);
-    return result;
-}
-
-int gettimeofday(struct timeval *tp, void *tzp)
+int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
 {
     if (tp)
     {
