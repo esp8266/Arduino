@@ -18,6 +18,7 @@ EXTERN(_DoubleExceptionVector)
 EXTERN(_KernelExceptionVector)
 EXTERN(_NMIExceptionVector)
 EXTERN(_UserExceptionVector)
+EXTERN(core_version)
 PROVIDE(_memmap_vecbase_reset = 0x40000000);
 /* Various memory-map dependent cache attribute settings: */
 _memmap_cacheattr_wb_base = 0x00000110;
@@ -156,6 +157,7 @@ SECTIONS
     *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, \
            EXCLUDE_FILE (umm_malloc.c.o) .text*)
     *.cpp.o(.literal*, .text*)
+    *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libgcc.a:_umoddi3.o(.literal .text)
     *libgcc.a:_udivdi3.o(.literal .text)

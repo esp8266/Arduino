@@ -39,8 +39,15 @@ TEST_CASE("A bunch of files show up in openDir, and can be removed", "[fs]")
     const int n = 10;
     int found[n] = {0};
 
+    {
+        Dir root = SPIFFS.openDir("");
+        while (root.next()) {
+            CHECK(SPIFFS.remove(root.fileName()));
+        }
+    }
+
     for (int i = 0; i < n; ++i) {
-        String name = "seq_";
+        String name = "/seq_";
         name += i;
         name += ".txt";
 
@@ -54,8 +61,8 @@ TEST_CASE("A bunch of files show up in openDir, and can be removed", "[fs]")
         Dir root = SPIFFS.openDir("/");
         while (root.next()) {
             String fileName = root.fileName();
-            CHECK(fileName.indexOf("seq_") == 0);
-            int i = fileName.substring(4).toInt();
+            CHECK(fileName.indexOf("/seq_") == 0);
+            int i = fileName.substring(5).toInt();
             CHECK(i >= 0 && i < n);
             found[i]++;
         }

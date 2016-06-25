@@ -36,6 +36,7 @@ enum HTTPClientStatus { HC_NONE, HC_WAIT_READ, HC_WAIT_CLOSE };
 #define HTTP_UPLOAD_BUFLEN 2048
 #define HTTP_MAX_DATA_WAIT 1000 //ms to wait for the client to send the request
 #define HTTP_MAX_POST_WAIT 1000 //ms to wait for POST data to arrive
+#define HTTP_MAX_SEND_WAIT 5000 //ms to wait for data chunk to be ACKed
 #define HTTP_MAX_CLOSE_WAIT 2000 //ms to wait for the client to close the connection
 
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
@@ -113,7 +114,7 @@ public:
   void send_P(int code, PGM_P content_type, PGM_P content);
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
-  void setContentLength(size_t contentLength) { _contentLength = contentLength; }
+  void setContentLength(size_t contentLength);
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
@@ -129,7 +130,7 @@ template<typename T> size_t streamFile(T &file, const String& contentType){
     sendHeader("Content-Encoding", "gzip");
   }
   send(200, contentType, "");
-  return _currentClient.write(file, HTTP_DOWNLOAD_UNIT_SIZE);
+  return _currentClient.write(file);
 }
 
 protected:
