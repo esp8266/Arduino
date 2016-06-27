@@ -95,6 +95,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
+  _chunked = false;
 
   HTTPMethod method = HTTP_GET;
   if (methodStr == "POST") {

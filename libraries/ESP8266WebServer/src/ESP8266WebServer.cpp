@@ -259,7 +259,6 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
     if (!content_type)
         content_type = "text/html";
 
-    _chunked = false;
     sendHeader("Content-Type", content_type, true);
     if (_contentLength == CONTENT_LENGTH_NOT_SET) {
         sendHeader("Content-Length", String(contentLength));
