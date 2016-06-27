@@ -176,6 +176,7 @@ protected:
   String           _responseHeaders;
 
   String           _hostHeader;
+  bool             _chunked;
 
 };
 

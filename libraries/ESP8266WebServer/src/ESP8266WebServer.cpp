@@ -50,6 +50,7 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 , _headerKeysCount(0)
 , _currentHeaders(0)
 , _contentLength(0)
+, _chunked(false)
 {
 }
 
@@ -65,6 +66,7 @@ ESP8266WebServer::ESP8266WebServer(int port)
 , _headerKeysCount(0)
 , _currentHeaders(0)
 , _contentLength(0)
+, _chunked(false)
 {
 }
 
@@ -257,6 +259,7 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
     if (!content_type)
         content_type = "text/html";
 
+    _chunked = false;
     sendHeader("Content-Type", content_type, true);
     if (_contentLength == CONTENT_LENGTH_NOT_SET) {
         sendHeader("Content-Length", String(contentLength));
@@ -264,6 +267,7 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
         sendHeader("Content-Length", String(_contentLength));
     } else if(_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion){ //HTTP/1.1 or above client
       //let's do chunked
+      _chunked = true;
       sendHeader("Accept-Ranges","none");
       sendHeader("Transfer-Encoding","chunked");
     }
@@ -276,8 +280,9 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
 
 void ESP8266WebServer::send(int code, const char* content_type, const String& content) {
     String header;
-    if(content.length() == 0 && _contentLength == CONTENT_LENGTH_NOT_SET)
-      _contentLength = CONTENT_LENGTH_UNKNOWN;
+    // Can we asume the following?
+    //if(code == 200 && content.length() == 0 && _contentLength == CONTENT_LENGTH_NOT_SET)
+    //  _contentLength = CONTENT_LENGTH_UNKNOWN;
     _prepareHeader(header, code, content_type, content.length());
     _currentClient.write(header.c_str(), header.length());
     if(content.length())
@@ -319,7 +324,7 @@ void ESP8266WebServer::send(int code, const String& content_type, const String& 
 void ESP8266WebServer::sendContent(const String& content) {
   const char * footer = "\r\n";
   size_t len = content.length();
-  if(_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion) {
+  if(_chunked) {
     char * chunkSize = (char *)malloc(11);
     if(chunkSize){
       sprintf(chunkSize, "%x%s", len, footer);
@@ -328,7 +333,7 @@ void ESP8266WebServer::sendContent(const String& content) {
     }
   }
   _currentClient.write(content.c_str(), len);
-  if(_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion){
+  if(_chunked){
     _currentClient.write(footer, 2);
   }
 }
@@ -339,7 +344,7 @@ void ESP8266WebServer::sendContent_P(PGM_P content) {
 
 void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
   const char * footer = "\r\n";
-  if(_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion) {
+  if(_chunked) {
     char * chunkSize = (char *)malloc(11);
     if(chunkSize){
       sprintf(chunkSize, "%x%s", size, footer);
@@ -348,7 +353,7 @@ void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
     }
   }
   _currentClient.write_P(content, size);
-  if(_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion){
+  if(_chunked){
     _currentClient.write(footer, 2);
   }
 }
