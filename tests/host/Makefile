@@ -37,6 +37,7 @@ MOCK_CPP_FILES := $(addprefix common/,\
 
 MOCK_C_FILES := $(addprefix common/,\
 	md5.c \
+	noniso.c \
 )
 
 INC_PATHS += $(addprefix -I, \
