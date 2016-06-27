@@ -156,6 +156,7 @@ protected:
   WiFiClient  _currentClient;
   HTTPMethod  _currentMethod;
   String      _currentUri;
+  uint8_t     _currentVersion;
   HTTPClientStatus _currentStatus;
   unsigned long _statusChange;
 
