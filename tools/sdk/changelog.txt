@@ -1,3 +1,29 @@
+ESP8266_NONOS_SDK_V1.5.4_16_05_20 Release Note 
+----------------------------------------------
+Optimization:
+1. Updated libphy.a to version 972.
+2. Updated libpp.a to version 10.1, revised issues about frequency offset and sleep mode.
+3. Optimized IGMP function.
+4. Optimized DNS function.
+5. Optimized WPS function.
+6. Optimized DHCP server function.
+7. Optimized wifi_station_get_connect_status function.
+8. Revised the issue that API system_adc_read and system_get_vdd33 may return wrong value.
+9. Optimized API:
+bool espconn_secure_ca_enable(uint8 level, uint32 flash_sector);
+bool espconn_secure_cert_req_enable(uint8 level, uint32 flash_sector);
+
+Added APIs: 
+1. system_adc_read_fast: ADC fast sampling.
+2. wifi_fpm_auto_sleep_set_in_null_mode: set whether enter modem-sleep mode or not when WiFi is in NULL_MODE.
+
+AT_V1.1 Release Note:
+Optimization: 
+1. Optimized the behavior of writing Flash.
+2. Optimized DHCP server function.
+3. Updated command AT+SAVETRANSLINK to save domain name. 
+
+
 ESP8266_NONOS_SDK_V1.5.3_16_04_16 Release Note
 ----------------------------------------------
 Optimization:
