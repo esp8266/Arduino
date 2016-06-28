@@ -41,6 +41,7 @@ const char * AUTHORIZATION_HEADER = "Authorization";
 ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 : _server(addr, port)
 , _currentMethod(HTTP_ANY)
+, _currentVersion(0)
 , _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
@@ -49,12 +50,14 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 , _headerKeysCount(0)
 , _currentHeaders(0)
 , _contentLength(0)
+, _chunked(false)
 {
 }
 
 ESP8266WebServer::ESP8266WebServer(int port)
 : _server(port)
 , _currentMethod(HTTP_ANY)
+, _currentVersion(0)
 , _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
@@ -63,6 +66,7 @@ ESP8266WebServer::ESP8266WebServer(int port)
 , _headerKeysCount(0)
 , _currentHeaders(0)
 , _contentLength(0)
+, _chunked(false)
 {
 }
 
@@ -246,7 +250,7 @@ void ESP8266WebServer::setContentLength(size_t contentLength) {
 }
 
 void ESP8266WebServer::_prepareHeader(String& response, int code, const char* content_type, size_t contentLength) {
-    response = "HTTP/1.1 ";
+    response = "HTTP/1."+String(_currentVersion)+" ";
     response += String(code);
     response += " ";
     response += _responseCodeToString(code);
@@ -260,9 +264,13 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
         sendHeader("Content-Length", String(contentLength));
     } else if (_contentLength != CONTENT_LENGTH_UNKNOWN) {
         sendHeader("Content-Length", String(_contentLength));
+    } else if(_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion){ //HTTP/1.1 or above client
+      //let's do chunked
+      _chunked = true;
+      sendHeader("Accept-Ranges","none");
+      sendHeader("Transfer-Encoding","chunked");
     }
     sendHeader("Connection", "close");
-    sendHeader("Access-Control-Allow-Origin", "*");
 
     response += _responseHeaders;
     response += "\r\n";
@@ -271,9 +279,13 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
 
 void ESP8266WebServer::send(int code, const char* content_type, const String& content) {
     String header;
+    // Can we asume the following?
+    //if(code == 200 && content.length() == 0 && _contentLength == CONTENT_LENGTH_NOT_SET)
+    //  _contentLength = CONTENT_LENGTH_UNKNOWN;
     _prepareHeader(header, code, content_type, content.length());
-    sendContent(header);
-    sendContent(content);
+    _currentClient.write(header.c_str(), header.length());
+    if(content.length())
+      sendContent(content);
 }
 
 void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
@@ -287,7 +299,7 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     char type[64];
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
     _prepareHeader(header, code, (const char* )type, contentLength);
-    sendContent(header);
+    _currentClient.write(header.c_str(), header.length());
     sendContent_P(content);
 }
 
@@ -309,15 +321,40 @@ void ESP8266WebServer::send(int code, const String& content_type, const String& 
 }
 
 void ESP8266WebServer::sendContent(const String& content) {
-  _currentClient.write(content.c_str(), content.length());
+  const char * footer = "\r\n";
+  size_t len = content.length();
+  if(_chunked) {
+    char * chunkSize = (char *)malloc(11);
+    if(chunkSize){
+      sprintf(chunkSize, "%x%s", len, footer);
+      _currentClient.write(chunkSize, strlen(chunkSize));
+      free(chunkSize);
+    }
+  }
+  _currentClient.write(content.c_str(), len);
+  if(_chunked){
+    _currentClient.write(footer, 2);
+  }
 }
 
 void ESP8266WebServer::sendContent_P(PGM_P content) {
-  _currentClient.write_P(content, strlen_P(content));
+  sendContent_P(content, strlen_P(content));
 }
 
 void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
+  const char * footer = "\r\n";
+  if(_chunked) {
+    char * chunkSize = (char *)malloc(11);
+    if(chunkSize){
+      sprintf(chunkSize, "%x%s", size, footer);
+      _currentClient.write(chunkSize, strlen(chunkSize));
+      free(chunkSize);
+    }
+  }
   _currentClient.write_P(content, size);
+  if(_chunked){
+    _currentClient.write(footer, 2);
+  }
 }
 
 
