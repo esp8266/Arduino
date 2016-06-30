@@ -7,17 +7,13 @@
 // Description:
 //		Header for KMP Dino WiFi board.
 // Version: 1.0.0
-// Date: 30.04.2016
+// Date: 17.06.2016
 // Author: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu> & Dimitar Antonov <d.antonov@kmpelectronics.eu>
 
 #include "KMPDinoWiFiESP.h"
+#include <HardwareSerial.h>
 
 #define CS 15
-
-// DiNo board led.
-//#define LED_PIN 16
-// ESP12-E Led
-//#define LED_PIN 14 
 
 #define READ_CMD  0x41
 #define WRITE_CMD 0x40
@@ -47,6 +43,10 @@
 #define IN3PIN 0x02
 #define IN4PIN 0x03
 
+#define RS485TXControlPin 16
+#define RS485Transmit     HIGH
+#define RS485Receive      LOW
+
 /**
  * @brief Relay pins.
  */
@@ -59,7 +59,6 @@ const uint8_t RELAY_PINS[RELAY_COUNT] =
 const int OPTOIN_PINS[OPTOIN_COUNT] =
 { IN1PIN, IN2PIN, IN3PIN, IN4PIN };
 
-
 uint8_t  _expTxData[16];
 uint8_t  _expRxData[16];
 
@@ -67,7 +66,7 @@ KMPDinoWiFiESPClass KMPDinoWiFiESP;
 
 /**
  * @brief Initialize KMP Dino WiFi board.
- *		   WiFi module ESP8266, Expander MCP23S17, relays, opto inputs and LED.
+ *		   WiFi module ESP8266, Expander MCP23S17, relays and opto inputs.
  *
  * @return void
  */
@@ -82,10 +81,6 @@ void KMPDinoWiFiESPClass::init()
 	pinMode(CS, OUTPUT);
 	digitalWrite(CS, HIGH);
 	ExpanderInitGPIO();
-
-	// Initialize the LED_BUILTIN pin as an output.
-	//pinMode(LED_PIN, OUTPUT);
-	//LedOff();
 }
 
 /* ----------------------------------------------------------------------- */
@@ -230,8 +225,8 @@ bool KMPDinoWiFiESPClass::GetOptoInState(OptoIn optoIn)
 /**
  * @brief Set expander MCP23S17 pin state.
  *
- * @param pinNumber Pin number to set.
- * @param state State of the pin, true - 1, false - 0.
+ * @param pinNumber The number of pin to be set.
+ * @param state The pin state, true - 1, false - 0.
  *
  * @return void
  */
@@ -254,7 +249,7 @@ void KMPDinoWiFiESPClass::ExpanderSetPin(uint8_t pinNumber, bool state)
 /**
  * @brief Get expander MCP23S17 pin state.
  *
- * @param pinNumber Pin number to read.
+ * @param pinNumber The number of pin to be get.
  *
  * @return State true - 1, false - 0.
  */
@@ -270,7 +265,7 @@ bool KMPDinoWiFiESPClass::ExpanderGetPin(uint8_t pinNumber)
  *
  * @param address Register address.
  *
- * @return Data from register.
+ * @return The data from the register.
  */
 uint8_t KMPDinoWiFiESPClass::ExpanderReadRegister(uint8_t address)
 {
@@ -350,44 +345,175 @@ void KMPDinoWiFiESPClass::ExpanderInitGPIO()
 	}
 }
 
-///**
-// * @brief Get current state LED.
-// *
-// * @return bool If result equal - true LED On, else Off.
-// */
-//bool KMPDinoWiFiESPClass::GetLedState()
-//{
-//	return !digitalRead(LED_PIN);
-//}
-//
-///**
-// * @brief Set status LED.
-// *
-// * @param on. Status LED true - On, false - Off.
-// *
-// * @return void
-// */
-//void KMPDinoWiFiESPClass::SetLedState(bool on)
-//{
-//	digitalWrite(LED_PIN, on ? LOW : HIGH);
-//}
-//
-///**
-// * @brief Set status LED On.
-// *
-// * @return void
-// */
-//void KMPDinoWiFiESPClass::LedOn()
-//{
-//	SetLedState(true);
-//}
-//
-///**
-// * @brief Set status LED On.
-// *
-// * @return void
-// */
-//void KMPDinoWiFiESPClass::LedOff()
-//{
-//	SetLedState(false);
-//}
+/**
+* @brief Connect to RS485. With default configuration SERIAL_8N1.
+*
+* @param boud Boud rate.
+*     Values: 75, 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600 and 115200 bit/s.
+*
+* @return void
+*/
+void KMPDinoWiFiESPClass::RS485Begin(unsigned long boud)
+{
+	RS485Begin(boud, SERIAL_8N1);
+}
+
+/**
+* @brief Start connect to RS485.
+*
+* @param boud Boud rate.
+*             Values: 75, 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600 and 115200 bit/s.
+* @param config Configuration - data bits, parity, stop bits.
+*               Values: SERIAL_5N1, SERIAL_6N1, SERIAL_7N1, SERIAL_8N1, SERIAL_5N2, SERIAL_6N2, SERIAL_7N2, SERIAL_8N2, SERIAL_5E1, SERIAL_6E1, SERIAL_7E1, SERIAL_8E1, SERIAL_5E2, 
+						SERIAL_6E2, SERIAL_7E2, SERIAL_8E2, SERIAL_5O1, SERIAL_6O1, SERIAL_7O1, SERIAL_8O1, SERIAL_5O2, SERIAL_6O2, SERIAL_7O2, SERIAL_8O2
+*
+* @return void
+*/
+void KMPDinoWiFiESPClass::RS485Begin(unsigned long boud, SerialConfig config)
+{
+	Serial.begin(boud, config);
+}
+
+/**
+* @brief Close connection to RS485.
+*
+* @return void
+*/
+void KMPDinoWiFiESPClass::RS485End()
+{
+	Serial.end();
+}
+
+/**
+* @brief Begin write data to RS485. 
+*
+* @return void
+*/
+void RS485BeginWrite()
+{
+	digitalWrite(RS485TXControlPin, RS485Transmit);
+	delay(1);
+}
+
+/**
+* @brief End write data to RS485.
+*
+* @return void
+*/
+void RS485EndWrite()
+{
+	Serial.flush();
+	digitalWrite(RS485TXControlPin, RS485Receive);
+}
+
+/**
+* @brief Transmit one byte data to RS485.
+*
+* @param data Data to transmit.
+*
+* @return size_t Count of transmitted - one byte.
+*/
+size_t KMPDinoWiFiESPClass::RS485Write(uint8_t data)
+{
+	RS485BeginWrite();
+
+	size_t result = Serial.write(data);
+
+	RS485EndWrite();
+
+	return result;
+}
+
+/**
+* @brief Transmit one char data to RS485.
+*
+* @param data Data to transmit.
+*
+* @return size_t Count of transmitted - one char.
+*/
+size_t KMPDinoWiFiESPClass::RS485Write(char data)
+{
+	return RS485Write((uint8_t)data);
+}
+
+/**
+* @brief Transmit the text to RS485.
+*
+* @param data Text data to transmit.
+*
+* @return size_t Count of transmitted chars.
+*/
+size_t KMPDinoWiFiESPClass::RS485Write(char* data)
+{
+	RS485BeginWrite();
+
+	size_t len = strlen(data);
+	size_t result = 0;
+	for (size_t i = 0; i < len; i++)
+	{
+		result += Serial.write(data[i]);
+	}
+
+	RS485EndWrite();
+
+	return result;
+}
+
+/**
+* @brief Send array of bytes to RS485.
+*
+* @param data Array in bytes to be send.
+* @param dataLen Array length.
+*
+* @return size_t Count of transmitted bytes.
+*/
+size_t KMPDinoWiFiESPClass::RS485Write(uint8_t* data, uint8_t dataLen)
+{
+	RS485BeginWrite();
+
+	size_t result = 0;
+	for (size_t i = 0; i < dataLen; i++)
+	{
+		result += Serial.write(data[i]);
+	}
+
+	RS485EndWrite();
+
+	return result;
+}
+
+/**
+* @brief Read received data from RS485.
+*
+*
+* @return int Received byte.<para></para>
+*   If result = -1 - buffer is empty, no data
+*   if result > -1 - valid byte to read.
+*/
+int KMPDinoWiFiESPClass::RS485Read()
+{
+	return RS485Read(10, 10);
+}
+
+/**
+* @brief Read received data from RS485. Reading data with delay and repeating the operation for all data to arrive.
+*
+* @param delayWait Wait delay if not available to read byte in milliseconds. Default 10.
+* @param repeatTime Repeat time if not read bytes. Default 10. All time = delayWait * repeatTime.
+*
+* @return int Received byte.
+*   If result = -1 - buffer is empty, no data<para></para>
+*   if result > -1 - valid byte to read.
+*/
+int KMPDinoWiFiESPClass::RS485Read(unsigned long delayWait, uint8_t repeatTime)
+{
+	digitalWrite(RS485TXControlPin, RS485Receive);
+
+	// Wait before read if buffer is empty.
+	while (Serial.available() == 0 && repeatTime-- > 0)
+	{
+		delay(delayWait);
+	}
+
+	return Serial.read();
+}

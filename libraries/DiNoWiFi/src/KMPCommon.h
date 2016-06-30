@@ -212,6 +212,8 @@ void ByteToHex(uint8_t b, char * result);
  */
 void ByteToHexStr(uint8_t b, char * result);
 
+void BytesToHexStr(const uint8_t* b, const int len,  char * result);
+
 /**
  * \brief Convert low bits from byte (0 - 16) to Hex char (0 - F).
  * 

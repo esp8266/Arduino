@@ -20,6 +20,7 @@
 #endif
 
 #include <SPI.h>
+#include <HardwareSerial.h>
 
 // Count of inputs and outputs.
 #define RELAY_COUNT  4
@@ -56,8 +57,8 @@ enum OptoIn {
 };
 
 const char TEXT_HTML[] = "text/html; charset=utf-8";
-const char DINO_WIFI[] = "ProDino WiFi-ESP";
-const char URL_KMPELECTRONICS_EU_DINO_WIFI[] = "http://kmpelectronics.eu/en-us/products/dinowifiesp.aspx";
+const char PRODINO_WIFI[] = "ProDino WiFi-ESP";
+const char URL_KMPELECTRONICS_EU_DINO_WIFI[] = "http://www.kmpelectronics.eu/en-us/products/prodinowifi-esp.aspx";
 
 class KMPDinoWiFiESPClass
 {
@@ -83,10 +84,15 @@ class KMPDinoWiFiESPClass
 	bool GetOptoInState(uint8_t optoInNumber);
 	bool GetOptoInState(OptoIn optoIn);
 
-	//bool GetLedState();
-	//void SetLedState(bool on);
-	//void LedOn();
-	//void LedOff();
+	void RS485Begin(unsigned long boud);
+	void RS485Begin(unsigned long boud, SerialConfig config);
+	void RS485End();
+	size_t RS485Write(uint8_t data);
+	size_t RS485Write(char data);
+	size_t RS485Write(char* data);
+	size_t RS485Write(uint8_t* data, uint8_t dataLen);
+	int RS485Read();
+	int RS485Read(unsigned long delayWait, uint8_t repeatTime);
 };
 
 extern KMPDinoWiFiESPClass KMPDinoWiFiESP;

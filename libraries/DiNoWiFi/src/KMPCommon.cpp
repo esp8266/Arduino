@@ -186,6 +186,18 @@ void ByteToHexStr( uint8_t b, char * result )
     result[2] = CH_NONE;
 }
 
+void BytesToHexStr(const uint8_t* b, const int len, char * result)
+{
+	for (int i = 0; i < len; i++)
+	{
+		ByteToHex(b[i], result);
+		result += 2;
+	}
+
+	*(++result) = CH_NONE;
+}
+
+
 char BitsToHex(uint8_t i)
 {
     if (i > 15)
