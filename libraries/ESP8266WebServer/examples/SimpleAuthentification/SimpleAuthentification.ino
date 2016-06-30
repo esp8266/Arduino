@@ -10,7 +10,7 @@ ESP8266WebServer server(80);
 //Check if header is present and correct
 bool is_authentified(){
   Serial.println("Enter is_authentified");
-  if (server.hasHeader("Cookie")){   
+  if (server.hasHeader("Cookie")){
     Serial.print("Found cookie: ");
     String cookie = server.header("Cookie");
     Serial.println(cookie);
@@ -20,27 +20,31 @@ bool is_authentified(){
     }
   }
   Serial.println("Authentification Failed");
-  return false;	
+  return false;
 }
 
 //login page, also called for disconnect
 void handleLogin(){
   String msg;
-  if (server.hasHeader("Cookie")){   
+  if (server.hasHeader("Cookie")){
     Serial.print("Found cookie: ");
     String cookie = server.header("Cookie");
     Serial.println(cookie);
   }
   if (server.hasArg("DISCONNECT")){
     Serial.println("Disconnection");
-    String header = "HTTP/1.1 301 OK\r\nSet-Cookie: ESPSESSIONID=0\r\nLocation: /login\r\nCache-Control: no-cache\r\n\r\n";
-    server.sendContent(header);
+    server.sendHeader("Location","/login");
+    server.sendHeader("Cache-Control","no-cache");
+    server.sendHeader("Set-Cookie","ESPSESSIONID=0");
+    server.send(301);
     return;
   }
   if (server.hasArg("USERNAME") && server.hasArg("PASSWORD")){
     if (server.arg("USERNAME") == "admin" &&  server.arg("PASSWORD") == "admin" ){
-      String header = "HTTP/1.1 301 OK\r\nSet-Cookie: ESPSESSIONID=1\r\nLocation: /\r\nCache-Control: no-cache\r\n\r\n";
-      server.sendContent(header);
+      server.sendHeader("Location","/");
+      server.sendHeader("Cache-Control","no-cache");
+      server.sendHeader("Set-Cookie","ESPSESSIONID=1");
+      server.send(301);
       Serial.println("Log in Successful");
       return;
     }
@@ -60,8 +64,9 @@ void handleRoot(){
   Serial.println("Enter handleRoot");
   String header;
   if (!is_authentified()){
-    String header = "HTTP/1.1 301 OK\r\nLocation: /login\r\nCache-Control: no-cache\r\n\r\n";
-    server.sendContent(header);
+    server.sendHeader("Location","/login");
+    server.sendHeader("Cache-Control","no-cache");
+    server.send(301);
     return;
   }
   String content = "<html><body><H2>hello, you successfully connected to esp8266!</H2><br>";
