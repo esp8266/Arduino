@@ -81,3 +81,5 @@ To troubleshoot resets follow FAQ item [My ESP crashes running some code](a02-my
 Identify compatibility issues and ask library author for support. If left on your own then check for usage of controller's low level access functionality.  Use [Esp Exception Decoder](https://github.com/me-no-dev/EspExceptionDecoder) if confronted with exceptions / watchdogs resets.
 
 The good news is that the number of libraries which aren't supported on the ESP8266 is shrinking. Community of ESP8266 enthusiasts is growing. If you are unable to resolve the issues yourself, there are very good odds that you will be able to find somebody else to help you.
+
+[FAQ list :back:](readme.md)

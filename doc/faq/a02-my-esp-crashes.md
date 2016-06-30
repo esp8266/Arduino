@@ -166,4 +166,4 @@ On the other hand if you flood you issue report with hundreds lines of code, you
 
 Do not be afraid to troubleshoot ESP exception and watchdog restarts. [Esp8266 / Arduino](https://github.com/esp8266/Arduino) core provides detailed diagnostics that will help you pin down the issue. Get your h/w right before diagnosing the s/w. Use [ESP Exception Decoder](https://github.com/me-no-dev/EspExceptionDecoder) to find out where the code fails. If you do you homework and still unable to identify the root cause, enter prepare the issue report. Provide enough details. Be specific and isolate the issue. Then ask community for support. There are plenty of people that like to work with ESP and willing to help with your problem.
 
-
+[FAQ list :back:](readme.md)

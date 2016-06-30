@@ -67,7 +67,7 @@ In order to troubleshoot "espcomm_sync failed" error, please proceed step by ste
 
 ### Advanced Checks
 
-  1. If you are still facing issues, test if module is indeed entering the boot loading mode. You can do it by connecting secondary USB to serial converter and checking the message displayed. Attach RX and GND pins of converter to TX and GND pin of ESP as shown on example below.
+  1. If you are still facing issues, test if module is indeed entering the boot loading mode. You can do it by connecting secondary USB to serial converter and checking the message displayed. Attach RX and GND pins of converter to TX and GND pin of ESP as shown on example below ([get fzz source](pictures/a01-secondary-serial-hookup.fzz)).
   
   ![Secondary USB to serial converter hookup](pictures/a01-secondary-serial-hookup.png)
   
@@ -166,7 +166,7 @@ Then compare your measurements with what is shown on wave-forms collected for ci
 
 #### Ck
     
-Circuit below has been prepared to collect wave-forms for ck reset method. It is simpler than for [nodemcu](#nodemcu) reset and therefore often used to wire up generic ESP modules on a breadboard. Check it against your wiring when comparing your measurements against wave-forms below.
+Circuit below has been prepared to collect wave-forms for ck reset method ([get fzz source](pictures/a01-circuit-ck-reset.fzz)). It is simpler than for [nodemcu](#nodemcu) reset and therefore often used to wire up generic ESP modules on a breadboard. Check it against your wiring when comparing your measurements against wave-forms below .
   
 ![Sample circuit to check ck method](pictures/a01-circuit-ck-reset.png)
 
@@ -207,7 +207,7 @@ If you prefer external terminal program, then for Windows users we can recommend
 
 Nodemcu reset method is named after [NodeMCU](https://github.com/nodemcu/nodemcu-devkit) board where it has been introduced for the first time. It overcomes limitations with handling of RTS and DTR lines discussed for [ck](#ck) reset method above. 
 
-Sample circuit to measure wave-form is shown below.
+Sample circuit to measure wave-form is shown below ([get fzz source](pictures/a01-circuit-nodemcu-reset.fzz)).
   
 ![Sample circuit to check nodemcu reset method](pictures/a01-circuit-nodemcu-reset.png)
     
@@ -271,3 +271,10 @@ If you are beginner use boards with integrated power supply and USB to serial co
 Double check your confection diagram and wave-form for consistency with selected reset method.
 
 If you get stuck ask [community](http://www.esp8266.com/) for support providing summary of all completed checks. 
+
+
+![Test stand used during checking of ck reset method](pictures/a01-test-stand.jpg)
+
+Test stand used for checking of ck reset method is shown above. No any ESP module has been harmed during preparation of this FAQ item.
+
+[FAQ list :back:](readme.md)
