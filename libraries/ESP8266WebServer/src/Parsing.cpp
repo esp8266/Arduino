@@ -91,7 +91,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   String searchStr = "";
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
-    searchStr = url.substring(hasSearch + 1);
+    searchStr = urlDecode(url.substring(hasSearch + 1));
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
@@ -135,6 +135,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     String headerName;
     String headerValue;
     bool isForm = false;
+    bool isEncoded = false;
     uint32_t contentLength = 0;
     //parse headers
     while(1){
@@ -150,17 +151,20 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       headerValue.trim();
        _collectHeader(headerName.c_str(),headerValue.c_str());
 
-	  #ifdef DEBUG_ESP_HTTP_SERVER
-	  DEBUG_OUTPUT.print("headerName: ");
-	  DEBUG_OUTPUT.println(headerName);
-	  DEBUG_OUTPUT.print("headerValue: ");
-	  DEBUG_OUTPUT.println(headerValue);
-	  #endif
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.print("headerName: ");
+      DEBUG_OUTPUT.println(headerName);
+      DEBUG_OUTPUT.print("headerValue: ");
+      DEBUG_OUTPUT.println(headerValue);
+      #endif
 
       if (headerName == "Content-Type"){
         if (headerValue.startsWith("text/plain")){
           isForm = false;
-        } else if (headerValue.startsWith("multipart/form-data")){
+        } else if (headerValue.startsWith("application/x-www-form-urlencoded")){
+          isForm = false;
+          isEncoded = true;
+        } else if (headerValue.startsWith("multipart/")){
           boundaryStr = headerValue.substring(headerValue.indexOf('=')+1);
           isForm = true;
         }
@@ -178,19 +182,22 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       	free(plainBuf);
       	return false;
       }
-#ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.print("Plain: ");
-      DEBUG_OUTPUT.println(plainBuf);
-#endif
       if (contentLength > 0) {
-        if (searchStr != "") searchStr += '&';
-        if(plainBuf[0] == '{' || plainBuf[0] == '[' || strstr(plainBuf, "=") == NULL){
+        if(isEncoded){
+          //url encoded form
+          String decoded = urlDecode(plainBuf);
+          size_t decodedLen = decoded.length();
+          memcpy(plainBuf, decoded.c_str(), decodedLen);
+          plainBuf[decodedLen] = 0;
+        } else {
           //plain post json or other data
           searchStr += "plain=";
-          searchStr += plainBuf;
-        } else {
-          searchStr += plainBuf;
         }
+        searchStr += plainBuf;
+  #ifdef DEBUG_ESP_HTTP_SERVER
+        DEBUG_OUTPUT.print("Plain: ");
+        DEBUG_OUTPUT.println(plainBuf);
+  #endif
         free(plainBuf);
       }
     }
@@ -303,7 +310,7 @@ void ESP8266WebServer::_parseArguments(String data) {
     }
     RequestArgument& arg = _currentArgs[iarg];
     arg.key = data.substring(pos, equal_sign_index);
-	arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
+	arg.value = data.substring(equal_sign_index + 1, next_arg_index);
 #ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.print("arg ");
     DEBUG_OUTPUT.print(iarg);
