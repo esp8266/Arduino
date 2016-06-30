@@ -99,6 +99,8 @@ Several APIs may be used to get flash chip info:
 
 `ESP.getFlashChipSize()` returns the flash chip size, in bytes, as seen by the SDK (may be less than actual size).
 
+`ESP.getFlashChipRealSize()` returns the real chip size, in bytes, based on the flash chip ID.
+
 `ESP.getFlashChipSpeed(void)` returns the flash chip frequency, in Hz.
 
 `ESP.getCycleCount()` returns the cpu instruction cycle count since start as an unsigned 32-bit.  This is useful for accurate timing of very short actions like bit banging.
