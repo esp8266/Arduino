@@ -28,7 +28,7 @@ Example boards with USB to serial converter build in, that will make your initia
 
 ![Example boards with integrated USB to serial converter](pictures/a01-example-boards-with-usb.png)
 
-If you are using a Generic ESP8266 module, separate USB to serial converter and connect them by yourself, please make sure you have the following tree things right:
+If you are using a Generic ESP8266 module, separate USB to serial converter and connect them by yourself, please make sure you have the following three things right:
   1. Module is provided with enough power,
   2. GPIO0, GPIO15 and CH_PD are connected using pull up / pull down resistors,
   3. Module is put into boot loader mode.
@@ -58,9 +58,9 @@ In order to troubleshoot "espcomm_sync failed" error, please proceed step by ste
   
   ![Board selection](pictures/a01-board-selection.png)
   
-  Basing on selected board type Arduino IDE will apply specific "reset method" to enter the board into boot-loading mode. Reset methods are board specific. Some boards do not have the h/w in place to support reset by Arduino IDE. If this is the case, you need to enter such board into boot loading mode manually.
+  Basing on selected board type, Arduino IDE will apply specific "reset method" to enter the board into boot loading mode. Reset methods are board specific. Some boards do not have the h/w in place to support reset by Arduino IDE. If this is the case, you need to enter such board into boot loading mode manually.
   
-  4. Upload may be also failing due to too high speed. If you have long or poor quality USB cable, try reducing selection under Upload Speed.
+  4. Upload may be also failing due to too high speed. If you have long or poor quality USB cable, try reducing selection under *Upload Speed*.
   
   ![Serial speed selection](pictures/a01-serial-speed-selection.png)
 
@@ -77,7 +77,7 @@ In order to troubleshoot "espcomm_sync failed" error, please proceed step by ste
    ets Jan  8 2013,rst cause:2, boot mode:(1,7)
   ```
 
-  If you see similar message but different values then decode them using [Boot Messages and Modes](../boards.md#boot-messages-and-modes). The key information is contained in first digit of the boot mode message as shown below.
+  If you see similar message but different values then decode them using [Boot Messages and Modes](../boards.md#boot-messages-and-modes). The key information is contained in first digit / three right-most bits of the boot mode message as shown below.
   
    ![Decoding of boot mode](pictures/a01-boot-mode-decoding.png)
   
@@ -85,11 +85,11 @@ In order to troubleshoot "espcomm_sync failed" error, please proceed step by ste
   
   > Note:  Without having this step right you will not be able to upload your module over a serial port.
 
-  2. You have confirmed that module is in boot loading mode but upload still fails. If you are using external USB to serial converter then check of operates correctly by looping it back. This is quite simple check. Just connect TX and RX of your converter together like on picture below. Then open Serial Monitor and type some characters. If everything is fine, then you should see what you type immediately printed back on the monitor. For ESP integrated with USB to serial converter this check may involve breaking some PCB traces. I would not do it unless being desperate. Instead try step below.
+  2. You have confirmed that module is in boot loading mode but upload still fails. If you are using external USB to serial converter, then check if it operates correctly by looping it back. This is quite simple check. Just connect TX and RX of your converter together like on picture below. Then open Serial Monitor and type some characters. If everything is fine, then you should see what you type immediately printed back on the monitor. For an ESP with USB to serial converter on board, this check may involve breaking some PCB traces. I would not do it unless being desperate. Instead try steps below.
 
   ![USB to serial converter loop back](pictures/a01-usb-to-serial-loop-back.png)
 
-  3. Next step to try, if not done already, is checking detailed debug messages. Go to File > Preferences, enable *Show verbose output during: upload* and try uploading again. For successful upload this log should look similar to example shown below:
+  3. Next step to try, if not done already, is checking detailed debug messages. Go to *File > Preferences*, enable *Show verbose output during: upload* and try uploading again. For successful upload this log should look similar to example shown below:
 
   ```
   C:\Users\Krzysztof\AppData\Local\Arduino15\packages\esp8266\tools\esptool\0.4.8/esptool.exe -vv -cd ck -cb 115200 -cp COM3 -ca 0x00000 -cf C:\Users\KRZYSZ~1\AppData\Local\Temp\build7e44b372385012e74d64fb272d24b802.tmp/Blink.ino.bin 
@@ -152,7 +152,7 @@ In order to troubleshoot "espcomm_sync failed" error, please proceed step by ste
       flush complete
   ```
 
-  This log may be longer depending on number of connection attempts made by esptool. Analyze it for any anomalies to configuration you have selected in Arduino IDE, like different serial port, reset method, baud rate, etc. Resolve all noted differences. 
+  Upload log may be longer depending on number of connection attempts made by esptool. Analyze it for any anomalies to configuration you have selected in Arduino IDE, like different serial port, reset method, baud rate, etc. Resolve all noted differences. 
 
 
 ### Reset Methods
@@ -161,24 +161,26 @@ If you got to this point and still see ``` espcomm_sync failed ```, then now you
 
 Connect scope or logic analyzer to GPIO0, RST and RXD pins of the ESP to check what's happening.
 
-Then compare your measurements with what is shown on wave-forms collected for circuits below. They document two standard methods of resetting ESP8266 for upload, that you can select in Arduino IDE - [ck](#ck) and [nodemcu](#nodemcu). 
+Then compare your measurements with wave-forms collected for circuits below. They document two standard methods of resetting ESP8266 for upload, that you can select in Arduino IDE - [ck](#ck) and [nodemcu](#nodemcu). 
 
 
 #### Ck
     
-Circuit below has been prepared to collect wave-forms for ck reset method ([get fzz source](pictures/a01-circuit-ck-reset.fzz)). It is simpler than for [nodemcu](#nodemcu) reset and therefore often used to wire up generic ESP modules on a breadboard. Check it against your wiring when comparing your measurements against wave-forms below .
+Circuit below has been prepared to collect wave-forms for ck reset method ([get fzz source](pictures/a01-circuit-ck-reset.fzz)). It is simpler than for [nodemcu](#nodemcu) reset and therefore often used to wire up generic ESP modules on a breadboard. Check it against your wiring when comparing your measurements against wave-forms below.
   
 ![Sample circuit to check ck method](pictures/a01-circuit-ck-reset.png)
 
-Wave-forms below show voltage signals on GPIO0 and RST pins of the ESP board when uploading the firmware. Close up of ck reset method signal sequence at the beginning of upload is shown below. 
+The following wave-forms below show voltage signals on GPIO0 and RST pins of the ESP board when uploading the firmware. 
+
+Close up of ck reset method signal sequence at the beginning of upload is shown below. 
 
 ![Reset Method: ck, close up at the beginning of upload](pictures/a01-reset-ck-closeup.png)
 
-Next picture shows complete upload of blink.ino example at 921600 baud. This is quite high speed so the upload takes only about 8s.
+Next picture shows complete upload of [Blink.ino](https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/Blink/Blink.ino) example at 921600 baud. This is quite high speed, so the upload takes only about 8s.
 
 ![Reset Method: ck, complete upload](pictures/a01-reset-ck-complete.png)
 
-Please note that when esptool is not able to initialize upload at the first time, then it retries reset procedure. Case of one such retry is shown on waveform below.
+Please note that when esptool is not able to initialize upload at the first time, then it retries reset procedure. Case of one such retry is shown on wave-form below.
 
 ![Reset Method: ck, complete upload](pictures/a01-reset-ck-complete-1-retry.png)
 
@@ -196,7 +198,7 @@ trying to connect
     read 0, requested 1
 ```
 
-Presented circuit has one important limitation when it comes to work with Arduino IDE. After opening Serial Monitor (Ctrl-Shift-M), both RTS and DTR lines are permanently pulled down. As RTS line is connected to REST input of ESP, the module is hold in reset state / not able to run. Therefore after uploading module, you need to disconnect both lines or use different serial terminal program that is not pulling down RTS and DTR lines. Otherwise the module will get stuck waiting for releasing the REST signal.
+Presented circuit has one important limitation when it comes to work with Arduino IDE. After opening Serial Monitor (Ctrl-Shift-M), both RTS and DTR lines are permanently pulled down. As RTS line is connected to REST input of ESP, the module is hold in reset state / not able to run. Therefore after uploading module, you need to disconnect both lines or use different serial terminal program that is not pulling down RTS and DTR lines. Otherwise the module will get stuck waiting for releasing the REST signal and you will see nothing on the Serial Monitor.
 
 As for different serial terminal program you can check Arduino IDE add-on [Serial Monitor for ESP8266]((https://github.com/esp8266/Arduino/issues/1360)) developed by user [@mytrain](https://github.com/mytrain) and discussed in [#1360](https://github.com/esp8266/Arduino/issues/1360). 
 
@@ -215,33 +217,33 @@ Close up of voltage signals on GPIO0 and RST pins at the beginning of firmware u
 
 ![Reset Method: nodemcu, close up at the beginning of upload](pictures/a01-reset-nodemcu-closeup.png)
 
-Please note that the reset sequence takes about 10x shorter comparing to [ck](@ck) reset (about 25ms vs. 250ms). 
+Please note that the reset sequence is about 10x shorter comparing to [ck](@ck) reset (about 25ms vs. 250ms). 
 
-Next picture covers complete upload of blink.ino example at 921600 baud. Except for difference of the reset signal sequence, the complete upload looks similar to that of [ck](@ck). 
+Next picture covers complete upload of [Blink.ino](https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/Blink/Blink.ino) example at 921600 baud. Except for difference of the reset signal sequence, the complete upload looks similar to that of [ck](@ck). 
 
 ![Reset Method: nodemcu, complete upload](pictures/a01-reset-nodemcu-complete.png)
 
-A sample wave-form below shows another upload of blink.ino example at 921600 baud but with two reset retries.
+A sample wave-form below shows another upload of [Blink.ino](https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/Blink/Blink.ino) example at 921600 baud, but with two reset retries.
 
 ![Reset Method: nodemcu, reset retries](pictures/a01-reset-nodemcu-complete-2-retries.png)
 
-If you are interested how noodemcu reset method is implemented, so it does not pull to ground RTS and DTR lines once you open Serial Monitor in Arduino IDE, then check circuit below.
+If you are interested how noodemcu reset method is implemented, then check circuit below. As indicated it does not pull to ground RTS and DTR lines once you open Serial Monitor in Arduino IDE.
 
 ![Implementation of noodemcu reset](pictures/a01-nodemcu-reset-implementation.png)
 
-It consists of two transistors and resistors that you can locate on NodeMCU board on right. On left you can see complete circuit and the truth table how RTS and DTR signals of the serial interface are translated to REST and GPIO0 on the ESP. For more details please refer to [nodemcu](https://github.com/nodemcu/nodemcu-devkit) repository on GitHub.
+It consists of two transistors and resistors that you can locate on NodeMCU board on right. On left you can see complete circuit and the truth table how RTS and DTR signals of the serial interface are translated to RST and GPIO0 on the ESP. For more details please refer to [nodemcu](https://github.com/nodemcu/nodemcu-devkit) repository on GitHub.
 
 
 ### I'm Stuck
 
 Hopefully at this point you were able to resolve ``` espcomm_sync failed ``` issue and now enjoy quick and reliable uploads of your ESP modules.
 
-If this is still not the case then review once more all discussed steps in the checklist below.
+If this is still not the case, then review once more all discussed steps in the checklist below.
 
 **Initial Checks**
 * [ ] Is your module connected to serial port and visible in IDE?
 * [ ] Is connected device responding to IDE? What is exact message in debug window?
-* [ ] Have you selected correct ESP module type in "Board" menu? What is the selection?
+* [ ] Have you selected correct ESP module type in *Board* menu? What is the selection?
 * [ ] Have you tried to reduce upload speed? What speeds have you tried?
 
 **Advanced Checks**
@@ -264,17 +266,19 @@ If you are stuck at certain step, then post this list on [ESP8266 Community Foru
 
 ### Conclusion
 
-With variety of available ESP8266 modules and boards as well as possible connection methods troubleshooting of upload issues may take several steps. 
+With variety of available ESP8266 modules and boards, as well as possible connection methods, troubleshooting of upload issues may take several steps. 
 
-If you are beginner use boards with integrated power supply and USB to serial converter. Check carefully message in debug window and act accordingly. Select your exact module type in IDE and try to adjust upload speed. Check is board is indeed entering boot loading mode. Double check your USB to serial converter. Analyze detailed upload log for inconsistencies with IDE settings. 
+If you are a beginner, then use boards with integrated power supply and USB to serial converter. Check carefully message in debug window and act accordingly. Select your exact module type in IDE and try to adjust upload speed. Check if board is indeed entering boot loading mode. Check operation of your USB to serial converter with loop back. Analyze detailed upload log for inconsistencies with IDE settings. 
 
-Double check your confection diagram and wave-form for consistency with selected reset method.
+Verify your connection diagram and wave-form for consistency with selected reset method.
 
-If you get stuck ask [community](http://www.esp8266.com/) for support providing summary of all completed checks. 
+If you get stuck, then ask [community](http://www.esp8266.com/) for support providing summary of all completed checks. 
 
 
 ![Test stand used during checking of ck reset method](pictures/a01-test-stand.jpg)
 
-Test stand used for checking of ck reset method is shown above. No any ESP module has been harmed during preparation of this FAQ item.
+Test stand used for checking of ck reset method is shown above. 
+
+No any ESP module has been harmed during preparation of this FAQ item.
 
 [FAQ list :back:](readme.md)
