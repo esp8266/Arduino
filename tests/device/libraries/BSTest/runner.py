@@ -42,15 +42,18 @@ class BSTestRunner(object):
 
     def get_test_list(self):
         self.sp.sendline('-1')
-        timeout = 10
+        self.tests = []
+        timeout = 100
         while timeout > 0:
             res = self.sp.expect(['>>>>>bs_test_menu_begin', EOF, TIMEOUT])
             if res == 0:
                 break
             timeout-=1
             time.sleep(0.1)
+        if timeout <= 0:
+            debug_print('begin timeout')
+            return
         debug_print('got begin')
-        self.tests = []
         while True:
             res = self.sp.expect(['>>>>>bs_test_item id\=(\d+) name\="([^\"]*?)" desc="([^"]*?)"',
                                   '>>>>>bs_test_menu_end',

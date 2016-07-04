@@ -81,7 +81,6 @@ Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 [makeEspArduino](https://github.com/plerup/makeEspArduino) is a generic makefile for any ESP8266 Arduino project.
 Using make instead of the Arduino IDE makes it easier to do automated and production builds.
 
-
 ### Documentation
 
 Documentation for latest development version:
@@ -91,6 +90,7 @@ Documentation for latest development version:
 - [File system](doc/filesystem.md)
 - [OTA update](doc/ota_updates/readme.md)
 - [Supported boards](doc/boards.md)
+- [FAQ / Trubleshooting](doc/faq/readme.md)
 - [Change log](doc/changes.md)
 
 ### Issues and support ###
