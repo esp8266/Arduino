@@ -183,6 +183,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       	return false;
       }
       if (contentLength > 0) {
+        if (searchStr != "") searchStr += '&';
         if(isEncoded){
           //url encoded form
           String decoded = urlDecode(plainBuf);
