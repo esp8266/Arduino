@@ -150,7 +150,7 @@ WiFiEventHandler ESP8266WiFiGenericClass::onStationModeGotIP(std::function<void(
     return handler;
 }
 
-WiFiEventHandler onStationModeDHCPTimeout(std::function<void(void)> f)
+WiFiEventHandler ESP8266WiFiGenericClass::onStationModeDHCPTimeout(std::function<void(void)> f)
 {
     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_DHCP_TIMEOUT, [f](System_Event_t* e){
         f();
