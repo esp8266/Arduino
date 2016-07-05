@@ -175,6 +175,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     http.addHeader(F("x-ESP8266-AP-MAC"), WiFi.softAPmacAddress());
     http.addHeader(F("x-ESP8266-free-space"), String(ESP.getFreeSketchSpace()));
     http.addHeader(F("x-ESP8266-sketch-size"), String(ESP.getSketchSize()));
+	http.addHeader(F("x-ESP8266-sketch-md5"), String(ESP.getSketchMD5()));
     http.addHeader(F("x-ESP8266-chip-size"), String(ESP.getFlashChipRealSize()));
     http.addHeader(F("x-ESP8266-sdk-version"), ESP.getSdkVersion());
 
