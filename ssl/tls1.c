@@ -1855,31 +1855,96 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
     int ret = SSL_OK;
     uint8_t *buf = &ssl->bm_data[ssl->dc->bm_proc_index];
     int pkt_size = ssl->bm_index;
-    int cert_size, offset = 5;
+    int cert_size, offset = 5, offset_start;
     int total_cert_size = (buf[offset]<<8) + buf[offset+1];
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
-    X509_CTX **chain = x509_ctx;
+    X509_CTX *chain = 0;
+    X509_CTX **certs = 0;
+    int *cert_used = 0;
+    int num_certs = 0;
+    int i = 0;
     offset += 2;
 
     PARANOIA_CHECK(total_cert_size, offset);
 
+    // record the start point for the second pass
+    offset_start = offset;
+
+    // first pass - count the certificates
+    while (offset < total_cert_size)
+    {
+        offset++;       /* skip empty char */
+        cert_size = (buf[offset]<<8) + buf[offset+1];
+        offset += 2;
+        offset += cert_size;
+        num_certs++;
+    }
+
+    PARANOIA_CHECK(pkt_size, offset);
+
+    certs = (X509_CTX**) calloc(num_certs, sizeof(void*));
+    cert_used = (int*) calloc(num_certs, sizeof(int));
+    num_certs = 0;
+
+    // restore the offset from the saved value 
+    offset = offset_start;
+
+    // second pass - load the certificates
     while (offset < total_cert_size)
     {
         offset++;       /* skip empty char */
         cert_size = (buf[offset]<<8) + buf[offset+1];
         offset += 2;
         
-        if (x509_new(&buf[offset], NULL, chain))
+        if (x509_new(&buf[offset], NULL, certs+num_certs))
         {
             ret = SSL_ERROR_BAD_CERTIFICATE;
             goto error;
         }
 
-        chain = &((*chain)->next);
+        num_certs++;
         offset += cert_size;
     }
 
     PARANOIA_CHECK(pkt_size, offset);
+
+    // third pass - link certs together, assume server cert is the first
+    *x509_ctx = certs[0];
+    chain = certs[0];
+    cert_used[0] = 1;
+
+    // repeat until the end of the chain is found
+    while (1)
+    {
+        // look for CA cert
+        for( i = 1; i < num_certs; i++ )
+        {
+            if (certs[i] == chain) 
+                continue;
+            if (cert_used[i]) 
+                continue; // don't allow loops
+
+            if (asn1_compare_dn(chain->ca_cert_dn, certs[i]->cert_dn) == 0)
+            {
+                // CA cert found, add it to the chain
+                cert_used[i] = 1;
+                chain->next = certs[i];
+                chain = certs[i];
+                break;
+            }
+        }
+
+        // no CA cert found, reached the end of the chain
+        if (i >= num_certs) 
+            break;
+    }
+
+    // clean up any certs that aren't part of the chain
+    for (i = 1; i < num_certs; i++)
+    {
+        if (cert_used[i] == 0) 
+            x509_free(certs[i]);
+    }
 
     /* if we are client we can do the verify now or later */
     if (is_client && !IS_SET_SSL_FLAG(SSL_SERVER_VERIFY_LATER))
@@ -1890,6 +1955,13 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
     ssl->next_state = is_client ? HS_SERVER_HELLO_DONE : HS_CLIENT_KEY_XCHG;
     ssl->dc->bm_proc_index += offset;
 error:
+    // clean up arrays
+    if (certs) 
+        free(certs);
+
+    if (cert_used) 
+        free(cert_used);
+
     return ret;
 }
 
