@@ -85,8 +85,6 @@ SSL * SSL_new(SSL_CTX *ssl_ctx)
 
     ssl = ssl_new(ssl_ctx, -1);        /* fd is set later */
 #ifdef CONFIG_SSL_ENABLE_CLIENT
-    ssl_func_type 
-
     if (ssl_func_type == SSLv3_client_method ||
         ssl_func_type == TLSv1_client_method)
     {
