@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2015, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  *
@@ -189,27 +189,7 @@ EXP_FUNC int STDCALL getdomainname(char *buf, int buf_size);
 #endif  /* Not Win32 */
 
 /* some functions to mutate the way these work */
-#define malloc(A)       ax_port_malloc(A, __FILE__, __LINE__)
-#ifndef realloc
-#define realloc(A,B)    ax_port_realloc(A,B, __FILE__, __LINE__)
-#endif
-#define calloc(A,B)     ax_port_calloc(A,B, __FILE__, __LINE__)
-#define free(x)         ax_port_free(x)
-
-EXP_FUNC void * STDCALL ax_port_malloc(size_t s, const char*, int);
-EXP_FUNC void * STDCALL ax_port_realloc(void *y, size_t s, const char*, int);
-EXP_FUNC void * STDCALL ax_port_calloc(size_t n, size_t s, const char*, int);
-EXP_FUNC void * STDCALL ax_port_free(void*);
-EXP_FUNC int STDCALL ax_open(const char *pathname, int flags);
-
-inline uint32_t htonl(uint32_t n){
-  return ((n & 0xff) << 24) |
-    ((n & 0xff00) << 8) |
-    ((n & 0xff0000UL) >> 8) |
-    ((n & 0xff000000UL) >> 24);
-}
-
-#define ntohl htonl
+EXP_FUNC int STDCALL ax_open(const char *pathname, int flags); 
 
 #ifdef CONFIG_PLATFORM_LINUX
 void exit_now(const char *format, ...) __attribute((noreturn));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2014, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -43,6 +43,7 @@ extern "C" {
 #include "version.h"
 #include "config.h"
 #include "os_int.h"
+#include "os_port.h"
 #include "crypto.h"
 #include "crypto_misc.h"
 

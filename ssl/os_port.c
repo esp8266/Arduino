@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2007, Cameron Rich
- *
+ * Copyright (c) 2007-2016, Cameron Rich
+ * 
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -91,9 +91,3 @@ EXP_FUNC int STDCALL getdomainname(char *buf, int buf_size)
 }
 #endif
 
-#undef malloc
-#undef realloc
-#undef calloc
-
-static const char * out_of_mem_str = "out of memory";
-static const char * file_open_str = "Could not open file \"%s\"";
