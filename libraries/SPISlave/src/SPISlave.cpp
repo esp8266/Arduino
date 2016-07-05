@@ -20,64 +20,84 @@
 */
 #include "SPISlave.h"
 extern "C" {
-  #include "hspi_slave.h"
+#include "hspi_slave.h"
 }
 
-void SPISlaveClass::_data_rx(uint8_t * data, uint8_t len){
-  if(_data_cb)
-    _data_cb(data, len);
+void SPISlaveClass::_data_rx(uint8_t * data, uint8_t len)
+{
+    if(_data_cb) {
+        _data_cb(data, len);
+    }
 }
-void SPISlaveClass::_status_rx(uint32_t data){
-  if(_status_cb)
-    _status_cb(data);
+void SPISlaveClass::_status_rx(uint32_t data)
+{
+    if(_status_cb) {
+        _status_cb(data);
+    }
 }
-void SPISlaveClass::_data_tx(void){
-  if(_data_sent_cb)
-    _data_sent_cb();
+void SPISlaveClass::_data_tx(void)
+{
+    if(_data_sent_cb) {
+        _data_sent_cb();
+    }
 }
-void SPISlaveClass::_status_tx(void){
-  if(_status_sent_cb)
-    _status_sent_cb();
+void SPISlaveClass::_status_tx(void)
+{
+    if(_status_sent_cb) {
+        _status_sent_cb();
+    }
 }
-void SPISlaveClass::_s_data_rx(void *arg, uint8_t * data, uint8_t len){
-  reinterpret_cast<SPISlaveClass*>(arg)->_data_rx(data,len);
+void SPISlaveClass::_s_data_rx(void *arg, uint8_t * data, uint8_t len)
+{
+    reinterpret_cast<SPISlaveClass*>(arg)->_data_rx(data,len);
 }
-void SPISlaveClass::_s_status_rx(void *arg, uint32_t data){
-  reinterpret_cast<SPISlaveClass*>(arg)->_status_rx(data);
+void SPISlaveClass::_s_status_rx(void *arg, uint32_t data)
+{
+    reinterpret_cast<SPISlaveClass*>(arg)->_status_rx(data);
 }
-void SPISlaveClass::_s_data_tx(void *arg){
-  reinterpret_cast<SPISlaveClass*>(arg)->_data_tx();
+void SPISlaveClass::_s_data_tx(void *arg)
+{
+    reinterpret_cast<SPISlaveClass*>(arg)->_data_tx();
 }
-void SPISlaveClass::_s_status_tx(void *arg){
-  reinterpret_cast<SPISlaveClass*>(arg)->_status_tx();
+void SPISlaveClass::_s_status_tx(void *arg)
+{
+    reinterpret_cast<SPISlaveClass*>(arg)->_status_tx();
 }
 
-void SPISlaveClass::begin(){
-  hspi_slave_onData(&_s_data_rx);
-  hspi_slave_onDataSent(&_s_data_tx);
-  hspi_slave_onStatus(&_s_status_rx);
-  hspi_slave_onStatusSent(&_s_status_tx);
-  hspi_slave_begin(4, this);
+void SPISlaveClass::begin()
+{
+    hspi_slave_onData(&_s_data_rx);
+    hspi_slave_onDataSent(&_s_data_tx);
+    hspi_slave_onStatus(&_s_status_rx);
+    hspi_slave_onStatusSent(&_s_status_tx);
+    hspi_slave_begin(4, this);
 }
-void SPISlaveClass::setData(uint8_t * data, size_t len){
-  if(len > 32)
-    len = 32;
-  hspi_slave_setData(data, len);
+void SPISlaveClass::setData(uint8_t * data, size_t len)
+{
+    if(len > 32) {
+        len = 32;
+    }
+    hspi_slave_setData(data, len);
 }
-void SPISlaveClass::setStatus(uint32_t status){
-  hspi_slave_setStatus(status);
+void SPISlaveClass::setStatus(uint32_t status)
+{
+    hspi_slave_setStatus(status);
 }
-void SPISlaveClass::onData(SpiSlaveDataHandler cb){
-  _data_cb = cb;
+void SPISlaveClass::onData(SpiSlaveDataHandler cb)
+{
+    _data_cb = cb;
 }
-void SPISlaveClass::onDataSent(SpiSlaveSentHandler cb){
-  _data_sent_cb = cb;
+void SPISlaveClass::onDataSent(SpiSlaveSentHandler cb)
+{
+    _data_sent_cb = cb;
 }
-void SPISlaveClass::onStatus(SpiSlaveStatusHandler cb){
-  _status_cb = cb;
+void SPISlaveClass::onStatus(SpiSlaveStatusHandler cb)
+{
+    _status_cb = cb;
 }
-void SPISlaveClass::onStatusSent(SpiSlaveSentHandler cb){
-  _status_sent_cb = cb;
+void SPISlaveClass::onStatusSent(SpiSlaveSentHandler cb)
+{
+    _status_sent_cb = cb;
 }
 
 SPISlaveClass SPISlave;

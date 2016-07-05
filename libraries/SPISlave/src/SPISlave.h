@@ -28,8 +28,9 @@ typedef std::function<void(uint8_t *data, size_t len)> SpiSlaveDataHandler;
 typedef std::function<void(uint32_t status)> SpiSlaveStatusHandler;
 typedef std::function<void(void)> SpiSlaveSentHandler;
 
-class SPISlaveClass {
-  protected:
+class SPISlaveClass
+{
+protected:
     SpiSlaveDataHandler _data_cb;
     SpiSlaveStatusHandler _status_cb;
     SpiSlaveSentHandler _data_sent_cb;
@@ -42,18 +43,19 @@ class SPISlaveClass {
     static void _s_status_rx(void *arg, uint32_t data);
     static void _s_data_tx(void *arg);
     static void _s_status_tx(void *arg);
-  public:
+public:
     SPISlaveClass()
-      : _data_cb(NULL)
-      , _status_cb(NULL)
-      , _data_sent_cb(NULL)
-      , _status_sent_cb(NULL)
+        : _data_cb(NULL)
+        , _status_cb(NULL)
+        , _data_sent_cb(NULL)
+        , _status_sent_cb(NULL)
     {}
-    ~SPISlaveClass(){}
+    ~SPISlaveClass() {}
     void begin();
     void setData(uint8_t * data, size_t len);
-    void setData(const char * data){
-      setData((uint8_t *)data, strlen(data));
+    void setData(const char * data)
+    {
+        setData((uint8_t *)data, strlen(data));
     }
     void setStatus(uint32_t status);
     void onData(SpiSlaveDataHandler cb);
