@@ -79,12 +79,14 @@ void SSL_CTX_free(SSL_CTX * ssl_ctx)
 SSL * SSL_new(SSL_CTX *ssl_ctx)
 {
     SSL *ssl;
-    ssl_func_type_t ssl_func_type;
+#ifdef CONFIG_SSL_ENABLE_CLIENT
+    ssl_func_type_t ssl_func_type = OPENSSL_CTX_ATTR->ssl_func_type;
+#endif
 
     ssl = ssl_new(ssl_ctx, -1);        /* fd is set later */
-    ssl_func_type = OPENSSL_CTX_ATTR->ssl_func_type;
-
 #ifdef CONFIG_SSL_ENABLE_CLIENT
+    ssl_func_type 
+
     if (ssl_func_type == SSLv3_client_method ||
         ssl_func_type == TLSv1_client_method)
     {

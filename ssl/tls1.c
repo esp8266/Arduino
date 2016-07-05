@@ -59,7 +59,9 @@ static int increase_bm_data_size(SSL *ssl, size_t size);
  * The server will pick the cipher based on the order that the order that the
  * ciphers are listed. This order is defined at compile time.
  */
+#ifndef CONFIG_SSL_SKELETON_MODE
 static void session_free(SSL_SESSION *ssl_sessions[], int sess_index);
+#endif
 
 const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
 #ifdef CONFIG_SSL_PROT_LOW                  /* same as medium for now */
