@@ -32,13 +32,17 @@ import shutil
 def compile(tmp_dir, sketch, tools_dir, hardware_dir, ide_path, f, args):
     cmd = ide_path + '/arduino-builder '
     cmd += '-compile -logger=human '
+    cmd += '-build-path "' + tmp_dir + '" '
+    cmd += '-tools "' +  ide_path + '/tools-builder" '
     if args.library_path:
         for lib_dir in args.library_path:
             cmd += '-libraries "' + lib_dir + '" '
-    cmd += '-build-path "' + tmp_dir + '" '
     cmd += '-hardware "' + ide_path + '/hardware" '
-    cmd += '-hardware ' + hardware_dir + ' '
-    cmd += '-tools "' +  ide_path + '/tools-builder" '
+    if args.hardware_dir:
+        for hw_dir in args.hardware_dir:
+            cmd += '-hardware "' + hw_dir + '" '
+    else:
+        cmd += '-hardware "' + hardware_dir + '" '
     # Debug=Serial,DebugLevel=Core____
     cmd += '-fqbn=esp8266com:esp8266:{board_name}:' \
             'CpuFrequency={cpu_freq},' \
@@ -71,6 +75,8 @@ def parse_args():
     parser.add_argument('-i', '--ide_path', help='Arduino IDE path')
     parser.add_argument('-p', '--build_path', help='Build directory')
     parser.add_argument('-l', '--library_path', help='Additional library path',
+                        action='append')
+    parser.add_argument('-d', '--hardware_dir', help='Additional hardware path',
                         action='append')
     parser.add_argument('-b', '--board_name', help='Board name', default='generic')
     parser.add_argument('-s', '--flash_size', help='Flash size', default='512K64',
@@ -111,6 +117,7 @@ def main():
         created_tmp_dir = True
 
     tools_dir = os.path.dirname(os.path.realpath(__file__)) + '/../tools'
+    # this is not the correct hardware folder to add.
     hardware_dir = os.path.dirname(os.path.realpath(__file__)) + '/../cores'
 
     output_name = tmp_dir + '/' + os.path.basename(sketch_path) + '.bin'
