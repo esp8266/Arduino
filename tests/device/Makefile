@@ -96,4 +96,4 @@ $(TEST_CONFIG):
 	@echo "******    "
 	false
 
-.PHONY: tests all count venv $(BUILD_DIR) $(TEST_LIST) 
+.PHONY: tests all count venv $(BUILD_DIR) $(TEST_LIST)
