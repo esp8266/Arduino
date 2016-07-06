@@ -8,3 +8,5 @@ exclude.txt
 tools/sdk/lib/liblwip_src.a
 tools/sdk/lwip/src/build
 tools/sdk/lwip/src/liblwip_src.a
+
+*.pyc

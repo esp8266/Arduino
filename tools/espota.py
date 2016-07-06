@@ -21,7 +21,7 @@
 # Changes
 # 2015-11-09:
 # - Added digest authentication
-# - Enchanced error tracking and reporting
+# - Enhanced error tracking and reporting
 #
 # Changes
 # 2016-01-03:
@@ -199,7 +199,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
 # end serve
 
 
-def parser():
+def parser(unparsed_args):
   parser = optparse.OptionParser(
     usage = "%prog [options]",
     description = "Transmit image over the air to the esp8266 module with OTA support."
@@ -275,7 +275,7 @@ def parser():
   )
   parser.add_option_group(group)
 
-  (options, args) = parser.parse_args()
+  (options, args) = parser.parse_args(unparsed_args)
 
   return options
 # end parser
@@ -283,7 +283,7 @@ def parser():
 
 def main(args):
   # get options
-  options = parser()
+  options = parser(args)
 
   # adapt log level
   loglevel = logging.WARNING
