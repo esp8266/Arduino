@@ -191,6 +191,8 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
             free(newAP.ssid);
             return false;
         }
+    } else {
+        newAP.passphrase = strdup("");
     }
 
     APlist.push_back(newAP);
