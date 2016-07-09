@@ -87,6 +87,8 @@ public:
 
     void end();
 
+    size_t setRxBufferSize(size_t size);
+
     void swap()
     {
         swap(1);
@@ -138,7 +140,7 @@ public:
 protected:
     int _uart_nr;
     uart_t* _uart = nullptr;
-    int _peek_char = -1;
+    size_t _rx_size;
 };
 
 extern HardwareSerial Serial;

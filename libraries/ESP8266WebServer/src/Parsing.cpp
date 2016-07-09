@@ -190,11 +190,16 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
           size_t decodedLen = decoded.length();
           memcpy(plainBuf, decoded.c_str(), decodedLen);
           plainBuf[decodedLen] = 0;
-        } else {
-          //plain post json or other data
-          searchStr += "plain=";
+          searchStr += plainBuf;
         }
-        searchStr += plainBuf;
+        _parseArguments(searchStr);
+        if(!isEncoded){
+          //plain post json or other data
+          RequestArgument& arg = _currentArgs[_currentArgCount++];
+          arg.key = "plain";
+          arg.value = String(plainBuf);
+        }
+
   #ifdef DEBUG_ESP_HTTP_SERVER
         DEBUG_OUTPUT.print("Plain: ");
         DEBUG_OUTPUT.println(plainBuf);
@@ -202,8 +207,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         free(plainBuf);
       }
     }
-    _parseArguments(searchStr);
+
     if (isForm){
+      _parseArguments(searchStr);
       if (!_parseForm(client, boundaryStr, contentLength)) {
         return false;
       }
@@ -269,6 +275,7 @@ void ESP8266WebServer::_parseArguments(String data) {
   _currentArgs = 0;
   if (data.length() == 0) {
     _currentArgCount = 0;
+    _currentArgs = new RequestArgument[1];
     return;
   }
   _currentArgCount = 1;
@@ -285,7 +292,7 @@ void ESP8266WebServer::_parseArguments(String data) {
   DEBUG_OUTPUT.println(_currentArgCount);
 #endif
 
-  _currentArgs = new RequestArgument[_currentArgCount];
+  _currentArgs = new RequestArgument[_currentArgCount+1];
   int pos = 0;
   int iarg;
   for (iarg = 0; iarg < _currentArgCount;) {
