@@ -44,11 +44,11 @@ public:
     , _tx_buf_head(0)
     , _tx_buf_cur(0)
     , _tx_buf_offset(0)
-    , _multicast_ttl(1)
-    , _dest_port(0)
     {
         _pcb = udp_new();
-        _dest_addr.addr = 0;
+#ifdef LWIP_MAYBE_XCC
+        _mcast_ttl = 1;
+#endif
     }
 
     ~UdpContext()
@@ -87,8 +87,8 @@ public:
 
     bool connect(ip_addr_t addr, uint16_t port)
     {
-        _dest_addr = addr;
-        _dest_port = port;
+        ip_addr_copy(_pcb->remote_ip, addr);
+        _pcb->remote_port = port;
         return true;
     }
 
@@ -106,17 +106,16 @@ public:
 
     void setMulticastInterface(ip_addr_t addr)
     {
-        // newer versions of lwip have a macro to set the multicast ip
-        // udp_set_multicast_netif_addr(_pcb, addr);
-        _pcb->multicast_ip = addr;
+        udp_set_multicast_netif_addr(_pcb, addr);
     }
 
     void setMulticastTTL(int ttl)
     {
-        // newer versions of lwip have an additional field (mcast_ttl) for this purpose
-        // and a macro to set it instead of direct field access
-        // udp_set_multicast_ttl(_pcb, ttl);
-        _multicast_ttl = ttl;
+#ifdef LWIP_MAYBE_XCC
+        _mcast_ttl = ttl;
+#else
+        udp_set_multicast_ttl(_pcb, ttl);
+#endif
     }
 
     // warning: handler is called from tcp stack context
@@ -275,20 +274,22 @@ public:
 
 
         if (!addr) {
-            addr = &_dest_addr;
-            port = _dest_port;
+            addr = &_pcb->remote_ip;
+            port = _pcb->remote_port;
         }
-
+#ifdef LWIP_MAYBE_XCC
         uint16_t old_ttl = _pcb->ttl;
         if (ip_addr_ismulticast(addr)) {
-            _pcb->ttl = _multicast_ttl;
+            _pcb->ttl = _mcast_ttl;
         }
-
+#endif
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
             DEBUGV(":ust rc=%d\r\n", err);
         }
+#ifdef LWIP_MAYBE_XCC
         _pcb->ttl = old_ttl;
+#endif
         pbuf_free(tx_copy);
         return err == ERR_OK;
     }
@@ -365,10 +366,10 @@ private:
     pbuf* _tx_buf_head;
     pbuf* _tx_buf_cur;
     size_t _tx_buf_offset;
-    uint16_t _multicast_ttl;
-    uint16_t _dest_port;
-    ip_addr_t _dest_addr;
     rxhandler_t _on_rx;
+#ifdef LWIP_MAYBE_XCC
+    uint16_t _mcast_ttl;
+#endif
 };
 
 
