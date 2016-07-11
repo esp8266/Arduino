@@ -46,6 +46,9 @@ public:
     , _tx_buf_offset(0)
     {
         _pcb = udp_new();
+#ifdef LWIP_MAYBE_XCC
+        _mcast_ttl = 1;
+#endif
     }
 
     ~UdpContext()
@@ -108,7 +111,11 @@ public:
 
     void setMulticastTTL(int ttl)
     {
+#ifdef LWIP_MAYBE_XCC
+        _mcast_ttl = ttl;
+#else
         udp_set_multicast_ttl(_pcb, ttl);
+#endif
     }
 
     // warning: handler is called from tcp stack context
@@ -270,11 +277,19 @@ public:
             addr = &_pcb->remote_ip;
             port = _pcb->remote_port;
         }
-
+#ifdef LWIP_MAYBE_XCC
+        uint16_t old_ttl = _pcb->ttl;
+        if (ip_addr_ismulticast(addr)) {
+            _pcb->ttl = _mcast_ttl;
+        }
+#endif
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
             DEBUGV(":ust rc=%d\r\n", err);
         }
+#ifdef LWIP_MAYBE_XCC
+        _pcb->ttl = old_ttl;
+#endif
         pbuf_free(tx_copy);
         return err == ERR_OK;
     }
@@ -352,6 +367,9 @@ private:
     pbuf* _tx_buf_cur;
     size_t _tx_buf_offset;
     rxhandler_t _on_rx;
+#ifdef LWIP_MAYBE_XCC
+    uint16_t _mcast_ttl;
+#endif
 };
 
 

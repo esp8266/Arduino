@@ -103,8 +103,10 @@ struct udp_pcb {
 #if LWIP_IGMP
   /** outgoing network interface for multicast packets */
   ip_addr_t multicast_ip;
+#ifndef LWIP_MAYBE_XCC
   /** TTL for outgoing multicast packets */
   u8_t mcast_ttl;
+#endif /* LWIP_MAYBE_XCC */
 #endif /* LWIP_IGMP */
 
 #if LWIP_UDPLITE
@@ -161,9 +163,11 @@ void             udp_input      (struct pbuf *p, struct netif *inp)ICACHE_FLASH_
 #if LWIP_IGMP
 #define udp_set_multicast_netif_addr(pcb, ipaddr)  ip_addr_copy((pcb)->multicast_ip, (ipaddr))
 #define udp_get_multicast_netif_addr(pcb)          ((pcb)->multicast_ip)
+#ifndef LWIP_MAYBE_XCC
 #define udp_set_multicast_ttl(pcb, value)      do { (pcb)->mcast_ttl = value; } while(0)
 #define udp_get_multicast_ttl(pcb)                 ((pcb)->mcast_ttl)
-#endif
+#endif /* LWIP_MAYBE_XCC */
+#endif /* LWIP_IGMP */
 
 #if UDP_DEBUG
 void udp_debug_print(struct udp_hdr *udphdr)ICACHE_FLASH_ATTR;
