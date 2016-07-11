@@ -28,5 +28,8 @@ all: $(LWIP_LIB)
 install: all
 	cp -f $(LWIP_LIB) $(SDK_PATH)/lib/$(LWIP_LIB)
 
+release: all
+	cp -f $(LWIP_LIB) $(SDK_PATH)/lib/liblwip_gcc.a
+
 clean:
 	@rm -rf $(BUILD_PATH) $(LWIP_LIB)
