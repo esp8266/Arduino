@@ -1680,7 +1680,7 @@ coredev.build.lwip_flags=
 
 coredev.menu.LwIPVariant.Espressif=Espressif (xcc)
 coredev.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-coredev.menu.LwIPVariant.Espressif.build.lwip_flags=
+coredev.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
 coredev.menu.LwIPVariant.Prebuilt=Prebuilt Source (gcc)
 coredev.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 coredev.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
