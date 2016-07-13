@@ -19,14 +19,14 @@ struct ip_addr;
 
 class ESP8266NetBIOS
 {
-  protected:
+protected:
     udp_pcb* _pcb;
     char _name[NBNS_MAX_HOSTNAME_LEN + 1];
     void _getnbname(char *nbname, char *name, uint8_t maxlen);
     void _makenbname(char *name, char *nbname, uint8_t outlen);
     void _recv(udp_pcb *upcb, pbuf *pb, struct ip_addr *addr, uint16_t port);
     static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip_addr *addr, uint16_t port);
-  public:
+public:
     ESP8266NetBIOS();
     ~ESP8266NetBIOS();
     bool begin(const char *name);
