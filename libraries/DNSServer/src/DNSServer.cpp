@@ -2,6 +2,11 @@
 #include <lwip/def.h>
 #include <Arduino.h>
 
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_OUTPUT DEBUG_ESP_PORT
+#else
+#define DEBUG_OUTPUT Serial
+#endif
 
 DNSServer::DNSServer()
 {
@@ -144,7 +149,7 @@ void DNSServer::replyWithIP()
 
 
 
-  #ifdef DEBUG
+  #ifdef DEBUG_ESP_DNS_SERVER
     DEBUG_OUTPUT.print("DNS responds: ");
     DEBUG_OUTPUT.print(_resolvedIP[0]);
     DEBUG_OUTPUT.print(".");
