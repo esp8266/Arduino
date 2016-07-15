@@ -75,10 +75,10 @@ void hspi_slave_begin(uint8_t status_len, void * arg)
 {
     status_len &= 7;
     if(status_len > 4) {
-        status_len == 4;    //max 32 bits
+        status_len = 4;    //max 32 bits
     }
     if(status_len == 0) {
-        status_len == 1;    //min 8 bits
+        status_len = 1;    //min 8 bits
     }
 
     pinMode(SS, SPECIAL);
