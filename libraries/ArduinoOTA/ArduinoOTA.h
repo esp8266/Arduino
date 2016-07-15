@@ -40,6 +40,7 @@ class ArduinoOTAClass
     void onProgress(THandlerFunction_Progress fn);
     void begin();
     void handle();
+    int getCommand(); // get update command type after OTA started- either U_FLASH or U_SPIFFS
 
   private:
     int _port;
