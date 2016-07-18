@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -205,7 +205,7 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
     /* only notify if we weren't notified first */
     /* spec says we must notify when we are dying */
     if (!IS_SET_SSL_FLAG(SSL_SENT_CLOSE_NOTIFY))
-      send_alert(ssl, SSL_ALERT_CLOSE_NOTIFY);
+        send_alert(ssl, SSL_ALERT_CLOSE_NOTIFY);
 
     ssl_ctx = ssl->ssl_ctx;
 
@@ -1000,6 +1000,9 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
     if (ssl->hs_status == SSL_ERROR_DEAD)
         return SSL_ERROR_CONN_LOST;
 
+    if (IS_SET_SSL_FLAG(SSL_SENT_CLOSE_NOTIFY))
+        return SSL_CLOSE_NOTIFY;
+
     if (in) /* has the buffer already been initialised? */
     {
         memcpy(ssl->bm_data, in, length);
@@ -1184,6 +1187,9 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     int read_len, is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     uint8_t *buf = ssl->bm_data;
 
+    if (IS_SET_SSL_FLAG(SSL_SENT_CLOSE_NOTIFY))
+        return SSL_CLOSE_NOTIFY;
+
     read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_read_index], 
                             ssl->need_bytes-ssl->got_bytes);
 
@@ -1335,12 +1341,12 @@ int basic_read(SSL *ssl, uint8_t **in_data)
 
         case PT_ALERT_PROTOCOL:
             /* return the alert # with alert bit set */
-            if(buf[0] == SSL_ALERT_TYPE_WARNING &&
+            if (buf[0] == SSL_ALERT_TYPE_WARNING &&
                buf[1] == SSL_ALERT_CLOSE_NOTIFY)
             {
               ret = SSL_CLOSE_NOTIFY;
-              send_alert(ssl, SSL_ALERT_CLOSE_NOTIFY);
-              SET_SSL_FLAG(SSL_SENT_CLOSE_NOTIFY);
+              ssl_free(ssl);
+              SOCKET_CLOSE(ssl->client_fd);
             }
             else 
             {
