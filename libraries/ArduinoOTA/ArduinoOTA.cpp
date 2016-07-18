@@ -29,7 +29,6 @@ extern "C" {
 
 ArduinoOTAClass::ArduinoOTAClass()
 : _port(0)
-, _pass_is_hash(false)
 , _udp_ota(0)
 , _initialized(false)
 , _state(OTA_IDLE)
