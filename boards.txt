@@ -1911,7 +1911,7 @@ coredev.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_
 
 ##############################################################
 
-esparduinounowifi.name=ESPonArduinoUnoWifi
+esparduinounowifi.name=ESP8266 on Arduino Uno WiFi
 
 esparduinounowifi.upload.tool=esptool
 esparduinounowifi.upload.speed=9600
