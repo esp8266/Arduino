@@ -83,6 +83,16 @@ String ArduinoOTAClass::getHostname() {
 
 void ArduinoOTAClass::setPassword(const char * password) {
   if (!_initialized && !_password.length() && password) {
+    MD5Builder passmd5;
+    passmd5.begin();
+    passmd5.add(password);
+    passmd5.calculate();
+    _password = passmd5.toString();
+  }
+}
+
+void ArduinoOTAClass::setPasswordHash(const char * password) {
+  if (!_initialized && !_password.length() && password) {
     _password = password;
   }
 }
@@ -206,13 +216,7 @@ void ArduinoOTAClass::_onRx(){
       return;
     }
 
-    MD5Builder _passmd5;
-    _passmd5.begin();
-    _passmd5.add(_password);
-    _passmd5.calculate();
-    String passmd5 = _passmd5.toString();
-
-    String challenge = passmd5 + ":" + String(_nonce) + ":" + cnonce;
+    String challenge = _password + ":" + String(_nonce) + ":" + cnonce;
     MD5Builder _challengemd5;
     _challengemd5.begin();
     _challengemd5.add(challenge);
