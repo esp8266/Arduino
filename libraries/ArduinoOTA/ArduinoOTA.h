@@ -45,7 +45,6 @@ class ArduinoOTAClass
 
   private:
     int _port;
-    bool _pass_is_hash;
     String _password;
     String _hostname;
     String _nonce;
