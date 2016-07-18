@@ -29,6 +29,7 @@ extern "C" {
 
 ArduinoOTAClass::ArduinoOTAClass()
 : _port(0)
+, _pass_is_hash(false)
 , _udp_ota(0)
 , _initialized(false)
 , _state(OTA_IDLE)
@@ -81,9 +82,10 @@ String ArduinoOTAClass::getHostname() {
   return _hostname;
 }
 
-void ArduinoOTAClass::setPassword(const char * password) {
+void ArduinoOTAClass::setPassword(const char * password, bool isHash) {
   if (!_initialized && !_password.length() && password) {
     _password = password;
+    _pass_is_hash = isHash;
   }
 }
 
@@ -206,11 +208,14 @@ void ArduinoOTAClass::_onRx(){
       return;
     }
 
-    MD5Builder _passmd5;
-    _passmd5.begin();
-    _passmd5.add(_password);
-    _passmd5.calculate();
-    String passmd5 = _passmd5.toString();
+    String passmd5 = _password;
+    if(!_pass_is_hash){
+      MD5Builder _passmd5;
+      _passmd5.begin();
+      _passmd5.add(_password);
+      _passmd5.calculate();
+      passmd5 = _passmd5.toString();
+    }
 
     String challenge = passmd5 + ":" + String(_nonce) + ":" + cnonce;
     MD5Builder _challengemd5;

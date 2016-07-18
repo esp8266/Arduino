@@ -33,7 +33,7 @@ class ArduinoOTAClass
     void setPort(uint16_t port);
     void setHostname(const char *hostname);
     String getHostname();
-    void setPassword(const char *password);
+    void setPassword(const char *password, bool isHash=false);
     void onStart(THandlerFunction fn);
     void onEnd(THandlerFunction fn);
     void onError(THandlerFunction_Error fn);
@@ -44,6 +44,7 @@ class ArduinoOTAClass
 
   private:
     int _port;
+    bool _pass_is_hash;
     String _password;
     String _hostname;
     String _nonce;
