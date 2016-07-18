@@ -27,7 +27,14 @@ void setup() {
   // ArduinoOTA.setPassword((const char *)"123");
 
   ArduinoOTA.onStart([]() {
-    Serial.println("Start");
+    String type;
+    if (ArduinoOTA.getCommand() == U_FLASH)
+      type = "sketch";
+    else // U_SPIFFS
+      type = "filesystem";
+
+    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+    Serial.println("Start updating " + type);
   });
   ArduinoOTA.onEnd([]() {
     Serial.println("\nEnd");

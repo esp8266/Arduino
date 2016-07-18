@@ -180,7 +180,7 @@ void ArduinoOTAClass::_onRx(){
       nonce_md5.add(String(micros()));
       nonce_md5.calculate();
       _nonce = nonce_md5.toString();
-      
+
       char auth_req[38];
       sprintf(auth_req, "AUTH %s", _nonce.c_str());
       _udp_ota->append((const char *)auth_req, strlen(auth_req));
@@ -324,6 +324,10 @@ void ArduinoOTAClass::handle() {
     _runUpdate();
     _state = OTA_IDLE;
   }
+}
+
+int ArduinoOTAClass::getCommand() {
+  return _cmd;
 }
 
 ArduinoOTAClass ArduinoOTA;
