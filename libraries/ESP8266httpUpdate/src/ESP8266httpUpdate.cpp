@@ -297,7 +297,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                     DEBUG_HTTP_UPDATE("[httpUpdate] Update ok\n");
                     http.end();
 
-                    if(_rebootOnUpdate) {
+                    if(_rebootOnUpdate && !spiffs) {
                         ESP.restart();
                     }
 

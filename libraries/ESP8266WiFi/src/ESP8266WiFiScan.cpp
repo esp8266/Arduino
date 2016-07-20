@@ -58,6 +58,8 @@ bool ESP8266WiFiScanClass::_scanComplete = false;
 size_t ESP8266WiFiScanClass::_scanCount = 0;
 void* ESP8266WiFiScanClass::_scanResult = 0;
 
+std::function<void(int)> ESP8266WiFiScanClass::_onComplete;
+
 /**
  * Start scan WiFi networks available
  * @param async         run in async mode
@@ -102,6 +104,15 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden) {
 
 }
 
+/**
+ * Starts scanning WiFi networks available in async mode
+ * @param onComplete    the event handler executed when the scan is done
+ * @param show_hidden   show hidden networks
+  */
+void ESP8266WiFiScanClass::scanNetworksAsync(std::function<void(int)> onComplete, bool show_hidden) {
+    _onComplete = onComplete;
+    scanNetworks(true, show_hidden);
+}
 
 /**
  * called to get the scan state in Async mode
@@ -305,6 +316,9 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status) {
 
     if(!ESP8266WiFiScanClass::_scanAsync) {
         esp_schedule();
+    } else if (ESP8266WiFiScanClass::_onComplete) {
+        ESP8266WiFiScanClass::_onComplete(ESP8266WiFiScanClass::_scanCount);
+        ESP8266WiFiScanClass::_onComplete = nullptr;
     }
 }
 
@@ -319,4 +333,3 @@ void * ESP8266WiFiScanClass::_getScanInfoByIndex(int i) {
     }
     return reinterpret_cast<bss_info*>(ESP8266WiFiScanClass::_scanResult) + i;
 }
-
