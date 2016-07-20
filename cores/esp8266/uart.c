@@ -371,7 +371,7 @@ void uart_uninit(uart_t* uart)
     if(uart->rx_enabled){
         free(uart->rx_buffer->buffer);
         free(uart->rx_buffer);
-        //uart_stop_isr(uart);
+        uart_stop_isr(uart);
     }
     free(uart);
 }
