@@ -1243,8 +1243,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         /* do we violate the spec with the message size?  */
         if (ssl->need_bytes > RT_MAX_PLAIN_LENGTH+RT_EXTRA-BM_RECORD_OFFSET)
         {
-            printf("ssl->need_bytes=%d violates spec\r\n", ssl->need_bytes, RT_MAX_PLAIN_LENGTH+RT_EXTRA-BM_RECORD_OFFSET);
-            ret = SSL_ERROR_INVALID_PROT_MSG;
+            ret = SSL_ERROR_RECORD_OVERFLOW;              
             goto error;
         }
 
@@ -1496,7 +1495,7 @@ int send_alert(SSL *ssl, int error_code)
     int is_warning = 0;
     uint8_t buf[2];
 
-    /* Don't bother we're already dead */
+    /* Don't bother, we're already dead */
     if (ssl->hs_status == SSL_ERROR_DEAD)
     {
         return SSL_ERROR_CONN_LOST;
@@ -1518,14 +1517,17 @@ int send_alert(SSL *ssl, int error_code)
             is_warning = 1;
             break;
 
-        case SSL_ERROR_INVALID_HANDSHAKE:
-        case SSL_ERROR_INVALID_PROT_MSG:
+        case SSL_ERROR_NO_CIPHER:
             alert_num = SSL_ALERT_HANDSHAKE_FAILURE;
             break;
 
         case SSL_ERROR_INVALID_HMAC:
-        case SSL_ERROR_FINISHED_INVALID:
             alert_num = SSL_ALERT_BAD_RECORD_MAC;
+            break;
+
+        case SSL_ERROR_FINISHED_INVALID:
+        case SSL_ERROR_INVALID_KEY:
+            alert_num = SSL_ALERT_DECRYPT_ERROR;
             break;
 
         case SSL_ERROR_INVALID_VERSION:
@@ -1533,23 +1535,41 @@ int send_alert(SSL *ssl, int error_code)
             break;
 
         case SSL_ERROR_INVALID_SESSION:
-        case SSL_ERROR_NO_CIPHER:
-        case SSL_ERROR_INVALID_KEY:
             alert_num = SSL_ALERT_ILLEGAL_PARAMETER;
-            break;
-
-        case SSL_ERROR_BAD_CERTIFICATE:
-            alert_num = SSL_ALERT_BAD_CERTIFICATE;
             break;
 
         case SSL_ERROR_NO_CLIENT_RENOG:
             alert_num = SSL_ALERT_NO_RENEGOTIATION;
             break;
 
+        case SSL_ERROR_RECORD_OVERFLOW:
+            alert_num = SSL_ALERT_RECORD_OVERFLOW;
+            break;
+
+        case SSL_X509_ERROR(X509_VFY_ERROR_EXPIRED):
+        case SSL_X509_ERROR(X509_VFY_ERROR_NOT_YET_VALID):
+            alert_num = SSL_ALERT_CERTIFICATE_EXPIRED;
+            break;
+
+        case SSL_X509_ERROR(X509_VFY_ERROR_NO_TRUSTED_CERT):
+            alert_num = SSL_ALERT_UNKNOWN_CA;
+            break;
+
+        case SSL_X509_ERROR(X509_VFY_ERROR_UNSUPPORTED_DIGEST):
+            alert_num = SSL_ALERT_UNSUPPORTED_CERTIFICATE;
+            break;
+
+        case SSL_ERROR_BAD_CERTIFICATE:
+        case SSL_X509_ERROR(X509_VFY_ERROR_BAD_SIGNATURE):
+            alert_num = SSL_ALERT_BAD_CERTIFICATE;
+            break;
+
+        case SSL_ERROR_INVALID_HANDSHAKE:
+        case SSL_ERROR_INVALID_PROT_MSG:
         default:
-            /* a catch-all for any badly verified certificates */
+            /* a catch-all for anything bad */
             alert_num = (error_code <= SSL_X509_OFFSET) ?  
-                SSL_ALERT_BAD_CERTIFICATE : SSL_ALERT_UNEXPECTED_MESSAGE;
+                SSL_ALERT_CERTIFICATE_UNKNOWN: SSL_ALERT_UNEXPECTED_MESSAGE;
             break;
     }
 
@@ -2125,6 +2145,10 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code)
             printf("connection dead");
             break;
 
+        case SSL_ERROR_RECORD_OVERFLOW:
+            printf("record overflow");
+            break;
+
         case SSL_ERROR_INVALID_HANDSHAKE:
             printf("invalid handshake");
             break;
@@ -2201,14 +2225,6 @@ void DISPLAY_ALERT(SSL *ssl, int alert)
             printf("close notify");
             break;
 
-        case SSL_ALERT_INVALID_VERSION:
-            printf("invalid version");
-            break;
-
-        case SSL_ALERT_BAD_CERTIFICATE:
-            printf("bad certificate");
-            break;
-
         case SSL_ALERT_UNEXPECTED_MESSAGE:
             printf("unexpected message");
             break;
@@ -2217,12 +2233,36 @@ void DISPLAY_ALERT(SSL *ssl, int alert)
             printf("bad record mac");
             break;
 
+        case SSL_ERROR_RECORD_OVERFLOW:
+            printf("record overlow");
+            break;
+
         case SSL_ALERT_HANDSHAKE_FAILURE:
             printf("handshake failure");
             break;
 
+        case SSL_ALERT_BAD_CERTIFICATE:
+            printf("bad certificate");
+            break;
+
+        case SSL_ALERT_UNSUPPORTED_CERTIFICATE:
+            printf("unsupported certificate");
+            break;
+
+        case SSL_ALERT_CERTIFICATE_EXPIRED:
+            printf("certificate expired");
+            break;
+
+        case SSL_ALERT_CERTIFICATE_UNKNOWN:
+            printf("certificate unknown");
+            break;
+
         case SSL_ALERT_ILLEGAL_PARAMETER:
             printf("illegal parameter");
+            break;
+
+        case SSL_ALERT_UNKNOWN_CA:
+            printf("unknown ca");
             break;
 
         case SSL_ALERT_DECODE_ERROR:
@@ -2231,6 +2271,10 @@ void DISPLAY_ALERT(SSL *ssl, int alert)
 
         case SSL_ALERT_DECRYPT_ERROR:
             printf("decrypt error");
+            break;
+
+        case SSL_ALERT_INVALID_VERSION:
+            printf("invalid version");
             break;
 
         case SSL_ALERT_NO_RENEGOTIATION:

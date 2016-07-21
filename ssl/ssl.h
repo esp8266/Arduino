@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -91,6 +91,7 @@ extern "C" {
 #define SSL_ERROR_DEAD                          -2
 #define SSL_CLOSE_NOTIFY                        -3
 #define SSL_ERROR_CONN_LOST                     -256
+#define SSL_ERROR_RECORD_OVERFLOW               -257
 #define SSL_ERROR_SOCK_SETUP_FAILURE            -258
 #define SSL_ERROR_INVALID_HANDSHAKE             -260
 #define SSL_ERROR_INVALID_PROT_MSG              -261
@@ -115,9 +116,14 @@ extern "C" {
 #define SSL_ALERT_CLOSE_NOTIFY                  0
 #define SSL_ALERT_UNEXPECTED_MESSAGE            10
 #define SSL_ALERT_BAD_RECORD_MAC                20
+#define SSL_ALERT_RECORD_OVERFLOW               22
 #define SSL_ALERT_HANDSHAKE_FAILURE             40
 #define SSL_ALERT_BAD_CERTIFICATE               42
+#define SSL_ALERT_UNSUPPORTED_CERTIFICATE       43
+#define SSL_ALERT_CERTIFICATE_EXPIRED           45
+#define SSL_ALERT_CERTIFICATE_UNKNOWN           46
 #define SSL_ALERT_ILLEGAL_PARAMETER             47
+#define SSL_ALERT_UNKNOWN_CA                    48
 #define SSL_ALERT_DECODE_ERROR                  50
 #define SSL_ALERT_DECRYPT_ERROR                 51
 #define SSL_ALERT_INVALID_VERSION               70
