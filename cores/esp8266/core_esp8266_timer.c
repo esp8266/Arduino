@@ -41,7 +41,7 @@ void ICACHE_RAM_ATTR timer1_isr_handler(void *para){
     }
 }
 
-void timer1_isr_init(){
+void ICACHE_RAM_ATTR timer1_isr_init(){
     ETS_FRC_TIMER1_INTR_ATTACH(timer1_isr_handler, NULL);
 }
 
