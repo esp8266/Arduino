@@ -1826,8 +1826,27 @@ coredev.menu.FlashSize.4M3M.build.flash_size=4M
 coredev.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 coredev.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 coredev.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+coredev.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 coredev.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
 coredev.menu.FlashSize.4M3M.upload.maximum_size=1044464
+
+coredev.menu.FlashSize.8M7M=8M (7M SPIFFS)
+coredev.menu.FlashSize.8M7M.build.flash_size=8M
+coredev.menu.FlashSize.8M7M.build.flash_ld=eagle.flash.8m.ld
+coredev.menu.FlashSize.8M7M.build.spiffs_start=0x100000
+coredev.menu.FlashSize.8M7M.build.spiffs_end=0x7FB000
+coredev.menu.FlashSize.8M7M.build.spiffs_pagesize=256
+coredev.menu.FlashSize.8M7M.build.spiffs_blocksize=8192
+coredev.menu.FlashSize.8M7M.upload.maximum_size=1044464
+
+coredev.menu.FlashSize.16M15M=16M (15M SPIFFS)
+coredev.menu.FlashSize.16M15M.build.flash_size=16M
+coredev.menu.FlashSize.16M15M.build.flash_ld=eagle.flash.16m.ld
+coredev.menu.FlashSize.16M15M.build.spiffs_start=0x100000
+coredev.menu.FlashSize.16M15M.build.spiffs_end=0x17FB000
+coredev.menu.FlashSize.16M15M.build.spiffs_pagesize=256
+coredev.menu.FlashSize.16M15M.build.spiffs_blocksize=8192
+coredev.menu.FlashSize.16M15M.upload.maximum_size=1044464
 
 coredev.menu.ResetMethod.ck=ck
 coredev.menu.ResetMethod.ck.upload.resetmethod=ck
