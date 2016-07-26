@@ -128,15 +128,15 @@ void ESP8266WebServer::requestAuthentication(){
   send(401);
 }
 
-void ESP8266WebServer::on(const char* uri, ESP8266WebServer::THandlerFunction handler) {
+void ESP8266WebServer::on(const String &uri, ESP8266WebServer::THandlerFunction handler) {
   on(uri, HTTP_ANY, handler);
 }
 
-void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn) {
+void ESP8266WebServer::on(const String &uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn) {
   on(uri, method, fn, _fileUploadHandler);
 }
 
-void ESP8266WebServer::on(const char* uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn) {
+void ESP8266WebServer::on(const String &uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn) {
   _addRequestHandler(new FunctionRequestHandler(fn, ufn, uri, method));
 }
 

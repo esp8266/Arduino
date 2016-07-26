@@ -1,9 +1,9 @@
-/* 
+/*
   digital.c - wiring digital implementation for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -25,9 +25,12 @@
 #include "eagle_soc.h"
 #include "ets_sys.h"
 
+extern void pwm_stop_pin(uint8_t pin);
+
 uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C, 0x20, 0x24, 0x28, 0x2C, 0x30, 0x04, 0x08, 0x0C, 0x10};
 
 extern void __pinMode(uint8_t pin, uint8_t mode) {
+  pwm_stop_pin(pin);
   if(pin < 16){
     if(mode == SPECIAL){
       GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
@@ -77,6 +80,7 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
 }
 
 extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
+  pwm_stop_pin(pin);
   if(pin < 16){
     if(val) GPOS = (1 << pin);
     else GPOC = (1 << pin);
@@ -87,6 +91,7 @@ extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
 }
 
 extern int ICACHE_RAM_ATTR __digitalRead(uint8_t pin) {
+  pwm_stop_pin(pin);
   if(pin < 16){
     return GPIP(pin);
   } else if(pin == 16){
@@ -121,12 +126,12 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
     while(!(changedbits & (1 << i))) i++;
     changedbits &= ~(1 << i);
     interrupt_handler_t *handler = &interrupt_handlers[i];
-    if (handler->fn && 
-        (handler->mode == CHANGE || 
+    if (handler->fn &&
+        (handler->mode == CHANGE ||
          (handler->mode & 1) == !!(levels & (1 << i)))) {
       // to make ISR compatible to Arduino AVR model where interrupts are disabled
       // we disable them before we call the client ISR
-      uint32_t savedPS = xt_rsil(15); // stop other interrupts 
+      uint32_t savedPS = xt_rsil(15); // stop other interrupts
       handler->fn();
       xt_wsr_ps(savedPS);
     }
@@ -170,7 +175,7 @@ void initPins() {
   for (int i = 12; i <= 16; ++i) {
     pinMode(i, INPUT);
   }
-  
+
   ETS_GPIO_INTR_ATTACH(interrupt_handler, &interrupt_reg);
   ETS_GPIO_INTR_ENABLE();
 }
@@ -180,4 +185,3 @@ extern void digitalWrite(uint8_t pin, uint8_t val) __attribute__ ((weak, alias("
 extern int digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead")));
 extern void attachInterrupt(uint8_t pin, voidFuncPtr handler, int mode) __attribute__ ((weak, alias("__attachInterrupt")));
 extern void detachInterrupt(uint8_t pin) __attribute__ ((weak, alias("__detachInterrupt")));
-

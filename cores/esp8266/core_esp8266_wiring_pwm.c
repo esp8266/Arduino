@@ -126,10 +126,11 @@ void ICACHE_RAM_ATTR pwm_timer_isr() //103-138
     TEIE &= ~TEIE1;//14
     T1I = 0;//9
     if(current_step < table->len) { //20/21
-        if(table->masks[current_step] & 0xFFFF) {
-            GPOC = table->masks[current_step] & 0xFFFF;    //15/21
+        uint32_t mask = table->masks[current_step] & pwm_mask;
+        if(mask & 0xFFFF) {
+            GPOC = mask & 0xFFFF;    //15/21
         }
-        if(table->masks[current_step] & 0x10000) {
+        if(mask & 0x10000) {
             GP16O = 0;    //6/13
         }
         current_step++;//1
@@ -164,18 +165,24 @@ void pwm_start_timer()
     timer1_write(1);
 }
 
-extern void __analogWrite(uint8_t pin, int value)
+void ICACHE_RAM_ATTR pwm_stop_pin(uint8_t pin)
 {
-    bool start_timer = false;
-    if(value == 0) {
+    if(pwm_mask){
         pwm_mask &= ~(1 << pin);
-        prep_pwm_steps();
-        digitalWrite(pin, LOW);
         if(pwm_mask == 0) {
             ETS_FRC_TIMER1_NMI_INTR_ATTACH(NULL);
             timer1_disable();
             timer1_isr_init();
         }
+    }
+}
+
+extern void __analogWrite(uint8_t pin, int value)
+{
+    bool start_timer = false;
+    if(value == 0) {
+        digitalWrite(pin, LOW);
+        prep_pwm_steps();
         return;
     }
     if((pwm_mask & (1 << pin)) == 0) {
@@ -183,9 +190,9 @@ extern void __analogWrite(uint8_t pin, int value)
             memset(&_pwm_isr_data, 0, sizeof(struct pwm_isr_data*));
             start_timer = true;
         }
-        pwm_mask |= (1 << pin);
         pinMode(pin, OUTPUT);
         digitalWrite(pin, LOW);
+        pwm_mask |= (1 << pin);
     }
     if((F_CPU / ESP8266_CLOCK) == 1) {
         value = (value+1) / 2;
