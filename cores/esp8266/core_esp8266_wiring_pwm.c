@@ -171,8 +171,7 @@ void ICACHE_RAM_ATTR pwm_stop_pin(uint8_t pin)
         pwm_mask &= ~(1 << pin);
         if(pwm_mask == 0) {
             ETS_FRC_TIMER1_NMI_INTR_ATTACH(NULL);
-            T1C = 0;
-            T1I = 0;
+            timer1_disable();
             timer1_isr_init();
         }
     }
@@ -182,14 +181,8 @@ extern void __analogWrite(uint8_t pin, int value)
 {
     bool start_timer = false;
     if(value == 0) {
-        pwm_mask &= ~(1 << pin);
-        prep_pwm_steps();
         digitalWrite(pin, LOW);
-        if(pwm_mask == 0) {
-            ETS_FRC_TIMER1_NMI_INTR_ATTACH(NULL);
-            timer1_disable();
-            timer1_isr_init();
-        }
+        prep_pwm_steps();
         return;
     }
     if((pwm_mask & (1 << pin)) == 0) {

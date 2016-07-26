@@ -66,7 +66,7 @@ void ICACHE_RAM_ATTR timer1_write(uint32_t ticks){
     if ((T1C & (1 << TCIT)) == 0) TEIE |= TEIE1;//edge int enable
 }
 
-void timer1_disable(){
+void ICACHE_RAM_ATTR timer1_disable(){
     T1C = 0;
     T1I = 0;
 }
