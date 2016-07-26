@@ -5,7 +5,7 @@
 
 class FunctionRequestHandler : public RequestHandler {
 public:
-    FunctionRequestHandler(ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn, const char* uri, HTTPMethod method)
+    FunctionRequestHandler(ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn, const String &uri, HTTPMethod method)
     : _fn(fn)
     , _ufn(ufn)
     , _uri(uri)
