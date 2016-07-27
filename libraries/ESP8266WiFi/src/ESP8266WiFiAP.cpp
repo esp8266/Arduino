@@ -79,11 +79,11 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
 
 /**
  * Set up an access point
- * @param ssid           Pointer to the SSID (max 63 char).
- * @param passphrase     (for WPA2 min 8 char, for open use NULL)
- * @param channel        WiFi channel number, 1 - 13.
- * @param ssid_hidden    Network cloaking (0 = broadcast SSID, 1 = hide SSID)
- * @param max_connection Max simultaneous connected clients, 1 - 4.
+ * @param ssid              Pointer to the SSID (max 63 char).
+ * @param passphrase        (for WPA2 min 8 char, for open use NULL)
+ * @param channel           WiFi channel number, 1 - 13.
+ * @param ssid_hidden       Network cloaking (0 = broadcast SSID, 1 = hide SSID)
+ * @param max_connection    Max simultaneous connected clients, 1 - 4.
  */
 bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int channel, int ssid_hidden, int max_connection) {
 
