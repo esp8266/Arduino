@@ -64,13 +64,14 @@ static void session_free(SSL_SESSION *ssl_sessions[], int sess_index);
 #endif
 
 const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
-#ifdef CONFIG_SSL_PROT_LOW                  /* same as medium for now */
-{ SSL_AES128_SHA, SSL_AES256_SHA };
+#ifdef CONFIG_SSL_PROT_LOW                  /* low security, fast speed */
+{ SSL_AES128_SHA, SSL_AES128_SHA256, SSL_AES256_SHA, SSL_AES256_SHA256 };
 #elif CONFIG_SSL_PROT_MEDIUM                /* medium security, medium speed */
-{ SSL_AES128_SHA, SSL_AES256_SHA };    
+{ SSL_AES128_SHA256, SSL_AES256_SHA256, SSL_AES256_SHA, SSL_AES128_SHA };    
 #else /* CONFIG_SSL_PROT_HIGH */            /* high security, low speed */
-{ SSL_AES256_SHA, SSL_AES128_SHA };
+{ SSL_AES256_SHA, SSL_AES128_SHA256, SSL_AES_256_SHA, SSL_AES128_SHA };
 #endif
+
 /**
  * The cipher map containing all the essentials for each cipher.
  */
@@ -80,9 +81,9 @@ static const cipher_info_t cipher_info[NUM_PROTOCOLS] =
         SSL_AES128_SHA,                 /* AES128-SHA */
         16,                             /* key size */
         16,                             /* iv size */ 
-        2*(SHA1_SIZE+16+16),            /* key block size */
         16,                             /* block padding size */
         SHA1_SIZE,                      /* digest size */
+        2*(SHA1_SIZE+16+16),            /* key block size */
         hmac_sha1,                      /* hmac algorithm */
         (crypt_func)AES_cbc_encrypt,    /* encrypt */
         (crypt_func)AES_cbc_decrypt     /* decrypt */
@@ -90,17 +91,40 @@ static const cipher_info_t cipher_info[NUM_PROTOCOLS] =
     {   /* AES256-SHA */
         SSL_AES256_SHA,                 /* AES256-SHA */
         32,                             /* key size */
-        16,                             /* iv size */
-        2*(SHA1_SIZE+32+16),            /* key block size */
+        16,                             /* iv size */ 
         16,                             /* block padding size */
         SHA1_SIZE,                      /* digest size */
+        2*(SHA1_SIZE+32+16),            /* key block size */
         hmac_sha1,                      /* hmac algorithm */
         (crypt_func)AES_cbc_encrypt,    /* encrypt */
         (crypt_func)AES_cbc_decrypt     /* decrypt */
     },       
+    {   /* AES128-SHA256 */
+        SSL_AES128_SHA256,              /* AES128-SHA256 */
+        16,                             /* key size */
+        16,                             /* iv size */ 
+        16,                             /* block padding size */
+        SHA256_SIZE,                    /* digest size */
+        2*(SHA256_SIZE+32+16),          /* key block size */
+        hmac_sha256,                    /* hmac algorithm */
+        (crypt_func)AES_cbc_encrypt,    /* encrypt */
+        (crypt_func)AES_cbc_decrypt     /* decrypt */
+    },       
+    {   /* AES256-SHA256 */
+        SSL_AES256_SHA256,              /* AES256-SHA256 */
+        32,                             /* key size */
+        16,                             /* iv size */ 
+        16,                             /* block padding size */
+        SHA256_SIZE,                    /* digest size */
+        2*(SHA256_SIZE+32+16),          /* key block size */
+        hmac_sha256,                    /* hmac algorithm */
+        (crypt_func)AES_cbc_encrypt,    /* encrypt */
+        (crypt_func)AES_cbc_decrypt     /* decrypt */
+    }
 };
 
-static void prf(const uint8_t *sec, int sec_len, uint8_t *seed, int seed_len,
+static void prf(SSL *ssl, const uint8_t *sec, int sec_len, 
+        uint8_t *seed, int seed_len,
         uint8_t *out, int olen);
 static const cipher_info_t *get_cipher_info(uint8_t cipher);
 static void increment_read_sequence(SSL *ssl);
@@ -615,36 +639,19 @@ static void increment_write_sequence(SSL *ssl)
 static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
-    const size_t prefix_size = 8 + SSL_RECORD_SIZE;
-    bool hmac_inplace = (uint32_t)buf - (uint32_t)ssl->bm_data >= prefix_size;
-    uint8_t tmp[prefix_size];
-    int hmac_len = buf_len + prefix_size;
-    uint8_t *t_buf;
-    if (hmac_inplace) {
-        t_buf = ((uint8_t*)buf) - prefix_size;
-        memcpy(tmp, t_buf, prefix_size);
-    } else {
-        t_buf = (uint8_t *)malloc(hmac_len+10);
-    }
+    int hmac_len = buf_len + 8 + SSL_RECORD_SIZE;
+    uint8_t *t_buf = (uint8_t *)alloca(buf_len);
 
-    memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ?
+    memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ? 
                     ssl->write_sequence : ssl->read_sequence, 8);
     memcpy(&t_buf[8], hmac_header, SSL_RECORD_SIZE);
-    if (!hmac_inplace) {
-        memcpy(&t_buf[8+SSL_RECORD_SIZE], buf, buf_len);
-    }
+    memcpy(&t_buf[8+SSL_RECORD_SIZE], buf, buf_len);
 
-    ssl->cipher_info->hmac(t_buf, hmac_len,
-            (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_READ) ?
-                ssl->server_mac : ssl->client_mac,
+    ssl->cipher_info->hmac(t_buf, hmac_len, 
+            (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_READ) ? 
+                ssl->server_mac : ssl->client_mac, 
             ssl->cipher_info->digest_size, hmac_buf);
 
-    if (hmac_inplace) {
-        memcpy(t_buf, tmp, prefix_size);
-    }
-    else {
-        free(t_buf);
-    }
 #if 0
     print_blob("record", hmac_header, SSL_RECORD_SIZE);
     print_blob("buf", buf, buf_len);
@@ -667,7 +674,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         print_blob("client mac", 
                 ssl->client_mac, ssl->cipher_info->digest_size);
     }
-    print_blob("hmac", hmac_buf, SHA1_SIZE);
+    print_blob("hmac", hmac_buf, ssl->cipher_info->digest_size);
 #endif
 }
 
@@ -676,7 +683,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
  */
 static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
 {   
-    uint8_t hmac_buf[SHA1_SIZE];
+    uint8_t hmac_buf[SHA256_SIZE];
     int hmac_offset;
    
     if (ssl->cipher_info->padding_size)
@@ -731,8 +738,15 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
  */
 void add_packet(SSL *ssl, const uint8_t *pkt, int len)
 {
-    MD5_Update(&ssl->dc->md5_ctx, pkt, len);
-    SHA1_Update(&ssl->dc->sha1_ctx, pkt, len);
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    {
+        SHA256_Update(&ssl->dc->sha256_ctx, pkt, len);
+    }
+    else // TLS1.0/1.0
+    {
+        MD5_Update(&ssl->dc->md5_ctx, pkt, len);
+        SHA1_Update(&ssl->dc->sha1_ctx, pkt, len);
+    }
 }
 
 /**
@@ -792,26 +806,62 @@ static void p_hash_sha1(const uint8_t *sec, int sec_len,
 }
 
 /**
+ * Work out the SHA256 PRF.
+ */
+static void p_hash_sha256(const uint8_t *sec, int sec_len, 
+        uint8_t *seed, int seed_len, uint8_t *out, int olen)
+{
+    uint8_t a1[128];
+
+    /* A(1) */
+    hmac_sha256(seed, seed_len, sec, sec_len, a1);
+    memcpy(&a1[SHA256_SIZE], seed, seed_len);
+    hmac_sha256(a1, SHA256_SIZE+seed_len, sec, sec_len, out);
+
+    while (olen > SHA256_SIZE)
+    {
+        uint8_t a2[SHA256_SIZE];
+        out += SHA256_SIZE;
+        olen -= SHA256_SIZE;
+
+        // A(N)
+        hmac_sha256(a1, SHA256_SIZE, sec, sec_len, a2);
+        memcpy(a1, a2, SHA256_SIZE);
+
+        // work out the actual hash 
+        hmac_sha256(a1, SHA256_SIZE+seed_len, sec, sec_len, out);
+    }
+}
+
+/**
  * Work out the PRF.
  */
-static void prf(const uint8_t *sec, int sec_len, uint8_t *seed, int seed_len,
+static void prf(SSL *ssl, const uint8_t *sec, int sec_len, 
+        uint8_t *seed, int seed_len,
         uint8_t *out, int olen)
 {
-    int len, i;
-    const uint8_t *S1, *S2;
-    uint8_t xbuf[256]; /* needs to be > the amount of key data */
-    uint8_t ybuf[256]; /* needs to be > the amount of key data */
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2)    // TLS1.2
+    {
+        p_hash_sha256(sec, sec_len, seed, seed_len, out, olen);
+    }
+    else // TLS1.0/1.1
+    {
+        int len, i;
+        const uint8_t *S1, *S2;
+        uint8_t xbuf[256]; /* needs to be > the amount of key data */
+        uint8_t ybuf[256]; /* needs to be > the amount of key data */
 
-    len = sec_len/2;
-    S1 = sec;
-    S2 = &sec[len];
-    len += (sec_len & 1); /* add for odd, make longer */
+        len = sec_len/2;
+        S1 = sec;
+        S2 = &sec[len];
+        len += (sec_len & 1); /* add for odd, make longer */
 
-    p_hash_md5(S1, len, seed, seed_len, xbuf, olen);
-    p_hash_sha1(S2, len, seed, seed_len, ybuf, olen);
+        p_hash_md5(S1, len, seed, seed_len, xbuf, olen);
+        p_hash_sha1(S2, len, seed, seed_len, ybuf, olen);
 
-    for (i = 0; i < olen; i++)
-        out[i] = xbuf[i] ^ ybuf[i];
+        for (i = 0; i < olen; i++)
+            out[i] = xbuf[i] ^ ybuf[i];
+    }
 }
 
 /**
@@ -821,24 +871,32 @@ static void prf(const uint8_t *sec, int sec_len, uint8_t *seed, int seed_len,
 void generate_master_secret(SSL *ssl, const uint8_t *premaster_secret)
 {
     uint8_t buf[128];   /* needs to be > 13+32+32 in size */
+    //print_blob("premaster secret", premaster_secret, 48);
     strcpy((char *)buf, "master secret");
     memcpy(&buf[13], ssl->dc->client_random, SSL_RANDOM_SIZE);
     memcpy(&buf[45], ssl->dc->server_random, SSL_RANDOM_SIZE);
-    prf(premaster_secret, SSL_SECRET_SIZE, buf, 77, ssl->dc->master_secret,
+    prf(ssl, premaster_secret, SSL_SECRET_SIZE, buf, 77, ssl->dc->master_secret,
             SSL_SECRET_SIZE);
+#if 0
+    print_blob("client random", ssl->dc->client_random, 32);
+    print_blob("server random", ssl->dc->server_random, 32);
+    print_blob("master secret", ssl->dc->master_secret, 48);
+#endif
 }
 
 /**
  * Generate a 'random' blob of data used for the generation of keys.
  */
-static void generate_key_block(uint8_t *client_random, uint8_t *server_random,
+static void generate_key_block(SSL *ssl, 
+        uint8_t *client_random, uint8_t *server_random,
         uint8_t *master_secret, uint8_t *key_block, int key_block_size)
 {
     uint8_t buf[128];
     strcpy((char *)buf, "key expansion");
     memcpy(&buf[13], server_random, SSL_RANDOM_SIZE);
     memcpy(&buf[45], client_random, SSL_RANDOM_SIZE);
-    prf(master_secret, SSL_SECRET_SIZE, buf, 77, key_block, key_block_size);
+    prf(ssl, master_secret, SSL_SECRET_SIZE, buf, 77, 
+                    key_block, key_block_size);
 }
 
 /** 
@@ -849,8 +907,6 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 {
     uint8_t mac_buf[128]; 
     uint8_t *q = mac_buf;
-    MD5_CTX md5_ctx = ssl->dc->md5_ctx;
-    SHA1_CTX sha1_ctx = ssl->dc->sha1_ctx;
 
     if (label)
     {
@@ -858,25 +914,47 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
         q += strlen(label);
     }
 
-    MD5_Final(q, &md5_ctx);
-    q += MD5_SIZE;
-    
-    SHA1_Final(q, &sha1_ctx);
-    q += SHA1_SIZE;
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    {
+        SHA256_CTX sha256_ctx = ssl->dc->sha256_ctx; // interim copy
+        SHA256_Final(q, &sha256_ctx);
+        q += SHA256_SIZE;
 
-    if (label)
-    {
-        prf(ssl->dc->master_secret, SSL_SECRET_SIZE, mac_buf, (int)(q-mac_buf),
-            digest, SSL_FINISHED_HASH_SIZE);
+        if (label)
+        {
+            prf(ssl, ssl->dc->master_secret, SSL_SECRET_SIZE, 
+                    mac_buf, (int)(q-mac_buf), digest,
+                    SSL_FINISHED_HASH_SIZE);
+        }
+        else    // for use in a certificate verify
+        {
+            memcpy(digest, mac_buf, SHA256_SIZE);
+        }
     }
-    else    /* for use in a certificate verify */
+    else // TLS1.0/1.1
     {
-        memcpy(digest, mac_buf, MD5_SIZE + SHA1_SIZE);
+        MD5_CTX md5_ctx = ssl->dc->md5_ctx; // interim copy
+        SHA1_CTX sha1_ctx = ssl->dc->sha1_ctx;
+
+        MD5_Final(q, &md5_ctx);
+        q += MD5_SIZE;
+        
+        SHA1_Final(q, &sha1_ctx);
+        q += SHA1_SIZE;
+
+        if (label)
+        {
+            prf(ssl, ssl->dc->master_secret, SSL_SECRET_SIZE, 
+                    mac_buf, (int)(q-mac_buf), digest, SSL_FINISHED_HASH_SIZE);
+        }
+        else    /* for use in a certificate verify */
+        {
+            memcpy(digest, mac_buf, MD5_SIZE + SHA1_SIZE);
+        }
     }
 
 #if 0
     printf("label: %s\n", label);
-    print_blob("master secret", ssl->dc->master_secret, 48);
     print_blob("mac_buf", mac_buf, q-mac_buf);
     print_blob("finished digest", digest, SSL_FINISHED_HASH_SIZE);
 #endif
@@ -890,6 +968,7 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt, void
     switch (ssl->cipher)
     {
         case SSL_AES128_SHA:
+        case SSL_AES128_SHA256:
             {
                 AES_CTX *aes_ctx;
                 if (cached)
@@ -907,6 +986,7 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt, void
             }
 
         case SSL_AES256_SHA:
+        case SSL_AES256_SHA256:
             {
                 AES_CTX *aes_ctx;
                 if (cached)
@@ -923,6 +1003,7 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt, void
 
                 return (void *)aes_ctx;
             }
+
     }
 
     return NULL;    /* its all gone wrong */
@@ -1058,7 +1139,7 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
         increment_write_sequence(ssl);
 
         /* add the explicit IV for TLS1.1 */
-        if (ssl->version >= SSL_PROTOCOL_VERSION1_1 &&
+        if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_1 &&
                         ssl->cipher_info->iv_size)
         {
             uint8_t iv_size = ssl->cipher_info->iv_size;
@@ -1109,16 +1190,14 @@ static int set_key_block(SSL *ssl, int is_write)
         return -1;
 
     /* only do once in a handshake */
-    if (ssl->dc->key_block == NULL)
+    if (ssl->dc->bm_proc_index ==0 )
     {
-        ssl->dc->key_block = (uint8_t *)malloc(ciph_info->key_block_size);
-
 #if 0
         print_blob("client", ssl->dc->client_random, 32);
         print_blob("server", ssl->dc->server_random, 32);
         print_blob("master", ssl->dc->master_secret, SSL_SECRET_SIZE);
 #endif
-        generate_key_block(ssl->dc->client_random, ssl->dc->server_random,
+        generate_key_block(ssl, ssl->dc->client_random, ssl->dc->server_random,
             ssl->dc->master_secret, ssl->dc->key_block, 
             ciph_info->key_block_size);
 #if 0
@@ -1146,13 +1225,10 @@ static int set_key_block(SSL *ssl, int is_write)
     memcpy(server_key, q, ciph_info->key_size);
     q += ciph_info->key_size;
 
-    if (ciph_info->iv_size)    /* RC4 has no IV, AES does */
-    {
-        memcpy(client_iv, q, ciph_info->iv_size);
-        q += ciph_info->iv_size;
-        memcpy(server_iv, q, ciph_info->iv_size);
-        q += ciph_info->iv_size;
-    }
+    memcpy(client_iv, q, ciph_info->iv_size);
+    q += ciph_info->iv_size;
+    memcpy(server_iv, q, ciph_info->iv_size);
+    q += ciph_info->iv_size;
 
     // free(is_write ? ssl->encrypt_ctx : ssl->decrypt_ctx);
 
@@ -1274,7 +1350,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     {
         ssl->cipher_info->decrypt(ssl->decrypt_ctx, buf, buf, read_len);
 
-        if (ssl->version >= SSL_PROTOCOL_VERSION1_1 &&
+        if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_1 &&
                         ssl->cipher_info->iv_size)
         {
             buf += ssl->cipher_info->iv_size;
@@ -1464,7 +1540,7 @@ int send_change_cipher_spec(SSL *ssl)
  */
 int send_finished(SSL *ssl)
 {
-    uint8_t buf[SSL_FINISHED_HASH_SIZE+4] = {
+    uint8_t buf[128] = {
         HS_FINISHED, 0, 0, SSL_FINISHED_HASH_SIZE };
 
     /* now add the finished digest mac (12 bytes) */
@@ -1653,6 +1729,7 @@ void disposable_new(SSL *ssl)
     if (ssl->dc == NULL)
     {
         ssl->dc = (DISPOSABLE_CTX *)calloc(1, sizeof(DISPOSABLE_CTX));
+        SHA256_Init(&ssl->dc->sha256_ctx);
         MD5_Init(&ssl->dc->md5_ctx);
         SHA1_Init(&ssl->dc->sha1_ctx);
     }
@@ -1665,7 +1742,6 @@ void disposable_free(SSL *ssl)
 {
     if (ssl->dc)
     {
-        free(ssl->dc->key_block);
         memset(ssl->dc, 0, sizeof(DISPOSABLE_CTX));
         free(ssl->dc);
         ssl->dc = NULL;

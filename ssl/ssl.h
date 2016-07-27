@@ -97,6 +97,7 @@ extern "C" {
 #define SSL_ERROR_INVALID_PROT_MSG              -261
 #define SSL_ERROR_INVALID_HMAC                  -262
 #define SSL_ERROR_INVALID_VERSION               -263
+#define SSL_ERROR_UNSUPPORTED_EXTENSION         -264
 #define SSL_ERROR_INVALID_SESSION               -265
 #define SSL_ERROR_NO_CIPHER                     -266
 #define SSL_ERROR_BAD_CERTIFICATE               -268
@@ -128,12 +129,13 @@ extern "C" {
 #define SSL_ALERT_DECRYPT_ERROR                 51
 #define SSL_ALERT_INVALID_VERSION               70
 #define SSL_ALERT_NO_RENEGOTIATION              100
+#define SSL_ALERT_UNSUPPORTED_EXTENSION         110
 
 /* The ciphers that are supported */
 #define SSL_AES128_SHA                          0x2f
 #define SSL_AES256_SHA                          0x35
-#define SSL_RC4_128_SHA                         0x05
-#define SSL_RC4_128_MD5                         0x04
+#define SSL_AES128_SHA256                       0x3c
+#define SSL_AES256_SHA256                       0x3d
 
 /* build mode ids' */
 #define SSL_BUILD_SKELETON_MODE                 0x01

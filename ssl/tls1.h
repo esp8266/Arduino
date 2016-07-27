@@ -48,9 +48,9 @@ extern "C" {
 #include "crypto_misc.h"
 
 #define SSL_PROTOCOL_MIN_VERSION    0x31   /* TLS v1.0 */
-#define SSL_PROTOCOL_MINOR_VERSION  0x02   /* TLS v1.1 */
-#define SSL_PROTOCOL_VERSION_MAX    0x32   /* TLS v1.1 */
-#define SSL_PROTOCOL_VERSION1_1     0x32   /* TLS v1.1 */
+#define SSL_PROTOCOL_VERSION_MAX    0x33   /* TLS v1.2 */
+#define SSL_PROTOCOL_VERSION_TLS1_1 0x32   /* TLS v1.1 */
+#define SSL_PROTOCOL_VERSION_TLS1_2 0x33   /* TLS v1.2 */
 #define SSL_RANDOM_SIZE             32
 #define SSL_SECRET_SIZE             48
 #define SSL_FINISHED_HASH_SIZE      12
@@ -80,7 +80,8 @@ extern "C" {
 #define RT_EXTRA                    1024
 #define BM_RECORD_OFFSET            5
 
-#define NUM_PROTOCOLS               2
+#define NUM_PROTOCOLS               4
+#define SIG_ALG_EXTENSION           0x0d
 
 #define PARANOIA_CHECK(A, B)        if (A < B) { \
     ret = SSL_ERROR_INVALID_HANDSHAKE; goto error; }
@@ -114,9 +115,9 @@ typedef struct
     uint8_t cipher;
     uint8_t key_size;
     uint8_t iv_size;
-    uint8_t key_block_size;
     uint8_t padding_size;
     uint8_t digest_size;
+    uint8_t key_block_size;
     hmac_func hmac;
     crypt_func encrypt;
     crypt_func decrypt;
@@ -147,11 +148,12 @@ typedef struct
 {
     MD5_CTX md5_ctx;
     SHA1_CTX sha1_ctx;
-    uint8_t final_finish_mac[SSL_FINISHED_HASH_SIZE];
-    uint8_t *key_block;
-    uint8_t master_secret[SSL_SECRET_SIZE];
+    SHA256_CTX sha256_ctx;
     uint8_t client_random[SSL_RANDOM_SIZE]; /* client's random sequence */
     uint8_t server_random[SSL_RANDOM_SIZE]; /* server's random sequence */
+    uint8_t final_finish_mac[128];
+    uint8_t master_secret[SSL_SECRET_SIZE];
+    uint8_t key_block[256];
     uint16_t bm_proc_index;
 } DISPOSABLE_CTX;
 
@@ -189,10 +191,10 @@ struct _SSL
     bool can_free_certificates;
 #endif
     uint8_t session_id[SSL_SESSION_ID_SIZE]; 
-    uint8_t client_mac[SHA1_SIZE];  /* for HMAC verification */
-    uint8_t server_mac[SHA1_SIZE];  /* for HMAC verification */
-    uint8_t read_sequence[8];       /* 64 bit sequence number */
-    uint8_t write_sequence[8];      /* 64 bit sequence number */
+    uint8_t client_mac[SHA256_SIZE];    /* for HMAC verification */
+    uint8_t server_mac[SHA256_SIZE];    /* for HMAC verification */
+    uint8_t read_sequence[8];           /* 64 bit sequence number */
+    uint8_t write_sequence[8];          /* 64 bit sequence number */
     uint8_t hmac_header[SSL_RECORD_SIZE];    /* rx hmac */
     char *host_name; /* Needed for the SNI support */
 };

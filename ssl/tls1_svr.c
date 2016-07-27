@@ -279,7 +279,7 @@ static int send_server_hello(SSL *ssl)
 
     buf[offset++] = 0;      /* cipher we are using */
     buf[offset++] = ssl->cipher;
-    buf[offset++] = 0;      /* no compression */
+    buf[offset++] = 0;      /* no compression and no extensions supported */
     buf[3] = offset - 4;    /* handshake size */
     return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, offset);
 }
