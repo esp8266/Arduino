@@ -591,8 +591,8 @@ void MDNSResponder::_parsePacket(){
         partsCollected |= 0x01;
         _conn_readS(hostName, answerRdlength); // Read rdata
         if(hostName[answerRdlength-2] & 0xc0){
-          memcpy(answerHostName, hostName, answerRdlength-2);
-          answerHostName[answerRdlength-2] = '\0';
+          memcpy(answerHostName, hostName+1, answerRdlength-3);
+          answerHostName[answerRdlength-3] = '\0';
         }
 #ifdef MDNS_DEBUG_RX
         Serial.printf("PTR %d ", answerRdlength);
