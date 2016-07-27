@@ -61,7 +61,7 @@ extern "C" {
 
 //#define MDNS_DEBUG_ERR
 //#define MDNS_DEBUG_TX
-//#define MDNS_DEBUG_RX
+#define MDNS_DEBUG_RX
 
 #define MDNS_NAME_REF   0xC000
 
@@ -495,9 +495,9 @@ void MDNSResponder::_parsePacket(){
 
     int numAnswers = packetHeader[3] + packetHeader[5];
     // Assume that the PTR answer always comes first and that it is always accompanied by a TXT, SRV, AAAA (optional) and A answer in the same packet.
-    if (numAnswers < 4 || numAnswers > 5) {
+    if (numAnswers < 4) {
 #ifdef MDNS_DEBUG_RX
-      Serial.println("Expected a packet with 4 or 5 answers, returning");
+      Serial.printf("Expected a packet with 4 or more answers, got %u\n", numAnswers);
 #endif
       _conn->flush();
       return;
@@ -529,13 +529,6 @@ void MDNSResponder::_parsePacket(){
       // Read name
       stringsRead = 0;
       do {
-        if(stringsRead > 3){
-#ifdef MDNS_DEBUG_RX
-          Serial.println("failed to read the response name");
-#endif
-          _conn->flush();
-          return;
-        }
         tmp8 = _conn_read8();
         if (tmp8 & 0xC0) { // Compressed pointer (not supported)
           tmp8 = _conn_read8();
@@ -543,6 +536,13 @@ void MDNSResponder::_parsePacket(){
         }
         if (tmp8 == 0x00) { // End of name
           break;
+        }
+        if(stringsRead > 3){
+#ifdef MDNS_DEBUG_RX
+          Serial.println("failed to read the response name");
+#endif
+          _conn->flush();
+          return;
         }
         _conn_readS(serviceName, tmp8);
         serviceName[tmp8] = '\0';
@@ -570,11 +570,15 @@ void MDNSResponder::_parsePacket(){
       uint16_t answerRdlength = _conn_read16(); // Read rdlength
 
       if(answerRdlength > 255){
+        if(answerType == MDNS_TYPE_TXT && answerRdlength < 1460){
+          while(--answerRdlength) _conn->read();
+        } else {
 #ifdef MDNS_DEBUG_RX
-        Serial.println("Data len too long!");
+        Serial.printf("Data len too long! %u\n", answerRdlength);
 #endif
-        _conn->flush();
-        return;
+          _conn->flush();
+          return;
+        }
       }
 
 #ifdef MDNS_DEBUG_RX
@@ -614,7 +618,9 @@ void MDNSResponder::_parsePacket(){
         // Read hostname
         tmp8 = _conn_read8();
         if (tmp8 & 0xC0) { // Compressed pointer (not supported)
+#ifdef MDNS_DEBUG_RX
           Serial.println("Skipping compressed pointer");
+#endif
           tmp8 = _conn_read8();
         }
         else {
@@ -674,6 +680,8 @@ void MDNSResponder::_parsePacket(){
         }
         answer->hostname = (char *)os_malloc(strlen(answerHostName) + 1);
         os_strcpy(answer->hostname, answerHostName);
+        _conn->flush();
+        return;
       }
     }
     
