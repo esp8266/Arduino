@@ -512,6 +512,8 @@ void MDNSResponder::_parsePacket(){
     uint8_t partsCollected = 0;
     uint8_t stringsRead = 0;
 
+    answerHostName[0] = '\0';
+
     // Clear answer list
     if (_newQuery) {
       int oldAnswers = _getNumAnswers();
@@ -588,6 +590,10 @@ void MDNSResponder::_parsePacket(){
       if (answerType == MDNS_TYPE_PTR) {
         partsCollected |= 0x01;
         _conn_readS(hostName, answerRdlength); // Read rdata
+        if(hostName[answerRdlength-2] & 0xc0){
+          memcpy(answerHostName, hostName, answerRdlength-2);
+          answerHostName[answerRdlength-2] = '\0';
+        }
 #ifdef MDNS_DEBUG_RX
         Serial.printf("PTR %d ", answerRdlength);
         for (int n = 0; n < answerRdlength; n++) {
