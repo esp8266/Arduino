@@ -61,7 +61,7 @@ extern "C" {
 
 //#define MDNS_DEBUG_ERR
 //#define MDNS_DEBUG_TX
-#define MDNS_DEBUG_RX
+//#define MDNS_DEBUG_RX
 
 #define MDNS_NAME_REF   0xC000
 
