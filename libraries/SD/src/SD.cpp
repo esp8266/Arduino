@@ -611,4 +611,6 @@ void File::rewindDirectory(void) {
     _file->rewind();
 }
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SD)
 SDClass SD;
+#endif

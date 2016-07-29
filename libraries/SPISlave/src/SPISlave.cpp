@@ -100,4 +100,6 @@ void SPISlaveClass::onStatusSent(SpiSlaveSentHandler cb)
     _status_sent_cb = cb;
 }
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPISLAVE)
 SPISlaveClass SPISlave;
+#endif

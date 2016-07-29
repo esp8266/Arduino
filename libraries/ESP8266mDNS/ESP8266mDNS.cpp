@@ -1046,4 +1046,6 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
  _conn->send();
 }
 
-MDNSResponder MDNS = MDNSResponder();
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
+MDNSResponder MDNS;
+#endif

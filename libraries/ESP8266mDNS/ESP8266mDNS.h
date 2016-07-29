@@ -131,6 +131,8 @@ private:
   void _restart();
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
 extern MDNSResponder MDNS;
+#endif
 
 #endif //ESP8266MDNS_H
