@@ -63,9 +63,7 @@ public:
   ~MDNSResponder();
   bool begin(const char* hostName);
   //for compatibility
-  bool begin(const char* hostName, IPAddress ip, uint32_t ttl=120){
-    return begin(hostName);
-  }
+  bool begin(const char* hostName, IPAddress ip, uint32_t ttl=120);
   void update();
 
   void addService(char *service, char *proto, uint16_t port);
@@ -116,8 +114,9 @@ private:
   bool _waitingForAnswers;
   WiFiEventHandler _disconnectedHandler;
   WiFiEventHandler _gotIPHandler;
-  
+  uint32_t _ip;
 
+  bool _begin(const char* hostName, uint32_t ip, uint32_t ttl);
   uint32_t _getOurIp();
   uint16_t _getServicePort(char *service, char *proto);
   MDNSTxt * _getServiceTxt(char *name, char *proto);

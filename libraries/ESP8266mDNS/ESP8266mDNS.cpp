@@ -142,26 +142,39 @@ MDNSResponder::~MDNSResponder() {
   _answers = 0;
 }
 
-bool MDNSResponder::begin(const char* hostname){
-  size_t n = strlen(hostname);
+bool MDNSResponder::begin(const char* hostName){
+  return _begin(hostName, 0, 120);
+}
+
+bool MDNSResponder::begin(const char* hostName, IPAddress ip, uint32_t ttl){
+  return _begin(hostName, ip, ttl);
+}
+
+bool MDNSResponder::_begin(const char *hostName, uint32_t ip, uint32_t ttl){
+  size_t n = strlen(hostName);
   if (n > 63) { // max size for a single label.
     return false;
   }
 
+  _ip = ip;
+
   // Copy in hostname characters as lowercase
-  _hostName = hostname;
+  _hostName = hostName;
   _hostName.toLowerCase();
 
   // If instance name is not already set copy hostname to instance name
-  if (_instanceName.equals("") ) _instanceName=hostname;
+  if (_instanceName.equals("") ) _instanceName=hostName;
 
-  _gotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& event){
-    _restart();
-  });
+  //only if the IP hasn't been set manually, use the events
+  if (ip == 0) {
+    _gotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& event){
+      _restart();
+    });
 
-  _disconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& event) {
-    _restart();
-  });
+    _disconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& event) {
+      _restart();
+    });
+  }
 
   return _listen();
 }
@@ -442,7 +455,11 @@ uint16_t MDNSResponder::_getServicePort(char *name, char *proto){
 
 uint32_t MDNSResponder::_getOurIp(){
   int mode = wifi_get_opmode();
-  if(mode & STATION_MODE){
+
+  //if has a manually set IP use this
+  if(_ip){
+    return _ip;
+  } else if(mode & STATION_MODE){
     struct ip_info staIpInfo;
     wifi_get_ip_info(STATION_IF, &staIpInfo);
     return staIpInfo.ip.addr;
