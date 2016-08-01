@@ -251,4 +251,6 @@ void TwoWire::onRequest( void (*function)(void) ){
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
-TwoWire Wire = TwoWire();
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_TWOWIRE)
+TwoWire Wire;
+#endif

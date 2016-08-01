@@ -64,6 +64,8 @@ public:
     void onStatusSent(SpiSlaveSentHandler cb);
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPISLAVE)
 extern SPISlaveClass SPISlave;
+#endif
 
 #endif

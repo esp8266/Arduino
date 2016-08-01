@@ -261,5 +261,8 @@ void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip_addr *
     reinterpret_cast<ESP8266NetBIOS*>(arg)->_recv(upcb, p, addr, port);
 }
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_NETBIOS)
 ESP8266NetBIOS NBNS;
+#endif
+
 // EOF
