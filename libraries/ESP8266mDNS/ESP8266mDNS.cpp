@@ -639,7 +639,7 @@ void MDNSResponder::_parsePacket(){
         else {
           answer = _answers;
           while (answer->next != 0) {
-            answer = _answers->next;
+            answer = answer->next;
           }
           answer->next = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
           answer = answer->next;
