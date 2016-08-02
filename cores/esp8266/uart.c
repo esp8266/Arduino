@@ -127,39 +127,21 @@ void ICACHE_RAM_ATTR uart_isr(void * arg)
 {
     uart_t* uart = (uart_t*)arg;
     if(uart == NULL || !uart->rx_enabled) {
-        USIC(uart->uart_nr) = 0xffff;
+        USIC(uart->uart_nr) = USIS(uart->uart_nr);
         ETS_UART_INTR_DISABLE();
         return;
     }
-
-    uint32_t int_status = USIS(uart->uart_nr);
-
-    if(int_status & (1 << UIFR)) {
-        USIC(uart->uart_nr) = (1 << UIFR);//clear any frame error
-    }
-
-    if(int_status & (1 << UIFF) || int_status & (1 << UITO)){
-        ETS_UART_INTR_DISABLE();
-        while(((USS(uart->uart_nr) >> USRXC) & 0x7F) != 0){
+    if(USIS(uart->uart_nr) & ((1 << UIFF) | (1 << UITO))){
+        while((USS(uart->uart_nr) >> USRXC) & 0x7F){
             uint8_t data = USF(uart->uart_nr);
             size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
             if(nextPos != uart->rx_buffer->rpos) {
                 uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
                 uart->rx_buffer->wpos = nextPos;
-            } else {
-                //rx buffer OverFlow
-                //maybe stop the loop and try later?
             }
         }
-        int_status = USIS(uart->uart_nr);
-        if(int_status & (1 << UIFF)) {
-            USIC(uart->uart_nr) = (1 << UIFF);//clear any FIFO FULL error
-        }
-        if(int_status & (1 << UITO)) {
-            USIC(uart->uart_nr) = (1 << UITO);//clear any TimeOut error
-        }
-        ETS_UART_INTR_ENABLE();
     }
+    USIC(uart->uart_nr) = USIS(uart->uart_nr);
 }
 
 void uart_start_isr(uart_t* uart)

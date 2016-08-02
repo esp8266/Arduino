@@ -142,26 +142,39 @@ MDNSResponder::~MDNSResponder() {
   _answers = 0;
 }
 
-bool MDNSResponder::begin(const char* hostname){
-  size_t n = strlen(hostname);
+bool MDNSResponder::begin(const char* hostName){
+  return _begin(hostName, 0, 120);
+}
+
+bool MDNSResponder::begin(const char* hostName, IPAddress ip, uint32_t ttl){
+  return _begin(hostName, ip, ttl);
+}
+
+bool MDNSResponder::_begin(const char *hostName, uint32_t ip, uint32_t ttl){
+  size_t n = strlen(hostName);
   if (n > 63) { // max size for a single label.
     return false;
   }
 
+  _ip = ip;
+
   // Copy in hostname characters as lowercase
-  _hostName = hostname;
+  _hostName = hostName;
   _hostName.toLowerCase();
 
   // If instance name is not already set copy hostname to instance name
-  if (_instanceName.equals("") ) _instanceName=hostname;
+  if (_instanceName.equals("") ) _instanceName=hostName;
 
-  _gotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& event){
-    _restart();
-  });
+  //only if the IP hasn't been set manually, use the events
+  if (ip == 0) {
+    _gotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& event){
+      _restart();
+    });
 
-  _disconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& event) {
-    _restart();
-  });
+    _disconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& event) {
+      _restart();
+    });
+  }
 
   return _listen();
 }
@@ -442,7 +455,11 @@ uint16_t MDNSResponder::_getServicePort(char *name, char *proto){
 
 uint32_t MDNSResponder::_getOurIp(){
   int mode = wifi_get_opmode();
-  if(mode & STATION_MODE){
+
+  //if has a manually set IP use this
+  if(_ip){
+    return _ip;
+  } else if(mode & STATION_MODE){
     struct ip_info staIpInfo;
     wifi_get_ip_info(STATION_IF, &staIpInfo);
     return staIpInfo.ip.addr;
@@ -493,11 +510,11 @@ void MDNSResponder::_parsePacket(){
       return;
     }
 
-    int numAnswers = packetHeader[3];
+    int numAnswers = packetHeader[3] + packetHeader[5];
     // Assume that the PTR answer always comes first and that it is always accompanied by a TXT, SRV, AAAA (optional) and A answer in the same packet.
     if (numAnswers < 4) {
 #ifdef MDNS_DEBUG_RX
-      Serial.println("Expected a packet with 4 answers, returning");
+      Serial.printf("Expected a packet with 4 or more answers, got %u\n", numAnswers);
 #endif
       _conn->flush();
       return;
@@ -510,11 +527,14 @@ void MDNSResponder::_parsePacket(){
     bool serviceMatch = false;
     MDNSAnswer *answer;
     uint8_t partsCollected = 0;
+    uint8_t stringsRead = 0;
+
+    answerHostName[0] = '\0';
 
     // Clear answer list
     if (_newQuery) {
-      int numAnswers = _getNumAnswers();
-      for (int n = numAnswers - 1; n >= 0; n--) {
+      int oldAnswers = _getNumAnswers();
+      for (int n = oldAnswers - 1; n >= 0; n--) {
         answer = _getAnswerFromIdx(n);
         os_free(answer->hostname);
         os_free(answer);
@@ -526,21 +546,29 @@ void MDNSResponder::_parsePacket(){
 
     while (numAnswers--) {
       // Read name
+      stringsRead = 0;
       do {
         tmp8 = _conn_read8();
         if (tmp8 & 0xC0) { // Compressed pointer (not supported)
           tmp8 = _conn_read8();
           break;
         }
-        if (tmp8 == 0x00) { // Énd of name
+        if (tmp8 == 0x00) { // End of name
           break;
+        }
+        if(stringsRead > 3){
+#ifdef MDNS_DEBUG_RX
+          Serial.println("failed to read the response name");
+#endif
+          _conn->flush();
+          return;
         }
         _conn_readS(serviceName, tmp8);
         serviceName[tmp8] = '\0';
 #ifdef MDNS_DEBUG_RX
         Serial.printf(" %d ", tmp8);
         for (int n = 0; n < tmp8; n++) {
-          Serial.printf("%02x ", serviceName[n]);
+          Serial.printf("%c", serviceName[n]);
         }
         Serial.println();
 #endif
@@ -552,12 +580,25 @@ void MDNSResponder::_parsePacket(){
 #endif
           }
         }
+        stringsRead++;
       } while (true);
 
       uint16_t answerType = _conn_read16(); // Read type
       uint16_t answerClass = _conn_read16(); // Read class
       uint32_t answerTtl = _conn_read32(); // Read ttl
       uint16_t answerRdlength = _conn_read16(); // Read rdlength
+
+      if(answerRdlength > 255){
+        if(answerType == MDNS_TYPE_TXT && answerRdlength < 1460){
+          while(--answerRdlength) _conn->read();
+        } else {
+#ifdef MDNS_DEBUG_RX
+        Serial.printf("Data len too long! %u\n", answerRdlength);
+#endif
+          _conn->flush();
+          return;
+        }
+      }
 
 #ifdef MDNS_DEBUG_RX
       Serial.printf("type: %04x rdlength: %d\n", answerType, answerRdlength);
@@ -566,9 +607,14 @@ void MDNSResponder::_parsePacket(){
       if (answerType == MDNS_TYPE_PTR) {
         partsCollected |= 0x01;
         _conn_readS(hostName, answerRdlength); // Read rdata
+        if(hostName[answerRdlength-2] & 0xc0){
+          memcpy(answerHostName, hostName+1, answerRdlength-3);
+          answerHostName[answerRdlength-3] = '\0';
+        }
 #ifdef MDNS_DEBUG_RX
+        Serial.printf("PTR %d ", answerRdlength);
         for (int n = 0; n < answerRdlength; n++) {
-          Serial.printf("%02x ", hostName[n]);
+          Serial.printf("%c", hostName[n]);
         }
         Serial.println();
 #endif
@@ -578,8 +624,9 @@ void MDNSResponder::_parsePacket(){
         partsCollected |= 0x02;
         _conn_readS(hostName, answerRdlength); // Read rdata
 #ifdef MDNS_DEBUG_RX
+        Serial.printf("TXT %d ", answerRdlength);
         for (int n = 0; n < answerRdlength; n++) {
-          Serial.printf("%02x ", hostName[n]);
+          Serial.printf("%c", hostName[n]);
         }
         Serial.println();
 #endif
@@ -594,14 +641,16 @@ void MDNSResponder::_parsePacket(){
         // Read hostname
         tmp8 = _conn_read8();
         if (tmp8 & 0xC0) { // Compressed pointer (not supported)
+#ifdef MDNS_DEBUG_RX
           Serial.println("Skipping compressed pointer");
+#endif
           tmp8 = _conn_read8();
         }
         else {
           _conn_readS(answerHostName, tmp8);
           answerHostName[tmp8] = '\0';
 #ifdef MDNS_DEBUG_RX
-          Serial.printf(" %d ", tmp8);
+          Serial.printf("SRV %d ", tmp8);
           for (int n = 0; n < tmp8; n++) {
             Serial.printf("%02x ", answerHostName[n]);
           }
@@ -621,7 +670,7 @@ void MDNSResponder::_parsePacket(){
       }
       else {
 #ifdef MDNS_DEBUG_RX
-          Serial.printf("Ignoring unsupported type %d\n", tmp8);
+          Serial.printf("Ignoring unsupported type %02x\n", tmp8);
 #endif
           for (int n = 0; n < answerRdlength; n++)
 		(void)_conn_read8();
@@ -639,7 +688,7 @@ void MDNSResponder::_parsePacket(){
         else {
           answer = _answers;
           while (answer->next != 0) {
-            answer = _answers->next;
+            answer = answer->next;
           }
           answer->next = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
           answer = answer->next;
@@ -654,6 +703,8 @@ void MDNSResponder::_parsePacket(){
         }
         answer->hostname = (char *)os_malloc(strlen(answerHostName) + 1);
         os_strcpy(answer->hostname, answerHostName);
+        _conn->flush();
+        return;
       }
     }
     
@@ -663,7 +714,7 @@ void MDNSResponder::_parsePacket(){
 
   // PARSE REQUEST NAME
 
-  hostNameLen = _conn_read8();
+  hostNameLen = _conn_read8() % 255;
   _conn_readS(hostName, hostNameLen);
   hostName[hostNameLen] = '\0';
 
@@ -685,7 +736,7 @@ void MDNSResponder::_parsePacket(){
   }
 
   if(!serviceParsed){
-    serviceNameLen = _conn_read8();
+    serviceNameLen = _conn_read8() % 255;
     _conn_readS(serviceName, serviceNameLen);
     serviceName[serviceNameLen] = '\0';
 
@@ -718,7 +769,7 @@ void MDNSResponder::_parsePacket(){
   }
 
   if(!protoParsed){
-    protoNameLen = _conn_read8();
+    protoNameLen = _conn_read8() % 255;
     _conn_readS(protoName, protoNameLen);
     protoName[protoNameLen] = '\0';
     if(protoNameLen == 4 && protoName[0] == '_'){
@@ -740,7 +791,7 @@ void MDNSResponder::_parsePacket(){
 
   if(!localParsed){
     char localName[32];
-    uint8_t localNameLen = _conn_read8();
+    uint8_t localNameLen = _conn_read8() % 31;
     _conn_readS(localName, localNameLen);
     localName[localNameLen] = '\0';
     tmp = _conn_read8();
@@ -1046,4 +1097,6 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
  _conn->send();
 }
 
-MDNSResponder MDNS = MDNSResponder();
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
+MDNSResponder MDNS;
+#endif
