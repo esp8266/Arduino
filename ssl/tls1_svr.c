@@ -165,15 +165,17 @@ static int process_client_hello(SSL *ssl)
             if (ssl_prot_prefs[j] == buf[offset+i])   /* got a match? */
             {
                 ssl->cipher = ssl_prot_prefs[j];
-                goto do_state;
+                goto do_extensions;
             }
         }
     }
 
     /* ouch! protocol is not supported */
-    ret = SSL_ERROR_NO_CIPHER;
+    return SSL_ERROR_NO_CIPHER;
 
-do_state:
+do_extensions:
+    PARANOIA_CHECK(pkt_size, offset);
+
 error:
     return ret;
 }
@@ -338,10 +340,6 @@ static int process_client_key_xchg(SSL *ssl)
         /* and continue - will die eventually when checking the mac */
     }
 
-#if 0
-    print_blob("pre-master", premaster_secret, SSL_SECRET_SIZE);
-#endif
-
     generate_master_secret(ssl, premaster_secret);
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
@@ -377,7 +375,7 @@ static int process_cert_verify(SSL *ssl)
     uint8_t *buf = &ssl->bm_data[ssl->dc->bm_proc_index];
     int pkt_size = ssl->bm_index;
     uint8_t dgst_buf[MAX_KEY_BYTE_SIZE];
-    uint8_t dgst[MD5_SIZE+SHA1_SIZE];
+    uint8_t dgst[128];
     X509_CTX *x509_ctx = ssl->x509_ctx;
     int ret = SSL_OK;
     int n;
@@ -390,16 +388,33 @@ static int process_cert_verify(SSL *ssl)
     n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[6], dgst_buf, sizeof(dgst_buf), 0);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
-    if (n != SHA1_SIZE + MD5_SIZE)
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
     {
-        ret = SSL_ERROR_INVALID_KEY;
-        goto end_cert_vfy;
-    }
+        if (n != SHA256_SIZE)
+        {
+            ret = SSL_ERROR_INVALID_KEY;
+            goto end_cert_vfy;
+        }
 
-    finished_digest(ssl, NULL, dgst);       /* calculate the digest */
-    if (memcmp(dgst_buf, dgst, MD5_SIZE + SHA1_SIZE))
+        finished_digest(ssl, NULL, dgst);       /* calculate the digest */
+        if (memcmp(dgst_buf, dgst, SHA256_SIZE))
+        {
+            ret = SSL_ERROR_INVALID_KEY;
+        }
+    }
+    else // TLS1.0/1.1
     {
-        ret = SSL_ERROR_INVALID_KEY;
+        if (n != SHA1_SIZE + MD5_SIZE)
+        {
+            ret = SSL_ERROR_INVALID_KEY;
+            goto end_cert_vfy;
+        }
+
+        finished_digest(ssl, NULL, dgst);       /* calculate the digest */
+        if (memcmp(dgst_buf, dgst, MD5_SIZE + SHA1_SIZE))
+        {
+            ret = SSL_ERROR_INVALID_KEY;
+        }
     }
 
 end_cert_vfy:

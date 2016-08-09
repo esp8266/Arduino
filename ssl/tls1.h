@@ -81,7 +81,15 @@ extern "C" {
 #define BM_RECORD_OFFSET            5
 
 #define NUM_PROTOCOLS               4
+
 #define SIG_ALG_EXTENSION           0x0d
+#define SIG_ALG_MD5                 1
+#define SIG_ALG_SHA1                2
+#define SIG_ALG_SHA224              3
+#define SIG_ALG_SHA256              4
+#define SIG_ALG_SHA384              5
+#define SIG_ALG_SHA512              6
+#define SIG_ALG_RSA                 1
 
 #define PARANOIA_CHECK(A, B)        if (A < B) { \
     ret = SSL_ERROR_INVALID_HANDSHAKE; goto error; }
@@ -155,6 +163,7 @@ typedef struct
     uint8_t master_secret[SSL_SECRET_SIZE];
     uint8_t key_block[256];
     uint16_t bm_proc_index;
+    uint8_t key_block_generated;
 } DISPOSABLE_CTX;
 
 struct _SSL
@@ -245,7 +254,7 @@ int send_finished(SSL *ssl);
 int send_certificate(SSL *ssl);
 int basic_read(SSL *ssl, uint8_t **in_data);
 int send_change_cipher_spec(SSL *ssl);
-void finished_digest(SSL *ssl, const char *label, uint8_t *digest);
+int finished_digest(SSL *ssl, const char *label, uint8_t *digest);
 void generate_master_secret(SSL *ssl, const uint8_t *premaster_secret);
 void add_packet(SSL *ssl, const uint8_t *pkt, int len);
 int add_cert(SSL_CTX *ssl_ctx, const uint8_t *buf, int len);

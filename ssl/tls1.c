@@ -69,7 +69,7 @@ const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] =
 #elif CONFIG_SSL_PROT_MEDIUM                /* medium security, medium speed */
 { SSL_AES128_SHA256, SSL_AES256_SHA256, SSL_AES256_SHA, SSL_AES128_SHA };    
 #else /* CONFIG_SSL_PROT_HIGH */            /* high security, low speed */
-{ SSL_AES256_SHA, SSL_AES128_SHA256, SSL_AES_256_SHA, SSL_AES128_SHA };
+{ SSL_AES256_SHA256, SSL_AES128_SHA256, SSL_AES256_SHA, SSL_AES128_SHA };
 #endif
 
 /**
@@ -640,7 +640,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
     int hmac_len = buf_len + 8 + SSL_RECORD_SIZE;
-    uint8_t *t_buf = (uint8_t *)alloca(buf_len);
+    uint8_t *t_buf = (uint8_t *)alloca(buf_len+100);
 
     memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ? 
                     ssl->write_sequence : ssl->read_sequence, 8);
@@ -683,7 +683,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
  */
 static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
 {   
-    uint8_t hmac_buf[SHA256_SIZE];
+    uint8_t hmac_buf[128];
     int hmac_offset;
    
     if (ssl->cipher_info->padding_size)
@@ -738,12 +738,22 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
  */
 void add_packet(SSL *ssl, const uint8_t *pkt, int len)
 {
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    // TLS1.2
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2 || ssl->version == 0) 
     {
         SHA256_Update(&ssl->dc->sha256_ctx, pkt, len);
+#if 0
+uint8_t buf[128];
+SHA256_CTX sha256_ctx = ssl->dc->sha256_ctx; // interim copy
+SHA256_Final(buf, &sha256_ctx);
+print_blob("handshake", buf, 8);
+#endif
+
     }
-    else // TLS1.0/1.0
+
+    if (ssl->version < SSL_PROTOCOL_VERSION_TLS1_2 || ssl->version == 0)
     {
+        uint8_t q[128]; 
         MD5_Update(&ssl->dc->md5_ctx, pkt, len);
         SHA1_Update(&ssl->dc->sha1_ctx, pkt, len);
     }
@@ -870,7 +880,7 @@ static void prf(SSL *ssl, const uint8_t *sec, int sec_len,
  */
 void generate_master_secret(SSL *ssl, const uint8_t *premaster_secret)
 {
-    uint8_t buf[128];   /* needs to be > 13+32+32 in size */
+    uint8_t buf[128]; 
     //print_blob("premaster secret", premaster_secret, 48);
     strcpy((char *)buf, "master secret");
     memcpy(&buf[13], ssl->dc->client_random, SSL_RANDOM_SIZE);
@@ -903,10 +913,11 @@ static void generate_key_block(SSL *ssl,
  * Calculate the digest used in the finished message. This function also
  * doubles up as a certificate verify function.
  */
-void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
+int finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 {
     uint8_t mac_buf[128]; 
     uint8_t *q = mac_buf;
+    int dgst_len;
 
     if (label)
     {
@@ -919,17 +930,7 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
         SHA256_CTX sha256_ctx = ssl->dc->sha256_ctx; // interim copy
         SHA256_Final(q, &sha256_ctx);
         q += SHA256_SIZE;
-
-        if (label)
-        {
-            prf(ssl, ssl->dc->master_secret, SSL_SECRET_SIZE, 
-                    mac_buf, (int)(q-mac_buf), digest,
-                    SSL_FINISHED_HASH_SIZE);
-        }
-        else    // for use in a certificate verify
-        {
-            memcpy(digest, mac_buf, SHA256_SIZE);
-        }
+        dgst_len = (int)(q-mac_buf);
     }
     else // TLS1.0/1.1
     {
@@ -941,23 +942,26 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
         
         SHA1_Final(q, &sha1_ctx);
         q += SHA1_SIZE;
+        dgst_len = (int)(q-mac_buf);
+    }
 
-        if (label)
-        {
-            prf(ssl, ssl->dc->master_secret, SSL_SECRET_SIZE, 
-                    mac_buf, (int)(q-mac_buf), digest, SSL_FINISHED_HASH_SIZE);
-        }
-        else    /* for use in a certificate verify */
-        {
-            memcpy(digest, mac_buf, MD5_SIZE + SHA1_SIZE);
-        }
+    if (label)
+    {
+        prf(ssl, ssl->dc->master_secret, SSL_SECRET_SIZE, 
+                mac_buf, dgst_len, digest, SSL_FINISHED_HASH_SIZE);
+    }
+    else    /* for use in a certificate verify */
+    {
+        memcpy(digest, mac_buf, dgst_len);
     }
 
 #if 0
     printf("label: %s\n", label);
-    print_blob("mac_buf", mac_buf, q-mac_buf);
+    print_blob("mac_buf", mac_buf, dgst_len);
     print_blob("finished digest", digest, SSL_FINISHED_HASH_SIZE);
 #endif
+
+    return dgst_len;
 }   
     
 /**
@@ -1190,19 +1194,18 @@ static int set_key_block(SSL *ssl, int is_write)
         return -1;
 
     /* only do once in a handshake */
-    if (ssl->dc->bm_proc_index ==0 )
+    if (!ssl->dc->key_block_generated)
     {
-#if 0
-        print_blob("client", ssl->dc->client_random, 32);
-        print_blob("server", ssl->dc->server_random, 32);
-        print_blob("master", ssl->dc->master_secret, SSL_SECRET_SIZE);
-#endif
         generate_key_block(ssl, ssl->dc->client_random, ssl->dc->server_random,
             ssl->dc->master_secret, ssl->dc->key_block, 
             ciph_info->key_block_size);
 #if 0
+        print_blob("master", ssl->dc->master_secret, SSL_SECRET_SIZE);
         print_blob("keyblock", ssl->dc->key_block, ciph_info->key_block_size);
+        print_blob("client random", ssl->dc->client_random, 32);
+        print_blob("server random", ssl->dc->server_random, 32);
 #endif
+        ssl->dc->key_block_generated = 1;
     }
 
     q = ssl->dc->key_block;
@@ -1229,6 +1232,12 @@ static int set_key_block(SSL *ssl, int is_write)
     q += ciph_info->iv_size;
     memcpy(server_iv, q, ciph_info->iv_size);
     q += ciph_info->iv_size;
+#if 0
+        print_blob("client key", client_key, ciph_info->key_size);
+        print_blob("server key", server_key, ciph_info->key_size);
+        print_blob("client iv", client_iv, ciph_info->iv_size);
+        print_blob("server iv", server_iv, ciph_info->iv_size);
+#endif
 
     // free(is_write ? ssl->encrypt_ctx : ssl->decrypt_ctx);
 
@@ -2284,6 +2293,10 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code)
 
     printf("\n");
 }
+
+/**
+ * Debugging routine to display alerts.
+ */
 
 /**
  * Debugging routine to display alerts.

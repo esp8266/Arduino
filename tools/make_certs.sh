@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2007, Cameron Rich
+# Copyright (c) 2007-2016, Cameron Rich
 #
 # All rights reserved.
 #
@@ -69,7 +69,7 @@ prompt                 = no
 EOF
 
 # private key generation
-openssl genrsa -out axTLS.ca_key.pem 1024
+openssl genrsa -out axTLS.ca_key.pem 2048
 openssl genrsa -out axTLS.key_512.pem 512
 openssl genrsa -out axTLS.key_1024.pem 1024
 openssl genrsa -out axTLS.key_1042.pem 1042
@@ -121,10 +121,10 @@ openssl x509 -req -in axTLS.x509_1042.req -out axTLS.x509_1042.pem \
             -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_2048.req -out axTLS.x509_2048.pem \
-            -md5 -CAcreateserial -days 5000 \
+            -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_4096.req -out axTLS.x509_4096.pem \
-            -md5 -CAcreateserial -days 5000 \
+            -sha256 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_device.req -out axTLS.x509_device.pem \
             -sha1 -CAcreateserial -days 5000 \
