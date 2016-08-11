@@ -100,6 +100,7 @@ extern "C" {
 #define SSL_ERROR_UNSUPPORTED_EXTENSION         -264
 #define SSL_ERROR_INVALID_SESSION               -265
 #define SSL_ERROR_NO_CIPHER                     -266
+#define SSL_ERROR_INVALID_CERT_HASH_ALG         -267
 #define SSL_ERROR_BAD_CERTIFICATE               -268
 #define SSL_ERROR_INVALID_KEY                   -269
 #define SSL_ERROR_FINISHED_INVALID              -271

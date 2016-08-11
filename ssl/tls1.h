@@ -82,10 +82,9 @@ extern "C" {
 
 #define NUM_PROTOCOLS               4
 
+#define MAX_SIG_ALGORITHMS          4
 #define SIG_ALG_EXTENSION           0x0d
-#define SIG_ALG_MD5                 1
 #define SIG_ALG_SHA1                2
-#define SIG_ALG_SHA224              3
 #define SIG_ALG_SHA256              4
 #define SIG_ALG_SHA384              5
 #define SIG_ALG_SHA512              6
@@ -150,6 +149,7 @@ typedef struct
 {
     uint8_t *buf;
     int size;
+    uint8_t hash_alg;
 } SSL_CERT;
 
 typedef struct
@@ -188,6 +188,8 @@ struct _SSL
     uint16_t bm_index;
     uint16_t bm_read_index;
     size_t max_plain_length;
+    uint8_t sig_algs[MAX_SIG_ALGORITHMS];
+    uint8_t num_sig_algs;
     struct _SSL *next;                  /* doubly linked list */
     struct _SSL *prev;
     struct _SSL_CTX *ssl_ctx;           /* back reference to a clnt/svr ctx */

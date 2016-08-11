@@ -524,9 +524,6 @@ void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx)
     printf("Sig Type:\t\t\t");
     switch (cert->sig_type)
     {
-        case SIG_TYPE_MD2:
-            printf("MD2\n");
-            break;
         case SIG_TYPE_MD5:
             printf("MD5\n");
             break;

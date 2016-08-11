@@ -38,9 +38,15 @@
 #ifdef CONFIG_SSL_ENABLE_CLIENT        /* all commented out if no client */
 
 /* support sha512/384/256/1 rsa */
-static const uint8_t g_sig_alg[] = { 0x00, 0x08, 
-                0x00, SIG_ALG_EXTENSION, 0x00, 0x04, 0x00, 0x02,
-                SIG_ALG_SHA256, SIG_ALG_RSA };
+static const uint8_t g_sig_alg[] = { 
+                0x00, 0x0e, 
+                0x00, SIG_ALG_EXTENSION, 
+                0x00, 0x0a, 0x00, 0x08,
+                SIG_ALG_SHA256, SIG_ALG_RSA,
+                SIG_ALG_SHA512, SIG_ALG_RSA,
+                SIG_ALG_SHA384, SIG_ALG_RSA,
+                SIG_ALG_SHA1, SIG_ALG_RSA 
+};
 
 static const uint8_t g_asn1_sha256[] = 
 { 
@@ -238,7 +244,8 @@ static int send_client_hello(SSL *ssl)
     buf[offset++] = 1;              /* no compression */
     buf[offset++] = 0;
 
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    /* send the signature algorithm extension for TLS 1.2+ */
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) 
     {
         memcpy(&buf[offset], g_sig_alg, sizeof(g_sig_alg));
         offset += sizeof(g_sig_alg);
@@ -371,17 +378,47 @@ static int process_cert_req(SSL *ssl)
 {
     uint8_t *buf = &ssl->bm_data[ssl->dc->bm_proc_index];
     int ret = SSL_OK;
-    int offset = (buf[2] << 4) + buf[3];
+    int cert_req_size = (buf[2]<<8) + buf[3];
+    int offset = 4;
     int pkt_size = ssl->bm_index;
+    uint8_t cert_type_len, sig_alg_len;
+
+    PARANOIA_CHECK(pkt_size, offset + cert_req_size);
+    ssl->dc->bm_proc_index = cert_req_size;
 
     /* don't do any processing - we will send back an RSA certificate anyway */
     ssl->next_state = HS_SERVER_HELLO_DONE;
     SET_SSL_FLAG(SSL_HAS_CERT_REQ);
-    ssl->dc->bm_proc_index += offset;
-    PARANOIA_CHECK(pkt_size, offset);
 
-    // don't care about sig/hash algorithm, let server take care of that
-    // (only SHA256/RSA supported)
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    {
+        // supported certificate types
+        cert_type_len = buf[offset++];
+        PARANOIA_CHECK(pkt_size, offset + cert_type_len);
+        offset += cert_type_len;
+        
+        // supported signature algorithms
+        sig_alg_len = buf[offset++] << 8;
+        sig_alg_len += buf[offset++];
+        PARANOIA_CHECK(pkt_size, offset + sig_alg_len);
+        
+        while (sig_alg_len > 0)
+        {
+            uint8_t hash_alg = buf[offset++];
+            uint8_t sig_alg = buf[offset++];
+            sig_alg_len -= 2;
+
+            if (sig_alg == SIG_ALG_RSA && 
+                    (hash_alg == SIG_ALG_SHA1 ||
+                     hash_alg == SIG_ALG_SHA256 ||
+                     hash_alg == SIG_ALG_SHA384 ||
+                     hash_alg == SIG_ALG_SHA512))
+            {
+                ssl->sig_algs[ssl->num_sig_algs++] = hash_alg;
+            }
+        }
+    }
+
 error:
     return ret;
 }

@@ -125,7 +125,6 @@ const char * x509_display_error(int error);
 #define ASN1_EXPLICIT_TAG       0xa0
 #define ASN1_V3_DATA			0xa3
 
-#define SIG_TYPE_MD2            0x02
 #define SIG_TYPE_MD5            0x04
 #define SIG_TYPE_SHA1           0x05
 #define SIG_TYPE_SHA256         0x0b

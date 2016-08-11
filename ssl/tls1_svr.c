@@ -35,6 +35,11 @@
 #include "ssl.h"
 
 static const uint8_t g_hello_done[] = { HS_SERVER_HELLO_DONE, 0, 0, 0 };
+static const uint8_t g_asn1_sha256[] = 
+{ 
+    0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 
+    0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20
+};
 
 static int process_client_hello(SSL *ssl);
 static int send_server_hello_sequence(SSL *ssl);
@@ -154,7 +159,7 @@ static int process_client_hello(SSL *ssl)
     cs_len = (buf[offset]<<8) + buf[offset+1];
     offset += 3;        /* add 1 due to all cipher suites being 8 bit */
 
-    PARANOIA_CHECK(pkt_size, offset);
+    PARANOIA_CHECK(pkt_size, offset + cs_len);
 
     /* work out what cipher suite we are going to use - client defines 
        the preference */
@@ -165,7 +170,7 @@ static int process_client_hello(SSL *ssl)
             if (ssl_prot_prefs[j] == buf[offset+i])   /* got a match? */
             {
                 ssl->cipher = ssl_prot_prefs[j];
-                goto do_extensions;
+                goto do_compression;
             }
         }
     }
@@ -173,8 +178,57 @@ static int process_client_hello(SSL *ssl)
     /* ouch! protocol is not supported */
     return SSL_ERROR_NO_CIPHER;
 
-do_extensions:
-    PARANOIA_CHECK(pkt_size, offset);
+    /* completely ignore compression */
+do_compression:
+    offset += cs_len;
+    id_len = buf[offset++];
+    offset += id_len;
+    PARANOIA_CHECK(pkt_size, offset + id_len);
+
+    /* extension size */
+    id_len = buf[offset++] << 8;
+    id_len += buf[offset++];
+    PARANOIA_CHECK(pkt_size, offset + id_len);
+    
+    // Check for extensions from the client - only the signature algorithm
+    // is supported
+    while (offset < pkt_size) 
+    {
+        int ext = buf[offset++] << 8;
+        ext += buf[offset++];
+        int ext_len = buf[offset++] << 8;
+        ext_len += buf[offset++];
+        PARANOIA_CHECK(pkt_size, offset + ext_len);
+        
+        if (ext == SIG_ALG_EXTENSION)
+        {
+            while (ext_len > 0)
+            {
+                uint8_t hash_alg = buf[offset++];
+                uint8_t sig_alg = buf[offset++];
+                ext_len -= 2;
+
+                if (sig_alg == SIG_ALG_RSA && 
+                        (hash_alg == SIG_ALG_SHA1 ||
+                         hash_alg == SIG_ALG_SHA256 ||
+                         hash_alg == SIG_ALG_SHA384 ||
+                         hash_alg == SIG_ALG_SHA512))
+                {
+                    ssl->sig_algs[ssl->num_sig_algs++] = hash_alg;
+                }
+            }
+        }
+        else
+        {
+            offset += ext_len;
+        }
+    }
+
+    /* default is RSA/SHA1 */
+    if (ssl->num_sig_algs == 0)
+    {
+        ssl->sig_algs[ssl->num_sig_algs++] = SIG_ALG_SHA1;
+    }
 
 error:
     return ret;
@@ -355,7 +409,16 @@ error:
 }
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-static const uint8_t g_cert_request[] = { HS_CERT_REQ, 0, 0, 4, 1, 0, 0, 0 };
+static const uint8_t g_cert_request[] = { HS_CERT_REQ, 0, 
+                0, 0x0e, 
+                1, 1, // rsa sign 
+                0x00, 0x08,
+                SIG_ALG_SHA256, SIG_ALG_RSA,
+                SIG_ALG_SHA512, SIG_ALG_RSA,
+                SIG_ALG_SHA384, SIG_ALG_RSA,
+                SIG_ALG_SHA1, SIG_ALG_RSA,
+                0, 0
+};
 
 /*
  * Send the certificate request message.
@@ -378,28 +441,47 @@ static int process_cert_verify(SSL *ssl)
     uint8_t dgst[128];
     X509_CTX *x509_ctx = ssl->x509_ctx;
     int ret = SSL_OK;
+    int offset = 6;
+    uint8_t hash_alg;
+    uint8_t sig_alg;
+    int rsa_len;
     int n;
 
-    PARANOIA_CHECK(pkt_size, x509_ctx->rsa_ctx->num_octets+6);
     DISPLAY_RSA(ssl, x509_ctx->rsa_ctx);
+
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    {
+        hash_alg = buf[4];
+        sig_alg = buf[5];
+        offset = 8;
+        rsa_len = (buf[6] << 8) + buf[7];
+    }
+    else
+    {
+        rsa_len = (buf[4] << 8) + buf[5];
+    }
+
+    PARANOIA_CHECK(pkt_size, offset + rsa_len);
 
     /* rsa_ctx->bi_ctx is not thread-safe */
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[6], dgst_buf, sizeof(dgst_buf), 0);
+    n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[offset], dgst_buf, 
+                    sizeof(dgst_buf), 0);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
     {
-        if (n != SHA256_SIZE)
+        if (memcmp(dgst_buf, g_asn1_sha256, sizeof(g_asn1_sha256)))
         {
             ret = SSL_ERROR_INVALID_KEY;
-            goto end_cert_vfy;
+            goto error;
         }
 
         finished_digest(ssl, NULL, dgst);       /* calculate the digest */
-        if (memcmp(dgst_buf, dgst, SHA256_SIZE))
+        if (memcmp(&dgst_buf[sizeof(g_asn1_sha256)], dgst, SHA256_SIZE))
         {
             ret = SSL_ERROR_INVALID_KEY;
+            goto error;
         }
     }
     else // TLS1.0/1.1
