@@ -18,25 +18,9 @@ title: Libraries
 
 ## WiFi(ESP8266WiFi library)
 
-This is mostly similar to WiFi shield library. Differences include:
+The [Wi-Fi library for ESP8266](https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi) has been developed basing on [ESP8266 SDK](http://bbs.espressif.com/viewtopic.php?f=51&t=1023), using naming convention and overall functionality philosophy of [Arduino WiFi library](https://www.arduino.cc/en/Reference/WiFi). Over time the wealth Wi-Fi features ported from ESP9266 SDK to [esp8266 / Adruino](https://github.com/esp8266/Arduino) outgrow [Arduino WiFi library](https://www.arduino.cc/en/Reference/WiFi) and it became apparent that we need to provide separate documentation on what is new and extra.
 
-- `WiFi.mode(m)`: set mode to `WIFI_AP`, `WIFI_STA`, `WIFI_AP_STA` or `WIFI_OFF`.
-- call `WiFi.softAP(ssid)` to set up an open network
-- call `WiFi.softAP(ssid, password)` to set up a WPA2-PSK network (password should be at least 8 characters)
-- `WiFi.macAddress(mac)` is for STA, `WiFi.softAPmacAddress(mac)` is for AP.
-- `WiFi.localIP()` is for STA, `WiFi.softAPIP()` is for AP.
-- `WiFi.printDiag(Serial)` will print out some diagnostic info
-- `WiFiUDP` class supports sending and receiving multicast packets on STA interface.
-When sending a multicast packet, replace `udp.beginPacket(addr, port)` with
-`udp.beginPacketMulticast(addr, port, WiFi.localIP())`.
-When listening to multicast packets, replace `udp.begin(port)` with
-`udp.beginMulticast(WiFi.localIP(), multicast_ip_addr, port)`.
-You can use `udp.destinationIP()` to tell whether the packet received was
-sent to the multicast or unicast address.
-
-`WiFiServer`, `WiFiClient`, and `WiFiUDP` behave mostly the same way as with WiFi shield library.
-Four samples are provided for this library.
-You can see more commands here: [http://www.arduino.cc/en/Reference/WiFi](http://www.arduino.cc/en/Reference/WiFi)
+[ESP8266WiFi library documentation](esp8266wifi/readme.md) : [Quick Start](esp8266wifi/readme.md#quick-start) | [Who is Who](esp8266wifi/readme.md#who-is-who) | [Station](esp8266wifi/readme.md#station) | [Soft Access Point](esp8266wifi/readme.md#soft-access-point) | [Scan](esp8266wifi/readme.md#scan) | [Client](esp8266wifi/readme.md#client) | [Client Secure](esp8266wifi/readme.md#client-secure) | [Server](esp8266wifi/readme.md#server) | [UDP](esp8266wifi/readme.md#udp) | [Generic](esp8266wifi/readme.md#generic) | [Diagnostics](esp8266wifi/readme.md#diagnostics)
 
 ## Ticker
 
