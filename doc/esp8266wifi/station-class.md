@@ -151,8 +151,8 @@ WiFi.reconnect()
 ```
 
 Notes:
-1. Station should be already connected to an access point. If this is not the case, then function will return `false` not performing any action.
-2. If `true` is returned it means that connection sequence has been successfully started. User should still check for connection status, waiting until `WL_CONNECTED` is reported:
+  1. Station should be already connected to an access point. If this is not the case, then function will return `false` not performing any action.
+  2. If `true` is returned it means that connection sequence has been successfully started. User should still check for connection status, waiting until `WL_CONNECTED` is reported:
 
 ```cpp
 WiFi.reconnect();
