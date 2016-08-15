@@ -567,7 +567,10 @@ INT8U TFT::drawFloat(float floatNumber,INT16U poX, INT16U poY,INT16U size,INT16U
     return f;
 }
 
-TFT Tft=TFT();
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_TFT)
+TFT Tft;
+#endif
+
 /*********************************************************************************************************
   END FILE
 *********************************************************************************************************/

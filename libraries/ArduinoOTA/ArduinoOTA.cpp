@@ -334,4 +334,6 @@ int ArduinoOTAClass::getCommand() {
   return _cmd;
 }
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ARDUINOOTA)
 ArduinoOTAClass ArduinoOTA;
+#endif

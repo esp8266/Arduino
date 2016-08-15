@@ -132,6 +132,8 @@ private:
   friend boolean callback_openPath(SdFile&, char *, boolean, void *); 
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SD)
 extern SDClass SD;
+#endif
 
 #endif

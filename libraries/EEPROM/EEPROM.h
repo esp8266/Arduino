@@ -29,6 +29,7 @@
 class EEPROMClass {
 public:
   EEPROMClass(uint32_t sector);
+  EEPROMClass(void);
 
   void begin(size_t size);
   uint8_t read(int address);
@@ -64,7 +65,9 @@ protected:
   bool _dirty;
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_EEPROM)
 extern EEPROMClass EEPROM;
+#endif
 
 #endif
 

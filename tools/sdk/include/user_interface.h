@@ -481,6 +481,7 @@ enum wps_cb_status {
 	WPS_CB_ST_FAILED,
 	WPS_CB_ST_TIMEOUT,
 	WPS_CB_ST_WEP,
+	WPS_CB_ST_UNK,
 };
 
 bool wifi_wps_enable(WPS_TYPE_t wps_type);

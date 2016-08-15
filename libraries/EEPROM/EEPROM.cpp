@@ -22,7 +22,7 @@
 #include "Arduino.h"
 #include "EEPROM.h"
 
- extern "C" {
+extern "C" {
 #include "c_types.h"
 #include "ets_sys.h"
 #include "os_type.h"
@@ -30,8 +30,18 @@
 #include "spi_flash.h"
 }
 
+extern "C" uint32_t _SPIFFS_end;
+
 EEPROMClass::EEPROMClass(uint32_t sector)
 : _sector(sector)
+, _data(0)
+, _size(0)
+, _dirty(false)
+{
+}
+
+EEPROMClass::EEPROMClass(void)
+: _sector((((uint32_t)&_SPIFFS_end - 0x40200000) / SPI_FLASH_SEC_SIZE))
 , _data(0)
 , _size(0)
 , _dirty(false)
@@ -121,5 +131,6 @@ uint8_t * EEPROMClass::getDataPtr() {
   return &_data[0];
 }
 
-extern "C" uint32_t _SPIFFS_end;
-EEPROMClass EEPROM((((uint32_t)&_SPIFFS_end - 0x40200000) / SPI_FLASH_SEC_SIZE));
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_EEPROM)
+EEPROMClass EEPROM;
+#endif

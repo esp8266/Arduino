@@ -33,6 +33,8 @@ public:
     void end();
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_NETBIOS)
 extern ESP8266NetBIOS NBNS;
+#endif
 
 #endif
