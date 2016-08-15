@@ -185,6 +185,12 @@ do_compression:
     offset += id_len;
     PARANOIA_CHECK(pkt_size, offset + id_len);
 
+    if (offset == pkt_size)
+    {
+        /* no extensions */
+        goto error;
+    }
+
     /* extension size */
     id_len = buf[offset++] << 8;
     id_len += buf[offset++];
@@ -420,13 +426,23 @@ static const uint8_t g_cert_request[] = { HS_CERT_REQ, 0,
                 0, 0
 };
 
+static const uint8_t g_cert_request_v1[] = { HS_CERT_REQ, 0, 0, 4, 1, 0, 0, 0 };
+
 /*
  * Send the certificate request message.
  */
 static int send_certificate_request(SSL *ssl)
 {
-    return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, 
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    {
+        return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, 
             g_cert_request, sizeof(g_cert_request));
+    }
+    else
+    {
+        return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, 
+            g_cert_request_v1, sizeof(g_cert_request_v1));
+    }
 }
 
 /*
@@ -442,8 +458,6 @@ static int process_cert_verify(SSL *ssl)
     X509_CTX *x509_ctx = ssl->x509_ctx;
     int ret = SSL_OK;
     int offset = 6;
-    uint8_t hash_alg;
-    uint8_t sig_alg;
     int rsa_len;
     int n;
 
@@ -451,10 +465,12 @@ static int process_cert_verify(SSL *ssl)
 
     if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
     {
-        hash_alg = buf[4];
-        sig_alg = buf[5];
+        // TODO: need to be able to handle another hash type here
+        //uint8_t hash_alg = buf[4];
+        //uint8_t sig_alg = buf[5];
         offset = 8;
         rsa_len = (buf[6] << 8) + buf[7];
+        //printf("YO, GOT %d %d\n", hash_alg, sig_alg);
     }
     else
     {

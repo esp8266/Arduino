@@ -462,7 +462,7 @@ static int send_cert_verify(SSL *ssl)
     if (rsa_ctx)
     {
         SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-        n = RSA_encrypt(rsa_ctx, dgst, dgst_len, &buf[offset+2], 1);
+        n = RSA_encrypt(rsa_ctx, dgst, dgst_len, &buf[offset + 2], 1);
         SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
         if (n == 0)
@@ -478,12 +478,13 @@ static int send_cert_verify(SSL *ssl)
 
     if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
     {
-        n += 2;
+        n += 2; // sig/alg
+        offset -= 2;
     }
 
     buf[2] = n >> 8;
     buf[3] = n & 0xff;
-    ret = send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, n + offset - 2);
+    ret = send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, n + offset);
 
 error:
     return ret;

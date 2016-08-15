@@ -56,7 +56,7 @@ prompt                 = no
 
 [ req_distinguished_name ]
  O                      = $PROJECT_NAME
- CN                     = 127.0.0.1
+ CN                     = localhost
 EOF
 
 cat > device_cert.conf << EOF  
@@ -70,20 +70,15 @@ EOF
 
 # private key generation
 openssl genrsa -out axTLS.ca_key.pem 2048
-openssl genrsa -out axTLS.key_512.pem 512
 openssl genrsa -out axTLS.key_1024.pem 1024
-openssl genrsa -out axTLS.key_1042.pem 1042
 openssl genrsa -out axTLS.key_2048.pem 2048
 openssl genrsa -out axTLS.key_4096.pem 4096
 openssl genrsa -out axTLS.device_key.pem 1024
-openssl genrsa -aes128 -passout pass:abcd -out axTLS.key_aes128.pem 512
-openssl genrsa -aes256 -passout pass:abcd -out axTLS.key_aes256.pem 512
-
+openssl genrsa -aes128 -passout pass:abcd -out axTLS.key_aes128.pem 1024
+openssl genrsa -aes256 -passout pass:abcd -out axTLS.key_aes256.pem 1024
 
 # convert private keys into DER format
-openssl rsa -in axTLS.key_512.pem -out axTLS.key_512 -outform DER
 openssl rsa -in axTLS.key_1024.pem -out axTLS.key_1024 -outform DER
-openssl rsa -in axTLS.key_1042.pem -out axTLS.key_1042 -outform DER
 openssl rsa -in axTLS.key_2048.pem -out axTLS.key_2048 -outform DER
 openssl rsa -in axTLS.key_4096.pem -out axTLS.key_4096 -outform DER
 openssl rsa -in axTLS.device_key.pem -out axTLS.device_key -outform DER
@@ -91,11 +86,7 @@ openssl rsa -in axTLS.device_key.pem -out axTLS.device_key -outform DER
 # cert requests
 openssl req -out axTLS.ca_x509.req -key axTLS.ca_key.pem -new \
             -config ./ca_cert.conf 
-openssl req -out axTLS.x509_512.req -key axTLS.key_512.pem -new \
-            -config ./certs.conf 
 openssl req -out axTLS.x509_1024.req -key axTLS.key_1024.pem -new \
-            -config ./certs.conf 
-openssl req -out axTLS.x509_1042.req -key axTLS.key_1042.pem -new \
             -config ./certs.conf 
 openssl req -out axTLS.x509_2048.req -key axTLS.key_2048.pem -new \
             -config ./certs.conf 
@@ -110,25 +101,32 @@ openssl req -out axTLS.x509_aes256.req -key axTLS.key_aes256.pem \
 
 # generate the actual certs.
 openssl x509 -req -in axTLS.ca_x509.req -out axTLS.ca_x509.pem \
-            -sha1 -days 5000 -signkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_512.req -out axTLS.x509_512.pem \
-            -sha1 -CAcreateserial -days 5000 \
-            -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
+            -sha1 -days 5000 -signkey axTLS.ca_key.pem \
+            -CAkey axTLS.ca_key.pem
+openssl x509 -req -in axTLS.ca_x509.req -out axTLS.ca_x509_sha256.pem \
+            -sha256 -days 5000 -signkey axTLS.ca_key.pem \
+            -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_1024.pem \
             -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_1042.req -out axTLS.x509_1042.pem \
-            -sha1 -CAcreateserial -days 5000 \
-            -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
+openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_1024_sha256.pem \
+            -sha256 -CAcreateserial -days 5000 \
+            -CA axTLS.ca_x509_sha256.pem -CAkey axTLS.ca_key.pem
+openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_1024_sha384.pem \
+            -sha384 -CAcreateserial -days 5000 \
+            -CA axTLS.ca_x509_sha256.pem -CAkey axTLS.ca_key.pem
+openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_1024_sha512.pem \
+            -sha512 -CAcreateserial -days 5000 \
+            -CA axTLS.ca_x509_sha256.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_2048.req -out axTLS.x509_2048.pem \
             -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_4096.req -out axTLS.x509_4096.pem \
-            -sha256 -CAcreateserial -days 5000 \
+            -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_device.req -out axTLS.x509_device.pem \
             -sha1 -CAcreateserial -days 5000 \
-            -CA axTLS.x509_512.pem -CAkey axTLS.key_512.pem
+            -CA axTLS.x509_1024.pem -CAkey axTLS.key_1024.pem
 openssl x509 -req -in axTLS.x509_aes128.req \
             -out axTLS.x509_aes128.pem \
             -sha1 -CAcreateserial -days 5000 \
@@ -141,35 +139,33 @@ openssl x509 -req -in axTLS.x509_aes256.req \
 # note: must be root to do this
 DATE_NOW=`date`
 if date -s "Jan 1 2025"; then
-openssl x509 -req -in axTLS.x509_512.req -out axTLS.x509_bad_before.pem \
+openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_bad_before.pem \
             -sha1 -CAcreateserial -days 365 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 date -s "$DATE_NOW"
 touch axTLS.x509_bad_before.pem
 fi
-openssl x509 -req -in axTLS.x509_512.req -out axTLS.x509_bad_after.pem \
+openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_bad_after.pem \
             -sha1 -CAcreateserial -days -365 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 
 # some cleanup
 rm axTLS*.req
-rm axTLS.srl
+rm *.srl
 rm *.conf
 
 # need this for the client tests
 openssl x509 -in axTLS.ca_x509.pem -outform DER -out axTLS.ca_x509.cer 
-openssl x509 -in axTLS.x509_512.pem -outform DER -out axTLS.x509_512.cer
 openssl x509 -in axTLS.x509_1024.pem -outform DER -out axTLS.x509_1024.cer
-openssl x509 -in axTLS.x509_1042.pem -outform DER -out axTLS.x509_1042.cer
 openssl x509 -in axTLS.x509_2048.pem -outform DER -out axTLS.x509_2048.cer
 openssl x509 -in axTLS.x509_4096.pem -outform DER -out axTLS.x509_4096.cer
 openssl x509 -in axTLS.x509_device.pem -outform DER -out axTLS.x509_device.cer
 
 # generate pkcs8 files (use RC4-128 for encryption)
-openssl pkcs8 -in axTLS.key_512.pem -passout pass:abcd -topk8 -v1 PBE-SHA1-RC4-128 -out axTLS.encrypted_pem.p8
-openssl pkcs8 -in axTLS.key_512.pem -passout pass:abcd -topk8 -outform DER -v1 PBE-SHA1-RC4-128 -out axTLS.encrypted.p8
-openssl pkcs8 -in axTLS.key_512.pem -nocrypt -topk8 -out axTLS.unencrypted_pem.p8
-openssl pkcs8 -in axTLS.key_512.pem -nocrypt -topk8 -outform DER -out axTLS.unencrypted.p8
+openssl pkcs8 -in axTLS.key_1024.pem -passout pass:abcd -topk8 -v1 PBE-SHA1-RC4-128 -out axTLS.encrypted_pem.p8
+openssl pkcs8 -in axTLS.key_1024.pem -passout pass:abcd -topk8 -outform DER -v1 PBE-SHA1-RC4-128 -out axTLS.encrypted.p8
+openssl pkcs8 -in axTLS.key_1024.pem -nocrypt -topk8 -out axTLS.unencrypted_pem.p8
+openssl pkcs8 -in axTLS.key_1024.pem -nocrypt -topk8 -outform DER -out axTLS.unencrypted.p8
 
 # generate pkcs12 files (use RC4-128 for encryption)
 openssl pkcs12 -export -in axTLS.x509_1024.pem -inkey axTLS.key_1024.pem -certfile axTLS.ca_x509.pem -keypbe PBE-SHA1-RC4-128 -certpbe PBE-SHA1-RC4-128 -name "p12_with_CA" -out axTLS.withCA.p12 -password pass:abcd

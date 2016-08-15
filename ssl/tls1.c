@@ -765,7 +765,9 @@ void add_packet(SSL *ssl, const uint8_t *pkt, int len)
         SHA256_Update(&ssl->dc->sha256_ctx, pkt, len);
     }
 
-    if (ssl->version < SSL_PROTOCOL_VERSION_TLS1_2)
+    if (ssl->version < SSL_PROTOCOL_VERSION_TLS1_2 || 
+                ssl->next_state == HS_SERVER_HELLO ||
+                ssl->next_state == 0) 
     {
         MD5_Update(&ssl->dc->md5_ctx, pkt, len);
         SHA1_Update(&ssl->dc->sha1_ctx, pkt, len);
@@ -894,7 +896,7 @@ static void prf(SSL *ssl, const uint8_t *sec, int sec_len,
 void generate_master_secret(SSL *ssl, const uint8_t *premaster_secret)
 {
     uint8_t buf[128]; 
-    //print_blob("premaster secret", premaster_secret, 48);
+//print_blob("premaster secret", premaster_secret, 48);
     strcpy((char *)buf, "master secret");
     memcpy(&buf[13], ssl->dc->client_random, SSL_RANDOM_SIZE);
     memcpy(&buf[45], ssl->dc->server_random, SSL_RANDOM_SIZE);
@@ -1994,6 +1996,7 @@ static int check_certificate_chain(SSL *ssl)
 
         if (!found)
         {
+
             ret = SSL_ERROR_INVALID_CERT_HASH_ALG;
             goto error;
         }
@@ -2033,7 +2036,7 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
     uint8_t *buf = &ssl->bm_data[ssl->dc->bm_proc_index];
     int pkt_size = ssl->bm_index;
     int cert_size, offset = 5, offset_start;
-    int total_cert_size = (buf[offset]<<8) + buf[offset+1];
+    int total_cert_len = (buf[offset]<<8) + buf[offset+1];
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     X509_CTX *chain = 0;
     X509_CTX **certs = 0;
@@ -2042,13 +2045,13 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
     int i = 0;
     offset += 2;
 
-    PARANOIA_CHECK(total_cert_size, offset);
+    PARANOIA_CHECK(pkt_size, total_cert_len + offset);
 
     // record the start point for the second pass
     offset_start = offset;
 
     // first pass - count the certificates
-    while (offset < total_cert_size)
+    while (offset < total_cert_len)
     {
         offset++;       /* skip empty char */
         cert_size = (buf[offset]<<8) + buf[offset+1];
@@ -2067,7 +2070,7 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
     offset = offset_start;
 
     // second pass - load the certificates
-    while (offset < total_cert_size)
+    while (offset < total_cert_len)
     {
         offset++;       /* skip empty char */
         cert_size = (buf[offset]<<8) + buf[offset+1];
