@@ -33,6 +33,7 @@ title: Supported Hardware
   * [WeMos D1](#wemos-d1)
   * [WeMos D1 mini](#wemos-d1-mini)
   * [ESPino by ThaiEasyElec](#espinotee)
+  * [YISON ESP-01/ESP-202](#yison-esp-01-esp-202)
 
 ## Adafruit HUZZAH ESP8266 (ESP-12)
 
@@ -303,6 +304,9 @@ We will update an English description soon.
 - Dimensions: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_Dimension.pdf
 - Pinouts: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_User_Manual_TH_v1_0_20160204.pdf (Please see pg. 8)
 
+## YISON ESP-01/ESP-202
 
+This board can be purchased for 3 to 10 dollars from AliExpress or eBay. Documentation says it's compatible to ESP-07/12/12E. The board has a mini USB connector, voltage regulator (3.7-5V), 6 blue LEDs, a RGB-LED and pin headers for all module pins.
+There is a connector to flash ESP-01 boards.
 
-
+More documentation can be found here: https://r3wald.github.io/YISON-ESP-01-ESP-202-Development-Board/
