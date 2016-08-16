@@ -433,7 +433,7 @@ static const uint8_t g_cert_request_v1[] = { HS_CERT_REQ, 0, 0, 4, 1, 0, 0, 0 };
  */
 static int send_certificate_request(SSL *ssl)
 {
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
     {
         return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, 
             g_cert_request, sizeof(g_cert_request));
@@ -454,7 +454,7 @@ static int process_cert_verify(SSL *ssl)
     uint8_t *buf = &ssl->bm_data[ssl->dc->bm_proc_index];
     int pkt_size = ssl->bm_index;
     uint8_t dgst_buf[MAX_KEY_BYTE_SIZE];
-    uint8_t dgst[128];
+    uint8_t dgst[MD5_SIZE + SHA1_SIZE];
     X509_CTX *x509_ctx = ssl->x509_ctx;
     int ret = SSL_OK;
     int offset = 6;
@@ -463,14 +463,14 @@ static int process_cert_verify(SSL *ssl)
 
     DISPLAY_RSA(ssl, x509_ctx->rsa_ctx);
 
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
     {
-        // TODO: need to be able to handle another hash type here
+        // TODO: should really need to be able to handle other algorihms. An 
+        // assumption is made on RSA/SHA256 and appears to be OK.
         //uint8_t hash_alg = buf[4];
         //uint8_t sig_alg = buf[5];
         offset = 8;
         rsa_len = (buf[6] << 8) + buf[7];
-        //printf("YO, GOT %d %d\n", hash_alg, sig_alg);
     }
     else
     {
@@ -485,7 +485,7 @@ static int process_cert_verify(SSL *ssl)
                     sizeof(dgst_buf), 0);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
     {
         if (memcmp(dgst_buf, g_asn1_sha256, sizeof(g_asn1_sha256)))
         {

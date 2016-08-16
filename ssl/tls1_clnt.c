@@ -37,14 +37,14 @@
 
 #ifdef CONFIG_SSL_ENABLE_CLIENT        /* all commented out if no client */
 
-/* support sha512/384/256/1 rsa */
+/* support sha512/384/256/1 RSA */
 static const uint8_t g_sig_alg[] = { 
                 0x00, 0x0e, 
                 0x00, SIG_ALG_EXTENSION, 
                 0x00, 0x0a, 0x00, 0x08,
-                SIG_ALG_SHA256, SIG_ALG_RSA,
                 SIG_ALG_SHA512, SIG_ALG_RSA,
                 SIG_ALG_SHA384, SIG_ALG_RSA,
+                SIG_ALG_SHA256, SIG_ALG_RSA,
                 SIG_ALG_SHA1, SIG_ALG_RSA 
 };
 
@@ -245,7 +245,7 @@ static int send_client_hello(SSL *ssl)
     buf[offset++] = 0;
 
     /* send the signature algorithm extension for TLS 1.2+ */
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) 
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2)
     {
         memcpy(&buf[offset], g_sig_alg, sizeof(g_sig_alg));
         offset += sizeof(g_sig_alg);
@@ -390,7 +390,7 @@ static int process_cert_req(SSL *ssl)
     ssl->next_state = HS_SERVER_HELLO_DONE;
     SET_SSL_FLAG(SSL_HAS_CERT_REQ);
 
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
     {
         // supported certificate types
         cert_type_len = buf[offset++];
@@ -429,7 +429,7 @@ error:
 static int send_cert_verify(SSL *ssl)
 {
     uint8_t *buf = ssl->bm_data;
-    uint8_t dgst[128];
+    uint8_t dgst[SHA1_SIZE+MD5_SIZE+15];
     RSA_CTX *rsa_ctx = ssl->ssl_ctx->rsa_ctx;
     int n = 0, ret;
     int offset = 0;
@@ -443,7 +443,7 @@ static int send_cert_verify(SSL *ssl)
     buf[0] = HS_CERT_VERIFY;
     buf[1] = 0;
 
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
     {
         buf[4] = SIG_ALG_SHA256;
         buf[5] = SIG_ALG_RSA;
@@ -476,7 +476,7 @@ static int send_cert_verify(SSL *ssl)
     buf[offset+1] = n & 0xff;
     n += 2;
 
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
     {
         n += 2; // sig/alg
         offset -= 2;

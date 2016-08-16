@@ -47,9 +47,8 @@ extern "C" {
 #include "crypto.h"
 #include "crypto_misc.h"
 
-#define SSL_PROTOCOL_MIN_VERSION    0x31   /* TLS v1.0 */
+#define SSL_PROTOCOL_MIN_VERSION    0x32   /* TLS v1.1 */
 #define SSL_PROTOCOL_VERSION_MAX    0x33   /* TLS v1.2 */
-#define SSL_PROTOCOL_VERSION_TLS1_1 0x32   /* TLS v1.1 */
 #define SSL_PROTOCOL_VERSION_TLS1_2 0x33   /* TLS v1.2 */
 #define SSL_RANDOM_SIZE             32
 #define SSL_SECRET_SIZE             48

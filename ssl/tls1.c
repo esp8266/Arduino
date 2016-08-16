@@ -704,39 +704,27 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
  */
 static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
 {   
-    uint8_t hmac_buf[128];
+    uint8_t hmac_buf[SHA256_SIZE]; // size of largest digest
     int hmac_offset;
    
-    if (ssl->cipher_info->padding_size)
-    {
-        int last_blk_size = buf[read_len-1], i;
-        hmac_offset = read_len-last_blk_size-ssl->cipher_info->digest_size-1;
+    int last_blk_size = buf[read_len-1], i;
+    hmac_offset = read_len-last_blk_size-ssl->cipher_info->digest_size-1;
 
-        /* guard against a timing attack - make sure we do the digest */
-        if (hmac_offset < 0)
-        {
-            hmac_offset = 0;
-        }
-        else
-        {
-            /* already looked at last byte */
-            for (i = 1; i < last_blk_size; i++)
-            {
-                if (buf[read_len-i] != last_blk_size)
-                {
-                    hmac_offset = 0;
-                    break;
-                }
-            }
-        }
+    /* guard against a timing attack - make sure we do the digest */
+    if (hmac_offset < 0)
+    {
+        hmac_offset = 0;
     }
-    else /* stream cipher */
+    else
     {
-        hmac_offset = read_len - ssl->cipher_info->digest_size;
-
-        if (hmac_offset < 0)
+        /* already looked at last byte */
+        for (i = 1; i < last_blk_size; i++)
         {
-            hmac_offset = 0;
+            if (buf[read_len-i] != last_blk_size)
+            {
+                hmac_offset = 0;
+                break;
+            }
         }
     }
 
@@ -759,7 +747,7 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
  */
 void add_packet(SSL *ssl, const uint8_t *pkt, int len)
 {
-    // TLS1.2
+    // TLS1.2+
     if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2 || ssl->version == 0) 
     {
         SHA256_Update(&ssl->dc->sha256_ctx, pkt, len);
@@ -780,7 +768,7 @@ void add_packet(SSL *ssl, const uint8_t *pkt, int len)
 static void p_hash_md5(const uint8_t *sec, int sec_len, 
         uint8_t *seed, int seed_len, uint8_t *out, int olen)
 {
-    uint8_t a1[128];
+    uint8_t a1[MD5_SIZE+77];
 
     /* A(1) */
     hmac_md5(seed, seed_len, sec, sec_len, a1);
@@ -808,7 +796,7 @@ static void p_hash_md5(const uint8_t *sec, int sec_len,
 static void p_hash_sha1(const uint8_t *sec, int sec_len, 
         uint8_t *seed, int seed_len, uint8_t *out, int olen)
 {
-    uint8_t a1[128];
+    uint8_t a1[SHA1_SIZE+77];
 
     /* A(1) */
     hmac_sha1(seed, seed_len, sec, sec_len, a1);
@@ -836,7 +824,7 @@ static void p_hash_sha1(const uint8_t *sec, int sec_len,
 static void p_hash_sha256(const uint8_t *sec, int sec_len, 
         uint8_t *seed, int seed_len, uint8_t *out, int olen)
 {
-    uint8_t a1[128];
+    uint8_t a1[SHA256_SIZE+77];
 
     /* A(1) */
     hmac_sha256(seed, seed_len, sec, sec_len, a1);
@@ -865,7 +853,7 @@ static void prf(SSL *ssl, const uint8_t *sec, int sec_len,
         uint8_t *seed, int seed_len,
         uint8_t *out, int olen)
 {
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2)    // TLS1.2
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2)    // TLS1.2+
     {
         p_hash_sha256(sec, sec_len, seed, seed_len, out, olen);
     }
@@ -895,7 +883,7 @@ static void prf(SSL *ssl, const uint8_t *sec, int sec_len,
  */
 void generate_master_secret(SSL *ssl, const uint8_t *premaster_secret)
 {
-    uint8_t buf[128]; 
+    uint8_t buf[77]; 
 //print_blob("premaster secret", premaster_secret, 48);
     strcpy((char *)buf, "master secret");
     memcpy(&buf[13], ssl->dc->client_random, SSL_RANDOM_SIZE);
@@ -916,7 +904,7 @@ static void generate_key_block(SSL *ssl,
         uint8_t *client_random, uint8_t *server_random,
         uint8_t *master_secret, uint8_t *key_block, int key_block_size)
 {
-    uint8_t buf[128];
+    uint8_t buf[77];
     strcpy((char *)buf, "key expansion");
     memcpy(&buf[13], server_random, SSL_RANDOM_SIZE);
     memcpy(&buf[45], client_random, SSL_RANDOM_SIZE);
@@ -930,7 +918,7 @@ static void generate_key_block(SSL *ssl,
  */
 int finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 {
-    uint8_t mac_buf[128]; 
+    uint8_t mac_buf[SHA1_SIZE+MD5_SIZE+15]; 
     uint8_t *q = mac_buf;
     int dgst_len;
 
@@ -940,7 +928,7 @@ int finished_digest(SSL *ssl, const char *label, uint8_t *digest)
         q += strlen(label);
     }
 
-    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
     {
         SHA256_CTX sha256_ctx = ssl->dc->sha256_ctx; // interim copy
         SHA256_Final(q, &sha256_ctx);
@@ -1140,8 +1128,7 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
                                                 &ssl->bm_data[msg_length]);
         msg_length += ssl->cipher_info->digest_size;
 
-        /* add padding? */
-        if (ssl->cipher_info->padding_size)
+        /* add padding */
         {
             int last_blk_size = msg_length%ssl->cipher_info->padding_size;
             int pad_bytes = ssl->cipher_info->padding_size - last_blk_size;
@@ -1158,8 +1145,6 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
         increment_write_sequence(ssl);
 
         /* add the explicit IV for TLS1.1 */
-        if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_1 &&
-                        ssl->cipher_info->iv_size)
         {
             uint8_t iv_size = ssl->cipher_info->iv_size;
             uint8_t *t_buf = malloc(msg_length + iv_size);
@@ -1373,13 +1358,8 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     if (IS_SET_SSL_FLAG(SSL_RX_ENCRYPTED))
     {
         ssl->cipher_info->decrypt(ssl->decrypt_ctx, buf, buf, read_len);
-
-        if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_1 &&
-                        ssl->cipher_info->iv_size)
-        {
-            buf += ssl->cipher_info->iv_size;
-            read_len -= ssl->cipher_info->iv_size;
-        }
+        buf += ssl->cipher_info->iv_size;
+        read_len -= ssl->cipher_info->iv_size;
 
         read_len = verify_digest(ssl, 
                 is_client ? SSL_CLIENT_READ : SSL_SERVER_READ, buf, read_len);
@@ -1564,7 +1544,7 @@ int send_change_cipher_spec(SSL *ssl)
  */
 int send_finished(SSL *ssl)
 {
-    uint8_t buf[128] = {
+    uint8_t buf[SHA1_SIZE+MD5_SIZE+15+4] = {
         HS_FINISHED, 0, 0, SSL_FINISHED_HASH_SIZE };
 
     /* now add the finished digest mac (12 bytes) */
@@ -1725,9 +1705,11 @@ int send_certificate(SSL *ssl)
     buf[1] = 0;
     buf[4] = 0;
 
+    /* spec says we must check if the hash/sig algorithm is OK */
     if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2 &&
              ((ret = check_certificate_chain(ssl)) != SSL_OK))
     {
+        ret = SSL_ERROR_INVALID_CERT_HASH_ALG;
         goto error;
     }
 
