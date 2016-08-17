@@ -383,6 +383,6 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int com
     return true;
 }
 
-
-
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_HTTPUPDATE)
 ESP8266HTTPUpdate ESPhttpUpdate;
+#endif

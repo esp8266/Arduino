@@ -68,6 +68,8 @@ class ArduinoOTAClass
     String readStringUntil(char end);
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ARDUINOOTA)
 extern ArduinoOTAClass ArduinoOTA;
+#endif
 
 #endif /* __ARDUINO_OTA_H */
