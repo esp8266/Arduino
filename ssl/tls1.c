@@ -1145,6 +1145,7 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
         increment_write_sequence(ssl);
 
         /* add the explicit IV for TLS1.1 */
+        if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_1)
         {
             uint8_t iv_size = ssl->cipher_info->iv_size;
             uint8_t *t_buf = malloc(msg_length + iv_size);
@@ -1358,8 +1359,12 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     if (IS_SET_SSL_FLAG(SSL_RX_ENCRYPTED))
     {
         ssl->cipher_info->decrypt(ssl->decrypt_ctx, buf, buf, read_len);
-        buf += ssl->cipher_info->iv_size;
-        read_len -= ssl->cipher_info->iv_size;
+
+        if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_1)
+        {
+            buf += ssl->cipher_info->iv_size;
+            read_len -= ssl->cipher_info->iv_size;
+        }
 
         read_len = verify_digest(ssl, 
                 is_client ? SSL_CLIENT_READ : SSL_SERVER_READ, buf, read_len);
