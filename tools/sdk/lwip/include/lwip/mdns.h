@@ -32,8 +32,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __LWIP_DNS_H__
-#define __LWIP_DNS_H__
+#ifndef __LWIP_MDNS_H__
+#define __LWIP_MDNS_H__
 
 #include "lwip/opt.h"
 
@@ -109,6 +109,6 @@ struct mdns_info {
 //void           mdns_tmr(void);
 //void           Delay(unsigned long ulSeconds);
 
-#endif /* LWIP_DNS */
+#endif /* LWIP_MDNS */
 
-#endif /* __LWIP_DNS_H__ */
+#endif /* __LWIP_MDNS_H__ */
