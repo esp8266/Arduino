@@ -226,12 +226,17 @@ bool UpdaterClass::_writeBuffer(){
 }
 
 size_t UpdaterClass::write(uint8_t *data, size_t len) {
-  size_t left = len;
   if(hasError() || !isRunning())
     return 0;
 
-  if(len > remaining())
-    len = remaining();
+  if(len > remaining()){
+    //len = remaining();
+    //fail instead
+    _error = UPDATE_ERROR_SPACE;
+    return 0;
+  }
+
+  size_t left = len;
 
   while((_bufferLen + left) > FLASH_SECTOR_SIZE) {
     size_t toBuff = FLASH_SECTOR_SIZE - _bufferLen;
