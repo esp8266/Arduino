@@ -70,7 +70,11 @@ long secureRandom(long howsmall, long howbig) {
 }
 
 long map(long x, long in_min, long in_max, long out_min, long out_max) {
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    long divisor = (in_max - in_min);
+    if(divisor == 0){
+        return -1; //AVR returns -1, SAM returns 0
+    }
+    return (x - in_min) * (out_max - out_min) / divisor + out_min;
 }
 
 unsigned int makeWord(unsigned int w) {
