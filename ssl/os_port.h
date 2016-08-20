@@ -62,7 +62,7 @@ extern "C" {
 
 #include "util/time.h"
 #include <errno.h>
-// #define alloca(size) __builtin_alloca(size)
+#define alloca(size) __builtin_alloca(size)
 #define TTY_FLUSH()
 #ifdef putc
 #undef putc
@@ -80,6 +80,7 @@ extern "C" {
 #define EWOULDBLOCK EAGAIN
 
 #define hmac_sha1 ax_hmac_sha1
+#define hmac_sha256 ax_hmac_sha256
 #define hmac_md5 ax_hmac_md5
 
 #ifndef be64toh
@@ -189,6 +190,15 @@ EXP_FUNC int STDCALL getdomainname(char *buf, int buf_size);
 #endif  /* Not Win32 */
 
 /* some functions to mutate the way these work */
+inline uint32_t htonl(uint32_t n){
+  return ((n & 0xff) << 24) |
+    ((n & 0xff00) << 8) |
+    ((n & 0xff0000UL) >> 8) |
+    ((n & 0xff000000UL) >> 24);
+}
+
+#define ntohl htonl
+
 EXP_FUNC int STDCALL ax_open(const char *pathname, int flags); 
 
 #ifdef CONFIG_PLATFORM_LINUX
