@@ -53,7 +53,7 @@ static int rng_fd = -1;
 static HCRYPTPROV gCryptProv;
 #endif
 
-#if (!defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB))
+#if (!defined(ESP8266) && !defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB))
 /* change to processor registers as appropriate */
 #define ENTROPY_POOL_SIZE 32
 #define ENTROPY_COUNTER1 ((((uint64_t)tv.tv_sec)<<32) | tv.tv_usec)
