@@ -56,7 +56,7 @@
 #define MAX_COMPONENT_LEN 12 // What is max length?
 #define PATH_COMPONENT_BUFFER_LEN MAX_COMPONENT_LEN+1
 
-bool getNextPathComponent(char *path, unsigned int *p_offset,
+bool getNextPathComponent(const char *path, unsigned int *p_offset,
 			  char *buffer) {
   /*
 
@@ -115,7 +115,7 @@ bool getNextPathComponent(char *path, unsigned int *p_offset,
 
 
 
-boolean walkPath(char *filepath, SdFile& parentDir,
+boolean walkPath(const char *filepath, SdFile& parentDir,
 		 boolean (*callback)(SdFile& parentDir,
 				     char *filePathComponent,
 				     boolean isLastComponent,
@@ -513,7 +513,7 @@ File SDClass::open(char *filepath, uint8_t mode) {
 //}
 
 
-boolean SDClass::exists(char *filepath) {
+boolean SDClass::exists(const char *filepath) {
   /*
 
      Returns true if the supplied file path exists.
@@ -534,7 +534,7 @@ boolean SDClass::exists(char *filepath) {
 //}
 
 
-boolean SDClass::mkdir(char *filepath) {
+boolean SDClass::mkdir(const char *filepath) {
   /*
   
     Makes a single directory or a heirarchy of directories.
@@ -545,7 +545,7 @@ boolean SDClass::mkdir(char *filepath) {
   return walkPath(filepath, root, callback_makeDirPath);
 }
 
-boolean SDClass::rmdir(char *filepath) {
+boolean SDClass::rmdir(const char *filepath) {
   /*
   
     Remove a single directory or a heirarchy of directories.
@@ -556,7 +556,7 @@ boolean SDClass::rmdir(char *filepath) {
   return walkPath(filepath, root, callback_rmdir);
 }
 
-boolean SDClass::remove(char *filepath) {
+boolean SDClass::remove(const char *filepath) {
   return walkPath(filepath, root, callback_remove);
 }
 
