@@ -534,7 +534,7 @@ static void clear_certificate() {
   default_certificate_len = 0;
 }
 
-extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {
+extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count) {
     ClientContext* _client = SSLContext::getIOContext(fd);
     if (!_client || _client->state() != ESTABLISHED && !_client->getSize()) {
         errno = EIO;
@@ -550,8 +550,9 @@ extern "C" int ax_port_read(int fd, uint8_t* buffer, size_t count) {
     }
     return cb;
 }
+extern "C" void ax_port_read() __attribute__ ((weak, alias("__ax_port_read")));
 
-extern "C" int ax_port_write(int fd, uint8_t* buffer, size_t count) {
+extern "C" int __ax_port_write(int fd, uint8_t* buffer, size_t count) {
     ClientContext* _client = SSLContext::getIOContext(fd);
     if (!_client || _client->state() != ESTABLISHED) {
         errno = EIO;
@@ -564,11 +565,13 @@ extern "C" int ax_port_write(int fd, uint8_t* buffer, size_t count) {
     }
     return cb;
 }
+extern "C" void ax_port_write() __attribute__ ((weak, alias("__ax_port_write")));
 
-extern "C" int ax_get_file(const char *filename, uint8_t **buf) {
+extern "C" int __ax_get_file(const char *filename, uint8_t **buf) {
     *buf = 0;
     return 0;
 }
+extern "C" void ax_get_file() __attribute__ ((weak, alias("__ax_get_file")));
 
 
 #ifdef DEBUG_TLS_MEM
@@ -609,6 +612,7 @@ extern "C" void ax_port_free(void* ptr) {
     free(ptr);
 }
 
-extern "C" void ax_wdt_feed() {
+extern "C" void __ax_wdt_feed() {
     optimistic_yield(10000);
 }
+extern "C" void ax_wdt_feed() __attribute__ ((weak, alias("__ax_wdt_feed")));
