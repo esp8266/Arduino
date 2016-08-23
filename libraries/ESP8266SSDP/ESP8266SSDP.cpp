@@ -161,7 +161,7 @@ bool SSDPClass::begin(){
     (uint16_t)   chipId        & 0xff  );
 
 #ifdef DEBUG_SSDP
-  DEBUG_SSDP.printf("SSDP UUID: %s\n", (char *)_uuid);
+  DEBUG_SSDP.printf("SSDP UUID: %s\r\n", (char *)_uuid);
 #endif
 
   if (_server) {
@@ -201,16 +201,21 @@ void SSDPClass::_send(ssdp_method_t method){
   char buffer[1460];
   uint32_t ip = WiFi.localIP();
 
-  int len = snprintf(buffer, sizeof(buffer),
-    _ssdp_packet_template,
-    (method == NONE)?_ssdp_response_template:_ssdp_notify_template,
-    SSDP_INTERVAL,
-    _modelName, _modelNumber,
-    _uuid,
-    (method == NONE)?"ST":"NT",
-    _deviceType,
-    IP2STR(&ip), _port, _schemaURL
-  );
+  int len;
+  if (_messageFormatCallback) {
+    len = _messageFormatCallback(this, buffer, sizeof(buffer), method != NONE, SSDP_INTERVAL, _modelName, _modelNumber, _uuid, _deviceType, ip, _port, _schemaURL);
+  } else {
+    len = snprintf(buffer, sizeof(buffer),
+      _ssdp_packet_template,
+      (method == NONE)?_ssdp_response_template:_ssdp_notify_template,
+      SSDP_INTERVAL,
+      _modelName, _modelNumber,
+      _uuid,
+      (method == NONE)?"ST":"NT",
+      _deviceType,
+      IP2STR(&ip), _port, _schemaURL
+    );
+  }
 
   _server->append(buffer, len);
 
@@ -312,14 +317,14 @@ void SSDPClass::_update(){
                 break;
               case MAN:
 #ifdef DEBUG_SSDP
-                DEBUG_SSDP.printf("MAN: %s\n", (char *)buffer);
+                DEBUG_SSDP.printf("MAN: %s\r\n", (char *)buffer);
 #endif
                 break;
               case ST:
                 if(strcmp(buffer, "ssdp:all")){
                   state = ABORT;
 #ifdef DEBUG_SSDP
-                  DEBUG_SSDP.printf("REJECT: %s\n", (char *)buffer);
+                  DEBUG_SSDP.printf("REJECT: %s\r\n", (char *)buffer);
 #endif
                 }
                 // if the search type matches our type, we should respond instead of ABORT
