@@ -140,6 +140,10 @@ MDNSResponder::~MDNSResponder() {
     answer = 0;
   }
   _answers = 0;
+
+  if (_conn) {
+    _conn->unref();
+  }
 }
 
 bool MDNSResponder::begin(const char* hostName){
