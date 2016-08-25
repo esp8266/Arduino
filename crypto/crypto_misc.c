@@ -53,7 +53,7 @@ static int rng_fd = -1;
 static HCRYPTPROV gCryptProv;
 #endif
 
-#if (!defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB))
+#if (!defined(ESP8266) && !defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB))
 /* change to processor registers as appropriate */
 #define ENTROPY_POOL_SIZE 32
 #define ENTROPY_COUNTER1 ((((uint64_t)tv.tv_sec)<<32) | tv.tv_usec)
@@ -109,7 +109,7 @@ int get_file(const char *filename, uint8_t **buf)
 EXP_FUNC void STDCALL RNG_initialize()
 {
 #if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
-    rng_fd = ax_open("/dev/urandom", O_RDONLY);
+    rng_fd = open("/dev/urandom", O_RDONLY);
 #elif defined(WIN32) && defined(CONFIG_WIN32_USE_CRYPTO_LIB)
     if (!CryptAcquireContext(&gCryptProv,
                       NULL, NULL, PROV_RSA_FULL, 0))
@@ -130,7 +130,7 @@ EXP_FUNC void STDCALL RNG_initialize()
     /* start of with a stack to copy across */
     int i;
     memcpy(entropy_pool, &i, ENTROPY_POOL_SIZE);
-    srand((unsigned int)&i);
+    rand_r((unsigned int *)entropy_pool); 
 #endif
 }
 
@@ -181,7 +181,7 @@ EXP_FUNC int STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
 #else   /* nothing else to use, so use a custom RNG */
     /* The method we use when we've got nothing better. Use RC4, time
        and a couple of random seeds to generate a random sequence */
-    RC4_CTX rng_ctx;
+    AES_CTX rng_ctx;
     struct timeval tv;
     MD5_CTX rng_digest_ctx;
     uint8_t digest[MD5_SIZE];
@@ -200,10 +200,10 @@ EXP_FUNC int STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
     MD5_Final(digest, &rng_digest_ctx);
 
     /* come up with the random sequence */
-    RC4_setup(&rng_ctx, digest, MD5_SIZE); /* use as a key */
+    AES_set_key(&rng_ctx, digest, (const uint8_t *)ep, AES_MODE_128); /* use as a key */
     memcpy(rand_data, entropy_pool, num_rand_bytes < ENTROPY_POOL_SIZE ?
 				num_rand_bytes : ENTROPY_POOL_SIZE);
-    RC4_crypt(&rng_ctx, rand_data, rand_data, num_rand_bytes);
+    AES_cbc_encrypt(&rng_ctx, rand_data, rand_data, num_rand_bytes);
 
     /* move things along */
     for (i = ENTROPY_POOL_SIZE-1; i >= MD5_SIZE ; i--)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -37,9 +37,6 @@
 #include <string.h>
 #include "os_port.h"
 #include "crypto.h"
-
-/* all commented out in skeleton mode */
-#ifndef CONFIG_SSL_SKELETON_MODE
 
 #define rot1(x) (((x) << 24) | ((x) >> 8))
 #define rot2(x) (((x) << 16) | ((x) >> 16))
@@ -453,5 +450,3 @@ static void AES_decrypt(const AES_CTX *ctx, uint32_t *data)
             data[row-1] = tmp[row-1] ^ *(--k);
     }
 }
-
-#endif

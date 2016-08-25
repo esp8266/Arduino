@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -49,10 +49,8 @@
 
 static char *key_password = NULL;
 
-void *SSLv23_server_method(void) { return NULL; }
 void *SSLv3_server_method(void) { return NULL; }
 void *TLSv1_server_method(void) { return NULL; }
-void *SSLv23_client_method(void) { return NULL; }
 void *SSLv3_client_method(void) { return NULL; }
 void *TLSv1_client_method(void) { return NULL; }
 
@@ -81,14 +79,13 @@ void SSL_CTX_free(SSL_CTX * ssl_ctx)
 SSL * SSL_new(SSL_CTX *ssl_ctx)
 {
     SSL *ssl;
-    ssl_func_type_t ssl_func_type;
+#ifdef CONFIG_SSL_ENABLE_CLIENT
+    ssl_func_type_t ssl_func_type = OPENSSL_CTX_ATTR->ssl_func_type;
+#endif
 
     ssl = ssl_new(ssl_ctx, -1);        /* fd is set later */
-    ssl_func_type = OPENSSL_CTX_ATTR->ssl_func_type;
-
 #ifdef CONFIG_SSL_ENABLE_CLIENT
-    if (ssl_func_type == SSLv23_client_method ||
-        ssl_func_type == SSLv3_client_method ||
+    if (ssl_func_type == SSLv3_client_method ||
         ssl_func_type == TLSv1_client_method)
     {
         SET_SSL_FLAG(SSL_IS_CLIENT);
@@ -230,8 +227,6 @@ void SSL_CTX_set_client_CA_list(SSL_CTX *ssl_ctx, void *file)
 
     ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CERT, (const char *)file, NULL);
 }
-
-void SSLv23_method(void) { }
 
 void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, void *cb) { }
 

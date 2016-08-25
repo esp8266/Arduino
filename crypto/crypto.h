@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2015, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -199,6 +199,8 @@ EXP_FUNC void STDCALL MD5_Final(uint8_t *digest, MD5_CTX *);
 void hmac_md5(const uint8_t *msg, int length, const uint8_t *key, 
         int key_len, uint8_t *digest);
 void hmac_sha1(const uint8_t *msg, int length, const uint8_t *key, 
+        int key_len, uint8_t *digest);
+void hmac_sha256(const uint8_t *msg, int length, const uint8_t *key, 
         int key_len, uint8_t *digest);
 
 /**************************************************************************

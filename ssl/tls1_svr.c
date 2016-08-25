@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -35,6 +35,11 @@
 #include "ssl.h"
 
 static const uint8_t g_hello_done[] = { HS_SERVER_HELLO_DONE, 0, 0, 0 };
+static const uint8_t g_asn1_sha256[] = 
+{ 
+    0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 
+    0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20
+};
 
 static int process_client_hello(SSL *ssl);
 static int send_server_hello_sequence(SSL *ssl);
@@ -154,7 +159,7 @@ static int process_client_hello(SSL *ssl)
     cs_len = (buf[offset]<<8) + buf[offset+1];
     offset += 3;        /* add 1 due to all cipher suites being 8 bit */
 
-    PARANOIA_CHECK(pkt_size, offset);
+    PARANOIA_CHECK(pkt_size, offset + cs_len);
 
     /* work out what cipher suite we are going to use - client defines 
        the preference */
@@ -165,89 +170,75 @@ static int process_client_hello(SSL *ssl)
             if (ssl_prot_prefs[j] == buf[offset+i])   /* got a match? */
             {
                 ssl->cipher = ssl_prot_prefs[j];
-                goto do_state;
+                goto do_compression;
             }
         }
     }
 
     /* ouch! protocol is not supported */
-    ret = SSL_ERROR_NO_CIPHER;
+    return SSL_ERROR_NO_CIPHER;
 
-do_state:
-error:
-    return ret;
-}
-
-#ifdef CONFIG_SSL_ENABLE_V23_HANDSHAKE
-/*
- * Some browsers use a hybrid SSLv2 "client hello" 
- */
-int process_sslv23_client_hello(SSL *ssl)
-{
-    uint8_t *buf = ssl->bm_data;
-    int bytes_needed = ((buf[0] & 0x7f) << 8) + buf[1];
-    int ret = SSL_OK;
-
-    /* we have already read 3 extra bytes so far */
-    int read_len = SOCKET_READ(ssl->client_fd, buf, bytes_needed-3);
-    int cs_len = buf[1];
-    int id_len = buf[3];
-    int ch_len = buf[5];
-    int i, j, offset = 8;   /* start at first cipher */
-    int random_offset = 0;
-
-    DISPLAY_BYTES(ssl, "received %d bytes", buf, read_len, read_len);
-    
-    /* connection has gone, so die */
-    if (read_len < 0)
-    {
-        return SSL_ERROR_CONN_LOST;
-    }
-
-    add_packet(ssl, buf, read_len);
-
-    /* now work out what cipher suite we are going to use */
-    for (j = 0; j < NUM_PROTOCOLS; j++)
-    {
-        for (i = 0; i < cs_len; i += 3)
-        {
-            if (ssl_prot_prefs[j] == buf[offset+i])
-            {
-                ssl->cipher = ssl_prot_prefs[j];
-                goto server_hello;
-            }
-        }
-    }
-
-    /* ouch! protocol is not supported */
-    ret = SSL_ERROR_NO_CIPHER;
-    goto error;
-
-server_hello:
-    /* get the session id */
-    offset += cs_len - 2;   /* we've gone 2 bytes past the end */
-#ifndef CONFIG_SSL_SKELETON_MODE
-    ssl->session = ssl_session_update(ssl->ssl_ctx->num_sessions,
-            ssl->ssl_ctx->ssl_sessions, ssl, id_len ? &buf[offset] : NULL);
-#endif
-
-    /* get the client random data */
+    /* completely ignore compression */
+do_compression:
+    offset += cs_len;
+    id_len = buf[offset++];
     offset += id_len;
+    PARANOIA_CHECK(pkt_size, offset + id_len);
 
-    /* random can be anywhere between 16 and 32 bytes long - so it is padded
-     * with 0's to the left */
-    if (ch_len == 0x10)
+    if (offset == pkt_size)
     {
-        random_offset += 0x10;
+        /* no extensions */
+        goto error;
     }
 
-    memcpy(&ssl->dc->client_random[random_offset], &buf[offset], ch_len);
-    ret = send_server_hello_sequence(ssl);
+    /* extension size */
+    id_len = buf[offset++] << 8;
+    id_len += buf[offset++];
+    PARANOIA_CHECK(pkt_size, offset + id_len);
+    
+    // Check for extensions from the client - only the signature algorithm
+    // is supported
+    while (offset < pkt_size) 
+    {
+        int ext = buf[offset++] << 8;
+        ext += buf[offset++];
+        int ext_len = buf[offset++] << 8;
+        ext_len += buf[offset++];
+        PARANOIA_CHECK(pkt_size, offset + ext_len);
+        
+        if (ext == SIG_ALG_EXTENSION)
+        {
+            while (ext_len > 0)
+            {
+                uint8_t hash_alg = buf[offset++];
+                uint8_t sig_alg = buf[offset++];
+                ext_len -= 2;
+
+                if (sig_alg == SIG_ALG_RSA && 
+                        (hash_alg == SIG_ALG_SHA1 ||
+                         hash_alg == SIG_ALG_SHA256 ||
+                         hash_alg == SIG_ALG_SHA384 ||
+                         hash_alg == SIG_ALG_SHA512))
+                {
+                    ssl->sig_algs[ssl->num_sig_algs++] = hash_alg;
+                }
+            }
+        }
+        else
+        {
+            offset += ext_len;
+        }
+    }
+
+    /* default is RSA/SHA1 */
+    if (ssl->num_sig_algs == 0)
+    {
+        ssl->sig_algs[ssl->num_sig_algs++] = SIG_ALG_SHA1;
+    }
 
 error:
     return ret;
 }
-#endif
 
 /*
  * Send the entire server hello sequence
@@ -350,7 +341,7 @@ static int send_server_hello(SSL *ssl)
 
     buf[offset++] = 0;      /* cipher we are using */
     buf[offset++] = ssl->cipher;
-    buf[offset++] = 0;      /* no compression */
+    buf[offset++] = 0;      /* no compression and no extensions supported */
     buf[3] = offset - 4;    /* handshake size */
     return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, offset);
 }
@@ -409,10 +400,6 @@ static int process_client_key_xchg(SSL *ssl)
         /* and continue - will die eventually when checking the mac */
     }
 
-#if 0
-    print_blob("pre-master", premaster_secret, SSL_SECRET_SIZE);
-#endif
-
     generate_master_secret(ssl, premaster_secret);
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
@@ -428,15 +415,34 @@ error:
 }
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-static const uint8_t g_cert_request[] = { HS_CERT_REQ, 0, 0, 4, 1, 0, 0, 0 };
+static const uint8_t g_cert_request[] = { HS_CERT_REQ, 0, 
+                0, 0x0e, 
+                1, 1, // rsa sign 
+                0x00, 0x08,
+                SIG_ALG_SHA256, SIG_ALG_RSA,
+                SIG_ALG_SHA512, SIG_ALG_RSA,
+                SIG_ALG_SHA384, SIG_ALG_RSA,
+                SIG_ALG_SHA1, SIG_ALG_RSA,
+                0, 0
+};
+
+static const uint8_t g_cert_request_v1[] = { HS_CERT_REQ, 0, 0, 4, 1, 0, 0, 0 };
 
 /*
  * Send the certificate request message.
  */
 static int send_certificate_request(SSL *ssl)
 {
-    return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, 
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
+    {
+        return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, 
             g_cert_request, sizeof(g_cert_request));
+    }
+    else
+    {
+        return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, 
+            g_cert_request_v1, sizeof(g_cert_request_v1));
+    }
 }
 
 /*
@@ -448,29 +454,65 @@ static int process_cert_verify(SSL *ssl)
     uint8_t *buf = &ssl->bm_data[ssl->dc->bm_proc_index];
     int pkt_size = ssl->bm_index;
     uint8_t dgst_buf[MAX_KEY_BYTE_SIZE];
-    uint8_t dgst[MD5_SIZE+SHA1_SIZE];
+    uint8_t dgst[MD5_SIZE + SHA1_SIZE];
     X509_CTX *x509_ctx = ssl->x509_ctx;
     int ret = SSL_OK;
+    int offset = 6;
+    int rsa_len;
     int n;
 
-    PARANOIA_CHECK(pkt_size, x509_ctx->rsa_ctx->num_octets+6);
     DISPLAY_RSA(ssl, x509_ctx->rsa_ctx);
+
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
+    {
+        // TODO: should really need to be able to handle other algorihms. An 
+        // assumption is made on RSA/SHA256 and appears to be OK.
+        //uint8_t hash_alg = buf[4];
+        //uint8_t sig_alg = buf[5];
+        offset = 8;
+        rsa_len = (buf[6] << 8) + buf[7];
+    }
+    else
+    {
+        rsa_len = (buf[4] << 8) + buf[5];
+    }
+
+    PARANOIA_CHECK(pkt_size, offset + rsa_len);
 
     /* rsa_ctx->bi_ctx is not thread-safe */
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[6], dgst_buf, sizeof(dgst_buf), 0);
+    n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[offset], dgst_buf, 
+                    sizeof(dgst_buf), 0);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
-    if (n != SHA1_SIZE + MD5_SIZE)
+    if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2) // TLS1.2+
     {
-        ret = SSL_ERROR_INVALID_KEY;
-        goto end_cert_vfy;
-    }
+        if (memcmp(dgst_buf, g_asn1_sha256, sizeof(g_asn1_sha256)))
+        {
+            ret = SSL_ERROR_INVALID_KEY;
+            goto error;
+        }
 
-    finished_digest(ssl, NULL, dgst);       /* calculate the digest */
-    if (memcmp(dgst_buf, dgst, MD5_SIZE + SHA1_SIZE))
+        finished_digest(ssl, NULL, dgst);       /* calculate the digest */
+        if (memcmp(&dgst_buf[sizeof(g_asn1_sha256)], dgst, SHA256_SIZE))
+        {
+            ret = SSL_ERROR_INVALID_KEY;
+            goto error;
+        }
+    }
+    else // TLS1.0/1.1
     {
-        ret = SSL_ERROR_INVALID_KEY;
+        if (n != SHA1_SIZE + MD5_SIZE)
+        {
+            ret = SSL_ERROR_INVALID_KEY;
+            goto end_cert_vfy;
+        }
+
+        finished_digest(ssl, NULL, dgst);       /* calculate the digest */
+        if (memcmp(dgst_buf, dgst, MD5_SIZE + SHA1_SIZE))
+        {
+            ret = SSL_ERROR_INVALID_KEY;
+        }
     }
 
 end_cert_vfy:
