@@ -303,12 +303,11 @@ EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len);
 /**
  * @brief Calculate the size of the encrypted data from what you are about to send
  * @param ssl [in] An SSL obect reference.
- * @param out_data [in] The data to be written
  * @param out_len [in] The number of bytes to be written.
  * @return The number of bytes that will be sent, or if < 0 if an error.
  * @see ssl.h for the error code list.
  */
-EXP_FUNC int STDCALL ssl_calculate_write_length(SSL *ssl, const uint8_t *out_data, int out_len);
+EXP_FUNC int STDCALL ssl_calculate_write_length(SSL *ssl, int out_len);
 
 /**
  * @brief Find an ssl object based on a file descriptor.
