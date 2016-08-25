@@ -661,7 +661,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
     int hmac_len = buf_len + 8 + SSL_RECORD_SIZE;
-    uint8_t *t_buf = (uint8_t *)alloca(buf_len+100);
+    uint8_t *t_buf = (uint8_t *)malloc(buf_len+100);
 
     memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ? 
                     ssl->write_sequence : ssl->read_sequence, 8);
@@ -672,6 +672,8 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
             (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_READ) ? 
                 ssl->server_mac : ssl->client_mac, 
             ssl->cipher_info->digest_size, hmac_buf);
+
+    free(t_buf);
 
 #if 0
     print_blob("record", hmac_header, SSL_RECORD_SIZE);
