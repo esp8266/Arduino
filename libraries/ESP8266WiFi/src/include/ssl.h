@@ -70,6 +70,8 @@ extern "C" {
 /* need to predefine before ssl_lib.h gets to it */
 #define SSL_SESSION_ID_SIZE                     32
 
+#define AXTLS_2_0_0_SNDBUF 1
+
 #define EXP_FUNC
 #define STDCALL
 // struct SSL_CTX_;
