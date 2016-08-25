@@ -93,13 +93,16 @@ typedef struct SSL_ SSL;
 #define SSL_ERROR_DEAD                          -2
 #define SSL_CLOSE_NOTIFY                        -3
 #define SSL_ERROR_CONN_LOST                     -256
+#define SSL_ERROR_RECORD_OVERFLOW               -257
 #define SSL_ERROR_SOCK_SETUP_FAILURE            -258
 #define SSL_ERROR_INVALID_HANDSHAKE             -260
 #define SSL_ERROR_INVALID_PROT_MSG              -261
 #define SSL_ERROR_INVALID_HMAC                  -262
 #define SSL_ERROR_INVALID_VERSION               -263
+#define SSL_ERROR_UNSUPPORTED_EXTENSION         -264
 #define SSL_ERROR_INVALID_SESSION               -265
 #define SSL_ERROR_NO_CIPHER                     -266
+#define SSL_ERROR_INVALID_CERT_HASH_ALG         -267
 #define SSL_ERROR_BAD_CERTIFICATE               -268
 #define SSL_ERROR_INVALID_KEY                   -269
 #define SSL_ERROR_FINISHED_INVALID              -271
@@ -117,17 +120,25 @@ typedef struct SSL_ SSL;
 #define SSL_ALERT_CLOSE_NOTIFY                  0
 #define SSL_ALERT_UNEXPECTED_MESSAGE            10
 #define SSL_ALERT_BAD_RECORD_MAC                20
+#define SSL_ALERT_RECORD_OVERFLOW               22
 #define SSL_ALERT_HANDSHAKE_FAILURE             40
 #define SSL_ALERT_BAD_CERTIFICATE               42
+#define SSL_ALERT_UNSUPPORTED_CERTIFICATE       43
+#define SSL_ALERT_CERTIFICATE_EXPIRED           45
+#define SSL_ALERT_CERTIFICATE_UNKNOWN           46
 #define SSL_ALERT_ILLEGAL_PARAMETER             47
+#define SSL_ALERT_UNKNOWN_CA                    48
 #define SSL_ALERT_DECODE_ERROR                  50
 #define SSL_ALERT_DECRYPT_ERROR                 51
 #define SSL_ALERT_INVALID_VERSION               70
 #define SSL_ALERT_NO_RENEGOTIATION              100
+#define SSL_ALERT_UNSUPPORTED_EXTENSION         110
 
 /* The ciphers that are supported */
 #define SSL_AES128_SHA                          0x2f
 #define SSL_AES256_SHA                          0x35
+#define SSL_AES128_SHA256                       0x3c
+#define SSL_AES256_SHA256                       0x3d
 #define SSL_RC4_128_SHA                         0x05
 #define SSL_RC4_128_MD5                         0x04
 
@@ -288,6 +299,16 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data);
  * @see ssl.h for the error code list.
  */
 EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len);
+
+/**
+ * @brief Calculate the size of the encrypted data from what you are about to send
+ * @param ssl [in] An SSL obect reference.
+ * @param out_data [in] The data to be written
+ * @param out_len [in] The number of bytes to be written.
+ * @return The number of bytes that will be sent, or if < 0 if an error.
+ * @see ssl.h for the error code list.
+ */
+EXP_FUNC int STDCALL ssl_calculate_write_length(SSL *ssl, const uint8_t *out_data, int out_len);
 
 /**
  * @brief Find an ssl object based on a file descriptor.
