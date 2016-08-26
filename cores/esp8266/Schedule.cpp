@@ -14,25 +14,6 @@ static scheduled_fn_t* sLastUnused = 0;
 
 static int sCount = 0;
 
-static void init_lists()
-{
-    if (sCount != 0) {
-        return;
-    }
-    while (sCount < SCHEDULED_FN_INITIAL_COUNT) {
-        scheduled_fn_t* it = new scheduled_fn_t;
-        if (sCount == 0) {
-            sFirstUnused = it;
-        }
-        else {
-            sLastUnused->mNext = it;
-        }
-        sLastUnused = it;
-        ++sCount;
-    }
-    sLastUnused->mNext = NULL;
-}
-
 static scheduled_fn_t* get_fn() {
     scheduled_fn_t* result = NULL;
     // try to get an item from unused items list
