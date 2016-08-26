@@ -173,6 +173,11 @@
 //RTC reg {{
 #define REG_RTC_BASE  PERIPHS_RTC_BASEADDR
 
+#define RTC_STORE0                              (REG_RTC_BASE + 0x030)
+#define RTC_STORE1                              (REG_RTC_BASE + 0x034)
+#define RTC_STORE2                              (REG_RTC_BASE + 0x038)
+#define RTC_STORE3                              (REG_RTC_BASE + 0x03C)
+
 #define RTC_GPIO_OUT                            (REG_RTC_BASE + 0x068)
 #define RTC_GPIO_ENABLE                         (REG_RTC_BASE + 0x074)
 #define RTC_GPIO_IN_DATA                        (REG_RTC_BASE + 0x08C)
