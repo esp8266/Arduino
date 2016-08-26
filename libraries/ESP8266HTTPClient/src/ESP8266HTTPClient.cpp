@@ -132,7 +132,6 @@ bool HTTPClient::begin(String url)
 bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 {
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
-    bool hasPort = false;
     clear();
 
     // check for : (http: or https:
