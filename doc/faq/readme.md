@@ -43,3 +43,8 @@ You will see this issue only if serial upload was not followed by a physical res
 
 Ref. [#1017](https://github.com/esp8266/Arduino/issues/1017), [#1107](https://github.com/esp8266/Arduino/issues/1107), [#1782](https://github.com/esp8266/Arduino/issues/1782)
 
+
+### How to resolve "Board generic (platform esp8266, package esp8266) is unknown" error?
+
+This error may pop up after switching between [staging](https://github.com/esp8266/Arduino#staging-version-) and [stable](https://github.com/esp8266/Arduino#stable-version-) esp8266 / Arduino package installations, or after upgrading the package version [:arrow_right:](a04-board-generic-is-unknown.md)
+
