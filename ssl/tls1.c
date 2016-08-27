@@ -315,6 +315,35 @@ EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
     return out_len;
 }
 
+EXP_FUNC int STDCALL ssl_calculate_write_length(SSL *ssl, int length)
+{
+    int msg_length = 0;
+    if (ssl->hs_status == SSL_ERROR_DEAD)
+        return SSL_ERROR_CONN_LOST;
+
+    if (ssl->flag & SSL_SENT_CLOSE_NOTIFY)
+        return SSL_CLOSE_NOTIFY;
+
+    msg_length += length;
+
+    if (ssl->flag & SSL_TX_ENCRYPTED)
+    {
+        msg_length += ssl->cipher_info->digest_size;
+        {
+            int last_blk_size = msg_length%ssl->cipher_info->padding_size;
+            int pad_bytes = ssl->cipher_info->padding_size - last_blk_size;
+            if (pad_bytes == 0)
+                pad_bytes += ssl->cipher_info->padding_size;
+            msg_length += pad_bytes;
+        }
+        if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_1)
+        {
+            msg_length += ssl->cipher_info->iv_size;
+        }
+    }
+    return SSL_RECORD_SIZE+msg_length;
+}
+
 /**
  * Add a certificate to the certificate chain.
  */
