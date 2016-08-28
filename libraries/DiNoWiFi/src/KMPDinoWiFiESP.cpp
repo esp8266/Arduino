@@ -13,7 +13,7 @@
 #include "KMPDinoWiFiESP.h"
 #include <HardwareSerial.h>
 
-#define CS 15
+#define CS 0x0F
 
 #define READ_CMD  0x41
 #define WRITE_CMD 0x40
@@ -43,9 +43,7 @@
 #define IN3PIN 0x02
 #define IN4PIN 0x03
 
-#define RS485TXControlPin 16
-#define RS485Transmit     HIGH
-#define RS485Receive      LOW
+#define RS485PIN 0x10
 
 /**
  * @brief Relay pins.
@@ -81,6 +79,10 @@ void KMPDinoWiFiESPClass::init()
 	pinMode(CS, OUTPUT);
 	digitalWrite(CS, HIGH);
 	ExpanderInitGPIO();
+
+	// RS485 init.
+	pinMode(RS485PIN, OUTPUT);
+	digitalWrite(RS485PIN, HIGH);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -261,9 +263,9 @@ bool KMPDinoWiFiESPClass::ExpanderGetPin(uint8_t pinNumber)
 }
 
 /**
- * @brief Read expander MCP23S17 register.
+ * @brief Read an expander MCP23S17 a register.
  *
- * @param address Register address.
+ * @param address A register address.
  *
  * @return The data from the register.
  */
@@ -282,8 +284,8 @@ uint8_t KMPDinoWiFiESPClass::ExpanderReadRegister(uint8_t address)
 /**
  * @brief Write data in expander MCP23S17 register.
  *
- * @param address Register address.
- * @param data Byte to write.
+ * @param address A register address.
+ * @param data A byte for write.
  *
  * @return void.
  */
@@ -299,9 +301,9 @@ void KMPDinoWiFiESPClass::ExpanderWriteRegister(uint8_t address, uint8_t data)
 }
 
 /**
- * @brief Set expander MCP23S17 pin direction.
+ * @brief Set a expander MCP23S17 the pin direction.
  *
- * @param pinNumber Pin number to set.
+ * @param pinNumber Pin number for set.
  * @param mode direction mode. 0 - INPUT, 1 - OUTPUT.
  *
  * @return void
@@ -348,20 +350,20 @@ void KMPDinoWiFiESPClass::ExpanderInitGPIO()
 /**
 * @brief Connect to RS485. With default configuration SERIAL_8N1.
 *
-* @param boud Boud rate.
+* @param baud Speed.
 *     Values: 75, 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600 and 115200 bit/s.
 *
 * @return void
 */
-void KMPDinoWiFiESPClass::RS485Begin(unsigned long boud)
+void KMPDinoWiFiESPClass::RS485Begin(unsigned long baud)
 {
-	RS485Begin(boud, SERIAL_8N1);
+	RS485Begin(baud, SERIAL_8N1);
 }
 
 /**
 * @brief Start connect to RS485.
 *
-* @param boud Boud rate.
+* @param baud Speed.
 *             Values: 75, 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600 and 115200 bit/s.
 * @param config Configuration - data bits, parity, stop bits.
 *               Values: SERIAL_5N1, SERIAL_6N1, SERIAL_7N1, SERIAL_8N1, SERIAL_5N2, SERIAL_6N2, SERIAL_7N2, SERIAL_8N2, SERIAL_5E1, SERIAL_6E1, SERIAL_7E1, SERIAL_8E1, SERIAL_5E2, 
@@ -369,9 +371,9 @@ void KMPDinoWiFiESPClass::RS485Begin(unsigned long boud)
 *
 * @return void
 */
-void KMPDinoWiFiESPClass::RS485Begin(unsigned long boud, SerialConfig config)
+void KMPDinoWiFiESPClass::RS485Begin(unsigned long baud, SerialConfig config)
 {
-	Serial.begin(boud, config);
+	Serial.begin(baud, config);
 }
 
 /**
@@ -391,7 +393,7 @@ void KMPDinoWiFiESPClass::RS485End()
 */
 void RS485BeginWrite()
 {
-	digitalWrite(RS485TXControlPin, RS485Transmit);
+	digitalWrite(RS485PIN, LOW);
 	delay(1);
 }
 
@@ -403,13 +405,14 @@ void RS485BeginWrite()
 void RS485EndWrite()
 {
 	Serial.flush();
-	digitalWrite(RS485TXControlPin, RS485Receive);
+	delay(1);
+	digitalWrite(RS485PIN, HIGH);
 }
 
 /**
 * @brief Transmit one byte data to RS485.
 *
-* @param data Data to transmit.
+* @param data Transmit data.
 *
 * @return size_t Count of transmitted - one byte.
 */
@@ -427,7 +430,7 @@ size_t KMPDinoWiFiESPClass::RS485Write(uint8_t data)
 /**
 * @brief Transmit one char data to RS485.
 *
-* @param data Data to transmit.
+* @param data Transmit data.
 *
 * @return size_t Count of transmitted - one char.
 */
@@ -449,9 +452,10 @@ size_t KMPDinoWiFiESPClass::RS485Write(char* data)
 
 	size_t len = strlen(data);
 	size_t result = 0;
-	for (size_t i = 0; i < len; i++)
+	while(len > 0)
 	{
-		result += Serial.write(data[i]);
+		result += Serial.write(*data++);
+		--len;
 	}
 
 	RS485EndWrite();
@@ -496,7 +500,7 @@ int KMPDinoWiFiESPClass::RS485Read()
 }
 
 /**
-* @brief Read received data from RS485. Reading data with delay and repeating the operation for all data to arrive.
+* @brief Read received data from RS485. Reading data with delay and repeating the operation while all data to arrive.
 *
 * @param delayWait Wait delay if not available to read byte in milliseconds. Default 10.
 * @param repeatTime Repeat time if not read bytes. Default 10. All time = delayWait * repeatTime.
@@ -507,12 +511,11 @@ int KMPDinoWiFiESPClass::RS485Read()
 */
 int KMPDinoWiFiESPClass::RS485Read(unsigned long delayWait, uint8_t repeatTime)
 {
-	digitalWrite(RS485TXControlPin, RS485Receive);
-
-	// Wait before read if buffer is empty.
-	while (Serial.available() == 0 && repeatTime-- > 0)
+	// Wait before read, if the buffer is empty.
+	while (Serial.available() == 0 && repeatTime > 0)
 	{
 		delay(delayWait);
+		--repeatTime;
 	}
 
 	return Serial.read();

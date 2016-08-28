@@ -8,7 +8,7 @@
 //		Web server RS485 example. 
 // Example link: http://www.kmpelectronics.eu/en-us/examples/dinowifiesp/wifiwebrelayserver.aspx
 // Version: 1.0.0
-// Date: 26.06.2016
+// Date: 01.07.2016
 // Author: Plamen Kovandjiev <p.kovandiev@kmpelectronics.eu>
 
 // --------------------------------------------------------------------------------
@@ -42,14 +42,11 @@ bool _isValidPost = false;
 */
 void setup()
 {
-	// Start RS485 with boud 19200 and 8N1.
-	KMPDinoWiFiESP.RS485Begin(19200);
-//#ifdef DEBUG
-//	// You can open the Arduino IDE Serial Monitor window to see what the code is doing
-//	Serial.begin(19200);
-//#endif
 	// Init KMP Dino WiFi board.
 	KMPDinoWiFiESP.init();
+
+	// Start RS485 with baud 19200 and 8N1.
+	KMPDinoWiFiESP.RS485Begin(19200);
 
 	// Connect to WiFi network
 	WiFi.begin(SSID, PASSWORD);

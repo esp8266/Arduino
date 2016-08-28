@@ -84,8 +84,8 @@ class KMPDinoWiFiESPClass
 	bool GetOptoInState(uint8_t optoInNumber);
 	bool GetOptoInState(OptoIn optoIn);
 
-	void RS485Begin(unsigned long boud);
-	void RS485Begin(unsigned long boud, SerialConfig config);
+	void RS485Begin(unsigned long baud);
+	void RS485Begin(unsigned long baud, SerialConfig config);
 	void RS485End();
 	size_t RS485Write(uint8_t data);
 	size_t RS485Write(char data);
