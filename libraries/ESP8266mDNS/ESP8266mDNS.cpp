@@ -143,8 +143,6 @@ MDNSResponder::~MDNSResponder() {
 }
 
 bool MDNSResponder::begin(const char* hostname){
-  // Open the MDNS socket if it isn't already open.
-
   size_t n = strlen(hostname);
   if (n > 63) { // max size for a single label.
     return false;
@@ -155,15 +153,41 @@ bool MDNSResponder::begin(const char* hostname){
   _hostName.toLowerCase();
 
   // If instance name is not already set copy hostname to instance name
-  if (_instanceName.equals("") ) _instanceName=hostname; 
+  if (_instanceName.equals("") ) _instanceName=hostname;
 
+  _gotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& event){
+    _restart();
+  });
+
+  _disconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& event) {
+    _restart();
+  });
+
+  return _listen();
+}
+
+void MDNSResponder::_restart() {
+  if (_conn) {
+    _conn->unref();
+    _conn = nullptr;
+  }
+  _listen();
+}
+
+bool MDNSResponder::_listen() {
   // Open the MDNS socket if it isn't already open.
   if (!_conn) {
     uint32_t ourIp = _getOurIp();
     if(ourIp == 0){
+      #ifdef MDNS_DEBUG_RX
+      Serial.println("MDNS: no IP address to listen on");
+      #endif
       return false;
     }
-
+    #ifdef MDNS_DEBUG_RX
+    Serial.print("MDNS listening on IP: ");
+    Serial.println(IPAddress(ourIp));
+    #endif
     ip_addr_t ifaddr;
     ifaddr.addr = ourIp;
     ip_addr_t multicast_addr;
@@ -470,8 +494,8 @@ void MDNSResponder::_parsePacket(){
     }
 
     int numAnswers = packetHeader[3];
-    // Assume that the PTR answer always comes first and that it is always accompanied by a TXT, SRV and A answer in the same packet.
-    if (numAnswers != 4) {
+    // Assume that the PTR answer always comes first and that it is always accompanied by a TXT, SRV, AAAA (optional) and A answer in the same packet.
+    if (numAnswers < 4) {
 #ifdef MDNS_DEBUG_RX
       Serial.println("Expected a packet with 4 answers, returning");
 #endif
@@ -550,7 +574,7 @@ void MDNSResponder::_parsePacket(){
 #endif
       }
 
-      if (answerType == MDNS_TYPE_TXT) {
+      else if (answerType == MDNS_TYPE_TXT) {
         partsCollected |= 0x02;
         _conn_readS(hostName, answerRdlength); // Read rdata
 #ifdef MDNS_DEBUG_RX
@@ -561,7 +585,7 @@ void MDNSResponder::_parsePacket(){
 #endif
       }
 
-      if (answerType == MDNS_TYPE_SRV) {
+      else if (answerType == MDNS_TYPE_SRV) {
         partsCollected |= 0x04;
         uint16_t answerPrio = _conn_read16(); // Read priority
         uint16_t answerWeight = _conn_read16(); // Read weight
@@ -589,11 +613,18 @@ void MDNSResponder::_parsePacket(){
         }
       }
 
-      if (answerType == MDNS_TYPE_A) {
+      else if (answerType == MDNS_TYPE_A) {
         partsCollected |= 0x08;
         for (int i = 0; i < 4; i++) {
           answerIp[i] = _conn_read8();
         }
+      }
+      else {
+#ifdef MDNS_DEBUG_RX
+          Serial.printf("Ignoring unsupported type %d\n", tmp8);
+#endif
+          for (int n = 0; n < answerRdlength; n++)
+		(void)_conn_read8();
       }
 
       if ((partsCollected == 0x0F) && serviceMatch) {

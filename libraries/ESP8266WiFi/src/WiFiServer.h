@@ -47,6 +47,7 @@ private:
 public:
   WiFiServer(IPAddress addr, uint16_t port);
   WiFiServer(uint16_t port);
+  virtual ~WiFiServer() {}
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
   void begin();

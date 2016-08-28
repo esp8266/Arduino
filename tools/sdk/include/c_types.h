@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <sys/cdefs.h>
 
 typedef signed char         sint8_t;
 typedef signed short        sint16_t;
@@ -39,8 +40,6 @@ typedef float               real32;
 typedef double              real64;
 
 #define __le16      u16
-
-#define __packed        __attribute__((packed))
 
 #define LOCAL       static
 
@@ -74,6 +73,8 @@ typedef enum {
 #define ICACHE_RAM_ATTR
 #define ICACHE_RODATA_ATTR
 #endif /* ICACHE_FLASH */
+
+#define STORE_ATTR __attribute__((aligned(4)))
 
 #ifndef __cplusplus
 #define BOOL            bool

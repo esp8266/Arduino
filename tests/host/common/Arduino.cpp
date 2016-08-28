@@ -35,3 +35,7 @@ extern "C" void yield()
 extern "C" void __panic_func(const char* file, int line, const char* func) {
     abort();
 }
+
+extern "C" void delay(unsigned long ms)
+{
+}

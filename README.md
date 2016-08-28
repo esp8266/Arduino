@@ -34,12 +34,12 @@ If you find this forum or the ESP8266 Boards Manager package useful, please cons
 ##### Stable version ![](http://arduino.esp8266.com/stable/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.2.0/](http://esp8266.github.io/Arduino/versions/2.2.0/)
+Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0/](http://esp8266.github.io/Arduino/versions/2.3.0/)
 
 ##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.2.0-rc1/](http://esp8266.github.io/Arduino/versions/2.2.0-rc1/)
+Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0-rc2/](http://esp8266.github.io/Arduino/versions/2.3.0-rc2/)
 
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino) [![codecov.io](https://codecov.io/github/esp8266/Arduino/coverage.svg?branch=master)](https://codecov.io/github/esp8266/Arduino?branch=master)
@@ -81,7 +81,6 @@ Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 [makeEspArduino](https://github.com/plerup/makeEspArduino) is a generic makefile for any ESP8266 Arduino project.
 Using make instead of the Arduino IDE makes it easier to do automated and production builds.
 
-
 ### Documentation
 
 Documentation for latest development version:
@@ -91,6 +90,7 @@ Documentation for latest development version:
 - [File system](doc/filesystem.md)
 - [OTA update](doc/ota_updates/readme.md)
 - [Supported boards](doc/boards.md)
+- [FAQ / Trubleshooting](doc/faq/readme.md)
 - [Change log](doc/changes.md)
 
 ### Issues and support ###

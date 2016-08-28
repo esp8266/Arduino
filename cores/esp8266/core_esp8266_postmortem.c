@@ -29,6 +29,8 @@
 #include "cont.h"
 
 extern void __real_system_restart_local();
+extern void gdb_do_break();
+
 extern cont_t g_cont;
 
 static const char* s_panic_file = 0;
@@ -184,11 +186,14 @@ void __assert_func(const char *file, int line, const char *func, const char *wha
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
+    gdb_do_break();
 }
 
 void __panic_func(const char* file, int line, const char* func) {
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
+    gdb_do_break();
     abort();
 }
+

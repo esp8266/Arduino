@@ -45,6 +45,10 @@ generic.menu.FlashMode.dio=DIO
 generic.menu.FlashMode.dio.build.flash_mode=dio
 generic.menu.FlashMode.qio=QIO
 generic.menu.FlashMode.qio.build.flash_mode=qio
+generic.menu.FlashMode.dout=DOUT
+generic.menu.FlashMode.dout.build.flash_mode=dout
+generic.menu.FlashMode.qout=QOUT
+generic.menu.FlashMode.qout.build.flash_mode=qout
 
 generic.menu.UploadSpeed.115200=115200
 generic.menu.UploadSpeed.115200.upload.speed=115200
@@ -227,6 +231,113 @@ generic.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_
 # generic.menu.FlashSize.16M.build.spiffs_blocksize=8192
 
 ##############################################################
+# ESP8285 chip has built-in 1MB flash
+
+esp8285.name=Generic ESP8285 Module
+
+esp8285.upload.tool=esptool
+esp8285.upload.speed=115200
+esp8285.upload.resetmethod=ck
+esp8285.upload.maximum_size=434160
+esp8285.upload.maximum_data_size=81920
+esp8285.upload.wait_for_upload_port=true
+esp8285.serial.disableDTR=true
+esp8285.serial.disableRTS=true
+
+esp8285.build.mcu=esp8266
+esp8285.build.f_cpu=80000000L
+esp8285.build.board=ESP8266_ESP01
+esp8285.build.core=esp8266
+esp8285.build.variant=generic
+esp8285.build.flash_mode=dout
+esp8285.build.flash_freq=40
+esp8285.build.spiffs_pagesize=256
+esp8285.build.debug_port=
+esp8285.build.debug_level=
+
+esp8285.menu.CpuFrequency.80=80 MHz
+esp8285.menu.CpuFrequency.80.build.f_cpu=80000000L
+esp8285.menu.CpuFrequency.160=160 MHz
+esp8285.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+esp8285.menu.UploadSpeed.115200=115200
+esp8285.menu.UploadSpeed.115200.upload.speed=115200
+esp8285.menu.UploadSpeed.9600=9600
+esp8285.menu.UploadSpeed.9600.upload.speed=9600
+esp8285.menu.UploadSpeed.57600=57600
+esp8285.menu.UploadSpeed.57600.upload.speed=57600
+esp8285.menu.UploadSpeed.256000.windows=256000
+esp8285.menu.UploadSpeed.256000.upload.speed=256000
+esp8285.menu.UploadSpeed.230400.linux=230400
+esp8285.menu.UploadSpeed.230400.macosx=230400
+esp8285.menu.UploadSpeed.230400.upload.speed=230400
+esp8285.menu.UploadSpeed.460800.linux=460800
+esp8285.menu.UploadSpeed.460800.macosx=460800
+esp8285.menu.UploadSpeed.460800.upload.speed=460800
+esp8285.menu.UploadSpeed.512000.windows=512000
+esp8285.menu.UploadSpeed.512000.upload.speed=512000
+esp8285.menu.UploadSpeed.921600=921600
+esp8285.menu.UploadSpeed.921600.upload.speed=921600
+
+esp8285.menu.FlashSize.1M512=1M (512K SPIFFS)
+esp8285.menu.FlashSize.1M512.build.flash_size=1M
+esp8285.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
+esp8285.menu.FlashSize.1M512.build.spiffs_start=0x7B000
+esp8285.menu.FlashSize.1M512.build.spiffs_end=0xFB000
+esp8285.menu.FlashSize.1M512.build.spiffs_blocksize=8192
+esp8285.menu.FlashSize.1M512.upload.maximum_size=499696
+
+esp8285.menu.FlashSize.1M256=1M (256K SPIFFS)
+esp8285.menu.FlashSize.1M256.build.flash_size=1M
+esp8285.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
+esp8285.menu.FlashSize.1M256.build.spiffs_start=0xBB000
+esp8285.menu.FlashSize.1M256.build.spiffs_end=0xFB000
+esp8285.menu.FlashSize.1M256.build.spiffs_blocksize=4096
+esp8285.menu.FlashSize.1M256.upload.maximum_size=761840
+
+esp8285.menu.FlashSize.1M192=1M (192K SPIFFS)
+esp8285.menu.FlashSize.1M192.build.flash_size=1M
+esp8285.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
+esp8285.menu.FlashSize.1M192.build.spiffs_start=0xCB000
+esp8285.menu.FlashSize.1M192.build.spiffs_end=0xFB000
+esp8285.menu.FlashSize.1M192.build.spiffs_blocksize=4096
+esp8285.menu.FlashSize.1M192.upload.maximum_size=827376
+
+esp8285.menu.FlashSize.1M160=1M (160K SPIFFS)
+esp8285.menu.FlashSize.1M160.build.flash_size=1M
+esp8285.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
+esp8285.menu.FlashSize.1M160.build.spiffs_start=0xD3000
+esp8285.menu.FlashSize.1M160.build.spiffs_end=0xFB000
+esp8285.menu.FlashSize.1M160.build.spiffs_blocksize=4096
+esp8285.menu.FlashSize.1M160.upload.maximum_size=860144
+
+esp8285.menu.FlashSize.1M144=1M (144K SPIFFS)
+esp8285.menu.FlashSize.1M144.build.flash_size=1M
+esp8285.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
+esp8285.menu.FlashSize.1M144.build.spiffs_start=0xD7000
+esp8285.menu.FlashSize.1M144.build.spiffs_end=0xFB000
+esp8285.menu.FlashSize.1M144.build.spiffs_blocksize=4096
+esp8285.menu.FlashSize.1M144.upload.maximum_size=876528
+
+esp8285.menu.FlashSize.1M128=1M (128K SPIFFS)
+esp8285.menu.FlashSize.1M128.build.flash_size=1M
+esp8285.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
+esp8285.menu.FlashSize.1M128.build.spiffs_start=0xDB000
+esp8285.menu.FlashSize.1M128.build.spiffs_end=0xFB000
+esp8285.menu.FlashSize.1M128.build.spiffs_blocksize=4096
+esp8285.menu.FlashSize.1M128.upload.maximum_size=892912
+
+esp8285.menu.FlashSize.1M64=1M (64K SPIFFS)
+esp8285.menu.FlashSize.1M64.build.flash_size=1M
+esp8285.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
+esp8285.menu.FlashSize.1M64.build.spiffs_start=0xEB000
+esp8285.menu.FlashSize.1M64.build.spiffs_end=0xFB000
+esp8285.menu.FlashSize.1M64.build.spiffs_blocksize=4096
+esp8285.menu.FlashSize.1M64.upload.maximum_size=958448
+
+
+##############################################################
+
 espduino.name=ESPDuino (ESP-13 Module)
 
 espduino.upload.tool=esptool
@@ -553,6 +664,216 @@ espresso_lite_v2.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DD
 
 espresso_lite_v2.build.debug_port=
 espresso_lite_v2.build.debug_level=
+
+##############################################################
+phoenix_v1.name=Phoenix 1.0
+phoenix_v1.upload.tool=esptool
+phoenix_v1.upload.speed=115200
+phoenix_v1.upload.maximum_size=1044464
+phoenix_v1.upload.maximum_data_size=81920
+phoenix_v1.upload.wait_for_upload_port=true
+
+phoenix_v1.build.mcu=esp8266
+phoenix_v1.build.f_cpu=80000000L
+phoenix_v1.build.board=ESP8266_PHOENIX_V1
+phoenix_v1.build.core=esp8266
+phoenix_v1.build.variant=phoenix_v1
+phoenix_v1.build.flash_mode=dio
+phoenix_v1.build.flash_size=4M
+phoenix_v1.build.flash_freq=40
+
+phoenix_v1.menu.CpuFrequency.80=80 MHz
+phoenix_v1.menu.CpuFrequency.80.build.f_cpu=80000000L
+phoenix_v1.menu.CpuFrequency.160=160 MHz
+phoenix_v1.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+phoenix_v1.menu.UploadSpeed.115200=115200
+phoenix_v1.menu.UploadSpeed.115200.upload.speed=115200
+phoenix_v1.menu.UploadSpeed.57600=57600
+phoenix_v1.menu.UploadSpeed.57600.upload.speed=57600
+phoenix_v1.menu.UploadSpeed.256000.windows=256000
+phoenix_v1.menu.UploadSpeed.256000.upload.speed=256000
+phoenix_v1.menu.UploadSpeed.230400.linux=230400
+phoenix_v1.menu.UploadSpeed.230400.macosx=230400
+phoenix_v1.menu.UploadSpeed.230400.macosx=230400
+phoenix_v1.menu.UploadSpeed.230400.upload.speed=230400
+phoenix_v1.menu.UploadSpeed.460800.linux=460800
+phoenix_v1.menu.UploadSpeed.460800.macosx=460800
+phoenix_v1.menu.UploadSpeed.460800.upload.speed=460800
+phoenix_v1.menu.UploadSpeed.512000.windows=512000
+phoenix_v1.menu.UploadSpeed.512000.upload.speed=512000
+phoenix_v1.menu.UploadSpeed.921600=921600
+phoenix_v1.menu.UploadSpeed.921600.upload.speed=921600
+
+phoenix_v1.menu.FlashSize.4M3M=4M (3M SPIFFS)
+phoenix_v1.menu.FlashSize.4M3M.build.flash_size=4M
+phoenix_v1.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+phoenix_v1.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+phoenix_v1.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+phoenix_v1.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+phoenix_v1.menu.FlashSize.4M3M.upload.maximum_size=1044464
+
+phoenix_v1.menu.FlashSize.4M1M=4M (1M SPIFFS)
+phoenix_v1.menu.FlashSize.4M1M.build.flash_size=4M
+phoenix_v1.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+phoenix_v1.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+phoenix_v1.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+phoenix_v1.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+phoenix_v1.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+phoenix_v1.menu.FlashSize.4M1M.upload.maximum_size=1044464
+
+phoenix_v1.menu.ResetMethod.nodemcu=nodemcu
+phoenix_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+phoenix_v1.menu.ResetMethod.ck=ck
+phoenix_v1.menu.ResetMethod.ck.upload.resetmethod=ck
+
+phoenix_v1.menu.Debug.Disabled=Disabled
+phoenix_v1.menu.Debug.Disabled.build.debug_port=
+phoenix_v1.menu.Debug.Serial=Serial
+phoenix_v1.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+phoenix_v1.menu.Debug.Serial1=Serial1
+phoenix_v1.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+phoenix_v1.menu.DebugLevel.None____=None
+phoenix_v1.menu.DebugLevel.None____.build.debug_level=
+phoenix_v1.menu.DebugLevel.Core____=Core
+phoenix_v1.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
+phoenix_v1.menu.DebugLevel.SSL_____=Core + SSL
+phoenix_v1.menu.DebugLevel.SSL_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+phoenix_v1.menu.DebugLevel.SSL_MEM_=Core + SSL + TLS Mem
+phoenix_v1.menu.DebugLevel.SSL_MEM_.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_TLS_MEM
+phoenix_v1.menu.DebugLevel.WiFic___=Core + WiFi
+phoenix_v1.menu.DebugLevel.WiFic___.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+phoenix_v1.menu.DebugLevel.WiFi____=WiFi
+phoenix_v1.menu.DebugLevel.WiFi____.build.debug_level=-DDEBUG_ESP_WIFI
+phoenix_v1.menu.DebugLevel.HTTPClient=HTTPClient
+phoenix_v1.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+phoenix_v1.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+phoenix_v1.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
+phoenix_v1.menu.DebugLevel.HTTPUpdate=HTTPUpdate
+phoenix_v1.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
+phoenix_v1.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
+phoenix_v1.menu.DebugLevel.HTTPUpdate2.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE
+phoenix_v1.menu.DebugLevel.HTTPUpdate3=HTTPClient + HTTPUpdate + Updater
+phoenix_v1.menu.DebugLevel.HTTPUpdate3.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER
+phoenix_v1.menu.DebugLevel.HTTPServer=HTTPServer
+phoenix_v1.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
+phoenix_v1.menu.DebugLevel.UPDATER=Updater
+phoenix_v1.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
+phoenix_v1.menu.DebugLevel.OTA_____=OTA
+phoenix_v1.menu.DebugLevel.OTA_____.build.debug_level=-DDEBUG_ESP_OTA
+phoenix_v1.menu.DebugLevel.OTA2____=OTA + Updater
+phoenix_v1.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
+phoenix_v1.menu.DebugLevel.all_____=All
+phoenix_v1.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
+
+phoenix_v1.build.debug_port=
+phoenix_v1.build.debug_level=
+
+##############################################################
+phoenix_v2.name=Phoenix 2.0
+phoenix_v2.upload.tool=esptool
+phoenix_v2.upload.speed=115200
+phoenix_v2.upload.maximum_size=1044464
+phoenix_v2.upload.maximum_data_size=81920
+phoenix_v2.upload.wait_for_upload_port=true
+
+phoenix_v2.build.mcu=esp8266
+phoenix_v2.build.f_cpu=80000000L
+phoenix_v2.build.board=ESP8266_PHOENIX_V2
+phoenix_v2.build.core=esp8266
+phoenix_v2.build.variant=phoenix_v2
+phoenix_v2.build.flash_mode=dio
+phoenix_v2.build.flash_size=4M
+phoenix_v2.build.flash_freq=40
+
+phoenix_v2.menu.CpuFrequency.80=80 MHz
+phoenix_v2.menu.CpuFrequency.80.build.f_cpu=80000000L
+phoenix_v2.menu.CpuFrequency.160=160 MHz
+phoenix_v2.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+phoenix_v2.menu.UploadSpeed.115200=115200
+phoenix_v2.menu.UploadSpeed.115200.upload.speed=115200
+phoenix_v2.menu.UploadSpeed.57600=57600
+phoenix_v2.menu.UploadSpeed.57600.upload.speed=57600
+phoenix_v2.menu.UploadSpeed.256000.windows=256000
+phoenix_v2.menu.UploadSpeed.256000.upload.speed=256000
+phoenix_v2.menu.UploadSpeed.230400.linux=230400
+phoenix_v2.menu.UploadSpeed.230400.macosx=230400
+phoenix_v2.menu.UploadSpeed.230400.macosx=230400
+phoenix_v2.menu.UploadSpeed.230400.upload.speed=230400
+phoenix_v2.menu.UploadSpeed.460800.linux=460800
+phoenix_v2.menu.UploadSpeed.460800.macosx=460800
+phoenix_v2.menu.UploadSpeed.460800.upload.speed=460800
+phoenix_v2.menu.UploadSpeed.512000.windows=512000
+phoenix_v2.menu.UploadSpeed.512000.upload.speed=512000
+phoenix_v2.menu.UploadSpeed.921600=921600
+phoenix_v2.menu.UploadSpeed.921600.upload.speed=921600
+
+phoenix_v2.menu.FlashSize.4M3M=4M (3M SPIFFS)
+phoenix_v2.menu.FlashSize.4M3M.build.flash_size=4M
+phoenix_v2.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+phoenix_v2.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+phoenix_v2.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+phoenix_v2.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+phoenix_v2.menu.FlashSize.4M3M.upload.maximum_size=1044464
+
+phoenix_v2.menu.FlashSize.4M1M=4M (1M SPIFFS)
+phoenix_v2.menu.FlashSize.4M1M.build.flash_size=4M
+phoenix_v2.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+phoenix_v2.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+phoenix_v2.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+phoenix_v2.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+phoenix_v2.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+phoenix_v2.menu.FlashSize.4M1M.upload.maximum_size=1044464
+
+phoenix_v2.menu.ResetMethod.ck=ck
+phoenix_v2.menu.ResetMethod.ck.upload.resetmethod=ck
+phoenix_v2.menu.ResetMethod.nodemcu=nodemcu
+phoenix_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+
+phoenix_v2.menu.Debug.Disabled=Disabled
+phoenix_v2.menu.Debug.Disabled.build.debug_port=
+phoenix_v2.menu.Debug.Serial=Serial
+phoenix_v2.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+phoenix_v2.menu.Debug.Serial1=Serial1
+phoenix_v2.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+phoenix_v2.menu.DebugLevel.None____=None
+phoenix_v2.menu.DebugLevel.None____.build.debug_level=
+phoenix_v2.menu.DebugLevel.Core____=Core
+phoenix_v2.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
+phoenix_v2.menu.DebugLevel.SSL_____=Core + SSL
+phoenix_v2.menu.DebugLevel.SSL_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+phoenix_v2.menu.DebugLevel.SSL_MEM_=Core + SSL + TLS Mem
+phoenix_v2.menu.DebugLevel.SSL_MEM_.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_TLS_MEM
+phoenix_v2.menu.DebugLevel.WiFic___=Core + WiFi
+phoenix_v2.menu.DebugLevel.WiFic___.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+phoenix_v2.menu.DebugLevel.WiFi____=WiFi
+phoenix_v2.menu.DebugLevel.WiFi____.build.debug_level=-DDEBUG_ESP_WIFI
+phoenix_v2.menu.DebugLevel.HTTPClient=HTTPClient
+phoenix_v2.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+phoenix_v2.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+phoenix_v2.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
+phoenix_v2.menu.DebugLevel.HTTPUpdate=HTTPUpdate
+phoenix_v2.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
+phoenix_v2.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
+phoenix_v2.menu.DebugLevel.HTTPUpdate2.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE
+phoenix_v2.menu.DebugLevel.HTTPUpdate3=HTTPClient + HTTPUpdate + Updater
+phoenix_v2.menu.DebugLevel.HTTPUpdate3.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER
+phoenix_v2.menu.DebugLevel.HTTPServer=HTTPServer
+phoenix_v2.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
+phoenix_v2.menu.DebugLevel.UPDATER=Updater
+phoenix_v2.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
+phoenix_v2.menu.DebugLevel.OTA_____=OTA
+phoenix_v2.menu.DebugLevel.OTA_____.build.debug_level=-DDEBUG_ESP_OTA
+phoenix_v2.menu.DebugLevel.OTA2____=OTA + Updater
+phoenix_v2.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
+phoenix_v2.menu.DebugLevel.all_____=All
+phoenix_v2.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
+
+phoenix_v2.build.debug_port=
+phoenix_v2.build.debug_level=
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
@@ -944,7 +1265,7 @@ d1_mini.serial.disableRTS=true
 
 d1_mini.build.mcu=esp8266
 d1_mini.build.f_cpu=80000000L
-d1_mini.build.board=ESP8266_NODEMCU
+d1_mini.build.board=ESP8266_WEMOS_D1MINI
 d1_mini.build.core=esp8266
 d1_mini.build.variant=d1_mini
 d1_mini.build.flash_mode=dio
@@ -995,7 +1316,6 @@ d1_mini.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 d1_mini.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1_mini.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
-
 ##############################################################
 d1.name=WeMos D1(Retired)
 
@@ -1010,7 +1330,7 @@ d1.serial.disableRTS=true
 
 d1.build.mcu=esp8266
 d1.build.f_cpu=80000000L
-d1.build.board=ESP8266_NODEMCU
+d1.build.board=ESP8266_WEMOS_D1MINI
 d1.build.core=esp8266
 d1.build.variant=d1
 d1.build.flash_mode=dio
@@ -1215,11 +1535,9 @@ wifinfo.serial.disableDTR=true
 wifinfo.serial.disableRTS=true
 
 wifinfo.build.mcu=esp8266
-wifinfo.build.f_cpu=160000000L
 wifinfo.build.core=esp8266
 wifinfo.build.variant=wifinfo
-wifinfo.build.flash_mode=qio
-wifinfo.build.board=ESP8266_NODEMCU
+wifinfo.build.board=WIFINFO
 wifinfo.build.spiffs_pagesize=256
 wifinfo.build.debug_port=Serial1
 wifinfo.build.debug_level=Wifinfo
@@ -1300,20 +1618,20 @@ wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
 wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
 wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
 
-wifinfo.menu.CpuFrequency.80=80 MHz
-wifinfo.menu.CpuFrequency.80.build.f_cpu=80000000L
 wifinfo.menu.CpuFrequency.160=160 MHz
 wifinfo.menu.CpuFrequency.160.build.f_cpu=160000000L
+wifinfo.menu.CpuFrequency.80=80 MHz
+wifinfo.menu.CpuFrequency.80.build.f_cpu=80000000L
 
 wifinfo.menu.FlashFreq.40=40MHz
 wifinfo.menu.FlashFreq.40.build.flash_freq=40
 wifinfo.menu.FlashFreq.80=80MHz
 wifinfo.menu.FlashFreq.80.build.flash_freq=80
 
-wifinfo.menu.FlashMode.dio=DIO
-wifinfo.menu.FlashMode.dio.build.flash_mode=dio
 wifinfo.menu.FlashMode.qio=QIO
 wifinfo.menu.FlashMode.qio.build.flash_mode=qio
+wifinfo.menu.FlashMode.dio=DIO
+wifinfo.menu.FlashMode.dio.build.flash_mode=dio
 
 wifinfo.menu.UploadSpeed.115200=115200
 wifinfo.menu.UploadSpeed.115200.upload.speed=115200
@@ -1385,6 +1703,10 @@ coredev.menu.FlashMode.dio=DIO
 coredev.menu.FlashMode.dio.build.flash_mode=dio
 coredev.menu.FlashMode.qio=QIO
 coredev.menu.FlashMode.qio.build.flash_mode=qio
+coredev.menu.FlashMode.dout=DOUT
+coredev.menu.FlashMode.dout.build.flash_mode=dout
+coredev.menu.FlashMode.qout=QOUT
+coredev.menu.FlashMode.qout.build.flash_mode=qout
 
 coredev.menu.UploadSpeed.115200=115200
 coredev.menu.UploadSpeed.115200.upload.speed=115200

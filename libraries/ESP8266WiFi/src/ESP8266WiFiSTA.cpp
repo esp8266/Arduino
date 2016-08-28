@@ -134,21 +134,28 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     wifi_station_get_config(&current_conf);
     if(sta_config_equal(current_conf, conf)) {
         DEBUGV("sta config unchanged");
-        return status();
+    }
+    else {
+        ETS_UART_INTR_DISABLE();
+
+        if(WiFi._persistent) {
+            // workaround for #1997: make sure the value of ap_number is updated and written to flash
+            // to be removed after SDK update
+            wifi_station_ap_number_set(2);
+            wifi_station_ap_number_set(1);
+
+            wifi_station_set_config(&conf);
+        } else {
+            wifi_station_set_config_current(&conf);
+        }
+
+        ETS_UART_INTR_ENABLE();
     }
 
     ETS_UART_INTR_DISABLE();
-
-    if(WiFi._persistent) {
-        wifi_station_set_config(&conf);
-    } else {
-        wifi_station_set_config_current(&conf);
-    }
-
     if(connect) {
         wifi_station_connect();
     }
-
     ETS_UART_INTR_ENABLE();
 
     if(channel > 0 && channel <= 13) {
@@ -206,6 +213,12 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddres
     info.ip.addr = static_cast<uint32_t>(local_ip);
     info.gw.addr = static_cast<uint32_t>(gateway);
     info.netmask.addr = static_cast<uint32_t>(subnet);
+
+    if (local_ip == 0U && gateway == 0U && subnet == 0U) {
+        _useStaticIp = false;
+        wifi_station_dhcpc_start();
+        return true;
+    }
 
     wifi_station_dhcpc_stop();
     if(wifi_set_ip_info(STATION_IF, &info)) {

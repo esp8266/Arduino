@@ -86,6 +86,8 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 
   String methodStr = req.substring(0, addr_start);
   String url = req.substring(addr_start + 1, addr_end);
+  String versionEnd = req.substring(addr_end + 8);
+  _currentVersion = atoi(versionEnd.c_str());
   String searchStr = "";
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
@@ -93,6 +95,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
+  _chunked = false;
 
   HTTPMethod method = HTTP_GET;
   if (methodStr == "POST") {

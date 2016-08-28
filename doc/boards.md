@@ -12,11 +12,14 @@ title: Supported Hardware
   * [Olimex MOD\-WIFI\-ESP8266\-DEV](#olimex-mod-wifi-esp8266-dev)
   * [Olimex MOD\-WIFI\-ESP8266](#olimex-mod-wifi-esp8266)
   * [Olimex ESP8266\-EVB](#olimex-esp8266-evb)
+  * [Phoenix 1\.0](#phoenix-10)
+  * [Phoenix 2\.0](#phoenix-20)
   * [SparkFun ESP8266 Thing](#sparkfun-esp8266-thing)
   * [SweetPea ESP\-210](#sweetpea-esp-210)
   * [ESPino](#espino)
   * [WifInfo](#WifInfo)
   * [Generic ESP8266 modules](#generic-esp8266-modules)
+  * [Generic ESP8285 modules](#generic-esp8285-modules)
   * [Serial Adapter](#serial-adapter)
   * [Minimal Hardware Setup for Bootloading and Usage](#minimal-hardware-setup-for-bootloading-and-usage)
   * [ESP to Serial](#esp-to-serial)
@@ -43,6 +46,13 @@ ESPresso Lite 1.0 (beta version) is an Arduino-compatible Wi-Fi development boar
 
 ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an earlier V1 (beta version). Re-designed together with Cytron Technologies, the newly-revised ESPresso Lite V2.0 features the auto-load/auto-program function, eliminating the previous need to reset the board manually before flashing a new program. It also feature two user programmable side buttons and a reset button. The special distinctive features of on-board pads for I2C sensor and actuator is retained.
 
+## Phoenix 1.0
+
+Product page: http://www.espert.co
+
+## Phoenix 2.0
+
+Product page: http://www.espert.co
 
 ## NodeMCU 0.9
 
@@ -270,6 +280,13 @@ the first value respects the pin setup of the Pins 0, 2 and 15.
 
 note:
  - number = ((GPIO15 << 2) | (GPIO0 << 1) | GPIO2);
+
+## Generic ESP8285 modules
+
+ESP8285 ([datasheet](http://espressif.com/sites/default/files/documentation/0a-esp8285_datasheet_en_v1.0_20160422.pdf)) is a multi-chip package which contains ESP8266 and 1MB flash.
+All points related to bootstrapping resistors and recommended circuits listed above apply to ESP8285 as well.
+
+Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.
 
 ## WeMos D1
 Product page: http://wemos.cc
