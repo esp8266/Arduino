@@ -91,7 +91,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   String searchStr = "";
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
-    searchStr = url.substring(hasSearch + 1);
+    searchStr = urlDecode(url.substring(hasSearch + 1));
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
@@ -135,6 +135,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     String headerName;
     String headerValue;
     bool isForm = false;
+    bool isEncoded = false;
     uint32_t contentLength = 0;
     //parse headers
     while(1){
@@ -150,17 +151,20 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       headerValue.trim();
        _collectHeader(headerName.c_str(),headerValue.c_str());
 
-	  #ifdef DEBUG_ESP_HTTP_SERVER
-	  DEBUG_OUTPUT.print("headerName: ");
-	  DEBUG_OUTPUT.println(headerName);
-	  DEBUG_OUTPUT.print("headerValue: ");
-	  DEBUG_OUTPUT.println(headerValue);
-	  #endif
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.print("headerName: ");
+      DEBUG_OUTPUT.println(headerName);
+      DEBUG_OUTPUT.print("headerValue: ");
+      DEBUG_OUTPUT.println(headerValue);
+      #endif
 
       if (headerName == "Content-Type"){
         if (headerValue.startsWith("text/plain")){
           isForm = false;
-        } else if (headerValue.startsWith("multipart/form-data")){
+        } else if (headerValue.startsWith("application/x-www-form-urlencoded")){
+          isForm = false;
+          isEncoded = true;
+        } else if (headerValue.startsWith("multipart/")){
           boundaryStr = headerValue.substring(headerValue.indexOf('=')+1);
           isForm = true;
         }
@@ -178,24 +182,34 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       	free(plainBuf);
       	return false;
       }
-#ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.print("Plain: ");
-      DEBUG_OUTPUT.println(plainBuf);
-#endif
       if (contentLength > 0) {
         if (searchStr != "") searchStr += '&';
-        if(plainBuf[0] == '{' || plainBuf[0] == '[' || strstr(plainBuf, "=") == NULL){
-          //plain post json or other data
-          searchStr += "plain=";
-          searchStr += plainBuf;
-        } else {
+        if(isEncoded){
+          //url encoded form
+          String decoded = urlDecode(plainBuf);
+          size_t decodedLen = decoded.length();
+          memcpy(plainBuf, decoded.c_str(), decodedLen);
+          plainBuf[decodedLen] = 0;
           searchStr += plainBuf;
         }
+        _parseArguments(searchStr);
+        if(!isEncoded){
+          //plain post json or other data
+          RequestArgument& arg = _currentArgs[_currentArgCount++];
+          arg.key = "plain";
+          arg.value = String(plainBuf);
+        }
+
+  #ifdef DEBUG_ESP_HTTP_SERVER
+        DEBUG_OUTPUT.print("Plain: ");
+        DEBUG_OUTPUT.println(plainBuf);
+  #endif
         free(plainBuf);
       }
     }
-    _parseArguments(searchStr);
+
     if (isForm){
+      _parseArguments(searchStr);
       if (!_parseForm(client, boundaryStr, contentLength)) {
         return false;
       }
@@ -261,6 +275,7 @@ void ESP8266WebServer::_parseArguments(String data) {
   _currentArgs = 0;
   if (data.length() == 0) {
     _currentArgCount = 0;
+    _currentArgs = new RequestArgument[1];
     return;
   }
   _currentArgCount = 1;
@@ -277,7 +292,7 @@ void ESP8266WebServer::_parseArguments(String data) {
   DEBUG_OUTPUT.println(_currentArgCount);
 #endif
 
-  _currentArgs = new RequestArgument[_currentArgCount];
+  _currentArgs = new RequestArgument[_currentArgCount+1];
   int pos = 0;
   int iarg;
   for (iarg = 0; iarg < _currentArgCount;) {
@@ -303,7 +318,7 @@ void ESP8266WebServer::_parseArguments(String data) {
     }
     RequestArgument& arg = _currentArgs[iarg];
     arg.key = data.substring(pos, equal_sign_index);
-	arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
+	arg.value = data.substring(equal_sign_index + 1, next_arg_index);
 #ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.print("arg ");
     DEBUG_OUTPUT.print(iarg);

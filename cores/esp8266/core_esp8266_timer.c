@@ -41,7 +41,7 @@ void ICACHE_RAM_ATTR timer1_isr_handler(void *para){
     }
 }
 
-void timer1_isr_init(){
+void ICACHE_RAM_ATTR timer1_isr_init(){
     ETS_FRC_TIMER1_INTR_ATTACH(timer1_isr_handler, NULL);
 }
 
@@ -66,7 +66,7 @@ void ICACHE_RAM_ATTR timer1_write(uint32_t ticks){
     if ((T1C & (1 << TCIT)) == 0) TEIE |= TEIE1;//edge int enable
 }
 
-void timer1_disable(){
+void ICACHE_RAM_ATTR timer1_disable(){
     T1C = 0;
     T1I = 0;
 }

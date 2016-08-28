@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# @file esp8266-arudino-doc.bash
+# @file esp8266-arduino-doc.bash
 # @author Ivan Grokhotkov (https://github.com/igrr)
 # @author Pascal Gollor (https://github.com/pgollor)
 #

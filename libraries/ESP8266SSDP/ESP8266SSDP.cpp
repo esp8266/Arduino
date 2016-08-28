@@ -431,4 +431,6 @@ void SSDPClass::_startTimer() {
   os_timer_arm(tm, interval, 1 /* repeat */);
 }
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SSDP)
 SSDPClass SSDP;
+#endif

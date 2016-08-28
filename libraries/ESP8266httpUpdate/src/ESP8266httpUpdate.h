@@ -105,6 +105,8 @@ protected:
     bool _rebootOnUpdate = true;
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_HTTPUPDATE)
 extern ESP8266HTTPUpdate ESPhttpUpdate;
+#endif
 
 #endif /* ESP8266HTTPUPDATE_H_ */
