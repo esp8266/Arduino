@@ -130,10 +130,13 @@ s32_t spiffs_phys_rd(
   spiffs_cache_page *cp =  spiffs_cache_page_get(fs, SPIFFS_PADDR_TO_PAGE(fs, addr));
   cache->last_access++;
   if (cp) {
+    // we've already got one, you see
 #if SPIFFS_CACHE_STATS
     fs->cache_hits++;
 #endif
     cp->last_access = cache->last_access;
+    u8_t *mem =  spiffs_get_cache_page(fs, cache, cp->ix);
+    memcpy(dst, &mem[SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr)], len);
   } else {
     if ((op & SPIFFS_OP_TYPE_MASK) == SPIFFS_OP_T_OBJ_LU2) {
       // for second layer lookup functions, we do not cache in order to prevent shredding
@@ -142,22 +145,34 @@ s32_t spiffs_phys_rd(
 #if SPIFFS_CACHE_STATS
     fs->cache_misses++;
 #endif
+    // this operation will always free one cache page (unless all already free),
+    // the result code stems from the write operation of the possibly freed cache page
     res = spiffs_cache_page_remove_oldest(fs, SPIFFS_CACHE_FLAG_TYPE_WR, 0);
+
     cp = spiffs_cache_page_allocate(fs);
     if (cp) {
       cp->flags = SPIFFS_CACHE_FLAG_WRTHRU;
       cp->pix = SPIFFS_PADDR_TO_PAGE(fs, addr);
-    }
-    s32_t res2 = SPIFFS_HAL_READ(fs,
-        addr - SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr),
-        SPIFFS_CFG_LOG_PAGE_SZ(fs),
-        spiffs_get_cache_page(fs, cache, cp->ix));
-    if (res2 != SPIFFS_OK) {
-      res = res2;
+
+      s32_t res2 = SPIFFS_HAL_READ(fs,
+          addr - SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr),
+          SPIFFS_CFG_LOG_PAGE_SZ(fs),
+          spiffs_get_cache_page(fs, cache, cp->ix));
+      if (res2 != SPIFFS_OK) {
+        // honor read failure before possible write failure (bad idea?)
+        res = res2;
+      }
+      u8_t *mem =  spiffs_get_cache_page(fs, cache, cp->ix);
+      memcpy(dst, &mem[SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr)], len);
+    } else {
+      // this will never happen, last resort for sake of symmetry
+      s32_t res2 = SPIFFS_HAL_READ(fs, addr, len, dst);
+      if (res2 != SPIFFS_OK) {
+        // honor read failure before possible write failure (bad idea?)
+        res = res2;
+      }
     }
   }
-  u8_t *mem =  spiffs_get_cache_page(fs, cache, cp->ix);
-  memcpy(dst, &mem[SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr)], len);
   return res;
 }
 

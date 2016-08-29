@@ -980,8 +980,8 @@ s32_t spiffs_object_index_consistency_check(spiffs *fs) {
   memset(fs->work, 0, SPIFFS_CFG_LOG_PAGE_SZ(fs));
   u32_t obj_id_log_ix = 0;
   CHECK_CB(fs, SPIFFS_CHECK_INDEX, SPIFFS_CHECK_PROGRESS, 0, 0);
-  res = spiffs_obj_lu_find_entry_visitor(fs, 0, 0, 0, 0, spiffs_object_index_consistency_check_v, &obj_id_log_ix,
-      0, 0, 0);
+  res = spiffs_obj_lu_find_entry_visitor(fs, 0, 0, 0, 0, spiffs_object_index_consistency_check_v, 0, &obj_id_log_ix,
+        0, 0);
   if (res == SPIFFS_VIS_END) {
     res = SPIFFS_OK;
   }

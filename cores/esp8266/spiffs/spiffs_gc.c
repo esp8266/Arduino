@@ -255,10 +255,7 @@ s32_t spiffs_gc_find_candidate(
   s32_t *cand_scores = (s32_t *)(fs->work + max_candidates * sizeof(spiffs_block_ix));
 
    // align cand_scores on s32_t boundary
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
   cand_scores = (s32_t*)(((ptrdiff_t)cand_scores + sizeof(ptrdiff_t) - 1) & ~(sizeof(ptrdiff_t) - 1));
-#pragma GCC diagnostic pop
 
   *block_candidates = cand_blocks;
 
@@ -359,6 +356,7 @@ typedef struct {
   spiffs_obj_id cur_obj_id;
   spiffs_span_ix cur_objix_spix;
   spiffs_page_ix cur_objix_pix;
+  spiffs_page_ix cur_data_pix;
   int stored_scan_entry_index;
   u8_t obj_id_found;
 } spiffs_gc;
@@ -378,10 +376,11 @@ typedef struct {
 //
 s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
   s32_t res = SPIFFS_OK;
-  int entries_per_page = (SPIFFS_CFG_LOG_PAGE_SZ(fs) / sizeof(spiffs_obj_id));
+  const int entries_per_page = (SPIFFS_CFG_LOG_PAGE_SZ(fs) / sizeof(spiffs_obj_id));
+  // this is the global localizer being pushed and popped
   int cur_entry = 0;
   spiffs_obj_id *obj_lu_buf = (spiffs_obj_id *)fs->lu_work;
-  spiffs_gc gc;
+  spiffs_gc gc; // our stack frame/state
   spiffs_page_ix cur_pix = 0;
   spiffs_page_object_ix_header *objix_hdr = (spiffs_page_object_ix_header *)fs->work;
   spiffs_page_object_ix *objix = (spiffs_page_object_ix *)fs->work;
@@ -400,7 +399,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
 
   while (res == SPIFFS_OK && gc.state != FINISHED) {
     SPIFFS_GC_DBG("gc_clean: state = %i entry:%i\n", gc.state, cur_entry);
-    gc.obj_id_found = 0;
+    gc.obj_id_found = 0; // reset (to no found data page)
 
     // scan through lookup pages
     int obj_lookup_page = cur_entry / entries_per_page;
@@ -411,7 +410,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
       res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU | SPIFFS_OP_C_READ,
           0, bix * SPIFFS_CFG_LOG_BLOCK_SZ(fs) + SPIFFS_PAGE_TO_PADDR(fs, obj_lookup_page),
           SPIFFS_CFG_LOG_PAGE_SZ(fs), fs->lu_work);
-      // check each entry
+      // check each object lookup entry
       while (scan && res == SPIFFS_OK &&
           cur_entry - entry_offset < entries_per_page && cur_entry < (int)(SPIFFS_PAGES_PER_BLOCK(fs)-SPIFFS_OBJ_LOOKUP_PAGES(fs))) {
         spiffs_obj_id obj_id = obj_lu_buf[cur_entry-entry_offset];
@@ -420,15 +419,20 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
         // act upon object id depending on gc state
         switch (gc.state) {
         case FIND_OBJ_DATA:
+          // find a data page
           if (obj_id != SPIFFS_OBJ_ID_DELETED && obj_id != SPIFFS_OBJ_ID_FREE &&
               ((obj_id & SPIFFS_OBJ_ID_IX_FLAG) == 0)) {
+            // found a data page, stop scanning and handle in switch case below
             SPIFFS_GC_DBG("gc_clean: FIND_DATA state:%i - found obj id %04x\n", gc.state, obj_id);
             gc.obj_id_found = 1;
             gc.cur_obj_id = obj_id;
+            gc.cur_data_pix = cur_pix;
             scan = 0;
           }
           break;
         case MOVE_OBJ_DATA:
+          // evacuate found data pages for corresponding object index we have in memory,
+          // update memory representation
           if (obj_id == gc.cur_obj_id) {
             spiffs_page_header p_hdr;
             res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
@@ -450,7 +454,9 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
                     SPIFFS_CFG_LOG_PAGE_SZ(fs), fs->lu_work);
                 SPIFFS_CHECK_RES(res);
               } else {
-                // page is deleted but not deleted in lookup, scrap it
+                // page is deleted but not deleted in lookup, scrap it -
+                // might seem unnecessary as we will erase this block, but
+                // we might get aborted
                 SPIFFS_GC_DBG("gc_clean: MOVE_DATA wipe objix %04x:%04x page %04x\n", obj_id, p_hdr.span_ix, cur_pix);
                 res = spiffs_page_delete(fs, cur_pix);
                 SPIFFS_CHECK_RES(res);
@@ -470,6 +476,7 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
           }
           break;
         case MOVE_OBJ_IX:
+          // find and evacuate object index pages
           if (obj_id != SPIFFS_OBJ_ID_DELETED && obj_id != SPIFFS_OBJ_ID_FREE &&
               (obj_id & SPIFFS_OBJ_ID_IX_FLAG)) {
             // found an index object id
@@ -484,18 +491,22 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
               res = spiffs_page_move(fs, 0, 0, obj_id, &p_hdr, cur_pix, &new_pix);
               SPIFFS_GC_DBG("gc_clean: MOVE_OBJIX move objix %04x:%04x page %04x to %04x\n", obj_id, p_hdr.span_ix, cur_pix, new_pix);
               SPIFFS_CHECK_RES(res);
-              spiffs_cb_object_event(fs, 0, SPIFFS_EV_IX_UPD, obj_id, p_hdr.span_ix, new_pix, 0);
+              spiffs_cb_object_event(fs, (spiffs_page_object_ix *)&p_hdr,
+                  SPIFFS_EV_IX_MOV, obj_id, p_hdr.span_ix, new_pix, 0);
               // move wipes obj_lu, reload it
               res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU | SPIFFS_OP_C_READ,
                   0, bix * SPIFFS_CFG_LOG_BLOCK_SZ(fs) + SPIFFS_PAGE_TO_PADDR(fs, obj_lookup_page),
                   SPIFFS_CFG_LOG_PAGE_SZ(fs), fs->lu_work);
               SPIFFS_CHECK_RES(res);
             } else {
-              // page is deleted but not deleted in lookup, scrap it
+              // page is deleted but not deleted in lookup, scrap it -
+              // might seem unnecessary as we will erase this block, but
+              // we might get aborted
               SPIFFS_GC_DBG("gc_clean: MOVE_OBJIX wipe objix %04x:%04x page %04x\n", obj_id, p_hdr.span_ix, cur_pix);
               res = spiffs_page_delete(fs, cur_pix);
               if (res == SPIFFS_OK) {
-                spiffs_cb_object_event(fs, 0, SPIFFS_EV_IX_DEL, obj_id, p_hdr.span_ix, cur_pix, 0);
+                spiffs_cb_object_event(fs, (spiffs_page_object_ix *)0,
+                    SPIFFS_EV_IX_DEL, obj_id, p_hdr.span_ix, cur_pix, 0);
               }
             }
             SPIFFS_CHECK_RES(res);
@@ -504,23 +515,23 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
         default:
           scan = 0;
           break;
-        }
+        } // switch gc state
         cur_entry++;
       } // per entry
-      obj_lookup_page++;
+      obj_lookup_page++; // no need to check scan variable here, obj_lookup_page is set in start of loop
     } // per object lookup page
-
     if (res != SPIFFS_OK) break;
 
     // state finalization and switch
     switch (gc.state) {
     case FIND_OBJ_DATA:
       if (gc.obj_id_found) {
+        // handle found data page -
         // find out corresponding obj ix page and load it to memory
         spiffs_page_header p_hdr;
         spiffs_page_ix objix_pix;
-        gc.stored_scan_entry_index = cur_entry;
-        cur_entry = 0;
+        gc.stored_scan_entry_index = cur_entry; // push cursor
+        cur_entry = 0; // restart scan from start
         gc.state = MOVE_OBJ_DATA;
         res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
             0, SPIFFS_PAGE_TO_PADDR(fs, cur_pix), sizeof(spiffs_page_header), (u8_t*)&p_hdr);
@@ -528,23 +539,40 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
         gc.cur_objix_spix = SPIFFS_OBJ_IX_ENTRY_SPAN_IX(fs, p_hdr.span_ix);
         SPIFFS_GC_DBG("gc_clean: FIND_DATA find objix span_ix:%04x\n", gc.cur_objix_spix);
         res = spiffs_obj_lu_find_id_and_span(fs, gc.cur_obj_id | SPIFFS_OBJ_ID_IX_FLAG, gc.cur_objix_spix, 0, &objix_pix);
+        if (res == SPIFFS_ERR_NOT_FOUND) {
+          // on borked systems we might get an ERR_NOT_FOUND here -
+          // this is handled by simply deleting the page as it is not referenced
+          // from anywhere
+          SPIFFS_GC_DBG("gc_clean: FIND_OBJ_DATA objix not found! Wipe page %04x\n", gc.cur_data_pix);
+          res = spiffs_page_delete(fs, gc.cur_data_pix);
+          SPIFFS_CHECK_RES(res);
+          // then we restore states and continue scanning for data pages
+          cur_entry = gc.stored_scan_entry_index; // pop cursor
+          gc.state = FIND_OBJ_DATA;
+          break; // done
+        }
         SPIFFS_CHECK_RES(res);
         SPIFFS_GC_DBG("gc_clean: FIND_DATA found object index at page %04x\n", objix_pix);
         res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
             0, SPIFFS_PAGE_TO_PADDR(fs, objix_pix), SPIFFS_CFG_LOG_PAGE_SZ(fs), fs->work);
         SPIFFS_CHECK_RES(res);
+        // cannot allow a gc if the presumed index in fact is no index, a
+        // check must run or lot of data may be lost
         SPIFFS_VALIDATE_OBJIX(objix->p_hdr, gc.cur_obj_id | SPIFFS_OBJ_ID_IX_FLAG, gc.cur_objix_spix);
         gc.cur_objix_pix = objix_pix;
       } else {
+        // no more data pages found, passed thru all block, start evacuating object indices
         gc.state = MOVE_OBJ_IX;
         cur_entry = 0; // restart entry scan index
       }
       break;
     case MOVE_OBJ_DATA: {
-      // store modified objix (hdr) page
+      // store modified objix (hdr) page residing in memory now that all
+      // data pages belonging to this object index and residing in the block
+      // we want to evacuate
       spiffs_page_ix new_objix_pix;
       gc.state = FIND_OBJ_DATA;
-      cur_entry = gc.stored_scan_entry_index;
+      cur_entry = gc.stored_scan_entry_index; // pop cursor
       if (gc.cur_objix_spix == 0) {
         // store object index header page
         res = spiffs_object_update_index_hdr(fs, 0, gc.cur_obj_id | SPIFFS_OBJ_ID_IX_FLAG, gc.cur_objix_pix, fs->work, 0, 0, &new_objix_pix);
@@ -555,17 +583,19 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
         res = spiffs_page_move(fs, 0, fs->work, gc.cur_obj_id | SPIFFS_OBJ_ID_IX_FLAG, 0, gc.cur_objix_pix, &new_objix_pix);
         SPIFFS_GC_DBG("gc_clean: MOVE_DATA store modified objix page, %04x:%04x\n", new_objix_pix, objix->p_hdr.span_ix);
         SPIFFS_CHECK_RES(res);
-        spiffs_cb_object_event(fs, 0, SPIFFS_EV_IX_UPD, gc.cur_obj_id, objix->p_hdr.span_ix, new_objix_pix, 0);
+        spiffs_cb_object_event(fs, (spiffs_page_object_ix *)fs->work,
+            SPIFFS_EV_IX_UPD, gc.cur_obj_id, objix->p_hdr.span_ix, new_objix_pix, 0);
       }
     }
     break;
     case MOVE_OBJ_IX:
+      // scanned thru all block, no more object indices found - our work here is done
       gc.state = FINISHED;
       break;
     default:
       cur_entry = 0;
       break;
-    }
+    } // switch gc.state
     SPIFFS_GC_DBG("gc_clean: state-> %i\n", gc.state);
   } // while state != FINISHED
 
