@@ -139,4 +139,6 @@ IPAddress EthernetClass::dnsServerIP()
   return _dnsServerAddress;
 }
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ETHERNET)
 EthernetClass Ethernet;
+#endif

@@ -35,6 +35,7 @@ class ESP8266WiFiScanClass {
     public:
 
         int8_t scanNetworks(bool async = false, bool show_hidden = false);
+        void scanNetworksAsync(std::function<void(int)> onComplete, bool show_hidden = false);
 
         int8_t scanComplete();
         void scanDelete();
@@ -58,6 +59,8 @@ class ESP8266WiFiScanClass {
 
         static size_t _scanCount;
         static void* _scanResult;
+
+        static std::function<void(int)> _onComplete;
 
         static void _scanDone(void* result, int status);
         static void * _getScanInfoByIndex(int i);

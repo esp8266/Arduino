@@ -590,6 +590,12 @@ void wifi_wps_status_cb(wps_cb_status status) {
         case WPS_CB_ST_WEP:
             DEBUGV("wps WEP\n");
             break;
+        case WPS_CB_ST_UNK:
+            DEBUGV("wps UNKNOWN\n");
+            if(!wifi_wps_disable()) {
+                DEBUGV("wps disable failed\n");
+            }
+            break;
     }
     // TODO user function to get status
 
@@ -670,4 +676,3 @@ void ESP8266WiFiSTAClass::_smartConfigCallback(uint32_t st, void* result) {
         WiFi.stopSmartConfig();
     }
 }
-

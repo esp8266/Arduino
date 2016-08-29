@@ -39,6 +39,7 @@ public:
   int connect(const char* name, uint16_t port) override;
 
   bool verify(const char* fingerprint, const char* domain_name);
+  bool verifyCertChain(const char* domain_name);
 
   uint8_t connected() override;
   size_t write(const uint8_t *buf, size_t size) override;
@@ -54,6 +55,7 @@ public:
 
   bool loadCertificate(Stream& stream, size_t size);
   bool loadPrivateKey(Stream& stream, size_t size);
+  bool loadCACert(Stream& stream, size_t size);
 
   template<typename TFile>
   bool loadCertificate(TFile& file) {
@@ -67,6 +69,7 @@ public:
 
 protected:
     int _connectSSL(const char* hostName);
+    bool _verifyDN(const char* name);
 
     SSLContext* _ssl = nullptr;
 };

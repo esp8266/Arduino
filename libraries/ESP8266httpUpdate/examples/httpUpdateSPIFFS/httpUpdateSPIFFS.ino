@@ -41,14 +41,14 @@ void loop() {
     if((WiFiMulti.run() == WL_CONNECTED)) {
 
         USE_SERIAL.println("Update SPIFFS...");
-        t_httpUpdate_return ret = ESPhttpUpdate.updateSpiffs("https://server/spiffs.bin");
+        t_httpUpdate_return ret = ESPhttpUpdate.updateSpiffs("http://server/spiffs.bin");
         if(ret == HTTP_UPDATE_OK) {
             USE_SERIAL.println("Update sketch...");
-            ret = ESPhttpUpdate.update("https://server/file.bin");
+            ret = ESPhttpUpdate.update("http://server/file.bin");
 
             switch(ret) {
                 case HTTP_UPDATE_FAILED:
-                    USE_SERIAL.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+                    USE_SERIAL.printf("HTTP_UPDATE_FAILED Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
                     break;
 
                 case HTTP_UPDATE_NO_UPDATES:

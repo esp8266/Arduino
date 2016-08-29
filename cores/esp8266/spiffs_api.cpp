@@ -124,11 +124,13 @@ extern "C" uint32_t _SPIFFS_block;
 #define SPIFFS_MAX_OPEN_FILES 5
 #endif
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
 FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(
                              SPIFFS_PHYS_ADDR,
                              SPIFFS_PHYS_SIZE,
                              SPIFFS_PHYS_PAGE,
                              SPIFFS_PHYS_BLOCK,
                              SPIFFS_MAX_OPEN_FILES)));
+#endif
 
 #endif
