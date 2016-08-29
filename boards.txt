@@ -1894,7 +1894,7 @@ coredev.menu.DebugLevel.all_____=All
 coredev.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
 
 ##############################################################
-dinowifi.name=KMP Dino WiFi ESP
+dinowifi.name=KMP ProDino WiFi-ESP
 
 dinowifi.upload.tool=esptool
 dinowifi.upload.speed=115200
@@ -1911,7 +1911,6 @@ dinowifi.build.board=DINOWIFI_ESP8266
 dinowifi.build.core=esp8266
 dinowifi.build.variant=dinowifi
 dinowifi.build.flash_mode=qio
-# Modul AI-Thinker ESP-12E, flash chip: 25Q32 (512 kbyte, 4Mbit. 80Mhz)
 dinowifi.build.flash_size=512K
 dinowifi.build.flash_ld=eagle.flash.512k64.ld
 dinowifi.build.flash_freq=40
@@ -1952,13 +1951,30 @@ dinowifi.menu.UploadSpeed.512000.upload.speed=512000
 dinowifi.menu.UploadSpeed.921600=921600
 dinowifi.menu.UploadSpeed.921600.upload.speed=921600
 
-dinowifi.menu.FlashSize.512K64=512K (64K SPIFFS)
-dinowifi.menu.FlashSize.512K64.build.flash_size=512K
-dinowifi.menu.FlashSize.512K64.build.flash_ld=eagle.flash.512k64.ld
-dinowifi.menu.FlashSize.512K64.build.spiffs_start=0x6B000
-dinowifi.menu.FlashSize.512K64.build.spiffs_end=0x7B000
-dinowifi.menu.FlashSize.512K64.build.spiffs_blocksize=4096
-dinowifi.menu.FlashSize.512K64.upload.maximum_size=434160
+dinowifi.menu.FlashSize.4M1M=4M (1M SPIFFS)
+dinowifi.menu.FlashSize.4M1M.build.flash_size=4M
+dinowifi.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+dinowifi.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+dinowifi.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+dinowifi.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+dinowifi.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+dinowifi.menu.FlashSize.4M1M.upload.maximum_size=1044464
+
+dinowifi.menu.FlashSize.4M3M=4M (3M SPIFFS)
+dinowifi.menu.FlashSize.4M3M.build.flash_size=4M
+dinowifi.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+dinowifi.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+dinowifi.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+dinowifi.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+dinowifi.menu.FlashSize.4M3M.upload.maximum_size=1044464
+
+dinowifi.menu.FlashSize.2M=2M (1M SPIFFS)
+dinowifi.menu.FlashSize.2M.build.flash_size=2M
+dinowifi.menu.FlashSize.2M.build.flash_ld=eagle.flash.2m.ld
+dinowifi.menu.FlashSize.2M.build.spiffs_start=0x100000
+dinowifi.menu.FlashSize.2M.build.spiffs_end=0x1FB000
+dinowifi.menu.FlashSize.2M.build.spiffs_blocksize=8192
+dinowifi.menu.FlashSize.2M.upload.maximum_size=1044464
 
 dinowifi.menu.ResetMethod.nodemcu=nodemcu
 dinowifi.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
