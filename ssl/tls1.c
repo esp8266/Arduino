@@ -735,7 +735,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
     int hmac_len = buf_len + 8 + SSL_RECORD_SIZE;
-    uint8_t *t_buf = (uint8_t *)malloc(buf_len+100);
+    uint8_t *t_buf = (uint8_t *)malloc(hmac_len);
 
     memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ? 
                     ssl->write_sequence : ssl->read_sequence, 8);
@@ -937,8 +937,8 @@ static void prf(SSL *ssl, const uint8_t *sec, int sec_len,
     {
         int len, i;
         const uint8_t *S1, *S2;
-        uint8_t xbuf[256]; /* needs to be > the amount of key data */
-        uint8_t ybuf[256]; /* needs to be > the amount of key data */
+        uint8_t xbuf[2*(SHA256_SIZE+32+16) + MD5_SIZE]; /* max keyblock */
+        uint8_t ybuf[2*(SHA256_SIZE+32+16) + SHA1_SIZE]; /* max keyblock */
 
         len = sec_len/2;
         S1 = sec;
