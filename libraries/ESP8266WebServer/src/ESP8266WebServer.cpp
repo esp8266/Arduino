@@ -42,6 +42,8 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 : _server(addr, port)
 , _currentMethod(HTTP_ANY)
 , _currentVersion(0)
+, _currentStatus(HC_NONE)
+, _statusChange(0)
 , _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
@@ -58,6 +60,8 @@ ESP8266WebServer::ESP8266WebServer(int port)
 : _server(port)
 , _currentMethod(HTTP_ANY)
 , _currentVersion(0)
+, _currentStatus(HC_NONE)
+, _statusChange(0)
 , _currentHandler(0)
 , _firstHandler(0)
 , _lastHandler(0)
@@ -393,7 +397,7 @@ bool ESP8266WebServer::hasArg(String  name) {
 
 String ESP8266WebServer::header(String name) {
   for (int i = 0; i < _headerKeysCount; ++i) {
-    if (_currentHeaders[i].key == name)
+    if (_currentHeaders[i].key.equalsIgnoreCase(name))
       return _currentHeaders[i].value;
   }
   return String();
@@ -428,7 +432,7 @@ int ESP8266WebServer::headers() {
 
 bool ESP8266WebServer::hasHeader(String name) {
   for (int i = 0; i < _headerKeysCount; ++i) {
-    if ((_currentHeaders[i].key == name) &&  (_currentHeaders[i].value.length() > 0))
+    if ((_currentHeaders[i].key.equalsIgnoreCase(name)) &&  (_currentHeaders[i].value.length() > 0))
       return true;
   }
   return false;
