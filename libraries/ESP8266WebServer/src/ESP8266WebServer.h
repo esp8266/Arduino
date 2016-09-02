@@ -25,6 +25,7 @@
 #define ESP8266WEBSERVER_H
 
 #include <functional>
+#include <map>
 #include <ESP8266WiFi.h>
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
@@ -95,12 +96,13 @@ public:
   String argName(int i);          // get request argument name by number
   int args();                     // get arguments count
   bool hasArg(String name);       // check if argument exists
+  void collectHeader(String name);// adds header to collect
   void collectHeaders(const char* headerKeys[], const size_t headerKeysCount); // set the request headers to collect
-  String header(String name);      // get request header value by name
-  String header(int i);              // get request header value by number
-  String headerName(int i);          // get request header name by number
-  int headers();                     // get header count
-  bool hasHeader(String name);       // check if header exists
+  String header(String name);     // get request header value by name
+  String header(int i);           // get request header value by number
+  String headerName(int i);       // get request header name by number
+  int headers();                  // get header count
+  bool hasHeader(String name);    // check if header exists
 
   String hostHeader();            // get request host header if available or empty String if not
 
@@ -170,8 +172,8 @@ protected:
   RequestArgument* _currentArgs;
   HTTPUpload       _currentUpload;
 
-  int              _headerKeysCount;
-  RequestArgument* _currentHeaders;
+  std::map <String, String> _collectedHeaders;
+
   size_t           _contentLength;
   String           _responseHeaders;
 

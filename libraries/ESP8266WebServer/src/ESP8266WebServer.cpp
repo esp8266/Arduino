@@ -49,8 +49,6 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 , _lastHandler(0)
 , _currentArgCount(0)
 , _currentArgs(0)
-, _headerKeysCount(0)
-, _currentHeaders(0)
 , _contentLength(0)
 , _chunked(false)
 {
@@ -67,17 +65,12 @@ ESP8266WebServer::ESP8266WebServer(int port)
 , _lastHandler(0)
 , _currentArgCount(0)
 , _currentArgs(0)
-, _headerKeysCount(0)
-, _currentHeaders(0)
 , _contentLength(0)
 , _chunked(false)
 {
 }
 
 ESP8266WebServer::~ESP8266WebServer() {
-  if (_currentHeaders)
-    delete[]_currentHeaders;
-  _headerKeysCount = 0;
   RequestHandler* handler = _firstHandler;
   while (handler) {
     RequestHandler* next = handler->next();
@@ -90,14 +83,13 @@ ESP8266WebServer::~ESP8266WebServer() {
 void ESP8266WebServer::begin() {
   _currentStatus = HC_NONE;
   _server.begin();
-  if(!_headerKeysCount)
-    collectHeaders(0, 0);
+  collectHeader(AUTHORIZATION_HEADER);
 }
 
 bool ESP8266WebServer::authenticate(const char * username, const char * password){
   if(hasHeader(AUTHORIZATION_HEADER)){
     String authReq = header(AUTHORIZATION_HEADER);
-    if(authReq.startsWith("Basic")){
+    if(authReq.length() > 5 && authReq.substring(0,5).equalsIgnoreCase("Basic")){
       authReq = authReq.substring(6);
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
@@ -396,46 +388,70 @@ bool ESP8266WebServer::hasArg(String  name) {
 
 
 String ESP8266WebServer::header(String name) {
-  for (int i = 0; i < _headerKeysCount; ++i) {
-    if (_currentHeaders[i].key.equalsIgnoreCase(name))
-      return _currentHeaders[i].value;
+  name.toLowerCase();
+  if(_collectedHeaders.find(name) == _collectedHeaders.end()){
+    return String();
   }
-  return String();
+  return _collectedHeaders[name];
 }
 
 void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
-  _headerKeysCount = headerKeysCount + 1;
-  if (_currentHeaders)
-     delete[]_currentHeaders;
-  _currentHeaders = new RequestArgument[_headerKeysCount];
-  _currentHeaders[0].key = AUTHORIZATION_HEADER;
-  for (int i = 1; i < _headerKeysCount; i++){
-    _currentHeaders[i].key = headerKeys[i-1];
+  for (size_t i = 0; i < headerKeysCount; i++){
+    collectHeader(headerKeys[i-1]);
+  }
+}
+
+void ESP8266WebServer::collectHeader(String name) {
+  name.toLowerCase();
+  if(_collectedHeaders.find(name) == _collectedHeaders.end()){
+    _collectedHeaders[name] = "";
   }
 }
 
 String ESP8266WebServer::header(int i) {
-  if (i < _headerKeysCount)
-    return _currentHeaders[i].value;
+  if(i >= 0 && (size_t)i < _collectedHeaders.size()){
+    int n = 0;
+    for (auto& x: _collectedHeaders) {
+      if(n++ == i){
+        return x.second;
+      }
+    }
+  }
   return String();
 }
 
 String ESP8266WebServer::headerName(int i) {
-  if (i < _headerKeysCount)
-    return _currentHeaders[i].key;
+  if(i >= 0 && (size_t)i < _collectedHeaders.size()){
+    int n = 0;
+    for (auto& x: _collectedHeaders) {
+      if(n++ == i){
+        return x.first;
+      }
+    }
+  }
   return String();
 }
 
 int ESP8266WebServer::headers() {
-  return _headerKeysCount;
+  return _collectedHeaders.size();
 }
 
 bool ESP8266WebServer::hasHeader(String name) {
-  for (int i = 0; i < _headerKeysCount; ++i) {
-    if ((_currentHeaders[i].key.equalsIgnoreCase(name)) &&  (_currentHeaders[i].value.length() > 0))
-      return true;
+  name.toLowerCase();
+  if(_collectedHeaders.find(name) == _collectedHeaders.end()){
+    return false;
   }
-  return false;
+  return true;
+}
+
+bool ESP8266WebServer::_collectHeader(const char* headerName, const char* headerValue) {
+  String name = String(headerName);
+  name.toLowerCase();
+  if(_collectedHeaders.find(name) == _collectedHeaders.end()){
+    return false;
+  }
+  _collectedHeaders[name] = headerValue;
+  return true;
 }
 
 String ESP8266WebServer::hostHeader() {
