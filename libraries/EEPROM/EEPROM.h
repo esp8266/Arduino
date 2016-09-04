@@ -53,8 +53,11 @@ public:
     if (address < 0 || address + sizeof(T) > _size)
       return t;
 
-    memcpy(_data + address, (const uint8_t*) &t, sizeof(T));
-    _dirty = true;
+    _dirty = (memcmp(_data + address, (const uint8_t*) &t, sizeof(T)) !=0);
+
+    if (_dirty) 
+	  memcpy(_data + address, (const uint8_t*) &t, sizeof(T));
+
     return t;
   }
 
