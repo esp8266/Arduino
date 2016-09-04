@@ -6,6 +6,7 @@ title: Supported Hardware
   * [Adafruit HUZZAH ESP8266 (ESP\-12)](#adafruit-huzzah-esp8266-esp-12)
   * [ESPresso Lite 1\.0](#espresso-lite-10)
   * [ESPresso Lite 2\.0](#espresso-lite-20)
+  * [KMP ProDino WiFi ESP 1\.0](#kmp-prodino-wifi-esp-10)
   * [NodeMCU 0\.9 <a name="user\-content\-nodemcu\-0\-9"></a>](#nodemcu-09-)
     * [Pin mapping](#pin-mapping)
   * [NodeMCU 1\.0](#nodemcu-10)
@@ -45,6 +46,21 @@ ESPresso Lite 1.0 (beta version) is an Arduino-compatible Wi-Fi development boar
 ## ESPresso Lite 2.0
 
 ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an earlier V1 (beta version). Re-designed together with Cytron Technologies, the newly-revised ESPresso Lite V2.0 features the auto-load/auto-program function, eliminating the previous need to reset the board manually before flashing a new program. It also feature two user programmable side buttons and a reset button. The special distinctive features of on-board pads for I2C sensor and actuator is retained.
+
+## KMP ProDino WiFi ESP 1.0
+
+
+Operating voltage:
+* from 5 VDC to 30 VDC. 
+
+Inputs:
+* 2 x GROVE connectors (1 internal)
+* 1 x UEXT (internal)
+* 1 x RS485
+
+Outputs:
+
+Product page: http://www.kmpelectronics.eu/en-us/products/prodinowifi-esp.aspx
 
 ## Phoenix 1.0
 
