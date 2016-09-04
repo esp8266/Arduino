@@ -53,6 +53,7 @@ PRODINo WiFi-ESP WROOM-02 1.0 is Arduino compatible Wi-Fi device powered by Espr
 
 Operating voltage:
 * from 5 VDC to 30 VDC. 
+
 Inputs:
 * 4 x optical isolated inputs (On/Off) operate from 2 VDC to 30 VDC
 * 2 x GROVE connectors (1 internal)
