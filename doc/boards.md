@@ -49,16 +49,19 @@ ESPresso Lite 2.0 is an Arduino-compatible Wi-Fi development board based on an e
 
 ## KMP ProDino WiFi ESP 1.0
 
+PRODINo WiFi-ESP WROOM-02 1.0 is Arduino compatible Wi-Fi device powered by Espressif System's own ESP8266 WROOM-02 module with 4 MB Flash. The board enclosed in DIN rail compatible plastic box.
 
 Operating voltage:
 * from 5 VDC to 30 VDC. 
 
 Inputs:
+* 4 x optical isolated inputs (On/Off) operate from 2 VDC to 30 VDC
 * 2 x GROVE connectors (1 internal)
 * 1 x UEXT (internal)
 * 1 x RS485
 
 Outputs:
+* 4 x relays (230V/5A).
 
 Product page: http://www.kmpelectronics.eu/en-us/products/prodinowifi-esp.aspx
 
