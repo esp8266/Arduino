@@ -158,7 +158,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       DEBUG_OUTPUT.println(headerValue);
       #endif
 
-      if (headerName == "Content-Type"){
+      if (headerName.equalsIgnoreCase("Content-Type")){
         if (headerValue.startsWith("text/plain")){
           isForm = false;
         } else if (headerValue.startsWith("application/x-www-form-urlencoded")){
@@ -168,9 +168,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
           boundaryStr = headerValue.substring(headerValue.indexOf('=')+1);
           isForm = true;
         }
-      } else if (headerName == "Content-Length"){
+      } else if (headerName.equalsIgnoreCase("Content-Length")){
         contentLength = headerValue.toInt();
-      } else if (headerName == "Host"){
+      } else if (headerName.equalsIgnoreCase("Host")){
         _hostHeader = headerValue;
       }
     }
@@ -237,7 +237,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 	  DEBUG_OUTPUT.println(headerValue);
 	  #endif
 
-	  if (headerName == "Host"){
+	  if (headerName.equalsIgnoreCase("Host")){
         _hostHeader = headerValue;
       }
     }
@@ -257,7 +257,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 
 bool ESP8266WebServer::_collectHeader(const char* headerName, const char* headerValue) {
   for (int i = 0; i < _headerKeysCount; i++) {
-    if (_currentHeaders[i].key==headerName) {
+    if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
             _currentHeaders[i].value=headerValue;
             return true;
         }
@@ -389,7 +389,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
 
       line = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (line.startsWith("Content-Disposition")){
+      if (line.length() > 19 && line.substring(0, 19).equalsIgnoreCase("Content-Disposition")){
         int nameStart = line.indexOf('=');
         if (nameStart != -1){
           argName = line.substring(nameStart+2);
@@ -414,7 +414,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
           argType = "text/plain";
           line = client.readStringUntil('\r');
           client.readStringUntil('\n');
-          if (line.startsWith("Content-Type")){
+          if (line.length() > 12 && line.substring(0, 12).equalsIgnoreCase("Content-Type")){
             argType = line.substring(line.indexOf(':')+2);
             //skip next line
             client.readStringUntil('\r');
