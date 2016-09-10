@@ -192,7 +192,6 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
           plainBuf[decodedLen] = 0;
           searchStr += plainBuf;
         }
-        _parseArguments(searchStr);
         if(!isEncoded){
           //plain post json or other data
           RequestArgument& arg = _currentArgs[_currentArgCount++];
@@ -206,6 +205,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   #endif
         free(plainBuf);
       }
+      _parseArguments(searchStr);
     }
 
     if (isForm){
