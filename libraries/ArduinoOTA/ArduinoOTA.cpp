@@ -31,6 +31,7 @@ ArduinoOTAClass::ArduinoOTAClass()
 : _port(0)
 , _udp_ota(0)
 , _initialized(false)
+, _rebootOnSuccess(true)
 , _state(OTA_IDLE)
 , _size(0)
 , _cmd(0)
@@ -95,6 +96,10 @@ void ArduinoOTAClass::setPasswordHash(const char * password) {
   if (!_initialized && !_password.length() && password) {
     _password = password;
   }
+}
+
+void ArduinoOTAClass::setRebootOnSuccess(bool reboot){
+  _rebootOnSuccess = reboot;
 }
 
 void ArduinoOTAClass::begin() {
@@ -304,12 +309,19 @@ void ArduinoOTAClass::_runUpdate() {
     client.stop();
     delay(10);
 #ifdef OTA_DEBUG
-    OTA_DEBUG.printf("Update Success\nRebooting...\n");
+    OTA_DEBUG.printf("Update Success\n");
 #endif
     if (_end_callback) {
       _end_callback();
     }
-    ESP.restart();
+    if(_rebootOnSuccess){
+#ifdef OTA_DEBUG
+    OTA_DEBUG.printf("Rebooting...\n");
+#endif
+      //let serial/network finish tasks that might be given in _end_callback
+      delay(100);
+      ESP.restart();
+    }
   } else {
     _udp_ota->listen(*IP_ADDR_ANY, _port);
     if (_error_callback) {
