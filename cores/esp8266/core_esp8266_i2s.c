@@ -194,6 +194,13 @@ bool ICACHE_FLASH_ATTR i2s_write_lr(int16_t left, int16_t right){
   return i2s_write_sample(sample);
 }
 
+bool ICACHE_FLASH_ATTR i2s_write_lr_nb(int16_t left, int16_t right){
+  int sample = right & 0xFFFF;
+  sample = sample << 16;
+  sample |= left & 0xFFFF;
+  return i2s_write_sample_nb(sample);
+}
+
 //  END DMA
 // =========
 // START I2S
