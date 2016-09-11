@@ -214,22 +214,60 @@ bool ICACHE_FLASH_ATTR i2s_write_lr_nb(int16_t left, int16_t right){
 // START I2S
 
 
-static uint32_t _i2s_sample_rate;
+static uint32_t _i2s_sample_rate = 0;
 
 void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
   if(rate == _i2s_sample_rate) return;
   _i2s_sample_rate = rate;
-  uint32_t i2s_clock_div = (I2SBASEFREQ/(_i2s_sample_rate*32)) & I2SCDM;
-  uint8_t i2s_bck_div = (I2SBASEFREQ/(_i2s_sample_rate*i2s_clock_div*2)) & I2SBDM;
-  //os_printf("Rate %u Div %u Bck %u Frq %u\n", _i2s_sample_rate, i2s_clock_div, i2s_bck_div, I2SBASEFREQ/(i2s_clock_div*i2s_bck_div*2));
 
-  //!trans master, !bits mod, rece slave mod, rece msb shift, right first, msb right
-  I2SC &= ~(I2STSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
-  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | ((i2s_bck_div-1) << I2SBD) | ((i2s_clock_div-1) << I2SCD);
+  // Find closest divider
+  uint32_t cpu_freq = ets_get_cpu_frequency() * 1000000L;
+  int bestfreq = 0;
+  uint32_t i2s_clkm_div, i2s_bck_div;
+
+  // CLK_I2S = CPU_FREQ / I2S_CLKM_DIV_NUM
+  // BCLK = CLK_I2S / I2S_BCK_DIV_NUM
+  // WS = BCLK/ 2 / (16 + I2S_BITS_MOD)
+  // Note that I2S_CLKM_DIV_NUM must be >5 for I2S data
+  // I2S_CLKM_DIV_NUM - 5 - 63
+  // I2S_BCK_DIV_NUM - 2 - 63
+  for (int bckdiv = 2; bckdiv < 64; bckdiv++) {
+    for (int clkmdiv = 5; clkmdiv < 64; clkmdiv++) {
+      uint32_t testfreq = cpu_freq / (bckdiv * clkmdiv * 32);
+      if (abs(_i2s_sample_rate - testfreq) < abs(_i2s_sample_rate - bestfreq)) {
+        bestfreq = testfreq;
+        i2s_clkm_div = clkmdiv;
+        i2s_bck_div = bckdiv;
+      }
+    }
+  }
+
+  // Apply the sample rate
+  // ~I2S_TRANS_SLAVE_MOD (TX master mode)
+  // ~I2S_BITS_MOD
+  //  I2S_RIGHT_FIRST
+  //  I2S_MSB_RIGHT
+  //  I2S_RECE_SLAVE_MOD (TX slave mode)
+  //  I2S_RECE_MSB_SHIFT (??)
+  //  I2S_TRANS_MSB_SHIFT (??)
+
+  // !trans master, !bits mod,
+  // rece slave mod, rece msb shift, right first, msb right
+  I2SC &= ~( I2STSM |           // TX master mode
+             I2STMS |           // TX LSB first
+            (I2SBMM << I2SBM) | // clear bits mode
+            (I2SBDM << I2SBD) | // clear bck_div
+            (I2SCDM << I2SCD)); // clear clkm_div
+  I2SC |= I2SRF |               // right first
+          I2SMR |               // MSB first
+          I2SRSM |              // RX slave mode
+          I2SRMS |              // receive MSB shift
+                                // bits_mode == 0 (16bit)
+          ((i2s_bck_div & I2SBDM) << I2SBD) | // set bck_div
+          ((i2s_clkm_div & I2SCDM) << I2SCD); // set clkm_div
 }
 
 void ICACHE_FLASH_ATTR i2s_begin(){
-  _i2s_sample_rate = 0;
   i2s_slc_begin();
 
   pinMode(2, FUNCTION_1); //I2SO_WS (LRCK)
@@ -248,7 +286,10 @@ void ICACHE_FLASH_ATTR i2s_begin(){
   I2SFC &= ~(I2SDE | (I2STXFMM << I2STXFM) | (I2SRXFMM << I2SRXFM)); //Set RX/TX FIFO_MOD=0 and disable DMA (FIFO only)
   I2SFC |= I2SDE; //Enable DMA
   I2SCC &= ~((I2STXCMM << I2STXCM) | (I2SRXCMM << I2SRXCM)); //Set RX/TX CHAN_MOD=0
-  i2s_set_rate(44100);
+
+  // defaults to 44100 if unset
+  i2s_set_rate(_i2s_sample_rate == 0 ? 44100 : _i2s_sample_rate);
+
   I2SC |= I2STXS; //Start transmission
 }
 
