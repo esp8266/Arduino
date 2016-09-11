@@ -69,6 +69,8 @@ class UpdaterClass {
     */
     bool end(bool evenIfRemaining = false);
 
+    void abort() { _reset(); clearError(); }
+
     /*
       Prints the last error to an output stream
     */
@@ -98,6 +100,7 @@ class UpdaterClass {
     size_t size(){ return _size; }
     size_t progress(){ return _currentAddress - _startAddress; }
     size_t remaining(){ return _size - (_currentAddress - _startAddress); }
+    uint32_t startAddress(){ return _startAddress; }
 
     /*
       Template to write from objects that expose
