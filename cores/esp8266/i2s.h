@@ -40,6 +40,8 @@ speed.
 extern "C" {
 #endif
 
+void i2s_init();
+void i2s_deinit();
 void i2s_begin();
 void i2s_end();
 void i2s_set_rate(uint32_t rate);//Sample Rate in Hz (ex 44100, 48000)

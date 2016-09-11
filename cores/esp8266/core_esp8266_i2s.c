@@ -92,13 +92,10 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
   }
 }
 
-void ICACHE_FLASH_ATTR i2s_slc_begin(){
-  i2s_slc_queue_len = 0;
-  int x, y;
-
-  for (x=0; x<SLC_BUF_CNT; x++) {
+void ICACHE_FLASH_ATTR i2s_init(){
+  for (int x=0; x<SLC_BUF_CNT; x++) {
     i2s_slc_buf_pntr[x] = malloc(SLC_BUF_LEN*4);
-    for (y=0; y<SLC_BUF_LEN; y++) i2s_slc_buf_pntr[x][y] = 0;
+    for (int y=0; y<SLC_BUF_LEN; y++) i2s_slc_buf_pntr[x][y] = 0;
 
     i2s_slc_items[x].unused = 0;
     i2s_slc_items[x].owner = 1;
@@ -109,6 +106,17 @@ void ICACHE_FLASH_ATTR i2s_slc_begin(){
     i2s_slc_items[x].buf_ptr = (uint32_t)&i2s_slc_buf_pntr[x][0];
     i2s_slc_items[x].next_link_ptr = (int)((x<(SLC_BUF_CNT-1))?(&i2s_slc_items[x+1]):(&i2s_slc_items[0]));
   }
+}
+
+void ICACHE_FLASH_ATTR i2s_deinit(){
+  for (int x = 0; x<SLC_BUF_CNT; x++){
+    free(i2s_slc_buf_pntr[x]);
+    i2s_slc_buf_pntr[x] = NULL;
+  }
+}
+
+void ICACHE_FLASH_ATTR i2s_slc_begin(){
+  i2s_slc_queue_len = 0;
 
   ETS_SLC_INTR_DISABLE();
   SLCC0 |= SLCRXLR | SLCTXLR;
