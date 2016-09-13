@@ -49,6 +49,8 @@ bool i2s_write_sample(uint32_t sample);//32bit sample with channels being upper 
 bool i2s_write_sample_nb(uint32_t sample);//same as above but does not block when DMA is full and returns false instead
 bool i2s_write_lr(int16_t left, int16_t right);//combines both channels and calls i2s_write_sample with the result
 bool i2s_write_lr_nb(int16_t left, int16_t right);//same as above but does not block when DMA is full and returns false instead
+uint32_t * i2s_get_buffer(); // buffer available for writing, nullptr if not applicatable.
+void i2s_put_buffer(); // yup you guessed it.
 bool i2s_is_full();//returns true if DMA is full and can not take more bytes (overflow)
 bool i2s_is_empty();//returns true if DMA is empty (underflow)
 

@@ -156,6 +156,23 @@ void ICACHE_FLASH_ATTR i2s_slc_end(){
   SLCRXL &= ~(SLCRXLAM << SLCRXLA); // clear RX descriptor address
 }
 
+uint32_t * i2s_get_buffer() {
+  if (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) {
+    if(i2s_slc_queue_len == 0){
+      return NULL;
+    }
+    ETS_SLC_INTR_DISABLE();
+    i2s_curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item();
+    ETS_SLC_INTR_ENABLE();
+    i2s_curr_slc_buf_pos=0;
+  }
+  return i2s_curr_slc_buf;
+}
+
+void i2s_put_buffer() {
+  i2s_curr_slc_buf_pos=SLC_BUF_LEN;
+}
+
 //This routine pushes a single, 32-bit sample to the I2S buffers. Call this at (on average)
 //at least the current sample rate. You can also call it quicker: it will suspend the calling
 //thread if the buffer is full and resume when there's room again.
