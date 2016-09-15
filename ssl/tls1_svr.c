@@ -206,7 +206,7 @@ do_compression:
         ext_len += buf[offset++];
         PARANOIA_CHECK(pkt_size, offset + ext_len);
         
-        if (ext == SIG_ALG_EXTENSION)
+        if (ext == SSL_EXT_SIG_ALG)
         {
             while (ext_len > 0)
             {

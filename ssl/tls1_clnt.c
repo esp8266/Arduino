@@ -39,8 +39,7 @@
 
 /* support sha512/384/256/1 RSA */
 static const uint8_t g_sig_alg[] = { 
-                0x00, 0x0e, 
-                0x00, SIG_ALG_EXTENSION, 
+                0x00, SSL_EXT_SIG_ALG,
                 0x00, 0x0a, 0x00, 0x08,
                 SIG_ALG_SHA512, SIG_ALG_RSA,
                 SIG_ALG_SHA384, SIG_ALG_RSA,
@@ -197,7 +196,10 @@ static int send_client_hello(SSL *ssl)
     uint8_t *buf = ssl->bm_data;
     time_t tm = time(NULL);
     uint8_t *tm_ptr = &buf[6]; /* time will go here */
-    int i, offset;
+    int i, offset, ext_offset;
+    uint16_t ext_len; /* extensions total length */
+
+    ext_len = 0;
 
     buf[0] = HS_CLIENT_HELLO;
     buf[1] = 0;
@@ -244,11 +246,41 @@ static int send_client_hello(SSL *ssl)
     buf[offset++] = 1;              /* no compression */
     buf[offset++] = 0;
 
+    ext_offset = offset;
+
+    buf[offset++] = 0;              /* total length of extensions */
+    buf[offset++] = 0;
+
     /* send the signature algorithm extension for TLS 1.2+ */
     if (ssl->version >= SSL_PROTOCOL_VERSION_TLS1_2)
     {
         memcpy(&buf[offset], g_sig_alg, sizeof(g_sig_alg));
         offset += sizeof(g_sig_alg);
+        ext_len += sizeof(g_sig_alg);
+    }
+
+    /* send the host name if specified */
+    if (ssl->host_name != NULL) {
+	unsigned int host_len = strlen(ssl->host_name);
+
+	buf[offset++] = 0;
+	buf[offset++] = SSL_EXT_SERVER_NAME;              /* server_name(0) (65535) */
+	buf[offset++] = 0;
+	buf[offset++] = host_len+5;     /* server_name length */
+	buf[offset++] = 0;
+	buf[offset++] = host_len+3;     /* server_list length */
+	buf[offset++] = 0;              /* host_name(0) (255) */
+	buf[offset++] = 0;
+	buf[offset++] = host_len;       /* host_name length */
+	strncpy((char*) &buf[offset], ssl->host_name, host_len);
+	offset += host_len;
+	ext_len += host_len + 9;
+    }
+
+    if(ext_len > 0) {
+    	// update the extensions length value
+    	buf[ext_offset] = (uint8_t) ((ext_len >> 8) & 0xff);
+    	buf[ext_offset + 1] = (uint8_t) (ext_len & 0xff);
     }
 
     buf[3] = offset - 4;            /* handshake size */

@@ -83,7 +83,6 @@ extern "C" {
 #define NUM_PROTOCOLS               4
 
 #define MAX_SIG_ALGORITHMS          4
-#define SIG_ALG_EXTENSION           0x0d
 #define SIG_ALG_SHA1                2
 #define SIG_ALG_SHA256              4
 #define SIG_ALG_SHA384              5
@@ -115,6 +114,13 @@ enum
     HS_CERT_VERIFY,
     HS_CLIENT_KEY_XCHG,
     HS_FINISHED = 20
+};
+
+/* SSL extension types */
+enum
+{
+    SSL_EXT_SERVER_NAME = 0,
+    SSL_EXT_SIG_ALG = 0x0d,
 };
 
 typedef struct 
