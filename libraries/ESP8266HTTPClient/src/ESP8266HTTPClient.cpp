@@ -388,8 +388,23 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
 
     // send Payload if needed
     if(payload && size > 0) {
-        if(_tcp->write(&payload[0], size) != size) {
-            return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+        size_t byteswritten = 0;
+        uint8_t * p = payload;
+        while(byteswritten < size) {
+            int written;
+            int towrite = size;
+            // Note: this cap may be on the small size; but over about 2k will cause coredumps.
+            //
+            if (towrite > HTTP_TCP_BUFFER_SIZE)
+                towrite = HTTP_TCP_BUFFER_SIZE;
+            written  = _tcp->write(&p[0], towrite);
+            if (written < 0)
+                 return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+            else 
+            if (written == 0)
+                  return returnError(HTTPC_ERROR_CONNECTION_LOST);
+            byteswritten += size; 
+            size -= written;
         }
     }
 
