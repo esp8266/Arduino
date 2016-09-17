@@ -51,7 +51,7 @@ When your sketch is running—either in the `setup` or during the `loop`—you have 
 ![wdt basic operation](pictures/wdt_basic_operation.png)
 
 
-**How does the esp8266 Arduino Core feed the watchdog(s)? **
+**How does the esp8266 Arduino Core feed the watchdog(s)?**
 From the perspective of your Arduino sketch, the basic feeding is implicit: Everytime an iteration of your main loop starts again, i.e. it hits the `loop` statement, (1) takes place and both watchdogs are fed. Esp8266 Arduino libraries, especially core libraries like for instance the `ESP8266WiFi` library take care of feeding the watchdogs, too. Thus, normally you don't have to feed them explicitly.
 
 **When and why should I feed the watchdog(s) explicitly?**
