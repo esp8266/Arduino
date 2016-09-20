@@ -30,9 +30,6 @@
 extern void ets_wdt_enable(void);
 extern void ets_wdt_disable(void);
 
-#define SLC_BUF_CNT (8) //Number of buffers in the I2S circular buffer
-#define SLC_BUF_LEN (64) //Length of one buffer, in 32-bit words.
-
 //We use a queue to keep track of the DMA buffers that are empty. The ISR will push buffers to the back of the queue,
 //the mp3 decode will pull them from the front and fill them. For ease, the queue will contain *pointers* to the DMA
 //buffers, not the data itself. The queue depth is one smaller than the amount of buffers we have, because there's
@@ -40,21 +37,24 @@ extern void ets_wdt_disable(void);
 //simultaneously.
 
 struct slc_queue_item {
-  uint32  blocksize:12;
-  uint32  datalen:12;
-  uint32  unused:5;
-  uint32  sub_sof:1;
-  uint32  eof:1;
-  uint32  owner:1;
-  uint32  buf_ptr;
-  uint32  next_link_ptr;
+  uint32_t                blocksize:12;
+  uint32_t                datalen:12;
+  uint32_t                unused:5;
+  uint32_t                sub_sof:1;
+  uint32_t                eof:1;
+  uint32_t                owner:1;
+  uint32_t *              buf_ptr;
+  struct slc_queue_item * next_link_ptr;
 };
 
-static uint32_t i2s_slc_queue[SLC_BUF_CNT-1];
+static size_t SLC_BUF_CNT = 0; //Number of buffers in the I2S circular buffer
+static size_t SLC_BUF_LEN = 0; //Length of one buffer, in 32-bit words.
+
+static uint32_t ** i2s_slc_queue;
 static uint8_t i2s_slc_queue_len;
-static uint32_t *i2s_slc_buf_pntr[SLC_BUF_CNT]; //Pointer to the I2S DMA buffer data
-static struct slc_queue_item i2s_slc_items[SLC_BUF_CNT]; //I2S DMA buffer descriptors
-static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
+static uint32_t * i2s_slc_buf_pntr=NULL; // Pointer to the I2S DMA buffer data
+static struct slc_queue_item * i2s_slc_items; //I2S DMA buffer descriptors
+static uint32_t * i2s_curr_slc_buf=NULL;//current buffer for writing
 static int i2s_curr_slc_buf_pos=0; //position in the current buffer
 
 bool ICACHE_FLASH_ATTR i2s_is_full(){
@@ -65,9 +65,9 @@ bool ICACHE_FLASH_ATTR i2s_is_empty(){
   return (i2s_slc_queue_len >= SLC_BUF_CNT-1);
 }
 
-uint32_t ICACHE_FLASH_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
+uint32_t * ICACHE_FLASH_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
   uint8_t i;
-  uint32_t item = i2s_slc_queue[0];
+  uint32_t * item = i2s_slc_queue[0];
   i2s_slc_queue_len--;
   for(i=0;i<i2s_slc_queue_len;i++)
     i2s_slc_queue[i] = i2s_slc_queue[i+1];
@@ -92,27 +92,38 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
   }
 }
 
-void ICACHE_FLASH_ATTR i2s_init(){
-  for (int x=0; x<SLC_BUF_CNT; x++) {
-    i2s_slc_buf_pntr[x] = malloc(SLC_BUF_LEN*4);
-    for (int y=0; y<SLC_BUF_LEN; y++) i2s_slc_buf_pntr[x][y] = 0;
+void ICACHE_FLASH_ATTR i2s_init(size_t count, size_t length){
+  SLC_BUF_CNT = count;
+  SLC_BUF_LEN = length;
 
-    i2s_slc_items[x].unused = 0;
-    i2s_slc_items[x].owner = 1;
-    i2s_slc_items[x].eof = 1;
-    i2s_slc_items[x].sub_sof = 0;
-    i2s_slc_items[x].datalen = SLC_BUF_LEN*4;
-    i2s_slc_items[x].blocksize = SLC_BUF_LEN*4;
-    i2s_slc_items[x].buf_ptr = (uint32_t)&i2s_slc_buf_pntr[x][0];
-    i2s_slc_items[x].next_link_ptr = (int)((x<(SLC_BUF_CNT-1))?(&i2s_slc_items[x+1]):(&i2s_slc_items[0]));
+  const int nsamples = count * length;
+  i2s_slc_buf_pntr = (uint32_t *)malloc(nsamples * sizeof(uint32_t));
+  for (int i = 0; i < nsamples; ++i)
+    i2s_slc_buf_pntr[i] = 0;
+  i2s_slc_items = (struct slc_queue_item *)malloc(sizeof(*i2s_slc_items) * SLC_BUF_CNT);
+  i2s_slc_queue = (uint32_t **)malloc(sizeof(uint32_t *) * (SLC_BUF_CNT-1));
+
+  for (int i = 0;i < SLC_BUF_CNT;++i) {
+      i2s_slc_items[i].unused = 0;
+      i2s_slc_items[i].owner = 1;
+      i2s_slc_items[i].eof = 1;
+      i2s_slc_items[i].sub_sof = 0;
+      i2s_slc_items[i].datalen = SLC_BUF_LEN * 4;
+      i2s_slc_items[i].blocksize = SLC_BUF_LEN * 4;
+      i2s_slc_items[i].buf_ptr = i2s_slc_buf_pntr + i * SLC_BUF_LEN;
+      i2s_slc_items[i].next_link_ptr = i < (SLC_BUF_CNT - 1) ?
+        &i2s_slc_items[i + 1] :
+        &i2s_slc_items[0];
   }
 }
 
 void ICACHE_FLASH_ATTR i2s_deinit(){
-  for (int x = 0; x<SLC_BUF_CNT; x++){
-    free(i2s_slc_buf_pntr[x]);
-    i2s_slc_buf_pntr[x] = NULL;
-  }
+  free(i2s_slc_buf_pntr);
+  i2s_slc_buf_pntr = NULL;
+  free(i2s_slc_items);
+  i2s_slc_items = NULL;
+  free(i2s_slc_queue);
+  i2s_slc_queue = NULL;
 }
 
 void ICACHE_FLASH_ATTR i2s_slc_begin(){
@@ -238,7 +249,7 @@ void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
   _i2s_sample_rate = rate;
 
   // Find closest divider
-  uint32_t cpu_freq = ets_get_cpu_frequency() * 1000000L;
+  uint32_t basefreq = 160000000L;
   int bestfreq = 0;
   uint32_t i2s_clkm_div, i2s_bck_div;
 
@@ -250,7 +261,7 @@ void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
   // I2S_BCK_DIV_NUM - 2 - 63
   for (int bckdiv = 2; bckdiv < 64; bckdiv++) {
     for (int clkmdiv = 5; clkmdiv < 64; clkmdiv++) {
-      uint32_t testfreq = cpu_freq / (bckdiv * clkmdiv * 32);
+      uint32_t testfreq = basefreq / (bckdiv * clkmdiv * 32);
       if (abs(_i2s_sample_rate - testfreq) < abs(_i2s_sample_rate - bestfreq)) {
         bestfreq = testfreq;
         i2s_clkm_div = clkmdiv;
@@ -264,7 +275,7 @@ void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
   // ~I2S_BITS_MOD
   //  I2S_RIGHT_FIRST
   //  I2S_MSB_RIGHT
-  //  I2S_RECE_SLAVE_MOD (TX slave mode)
+  //  I2S_RECE_SLAVE_MOD (RX slave mode)
   //  I2S_RECE_MSB_SHIFT (??)
   //  I2S_TRANS_MSB_SHIFT (??)
 
