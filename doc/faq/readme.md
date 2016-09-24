@@ -47,7 +47,7 @@ Ref. [#1017](https://github.com/esp8266/Arduino/issues/1017), [#1107](https://gi
 ### I'm getting these Watchdog Resets "wdt reset"—How can I avoid them?
 The esp8266 is equipped with two watchdog timers: A software watchdog and a hardware watchdog. If you don't understand why microcontrollers need a watchdog (timer), you may first read [here](http://www.embedded.com/electronics-blogs/beginner-s-corner/4023849/Introduction-to-Watchdog-Timers).
 
-When your sketch is running—either in the `setup` or during the `loop`—you have to make sure to feed the watchdog periodically. Otherwise "it will bite" and the watchdog reset will stop your sketch. The basic operation is illustrated in the following picture:
+When your sketch is running—either in the `setup` or during the `loop`—you have to make sure to feed the watchdog periodically. Otherwise "it will bite" and the watchdog will restart your sketch. The basic operation is illustrated in the following picture:
 ![wdt basic operation](pictures/wdt_basic_operation.png)
 
 
