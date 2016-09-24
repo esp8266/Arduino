@@ -52,10 +52,10 @@ When your sketch is running—either in the `setup` or during the `loop`—you have 
 
 
 **How does the esp8266 Arduino Core feed the watchdog(s)?**
-From the perspective of your Arduino sketch, the basic feeding is implicit: Everytime an iteration of your main loop starts again, i.e. it hits the `loop` statement, (1) takes place and both watchdogs are fed. Esp8266 Arduino libraries, especially core libraries like for instance the `ESP8266WiFi` library take care of feeding the watchdogs, too. Thus, normally you don't have to feed them explicitly.
+From the perspective of your Arduino sketch, the basic feeding is implicit: Everytime an iteration of your main loop starts again, i.e. it hits the `loop` statement both watchdogs are fed; cf. (1) in the figure above. Esp8266 Arduino libraries, especially core libraries like for instance the `ESP8266WiFi` library take care of feeding the watchdogs, too. Thus, normally you don't have to feed them explicitly.
 
 **When and why should I feed the watchdog(s) explicitly?**
-The software watchdog bites exactly every 3.2 seconds, the hardware watchdog every 7–8 seconds. If your sketch contains code which could exceed running for 3.2 seconds you must feed the watchdogs. I.e. you have to feed them explicitly by calling
+The software watchdog bites exactly every 3.2 seconds, the hardware watchdog every 7–8 seconds. If your sketch contains code which could exceed running for 3.2 seconds you must feed the watchdogs. I.e. you have to feed them explicitly by calling (cf. (1) in the figure above):
 
  - `yield()`
  or
@@ -65,6 +65,14 @@ Note that calling `delayMicroseconds(...)` does **not** feed the watchdogs!
 
 **Can I disable the watchdogs?**
 You can disable the software watchdog but you **cannot** disable the hardware watchdog. Furthermore, you **cannot** change the intervals of the watchdogs timers. 
+
+If you want to disable the software watchdog, you have to call the corresponding SDK functions from the `user_interface.h`. For the documentation on these functions see Espressif's ESP8266 Non-OS SDK API Reference (download on [bbs.espressif](http://bbs.espressif.com/)).
+
+ - `system_soft_wdt_stop()`
+ - `system_soft_wdt_feed()`
+ - `system_soft_wdt_restart()`
+
+The name of the function `system_soft_wdt_feed()` is bit confusing: In general it will feed **both** watchdogs, i.e. the software **and** hardware watchdog. If you disable the software watchdog by calling `system_soft_wdt_stop()` and then call `system_soft_wdt_feed()` afterwards, it will still feed both watchdogs. However, since you have just disabled the software watchdog before, it will have no effect on the software watchdog (timer) and will only affect the hardware watchdog (timer). Thus, from an "End-User's" perspective, this looks like `system_soft_wdt_feed()` feeds the hardware watchdog only.
 
 The following code snippet shows you how to disable the software watchdog and how to feed the hardware watchdog periodically.
 ```c
