@@ -1317,6 +1317,65 @@ d1_mini.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1_mini.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
 ##############################################################
+d1_mini_pro.name=WeMos D1 mini Pro
+
+d1_mini_pro.upload.tool=esptool
+d1_mini_pro.upload.speed=460800
+d1_mini_pro.upload.resetmethod=nodemcu
+d1_mini_pro.upload.maximum_size=1044464
+d1_mini_pro.upload.maximum_data_size=81920
+d1_mini_pro.upload.wait_for_upload_port=true
+
+d1_mini_pro.serial.disableDTR=true
+d1_mini_pro.serial.disableRTS=true
+
+d1_mini_pro.build.mcu=esp8266
+d1_mini_pro.build.f_cpu=80000000L
+d1_mini_pro.build.board=ESP8266_WEMOS_D1MINI
+d1_mini_pro.build.core=esp8266
+d1_mini_pro.build.variant=d1_mini
+d1_mini_pro.build.flash_mode=dio
+d1_mini_pro.build.flash_size=16M
+d1_mini_pro.build.flash_freq=40
+d1_mini_pro.build.debug_port=
+d1_mini_pro.build.debug_level=
+
+d1_mini_pro.menu.CpuFrequency.80=80 MHz
+d1_mini_pro.menu.CpuFrequency.80.build.f_cpu=80000000L
+d1_mini_pro.menu.CpuFrequency.160=160 MHz
+d1_mini_pro.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+d1_mini_pro.menu.UploadSpeed.921600=921600
+d1_mini_pro.menu.UploadSpeed.921600.upload.speed=921600
+d1_mini_pro.menu.UploadSpeed.115200=115200
+d1_mini_pro.menu.UploadSpeed.115200.upload.speed=115200
+d1_mini_pro.menu.UploadSpeed.9600=9600
+d1_mini_pro.menu.UploadSpeed.9600.upload.speed=9600
+d1_mini_pro.menu.UploadSpeed.57600=57600
+d1_mini_pro.menu.UploadSpeed.57600.upload.speed=57600
+d1_mini_pro.menu.UploadSpeed.256000.windows=256000
+d1_mini_pro.menu.UploadSpeed.256000.upload.speed=256000
+d1_mini_pro.menu.UploadSpeed.230400.linux=230400
+d1_mini_pro.menu.UploadSpeed.230400.macosx=230400
+d1_mini_pro.menu.UploadSpeed.230400.macosx=230400
+d1_mini_pro.menu.UploadSpeed.230400.upload.speed=230400
+d1_mini_pro.menu.UploadSpeed.460800.linux=460800
+d1_mini_pro.menu.UploadSpeed.460800.macosx=460800
+d1_mini_pro.menu.UploadSpeed.460800.upload.speed=460800
+d1_mini_pro.menu.UploadSpeed.512000.windows=512000
+d1_mini_pro.menu.UploadSpeed.512000.upload.speed=512000
+
+
+d1_mini_pro.menu.FlashSize.16M15M=16M (15M SPIFFS)
+d1_mini_pro.menu.FlashSize.16M15M.build.flash_size=16M
+d1_mini_pro.menu.FlashSize.16M15M.build.flash_ld=eagle.flash.16m.ld
+d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_start=0x100000
+d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_end=0x17FB000
+d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_pagesize=256
+d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_blocksize=8192
+d1_mini_pro.menu.FlashSize.16M15M.upload.maximum_size=1044464
+
+##############################################################
 d1.name=WeMos D1(Retired)
 
 d1.upload.tool=esptool

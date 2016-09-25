@@ -32,6 +32,7 @@ title: Supported Hardware
     * [boot mode](#boot-mode)
   * [WeMos D1](#wemos-d1)
   * [WeMos D1 mini](#wemos-d1-mini)
+  * [WeMos D1 mini Pro](#wemos-d1-mini-pro)
   * [ESPino by ThaiEasyElec](#espinotee)
 
 ## Adafruit HUZZAH ESP8266 (ESP-12)
@@ -289,10 +290,16 @@ All points related to bootstrapping resistors and recommended circuits listed ab
 Note that since ESP8285 has SPI flash memory internally connected in DOUT mode, pins 9 and 10 may be used as GPIO / I2C / PWM pins.
 
 ## WeMos D1
-Product page: http://wemos.cc
+
+Product page: http://www.wemos.cc/product/d1.html
 
 ## WeMos D1 mini
-Product page: http://wemos.cc
+
+Product page: http://www.wemos.cc/product/d1-mini.html
+
+## WeMos D1 mini Pro
+
+Product page: http://www.wemos.cc/product/d1-mini-pro.html
 
 ## ESPino (WROOM-02 Module) by ThaiEasyElec
 ESPino by ThaiEasyElec using WROOM-02 module from Espressif Systems with 4 MB Flash.
