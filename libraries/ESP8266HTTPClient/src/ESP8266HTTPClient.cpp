@@ -280,7 +280,11 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
         _base64Authorization = base64::encode(auth);
     }
 }
-
+void HTTPClient::setAuthorizationType(const char * type) {
+	if (type) {
+		_autorizationType = type;
+	}
+}
 /**
  * set the Authorizatio for the http request
  * @param auth const char * base64
@@ -335,20 +339,6 @@ int HTTPClient::POST(uint8_t * payload, size_t size)
 
 int HTTPClient::POST(String payload)
 {
-    return POST((uint8_t *) payload.c_str(), payload.length());
-}
-
-/**
- * sends a put request to the server
- * @param payload uint8_t *
- * @param size size_t
- * @return http code
- */
-int HTTPClient::PUT(uint8_t * payload, size_t size) {
-    return sendRequest("PUT", payload, size);
-}
-
-int HTTPClient::PUT(String payload) {
     return POST((uint8_t *) payload.c_str(), payload.length());
 }
 
@@ -888,7 +878,9 @@ bool HTTPClient::sendHeader(const char * type)
 
     if(_base64Authorization.length()) {
         _base64Authorization.replace("\n", "");
-        header += F("Authorization: Basic ");
+        header += F("Authorization: ");
+        header += _autorizationType;
+        header += ' ';
         header += _base64Authorization;
         header += "\r\n";
     }
