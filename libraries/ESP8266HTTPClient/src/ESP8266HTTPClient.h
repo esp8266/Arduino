@@ -148,6 +148,7 @@ public:
     void setUserAgent(const String& userAgent);
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
+    void setAuthorizationType(const char * type);
     void setTimeout(uint16_t timeout);
 
     void useHTTP10(bool usehttp10 = true);
@@ -156,8 +157,6 @@ public:
     int GET();
     int POST(uint8_t * payload, size_t size);
     int POST(String payload);
-    int PUT(uint8_t * payload, size_t size);
-    int PUT(String payload);
     int sendRequest(const char * type, String payload);
     int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
     int sendRequest(const char * type, Stream * stream, size_t size = 0);
@@ -212,6 +211,7 @@ protected:
     String _headers;
     String _userAgent = "ESP8266HTTPClient";
     String _base64Authorization;
+    String _autorizationType = "Basic";
 
     /// Response handling
     RequestArgument* _currentHeaders = nullptr;
