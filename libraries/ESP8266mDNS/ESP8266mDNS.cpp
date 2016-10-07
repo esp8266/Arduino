@@ -38,7 +38,7 @@ License (MIT license):
 #define LWIP_OPEN_SRC
 #endif
 
-#include "ESP8266mDNShost.h"
+#include "ESP8266mDNS.h"
 #include <functional>
 
 #include "debug.h"
