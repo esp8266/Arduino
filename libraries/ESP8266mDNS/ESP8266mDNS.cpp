@@ -388,8 +388,8 @@ IPAddress MDNSResponder::queryHost(const char *host)
     _query = 0;
   }
   _query = (struct MDNSQuery*)(os_malloc(sizeof(struct MDNSQuery)));
-  os_strncpy(_query->_service, host, sizeof( _query->service) - 1);
-  _query->_service[ sizeof( _query->service ) - 1 ] = '\0';
+  os_strncpy(_query->_service, host, sizeof( _query->_service) - 1);
+  _query->_service[ sizeof( _query->_service ) - 1 ] = '\0';
 
   _newQuery = true;
   
