@@ -4,6 +4,7 @@ Version 1.1
 Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
 ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
 Extended MDNS-SD support 2016 Lars Englund (lars.englund@gmail.com)
+Host query support 2016 Erland Lewin (erland@lewin.nu)
 
 This is a simple implementation of multicast DNS query support for an Arduino
 running on ESP8266 chip. Only support for resolving address queries is currently
@@ -89,6 +90,9 @@ public:
   int queryService(String service, String proto){
     return queryService(service.c_str(), proto.c_str());
   }
+
+  IPAddress queryHost(const char *host);
+
   String hostname(int idx);
   IPAddress IP(int idx);
   uint16_t port(int idx);

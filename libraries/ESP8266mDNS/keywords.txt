@@ -18,6 +18,8 @@ begin	KEYWORD2
 update	KEYWORD2
 addService	KEYWORD2
 enableArduino	KEYWORD2
+queryService    KEYWORD2
+queryHost       KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

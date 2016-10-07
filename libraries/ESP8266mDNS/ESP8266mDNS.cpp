@@ -6,7 +6,7 @@ Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
 ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
 MDNS-SD Suport 2015 Hristo Gochkov
 Extended MDNS-SD support 2016 Lars Englund (lars.englund@gmail.com)
-
+Host query support 2016 Erland Lewin (erland@lewin.nu)
 
 License (MIT license):
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,7 +38,7 @@ License (MIT license):
 #define LWIP_OPEN_SRC
 #endif
 
-#include "ESP8266mDNS.h"
+#include "ESP8266mDNShost.h"
 #include <functional>
 
 #include "debug.h"
@@ -376,6 +376,100 @@ int MDNSResponder::queryService(char *service, char *proto) {
   return _getNumAnswers();
 }
 
+// do not pass "<host>.local", but just "<host>"
+IPAddress MDNSResponder::queryHost(const char *host) 
+{
+#ifdef MDNS_DEBUG_TX
+  Serial.printf("queryHost %s\n", host);
+#endif  
+  
+  if (_query != 0) {
+    os_free(_query);
+    _query = 0;
+  }
+  _query = (struct MDNSQuery*)(os_malloc(sizeof(struct MDNSQuery)));
+  os_strncpy(_query->_service, host, sizeof( _query->service) - 1);
+  _query->_service[ sizeof( _query->service ) - 1 ] = '\0';
+
+  _newQuery = true;
+  
+  //local string
+  char localName[] = "local";
+  size_t localNameLen = 5;
+
+  //terminator
+  // char terminator[] = "\0";
+
+  // Write the header
+  _conn->flush();
+  uint8_t head[12] = {
+    0x00, 0x00, //ID = 0
+    0x00, 0x00, //Flags = response + authoritative answer
+    0x00, 0x01, //Question count
+    0x00, 0x00, //Answer count
+    0x00, 0x00, //Name server records
+    0x00, 0x00 //Additional records
+  };
+  _conn->append(reinterpret_cast<const char*>(head), 12);
+
+  // Only supports sending one PTR query
+  // Send the Name field (eg. "_http._tcp.local")
+  uint8_t hostNameLen = os_strlen( host );
+
+  _conn->append( (const char *) &hostNameLen, 1 ); // reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_" + service
+  _conn->append( host, hostNameLen ); // reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_" + service
+  _conn->append( (const char *) &localNameLen, 1 ); // reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_" + proto
+  _conn->append( localName, localNameLen ); // reinterpret_cast<const char*>(protoName), protoNameLen);     // "_" + proto
+  // _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght of "local"
+  // _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+  // _conn->append( reinterpret_cast<const char*>(&terminator), 1);              // terminator
+  _conn->append( "", 1 );                                                 // terminator
+    
+  //Send the type and class
+  uint8_t ptrAttrs[4] = {
+    0x00, 0x01, //HOST address record query
+    0x00, 0x01 //Class IN
+  };
+  _conn->append(reinterpret_cast<const char*>(ptrAttrs), 4);
+  _waitingForAnswers = true;
+
+#ifdef MDNS_DEBUG_TX
+  Serial.printf("Before send, have %d answers.\n", _getNumAnswers() );
+#endif
+
+  _conn->send();
+
+#ifdef MDNS_DEBUG_TX
+  Serial.println("Waiting for answers..");
+#endif
+  
+  unsigned long startTime = millis();
+  // It is simplest for the user if we don't make timeout a parameter, but we could
+  // in milliseconds
+  int timeout = 2000; 
+
+  // _newQuery is set to false when the first packet is received, only after that can we trust getNumAnswers
+  while( ((millis() - startTime) < timeout ) && (_newQuery || _getNumAnswers() == 0 )) 
+    delay(1);
+
+#ifdef MDNS_DEBUG_RX
+  Serial.printf( "MDNS host query took %d ms, num answers=%d\n", millis() - startTime, _getNumAnswers() );
+#endif
+  _waitingForAnswers = false;
+
+  if( _getNumAnswers() > 0 )
+  {
+    MDNSAnswer *answer = _getAnswerFromIdx(0);
+
+    if( answer == NULL ) 
+      return IPAddress();
+    else
+      return IPAddress(answer->ip);
+  }
+  else
+    return IPAddress();
+}
+
 String MDNSResponder::hostname(int idx) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
   if (answer == 0) {
@@ -515,15 +609,9 @@ void MDNSResponder::_parsePacket(){
     }
 
     int numAnswers = packetHeader[3] + packetHeader[5];
-    // Assume that the PTR answer always comes first and that it is always accompanied by a TXT, SRV, AAAA (optional) and A answer in the same packet.
-    if (numAnswers < 4) {
-#ifdef MDNS_DEBUG_RX
-      Serial.printf("Expected a packet with 4 or more answers, got %u\n", numAnswers);
-#endif
-      _conn->flush();
-      return;
-    }
-    
+
+    /* Previously, packets with numAnswers < 4 were rejected, but host lookups
+    /* can return only one answers */
     uint8_t tmp8;
     uint16_t answerPort = 0;
     uint8_t answerIp[4] = { 0,0,0,0 };
@@ -584,6 +672,14 @@ void MDNSResponder::_parsePacket(){
 #endif
           }
         }
+        else if (strcmp( serviceName, _query->_service) == 0 ) {
+	  // it is the response to a host address query
+	  serviceMatch = true;
+#ifdef MDNS_DEBUG_RX
+            Serial.printf("found matching host: %s\n", _query->_service);
+#endif
+	}
+
         stringsRead++;
       } while (true);
 
@@ -671,6 +767,12 @@ void MDNSResponder::_parsePacket(){
         for (int i = 0; i < 4; i++) {
           answerIp[i] = _conn_read8();
         }
+#ifdef MDNS_DEBUG_RX
+	Serial.printf("A "); //  , tmp8);
+          for (int n = 0; n < 4; n++)
+            Serial.printf("%s%d", (n == 0 ) ? "" : ".", answerIp[n] );
+          Serial.printf("\n");
+#endif
       }
       else {
 #ifdef MDNS_DEBUG_RX
@@ -680,7 +782,9 @@ void MDNSResponder::_parsePacket(){
 		(void)_conn_read8();
       }
 
-      if ((partsCollected == 0x0F) && serviceMatch) {
+      /* Previously, required partsCollected = 0x0f, but that will not be the
+         case for host lookups */
+      if( serviceMatch) {
 #ifdef MDNS_DEBUG_RX
         Serial.println("All answers parsed, adding to _answers list..");
 #endif
