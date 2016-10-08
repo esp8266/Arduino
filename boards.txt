@@ -236,7 +236,7 @@ generic.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_
 esp8285.name=Generic ESP8285 Module
 
 esp8285.upload.tool=esptool
-esp8285.upload.speed=115200
+esp8285.upload.speed=74880
 esp8285.upload.resetmethod=ck
 esp8285.upload.maximum_size=434160
 esp8285.upload.maximum_data_size=81920
@@ -260,12 +260,14 @@ esp8285.menu.CpuFrequency.80.build.f_cpu=80000000L
 esp8285.menu.CpuFrequency.160=160 MHz
 esp8285.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-esp8285.menu.UploadSpeed.115200=115200
-esp8285.menu.UploadSpeed.115200.upload.speed=115200
+esp8285.menu.UploadSpeed.74880=74880
+esp8285.menu.UploadSpeed.74880.upload.speed=74880
 esp8285.menu.UploadSpeed.9600=9600
 esp8285.menu.UploadSpeed.9600.upload.speed=9600
 esp8285.menu.UploadSpeed.57600=57600
 esp8285.menu.UploadSpeed.57600.upload.speed=57600
+esp8285.menu.UploadSpeed.115200=115200
+esp8285.menu.UploadSpeed.115200.upload.speed=115200
 esp8285.menu.UploadSpeed.256000.windows=256000
 esp8285.menu.UploadSpeed.256000.upload.speed=256000
 esp8285.menu.UploadSpeed.230400.linux=230400
