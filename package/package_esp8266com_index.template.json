@@ -70,8 +70,11 @@
             {
               "name": "WifInfo"
             },
-			{
+	    {
               "name": "ESPDuino"
+            },
+	    {
+              "name": "Blinkinlabs EightByEight Blinky"
             }
           ],
           "toolsDependencies": [

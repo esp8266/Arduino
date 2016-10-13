@@ -33,6 +33,7 @@ title: Supported Hardware
   * [WeMos D1](#wemos-d1)
   * [WeMos D1 mini](#wemos-d1-mini)
   * [ESPino by ThaiEasyElec](#espinotee)
+  * [Blinkinlabs EightByEight Blinky](#eightbyeight-blinky)
 
 ## Adafruit HUZZAH ESP8266 (ESP-12)
 
@@ -303,6 +304,9 @@ We will update an English description soon.
 - Dimensions: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_Dimension.pdf
 - Pinouts: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_User_Manual_TH_v1_0_20160204.pdf (Please see pg. 8)
 
+
+## Blinkinlabs EightByEight Blinky
+Product page: https://blinkinlabs.com/eightbyeight
 
 
 
