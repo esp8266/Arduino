@@ -350,7 +350,7 @@ static int process_server_hello(SSL *ssl)
     offset += 2; // ignore compression
     PARANOIA_CHECK(pkt_size, offset);
 
-    ssl->dc->bm_proc_index = offset+1; 
+    ssl->dc->bm_proc_index = offset;
     PARANOIA_CHECK(pkt_size, offset);
 
     // no extensions
