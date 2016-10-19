@@ -139,6 +139,8 @@ static uint8_t* ICACHE_FLASH_ATTR add_offer_options(uint8_t *optptr)
         os_bzero(&if_ip, sizeof(struct ip_info));
         wifi_get_ip_info(SOFTAP_IF, &if_ip);
 
+        *optptr++ = DHCP_OPTION_SUBNET_MASK;
+        *optptr++ = 4;
         *optptr++ = ip4_addr1( &if_ip.netmask);
         *optptr++ = ip4_addr2( &if_ip.netmask);
         *optptr++ = ip4_addr3( &if_ip.netmask);
