@@ -450,6 +450,10 @@ void ESP8266WebServer::onNotFound(THandlerFunction fn) {
   _notFoundHandler = fn;
 }
 
+void ESP8266WebServer::onBefore(TCheckHandlerFunction fn) {
+  _onBeforeHandler = fn;
+}
+
 void ESP8266WebServer::_handleRequest() {
   bool handled = false;
   if (!_currentHandler){
@@ -458,12 +462,19 @@ void ESP8266WebServer::_handleRequest() {
 #endif
   }
   else {
-    handled = _currentHandler->handle(*this, _currentMethod, _currentUri);
+	bool canhandle = true;
+	if (_onBeforeHandler) {
+  	  canhandle = _onBeforeHandler();
+	}
+
+    if (canhandle) {	
+      handled = _currentHandler->handle(*this, _currentMethod, _currentUri);
 #ifdef DEBUG_ESP_HTTP_SERVER
-    if (!handled) {
-      DEBUG_OUTPUT.println("request handler failed to handle request");
-    }
+      if (!handled) {
+        DEBUG_OUTPUT.println("request handler failed to handle request");
+      }
 #endif
+    }
   }
 
   if (!handled) {
@@ -523,3 +534,4 @@ String ESP8266WebServer::_responseCodeToString(int code) {
     default:  return "";
   }
 }
+
