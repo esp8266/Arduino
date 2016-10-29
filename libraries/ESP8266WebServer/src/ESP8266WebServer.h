@@ -36,7 +36,6 @@ enum HTTPClientStatus { HC_NONE, HC_WAIT_READ, HC_WAIT_CLOSE };
 #define HTTP_UPLOAD_BUFLEN 2048
 #define HTTP_MAX_DATA_WAIT 1000 //ms to wait for the client to send the request
 #define HTTP_MAX_POST_WAIT 1000 //ms to wait for POST data to arrive
-#define HTTP_MAX_SEND_WAIT 5000 //ms to wait for data chunk to be ACKed
 #define HTTP_MAX_CLOSE_WAIT 2000 //ms to wait for the client to close the connection
 
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
@@ -77,13 +76,16 @@ public:
   void requestAuthentication();
 
   typedef std::function<void(void)> THandlerFunction;
-  void on(const String &uri, THandlerFunction handler);
-  void on(const String &uri, HTTPMethod method, THandlerFunction fn);
-  void on(const String &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
+  void on(const char* uri, THandlerFunction handler);
+  void on(const char* uri, HTTPMethod method, THandlerFunction fn);
+  void on(const char* uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
   void addHandler(RequestHandler* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
+
+  typedef std::function<bool(void)> TCheckHandlerFunction;
+  void onBefore(TCheckHandlerFunction fn); //called before a .on is executed, if returns false, .on is not handled
 
   String uri() { return _currentUri; }
   HTTPMethod method() { return _currentMethod; }
@@ -114,7 +116,7 @@ public:
   void send_P(int code, PGM_P content_type, PGM_P content);
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
-  void setContentLength(size_t contentLength);
+  void setContentLength(size_t contentLength) { _contentLength = contentLength; }
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
@@ -130,7 +132,7 @@ template<typename T> size_t streamFile(T &file, const String& contentType){
     sendHeader("Content-Encoding", "gzip");
   }
   send(200, contentType, "");
-  return _currentClient.write(file);
+  return _currentClient.write(file, HTTP_DOWNLOAD_UNIT_SIZE);
 }
 
 protected:
@@ -156,7 +158,6 @@ protected:
   WiFiClient  _currentClient;
   HTTPMethod  _currentMethod;
   String      _currentUri;
-  uint8_t     _currentVersion;
   HTTPClientStatus _currentStatus;
   unsigned long _statusChange;
 
@@ -165,6 +166,8 @@ protected:
   RequestHandler*  _lastHandler;
   THandlerFunction _notFoundHandler;
   THandlerFunction _fileUploadHandler;
+  
+  TCheckHandlerFunction _onBeforeHandler;
 
   int              _currentArgCount;
   RequestArgument* _currentArgs;
@@ -176,7 +179,6 @@ protected:
   String           _responseHeaders;
 
   String           _hostHeader;
-  bool             _chunked;
 
 };
 
