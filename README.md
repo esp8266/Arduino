@@ -20,7 +20,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 
 Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
 
-- Install Arduino 1.6.8 from the [Arduino website](http://www.arduino.cc/en/main/software).
+- Install Arduino 1.6.12 from the [Arduino website](http://www.arduino.cc/en/main/software).
 - Start Arduino and open Preferences window.
 - Enter ```http://arduino.esp8266.com/stable/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
@@ -44,18 +44,16 @@ Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0-rc2/](http://esp
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino) [![codecov.io](https://codecov.io/github/esp8266/Arduino/coverage.svg?branch=master)](https://codecov.io/github/esp8266/Arduino?branch=master)
 
-- Install Arduino 1.6.8
+- Install Arduino 1.6.12
 - Go to Arduino directory
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash
 cd hardware
-mkdir esp8266com
-cd esp8266com
-git clone https://github.com/esp8266/Arduino.git esp8266
+git clone https://github.com/esp8266/Arduino.git esp8266com/esp8266
 ```
 - Download binary tools (you need Python 2.7)
 ```bash
-cd esp8266/tools
+cd esp8266com/esp8266/tools
 python get.py
 ```
 - Restart Arduino
@@ -104,7 +102,7 @@ If you can not find the answers above, you can also try [ESP8266 Community Forum
 
 For minor fixes of code and documentation, go ahead and submit a pull request.
 
-Check out the list of issues which are easy to fix — [easy issues for 2.2.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.2.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
+Check out the list of [issues which are easy to fix](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
 
 Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed [in the chat](https://gitter.im/esp8266/Arduino) first.
 
