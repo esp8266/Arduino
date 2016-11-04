@@ -226,7 +226,7 @@ void SSDPClass::_send(ssdp_method_t method){
     remoteAddr.addr = SSDP_MULTICAST_ADDR;
     remotePort = SSDP_PORT;
 #ifdef DEBUG_SSDP
-    DEBUG_SSDP.println("Sending Notify to ");
+    DEBUG_SSDP.print("Sending Notify to ");
 #endif
   }
 #ifdef DEBUG_SSDP
@@ -273,6 +273,16 @@ void SSDPClass::_update(){
 
     char buffer[SSDP_BUFFER_SIZE] = {0};
 
+#ifdef DEBUG_SSDP
+    if(_server->getSize() > 0)
+	{
+		DEBUG_SSDP.printf("Received SSDP packet with %d bytes from: ", _server->getSize());
+		DEBUG_SSDP.print(IPAddress(_respondToAddr));
+		DEBUG_SSDP.print(":");
+		DEBUG_SSDP.println(_respondToPort);
+	}
+#endif
+    
     while(_server->getSize() > 0){
       char c = _server->read();
 
@@ -281,8 +291,10 @@ void SSDPClass::_update(){
       switch(state){
         case METHOD:
           if(c == ' '){
-            if(strcmp(buffer, "M-SEARCH") == 0) method = SEARCH;
-            else if(strcmp(buffer, "NOTIFY") == 0) method = NOTIFY;
+#ifdef DEBUG_SSDP
+                DEBUG_SSDP.printf("METHOD: %s\n", (char *)buffer);
+#endif
+            if(strcmp(buffer, "M-SEARCH") == 0) method = SEARCH; // We only respond to M-SEARCH and ignore everthing else
 
             if(method == NONE) state = ABORT;
             else state = URI;
@@ -316,21 +328,31 @@ void SSDPClass::_update(){
 #endif
                 break;
               case ST:
-                if(strcmp(buffer, "ssdp:all")){
-                  state = ABORT;
 #ifdef DEBUG_SSDP
-                  DEBUG_SSDP.printf("REJECT: %s\n", (char *)buffer);
+                DEBUG_SSDP.printf("ST: %s\n", (char *)buffer);
 #endif
-                }
-                // if the search type matches our type, we should respond instead of ABORT
-                if(strcmp(buffer, _deviceType) == 0){
+                // if the search type matches our type or is send to ssdp:all, we should respond otherwise ABORT
+                if((strcmp(buffer, "ssdp:all") == 0) || (strcmp(buffer, _deviceType) == 0)){
+#ifdef DEBUG_SSDP
+                  DEBUG_SSDP.printf("ACCEPT: %s\n", (char *)buffer);
+#endif			
                   _pending = true;
                   _process_time = millis();
                   state = KEY;
                 }
+				else
+				{
+                  state = ABORT;
+#ifdef DEBUG_SSDP
+                  DEBUG_SSDP.printf("REJECT: %s\n", (char *)buffer);
+#endif			
+				}
                 break;
               case MX:
-                _delay = random(0, atoi(buffer)) * 1000L;
+#ifdef DEBUG_SSDP
+                DEBUG_SSDP.printf("MX: %s\n", (char *)buffer);
+#endif
+                _delay = random(0, atoi(buffer) * 1000L);
                 break;
             }
 
@@ -361,10 +383,15 @@ void SSDPClass::_update(){
   }
 
   if (_pending) {
+#ifdef DEBUG_SSDP
+		DEBUG_SSDP.println("TX packet pending");
+#endif
     while (_server->next())
       _server->flush();
-  }
-
+#ifdef DEBUG_SSDP
+		DEBUG_SSDP.println("Flushing received data");
+#endif
+	}
 }
 
 void SSDPClass::setSchemaURL(const char *url){
