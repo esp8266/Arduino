@@ -34,6 +34,9 @@ private:
     char * _username;
     char * _password;
     bool _authenticated;
+protected:
+    template<class ...Ts>
+    void debug(const char *fmt, Ts... args);
 };
 
 
