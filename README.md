@@ -22,7 +22,7 @@ time
 ctime
 ```
 
-For use with LwIP raw TCP API, see [compat/README.md](compat/README.md)
+For use with LwIP raw TCP API, see [compat/README.md](https://github.com/attachix/lwirax/blob/master/README.md)
 
 To build, add xtensa toolchain to your path, and run `make`.
 
