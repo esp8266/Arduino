@@ -120,6 +120,7 @@ enum
 enum
 {
     SSL_EXT_SERVER_NAME = 0,
+    SSL_EXT_MAX_FRAGMENT_SIZE,
     SSL_EXT_SIG_ALG = 0x0d,
 };
 
@@ -172,6 +173,11 @@ typedef struct
     uint8_t key_block_generated;
 } DISPOSABLE_CTX;
 
+typedef struct {
+    char *host_name; /* Needed for the SNI support */
+    uint16_t max_fragment_size; /* Needed for the Max Fragment Size Extension. Allowed values: 2^9, 2^10 .. 2^14 */
+} SSL_EXTENSIONS;
+
 struct _SSL
 {
     uint32_t flag;
@@ -213,7 +219,7 @@ struct _SSL
     uint8_t read_sequence[8];           /* 64 bit sequence number */
     uint8_t write_sequence[8];          /* 64 bit sequence number */
     uint8_t hmac_header[SSL_RECORD_SIZE];    /* rx hmac */
-    char *host_name; /* Needed for the SNI support */
+    SSL_EXTENSIONS *extensions; /* Contains the SSL (client) extensions */
 };
 
 typedef struct _SSL SSL;

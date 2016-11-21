@@ -64,7 +64,7 @@ static int send_cert_verify(SSL *ssl);
  * Establish a new SSL connection to an SSL server.
  */
 EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
-        uint8_t *session_id, uint8_t sess_id_size, const char* host_name)
+        uint8_t *session_id, uint8_t sess_id_size, SSL_EXTENSIONS* ssl_ext)
 {
     SSL *ssl = ssl_new(ssl_ctx, client_fd);
     ssl->version = SSL_PROTOCOL_VERSION_MAX; /* try top version first */
@@ -82,9 +82,7 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
         SET_SSL_FLAG(SSL_SESSION_RESUME);   /* just flag for later */
     }
 
-    if(host_name != NULL && strlen(host_name) > 0) {
-        ssl->host_name = (char *)strdup(host_name);
-    }
+    ssl->extensions = ssl_ext;
 
     SET_SSL_FLAG(SSL_IS_CLIENT);
     do_client_connect(ssl);
@@ -259,22 +257,36 @@ static int send_client_hello(SSL *ssl)
         ext_len += sizeof(g_sig_alg);
     }
 
-    /* send the host name if specified */
-    if (ssl->host_name != NULL) {
-	unsigned int host_len = strlen(ssl->host_name);
+    if (ssl->extensions != NULL) {
+        /* send the host name if specified */
+        if (ssl->extensions->host_name != NULL) {
+	    unsigned int host_len = strlen(ssl->extensions->host_name);
 
-	buf[offset++] = 0;
-	buf[offset++] = SSL_EXT_SERVER_NAME;              /* server_name(0) (65535) */
-	buf[offset++] = 0;
-	buf[offset++] = host_len+5;     /* server_name length */
-	buf[offset++] = 0;
-	buf[offset++] = host_len+3;     /* server_list length */
-	buf[offset++] = 0;              /* host_name(0) (255) */
-	buf[offset++] = 0;
-	buf[offset++] = host_len;       /* host_name length */
-	strncpy((char*) &buf[offset], ssl->host_name, host_len);
-	offset += host_len;
-	ext_len += host_len + 9;
+	    buf[offset++] = 0;
+	    buf[offset++] = SSL_EXT_SERVER_NAME; /* server_name(0) (65535) */
+	    buf[offset++] = 0;
+	    buf[offset++] = host_len + 5; /* server_name length */
+	    buf[offset++] = 0;
+	    buf[offset++] = host_len + 3; /* server_list length */
+	    buf[offset++] = 0; /* host_name(0) (255) */
+	    buf[offset++] = 0;
+	    buf[offset++] = host_len; /* host_name length */
+	    strncpy((char*) &buf[offset], ssl->extensions->host_name, host_len);
+	    offset += host_len;
+	    ext_len += host_len + 9;
+        }
+
+        if (ssl->extensions->max_fragment_size) {
+	    buf[offset++] = 0;
+	    buf[offset++] = SSL_EXT_MAX_FRAGMENT_SIZE;
+
+	    buf[offset++] = 0; // size of data
+	    buf[offset++] = 2;
+
+	    buf[offset++] = (uint8_t)((ssl->extensions->max_fragment_size >> 8) & 0xff);
+	    buf[offset++] = (uint8_t)(ssl->extensions->max_fragment_size & 0xff);
+	    ext_len += 6;
+        }
     }
 
     if(ext_len > 0) {

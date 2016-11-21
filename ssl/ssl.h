@@ -226,6 +226,22 @@ EXP_FUNC SSL_CTX * STDCALL ssl_ctx_new(uint32_t options, int num_sessions);
 EXP_FUNC void STDCALL ssl_ctx_free(SSL_CTX *ssl_ctx);
 
 /**
+ * @brief Allocates new SSL extensions structure and returns pointer to it
+ *
+ * @return ssl_ext Pointer to SSL_EXTENSIONS structure
+ *
+ */
+EXP_FUNC SSL_EXTENSIONS * STDCALL ssl_ext_new();
+
+/**
+ * @brief Frees SSL extensions structure
+ *
+ * @param ssl_ext [in] Pointer to SSL_EXTENSION structure
+ *
+ */
+EXP_FUNC void STDCALL ssl_ext_free(SSL_EXTENSIONS *ssl_ext);
+
+/**
  * @brief (server only) Establish a new SSL connection to an SSL client.
  *
  * It is up to the application to establish the logical connection (whether it
@@ -251,11 +267,11 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
  * can be null if no session resumption is being used or required. This option
  * is not used in skeleton mode.
  * @param sess_id_size The size of the session id (max 32)
- * @param host_name If non-zero, host name to be sent to server for SNI support
+ * @param ssl_ext pointer to a structure with the activated SSL extensions and their values
  * @return An SSL object reference. Use ssl_handshake_status() to check 
  * if a handshake succeeded.
  */
-EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id, uint8_t sess_id_size, const char* host_name);
+EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id, uint8_t sess_id_size, SSL_EXTENSIONS* ssl_ext);
 
 /**
  * @brief Free any used resources on this connection. 
