@@ -8,12 +8,19 @@
 
 const char* ESP8266HTTPUpdateServer::_serverIndex =
 R"(<html><body><form method='POST' action='' enctype='multipart/form-data'>
+		  <input type='hidden' name='cmd' value='0'>
                   <input type='file' name='update'>
-                  <input type='submit' value='Update'>
+                  <input type='submit' value='Update Flash'>
+               </form>
+	       <form method='POST' action='' enctype='multipart/form-data'> 
+		  <input type='hidden' name='cmd' value='100'>
+                  <input type='file' name='update'>
+                  <input type='submit' value='Update Spiffs'>
                </form>
          </body></html>)";
 const char* ESP8266HTTPUpdateServer::_failedResponse = R"(Update Failed!)";
 const char* ESP8266HTTPUpdateServer::_successResponse = "<META http-equiv=\"refresh\" content=\"15;URL=\">Update Success! Rebooting...";
+int _command;
 
 ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
 {
@@ -41,6 +48,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
     _server->on(path, HTTP_POST, [&](){
       if(!_authenticated)
         return _server->requestAuthentication();
+      _command = _server->arg("cmd").toInt();
       _server->send(200, "text/html", Update.hasError() ? _failedResponse : _successResponse);
       ESP.restart();
     },[&](){
@@ -62,7 +70,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
         if (_serial_output)
           Serial.printf("Update: %s\n", upload.filename.c_str());
         uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
-        if(!Update.begin(maxSketchSpace)){//start with max available size
+        if(!Update.begin(maxSketchSpace, _command)){//start with max available size
           if (_serial_output) Update.printError(Serial);
         }
       } else if(_authenticated && upload.status == UPLOAD_FILE_WRITE){
