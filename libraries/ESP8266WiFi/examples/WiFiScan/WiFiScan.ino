@@ -10,7 +10,12 @@ void setup() {
 
   // Set WiFi to station mode and disconnect from an AP if it was previously connected
   WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
+  // Check if there is any connections made previously. If there is any, disconnect
+  // This throws "Exception 3" and prints a huge stack on Serial monitor and stops scanning
+  // if we try to disconnect when the ESP has not connected to any
+  if (WiFi.status() == WL_CONNECTED) {
+    WiFi.disconnect();
+  }
   delay(100);
 
   Serial.println("Setup done");
