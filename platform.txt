@@ -107,7 +107,7 @@ recipe.size.regex.data=^(?:\.data|\.rodata|\.bss)\s+([0-9]+).*
 
 tools.esptool.cmd=esptool
 tools.esptool.cmd.windows=esptool.exe
-tools.esptool.path={runtime.platform.path}/tools/esptool
+tools.esptool.path={runtime.tools.esptool.path}
 tools.esptool.network_cmd=python
 tools.esptool.network_cmd.windows=python.exe
 
