@@ -28,6 +28,7 @@
 #include <memory>
 #include <Arduino.h>
 #include <WiFiClient.h>
+#include <vector>
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
@@ -166,6 +167,8 @@ public:
 
     /// Response handling
     void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
+    void collectAllHeaders();
+    void collectNone();
     String header(const char* name);   // get request header value by name
     String header(size_t i);              // get request header value by number
     String headerName(size_t i);          // get request header name by number
@@ -216,6 +219,10 @@ protected:
     /// Response handling
     RequestArgument* _currentHeaders = nullptr;
     size_t           _headerKeysCount = 0;
+    std::vector<RequestArgument>* 
+                    _responseHeader = nullptr;    // if _responseHeader is not nullptr, then save all response headers
+    
+    
 
     int _returnCode = 0;
     int _size = -1;

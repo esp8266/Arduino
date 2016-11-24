@@ -86,9 +86,7 @@ HTTPClient::~HTTPClient()
     if(_tcp) {
         _tcp->stop();
     }
-    if(_currentHeaders) {
-        delete[] _currentHeaders;
-    }
+    collectNone();
 }
 
 void HTTPClient::clear()
@@ -168,6 +166,8 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
         _host = host;
     }
     _uri = url;
+    if (_uri == "")
+        _uri = "/";
     if (_protocol != expectedProtocol) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
         return false;
@@ -750,16 +750,41 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first, 
 
 }
 
+void HTTPClient::collectNone()
+{
+    // clear collectAllHeaders() effect
+    if (_responseHeader)
+    {
+        delete _responseHeader;
+        _responseHeader = nullptr;
+    }
+    // clear collectHeaders() effect
+    if (_currentHeaders)
+    {
+        delete[] _currentHeaders;
+        _currentHeaders = nullptr;
+        _headerKeysCount = 0;
+    }
+}
+
 void HTTPClient::collectHeaders(const char* headerKeys[], const size_t headerKeysCount)
 {
+    collectNone();
     _headerKeysCount = headerKeysCount;
-    if(_currentHeaders) {
-        delete[] _currentHeaders;
+    if (!_headerKeysCount) {
+        _currentHeaders = nullptr;
+    } else {
+        _currentHeaders = new RequestArgument[_headerKeysCount];
     }
-    _currentHeaders = new RequestArgument[_headerKeysCount];
     for(size_t i = 0; i < _headerKeysCount; i++) {
         _currentHeaders[i].key = headerKeys[i];
     }
+}
+
+void HTTPClient::collectAllHeaders()
+{
+    collectNone();
+    _responseHeader = new std::vector<RequestArgument>;
 }
 
 String HTTPClient::header(const char* name)
@@ -777,6 +802,9 @@ String HTTPClient::header(size_t i)
     if(i < _headerKeysCount) {
         return _currentHeaders[i].value;
     }
+    if (_responseHeader && i < _responseHeader->size()) {
+        return (*_responseHeader)[i].value;
+    }
     return String();
 }
 
@@ -785,16 +813,28 @@ String HTTPClient::headerName(size_t i)
     if(i < _headerKeysCount) {
         return _currentHeaders[i].key;
     }
+    if (_responseHeader && i < _responseHeader->size()) {
+        return (*_responseHeader)[i].key;
+    }
     return String();
 }
 
 int HTTPClient::headers()
 {
+    if (_responseHeader)
+        return _responseHeader->size();
     return _headerKeysCount;
 }
 
 bool HTTPClient::hasHeader(const char* name)
 {
+    if (_responseHeader) {
+        for(size_t i = 0; i < _responseHeader->size(); ++i) {
+            if(((*_responseHeader)[i].key == name) && ((*_responseHeader)[i].value.length() > 0)) {
+                return true;
+            }
+        }
+    }
     for(size_t i = 0; i < _headerKeysCount; ++i) {
         if((_currentHeaders[i].key == name) && (_currentHeaders[i].value.length() > 0)) {
             return true;
@@ -904,11 +944,12 @@ bool HTTPClient::sendHeader(const char * type)
  */
 int HTTPClient::handleHeaderResponse()
 {
-
     if(!connected()) {
         return HTTPC_ERROR_NOT_CONNECTED;
     }
-
+    if (_responseHeader) {
+        _responseHeader->clear();
+    }
     String transferEncoding;
     _returnCode = -1;
     _size = -1;
@@ -943,8 +984,18 @@ int HTTPClient::handleHeaderResponse()
                 if(headerName.equalsIgnoreCase("Transfer-Encoding")) {
                     transferEncoding = headerValue;
                 }
-
-                for(size_t i = 0; i < _headerKeysCount; i++) {
+                
+                if (_responseHeader) {
+                    String key = headerName;
+                    key.trim();
+                    if (key != "") {
+                        _responseHeader->emplace_back();
+                        auto& lastone = (*_responseHeader)[_responseHeader->size()-1];
+                        lastone.key = key;
+                        lastone.value = headerValue;
+                    }
+                }
+                else for(size_t i = 0; i < _headerKeysCount; i++) {
                     if(_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
                         _currentHeaders[i].value = headerValue;
                         break;
