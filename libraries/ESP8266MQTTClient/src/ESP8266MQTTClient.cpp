@@ -297,6 +297,7 @@ void MQTTClient::handle(void)
                 _connected_cb();
             _keepalive_tick = millis();
         } else {
+            delay(200);  //some little delay to not flood the server
             return;
         }
     }
