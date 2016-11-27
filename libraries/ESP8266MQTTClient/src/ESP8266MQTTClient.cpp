@@ -194,7 +194,12 @@ bool MQTTClient::connect(void)
         return false;
     }
 
-    _tcp = _transportTraits->create();
+    if(_scheme == "mqtt")
+        _tcp = _transportTraits->create();
+    else {
+        LOG("ERROR: currently only support mqtt over tcp\r\n");
+        return false;
+    }
 
     if(!_tcp->connect(_host.c_str(), _port)) {
         LOG("[MQTT-Client] failed connect to %s:%u\n", _host.c_str(), _port);
