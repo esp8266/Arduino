@@ -28,7 +28,7 @@ License (MIT license):
 #include <Arduino.h>
 #include <WiFiClient.h>
 #include <functional>
-#include <URIParser.h>
+#include "uri_parser.h"
 #include "mqtt_msg.h"
 #include "mqtt_outbox.h"
 
@@ -69,7 +69,7 @@ typedef struct mqtt_state_t
 	uint16_t message_length;
 	uint16_t message_length_read;
 	mqtt_message_t* outbound_message;
-	mqtt_connection_t mqtt_connection;
+	mqtt_connection_t connection;
 	uint16_t pending_msg_id;
 	int pending_msg_type;
 	int pending_publish_qos;
@@ -124,7 +124,7 @@ protected:
 	void send_ping();
 	bool deliver_publish(uint8_t *message);
 
-	mqtt_state_t  _mqtt_state;
+	mqtt_state_t  _state;
 	mqtt_connect_info_t _connect_info;
 	mqtt_outbox *_outbox;
 	uint32_t _keepalive_tick;
@@ -142,6 +142,7 @@ protected:
 	int _lwt_retain;
 	int _clean_session;
 	int _keepalive;
+	bool _initialized;
 
 	THandlerFunction _connected_cb;
 	THandlerFunction _disconnected_cb;

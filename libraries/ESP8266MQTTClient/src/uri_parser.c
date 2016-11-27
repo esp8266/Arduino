@@ -5,7 +5,7 @@
  *      Hirochika Asai
  */
 
-#include "URIParser.h"
+#include "uri_parser.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,9 +28,9 @@ _is_scheme_char(int c)
 /*
  * See RFC 1738, 3986
  */
-parsed_url *parse_uri(const char *url)
+parsed_uri_t *parse_uri(const char *url)
 {
-	parsed_url *purl;
+	parsed_uri_t *purl;
 	const char *tmpstr;
 	const char *curstr;
 	int len;
@@ -39,7 +39,7 @@ parsed_url *parse_uri(const char *url)
 	int bracket_flag;
 
 	/* Allocate the parsed url storage */
-	purl = (parsed_url *)malloc(sizeof(parsed_url));
+	purl = (parsed_uri_t *)malloc(sizeof(parsed_uri_t));
 	if ( NULL == purl ) {
 		return NULL;
 	}
@@ -63,7 +63,7 @@ parsed_url *parse_uri(const char *url)
 	tmpstr = strchr(curstr, ':');
 	if ( NULL == tmpstr ) {
 		/* Not found the character */
-		http_parsed_url_free(purl);
+		free_parsed_uri(purl);
 		return NULL;
 	}
 	/* Get the scheme length */
@@ -72,14 +72,14 @@ parsed_url *parse_uri(const char *url)
 	for ( i = 0; i < len; i++ ) {
 		if ( !_is_scheme_char(curstr[i]) ) {
 			/* Invalid format */
-			http_parsed_url_free(purl);
+			free_parsed_uri(purl);
 			return NULL;
 		}
 	}
 	/* Copy the scheme to the storage */
 	purl->scheme = (char *)malloc(sizeof(char) * (len + 1));
 	if ( NULL == purl->scheme ) {
-		http_parsed_url_free(purl);
+		free_parsed_uri(purl);
 		return NULL;
 	}
 	(void)strncpy(purl->scheme, curstr, len);
@@ -99,7 +99,7 @@ parsed_url *parse_uri(const char *url)
 	/* Eat "//" */
 	for ( i = 0; i < 2; i++ ) {
 		if ( '/' != *curstr ) {
-			http_parsed_url_free(purl);
+			free_parsed_uri(purl);
 			return NULL;
 		}
 		curstr++;
@@ -131,7 +131,7 @@ parsed_url *parse_uri(const char *url)
 		len = tmpstr - curstr;
 		purl->username = (char *)malloc(sizeof(char) * (len + 1));
 		if ( NULL == purl->username ) {
-			http_parsed_url_free(purl);
+			free_parsed_uri(purl);
 			return NULL;
 		}
 		(void)strncpy(purl->username, curstr, len);
@@ -149,7 +149,7 @@ parsed_url *parse_uri(const char *url)
 			len = tmpstr - curstr;
 			purl->password = (char *)malloc(sizeof(char) * (len + 1));
 			if ( NULL == purl->password ) {
-				http_parsed_url_free(purl);
+				free_parsed_uri(purl);
 				return NULL;
 			}
 			(void)strncpy(purl->password, curstr, len);
@@ -158,7 +158,7 @@ parsed_url *parse_uri(const char *url)
 		}
 		/* Skip '@' */
 		if ( '@' != *curstr ) {
-			http_parsed_url_free(purl);
+			free_parsed_uri(purl);
 			return NULL;
 		}
 		curstr++;
@@ -185,7 +185,7 @@ parsed_url *parse_uri(const char *url)
 	len = tmpstr - curstr;
 	purl->host = (char *)malloc(sizeof(char) * (len + 1));
 	if ( NULL == purl->host || len <= 0 ) {
-		http_parsed_url_free(purl);
+		free_parsed_uri(purl);
 		return NULL;
 	}
 	(void)strncpy(purl->host, curstr, len);
@@ -203,7 +203,7 @@ parsed_url *parse_uri(const char *url)
 		len = tmpstr - curstr;
 		purl->port = (char *)malloc(sizeof(char) * (len + 1));
 		if ( NULL == purl->port ) {
-			http_parsed_url_free(purl);
+			free_parsed_uri(purl);
 			return NULL;
 		}
 		(void)strncpy(purl->port, curstr, len);
@@ -218,7 +218,7 @@ parsed_url *parse_uri(const char *url)
 
 	/* Skip '/' */
 	if ( '/' != *curstr ) {
-		http_parsed_url_free(purl);
+		free_parsed_uri(purl);
 		return NULL;
 	}
 	curstr++;
@@ -231,7 +231,7 @@ parsed_url *parse_uri(const char *url)
 	len = tmpstr - curstr;
 	purl->path = (char *)malloc(sizeof(char) * (len + 1));
 	if ( NULL == purl->path ) {
-		http_parsed_url_free(purl);
+		free_parsed_uri(purl);
 		return NULL;
 	}
 	(void)strncpy(purl->path, curstr, len);
@@ -250,7 +250,7 @@ parsed_url *parse_uri(const char *url)
 		len = tmpstr - curstr;
 		purl->query = (char *)malloc(sizeof(char) * (len + 1));
 		if ( NULL == purl->query ) {
-			http_parsed_url_free(purl);
+			free_parsed_uri(purl);
 			return NULL;
 		}
 		(void)strncpy(purl->query, curstr, len);
@@ -270,7 +270,7 @@ parsed_url *parse_uri(const char *url)
 		len = tmpstr - curstr;
 		purl->fragment = (char *)malloc(sizeof(char) * (len + 1));
 		if ( NULL == purl->fragment ) {
-			http_parsed_url_free(purl);
+			free_parsed_uri(purl);
 			return NULL;
 		}
 		(void)strncpy(purl->fragment, curstr, len);
@@ -284,7 +284,7 @@ parsed_url *parse_uri(const char *url)
 /*
  * Free memory of parsed url
  */
-void http_parsed_url_free(parsed_url *purl)
+void free_parsed_uri(parsed_uri_t *purl)
 {
 	if ( NULL != purl ) {
 		if ( NULL != purl->scheme ) {

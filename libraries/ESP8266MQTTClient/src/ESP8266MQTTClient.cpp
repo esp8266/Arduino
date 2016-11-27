@@ -76,7 +76,8 @@ MQTTClient::MQTTClient():
     _disconnected_cb(NULL),
     _subscribe_cb(NULL),
     _publish_cb(NULL),
-    _data_cb(NULL)
+    _data_cb(NULL),
+    _initialized(false)
 {
     _outbox = ob_create();
 
@@ -108,7 +109,7 @@ bool MQTTClient::begin(String uri, LwtOptions lwt)
 }
 bool MQTTClient::begin(String uri, LwtOptions lwt, int keepalive, bool clean_session)
 {
-    parsed_url *puri = parse_uri(uri.c_str());
+    parsed_uri_t *puri = parse_uri(uri.c_str());
     MQTT_CHECK(puri->scheme == NULL, "ERROR: Protocol must not NULL\r\n", false);
     MQTT_CHECK(puri->host == NULL, "ERROR: Host must not NULL\r\n", false);
     _scheme = String(puri->scheme);
@@ -130,7 +131,7 @@ bool MQTTClient::begin(String uri, LwtOptions lwt, int keepalive, bool clean_ses
     if(puri->password)
         _password = String(puri->password);
 
-    http_parsed_url_free(puri);
+    free_parsed_uri(puri);
 
     _lwt_topic = String(lwt.lwtTopic);
     _lwt_msg = String(lwt.lwtMsg);
@@ -152,21 +153,28 @@ bool MQTTClient::begin(String uri, LwtOptions lwt, int keepalive, bool clean_ses
     _connect_info.clean_session = clean_session;
 
 
-    _mqtt_state.in_buffer = (uint8_t *)malloc(DEFAULT_MQTT_BUFFER_SIZE_BYTES);
-    _mqtt_state.in_buffer_length = DEFAULT_MQTT_BUFFER_SIZE_BYTES;
-    _mqtt_state.out_buffer =  (uint8_t *)malloc(DEFAULT_MQTT_BUFFER_SIZE_BYTES);
-    _mqtt_state.out_buffer_length = DEFAULT_MQTT_BUFFER_SIZE_BYTES;
-    _mqtt_state.connect_info = &_connect_info;
+    _state.in_buffer = (uint8_t *)malloc(DEFAULT_MQTT_BUFFER_SIZE_BYTES);
+    if(_state.in_buffer == NULL) {
+        LOG("Not enought memory\r\n");
+        return false;
+    }
+    _state.in_buffer_length = DEFAULT_MQTT_BUFFER_SIZE_BYTES;
+    _state.out_buffer =  (uint8_t *)malloc(DEFAULT_MQTT_BUFFER_SIZE_BYTES);
+    if(_state.in_buffer == NULL) {
+        free(_state.in_buffer);
+        LOG("Not enought memory\r\n");
+        return false;
+    }
+    _state.out_buffer_length = DEFAULT_MQTT_BUFFER_SIZE_BYTES;
+    _state.connect_info = &_connect_info;
 
-    mqtt_msg_init(&_mqtt_state.mqtt_connection,
-                  _mqtt_state.out_buffer,
-                  _mqtt_state.out_buffer_length);
+    mqtt_msg_init(&_state.connection,
+                  _state.out_buffer,
+                  _state.out_buffer_length);
 
     _transportTraits.reset(nullptr);
     _transportTraits = MQTTTransportTraitsPtr(new MQTTTransportTraits());
-
-    LOG("%s:%s@%s:%d/%s", _username.c_str(), _password.c_str(), _host.c_str(), _port, _client_id.c_str());
-
+    _initialized = true;
     return true;
 }
 
@@ -216,19 +224,23 @@ bool MQTTClient::connect(void)
 
     _tcp->setNoDelay(true);
 
-    _mqtt_state.outbound_message = mqtt_msg_connect(&_mqtt_state.mqtt_connection,
-                                   _mqtt_state.connect_info);
-    _mqtt_state.pending_msg_type = mqtt_get_type(_mqtt_state.outbound_message->data);
-    _mqtt_state.pending_msg_id = mqtt_get_id(_mqtt_state.outbound_message->data,
-                                 _mqtt_state.outbound_message->length);
+    _state.outbound_message = mqtt_msg_connect(&_state.connection,
+                                   _state.connect_info);
+    _state.pending_msg_type = mqtt_get_type(_state.outbound_message->data);
+    _state.pending_msg_id = mqtt_get_id(_state.outbound_message->data,
+                                 _state.outbound_message->length);
     LOG("Sending MQTT CONNECT message, type: %d, id: %04X\r\n",
-        _mqtt_state.pending_msg_type,
-        _mqtt_state.pending_msg_id);
-    write_len = _tcp->write(_mqtt_state.outbound_message->data,
-                            _mqtt_state.outbound_message->length);
+        _state.pending_msg_type,
+        _state.pending_msg_id);
+    write_len = _tcp->write(_state.outbound_message->data,
+                            _state.outbound_message->length);
     LOG("Reading MQTT CONNECT response message\r\n");
-    while (_tcp->available() == 0);
-    read_len = _tcp->read(_mqtt_state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
+    while (!_tcp->available()) {
+        if(!_tcp->connected())
+            return false;
+        yield();
+    }
+    read_len = _tcp->read(_state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
 
 
 
@@ -236,11 +248,11 @@ bool MQTTClient::connect(void)
         LOG("Error network response\r\n");
         return false;
     }
-    if (mqtt_get_type(_mqtt_state.in_buffer) != MQTT_MSG_TYPE_CONNACK) {
-        LOG("Invalid MSG_TYPE response: %d, read_len: %d\r\n", mqtt_get_type(_mqtt_state.in_buffer), read_len);
+    if (mqtt_get_type(_state.in_buffer) != MQTT_MSG_TYPE_CONNACK) {
+        LOG("Invalid MSG_TYPE response: %d, read_len: %d\r\n", mqtt_get_type(_state.in_buffer), read_len);
         return false;
     }
-    connect_rsp_code = mqtt_get_connect_return_code(_mqtt_state.in_buffer);
+    connect_rsp_code = mqtt_get_connect_return_code(_state.in_buffer);
     switch (connect_rsp_code) {
         case CONNECTION_ACCEPTED:
             LOG("Connected\r\n");
@@ -277,15 +289,18 @@ void MQTTClient::onData(THandlerFunction_Data fn)
 void MQTTClient::handle(void)
 {
     mqtt_outbox *ob;
-    while(!connected()) {
+    if(!_initialized)
+        return;
+    if(!connected()) {
         if(connect()) {
             if(_connected_cb)
                 _connected_cb();
             _keepalive_tick = millis();
-            break;
+        } else {
+            return;
         }
-        delay(MQTT_RECONNECT_TIMEOUT);
     }
+
     process_read();
 
     if(millis() - _keepalive_tick > _keepalive / 2) {
@@ -314,14 +329,14 @@ bool MQTTClient::deliver_publish(uint8_t *message)
     int more_data = 0, len_read_more = 0;
     String topic, data;
     char temp;
-    _mqtt_state.message_length = mqtt_get_total_length(_mqtt_state.in_buffer, _mqtt_state.message_length_read);
+    _state.message_length = mqtt_get_total_length(_state.in_buffer, _state.message_length_read);
 
-    event_data.topic_length = _mqtt_state.message_length_read;
+    event_data.topic_length = _state.message_length_read;
     event_data.topic = mqtt_get_publish_topic(message, &event_data.topic_length);
-    event_data.data_length = _mqtt_state.message_length_read;
+    event_data.data_length = _state.message_length_read;
     event_data.data = mqtt_get_publish_data(message, &event_data.data_length);
 
-    LOG("Data received, total package len: %d, publish package len: %d, data len: %d\r\n", _mqtt_state.message_length_read, _mqtt_state.message_length, event_data.data_length);
+    LOG("Data received, total package len: %d, publish package len: %d, data len: %d\r\n", _state.message_length_read, _state.message_length, event_data.data_length);
     if(_data_cb) {
         temp = event_data.topic[event_data.topic_length];
         event_data.topic[event_data.topic_length] = 0;
@@ -331,16 +346,16 @@ bool MQTTClient::deliver_publish(uint8_t *message)
         data = String(event_data.data);
         _data_cb(topic, data, false);
     }
-    while(_mqtt_state.message_length_read < _mqtt_state.message_length) {
-        len_read_more = _tcp->read(_mqtt_state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
+    while(_state.message_length_read < _state.message_length) {
+        len_read_more = _tcp->read(_state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
         LOG("Get more data: %d\r\n", len_read_more);
         if(len_read_more <= 0)
             break;
         if(_data_cb) {
-            _mqtt_state.in_buffer[len_read_more] = 0;
-            _data_cb(String((char*)event_data.topic), String((char*)_mqtt_state.in_buffer), true);
+            _state.in_buffer[len_read_more] = 0;
+            _data_cb(String((char*)event_data.topic), String((char*)_state.in_buffer), true);
         }
-        _mqtt_state.message_length_read += len_read_more;
+        _state.message_length_read += len_read_more;
     }
 
     return true;
@@ -355,14 +370,14 @@ int MQTTClient::process_read()
     uint16_t msg_id;
     mqtt_outbox *valid_msg;
     _tcp->setTimeout(DEFAULT_MQTT_READ_TIMEOUT);
-    read_len = _tcp->read(_mqtt_state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
+    read_len = _tcp->read(_state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
     if (read_len <= 0)
         return 0;
-    _mqtt_state.message_length_read = read_len;
+    _state.message_length_read = read_len;
 PROCESS_READ_AGAIN:
-    msg_type = mqtt_get_type(_mqtt_state.in_buffer);
-    msg_qos = mqtt_get_qos(_mqtt_state.in_buffer);
-    msg_id = mqtt_get_id(_mqtt_state.in_buffer, _mqtt_state.in_buffer_length);
+    msg_type = mqtt_get_type(_state.in_buffer);
+    msg_qos = mqtt_get_qos(_state.in_buffer);
+    msg_id = mqtt_get_id(_state.in_buffer, _state.in_buffer_length);
     LOG("Read len %d, id: %d, type: %d\r\n", read_len, msg_id, msg_type);
     switch (msg_type)
     {
@@ -372,7 +387,7 @@ PROCESS_READ_AGAIN:
                 if(_subscribe_cb)
                     _subscribe_cb(msg_id);
                 ob_del_id(_outbox, msg_id);
-                _mqtt_state.message_length = mqtt_get_total_length(_mqtt_state.in_buffer, _mqtt_state.message_length_read);
+                _state.message_length = mqtt_get_total_length(_state.in_buffer, _state.message_length_read);
 
                 LOG("Subscribe successful, msgid: %d, outbox size: %d\r\n", msg_id, ob_get_size(_outbox));
             }
@@ -384,14 +399,14 @@ PROCESS_READ_AGAIN:
             break;
         case MQTT_MSG_TYPE_PUBLISH:
             if (msg_qos == 1)
-                _mqtt_state.outbound_message = mqtt_msg_puback(&_mqtt_state.mqtt_connection, msg_id);
+                _state.outbound_message = mqtt_msg_puback(&_state.connection, msg_id);
             else if (msg_qos == 2)
-                _mqtt_state.outbound_message = mqtt_msg_pubrec(&_mqtt_state.mqtt_connection, msg_id);
+                _state.outbound_message = mqtt_msg_pubrec(&_state.connection, msg_id);
 
 
 
 
-            deliver_publish(_mqtt_state.in_buffer);
+            deliver_publish(_state.in_buffer);
             if(msg_qos == 0)
                 ob_del_id(_outbox, msg_id);
 
@@ -400,7 +415,7 @@ PROCESS_READ_AGAIN:
                 LOG("Queue MQTT_MSG_TYPE_PUBACK/MQTT_MSG_TYPE_PUBREC: %d, delete on send\r\n", msg_qos);
                 queue(msg_qos == 1); //delete after send
             }
-            // deliver_publish(client, _mqtt_state.in_buffer, _mqtt_state.message_length_read);
+            // deliver_publish(client, _state.in_buffer, _state.message_length_read);
             break;
         case MQTT_MSG_TYPE_PUBACK:
             valid_msg = ob_get(_outbox, msg_id);
@@ -417,7 +432,7 @@ PROCESS_READ_AGAIN:
             if (valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_PUBLISH && valid_msg->msg_id == msg_id) {
                 LOG("Reply with MQTT_MSG_TYPE_PUBREL msg_id: %d, %d\r\n", msg_id);
                 ob_del_id(_outbox, msg_id);
-                _mqtt_state.outbound_message = mqtt_msg_pubrel(&_mqtt_state.mqtt_connection, msg_id);
+                _state.outbound_message = mqtt_msg_pubrel(&_state.connection, msg_id);
                 queue(0);
                 LOG("Outbox size: %d\r\n", ob_get_size(_outbox));
             }
@@ -428,7 +443,7 @@ PROCESS_READ_AGAIN:
             if (valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_PUBREC && valid_msg->msg_id == msg_id) {
                 LOG("Reply with MQTT_MSG_TYPE_PUBCOMP, remove on sent, msg_id: %d, %d\r\n", msg_id);
                 ob_del_id(_outbox, msg_id);
-                _mqtt_state.outbound_message = mqtt_msg_pubcomp(&_mqtt_state.mqtt_connection, msg_id);
+                _state.outbound_message = mqtt_msg_pubcomp(&_state.connection, msg_id);
                 queue(1);
                 LOG("Outbox size: %d\r\n", ob_get_size(_outbox));
             }
@@ -446,7 +461,7 @@ PROCESS_READ_AGAIN:
             break;
         case MQTT_MSG_TYPE_PINGREQ:
             LOG("received MQTT_MSG_TYPE_PINGREQ\r\n");
-            _mqtt_state.outbound_message = mqtt_msg_pingresp(&_mqtt_state.mqtt_connection);
+            _state.outbound_message = mqtt_msg_pingresp(&_state.connection);
             queue(1);
             break;
         case MQTT_MSG_TYPE_PINGRESP:
@@ -454,9 +469,9 @@ PROCESS_READ_AGAIN:
             // Ignore
             break;
     }
-    if(_mqtt_state.message_length < _mqtt_state.message_length_read) {
-        _mqtt_state.message_length_read -= _mqtt_state.message_length;
-        _mqtt_state.in_buffer += _mqtt_state.message_length;
+    if(_state.message_length < _state.message_length_read) {
+        _state.message_length_read -= _state.message_length;
+        _state.in_buffer += _state.message_length;
         goto PROCESS_READ_AGAIN;
     }
     return 1;
@@ -464,14 +479,14 @@ PROCESS_READ_AGAIN:
 
 void MQTTClient::queue(int remove_on_sent)
 {
-    _mqtt_state.pending_msg_type = mqtt_get_type(_mqtt_state.outbound_message->data);
-    _mqtt_state.pending_msg_id = mqtt_get_id(_mqtt_state.outbound_message->data, _mqtt_state.outbound_message->length);
-    LOG("Queue: msgid: %d, msgtype: %d\r\n", _mqtt_state.pending_msg_id, _mqtt_state.pending_msg_type);
+    _state.pending_msg_type = mqtt_get_type(_state.outbound_message->data);
+    _state.pending_msg_id = mqtt_get_id(_state.outbound_message->data, _state.outbound_message->length);
+    LOG("Queue: msgid: %d, msgtype: %d\r\n", _state.pending_msg_id, _state.pending_msg_type);
     ob_put(_outbox,
-           _mqtt_state.outbound_message->data,
-           _mqtt_state.outbound_message->length,
-           _mqtt_state.pending_msg_id,
-           _mqtt_state.pending_msg_type,
+           _state.outbound_message->data,
+           _state.outbound_message->length,
+           _state.pending_msg_id,
+           _state.pending_msg_type,
            millis(),
            remove_on_sent);
     LOG("Outbox size: %d\r\n", ob_get_size(_outbox));
@@ -479,13 +494,13 @@ void MQTTClient::queue(int remove_on_sent)
 void MQTTClient::send_ping()
 {
 
-    _mqtt_state.outbound_message = mqtt_msg_pingreq(&_mqtt_state.mqtt_connection);
-    _mqtt_state.pending_msg_type = mqtt_get_type(_mqtt_state.outbound_message->data);
-    _mqtt_state.pending_msg_id = mqtt_get_id(_mqtt_state.outbound_message->data,
-                                 _mqtt_state.outbound_message->length);
+    _state.outbound_message = mqtt_msg_pingreq(&_state.connection);
+    _state.pending_msg_type = mqtt_get_type(_state.outbound_message->data);
+    _state.pending_msg_id = mqtt_get_id(_state.outbound_message->data,
+                                 _state.outbound_message->length);
     LOG("Sending pingreq");
-    _tcp->write(_mqtt_state.outbound_message->data,
-                _mqtt_state.outbound_message->length);
+    _tcp->write(_state.outbound_message->data,
+                _state.outbound_message->length);
 }
 
 int MQTTClient::subscribe(String topic)
@@ -494,13 +509,13 @@ int MQTTClient::subscribe(String topic)
 }
 int MQTTClient::subscribe(String topic, uint8_t qos)
 {
-    _mqtt_state.outbound_message = mqtt_msg_subscribe(&_mqtt_state.mqtt_connection,
+    _state.outbound_message = mqtt_msg_subscribe(&_state.connection,
                                    topic.c_str(), qos,
-                                   &_mqtt_state.pending_msg_id);
+                                   &_state.pending_msg_id);
 
-    LOG("Queue subscribe, topic\"%s\", id: %d\r\n", topic.c_str(), _mqtt_state.pending_msg_id);
+    LOG("Queue subscribe, topic\"%s\", id: %d\r\n", topic.c_str(), _state.pending_msg_id);
     queue(0);
-    return _mqtt_state.pending_msg_id;
+    return _state.pending_msg_id;
 }
 int MQTTClient::publish(String topic, String data)
 {
@@ -509,14 +524,14 @@ int MQTTClient::publish(String topic, String data)
 int MQTTClient::publish(String topic, String data, int qos, int retain)
 {
     int remove_on_sent = 0;
-    _mqtt_state.outbound_message = mqtt_msg_publish(&_mqtt_state.mqtt_connection,
+    _state.outbound_message = mqtt_msg_publish(&_state.connection,
                                    topic.c_str(), data.c_str(), data.length(),
                                    qos, retain,
-                                   &_mqtt_state.pending_msg_id);
-    LOG("Queue publish, topic\"%s\", id: %d\r\n", topic.c_str(), _mqtt_state.pending_msg_id);
+                                   &_state.pending_msg_id);
+    LOG("Queue publish, topic\"%s\", id: %d\r\n", topic.c_str(), _state.pending_msg_id);
     if(qos == 0)
         remove_on_sent = 1;
 
     queue(remove_on_sent);
-    return _mqtt_state.pending_msg_id;
+    return _state.pending_msg_id;
 }
