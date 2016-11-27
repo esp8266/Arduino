@@ -1,6 +1,6 @@
 /*
 ESP8266 MQTT Client library for ESP8266 Arduino
-Version 1.1
+Version 0.1
 Copyright (c) 2016 Tuan PM (tuanpm@live.com)
 ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
 License (MIT license):
@@ -130,7 +130,7 @@ bool MQTTClient::begin(String uri, LwtOptions lwt, int keepalive, bool clean_ses
     if(puri->password)
         _password = String(puri->password);
 
-    free(puri);
+    http_parsed_url_free(puri);
 
     _lwt_topic = String(lwt.lwtTopic);
     _lwt_msg = String(lwt.lwtMsg);

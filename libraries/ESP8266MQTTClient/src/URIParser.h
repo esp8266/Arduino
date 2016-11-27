@@ -19,7 +19,7 @@ extern "C" {
      * Declaration of function prototypes
      */
     parsed_url *parse_uri(const char *);
-    void parsed_url_free(parsed_url *);
+    void http_parsed_url_free(parsed_url *);
 
 #ifdef __cplusplus
 }

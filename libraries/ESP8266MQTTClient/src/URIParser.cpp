@@ -25,7 +25,6 @@ _is_scheme_char(int c)
 {
 	return (!isalpha(c) && '+' != c && '-' != c && '.' != c) ? 0 : 1;
 }
-static void http_parsed_url_free(parsed_url *purl);
 /*
  * See RFC 1738, 3986
  */
