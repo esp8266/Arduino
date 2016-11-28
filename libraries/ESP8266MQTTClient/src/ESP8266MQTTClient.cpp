@@ -302,11 +302,11 @@ void MQTTClient::handle(void)
         }
     }
 
-    process_read();
+    processRead();
 
     if(millis() - _keepalive_tick > _keepalive / 2) {
         _keepalive_tick = millis();
-        send_ping();
+        sendPing();
     }
     ob = ob_get_oldest_no_pending(_outbox);
     if(ob != NULL) {
@@ -324,7 +324,7 @@ void MQTTClient::handle(void)
     ob_cleanup(_outbox, DEFAULT_MQTT_MAX_QUEUE); //keep outbox maximum is DEFAULT_MQTT_MAX_QUEUE(8*1024) bytes 
 }
 
-bool MQTTClient::deliver_publish(uint8_t *message)
+bool MQTTClient::deliverPublish(uint8_t *message)
 {
     mqtt_event_data_t event_data;
     int more_data = 0, len_read_more = 0;
@@ -363,7 +363,7 @@ bool MQTTClient::deliver_publish(uint8_t *message)
 
 }
 
-int MQTTClient::process_read()
+int MQTTClient::processRead()
 {
     int read_len;
     uint8_t msg_type;
@@ -409,7 +409,7 @@ PROCESS_READ_AGAIN:
 
 
 
-            deliver_publish(_state.in_buffer);
+            deliverPublish(_state.in_buffer);
             if(msg_qos == 0)
                 ob_del_id(_outbox, msg_id);
 
@@ -493,7 +493,7 @@ void MQTTClient::queue(int remove_on_sent)
            remove_on_sent);
     LOG("Outbox size: %d\r\n", ob_get_size(_outbox));
 }
-void MQTTClient::send_ping()
+void MQTTClient::sendPing()
 {
 
     _state.outbound_message = mqtt_msg_pingreq(&_state.connection);
@@ -519,7 +519,7 @@ int MQTTClient::subscribe(String topic, uint8_t qos)
     queue(0);
     return _state.pending_msg_id;
 }
-int MQTTClient::unsubscribe(String topic)
+int MQTTClient::unSubscribe(String topic)
 {
     _state.outbound_message = mqtt_msg_unsubscribe(&_state.connection,
                                    topic.c_str(),

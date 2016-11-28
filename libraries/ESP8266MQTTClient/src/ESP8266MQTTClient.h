@@ -112,7 +112,7 @@ public:
 	void handle();
 	bool connect();
 	int subscribe(String topic);
-	int unsubscribe(String topic);
+	int unSubscribe(String topic);
 	int subscribe(String topic, uint8_t qos);
 	int publish(String topic, String data);
 	int publish(String topic, String data, int qos, int retain);
@@ -120,10 +120,10 @@ protected:
 	std::unique_ptr<WiFiClient> _tcp;
 	MQTTTransportTraitsPtr _transportTraits;
 	bool connected();
-	int process_read();
+	int processRead();
 	void queue(int remove_on_sent);
-	void send_ping();
-	bool deliver_publish(uint8_t *message);
+	void sendPing();
+	bool deliverPublish(uint8_t *message);
 
 	mqtt_state_t  _state;
 	mqtt_connect_info_t _connect_info;
