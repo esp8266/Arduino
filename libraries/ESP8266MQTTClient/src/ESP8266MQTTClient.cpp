@@ -395,8 +395,10 @@ PROCESS_READ_AGAIN:
             break;
         case MQTT_MSG_TYPE_UNSUBACK:
             valid_msg = ob_get(_outbox, msg_id);
-            if (valid_msg->msg_type == MQTT_MSG_TYPE_UNSUBSCRIBE && valid_msg->msg_id == msg_id)
+            if (valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_UNSUBSCRIBE && valid_msg->msg_id == msg_id){
                 LOG("UnSubscribe successful\r\n");
+                ob_del_id(_outbox, msg_id);
+            }
             break;
         case MQTT_MSG_TYPE_PUBLISH:
             if (msg_qos == 1)
@@ -416,7 +418,6 @@ PROCESS_READ_AGAIN:
                 LOG("Queue MQTT_MSG_TYPE_PUBACK/MQTT_MSG_TYPE_PUBREC: %d, delete on send\r\n", msg_qos);
                 queue(msg_qos == 1); //delete after send
             }
-            // deliver_publish(client, _state.in_buffer, _state.message_length_read);
             break;
         case MQTT_MSG_TYPE_PUBACK:
             valid_msg = ob_get(_outbox, msg_id);
@@ -515,6 +516,16 @@ int MQTTClient::subscribe(String topic, uint8_t qos)
                                    &_state.pending_msg_id);
 
     LOG("Queue subscribe, topic\"%s\", id: %d\r\n", topic.c_str(), _state.pending_msg_id);
+    queue(0);
+    return _state.pending_msg_id;
+}
+int MQTTClient::unsubscribe(String topic)
+{
+    _state.outbound_message = mqtt_msg_unsubscribe(&_state.connection,
+                                   topic.c_str(),
+                                   &_state.pending_msg_id);
+
+    LOG("Queue unsubscribe, topic\"%s\", id: %d\r\n", topic.c_str(), _state.pending_msg_id);
     queue(0);
     return _state.pending_msg_id;
 }

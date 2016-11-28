@@ -274,6 +274,7 @@ uint16_t mqtt_get_id(uint8_t* buffer, uint16_t length)
     case MQTT_MSG_TYPE_SUBACK:
     case MQTT_MSG_TYPE_UNSUBACK:
     case MQTT_MSG_TYPE_SUBSCRIBE:
+    case MQTT_MSG_TYPE_UNSUBSCRIBE:
       {
         // This requires the remaining length to be encoded in 1 byte,
         // which it should be.

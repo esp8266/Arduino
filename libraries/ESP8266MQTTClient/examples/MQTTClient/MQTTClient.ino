@@ -4,7 +4,7 @@ MQTTClient mqtt;
 
 void setup() {
   Serial.begin(115200);
-  WiFi.begin("ssid", "pass");
+//  WiFi.begin("ssid", "pass");
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -14,6 +14,7 @@ void setup() {
   //topic, data, data is continuing
   mqtt.onData([](String topic, String data, bool cont) {
     Serial.printf("Data received, topic: %s, data: %s\r\n", topic.c_str(), data.c_str());
+    mqtt.unsubscribe("/qos0");
   });
 
   mqtt.onSubscribe([](int sub_id) {

@@ -112,6 +112,7 @@ public:
 	void handle();
 	bool connect();
 	int subscribe(String topic);
+	int unsubscribe(String topic);
 	int subscribe(String topic, uint8_t qos);
 	int publish(String topic, String data);
 	int publish(String topic, String data, int qos, int retain);
