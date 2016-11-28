@@ -51,6 +51,7 @@ public:
   WiFiClient available(uint8_t* status = NULL);
   bool hasClient();
   void begin();
+  void begin(uint16_t port);
   void setNoDelay(bool nodelay);
   bool getNoDelay();
   virtual size_t write(uint8_t);
