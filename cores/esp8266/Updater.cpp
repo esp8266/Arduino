@@ -22,6 +22,7 @@ UpdaterClass::UpdaterClass()
 , _startAddress(0)
 , _currentAddress(0)
 , _command(U_FLASH)
+, _handler(0)
 {
 }
 
@@ -34,6 +35,10 @@ void UpdaterClass::_reset() {
   _currentAddress = 0;
   _size = 0;
   _command = U_FLASH;
+}
+
+void UpdaterClass::setCryptoHandler(UpdateHandlerFunction handler) {
+  _handler = handler;
 }
 
 bool UpdaterClass::begin(size_t size, int command) {
@@ -121,6 +126,9 @@ bool UpdaterClass::begin(size_t size, int command) {
   DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", _size, _size);
 #endif
 
+  if (_handler) {
+     _handler(UPDATE_OPERATION_BEGIN, 0, size);
+  }
   _md5.begin();
   return true;
 }
@@ -181,6 +189,15 @@ bool UpdaterClass::end(bool evenIfRemaining){
     return false;
   }
 
+  if(_handler && (_handler(UPDATE_OPERATION_END, 0, _size) != UPDATE_ERROR_OK)) {
+    _error = UPDATE_ERROR_CRYPTO;
+#ifdef DEBUG_UPDATER
+    printError(DEBUG_UPDATER);
+#endif
+    _reset();
+    return false;
+  }
+
   if (_command == U_FLASH) {
     eboot_command ebcmd;
     ebcmd.action = ACTION_COPY_RAW;
@@ -234,6 +251,10 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
     //fail instead
     _error = UPDATE_ERROR_SPACE;
     return 0;
+  }
+
+  if(_handler) {
+    _handler(UPDATE_OPERATION_WRITE, data, len);
   }
 
   size_t left = len;
@@ -372,6 +393,8 @@ void UpdaterClass::printError(Stream &out){
     out.printf("new Flash config wrong real: %d\n", ESP.getFlashChipRealSize());
   } else if(_error == UPDATE_ERROR_MAGIC_BYTE){
     out.println("Magic byte is wrong, not 0xE9");
+  } else if(_error == UPDATE_ERROR_CRYPTO){
+    out.println("Firmware is not crypto signed");
   } else {
     out.println("UNKNOWN");
   }
