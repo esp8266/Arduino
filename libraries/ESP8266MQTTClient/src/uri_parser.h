@@ -12,6 +12,8 @@ typedef struct {
 	char *fragment;             /* optional */
 	char *username;             /* optional */
 	char *password;             /* optional */
+	char *_uri;             	/* private */
+	int _uri_len;             	/* private */
 } parsed_uri_t;
 
 parsed_uri_t *parse_uri(const char *);

@@ -1,316 +1,176 @@
-/*_
- * Copyright 2010-2011 Scyphus Solutions Co. Ltd.  All rights reserved.
- *
- * Authors:
- *      Hirochika Asai
- */
-
+/*
+URI Parser
+Copyright (c) 2016 Tuan PM (tuanpm@live.com)
+License (MIT license):
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+*/
 #include "uri_parser.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
-/*
- * Prototype declarations
- */
-static __inline__ int _is_scheme_char(int);
-
-/*
- * Check whether the character is permitted in scheme string
- */
 static __inline__ int
 _is_scheme_char(int c)
 {
 	return (!isalpha(c) && '+' != c && '-' != c && '.' != c) ? 0 : 1;
 }
-/*
- * See RFC 1738, 3986
- */
+
+#define JUMP_NEXT_STATE(var, state) { *curr_ptr = 0; curr_ptr ++; var = curr_ptr; parse_state = state; break;}
 parsed_uri_t *parse_uri(const char *url)
 {
-	parsed_uri_t *purl;
-	const char *tmpstr;
-	const char *curstr;
-	int len;
-	int i;
-	int userpass_flag;
+	parsed_uri_t *puri;
+	char *curr_ptr;
 	int bracket_flag;
-
-	/* Allocate the parsed url storage */
-	purl = (parsed_uri_t *)malloc(sizeof(parsed_uri_t));
-	if ( NULL == purl ) {
+	enum parse_state_t {
+		PARSE_SCHEME = 0,
+		PARSE_USERNAME_OR_HOST,
+		PARSE_PASSWORD_OR_PORT,
+		PARSE_HOST,
+		PARSE_PORT,
+		PARSE_PATH,
+		PARSE_QUERY,
+		PARSE_FRAGMENT
+	} parse_state = 0;
+	puri = (parsed_uri_t *)malloc(sizeof(parsed_uri_t));
+	if ( NULL == puri ) {
 		return NULL;
 	}
-	purl->scheme = NULL;
-	purl->host = NULL;
-	purl->port = NULL;
-	purl->path = NULL;
-	purl->query = NULL;
-	purl->fragment = NULL;
-	purl->username = NULL;
-	purl->password = NULL;
-
-	curstr = url;
-
-	/*
-	 * <scheme>:<scheme-specific-part>
-	 * <scheme> := [a-z\+\-\.]+
-	 *             upper case = lower case for resiliency
-	 */
-	/* Read scheme */
-	tmpstr = strchr(curstr, ':');
-	if ( NULL == tmpstr ) {
-		/* Not found the character */
-		free_parsed_uri(purl);
+	puri->_uri_len = strlen(url);
+	puri->_uri = (char*) malloc(puri->_uri_len + 1);
+	if(puri->_uri == NULL) {
+		free_parsed_uri(puri);
 		return NULL;
 	}
-	/* Get the scheme length */
-	len = tmpstr - curstr;
-	/* Check restrictions */
-	for ( i = 0; i < len; i++ ) {
-		if ( !_is_scheme_char(curstr[i]) ) {
-			/* Invalid format */
-			free_parsed_uri(purl);
-			return NULL;
-		}
-	}
-	/* Copy the scheme to the storage */
-	purl->scheme = (char *)malloc(sizeof(char) * (len + 1));
-	if ( NULL == purl->scheme ) {
-		free_parsed_uri(purl);
-		return NULL;
-	}
-	(void)strncpy(purl->scheme, curstr, len);
-	purl->scheme[len] = '\0';
-	/* Make the character to lower if it is upper case. */
-	for ( i = 0; i < len; i++ ) {
-		purl->scheme[i] = tolower(purl->scheme[i]);
-	}
-	/* Skip ':' */
-	tmpstr++;
-	curstr = tmpstr;
+	strcpy(puri->_uri, url);
+	puri->_uri[puri->_uri_len] = 0;
+	puri->scheme = NULL;
+	puri->host = NULL;
+	puri->port = NULL;
+	puri->path = NULL;
+	puri->query = NULL;
+	puri->fragment = NULL;
+	puri->username = NULL;
+	puri->password = NULL;
 
-	/*
-	 * //<user>:<password>@<host>:<port>/<url-path>
-	 * Any ":", "@" and "/" must be encoded.
-	 */
-	/* Eat "//" */
-	for ( i = 0; i < 2; i++ ) {
-		if ( '/' != *curstr ) {
-			free_parsed_uri(purl);
-			return NULL;
+	curr_ptr = puri->_uri;
+	puri->scheme = curr_ptr;
+	parse_state = PARSE_SCHEME;
+	bracket_flag = 0;
+	while(*curr_ptr) {
+		*curr_ptr = tolower(*curr_ptr);
+		switch(parse_state) {
+			case PARSE_SCHEME: /* parse scheme */
+				if(curr_ptr + 3 < (puri->_uri + puri->_uri_len) && memcmp(curr_ptr, "://", 3) == 0) {
+					*curr_ptr++ = 0;
+					*curr_ptr++ = 0;
+					*curr_ptr++ = 0;
+					puri->host = curr_ptr;
+					puri->username = curr_ptr;
+					parse_state = PARSE_USERNAME_OR_HOST; //next is username or host
+					break;
+				}
+				if(!_is_scheme_char(*curr_ptr)) {
+					free_parsed_uri(puri);
+					return NULL;
+				}
+				curr_ptr ++;
+				break;
+			case PARSE_USERNAME_OR_HOST: /* username or host*/
+				if ( '[' == *curr_ptr && bracket_flag == 0) {
+					bracket_flag = 1;
+				} else if(']' == *curr_ptr && bracket_flag == 1) {
+					bracket_flag = 0;
+				}
+				if(bracket_flag == 0 && *curr_ptr == ':') {
+					puri->port = curr_ptr;
+					JUMP_NEXT_STATE(puri->password, PARSE_PASSWORD_OR_PORT);
+				}
+				curr_ptr ++;
+				break;
+			case PARSE_PASSWORD_OR_PORT: /* password or port */
+				if(*curr_ptr == '@') {  
+					puri->port = NULL;
+					JUMP_NEXT_STATE(puri->host, PARSE_HOST);
+					break;
+				} else if(*curr_ptr == '/') {
+					puri->username = NULL;
+					puri->password = NULL;
+					JUMP_NEXT_STATE(puri->path, PARSE_PATH);
+					break;
+				}
+				curr_ptr ++;
+				break;
+			case PARSE_HOST: /* host */
+				if ( '[' == *curr_ptr && bracket_flag == 0) {
+					bracket_flag = 1;
+				} else if(']' == *curr_ptr && bracket_flag == 1) {
+					bracket_flag = 0;
+				}
+				if(bracket_flag == 0 && *curr_ptr == ':') {
+					JUMP_NEXT_STATE(puri->port, PARSE_PORT);
+				} else if(bracket_flag == 0 && *curr_ptr == '/') {
+					puri->port = NULL;
+					JUMP_NEXT_STATE(puri->path, PARSE_PATH);
+				}
+				curr_ptr ++;
+				break;
+			case PARSE_PORT: /* port */
+				if(*curr_ptr == '/') {
+					JUMP_NEXT_STATE(puri->path, PARSE_PATH);
+				} else if(*curr_ptr == '?') {
+					JUMP_NEXT_STATE(puri->query, PARSE_QUERY);
+				} else if(*curr_ptr == '#') {
+					JUMP_NEXT_STATE(puri->fragment, PARSE_FRAGMENT);
+				}
+				curr_ptr ++;
+				break;
+			case PARSE_PATH: /* path */
+				if(*curr_ptr == '?') {
+					JUMP_NEXT_STATE(puri->query, PARSE_QUERY);
+				} else if(*curr_ptr == '#') {
+					JUMP_NEXT_STATE(puri->fragment, PARSE_FRAGMENT);
+				}
+				curr_ptr ++;
+			case PARSE_QUERY: /* query */
+				if(*curr_ptr == '#') {
+					JUMP_NEXT_STATE(puri->fragment, PARSE_FRAGMENT);
+				}
+			case PARSE_FRAGMENT: /* fragment*/
+				curr_ptr ++;
+				break;
 		}
-		curstr++;
-	}
 
-	/* Check if the user (and password) are specified. */
-	userpass_flag = 0;
-	tmpstr = curstr;
-	while ( '\0' != *tmpstr ) {
-		if ( '@' == *tmpstr ) {
-			/* Username and password are specified */
-			userpass_flag = 1;
-			break;
-		} else if ( '/' == *tmpstr ) {
-			/* End of <host>:<port> specification */
-			userpass_flag = 0;
-			break;
-		}
-		tmpstr++;
 	}
-
-	/* User and password specification */
-	tmpstr = curstr;
-	if ( userpass_flag ) {
-		/* Read username */
-		while ( '\0' != *tmpstr && ':' != *tmpstr && '@' != *tmpstr ) {
-			tmpstr++;
-		}
-		len = tmpstr - curstr;
-		purl->username = (char *)malloc(sizeof(char) * (len + 1));
-		if ( NULL == purl->username ) {
-			free_parsed_uri(purl);
-			return NULL;
-		}
-		(void)strncpy(purl->username, curstr, len);
-		purl->username[len] = '\0';
-		/* Proceed current pointer */
-		curstr = tmpstr;
-		if ( ':' == *curstr ) {
-			/* Skip ':' */
-			curstr++;
-			/* Read password */
-			tmpstr = curstr;
-			while ( '\0' != *tmpstr && '@' != *tmpstr ) {
-				tmpstr++;
-			}
-			len = tmpstr - curstr;
-			purl->password = (char *)malloc(sizeof(char) * (len + 1));
-			if ( NULL == purl->password ) {
-				free_parsed_uri(purl);
-				return NULL;
-			}
-			(void)strncpy(purl->password, curstr, len);
-			purl->password[len] = '\0';
-			curstr = tmpstr;
-		}
-		/* Skip '@' */
-		if ( '@' != *curstr ) {
-			free_parsed_uri(purl);
-			return NULL;
-		}
-		curstr++;
-	}
-
-	if ( '[' == *curstr ) {
-		bracket_flag = 1;
-	} else {
-		bracket_flag = 0;
-	}
-	/* Proceed on by delimiters with reading host */
-	tmpstr = curstr;
-	while ( '\0' != *tmpstr ) {
-		if ( bracket_flag && ']' == *tmpstr ) {
-			/* End of IPv6 address. */
-			tmpstr++;
-			break;
-		} else if ( !bracket_flag && (':' == *tmpstr || '/' == *tmpstr) ) {
-			/* Port number is specified. */
-			break;
-		}
-		tmpstr++;
-	}
-	len = tmpstr - curstr;
-	purl->host = (char *)malloc(sizeof(char) * (len + 1));
-	if ( NULL == purl->host || len <= 0 ) {
-		free_parsed_uri(purl);
-		return NULL;
-	}
-	(void)strncpy(purl->host, curstr, len);
-	purl->host[len] = '\0';
-	curstr = tmpstr;
-
-	/* Is port number specified? */
-	if ( ':' == *curstr ) {
-		curstr++;
-		/* Read port number */
-		tmpstr = curstr;
-		while ( '\0' != *tmpstr && '/' != *tmpstr ) {
-			tmpstr++;
-		}
-		len = tmpstr - curstr;
-		purl->port = (char *)malloc(sizeof(char) * (len + 1));
-		if ( NULL == purl->port ) {
-			free_parsed_uri(purl);
-			return NULL;
-		}
-		(void)strncpy(purl->port, curstr, len);
-		purl->port[len] = '\0';
-		curstr = tmpstr;
+	if(parse_state < PARSE_HOST) {
+		puri->host = puri->username;
+		puri->port = puri->password;
+		puri->username = NULL;
+		puri->password = NULL;
 	}
 
-	/* End of the string */
-	if ( '\0' == *curstr ) {
-		return purl;
-	}
-
-	/* Skip '/' */
-	if ( '/' != *curstr ) {
-		free_parsed_uri(purl);
-		return NULL;
-	}
-	curstr++;
-
-	/* Parse path */
-	tmpstr = curstr;
-	while ( '\0' != *tmpstr && '#' != *tmpstr  && '?' != *tmpstr ) {
-		tmpstr++;
-	}
-	len = tmpstr - curstr;
-	purl->path = (char *)malloc(sizeof(char) * (len + 1));
-	if ( NULL == purl->path ) {
-		free_parsed_uri(purl);
-		return NULL;
-	}
-	(void)strncpy(purl->path, curstr, len);
-	purl->path[len] = '\0';
-	curstr = tmpstr;
-
-	/* Is query specified? */
-	if ( '?' == *curstr ) {
-		/* Skip '?' */
-		curstr++;
-		/* Read query */
-		tmpstr = curstr;
-		while ( '\0' != *tmpstr && '#' != *tmpstr ) {
-			tmpstr++;
-		}
-		len = tmpstr - curstr;
-		purl->query = (char *)malloc(sizeof(char) * (len + 1));
-		if ( NULL == purl->query ) {
-			free_parsed_uri(purl);
-			return NULL;
-		}
-		(void)strncpy(purl->query, curstr, len);
-		purl->query[len] = '\0';
-		curstr = tmpstr;
-	}
-
-	/* Is fragment specified? */
-	if ( '#' == *curstr ) {
-		/* Skip '#' */
-		curstr++;
-		/* Read fragment */
-		tmpstr = curstr;
-		while ( '\0' != *tmpstr ) {
-			tmpstr++;
-		}
-		len = tmpstr - curstr;
-		purl->fragment = (char *)malloc(sizeof(char) * (len + 1));
-		if ( NULL == purl->fragment ) {
-			free_parsed_uri(purl);
-			return NULL;
-		}
-		(void)strncpy(purl->fragment, curstr, len);
-		purl->fragment[len] = '\0';
-		curstr = tmpstr;
-	}
-
-	return purl;
+	return puri;
 }
-
-/*
- * Free memory of parsed url
- */
-void free_parsed_uri(parsed_uri_t *purl)
+void free_parsed_uri(parsed_uri_t *puri)
 {
-	if ( NULL != purl ) {
-		if ( NULL != purl->scheme ) {
-			free(purl->scheme);
+	if ( NULL != puri ) {
+		if ( NULL != puri->_uri ) {
+			free(puri->_uri);
 		}
-		if ( NULL != purl->host ) {
-			free(purl->host);
-		}
-		if ( NULL != purl->port ) {
-			free(purl->port);
-		}
-		if ( NULL != purl->path ) {
-			free(purl->path);
-		}
-		if ( NULL != purl->query ) {
-			free(purl->query);
-		}
-		if ( NULL != purl->fragment ) {
-			free(purl->fragment);
-		}
-		if ( NULL != purl->username ) {
-			free(purl->username);
-		}
-		if ( NULL != purl->password ) {
-			free(purl->password);
-		}
-		free(purl);
+		free(puri);
 	}
 }
