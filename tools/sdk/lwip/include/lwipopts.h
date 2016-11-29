@@ -505,7 +505,7 @@
  * interface, define this to 0.
  */
 #ifndef IP_FORWARD
-#define IP_FORWARD                      0
+#define IP_FORWARD                      1
 #endif
 
 /**
