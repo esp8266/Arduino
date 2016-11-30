@@ -1,3 +1,25 @@
+/*
+ESP8266 MQTT Client library for ESP8266 Arduino
+Version 0.1
+Copyright (c) 2016 Tuan PM (tuanpm@live.com)
+ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
+License (MIT license):
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+*/
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
@@ -98,7 +120,7 @@ bool MQTTWSTraits::connect(WiFiClient& client, const char* host, int port)
 	String handshake = "GET / HTTP/1.1\r\n"
 	                   "Connection: Upgrade\r\n"
 	                   "Upgrade: websocket\r\n"
-	                   "Host: " + String(host) + ":" +String(port)+ "\r\n"
+	                   "Host: " + String(host) + ":" + String(port) + "\r\n"
 	                   "Sec-WebSocket-Version: 13\r\n"
 	                   "Origin: file://\r\n"
 	                   "Sec-WebSocket-Protocol: mqttv3.1\r\n"
@@ -165,7 +187,6 @@ int MQTTWSTraits::write(WiFiClient& client, unsigned char *data, int size)
 	data_buffer[header_len++] = random(0, 256);
 	data_buffer[header_len++] = random(0, 256);
 
-	
 	for(int i = 0; i < size; ++i) {
 		data_buffer[header_len++] = (data[i] ^ mask[i % 4]);
 	}
@@ -189,7 +210,6 @@ int MQTTWSTraits::read(WiFiClient& client, unsigned char *data, int size)
 		free(data_buffer);
 		return -1;
 	}
-	
 	opcode = (*data_ptr & 0x0F);
 	data_ptr ++;
 	mask = ((*data_ptr >> 7) & 0x01);
