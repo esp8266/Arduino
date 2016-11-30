@@ -32,11 +32,11 @@ License (MIT license):
 #include "mqtt_msg.h"
 #include "mqtt_outbox.h"
 
-// #ifdef DEBUG_ESP_MQTT_CLIENT
+#ifdef DEBUG_ESP_MQTT_CLIENT
 #ifdef DEBUG_ESP_PORT
 #define LOG(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
 #endif
-// #endif
+#endif
 
 #ifndef LOG
 #define LOG(...)
