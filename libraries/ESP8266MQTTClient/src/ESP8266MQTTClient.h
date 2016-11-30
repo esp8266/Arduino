@@ -32,11 +32,11 @@ License (MIT license):
 #include "mqtt_msg.h"
 #include "mqtt_outbox.h"
 
-#ifdef DEBUG_ESP_MQTT_CLIENT
+// #ifdef DEBUG_ESP_MQTT_CLIENT
 #ifdef DEBUG_ESP_PORT
 #define LOG(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
 #endif
-#endif
+// #endif
 
 #ifndef LOG
 #define LOG(...)
@@ -48,6 +48,7 @@ License (MIT license):
 #define DEFAULT_MQTT_BUFFER_SIZE_BYTES	1024
 #define DEFAULT_MQTT_CLEAN_SESSION 1
 #define MQTT_RECONNECT_TIMEOUT 5000
+#define MQTT_CONNECT_TIMEOUT 5000
 #define DEFAULT_MQTT_READ_TIMEOUT 200
 #define DEFAULT_MQTT_MAX_QUEUE (1024*8)
 typedef struct {
@@ -129,6 +130,7 @@ protected:
 	mqtt_connect_info_t _connect_info;
 	mqtt_outbox *_outbox;
 	uint32_t _keepalive_tick;
+	uint32_t _reconnect_tick;
 
 
 	String _scheme;
