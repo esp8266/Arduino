@@ -207,7 +207,7 @@ bool MQTTClient::connect(void)
     while(!_tcp->available()) {
         if(!_tcp->connected())
             return false;
-        delay(10);
+        yield();
         if(millis() - connect_tick > MQTT_CONNECT_TIMEOUT){
             _tcp->stop();
             return false;

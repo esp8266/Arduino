@@ -26,7 +26,7 @@ bool MQTTTransportTraits::connect(WiFiClient& client, const char* host, int port
 }
 int MQTTTransportTraits::write(WiFiClient& client, unsigned char *data, int size)
 {
-	return client.connect(data, size);
+	return client.write(data, size);
 }
 int MQTTTransportTraits::read(WiFiClient& client, unsigned char *data, int size)
 {
