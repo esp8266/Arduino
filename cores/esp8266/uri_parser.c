@@ -1,6 +1,7 @@
 /*
 URI Parser
 Copyright (c) 2016 Tuan PM (tuanpm@live.com)
+Inspired by Hirochika Asai, http://draft.scyphus.co.jp/lang/c/url_parser.html
 License (MIT license):
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +48,7 @@ parsed_uri_t *parse_uri(const char *url)
 		PARSE_FRAGMENT
 	} parse_state = 0;
 	puri = (parsed_uri_t *)malloc(sizeof(parsed_uri_t));
-	if ( NULL == puri ) {
+	if(NULL == puri) {
 		return NULL;
 	}
 	puri->_uri_len = strlen(url);
@@ -91,7 +92,7 @@ parsed_uri_t *parse_uri(const char *url)
 				curr_ptr ++;
 				break;
 			case PARSE_USERNAME_OR_HOST: /* username or host*/
-				if ( '[' == *curr_ptr && bracket_flag == 0) {
+				if('[' == *curr_ptr && bracket_flag == 0) {
 					bracket_flag = 1;
 				} else if(']' == *curr_ptr && bracket_flag == 1) {
 					bracket_flag = 0;
@@ -103,7 +104,7 @@ parsed_uri_t *parse_uri(const char *url)
 				curr_ptr ++;
 				break;
 			case PARSE_PASSWORD_OR_PORT: /* password or port */
-				if(*curr_ptr == '@') {  
+				if(*curr_ptr == '@') {
 					puri->port = NULL;
 					JUMP_NEXT_STATE(puri->host, PARSE_HOST);
 					break;
@@ -116,7 +117,7 @@ parsed_uri_t *parse_uri(const char *url)
 				curr_ptr ++;
 				break;
 			case PARSE_HOST: /* host */
-				if ( '[' == *curr_ptr && bracket_flag == 0) {
+				if('[' == *curr_ptr && bracket_flag == 0) {
 					bracket_flag = 1;
 				} else if(']' == *curr_ptr && bracket_flag == 1) {
 					bracket_flag = 0;
@@ -167,8 +168,8 @@ parsed_uri_t *parse_uri(const char *url)
 }
 void free_parsed_uri(parsed_uri_t *puri)
 {
-	if ( NULL != puri ) {
-		if ( NULL != puri->_uri ) {
+	if(NULL != puri) {
+		if(NULL != puri->_uri) {
 			free(puri->_uri);
 		}
 		free(puri);
