@@ -26,47 +26,7 @@ License (MIT license):
 #include <StreamString.h>
 #include <base64.h>
 #include "ESP8266MQTTClient.h"
-
-class MQTTTransportTraits
-{
-public:
-    virtual ~MQTTTransportTraits()
-    {
-    }
-
-    virtual std::unique_ptr<WiFiClient> create()
-    {
-        return std::unique_ptr<WiFiClient>(new WiFiClient());
-    }
-
-    virtual bool verify(WiFiClient& client, const char* host)
-    {
-        return true;
-    }
-};
-
-class MQTTTLSTraits : public MQTTTransportTraits
-{
-public:
-    MQTTTLSTraits(const String& fingerprint) :
-        _fingerprint(fingerprint)
-    {
-    }
-
-    std::unique_ptr<WiFiClient> create() override
-    {
-        return std::unique_ptr<WiFiClient>(new WiFiClientSecure());
-    }
-
-    bool verify(WiFiClient& client, const char* host) override
-    {
-        auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
-        return wcs.verify(_fingerprint.c_str(), host);
-    }
-
-protected:
-    String _fingerprint;
-};
+#include "MQTTTransport.h"
 
 /**
  * constructor
@@ -159,7 +119,7 @@ bool MQTTClient::begin(String uri, LwtOptions lwt, int keepalive, bool clean_ses
         return false;
     }
     _state.in_buffer_length = DEFAULT_MQTT_BUFFER_SIZE_BYTES;
-    _state.out_buffer =  (uint8_t *)malloc(DEFAULT_MQTT_BUFFER_SIZE_BYTES);
+    _state.out_buffer = (uint8_t *)malloc(DEFAULT_MQTT_BUFFER_SIZE_BYTES);
     if(_state.in_buffer == NULL) {
         free(_state.in_buffer);
         LOG("Not enought memory\r\n");
@@ -197,7 +157,7 @@ bool MQTTClient::connect(void)
         return true;
     }
 
-    if (!_transportTraits) {
+    if(!_transportTraits) {
         LOG("[MQTT-Client] connect: MQTTClient::begin was not called or returned error\n");
         return false;
     }
@@ -216,7 +176,7 @@ bool MQTTClient::connect(void)
 
     LOG("[MQTT-Client] connected to %s:%u\n", _host.c_str(), _port);
 
-    if (!_transportTraits->verify(*_tcp, _host.c_str())) {
+    if(!_transportTraits->verify(*_tcp, _host.c_str())) {
         LOG("[MQTT-Client] transport level verify failed\n");
         _tcp->stop();
         return false;
@@ -225,17 +185,17 @@ bool MQTTClient::connect(void)
     _tcp->setNoDelay(true);
 
     _state.outbound_message = mqtt_msg_connect(&_state.connection,
-                                   _state.connect_info);
+                              _state.connect_info);
     _state.pending_msg_type = mqtt_get_type(_state.outbound_message->data);
     _state.pending_msg_id = mqtt_get_id(_state.outbound_message->data,
-                                 _state.outbound_message->length);
+                                        _state.outbound_message->length);
     LOG("Sending MQTT CONNECT message, type: %d, id: %04X\r\n",
         _state.pending_msg_type,
         _state.pending_msg_id);
     write_len = _tcp->write(_state.outbound_message->data,
                             _state.outbound_message->length);
     LOG("Reading MQTT CONNECT response message\r\n");
-    while (!_tcp->available()) {
+    while(!_tcp->available()) {
         if(!_tcp->connected())
             return false;
         yield();
@@ -244,16 +204,16 @@ bool MQTTClient::connect(void)
 
 
 
-    if (read_len < 0) {
+    if(read_len < 0) {
         LOG("Error network response\r\n");
         return false;
     }
-    if (mqtt_get_type(_state.in_buffer) != MQTT_MSG_TYPE_CONNACK) {
+    if(mqtt_get_type(_state.in_buffer) != MQTT_MSG_TYPE_CONNACK) {
         LOG("Invalid MSG_TYPE response: %d, read_len: %d\r\n", mqtt_get_type(_state.in_buffer), read_len);
         return false;
     }
     connect_rsp_code = mqtt_get_connect_return_code(_state.in_buffer);
-    switch (connect_rsp_code) {
+    switch(connect_rsp_code) {
         case CONNECTION_ACCEPTED:
             LOG("Connected\r\n");
             return connected();
@@ -320,8 +280,8 @@ void MQTTClient::handle(void)
         LOG("Sent - Outbox size: %d\r\n", ob_get_size(_outbox));
     }
 
-    ob_del_expired(_outbox, millis(), 60*60*1000); //remove all package not sent in 60 minutes
-    ob_cleanup(_outbox, DEFAULT_MQTT_MAX_QUEUE); //keep outbox maximum is DEFAULT_MQTT_MAX_QUEUE(8*1024) bytes 
+    ob_del_expired(_outbox, millis(), 60 * 60 * 1000); //remove all package not sent in 60 minutes
+    ob_cleanup(_outbox, DEFAULT_MQTT_MAX_QUEUE); //keep outbox maximum is DEFAULT_MQTT_MAX_QUEUE(8*1024) bytes
 }
 
 bool MQTTClient::deliverPublish(uint8_t *message)
@@ -372,7 +332,7 @@ int MQTTClient::processRead()
     mqtt_outbox *valid_msg;
     _tcp->setTimeout(DEFAULT_MQTT_READ_TIMEOUT);
     read_len = _tcp->read(_state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
-    if (read_len <= 0)
+    if(read_len <= 0)
         return 0;
     _state.message_length_read = read_len;
 PROCESS_READ_AGAIN:
@@ -380,11 +340,11 @@ PROCESS_READ_AGAIN:
     msg_qos = mqtt_get_qos(_state.in_buffer);
     msg_id = mqtt_get_id(_state.in_buffer, _state.in_buffer_length);
     LOG("Read len %d, id: %d, type: %d\r\n", read_len, msg_id, msg_type);
-    switch (msg_type)
+    switch(msg_type)
     {
         case MQTT_MSG_TYPE_SUBACK:
             valid_msg = ob_get(_outbox, msg_id);
-            if (valid_msg->msg_type == MQTT_MSG_TYPE_SUBSCRIBE && valid_msg->msg_id == msg_id) {
+            if(valid_msg->msg_type == MQTT_MSG_TYPE_SUBSCRIBE && valid_msg->msg_id == msg_id) {
                 if(_subscribe_cb)
                     _subscribe_cb(msg_id);
                 ob_del_id(_outbox, msg_id);
@@ -395,15 +355,15 @@ PROCESS_READ_AGAIN:
             break;
         case MQTT_MSG_TYPE_UNSUBACK:
             valid_msg = ob_get(_outbox, msg_id);
-            if (valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_UNSUBSCRIBE && valid_msg->msg_id == msg_id){
+            if(valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_UNSUBSCRIBE && valid_msg->msg_id == msg_id) {
                 LOG("UnSubscribe successful\r\n");
                 ob_del_id(_outbox, msg_id);
             }
             break;
         case MQTT_MSG_TYPE_PUBLISH:
-            if (msg_qos == 1)
+            if(msg_qos == 1)
                 _state.outbound_message = mqtt_msg_puback(&_state.connection, msg_id);
-            else if (msg_qos == 2)
+            else if(msg_qos == 2)
                 _state.outbound_message = mqtt_msg_pubrec(&_state.connection, msg_id);
 
 
@@ -414,14 +374,14 @@ PROCESS_READ_AGAIN:
                 ob_del_id(_outbox, msg_id);
 
             LOG("Outbox size: %d, msgid: %d\r\n", ob_get_size(_outbox), msg_id);
-            if (msg_qos == 1 || msg_qos == 2) {
+            if(msg_qos == 1 || msg_qos == 2) {
                 LOG("Queue MQTT_MSG_TYPE_PUBACK/MQTT_MSG_TYPE_PUBREC: %d, delete on send\r\n", msg_qos);
                 queue(msg_qos == 1); //delete after send
             }
             break;
         case MQTT_MSG_TYPE_PUBACK:
             valid_msg = ob_get(_outbox, msg_id);
-            if (valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_PUBLISH && valid_msg->msg_id == msg_id) {
+            if(valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_PUBLISH && valid_msg->msg_id == msg_id) {
                 LOG("Received MQTT_MSG_TYPE_PUBACK, finish QoS1 publish, msgid: %d, remove data outbox\r\n", msg_id);
                 ob_del_id(_outbox, msg_id);
                 LOG("Outbox size: %d\r\n", ob_get_size(_outbox));
@@ -431,7 +391,7 @@ PROCESS_READ_AGAIN:
         case MQTT_MSG_TYPE_PUBREC:
             LOG("received MQTT_MSG_TYPE_PUBREC, msgid: %d\r\n", msg_id);
             valid_msg = ob_get(_outbox, msg_id);
-            if (valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_PUBLISH && valid_msg->msg_id == msg_id) {
+            if(valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_PUBLISH && valid_msg->msg_id == msg_id) {
                 LOG("Reply with MQTT_MSG_TYPE_PUBREL msg_id: %d, %d\r\n", msg_id);
                 ob_del_id(_outbox, msg_id);
                 _state.outbound_message = mqtt_msg_pubrel(&_state.connection, msg_id);
@@ -442,7 +402,7 @@ PROCESS_READ_AGAIN:
         case MQTT_MSG_TYPE_PUBREL:
             valid_msg = ob_get(_outbox, msg_id);
             LOG("Received MQTT_MSG_TYPE_PUBREL, msg_id: %d, %d\r\n", msg_id);
-            if (valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_PUBREC && valid_msg->msg_id == msg_id) {
+            if(valid_msg && valid_msg->msg_type == MQTT_MSG_TYPE_PUBREC && valid_msg->msg_id == msg_id) {
                 LOG("Reply with MQTT_MSG_TYPE_PUBCOMP, remove on sent, msg_id: %d, %d\r\n", msg_id);
                 ob_del_id(_outbox, msg_id);
                 _state.outbound_message = mqtt_msg_pubcomp(&_state.connection, msg_id);
@@ -455,8 +415,8 @@ PROCESS_READ_AGAIN:
         case MQTT_MSG_TYPE_PUBCOMP:
             LOG("Received MQTT_MSG_TYPE_PUBCOMP, msg_id: %d\r\n", msg_id);
             valid_msg = ob_get(_outbox, msg_id);
-            if (valid_msg && (valid_msg->msg_type == MQTT_MSG_TYPE_PUBCOMP || valid_msg->msg_type == MQTT_MSG_TYPE_PUBREL) && valid_msg->msg_id == msg_id) {
-                
+            if(valid_msg && (valid_msg->msg_type == MQTT_MSG_TYPE_PUBCOMP || valid_msg->msg_type == MQTT_MSG_TYPE_PUBREL) && valid_msg->msg_id == msg_id) {
+
                 ob_del_id(_outbox, msg_id);
                 LOG("Outbox size: %d\r\n", ob_get_size(_outbox));
             }
@@ -499,7 +459,7 @@ void MQTTClient::sendPing()
     _state.outbound_message = mqtt_msg_pingreq(&_state.connection);
     _state.pending_msg_type = mqtt_get_type(_state.outbound_message->data);
     _state.pending_msg_id = mqtt_get_id(_state.outbound_message->data,
-                                 _state.outbound_message->length);
+                                        _state.outbound_message->length);
     LOG("Sending pingreq");
     _tcp->write(_state.outbound_message->data,
                 _state.outbound_message->length);
@@ -512,8 +472,8 @@ int MQTTClient::subscribe(String topic)
 int MQTTClient::subscribe(String topic, uint8_t qos)
 {
     _state.outbound_message = mqtt_msg_subscribe(&_state.connection,
-                                   topic.c_str(), qos,
-                                   &_state.pending_msg_id);
+                              topic.c_str(), qos,
+                              &_state.pending_msg_id);
 
     LOG("Queue subscribe, topic\"%s\", id: %d\r\n", topic.c_str(), _state.pending_msg_id);
     queue(0);
@@ -522,8 +482,8 @@ int MQTTClient::subscribe(String topic, uint8_t qos)
 int MQTTClient::unSubscribe(String topic)
 {
     _state.outbound_message = mqtt_msg_unsubscribe(&_state.connection,
-                                   topic.c_str(),
-                                   &_state.pending_msg_id);
+                              topic.c_str(),
+                              &_state.pending_msg_id);
 
     LOG("Queue unsubscribe, topic\"%s\", id: %d\r\n", topic.c_str(), _state.pending_msg_id);
     queue(0);
@@ -537,9 +497,9 @@ int MQTTClient::publish(String topic, String data, int qos, int retain)
 {
     int remove_on_sent = 0;
     _state.outbound_message = mqtt_msg_publish(&_state.connection,
-                                   topic.c_str(), data.c_str(), data.length(),
-                                   qos, retain,
-                                   &_state.pending_msg_id);
+                              topic.c_str(), data.c_str(), data.length(),
+                              qos, retain,
+                              &_state.pending_msg_id);
     LOG("Queue publish, topic\"%s\", id: %d\r\n", topic.c_str(), _state.pending_msg_id);
     if(qos == 0)
         remove_on_sent = 1;
