@@ -189,9 +189,7 @@ bool MQTTClient::connect(void)
         _tcp->stop();
         return false;
     }
-
     _tcp->setNoDelay(true);
-
     _state.outbound_message = mqtt_msg_connect(&_state.connection,
                               _state.connect_info);
     _state.pending_msg_type = mqtt_get_type(_state.outbound_message->data);
@@ -333,9 +331,7 @@ bool MQTTClient::deliverPublish(uint8_t *message)
         }
         _state.message_length_read += len_read_more;
     }
-
     return true;
-
 }
 
 int MQTTClient::processRead()
@@ -383,9 +379,6 @@ PROCESS_READ_AGAIN:
             else if(msg_qos == 2)
                 _state.outbound_message = mqtt_msg_pubrec(&_state.connection, msg_id);
 
-
-
-
             deliverPublish(_state.in_buffer);
             if(msg_qos == 0)
                 ob_del_id(_outbox, msg_id);
@@ -426,8 +419,6 @@ PROCESS_READ_AGAIN:
                 queue(1);
                 LOG("Outbox size: %d\r\n", ob_get_size(_outbox));
             }
-
-
             break;
         case MQTT_MSG_TYPE_PUBCOMP:
             LOG("Received MQTT_MSG_TYPE_PUBCOMP, msg_id: %d\r\n", msg_id);
@@ -472,7 +463,6 @@ void MQTTClient::queue(int remove_on_sent)
 }
 void MQTTClient::sendPing()
 {
-
     _state.outbound_message = mqtt_msg_pingreq(&_state.connection);
     _state.pending_msg_type = mqtt_get_type(_state.outbound_message->data);
     _state.pending_msg_id = mqtt_get_id(_state.outbound_message->data,

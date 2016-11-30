@@ -98,8 +98,11 @@ bool MQTTWSTraits::connect(WiFiClient& client, const char* host, int port)
 	String handshake = "GET / HTTP/1.1\r\n"
 	                   "Connection: Upgrade\r\n"
 	                   "Upgrade: websocket\r\n"
-	                   "Host: " + String(host) + "\r\n"
+	                   "Host: " + String(host) + ":" +String(port)+ "\r\n"
 	                   "Sec-WebSocket-Version: 13\r\n"
+	                   "Origin: file://\r\n"
+	                   "Sec-WebSocket-Protocol: mqttv3.1\r\n"
+	                   "User-Agent: ESP8266MQTTClient\r\n"
 	                   "Sec-WebSocket-Key: " + _key + "\r\n\r\n";
 	if(!client.connect(host, port))
 		return false;
@@ -132,7 +135,7 @@ bool MQTTWSTraits::connect(WiFiClient& client, const char* host, int port)
 	sha1(_key, &sha1HashBin[0]);
 	acceptKey = base64::encode(sha1HashBin, 20);
 	acceptKey.trim();
-	LOG("AccpetKey: %s\r\n", acceptKey.c_str());
+	LOG("AcceptKey: %s\r\n", acceptKey.c_str());
 	LOG("ServerKey: %s\r\n", serverKey.c_str());
 	timeout = 0;
 	return acceptKey == serverKey;
@@ -142,7 +145,7 @@ int MQTTWSTraits::write(WiFiClient& client, unsigned char *data, int size)
 {
 	char header_len = 0, *mask, *data_buffer;
 	int written = 0;
-	data_buffer = (char *) malloc(8 + size);
+	data_buffer = (char *) malloc(MAX_WEBSOCKET_HEADER_SIZE + size);
 	if(data_buffer == NULL)
 		return -1;
 	// Opcode; final fragment
@@ -162,42 +165,37 @@ int MQTTWSTraits::write(WiFiClient& client, unsigned char *data, int size)
 	data_buffer[header_len++] = random(0, 256);
 	data_buffer[header_len++] = random(0, 256);
 
-	for(int i=0; i<size; i++) {
-		LOG("0x%X ", data[i]);
-	}
-	LOG("\r\n---\r\n");
+	
 	for(int i = 0; i < size; ++i) {
 		data_buffer[header_len++] = (data[i] ^ mask[i % 4]);
 	}
-	for(int i=0; i<header_len; i++) {
-		LOG("0x%X ", data_buffer[i]);
-	}
-	LOG("\r\n");
 	client.write(data_buffer, header_len);
+	client.flush();
 	free(data_buffer);
 	return size;
 }
 int MQTTWSTraits::read(WiFiClient& client, unsigned char *data, int size)
 {
-	unsigned char *data_buffer = (unsigned char*) malloc(size + 10), *data_ptr, opcode, mask, *maskKey = NULL;
+	unsigned char *data_buffer = (unsigned char*) malloc(size + MAX_WEBSOCKET_HEADER_SIZE), *data_ptr, opcode, mask, *maskKey = NULL;
 	int tcp_read_size, payloadLen;
 	data_ptr = data_buffer;
 	if(data_buffer == NULL)
 		return -1;
 
-	tcp_read_size = client.read(data_buffer, size + 10);
+	tcp_read_size = client.read(data_buffer, size + MAX_WEBSOCKET_HEADER_SIZE);
 
 	if(tcp_read_size <= 0)
 	{
 		free(data_buffer);
 		return -1;
 	}
+	
 	opcode = (*data_ptr & 0x0F);
 	data_ptr ++;
 	mask = ((*data_ptr >> 7) & 0x01);
-	data_ptr ++;
 	payloadLen = (*data_ptr & 0x7F);
 	data_ptr++;
+	LOG("Opcode: %d, mask: %d, len: %d\r\n", opcode, mask, payloadLen);
 	if(payloadLen == 126) {
 		// headerLen += 2;
 		payloadLen = data_ptr[0] << 8 | data_ptr[1];
@@ -220,6 +218,8 @@ int MQTTWSTraits::read(WiFiClient& client, unsigned char *data, int size)
 		for(size_t i = 0; i < payloadLen; i++) {
 			data[i] = (data_ptr[i] ^ maskKey[i % 4]);
 		}
+	} else {
+		memcpy(data, data_ptr, payloadLen);
 	}
 	return payloadLen;
 }

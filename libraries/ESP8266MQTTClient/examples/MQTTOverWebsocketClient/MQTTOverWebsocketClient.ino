@@ -4,7 +4,7 @@ MQTTClient mqtt;
 
 void setup() {
   Serial.begin(115200);
-//  WiFi.begin("ssid", "pass");
+  //  WiFi.begin("ssid", "pass");
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -24,16 +24,14 @@ void setup() {
   mqtt.onConnect([]() {
     Serial.printf("MQTT: Connected\r\n");
     Serial.printf("Subscribe id: %d\r\n", mqtt.subscribe("/qos0", 0));
-//    mqtt.subscribe("/qos1", 1);
-//    mqtt.subscribe("/qos2", 2);
+    mqtt.subscribe("/qos1", 1);
+    mqtt.subscribe("/qos2", 2);
   });
 
   mqtt.begin("ws://test.mosquitto.org:8080");
-//  mqtt.begin("mqtt://test.mosquitto.org:1883");
-  
-//  mqtt.begin("mqtt://test.mosquitto.org:1883", {.lwtTopic = "hello", .lwtMsg = "offline", .lwtQos = 0, .lwtRetain = 0});
-//  mqtt.begin("mqtt://user:pass@mosquito.org:1883");
-//  mqtt.begin("mqtt://user:pass@mosquito.org:1883/clientId");
+  //mqtt.begin("ws://test.mosquitto.org:1883", {.lwtTopic = "hello", .lwtMsg = "offline", .lwtQos = 0, .lwtRetain = 0});
+  //mqtt.begin("ws://user:pass@mosquito.org:1883");
+  //mqtt.begin("ws://user:pass@mosquito.org:1883/clientId");
 
 }
 

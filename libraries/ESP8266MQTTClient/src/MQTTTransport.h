@@ -12,7 +12,7 @@
 #define WS_MASK           0x80
 #define WS_SIZE16         126
 #define WS_SIZE64         127
-
+#define MAX_WEBSOCKET_HEADER_SIZE 10
 
 class MQTTTransportTraits
 {
