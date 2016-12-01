@@ -186,7 +186,7 @@ bool MQTTClient::connect(void)
     }
     _tcp->setNoDelay(true);
     //if(!_tcp->connect(_host.c_str(), _port)) { //=>works
-    if(!_transportTraits->connect(*_tcp, _host.c_str(), _port)) { //=not works
+    if(!_transportTraits->connect(_tcp.get(), _host.c_str(), _port)) { //=not works
         LOG("[MQTT-Client] failed connect to %s:%u\n", _host.c_str(), _port);
         return false;
     }
@@ -214,7 +214,7 @@ bool MQTTClient::connect(void)
         _state.pending_msg_type,
         _state.pending_msg_id,
         _state.outbound_message->length);
-    write_len = _transportTraits->write(*_tcp, _state.outbound_message->data,
+    write_len = _transportTraits->write(_tcp.get(), _state.outbound_message->data,
                                         _state.outbound_message->length);
     connect_tick = millis();
     while(!_tcp->available()) {
@@ -227,7 +227,7 @@ bool MQTTClient::connect(void)
         }
     }
     LOG("Reading MQTT CONNECT response message\r\n");
-    read_len = _transportTraits->read(*_tcp, _state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
+    read_len = _transportTraits->read(_tcp.get(), _state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
     if(read_len < 0) {
         LOG("Error network response\r\n");
         return false;
@@ -302,7 +302,7 @@ void MQTTClient::handle(void)
     }
     ob = ob_get_oldest_no_pending(_outbox);
     if(ob != NULL) {
-        _transportTraits->write(*_tcp, (unsigned char*)ob->buffer,
+        _transportTraits->write(_tcp.get(), (unsigned char*)ob->buffer,
                                 ob->len);
         ob->pending = 1;
         if(ob->remove_on_sent) {
@@ -340,7 +340,7 @@ bool MQTTClient::deliverPublish(uint8_t *message)
         _data_cb(topic, data, false);
     }
     while(_state.message_length_read < _state.message_length) {
-        len_read_more = _transportTraits->read(*_tcp, _state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
+        len_read_more = _transportTraits->read(_tcp.get(), _state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
         LOG("Get more data: %d\r\n", len_read_more);
         if(len_read_more <= 0)
             break;
@@ -363,7 +363,7 @@ int MQTTClient::processRead()
     if(!connected())
         return 0;
     _tcp->setTimeout(DEFAULT_MQTT_READ_TIMEOUT);
-    read_len = _transportTraits->read(*_tcp, _state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
+    read_len = _transportTraits->read(_tcp.get(), _state.in_buffer, DEFAULT_MQTT_BUFFER_SIZE_BYTES);
     if(read_len <= 0)
         return 0;
     _state.message_length_read = read_len;
@@ -487,7 +487,7 @@ void MQTTClient::sendPing()
     _state.pending_msg_id = mqtt_get_id(_state.outbound_message->data,
                                         _state.outbound_message->length);
     LOG("Sending pingreq");
-    _transportTraits->write(*_tcp, _state.outbound_message->data,
+    _transportTraits->write(_tcp.get(), _state.outbound_message->data,
                             _state.outbound_message->length);
 }
 

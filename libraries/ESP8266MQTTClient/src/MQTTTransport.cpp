@@ -37,18 +37,17 @@ std::unique_ptr<WiFiClient> MQTTTransportTraits::create()
 {
 	return std::unique_ptr<WiFiClient>(new WiFiClient());
 }
-
-bool MQTTTransportTraits::connect(WiFiClient& client, const char* host, int port)
+bool MQTTTransportTraits::connect(WiFiClient* client, const char* host, int port)
 {
-	return client.connect(host, port);
+	return client->connect(host, port);
 }
-int MQTTTransportTraits::write(WiFiClient& client, unsigned char *data, int size)
+int MQTTTransportTraits::write(WiFiClient* client, unsigned char *data, int size)
 {
-	return client.write(data, size);
+	return client->write(data, size);
 }
-int MQTTTransportTraits::read(WiFiClient& client, unsigned char *data, int size)
+int MQTTTransportTraits::read(WiFiClient* client, unsigned char *data, int size)
 {
-	return client.read(data, size);
+	return client->read(data, size);
 }
 /**
  * MQTT Over TLS
@@ -62,20 +61,20 @@ std::unique_ptr<WiFiClient> MQTTTLSTraits::create()
 	return std::unique_ptr<WiFiClient>(new WiFiClientSecure());
 }
 
-bool MQTTTLSTraits::connect(WiFiClient& client, const char* host, int port)
+bool MQTTTLSTraits::connect(WiFiClient* client, const char* host, int port)
 {
-	auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
-	return wcs.connect(host, port);
+	WiFiClientSecure *wcs = (WiFiClientSecure*) client;
+	return wcs->connect(host, port);
 }
-int MQTTTLSTraits::write(WiFiClient& client, unsigned char *data, int size)
+int MQTTTLSTraits::write(WiFiClient* client, unsigned char *data, int size)
 {
-	auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
-	return wcs.write(data, size);
+	WiFiClientSecure *wcs = (WiFiClientSecure*) client;
+	return wcs->write(data, size);
 }
-int MQTTTLSTraits::read(WiFiClient& client, unsigned char *data, int size)
+int MQTTTLSTraits::read(WiFiClient* client, unsigned char *data, int size)
 {
-	auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
-	return wcs.read(data, size);
+	WiFiClientSecure *wcs = (WiFiClientSecure*) client;
+	return wcs->read(data, size);
 }
 /**
  * MQTT Over WS
@@ -91,7 +90,7 @@ std::unique_ptr<WiFiClient> MQTTWSTraits::create()
 	return std::unique_ptr<WiFiClient>(new WiFiClient());
 }
 
-bool MQTTWSTraits::connect(WiFiClient& client, const char* host, int port)
+bool MQTTWSTraits::connect(WiFiClient* client, const char* host, int port)
 {
 	uint8_t randomKey[16] = { 0 }, timeout = 0;
 	int bite;
@@ -112,16 +111,16 @@ bool MQTTWSTraits::connect(WiFiClient& client, const char* host, int port)
 	                   "Sec-WebSocket-Protocol: mqttv3.1\r\n"
 	                   "User-Agent: ESP8266MQTTClient\r\n"
 	                   "Sec-WebSocket-Key: " + _key + "\r\n\r\n";
-	if(!client.connect(host, port))
+	if(!client->connect(host, port))
 		return false;
-	client.write(handshake.c_str(), handshake.length());
+	client->write(handshake.c_str(), handshake.length());
 
-	while(client.connected() && !client.available()) {
+	while(client->connected() && !client->available()) {
 		delay(100);
 		if(timeout++ > 10)
 			return false;
 	}
-	while((bite = client.read()) != -1) {
+	while((bite = client->read()) != -1) {
 
 		temp += (char)bite;
 
@@ -134,7 +133,7 @@ bool MQTTWSTraits::connect(WiFiClient& client, const char* host, int port)
 			temp = "";
 		}
 
-		if(!client.available()) {
+		if(!client->available()) {
 			delay(100);
 		}
 	}
@@ -149,7 +148,7 @@ bool MQTTWSTraits::connect(WiFiClient& client, const char* host, int port)
 	return acceptKey == serverKey;
 }
 
-int MQTTWSTraits::write(WiFiClient& client, unsigned char *data, int size)
+int MQTTWSTraits::write(WiFiClient* client, unsigned char *data, int size)
 {
 	char header_len = 0, *mask, *data_buffer;
 	int written = 0;
@@ -176,12 +175,12 @@ int MQTTWSTraits::write(WiFiClient& client, unsigned char *data, int size)
 	for(int i = 0; i < size; ++i) {
 		data_buffer[header_len++] = (data[i] ^ mask[i % 4]);
 	}
-	client.write(data_buffer, header_len);
-	client.flush();
+	client->write(data_buffer, header_len);
+	client->flush();
 	free(data_buffer);
 	return size;
 }
-int MQTTWSTraits::read(WiFiClient& client, unsigned char *data, int size)
+int MQTTWSTraits::read(WiFiClient* client, unsigned char *data, int size)
 {
 	unsigned char *data_buffer = (unsigned char*) malloc(size + MAX_WEBSOCKET_HEADER_SIZE), *data_ptr, opcode, mask, *maskKey = NULL;
 	int tcp_read_size, payloadLen;
@@ -189,7 +188,7 @@ int MQTTWSTraits::read(WiFiClient& client, unsigned char *data, int size)
 	if(data_buffer == NULL)
 		return -1;
 
-	tcp_read_size = client.read(data_buffer, size + MAX_WEBSOCKET_HEADER_SIZE);
+	tcp_read_size = client->read(data_buffer, size + MAX_WEBSOCKET_HEADER_SIZE);
 
 	if(tcp_read_size <= 0)
 	{
