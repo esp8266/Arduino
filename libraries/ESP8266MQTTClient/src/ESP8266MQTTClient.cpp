@@ -71,22 +71,27 @@ bool MQTTClient::begin(String uri, LwtOptions lwt)
 bool MQTTClient::begin(String uri, LwtOptions lwt, int keepalive, bool clean_session)
 {
     parsed_uri_t *puri = parse_uri(uri.c_str());
-    MQTT_CHECK(puri->scheme == NULL, "ERROR: Protocol must not NULL\r\n", false);
-    MQTT_CHECK(puri->host == NULL, "ERROR: Host must not NULL\r\n", false);
+    MQTT_CHECK(puri->scheme == NULL, "ERROR: Protocol is not NULL\r\n", false);
+    MQTT_CHECK(puri->host == NULL, "ERROR: Host is not NULL\r\n", false);
+    delay(1000);
     _scheme = String(puri->scheme);
     _host = String(puri->host);
     _port = DEFAULT_MQTT_PORT;
+    _path = "/";
 
+    if(puri->fragment) {
+        _client_id = String(puri->fragment);
+    } else {
+        _client_id = String("ESP_") + ESP.getChipId();
+    }
+    LOG("MQTT ClientId: %s\r\n", _client_id.c_str());
     if(puri->port) {
         _port = atoi(puri->port);
     }
 
     if(puri->path) {
-        _client_id = String(puri->path);
-    } else {
-        _client_id = String("ESP_") + ESP.getChipId();
+        _path += String(puri->path);
     }
-
     if(puri->username)
         _username = String(puri->username);
     if(puri->password)

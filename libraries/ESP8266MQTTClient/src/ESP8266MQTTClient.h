@@ -135,6 +135,7 @@ protected:
 
 	String _scheme;
 	String _host;
+	String _path; //for websocket
 	int _port;
 	String _client_id;
 	String _username;

@@ -31,7 +31,7 @@ void setup() {
   mqtt.begin("ws://test.mosquitto.org:8080");
   //mqtt.begin("ws://test.mosquitto.org:1883", {.lwtTopic = "hello", .lwtMsg = "offline", .lwtQos = 0, .lwtRetain = 0});
   //mqtt.begin("ws://user:pass@mosquito.org:1883");
-  //mqtt.begin("ws://user:pass@mosquito.org:1883/clientId");
+  //mqtt.begin("ws://user:pass@mosquito.org:1883#clientId");
 
 }
 

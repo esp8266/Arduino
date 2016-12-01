@@ -16,11 +16,12 @@ Features:
 
 ## MQTT URI Scheme
 
-- `mqtt://[username][:password]@hostname[:port][/clientId]`
-    + `mqtt`, `mqtts` for MQTT over TCP & SSL support - only support `mqtt`
-    + `ws`, `wss` for MQTT over Websocket & SSL support - currently not support.
+- `mqtt://[username][:password@]hostname[:port][#clientId]`
+    + `mqtt` for MQTT over TCP 
+    + `ws` for MQTT over Websocket
 - Example:
-    + **Full** `mqtt://username:password@test.mosquitto.org:1883/my_client_id`
+    + **Full** `mqtt://username:password@test.mosquitto.org:1883#my_client_id`
+    + **Websocket** `ws://username:password@test.mosquitto.org:1883/mqtt#my_client_id`
     + **Minimal** `mqtt://test.mosquitto.org`, with `user`, `pass` = NULL, port = 1883, client id = "ESP_" + ESP.getChipId()
 
 ## API 
