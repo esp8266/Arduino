@@ -68,3 +68,12 @@ void Ticker::detach()
 	delete _timer;
 	_timer = 0;
 }
+
+bool Ticker::active()
+{
+	if (_timer) {
+		return true;
+	} else {
+		return false;
+	}
+}
