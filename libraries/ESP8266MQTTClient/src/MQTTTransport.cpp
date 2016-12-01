@@ -38,10 +38,6 @@ std::unique_ptr<WiFiClient> MQTTTransportTraits::create()
 	return std::unique_ptr<WiFiClient>(new WiFiClient());
 }
 
-bool MQTTTransportTraits::verify(WiFiClient& client, const char* host)
-{
-	return true;
-}
 bool MQTTTransportTraits::connect(WiFiClient& client, const char* host, int port)
 {
 	return client.connect(host, port);
@@ -57,8 +53,7 @@ int MQTTTransportTraits::read(WiFiClient& client, unsigned char *data, int size)
 /**
  * MQTT Over TLS
  */
-MQTTTLSTraits::MQTTTLSTraits(const String& fingerprint) :
-	_fingerprint(fingerprint)
+MQTTTLSTraits::MQTTTLSTraits()
 {
 }
 
@@ -67,11 +62,6 @@ std::unique_ptr<WiFiClient> MQTTTLSTraits::create()
 	return std::unique_ptr<WiFiClient>(new WiFiClientSecure());
 }
 
-bool MQTTTLSTraits::verify(WiFiClient& client, const char* host)
-{
-	auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
-	return wcs.verify(_fingerprint.c_str(), host);
-}
 bool MQTTTLSTraits::connect(WiFiClient& client, const char* host, int port)
 {
 	auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
@@ -101,10 +91,6 @@ std::unique_ptr<WiFiClient> MQTTWSTraits::create()
 	return std::unique_ptr<WiFiClient>(new WiFiClient());
 }
 
-bool MQTTWSTraits::verify(WiFiClient& client, const char* host)
-{
-	return true;
-}
 bool MQTTWSTraits::connect(WiFiClient& client, const char* host, int port)
 {
 	uint8_t randomKey[16] = { 0 }, timeout = 0;

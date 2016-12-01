@@ -37,6 +37,7 @@ MQTTClient::MQTTClient():
     _subscribe_cb(NULL),
     _publish_cb(NULL),
     _data_cb(NULL),
+    _secure_cb(NULL),
     _initialized(false),
     _reconnect_tick(0)
 {
@@ -143,6 +144,8 @@ bool MQTTClient::begin(String uri, LwtOptions lwt, int keepalive, bool clean_ses
 
     if(_scheme == "mqtt") {
         _transportTraits = MQTTTransportTraitsPtr(new MQTTTransportTraits());
+    } else if(_scheme == "mqtts") {
+        _transportTraits = MQTTTransportTraitsPtr(new MQTTTLSTraits());
     } else if(_scheme == "ws") {
         _transportTraits = MQTTTransportTraitsPtr(new MQTTWSTraits());
     }
@@ -181,20 +184,27 @@ bool MQTTClient::connect(void)
         LOG("[MQTT-Client] connect: MQTTClient::begin was not called or returned error\n");
         return false;
     }
-
-    if(!_transportTraits->connect(*_tcp, _host.c_str(), _port)) {
+    _tcp->setNoDelay(true);
+    //if(!_tcp->connect(_host.c_str(), _port)) { //=>works
+    if(!_transportTraits->connect(*_tcp, _host.c_str(), _port)) { //=not works
         LOG("[MQTT-Client] failed connect to %s:%u\n", _host.c_str(), _port);
         return false;
     }
 
     LOG("[MQTT-Client] connected to %s:%u\n", _host.c_str(), _port);
+    
 
-    if(!_transportTraits->verify(*_tcp, _host.c_str())) {
-        LOG("[MQTT-Client] transport level verify failed\n");
-        _tcp->stop();
-        return false;
+    if(_secure_cb && (_scheme == "wss" || _scheme == "mqtts")) {
+        LOG("[MQTT-Client] begin verifying %s:%u\n", _host.c_str(), _port);
+        auto wcs = reinterpret_cast<WiFiClientSecure&>(*_tcp);
+        if(!_secure_cb(wcs, _host)) {
+            _tcp->stop();
+            LOG("[MQTT-Client] failed verify to %s:%u\n", _host.c_str(), _port);
+            return false;
+        }
     }
-    _tcp->setNoDelay(true);
+    if(!_tcp->connected())
+            return false;
     _state.outbound_message = mqtt_msg_connect(&_state.connection,
                               _state.connect_info);
     _state.pending_msg_type = mqtt_get_type(_state.outbound_message->data);
@@ -211,7 +221,7 @@ bool MQTTClient::connect(void)
         if(!_tcp->connected())
             return false;
         yield();
-        if(millis() - connect_tick > MQTT_CONNECT_TIMEOUT){
+        if(millis() - connect_tick > MQTT_CONNECT_TIMEOUT) {
             _tcp->stop();
             return false;
         }
@@ -260,6 +270,10 @@ void MQTTClient::onPublish(THandlerFunction_PubSub fn)
 void MQTTClient::onData(THandlerFunction_Data fn)
 {
     _data_cb = fn;
+}
+void MQTTClient::onSecure(THandlerFunction_Secure fn)
+{
+    _secure_cb = fn;
 }
 void MQTTClient::handle(void)
 {

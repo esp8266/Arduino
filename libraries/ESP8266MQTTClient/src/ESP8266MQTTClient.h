@@ -27,6 +27,7 @@ License (MIT license):
 #include <memory>
 #include <Arduino.h>
 #include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <functional>
 #include "uri_parser.h"
 #include "mqtt_msg.h"
@@ -97,6 +98,7 @@ public:
 	typedef std::function<void(int)> THandlerFunction_Error;
 	typedef std::function<void(int)> THandlerFunction_PubSub;
 	typedef std::function<void(String, String, bool)> THandlerFunction_Data;
+	typedef std::function<bool(WiFiClientSecure& client, String host)> THandlerFunction_Secure;
 
 	MQTTClient();
 	~MQTTClient();
@@ -105,6 +107,7 @@ public:
 	void onSubscribe(THandlerFunction_PubSub fn);
 	void onPublish(THandlerFunction_PubSub fn);
 	void onData(THandlerFunction_Data fn);
+	void onSecure(THandlerFunction_Secure fn);
 
 	bool begin(String uri);
 	bool begin(String uri, int keepalive, bool clean_session); 
@@ -153,5 +156,6 @@ protected:
 	THandlerFunction_PubSub _subscribe_cb;
 	THandlerFunction_PubSub _publish_cb;
 	THandlerFunction_Data _data_cb;
+	THandlerFunction_Secure _secure_cb;
 };
 #endif /* ESP8266MQTTClient_H_ */
