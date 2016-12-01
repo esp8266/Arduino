@@ -98,8 +98,10 @@ parsed_uri_t *parse_uri(const char *url)
 					bracket_flag = 0;
 				}
 				if(bracket_flag == 0 && *curr_ptr == ':') {
-					puri->port = curr_ptr;
-					JUMP_NEXT_STATE(puri->password, PARSE_PASSWORD_OR_PORT);
+					JUMP_NEXT_STATE(puri->port = puri->password, PARSE_PASSWORD_OR_PORT);
+				} else if(bracket_flag == 0 && *curr_ptr == '#') {
+					puri->username = NULL;
+					JUMP_NEXT_STATE(puri->fragment, PARSE_FRAGMENT);
 				}
 				curr_ptr ++;
 				break;
@@ -112,6 +114,11 @@ parsed_uri_t *parse_uri(const char *url)
 					puri->username = NULL;
 					puri->password = NULL;
 					JUMP_NEXT_STATE(puri->path, PARSE_PATH);
+					break;
+				} else if(*curr_ptr == '#') {
+					puri->username = NULL;
+					puri->password = NULL;
+					JUMP_NEXT_STATE(puri->fragment, PARSE_FRAGMENT);
 					break;
 				}
 				curr_ptr ++;
@@ -127,6 +134,9 @@ parsed_uri_t *parse_uri(const char *url)
 				} else if(bracket_flag == 0 && *curr_ptr == '/') {
 					puri->port = NULL;
 					JUMP_NEXT_STATE(puri->path, PARSE_PATH);
+				} else if(bracket_flag == 0 && *curr_ptr == '#') {
+					puri->port = NULL;
+					JUMP_NEXT_STATE(puri->fragment, PARSE_FRAGMENT);
 				}
 				curr_ptr ++;
 				break;
