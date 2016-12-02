@@ -73,7 +73,6 @@ extern "C" {
 #define MSBFIRST 1
 
 //Interrupt Modes
-#define DISABLED  0x00
 #define RISING    0x01
 #define FALLING   0x02
 #define CHANGE    0x03
@@ -272,6 +271,8 @@ void noTone(uint8_t _pin);
 long random(long);
 long random(long, long);
 void randomSeed(unsigned long);
+long secureRandom(long);
+long secureRandom(long, long);
 long map(long, long, long, long, long);
 
 extern "C" void configTime(long timezone, int daylightOffset_sec,

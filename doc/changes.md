@@ -2,13 +2,140 @@
 title: Change Log
 ---
 
-## Current version
+## 2.3.0
+June 23, 2016
+
+Package link: `http://arduino.esp8266.com/versions/2.3.0/package_esp8266com_index.json`.
 
 ### Core
+- Fix NMI interrupt handler alignment
+- Update SDK to 1.5.3
+- umm_malloc: print block start address before heap corruption callback is triggered
+- If GDBStub library is used, break into gdb on assert and panic
+- Add option to keep FS classes in namespace (#2030)
+- Add SPIFFS::end (#1657)
+- Add ArduinoOTA::getHostname() interface
+- Add __throw_out_of_range
+- Add support for RTC user memory in ESP-specific APIs. (#1836)
+- Expose RTC_USER_MEM in esp8266_peri.h
+- Remove DISABLED macro (#2072)
+- Execute global constructors in correct order (#2074)
+- Real board name available in Sketch/MDNS/OTA (#2054)
+- Add DOUT/QOUT flash modes
+- Add ESP8285 entry in boards menu
+- Move timer detachInterrupt functions into IRAM (#2083)
+- Make Updater be able to run inside async callbacks (#2096)
+- Add new boards Phoenix 1.0 & Phoenix 2.0 (#2088)
+- Store git version of the core in the compiled binary (#2099)
+- Rebuild libstdc++ with mlongcalls and link against it (#1983)
+- Add mechanism for posting functions to the main loop (#2082)
+- MD5Builder::addStream: fixed falsy calculated hash for len > filelength (#2126)
+- Fix SPIFFS.openDir("") (#2143)
+- Bring back old semantics to random and randomSeed, add secureRandom (#1710) (#2142)
+- Add missing pgm_read_ptr{_near/_far} macros (#2160)
+- Add macro for maximum open SPIFFS files, settings it to 1 saves about 1k heap. (#2167)
+- Fix UART pins setting (#2098)
+- Fix ESP.getSketchSize, add ESP.getSketchMD5 (#2158)
+- Add Serial.baudRate() to get current baud rate (#2079)
 
 ### Libraries
 
+- SNI support in WiFiClientSecure (#1285)
+- Update axTLS to 139914f
+- HTTPClient: return error when HTTPClient::begin is called with HTTPS URL without certificate fingerprint (#1941)
+- HTTPClient: fix default port not being set
+- HTTPClient: fix handling of chunked transfer encoding (#1975)
+- ESP8266SSDP: switch SSDP send arguments around
+- ESP8266WiFi: fix UdpContext::peek to return int (#1946)
+- ESP8266WiFi: fix WiFiSleepType_t values to match SDK ones
+- LwIP: use gcc-built LwIP by default (#1926)
+- LwIP: fix crash in igmp_start_timer (#1826)
+- HTTPClient: include non-standard ports in Host: header
+- ESP8266WiFi: Prevent WiFi config corruption (#1997 #1856 #1699 #1675)
+- GDBStub: fix section attribute for core gdbstub functions
+- Wire: I2C bus reset with info to user
+- ESP8266HTTPClient: allow HTTP header value without LWS
+- ESP8266mDNS: Fix mDNS doesn't accept queryService responses from avahi-daemon (#2015)
+- Add MFRC522 to supported libraries (#2044)
+- Update axTLS to ab516f7 (1.5.3+)
+- Mention ESP8266Ping library
+- ESP8266HTTPClient: fix duplicate Content-Length headers (#1902)
+- ESP8266HTTPUpdateServer: make HTTP Update Server more secure (#2104)
+- ESP8266WiFi: add virtual destructor to WiFiServer class (#2116)
+- ESP8266WiFi: fix error when calling `WiFiServer::close` more than once
+- ESP8266WiFi: WiFi event handling refactoring (#2119)
+- ESP8266mDNS: restart listening when WiFi STA is connected/disconnected (#1828)
+- ESP8266WiFi: allow DHCP client to be re-enabled using WiFi.config(0U, 0U, 0U) (#1896)
+- ESP8266WiFi: enable SO_REUSE in LwIP and WiFiServer (#1431)
+- ESP8266WebServer: make ESP8266WebServer::urlDecode public (#1419)
+- LwIP: sntp_localtime: return -1 in tm_isdst field (#2010)
+- ESP8266WiFi: fix for crash in WiFiClientSecure when WiFi is disconnected (#2139)
+- SD: Prevent WDT resets in SD library (#1815)
+- ESP8266WiFi: Fix issue when WiFi.begin(ssid, pass) is called right after WiFi.mode(WIFI_OFF)
+
 ### Tools
+
+- Python 3 compatibility for get.py
+- Device side test library and test runner
+- Fix ARM toolchain files permissions (#2004)
+- Update esptool to 0.4.9
+
+## 2.2.0
+April 18, 2016
+
+Package link: `http://arduino.esp8266.com/versions/2.2.0/package_esp8266com_index.json`.
+
+### Core
+- Leverage realloc() in String::changeBuffer()
+- Clean up core files
+- Add host side tests
+- Fix possible null pointer in umm_malloc
+- Remove "Upload Using" option from Tools menu
+- Move attachInterrupt and detachInterrupt into IRAM (#1734)
+- Implement strstr_P
+- Allow indefinite duration for tone()
+- Fix crashes when using tone()
+- Fix RF_MODE and ADC_MODE
+- Move micros, delayMicroseconds, millis to IRAM (#1326)
+- Fix pulseIn (#1072, #1149)
+- Accept both named constant and ADC channel number in analogRead (#1766)
+- Enable heap poisoning only when debug options are enabled (#1800)
+- Bootloader: don't touch RTC memory if it doesn't contain a valid command (#619)
+- Update SDK to 1.5.2 (#1653)
+- Clean up variants, fix digitalPinHasPWM definition (#1831)
+- Don't set RF mode on boot unless it was overridden
+- Change build.board property for boards which renumber pins like NodeMCU (#1878)
+- Fix Exception 2 when using printf or vprintf
+
+### Libraries
+- Update axTLS to 5b4be7d
+- WiFiClientSecure: implement connection timeout, fix connected method behavior
+- WiFiClient: fix write behavior when connection is closed by remote side
+- ESP8266HTTPServer: add font MIME types, fix #1601
+- ESP8266mDNS: add client support
+- Update SPIFFS to 82aeac6
+- Servo: move some functions into IRAM (#1742)
+- Update SoftwareSerial to version 3.1.0
+- ESP8266SSDP: change templates to include deviceType
+- ESP8266WebServer: handle more file types
+- SPI: add CPOL setting
+- ESP8266WebServer: Fix buffer overflow in ESP8266WebServer::authenticate (#1790)
+- ESP8266WiFi: fix undefined behavior in WiFiServer::setNoDelay (#1695)
+- Servo: use peripheral clock frequency when calculating FRC1 tick count (#1789)
+- ESP8266WiFi: avoid multiple instances of INADDR_NONE
+- Add LwIP binary built with gcc
+- ESP8266WiFi: Allow PSK instead of passphrase in WiFiSTA::begin
+- SPI: Fix SPI.transfer16() using wrong endianness
+- HTTPClient: decouple transport layer handling + save some RAM
+- ESP8266httpUpdate: decouple HTTPS overloads + save some RAM
+- Update and move lwIP headers, add options to use different lwIP build
+- ESP8266WebServer: wait for data to arrive
+- ESP8266WebServer: save RAM by moving response strings to flash (#1732)
+- SPI: Speed up SPI.writePattern()
+
+
+### Tools
+- Add ARM tools (#269)
 
 ---
 ## 2.1.0

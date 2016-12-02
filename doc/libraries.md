@@ -18,25 +18,9 @@ title: Libraries
 
 ## WiFi(ESP8266WiFi library)
 
-This is mostly similar to WiFi shield library. Differences include:
+The [Wi-Fi library for ESP8266](https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi) has been developed basing on [ESP8266 SDK](http://bbs.espressif.com/viewtopic.php?f=51&t=1023), using naming convention and overall functionality philosophy of [Arduino WiFi library](https://www.arduino.cc/en/Reference/WiFi). Over time the wealth Wi-Fi features ported from ESP9266 SDK to [esp8266 / Adruino](https://github.com/esp8266/Arduino) outgrow [Arduino WiFi library](https://www.arduino.cc/en/Reference/WiFi) and it became apparent that we need to provide separate documentation on what is new and extra.
 
-- `WiFi.mode(m)`: set mode to `WIFI_AP`, `WIFI_STA`, `WIFI_AP_STA` or `WIFI_OFF`.
-- call `WiFi.softAP(ssid)` to set up an open network
-- call `WiFi.softAP(ssid, password)` to set up a WPA2-PSK network (password should be at least 8 characters)
-- `WiFi.macAddress(mac)` is for STA, `WiFi.softAPmacAddress(mac)` is for AP.
-- `WiFi.localIP()` is for STA, `WiFi.softAPIP()` is for AP.
-- `WiFi.printDiag(Serial)` will print out some diagnostic info
-- `WiFiUDP` class supports sending and receiving multicast packets on STA interface.
-When sending a multicast packet, replace `udp.beginPacket(addr, port)` with
-`udp.beginPacketMulticast(addr, port, WiFi.localIP())`.
-When listening to multicast packets, replace `udp.begin(port)` with
-`udp.beginMulticast(WiFi.localIP(), multicast_ip_addr, port)`.
-You can use `udp.destinationIP()` to tell whether the packet received was
-sent to the multicast or unicast address.
-
-`WiFiServer`, `WiFiClient`, and `WiFiUDP` behave mostly the same way as with WiFi shield library.
-Four samples are provided for this library.
-You can see more commands here: [http://www.arduino.cc/en/Reference/WiFi](http://www.arduino.cc/en/Reference/WiFi)
+[ESP8266WiFi library documentation](esp8266wifi/readme.md) : [Quick Start](esp8266wifi/readme.md#quick-start) | [Who is Who](esp8266wifi/readme.md#who-is-who) | [Station](esp8266wifi/readme.md#station) | [Soft Access Point](esp8266wifi/readme.md#soft-access-point) | [Scan](esp8266wifi/readme.md#scan) | [Client](esp8266wifi/readme.md#client) | [Client Secure](esp8266wifi/readme.md#client-secure) | [Server](esp8266wifi/readme.md#server) | [UDP](esp8266wifi/readme.md#udp) | [Generic](esp8266wifi/readme.md#generic) | [Diagnostics](esp8266wifi/readme.md#diagnostics)
 
 ## Ticker
 
@@ -83,6 +67,8 @@ APIs related to deep sleep and watchdog timer are available in the `ESP` object,
 
 `ESP.deepSleep(microseconds, mode)` will put the chip into deep sleep. `mode` is one of `WAKE_RF_DEFAULT`, `WAKE_RFCAL`, `WAKE_NO_RFCAL`, `WAKE_RF_DISABLED`. (GPIO16 needs to be tied to RST to wake from deepSleep.)
 
+`ESP.rtcUserMemoryWrite(offset, &data, sizeof(data))` and `ESP.rtcUserMemoryRead(offset, &data, sizeof(data))` allow data to be stored in and retrieved from the RTC user memory of the chip respectively. Total size of RTC user memory is 512 bytes, so offset + sizeof(data) shouldn't exceed 512. Data should be 4-byte aligned. The stored data can be retained between deep sleep cycles. However, the data might be lost after power cycling the chip.
+
 `ESP.restart()` restarts the CPU.
 
 `ESP.getResetReason()` returns String containing the last reset resaon in human readable format.
@@ -96,6 +82,8 @@ Several APIs may be used to get flash chip info:
 `ESP.getFlashChipId()` returns the flash chip ID as a 32-bit integer.
 
 `ESP.getFlashChipSize()` returns the flash chip size, in bytes, as seen by the SDK (may be less than actual size).
+
+`ESP.getFlashChipRealSize()` returns the real chip size, in bytes, based on the flash chip ID.
 
 `ESP.getFlashChipSpeed(void)` returns the flash chip frequency, in Hz.
 
@@ -147,6 +135,9 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [DimSwitch](https://github.com/krzychb/DimSwitch) - Control electronic dimmable ballasts for fluorescent light tubes remotely as if using a wall switch.
 - [Encoder](https://github.com/PaulStoffregen/Encoder) - Arduino library for rotary encoders. Version 1.4 supports ESP8266.
 - [esp8266_mdns](https://github.com/mrdunk/esp8266_mdns) - mDNS queries and responses on esp8266. Or to describe it another way: An mDNS Client or Bonjour Client library for the esp8266.
+- [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP) - Asynchronous TCP Library for ESP8266 and ESP32/31B
+- [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer) - Asynchronous Web Server Library for ESP8266 and ESP32/31B
+- [Homie for ESP8266](https://github.com/marvinroger/homie-esp8266) - Arduino framework for ESP8266 implementing Homie, an MQTT convention for the IoT.
 - [NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel) - Adafruit's NeoPixel library, now with support for the ESP8266 (use version 1.0.2 or higher from Arduino's library manager).
 - [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) - Arduino NeoPixel library compatible with ESP8266. Use the "DmaDriven" or "UartDriven" branches for ESP8266. Includes HSL color support and more.
 - [PubSubClient](https://github.com/Imroy/pubsubclient) - MQTT library by @Imroy.
@@ -162,3 +153,8 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [Adafruit-PCD8544-Nokia-5110-LCD-Library](https://github.com/WereCatf/Adafruit-PCD8544-Nokia-5110-LCD-library) - Port of the Adafruit PCD8544 - library for the ESP8266.
 - [PCF8574_ESP](https://github.com/WereCatf/PCF8574_ESP) - A very simplistic library for using the PCF8574/PCF8574A I2C 8-pin GPIO-expander.
 - [Dot Matrix Display Library 2](https://github.com/freetronics/DMD2) - Freetronics DMD & Generic 16 x 32 P10 style Dot Matrix Display Library
+- [SdFat-beta](https://github.com/greiman/SdFat-beta) - SD-card library with support for long filenames, software- and hardware-based SPI and lots more.
+- [FastLED](https://github.com/FastLED/FastLED) - a library for easily & efficiently controlling a wide variety of LED chipsets, like the Neopixel (WS2812B), DotStar, LPD8806 and many more. Includes fading, gradient, color conversion functions.
+- [OLED](https://github.com/klarsys/esp8266-OLED) - a library for controlling I2C connected OLED displays. Tested with 0.96 inch OLED graphics display.
+- [MFRC522](https://github.com/miguelbalboa/rfid) - A library for using the Mifare RC522 RFID-tag reader/writer.
+- [Ping](https://github.com/dancol90/ESP8266Ping) - lets the ESP8266 ping a remote machine.

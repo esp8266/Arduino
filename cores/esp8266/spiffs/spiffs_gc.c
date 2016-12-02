@@ -1,6 +1,8 @@
 #include "spiffs.h"
 #include "spiffs_nucleus.h"
 
+#if !SPIFFS_READ_ONLY
+
 // Erases a logical block and updates the erase counter.
 // If cache is enabled, all pages that might be cached in this block
 // is dropped.
@@ -571,3 +573,4 @@ s32_t spiffs_gc_clean(spiffs *fs, spiffs_block_ix bix) {
   return res;
 }
 
+#endif // !SPIFFS_READ_ONLY

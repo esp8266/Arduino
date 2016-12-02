@@ -47,6 +47,13 @@
 
 static int s_uart_debug_nr = UART0;
 
+struct uart_rx_buffer_ {
+    size_t size;
+    size_t rpos;
+    size_t wpos;
+    uint8_t * buffer;
+};
+
 struct uart_ {
     int uart_nr;
     int baud_rate;
@@ -54,7 +61,113 @@ struct uart_ {
     bool tx_enabled;
     uint8_t rx_pin;
     uint8_t tx_pin;
+    struct uart_rx_buffer_ * rx_buffer;
 };
+
+size_t uart_resize_rx_buffer(uart_t* uart, size_t new_size)
+{
+    if(uart == NULL || !uart->rx_enabled) {
+        return 0;
+    }
+    if(uart->rx_buffer->size == new_size) {
+        return uart->rx_buffer->size;
+    }
+    uint8_t * new_buf = (uint8_t*)malloc(new_size);
+    if(!new_buf) {
+        return uart->rx_buffer->size;
+    }
+    size_t new_wpos = 0;
+    ETS_UART_INTR_DISABLE();
+    while(uart_rx_available(uart) && new_wpos < new_size) {
+        new_buf[new_wpos++] = uart_read_char(uart);
+    }
+    uint8_t * old_buf = uart->rx_buffer->buffer;
+    uart->rx_buffer->rpos = 0;
+    uart->rx_buffer->wpos = new_wpos;
+    uart->rx_buffer->size = new_size;
+    uart->rx_buffer->buffer = new_buf;
+    free(old_buf);
+    ETS_UART_INTR_ENABLE();
+    return uart->rx_buffer->size;
+}
+
+int uart_peek_char(uart_t* uart)
+{
+    if(uart == NULL || !uart->rx_enabled) {
+        return -1;
+    }
+    if (!uart_rx_available(uart)) {
+        return -1;
+    }
+    return uart->rx_buffer->buffer[uart->rx_buffer->rpos];
+}
+
+int uart_read_char(uart_t* uart)
+{
+    int data = uart_peek_char(uart);
+    if(data != -1) {
+        uart->rx_buffer->rpos = (uart->rx_buffer->rpos + 1) % uart->rx_buffer->size;
+    }
+    return data;
+}
+
+size_t uart_rx_available(uart_t* uart)
+{
+    if(uart == NULL || !uart->rx_enabled) {
+        return 0;
+    }
+    if(uart->rx_buffer->wpos < uart->rx_buffer->rpos) {
+      return (uart->rx_buffer->wpos + uart->rx_buffer->size) - uart->rx_buffer->rpos;
+    }
+    return uart->rx_buffer->wpos - uart->rx_buffer->rpos;
+}
+
+
+void ICACHE_RAM_ATTR uart_isr(void * arg)
+{
+    uart_t* uart = (uart_t*)arg;
+    if(uart == NULL || !uart->rx_enabled) {
+        USIC(uart->uart_nr) = USIS(uart->uart_nr);
+        ETS_UART_INTR_DISABLE();
+        return;
+    }
+    if(USIS(uart->uart_nr) & ((1 << UIFF) | (1 << UITO))){
+        while((USS(uart->uart_nr) >> USRXC) & 0x7F){
+            uint8_t data = USF(uart->uart_nr);
+            size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
+            if(nextPos != uart->rx_buffer->rpos) {
+                uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
+                uart->rx_buffer->wpos = nextPos;
+            }
+        }
+    }
+    USIC(uart->uart_nr) = USIS(uart->uart_nr);
+}
+
+void uart_start_isr(uart_t* uart)
+{
+    if(uart == NULL || !uart->rx_enabled) {
+        return;
+    }
+    USC1(uart->uart_nr) = (127 << UCFFT) | (0x02 << UCTOT) | (1 <<UCTOE );
+    USIC(uart->uart_nr) = 0xffff;
+    USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIFR) | (1 << UITO);
+    ETS_UART_INTR_ATTACH(uart_isr,  (void *)uart);
+    ETS_UART_INTR_ENABLE();
+}
+
+void uart_stop_isr(uart_t* uart)
+{
+    if(uart == NULL || !uart->rx_enabled) {
+        return;
+    }
+    ETS_UART_INTR_DISABLE();
+    USC1(uart->uart_nr) = 0;
+    USIC(uart->uart_nr) = 0xffff;
+    USIE(uart->uart_nr) = 0;
+    ETS_UART_INTR_ATTACH(NULL, NULL);
+}
+
 
 void uart_write_char(uart_t* uart, char c)
 {
@@ -73,25 +186,6 @@ void uart_write(uart_t* uart, const char* buf, size_t size)
     while(size--) {
         uart_write_char(uart, *buf++);
     }
-}
-
-int uart_read_char(uart_t* uart)
-{
-    if(uart == NULL || !uart->rx_enabled) {
-        return -1;
-    }
-    if (!uart_rx_available(uart)) {
-        return -1;
-    }
-    return USF(uart->uart_nr) & 0xff;
-}
-
-size_t uart_rx_available(uart_t* uart)
-{
-    if(uart == NULL || !uart->rx_enabled) {
-        return -1;
-    }
-    return (USS(uart->uart_nr) >> USRXC) & 0xff;
 }
 
 size_t uart_tx_free(uart_t* uart)
@@ -121,6 +215,10 @@ void uart_flush(uart_t* uart)
     uint32_t tmp = 0x00000000;
     if(uart->rx_enabled) {
         tmp |= (1 << UCRXRST);
+        ETS_UART_INTR_DISABLE();
+        uart->rx_buffer->rpos = 0;
+        uart->rx_buffer->wpos = 0;
+        ETS_UART_INTR_ENABLE();
     }
 
     if(uart->tx_enabled) {
@@ -148,7 +246,7 @@ int uart_get_baudrate(uart_t* uart)
     return uart->baud_rate;
 }
 
-uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin)
+uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
 {
     uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
     if(uart == NULL) {
@@ -159,22 +257,39 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin)
 
     switch(uart->uart_nr) {
     case UART0:
+        ETS_UART_INTR_DISABLE();
+        ETS_UART_INTR_ATTACH(NULL, NULL);
         uart->rx_enabled = (mode != UART_TX_ONLY);
         uart->tx_enabled = (mode != UART_RX_ONLY);
         uart->rx_pin = (uart->rx_enabled)?3:255;
         if(uart->rx_enabled) {
+            struct uart_rx_buffer_ * rx_buffer = (struct uart_rx_buffer_ *)malloc(sizeof(struct uart_rx_buffer_));
+            if(rx_buffer == NULL) {
+              free(uart);
+              return NULL;
+            }
+            rx_buffer->size = rx_size;//var this
+            rx_buffer->rpos = 0;
+            rx_buffer->wpos = 0;
+            rx_buffer->buffer = (uint8_t *)malloc(rx_buffer->size);
+            if(rx_buffer->buffer == NULL) {
+              free(rx_buffer);
+              free(uart);
+              return NULL;
+            }
+            uart->rx_buffer = rx_buffer;
+            pinMode(uart->rx_pin, SPECIAL);
+        }
+        if(uart->tx_enabled) {
             if (tx_pin == 2) {
                 uart->tx_pin = 2;
-                pinMode(uart->rx_pin, FUNCTION_4);
+                pinMode(uart->tx_pin, FUNCTION_4);
             } else {
                 uart->tx_pin = 1;
-                pinMode(uart->rx_pin, SPECIAL);
+                pinMode(uart->tx_pin, FUNCTION_0);
             }
         } else {
             uart->tx_pin = 255;
-        }
-        if(uart->tx_enabled) {
-            pinMode(uart->tx_pin, SPECIAL);
         }
         IOSWAP &= ~(1 << IOSWAPU0);
         break;
@@ -199,6 +314,11 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin)
     USC0(uart->uart_nr) = config;
     uart_flush(uart);
     USC1(uart->uart_nr) = 0;
+    USIC(uart->uart_nr) = 0xffff;
+    USIE(uart->uart_nr) = 0;
+    if(uart->uart_nr == UART0 && uart->rx_enabled) {
+        uart_start_isr(uart);
+    }
 
     return uart;
 }
@@ -230,6 +350,11 @@ void uart_uninit(uart_t* uart)
         break;
     }
 
+    if(uart->rx_enabled){
+        free(uart->rx_buffer->buffer);
+        free(uart->rx_buffer);
+        uart_stop_isr(uart);
+    }
     free(uart);
 }
 

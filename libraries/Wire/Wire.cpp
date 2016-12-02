@@ -77,6 +77,10 @@ void TwoWire::begin(uint8_t address){
   begin();
 }
 
+uint8_t TwoWire::status(){
+	return twi_status();
+}
+
 void TwoWire::begin(int address){
   begin((uint8_t)address);
 }
@@ -247,4 +251,6 @@ void TwoWire::onRequest( void (*function)(void) ){
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
-TwoWire Wire = TwoWire();
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_TWOWIRE)
+TwoWire Wire;
+#endif

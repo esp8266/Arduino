@@ -32,21 +32,13 @@
 
 
 HardwareSerial::HardwareSerial(int uart_nr)
-    : _uart_nr(uart_nr)
+    : _uart_nr(uart_nr), _rx_size(256)
 {}
 
 void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin)
 {
-    if(uart_get_debug() == _uart_nr) {
-        uart_set_debug(UART_NO);
-    }
-
-    if (_uart) {
-        free(_uart);
-    }
-
-    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin);
-    _peek_char = -1;
+    end();
+    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
 }
 
 void HardwareSerial::end()
@@ -55,8 +47,19 @@ void HardwareSerial::end()
         uart_set_debug(UART_NO);
     }
 
-    uart_uninit(_uart);
-    _uart = NULL;
+    if (_uart) {
+        uart_uninit(_uart);
+        _uart = NULL;
+    }
+}
+
+size_t HardwareSerial::setRxBufferSize(size_t size){
+    if(_uart) {
+        _rx_size = uart_resize_rx_buffer(_uart, size);
+    } else {
+        _rx_size = size;
+    }
+    return _rx_size;
 }
 
 void HardwareSerial::swap(uint8_t tx_pin)
@@ -114,14 +117,7 @@ bool HardwareSerial::isRxEnabled(void)
 
 int HardwareSerial::available(void)
 {
-    if(!_uart || !uart_rx_enabled(_uart)) {
-        return 0;
-    }
-
     int result = static_cast<int>(uart_rx_available(_uart));
-    if (_peek_char != -1) {
-        result += 1;
-    }
     if (!result) {
         optimistic_yield(10000);
     }
@@ -130,25 +126,13 @@ int HardwareSerial::available(void)
 
 int HardwareSerial::peek(void)
 {
-    if (_peek_char != -1) {
-        return _peek_char;
-    }
     // this may return -1, but that's okay
-    _peek_char = uart_read_char(_uart);
-    return _peek_char;
+    return uart_peek_char(_uart);
 }
 
 int HardwareSerial::read(void)
 {
-    if(!_uart || !uart_rx_enabled(_uart)) {
-        return -1;
-    }
-
-    if (_peek_char != -1) {
-        auto tmp = _peek_char;
-        _peek_char = -1;
-        return tmp;
-    }
+    // this may return -1, but that's okay
     return uart_read_char(_uart);
 }
 
@@ -179,6 +163,13 @@ size_t HardwareSerial::write(uint8_t c)
     uart_write_char(_uart, c);
     return 1;
 }
+
+int HardwareSerial::baudRate(void)
+{
+    // Null pointer on _uart is checked by SDK
+    return uart_get_baudrate(_uart);
+}
+
 
 HardwareSerial::operator bool() const
 {

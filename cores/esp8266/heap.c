@@ -6,6 +6,27 @@
 #include <stdlib.h>
 #include "umm_malloc/umm_malloc.h"
 #include <c_types.h>
+#include <sys/reent.h>
+
+void* _malloc_r(struct _reent* unused, size_t size)
+{
+    return malloc(size);
+}
+
+void _free_r(struct _reent* unused, void* ptr)
+{
+    return free(ptr);
+}
+
+void* _realloc_r(struct _reent* unused, void* ptr, size_t size)
+{
+    return realloc(ptr, size);
+}
+
+void* _calloc_r(struct _reent* unused, size_t count, size_t size)
+{
+    return calloc(count, size);
+}
 
 void* ICACHE_RAM_ATTR pvPortMalloc(size_t size, const char* file, int line)
 {

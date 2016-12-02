@@ -1,15 +1,51 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+function print_size_info()
+{
+    elf_file=$1
+
+    if [ -z "$elf_file" ]; then
+        printf "sketch                       data     rodata   bss      text     irom0.text   dram     flash\n"
+        return 0
+    fi
+
+    elf_name=$(basename $elf_file)
+    sketch_name="${elf_name%.*}"
+    # echo $sketch_name
+    declare -A segments
+    while read -a tokens; do
+        seg=${tokens[0]}
+        seg=${seg//./}
+        size=${tokens[1]}
+        addr=${tokens[2]}
+        if [ "$addr" -eq "$addr" -a "$addr" -ne "0" ] 2>/dev/null; then
+            segments[$seg]=$size
+        fi
+
+
+    done < <(xtensa-lx106-elf-size --format=sysv $elf_file)
+
+    total_ram=$((${segments[data]} + ${segments[rodata]} + ${segments[bss]}))
+    total_flash=$((${segments[data]} + ${segments[rodata]} + ${segments[text]} + ${segments[irom0text]}))
+
+    printf "%-28s %-8d %-8d %-8d %-8d %-8d     %-8d %-8d\n" $sketch_name ${segments[data]} ${segments[rodata]} ${segments[bss]} ${segments[text]} ${segments[irom0text]} $total_ram $total_flash
+    return 0
+}
 
 function build_sketches()
 {
     set +e
     local arduino=$1
     local srcpath=$2
-    local build_cmd=$3
-    echo $build_cmd
+    local build_arg=$3
+    local build_dir=build.tmp
+    mkdir -p $build_dir
+    local build_cmd="python tools/build.py -b generic -v -k -p $PWD/$build_dir $build_arg "
     local sketches=$(find $srcpath -name *.ino)
+    print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
     for sketch in $sketches; do
+        rm -rf $build_dir/*
         local sketchdir=$(dirname $sketch)
         local sketchdirname=$(basename $sketchdir)
         local sketchname=$(basename $sketch)
@@ -33,6 +69,7 @@ function build_sketches()
             return $result
         fi
         rm build.log
+        print_size_info $build_dir/*.elf >>size.log
     done
     set -e
 }

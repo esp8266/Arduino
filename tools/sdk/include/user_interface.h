@@ -96,6 +96,7 @@ void system_uart_swap(void);
 void system_uart_de_swap(void);
 
 uint16 system_adc_read(void);
+void system_adc_read_fast(uint16 *adc_addr, uint16 adc_num, uint8 adc_clk_div);
 uint16 system_get_vdd33(void);
 
 const char *system_get_sdk_version(void);
@@ -255,7 +256,7 @@ int wifi_station_set_cert_key(uint8 *client_cert, int client_cert_len,
     uint8 *private_key, int private_key_len,
     uint8 *private_key_passwd, int private_key_passwd_len);
 void wifi_station_clear_cert_key(void);
-int wifi_station_set_username(unsigned char*, int);
+int wifi_station_set_username(uint8 *username, int len);
 void wifi_station_clear_username(void);
 
 struct softap_config {
@@ -356,9 +357,13 @@ sleep_type_t wifi_get_sleep_type(void);
 void wifi_fpm_open(void);
 void wifi_fpm_close(void);
 void wifi_fpm_do_wakeup(void);
+typedef void (*fpm_wakeup_cb)(void);
+void wifi_fpm_set_wakeup_cb(fpm_wakeup_cb cb);
+
 sint8 wifi_fpm_do_sleep(uint32 sleep_time_in_us);
 void wifi_fpm_set_sleep_type(sleep_type_t type);
 sleep_type_t wifi_fpm_get_sleep_type(void);
+void wifi_fpm_auto_sleep_set_in_null_mode(uint8 req);
 
 enum {
     EVENT_STAMODE_CONNECTED = 0,
@@ -476,6 +481,7 @@ enum wps_cb_status {
 	WPS_CB_ST_FAILED,
 	WPS_CB_ST_TIMEOUT,
 	WPS_CB_ST_WEP,
+	WPS_CB_ST_UNK,
 };
 
 bool wifi_wps_enable(WPS_TYPE_t wps_type);

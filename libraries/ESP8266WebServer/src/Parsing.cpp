@@ -31,6 +31,38 @@
 #define DEBUG_OUTPUT Serial
 #endif
 
+static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& dataLength, int timeout_ms)
+{
+  char *buf = nullptr;
+  dataLength = 0;
+  while (dataLength < maxLength) {
+    int tries = timeout_ms;
+    size_t newLength;
+    while (!(newLength = client.available()) && tries--) delay(1);
+    if (!newLength) {
+      break;
+    }
+    if (!buf) {
+      buf = (char *) malloc(newLength + 1);
+      if (!buf) {
+        return nullptr;
+      }
+    }
+    else {
+      char* newBuf = (char *) realloc(buf, dataLength + newLength + 1);
+      if (!newBuf) {
+        free(buf);
+        return nullptr;
+      }
+      buf = newBuf;
+    }
+    client.readBytes(buf + dataLength, newLength);
+    dataLength += newLength;
+    buf[dataLength] = '\0';
+  }
+  return buf;
+}
+
 bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
@@ -54,13 +86,16 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 
   String methodStr = req.substring(0, addr_start);
   String url = req.substring(addr_start + 1, addr_end);
+  String versionEnd = req.substring(addr_end + 8);
+  _currentVersion = atoi(versionEnd.c_str());
   String searchStr = "";
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
-    searchStr = url.substring(hasSearch + 1);
+    searchStr = urlDecode(url.substring(hasSearch + 1));
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
+  _chunked = false;
 
   HTTPMethod method = HTTP_GET;
   if (methodStr == "POST") {
@@ -100,6 +135,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     String headerName;
     String headerValue;
     bool isForm = false;
+    bool isEncoded = false;
     uint32_t contentLength = 0;
     //parse headers
     while(1){
@@ -114,53 +150,66 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       headerValue = req.substring(headerDiv + 1);
       headerValue.trim();
        _collectHeader(headerName.c_str(),headerValue.c_str());
-	  
-	  #ifdef DEBUG_ESP_HTTP_SERVER
-	  DEBUG_OUTPUT.print("headerName: ");
-	  DEBUG_OUTPUT.println(headerName);
-	  DEBUG_OUTPUT.print("headerValue: ");
-	  DEBUG_OUTPUT.println(headerValue);
-	  #endif
-	  
-      if (headerName == "Content-Type"){
+
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.print("headerName: ");
+      DEBUG_OUTPUT.println(headerName);
+      DEBUG_OUTPUT.print("headerValue: ");
+      DEBUG_OUTPUT.println(headerValue);
+      #endif
+
+      if (headerName.equalsIgnoreCase("Content-Type")){
         if (headerValue.startsWith("text/plain")){
           isForm = false;
-        } else if (headerValue.startsWith("multipart/form-data")){
+        } else if (headerValue.startsWith("application/x-www-form-urlencoded")){
+          isForm = false;
+          isEncoded = true;
+        } else if (headerValue.startsWith("multipart/")){
           boundaryStr = headerValue.substring(headerValue.indexOf('=')+1);
           isForm = true;
         }
-      } else if (headerName == "Content-Length"){
+      } else if (headerName.equalsIgnoreCase("Content-Length")){
         contentLength = headerValue.toInt();
-      } else if (headerName == "Host"){
+      } else if (headerName.equalsIgnoreCase("Host")){
         _hostHeader = headerValue;
       }
     }
 
     if (!isForm){
-      if (searchStr != "") searchStr += '&';
-      //some clients send headers first and data after (like we do)
-      //give them a chance
-      int tries = 100;//100ms max wait
-      while(!client.available() && tries--)delay(1);
-      size_t plainLen = client.available();
-      char *plainBuf = (char*)malloc(plainLen+1);
-      client.readBytes(plainBuf, plainLen);
-      plainBuf[plainLen] = '\0';
-#ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.print("Plain: ");
-      DEBUG_OUTPUT.println(plainBuf);
-#endif
-      if(plainBuf[0] == '{' || plainBuf[0] == '[' || strstr(plainBuf, "=") == NULL){
-        //plain post json or other data
-        searchStr += "plain=";
-        searchStr += plainBuf;
-      } else {
-        searchStr += plainBuf;
+      size_t plainLength;
+      char* plainBuf = readBytesWithTimeout(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
+      if (plainLength < contentLength) {
+      	free(plainBuf);
+      	return false;
       }
-      free(plainBuf);
+      if (contentLength > 0) {
+        if (searchStr != "") searchStr += '&';
+        if(isEncoded){
+          //url encoded form
+          String decoded = urlDecode(plainBuf);
+          size_t decodedLen = decoded.length();
+          memcpy(plainBuf, decoded.c_str(), decodedLen);
+          plainBuf[decodedLen] = 0;
+          searchStr += plainBuf;
+        }
+        _parseArguments(searchStr);
+        if(!isEncoded){
+          //plain post json or other data
+          RequestArgument& arg = _currentArgs[_currentArgCount++];
+          arg.key = "plain";
+          arg.value = String(plainBuf);
+        }
+
+  #ifdef DEBUG_ESP_HTTP_SERVER
+        DEBUG_OUTPUT.print("Plain: ");
+        DEBUG_OUTPUT.println(plainBuf);
+  #endif
+        free(plainBuf);
+      }
     }
-    _parseArguments(searchStr);
+
     if (isForm){
+      _parseArguments(searchStr);
       if (!_parseForm(client, boundaryStr, contentLength)) {
         return false;
       }
@@ -180,15 +229,15 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       headerName = req.substring(0, headerDiv);
       headerValue = req.substring(headerDiv + 2);
       _collectHeader(headerName.c_str(),headerValue.c_str());
-	  
+
 	  #ifdef DEBUG_ESP_HTTP_SERVER
 	  DEBUG_OUTPUT.print("headerName: ");
 	  DEBUG_OUTPUT.println(headerName);
 	  DEBUG_OUTPUT.print("headerValue: ");
 	  DEBUG_OUTPUT.println(headerValue);
 	  #endif
-	  
-	  if (headerName == "Host"){
+
+	  if (headerName.equalsIgnoreCase("Host")){
         _hostHeader = headerValue;
       }
     }
@@ -208,7 +257,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 
 bool ESP8266WebServer::_collectHeader(const char* headerName, const char* headerValue) {
   for (int i = 0; i < _headerKeysCount; i++) {
-    if (_currentHeaders[i].key==headerName) {
+    if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
             _currentHeaders[i].value=headerValue;
             return true;
         }
@@ -226,6 +275,7 @@ void ESP8266WebServer::_parseArguments(String data) {
   _currentArgs = 0;
   if (data.length() == 0) {
     _currentArgCount = 0;
+    _currentArgs = new RequestArgument[1];
     return;
   }
   _currentArgCount = 1;
@@ -242,7 +292,7 @@ void ESP8266WebServer::_parseArguments(String data) {
   DEBUG_OUTPUT.println(_currentArgCount);
 #endif
 
-  _currentArgs = new RequestArgument[_currentArgCount];
+  _currentArgs = new RequestArgument[_currentArgCount+1];
   int pos = 0;
   int iarg;
   for (iarg = 0; iarg < _currentArgCount;) {
@@ -268,7 +318,7 @@ void ESP8266WebServer::_parseArguments(String data) {
     }
     RequestArgument& arg = _currentArgs[iarg];
     arg.key = data.substring(pos, equal_sign_index);
-	arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
+	arg.value = data.substring(equal_sign_index + 1, next_arg_index);
 #ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.print("arg ");
     DEBUG_OUTPUT.print(iarg);
@@ -339,7 +389,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
 
       line = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (line.startsWith("Content-Disposition")){
+      if (line.length() > 19 && line.substring(0, 19).equalsIgnoreCase("Content-Disposition")){
         int nameStart = line.indexOf('=');
         if (nameStart != -1){
           argName = line.substring(nameStart+2);
@@ -364,7 +414,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
           argType = "text/plain";
           line = client.readStringUntil('\r');
           client.readStringUntil('\n');
-          if (line.startsWith("Content-Type")){
+          if (line.length() > 12 && line.substring(0, 12).equalsIgnoreCase("Content-Type")){
             argType = line.substring(line.indexOf(':')+2);
             //skip next line
             client.readStringUntil('\r');

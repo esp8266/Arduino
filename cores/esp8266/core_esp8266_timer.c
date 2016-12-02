@@ -41,7 +41,7 @@ void ICACHE_RAM_ATTR timer1_isr_handler(void *para){
     }
 }
 
-void timer1_isr_init(){
+void ICACHE_RAM_ATTR timer1_isr_init(){
     ETS_FRC_TIMER1_INTR_ATTACH(timer1_isr_handler, NULL);
 }
 
@@ -50,7 +50,7 @@ void timer1_attachInterrupt(timercallback userFunc) {
     ETS_FRC1_INTR_ENABLE();
 }
 
-void timer1_detachInterrupt() {
+void ICACHE_RAM_ATTR timer1_detachInterrupt() {
     timer1_user_cb = 0;
     TEIE &= ~TEIE1;//edge int disable
     ETS_FRC1_INTR_DISABLE();
@@ -66,7 +66,7 @@ void ICACHE_RAM_ATTR timer1_write(uint32_t ticks){
     if ((T1C & (1 << TCIT)) == 0) TEIE |= TEIE1;//edge int enable
 }
 
-void timer1_disable(){
+void ICACHE_RAM_ATTR timer1_disable(){
     T1C = 0;
     T1I = 0;
 }
@@ -95,7 +95,7 @@ void timer0_attachInterrupt(timercallback userFunc) {
     ETS_CCOMPARE0_ENABLE();
 }
 
-void timer0_detachInterrupt() {
+void ICACHE_RAM_ATTR timer0_detachInterrupt() {
     timer0_user_cb = NULL;
     ETS_CCOMPARE0_DISABLE();
 }

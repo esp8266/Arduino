@@ -1,4 +1,3 @@
-OBJECT_DIRECTORY := obj
 BINARY_DIRECTORY := bin
 OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
 CORE_PATH := ../../cores/esp8266
@@ -17,6 +16,8 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	Print.cpp \
 	FS.cpp \
 	spiffs_api.cpp \
+	pgmspace.cpp \
+	MD5Builder.cpp \
 )
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
@@ -34,6 +35,11 @@ MOCK_CPP_FILES := $(addprefix common/,\
 	WMath.cpp \
 )
 
+MOCK_C_FILES := $(addprefix common/,\
+	md5.c \
+	noniso.c \
+)
+
 INC_PATHS += $(addprefix -I, \
 	common \
 	$(CORE_PATH) \
@@ -41,18 +47,24 @@ INC_PATHS += $(addprefix -I, \
 
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
+	core/test_pgmspace.cpp \
+	core/test_md5builder.cpp \
 
-CXXFLAGS += -std=c++11 -Wall -coverage -O0
-CFLAGS += -std=c99 -Wall -coverage -O0
+
+CXXFLAGS += -std=c++11 -Wall -coverage -O0 -fno-common
+CFLAGS += -std=c99 -Wall -coverage -O0 -fno-common
 LDFLAGS += -coverage -O0
 
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
-C_SOURCE_FILES = $(CORE_C_FILES)
+C_SOURCE_FILES = $(MOCK_C_FILES) $(CORE_C_FILES)
 CPP_SOURCE_FILES = $(MOCK_CPP_FILES) $(CORE_CPP_FILES) $(TEST_CPP_FILES)
 C_OBJECTS = $(C_SOURCE_FILES:.c=.c.o)
 
-CPP_OBJECTS = $(CPP_SOURCE_FILES:.cpp=.cpp.o)
+CPP_OBJECTS_CORE = $(MOCK_CPP_FILES:.cpp=.cpp.o) $(CORE_CPP_FILES:.cpp=.cpp.o)
+CPP_OBJECTS_TESTS = $(TEST_CPP_FILES:.cpp=.cpp.o)
+
+CPP_OBJECTS = $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_TESTS)
 
 OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS)
 COVERAGE_FILES = $(OBJECTS:.o=.gc*)
@@ -75,14 +87,14 @@ gcov: test
 	find $(CORE_PATH) -name "*.gcno" -exec $(GCOV) -r -pb {} +
 
 build-info:
-	echo "-------- build tools info --------"
-	echo "CC: " $(CC)
+	@echo "-------- build tools info --------"
+	@echo "CC: " $(CC)
 	$(CC) -v
-	echo "CXX: " $(CXX)
+	@echo "CXX: " $(CXX)
 	$(CXX) -v
-	echo "GCOV: " $(GCOV)
+	@echo "GCOV: " $(GCOV)
 	$(GCOV) -v
-	echo "----------------------------------"
+	@echo "----------------------------------"
 
 $(BINARY_DIRECTORY):
 	mkdir -p $@
@@ -93,5 +105,9 @@ $(C_OBJECTS): %.c.o: %.c
 $(CPP_OBJECTS): %.cpp.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
 
-$(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(OBJECTS)
-	$(CXX) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $(OUTPUT_BINARY)
+$(BINARY_DIRECTORY)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
+	ar -rcu $@ $(C_OBJECTS) $(CPP_OBJECTS_CORE)
+	ranlib -c $@
+
+$(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/core.a
+	$(CXX) $(LDFLAGS) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/core.a $(LIBS) -o $(OUTPUT_BINARY)

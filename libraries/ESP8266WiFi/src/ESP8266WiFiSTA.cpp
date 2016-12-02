@@ -106,7 +106,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         return WL_CONNECT_FAILED;
     }
 
-    if(passphrase && strlen(passphrase) > 63) {
+    if(passphrase && strlen(passphrase) > 64) {
         // fail passphrase too long!
         return WL_CONNECT_FAILED;
     }
@@ -115,7 +115,10 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
 
     if(passphrase) {
-        strcpy(reinterpret_cast<char*>(conf.password), passphrase);
+        if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK
+            memcpy(reinterpret_cast<char*>(conf.password), passphrase, 64);
+        else
+            strcpy(reinterpret_cast<char*>(conf.password), passphrase);
     } else {
         *conf.password = 0;
     }
@@ -131,21 +134,28 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     wifi_station_get_config(&current_conf);
     if(sta_config_equal(current_conf, conf)) {
         DEBUGV("sta config unchanged");
-        return status();
+    }
+    else {
+        ETS_UART_INTR_DISABLE();
+
+        if(WiFi._persistent) {
+            // workaround for #1997: make sure the value of ap_number is updated and written to flash
+            // to be removed after SDK update
+            wifi_station_ap_number_set(2);
+            wifi_station_ap_number_set(1);
+
+            wifi_station_set_config(&conf);
+        } else {
+            wifi_station_set_config_current(&conf);
+        }
+
+        ETS_UART_INTR_ENABLE();
     }
 
     ETS_UART_INTR_DISABLE();
-
-    if(WiFi._persistent) {
-        wifi_station_set_config(&conf);
-    } else {
-        wifi_station_set_config_current(&conf);
-    }
-
     if(connect) {
         wifi_station_connect();
     }
-
     ETS_UART_INTR_ENABLE();
 
     if(channel > 0 && channel <= 13) {
@@ -203,6 +213,12 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddres
     info.ip.addr = static_cast<uint32_t>(local_ip);
     info.gw.addr = static_cast<uint32_t>(gateway);
     info.netmask.addr = static_cast<uint32_t>(subnet);
+
+    if (local_ip == 0U && gateway == 0U && subnet == 0U) {
+        _useStaticIp = false;
+        wifi_station_dhcpc_start();
+        return true;
+    }
 
     wifi_station_dhcpc_stop();
     if(wifi_set_ip_info(STATION_IF, &info)) {
@@ -574,6 +590,12 @@ void wifi_wps_status_cb(wps_cb_status status) {
         case WPS_CB_ST_WEP:
             DEBUGV("wps WEP\n");
             break;
+        case WPS_CB_ST_UNK:
+            DEBUGV("wps UNKNOWN\n");
+            if(!wifi_wps_disable()) {
+                DEBUGV("wps disable failed\n");
+            }
+            break;
     }
     // TODO user function to get status
 
@@ -654,4 +676,3 @@ void ESP8266WiFiSTAClass::_smartConfigCallback(uint32_t st, void* result) {
         WiFi.stopSmartConfig();
     }
 }
-

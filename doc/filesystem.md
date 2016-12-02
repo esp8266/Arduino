@@ -7,6 +7,7 @@ title: File System
   * [Uploading files to file system](#uploading-files-to-file-system)
   * [File system object (SPIFFS)](#file-system-object-spiffs)
     * [begin](#begin)
+    * [end](#end)
     * [format](#format)
     * [open](#open)
     * [exists](#exists)
@@ -86,6 +87,14 @@ This method mounts SPIFFS file system. It must be called before any other
 FS APIs are used. Returns *true* if file system was mounted successfully, false
 otherwise.
 
+### end
+
+```c++
+SPIFFS.end()
+```
+
+This method unmounts SPIFFS file system. Use this method before updating SPIFFS using OTA.
+
 ### format
 
 ```c++
@@ -105,6 +114,28 @@ Opens a file. `path` should be an absolute path starting with a slash
 (e.g. `/dir/filename.txt`). `mode` is a string specifying access mode. It can be
 one of "r", "w", "a", "r+", "w+", "a+". Meaning of these modes is the same as
 for `fopen` C function.
+       
+       r      Open text file for reading.  The stream is positioned at the
+              beginning of the file.
+
+       r+     Open for reading and writing.  The stream is positioned at the
+              beginning of the file.
+
+       w      Truncate file to zero length or create text file for writing.
+              The stream is positioned at the beginning of the file.
+
+       w+     Open for reading and writing.  The file is created if it does
+              not exist, otherwise it is truncated.  The stream is
+              positioned at the beginning of the file.
+
+       a      Open for appending (writing at end of file).  The file is
+              created if it does not exist.  The stream is positioned at the
+              end of the file.
+
+       a+     Open for reading and appending (writing at end of file).  The
+              file is created if it does not exist.  The initial file
+              position for reading is at the beginning of the file, but
+              output is always appended to the end of the file.
 
 Returns *File* object. To check whether the file was opened successfully, use
 the boolean operator.

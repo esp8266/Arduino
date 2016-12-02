@@ -167,6 +167,7 @@ static void initISR(ServoTimerSequence timerId)
 #endif
 }
 
+static void finISR(ServoTimerSequence timerId) ICACHE_RAM_ATTR;
 static void finISR(ServoTimerSequence timerId)
 {
 #if !defined (SERVO_EXCLUDE_TIMER0)
@@ -180,6 +181,7 @@ static void finISR(ServoTimerSequence timerId)
 }
 
 // returns true if any servo is active on this timer
+static boolean isTimerActive(ServoTimerSequence timerId) ICACHE_RAM_ATTR;
 static boolean isTimerActive(ServoTimerSequence timerId)
 {
     for (uint8_t channel = 0; channel < SERVOS_PER_TIMER; channel++) {

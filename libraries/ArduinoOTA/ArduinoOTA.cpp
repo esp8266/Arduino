@@ -1,4 +1,6 @@
+#ifndef LWIP_OPEN_SRC
 #define LWIP_OPEN_SRC
+#endif
 #include <functional>
 #include <WiFiUdp.h>
 #include "ArduinoOTA.h"
@@ -29,6 +31,7 @@ ArduinoOTAClass::ArduinoOTAClass()
 : _port(0)
 , _udp_ota(0)
 , _initialized(false)
+, _rebootOnSuccess(true)
 , _state(OTA_IDLE)
 , _size(0)
 , _cmd(0)
@@ -47,19 +50,19 @@ ArduinoOTAClass::~ArduinoOTAClass(){
   }
 }
 
-void ArduinoOTAClass::onStart(OTA_CALLBACK(fn)) {
+void ArduinoOTAClass::onStart(THandlerFunction fn) {
     _start_callback = fn;
 }
 
-void ArduinoOTAClass::onEnd(OTA_CALLBACK(fn)) {
+void ArduinoOTAClass::onEnd(THandlerFunction fn) {
     _end_callback = fn;
 }
 
-void ArduinoOTAClass::onProgress(OTA_CALLBACK_PROGRESS(fn)) {
+void ArduinoOTAClass::onProgress(THandlerFunction_Progress fn) {
     _progress_callback = fn;
 }
 
-void ArduinoOTAClass::onError(OTA_CALLBACK_ERROR(fn)) {
+void ArduinoOTAClass::onError(THandlerFunction_Error fn) {
     _error_callback = fn;
 }
 
@@ -75,10 +78,28 @@ void ArduinoOTAClass::setHostname(const char * hostname) {
   }
 }
 
+String ArduinoOTAClass::getHostname() {
+  return _hostname;
+}
+
 void ArduinoOTAClass::setPassword(const char * password) {
+  if (!_initialized && !_password.length() && password) {
+    MD5Builder passmd5;
+    passmd5.begin();
+    passmd5.add(password);
+    passmd5.calculate();
+    _password = passmd5.toString();
+  }
+}
+
+void ArduinoOTAClass::setPasswordHash(const char * password) {
   if (!_initialized && !_password.length() && password) {
     _password = password;
   }
+}
+
+void ArduinoOTAClass::setRebootOnSuccess(bool reboot){
+  _rebootOnSuccess = reboot;
 }
 
 void ArduinoOTAClass::begin() {
@@ -174,7 +195,7 @@ void ArduinoOTAClass::_onRx(){
       nonce_md5.add(String(micros()));
       nonce_md5.calculate();
       _nonce = nonce_md5.toString();
-      
+
       char auth_req[38];
       sprintf(auth_req, "AUTH %s", _nonce.c_str());
       _udp_ota->append((const char *)auth_req, strlen(auth_req));
@@ -200,13 +221,7 @@ void ArduinoOTAClass::_onRx(){
       return;
     }
 
-    MD5Builder _passmd5;
-    _passmd5.begin();
-    _passmd5.add(_password);
-    _passmd5.calculate();
-    String passmd5 = _passmd5.toString();
-
-    String challenge = passmd5 + ":" + String(_nonce) + ":" + cnonce;
+    String challenge = _password + ":" + String(_nonce) + ":" + cnonce;
     MD5Builder _challengemd5;
     _challengemd5.begin();
     _challengemd5.add(challenge);
@@ -294,12 +309,19 @@ void ArduinoOTAClass::_runUpdate() {
     client.stop();
     delay(10);
 #ifdef OTA_DEBUG
-    OTA_DEBUG.printf("Update Success\nRebooting...\n");
+    OTA_DEBUG.printf("Update Success\n");
 #endif
     if (_end_callback) {
       _end_callback();
     }
-    ESP.restart();
+    if(_rebootOnSuccess){
+#ifdef OTA_DEBUG
+    OTA_DEBUG.printf("Rebooting...\n");
+#endif
+      //let serial/network finish tasks that might be given in _end_callback
+      delay(100);
+      ESP.restart();
+    }
   } else {
     _udp_ota->listen(*IP_ADDR_ANY, _port);
     if (_error_callback) {
@@ -320,4 +342,10 @@ void ArduinoOTAClass::handle() {
   }
 }
 
+int ArduinoOTAClass::getCommand() {
+  return _cmd;
+}
+
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ARDUINOOTA)
 ArduinoOTAClass ArduinoOTA;
+#endif

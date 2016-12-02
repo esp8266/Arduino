@@ -131,7 +131,9 @@ extern char _heap_start;
  * callback is called: `UMM_HEAP_CORRUPTION_CB()`
  */
 
+#if defined(DEBUG_ESP_PORT) || defined(DEBUG_ESP_CORE)
 #define UMM_POISON
+#endif
 
 #define UMM_POISON_SIZE_BEFORE 4
 #define UMM_POISON_SIZE_AFTER  4

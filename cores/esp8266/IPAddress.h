@@ -77,7 +77,7 @@ class IPAddress: public Printable {
         IPAddress& operator=(uint32_t address);
 
         virtual size_t printTo(Print& p) const;
-        String toString();
+        String toString() const;
 
         friend class EthernetClass;
         friend class UDP;
@@ -87,6 +87,6 @@ class IPAddress: public Printable {
         friend class DNSClient;
 };
 
-const IPAddress INADDR_NONE(0, 0, 0, 0);
+extern const IPAddress INADDR_NONE;
 
 #endif

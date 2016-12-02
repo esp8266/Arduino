@@ -172,8 +172,21 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     {
         return 0;
     }
+    return _client->write(buf, size);
+}
 
-    return _client->write(reinterpret_cast<const char*>(buf), size);
+size_t WiFiClient::write(Stream& stream, size_t unused)
+{
+    return WiFiClient::write(stream);
+}
+
+size_t WiFiClient::write(Stream& stream)
+{
+    if (!_client || !stream.available())
+    {
+        return 0;
+    }
+    return _client->write(stream);
 }
 
 size_t WiFiClient::write_P(PGM_P buf, size_t size)
@@ -182,25 +195,7 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
     {
         return 0;
     }
-
-    char chunkUnit[WIFICLIENT_MAX_PACKET_SIZE + 1];
-    chunkUnit[WIFICLIENT_MAX_PACKET_SIZE] = '\0';
-    size_t remaining_size = size;
-
-    while (buf != NULL && remaining_size > 0) {
-        size_t chunkUnitLen = WIFICLIENT_MAX_PACKET_SIZE;
-
-        if (remaining_size < WIFICLIENT_MAX_PACKET_SIZE) chunkUnitLen = remaining_size;
-        // due to the memcpy signature, lots of casts are needed
-        memcpy_P((void*)chunkUnit, (PGM_VOID_P)buf, chunkUnitLen);
-
-        buf += chunkUnitLen;
-        remaining_size -= chunkUnitLen;
-
-        // write is so overloaded, had to use the cast to get it pick the right one
-        _client->write((const char*)chunkUnit, chunkUnitLen);
-    }
-    return size;
+    return _client->write_P(buf, size);
 }
 
 int WiFiClient::available()
@@ -339,24 +334,16 @@ void WiFiClient::_s_err(void* arg, int8_t err)
 void WiFiClient::stopAll()
 {
     for (WiFiClient* it = _s_first; it; it = it->_next) {
-        ClientContext* c = it->_client;
-        if (c) {
-            c->abort();
-            c->unref();
-            it->_client = 0;
-        }
+        it->stop();
     }
 }
 
 
-void WiFiClient::stopAllExcept(WiFiClient * exC) {
+void WiFiClient::stopAllExcept(WiFiClient* except) 
+{
     for (WiFiClient* it = _s_first; it; it = it->_next) {
-        ClientContext* c = it->_client;
-
-        if (c && c != exC->_client) {
-            c->abort();
-            c->unref();
-            it->_client = 0;
+        if (it != except) {
+            it->stop();
         }
     }
 }

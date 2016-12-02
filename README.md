@@ -9,7 +9,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
   - [Using git version](#using-git-version)
-  - [Using stable version with PlatformIO](#using-stable-version-with-platformio)
+  - [Using PlatformIO](#using-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
 - [Issues and support](#issues-and-support)
@@ -20,7 +20,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 
 Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
 
-- Install Arduino 1.6.5 from the [Arduino website](http://www.arduino.cc/en/main/software).
+- Install Arduino 1.6.8 from the [Arduino website](http://www.arduino.cc/en/main/software).
 - Start Arduino and open Preferences window.
 - Enter ```http://arduino.esp8266.com/stable/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
@@ -34,17 +34,17 @@ If you find this forum or the ESP8266 Boards Manager package useful, please cons
 ##### Stable version ![](http://arduino.esp8266.com/stable/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0/](http://esp8266.github.io/Arduino/versions/2.1.0/)
+Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0/](http://esp8266.github.io/Arduino/versions/2.3.0/)
 
 ##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
 Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.1.0-rc2/](http://esp8266.github.io/Arduino/versions/2.1.0-rc2/)
+Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0-rc2/](http://esp8266.github.io/Arduino/versions/2.3.0-rc2/)
 
-### Using git version 
+### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino) [![codecov.io](https://codecov.io/github/esp8266/Arduino/coverage.svg?branch=master)](https://codecov.io/github/esp8266/Arduino?branch=master)
 
-- Install Arduino 1.6.7
+- Install Arduino 1.6.8
 - Go to Arduino directory
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash
@@ -60,17 +60,26 @@ python get.py
 ```
 - Restart Arduino
 
-### Using stable version with PlatformIO
+### Using PlatformIO
 
-[PlatformIO](http://platformio.org) is a cross-platform code-builder and library manager for embedded development with no external dependencies. Works on the popular host OS: Mac OS X, Windows, Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard). More details in documentation [What is PlatformIO? How does it work?](http://docs.platformio.org/en/latest/faq.html#general).
+[PlatformIO](http://platformio.org) is an open source ecosystem for IoT
+development with cross platform build system, library manager and full support
+for Espressif (ESP8266) development. It works on the popular host OS: Mac OS X, Windows,
+Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-See [detailed instructions on how to use Espressif platform with PlatformIO](doc/platformio.md).
+- [What is PlatformIO?](http://docs.platformio.org/en/stable/what-is-platformio.html)
+- [PlatformIO IDE](http://platformio.org/platformio-ide)
+- Quick Start with [PlatformIO IDE](http://docs.platformio.org/en/stable/ide/atom.html#quick-start) or [PlatformIO CLI](http://docs.platformio.org/en/stable/quickstart.html)
+- [Advanced using](http://docs.platformio.org/en/stable/platforms/espressif.html) -
+  custom settings, uploading to SPIFFS, Over-the-Air (OTA) or using stage version
+- [Integration with other IDE](http://docs.platformio.org/en/stable/ide.html) -
+  Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
+- [Project Examples](http://docs.platformio.org/en/stable/platforms/espressif.html#examples)
 
 ### Building with make
 
 [makeEspArduino](https://github.com/plerup/makeEspArduino) is a generic makefile for any ESP8266 Arduino project.
 Using make instead of the Arduino IDE makes it easier to do automated and production builds.
-
 
 ### Documentation
 
@@ -81,6 +90,7 @@ Documentation for latest development version:
 - [File system](doc/filesystem.md)
 - [OTA update](doc/ota_updates/readme.md)
 - [Supported boards](doc/boards.md)
+- [FAQ / Trubleshooting](doc/faq/readme.md)
 - [Change log](doc/changes.md)
 
 ### Issues and support ###

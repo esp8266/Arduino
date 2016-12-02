@@ -197,3 +197,18 @@ unsigned char twi_readFrom(unsigned char address, unsigned char* buf, unsigned i
   }
   return 0;
 }
+
+uint8_t twi_status(){           
+    if (SCL_READ()==0)     return I2C_SCL_HELD_LOW;       		//SCL held low by another device, no procedure available to recover
+    int clockCount = 20;                   
+
+    while (SDA_READ()==0 && clockCount>0){                      //if SDA low, read the bits slaves have to sent to a max
+        twi_read_bit();                    
+        if (SCL_READ()==0) return I2C_SCL_HELD_LOW_AFTER_READ;  //I2C bus error. SCL held low beyond slave clock stretch time
+    }
+
+    if (SDA_READ()==0)     return I2C_SDA_HELD_LOW;       		//I2C bus error. SDA line held low by slave/another_master after n bits.
+
+    if(!twi_write_start()) return I2C_SDA_HELD_LOW_AFTER_INIT;  //line busy. SDA again held low by another device. 2nd master?
+    else                   return I2C_OK;       				//all ok 
+}

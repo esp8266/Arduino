@@ -25,6 +25,10 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
+#include <memory>
+#include <Arduino.h>
+#include <WiFiClient.h>
+
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
 #define DEBUG_HTTPCLIENT(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
@@ -120,97 +124,103 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
-class HTTPClient {
-    public:
-        HTTPClient();
-        ~HTTPClient();
+class TransportTraits;
+typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 
-        void begin(const char *url, const char * httpsFingerprint = "");
-        void begin(String url, String httpsFingerprint = "");
+class HTTPClient
+{
+public:
+    HTTPClient();
+    ~HTTPClient();
 
-        void begin(const char *host, uint16_t port, const char * url  = "/", bool https = false, const char * httpsFingerprint = "");
-        void begin(String host, uint16_t port, String url = "/", bool https = false, String httpsFingerprint = "");
+    bool begin(String url);
+    bool begin(String url, String httpsFingerprint);
+    bool begin(String host, uint16_t port, String uri = "/");
+    bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
+    // deprecated, use the overload above instead
+    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
 
-        void end(void);
+    void end(void);
 
-        bool connected(void);
+    bool connected(void);
 
-        void setReuse(bool reuse); /// keep-alive
-        void setUserAgent(const char * userAgent);
-        void setAuthorization(const char * user, const char * password);
-        void setAuthorization(const char * auth);
-        void setTimeout(uint16_t timeout);
+    void setReuse(bool reuse); /// keep-alive
+    void setUserAgent(const String& userAgent);
+    void setAuthorization(const char * user, const char * password);
+    void setAuthorization(const char * auth);
+    void setTimeout(uint16_t timeout);
 
-        void useHTTP10(bool usehttp10 = true);
+    void useHTTP10(bool usehttp10 = true);
 
-        /// request handling
-        int GET();
-        int POST(uint8_t * payload, size_t size);
-        int POST(String payload);
-        int sendRequest(const char * type, String payload);
-        int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
-        int sendRequest(const char * type, Stream * stream, size_t size = 0);
+    /// request handling
+    int GET();
+    int POST(uint8_t * payload, size_t size);
+    int POST(String payload);
+    int PUT(uint8_t * payload, size_t size);
+    int PUT(String payload);
+    int sendRequest(const char * type, String payload);
+    int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
+    int sendRequest(const char * type, Stream * stream, size_t size = 0);
 
-        void addHeader(const String& name, const String& value, bool first = false);
+    void addHeader(const String& name, const String& value, bool first = false, bool replace = true);
 
-        /// Response handling
-        void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
-        String header(const char* name);   // get request header value by name
-        String header(size_t i);              // get request header value by number
-        String headerName(size_t i);          // get request header name by number
-        int headers();                     // get header count
-        bool hasHeader(const char* name);  // check if header exists
-
-
-        int getSize(void);
-
-        WiFiClient & getStream(void)  __attribute__ ((deprecated)) ;
-        WiFiClient * getStreamPtr(void);
-        int writeToStream(Stream * stream);
-        String getString(void);
-
-        static String errorToString(int error);
-
-    protected:
-
-        struct RequestArgument {
-          String key;
-          String value;
-        };
+    /// Response handling
+    void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);
+    String header(const char* name);   // get request header value by name
+    String header(size_t i);              // get request header value by number
+    String headerName(size_t i);          // get request header name by number
+    int headers();                     // get header count
+    bool hasHeader(const char* name);  // check if header exists
 
 
-        WiFiClient * _tcp;
-        WiFiClientSecure * _tcps;
+    int getSize(void);
 
-        /// request handling
-        String _host;
-        uint16_t _port;
-        bool _reuse;
-        uint16_t _tcpTimeout;
-        bool _useHTTP10;
+    WiFiClient& getStream(void);
+    WiFiClient* getStreamPtr(void);
+    int writeToStream(Stream* stream);
+    String getString(void);
 
-        String _url;
-        bool _https;
-        String _httpsFingerprint;
+    static String errorToString(int error);
 
-        String _Headers;
-        String _userAgent;
-        String _base64Authorization;
+protected:
+    struct RequestArgument {
+        String key;
+        String value;
+    };
 
-        /// Response handling
-        RequestArgument* _currentHeaders;
-        size_t           _headerKeysCount;
+    bool beginInternal(String url, const char* expectedProtocol);
+    void clear();
+    int returnError(int error);
+    bool connect(void);
+    bool sendHeader(const char * type);
+    int handleHeaderResponse();
+    int writeToStreamDataBlock(Stream * stream, int len);
 
-        int _returnCode;
-        int _size;
-        bool _canReuse;
-        transferEncoding_t _transferEncoding;
 
-        int returnError(int error);
-        bool connect(void);
-        bool sendHeader(const char * type);
-        int handleHeaderResponse();
-        int writeToStreamDataBlock(Stream * stream, int len);
+    TransportTraitsPtr _transportTraits;
+    std::unique_ptr<WiFiClient> _tcp;
+
+    /// request handling
+    String _host;
+    uint16_t _port = 0;
+    bool _reuse = false;
+    uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
+    bool _useHTTP10 = false;
+
+    String _uri;
+    String _protocol;
+    String _headers;
+    String _userAgent = "ESP8266HTTPClient";
+    String _base64Authorization;
+
+    /// Response handling
+    RequestArgument* _currentHeaders = nullptr;
+    size_t           _headerKeysCount = 0;
+
+    int _returnCode = 0;
+    int _size = -1;
+    bool _canReuse = false;
+    transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
 };
 
 

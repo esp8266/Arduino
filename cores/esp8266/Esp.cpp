@@ -23,6 +23,7 @@
 #include "eboot_command.h"
 #include <memory>
 #include "interrupts.h"
+#include "MD5Builder.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -112,6 +113,24 @@ void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
     esp_yield();
 }
 
+bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
+{
+    if (size + offset > 512) {
+        return false;
+    } else {
+        return system_rtc_mem_read(64 + offset, data, size);
+    }
+}
+
+bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
+{
+    if (size + offset > 512) {
+        return false;
+    } else {
+        return system_rtc_mem_write(64 + offset, data, size);
+    }
+}
+
 extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
 {
@@ -138,6 +157,19 @@ uint32_t EspClass::getFreeHeap(void)
 uint32_t EspClass::getChipId(void)
 {
     return system_get_chip_id();
+}
+
+extern "C" uint32_t core_version;
+extern "C" const char* core_release;
+
+String EspClass::getCoreVersion()
+{
+    if (core_release != NULL) {
+        return String(core_release);
+    }
+    char buf[12];
+    snprintf(buf, sizeof(buf), "%08x", core_version);
+    return String(buf);
 }
 
 const char * EspClass::getSdkVersion(void)
@@ -217,12 +249,10 @@ uint32_t EspClass::magicFlashChipSize(uint8_t byte) {
             return (2_MB);
         case 0x4: // 32 MBit (4MB)
             return (4_MB);
-        case 0x5: // 64 MBit (8MB)
+        case 0x8: // 64 MBit (8MB)
             return (8_MB);
-        case 0x6: // 128 MBit (16MB)
+        case 0x9: // 128 MBit (16MB)
             return (16_MB);
-        case 0x7: // 256 MBit (32MB)
-            return (32_MB);
         default: // fail?
             return 0;
     }
@@ -331,19 +361,19 @@ bool EspClass::checkFlashConfig(bool needsEquals) {
 
 String EspClass::getResetReason(void) {
     char buff[32];
-    if (resetInfo.reason == REASON_DEFAULT_RST) { // normal startup by power on 
+    if (resetInfo.reason == REASON_DEFAULT_RST) { // normal startup by power on
       strcpy_P(buff, PSTR("Power on"));
     } else if (resetInfo.reason == REASON_WDT_RST) { // hardware watch dog reset
       strcpy_P(buff, PSTR("Hardware Watchdog"));
-    } else if (resetInfo.reason == REASON_EXCEPTION_RST) { // exception reset, GPIO status won’t change 
+    } else if (resetInfo.reason == REASON_EXCEPTION_RST) { // exception reset, GPIO status won’t change
       strcpy_P(buff, PSTR("Exception"));
-    } else if (resetInfo.reason == REASON_SOFT_WDT_RST) { // software watch dog reset, GPIO status won’t change 
+    } else if (resetInfo.reason == REASON_SOFT_WDT_RST) { // software watch dog reset, GPIO status won’t change
       strcpy_P(buff, PSTR("Software Watchdog"));
-    } else if (resetInfo.reason == REASON_SOFT_RESTART) { // software restart ,system_restart , GPIO status won’t change 
+    } else if (resetInfo.reason == REASON_SOFT_RESTART) { // software restart ,system_restart , GPIO status won’t change
       strcpy_P(buff, PSTR("Software/System restart"));
-    } else if (resetInfo.reason == REASON_DEEP_SLEEP_AWAKE) { // wake up from deep-sleep 
+    } else if (resetInfo.reason == REASON_DEEP_SLEEP_AWAKE) { // wake up from deep-sleep
       strcpy_P(buff, PSTR("Deep-Sleep Wake"));
-    } else if (resetInfo.reason == REASON_EXT_SYS_RST) { // external system reset 
+    } else if (resetInfo.reason == REASON_EXT_SYS_RST) { // external system reset
       strcpy_P(buff, PSTR("External System"));
     } else {
       strcpy_P(buff, PSTR("Unknown"));
@@ -412,7 +442,7 @@ uint32_t EspClass::getSketchSize() {
         DEBUG_SERIAL.printf("section=%u size=%u pos=%u\r\n", section_index, section_header.size, pos);
 #endif
     }
-    result = pos;
+    result = (pos + 16) & ~15;
     return result;
 }
 
@@ -487,4 +517,33 @@ bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
     int rc = spi_flash_read(offset, (uint32_t*) data, size);
     ets_isr_unmask(FLASH_INT_MASK);
     return rc == 0;
+}
+
+String EspClass::getSketchMD5()
+{
+    static String result;
+    if (result.length()) {
+        return result;
+    }
+    uint32_t lengthLeft = getSketchSize();
+    const size_t bufSize = 512;
+    std::unique_ptr<uint8_t[]> buf(new uint8_t[bufSize]);
+    uint32_t offset = 0;
+    if(!buf.get()) {
+        return String();
+    }
+    MD5Builder md5;
+    md5.begin();
+    while( lengthLeft > 0) {
+        size_t readBytes = (lengthLeft < bufSize) ? lengthLeft : bufSize;
+        if (!flashRead(offset, reinterpret_cast<uint32_t*>(buf.get()), (readBytes + 3) & ~3)) {
+            return String();
+        }
+        md5.add(buf.get(), readBytes);
+        lengthLeft -= readBytes;
+        offset += readBytes;
+    }
+    md5.calculate();
+    result = md5.toString();
+    return result;
 }
