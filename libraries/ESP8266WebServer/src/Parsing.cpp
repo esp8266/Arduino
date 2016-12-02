@@ -31,6 +31,96 @@
 #define DEBUG_OUTPUT Serial
 #endif
 
+bool redirectRequest(WiFiClient& client, String& methodStr, String& url, String& searchStr, String& versionStr){
+    String HostStr = url.substring(5);
+	String URIStr = "/";
+    int hasURI = HostStr.indexOf('/');
+    if (hasURI != -1){
+       URIStr = HostStr.substring(hasURI);
+       HostStr = HostStr.substring(0, hasURI);
+    }  	
+	
+    String redirectRequest = methodStr + " " + URIStr;
+    if(searchStr!="") redirectRequest += "?" + searchStr;
+    redirectRequest += " " + versionStr;	
+	
+	uint8_t dataBuffer[1024];
+    String dataBufferStr;
+    int Rsize=0;
+	int Wsize=0;
+	bool header=true;
+	unsigned long timeout;
+
+    //connect to the redirection client
+	WiFiClient redirectclient;
+	if (!redirectclient.connect(HostStr.c_str(), 80)) {
+		Serial.println(">>> Redirect connection failed");
+		return false;
+	}	
+	redirectclient.print(redirectRequest+"\r\n");  //SEND HTTP REQUEST
+	
+	   		
+    //wait for request availability
+	timeout = millis();
+	while (client.available() == 0) {
+	    if (millis() - timeout > 5000) {
+	      Serial.println(">>> Client Timeout !");
+	      client.stop();
+	      return false;
+	    }
+	}
+
+
+  	// Read all the lines of the request to server and redirect it
+  	while(client.available()){
+	    Rsize = client.readBytesUntil('\n', dataBuffer, 1023);
+
+		dataBuffer[Rsize] = '\0'; //to allow conversion to string
+		dataBufferStr = (const char*) dataBuffer;
+		if(header){
+		   if(dataBufferStr.startsWith("Host:")){ //correct host to account for redirection
+		      dataBufferStr = "Host: " + HostStr + "\r";
+		      dataBufferStr.toCharArray((char*)dataBuffer, 1023);
+		      Rsize = dataBufferStr.length();		   
+		   }else if(dataBufferStr=="\r"){
+		      header=false; //end of header
+		   }
+        }
+
+		dataBuffer[Rsize] = '\n'; //add the separating char and adapt the Rsize accordingly
+		Rsize += 1;
+		if((Rsize)!=redirectclient.write((const uint8_t*)dataBuffer, Rsize)){
+		  Serial.println(">>> Mismatch in number of read/write bytes in http redirection !");	      
+		  break;
+		}			
+  	}
+		
+    //wait for response availability		
+	timeout = millis();
+	while (redirectclient.available() == 0) {
+	    if (millis() - timeout > 5000) {
+	      Serial.println(">>> Redirect Client Timeout !");
+	      redirectclient.stop();
+	      return false;
+	    }
+	}	
+	
+	
+    // Read all the lines of the reply from server and print them to Serial		
+  	while(redirectclient.available()){
+	    Rsize = redirectclient.read(dataBuffer, 1023);
+		if(Rsize!=client.write((const uint8_t*)dataBuffer, Rsize)){
+		  Serial.println(">>> Mismatch in number of read/write bytes in http response redirection !");	      		
+		  break;
+		}
+  	}	  
+    redirectclient.stop();
+    client.stop();
+  
+	return true;	
+}
+
+
 static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& dataLength, int timeout_ms)
 {
   char *buf = nullptr;
@@ -91,7 +181,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   String searchStr = "";
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
-    searchStr = urlDecode(url.substring(hasSearch + 1));
+    searchStr = url.substring(hasSearch + 1);
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
@@ -110,6 +200,19 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     method = HTTP_PATCH;
   }
   _currentMethod = method;
+
+  //allows http redirection with URL of the form:
+  //http://SERVERIP/fwd/REDIRECTIP --> very useful in meshnetwork architecture
+  //http://192.168.0.7/fwd/192.168.4.2 --> for instance, this allows to connect the chip with IP 192.168.4.2 which is connected to the softAP of node 192.168.0.7  
+  // (POST requests are also supported)
+  if(url.indexOf("/fwd/") == 0){
+     return redirectRequest(client, methodStr, url, searchStr, req.substring(addr_end + 1));
+  }
+
+  //decode the URL
+  searchStr = urlDecode(searchStr));                                                                                                     |      searchStr = url.substring(hasSearch + 1);                                                                                                                
+
+
 
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("method: ");
