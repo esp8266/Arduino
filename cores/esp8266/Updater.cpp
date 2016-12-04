@@ -360,6 +360,9 @@ size_t UpdaterClass::writeStream(Stream &data) {
                 return written;
             }
         }
+        if(_handler) {
+          _handler(UPDATE_OPERATION_WRITE, _buffer + _bufferLen, toRead);
+        }
         _bufferLen += toRead;
         if((_bufferLen == remaining() || _bufferLen == FLASH_SECTOR_SIZE) && !_writeBuffer())
             return written;
