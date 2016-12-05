@@ -67,4 +67,18 @@ void Ticker::detach()
 	os_timer_disarm(_timer);
 	delete _timer;
 	_timer = 0;
+	internalTicker = nullptr;
+}
+
+void Ticker::internalCallback(void* arg)
+{
+	Ticker* pTicker = (Ticker*)arg;
+	if (pTicker == nullptr)
+	{
+		return;
+	}
+	if (pTicker->internalTicker)
+	{
+		pTicker->internalTicker();
+	}
 }
