@@ -342,7 +342,12 @@ espduino.name=ESPDuino (ESP-13 Module)
 
 espduino.upload.tool=esptool
 espduino.upload.speed=115200
-espduino.upload.resetmethod=ck
+
+espduino.menu.ResetMethod.ck=ESPduino-V1
+espduino.menu.ResetMethod.ck.upload.resetmethod=nodemcu
+espduino.menu.ResetMethod.ESPduino=ESPduino-V2
+espduino.menu.ResetMethod.ESPduino.upload.resetmethod=nodemcu
+
 espduino.upload.maximum_size=1044464
 espduino.upload.maximum_data_size=81920
 espduino.upload.wait_for_upload_port=true
