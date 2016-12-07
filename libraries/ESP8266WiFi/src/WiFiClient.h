@@ -63,6 +63,7 @@ public:
     return peekBytes((uint8_t *) buffer, length);
   }
   virtual void flush();
+  virtual void abort();
   virtual void stop();
   virtual uint8_t connected();
   virtual operator bool();
