@@ -25,7 +25,6 @@
 #include <stdlib.h>
 
 #define SPI_HAS_TRANSACTION
-#define SPI_SKIP_INITIAL_BUSY_CHECK //comment this line for backward compatibility if really needed
 
 // This defines are not representing the real Divider of the ESP8266
 // the Defines match to an AVR Arduino on 16MHz for better compatibility
@@ -75,9 +74,9 @@ public:
   void endTransaction(void);
 private:
   bool useHwCs;
-  inline void writeBytes_(uint8_t * data, uint32_t size);
-  inline void transferBytes_(uint8_t * out, uint8_t * in, uint32_t size);
-  inline void setDataBits(uint32_t bits);
+  void writeBytes_(uint8_t * data, uint8_t size);
+  void transferBytes_(uint8_t * out, uint8_t * in, uint8_t size);
+  inline void setDataBits(uint16_t bits);
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPI)
