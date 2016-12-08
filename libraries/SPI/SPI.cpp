@@ -217,14 +217,16 @@ void SPIClass::setClockDivider(uint32_t clockDiv) {
     SPI1CLK = clockDiv;
 }
 
-inline void SPIClass::setDataBits(uint16_t bits) {
+inline void SPIClass::setDataBits(uint32_t bits) {
     const uint32_t mask = ~((SPIMMOSI << SPILMOSI) | (SPIMMISO << SPILMISO));
     bits--;
     SPI1U1 = ((SPI1U1 & mask) | ((bits << SPILMOSI) | (bits << SPILMISO)));
 }
 
 uint8_t SPIClass::transfer(uint8_t data) {
+#ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
+#endif
     // reset to 8Bit mode
     setDataBits(8);
     SPI1W0 = data;
@@ -256,7 +258,9 @@ uint16_t SPIClass::transfer16(uint16_t data) {
 }
 
 void SPIClass::write(uint8_t data) {
+#ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
+#endif
     // reset to 8Bit mode
     setDataBits(8);
     SPI1W0 = data;
@@ -269,7 +273,9 @@ void SPIClass::write16(uint16_t data) {
 }
 
 void SPIClass::write16(uint16_t data, bool msb) {
+#ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
+#endif
     // Set to 16Bits transfer
     setDataBits(16);
     if(msb) {
@@ -289,7 +295,9 @@ void SPIClass::write32(uint32_t data) {
 }
 
 void SPIClass::write32(uint32_t data, bool msb) {
+#ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
+#endif
     // Set to 32Bits transfer
     setDataBits(32);
     if(msb) {
@@ -311,43 +319,45 @@ void SPIClass::write32(uint32_t data, bool msb) {
 
 /**
  * Note:
- *  data need to be aligned to 32Bit
- *  or you get an Fatal exception (9)
+ *  data needs to be aligned to 32 bit boundaries like this: char outBuffer[spiBufferSize] __attribute__ ((aligned (4)));
+ *  if not you may get an Fatal exception (9)
  * @param data uint8_t *
  * @param size uint32_t
  */
 void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
+	uint32_t localSize;
     while(size) {
-        if(size > 64) {
-            writeBytes_(data, 64);
-            size -= 64;
-            data += 64;
-        } else {
-            writeBytes_(data, size);
-            size = 0;
-        }
-    }
+        if(size > 64)
+			localSize = 64;
+		else
+			localSize = size;
+			
+        writeBytes_(data, localSize);
+        size -= localSize;
+		if ((size != 0) && (data)) data += localSize;
+	}
 }
 
-void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
+
+inline void SPIClass::writeBytes_(uint8_t * data, uint32_t size) {
+#ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
-    // Set Bits to transfer
+#endif
+    // Set bits to transfer
     setDataBits(size * 8);
 
-    volatile uint32_t * fifoPtr = &SPI1W0;
-    uint32_t * dataPtr = (uint32_t*) data;
-    uint8_t dataSize = ((size + 3) / 4);
-
-    while(dataSize--) {
-        *fifoPtr = *dataPtr;
-        dataPtr++;
-        fifoPtr++;
-    }
-
+	if(data) {
+		memcpy((uint8_t*)&SPI1W0, data, size);
+	} 
+	else {
+		// no data buffer specified, transmit dummy data
+		memset((uint8_t*)&SPI1W0, 0xFFFFFFFF, size);
+	}
+	// Start SPI transfer
     SPI1CMD |= SPIBUSY;
+	// and wait for transfer to complete
     while(SPI1CMD & SPIBUSY) {}
 }
-
 /**
  * @param data uint8_t *
  * @param size uint8_t  max for size is 64Byte
@@ -355,9 +365,9 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
  */
 void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
     if(size > 64) return; //max Hardware FIFO
-
+#ifndef SPI_SKIP_INITIAL_BUSY_CHECK
     while(SPI1CMD & SPIBUSY) {}
-
+#endif
     uint32_t buffer[16];
     uint8_t *bufferPtr=(uint8_t *)&buffer;
     uint8_t *dataPtr = data;
@@ -426,61 +436,53 @@ void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
 
 /**
  * Note:
- *  in and out need to be aligned to 32Bit
- *  or you get an Fatal exception (9)
- * @param out uint8_t *
- * @param in  uint8_t *
+ *  in and out need to be aligned to 32 bit boundaries like this: char outBuffer[spiBufferSize] __attribute__ ((aligned (4)));
+ *  if not you may get an Fatal exception (9)
+ * @param out uint32_t *
+ * @param in  uint32_t *
  * @param size uint32_t
  */
 void SPIClass::transferBytes(uint8_t * out, uint8_t * in, uint32_t size) {
+	uint32_t localSize;
     while(size) {
-        if(size > 64) {
-            transferBytes_(out, in, 64);
-            size -= 64;
-            if(out) out += 64;
-            if(in) in += 64;
-        } else {
-            transferBytes_(out, in, size);
-            size = 0;
-        }
-    }
+        if(size > 64)
+			localSize = 64;
+		else
+			localSize = size;
+			
+        transferBytes_(out, in, localSize);
+        size -= localSize;
+		if (size != 0)
+		{
+			if(out) out += localSize;
+			if(in) in += localSize;
+		}
+	}
 }
 
-void SPIClass::transferBytes_(uint8_t * out, uint8_t * in, uint8_t size) {
-    while(SPI1CMD & SPIBUSY) {}
-    // Set in/out Bits to transfer
 
+inline void SPIClass::transferBytes_(uint8_t * out, uint8_t * in, uint32_t size) {
+#ifndef SPI_SKIP_INITIAL_BUSY_CHECK
+    while(SPI1CMD & SPIBUSY) {}
+#endif
+    // Set bits to transfer
     setDataBits(size * 8);
 
-    volatile uint32_t * fifoPtr = &SPI1W0;
-    uint8_t dataSize = ((size + 3) / 4);
-
-    if(out) {
-        uint32_t * dataPtr = (uint32_t*) out;
-        while(dataSize--) {
-            *fifoPtr = *dataPtr;
-            dataPtr++;
-            fifoPtr++;
-        }
-    } else {
-        // no out data only read fill with dummy data!
-        while(dataSize--) {
-            *fifoPtr = 0xFFFFFFFF;
-            fifoPtr++;
-        }
-    }
-
+	if(out) {
+		memcpy((uint8_t*)&SPI1W0, out, size);
+	} 
+	else {
+		// no out buffer specified, transmit dummy data
+		memset((uint8_t*)&SPI1W0, 0xFFFFFFFF, size);
+	}
+	// Start SPI transfer
     SPI1CMD |= SPIBUSY;
+	// and wait for transfer to complete
     while(SPI1CMD & SPIBUSY) {}
-
-    if(in) {
-        volatile uint8_t * fifoPtr8 = (volatile uint8_t *) &SPI1W0;
-        dataSize = size;
-        while(dataSize--) {
-            *in = *fifoPtr8;
-            in++;
-            fifoPtr8++;
-        }
+	
+	// then return received data
+	if(in) {
+		memcpy((uint8_t*)in, (uint8_t*)&SPI1W0, size);
     }
 }
 
