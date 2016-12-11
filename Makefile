@@ -4,6 +4,7 @@ AR := $(TOOLCHAIN_PREFIX)ar
 LD := $(TOOLCHAIN_PREFIX)gcc
 OBJCOPY := $(TOOLCHAIN_PREFIX)objcopy
 
+MFORCE32 := $(shell $(CC) --help=target | grep mforce-l32)
 
 XTENSA_LIBS ?= $(shell $(CC) -print-sysroot)
 
@@ -43,6 +44,14 @@ LDFLAGS  += 	-L$(XTENSA_LIBS)/lib \
 CFLAGS+=-std=c99 -DESP8266
 
 CFLAGS += -Wall -Os -g -O2 -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals  -D__ets__ -DICACHE_FLASH
+
+ifneq ($(MFORCE32),)
+    # Your compiler supports the -mforce-l32 flag which means that 
+    # constants can be stored in flash (program) memory instead of SRAM.
+    # See: https://www.arduino.cc/en/Reference/PROGMEM
+    CFLAGS += -DPROGMEM="__attribute__((aligned(4))) __attribute__((section(\".irom.text\")))" -mforce-l32
+endif
+
 BIN_DIR := bin
 AXTLS_AR := $(BIN_DIR)/libaxtls.a
 

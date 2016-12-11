@@ -230,6 +230,10 @@ void exit_now(const char *format, ...);
 #define SSL_CTX_UNLOCK(A)
 #endif
 
+#ifndef PROGMEM
+#define PROGMEM
+#endif
+
 #ifdef __cplusplus
 }
 #endif

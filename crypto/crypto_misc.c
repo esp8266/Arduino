@@ -309,7 +309,7 @@ EXP_FUNC void STDCALL print_blob(const char *format, const unsigned char *data,
 
 #if defined(CONFIG_SSL_HAS_PEM) || defined(CONFIG_HTTP_HAS_AUTHORIZATION)
 /* base64 to binary lookup table */
-static const uint8_t map[128] =
+static const uint8_t map[128] PROGMEM =
 {
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
