@@ -499,7 +499,7 @@ s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
               spiffs_get_cache_page(fs, spiffs_get_cache(fs), fd->cache_page->ix),
               fd->cache_page->offset, fd->cache_page->size);
           spiffs_cache_fd_release(fs, fd->cache_page);
-          SPIFFS_API_CHECK_RES(fs, res);
+          SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
         } else {
           // writing within cache
           alloc_cpage = 0;
@@ -530,7 +530,7 @@ s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
         return len;
       } else {
         res = spiffs_hydro_write(fs, fd, buf, offset, len);
-        SPIFFS_API_CHECK_RES(fs, res);
+        SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
         fd->fdoffset += len;
         SPIFFS_UNLOCK(fs);
         return res;
@@ -545,16 +545,16 @@ s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
             spiffs_get_cache_page(fs, spiffs_get_cache(fs), fd->cache_page->ix),
             fd->cache_page->offset, fd->cache_page->size);
         spiffs_cache_fd_release(fs, fd->cache_page);
-        SPIFFS_API_CHECK_RES(fs, res);
+        SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
         res = spiffs_hydro_write(fs, fd, buf, offset, len);
-        SPIFFS_API_CHECK_RES(fs, res);
+        SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
       }
     }
   }
 #endif
 
   res = spiffs_hydro_write(fs, fd, buf, offset, len);
-  SPIFFS_API_CHECK_RES(fs, res);
+  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
   fd->fdoffset += len;
 
   SPIFFS_UNLOCK(fs);
@@ -572,7 +572,7 @@ s32_t SPIFFS_lseek(spiffs *fs, spiffs_file fh, s32_t offs, int whence) {
   s32_t res;
   fh = SPIFFS_FH_UNOFFS(fs, fh);
   res = spiffs_fd_get(fs, fh, &fd);
-  SPIFFS_API_CHECK_RES(fs, res);
+  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
 
 #if SPIFFS_CACHE_WR
   spiffs_fflush_cache(fs, fh);
@@ -1160,11 +1160,10 @@ s32_t SPIFFS_vis(spiffs *fs) {
   spiffs_printf("free_blocks: %i\n", fs->free_blocks);
   spiffs_printf("page_alloc:  %i\n", fs->stats_p_allocated);
   spiffs_printf("page_delet:  %i\n", fs->stats_p_deleted);
+  SPIFFS_UNLOCK(fs);
   u32_t total, used;
   SPIFFS_info(fs, &total, &used);
   spiffs_printf("used:        %i of %i\n", used, total);
-
-  SPIFFS_UNLOCK(fs);
   return res;
 }
 #endif
