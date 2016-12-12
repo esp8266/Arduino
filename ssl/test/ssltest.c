@@ -1587,7 +1587,7 @@ static int SSL_client_test(
 #endif
     }
     
-    usleep(200000);           /* allow server to start */
+    usleep(500000);           /* allow server to start */
 
     if (*ssl_ctx == NULL)
     {
@@ -1649,7 +1649,8 @@ static int SSL_client_test(
         goto client_test_exit;
     }
 
-    ssl = ssl_client_new(*ssl_ctx, client_fd, session_id, sizeof(session_id));
+    ssl = ssl_client_new(*ssl_ctx, client_fd, 
+            session_id, sizeof(session_id), NULL);
 
     /* check the return status */
     if ((ret = ssl_handshake_status(ssl)))
@@ -1938,7 +1939,7 @@ static void do_basic(void)
                                         "../ssl/test/axTLS.ca_x509.cer", NULL))
         goto error;
 
-    ssl_clnt = ssl_client_new(ssl_clnt_ctx, client_fd, NULL, 0);
+    ssl_clnt = ssl_client_new(ssl_clnt_ctx, client_fd, NULL, 0, NULL);
 
     /* check the return status */
     if (ssl_handshake_status(ssl_clnt) < 0)
@@ -2062,7 +2063,7 @@ static void do_unblocked(void)
                                         "../ssl/test/axTLS.ca_x509.cer", NULL))
         goto error;
 
-    ssl_clnt = ssl_client_new(ssl_clnt_ctx, client_fd, NULL, 0);
+    ssl_clnt = ssl_client_new(ssl_clnt_ctx, client_fd, NULL, 0, NULL);
 
     while (ssl_handshake_status(ssl_clnt) != SSL_OK)
     {
@@ -2182,7 +2183,7 @@ void do_multi_clnt(multi_t *multi_data)
         goto client_test_exit;
 
     usleep(200000);
-    ssl = ssl_client_new(multi_data->ssl_clnt_ctx, client_fd, NULL, 0);
+    ssl = ssl_client_new(multi_data->ssl_clnt_ctx, client_fd, NULL, 0, NULL);
 
     if ((res = ssl_handshake_status(ssl)))
     {

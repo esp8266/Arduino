@@ -173,9 +173,12 @@ typedef struct
     uint8_t key_block_generated;
 } DISPOSABLE_CTX;
 
-typedef struct {
+typedef struct 
+{
     char *host_name; /* Needed for the SNI support */
-    uint16_t max_fragment_size; /* Needed for the Max Fragment Size Extension. Allowed values: 2^9, 2^10 .. 2^14 */
+    /* Needed for the Max Fragment Size Extension. 
+       Allowed values: 2^9, 2^10 .. 2^14 */
+    uint16_t max_fragment_size; 
 } SSL_EXTENSIONS;
 
 struct _SSL

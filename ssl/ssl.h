@@ -231,7 +231,7 @@ EXP_FUNC void STDCALL ssl_ctx_free(SSL_CTX *ssl_ctx);
  * @return ssl_ext Pointer to SSL_EXTENSIONS structure
  *
  */
-EXP_FUNC SSL_EXTENSIONS * STDCALL ssl_ext_new();
+EXP_FUNC SSL_EXTENSIONS * STDCALL ssl_ext_new(void);
 
 /**
  * @brief Set the host name for SNI extension
@@ -281,7 +281,8 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
  * can be null if no session resumption is being used or required. This option
  * is not used in skeleton mode.
  * @param sess_id_size The size of the session id (max 32)
- * @param ssl_ext pointer to a structure with the activated SSL extensions and their values
+ * @param ssl_ext pointer to a structure with the activated SSL extensions 
+ * and their values
  * @return An SSL object reference. Use ssl_handshake_status() to check 
  * if a handshake succeeded.
  */
@@ -373,8 +374,8 @@ EXP_FUNC uint8_t STDCALL ssl_get_session_id_size(const SSL *ssl);
  * @return The cipher id. This will be one of the following:
  * - SSL_AES128_SHA (0x2f)
  * - SSL_AES256_SHA (0x35)
- * - SSL_RC4_128_SHA (0x05)
- * - SSL_RC4_128_MD5 (0x04)
+ * - SSL_AES128_SHA256 (0x3c)
+ * - SSL_AES256_SHA256 (0x3d)
  */
 EXP_FUNC uint8_t STDCALL ssl_get_cipher_id(const SSL *ssl);
 

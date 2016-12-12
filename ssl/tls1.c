@@ -158,11 +158,13 @@ EXP_FUNC SSL_EXTENSIONS * STDCALL ssl_ext_new()
  */
 EXP_FUNC void STDCALL ssl_ext_free(SSL_EXTENSIONS *ssl_ext)
 {
-    if(ssl_ext == NULL ) {
+    if (ssl_ext == NULL ) 
+    {
         return;
     }
 
-    if(ssl_ext->host_name != NULL) {
+    if (ssl_ext->host_name != NULL) 
+    {
         free(ssl_ext->host_name);
     }
     free(ssl_ext);
