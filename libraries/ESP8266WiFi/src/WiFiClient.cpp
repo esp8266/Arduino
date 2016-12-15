@@ -269,6 +269,15 @@ void WiFiClient::stop()
     _client = 0;
 }
 
+void WiFiClient::stop_abort()  //Compare this to ::stop
+{
+    if (!_client)
+        return;
+
+    _client->unref_abort();
+    _client = 0;
+}
+
 uint8_t WiFiClient::connected()
 {
     if (!_client)

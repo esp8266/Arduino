@@ -64,6 +64,7 @@ public:
   }
   virtual void flush();
   virtual void stop();
+  virtual void stop_abort();
   virtual uint8_t connected();
   virtual operator bool();
 

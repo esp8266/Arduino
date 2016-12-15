@@ -86,6 +86,27 @@ public:
         }
         return err;
     }
+    
+    err_t close_abort()
+    {
+          /* ERR_ABRT must be sent back on abortion as specified in the comments
+           * of tools/sdk/lwip/src/core/tcp.c at the footnote of tcp_abort() */
+          err_t err = ERR_ABRT;
+          if(_pcb) {
+              DEBUGV(":close\r\n");
+              tcp_arg(_pcb, NULL);
+              tcp_sent(_pcb, NULL);
+              tcp_recv(_pcb, NULL);
+              tcp_err(_pcb, NULL);
+              tcp_close(_pcb);
+              /* Without delay some clients fail to receive the response and 
+               * report a 'cannot connect' error message */
+              delay(10);
+              tcp_abort(_pcb);
+              _pcb = 0;
+          }
+          return err;
+	}
 
     ~ClientContext()
     {
@@ -123,6 +144,21 @@ public:
             }
         }
     }
+    
+    void unref_abort()
+    {
+		if(this != 0) {
+		    DEBUGV(":ur_abrt %d\r\n", _refcnt);
+		    if(--_refcnt == 0) {
+		        flush();
+		        close_abort();
+		        if(_discard_cb)
+		            _discard_cb(_discard_cb_arg, this);
+		        DEBUGV(":del\r\n");
+		        delete this;
+		    }
+		}
+	}
 
     void setNoDelay(bool nodelay)
     {
