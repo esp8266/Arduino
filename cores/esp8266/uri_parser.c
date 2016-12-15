@@ -102,7 +102,10 @@ parsed_uri_t *parse_uri(const char *url)
 				} else if(bracket_flag == 0 && *curr_ptr == '#') {
 					puri->username = NULL;
 					JUMP_NEXT_STATE(puri->fragment, PARSE_FRAGMENT);
-				}
+				} else if(bracket_flag == 0 && *curr_ptr == '/') {
+                    puri->username = NULL;
+                    JUMP_NEXT_STATE(puri->path, PARSE_PATH);
+                }
 				curr_ptr ++;
 				break;
 			case PARSE_PASSWORD_OR_PORT: /* password or port */
