@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2015, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -80,8 +80,8 @@ static const uint8_t sig_subject_alt_name[] =
     0x55, 0x1d, 0x11
 };
 
-/* CN, O, OU */
-static const uint8_t g_dn_types[] = { 3, 10, 11 };
+/* CN, O, OU, L, C, ST */
+static const uint8_t g_dn_types[] = { 3, 10, 11, 7, 6, 8 };
 
 uint32_t get_asn1_length(const uint8_t *buf, int *offset)
 {
@@ -300,13 +300,19 @@ static int asn1_get_utc_time(const uint8_t *buf, int *offset, time_t *t)
 int asn1_version(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
 {
     int ret = X509_NOT_OK;
+    int len;
 
     (*offset) += 2;        /* get past explicit tag */
-    if (asn1_skip_obj(cert, offset, ASN1_INTEGER))
-        goto end_version;
+    if (cert[(*offset)++] != ASN1_INTEGER)
+		return X509_NOT_OK;
 
-    ret = X509_OK;
-end_version:
+	len = get_asn1_length(cert, offset);
+	if (len == 1)
+	{
+		ret = cert[*offset];
+	}
+
+	*offset += len;
     return ret;
 }
 

@@ -650,7 +650,6 @@ static void do_client(int argc, char *argv[])
                 }
 
                 ssl_free(ssl);
-                ssl_ext_free(extensions);
                 exit(1);
             }
 
@@ -660,7 +659,6 @@ static void do_client(int argc, char *argv[])
             if (reconnect)
             {
                 ssl_free(ssl);
-                ssl_ext_free(extensions);
                 SOCKET_CLOSE(client_fd);
 
                 client_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -687,13 +685,6 @@ static void do_client(int argc, char *argv[])
 
     if (!quiet)
     {
-        const char *common_name = ssl_get_cert_dn(ssl,
-                SSL_X509_CERT_COMMON_NAME);
-        if (common_name)
-        {
-            printf("Common Name:\t\t\t%s\n", common_name);
-        }
-
         display_session_id(ssl);
         display_cipher(ssl);
     }
@@ -766,7 +757,6 @@ static void do_client(int argc, char *argv[])
     }
 
     ssl_ctx_free(ssl_ctx);
-    ssl_ext_free(extensions);
     SOCKET_CLOSE(client_fd);
 #else
     print_client_options(argv[1]);

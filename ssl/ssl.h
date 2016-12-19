@@ -159,9 +159,15 @@ extern "C" {
 #define SSL_X509_CERT_COMMON_NAME               0
 #define SSL_X509_CERT_ORGANIZATION              1
 #define SSL_X509_CERT_ORGANIZATIONAL_NAME       2
-#define SSL_X509_CA_CERT_COMMON_NAME            3
-#define SSL_X509_CA_CERT_ORGANIZATION           4
-#define SSL_X509_CA_CERT_ORGANIZATIONAL_NAME    5
+#define SSL_X509_CERT_LOCATION                  3
+#define SSL_X509_CERT_COUNTRY                   4
+#define SSL_X509_CERT_STATE                     5
+#define SSL_X509_CA_CERT_COMMON_NAME            6
+#define SSL_X509_CA_CERT_ORGANIZATION           7
+#define SSL_X509_CA_CERT_ORGANIZATIONAL_NAME    8
+#define SSL_X509_CA_CERT_LOCATION               9
+#define SSL_X509_CA_CERT_COUNTRY                10
+#define SSL_X509_CA_CERT_STATE                  11
 
 /* SSL object loader types */
 #define SSL_OBJ_X509_CERT                       1
@@ -454,9 +460,15 @@ EXP_FUNC int STDCALL ssl_match_spki_sha256(const SSL *ssl, const uint8_t* hash);
  * - SSL_X509_CERT_COMMON_NAME
  * - SSL_X509_CERT_ORGANIZATION
  * - SSL_X509_CERT_ORGANIZATIONAL_NAME
+ * - SSL_X509_CERT_LOCATION
+ * - SSL_X509_CERT_COUNTRY
+ * - SSL_X509_CERT_STATE
  * - SSL_X509_CA_CERT_COMMON_NAME
  * - SSL_X509_CA_CERT_ORGANIZATION
  * - SSL_X509_CA_CERT_ORGANIZATIONAL_NAME
+ * - SSL_X509_CA_CERT_LOCATION
+ * - SSL_X509_CA_CERT_COUNTRY
+ * - SSL_X509_CA_CERT_STATE
  * @return The appropriate string (or null if not defined)
  * @note Verification build mode must be enabled.
  */

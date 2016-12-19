@@ -60,10 +60,13 @@ extern "C" {
 /*
  * The Distinguished Name
  */
-#define X509_NUM_DN_TYPES                   3
+#define X509_NUM_DN_TYPES                   6
 #define X509_COMMON_NAME                    0
 #define X509_ORGANIZATION                   1
 #define X509_ORGANIZATIONAL_UNIT            2
+#define X509_LOCATION                       3
+#define X509_COUNTRY                        4
+#define X509_STATE                          5
 
 struct _x509_ctx
 {
