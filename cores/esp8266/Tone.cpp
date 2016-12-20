@@ -82,7 +82,12 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
         timer1_isr_init();
         timer1_attachInterrupt(t1IntHandler);
         timer1_enable(TIM_DIV1, TIM_EDGE, TIM_LOOP);
-        timer1_write((clockCyclesPerMicrosecond() * 500000) / frequency);
+        if (frequency == 0) {
+          timer1_write((clockCyclesPerMicrosecond() * 500000));
+        }
+        else {
+          timer1_write((clockCyclesPerMicrosecond() * 500000) / frequency);
+        }
         break;
     }
   }
