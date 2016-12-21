@@ -349,7 +349,7 @@ int HTTPClient::PUT(uint8_t * payload, size_t size) {
 }
 
 int HTTPClient::PUT(String payload) {
-    return POST((uint8_t *) payload.c_str(), payload.length());
+    return PUT((uint8_t *) payload.c_str(), payload.length());
 }
 
 /**
