@@ -1,11 +1,11 @@
-/* 
+/*
   i2s.c - Software I2S library for esp8266
-  
+
   Code taken and reworked from espessif's I2S example
-  
+
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -52,7 +52,7 @@ struct slc_queue_item {
 
 static uint32_t i2s_slc_queue[SLC_BUF_CNT-1];
 static uint8_t i2s_slc_queue_len;
-static uint32_t *i2s_slc_buf_pntr[SLC_BUF_CNT]; //Pointer to the I2S DMA buffer data
+static uint32_t i2s_slc_buf_pntr[SLC_BUF_CNT][SLC_BUF_LEN]; //I2S DMA buffer data
 static struct slc_queue_item i2s_slc_items[SLC_BUF_CNT]; //I2S DMA buffer descriptors
 static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
 static int i2s_curr_slc_buf_pos=0; //position in the current buffer
@@ -95,9 +95,8 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
 void ICACHE_FLASH_ATTR i2s_slc_begin(){
   i2s_slc_queue_len = 0;
   int x, y;
-  
+
   for (x=0; x<SLC_BUF_CNT; x++) {
-    i2s_slc_buf_pntr[x] = malloc(SLC_BUF_LEN*4);
     for (y=0; y<SLC_BUF_LEN; y++) i2s_slc_buf_pntr[x][y] = 0;
 
     i2s_slc_items[x].unused = 0;
@@ -148,7 +147,7 @@ void ICACHE_FLASH_ATTR i2s_slc_end(){
   SLCRXL &= ~(SLCRXLAM << SLCRXLA); // clear RX descriptor address
 }
 
-//This routine pushes a single, 32-bit sample to the I2S buffers. Call this at (on average) 
+//This routine pushes a single, 32-bit sample to the I2S buffers. Call this at (on average)
 //at least the current sample rate. You can also call it quicker: it will suspend the calling
 //thread if the buffer is full and resume when there's room again.
 
@@ -216,20 +215,20 @@ void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
 void ICACHE_FLASH_ATTR i2s_begin(){
   _i2s_sample_rate = 0;
   i2s_slc_begin();
-  
+
   pinMode(2, FUNCTION_1); //I2SO_WS (LRCK)
   pinMode(3, FUNCTION_1); //I2SO_DATA (SDIN)
   pinMode(15, FUNCTION_1); //I2SO_BCK (SCLK)
-  
+
   I2S_CLK_ENABLE();
   I2SIC = 0x3F;
   I2SIE = 0;
-  
+
   //Reset I2S
   I2SC &= ~(I2SRST);
   I2SC |= I2SRST;
   I2SC &= ~(I2SRST);
-  
+
   I2SFC &= ~(I2SDE | (I2STXFMM << I2STXFM) | (I2SRXFMM << I2SRXFM)); //Set RX/TX FIFO_MOD=0 and disable DMA (FIFO only)
   I2SFC |= I2SDE; //Enable DMA
   I2SCC &= ~((I2STXCMM << I2STXCM) | (I2SRXCMM << I2SRXCM)); //Set RX/TX CHAN_MOD=0
