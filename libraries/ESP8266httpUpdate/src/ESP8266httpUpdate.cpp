@@ -135,21 +135,21 @@ String ESP8266HTTPUpdate::getLastErrorString(void)
 
     switch(_lastError) {
     case HTTP_UE_TOO_LESS_SPACE:
-        return F("To less space");
+        return F("Not Enough space");
     case HTTP_UE_SERVER_NOT_REPORT_SIZE:
-        return F("Server not Report Size");
+        return F("Server Did Not Report Size");
     case HTTP_UE_SERVER_FILE_NOT_FOUND:
-        return F("File not Found (404)");
+        return F("File Not Found (404)");
     case HTTP_UE_SERVER_FORBIDDEN:
         return F("Forbidden (403)");
     case HTTP_UE_SERVER_WRONG_HTTP_CODE:
-        return F("Wrong HTTP code");
+        return F("Wrong HTTP Code");
     case HTTP_UE_SERVER_FAULTY_MD5:
-        return F("Faulty MD5");
+        return F("Wrong MD5");
     case HTTP_UE_BIN_VERIFY_HEADER_FAILED:
-        return F("Verify bin header failed");
+        return F("Verify Bin Header Failed");
     case HTTP_UE_BIN_FOR_WRONG_FLASH:
-        return F("bin for wrong flash size");
+        return F("New Binary Does Not Fit Flash Size");
     }
 
     return String();
@@ -274,7 +274,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
                     // check for valid first magic byte
                     if(buf[0] != 0xE9) {
-                        DEBUG_HTTP_UPDATE("[httpUpdate] magic header not starts with 0xE9\n");
+                        DEBUG_HTTP_UPDATE("[httpUpdate] Magic header does not start with 0xE9\n");
                         _lastError = HTTP_UE_BIN_VERIFY_HEADER_FAILED;
                         http.end();
                         return HTTP_UPDATE_FAILED;
@@ -285,7 +285,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
                     // check if new bin fits to SPI flash
                     if(bin_flash_size > ESP.getFlashChipRealSize()) {
-                        DEBUG_HTTP_UPDATE("[httpUpdate] magic header, new bin not fits SPI Flash\n");
+                        DEBUG_HTTP_UPDATE("[httpUpdate] New binary does not fit SPI Flash size\n");
                         _lastError = HTTP_UE_BIN_FOR_WRONG_FLASH;
                         http.end();
                         return HTTP_UPDATE_FAILED;
@@ -309,7 +309,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
         } else {
             _lastError = HTTP_UE_SERVER_NOT_REPORT_SIZE;
             ret = HTTP_UPDATE_FAILED;
-            DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length is 0 or not set by Server?!\n");
+            DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length was 0 or wasn't set by Server?!\n");
         }
         break;
     case HTTP_CODE_NOT_MODIFIED:
