@@ -41,6 +41,11 @@
 extern "C" {
 #endif
 
+/* some bool types - just make life easier */
+typedef char bool;
+#define false       0
+#define true        1
+
 #if defined(WIN32)
 typedef UINT8 uint8_t;
 typedef INT8 int8_t;

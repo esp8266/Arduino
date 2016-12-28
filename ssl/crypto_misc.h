@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2015, Cameron Rich
+ * Copyright (c) 2007-2016, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -56,6 +56,7 @@ extern "C" {
 #define X509_VFY_ERROR_UNSUPPORTED_DIGEST   -8
 #define X509_INVALID_PRIV_KEY               -9
 #define X509_MAX_CERTS                      -10
+#define X509_VFY_ERROR_BASIC_CONSTRAINT     -11
 
 /*
  * The Distinguished Name
@@ -68,6 +69,21 @@ extern "C" {
 #define X509_COUNTRY                        4
 #define X509_STATE                          5
 
+/*
+ * Key Usage bits
+ */
+#define IS_SET_KEY_USAGE_FLAG(A, B)          (A->key_usage & B)
+
+#define KEY_USAGE_DIGITAL_SIGNATURE         0x0001
+#define KEY_USAGE_CONTENT_COMMITMENT        0x0002
+#define KEY_USAGE_KEY_ENCIPHERMENT          0x0004
+#define KEY_USAGE_DATA_ENCIPHERMENT         0x0008
+#define KEY_USAGE_KEY_AGREEMENT             0x0010
+#define KEY_USAGE_KEY_CERT_SIGN             0x0020
+#define KEY_USAGE_CRL_SIGN                  0x0040
+#define KEY_USAGE_ENCIPHER_ONLY             0x0080
+#define KEY_USAGE_DECIPHER_ONLY             0x0100
+
 struct _x509_ctx
 {
     char *ca_cert_dn[X509_NUM_DN_TYPES];
@@ -76,12 +92,19 @@ struct _x509_ctx
     time_t not_before;
     time_t not_after;
     uint8_t *signature;
-    uint16_t sig_len;
-    uint8_t sig_type;
     RSA_CTX *rsa_ctx;
     bigint *digest;
     uint8_t *fingerprint;
     uint8_t *spki_sha256;
+    uint16_t sig_len;
+    uint8_t sig_type;
+    bool basic_constraint_present;
+    bool basic_constraint_is_critical;
+    bool key_usage_present;
+    bool key_usage_is_critical;
+    bool basic_constaint_cA;
+    int basic_constraint_pathLenConstraint;
+    uint32_t key_usage;
     struct _x509_ctx *next;
 };
 
@@ -97,7 +120,8 @@ typedef struct
 int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx);
 void x509_free(X509_CTX *x509_ctx);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert);
+int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert, 
+        int *pathLenConstraint);
 #endif
 #ifdef CONFIG_SSL_FULL_MODE
 void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx);
@@ -107,6 +131,7 @@ const char * x509_display_error(int error);
 /**************************************************************************
  * ASN1 declarations 
  **************************************************************************/
+#define ASN1_BOOLEAN            0x01
 #define ASN1_INTEGER            0x02
 #define ASN1_BIT_STRING         0x03
 #define ASN1_OCTET_STRING       0x04
@@ -139,15 +164,21 @@ uint32_t get_asn1_length(const uint8_t *buf, int *offset);
 int asn1_get_private_key(const uint8_t *buf, int len, RSA_CTX **rsa_ctx);
 int asn1_next_obj(const uint8_t *buf, int *offset, int obj_type);
 int asn1_skip_obj(const uint8_t *buf, int *offset, int obj_type);
-int asn1_get_int(const uint8_t *buf, int *offset, uint8_t **object);
-int asn1_version(const uint8_t *cert, int *offset, X509_CTX *x509_ctx);
+int asn1_get_big_int(const uint8_t *buf, int *offset, uint8_t **object);
+int asn1_get_int(const uint8_t *buf, int *offset, int32_t *val);
+int asn1_get_bool(const uint8_t *buf, int *offset, bool *val);
+int asn1_get_bit_string_as_int(const uint8_t *buf, int *offset, uint32_t *val);
+int asn1_version(const uint8_t *cert, int *offset, int *val);
 int asn1_validity(const uint8_t *cert, int *offset, X509_CTX *x509_ctx);
 int asn1_name(const uint8_t *cert, int *offset, char *dn[]);
 int asn1_public_key(const uint8_t *cert, int *offset, X509_CTX *x509_ctx);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
 int asn1_signature(const uint8_t *cert, int *offset, X509_CTX *x509_ctx);
-int asn1_find_subjectaltname(const uint8_t* cert, int offset);
 int asn1_compare_dn(char * const dn1[], char * const dn2[]);
+int asn1_is_subject_alt_name(const uint8_t *cert, int offset);
+int asn1_is_basic_constraints(const uint8_t *cert, int offset);
+int asn1_is_key_usage(const uint8_t *cert, int offset);
+bool asn1_is_critical_ext(const uint8_t *buf, int *offset);
 #endif /* CONFIG_SSL_CERT_VERIFICATION */
 int asn1_signature_type(const uint8_t *cert, 
                                 int *offset, X509_CTX *x509_ctx);

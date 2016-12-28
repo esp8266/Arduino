@@ -2090,8 +2090,11 @@ error:
 EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
 {
     int ret;
+    int pathLenConstraint = 0;
+
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    ret = x509_verify(ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx);
+    ret = x509_verify(ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx,
+            &pathLenConstraint);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (ret)        /* modify into an SSL error type */

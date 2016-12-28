@@ -80,6 +80,16 @@ static const uint8_t sig_subject_alt_name[] =
     0x55, 0x1d, 0x11
 };
 
+static const uint8_t sig_basic_constraints[] =
+{
+    0x55, 0x1d, 0x13
+};
+
+static const uint8_t sig_key_usage[] =
+{
+    0x55, 0x1d, 0x0f
+};
+
 /* CN, O, OU, L, C, ST */
 static const uint8_t g_dn_types[] = { 3, 10, 11, 7, 6, 8 };
 
@@ -117,6 +127,7 @@ int asn1_next_obj(const uint8_t *buf, int *offset, int obj_type)
 {
     if (buf[*offset] != obj_type)
         return X509_NOT_OK;
+
     (*offset)++;
     return get_asn1_length(buf, offset);
 }
@@ -141,12 +152,12 @@ int asn1_skip_obj(const uint8_t *buf, int *offset, int obj_type)
  * Read an integer value for ASN.1 data
  * Note: This function allocates memory which must be freed by the user.
  */
-int asn1_get_int(const uint8_t *buf, int *offset, uint8_t **object)
+int asn1_get_big_int(const uint8_t *buf, int *offset, uint8_t **object)
 {
     int len;
 
     if ((len = asn1_next_obj(buf, offset, ASN1_INTEGER)) < 0)
-        goto end_int_array;
+        goto end_big_int;
 
     if (len > 1 && buf[*offset] == 0x00)    /* ignore the negative byte */
     {
@@ -158,8 +169,91 @@ int asn1_get_int(const uint8_t *buf, int *offset, uint8_t **object)
     memcpy(*object, &buf[*offset], len);
     *offset += len;
 
-end_int_array:
+end_big_int:
     return len;
+}
+
+/**
+ * Read an integer value for ASN.1 data
+ */
+int asn1_get_int(const uint8_t *buf, int *offset, int32_t *val)
+{
+    int res = X509_OK;
+    int len;
+    int i;
+
+    if ((len = asn1_next_obj(buf, offset, ASN1_INTEGER)) < 0 || 
+                len > sizeof(int32_t))
+    {
+        res = X509_NOT_OK;
+        goto end_int;
+    }
+
+    *val = 0;
+    for (i = 0; i < len; i++)
+    {
+        *val <<= 8;
+        *val |= buf[(*offset)++];
+    }
+
+end_int:
+    return res;
+}
+
+/**
+ * Read an boolean value for ASN.1 data
+ */
+int asn1_get_bool(const uint8_t *buf, int *offset, bool *val)
+{
+    int res = X509_OK;
+
+    if (asn1_next_obj(buf, offset, ASN1_BOOLEAN) != 1)
+    {
+        res = X509_NOT_OK;
+        goto end_bool;
+    }
+
+    /* DER demands that "If the encoding represents the boolean value TRUE,
+       its single contents octet shall have all eight bits set to one."
+       Thus only 0 and 255 are valid encoded values. */
+    *val = buf[(*offset)++] == 0xFF;
+
+end_bool:
+    return res;
+}
+
+/**
+ * Convert an ASN.1 bit string into a 32 bit integer
+ */
+int asn1_get_bit_string_as_int(const uint8_t *buf, int *offset, uint32_t *val)
+{
+    int res = X509_OK;
+    int len, i;
+    int ignore_bits;
+
+    if ((len = asn1_next_obj(buf, offset, ASN1_BIT_STRING)) < 0 || len > 5)
+    {
+        res = X509_NOT_OK;
+        goto end_bit_string_as_int;
+    }
+
+    /* number of bits left unused in the final byte of content */
+    ignore_bits = buf[(*offset)++];
+    len--;
+    *val = 0;
+    for (i = 0; i < len; i++)
+    {
+        *val <<= 8;
+        *val |= buf[(*offset)++];
+    }
+
+    for (i = 0; i < ignore_bits; i++)
+    {
+        *val >>= 1;
+    }
+
+end_bit_string_as_int:
+    return res;
 }
 
 /**
@@ -187,19 +281,19 @@ int asn1_get_private_key(const uint8_t *buf, int len, RSA_CTX **rsa_ctx)
     /* Use the private key to mix up the RNG if possible. */
     RNG_custom_init(buf, len);
 
-    mod_len = asn1_get_int(buf, &offset, &modulus);
-    pub_len = asn1_get_int(buf, &offset, &pub_exp);
-    priv_len = asn1_get_int(buf, &offset, &priv_exp);
+    mod_len = asn1_get_big_int(buf, &offset, &modulus);
+    pub_len = asn1_get_big_int(buf, &offset, &pub_exp);
+    priv_len = asn1_get_big_int(buf, &offset, &priv_exp);
 
     if (mod_len <= 0 || pub_len <= 0 || priv_len <= 0)
         return X509_INVALID_PRIV_KEY;
 
 #ifdef CONFIG_BIGINT_CRT
-    p_len = asn1_get_int(buf, &offset, &p);
-    q_len = asn1_get_int(buf, &offset, &q);
-    dP_len = asn1_get_int(buf, &offset, &dP);
-    dQ_len = asn1_get_int(buf, &offset, &dQ);
-    qInv_len = asn1_get_int(buf, &offset, &qInv);
+    p_len = asn1_get_big_int(buf, &offset, &p);
+    q_len = asn1_get_big_int(buf, &offset, &q);
+    dP_len = asn1_get_big_int(buf, &offset, &dP);
+    dQ_len = asn1_get_big_int(buf, &offset, &dQ);
+    qInv_len = asn1_get_big_int(buf, &offset, &qInv);
 
     if (p_len <= 0 || q_len <= 0 || dP_len <= 0 || dQ_len <= 0 || qInv_len <= 0)
         return X509_INVALID_PRIV_KEY;
@@ -295,25 +389,12 @@ static int asn1_get_utc_time(const uint8_t *buf, int *offset, time_t *t)
 }
 
 /**
- * Get the version type of a certificate (which we don't actually care about)
+ * Get the version type of a certificate
  */
-int asn1_version(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
+int asn1_version(const uint8_t *cert, int *offset, int *val)
 {
-    int ret = X509_NOT_OK;
-    int len;
-
     (*offset) += 2;        /* get past explicit tag */
-    if (cert[(*offset)++] != ASN1_INTEGER)
-		return X509_NOT_OK;
-
-	len = get_asn1_length(cert, offset);
-	if (len == 1)
-	{
-		ret = cert[*offset];
-	}
-
-	*offset += len;
-    return ret;
+    return asn1_get_int(cert, offset, val);
 }
 
 /**
@@ -463,8 +544,8 @@ int asn1_public_key(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
     if (asn1_next_obj(cert, offset, ASN1_SEQUENCE) < 0)
         goto end_pub_key;
 
-    mod_len = asn1_get_int(cert, offset, &modulus);
-    pub_len = asn1_get_int(cert, offset, &pub_exp);
+    mod_len = asn1_get_big_int(cert, offset, &modulus);
+    pub_len = asn1_get_big_int(cert, offset, &pub_exp);
 
     RSA_pub_key_new(&x509_ctx->rsa_ctx, modulus, mod_len, pub_exp, pub_len);
 
@@ -584,7 +665,7 @@ int asn1_find_oid(const uint8_t* cert, int* offset,
     return 0;
 }
 
-int asn1_find_subjectaltname(const uint8_t* cert, int offset)
+int asn1_is_subject_alt_name(const uint8_t *cert, int offset)
 {
     if (asn1_find_oid(cert, &offset, sig_subject_alt_name, 
                                 sizeof(sig_subject_alt_name)))
@@ -593,6 +674,39 @@ int asn1_find_subjectaltname(const uint8_t* cert, int offset)
     }
 
     return 0;
+}
+
+int asn1_is_basic_constraints(const uint8_t *cert, int offset)
+{
+    if (asn1_find_oid(cert, &offset, sig_basic_constraints, 
+                                sizeof(sig_basic_constraints)))
+    {
+        return offset;
+    }
+
+    return 0;
+}
+
+int asn1_is_key_usage(const uint8_t *cert, int offset)
+{
+    if (asn1_find_oid(cert, &offset, sig_key_usage, 
+                                sizeof(sig_key_usage)))
+    {
+        return offset;
+    }
+
+    return 0;
+}
+
+bool asn1_is_critical_ext(const uint8_t *buf, int *offset)
+{
+    /* critical is optional */
+    bool res = false;
+
+    if (asn1_next_obj(buf, offset, ASN1_BOOLEAN) == 1)
+        res = buf[(*offset)++] == 0xFF;
+
+    return res;
 }
 
 #endif /* CONFIG_SSL_CERT_VERIFICATION */

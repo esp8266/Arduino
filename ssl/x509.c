@@ -42,6 +42,13 @@
 #include "crypto_misc.h"
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
+static int x509_v3_subject_alt_name(const uint8_t *cert, int offset, 
+        X509_CTX *x509_ctx);
+static int x509_v3_basic_constraints(const uint8_t *cert, int offset, 
+        X509_CTX *x509_ctx);
+static int x509_v3_key_usage(const uint8_t *cert, int offset, 
+        X509_CTX *x509_ctx);
+
 /**
  * Retrieve the signature from a certificate.
  */
@@ -95,11 +102,10 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
     if (asn1_next_obj(cert, &offset, ASN1_SEQUENCE) < 0)
         goto end_cert;
 
-    if (cert[offset] == ASN1_EXPLICIT_TAG)   /* optional version */
-    {
-        if ((version = asn1_version(cert, &offset, x509_ctx)) == X509_NOT_OK)
-            goto end_cert;
-    }
+    /* optional version */
+    if (cert[offset] == ASN1_EXPLICIT_TAG && 
+            asn1_version(cert, &offset, &version) == X509_NOT_OK)
+        goto end_cert;
 
     if (asn1_skip_obj(cert, &offset, ASN1_INTEGER) || /* serial number */ 
             asn1_next_obj(cert, &offset, ASN1_SEQUENCE) < 0)
@@ -197,50 +203,11 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
             break;
     }
 
-    if (version == 2 && cert[offset] == ASN1_V3_DATA)
+    if (version == 2 && asn1_next_obj(cert, &offset, ASN1_V3_DATA) > 0)
     {
-        int suboffset;
-
-        ++offset;
-        get_asn1_length(cert, &offset);
-
-        if ((suboffset = asn1_find_subjectaltname(cert, offset)) > 0)
-        {
-            if (asn1_next_obj(cert, &suboffset, ASN1_OCTET_STRING) > 0)
-            {
-                int altlen;
-
-                if ((altlen = asn1_next_obj(cert, 
-                                            &suboffset, ASN1_SEQUENCE)) > 0)
-                {
-                    int endalt = suboffset + altlen;
-                    int totalnames = 0;
-
-                    while (suboffset < endalt)
-                    {
-                        int type = cert[suboffset++];
-                        int dnslen = get_asn1_length(cert, &suboffset);
-
-                        if (type == ASN1_CONTEXT_DNSNAME)
-                        {
-                            x509_ctx->subject_alt_dnsnames = (char**)
-                                    realloc(x509_ctx->subject_alt_dnsnames, 
-                                       (totalnames + 2) * sizeof(char*));
-                            x509_ctx->subject_alt_dnsnames[totalnames] = 
-                                    (char*)malloc(dnslen + 1);
-                            x509_ctx->subject_alt_dnsnames[totalnames+1] = NULL;
-                            memcpy(x509_ctx->subject_alt_dnsnames[totalnames], 
-                                    cert + suboffset, dnslen);
-                            x509_ctx->subject_alt_dnsnames[
-                                    totalnames][dnslen] = 0;
-                            ++totalnames;
-                        }
-
-                        suboffset += dnslen;
-                    }
-                }
-            }
-        }
+        x509_v3_subject_alt_name(cert, offset, x509_ctx);
+        x509_v3_basic_constraints(cert, offset, x509_ctx);
+        x509_v3_key_usage(cert, offset, x509_ctx);
     }
 
     offset = end_tbs;   /* skip the rest of v3 data */
@@ -267,6 +234,106 @@ end_cert:
 
     return ret;
 }
+
+#ifdef CONFIG_SSL_CERT_VERIFICATION /* only care if doing verification */
+static int x509_v3_subject_alt_name(const uint8_t *cert, int offset, 
+        X509_CTX *x509_ctx)
+{
+    if ((offset = asn1_is_subject_alt_name(cert, offset)) > 0)
+    {
+        /* ignore if present */
+        asn1_is_critical_ext(cert, &offset);
+
+        if (asn1_next_obj(cert, &offset, ASN1_OCTET_STRING) > 0)
+        {
+            int altlen;
+
+            if ((altlen = asn1_next_obj(cert, &offset, ASN1_SEQUENCE)) > 0)
+            {
+                int endalt = offset + altlen;
+                int totalnames = 0;
+
+                while (offset < endalt)
+                {
+                    int type = cert[offset++];
+                    int dnslen = get_asn1_length(cert, &offset);
+
+                    if (type == ASN1_CONTEXT_DNSNAME)
+                    {
+                        x509_ctx->subject_alt_dnsnames = (char**)
+                                realloc(x509_ctx->subject_alt_dnsnames, 
+                                   (totalnames + 2) * sizeof(char*));
+                        x509_ctx->subject_alt_dnsnames[totalnames] = 
+                                (char*)malloc(dnslen + 1);
+                        x509_ctx->subject_alt_dnsnames[totalnames+1] = NULL;
+                        memcpy(x509_ctx->subject_alt_dnsnames[totalnames], 
+                                cert + offset, dnslen);
+                        x509_ctx->subject_alt_dnsnames[
+                                totalnames][dnslen] = 0;
+                        ++totalnames;
+                    }
+
+                    offset += dnslen;
+                }
+            }
+        }
+    }
+
+    return X509_OK;
+}
+
+/**
+ * Basic constraints - see https://tools.ietf.org/html/rfc5280#page-39
+ */
+static int x509_v3_basic_constraints(const uint8_t *cert, int offset, 
+        X509_CTX *x509_ctx)
+{
+    int ret = X509_OK;
+
+    if ((offset = asn1_is_basic_constraints(cert, offset)) == 0)
+        goto end_contraints;
+
+    x509_ctx->basic_constraint_present = true;
+    x509_ctx->basic_constraint_is_critical = 
+                    asn1_is_critical_ext(cert, &offset);
+
+    if (asn1_next_obj(cert, &offset, ASN1_OCTET_STRING) < 0 ||
+    		asn1_next_obj(cert, &offset, ASN1_SEQUENCE) < 0 ||
+    		asn1_get_bool(cert, &offset, &x509_ctx->basic_constaint_cA) < 0 ||
+    		asn1_get_int(cert, &offset,
+    		                &x509_ctx->basic_constraint_pathLenConstraint) < 0)
+    {
+        ret = X509_NOT_OK;       
+    }
+
+end_contraints:
+    return ret;
+}
+
+/*
+ * Key usage - see https://tools.ietf.org/html/rfc5280#section-4.2.1.3
+ */
+static int x509_v3_key_usage(const uint8_t *cert, int offset, 
+        X509_CTX *x509_ctx)
+{
+    int ret = X509_OK;
+
+    if ((offset = asn1_is_key_usage(cert, offset)) == 0)
+        goto end_key_usage;
+
+    x509_ctx->key_usage_present = true;
+    x509_ctx->key_usage_is_critical = asn1_is_critical_ext(cert, &offset);
+
+    if (asn1_next_obj(cert, &offset, ASN1_OCTET_STRING) < 0 ||
+    		asn1_get_bit_string_as_int(cert, &offset, &x509_ctx->key_usage))
+    {
+        ret = X509_NOT_OK;       
+    }
+
+end_key_usage:
+    return ret;
+}
+#endif
 
 /**
  * Free an X.509 object's resources.
@@ -371,8 +438,10 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
  * - That the certificate(s) are not self-signed.
  * - The certificate chain is valid.
  * - The signature of the certificate is valid.
+ * - Basic constraints 
  */
-int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert) 
+int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert, 
+        int *pathLenConstraint) 
 {
     int ret = X509_OK, i = 0;
     bigint *cert_sig;
@@ -415,6 +484,13 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
         goto end_verify;
     }
 
+    if (cert->basic_constaint_cA && 
+                IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_KEY_CERT_SIGN))
+    {
+        ret = X509_VFY_ERROR_BASIC_CONSTRAINT;     
+        goto end_verify;
+    }
+
     next_cert = cert->next;
 
     /* last cert in the chain - look for a trusted cert */
@@ -425,14 +501,29 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
             /* go thu the CA store */
             while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
             {
+                /* ignore CA certs that are not really CA certs */
+                if (cert->basic_constraint_present && 
+                        !ca_cert_ctx->cert[i]->basic_constaint_cA)
+                    continue;
+                        
                 if (asn1_compare_dn(cert->ca_cert_dn,
                                             ca_cert_ctx->cert[i]->cert_dn) == 0)
                 {
                     /* use this CA certificate for signature verification */
-                    match_ca_cert = 1;
+                    match_ca_cert = true;
                     ctx = ca_cert_ctx->cert[i]->rsa_ctx->bi_ctx;
                     mod = ca_cert_ctx->cert[i]->rsa_ctx->m;
                     expn = ca_cert_ctx->cert[i]->rsa_ctx->e;
+
+                    if (ca_cert_ctx->cert[i]->basic_constaint_cA &&
+                        ca_cert_ctx->cert[i]->
+                                    basic_constraint_pathLenConstraint <
+                                                            *pathLenConstraint)
+                    {
+                        ret = X509_VFY_ERROR_BASIC_CONSTRAINT;       
+                        goto end_verify;
+                    }
+
                     break;
                 }
 
@@ -491,7 +582,8 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     /* go down the certificate chain using recursion. */
     if (next_cert != NULL)
     {
-        ret = x509_verify(ca_cert_ctx, next_cert);
+        ret = x509_verify(ca_cert_ctx, next_cert, pathLenConstraint);
+        (*pathLenConstraint)++; /* don't include last certificate */
     }
 
 end_verify:
@@ -603,8 +695,19 @@ void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx)
 
     if (ca_cert_ctx)
     {
+        int pathLenConstraint = 0;
         printf("Verify:\t\t\t\t%s\n",
-                x509_display_error(x509_verify(ca_cert_ctx, cert)));
+                x509_display_error(x509_verify(ca_cert_ctx, cert,
+                        &pathLenConstraint)));
+    }
+
+    if (cert->basic_constraint_present)
+    {
+        printf("Basic Constraints:\t\t%s, CA:%s, pathlen:%d\n",
+                cert->basic_constraint_is_critical ? 
+                    "critical" : "NOT critical",
+                cert->basic_constaint_cA? "TRUE" : "FALSE",
+                cert->basic_constraint_pathLenConstraint);
     }
 
 #if 0
@@ -654,6 +757,9 @@ const char * x509_display_error(int error)
 
         case X509_INVALID_PRIV_KEY:
             return "Invalid private key";
+
+        case X509_VFY_ERROR_BASIC_CONSTRAINT:
+            return "Basic constraint invalid";
 
         default:
             return "Unknown";
