@@ -118,7 +118,6 @@ static const char* _ssdp_schema_template =
   "</root>\r\n"
   "\r\n";
 
-
 struct SSDPTimer {
   ETSTimer timer;
 };
@@ -238,7 +237,7 @@ void SSDPClass::_send(ssdp_method_t method){
   _server->send(&remoteAddr, remotePort);
 }
 
-void SSDPClass::schema(WiFiClient client){
+void SSDPClass::schema(WiFiClient & client) const{
   uint32_t ip = WiFi.localIP();
   client.printf(_ssdp_schema_template,
     IP2STR(&ip), _port,
@@ -255,6 +254,22 @@ void SSDPClass::schema(WiFiClient client){
   );
 }
 
+void SSDPClass::schema(Print & print) const{
+  uint32_t ip = WiFi.localIP();
+  print.printf(_ssdp_schema_template,
+    IP2STR(&ip), _port,
+    _deviceType,
+    _friendlyName,
+    _presentationURL,
+    _serialNumber,
+    _modelName,
+    _modelNumber,
+    _modelURL,
+    _manufacturer,
+    _manufacturerURL,
+    _uuid
+  );
+}
 void SSDPClass::_update(){
   if(!_pending && _server->next()) {
     ssdp_method_t method = NONE;

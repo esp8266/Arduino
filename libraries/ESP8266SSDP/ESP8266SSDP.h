@@ -63,7 +63,8 @@ class SSDPClass{
 
     bool begin();
 
-    void schema(WiFiClient client);
+    void schema(WiFiClient & client) const;
+    void schema(Print & print) const;
 
     void setDeviceType(const String& deviceType) { setDeviceType(deviceType.c_str()); }
     void setDeviceType(const char *deviceType);
