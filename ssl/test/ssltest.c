@@ -1273,8 +1273,10 @@ int SSL_server_tests(void)
     if ((ret = SSL_server_test("Client Verification TLS1.2", 
                     "-cipher AES128-SHA -tls1_2 "
                     "-cert ../ssl/test/axTLS.x509_2048.pem "
-                    "-key ../ssl/test/axTLS.key_2048.pem ",
-                    NULL, NULL, NULL, 
+                    "-key ../ssl/test/axTLS.key_2048.pem ", 
+                    NULL,
+                "../ssl/test/axTLS.x509_1024.pem", 
+                "../ssl/test/axTLS.key_1024.pem",
                     "../ssl/test/axTLS.ca_x509.cer", NULL,
                     DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)))
         goto cleanup;
@@ -1283,7 +1285,9 @@ int SSL_server_tests(void)
                     "-cipher AES128-SHA -tls1_1 "
                     "-cert ../ssl/test/axTLS.x509_2048.pem "
                     "-key ../ssl/test/axTLS.key_2048.pem ",
-                    NULL, NULL, NULL, 
+                    NULL,
+                "../ssl/test/axTLS.x509_1024.pem", 
+                "../ssl/test/axTLS.key_1024.pem",
                     "../ssl/test/axTLS.ca_x509.cer", NULL,
                     DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)))
         goto cleanup;
@@ -1295,7 +1299,9 @@ int SSL_server_tests(void)
                     "-cipher AES128-SHA -tls1_2 "
                     "-cert ../ssl/test/axTLS.x509_bad_before.pem "
                     "-key ../ssl/test/axTLS.key_1024.pem ",
-                    NULL, NULL, NULL, 
+                    NULL,
+                "../ssl/test/axTLS.x509_1024.pem", 
+                "../ssl/test/axTLS.key_1024.pem",
                     "../ssl/test/axTLS.ca_x509.cer", NULL,
                     DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)) !=
                             SSL_X509_ERROR(X509_VFY_ERROR_NOT_YET_VALID))
@@ -1310,7 +1316,9 @@ int SSL_server_tests(void)
                     "-cipher AES128-SHA -tls1_2 "
                     "-cert ../ssl/test/axTLS.x509_bad_after.pem "
                     "-key ../ssl/test/axTLS.key_1024.pem ",
-                    NULL, NULL, NULL, 
+                    NULL,
+                "../ssl/test/axTLS.x509_1024.pem", 
+                "../ssl/test/axTLS.key_1024.pem",
                     "../ssl/test/axTLS.ca_x509.cer", NULL,
                     DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)) !=
                             SSL_X509_ERROR(X509_VFY_ERROR_EXPIRED))
@@ -1326,7 +1334,9 @@ int SSL_server_tests(void)
                     "-cipher AES128-SHA -tls1_2 "
                     "-cert ../ssl/test/axTLS.x509_1024.pem "
                     "-key ../ssl/test/axTLS.key_1024.pem ",
-                    NULL, NULL, NULL, 
+                    NULL,
+                "../ssl/test/axTLS.x509_1024.pem", 
+                "../ssl/test/axTLS.key_1024.pem",
                     NULL, NULL,
                     DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)) !=
                             SSL_X509_ERROR(X509_VFY_ERROR_NO_TRUSTED_CERT))
@@ -1343,7 +1353,9 @@ int SSL_server_tests(void)
                     "-cert ../ssl/test/axTLS.x509_1024.pem "
                     "-key ../ssl/test/axTLS.key_1024.pem "
                     "-CAfile ../ssl/test/axTLS.ca_x509.pem ",
-                    NULL, NULL, NULL, 
+                    NULL,
+                "../ssl/test/axTLS.x509_1024.pem", 
+                "../ssl/test/axTLS.key_1024.pem",
                     NULL, NULL,
                     DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)) !=
                             SSL_X509_ERROR(X509_VFY_ERROR_SELF_SIGNED))
@@ -1360,7 +1372,9 @@ int SSL_server_tests(void)
                     "-cipher AES128-SHA -tls1_2 "
                     "-cert ../ssl/test/axTLS.x509_1024.pem "
                     "-key ../ssl/test/axTLS.key_1024.pem ",
-                    NULL, NULL, NULL, 
+                    NULL,
+                "../ssl/test/axTLS.x509_1024.pem", 
+                "../ssl/test/axTLS.key_1024.pem",
                     "../ssl/test/axTLS.ca_x509.cer",
                     NULL,
                     DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)))
@@ -1392,7 +1406,7 @@ int SSL_server_tests(void)
     if ((ret = SSL_server_test("Cert chain in PEM format", 
                     "-cipher AES128-SHA -tls1_2", 
                     "../ssl/test/axTLS.x509_device.pem", 
-                    NULL, "../ssl/test/axTLS.device_key.pem",
+                    NULL, "../ssl/test/axTLS.key_device.pem",
                     "../ssl/test/axTLS.ca_x509.pem", NULL, DEFAULT_SVR_OPTION)))
         goto cleanup;
 
@@ -1587,7 +1601,7 @@ static int SSL_client_test(
 #endif
     }
     
-    usleep(500000);           /* allow server to start */
+    usleep(200000);           /* allow server to start */
 
     if (*ssl_ctx == NULL)
     {
@@ -1805,10 +1819,37 @@ int SSL_client_tests(void)
                     DEFAULT_CLNT_OPTION, NULL, NULL, NULL)))
         goto cleanup;
 
+    if ((ret = SSL_client_test("Basic Constraint - len OK", 
+                    &ssl_ctx,
+                    "-cert ../ssl/test/axTLS.x509_end_chain.pem -key "
+                    "../ssl/test/axTLS.key_end_chain.pem -CAfile "
+                    "../ssl/test/axTLS.x509_intermediate_ca.pem",
+                    NULL, 
+                    DEFAULT_CLNT_OPTION, NULL, NULL, NULL)))
+        goto cleanup;
+
+    if ((ret = SSL_client_test("Basic Constraint - len NOT OK", 
+                    &ssl_ctx,
+                    "-cert ../ssl/test/axTLS.x509_end_chain_bad.pem -key "
+                    "../ssl/test/axTLS.key_end_chain.pem -CAfile "
+                    "../ssl/test/axTLS.x509_intermediate_ca2.pem",
+                    NULL, 
+                    DEFAULT_CLNT_OPTION, NULL, NULL, NULL))
+                            != SSL_X509_ERROR(X509_VFY_ERROR_BASIC_CONSTRAINT))
+    {
+        printf("*** Error: %d\n", ret); 
+        if (ret == 0)
+            ret = SSL_NOT_OK;
+
+        goto cleanup;
+    }
+
+    printf("SSL server test \"%s\" passed\n", "Basic Constraint - len NOT OK");
+
     if ((ret = SSL_client_test("Server cert chaining", 
                     &ssl_ctx,
                     "-cert ../ssl/test/axTLS.x509_device.pem "
-                    "-key ../ssl/test/axTLS.device_key.pem "
+                    "-key ../ssl/test/axTLS.key_device.pem "
                     "-CAfile ../ssl/test/axTLS.x509_1024.pem ", NULL,
                     DEFAULT_CLNT_OPTION, NULL, NULL, NULL)))
         goto cleanup;
@@ -1865,27 +1906,32 @@ int SSL_client_tests(void)
     printf("SSL client test \"Expired cert (verify later)\" passed\n");
 
     /* invalid cert type */
-    if ((ret = SSL_client_test("Error: Invalid certificate type", 
+    /*if ((ret = SSL_client_test("Error: Invalid certificate type", 
                     &ssl_ctx,
                     "-cert ../ssl/test/axTLS.x509_2048.pem "
                     "-key ../ssl/test/axTLS.key_2048.pem "
                     "-CAfile ../ssl/test/axTLS.ca_x509.pem "
                     "-verify 1 ", NULL, DEFAULT_CLNT_OPTION, 
-                    "../ssl/test/axTLS.x509_1024.cer", NULL,
-                    "../ssl/test/axTLS.x509_1024.cer")) 
+                    "../ssl/test/axTLS.key_1024.pem", NULL,
+                    "../ssl/test/axTLS.x509_1024.pem")) 
                             != SSL_ERROR_INVALID_KEY)
     {
+        if (ret == 0)
+            ret = SSL_NOT_OK;
+
         printf("*** Error: %d\n", ret); TTY_FLUSH();
         goto cleanup;
     }
 
-    printf("SSL client test \"Invalid certificate type\" passed\n");
+    printf("SSL client test \"Invalid certificate type\" passed\n"); */
 
     if ((ret = SSL_client_test("GNUTLS client", 
                     &ssl_ctx,
                     "--x509certfile ../ssl/test/axTLS.x509_1024.pem "
                     "--x509keyfile ../ssl/test/axTLS.key_1024.pem -g", NULL,
-                    DEFAULT_CLNT_OPTION, NULL, NULL, NULL)))
+                    DEFAULT_CLNT_OPTION, 
+                    "../ssl/test/axTLS.key_1024.pem", NULL,
+                    "../ssl/test/axTLS.x509_1024.pem")))
         goto cleanup;
 
     ret = 0;
@@ -1895,7 +1941,8 @@ int SSL_client_tests(void)
                     "--x509certfile ../ssl/test/axTLS.x509_1024.pem "
                     "--x509keyfile ../ssl/test/axTLS.key_1024.pem -r -g", NULL,
                     DEFAULT_CLNT_OPTION|SSL_SERVER_VERIFY_LATER, 
-                    NULL, NULL, NULL)))
+                    "../ssl/test/axTLS.key_1024.pem", NULL,
+                    "../ssl/test/axTLS.x509_1024.pem"))) 
         goto cleanup;
 
     ret = 0;
@@ -1976,7 +2023,13 @@ static int SSL_basic_test(void)
         goto error;
 
     ssl_svr_ctx = ssl_ctx_new(DEFAULT_SVR_OPTION, SSL_DEFAULT_SVR_SESS);
+    if ((ret = ssl_obj_load(ssl_svr_ctx, SSL_OBJ_X509_CERT, 
+                    "../ssl/test/axTLS.x509_1024.pem", NULL)) != SSL_OK)
+        goto error;
 
+    if ((ret = ssl_obj_load(ssl_svr_ctx, SSL_OBJ_RSA_KEY, 
+                    "../ssl/test/axTLS.key_1024.pem", NULL)) != SSL_OK)
+        goto error;
 #ifndef WIN32
     pthread_create(&thread, NULL, 
                 (void *(*)(void *))do_basic, NULL);
@@ -2102,6 +2155,13 @@ static int SSL_unblocked_test(void)
         goto error;
 
     ssl_svr_ctx = ssl_ctx_new(DEFAULT_SVR_OPTION, SSL_DEFAULT_SVR_SESS);
+    if ((ret = ssl_obj_load(ssl_svr_ctx, SSL_OBJ_X509_CERT, 
+                    "../ssl/test/axTLS.x509_1024.pem", NULL)) != SSL_OK)
+        goto error;
+
+    if ((ret = ssl_obj_load(ssl_svr_ctx, SSL_OBJ_RSA_KEY, 
+                    "../ssl/test/axTLS.key_1024.pem", NULL)) != SSL_OK)
+        goto error;
 
 #ifndef WIN32
     pthread_create(&thread, NULL, 
@@ -2253,7 +2313,14 @@ int multi_thread_test(void)
 
     printf("Do multi-threading test (takes a minute)\n");
 
-    ssl_server_ctx = ssl_ctx_new(DEFAULT_SVR_OPTION, SSL_DEFAULT_SVR_SESS);
+    ssl_svr_ctx = ssl_ctx_new(DEFAULT_SVR_OPTION, SSL_DEFAULT_SVR_SESS);
+    if ((ret = ssl_obj_load(ssl_svr_ctx, SSL_OBJ_X509_CERT, 
+                    "../ssl/test/axTLS.x509_1024.pem", NULL)) != SSL_OK)
+        goto error;
+
+    if ((ret = ssl_obj_load(ssl_svr_ctx, SSL_OBJ_RSA_KEY, 
+                    "../ssl/test/axTLS.key_1024.pem", NULL)) != SSL_OK)
+        goto error;
     ssl_clnt_ctx = ssl_ctx_new(DEFAULT_CLNT_OPTION, SSL_DEFAULT_CLNT_SESS);
 
     if (ssl_obj_load(ssl_clnt_ctx, SSL_OBJ_X509_CACERT, 
@@ -2306,7 +2373,7 @@ int multi_thread_test(void)
 
     printf("Multi-thread test passed (%d)\n", NUM_THREADS);
 error:
-    ssl_ctx_free(ssl_server_ctx);
+    ssl_ctx_free(ssl_svr_ctx);
     ssl_ctx_free(ssl_clnt_ctx);
     SOCKET_CLOSE(server_fd);
     return res;

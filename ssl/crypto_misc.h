@@ -74,15 +74,15 @@ extern "C" {
  */
 #define IS_SET_KEY_USAGE_FLAG(A, B)          (A->key_usage & B)
 
-#define KEY_USAGE_DIGITAL_SIGNATURE         0x0001
-#define KEY_USAGE_CONTENT_COMMITMENT        0x0002
-#define KEY_USAGE_KEY_ENCIPHERMENT          0x0004
-#define KEY_USAGE_DATA_ENCIPHERMENT         0x0008
-#define KEY_USAGE_KEY_AGREEMENT             0x0010
-#define KEY_USAGE_KEY_CERT_SIGN             0x0020
-#define KEY_USAGE_CRL_SIGN                  0x0040
-#define KEY_USAGE_ENCIPHER_ONLY             0x0080
-#define KEY_USAGE_DECIPHER_ONLY             0x0100
+#define KEY_USAGE_DIGITAL_SIGNATURE         0x0080
+#define KEY_USAGE_NON_REPUDIATION           0x0040
+#define KEY_USAGE_KEY_ENCIPHERMENT          0x0020
+#define KEY_USAGE_DATA_ENCIPHERMENT         0x0010
+#define KEY_USAGE_KEY_AGREEMENT             0x0008
+#define KEY_USAGE_KEY_CERT_SIGN             0x0004
+#define KEY_USAGE_CRL_SIGN                  0x0002
+#define KEY_USAGE_ENCIPHER_ONLY             0x0001
+#define KEY_USAGE_DECIPHER_ONLY             0x8000
 
 struct _x509_ctx
 {
@@ -102,7 +102,9 @@ struct _x509_ctx
     bool basic_constraint_is_critical;
     bool key_usage_present;
     bool key_usage_is_critical;
-    bool basic_constaint_cA;
+    bool subject_alt_name_present;
+    bool subject_alt_name_is_critical;
+    bool basic_constraint_cA;
     int basic_constraint_pathLenConstraint;
     uint32_t key_usage;
     struct _x509_ctx *next;

@@ -223,7 +223,7 @@ end_bool:
 }
 
 /**
- * Convert an ASN.1 bit string into a 32 bit integer
+ * Convert an ASN.1 bit string into a 32 bit integer. Used for key usage
  */
 int asn1_get_bit_string_as_int(const uint8_t *buf, int *offset, uint32_t *val)
 {
@@ -241,16 +241,20 @@ int asn1_get_bit_string_as_int(const uint8_t *buf, int *offset, uint32_t *val)
     ignore_bits = buf[(*offset)++];
     len--;
     *val = 0;
-    for (i = 0; i < len; i++)
+
+    /* not sure why key usage doesn't used proper DER spec version */
+    for (i = len-1; i >= 0; --i)
     {
         *val <<= 8;
-        *val |= buf[(*offset)++];
+        *val |= buf[(*offset) + i];
     }
 
-    for (i = 0; i < ignore_bits; i++)
+    *offset += len;
+
+    /*for (i = 0; i < ignore_bits; i++)
     {
         *val >>= 1;
-    }
+    }*/
 
 end_bit_string_as_int:
     return res;

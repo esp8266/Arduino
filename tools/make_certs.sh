@@ -42,21 +42,36 @@ PROJECT_NAME="axTLS Project"
 # Generate the openssl configuration files.
 cat > ca_cert.conf << EOF  
 [ req ]
-distinguished_name     = req_distinguished_name
-prompt                 = no
+distinguished_name      = req_distinguished_name
+prompt                  = no
+req_extensions          = v3_ca
 
 [ req_distinguished_name ]
  O                      = $PROJECT_NAME Dodgy Certificate Authority
+
+[ v3_ca ]
+basicConstraints        = critical, CA:true
+keyUsage                = critical, cRLSign, keyCertSign, digitalSignature
 EOF
 
 cat > certs.conf << EOF  
 [ req ]
-distinguished_name     = req_distinguished_name
-prompt                 = no
+distinguished_name      = req_distinguished_name
+prompt                  = no
+req_extensions          = v3_usr_cert
 
 [ req_distinguished_name ]
  O                      = $PROJECT_NAME
  CN                     = localhost
+
+[ v3_usr_cert ]
+basicConstraints        = critical, CA:false
+keyUsage                = critical, nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName          = @alt_names
+ 
+[alt_names]
+DNS.1 = www.example.net
+DNS.2 = www.example.org
 EOF
 
 cat > device_cert.conf << EOF  
@@ -68,12 +83,43 @@ prompt                 = no
  O                      = $PROJECT_NAME Device Certificate
 EOF
 
+cat > intermediate_ca.conf << EOF  
+[ req ]
+distinguished_name     = req_distinguished_name
+prompt                 = no
+req_extensions         = v3_intermediate_ca
+
+[ req_distinguished_name ]
+ O                      = $PROJECT_NAME Intermediate CA
+
+[ v3_intermediate_ca ]
+basicConstraints        = critical, CA:true, pathlen:0
+keyUsage                = cRLSign, keyCertSign, digitalSignature
+EOF
+
+cat > intermediate_ca2.conf << EOF  
+[ req ]
+distinguished_name      = req_distinguished_name
+prompt                  = no
+req_extensions          = v3_intermediate_ca2
+
+[ req_distinguished_name ]
+ O                      = $PROJECT_NAME Intermediate 2 CA
+
+[ v3_intermediate_ca2 ]
+basicConstraints        = critical, CA:true, pathlen:10
+keyUsage                = encipherOnly, keyCertSign, decipherOnly
+EOF
+
 # private key generation
 openssl genrsa -out axTLS.ca_key.pem 2048
 openssl genrsa -out axTLS.key_1024.pem 1024
 openssl genrsa -out axTLS.key_2048.pem 2048
 openssl genrsa -out axTLS.key_4096.pem 4096
-openssl genrsa -out axTLS.device_key.pem 1024
+openssl genrsa -out axTLS.key_device.pem 2048
+openssl genrsa -out axTLS.key_intermediate_ca.pem 2048
+openssl genrsa -out axTLS.key_intermediate_ca2.pem 2048
+openssl genrsa -out axTLS.key_end_chain.pem 2048
 openssl genrsa -aes128 -passout pass:abcd -out axTLS.key_aes128.pem 1024
 openssl genrsa -aes256 -passout pass:abcd -out axTLS.key_aes256.pem 1024
 
@@ -81,57 +127,86 @@ openssl genrsa -aes256 -passout pass:abcd -out axTLS.key_aes256.pem 1024
 openssl rsa -in axTLS.key_1024.pem -out axTLS.key_1024 -outform DER
 openssl rsa -in axTLS.key_2048.pem -out axTLS.key_2048 -outform DER
 openssl rsa -in axTLS.key_4096.pem -out axTLS.key_4096 -outform DER
-openssl rsa -in axTLS.device_key.pem -out axTLS.device_key -outform DER
 
 # cert requests
-openssl req -out axTLS.ca_x509.req -key axTLS.ca_key.pem -new \
+openssl req -out axTLS.ca_x509.csr -key axTLS.ca_key.pem -new \
             -config ./ca_cert.conf 
-openssl req -out axTLS.x509_1024.req -key axTLS.key_1024.pem -new \
+openssl req -out axTLS.x509_1024.csr -key axTLS.key_1024.pem -new \
             -config ./certs.conf 
-openssl req -out axTLS.x509_2048.req -key axTLS.key_2048.pem -new \
+openssl req -out axTLS.x509_2048.csr -key axTLS.key_2048.pem -new \
             -config ./certs.conf 
-openssl req -out axTLS.x509_4096.req -key axTLS.key_4096.pem -new \
+openssl req -out axTLS.x509_4096.csr -key axTLS.key_4096.pem -new \
             -config ./certs.conf 
-openssl req -out axTLS.x509_device.req -key axTLS.device_key.pem -new \
+openssl req -out axTLS.x509_device.csr -key axTLS.key_device.pem -new \
             -config ./device_cert.conf
-openssl req -out axTLS.x509_aes128.req -key axTLS.key_aes128.pem \
+openssl req -out axTLS.x509_intermediate_ca.csr \
+            -key axTLS.key_intermediate_ca.pem -new \
+            -config ./intermediate_ca.conf
+openssl req -out axTLS.x509_intermediate_ca2.csr \
+            -key axTLS.key_intermediate_ca2.pem -new \
+            -config ./intermediate_ca2.conf
+openssl req -out axTLS.x509_end_chain.csr -key axTLS.key_end_chain.pem -new \
+            -config ./certs.conf
+openssl req -out axTLS.x509_aes128.csr -key axTLS.key_aes128.pem \
             -new -config ./certs.conf -passin pass:abcd
-openssl req -out axTLS.x509_aes256.req -key axTLS.key_aes256.pem \
+openssl req -out axTLS.x509_aes256.csr -key axTLS.key_aes256.pem \
             -new -config ./certs.conf -passin pass:abcd
 
 # generate the actual certs.
-openssl x509 -req -in axTLS.ca_x509.req -out axTLS.ca_x509.pem \
+openssl x509 -req -in axTLS.ca_x509.csr -out axTLS.ca_x509.pem \
             -sha1 -days 5000 -signkey axTLS.ca_key.pem \
-            -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.ca_x509.req -out axTLS.ca_x509_sha256.pem \
+            -CAkey axTLS.ca_key.pem -extfile ./ca_cert.conf -extensions v3_ca
+openssl x509 -req -in axTLS.ca_x509.csr -out axTLS.ca_x509_sha256.pem \
             -sha256 -days 5000 -signkey axTLS.ca_key.pem \
-            -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_1024.pem \
+            -CAkey axTLS.ca_key.pem -extfile ./ca_cert.conf -extensions v3_ca
+openssl x509 -req -in axTLS.x509_1024.csr -out axTLS.x509_1024.pem \
             -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_1024_sha256.pem \
+openssl x509 -req -in axTLS.x509_1024.csr -out axTLS.x509_1024_sha256.pem \
             -sha256 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509_sha256.pem -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_1024_sha384.pem \
+openssl x509 -req -in axTLS.x509_1024.csr -out axTLS.x509_1024_sha384.pem \
             -sha384 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509_sha256.pem -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_1024_sha512.pem \
+openssl x509 -req -in axTLS.x509_1024.csr -out axTLS.x509_1024_sha512.pem \
             -sha512 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509_sha256.pem -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_2048.req -out axTLS.x509_2048.pem \
+openssl x509 -req -in axTLS.x509_2048.csr -out axTLS.x509_2048.pem \
             -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_4096.req -out axTLS.x509_4096.pem \
+openssl x509 -req -in axTLS.x509_4096.csr -out axTLS.x509_4096.pem \
             -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_device.req -out axTLS.x509_device.pem \
+openssl x509 -req -in axTLS.x509_device.csr -out axTLS.x509_device.pem \
             -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.x509_1024.pem -CAkey axTLS.key_1024.pem
-openssl x509 -req -in axTLS.x509_aes128.req \
+openssl x509 -req -in axTLS.x509_intermediate_ca.csr -out axTLS.x509_intermediate_ca.pem \
+            -sha256 -CAcreateserial -days 5000 \
+            -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem \
+            -extfile ./intermediate_ca.conf -extensions v3_intermediate_ca
+openssl x509 -req -in axTLS.x509_intermediate_ca2.csr -out axTLS.x509_intermediate_ca2.pem \
+            -sha256 -CAcreateserial -days 5000 \
+            -CA axTLS.x509_intermediate_ca.pem \
+            -CAkey axTLS.key_intermediate_ca.pem \
+            -extfile ./intermediate_ca2.conf -extensions v3_intermediate_ca2
+openssl x509 -req -in axTLS.x509_end_chain.csr -out axTLS.x509_end_chain.pem \
+            -sha256 -CAcreateserial -days 5000 \
+            -CA axTLS.x509_intermediate_ca.pem \
+            -CAkey axTLS.key_intermediate_ca.pem \
+            -extfile ./certs.conf -extensions v3_usr_cert 
+# basic constraint path len failure
+openssl x509 -req -in axTLS.x509_end_chain.csr \
+            -out axTLS.x509_end_chain_bad.pem \
+            -sha256 -CAcreateserial -days 5000 \
+            -CA axTLS.x509_intermediate_ca2.pem \
+            -CAkey axTLS.key_intermediate_ca2.pem \
+            -extfile ./certs.conf -extensions v3_usr_cert 
+cat axTLS.x509_intermediate_ca.pem >> axTLS.x509_intermediate_ca2.pem 
+openssl x509 -req -in axTLS.x509_aes128.csr \
             -out axTLS.x509_aes128.pem \
             -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
-openssl x509 -req -in axTLS.x509_aes256.req \
+openssl x509 -req -in axTLS.x509_aes256.csr \
             -out axTLS.x509_aes256.pem \
             -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
@@ -139,18 +214,18 @@ openssl x509 -req -in axTLS.x509_aes256.req \
 # note: must be root to do this
 DATE_NOW=`date`
 if date -s "Jan 1 2025"; then
-openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_bad_before.pem \
+openssl x509 -req -in axTLS.x509_1024.csr -out axTLS.x509_bad_before.pem \
             -sha1 -CAcreateserial -days 365 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 date -s "$DATE_NOW"
 touch axTLS.x509_bad_before.pem
 fi
-openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_bad_after.pem \
+openssl x509 -req -in axTLS.x509_1024.csr -out axTLS.x509_bad_after.pem \
             -sha1 -CAcreateserial -days -365 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 
 # some cleanup
-rm axTLS*.req
+rm axTLS*.csr
 rm *.srl
 rm *.conf
 
@@ -159,7 +234,6 @@ openssl x509 -in axTLS.ca_x509.pem -outform DER -out axTLS.ca_x509.cer
 openssl x509 -in axTLS.x509_1024.pem -outform DER -out axTLS.x509_1024.cer
 openssl x509 -in axTLS.x509_2048.pem -outform DER -out axTLS.x509_2048.cer
 openssl x509 -in axTLS.x509_4096.pem -outform DER -out axTLS.x509_4096.cer
-openssl x509 -in axTLS.x509_device.pem -outform DER -out axTLS.x509_device.cer
 
 # generate pkcs8 files (use RC4-128 for encryption)
 openssl pkcs8 -in axTLS.key_1024.pem -passout pass:abcd -topk8 -v1 PBE-SHA1-RC4-128 -out axTLS.encrypted_pem.p8

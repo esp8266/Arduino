@@ -241,8 +241,9 @@ static int x509_v3_subject_alt_name(const uint8_t *cert, int offset,
 {
     if ((offset = asn1_is_subject_alt_name(cert, offset)) > 0)
     {
-        /* ignore if present */
-        asn1_is_critical_ext(cert, &offset);
+        x509_ctx->subject_alt_name_present = true;
+        x509_ctx->subject_alt_name_is_critical = 
+                        asn1_is_critical_ext(cert, &offset);
 
         if (asn1_next_obj(cert, &offset, ASN1_OCTET_STRING) > 0)
         {
@@ -268,9 +269,8 @@ static int x509_v3_subject_alt_name(const uint8_t *cert, int offset,
                         x509_ctx->subject_alt_dnsnames[totalnames+1] = NULL;
                         memcpy(x509_ctx->subject_alt_dnsnames[totalnames], 
                                 cert + offset, dnslen);
-                        x509_ctx->subject_alt_dnsnames[
-                                totalnames][dnslen] = 0;
-                        ++totalnames;
+                        x509_ctx->subject_alt_dnsnames[totalnames][dnslen] = 0;
+                        totalnames++;
                     }
 
                     offset += dnslen;
@@ -299,7 +299,7 @@ static int x509_v3_basic_constraints(const uint8_t *cert, int offset,
 
     if (asn1_next_obj(cert, &offset, ASN1_OCTET_STRING) < 0 ||
     		asn1_next_obj(cert, &offset, ASN1_SEQUENCE) < 0 ||
-    		asn1_get_bool(cert, &offset, &x509_ctx->basic_constaint_cA) < 0 ||
+    		asn1_get_bool(cert, &offset, &x509_ctx->basic_constraint_cA) < 0 ||
     		asn1_get_int(cert, &offset,
     		                &x509_ctx->basic_constraint_pathLenConstraint) < 0)
     {
@@ -484,11 +484,31 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert,
         goto end_verify;
     }
 
-    if (cert->basic_constaint_cA && 
-                IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_KEY_CERT_SIGN))
+    if (cert->basic_constraint_present)
     {
-        ret = X509_VFY_ERROR_BASIC_CONSTRAINT;     
-        goto end_verify;
+    	/* If the cA boolean is not asserted,
+    	   then the keyCertSign bit in the key usage extension MUST NOT be
+    	   asserted. */
+    	if (!cert->basic_constraint_cA &&
+                IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_KEY_CERT_SIGN))
+		{
+			ret = X509_VFY_ERROR_BASIC_CONSTRAINT;
+			goto end_verify;
+		}
+
+        /* The pathLenConstraint field is meaningful only if the cA boolean is
+           asserted and the key usage extension, if present, asserts the
+           keyCertSign bit.  In this case, it gives the maximum number of 
+           non-self-issued intermediate certificates that may follow this 
+           certificate in a valid certification path. */
+		if (cert->basic_constraint_cA &&
+            (!cert->key_usage_present || 
+                IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_KEY_CERT_SIGN)) &&
+            (cert->basic_constraint_pathLenConstraint+1) < *pathLenConstraint)
+		{
+			ret = X509_VFY_ERROR_BASIC_CONSTRAINT;
+			goto end_verify;
+		}
     }
 
     next_cert = cert->next;
@@ -498,12 +518,14 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert,
     {
        if (ca_cert_ctx != NULL) 
        {
-            /* go thu the CA store */
+            /* go thru the CA store */
             while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
             {
-                /* ignore CA certs that are not really CA certs */
+                /* the extension is present but the cA boolean is not 
+                   asserted, then the certified public key MUST NOT be used 
+                   to verify certificate signatures. */
                 if (cert->basic_constraint_present && 
-                        !ca_cert_ctx->cert[i]->basic_constaint_cA)
+                        !ca_cert_ctx->cert[i]->basic_constraint_cA)
                     continue;
                         
                 if (asn1_compare_dn(cert->ca_cert_dn,
@@ -515,14 +537,6 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert,
                     mod = ca_cert_ctx->cert[i]->rsa_ctx->m;
                     expn = ca_cert_ctx->cert[i]->rsa_ctx->e;
 
-                    if (ca_cert_ctx->cert[i]->basic_constaint_cA &&
-                        ca_cert_ctx->cert[i]->
-                                    basic_constraint_pathLenConstraint <
-                                                            *pathLenConstraint)
-                    {
-                        ret = X509_VFY_ERROR_BASIC_CONSTRAINT;       
-                        goto end_verify;
-                    }
 
                     break;
                 }
@@ -582,8 +596,8 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert,
     /* go down the certificate chain using recursion. */
     if (next_cert != NULL)
     {
+    	(*pathLenConstraint)++; /* don't include last certificate */
         ret = x509_verify(ca_cert_ctx, next_cert, pathLenConstraint);
-        (*pathLenConstraint)++; /* don't include last certificate */
     }
 
 end_verify:
@@ -632,6 +646,117 @@ void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx)
     {
         printf("State (ST):\t\t\t");
         printf("%s\n", cert->cert_dn[X509_STATE]);
+    }
+
+    if (cert->basic_constraint_present)
+    {
+        printf("Basic Constraints:\t\t%sCA:%s, pathlen:%d\n",
+                cert->basic_constraint_is_critical ? 
+                    "critical, " : "",
+                cert->basic_constraint_cA? "TRUE" : "FALSE",
+                cert->basic_constraint_pathLenConstraint);
+    }
+
+    if (cert->key_usage_present)
+    {
+        printf("Key Usage:\t\t\t%s", cert->key_usage_is_critical ? 
+                    "critical, " : "");
+        bool has_started = false;
+
+        if (IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_DIGITAL_SIGNATURE))
+        {
+            printf("Digital Signature");
+            has_started = true;
+        }
+
+        if (IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_NON_REPUDIATION))
+        {
+            if (has_started)
+                printf(", ");
+
+            printf("Non Repudiation");
+            has_started = true;
+        }
+
+        if (IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_KEY_ENCIPHERMENT))
+        {
+            if (has_started)
+                printf(", ");
+
+            printf("Key Encipherment");
+            has_started = true;
+        }
+        
+        if (IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_DATA_ENCIPHERMENT))
+        {
+            if (has_started)
+                printf(", ");
+
+            printf("Data Encipherment");
+            has_started = true;
+        }
+
+        if (IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_KEY_AGREEMENT))
+        {
+            if (has_started)
+                printf(", ");
+
+            printf("Key Agreement");
+            has_started = true;
+        }
+
+        if (IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_KEY_CERT_SIGN))
+        {
+            if (has_started)
+                printf(", ");
+
+            printf("Key Cert Sign");
+            has_started = true;
+        }
+
+        if (IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_CRL_SIGN))
+        {
+            if (has_started)
+                printf(", ");
+
+            printf("CRL Sign");
+            has_started = true;
+        }
+       
+        if (IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_ENCIPHER_ONLY))
+        {
+            if (has_started)
+                printf(", ");
+
+            printf("Encipher Only");
+            has_started = true;
+        }
+
+        if (IS_SET_KEY_USAGE_FLAG(cert, KEY_USAGE_DECIPHER_ONLY))
+        {
+            if (has_started)
+                printf(", ");
+
+            printf("Decipher Only");
+            has_started = true;
+        }
+
+        printf("\n");
+    }
+
+    if (cert->subject_alt_name_present)
+    {
+        printf("Subject Alt Name:\t\t%s", cert->subject_alt_name_is_critical 
+                ?  "critical, " : "");
+        if (cert->subject_alt_dnsnames)
+        {
+            int i = 0;
+
+            while (cert->subject_alt_dnsnames[i])
+                printf("%s ", cert->subject_alt_dnsnames[i++]);
+        }
+        printf("\n");
+
     }
 
     printf("=== CERTIFICATE ISSUED BY ===\n");
@@ -699,15 +824,6 @@ void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx)
         printf("Verify:\t\t\t\t%s\n",
                 x509_display_error(x509_verify(ca_cert_ctx, cert,
                         &pathLenConstraint)));
-    }
-
-    if (cert->basic_constraint_present)
-    {
-        printf("Basic Constraints:\t\t%s, CA:%s, pathlen:%d\n",
-                cert->basic_constraint_is_critical ? 
-                    "critical" : "NOT critical",
-                cert->basic_constaint_cA? "TRUE" : "FALSE",
-                cert->basic_constraint_pathLenConstraint);
     }
 
 #if 0
