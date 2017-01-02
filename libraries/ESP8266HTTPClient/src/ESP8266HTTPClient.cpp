@@ -33,7 +33,7 @@
 class TransportTraits
 {
 public:
-    virtual ~TransportTraits() 
+    virtual ~TransportTraits()
     {
     }
 
@@ -311,6 +311,15 @@ void HTTPClient::setTimeout(uint16_t timeout)
 void HTTPClient::useHTTP10(bool useHTTP10)
 {
     _useHTTP10 = useHTTP10;
+}
+
+/**
+ * ignore TLS verification errors
+ * @param ignore
+ */
+void HTTPClient::setIgnoreTLSVerifyFailure(bool ignore)
+{
+    _ignoreTLSVerifyFailure = ignore;
 }
 
 /**
@@ -833,9 +842,13 @@ bool HTTPClient::connect(void)
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
     if (!_transportTraits->verify(*_tcp, _host.c_str())) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
-        _tcp->stop();
-        return false;
+        if(_ignoreTLSVerifyFailure) {
+            DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed but continuing anyway\n");
+        } else {
+            DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
+            _tcp->stop();
+            return false;
+        }
     }
 
     // set Timeout for readBytesUntil and readStringUntil

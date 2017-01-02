@@ -151,6 +151,7 @@ public:
     void setTimeout(uint16_t timeout);
 
     void useHTTP10(bool usehttp10 = true);
+    void setIgnoreTLSVerifyFailure(bool ignore);
 
     /// request handling
     int GET();
@@ -206,6 +207,7 @@ protected:
     bool _reuse = false;
     uint16_t _tcpTimeout = HTTPCLIENT_DEFAULT_TCP_TIMEOUT;
     bool _useHTTP10 = false;
+    bool _ignoreTLSVerifyFailure = false;
 
     String _uri;
     String _protocol;
