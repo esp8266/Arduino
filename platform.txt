@@ -72,7 +72,7 @@ compiler.elf2hex.flags=
 compiler.size.cmd=xtensa-lx106-elf-size
 
 # This can be overriden in boards.txt
-build.extra_flags=-DESP8266
+build.extra_flags=-DESP8266 -DEBOOT_ENABLE_FLASH_STORAGE
 
 # These can be overridden in platform.local.txt
 compiler.c.extra_flags=

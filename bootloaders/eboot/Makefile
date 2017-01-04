@@ -18,7 +18,7 @@ LD := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-gcc
 OBJDUMP := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-objdump
 
 INC += -I../../tools/sdk/include
-CFLAGS += -std=gnu99
+CFLAGS += -std=gnu99 -DEBOOT_ENABLE_FLASH_STORAGE
 
 CFLAGS += -O0 -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals
 

@@ -520,6 +520,8 @@ uint32_t EspClass::getSketchSize() {
 }
 
 extern "C" uint32_t _FS_start;
+extern "C" uint32_t _SKETCH_AREA_end;
+// Merged Conflict To Resolve
 
 uint32_t EspClass::getFreeSketchSpace() {
 
@@ -527,6 +529,9 @@ uint32_t EspClass::getFreeSketchSpace() {
     // round one sector up
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     uint32_t freeSpaceEnd = (uint32_t)&_FS_start - 0x40200000;
+    uint32_t freeSpaceEnd = (uint32_t)&_SKETCH_AREA_end - 0x40200000;
+    // Merged Conflict To Resolve
+
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);

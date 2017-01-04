@@ -95,6 +95,8 @@ SECTIONS
 
   /* IRAM is split into .text and .text1 to allow for moving specific */
   /* functions into IRAM that would be matched by the irom0.text matcher */
+  // Merged Conflict To Resolve
+  // iram layout inclding magic marker
   .text : ALIGN(4)
   {
     _stext = .;

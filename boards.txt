@@ -2720,6 +2720,50 @@ nodemcuv2.menu.baud.921600.upload.speed=921600
 nodemcuv2.menu.baud.3000000=3000000
 nodemcuv2.menu.baud.3000000.upload.speed=3000000
 
+
+
+
+nodemcuv2.menu.Debug.Disabled=Disabled
+nodemcuv2.menu.Debug.Disabled.build.debug_port=
+nodemcuv2.menu.Debug.Serial=Serial
+nodemcuv2.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+nodemcuv2.menu.Debug.Serial1=Serial1
+nodemcuv2.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+nodemcuv2.menu.DebugLevel.None____=None
+nodemcuv2.menu.DebugLevel.None____.build.debug_level=
+nodemcuv2.menu.DebugLevel.Core____=Core
+nodemcuv2.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
+nodemcuv2.menu.DebugLevel.SSL_____=Core + SSL
+nodemcuv2.menu.DebugLevel.SSL_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+nodemcuv2.menu.DebugLevel.SSL_MEM_=Core + SSL + TLS Mem
+nodemcuv2.menu.DebugLevel.SSL_MEM_.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_TLS_MEM
+nodemcuv2.menu.DebugLevel.WiFic___=Core + WiFi
+nodemcuv2.menu.DebugLevel.WiFic___.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+nodemcuv2.menu.DebugLevel.WiFi____=WiFi
+nodemcuv2.menu.DebugLevel.WiFi____.build.debug_level=-DDEBUG_ESP_WIFI
+nodemcuv2.menu.DebugLevel.HTTPClient=HTTPClient
+nodemcuv2.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+nodemcuv2.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+nodemcuv2.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
+nodemcuv2.menu.DebugLevel.HTTPUpdate=HTTPUpdate
+nodemcuv2.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
+nodemcuv2.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
+nodemcuv2.menu.DebugLevel.HTTPUpdate2.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE
+nodemcuv2.menu.DebugLevel.HTTPUpdate3=HTTPClient + HTTPUpdate + Updater
+nodemcuv2.menu.DebugLevel.HTTPUpdate3.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER
+nodemcuv2.menu.DebugLevel.HTTPServer=HTTPServer
+nodemcuv2.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
+nodemcuv2.menu.DebugLevel.UPDATER=Updater
+nodemcuv2.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
+nodemcuv2.menu.DebugLevel.OTA_____=OTA
+nodemcuv2.menu.DebugLevel.OTA_____.build.debug_level=-DDEBUG_ESP_OTA
+nodemcuv2.menu.DebugLevel.OTA2____=OTA + Updater
+nodemcuv2.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
+nodemcuv2.menu.DebugLevel.all_____=All
+nodemcuv2.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
+
+
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
 modwifi.build.board=MOD_WIFI_ESP8266
