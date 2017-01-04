@@ -72,6 +72,9 @@ int find_app_start(const uint32_t flash_addr)
         }
         count += 1;
     } while ((image_header.magic != 0xe9) && (count < 4));
+    if (count >= 4) {
+        return 0;
+    }
     return pos;
 }
 
