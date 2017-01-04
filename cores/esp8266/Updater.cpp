@@ -11,6 +11,7 @@ extern "C" {
     #include "user_interface.h"
 }
 
+extern "C" uint32_t _SKETCH_AREA_end;
 extern "C" uint32_t _SPIFFS_start;
 
 UpdaterClass::UpdaterClass()
@@ -76,7 +77,7 @@ bool UpdaterClass::begin(size_t size, int command) {
     //size of current sketch rounded to a sector
     uint32_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address of the end of the space available for sketch and update
-    uint32_t updateEndAddress = (uint32_t)&_SPIFFS_start - 0x40200000;
+    uint32_t updateEndAddress = (uint32_t)&_SKETCH_AREA_end - 0x40200000;
     //size of the update rounded to a sector
     uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address where we will start writing the update

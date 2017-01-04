@@ -40,6 +40,8 @@ extern "C"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
+#define DEBUG_ESP_SSL
+
 #ifdef DEBUG_ESP_SSL
 #define DEBUG_SSL
 #endif

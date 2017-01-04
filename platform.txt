@@ -53,7 +53,7 @@ compiler.esptool.cmd=esptool
 compiler.esptool.cmd.windows=esptool.exe
 
 # This can be overriden in boards.txt
-build.extra_flags=-DESP8266
+build.extra_flags=-DESP8266 -DEBOOT_ENABLE_FLASH_STORAGE
 
 # These can be overridden in platform.local.txt
 compiler.c.extra_flags=
@@ -120,3 +120,38 @@ tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/to
 tools.mkspiffs.cmd=mkspiffs
 tools.mkspiffs.cmd.windows=mkspiffs.exe
 tools.mkspiffs.path={runtime.platform.path}/tools/mkspiffs
+
+
+# StrobeLoader settings
+# ------------------------------
+
+tools.sl.path={runtime.tools.sl.path}
+tools.sl.cmd.path=curl
+tools.sl.config.path={path}/etc/sl.conf
+
+tools.sl.upload.params.verbose=-v
+tools.sl.upload.params.quiet=-q -q
+# tools.sl.upload.verify is needed for backwards compatibility with IDE 1.6.8 or older, IDE 1.6.9 or newer overrides this value
+tools.sl.upload.verify=
+tools.sl.upload.params.noverify=-V
+#tools.sl.upload.pattern="{cmd.path}" -X POST -u julian@davison.org.nz:pleb22 -F new_binary=@"{build.path}/{build.project_name}.bin" -F _method=PUT -F automaton=True https://sl.davison.org.nz/fw/thread/1f2e2d40-b10e-11e6-88fe-5bbac7f802bf/new
+# "-C{config.path}" {upload.verbose} {upload.verify} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+
+
+tools.sl.program.params.verbose=-v
+tools.sl.program.params.quiet=-s -S
+# tools.sl.program.verify is needed for backwards compatibility with IDE 1.6.8 or older, IDE 1.6.9 or newer overrides this value
+tools.sl.program.verify=
+tools.sl.program.params.noverify=-V
+tools.sl.program.pattern="{cmd.path}" -X POST -u julian@davison.org.nz:pleb22 -F new_binary=@"{build.path}/{build.project_name}.bin" -F _method=PUT -F automaton=True https://sl.davison.org.nz/fw/thread/1f2e2d40-b10e-11e6-88fe-5bbac7f802bf/new
+#tools.sl.program.pattern="{cmd.path}" "-C{config.path}" {program.verbose} {program.verify} -p{build.mcu} -c{protocol} {program.extra_params} #"-Uflash:w:{build.path}/{build.project_name}.hex:i"
+#
+#tools.sl.erase.params.verbose=-v
+#tools.sl.erase.params.quiet=-q -q
+tools.sl.erase.pattern="{cmd.path}" "-C{config.path}" {erase.verbose} -p{build.mcu} -c{protocol} {program.extra_params} -e #-Ulock:w:{bootloader.unlock_bits}:m -Uefuse:w:{bootloader.extended_fuses}:m -Uhfuse:w:{bootloader.high_fuses}:m -Ulfuse:w:{bootloader.low_fuses}:m
+#
+#tools.sl.bootloader.params.verbose=-v
+#tools.sl.bootloader.params.quiet=-q -q
+tools.sl.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} #"-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i" -Ulock:w:{bootloader.lock_bits}:m
+#
+#tools.sl_remote.upload.pattern=/usr/bin/run-sl /tmp/sketch.hex {upload.verbose} -p{build.mcu}
