@@ -158,4 +158,4 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [OLED](https://github.com/klarsys/esp8266-OLED) - a library for controlling I2C connected OLED displays. Tested with 0.96 inch OLED graphics display.
 - [MFRC522](https://github.com/miguelbalboa/rfid) - A library for using the Mifare RC522 RFID-tag reader/writer.
 - [Ping](https://github.com/dancol90/ESP8266Ping) - lets the ESP8266 ping a remote machine.
-- [JPEGDecoder](https://github.com/fredericplante/JPEGDecoder) - lets the ESP8266 decode your JPEG file, then show it on TFT
+- [JPEGDecoder](https://github.com/fredericplante/JPEGDecoder) - lets the ESP8266 decode your JPEG files.
