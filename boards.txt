@@ -1,5 +1,6 @@
 menu.UploadSpeed=Upload Speed
 menu.CpuFrequency=CPU Frequency
+menu.CrystalFrequency=Crystal Frequency
 menu.FlashSize=Flash Size
 menu.FlashMode=Flash Mode
 menu.FlashFreq=Flash Frequency
@@ -23,6 +24,7 @@ generic.serial.disableRTS=true
 
 generic.build.mcu=esp8266
 generic.build.f_cpu=80000000L
+generic.build.f_crystal=1
 generic.build.board=ESP8266_ESP01
 generic.build.core=esp8266
 generic.build.variant=generic
@@ -35,6 +37,13 @@ generic.menu.CpuFrequency.80=80 MHz
 generic.menu.CpuFrequency.80.build.f_cpu=80000000L
 generic.menu.CpuFrequency.160=160 MHz
 generic.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+generic.menu.CrystalFrequency.40=40 MHz
+generic.menu.CrystalFrequency.40.build.f_crystal=0
+generic.menu.CrystalFrequency.26=26 MHz
+generic.menu.CrystalFrequency.26.build.f_crystal=1
+generic.menu.CrystalFrequency.24=24 MHz
+generic.menu.CrystalFrequency.24.build.f_crystal=2
 
 generic.menu.FlashFreq.40=40MHz
 generic.menu.FlashFreq.40.build.flash_freq=40

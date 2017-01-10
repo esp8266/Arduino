@@ -26,6 +26,10 @@
  #include <string.h>
  #include "c_types.h"
 
+#ifndef F_CRYSTAL
+#define F_CRYSTAL 1
+#endif
+
 static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 {
     [0] = 5,  // Reserved, do not change
@@ -86,9 +90,7 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     // 0: 40MHz
     // 1: 26MHz
     // 2: 24MHz
-    [48] = 1,
-
-
+    [48] = F_CRYSTAL,
 
     // sdio_configure
     // 0: Auto by pin strapping
