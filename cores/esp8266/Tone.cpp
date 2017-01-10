@@ -67,10 +67,10 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
     // Alternate handling of zero freqency to avoid divide by zero errors
     if (frequency == 0)
     {
-	    noTone(_pin);
-	    return;
-    }    
-    
+        noTone(_pin);
+        return;
+    }
+
     // Calculate the toggle count
     if (duration > 0) {
       toggle_counts[_index] = 2 * frequency * duration / 1000;
