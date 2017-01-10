@@ -64,6 +64,13 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
     // Set the pinMode as OUTPUT
     pinMode(_pin, OUTPUT);
 
+	  // Alternate handling of zero freqency to avoid divide by zero errors
+	  if (frequency == 0)
+    {
+	    noTone(_pin);
+	    return;
+    }    
+    
     // Calculate the toggle count
     if (duration > 0) {
       toggle_counts[_index] = 2 * frequency * duration / 1000;
@@ -82,12 +89,7 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
         timer1_isr_init();
         timer1_attachInterrupt(t1IntHandler);
         timer1_enable(TIM_DIV1, TIM_EDGE, TIM_LOOP);
-        if (frequency == 0) {
-          timer1_write((clockCyclesPerMicrosecond() * 500000));
-        }
-        else {
-          timer1_write((clockCyclesPerMicrosecond() * 500000) / frequency);
-        }
+        timer1_write((clockCyclesPerMicrosecond() * 500000) / frequency);
         break;
     }
   }
