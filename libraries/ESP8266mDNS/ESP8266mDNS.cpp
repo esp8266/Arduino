@@ -170,6 +170,10 @@ bool MDNSResponder::begin(const char* hostname){
   return _listen();
 }
 
+void MDNSResponder::notifyAPChange() {
+  _restart();
+}
+
 void MDNSResponder::_restart() {
   if (_conn) {
     _conn->unref();
@@ -181,23 +185,13 @@ void MDNSResponder::_restart() {
 bool MDNSResponder::_listen() {
   // Open the MDNS socket if it isn't already open.
   if (!_conn) {
-    uint32_t ourIp = _getOurIp();
-    if(ourIp == 0){
-      #ifdef MDNS_DEBUG_RX
-      Serial.println("MDNS: no IP address to listen on");
-      #endif
-      return false;
-    }
     #ifdef MDNS_DEBUG_RX
-    Serial.print("MDNS listening on IP: ");
-    Serial.println(IPAddress(ourIp));
+    Serial.println("MDNS listening");
     #endif
-    ip_addr_t ifaddr;
-    ifaddr.addr = ourIp;
     ip_addr_t multicast_addr;
     multicast_addr.addr = (uint32_t) MDNS_MULTICAST_ADDR;
 
-    if (igmp_joingroup(&ifaddr, &multicast_addr)!= ERR_OK) {
+    if (igmp_joingroup(IP_ADDR_ANY, &multicast_addr)!= ERR_OK) {
       return false;
     }
 
@@ -207,7 +201,6 @@ bool MDNSResponder::_listen() {
     if (!_conn->listen(*IP_ADDR_ANY, MDNS_PORT)) {
       return false;
     }
-    _conn->setMulticastInterface(ifaddr);
     _conn->setMulticastTTL(MDNS_MULTICAST_TTL);
     _conn->onRx(std::bind(&MDNSResponder::update, this));
     _conn->connect(multicast_addr, MDNS_PORT);
@@ -442,24 +435,6 @@ uint16_t MDNSResponder::_getServicePort(char *name, char *proto){
     }
   }
   return 0;
-}
-
-uint32_t MDNSResponder::_getOurIp(){
-  int mode = wifi_get_opmode();
-  if(mode & STATION_MODE){
-    struct ip_info staIpInfo;
-    wifi_get_ip_info(STATION_IF, &staIpInfo);
-    return staIpInfo.ip.addr;
-  } else if (mode & SOFTAP_MODE) {
-    struct ip_info staIpInfo;
-    wifi_get_ip_info(SOFTAP_IF, &staIpInfo);
-    return staIpInfo.ip.addr;
-  } else {
-#ifdef MDNS_DEBUG_ERR
-    Serial.printf("ERR_NO_LOCAL_IP\n");
-#endif
-    return 0;
-  }
 }
 
 void MDNSResponder::_parsePacket(){
@@ -868,7 +843,20 @@ void MDNSResponder::_parsePacket(){
     else if(questions[i] == MDNS_TYPE_PTR) responseMask |= 0xF;
   }
 
-  return _reply(responseMask, serviceName, protoName, servicePort);
+  struct ip_info ip_info;
+  bool match_ap = false;
+  if (wifi_get_opmode() & SOFTAP_MODE) {
+    struct ip_info remote_ip_info;
+    remote_ip_info.ip.addr = _conn->getRemoteAddress();
+    wifi_get_ip_info(SOFTAP_IF, &ip_info);
+    if (ip_info.ip.addr && ip_addr_netcmp(&remote_ip_info.ip, &ip_info.ip, &ip_info.netmask))
+      match_ap = true;
+  }
+  if (!match_ap)
+    wifi_get_ip_info(STATION_IF, &ip_info);
+  uint32_t ip = ip_info.ip.addr;
+
+  return _reply(responseMask, serviceName, protoName, servicePort, ip);
 }
 
 void MDNSResponder::enableArduino(uint16_t port, bool auth){
@@ -882,17 +870,28 @@ void MDNSResponder::enableArduino(uint16_t port, bool auth){
 
 size_t MDNSResponder::advertiseServices(){
   MDNSService* servicePtr;
+  struct ip_info ip_info;
+  uint32_t ip;
   size_t i = 0;
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
     if(servicePtr->_port > 0){
-      _reply(0x0F, servicePtr->_name, servicePtr->_proto, servicePtr->_port);
+      wifi_get_ip_info(SOFTAP_IF, &ip_info);
+      ip = ip_info.ip.addr;
+      if (ip)
+        _reply(0x0F, servicePtr->_name, servicePtr->_proto, servicePtr->_port, ip);
+
+      wifi_get_ip_info(SOFTAP_IF, &ip_info);
+      ip = ip_info.ip.addr;
+      if (ip)
+        _reply(0x0F, servicePtr->_name, servicePtr->_proto, servicePtr->_port, ip);
+
       i++;
     }
   }
   return i;
 }
 
-void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint16_t port){
+void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint16_t port, uint32_t ip) {
   int i;
   if(replyMask == 0) return;
 
@@ -1062,7 +1061,6 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
     _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
     _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
 
-    uint32_t ip = _getOurIp();
     uint8_t aaaAttrs[10] = {
       0x00, 0x01,             //TYPE A
       0x80, 0x01,             //Class IN, with cache flush
@@ -1081,7 +1079,10 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
     _conn->append(reinterpret_cast<const char*>(aaaRData), 4);
   }
 
- _conn->send();
+  ip_addr_t ifaddr;
+  ifaddr.addr = ip;
+  _conn->setMulticastInterface(ifaddr);
+  _conn->send();
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
