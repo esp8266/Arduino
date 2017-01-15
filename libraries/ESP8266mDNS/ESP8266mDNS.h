@@ -66,6 +66,8 @@ public:
   bool begin(const char* hostName, IPAddress ip, uint32_t ttl=120){
     return begin(hostName);
   }
+  /* Application should call this whenever AP is configured/disabled */
+  void notifyAPChange();
   void update();
 
   void addService(char *service, char *proto, uint16_t port);
@@ -118,12 +120,11 @@ private:
   WiFiEventHandler _gotIPHandler;
   
 
-  uint32_t _getOurIp();
   uint16_t _getServicePort(char *service, char *proto);
   MDNSTxt * _getServiceTxt(char *name, char *proto);
   uint16_t _getServiceTxtLen(char *name, char *proto);
   void _parsePacket();
-  void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port);
+  void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port, uint32_t ip);
   size_t advertiseServices(); // advertise all hosted services
   MDNSAnswer* _getAnswerFromIdx(int idx);
   int _getNumAnswers();
