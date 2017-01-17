@@ -54,8 +54,11 @@ public:
   void setPrivateKey(const uint8_t* pk, size_t size);
 
   bool loadCertificate(Stream& stream, size_t size);
+  bool loadCertificate(const uint8_t* pk, size_t size);
   bool loadPrivateKey(Stream& stream, size_t size);
+  bool loadPrivateKey(const uint8_t* pk, size_t size);
   bool loadCACert(Stream& stream, size_t size);
+  bool loadCACert(const uint8_t* pk, size_t size);
 
   template<typename TFile>
   bool loadCertificate(TFile& file) {
