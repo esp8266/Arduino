@@ -333,6 +333,7 @@ protected:
         return _written;
     }
 
+#define TCP_WRITE_CHUNK_SIZE 256
 
     void _write_some()
     {
@@ -345,16 +346,21 @@ protected:
         if (_pcb->snd_queuelen >= TCP_SND_QUEUELEN) {
             can_send = 0;
         }
-        size_t will_send = (can_send < left) ? can_send : left;
-        if (will_send) {
-            const uint8_t* buf = _datasource->get_buffer(will_send);
-            err_t err = tcp_write(_pcb, buf, will_send, TCP_WRITE_FLAG_COPY);
-            _datasource->release_buffer(buf, will_send);
+		size_t will_send = (can_send < left) ? can_send : left;
+		bool did_write = false;
+		while( will_send ) {
+			size_t next_chunk =
+				will_send > TCP_WRITE_CHUNK_SIZE ? TCP_WRITE_CHUNK_SIZE : will_send;
+            const uint8_t* buf = _datasource->get_buffer(next_chunk);
+            err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
+            _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
-                _written += will_send;
-                tcp_output(_pcb);
+                _written += next_chunk;
+				did_write = true;
             }
+			will_send -= next_chunk;
         }
+		if( did_write ) tcp_output(_pcb);
 
         if (!_datasource->available() || _noblock) {
             delete _datasource;
