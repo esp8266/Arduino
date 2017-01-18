@@ -153,6 +153,7 @@ SECTIONS
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
+    _ESP8266_AR_APP_START = ABSOLUTE(.);
     *(.ver_number)
     LONG(0x31305241)
     LONG(_BOOTLOADER_DATA)

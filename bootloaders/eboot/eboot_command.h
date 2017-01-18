@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "eboot.h"
 
 #define RTC_MEM ((volatile uint32_t*)0x60001200)
 

@@ -31,22 +31,11 @@ uint32_t eboot_command_calculate_crc32(const struct eboot_command* cmd)
 
 #if defined (EBOOT_ENABLE_FLASH_STORAGE)
 
-uint32_t eboot_read_flash_index(eboot_index_t *eboot_index)
-{
-    if (SPIRead(0 + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t), &eboot_index, sizeof(eboot_index))) {
-        return 0;
-    }
-
-    if (eboot_index->magic != EBOOT_INDEX_MAGIC_V1) {
-        return 0;
-    }
-
-    return 1;
-}
+extern int find_app_start(const uint32_t flash_addr);
 
 eboot_flash_command_t *commandAddress(void) {
   eboot_index_t eboot_index;
-  const uint32_t addr = 0 + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t);
+  const uint32_t addr = find_app_start(0) + sizeof(image_header_t) + sizeof(section_header_t);
   if (SPIRead(addr, (uint32_t *)&eboot_index, sizeof(eboot_index))) {
     return NULL;
   }
@@ -62,10 +51,12 @@ bool readBootCommand(int cmd, eboot_flash_command_t *dst) {
   if (cmd >= EBOOT_COMMAND_MAX_COUNT) {
     return 0;
   }
+#ifdef EBOOT_DEBUG_FLASH
     ets_putc('r');
     ets_putc('b');
     ets_putc('0' + cmd);
     ets_putc('\n');
+#endif // EBOOT_DEBUG_FLASH
   uint32_t uint = (uint32_t) cmds;
   uint32_t addr = (uint32_t)cmds - 0x40200000;
   addr += cmd * sizeof(*dst);
@@ -79,10 +70,12 @@ bool writeBootCommand(int cmd, eboot_flash_command_t *dst) {
   if (cmd >= EBOOT_COMMAND_MAX_COUNT) {
     return 0;
   }
+#ifdef EBOOT_DEBUG_FLASH
     ets_putc('w');
     ets_putc('b');
     ets_putc('0' + cmd);
     ets_putc('\n');
+#endif // EBOOT_DEBUG_FLASH
   uint32_t uint = (uint32_t) cmds;
   uint32_t addr = (uint32_t)cmds - 0x40200000;
   addr += cmd * sizeof(*dst);
@@ -106,10 +99,12 @@ uint32_t eboot_command_read_from_flash(struct eboot_command *cmd)
         if (((flash_command.flags & EBOOT_CMD_FLAG_SLOT_FREE) == 0) &&
             ((flash_command.flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING)) {
             // Not free (meaning there's some data) and pending (so it's yet to be completed)
+#ifdef EBOOT_DEBUG_FLASH
         ets_putc('r');
         ets_putc('c');
         ets_putc('0' + i);
         ets_putc('\n');
+#endif // EBOOT_DEBUG_FLASH
             src = (uint32_t *)&flash_command.cmd;
             for (uint32_t j = 0; j < dw_count; ++j) {
                 dst[j] = src[j];
@@ -131,10 +126,12 @@ uint32_t eboot_command_write_to_flash(struct eboot_command *cmd)
         readBootCommand(i, &flash_command);
         if (((flash_command.flags & EBOOT_CMD_FLAG_SLOT_FREE) == EBOOT_CMD_FLAG_SLOT_FREE) &&
             ((flash_command.flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING)) {
+#ifdef EBOOT_DEBUG_FLASH
         ets_putc('w');
         ets_putc('c');
         ets_putc('0' + i);
         ets_putc('\n');
+#endif // EBOOT_DEBUG_FLASH
             dst = (uint32_t *)&flash_command.cmd;
             for (uint32_t j = 0; j < dw_count; ++j) {
                 dst[j] = src[j];
@@ -157,10 +154,9 @@ uint32_t eboot_command_clear_flash(void)
         if (((flash_command.flags & EBOOT_CMD_FLAG_SLOT_FREE) == 0) &&
             ((flash_command.flags & EBOOT_CMD_FLAG_PENDING) == EBOOT_CMD_FLAG_PENDING)) {
             flash_command.flags &= ~EBOOT_CMD_FLAG_PENDING;
-            // ets_printf("Clearing bootCommand %d, flags: %x\n", i, flash_command.flags);
-        ets_wdt_disable();
+            ets_wdt_disable();
             writeBootCommand(i, &flash_command);
-        ets_wdt_enable();
+            ets_wdt_enable();
             return 1;
         }
     }
@@ -198,7 +194,6 @@ void eboot_command_clear_rtc(void)
 int eboot_command_read(struct eboot_command* cmd)
 {
     uint32_t have_command = 0;
-    uint32_t count = 0;
 #if defined (EBOOT_ENABLE_FLASH_STORAGE)
     ets_putc('F');
     ets_putc(':');
@@ -208,11 +203,7 @@ int eboot_command_read(struct eboot_command* cmd)
 #endif // EBOOT_ENABLE_FLASH_STORAGE
     if (have_command == 0) {
         ets_putc('R');
-        ets_putc('-');
         eboot_command_read_from_rtc(cmd);
-        count = cmd->args[28];
-        cmd->args[28] = 0;
-        ets_putc('0' + count);
         ets_putc('\n');
     }
 
@@ -222,16 +213,6 @@ int eboot_command_read(struct eboot_command* cmd)
         return 1;
     }
 
-    if (count >= 3) {
-        ets_putc('R');
-        ets_putc('>');
-        ets_putc('!');
-        ets_putc('\n');
-        return 1;
-    }
-
-    cmd->args[28] = count + 1;
-    eboot_command_write_to_rtc(cmd);
     return 0;
 }
 
