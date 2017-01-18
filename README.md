@@ -64,17 +64,17 @@ python get.py
 
 [PlatformIO](http://platformio.org) is an open source ecosystem for IoT
 development with cross platform build system, library manager and full support
-for Espressif (ESP8266) development. It works on the popular host OS: Mac OS X, Windows,
+for Espressif (ESP8266) development. It works on the popular host OS: macOS, Windows,
 Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-- [What is PlatformIO?](http://docs.platformio.org/en/stable/what-is-platformio.html)
+- [What is PlatformIO?](http://docs.platformio.org/page/what-is-platformio.html)
 - [PlatformIO IDE](http://platformio.org/platformio-ide)
-- Quick Start with [PlatformIO IDE](http://docs.platformio.org/en/stable/ide/atom.html#quick-start) or [PlatformIO CLI](http://docs.platformio.org/en/stable/quickstart.html)
-- [Advanced using](http://docs.platformio.org/en/stable/platforms/espressif.html) -
+- Quick Start with [PlatformIO IDE](http://docs.platformio.org/page/ide/atom.html#quick-start) or [PlatformIO Core](http://docs.platformio.org/page/core.html)
+- [Advanced using](http://docs.platformio.org/page/platforms/espressif.html) -
   custom settings, uploading to SPIFFS, Over-the-Air (OTA) or using stage version
-- [Integration with other IDE](http://docs.platformio.org/en/stable/ide.html) -
-  Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
-- [Project Examples](http://docs.platformio.org/en/stable/platforms/espressif.html#examples)
+- [Integration with Cloud and Standalone IDEs](http://docs.platformio.org/page/ide.html) -
+  Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
+- [Project Examples](http://docs.platformio.org/page/platforms/espressif.html#examples)
 
 ### Building with make
 
