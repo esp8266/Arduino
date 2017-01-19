@@ -35,7 +35,7 @@ extern uint32_t _ESP8266_AR_APP_START;
 
 #define FLASH_SECTOR_SIZE 0x1000
 #define FLASH_BLOCK_SIZE 0x10000
-#define APP_START_OFFSET (&_ESP8266_AR_APP_START - 0x40200000)
+#define APP_START_OFFSET ((uint32_t) (&_ESP8266_AR_APP_START) - 0x40200000)
 
 typedef struct {
     unsigned char       magic;
