@@ -86,17 +86,14 @@ static int base64_decode_chars_signed(const int8_t* code_in, const int length_in
   return len;
 }
 
-int base64_decode_value(char value_in)
-{
-	return base64_decode_value_signed(*((int8_t *) &value_in));
+int base64_decode_value(char value_in){
+  return base64_decode_value_signed(*((int8_t *) &value_in));
 }
 
-int base64_decode_block(const char* code_in, const int length_in, char* plaintext_out, base64_decodestate* state_in)
-{
-	return base64_decode_block_signed( (int8_t *) code_in, length_in, (int8_t *) plaintext_out, state_in );
+int base64_decode_block(const char* code_in, const int length_in, char* plaintext_out, base64_decodestate* state_in){
+  return base64_decode_block_signed((int8_t *) code_in, length_in, (int8_t *) plaintext_out, state_in);
 }
 
-int base64_decode_chars(const char* code_in, const int length_in, char* plaintext_out)
-{
-	return base64_decode_chars_signed( (int8_t *) code_in, length_in, (int8_t *) plaintext_out );
+int base64_decode_chars(const char* code_in, const int length_in, char* plaintext_out){
+  return base64_decode_chars_signed((int8_t *) code_in, length_in, (int8_t *) plaintext_out);
 }
