@@ -242,6 +242,11 @@ protected:
     static void _check_cb(spiffs_check_type type, spiffs_check_report report,
                           uint32_t arg1, uint32_t arg2)
     {
+        (void) type;
+        (void) report;
+        (void) arg1;
+        (void) arg2;
+        
         // TODO: spiffs doesn't pass any context pointer along with _check_cb,
         // so we can't do anything useful here other than perhaps
         // feeding the watchdog
