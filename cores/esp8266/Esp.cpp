@@ -433,7 +433,7 @@ uint32_t EspClass::getSketchSize() {
         section_index < image_header.num_segments;
         ++section_index)
     {
-        section_header_t section_header = {0};
+        section_header_t section_header = {0, 0};
         if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header))) {
             return 0;
         }

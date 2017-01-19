@@ -49,7 +49,7 @@ class SPIFFSImpl : public FSImpl
 {
 public:
     SPIFFSImpl(uint32_t start, uint32_t size, uint32_t pageSize, uint32_t blockSize, uint32_t maxOpenFds)
-        : _fs({0})
+        : _fs{{0, 0, 0, 0, 0, 0, 0, 0}, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     , _start(start)
     , _size(size)
     , _pageSize(pageSize)
@@ -176,7 +176,7 @@ protected:
 
     bool _tryMount()
     {
-        spiffs_config config = {0};
+        spiffs_config config = {0, 0, 0, 0, 0, 0, 0, 0};
 
         config.hal_read_f       = &spiffs_hal_read;
         config.hal_write_f      = &spiffs_hal_write;
@@ -273,7 +273,7 @@ public:
     SPIFFSFileImpl(SPIFFSImpl* fs, spiffs_file fd)
         : _fs(fs)
         , _fd(fd)
-        , _stat({0})
+        , _stat{0, 0, 0, 0, {0}}
     , _written(false)
     {
         _getStat();
@@ -381,7 +381,7 @@ protected:
         auto rc = SPIFFS_fstat(_fs->getFs(), _fd, &_stat);
         if (rc != SPIFFS_OK) {
             DEBUGV("SPIFFS_fstat rc=%d\r\n", rc);
-            _stat = {0};
+            _stat = {0, 0, 0, 0, {0}};
         }
         _written = false;
     }
