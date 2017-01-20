@@ -589,7 +589,7 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size)
 extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count)
 {
     ClientContext* _client = SSLContext::getIOContext(fd);
-    if (!_client || _client->state() != ESTABLISHED && !_client->getSize()) {
+    if (!_client || (_client->state() != ESTABLISHED && !_client->getSize())) {
         errno = EIO;
         return -1;
     }
