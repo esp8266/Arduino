@@ -129,7 +129,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
 
 void ESP8266WebServer::requestAuthentication(){
   sendHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
-  send(401);
+  send(401,"text/html","<h1>Access Denied</h1>");
 }
 
 void ESP8266WebServer::on(const String &uri, ESP8266WebServer::THandlerFunction handler) {
