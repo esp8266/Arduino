@@ -128,77 +128,76 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       delete[] toencode;
       delete[] encoded;
     }else if(authReq.startsWith("Digest")){
-		  authReq = authReq.substring(7);
-		  #ifdef DEBUG_ESP_HTTP_SERVER
-		  DEBUG_OUTPUT.println(authReq);
-		  #endif
-		  String _username = _exractparam(authReq,"username=\"");
-		  if((!_username.length())||_username!=String(username)){
-			  authReq = String();
-			  return false;
-	  	}
-		  // extracting required parameters for RFC 2069 simpler Digest
-		  String _realm    = _exractparam(authReq,"realm=\"");
-		  String _nonce    = _exractparam(authReq,"nonce=\"");
-		  String _uri      = _exractparam(authReq,"uri=\"");
-		  String _response = _exractparam(authReq,"response=\"");
-		  String _opaque   = _exractparam(authReq,"opaque=\"");
-
-		  if((!_realm.length())||(!_nonce.length())||(!_uri.length())||(!_response.length())||(!_opaque.length())){
-			  authReq = String();
-			  return false;
-		  }
-      if((_opaque!=_sopaque)||(_nonce!=_snonce)){
-        authReq = String();
-        return false;
+	  authReq = authReq.substring(7);
+	  #ifdef DEBUG_ESP_HTTP_SERVER
+	  DEBUG_OUTPUT.println(authReq);
+	  #endif
+	  String _username = _exractparam(authReq,"username=\"");
+	  if((!_username.length())||_username!=String(username)){
+		  authReq = String();
+		  return false;
       }
-		  // parameters for the RFC 2617 newer Digest
-		  String _nc,_cnonce;
-		  if(authReq.indexOf("qop=auth") != -1){	
-			  _nc = _exractparam(authReq,"nc=",',');
-			  _cnonce = _exractparam(authReq,"cnonce=\"");
-	  	}
-		  MD5Builder md5;
-		  md5.begin();
-		  md5.add(String(username)+":"+_realm+":"+String(password));	// md5 of the user:realm:user
-		  md5.calculate();
-		  String _H1 = md5.toString();
-		  #ifdef DEBUG_ESP_HTTP_SERVER
-		  DEBUG_OUTPUT.println("Hash of user:realm:pass=" + _H1);
-		  #endif
-		  md5.begin();
-		  if(_currentMethod == HTTP_GET){
-			  md5.add("GET:"+_uri);	
-		  }else if(_currentMethod == HTTP_POST){
-			  md5.add("POST:"+_uri);	
-		  }else if(_currentMethod == HTTP_PUT){
-			  md5.add("PUT:"+_uri);	
-		  }else if(_currentMethod == HTTP_DELETE){
-			  md5.add("DELETE:"+_uri);
-		  }else{
-			  md5.add("GET:"+_uri);
-		  }
-		  md5.calculate();
-		  String _H2 = md5.toString();
-		  #ifdef DEBUG_ESP_HTTP_SERVER
-		  DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
-		  #endif
-		  md5.begin();
-		  if(authReq.indexOf("qop=auth") != -1){
-			  md5.add(_H1+":"+_nonce+":"+_nc+":"+_cnonce+":auth:"+_H2);
-		  }else{
-			  md5.add(_H1+":"+_nonce+":"+_H2);
-	  	}
-		  md5.calculate();
-		  String _responsecheck = md5.toString();
-		  #ifdef DEBUG_ESP_HTTP_SERVER
-		  DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
-		  #endif
-		  Serial.println(_responsecheck);
-		  if(_response==_responsecheck){
-	        authReq = String();
-			return true;
-	  	}
+	  // extracting required parameters for RFC 2069 simpler Digest
+	  String _realm    = _exractparam(authReq,"realm=\"");
+	  String _nonce    = _exractparam(authReq,"nonce=\"");
+	  String _uri      = _exractparam(authReq,"uri=\"");
+	  String _response = _exractparam(authReq,"response=\"");
+	  String _opaque   = _exractparam(authReq,"opaque=\"");
+
+	  if((!_realm.length())||(!_nonce.length())||(!_uri.length())||(!_response.length())||(!_opaque.length())){
+		  authReq = String();
+		  return false;
+	  }
+      if((_opaque!=_sopaque)||(_nonce!=_snonce)){
+          authReq = String();
+          return false;
+      }
+	  // parameters for the RFC 2617 newer Digest
+	  String _nc,_cnonce;
+	  if(authReq.indexOf("qop=auth") != -1){	
+		  _nc = _exractparam(authReq,"nc=",',');
+		  _cnonce = _exractparam(authReq,"cnonce=\"");
+      }
+	  MD5Builder md5;
+	  md5.begin();
+	  md5.add(String(username)+":"+_realm+":"+String(password));	// md5 of the user:realm:user
+	  md5.calculate();
+	  String _H1 = md5.toString();
+	  #ifdef DEBUG_ESP_HTTP_SERVER
+	  DEBUG_OUTPUT.println("Hash of user:realm:pass=" + _H1);
+	  #endif
+	  md5.begin();
+	  if(_currentMethod == HTTP_GET){
+		  md5.add("GET:"+_uri);	
+	  }else if(_currentMethod == HTTP_POST){
+		  md5.add("POST:"+_uri);	
+	  }else if(_currentMethod == HTTP_PUT){
+		  md5.add("PUT:"+_uri);	
+	  }else if(_currentMethod == HTTP_DELETE){
+		  md5.add("DELETE:"+_uri);
+	  }else{
+		  md5.add("GET:"+_uri);
+      }
+	  md5.calculate();
+	  String _H2 = md5.toString();
+	  #ifdef DEBUG_ESP_HTTP_SERVER
+	  DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
+	  #endif
+	  md5.begin();
+	  if(authReq.indexOf("qop=auth") != -1){
+		  md5.add(_H1+":"+_nonce+":"+_nc+":"+_cnonce+":auth:"+_H2);
+	  }else{
+		  md5.add(_H1+":"+_nonce+":"+_H2);
+      }
+	  md5.calculate();
+	  String _responsecheck = md5.toString();
+	  #ifdef DEBUG_ESP_HTTP_SERVER
+	  DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
+	  #endif
+	  if(_response==_responsecheck){
+          authReq = String();
+          return true;
+      }
   	}
     authReq = String();
   }
