@@ -143,11 +143,15 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
 		  String _uri      = _exractparam(authReq,"uri=\"");
 		  String _response = _exractparam(authReq,"response=\"");
 		  String _opaque   = _exractparam(authReq,"opaque=\"");
-		
+
 		  if((!_realm.length())||(!_nonce.length())||(!_uri.length())||(!_response.length())||(!_opaque.length())){
 			  authReq = String();
 			  return false;
 		  }
+      if((_opaque!=_sopaque)||(_nonce!=_snonce)){
+        authReq = String();
+        return false;
+      }
 		  // parameters for the RFC 2617 newer Digest
 		  String _nc,_cnonce;
 		  if(authReq.indexOf("qop=auth") != -1){	
