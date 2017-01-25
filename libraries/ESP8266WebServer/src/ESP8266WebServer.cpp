@@ -94,6 +94,12 @@ void ESP8266WebServer::begin() {
     collectHeaders(0, 0);
 }
 
+String ESP8266WebServer::_exractparam(String& authReq,const String& param,const char delimit){
+	int _begin = authReq.indexOf(param);
+	if (_begin==-1) return "";
+	return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
+}
+
 bool ESP8266WebServer::authenticate(const char * username, const char * password){
   if(hasHeader(AUTHORIZATION_HEADER)){
     String authReq = header(AUTHORIZATION_HEADER);
@@ -121,15 +127,89 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       }
       delete[] toencode;
       delete[] encoded;
-    }
+    }else if(authReq.startsWith("Digest")){
+		  authReq = authReq.substring(7);
+		  #ifdef DEBUG_ESP_HTTP_SERVER
+		  DEBUG_OUTPUT.println(authReq);
+		  #endif
+		  String _username = _exractparam(authReq,"username=\"");
+		  if((!_username.length())||_username!=String(username)){
+			  authReq = String();
+			  return false;
+	  	}
+		  // extracting required parameters for RFC 2069 simpler Digest
+		  String _realm    = _exractparam(authReq,"realm=\"");
+		  String _nonce    = _exractparam(authReq,"nonce=\"");
+		  String _uri      = _exractparam(authReq,"uri=\"");
+		  String _response = _exractparam(authReq,"response=\"");
+		  String _opaque   = _exractparam(authReq,"opaque=\"");
+		
+		  if((!_realm.length())||(!_nonce.length())||(!_uri.length())||(!_response.length())||(!_opaque.length())){
+			  authReq = String();
+			  return false;
+		  }
+		  // parameters for the RFC 2617 newer Digest
+		  String _nc,_cnonce;
+		  if(authReq.indexOf("qop=auth") != -1){	
+			  _nc = _exractparam(authReq,"nc=",',');
+			  _cnonce = _exractparam(authReq,"cnonce=\"");
+	  	}
+		  MD5Builder md5;
+		  md5.begin();
+		  md5.add(String(username)+":"+_realm+":"+String(password));	// md5 of the user:realm:user
+		  md5.calculate();
+		  String _H1 = md5.toString();
+		  #ifdef DEBUG_ESP_HTTP_SERVER
+		  DEBUG_OUTPUT.println("Hash of user:realm:pass=" + _H1);
+		  #endif
+		  md5.begin();
+		  if(_currentMethod == HTTP_GET){
+			  md5.add("GET:"+_uri);	
+		  }else if(_currentMethod == HTTP_POST){
+			  md5.add("POST:"+_uri);	
+		  }else if(_currentMethod == HTTP_PUT){
+			  md5.add("PUT:"+_uri);	
+		  }else if(_currentMethod == HTTP_DELETE){
+			  md5.add("DELETE:"+_uri);
+		  }else{
+			  md5.add("GET:"+_uri);
+		  }
+		  md5.calculate();
+		  String _H2 = md5.toString();
+		  #ifdef DEBUG_ESP_HTTP_SERVER
+		  DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
+		  #endif
+		  md5.begin();
+		  if(authReq.indexOf("qop=auth") != -1){
+			  md5.add(_H1+":"+_nonce+":"+_nc+":"+_cnonce+":auth:"+_H2);
+		  }else{
+			  md5.add(_H1+":"+_nonce+":"+_H2);
+	  	}
+		  md5.calculate();
+		  String _responsecheck = md5.toString();
+		  #ifdef DEBUG_ESP_HTTP_SERVER
+		  DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
+		  #endif
+		  Serial.println(_responsecheck);
+		  if(_response==_responsecheck){
+	        authReq = String();
+			return true;
+	  	}
+  	}
     authReq = String();
   }
   return false;
 }
 
-void ESP8266WebServer::requestAuthentication(){
-  sendHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
-  send(401);
+void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode){
+		if(mode==BASIC_AUTH){
+			sendHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
+		}else{
+			_snonce=String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX);
+			_sopaque=String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX);
+			sendHeader("WWW-Authenticate", "Digest realm=\"Login Required\", qop=\"auth\", nonce=\""+_snonce+"\", opaque=\""+_sopaque+"\"");
+		}
+		send(401,"text/html","Authentication Failed");
 }
 
 void ESP8266WebServer::on(const String &uri, ESP8266WebServer::THandlerFunction handler) {

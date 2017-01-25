@@ -31,6 +31,7 @@ enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELE
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
                         UPLOAD_FILE_ABORTED };
 enum HTTPClientStatus { HC_NONE, HC_WAIT_READ, HC_WAIT_CLOSE };
+enum HTTPAuthMethod { BASIC_AUTH, DIGEST_AUTH };
 
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
 #define HTTP_UPLOAD_BUFLEN 2048
@@ -74,7 +75,7 @@ public:
   void stop();
 
   bool authenticate(const char * username, const char * password);
-  void requestAuthentication();
+  void requestAuthentication(HTTPAuthMethod mode = DIGEST_AUTH);
 
   typedef std::function<void(void)> THandlerFunction;
   void on(const String &uri, THandlerFunction handler);
@@ -146,6 +147,9 @@ protected:
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
 
+  // for extracting Auth parameters
+  String _exractparam(String& authReq,const String& param,const char delimit = '"');
+
   struct RequestArgument {
     String key;
     String value;
@@ -177,6 +181,9 @@ protected:
 
   String           _hostHeader;
   bool             _chunked;
+
+  String           _snonce;  // Store noance for future comparison 
+  String           _sopaque;
 
 };
 
