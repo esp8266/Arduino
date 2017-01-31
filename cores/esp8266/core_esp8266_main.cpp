@@ -52,6 +52,7 @@ const char* core_release =
 } // extern "C"
 
 int atexit(void (*func)()) {
+    (void) func;
     return 0;
 }
 
@@ -125,6 +126,7 @@ static void loop_wrapper() {
 }
 
 static void loop_task(os_event_t *events) {
+    (void) events;
     g_micros_at_task_start = system_get_time();
     cont_run(&g_cont, &loop_wrapper);
     if (cont_check(&g_cont) != 0) {

@@ -372,6 +372,8 @@ protected:
 
     err_t _sent(tcp_pcb* pcb, uint16_t len)
     {
+        (void) pcb;
+        (void) len;
         DEBUGV(":sent %d\r\n", len);
         _write_some_from_cb();
         return ERR_OK;
@@ -405,6 +407,8 @@ protected:
 
     recv_ret_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)
     {
+        (void) pcb;
+        (void) err;
         if(pb == 0) { // connection closed
             DEBUGV(":rcl\r\n");
             _cancel_write();
@@ -425,6 +429,7 @@ protected:
 
     void _error(err_t err)
     {
+        (void) err;
         DEBUGV(":er %d %08x\r\n", err, (uint32_t) _datasource);
         tcp_arg(_pcb, NULL);
         tcp_sent(_pcb, NULL);

@@ -361,7 +361,7 @@ uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
 }
 
 bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t len){
-
+  (void) len;
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");
   DEBUG_OUTPUT.print(boundary);
