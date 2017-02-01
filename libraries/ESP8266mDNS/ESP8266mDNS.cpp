@@ -160,10 +160,12 @@ bool MDNSResponder::begin(const char* hostname){
   if (_instanceName.equals("") ) _instanceName=hostname;
 
   _gotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& event){
+    (void) event;
     _restart();
   });
 
   _disconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& event) {
+    (void) event;
     _restart();
   });
 
@@ -550,6 +552,9 @@ void MDNSResponder::_parsePacket(){
       uint32_t answerTtl = _conn_read32(); // Read ttl
       uint16_t answerRdlength = _conn_read16(); // Read rdlength
 
+      (void) answerClass;
+      (void) answerTtl;
+
       if(answerRdlength > 255){
         if(answerType == MDNS_TYPE_TXT && answerRdlength < 1460){
           while(--answerRdlength) _conn->read();
@@ -599,6 +604,9 @@ void MDNSResponder::_parsePacket(){
         uint16_t answerPrio = _conn_read16(); // Read priority
         uint16_t answerWeight = _conn_read16(); // Read weight
         answerPort = _conn_read16(); // Read port
+
+        (void) answerPrio;
+        (void) answerWeight;
 
         // Read hostname
         tmp8 = _conn_read8();
