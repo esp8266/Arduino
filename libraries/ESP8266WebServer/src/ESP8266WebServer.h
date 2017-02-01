@@ -75,7 +75,7 @@ public:
   void stop();
 
   bool authenticate(const char * username, const char * password);
-  void requestAuthentication(HTTPAuthMethod mode = DIGEST_AUTH);
+  void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& AuthFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
   void on(const String &uri, THandlerFunction handler);
@@ -182,8 +182,9 @@ protected:
   String           _hostHeader;
   bool             _chunked;
 
-  String           _snonce;  // Store noance for future comparison 
+  String           _snonce;  // Store noance and opaque for future comparison
   String           _sopaque;
+  String           _srealm;  // Store the Auth realm between Calls
 
 };
 
