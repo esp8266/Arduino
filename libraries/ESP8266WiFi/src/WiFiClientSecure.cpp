@@ -214,6 +214,7 @@ public:
 
     static ClientContext* getIOContext(int fd)
     {
+        (void) fd;
         return s_io_ctx;
     }
 
@@ -623,6 +624,7 @@ extern "C" void ax_port_write() __attribute__ ((weak, alias("__ax_port_write")))
 
 extern "C" int __ax_get_file(const char *filename, uint8_t **buf)
 {
+    (void) filename;
     *buf = 0;
     return 0;
 }
@@ -637,6 +639,8 @@ extern "C" void ax_get_file() __attribute__ ((weak, alias("__ax_get_file")));
 
 extern "C" void* ax_port_malloc(size_t size, const char* file, int line)
 {
+    (void) file;
+    (void) line;
     void* result = malloc(size);
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
@@ -656,6 +660,8 @@ extern "C" void* ax_port_calloc(size_t size, size_t count, const char* file, int
 
 extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int line)
 {
+    (void) file;
+    (void) line;
     void* result = realloc(ptr, size);
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
