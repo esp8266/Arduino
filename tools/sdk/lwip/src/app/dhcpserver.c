@@ -137,21 +137,16 @@ static uint8_t* ICACHE_FLASH_ATTR add_offer_options(uint8_t *optptr)
 
         ipadd.addr = *( (uint32_t *) &server_address);
 
-#ifdef USE_CLASS_B_NET
+        struct ip_info if_ip;
+        os_bzero(&if_ip, sizeof(struct ip_info));
+        wifi_get_ip_info(SOFTAP_IF, &if_ip);
+    
         *optptr++ = DHCP_OPTION_SUBNET_MASK;
-        *optptr++ = 4;  //length
-        *optptr++ = 255;
-        *optptr++ = 240;
-        *optptr++ = 0;
-        *optptr++ = 0;
-#else
-        *optptr++ = DHCP_OPTION_SUBNET_MASK;
-        *optptr++ = 4;  
-        *optptr++ = 255;
-        *optptr++ = 255;
-        *optptr++ = 255;
-        *optptr++ = 0;
-#endif
+        *optptr++ = 4;
+        *optptr++ = ip4_addr1( &if_ip.netmask);
+        *optptr++ = ip4_addr2( &if_ip.netmask);
+        *optptr++ = ip4_addr3( &if_ip.netmask);
+        *optptr++ = ip4_addr4( &if_ip.netmask);
 
         *optptr++ = DHCP_OPTION_LEASE_TIME;
         *optptr++ = 4;  
@@ -168,10 +163,6 @@ static uint8_t* ICACHE_FLASH_ATTR add_offer_options(uint8_t *optptr)
         *optptr++ = ip4_addr4( &ipadd);
 
         if (dhcps_router_enabled(offer)){
-            struct ip_info if_ip;
-            os_bzero(&if_ip, sizeof(struct ip_info));
-            wifi_get_ip_info(SOFTAP_IF, &if_ip);
-
             *optptr++ = DHCP_OPTION_ROUTER;
             *optptr++ = 4;
             *optptr++ = ip4_addr1( &if_ip.gw);
