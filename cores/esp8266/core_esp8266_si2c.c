@@ -153,11 +153,11 @@ void twi_init(unsigned char sda, unsigned char scl)
   twi_scl = scl;
   pinMode(twi_sda, INPUT_PULLUP);
   pinMode(twi_scl, INPUT_PULLUP);
-  pinMode(2, OUTPUT);
-  pinMode(12, OUTPUT);
-  pinMode(14, OUTPUT);
-  pinMode(13, OUTPUT);
-  digitalWrite(2, HIGH);
+  //pinMode(2, OUTPUT);
+  //pinMode(12, OUTPUT);
+  //pinMode(14, OUTPUT);
+  //pinMode(13, OUTPUT);
+  //digitalWrite(2, HIGH);
   twi_setClock(100000);
   twi_setClockStretchLimit(230); // default value is 230 uS
   
@@ -396,7 +396,7 @@ void ICACHE_RAM_ATTR twi_releaseBus(void)
 
 void ICACHE_RAM_ATTR onTimer(void *timer_arg)
 {
-	digitalWrite(13, HIGH);
+	//digitalWrite(13, HIGH);
 	twi_releaseBus();
 	//ets_timer_disarm(&timer);
 
@@ -404,12 +404,12 @@ void ICACHE_RAM_ATTR onTimer(void *timer_arg)
 	twi_onTwipEvent(twip_status);
 	twip_mode = TWIPM_WAIT;
 	twip_state = TWIP_BUS_ERR;
-	digitalWrite(13, LOW);
+	//digitalWrite(13, LOW);
 }
 
 static void eventTask(ETSEvent *e)
 {
-	digitalWrite(14, HIGH);
+	//digitalWrite(14, HIGH);
 	
 	if (e == NULL) {
 		return;
@@ -432,17 +432,18 @@ static void eventTask(ETSEvent *e)
 			break;
 
 		case TWI_SIG_RX:
+			// ack future responses and leave slave receiver state
 			twi_releaseBus();
 			twi_onSlaveReceive(twi_rxBuffer, e->par);
 			break;
 	}
 
-	digitalWrite(14, LOW);
+	//digitalWrite(14, LOW);
 }
 
 void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
 {
-  digitalWrite(13, HIGH);
+  //digitalWrite(13, HIGH);
   //switch(TW_STATUS){
   switch(status) {
 #if 0
@@ -544,14 +545,11 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
       }
       break;
     case TW_SR_STOP: // stop or repeated start condition received
-      // ack future responses and leave slave receiver state
-      //BH twi_releaseBus();
       // put a null char after data if there's room
       if(twi_rxBufferIndex < TWI_BUFFER_LENGTH){
         twi_rxBuffer[twi_rxBufferIndex] = '\0';
       }
-      // callback to user defined callback
-      //twi_onSlaveReceive(twi_rxBuffer, twi_rxBufferIndex);
+      // callback to user-defined callback over event task to allow for non-RAM-residing code
 	  //twi_rxBufferLock = true; // This may be necessary
 	  ets_post(EVENTTASK_QUEUE_PRIO, TWI_SIG_RX, twi_rxBufferIndex);
 
@@ -574,22 +572,13 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
       twi_txBufferIndex = 0;
       // set tx buffer length to be zero, to verify if user changes it
       twi_txBufferLength = 0;
+      // callback to user-defined callback over event task to allow for non-RAM-residing code
       // request for txBuffer to be filled and length to be set
       // note: user must call twi_transmit(bytes, length) to do this
-      //twi_onSlaveTransmit();
 	  ets_post(EVENTTASK_QUEUE_PRIO, TWI_SIG_TX, 0);
-
-      // if they didn't change buffer & length, initialize it
-      if(false) { //0 == twi_txBufferLength){
-        twi_txBufferLength = 1;
-        twi_txBuffer[0] = 0x00;
-      }
-	  else
-	  {
-		  break;
-	  }
-      // transmit first byte from buffer, fall
-    case TW_ST_DATA_ACK: // byte sent, ack returned
+	  break;
+	  
+	case TW_ST_DATA_ACK: // byte sent, ack returned
       // copy data to output register
       TWDR = twi_txBuffer[twi_txBufferIndex++];
 
@@ -619,7 +608,7 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
       twi_stop();
       break;
   }
-  digitalWrite(13, LOW);
+  //digitalWrite(13, LOW);
 }
 
 void ICACHE_RAM_ATTR onSclChange(void)
@@ -633,7 +622,7 @@ void ICACHE_RAM_ATTR onSclChange(void)
 	sda	= SDA_READ();
 	scl = SCL_READ();
 	
-	digitalWrite(12, scl);
+	//digitalWrite(12, scl);
 	//digitalWrite(14, LOW);
 	
 	twip_status = 0xF8;		// reset TWI status
@@ -793,7 +782,7 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 	sda	= SDA_READ();
 	scl = SCL_READ();
 	
-	digitalWrite(2, sda);
+	//digitalWrite(2, sda);
 	
 	switch (twip_state)
 	{
@@ -806,9 +795,9 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 				// START
 				bitCount = 8;
 				twip_state = TWIP_START;
-				digitalWrite(14, HIGH);
+				//digitalWrite(14, HIGH);
 				ets_timer_arm_new(&timer, twi_timeout_ms, false, true); // Once, ms
-				digitalWrite(14, LOW);
+				//digitalWrite(14, LOW);
 			}
 			break;
 			
