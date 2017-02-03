@@ -34,8 +34,73 @@ static unsigned char twi_sda, twi_scl;
 static uint32_t twi_clockStretchLimit;
 static unsigned char twi_addr = 0;
 
+// modes (private)
+#define TWIPM_UNKNOWN 	0
+#define TWIPM_IDLE 		1
+#define TWIPM_ADDRESSED	2
+#define TWIPM_WAIT		3
+
+// states (private)
+#define TWIP_UNKNOWN 	0
+#define TWIP_IDLE 		1
+#define TWIP_START 		2
+#define TWIP_SEND_ACK	3
+#define TWIP_WAIT_ACK	4
+#define TWIP_WAIT_STOP	5
+#define TWIP_SLA_W		6
+#define TWIP_SLA_R		7
+#define TWIP_REP_START	8
+#define TWIP_READ		9
+#define TWIP_STOP 		10
+#define TWIP_REC_ACK	11
+#define TWIP_READ_ACK	12
+#define TWIP_RWAIT_ACK	13
+#define TWIP_WRITE		14
+#define TWIP_BUS_ERR 	15
+
+static volatile uint8_t twip_mode = TWIPM_IDLE;
+static volatile uint8_t twip_state = TWIP_IDLE;
+static volatile uint8_t twip_status = TW_NO_INFO;
+static volatile uint8_t bitCount = 0;
+
+#define TWDR twi_data
+static volatile uint8_t twi_data = 0x00;
+static volatile uint8_t twi_ack = 0;
+static volatile uint8_t twi_ack_rec = 0;
+static volatile int twi_timeout_ms = 10;
+
+#define TWI_READY 0
+#define TWI_MRX   1
+#define TWI_MTX   2
+#define TWI_SRX   3
+#define TWI_STX   4
+static volatile uint8_t twi_state = TWI_READY;
+static volatile uint8_t twi_error = 0xFF;
+
+static uint8_t twi_txBuffer[TWI_BUFFER_LENGTH];
+static volatile uint8_t twi_txBufferIndex;
+static volatile uint8_t twi_txBufferLength;
+
+static uint8_t twi_rxBuffer[TWI_BUFFER_LENGTH];
+static volatile uint8_t twi_rxBufferIndex;
+
+static void (*twi_onSlaveTransmit)(void);
+static void (*twi_onSlaveReceive)(uint8_t*, int);
+
 void onSclChange(void);
 void onSdaChange(void);
+
+#define TASK_QUEUE_SIZE 1
+#define TASK_QUEUE_PRIO 2
+
+#define TWI_SIG_RANGE	0x00000100
+#define TWI_SIG_RX 		(TWI_SIG_RANGE + 0x01)
+#define TWI_SIG_TX 		(TWI_SIG_RANGE + 0x02)
+
+static ETSEvent task_queue[TASK_QUEUE_SIZE];
+static void task(ETSEvent *e);
+static ETSTimer timer;
+void onTimer(void *timer_arg);
 
 #define SDA_LOW()   (GPES = (1 << twi_sda)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
 #define SDA_HIGH()  (GPEC = (1 << twi_sda)) //Disable SDA (becomes input and since it has pullup it will go high)
@@ -75,19 +140,6 @@ void twi_setClock(unsigned int freq){
 void twi_setClockStretchLimit(uint32_t limit){
   twi_clockStretchLimit = limit * TWI_CLOCK_STRETCH_MULTIPLIER;
 }
-
-#define TASK_QUEUE_SIZE 1
-#define TASK_QUEUE_PRIO 2
-
-#define TWI_SIG_RANGE	0x00000100
-#define TWI_SIG_RX 		(TWI_SIG_RANGE + 0x01)
-#define TWI_SIG_TX 		(TWI_SIG_RANGE + 0x02)
-
-
-static ETSEvent task_queue[TASK_QUEUE_SIZE];
-static void task(ETSEvent *e);
-static ETSTimer timer;
-void onTimer(void *timer_arg);
 
 void twi_init(unsigned char sda, unsigned char scl){
 	
@@ -263,60 +315,6 @@ uint8_t twi_status(){
     if(!twi_write_start()) return I2C_SDA_HELD_LOW_AFTER_INIT;  //line busy. SDA again held low by another device. 2nd master?
     else                   return I2C_OK;       				//all ok 
 }
-
-
-
-#define TWIPM_UNKNOWN 	0
-#define TWIPM_IDLE 		1
-#define TWIPM_ADDRESSED	2
-#define TWIPM_WAIT		3
-
-#define TWIP_UNKNOWN 	0
-#define TWIP_IDLE 		1
-#define TWIP_START 		2
-#define TWIP_SEND_ACK	3
-#define TWIP_WAIT_ACK	4
-#define TWIP_WAIT_STOP	5
-#define TWIP_SLA_W		6
-#define TWIP_SLA_R		7
-#define TWIP_REP_START	8
-#define TWIP_READ		9
-#define TWIP_STOP 		10
-#define TWIP_REC_ACK	11
-#define TWIP_READ_ACK	12
-#define TWIP_RWAIT_ACK	13
-#define TWIP_WRITE		14
-#define TWIP_BUS_ERR 	99
-
-static volatile uint8_t twip_mode = TWIPM_IDLE;
-static volatile uint8_t twip_state = TWIP_IDLE;
-static volatile uint8_t twip_status = TW_NO_INFO;
-static volatile uint8_t bitCount = 0;
-
-#define TWDR twi_data
-static volatile uint8_t twi_data = 0x00;
-static volatile uint8_t twi_ack = 0;
-static volatile uint8_t twi_ack_rec = 0;
-static volatile int twi_timeout_ms = 10;
-
-#define TWI_READY 0
-#define TWI_MRX   1
-#define TWI_MTX   2
-#define TWI_SRX   3
-#define TWI_STX   4
-static volatile uint8_t twi_state = TWI_READY;
-static volatile uint8_t twi_error = 0xFF;
-
-static uint8_t twi_txBuffer[TWI_BUFFER_LENGTH];
-static volatile uint8_t twi_txBufferIndex;
-static volatile uint8_t twi_txBufferLength;
-
-static uint8_t twi_rxBuffer[TWI_BUFFER_LENGTH];
-static volatile uint8_t twi_rxBufferIndex;
-
-
-static void (*twi_onSlaveTransmit)(void);
-static void (*twi_onSlaveReceive)(uint8_t*, int);
 
 uint8_t twi_transmit(const uint8_t* data, uint8_t length)
 {
