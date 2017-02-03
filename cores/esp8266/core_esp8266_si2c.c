@@ -87,20 +87,20 @@ static volatile uint8_t twi_rxBufferIndex;
 static void (*twi_onSlaveTransmit)(void);
 static void (*twi_onSlaveReceive)(uint8_t*, int);
 
-void onSclChange(void);
-void onSdaChange(void);
+static void onSclChange(void);
+static void onSdaChange(void);
 
-#define TASK_QUEUE_SIZE 1
-#define TASK_QUEUE_PRIO 2
+#define EVENTTASK_QUEUE_SIZE 1
+#define EVENTTASK_QUEUE_PRIO 2
 
 #define TWI_SIG_RANGE	0x00000100
 #define TWI_SIG_RX 		(TWI_SIG_RANGE + 0x01)
 #define TWI_SIG_TX 		(TWI_SIG_RANGE + 0x02)
 
-static ETSEvent task_queue[TASK_QUEUE_SIZE];
-static void task(ETSEvent *e);
+static ETSEvent eventTaskQueue[EVENTTASK_QUEUE_SIZE];
+static void eventTask(ETSEvent *e);
 static ETSTimer timer;
-void onTimer(void *timer_arg);
+static void onTimer(void *timer_arg);
 
 #define SDA_LOW()   (GPES = (1 << twi_sda)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
 #define SDA_HIGH()  (GPEC = (1 << twi_sda)) //Disable SDA (becomes input and since it has pullup it will go high)
@@ -141,15 +141,13 @@ void twi_setClockStretchLimit(uint32_t limit){
   twi_clockStretchLimit = limit * TWI_CLOCK_STRETCH_MULTIPLIER;
 }
 
-void twi_init(unsigned char sda, unsigned char scl){
-	
-
-	ets_timer_setfn(&timer, onTimer, NULL);
-	
-    ets_task(task, TASK_QUEUE_PRIO, task_queue, TASK_QUEUE_SIZE);
-		
-	ets_post(TASK_QUEUE_PRIO, 9, 42);
-
+void twi_init(unsigned char sda, unsigned char scl)
+{
+  // set timer function 
+  ets_timer_setfn(&timer, onTimer, NULL);
+  
+  // create event task
+  ets_task(eventTask, EVENTTASK_QUEUE_PRIO, eventTaskQueue, EVENTTASK_QUEUE_SIZE);
 	
   twi_sda = sda;
   twi_scl = scl;
@@ -409,7 +407,7 @@ void ICACHE_RAM_ATTR onTimer(void *timer_arg)
 	digitalWrite(13, LOW);
 }
 
-static void task(ETSEvent *e)
+static void eventTask(ETSEvent *e)
 {
 	digitalWrite(14, HIGH);
 	
@@ -555,7 +553,7 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
       // callback to user defined callback
       //twi_onSlaveReceive(twi_rxBuffer, twi_rxBufferIndex);
 	  //twi_rxBufferLock = true; // This may be necessary
-	  ets_post(TASK_QUEUE_PRIO, TWI_SIG_RX, twi_rxBufferIndex);
+	  ets_post(EVENTTASK_QUEUE_PRIO, TWI_SIG_RX, twi_rxBufferIndex);
 
       // since we submit rx buffer to "wire" library, we can reset it
       twi_rxBufferIndex = 0;
