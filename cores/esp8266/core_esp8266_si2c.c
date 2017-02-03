@@ -579,7 +579,7 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
       // request for txBuffer to be filled and length to be set
       // note: user must call twi_transmit(bytes, length) to do this
       //twi_onSlaveTransmit();
-	  ets_post(TASK_QUEUE_PRIO, TWI_SIG_TX, 0);
+	  ets_post(EVENTTASK_QUEUE_PRIO, TWI_SIG_TX, 0);
 
       // if they didn't change buffer & length, initialize it
       if(false) { //0 == twi_txBufferLength){
