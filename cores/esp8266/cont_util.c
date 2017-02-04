@@ -32,7 +32,7 @@ void ICACHE_RAM_ATTR cont_init(cont_t* cont) {
     cont->struct_start = (unsigned*) cont;
     
     // fill stack with magic values to check high water mark
-    for(int pos = 0; pos < sizeof(cont->stack) / 4; pos++)
+    for(int pos = 0; pos < (int)(sizeof(cont->stack) / 4); pos++)
     {
         cont->stack[pos] = CONT_STACKGUARD;
     }

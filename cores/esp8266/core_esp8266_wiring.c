@@ -36,6 +36,7 @@ static uint32_t micros_overflow_count = 0;
 #define REPEAT 1
 
 void delay_end(void* arg) {
+    (void) arg;
     esp_schedule();
 }
 
@@ -53,6 +54,7 @@ void delay(unsigned long ms) {
 }
 
 void micros_overflow_tick(void* arg) {
+    (void) arg;
     uint32_t m = system_get_time();
     if(m < micros_at_last_overflow_tick)
         ++micros_overflow_count;
