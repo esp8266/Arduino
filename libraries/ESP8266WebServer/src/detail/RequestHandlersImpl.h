@@ -121,6 +121,7 @@ public:
         else if (path.endsWith(".css")) return "text/css";
         else if (path.endsWith(".txt")) return "text/plain";
         else if (path.endsWith(".js")) return "application/javascript";
+        else if (path.endsWith(".json")) return "application/json";
         else if (path.endsWith(".png")) return "image/png";
         else if (path.endsWith(".gif")) return "image/gif";
         else if (path.endsWith(".jpg")) return "image/jpeg";
