@@ -77,6 +77,7 @@ void configTime(int timezone, int daylightOffset_sec, const char* server1, const
 
 int clock_gettime(clockid_t unused, struct timespec *tp)
 {
+    (void) unused;
     tp->tv_sec  = millis() / 1000;
     tp->tv_nsec = micros() * 1000;
     return 0;
@@ -94,6 +95,8 @@ time_t time(time_t * t)
 
 int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
 {
+    (void) unused;
+    (void) tzp;
     if (tp)
     {
         ensureBootTimeIsSet();
