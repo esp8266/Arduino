@@ -1,8 +1,21 @@
 #!/bin/bash
 #
 
+# Extract next version from platform.txt
+next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
+
 # Figure out how will the package be called
-ver=`git describe --tags --always`
+ver=`git describe --exact-match`
+if [ $? -ne 0 ]; then
+    # not tagged version; generate nightly package
+    date_str=`date +"%Y%m%d"`
+    is_nightly=1
+    plain_ver="${next}-nightly"
+    ver="${plain_ver}+${date_str}"
+else
+    plain_ver=$ver
+fi
+
 package_name=esp8266-$ver
 echo "Version: $ver"
 echo "Package name: $package_name"
@@ -16,14 +29,14 @@ fi
 echo "Remote: $REMOTE_URL"
 
 if [ -z "$PKG_URL" ]; then
-    PKG_URL="$REMOTE_URL/versions/$ver/$package_name.zip"
+    if [ -z "$PKG_URL_PREFIX" ]; then
+        PKG_URL_PREFIX="$REMOTE_URL/versions/$ver"
+    fi
+    PKG_URL="$PKG_URL_PREFIX/$package_name.zip"
 fi
 echo "Package: $PKG_URL"
-
-if [ -z "$DOC_URL" ]; then
-    DOC_URL="$REMOTE_URL/versions/$ver/doc/reference.html"
-fi
 echo "Docs: $DOC_URL"
+
 pushd ..
 # Create directory for the package
 outdir=package/versions/$ver/$package_name
@@ -37,6 +50,7 @@ cat << EOF > exclude.txt
 .gitignore
 .travis.yml
 package
+doc
 EOF
 # Also include all files which are ignored by git
 git ls-files --other --directory >> exclude.txt
@@ -47,7 +61,7 @@ rm exclude.txt
 # Get additional libraries (TODO: add them as git submodule or subtree?)
 
 # SoftwareSerial library
-wget -q -O SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/3.1.0.zip
+curl -L -o SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/3.1.0.zip
 unzip -q SoftwareSerial.zip
 rm -rf SoftwareSerial.zip
 mv espsoftwareserial-* SoftwareSerial
@@ -71,7 +85,7 @@ $SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' \
  > $outdir/platform.txt
 
 # Put core version and short hash of git version into core_version.h
-ver_define=`echo $ver | tr "[:lower:].-" "[:upper:]_"`
+ver_define=`echo $plain_ver | tr "[:lower:].\055" "[:upper:]_"`
 echo Ver define: $ver_define
 echo \#define ARDUINO_ESP8266_GIT_VER 0x`git rev-parse --short=8 HEAD 2>/dev/null` >$outdir/cores/esp8266/core_version.h
 echo \#define ARDUINO_ESP8266_RELEASE_$ver_define >>$outdir/cores/esp8266/core_version.h
@@ -90,14 +104,49 @@ echo Size: $size
 echo SHA-256: $sha
 
 echo "Making package_esp8266com_index.json"
-cat $srcdir/package/package_esp8266com_index.template.json | \
-jq ".packages[0].platforms[0].version = \"$ver\" | \
+
+jq_arg=".packages[0].platforms[0].version = \"$ver\" | \
     .packages[0].platforms[0].url = \"$PKG_URL\" |\
-    .packages[0].platforms[0].archiveFileName = \"$package_name.zip\" |\
-    .packages[0].platforms[0].checksum = \"SHA-256:$sha\" |\
-    .packages[0].platforms[0].size = \"$size\" |\
-    .packages[0].platforms[0].help.online = \"$DOC_URL\"" \
-    > package_esp8266com_index.json
+    .packages[0].platforms[0].archiveFileName = \"$package_name.zip\""
+
+if [ -z "$is_nightly" ]; then
+    jq_arg="$jq_arg |\
+        .packages[0].platforms[0].size = \"$size\" |\
+        .packages[0].platforms[0].checksum = \"SHA-256:$sha\""
+fi
+
+if [ ! -z "$DOC_URL" ]; then
+    jq_arg="$jq_arg |\
+        .packages[0].platforms[0].help.online = \"$DOC_URL\""
+fi
+
+cat $srcdir/package/package_esp8266com_index.template.json | \
+    jq "$jq_arg" > package_esp8266com_index.json
+
+# Get previous release name
+curl --silent https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+# Previous final release (prerelase == false)
+prev_release=$(jq -r '. | map(select(.draft == false and .prerelease == false)) | sort_by(.created_at | - fromdateiso8601) | .[0].tag_name' releases.json)
+# Previous release (possibly a pre-release)
+prev_any_release=$(jq -r '. | map(select(.draft == false)) | sort_by(.created_at | - fromdateiso8601)  | .[0].tag_name' releases.json)
+# Previous pre-release
+prev_pre_release=$(jq -r '. | map(select(.draft == false and .prerelease == true)) | sort_by(.created_at | - fromdateiso8601)  | .[0].tag_name' releases.json)
+
+echo "Previous release: $prev_release"
+echo "Previous (pre-?)release: $prev_any_release"
+echo "Previous pre-release: $prev_pre_release"
+
+# Make all released versions available in one package (i.e. don't separate stable/staging versions)
+base_ver=$prev_any_release
+
+# Download previous release
+echo "Downloading base package: $base_ver"
+old_json=package_esp8266com_index_stable.json
+curl -L -o $old_json "https://github.com/esp8266/Arduino/releases/download/${base_ver}/package_esp8266com_index.json"
+new_json=package_esp8266com_index.json
+
+set +e
+python ../../merge_packages.py $new_json $old_json >tmp && mv tmp $new_json && rm $old_json
 
 popd
 popd
