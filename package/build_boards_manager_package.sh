@@ -1,8 +1,19 @@
 #!/bin/bash
 #
+next="2.4.0"
 
 # Figure out how will the package be called
-ver=`git describe --tags --always`
+ver=`git describe --exact-match`
+if [ $? -ne 0 ]; then
+    # not tagged version; generate nightly package
+    date_str=`date +"%Y%m%d"`
+    is_nightly=1
+    plain_ver="${next}-nightly"
+    ver="${plain_ver}+${date_str}"
+else
+    plain_ver=$ver
+fi
+
 package_name=esp8266-$ver
 echo "Version: $ver"
 echo "Package name: $package_name"
@@ -71,7 +82,7 @@ $SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' \
  > $outdir/platform.txt
 
 # Put core version and short hash of git version into core_version.h
-ver_define=`echo $ver | tr "[:lower:].-" "[:upper:]_"`
+ver_define=`echo $plain_ver | tr "[:lower:].-+" "[:upper:]_"`
 echo Ver define: $ver_define
 echo \#define ARDUINO_ESP8266_GIT_VER 0x`git rev-parse --short=8 HEAD 2>/dev/null` >$outdir/cores/esp8266/core_version.h
 echo \#define ARDUINO_ESP8266_RELEASE_$ver_define >>$outdir/cores/esp8266/core_version.h
@@ -90,14 +101,26 @@ echo Size: $size
 echo SHA-256: $sha
 
 echo "Making package_esp8266com_index.json"
-cat $srcdir/package/package_esp8266com_index.template.json | \
-jq ".packages[0].platforms[0].version = \"$ver\" | \
+
+jq_arg=".packages[0].platforms[0].version = \"$ver\" | \
     .packages[0].platforms[0].url = \"$PKG_URL\" |\
     .packages[0].platforms[0].archiveFileName = \"$package_name.zip\" |\
-    .packages[0].platforms[0].checksum = \"SHA-256:$sha\" |\
-    .packages[0].platforms[0].size = \"$size\" |\
-    .packages[0].platforms[0].help.online = \"$DOC_URL\"" \
-    > package_esp8266com_index.json
+    .packages[0].platforms[0].help.online = \"$DOC_URL\""
+
+if [ -z "$is_nightly" ]; then
+    jq_arg="$jq_arg |\
+        .packages[0].platforms[0].size = \"$size\" |\
+        .packages[0].platforms[0].checksum = \"SHA-256:$sha\" |"
+fi
+
+cat $srcdir/package/package_esp8266com_index.template.json | \
+    jq "$jq_arg" > package_esp8266com_index.json
+
+old_json=package_esp8266com_index_stable.json
+wget -O $old_json http://arduino.esp8266.com/$branch/package_esp8266com_index.json
+new_json=package_esp8266com_index.json
+
+python ../../merge_packages.py $new_json $old_json >tmp && mv tmp $new_json && rm $old_json
 
 popd
 popd
