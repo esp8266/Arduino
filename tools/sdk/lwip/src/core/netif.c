@@ -486,6 +486,10 @@ void netif_set_up(struct netif *netif)
  */ 
 void netif_set_down(struct netif *netif)
 {
+  if (netif == NULL) {	
+    return;
+  }
+
   if (netif->flags & NETIF_FLAG_UP) {
     netif->flags &= ~NETIF_FLAG_UP;
 #if LWIP_SNMP

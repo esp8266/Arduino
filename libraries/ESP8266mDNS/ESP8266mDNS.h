@@ -64,6 +64,8 @@ public:
   bool begin(const char* hostName);
   //for compatibility
   bool begin(const char* hostName, IPAddress ip, uint32_t ttl=120){
+    (void) ip;
+    (void) ttl;
     return begin(hostName);
   }
   /* Application should call this whenever AP is configured/disabled */
