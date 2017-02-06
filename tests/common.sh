@@ -84,3 +84,91 @@ function install_libraries()
 
     popd
 }
+
+function install_ide()
+{
+    local ide_path=$1
+    local core_path=$2
+    wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+    tar xf arduino.tar.xz
+    mv arduino-nightly $ide_path
+    cd $ide_path/hardware
+    mkdir esp8266com
+    cd esp8266com
+    ln -s $core_path esp8266
+    cd esp8266/tools
+    python get.py
+    export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
+}
+
+function build_docs()
+{
+    SPHINXOPTS="-W" make html
+}
+
+function run_host_tests()
+{
+    pushd host
+    make
+    make clean-objects
+    popd
+}
+
+function build_package()
+{
+    export PKG_URL=https://github.com/esp8266/Arduino/releases/download/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
+    export DOC_URL=https://arduino-esp8266.readthedocs.io/en/$TRAVIS_TAG/
+    ./build_boards_manager_package.sh
+}
+
+function run_travis_ci_build()
+{
+    # Build documentation using Sphinx
+    echo -e "travis_fold:start:docs"
+    cd $TRAVIS_BUILD_DIR/doc
+    build_docs
+    echo -e "travis_fold:end:docs"
+
+    # Build release package
+    echo -e "travis_fold:start:build_package"
+    cd $TRAVIS_BUILD_DIR/package
+    build_package
+    echo -e "travis_fold:end:build_package"
+
+    if [ "$TRAVIS_TAG" != "" ]; then
+        echo "Skipping tests for tagged build"
+        return 0;
+    fi
+
+    # Run host side tests
+    echo -e "travis_fold:start:host_tests"
+    cd $TRAVIS_BUILD_DIR/tests
+    run_host_tests
+    echo -e "travis_fold:end:host_tests"
+
+    # Install Arduino IDE and required libraries
+    echo -e "travis_fold:start:sketch_test_env_prepare"
+    cd $TRAVIS_BUILD_DIR
+    install_ide $HOME/arduino_ide $TRAVIS_BUILD_DIR
+    which arduino
+    cd $TRAVIS_BUILD_DIR
+    install_libraries
+    echo -e "travis_fold:end:sketch_test_env_prepare"
+
+    # Compile sketches
+    echo -e "travis_fold:start:sketch_test"
+    build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries"
+    echo -e "travis_fold:end:sketch_test"
+
+    # Generate size report
+    echo -e "travis_fold:start:size_report"
+    cat size.log
+    echo -e "travis_fold:end:size_report"
+}
+
+set -e
+
+if [ "$BUILD_TYPE" = "build" ]; then
+    run_travis_ci_build
+fi
+
