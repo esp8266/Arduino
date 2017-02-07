@@ -186,6 +186,19 @@ WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeStationDisconnected(std::f
     return handler;
 }
 
+WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED, [f](System_Event_t* e){
+        auto& src = e->event_info.ap_probereqrecved;
+        WiFiEventSoftAPModeProbeRequestReceived dst;
+        memcpy(dst.mac, src.mac, 6);
+        dst.rssi = src.rssi;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
 // WiFiEventHandler ESP8266WiFiGenericClass::onWiFiModeChange(std::function<void(const WiFiEventModeChange&)> f)
 // {
 //     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_MODE_CHANGE, [f](System_Event_t* e){
