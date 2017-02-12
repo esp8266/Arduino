@@ -67,6 +67,11 @@ public:
     return loadPrivateKey(file, file.size());
   }
 
+  template<typename TFile>
+  bool loadCACert(TFile& file) {
+    return loadCACert(file, file.size());
+  }
+
 protected:
     int _connectSSL(const char* hostName);
     bool _verifyDN(const char* name);
