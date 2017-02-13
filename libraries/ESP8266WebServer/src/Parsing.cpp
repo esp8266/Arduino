@@ -91,7 +91,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   String searchStr = "";
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
-    searchStr = urlDecode(url.substring(hasSearch + 1));
+    searchStr = url.substring(hasSearch + 1);
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
@@ -318,7 +318,7 @@ void ESP8266WebServer::_parseArguments(String data) {
     }
     RequestArgument& arg = _currentArgs[iarg];
     arg.key = data.substring(pos, equal_sign_index);
-	arg.value = data.substring(equal_sign_index + 1, next_arg_index);
+    arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
 #ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.print("arg ");
     DEBUG_OUTPUT.print(iarg);
