@@ -75,6 +75,7 @@ public:
 
     void release_buffer(const uint8_t* buffer, size_t size) override
     {
+        (void) buffer;
         _pos += size;
     }
 
