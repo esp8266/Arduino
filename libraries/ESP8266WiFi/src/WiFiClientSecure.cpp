@@ -547,20 +547,28 @@ bool WiFiClientSecure::verifyCertChain(const char* domain_name)
     return _verifyDN(domain_name);
 }
 
-void WiFiClientSecure::setCertificate(const uint8_t* cert_data, size_t size)
+bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size)
 {
     if (!_ssl) {
-        return;
+        return false;
     }
-    _ssl->loadObject(SSL_OBJ_X509_CERT, cert_data, size);
+    return _ssl->loadObject(SSL_OBJ_X509_CACERT, pk, size);
 }
 
-void WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size)
+bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size)
 {
     if (!_ssl) {
-        return;
+        return false;
     }
-    _ssl->loadObject(SSL_OBJ_RSA_KEY, pk, size);
+    return _ssl->loadObject(SSL_OBJ_X509_CERT, pk, size);
+}
+
+bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size)
+{
+    if (!_ssl) {
+        return false;
+    }
+    return _ssl->loadObject(SSL_OBJ_RSA_KEY, pk, size);
 }
 
 bool WiFiClientSecure::loadCACert(Stream& stream, size_t size)
