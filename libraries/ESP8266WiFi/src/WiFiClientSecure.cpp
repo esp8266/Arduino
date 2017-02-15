@@ -571,6 +571,14 @@ bool WiFiClientSecure::loadCACert(Stream& stream, size_t size)
     return _ssl->loadObject(SSL_OBJ_X509_CACERT, stream, size);
 }
 
+bool WiFiClientSecure::loadCACert(const uint8_t* pk, size_t size)
+{
+    if (!_ssl) {
+        return false;
+    }
+    return _ssl->loadObject(SSL_OBJ_X509_CACERT, pk, size);
+}
+
 bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size)
 {
     if (!_ssl) {
@@ -579,12 +587,28 @@ bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size)
     return _ssl->loadObject(SSL_OBJ_X509_CERT, stream, size);
 }
 
+bool WiFiClientSecure::loadCertificate(const uint8_t* pk, size_t size)
+{
+    if (!_ssl) {
+        return false;
+    }
+    return _ssl->loadObject(SSL_OBJ_X509_CERT, pk, size);
+}
+
 bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size)
 {
     if (!_ssl) {
         return false;
     }
     return _ssl->loadObject(SSL_OBJ_RSA_KEY, stream, size);
+}
+
+bool WiFiClientSecure::loadPrivateKey(const uint8_t* pk, size_t size)
+{
+    if (!_ssl) {
+        return false;
+    }
+    return _ssl->loadObject(SSL_OBJ_RSA_KEY, pk, size);
 }
 
 extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count)
