@@ -5,6 +5,8 @@ This project brings support for ESP8266 chip to the Arduino environment. It lets
 
 ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, work with SD cards, servos, SPI and I2C peripherals.
 
+A large community is well established for questions and answers about Arduino for ESP8266 [ESP8266 Community Forum](http://www.esp8266.com/u/arduinoanswers)
+
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
