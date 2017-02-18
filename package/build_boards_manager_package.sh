@@ -1,6 +1,8 @@
 #!/bin/bash
 #
-next="2.4.0"
+
+# Extract next version from platform.txt
+next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
 
 # Figure out how will the package be called
 ver=`git describe --exact-match`
@@ -27,14 +29,14 @@ fi
 echo "Remote: $REMOTE_URL"
 
 if [ -z "$PKG_URL" ]; then
-    PKG_URL="$REMOTE_URL/versions/$ver/$package_name.zip"
+    if [ -z "$PKG_URL_PREFIX" ]; then
+        PKG_URL_PREFIX="$REMOTE_URL/versions/$ver"
+    fi
+    PKG_URL="$PKG_URL_PREFIX/$package_name.zip"
 fi
 echo "Package: $PKG_URL"
-
-if [ -z "$DOC_URL" ]; then
-    DOC_URL="$REMOTE_URL/versions/$ver/doc/reference.html"
-fi
 echo "Docs: $DOC_URL"
+
 pushd ..
 # Create directory for the package
 outdir=package/versions/$ver/$package_name
@@ -82,7 +84,7 @@ $SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' \
  > $outdir/platform.txt
 
 # Put core version and short hash of git version into core_version.h
-ver_define=`echo $plain_ver | tr "[:lower:].-+" "[:upper:]_"`
+ver_define=`echo $plain_ver | tr "[:lower:].\055" "[:upper:]_"`
 echo Ver define: $ver_define
 echo \#define ARDUINO_ESP8266_GIT_VER 0x`git rev-parse --short=8 HEAD 2>/dev/null` >$outdir/cores/esp8266/core_version.h
 echo \#define ARDUINO_ESP8266_RELEASE_$ver_define >>$outdir/cores/esp8266/core_version.h
@@ -104,8 +106,7 @@ echo "Making package_esp8266com_index.json"
 
 jq_arg=".packages[0].platforms[0].version = \"$ver\" | \
     .packages[0].platforms[0].url = \"$PKG_URL\" |\
-    .packages[0].platforms[0].archiveFileName = \"$package_name.zip\" |\
-    .packages[0].platforms[0].help.online = \"$DOC_URL\""
+    .packages[0].platforms[0].archiveFileName = \"$package_name.zip\""
 
 if [ -z "$is_nightly" ]; then
     jq_arg="$jq_arg |\
@@ -113,13 +114,22 @@ if [ -z "$is_nightly" ]; then
         .packages[0].platforms[0].checksum = \"SHA-256:$sha\" |"
 fi
 
+if [ ! -z "$DOC_URL" ]; then
+    jq_arg="$jq_arg |\
+        .packages[0].platforms[0].help.online = \"$DOC_URL\""
+fi
+
 cat $srcdir/package/package_esp8266com_index.template.json | \
     jq "$jq_arg" > package_esp8266com_index.json
 
 old_json=package_esp8266com_index_stable.json
-wget -O $old_json http://arduino.esp8266.com/$branch/package_esp8266com_index.json
+for i in $(seq 1 5); do
+    echo "Downloading old package, try $i"
+    curl -L -o $old_json http://arduino.esp8266.com/stable/package_esp8266com_index.json && break
+done
 new_json=package_esp8266com_index.json
 
+set +e
 python ../../merge_packages.py $new_json $old_json >tmp && mv tmp $new_json && rm $old_json
 
 popd
