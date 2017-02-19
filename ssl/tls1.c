@@ -2210,6 +2210,25 @@ EXP_FUNC int STDCALL ssl_match_fingerprint(const SSL *ssl, const uint8_t* fp)
     return res;
 }
 
+EXP_FUNC int STDCALL ssl_match_spki_sha256(const SSL *ssl, const uint8_t* hash)
+{
+    if (ssl->x509_ctx == NULL || ssl->x509_ctx->spki_sha256 == NULL)
+        return 1;
+    int res = memcmp(ssl->x509_ctx->spki_sha256, hash, SHA256_SIZE);
+    if (res != 0) {
+        printf("cert SPKI SHA-256 hash: ");
+        for (int i = 0; i < SHA256_SIZE; ++i) {
+            printf("%02X ", ssl->x509_ctx->spki_sha256[i]);
+        }
+        printf("\r\ntest hash: ");
+        for (int i = 0; i < SHA256_SIZE; ++i) {
+            printf("%02X ", hash[i]);
+        }
+        printf("\r\n");
+    }
+    return res;
+}
+
 #endif /* CONFIG_SSL_CERT_VERIFICATION */
 
 /**

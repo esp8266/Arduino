@@ -78,6 +78,7 @@ struct _x509_ctx
     RSA_CTX *rsa_ctx;
     bigint *digest;
     uint8_t *fingerprint;
+    uint8_t *spki_sha256;
     struct _x509_ctx *next;
 };
 

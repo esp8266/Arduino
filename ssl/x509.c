@@ -71,7 +71,7 @@ end_get_sig:
  */
 int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
 {
-    int begin_tbs, end_tbs;
+    int begin_tbs, end_tbs, begin_spki, end_spki;
     int ret = X509_NOT_OK, offset = 0, cert_size = 0;
     X509_CTX *x509_ctx;
 #ifdef CONFIG_SSL_CERT_VERIFICATION /* only care if doing verification */
@@ -113,11 +113,14 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
 
     if (asn1_name(cert, &offset, x509_ctx->ca_cert_dn) || 
             asn1_validity(cert, &offset, x509_ctx) ||
-            asn1_name(cert, &offset, x509_ctx->cert_dn) ||
-            asn1_public_key(cert, &offset, x509_ctx))
+            asn1_name(cert, &offset, x509_ctx->cert_dn))
     {
         goto end_cert;
     }
+    begin_spki = offset;
+    if (asn1_public_key(cert, &offset, x509_ctx))
+        goto end_cert;
+    end_spki = offset;
 
 
     x509_ctx->fingerprint = malloc(SHA1_SIZE);
@@ -125,6 +128,12 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
     SHA1_Init(&sha_fp_ctx);
     SHA1_Update(&sha_fp_ctx, &cert[0], cert_size);
     SHA1_Final(x509_ctx->fingerprint, &sha_fp_ctx);
+
+    x509_ctx->spki_sha256 = malloc(SHA256_SIZE);
+    SHA256_CTX spki_hash_ctx;
+    SHA256_Init(&spki_hash_ctx);
+    SHA256_Update(&spki_hash_ctx, &cert[begin_spki], end_spki-begin_spki);
+    SHA256_Final(x509_ctx->spki_sha256, &spki_hash_ctx);
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION /* only care if doing verification */
     bi_ctx = x509_ctx->rsa_ctx->bi_ctx;
@@ -287,6 +296,11 @@ void x509_free(X509_CTX *x509_ctx)
     if (x509_ctx->fingerprint)
     {
         free(x509_ctx->fingerprint);
+    }
+
+    if (x509_ctx->spki_sha256)
+    {
+        free(x509_ctx->spki_sha256);
     }
 
     if (x509_ctx->subject_alt_dnsnames)
