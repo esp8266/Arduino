@@ -1,3 +1,30 @@
+ESP8266_NONOS_SDK_V2.0.0_16_07_19 Release Note
+----------------------------------------------
+1. Updated libphy.a to 1055, fixed an issue of large current in Light-sleep.
+2. Updated AT+ to 1.3.0:
+   2.1 Added Light-sleep wakeup command, AT+WAKEUPGPIO;
+   2.2 Fixed abnormal AT+CWDHCPS IP allocation;
+   2.3 Added at_sdio demo under example directory.
+3. Fixed probable system default when calling cur and def interfaces.
+4. Fixed the issue of high current in Deep-sleep mode without disabling SPI first.
+5. Fixed an issue where the SDK would crash when switching from AP to Station mode by calling wifi_set_phy_mode.
+6. Updated secondary boot loader to v1.6:
+   6.1 Supports AT + based on SDIO;
+   6.2 Supports entering testing mode through GPIO.
+7. Added support for MXIC Flash QIO mode.
+8. Fixed exception caused during TCP handshake and retransmission.
+9. Fixed issues in ESP-NOW.
+10. Added ESP-PAIR (Simple-Pair) feature, for APIs please refer to ESP8266 SDK API Guide.
+11. wpa2-enterprise time function derivation and time check disable can be set by users.
+12. Support for PEAP/TTLS in wpa2-enterprise, for APIs please refer to ESP8266 SDK API Guide.
+13. Added mqtt demos under examples directory.
+14. Other issue fixes.
+15. Resolved an issue that RF_Init_data sector may be broken in stress test. Provided a function user_rf_cal_sector_set which has to be added in application by software developer. More details about user_rf_cal_sector_set refer to documentation "2C-ESP8266__SDK__API Guide". (Resolved in ESP8266_NONOS_SDK_V1.5.4.1) 
+16. Fix a potential risk that will cause rf not work after external reset. (Resolved in ESP8266_NONOS_SDK_V1.5.4.1)
+17. Add SDIO AT support. (Resolved in ESP8266_NONOS_SDK_V1.5.4.1)
+18. Fix a potential bug in espconn. (Resolved in ESP8266_NONOS_SDK_V1.5.4.1)
+
+
 ESP8266_NONOS_SDK_V1.5.4_16_05_20 Release Note 
 ----------------------------------------------
 Optimization:

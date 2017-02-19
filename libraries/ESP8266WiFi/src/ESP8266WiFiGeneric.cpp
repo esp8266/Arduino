@@ -153,6 +153,7 @@ WiFiEventHandler ESP8266WiFiGenericClass::onStationModeGotIP(std::function<void(
 WiFiEventHandler ESP8266WiFiGenericClass::onStationModeDHCPTimeout(std::function<void(void)> f)
 {
     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_DHCP_TIMEOUT, [f](System_Event_t* e){
+        (void) e;
         f();
     });
     sCbEventList.push_back(handler);
@@ -179,6 +180,19 @@ WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeStationDisconnected(std::f
         WiFiEventSoftAPModeStationDisconnected dst;
         memcpy(dst.mac, src.mac, 6);
         dst.aid = src.aid;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
+WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED, [f](System_Event_t* e){
+        auto& src = e->event_info.ap_probereqrecved;
+        WiFiEventSoftAPModeProbeRequestReceived dst;
+        memcpy(dst.mac, src.mac, 6);
+        dst.rssi = src.rssi;
         f(dst);
     });
     sCbEventList.push_back(handler);
@@ -452,6 +466,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param callback_arg
  */
 void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg) {
+    (void) name;
     if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
     }

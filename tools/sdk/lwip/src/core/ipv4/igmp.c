@@ -149,7 +149,7 @@ static err_t  igmp_ip_output_if(struct pbuf *p, ip_addr_t *src, ip_addr_t *dest,
 static void   igmp_send(struct igmp_group *group, u8_t type)ICACHE_FLASH_ATTR;
 
 
-static struct igmp_group* igmp_group_list;
+static struct igmp_group* igmp_group_list = NULL;
 static ip_addr_t     allsystems;
 static ip_addr_t     allrouters;
 
