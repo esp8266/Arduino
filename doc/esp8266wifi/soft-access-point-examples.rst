@@ -1,4 +1,4 @@
-`ESP8266WiFi Library :back: <readme.md#soft-access-point>`__
+:orphan:
 
 Soft Access Point
 -----------------

@@ -1,11 +1,3 @@
-.. toctree::
-   :hidden:
-
-   a01-espcomm_sync-failed
-   a02-my-esp-crashes
-   a03-library-does-not-work
-   a04-board-generic-is-unknown   
-
 FAQ
 ===
 

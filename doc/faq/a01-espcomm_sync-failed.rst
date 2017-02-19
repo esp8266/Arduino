@@ -1,4 +1,4 @@
-`FAQ list :back: <readme.md>`__
+:orphan:
 
 I am getting "espcomm\_sync failed" error when trying to upload my ESP. How to resolve this issue?
 --------------------------------------------------------------------------------------------------

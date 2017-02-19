@@ -1,23 +1,3 @@
-.. toctree::
-   :hidden:
-   
-   client-class
-   client-examples
-   client-secure-class
-   client-secure-examples
-   generic-class
-   generic-examples
-   scan-class
-   scan-examples
-   server-class
-   server-examples
-   soft-access-point-class
-   soft-access-point-examples
-   station-class
-   station-examples
-   udp-class
-   udp-examples
-
 ESP8266WiFi library
 ===================
 

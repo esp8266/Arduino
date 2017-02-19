@@ -1,3 +1,5 @@
+:orphan:
+
 How to resolve "Board generic (platform esp8266, package esp8266) is unknown" error?
 ------------------------------------------------------------------------------------
 

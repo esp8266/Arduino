@@ -1,4 +1,4 @@
-`ESP8266WiFi Library :back: <readme.md#station>`__
+:orphan:
 
 Station
 -------

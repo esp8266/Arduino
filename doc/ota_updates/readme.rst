@@ -154,19 +154,17 @@ captures have been made on Windows 7 and you may see small differences
       .. figure:: a-ota-python-configuration.png
          :alt: Python installation set up
 
-         alt text
-
 2. Now prepare the sketch and configuration for the upload over a serial
    port.
 
    -  Start Arduino IDE and load sketch BasicOTA.ino available under
-      File > Examples > ArduinoOTA |alt text|
+      File > Examples > ArduinoOTA |ota sketch selection|
 
    -  Update SSID and password in the sketch, so the module can join
-      your Wi-Fi network |alt text|
+      your Wi-Fi network |ota ssid pass entry|
 
    -  Configure upload parameters as below (you may need to adjust
-      configuration if you are using a different module): |alt text|
+      configuration if you are using a different module): |ota serial upload config|
 
       **Note:** Depending on version of platform package and board you
       have, you may see ``Upload Using:`` in the menu above. This option
@@ -179,8 +177,6 @@ captures have been made on Windows 7 and you may see small differences
 
    .. figure:: a-ota-upload-complete-and-joined-wifi.png
       :alt: Check if module joined network
-
-      alt text
 
 **Note:** ESP module should be reset after serial upload. Otherwise
 subsequent steps will not work. Reset may be done automatically for you
@@ -199,8 +195,6 @@ regarding ``ESP.restart()``.
    .. figure:: a-ota-ota-port-selection.png
       :alt: Selection of OTA port
 
-      alt text
-
    **Note:** If OTA port does not show up, exit Arduino IDE, open it
    again and check if port is there. If it does not help, check your
    firewall and router settings. OTA port is advertised using mDNS
@@ -212,8 +206,6 @@ regarding ``ESP.restart()``.
    .. figure:: a-ota-ota-upload-configuration.png
       :alt: Configuration of OTA upload
 
-      alt text
-
    **Note:** The menu entry ``Upload Speed:`` does not matter at this
    point as it concerns the serial port. Just left it unchanged.
 
@@ -222,8 +214,6 @@ regarding ``ESP.restart()``.
 
    .. figure:: a-ota-ota-upload-complete.png
       :alt: OTA upload complete
-
-      alt text
 
 **Note:** To be able to upload your sketch over and over again using
 OTA, you need to embed OTA routines inside. Please use BasicOTA.ino as
@@ -255,15 +245,11 @@ prompt for password as follows:
 .. figure:: a-ota-upload-password-prompt.png
    :alt: Password prompt for OTA upload
 
-   alt text
-
 Enter the password and upload should be initiated as usual with the only
 difference being ``Authenticating...OK`` message visible in upload log.
 
 .. figure:: a-ota-upload-password-authenticating-ok.png
    :alt: Authenticating...OK during OTA upload
-
-   alt text
 
 You will not be prompted for a reentering the same password next time.
 Arduino IDE will remember it for you. You will see prompt for password
@@ -278,8 +264,6 @@ Preferences* and attempting to upload the module.
 .. figure:: a-ota-upload-password-passing-upload-ok.png
    :alt: Verbose upload output with password passing in plain text
 
-   alt text
-
 The picture above shows that the password is visible in log, as it is
 passed to *espota.py* upload script.
 
@@ -288,8 +272,6 @@ uploads.
 
 .. figure:: a-ota-upload-password-passing-again-upload-ok.png
    :alt: Verbose output when OTA password has been changed between uploads
-
-   alt text
 
 When uploading, Arduino IDE used previously entered password, so the
 upload failed and that has been clearly reported by IDE. Only then IDE
@@ -308,8 +290,6 @@ When attempting to open it, you will likely see the following:
 .. figure:: a-ota-network-terminal.png
    :alt: Arduino IDE network terminal window
 
-   alt text
-
 This window is for Arduino Yún and not yet implemented for
 esp8266/Arduino. It shows up because IDE is attempting to open Serial
 Monitor using network port you have selected for OTA upload.
@@ -327,7 +307,6 @@ were using Arduino Serial Monitor. Please see typical settings for
 .. figure:: termite-configuration.png
    :alt: Termite settings
 
-   alt text
 
 Then run OTA from IDE and look what is displayed on terminal. Successful
 `ArduinoOTA <#arduinoota>`__ process using BasicOTA.ino sketch looks
@@ -336,8 +315,6 @@ like below (IP address depends on your network configuration):
 .. figure:: a-ota-external-serial-terminal-output.png
    :alt: OTA upload successful - output on an external serial terminal
 
-   alt text
-
 If upload fails you will likely see errors caught by the uploader,
 exception and the stack trace, or both.
 
@@ -345,8 +322,6 @@ Instead of the log as on the above screen you may see the following:
 
 .. figure:: a-ota-external-serial-terminal-output-failed.png
    :alt: OTA upload failed - output on an external serial terminal
-
-   alt text
 
 If this is the case, then most likely ESP module has not been reset
 after initial upload using serial port.
@@ -446,8 +421,6 @@ You can use another module if it meets previously described
       .. figure:: ota-web-show-verbose-compilation.png
          :alt: Preferences - enabling verbose output during compilation
 
-         alt text
-
       **Note:** This setting will be required in step 5 below. You can
       uncheck this setting afterwards.
 
@@ -457,8 +430,6 @@ You can use another module if it meets previously described
 
    .. figure:: ota-web-serial-monitor-ready.png
       :alt: Serial Monitor - after first load using serial
-
-      alt text
 
    **Note:** Such message will be shown only after module successfully
    joins network and is ready for an OTA upload. Please remember about
@@ -472,8 +443,6 @@ You can use another module if it meets previously described
 
    .. figure:: ota-web-browser-form.png
       :alt: OTA update form in web browser
-
-      alt text
 
    **Note:** If entering ``http://esp8266-webupdate.local/update`` does
    not work, try replacing ``esp8266-webupdate`` with module’s IP
@@ -492,8 +461,6 @@ You can use another module if it meets previously described
    .. figure:: ota-web-path-to-binary.png
       :alt: Compilation complete - path to binary file
 
-      alt text
-
 6. Now press “Choose File” in web browser, go to directory identified in
    step 5 above, find the file “WebUpdater.cpp.bin” and upload it. If
    upload is successful, you will see “OK” on web browser like below.
@@ -501,14 +468,10 @@ You can use another module if it meets previously described
    .. figure:: ota-web-browser-form-ok.png
       :alt: OTA update complete
 
-      alt text
-
    Module will reboot that should be visible on Serial Monitor:
 
    .. figure:: ota-web-serial-monitor-reboot.png
       :alt: Serial Monitor - after OTA update
-
-      alt text
 
    Just after reboot you should see exactly the same message
    ``HTTPUpdateServer ready! Open http:// esp8266-webupdate.local /update in your browser``
@@ -538,15 +501,15 @@ from HTTP web server. It is possible to download updates from every IP
 or domain address on the network or Internet.
 
 Requirements
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 -  web server
 
 Arduino code
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 Simple updater
-''''''''''''''
+^^^^^^^^^^^^^^
 
 Simple updater downloads the file every time the function is called.
 
@@ -555,7 +518,7 @@ Simple updater downloads the file every time the function is called.
     ESPhttpUpdate.update("192.168.0.2", 80, "/arduino.bin");
 
 Advanced updater
-''''''''''''''''
+^^^^^^^^^^^^^^^^
 
 Its possible to point update function to a script at the server. If
 version string argument is given, it will be sent to the server. Server
@@ -581,16 +544,16 @@ is required.
     }
 
 Server request handling
-^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Simple updater
-''''''''''''''
+^^^^^^^^^^^^^^
 
 For the simple updater the server only needs to deliver the binary file
 for update.
 
 Advanced updater
-''''''''''''''''
+^^^^^^^^^^^^^^^^
 
 For advanced update management a script needs to run at the server side,
 for example a PHP script. At every update request the ESP sends some
@@ -711,9 +674,7 @@ Update process - memory view
 .. figure:: update_memory_copy.png
    :alt: Memory layout for OTA updates
 
-   alt text
-
-.. |alt text| image:: a-ota-sketch-selection.png
-.. |alt text| image:: a-ota-ssid-pass-entry.png
-.. |alt text| image:: a-ota-serial-upload-configuration.png
+.. |ota sketch selection| image:: a-ota-sketch-selection.png
+.. |ota ssid pass entry| image:: a-ota-ssid-pass-entry.png
+.. |ota serial upload config| image:: a-ota-serial-upload-configuration.png
 

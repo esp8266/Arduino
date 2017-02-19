@@ -1,29 +1,9 @@
-`ESP8266WiFi Library :back: <readme.md#scan>`__
+:orphan:
 
 Scan Class
-----------
+~~~~~~~~~~
 
 This class is represented in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ by `scanNetworks() <https://www.arduino.cc/en/Reference/WiFiScanNetworks>`__ function. Developers of esp8266 / Arduino core extend this functionality by additional methods and properties.
-
-Table of Contents
------------------
-
--  `Scan for Networks <#scan-for-networks>`__
-
-   -  `scanNetworks <#scannetworks>`__
-   -  `scanNetworksAsync <#scannetworksasync>`__
-   -  `scanComplete <#scancomplete>`__
-   -  `scanDelete <#scandelete>`__
-
--  `Show Results <#show-results>`__
-
-   -  `SSID <#ssid>`__
-   -  `encryptionType <#encryptiontype>`__
-   -  `BSSID <#bssid>`__
-   -  `BSSIDstr <#bssidstr>`__
-   -  `channel <#channel>`__
-   -  `isHidden <#ishidden>`__
-   -  `getNetworkInfo <#getnetworkinfo>`__
 
 Documentation of this class is divided into two parts. First covers functions to scan for available networks. Second describes what information is collected during scanning process and how to access it.
 

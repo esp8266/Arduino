@@ -1,4 +1,4 @@
-`ESP8266WiFi Library :back: <readme.md#client>`__
+:orphan:
 
 Client
 ------
@@ -255,7 +255,6 @@ For more client examples please check
 
 - `WiFiClientBasic.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiClientBasic/WiFiClientBasic.ino>`__ - a simple sketch that sends a message to a TCP server
 
-- `WiFiClient.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient.ino>`__ - this sketch sends data via HTTP GET requests to data.sparkfun.com
-service.
+- `WiFiClient.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient.ino>`__ - this sketch sends data via HTTP GET requests to data.sparkfun.com service.
 
 For the list of functions provided to manage clients, please refer to the `Client Class :arrow\_right: <client-class.md>`__ documentation.

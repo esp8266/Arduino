@@ -1,4 +1,4 @@
-`ESP8266WiFi Library :back: <readme.md#client-secure>`__
+:orphan:
 
 Client Secure Class
 -------------------

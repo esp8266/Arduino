@@ -1,30 +1,9 @@
-`ESP8266WiFi Library :back: <readme.md#scan>`__
+:orphan:
 
 Scan
 ~~~~
 
 To connect a mobile phone to a hot spot, you typically open Wi-Fi settings app, list available networks and then pick the hot spot you need. You can also list the networks with ESP8266 and here is how.
-
-Table of Contents
------------------
-
--  `Simple Scan <#simple-scan>`__
-
-   -  `Disconnect <#disconnect>`__
-   -  `Scan for Networks <#scan-for-networks>`__
-   -  `Complete Example <#complete-example>`__
-   -  `Example in Action <#example-in-action>`__
-
--  `Async Scan <#async-scan>`__
-
-   -  `No delay() <#no-delay>`__
-   -  `Setup <#setup>`__
-   -  `When to Start <#when-to-start>`__
-   -  `Check When Done <#check-when-done>`__
-   -  `Complete Example <#complete-example-1>`__
-   -  `Example in Action <#example-in-action-1>`__
-
--  `Conclusion <#conclusion>`__
 
 Simple Scan
 ~~~~~~~~~~~

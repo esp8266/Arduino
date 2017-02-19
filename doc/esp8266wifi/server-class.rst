@@ -1,4 +1,4 @@
-`ESP8266WiFi Library :back: <readme.md#server>`__
+:orphan:
 
 Server Class
 ------------
