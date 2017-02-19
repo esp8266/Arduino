@@ -16,6 +16,7 @@
 #include "queue.h"
 #include "user_config.h"
 #include "spi_flash.h"
+#include "gpio.h"
 
 #ifndef MAC2STR
 #define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
@@ -166,8 +167,7 @@ uint8 wifi_get_broadcast_if(void);
 bool wifi_set_broadcast_if(uint8 interface);
 
 typedef struct bss_info {
-    STAILQ_ENTRY(bss_info)     next;
-
+    struct bss_info* next;
     uint8 bssid[6];
     uint8 ssid[32];
     uint8 ssid_len;
@@ -178,10 +178,15 @@ typedef struct bss_info {
     sint16 freq_offset;
     sint16 freqcal_val;
 	uint8 *esp_mesh_ie;
+	uint8 simple_pair;
 } bss_info_t;
 
+typedef struct {
+    struct bss_info* first;
+} bss_info_head_t;
+
 typedef struct _scaninfo {
-    STAILQ_HEAD(, bss_info) *pbss;
+	bss_info_head_t *pbss;
     struct espconn *pespconn;
     uint8 totalpage;
     uint8 pagenum;
@@ -276,8 +281,7 @@ bool wifi_softap_set_config(struct softap_config *config);
 bool wifi_softap_set_config_current(struct softap_config *config);
 
 struct station_info {
-	STAILQ_ENTRY(station_info)	next;
-
+	struct station_info* next;
 	uint8 bssid[6];
 	struct ip_addr ip;
 };
@@ -605,5 +609,8 @@ typedef void (*user_ie_manufacturer_recv_cb_t)(uint8 type, const uint8 sa[6], co
 bool wifi_set_user_ie(bool enable, uint8 *m_oui, uint8 type, uint8 *user_ie, uint8 len);
 int wifi_register_user_ie_manufacturer_recv_cb(user_ie_manufacturer_recv_cb_t cb);
 void wifi_unregister_user_ie_manufacturer_recv_cb(void);
+
+void wifi_enable_gpio_wakeup(uint32 i, GPIO_INT_TYPE intr_status);
+void wifi_disable_gpio_wakeup(void);
 
 #endif

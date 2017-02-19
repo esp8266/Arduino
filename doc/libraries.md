@@ -71,7 +71,7 @@ APIs related to deep sleep and watchdog timer are available in the `ESP` object,
 
 `ESP.restart()` restarts the CPU.
 
-`ESP.getResetReason()` returns String containing the last reset resaon in human readable format.
+`ESP.getResetReason()` returns String containing the last reset reason in human readable format.
 
 `ESP.getFreeHeap()` returns the free heap size.
 
@@ -104,7 +104,7 @@ Note that by default ADC is configured to read from TOUT pin using `analogRead(A
 
 ## mDNS and DNS-SD responder (ESP8266mDNS library)
 
-Allows the sketch to respond to multicast DNS queries for domain names like "foo.local", and DNS-SD (service dicovery) queries.
+Allows the sketch to respond to multicast DNS queries for domain names like "foo.local", and DNS-SD (service discovery) queries.
 See attached example for details.
 
 ## SSDP responder (ESP8266SSDP)
@@ -113,7 +113,7 @@ SSDP is another service discovery protocol, supported on Windows out of the box.
 
 ## DNS server (DNSServer library)
 
-Implements a simple DNS server that can be used in both STA and AP modes. The DNS server currently supports only one domain (for all other domains it will reply with NXDOMAIN or custom status code). With it clients can open a web server running on ESP8266 using a domain name, not an IP address.
+Implements a simple DNS server that can be used in both STA and AP modes. The DNS server currently supports only one domain (for all other domains it will reply with NXDOMAIN or custom status code). With it, clients can open a web server running on ESP8266 using a domain name, not an IP address.
 See attached example for details.
 
 ## Servo
