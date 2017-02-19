@@ -156,9 +156,10 @@ texinfo_documents = [
 # ref. https://github.com/snide/sphinx_rtd_theme#using-this-theme-locally-then-building-on-read-the-docs
 #
 # on_rtd is whether we are on readthedocs.org
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+env_readthedocs = os.environ.get('READTHEDOCS', None)
+print env_readthedocs
 
-if not on_rtd:  # only import and set the theme if we're building docs locally
+if not env_readthedocs:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
