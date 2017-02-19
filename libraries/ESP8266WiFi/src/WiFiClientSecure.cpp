@@ -214,6 +214,7 @@ public:
 
     static ClientContext* getIOContext(int fd)
     {
+        (void) fd;
         return s_io_ctx;
     }
 
@@ -546,20 +547,28 @@ bool WiFiClientSecure::verifyCertChain(const char* domain_name)
     return _verifyDN(domain_name);
 }
 
-void WiFiClientSecure::setCertificate(const uint8_t* cert_data, size_t size)
+bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size)
 {
     if (!_ssl) {
-        return;
+        return false;
     }
-    _ssl->loadObject(SSL_OBJ_X509_CERT, cert_data, size);
+    return _ssl->loadObject(SSL_OBJ_X509_CACERT, pk, size);
 }
 
-void WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size)
+bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size)
 {
     if (!_ssl) {
-        return;
+        return false;
     }
-    _ssl->loadObject(SSL_OBJ_RSA_KEY, pk, size);
+    return _ssl->loadObject(SSL_OBJ_X509_CERT, pk, size);
+}
+
+bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size)
+{
+    if (!_ssl) {
+        return false;
+    }
+    return _ssl->loadObject(SSL_OBJ_RSA_KEY, pk, size);
 }
 
 bool WiFiClientSecure::loadCACert(Stream& stream, size_t size)
@@ -623,6 +632,7 @@ extern "C" void ax_port_write() __attribute__ ((weak, alias("__ax_port_write")))
 
 extern "C" int __ax_get_file(const char *filename, uint8_t **buf)
 {
+    (void) filename;
     *buf = 0;
     return 0;
 }
@@ -637,6 +647,8 @@ extern "C" void ax_get_file() __attribute__ ((weak, alias("__ax_get_file")));
 
 extern "C" void* ax_port_malloc(size_t size, const char* file, int line)
 {
+    (void) file;
+    (void) line;
     void* result = malloc(size);
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d malloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
@@ -656,6 +668,8 @@ extern "C" void* ax_port_calloc(size_t size, size_t count, const char* file, int
 
 extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int line)
 {
+    (void) file;
+    (void) line;
     void* result = realloc(ptr, size);
     if (result == nullptr) {
         DEBUG_TLS_MEM_PRINT("%s:%d realloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());

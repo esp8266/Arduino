@@ -330,6 +330,9 @@ private:
     void _recv(udp_pcb *upcb, pbuf *pb,
             ip_addr_t *addr, u16_t port)
     {
+        (void) upcb;
+        (void) addr;
+        (void) port;
         if (_rx_buf)
         {
             // there is some unread data
