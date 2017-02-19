@@ -4,8 +4,6 @@ AR := $(TOOLCHAIN_PREFIX)ar
 LD := $(TOOLCHAIN_PREFIX)gcc
 OBJCOPY := $(TOOLCHAIN_PREFIX)objcopy
 
-MFORCE32 := $(shell $(CC) --help=target | grep mforce-l32)
-
 XTENSA_LIBS ?= $(shell $(CC) -print-sysroot)
 
 
@@ -43,13 +41,17 @@ LDFLAGS  += 	-L$(XTENSA_LIBS)/lib \
 
 CFLAGS+=-std=c99 -DESP8266
 
-CFLAGS += -Wall -Os -g -O2 -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mno-text-section-literals  -D__ets__ -DICACHE_FLASH
+CFLAGS += -Wall -Os -g -O2 -Wpointer-arith -Wl,-EL -nostdlib -mlongcalls -mno-text-section-literals  -D__ets__ -DICACHE_FLASH
 
+MFORCE32 := $(shell $(CC) --help=target | grep mforce-l32)
 ifneq ($(MFORCE32),)
-    # Your compiler supports the -mforce-l32 flag which means that 
-    # constants can be stored in flash (program) memory instead of SRAM.
-    # See: https://www.arduino.cc/en/Reference/PROGMEM
-    CFLAGS += -DPROGMEM="__attribute__((aligned(4))) __attribute__((section(\".irom.text\")))" -mforce-l32
+    # If the compiler supports the -mforce-l32 flag, the compiler will generate correct code for loading
+    # 16- and 8-bit constants from program memory. So in the code we can directly access the arrays
+    # placed into program memory.
+    CFLAGS +=  -mforce-l32
+else
+	# Otherwise we need to use a helper function to load 16- and 8-bit constants from program memory.
+    CFLAGS += -DWITH_PGM_READ_HELPER
 endif
 
 BIN_DIR := bin

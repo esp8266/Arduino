@@ -234,6 +234,20 @@ EXP_FUNC void STDCALL ssl_ctx_free(SSL_CTX *ssl_ctx);
 EXP_FUNC SSL_EXTENSIONS * STDCALL ssl_ext_new();
 
 /**
+ * @brief Set the host name for SNI extension
+ * @param ssl_ext pointer returned by ssl_ext_new
+ * @param host_name pointer to a zero-terminated string containing host name
+ */
+EXP_FUNC void STDCALL ssl_ext_set_host_name(SSL_EXTENSIONS * ext, const char* host_name);
+
+/**
+ * @brief Set the maximum fragment size for the fragment size negotiation extension
+ * @param ssl_ext pointer returned by ssl_ext_new
+ * @param fragment_size fragment size, allowed values: 2^9, 2^10 ... 2^14
+ */
+EXP_FUNC void STDCALL ssl_ext_set_max_fragment_size(SSL_EXTENSIONS * ext, unsigned fragment_size);
+
+/**
  * @brief Frees SSL extensions structure
  *
  * @param ssl_ext [in] Pointer to SSL_EXTENSION structure

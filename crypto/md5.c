@@ -60,7 +60,7 @@ static void MD5Transform(uint32_t state[4], const uint8_t block[64]);
 static void Encode(uint8_t *output, uint32_t *input, uint32_t len);
 static void Decode(uint32_t *output, const uint8_t *input, uint32_t len);
 
-static const uint8_t PADDING[64] = 
+static const uint8_t PADDING[64] PROGMEM = 
 {
     0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -158,7 +158,10 @@ EXP_FUNC void STDCALL MD5_Final(uint8_t *digest, MD5_CTX *ctx)
 {
     uint8_t bits[8];
     uint32_t x, padLen;
-
+#ifdef WITH_PGM_READ_HELPER
+    uint8_t PADDING_stack[64];
+    memcpy(PADDING_stack, PADDING, 64);
+#endif
     /* Save number of bits */
     Encode(bits, ctx->count, 8);
 
@@ -166,7 +169,11 @@ EXP_FUNC void STDCALL MD5_Final(uint8_t *digest, MD5_CTX *ctx)
      */
     x = (uint32_t)((ctx->count[0] >> 3) & 0x3f);
     padLen = (x < 56) ? (56 - x) : (120 - x);
+#ifdef WITH_PGM_READ_HELPER
+    MD5_Update(ctx, PADDING_stack, padLen);
+#else
     MD5_Update(ctx, PADDING, padLen);
+#endif
 
     /* Append length (before padding) */
     MD5_Update(ctx, bits, 8);

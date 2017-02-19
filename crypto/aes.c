@@ -220,20 +220,20 @@ void AES_set_key(AES_CTX *ctx, const uint8_t *key,
 
         if ((i % words) == 0)
         {
-            tmp2 =(uint32_t)aes_sbox[(tmp    )&0xff]<< 8;
-            tmp2|=(uint32_t)aes_sbox[(tmp>> 8)&0xff]<<16;
-            tmp2|=(uint32_t)aes_sbox[(tmp>>16)&0xff]<<24;
-            tmp2|=(uint32_t)aes_sbox[(tmp>>24)     ];
+            tmp2 =(uint32_t)(ax_array_read_u8(aes_sbox, (tmp    )&0xff))<< 8;
+            tmp2|=(uint32_t)(ax_array_read_u8(aes_sbox, (tmp>> 8)&0xff))<<16;
+            tmp2|=(uint32_t)(ax_array_read_u8(aes_sbox, (tmp>>16)&0xff))<<24;
+            tmp2|=(uint32_t)(ax_array_read_u8(aes_sbox, (tmp>>24)));
             tmp=tmp2^(((unsigned int)*ip)<<24);
             ip++;
         }
 
         if ((words == 8) && ((i % words) == 4))
         {
-            tmp2 =(uint32_t)aes_sbox[(tmp    )&0xff]    ;
-            tmp2|=(uint32_t)aes_sbox[(tmp>> 8)&0xff]<< 8;
-            tmp2|=(uint32_t)aes_sbox[(tmp>>16)&0xff]<<16;
-            tmp2|=(uint32_t)aes_sbox[(tmp>>24)     ]<<24;
+            tmp2 =(uint32_t)(ax_array_read_u8(aes_sbox, (tmp    )&0xff))    ;
+            tmp2|=(uint32_t)(ax_array_read_u8(aes_sbox, (tmp>> 8)&0xff))<< 8;
+            tmp2|=(uint32_t)(ax_array_read_u8(aes_sbox, (tmp>>16)&0xff))<<16;
+            tmp2|=(uint32_t)(ax_array_read_u8(aes_sbox, (tmp>>24)     ))<<24;
             tmp=tmp2;
         }
 
@@ -369,10 +369,10 @@ static void AES_encrypt(const AES_CTX *ctx, uint32_t *data)
         /* Perform ByteSub and ShiftRow operations together */
         for (row = 0; row < 4; row++)
         {
-            a0 = (uint32_t)aes_sbox[(data[row%4]>>24)&0xFF];
-            a1 = (uint32_t)aes_sbox[(data[(row+1)%4]>>16)&0xFF];
-            a2 = (uint32_t)aes_sbox[(data[(row+2)%4]>>8)&0xFF]; 
-            a3 = (uint32_t)aes_sbox[(data[(row+3)%4])&0xFF];
+            a0 = (uint32_t)(ax_array_read_u8(aes_sbox, (data[row%4]>>24)&0xFF));
+            a1 = (uint32_t)(ax_array_read_u8(aes_sbox, (data[(row+1)%4]>>16)&0xFF));
+            a2 = (uint32_t)(ax_array_read_u8(aes_sbox, (data[(row+2)%4]>>8)&0xFF));
+            a3 = (uint32_t)(ax_array_read_u8(aes_sbox, (data[(row+3)%4])&0xFF));
 
             /* Perform MixColumn iff not last round */
             if (curr_rnd < (rounds - 1))
@@ -417,10 +417,10 @@ static void AES_decrypt(const AES_CTX *ctx, uint32_t *data)
         /* Perform ByteSub and ShiftRow operations together */
         for (row = 4; row > 0; row--)
         {
-            a0 = aes_isbox[(data[(row+3)%4]>>24)&0xFF];
-            a1 = aes_isbox[(data[(row+2)%4]>>16)&0xFF];
-            a2 = aes_isbox[(data[(row+1)%4]>>8)&0xFF];
-            a3 = aes_isbox[(data[row%4])&0xFF];
+            a0 = ax_array_read_u8(aes_isbox, (data[(row+3)%4]>>24)&0xFF);
+            a1 = ax_array_read_u8(aes_isbox, (data[(row+2)%4]>>16)&0xFF);
+            a2 = ax_array_read_u8(aes_isbox, (data[(row+1)%4]>>8)&0xFF);
+            a3 = ax_array_read_u8(aes_isbox, (data[row%4])&0xFF);
 
             /* Perform MixColumn iff not last round */
             if (curr_rnd<(rounds-1))

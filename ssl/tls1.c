@@ -140,7 +140,7 @@ void DISPLAY_BYTES(SSL *ssl, const char *format,
 #endif
 
 /**
- * Allocates new SSL extensions structure and returns pointer to it
+ * Allocate new SSL extensions structure and return pointer to it
  *
  */
 EXP_FUNC SSL_EXTENSIONS * STDCALL ssl_ext_new()
@@ -153,7 +153,7 @@ EXP_FUNC SSL_EXTENSIONS * STDCALL ssl_ext_new()
 }
 
 /**
- * Allocates new SSL extensions structure and returns pointer to it
+ * Free SSL extensions structure
  *
  */
 EXP_FUNC void STDCALL ssl_ext_free(SSL_EXTENSIONS *ssl_ext)
@@ -166,6 +166,23 @@ EXP_FUNC void STDCALL ssl_ext_free(SSL_EXTENSIONS *ssl_ext)
         free(ssl_ext->host_name);
     }
     free(ssl_ext);
+}
+
+EXP_FUNC void STDCALL ssl_ext_set_host_name(SSL_EXTENSIONS * ext, const char* host_name)
+{
+    free(ext->host_name);
+    ext->host_name = NULL;
+    if (host_name) {
+        ext->host_name = strdup(host_name);
+    }
+}
+
+/**
+ * Set the maximum fragment size for the fragment size negotiation extension
+ */
+EXP_FUNC void STDCALL ssl_ext_set_max_fragment_size(SSL_EXTENSIONS * ext, unsigned fragment_size)
+{
+    ext->max_fragment_size = fragment_size;
 }
 
 /**
@@ -2425,10 +2442,6 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code)
 
     printf("\n");
 }
-
-/**
- * Debugging routine to display alerts.
- */
 
 /**
  * Debugging routine to display alerts.

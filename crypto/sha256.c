@@ -48,7 +48,7 @@
     (b)[(i) + 3] = (uint8_t) ((n)      );       \
 }
 
-static const uint8_t sha256_padding[64] =
+static const uint8_t sha256_padding[64] PROGMEM =
 {
  0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -249,6 +249,10 @@ void SHA256_Final(uint8_t *digest, SHA256_CTX *ctx)
     uint32_t last, padn;
     uint32_t high, low;
     uint8_t msglen[8];
+#ifdef WITH_PGM_READ_HELPER
+    uint8_t sha256_padding_ram[64];
+    memcpy(sha256_padding_ram, sha256_padding, 64);
+#endif
 
     high = (ctx->total[0] >> 29)
          | (ctx->total[1] <<  3);
@@ -259,8 +263,11 @@ void SHA256_Final(uint8_t *digest, SHA256_CTX *ctx)
 
     last = ctx->total[0] & 0x3F;
     padn = (last < 56) ? (56 - last) : (120 - last);
-
+#ifdef WITH_PGM_READ_HELPER
+    SHA256_Update(ctx, sha256_padding_ram, padn);
+#else
     SHA256_Update(ctx, sha256_padding, padn);
+#endif
     SHA256_Update(ctx, msglen, 8);
 
     PUT_UINT32(ctx->state[0], digest,  0);

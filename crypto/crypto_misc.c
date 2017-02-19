@@ -334,7 +334,7 @@ EXP_FUNC int STDCALL base64_decode(const char *in, int len,
     g = 3;
     for (x = y = z = t = 0; x < len; x++)
     {
-        if ((c = map[in[x]&0x7F]) == 0xff)
+        if ((c = ax_array_read_u8(map, in[x]&0x7F)) == 0xff)
             continue;
 
         if (c == 254)   /* this is the end... */

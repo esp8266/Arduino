@@ -98,6 +98,31 @@ extern "C" {
 
 void ax_wdt_feed();
 
+#ifndef PROGMEM
+#define PROGMEM __attribute__((aligned(4))) __attribute__((section(".irom.text")))
+#endif
+
+#ifndef WITH_PGM_READ_HELPER
+#define ax_array_read_u8(x, y) x[y]
+#else
+
+static inline uint8_t pgm_read_byte(const void* addr) {
+  register uint32_t res;
+  __asm__("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */
+      "sub      %1, %1, %0\n"       /* Subtract offset from addr, yielding an aligned address */
+      "l32i.n   %1, %1, 0x0\n"      /* Load word from aligned address */
+      "slli     %0, %0, 3\n"        /* Multiply offset by 8, yielding an offset in bits */
+      "ssr      %0\n"               /* Prepare to shift by offset (in bits) */
+      "srl      %0, %1\n"           /* Shift right; now the requested byte is the first one */
+      :"=r"(res), "=r"(addr)
+      :"1"(addr)
+      :);
+  return (uint8_t) res;     /* This masks the lower byte from the returned word */
+}
+
+#define ax_array_read_u8(x, y) pgm_read_byte((x)+(y))
+#endif //WITH_PGM_READ_HELPER
+
 #elif defined(WIN32)
 
 /* Windows CE stuff */
