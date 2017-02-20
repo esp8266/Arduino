@@ -50,6 +50,7 @@ cat << EOF > exclude.txt
 .gitignore
 .travis.yml
 package
+doc
 EOF
 # Also include all files which are ignored by git
 git ls-files --other --directory >> exclude.txt
