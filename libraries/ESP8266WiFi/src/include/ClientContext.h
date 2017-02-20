@@ -333,7 +333,6 @@ protected:
         return _written;
     }
 
-
     void _write_some()
     {
         if (!_datasource || !_pcb) {
@@ -346,15 +345,20 @@ protected:
             can_send = 0;
         }
         size_t will_send = (can_send < left) ? can_send : left;
-        if (will_send) {
-            const uint8_t* buf = _datasource->get_buffer(will_send);
-            err_t err = tcp_write(_pcb, buf, will_send, TCP_WRITE_FLAG_COPY);
-            _datasource->release_buffer(buf, will_send);
+        bool did_write = false;
+        while( will_send ) {
+            size_t next_chunk =
+                will_send > _write_chunk_size ? _write_chunk_size : will_send;
+            const uint8_t* buf = _datasource->get_buffer(next_chunk);
+            err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
+            _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
-                _written += will_send;
-                tcp_output(_pcb);
+                _written += next_chunk;
+                did_write = true;
             }
+            will_send -= next_chunk;
         }
+        if( did_write ) tcp_output(_pcb);
 
         if (!_datasource->available() || _noblock) {
             delete _datasource;
@@ -372,6 +376,8 @@ protected:
 
     err_t _sent(tcp_pcb* pcb, uint16_t len)
     {
+        (void) pcb;
+        (void) len;
         DEBUGV(":sent %d\r\n", len);
         _write_some_from_cb();
         return ERR_OK;
@@ -405,6 +411,8 @@ protected:
 
     recv_ret_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)
     {
+        (void) pcb;
+        (void) err;
         if(pb == 0) { // connection closed
             DEBUGV(":rcl\r\n");
             _cancel_write();
@@ -425,6 +433,7 @@ protected:
 
     void _error(err_t err)
     {
+        (void) err;
         DEBUGV(":er %d %08x\r\n", err, (uint32_t) _datasource);
         tcp_arg(_pcb, NULL);
         tcp_sent(_pcb, NULL);
@@ -474,6 +483,7 @@ private:
 
     DataSource* _datasource = nullptr;
     size_t _written = 0;
+    size_t _write_chunk_size = 256;
     bool _noblock = false;
     bool _send_waiting = false;
 };

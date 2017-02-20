@@ -480,6 +480,7 @@ bool uart_rx_enabled(uart_t* uart)
 
 static void uart_ignore_char(char c)
 {
+    (void) c;
 }
 
 static void uart0_write_char(char c)
