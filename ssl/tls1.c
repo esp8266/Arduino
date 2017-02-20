@@ -2108,6 +2108,8 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
     int i = 0;
     offset += 2;
 
+    ax_wdt_feed();
+
     PARANOIA_CHECK(pkt_size, total_cert_len + offset);
 
     // record the start point for the second pass
@@ -2138,7 +2140,7 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
         offset++;       /* skip empty char */
         cert_size = (buf[offset]<<8) + buf[offset+1];
         offset += 2;
-        
+        ax_wdt_feed();
         if (x509_new(&buf[offset], NULL, certs+num_certs))
         {
             ret = SSL_ERROR_BAD_CERTIFICATE;
