@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-export PKG_URL_PREFIX=https://dl.bintray.com/igrr/arduino-esp8266/:
+export PKG_URL_PREFIX=https://dl.bintray.com/igrr/arduino-esp8266
 commit=`git rev-parse --short HEAD`
 
 ./build_boards_manager_package.sh
