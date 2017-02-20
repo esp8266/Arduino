@@ -152,6 +152,8 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+linkcheck_anchors_ignore = ["/#!"]
+
 # -- Use sphinx_rtd_theme for local builds --------------------------------
 # ref. https://github.com/snide/sphinx_rtd_theme#using-this-theme-locally-then-building-on-read-the-docs
 #

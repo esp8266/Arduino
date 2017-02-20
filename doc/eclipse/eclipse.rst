@@ -12,7 +12,7 @@ What to Download
 Setup Arduino
 ~~~~~~~~~~~~~
 
-see the
+See the
 `Readme <https://github.com/esp8266/Arduino#installing-with-boards-manager>`__
 
 Setup Eclipse

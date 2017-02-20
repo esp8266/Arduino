@@ -51,7 +51,7 @@ Example:
     <<<stack<<<
 
 The first number after ``Exception`` gives the cause of the reset. a
-full ist of all causes can be found `here <../exception_causes.md>`__
+full ist of all causes can be found :doc:`here <../exception_causes>`
 the hex after are the stack dump.
 
 Decode
