@@ -71,7 +71,7 @@ APIs related to deep sleep and watchdog timer are available in the `ESP` object,
 
 `ESP.restart()` restarts the CPU.
 
-`ESP.getResetReason()` returns String containing the last reset resaon in human readable format.
+`ESP.getResetReason()` returns String containing the last reset reason in human readable format.
 
 `ESP.getFreeHeap()` returns the free heap size.
 
@@ -104,7 +104,7 @@ Note that by default ADC is configured to read from TOUT pin using `analogRead(A
 
 ## mDNS and DNS-SD responder (ESP8266mDNS library)
 
-Allows the sketch to respond to multicast DNS queries for domain names like "foo.local", and DNS-SD (service dicovery) queries.
+Allows the sketch to respond to multicast DNS queries for domain names like "foo.local", and DNS-SD (service discovery) queries.
 See attached example for details.
 
 ## SSDP responder (ESP8266SSDP)
@@ -113,7 +113,7 @@ SSDP is another service discovery protocol, supported on Windows out of the box.
 
 ## DNS server (DNSServer library)
 
-Implements a simple DNS server that can be used in both STA and AP modes. The DNS server currently supports only one domain (for all other domains it will reply with NXDOMAIN or custom status code). With it clients can open a web server running on ESP8266 using a domain name, not an IP address.
+Implements a simple DNS server that can be used in both STA and AP modes. The DNS server currently supports only one domain (for all other domains it will reply with NXDOMAIN or custom status code). With it, clients can open a web server running on ESP8266 using a domain name, not an IP address.
 See attached example for details.
 
 ## Servo
@@ -158,3 +158,4 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [OLED](https://github.com/klarsys/esp8266-OLED) - a library for controlling I2C connected OLED displays. Tested with 0.96 inch OLED graphics display.
 - [MFRC522](https://github.com/miguelbalboa/rfid) - A library for using the Mifare RC522 RFID-tag reader/writer.
 - [Ping](https://github.com/dancol90/ESP8266Ping) - lets the ESP8266 ping a remote machine.
+- [AsyncPing](https://github.com/akaJes/AsyncPing) - fully asynchronous Ping library (have full ping statistic and hardware MAC address).
