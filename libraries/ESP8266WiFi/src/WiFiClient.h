@@ -53,7 +53,7 @@ public:
   virtual int connect(const String host, uint16_t port);
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
-  size_t write_P(PGM_P buf, size_t size);
+  virtual size_t write_P(PGM_P buf, size_t size);
   size_t write(Stream& stream);
 
   // This one is deprecated, use write(Stream& instead)
