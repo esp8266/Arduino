@@ -103,6 +103,23 @@ public:
         }
     }
 
+    void connectServer(ClientContext *ctx) {
+        s_io_ctx = ctx;
+	_ssl = ssl_server_new(_ssl_ctx, 0);
+        _isServer = true;
+
+	int timeout_ms = 5000;
+        uint32_t t = millis();
+
+        while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
+            uint8_t* data;
+            int rc = ssl_read(_ssl, &data);
+            if (rc < SSL_OK) {
+                break;
+            }
+        }
+    }
+
     void stop()
     {
         s_io_ctx = nullptr;
@@ -110,7 +127,8 @@ public:
 
     bool connected()
     {
-        return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
+        if (_isServer) return _ssl != nullptr;
+        else return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
     }
 
     int read(uint8_t* dst, size_t size)
@@ -218,6 +236,14 @@ public:
         return s_io_ctx;
     }
 
+    int loadServerX509Cert(const uint8_t *cert, int len) {
+        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_X509_CERT, cert, len, NULL);
+    }
+
+    int loadServerRSAKey(const uint8_t *rsakey, int len) {
+        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_RSA_KEY, rsakey, len, NULL);
+    }
+
 protected:
     int _readAll()
     {
@@ -242,6 +268,7 @@ protected:
         return _available;
     }
 
+    bool _isServer = false;
     static SSL_CTX* _ssl_ctx;
     static int _ssl_ctx_refcnt;
     SSL* _ssl = nullptr;
@@ -283,6 +310,42 @@ WiFiClientSecure& WiFiClientSecure::operator=(const WiFiClientSecure& rhs)
         _ssl->ref();
     }
     return *this;
+}
+
+// Only called by the WifiServerSecure, need to get the keys/certs loaded before beginning
+WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM, const uint8_t *rsakey, int rsakeyLen, const uint8_t *cert, int certLen)
+{
+    _client = client;
+    if (_ssl) {
+        _ssl->unref();
+        _ssl = nullptr;
+    }
+
+    _ssl = new SSLContext;
+    _ssl->ref();
+
+    if (usePMEM) {
+        // When using PMEM based certs, allocate stack and copy from flash to DRAM, call SSL functions to avoid
+        // heap fragmentation that would happen w/malloc()
+        uint8_t *stackData = (uint8_t*)alloca(max(certLen, rsakeyLen));
+        if (rsakey && rsakeyLen) {
+              memcpy_P(stackData, rsakey, rsakeyLen);
+              _ssl->loadServerRSAKey(stackData, rsakeyLen);
+        }
+        if (cert && certLen) {
+            memcpy_P(stackData, cert, certLen);
+            _ssl->loadServerX509Cert(stackData, certLen);
+        }
+    } else {
+        if (rsakey && rsakeyLen) {
+            _ssl->loadServerRSAKey(rsakey, rsakeyLen);
+        }
+        if (cert && certLen) {
+            _ssl->loadServerX509Cert(cert, certLen);
+        }
+    }
+    _client->ref();
+    _ssl->connectServer(client);
 }
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port)

@@ -35,6 +35,9 @@ class ClientContext;
 class WiFiClient;
 
 class WiFiServer : public Server {
+  // Secure server needs access to all the private entries here
+  friend class WiFiServerSecure;
+
 private:
   uint16_t _port;
   IPAddress _addr;

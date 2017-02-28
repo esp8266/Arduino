@@ -38,6 +38,7 @@ extern "C" {
 
 #include "WiFiClient.h"
 #include "WiFiServer.h"
+#include "WiFiServerSecure.h"
 #include "WiFiClientSecure.h"
 
 #ifdef DEBUG_ESP_WIFI

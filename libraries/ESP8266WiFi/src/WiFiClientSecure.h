@@ -34,6 +34,8 @@ public:
   ~WiFiClientSecure() override;
   WiFiClientSecure(const WiFiClientSecure&);
   WiFiClientSecure& operator=(const WiFiClientSecure&);
+  // Only called by WiFiServerSecure
+  WiFiClientSecure(ClientContext* client, bool usePMEM, const uint8_t *rsakey, int rsakeyLen, const uint8_t *cert, int certLen);
 
   int connect(IPAddress ip, uint16_t port) override;
   int connect(const char* name, uint16_t port) override;
