@@ -108,6 +108,8 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     method = HTTP_PUT;
   } else if (methodStr == "PATCH") {
     method = HTTP_PATCH;
+  } else if (methodStr == "HEAD") {
+    method = HTTP_HEAD;
   }
   _currentMethod = method;
 

@@ -325,6 +325,7 @@ void ESP8266WebServer::send(int code, const String& content_type, const String& 
 }
 
 void ESP8266WebServer::sendContent(const String& content) {
+  if(_currentMethod == HTTP_HEAD){ return; }
   const char * footer = "\r\n";
   size_t len = content.length();
   if(_chunked) {
@@ -514,6 +515,7 @@ String ESP8266WebServer::_responseCodeToString(int code) {
     case 415: return F("Unsupported Media Type");
     case 416: return F("Requested range not satisfiable");
     case 417: return F("Expectation Failed");
+    case 418: return F("I'm a teapot");
     case 500: return F("Internal Server Error");
     case 501: return F("Not Implemented");
     case 502: return F("Bad Gateway");
