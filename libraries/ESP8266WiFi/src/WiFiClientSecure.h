@@ -25,6 +25,7 @@
 #include "WiFiClient.h"
 #include "include/ssl.h"
 
+#define SSL_ERROR_READ_LOCK -275
 
 class SSLContext;
 
@@ -49,6 +50,9 @@ public:
   int peek() override;
   size_t peekBytes(uint8_t *buffer, size_t length) override;
   void stop() override;
+  
+  void discardCache();
+  int  wantRead();
 
   bool setCACert(const uint8_t* pk, size_t size);
   bool setCertificate(const uint8_t* pk, size_t size);

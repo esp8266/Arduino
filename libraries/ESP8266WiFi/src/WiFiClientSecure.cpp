@@ -120,6 +120,11 @@ public:
     {
         return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
     }
+    
+    void discardCache() {
+        _available = 0;
+        _read_ptr = nullptr;
+    }
 
     int read(uint8_t* dst, size_t size)
     {
@@ -186,6 +191,14 @@ public:
             optimistic_yield(100);
         }
         return cb;
+    }
+    
+    bool wantRead() {
+        return _available > 0 || (_ssl && ssl_want_read(_ssl) == 1);
+    }
+    
+    bool emptyCache() {
+        return _available == 0;
     }
 
     bool loadObject(int type, Stream& stream, size_t size)
@@ -341,7 +354,14 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
     if (!_ssl) {
         return 0;
     }
-
+    
+    // axTLS is half-duplex so if a read operation is already underway,
+    // finish the read before trying to write; otherwise the read
+    // cache will be overwritten and data will be lost
+    if (!_ssl->emptyCache()) {
+        return SSL_ERROR_READ_LOCK;
+    }
+    
     int rc = ssl_write(*_ssl, buf, size);
     if (rc >= 0) {
         return rc;
@@ -353,6 +373,20 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
     }
 
     return 0;
+}
+
+int WiFiClientSecure::wantRead() {
+    if (_ssl) {
+        return _ssl->wantRead();
+    }
+    
+    return 0;
+}
+
+void WiFiClientSecure::discardCache() {
+    if (_ssl) {
+        _ssl->discardCache();
+    }
 }
 
 int WiFiClientSecure::read(uint8_t *buf, size_t size)
@@ -429,7 +463,7 @@ err     x       N           N
 uint8_t WiFiClientSecure::connected()
 {
     if (_ssl) {
-        if (_ssl->available()) {
+        if (_ssl->wantRead()) {
             return true;
         }
         if (_client && _client->state() == ESTABLISHED && _ssl->connected()) {
