@@ -91,7 +91,15 @@ public:
     void connect(ClientContext* ctx, const char* hostName, uint32_t timeout_ms)
     {
         s_io_ctx = ctx;
-        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, hostName);
+        _ssl_ext = ssl_ext_new();
+        
+        int name_len = strlen(hostName);
+        
+        _ssl_ext->host_name = (char*) malloc((name_len + 1) * sizeof (char));
+        strncpy(_ssl_ext->host_name, hostName, name_len + 1);
+        _ssl_ext->host_name[name_len] = 0;
+        
+        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, _ssl_ext);
         uint32_t t = millis();
 
         while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
@@ -245,6 +253,7 @@ protected:
     static SSL_CTX* _ssl_ctx;
     static int _ssl_ctx_refcnt;
     SSL* _ssl = nullptr;
+    SSL_EXTENSIONS* _ssl_ext = nullptr;
     int _refcnt = 0;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
@@ -594,6 +603,20 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size)
     }
     return _ssl->loadObject(SSL_OBJ_RSA_KEY, stream, size);
 }
+
+extern "C" int __ax_port_pending(int fd) {
+    //Serial.println("ax_port_pending");
+    ClientContext* _client = SSLContext::getIOContext(fd);
+    if (!_client || _client->state() != ESTABLISHED && !_client->getSize()) {
+        errno = EIO;
+        return -1;
+    }
+    
+    //Serial.printf("pending: %d\r\n", _client->getSize());
+    return _client->getSize();
+}
+
+extern "C" void ax_port_pending() __attribute__ ((weak, alias("__ax_port_pending")));
 
 extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count)
 {
