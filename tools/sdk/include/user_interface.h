@@ -167,8 +167,7 @@ uint8 wifi_get_broadcast_if(void);
 bool wifi_set_broadcast_if(uint8 interface);
 
 typedef struct bss_info {
-    STAILQ_ENTRY(bss_info)     next;
-
+    struct bss_info* next;
     uint8 bssid[6];
     uint8 ssid[32];
     uint8 ssid_len;
@@ -182,8 +181,12 @@ typedef struct bss_info {
 	uint8 simple_pair;
 } bss_info_t;
 
+typedef struct {
+    struct bss_info* first;
+} bss_info_head_t;
+
 typedef struct _scaninfo {
-    STAILQ_HEAD(, bss_info) *pbss;
+	bss_info_head_t *pbss;
     struct espconn *pespconn;
     uint8 totalpage;
     uint8 pagenum;
@@ -278,8 +281,7 @@ bool wifi_softap_set_config(struct softap_config *config);
 bool wifi_softap_set_config_current(struct softap_config *config);
 
 struct station_info {
-	STAILQ_ENTRY(station_info)	next;
-
+	struct station_info* next;
 	uint8 bssid[6];
 	struct ip_addr ip;
 };
