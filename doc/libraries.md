@@ -159,3 +159,4 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 - [MFRC522](https://github.com/miguelbalboa/rfid) - A library for using the Mifare RC522 RFID-tag reader/writer.
 - [Ping](https://github.com/dancol90/ESP8266Ping) - lets the ESP8266 ping a remote machine.
 - [AsyncPing](https://github.com/akaJes/AsyncPing) - fully asynchronous Ping library (have full ping statistic and hardware MAC address).
+- [ESPMetRED](https://github.com/HobbytronicsPK/ESPMetRED) - A library for new ESP8266 users to control ESP8266 from NodeRed via MQTT with ease.
