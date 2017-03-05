@@ -38,10 +38,10 @@ generic.menu.CpuFrequency.80.build.f_cpu=80000000L
 generic.menu.CpuFrequency.160=160 MHz
 generic.menu.CpuFrequency.160.build.f_cpu=160000000L
 
-generic.menu.CrystalFrequency.40=40 MHz
-generic.menu.CrystalFrequency.40.build.f_crystal=0
 generic.menu.CrystalFrequency.26=26 MHz
 generic.menu.CrystalFrequency.26.build.f_crystal=1
+generic.menu.CrystalFrequency.40=40 MHz
+generic.menu.CrystalFrequency.40.build.f_crystal=0
 generic.menu.CrystalFrequency.24=24 MHz
 generic.menu.CrystalFrequency.24.build.f_crystal=2
 
