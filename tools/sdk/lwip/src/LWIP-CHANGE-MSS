@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+mss=$1
+
+[ -z "$mss" ] && { echo "syntax: $0 <mss>    (try with 256)"; exit 1; }
+
+[ -f ../include/lwipopts.h.orig ] || mv ../include/lwipopts.h ../include/lwipopts.h.orig
+
+< ../include/lwipopts.h.orig \
+> ../include/lwipopts.h \
+sed "s,^[ \t]*#define[ \t]*TCP_MSS\(.*\)$,#define TCP_MSS $mss //\1,g"
+
+make clean
+make
+for i in liblwip_gcc.a liblwip.a liblwip_536.a; do 
+    test -f ../../lib/${i}.orig || mv ../../lib/${i} ../../lib/${i}.orig
+done
+
+ln -sf ../lwip/src/liblwip_src.a ../../lib/liblwip_gcc.a
