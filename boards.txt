@@ -1655,9 +1655,9 @@ wifinfo.menu.UploadSpeed.921600.upload.speed=921600
 ##############################################################
 nodewifi.name=NodeWIFI
 
-esp8285.upload.tool=esptool
-esp8285.upload.speed=115200
-esp8285.upload.resetmethod=nodemcu
+nodewifi.upload.tool=esptool
+nodewifi.upload.speed=115200
+nodewifi.upload.resetmethod=nodemcu
 nodewifi.upload.maximum_size=434160
 nodewifi.upload.maximum_data_size=81920
 nodewifi.upload.wait_for_upload_port=true
