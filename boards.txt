@@ -1652,6 +1652,108 @@ wifinfo.menu.UploadSpeed.512000.upload.speed=512000
 wifinfo.menu.UploadSpeed.921600=921600
 wifinfo.menu.UploadSpeed.921600.upload.speed=921600
 
+##############################################################
+nodewifi.name=NodeWIFI
+
+esp8285.upload.tool=esptool
+esp8285.upload.speed=115200
+esp8285.upload.resetmethod=nodemcu
+nodewifi.upload.maximum_size=434160
+nodewifi.upload.maximum_data_size=81920
+nodewifi.upload.wait_for_upload_port=true
+nodewifi.serial.disableDTR=true
+nodewifi.serial.disableRTS=true
+
+nodewifi.build.mcu=esp8266
+nodewifi.build.f_cpu=80000000L
+nodewifi.build.board=ESP8266_ESP01
+nodewifi.build.core=esp8266
+nodewifi.build.variant=nodewifi
+nodewifi.build.flash_mode=dout
+nodewifi.build.flash_freq=40
+nodewifi.build.spiffs_pagesize=256
+nodewifi.build.debug_port=
+nodewifi.build.debug_level=
+
+nodewifi.menu.CpuFrequency.80=80 MHz
+nodewifi.menu.CpuFrequency.80.build.f_cpu=80000000L
+nodewifi.menu.CpuFrequency.160=160 MHz
+nodewifi.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+nodewifi.menu.UploadSpeed.115200=115200
+nodewifi.menu.UploadSpeed.115200.upload.speed=115200
+#nodewifi.menu.UploadSpeed.9600=9600
+#nodewifi.menu.UploadSpeed.9600.upload.speed=9600
+#nodewifi.menu.UploadSpeed.57600=57600
+#nodewifi.menu.UploadSpeed.57600.upload.speed=57600
+nodewifi.menu.UploadSpeed.256000.windows=256000
+nodewifi.menu.UploadSpeed.256000.upload.speed=256000
+#nodewifi.menu.UploadSpeed.230400.linux=230400
+#nodewifi.menu.UploadSpeed.230400.macosx=230400
+#nodewifi.menu.UploadSpeed.230400.upload.speed=230400
+#nodewifi.menu.UploadSpeed.460800.linux=460800
+#nodewifi.menu.UploadSpeed.460800.macosx=460800
+#nodewifi.menu.UploadSpeed.460800.upload.speed=460800
+nodewifi.menu.UploadSpeed.512000.windows=512000
+nodewifi.menu.UploadSpeed.512000.upload.speed=512000
+nodewifi.menu.UploadSpeed.921600=921600
+nodewifi.menu.UploadSpeed.921600.upload.speed=921600
+
+nodewifi.menu.FlashSize.1M512=1M (512K SPIFFS)
+nodewifi.menu.FlashSize.1M512.build.flash_size=1M
+nodewifi.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
+nodewifi.menu.FlashSize.1M512.build.spiffs_start=0x7B000
+nodewifi.menu.FlashSize.1M512.build.spiffs_end=0xFB000
+nodewifi.menu.FlashSize.1M512.build.spiffs_blocksize=8192
+nodewifi.menu.FlashSize.1M512.upload.maximum_size=499696
+
+#nodewifi.menu.FlashSize.1M256=1M (256K SPIFFS)
+#nodewifi.menu.FlashSize.1M256.build.flash_size=1M
+#nodewifi.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
+#nodewifi.menu.FlashSize.1M256.build.spiffs_start=0xBB000
+#nodewifi.menu.FlashSize.1M256.build.spiffs_end=0xFB000
+#nodewifi.menu.FlashSize.1M256.build.spiffs_blocksize=4096
+#nodewifi.menu.FlashSize.1M256.upload.maximum_size=761840
+
+nodewifi.menu.FlashSize.1M192=1M (192K SPIFFS)
+nodewifi.menu.FlashSize.1M192.build.flash_size=1M
+nodewifi.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
+nodewifi.menu.FlashSize.1M192.build.spiffs_start=0xCB000
+nodewifi.menu.FlashSize.1M192.build.spiffs_end=0xFB000
+nodewifi.menu.FlashSize.1M192.build.spiffs_blocksize=4096
+nodewifi.menu.FlashSize.1M192.upload.maximum_size=827376
+
+#nodewifi.menu.FlashSize.1M160=1M (160K SPIFFS)
+#nodewifi.menu.FlashSize.1M160.build.flash_size=1M
+#nodewifi.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
+#nodewifi.menu.FlashSize.1M160.build.spiffs_start=0xD3000
+#nodewifi.menu.FlashSize.1M160.build.spiffs_end=0xFB000
+#nodewifi.menu.FlashSize.1M160.build.spiffs_blocksize=4096
+#nodewifi.menu.FlashSize.1M160.upload.maximum_size=860144
+
+#nodewifi.menu.FlashSize.1M144=1M (144K SPIFFS)
+#nodewifi.menu.FlashSize.1M144.build.flash_size=1M
+#nodewifi.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
+#nodewifi.menu.FlashSize.1M144.build.spiffs_start=0xD7000
+#nodewifi.menu.FlashSize.1M144.build.spiffs_end=0xFB000
+#nodewifi.menu.FlashSize.1M144.build.spiffs_blocksize=4096
+#nodewifi.menu.FlashSize.1M144.upload.maximum_size=876528
+
+#nodewifi.menu.FlashSize.1M128=1M (128K SPIFFS)
+#nodewifi.menu.FlashSize.1M128.build.flash_size=1M
+#nodewifi.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
+#nodewifi.menu.FlashSize.1M128.build.spiffs_start=0xDB000
+#nodewifi.menu.FlashSize.1M128.build.spiffs_end=0xFB000
+#nodewifi.menu.FlashSize.1M128.build.spiffs_blocksize=4096
+#nodewifi.menu.FlashSize.1M128.upload.maximum_size=892912
+
+#nodewifi.menu.FlashSize.1M64=1M (64K SPIFFS)
+#nodewifi.menu.FlashSize.1M64.build.flash_size=1M
+#nodewifi.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
+#nodewifi.menu.FlashSize.1M64.build.spiffs_start=0xEB000
+#nodewifi.menu.FlashSize.1M64.build.spiffs_end=0xFB000
+#nodewifi.menu.FlashSize.1M64.build.spiffs_blocksize=4096
+#nodewifi.menu.FlashSize.1M64.upload.maximum_size=958448
 
 ##############################################################
 coredev.name=Core Development Module
