@@ -48,7 +48,7 @@
             },
             {
               "name": "Phoenix 2.0"
-            },                        
+            },
             {
               "name": "SparkFun Thing"
             },
@@ -70,8 +70,11 @@
             {
               "name": "WifInfo"
             },
-			{
+			      {
               "name": "ESPDuino"
+            },
+            {
+              "name": "YISON ESP-01/ESP-202"
             }
           ],
           "toolsDependencies": [
