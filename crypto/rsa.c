@@ -145,13 +145,19 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
                             uint8_t *out_data, int out_len, int is_decryption)
 {
     const int byte_size = ctx->num_octets;
-    int i = 0, size;
+    int i = 0, size = -1;
     bigint *decrypted_bi, *dat_bi;
-    uint8_t *block = (uint8_t *)malloc(byte_size);
+    uint8_t *block = NULL;
     int pad_count = 0;
 
+    do
+    {
     if (out_len < byte_size)        /* check output has enough size */
-        return -1;
+       break;
+
+    block = (uint8_t *)malloc(byte_size);
+    if (!block)
+       break;
 
     memset(out_data, 0, out_len);   /* initialise */
 
@@ -168,13 +174,13 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
     bi_export(ctx->bi_ctx, decrypted_bi, block, byte_size);
 
     if (block[i++] != 0)             /* leading 0? */
-        return -1;
+        break;
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     if (is_decryption == 0) /* PKCS1.5 signing pads with "0xff"s */
     {
         if (block[i++] != 0x01)     /* BT correct? */
-            return -1;
+            break;
 
         while (block[i++] == 0xff && i < byte_size)
             pad_count++;
@@ -183,7 +189,7 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
 #endif
     {
         if (block[i++] != 0x02)     /* BT correct? */
-            return -1;
+            break;
 
         while (block[i++] && i < byte_size)
             pad_count++;
@@ -191,13 +197,17 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
 
     /* check separator byte 0x00 - and padding must be 8 or more bytes */
     if (i == byte_size || pad_count < 8) 
-        return -1;
+        break;
 
     size = byte_size - i;
 
     /* get only the bit we want */
     memcpy(out_data, &block[i], size);
-    free(block);
+    } while(false);
+
+    if(block)
+       free(block);
+
     return size;
 }
 
