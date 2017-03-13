@@ -55,7 +55,7 @@ public:
     void setData(uint8_t * data, size_t len);
     void setData(const char * data)
     {
-        setData((uint8_t *)data, strlen(data));
+        setData((uint8_t *)data, 32); //strlen(data)
     }
     void setStatus(uint32_t status);
     void onData(SpiSlaveDataHandler cb);
