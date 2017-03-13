@@ -290,7 +290,7 @@ EXP_FUNC void STDCALL print_blob(const char *format,
     va_list(ap);
 
     va_start(ap, size);
-    sprintf(tmp, "%s\n", format);
+    snprintf(tmp, sizeof(tmp), "SSL: %s\n", format);
     vprintf(tmp, ap);
     print_hex_init(size);
     for (i = 0; i < size; i++)
