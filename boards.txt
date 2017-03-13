@@ -1892,3 +1892,67 @@ coredev.menu.DebugLevel.OTA2____=OTA + Updater
 coredev.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
 coredev.menu.DebugLevel.all_____=All
 coredev.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
+
+##############################################################
+espectro.name=ESPectro Core
+
+espectro.upload.tool=esptool
+espectro.upload.speed=460800
+espectro.upload.resetmethod=nodemcu
+espectro.upload.maximum_size=1044464
+espectro.upload.maximum_data_size=81920
+espectro.upload.wait_for_upload_port=true
+espectro.serial.disableDTR=true
+espectro.serial.disableRTS=true
+
+espectro.build.mcu=esp8266
+espectro.build.f_cpu=80000000L
+espectro.build.board=ESP8266_ESPECTRO
+espectro.build.core=esp8266
+espectro.build.variant=espectro
+espectro.build.flash_mode=dio
+espectro.build.flash_size=4M
+espectro.build.flash_freq=40
+espectro.build.debug_port=
+espectro.build.debug_level=
+
+espectro.menu.CpuFrequency.80=80 MHz
+espectro.menu.CpuFrequency.80.build.f_cpu=80000000L
+espectro.menu.CpuFrequency.160=160 MHz
+espectro.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+espectro.menu.UploadSpeed.115200=115200
+espectro.menu.UploadSpeed.115200.upload.speed=115200
+espectro.menu.UploadSpeed.921600=921600
+espectro.menu.UploadSpeed.921600.upload.speed=921600
+espectro.menu.UploadSpeed.9600=9600
+espectro.menu.UploadSpeed.9600.upload.speed=9600
+espectro.menu.UploadSpeed.57600=57600
+espectro.menu.UploadSpeed.57600.upload.speed=57600
+espectro.menu.UploadSpeed.256000.windows=256000
+espectro.menu.UploadSpeed.256000.upload.speed=256000
+espectro.menu.UploadSpeed.230400.linux=230400
+espectro.menu.UploadSpeed.230400.macosx=230400
+espectro.menu.UploadSpeed.230400.macosx=230400
+espectro.menu.UploadSpeed.230400.upload.speed=230400
+espectro.menu.UploadSpeed.460800.linux=460800
+espectro.menu.UploadSpeed.460800.macosx=460800
+espectro.menu.UploadSpeed.460800.upload.speed=460800
+espectro.menu.UploadSpeed.512000.windows=512000
+espectro.menu.UploadSpeed.512000.upload.speed=512000
+
+espectro.menu.FlashSize.4M3M=4M (3M SPIFFS)
+espectro.menu.FlashSize.4M3M.build.flash_size=4M
+espectro.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+espectro.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+espectro.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+espectro.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+espectro.menu.FlashSize.4M3M.build.spiffs_pagesize=256
+
+espectro.menu.FlashSize.4M1M=4M (1M SPIFFS)
+espectro.menu.FlashSize.4M1M.build.flash_size=4M
+espectro.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+espectro.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+espectro.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+espectro.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+espectro.menu.FlashSize.4M1M.build.spiffs_pagesize=256

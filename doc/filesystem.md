@@ -54,6 +54,7 @@ SparkFun Thing | 512k | 64k
 SweetPea ESP-210 | 4M | 1M, 3M
 WeMos D1 & D1 mini | 4M | 1M, 3M
 ESPDuino | 4M | 1M, 3M
+ESPectro | 4M | 1M, 3M
 
 **Note:** to use any of file system functions in the sketch, add the following include to the sketch:
 

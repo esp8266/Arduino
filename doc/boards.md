@@ -33,6 +33,7 @@ title: Supported Hardware
   * [WeMos D1](#wemos-d1)
   * [WeMos D1 mini](#wemos-d1-mini)
   * [ESPino by ThaiEasyElec](#espinotee)
+  * [ESPectro](#espectro)
 
 ## Adafruit HUZZAH ESP8266 (ESP-12)
 
@@ -303,6 +304,11 @@ We will update an English description soon.
 - Dimensions: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_Dimension.pdf
 - Pinouts: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_User_Manual_TH_v1_0_20160204.pdf (Please see pg. 8)
 
+## ESPectro
+ESPectro is designed by DycodeX, one of the first IoT companies in Indonesia. It uses the famous ESP8266 ESP-12 module, designed to fit on a breadboard, and all ESP-12 pins are broken out. Commonly accessible pins are colored, so it is user-friendly and still hacker-friendly. It integrates FT231XS as USB to TTL and auto-flash circuity so no need to press flash and reset button manually. It features a lot of on-board features: WS2812/Neopixel RGB LED, one color LED, programmable/user button, I2C grove connector, I2C OLED display compatible connector, and Flash and Reset button for manual flashing.
 
+For more information about the hardware, pinout diagram, project examples, and learning materials, please see the [https://shop.makestro.com/en/product/espectro-core/](https://shop.makestro.com/en/product/espectro-core/).
+
+Extensive libraries also provided to easily access the board features and integration with the cloud as published here: [https://github.com/andriyadi/EspX/](https://github.com/andriyadi/EspX/), so you can focus on the making.
 
 

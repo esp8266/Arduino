@@ -72,6 +72,9 @@
             },
 			{
               "name": "ESPDuino"
+            },
+			{
+              "name": "ESPectro"
             }
           ],
           "toolsDependencies": [
