@@ -1892,3 +1892,39 @@ coredev.menu.DebugLevel.OTA2____=OTA + Updater
 coredev.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
 coredev.menu.DebugLevel.all_____=All
 coredev.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
+
+##############################################################
+eightbyeight.name=Blinkinlabs EightByEight Blinky
+
+eightbyeight.upload.tool=esptool
+eightbyeight.upload.speed.linux=460800
+eightbyeight.upload.speed.macosx=460800
+eightbyeight.upload.speed.windows=512000
+eightbyeight.upload.resetmethod=nodemcu
+eightbyeight.upload.maximum_size=1044464
+eightbyeight.upload.maximum_data_size=81920
+eightbyeight.upload.wait_for_upload_port=true
+eightbyeight.serial.disableDTR=true
+eightbyeight.serial.disableRTS=true
+
+eightbyeight.build.mcu=esp8266
+eightbyeight.build.f_cpu=80000000L
+eightbyeight.build.board=ESP8266_ESP12
+eightbyeight.build.core=esp8266
+eightbyeight.build.variant=generic
+eightbyeight.build.flash_mode=qio
+eightbyeight.build.flash_size=2M
+eightbyeight.build.flash_freq=40
+eightbyeight.build.flash_ld=eagle.flash.2m.ld
+eightbyeight.build.spiffs_start=0x100000
+eightbyeight.build.spiffs_end=0x1FB000
+eightbyeight.build.spiffs_blocksize=8192
+eightbyeight.upload.maximum_size=1044464
+
+eightbyeight.build.debug_port=
+eightbyeight.build.debug_level=
+
+eightbyeight.menu.CpuFrequency.80=80 MHz
+eightbyeight.menu.CpuFrequency.80.build.f_cpu=80000000L
+eightbyeight.menu.CpuFrequency.160=160 MHz
+eightbyeight.menu.CpuFrequency.160.build.f_cpu=160000000L
