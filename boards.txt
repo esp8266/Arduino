@@ -1892,3 +1892,57 @@ coredev.menu.DebugLevel.OTA2____=OTA + Updater
 coredev.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
 coredev.menu.DebugLevel.all_____=All
 coredev.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
+
+##############################################################
+
+esparduinowifi.name=ESP8266 on Arduino
+
+esparduinowifi.upload.tool=esptool
+esparduinowifi.upload.speed=9600
+esparduinowifi.upload.resetmethod=ck
+esparduinowifi.upload.maximum_size=1044464
+esparduinowifi.upload.maximum_data_size=81920
+esparduinowifi.upload.wait_for_upload_port=true
+esparduinowifi.serial.disableDTR=true
+esparduinowifi.serial.disableRTS=true
+
+esparduinowifi.build.mcu=esp8266
+esparduinowifi.build.f_cpu=80000000L
+esparduinowifi.build.f_crystal=0
+esparduinowifi.build.board=ESP8266_ESP01
+esparduinowifi.build.core=esp8266
+esparduinowifi.build.variant=generic
+esparduinowifi.build.flash_mode=qio
+esparduinowifi.build.flash_size=4M
+esparduinowifi.build.flash_freq=40
+esparduinowifi.build.debug_port=
+esparduinowifi.build.debug_level=
+
+esparduinowifi.menu.UploadSpeed.9600=9600
+esparduinowifi.menu.UploadSpeed.9600.upload.speed=9600
+esparduinowifi.menu.UploadSpeed.19200=19200
+esparduinowifi.menu.UploadSpeed.19200.upload.speed=19200
+esparduinowifi.menu.UploadSpeed.57600=57600
+esparduinowifi.menu.UploadSpeed.57600.upload.speed=57600
+esparduinowifi.menu.UploadSpeed.115200=115200
+esparduinowifi.menu.UploadSpeed.115200.upload.speed=115200
+esparduinowifi.menu.UploadSpeed.230400=230400
+esparduinowifi.menu.UploadSpeed.230400.upload.speed=230400
+esparduinowifi.menu.UploadSpeed.460800=460800
+esparduinowifi.menu.UploadSpeed.460800.upload.speed=460800
+
+esparduinowifi.menu.FlashSize.4M3M=4M (3M SPIFFS)
+esparduinowifi.menu.FlashSize.4M3M.build.flash_size=4M
+esparduinowifi.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+esparduinowifi.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+esparduinowifi.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+esparduinowifi.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+esparduinowifi.menu.FlashSize.4M3M.build.spiffs_pagesize=256
+
+esparduinowifi.menu.FlashSize.4M1M=4M (1M SPIFFS)
+esparduinowifi.menu.FlashSize.4M1M.build.flash_size=4M
+esparduinowifi.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+esparduinowifi.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+esparduinowifi.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+esparduinowifi.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+esparduinowifi.menu.FlashSize.4M1M.build.spiffs_pagesize=256
