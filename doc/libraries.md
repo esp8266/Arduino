@@ -71,13 +71,23 @@ APIs related to deep sleep and watchdog timer are available in the `ESP` object,
 
 `ESP.restart()` restarts the CPU.
 
-`ESP.getResetReason()` returns String containing the last reset reason in human readable format.
+`ESP.getResetReason()` returns a String containing the last reset reason in human readable format.
 
 `ESP.getFreeHeap()` returns the free heap size.
 
 `ESP.getChipId()` returns the ESP8266 chip ID as a 32-bit integer.
 
-Several APIs may be used to get flash chip info:
+`ESP.getCoreVersion()` returns a String containing the core version.
+
+`ESP.getSdkVersion()` returns the SDK version as a char.
+
+`ESP.getCpuFreqMHz()` returns the CPU frequency in MHz as an unsigned 8-bit integer.
+
+`ESP.getSketchSize()` returns the size of the current sketch as an unsigned 32-bit integer.
+
+`ESP.getFreeSketchSpace()` returns the free sketch space as an unsigned 8-bit intege.
+
+`ESP.getSketchMD5()` returns a lowercase String containing the MD5 of the current sketch.
 
 `ESP.getFlashChipId()` returns the flash chip ID as a 32-bit integer.
 
