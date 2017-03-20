@@ -23,8 +23,12 @@
 
 class UdpContext;
 
-extern "C" void esp_yield();
-extern "C" void esp_schedule();
+extern "C" {
+void esp_yield();
+void esp_schedule();
+#include "lwip/init.h" // LWIP_VERSION_
+}
+
 
 #define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);
 #define GET_UDP_HDR(pb) reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN);
@@ -104,10 +108,17 @@ public:
         udp_disconnect(_pcb);
     }
 
+#if LWIP_VERSION_MAJOR == 1
     void setMulticastInterface(ip_addr_t addr)
     {
         udp_set_multicast_netif_addr(_pcb, addr);
     }
+#else
+    void setMulticastInterface(const ip_addr_t& addr)
+    {
+        udp_set_multicast_netif_addr(_pcb, &addr);
+    }
+#endif
 
     void setMulticastTTL(int ttl)
     {
@@ -328,7 +339,7 @@ private:
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
-            ip_addr_t *addr, u16_t port)
+            const ip_addr_t *addr, u16_t port)
     {
         (void) upcb;
         (void) addr;
@@ -353,9 +364,15 @@ private:
     }
 
 
+#if LWIP_VERSION_MAJOR == 1
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
             ip_addr_t *addr, u16_t port)
+#else
+    static void _s_recv(void *arg,
+            udp_pcb *upcb, pbuf *p,
+            const ip_addr_t *addr, u16_t port)
+#endif
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, addr, port);
     }
