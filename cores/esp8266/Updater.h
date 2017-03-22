@@ -1,9 +1,20 @@
 #ifndef ESP8266UPDATER_H
 #define ESP8266UPDATER_H
 
+#define VERIFY_SIGNATURE 1
+
 #include <Arduino.h>
 #include <flash_utils.h>
 #include <MD5Builder.h>
+
+#ifdef VERIFY_SIGNATURE
+#include "axtls/rsa.h"
+#include "axtls/asn1.h"
+#include "axtls/sha1.h"
+#include "axtls/sha256.h"
+
+#define MAX_KEY_LEN 256
+#endif
 
 #define UPDATE_ERROR_OK                 (0)
 #define UPDATE_ERROR_WRITE              (1)
@@ -141,6 +152,10 @@ class UpdaterClass {
       return written;
     }
 
+#ifdef VERIFY_SIGNATURE
+    int addCA(const uint8_t *cert, int *len);
+#endif
+
   private:
     void _reset();
     bool _writeBuffer();
@@ -148,11 +163,25 @@ class UpdaterClass {
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
 
+#ifdef VERIFY_SIGNATURE
+    CA_CERT_CTX *_ca_ctx;
+    bool _loadCertificate(X509_CTX *ctx);
+    bool _verifyCertificate(X509_CTX *ctx);
+    bool _decryptSignature(X509_CTX *ctx, unsigned char **hash);
+    bool _compareHash(unsigned char **hash);
+    bool _verifySignature();
+
+    uint32_t _certificateStartAddress;
+    size_t _certificateLen;
+    uint32_t _signatureStartAddress;
+    size_t _signatureLen;
+#endif
+
     bool _async;
     uint8_t _error;
     uint8_t *_buffer;
-    size_t _bufferLen;
-    size_t _size;
+    uint32_t _bufferLen;
+    uint32_t _size;
     uint32_t _startAddress;
     uint32_t _currentAddress;
     uint32_t _command;
