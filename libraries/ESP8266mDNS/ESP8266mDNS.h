@@ -122,6 +122,7 @@ private:
   WiFiEventHandler _gotIPHandler;
   
 
+  void _initVar();
   uint16_t _getServicePort(char *service, char *proto);
   MDNSTxt * _getServiceTxt(char *name, char *proto);
   uint16_t _getServiceTxtLen(char *name, char *proto);

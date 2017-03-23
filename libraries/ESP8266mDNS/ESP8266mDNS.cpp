@@ -115,14 +115,17 @@ struct MDNSQuery {
   char _proto[4];
 };
 
-
-MDNSResponder::MDNSResponder() : _conn(0) { 
-  _services = 0;
-  _instanceName = ""; 
+void MDNSResponder::_initVar() {
   _answers = 0;
   _query = 0;
   _newQuery = false;
   _waitingForAnswers = false;
+}
+
+MDNSResponder::MDNSResponder() : _conn(0) {
+  _initVar();
+  _services = 0;
+  _instanceName = "";
 }
 MDNSResponder::~MDNSResponder() {
   if (_query != 0) {
@@ -283,7 +286,9 @@ int MDNSResponder::queryService(char *service, char *proto) {
 #ifdef MDNS_DEBUG_TX
   Serial.printf("queryService %s %s\n", service, proto);
 #endif  
-  
+
+  _initVar();
+
   if (_query != 0) {
     os_free(_query);
     _query = 0;
@@ -292,7 +297,7 @@ int MDNSResponder::queryService(char *service, char *proto) {
   os_strcpy(_query->_service, service);
   os_strcpy(_query->_proto, proto);
   _newQuery = true;
-  
+
   char underscore[] = "_";
 
   // build service name with _
