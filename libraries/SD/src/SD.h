@@ -23,6 +23,8 @@
 #define FILE_READ O_READ
 #define FILE_WRITE (O_READ | O_WRITE | O_CREAT)
 
+namespace SDLib {
+
 class File : public Stream {
  private:
   char _name[13]; // our name
@@ -135,5 +137,19 @@ private:
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SD)
 extern SDClass SD;
 #endif
+
+};
+
+// We enclose File and SD classes in namespace SDLib to avoid conflicts
+// with others legacy libraries that redefines File class.
+
+// This ensure compatibility with sketches that uses only SD library
+using namespace SDLib;
+
+// This allows sketches to use SDLib::File with other libraries (in the
+// sketch you must use SDFile instead of File to disambiguate)
+typedef SDLib::File    SDFile;
+typedef SDLib::SDClass SDFileSystemClass;
+#define SDFileSystem   SDLib::SD
 
 #endif
