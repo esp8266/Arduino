@@ -1892,3 +1892,53 @@ coredev.menu.DebugLevel.OTA2____=OTA + Updater
 coredev.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
 coredev.menu.DebugLevel.all_____=All
 coredev.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
+
+
+##############################################################
+gen4iod.name=4D Systems gen4 IoD Range
+
+gen4iod.upload.tool=esptool
+gen4iod.upload.speed=921600
+gen4iod.upload.resetmethod=nodemcu
+gen4iod.upload.maximum_size=434160
+gen4iod.upload.maximum_data_size=81920
+gen4iod.upload.wait_for_upload_port=true
+gen4iod.serial.disableDTR=true
+gen4iod.serial.disableRTS=true
+
+gen4iod.build.mcu=esp8266
+gen4iod.build.f_cpu=160000000L
+gen4iod.build.board=GEN4_IOD
+gen4iod.build.core=esp8266
+gen4iod.build.variant=generic
+gen4iod.build.flash_mode=qio
+# flash chip: AT25SF041 (512 kbyte, 4Mbit)
+gen4iod.build.flash_size=512K
+gen4iod.build.flash_ld=eagle.flash.512k0.ld
+gen4iod.build.flash_freq=80
+gen4iod.build.debug_port=
+gen4iod.build.debug_level=
+
+gen4iod.menu.CpuFrequency.160=160 MHz
+gen4iod.menu.CpuFrequency.160.build.f_cpu=160000000L
+gen4iod.menu.CpuFrequency.80=80 MHz
+gen4iod.menu.CpuFrequency.80.build.f_cpu=80000000L
+
+gen4iod.menu.UploadSpeed.115200=115200
+gen4iod.menu.UploadSpeed.115200.upload.speed=115200
+gen4iod.menu.UploadSpeed.9600=9600
+gen4iod.menu.UploadSpeed.9600.upload.speed=9600
+gen4iod.menu.UploadSpeed.57600=57600
+gen4iod.menu.UploadSpeed.57600.upload.speed=57600
+gen4iod.menu.UploadSpeed.256000.windows=256000
+gen4iod.menu.UploadSpeed.256000.upload.speed=256000
+gen4iod.menu.UploadSpeed.230400.linux=230400
+gen4iod.menu.UploadSpeed.230400.macosx=230400
+gen4iod.menu.UploadSpeed.230400.upload.speed=230400
+gen4iod.menu.UploadSpeed.460800.linux=460800
+gen4iod.menu.UploadSpeed.460800.macosx=460800
+gen4iod.menu.UploadSpeed.460800.upload.speed=460800
+gen4iod.menu.UploadSpeed.512000.windows=512000
+gen4iod.menu.UploadSpeed.512000.upload.speed=512000
+gen4iod.menu.UploadSpeed.921600=921600
+gen4iod.menu.UploadSpeed.921600.upload.speed=921600 
