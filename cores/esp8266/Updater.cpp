@@ -124,22 +124,6 @@ bool UpdaterClass::begin(size_t size, int command) {
   DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", _size, _size);
 #endif
 
-#ifdef VERIFY_SIGNATURE
-  // If this package has been signed correctly, the last uint32 is the size of the signature
-  // the second-last uint32 is the size of the certificate
-  _signatureLen = (uint32_t)&_size - sizeof(uint32);
-  _certificateLen = (uint32_t)&_size - (2 * sizeof(uint32));
-  _signatureStartAddress = (uint32_t)&_size - _signatureLen - (2 * sizeof(uint32));
-  _certificateStartAddress = _signatureStartAddress - _certificateLen;
-
-#ifdef DEBUG_UPDATER
-  DEBUG_UPDATER.printf("[begin] _signatureLen:       0x%08X (%d)\n", _signatureLen, _signatureLen);
-  DEBUG_UPDATER.printf("[begin] _certificateLen:  0x%08X (%d)\n", _certificateLen, _certificateLen);
-  DEBUG_UPDATER.printf("[begin] _signatureStartAddress: 0x%08X (%d)\n", _signatureStartAddress, _signatureStartAddress);
-  DEBUG_UPDATER.printf("[begin] _certificateStartAddress: 0x%08X (%d)\n", _certificateStartAddress, _certificateStartAddress);
-#endif
-#endif
-
   _md5.begin();
   return true;
 }
@@ -200,6 +184,23 @@ bool UpdaterClass::end(bool evenIfRemaining){
     return false;
   }
 
+#ifdef VERIFY_SIGNATURE
+  // If this package has been signed correctly, the last uint32 is the size of the signature
+  // the second-last uint32 is the size of the certificate
+  ESP.flashRead(_startAddress + _size - 4, &_signatureLen, sizeof(uint32_t));
+  ESP.flashRead(_startAddress + _size - 8, &_certificateLen, sizeof(uint32_t));
+  _signatureStartAddress = _startAddress + _size - 8 - _signatureLen;
+  _certificateStartAddress = _signatureStartAddress - _certificateLen;
+
+#ifdef DEBUG_UPDATER
+  DEBUG_UPDATER.printf("\n");
+  DEBUG_UPDATER.printf("[begin] _signatureLen:    0x%08X (%d)\n", _signatureLen, _signatureLen);
+  DEBUG_UPDATER.printf("[begin] _certificateLen:  0x%08X (%d)\n", _certificateLen, _certificateLen);
+  DEBUG_UPDATER.printf("[begin] _signatureStartAddress: 0x%08X (%d)\n", _signatureStartAddress, _signatureStartAddress);
+  DEBUG_UPDATER.printf("[begin] _certificateStartAddress: 0x%08X (%d)\n", _certificateStartAddress, _certificateStartAddress);
+#endif
+#endif
+
   if (_command == U_FLASH) {
     eboot_command ebcmd;
     ebcmd.action = ACTION_COPY_RAW;
@@ -220,112 +221,112 @@ bool UpdaterClass::end(bool evenIfRemaining){
   return true;
 }
 
-#ifdef VERIFY_SIGNATURE
-    int UpdaterClass::addCA(const uint8_t *cert, int *len) {
-      // TODO: Allow more than one CA
-      int res = x509_new(cert, len, &(_ca_ctx->cert[0]));
+// #ifdef VERIFY_SIGNATURE
+//     int UpdaterClass::addCA(const uint8_t *cert, int *len) {
+//       // TODO: Allow more than one CA
+//       int res = x509_new(cert, len, &(_ca_ctx->cert[0]));
 
-#ifdef DEBUG_UPDATER
-      if(res == X509_OK) {
-        DEBUG_UPDATER.printf("Loaded CA certificate. Common Name: %s\n", _ca_ctx->cert[0]->cert_dn[X509_COMMON_NAME]);
-      } else {
-        DEBUG_UPDATER.printf("Unable to load CA certificate: %i\n", res);
-      }
-#endif
+// #ifdef DEBUG_UPDATER
+//       if(res == X509_OK) {
+//         DEBUG_UPDATER.printf("Loaded CA certificate. Common Name: %s\n", _ca_ctx->cert[0]->cert_dn[X509_COMMON_NAME]);
+//       } else {
+//         DEBUG_UPDATER.printf("Unable to load CA certificate: %i\n", res);
+//       }
+// #endif
 
-      return res;
-    }
+//       return res;
+//     }
 
-    bool UpdaterClass::_loadCertificate(X509_CTX *ctx) {
-      uint8_t *cert = (uint8_t *)_certificateStartAddress;
-      int res = x509_new(cert, (int *)&_certificateLen, &ctx);
-      if(res != X509_OK) {
-#ifdef DEBUG_UPDATER
-        DEBUG_UPDATER.printf("Unable to load developer certificate: %i\n", res);
-#endif
-        return false;
-      }
-#ifdef DEBUG_UPDATER
-      DEBUG_UPDATER.printf("Loaded developer certificate. Common Name: %s\n", ctx->cert_dn[X509_COMMON_NAME]);
-#endif
-      return true;
-    }
+//     bool UpdaterClass::_loadCertificate(X509_CTX *ctx) {
+//       uint8_t *cert = (uint8_t *)_certificateStartAddress;
+//       int res = x509_new(cert, (int *)&_certificateLen, &ctx);
+//       if(res != X509_OK) {
+// #ifdef DEBUG_UPDATER
+//         DEBUG_UPDATER.printf("Unable to load developer certificate: %i\n", res);
+// #endif
+//         return false;
+//       }
+// #ifdef DEBUG_UPDATER
+//       DEBUG_UPDATER.printf("Loaded developer certificate. Common Name: %s\n", ctx->cert_dn[X509_COMMON_NAME]);
+// #endif
+//       return true;
+//     }
 
-    bool UpdaterClass::_verifyCertificate(X509_CTX *ctx) {
-      int constraint;
-      int res = x509_verify(_ca_ctx, ctx, &constraint);
+//     bool UpdaterClass::_verifyCertificate(X509_CTX *ctx) {
+//       int constraint;
+//       int res = x509_verify(_ca_ctx, ctx, &constraint);
 
-#ifdef DEBUG_UPDATER
-      if(res == 0) {
-        DEBUG_UPDATER.printf("Developer certificate verified\n");
-      } else {
-        DEBUG_UPDATED.printf("Developer certificate not verified\n");
-      }
-#endif
+// #ifdef DEBUG_UPDATER
+//       if(res == 0) {
+//         DEBUG_UPDATER.printf("Developer certificate verified\n");
+//       } else {
+//         DEBUG_UPDATED.printf("Developer certificate not verified\n");
+//       }
+// #endif
 
-      return res == 0;
-    }
+//       return res == 0;
+//     }
 
-    bool UpdaterClass::_decryptSignature(X509_CTX *ctx, unsigned char **hash) {
-      const uint8_t *sig = (uint8_t *)_signatureStartAddress;
+//     bool UpdaterClass::_decryptSignature(X509_CTX *ctx, unsigned char **hash) {
+//       const uint8_t *sig = (uint8_t *)_signatureStartAddress;
 
-// This should be derived from the hash type
-#define MAX_LEN_KEY 512
+// // This should be derived from the hash type
+// #define MAX_LEN_KEY 512
 
-      unsigned char sig_bytes[MAX_KEY_LEN];
-      int len = RSA_decrypt(ctx->rsa_ctx, (const uint8_t*)sig, sig_bytes, MAX_KEY_LEN, 0);
+//       unsigned char sig_bytes[MAX_KEY_LEN];
+//       int len = RSA_decrypt(ctx->rsa_ctx, (const uint8_t*)sig, sig_bytes, MAX_KEY_LEN, 0);
 
-      if(len == -1) {
-        return false;
-      }
+//       if(len == -1) {
+//         return false;
+//       }
 
-      if(len != (int)_signatureLen) {
-        return false;
-      }
+//       if(len != (int)_signatureLen) {
+//         return false;
+//       }
 
-      (*hash) = sig_bytes + len - SHA256_SIZE;
-      return true;
-    }
+//       (*hash) = sig_bytes + len - SHA256_SIZE;
+//       return true;
+//     }
 
-    bool UpdaterClass::_compareHash(unsigned char **hash) {
-      unsigned char hash_computed[SHA256_SIZE];
+//     bool UpdaterClass::_compareHash(unsigned char **hash) {
+//       unsigned char hash_computed[SHA256_SIZE];
 
-      SHA256_CTX sha256;
-      SHA256_Init(&sha256);
-      SHA256_Update(&sha256, _buffer, _bufferLen);
-      SHA256_Final(hash_computed, &sha256);
+//       SHA256_CTX sha256;
+//       SHA256_Init(&sha256);
+//       SHA256_Update(&sha256, _buffer, _bufferLen);
+//       SHA256_Final(hash_computed, &sha256);
 
-      if(memcmp(hash, hash_computed, SHA256_SIZE) == 0) {
-        return true;
-      } else {
-        return false;
-      }
-    }
+//       if(memcmp(hash, hash_computed, SHA256_SIZE) == 0) {
+//         return true;
+//       } else {
+//         return false;
+//       }
+//     }
 
-    bool UpdaterClass::_verifySignature() {
-      X509_CTX ctx;
-      if(!_loadCertificate(&ctx)) {
-        return false;
-      }
+//     bool UpdaterClass::_verifySignature() {
+//       X509_CTX ctx;
+//       if(!_loadCertificate(&ctx)) {
+//         return false;
+//       }
 
-      if(!_verifyCertificate(&ctx)) {
-        return false;
-      }
+//       if(!_verifyCertificate(&ctx)) {
+//         return false;
+//       }
 
-      unsigned char *hash;
-      if(!_decryptSignature(&ctx, &hash)) {
-        return false;
-      }
+//       unsigned char *hash;
+//       if(!_decryptSignature(&ctx, &hash)) {
+//         return false;
+//       }
 
-      if(_compareHash(&hash)) {
-        free(hash);
-        return true;
-      } else {
-        free(hash);
-        return false;
-      }
-    }
-#endif
+//       if(_compareHash(&hash)) {
+//         free(hash);
+//         return true;
+//       } else {
+//         free(hash);
+//         return false;
+//       }
+//     }
+// #endif
 
 bool UpdaterClass::_writeBuffer(){
 

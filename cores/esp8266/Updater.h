@@ -13,7 +13,7 @@
 #include "axtls/sha1.h"
 #include "axtls/sha256.h"
 
-#define MAX_KEY_LEN 256
+#define MAX_KEY_LEN 512
 #endif
 
 #define UPDATE_ERROR_OK                 (0)
@@ -172,9 +172,9 @@ class UpdaterClass {
     bool _verifySignature();
 
     uint32_t _certificateStartAddress;
-    size_t _certificateLen;
+    uint32_t _certificateLen;
     uint32_t _signatureStartAddress;
-    size_t _signatureLen;
+    uint32_t _signatureLen;
 #endif
 
     bool _async;
