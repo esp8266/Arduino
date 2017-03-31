@@ -3,5 +3,5 @@
     "description": "Arduino Wiring-based Framework (ESP8266 Core)",
     "system": "all",
     "url": "https://github.com/esp8266/Arduino",
-    "version": "1.20400.0-dev"
+    "version": "1.20400.0-alpha.1"
 }
