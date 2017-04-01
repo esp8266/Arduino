@@ -165,7 +165,7 @@ class UpdaterClass {
 
 #ifdef VERIFY_SIGNATURE
     CA_CERT_CTX *_ca_ctx;
-    bool _loadCertificate(X509_CTX *ctx);
+    bool _loadCertificate(X509_CTX *ctx, uint32_t *cert);
     bool _verifyCertificate(X509_CTX *ctx);
     bool _decryptSignature(X509_CTX *ctx, unsigned char **hash);
     bool _compareHash(unsigned char **hash);
