@@ -165,8 +165,7 @@ class UpdaterClass {
     CA_CERT_CTX *_ca_ctx;
     bool _loadCertificate(X509_CTX **ctx);
     bool _verifyCertificate(X509_CTX **ctx);
-    bool _decryptSignature(X509_CTX **ctx, unsigned char **hash);
-    bool _compareHash(unsigned char **hash);
+    bool _decryptSignature(X509_CTX **ctx, char **hash);
     bool _decryptMD5();
 
     uint32_t _certificateStartAddress;

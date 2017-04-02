@@ -299,7 +299,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return res == X509_OK;
     }
 
-    bool UpdaterClass::_decryptSignature(X509_CTX **ctx, unsigned char **hash) {
+    bool UpdaterClass::_decryptSignature(X509_CTX **ctx, char **hash) {
       size_t num_of_bits = sizeof(uint8_t) * _signatureLen;
       uint8_t *sig = (uint8_t *)malloc(num_of_bits + (num_of_bits % 32)); // Round up to the next uint32_t boundary
       ESP.flashRead(_signatureStartAddress, (uint32_t *)sig, num_of_bits);
@@ -330,14 +330,13 @@ bool UpdaterClass::end(bool evenIfRemaining){
       DEBUG_UPDATER.printf("Decryption successful.\n");
 #endif
 
-      (*hash) = (unsigned char *)calloc((MD5_SIZE * 2) + 1, sizeof(unsigned char));
+      // Fetch the last part of the encrypted string - that is the MD5 hash, and then save the string
+      // version of it in to the hash pointer.
+      (*hash) = (char *)calloc((MD5_SIZE * 2) + 1, sizeof(char));
       for(int i = 0; i < MD5_SIZE; i++) {
-        sprintf((char *)(*hash + (i * 2)), "%02x", sig_data[i]);
+        sprintf(*hash + (i * 2), "%02x", sig_data[len - MD5_SIZE + i]);
       }
-
-#ifdef DEBUG_UPDATER
-      DEBUG_UPDATER.printf("MD5 hash: %s\n", *hash);
-#endif
+      
       return true;
     }
 
@@ -352,12 +351,11 @@ bool UpdaterClass::end(bool evenIfRemaining){
         return false;
       }
 
-      unsigned char *hash;
+      char *hash;
       if(!_decryptSignature(&ctx, &hash)) {
         return false;
       }
 
-      DEBUG_UPDATER.printf("Length of hash: %i\n", strlen((const char *)hash));
       setMD5((const char *)hash);
 
       return true;
