@@ -161,8 +161,52 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _size = progress();
   }
 
-  _md5.calculate();
+#ifdef VERIFY_SIGNATURE
+  // If this package has been signed correctly, the last uint32 is the size of the signature
+  // the second-last uint32 is the size of the certificate
+  ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &_signatureLen, sizeof(uint32_t));
+  ESP.flashRead(_startAddress + _size - (2 * sizeof(uint32_t)), &_certificateLen, sizeof(uint32_t));
+  _signatureStartAddress = _startAddress + _size - (2 * sizeof(uint32_t)) - _signatureLen;
+  _certificateStartAddress = _signatureStartAddress - _certificateLen;
+
+#ifdef DEBUG_UPDATER
+  DEBUG_UPDATER.printf("\n");
+  DEBUG_UPDATER.printf("[begin] _signatureLen:    0x%08X (%d)\n", _signatureLen, _signatureLen);
+  DEBUG_UPDATER.printf("[begin] _certificateLen:  0x%08X (%d)\n", _certificateLen, _certificateLen);
+  DEBUG_UPDATER.printf("[begin] _signatureStartAddress: 0x%08X (%d)\n", _signatureStartAddress, _signatureStartAddress);
+  DEBUG_UPDATER.printf("[begin] _certificateStartAddress: 0x%08X (%d)\n", _certificateStartAddress, _certificateStartAddress);
+#endif
+
+  if(!_decryptMD5()) {
+#ifdef DEBUG_UPDATER
+    DEBUG_UPDATER.printf("MD5 Decryption Failed.\n");
+#endif
+    _reset();
+    return false;
+  }
+#endif
+
   if(_target_md5.length()) {
+    // If there is a target MD5 hash set, we now take the md5 hash of the binary
+    int bin_size = (int)_size;
+#ifdef VERIFY_SIGNATURE
+    bin_size -= (int)(_signatureLen + _certificateLen + (2 * sizeof(uint32_t)));
+#endif
+    
+    uint8_t *bin_buffer = (uint8_t *)malloc(sizeof(uint8_t) * 32);
+    for(int i = 0; i < bin_size; i += 32) {
+      ESP.flashRead(_startAddress + i, (uint32_t *)bin_buffer, 32);
+      
+      int read = bin_size - i;
+      if(read > 32) {
+        read = 32;
+      }
+
+      _md5.add(bin_buffer, read);
+    }
+    _md5.calculate();
+    free(bin_buffer);
+
     if(_target_md5 != _md5.toString()){
       _error = UPDATE_ERROR_MD5;
 #ifdef DEBUG_UPDATER
@@ -183,31 +227,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _reset();
     return false;
   }
-
-#ifdef VERIFY_SIGNATURE
-  // If this package has been signed correctly, the last uint32 is the size of the signature
-  // the second-last uint32 is the size of the certificate
-  ESP.flashRead(_startAddress + _size - 4, &_signatureLen, sizeof(uint32_t));
-  ESP.flashRead(_startAddress + _size - 8, &_certificateLen, sizeof(uint32_t));
-  _signatureStartAddress = _startAddress + _size - 8 - _signatureLen;
-  _certificateStartAddress = _signatureStartAddress - _certificateLen;
-
-#ifdef DEBUG_UPDATER
-  DEBUG_UPDATER.printf("\n");
-  DEBUG_UPDATER.printf("[begin] _signatureLen:    0x%08X (%d)\n", _signatureLen, _signatureLen);
-  DEBUG_UPDATER.printf("[begin] _certificateLen:  0x%08X (%d)\n", _certificateLen, _certificateLen);
-  DEBUG_UPDATER.printf("[begin] _signatureStartAddress: 0x%08X (%d)\n", _signatureStartAddress, _signatureStartAddress);
-  DEBUG_UPDATER.printf("[begin] _certificateStartAddress: 0x%08X (%d)\n", _certificateStartAddress, _certificateStartAddress);
-#endif
-
-  if(!_verifySignature()) {
-#ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("Signature verification failed\n");
-#endif
-    _reset();
-    return false;
-  }
-#endif
 
   if (_command == U_FLASH) {
     eboot_command ebcmd;
@@ -285,11 +304,13 @@ bool UpdaterClass::end(bool evenIfRemaining){
       uint8_t *sig = (uint8_t *)malloc(num_of_bits + (num_of_bits % 32)); // Round up to the next uint32_t boundary
       ESP.flashRead(_signatureStartAddress, (uint32_t *)sig, num_of_bits);
 
-// This should be derived from the hash type
-#define MAX_LEN_KEY 512
-
-      unsigned char sig_bytes[MAX_KEY_LEN];
-      int len = RSA_decrypt((*ctx)->rsa_ctx, (const uint8_t*)sig, sig_bytes, MAX_KEY_LEN, 0);
+      const int signature_size = (*ctx)->rsa_ctx->num_octets;
+#ifdef DEBUG_UPDATER
+        DEBUG_UPDATER.printf("Size of output buffer: %i\n", signature_size);
+#endif      
+      uint8_t sig_data[signature_size];
+      int len = RSA_decrypt((*ctx)->rsa_ctx, (const uint8_t *)sig, sig_data, signature_size, 0);
+      free(sig);
 
       if(len == -1) {
 #ifdef DEBUG_UPDATER
@@ -298,36 +319,29 @@ bool UpdaterClass::end(bool evenIfRemaining){
         return false;
       }
 
-      if(len < SHA256_SIZE) {
+      if(len < MD5_SIZE) {
 #ifdef DEBUG_UPDATER
-        DEBUG_UPDATER.printf("Decryption failed: Signature length too short. Expected %i, got %i\n", SHA256_SIZE, len);
+        DEBUG_UPDATER.printf("Decryption failed: Signature is too short. Expected %i, got %i\n", MD5_SIZE, len);
 #endif
         return false;
       }
-
-      (*hash) = sig_bytes + len - SHA256_SIZE;
+      
 #ifdef DEBUG_UPDATER
       DEBUG_UPDATER.printf("Decryption successful.\n");
+#endif
+
+      (*hash) = (unsigned char *)calloc((MD5_SIZE * 2) + 1, sizeof(unsigned char));
+      for(int i = 0; i < MD5_SIZE; i++) {
+        sprintf((char *)(*hash + (i * 2)), "%02x", sig_data[i]);
+      }
+
+#ifdef DEBUG_UPDATER
+      DEBUG_UPDATER.printf("MD5 hash: %s\n", *hash);
 #endif
       return true;
     }
 
-    // bool UpdaterClass::_compareHash(unsigned char **hash) {
-    //   unsigned char hash_computed[SHA256_SIZE];
-
-    //   SHA256_CTX sha256;
-    //   SHA256_Init(&sha256);
-    //   SHA256_Update(&sha256, _buffer, _bufferLen);
-    //   SHA256_Final(hash_computed, &sha256);
-
-    //   if(memcmp(hash, hash_computed, SHA256_SIZE) == 0) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // }
-
-    bool UpdaterClass::_verifySignature() {
+    bool UpdaterClass::_decryptMD5() {
       X509_CTX *ctx;
 
       if(!_loadCertificate(&ctx)) {
@@ -343,17 +357,10 @@ bool UpdaterClass::end(bool evenIfRemaining){
         return false;
       }
 
-      return true;
+      DEBUG_UPDATER.printf("Length of hash: %i\n", strlen((const char *)hash));
+      setMD5((const char *)hash);
 
-      // if(_compareHash(&hash)) {
-      //   free(hash);
-      //   free(cert);
-      //   return true;
-      // } else {
-      //   free(hash);
-      //   free(cert);
-      //   return false;
-      // }
+      return true;
     }
 #endif
 
@@ -375,7 +382,6 @@ bool UpdaterClass::_writeBuffer(){
 #endif
     return false;
   }
-  _md5.add(_buffer, _bufferLen);
   _currentAddress += _bufferLen;
   _bufferLen = 0;
   return true;

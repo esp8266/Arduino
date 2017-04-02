@@ -37,6 +37,8 @@
 #include <Arduino.h>
 #include <time.h>
 #include "asn1.h"
+#include "md5.h"
+#include "sha1.h"
 #include "sha256.h"
 #include "x509.h"
 
@@ -125,7 +127,7 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
     /* use the appropriate signature algorithm */
     switch (x509_ctx->sig_type)
     {
-        /*
+        
         case SIG_TYPE_MD5:
         {
             MD5_CTX md5_ctx;
@@ -147,7 +149,7 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
             x509_ctx->digest = bi_import(bi_ctx, sha_dgst, SHA1_SIZE);
         }
             break;
-        */
+        
         case SIG_TYPE_SHA256:
         {
             SHA256_CTX sha256_ctx;

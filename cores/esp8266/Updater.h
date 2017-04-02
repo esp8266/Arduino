@@ -12,8 +12,6 @@
 #include "axtls/asn1.h"
 #include "axtls/sha1.h"
 #include "axtls/sha256.h"
-
-#define MAX_KEY_LEN 512
 #endif
 
 #define UPDATE_ERROR_OK                 (0)
@@ -169,7 +167,7 @@ class UpdaterClass {
     bool _verifyCertificate(X509_CTX **ctx);
     bool _decryptSignature(X509_CTX **ctx, unsigned char **hash);
     bool _compareHash(unsigned char **hash);
-    bool _verifySignature();
+    bool _decryptMD5();
 
     uint32_t _certificateStartAddress;
     uint32_t _certificateLen;

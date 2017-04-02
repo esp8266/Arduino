@@ -23,11 +23,11 @@
 
 #include <WString.h>
 #include <Stream.h>
-#include "md5.h"
+#include "axtls/md5.h"
 
 class MD5Builder {
   private:
-    md5_context_t _ctx;
+    MD5_CTX _ctx;
     uint8_t _buf[16];
   public:
     void begin(void);
