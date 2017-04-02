@@ -245,11 +245,14 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return res;
     }
 
-    bool UpdaterClass::_loadCertificate(X509_CTX *ctx, uint32_t *cert) {
-      cert = (uint32_t *)malloc(sizeof(uint32_t) * _certificateLen);
-      ESP.flashRead(_certificateStartAddress, cert, _certificateLen);
-      int res = x509_new((uint8_t *)cert, (int *)&_certificateLen, &ctx);
-      
+    bool UpdaterClass::_loadCertificate(X509_CTX **ctx) {
+      size_t num_of_bits = sizeof(uint8_t) * _certificateLen;
+      uint8_t *cert = (uint8_t *)malloc(num_of_bits + (num_of_bits % 32)); // Round up to the next uint32_t boundary
+      ESP.flashRead(_certificateStartAddress, (uint32_t *)cert, num_of_bits);
+
+      int res = x509_new(cert, (int *)&_certificateLen, ctx);
+      free(cert);
+
       if(res != X509_OK) {
 #ifdef DEBUG_UPDATER
         DEBUG_UPDATER.printf("Unable to load developer certificate: %i\n", res);
@@ -257,34 +260,36 @@ bool UpdaterClass::end(bool evenIfRemaining){
         return false;
       }
 #ifdef DEBUG_UPDATER
-      DEBUG_UPDATER.printf("Loaded developer certificate. Common Name: %s\n", ctx->cert_dn[X509_COMMON_NAME]);
+      DEBUG_UPDATER.printf("Loaded developer certificate. Common Name: %s\n", (*ctx)->cert_dn[X509_COMMON_NAME]);
 #endif
       return true;
     }
 
-    bool UpdaterClass::_verifyCertificate(X509_CTX *ctx) {
+    bool UpdaterClass::_verifyCertificate(X509_CTX **ctx) {
       int constraint;
-      int res = x509_verify(_ca_ctx, ctx, &constraint);
+      int res = x509_verify(_ca_ctx, *ctx, &constraint);
 
 #ifdef DEBUG_UPDATER
-      if(res == 0) {
+      if(res == X509_OK) {
         DEBUG_UPDATER.printf("Developer certificate verified\n");
       } else {
-        DEBUG_UPDATER.printf("Developer certificate not verified\n");
+        DEBUG_UPDATER.printf("Developer certificate not verified: %i\n", res);
       }
 #endif
 
-      return res == 0;
+      return res == X509_OK;
     }
 
-    bool UpdaterClass::_decryptSignature(X509_CTX *ctx, unsigned char **hash) {
-      const uint8_t *sig = (uint8_t *)_signatureStartAddress;
+    bool UpdaterClass::_decryptSignature(X509_CTX **ctx, unsigned char **hash) {
+      size_t num_of_bits = sizeof(uint8_t) * _signatureLen;
+      uint8_t *sig = (uint8_t *)malloc(num_of_bits + (num_of_bits % 32)); // Round up to the next uint32_t boundary
+      ESP.flashRead(_signatureStartAddress, (uint32_t *)sig, num_of_bits);
 
 // This should be derived from the hash type
 #define MAX_LEN_KEY 512
 
       unsigned char sig_bytes[MAX_KEY_LEN];
-      int len = RSA_decrypt(ctx->rsa_ctx, (const uint8_t*)sig, sig_bytes, MAX_KEY_LEN, 0);
+      int len = RSA_decrypt((*ctx)->rsa_ctx, (const uint8_t*)sig, sig_bytes, MAX_KEY_LEN, 0);
 
       if(len == -1) {
 #ifdef DEBUG_UPDATER
@@ -293,9 +298,9 @@ bool UpdaterClass::end(bool evenIfRemaining){
         return false;
       }
 
-      if(len != (int)_signatureLen) {
+      if(len < SHA256_SIZE) {
 #ifdef DEBUG_UPDATER
-        DEBUG_UPDATER.printf("Decryption failed: Signature length too short.\n");
+        DEBUG_UPDATER.printf("Decryption failed: Signature length too short. Expected %i, got %i\n", SHA256_SIZE, len);
 #endif
         return false;
       }
@@ -323,28 +328,23 @@ bool UpdaterClass::end(bool evenIfRemaining){
     // }
 
     bool UpdaterClass::_verifySignature() {
-      X509_CTX ctx;
-      uint32_t *cert;
+      X509_CTX *ctx;
 
-      if(!_loadCertificate(&ctx, cert)) {
-        free(cert);
+      if(!_loadCertificate(&ctx)) {
         return false;
       }
 
-      // if(!_verifyCertificate(&ctx)) {
-      //   free(cert);
-      //   return false;
-      // }
+      if(!_verifyCertificate(&ctx)) {
+        return false;
+      }
 
-      free(cert);
+      unsigned char *hash;
+      if(!_decryptSignature(&ctx, &hash)) {
+        return false;
+      }
+
       return true;
 
-      // unsigned char *hash;
-      // if(!_decryptSignature(&ctx, &hash)) {
-      //   free(cert);
-      //   return false;
-      // }
-      
       // if(_compareHash(&hash)) {
       //   free(hash);
       //   free(cert);
