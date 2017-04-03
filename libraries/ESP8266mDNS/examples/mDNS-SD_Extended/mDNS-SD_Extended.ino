@@ -42,6 +42,8 @@ void setup() {
   }
   Serial.println("mDNS responder started");
   MDNS.addService("esp", "tcp", 8080); // Announce esp tcp service on port 8080
+  MDNS.addServiceTxt("esp", "tcp", "foo", "bar");
+  MDNS.addServiceTxt("esp", "tcp", "chipid", String(ESP.getChipId(), HEX));
 
   Serial.println("Sending mDNS query");
   int n = MDNS.queryService("esp", "tcp"); // Send out query for esp tcp services
@@ -62,6 +64,15 @@ void setup() {
       Serial.print(":");
       Serial.print(MDNS.port(i));
       Serial.println(")");
+      if(MDNS.numTxt(i)>0){
+        int num = MDNS.numTxt(i);
+        Serial.println("  TXT");
+        for(int j=0; j < num; j++){
+          Serial.print("    ");
+          Serial.println(MDNS.txt(i,j));
+        }
+        Serial.println("  ENDTXT");
+      }
     }
   }
   Serial.println();

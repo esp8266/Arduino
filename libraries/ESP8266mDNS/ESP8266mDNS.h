@@ -98,6 +98,10 @@ public:
   String hostname(int idx);
   IPAddress IP(int idx);
   uint16_t port(int idx);
+  int numTxt(int idx);
+  bool hasTxt(int idx, char * key);
+  String txt(int idx, char * key);
+  String txt(int idx, int txtIdx);
   
   void enableArduino(uint16_t port, bool auth=false);
 

@@ -105,6 +105,7 @@ struct MDNSTxt{
 
 struct MDNSAnswer {
   MDNSAnswer* next;
+  MDNSTxt * txts;
   uint8_t ip[4];
   uint16_t port;
   char *hostname;
@@ -137,6 +138,13 @@ MDNSResponder::~MDNSResponder() {
     answer = _getAnswerFromIdx(n);
     os_free(answer->hostname);
     os_free(answer);
+    MDNSTxt *txt;
+    MDNSTxt *nextTxt = answer->txts;
+    while(nextTxt != nullptr){
+      txt = nextTxt;
+      nextTxt = nextTxt->_next;
+      delete txt;
+    }
     answer = 0;
   }
   _answers = 0;
@@ -382,6 +390,66 @@ uint16_t MDNSResponder::port(int idx) {
   return answer->port;
 }
 
+int MDNSResponder::numTxt(int idx) {
+  MDNSAnswer *answer = _getAnswerFromIdx(idx);
+  if (answer == 0) {
+    return 0;
+  }
+  MDNSTxt *txt = answer->txts;
+  int numTxt = 0;
+  while(txt != nullptr){
+    numTxt++;
+    txt = txt->_next;
+  }
+  return numTxt;
+}
+
+bool MDNSResponder::hasTxt(int idx, char * key) {
+  MDNSAnswer *answer = _getAnswerFromIdx(idx);
+  if (answer == 0) {
+    return false;
+  }
+  MDNSTxt *txt = answer->txts;
+  while(txt != nullptr){
+    if(txt->_txt.startsWith(String(key)+'=')){
+      return true;
+    }
+    txt = txt->_next;
+  }
+  return false;
+}
+
+String MDNSResponder::txt(int idx, char * key) {
+  MDNSAnswer *answer = _getAnswerFromIdx(idx);
+  if (answer == 0) {
+    return String();
+  }
+  MDNSTxt *txt = answer->txts;
+  String cmp = String(key)+'=';
+  while(txt != nullptr){
+    if(txt->_txt.startsWith(cmp)){
+      return txt->_txt.substring(cmp.length());
+    }
+    txt = txt->_next;
+  }
+  return String();
+}
+
+String MDNSResponder::txt(int idx, int txtIdx) {
+  MDNSAnswer *answer = _getAnswerFromIdx(idx);
+  if (answer == 0) {
+    return String();
+  }
+  MDNSTxt *txt = answer->txts;
+  while(txt != nullptr && txtIdx-- > 0){
+    txt = txt->_next;
+  }
+  if(txtIdx > 0 || txt==nullptr){
+    return String();
+  }
+  return txt->_txt;
+}
+
 MDNSAnswer* MDNSResponder::_getAnswerFromIdx(int idx) {
   MDNSAnswer *answer = _answers;
   while (answer != 0 && idx-- > 0) {
@@ -488,6 +556,7 @@ void MDNSResponder::_parsePacket(){
     uint16_t answerPort = 0;
     uint8_t answerIp[4] = { 0,0,0,0 };
     char answerHostName[255];
+    MDNSTxt * txtPtr = nullptr;
     bool serviceMatch = false;
     MDNSAnswer *answer;
     uint8_t partsCollected = 0;
@@ -502,6 +571,13 @@ void MDNSResponder::_parsePacket(){
         answer = _getAnswerFromIdx(n);
         os_free(answer->hostname);
         os_free(answer);
+        MDNSTxt *txt;
+        MDNSTxt *nextTxt = answer->txts;
+        while(nextTxt != nullptr){
+          txt = nextTxt;
+          nextTxt = nextTxt->_next;
+          delete txt;
+        }
         answer = 0;
       }
       _answers = 0;
@@ -589,14 +665,25 @@ void MDNSResponder::_parsePacket(){
 
       else if (answerType == MDNS_TYPE_TXT) {
         partsCollected |= 0x02;
-        _conn_readS(hostName, answerRdlength); // Read rdata
+        while(answerRdlength){
+          MDNSTxt *newtxt = new MDNSTxt;
+          uint16_t txtRdLength = _conn_read8();
+          answerRdlength--;
+          txtRdLength = (answerRdlength<txtRdLength)?answerRdlength:txtRdLength; //in case the packet is malformed
+          _conn_readS(hostName, txtRdLength); // Read rdata
+          hostName[txtRdLength] = '\0';
+          answerRdlength -= txtRdLength;
+          newtxt->_txt = String(hostName);
+          newtxt->_next = txtPtr;
+          txtPtr = newtxt;
 #ifdef MDNS_DEBUG_RX
-        Serial.printf("TXT %d ", answerRdlength);
-        for (int n = 0; n < answerRdlength; n++) {
-          Serial.printf("%c", hostName[n]);
-        }
-        Serial.println();
+          Serial.printf(" %d:", txtRdLength);
+          for (int n = 0; n < txtRdLength; n++) {
+            Serial.printf("%02x ", hostName[n]);
+          }
+          Serial.printf("\n%s\n", hostName);
 #endif
+        }
       }
 
       else if (answerType == MDNS_TYPE_SRV) {
@@ -665,6 +752,7 @@ void MDNSResponder::_parsePacket(){
         }
         answer->next = 0;
         answer->hostname = 0;
+        answer->txts = txtPtr;
 
         // Populate new answer
         answer->port = answerPort;
