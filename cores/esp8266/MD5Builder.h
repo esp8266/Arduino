@@ -23,7 +23,7 @@
 
 #include <WString.h>
 #include <Stream.h>
-#include "axtls/md5.h"
+#include <crypto/crypto.h>
 
 class MD5Builder {
   private:

@@ -8,10 +8,8 @@
 #include <MD5Builder.h>
 
 #ifdef VERIFY_SIGNATURE
-#include "axtls/rsa.h"
-#include "axtls/asn1.h"
-#include "axtls/sha1.h"
-#include "axtls/sha256.h"
+#include <ssl/crypto_misc.h>
+#include <crypto/crypto.h>
 #endif
 
 #define UPDATE_ERROR_OK                 (0)
