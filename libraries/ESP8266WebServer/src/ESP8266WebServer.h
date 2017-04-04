@@ -74,6 +74,8 @@ public:
   void stop();
 
   bool authenticate(const char * username, const char * password);
+  bool authenticateHash(const char * hash);
+  char* getUserPasswordHash(const char * username, const char * password);
   void requestAuthentication();
 
   typedef std::function<void(void)> THandlerFunction;

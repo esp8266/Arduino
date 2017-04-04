@@ -94,34 +94,64 @@ void ESP8266WebServer::begin() {
     collectHeaders(0, 0);
 }
 
+char* ESP8266WebServer::getUserPasswordHash(const char * username, const char * password) {
+	
+	char toencodeLen = strlen(username)+strlen(password)+1;
+	char *toencode = new char[toencodeLen + 1];
+	if(toencode == NULL){
+		return NULL;
+	}
+	char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
+	if(encoded == NULL){
+		delete[] toencode;
+		return NULL;
+	}
+		
+	sprintf(toencode, "%s:%s", username, password);
+		
+	if (base64_encode_chars(toencode, toencodeLen, encoded) > 0) {
+		
+		delete[] toencode;
+    	return encoded;
+	}
+	
+	delete[] toencode;
+    return NULL;
+}
+
 bool ESP8266WebServer::authenticate(const char * username, const char * password){
   if(hasHeader(AUTHORIZATION_HEADER)){
     String authReq = header(AUTHORIZATION_HEADER);
     if(authReq.startsWith("Basic")){
       authReq = authReq.substring(6);
       authReq.trim();
-      char toencodeLen = strlen(username)+strlen(password)+1;
-      char *toencode = new char[toencodeLen + 1];
-      if(toencode == NULL){
+      
+	  char *encoded = getUserPasswordHash(username, password);
+	  
+	  if(encoded != NULL && authReq.equals(encoded)){
         authReq = String();
-        return false;
-      }
-      char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
-      if(encoded == NULL){
-        authReq = String();
-        delete[] toencode;
-        return false;
-      }
-      sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equals(encoded)){
-        authReq = String();
-        delete[] toencode;
         delete[] encoded;
         return true;
       }
-      delete[] toencode;
-      delete[] encoded;
+	  delete[] encoded;
     }
+    authReq = String();
+  }
+  return false;
+}
+
+bool ESP8266WebServer::authenticateHash(const char * hash){
+  if(hasHeader(AUTHORIZATION_HEADER)){
+    String authReq = header(AUTHORIZATION_HEADER);
+    if(authReq.startsWith("Basic")){
+      authReq = authReq.substring(6);
+      authReq.trim();
+      
+	  if(authReq.equals(hash)){
+        authReq = String();
+        return true;
+      }
+	}
     authReq = String();
   }
   return false;
