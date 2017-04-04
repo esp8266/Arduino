@@ -52,6 +52,8 @@
 
 #include "SD.h"
 
+namespace SDLib {
+
 // Used by `getNextPathComponent`
 #define MAX_COMPONENT_LEN 12 // What is max length?
 #define PATH_COMPONENT_BUFFER_LEN MAX_COMPONENT_LEN+1
@@ -614,3 +616,5 @@ void File::rewindDirectory(void) {
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SD)
 SDClass SD;
 #endif
+
+};
