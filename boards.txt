@@ -1299,6 +1299,43 @@ d1_mini.menu.UploadSpeed.460800.upload.speed=460800
 d1_mini.menu.UploadSpeed.512000.windows=512000
 d1_mini.menu.UploadSpeed.512000.upload.speed=512000
 
+d1_mini.menu.Debug.Disabled=Disabled
+d1_mini.menu.Debug.Disabled.build.debug_port=
+d1_mini.menu.Debug.Serial=Serial
+d1_mini.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+d1_mini.menu.DebugLevel.None____=None
+d1_mini.menu.DebugLevel.None____.build.debug_level=
+d1_mini.menu.DebugLevel.Core____=Core
+d1_mini.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
+d1_mini.menu.DebugLevel.SSL_____=Core + SSL
+d1_mini.menu.DebugLevel.SSL_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+d1_mini.menu.DebugLevel.SSL_MEM_=Core + SSL + TLS Mem
+d1_mini.menu.DebugLevel.SSL_MEM_.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_TLS_MEM
+d1_mini.menu.DebugLevel.WiFic___=Core + WiFi
+d1_mini.menu.DebugLevel.WiFic___.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+d1_mini.menu.DebugLevel.WiFi____=WiFi
+d1_mini.menu.DebugLevel.WiFi____.build.debug_level=-DDEBUG_ESP_WIFI
+d1_mini.menu.DebugLevel.HTTPClient=HTTPClient
+d1_mini.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+d1_mini.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+d1_mini.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
+d1_mini.menu.DebugLevel.HTTPUpdate=HTTPUpdate
+d1_mini.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
+d1_mini.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
+d1_mini.menu.DebugLevel.HTTPUpdate2.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE
+d1_mini.menu.DebugLevel.HTTPUpdate3=HTTPClient + HTTPUpdate + Updater
+d1_mini.menu.DebugLevel.HTTPUpdate3.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER
+d1_mini.menu.DebugLevel.HTTPServer=HTTPServer
+d1_mini.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
+d1_mini.menu.DebugLevel.UPDATER=Updater
+d1_mini.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
+d1_mini.menu.DebugLevel.OTA_____=OTA
+d1_mini.menu.DebugLevel.OTA_____.build.debug_level=-DDEBUG_ESP_OTA
+d1_mini.menu.DebugLevel.OTA2____=OTA + Updater
+d1_mini.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
+d1_mini.menu.DebugLevel.all_____=All
+d1_mini.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
+
 
 d1_mini.menu.FlashSize.4M3M=4M (3M SPIFFS)
 d1_mini.menu.FlashSize.4M3M.build.flash_size=4M
