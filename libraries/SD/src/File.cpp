@@ -1,6 +1,5 @@
 /*
 
-1
  SD - a slightly more friendly wrapper for sdfatlib
 
  This library aims to expose a subset of SD card functionality
