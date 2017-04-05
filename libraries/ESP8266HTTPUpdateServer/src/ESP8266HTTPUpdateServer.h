@@ -11,16 +11,16 @@ class ESP8266HTTPUpdateServer
     static const char *_serverIndex;
     static const char *_failedResponse;
     static const char *_successResponse;
-    char * _username;
-    char * _password;
-	char * _hash;
+    const char * _username;
+    const char * _password;
+	const char * _hash;
     bool _authenticated;
   public:
     ESP8266HTTPUpdateServer(bool serial_debug=false);
 
     bool setLoginPassword(const char * username, const char * password);
 	
-	bool setLoginPasswordHASH(const char * hash);
+	bool setLoginPasswordHASH(const char * hashUNP);
 	
 	void setup(ESP8266WebServer *server, const char * path);
 

@@ -105,7 +105,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path)
 
 bool ESP8266HTTPUpdateServer::setLoginPassword(const char * username, const char * password) {
 	
-	if(!_hash.length() && !_username.length() && !_password.length() && username && password) {
+	if(_hash == NULL && _username == NULL && _password == NULL && password && username) {
 		_username = username;
 		_password = password;
 		return true;
@@ -114,10 +114,10 @@ bool ESP8266HTTPUpdateServer::setLoginPassword(const char * username, const char
 	return false;
 }
 	
-bool ESP8266HTTPUpdateServer::setLoginPasswordHASH(const char * hash) {
+bool ESP8266HTTPUpdateServer::setLoginPasswordHASH(const char * hashUNP) {
 	
-	if(!_hash.length() && !_username.length() && !_password.length() && hash) {
-		_hash = hash;
+	if(_hash == NULL && _username == NULL && _password == NULL && hashUNP) {
+		_hash = hashUNP;
 		return true;
 	}
 	
