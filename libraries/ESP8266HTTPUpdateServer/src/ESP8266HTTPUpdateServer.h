@@ -13,26 +13,22 @@ class ESP8266HTTPUpdateServer
     static const char *_successResponse;
     char * _username;
     char * _password;
+	char * _hash;
     bool _authenticated;
   public:
     ESP8266HTTPUpdateServer(bool serial_debug=false);
 
-    void setup(ESP8266WebServer *server)
-    {
-      setup(server, NULL, NULL);
-    }
+    bool setLoginPassword(const char * username, const char * password);
+	
+	bool setLoginPasswordHASH(const char * hash);
+	
+	void setup(ESP8266WebServer *server, const char * path);
 
-    void setup(ESP8266WebServer *server, const char * path)
+	void setup(ESP8266WebServer *server)
     {
-      setup(server, path, NULL, NULL);
+      setup(server, "/update");
     }
-
-    void setup(ESP8266WebServer *server, const char * username, const char * password)
-    {
-      setup(server, "/update", username, password);
-    }
-
-    void setup(ESP8266WebServer *server, const char * path, const char * username, const char * password);
+	
 };
 
 

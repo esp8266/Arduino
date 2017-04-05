@@ -30,18 +30,21 @@ ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
   _server = NULL;
   _username = NULL;
   _password = NULL;
+  _hash = NULL;
   _authenticated = false;
 }
 
-void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path, const char * username, const char * password)
+void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path)
 {
     _server = server;
-    _username = (char *)username;
-    _password = (char *)password;
-
+    
+	if (_hash == NULL && _username != NULL && _password != NULL) {
+		_hash = _server->getUserPasswordHash(_username, _password);
+	}
+	
     // handler for the /update form page
     _server->on(path, HTTP_GET, [&](){
-      if(_username != NULL && _password != NULL && !_server->authenticate(_username, _password))
+      if(_hash != NULL && !_server->authenticate(_hash))
         return _server->requestAuthentication();
       _server->send(200, "text/html", _serverIndex);
     });
@@ -61,7 +64,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
         if (_serial_output)
           Serial.setDebugOutput(true);
 
-        _authenticated = (_username == NULL || _password == NULL || _server->authenticate(_username, _password));
+        _authenticated = (_hash == NULL || _server->authenticate(_hash));
         if(!_authenticated){
           if (_serial_output)
             Serial.printf("Unauthenticated Update\n");
@@ -98,4 +101,25 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
       }
       delay(0);
     });
+}
+
+bool ESP8266HTTPUpdateServer::setLoginPassword(const char * username, const char * password) {
+	
+	if(!_hash.length() && !_username.length() && !_password.length() && username && password) {
+		_username = username;
+		_password = password;
+		return true;
+	}
+	
+	return false;
+}
+	
+bool ESP8266HTTPUpdateServer::setLoginPasswordHASH(const char * hash) {
+	
+	if(!_hash.length() && !_username.length() && !_password.length() && hash) {
+		_hash = hash;
+		return true;
+	}
+	
+	return false;
 }
