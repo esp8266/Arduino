@@ -317,36 +317,47 @@ int MDNSResponder::queryService(char *service, char *proto) {
   // Only supports sending one PTR query
   uint8_t questionCount = 1;
 
-  // Write the header
-  _conn->flush();
-  uint8_t head[12] = {
-    0x00, 0x00, //ID = 0
-    0x00, 0x00, //Flags = response + authoritative answer
-    0x00, questionCount, //Question count
-    0x00, 0x00, //Answer count
-    0x00, 0x00, //Name server records
-    0x00, 0x00 //Additional records
-  };
-  _conn->append(reinterpret_cast<const char*>(head), 12);
-
-  // Only supports sending one PTR query
-  // Send the Name field (eg. "_http._tcp.local")
-  _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_" + service
-  _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_" + service
-  _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_" + proto
-  _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_" + proto
-  _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght of "local"
-  _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
-  _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
-    
-  //Send the type and class
-  uint8_t ptrAttrs[4] = {
-    0x00, 0x0c, //PTR record query
-    0x00, 0x01 //Class IN
-  };
-  _conn->append(reinterpret_cast<const char*>(ptrAttrs), 4);
   _waitingForAnswers = true;
-  _conn->send();
+  for (int itfn = 0; itfn < 2; itfn++) {
+    struct ip_info ip_info;
+    ip_addr_t ifaddr;
+
+    wifi_get_ip_info((!itfn) ? SOFTAP_IF : STATION_IF, &ip_info);
+    if (!ip_info.ip.addr)
+      continue;
+    ifaddr.addr = ip_info.ip.addr;
+    _conn->setMulticastInterface(ifaddr);
+
+    // Write the header
+    _conn->flush();
+    uint8_t head[12] = {
+      0x00, 0x00, //ID = 0
+      0x00, 0x00, //Flags = response + authoritative answer
+      0x00, questionCount, //Question count
+      0x00, 0x00, //Answer count
+      0x00, 0x00, //Name server records
+      0x00, 0x00 //Additional records
+    };
+    _conn->append(reinterpret_cast<const char*>(head), 12);
+
+    // Only supports sending one PTR query
+    // Send the Name field (eg. "_http._tcp.local")
+    _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_" + service
+    _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_" + service
+    _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_" + proto
+    _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_" + proto
+    _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght of "local"
+    _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+    _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
+
+    //Send the type and class
+    uint8_t ptrAttrs[4] = {
+      0x00, 0x0c, //PTR record query
+      0x00, 0x01 //Class IN
+    };
+    _conn->append(reinterpret_cast<const char*>(ptrAttrs), 4);
+    _conn->send();
+  }
 
 #ifdef MDNS_DEBUG_TX
   Serial.println("Waiting for answers..");
