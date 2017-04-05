@@ -62,6 +62,9 @@ class FS;
 
 class ESP8266WebServer
 {
+private:
+	bool authenticate(const char * username, const char * password, const char * hash);
+  
 public:
   ESP8266WebServer(IPAddress addr, int port = 80);
   ESP8266WebServer(int port = 80);
@@ -73,8 +76,17 @@ public:
   void close();
   void stop();
 
-  bool authenticate(const char * username, const char * password);
-  bool authenticateHash(const char * hash);
+  
+  bool authenticate(const char * username, const char * password)
+    {
+      return authenticate(const char * username, const char * password, NULL);
+	}
+	
+  bool authenticate(const char * hash)
+    {
+      return authenticate(NULL, NULL, const char * hash);
+	}
+  
   char* getUserPasswordHash(const char * username, const char * password);
   void requestAuthentication();
 

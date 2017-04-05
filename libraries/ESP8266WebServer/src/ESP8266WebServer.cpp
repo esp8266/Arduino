@@ -119,14 +119,19 @@ char* ESP8266WebServer::getUserPasswordHash(const char * username, const char * 
     return NULL;
 }
 
-bool ESP8266WebServer::authenticate(const char * username, const char * password){
+bool ESP8266WebServer::authenticate(const char * username, const char * password, const char * hash) {
   if(hasHeader(AUTHORIZATION_HEADER)){
     String authReq = header(AUTHORIZATION_HEADER);
     if(authReq.startsWith("Basic")){
       authReq = authReq.substring(6);
       authReq.trim();
       
-	  char *encoded = getUserPasswordHash(username, password);
+	  if (hash == NULL) {
+		char *encoded = getUserPasswordHash(username, password);
+	  }
+	  else {
+		char *encoded = hash;
+	  }
 	  
 	  if(encoded != NULL && authReq.equals(encoded)){
         authReq = String();
@@ -140,6 +145,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
   return false;
 }
 
+/*
 bool ESP8266WebServer::authenticateHash(const char * hash){
   if(hasHeader(AUTHORIZATION_HEADER)){
     String authReq = header(AUTHORIZATION_HEADER);
@@ -156,6 +162,7 @@ bool ESP8266WebServer::authenticateHash(const char * hash){
   }
   return false;
 }
+*/
 
 void ESP8266WebServer::requestAuthentication(){
   sendHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
