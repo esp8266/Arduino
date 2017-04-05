@@ -1,6 +1,7 @@
 BINARY_DIRECTORY := bin
 OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
 CORE_PATH := ../../cores/esp8266
+SDK_PATH := ../../tools/sdk/include
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
@@ -43,6 +44,7 @@ MOCK_C_FILES := $(addprefix common/,\
 INC_PATHS += $(addprefix -I, \
 	common \
 	$(CORE_PATH) \
+	$(SDK_PATH) \
 )
 
 TEST_CPP_FILES := \
