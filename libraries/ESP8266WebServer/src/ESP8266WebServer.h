@@ -79,12 +79,12 @@ public:
   
   bool authenticate(const char * username, const char * password)
     {
-      return authenticate(const char * username, const char * password, NULL);
+      return authenticate(username, password, NULL);
 	}
 	
   bool authenticate(const char * hash)
     {
-      return authenticate(NULL, NULL, const char * hash);
+      return authenticate(NULL, NULL, hash);
 	}
   
   char* getUserPasswordHash(const char * username, const char * password);
