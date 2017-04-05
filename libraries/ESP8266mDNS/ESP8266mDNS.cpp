@@ -888,7 +888,7 @@ size_t MDNSResponder::advertiseServices(){
       if (ip)
         _reply(0x0F, servicePtr->_name, servicePtr->_proto, servicePtr->_port, ip);
 
-      wifi_get_ip_info(SOFTAP_IF, &ip_info);
+      wifi_get_ip_info(STATION_IF, &ip_info);
       ip = ip_info.ip.addr;
       if (ip)
         _reply(0x0F, servicePtr->_name, servicePtr->_proto, servicePtr->_port, ip);
