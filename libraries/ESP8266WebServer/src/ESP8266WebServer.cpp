@@ -119,14 +119,14 @@ char* ESP8266WebServer::getUserPasswordHash(const char * username, const char * 
     return NULL;
 }
 
-bool ESP8266WebServer::authenticate(const char * username, const char * password, const char * hash) {
+bool ESP8266WebServer::authenticate(const char * username, const char * password, const char * hashUNP) {
   if(hasHeader(AUTHORIZATION_HEADER)){
     String authReq = header(AUTHORIZATION_HEADER);
     if(authReq.startsWith("Basic")){
       authReq = authReq.substring(6);
       authReq.trim();
       
-	  const char *encoded = (hash == NULL) ? getUserPasswordHash(username, password) : hash;
+	  const char *encoded = (hashUNP == NULL) ? getUserPasswordHash(username, password) : hashUNP;
 	  
 	  if(encoded != NULL && authReq.equals(encoded)){
         authReq = String();
