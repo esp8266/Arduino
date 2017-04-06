@@ -25,7 +25,7 @@ class ESP8266HTTPUpdateServer
 	void setup(ESP8266WebServer *server, const char * path);
 
 	void setup(ESP8266WebServer *server)
-    {
+    { 
       setup(server, "/update");
     }
 	
