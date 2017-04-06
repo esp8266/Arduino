@@ -130,10 +130,15 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
 	  
 	  if(encoded != NULL && authReq.equals(encoded)){
         authReq = String();
-        delete[] encoded;
+        if (hashUNP == NULL) {
+			delete[] encoded;
+		}
         return true;
       }
-	  delete[] encoded;
+	  
+	  if (hashUNP == NULL) {
+		delete[] encoded;
+	  }
     }
     authReq = String();
   }
