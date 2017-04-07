@@ -154,6 +154,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
 
     ETS_UART_INTR_DISABLE();
     if(connect) {
+        wifi_station_disconnect();
         wifi_station_connect();
     }
     ETS_UART_INTR_ENABLE();
