@@ -98,17 +98,112 @@ struct MDNSService {
   uint16_t _txtLen; // length of all txts 
 };
 
-struct MDNSTxt{
-  MDNSTxt * _next;
-  String _txt;
-};
+MDNSTxt::MDNSTxt() :
+  _next(nullptr),
+  _txt()
+{}
 
-struct MDNSAnswer {
-  MDNSAnswer* next;
-  MDNSTxt * txts;
-  uint8_t ip[4];
-  uint16_t port;
-  char *hostname;
+MDNSTxt::~MDNSTxt(){
+  if(_next != nullptr){
+    delete _next;
+  }
+}
+
+MDNSAnswer::MDNSAnswer() :
+  txts(nullptr),
+  ip({0,0,0,0}),
+  port(0),
+  hostname(nullptr)
+{}
+
+MDNSAnswer::~MDNSAnswer(){
+  if(txts != nullptr){
+    delete txts;
+  }
+  if(hostname != nullptr){
+    delete[] hostname;
+  }
+}
+
+String MDNSAnswer::getHostname(){
+  return hostname;
+}
+
+IPAddress MDNSAnswer::getIP(){
+  return IPAddress(ip);
+}
+
+uint16_t MDNSAnswer::getPort(){
+  return port;
+}
+
+int MDNSAnswer::numTxt(){
+  MDNSTxt *txt = txts;
+  int numTxt = 0;
+  while(txt != nullptr){
+    numTxt++;
+    txt = txt->_next;
+  }
+  return numTxt;
+}
+
+bool MDNSAnswer::hasTxt(char * key){
+  MDNSTxt *txt = txts;
+  while(txt != nullptr){
+    if(txt->_txt.startsWith(String(key)+'=')){
+      return true;
+    }
+    txt = txt->_next;
+  }
+  return false;
+}
+
+String MDNSAnswer::getTxt(char * key){
+  MDNSTxt *txt = txts;
+  String cmp = String(key)+'=';
+  while(txt != nullptr){
+    if(txt->_txt.startsWith(cmp)){
+      return txt->_txt.substring(cmp.length());
+    }
+    txt = txt->_next;
+  }
+  return String();
+}
+
+std::pair<String,String> MDNSAnswer::getTxt(int idx){
+  String tmp = getTxtString(idx);
+  int loc = tmp.indexOf('=');
+  if(loc == -1){
+    return std::make_pair(tmp,String());
+  }
+  else if(loc+1 == tmp.length()){ //the = is the last character
+    return std::make_pair(tmp.substring(0,loc),String());
+  }
+  else{
+    return std::make_pair(tmp.substring(0,loc),tmp.substring(loc+1));
+  }
+}
+
+String MDNSAnswer::getTxtString(int idx){
+  MDNSTxt *txt = txts;
+  while(txt != nullptr && idx-- > 0){
+    txt = txt->_next;
+  }
+  if(idx > 0 || txt==nullptr){
+    return String();
+  }
+  return txt->_txt;
+}
+
+struct MDNSAnswerList {
+  MDNSAnswerList() : next(nullptr), answer() {}
+  ~MDNSAnswerList(){
+    if(next != nullptr){
+      delete next;
+    }
+  }
+  MDNSAnswerList* next;
+  MDNSAnswer answer;
 };
 
 struct MDNSQuery {
@@ -117,14 +212,18 @@ struct MDNSQuery {
 };
 
 
-MDNSResponder::MDNSResponder() : _conn(0) { 
-  _services = 0;
-  _instanceName = ""; 
-  _answers = 0;
-  _query = 0;
-  _newQuery = false;
-  _waitingForAnswers = false;
-}
+MDNSResponder::MDNSResponder() :
+  _services(nullptr),
+  _conn(nullptr),
+  _hostName(),
+  _instanceName(), 
+  _answers(nullptr),
+  _query(nullptr),
+  _newQuery(false),
+  _waitingForAnswers(false),
+  _answerCallback()
+{}
+
 MDNSResponder::~MDNSResponder() {
   if (_query != 0) {
     os_free(_query);
@@ -132,22 +231,10 @@ MDNSResponder::~MDNSResponder() {
   }
 
   // Clear answer list
-  MDNSAnswer *answer;
-  int numAnswers = _getNumAnswers();
-  for (int n = numAnswers - 1; n >= 0; n--) {
-    answer = _getAnswerFromIdx(n);
-    os_free(answer->hostname);
-    os_free(answer);
-    MDNSTxt *txt;
-    MDNSTxt *nextTxt = answer->txts;
-    while(nextTxt != nullptr){
-      txt = nextTxt;
-      nextTxt = nextTxt->_next;
-      delete txt;
-    }
-    answer = 0;
+  if(_answers != nullptr){
+    delete _answers;
+    _answers = nullptr;
   }
-  _answers = 0;
 
   if (_conn) {
     _conn->unref();
@@ -368,23 +455,23 @@ int MDNSResponder::queryService(char *service, char *proto) {
 
 String MDNSResponder::hostname(int idx) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == 0) {
+  if (answer == nullptr) {
     return String();
   }
-  return answer->hostname;
+  return answer->getHostname();
 }
 
 IPAddress MDNSResponder::IP(int idx) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == 0) {
+  if (answer == nullptr) {
     return IPAddress();
   }
-  return IPAddress(answer->ip);
+  return answer->getIP();
 }
 
 uint16_t MDNSResponder::port(int idx) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == 0) {
+  if (answer == nullptr) {
     return 0;
   }
   return answer->port;
@@ -392,78 +479,58 @@ uint16_t MDNSResponder::port(int idx) {
 
 int MDNSResponder::numTxt(int idx) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == 0) {
+  if (answer == nullptr) {
     return 0;
   }
-  MDNSTxt *txt = answer->txts;
-  int numTxt = 0;
-  while(txt != nullptr){
-    numTxt++;
-    txt = txt->_next;
-  }
-  return numTxt;
+  return answer->numTxt();
 }
 
 bool MDNSResponder::hasTxt(int idx, char * key) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == 0) {
+  if (answer == nullptr) {
     return false;
   }
-  MDNSTxt *txt = answer->txts;
-  while(txt != nullptr){
-    if(txt->_txt.startsWith(String(key)+'=')){
-      return true;
-    }
-    txt = txt->_next;
-  }
-  return false;
+  return answer->hasTxt(key);
 }
 
 String MDNSResponder::txt(int idx, char * key) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == 0) {
+  if (answer == nullptr) {
     return String();
   }
-  MDNSTxt *txt = answer->txts;
-  String cmp = String(key)+'=';
-  while(txt != nullptr){
-    if(txt->_txt.startsWith(cmp)){
-      return txt->_txt.substring(cmp.length());
-    }
-    txt = txt->_next;
-  }
-  return String();
+  return answer->getTxt(key);
 }
 
 String MDNSResponder::txt(int idx, int txtIdx) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == 0) {
+  if (answer == nullptr) {
     return String();
   }
-  MDNSTxt *txt = answer->txts;
-  while(txt != nullptr && txtIdx-- > 0){
-    txt = txt->_next;
-  }
-  if(txtIdx > 0 || txt==nullptr){
-    return String();
-  }
-  return txt->_txt;
+  answer->getTxtString(txtIdx);
+}
+
+MDNSAnswer* MDNSResponder::getAnswer(int idx) {
+  return _getAnswerFromIdx(idx);
+}
+
+void MDNSResponder::setAnswerCallback(std::function<void(MDNSAnswer*)> cb){
+  _answerCallback = cb;
 }
 
 MDNSAnswer* MDNSResponder::_getAnswerFromIdx(int idx) {
-  MDNSAnswer *answer = _answers;
-  while (answer != 0 && idx-- > 0) {
+  MDNSAnswerList *answer = _answers;
+  while (answer != nullptr && idx-- > 0) {
     answer = answer->next;
   }
-  if (idx > 0) {
-    return 0;
+  if (idx > 0 || answer == nullptr) {
+    return nullptr;
   }
-  return answer;
+  return &answer->answer;
 }
 
 int MDNSResponder::_getNumAnswers() {
   int numAnswers = 0;
-  MDNSAnswer *answer = _answers;
+  MDNSAnswerList *answer = _answers;
   while (answer != 0) {
     numAnswers++;
     answer = answer->next;
@@ -534,7 +601,7 @@ void MDNSResponder::_parsePacket(){
     Serial.printf("Reading answers RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
 #endif
 
-    if (!_waitingForAnswers) {
+    if (!_waitingForAnswers && !_answerCallback) {
 #ifdef MDNS_DEBUG_RX
       Serial.println("Not expecting any answers right now, returning");
 #endif
@@ -558,7 +625,7 @@ void MDNSResponder::_parsePacket(){
     char answerHostName[255];
     MDNSTxt * txtPtr = nullptr;
     bool serviceMatch = false;
-    MDNSAnswer *answer;
+    MDNSAnswerList *answer;
     uint8_t partsCollected = 0;
     uint8_t stringsRead = 0;
 
@@ -566,21 +633,10 @@ void MDNSResponder::_parsePacket(){
 
     // Clear answer list
     if (_newQuery) {
-      int oldAnswers = _getNumAnswers();
-      for (int n = oldAnswers - 1; n >= 0; n--) {
-        answer = _getAnswerFromIdx(n);
-        os_free(answer->hostname);
-        os_free(answer);
-        MDNSTxt *txt;
-        MDNSTxt *nextTxt = answer->txts;
-        while(nextTxt != nullptr){
-          txt = nextTxt;
-          nextTxt = nextTxt->_next;
-          delete txt;
-        }
-        answer = 0;
+      if(_answers != nullptr){
+        delete _answers;
+        _answers = nullptr;
       }
-      _answers = 0;
       _newQuery = false;
     }
 
@@ -734,33 +790,42 @@ void MDNSResponder::_parsePacket(){
       }
 
       if ((partsCollected == 0x0F) && serviceMatch) {
+        if(_waitingForAnswers){
 #ifdef MDNS_DEBUG_RX
-        Serial.println("All answers parsed, adding to _answers list..");
+          Serial.println("All answers parsed, adding to _answers list..");
 #endif
-        // Add new answer to answer list
-        if (_answers == 0) {
-          _answers = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
-          answer = _answers;
-        }
-        else {
-          answer = _answers;
-          while (answer->next != 0) {
+          // Add new answer to answer list
+          if (_answers == nullptr) {
+            _answers = new MDNSAnswerList();
+            answer = _answers;
+          }
+          else {
+            answer = _answers;
+            while (answer->next != nullptr) {
+              answer = answers->next;
+            }
+            answer->next = new MDNSAnswerList();
             answer = answer->next;
           }
-          answer->next = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
-          answer = answer->next;
         }
-        answer->next = 0;
-        answer->hostname = 0;
-        answer->txts = txtPtr;
+        else{ //must want an answerCallback
+          answer = new MDNSAnswerList();
+        }
 
         // Populate new answer
-        answer->port = answerPort;
+        answer->answer.txts = txtPtr;
+        answer->answer.port = answerPort;
         for (int i = 0; i < 4; i++) {
-          answer->ip[i] = answerIp[i];
+          answer->answer.ip[i] = answerIp[i];
         }
-        answer->hostname = (char *)os_malloc(strlen(answerHostName) + 1);
-        os_strcpy(answer->hostname, answerHostName);
+        answer->answer.hostname = new char [strlen(answerHostName) + 1];
+        os_strcpy(answer->answer.hostname, answerHostName);
+        if(!_waitingForAnswers){
+          if(_answerCallback){ //double-check just to be sure, but this should be OK
+            _answerCallback(&answer->answer);
+          }
+          delete answer;
+        }
         _conn->flush();
         return;
       }

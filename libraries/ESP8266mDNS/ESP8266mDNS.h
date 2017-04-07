@@ -54,8 +54,38 @@ License (MIT license):
 class UdpContext;
 
 struct MDNSService;
-struct MDNSTxt;
-struct MDNSAnswer;
+class MDNSTxt{
+friend class MDNSAnswer;
+friend class MDNSResponder;
+public:
+  MDNSTxt();
+  ~MDNSTxt();
+private:
+  MDNSTxt * _next;
+  String _txt;
+};
+class MDNSAnswer {
+friend class MDNSResponder;
+public:
+  MDNSAnswer();
+  ~MDNSAnswer();
+
+  String getHostname();
+  IPAddress getIP();
+  uint16_t getPort();
+  int numTxt();
+  bool hasTxt(char * key);
+  String getTxt(char * key);
+  std::pair<String,String> getTxt(int idx);
+  String getTxtString(int idx);
+
+private:
+  MDNSTxt * txts;
+  uint8_t ip[4];
+  uint16_t port;
+  char *hostname;
+};
+struct MDNSAnswerList;
 
 class MDNSResponder {
 public:
@@ -102,6 +132,9 @@ public:
   bool hasTxt(int idx, char * key);
   String txt(int idx, char * key);
   String txt(int idx, int txtIdx);
+  MDNSAnswer* getAnswer(int idx);
+
+  void setAnswerCallback(std::function<void(MDNSAnswer*)>);
   
   void enableArduino(uint16_t port, bool auth=false);
 
@@ -118,12 +151,13 @@ private:
   UdpContext* _conn;
   String _hostName;
   String _instanceName;
-  struct MDNSAnswer * _answers;
+  struct MDNSAnswerList * _answers;
   struct MDNSQuery * _query;
   bool _newQuery;
   bool _waitingForAnswers;
   WiFiEventHandler _disconnectedHandler;
   WiFiEventHandler _gotIPHandler;
+  std::function<void(MDNSAnswer*)> _answerCallback;
   
 
   uint16_t _getServicePort(char *service, char *proto);
