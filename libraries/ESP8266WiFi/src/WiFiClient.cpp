@@ -165,6 +165,11 @@ bool WiFiClient::getNoDelay() {
     return _client->getNoDelay();
 }
 
+size_t WiFiClient::availableForWrite ()
+{
+    return _client->availableForWrite();
+}
+
 size_t WiFiClient::write(uint8_t b)
 {
     return write(&b, 1);
