@@ -30,6 +30,8 @@
 
 #define WIFICLIENT_MAX_PACKET_SIZE 1460
 
+extern char lwip_bufferize;
+
 class ClientContext;
 class WiFiServer;
 
@@ -74,6 +76,8 @@ public:
   bool getNoDelay();
   void setNoDelay(bool nodelay);
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
+
+  size_t ESPWriteAvailable();
 
   friend class WiFiServer;
 

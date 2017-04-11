@@ -36,6 +36,9 @@ typedef int32_t recv_ret_t;
 #endif
 
 #include "DataSource.h"
+#include "cbuf.h"
+
+extern char lwip_bufferize;
 
 class ClientContext
 {
@@ -49,6 +52,12 @@ public:
         tcp_sent(pcb, &_s_sent);
         tcp_err(pcb, &_s_error);
         tcp_poll(pcb, &_s_poll, 1);
+
+	if(lwip_bufferize) {
+            /* cbuf impl. handles size-1 bytes at most,
+               we want the whole TCP_WND at least */
+            _rx_full_buf = new cbuf(TCP_WND + 1);
+        }
     }
 
     err_t abort()
@@ -89,6 +98,13 @@ public:
 
     ~ClientContext()
     {
+        if(_rx_full_buf)
+            delete _rx_full_buf;
+    }
+
+    uint16_t writeAvailable ()
+    {
+        return _pcb? tcp_sndbuf(_pcb): 0;
     }
 
     ClientContext* next() const
@@ -192,6 +208,9 @@ public:
 
     size_t getSize() const
     {
+        if(_rx_full_buf) {
+            return _rx_full_buf->available();
+        }
         if(!_rx_buf) {
             return 0;
         }
@@ -201,6 +220,15 @@ public:
 
     char read()
     {
+        if(_rx_full_buf) {
+            if(!_rx_full_buf->available())
+                return 0;
+            if(_pcb) {
+                tcp_recved(_pcb, 1);
+            }
+            return (char)_rx_full_buf->read();
+        }
+
         if(!_rx_buf) {
             return 0;
         }
@@ -212,6 +240,15 @@ public:
 
     size_t read(char* dst, size_t size)
     {
+        if(_rx_full_buf) {
+            DEBUGV(":rdifb %d\r\n", size);
+            size_t size_read = _rx_full_buf->read(dst, size);
+            if(_pcb) {
+                tcp_recved(_pcb, size_read);
+            }
+            return size_read;
+        }
+
         if(!_rx_buf) {
             return 0;
         }
@@ -236,6 +273,9 @@ public:
 
     char peek()
     {
+        if(_rx_full_buf) {
+            return _rx_full_buf->available()? (char)_rx_full_buf->peek(): 0;
+        }
         if(!_rx_buf) {
             return 0;
         }
@@ -245,6 +285,10 @@ public:
 
     size_t peekBytes(char *dst, size_t size)
     {
+	if(_rx_full_buf) {
+	    return _rx_full_buf->peek(dst, size);
+	}
+
         if(!_rx_buf) {
             return 0;
         }
@@ -262,6 +306,13 @@ public:
 
     void flush()
     {
+        if(_rx_full_buf) {
+            if(_pcb) {
+                tcp_recved(_pcb, _rx_full_buf->available());
+            }
+            return _rx_full_buf->flush();
+        }
+
         if(!_rx_buf) {
             return;
         }
@@ -353,6 +404,7 @@ protected:
             err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
             _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
+		DEBUGV(":w %d\r\n", next_chunk);
                 _written += next_chunk;
                 did_write = true;
             }
@@ -420,7 +472,24 @@ protected:
             return ERR_ABRT;
         }
 
-        if(_rx_buf) {
+        if(_rx_full_buf) {
+            DEBUGV(":rfb0\r\n");
+            for (pbuf* p = pb; p; p = p->next) {
+                /* cbuf does not like null pointer and 0 size */
+                if(p->len) {
+	            DEBUGV(":rfb %d, %d\r\n", _rx_full_buf->available(), p->len);
+                    size_t test = _rx_full_buf->write((const char*)p->payload, p->len);
+                    if(test != p->len) {
+                        /* internal error, cbuf is supposed to contain all receivable data (TCP_WND) */
+                        printf/*DEBUGV*/(":rfbe %d %d %d !IntErr!\r\n", test, p->len, _rx_full_buf->available());
+                        pbuf_free(pb);
+                        return ERR_ABRT;
+                    }
+                }
+            }
+            pbuf_free(pb);
+        }
+        else if(_rx_buf) {
             DEBUGV(":rch %d, %d\r\n", _rx_buf->tot_len, pb->tot_len);
             pbuf_cat(_rx_buf, pb);
         } else {
@@ -480,6 +549,8 @@ private:
 
     int _refcnt;
     ClientContext* _next;
+
+    cbuf* _rx_full_buf = nullptr;
 
     DataSource* _datasource = nullptr;
     size_t _written = 0;

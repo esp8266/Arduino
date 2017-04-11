@@ -41,6 +41,8 @@ extern "C"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
+char lwip_bufferize = 1;
+
 uint16_t WiFiClient::_localPort = 0;
 
 template<>
@@ -161,6 +163,10 @@ bool WiFiClient::getNoDelay() {
     if (!_client)
         return false;
     return _client->getNoDelay();
+}
+
+size_t WiFiClient::ESPWriteAvailable() {
+    return _client->writeAvailable();
 }
 
 size_t WiFiClient::write(uint8_t b)
