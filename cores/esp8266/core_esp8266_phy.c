@@ -88,10 +88,10 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     // 0: 40MHz
     // 1: 26MHz
     // 2: 24MHz
-    #ifdef F_CRYSTAL
-    [48] = F_CRYSTAL,
+    #if F_CRYSTAL == 40000000
+      [48] = 0,
     #else
-    [48] = 1,
+      [48] = 1,
     #endif
 
 
@@ -316,4 +316,3 @@ void user_rf_pre_init()
 
 
 void ICACHE_RAM_ATTR user_spi_flash_dio_to_qio_pre_init() {}
-

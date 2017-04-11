@@ -25,7 +25,6 @@ generic.serial.disableRTS=true
 
 generic.build.mcu=esp8266
 generic.build.f_cpu=80000000L
-generic.build.f_crystal=1
 generic.build.board=ESP8266_ESP01
 generic.build.core=esp8266
 generic.build.variant=generic
@@ -38,13 +37,6 @@ generic.menu.CpuFrequency.80=80 MHz
 generic.menu.CpuFrequency.80.build.f_cpu=80000000L
 generic.menu.CpuFrequency.160=160 MHz
 generic.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-generic.menu.CrystalFreq.24=24 MHz
-generic.menu.CrystalFreq.24.build.f_crystal=2
-generic.menu.CrystalFreq.26=26 MHz
-generic.menu.CrystalFreq.26.build.f_crystal=1
-generic.menu.CrystalFreq.40=40 MHz
-generic.menu.CrystalFreq.40.build.f_crystal=0
 
 generic.menu.FlashFreq.40=40MHz
 generic.menu.FlashFreq.40.build.flash_freq=40
@@ -256,7 +248,6 @@ esp8285.serial.disableRTS=true
 
 esp8285.build.mcu=esp8266
 esp8285.build.f_cpu=80000000L
-esp8285.build.f_crystal=1
 esp8285.build.board=ESP8266_ESP01
 esp8285.build.core=esp8266
 esp8285.build.variant=generic
@@ -270,13 +261,6 @@ esp8285.menu.CpuFrequency.80=80 MHz
 esp8285.menu.CpuFrequency.80.build.f_cpu=80000000L
 esp8285.menu.CpuFrequency.160=160 MHz
 esp8285.menu.CpuFrequency.160.build.f_cpu=160000000L
-
-esp8285.menu.CrystalFreq.24=24 MHz
-esp8285.menu.CrystalFreq.24.build.f_crystal=2
-esp8285.menu.CrystalFreq.26=26 MHz
-esp8285.menu.CrystalFreq.26.build.f_crystal=1
-esp8285.menu.CrystalFreq.40=40 MHz
-esp8285.menu.CrystalFreq.40.build.f_crystal=0
 
 esp8285.menu.UploadSpeed.115200=115200
 esp8285.menu.UploadSpeed.115200.upload.speed=115200
@@ -369,7 +353,6 @@ espduino.serial.disableRTS=true
 
 espduino.build.mcu=esp8266
 espduino.build.f_cpu=80000000L
-espduino.build.f_crystal=1
 espduino.build.board=ESP8266_ESP13
 espduino.build.core=esp8266
 espduino.build.variant=ESPDuino
@@ -433,7 +416,6 @@ huzzah.serial.disableRTS=true
 
 huzzah.build.mcu=esp8266
 huzzah.build.f_cpu=80000000L
-huzzah.build.f_crystal=1
 huzzah.build.board=ESP8266_ESP12
 huzzah.build.core=esp8266
 huzzah.build.variant=adafruit
@@ -485,7 +467,6 @@ espresso_lite_v1.upload.wait_for_upload_port=true
 
 espresso_lite_v1.build.mcu=esp8266
 espresso_lite_v1.build.f_cpu=80000000L
-espresso_lite_v1.build.f_crystal=1
 espresso_lite_v1.build.board=ESP8266_ESPRESSO_LITE_V1
 espresso_lite_v1.build.core=esp8266
 espresso_lite_v1.build.variant=espresso_lite_v1
@@ -591,7 +572,6 @@ espresso_lite_v2.upload.wait_for_upload_port=true
 
 espresso_lite_v2.build.mcu=esp8266
 espresso_lite_v2.build.f_cpu=80000000L
-espresso_lite_v2.build.f_crystal=1
 espresso_lite_v2.build.board=ESP8266_ESPRESSO_LITE_V2
 espresso_lite_v2.build.core=esp8266
 espresso_lite_v2.build.variant=espresso_lite_v2
@@ -697,7 +677,6 @@ phoenix_v1.upload.wait_for_upload_port=true
 
 phoenix_v1.build.mcu=esp8266
 phoenix_v1.build.f_cpu=80000000L
-phoenix_v1.build.f_crystal=1
 phoenix_v1.build.board=ESP8266_PHOENIX_V1
 phoenix_v1.build.core=esp8266
 phoenix_v1.build.variant=phoenix_v1
@@ -803,7 +782,6 @@ phoenix_v2.upload.wait_for_upload_port=true
 
 phoenix_v2.build.mcu=esp8266
 phoenix_v2.build.f_cpu=80000000L
-phoenix_v2.build.f_crystal=1
 phoenix_v2.build.board=ESP8266_PHOENIX_V2
 phoenix_v2.build.core=esp8266
 phoenix_v2.build.variant=phoenix_v2
@@ -913,7 +891,6 @@ nodemcu.serial.disableRTS=true
 
 nodemcu.build.mcu=esp8266
 nodemcu.build.f_cpu=80000000L
-nodemcu.build.f_crystal=1
 nodemcu.build.board=ESP8266_NODEMCU
 nodemcu.build.core=esp8266
 nodemcu.build.variant=nodemcu
@@ -978,7 +955,6 @@ nodemcuv2.serial.disableRTS=true
 
 nodemcuv2.build.mcu=esp8266
 nodemcuv2.build.f_cpu=80000000L
-nodemcuv2.build.f_crystal=1
 nodemcuv2.build.board=ESP8266_NODEMCU
 nodemcuv2.build.core=esp8266
 nodemcuv2.build.variant=nodemcu
@@ -1044,7 +1020,6 @@ modwifi.serial.disableRTS=true
 
 modwifi.build.mcu=esp8266
 modwifi.build.f_cpu=80000000L
-modwifi.build.f_crystal=1
 modwifi.build.board=MOD_WIFI_ESP8266
 modwifi.build.core=esp8266
 modwifi.build.variant=generic
@@ -1099,7 +1074,6 @@ thing.serial.disableRTS=true
 
 thing.build.mcu=esp8266
 thing.build.f_cpu=80000000L
-thing.build.f_crystal=1
 thing.build.board=ESP8266_THING
 thing.build.core=esp8266
 thing.build.variant=thing
@@ -1153,7 +1127,6 @@ thingdev.serial.disableRTS=true
 
 thingdev.build.mcu=esp8266
 thingdev.build.f_cpu=80000000L
-thingdev.build.f_crystal=1
 thingdev.build.board=ESP8266_THING_DEV
 thingdev.build.core=esp8266
 thingdev.build.variant=thing
@@ -1203,7 +1176,6 @@ esp210.serial.disableRTS=true
 
 esp210.build.mcu=esp8266
 esp210.build.f_cpu=80000000L
-esp210.build.f_crystal=1
 esp210.build.board=ESP8266_ESP210
 esp210.build.core=esp8266
 esp210.build.variant=generic
@@ -1263,7 +1235,6 @@ esp210.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 #
 # wifio.build.mcu=esp8266
 # wifio.build.f_cpu=80000000L
-# wifio.build.f_crystal=1
 # wifio.build.board=ESP8266_WIFIO
 # wifio.build.core=esp8266
 # wifio.build.variant=wifio
@@ -1296,7 +1267,6 @@ d1_mini.serial.disableRTS=true
 
 d1_mini.build.mcu=esp8266
 d1_mini.build.f_cpu=80000000L
-d1_mini.build.f_crystal=1
 d1_mini.build.board=ESP8266_WEMOS_D1MINI
 d1_mini.build.core=esp8266
 d1_mini.build.variant=d1_mini
@@ -1362,7 +1332,6 @@ d1.serial.disableRTS=true
 
 d1.build.mcu=esp8266
 d1.build.f_cpu=80000000L
-d1.build.f_crystal=1
 d1.build.board=ESP8266_WEMOS_D1MINI
 d1.build.core=esp8266
 d1.build.variant=d1
@@ -1430,7 +1399,6 @@ espino.serial.disableRTS=true
 
 espino.build.mcu=esp8266
 espino.build.f_cpu=80000000L
-espino.build.f_crystal=1
 espino.build.board=ESP8266_ESP12
 espino.build.core=esp8266
 espino.build.variant=espino
@@ -1506,7 +1474,6 @@ espinotee.serial.disableRTS=true
 
 espinotee.build.mcu=esp8266
 espinotee.build.f_cpu=80000000L
-espinotee.build.f_crystal=1
 espinotee.build.board=ESP8266_ESP13
 espinotee.build.core=esp8266
 espinotee.build.variant=espinotee
@@ -1572,7 +1539,6 @@ wifinfo.serial.disableRTS=true
 wifinfo.build.mcu=esp8266
 wifinfo.build.core=esp8266
 wifinfo.build.variant=wifinfo
-wifinfo.build.f_crystal=1
 wifinfo.build.board=WIFINFO
 wifinfo.build.spiffs_pagesize=256
 wifinfo.build.debug_port=Serial1
@@ -1703,7 +1669,6 @@ coredev.serial.disableRTS=true
 
 coredev.build.mcu=esp8266
 coredev.build.f_cpu=80000000L
-coredev.build.f_crystal=1
 coredev.build.board=ESP8266_ESP01
 coredev.build.core=esp8266
 coredev.build.variant=generic
@@ -1945,25 +1910,29 @@ arduino-esp8266.serial.disableRTS=true
 
 arduino-esp8266.build.mcu=esp8266
 arduino-esp8266.build.f_cpu=80000000L
-arduino-esp8266.build.f_crystal=0
+#arduino-esp8266.build.f_crystal=40000000
 arduino-esp8266.build.core=esp8266
 arduino-esp8266.build.flash_mode=qio
 arduino-esp8266.build.flash_size=4M
 arduino-esp8266.build.flash_freq=40
 arduino-esp8266.build.debug_port=
 arduino-esp8266.build.debug_level=
+arduino-esp8266.build.board=ESP8266_ARDUINO
 
 arduino-esp8266.menu.BoardModel.starottodeved=Star OTTO
-arduino-esp8266.menu.BoardModel.starottodeved.build.board=star_otto
+arduino-esp8266.menu.BoardModel.starottodeved.build.board=ESP8266_ARDUINO_STAR_OTTO
 arduino-esp8266.menu.BoardModel.starottodeved.build.variant=arduino_uart
+arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000
 
 arduino-esp8266.menu.BoardModel.primo=Primo
-arduino-esp8266.menu.BoardModel.primo.build.board=primo
+arduino-esp8266.menu.BoardModel.primo.build.board=ESP8266_ARDUINO_PRIMO
 arduino-esp8266.menu.BoardModel.primo.build.variant=arduino_spi
+arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000
 
 arduino-esp8266.menu.BoardModel.unowifideved=Uno WiFi
-arduino-esp8266.menu.BoardModel.unowifideved.build.board=unowifi
+arduino-esp8266.menu.BoardModel.unowifideved.build.board=ESP8266_ARDUINO_UNOWIFI
 arduino-esp8266.menu.BoardModel.unowifideved.build.variant=arduino_uart
+arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000
 
 arduino-esp8266.menu.UploadSpeed.9600=9600
 arduino-esp8266.menu.UploadSpeed.9600.upload.speed=9600
