@@ -282,7 +282,7 @@ bigint *bi_add(BI_CTX *ctx, bigint *bia, bigint *bib)
     check(bia);
     check(bib);
 
-    n = max(bia->size, bib->size);
+    n = axtls_max(bia->size, bib->size);
     more_comps(bia, n+1);
     more_comps(bib, n);
     pa = bia->comps;
@@ -876,7 +876,7 @@ static bigint *karatsuba(BI_CTX *ctx, bigint *bia, bigint *bib, int is_square)
     }
     else
     {
-        m = (max(bia->size, bib->size) + 1)/2;
+        m = (axtls_max(bia->size, bib->size) + 1)/2;
     }
 
     x0 = bi_clone(ctx, bia);
@@ -928,7 +928,7 @@ bigint *bi_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
     check(bib);
 
 #ifdef CONFIG_BIGINT_KARATSUBA
-    if (min(bia->size, bib->size) < MUL_KARATSUBA_THRESH)
+    if (axtls_min(bia->size, bib->size) < MUL_KARATSUBA_THRESH)
     {
         return regular_multiply(ctx, bia, bib, 0, 0);
     }
@@ -1068,7 +1068,7 @@ static void more_comps(bigint *bi, int n)
 {
     if (n > bi->max_comps)
     {
-        bi->max_comps = max(bi->max_comps * 2, n);
+        bi->max_comps = axtls_max(bi->max_comps * 2, n);
         bi->comps = (comp*)realloc(bi->comps, bi->max_comps * COMP_BYTE_SIZE);
     }
 
