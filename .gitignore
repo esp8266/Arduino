@@ -1,3 +1,4 @@
+Dockerfile
 .DS_Store
 tools/dist/
 tools/xtensa-lx106-elf/
@@ -9,4 +10,6 @@ tools/sdk/lib/liblwip_src.a
 tools/sdk/lwip/src/build
 tools/sdk/lwip/src/liblwip_src.a
 
+*.o
+*.gcno
 *.pyc
