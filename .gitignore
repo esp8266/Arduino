@@ -11,5 +11,6 @@ tools/sdk/lwip/src/build
 tools/sdk/lwip/src/liblwip_src.a
 
 *.o
-*.gcno
+*.gc??
+*.gc??
 *.pyc
