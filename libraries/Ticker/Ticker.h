@@ -93,6 +93,7 @@ public:
 
 	void once_ms(uint32_t milliseconds, TickerFunction tf)
 	{
+		internalTicker = tf;
 		once_ms(milliseconds, internalCallback, (void*)this);
 	}
 
