@@ -73,6 +73,9 @@
 			{
               "name": "ESPDuino"
             }
+            {
+              "name": "ESPDuino"
+            },
           ],
           "toolsDependencies": [
             {
