@@ -50,6 +50,7 @@ ESPresso Lite 2.0 | 4M | 1M, 3M
 NodeMCU 0.9    | 4M | 1M, 3M
 NodeMCU 1.0    | 4M | 1M, 3M
 Olimex MOD-WIFI-ESP8266(-DEV)| 2M | 1M
+ProDino WiFi ESP 1.0 | 4M | 1M, 3M
 SparkFun Thing | 512k | 64k
 SweetPea ESP-210 | 4M | 1M, 3M
 WeMos D1 & D1 mini | 4M | 1M, 3M
