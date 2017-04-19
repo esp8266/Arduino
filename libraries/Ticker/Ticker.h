@@ -53,7 +53,7 @@ public:
 	void attach_ms(uint32_t milliseconds, TickerFunction tf)
 	{
 		internalTicker = tf;
-		attach(milliseconds, internalCallback, (void*)this);
+		attach_ms(milliseconds, internalCallback, (void*)this);
 	}
 
 	void attach_ms(uint32_t milliseconds, callback_t callback)
