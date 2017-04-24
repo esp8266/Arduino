@@ -125,9 +125,10 @@ private:
   uint16_t _getServicePort(char *service, char *proto);
   MDNSTxt * _getServiceTxt(char *name, char *proto);
   uint16_t _getServiceTxtLen(char *name, char *proto);
+  IPAddress _getRequestMulticastInterface();
   void _parsePacket();
-  void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port, uint32_t ip);
-  size_t advertiseServices(); // advertise all hosted services
+  void _replyToTypeEnumRequest(IPAddress multicastInterface);
+  void _replyToInstanceRequest(uint8_t questionMask, uint8_t responseMask, char * service, char *proto, uint16_t port, IPAddress multicastInterface);
   MDNSAnswer* _getAnswerFromIdx(int idx);
   int _getNumAnswers();
   bool _listen();
