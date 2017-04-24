@@ -1319,6 +1319,111 @@ d1_mini.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1_mini.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
 ##############################################################
+# d1_mini_lite ESP8285 chip has built-in 1MB flash
+
+d1_mini_lite.name=Wemos D1 mini lite (ESP8285)
+
+d1_mini_lite.upload.tool=esptool
+d1_mini_lite.upload.speed=460800
+d1_mini_lite.upload.resetmethod=nodemcu
+d1_mini_lite.upload.maximum_size=1044464
+d1_mini_lite.upload.maximum_data_size=81920
+d1_mini_lite.upload.wait_for_upload_port=true
+d1_mini_lite.serial.disableDTR=true
+d1_mini_lite.serial.disableRTS=true
+
+d1_mini_lite.build.mcu=esp8266
+d1_mini_lite.build.f_cpu=80000000L
+d1_mini_lite.build.board=ESP8266_ESP01
+d1_mini_lite.build.core=esp8266
+d1_mini_lite.build.variant=generic
+d1_mini_lite.build.flash_mode=dout
+d1_mini_lite.build.flash_freq=40
+d1_mini_lite.build.spiffs_pagesize=256
+d1_mini_lite.build.debug_port=
+d1_mini_lite.build.debug_level=
+
+d1_mini_lite.menu.CpuFrequency.80=80 MHz
+d1_mini_lite.menu.CpuFrequency.80.build.f_cpu=80000000L
+d1_mini_lite.menu.CpuFrequency.160=160 MHz
+d1_mini_lite.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+d1_mini_lite.menu.UploadSpeed.115200=115200
+d1_mini_lite.menu.UploadSpeed.115200.upload.speed=115200
+d1_mini_lite.menu.UploadSpeed.9600=9600
+d1_mini_lite.menu.UploadSpeed.9600.upload.speed=9600
+d1_mini_lite.menu.UploadSpeed.57600=57600
+d1_mini_lite.menu.UploadSpeed.57600.upload.speed=57600
+d1_mini_lite.menu.UploadSpeed.256000.windows=256000
+d1_mini_lite.menu.UploadSpeed.256000.upload.speed=256000
+d1_mini_lite.menu.UploadSpeed.230400.linux=230400
+d1_mini_lite.menu.UploadSpeed.230400.macosx=230400
+d1_mini_lite.menu.UploadSpeed.230400.upload.speed=230400
+d1_mini_lite.menu.UploadSpeed.460800.linux=460800
+d1_mini_lite.menu.UploadSpeed.460800.macosx=460800
+d1_mini_lite.menu.UploadSpeed.460800.upload.speed=460800
+d1_mini_lite.menu.UploadSpeed.512000.windows=512000
+d1_mini_lite.menu.UploadSpeed.512000.upload.speed=512000
+d1_mini_lite.menu.UploadSpeed.921600=921600
+d1_mini_lite.menu.UploadSpeed.921600.upload.speed=921600
+
+d1_mini_lite.menu.FlashSize.1M512=1M (512K SPIFFS)
+d1_mini_lite.menu.FlashSize.1M512.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
+d1_mini_lite.menu.FlashSize.1M512.build.spiffs_start=0x7B000
+d1_mini_lite.menu.FlashSize.1M512.build.spiffs_end=0xFB000
+d1_mini_lite.menu.FlashSize.1M512.build.spiffs_blocksize=8192
+d1_mini_lite.menu.FlashSize.1M512.upload.maximum_size=499696
+
+d1_mini_lite.menu.FlashSize.1M256=1M (256K SPIFFS)
+d1_mini_lite.menu.FlashSize.1M256.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
+d1_mini_lite.menu.FlashSize.1M256.build.spiffs_start=0xBB000
+d1_mini_lite.menu.FlashSize.1M256.build.spiffs_end=0xFB000
+d1_mini_lite.menu.FlashSize.1M256.build.spiffs_blocksize=4096
+d1_mini_lite.menu.FlashSize.1M256.upload.maximum_size=761840
+
+d1_mini_lite.menu.FlashSize.1M192=1M (192K SPIFFS)
+d1_mini_lite.menu.FlashSize.1M192.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
+d1_mini_lite.menu.FlashSize.1M192.build.spiffs_start=0xCB000
+d1_mini_lite.menu.FlashSize.1M192.build.spiffs_end=0xFB000
+d1_mini_lite.menu.FlashSize.1M192.build.spiffs_blocksize=4096
+d1_mini_lite.menu.FlashSize.1M192.upload.maximum_size=827376
+
+d1_mini_lite.menu.FlashSize.1M160=1M (160K SPIFFS)
+d1_mini_lite.menu.FlashSize.1M160.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
+d1_mini_lite.menu.FlashSize.1M160.build.spiffs_start=0xD3000
+d1_mini_lite.menu.FlashSize.1M160.build.spiffs_end=0xFB000
+d1_mini_lite.menu.FlashSize.1M160.build.spiffs_blocksize=4096
+d1_mini_lite.menu.FlashSize.1M160.upload.maximum_size=860144
+
+d1_mini_lite.menu.FlashSize.1M144=1M (144K SPIFFS)
+d1_mini_lite.menu.FlashSize.1M144.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
+d1_mini_lite.menu.FlashSize.1M144.build.spiffs_start=0xD7000
+d1_mini_lite.menu.FlashSize.1M144.build.spiffs_end=0xFB000
+d1_mini_lite.menu.FlashSize.1M144.build.spiffs_blocksize=4096
+d1_mini_lite.menu.FlashSize.1M144.upload.maximum_size=876528
+
+d1_mini_lite.menu.FlashSize.1M128=1M (128K SPIFFS)
+d1_mini_lite.menu.FlashSize.1M128.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
+d1_mini_lite.menu.FlashSize.1M128.build.spiffs_start=0xDB000
+d1_mini_lite.menu.FlashSize.1M128.build.spiffs_end=0xFB000
+d1_mini_lite.menu.FlashSize.1M128.build.spiffs_blocksize=4096
+d1_mini_lite.menu.FlashSize.1M128.upload.maximum_size=892912
+
+d1_mini_lite.menu.FlashSize.1M64=1M (64K SPIFFS)
+d1_mini_lite.menu.FlashSize.1M64.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
+d1_mini_lite.menu.FlashSize.1M64.build.spiffs_start=0xEB000
+d1_mini_lite.menu.FlashSize.1M64.build.spiffs_end=0xFB000
+d1_mini_lite.menu.FlashSize.1M64.build.spiffs_blocksize=4096
+d1_mini_lite.menu.FlashSize.1M64.upload.maximum_size=958448
+
+##############################################################
 d1.name=WeMos D1(Retired)
 
 d1.upload.tool=esptool
