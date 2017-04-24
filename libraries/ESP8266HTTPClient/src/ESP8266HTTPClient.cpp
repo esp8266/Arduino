@@ -51,6 +51,11 @@ public:
 class TLSTraits : public TransportTraits
 {
 public:
+    TLSTraits() :
+        _fingerprint("")
+    {
+    }
+
     TLSTraits(const String& fingerprint) :
         _fingerprint(fingerprint)
     {
@@ -64,7 +69,14 @@ public:
     bool verify(WiFiClient& client, const char* host) override
     {
         auto wcs = static_cast<WiFiClientSecure&>(client);
-        return wcs.verify(_fingerprint.c_str(), host);
+        if (_fingerprint == "")
+        {
+            return wcs.verifyCertChain(host);
+        }
+        else
+        {
+            return wcs.verify(_fingerprint.c_str(), host);
+        }
     }
 
 protected:
@@ -110,6 +122,14 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
         return false;
     }
     _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
+    _tcp = _transportTraits->create();
+
+    if(!_tcp->connect(_host.c_str(), _port)) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
+        return false;
+    }
+    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
+
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
     return true;
 }
@@ -121,11 +141,25 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
 bool HTTPClient::begin(String url)
 {
     _transportTraits.reset(nullptr);
-    _port = 80;
-    if (!beginInternal(url, "http")) {
+    if (!beginInternal(url, nullptr)) {
         return false;
     }
-    _transportTraits = TransportTraitsPtr(new TransportTraits());
+    if (_protocol == "https") {
+        _port = 443;
+        _transportTraits = TransportTraitsPtr(new TLSTraits());
+    }
+    else {
+        _port = 80;
+        _transportTraits = TransportTraitsPtr(new TransportTraits());
+    }
+    _tcp = _transportTraits->create();
+
+    if(!_tcp->connect(_host.c_str(), _port)) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
+        return false;
+    }
+    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
+
     return true;
 }
 
@@ -168,7 +202,7 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
         _host = host;
     }
     _uri = url;
-    if (_protocol != expectedProtocol) {
+    if (expectedProtocol != nullptr && _protocol != expectedProtocol) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
         return false;
     }
@@ -183,6 +217,14 @@ bool HTTPClient::begin(String host, uint16_t port, String uri)
     _port = port;
     _uri = uri;
     _transportTraits = TransportTraitsPtr(new TransportTraits());
+    _tcp = _transportTraits->create();
+
+    if(!_tcp->connect(_host.c_str(), _port)) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
+        return false;
+    }
+    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
+
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d uri: %s\n", host.c_str(), port, uri.c_str());
     return true;
 }
@@ -207,6 +249,14 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
         return false;
     }
     _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
+    _tcp = _transportTraits->create();
+    
+    if(!_tcp->connect(_host.c_str(), _port)) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
+        return false;
+    }
+    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
+
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s httpsFingerprint: %s\n", host.c_str(), port, uri.c_str(), httpsFingerprint.c_str());
     return true;
 }
@@ -302,6 +352,32 @@ void HTTPClient::setTimeout(uint16_t timeout)
     if(connected()) {
         _tcp->setTimeout(timeout);
     }
+}
+
+bool HTTPClient::setRootCA(uint8_t * cert, size_t size)
+{
+    bool result = false;
+    if(_tcp && _protocol == "https") {
+        auto client = static_cast<WiFiClientSecure*>(_tcp.get());
+        if(client) {
+            result = client->setCACert(cert, size);
+        }
+    }
+    DEBUG_HTTPCLIENT("[HTTP-Client][setRootCA] Result: %d\n", (int) result);
+    return result;
+}
+
+bool HTTPClient::setRootCA(Stream& cert, size_t size)
+{
+    bool result = false;
+    if(_tcp && _protocol == "https") {
+        auto client = static_cast<WiFiClientSecure*>(_tcp.get());
+        if(client) {
+            result = client->loadCACert(cert, size);
+        }
+    }
+    DEBUG_HTTPCLIENT("[HTTP-Client][setRootCA] Result: %d\n", (int) result);
+    return result;
 }
 
 /**
@@ -822,15 +898,6 @@ bool HTTPClient::connect(void)
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
         return false;
     }
-
-    _tcp = _transportTraits->create();
-
-    if(!_tcp->connect(_host.c_str(), _port)) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
-        return false;
-    }
-
-    DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
     if (!_transportTraits->verify(*_tcp, _host.c_str())) {
         DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");

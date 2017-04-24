@@ -149,6 +149,8 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
+    bool setRootCA(uint8_t * cert, size_t size);
+    bool setRootCA(Stream& cert, size_t size);
 
     void useHTTP10(bool usehttp10 = true);
 
