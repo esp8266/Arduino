@@ -124,6 +124,11 @@ public:
         }
     }
 
+    size_t availableForWrite ()
+    {
+        return _pcb? tcp_sndbuf(_pcb): 0;
+    }
+
     void setNoDelay(bool nodelay)
     {
         if(!_pcb) {
