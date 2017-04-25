@@ -92,7 +92,8 @@ int	vsnprintf_P(char *str, size_t strSize, PGM_P formatP, va_list ap) __attribut
     PGM_P __local = (PGM_P)(addr);  /* isolate varible for macro expansion */         \
     ptrdiff_t __offset = ((uint32_t)__local & 0x00000003); /* byte aligned mask */            \
     const uint32_t* __addr32 = (const uint32_t*)((const uint8_t*)(__local)-__offset); \
-    uint8_t __result = ((*__addr32) >> (__offset * 8));                        \
+    uint32_t volatile __data32 = *__addr32;  /* stop compiler from optimizing 32bit aligned addresses */        \
+    uint8_t __result = (__data32 >> (__offset * 8));                        \
     __result;                                                                  \
 }))
 
@@ -101,7 +102,8 @@ int	vsnprintf_P(char *str, size_t strSize, PGM_P formatP, va_list ap) __attribut
     PGM_P __local = (PGM_P)(addr); /* isolate varible for macro expansion */          \
     ptrdiff_t __offset = ((uint32_t)__local & 0x00000002);   /* word aligned mask */          \
     const uint32_t* __addr32 = (const uint32_t*)((const uint8_t*)(__local) - __offset); \
-    uint16_t __result = ((*__addr32) >> (__offset * 8));                       \
+    uint32_t volatile __data32 = *__addr32;  /* stop compiler from optimizing 32bit aligned addresses */        \
+    uint16_t __result = (__data32 >> (__offset * 8));                       \
     __result;                                                                  \
 }))	
 #else //__ets__
