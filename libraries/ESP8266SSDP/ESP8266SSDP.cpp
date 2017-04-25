@@ -201,7 +201,7 @@ void SSDPClass::_send(ssdp_method_t method){
   char buffer[1460];
   uint32_t ip = WiFi.localIP();
 
-  char valueBuffer[strlen(_ssdp_notify_template)+1];
+  char valueBuffer[strlen_P(_ssdp_notify_template)+1];
   strcpy_P(valueBuffer, (method == NONE)?_ssdp_response_template:_ssdp_notify_template);
 
   int len = snprintf_P(buffer, sizeof(buffer),
@@ -243,7 +243,7 @@ void SSDPClass::_send(ssdp_method_t method){
 
 void SSDPClass::schema(WiFiClient client){
   uint32_t ip = WiFi.localIP();
-  char buffer[strlen(_ssdp_schema_template)+1];
+  char buffer[strlen_P(_ssdp_schema_template)+1];
   strcpy_P(buffer, _ssdp_schema_template);
   client.printf(buffer,
     IP2STR(&ip), _port,
