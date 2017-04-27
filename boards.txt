@@ -1334,10 +1334,10 @@ d1_mini_lite.serial.disableRTS=true
 
 d1_mini_lite.build.mcu=esp8266
 d1_mini_lite.build.f_cpu=80000000L
-d1_mini_lite.build.board=ESP8266_ESP01
+d1_mini_lite.build.board=ESP8285_WEMOS_D1MINI_LITE
 d1_mini_lite.build.core=esp8266
-d1_mini_lite.build.variant=generic
-d1_mini_lite.build.flash_mode=dout
+d1_mini_lite.build.variant=d1_mini
+d1_mini_lite.build.flash_mode=dio
 d1_mini_lite.build.flash_freq=40
 d1_mini_lite.build.spiffs_pagesize=256
 d1_mini_lite.build.debug_port=
