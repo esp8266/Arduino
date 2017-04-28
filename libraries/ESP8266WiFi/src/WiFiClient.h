@@ -75,6 +75,8 @@ public:
   void setNoDelay(bool nodelay);
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
+  size_t availableForWrite();
+
   friend class WiFiServer;
 
   using Print::write;
