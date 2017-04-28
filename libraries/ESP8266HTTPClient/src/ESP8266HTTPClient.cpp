@@ -131,8 +131,6 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
         return false;
     }
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
     return true;
 }
 
@@ -146,7 +144,7 @@ bool HTTPClient::begin(String url)
     if (!beginInternal(url, nullptr)) {
         return false;
     }
-    if (_protocol == "https") {
+    if (_protocol == "https" || _port == 443) {
         _port = 443;
         _transportTraits = TransportTraitsPtr(new TLSTraits());
     }
@@ -214,30 +212,31 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 
 bool HTTPClient::begin(String host, uint16_t port, String uri)
 {
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d uri: %s\n", host.c_str(), port, uri.c_str());
     clear();
+
+    // Remove protocol if any
     int index = host.indexOf(':');
     if(index >= 0) {
         _protocol = host.substring(0, index);
+        host.remove(0, (index + 3)); // remove http:// or https://
     }
+
     _host = host;
     _port = port;
     _uri = uri;
-    _transportTraits = TransportTraitsPtr(new TransportTraits());
-    if (_protocol == "https") {
-        _port = 443;
+    if (_protocol == "https" || _port == 443) {
         _transportTraits = TransportTraitsPtr(new TLSTraits());
     }
     else {
-        _port = 80;
         _transportTraits = TransportTraitsPtr(new TransportTraits());
     }
+    _tcp = _transportTraits->create();
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
         return false;
     }
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d uri: %s\n", host.c_str(), port, uri.c_str());
     return true;
 }
 
@@ -252,6 +251,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, Strin
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFingerprint)
 {
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s httpsFingerprint: %s\n", host.c_str(), port, uri.c_str(), httpsFingerprint.c_str());
     clear();
     _host = host;
     _port = port;
@@ -268,8 +268,6 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
         return false;
     }
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
-
-    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s httpsFingerprint: %s\n", host.c_str(), port, uri.c_str(), httpsFingerprint.c_str());
     return true;
 }
 
@@ -369,7 +367,7 @@ void HTTPClient::setTimeout(uint16_t timeout)
 bool HTTPClient::setRootCA(uint8_t * cert, size_t size)
 {
     bool result = false;
-    if(_tcp && _protocol == "https") {
+    if(_tcp && (_protocol == "https" || _port == 443)) {
         auto client = static_cast<WiFiClientSecure*>(_tcp.get());
         if(client) {
             result = client->setCACert(cert, size);
@@ -382,7 +380,7 @@ bool HTTPClient::setRootCA(uint8_t * cert, size_t size)
 bool HTTPClient::setRootCA(Stream& cert, size_t size)
 {
     bool result = false;
-    if(_tcp && _protocol == "https") {
+    if(_tcp && (_protocol == "https" || _port == 443)) {
         auto client = static_cast<WiFiClientSecure*>(_tcp.get());
         if(client) {
             result = client->loadCACert(cert, size);
@@ -460,6 +458,7 @@ int HTTPClient::sendRequest(const char * type, String payload)
  */
 int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
 {
+    DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest][%s] with payload size %d\n", type, size);
     // connect to server
     if(!connect()) {
         return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
@@ -494,7 +493,7 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
  */
 int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 {
-
+    DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest][%s] with streaming with size %d\n", type, size);
     if(!stream) {
         return returnError(HTTPC_ERROR_NO_STREAM);
     }
@@ -698,6 +697,7 @@ int HTTPClient::writeToStream(Stream * stream)
             String chunkHeader = _tcp->readStringUntil('\n');
 
             if(chunkHeader.length() <= 0) {
+                DEBUG_HTTPCLIENT("[HTTP-Client] chunkHeader length invalid\n");
                 return returnError(HTTPC_ERROR_READ_TIMEOUT);
             }
 
@@ -734,6 +734,7 @@ int HTTPClient::writeToStream(Stream * stream)
             char buf[2];
             auto trailing_seq_len = _tcp->readBytes((uint8_t*)buf, 2);
             if (trailing_seq_len != 2 || buf[0] != '\r' || buf[1] != '\n') {
+                DEBUG_HTTPCLIENT("[HTTP-Client] Didn't trail as expected\n");
                 return returnError(HTTPC_ERROR_READ_TIMEOUT);
             }
 
@@ -1052,13 +1053,14 @@ int HTTPClient::handleHeaderResponse()
                 if(_returnCode) {
                     return _returnCode;
                 } else {
-                    DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] Remote host is not an HTTP Server!");
+                    DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] Remote host is not an HTTP Server!\n");
                     return HTTPC_ERROR_NO_HTTP_SERVER;
                 }
             }
 
         } else {
             if((millis() - lastDataTime) > _tcpTimeout) {
+                DEBUG_HTTPCLIENT("[HTTP-Client][handleHeaderResponse] Tcp timeout %d\n", (millis() - lastDataTime));
                 return HTTPC_ERROR_READ_TIMEOUT;
             }
             delay(0);

@@ -149,7 +149,10 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
+
+    // Set the root certificate authority to authorize SSL connections with. Must initialize SNTP first.
     bool setRootCA(uint8_t * cert, size_t size);
+    // Set the root certificate authority to authorize SSL connections with. Must initialize SNTP first.
     bool setRootCA(Stream& cert, size_t size);
 
     void useHTTP10(bool usehttp10 = true);
