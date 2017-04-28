@@ -91,7 +91,15 @@ public:
     void connect(ClientContext* ctx, const char* hostName, uint32_t timeout_ms)
     {
         s_io_ctx = ctx;
-        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, hostName);
+        _ssl_ext = ssl_ext_new();
+        
+        int name_len = strlen(hostName);
+        
+        _ssl_ext->host_name = (char*) malloc((name_len + 1) * sizeof (char));
+        strncpy(_ssl_ext->host_name, hostName, name_len + 1);
+        _ssl_ext->host_name[name_len] = 0;
+        
+        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, _ssl_ext);
         uint32_t t = millis();
 
         while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
@@ -111,6 +119,11 @@ public:
     bool connected()
     {
         return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
+    }
+    
+    void discardCache() {
+        _available = 0;
+        _read_ptr = nullptr;
     }
 
     int read(uint8_t* dst, size_t size)
@@ -179,6 +192,14 @@ public:
         }
         return cb;
     }
+    
+    bool wantRead() {
+        return _available > 0 || (_ssl && ssl_want_read(_ssl) == 1);
+    }
+    
+    bool emptyCache() {
+        return _available == 0;
+    }
 
     bool loadObject(int type, Stream& stream, size_t size)
     {
@@ -245,6 +266,7 @@ protected:
     static SSL_CTX* _ssl_ctx;
     static int _ssl_ctx_refcnt;
     SSL* _ssl = nullptr;
+    SSL_EXTENSIONS* _ssl_ext = nullptr;
     int _refcnt = 0;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
@@ -332,7 +354,14 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
     if (!_ssl) {
         return 0;
     }
-
+    
+    // axTLS is half-duplex so if a read operation is already underway,
+    // finish the read before trying to write; otherwise the read
+    // cache will be overwritten and data will be lost
+    if (!_ssl->emptyCache()) {
+        return SSL_ERROR_READ_LOCK;
+    }
+    
     int rc = ssl_write(*_ssl, buf, size);
     if (rc >= 0) {
         return rc;
@@ -344,6 +373,20 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
     }
 
     return 0;
+}
+
+int WiFiClientSecure::wantRead() {
+    if (_ssl) {
+        return _ssl->wantRead();
+    }
+    
+    return 0;
+}
+
+void WiFiClientSecure::discardCache() {
+    if (_ssl) {
+        _ssl->discardCache();
+    }
 }
 
 int WiFiClientSecure::read(uint8_t *buf, size_t size)
@@ -420,7 +463,7 @@ err     x       N           N
 uint8_t WiFiClientSecure::connected()
 {
     if (_ssl) {
-        if (_ssl->available()) {
+        if (_ssl->wantRead()) {
             return true;
         }
         if (_client && _client->state() == ESTABLISHED && _ssl->connected()) {
@@ -594,6 +637,20 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size)
     }
     return _ssl->loadObject(SSL_OBJ_RSA_KEY, stream, size);
 }
+
+extern "C" int __ax_port_pending(int fd) {
+    //Serial.println("ax_port_pending");
+    ClientContext* _client = SSLContext::getIOContext(fd);
+    if (!_client || _client->state() != ESTABLISHED && !_client->getSize()) {
+        errno = EIO;
+        return -1;
+    }
+    
+    //Serial.printf("pending: %d\r\n", _client->getSize());
+    return _client->getSize();
+}
+
+extern "C" void ax_port_pending() __attribute__ ((weak, alias("__ax_port_pending")));
 
 extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count)
 {
