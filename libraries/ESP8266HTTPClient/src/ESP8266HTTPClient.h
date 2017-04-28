@@ -222,6 +222,7 @@ protected:
     int _returnCode = 0;
     int _size = -1;
     bool _canReuse = false;
+    bool _verified = false;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
 };
 

@@ -71,10 +71,12 @@ public:
         auto wcs = static_cast<WiFiClientSecure&>(client);
         if (_fingerprint == "")
         {
+            DEBUG_HTTPCLIENT("[HTTP-Client] Performing verify with Certificate Authority\n");
             return wcs.verifyCertChain(host);
         }
         else
         {
+            DEBUG_HTTPCLIENT("[HTTP-Client] Performing verify with fingerprint\n");
             return wcs.verify(_fingerprint.c_str(), host);
         }
     }
@@ -213,12 +215,22 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 bool HTTPClient::begin(String host, uint16_t port, String uri)
 {
     clear();
+    int index = host.indexOf(':');
+    if(index >= 0) {
+        _protocol = host.substring(0, index);
+    }
     _host = host;
     _port = port;
     _uri = uri;
     _transportTraits = TransportTraitsPtr(new TransportTraits());
-    _tcp = _transportTraits->create();
-
+    if (_protocol == "https") {
+        _port = 443;
+        _transportTraits = TransportTraitsPtr(new TLSTraits());
+    }
+    else {
+        _port = 80;
+        _transportTraits = TransportTraitsPtr(new TransportTraits());
+    }
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
         return false;
@@ -250,7 +262,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
     }
     _transportTraits = TransportTraitsPtr(new TLSTraits(httpsFingerprint));
     _tcp = _transportTraits->create();
-    
+
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
         return false;
@@ -885,6 +897,17 @@ bool HTTPClient::hasHeader(const char* name)
  */
 bool HTTPClient::connect(void)
 {
+    if (!_transportTraits) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
+        return false;
+    }
+
+    if (!_verified && !_transportTraits->verify(*_tcp, _host.c_str())) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed for host %s\n", _host.c_str());
+        _tcp->stop();
+        return false;
+    }
+    _verified = true;
 
     if(connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, try reuse!\n");
@@ -892,17 +915,6 @@ bool HTTPClient::connect(void)
             _tcp->read();
         }
         return true;
-    }
-
-    if (!_transportTraits) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
-        return false;
-    }
-
-    if (!_transportTraits->verify(*_tcp, _host.c_str())) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
-        _tcp->stop();
-        return false;
     }
 
     // set Timeout for readBytesUntil and readStringUntil
