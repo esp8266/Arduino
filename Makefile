@@ -43,6 +43,8 @@ CFLAGS+=-std=c99 -DESP8266
 
 CFLAGS += -Wall -Os -g -O2 -Wpointer-arith -Wl,-EL -nostdlib -mlongcalls -mno-text-section-literals  -D__ets__ -DICACHE_FLASH
 
+CFLAGS += -ffunction-sections -fdata-sections
+
 MFORCE32 := $(shell $(CC) --help=target | grep mforce-l32)
 ifneq ($(MFORCE32),)
     # If the compiler supports the -mforce-l32 flag, the compiler will generate correct code for loading
@@ -62,12 +64,6 @@ all: $(AXTLS_AR)
 $(AXTLS_AR): | $(BIN_DIR)
 
 $(AXTLS_AR): $(OBJ_FILES)
-	for file in $(OBJ_FILES); do \
-		$(OBJCOPY) \
-		--rename-section .text=.irom0.text \
-		--rename-section .literal=.irom0.literal \
-		$$file; \
-	done
 	$(AR) cru $@ $^
 
 $(BIN_DIR):
