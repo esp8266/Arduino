@@ -6,6 +6,7 @@ OBJCOPY := $(TOOLCHAIN_PREFIX)objcopy
 
 XTENSA_LIBS ?= $(shell $(CC) -print-sysroot)
 
+TOOLCHAIN_DIR=$(shell cd $(XTENSA_LIBS)/../../; pwd)
 
 OBJ_FILES := \
 	crypto/aes.o \
@@ -44,6 +45,8 @@ CFLAGS+=-std=c99 -DESP8266
 CFLAGS += -Wall -Os -g -O2 -Wpointer-arith -Wl,-EL -nostdlib -mlongcalls -mno-text-section-literals  -D__ets__ -DICACHE_FLASH
 
 CFLAGS += -ffunction-sections -fdata-sections
+
+CFLAGS += -fdebug-prefix-map=$(PWD)= -fdebug-prefix-map=$(TOOLCHAIN_DIR)=xtensa-lx106-elf -gno-record-gcc-switches
 
 MFORCE32 := $(shell $(CC) --help=target | grep mforce-l32)
 ifneq ($(MFORCE32),)
