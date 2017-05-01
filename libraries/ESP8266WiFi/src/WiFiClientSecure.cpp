@@ -90,8 +90,11 @@ public:
 
     void connect(ClientContext* ctx, const char* hostName, uint32_t timeout_ms)
     {
+        SSL_EXTENSIONS* ext = ssl_ext_new();
+        ssl_ext_set_host_name(ext, hostName);
+        ssl_ext_set_max_fragment_size(ext, 4096);
         s_io_ctx = ctx;
-        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, hostName);
+        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, ext);
         uint32_t t = millis();
 
         while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
