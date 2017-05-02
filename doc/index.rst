@@ -11,7 +11,8 @@ Welcome to ESP8266 Arduino Core's documentation!
    File system <filesystem>
    ESP8266WiFi <esp8266wifi/readme>
    OTA Updates <ota_updates/readme>
-   
+   PROGMEM <PROGMEM>
+
    Boards <boards>
    FAQ <faq/readme>
    
