@@ -33,7 +33,7 @@ title: Supported Hardware
   * [WeMos D1](#wemos-d1)
   * [WeMos D1 mini](#wemos-d1-mini)
   * [ESPino by ThaiEasyElec](#espinotee)
-	* [gen4-IoD Range by 4D Systems](#gen4iod)
+  * [gen4-IoD Range by 4D Systems](#gen4iod)
 
 ## Adafruit HUZZAH ESP8266 (ESP-12)
 
