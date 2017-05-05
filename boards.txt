@@ -148,6 +148,11 @@ generic.menu.FlashSize.1M64.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M64.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M64.upload.maximum_size=958448
 
+generic.menu.FlashSize.1M0=1M (no SPIFFS)
+generic.menu.FlashSize.1M0.build.flash_size=1M
+generic.menu.FlashSize.1M0.build.flash_ld=eagle.flash.1m0.ld
+generic.menu.FlashSize.1M0.upload.maximum_size=1023984
+
 generic.menu.FlashSize.2M=2M (1M SPIFFS)
 generic.menu.FlashSize.2M.build.flash_size=2M
 generic.menu.FlashSize.2M.build.flash_ld=eagle.flash.2m.ld
