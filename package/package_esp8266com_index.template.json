@@ -70,8 +70,11 @@
             {
               "name": "WifInfo"
             },
-			{
+            {
               "name": "ESPDuino"
+            },
+            {
+              "name": "gen4-IoD Range"
             }
           ],
           "toolsDependencies": [
