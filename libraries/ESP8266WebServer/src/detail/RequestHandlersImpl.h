@@ -96,13 +96,6 @@ public:
 
         String contentType = getContentType(path);
 
-        // If content type not matched on path, then try for uri
-	// Useful for minified javascript et al.
-        if (contentType.equals("application/octet-stream"))
-        {
-            contentType = getContentType(requestUri);
-        }
-
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
         // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
         if (!path.endsWith(".gz") && !_fs.exists(path))  {
