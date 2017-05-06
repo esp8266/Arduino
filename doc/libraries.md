@@ -56,6 +56,28 @@ else they default to pins 4(SDA) and 5(SCL).
 
 SPI library supports the entire Arduino SPI API including transactions, including setting phase (CPHA).
 Setting the Clock polarity (CPOL) is not supported, yet (SPI_MODE2 and SPI_MODE3 not working).
+The usual SPI pins are: 
+
+- `MOSI` = GPIO13
+- `MISO` = GPIO12
+- `SCLK` = GPIO14
+
+There's an extended mode where you can swap the normal pins to the pin0 hardware pins.
+This is enabled  by calling `SPI.pins(6, 7, 8, 0)` before the call to `SPI.begin()`. The pins would
+change to:
+
+- `MOSI` = SD1
+- `MISO` = SD0
+- `SCLK` = CLK
+- `HWCS` = GPIO0
+
+This mode shares the SPI pins with the controller that reads the program code from flash and is
+controlled by a hardware arbiter (the flash has always higher priority). For this mode the CS
+will be controlled by hardware as you can't handle the CS line with a GPIO, you never actually
+know when the arbiter is going to grant you access to the bus so you must let it handle CS
+automatically.
+
+
 
 ## SoftwareSerial
 
