@@ -1,0 +1,5 @@
+#ifndef LWIP2_HASH_H
+#define LWIP2_HASH_H
+#define LWIP2_HASH 0xc0862d6
+#define LWIP2_HASH_STR "c0862d6(STABLE-2_0_2_RELEASE_VER)"
+#endif // LWIP2_HASH_H
