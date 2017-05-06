@@ -61,3 +61,25 @@ String base64::encode(String text) {
     return base64::encode((uint8_t *) text.c_str(), text.length());
 }
 
+/**
+ * convert input data from base64
+ * @param text String base64 encoded zero-terminated string
+ * @param data uint8_t * byte array to hold resulting decoded data
+ * @param maxlength size_t maximum number of bytes we can copy to array
+ * @return number of bytes copied, including zero terminating char
+ */
+size_t base64::decode(char* text, uint8_t * data, size_t maxlength) {
+  // allocate big enough array to hold result
+  char* plaintext = new char[strlen(text)];
+  int len = base64_decode_chars(text, strlen(text), plaintext);
+  if (len <= maxlength) {
+    // in case output array can contain extra zero character, it will be copied.
+    size_t bytes_to_copy = min(maxlength, len+1);
+    memcpy(data, plaintext, bytes_to_copy);
+    delete(plaintext);
+    return bytes_to_copy;
+  } else {
+    delete(plaintext);
+    return 0;
+  }
+}

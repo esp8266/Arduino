@@ -16,7 +16,17 @@
 #define UPDATE_ERROR_FLASH_CONFIG       (8)
 #define UPDATE_ERROR_NEW_FLASH_CONFIG   (9)
 #define UPDATE_ERROR_MAGIC_BYTE         (10)
+#define UPDATE_ERROR_CRYPTO             (11)
 
+#define UPDATE_OPERATION_BEGIN          (1)
+#define UPDATE_OPERATION_WRITE          (2)
+#define UPDATE_OPERATION_END            (3)
+
+// UpdateHandlerFunction provides external hook for signing and verification of the firmware.
+// This allows reuse of all existing update libraries and using your choice of crypto
+// signature verification. Examples how to build your own external crypto should be available from
+// https://github.com/kotl/esp8266-cryptosign
+typedef uint8_t (*UpdateHandlerFunction) (uint8_t op, uint8_t * data, size_t len);
 
 #define U_FLASH   0
 #define U_SPIFFS  100
@@ -83,6 +93,11 @@ class UpdaterClass {
       returns the MD5 String of the sucessfully ended firmware
     */
     String md5String(void){ return _md5.toString(); }
+
+    /*
+      set handler to verify crypto signature of the firmware
+    */
+    void setCryptoHandler(UpdateHandlerFunction handler);
 
     /*
       populated the result with the md5 bytes of the sucessfully ended firmware
@@ -159,6 +174,7 @@ class UpdaterClass {
 
     String _target_md5;
     MD5Builder _md5;
+    UpdateHandlerFunction _handler;
 };
 
 extern UpdaterClass Update;

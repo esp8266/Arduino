@@ -29,6 +29,7 @@ class base64 {
     public:
         static String encode(uint8_t * data, size_t length);
         static String encode(String text);
+        static size_t decode(char* text, uint8_t * data, size_t maxlength);
     private:
 };
 
