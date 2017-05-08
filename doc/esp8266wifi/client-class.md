@@ -36,7 +36,7 @@ This algorithm is intended to reduce TCP/IP traffic of small packets sent over t
 
 *Example:*
 ```cpp
-clinet.setNoDelay(true);
+client.setNoDelay(true);
 ```
 
 
