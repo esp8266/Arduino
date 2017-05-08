@@ -61,6 +61,7 @@ class ESP8266WiFiGenericClass {
         WiFiEventHandler onStationModeDHCPTimeout(std::function<void(void)>);
         WiFiEventHandler onSoftAPModeStationConnected(std::function<void(const WiFiEventSoftAPModeStationConnected&)>);
         WiFiEventHandler onSoftAPModeStationDisconnected(std::function<void(const WiFiEventSoftAPModeStationDisconnected&)>);
+        WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
         // WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
 
         int32_t channel(void);

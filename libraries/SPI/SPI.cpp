@@ -22,6 +22,12 @@
 #include "SPI.h"
 #include "HardwareSerial.h"
 
+#define SPI_PINS_HSPI			0 // Normal HSPI mode (MISO = GPIO12, MOSI = GPIO13, SCLK = GPIO14);
+#define SPI_PINS_HSPI_OVERLAP	1 // HSPI Overllaped in spi0 pins (MISO = SD0, MOSI = SDD1, SCLK = CLK);
+
+#define SPI_OVERLAP_SS 0
+
+
 typedef union {
         uint32_t regValue;
         struct {
@@ -35,12 +41,43 @@ typedef union {
 
 SPIClass::SPIClass() {
     useHwCs = false;
+    pinSet = SPI_PINS_HSPI;
+}
+
+bool SPIClass::pins(int8_t sck, int8_t miso, int8_t mosi, int8_t ss)
+{
+    if (sck == 6 &&
+        miso == 7 &&
+        mosi == 8 &&
+        ss == 0) {
+        pinSet = SPI_PINS_HSPI_OVERLAP;
+    } else if (sck == 14 &&
+	           miso == 12 &&
+               mosi == 13) {
+        pinSet = SPI_PINS_HSPI;
+    } else {
+        return false;
+    }
+
+    return true;
 }
 
 void SPIClass::begin() {
-    pinMode(SCK, SPECIAL);  ///< GPIO14
-    pinMode(MISO, SPECIAL); ///< GPIO12
-    pinMode(MOSI, SPECIAL); ///< GPIO13
+    switch (pinSet) {
+    case SPI_PINS_HSPI_OVERLAP:
+        IOSWAP |= (1 << IOSWAP2CS);
+        //SPI0E3 |= 0x1; This is in the MP3_DECODER example, but makes the WD kick in here.
+        SPI1E3 |= 0x3;
+
+        setHwCs(true);
+        break;
+    case SPI_PINS_HSPI:
+    default:
+        pinMode(SCK, SPECIAL);  ///< GPIO14
+        pinMode(MISO, SPECIAL); ///< GPIO12
+        pinMode(MOSI, SPECIAL); ///< GPIO13
+        break;
+    }
 
     SPI1C = 0;
     setFrequency(1000000); ///< 1MHz
@@ -50,24 +87,55 @@ void SPIClass::begin() {
 }
 
 void SPIClass::end() {
-    pinMode(SCK, INPUT);
-    pinMode(MISO, INPUT);
-    pinMode(MOSI, INPUT);
-    if(useHwCs) {
-        pinMode(SS, INPUT);
+    switch (pinSet) {
+    case SPI_PINS_HSPI:
+        pinMode(SCK, INPUT);
+        pinMode(MISO, INPUT);
+        pinMode(MOSI, INPUT);
+        if (useHwCs) {
+            pinMode(SS, INPUT);
+        }
+        break;
+    case SPI_PINS_HSPI_OVERLAP:
+        IOSWAP &= ~(1 << IOSWAP2CS);
+        if (useHwCs) {
+            SPI1P |= SPIPCS1DIS | SPIPCS0DIS | SPIPCS2DIS;
+            pinMode(SPI_OVERLAP_SS, INPUT);
+        }
+        break;
     }
 }
 
 void SPIClass::setHwCs(bool use) {
-    if(use) {
-        pinMode(SS, SPECIAL); ///< GPIO15
-        SPI1U |= (SPIUCSSETUP | SPIUCSHOLD);
+    switch (pinSet) {
+    case SPI_PINS_HSPI:
+        if (use) {
+            pinMode(SS, SPECIAL); ///< GPIO15
+            SPI1U |= (SPIUCSSETUP | SPIUCSHOLD);
     } else {
-        if(useHwCs) {
-            pinMode(SS, INPUT);
+            if (useHwCs) {
+                pinMode(SS, INPUT);
             SPI1U &= ~(SPIUCSSETUP | SPIUCSHOLD);
+            }
         }
+        break;
+    case SPI_PINS_HSPI_OVERLAP:
+        if (use) {
+            pinMode(SPI_OVERLAP_SS, FUNCTION_1); // GPI0 to SPICS2 mode
+            SPI1P &= ~SPIPCS2DIS;
+            SPI1P |= SPIPCS1DIS | SPIPCS0DIS;
+            SPI1U |= (SPIUCSSETUP | SPIUCSHOLD);
+        }
+        else {
+            if (useHwCs) {
+                pinMode(SPI_OVERLAP_SS, INPUT);
+                SPI1P |= SPIPCS1DIS | SPIPCS0DIS | SPIPCS2DIS;
+                SPI1U &= ~(SPIUCSSETUP | SPIUCSHOLD);
+            }
+        }
+        break;
     }
+
     useHwCs = use;
 }
 
@@ -306,7 +374,7 @@ void SPIClass::write32(uint32_t data, bool msb) {
         SPI1W0 = data;
         SPI1CMD |= SPIBUSY;
     }
-    while(SPI1CMD & SPIBUSY) {}
+    while(SPI1CMD & SPIBUSY) {}	
 }
 
 /**

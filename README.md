@@ -5,6 +5,8 @@ This project brings support for ESP8266 chip to the Arduino environment. It lets
 
 ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, work with SD cards, servos, SPI and I2C peripherals.
 
+A large community is well established for questions and answers about Arduino for ESP8266 [ESP8266 Community Forum](http://www.esp8266.com/u/arduinoanswers)
+
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
@@ -64,17 +66,17 @@ python get.py
 
 [PlatformIO](http://platformio.org) is an open source ecosystem for IoT
 development with cross platform build system, library manager and full support
-for Espressif (ESP8266) development. It works on the popular host OS: Mac OS X, Windows,
+for Espressif (ESP8266) development. It works on the popular host OS: macOS, Windows,
 Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-- [What is PlatformIO?](http://docs.platformio.org/en/stable/what-is-platformio.html)
+- [What is PlatformIO?](http://docs.platformio.org/page/what-is-platformio.html)
 - [PlatformIO IDE](http://platformio.org/platformio-ide)
-- Quick Start with [PlatformIO IDE](http://docs.platformio.org/en/stable/ide/atom.html#quick-start) or [PlatformIO CLI](http://docs.platformio.org/en/stable/quickstart.html)
-- [Advanced using](http://docs.platformio.org/en/stable/platforms/espressif.html) -
+- Quick Start with [PlatformIO IDE](http://docs.platformio.org/page/ide/atom.html#quick-start) or [PlatformIO Core](http://docs.platformio.org/page/core.html)
+- [Advanced using](http://docs.platformio.org/page/platforms/espressif.html) -
   custom settings, uploading to SPIFFS, Over-the-Air (OTA) or using stage version
-- [Integration with other IDE](http://docs.platformio.org/en/stable/ide.html) -
-  Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
-- [Project Examples](http://docs.platformio.org/en/stable/platforms/espressif.html#examples)
+- [Integration with Cloud and Standalone IDEs](http://docs.platformio.org/page/ide.html) -
+  Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
+- [Project Examples](http://docs.platformio.org/page/platforms/espressif.html#examples)
 
 ### Building with make
 
@@ -125,3 +127,5 @@ ESP8266 core files are licensed under LGPL.
 [SPI Flash File System (SPIFFS)](https://github.com/pellepl/spiffs) written by Peter Andersson is used in this project. It is distributed under MIT license.
 
 [umm_malloc](https://github.com/rhempel/umm_malloc) memory management library written by Ralph Hempel is used in this project. It is distributed under MIT license.
+
+[axTLS](http://axtls.sourceforge.net/) library written by Cameron Rich, built from https://github.com/igrr/axtls-8266, is used in this project. It is distributed under [BSD license](https://github.com/igrr/axtls-8266/blob/master/LICENSE).

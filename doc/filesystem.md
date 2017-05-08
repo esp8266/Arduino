@@ -4,6 +4,7 @@ title: File System
 
 ## Table of Contents
   * [Flash layout](#flash-layout)
+  * [File system limitations](#file-system-limitations)
   * [Uploading files to file system](#uploading-files-to-file-system)
   * [File system object (SPIFFS)](#file-system-object-spiffs)
     * [begin](#begin)
@@ -59,12 +60,28 @@ ESPDuino | 4M | 1M, 3M
 ```c++
 #include "FS.h"
 ```
+## File system limitations
+
+The filesystem implementation for ESP8266 had to accomodate the constraints of the chip, among which its limited RAM. [SPIFFS](https://github.com/pellepl/spiffs) was selected because it is designed for small systems, but that comes at the cost of some simplifications and limitations.
+
+First, behind the scenes, SPIFFS does not support directories, it just stores a "flat" list of files. 
+But contrary to traditional filesystems, the slash character `'/'` is allowed in filenames, so the functions that deal with directory listing (e.g. `openDir("/website")`) basically just filter the filenames and keep the ones that start with the requested prefix (`/website/`).
+Practically speaking, that makes little difference though.
+
+Second, there is a limit of 32 chars in total for filenames. One `'\0'` char is reserved for C string termination, so that leaves us with 31 usable characters.
+
+Combined, that means it is advised to keep filenames short and not use deeply nested directories, as the full path of each file (including directories, `'/'` characters, base name, dot and extension) has to be 31 chars at a maximum. 
+For example, the filename `/website/images/bird_thumbnail.jpg` is 34 chars and will cause some problems if used, for example in `exists()` or in case another file starts with the same first 31 characters.
+
+**Warning**: That limit is easily reached and if ignored, problems might go unnoticed because no error message will appear at compilation nor runtime.
+
+For more details on the internals of SPIFFS implementation, see the [SPIFFS readme file](https://github.com/esp8266/Arduino/blob/master/cores/esp8266/spiffs/README.md).
 
 ## Uploading files to file system
 
 *ESP8266FS* is a tool which integrates into the Arduino IDE. It adds a menu item to *Tools* menu for uploading the contents of sketch data directory into ESP8266 flash file system.
 
-- Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.2.0/ESP8266FS-0.2.0.zip.
+- Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.3.0/ESP8266FS-0.3.0.zip.
 - In your Arduino sketchbook directory, create `tools` directory if it doesn't exist yet
 - Unpack the tool into `tools` directory (the path will look like `<home_dir>/Arduino/tools/ESP8266FS/tool/esp8266fs.jar`)
 - Restart Arduino IDE
