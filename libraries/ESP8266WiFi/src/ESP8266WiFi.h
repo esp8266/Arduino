@@ -76,6 +76,8 @@ class ESP8266WiFiClass : public ESP8266WiFiGenericClass, public ESP8266WiFiSTACl
 
     public:
 
+        String passphrase();
+
         void printDiag(Print& dest);
 
         friend class WiFiClient;
