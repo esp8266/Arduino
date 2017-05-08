@@ -38,6 +38,7 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/err.h"
 #include "lwip/dns.h"
+#include "lwip/init.h" // LWIP_VERSION_
 }
 
 #include "WiFiClient.h"
@@ -419,7 +420,11 @@ bool ESP8266WiFiGenericClass::forceSleepWake() {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
+#if LWIP_VERSION_MAJOR == 1
 void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg);
+#else
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
+#endif
 
 /**
  * Resolve the given hostname to an IP address.
@@ -465,7 +470,12 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg) {
+#if LWIP_VERSION_MAJOR == 1
+void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg)
+#else
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
+#endif
+{
     (void) name;
     if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
