@@ -49,13 +49,13 @@ class SPIFFSImpl : public FSImpl
 {
 public:
     SPIFFSImpl(uint32_t start, uint32_t size, uint32_t pageSize, uint32_t blockSize, uint32_t maxOpenFds)
-        : _fs({0})
-    , _start(start)
+        : _start(start)
     , _size(size)
     , _pageSize(pageSize)
     , _blockSize(blockSize)
     , _maxOpenFds(maxOpenFds)
     {
+        memset(&_fs, 0, sizeof(_fs));
     }
 
     FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) override;
@@ -176,7 +176,8 @@ protected:
 
     bool _tryMount()
     {
-        spiffs_config config = {0};
+        spiffs_config config;
+        memset(&config, 0, sizeof(config));
 
         config.hal_read_f       = &spiffs_hal_read;
         config.hal_write_f      = &spiffs_hal_write;
@@ -242,6 +243,11 @@ protected:
     static void _check_cb(spiffs_check_type type, spiffs_check_report report,
                           uint32_t arg1, uint32_t arg2)
     {
+        (void) type;
+        (void) report;
+        (void) arg1;
+        (void) arg2;
+        
         // TODO: spiffs doesn't pass any context pointer along with _check_cb,
         // so we can't do anything useful here other than perhaps
         // feeding the watchdog
@@ -268,9 +274,9 @@ public:
     SPIFFSFileImpl(SPIFFSImpl* fs, spiffs_file fd)
         : _fs(fs)
         , _fd(fd)
-        , _stat({0})
     , _written(false)
     {
+        memset(&_stat, 0, sizeof(_stat));
         _getStat();
     }
 
@@ -376,7 +382,7 @@ protected:
         auto rc = SPIFFS_fstat(_fs->getFs(), _fd, &_stat);
         if (rc != SPIFFS_OK) {
             DEBUGV("SPIFFS_fstat rc=%d\r\n", rc);
-            _stat = {0};
+            memset(&_stat, 0, sizeof(_stat));
         }
         _written = false;
     }

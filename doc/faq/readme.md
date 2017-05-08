@@ -39,7 +39,12 @@ The option to choose 4M or 1M SPIFFS is to optimize the upload time. Uploading 3
 
 ### I have observed a case when ESP.restart() doesn't work. What is the reason for that? 
 
-You will see this issue only if serial upload was not followed by a physical reset (e.g. power-on reset). For a device being in that state ESP.restart() will not work. Apparently the issue is caused by [one of internal registers not being properly updated until physical reset](https://github.com/esp8266/Arduino/issues/1017#issuecomment-200605576). This issue concerns only serial uploads. OTA uploads are not affected. If you are using ESP.restart(), the work around is to reset ESP once after each serial upload.
+You will see this issue only if serial upload was not followed by a physical reset (e.g. power-on reset). For a device being in that state `ESP.restart` will not work. Apparently the issue is caused by [one of internal registers not being properly updated until physical reset](https://github.com/esp8266/Arduino/issues/1017#issuecomment-200605576). This issue concerns only serial uploads. OTA uploads are not affected. If you are using `ESP.restart`, the work around is to reset ESP once after each serial upload.
 
 Ref. [#1017](https://github.com/esp8266/Arduino/issues/1017), [#1107](https://github.com/esp8266/Arduino/issues/1107), [#1782](https://github.com/esp8266/Arduino/issues/1782)
+
+
+### How to resolve "Board generic (platform esp8266, package esp8266) is unknown" error?
+
+This error may pop up after switching between [staging](https://github.com/esp8266/Arduino#staging-version-) and [stable](https://github.com/esp8266/Arduino#stable-version-) esp8266 / Arduino package installations, or after upgrading the package version [:arrow_right:](a04-board-generic-is-unknown.md)
 

@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+typedef long     time_t;
+
 /** The maximum number of SNTP servers that can be set */
 #ifndef SNTP_MAX_SERVERS
 #define SNTP_MAX_SERVERS           3
@@ -24,6 +26,8 @@ extern "C" {
 #define SNTP_SERVER_DNS            1
 #endif
 
+bool sntp_get_timetype(void);
+void sntp_set_receive_time_size(void);
 /** One server address/name can be defined as default if SNTP_SERVER_DNS == 1:
  * #define SNTP_SERVER_ADDRESS "pool.ntp.org"
  */

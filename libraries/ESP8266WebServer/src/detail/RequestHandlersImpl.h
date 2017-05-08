@@ -31,6 +31,7 @@ public:
     }
 
     bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+        (void) server;
         if (!canHandle(requestMethod, requestUri))
             return false;
 
@@ -39,6 +40,8 @@ public:
     }
 
     void upload(ESP8266WebServer& server, String requestUri, HTTPUpload& upload) override {
+        (void) server;
+        (void) upload;
         if (canUpload(requestUri))
             _ufn();
     }

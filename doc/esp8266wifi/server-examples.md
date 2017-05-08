@@ -7,9 +7,9 @@ title: ESP8266WiFi Server Class - Sketch Examples
 
 ## Server
 
-Setting up web a server on ESP8266 requires very title code and is surprisingly straightforward. This is thanks to functionality provided by versatile ESP8266WiFi library.
+Setting up web a server on ESP8266 requires very little code and is surprisingly straightforward. This is thanks to functionality provided by the versatile ESP8266WiFi library.
 
-The purpose of this example will be to prepare a web page that can be opened in a web browser. This page should show current raw reading of ESP's analog input pin.
+The purpose of this example will be to prepare a web page that can be opened in a web browser. This page should show the current raw reading of ESP's analog input pin.
 
 
 ## Table of Contents
@@ -69,7 +69,7 @@ Connection: close
 Refresh: 5
 
 ```
-In our example the content type is `text/html`, the connection will be closed after serving and the content should requested by client again every 5 seconds. The header is concluded with an empty line `\r\n`. This is to distinguish header from the content to follow. 
+In our example the content type is `text/html`, the connection will be closed after serving and the content should be requested by the client again every 5 seconds. The header is concluded with an empty line `\r\n`. This is to distinguish header from the content to follow. 
 
 ```
 <!DOCTYPE HTML>
@@ -222,7 +222,7 @@ Enter provided IP address in a web browser. You should see the page served by ES
 
 ![alt text](pictures/server-browser-output.png "Output from server in a web browser")
 
-The page would be refreshed every 5 seconds. Each time this happens, you should see request from the client (your web browser) printed out on the serial monitor:
+The page would be refreshed every 5 seconds. Each time this happens, you should see a request from the client (your web browser) printed out on the serial monitor:
 
 ```
 [Client connected]

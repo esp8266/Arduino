@@ -106,11 +106,13 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
     // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
+#if LWIP_VERSION_MAJOR == 1
     netif* interface = ip_route(&addr);
     if (!interface) {
         DEBUGV("no route to host\r\n");
         return 0;
     }
+#endif
 
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
@@ -135,6 +137,7 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
 
 int8_t WiFiClient::_connected(void* pcb, int8_t err)
 {
+    (void) err;
     tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
     _client = new ClientContext(tpcb, 0, 0);
     _client->ref();
@@ -144,6 +147,7 @@ int8_t WiFiClient::_connected(void* pcb, int8_t err)
 
 void WiFiClient::_err(int8_t err)
 {
+    (void) err;
     DEBUGV(":err %d\r\n", err);
     esp_schedule();
 }
@@ -159,6 +163,11 @@ bool WiFiClient::getNoDelay() {
     if (!_client)
         return false;
     return _client->getNoDelay();
+}
+
+size_t WiFiClient::availableForWrite ()
+{
+    return _client->availableForWrite();
 }
 
 size_t WiFiClient::write(uint8_t b)
@@ -177,6 +186,7 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
 
 size_t WiFiClient::write(Stream& stream, size_t unused)
 {
+    (void) unused;
     return WiFiClient::write(stream);
 }
 

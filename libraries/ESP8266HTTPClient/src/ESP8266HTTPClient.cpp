@@ -63,7 +63,7 @@ public:
 
     bool verify(WiFiClient& client, const char* host) override
     {
-        auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
+        auto wcs = static_cast<WiFiClientSecure&>(client);
         return wcs.verify(_fingerprint.c_str(), host);
     }
 
@@ -132,7 +132,6 @@ bool HTTPClient::begin(String url)
 bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 {
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
-    bool hasPort = false;
     clear();
 
     // check for : (http: or https:
@@ -349,7 +348,7 @@ int HTTPClient::PUT(uint8_t * payload, size_t size) {
 }
 
 int HTTPClient::PUT(String payload) {
-    return POST((uint8_t *) payload.c_str(), payload.length());
+    return PUT((uint8_t *) payload.c_str(), payload.length());
 }
 
 /**
