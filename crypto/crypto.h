@@ -204,6 +204,16 @@ void hmac_sha256(const uint8_t *msg, int length, const uint8_t *key,
         int key_len, uint8_t *digest);
 
 /**************************************************************************
+ * HMAC functions operating on vectors 
+ **************************************************************************/
+void hmac_md5_v(const uint8_t **msg, int* length, int count, const uint8_t *key, 
+        int key_len, uint8_t *digest);
+void hmac_sha1_v(const uint8_t **msg, int* length, int count, const uint8_t *key, 
+        int key_len, uint8_t *digest);
+void hmac_sha256_v(const uint8_t **msg, int* length, int count, const uint8_t *key, 
+        int key_len, uint8_t *digest);
+
+/**************************************************************************
  * RSA declarations 
  **************************************************************************/
 

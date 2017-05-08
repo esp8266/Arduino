@@ -45,6 +45,12 @@
 void hmac_md5(const uint8_t *msg, int length, const uint8_t *key, 
         int key_len, uint8_t *digest)
 {
+    hmac_md5_v(&msg, &length, 1, key, key_len, digest);
+}
+
+void hmac_md5_v(const uint8_t **msg, int* length, int count, const uint8_t *key, 
+        int key_len, uint8_t *digest)
+{
     MD5_CTX context;
     uint8_t k_ipad[64];
     uint8_t k_opad[64];
@@ -63,7 +69,10 @@ void hmac_md5(const uint8_t *msg, int length, const uint8_t *key,
 
     MD5_Init(&context);
     MD5_Update(&context, k_ipad, 64);
-    MD5_Update(&context, msg, length);
+    for (i = 0; i < count; ++i) 
+    {
+        MD5_Update(&context, msg[i], length[i]);
+    }
     MD5_Final(digest, &context);
     MD5_Init(&context);
     MD5_Update(&context, k_opad, 64);
@@ -76,6 +85,12 @@ void hmac_md5(const uint8_t *msg, int length, const uint8_t *key,
  * NOTE: does not handle keys larger than the block size.
  */
 void hmac_sha1(const uint8_t *msg, int length, const uint8_t *key, 
+        int key_len, uint8_t *digest)
+{
+    hmac_sha1_v(&msg, &length, 1, key, key_len, digest);
+}
+
+void hmac_sha1_v(const uint8_t **msg, int *length, int count, const uint8_t *key, 
         int key_len, uint8_t *digest)
 {
     SHA1_CTX context;
@@ -96,7 +111,10 @@ void hmac_sha1(const uint8_t *msg, int length, const uint8_t *key,
 
     SHA1_Init(&context);
     SHA1_Update(&context, k_ipad, 64);
-    SHA1_Update(&context, msg, length);
+    for (i = 0; i < count; ++i) 
+    {
+        SHA1_Update(&context, msg[i], length[i]);
+    }
     SHA1_Final(digest, &context);
     SHA1_Init(&context);
     SHA1_Update(&context, k_opad, 64);
@@ -109,6 +127,12 @@ void hmac_sha1(const uint8_t *msg, int length, const uint8_t *key,
  * NOTE: does not handle keys larger than the block size.
  */
 void hmac_sha256(const uint8_t *msg, int length, const uint8_t *key, 
+        int key_len, uint8_t *digest)
+{
+    hmac_sha256_v(&msg, &length, 1, key, key_len, digest);
+}
+
+void hmac_sha256_v(const uint8_t **msg, int *length, int count, const uint8_t *key, 
         int key_len, uint8_t *digest)
 {
     SHA256_CTX context;
@@ -129,7 +153,10 @@ void hmac_sha256(const uint8_t *msg, int length, const uint8_t *key,
 
     SHA256_Init(&context);
     SHA256_Update(&context, k_ipad, 64);
-    SHA256_Update(&context, msg, length);
+    for (i = 0; i < count; ++i) 
+    {
+        SHA256_Update(&context, msg[i], length[i]);
+    }
     SHA256_Final(digest, &context);
     SHA256_Init(&context);
     SHA256_Update(&context, k_opad, 64);

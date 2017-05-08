@@ -195,6 +195,9 @@ extern const char * const unsupported_str;
 typedef void (*crypt_func)(void *, const uint8_t *, uint8_t *, int);
 typedef void (*hmac_func)(const uint8_t *msg, int length, const uint8_t *key, 
         int key_len, uint8_t *digest);
+typedef void (*hmac_func_v)(const uint8_t **msg, int *length, int count, const uint8_t *key, 
+        int key_len, uint8_t *digest);
+
 
 int get_file(const char *filename, uint8_t **buf);
 
