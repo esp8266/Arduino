@@ -22,9 +22,11 @@ typedef struct {
   base64_encodestep step;
   char result;
   int stepcount;
+  int stepsnewline;
 } base64_encodestate;
 
 void base64_init_encodestate(base64_encodestate* state_in);
+void base64_init_encodestate_nonewlines(base64_encodestate* state_in);
 
 char base64_encode_value(char value_in);
 
