@@ -132,7 +132,7 @@ typedef struct
     uint8_t padding_size;
     uint8_t digest_size;
     uint8_t key_block_size;
-    hmac_func hmac;
+    hmac_func_v hmac_v;
     crypt_func encrypt;
     crypt_func decrypt;
 } cipher_info_t;
