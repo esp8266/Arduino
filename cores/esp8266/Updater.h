@@ -16,7 +16,7 @@
 #define UPDATE_ERROR_FLASH_CONFIG       (8)
 #define UPDATE_ERROR_NEW_FLASH_CONFIG   (9)
 #define UPDATE_ERROR_MAGIC_BYTE         (10)
-
+#define UPDATE_ERROR_BOOTSTRAP          (11)
 
 #define U_FLASH   0
 #define U_SPIFFS  100

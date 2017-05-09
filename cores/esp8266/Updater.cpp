@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include "eboot_command.h"
 #include "interrupts.h"
+#include "esp8266_peri.h"
 
 //#define DEBUG_UPDATER Serial
 
@@ -44,6 +45,20 @@ bool UpdaterClass::begin(size_t size, int command) {
     return false;
   }
 
+  /* Check boot mode; if boot mode is 1 (UART download mode),
+    we will not be able to reset into normal mode once update is done.
+    Fail early to avoid frustration.
+    https://github.com/esp8266/Arduino/issues/1017#issuecomment-200605576
+  */
+  int boot_mode = (GPI >> 16) & 0xf;
+  if (boot_mode == 1) {
+    _error = UPDATE_ERROR_BOOTSTRAP;
+#ifdef DEBUG_UPDATER
+    printError(DEBUG_UPDATER);
+#endif
+    return false;
+  }
+  
 #ifdef DEBUG_UPDATER
   if (command == U_SPIFFS) {
     DEBUG_UPDATER.println(F("[begin] Update SPIFFS."));
