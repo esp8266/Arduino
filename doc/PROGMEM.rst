@@ -75,15 +75,15 @@ Which are all defined in
     void* memmem_P(const void* buf, size_t bufSize, PGM_VOID_P findP, size_t findPSize);
     void* memcpy_P(void* dest, PGM_VOID_P src, size_t count);
     char* strncpy_P(char* dest, PGM_P src, size_t size);
-    #define strcpy_P(dest, src)          strncpy_P((dest), (src), SIZE_IRRELEVANT)
+    char* strcpy_P(dest, src)          
     char* strncat_P(char* dest, PGM_P src, size_t size);
-    #define strcat_P(dest, src)          strncat_P((dest), (src), SIZE_IRRELEVANT)
+    char* strcat_P(dest, src)         
     int strncmp_P(const char* str1, PGM_P str2P, size_t size);
-    #define strcmp_P(str1, str2P)          strncmp_P((str1), (str2P), SIZE_IRRELEVANT)s
+    int strcmp_P(str1, str2P)        
     int strncasecmp_P(const char* str1, PGM_P str2P, size_t size);
-    #define strcasecmp_P(str1, str2P)          strncasecmp_P((str1), (str2P), SIZE_IRRELEVANT)
+    int strcasecmp_P(str1, str2P)        
     size_t strnlen_P(PGM_P s, size_t size);
-    #define strlen_P(strP)          strnlen_P((strP), SIZE_IRRELEVANT)
+    size_t strlen_P(strP)     
     char* strstr_P(const char* haystack, PGM_P needle);
     int printf_P(PGM_P formatP, ...);
     int sprintf_P(char *str, PGM_P formatP, ...);
