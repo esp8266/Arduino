@@ -4,30 +4,29 @@ Guide to PROGMEM on ESP8266 and Arduino IDE
 Intro
 -----
 
-On low memory devices like the arduino and esp8266 you do not want
-strings to be stored in RAM. This occurs by default on these systems.
-Declare a string ``const char * xyz = "this is a string"`` and it will
-use up RAM.
+PROGMEM is a Arduino AVR feature that has been ported to ESP8266 to 
+ensure compatability with existing Arduino libraries, as well as, saving 
+RAM. On the esp8266 declaring a string such as ``const char * xyz = 
+"this is a string"`` will place this string in RAM, not flash.  It is 
+possible to place a String into flash, and then load it into RAM when
+it is needed.  On an 8bit AVR this process is very simple.  On the 32bit
+ESP8266 there are conditions that must be met to read back from flash.  
 
-The solution on these devices is to allow strings to be stored in read
-only memory, in Arduino this is the PROGMEM macro. Most of my experience
-is with the ESP8266 which is a 32bit micros controller. This device
-stores PROGMEM data in flash. The macro PROGMEM on ESP8266 is simply
+On the ESP8266 PROGMEM is a macro: 
 
 .. code:: cpp
 
     #define PROGMEM   ICACHE_RODATA_ATTR
 
-Which in turn is defined by:
+``ICACHE_RODATA_ATTR`` is defined by:
 
 .. code:: cpp
 
     #define ICACHE_RODATA_ATTR  __attribute__((section(".irom.text")))
 
-Which places the variable in the .irom.text section ie flash.
+Which places the variable in the .irom.text section ie flash.  Placing strings in
+flash requires using any of the methods above.  
 
-| The key to understanding PROGMEM is to understand how the strings are
-  stored and then how they are retrieved from flash.
 | ### Declare a global string to be stored in flash.
 
 .. code:: cpp
@@ -56,13 +55,12 @@ In practice:
     }
 
 The two examples above will store these strings in flash. To retrieve
-and manipulate flash strings is not straight forward as the esp8266 must
-read from flash in 4byte words. In the Arduino IDE for esp8266 there are
-several functions that can help retrieve strings from flash that have
-been stored using PROGMEM. Both of the examples above will give you a
-``const char *`` back, however if you try to do anything with these
-pointers, without correct 32bit alignment you will get a seg fault and
-the esp will crash. You must read from the flash 32 bit aligned.
+and manipulate flash strings they must be read from flash in 4byte words. 
+In the Arduino IDE for esp8266 there are several functions that can help 
+retrieve strings from flash that have been stored using PROGMEM. Both of 
+the examples above return ``const char *``.   However use of these pointers, 
+without correct 32bit alignment you will cause a segmentation fault and
+the ESP8266 will crash. You must read from the flash 32 bit aligned.
 
 Functions to read back from PROGMEM
 -----------------------------------
@@ -95,20 +93,8 @@ Which are all defined in
 There are a lot of functions there but in reality they are ``_P``
 versions of standard c functions that are adapted to read from the
 esp8266 32bit aligned flash. All of them take a ``PGM_P`` which is
-essentially a ``const char *``. Under the hood these functions all use:
-
-.. code:: cpp
-
-    #define pgm_read_byte(addr)                                                    \
-    (__extension__({                                                               \
-        PGM_P __local = (PGM_P)(addr);  /* isolate varible for macro expansion */         \
-        ptrdiff_t __offset = ((uint32_t)__local & 0x00000003); /* byte aligned mask */            \
-        const uint32_t* __addr32 = (const uint32_t*)((const uint8_t*)(__local)-__offset); \
-        uint8_t __result = ((*__addr32) >> (__offset * 8));                        \
-        __result;                                                                  \
-    }))
-
-which reads backs the bytes without causing a seg fault.
+essentially a ``const char *``. Under the hood these functions all use, a 
+process to ensure that 4 bytes are read, and the request byte is returned. 
 
 This works well when you have designed a function as above that is
 specialised for dealing with PROGMEM pointers but there is no type
@@ -120,8 +106,10 @@ functions that can use flash strings when they are defined as ``PGM_P``.
 If you try you will get an ambiguous overload error as ``PGM_P`` ==
 ``const char *``.
 
-Enter the \_\_FlashStringHelper... This is a wrapper class that allows flash strings to be used as a class, this means that type checking and function overloading can be used with flash strings. Most people will be familiar with the ``F()`` macro and possibly the FPSTR() macro. These are defined in `WString.h <https://github.com/esp8266/Arduino/blob/master/cores/esp8266/WString.h#L37>`__:
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Enter the \_\_FlashStringHelper... This is a wrapper class that allows flash 
+strings to be used as a class, this means that type checking and function 
+overloading can be used with flash strings. Most people will be familiar with 
+the ``F()`` macro and possibly the FPSTR() macro. These are defined in `WString.h <https://github.com/esp8266/Arduino/blob/master/cores/esp8266/WString.h#L37>`__:
 
 .. code:: cpp
 
@@ -168,7 +156,6 @@ This allows you to write:
     String mystring(F("This string is stored in flash"));
 
 How do I write a function to use \_\_FlashStringHelper? Simples: cast the pointer back to a PGM\_P and use the ``_P`` functions shown above. This an example implementation for String for the concat function.
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 .. code:: cpp
 
