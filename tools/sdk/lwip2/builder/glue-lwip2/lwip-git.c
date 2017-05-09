@@ -304,7 +304,7 @@ static void netif_init_common (struct netif* netif)
 	
 	netif->hostname = hostname;
 	netif->chksum_flags = NETIF_CHECKSUM_ENABLE_ALL;
-	netif->mtu = TCP_MSS + 40;
+	netif->mtu = 1500;//TCP_MSS + 40;
 }
 
 static err_t netif_init_sta (struct netif* netif)

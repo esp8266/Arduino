@@ -16,8 +16,8 @@ original repository: https://github.com/d-a-v/esp8266-phy
 
 * NTPClient
 * WiFiAccessPoint
-* OTA (you'll have to change 1460 to 536 in espota.py, see below)
-* seems to solve some Arduino/esp8266 TCP issues
+* OTA
+* seems to solve some TCP issues
 
 # rebuild
 
@@ -41,13 +41,7 @@ make install
 
 this will overwrite tools/sdk/{lib/liblwip2.a,lwip2/include/}
 
-# about OTA and MSS
-
-Although OTA works over http, it won't with UDP in arduino IDE / espota.py if MSS does not match the '1460' value in tools/espota.py.
-
-One can either change 1460 to the current MSS value (tools/espota.py: line 156: f.read(1460)),
-
-or use 1460 as MSS value (tools/sdk/lwip2/builder/glue-lwip2/lwipopts.h).
+# about MSS
 
 Remember the MSS footprint: 4*MSS bytes in RAM per tcp connection.
 The lowest recommanded value is 536 which is the default here.
