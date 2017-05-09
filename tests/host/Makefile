@@ -18,6 +18,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	spiffs_api.cpp \
 	pgmspace.cpp \
 	MD5Builder.cpp \
+	SHA256Builder.cpp \
 )
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
@@ -37,6 +38,7 @@ MOCK_CPP_FILES := $(addprefix common/,\
 
 MOCK_C_FILES := $(addprefix common/,\
 	md5.c \
+	sha256.c \
 	noniso.c \
 )
 
@@ -49,6 +51,7 @@ TEST_CPP_FILES := \
 	fs/test_fs.cpp \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
+	core/test_sha256builder.cpp \
 
 
 CXXFLAGS += -std=c++11 -Wall -coverage -O0 -fno-common
