@@ -39,14 +39,14 @@ void UpdaterClass::_reset() {
 bool UpdaterClass::begin(size_t size, int command) {
   if(_size > 0){
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.println("[begin] already running");
+    DEBUG_UPDATER.println(F("[begin] already running"));
 #endif
     return false;
   }
 
 #ifdef DEBUG_UPDATER
   if (command == U_SPIFFS) {
-    DEBUG_UPDATER.println("[begin] Update SPIFFS.");
+    DEBUG_UPDATER.println(F("[begin] Update SPIFFS."));
   }
 #endif
 
@@ -103,7 +103,7 @@ bool UpdaterClass::begin(size_t size, int command) {
   else {
     // unknown command
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.println("[begin] Unknown update command.");
+    DEBUG_UPDATER.println(F("[begin] Unknown update command."));
 #endif
     return false;
   }
@@ -137,7 +137,7 @@ bool UpdaterClass::setMD5(const char * expected_md5){
 bool UpdaterClass::end(bool evenIfRemaining){
   if(_size == 0){
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.println("no update");
+    DEBUG_UPDATER.println(F("no update"));
 #endif
     return false;
   }
@@ -349,31 +349,33 @@ size_t UpdaterClass::writeStream(Stream &data) {
 }
 
 void UpdaterClass::printError(Stream &out){
-  out.printf("ERROR[%u]: ", _error);
+  out.printf_P(PSTR("ERROR[%u]: "), _error);
   if(_error == UPDATE_ERROR_OK){
-    out.println("No Error");
+    out.println(F("No Error"));
   } else if(_error == UPDATE_ERROR_WRITE){
-    out.println("Flash Write Failed");
+    out.println(F("Flash Write Failed"));
   } else if(_error == UPDATE_ERROR_ERASE){
-    out.println("Flash Erase Failed");
+    out.println(F("Flash Erase Failed"));
   } else if(_error == UPDATE_ERROR_READ){
-    out.println("Flash Read Failed");
+    out.println(F("Flash Read Failed"));
   } else if(_error == UPDATE_ERROR_SPACE){
-    out.println("Not Enough Space");
+    out.println(F("Not Enough Space"));
   } else if(_error == UPDATE_ERROR_SIZE){
-    out.println("Bad Size Given");
+    out.println(F("Bad Size Given"));
   } else if(_error == UPDATE_ERROR_STREAM){
-    out.println("Stream Read Timeout");
+    out.println(F("Stream Read Timeout"));
   } else if(_error == UPDATE_ERROR_MD5){
-    out.println("MD5 Check Failed");
+    out.println(F("MD5 Check Failed"));
   } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
-    out.printf("Flash config wrong real: %d IDE: %d\n", ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
+    out.printf_P(PSTR("Flash config wrong real: %d IDE: %d\n"), ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
   } else if(_error == UPDATE_ERROR_NEW_FLASH_CONFIG){
-    out.printf("new Flash config wrong real: %d\n", ESP.getFlashChipRealSize());
+    out.printf_P(PSTR("new Flash config wrong real: %d\n"), ESP.getFlashChipRealSize());
   } else if(_error == UPDATE_ERROR_MAGIC_BYTE){
-    out.println("Magic byte is wrong, not 0xE9");
+    out.println(F("Magic byte is wrong, not 0xE9"));
+  } else if (_error == UPDATE_ERROR_BOOTSTRAP){
+    out.println(F("Invalid bootstrapping state, reset ESP8266 before updating"));
   } else {
-    out.println("UNKNOWN");
+    out.println(F("UNKNOWN"));
   }
 }
 
