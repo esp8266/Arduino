@@ -33,7 +33,11 @@ enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
 enum HTTPClientStatus { HC_NONE, HC_WAIT_READ, HC_WAIT_CLOSE };
 
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
+
+#ifndef HTTP_UPLOAD_BUFLEN
 #define HTTP_UPLOAD_BUFLEN 2048
+#endif
+
 #define HTTP_MAX_DATA_WAIT 1000 //ms to wait for the client to send the request
 #define HTTP_MAX_POST_WAIT 1000 //ms to wait for POST data to arrive
 #define HTTP_MAX_SEND_WAIT 5000 //ms to wait for data chunk to be ACKed
