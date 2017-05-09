@@ -127,7 +127,12 @@ bool UpdaterClass::begin(size_t size, int command) {
   _startAddress = updateStartAddress;
   _currentAddress = _startAddress;
   _size = size;
-  _buffer = new uint8_t[FLASH_SECTOR_SIZE];
+  if (ESP.getFreeHeap() > 2 * FLASH_SECTOR_SIZE) {
+    _bufferSize = FLASH_SECTOR_SIZE;
+  } else {
+    _bufferSize = 256;
+  }
+  _buffer = new uint8_t[_bufferSize];
   _command = command;
 
 #ifdef DEBUG_UPDATER
@@ -218,13 +223,16 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
 bool UpdaterClass::_writeBuffer(){
 
-  if(!_async) yield();
-  bool result = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
-  if(!_async) yield();
-  if (result) {
-      result = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+  bool result = true;
+  if (_currentAddress % FLASH_SECTOR_SIZE == 0) {
+    if(!_async) yield();
+    result = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
   }
-  if(!_async) yield();
+  
+  if (result) {
+    if(!_async) yield();
+    result = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+  }
 
   if (!result) {
     _error = UPDATE_ERROR_WRITE;
@@ -253,8 +261,8 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
 
   size_t left = len;
 
-  while((_bufferLen + left) > FLASH_SECTOR_SIZE) {
-    size_t toBuff = FLASH_SECTOR_SIZE - _bufferLen;
+  while((_bufferLen + left) > _bufferSize) {
+    size_t toBuff = _bufferSize - _bufferLen;
     memcpy(_buffer + _bufferLen, data + (len - left), toBuff);
     _bufferLen += toBuff;
     if(!_writeBuffer()){
@@ -340,10 +348,10 @@ size_t UpdaterClass::writeStream(Stream &data) {
     }
 
     while(remaining()) {
-        toRead = data.readBytes(_buffer + _bufferLen,  (FLASH_SECTOR_SIZE - _bufferLen));
+        toRead = data.readBytes(_buffer + _bufferLen,  (_bufferSize - _bufferLen));
         if(toRead == 0) { //Timeout
             delay(100);
-            toRead = data.readBytes(_buffer + _bufferLen, (FLASH_SECTOR_SIZE - _bufferLen));
+            toRead = data.readBytes(_buffer + _bufferLen, (_bufferSize - _bufferLen));
             if(toRead == 0) { //Timeout
                 _error = UPDATE_ERROR_STREAM;
                 _currentAddress = (_startAddress + _size);
@@ -355,7 +363,7 @@ size_t UpdaterClass::writeStream(Stream &data) {
             }
         }
         _bufferLen += toRead;
-        if((_bufferLen == remaining() || _bufferLen == FLASH_SECTOR_SIZE) && !_writeBuffer())
+        if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
             return written;
         written += toRead;
         yield();
