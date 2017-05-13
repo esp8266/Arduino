@@ -450,7 +450,9 @@ void dhcps_stop (void)
 void espconn_init (void)
 {
 	// not implemented yet
-	STUB(espconn_init);
+	// called at boot/reset
+	// annoying message to hide:
+	//STUB(espconn_init);
 }
 
 void dhcp_cleanup (struct netif* netif)
