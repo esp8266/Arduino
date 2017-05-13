@@ -611,7 +611,7 @@ struct netif* netif_add (
 		uassert(!netif_esp[netif->num]);
 		netif_esp[netif->num] = netif;
 
-		esp2glue_netif_add(netif->num, ipaddr->addr, netmask->addr, gw->addr, netif->hwaddr_len, netif->hwaddr);
+		esp2glue_netif_add(netif->num, ipaddr->addr, netmask->addr, gw->addr, netif->hwaddr_len, netif->hwaddr, netif->mtu);
 	}
 
 	//////////////////////////////

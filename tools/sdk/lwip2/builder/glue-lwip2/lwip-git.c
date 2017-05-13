@@ -304,7 +304,8 @@ static void netif_init_common (struct netif* netif)
 	
 	netif->hostname = hostname;
 	netif->chksum_flags = NETIF_CHECKSUM_ENABLE_ALL;
-	netif->mtu = 1500;//TCP_MSS + 40;
+	// netif->mtu given by glue
+	//netif->mtu = 1500;//TCP_MSS + 40;
 }
 
 static err_t netif_init_sta (struct netif* netif)
@@ -333,7 +334,7 @@ static err_t netif_init_ap (struct netif* netif)
 	return ERR_OK;
 }
 
-void esp2glue_netif_add (int netif_idx, uint32_t ip, uint32_t mask, uint32_t gw, size_t hwlen, const uint8_t* hwaddr)
+void esp2glue_netif_add (int netif_idx, uint32_t ip, uint32_t mask, uint32_t gw, size_t hwlen, const uint8_t* hwaddr, uint16_t mtu)
 {
 	static int check_idx = 0;
 	uassert(netif_idx == check_idx);
@@ -343,6 +344,7 @@ void esp2glue_netif_add (int netif_idx, uint32_t ip, uint32_t mask, uint32_t gw,
 	netif->hwaddr_len = hwlen;
 	if (hwlen && hwlen <= sizeof(netif->hwaddr))
 		memcpy(netif->hwaddr, hwaddr, netif->hwaddr_len = hwlen);
+	netif->mtu = mtu;
 
 	ip4_addr_t aip = { ip }, amask = { mask }, agw = { gw };
 	netif_add(
