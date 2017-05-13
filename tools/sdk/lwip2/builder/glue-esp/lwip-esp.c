@@ -310,6 +310,9 @@ err_glue_t glue2esp_linkoutput (int netif_idx, void* ref2save, void* data, size_
 	return esp2glue_err(err);
 }
 
+#if 1
+#define esp_guess_netif_idx(netif) ((netif)->num)
+#else
 int esp_guess_netif_idx (struct netif* netif)
 {
 	struct netif* test_netif_sta = eagle_lwip_getif(STATION_IF);
@@ -341,6 +344,7 @@ int esp_guess_netif_idx (struct netif* netif)
 	}
 	return ret;
 }
+#endif
 
 ///////////////////////////////////////
 // STUBS / wrappers
