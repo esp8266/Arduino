@@ -137,7 +137,7 @@ Connecting to sensor-net
 .
 Connected, IP address: 192.168.1.22
 ```
-Please note that station with static IP configuration usually connects to the network faster. In the above example it took about 500ms (one dot `.` displayed). This is because obtaining of IP configuration by DHCP client takes time and in this case this step is skipped.
+Please note that station with static IP configuration usually connects to the network faster. In the above example it took about 500ms (one dot `.` displayed). This is because obtaining of IP configuration by DHCP client takes time and in this case this step is skipped. If you pass all three parameter as 0.0.0.0 ( local_ip, gateway and subnet), it will re enable DHCP. You need to re connect the device to get new IPs.
 
 
 ### Manage Connection

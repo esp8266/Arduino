@@ -124,6 +124,11 @@ public:
         }
     }
 
+    size_t availableForWrite ()
+    {
+        return _pcb? tcp_sndbuf(_pcb): 0;
+    }
+
     void setNoDelay(bool nodelay)
     {
         if(!_pcb) {
@@ -312,9 +317,7 @@ protected:
 
     void _cancel_write()
     {
-        if (_datasource) {
-            delete _datasource;
-            _datasource = nullptr;
+        if (_send_waiting) {
             esp_schedule();
         }
     }
@@ -322,14 +325,22 @@ protected:
     size_t _write_from_source(DataSource* ds)
     {
         assert(_datasource == nullptr);
+        assert(_send_waiting == 0);
         _datasource = ds;
         _written = 0;
-        _write_some();
-        while (_datasource && !_noblock) {
-            _send_waiting = true;
+        do {
+            _write_some();
+
+            if (!_datasource->available() || _noblock || state() == CLOSED) {
+                delete _datasource;
+                _datasource = nullptr;
+                break;
+            }
+
+            ++_send_waiting;
             esp_yield();
-        }
-        _send_waiting = false;
+        } while(true);
+        _send_waiting = 0;
         return _written;
     }
 
@@ -345,31 +356,36 @@ protected:
             can_send = 0;
         }
         size_t will_send = (can_send < left) ? can_send : left;
-        bool did_write = false;
-        while( will_send ) {
+        DEBUGV(":wr %d %d %d\r\n", will_send, left, _written);
+        bool need_output = false;
+        while( will_send && _datasource) {
             size_t next_chunk =
                 will_send > _write_chunk_size ? _write_chunk_size : will_send;
             const uint8_t* buf = _datasource->get_buffer(next_chunk);
+            if (state() == CLOSED) {
+                need_output = false;
+                break;
+            }
             err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
+            DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, err);
             _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
                 _written += next_chunk;
-                did_write = true;
+                need_output = true;
+            } else {
+                break;
             }
             will_send -= next_chunk;
         }
-        if( did_write ) tcp_output(_pcb);
-
-        if (!_datasource->available() || _noblock) {
-            delete _datasource;
-            _datasource = nullptr;
+        if( need_output ) {
+            tcp_output(_pcb);
         }
     }
 
     void _write_some_from_cb()
     {
-        _write_some();
-        if (!_datasource && _send_waiting) {
+        if (_send_waiting == 1) {
+            _send_waiting--;
             esp_schedule();
         }
     }
@@ -485,7 +501,7 @@ private:
     size_t _written = 0;
     size_t _write_chunk_size = 256;
     bool _noblock = false;
-    bool _send_waiting = false;
+    int _send_waiting = 0;
 };
 
 #endif//CLIENTCONTEXT_H

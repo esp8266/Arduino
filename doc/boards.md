@@ -33,6 +33,7 @@ title: Supported Hardware
   * [WeMos D1](#wemos-d1)
   * [WeMos D1 mini](#wemos-d1-mini)
   * [ESPino by ThaiEasyElec](#espinotee)
+  * [gen4-IoD Range by 4D Systems](#gen4iod)
 
 ## Adafruit HUZZAH ESP8266 (ESP-12)
 
@@ -303,6 +304,16 @@ We will update an English description soon.
 - Dimensions: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_Dimension.pdf
 - Pinouts: http://thaieasyelec.com/downloads/ETEE052/ETEE052_ESPino_User_Manual_TH_v1_0_20160204.pdf (Please see pg. 8)
 
+## gen4-IoD Range by 4D Systems
+gen4-IoD Range of ESP8266 powered Display Modules by 4D Systems.
+
+2.4", 2.8" and 3.2" TFT LCD with uSD card socket and Resistive Touch. Chip Antenna + uFL Connector.
+  
+Datasheet and associated downloads can be found on the 4D Systems product page.
+
+The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.
+  
+- Product page: http://www.4dsystems.com.au/product/gen4-IoD
 
 
 
