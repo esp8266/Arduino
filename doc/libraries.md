@@ -107,7 +107,7 @@ APIs related to deep sleep and watchdog timer are available in the `ESP` object,
 
 `ESP.getSketchSize()` returns the size of the current sketch as an unsigned 32-bit integer.
 
-`ESP.getFreeSketchSpace()` returns the free sketch space as an unsigned 8-bit intege.
+`ESP.getFreeSketchSpace()` returns the free sketch space as an unsigned 32-bit integer.
 
 `ESP.getSketchMD5()` returns a lowercase String containing the MD5 of the current sketch.
 
