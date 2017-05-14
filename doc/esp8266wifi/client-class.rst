@@ -33,7 +33,7 @@ This algorithm is intended to reduce TCP/IP traffic of small packets sent over t
 
 .. code:: cpp
 
-    clinet.setNoDelay(true);
+    client.setNoDelay(true);
 
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~

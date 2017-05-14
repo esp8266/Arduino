@@ -39,6 +39,28 @@ SPI
 
 SPI library supports the entire Arduino SPI API including transactions, including setting phase (CPHA). Setting the Clock polarity (CPOL) is not supported, yet (SPI\_MODE2 and SPI\_MODE3 not working).
 
+The usual SPI pins are: 
+
+- ``MOSI`` = GPIO13
+- ``MISO`` = GPIO12
+- ``SCLK`` = GPIO14
+
+There's an extended mode where you can swap the normal pins to the SPI0 hardware pins.
+This is enabled  by calling ``SPI.pins(6, 7, 8, 0)`` before the call to ``SPI.begin()``. The pins would
+change to:
+
+- ``MOSI`` = SD1
+- ``MISO`` = SD0
+- ``SCLK`` = CLK
+- ``HWCS`` = GPIO0
+
+This mode shares the SPI pins with the controller that reads the program code from flash and is
+controlled by a hardware arbiter (the flash has always higher priority). For this mode the CS
+will be controlled by hardware as you can't handle the CS line with a GPIO, you never actually
+know when the arbiter is going to grant you access to the bus so you must let it handle CS
+automatically.
+
+
 SoftwareSerial
 --------------
 
@@ -55,13 +77,23 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.restart()`` restarts the CPU.
 
-``ESP.getResetReason()`` returns String containing the last reset resaon in human readable format.
+``ESP.getResetReason()`` returns a String containing the last reset reason in human readable format.
 
 ``ESP.getFreeHeap()`` returns the free heap size.
 
 ``ESP.getChipId()`` returns the ESP8266 chip ID as a 32-bit integer.
 
-Several APIs may be used to get flash chip info:
+``ESP.getCoreVersion()`` returns a String containing the core version.
+
+``ESP.getSdkVersion()`` returns the SDK version as a char.
+
+``ESP.getCpuFreqMHz()`` returns the CPU frequency in MHz as an unsigned 8-bit integer.
+
+``ESP.getSketchSize()`` returns the size of the current sketch as an unsigned 32-bit integer.
+
+``ESP.getFreeSketchSpace()`` returns the free sketch space as an unsigned 32-bit integer.
+
+``ESP.getSketchMD5()`` returns a lowercase String containing the MD5 of the current sketch.
 
 ``ESP.getFlashChipId()`` returns the flash chip ID as a 32-bit integer.
 
@@ -86,7 +118,7 @@ Note that by default ADC is configured to read from TOUT pin using ``analogRead(
 mDNS and DNS-SD responder (ESP8266mDNS library)
 -----------------------------------------------
 
-Allows the sketch to respond to multicast DNS queries for domain names like "foo.local", and DNS-SD (service dicovery) queries. See attached example for details.
+Allows the sketch to respond to multicast DNS queries for domain names like "foo.local", and DNS-SD (service discovery) queries. See attached example for details.
 
 SSDP responder (ESP8266SSDP)
 ----------------------------
@@ -96,7 +128,7 @@ SSDP is another service discovery protocol, supported on Windows out of the box.
 DNS server (DNSServer library)
 ------------------------------
 
-Implements a simple DNS server that can be used in both STA and AP modes. The DNS server currently supports only one domain (for all other domains it will reply with NXDOMAIN or custom status code). With it clients can open a web server running on ESP8266 using a domain name, not an IP address. See attached example for details.
+Implements a simple DNS server that can be used in both STA and AP modes. The DNS server currently supports only one domain (for all other domains it will reply with NXDOMAIN or custom status code). With it, clients can open a web server running on ESP8266 using a domain name, not an IP address.
 
 Servo
 -----
@@ -141,3 +173,4 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 -  `OLED <https://github.com/klarsys/esp8266-OLED>`__ - a library for controlling I2C connected OLED displays. Tested with 0.96 inch OLED graphics display.
 -  `MFRC522 <https://github.com/miguelbalboa/rfid>`__ - A library for using the Mifare RC522 RFID-tag reader/writer.
 -  `Ping <https://github.com/dancol90/ESP8266Ping>`__ - lets the ESP8266 ping a remote machine.
+-  `AsyncPing <https://github.com/akaJes/AsyncPing>`__ - fully asynchronous Ping library (have full ping statistic and hardware MAC address).

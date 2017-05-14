@@ -105,8 +105,7 @@ Uploading files to file system
 menu item to *Tools* menu for uploading the contents of sketch data
 directory into ESP8266 flash file system.
 
--  Download the tool:
-   https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.2.0/ESP8266FS-0.2.0.zip.
+-  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.3.0/ESP8266FS-0.3.0.zip.
 -  In your Arduino sketchbook directory, create ``tools`` directory if
    it doesn't exist yet
 -  Unpack the tool into ``tools`` directory (the path will look like
