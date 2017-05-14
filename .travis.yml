@@ -3,23 +3,25 @@ language: bash
 os:
   - linux
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
+dist: trusty
+
+install:
+  - pip install --user -r doc/requirements.txt
 
 script:
   - set -e
-  - export CXX="g++-4.8" CC="gcc-4.8" GCOV="gcov-4.8"
+  - echo -e "travis_fold:start:docs"
+  - pushd $TRAVIS_BUILD_DIR/doc
+  - SPHINXOPTS="-W" make html
+  - popd
+  - echo -e "travis_fold:end:docs"
   - echo -e "travis_fold:start:host_tests"
   - pushd $TRAVIS_BUILD_DIR/tests/host
   - make
   - make clean-objects
+  - popd
   - echo -e "travis_fold:end:host_tests"
   - echo -e "travis_fold:start:sketch_test_env_prepare"
-  - popd
   - wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
   - tar xf arduino.tar.xz
   - mv arduino-nightly $HOME/arduino_ide
@@ -41,10 +43,6 @@ script:
   - echo -e "travis_fold:start:size_report"
   - cat size.log
   - echo -e "travis_fold:end:size_report"
-
-after_success:
-    - pushd $TRAVIS_BUILD_DIR/tests/host
-    - bash <(curl -s https://codecov.io/bash) -X gcov
 
 notifications:
   email:
