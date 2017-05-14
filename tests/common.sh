@@ -84,3 +84,67 @@ function install_libraries()
 
     popd
 }
+
+function install_ide()
+{
+    local ide_path=$1
+    local core_path=$2
+    wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+    tar xf arduino.tar.xz
+    mv arduino-nightly $ide_path
+    cd $ide_path/hardware
+    mkdir esp8266com
+    cd esp8266com
+    ln -s $core_path esp8266
+    cd esp8266/tools
+    python get.py
+    export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
+}
+
+function run_host_tests()
+{
+    pushd host
+    make
+    make clean-objects
+    popd
+}
+
+
+function run_travis_ci_build()
+{
+    export CXX="g++-4.8" CC="gcc-4.8" GCOV="gcov-4.8"
+    echo -e "travis_fold:start:host_tests"
+    cd $TRAVIS_BUILD_DIR/tests
+    run_host_tests
+    echo -e "travis_fold:end:host_tests"
+    echo -e "travis_fold:start:sketch_test_env_prepare"
+    cd $TRAVIS_BUILD_DIR
+    install_ide $HOME/arduino_ide $TRAVIS_BUILD_DIR
+    which arduino
+    cd $TRAVIS_BUILD_DIR
+    install_libraries
+    echo -e "travis_fold:end:sketch_test_env_prepare"
+    echo -e "travis_fold:start:sketch_test"
+    build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries"
+    echo -e "travis_fold:end:sketch_test"
+    echo -e "travis_fold:start:size_report"
+    cat size.log
+    echo -e "travis_fold:end:size_report"
+    pushd $TRAVIS_BUILD_DIR/tests/host
+    bash <(curl -s https://codecov.io/bash) -X gcov
+}
+
+function deploy_nightly_package()
+{
+    cd $TRAVIS_BUILD_DIR/package
+    ./deploy_nightly_package.sh
+}
+
+set -e
+
+if [ "$BUILD_TYPE" = "deploy_nightly_package" ]; then
+    deploy_nightly_package
+elif [ "$BUILD_TYPE" = "build" ]; then
+    run_travis_ci_build
+fi
+

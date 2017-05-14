@@ -38,10 +38,10 @@ Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index
 
 Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0/](http://esp8266.github.io/Arduino/versions/2.3.0/)
 
-##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
-Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
+##### Nightly version ![](http://arduino.esp8266.com/nightly/badge.svg)
+Boards manager link: `http://arduino.esp8266.com/nightly/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0-rc2/](http://esp8266.github.io/Arduino/versions/2.3.0-rc2/)
+No online documentation available for nightly version yet — work in progress.
 
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino) [![codecov.io](https://codecov.io/github/esp8266/Arduino/coverage.svg?branch=master)](https://codecov.io/github/esp8266/Arduino?branch=master)

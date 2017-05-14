@@ -2,6 +2,8 @@ sudo: false
 language: bash
 os:
   - linux
+env:
+  - BUILD_TYPE=build
 
 addons:
   apt:
@@ -11,40 +13,7 @@ addons:
       - g++-4.8
 
 script:
-  - set -e
-  - export CXX="g++-4.8" CC="gcc-4.8" GCOV="gcov-4.8"
-  - echo -e "travis_fold:start:host_tests"
-  - pushd $TRAVIS_BUILD_DIR/tests/host
-  - make
-  - make clean-objects
-  - echo -e "travis_fold:end:host_tests"
-  - echo -e "travis_fold:start:sketch_test_env_prepare"
-  - popd
-  - wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-  - tar xf arduino.tar.xz
-  - mv arduino-nightly $HOME/arduino_ide
-  - cd $HOME/arduino_ide/hardware
-  - mkdir esp8266com
-  - cd esp8266com
-  - ln -s $TRAVIS_BUILD_DIR esp8266
-  - cd esp8266/tools
-  - python get.py
-  - export PATH="$HOME/arduino_ide:$TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf/bin:$PATH"
-  - which arduino
-  - cd $TRAVIS_BUILD_DIR
-  - source tests/common.sh
-  - install_libraries
-  - echo -e "travis_fold:end:sketch_test_env_prepare"
-  - echo -e "travis_fold:start:sketch_test"
-  - build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries"
-  - echo -e "travis_fold:end:sketch_test"
-  - echo -e "travis_fold:start:size_report"
-  - cat size.log
-  - echo -e "travis_fold:end:size_report"
-
-after_success:
-    - pushd $TRAVIS_BUILD_DIR/tests/host
-    - bash <(curl -s https://codecov.io/bash) -X gcov
+  - $TRAVIS_BUILD_DIR/tests/common.sh
 
 notifications:
   email:
