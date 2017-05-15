@@ -8,7 +8,8 @@
 #include "lwip/udp.h"
 #include "lwip/mem.h"
 #include "osapi.h"
-#include "lwip/app/dhcpserver.h"
+
+#include "lwip/apps-esp/dhcpserver.h"
 
 #ifndef LWIP_OPEN_SRC
 #include "net80211/ieee80211_var.h"

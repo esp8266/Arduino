@@ -36,7 +36,10 @@ author: d. gauchard
 #include "lwip/dhcp.h"
 #include "lwip/etharp.h"
 #include "netif/ethernet.h"
-#include "lwip/app/dhcpserver.h"
+#include "lwip/apps/sntp.h"
+
+// this is dhcpserver taken from lwip-1.4-espressif
+#include "lwip/apps-esp/dhcpserver.h"
 
 #include "glue.h"
 #include "lwip-helper.h"
@@ -51,8 +54,8 @@ static char hostname[32];
 struct netif netif_git[2];
 const char netif_name[2][8] = { "station", "soft-ap" };
 
-int ntp_servers_number = 0;
-ip4_addr_t* ntp_servers = NULL;
+//int ntp_servers_number = 0;
+//ip4_addr_t* ntp_servers = NULL;
 
 int doprint_allow = 0; // for doprint()
 
@@ -197,6 +200,7 @@ err_glue_t esp2glue_dhcp_start (int netif_idx)
 	return git2glue_err(err);
 }
 
+#if 0 // now using apps/sntp
 void dhcp_set_ntp_servers (u8_t number, const ip4_addr_t* ntp_server_addrs)
 {
 	uprint(DBG "%d ntp-server known\n", number);
@@ -226,6 +230,7 @@ void dhcp_set_ntp_servers (u8_t number, const ip4_addr_t* ntp_server_addrs)
 	}
 #endif
 }
+#endif
 
 err_t new_linkoutput (struct netif* netif, struct pbuf* p)
 {
@@ -377,6 +382,10 @@ void esp2glue_netif_set_addr (int netif_idx, uint32_t ip, uint32_t mask, uint32_
 void esp2glue_lwip_init (void)
 {
 	lwip_init();
+	
+	sntp_servermode_dhcp(1); /* get SNTP server via DHCP */
+	sntp_setoperatingmode(SNTP_OPMODE_POLL);
+	sntp_init();
 }
 
 void esp2glue_alloc_for_recv (size_t len, void** pbuf, void** data)

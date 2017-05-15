@@ -38,7 +38,9 @@ copy:
 	cp $(LWIP_LIB) $(LWIP_LIB_RELEASE)
 	rm -rf ../include
 	cp -a lwip2-src/src/include ..
-	cp -a glue-lwip2/lwipopts.h glue-lwip2/lwip2-git-hash.h glue-lwip2/arch ../include
+	cp -a glue-lwip2/lwip2-git-hash.h glue-lwip2/arch ../include
+	(echo "/* this will be overwritten from ../builder/glue-lwip2/lwip2/lwipopts.h */"; cat glue-lwip2/lwipopts.h) > ../include/lwipopts.h
+	echo "warning: this directory is re/over/written from ../builder/ files upon lwip2 build" > ../include/README.md
 
 rawinstall: $(LWIP_LIB) copy
 install: rawinstall section-rename

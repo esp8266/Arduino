@@ -2968,6 +2968,20 @@
  * @}
  */
 
+
+/*
+   --------------------------------------------------
+   ------------------ SNTP options ------------------
+   --------------------------------------------------
+*/
+#define SNTP_SERVER_DNS            1	// SNTP support DNS names through sntp_setservername / sntp_getservername
+
+
+/*
+   --------------------------------------------------
+   --------------------------------------------------
+*/
+
 #include "lwip/debug.h"
 #include "arch/cc.h"
 #include "lwip2-git-hash.h"
