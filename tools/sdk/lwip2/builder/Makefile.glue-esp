@@ -1,0 +1,10 @@
+
+SRC = \
+	$(patsubst %.c,$(BUILD)/%.o,$(wildcard glue-esp/*.c))
+
+BUILD_INCLUDES = -I$(BUILD) -I$(SDK)/include -I$(ESP_LWIP_ORIG)/include -Iglue-esp -Iglue
+
+include $(ROOT)/Makefile.common
+-include $(BUILD)/glue-esp/*.d
+
+all: $(LWIP_LIB)
