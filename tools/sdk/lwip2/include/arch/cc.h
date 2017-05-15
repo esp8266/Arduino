@@ -35,13 +35,18 @@ author: d. gauchard
 #include "stdint.h"
 
 #ifdef LWIP_BUILD
+
 // define LWIP_BUILD only when building LWIP
 // otherwise include files below would conflict
 // with standard headers like atoi()
 #include "ets_sys.h"
 #include "osapi.h"
 #include "esp-missing.h"
-#endif
+
+void sntp_set_system_time (uint32_t t);
+
+#endif // defined(LWIP_BUILD)
+
 #include "mem.h" // useful for os_malloc used in esp-arduino's mDNS
 
 typedef int sys_prot_t;	// not really used

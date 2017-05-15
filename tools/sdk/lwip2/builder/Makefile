@@ -10,6 +10,8 @@ IRAM	= glue2esp_err esp2glue_err pbuf_wrapper_get pbuf_wrapper_release glue2esp_
 IRAM	+= glue2git_err git2glue_err new_linkoutput esp2glue_pbuf_freed esp2glue_alloc_for_recv esp2glue_ethernet_input
 # lwip2
 IRAM	+= sys_timeout_LWIP2
+# sntp
+IRAM	+= sntp_time_inc sntp_get_current_timestamp
 ####################################
 
 $(LWIP_LIB): all

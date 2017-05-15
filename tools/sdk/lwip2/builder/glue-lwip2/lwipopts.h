@@ -2974,8 +2974,10 @@
    ------------------ SNTP options ------------------
    --------------------------------------------------
 */
-#define SNTP_SERVER_DNS            1	// SNTP support DNS names through sntp_setservername / sntp_getservername
-
+#define SNTP_SERVER_DNS			1				// SNTP support DNS names through sntp_setservername / sntp_getservername
+#define SNTP_SERVER_ADDRESS		"pool.ntp.org"			// default
+#define SNTP_GET_SERVERS_FROM_DHCP	1
+#define SNTP_SET_SYSTEM_TIME(t)		(sntp_set_system_time(t))	// implemented in lwip2-sntp.c
 
 /*
    --------------------------------------------------

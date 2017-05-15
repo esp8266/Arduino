@@ -54,9 +54,6 @@ static char hostname[32];
 struct netif netif_git[2];
 const char netif_name[2][8] = { "station", "soft-ap" };
 
-//int ntp_servers_number = 0;
-//ip4_addr_t* ntp_servers = NULL;
-
 int doprint_allow = 0; // for doprint()
 
 err_t glue2git_err (err_glue_t err)
@@ -200,38 +197,6 @@ err_glue_t esp2glue_dhcp_start (int netif_idx)
 	return git2glue_err(err);
 }
 
-#if 0 // now using apps/sntp
-void dhcp_set_ntp_servers (u8_t number, const ip4_addr_t* ntp_server_addrs)
-{
-	uprint(DBG "%d ntp-server known\n", number);
-	if (ntp_servers)
-		mem_free(ntp_servers);
-	if (!number)
-	{
-		ntp_servers = NULL;
-		ntp_servers_number = 0;
-		return;
-	}
-	size_t size = number * sizeof(ip4_addr_t);
-	ntp_servers = mem_malloc(size);
-	if (!ntp_servers)
-	{
-		uerror("ERROR alloc(%d) failed for %d ntp server address\n", (int)size, number);
-		ntp_servers_number = 0;
-		return;
-	}
-	ntp_servers_number = number;
-	os_memcpy(ntp_servers, ntp_server_addrs, size);
-#if UDEBUG
-	for (int i = 0; i < number; i++)
-	{
-		display_ip32("ntp: ", ntp_servers[i].addr);
-		nl();
-	}
-#endif
-}
-#endif
-
 err_t new_linkoutput (struct netif* netif, struct pbuf* p)
 {
 	#if !LWIP_NETIF_TX_SINGLE_PBUF
@@ -293,8 +258,13 @@ static void netif_sta_status_callback (struct netif* netif)
 		glue2esp_ifup(netif == netif_sta? STATION_IF: SOFTAP_IF, netif->ip_addr.addr, netif->netmask.addr, netif->gw.addr);
 
 		if (netif == netif_sta)
+		{
 			// this is our default route
 			netif_set_default(netif);
+			
+			// start sntp
+			sntp_init();
+		}
 	}
 }
 
@@ -385,7 +355,8 @@ void esp2glue_lwip_init (void)
 	
 	sntp_servermode_dhcp(1); /* get SNTP server via DHCP */
 	sntp_setoperatingmode(SNTP_OPMODE_POLL);
-	sntp_init();
+	// do not start sntp here, but when we got our address
+	//sntp_init();
 }
 
 void esp2glue_alloc_for_recv (size_t len, void** pbuf, void** data)
