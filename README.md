@@ -38,11 +38,6 @@ Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index
 
 Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0/](http://esp8266.github.io/Arduino/versions/2.3.0/)
 
-##### Staging version ![](http://arduino.esp8266.com/staging/badge.svg)
-Boards manager link: `http://arduino.esp8266.com/staging/package_esp8266com_index.json`
-
-Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0-rc2/](http://esp8266.github.io/Arduino/versions/2.3.0-rc2/)
-
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino) [![codecov.io](https://codecov.io/github/esp8266/Arduino/coverage.svg?branch=master)](https://codecov.io/github/esp8266/Arduino?branch=master)
 
@@ -106,7 +101,7 @@ If you can not find the answers above, you can also try [ESP8266 Community Forum
 
 For minor fixes of code and documentation, go ahead and submit a pull request.
 
-Check out the list of issues which are easy to fix — [easy issues for 2.2.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.2.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
+Check out the list of issues which are easy to fix — [easy issues for 2.4.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.4.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
 
 Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed [in the chat](https://gitter.im/esp8266/Arduino) first.
 
