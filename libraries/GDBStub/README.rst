@@ -34,11 +34,11 @@ Using GDB stub
 Tips and tricks
 ---------------
 
--  To halt the target when software WDT fires, add
+-  Upon including GDBStub.h in the sketch, the target is automatically halted when software WDT fires, with
 
    ::
 
-       ((int*)0) = 0;
+       *((int*)0) = 0;
 
    at the top of ``__wrap_system_restart_local`` in
    core\_esp8266\_postmortem.c.
