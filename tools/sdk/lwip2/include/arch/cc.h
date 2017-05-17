@@ -68,6 +68,8 @@ typedef int sys_prot_t;	// not really used
 extern int os_printf_plus(const char * format, ...) __attribute__ ((format (printf, 1, 2)));
 #define LWIP_PLATFORM_DIAG(x) do { os_printf x;} while(0)
 
+#else
+#define LWIP_NOASSERT 1
 #endif // debug
 
 ///////////////////////////////
