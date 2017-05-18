@@ -88,7 +88,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 int WiFiClient::connect(const char* host, uint16_t port)
 {
     IPAddress remote_addr;
-    if (WiFi.hostByName(host, remote_addr))
+    if (WiFi.hostByName(host, remote_addr, _timeout))
     {
         return connect(remote_addr, port);
     }
@@ -122,36 +122,18 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
         pcb->local_port = _localPort++;
     }
 
-    tcp_arg(pcb, this);
-    tcp_err(pcb, &WiFiClient::_s_err);
-    tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
-
-    esp_yield();
-    if (_client)
-        return 1;
-
-    //  if tcp_error was called, pcb has already been destroyed.
-    // tcp_abort(pcb);
-    return 0;
-}
-
-int8_t WiFiClient::_connected(void* pcb, int8_t err)
-{
-    (void) err;
-    tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
-    _client = new ClientContext(tpcb, 0, 0);
+    _client = new ClientContext(pcb, nullptr, nullptr);
     _client->ref();
-    esp_schedule();
-    return ERR_OK;
-}
+    _client->setTimeout(_timeout);
+    int res = _client->connect(&addr, port);
+    if (res == 0) {
+        _client->unref();
+        _client = nullptr;
+        return 0;
+    }
 
-void WiFiClient::_err(int8_t err)
-{
-    (void) err;
-    DEBUGV(":err %d\r\n", err);
-    esp_schedule();
+    return 1;
 }
-
 
 void WiFiClient::setNoDelay(bool nodelay) {
     if (!_client)
@@ -329,16 +311,6 @@ uint16_t WiFiClient::localPort()
         return 0;
 
     return _client->getLocalPort();
-}
-
-int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
-{
-    return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);
-}
-
-void WiFiClient::_s_err(void* arg, int8_t err)
-{
-    reinterpret_cast<WiFiClient*>(arg)->_err(err);
 }
 
 void WiFiClient::stopAll()
