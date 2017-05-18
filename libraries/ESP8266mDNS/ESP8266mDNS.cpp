@@ -907,7 +907,7 @@ void MDNSResponder::_replyToTypeEnumRequest(IPAddress multicastInterface) {
     if(servicePtr->_port > 0){
       char *service = servicePtr->_name;
       char *proto = servicePtr->_proto;
-      uint16_t port = servicePtr->_port;
+      //uint16_t port = servicePtr->_port;
 
 #ifdef MDNS_DEBUG_TX
       Serial.printf("TX: service:%s, proto:%s\n", service, proto);
