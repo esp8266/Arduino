@@ -147,20 +147,19 @@ extern "C" void __gdb_do_break(){}
 extern "C" void gdb_do_break(void) __attribute__ ((weak, alias("__gdb_do_break")));
 
 void init_done() {
-    system_set_os_print(1);
     gdb_init();
     do_global_ctors();
-    printf("\n%08x\n", core_version);
     esp_schedule();
 }
 
+extern "C" void uart0_wait_tx_empty();
 
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
-
+    uart0_wait_tx_empty();
     uart_div_modify(0, UART_CLK_FREQ / (115200));
-
+    
     init();
 
     initVariant();

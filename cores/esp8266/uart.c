@@ -55,14 +55,18 @@ struct uart_rx_buffer_ {
 };
 
 struct uart_ {
-    int uart_nr;
     int baud_rate;
+    int uart_nr;
+    int rx_pin;
+    int tx_pin;
     bool rx_enabled;
     bool tx_enabled;
-    uint8_t rx_pin;
-    uint8_t tx_pin;
     struct uart_rx_buffer_ * rx_buffer;
 };
+
+static void uart_pins_uninit(const uart_t* uart);
+static bool uart_pins_init(const uart_t* uart);
+
 
 size_t uart_resize_rx_buffer(uart_t* uart, size_t new_size)
 {
@@ -206,6 +210,13 @@ void uart_wait_tx_empty(uart_t* uart)
     }
 }
 
+void uart0_wait_tx_empty()
+{
+    while(((USS(0) >> USTXC) & 0xff) > 0) {
+        ;
+    }
+}
+
 void uart_flush(uart_t* uart)
 {
     if(uart == NULL) {
@@ -246,68 +257,63 @@ int uart_get_baudrate(uart_t* uart)
     return uart->baud_rate;
 }
 
-uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
+uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, int rx_pin, size_t rx_size)
 {
-    uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
+    uart_t* uart = (uart_t*) calloc(1, sizeof(uart_t));
     if(uart == NULL) {
         return NULL;
     }
 
     uart->uart_nr = uart_nr;
-
-    switch(uart->uart_nr) {
-    case UART0:
-        ETS_UART_INTR_DISABLE();
-        ETS_UART_INTR_ATTACH(NULL, NULL);
-        uart->rx_enabled = (mode != UART_TX_ONLY);
-        uart->tx_enabled = (mode != UART_RX_ONLY);
-        uart->rx_pin = (uart->rx_enabled)?3:255;
-        if(uart->rx_enabled) {
-            struct uart_rx_buffer_ * rx_buffer = (struct uart_rx_buffer_ *)malloc(sizeof(struct uart_rx_buffer_));
-            if(rx_buffer == NULL) {
-              free(uart);
-              return NULL;
-            }
-            rx_buffer->size = rx_size;//var this
-            rx_buffer->rpos = 0;
-            rx_buffer->wpos = 0;
-            rx_buffer->buffer = (uint8_t *)malloc(rx_buffer->size);
-            if(rx_buffer->buffer == NULL) {
-              free(rx_buffer);
-              free(uart);
-              return NULL;
-            }
-            uart->rx_buffer = rx_buffer;
-            pinMode(uart->rx_pin, SPECIAL);
-        }
-        if(uart->tx_enabled) {
-            if (tx_pin == 2) {
-                uart->tx_pin = 2;
-                pinMode(uart->tx_pin, FUNCTION_4);
-            } else {
-                uart->tx_pin = 1;
-                pinMode(uart->tx_pin, FUNCTION_0);
-            }
-        } else {
-            uart->tx_pin = 255;
-        }
-        IOSWAP &= ~(1 << IOSWAPU0);
-        break;
-    case UART1:
-        // Note: uart_interrupt_handler does not support RX on UART 1.
-        uart->rx_enabled = false;
-        uart->tx_enabled = (mode != UART_RX_ONLY);
-        uart->rx_pin = 255;
-        uart->tx_pin = (uart->tx_enabled)?2:255;  // GPIO7 as TX not possible! See GPIO pins used by UART
-        if(uart->tx_enabled) {
-            pinMode(uart->tx_pin, SPECIAL);
-        }
-        break;
-    case UART_NO:
-    default:
-        // big fail!
+    if (uart_nr == 0) {
+        U0IE = 0;
+        U1IE = 0;
+    } else if (uart_nr == 1 && mode == UART_FULL) {
+        mode = UART_TX_ONLY;
+    } else if (uart_nr >= 2) {
         free(uart);
         return NULL;
+    }
+
+    // treat pin number '-1' as 'default'
+    if (tx_pin == -1) {
+        tx_pin = (uart_nr == 0) ? 1 : 2;
+    }
+    if (rx_pin == -1) {
+        rx_pin = (uart_nr == 0) ? 3 : -1;
+    }
+    uart->tx_pin = tx_pin;
+    uart->rx_pin = rx_pin;
+
+    uart->rx_enabled = (mode != UART_TX_ONLY);
+    uart->tx_enabled = (mode != UART_RX_ONLY);
+
+    if (!uart_pins_init(uart)) {
+        free(uart);
+        return NULL;
+    }
+
+    // assert(uart->tx_enabled && "uart->tx_enabled!!!!!!!!!!");
+
+    if(uart->rx_enabled) {
+        ETS_UART_INTR_DISABLE();
+        ETS_UART_INTR_ATTACH(NULL, NULL);
+
+        struct uart_rx_buffer_ * rx_buffer = (struct uart_rx_buffer_ *)malloc(sizeof(struct uart_rx_buffer_));
+        if(rx_buffer == NULL) {
+            free(uart);
+            return NULL;
+        }
+        rx_buffer->size = rx_size;
+        rx_buffer->rpos = 0;
+        rx_buffer->wpos = 0;
+        rx_buffer->buffer = (uint8_t *)malloc(rx_buffer->size);
+        if(rx_buffer->buffer == NULL) {
+            free(rx_buffer);
+            free(uart);
+            return NULL;
+        }
+        uart->rx_buffer = rx_buffer;
     }
 
     uart_set_baudrate(uart, baudrate);
@@ -316,7 +322,7 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
     USC1(uart->uart_nr) = 0;
     USIC(uart->uart_nr) = 0xffff;
     USIE(uart->uart_nr) = 0;
-    if(uart->uart_nr == UART0 && uart->rx_enabled) {
+    if(uart->rx_enabled) {
         uart_start_isr(uart);
     }
 
@@ -328,112 +334,93 @@ void uart_uninit(uart_t* uart)
     if(uart == NULL) {
         return;
     }
-
-    switch(uart->rx_pin) {
-    case 3:
-        pinMode(3, INPUT);
-        break;
-    case 13:
-        pinMode(13, INPUT);
-        break;
-    }
-
-    switch(uart->tx_pin) {
-    case 1:
-        pinMode(1, INPUT);
-        break;
-    case 2:
-        pinMode(2, INPUT);
-        break;
-    case 15:
-        pinMode(15, INPUT);
-        break;
-    }
-
     if(uart->rx_enabled){
+        uart_stop_isr(uart);
         free(uart->rx_buffer->buffer);
         free(uart->rx_buffer);
-        uart_stop_isr(uart);
     }
+    uart_pins_uninit(uart);
     free(uart);
 }
 
-void uart_swap(uart_t* uart, int tx_pin)
+static void uart_pins_uninit(const uart_t* uart)
 {
-    if(uart == NULL) {
+    if (uart->tx_enabled) {
+        pinMode(uart->tx_pin, INPUT);
+    }
+    if (uart->rx_enabled) {
+        pinMode(uart->rx_pin, INPUT);
+    }
+}
+
+static bool uart_pins_init(const uart_t* uart)
+{
+    const int tx = uart->tx_pin;
+    const int rx = uart->rx_pin;
+    const bool tx_en = uart->tx_enabled;
+    const bool rx_en = uart->rx_enabled;
+
+    if (uart->uart_nr == 0 && 
+        (!rx_en || rx == 3) && 
+        (!tx_en || tx == 1 || tx == 2)) {
+        // UART0, normal pins or TX swaped to IO2
+        IOSWAP &= ~(1 << IOSWAPU0);
+        if (tx_en) {
+            if (tx == 1) {
+                pinMode(tx, SPECIAL);
+            } else { /* tx == 2 */ 
+                pinMode(tx, FUNCTION_4);
+            }
+        }
+        if (rx_en) {
+            pinMode(rx, SPECIAL);
+        }
+    } else if (uart->uart_nr == 0 &&
+        (!rx_en || rx == 13) && 
+        (!tx_en || tx == 15)) {
+        // UART0, TX/RX pins swapped to DTR/RTS
+        IOSWAP |= (1 << IOSWAPU0);
+        if (tx_en) {
+            pinMode(tx, FUNCTION_4);
+        }
+        if (rx_en) {
+            pinMode(rx, FUNCTION_4);
+        }
+    } else if (uart->uart_nr == 1 && tx == 2) {
+        // UART1. Ignoring RX pin (GPIO7) as it is used by SPI0
+        if (tx_en) {
+            pinMode(tx, FUNCTION_4);
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+void uart_swap(uart_t* uart)
+{
+    if (uart == NULL) {
         return;
     }
-    switch(uart->uart_nr) {
-    case UART0:
-        if(((uart->tx_pin == 1 || uart->tx_pin == 2) && uart->tx_enabled) || (uart->rx_pin == 3 && uart->rx_enabled)) {
-            if(uart->tx_enabled) { //TX
-                pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 15;
-            }
-            if(uart->rx_enabled) { //RX
-                pinMode(uart->rx_pin, INPUT);
-                uart->rx_pin = 13;
-            }
-            if(uart->tx_enabled) {
-                pinMode(uart->tx_pin, FUNCTION_4);    //TX
-            }
-            if(uart->rx_enabled) {
-                pinMode(uart->rx_pin, FUNCTION_4);    //RX
-            }
-            IOSWAP |= (1 << IOSWAPU0);
-        } else {
-            if(uart->tx_enabled) { //TX
-                pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = (tx_pin == 2)?2:1;
-            }
-            if(uart->rx_enabled) { //RX
-                pinMode(uart->rx_pin, INPUT);
-                uart->rx_pin = 3;
-            }
-            if(uart->tx_enabled) {
-                pinMode(uart->tx_pin, (tx_pin == 2)?FUNCTION_4:SPECIAL);    //TX
-            }
-            if(uart->rx_enabled) {
-                pinMode(3, SPECIAL);    //RX
-            }
-            IOSWAP &= ~(1 << IOSWAPU0);
-        }
-
-        break;
-    case UART1:
-        // Currently no swap possible! See GPIO pins used by UART
-        break;
-    default:
-        break;
+    if (uart->uart_nr == 1) {
+        return;
     }
+    uart_pins_uninit(uart);
+    if ((!uart->rx_enabled || uart->rx_pin == 3) && 
+        (!uart->tx_enabled || uart->tx_pin == 1 || uart->tx_pin == 2)) {
+        uart->tx_pin = 15;
+        uart->rx_pin = 13;
+    } else {
+        uart->tx_pin = 1;
+        uart->rx_pin = 3;
+    }
+    uart_pins_init(uart);
+
 }
 
 void uart_set_tx(uart_t* uart, int tx_pin)
 {
-    if(uart == NULL) {
-        return;
-    }
-    switch(uart->uart_nr) {
-    case UART0:
-        if(uart->tx_enabled) {
-            if (uart->tx_pin == 1 && tx_pin == 2) {
-                pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 2;
-                pinMode(uart->tx_pin, FUNCTION_4);
-            } else if (uart->tx_pin == 2 && tx_pin != 2) {
-                pinMode(uart->tx_pin, INPUT);
-                uart->tx_pin = 1;
-                pinMode(uart->tx_pin, SPECIAL);
-            }
-        }
-
-        break;
-    case UART1:
-        // GPIO7 as TX not possible! See GPIO pins used by UART
-        break;
-    default:
-        break;
-    }
+    uart_set_pins(uart, tx_pin, uart->rx_pin);
 }
 
 void uart_set_pins(uart_t* uart, int tx, int rx)
@@ -441,23 +428,13 @@ void uart_set_pins(uart_t* uart, int tx, int rx)
     if(uart == NULL) {
         return;
     }
-
-    if(uart->uart_nr == UART0) { // Only UART0 allows pin changes
-        if(uart->tx_enabled && uart->tx_pin != tx) {
-            if( rx == 13 && tx == 15) {
-                uart_swap(uart, 15);
-            } else if (rx == 3 && (tx == 1 || tx == 2)) {
-                if (uart->rx_pin != rx) {
-                    uart_swap(uart, tx);
-                } else {
-                    uart_set_tx(uart, tx);
-                }
-            }
-        }
-        if(uart->rx_enabled && uart->rx_pin != rx && rx == 13 && tx == 15) {
-            uart_swap(uart, 15);
-        }
+    if (uart->uart_nr == 1) {
+        return;
     }
+    uart_pins_uninit(uart);
+    uart->tx_pin = tx;
+    uart->rx_pin = rx;
+    uart_pins_init(uart);
 }
 
 

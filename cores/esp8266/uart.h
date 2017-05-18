@@ -113,10 +113,10 @@ extern "C" {
 struct uart_;
 typedef struct uart_ uart_t;
 
-uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size);
+uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, int rx_pin, size_t rx_size);
 void uart_uninit(uart_t* uart);
 
-void uart_swap(uart_t* uart, int tx_pin);
+void uart_swap(uart_t* uart);
 void uart_set_tx(uart_t* uart, int tx_pin);
 void uart_set_pins(uart_t* uart, int tx, int rx);
 bool uart_tx_enabled(uart_t* uart);
