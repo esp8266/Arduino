@@ -48,12 +48,13 @@ WiFiClient* SList<WiFiClient>::_s_first = 0;
 
 
 WiFiClient::WiFiClient()
-: _client(0)
+: _client(0), _timeout(5000)
 {
     WiFiClient::_add(this);
 }
 
-WiFiClient::WiFiClient(ClientContext* client) : _client(client)
+WiFiClient::WiFiClient(ClientContext* client)
+: _client(client), _timeout(5000)
 {
     _client->ref();
     WiFiClient::_add(this);
@@ -69,6 +70,8 @@ WiFiClient::~WiFiClient()
 WiFiClient::WiFiClient(const WiFiClient& other)
 {
     _client = other._client;
+    _timeout = other._timeout;
+    _localPort = other._localPort;
     if (_client)
         _client->ref();
     WiFiClient::_add(this);
@@ -79,6 +82,8 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
    if (_client)
         _client->unref();
     _client = other._client;
+    _timeout = other._timeout;
+    _localPort = other._localPort;
     if (_client)
         _client->ref();
     return *this;
