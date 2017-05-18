@@ -124,7 +124,25 @@ public:
         }
     }
 
-    size_t availableForWrite ()
+    int connect(ip_addr_t* addr, uint16_t port)
+    {
+        err_t err = tcp_connect(_pcb, addr, port, reinterpret_cast<tcp_connected_fn>(&ClientContext::_s_connected));
+        if (err != ERR_OK) {
+            return 0;
+        }
+        _connect_pending = 1;
+        _op_start_time = millis();
+        // This delay will be interrupted by esp_schedule in the connect callback
+        delay(_timeout_ms);
+        _connect_pending = 0;
+        if (state() != ESTABLISHED) {
+            abort();
+            return 0;
+        }
+        return 1;
+    }
+
+    size_t availableForWrite()
     {
         return _pcb? tcp_sndbuf(_pcb): 0;
     }
@@ -149,14 +167,14 @@ public:
         return tcp_nagle_disabled(_pcb);
     }
 
-    void setNonBlocking(bool nonblocking)
+    void setTimeout(int timeout_ms) 
     {
-        _noblock = nonblocking;
+        _timeout_ms = timeout_ms;
     }
 
-    bool getNonBlocking()
+    int getTimeout()
     {
-        return _noblock;
+        return _timeout_ms;
     }
 
     uint32_t getRemoteAddress()
@@ -315,9 +333,14 @@ public:
 
 protected:
 
-    void _cancel_write()
+    bool _is_timeout()
     {
-        if (_send_waiting) {
+        return millis() - _op_start_time > _timeout_ms;
+    }
+
+    void _notify_error()
+    {
+        if (_connect_pending || _send_waiting) {
             esp_schedule();
         }
     }
@@ -328,10 +351,11 @@ protected:
         assert(_send_waiting == 0);
         _datasource = ds;
         _written = 0;
+        _op_start_time = millis();
         do {
             _write_some();
 
-            if (!_datasource->available() || _noblock || state() == CLOSED) {
+            if (!_datasource->available() || _is_timeout() || state() == CLOSED) {
                 delete _datasource;
                 _datasource = nullptr;
                 break;
@@ -431,7 +455,7 @@ protected:
         (void) err;
         if(pb == 0) { // connection closed
             DEBUGV(":rcl\r\n");
-            _cancel_write();
+            _notify_error();
             abort();
             return ERR_ABRT;
         }
@@ -456,7 +480,16 @@ protected:
         tcp_recv(_pcb, NULL);
         tcp_err(_pcb, NULL);
         _pcb = NULL;
-        _cancel_write();
+        _notify_error();
+    }
+
+    int8_t _connected(void* pcb, int8_t err)
+    {
+        (void) err;
+        assert(pcb == _pcb);
+        assert(_connect_pending);
+        esp_schedule();
+        return ERR_OK;
     }
 
     err_t _poll(tcp_pcb*)
@@ -485,6 +518,11 @@ protected:
         return reinterpret_cast<ClientContext*>(arg)->_sent(tpcb, len);
     }
 
+    static int8_t _s_connected(void* arg, void* pcb, int8_t err)
+    {
+        return reinterpret_cast<ClientContext*>(arg)->_connected(pcb, err);
+    }
+
 private:
     tcp_pcb* _pcb;
 
@@ -494,14 +532,16 @@ private:
     discard_cb_t _discard_cb;
     void* _discard_cb_arg;
 
-    int _refcnt;
-    ClientContext* _next;
-
     DataSource* _datasource = nullptr;
     size_t _written = 0;
     size_t _write_chunk_size = 256;
-    bool _noblock = false;
-    int _send_waiting = 0;
+    uint32_t _timeout_ms = 5000;
+    uint32_t _op_start_time = 0;
+    uint8_t _send_waiting = 0;
+    uint8_t _connect_pending = 0;
+
+    int8_t _refcnt;
+    ClientContext* _next;
 };
 
 #endif//CLIENTCONTEXT_H
