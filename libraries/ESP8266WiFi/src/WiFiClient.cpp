@@ -163,6 +163,7 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     {
         return 0;
     }
+    _client->setTimeout(_timeout);
     return _client->write(buf, size);
 }
 
@@ -178,6 +179,7 @@ size_t WiFiClient::write(Stream& stream)
     {
         return 0;
     }
+    _client->setTimeout(_timeout);
     return _client->write(stream);
 }
 
@@ -187,6 +189,7 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
     {
         return 0;
     }
+    _client->setTimeout(_timeout);
     return _client->write_P(buf, size);
 }
 
