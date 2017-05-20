@@ -48,14 +48,16 @@ WiFiClient* SList<WiFiClient>::_s_first = 0;
 
 
 WiFiClient::WiFiClient()
-: _client(0), _timeout(5000)
+: _client(0)
 {
+    _timeout = 5000;
     WiFiClient::_add(this);
 }
 
 WiFiClient::WiFiClient(ClientContext* client)
-: _client(client), _timeout(5000)
+: _client(client)
 {
+    _timeout = 5000;
     _client->ref();
     WiFiClient::_add(this);
 }
