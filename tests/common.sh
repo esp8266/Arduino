@@ -66,6 +66,7 @@ function build_sketches()
             echo "Build failed ($1)"
             echo "Build log:"
             cat build.log
+            set -e
             return $result
         fi
         rm build.log
