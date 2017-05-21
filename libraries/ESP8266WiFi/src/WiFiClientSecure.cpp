@@ -521,14 +521,18 @@ bool WiFiClientSecure::_verifyDN(const char* domain_name)
     const char* san = NULL;
     int i = 0;
     while ((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != NULL) {
-        if (matchName(String(san), domain_name_str)) {
+        String san_str(san);
+        san_str.toLowerCase();
+        if (matchName(san_str, domain_name_str)) {
             return true;
         }
         DEBUGV("SAN %d: '%s', no match\r\n", i, san);
         ++i;
     }
     const char* common_name = ssl_get_cert_dn(*_ssl, SSL_X509_CERT_COMMON_NAME);
-    if (common_name && matchName(String(common_name), domain_name_str)) {
+    String common_name_str(common_name);
+    common_name_str.toLowerCase();
+    if (common_name && matchName(common_name_str, domain_name_str)) {
         return true;
     }
     DEBUGV("CN: '%s', no match\r\n", (common_name)?common_name:"(null)");
