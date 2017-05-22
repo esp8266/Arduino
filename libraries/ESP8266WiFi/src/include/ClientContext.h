@@ -353,9 +353,14 @@ protected:
         _written = 0;
         _op_start_time = millis();
         do {
-            _write_some();
+            if (_write_some()) {
+                _op_start_time = millis();
+            }
 
             if (!_datasource->available() || _is_timeout() || state() == CLOSED) {
+                if (_is_timeout()) {
+                    DEBUGV(":wtmo\r\n");
+                }
                 delete _datasource;
                 _datasource = nullptr;
                 break;
@@ -368,10 +373,10 @@ protected:
         return _written;
     }
 
-    void _write_some()
+    bool _write_some()
     {
         if (!_datasource || !_pcb) {
-            return;
+            return false;
         }
 
         size_t left = _datasource->available();
@@ -403,7 +408,9 @@ protected:
         }
         if( need_output ) {
             tcp_output(_pcb);
+            return true;
         }
+        return false;
     }
 
     void _write_some_from_cb()
