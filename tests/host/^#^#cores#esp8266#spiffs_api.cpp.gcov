@@ -1,0 +1,215 @@
+        -:    0:Source:../../cores/esp8266/spiffs_api.cpp
+        -:    0:Programs:16
+        -:    1:/*
+        -:    2: spiffs_api.cpp - file system wrapper for SPIFFS
+        -:    3: Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+        -:    4:
+        -:    5: This code was influenced by NodeMCU and Sming libraries, and first version of
+        -:    6: Arduino wrapper written by Hristo Gochkov.
+        -:    7:
+        -:    8: This file is part of the esp8266 core for Arduino environment.
+        -:    9:
+        -:   10: This library is free software; you can redistribute it and/or
+        -:   11: modify it under the terms of the GNU Lesser General Public
+        -:   12: License as published by the Free Software Foundation; either
+        -:   13: version 2.1 of the License, or (at your option) any later version.
+        -:   14:
+        -:   15: This library is distributed in the hope that it will be useful,
+        -:   16: but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   17: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        -:   18: Lesser General Public License for more details.
+        -:   19:
+        -:   20: You should have received a copy of the GNU Lesser General Public
+        -:   21: License along with this library; if not, write to the Free Software
+        -:   22: Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+        -:   23: */
+        -:   24:#include "spiffs_api.h"
+        -:   25:
+        -:   26:using namespace fs;
+        -:   27:
+function _ZN10SPIFFSImpl4openEPKcN2fs8OpenModeENS2_10AccessModeE called 28 returned 100% blocks executed 70%
+       28:   28:FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
+        -:   29:{
+       28:   30:    if (!isSpiffsFilenameValid(path)) {
+call    0 returned 100%
+branch  1 taken 14% (fallthrough)
+branch  2 taken 86%
+        -:   31:        DEBUGV("SPIFFSImpl::open: invalid path=`%s` \r\n", path);
+        4:   32:        return FileImplPtr();
+call    0 returned 100%
+        -:   33:    }
+       24:   34:    int mode = getSpiffsMode(openMode, accessMode);
+call    0 returned 100%
+       24:   35:    int fd = SPIFFS_open(&_fs, path, mode, 0);
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+       24:   36:    if (fd < 0 && _fs.err_code == SPIFFS_ERR_DELETED && (openMode & OM_CREATE)) {
+branch  0 taken 4% (fallthrough)
+branch  1 taken 96%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+branch  4 never executed
+branch  5 never executed
+        -:   37:        DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d, trying to remove\r\n",
+        -:   38:               fd, path, openMode, accessMode, _fs.err_code);
+    #####:   39:        auto rc = SPIFFS_remove(&_fs, path);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   40:        if (rc != SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+        -:   41:            DEBUGV("SPIFFSImpl::open: SPIFFS_ERR_DELETED, but failed to remove path=`%s` openMode=%d accessMode=%d err=%d\r\n",
+        -:   42:                   path, openMode, accessMode, _fs.err_code);
+    #####:   43:            return FileImplPtr();
+call    0 never executed
+        -:   44:        }
+    #####:   45:        fd = SPIFFS_open(&_fs, path, mode, 0);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:   46:    }
+       24:   47:    if (fd < 0) {
+branch  0 taken 4% (fallthrough)
+branch  1 taken 96%
+        -:   48:        DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n",
+        -:   49:               fd, path, openMode, accessMode, _fs.err_code);
+        1:   50:        return FileImplPtr();
+call    0 returned 100%
+        -:   51:    }
+       23:   52:    return std::make_shared<SPIFFSFileImpl>(this, fd);
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+call    3 returned 100%
+call    4 returned 100%
+        -:   53:}
+        -:   54:
+function _ZN10SPIFFSImpl6existsEPKc called 4 returned 100% blocks executed 100%
+        4:   55:bool SPIFFSImpl::exists(const char* path)
+        -:   56:{
+        4:   57:    if (!isSpiffsFilenameValid(path)) {
+call    0 returned 100%
+branch  1 taken 50% (fallthrough)
+branch  2 taken 50%
+        -:   58:        DEBUGV("SPIFFSImpl::exists: invalid path=`%s` \r\n", path);
+        2:   59:        return false;
+        -:   60:    }
+        -:   61:    spiffs_stat stat;
+        2:   62:    int rc = SPIFFS_stat(&_fs, path, &stat);
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+        2:   63:    return rc == SPIFFS_OK;
+        -:   64:}
+        -:   65:
+function _ZN10SPIFFSImpl7openDirEPKc called 4 returned 100% blocks executed 78%
+        4:   66:DirImplPtr SPIFFSImpl::openDir(const char* path) 
+        -:   67:{
+        4:   68:    if (strlen(path) > 0 && !isSpiffsFilenameValid(path)) {
+branch  0 taken 75% (fallthrough)
+branch  1 taken 25%
+call    2 returned 100%
+branch  3 taken 0% (fallthrough)
+branch  4 taken 100%
+branch  5 taken 0% (fallthrough)
+branch  6 taken 100%
+        -:   69:        DEBUGV("SPIFFSImpl::openDir: invalid path=`%s` \r\n", path);
+    #####:   70:        return DirImplPtr();
+call    0 never executed
+        -:   71:    }
+        -:   72:    spiffs_DIR dir;
+        4:   73:    spiffs_DIR* result = SPIFFS_opendir(&_fs, path, &dir);
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+        4:   74:    if (!result) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:   75:        DEBUGV("SPIFFSImpl::openDir: path=`%s` err=%d\r\n", path, _fs.err_code);
+    #####:   76:        return DirImplPtr();
+call    0 never executed
+        -:   77:    }
+        4:   78:    return std::make_shared<SPIFFSDirImpl>(path, this, dir);
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+call    3 returned 100%
+call    4 returned 100%
+        -:   79:}
+        -:   80:
+function _Z13getSpiffsModeN2fs8OpenModeENS_10AccessModeE called 24 returned 100% blocks executed 100%
+       24:   81:int getSpiffsMode(OpenMode openMode, AccessMode accessMode)
+        -:   82:{
+       24:   83:    int mode = 0;
+       24:   84:    if (openMode & OM_CREATE) {
+branch  0 taken 83% (fallthrough)
+branch  1 taken 17%
+       20:   85:        mode |= SPIFFS_CREAT;
+        -:   86:    }
+       24:   87:    if (openMode & OM_APPEND) {
+branch  0 taken 4% (fallthrough)
+branch  1 taken 96%
+        1:   88:        mode |= SPIFFS_APPEND;
+        -:   89:    }
+       24:   90:    if (openMode & OM_TRUNCATE) {
+branch  0 taken 79% (fallthrough)
+branch  1 taken 21%
+       19:   91:        mode |= SPIFFS_TRUNC;
+        -:   92:    }
+       24:   93:    if (accessMode & AM_READ) {
+branch  0 taken 17% (fallthrough)
+branch  1 taken 83%
+        4:   94:        mode |= SPIFFS_RDONLY;
+        -:   95:    }
+       24:   96:    if (accessMode & AM_WRITE) {
+branch  0 taken 83% (fallthrough)
+branch  1 taken 17%
+       20:   97:        mode |= SPIFFS_WRONLY;
+        -:   98:    }
+       24:   99:    return mode;
+        -:  100:}
+        -:  101:
+function _Z21isSpiffsFilenameValidPKc called 35 returned 100% blocks executed 88%
+       35:  102:bool isSpiffsFilenameValid(const char* name)
+        -:  103:{
+       35:  104:    if (name == nullptr) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  105:        return false;
+        -:  106:    }
+       35:  107:    auto len = strlen(name);
+       35:  108:    return len > 0 && len < SPIFFS_OBJ_NAME_LEN;
+branch  0 taken 91% (fallthrough)
+branch  1 taken 9%
+branch  2 taken 91% (fallthrough)
+branch  3 taken 9%
+        -:  109:}
+        -:  110:
+        -:  111:// these symbols should be defined in the linker script for each flash layout
+        -:  112:#ifdef ARDUINO
+        -:  113:extern "C" uint32_t _SPIFFS_start;
+        -:  114:extern "C" uint32_t _SPIFFS_end;
+        -:  115:extern "C" uint32_t _SPIFFS_page;
+        -:  116:extern "C" uint32_t _SPIFFS_block;
+        -:  117:
+        -:  118:#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
+        -:  119:#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
+        -:  120:#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
+        -:  121:#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
+        -:  122:
+        -:  123:#ifndef SPIFFS_MAX_OPEN_FILES
+        -:  124:#define SPIFFS_MAX_OPEN_FILES 5
+        -:  125:#endif
+        -:  126:
+        -:  127:#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
+        -:  128:FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(
+        -:  129:                             SPIFFS_PHYS_ADDR,
+        -:  130:                             SPIFFS_PHYS_SIZE,
+        -:  131:                             SPIFFS_PHYS_PAGE,
+        -:  132:                             SPIFFS_PHYS_BLOCK,
+        -:  133:                             SPIFFS_MAX_OPEN_FILES)));
+        -:  134:#endif
+        -:  135:
+        -:  136:#endif

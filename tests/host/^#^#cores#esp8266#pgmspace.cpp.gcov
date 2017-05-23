@@ -1,0 +1,378 @@
+        -:    0:Source:../../cores/esp8266/pgmspace.cpp
+        -:    0:Programs:16
+        -:    1:/*
+        -:    2: pgmspace.cpp - string functions that support PROGMEM
+        -:    3: Copyright (c) 2015 Michael C. Miller.  All right reserved.
+        -:    4:
+        -:    5: This library is free software; you can redistribute it and/or
+        -:    6: modify it under the terms of the GNU Lesser General Public
+        -:    7: License as published by the Free Software Foundation; either
+        -:    8: version 2.1 of the License, or (at your option) any later version.
+        -:    9:
+        -:   10: This library is distributed in the hope that it will be useful,
+        -:   11: but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   12: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        -:   13: Lesser General Public License for more details.
+        -:   14:
+        -:   15: You should have received a copy of the GNU Lesser General Public
+        -:   16: License along with this library; if not, write to the Free Software
+        -:   17: Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+        -:   18: */
+        -:   19:
+        -:   20:#include <ctype.h>
+        -:   21:#include <stdint.h>
+        -:   22:#include <stddef.h>
+        -:   23:#include <stdbool.h>
+        -:   24:#include <stdarg.h>
+        -:   25:#include "pgmspace.h"
+        -:   26:
+function _Z9strnlen_PPKcm called 0 returned 0% blocks executed 0%
+    #####:   27:size_t strnlen_P(PGM_P s, size_t size) {
+        -:   28:    const char* cp;
+    #####:   29:    for (cp = s; size != 0 && pgm_read_byte(cp) != '\0'; cp++, size--);
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:   30:    return (size_t) (cp - s);
+        -:   31:}
+        -:   32:
+function _Z8strstr_PPKcS0_ called 25 returned 100% blocks executed 100%
+       25:   33:char* strstr_P(const char* haystack, PGM_P needle)
+        -:   34:{
+       25:   35:    const char* pn = reinterpret_cast<const char*>(needle);
+       25:   36:    if (haystack[0] == 0) {
+branch  0 taken 12% (fallthrough)
+branch  1 taken 88%
+        3:   37:        if (pgm_read_byte(pn)) {
+branch  0 taken 67% (fallthrough)
+branch  1 taken 33%
+        2:   38:	        return NULL;
+        -:   39:        }
+        1:   40:        return (char*) haystack;
+        -:   41:    }
+        -:   42:
+      256:   43:    while (*haystack) {
+branch  0 taken 95% (fallthrough)
+branch  1 taken 5%
+      132:   44:        size_t i = 0;
+      142:   45:        while (true) {
+      274:   46:            char n = pgm_read_byte(pn + i);
+      274:   47:            if (n == 0) {
+branch  0 taken 5% (fallthrough)
+branch  1 taken 95%
+       15:   48:                return (char *) haystack;
+        -:   49:            }
+      259:   50:            if (n != haystack[i]) {
+branch  0 taken 45% (fallthrough)
+branch  1 taken 55%
+      117:   51:                break;
+        -:   52:            }
+      142:   53:            ++i;
+        -:   54:        }
+      117:   55:        ++haystack;
+        -:   56:    }
+        7:   57:    return NULL;
+        -:   58:}
+        -:   59:
+function _Z8memcpy_PPvPKvm called 0 returned 0% blocks executed 0%
+    #####:   60:void* memcpy_P(void* dest, PGM_VOID_P src, size_t count) {
+    #####:   61:    const uint8_t* read = reinterpret_cast<const uint8_t*>(src);
+    #####:   62:    uint8_t* write = reinterpret_cast<uint8_t*>(dest);
+        -:   63:
+    #####:   64:    while (count)
+branch  0 never executed
+branch  1 never executed
+        -:   65:    {
+    #####:   66:        *write++ = pgm_read_byte(read++);
+    #####:   67:        count--;
+        -:   68:    }
+        -:   69:
+    #####:   70:    return dest;
+        -:   71:}
+        -:   72:
+function _Z8memcmp_PPKvS0_m called 0 returned 0% blocks executed 0%
+    #####:   73:int memcmp_P(const void* buf1, PGM_VOID_P buf2P, size_t size) {
+    #####:   74:    int result = 0;
+    #####:   75:    const uint8_t* read1 = (const uint8_t*)buf1;
+    #####:   76:    const uint8_t* read2 = (const uint8_t*)buf2P;
+        -:   77:
+    #####:   78:    while (size > 0) {
+branch  0 never executed
+branch  1 never executed
+    #####:   79:        uint8_t ch2 = pgm_read_byte(read2);
+    #####:   80:        uint8_t ch1 = *read1;
+    #####:   81:        if (ch1 != ch2) {
+branch  0 never executed
+branch  1 never executed
+    #####:   82:            result = (int)(ch1)-(int)(ch2);
+    #####:   83:            break;
+        -:   84:        }
+        -:   85:
+    #####:   86:        read1++;
+    #####:   87:        read2++;
+    #####:   88:        size--;
+        -:   89:    }
+        -:   90:
+    #####:   91:    return result;
+        -:   92:}
+        -:   93:
+function _Z9memccpy_PPvPKvim called 0 returned 0% blocks executed 0%
+    #####:   94:void* memccpy_P(void* dest, PGM_VOID_P src, int c, size_t count) {
+    #####:   95:    uint8_t* read = (uint8_t*)src;
+    #####:   96:    uint8_t* write = (uint8_t*)dest;
+    #####:   97:    void* result = NULL;
+        -:   98:
+    #####:   99:    while (count > 0) {
+branch  0 never executed
+branch  1 never executed
+    #####:  100:        uint8_t ch = pgm_read_byte(read++);
+    #####:  101:        *write++ = ch;
+    #####:  102:        count--;
+    #####:  103:        if (c == ch) {
+branch  0 never executed
+branch  1 never executed
+    #####:  104:            return write; // the value after the found c
+        -:  105:        }
+        -:  106:    }
+        -:  107:
+    #####:  108:    return result;
+        -:  109:}
+        -:  110:
+function _Z8memmem_PPKvmS0_m called 0 returned 0% blocks executed 0%
+    #####:  111:void* memmem_P(const void* buf, size_t bufSize, PGM_VOID_P findP, size_t findPSize) {
+    #####:  112:    const uint8_t* read = (const uint8_t*)buf;
+    #####:  113:    const uint8_t* find = (uint8_t*)findP;
+    #####:  114:    uint8_t first = pgm_read_byte(find++);
+        -:  115:
+    #####:  116:    findPSize--;
+        -:  117:
+    #####:  118:    while (bufSize > 0) {
+branch  0 never executed
+branch  1 never executed
+    #####:  119:        if (*read == first) {
+branch  0 never executed
+branch  1 never executed
+    #####:  120:            size_t findSize = findPSize;
+    #####:  121:            const uint8_t* tag = read + 1;
+    #####:  122:            size_t tagBufSize = bufSize - 1;
+    #####:  123:            const uint8_t* findTag = find;
+        -:  124:
+    #####:  125:            while (tagBufSize > 0 && findSize > 0) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:  126:                uint8_t ch = pgm_read_byte(findTag++);
+    #####:  127:                if (ch != *tag) {
+branch  0 never executed
+branch  1 never executed
+    #####:  128:                    bufSize--;
+    #####:  129:                    read++;
+    #####:  130:                    break;
+        -:  131:                }
+    #####:  132:                findSize--;
+    #####:  133:                tagBufSize--;
+    #####:  134:                tag++;
+        -:  135:            }
+    #####:  136:            if (findSize == 0) {
+branch  0 never executed
+branch  1 never executed
+    #####:  137:                return (void*)read;
+        -:  138:            }
+        -:  139:        }
+        -:  140:        else {
+    #####:  141:            bufSize--;
+    #####:  142:            read++;
+        -:  143:        }
+        -:  144:    }
+    #####:  145:    return NULL;
+        -:  146:}
+        -:  147:
+        -:  148:
+function _Z9strncpy_PPcPKcm called 0 returned 0% blocks executed 0%
+    #####:  149:char* strncpy_P(char* dest, PGM_P src, size_t size) {
+    #####:  150:    const char* read = src;
+    #####:  151:    char* write = dest;
+    #####:  152:    char ch = '.';
+    #####:  153:    while (size > 0 && ch != '\0')
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+        -:  154:    {
+    #####:  155:        ch = pgm_read_byte(read++);
+    #####:  156:        *write++ = ch;
+    #####:  157:        size--;
+        -:  158:    }
+        -:  159:
+    #####:  160:    return dest;
+        -:  161:}
+        -:  162:
+function _Z9strncat_PPcPKcm called 0 returned 0% blocks executed 0%
+    #####:  163:char* strncat_P(char* dest, PGM_P src, size_t size) {
+    #####:  164:    char* write = dest;
+        -:  165:
+    #####:  166:    while (*write != '\0')
+branch  0 never executed
+branch  1 never executed
+        -:  167:    {
+    #####:  168:        write++;
+        -:  169:    }
+        -:  170:
+    #####:  171:    const char* read = src;
+    #####:  172:    char ch = '.';
+        -:  173:
+    #####:  174:    while (size > 0 && ch != '\0')
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+        -:  175:    {
+    #####:  176:        ch = pgm_read_byte(read++);
+    #####:  177:        *write++ = ch;
+        -:  178:
+    #####:  179:        size--;
+        -:  180:    }
+        -:  181:
+    #####:  182:    if (ch != '\0')
+branch  0 never executed
+branch  1 never executed
+        -:  183:    {
+    #####:  184:        *write = '\0';
+        -:  185:    }
+        -:  186:
+    #####:  187:    return dest;
+        -:  188:}
+        -:  189:
+function _Z9strncmp_PPKcS0_m called 0 returned 0% blocks executed 0%
+    #####:  190:int strncmp_P(const char* str1, PGM_P str2P, size_t size) {
+    #####:  191:    int result = 0;
+        -:  192:
+    #####:  193:    while (size > 0)
+branch  0 never executed
+branch  1 never executed
+        -:  194:    {
+    #####:  195:        char ch1 = *str1++;
+    #####:  196:        char ch2 = pgm_read_byte(str2P++);
+    #####:  197:        result = ch1 - ch2;
+    #####:  198:        if (result != 0 || ch2 == '\0')
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+        -:  199:        {
+        -:  200:            break;
+        -:  201:        }
+        -:  202:
+    #####:  203:        size--;
+        -:  204:    }
+        -:  205:
+    #####:  206:    return result;
+        -:  207:}
+        -:  208:
+function _Z13strncasecmp_PPKcS0_m called 0 returned 0% blocks executed 0%
+    #####:  209:int strncasecmp_P(const char* str1, PGM_P str2P, size_t size) {
+    #####:  210:    int result = 0;
+        -:  211:
+    #####:  212:    while (size > 0)
+branch  0 never executed
+branch  1 never executed
+        -:  213:    {
+    #####:  214:        char ch1 = tolower(*str1++);
+    #####:  215:        char ch2 = tolower(pgm_read_byte(str2P++));
+    #####:  216:        result = ch1 - ch2;
+    #####:  217:        if (result != 0 || ch2 == '\0')
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+        -:  218:        {
+        -:  219:            break;
+        -:  220:        }
+        -:  221:
+    #####:  222:        size--;
+        -:  223:    }
+        -:  224:
+    #####:  225:    return result;
+        -:  226:}
+        -:  227:
+function _Z8printf_PPKcz called 0 returned 0% blocks executed 0%
+    #####:  228:int printf_P(PGM_P formatP, ...) {
+        -:  229:    int ret;
+        -:  230:    va_list arglist;
+    #####:  231:    va_start(arglist, formatP);
+        -:  232:
+    #####:  233:    size_t fmtLen = strlen_P(formatP);
+call    0 never executed
+    #####:  234:    char* format = new char[fmtLen + 1];
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  235:    strcpy_P(format, formatP);
+call    0 never executed
+        -:  236:
+    #####:  237:    ret = printf(format, arglist);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  238:
+    #####:  239:    delete[] format;
+branch  0 never executed
+branch  1 never executed
+call    2 never executed
+        -:  240:
+    #####:  241:    va_end(arglist);
+    #####:  242:    return ret;
+        -:  243:}
+        -:  244:
+function _Z9sprintf_PPcPKcz called 0 returned 0% blocks executed 0%
+    #####:  245:int sprintf_P(char* str, PGM_P formatP, ...) {
+        -:  246:    int ret;
+        -:  247:    va_list arglist;
+    #####:  248:    va_start(arglist, formatP);
+        -:  249:
+    #####:  250:    ret = vsnprintf_P(str, SIZE_IRRELEVANT, formatP, arglist);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  251:
+    #####:  252:    va_end(arglist);
+    #####:  253:    return ret;
+        -:  254:}
+        -:  255:
+function _Z10snprintf_PPcmPKcz called 0 returned 0% blocks executed 0%
+    #####:  256:int snprintf_P(char* str, size_t strSize, PGM_P formatP, ...) {
+        -:  257:    int ret;
+        -:  258:    va_list arglist;
+    #####:  259:    va_start(arglist, formatP);
+        -:  260:
+    #####:  261:    ret = vsnprintf_P(str, strSize, formatP, arglist);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  262:
+    #####:  263:    va_end(arglist);
+    #####:  264:    return ret;
+        -:  265:}
+        -:  266:
+function _Z11vsnprintf_PPcmPKcP13__va_list_tag called 0 returned 0% blocks executed 0%
+    #####:  267:int vsnprintf_P(char* str, size_t strSize, PGM_P formatP, va_list ap) {
+        -:  268:    int ret;
+        -:  269:
+    #####:  270:    size_t fmtLen = strlen_P(formatP);
+call    0 never executed
+    #####:  271:    char* format = new char[fmtLen + 1];
+call    0 never executed
+    #####:  272:    strcpy_P(format, formatP);
+call    0 never executed
+        -:  273:
+    #####:  274:    ret = vsnprintf(str, strSize, format, ap);
+        -:  275:
+    #####:  276:    delete[] format;
+branch  0 never executed
+branch  1 never executed
+call    2 never executed
+        -:  277:
+    #####:  278:    return ret;
+        -:  279:}

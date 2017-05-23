@@ -1,0 +1,29 @@
+        -:    0:Source:../../cores/esp8266/SHA256Builder.cpp
+        -:    0:Programs:16
+        -:    1:#include <SHA256Builder.h>
+        -:    2:
+function _ZN13SHA256Builder5_initEv called 6 returned 100% blocks executed 100%
+        6:    3:void SHA256Builder::_init(void){
+        6:    4:  _resultVector = {};
+call    0 returned 100%
+        6:    5:  SHA256_Init(&_ctx);
+call    0 returned 100%
+        6:    6:  return;
+        -:    7:}
+        -:    8:
+function _ZN13SHA256Builder7_updateEPht called 6 returned 100% blocks executed 100%
+        6:    9:void SHA256Builder::_update(uint8_t * data, uint16_t len){
+        6:   10:    SHA256_Update(&_ctx, data, len);
+call    0 returned 100%
+        6:   11:    return;
+        -:   12:}
+        -:   13:
+function _ZN13SHA256Builder6_finalEv called 6 returned 100% blocks executed 100%
+        6:   14:void SHA256Builder::_final(void){
+        6:   15:    _resultVector.resize(HEX_STR_LEN);
+call    0 returned 100%
+        6:   16:    SHA256_Final(_resultVector.data(), &_ctx);
+call    0 returned 100%
+call    1 returned 100%
+        6:   17:    return;
+        -:   18:}

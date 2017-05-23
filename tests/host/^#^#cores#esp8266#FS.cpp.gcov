@@ -1,0 +1,580 @@
+        -:    0:Source:../../cores/esp8266/FS.cpp
+        -:    0:Programs:16
+        -:    1:/*
+        -:    2: FS.cpp - file system wrapper
+        -:    3: Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+        -:    4: This file is part of the esp8266 core for Arduino environment.
+        -:    5:
+        -:    6: This library is free software; you can redistribute it and/or
+        -:    7: modify it under the terms of the GNU Lesser General Public
+        -:    8: License as published by the Free Software Foundation; either
+        -:    9: version 2.1 of the License, or (at your option) any later version.
+        -:   10:
+        -:   11: This library is distributed in the hope that it will be useful,
+        -:   12: but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        -:   14: Lesser General Public License for more details.
+        -:   15:
+        -:   16: You should have received a copy of the GNU Lesser General Public
+        -:   17: License along with this library; if not, write to the Free Software
+        -:   18: Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+        -:   19: */
+        -:   20:
+        -:   21:#include "FS.h"
+        -:   22:#include "FSImpl.h"
+        -:   23:
+        -:   24:using namespace fs;
+        -:   25:
+        -:   26:static bool sflags(const char* mode, OpenMode& om, AccessMode& am);
+        -:   27:
+function _ZN2fs4File5writeEh called 0 returned 0% blocks executed 0%
+    #####:   28:size_t File::write(uint8_t c) {
+    #####:   29:    if (!_p)
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   30:        return 0;
+        -:   31:
+    #####:   32:    return _p->write(&c, 1);
+call    0 never executed
+call    1 never executed
+        -:   33:}
+        -:   34:
+function _ZN2fs4File5writeEPKhm called 20 returned 100% blocks executed 86%
+       20:   35:size_t File::write(const uint8_t *buf, size_t size) {
+       20:   36:    if (!_p)
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   37:        return 0;
+        -:   38:
+       20:   39:    return _p->write(buf, size);
+call    0 returned 100%
+call    1 returned 100%
+        -:   40:}
+        -:   41:
+function _ZN2fs4File9availableEv called 0 returned 0% blocks executed 0%
+    #####:   42:int File::available() {
+    #####:   43:    if (!_p)
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   44:        return false;
+        -:   45:
+    #####:   46:    return _p->size() - _p->position();
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+        -:   47:}
+        -:   48:
+function _ZN2fs4File4readEv called 23069953 returned 100% blocks executed 91%
+ 23069953:   49:int File::read() {
+ 23069953:   50:    if (!_p)
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   51:        return -1;
+        -:   52:
+        -:   53:    uint8_t result;
+ 23069953:   54:    if (_p->read(&result, 1) != 1) {
+call    0 returned 100%
+call    1 returned 100%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0% (throw)
+branch  4 taken 99% (fallthrough)
+branch  5 taken 1%
+ 23069938:   55:        return -1;
+        -:   56:    }
+        -:   57:
+       15:   58:    return result;
+        -:   59:}
+        -:   60:
+function _ZN2fs4File4readEPhm called 1 returned 100% blocks executed 86%
+        1:   61:size_t File::read(uint8_t* buf, size_t size) {
+        1:   62:    if (!_p)
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   63:        return -1;
+        -:   64:
+        1:   65:    return _p->read(buf, size);
+call    0 returned 100%
+call    1 returned 100%
+        -:   66:}
+        -:   67:
+function _ZN2fs4File4peekEv called 0 returned 0% blocks executed 0%
+    #####:   68:int File::peek() {
+    #####:   69:    if (!_p)
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   70:        return -1;
+        -:   71:
+    #####:   72:    size_t curPos = _p->position();
+call    0 never executed
+call    1 never executed
+    #####:   73:    int result = read();
+call    0 never executed
+    #####:   74:    seek(curPos, SeekSet);
+call    0 never executed
+    #####:   75:    return result;
+        -:   76:}
+        -:   77:
+function _ZN2fs4File5flushEv called 0 returned 0% blocks executed 0%
+    #####:   78:void File::flush() {
+    #####:   79:    if (!_p)
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   80:        return;
+        -:   81:
+    #####:   82:    _p->flush();
+call    0 never executed
+call    1 never executed
+        -:   83:}
+        -:   84:
+function _ZN2fs4File4seekEjNS_8SeekModeE called 0 returned 0% blocks executed 0%
+    #####:   85:bool File::seek(uint32_t pos, SeekMode mode) {
+    #####:   86:    if (!_p)
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   87:        return false;
+        -:   88:
+    #####:   89:    return _p->seek(pos, mode);
+call    0 never executed
+call    1 never executed
+        -:   90:}
+        -:   91:
+function _ZNK2fs4File8positionEv called 0 returned 0% blocks executed 0%
+    #####:   92:size_t File::position() const {
+    #####:   93:    if (!_p)
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   94:        return 0;
+        -:   95:
+    #####:   96:    return _p->position();
+call    0 never executed
+call    1 never executed
+        -:   97:}
+        -:   98:
+function _ZNK2fs4File4sizeEv called 0 returned 0% blocks executed 0%
+    #####:   99:size_t File::size() const {
+    #####:  100:    if (!_p)
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  101:        return 0;
+        -:  102:
+    #####:  103:    return _p->size();
+call    0 never executed
+call    1 never executed
+        -:  104:}
+        -:  105:
+function _ZN2fs4File5closeEv called 0 returned 0% blocks executed 0%
+    #####:  106:void File::close() {
+    #####:  107:    if (_p) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  108:        _p->close();
+call    0 never executed
+call    1 never executed
+    #####:  109:        _p = nullptr;
+call    0 never executed
+call    1 never executed
+call    2 never executed
+        -:  110:    }
+    #####:  111:}
+        -:  112:
+function _ZNK2fs4FilecvbEv called 28 returned 100% blocks executed 100%
+       28:  113:File::operator bool() const {
+       28:  114:    return !!_p;
+call    0 returned 100%
+        -:  115:}
+        -:  116:
+function _ZNK2fs4File4nameEv called 0 returned 0% blocks executed 0%
+    #####:  117:const char* File::name() const {
+    #####:  118:    if (!_p)
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  119:        return nullptr;
+        -:  120:
+    #####:  121:    return _p->name();
+call    0 never executed
+call    1 never executed
+        -:  122:}
+        -:  123:
+function _ZN2fs3Dir8openFileEPKc called 0 returned 0% blocks executed 0%
+    #####:  124:File Dir::openFile(const char* mode) {
+    #####:  125:    if (!_impl) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  126:        return File();
+call    0 never executed
+call    1 never executed
+call    2 never executed
+        -:  127:    }
+        -:  128:
+        -:  129:    OpenMode om;
+        -:  130:    AccessMode am;
+    #####:  131:    if (!sflags(mode, om, am)) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  132:        DEBUGV("Dir::openFile: invalid mode `%s`\r\n", mode);
+    #####:  133:        return File();
+call    0 never executed
+call    1 never executed
+call    2 never executed
+        -:  134:    }
+        -:  135:
+    #####:  136:    return File(_impl->openFile(om, am));
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+call    4 never executed
+call    5 never executed
+        -:  137:}
+        -:  138:
+function _ZN2fs3Dir8fileNameEv called 22 returned 100% blocks executed 86%
+       22:  139:String Dir::fileName() {
+       22:  140:    if (!_impl) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  141:        return String();
+call    0 never executed
+        -:  142:    }
+        -:  143:
+       22:  144:    return _impl->fileName();
+call    0 returned 100%
+call    1 returned 100%
+call    2 returned 100%
+        -:  145:}
+        -:  146:
+function _ZN2fs3Dir8fileSizeEv called 0 returned 0% blocks executed 0%
+    #####:  147:size_t Dir::fileSize() {
+    #####:  148:    if (!_impl) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  149:        return 0;
+        -:  150:    }
+        -:  151:
+    #####:  152:    return _impl->fileSize();
+call    0 never executed
+call    1 never executed
+        -:  153:}
+        -:  154:
+function _ZN2fs3Dir4nextEv called 15 returned 100% blocks executed 86%
+       15:  155:bool Dir::next() {
+       15:  156:    if (!_impl) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  157:        return false;
+        -:  158:    }
+        -:  159:
+       15:  160:    return _impl->next();
+call    0 returned 100%
+call    1 returned 100%
+        -:  161:}
+        -:  162:
+function _ZN2fs2FS5beginEv called 11 returned 100% blocks executed 86%
+       11:  163:bool FS::begin() {
+       11:  164:    if (!_impl) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  165:        return false;
+        -:  166:    }
+       11:  167:    return _impl->begin();
+call    0 returned 100%
+call    1 returned 100%
+        -:  168:}
+        -:  169:
+function _ZN2fs2FS3endEv called 0 returned 0% blocks executed 0%
+    #####:  170:void FS::end() {
+    #####:  171:    if (_impl) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  172:        _impl->end();
+call    0 never executed
+call    1 never executed
+        -:  173:    }
+    #####:  174:}
+        -:  175:
+function _ZN2fs2FS6formatEv called 2 returned 100% blocks executed 86%
+        2:  176:bool FS::format() {
+        2:  177:    if (!_impl) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  178:        return false;
+        -:  179:    }
+        2:  180:    return _impl->format();
+call    0 returned 100%
+call    1 returned 100%
+        -:  181:}
+        -:  182:
+function _ZN2fs2FS4infoERNS_6FSInfoE called 0 returned 0% blocks executed 0%
+    #####:  183:bool FS::info(FSInfo& info){
+    #####:  184:    if (!_impl) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  185:        return false;
+        -:  186:    }
+    #####:  187:    return _impl->info(info);
+call    0 never executed
+call    1 never executed
+        -:  188:}
+        -:  189:
+function _ZN2fs2FS4openERK6StringPKc called 0 returned 0% blocks executed 0%
+    #####:  190:File FS::open(const String& path, const char* mode) {
+    #####:  191:    return open(path.c_str(), mode);
+call    0 never executed
+call    1 never executed
+        -:  192:}
+        -:  193:
+function _ZN2fs2FS4openEPKcS2_ called 28 returned 100% blocks executed 60%
+       28:  194:File FS::open(const char* path, const char* mode) {
+       28:  195:    if (!_impl) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  196:        return File();
+call    0 never executed
+call    1 never executed
+call    2 never executed
+        -:  197:    }
+        -:  198:
+        -:  199:    OpenMode om;
+        -:  200:    AccessMode am;
+       28:  201:    if (!sflags(mode, om, am)) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+        -:  202:        DEBUGV("FS::open: invalid mode `%s`\r\n", mode);
+    #####:  203:        return File();
+call    0 never executed
+call    1 never executed
+call    2 never executed
+        -:  204:    }
+        -:  205:
+       28:  206:    return File(_impl->open(path, om, am));
+call    0 returned 100%
+call    1 returned 100%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0% (throw)
+call    4 returned 100%
+call    5 returned 100%
+        -:  207:}
+        -:  208:
+function _ZN2fs2FS6existsEPKc called 4 returned 100% blocks executed 86%
+        4:  209:bool FS::exists(const char* path) {
+        4:  210:    if (!_impl) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  211:        return false;
+        -:  212:    }
+        4:  213:    return _impl->exists(path);
+call    0 returned 100%
+call    1 returned 100%
+        -:  214:}
+        -:  215:
+function _ZN2fs2FS6existsERK6String called 0 returned 0% blocks executed 0%
+    #####:  216:bool FS::exists(const String& path) {
+    #####:  217:    return exists(path.c_str());
+call    0 never executed
+call    1 never executed
+        -:  218:}
+        -:  219:
+function _ZN2fs2FS7openDirEPKc called 4 returned 100% blocks executed 67%
+        4:  220:Dir FS::openDir(const char* path) {
+        4:  221:    if (!_impl) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  222:        return Dir();
+call    0 never executed
+call    1 never executed
+call    2 never executed
+        -:  223:    }
+        4:  224:    return Dir(_impl->openDir(path));
+call    0 returned 100%
+call    1 returned 100%
+call    2 returned 100%
+call    3 returned 100%
+        -:  225:}
+        -:  226:
+function _ZN2fs2FS7openDirERK6String called 0 returned 0% blocks executed 0%
+    #####:  227:Dir FS::openDir(const String& path) {
+    #####:  228:    return openDir(path.c_str());
+call    0 never executed
+call    1 never executed
+        -:  229:}
+        -:  230:
+function _ZN2fs2FS6removeEPKc called 0 returned 0% blocks executed 0%
+    #####:  231:bool FS::remove(const char* path) {
+    #####:  232:    if (!_impl) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  233:        return false;
+        -:  234:    }
+    #####:  235:    return _impl->remove(path);
+call    0 never executed
+call    1 never executed
+        -:  236:}
+        -:  237:
+function _ZN2fs2FS6removeERK6String called 0 returned 0% blocks executed 0%
+    #####:  238:bool FS::remove(const String& path) {
+    #####:  239:    return remove(path.c_str());
+call    0 never executed
+call    1 never executed
+        -:  240:}
+        -:  241:
+function _ZN2fs2FS6renameEPKcS2_ called 0 returned 0% blocks executed 0%
+    #####:  242:bool FS::rename(const char* pathFrom, const char* pathTo) {
+    #####:  243:    if (!_impl) {
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  244:        return false;
+        -:  245:    }
+    #####:  246:    return _impl->rename(pathFrom, pathTo);
+call    0 never executed
+call    1 never executed
+        -:  247:}
+        -:  248:
+function _ZN2fs2FS6renameERK6StringS3_ called 0 returned 0% blocks executed 0%
+    #####:  249:bool FS::rename(const String& pathFrom, const String& pathTo) {
+    #####:  250:    return rename(pathFrom.c_str(), pathTo.c_str());
+call    0 never executed
+call    1 never executed
+call    2 never executed
+        -:  251:}
+        -:  252:
+        -:  253:
+function _ZL6sflagsPKcRN2fs8OpenModeERNS1_10AccessModeE called 28 returned 100% blocks executed 73%
+       28:  254:static bool sflags(const char* mode, OpenMode& om, AccessMode& am) {
+       28:  255:    switch (mode[0]) {
+branch  0 taken 21%
+branch  1 taken 75%
+branch  2 taken 4%
+branch  3 taken 0%
+        -:  256:        case 'r':
+        6:  257:            am = AM_READ;
+        6:  258:            om = OM_DEFAULT;
+        6:  259:            break;
+        -:  260:        case 'w':
+       21:  261:            am = AM_WRITE;
+       21:  262:            om = (OpenMode) (OM_CREATE | OM_TRUNCATE);
+       21:  263:            break;
+        -:  264:        case 'a':
+        1:  265:            am = AM_WRITE;
+        1:  266:            om = (OpenMode) (OM_CREATE | OM_APPEND);
+        1:  267:            break;
+        -:  268:        default:
+    #####:  269:            return false;
+        -:  270:    }
+       28:  271:    switch(mode[1]) {
+branch  0 taken 0%
+branch  1 taken 100%
+branch  2 taken 0%
+        -:  272:        case '+':
+    #####:  273:            am = (AccessMode) (AM_WRITE | AM_READ);
+    #####:  274:            break;
+        -:  275:        case 0:
+       28:  276:            break;
+        -:  277:        default:
+    #####:  278:            return false;
+        -:  279:    }
+       28:  280:    return true;
+        -:  281:}
+        -:  282:
+        -:  283:
+        -:  284:#if defined(FS_FREESTANDING_FUNCTIONS)
+        -:  285:
+        -:  286:/*
+        -:  287:TODO: move these functions to public API:
+        -:  288:*/
+        -:  289:File open(const char* path, const char* mode);
+        -:  290:File open(String& path, const char* mode);
+        -:  291:
+        -:  292:Dir openDir(const char* path);
+        -:  293:Dir openDir(String& path);
+        -:  294:
+        -:  295:template<>
+        -:  296:bool mount<FS>(FS& fs, const char* mountPoint);
+        -:  297:/*
+        -:  298:*/
+        -:  299:
+        -:  300:
+        -:  301:struct MountEntry {
+        -:  302:    FSImplPtr fs;
+        -:  303:    String    path;
+        -:  304:    MountEntry* next;
+        -:  305:};
+        -:  306:
+        -:  307:static MountEntry* s_mounted = nullptr;
+        -:  308:
+        -:  309:template<>
+        -:  310:bool mount<FS>(FS& fs, const char* mountPoint) {
+        -:  311:    FSImplPtr p = fs._impl;
+        -:  312:    if (!p || !p->mount()) {
+        -:  313:        DEBUGV("FSImpl mount failed\r\n");
+        -:  314:        return false;
+        -:  315:    }
+        -:  316:
+        -:  317:    !make sure mountPoint has trailing '/' here
+        -:  318:
+        -:  319:    MountEntry* entry = new MountEntry;
+        -:  320:    entry->fs = p;
+        -:  321:    entry->path = mountPoint;
+        -:  322:    entry->next = s_mounted;
+        -:  323:    s_mounted = entry;
+        -:  324:    return true;
+        -:  325:}
+        -:  326:
+        -:  327:
+        -:  328:/*
+        -:  329:    iterate over MountEntries and look for the ones which match the path
+        -:  330:*/
+        -:  331:File open(const char* path, const char* mode) {
+        -:  332:    OpenMode om;
+        -:  333:    AccessMode am;
+        -:  334:    if (!sflags(mode, om, am)) {
+        -:  335:        DEBUGV("open: invalid mode `%s`\r\n", mode);
+        -:  336:        return File();
+        -:  337:    }
+        -:  338:
+        -:  339:    for (MountEntry* entry = s_mounted; entry; entry = entry->next) {
+        -:  340:        size_t offset = entry->path.length();
+        -:  341:        if (strstr(path, entry->path.c_str())) {
+        -:  342:            File result = entry->fs->open(path + offset);
+        -:  343:            if (result)
+        -:  344:                return result;
+        -:  345:        }
+        -:  346:    }
+        -:  347:
+        -:  348:    return File();
+        -:  349:}
+        -:  350:
+        -:  351:File open(const String& path, const char* mode) {
+        -:  352:    return FS::open(path.c_str(), mode);
+        -:  353:}
+        -:  354:
+        -:  355:Dir openDir(const String& path) {
+        -:  356:    return openDir(path.c_str());
+        -:  357:}
+        -:  358:#endif

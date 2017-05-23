@@ -1,0 +1,228 @@
+        -:    0:Source:../../cores/esp8266/HashBuilder.cpp
+        -:    0:Programs:16
+        -:    1:#include <HashBuilder.h>
+        -:    2:#include <Arduino.h>
+        -:    3:
+function _ZN11HashBuilder14_hexCharToByteEh called 368 returned 100% blocks executed 79%
+      368:    4:uint8_t HashBuilder::_hexCharToByte(uint8_t c){
+       74:    5:    return  (c >= 'a' && c <= 'f') ? (c - ((uint8_t)'a' - 0xa)) :
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+    #####:    6:            (c >= 'A' && c <= 'F') ? (c - ((uint8_t)'A' - 0xA)) :
+branch  0 never executed
+branch  1 never executed
+      442:    7:            (c >= '0' &&  c<= '9') ? (c - (uint8_t)'0') : 0;
+branch  0 taken 20% (fallthrough)
+branch  1 taken 80%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+branch  4 taken 100% (fallthrough)
+branch  5 taken 0%
+branch  6 taken 100% (fallthrough)
+branch  7 taken 0%
+        -:    8:}
+        -:    9:
+function _ZN11HashBuilder5beginEv called 12 returned 100% blocks executed 100%
+       12:   10:void HashBuilder::begin(void){
+       12:   11:    _init();
+call    0 returned 100%
+       12:   12:}
+        -:   13:
+function _ZN11HashBuilder3addEPht called 8 returned 100% blocks executed 100%
+        8:   14:void HashBuilder::add(uint8_t * data, uint16_t len){
+        8:   15:    _update(data, len);
+call    0 returned 100%
+        8:   16:}
+        -:   17:
+function _ZN11HashBuilder9calculateEv called 12 returned 100% blocks executed 100%
+       12:   18:void HashBuilder::calculate(void){
+       12:   19:    _final();
+call    0 returned 100%
+       12:   20:}
+        -:   21:
+        -:   22:
+function _ZN11HashBuilder12addHexStringEPKc called 4 returned 100% blocks executed 85%
+        4:   23:void HashBuilder::addHexString(const char * data){
+        4:   24:    uint16_t i, len = strlen(data);
+        8:   25:    std::unique_ptr<uint8_t[]> tmp(new uint8_t[len/2]);
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+call    3 returned 100%
+call    4 returned 100%
+call    5 never executed
+        4:   26:    if(tmp == NULL) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   27:        return;
+        -:   28:    }
+      180:   29:    for(i=0; i<len; i+=2) {
+branch  0 taken 98% (fallthrough)
+branch  1 taken 2%
+      176:   30:        uint8_t high = _hexCharToByte(data[i]);
+call    0 returned 100%
+      176:   31:        uint8_t low = _hexCharToByte(data[i+1]);
+call    0 returned 100%
+      176:   32:        tmp[i/2] = (high & 0x0F) << 4 | (low & 0x0F);
+call    0 returned 100%
+        -:   33:    }
+        4:   34:    add(tmp.get(), len/2);
+call    0 returned 100%
+call    1 returned 100%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0% (throw)
+        4:   35:    return;
+        -:   36:}
+        -:   37:
+function _ZN11HashBuilder9addStreamER6Streamm called 7 returned 100% blocks executed 83%
+        7:   38:bool HashBuilder::addStream(Stream & stream, const size_t totalLen){
+        7:   39:    const int BUFFER_SIZE = 512;
+       14:   40:    std::unique_ptr<uint8_t[]> buf(new uint8_t[BUFFER_SIZE]);
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+call    3 returned 100%
+call    4 returned 100%
+call    5 never executed
+        7:   41:    if(!buf){
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   42:       return false;
+        -:   43:    }
+        -:   44:
+        7:   45:    int maxLeft = totalLen;
+        7:   46:    int bytesAvailable = stream.available();
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+       21:   47:    while((bytesAvailable > 0) && (maxLeft > 0)) {
+branch  0 taken 64% (fallthrough)
+branch  1 taken 36%
+branch  2 taken 78% (fallthrough)
+branch  3 taken 22%
+        -:   48:
+        7:   49:        int bytesToRead = bytesAvailable;
+        7:   50:        if(bytesToRead > maxLeft) bytesToRead = maxLeft ;
+branch  0 taken 29% (fallthrough)
+branch  1 taken 71%
+        7:   51:        if(bytesToRead > BUFFER_SIZE) bytesToRead = BUFFER_SIZE;
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:   52:
+        7:   53:        int numBytesRead = stream.readBytes(buf.get(), bytesToRead);
+call    0 returned 100%
+call    1 returned 100%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0% (throw)
+        7:   54:        if(numBytesRead<1) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   55:            return false;
+        -:   56:        }
+        7:   57:        _update(buf.get(), numBytesRead);
+call    0 returned 100%
+call    1 returned 100%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0% (throw)
+        7:   58:        yield();
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+        -:   59:
+        7:   60:        maxLeft -= numBytesRead;
+        7:   61:        bytesAvailable = stream.available();
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+        -:   62:    }
+        7:   63:    return true;
+        -:   64:}
+        -:   65:
+        -:   66:// RESULTS
+function _ZN11HashBuilder16_byteVecToStringERSt6vectorIhSaIhEE called 18 returned 100% blocks executed 75%
+       18:   67:String HashBuilder::_byteVecToString( std::vector<uint8_t>& res){
+       18:   68:  String resString;
+call    0 returned 100%
+       18:   69:  resString.reserve(res.size()*2);
+call    0 returned 100%
+call    1 returned 100%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0% (throw)
+        -:   70:  static constexpr char hex[] = "0123456789abcdef";
+      423:   71:  for (uint8_t & c : res){
+call    0 returned 100%
+call    1 returned 100%
+call    2 returned 100%
+branch  3 taken 96% (fallthrough)
+branch  4 taken 4%
+call    5 returned 100%
+call    6 returned 100%
+      405:   72:      resString += String(hex[c / 16]);
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+call    3 returned 100%
+branch  4 taken 100% (fallthrough)
+branch  5 taken 0% (throw)
+call    6 returned 100%
+call    7 never executed
+      405:   73:      resString += String(hex[c % 16]);
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+call    3 returned 100%
+branch  4 taken 100% (fallthrough)
+branch  5 taken 0% (throw)
+call    6 returned 100%
+call    7 never executed
+call    8 never executed
+        -:   74:  }
+       18:   75:  return resString;
+        -:   76:}
+        -:   77:
+function _ZN11HashBuilder8toStringEv called 15 returned 100% blocks executed 100%
+       15:   78:String HashBuilder::toString(){
+       15:   79:  return _byteVecToString(_result());
+call    0 returned 100%
+call    1 returned 100%
+        -:   80:}
+        -:   81:
+function _ZN11HashBuilder8getBytesEPh called 1 returned 100% blocks executed 100%
+        1:   82:void HashBuilder::getBytes(uint8_t * output){
+        2:   83:    auto res = _result();
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+call    3 returned 100%
+branch  4 taken 100% (fallthrough)
+branch  5 taken 0% (throw)
+call    6 returned 100%
+        5:   84:    for(uint8_t i = 0; i < res.size(); i++){
+call    0 returned 100%
+branch  1 taken 80% (fallthrough)
+branch  2 taken 20%
+        4:   85:        output[i] =  res[i];
+call    0 returned 100%
+        -:   86:    }
+        1:   87:}
+        -:   88:
+function _ZN11HashBuilder8getCharsEPc called 1 returned 100% blocks executed 100%
+        1:   89:void HashBuilder::getChars(char * output){
+        2:   90:  auto res = _result();
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0% (throw)
+call    3 returned 100%
+branch  4 taken 100% (fallthrough)
+branch  5 taken 0% (throw)
+call    6 returned 100%
+        5:   91:  for(uint8_t i = 0; i < res.size(); i++){
+call    0 returned 100%
+branch  1 taken 80% (fallthrough)
+branch  2 taken 20%
+        4:   92:    sprintf(output + (i * 2), "%02x", res[i]);
+call    0 returned 100%
+        -:   93:  }
+        1:   94:}

@@ -1,0 +1,411 @@
+        -:    0:Source:../../cores/esp8266/spiffs/spiffs_cache.c
+        -:    0:Programs:16
+        -:    1:/*
+        -:    2: * spiffs_cache.c
+        -:    3: *
+        -:    4: *  Created on: Jun 23, 2013
+        -:    5: *      Author: petera
+        -:    6: */
+        -:    7:
+        -:    8:#include "spiffs.h"
+        -:    9:#include "spiffs_nucleus.h"
+        -:   10:
+        -:   11:#if SPIFFS_CACHE
+        -:   12:
+        -:   13:// returns cached page for give page index, or null if no such cached page
+function spiffs_cache_page_get called 1131 returned 100% blocks executed 100%
+     1131:   14:static spiffs_cache_page *spiffs_cache_page_get(spiffs *fs, spiffs_page_ix pix) {
+     1131:   15:  spiffs_cache *cache = spiffs_get_cache(fs);
+     1131:   16:  if ((cache->cpage_use_map & cache->cpage_use_mask) == 0) return 0;
+branch  0 taken 33% (fallthrough)
+branch  1 taken 67%
+        -:   17:  int i;
+     3015:   18:  for (i = 0; i < cache->cpage_count; i++) {
+branch  0 taken 84%
+branch  1 taken 16% (fallthrough)
+     2526:   19:    spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, i);
+     4929:   20:    if ((cache->cpage_use_map & (1<<i)) &&
+branch  0 taken 95% (fallthrough)
+branch  1 taken 5%
+branch  2 taken 98% (fallthrough)
+branch  3 taken 2%
+     4759:   21:        (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) == 0 &&
+branch  0 taken 11% (fallthrough)
+branch  1 taken 89%
+     2356:   22:        cp->pix == pix ) {
+        -:   23:      SPIFFS_CACHE_DBG("CACHE_GET: have cache page %i for %04x\n", i, pix);
+      267:   24:      cp->last_access = cache->last_access;
+      267:   25:      return cp;
+        -:   26:    }
+        -:   27:  }
+        -:   28:  //SPIFFS_CACHE_DBG("CACHE_GET: no cache for %04x\n", pix);
+      489:   29:  return 0;
+        -:   30:}
+        -:   31:
+        -:   32:// frees cached page
+function spiffs_cache_page_free called 403 returned 100% blocks executed 88%
+      403:   33:static s32_t spiffs_cache_page_free(spiffs *fs, int ix, u8_t write_back) {
+      403:   34:  s32_t res = SPIFFS_OK;
+      403:   35:  spiffs_cache *cache = spiffs_get_cache(fs);
+      403:   36:  spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, ix);
+      403:   37:  if (cache->cpage_use_map & (1<<ix)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+      787:   38:    if (write_back &&
+branch  0 taken 95% (fallthrough)
+branch  1 taken 5%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+      768:   39:        (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) == 0 &&
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+      384:   40:        (cp->flags & SPIFFS_CACHE_FLAG_DIRTY)) {
+    #####:   41:      u8_t *mem =  spiffs_get_cache_page(fs, cache, ix);
+    #####:   42:      res = SPIFFS_HAL_WRITE(fs, SPIFFS_PAGE_TO_PADDR(fs, cp->pix), SPIFFS_CFG_LOG_PAGE_SZ(fs), mem);
+call    0 never executed
+        -:   43:    }
+        -:   44:
+      403:   45:    cp->flags = 0;
+      403:   46:    cache->cpage_use_map &= ~(1 << ix);
+        -:   47:
+      403:   48:    if (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) {
+        -:   49:      SPIFFS_CACHE_DBG("CACHE_FREE: free cache page %i objid %04x\n", ix, cp->obj_id);
+        -:   50:    } else {
+        -:   51:      SPIFFS_CACHE_DBG("CACHE_FREE: free cache page %i pix %04x\n", ix, cp->pix);
+        -:   52:    }
+        -:   53:  }
+        -:   54:
+      403:   55:  return res;
+        -:   56:}
+        -:   57:
+        -:   58:// removes the oldest accessed cached page
+function spiffs_cache_page_remove_oldest called 447 returned 100% blocks executed 100%
+      447:   59:static s32_t spiffs_cache_page_remove_oldest(spiffs *fs, u8_t flag_mask, u8_t flags) {
+      447:   60:  s32_t res = SPIFFS_OK;
+      447:   61:  spiffs_cache *cache = spiffs_get_cache(fs);
+        -:   62:
+      447:   63:  if ((cache->cpage_use_map & cache->cpage_use_mask) != cache->cpage_use_mask) {
+branch  0 taken 14% (fallthrough)
+branch  1 taken 86%
+        -:   64:    // at least one free cpage
+       63:   65:    return SPIFFS_OK;
+        -:   66:  }
+        -:   67:
+        -:   68:  // all busy, scan thru all to find the cpage which has oldest access
+        -:   69:  int i;
+      384:   70:  int cand_ix = -1;
+      384:   71:  u32_t oldest_val = 0;
+     1920:   72:  for (i = 0; i < cache->cpage_count; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+     1536:   73:    spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, i);
+     2215:   74:    if ((cache->last_access - cp->last_access) > oldest_val &&
+branch  0 taken 44% (fallthrough)
+branch  1 taken 56%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+      679:   75:        (cp->flags & flag_mask) == flags) {
+      679:   76:      oldest_val = cache->last_access - cp->last_access;
+      679:   77:      cand_ix = i;
+        -:   78:    }
+        -:   79:  }
+        -:   80:
+      384:   81:  if (cand_ix >= 0) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+      384:   82:    res = spiffs_cache_page_free(fs, cand_ix, 1);
+call    0 returned 100%
+        -:   83:  }
+        -:   84:
+      384:   85:  return res;
+        -:   86:}
+        -:   87:
+        -:   88:// allocates a new cached page and returns it, or null if all cache pages are busy
+function spiffs_cache_page_allocate called 447 returned 100% blocks executed 78%
+      447:   89:static spiffs_cache_page *spiffs_cache_page_allocate(spiffs *fs) {
+      447:   90:  spiffs_cache *cache = spiffs_get_cache(fs);
+      447:   91:  if (cache->cpage_use_map == 0xffffffff) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:   92:    // out of cache memory
+    #####:   93:    return 0;
+        -:   94:  }
+        -:   95:  int i;
+     1108:   96:  for (i = 0; i < cache->cpage_count; i++) {
+branch  0 taken 100%
+branch  1 taken 0% (fallthrough)
+     1108:   97:    if ((cache->cpage_use_map & (1<<i)) == 0) {
+branch  0 taken 40% (fallthrough)
+branch  1 taken 60%
+      447:   98:      spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, i);
+      447:   99:      cache->cpage_use_map |= (1<<i);
+      447:  100:      cp->last_access = cache->last_access;
+        -:  101:      SPIFFS_CACHE_DBG("CACHE_ALLO: allocated cache page %i\n", i);
+      447:  102:      return cp;
+        -:  103:    }
+        -:  104:  }
+        -:  105:  // out of cache entries
+    #####:  106:  return 0;
+        -:  107:}
+        -:  108:
+        -:  109:// drops the cache page for give page index
+function spiffs_cache_drop_page called 0 returned 0% blocks executed 0%
+    #####:  110:void spiffs_cache_drop_page(spiffs *fs, spiffs_page_ix pix) {
+    #####:  111:  spiffs_cache_page *cp =  spiffs_cache_page_get(fs, pix);
+call    0 never executed
+    #####:  112:  if (cp) {
+branch  0 never executed
+branch  1 never executed
+    #####:  113:    spiffs_cache_page_free(fs, cp->ix, 0);
+call    0 never executed
+        -:  114:  }
+    #####:  115:}
+        -:  116:
+        -:  117:// ------------------------------
+        -:  118:
+        -:  119:// reads from spi flash or the cache
+function spiffs_phys_rd called 879 returned 100% blocks executed 93%
+      879:  120:s32_t spiffs_phys_rd(
+        -:  121:    spiffs *fs,
+        -:  122:    u8_t op,
+        -:  123:    spiffs_file fh,
+        -:  124:    u32_t addr,
+        -:  125:    u32_t len,
+        -:  126:    u8_t *dst) {
+        -:  127:  (void)fh;
+      879:  128:  s32_t res = SPIFFS_OK;
+      879:  129:  spiffs_cache *cache = spiffs_get_cache(fs);
+      879:  130:  spiffs_cache_page *cp =  spiffs_cache_page_get(fs, SPIFFS_PADDR_TO_PAGE(fs, addr));
+call    0 returned 100%
+      879:  131:  cache->last_access++;
+      879:  132:  if (cp) {
+branch  0 taken 24% (fallthrough)
+branch  1 taken 76%
+        -:  133:#if SPIFFS_CACHE_STATS
+        -:  134:    fs->cache_hits++;
+        -:  135:#endif
+      212:  136:    cp->last_access = cache->last_access;
+        -:  137:  } else {
+      667:  138:    if ((op & SPIFFS_OP_TYPE_MASK) == SPIFFS_OP_T_OBJ_LU2) {
+branch  0 taken 36% (fallthrough)
+branch  1 taken 64%
+        -:  139:      // for second layer lookup functions, we do not cache in order to prevent shredding
+      238:  140:      return SPIFFS_HAL_READ(fs, addr, len, dst);
+call    0 returned 100%
+        -:  141:    }
+        -:  142:#if SPIFFS_CACHE_STATS
+        -:  143:    fs->cache_misses++;
+        -:  144:#endif
+      429:  145:    res = spiffs_cache_page_remove_oldest(fs, SPIFFS_CACHE_FLAG_TYPE_WR, 0);
+call    0 returned 100%
+      429:  146:    cp = spiffs_cache_page_allocate(fs);
+call    0 returned 100%
+      429:  147:    if (cp) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+      429:  148:      cp->flags = SPIFFS_CACHE_FLAG_WRTHRU;
+      429:  149:      cp->pix = SPIFFS_PADDR_TO_PAGE(fs, addr);
+        -:  150:    }
+      429:  151:    s32_t res2 = SPIFFS_HAL_READ(fs,
+call    0 returned 100%
+        -:  152:        addr - SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr),
+        -:  153:        SPIFFS_CFG_LOG_PAGE_SZ(fs),
+        -:  154:        spiffs_get_cache_page(fs, cache, cp->ix));
+      429:  155:    if (res2 != SPIFFS_OK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  156:      res = res2;
+        -:  157:    }
+        -:  158:  }
+      641:  159:  u8_t *mem =  spiffs_get_cache_page(fs, cache, cp->ix);
+      641:  160:  memcpy(dst, &mem[SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr)], len);
+      641:  161:  return res;
+        -:  162:}
+        -:  163:
+        -:  164:// writes to spi flash and/or the cache
+function spiffs_phys_wr called 252 returned 100% blocks executed 92%
+      252:  165:s32_t spiffs_phys_wr(
+        -:  166:    spiffs *fs,
+        -:  167:    u8_t op,
+        -:  168:    spiffs_file fh,
+        -:  169:    u32_t addr,
+        -:  170:    u32_t len,
+        -:  171:    u8_t *src) {
+        -:  172:  (void)fh;
+      252:  173:  spiffs_page_ix pix = SPIFFS_PADDR_TO_PAGE(fs, addr);
+      252:  174:  spiffs_cache *cache = spiffs_get_cache(fs);
+      252:  175:  spiffs_cache_page *cp =  spiffs_cache_page_get(fs, pix);
+call    0 returned 100%
+        -:  176:
+      252:  177:  if (cp && (op & SPIFFS_OP_COM_MASK) != SPIFFS_OP_C_WRTHRU) {
+branch  0 taken 22% (fallthrough)
+branch  1 taken 78%
+branch  2 taken 85% (fallthrough)
+branch  3 taken 15%
+        -:  178:    // have a cache page
+        -:  179:    // copy in data to cache page
+        -:  180:
+       49:  181:    if ((op & SPIFFS_OP_COM_MASK) == SPIFFS_OP_C_DELE &&
+branch  0 taken 4% (fallthrough)
+branch  1 taken 96%
+branch  2 taken 50% (fallthrough)
+branch  3 taken 50%
+        2:  182:        (op & SPIFFS_OP_TYPE_MASK) != SPIFFS_OP_T_OBJ_LU) {
+        -:  183:      // page is being deleted, wipe from cache - unless it is a lookup page
+        1:  184:      spiffs_cache_page_free(fs, cp->ix, 0);
+call    0 returned 100%
+        1:  185:      return SPIFFS_HAL_WRITE(fs, addr, len, src);
+call    0 returned 100%
+        -:  186:    }
+        -:  187:
+       46:  188:    u8_t *mem =  spiffs_get_cache_page(fs, cache, cp->ix);
+       46:  189:    memcpy(&mem[SPIFFS_PADDR_TO_PAGE_OFFSET(fs, addr)], src, len);
+        -:  190:
+       46:  191:    cache->last_access++;
+       46:  192:    cp->last_access = cache->last_access;
+        -:  193:
+       46:  194:    if (cp->flags & SPIFFS_CACHE_FLAG_WRTHRU) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  195:      // page is being updated, no write-cache, just pass thru
+       46:  196:      return SPIFFS_HAL_WRITE(fs, addr, len, src);
+call    0 returned 100%
+        -:  197:    } else {
+    #####:  198:      return SPIFFS_OK;
+        -:  199:    }
+        -:  200:  } else {
+        -:  201:    // no cache page, no write cache - just write thru
+      205:  202:    return SPIFFS_HAL_WRITE(fs, addr, len, src);
+call    0 returned 100%
+        -:  203:  }
+        -:  204:}
+        -:  205:
+        -:  206:#if SPIFFS_CACHE_WR
+        -:  207:// returns the cache page that this fd refers, or null if no cache page
+function spiffs_cache_page_get_by_fd called 23070000 returned 100% blocks executed 73%
+ 23070000:  208:spiffs_cache_page *spiffs_cache_page_get_by_fd(spiffs *fs, spiffs_fd *fd) {
+ 23070000:  209:  spiffs_cache *cache = spiffs_get_cache(fs);
+        -:  210:
+ 23070000:  211:  if ((cache->cpage_use_map & cache->cpage_use_mask) == 0) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  212:    // all cpages free, no cpage cannot be assigned to obj_id
+    #####:  213:    return 0;
+        -:  214:  }
+        -:  215:
+        -:  216:  int i;
+115350000:  217:  for (i = 0; i < cache->cpage_count; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+ 92280000:  218:    spiffs_cache_page *cp = spiffs_get_cache_page_hdr(fs, cache, i);
+184559995:  219:    if ((cache->cpage_use_map & (1<<i)) &&
+branch  0 taken 99% (fallthrough)
+branch  1 taken 1%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+ 92279995:  220:        (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) &&
+branch  0 never executed
+branch  1 never executed
+    #####:  221:        cp->obj_id == fd->obj_id) {
+    #####:  222:      return cp;
+        -:  223:    }
+        -:  224:  }
+        -:  225:
+ 23070000:  226:  return 0;
+        -:  227:}
+        -:  228:
+        -:  229:// allocates a new cache page and refers this to given fd - flushes an old cache
+        -:  230:// page if all cache is busy
+function spiffs_cache_page_allocate_by_fd called 18 returned 100% blocks executed 83%
+       18:  231:spiffs_cache_page *spiffs_cache_page_allocate_by_fd(spiffs *fs, spiffs_fd *fd) {
+        -:  232:  // before this function is called, it is ensured that there is no already existing
+        -:  233:  // cache page with same object id
+       18:  234:  spiffs_cache_page_remove_oldest(fs, SPIFFS_CACHE_FLAG_TYPE_WR, 0);
+call    0 returned 100%
+       18:  235:  spiffs_cache_page *cp = spiffs_cache_page_allocate(fs);
+call    0 returned 100%
+       18:  236:  if (cp == 0) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  237:    // could not get cache page
+    #####:  238:    return 0;
+        -:  239:  }
+        -:  240:
+       18:  241:  cp->flags = SPIFFS_CACHE_FLAG_TYPE_WR;
+       18:  242:  cp->obj_id = fd->obj_id;
+       18:  243:  fd->cache_page = cp;
+       18:  244:  return cp;
+        -:  245:}
+        -:  246:
+        -:  247:// unrefers all fds that this cache page refers to and releases the cache page
+function spiffs_cache_fd_release called 18 returned 100% blocks executed 91%
+       18:  248:void spiffs_cache_fd_release(spiffs *fs, spiffs_cache_page *cp) {
+       18:  249:  if (cp == 0) return;
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  250:  u32_t i;
+       18:  251:  spiffs_fd *fds = (spiffs_fd *)fs->fd_space;
+      108:  252:  for (i = 0; i < fs->fd_count; i++) {
+branch  0 taken 83%
+branch  1 taken 17% (fallthrough)
+       90:  253:    spiffs_fd *cur_fd = &fds[i];
+       90:  254:    if (cur_fd->file_nbr != 0 && cur_fd->cache_page == cp) {
+branch  0 taken 20% (fallthrough)
+branch  1 taken 80%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+       18:  255:      cur_fd->cache_page = 0;
+        -:  256:    }
+        -:  257:  }
+       18:  258:  spiffs_cache_page_free(fs, cp->ix, 0);
+call    0 returned 100%
+        -:  259:
+       18:  260:  cp->obj_id = 0;
+        -:  261:}
+        -:  262:
+        -:  263:#endif
+        -:  264:
+        -:  265:// initializes the cache
+function spiffs_cache_init called 21 returned 100% blocks executed 77%
+       21:  266:void spiffs_cache_init(spiffs *fs) {
+       21:  267:  if (fs->cache == 0) return;
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       21:  268:  u32_t sz = fs->cache_size;
+       21:  269:  u32_t cache_mask = 0;
+        -:  270:  int i;
+       21:  271:  int cache_entries =
+       21:  272:      (sz - sizeof(spiffs_cache)) / (SPIFFS_CACHE_PAGE_SIZE(fs));
+       21:  273:  if (cache_entries <= 0) return;
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  274:
+      105:  275:  for (i = 0; i < cache_entries; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+       84:  276:    cache_mask <<= 1;
+       84:  277:    cache_mask |= 1;
+        -:  278:  }
+        -:  279:
+        -:  280:  spiffs_cache cache;
+       21:  281:  memset(&cache, 0, sizeof(spiffs_cache));
+       21:  282:  cache.cpage_count = cache_entries;
+       21:  283:  cache.cpages = (u8_t *)((u8_t *)fs->cache + sizeof(spiffs_cache));
+        -:  284:
+       21:  285:  cache.cpage_use_map = 0xffffffff;
+       21:  286:  cache.cpage_use_mask = cache_mask;
+       21:  287:  memcpy(fs->cache, &cache, sizeof(spiffs_cache));
+        -:  288:
+       21:  289:  spiffs_cache *c = spiffs_get_cache(fs);
+        -:  290:
+       21:  291:  memset(c->cpages, 0, c->cpage_count * SPIFFS_CACHE_PAGE_SIZE(fs));
+        -:  292:
+       21:  293:  c->cpage_use_map &= ~(c->cpage_use_mask);
+      105:  294:  for (i = 0; i < cache.cpage_count; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+       84:  295:    spiffs_get_cache_page_hdr(fs, c, i)->ix = i;
+        -:  296:  }
+        -:  297:}
+        -:  298:
+        -:  299:#endif // SPIFFS_CACHE

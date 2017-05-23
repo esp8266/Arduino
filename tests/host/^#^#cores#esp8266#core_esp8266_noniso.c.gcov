@@ -1,0 +1,209 @@
+        -:    0:Source:../../cores/esp8266/core_esp8266_noniso.c
+        -:    0:Programs:16
+        -:    1:/*
+        -:    2: core_esp8266_noniso.c - nonstandard (but usefull) conversion functions
+        -:    3:
+        -:    4: Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+        -:    5: This file is part of the esp8266 core for Arduino environment.
+        -:    6:
+        -:    7: This library is free software; you can redistribute it and/or
+        -:    8: modify it under the terms of the GNU Lesser General Public
+        -:    9: License as published by the Free Software Foundation; either
+        -:   10: version 2.1 of the License, or (at your option) any later version.
+        -:   11:
+        -:   12: This library is distributed in the hope that it will be useful,
+        -:   13: but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   14: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        -:   15: Lesser General Public License for more details.
+        -:   16:
+        -:   17: You should have received a copy of the GNU Lesser General Public
+        -:   18: License along with this library; if not, write to the Free Software
+        -:   19: Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+        -:   20:
+        -:   21: Modified 03 April 2015 by Markus Sattler
+        -:   22:
+        -:   23: */
+        -:   24:
+        -:   25:#include <stdlib.h>
+        -:   26:#include <string.h>
+        -:   27:#include <stdbool.h>
+        -:   28:#include <stdint.h>
+        -:   29:#include <math.h>
+        -:   30:#include "stdlib_noniso.h"
+        -:   31:
+function reverse called 0 returned 0% blocks executed 0%
+    #####:   32:void reverse(char* begin, char* end) {
+    #####:   33:    char *is = begin;
+    #####:   34:    char *ie = end - 1;
+    #####:   35:    while(is < ie) {
+branch  0 never executed
+branch  1 never executed
+    #####:   36:        char tmp = *ie;
+    #####:   37:        *ie = *is;
+    #####:   38:        *is = tmp;
+    #####:   39:        ++is;
+    #####:   40:        --ie;
+        -:   41:    }
+    #####:   42:}
+        -:   43:
+function ltoa called 0 returned 0% blocks executed 0%
+    #####:   44:char* ltoa(long value, char* result, int base) {
+    #####:   45:    if(base < 2 || base > 16) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:   46:        *result = 0;
+    #####:   47:        return result;
+        -:   48:    }
+        -:   49:
+    #####:   50:    char* out = result;
+    #####:   51:    long quotient = abs(value);
+        -:   52:
+        -:   53:    do {
+    #####:   54:        const long tmp = quotient / base;
+    #####:   55:        *out = "0123456789abcdef"[quotient - (tmp * base)];
+    #####:   56:        ++out;
+    #####:   57:        quotient = tmp;
+    #####:   58:    } while(quotient);
+branch  0 never executed
+branch  1 never executed
+        -:   59:
+        -:   60:    // Apply negative sign
+    #####:   61:    if(value < 0)
+branch  0 never executed
+branch  1 never executed
+    #####:   62:        *out++ = '-';
+        -:   63:
+    #####:   64:    reverse(result, out);
+call    0 never executed
+    #####:   65:    *out = 0;
+    #####:   66:    return result;
+        -:   67:}
+        -:   68:
+function ultoa called 0 returned 0% blocks executed 0%
+    #####:   69:char* ultoa(unsigned long value, char* result, int base) {
+    #####:   70:    if(base < 2 || base > 16) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:   71:        *result = 0;
+    #####:   72:        return result;
+        -:   73:    }
+        -:   74:
+    #####:   75:    char* out = result;
+    #####:   76:    unsigned long quotient = value;
+        -:   77:
+        -:   78:    do {
+    #####:   79:        const unsigned long tmp = quotient / base;
+    #####:   80:        *out = "0123456789abcdef"[quotient - (tmp * base)];
+    #####:   81:        ++out;
+    #####:   82:        quotient = tmp;
+    #####:   83:    } while(quotient);
+branch  0 never executed
+branch  1 never executed
+        -:   84:
+    #####:   85:    reverse(result, out);
+call    0 never executed
+    #####:   86:    *out = 0;
+    #####:   87:    return result;
+        -:   88:}
+        -:   89:
+function dtostrf called 0 returned 0% blocks executed 0%
+    #####:   90:char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
+    #####:   91:    bool negative = false;
+        -:   92:
+    #####:   93:    if (isnan(number)) {
+branch  0 never executed
+branch  1 never executed
+    #####:   94:        strcpy(s, "nan");
+    #####:   95:        return s;
+        -:   96:    }
+    #####:   97:    if (isinf(number)) {
+branch  0 never executed
+branch  1 never executed
+    #####:   98:        strcpy(s, "inf");
+    #####:   99:        return s;
+        -:  100:    }
+        -:  101:
+    #####:  102:    char* out = s;
+        -:  103:
+    #####:  104:    int fillme = width; // how many cells to fill for the integer part
+    #####:  105:    if (prec > 0) {
+branch  0 never executed
+branch  1 never executed
+    #####:  106:        fillme -= (prec+1);
+        -:  107:    }
+        -:  108:
+        -:  109:    // Handle negative numbers
+    #####:  110:    if (number < 0.0) {
+branch  0 never executed
+branch  1 never executed
+    #####:  111:        negative = true;
+    #####:  112:        fillme--;
+    #####:  113:        number = -number;
+        -:  114:    }
+        -:  115:
+        -:  116:    // Round correctly so that print(1.999, 2) prints as "2.00"
+        -:  117:    // I optimized out most of the divisions
+    #####:  118:    double rounding = 2.0;
+    #####:  119:    for (uint8_t i = 0; i < prec; ++i)
+branch  0 never executed
+branch  1 never executed
+    #####:  120:        rounding *= 10.0;
+    #####:  121:    rounding = 1.0 / rounding;
+        -:  122:
+    #####:  123:    number += rounding;
+        -:  124:
+        -:  125:    // Figure out how big our number really is
+    #####:  126:    double tenpow = 1.0;
+    #####:  127:    int digitcount = 1;
+    #####:  128:    while (number >= 10.0 * tenpow) {
+branch  0 never executed
+branch  1 never executed
+    #####:  129:        tenpow *= 10.0;
+    #####:  130:        digitcount++;
+        -:  131:    }
+        -:  132:
+    #####:  133:    number /= tenpow;
+    #####:  134:    fillme -= digitcount;
+        -:  135:
+        -:  136:    // Pad unused cells with spaces
+    #####:  137:    while (fillme-- > 0) {
+branch  0 never executed
+branch  1 never executed
+    #####:  138:        *out++ = ' ';
+        -:  139:    }
+        -:  140:
+        -:  141:    // Handle negative sign
+    #####:  142:    if (negative) *out++ = '-';
+branch  0 never executed
+branch  1 never executed
+        -:  143:
+        -:  144:    // Print the digits, and if necessary, the decimal point
+    #####:  145:    digitcount += prec;
+    #####:  146:    int8_t digit = 0;
+    #####:  147:    while (digitcount-- > 0) {
+branch  0 never executed
+branch  1 never executed
+    #####:  148:        digit = (int8_t)number;
+    #####:  149:        if (digit > 9) digit = 9; // insurance
+branch  0 never executed
+branch  1 never executed
+    #####:  150:        *out++ = (char)('0' | digit);
+    #####:  151:        if ((digitcount == prec) && (prec > 0)) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:  152:            *out++ = '.';
+        -:  153:        }
+    #####:  154:        number -= digit;
+    #####:  155:        number *= 10.0;
+        -:  156:    }
+        -:  157:
+        -:  158:    // make sure the string is terminated
+    #####:  159:    *out = 0;
+    #####:  160:    return s;
+        -:  161:}

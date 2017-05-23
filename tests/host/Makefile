@@ -17,6 +17,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	FS.cpp \
 	spiffs_api.cpp \
 	pgmspace.cpp \
+	HashBuilder.cpp \
 	MD5Builder.cpp \
 	SHA256Builder.cpp \
 )
@@ -50,6 +51,7 @@ INC_PATHS += $(addprefix -I, \
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
 	core/test_pgmspace.cpp \
+	core/test_hashbuilder.cpp \
 	core/test_md5builder.cpp \
 	core/test_sha256builder.cpp \
 

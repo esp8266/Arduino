@@ -1,0 +1,315 @@
+        -:    0:Source:../../cores/esp8266/WString.h
+        -:    0:Programs:16
+        -:    1:/*
+        -:    2: WString.h - String library for Wiring & Arduino
+        -:    3: ...mostly rewritten by Paul Stoffregen...
+        -:    4: Copyright (c) 2009-10 Hernando Barragan.  All right reserved.
+        -:    5: Copyright 2011, Paul Stoffregen, paul@pjrc.com
+        -:    6:
+        -:    7: This library is free software; you can redistribute it and/or
+        -:    8: modify it under the terms of the GNU Lesser General Public
+        -:    9: License as published by the Free Software Foundation; either
+        -:   10: version 2.1 of the License, or (at your option) any later version.
+        -:   11:
+        -:   12: This library is distributed in the hope that it will be useful,
+        -:   13: but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   14: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        -:   15: Lesser General Public License for more details.
+        -:   16:
+        -:   17: You should have received a copy of the GNU Lesser General Public
+        -:   18: License along with this library; if not, write to the Free Software
+        -:   19: Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+        -:   20: */
+        -:   21:
+        -:   22:#ifndef String_class_h
+        -:   23:#define String_class_h
+        -:   24:#ifdef __cplusplus
+        -:   25:
+        -:   26:#include <stdlib.h>
+        -:   27:#include <string.h>
+        -:   28:#include <ctype.h>
+        -:   29:#include <pgmspace.h>
+        -:   30:
+        -:   31:// An inherited class for holding the result of a concatenation.  These
+        -:   32:// result objects are assumed to be writable by subsequent concatenations.
+        -:   33:class StringSumHelper;
+        -:   34:
+        -:   35:// an abstract class used as a means to proide a unique pointer type
+        -:   36:// but really has no body
+        -:   37:class __FlashStringHelper;
+        -:   38:#define FPSTR(pstr_pointer) (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
+        -:   39:#define F(string_literal) (FPSTR(PSTR(string_literal)))
+        -:   40:
+        -:   41:// The string class
+        -:   42:class String {
+        -:   43:        // use a function pointer to allow for "if (s)" without the
+        -:   44:        // complications of an operator bool(). for more information, see:
+        -:   45:        // http://www.artima.com/cppsource/safebool.html
+        -:   46:        typedef void (String::*StringIfHelperType)() const;
+        -:   47:        void StringIfHelper() const {
+        -:   48:        }
+        -:   49:
+        -:   50:    public:
+        -:   51:        // constructors
+        -:   52:        // creates a copy of the initial value.
+        -:   53:        // if the initial value is null or invalid, or if memory allocation
+        -:   54:        // fails, the string will be marked as invalid (i.e. "if (s)" will
+        -:   55:        // be false).
+        -:   56:        String(const char *cstr = "");
+        -:   57:        String(const String &str);
+        -:   58:        String(const __FlashStringHelper *str);
+        -:   59:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:   60:        String(String &&rval);
+        -:   61:        String(StringSumHelper &&rval);
+        -:   62:#endif
+        -:   63:        explicit String(char c);
+        -:   64:        explicit String(unsigned char, unsigned char base = 10);
+        -:   65:        explicit String(int, unsigned char base = 10);
+        -:   66:        explicit String(unsigned int, unsigned char base = 10);
+        -:   67:        explicit String(long, unsigned char base = 10);
+        -:   68:        explicit String(unsigned long, unsigned char base = 10);
+        -:   69:        explicit String(float, unsigned char decimalPlaces = 2);
+        -:   70:        explicit String(double, unsigned char decimalPlaces = 2);
+        -:   71:        ~String(void);
+        -:   72:
+        -:   73:        // memory management
+        -:   74:        // return true on success, false on failure (in which case, the string
+        -:   75:        // is left unchanged).  reserve(0), if successful, will validate an
+        -:   76:        // invalid string (i.e., "if (s)" will be true afterwards)
+        -:   77:        unsigned char reserve(unsigned int size);
+function _ZNK6String6lengthEv called 0 returned 0% blocks executed 0%
+function _ZNK6String6lengthEv called 0 returned 0% blocks executed 0%
+function _ZNK6String6lengthEv called 576 returned 100% blocks executed 75%
+      576:   78:        inline unsigned int length(void) const {
+      576:   79:            if(buffer) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+branch  4 taken 100% (fallthrough)
+branch  5 taken 0%
+      576:   80:                return len;
+        -:   81:            } else {
+    #####:   82:                return 0;
+        -:   83:            }
+        -:   84:        }
+        -:   85:
+        -:   86:        // creates a copy of the assigned value.  if the value is null or
+        -:   87:        // invalid, or if the memory allocation fails, the string will be
+        -:   88:        // marked as invalid ("if (s)" will be false).
+        -:   89:        String & operator =(const String &rhs);
+        -:   90:        String & operator =(const char *cstr);
+        -:   91:        String & operator = (const __FlashStringHelper *str);
+        -:   92:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:   93:        String & operator =(String &&rval);
+        -:   94:        String & operator =(StringSumHelper &&rval);
+        -:   95:#endif
+        -:   96:
+        -:   97:        // concatenate (works w/ built-in types)
+        -:   98:
+        -:   99:        // returns true on success, false on failure (in which case, the string
+        -:  100:        // is left unchanged).  if the argument is null or invalid, the
+        -:  101:        // concatenation is considered unsucessful.
+        -:  102:        unsigned char concat(const String &str);
+        -:  103:        unsigned char concat(const char *cstr);
+        -:  104:        unsigned char concat(char c);
+        -:  105:        unsigned char concat(unsigned char c);
+        -:  106:        unsigned char concat(int num);
+        -:  107:        unsigned char concat(unsigned int num);
+        -:  108:        unsigned char concat(long num);
+        -:  109:        unsigned char concat(unsigned long num);
+        -:  110:        unsigned char concat(float num);
+        -:  111:        unsigned char concat(double num);
+        -:  112:        unsigned char concat(const __FlashStringHelper * str);
+        -:  113:
+        -:  114:        // if there's not enough memory for the concatenated value, the string
+        -:  115:        // will be left unchanged (but this isn't signalled in any way)
+function _ZN6StringpLERKS_ called 810 returned 100% blocks executed 100%
+      810:  116:        String & operator +=(const String &rhs) {
+      810:  117:            concat(rhs);
+call    0 returned 100%
+      810:  118:            return (*this);
+        -:  119:        }
+        -:  120:        String & operator +=(const char *cstr) {
+        -:  121:            concat(cstr);
+        -:  122:            return (*this);
+        -:  123:        }
+function _ZN6StringpLEc called 0 returned 0% blocks executed 0%
+    #####:  124:        String & operator +=(char c) {
+    #####:  125:            concat(c);
+call    0 never executed
+    #####:  126:            return (*this);
+        -:  127:        }
+        -:  128:        String & operator +=(unsigned char num) {
+        -:  129:            concat(num);
+        -:  130:            return (*this);
+        -:  131:        }
+        -:  132:        String & operator +=(int num) {
+        -:  133:            concat(num);
+        -:  134:            return (*this);
+        -:  135:        }
+        -:  136:        String & operator +=(unsigned int num) {
+        -:  137:            concat(num);
+        -:  138:            return (*this);
+        -:  139:        }
+        -:  140:        String & operator +=(long num) {
+        -:  141:            concat(num);
+        -:  142:            return (*this);
+        -:  143:        }
+        -:  144:        String & operator +=(unsigned long num) {
+        -:  145:            concat(num);
+        -:  146:            return (*this);
+        -:  147:        }
+        -:  148:        String & operator +=(float num) {
+        -:  149:            concat(num);
+        -:  150:            return (*this);
+        -:  151:        }
+        -:  152:        String & operator +=(double num) {
+        -:  153:            concat(num);
+        -:  154:            return (*this);
+        -:  155:        }
+        -:  156:        String & operator += (const __FlashStringHelper *str){
+        -:  157:            concat(str);
+        -:  158:            return (*this);
+        -:  159:        }
+        -:  160:
+        -:  161:        friend StringSumHelper & operator +(const StringSumHelper &lhs, const String &rhs);
+        -:  162:        friend StringSumHelper & operator +(const StringSumHelper &lhs, const char *cstr);
+        -:  163:        friend StringSumHelper & operator +(const StringSumHelper &lhs, char c);
+        -:  164:        friend StringSumHelper & operator +(const StringSumHelper &lhs, unsigned char num);
+        -:  165:        friend StringSumHelper & operator +(const StringSumHelper &lhs, int num);
+        -:  166:        friend StringSumHelper & operator +(const StringSumHelper &lhs, unsigned int num);
+        -:  167:        friend StringSumHelper & operator +(const StringSumHelper &lhs, long num);
+        -:  168:        friend StringSumHelper & operator +(const StringSumHelper &lhs, unsigned long num);
+        -:  169:        friend StringSumHelper & operator +(const StringSumHelper &lhs, float num);
+        -:  170:        friend StringSumHelper & operator +(const StringSumHelper &lhs, double num);
+        -:  171:        friend StringSumHelper & operator +(const StringSumHelper &lhs, const __FlashStringHelper *rhs);
+        -:  172:
+        -:  173:        // comparison (only works w/ Strings and "strings")
+        -:  174:        operator StringIfHelperType() const {
+        -:  175:            return buffer ? &String::StringIfHelper : 0;
+        -:  176:        }
+        -:  177:        int compareTo(const String &s) const;
+        -:  178:        unsigned char equals(const String &s) const;
+        -:  179:        unsigned char equals(const char *cstr) const;
+        -:  180:        unsigned char operator ==(const String &rhs) const {
+        -:  181:            return equals(rhs);
+        -:  182:        }
+        -:  183:        unsigned char operator ==(const char *cstr) const {
+        -:  184:            return equals(cstr);
+        -:  185:        }
+        -:  186:        unsigned char operator !=(const String &rhs) const {
+        -:  187:            return !equals(rhs);
+        -:  188:        }
+        -:  189:        unsigned char operator !=(const char *cstr) const {
+        -:  190:            return !equals(cstr);
+        -:  191:        }
+        -:  192:        unsigned char operator <(const String &rhs) const;
+        -:  193:        unsigned char operator >(const String &rhs) const;
+        -:  194:        unsigned char operator <=(const String &rhs) const;
+        -:  195:        unsigned char operator >=(const String &rhs) const;
+        -:  196:        unsigned char equalsIgnoreCase(const String &s) const;
+        -:  197:        unsigned char startsWith(const String &prefix) const;
+        -:  198:        unsigned char startsWith(const String &prefix, unsigned int offset) const;
+        -:  199:        unsigned char endsWith(const String &suffix) const;
+        -:  200:
+        -:  201:        // character acccess
+        -:  202:        char charAt(unsigned int index) const;
+        -:  203:        void setCharAt(unsigned int index, char c);
+        -:  204:        char operator [](unsigned int index) const;
+        -:  205:        char& operator [](unsigned int index);
+        -:  206:        void getBytes(unsigned char *buf, unsigned int bufsize, unsigned int index = 0) const;
+        -:  207:        void toCharArray(char *buf, unsigned int bufsize, unsigned int index = 0) const {
+        -:  208:            getBytes((unsigned char *) buf, bufsize, index);
+        -:  209:        }
+function _ZNK6String5c_strEv called 0 returned 0% blocks executed 0%
+function _ZNK6String5c_strEv called 0 returned 0% blocks executed 0%
+function _ZNK6String5c_strEv called 0 returned 0% blocks executed 0%
+    #####:  210:        const char* c_str() const { return buffer; }
+        -:  211:        char* begin() { return buffer; }
+        -:  212:        char* end() { return buffer + length(); }
+        -:  213:        const char* begin() const { return c_str(); }
+        -:  214:        const char* end() const { return c_str() + length(); }
+        -:  215:
+        -:  216:        // search
+        -:  217:        int indexOf(char ch) const;
+        -:  218:        int indexOf(char ch, unsigned int fromIndex) const;
+        -:  219:        int indexOf(const String &str) const;
+        -:  220:        int indexOf(const String &str, unsigned int fromIndex) const;
+        -:  221:        int lastIndexOf(char ch) const;
+        -:  222:        int lastIndexOf(char ch, unsigned int fromIndex) const;
+        -:  223:        int lastIndexOf(const String &str) const;
+        -:  224:        int lastIndexOf(const String &str, unsigned int fromIndex) const;
+        -:  225:        String substring(unsigned int beginIndex) const {
+        -:  226:            return substring(beginIndex, len);
+        -:  227:        }
+        -:  228:        ;
+        -:  229:        String substring(unsigned int beginIndex, unsigned int endIndex) const;
+        -:  230:
+        -:  231:        // modification
+        -:  232:        void replace(char find, char replace);
+        -:  233:        void replace(const String& find, const String& replace);
+        -:  234:        void remove(unsigned int index);
+        -:  235:        void remove(unsigned int index, unsigned int count);
+        -:  236:        void toLowerCase(void);
+        -:  237:        void toUpperCase(void);
+        -:  238:        void trim(void);
+        -:  239:
+        -:  240:        // parsing/conversion
+        -:  241:        long toInt(void) const;
+        -:  242:        float toFloat(void) const;
+        -:  243:
+        -:  244:    protected:
+        -:  245:        char *buffer;	        // the actual char array
+        -:  246:        unsigned int capacity;  // the array length minus one (for the '\0')
+        -:  247:        unsigned int len;       // the String length (not counting the '\0')
+        -:  248:    protected:
+        -:  249:        void init(void);
+        -:  250:        void invalidate(void);
+        -:  251:        unsigned char changeBuffer(unsigned int maxStrLen);
+        -:  252:        unsigned char concat(const char *cstr, unsigned int length);
+        -:  253:
+        -:  254:        // copy and move
+        -:  255:        String & copy(const char *cstr, unsigned int length);
+        -:  256:        String & copy(const __FlashStringHelper *pstr, unsigned int length);
+        -:  257:#ifdef __GXX_EXPERIMENTAL_CXX0X__
+        -:  258:        void move(String &rhs);
+        -:  259:#endif
+        -:  260:};
+        -:  261:
+        -:  262:class StringSumHelper: public String {
+        -:  263:    public:
+        -:  264:        StringSumHelper(const String &s) :
+        -:  265:                String(s) {
+        -:  266:        }
+        -:  267:        StringSumHelper(const char *p) :
+        -:  268:                String(p) {
+        -:  269:        }
+        -:  270:        StringSumHelper(char c) :
+        -:  271:                String(c) {
+        -:  272:        }
+        -:  273:        StringSumHelper(unsigned char num) :
+        -:  274:                String(num) {
+        -:  275:        }
+        -:  276:        StringSumHelper(int num) :
+        -:  277:                String(num) {
+        -:  278:        }
+        -:  279:        StringSumHelper(unsigned int num) :
+        -:  280:                String(num) {
+        -:  281:        }
+        -:  282:        StringSumHelper(long num) :
+        -:  283:                String(num) {
+        -:  284:        }
+        -:  285:        StringSumHelper(unsigned long num) :
+        -:  286:                String(num) {
+        -:  287:        }
+        -:  288:        StringSumHelper(float num) :
+        -:  289:                String(num) {
+        -:  290:        }
+        -:  291:        StringSumHelper(double num) :
+        -:  292:                String(num) {
+        -:  293:        }
+        -:  294:};
+        -:  295:
+        -:  296:#endif  // __cplusplus
+        -:  297:#endif  // String_class_h

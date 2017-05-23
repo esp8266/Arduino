@@ -1,0 +1,1771 @@
+        -:    0:Source:../../cores/esp8266/spiffs/spiffs_hydrogen.c
+        -:    0:Programs:16
+        -:    1:/*
+        -:    2: * spiffs_hydrogen.c
+        -:    3: *
+        -:    4: *  Created on: Jun 16, 2013
+        -:    5: *      Author: petera
+        -:    6: */
+        -:    7:
+        -:    8:#include "spiffs.h"
+        -:    9:#include "spiffs_nucleus.h"
+        -:   10:
+        -:   11:#if SPIFFS_FILEHDL_OFFSET
+        -:   12:#define SPIFFS_FH_OFFS(fs, fh)   ((fh) != 0 ? ((fh) + (fs)->cfg.fh_ix_offset) : 0)
+        -:   13:#define SPIFFS_FH_UNOFFS(fs, fh) ((fh) != 0 ? ((fh) - (fs)->cfg.fh_ix_offset) : 0)
+        -:   14:#else
+        -:   15:#define SPIFFS_FH_OFFS(fs, fh)   (fh)
+        -:   16:#define SPIFFS_FH_UNOFFS(fs, fh) (fh)
+        -:   17:#endif
+        -:   18:
+        -:   19:#if SPIFFS_CACHE == 1
+        -:   20:static s32_t spiffs_fflush_cache(spiffs *fs, spiffs_file fh);
+        -:   21:#endif
+        -:   22:
+        -:   23:#if SPIFFS_BUFFER_HELP
+function SPIFFS_buffer_bytes_for_filedescs called 21 returned 100% blocks executed 100%
+       21:   24:u32_t SPIFFS_buffer_bytes_for_filedescs(spiffs *fs, u32_t num_descs) {
+        -:   25:  (void) fs;
+       21:   26:  return num_descs * sizeof(spiffs_fd);
+        -:   27:}
+        -:   28:#if SPIFFS_CACHE
+function SPIFFS_buffer_bytes_for_cache called 21 returned 100% blocks executed 100%
+       21:   29:u32_t SPIFFS_buffer_bytes_for_cache(spiffs *fs, u32_t num_pages) {
+       21:   30:  return sizeof(spiffs_cache) + num_pages * (sizeof(spiffs_cache_page) + SPIFFS_CFG_LOG_PAGE_SZ(fs));
+        -:   31:}
+        -:   32:#endif
+        -:   33:#endif
+        -:   34:
+function SPIFFS_mounted called 13 returned 100% blocks executed 100%
+       13:   35:u8_t SPIFFS_mounted(spiffs *fs) {
+       13:   36:  return SPIFFS_CHECK_MOUNT(fs);
+        -:   37:}
+        -:   38:
+function SPIFFS_format called 10 returned 100% blocks executed 71%
+       10:   39:s32_t SPIFFS_format(spiffs *fs) {
+        -:   40:#if SPIFFS_READ_ONLY
+        -:   41:  (void)fs;
+        -:   42:  return SPIFFS_ERR_RO_NOT_IMPL;
+        -:   43:#else
+       10:   44:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       10:   45:  if (SPIFFS_CHECK_MOUNT(fs)) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   46:    fs->err_code = SPIFFS_ERR_MOUNTED;
+    #####:   47:    return -1;
+        -:   48:  }
+        -:   49:
+        -:   50:  s32_t res;
+        -:   51:  SPIFFS_LOCK(fs);
+        -:   52:
+       10:   53:  spiffs_block_ix bix = 0;
+      100:   54:  while (bix < fs->block_count) {
+branch  0 taken 89%
+branch  1 taken 11% (fallthrough)
+       80:   55:    fs->max_erase_count = 0;
+       80:   56:    res = spiffs_erase_block(fs, bix);
+call    0 returned 100%
+       80:   57:    if (res != SPIFFS_OK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   58:      res = SPIFFS_ERR_ERASE_FAIL;
+        -:   59:    }
+       80:   60:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       80:   61:    bix++;
+        -:   62:  }
+        -:   63:
+        -:   64:  SPIFFS_UNLOCK(fs);
+        -:   65:
+       10:   66:  return 0;
+        -:   67:#endif // SPIFFS_READ_ONLY
+        -:   68:}
+        -:   69:
+        -:   70:#if SPIFFS_USE_MAGIC && SPIFFS_USE_MAGIC_LENGTH && SPIFFS_SINGLETON==0
+        -:   71:
+        -:   72:s32_t SPIFFS_probe_fs(spiffs_config *config) {
+        -:   73:  s32_t res = spiffs_probe(config);
+        -:   74:  return res;
+        -:   75:}
+        -:   76:
+        -:   77:#endif // SPIFFS_USE_MAGIC && SPIFFS_USE_MAGIC_LENGTH && SPIFFS_SINGLETON==0
+        -:   78:
+function SPIFFS_mount called 21 returned 100% blocks executed 75%
+       21:   79:s32_t SPIFFS_mount(spiffs *fs, spiffs_config *config, u8_t *work,
+        -:   80:    u8_t *fd_space, u32_t fd_space_size,
+        -:   81:    void *cache, u32_t cache_size,
+        -:   82:    spiffs_check_callback check_cb_f) {
+        -:   83:  void *user_data;
+        -:   84:  SPIFFS_LOCK(fs);
+       21:   85:  user_data = fs->user_data;
+       21:   86:  memset(fs, 0, sizeof(spiffs));
+       21:   87:  memcpy(&fs->cfg, config, sizeof(spiffs_config));
+       21:   88:  fs->user_data = user_data;
+       21:   89:  fs->block_count = SPIFFS_CFG_PHYS_SZ(fs) / SPIFFS_CFG_LOG_BLOCK_SZ(fs);
+       21:   90:  fs->work = &work[0];
+       21:   91:  fs->lu_work = &work[SPIFFS_CFG_LOG_PAGE_SZ(fs)];
+       21:   92:  memset(fd_space, 0, fd_space_size);
+        -:   93:  // align fd_space pointer to pointer size byte boundary, below is safe
+       21:   94:  u8_t ptr_size = sizeof(void*);
+        -:   95:#pragma GCC diagnostic push
+        -:   96:#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+       21:   97:  u8_t addr_lsb = ((u8_t)fd_space) & (ptr_size-1);
+        -:   98:#pragma GCC diagnostic pop
+       21:   99:  if (addr_lsb) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  100:    fd_space += (ptr_size-addr_lsb);
+    #####:  101:    fd_space_size -= (ptr_size-addr_lsb);
+        -:  102:  }
+       21:  103:  fs->fd_space = fd_space;
+       21:  104:  fs->fd_count = (fd_space_size/sizeof(spiffs_fd));
+        -:  105:
+        -:  106:  // align cache pointer to 4 byte boundary, below is safe
+        -:  107:#pragma GCC diagnostic push
+        -:  108:#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+       21:  109:  addr_lsb = ((u8_t)cache) & (ptr_size-1);
+        -:  110:#pragma GCC diagnostic pop
+       21:  111:  if (addr_lsb) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  112:    u8_t *cache_8 = (u8_t *)cache;
+    #####:  113:    cache_8 += (ptr_size-addr_lsb);
+    #####:  114:    cache = cache_8;
+    #####:  115:    cache_size -= (ptr_size-addr_lsb);
+        -:  116:  }
+       21:  117:  if (cache_size & (ptr_size-1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       21:  118:    cache_size -= (cache_size & (ptr_size-1));
+        -:  119:  }
+        -:  120:
+        -:  121:#if SPIFFS_CACHE
+       21:  122:  fs->cache = cache;
+       21:  123:  fs->cache_size = (cache_size > (SPIFFS_CFG_LOG_PAGE_SZ(fs)*32)) ? SPIFFS_CFG_LOG_PAGE_SZ(fs)*32 : cache_size;
+       21:  124:  spiffs_cache_init(fs);
+call    0 returned 100%
+        -:  125:#endif
+        -:  126:
+        -:  127:  s32_t res;
+        -:  128:
+        -:  129:#if SPIFFS_USE_MAGIC
+       21:  130:  res = SPIFFS_CHECK_MAGIC_POSSIBLE(fs) ? SPIFFS_OK : SPIFFS_ERR_MAGIC_NOT_POSSIBLE;
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+       21:  131:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  132:#endif
+        -:  133:
+       21:  134:  fs->config_magic = SPIFFS_CONFIG_MAGIC;
+        -:  135:
+       21:  136:  res = spiffs_obj_lu_scan(fs);
+call    0 returned 100%
+       21:  137:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 43% (fallthrough)
+branch  1 taken 57%
+        -:  138:
+        -:  139:  SPIFFS_DBG("page index byte len:         %i\n", SPIFFS_CFG_LOG_PAGE_SZ(fs));
+        -:  140:  SPIFFS_DBG("object lookup pages:         %i\n", SPIFFS_OBJ_LOOKUP_PAGES(fs));
+        -:  141:  SPIFFS_DBG("page pages per block:        %i\n", SPIFFS_PAGES_PER_BLOCK(fs));
+        -:  142:  SPIFFS_DBG("page header length:          %i\n", sizeof(spiffs_page_header));
+        -:  143:  SPIFFS_DBG("object header index entries: %i\n", SPIFFS_OBJ_HDR_IX_LEN(fs));
+        -:  144:  SPIFFS_DBG("object index entries:        %i\n", SPIFFS_OBJ_IX_LEN(fs));
+        -:  145:  SPIFFS_DBG("available file descriptors:  %i\n", fs->fd_count);
+        -:  146:  SPIFFS_DBG("free blocks:                 %i\n", fs->free_blocks);
+        -:  147:
+       12:  148:  fs->check_cb_f = check_cb_f;
+        -:  149:
+       12:  150:  fs->mounted = 1;
+        -:  151:
+        -:  152:  SPIFFS_UNLOCK(fs);
+        -:  153:
+       12:  154:  return 0;
+        -:  155:}
+        -:  156:
+function SPIFFS_unmount called 1 returned 100% blocks executed 73%
+        1:  157:void SPIFFS_unmount(spiffs *fs) {
+        1:  158:  if (!SPIFFS_CHECK_CFG(fs) || !SPIFFS_CHECK_MOUNT(fs)) return;
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+        -:  159:  SPIFFS_LOCK(fs);
+        -:  160:  u32_t i;
+        1:  161:  spiffs_fd *fds = (spiffs_fd *)fs->fd_space;
+        6:  162:  for (i = 0; i < fs->fd_count; i++) {
+branch  0 taken 83%
+branch  1 taken 17% (fallthrough)
+        5:  163:    spiffs_fd *cur_fd = &fds[i];
+        5:  164:    if (cur_fd->file_nbr != 0) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  165:#if SPIFFS_CACHE
+    #####:  166:      (void)spiffs_fflush_cache(fs, cur_fd->file_nbr);
+call    0 never executed
+        -:  167:#endif
+    #####:  168:      spiffs_fd_return(fs, cur_fd->file_nbr);
+call    0 never executed
+        -:  169:    }
+        -:  170:  }
+        1:  171:  fs->mounted = 0;
+        -:  172:
+        -:  173:  SPIFFS_UNLOCK(fs);
+        -:  174:}
+        -:  175:
+function SPIFFS_errno called 0 returned 0% blocks executed 0%
+    #####:  176:s32_t SPIFFS_errno(spiffs *fs) {
+    #####:  177:  return fs->err_code;
+        -:  178:}
+        -:  179:
+function SPIFFS_clearerr called 0 returned 0% blocks executed 0%
+    #####:  180:void SPIFFS_clearerr(spiffs *fs) {
+    #####:  181:  fs->err_code = SPIFFS_OK;
+    #####:  182:}
+        -:  183:
+function SPIFFS_creat called 0 returned 0% blocks executed 0%
+    #####:  184:s32_t SPIFFS_creat(spiffs *fs, const char *path, spiffs_mode mode) {
+        -:  185:#if SPIFFS_READ_ONLY
+        -:  186:  (void)fs; (void)path; (void)mode;
+        -:  187:  return SPIFFS_ERR_RO_NOT_IMPL;
+        -:  188:#else
+        -:  189:  (void)mode;
+    #####:  190:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  191:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -:  192:  SPIFFS_LOCK(fs);
+        -:  193:  spiffs_obj_id obj_id;
+        -:  194:  s32_t res;
+        -:  195:
+    #####:  196:  res = spiffs_obj_lu_find_free_obj_id(fs, &obj_id, (const u8_t*)path);
+call    0 never executed
+    #####:  197:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+    #####:  198:  res = spiffs_object_create(fs, obj_id, (const u8_t*)path, SPIFFS_TYPE_FILE, 0);
+call    0 never executed
+    #####:  199:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  200:  SPIFFS_UNLOCK(fs);
+    #####:  201:  return 0;
+        -:  202:#endif // SPIFFS_READ_ONLY
+        -:  203:}
+        -:  204:
+function SPIFFS_open called 24 returned 100% blocks executed 64%
+       24:  205:spiffs_file SPIFFS_open(spiffs *fs, const char *path, spiffs_flags flags, spiffs_mode mode) {
+        -:  206:  (void)mode;
+       24:  207:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 taken 4% (fallthrough)
+branch  1 taken 96%
+       23:  208:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  209:  SPIFFS_LOCK(fs);
+        -:  210:
+        -:  211:  spiffs_fd *fd;
+        -:  212:  spiffs_page_ix pix;
+        -:  213:
+        -:  214:#if SPIFFS_READ_ONLY
+        -:  215:  // not valid flags in read only mode
+        -:  216:  flags &= ~SPIFFS_WRONLY | SPIFFS_CREAT | SPIFFS_TRUNC;
+        -:  217:#endif // SPIFFS_READ_ONLY
+        -:  218:
+       23:  219:  s32_t res = spiffs_fd_find_new(fs, &fd);
+call    0 returned 100%
+       23:  220:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  221:
+       23:  222:  res = spiffs_object_find_object_index_header_by_name(fs, (const u8_t*)path, &pix);
+call    0 returned 100%
+       23:  223:  if ((flags & SPIFFS_CREAT) == 0) {
+branch  0 taken 17% (fallthrough)
+branch  1 taken 83%
+        4:  224:    if (res < SPIFFS_OK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  225:      spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  226:    }
+        4:  227:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  228:  }
+        -:  229:
+       29:  230:  if (res == SPIFFS_OK &&
+branch  0 taken 26% (fallthrough)
+branch  1 taken 74%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+        6:  231:      (flags & (SPIFFS_CREAT | SPIFFS_EXCL)) == (SPIFFS_CREAT | SPIFFS_EXCL)) {
+        -:  232:    // creat and excl and file exists - fail
+    #####:  233:    res = SPIFFS_ERR_FILE_EXISTS;
+    #####:  234:    spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+    #####:  235:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  236:  }
+        -:  237:
+       40:  238:  if ((flags & SPIFFS_CREAT) && res == SPIFFS_ERR_NOT_FOUND) {
+branch  0 taken 83% (fallthrough)
+branch  1 taken 17%
+branch  2 taken 89% (fallthrough)
+branch  3 taken 11%
+        -:  239:#if !SPIFFS_READ_ONLY
+        -:  240:    spiffs_obj_id obj_id;
+        -:  241:    // no need to enter conflicting name here, already looked for it above
+       17:  242:    res = spiffs_obj_lu_find_free_obj_id(fs, &obj_id, 0);
+call    0 returned 100%
+       17:  243:    if (res < SPIFFS_OK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  244:      spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  245:    }
+       17:  246:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       17:  247:    res = spiffs_object_create(fs, obj_id, (const u8_t*)path, SPIFFS_TYPE_FILE, &pix);
+call    0 returned 100%
+       17:  248:    if (res < SPIFFS_OK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  249:      spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  250:    }
+       17:  251:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       17:  252:    flags &= ~SPIFFS_TRUNC;
+        -:  253:#endif // !SPIFFS_READ_ONLY
+        -:  254:  } else {
+        6:  255:    if (res < SPIFFS_OK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  256:      spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  257:    }
+        6:  258:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  259:  }
+       23:  260:  res = spiffs_object_open_by_page(fs, pix, fd, flags, mode);
+call    0 returned 100%
+       23:  261:  if (res < SPIFFS_OK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  262:    spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  263:  }
+       23:  264:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  265:#if !SPIFFS_READ_ONLY
+       23:  266:  if (flags & SPIFFS_TRUNC) {
+branch  0 taken 4% (fallthrough)
+branch  1 taken 96%
+        1:  267:    res = spiffs_object_truncate(fd, 0, 0);
+call    0 returned 100%
+        1:  268:    if (res < SPIFFS_OK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  269:      spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  270:    }
+        1:  271:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  272:  }
+        -:  273:#endif // !SPIFFS_READ_ONLY
+        -:  274:
+       23:  275:  fd->fdoffset = 0;
+        -:  276:
+        -:  277:  SPIFFS_UNLOCK(fs);
+        -:  278:
+       23:  279:  return SPIFFS_FH_OFFS(fs, fd->file_nbr);
+        -:  280:}
+        -:  281:
+function SPIFFS_open_by_dirent called 0 returned 0% blocks executed 0%
+    #####:  282:spiffs_file SPIFFS_open_by_dirent(spiffs *fs, struct spiffs_dirent *e, spiffs_flags flags, spiffs_mode mode) {
+    #####:  283:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  284:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -:  285:  SPIFFS_LOCK(fs);
+        -:  286:
+        -:  287:  spiffs_fd *fd;
+        -:  288:
+    #####:  289:  s32_t res = spiffs_fd_find_new(fs, &fd);
+call    0 never executed
+    #####:  290:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  291:
+    #####:  292:  res = spiffs_object_open_by_page(fs, e->pix, fd, flags, mode);
+call    0 never executed
+    #####:  293:  if (res < SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+    #####:  294:    spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  295:  }
+    #####:  296:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  297:#if !SPIFFS_READ_ONLY
+    #####:  298:  if (flags & SPIFFS_TRUNC) {
+branch  0 never executed
+branch  1 never executed
+    #####:  299:    res = spiffs_object_truncate(fd, 0, 0);
+call    0 never executed
+    #####:  300:    if (res < SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+    #####:  301:      spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  302:    }
+    #####:  303:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  304:  }
+        -:  305:#endif // !SPIFFS_READ_ONLY
+        -:  306:
+    #####:  307:  fd->fdoffset = 0;
+        -:  308:
+        -:  309:  SPIFFS_UNLOCK(fs);
+        -:  310:
+    #####:  311:  return SPIFFS_FH_OFFS(fs, fd->file_nbr);
+        -:  312:}
+        -:  313:
+function SPIFFS_open_by_page called 0 returned 0% blocks executed 0%
+    #####:  314:spiffs_file SPIFFS_open_by_page(spiffs *fs, spiffs_page_ix page_ix, spiffs_flags flags, spiffs_mode mode) {
+    #####:  315:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  316:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -:  317:  SPIFFS_LOCK(fs);
+        -:  318:
+        -:  319:  spiffs_fd *fd;
+        -:  320:
+    #####:  321:  s32_t res = spiffs_fd_find_new(fs, &fd);
+call    0 never executed
+    #####:  322:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  323:
+    #####:  324:  if (SPIFFS_IS_LOOKUP_PAGE(fs, page_ix)) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:  325:    res = SPIFFS_ERR_NOT_A_FILE;
+    #####:  326:    spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+    #####:  327:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  328:  }
+        -:  329:
+    #####:  330:  res = spiffs_object_open_by_page(fs, page_ix, fd, flags, mode);
+call    0 never executed
+    #####:  331:  if (res == SPIFFS_ERR_IS_FREE ||
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:  332:      res == SPIFFS_ERR_DELETED ||
+branch  0 never executed
+branch  1 never executed
+    #####:  333:      res == SPIFFS_ERR_NOT_FINALIZED ||
+branch  0 never executed
+branch  1 never executed
+    #####:  334:      res == SPIFFS_ERR_NOT_INDEX ||
+branch  0 never executed
+branch  1 never executed
+        -:  335:      res == SPIFFS_ERR_INDEX_SPAN_MISMATCH) {
+    #####:  336:    res = SPIFFS_ERR_NOT_A_FILE;
+        -:  337:  }
+    #####:  338:  if (res < SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+    #####:  339:    spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  340:  }
+    #####:  341:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  342:
+        -:  343:#if !SPIFFS_READ_ONLY
+    #####:  344:  if (flags & SPIFFS_TRUNC) {
+branch  0 never executed
+branch  1 never executed
+    #####:  345:    res = spiffs_object_truncate(fd, 0, 0);
+call    0 never executed
+    #####:  346:    if (res < SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+    #####:  347:      spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  348:    }
+    #####:  349:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  350:  }
+        -:  351:#endif // !SPIFFS_READ_ONLY
+        -:  352:
+    #####:  353:  fd->fdoffset = 0;
+        -:  354:
+        -:  355:  SPIFFS_UNLOCK(fs);
+        -:  356:
+    #####:  357:  return SPIFFS_FH_OFFS(fs, fd->file_nbr);
+        -:  358:}
+        -:  359:
+function SPIFFS_read called 23069954 returned 100% blocks executed 63%
+ 23069954:  360:s32_t SPIFFS_read(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
+ 23069954:  361:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+ 23069954:  362:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  363:  SPIFFS_LOCK(fs);
+        -:  364:
+        -:  365:  spiffs_fd *fd;
+        -:  366:  s32_t res;
+        -:  367:
+ 23069954:  368:  fh = SPIFFS_FH_UNOFFS(fs, fh);
+ 23069954:  369:  res = spiffs_fd_get(fs, fh, &fd);
+call    0 returned 100%
+ 23069954:  370:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  371:
+ 23069954:  372:  if ((fd->flags & SPIFFS_RDONLY) == 0) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  373:    res = SPIFFS_ERR_NOT_READABLE;
+    #####:  374:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  375:  }
+        -:  376:
+ 23069954:  377:  if (fd->size == SPIFFS_UNDEFINED_LEN && len > 0) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+branch  2 never executed
+branch  3 never executed
+        -:  378:    // special case for zero sized files
+    #####:  379:    res = SPIFFS_ERR_END_OF_OBJECT;
+    #####:  380:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  381:  }
+        -:  382:
+        -:  383:#if SPIFFS_CACHE_WR
+ 23069954:  384:  spiffs_fflush_cache(fs, fh);
+call    0 returned 100%
+        -:  385:#endif
+        -:  386:
+ 23069954:  387:  if (fd->fdoffset + len >= fd->size) {
+branch  0 taken 99% (fallthrough)
+branch  1 taken 1%
+        -:  388:    // reading beyond file size
+ 23069941:  389:    s32_t avail = fd->size - fd->fdoffset;
+ 23069941:  390:    if (avail <= 0) {
+branch  0 taken 99% (fallthrough)
+branch  1 taken 1%
+ 23069938:  391:      SPIFFS_API_CHECK_RES_UNLOCK(fs, SPIFFS_ERR_END_OF_OBJECT);
+        -:  392:    }
+        3:  393:    res = spiffs_object_read(fd, fd->fdoffset, avail, (u8_t*)buf);
+call    0 returned 100%
+        3:  394:    if (res == SPIFFS_ERR_END_OF_OBJECT) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  395:      fd->fdoffset += avail;
+        -:  396:      SPIFFS_UNLOCK(fs);
+    #####:  397:      return avail;
+        -:  398:    } else {
+        3:  399:      SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        3:  400:      len = avail;
+        -:  401:    }
+        -:  402:  } else {
+        -:  403:    // reading within file size
+       13:  404:    res = spiffs_object_read(fd, fd->fdoffset, len, (u8_t*)buf);
+call    0 returned 100%
+       13:  405:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  406:  }
+       16:  407:  fd->fdoffset += len;
+        -:  408:
+        -:  409:  SPIFFS_UNLOCK(fs);
+        -:  410:
+       16:  411:  return len;
+        -:  412:}
+        -:  413:
+        -:  414:#if !SPIFFS_READ_ONLY
+function spiffs_hydro_write called 18 returned 100% blocks executed 58%
+       18:  415:static s32_t spiffs_hydro_write(spiffs *fs, spiffs_fd *fd, void *buf, u32_t offset, s32_t len) {
+        -:  416:  (void)fs;
+       18:  417:  s32_t res = SPIFFS_OK;
+       18:  418:  s32_t remaining = len;
+       18:  419:  if (fd->size != SPIFFS_UNDEFINED_LEN && offset < fd->size) {
+branch  0 taken 6% (fallthrough)
+branch  1 taken 94%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+    #####:  420:    s32_t m_len = MIN((s32_t)(fd->size - offset), len);
+    #####:  421:    res = spiffs_object_modify(fd, offset, (u8_t *)buf, m_len);
+call    0 never executed
+    #####:  422:    SPIFFS_CHECK_RES(res);
+branch  0 never executed
+branch  1 never executed
+    #####:  423:    remaining -= m_len;
+    #####:  424:    u8_t *buf_8 = (u8_t *)buf;
+    #####:  425:    buf_8 += m_len;
+    #####:  426:    buf = buf_8;
+    #####:  427:    offset += m_len;
+        -:  428:  }
+       18:  429:  if (remaining > 0) {
+branch  0 taken 78% (fallthrough)
+branch  1 taken 22%
+       14:  430:    res = spiffs_object_append(fd, offset, (u8_t *)buf, remaining);
+call    0 returned 100%
+       14:  431:    SPIFFS_CHECK_RES(res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  432:  }
+       18:  433:  return len;
+        -:  434:
+        -:  435:}
+        -:  436:#endif // !SPIFFS_READ_ONLY
+        -:  437:
+function SPIFFS_write called 20 returned 100% blocks executed 53%
+       20:  438:s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
+        -:  439:#if SPIFFS_READ_ONLY
+        -:  440:  (void)fs; (void)fh; (void)buf; (void)len;
+        -:  441:  return SPIFFS_ERR_RO_NOT_IMPL;
+        -:  442:#else
+       20:  443:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       20:  444:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  445:  SPIFFS_LOCK(fs);
+        -:  446:
+        -:  447:  spiffs_fd *fd;
+        -:  448:  s32_t res;
+        -:  449:  u32_t offset;
+        -:  450:
+       20:  451:  fh = SPIFFS_FH_UNOFFS(fs, fh);
+       20:  452:  res = spiffs_fd_get(fs, fh, &fd);
+call    0 returned 100%
+       20:  453:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  454:
+       20:  455:  if ((fd->flags & SPIFFS_WRONLY) == 0) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  456:    res = SPIFFS_ERR_NOT_WRITABLE;
+    #####:  457:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  458:  }
+        -:  459:
+       20:  460:  if ((fd->flags & SPIFFS_APPEND)) {
+branch  0 taken 10% (fallthrough)
+branch  1 taken 90%
+        2:  461:    fd->fdoffset = fd->size == SPIFFS_UNDEFINED_LEN ? 0 : fd->size;
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  462:  }
+        -:  463:
+       20:  464:  offset = fd->fdoffset;
+        -:  465:
+        -:  466:#if SPIFFS_CACHE_WR
+       20:  467:  if (fd->cache_page == 0) {
+branch  0 taken 90% (fallthrough)
+branch  1 taken 10%
+        -:  468:    // see if object id is associated with cache already
+       18:  469:    fd->cache_page = spiffs_cache_page_get_by_fd(fs, fd);
+call    0 returned 100%
+        -:  470:  }
+        -:  471:#endif
+       20:  472:  if (fd->flags & SPIFFS_APPEND) {
+branch  0 taken 10% (fallthrough)
+branch  1 taken 90%
+        2:  473:    if (fd->size == SPIFFS_UNDEFINED_LEN) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  474:      offset = 0;
+        -:  475:    } else {
+        2:  476:      offset = fd->size;
+        -:  477:    }
+        -:  478:#if SPIFFS_CACHE_WR
+        2:  479:    if (fd->cache_page) {
+branch  0 taken 50% (fallthrough)
+branch  1 taken 50%
+        1:  480:      offset = MAX(offset, fd->cache_page->offset + fd->cache_page->size);
+        -:  481:    }
+        -:  482:#endif
+        -:  483:  }
+        -:  484:
+        -:  485:#if SPIFFS_CACHE_WR
+       20:  486:  if ((fd->flags & SPIFFS_DIRECT) == 0) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       20:  487:    if (len < (s32_t)SPIFFS_CFG_LOG_PAGE_SZ(fs)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  488:      // small write, try to cache it
+       20:  489:      u8_t alloc_cpage = 1;
+       20:  490:      if (fd->cache_page) {
+branch  0 taken 10% (fallthrough)
+branch  1 taken 90%
+        -:  491:        // have a cached page for this fd already, check cache page boundaries
+        4:  492:        if (offset < fd->cache_page->offset || // writing before cache
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+        4:  493:            offset > fd->cache_page->offset + fd->cache_page->size || // writing after cache
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        2:  494:            offset + len > fd->cache_page->offset + SPIFFS_CFG_LOG_PAGE_SZ(fs)) // writing beyond cache page
+        -:  495:        {
+        -:  496:          // boundary violation, write back cache first and allocate new
+        -:  497:          SPIFFS_CACHE_DBG("CACHE_WR_DUMP: dumping cache page %i for fd %i:%04x, boundary viol, offs:%i size:%i\n",
+        -:  498:              fd->cache_page->ix, fd->file_nbr, fd->obj_id, fd->cache_page->offset, fd->cache_page->size);
+    #####:  499:          res = spiffs_hydro_write(fs, fd,
+call    0 never executed
+    #####:  500:              spiffs_get_cache_page(fs, spiffs_get_cache(fs), fd->cache_page->ix),
+    #####:  501:              fd->cache_page->offset, fd->cache_page->size);
+    #####:  502:          spiffs_cache_fd_release(fs, fd->cache_page);
+call    0 never executed
+    #####:  503:          SPIFFS_API_CHECK_RES(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  504:        } else {
+        -:  505:          // writing within cache
+        2:  506:          alloc_cpage = 0;
+        -:  507:        }
+        -:  508:      }
+        -:  509:
+       20:  510:      if (alloc_cpage) {
+branch  0 taken 90% (fallthrough)
+branch  1 taken 10%
+       18:  511:        fd->cache_page = spiffs_cache_page_allocate_by_fd(fs, fd);
+call    0 returned 100%
+       18:  512:        if (fd->cache_page) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       18:  513:          fd->cache_page->offset = offset;
+       18:  514:          fd->cache_page->size = 0;
+        -:  515:          SPIFFS_CACHE_DBG("CACHE_WR_ALLO: allocating cache page %i for fd %i:%04x\n",
+        -:  516:              fd->cache_page->ix, fd->file_nbr, fd->obj_id);
+        -:  517:        }
+        -:  518:      }
+        -:  519:
+       20:  520:      if (fd->cache_page) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       20:  521:        u32_t offset_in_cpage = offset - fd->cache_page->offset;
+        -:  522:        SPIFFS_CACHE_DBG("CACHE_WR_WRITE: storing to cache page %i for fd %i:%04x, offs %i:%i len %i\n",
+        -:  523:            fd->cache_page->ix, fd->file_nbr, fd->obj_id,
+        -:  524:            offset, offset_in_cpage, len);
+       20:  525:        spiffs_cache *cache = spiffs_get_cache(fs);
+       20:  526:        u8_t *cpage_data = spiffs_get_cache_page(fs, cache, fd->cache_page->ix);
+       20:  527:        memcpy(&cpage_data[offset_in_cpage], buf, len);
+       20:  528:        fd->cache_page->size = MAX(fd->cache_page->size, offset_in_cpage + len);
+       20:  529:        fd->fdoffset += len;
+        -:  530:        SPIFFS_UNLOCK(fs);
+       20:  531:        return len;
+        -:  532:      } else {
+    #####:  533:        res = spiffs_hydro_write(fs, fd, buf, offset, len);
+call    0 never executed
+    #####:  534:        SPIFFS_API_CHECK_RES(fs, res);
+branch  0 never executed
+branch  1 never executed
+    #####:  535:        fd->fdoffset += len;
+        -:  536:        SPIFFS_UNLOCK(fs);
+    #####:  537:        return res;
+        -:  538:      }
+        -:  539:    } else {
+        -:  540:      // big write, no need to cache it - but first check if there is a cached write already
+    #####:  541:      if (fd->cache_page) {
+branch  0 never executed
+branch  1 never executed
+        -:  542:        // write back cache first
+        -:  543:        SPIFFS_CACHE_DBG("CACHE_WR_DUMP: dumping cache page %i for fd %i:%04x, big write, offs:%i size:%i\n",
+        -:  544:            fd->cache_page->ix, fd->file_nbr, fd->obj_id, fd->cache_page->offset, fd->cache_page->size);
+    #####:  545:        res = spiffs_hydro_write(fs, fd,
+call    0 never executed
+    #####:  546:            spiffs_get_cache_page(fs, spiffs_get_cache(fs), fd->cache_page->ix),
+    #####:  547:            fd->cache_page->offset, fd->cache_page->size);
+    #####:  548:        spiffs_cache_fd_release(fs, fd->cache_page);
+call    0 never executed
+    #####:  549:        SPIFFS_API_CHECK_RES(fs, res);
+branch  0 never executed
+branch  1 never executed
+    #####:  550:        res = spiffs_hydro_write(fs, fd, buf, offset, len);
+call    0 never executed
+    #####:  551:        SPIFFS_API_CHECK_RES(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  552:      }
+        -:  553:    }
+        -:  554:  }
+        -:  555:#endif
+        -:  556:
+    #####:  557:  res = spiffs_hydro_write(fs, fd, buf, offset, len);
+call    0 never executed
+    #####:  558:  SPIFFS_API_CHECK_RES(fs, res);
+branch  0 never executed
+branch  1 never executed
+    #####:  559:  fd->fdoffset += len;
+        -:  560:
+        -:  561:  SPIFFS_UNLOCK(fs);
+        -:  562:
+    #####:  563:  return res;
+        -:  564:#endif // SPIFFS_READ_ONLY
+        -:  565:}
+        -:  566:
+function SPIFFS_lseek called 0 returned 0% blocks executed 0%
+    #####:  567:s32_t SPIFFS_lseek(spiffs *fs, spiffs_file fh, s32_t offs, int whence) {
+    #####:  568:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  569:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -:  570:  SPIFFS_LOCK(fs);
+        -:  571:
+        -:  572:  spiffs_fd *fd;
+        -:  573:  s32_t res;
+    #####:  574:  fh = SPIFFS_FH_UNOFFS(fs, fh);
+    #####:  575:  res = spiffs_fd_get(fs, fh, &fd);
+call    0 never executed
+    #####:  576:  SPIFFS_API_CHECK_RES(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  577:
+        -:  578:#if SPIFFS_CACHE_WR
+    #####:  579:  spiffs_fflush_cache(fs, fh);
+call    0 never executed
+        -:  580:#endif
+        -:  581:
+    #####:  582:  switch (whence) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  583:  case SPIFFS_SEEK_CUR:
+    #####:  584:    offs = fd->fdoffset+offs;
+    #####:  585:    break;
+        -:  586:  case SPIFFS_SEEK_END:
+    #####:  587:    offs = (fd->size == SPIFFS_UNDEFINED_LEN ? 0 : fd->size) + offs;
+branch  0 never executed
+branch  1 never executed
+    #####:  588:    break;
+        -:  589:  }
+        -:  590:
+    #####:  591:  if ((offs > (s32_t)fd->size) && (SPIFFS_UNDEFINED_LEN != fd->size)) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:  592:    res = SPIFFS_ERR_END_OF_OBJECT;
+        -:  593:  }
+    #####:  594:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  595:
+    #####:  596:  spiffs_span_ix data_spix = offs / SPIFFS_DATA_PAGE_SIZE(fs);
+    #####:  597:  spiffs_span_ix objix_spix = SPIFFS_OBJ_IX_ENTRY_SPAN_IX(fs, data_spix);
+branch  0 never executed
+branch  1 never executed
+    #####:  598:  if (fd->cursor_objix_spix != objix_spix) {
+branch  0 never executed
+branch  1 never executed
+        -:  599:    spiffs_page_ix pix;
+    #####:  600:    res = spiffs_obj_lu_find_id_and_span(
+call    0 never executed
+    #####:  601:        fs, fd->obj_id | SPIFFS_OBJ_ID_IX_FLAG, objix_spix, 0, &pix);
+    #####:  602:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+    #####:  603:    fd->cursor_objix_spix = objix_spix;
+    #####:  604:    fd->cursor_objix_pix = pix;
+        -:  605:  }
+    #####:  606:  fd->fdoffset = offs;
+        -:  607:
+        -:  608:  SPIFFS_UNLOCK(fs);
+        -:  609:
+    #####:  610:  return offs;
+        -:  611:}
+        -:  612:
+function SPIFFS_remove called 0 returned 0% blocks executed 0%
+    #####:  613:s32_t SPIFFS_remove(spiffs *fs, const char *path) {
+        -:  614:#if SPIFFS_READ_ONLY
+        -:  615:  (void)fs; (void)path;
+        -:  616:  return SPIFFS_ERR_RO_NOT_IMPL;
+        -:  617:#else
+    #####:  618:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  619:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -:  620:  SPIFFS_LOCK(fs);
+        -:  621:
+        -:  622:  spiffs_fd *fd;
+        -:  623:  spiffs_page_ix pix;
+        -:  624:  s32_t res;
+        -:  625:
+    #####:  626:  res = spiffs_fd_find_new(fs, &fd);
+call    0 never executed
+    #####:  627:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  628:
+    #####:  629:  res = spiffs_object_find_object_index_header_by_name(fs, (const u8_t*)path, &pix);
+call    0 never executed
+    #####:  630:  if (res != SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+    #####:  631:    spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  632:  }
+    #####:  633:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  634:
+    #####:  635:  res = spiffs_object_open_by_page(fs, pix, fd, 0,0);
+call    0 never executed
+    #####:  636:  if (res != SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+    #####:  637:    spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  638:  }
+    #####:  639:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  640:
+    #####:  641:  res = spiffs_object_truncate(fd, 0, 1);
+call    0 never executed
+    #####:  642:  if (res != SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+    #####:  643:    spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  644:  }
+    #####:  645:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  646:
+        -:  647:  SPIFFS_UNLOCK(fs);
+    #####:  648:  return 0;
+        -:  649:#endif // SPIFFS_READ_ONLY
+        -:  650:}
+        -:  651:
+function SPIFFS_fremove called 0 returned 0% blocks executed 0%
+    #####:  652:s32_t SPIFFS_fremove(spiffs *fs, spiffs_file fh) {
+        -:  653:#if SPIFFS_READ_ONLY
+        -:  654:  (void)fs; (void)fh;
+        -:  655:  return SPIFFS_ERR_RO_NOT_IMPL;
+        -:  656:#else
+    #####:  657:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  658:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -:  659:  SPIFFS_LOCK(fs);
+        -:  660:
+        -:  661:  spiffs_fd *fd;
+        -:  662:  s32_t res;
+    #####:  663:  fh = SPIFFS_FH_UNOFFS(fs, fh);
+    #####:  664:  res = spiffs_fd_get(fs, fh, &fd);
+call    0 never executed
+    #####:  665:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  666:
+    #####:  667:  if ((fd->flags & SPIFFS_WRONLY) == 0) {
+branch  0 never executed
+branch  1 never executed
+    #####:  668:    res = SPIFFS_ERR_NOT_WRITABLE;
+    #####:  669:    SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  670:  }
+        -:  671:
+        -:  672:#if SPIFFS_CACHE_WR
+    #####:  673:  spiffs_cache_fd_release(fs, fd->cache_page);
+call    0 never executed
+        -:  674:#endif
+        -:  675:
+    #####:  676:  res = spiffs_object_truncate(fd, 0, 1);
+call    0 never executed
+        -:  677:
+    #####:  678:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  679:
+        -:  680:  SPIFFS_UNLOCK(fs);
+        -:  681:
+    #####:  682:  return 0;
+        -:  683:#endif // SPIFFS_READ_ONLY
+        -:  684:}
+        -:  685:
+function spiffs_stat_pix called 25 returned 100% blocks executed 80%
+       25:  686:static s32_t spiffs_stat_pix(spiffs *fs, spiffs_page_ix pix, spiffs_file fh, spiffs_stat *s) {
+        -:  687:  (void)fh;
+        -:  688:  spiffs_page_object_ix_header objix_hdr;
+        -:  689:  spiffs_obj_id obj_id;
+       25:  690:  s32_t res =_spiffs_rd(fs,  SPIFFS_OP_T_OBJ_IX | SPIFFS_OP_C_READ, fh,
+call    0 returned 100%
+        -:  691:      SPIFFS_PAGE_TO_PADDR(fs, pix), sizeof(spiffs_page_object_ix_header), (u8_t *)&objix_hdr);
+       25:  692:  SPIFFS_API_CHECK_RES(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  693:
+       50:  694:  u32_t obj_id_addr = SPIFFS_BLOCK_TO_PADDR(fs, SPIFFS_BLOCK_FOR_PAGE(fs , pix)) +
+       25:  695:      SPIFFS_OBJ_LOOKUP_ENTRY_FOR_PAGE(fs, pix) * sizeof(spiffs_obj_id);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       25:  696:  res =_spiffs_rd(fs,  SPIFFS_OP_T_OBJ_LU | SPIFFS_OP_C_READ, fh,
+call    0 returned 100%
+        -:  697:      obj_id_addr, sizeof(spiffs_obj_id), (u8_t *)&obj_id);
+       25:  698:  SPIFFS_API_CHECK_RES(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  699:
+       25:  700:  s->obj_id = obj_id & ~SPIFFS_OBJ_ID_IX_FLAG;
+       25:  701:  s->type = objix_hdr.type;
+       25:  702:  s->size = objix_hdr.size == SPIFFS_UNDEFINED_LEN ? 0 : objix_hdr.size;
+branch  0 taken 16% (fallthrough)
+branch  1 taken 84%
+       25:  703:  s->pix = pix;
+       25:  704:  strncpy((char *)s->name, (char *)objix_hdr.name, SPIFFS_OBJ_NAME_LEN);
+        -:  705:
+       25:  706:  return res;
+        -:  707:}
+        -:  708:
+function SPIFFS_stat called 2 returned 100% blocks executed 73%
+        2:  709:s32_t SPIFFS_stat(spiffs *fs, const char *path, spiffs_stat *s) {
+        2:  710:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        2:  711:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  712:  SPIFFS_LOCK(fs);
+        -:  713:
+        -:  714:  s32_t res;
+        -:  715:  spiffs_page_ix pix;
+        -:  716:
+        2:  717:  res = spiffs_object_find_object_index_header_by_name(fs, (const u8_t*)path, &pix);
+call    0 returned 100%
+        2:  718:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  719:
+        2:  720:  res = spiffs_stat_pix(fs, pix, 0, s);
+call    0 returned 100%
+        -:  721:
+        -:  722:  SPIFFS_UNLOCK(fs);
+        -:  723:
+        2:  724:  return res;
+        -:  725:}
+        -:  726:
+function SPIFFS_fstat called 23 returned 100% blocks executed 75%
+       23:  727:s32_t SPIFFS_fstat(spiffs *fs, spiffs_file fh, spiffs_stat *s) {
+       23:  728:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       23:  729:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  730:  SPIFFS_LOCK(fs);
+        -:  731:
+        -:  732:  spiffs_fd *fd;
+        -:  733:  s32_t res;
+        -:  734:
+       23:  735:  fh = SPIFFS_FH_UNOFFS(fs, fh);
+       23:  736:  res = spiffs_fd_get(fs, fh, &fd);
+call    0 returned 100%
+       23:  737:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  738:
+        -:  739:#if SPIFFS_CACHE_WR
+       23:  740:  spiffs_fflush_cache(fs, fh);
+call    0 returned 100%
+        -:  741:#endif
+        -:  742:
+       23:  743:  res = spiffs_stat_pix(fs, fd->objix_hdr_pix, fh, s);
+call    0 returned 100%
+        -:  744:
+        -:  745:  SPIFFS_UNLOCK(fs);
+        -:  746:
+       23:  747:  return res;
+        -:  748:}
+        -:  749:
+        -:  750:// Checks if there are any cached writes for the object id associated with
+        -:  751:// given filehandle. If so, these writes are flushed.
+        -:  752:#if SPIFFS_CACHE == 1
+function spiffs_fflush_cache called 23070000 returned 100% blocks executed 87%
+ 23070000:  753:static s32_t spiffs_fflush_cache(spiffs *fs, spiffs_file fh) {
+        -:  754:  (void)fs;
+        -:  755:  (void)fh;
+ 23070000:  756:  s32_t res = SPIFFS_OK;
+        -:  757:#if !SPIFFS_READ_ONLY && SPIFFS_CACHE_WR
+        -:  758:
+        -:  759:  spiffs_fd *fd;
+ 23070000:  760:  res = spiffs_fd_get(fs, fh, &fd);
+call    0 returned 100%
+ 23070000:  761:  SPIFFS_API_CHECK_RES(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  762:
+ 23070000:  763:  if ((fd->flags & SPIFFS_DIRECT) == 0) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+ 23070000:  764:    if (fd->cache_page == 0) {
+branch  0 taken 99% (fallthrough)
+branch  1 taken 1%
+        -:  765:      // see if object id is associated with cache already
+ 23069982:  766:      fd->cache_page = spiffs_cache_page_get_by_fd(fs, fd);
+call    0 returned 100%
+        -:  767:    }
+ 23070000:  768:    if (fd->cache_page) {
+branch  0 taken 1% (fallthrough)
+branch  1 taken 99%
+        -:  769:      SPIFFS_CACHE_DBG("CACHE_WR_DUMP: dumping cache page %i for fd %i:%04x, flush, offs:%i size:%i\n",
+        -:  770:          fd->cache_page->ix, fd->file_nbr,  fd->obj_id, fd->cache_page->offset, fd->cache_page->size);
+       54:  771:      res = spiffs_hydro_write(fs, fd,
+call    0 returned 100%
+       18:  772:          spiffs_get_cache_page(fs, spiffs_get_cache(fs), fd->cache_page->ix),
+       36:  773:          fd->cache_page->offset, fd->cache_page->size);
+       18:  774:      if (res < SPIFFS_OK) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  775:        fs->err_code = res;
+        -:  776:      }
+       18:  777:      spiffs_cache_fd_release(fs, fd->cache_page);
+call    0 returned 100%
+        -:  778:    }
+        -:  779:  }
+        -:  780:#endif
+        -:  781:
+ 23070000:  782:  return res;
+        -:  783:}
+        -:  784:#endif
+        -:  785:
+function SPIFFS_fflush called 0 returned 0% blocks executed 0%
+    #####:  786:s32_t SPIFFS_fflush(spiffs *fs, spiffs_file fh) {
+        -:  787:  (void)fh;
+    #####:  788:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  789:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  790:  s32_t res = SPIFFS_OK;
+        -:  791:#if !SPIFFS_READ_ONLY && SPIFFS_CACHE_WR
+        -:  792:  SPIFFS_LOCK(fs);
+    #####:  793:  fh = SPIFFS_FH_UNOFFS(fs, fh);
+    #####:  794:  res = spiffs_fflush_cache(fs, fh);
+call    0 never executed
+    #####:  795:  SPIFFS_API_CHECK_RES_UNLOCK(fs,res);
+branch  0 never executed
+branch  1 never executed
+        -:  796:  SPIFFS_UNLOCK(fs);
+        -:  797:#endif
+        -:  798:
+    #####:  799:  return res;
+        -:  800:}
+        -:  801:
+function SPIFFS_close called 23 returned 100% blocks executed 67%
+       23:  802:s32_t SPIFFS_close(spiffs *fs, spiffs_file fh) {
+       23:  803:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       23:  804:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  805:
+       23:  806:  s32_t res = SPIFFS_OK;
+        -:  807:  SPIFFS_LOCK(fs);
+        -:  808:
+       23:  809:  fh = SPIFFS_FH_UNOFFS(fs, fh);
+        -:  810:#if SPIFFS_CACHE
+       23:  811:  res = spiffs_fflush_cache(fs, fh);
+call    0 returned 100%
+       23:  812:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  813:#endif
+       23:  814:  res = spiffs_fd_return(fs, fh);
+call    0 returned 100%
+       23:  815:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  816:
+        -:  817:  SPIFFS_UNLOCK(fs);
+        -:  818:
+       23:  819:  return res;
+        -:  820:}
+        -:  821:
+function SPIFFS_rename called 0 returned 0% blocks executed 0%
+    #####:  822:s32_t SPIFFS_rename(spiffs *fs, const char *old, const char *new) {
+        -:  823:#if SPIFFS_READ_ONLY
+        -:  824:  (void)fs; (void)old; (void)new;
+        -:  825:  return SPIFFS_ERR_RO_NOT_IMPL;
+        -:  826:#else
+    #####:  827:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  828:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -:  829:  SPIFFS_LOCK(fs);
+        -:  830:
+        -:  831:  spiffs_page_ix pix_old, pix_dummy;
+        -:  832:  spiffs_fd *fd;
+        -:  833:
+    #####:  834:  s32_t res = spiffs_object_find_object_index_header_by_name(fs, (const u8_t*)old, &pix_old);
+call    0 never executed
+    #####:  835:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  836:
+    #####:  837:  res = spiffs_object_find_object_index_header_by_name(fs, (const u8_t*)new, &pix_dummy);
+call    0 never executed
+    #####:  838:  if (res == SPIFFS_ERR_NOT_FOUND) {
+branch  0 never executed
+branch  1 never executed
+    #####:  839:    res = SPIFFS_OK;
+    #####:  840:  } else if (res == SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+    #####:  841:    res = SPIFFS_ERR_CONFLICTING_NAME;
+        -:  842:  }
+    #####:  843:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  844:
+    #####:  845:  res = spiffs_fd_find_new(fs, &fd);
+call    0 never executed
+    #####:  846:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  847:
+    #####:  848:  res = spiffs_object_open_by_page(fs, pix_old, fd, 0, 0);
+call    0 never executed
+    #####:  849:  if (res != SPIFFS_OK) {
+branch  0 never executed
+branch  1 never executed
+    #####:  850:    spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  851:  }
+    #####:  852:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  853:
+    #####:  854:  res = spiffs_object_update_index_hdr(fs, fd, fd->obj_id, fd->objix_hdr_pix, 0, (const u8_t*)new,
+call    0 never executed
+        -:  855:      0, &pix_dummy);
+        -:  856:
+    #####:  857:  spiffs_fd_return(fs, fd->file_nbr);
+call    0 never executed
+        -:  858:
+    #####:  859:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -:  860:
+        -:  861:  SPIFFS_UNLOCK(fs);
+        -:  862:
+    #####:  863:  return res;
+        -:  864:#endif // SPIFFS_READ_ONLY
+        -:  865:}
+        -:  866:
+function SPIFFS_opendir called 4 returned 100% blocks executed 67%
+        4:  867:spiffs_DIR *SPIFFS_opendir(spiffs *fs, const char *name, spiffs_DIR *d) {
+        -:  868:  (void)name;
+        -:  869:
+        4:  870:  if (!SPIFFS_CHECK_CFG((fs))) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  871:    (fs)->err_code = SPIFFS_ERR_NOT_CONFIGURED;
+    #####:  872:    return 0;
+        -:  873:  }
+        -:  874:
+        4:  875:  if (!SPIFFS_CHECK_MOUNT(fs)) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  876:    fs->err_code = SPIFFS_ERR_NOT_MOUNTED;
+    #####:  877:    return 0;
+        -:  878:  }
+        -:  879:
+        4:  880:  d->fs = fs;
+        4:  881:  d->block = 0;
+        4:  882:  d->entry = 0;
+        4:  883:  return d;
+        -:  884:}
+        -:  885:
+function spiffs_read_dir_v called 480 returned 100% blocks executed 85%
+      480:  886:static s32_t spiffs_read_dir_v(
+        -:  887:    spiffs *fs,
+        -:  888:    spiffs_obj_id obj_id,
+        -:  889:    spiffs_block_ix bix,
+        -:  890:    int ix_entry,
+        -:  891:    const void *user_const_p,
+        -:  892:    void *user_var_p) {
+        -:  893:  (void)user_const_p;
+        -:  894:  s32_t res;
+        -:  895:  spiffs_page_object_ix_header objix_hdr;
+      500:  896:  if (obj_id == SPIFFS_OBJ_ID_FREE || obj_id == SPIFFS_OBJ_ID_DELETED ||
+branch  0 taken 4% (fallthrough)
+branch  1 taken 96%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+branch  4 taken 45% (fallthrough)
+branch  5 taken 55%
+       20:  897:      (obj_id & SPIFFS_OBJ_ID_IX_FLAG) == 0) {
+      469:  898:    return SPIFFS_VIS_COUNTINUE;
+        -:  899:  }
+        -:  900:
+       11:  901:  spiffs_page_ix pix = SPIFFS_OBJ_LOOKUP_ENTRY_TO_PIX(fs, bix, ix_entry);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       11:  902:  res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
+call    0 returned 100%
+        -:  903:      0, SPIFFS_PAGE_TO_PADDR(fs, pix), sizeof(spiffs_page_object_ix_header), (u8_t *)&objix_hdr);
+       11:  904:  if (res != SPIFFS_OK) return res;
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+       22:  905:  if ((obj_id & SPIFFS_OBJ_ID_IX_FLAG) &&
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+       22:  906:      objix_hdr.p_hdr.span_ix == 0 &&
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       11:  907:      (objix_hdr.p_hdr.flags& (SPIFFS_PH_FLAG_DELET | SPIFFS_PH_FLAG_FINAL | SPIFFS_PH_FLAG_IXDELE)) ==
+        -:  908:          (SPIFFS_PH_FLAG_DELET | SPIFFS_PH_FLAG_IXDELE)) {
+       11:  909:    struct spiffs_dirent *e = (struct spiffs_dirent*)user_var_p;
+       11:  910:    e->obj_id = obj_id;
+       11:  911:    strcpy((char *)e->name, (char *)objix_hdr.name);
+       11:  912:    e->type = objix_hdr.type;
+       11:  913:    e->size = objix_hdr.size == SPIFFS_UNDEFINED_LEN ? 0 : objix_hdr.size;
+branch  0 taken 82% (fallthrough)
+branch  1 taken 18%
+       11:  914:    e->pix = pix;
+       11:  915:    return SPIFFS_OK;
+        -:  916:  }
+        -:  917:
+    #####:  918:  return SPIFFS_VIS_COUNTINUE;
+        -:  919:}
+        -:  920:
+function SPIFFS_readdir called 15 returned 100% blocks executed 89%
+       15:  921:struct spiffs_dirent *SPIFFS_readdir(spiffs_DIR *d, struct spiffs_dirent *e) {
+       15:  922:  if (!SPIFFS_CHECK_MOUNT(d->fs)) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  923:    d->fs->err_code = SPIFFS_ERR_NOT_MOUNTED;
+    #####:  924:    return 0;
+        -:  925:  }
+        -:  926:  SPIFFS_LOCK(d->fs);
+        -:  927:
+        -:  928:  spiffs_block_ix bix;
+        -:  929:  int entry;
+        -:  930:  s32_t res;
+       15:  931:  struct spiffs_dirent *ret = 0;
+        -:  932:
+       30:  933:  res = spiffs_obj_lu_find_entry_visitor(d->fs,
+call    0 returned 100%
+       15:  934:      d->block,
+        -:  935:      d->entry,
+        -:  936:      SPIFFS_VIS_NO_WRAP,
+        -:  937:      0,
+        -:  938:      spiffs_read_dir_v,
+        -:  939:      0,
+        -:  940:      e,
+        -:  941:      &bix,
+        -:  942:      &entry);
+       15:  943:  if (res == SPIFFS_OK) {
+branch  0 taken 73% (fallthrough)
+branch  1 taken 27%
+       11:  944:    d->block = bix;
+       11:  945:    d->entry = entry + 1;
+       11:  946:    ret = e;
+        -:  947:  } else {
+        4:  948:    d->fs->err_code = res;
+        -:  949:  }
+        -:  950:  SPIFFS_UNLOCK(d->fs);
+       15:  951:  return ret;
+        -:  952:}
+        -:  953:
+function SPIFFS_closedir called 4 returned 100% blocks executed 67%
+        4:  954:s32_t SPIFFS_closedir(spiffs_DIR *d) {
+        4:  955:  SPIFFS_API_CHECK_CFG(d->fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        4:  956:  SPIFFS_API_CHECK_MOUNT(d->fs);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        4:  957:  return 0;
+        -:  958:}
+        -:  959:
+function SPIFFS_check called 0 returned 0% blocks executed 0%
+    #####:  960:s32_t SPIFFS_check(spiffs *fs) {
+        -:  961:#if SPIFFS_READ_ONLY
+        -:  962:  (void)fs;
+        -:  963:  return SPIFFS_ERR_RO_NOT_IMPL;
+        -:  964:#else
+        -:  965:  s32_t res;
+    #####:  966:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  967:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -:  968:  SPIFFS_LOCK(fs);
+        -:  969:
+    #####:  970:  res = spiffs_lookup_consistency_check(fs, 0);
+call    0 never executed
+        -:  971:
+    #####:  972:  res = spiffs_object_index_consistency_check(fs);
+call    0 never executed
+        -:  973:
+    #####:  974:  res = spiffs_page_consistency_check(fs);
+call    0 never executed
+        -:  975:
+    #####:  976:  res = spiffs_obj_lu_scan(fs);
+call    0 never executed
+        -:  977:
+        -:  978:  SPIFFS_UNLOCK(fs);
+    #####:  979:  return res;
+        -:  980:#endif // SPIFFS_READ_ONLY
+        -:  981:}
+        -:  982:
+function SPIFFS_info called 0 returned 0% blocks executed 0%
+    #####:  983:s32_t SPIFFS_info(spiffs *fs, u32_t *total, u32_t *used) {
+    #####:  984:  s32_t res = SPIFFS_OK;
+    #####:  985:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  986:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -:  987:  SPIFFS_LOCK(fs);
+        -:  988:
+    #####:  989:  u32_t pages_per_block = SPIFFS_PAGES_PER_BLOCK(fs);
+    #####:  990:  u32_t blocks = fs->block_count;
+    #####:  991:  u32_t obj_lu_pages = SPIFFS_OBJ_LOOKUP_PAGES(fs);
+branch  0 never executed
+branch  1 never executed
+    #####:  992:  u32_t data_page_size = SPIFFS_DATA_PAGE_SIZE(fs);
+    #####:  993:  u32_t total_data_pages = (blocks - 2) * (pages_per_block - obj_lu_pages) + 1; // -2 for spare blocks, +1 for emergency page
+        -:  994:
+    #####:  995:  if (total) {
+branch  0 never executed
+branch  1 never executed
+    #####:  996:    *total = total_data_pages * data_page_size;
+        -:  997:  }
+        -:  998:
+    #####:  999:  if (used) {
+branch  0 never executed
+branch  1 never executed
+    #####: 1000:    *used = fs->stats_p_allocated * data_page_size;
+        -: 1001:  }
+        -: 1002:
+        -: 1003:  SPIFFS_UNLOCK(fs);
+    #####: 1004:  return res;
+        -: 1005:}
+        -: 1006:
+function SPIFFS_gc_quick called 0 returned 0% blocks executed 0%
+    #####: 1007:s32_t SPIFFS_gc_quick(spiffs *fs, u16_t max_free_pages) {
+        -: 1008:#if SPIFFS_READ_ONLY
+        -: 1009:  (void)fs; (void)max_free_pages;
+        -: 1010:  return SPIFFS_ERR_RO_NOT_IMPL;
+        -: 1011:#else
+        -: 1012:  s32_t res;
+    #####: 1013:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####: 1014:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -: 1015:  SPIFFS_LOCK(fs);
+        -: 1016:
+    #####: 1017:  res = spiffs_gc_quick(fs, max_free_pages);
+call    0 never executed
+        -: 1018:
+    #####: 1019:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -: 1020:  SPIFFS_UNLOCK(fs);
+    #####: 1021:  return 0;
+        -: 1022:#endif // SPIFFS_READ_ONLY
+        -: 1023:}
+        -: 1024:
+        -: 1025:
+function SPIFFS_gc called 0 returned 0% blocks executed 0%
+    #####: 1026:s32_t SPIFFS_gc(spiffs *fs, u32_t size) {
+        -: 1027:#if SPIFFS_READ_ONLY
+        -: 1028:  (void)fs; (void)size;
+        -: 1029:  return SPIFFS_ERR_RO_NOT_IMPL;
+        -: 1030:#else
+        -: 1031:  s32_t res;
+    #####: 1032:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####: 1033:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -: 1034:  SPIFFS_LOCK(fs);
+        -: 1035:
+    #####: 1036:  res = spiffs_gc_check(fs, size);
+call    0 never executed
+        -: 1037:
+    #####: 1038:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -: 1039:  SPIFFS_UNLOCK(fs);
+    #####: 1040:  return 0;
+        -: 1041:#endif // SPIFFS_READ_ONLY
+        -: 1042:}
+        -: 1043:
+function SPIFFS_eof called 0 returned 0% blocks executed 0%
+    #####: 1044:s32_t SPIFFS_eof(spiffs *fs, spiffs_file fh) {
+        -: 1045:  s32_t res;
+    #####: 1046:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####: 1047:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -: 1048:  SPIFFS_LOCK(fs);
+        -: 1049:
+    #####: 1050:  fh = SPIFFS_FH_UNOFFS(fs, fh);
+        -: 1051:
+        -: 1052:  spiffs_fd *fd;
+    #####: 1053:  res = spiffs_fd_get(fs, fh, &fd);
+call    0 never executed
+    #####: 1054:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -: 1055:
+        -: 1056:#if SPIFFS_CACHE_WR
+    #####: 1057:  res = spiffs_fflush_cache(fs, fh);
+call    0 never executed
+    #####: 1058:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -: 1059:#endif
+        -: 1060:
+    #####: 1061:  res = (fd->fdoffset >= (fd->size == SPIFFS_UNDEFINED_LEN ? 0 : fd->size));
+branch  0 never executed
+branch  1 never executed
+        -: 1062:
+        -: 1063:  SPIFFS_UNLOCK(fs);
+    #####: 1064:  return res;
+        -: 1065:}
+        -: 1066:
+function SPIFFS_tell called 0 returned 0% blocks executed 0%
+    #####: 1067:s32_t SPIFFS_tell(spiffs *fs, spiffs_file fh) {
+        -: 1068:  s32_t res;
+    #####: 1069:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####: 1070:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -: 1071:  SPIFFS_LOCK(fs);
+        -: 1072:
+    #####: 1073:  fh = SPIFFS_FH_UNOFFS(fs, fh);
+        -: 1074:
+        -: 1075:  spiffs_fd *fd;
+    #####: 1076:  res = spiffs_fd_get(fs, fh, &fd);
+call    0 never executed
+    #####: 1077:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -: 1078:
+        -: 1079:#if SPIFFS_CACHE_WR
+    #####: 1080:  res = spiffs_fflush_cache(fs, fh);
+call    0 never executed
+    #####: 1081:  SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
+branch  0 never executed
+branch  1 never executed
+        -: 1082:#endif
+        -: 1083:
+    #####: 1084:  res = fd->fdoffset;
+        -: 1085:
+        -: 1086:  SPIFFS_UNLOCK(fs);
+    #####: 1087:  return res;
+        -: 1088:}
+        -: 1089:
+function SPIFFS_set_file_callback_func called 0 returned 0% blocks executed 0%
+    #####: 1090:s32_t SPIFFS_set_file_callback_func(spiffs *fs, spiffs_file_callback cb_func) {
+        -: 1091:  SPIFFS_LOCK(fs);
+    #####: 1092:  fs->file_cb_f = cb_func;
+        -: 1093:  SPIFFS_UNLOCK(fs);
+    #####: 1094:  return 0;
+        -: 1095:}
+        -: 1096:
+        -: 1097:#if SPIFFS_TEST_VISUALISATION
+function SPIFFS_vis called 0 returned 0% blocks executed 0%
+    #####: 1098:s32_t SPIFFS_vis(spiffs *fs) {
+    #####: 1099:  s32_t res = SPIFFS_OK;
+    #####: 1100:  SPIFFS_API_CHECK_CFG(fs);
+branch  0 never executed
+branch  1 never executed
+    #####: 1101:  SPIFFS_API_CHECK_MOUNT(fs);
+branch  0 never executed
+branch  1 never executed
+        -: 1102:  SPIFFS_LOCK(fs);
+        -: 1103:
+    #####: 1104:  int entries_per_page = (SPIFFS_CFG_LOG_PAGE_SZ(fs) / sizeof(spiffs_obj_id));
+    #####: 1105:  spiffs_obj_id *obj_lu_buf = (spiffs_obj_id *)fs->lu_work;
+    #####: 1106:  spiffs_block_ix bix = 0;
+        -: 1107:
+    #####: 1108:  while (bix < fs->block_count) {
+branch  0 never executed
+branch  1 never executed
+        -: 1109:    // check each object lookup page
+    #####: 1110:    int obj_lookup_page = 0;
+    #####: 1111:    int cur_entry = 0;
+        -: 1112:
+    #####: 1113:    while (res == SPIFFS_OK && obj_lookup_page < (int)SPIFFS_OBJ_LOOKUP_PAGES(fs)) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+branch  4 never executed
+branch  5 never executed
+    #####: 1114:      int entry_offset = obj_lookup_page * entries_per_page;
+    #####: 1115:      res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU | SPIFFS_OP_C_READ,
+call    0 never executed
+        -: 1116:          0, bix * SPIFFS_CFG_LOG_BLOCK_SZ(fs) + SPIFFS_PAGE_TO_PADDR(fs, obj_lookup_page), SPIFFS_CFG_LOG_PAGE_SZ(fs), fs->lu_work);
+        -: 1117:      // check each entry
+    #####: 1118:      while (res == SPIFFS_OK &&
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####: 1119:          cur_entry - entry_offset < entries_per_page && cur_entry < (int)(SPIFFS_PAGES_PER_BLOCK(fs)-SPIFFS_OBJ_LOOKUP_PAGES(fs))) {
+branch  0 never executed
+branch  1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####: 1120:        spiffs_obj_id obj_id = obj_lu_buf[cur_entry-entry_offset];
+    #####: 1121:        if (cur_entry == 0) {
+branch  0 never executed
+branch  1 never executed
+    #####: 1122:          spiffs_printf("%4i ", bix);
+call    0 never executed
+    #####: 1123:        } else if ((cur_entry & 0x3f) == 0) {
+branch  0 never executed
+branch  1 never executed
+    #####: 1124:          spiffs_printf("     ");
+call    0 never executed
+        -: 1125:        }
+    #####: 1126:        if (obj_id == SPIFFS_OBJ_ID_FREE) {
+branch  0 never executed
+branch  1 never executed
+    #####: 1127:          spiffs_printf(SPIFFS_TEST_VIS_FREE_STR);
+call    0 never executed
+    #####: 1128:        } else if (obj_id == SPIFFS_OBJ_ID_DELETED) {
+branch  0 never executed
+branch  1 never executed
+    #####: 1129:          spiffs_printf(SPIFFS_TEST_VIS_DELE_STR);
+call    0 never executed
+    #####: 1130:        } else if (obj_id & SPIFFS_OBJ_ID_IX_FLAG){
+branch  0 never executed
+branch  1 never executed
+    #####: 1131:          spiffs_printf(SPIFFS_TEST_VIS_INDX_STR(obj_id));
+call    0 never executed
+        -: 1132:        } else {
+    #####: 1133:          spiffs_printf(SPIFFS_TEST_VIS_DATA_STR(obj_id));
+call    0 never executed
+        -: 1134:        }
+    #####: 1135:        cur_entry++;
+    #####: 1136:        if ((cur_entry & 0x3f) == 0) {
+branch  0 never executed
+branch  1 never executed
+    #####: 1137:          spiffs_printf("\n");
+call    0 never executed
+        -: 1138:        }
+        -: 1139:      } // per entry
+    #####: 1140:      obj_lookup_page++;
+        -: 1141:    } // per object lookup page
+        -: 1142:
+        -: 1143:    spiffs_obj_id erase_count;
+    #####: 1144:    res = _spiffs_rd(fs, SPIFFS_OP_C_READ | SPIFFS_OP_T_OBJ_LU2, 0,
+branch  0 never executed
+branch  1 never executed
+call    2 never executed
+        -: 1145:        SPIFFS_ERASE_COUNT_PADDR(fs, bix),
+        -: 1146:        sizeof(spiffs_obj_id), (u8_t *)&erase_count);
+    #####: 1147:    SPIFFS_CHECK_RES(res);
+branch  0 never executed
+branch  1 never executed
+        -: 1148:
+    #####: 1149:    if (erase_count != (spiffs_obj_id)-1) {
+branch  0 never executed
+branch  1 never executed
+    #####: 1150:      spiffs_printf("\tera_cnt: %i\n", erase_count);
+call    0 never executed
+        -: 1151:    } else {
+    #####: 1152:      spiffs_printf("\tera_cnt: N/A\n");
+call    0 never executed
+        -: 1153:    }
+        -: 1154:
+    #####: 1155:    bix++;
+        -: 1156:  } // per block
+        -: 1157:
+    #####: 1158:  spiffs_printf("era_cnt_max: %i\n", fs->max_erase_count);
+call    0 never executed
+    #####: 1159:  spiffs_printf("last_errno:  %i\n", fs->err_code);
+call    0 never executed
+    #####: 1160:  spiffs_printf("blocks:      %i\n", fs->block_count);
+call    0 never executed
+    #####: 1161:  spiffs_printf("free_blocks: %i\n", fs->free_blocks);
+call    0 never executed
+    #####: 1162:  spiffs_printf("page_alloc:  %i\n", fs->stats_p_allocated);
+call    0 never executed
+    #####: 1163:  spiffs_printf("page_delet:  %i\n", fs->stats_p_deleted);
+call    0 never executed
+        -: 1164:  u32_t total, used;
+    #####: 1165:  SPIFFS_info(fs, &total, &used);
+call    0 never executed
+    #####: 1166:  spiffs_printf("used:        %i of %i\n", used, total);
+call    0 never executed
+        -: 1167:
+        -: 1168:  SPIFFS_UNLOCK(fs);
+    #####: 1169:  return res;
+        -: 1170:}
+        -: 1171:#endif

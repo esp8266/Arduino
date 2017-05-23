@@ -17,6 +17,7 @@
 #include <string.h>
 #include <MD5Builder.h>
 #include <StreamString.h>
+#include <iostream>
 
 TEST_CASE("MD5Builder::add works as expected", "[core][MD5Builder]")
 {
@@ -24,7 +25,9 @@ TEST_CASE("MD5Builder::add works as expected", "[core][MD5Builder]")
     builder.begin();
     builder.add("short");
     builder.calculate();
+    std::cout << "String" << builder.toString().c_str() << std::endl;
     REQUIRE(builder.toString() == "4f09daa9d95bcb166a302407a0e0babe");
+
 
     builder.begin();
     builder.add("longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong");
