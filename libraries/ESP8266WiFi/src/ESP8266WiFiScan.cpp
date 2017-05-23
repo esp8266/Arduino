@@ -294,7 +294,7 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status) {
         int i = 0;
         bss_info* head = reinterpret_cast<bss_info*>(result);
 
-        for(bss_info* it = head; it; it = it->next, ++i)
+        for(bss_info* it = head; it; it = STAILQ_NEXT(it, next), ++i)
             ;
         ESP8266WiFiScanClass::_scanCount = i;
         if(i == 0) {
@@ -302,7 +302,7 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status) {
         } else {
             bss_info* copied_info = new bss_info[i];
             i = 0;
-            for(bss_info* it = head; it; it = it->next, ++i) {
+            for(bss_info* it = head; it; it = STAILQ_NEXT(it, next), ++i) {
                 memcpy(copied_info + i, it, sizeof(bss_info));
             }
 

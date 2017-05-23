@@ -228,19 +228,6 @@ generic.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_U
 generic.menu.DebugLevel.all_____=All
 generic.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
 
-# disabled because espressif's bootloader refuses to write above 4M
-# generic.menu.FlashSize.8M=8M (7M SPIFFS)
-# generic.menu.FlashSize.8M.build.flash_size=1M
-# generic.menu.FlashSize.8M.build.flash_ld=eagle.flash.8m.ld
-# generic.menu.FlashSize.8M.build.spiffs_start=0x100000
-# generic.menu.FlashSize.8M.build.spiffs_end=0x800000
-# generic.menu.FlashSize.8M.build.spiffs_blocksize=8192
-# generic.menu.FlashSize.16M=16M (15M SPIFFS)
-# generic.menu.FlashSize.16M.build.flash_size=1M
-# generic.menu.FlashSize.16M.build.flash_ld=eagle.flash.16m.ld
-# generic.menu.FlashSize.16M.build.spiffs_start=0x100000
-# generic.menu.FlashSize.16M.build.spiffs_end=0x1000000
-# generic.menu.FlashSize.16M.build.spiffs_blocksize=8192
 
 generic.menu.lwIP.open=v2
 generic.menu.lwIP.open.build.lwip_include=lwip2/include
