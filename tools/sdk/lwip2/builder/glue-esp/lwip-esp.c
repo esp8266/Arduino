@@ -27,8 +27,9 @@ author: d. gauchard
 
 */
 
-// version for esp8266 sdk-2.0.0(656edbf)
-// esp(lwip1.4) side of glue
+// esp(lwip1.4) side of glue for esp8266
+// - sdk-2.0.0(656edbf)
+// - sdk-2.1.0(116b762)
 
 // todo: get rid of esp_guess_netif_idx()
 
