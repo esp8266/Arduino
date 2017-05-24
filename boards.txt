@@ -1128,9 +1128,9 @@ thing.menu.UploadSpeed.921600.upload.speed=921600
 my.name=MyBoard
 
 my.upload.tool=esptool
-my.upload.speed=921600
-my.upload.resetmethod=ck
-my.upload.maximum_size=434160
+my.upload.speed=115200
+my.upload.resetmethod=nodemcu
+my.upload.maximum_size=1044464
 my.upload.maximum_data_size=81920
 my.upload.wait_for_upload_port=true
 my.serial.disableDTR=true
@@ -1138,18 +1138,12 @@ my.serial.disableRTS=true
 
 my.build.mcu=esp8266
 my.build.f_cpu=80000000L
-my.build.board=ESP8266_MyBoard
+my.build.board=ESP8266_NODEMCU
 my.build.core=esp8266
 my.build.variant=My_Board
-my.build.flash_mode=qio
-# flash chip: AT25SF041 (512 kbyte, 4Mbit)
-my.build.flash_size=512K
-my.build.flash_ld=eagle.flash.512k64.ld
+my.build.flash_mode=dio
+my.build.flash_size=4M
 my.build.flash_freq=40
-my.build.spiffs_start=0x6B000
-my.build.spiffs_end=0x7B000
-my.build.spiffs_blocksize=4096
-my.build.spiffs_pagesize=256
 my.build.debug_port=
 my.build.debug_level=
 
@@ -1168,6 +1162,7 @@ my.menu.UploadSpeed.256000.windows=256000
 my.menu.UploadSpeed.256000.upload.speed=256000
 my.menu.UploadSpeed.230400.linux=230400
 my.menu.UploadSpeed.230400.macosx=230400
+my.menu.UploadSpeed.230400.macosx=230400
 my.menu.UploadSpeed.230400.upload.speed=230400
 my.menu.UploadSpeed.460800.linux=460800
 my.menu.UploadSpeed.460800.macosx=460800
@@ -1177,8 +1172,24 @@ my.menu.UploadSpeed.512000.upload.speed=512000
 my.menu.UploadSpeed.921600=921600
 my.menu.UploadSpeed.921600.upload.speed=921600
 
-##############################################################
+my.menu.FlashSize.4M3M=4M (3M SPIFFS)
+my.menu.FlashSize.4M3M.build.flash_size=4M
+my.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+my.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+my.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+my.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+my.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 
+my.menu.FlashSize.4M1M=4M (1M SPIFFS)
+my.menu.FlashSize.4M1M.build.flash_size=4M
+my.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+my.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+my.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+my.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+my.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+
+
+##############################################################
 
 
 
