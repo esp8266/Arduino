@@ -31,7 +31,7 @@
 static const uint8_t SDA = 4;
 static const uint8_t SCL = 5;
 
-static const uint8_t BUILTIN_LED1 = 5;
+static const uint8_t BUILTIN_LED1 = 13;
 static const uint8_t BUILTIN_LED2 = 2;
 static const uint8_t SAMPLE = 12;
 
