@@ -94,6 +94,9 @@ public:
         ssl_ext_set_host_name(ext, hostName);
         ssl_ext_set_max_fragment_size(ext, 4096);
         s_io_ctx = ctx;
+        if (_ssl) {
+            ssl_free(_ssl);
+        }
         _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, ext);
         uint32_t t = millis();
 
@@ -265,7 +268,7 @@ protected:
             }
             return 0;
         }
-        DEBUGV(":wcs ra %d", rc);
+        DEBUGV(":wcs ra %d\r\n", rc);
         _read_ptr = data;
         _available = rc;
         return _available;
@@ -374,13 +377,10 @@ int WiFiClientSecure::connect(const char* name, uint16_t port)
 
 int WiFiClientSecure::_connectSSL(const char* hostName)
 {
-    if (_ssl) {
-        _ssl->unref();
-        _ssl = nullptr;
+    if (!_ssl) {
+        _ssl = new SSLContext;
+        _ssl->ref();
     }
-
-    _ssl = new SSLContext;
-    _ssl->ref();
     _ssl->connect(_client, hostName, 5000);
 
     auto status = ssl_handshake_status(*_ssl);
@@ -584,14 +584,18 @@ bool WiFiClientSecure::_verifyDN(const char* domain_name)
     const char* san = NULL;
     int i = 0;
     while ((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != NULL) {
-        if (matchName(String(san), domain_name_str)) {
+        String san_str(san);
+        san_str.toLowerCase();
+        if (matchName(san_str, domain_name_str)) {
             return true;
         }
         DEBUGV("SAN %d: '%s', no match\r\n", i, san);
         ++i;
     }
     const char* common_name = ssl_get_cert_dn(*_ssl, SSL_X509_CERT_COMMON_NAME);
-    if (common_name && matchName(String(common_name), domain_name_str)) {
+    String common_name_str(common_name);
+    common_name_str.toLowerCase();
+    if (common_name && matchName(common_name_str, domain_name_str)) {
         return true;
     }
     DEBUGV("CN: '%s', no match\r\n", (common_name)?common_name:"(null)");
@@ -616,7 +620,8 @@ bool WiFiClientSecure::verifyCertChain(const char* domain_name)
 bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size)
 {
     if (!_ssl) {
-        return false;
+        _ssl = new SSLContext;
+        _ssl->ref();
     }
     return _ssl->loadObject(SSL_OBJ_X509_CACERT, pk, size);
 }
@@ -624,7 +629,8 @@ bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size)
 bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size)
 {
     if (!_ssl) {
-        return false;
+        _ssl = new SSLContext;
+        _ssl->ref();
     }
     return _ssl->loadObject(SSL_OBJ_X509_CERT, pk, size);
 }
@@ -632,7 +638,8 @@ bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size)
 bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size)
 {
     if (!_ssl) {
-        return false;
+        _ssl = new SSLContext;
+        _ssl->ref();
     }
     return _ssl->loadObject(SSL_OBJ_RSA_KEY, pk, size);
 }
@@ -640,7 +647,8 @@ bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size)
 bool WiFiClientSecure::loadCACert(Stream& stream, size_t size)
 {
     if (!_ssl) {
-        return false;
+        _ssl = new SSLContext;
+        _ssl->ref();
     }
     return _ssl->loadObject(SSL_OBJ_X509_CACERT, stream, size);
 }
@@ -648,7 +656,8 @@ bool WiFiClientSecure::loadCACert(Stream& stream, size_t size)
 bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size)
 {
     if (!_ssl) {
-        return false;
+        _ssl = new SSLContext;
+        _ssl->ref();
     }
     return _ssl->loadObject(SSL_OBJ_X509_CERT, stream, size);
 }
@@ -656,7 +665,8 @@ bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size)
 bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size)
 {
     if (!_ssl) {
-        return false;
+        _ssl = new SSLContext;
+        _ssl->ref();
     }
     return _ssl->loadObject(SSL_OBJ_RSA_KEY, stream, size);
 }
