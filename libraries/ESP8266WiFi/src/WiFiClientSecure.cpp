@@ -40,6 +40,8 @@ extern "C"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
+#include <map> // is it too much?
+
 #ifdef DEBUG_ESP_SSL
 #define DEBUG_SSL
 #endif
@@ -59,6 +61,7 @@ public:
             _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
         }
         ++_ssl_ctx_refcnt;
+        _fd = ++_fdcounter;
     }
 
     ~SSLContext()
@@ -72,8 +75,6 @@ public:
         if (_ssl_ctx_refcnt == 0) {
             ssl_ctx_free(_ssl_ctx);
         }
-
-        s_io_ctx = nullptr;
     }
 
     void ref()
@@ -93,11 +94,11 @@ public:
         SSL_EXTENSIONS* ext = ssl_ext_new();
         ssl_ext_set_host_name(ext, hostName);
         ssl_ext_set_max_fragment_size(ext, 4096);
-        s_io_ctx = ctx;
+        s_io_ctx[_fd] = ctx;
         if (_ssl) {
             ssl_free(_ssl);
         }
-        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, ext);
+        _ssl = ssl_client_new(_ssl_ctx, _fd, nullptr, 0, ext);
         uint32_t t = millis();
 
         while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
@@ -110,8 +111,8 @@ public:
     }
 
     void connectServer(ClientContext *ctx) {
-        s_io_ctx = ctx;
-	_ssl = ssl_server_new(_ssl_ctx, 0);
+        s_io_ctx[_fd] = ctx;
+	_ssl = ssl_server_new(_ssl_ctx, _fd);
         _isServer = true;
 
 	int timeout_ms = 5000;
@@ -128,7 +129,6 @@ public:
 
     void stop()
     {
-        s_io_ctx = nullptr;
     }
 
     bool connected()
@@ -238,8 +238,7 @@ public:
 
     static ClientContext* getIOContext(int fd)
     {
-        (void) fd;
-        return s_io_ctx;
+        return s_io_ctx[fd];
     }
 
     int loadServerX509Cert(const uint8_t *cert, int len) {
@@ -277,16 +276,19 @@ protected:
     bool _isServer = false;
     static SSL_CTX* _ssl_ctx;
     static int _ssl_ctx_refcnt;
+    static int _fdcounter; // increased in constructor
+    int _fd; // axtls file descriptor
     SSL* _ssl = nullptr;
     int _refcnt = 0;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
-    static ClientContext* s_io_ctx;
+    static std::map<int, ClientContext*> s_io_ctx;
 };
 
 SSL_CTX* SSLContext::_ssl_ctx = nullptr;
 int SSLContext::_ssl_ctx_refcnt = 0;
-ClientContext* SSLContext::s_io_ctx = nullptr;
+int SSLContext::_fdcounter = 0;
+std::map<int, ClientContext*> SSLContext::s_io_ctx;
 
 WiFiClientSecure::WiFiClientSecure()
 {
