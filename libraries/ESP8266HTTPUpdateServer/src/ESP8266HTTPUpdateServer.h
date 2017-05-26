@@ -5,16 +5,6 @@ class ESP8266WebServer;
 
 class ESP8266HTTPUpdateServer
 {
-  private:
-    bool _serial_output;
-    ESP8266WebServer *_server;
-    static const char *_serverIndex;
-    static const char *_failedResponse;
-    static const char *_successResponse;
-    const char * _username;
-    const char * _password;
-	const char * _hash;
-    bool _authenticated;
   public:
     ESP8266HTTPUpdateServer(bool serial_debug=false);
 
@@ -28,7 +18,21 @@ class ESP8266HTTPUpdateServer
     { 
       setup(server, "/update");
     }
-	
+
+    void setup(ESP8266WebServer *server, const char * path);
+  
+  protected:
+    void _setUpdaterError();
+
+  private:
+    bool _serial_output;
+    ESP8266WebServer *_server;
+    char * _username;
+    char * _password;
+    char * _hash;
+    bool _authenticated;
+    String _updaterError;
+
 };
 
 
