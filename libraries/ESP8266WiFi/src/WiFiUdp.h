@@ -24,6 +24,7 @@
 
 #include <Udp.h>
 #include <include/slist.h>
+#include <functional>
 
 #define UDP_TX_PACKET_MAX_SIZE 8192
 
@@ -34,6 +35,8 @@ private:
   UdpContext* _ctx;
 
 public:
+
+  typedef std::function<void(void)> rx_callback_t; 
   WiFiUDP();  // Constructor
   WiFiUDP(const WiFiUDP& other);
   WiFiUDP& operator=(const WiFiUDP& rhs);
@@ -104,8 +107,15 @@ public:
   // Return the local port for outgoing packets
   uint16_t localPort();
 
+  // Set an Rx callback.  
+  void onRx(rx_callback_t cb); 
+
   static void stopAll();
   static void stopAllExcept(WiFiUDP * exC);
+
+private:
+  rx_callback_t _cb; 
+  void _onRx(); 
 
 };
 

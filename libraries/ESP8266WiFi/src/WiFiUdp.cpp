@@ -85,6 +85,7 @@ uint8_t WiFiUDP::begin(uint16_t port)
     _ctx->ref();
     ip_addr_t addr;
     addr.addr = INADDR_ANY;
+    _ctx->onRx(std::bind(&WiFiUDP::_onRx, this));
     return (_ctx->listen(addr, port)) ? 1 : 0;
 }
 
@@ -109,6 +110,7 @@ uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, ui
     if (!_ctx->listen(*IP_ADDR_ANY, port)) {
         return 0;
     }
+    _ctx->onRx(std::bind(&WiFiUDP::_onRx, this));
 
     return 1;
 }
@@ -297,4 +299,15 @@ void WiFiUDP::stopAllExcept(WiFiUDP * exC) {
             it->stop();
         }
     }
+}
+
+void WiFiUDP::onRx(rx_callback_t cb) {
+    _cb = cb; 
+}
+
+void WiFiUDP::_onRx()
+{
+    if(!_ctx->next()) return;
+    if (!_cb) return;
+    _cb(); 
 }
