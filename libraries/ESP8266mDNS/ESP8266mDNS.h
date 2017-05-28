@@ -51,7 +51,7 @@ License (MIT license):
 #define ARDUINO_BOARD "generic"
 #endif
 
-class UdpContext;
+//class UdpContext;
 
 struct MDNSService;
 struct MDNSTxt;
@@ -111,7 +111,8 @@ public:
 
 private:
   struct MDNSService * _services;
-  UdpContext* _conn;
+  //UdpContext* _conn;
+  WiFiUDP _conn; 
   String _hostName;
   String _instanceName;
   struct MDNSAnswer * _answers;

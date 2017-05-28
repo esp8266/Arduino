@@ -59,9 +59,9 @@ extern "C" {
 
 
 
-//#define MDNS_DEBUG_ERR
-//#define MDNS_DEBUG_TX
-//#define MDNS_DEBUG_RX
+// #define MDNS_DEBUG_ERR
+// #define MDNS_DEBUG_TX
+// #define MDNS_DEBUG_RX
 
 #define MDNS_NAME_REF   0xC000
 
@@ -80,10 +80,10 @@ extern "C" {
 #define MDNS_ANSWER_SRV   0x02
 #define MDNS_ANSWER_A     0x01
 
-#define _conn_read32() (((uint32_t)_conn->read() << 24) | ((uint32_t)_conn->read() << 16) | ((uint32_t)_conn->read() << 8) | _conn->read())
-#define _conn_read16() (((uint16_t)_conn->read() << 8) | _conn->read())
-#define _conn_read8() _conn->read()
-#define _conn_readS(b,l) _conn->read((char*)(b),l);
+#define _conn_read32() (((uint32_t)_conn.read() << 24) | ((uint32_t)_conn.read() << 16) | ((uint32_t)_conn.read() << 8) | _conn.read())
+#define _conn_read16() (((uint16_t)_conn.read() << 8) | _conn.read())
+#define _conn_read8() _conn.read()
+#define _conn_readS(b,l) _conn.read((char*)(b),l);
 
 static const IPAddress MDNS_MULTICAST_ADDR(224, 0, 0, 251);
 static const int MDNS_MULTICAST_TTL = 1;
@@ -116,7 +116,7 @@ struct MDNSQuery {
 };
 
 
-MDNSResponder::MDNSResponder() : _conn(0) { 
+MDNSResponder::MDNSResponder() { 
   _services = 0;
   _instanceName = ""; 
   _answers = 0;
@@ -141,9 +141,6 @@ MDNSResponder::~MDNSResponder() {
   }
   _answers = 0;
 
-  if (_conn) {
-    _conn->unref();
-  }
 }
 
 bool MDNSResponder::begin(const char* hostname){
@@ -177,10 +174,7 @@ void MDNSResponder::notifyAPChange() {
 }
 
 void MDNSResponder::_restart() {
-  if (_conn) {
-    _conn->unref();
-    _conn = nullptr;
-  }
+  _conn.stop(); 
   _listen();
 }
 
@@ -190,30 +184,18 @@ bool MDNSResponder::_listen() {
     #ifdef MDNS_DEBUG_RX
     Serial.println("MDNS listening");
     #endif
-    ip_addr_t multicast_addr;
-    multicast_addr.addr = (uint32_t) MDNS_MULTICAST_ADDR;
-
-    if (igmp_joingroup(IP_ADDR_ANY, &multicast_addr)!= ERR_OK) {
-      return false;
+     ip_addr_t if_addr;
+     IPAddress ifaddr = (uint32_t) IP_ADDR_ANY;
+       _conn.onRx(std::bind(&MDNSResponder::update, this));
+    if (!_conn.beginMulticast( IP_ADDR_ANY->addr, MDNS_MULTICAST_ADDR, MDNS_PORT )) 
+    {
+      return false; 
     }
-
-    _conn = new UdpContext;
-    _conn->ref();
-
-    if (!_conn->listen(*IP_ADDR_ANY, MDNS_PORT)) {
-      return false;
-    }
-    _conn->setMulticastTTL(MDNS_MULTICAST_TTL);
-    _conn->onRx(std::bind(&MDNSResponder::update, this));
-    _conn->connect(multicast_addr, MDNS_PORT);
   }
   return true;
 }
 
 void MDNSResponder::update() {
-  if (!_conn || !_conn->next()) {
-    return;
-  }
   _parsePacket();
 }
 
@@ -326,10 +308,12 @@ int MDNSResponder::queryService(char *service, char *proto) {
     if (!ip_info.ip.addr)
       continue;
     ifaddr.addr = ip_info.ip.addr;
-    _conn->setMulticastInterface(ifaddr);
+//    _conn.setMulticastInterface(ifaddr);
 
     // Write the header
-    _conn->flush();
+    _conn.flush();
+    _conn.beginPacketMulticast( MDNS_MULTICAST_ADDR , MDNS_PORT, IPAddress(ifaddr.addr), MDNS_MULTICAST_TTL );
+
     uint8_t head[12] = {
       0x00, 0x00, //ID = 0
       0x00, 0x00, //Flags = response + authoritative answer
@@ -338,25 +322,25 @@ int MDNSResponder::queryService(char *service, char *proto) {
       0x00, 0x00, //Name server records
       0x00, 0x00 //Additional records
     };
-    _conn->append(reinterpret_cast<const char*>(head), 12);
+   _conn.write(reinterpret_cast<const char*>(head), 12);
 
     // Only supports sending one PTR query
     // Send the Name field (eg. "_http._tcp.local")
-    _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_" + service
-    _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_" + service
-    _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_" + proto
-    _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_" + proto
-    _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght of "local"
-    _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
-    _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
+    _conn.write(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_" + service
+    _conn.write(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_" + service
+    _conn.write(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_" + proto
+    _conn.write(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_" + proto
+    _conn.write(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght of "local"
+    _conn.write(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+    _conn.write(reinterpret_cast<const char*>(&terminator), 1);              // terminator
 
     //Send the type and class
     uint8_t ptrAttrs[4] = {
       0x00, 0x0c, //PTR record query
       0x00, 0x01 //Class IN
     };
-    _conn->append(reinterpret_cast<const char*>(ptrAttrs), 4);
-    _conn->send();
+     _conn.write(reinterpret_cast<const char*>(ptrAttrs), 4);
+    _conn.endPacket();
   }
 
 #ifdef MDNS_DEBUG_TX
@@ -455,7 +439,7 @@ IPAddress MDNSResponder::_getRequestMulticastInterface(){
   bool match_ap = false;
   if (wifi_get_opmode() & SOFTAP_MODE) {
     struct ip_info remote_ip_info;
-    remote_ip_info.ip.addr = _conn->getRemoteAddress();
+    remote_ip_info.ip.addr = _conn.remoteIP();
     wifi_get_ip_info(SOFTAP_IF, &ip_info);
     if (ip_info.ip.addr && ip_addr_netcmp(&remote_ip_info.ip, &ip_info.ip, &ip_info.netmask))
       match_ap = true;
@@ -496,7 +480,7 @@ void MDNSResponder::_parsePacket(){
 #ifdef MDNS_DEBUG_RX
       Serial.println("Not expecting any answers right now, returning");
 #endif
-      _conn->flush();
+      _conn.flush();
       return;
     }
 
@@ -506,7 +490,7 @@ void MDNSResponder::_parsePacket(){
 #ifdef MDNS_DEBUG_RX
       Serial.printf("Expected a packet with 4 or more answers, got %u\n", numAnswers);
 #endif
-      _conn->flush();
+      _conn.flush();
       return;
     }
     
@@ -550,7 +534,7 @@ void MDNSResponder::_parsePacket(){
 #ifdef MDNS_DEBUG_RX
           Serial.println("failed to read the response name");
 #endif
-          _conn->flush();
+          _conn.flush();
           return;
         }
         _conn_readS(serviceName, tmp8);
@@ -583,12 +567,12 @@ void MDNSResponder::_parsePacket(){
 
       if(answerRdlength > 255){
         if(answerType == MDNS_TYPE_TXT && answerRdlength < 1460){
-          while(--answerRdlength) _conn->read();
+          while(--answerRdlength) _conn.read();
         } else {
 #ifdef MDNS_DEBUG_RX
         Serial.printf("Data len too long! %u\n", answerRdlength);
 #endif
-          _conn->flush();
+          _conn.flush();
           return;
         }
       }
@@ -699,12 +683,12 @@ void MDNSResponder::_parsePacket(){
         }
         answer->hostname = (char *)os_malloc(strlen(answerHostName) + 1);
         os_strcpy(answer->hostname, answerHostName);
-        _conn->flush();
+        _conn.flush();
         return;
       }
     }
     
-    _conn->flush();
+    _conn.flush();
     return;
   }
 
@@ -727,7 +711,7 @@ void MDNSResponder::_parsePacket(){
     Serial.printf("hostname: %s\n", _hostName.c_str() );
     Serial.printf("instance: %s\n", _instanceName.c_str() );
 #endif
-    _conn->flush();
+    _conn.flush();
     return;
   }
 
@@ -752,14 +736,14 @@ void MDNSResponder::_parsePacket(){
 #ifdef MDNS_DEBUG_ERR
         Serial.printf("ERR_FQDN: %s\n", serviceName);
 #endif
-        _conn->flush();
+        _conn.flush();
         return;
       }
     } else {
 #ifdef MDNS_DEBUG_ERR
       Serial.printf("ERR_SERVICE: %s\n", serviceName);
 #endif
-      _conn->flush();
+      _conn.flush();
       return;
     }
   }
@@ -773,7 +757,7 @@ void MDNSResponder::_parsePacket(){
       protoNameLen--;
       protoParsed = true;
     } else if(strcmp("services", serviceName) == 0 && strcmp("_dns-sd", protoName) == 0){
-      _conn->flush();
+      _conn.flush();
       IPAddress interface = _getRequestMulticastInterface();
       _replyToTypeEnumRequest(interface);
       return;
@@ -781,7 +765,7 @@ void MDNSResponder::_parsePacket(){
 #ifdef MDNS_DEBUG_ERR
       Serial.printf("ERR_PROTO: %s\n", protoName);
 #endif
-      _conn->flush();
+      _conn.flush();
       return;
     }
   }
@@ -798,7 +782,7 @@ void MDNSResponder::_parsePacket(){
 #ifdef MDNS_DEBUG_ERR
       Serial.printf("ERR_FQDN: %s\n", localName);
 #endif
-      _conn->flush();
+      _conn.flush();
       return;
     }
   }
@@ -809,14 +793,14 @@ void MDNSResponder::_parsePacket(){
 #ifdef MDNS_DEBUG_ERR
       Serial.printf("ERR_NO_SERVICE: %s\n", serviceName);
 #endif
-      _conn->flush();
+      _conn.flush();
       return;
     }
   } else if(serviceNameLen > 0 || protoNameLen > 0){
 #ifdef MDNS_DEBUG_ERR
     Serial.printf("ERR_SERVICE_PROTO: %s\n", serviceName);
 #endif
-    _conn->flush();
+    _conn.flush();
     return;
   }
 
@@ -844,7 +828,7 @@ void MDNSResponder::_parsePacket(){
 
     if(numQuestions > 0){
       if(_conn_read16() != 0xC00C){//new question but for another host/service
-        _conn->flush();
+        _conn.flush();
         numQuestions = 0;
       }
     }
@@ -942,7 +926,8 @@ void MDNSResponder::_replyToTypeEnumRequest(IPAddress multicastInterface) {
       char terminator[] = "\0";
 
       //Write the header
-      _conn->flush();
+      _conn.flush();
+      _conn.beginPacketMulticast( MDNS_MULTICAST_ADDR , MDNS_PORT, multicastInterface, MDNS_MULTICAST_TTL );
       uint8_t head[12] = {
         0x00, 0x00, //ID = 0
         0x84, 0x00, //Flags = response + authoritative answer
@@ -951,18 +936,18 @@ void MDNSResponder::_replyToTypeEnumRequest(IPAddress multicastInterface) {
         0x00, 0x00, //Name server records
         0x00, 0x00, //Additional records
       };
-      _conn->append(reinterpret_cast<const char*>(head), 12);
+      _conn.write(reinterpret_cast<const char*>(head), 12);
 
       // Send the Name field (ie. "_services._dns-sd._udp.local")
-      _conn->append(reinterpret_cast<const char*>(&sdHostNameLen), 1);         // length of "_services"
-      _conn->append(reinterpret_cast<const char*>(sdHostName), sdHostNameLen); // "_services"
-      _conn->append(reinterpret_cast<const char*>(&sdServiceNameLen), 1);      // length of "_dns-sd"
-      _conn->append(reinterpret_cast<const char*>(sdServiceName), sdServiceNameLen);// "_dns-sd"
-      _conn->append(reinterpret_cast<const char*>(&sdProtoNameLen), 1);        // length of "_udp"
-      _conn->append(reinterpret_cast<const char*>(sdProtoName), sdProtoNameLen); // "_udp"
-      _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
-      _conn->append(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
-      _conn->append(reinterpret_cast<const char*>(&terminator), 1);            // terminator
+      _conn.write(reinterpret_cast<const char*>(&sdHostNameLen), 1);         // length of "_services"
+      _conn.write(reinterpret_cast<const char*>(sdHostName), sdHostNameLen); // "_services"
+      _conn.write(reinterpret_cast<const char*>(&sdServiceNameLen), 1);      // length of "_dns-sd"
+      _conn.write(reinterpret_cast<const char*>(sdServiceName), sdServiceNameLen);// "_dns-sd"
+      _conn.write(reinterpret_cast<const char*>(&sdProtoNameLen), 1);        // length of "_udp"
+      _conn.write(reinterpret_cast<const char*>(sdProtoName), sdProtoNameLen); // "_udp"
+      _conn.write(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
+      _conn.write(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
+      _conn.write(reinterpret_cast<const char*>(&terminator), 1);            // terminator
 
       //Send the type, class, ttl and rdata length
       uint8_t ptrDataLen = serviceNameLen + protoNameLen + localNameLen + 4;   // 4 is three label sizes and the terminator
@@ -972,21 +957,21 @@ void MDNSResponder::_replyToTypeEnumRequest(IPAddress multicastInterface) {
         0x00, 0x00, 0x11, 0x94, //TTL 4500
         0x00, ptrDataLen,       //RData length
       };
-      _conn->append(reinterpret_cast<const char*>(ptrAttrs), 10);
+      _conn.write(reinterpret_cast<const char*>(ptrAttrs), 10);
 
       //Send the RData (ie. "_http._tcp.local")
-      _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
-      _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
-      _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
-      _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
-      _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
-      _conn->append(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
-      _conn->append(reinterpret_cast<const char*>(&terminator), 1);            // terminator
+      _conn.write(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
+      _conn.write(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
+      _conn.write(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
+      _conn.write(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
+      _conn.write(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
+      _conn.write(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
+      _conn.write(reinterpret_cast<const char*>(&terminator), 1);            // terminator
 
-      ip_addr_t ifaddr;
-      ifaddr.addr = multicastInterface;
-      _conn->setMulticastInterface(ifaddr);
-      _conn->send();
+      // ip_addr_t ifaddr;
+      // ifaddr.addr = multicastInterface;
+      // _conn.setMulticastInterface(ifaddr);
+      _conn.endPacket();
     }
   }
 }
@@ -1039,7 +1024,9 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
 
 
  //Write the header
-  _conn->flush();
+  _conn.flush();
+  _conn.beginPacketMulticast( MDNS_MULTICAST_ADDR , MDNS_PORT, multicastInterface, MDNS_MULTICAST_TTL );
+
   uint8_t head[12] = {
     0x00, 0x00, //ID = 0
     0x84, 0x00, //Flags = response + authoritative answer
@@ -1048,20 +1035,20 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
     0x00, 0x00, //Name server records
     0x00, additionalCount, //Additional records
   };
-  _conn->append(reinterpret_cast<const char*>(head), 12);
+  _conn.write(reinterpret_cast<const char*>(head), 12);
 
   for(int responseSection = 0; responseSection < 2; ++responseSection) {
 
     // PTR Response
     if((responseSection == 0 ? answerMask : additionalMask) & 0x8){
       // Send the Name field (ie. "_http._tcp.local")
-      _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
-      _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
-      _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
-      _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
-      _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
-      _conn->append(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
-      _conn->append(reinterpret_cast<const char*>(&terminator), 1);            // terminator
+      _conn.write(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
+      _conn.write(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
+      _conn.write(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
+      _conn.write(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
+      _conn.write(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
+      _conn.write(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
+      _conn.write(reinterpret_cast<const char*>(&terminator), 1);            // terminator
 
       //Send the type, class, ttl and rdata length
       uint8_t ptrDataLen = instanceNameLen + serviceNameLen + protoNameLen + localNameLen + 5; // 5 is four label sizes and the terminator
@@ -1071,32 +1058,32 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
         0x00, 0x00, 0x00, 0x78, //TTL 120
         0x00, ptrDataLen,       //RData length
       };
-      _conn->append(reinterpret_cast<const char*>(ptrAttrs), 10);
+      _conn.write(reinterpret_cast<const char*>(ptrAttrs), 10);
 
       //Send the RData (ie. "My IOT device._http._tcp.local")
-      _conn->append(reinterpret_cast<const char*>(&instanceNameLen), 1);       // length of "My IOT device"
-      _conn->append(reinterpret_cast<const char*>(instanceName.c_str()), instanceNameLen);// "My IOT device"
-      _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
-      _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
-      _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
-      _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
-      _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
-      _conn->append(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
-      _conn->append(reinterpret_cast<const char*>(&terminator), 1);            // terminator
+      _conn.write(reinterpret_cast<const char*>(&instanceNameLen), 1);       // length of "My IOT device"
+      _conn.write(reinterpret_cast<const char*>(instanceName.c_str()), instanceNameLen);// "My IOT device"
+      _conn.write(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
+      _conn.write(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
+      _conn.write(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
+      _conn.write(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
+      _conn.write(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
+      _conn.write(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
+      _conn.write(reinterpret_cast<const char*>(&terminator), 1);            // terminator
     }
 
     //TXT Responce
     if((responseSection == 0 ? answerMask : additionalMask) & 0x4){
       //Send the name field (ie. "My IOT device._http._tcp.local")
-      _conn->append(reinterpret_cast<const char*>(&instanceNameLen), 1);       // length of "My IOT device"
-      _conn->append(reinterpret_cast<const char*>(instanceName.c_str()), instanceNameLen);// "My IOT device"
-      _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
-      _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
-      _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
-      _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
-      _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
-      _conn->append(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
-      _conn->append(reinterpret_cast<const char*>(&terminator), 1);            // terminator
+      _conn.write(reinterpret_cast<const char*>(&instanceNameLen), 1);       // length of "My IOT device"
+      _conn.write(reinterpret_cast<const char*>(instanceName.c_str()), instanceNameLen);// "My IOT device"
+      _conn.write(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
+      _conn.write(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
+      _conn.write(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
+      _conn.write(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
+      _conn.write(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
+      _conn.write(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
+      _conn.write(reinterpret_cast<const char*>(&terminator), 1);            // terminator
 
       //Send the type, class, ttl and rdata length
       uint8_t txtDataLen = _getServiceTxtLen(service,proto);
@@ -1106,14 +1093,14 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
         0x00, 0x00, 0x11, 0x94, //TTL 4500
         0x00, txtDataLen,       //RData length
       };
-      _conn->append(reinterpret_cast<const char*>(txtAttrs), 10);
+      _conn.write(reinterpret_cast<const char*>(txtAttrs), 10);
 
       //Send the RData
       MDNSTxt * txtPtr = _getServiceTxt(service,proto);
       while(txtPtr !=0){
         uint8_t txtLen = txtPtr->_txt.length();
-        _conn->append(reinterpret_cast<const char*>(&txtLen), 1);                  // length of txt
-        _conn->append(reinterpret_cast<const char*>(txtPtr->_txt.c_str()), txtLen);// the txt
+        _conn.write(reinterpret_cast<const char*>(&txtLen), 1);                  // length of txt
+        _conn.write(reinterpret_cast<const char*>(txtPtr->_txt.c_str()), txtLen);// the txt
         txtPtr = txtPtr->_next;
       }
     }
@@ -1122,15 +1109,15 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
     //SRV Responce
     if((responseSection == 0 ? answerMask : additionalMask) & 0x2){
       //Send the name field (ie. "My IOT device._http._tcp.local")
-      _conn->append(reinterpret_cast<const char*>(&instanceNameLen), 1);       // length of "My IOT device"
-      _conn->append(reinterpret_cast<const char*>(instanceName.c_str()), instanceNameLen);// "My IOT device"
-      _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
-      _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
-      _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
-      _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
-      _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
-      _conn->append(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
-      _conn->append(reinterpret_cast<const char*>(&terminator), 1);            // terminator
+      _conn.write(reinterpret_cast<const char*>(&instanceNameLen), 1);       // length of "My IOT device"
+      _conn.write(reinterpret_cast<const char*>(instanceName.c_str()), instanceNameLen);// "My IOT device"
+      _conn.write(reinterpret_cast<const char*>(&serviceNameLen), 1);        // length of "_http"
+      _conn.write(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_http"
+      _conn.write(reinterpret_cast<const char*>(&protoNameLen), 1);          // length of "_tcp"
+      _conn.write(reinterpret_cast<const char*>(protoName), protoNameLen);   // "_tcp"
+      _conn.write(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
+      _conn.write(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
+      _conn.write(reinterpret_cast<const char*>(&terminator), 1);            // terminator
 
       //Send the type, class, ttl, rdata length, priority and weight
       uint8_t srvDataSize = hostNameLen + localNameLen + 3; // 3 is 2 lable size bytes and the terminator
@@ -1141,7 +1128,7 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
         0x00, 0x00, 0x00, 0x78, //TTL 120
         0x00, srvDataSize,      //RData length
       };
-      _conn->append(reinterpret_cast<const char*>(srvAttrs), 10);
+      _conn.write(reinterpret_cast<const char*>(srvAttrs), 10);
 
       //Send the RData Priority weight and port
       uint8_t srvRData[6] = {
@@ -1149,24 +1136,24 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
         0x00, 0x00,             //Weight 0
         (uint8_t)((port >> 8) & 0xFF), (uint8_t)(port & 0xFF)
       };
-      _conn->append(reinterpret_cast<const char*>(srvRData), 6);
+      _conn.write(reinterpret_cast<const char*>(srvRData), 6);
       //Send the RData (ie. "esp8266.local")
-      _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);           // length of "esp8266"
-      _conn->append(reinterpret_cast<const char*>(hostName.c_str()), hostNameLen);// "esp8266"
-      _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
-      _conn->append(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
-      _conn->append(reinterpret_cast<const char*>(&terminator), 1);            // terminator
+      _conn.write(reinterpret_cast<const char*>(&hostNameLen), 1);           // length of "esp8266"
+      _conn.write(reinterpret_cast<const char*>(hostName.c_str()), hostNameLen);// "esp8266"
+      _conn.write(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
+      _conn.write(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
+      _conn.write(reinterpret_cast<const char*>(&terminator), 1);            // terminator
 
     }
 
     // A Response
     if((responseSection == 0 ? answerMask : additionalMask) & 0x1){
       //Send the RData (ie. "esp8266.local")
-      _conn->append(reinterpret_cast<const char*>(&hostNameLen), 1);           // length of "esp8266"
-      _conn->append(reinterpret_cast<const char*>(hostName.c_str()), hostNameLen);// "esp8266"
-      _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
-      _conn->append(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
-      _conn->append(reinterpret_cast<const char*>(&terminator), 1);            // terminator
+      _conn.write(reinterpret_cast<const char*>(&hostNameLen), 1);           // length of "esp8266"
+      _conn.write(reinterpret_cast<const char*>(hostName.c_str()), hostNameLen);// "esp8266"
+      _conn.write(reinterpret_cast<const char*>(&localNameLen), 1);          // length "local"
+      _conn.write(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
+      _conn.write(reinterpret_cast<const char*>(&terminator), 1);            // terminator
 
       uint8_t aaaAttrs[10] = {
         0x00, 0x01,             //TYPE A
@@ -1174,7 +1161,7 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
         0x00, 0x00, 0x00, 0x78, //TTL 120
         0x00, 0x04,             //DATA LEN
       };
-      _conn->append(reinterpret_cast<const char*>(aaaAttrs), 10);
+      _conn.write(reinterpret_cast<const char*>(aaaAttrs), 10);
 
       // Send RData
       uint32_t ip = multicastInterface;
@@ -1184,14 +1171,11 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
         (uint8_t)((ip >> 16) & 0xFF), //IP third octet
         (uint8_t)((ip >> 24) & 0xFF)  //IP fourth octet
       };
-      _conn->append(reinterpret_cast<const char*>(aaaRData), 4);
+      _conn.write(reinterpret_cast<const char*>(aaaRData), 4);
     }
   }
 
-  ip_addr_t ifaddr;
-  ifaddr.addr = multicastInterface;
-  _conn->setMulticastInterface(ifaddr);
-  _conn->send();
+  _conn.endPacket();
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
