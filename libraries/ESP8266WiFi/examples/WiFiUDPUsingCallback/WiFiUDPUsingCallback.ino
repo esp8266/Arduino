@@ -5,8 +5,8 @@
 
 
 WiFiUDP udp;
-const char * ssid = "fyffest";
-const char * pass = "wellcometrust";
+const char * ssid = "ssid";
+const char * pass = "password";
 
 
 void setup() {
