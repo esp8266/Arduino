@@ -64,6 +64,7 @@ void WiFiServerSecure::setServerKeyAndCert_P(const uint8_t *key, int keyLen, con
 
 WiFiClientSecure WiFiServerSecure::available(uint8_t* status)
 {
+    (void) status;
     if (_unclaimed) {
         WiFiClientSecure result(_unclaimed, usePMEM, rsakey, rsakeyLen, cert, certLen);
         _unclaimed = _unclaimed->next();
