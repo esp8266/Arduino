@@ -75,6 +75,8 @@ public:
         if (_ssl_ctx_refcnt == 0) {
             ssl_ctx_free(_ssl_ctx);
         }
+
+        s_io_ctx.erase(_fd);
     }
 
     void ref()
