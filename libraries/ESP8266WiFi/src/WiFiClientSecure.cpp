@@ -61,7 +61,7 @@ public:
             _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
         }
         ++_ssl_ctx_refcnt;
-        _fd = ++_fdcounter;
+        _fd = 0; // 0 = no yet used
     }
 
     ~SSLContext()
@@ -76,7 +76,9 @@ public:
             ssl_ctx_free(_ssl_ctx);
         }
 
-        s_io_ctx.erase(_fd);
+	if (_fd) {
+	    s_io_ctx.erase(_fd);
+	}
     }
 
     void ref()
@@ -113,6 +115,7 @@ public:
     }
 
     void connectServer(ClientContext *ctx) {
+        _fd = ++_fdcounter;
         s_io_ctx[_fd] = ctx;
 	_ssl = ssl_server_new(_ssl_ctx, _fd);
         _isServer = true;
