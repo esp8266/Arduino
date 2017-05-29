@@ -98,6 +98,7 @@ public:
         SSL_EXTENSIONS* ext = ssl_ext_new();
         ssl_ext_set_host_name(ext, hostName);
         ssl_ext_set_max_fragment_size(ext, 4096);
+        _fd = ++_fdcounter;
         s_io_ctx[_fd] = ctx;
         if (_ssl) {
             ssl_free(_ssl);
