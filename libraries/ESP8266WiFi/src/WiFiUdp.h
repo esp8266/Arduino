@@ -33,6 +33,7 @@ class UdpContext;
 class WiFiUDP : public UDP, public SList<WiFiUDP> {
 private:
   UdpContext* _ctx;
+  enum { UNINIT, NORMAL, MULTICAST } _type{UNINIT}; 
 
 public:
 
@@ -49,6 +50,7 @@ public:
   virtual uint8_t begin(uint16_t port);	
   // Finish with the UDP connetion
   virtual void stop();
+  virtual bool restart(); 
   // join a multicast group and listen on the given port
   uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port); 
 
@@ -112,10 +114,16 @@ public:
 
   static void stopAll();
   static void stopAllExcept(WiFiUDP * exC);
+  static void restartAll(); 
 
 private:
   rx_callback_t _cb; 
   void _onRx(); 
+  uint8_t _begin(); 
+  IPAddress _ip{INADDR_NONE};
+  IPAddress _ifaddr{INADDR_NONE};  
+
+  uint16_t _port{0}; 
 
 };
 

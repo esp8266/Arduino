@@ -73,46 +73,55 @@ WiFiUDP::~WiFiUDP()
         _ctx->unref();
 }
 
-/* Start WiFiUDP socket, listening at local port */
-uint8_t WiFiUDP::begin(uint16_t port)
+/* Private Begin function, called internally to initiate or restart UDP instance */ 
+uint8_t WiFiUDP::_begin() 
 {
+    if (_type == UNINIT)
+    {
+        return 0; 
+    }
+
     if (_ctx) {
         _ctx->unref();
         _ctx = 0;
     }
 
+    if (_type == MULTICAST) {
+        ip_addr_t ifaddr;
+        ifaddr.addr = (uint32_t) _ifaddr;
+        ip_addr_t multicast_addr;
+        multicast_addr.addr = (uint32_t) _ip;           
+        if (igmp_joingroup(&ifaddr, &multicast_addr) != ERR_OK) {
+            return 0;
+        }
+    }
+
     _ctx = new UdpContext;
     _ctx->ref();
-    ip_addr_t addr;
-    addr.addr = INADDR_ANY;
     _ctx->onRx(std::bind(&WiFiUDP::_onRx, this));
-    return (_ctx->listen(addr, port)) ? 1 : 0;
+
+    if (!_ctx->listen(*IP_ADDR_ANY, _port)) {
+        return 0;
+    }
+
+    return 1; 
+}
+
+/* Start WiFiUDP socket, listening at local port */
+uint8_t WiFiUDP::begin(uint16_t port)
+{
+    _type = NORMAL; 
+    _port = port; 
+    return _begin(); 
 }
 
 uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port)
 {
-    if (_ctx) {
-        _ctx->unref();
-        _ctx = 0;
-    }
-
-    ip_addr_t ifaddr;
-    ifaddr.addr = (uint32_t) interfaceAddr;
-    ip_addr_t multicast_addr;
-    multicast_addr.addr = (uint32_t) multicast;
-
-    if (igmp_joingroup(&ifaddr, &multicast_addr)!= ERR_OK) {
-        return 0;
-    }
-
-    _ctx = new UdpContext;
-    _ctx->ref();
-    if (!_ctx->listen(*IP_ADDR_ANY, port)) {
-        return 0;
-    }
-    _ctx->onRx(std::bind(&WiFiUDP::_onRx, this));
-
-    return 1;
+    _type = MULTICAST; 
+    _ip = multicast;
+    _ifaddr = interfaceAddr; 
+    _port = port;
+    return _begin();
 }
 
 /* return number of bytes available in the current packet,
@@ -141,6 +150,11 @@ void WiFiUDP::stop()
         _ctx->unref();
     }
     _ctx = 0;
+}
+
+bool WiFiUDP::restart() 
+{
+    return _begin(); 
 }
 
 int WiFiUDP::beginPacket(const char *host, uint16_t port)
@@ -289,6 +303,14 @@ void WiFiUDP::stopAll()
     for (WiFiUDP* it = _s_first; it; it = it->_next) {
         DEBUGV("%s %08x %08x\n", __func__, (uint32_t) it, (uint32_t) _s_first);
         it->stop();
+    }
+}
+
+void WiFiUDP::restartAll()
+{
+    for (WiFiUDP* it = _s_first; it; it = it->_next) {
+        DEBUGV("%s %08x %08x\n", __func__, (uint32_t) it, (uint32_t) _s_first);
+        it->restart();
     }
 }
 
