@@ -24,7 +24,7 @@ def setup_echo_server(e):
             while len(data) < 1024 and retries < 3:
                 data += sock.recv(1024)
                 retries += 1
-            print 'Received {} bytes'.format(len(data))
+            print('Received {} bytes'.format(len(data)))
             if len(data) != 1024:
                 raise RuntimeError('client failed to receive response')
             count += 1
