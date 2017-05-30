@@ -1,24 +1,7 @@
-/**
+ /**
  * SSLCertificateVerification.ino
  *
- * Created on: 04.28.2017
- *
- * Copyright (c) 2017 Syed Salman Qadri. All rights reserved.
- * This file is part of the ESP8266HTTPClient for Arduino.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *  Created on: 04.28.2017
  *
  */
 
@@ -32,12 +15,12 @@ const char wifipsk[] = "Password";
 
 // This is a binary dump of the root CA.
 // You can also choose to load the cert via a file stream.
-// Here are the steps I did to dump the CA on my Mac:
+// Here are steps one can use to dump the CA:
 //   1) openssl s_client -connect google.com:443
 //        The output has a "Certificate chain" section. Your root CA is the bottom line.
 //        In the case of google.com, this line is
 //          "i:/C=US/O=Equifax/OU=Equifax Secure Certificate Authority"
-//        This means I need to validate with the Equifax Secure CA
+//        This means we need to validate with the Equifax Secure CA
 //   2) Open Keychain Access. In the Search bar type "Equifax" and press Enter.
 //   3) Right-click the cert and click Export and save it as a .cer.
 //   4) In the terminal, type xxd -i <path_to_cer_file>
