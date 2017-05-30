@@ -6,7 +6,7 @@
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=ESP8266 Modules
-version=2.3.0
+version=2.4.0
 
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
 runtime.tools.esptool.path={runtime.platform.path}/tools/esptool

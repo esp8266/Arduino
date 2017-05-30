@@ -426,6 +426,8 @@ void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback
 void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
 #endif
 
+static bool _dns_lookup_pending = false;
+
 /**
  * Resolve the given hostname to an IP address.
  * @param aHostname     Name to be resolved
@@ -433,7 +435,14 @@ void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *ca
  * @return 1 if aIPAddrString was successfully converted to an IP address,
  *          else error code
  */
-int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult) {
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
+{
+    return hostByName(aHostname, aResult, 10000);
+}
+
+
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
+{
     ip_addr_t addr;
     aResult = static_cast<uint32_t>(0);
 
@@ -448,7 +457,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     if(err == ERR_OK) {
         aResult = addr.addr;
     } else if(err == ERR_INPROGRESS) {
-        esp_yield();
+        _dns_lookup_pending = true;
+        delay(timeout_ms);
+        _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
         if(aResult != 0) {
             err = ERR_OK;
@@ -477,6 +488,9 @@ void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *ca
 #endif
 {
     (void) name;
+    if (!_dns_lookup_pending) {
+        return;
+    }
     if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
     }
