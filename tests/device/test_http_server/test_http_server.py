@@ -24,7 +24,7 @@ def http_test(res, url, get=None, post=None):
 @setup('HTTP GET Parameters')
 def setup_http_get_params(e):
     def testRun():
-        return http_test('var1 = val with spaces\nvar+ = some%', 'http://etd.local/get', {'var1' : 'val with spaces', 'var+' : 'some%'})
+        return http_test('var1 = val with spaces\nva=r+ = so&me%', 'http://etd.local/get', {'var1' : 'val with spaces', 'va=r+' : 'so&me%'})
     Thread(target=testRun).start()
 
 @teardown('HTTP GET Parameters')
@@ -44,7 +44,7 @@ def teardown_http_post_params(e):
 @setup('HTTP GET+POST Parameters')
 def setup_http_getpost_params(e):
     def testRun():
-        return http_test('var3 = val with spaces\nvar+ = some%', 'http://etd.local/get_and_post', {'var3' : 'val with spaces'}, {'var+' : 'some%'})
+        return http_test('var3 = val with spaces\nva&r+ = so=me%', 'http://etd.local/get_and_post', {'var3' : 'val with spaces'}, {'va&r+' : 'so=me%'})
     Thread(target=testRun).start()
 
 @teardown('HTTP GET+POST Parameters')

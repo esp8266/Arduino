@@ -45,7 +45,7 @@ TEST_CASE("HTTP GET Parameters", "[HTTPServer]")
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
             server.handleClient();
-        REQUIRE(siteHits > 0 && siteData.equals("var1 = val with spaces\nvar+ = some%"));
+        REQUIRE(siteHits > 0 && siteData.equals("var1 = val with spaces\nva=r+ = so&me%"));
     }
 }
 
@@ -87,7 +87,7 @@ TEST_CASE("HTTP GET+POST Parameters", "[HTTPServer]")
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
             server.handleClient();
-        REQUIRE(siteHits > 0 && siteData.equals("var3 = val with spaces\nvar+ = some%"));
+        REQUIRE(siteHits > 0 && siteData.equals("var3 = val with spaces\nva&r+ = so=me%"));
     }
 }
 
