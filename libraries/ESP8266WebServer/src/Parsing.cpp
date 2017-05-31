@@ -186,13 +186,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       	return false;
       }
       if (contentLength > 0) {
-        if (searchStr != "") searchStr += '&';
         if(isEncoded){
           //url encoded form
-          String decoded = urlDecode(plainBuf);
-          size_t decodedLen = decoded.length();
-          memcpy(plainBuf, decoded.c_str(), decodedLen);
-          plainBuf[decodedLen] = 0;
+          if (searchStr != "") searchStr += '&';
           searchStr += plainBuf;
         }
         _parseArguments(searchStr);
@@ -323,7 +319,7 @@ void ESP8266WebServer::_parseArguments(String data) {
       continue;
     }
     RequestArgument& arg = _currentArgs[iarg];
-    arg.key = data.substring(pos, equal_sign_index);
+    arg.key = urlDecode(data.substring(pos, equal_sign_index));
     arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
 #ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.print("arg ");
