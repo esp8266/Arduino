@@ -112,7 +112,7 @@ typedef struct {
 } interrupt_handler_t;
 
 static interrupt_handler_t interrupt_handlers[16];
-static uint32_t interrupt_reg = 0;
+uint32_t interrupt_reg = 0;
 
 void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
   (void) arg;
