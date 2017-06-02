@@ -233,7 +233,13 @@ Some functions provide more than just a binary status information. A good exampl
 
     Serial.printf("Connection status: %d\n", WiFi.status());
 
-This function returns following codes to describe what is going on with Wi-Fi connection: \* 0 : ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses \* 1 : ``WL_NO_SSID_AVAIL``\ in case configured SSID cannot be reached \* 3 : ``WL_CONNECTED`` after successful connection is established \* 4 : ``WL_CONNECT_FAILED`` if password is incorrect \* 6 : ``WL_DISCONNECTED`` if module is not configured in station mode
+This function returns following codes to describe what is going on with Wi-Fi connection: 
+
+* 0 : ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses 
+* 1 : ``WL_NO_SSID_AVAIL``\ in case configured SSID cannot be reached 
+* 3 : ``WL_CONNECTED`` after successful connection is established 
+* 4 : ``WL_CONNECT_FAILED`` if password is incorrect 
+* 6 : ``WL_DISCONNECTED`` if module is not configured in station mode
 
 It is a good practice to display and check information returned by functions. Application development and troubleshooting will be easier with that.
 
