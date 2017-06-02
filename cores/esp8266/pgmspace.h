@@ -99,18 +99,22 @@ int	vsnprintf_P(char *str, size_t strSize, PGM_P formatP, va_list ap) __attribut
       :"1"(addr) \
       :);
 
-static inline uint8_t pgm_read_byte(const void* addr) {
+static inline uint8_t pgm_read_byte_inlined(const void* addr) {
   register uint32_t res;
   pgm_read_with_offset(addr, res);
   return (uint8_t) res;     /* This masks the lower byte from the returned word */
 }
 
 /* Although this says "word", it's actually 16 bit, i.e. half word on Xtensa */
-static inline uint16_t pgm_read_word(const void* addr) {
+static inline uint16_t pgm_read_word_inlined(const void* addr) {
   register uint32_t res;
   pgm_read_with_offset(addr, res);
   return (uint16_t) res;    /* This masks the lower half-word from the returned word */
 }
+
+// Make sure, that libraries checking existence of this macro are not failing
+#define pgm_read_byte(addr) pgm_read_byte_inlined(addr)
+#define pgm_read_word(addr) pgm_read_word_inlined(addr)
 
 #else //__ets__
 #define pgm_read_byte(addr)     (*reinterpret_cast<const uint8_t*>(addr))
