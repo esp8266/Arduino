@@ -343,12 +343,11 @@ void SPIClass::write16(uint16_t data, bool msb) {
     if(msb) {
         // MSBFIRST Byte first
         SPI1W0 = (data >> 8) | (data << 8);
-        SPI1CMD |= SPIBUSY;
     } else {
         // LSBFIRST Byte first
         SPI1W0 = data;
-        SPI1CMD |= SPIBUSY;
     }
+    SPI1CMD |= SPIBUSY;
     while(SPI1CMD & SPIBUSY) {}
 }
 
@@ -367,14 +366,11 @@ void SPIClass::write32(uint32_t data, bool msb) {
         } data_;
         data_.l = data;
         // MSBFIRST Byte first
-        SPI1W0 = (data_.b[3] | (data_.b[2] << 8) | (data_.b[1] << 16) | (data_.b[0] << 24));
-        SPI1CMD |= SPIBUSY;
-    } else {
-        // LSBFIRST Byte first
-        SPI1W0 = data;
-        SPI1CMD |= SPIBUSY;
+        data = (data_.b[3] | (data_.b[2] << 8) | (data_.b[1] << 16) | (data_.b[0] << 24));
     }
-    while(SPI1CMD & SPIBUSY) {}	
+    SPI1W0 = data;
+    SPI1CMD |= SPIBUSY;
+    while(SPI1CMD & SPIBUSY) {}
 }
 
 /**
