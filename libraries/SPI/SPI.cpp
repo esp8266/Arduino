@@ -398,7 +398,7 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
     // Set Bits to transfer
     setDataBits(size * 8);
 
-    volatile uint32_t * fifoPtr = &SPI1W0;
+    uint32_t * fifoPtr = (uint32_t*)&SPI1W0;
     uint32_t * dataPtr = (uint32_t*) data;
     uint8_t dataSize = ((size + 3) / 4);
 
@@ -408,6 +408,7 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
         fifoPtr++;
     }
 
+    __sync_synchronize();
     SPI1CMD |= SPIBUSY;
     while(SPI1CMD & SPIBUSY) {}
 }
