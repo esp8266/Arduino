@@ -400,7 +400,7 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
 
     uint32_t * fifoPtr = (uint32_t*)&SPI1W0;
     uint32_t * dataPtr = (uint32_t*) data;
-    uint8_t dataSize = ((size + 3) / 4);
+    uint32_t dataSize = ((size + 3) / 4);
 
     while(dataSize--) {
         *fifoPtr = *dataPtr;
