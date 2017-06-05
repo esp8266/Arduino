@@ -40,6 +40,8 @@ extern "C"
 #include "include/ClientContext.h"
 #include "c_types.h"
 
+#include <map> // is it too much?
+
 #ifdef DEBUG_ESP_SSL
 #define DEBUG_SSL
 #endif
@@ -59,6 +61,7 @@ public:
             _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
         }
         ++_ssl_ctx_refcnt;
+        _fd = 0; // 0 = no yet used
     }
 
     ~SSLContext()
@@ -73,7 +76,9 @@ public:
             ssl_ctx_free(_ssl_ctx);
         }
 
-        s_io_ctx = nullptr;
+	if (_fd) {
+	    s_io_ctx.erase(_fd);
+	}
     }
 
     void ref()
@@ -93,11 +98,30 @@ public:
         SSL_EXTENSIONS* ext = ssl_ext_new();
         ssl_ext_set_host_name(ext, hostName);
         ssl_ext_set_max_fragment_size(ext, 4096);
-        s_io_ctx = ctx;
+        _fd = ++_fdcounter;
+        s_io_ctx[_fd] = ctx;
         if (_ssl) {
             ssl_free(_ssl);
         }
-        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, ext);
+        _ssl = ssl_client_new(_ssl_ctx, _fd, nullptr, 0, ext);
+        uint32_t t = millis();
+
+        while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
+            uint8_t* data;
+            int rc = ssl_read(_ssl, &data);
+            if (rc < SSL_OK) {
+                break;
+            }
+        }
+    }
+
+    void connectServer(ClientContext *ctx) {
+        _fd = ++_fdcounter;
+        s_io_ctx[_fd] = ctx;
+	_ssl = ssl_server_new(_ssl_ctx, _fd);
+        _isServer = true;
+
+	const uint32_t timeout_ms = 5000;
         uint32_t t = millis();
 
         while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
@@ -111,12 +135,12 @@ public:
 
     void stop()
     {
-        s_io_ctx = nullptr;
     }
 
     bool connected()
     {
-        return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
+        if (_isServer) return _ssl != nullptr;
+        else return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
     }
 
     int read(uint8_t* dst, size_t size)
@@ -220,8 +244,15 @@ public:
 
     static ClientContext* getIOContext(int fd)
     {
-        (void) fd;
-        return s_io_ctx;
+        return s_io_ctx[fd];
+    }
+
+    int loadServerX509Cert(const uint8_t *cert, int len) {
+        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_X509_CERT, cert, len, NULL);
+    }
+
+    int loadServerRSAKey(const uint8_t *rsakey, int len) {
+        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_RSA_KEY, rsakey, len, NULL);
     }
 
 protected:
@@ -248,18 +279,22 @@ protected:
         return _available;
     }
 
+    bool _isServer = false;
     static SSL_CTX* _ssl_ctx;
     static int _ssl_ctx_refcnt;
+    static int _fdcounter; // increased in constructor
+    int _fd; // axtls file descriptor
     SSL* _ssl = nullptr;
     int _refcnt = 0;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
-    static ClientContext* s_io_ctx;
+    static std::map<int, ClientContext*> s_io_ctx;
 };
 
 SSL_CTX* SSLContext::_ssl_ctx = nullptr;
 int SSLContext::_ssl_ctx_refcnt = 0;
-ClientContext* SSLContext::s_io_ctx = nullptr;
+int SSLContext::_fdcounter = 0;
+std::map<int, ClientContext*> SSLContext::s_io_ctx;
 
 WiFiClientSecure::WiFiClientSecure()
 {
@@ -289,6 +324,42 @@ WiFiClientSecure& WiFiClientSecure::operator=(const WiFiClientSecure& rhs)
         _ssl->ref();
     }
     return *this;
+}
+
+// Only called by the WifiServerSecure, need to get the keys/certs loaded before beginning
+WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM, const uint8_t *rsakey, int rsakeyLen, const uint8_t *cert, int certLen)
+{
+    _client = client;
+    if (_ssl) {
+        _ssl->unref();
+        _ssl = nullptr;
+    }
+
+    _ssl = new SSLContext;
+    _ssl->ref();
+
+    if (usePMEM) {
+        // When using PMEM based certs, allocate stack and copy from flash to DRAM, call SSL functions to avoid
+        // heap fragmentation that would happen w/malloc()
+        uint8_t *stackData = (uint8_t*)alloca(max(certLen, rsakeyLen));
+        if (rsakey && rsakeyLen) {
+              memcpy_P(stackData, rsakey, rsakeyLen);
+              _ssl->loadServerRSAKey(stackData, rsakeyLen);
+        }
+        if (cert && certLen) {
+            memcpy_P(stackData, cert, certLen);
+            _ssl->loadServerX509Cert(stackData, certLen);
+        }
+    } else {
+        if (rsakey && rsakeyLen) {
+            _ssl->loadServerRSAKey(rsakey, rsakeyLen);
+        }
+        if (cert && certLen) {
+            _ssl->loadServerX509Cert(cert, certLen);
+        }
+    }
+    _client->ref();
+    _ssl->connectServer(client);
 }
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port)
