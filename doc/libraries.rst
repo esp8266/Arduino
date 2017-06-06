@@ -27,7 +27,7 @@ This is a bit different from standard EEPROM class. You need to call ``EEPROM.be
 
 EEPROM library uses one sector of flash located just after the SPIFFS.
 
-Three examples included.
+`Three examples <https://github.com/esp8266/Arduino/tree/master/libraries/EEPROM>`__  included.
 
 I2C (Wire library)
 ------------------
