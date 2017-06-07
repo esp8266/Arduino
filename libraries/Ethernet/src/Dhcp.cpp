@@ -29,7 +29,7 @@ int DhcpClass::beginWithDHCP(uint8_t *mac, unsigned long timeout, unsigned long 
 
 void DhcpClass::reset_DHCP_lease(){
     // zero out _dhcpSubnetMask, _dhcpGatewayIp, _dhcpLocalIp, _dhcpDhcpServerIp, _dhcpDnsServerIp
-    memset(_dhcpLocalIp, 0, 20);
+    memset(_dhcpLocalIp, 0, 4);
 }
 
 //return:0 on error, 1 if request is sent and response is received
