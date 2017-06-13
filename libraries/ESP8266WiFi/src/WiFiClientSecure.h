@@ -36,6 +36,7 @@ public:
   WiFiClientSecure& operator=(const WiFiClientSecure&);
 
   int connect(IPAddress ip, uint16_t port) override;
+  int connect(const String host, uint16_t port) override;
   int connect(const char* name, uint16_t port) override;
 
   bool verify(const char* fingerprint, const char* domain_name);
