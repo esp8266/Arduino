@@ -40,6 +40,9 @@
 #include "osapi.h"
 #define EFAULT 14
 
+#undef ICACHE_FLASH_ATTR
+#define ICACHE_FLASH_ATTR
+
 //#define LWIP_PROVIDE_ERRNO
 
 #if (1)

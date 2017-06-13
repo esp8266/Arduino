@@ -31,6 +31,7 @@ public:
     }
 
     bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override {
+        (void) server;
         if (!canHandle(requestMethod, requestUri))
             return false;
 
@@ -39,6 +40,8 @@ public:
     }
 
     void upload(ESP8266WebServer& server, String requestUri, HTTPUpload& upload) override {
+        (void) server;
+        (void) upload;
         if (canUpload(requestUri))
             _ufn();
     }
@@ -118,6 +121,7 @@ public:
         else if (path.endsWith(".css")) return "text/css";
         else if (path.endsWith(".txt")) return "text/plain";
         else if (path.endsWith(".js")) return "application/javascript";
+        else if (path.endsWith(".json")) return "application/json";
         else if (path.endsWith(".png")) return "image/png";
         else if (path.endsWith(".gif")) return "image/gif";
         else if (path.endsWith(".jpg")) return "image/jpeg";

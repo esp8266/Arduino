@@ -124,6 +124,29 @@ public:
         }
     }
 
+    int connect(ip_addr_t* addr, uint16_t port)
+    {
+        err_t err = tcp_connect(_pcb, addr, port, reinterpret_cast<tcp_connected_fn>(&ClientContext::_s_connected));
+        if (err != ERR_OK) {
+            return 0;
+        }
+        _connect_pending = 1;
+        _op_start_time = millis();
+        // This delay will be interrupted by esp_schedule in the connect callback
+        delay(_timeout_ms);
+        _connect_pending = 0;
+        if (state() != ESTABLISHED) {
+            abort();
+            return 0;
+        }
+        return 1;
+    }
+
+    size_t availableForWrite()
+    {
+        return _pcb? tcp_sndbuf(_pcb): 0;
+    }
+
     void setNoDelay(bool nodelay)
     {
         if(!_pcb) {
@@ -144,14 +167,14 @@ public:
         return tcp_nagle_disabled(_pcb);
     }
 
-    void setNonBlocking(bool nonblocking)
+    void setTimeout(int timeout_ms) 
     {
-        _noblock = nonblocking;
+        _timeout_ms = timeout_ms;
     }
 
-    bool getNonBlocking()
+    int getTimeout()
     {
-        return _noblock;
+        return _timeout_ms;
     }
 
     uint32_t getRemoteAddress()
@@ -310,11 +333,14 @@ public:
 
 protected:
 
-    void _cancel_write()
+    bool _is_timeout()
     {
-        if (_datasource) {
-            delete _datasource;
-            _datasource = nullptr;
+        return millis() - _op_start_time > _timeout_ms;
+    }
+
+    void _notify_error()
+    {
+        if (_connect_pending || _send_waiting) {
             esp_schedule();
         }
     }
@@ -322,22 +348,35 @@ protected:
     size_t _write_from_source(DataSource* ds)
     {
         assert(_datasource == nullptr);
+        assert(_send_waiting == 0);
         _datasource = ds;
         _written = 0;
-        _write_some();
-        while (_datasource && !_noblock) {
-            _send_waiting = true;
+        _op_start_time = millis();
+        do {
+            if (_write_some()) {
+                _op_start_time = millis();
+            }
+
+            if (!_datasource->available() || _is_timeout() || state() == CLOSED) {
+                if (_is_timeout()) {
+                    DEBUGV(":wtmo\r\n");
+                }
+                delete _datasource;
+                _datasource = nullptr;
+                break;
+            }
+
+            ++_send_waiting;
             esp_yield();
-        }
-        _send_waiting = false;
+        } while(true);
+        _send_waiting = 0;
         return _written;
     }
 
-
-    void _write_some()
+    bool _write_some()
     {
         if (!_datasource || !_pcb) {
-            return;
+            return false;
         }
 
         size_t left = _datasource->available();
@@ -346,32 +385,46 @@ protected:
             can_send = 0;
         }
         size_t will_send = (can_send < left) ? can_send : left;
-        if (will_send) {
-            const uint8_t* buf = _datasource->get_buffer(will_send);
-            err_t err = tcp_write(_pcb, buf, will_send, TCP_WRITE_FLAG_COPY);
-            _datasource->release_buffer(buf, will_send);
-            if (err == ERR_OK) {
-                _written += will_send;
-                tcp_output(_pcb);
+        DEBUGV(":wr %d %d %d\r\n", will_send, left, _written);
+        bool need_output = false;
+        while( will_send && _datasource) {
+            size_t next_chunk =
+                will_send > _write_chunk_size ? _write_chunk_size : will_send;
+            const uint8_t* buf = _datasource->get_buffer(next_chunk);
+            if (state() == CLOSED) {
+                need_output = false;
+                break;
             }
+            err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
+            DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, err);
+            _datasource->release_buffer(buf, next_chunk);
+            if (err == ERR_OK) {
+                _written += next_chunk;
+                need_output = true;
+            } else {
+                break;
+            }
+            will_send -= next_chunk;
         }
-
-        if (!_datasource->available() || _noblock) {
-            delete _datasource;
-            _datasource = nullptr;
+        if( need_output ) {
+            tcp_output(_pcb);
+            return true;
         }
+        return false;
     }
 
     void _write_some_from_cb()
     {
-        _write_some();
-        if (!_datasource && _send_waiting) {
+        if (_send_waiting == 1) {
+            _send_waiting--;
             esp_schedule();
         }
     }
 
     err_t _sent(tcp_pcb* pcb, uint16_t len)
     {
+        (void) pcb;
+        (void) len;
         DEBUGV(":sent %d\r\n", len);
         _write_some_from_cb();
         return ERR_OK;
@@ -405,9 +458,11 @@ protected:
 
     recv_ret_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)
     {
+        (void) pcb;
+        (void) err;
         if(pb == 0) { // connection closed
             DEBUGV(":rcl\r\n");
-            _cancel_write();
+            _notify_error();
             abort();
             return ERR_ABRT;
         }
@@ -425,13 +480,23 @@ protected:
 
     void _error(err_t err)
     {
+        (void) err;
         DEBUGV(":er %d %08x\r\n", err, (uint32_t) _datasource);
         tcp_arg(_pcb, NULL);
         tcp_sent(_pcb, NULL);
         tcp_recv(_pcb, NULL);
         tcp_err(_pcb, NULL);
         _pcb = NULL;
-        _cancel_write();
+        _notify_error();
+    }
+
+    int8_t _connected(void* pcb, int8_t err)
+    {
+        (void) err;
+        assert(pcb == _pcb);
+        assert(_connect_pending);
+        esp_schedule();
+        return ERR_OK;
     }
 
     err_t _poll(tcp_pcb*)
@@ -460,6 +525,11 @@ protected:
         return reinterpret_cast<ClientContext*>(arg)->_sent(tpcb, len);
     }
 
+    static int8_t _s_connected(void* arg, void* pcb, int8_t err)
+    {
+        return reinterpret_cast<ClientContext*>(arg)->_connected(pcb, err);
+    }
+
 private:
     tcp_pcb* _pcb;
 
@@ -469,13 +539,16 @@ private:
     discard_cb_t _discard_cb;
     void* _discard_cb_arg;
 
-    int _refcnt;
-    ClientContext* _next;
-
     DataSource* _datasource = nullptr;
     size_t _written = 0;
-    bool _noblock = false;
-    bool _send_waiting = false;
+    size_t _write_chunk_size = 256;
+    uint32_t _timeout_ms = 5000;
+    uint32_t _op_start_time = 0;
+    uint8_t _send_waiting = 0;
+    uint8_t _connect_pending = 0;
+
+    int8_t _refcnt;
+    ClientContext* _next;
 };
 
 #endif//CLIENTCONTEXT_H

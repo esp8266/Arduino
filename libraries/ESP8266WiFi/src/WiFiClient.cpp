@@ -50,11 +50,14 @@ WiFiClient* SList<WiFiClient>::_s_first = 0;
 WiFiClient::WiFiClient()
 : _client(0)
 {
+    _timeout = 5000;
     WiFiClient::_add(this);
 }
 
-WiFiClient::WiFiClient(ClientContext* client) : _client(client)
+WiFiClient::WiFiClient(ClientContext* client)
+: _client(client)
 {
+    _timeout = 5000;
     _client->ref();
     WiFiClient::_add(this);
 }
@@ -69,6 +72,8 @@ WiFiClient::~WiFiClient()
 WiFiClient::WiFiClient(const WiFiClient& other)
 {
     _client = other._client;
+    _timeout = other._timeout;
+    _localPort = other._localPort;
     if (_client)
         _client->ref();
     WiFiClient::_add(this);
@@ -79,6 +84,8 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
    if (_client)
         _client->unref();
     _client = other._client;
+    _timeout = other._timeout;
+    _localPort = other._localPort;
     if (_client)
         _client->ref();
     return *this;
@@ -88,7 +95,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 int WiFiClient::connect(const char* host, uint16_t port)
 {
     IPAddress remote_addr;
-    if (WiFi.hostByName(host, remote_addr))
+    if (WiFi.hostByName(host, remote_addr, _timeout))
     {
         return connect(remote_addr, port);
     }
@@ -106,11 +113,13 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
     // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
+#if LWIP_VERSION_MAJOR == 1
     netif* interface = ip_route(&addr);
     if (!interface) {
         DEBUGV("no route to host\r\n");
         return 0;
     }
+#endif
 
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
@@ -120,34 +129,18 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
         pcb->local_port = _localPort++;
     }
 
-    tcp_arg(pcb, this);
-    tcp_err(pcb, &WiFiClient::_s_err);
-    tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
-
-    esp_yield();
-    if (_client)
-        return 1;
-
-    //  if tcp_error was called, pcb has already been destroyed.
-    // tcp_abort(pcb);
-    return 0;
-}
-
-int8_t WiFiClient::_connected(void* pcb, int8_t err)
-{
-    tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
-    _client = new ClientContext(tpcb, 0, 0);
+    _client = new ClientContext(pcb, nullptr, nullptr);
     _client->ref();
-    esp_schedule();
-    return ERR_OK;
-}
+    _client->setTimeout(_timeout);
+    int res = _client->connect(&addr, port);
+    if (res == 0) {
+        _client->unref();
+        _client = nullptr;
+        return 0;
+    }
 
-void WiFiClient::_err(int8_t err)
-{
-    DEBUGV(":err %d\r\n", err);
-    esp_schedule();
+    return 1;
 }
-
 
 void WiFiClient::setNoDelay(bool nodelay) {
     if (!_client)
@@ -161,6 +154,11 @@ bool WiFiClient::getNoDelay() {
     return _client->getNoDelay();
 }
 
+size_t WiFiClient::availableForWrite ()
+{
+    return _client->availableForWrite();
+}
+
 size_t WiFiClient::write(uint8_t b)
 {
     return write(&b, 1);
@@ -172,11 +170,13 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     {
         return 0;
     }
+    _client->setTimeout(_timeout);
     return _client->write(buf, size);
 }
 
 size_t WiFiClient::write(Stream& stream, size_t unused)
 {
+    (void) unused;
     return WiFiClient::write(stream);
 }
 
@@ -186,6 +186,7 @@ size_t WiFiClient::write(Stream& stream)
     {
         return 0;
     }
+    _client->setTimeout(_timeout);
     return _client->write(stream);
 }
 
@@ -195,6 +196,7 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
     {
         return 0;
     }
+    _client->setTimeout(_timeout);
     return _client->write_P(buf, size);
 }
 
@@ -319,16 +321,6 @@ uint16_t WiFiClient::localPort()
         return 0;
 
     return _client->getLocalPort();
-}
-
-int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
-{
-    return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);
-}
-
-void WiFiClient::_s_err(void* arg, int8_t err)
-{
-    reinterpret_cast<WiFiClient*>(arg)->_err(err);
 }
 
 void WiFiClient::stopAll()

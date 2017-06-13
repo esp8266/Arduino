@@ -45,12 +45,18 @@ static void uart1_write_char_d(char c);
 static void print_stack(uint32_t start, uint32_t end);
 //static void print_pcs(uint32_t start, uint32_t end);
 
+bool __attribute((weak)) crash_for_gdb = 0;
+
 extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) {
+    (void) rst_info;
+    (void) stack;
+    (void) stack_end;
 }
 
 extern void custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) __attribute__ ((weak, alias("__custom_crash_callback")));
 
 void __wrap_system_restart_local() {
+    if (crash_for_gdb) *((int*)0) = 0;
     register uint32_t sp asm("a1");
 
     struct rst_info rst_info = {0};
@@ -183,6 +189,7 @@ void abort(){
 }
 
 void __assert_func(const char *file, int line, const char *func, const char *what) {
+    (void) what;
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;

@@ -38,6 +38,7 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/err.h"
 #include "lwip/dns.h"
+#include "lwip/init.h" // LWIP_VERSION_
 }
 
 #include "WiFiClient.h"
@@ -153,6 +154,7 @@ WiFiEventHandler ESP8266WiFiGenericClass::onStationModeGotIP(std::function<void(
 WiFiEventHandler ESP8266WiFiGenericClass::onStationModeDHCPTimeout(std::function<void(void)> f)
 {
     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_DHCP_TIMEOUT, [f](System_Event_t* e){
+        (void) e;
         f();
     });
     sCbEventList.push_back(handler);
@@ -179,6 +181,19 @@ WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeStationDisconnected(std::f
         WiFiEventSoftAPModeStationDisconnected dst;
         memcpy(dst.mac, src.mac, 6);
         dst.aid = src.aid;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
+WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED, [f](System_Event_t* e){
+        auto& src = e->event_info.ap_probereqrecved;
+        WiFiEventSoftAPModeProbeRequestReceived dst;
+        memcpy(dst.mac, src.mac, 6);
+        dst.rssi = src.rssi;
         f(dst);
     });
     sCbEventList.push_back(handler);
@@ -405,7 +420,13 @@ bool ESP8266WiFiGenericClass::forceSleepWake() {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
+#if LWIP_VERSION_MAJOR == 1
 void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg);
+#else
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
+#endif
+
+static bool _dns_lookup_pending = false;
 
 /**
  * Resolve the given hostname to an IP address.
@@ -414,7 +435,14 @@ void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback
  * @return 1 if aIPAddrString was successfully converted to an IP address,
  *          else error code
  */
-int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult) {
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
+{
+    return hostByName(aHostname, aResult, 10000);
+}
+
+
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
+{
     ip_addr_t addr;
     aResult = static_cast<uint32_t>(0);
 
@@ -429,7 +457,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     if(err == ERR_OK) {
         aResult = addr.addr;
     } else if(err == ERR_INPROGRESS) {
-        esp_yield();
+        _dns_lookup_pending = true;
+        delay(timeout_ms);
+        _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
         if(aResult != 0) {
             err = ERR_OK;
@@ -451,7 +481,16 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg) {
+#if LWIP_VERSION_MAJOR == 1
+void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg)
+#else
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
+#endif
+{
+    (void) name;
+    if (!_dns_lookup_pending) {
+        return;
+    }
     if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
     }
