@@ -98,112 +98,16 @@ struct MDNSService {
   uint16_t _txtLen; // length of all txts 
 };
 
-MDNSTxt::MDNSTxt() :
-  _next(nullptr),
-  _txt()
-{}
+struct MDNSTxt{
+  MDNSTxt * _next;
+  String _txt;
+};
 
-MDNSTxt::~MDNSTxt(){
-  if(_next != nullptr){
-    delete _next;
-  }
-}
-
-MDNSAnswer::MDNSAnswer() :
-  txts(nullptr),
-  ip(), //NOTE: should value-initialize to 0
-  port(0),
-  hostname(nullptr)
-{}
-
-MDNSAnswer::~MDNSAnswer(){
-  if(txts != nullptr){
-    delete txts;
-  }
-  if(hostname != nullptr){
-    delete[] hostname;
-  }
-}
-
-String MDNSAnswer::getHostname(){
-  return hostname;
-}
-
-IPAddress MDNSAnswer::getIP(){
-  return IPAddress(ip);
-}
-
-uint16_t MDNSAnswer::getPort(){
-  return port;
-}
-
-int MDNSAnswer::numTxt(){
-  MDNSTxt *txt = txts;
-  int numTxt = 0;
-  while(txt != nullptr){
-    numTxt++;
-    txt = txt->_next;
-  }
-  return numTxt;
-}
-
-bool MDNSAnswer::hasTxt(const char * key){
-  MDNSTxt *txt = txts;
-  while(txt != nullptr){
-    if(txt->_txt.startsWith(String(key)+'=')){
-      return true;
-    }
-    txt = txt->_next;
-  }
-  return false;
-}
-
-String MDNSAnswer::getTxt(const char * key){
-  MDNSTxt *txt = txts;
-  String cmp = String(key)+'=';
-  while(txt != nullptr){
-    if(txt->_txt.startsWith(cmp)){
-      return txt->_txt.substring(cmp.length());
-    }
-    txt = txt->_next;
-  }
-  return String();
-}
-
-std::pair<String,String> MDNSAnswer::getTxt(int idx){
-  String tmp = getTxtString(idx);
-  int loc = tmp.indexOf('=');
-  if(loc == -1){
-    return std::make_pair(tmp,String());
-  }
-  else if(loc+1 == tmp.length()){ //the = is the last character
-    return std::make_pair(tmp.substring(0,loc),String());
-  }
-  else{
-    return std::make_pair(tmp.substring(0,loc),tmp.substring(loc+1));
-  }
-}
-
-String MDNSAnswer::getTxtString(int idx){
-  MDNSTxt *txt = txts;
-  while(txt != nullptr && idx-- > 0){
-    txt = txt->_next;
-  }
-  if(idx > 0 || txt==nullptr){
-    return String();
-  }
-  return txt->_txt;
-}
-
-struct MDNSAnswerList {
-  MDNSAnswerList() : next(nullptr), answer() {}
-  ~MDNSAnswerList(){
-    if(next != nullptr){
-      delete next;
-    }
-  }
-  MDNSAnswerList* next;
-  MDNSAnswer answer;
+struct MDNSAnswer {
+  MDNSAnswer* next;
+  uint8_t ip[4];
+  uint16_t port;
+  char *hostname;
 };
 
 struct MDNSQuery {
@@ -212,18 +116,14 @@ struct MDNSQuery {
 };
 
 
-MDNSResponder::MDNSResponder() :
-  _services(nullptr),
-  _conn(nullptr),
-  _hostName(),
-  _instanceName(), 
-  _answers(nullptr),
-  _query(nullptr),
-  _newQuery(false),
-  _waitingForAnswers(false),
-  _answerCallback()
-{}
-
+MDNSResponder::MDNSResponder() : _conn(0) { 
+  _services = 0;
+  _instanceName = ""; 
+  _answers = 0;
+  _query = 0;
+  _newQuery = false;
+  _waitingForAnswers = false;
+}
 MDNSResponder::~MDNSResponder() {
   if (_query != 0) {
     os_free(_query);
@@ -231,10 +131,15 @@ MDNSResponder::~MDNSResponder() {
   }
 
   // Clear answer list
-  if(_answers != nullptr){
-    delete _answers;
-    _answers = nullptr;
+  MDNSAnswer *answer;
+  int numAnswers = _getNumAnswers();
+  for (int n = numAnswers - 1; n >= 0; n--) {
+    answer = _getAnswerFromIdx(n);
+    os_free(answer->hostname);
+    os_free(answer);
+    answer = 0;
   }
+  _answers = 0;
 
   if (_conn) {
     _conn->unref();
@@ -441,10 +346,49 @@ int MDNSResponder::queryService(char *service, char *proto) {
   };
   _conn->append(reinterpret_cast<const char*>(ptrAttrs), 4);
   _waitingForAnswers = true;
-  if(!_conn->send()){
+  for (int itfn = 0; itfn < 2; itfn++) {
+    struct ip_info ip_info;
+    ip_addr_t ifaddr;
+
+    wifi_get_ip_info((!itfn) ? SOFTAP_IF : STATION_IF, &ip_info);
+    if (!ip_info.ip.addr)
+      continue;
+    ifaddr.addr = ip_info.ip.addr;
+    _conn->setMulticastInterface(ifaddr);
+
+    // Write the header
+    _conn->flush();
+    uint8_t head[12] = {
+      0x00, 0x00, //ID = 0
+      0x00, 0x00, //Flags = response + authoritative answer
+      0x00, questionCount, //Question count
+      0x00, 0x00, //Answer count
+      0x00, 0x00, //Name server records
+      0x00, 0x00 //Additional records
+    };
+    _conn->append(reinterpret_cast<const char*>(head), 12);
+
+    // Only supports sending one PTR query
+    // Send the Name field (eg. "_http._tcp.local")
+    _conn->append(reinterpret_cast<const char*>(&serviceNameLen), 1);          // lenght of "_" + service
+    _conn->append(reinterpret_cast<const char*>(serviceName), serviceNameLen); // "_" + service
+    _conn->append(reinterpret_cast<const char*>(&protoNameLen), 1);            // lenght of "_" + proto
+    _conn->append(reinterpret_cast<const char*>(protoName), protoNameLen);     // "_" + proto
+    _conn->append(reinterpret_cast<const char*>(&localNameLen), 1);            // lenght of "local"
+    _conn->append(reinterpret_cast<const char*>(localName), localNameLen);     // "local"
+    _conn->append(reinterpret_cast<const char*>(&terminator), 1);              // terminator
+
+    //Send the type and class
+    uint8_t ptrAttrs[4] = {
+      0x00, 0x0c, //PTR record query
+      0x00, 0x01 //Class IN
+    };
+    _conn->append(reinterpret_cast<const char*>(ptrAttrs), 4);
+    if(!_conn->send()){
 #ifdef MDNS_DEBUG_ERR
-    Serial.println("ERROR: Query send failed!");
+      Serial.println("ERROR: Query send failed!");
 #endif
+    }
   }
 
 #ifdef MDNS_DEBUG_TX
@@ -459,82 +403,42 @@ int MDNSResponder::queryService(char *service, char *proto) {
 
 String MDNSResponder::hostname(int idx) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == nullptr) {
+  if (answer == 0) {
     return String();
   }
-  return answer->getHostname();
+  return answer->hostname;
 }
 
 IPAddress MDNSResponder::IP(int idx) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == nullptr) {
+  if (answer == 0) {
     return IPAddress();
   }
-  return answer->getIP();
+  return IPAddress(answer->ip);
 }
 
 uint16_t MDNSResponder::port(int idx) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == nullptr) {
+  if (answer == 0) {
     return 0;
   }
   return answer->port;
 }
 
-int MDNSResponder::numTxt(int idx) {
-  MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == nullptr) {
-    return 0;
-  }
-  return answer->numTxt();
-}
-
-bool MDNSResponder::hasTxt(int idx, const char * key) {
-  MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == nullptr) {
-    return false;
-  }
-  return answer->hasTxt(key);
-}
-
-String MDNSResponder::txt(int idx, const char * key) {
-  MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == nullptr) {
-    return String();
-  }
-  return answer->getTxt(key);
-}
-
-String MDNSResponder::txt(int idx, int txtIdx) {
-  MDNSAnswer *answer = _getAnswerFromIdx(idx);
-  if (answer == nullptr) {
-    return String();
-  }
-  return answer->getTxtString(txtIdx);
-}
-
-MDNSAnswer* MDNSResponder::getAnswer(int idx) {
-  return _getAnswerFromIdx(idx);
-}
-
-void MDNSResponder::setAnswerCallback(std::function<void(MDNSAnswer*)> cb){
-  _answerCallback = cb;
-}
-
 MDNSAnswer* MDNSResponder::_getAnswerFromIdx(int idx) {
-  MDNSAnswerList *answer = _answers;
-  while (answer != nullptr && idx-- > 0) {
+  MDNSAnswer *answer = _answers;
+  while (answer != 0 && idx-- > 0) {
     answer = answer->next;
   }
-  if (idx > 0 || answer == nullptr) {
-    return nullptr;
+  if (idx > 0) {
+    return 0;
   }
-  return &answer->answer;
+  return answer;
 }
 
 int MDNSResponder::_getNumAnswers() {
   int numAnswers = 0;
-  MDNSAnswerList *answer = _answers;
+  MDNSAnswer *answer = _answers;
   while (answer != 0) {
     numAnswers++;
     answer = answer->next;
@@ -605,7 +509,7 @@ void MDNSResponder::_parsePacket(){
     Serial.printf("Reading answers RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
 #endif
 
-    if (!_waitingForAnswers && !_answerCallback) {
+    if (!_waitingForAnswers) {
 #ifdef MDNS_DEBUG_RX
       Serial.println("Not expecting any answers right now, returning");
 #endif
@@ -627,9 +531,8 @@ void MDNSResponder::_parsePacket(){
     uint16_t answerPort = 0;
     uint8_t answerIp[4] = { 0,0,0,0 };
     char answerHostName[255];
-    MDNSTxt * txtPtr = nullptr;
     bool serviceMatch = false;
-    MDNSAnswerList *answer;
+    MDNSAnswer *answer;
     uint8_t partsCollected = 0;
     uint8_t stringsRead = 0;
 
@@ -637,10 +540,14 @@ void MDNSResponder::_parsePacket(){
 
     // Clear answer list
     if (_newQuery) {
-      if(_answers != nullptr){
-        delete _answers;
-        _answers = nullptr;
+      int oldAnswers = _getNumAnswers();
+      for (int n = oldAnswers - 1; n >= 0; n--) {
+        answer = _getAnswerFromIdx(n);
+        os_free(answer->hostname);
+        os_free(answer);
+        answer = 0;
       }
+      _answers = 0;
       _newQuery = false;
     }
 
@@ -725,25 +632,14 @@ void MDNSResponder::_parsePacket(){
 
       else if (answerType == MDNS_TYPE_TXT) {
         partsCollected |= 0x02;
-        while(answerRdlength){
-          MDNSTxt *newtxt = new MDNSTxt;
-          uint16_t txtRdLength = _conn_read8();
-          answerRdlength--;
-          txtRdLength = (answerRdlength<txtRdLength)?answerRdlength:txtRdLength; //in case the packet is malformed
-          _conn_readS(hostName, txtRdLength); // Read rdata
-          hostName[txtRdLength] = '\0';
-          answerRdlength -= txtRdLength;
-          newtxt->_txt = String(hostName);
-          newtxt->_next = txtPtr;
-          txtPtr = newtxt;
+        _conn_readS(hostName, answerRdlength); // Read rdata
 #ifdef MDNS_DEBUG_RX
-          Serial.printf(" %d:", txtRdLength);
-          for (int n = 0; n < txtRdLength; n++) {
-            Serial.printf("%02x ", hostName[n]);
-          }
-          Serial.printf("\n%s\n", hostName);
-#endif
+        Serial.printf("TXT %d ", answerRdlength);
+        for (int n = 0; n < answerRdlength; n++) {
+          Serial.printf("%c", hostName[n]);
         }
+        Serial.println();
+#endif
       }
 
       else if (answerType == MDNS_TYPE_SRV) {
@@ -794,42 +690,32 @@ void MDNSResponder::_parsePacket(){
       }
 
       if ((partsCollected == 0x0F) && serviceMatch) {
-        if(_waitingForAnswers){
 #ifdef MDNS_DEBUG_RX
-          Serial.println("All answers parsed, adding to _answers list..");
+        Serial.println("All answers parsed, adding to _answers list..");
 #endif
-          // Add new answer to answer list
-          if (_answers == nullptr) {
-            _answers = new MDNSAnswerList();
-            answer = _answers;
-          }
-          else {
-            answer = _answers;
-            while (answer->next != nullptr) {
-              answer = answer->next;
-            }
-            answer->next = new MDNSAnswerList();
+        // Add new answer to answer list
+        if (_answers == 0) {
+          _answers = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
+          answer = _answers;
+        }
+        else {
+          answer = _answers;
+          while (answer->next != 0) {
             answer = answer->next;
           }
+          answer->next = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
+          answer = answer->next;
         }
-        else{ //must want an answerCallback
-          answer = new MDNSAnswerList();
-        }
+        answer->next = 0;
+        answer->hostname = 0;
 
         // Populate new answer
-        answer->answer.txts = txtPtr;
-        answer->answer.port = answerPort;
+        answer->port = answerPort;
         for (int i = 0; i < 4; i++) {
-          answer->answer.ip[i] = answerIp[i];
+          answer->ip[i] = answerIp[i];
         }
-        answer->answer.hostname = new char [strlen(answerHostName) + 1];
-        os_strcpy(answer->answer.hostname, answerHostName);
-        if(!_waitingForAnswers){
-          if(_answerCallback){ //double-check just to be sure, but this should be OK
-            _answerCallback(&answer->answer);
-          }
-          delete answer;
-        }
+        answer->hostname = (char *)os_malloc(strlen(answerHostName) + 1);
+        os_strcpy(answer->hostname, answerHostName);
         _conn->flush();
         return;
       }
@@ -1247,11 +1133,7 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
   ip_addr_t ifaddr;
   ifaddr.addr = ip;
   _conn->setMulticastInterface(ifaddr);
-  if(!_conn->send()){
-#ifdef MDNS_DEBUG_ERR
-    Serial.println("ERROR: Reply send failed!");
-#endif
-  }
+  _conn->send();
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
