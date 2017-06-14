@@ -98,9 +98,7 @@ int File::read(void *buf, uint16_t nbyte) {
 int File::available() {
   if (! _file) return 0;
 
-  uint32_t n = size() - position();
-
-  return n > 0X7FFF ? 0X7FFF : n;
+  return size() - position();
 }
 
 void File::flush() {

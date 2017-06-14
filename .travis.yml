@@ -1,50 +1,29 @@
 sudo: false
 language: bash
-os:
-  - linux
+os: linux
+dist: trusty
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
+env:
+  - BUILD_TYPE=build
+
+install:
+  - pip install --user -r doc/requirements.txt
 
 script:
-  - set -e
-  - export CXX="g++-4.8" CC="gcc-4.8" GCOV="gcov-4.8"
-  - echo -e "travis_fold:start:host_tests"
-  - pushd $TRAVIS_BUILD_DIR/tests/host
-  - make
-  - make clean-objects
-  - echo -e "travis_fold:end:host_tests"
-  - echo -e "travis_fold:start:sketch_test_env_prepare"
-  - popd
-  - wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
-  - tar xf arduino.tar.xz
-  - mv arduino-nightly $HOME/arduino_ide
-  - cd $HOME/arduino_ide/hardware
-  - mkdir esp8266com
-  - cd esp8266com
-  - ln -s $TRAVIS_BUILD_DIR esp8266
-  - cd esp8266/tools
-  - python get.py
-  - export PATH="$HOME/arduino_ide:$TRAVIS_BUILD_DIR/tools/xtensa-lx106-elf/bin:$PATH"
-  - which arduino
-  - cd $TRAVIS_BUILD_DIR
-  - source tests/common.sh
-  - install_libraries
-  - echo -e "travis_fold:end:sketch_test_env_prepare"
-  - echo -e "travis_fold:start:sketch_test"
-  - build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries"
-  - echo -e "travis_fold:end:sketch_test"
-  - echo -e "travis_fold:start:size_report"
-  - cat size.log
-  - echo -e "travis_fold:end:size_report"
+  - $TRAVIS_BUILD_DIR/tests/common.sh
 
-after_success:
-    - pushd $TRAVIS_BUILD_DIR/tests/host
-    - bash <(curl -s https://codecov.io/bash) -X gcov
+deploy:
+  provider: releases
+  prerelease: true
+  api_key:
+    secure: A4FBmqyhlzy33oPeZVolg2Q/A3ZcJ3WnRQqQJ3NAPy+qGM5xcboOYtwcLL9vKaHZGfUB7lUP9QVZFGou1Wrmo9DnPvAoe3+XvCaDRGzVMxeIpu7UStbBD4Knbh98tlbMvZCXYRlT4VcusI9bMLK6UWw4sMdPislBh2FEfglTiag=
+  file_glob: true
+  file:
+    - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
+    - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
+  on:
+    repo: esp8266/Arduino
+    tags: true
 
 notifications:
   email:
