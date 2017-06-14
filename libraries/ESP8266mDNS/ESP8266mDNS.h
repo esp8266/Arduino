@@ -74,8 +74,8 @@ public:
   IPAddress getIP();
   uint16_t getPort();
   int numTxt();
-  bool hasTxt(char * key);
-  String getTxt(char * key);
+  bool hasTxt(const char * key);
+  String getTxt(const char * key);
   std::pair<String,String> getTxt(int idx);
   String getTxtString(int idx);
 
@@ -129,8 +129,8 @@ public:
   IPAddress IP(int idx);
   uint16_t port(int idx);
   int numTxt(int idx);
-  bool hasTxt(int idx, char * key);
-  String txt(int idx, char * key);
+  bool hasTxt(int idx, const char * key);
+  String txt(int idx, const char * key);
   String txt(int idx, int txtIdx);
   MDNSAnswer* getAnswer(int idx);
 

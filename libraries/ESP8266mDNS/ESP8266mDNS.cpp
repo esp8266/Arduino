@@ -111,7 +111,7 @@ MDNSTxt::~MDNSTxt(){
 
 MDNSAnswer::MDNSAnswer() :
   txts(nullptr),
-  ip({0,0,0,0}),
+  ip(), //NOTE: should value-initialize to 0
   port(0),
   hostname(nullptr)
 {}
@@ -147,7 +147,7 @@ int MDNSAnswer::numTxt(){
   return numTxt;
 }
 
-bool MDNSAnswer::hasTxt(char * key){
+bool MDNSAnswer::hasTxt(const char * key){
   MDNSTxt *txt = txts;
   while(txt != nullptr){
     if(txt->_txt.startsWith(String(key)+'=')){
@@ -158,7 +158,7 @@ bool MDNSAnswer::hasTxt(char * key){
   return false;
 }
 
-String MDNSAnswer::getTxt(char * key){
+String MDNSAnswer::getTxt(const char * key){
   MDNSTxt *txt = txts;
   String cmp = String(key)+'=';
   while(txt != nullptr){
@@ -441,7 +441,11 @@ int MDNSResponder::queryService(char *service, char *proto) {
   };
   _conn->append(reinterpret_cast<const char*>(ptrAttrs), 4);
   _waitingForAnswers = true;
-  _conn->send();
+  if(!_conn->send()){
+#ifdef MDNS_DEBUG_ERR
+    Serial.println("ERROR: Query send failed!");
+#endif
+  }
 
 #ifdef MDNS_DEBUG_TX
   Serial.println("Waiting for answers..");
@@ -485,7 +489,7 @@ int MDNSResponder::numTxt(int idx) {
   return answer->numTxt();
 }
 
-bool MDNSResponder::hasTxt(int idx, char * key) {
+bool MDNSResponder::hasTxt(int idx, const char * key) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
   if (answer == nullptr) {
     return false;
@@ -493,7 +497,7 @@ bool MDNSResponder::hasTxt(int idx, char * key) {
   return answer->hasTxt(key);
 }
 
-String MDNSResponder::txt(int idx, char * key) {
+String MDNSResponder::txt(int idx, const char * key) {
   MDNSAnswer *answer = _getAnswerFromIdx(idx);
   if (answer == nullptr) {
     return String();
@@ -506,7 +510,7 @@ String MDNSResponder::txt(int idx, int txtIdx) {
   if (answer == nullptr) {
     return String();
   }
-  answer->getTxtString(txtIdx);
+  return answer->getTxtString(txtIdx);
 }
 
 MDNSAnswer* MDNSResponder::getAnswer(int idx) {
@@ -1243,7 +1247,11 @@ void MDNSResponder::_reply(uint8_t replyMask, char * service, char *proto, uint1
   ip_addr_t ifaddr;
   ifaddr.addr = ip;
   _conn->setMulticastInterface(ifaddr);
-  _conn->send();
+  if(!_conn->send()){
+#ifdef MDNS_DEBUG_ERR
+    Serial.println("ERROR: Reply send failed!");
+#endif
+  }
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
