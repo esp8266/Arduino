@@ -127,7 +127,7 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert,
 #endif
 #ifdef CONFIG_SSL_FULL_MODE
 void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx);
-const char * x509_display_error(int error);
+const char * x509_display_error(int error, char *buff);
 #endif
 
 /**************************************************************************

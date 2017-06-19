@@ -68,10 +68,6 @@ extern "C" {
 #undef putc
 #endif
 #define putc(x, f)   ets_putc(x)
-#ifdef printf
-#undef printf
-#endif
-#define printf(...)  ets_printf(__VA_ARGS__)
 
 #define SOCKET_READ(A,B,C)      ax_port_read(A,B,C)
 #define SOCKET_WRITE(A,B,C)     ax_port_write(A,B,C)
@@ -122,6 +118,27 @@ static inline uint8_t pgm_read_byte(const void* addr) {
 
 #define ax_array_read_u8(x, y) pgm_read_byte((x)+(y))
 #endif //WITH_PGM_READ_HELPER
+
+#ifdef printf
+#undef printf
+#endif
+//#define printf(...)  ets_printf(__VA_ARGS__)
+#define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
+#define PGM_VOID_P const void *
+static inline void* memcpy_P(void* dest, PGM_VOID_P src, size_t count) {
+    const uint8_t* read = (const uint8_t*)(src);
+    uint8_t* write = (uint8_t*)(dest);
+
+    while (count)
+    {
+        *write++ = pgm_read_byte(read++);
+        count--;
+    }
+
+    return dest;
+}
+#define printf(fmt, ...) do { static const char fstr[] PROGMEM = fmt; char rstr[sizeof(fmt)]; memcpy_P(rstr, fstr, sizeof(rstr)); ets_printf(rstr, ##__VA_ARGS__); } while (0)
+#define strcpy_P(dst, src) do { static const char fstr[] PROGMEM = src; memcpy_P(dst, fstr, sizeof(src)); } while (0)
 
 #elif defined(WIN32)
 

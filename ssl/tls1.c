@@ -2287,58 +2287,57 @@ void DISPLAY_STATE(SSL *ssl, int is_send, uint8_t state, int not_ok)
     if (!IS_SET_SSL_FLAG(SSL_DISPLAY_STATES))
         return;
 
-    printf(not_ok ? "Error - invalid State:\t" : "State:\t");
-    printf(is_send ? "sending " : "receiving ");
+    if (not_ok) printf("Error - invalid State:\t");
+    else printf("State:\t");
+    if (is_send) printf("sending ");
+    else printf("receiving ");
 
     switch (state)
     {
         case HS_HELLO_REQUEST:
-            str = "Hello Request (0)";
+            printf("Hello Request (0)\n");
             break;
 
         case HS_CLIENT_HELLO:
-            str = "Client Hello (1)";
+            printf("Client Hello (1)\n");
             break;
 
         case HS_SERVER_HELLO:
-            str = "Server Hello (2)";
+            printf("Server Hello (2)\n");
             break;
 
         case HS_CERTIFICATE:
-            str = "Certificate (11)";
+            printf("Certificate (11)\n");
             break;
 
         case HS_SERVER_KEY_XCHG:
-            str = "Certificate Request (12)";
+            printf("Certificate Request (12)\n");
             break;
 
         case HS_CERT_REQ:
-            str = "Certificate Request (13)";
+            printf("Certificate Request (13)\n");
             break;
 
         case HS_SERVER_HELLO_DONE:
-            str = "Server Hello Done (14)";
+            printf("Server Hello Done (14)\n");
             break;
 
         case HS_CERT_VERIFY:
-            str = "Certificate Verify (15)";
+            printf("Certificate Verify (15)\n");
             break;
 
         case HS_CLIENT_KEY_XCHG:
-            str = "Client Key Exchange (16)";
+            printf("Client Key Exchange (16)\n");
             break;
 
         case HS_FINISHED:
-            str = "Finished (16)";
+            printf("Finished (16)\n");
             break;
 
         default:
-            str = "Error (Unknown)";
-            
+            printf("Error (Unknown)\n");
             break;
     }
-
-    printf("%s\n", str);
 }
 
 /**
@@ -2383,7 +2382,8 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code)
     /* X509 error? */
     if (error_code < SSL_X509_OFFSET)
     {
-        printf("%s\n", x509_display_error(error_code - SSL_X509_OFFSET));
+        char buff[64];
+        printf("%s\n", x509_display_error(error_code - SSL_X509_OFFSET, buff));
         return;
     }
 

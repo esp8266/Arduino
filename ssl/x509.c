@@ -225,8 +225,9 @@ end_cert:
     if (ret)
     {
 #ifdef CONFIG_SSL_FULL_MODE
+        char buff[64];
         printf("Error: Invalid X509 ASN.1 file (%s)\n",
-                        x509_display_error(ret));
+                        x509_display_error(ret, buff));
 #endif
         x509_free(x509_ctx);
         *ctx = NULL;
@@ -821,9 +822,10 @@ void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx)
     if (ca_cert_ctx)
     {
         int pathLenConstraint = 0;
+        char buff[64];
         printf("Verify:\t\t\t\t%s\n",
                 x509_display_error(x509_verify(ca_cert_ctx, cert,
-                        &pathLenConstraint)));
+                        &pathLenConstraint), buff));
     }
 
 #if 0
@@ -840,45 +842,57 @@ void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx)
     TTY_FLUSH();
 }
 
-const char * x509_display_error(int error)
+const char * x509_display_error(int error, char *buff)
 {
     switch (error)
     {
         case X509_OK:
-            return "Certificate verify successful";
+            strcpy_P(buff, "Certificate verify successful");
+            return buff;
 
         case X509_NOT_OK:
-            return "X509 not ok";
+            strcpy_P(buff, "X509 not ok");
+            return buff;
 
         case X509_VFY_ERROR_NO_TRUSTED_CERT:
-            return "No trusted cert is available";
+            strcpy_P(buff, "No trusted cert is available");
+            return buff;
 
         case X509_VFY_ERROR_BAD_SIGNATURE:
-            return "Bad signature";
+            strcpy_P(buff, "Bad signature");
+            return buff;
 
         case X509_VFY_ERROR_NOT_YET_VALID:
-            return "Cert is not yet valid";
+            strcpy_P(buff, "Cert is not yet valid");
+            return buff;
 
         case X509_VFY_ERROR_EXPIRED:
-            return "Cert has expired";
+            strcpy_P(buff, "Cert has expired");
+            return buff;
 
         case X509_VFY_ERROR_SELF_SIGNED:
-            return "Cert is self-signed";
+            strcpy_P(buff, "Cert is self-signed");
+            return buff;
 
         case X509_VFY_ERROR_INVALID_CHAIN:
-            return "Chain is invalid (check order of certs)";
+            strcpy_P(buff, "Chain is invalid (check order of certs)");
+            return buff;
 
         case X509_VFY_ERROR_UNSUPPORTED_DIGEST:
-            return "Unsupported digest";
+            strcpy_P(buff, "Unsupported digest");
+            return buff;
 
         case X509_INVALID_PRIV_KEY:
-            return "Invalid private key";
+            strcpy_P(buff, "Invalid private key");
+            return buff;
 
         case X509_VFY_ERROR_BASIC_CONSTRAINT:
-            return "Basic constraint invalid";
+            strcpy_P(buff, "Basic constraint invalid");
+            return buff;
 
         default:
-            return "Unknown";
+            strcpy_P(buff, "Unknown");
+            return buff;
     }
 }
 #endif      /* CONFIG_SSL_FULL_MODE */
