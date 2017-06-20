@@ -38,6 +38,10 @@ generic.menu.CpuFrequency.80.build.f_cpu=80000000L
 generic.menu.CpuFrequency.160=160 MHz
 generic.menu.CpuFrequency.160.build.f_cpu=160000000L
 
+generic.menu.CrystalFreq.26=26 MHz
+generic.menu.CrystalFreq.40=40 MHz
+generic.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000
+
 generic.menu.FlashFreq.40=40MHz
 generic.menu.FlashFreq.40.build.flash_freq=40
 generic.menu.FlashFreq.80=80MHz
