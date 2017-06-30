@@ -22,6 +22,7 @@
 #include "pins_arduino.h"
 #include "wiring_private.h"
 
+unsigned int preferred_si2c_clock = 100000;
 unsigned char twi_dcount = 18;
 static unsigned char twi_sda, twi_scl;
 static uint32_t twi_clockStretchLimit;
@@ -44,6 +45,7 @@ static uint32_t twi_clockStretchLimit;
 #endif
 
 void twi_setClock(unsigned int freq){
+  preferred_si2c_clock = freq;
 #if F_CPU == FCPU80
   if(freq <= 100000) twi_dcount = 19;//about 100KHz
   else if(freq <= 200000) twi_dcount = 8;//about 200KHz
@@ -70,7 +72,7 @@ void twi_init(unsigned char sda, unsigned char scl){
   twi_scl = scl;
   pinMode(twi_sda, INPUT_PULLUP);
   pinMode(twi_scl, INPUT_PULLUP);
-  twi_setClock(100000);
+  twi_setClock(preferred_si2c_clock);
   twi_setClockStretchLimit(230); // default value is 230 uS
 }
 
