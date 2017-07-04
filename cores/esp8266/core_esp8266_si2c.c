@@ -45,13 +45,15 @@ static uint32_t twi_clockStretchLimit;
 
 void twi_setClock(unsigned int freq){
 #if F_CPU == FCPU80
-  if(freq <= 100000) twi_dcount = 19;//about 100KHz
+  if(freq <= 50000) twi_dcount = 38;//about 50KHz
+  else if(freq <= 100000) twi_dcount = 19;//about 100KHz
   else if(freq <= 200000) twi_dcount = 8;//about 200KHz
   else if(freq <= 300000) twi_dcount = 3;//about 300KHz
   else if(freq <= 400000) twi_dcount = 1;//about 400KHz
   else twi_dcount = 1;//about 400KHz
 #else
-  if(freq <= 100000) twi_dcount = 32;//about 100KHz
+  if(freq <= 50000) twi_dcount = 64;//about 50KHz
+  else if(freq <= 100000) twi_dcount = 32;//about 100KHz
   else if(freq <= 200000) twi_dcount = 14;//about 200KHz
   else if(freq <= 300000) twi_dcount = 8;//about 300KHz
   else if(freq <= 400000) twi_dcount = 5;//about 400KHz
