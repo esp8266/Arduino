@@ -1,9 +1,16 @@
 #ifndef ESP8266UPDATER_H
 #define ESP8266UPDATER_H
 
+#define VERIFY_SIGNATURE 1
+
 #include <Arduino.h>
 #include <flash_utils.h>
 #include <MD5Builder.h>
+
+#ifdef VERIFY_SIGNATURE
+#include <ssl/crypto_misc.h>
+#include <crypto/crypto.h>
+#endif
 
 #define UPDATE_ERROR_OK                 (0)
 #define UPDATE_ERROR_WRITE              (1)
@@ -141,6 +148,10 @@ class UpdaterClass {
       return written;
     }
 
+#ifdef VERIFY_SIGNATURE
+    int addCA(const uint8_t *cert, int *len);
+#endif
+
   private:
     void _reset();
     bool _writeBuffer();
@@ -148,12 +159,30 @@ class UpdaterClass {
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
 
+#ifdef VERIFY_SIGNATURE
+    CA_CERT_CTX *_ca_ctx;
+    bool _loadCertificate(X509_CTX **ctx);
+    bool _verifyCertificate(X509_CTX **ctx);
+    bool _decryptSignature(X509_CTX **ctx, char **hash);
+    bool _decryptMD5();
+
+    uint32_t _certificateStartAddress;
+    uint32_t _certificateLen;
+    uint32_t _signatureStartAddress;
+    uint32_t _signatureLen;
+#endif
+
     bool _async;
     uint8_t _error;
     uint8_t *_buffer;
+<<<<<<< HEAD
     size_t _bufferLen; // amount of data written into _buffer
     size_t _bufferSize; // total size of _buffer
     size_t _size;
+=======
+    uint32_t _bufferLen;
+    uint32_t _size;
+>>>>>>> 74a9b900b470a55e9ae6a330a17fda58925f9367
     uint32_t _startAddress;
     uint32_t _currentAddress;
     uint32_t _command;

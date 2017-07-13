@@ -24,6 +24,9 @@ UpdaterClass::UpdaterClass()
 , _currentAddress(0)
 , _command(U_FLASH)
 {
+#ifdef VERIFY_SIGNATURE
+  _ca_ctx = (CA_CERT_CTX *)malloc(sizeof(CA_CERT_CTX));
+#endif
 }
 
 void UpdaterClass::_reset() {
@@ -178,8 +181,52 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _size = progress();
   }
 
-  _md5.calculate();
+#ifdef VERIFY_SIGNATURE
+  // If this package has been signed correctly, the last uint32 is the size of the signature
+  // the second-last uint32 is the size of the certificate
+  ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &_signatureLen, sizeof(uint32_t));
+  ESP.flashRead(_startAddress + _size - (2 * sizeof(uint32_t)), &_certificateLen, sizeof(uint32_t));
+  _signatureStartAddress = _startAddress + _size - (2 * sizeof(uint32_t)) - _signatureLen;
+  _certificateStartAddress = _signatureStartAddress - _certificateLen;
+
+#ifdef DEBUG_UPDATER
+  DEBUG_UPDATER.printf("\n");
+  DEBUG_UPDATER.printf("[begin] _signatureLen:    0x%08X (%d)\n", _signatureLen, _signatureLen);
+  DEBUG_UPDATER.printf("[begin] _certificateLen:  0x%08X (%d)\n", _certificateLen, _certificateLen);
+  DEBUG_UPDATER.printf("[begin] _signatureStartAddress: 0x%08X (%d)\n", _signatureStartAddress, _signatureStartAddress);
+  DEBUG_UPDATER.printf("[begin] _certificateStartAddress: 0x%08X (%d)\n", _certificateStartAddress, _certificateStartAddress);
+#endif
+
+  if(!_decryptMD5()) {
+#ifdef DEBUG_UPDATER
+    DEBUG_UPDATER.printf("MD5 Decryption Failed.\n");
+#endif
+    _reset();
+    return false;
+  }
+#endif
+
   if(_target_md5.length()) {
+    // If there is a target MD5 hash set, we now take the md5 hash of the binary
+    int bin_size = (int)_size;
+#ifdef VERIFY_SIGNATURE
+    bin_size -= (int)(_signatureLen + _certificateLen + (2 * sizeof(uint32_t)));
+#endif
+    
+    uint8_t *bin_buffer = (uint8_t *)malloc(sizeof(uint8_t) * 32);
+    for(int i = 0; i < bin_size; i += 32) {
+      ESP.flashRead(_startAddress + i, (uint32_t *)bin_buffer, 32);
+      
+      int read = bin_size - i;
+      if(read > 32) {
+        read = 32;
+      }
+
+      _md5.add(bin_buffer, read);
+    }
+    _md5.calculate();
+    free(bin_buffer);
+
     if(_target_md5 != _md5.toString()){
       _error = UPDATE_ERROR_MD5;
 #ifdef DEBUG_UPDATER
@@ -242,7 +289,6 @@ bool UpdaterClass::_writeBuffer(){
 #endif
     return false;
   }
-  _md5.add(_buffer, _bufferLen);
   _currentAddress += _bufferLen;
   _bufferLen = 0;
   return true;
@@ -370,6 +416,120 @@ size_t UpdaterClass::writeStream(Stream &data) {
     }
     return written;
 }
+
+#ifdef VERIFY_SIGNATURE
+    int UpdaterClass::addCA(const uint8_t *cert, int *len) {
+      // TODO: Allow more than one CA
+      int res = x509_new(cert, len, &(_ca_ctx->cert[0]));
+
+#ifdef DEBUG_UPDATER
+      if(res == X509_OK) {
+        DEBUG_UPDATER.printf("Loaded CA certificate. Common Name: %s\n", _ca_ctx->cert[0]->cert_dn[X509_COMMON_NAME]);
+      } else {
+        DEBUG_UPDATER.printf("Unable to load CA certificate: %i\n", res);
+      }
+#endif
+
+      return res;
+    }
+
+    bool UpdaterClass::_loadCertificate(X509_CTX **ctx) {
+      size_t num_of_bits = sizeof(uint8_t) * _certificateLen;
+      uint8_t *cert = (uint8_t *)malloc(num_of_bits + (num_of_bits % 32)); // Round up to the next uint32_t boundary
+      ESP.flashRead(_certificateStartAddress, (uint32_t *)cert, num_of_bits);
+
+      int res = x509_new(cert, (int *)&_certificateLen, ctx);
+      free(cert);
+
+      if(res != X509_OK) {
+#ifdef DEBUG_UPDATER
+        DEBUG_UPDATER.printf("Unable to load developer certificate: %i\n", res);
+#endif
+        return false;
+      }
+#ifdef DEBUG_UPDATER
+      DEBUG_UPDATER.printf("Loaded developer certificate. Common Name: %s\n", (*ctx)->cert_dn[X509_COMMON_NAME]);
+#endif
+      return true;
+    }
+
+    bool UpdaterClass::_verifyCertificate(X509_CTX **ctx) {
+      int res = x509_verify(_ca_ctx, *ctx);
+
+#ifdef DEBUG_UPDATER
+      if(res == X509_OK) {
+        DEBUG_UPDATER.printf("Developer certificate verified\n");
+      } else {
+        DEBUG_UPDATER.printf("Developer certificate not verified: %i\n", res);
+      }
+#endif
+
+      return res == X509_OK;
+    }
+
+    bool UpdaterClass::_decryptSignature(X509_CTX **ctx, char **hash) {
+      size_t num_of_bits = sizeof(uint8_t) * _signatureLen;
+      uint8_t *sig = (uint8_t *)malloc(num_of_bits + (num_of_bits % 32)); // Round up to the next uint32_t boundary
+      ESP.flashRead(_signatureStartAddress, (uint32_t *)sig, num_of_bits);
+
+      //const int signature_size = (*ctx)->rsa_ctx->num_octets;
+      const int signature_size = _signatureLen; // In this version of the library, the num_octects is 0. Not sure why...
+#ifdef DEBUG_UPDATER
+        DEBUG_UPDATER.printf("Size of output buffer: %i\n", signature_size);
+#endif      
+      uint8_t sig_data[signature_size];
+      int len = RSA_decrypt((*ctx)->rsa_ctx, (const uint8_t *)sig, sig_data, signature_size, 0);
+      free(sig);
+
+      if(len == -1) {
+#ifdef DEBUG_UPDATER
+        DEBUG_UPDATER.printf("Decryption failed\n");
+#endif
+        return false;
+      }
+
+      if(len < MD5_SIZE) {
+#ifdef DEBUG_UPDATER
+        DEBUG_UPDATER.printf("Decryption failed: Signature is too short. Expected %i, got %i\n", MD5_SIZE, len);
+#endif
+        return false;
+      }
+      
+#ifdef DEBUG_UPDATER
+      DEBUG_UPDATER.printf("Decryption successful.\n");
+#endif
+
+      // Fetch the last part of the encrypted string - that is the MD5 hash, and then save the string
+      // version of it in to the hash pointer.
+      (*hash) = (char *)calloc((MD5_SIZE * 2) + 1, sizeof(char));
+      for(int i = 0; i < MD5_SIZE; i++) {
+        sprintf(*hash + (i * 2), "%02x", sig_data[len - MD5_SIZE + i]);
+      }
+      
+      return true;
+    }
+
+    bool UpdaterClass::_decryptMD5() {
+      X509_CTX *ctx;
+
+      if(!_loadCertificate(&ctx)) {
+        return false;
+      }
+
+      if(!_verifyCertificate(&ctx)) {
+        return false;
+      }
+
+      char *hash;
+      if(!_decryptSignature(&ctx, &hash)) {
+        return false;
+      }
+
+      setMD5((const char *)hash);
+
+      return true;
+    }
+#endif
 
 void UpdaterClass::printError(Stream &out){
   out.printf_P(PSTR("ERROR[%u]: "), _error);

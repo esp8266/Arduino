@@ -9,7 +9,7 @@ uint8_t hex_char_to_byte(uint8_t c){
 
 void MD5Builder::begin(void){
     memset(_buf, 0x00, 16);
-    MD5Init(&_ctx);
+    MD5_Init(&_ctx);
 }
 
 void MD5Builder::add(const uint8_t * data, const uint16_t len){
@@ -59,7 +59,7 @@ bool MD5Builder::addStream(Stream & stream, const size_t maxLen){
         }
 
         // Update MD5 with buffer payload
-        MD5Update(&_ctx, buf, numBytesRead);
+        MD5_Update(&_ctx, buf, numBytesRead);
 
         yield();      // time for network streams
 
