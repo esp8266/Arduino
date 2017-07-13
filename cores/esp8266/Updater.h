@@ -175,14 +175,9 @@ class UpdaterClass {
     bool _async;
     uint8_t _error;
     uint8_t *_buffer;
-<<<<<<< HEAD
     size_t _bufferLen; // amount of data written into _buffer
     size_t _bufferSize; // total size of _buffer
     size_t _size;
-=======
-    uint32_t _bufferLen;
-    uint32_t _size;
->>>>>>> 74a9b900b470a55e9ae6a330a17fda58925f9367
     uint32_t _startAddress;
     uint32_t _currentAddress;
     uint32_t _command;
