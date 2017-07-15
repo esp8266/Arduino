@@ -27,7 +27,7 @@
 #include "Hash.h"
 
 extern "C" {
-#include "sha1/sha1.h"
+#include "crypto/crypto.h"
 }
 
 /**
@@ -39,31 +39,9 @@ extern "C" {
 void sha1(uint8_t * data, uint32_t size, uint8_t hash[20]) {
 
     SHA1_CTX ctx;
-
-#ifdef DEBUG_SHA1
-    os_printf("DATA:");
-    for(uint16_t i = 0; i < size; i++) {
-        os_printf("%02X", data[i]);
-    }
-    os_printf("\n");
-    os_printf("DATA:");
-    for(uint16_t i = 0; i < size; i++) {
-        os_printf("%c", data[i]);
-    }
-    os_printf("\n");
-#endif
-
-    SHA1Init(&ctx);
-    SHA1Update(&ctx, data, size);
-    SHA1Final(hash, &ctx);
-
-#ifdef DEBUG_SHA1
-    os_printf("SHA1:");
-    for(uint16_t i = 0; i < 20; i++) {
-        os_printf("%02X", hash[i]);
-    }
-    os_printf("\n\n");
-#endif
+    SHA1_Init(&ctx);
+    SHA1_Update(&ctx, data, size);
+    SHA1_Final(hash, &ctx);
 }
 
 void sha1(char * data, uint32_t size, uint8_t hash[20]) {
