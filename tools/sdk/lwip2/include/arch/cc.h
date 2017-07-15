@@ -49,28 +49,25 @@ void sntp_set_system_time (uint32_t t);
 
 #include "mem.h" // useful for os_malloc used in esp-arduino's mDNS
 
-typedef int sys_prot_t;	// not really used
+typedef uint32_t sys_prot_t;	// not really used
 #define SYS_ARCH_DECL_PROTECT(lev)
 #define SYS_ARCH_PROTECT(lev) os_intr_lock()
 #define SYS_ARCH_UNPROTECT(lev) os_intr_unlock()
 
 ///////////////////////////////
 //// DEBUG
-#if 0 // debug 1:on or 0
+#include "gluedebug.h"
 
-//#define LWIP_DBG_TYPES_ON		(LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT)
-#define LWIP_DBG_TYPES_ON		(LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH)
-//#define LWIP_DBG_TYPES_ON		(LWIP_DBG_ON)
-
+#if ULWIPDEBUG // debug 1:on or 0
 #define LWIP_DEBUG 1
+#define LWIP_PLATFORM_DIAG(x) do { os_printf x; } while(0)
+#define LWIP_PLATFORM_ASSERT(x) 	do { os_printf("Assertion \"%s\" failed at line %d in %s\n", x, __LINE__, __FILE__); *(int*)0=0; } while(0)
+//#define LWIP_PLATFORM_ASSERT(x) 	do { os_printf("Assertion \"%s\" failed at line %d in %s\n", x, __LINE__, __FILE__); while(1); } while(0)
+#endif // ULWIPDEBUG
 
-//int doprint (const char* format, ...) __attribute__ ((format (printf, 1, 2)));
-extern int os_printf_plus(const char * format, ...) __attribute__ ((format (printf, 1, 2)));
-#define LWIP_PLATFORM_DIAG(x) do { os_printf x;} while(0)
-
-#else
+#if !ULWIPASSERT
 #define LWIP_NOASSERT 1
-#endif // debug
+#endif
 
 ///////////////////////////////
 //// MISSING 
@@ -111,7 +108,7 @@ extern ip4_addr_t* ntp_servers;
 #define dhcp_start dhcp_start_LWIP2
 #define dhcp_stop dhcp_stop_LWIP2
 #define dhcps_start dhcps_start_LWIP2
-#define dhcps_stop dhcps_stop_LWIP2
+//#define dhcps_stop dhcps_stop_LWIP2				// void(void)
 #define espconn_init espconn_init_LWIP2
 #define etharp_output etharp_output_LWIP2
 #define ethbroadcast ethbroadcast_LWIP2
