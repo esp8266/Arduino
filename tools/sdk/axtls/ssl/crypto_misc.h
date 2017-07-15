@@ -39,8 +39,8 @@
 extern "C" {
 #endif
 
-#include "crypto.h"
-#include "bigint.h"
+#include "../crypto/crypto.h"
+#include "../crypto/bigint.h"
 
 /**************************************************************************
  * X509 declarations 
@@ -198,8 +198,9 @@ typedef void (*hmac_func)(const uint8_t *msg, int length, const uint8_t *key,
 typedef void (*hmac_func_v)(const uint8_t **msg, int *length, int count, const uint8_t *key, 
         int key_len, uint8_t *digest);
 
-
+#ifndef ESP8266
 int get_file(const char *filename, uint8_t **buf);
+#endif
 
 #if defined(CONFIG_SSL_FULL_MODE) || defined(WIN32) || defined(CONFIG_DEBUG)
 EXP_FUNC void STDCALL print_blob(const char *format, const uint8_t *data, int size, ...);

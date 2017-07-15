@@ -27,7 +27,7 @@
 #include "Hash.h"
 
 extern "C" {
-#include "crypto/crypto.h"
+#include <crypto/crypto.h>
 }
 
 /**

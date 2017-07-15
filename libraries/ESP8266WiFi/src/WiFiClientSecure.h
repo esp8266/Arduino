@@ -23,7 +23,7 @@
 #ifndef wificlientsecure_h
 #define wificlientsecure_h
 #include "WiFiClient.h"
-#include "include/ssl.h"
+#include <ssl/ssl.h>
 
 
 class SSLContext;
