@@ -1,5 +1,0 @@
-*.o
-bin/
-Makefile.local
-.DS_Store
-
