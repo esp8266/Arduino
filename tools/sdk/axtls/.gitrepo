@@ -1,0 +1,11 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/igrr/axtls-8266
+	branch = master
+	commit = 27f4a6caf69625a9e798b7a1c3b1406ec1ec1d85
+	parent = b6958986d1fd1e020ae8794d91959c2e1030eacf
+	cmdver = 0.3.1
