@@ -5,6 +5,7 @@
 #include <WiFiUdp.h>
 #include "ArduinoOTA.h"
 #include "MD5Builder.h"
+#include "StreamString.h"
 
 extern "C" {
   #include "osapi.h"
@@ -180,6 +181,7 @@ void ArduinoOTAClass::_onRx(){
     _ota_ip = _udp_ota->getRemoteAddress();
     _cmd  = cmd;
     _ota_port = parseInt();
+    _ota_udp_port = _udp_ota->getRemotePort();
     _size = parseInt();
     _udp_ota->read();
     _md5 = readStringUntil('\n');
@@ -199,12 +201,10 @@ void ArduinoOTAClass::_onRx(){
       char auth_req[38];
       sprintf(auth_req, "AUTH %s", _nonce.c_str());
       _udp_ota->append((const char *)auth_req, strlen(auth_req));
-      _udp_ota->send(&ota_ip, _udp_ota->getRemotePort());
+      _udp_ota->send(&ota_ip, _ota_udp_port);
       _state = OTA_WAITAUTH;
       return;
     } else {
-      _udp_ota->append("OK", 2);
-      _udp_ota->send(&ota_ip, _udp_ota->getRemotePort());
       _state = OTA_RUNUPDATE;
     }
   } else if (_state == OTA_WAITAUTH) {
@@ -230,12 +230,10 @@ void ArduinoOTAClass::_onRx(){
 
     ota_ip.addr = (uint32_t)_ota_ip;
     if(result.equals(response)){
-      _udp_ota->append("OK", 2);
-      _udp_ota->send(&ota_ip, _udp_ota->getRemotePort());
       _state = OTA_RUNUPDATE;
     } else {
       _udp_ota->append("Authentication Failed", 21);
-      _udp_ota->send(&ota_ip, _udp_ota->getRemotePort());
+      _udp_ota->send(&ota_ip, _ota_udp_port);
       if (_error_callback) _error_callback(OTA_AUTH_ERROR);
       _state = OTA_IDLE;
     }
@@ -245,6 +243,9 @@ void ArduinoOTAClass::_onRx(){
 }
 
 void ArduinoOTAClass::_runUpdate() {
+  ip_addr_t ota_ip;
+  ota_ip.addr = (uint32_t)_ota_ip;
+
   if (!Update.begin(_size, _cmd)) {
 #ifdef OTA_DEBUG
     OTA_DEBUG.println("Update Begin Error");
@@ -252,10 +253,21 @@ void ArduinoOTAClass::_runUpdate() {
     if (_error_callback) {
       _error_callback(OTA_BEGIN_ERROR);
     }
+    
+    StreamString ss;
+    Update.printError(ss);
+    _udp_ota->append("ERR: ", 5);
+    _udp_ota->append(ss.c_str(), ss.length());
+    _udp_ota->send(&ota_ip, _ota_udp_port);
+    delay(100);
     _udp_ota->listen(*IP_ADDR_ANY, _port);
     _state = OTA_IDLE;
     return;
   }
+  _udp_ota->append("OK", 2);
+  _udp_ota->send(&ota_ip, _ota_udp_port);
+  delay(100);
+
   Update.setMD5(_md5.c_str());
   WiFiUDP::stopAll();
   WiFiClient::stopAll();
