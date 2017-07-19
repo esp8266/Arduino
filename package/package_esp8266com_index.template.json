@@ -33,6 +33,9 @@
               "name": "NodeMCU 1.0 (ESP-12E Module)"
             },
             {
+              "name": "NodeMCU 1.0 LoLin V3 (ESP-12E Module)"
+            },
+            {
               "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
             },
             {
@@ -46,7 +49,7 @@
             },
             {
               "name": "Phoenix 2.0"
-            },                        
+            },
             {
               "name": "SparkFun Thing"
             },
