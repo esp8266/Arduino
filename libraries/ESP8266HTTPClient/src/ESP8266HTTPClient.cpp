@@ -63,6 +63,7 @@ public:
 
     bool verify(WiFiClient& client, const char* host) override
     {
+	    //make sure you change WiFiClientSecure.cpp to by pass httpsFingerPrint check
         auto wcs = static_cast<WiFiClientSecure&>(client);
         return wcs.verify(_fingerprint.c_str(), host);
     }
@@ -217,7 +218,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
 void HTTPClient::end(void)
 {
     if(connected()) {
-        if(_tcp->available() > 0) {
+        if((_tcp->available() > 0)&&(!getPending())) { //FirebaseStream - Pending switch         
             DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _tcp->available());
             while(_tcp->available() > 0) {
                 _tcp->read();
@@ -232,6 +233,36 @@ void HTTPClient::end(void)
     } else {
         DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp is closed\n");
     }
+}
+
+/* support FirebaseStream - Type, Event */
+String HTTPClient::getType(void)
+{
+	String type = _tcp->readStringUntil('\n').substring(7); //put
+	return type;
+}
+
+String HTTPClient::getEvent(void)
+{
+	String event = _tcp->readStringUntil('\n').substring(6); //{"path":"/","data":"416.28"}	
+        _tcp->readStringUntil('\n');   	
+	return event;
+}
+
+/* support FirebaseStream - Pending switch */
+bool HTTPClient::getPending(void)
+{
+	return _pending;	
+}
+
+void HTTPClient::setPending(void)
+{
+	_pending = true;	
+}
+
+void HTTPClient::clrPending(void)
+{
+	_pending = false;	
 }
 
 /**
@@ -565,7 +596,7 @@ WiFiClient& HTTPClient::getStream(void)
  */
 WiFiClient* HTTPClient::getStreamPtr(void)
 {
-    if(connected()) {
+    if(connected()) { //never get connected at FirebaseStream	    	    
         return _tcp.get();
     }
 
