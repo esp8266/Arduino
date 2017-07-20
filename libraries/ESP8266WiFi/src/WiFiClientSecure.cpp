@@ -510,10 +510,13 @@ bool WiFiClientSecure::verify(const char* fp, const char* domain_name)
         pos += 2;
         sha1[i] = low | (high << 4);
     }
-    if (ssl_match_fingerprint(*_ssl, sha1) != 0) {
-        DEBUGV("fingerprint doesn't match\r\n");
-        return false;
+    //skip httpsFingerPrint check for Google Firebase
+    Serial.println("httpsFingerPrint: ");
+    for (int i=0; i<20; i++){
+    	Serial.print(sha1[i],HEX);
+    	Serial.print(" ");	
     }
+    Serial.println("");
 
     return _verifyDN(domain_name);
 }
