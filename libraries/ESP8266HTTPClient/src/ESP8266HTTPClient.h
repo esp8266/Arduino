@@ -142,6 +142,15 @@ public:
 
     void end(void);
 
+    /* support FirebaseStream - Type, Event */
+    String getType(void);
+    String getEvent(void);
+    
+    /* support FurebaseStream - Pending switch */
+    void setPending(void);
+    bool getPending(void);
+    void clrPending(void);
+
     bool connected(void);
 
     void setReuse(bool reuse); /// keep-alive
@@ -221,6 +230,13 @@ protected:
     int _size = -1;
     bool _canReuse = false;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
+
+    /* support FirebaseStream - Type, Event */
+    String _type;
+    String _event;
+    
+    /* support FirebaseStream - Pending switch */
+    bool _pending = false;
 };
 
 
