@@ -9,8 +9,7 @@
   There are two variants of the attach function: attach and attach_ms.
   The first one takes period in seconds, the second one in milliseconds.
   
-  An LED connected to GPIO1 will be blinking. Use a built-in LED on ESP-01
-  or connect an external one to TXD on other boards.
+  The built-in LED will be blinking.
 */
 
 #include <Ticker.h>
