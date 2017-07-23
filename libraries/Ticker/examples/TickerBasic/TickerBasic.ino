@@ -21,8 +21,8 @@ int count = 0;
 
 void flip()
 {
-  int state = digitalRead(1);  // get the current state of GPIO1 pin
-  digitalWrite(1, !state);     // set pin to the opposite state
+  int state = digitalRead(LED_BUILTIN);  // get the current state of GPIO1 pin
+  digitalWrite(LED_BUILTIN, !state);     // set pin to the opposite state
   
   ++count;
   // when the counter reaches a certain value, start blinking like crazy
@@ -38,8 +38,8 @@ void flip()
 }
 
 void setup() {
-  pinMode(1, OUTPUT);
-  digitalWrite(1, LOW);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
   
   // flip the pin every 0.3s
   flipper.attach(0.3, flip);
