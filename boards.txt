@@ -196,6 +196,8 @@ generic.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
 
 generic.menu.DebugLevel.None____=None
 generic.menu.DebugLevel.None____.build.debug_level=
+generic.menu.DebugLevel.No_ASSERT____=None + No Asserts
+generic.menu.DebugLevel.No_ASSERT____.build.debug_level=-DNDEBUG
 generic.menu.DebugLevel.Core____=Core
 generic.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
 generic.menu.DebugLevel.SSL_____=Core + SSL
