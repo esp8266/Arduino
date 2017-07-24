@@ -166,6 +166,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
           isEncoded = true;
         } else if (headerValue.startsWith("multipart/")){
           boundaryStr = headerValue.substring(headerValue.indexOf('=')+1);
+          boundaryStr.replace("\"","");
           isForm = true;
         }
       } else if (headerName.equalsIgnoreCase("Content-Length")){
