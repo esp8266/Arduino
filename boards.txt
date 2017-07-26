@@ -2021,3 +2021,43 @@ gen4iod.menu.UploadSpeed.512000.windows=512000
 gen4iod.menu.UploadSpeed.512000.upload.speed=512000
 gen4iod.menu.UploadSpeed.921600=921600
 gen4iod.menu.UploadSpeed.921600.upload.speed=921600
+
+##############################################################
+
+openbci.name=OpenBCI Wifi Shield
+
+openbci.upload.tool=esptool
+openbci.upload.speed=115200
+openbci.upload.resetmethod=nodemcu
+openbci.upload.maximum_size=1044464
+openbci.upload.maximum_data_size=81920
+openbci.upload.wait_for_upload_port=true
+openbci.serial.disableDTR=true
+openbci.serial.disableRTS=true
+
+openbci.build.mcu=esp8266
+openbci.build.f_cpu=160000000L
+openbci.build.board=ESP8266_ESP12
+openbci.build.core=esp8266
+openbci.build.variant=openbci
+openbci.build.flash_mode=qio
+openbci.build.flash_size=4M
+openbci.build.flash_freq=40
+openbci.build.debug_port=
+openbci.build.debug_level=
+
+openbci.menu.CpuFrequency.80=80 MHz
+openbci.menu.CpuFrequency.80.build.f_cpu=80000000L
+openbci.menu.CpuFrequency.160=160 MHz
+openbci.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+openbci.menu.UploadSpeed.115200=115200
+openbci.menu.UploadSpeed.115200.upload.speed=115200
+
+openbci.menu.FlashSize.4M1M=4M (1M SPIFFS)
+openbci.menu.FlashSize.4M1M.build.flash_size=4M
+openbci.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+openbci.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+openbci.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+openbci.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+openbci.menu.FlashSize.4M1M.build.spiffs_pagesize=256
