@@ -376,6 +376,22 @@ bool HTTPClient::setRootCA(uint8_t * cert, size_t size)
     return result;
 }
 
+bool HTTPClient::setRootCA_P(PGM_VOID_P * cert, size_t size)
+{
+    bool result = false;
+    if(_tcp && (_protocol == "https" || _port == 443)) {
+        auto client = static_cast<WiFiClientSecure*>(_tcp.get());
+        if(client) {
+            uint8_t* buf = new uint8_t[size];
+            memcpy_P(buf, cert, size);
+            result = client->setCACert(buf, size);
+            delete[] buf;
+        }
+    }
+    DEBUG_HTTPCLIENT("[HTTP-Client][setRootCA_P] Result: %d\n", (int) result);
+    return result;
+}
+
 bool HTTPClient::setRootCA(Stream& cert, size_t size)
 {
     bool result = false;
