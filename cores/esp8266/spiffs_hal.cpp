@@ -60,7 +60,7 @@ int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
                 __LINE__, addr, size, alignedBegin, alignedEnd);
             return SPIFFS_ERR_INTERNAL;
         }
-        memcpy(dst, &tmp + 4 - nb, nb);
+        memcpy(dst, ((uint8_t*) &tmp) + 4 - nb, nb);
     }
 
     if (alignedEnd != alignedBegin) {

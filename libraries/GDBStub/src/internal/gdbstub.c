@@ -291,7 +291,7 @@ static void ATTR_GDBFN sendReason() {
 #endif
 	//exception-to-signal mapping
 	char exceptionSignal[]={4,31,11,11,2,6,8,0,6,7,0,0,7,7,7,7};
-	int i=0;
+	unsigned int i=0;
 	gdbPacketStart();
 	gdbPacketChar('T');
 	if (gdbstub_savedRegs.reason==0xff) {
@@ -321,6 +321,7 @@ static void ATTR_GDBFN sendReason() {
 
 //Handle a command as received from GDB.
 static int ATTR_GDBFN gdbHandleCommand(unsigned char *cmd, int len) {
+	(void)len; // unused
 	//Handle a command
 	int i, j, k;
 	unsigned char *data=cmd+1;
@@ -657,7 +658,7 @@ static void ATTR_GDBFN gdb_semihost_putchar1(char c) {
 //The OS-less SDK uses the Xtensa HAL to handle exceptions. We can use those functions to catch any
 //fatal exceptions and invoke the debugger when this happens.
 static void ATTR_GDBINIT install_exceptions() {
-	int i;
+	unsigned int i;
 	int exno[]={EXCCAUSE_ILLEGAL, EXCCAUSE_SYSCALL, EXCCAUSE_INSTR_ERROR, EXCCAUSE_LOAD_STORE_ERROR,
 			EXCCAUSE_DIVIDE_BY_ZERO, EXCCAUSE_UNALIGNED, EXCCAUSE_INSTR_DATA_ERROR, EXCCAUSE_LOAD_STORE_DATA_ERROR,
 			EXCCAUSE_INSTR_ADDR_ERROR, EXCCAUSE_LOAD_STORE_ADDR_ERROR, EXCCAUSE_INSTR_PROHIBITED,

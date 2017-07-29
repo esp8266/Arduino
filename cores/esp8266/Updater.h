@@ -16,7 +16,7 @@
 #define UPDATE_ERROR_FLASH_CONFIG       (8)
 #define UPDATE_ERROR_NEW_FLASH_CONFIG   (9)
 #define UPDATE_ERROR_MAGIC_BYTE         (10)
-
+#define UPDATE_ERROR_BOOTSTRAP          (11)
 
 #define U_FLASH   0
 #define U_SPIFFS  100
@@ -116,8 +116,8 @@ class UpdaterClass {
         if(_bufferLen + available > remaining()){
           available = remaining() - _bufferLen;
         }
-        if(_bufferLen + available > FLASH_SECTOR_SIZE) {
-          size_t toBuff = FLASH_SECTOR_SIZE - _bufferLen;
+        if(_bufferLen + available > _bufferSize) {
+          size_t toBuff = _bufferSize - _bufferLen;
           data.read(_buffer + _bufferLen, toBuff);
           _bufferLen += toBuff;
           if(!_writeBuffer())
@@ -151,7 +151,8 @@ class UpdaterClass {
     bool _async;
     uint8_t _error;
     uint8_t *_buffer;
-    size_t _bufferLen;
+    size_t _bufferLen; // amount of data written into _buffer
+    size_t _bufferSize; // total size of _buffer
     size_t _size;
     uint32_t _startAddress;
     uint32_t _currentAddress;
