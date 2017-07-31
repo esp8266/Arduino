@@ -95,7 +95,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   sent = sock2.sendto(message.encode(), remote_address)
   sock2.settimeout(10)
   try:
-    data = sock2.recv(37).decode()
+    data = sock2.recv(128).decode()
   except:
     logging.error('No Answer')
     sock2.close()
