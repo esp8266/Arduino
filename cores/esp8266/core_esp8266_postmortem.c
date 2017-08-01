@@ -27,12 +27,14 @@
 #include "user_interface.h"
 #include "esp8266_peri.h"
 #include "cont.h"
+#include "pgmspace.h"
 
 extern void __real_system_restart_local();
 extern void gdb_do_break();
 
 extern cont_t g_cont;
 
+// These will be pointers to PROGMEM const strings
 static const char* s_panic_file = 0;
 static int s_panic_line = 0;
 static const char* s_panic_func = 0;
@@ -55,6 +57,14 @@ extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack,
 
 extern void custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) __attribute__ ((weak, alias("__custom_crash_callback")));
 
+static void ets_puts_P(const char *romString) {
+    char c = pgm_read_byte(romString++);
+    while (c) {
+        ets_putc(c);
+        c = pgm_read_byte(romString++);
+    }
+}
+
 void __wrap_system_restart_local() {
     if (crash_for_gdb) *((int*)0) = 0;
     register uint32_t sp asm("a1");
@@ -71,17 +81,21 @@ void __wrap_system_restart_local() {
     ets_install_putc1(&uart_write_char_d);
 
     if (s_panic_line) {
-        ets_printf("\nPanic %s:%d %s\n", s_panic_file, s_panic_line, s_panic_func);
+        ets_puts_P(PSTR("\nPanic "));
+        ets_puts_P(s_panic_file);
+        ets_printf(":%d ", s_panic_line);
+        ets_puts_P(s_panic_func);
+        ets_puts_P(PSTR("\n"));
     }
     else if (s_abort_called) {
-        ets_printf("Abort called\n");
+        ets_puts_P(PSTR("Abort called\n"));
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
         ets_printf("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n",
             rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
-        ets_printf("\nSoft WDT reset\n");
+        ets_puts_P(PSTR("\nSoft WDT reset\n"));
     }
 
     uint32_t cont_stack_start = (uint32_t) &(g_cont.stack);
@@ -103,11 +117,11 @@ void __wrap_system_restart_local() {
     }
 
     if (sp > cont_stack_start && sp < cont_stack_end) {
-        ets_printf("\nctx: cont \n");
+        ets_puts_P(PSTR("\nctx: cont \n"));
         stack_end = cont_stack_end;
     }
     else {
-        ets_printf("\nctx: sys \n");
+        ets_puts_P(("\nctx: sys \n"));
         stack_end = 0x3fffffb0;
         // it's actually 0x3ffffff0, but the stuff below ets_run
         // is likely not really relevant to the crash
@@ -126,7 +140,7 @@ void __wrap_system_restart_local() {
 
 
 static void print_stack(uint32_t start, uint32_t end) {
-    ets_printf("\n>>>stack>>>\n");
+    ets_puts_P(PSTR("\n>>>stack>>>\n"));
     for (uint32_t pos = start; pos < end; pos += 0x10) {
         uint32_t* values = (uint32_t*)(pos);
 
@@ -136,7 +150,7 @@ static void print_stack(uint32_t start, uint32_t end) {
         ets_printf("%08x:  %08x %08x %08x %08x %c\n",
             pos, values[0], values[1], values[2], values[3], (looksLikeStackFrame)?'<':' ');
     }
-    ets_printf("<<<stack<<<\n");
+    ets_puts_P(PSTR("<<<stack<<<\n"));
 }
 
 /*
