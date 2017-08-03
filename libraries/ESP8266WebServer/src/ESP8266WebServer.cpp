@@ -292,6 +292,14 @@ void ESP8266WebServer::send(int code, const char* content_type, const String& co
       sendContent(content);
 }
 
+void ESP8266WebServer::send(int code, const char* content_type, const char* content, size_t contentLength) {
+  String header;
+  _prepareHeader(header, code, content_type, contentLength);
+  sendContent(header);
+
+  sendContent(content, contentLength);
+}
+
 void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     size_t contentLength = 0;
 
@@ -338,6 +346,20 @@ void ESP8266WebServer::sendContent(const String& content) {
   _currentClient.write(content.c_str(), len);
   if(_chunked){
     _currentClient.write(footer, 2);
+  }
+}
+
+void ESP8266WebServer::sendContent(const char* content, size_t contentLength) {
+  const size_t unit_size = HTTP_DOWNLOAD_UNIT_SIZE;
+
+  while (contentLength) {
+    size_t will_send = (contentLength < unit_size) ? contentLength : unit_size;
+    size_t sent = _currentClient.write(content, will_send);
+    if (sent == 0) {
+      break;
+    }
+    contentLength -= sent;
+    content += sent;
   }
 }
 
