@@ -1,0 +1,12 @@
+
+SRC = \
+	$(patsubst %.c,$(BUILD)/%.o,$(wildcard glue/*.c)) \
+	$(patsubst %.c,$(BUILD)/%.o,$(wildcard glue-lwip2/*.c)) \
+
+BUILD_INCLUDES = -I$(BUILD) -I$(SDK)/include -Iglue -Iglue-lwip2 -Ilwip2-src/src/include
+
+include $(ROOT)/Makefile.common
+-include $(BUILD)/glue/*.d
+-include $(BUILD)/glue-lwip2/*.d
+
+all: $(LWIP_LIB)

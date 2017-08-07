@@ -1,0 +1,26 @@
+#!/bin/sh
+
+test -z "$1" && \
+{
+	echo "syntax: $0 <tag/sha1>"
+	echo "	latest known stable version is 'STABLE-2_0_2_RELEASE_VER'"
+	echo "	use 'master' at your own risk"
+	echo "	check http://git.savannah.nongnu.org/cgit/lwip.git"
+	exit 1
+}
+
+
+test -d lwip2-src \
+	&& cd lwip2-src \
+	|| { git clone https://git.savannah.nongnu.org/git/lwip.git lwip2-src && cd lwip2-src; }
+git checkout $1
+taginfo=""
+test "$1" = master && { taginfo="/unstable"; git pull; }
+version=`git log -1 --format="%h"`
+cat << EOF > ../glue-lwip2/lwip2-git-hash.h
+#ifndef LWIP2_HASH_H
+#define LWIP2_HASH_H
+#define LWIP2_HASH 0x$version
+#define LWIP2_HASH_STR "$version($1$taginfo)"
+#endif // LWIP2_HASH_H
+EOF

@@ -10,6 +10,7 @@ menu.ESPModule=Module
 menu.Debug=Debug port
 menu.DebugLevel=Debug Level
 menu.LwIPVariant=lwIP Variant
+menu.lwIP=lwIP Build
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -241,6 +242,13 @@ generic.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_
 # generic.menu.FlashSize.16M.build.spiffs_end=0x1000000
 # generic.menu.FlashSize.16M.build.spiffs_blocksize=8192
 
+generic.menu.lwIP.open=v2
+generic.menu.lwIP.open.build.lwip_include=lwip2/include
+generic.menu.lwIP.open.build.lwip_lib=-llwip2
+generic.menu.lwIP.legacy=v1.4 (espressif)
+generic.menu.lwIP.legacy.build.lwip_include=lwip/include
+generic.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 # ESP8285 chip has built-in 1MB flash
 
@@ -346,6 +354,12 @@ esp8285.menu.FlashSize.1M64.build.spiffs_end=0xFB000
 esp8285.menu.FlashSize.1M64.build.spiffs_blocksize=4096
 esp8285.menu.FlashSize.1M64.upload.maximum_size=958448
 
+esp8285.menu.lwIP.open=v2
+esp8285.menu.lwIP.open.build.lwip_include=lwip2/include
+esp8285.menu.lwIP.open.build.lwip_lib=-llwip2
+esp8285.menu.lwIP.legacy=v1.4 (espressif)
+esp8285.menu.lwIP.legacy.build.lwip_include=lwip/include
+esp8285.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
 
 ##############################################################
 
@@ -411,6 +425,14 @@ espduino.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 espduino.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 espduino.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 espduino.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+
+espduino.menu.lwIP.open=v2
+espduino.menu.lwIP.open.build.lwip_include=lwip2/include
+espduino.menu.lwIP.open.build.lwip_lib=-llwip2
+espduino.menu.lwIP.legacy=v1.4 (espressif)
+espduino.menu.lwIP.legacy.build.lwip_include=lwip/include
+espduino.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 huzzah.name=Adafruit HUZZAH ESP8266
 
@@ -465,6 +487,13 @@ huzzah.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 huzzah.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 huzzah.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 huzzah.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+
+huzzah.menu.lwIP.open=v2
+huzzah.menu.lwIP.open.build.lwip_include=lwip2/include
+huzzah.menu.lwIP.open.build.lwip_lib=-llwip2
+huzzah.menu.lwIP.legacy=v1.4 (espressif)
+huzzah.menu.lwIP.legacy.build.lwip_include=lwip/include
+huzzah.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
 
 ##############################################################
 espresso_lite_v1.name=ESPresso Lite 1.0
@@ -571,6 +600,13 @@ espresso_lite_v1.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DD
 espresso_lite_v1.build.debug_port=
 espresso_lite_v1.build.debug_level=
 
+espresso_lite_v1.menu.lwIP.open=v2
+espresso_lite_v1.menu.lwIP.open.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.lwIP.open.build.lwip_lib=-llwip2
+espresso_lite_v1.menu.lwIP.legacy=v1.4 (espressif)
+espresso_lite_v1.menu.lwIP.legacy.build.lwip_include=lwip/include
+espresso_lite_v1.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 espresso_lite_v2.name=ESPresso Lite 2.0
 espresso_lite_v2.upload.tool=esptool
@@ -675,6 +711,13 @@ espresso_lite_v2.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DD
 
 espresso_lite_v2.build.debug_port=
 espresso_lite_v2.build.debug_level=
+
+espresso_lite_v2.menu.lwIP.open=v2
+espresso_lite_v2.menu.lwIP.open.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.lwIP.open.build.lwip_lib=-llwip2
+espresso_lite_v2.menu.lwIP.legacy=v1.4 (espressif)
+espresso_lite_v2.menu.lwIP.legacy.build.lwip_include=lwip/include
+espresso_lite_v2.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
 
 ##############################################################
 phoenix_v1.name=Phoenix 1.0
@@ -781,6 +824,13 @@ phoenix_v1.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_E
 phoenix_v1.build.debug_port=
 phoenix_v1.build.debug_level=
 
+phoenix_v1.menu.lwIP.open=v2
+phoenix_v1.menu.lwIP.open.build.lwip_include=lwip2/include
+phoenix_v1.menu.lwIP.open.build.lwip_lib=-llwip2
+phoenix_v1.menu.lwIP.legacy=v1.4 (espressif)
+phoenix_v1.menu.lwIP.legacy.build.lwip_include=lwip/include
+phoenix_v1.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 phoenix_v2.name=Phoenix 2.0
 phoenix_v2.upload.tool=esptool
@@ -886,6 +936,13 @@ phoenix_v2.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_E
 phoenix_v2.build.debug_port=
 phoenix_v2.build.debug_level=
 
+phoenix_v2.menu.lwIP.open=v2
+phoenix_v2.menu.lwIP.open.build.lwip_include=lwip2/include
+phoenix_v2.menu.lwIP.open.build.lwip_lib=-llwip2
+phoenix_v2.menu.lwIP.legacy=v1.4 (espressif)
+phoenix_v2.menu.lwIP.legacy.build.lwip_include=lwip/include
+phoenix_v2.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
 
@@ -949,6 +1006,13 @@ nodemcu.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 nodemcu.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 nodemcu.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 nodemcu.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+
+nodemcu.menu.lwIP.open=v2
+nodemcu.menu.lwIP.open.build.lwip_include=lwip2/include
+nodemcu.menu.lwIP.open.build.lwip_lib=-llwip2
+nodemcu.menu.lwIP.legacy=v1.4 (espressif)
+nodemcu.menu.lwIP.legacy.build.lwip_include=lwip/include
+nodemcu.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
 
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
@@ -1014,6 +1078,12 @@ nodemcuv2.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 nodemcuv2.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 nodemcuv2.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
+nodemcuv2.menu.lwIP.open=v2
+nodemcuv2.menu.lwIP.open.build.lwip_include=lwip2/include
+nodemcuv2.menu.lwIP.open.build.lwip_lib=-llwip2
+nodemcuv2.menu.lwIP.legacy=v1.4 (espressif)
+nodemcuv2.menu.lwIP.legacy.build.lwip_include=lwip/include
+nodemcuv2.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
 
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
@@ -1069,6 +1139,13 @@ modwifi.menu.UploadSpeed.512000.upload.speed=512000
 modwifi.menu.UploadSpeed.921600=921600
 modwifi.menu.UploadSpeed.921600.upload.speed=921600
 
+modwifi.menu.lwIP.open=v2
+modwifi.menu.lwIP.open.build.lwip_include=lwip2/include
+modwifi.menu.lwIP.open.build.lwip_lib=-llwip2
+modwifi.menu.lwIP.legacy=v1.4 (espressif)
+modwifi.menu.lwIP.legacy.build.lwip_include=lwip/include
+modwifi.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 thing.name=SparkFun ESP8266 Thing
 
@@ -1121,6 +1198,13 @@ thing.menu.UploadSpeed.512000.windows=512000
 thing.menu.UploadSpeed.512000.upload.speed=512000
 thing.menu.UploadSpeed.921600=921600
 thing.menu.UploadSpeed.921600.upload.speed=921600
+
+thing.menu.lwIP.open=v2
+thing.menu.lwIP.open.build.lwip_include=lwip2/include
+thing.menu.lwIP.open.build.lwip_lib=-llwip2
+thing.menu.lwIP.legacy=v1.4 (espressif)
+thing.menu.lwIP.legacy.build.lwip_include=lwip/include
+thing.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
 
 ##############################################################
 thingdev.name=SparkFun ESP8266 Thing Dev
@@ -1233,6 +1317,13 @@ esp210.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 esp210.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 esp210.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
+esp210.menu.lwIP.open=v2
+esp210.menu.lwIP.open.build.lwip_include=lwip2/include
+esp210.menu.lwIP.open.build.lwip_lib=-llwip2
+esp210.menu.lwIP.legacy=v1.4 (espressif)
+esp210.menu.lwIP.legacy.build.lwip_include=lwip/include
+esp210.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 # wifio.name=Wifio
 #
@@ -1327,6 +1418,13 @@ d1_mini.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 d1_mini.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1_mini.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
+d1_mini.menu.lwIP.open=v2
+d1_mini.menu.lwIP.open.build.lwip_include=lwip2/include
+d1_mini.menu.lwIP.open.build.lwip_lib=-llwip2
+d1_mini.menu.lwIP.legacy=v1.4 (espressif)
+d1_mini.menu.lwIP.legacy.build.lwip_include=lwip/include
+d1_mini.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 d1.name=WeMos D1(Retired)
 
@@ -1392,6 +1490,12 @@ d1.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 d1.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 
+d1.menu.lwIP.open=v2
+d1.menu.lwIP.open.build.lwip_include=lwip2/include
+d1.menu.lwIP.open.build.lwip_lib=-llwip2
+d1.menu.lwIP.legacy=v1.4 (espressif)
+d1.menu.lwIP.legacy.build.lwip_include=lwip/include
+d1.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
 
 ##############################################################
 
@@ -1469,6 +1573,13 @@ espino.menu.ResetMethod.ck.upload.resetmethod=ck
 espino.menu.ResetMethod.nodemcu=nodemcu
 espino.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 
+espino.menu.lwIP.open=v2
+espino.menu.lwIP.open.build.lwip_include=lwip2/include
+espino.menu.lwIP.open.build.lwip_lib=-llwip2
+espino.menu.lwIP.legacy=v1.4 (espressif)
+espino.menu.lwIP.legacy.build.lwip_include=lwip/include
+espino.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 espinotee.name=ThaiEasyElec's ESPino
 
@@ -1532,6 +1643,13 @@ espinotee.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 espinotee.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 espinotee.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 espinotee.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+
+espinotee.menu.lwIP.open=v2
+espinotee.menu.lwIP.open.build.lwip_include=lwip2/include
+espinotee.menu.lwIP.open.build.lwip_lib=-llwip2
+espinotee.menu.lwIP.legacy=v1.4 (espressif)
+espinotee.menu.lwIP.legacy.build.lwip_include=lwip/include
+espinotee.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
 
 ##############################################################
 wifinfo.name=WifInfo
@@ -1663,6 +1781,12 @@ wifinfo.menu.UploadSpeed.512000.upload.speed=512000
 wifinfo.menu.UploadSpeed.921600=921600
 wifinfo.menu.UploadSpeed.921600.upload.speed=921600
 
+wifinfo.menu.lwIP.open=v2
+wifinfo.menu.lwIP.open.build.lwip_include=lwip2/include
+wifinfo.menu.lwIP.open.build.lwip_lib=-llwip2
+wifinfo.menu.lwIP.legacy=v1.4 (espressif)
+wifinfo.menu.lwIP.legacy.build.lwip_include=lwip/include
+wifinfo.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
 
 ##############################################################
 coredev.name=Core Development Module
@@ -1699,6 +1823,11 @@ coredev.menu.LwIPVariant.OpenSource=Open Source (gcc)
 coredev.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 coredev.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 coredev.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
+coredev.menu.LwIPVariant.LWIP2=Original Sources (git+gcc)
+coredev.menu.LwIPVariant.LWIP2.build.lwip_lib=-llwip2
+coredev.menu.LwIPVariant.LWIP2.build.lwip_include=lwip2/include
+coredev.menu.LwIPVariant.LWIP2.build.lwip_flags=-DLWIP_OPEN_SRC
+coredev.menu.LwIPVariant.LWIP2.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip2/builder" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
 
 coredev.menu.CpuFrequency.80=80 MHz
 coredev.menu.CpuFrequency.80.build.f_cpu=80000000L
@@ -1904,6 +2033,13 @@ coredev.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_U
 coredev.menu.DebugLevel.all_____=All
 coredev.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
 
+coredev.menu.lwIP.open=v2
+coredev.menu.lwIP.open.build.lwip_include=lwip2/include
+coredev.menu.lwIP.open.build.lwip_lib=-llwip2
+coredev.menu.lwIP.legacy=v1.4 (espressif)
+coredev.menu.lwIP.legacy.build.lwip_include=lwip/include
+coredev.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ############ Arduino boards with Esp8266 ############
 
 arduino-esp8266.name=Arduino
@@ -1972,6 +2108,13 @@ arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 
+arduino-esp8266.menu.lwIP.open=v2
+arduino-esp8266.menu.lwIP.open.build.lwip_include=lwip2/include
+arduino-esp8266.menu.lwIP.open.build.lwip_lib=-llwip2
+arduino-esp8266.menu.lwIP.legacy=v1.4 (espressif)
+arduino-esp8266.menu.lwIP.legacy.build.lwip_include=lwip/include
+arduino-esp8266.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc
+
 ##############################################################
 
 gen4iod.name=4D Systems gen4 IoD Range
@@ -2021,3 +2164,10 @@ gen4iod.menu.UploadSpeed.512000.windows=512000
 gen4iod.menu.UploadSpeed.512000.upload.speed=512000
 gen4iod.menu.UploadSpeed.921600=921600
 gen4iod.menu.UploadSpeed.921600.upload.speed=921600
+
+gen4iod.menu.lwIP.open=v2
+gen4iod.menu.lwIP.open.build.lwip_include=lwip2/include
+gen4iod.menu.lwIP.open.build.lwip_lib=-llwip2
+gen4iod.menu.lwIP.legacy=v1.4 (espressif)
+gen4iod.menu.lwIP.legacy.build.lwip_include=lwip/include
+gen4iod.menu.lwIP.legacy.build.lwip_lib=-llwip_gcc

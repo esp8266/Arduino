@@ -1,0 +1,28 @@
+
+SDK			?= $(ROOT)/../..
+ESP_LWIP_ORIG		?= $(SDK)/lwip
+LWIP_LIB		?= $(ROOT)/liblwip2.a
+LWIP_LIB_RELEASE	?= $(SDK)/lib/liblwip2.a
+TOOLS			?= $(SDK)/../xtensa-lx106-elf/bin/xtensa-lx106-elf-
+CC			= $(TOOLS)gcc
+AR			= $(TOOLS)ar
+OC			= $(TOOLS)objcopy
+OD			= $(TOOLS)objdump
+
+BUILD			= $(ROOT)/build
+BUILD_FLAGS = -Wall -Wextra -std=c99 -c -Os -g -Wpointer-arith -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -std=gnu99 -ffunction-sections -fdata-sections
+BUILD_DEFINES = -D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ -DLWIP_OPEN_SRC -DLWIP_BUILD -DUSE_OPTIMIZE_PRINTF
+
+default: all
+
+$(BUILD)/%.h:
+	@mkdir -p $(dir $@)
+	@touch $@
+
+$(BUILD)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(BUILD_FLAGS) $(BUILD_DEFINES) $(BUILD_INCLUDES) $< -o $@
+
+$(LWIP_LIB): $(BUILD)/user_config.h $(SRC)
+	$(AR) cru $(LWIP_LIB) $(SRC)
+

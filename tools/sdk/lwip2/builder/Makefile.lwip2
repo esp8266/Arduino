@@ -1,0 +1,25 @@
+
+# this one is executed from directory lwip-git-src/src/
+
+all:
+	cd lwip2-src/src && $(MAKE) -f $(ROOT)/../../Makefile.lwip2 ROOT=$(ROOT)/../.. j$@
+
+SRC = \
+	$(patsubst %.c,$(BUILD)/%.o,$(wildcard netif/ethernet.c)) \
+	$(patsubst %.c,$(BUILD)/%.o,$(wildcard core/*.c)) \
+	$(patsubst %.c,$(BUILD)/%.o,$(wildcard core/ipv4/*.c)) \
+	$(patsubst %.c,$(BUILD)/%.o,$(wildcard core/ipv6/*.c)) \
+	$(patsubst %.c,$(BUILD)/%.o,$(wildcard api/*.c)) \
+	$(patsubst %.c,$(BUILD)/%.o,$(wildcard apps/sntp/*.c)) \
+
+BUILD_INCLUDES = -I$(BUILD) -I$(SDK)/include -Iinclude -I../../glue -I../../glue-lwip2
+
+include $(ROOT)/Makefile.common
+-include $(BUILD)/netif/*.d
+-include $(BUILD)/core/*.d
+-include $(BUILD)/core/ipv4/*.d
+-include $(BUILD)/core/ipv6/*.d
+-include $(BUILD)/api/*.d
+-include $(BUILD)/apps/sntp/*.d
+
+jall: $(LWIP_LIB)
