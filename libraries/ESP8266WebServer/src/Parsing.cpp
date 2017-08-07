@@ -205,6 +205,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         DEBUG_OUTPUT.println(plainBuf);
   #endif
         free(plainBuf);
+      } else {
+        // No content - but we can still have arguments in the URL.
+        _parseArguments(searchStr);
       }
     }
 
