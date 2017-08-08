@@ -25,7 +25,7 @@ char ssid[] = "*************";  //  your network SSID (name)
 char pass[] = "********";       // your network password
 
 
-unsigned int localPort = 2390;      // local port to listen for UDP packets
+unsigned int localPort = 123;      // local port to listen for UDP packets
 
 /* Don't hardwire the IP address or we won't get the benefits of the pool.
  *  Lookup the IP address for the host name instead */
