@@ -3,6 +3,32 @@
 
 #include "RequestHandler.h"
 
+// Table of extension->MIME strings stored in PROGMEM, needs to be global due to GCC section typing rules
+static const struct {const char endsWith[16]; const char mimeType[32];} mimeTable[] ICACHE_RODATA_ATTR = {
+    { ".html", "text/html" },
+    { ".htm", "text/html" },
+    { ".css", "text/css" },
+    { ".txt", "text/plain" },
+    { ".js", "application/javascript" },
+    { ".json", "application/json" },
+    { ".png", "image/png" },
+    { ".gif", "image/gif" },
+    { ".jpg", "image/jpeg" },
+    { ".ico", "image/x-icon" },
+    { ".svg", "image/svg+xml" },
+    { ".ttf", "application/x-font-ttf" },
+    { ".otf", "application/x-font-opentype" },
+    { ".woff", "application/font-woff" },
+    { ".woff2", "application/font-woff2" },
+    { ".eot", "application/vnd.ms-fontobject" },
+    { ".sfnt", "application/font-sfnt" },
+    { ".xml", "text/xml" },
+    { ".pdf", "application/pdf" },
+    { ".zip", "application/zip" },
+    { ".gz", "application/x-gzip" },
+    { ".appcache", "text/cache-manifest" },
+    { "", "application/octet-stream" } };
+
 class FunctionRequestHandler : public RequestHandler {
 public:
     FunctionRequestHandler(ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn, const String &uri, HTTPMethod method)
@@ -116,29 +142,18 @@ public:
     }
 
     static String getContentType(const String& path) {
-        if (path.endsWith(".html")) return "text/html";
-        else if (path.endsWith(".htm")) return "text/html";
-        else if (path.endsWith(".css")) return "text/css";
-        else if (path.endsWith(".txt")) return "text/plain";
-        else if (path.endsWith(".js")) return "application/javascript";
-        else if (path.endsWith(".json")) return "application/json";
-        else if (path.endsWith(".png")) return "image/png";
-        else if (path.endsWith(".gif")) return "image/gif";
-        else if (path.endsWith(".jpg")) return "image/jpeg";
-        else if (path.endsWith(".ico")) return "image/x-icon";
-        else if (path.endsWith(".svg")) return "image/svg+xml";
-        else if (path.endsWith(".ttf")) return "application/x-font-ttf";
-        else if (path.endsWith(".otf")) return "application/x-font-opentype";
-        else if (path.endsWith(".woff")) return "application/font-woff";
-        else if (path.endsWith(".woff2")) return "application/font-woff2";
-        else if (path.endsWith(".eot")) return "application/vnd.ms-fontobject";
-        else if (path.endsWith(".sfnt")) return "application/font-sfnt";
-        else if (path.endsWith(".xml")) return "text/xml";
-        else if (path.endsWith(".pdf")) return "application/pdf";
-        else if (path.endsWith(".zip")) return "application/zip";
-        else if(path.endsWith(".gz")) return "application/x-gzip";
-        else if (path.endsWith(".appcache")) return "text/cache-manifest";
-        return "application/octet-stream";
+        char buff[sizeof(mimeTable[0].mimeType)];
+        // Check all entries but last one for match, return if found
+        for (size_t i=0; i < sizeof(mimeTable)/sizeof(mimeTable[0])-1; i++) {
+            strcpy_P(buff, mimeTable[i].endsWith);
+            if (path.endsWith(buff)) {
+                strcpy_P(buff, mimeTable[i].mimeType);
+                return String(buff);
+            }
+        }
+        // Fall-through and just return default type
+        strcpy_P(buff, mimeTable[sizeof(mimeTable)/sizeof(mimeTable[0])-1].mimeType);
+        return String(buff);
     }
 
 protected:

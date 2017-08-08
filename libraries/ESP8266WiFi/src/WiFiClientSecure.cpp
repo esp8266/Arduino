@@ -657,53 +657,6 @@ extern "C" int __ax_get_file(const char *filename, uint8_t **buf)
 }
 extern "C" void ax_get_file() __attribute__ ((weak, alias("__ax_get_file")));
 
-
-#ifdef DEBUG_TLS_MEM
-#define DEBUG_TLS_MEM_PRINT(...) DEBUGV(__VA_ARGS__)
-#else
-#define DEBUG_TLS_MEM_PRINT(...)
-#endif
-
-extern "C" void* ax_port_malloc(size_t size, const char* file, int line)
-{
-    (void) file;
-    (void) line;
-    void* result = malloc(size);
-    if (result == nullptr) {
-        DEBUG_TLS_MEM_PRINT("%s:%d malloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
-    }
-    if (size >= 1024) {
-        DEBUG_TLS_MEM_PRINT("%s:%d malloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());
-    }
-    return result;
-}
-
-extern "C" void* ax_port_calloc(size_t size, size_t count, const char* file, int line)
-{
-    void* result = ax_port_malloc(size * count, file, line);
-    memset(result, 0, size * count);
-    return result;
-}
-
-extern "C" void* ax_port_realloc(void* ptr, size_t size, const char* file, int line)
-{
-    (void) file;
-    (void) line;
-    void* result = realloc(ptr, size);
-    if (result == nullptr) {
-        DEBUG_TLS_MEM_PRINT("%s:%d realloc %d failed, left %d\r\n", file, line, size, ESP.getFreeHeap());
-    }
-    if (size >= 1024) {
-        DEBUG_TLS_MEM_PRINT("%s:%d realloc %d, left %d\r\n", file, line, size, ESP.getFreeHeap());
-    }
-    return result;
-}
-
-extern "C" void ax_port_free(void* ptr)
-{
-    free(ptr);
-}
-
 extern "C" void __ax_wdt_feed()
 {
     optimistic_yield(10000);
