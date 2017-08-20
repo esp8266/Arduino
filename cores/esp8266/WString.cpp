@@ -159,7 +159,6 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
         buffer = newbuffer;
         return 1;
     }
-    buffer = newbuffer;
     return 0;
 }
 
