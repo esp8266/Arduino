@@ -606,7 +606,7 @@ extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count)
 extern "C" void ax_port_read() __attribute__ ((weak, alias("__ax_port_read")));
 
 uint8_t ax_port_write_retries = 0;
-extern "C" int ax_port_write(int fd, uint8_t* buffer, size_t count) {
+extern "C" int __ax_port_write(int fd, uint8_t* buffer, size_t count) {
     ClientContext* _client = SSLContext::getIOContext(fd);
     if (!_client || _client->state() != ESTABLISHED) {
         errno = EIO;
