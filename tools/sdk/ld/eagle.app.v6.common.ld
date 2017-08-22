@@ -157,11 +157,27 @@ SECTIONS
     *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, \
            EXCLUDE_FILE (umm_malloc.c.o) .text*)
     *.cpp.o(.literal*, .text*)
+    *.pioenvs\\*\\lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, \
+    EXCLUDE_FILE (umm_malloc.o) .text*)
+    *.pioenvs/*/lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, \
+    EXCLUDE_FILE (umm_malloc.o) .text*)
+    *.pioenvs\\*\\lib\*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, \
+    EXCLUDE_FILE (umm_malloc.o) .text*)
+    *.pioenvs/*/lib/*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, \
+    EXCLUDE_FILE (umm_malloc.o) .text*)
+    *.pioenvs\\*\\src\\*.o(EXCLUDE_FILE (umm_malloc.o) .literal*, \
+    EXCLUDE_FILE (umm_malloc.o) .text*)
+    *.pioenvs/*/src/*.o(EXCLUDE_FILE (umm_malloc.o) .literal*, \
+    EXCLUDE_FILE (umm_malloc.o) .text*)
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libgcc.a:_umoddi3.o(.literal .text)
     *libgcc.a:_udivdi3.o(.literal .text)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)
+    *libstdc++.a:(.literal .text .literal.* .text.*)
+    *liblwip_gcc.a:(.literal .text .literal.* .text.*)
+    *liblwip_src.a:(.literal .text .literal.* .text.*)
+    *libaxtls.a:(.literal .text .literal.* .text.*)
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text .irom.text.*)
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);
@@ -201,6 +217,12 @@ SECTIONS
     *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
     *.cpp.o(.iram.text)
     *.c.o(.iram.text)
+    *.pioenvs\\*\\lib*.a:(.iram.text)
+    *.pioenvs/*/lib*.a:(.iram.text)
+    *.pioenvs\\*\\lib\\*.a:(.iram.text)
+    *.pioenvs/*/lib/*.a:(.iram.text)
+    *.pioenvs\\*\\src\\*.o(.iram.text)
+    *.pioenvs/*/src/*.o(.iram.text)
     *(.fini.literal)
     *(.fini)
     *(.gnu.version)

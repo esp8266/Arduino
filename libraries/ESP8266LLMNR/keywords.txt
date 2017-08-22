@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map For Ultrasound
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ESP8266LLMNR	KEYWORD1
+LLMNRResponder	KEYWORD1
+LLMNR	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+notify_ap_change	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

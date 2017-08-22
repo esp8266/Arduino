@@ -83,6 +83,7 @@ EspClass ESP;
 
 void EspClass::wdtEnable(uint32_t timeout_ms)
 {
+    (void) timeout_ms;
     /// This API can only be called if software watchdog is stopped
     system_soft_wdt_restart();
 }
@@ -432,7 +433,7 @@ uint32_t EspClass::getSketchSize() {
         section_index < image_header.num_segments;
         ++section_index)
     {
-        section_header_t section_header = {0};
+        section_header_t section_header = {0, 0};
         if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header))) {
             return 0;
         }

@@ -14,6 +14,7 @@ static scheduled_fn_t* sLastUnused = 0;
 
 static int sCount = 0;
 
+static void init_lists() __attribute__((unused));
 static void init_lists()
 {
     if (sCount != 0) {

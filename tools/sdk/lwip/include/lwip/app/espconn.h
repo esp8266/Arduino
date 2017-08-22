@@ -3,6 +3,7 @@
 
 #include "lwip/dns.h"
 #include "os_type.h"
+#include "lwip/app/espconn_buf.h"
 
 #if 0
 #define espconn_printf(fmt, args...) os_printf(fmt,## args)
@@ -32,6 +33,8 @@ typedef void (* espconn_reconnect_callback)(void *arg, sint8 err);
 #define ESPCONN_ARG        -12   /* Illegal argument.        */
 #define ESPCONN_IF		   -14	 /* Low_level error			 */
 #define ESPCONN_ISCONN     -15   /* Already connected.       */
+#define ESPCONN_TIME	   -16	 /* Sync Time error			 */
+#define ESPCONN_NODATA	   -17	 /* No data can be read	     */
 
 #define ESPCONN_HANDSHAKE  -28   /* ssl handshake failed	 */
 #define ESPCONN_RESP_TIMEOUT -29 /* ssl handshake no response*/
@@ -186,6 +189,8 @@ typedef struct _espconn_msg{
 //***********Code for WIFI_BLOCK from upper**************
 	uint8 recv_hold_flag;
 	uint16 recv_holded_buf_Len;
+//*******************************************************
+	ringbuf *readbuf;
 }espconn_msg;
 
 #ifndef _MDNS_INFO
