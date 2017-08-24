@@ -131,6 +131,15 @@ WifInfo integrates the ESP-12 or ESP-07+Ext antenna module with a 3.3v regulator
 
 For more information, please see WifInfo related `blog <http://hallard.me/category/wifinfo/>`__ entries, `github <https://github.com/hallard/WifInfo>`__ and `community <https://community.hallard.me/category/16/wifinfo>`__ forum.
 
+DigiStump Oak
+-------------
+
+The Oak requires an [adapter](#serial-adapter) for a serial connection or flashing; its micro USB port is only for power.
+
+To make a serial connection, wire the adapter's **TX to P3**, **RX to P4**, and **GND** to **GND**.  Supply 3.3v from the serial adapter if not already powered via USB.
+
+To put the board into bootloader mode, configure a serial connection as above, connect **P2 to GND**, then re-apply power.  Once flashing is complete, remove the connection from P2 to GND, then re-apply power to boot into normal mode.
+
 Generic ESP8266 modules
 -----------------------
 
