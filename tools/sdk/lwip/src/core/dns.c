@@ -227,7 +227,7 @@ static ip_addr_t              dns_servers[DNS_MAX_SERVERS];
 /** Contiguous buffer for processing responses */
 //static u8_t                   dns_payload_buffer[LWIP_MEM_ALIGN_BUFFER(DNS_MSG_SIZE)];
 static u8_t*                  dns_payload;
-static u8_t					  dns_random;
+static u16_t					  dns_random;
 /**
  * Initialize the resolver: set up the UDP pcb and configure the default server
  * (DNS_SERVER_ADDRESS).
@@ -570,7 +570,7 @@ dns_send(u8_t numdns, const char* name, u8_t id)
   char *query, *nptr;
   const char *pHostname;
   u8_t n;
-  dns_random = os_random()%250;
+  dns_random = os_random()>>16;
   LWIP_DEBUGF(DNS_DEBUG, ("dns_send: dns_servers[%"U16_F"] \"%s\": request\n",
               (u16_t)(numdns), name));
   LWIP_ASSERT("dns server out of array", numdns < DNS_MAX_SERVERS);
@@ -698,7 +698,7 @@ dns_check_entry(u8_t i)
 
     case DNS_STATE_DONE: {
       /* if the time to live is nul */
-      if (--pEntry->ttl == 0) {
+      if ((pEntry->ttl == 0) || (--pEntry->ttl == 0)) {
         LWIP_DEBUGF(DNS_DEBUG, ("dns_check_entry: \"%s\": flush\n", pEntry->name));
         /* flush this entry */
         pEntry->state = DNS_STATE_UNUSED;
@@ -825,6 +825,13 @@ dns_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p, ip_addr_t *addr, u16_t 
             if (pEntry->found) {
               (*pEntry->found)(pEntry->name, &pEntry->ipaddr, pEntry->arg);
             }
+            if (pEntry->ttl == 0) {
+              /* RFC 883, page 29: "Zero values are
+                 interpreted to mean that the RR can only be used for the
+                 transaction in progress, and should not be cached."
+                 -> flush this entry now */
+              goto flushentry;
+            }
             /* deallocate memory and return */
             goto memerr;
           } else {
@@ -847,6 +854,7 @@ responseerr:
   if (pEntry->found) {
     (*pEntry->found)(pEntry->name, NULL, pEntry->arg);
   }
+flushentry:
   /* flush this entry */
   pEntry->state = DNS_STATE_UNUSED;
   pEntry->found = NULL;

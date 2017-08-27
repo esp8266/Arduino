@@ -493,6 +493,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <pgmspace.h>
 
 #include "umm_malloc.h"
 
@@ -511,6 +512,9 @@
 #  undef  DBG_LOG_LEVEL
 #  define DBG_LOG_LEVEL DBG_LOG_LEVEL
 #endif
+
+// Macro to place constant strings into PROGMEM and print them properly
+#define printf(fmt, ...)  do { static const char fstr[] PROGMEM = fmt; char rstr[sizeof(fmt)]; for (size_t i=0; i<sizeof(rstr); i++) rstr[i] = fstr[i]; printf(rstr, ##__VA_ARGS__); } while (0)
 
 /* -- dbglog {{{ */
 
