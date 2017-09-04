@@ -860,9 +860,9 @@ bool HTTPClient::sendHeader(const char * type)
     String header = String(type) + " " + _uri + F(" HTTP/1.");
 
     if(_useHTTP10) {
-        header += "0";
+        header += F("0");
     } else {
-        header += "1";
+        header += F("1");
     }
 
     header += String(F("\r\nHost: ")) + _host;
