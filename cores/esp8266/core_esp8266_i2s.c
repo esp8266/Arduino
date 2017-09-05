@@ -95,7 +95,10 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
 void ICACHE_FLASH_ATTR i2s_slc_begin(){
   i2s_slc_queue_len = 0;
   int x, y;
-  
+ 
+  // If a buffer is already allocated, DMA is already running and should be stopped to avoid any race conditions
+  if (i2s_slc_buf_pntr[0]) i2s_end();
+
   for (x=0; x<SLC_BUF_CNT; x++) {
     i2s_slc_buf_pntr[x] = malloc(SLC_BUF_LEN*4);
     for (y=0; y<SLC_BUF_LEN; y++) i2s_slc_buf_pntr[x][y] = 0;
@@ -239,6 +242,10 @@ void ICACHE_FLASH_ATTR i2s_begin(){
 
 void ICACHE_FLASH_ATTR i2s_end(){
   i2s_slc_end();
+  for (int x=0; x<SLC_BUF_CNT; x++) {
+    free(i2s_slc_buf_pntr[x]);
+    i2s_slc_buf_pntr[x] = NULL;
+  }
   pinMode(2, INPUT);
   pinMode(3, INPUT);
   pinMode(15, INPUT);
