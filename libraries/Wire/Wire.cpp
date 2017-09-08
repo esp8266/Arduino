@@ -58,7 +58,6 @@ void TwoWire::begin(int sda, int scl){
   default_sda_pin = sda;
   default_scl_pin = scl;
   twi_init(sda, scl);
-  flush();
 }
 
 void TwoWire::pins(int sda, int scl){
