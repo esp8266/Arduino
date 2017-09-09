@@ -204,7 +204,16 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
   return false;
 }
 
-void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* realm, const String& AuthFailMsg){
+String ESP8266WebServer::getRandomHexString(){
+  char buffer[33];  // buffer to hold 32 Hex Digit + /0
+  int i;
+  for(i=0;i<4;i++){
+    sprintf (buffer+(i*8), "%08x", RANDOM_REG32);
+  }
+  return String(buffer);
+}
+
+void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* realm, const String& authFailMsg){
   if(realm==NULL){
     _srealm = "Login Required";
   }else{
@@ -213,11 +222,11 @@ void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* re
   if(mode==BASIC_AUTH){
     sendHeader("WWW-Authenticate", "Basic realm=\"" + _srealm + "\"");
   }else{
-    _snonce=String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX);
-    _sopaque=String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX)+String(RANDOM_REG32,HEX);
+    _snonce=getRandomHexString();
+    _sopaque=getRandomHexString();
     sendHeader("WWW-Authenticate", "Digest realm=\"" +_srealm + "\", qop=\"auth\", nonce=\""+_snonce+"\", opaque=\""+_sopaque+"\"");
   }
-  send(401,"text/html",AuthFailMsg);
+  send(401,"text/html",authFailMsg);
 }
 
 void ESP8266WebServer::on(const String &uri, ESP8266WebServer::THandlerFunction handler) {

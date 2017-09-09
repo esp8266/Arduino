@@ -79,7 +79,7 @@ public:
   void stop();
 
   bool authenticate(const char * username, const char * password);
-  void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& AuthFailMsg = String("") );
+  void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
   void on(const String &uri, THandlerFunction handler);
@@ -150,7 +150,8 @@ protected:
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
-
+  
+  String getRandomHexString();
   // for extracting Auth parameters
   String _exractparam(String& authReq,const String& param,const char delimit = '"');
 
