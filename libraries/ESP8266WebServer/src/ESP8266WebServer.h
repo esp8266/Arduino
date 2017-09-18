@@ -151,9 +151,9 @@ protected:
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
   
-  String getRandomHexString();
+  String _getRandomHexString();
   // for extracting Auth parameters
-  String _exractparam(String& authReq,const String& param,const char delimit = '"');
+  String _exractParam(String& authReq,const String& param,const char delimit = '"');
 
   struct RequestArgument {
     String key;
