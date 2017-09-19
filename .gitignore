@@ -10,3 +10,4 @@ tools/sdk/lwip/src/build
 tools/sdk/lwip/src/liblwip_src.a
 
 *.pyc
+*.gch
