@@ -152,6 +152,7 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
 
 extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void *arg, int mode) {
   if(pin < 16) {
+    ETS_GPIO_INTR_DISABLE();
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = mode;
     handler->fn = userFunc;
@@ -160,6 +161,7 @@ extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFu
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
     GPIEC = (1 << pin); //Clear Interrupt for this pin
     GPC(pin) |= ((mode & 0xF) << GPCI);//INT mode "mode"
+    ETS_GPIO_INTR_ENABLE();
   }
 }
 
@@ -170,6 +172,7 @@ extern void ICACHE_RAM_ATTR __attachInterrupt(uint8_t pin, voidFuncPtr userFunc,
 
 extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
   if(pin < 16) {
+    ETS_GPIO_INTR_DISABLE();
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
     GPIEC = (1 << pin); //Clear Interrupt for this pin
     interrupt_reg &= ~(1 << pin);
@@ -177,6 +180,7 @@ extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
     handler->mode = 0;
     handler->fn = 0;
     handler->arg = 0;
+    ETS_GPIO_INTR_ENABLE();
   }
 }
 
