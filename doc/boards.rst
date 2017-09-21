@@ -383,3 +383,9 @@ Datasheet and associated downloads can be found on the 4D Systems product page.
 The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.
   
 - Product page: http://www.4dsystems.com.au/product/gen4-IoD
+
+NodeWiFi
+--------
+Open Source Ayarafun/LamLoei NodeWiFi use ESP8285 WiFi chip from Espressif add Charge Battery Lithium Ion or Lithium Polymer 1 cell and PTC Fuse  500mA
+
+Product page: https://www.gravitechthai.com/product_detail.php?d=1622
