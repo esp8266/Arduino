@@ -95,7 +95,7 @@ void HTTPClient::clear()
 {
     _returnCode = 0;
     _size = -1;
-    _headers = "";
+    _headers = F("");
 }
 
 
@@ -274,7 +274,7 @@ void HTTPClient::setAuthorization(const char * user, const char * password)
 {
     if(user && password) {
         String auth = user;
-        auth += ":";
+        auth += F(":");
         auth += password;
         _base64Authorization = base64::encode(auth);
     }
@@ -728,7 +728,7 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first, 
        !(name.equalsIgnoreCase(F("Authorization")) && _base64Authorization.length())){
 
         String headerLine = name;
-        headerLine += ": ";
+        headerLine += F(": ");
 
         if (replace) {
             int headerStart = _headers.indexOf(headerLine);
@@ -739,7 +739,7 @@ void HTTPClient::addHeader(const String& name, const String& value, bool first, 
         }
 
         headerLine += value;
-        headerLine += "\r\n";
+        headerLine += F("\r\n");
         if(first) {
             _headers = headerLine + _headers;
         } else {
@@ -868,7 +868,7 @@ bool HTTPClient::sendHeader(const char * type)
     header += String(F("\r\nHost: ")) + _host;
     if (_port != 80 && _port != 443)
     {
-        header += ':';
+        header += F(":");
         header += String(_port);
     }
     header += String(F("\r\nUser-Agent: ")) + _userAgent +
@@ -879,7 +879,7 @@ bool HTTPClient::sendHeader(const char * type)
     } else {
         header += F("close");
     }
-    header += "\r\n";
+    header += F("\r\n");
 
     if(!_useHTTP10) {
         header += F("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0\r\n");
@@ -889,7 +889,7 @@ bool HTTPClient::sendHeader(const char * type)
         _base64Authorization.replace("\n", "");
         header += F("Authorization: Basic ");
         header += _base64Authorization;
-        header += "\r\n";
+        header += F("\r\n");
     }
 
     header += _headers + "\r\n";
