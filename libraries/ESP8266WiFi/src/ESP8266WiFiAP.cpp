@@ -208,10 +208,10 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     struct dhcps_lease dhcp_lease;
 
     uint32_t net_addr = info.ip.addr & info.netmask.addr;
-    uint32_t bcast_addr = net_addr | !info.netmask.addr;
+    uint32_t bcast_addr = net_addr | ~info.netmask.addr;
 
     // Assign user-supplied range, checking its validity
-    IPAddress ip = (static_cast<uint32_t>(dhcp_start) & !info.netmask.addr) | net_addr;
+    IPAddress ip = (static_cast<uint32_t>(dhcp_start) & ~info.netmask.addr) | net_addr;
 
     dhcp_lease.start_ip.addr = ip;
     if(ip != net_addr && ip != bcast_addr && ip != info.ip.addr && ip != info.gw.addr) {
@@ -220,7 +220,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
         dhcp_lease.start_ip.addr=0;
     }
 
-    ip = (static_cast<uint32_t>(dhcp_end) & !info.netmask.addr) | net_addr;
+    ip = (static_cast<uint32_t>(dhcp_end) & ~info.netmask.addr) | net_addr;
     dhcp_lease.end_ip.addr = static_cast<uint32_t>(ip);
     if(ip != net_addr && ip != bcast_addr && ip != info.ip.addr && ip != info.gw.addr) {
         DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
