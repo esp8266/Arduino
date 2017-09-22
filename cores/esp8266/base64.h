@@ -32,6 +32,7 @@ class base64 {
         // This may 'break' longer uris and json variables
         static String encode(uint8_t * data, size_t length, bool doNewLines = true);
         static String encode(String text, bool doNewLines = true);
+        static size_t decode(char* text, uint8_t * data, size_t maxlength);
     private:
 };
 
