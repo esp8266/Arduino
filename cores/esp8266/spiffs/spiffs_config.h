@@ -201,7 +201,7 @@ typedef uint8_t u8_t;
 // be accepted for mounting with a configuration defining the filesystem as 2
 // megabytes.
 #ifndef SPIFFS_USE_MAGIC_LENGTH
-#define SPIFFS_USE_MAGIC_LENGTH         (1)
+#define SPIFFS_USE_MAGIC_LENGTH         (0)
 #endif
 #endif
 

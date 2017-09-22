@@ -25,7 +25,9 @@ License (MIT license):
   THE SOFTWARE.
 
 */
+#ifndef LWIP_OPEN_SRC
 #define LWIP_OPEN_SRC
+#endif
 #include <functional>
 #include "ESP8266SSDP.h"
 #include "WiFiUdp.h"
@@ -287,7 +289,6 @@ void SSDPClass::_update(){
         case METHOD:
           if(c == ' '){
             if(strcmp(buffer, "M-SEARCH") == 0) method = SEARCH;
-            else if(strcmp(buffer, "NOTIFY") == 0) method = NOTIFY;
 
             if(method == NONE) state = ABORT;
             else state = URI;
@@ -328,7 +329,7 @@ void SSDPClass::_update(){
 #endif
                 }
                 // if the search type matches our type, we should respond instead of ABORT
-                if(strcmp(buffer, _deviceType) == 0){
+                if(strcasecmp(buffer, _deviceType) == 0){
                   _pending = true;
                   _process_time = millis();
                   state = KEY;
