@@ -1061,12 +1061,18 @@ void spiffs_cb_object_event(
 #if SPIFFS_TEMPORAL_FD_CACHE
         if (cur_fd->score == 0) continue; // never used fd
 #endif
-        SPIFFS_DBG("       callback: setting fd "_SPIPRIfd":"_SPIPRIid"(fdoffs:"_SPIPRIi" offs:"_SPIPRIi") objix_hdr_pix to "_SPIPRIpg", size:"_SPIPRIi"\n", SPIFFS_FH_OFFS(fs, cur_fd->file_nbr), cur_fd->obj_id, cur_fd->fdoffset, cur_fd->offset, new_pix, new_size);
+        SPIFFS_DBG("       callback: setting fd "_SPIPRIfd":"_SPIPRIid"(fdoffs:"_SPIPRIi" offs:"_SPIPRIi") objix_hdr_pix to "_SPIPRIpg", size:"_SPIPRIi"\n",
+            SPIFFS_FH_OFFS(fs, cur_fd->file_nbr), cur_fd->obj_id, cur_fd->fdoffset, cur_fd->offset, new_pix, new_size);
         cur_fd->objix_hdr_pix = new_pix;
         if (new_size != 0) {
           // update size and offsets for fds to this file
           cur_fd->size = new_size;
           u32_t act_new_size = new_size == SPIFFS_UNDEFINED_LEN ? 0 : new_size;
+#if SPIFFS_CACHE_WR
+          if (act_new_size > 0 && cur_fd->cache_page) {
+            act_new_size = MAX(act_new_size, cur_fd->cache_page->offset + cur_fd->cache_page->size);
+          }
+#endif
           if (cur_fd->offset > act_new_size) {
             cur_fd->offset = act_new_size;
           }
