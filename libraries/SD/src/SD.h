@@ -91,7 +91,7 @@ public:
  
   //Performs end The SD Card and close the spi connection
   //and to able begin SD Card again without error
-  boolean end();
+  void end();
 
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Returns a File object for interacting with the file.
