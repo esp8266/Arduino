@@ -88,6 +88,10 @@ public:
   // This needs to be called to set up the connection to the SD card
   // before other methods are used.
   boolean begin(uint8_t csPin = SD_CHIP_SELECT_PIN, uint32_t speed = SPI_HALF_SPEED);
+ 
+  //Performs end The SD Card and close the spi connection
+  //and to able begin SD Card again without error
+  void end();
 
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Returns a File object for interacting with the file.
