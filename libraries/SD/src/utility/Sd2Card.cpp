@@ -351,6 +351,13 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
 }
 //------------------------------------------------------------------------------
 /**
+ * End SPI Connection
+ */
+void Sd2Card::end(){
+  SPI.end();
+}
+//------------------------------------------------------------------------------
+/**
  * Enable or disable partial block reads.
  *
  * Enabling partial block reads improves performance by allowing a block
