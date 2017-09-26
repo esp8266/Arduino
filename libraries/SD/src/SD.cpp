@@ -345,6 +345,18 @@ boolean SDClass::begin(uint8_t csPin, uint32_t speed) {
          root.openRoot(volume);
 }
 
+
+void SDClass::end() {
+   /*
+
+    Performs to end The SD Card and close the spi connection
+    and to able begin SD Card again without error
+
+   */
+  root.close();
+  card.end();
+}
+
 // this little helper is used to traverse paths
 SdFile SDClass::getParentDir(const char *filepath, int *index) {
   // get parent directory
