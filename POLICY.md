@@ -1,19 +1,22 @@
 This document describes rules that are in effect for this repository, meant for handling issues by contributors in the issue tracker and PRs.
 # Opening New Issues
 1.	The issue tracker is precisely that: a tool to track issues in the core code, and not a discussion forum. Opening an issues means that a problem has been found in the core code, and that it should be addressed by a contributor.
-2.	Questions of type "How do I..." or "Can you please help me with..." or "Can the ESP do..." won't be handled here. Such questions should be directed at a discussion forum, like esp8266.com or stackoverflow. All issues of this type will be closed with a simple reference to the policy. Example:
+2.	When opening an issue, a template is presented with fields to fill out. The requested information is important. If the template is ignored, or not enough info about the issue is provided, the issue may be closed due to lack of info. Example:
+      * Using WifiMulti and FS crashes with error. Why? (no basic info, no IDE settings, no sketch provided)
+3. Questions of type "How do I..." or "Can you please help me with..." or "Can the ESP do..." won't be handled here. Such questions should be directed at a discussion forum, like esp8266.com or stackoverflow. All issues of this type will be closed with a simple reference to the policy. Example:
     *	how do I connect to wifi
     * how do I connect two ESPs
     * can I send http data over a public network
-3.	Issues that are obviously user error, programming language errors, lack of knowledge or experience with the use semantics of the core libs, or similar, will be closed with a reference to the policy. Examples: 
+    * my wiring/project/code doesn't work, help!
+4. Issues that are obviously user error, programming language errors, lack of knowledge or experience with the use semantics of the core libs, or similar, will be closed with a reference to the policy. Examples: 
     *	sketch crashes due to a char[] in it that is not null terminated
     *	trying to use yield/delay, or libs that use yield/delay, from inside async callbacks
     *	Use of new/malloc without matching delete/free (mem leak)
-4.	Issues about topics already handled in the documentation will be closed in a similar manner. Example:
+5.	Issues about topics already handled in the documentation will be closed in a similar manner. Example:
     *	can't flash with error espcomm failed
-5.	Issues must be provided with a minimalist sketch. Issues with an incomplete sketch, or a huge sketch, will be closed. Maximum effort must be put forth by the person opening the issue to reduce the relevant code that reproduces the issue, so that investigation can be taken up. MCVE is a must.
-6.	Issues with accompanied investigation that shows the root of the problem should be given priority
-7.	Duplicate issues will be closed with a reference to the original
+6.	Issues must be provided with a minimalist sketch. Issues with an incomplete sketch, or a huge sketch, will be closed. Maximum effort must be put forth by the person opening the issue to reduce the relevant code that reproduces the issue, so that investigation can be taken up. MCVE is a must.
+7.	Issues with accompanied investigation that shows the root of the problem should be given priority
+8.	Duplicate issues will be closed with a reference to the original
 
 # Triaging
 1.	Any contributor of the project can participate in the triaging process, if he/she chooses to do so
