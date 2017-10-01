@@ -151,7 +151,7 @@ public:
     void setTimeout(uint16_t timeout);
 
     // Set the root certificate authority to authorize SSL connections with. Must initialize SNTP first.
-    bool setRootCA(uint8_t * cert, size_t size);
+    bool setRootCA(const uint8_t * cert, size_t size);
     // Set the root certificate authority to authorize SSL connections with. Must initialize SNTP first.
     bool setRootCA_P(PGM_VOID_P * cert, size_t size);
     // Set the root certificate authority to authorize SSL connections with. Must initialize SNTP first.

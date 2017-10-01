@@ -363,7 +363,7 @@ void HTTPClient::setTimeout(uint16_t timeout)
     }
 }
 
-bool HTTPClient::setRootCA(uint8_t * cert, size_t size)
+bool HTTPClient::setRootCA(const uint8_t * cert, size_t size)
 {
     bool result = false;
     if(_tcp && (_protocol == "https" || _port == 443)) {
