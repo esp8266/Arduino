@@ -122,6 +122,53 @@ function build_package()
     ./build_boards_manager_package.sh
 }
 
+
+function install_platformio()
+{
+    pip install --user -U https://github.com/platformio/platformio/archive/develop.zip
+    platformio platform install https://github.com/platformio/platform-espressif8266.git#feature/stage
+    sed -i 's/https:\/\/github\.com\/esp8266\/Arduino\.git/*/' ~/.platformio/platforms/espressif8266_stage/platform.json
+    ln -s $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
+    # Install dependencies:
+    # - esp8266/examples/ConfigFile
+    pio lib install ArduinoJson
+}
+
+function build_sketches_with_platformio()
+{
+    set +e
+    local srcpath=$1
+    local build_arg=$2
+    local sketches=$(find $srcpath -name *.ino)
+    for sketch in $sketches; do
+        local sketchdir=$(dirname $sketch)
+        local sketchdirname=$(basename $sketchdir)
+        local sketchname=$(basename $sketch)
+        if [[ "${sketchdirname}.ino" != "$sketchname" ]]; then
+            echo "Skipping $sketch, beacause it is not the main sketch file";
+            continue
+        fi;
+        if [[ -f "$sketchdir/.test.skip" ]]; then
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
+            continue
+        fi
+        local build_cmd="pio ci $sketchdir $build_arg"
+        echo -e "\n ------------ Building $sketch ------------ \n";
+        echo "$build_cmd"
+        time ($build_cmd >build.log)
+        local result=$?
+        if [ $result -ne 0 ]; then
+            echo "Build failed ($1)"
+            echo "Build log:"
+            cat build.log
+            set -e
+            return $result
+        fi
+        rm build.log
+    done
+    set -e
+}
+
 function run_travis_ci_build()
 {
     # Build documentation using Sphinx
@@ -165,6 +212,15 @@ function run_travis_ci_build()
     echo -e "travis_fold:start:size_report"
     cat size.log
     echo -e "travis_fold:end:size_report"
+
+    # PlatformIO
+    echo -e "travis_fold:start:install_platformio"
+    install_platformio
+    echo -e "travis_fold:end:install_platformio"
+
+    echo -e "travis_fold:start:build_sketches_with_platformio"
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
+    echo -e "travis_fold:end:build_sketches_with_platformio"
 }
 
 set -e

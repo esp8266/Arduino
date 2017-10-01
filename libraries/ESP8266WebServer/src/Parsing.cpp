@@ -91,7 +91,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   String searchStr = "";
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
-    searchStr = urlDecode(url.substring(hasSearch + 1));
+    searchStr = url.substring(hasSearch + 1);
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
@@ -166,6 +166,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
           isEncoded = true;
         } else if (headerValue.startsWith("multipart/")){
           boundaryStr = headerValue.substring(headerValue.indexOf('=')+1);
+          boundaryStr.replace("\"","");
           isForm = true;
         }
       } else if (headerName.equalsIgnoreCase("Content-Length")){
@@ -205,6 +206,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         DEBUG_OUTPUT.println(plainBuf);
   #endif
         free(plainBuf);
+      } else {
+        // No content - but we can still have arguments in the URL.
+        _parseArguments(searchStr);
       }
     }
 
@@ -318,7 +322,7 @@ void ESP8266WebServer::_parseArguments(String data) {
     }
     RequestArgument& arg = _currentArgs[iarg];
     arg.key = data.substring(pos, equal_sign_index);
-	arg.value = data.substring(equal_sign_index + 1, next_arg_index);
+    arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
 #ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.print("arg ");
     DEBUG_OUTPUT.print(iarg);
