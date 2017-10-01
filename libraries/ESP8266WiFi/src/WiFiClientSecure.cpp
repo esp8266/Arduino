@@ -45,7 +45,7 @@ extern "C"
 #endif
 
 #ifdef DEBUG_SSL
-#define SSL_DEBUG_OPTS SSL_DISPLAY_STATES
+#define SSL_DEBUG_OPTS (SSL_DISPLAY_STATES | SSL_DISPLAY_CERTS)
 #else
 #define SSL_DEBUG_OPTS 0
 #endif
