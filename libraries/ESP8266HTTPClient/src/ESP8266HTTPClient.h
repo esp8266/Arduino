@@ -150,6 +150,13 @@ public:
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
 
+    // Set the root certificate authority to authorize SSL connections with. Must initialize SNTP first.
+    bool setRootCA(const uint8_t * cert, size_t size);
+    // Set the root certificate authority to authorize SSL connections with. Must initialize SNTP first.
+    bool setRootCA_P(PGM_VOID_P * cert, size_t size);
+    // Set the root certificate authority to authorize SSL connections with. Must initialize SNTP first.
+    bool setRootCA(Stream& cert, size_t size);
+
     void useHTTP10(bool usehttp10 = true);
 
     /// request handling
@@ -222,6 +229,7 @@ protected:
     int _returnCode = 0;
     int _size = -1;
     bool _canReuse = false;
+    bool _verified = false;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
 };
 
