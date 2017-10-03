@@ -42,10 +42,12 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
       GPEC = (1 << pin); //Disable
       GPF(pin) = GPFFS((mode >> 4) & 0x07);
       if(pin == 13 && mode == FUNCTION_4) GPF(pin) |= (1 << GPFPU);//enable pullup on RX
-    }  else if(mode == OUTPUT || mode == OUTPUT_OPEN_DRAIN){
+    }  else if(mode == OUTPUT || mode == OUTPUT_OPEN_DRAIN || mode == OUTPUT_SLEEP_PULLDOWN || mode == OUTPUT_SLEEP_PULLUP){
       GPF(pin) = GPFFS(GPFFS_GPIO(pin));//Set mode to GPIO
       GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
       if(mode == OUTPUT_OPEN_DRAIN) GPC(pin) |= (1 << GPCD);
+	  if(mode == OUTPUT_SLEEP_PULLDOWN) GPF(pin) = (GPF(pin) & ~(1 << GPFSPU)) | (1 << GPFSPD); // Enable low state during sleep
+	  if(mode == OUTPUT_SLEEP_PULLUP) GPF(pin) = (GPF(pin) & ~(1 << GPFSPD)) | (1 << GPFSPU); // Enable high state during sleep
       GPES = (1 << pin); //Enable
     } else if(mode == INPUT || mode == INPUT_PULLUP){
       GPF(pin) = GPFFS(GPFFS_GPIO(pin));//Set mode to GPIO
