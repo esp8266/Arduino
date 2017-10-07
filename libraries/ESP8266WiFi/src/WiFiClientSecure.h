@@ -62,6 +62,8 @@ public:
   bool loadCertificate(Stream& stream, size_t size);
   bool loadPrivateKey(Stream& stream, size_t size);
 
+  void allowSelfSignedCerts();
+
   template<typename TFile>
   bool loadCertificate(TFile& file) {
     return loadCertificate(file, file.size());
@@ -79,6 +81,7 @@ public:
 
 
 protected:
+    void _initSSLContext();
     int _connectSSL(const char* hostName);
     bool _verifyDN(const char* name);
 
