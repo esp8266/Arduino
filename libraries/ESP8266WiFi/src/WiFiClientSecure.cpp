@@ -209,6 +209,14 @@ public:
         return loadObject(type, buf.get(), size);
     }
 
+    bool loadObject_P(int type, PGM_VOID_P data, size_t size)
+    {
+        std::unique_ptr<uint8_t[]> buf(new uint8_t[size]);
+        memcpy_P(buf.get(),data, size);
+        return loadObject(type, buf.get(), size);
+    }
+
+
     bool loadObject(int type, const uint8_t* data, size_t size)
     {
         int rc = ssl_obj_memory_load(_ssl_ctx, type, data, static_cast<int>(size), nullptr);
@@ -585,6 +593,33 @@ bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size)
         _ssl->ref();
     }
     return _ssl->loadObject(SSL_OBJ_RSA_KEY, pk, size);
+}
+
+bool WiFiClientSecure::setCACert_P(PGM_VOID_P pk, size_t size)
+{
+    if (!_ssl) {
+        _ssl = new SSLContext;
+        _ssl->ref();
+    }
+    return _ssl->loadObject_P(SSL_OBJ_X509_CACERT, pk, size);
+}
+
+bool WiFiClientSecure::setCertificate_P(PGM_VOID_P pk, size_t size)
+{
+    if (!_ssl) {
+        _ssl = new SSLContext;
+        _ssl->ref();
+    }
+    return _ssl->loadObject_P(SSL_OBJ_X509_CERT, pk, size);
+}
+
+bool WiFiClientSecure::setPrivateKey_P(PGM_VOID_P pk, size_t size)
+{
+    if (!_ssl) {
+        _ssl = new SSLContext;
+        _ssl->ref();
+    }
+    return _ssl->loadObject_P(SSL_OBJ_RSA_KEY, pk, size);
 }
 
 bool WiFiClientSecure::loadCACert(Stream& stream, size_t size)
