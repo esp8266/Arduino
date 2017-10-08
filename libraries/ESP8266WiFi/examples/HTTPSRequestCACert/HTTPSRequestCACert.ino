@@ -27,7 +27,7 @@ const int httpsPort = 443;
 
 // Root certificate used by api.github.com.
 // Defined in "CACert" tab.
-extern const unsigned char caCert[];
+extern const unsigned char caCert[] PROGMEM;
 extern const unsigned int caCertLen;
 
 WiFiClientSecure client;
@@ -64,7 +64,7 @@ void setup() {
   Serial.print(asctime(&timeinfo));
 
   // Load root certificate in DER format into WiFiClientSecure object
-  bool res = client.setCACert(caCert, caCertLen);
+  bool res = client.setCACert_P(caCert, caCertLen);
   if (!res) {
     Serial.println("Failed to load root CA certificate!");
     while (true) {

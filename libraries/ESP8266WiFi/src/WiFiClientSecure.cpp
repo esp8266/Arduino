@@ -110,6 +110,7 @@ public:
             uint8_t* data;
             int rc = ssl_read(_ssl, &data);
             if (rc < SSL_OK) {
+                ssl_display_error(rc);
                 break;
             }
         }
@@ -209,6 +210,14 @@ public:
         return loadObject(type, buf.get(), size);
     }
 
+    bool loadObject_P(int type, PGM_VOID_P data, size_t size)
+    {
+        std::unique_ptr<uint8_t[]> buf(new uint8_t[size]);
+        memcpy_P(buf.get(),data, size);
+        return loadObject(type, buf.get(), size);
+    }
+
+
     bool loadObject(int type, const uint8_t* data, size_t size)
     {
         int rc = ssl_obj_memory_load(_ssl_ctx, type, data, static_cast<int>(size), nullptr);
@@ -217,6 +226,25 @@ public:
             return false;
         }
         return true;
+    }
+
+    bool verifyCert()
+    {
+        int rc = ssl_verify_cert(_ssl);
+        if (_allowSelfSignedCerts && rc == SSL_X509_ERROR(X509_VFY_ERROR_SELF_SIGNED)) {
+            DEBUGV("Allowing self-signed certificate\n");
+            return true;
+        } else if (rc != SSL_OK) {
+            DEBUGV("ssl_verify_cert returned %d\n", rc);
+            ssl_display_error(rc);
+            return false;
+        }
+        return true;
+    }
+
+    void allowSelfSignedCerts()
+    {
+        _allowSelfSignedCerts = true;
     }
 
     operator SSL*()
@@ -260,6 +288,7 @@ protected:
     int _refcnt = 0;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
+    bool _allowSelfSignedCerts = false;
     static ClientContext* s_io_ctx;
 };
 
@@ -551,67 +580,78 @@ bool WiFiClientSecure::verifyCertChain(const char* domain_name)
     if (!_ssl) {
         return false;
     }
-    int rc = ssl_verify_cert(*_ssl);
-    if (rc != SSL_OK) {
-        DEBUGV("ssl_verify_cert returned %d\n", rc);
+    if (!_ssl->verifyCert()) {
         return false;
     }
-
     return _verifyDN(domain_name);
 }
 
-bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size)
+void WiFiClientSecure::_initSSLContext()
 {
     if (!_ssl) {
         _ssl = new SSLContext;
         _ssl->ref();
     }
+}
+
+bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size)
+{
+    _initSSLContext();
     return _ssl->loadObject(SSL_OBJ_X509_CACERT, pk, size);
 }
 
 bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size)
 {
-    if (!_ssl) {
-        _ssl = new SSLContext;
-        _ssl->ref();
-    }
+    _initSSLContext();
     return _ssl->loadObject(SSL_OBJ_X509_CERT, pk, size);
 }
 
 bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size)
 {
-    if (!_ssl) {
-        _ssl = new SSLContext;
-        _ssl->ref();
-    }
+    _initSSLContext();
     return _ssl->loadObject(SSL_OBJ_RSA_KEY, pk, size);
+}
+
+bool WiFiClientSecure::setCACert_P(PGM_VOID_P pk, size_t size)
+{
+    _initSSLContext();
+    return _ssl->loadObject_P(SSL_OBJ_X509_CACERT, pk, size);
+}
+
+bool WiFiClientSecure::setCertificate_P(PGM_VOID_P pk, size_t size)
+{
+    _initSSLContext();
+    return _ssl->loadObject_P(SSL_OBJ_X509_CERT, pk, size);
+}
+
+bool WiFiClientSecure::setPrivateKey_P(PGM_VOID_P pk, size_t size)
+{
+    _initSSLContext();
+    return _ssl->loadObject_P(SSL_OBJ_RSA_KEY, pk, size);
 }
 
 bool WiFiClientSecure::loadCACert(Stream& stream, size_t size)
 {
-    if (!_ssl) {
-        _ssl = new SSLContext;
-        _ssl->ref();
-    }
+    _initSSLContext();
     return _ssl->loadObject(SSL_OBJ_X509_CACERT, stream, size);
 }
 
 bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size)
 {
-    if (!_ssl) {
-        _ssl = new SSLContext;
-        _ssl->ref();
-    }
+    _initSSLContext();
     return _ssl->loadObject(SSL_OBJ_X509_CERT, stream, size);
 }
 
 bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size)
 {
-    if (!_ssl) {
-        _ssl = new SSLContext;
-        _ssl->ref();
-    }
+    _initSSLContext();
     return _ssl->loadObject(SSL_OBJ_RSA_KEY, stream, size);
+}
+
+void WiFiClientSecure::allowSelfSignedCerts()
+{
+    _initSSLContext();
+    _ssl->allowSelfSignedCerts();
 }
 
 extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count)
