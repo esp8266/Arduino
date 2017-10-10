@@ -138,6 +138,8 @@ loadCertificate	KEYWORD2
 loadPrivateKey	KEYWORD2
 loadCACert	KEYWORD2
 allowSelfSignedCerts	KEYWORD2
+setFingerprint	KEYWORD2
+setSPKI	KEYWORD2
 
 #WiFiServer
 hasClient	KEYWORD2

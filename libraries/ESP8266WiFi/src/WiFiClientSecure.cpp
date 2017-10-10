@@ -228,10 +228,36 @@ public:
         return true;
     }
 
+    bool setFingerprint(const char* fp) {
+        const size_t sha1_size = 20;
+        _fingerprint.reset(new uint8_t[sha1_size]);
+        return parseHexString(_fingerprint.get(), sha1_size, fp);
+    }
+
+    bool setSPKI(const char* spki) {
+        const size_t sha256_size = 32;
+        _spki.reset(new uint8_t[sha256_size]);
+        return parseHexString(_spki.get(), sha256_size, spki);
+    }
+
     bool verifyCert()
     {
         int rc = ssl_verify_cert(_ssl);
-        if (_allowSelfSignedCerts && rc == SSL_X509_ERROR(X509_VFY_ERROR_SELF_SIGNED)) {
+        if (rc == SSL_X509_ERROR(X509_VFY_ERROR_NO_TRUSTED_CERT)) {
+            if (_spki) {
+                DEBUGV("Verifying certificate by SPKI\n");
+                if (ssl_match_spki_sha256(_ssl, _spki.get()) != SSL_OK) {
+                    DEBUGV("Fingerprint does not match\n");
+                    return false;
+                }
+            } else if (_fingerprint) {
+                DEBUGV("Verifying certificate by fingerprint\n");
+                if (ssl_match_fingerprint(_ssl, _fingerprint.get()) != SSL_OK) {
+                    DEBUGV("SPKI does not match\n");
+                    return false;
+                }
+            }
+        } else if (_allowSelfSignedCerts && rc == SSL_X509_ERROR(X509_VFY_ERROR_SELF_SIGNED)) {
             DEBUGV("Allowing self-signed certificate\n");
             return true;
         } else if (rc != SSL_OK) {
@@ -282,6 +308,43 @@ protected:
         return _available;
     }
 
+    static bool parseHexNibble(char pb, uint8_t* res)
+    {
+        if (pb >= '0' && pb <= '9') {
+            *res = (uint8_t) (pb - '0'); return true;
+        } else if (pb >= 'a' && pb <= 'f') {
+            *res = (uint8_t) (pb - 'a' + 10); return true;
+        } else if (pb >= 'A' && pb <= 'F') {
+            *res = (uint8_t) (pb - 'A' + 10); return true;
+        }
+        return false;
+    }
+
+    static bool parseHexString(uint8_t* dest, size_t dst_len, const char* src)
+    {
+        int len = strlen(src);
+        int pos = 0;
+        for (size_t i = 0; i < dst_len; ++i) {
+            while (pos < len && ((src[pos] == ' ') || (src[pos] == ':'))) {
+                ++pos;
+            }
+            if (pos > len - 2) {
+                DEBUGV("pos:%d len:%d fingerprint too short\r\n", pos, len);
+                return false;
+            }
+            uint8_t high, low;
+            if (!parseHexNibble(src[pos], &high) || !parseHexNibble(src[pos+1], &low)) {
+                DEBUGV("pos:%d len:%d invalid hex sequence: %c%c\r\n", pos, len, src[pos], src[pos+1]);
+                return false;
+            }
+            pos += 2;
+            dest[i] = low | (high << 4);
+        }
+        return true;
+    }
+
+
+
     static SSL_CTX* _ssl_ctx;
     static int _ssl_ctx_refcnt;
     SSL* _ssl = nullptr;
@@ -289,6 +352,8 @@ protected:
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
     bool _allowSelfSignedCerts = false;
+    std::unique_ptr<uint8_t[]> _fingerprint;
+    std::unique_ptr<uint8_t[]> _spki;
     static ClientContext* s_io_ctx;
 };
 
@@ -476,18 +541,6 @@ void WiFiClientSecure::stop()
     WiFiClient::stop();
 }
 
-static bool parseHexNibble(char pb, uint8_t* res)
-{
-    if (pb >= '0' && pb <= '9') {
-        *res = (uint8_t) (pb - '0'); return true;
-    } else if (pb >= 'a' && pb <= 'f') {
-        *res = (uint8_t) (pb - 'a' + 10); return true;
-    } else if (pb >= 'A' && pb <= 'F') {
-        *res = (uint8_t) (pb - 'A' + 10); return true;
-    }
-    return false;
-}
-
 // Compare a name from certificate and domain name, return true if they match
 static bool matchName(const String& name, const String& domainName)
 {
@@ -520,27 +573,11 @@ bool WiFiClientSecure::verify(const char* fp, const char* domain_name)
         return false;
     }
 
-    uint8_t sha1[20];
-    int len = strlen(fp);
-    int pos = 0;
-    for (size_t i = 0; i < sizeof(sha1); ++i) {
-        while (pos < len && ((fp[pos] == ' ') || (fp[pos] == ':'))) {
-            ++pos;
-        }
-        if (pos > len - 2) {
-            DEBUGV("pos:%d len:%d fingerprint too short\r\n", pos, len);
-            return false;
-        }
-        uint8_t high, low;
-        if (!parseHexNibble(fp[pos], &high) || !parseHexNibble(fp[pos+1], &low)) {
-            DEBUGV("pos:%d len:%d invalid hex sequence: %c%c\r\n", pos, len, fp[pos], fp[pos+1]);
-            return false;
-        }
-        pos += 2;
-        sha1[i] = low | (high << 4);
+    if (!setFingerprint(fp)) {
+        return false;
     }
-    if (ssl_match_fingerprint(*_ssl, sha1) != 0) {
-        DEBUGV("fingerprint doesn't match\r\n");
+
+    if (!_ssl->verifyCert()) {
         return false;
     }
 
@@ -646,6 +683,18 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size)
 {
     _initSSLContext();
     return _ssl->loadObject(SSL_OBJ_RSA_KEY, stream, size);
+}
+
+bool WiFiClientSecure::setFingerprint(const char* fp)
+{
+    _initSSLContext();
+    return _ssl->setFingerprint(fp);
+}
+
+bool WiFiClientSecure::setSPKI(const char* spki)
+{
+    _initSSLContext();
+    return _ssl->setSPKI(spki);
 }
 
 void WiFiClientSecure::allowSelfSignedCerts()

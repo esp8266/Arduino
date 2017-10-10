@@ -38,7 +38,9 @@ public:
   int connect(IPAddress ip, uint16_t port) override;
   int connect(const char* name, uint16_t port) override;
 
-  bool verify(const char* fingerprint, const char* domain_name);
+  /* Deprecated; call setFingerprint(fingerprint) and then verifyCertChain(domain_name) */
+  bool verify(const char* fingerprint, const char* domain_name) __attribute__((deprecated));
+  
   bool verifyCertChain(const char* domain_name);
 
   uint8_t connected() override;
@@ -61,6 +63,9 @@ public:
   bool loadCACert(Stream& stream, size_t size);
   bool loadCertificate(Stream& stream, size_t size);
   bool loadPrivateKey(Stream& stream, size_t size);
+
+  bool setFingerprint(const char* fp);
+  bool setSPKI(const char* spki);
 
   void allowSelfSignedCerts();
 
