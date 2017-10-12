@@ -234,7 +234,7 @@ int printf_P(PGM_P formatP, ...) {
     char* format = new char[fmtLen + 1];
     strcpy_P(format, formatP);
 
-    ret = printf(format, arglist);
+    ret = vprintf(format, arglist);
 
     delete[] format;
 
