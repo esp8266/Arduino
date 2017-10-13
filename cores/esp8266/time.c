@@ -122,7 +122,7 @@ int gettimeofday(struct timeval *tp, void *tzp)
     {
         ensureBootTimeIsSet();
         tp->tv_sec  = (s_bootTime + millis()) / 1000;
-        tp->tv_usec = micros() * 1000;
+        tp->tv_usec = micros();
     }
     return 0;
 }
