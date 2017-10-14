@@ -62,10 +62,10 @@ public:
   using Print::write;
 
 protected:
-  int8_t _accept(tcp_pcb* newpcb, int8_t err);
+  long _accept(tcp_pcb* newpcb, long err);
   void   _discard(ClientContext* client);
 
-  static int8_t _s_accept(void *arg, tcp_pcb* newpcb, int8_t err);
+  static long _s_accept(void *arg, tcp_pcb* newpcb, long err);
   static void _s_discard(void* server, ClientContext* ctx);
 };
 

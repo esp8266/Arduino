@@ -29,12 +29,6 @@ typedef void (*discard_cb_t)(void*, ClientContext*);
 extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
-#ifdef LWIP_OPEN_SRC
-typedef err_t recv_ret_t;
-#else
-typedef int32_t recv_ret_t;
-#endif
-
 #include "DataSource.h"
 
 class ClientContext
@@ -45,7 +39,7 @@ public:
     {
         tcp_setprio(pcb, TCP_PRIO_MIN);
         tcp_arg(pcb, this);
-        tcp_recv(pcb, (tcp_recv_fn) &_s_recv);
+        tcp_recv(pcb, &_s_recv);
         tcp_sent(pcb, &_s_sent);
         tcp_err(pcb, &_s_error);
         tcp_poll(pcb, &_s_poll, 1);
@@ -78,7 +72,7 @@ public:
             tcp_poll(_pcb, NULL, 0);
             err = tcp_close(_pcb);
             if(err != ERR_OK) {
-                DEBUGV(":tc err %d\r\n", err);
+                DEBUGV(":tc err %d\r\n", (int) err);
                 tcp_abort(_pcb);
                 err = ERR_ABRT;
             }
@@ -126,7 +120,7 @@ public:
 
     int connect(ip_addr_t* addr, uint16_t port)
     {
-        err_t err = tcp_connect(_pcb, addr, port, reinterpret_cast<tcp_connected_fn>(&ClientContext::_s_connected));
+        err_t err = tcp_connect(_pcb, addr, port, &ClientContext::_s_connected);
         if (err != ERR_OK) {
             return 0;
         }
@@ -396,7 +390,7 @@ protected:
                 break;
             }
             err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
-            DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, err);
+            DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, (int) err);
             _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
                 _written += next_chunk;
@@ -456,7 +450,7 @@ protected:
         }
     }
 
-    recv_ret_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)
+    err_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)
     {
         (void) pcb;
         (void) err;
@@ -481,7 +475,7 @@ protected:
     void _error(err_t err)
     {
         (void) err;
-        DEBUGV(":er %d %08x\r\n", err, (uint32_t) _datasource);
+        DEBUGV(":er %d 0x%08x\r\n", (int) err, (uint32_t) _datasource);
         tcp_arg(_pcb, NULL);
         tcp_sent(_pcb, NULL);
         tcp_recv(_pcb, NULL);
@@ -490,7 +484,7 @@ protected:
         _notify_error();
     }
 
-    int8_t _connected(void* pcb, int8_t err)
+    err_t _connected(struct tcp_pcb *pcb, err_t err)
     {
         (void) err;
         assert(pcb == _pcb);
@@ -505,7 +499,7 @@ protected:
         return ERR_OK;
     }
 
-    static recv_ret_t _s_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *pb, err_t err)
+    static err_t _s_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *pb, err_t err)
     {
         return reinterpret_cast<ClientContext*>(arg)->_recv(tpcb, pb, err);
     }
@@ -525,7 +519,7 @@ protected:
         return reinterpret_cast<ClientContext*>(arg)->_sent(tpcb, len);
     }
 
-    static int8_t _s_connected(void* arg, void* pcb, int8_t err)
+    static err_t _s_connected(void* arg, struct tcp_pcb *pcb, err_t err)
     {
         return reinterpret_cast<ClientContext*>(arg)->_connected(pcb, err);
     }
