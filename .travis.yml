@@ -15,6 +15,7 @@ script:
 deploy:
   provider: releases
   prerelease: true
+  skip_cleanup: true
   api_key:
     secure: A4FBmqyhlzy33oPeZVolg2Q/A3ZcJ3WnRQqQJ3NAPy+qGM5xcboOYtwcLL9vKaHZGfUB7lUP9QVZFGou1Wrmo9DnPvAoe3+XvCaDRGzVMxeIpu7UStbBD4Knbh98tlbMvZCXYRlT4VcusI9bMLK6UWw4sMdPislBh2FEfglTiag=
   file_glob: true
