@@ -154,6 +154,7 @@ void init_done() {
     esp_schedule();
 }
 
+extern void early_init();
 
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
@@ -172,4 +173,7 @@ extern "C" void user_init(void) {
         LOOP_QUEUE_SIZE);
 
     system_init_done_cb(&init_done);
+    
+    // early init stuff from user sketch
+    early_init();
 }
