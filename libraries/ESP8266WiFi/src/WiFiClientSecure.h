@@ -80,6 +80,11 @@ public:
   }
 
 
+  template<typename TFile>
+  bool loadCACert(TFile& file) {
+    return loadCACert(file, file.size());
+  }
+
 protected:
     void _initSSLContext();
     int _connectSSL(const char* hostName);
