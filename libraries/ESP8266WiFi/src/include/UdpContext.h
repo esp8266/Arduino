@@ -309,7 +309,7 @@ public:
 #endif
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
-            DEBUGV(":ust rc=%d\r\n", err);
+            DEBUGV(":ust rc=%d\r\n", (int) err);
         }
 #ifdef LWIP_MAYBE_XCC
         _pcb->ttl = old_ttl;
