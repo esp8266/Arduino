@@ -52,9 +52,11 @@ public:
   const T &put(int address, const T &t) {
     if (address < 0 || address + sizeof(T) > _size)
       return t;
+    if (memcmp(_data + address, (const uint8_t*)&t, sizeof(T)) != 0) {
+	_dirty = true;
+	memcpy(_data + address, (const uint8_t*)&t, sizeof(T));
+    }
 
-    memcpy(_data + address, (const uint8_t*) &t, sizeof(T));
-    _dirty = true;
     return t;
   }
 
