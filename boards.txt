@@ -242,7 +242,6 @@ generic.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_U
 generic.menu.DebugLevel.all_____=All
 generic.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM
 
-
 generic.menu.lwIP.open=v2
 generic.menu.lwIP.open.build.lwip_include=lwip2/include
 generic.menu.lwIP.open.build.lwip_lib=-llwip2
