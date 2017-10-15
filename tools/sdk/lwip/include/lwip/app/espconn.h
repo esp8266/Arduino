@@ -573,7 +573,7 @@ extern sint8 espconn_get_keepalive(struct espconn *espconn, uint8 level, void *o
  *                - ESPCONN_ARG: dns client not initialized or invalid hostname
 *******************************************************************************/
 
-extern sint8 espconn_gethostbyname(struct espconn *pespconn, const char *name, ip_addr_t *addr, dns_found_callback found);
+extern err_t espconn_gethostbyname(struct espconn *pespconn, const char *name, ip_addr_t *addr, dns_found_callback found);
 
 /******************************************************************************
  * FunctionName : espconn_igmp_join
@@ -674,5 +674,13 @@ extern void espconn_mdns_enable(void);
  *  Returns     : none
 *******************************************************************************/
 extern void espconn_dns_setserver(u8_t numdns, ip_addr_t *dnsserver);
+/******************************************************************************
+ * FunctionName : espconn_dns_getserver
+ * Description  : get dns server.
+ * Parameters   : numdns -- the index of the DNS server ,must
+ * 				  be < DNS_MAX_SERVERS = 2
+ *  Returns     : dnsserver -- struct ip_addr_t
+*******************************************************************************/
+extern ip_addr_t espconn_dns_getserver(u8_t numdns);
 #endif
 
