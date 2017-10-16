@@ -34,6 +34,7 @@ public:
     virtual bool seek(uint32_t pos, SeekMode mode) = 0;
     virtual size_t position() const = 0;
     virtual size_t size() const = 0;
+    virtual time_t getLastWrite() = 0;
     virtual void close() = 0;
     virtual const char* name() const = 0;
 };

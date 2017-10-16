@@ -49,6 +49,16 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
                fd, path, openMode, accessMode, _fs.err_code);
         return FileImplPtr();
     }
+#if SPIFFS_OBJ_META_LEN > 0
+    if (!(mode & SPIFFS_O_RDONLY))
+        {
+            time_t t = time(NULL);
+            struct tm tmr;
+            localtime_r(&t, &tmr);
+            time_t meta = mktime(&tmr);
+            SPIFFS_fupdate_meta(&_fs, fd, &meta);
+        }
+#endif
     return std::make_shared<SPIFFSFileImpl>(this, fd);
 }
 

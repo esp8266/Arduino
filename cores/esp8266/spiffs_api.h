@@ -32,6 +32,9 @@
 #include "spiffs/spiffs.h"
 #include "debug.h"
 #include "flash_utils.h"
+#if SPIFFS_OBJ_META_LEN > 0
+#include <time.h>
+#endif
 
 using namespace fs;
 
@@ -373,6 +376,16 @@ public:
         CHECKFD();
 
         return (const char*) _stat.name;
+    }
+
+    time_t getLastWrite() 
+    {
+        time_t t =0;
+#if SPIFFS_OBJ_META_LEN > 0
+        _getStat() ;
+        memcpy(&t, _stat.meta, sizeof(time_t));
+#endif
+        return t;
     }
 
 protected:

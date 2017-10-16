@@ -59,6 +59,7 @@ public:
     int read() override;
     int peek() override;
     void flush() override;
+    time_t getLastWrite();
     size_t readBytes(char *buffer, size_t length)  override {
         return read((uint8_t*)buffer, length);
     }

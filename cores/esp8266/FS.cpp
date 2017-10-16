@@ -96,6 +96,13 @@ size_t File::position() const {
     return _p->position();
 }
 
+time_t File::getLastWrite() {
+ if (!_p)
+        return 0;
+
+    return _p->getLastWrite();
+}
+
 size_t File::size() const {
     if (!_p)
         return 0;
