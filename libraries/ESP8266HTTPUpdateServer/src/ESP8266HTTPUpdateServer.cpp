@@ -3,6 +3,7 @@
 #include <WiFiServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
+#include <FS.h>
 #include "StreamString.h"
 #include "ESP8266HTTPUpdateServer.h"
 
@@ -82,6 +83,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
           Serial.printf("Update: %s\n", upload.filename.c_str());
         if (upload.name == "spiffs") {
           size_t spiffsSize = ((size_t) &_SPIFFS_end - (size_t) &_SPIFFS_start);
+          SPIFFS.end();
           if (!Update.begin(spiffsSize, U_SPIFFS)){//start with max available size
             if (_serial_output) Update.printError(Serial);
           }
