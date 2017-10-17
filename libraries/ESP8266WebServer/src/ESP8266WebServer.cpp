@@ -279,6 +279,7 @@ void ESP8266WebServer::handleClient() {
   if (!_currentClient.connected()) {
     _currentClient = WiFiClient();
     _currentStatus = HC_NONE;
+    _currentUpload.reset();
     return;
   }
 
@@ -288,6 +289,7 @@ void ESP8266WebServer::handleClient() {
       if (millis() - _statusChange > HTTP_MAX_DATA_WAIT) {
         _currentClient = WiFiClient();
         _currentStatus = HC_NONE;
+        _currentUpload.reset();
       }
       yield();
       return;
@@ -296,6 +298,7 @@ void ESP8266WebServer::handleClient() {
     if (!_parseRequest(_currentClient)) {
       _currentClient = WiFiClient();
       _currentStatus = HC_NONE;
+      _currentUpload.reset();
       return;
     }
     _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
@@ -305,6 +308,7 @@ void ESP8266WebServer::handleClient() {
     if (!_currentClient.connected()) {
       _currentClient = WiFiClient();
       _currentStatus = HC_NONE;
+      _currentUpload.reset();
       return;
     } else {
       _currentStatus = HC_WAIT_CLOSE;
@@ -317,6 +321,7 @@ void ESP8266WebServer::handleClient() {
     if (millis() - _statusChange > HTTP_MAX_CLOSE_WAIT) {
       _currentClient = WiFiClient();
       _currentStatus = HC_NONE;
+      _currentUpload.reset();
     } else {
       yield();
       return;

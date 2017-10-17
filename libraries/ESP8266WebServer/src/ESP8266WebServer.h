@@ -25,6 +25,7 @@
 #define ESP8266WEBSERVER_H
 
 #include <functional>
+#include <memory>
 #include <ESP8266WiFi.h>
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
@@ -93,7 +94,7 @@ public:
   String uri() { return _currentUri; }
   HTTPMethod method() { return _currentMethod; }
   WiFiClient client() { return _currentClient; }
-  HTTPUpload& upload() { return _currentUpload; }
+  HTTPUpload& upload() { return *_currentUpload; }
 
   String arg(String name);        // get request argument value by name
   String arg(int i);              // get request argument value by number
@@ -177,7 +178,7 @@ protected:
 
   int              _currentArgCount;
   RequestArgument* _currentArgs;
-  HTTPUpload       _currentUpload;
+  std::unique_ptr<HTTPUpload> _currentUpload;
 
   int              _headerKeysCount;
   RequestArgument* _currentHeaders;
