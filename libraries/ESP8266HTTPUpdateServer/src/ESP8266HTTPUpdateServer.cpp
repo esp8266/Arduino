@@ -6,13 +6,22 @@
 #include "StreamString.h"
 #include "ESP8266HTTPUpdateServer.h"
 
+extern "C" uint32_t _SPIFFS_start;
+extern "C" uint32_t _SPIFFS_end;
 
 static const char serverIndex[] PROGMEM =
-  R"(<html><body><form method='POST' action='' enctype='multipart/form-data'>
-                  <input type='file' name='update'>
-                  <input type='submit' value='Update'>
+  R"(<html><body>
+     <form method='POST' action='' enctype='multipart/form-data'>
+     Firmware:<br>
+                  <input type='file' name='firmware'>
+                  <input type='submit' value='Update Firmware'>
                </form>
-         </body></html>)";
+     <form method='POST' action='' enctype='multipart/form-data'>
+     Spiffs:<br>
+                  <input type='file' name='spiffs'>
+                  <input type='submit' value='Update SPIFFS'>
+               </form>
+     </body></html>)";
 static const char successResponse[] PROGMEM = 
   "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
 
@@ -71,9 +80,16 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
         WiFiUDP::stopAll();
         if (_serial_output)
           Serial.printf("Update: %s\n", upload.filename.c_str());
-        uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
-        if(!Update.begin(maxSketchSpace)){//start with max available size
-          _setUpdaterError();
+        if (upload.name == "spiffs") {
+          size_t spiffsSize = ((size_t) &_SPIFFS_end - (size_t) &_SPIFFS_start);
+          if (!Update.begin(spiffsSize, U_SPIFFS)){//start with max available size
+            if (_serial_output) Update.printError(Serial);
+          }
+        } else {
+          uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+          if (!Update.begin(maxSketchSpace, U_FLASH)){//start with max available size
+            _setUpdaterError();
+          }
         }
       } else if(_authenticated && upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()){
         if (_serial_output) Serial.printf(".");
