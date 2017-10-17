@@ -91,14 +91,6 @@ u32_t lwip_htonl(u32_t x);
 #endif
 #define lwip_ntohl(x) lwip_htonl(x)
 
-/* Provide usual function names as macros for users, but this can be turned off */
-#ifndef LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
-#define htons(x) lwip_htons(x)
-#define ntohs(x) lwip_ntohs(x)
-#define htonl(x) lwip_htonl(x)
-#define ntohl(x) lwip_ntohl(x)
-#endif
-
 /* These macros should be calculated by the preprocessor and are used
    with compile-time constants only (so that there is no little-endian
    overhead at runtime). */
@@ -109,8 +101,15 @@ u32_t lwip_htonl(u32_t x);
                      (((x) & 0x00ff0000UL) >>  8) | \
                      (((x) & 0xff000000UL) >> 24))
 #define PP_NTOHL(x) PP_HTONL(x)
-
 #endif /* BYTE_ORDER == BIG_ENDIAN */
+
+/* Provide usual function names as macros for users, but this can be turned off */
+#ifndef LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
+#define htons(x) lwip_htons(x)
+#define ntohs(x) lwip_ntohs(x)
+#define htonl(x) lwip_htonl(x)
+#define ntohl(x) lwip_ntohl(x)
+#endif
 
 /* Functions that are not available as standard implementations.
  * In cc.h, you can #define these to implementations available on

@@ -387,9 +387,9 @@ void stats_init(void);
 
 #if MEM_STATS
 #define MEM_STATS_AVAIL(x, y) lwip_stats.mem.x = y
-#define MEM_STATS_INC(x) STATS_INC(mem.x)
-#define MEM_STATS_INC_USED(x, y) STATS_INC_USED(mem, y)
-#define MEM_STATS_DEC_USED(x, y) lwip_stats.mem.x -= y
+#define MEM_STATS_INC(x) SYS_ARCH_INC(lwip_stats.mem.x, 1)
+#define MEM_STATS_INC_USED(x, y) SYS_ARCH_INC(lwip_stats.mem.x, y)
+#define MEM_STATS_DEC_USED(x, y) SYS_ARCH_DEC(lwip_stats.mem.x, y)
 #define MEM_STATS_DISPLAY() stats_display_mem(&lwip_stats.mem, "HEAP")
 #else
 #define MEM_STATS_AVAIL(x, y)
