@@ -34,6 +34,8 @@ author: d. gauchard
 
 #include "stdint.h"
 
+#include "lwip-err-t.h"
+
 #ifdef LWIP_BUILD
 
 // define LWIP_BUILD only when building LWIP
