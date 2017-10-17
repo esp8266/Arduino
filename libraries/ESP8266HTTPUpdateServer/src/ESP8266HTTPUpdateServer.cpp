@@ -13,12 +13,12 @@ static const char serverIndex[] PROGMEM =
   R"(<html><body>
      <form method='POST' action='' enctype='multipart/form-data'>
      Firmware:<br>
-                  <input type='file' name='firmware'>
+                  <input type='file' accept='.bin' name='firmware'>
                   <input type='submit' value='Update Firmware'>
                </form>
      <form method='POST' action='' enctype='multipart/form-data'>
      Spiffs:<br>
-                  <input type='file' name='spiffs'>
+                  <input type='file' accept='.bin' name='spiffs'>
                   <input type='submit' value='Update SPIFFS'>
                </form>
      </body></html>)";
