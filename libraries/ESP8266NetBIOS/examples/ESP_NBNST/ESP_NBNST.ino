@@ -22,6 +22,7 @@ void setup()
     Serial.begin(115200);
 
     // Connect to WiFi network
+    WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
     Serial.println("");
 

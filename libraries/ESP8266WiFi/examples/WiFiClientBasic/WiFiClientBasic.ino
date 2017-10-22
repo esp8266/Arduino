@@ -13,6 +13,7 @@ void setup() {
     delay(10);
 
     // We start by connecting to a WiFi network
+    WiFi.mode(WIFI_STA);
     WiFiMulti.addAP("SSID", "passpasspass");
 
     Serial.println();
