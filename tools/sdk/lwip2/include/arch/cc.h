@@ -41,9 +41,16 @@ author: d. gauchard
 // define LWIP_BUILD only when building LWIP
 // otherwise include files below would conflict
 // with standard headers like atoi()
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 #include "ets_sys.h"
 #include "osapi.h"
 #include "esp-missing.h"
+#ifdef __cplusplus
+}
+#endif
 
 void sntp_set_system_time (uint32_t t);
 

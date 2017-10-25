@@ -405,7 +405,7 @@
  * (requires the LWIP_TCP option)
  */
 #if !defined MEMP_NUM_TCP_SEG || defined __DOXYGEN__
-#define MEMP_NUM_TCP_SEG                16 // 5
+#define MEMP_NUM_TCP_SEG                10 // 5
 #endif
 
 /**
@@ -1045,12 +1045,12 @@
 
 /** DNS maximum number of entries to maintain locally. */
 #if !defined DNS_TABLE_SIZE || defined __DOXYGEN__
-#define DNS_TABLE_SIZE                  4
+#define DNS_TABLE_SIZE                  3 // 4
 #endif
 
 /** DNS maximum host name length supported in the name table. */
 #if !defined DNS_MAX_NAME_LENGTH || defined __DOXYGEN__
-#define DNS_MAX_NAME_LENGTH             256
+#define DNS_MAX_NAME_LENGTH             48 // 256
 #endif
 
 /** The maximum of DNS servers
@@ -1127,7 +1127,7 @@
  * LWIP_UDPLITE==1: Turn on UDP-Lite. (Requires LWIP_UDP)
  */
 #if !defined LWIP_UDPLITE || defined __DOXYGEN__
-#define LWIP_UDPLITE                    1 // 0
+#define LWIP_UDPLITE                    0
 #endif
 
 /**
