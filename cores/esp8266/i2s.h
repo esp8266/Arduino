@@ -40,7 +40,8 @@ speed.
 extern "C" {
 #endif
 
-void i2s_begin();
+void i2s_begin(); // Start I2S with default buffer sizes
+void i2s_begin_custom(uint16_t buffers, uint16_t buffer_samples); // User-defined RAM buffers for I2S DMA, specified in # of 32-bit samples
 void i2s_end();
 void i2s_set_rate(uint32_t rate);//Sample Rate in Hz (ex 44100, 48000)
 bool i2s_write_sample(uint32_t sample);//32bit sample with channels being upper and lower 16 bits (blocking when DMA is full)
