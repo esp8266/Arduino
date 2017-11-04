@@ -277,7 +277,7 @@ bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
         DEBUG_WIFI("[APdisconnect] set_config failed!\n");
     }
 
-    if(wifioff) {
+    if(ret && wifioff) {
         ret = WiFi.enableAP(false);
     }
 
