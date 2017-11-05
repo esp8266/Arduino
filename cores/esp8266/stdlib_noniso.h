@@ -42,6 +42,8 @@ char* ultoa (unsigned long val, char *s, int radix);
  
 char* dtostrf (double val, signed char width, unsigned char prec, char *s);
 
+void reverse(char* begin, char* end);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

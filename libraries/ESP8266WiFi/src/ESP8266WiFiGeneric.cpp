@@ -22,6 +22,8 @@
 
  */
 
+#include <list>
+#include <string.h>
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 
@@ -36,72 +38,184 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/err.h"
 #include "lwip/dns.h"
+#include "lwip/init.h" // LWIP_VERSION_
 }
 
 #include "WiFiClient.h"
 #include "WiFiUdp.h"
-
 #include "debug.h"
-
-#undef min
-#undef max
-#include <vector>
 
 extern "C" void esp_schedule();
 extern "C" void esp_yield();
+
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------- Generic WiFi function -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-// arduino dont like std::vectors move static here
-static std::vector<WiFiEventCbList_t> cbEventList;
+struct WiFiEventHandlerOpaque
+{
+    WiFiEventHandlerOpaque(WiFiEvent_t event, std::function<void(System_Event_t*)> handler)
+    : mEvent(event), mHandler(handler)
+    {
+    }
+
+    void operator()(System_Event_t* e)
+    {
+        if (static_cast<WiFiEvent>(e->event) == mEvent || mEvent == WIFI_EVENT_ANY) {
+            mHandler(e);
+        }
+    }
+
+    bool canExpire()
+    {
+        return mCanExpire;
+    }
+
+    WiFiEvent_t mEvent;
+    std::function<void(System_Event_t*)> mHandler;
+    bool mCanExpire = true; /* stopgap solution to handle deprecated void onEvent(cb, evt) case */
+};
+
+static std::list<WiFiEventHandler> sCbEventList;
 
 bool ESP8266WiFiGenericClass::_persistent = true;
 WiFiMode_t ESP8266WiFiGenericClass::_forceSleepLastMode = WIFI_OFF;
 
-ESP8266WiFiGenericClass::ESP8266WiFiGenericClass()  {
+ESP8266WiFiGenericClass::ESP8266WiFiGenericClass() 
+{
     wifi_set_event_handler_cb((wifi_event_handler_cb_t) &ESP8266WiFiGenericClass::_eventCallback);
 }
 
-/**
- * set callback function
- * @param cbEvent WiFiEventCb
- * @param event optional filter (WIFI_EVENT_MAX is all events)
- */
-void ESP8266WiFiGenericClass::onEvent(WiFiEventCb cbEvent, WiFiEvent_t event) {
-    if(!cbEvent) {
-        return;
-    }
-    WiFiEventCbList_t newEventHandler;
-    newEventHandler.cb = cbEvent;
-    newEventHandler.event = event;
-    cbEventList.push_back(newEventHandler);
+void ESP8266WiFiGenericClass::onEvent(WiFiEventCb f, WiFiEvent_t event)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(event, [f](System_Event_t* e) {
+        (*f)(static_cast<WiFiEvent>(e->event));
+    });
+    handler->mCanExpire = false;
+    sCbEventList.push_back(handler);
 }
 
-/**
- * removes a callback form event handler
- * @param cbEvent WiFiEventCb
- * @param event optional filter (WIFI_EVENT_MAX is all events)
- */
-void ESP8266WiFiGenericClass::removeEvent(WiFiEventCb cbEvent, WiFiEvent_t event) {
-    if(!cbEvent) {
-        return;
-    }
-
-    for(uint32_t i = 0; i < cbEventList.size(); i++) {
-        WiFiEventCbList_t entry = cbEventList[i];
-        if(entry.cb == cbEvent && entry.event == event) {
-            cbEventList.erase(cbEventList.begin() + i);
-        }
-    }
+WiFiEventHandler ESP8266WiFiGenericClass::onStationModeConnected(std::function<void(const WiFiEventStationModeConnected&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_CONNECTED, [f](System_Event_t* e) {
+        auto& src = e->event_info.connected;
+        WiFiEventStationModeConnected dst;
+        dst.ssid = String(reinterpret_cast<char*>(src.ssid));
+        memcpy(dst.bssid, src.bssid, 6);
+        dst.channel = src.channel;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
 }
+
+WiFiEventHandler ESP8266WiFiGenericClass::onStationModeDisconnected(std::function<void(const WiFiEventStationModeDisconnected&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_DISCONNECTED, [f](System_Event_t* e){
+        auto& src = e->event_info.disconnected;
+        WiFiEventStationModeDisconnected dst;
+        dst.ssid = String(reinterpret_cast<char*>(src.ssid));
+        memcpy(dst.bssid, src.bssid, 6);
+        dst.reason = static_cast<WiFiDisconnectReason>(src.reason);
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
+WiFiEventHandler ESP8266WiFiGenericClass::onStationModeAuthModeChanged(std::function<void(const WiFiEventStationModeAuthModeChanged&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_AUTHMODE_CHANGE, [f](System_Event_t* e){
+        auto& src = e->event_info.auth_change;
+        WiFiEventStationModeAuthModeChanged dst;
+        dst.oldMode = src.old_mode;
+        dst.newMode = src.new_mode;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
+WiFiEventHandler ESP8266WiFiGenericClass::onStationModeGotIP(std::function<void(const WiFiEventStationModeGotIP&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_GOT_IP, [f](System_Event_t* e){
+        auto& src = e->event_info.got_ip;
+        WiFiEventStationModeGotIP dst;
+        dst.ip = src.ip.addr;
+        dst.mask = src.mask.addr;
+        dst.gw = src.gw.addr;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
+WiFiEventHandler ESP8266WiFiGenericClass::onStationModeDHCPTimeout(std::function<void(void)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_DHCP_TIMEOUT, [f](System_Event_t* e){
+        (void) e;
+        f();
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
+WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeStationConnected(std::function<void(const WiFiEventSoftAPModeStationConnected&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_SOFTAPMODE_STACONNECTED, [f](System_Event_t* e){
+        auto& src = e->event_info.sta_connected;
+        WiFiEventSoftAPModeStationConnected dst;
+        memcpy(dst.mac, src.mac, 6);
+        dst.aid = src.aid;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
+WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeStationDisconnected(std::function<void(const WiFiEventSoftAPModeStationDisconnected&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_SOFTAPMODE_STADISCONNECTED, [f](System_Event_t* e){
+        auto& src = e->event_info.sta_disconnected;
+        WiFiEventSoftAPModeStationDisconnected dst;
+        memcpy(dst.mac, src.mac, 6);
+        dst.aid = src.aid;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
+WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED, [f](System_Event_t* e){
+        auto& src = e->event_info.ap_probereqrecved;
+        WiFiEventSoftAPModeProbeRequestReceived dst;
+        memcpy(dst.mac, src.mac, 6);
+        dst.rssi = src.rssi;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
+// WiFiEventHandler ESP8266WiFiGenericClass::onWiFiModeChange(std::function<void(const WiFiEventModeChange&)> f)
+// {
+//     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_MODE_CHANGE, [f](System_Event_t* e){
+//         WiFiEventModeChange& dst = *reinterpret_cast<WiFiEventModeChange*>(&e->event_info);
+//         f(dst);
+//     });
+//     sCbEventList.push_back(handler);
+//     return handler;
+// }
 
 /**
  * callback for WiFi events
  * @param arg
  */
-void ESP8266WiFiGenericClass::_eventCallback(void* arg) {
+void ESP8266WiFiGenericClass::_eventCallback(void* arg) 
+{
     System_Event_t* event = reinterpret_cast<System_Event_t*>(arg);
     DEBUG_WIFI("wifi evt: %d\n", event->event);
 
@@ -110,12 +224,14 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg) {
         WiFiClient::stopAll();
     }
 
-    for(uint32_t i = 0; i < cbEventList.size(); i++) {
-        WiFiEventCbList_t entry = cbEventList[i];
-        if(entry.cb) {
-            if(entry.event == (WiFiEvent_t) event->event || entry.event == WIFI_EVENT_MAX) {
-                entry.cb((WiFiEvent_t) event->event);
-            }
+    for(auto it = std::begin(sCbEventList); it != std::end(sCbEventList); ) {
+        WiFiEventHandler &handler = *it;
+        if (handler->canExpire() && handler.unique()) {
+            it = sCbEventList.erase(it);
+        }
+        else {
+            (*handler)(event);
+            ++it;
         }
     }
 }
@@ -304,7 +420,13 @@ bool ESP8266WiFiGenericClass::forceSleepWake() {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
+#if LWIP_VERSION_MAJOR == 1
 void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg);
+#else
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
+#endif
+
+static bool _dns_lookup_pending = false;
 
 /**
  * Resolve the given hostname to an IP address.
@@ -313,7 +435,14 @@ void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback
  * @return 1 if aIPAddrString was successfully converted to an IP address,
  *          else error code
  */
-int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult) {
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
+{
+    return hostByName(aHostname, aResult, 10000);
+}
+
+
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
+{
     ip_addr_t addr;
     aResult = static_cast<uint32_t>(0);
 
@@ -328,7 +457,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     if(err == ERR_OK) {
         aResult = addr.addr;
     } else if(err == ERR_INPROGRESS) {
-        esp_yield();
+        _dns_lookup_pending = true;
+        delay(timeout_ms);
+        _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
         if(aResult != 0) {
             err = ERR_OK;
@@ -350,7 +481,16 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg) {
+#if LWIP_VERSION_MAJOR == 1
+void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg)
+#else
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
+#endif
+{
+    (void) name;
+    if (!_dns_lookup_pending) {
+        return;
+    }
     if(ipaddr) {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
     }

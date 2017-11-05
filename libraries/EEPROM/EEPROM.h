@@ -29,6 +29,7 @@
 class EEPROMClass {
 public:
   EEPROMClass(uint32_t sector);
+  EEPROMClass(void);
 
   void begin(size_t size);
   uint8_t read(int address);
@@ -51,9 +52,11 @@ public:
   const T &put(int address, const T &t) {
     if (address < 0 || address + sizeof(T) > _size)
       return t;
+    if (memcmp(_data + address, (const uint8_t*)&t, sizeof(T)) != 0) {
+	_dirty = true;
+	memcpy(_data + address, (const uint8_t*)&t, sizeof(T));
+    }
 
-    memcpy(_data + address, (const uint8_t*) &t, sizeof(T));
-    _dirty = true;
     return t;
   }
 
@@ -64,7 +67,9 @@ protected:
   bool _dirty;
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_EEPROM)
 extern EEPROMClass EEPROM;
+#endif
 
 #endif
 

@@ -121,6 +121,8 @@ class SSDPClass{
     char _modelNumber[SSDP_MODEL_VERSION_SIZE];
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SSDP)
 extern SSDPClass SSDP;
+#endif
 
 #endif

@@ -39,6 +39,7 @@ public:
   int connect(const char* name, uint16_t port) override;
 
   bool verify(const char* fingerprint, const char* domain_name);
+  bool verifyCertChain(const char* domain_name);
 
   uint8_t connected() override;
   size_t write(const uint8_t *buf, size_t size) override;
@@ -49,11 +50,19 @@ public:
   size_t peekBytes(uint8_t *buffer, size_t length) override;
   void stop() override;
 
-  void setCertificate(const uint8_t* cert_data, size_t size);
-  void setPrivateKey(const uint8_t* pk, size_t size);
+  bool setCACert(const uint8_t* pk, size_t size);
+  bool setCertificate(const uint8_t* pk, size_t size);
+  bool setPrivateKey(const uint8_t* pk, size_t size);
 
+  bool setCACert_P(PGM_VOID_P pk, size_t size);
+  bool setCertificate_P(PGM_VOID_P pk, size_t size);
+  bool setPrivateKey_P(PGM_VOID_P pk, size_t size);
+
+  bool loadCACert(Stream& stream, size_t size);
   bool loadCertificate(Stream& stream, size_t size);
   bool loadPrivateKey(Stream& stream, size_t size);
+
+  void allowSelfSignedCerts();
 
   template<typename TFile>
   bool loadCertificate(TFile& file) {
@@ -64,9 +73,17 @@ public:
   bool loadPrivateKey(TFile& file) {
     return loadPrivateKey(file, file.size());
   }
+  
+  template<typename TFile>
+  bool loadCACert(TFile& file) {
+    return loadCACert(file, file.size());
+  }
+
 
 protected:
+    void _initSSLContext();
     int _connectSSL(const char* hostName);
+    bool _verifyDN(const char* name);
 
     SSLContext* _ssl = nullptr;
 };

@@ -23,8 +23,12 @@
 
 class UdpContext;
 
-extern "C" void esp_yield();
-extern "C" void esp_schedule();
+extern "C" {
+void esp_yield();
+void esp_schedule();
+#include "lwip/init.h" // LWIP_VERSION_
+}
+
 
 #define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);
 #define GET_UDP_HDR(pb) reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN);
@@ -44,11 +48,11 @@ public:
     , _tx_buf_head(0)
     , _tx_buf_cur(0)
     , _tx_buf_offset(0)
-    , _multicast_ttl(1)
-    , _dest_port(0)
     {
         _pcb = udp_new();
-        _dest_addr.addr = 0;
+#ifdef LWIP_MAYBE_XCC
+        _mcast_ttl = 1;
+#endif
     }
 
     ~UdpContext()
@@ -87,8 +91,8 @@ public:
 
     bool connect(ip_addr_t addr, uint16_t port)
     {
-        _dest_addr = addr;
-        _dest_port = port;
+        ip_addr_copy(_pcb->remote_ip, addr);
+        _pcb->remote_port = port;
         return true;
     }
 
@@ -104,19 +108,25 @@ public:
         udp_disconnect(_pcb);
     }
 
+#if LWIP_VERSION_MAJOR == 1
     void setMulticastInterface(ip_addr_t addr)
     {
-        // newer versions of lwip have a macro to set the multicast ip
-        // udp_set_multicast_netif_addr(_pcb, addr);
-        _pcb->multicast_ip = addr;
+        udp_set_multicast_netif_addr(_pcb, addr);
     }
+#else
+    void setMulticastInterface(const ip_addr_t& addr)
+    {
+        udp_set_multicast_netif_addr(_pcb, &addr);
+    }
+#endif
 
     void setMulticastTTL(int ttl)
     {
-        // newer versions of lwip have an additional field (mcast_ttl) for this purpose
-        // and a macro to set it instead of direct field access
-        // udp_set_multicast_ttl(_pcb, ttl);
-        _multicast_ttl = ttl;
+#ifdef LWIP_MAYBE_XCC
+        _mcast_ttl = ttl;
+#else
+        udp_set_multicast_ttl(_pcb, ttl);
+#endif
     }
 
     // warning: handler is called from tcp stack context
@@ -236,6 +246,11 @@ public:
         {
             _reserve(_tx_buf_offset + size);
         }
+        if (!_tx_buf_head || _tx_buf_head->tot_len < _tx_buf_offset + size)
+        {
+            DEBUGV("failed _reserve");
+            return 0;
+        }
 
         size_t left_to_copy = size;
         while(left_to_copy)
@@ -261,34 +276,44 @@ public:
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
-        uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
-        for (pbuf* p = _tx_buf_head; p; p = p->next) {
-            size_t will_copy = (data_size < p->len) ? data_size : p->len;
-            memcpy(dst, p->payload, will_copy);
-            dst += will_copy;
-            data_size -= will_copy;
+        if(!tx_copy){
+            DEBUGV("failed pbuf_alloc");
+        }
+        else{
+            uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
+            for (pbuf* p = _tx_buf_head; p; p = p->next) {
+                size_t will_copy = (data_size < p->len) ? data_size : p->len;
+                memcpy(dst, p->payload, will_copy);
+                dst += will_copy;
+                data_size -= will_copy;
+            }
         }
         pbuf_free(_tx_buf_head);
         _tx_buf_head = 0;
         _tx_buf_cur = 0;
         _tx_buf_offset = 0;
+        if(!tx_copy){
+            return false;
+        }
 
 
         if (!addr) {
-            addr = &_dest_addr;
-            port = _dest_port;
+            addr = &_pcb->remote_ip;
+            port = _pcb->remote_port;
         }
-
+#ifdef LWIP_MAYBE_XCC
         uint16_t old_ttl = _pcb->ttl;
         if (ip_addr_ismulticast(addr)) {
-            _pcb->ttl = _multicast_ttl;
+            _pcb->ttl = _mcast_ttl;
         }
-
+#endif
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
-            DEBUGV(":ust rc=%d\r\n", err);
+            DEBUGV(":ust rc=%d\r\n", (int) err);
         }
+#ifdef LWIP_MAYBE_XCC
         _pcb->ttl = old_ttl;
+#endif
         pbuf_free(tx_copy);
         return err == ERR_OK;
     }
@@ -301,6 +326,10 @@ private:
         if (!_tx_buf_head)
         {
             _tx_buf_head = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
+            if (!_tx_buf_head)
+            {
+                return;
+            }
             _tx_buf_cur = _tx_buf_head;
             _tx_buf_offset = 0;
         }
@@ -314,6 +343,10 @@ private:
         while(grow_size)
         {
             pbuf* pb = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
+            if (!pb)
+            {
+                return;
+            }
             pbuf_cat(_tx_buf_head, pb);
             if (grow_size < pbuf_unit_size)
                 return;
@@ -327,8 +360,11 @@ private:
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
-            ip_addr_t *addr, u16_t port)
+            const ip_addr_t *addr, u16_t port)
     {
+        (void) upcb;
+        (void) addr;
+        (void) port;
         if (_rx_buf)
         {
             // there is some unread data
@@ -349,9 +385,15 @@ private:
     }
 
 
+#if LWIP_VERSION_MAJOR == 1
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
             ip_addr_t *addr, u16_t port)
+#else
+    static void _s_recv(void *arg,
+            udp_pcb *upcb, pbuf *p,
+            const ip_addr_t *addr, u16_t port)
+#endif
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, addr, port);
     }
@@ -365,10 +407,10 @@ private:
     pbuf* _tx_buf_head;
     pbuf* _tx_buf_cur;
     size_t _tx_buf_offset;
-    uint16_t _multicast_ttl;
-    uint16_t _dest_port;
-    ip_addr_t _dest_addr;
     rxhandler_t _on_rx;
+#ifdef LWIP_MAYBE_XCC
+    uint16_t _mcast_ttl;
+#endif
 };
 
 

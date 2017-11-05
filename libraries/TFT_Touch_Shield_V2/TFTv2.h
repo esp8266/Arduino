@@ -213,7 +213,9 @@ public:
 
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_TFT)
 extern TFT Tft;
+#endif
 
 #endif
 

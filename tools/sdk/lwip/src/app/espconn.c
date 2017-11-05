@@ -35,6 +35,8 @@ remot_info premot[linkMax];
 
 struct espconn_packet pktinfo[2];
 
+void espconn_init(void);
+
 static uint8 espconn_tcp_get_buf_count(espconn_buf *pesp_buf);
 /******************************************************************************
  * FunctionName : espconn_copy_partial
@@ -266,6 +268,8 @@ espconn_connect(struct espconn *espconn)
 	espconn_msg *plist = NULL;
 	remot_info *pinfo = NULL;
 
+	volatile int tmp = (int) espconn_init;
+
     if (espconn == NULL) {
         return ESPCONN_ARG;
     } else if (espconn ->type != ESPCONN_TCP)
@@ -335,6 +339,8 @@ espconn_create(struct espconn *espconn)
 {
 	sint8 value = ESPCONN_OK;
 	espconn_msg *plist = NULL;
+
+	volatile int tmp = (int) espconn_init;
 
 	if (espconn == NULL) {
 		return ESPCONN_ARG;
@@ -434,6 +440,39 @@ espconn_sent(struct espconn *espconn, uint8 *psent, uint16 length)
 		}
     }
     return ESPCONN_ARG;
+}
+
+sint16 ICACHE_FLASH_ATTR espconn_recv(struct espconn *espconn, void *mem, size_t len)
+{
+	espconn_msg *pnode = NULL;
+	bool value = false;
+	int bytes_used = 0;
+	if (espconn == NULL || mem == NULL || len == 0)
+		return ESPCONN_ARG;
+
+	/*Find the node depend on the espconn message*/
+	value = espconn_find_connection(espconn, &pnode);
+	if (value && espconn->type == ESPCONN_TCP){
+		if (pnode->readbuf != NULL){
+			bytes_used = ringbuf_bytes_used(pnode->readbuf);
+			if (bytes_used != 0) {
+				if (len > bytes_used) {
+					len = bytes_used;
+				}
+				ringbuf_memcpy_from(mem, pnode->readbuf, len);
+				espconn_recv_unhold(pnode->pespconn);
+				return len;
+			} else {
+				return ESPCONN_OK;
+			}
+		} else{
+			return ESPCONN_OK;
+		}
+	} else{
+		return ESPCONN_ARG;
+	}
+
+	return ESPCONN_ARG;
 }
 
 /******************************************************************************
@@ -876,6 +915,8 @@ espconn_accept(struct espconn *espconn)
 {
 	sint8 value = ESPCONN_OK;
 	espconn_msg *plist = NULL;
+
+	volatile int tmp = (int) espconn_init;
 
     if (espconn == NULL) {
         return ESPCONN_ARG;

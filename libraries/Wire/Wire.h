@@ -62,6 +62,7 @@ class TwoWire : public Stream
     uint8_t endTransmission(void);
     uint8_t endTransmission(uint8_t);
     size_t requestFrom(uint8_t address, size_t size, bool sendStop);
+	uint8_t status();
 
     uint8_t requestFrom(uint8_t, uint8_t);
     uint8_t requestFrom(uint8_t, uint8_t, uint8_t);
@@ -84,7 +85,9 @@ class TwoWire : public Stream
     using Print::write;
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_TWOWIRE)
 extern TwoWire Wire;
+#endif
 
 #endif
 

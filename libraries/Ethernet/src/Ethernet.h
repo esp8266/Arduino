@@ -36,6 +36,8 @@ public:
   friend class EthernetServer;
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ETHERNET)
 extern EthernetClass Ethernet;
+#endif
 
 #endif

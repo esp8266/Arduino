@@ -64,8 +64,12 @@ public:
   bool begin(const char* hostName);
   //for compatibility
   bool begin(const char* hostName, IPAddress ip, uint32_t ttl=120){
+    (void) ip;
+    (void) ttl;
     return begin(hostName);
   }
+  /* Application should call this whenever AP is configured/disabled */
+  void notifyAPChange();
   void update();
 
   void addService(char *service, char *proto, uint16_t port);
@@ -114,19 +118,25 @@ private:
   struct MDNSQuery * _query;
   bool _newQuery;
   bool _waitingForAnswers;
+  WiFiEventHandler _disconnectedHandler;
+  WiFiEventHandler _gotIPHandler;
   
 
-  uint32_t _getOurIp();
   uint16_t _getServicePort(char *service, char *proto);
   MDNSTxt * _getServiceTxt(char *name, char *proto);
   uint16_t _getServiceTxtLen(char *name, char *proto);
+  IPAddress _getRequestMulticastInterface();
   void _parsePacket();
-  void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port);
-  size_t advertiseServices(); // advertise all hosted services
+  void _replyToTypeEnumRequest(IPAddress multicastInterface);
+  void _replyToInstanceRequest(uint8_t questionMask, uint8_t responseMask, char * service, char *proto, uint16_t port, IPAddress multicastInterface);
   MDNSAnswer* _getAnswerFromIdx(int idx);
   int _getNumAnswers();
+  bool _listen();
+  void _restart();
 };
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
 extern MDNSResponder MDNS;
+#endif
 
 #endif //ESP8266MDNS_H

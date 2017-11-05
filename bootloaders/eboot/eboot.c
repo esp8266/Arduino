@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "flash.h"
 #include "eboot_command.h"
 
@@ -16,6 +17,20 @@
 
 extern void ets_wdt_enable(void);
 extern void ets_wdt_disable(void);
+
+int print_version(const uint32_t flash_addr)
+{
+    uint32_t ver;
+    if (SPIRead(flash_addr + APP_START_OFFSET + sizeof(image_header_t) + sizeof(section_header_t), &ver, sizeof(ver))) {
+        return 1;
+    }
+    const char* __attribute__ ((aligned (4))) fmtt = "v%08x\n\0\0";
+    uint32_t fmt[2];
+    fmt[0] = ((uint32_t*) fmtt)[0];
+    fmt[1] = ((uint32_t*) fmtt)[1];
+    ets_printf((const char*) fmt, ver);
+    return 0;
+}
 
 int load_app_from_flash_raw(const uint32_t flash_addr)
 {
@@ -114,6 +129,8 @@ void main()
 {
     int res = 9;
     struct eboot_command cmd;
+    
+    print_version(0);
 
     if (eboot_command_read(&cmd) == 0) {
         // valid command was passed via RTC_MEM

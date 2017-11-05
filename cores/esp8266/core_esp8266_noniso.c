@@ -29,21 +29,6 @@
 #include <math.h>
 #include "stdlib_noniso.h"
 
-
-int atoi(const char* s) {
-    return (int) atol(s);
-}
-
-long atol(const char* s) {
-    char * tmp;
-    return strtol(s, &tmp, 10);
-}
-
-double atof(const char* s) {
-    char * tmp;
-    return strtod(s, &tmp);
-}
-
 void reverse(char* begin, char* end) {
     char *is = begin;
     char *ie = end - 1;
@@ -54,31 +39,6 @@ void reverse(char* begin, char* end) {
         ++is;
         --ie;
     }
-}
-
-char* itoa(int value, char* result, int base) {
-    if(base < 2 || base > 16) {
-        *result = 0;
-        return result;
-    }
-
-    char* out = result;
-    int quotient = abs(value);
-
-    do {
-        const int tmp = quotient / base;
-        *out = "0123456789abcdef"[quotient - (tmp * base)];
-        ++out;
-        quotient = tmp;
-    } while(quotient);
-
-    // Apply negative sign
-    if(value < 0)
-        *out++ = '-';
-
-    reverse(result, out);
-    *out = 0;
-    return result;
 }
 
 char* ltoa(long value, char* result, int base) {
@@ -100,27 +60,6 @@ char* ltoa(long value, char* result, int base) {
     // Apply negative sign
     if(value < 0)
         *out++ = '-';
-
-    reverse(result, out);
-    *out = 0;
-    return result;
-}
-
-char* utoa(unsigned value, char* result, int base) {
-    if(base < 2 || base > 16) {
-        *result = 0;
-        return result;
-    }
-
-    char* out = result;
-    unsigned quotient = value;
-
-    do {
-        const unsigned tmp = quotient / base;
-        *out = "0123456789abcdef"[quotient - (tmp * base)];
-        ++out;
-        quotient = tmp;
-    } while(quotient);
 
     reverse(result, out);
     *out = 0;

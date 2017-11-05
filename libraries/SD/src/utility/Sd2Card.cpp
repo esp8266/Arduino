@@ -138,6 +138,9 @@ uint8_t Sd2Card::cardCommand(uint8_t cmd, uint32_t arg) {
   // wait for response
   for (uint8_t i = 0; ((status_ = spiRec()) & 0x80) && i != 0xFF; i++)
     ;
+  #ifdef ESP8266
+  optimistic_yield(10000);
+  #endif
   return status_;
 }
 //------------------------------------------------------------------------------
@@ -569,6 +572,9 @@ uint8_t Sd2Card::setSckRate(uint8_t sckRateID) {
 uint8_t Sd2Card::waitNotBusy(uint16_t timeoutMillis) {
   uint16_t t0 = millis();
   do {
+    #ifdef ESP8266
+    optimistic_yield(10000);
+    #endif
     if (spiRec() == 0XFF) return true;
   }
   while (((uint16_t)millis() - t0) < timeoutMillis);
@@ -579,6 +585,9 @@ uint8_t Sd2Card::waitNotBusy(uint16_t timeoutMillis) {
 uint8_t Sd2Card::waitStartBlock(void) {
   uint16_t t0 = millis();
   while ((status_ = spiRec()) == 0XFF) {
+    #ifdef ESP8266
+    optimistic_yield(10000);
+    #endif
     if (((uint16_t)millis() - t0) > SD_READ_TIMEOUT) {
       error(SD_CARD_ERROR_READ_TIMEOUT);
       goto fail;

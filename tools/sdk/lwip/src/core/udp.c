@@ -144,7 +144,7 @@ udp_input(struct pbuf *p, struct netif *inp)
     /* all packets for DHCP_CLIENT_PORT not coming from DHCP_SERVER_PORT are dropped! */
     if (src == DHCP_SERVER_PORT) {
       if ((inp->dhcp != NULL) && (inp->dhcp->pcb != NULL)) {
-        /* accept the packe if 
+        /* accept the packe if
            (- broadcast or directed to us) -> DHCP is link-layer-addressed, local ip is always ANY!
            - inp->dhcp->pcb->remote == ANY or iphdr->src */
         if ((ip_addr_isany(&inp->dhcp->pcb->remote_ip) ||
@@ -196,7 +196,7 @@ udp_input(struct pbuf *p, struct netif *inp)
            (broadcast))) {
 #endif /* IP_SOF_BROADCAST_RECV */
         local_match = 1;
-        if ((uncon_pcb == NULL) && 
+        if ((uncon_pcb == NULL) &&
             ((pcb->flags & UDP_FLAGS_CONNECTED) == 0)) {
           /* the first unconnected matching PCB */
           uncon_pcb = pcb;
@@ -422,7 +422,7 @@ udp_send_chksum(struct udp_pcb *pcb, struct pbuf *p,
  *
  * If the PCB already has a remote address association, it will
  * be restored after the data is sent.
- * 
+ *
  * @return lwIP error code (@see udp_send for possible error codes)
  *
  * @see udp_disconnect() udp_send()
@@ -504,6 +504,7 @@ udp_sendto_if_chksum(struct udp_pcb *pcb, struct pbuf *p, ip_addr_t *dst_ip,
   ip_addr_t *src_ip;
   err_t err;
   struct pbuf *q; /* q will be sent down the stack */
+  u8_t ttl;
 
 #if IP_SOF_BROADCAST
   /* broadcast filter? */
@@ -553,11 +554,11 @@ udp_sendto_if_chksum(struct udp_pcb *pcb, struct pbuf *p, ip_addr_t *dst_ip,
   udphdr->src = htons(pcb->local_port);
   udphdr->dest = htons(dst_port);
   /* in UDP, 0 checksum means 'no checksum' */
-  udphdr->chksum = 0x0000; 
+  udphdr->chksum = 0x0000;
 
   /* Multicast Loop? */
 #if LWIP_IGMP
-  if (ip_addr_ismulticast(dst_ip) && ((pcb->flags & UDP_FLAGS_MULTICAST_LOOP) != 0)) {
+  if (((pcb->flags & UDP_FLAGS_MULTICAST_LOOP) != 0) && ip_addr_ismulticast(dst_ip)) {
     q->flags |= PBUF_FLAG_MCASTLOOP;
   }
 #endif /* LWIP_IGMP */
@@ -665,13 +666,21 @@ udp_sendto_if_chksum(struct udp_pcb *pcb, struct pbuf *p, ip_addr_t *dst_ip,
       udphdr->chksum = udpchksum;
     }
 #endif /* CHECKSUM_GEN_UDP */
+
+  /* Determine TTL to use */
+#if LWIP_IGMP
+    ttl = (ip_addr_ismulticast(dst_ip) ? pcb->mcast_ttl : pcb->ttl);
+#else /* LWIP_IGMP */
+    ttl = pcb->ttl;
+#endif /* LWIP_IGMP */
+
     LWIP_DEBUGF(UDP_DEBUG, ("udp_send: UDP checksum 0x%04"X16_F"\n", udphdr->chksum));
     LWIP_DEBUGF(UDP_DEBUG, ("udp_send: ip_output_if (,,,,IP_PROTO_UDP,)\n"));
     /* output to IP */
 #if LWIP_NETIF_HWADDRHINT
     netif->addr_hint = &(pcb->addr_hint);
 #endif /* LWIP_NETIF_HWADDRHINT*/
-    err = ip_output_if(q, src_ip, dst_ip, pcb->ttl, pcb->tos, IP_PROTO_UDP, netif);
+    err = ip_output_if(q, src_ip, dst_ip, ttl, pcb->tos, IP_PROTO_UDP, netif);
 #if LWIP_NETIF_HWADDRHINT
     netif->addr_hint = NULL;
 #endif /* LWIP_NETIF_HWADDRHINT*/
@@ -950,6 +959,9 @@ udp_new(void)
     /* initialize PCB to all zeroes */
     os_memset(pcb, 0, sizeof(struct udp_pcb));
     pcb->ttl = UDP_TTL;
+#if LWIP_IGMP
+    pcb->mcast_ttl = UDP_TTL;
+#endif
   }
   return pcb;
 }

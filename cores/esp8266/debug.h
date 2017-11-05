@@ -13,9 +13,9 @@
 #endif
 
 #ifdef __cplusplus
-void hexdump(uint8_t *mem, uint32_t len, uint8_t cols = 16);
+void hexdump(const void *mem, uint32_t len, uint8_t cols = 16);
 #else
-void hexdump(uint8_t *mem, uint32_t len, uint8_t cols);
+void hexdump(const void *mem, uint32_t len, uint8_t cols);
 #endif
 
 #ifdef __cplusplus

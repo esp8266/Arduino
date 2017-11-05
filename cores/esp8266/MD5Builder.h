@@ -1,9 +1,9 @@
-/* 
+/*
   md5.h - exposed md5 ROM functions for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -21,7 +21,8 @@
 #ifndef __ESP8266_MD5_BUILDER__
 #define __ESP8266_MD5_BUILDER__
 
-#include "Arduino.h"
+#include <WString.h>
+#include <Stream.h>
 #include "md5.h"
 
 class MD5Builder {
@@ -30,14 +31,14 @@ class MD5Builder {
     uint8_t _buf[16];
   public:
     void begin(void);
-    void add(uint8_t * data, uint16_t len);
-    void add(const char * data){ add((uint8_t*)data, strlen(data)); }
+    void add(const uint8_t * data, const uint16_t len);
+    void add(const char * data){ add((const uint8_t*)data, strlen(data)); }
     void add(char * data){ add((const char*)data); }
-    void add(String data){ add(data.c_str()); }
+    void add(const String data){ add(data.c_str()); }
     void addHexString(const char * data);
     void addHexString(char * data){ addHexString((const char*)data); }
-    void addHexString(String data){ addHexString(data.c_str()); }
-    bool addStream(Stream & stream, const size_t total_len);
+    void addHexString(const String data){ addHexString(data.c_str()); }
+    bool addStream(Stream & stream, const size_t maxLen);
     void calculate(void);
     void getBytes(uint8_t * output);
     void getChars(char * output);

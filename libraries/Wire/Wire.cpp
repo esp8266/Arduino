@@ -71,10 +71,15 @@ void TwoWire::begin(void){
 }
 
 void TwoWire::begin(uint8_t address){
+  (void)address;
   // twi_setAddress(address);
   // twi_attachSlaveTxEvent(onRequestService);
   // twi_attachSlaveRxEvent(onReceiveService);
   begin();
+}
+
+uint8_t TwoWire::status(){
+	return twi_status();
 }
 
 void TwoWire::begin(int address){
@@ -202,6 +207,8 @@ void TwoWire::flush(void){
 
 void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
 {
+  (void)inBytes;
+  (void)numBytes;
   // don't bother if user hasn't registered a callback
   // if(!user_onReceive){
   //   return;
@@ -238,13 +245,17 @@ void TwoWire::onRequestService(void){
 }
 
 void TwoWire::onReceive( void (*function)(int) ){
+  (void)function;
   //user_onReceive = function;
 }
 
 void TwoWire::onRequest( void (*function)(void) ){
+  (void)function;
   //user_onRequest = function;
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
-TwoWire Wire = TwoWire();
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_TWOWIRE)
+TwoWire Wire;
+#endif

@@ -64,6 +64,9 @@ public:
     }
     size_t read(uint8_t* buf, size_t size);
     bool seek(uint32_t pos, SeekMode mode);
+    bool seek(uint32_t pos) {
+        return seek(pos, SeekSet);
+    }
     size_t position() const;
     size_t size() const;
     void close();
@@ -102,7 +105,8 @@ public:
     FS(FSImplPtr impl) : _impl(impl) { }
 
     bool begin();
-
+    void end();
+    
     bool format();
     bool info(FSInfo& info);
 
@@ -127,6 +131,7 @@ protected:
 
 } // namespace fs
 
+#ifndef FS_NO_GLOBALS
 using fs::FS;
 using fs::File;
 using fs::Dir;
@@ -135,7 +140,10 @@ using fs::SeekSet;
 using fs::SeekCur;
 using fs::SeekEnd;
 using fs::FSInfo;
+#endif //FS_NO_GLOBALS
 
-extern FS SPIFFS;
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
+extern fs::FS SPIFFS;
+#endif
 
 #endif //FS_H

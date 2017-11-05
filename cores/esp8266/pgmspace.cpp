@@ -147,6 +147,7 @@ void* memmem_P(const void* buf, size_t bufSize, PGM_VOID_P findP, size_t findPSi
 
 
 char* strncpy_P(char* dest, PGM_P src, size_t size) {
+    bool size_known = (size != SIZE_IRRELEVANT);
     const char* read = src;
     char* write = dest;
     char ch = '.';
@@ -155,6 +156,14 @@ char* strncpy_P(char* dest, PGM_P src, size_t size) {
         ch = pgm_read_byte(read++);
         *write++ = ch;
         size--;
+    }
+    if (size_known)
+    {
+        while (size > 0)
+        {
+            *write++ = 0;
+            size--;
+        }
     }
 
     return dest;
@@ -234,7 +243,7 @@ int printf_P(PGM_P formatP, ...) {
     char* format = new char[fmtLen + 1];
     strcpy_P(format, formatP);
 
-    ret = printf(format, arglist);
+    ret = vprintf(format, arglist);
 
     delete[] format;
 

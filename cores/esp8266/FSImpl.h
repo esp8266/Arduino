@@ -63,6 +63,7 @@ public:
 class FSImpl {
 public:
     virtual bool begin() = 0;
+    virtual void end() = 0;
     virtual bool format() = 0;
     virtual bool info(FSInfo& info) = 0;
     virtual FileImplPtr open(const char* path, OpenMode openMode, AccessMode accessMode) = 0;

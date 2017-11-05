@@ -24,12 +24,10 @@ void setup(void){
     MDNS.begin(host);
     server.on("/", HTTP_GET, [](){
       server.sendHeader("Connection", "close");
-      server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/html", serverIndex);
     });
     server.on("/update", HTTP_POST, [](){
       server.sendHeader("Connection", "close");
-      server.sendHeader("Access-Control-Allow-Origin", "*");
       server.send(200, "text/plain", (Update.hasError())?"FAIL":"OK");
       ESP.restart();
     },[](){
@@ -58,14 +56,14 @@ void setup(void){
     });
     server.begin();
     MDNS.addService("http", "tcp", 80);
-  
+
     Serial.printf("Ready! Open http://%s.local in your browser\n", host);
   } else {
     Serial.println("WiFi Failed");
   }
 }
- 
+
 void loop(void){
   server.handleClient();
   delay(1);
-} 
+}

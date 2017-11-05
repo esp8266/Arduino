@@ -63,9 +63,9 @@ bool SPIFFSImpl::exists(const char* path)
     return rc == SPIFFS_OK;
 }
 
-DirImplPtr SPIFFSImpl::openDir(const char* path)
+DirImplPtr SPIFFSImpl::openDir(const char* path) 
 {
-    if (!isSpiffsFilenameValid(path)) {
+    if (strlen(path) > 0 && !isSpiffsFilenameValid(path)) {
         DEBUGV("SPIFFSImpl::openDir: invalid path=`%s` \r\n", path);
         return DirImplPtr();
     }
@@ -120,11 +120,17 @@ extern "C" uint32_t _SPIFFS_block;
 #define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
 #define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
 
+#ifndef SPIFFS_MAX_OPEN_FILES
+#define SPIFFS_MAX_OPEN_FILES 5
+#endif
+
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
 FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(
                              SPIFFS_PHYS_ADDR,
                              SPIFFS_PHYS_SIZE,
                              SPIFFS_PHYS_PAGE,
                              SPIFFS_PHYS_BLOCK,
-                             5)));
+                             SPIFFS_MAX_OPEN_FILES)));
+#endif
 
 #endif

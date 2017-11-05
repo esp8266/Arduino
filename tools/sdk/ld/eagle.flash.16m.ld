@@ -1,7 +1,7 @@
 /* Flash Split for 16M chips */
 /* sketch 1019KB */
+/* spiffs 15340KB */
 /* eeprom 20KB */
-/* spiffs 15MB */
 
 MEMORY
 {
@@ -12,7 +12,7 @@ MEMORY
 }
 
 PROVIDE ( _SPIFFS_start = 0x40300000 );
-PROVIDE ( _SPIFFS_end = 0x41200000 );
+PROVIDE ( _SPIFFS_end = 0x411FB000 );
 PROVIDE ( _SPIFFS_page = 0x100 );
 PROVIDE ( _SPIFFS_block = 0x2000 );
 

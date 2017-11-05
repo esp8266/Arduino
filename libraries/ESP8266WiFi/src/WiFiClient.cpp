@@ -50,11 +50,14 @@ WiFiClient* SList<WiFiClient>::_s_first = 0;
 WiFiClient::WiFiClient()
 : _client(0)
 {
+    _timeout = 5000;
     WiFiClient::_add(this);
 }
 
-WiFiClient::WiFiClient(ClientContext* client) : _client(client)
+WiFiClient::WiFiClient(ClientContext* client)
+: _client(client)
 {
+    _timeout = 5000;
     _client->ref();
     WiFiClient::_add(this);
 }
@@ -69,6 +72,8 @@ WiFiClient::~WiFiClient()
 WiFiClient::WiFiClient(const WiFiClient& other)
 {
     _client = other._client;
+    _timeout = other._timeout;
+    _localPort = other._localPort;
     if (_client)
         _client->ref();
     WiFiClient::_add(this);
@@ -79,6 +84,8 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
    if (_client)
         _client->unref();
     _client = other._client;
+    _timeout = other._timeout;
+    _localPort = other._localPort;
     if (_client)
         _client->ref();
     return *this;
@@ -88,7 +95,7 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 int WiFiClient::connect(const char* host, uint16_t port)
 {
     IPAddress remote_addr;
-    if (WiFi.hostByName(host, remote_addr))
+    if (WiFi.hostByName(host, remote_addr, _timeout))
     {
         return connect(remote_addr, port);
     }
@@ -106,11 +113,13 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
     // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
+#if LWIP_VERSION_MAJOR == 1
     netif* interface = ip_route(&addr);
     if (!interface) {
         DEBUGV("no route to host\r\n");
         return 0;
     }
+#endif
 
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
@@ -120,34 +129,18 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
         pcb->local_port = _localPort++;
     }
 
-    tcp_arg(pcb, this);
-    tcp_err(pcb, &WiFiClient::_s_err);
-    tcp_connect(pcb, &addr, port, reinterpret_cast<tcp_connected_fn>(&WiFiClient::_s_connected));
-
-    esp_yield();
-    if (_client)
-        return 1;
-
-    //  if tcp_error was called, pcb has already been destroyed.
-    // tcp_abort(pcb);
-    return 0;
-}
-
-int8_t WiFiClient::_connected(void* pcb, int8_t err)
-{
-    tcp_pcb* tpcb = reinterpret_cast<tcp_pcb*>(pcb);
-    _client = new ClientContext(tpcb, 0, 0);
+    _client = new ClientContext(pcb, nullptr, nullptr);
     _client->ref();
-    esp_schedule();
-    return ERR_OK;
-}
+    _client->setTimeout(_timeout);
+    int res = _client->connect(&addr, port);
+    if (res == 0) {
+        _client->unref();
+        _client = nullptr;
+        return 0;
+    }
 
-void WiFiClient::_err(int8_t err)
-{
-    DEBUGV(":err %d\r\n", err);
-    esp_schedule();
+    return 1;
 }
-
 
 void WiFiClient::setNoDelay(bool nodelay) {
     if (!_client)
@@ -161,6 +154,11 @@ bool WiFiClient::getNoDelay() {
     return _client->getNoDelay();
 }
 
+size_t WiFiClient::availableForWrite ()
+{
+    return _client->availableForWrite();
+}
+
 size_t WiFiClient::write(uint8_t b)
 {
     return write(&b, 1);
@@ -172,8 +170,24 @@ size_t WiFiClient::write(const uint8_t *buf, size_t size)
     {
         return 0;
     }
+    _client->setTimeout(_timeout);
+    return _client->write(buf, size);
+}
 
-    return _client->write(reinterpret_cast<const char*>(buf), size);
+size_t WiFiClient::write(Stream& stream, size_t unused)
+{
+    (void) unused;
+    return WiFiClient::write(stream);
+}
+
+size_t WiFiClient::write(Stream& stream)
+{
+    if (!_client || !stream.available())
+    {
+        return 0;
+    }
+    _client->setTimeout(_timeout);
+    return _client->write(stream);
 }
 
 size_t WiFiClient::write_P(PGM_P buf, size_t size)
@@ -182,25 +196,8 @@ size_t WiFiClient::write_P(PGM_P buf, size_t size)
     {
         return 0;
     }
-
-    char chunkUnit[WIFICLIENT_MAX_PACKET_SIZE + 1];
-    chunkUnit[WIFICLIENT_MAX_PACKET_SIZE] = '\0';
-    size_t remaining_size = size;
-
-    while (buf != NULL && remaining_size > 0) {
-        size_t chunkUnitLen = WIFICLIENT_MAX_PACKET_SIZE;
-
-        if (remaining_size < WIFICLIENT_MAX_PACKET_SIZE) chunkUnitLen = remaining_size;
-        // due to the memcpy signature, lots of casts are needed
-        memcpy_P((void*)chunkUnit, (PGM_VOID_P)buf, chunkUnitLen);
-
-        buf += chunkUnitLen;
-        remaining_size -= chunkUnitLen;
-
-        // write is so overloaded, had to use the cast to get it pick the right one
-        _client->write((const char*)chunkUnit, chunkUnitLen);
-    }
-    return size;
+    _client->setTimeout(_timeout);
+    return _client->write_P(buf, size);
 }
 
 int WiFiClient::available()
@@ -326,37 +323,19 @@ uint16_t WiFiClient::localPort()
     return _client->getLocalPort();
 }
 
-int8_t WiFiClient::_s_connected(void* arg, void* tpcb, int8_t err)
-{
-    return reinterpret_cast<WiFiClient*>(arg)->_connected(tpcb, err);
-}
-
-void WiFiClient::_s_err(void* arg, int8_t err)
-{
-    reinterpret_cast<WiFiClient*>(arg)->_err(err);
-}
-
 void WiFiClient::stopAll()
 {
     for (WiFiClient* it = _s_first; it; it = it->_next) {
-        ClientContext* c = it->_client;
-        if (c) {
-            c->abort();
-            c->unref();
-            it->_client = 0;
-        }
+        it->stop();
     }
 }
 
 
-void WiFiClient::stopAllExcept(WiFiClient * exC) {
+void WiFiClient::stopAllExcept(WiFiClient* except) 
+{
     for (WiFiClient* it = _s_first; it; it = it->_next) {
-        ClientContext* c = it->_client;
-
-        if (c && c != exC->_client) {
-            c->abort();
-            c->unref();
-            it->_client = 0;
+        if (it != except) {
+            it->stop();
         }
     }
 }

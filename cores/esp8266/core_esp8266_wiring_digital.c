@@ -1,9 +1,9 @@
-/* 
+/*
   digital.c - wiring digital implementation for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -25,9 +25,12 @@
 #include "eagle_soc.h"
 #include "ets_sys.h"
 
+extern void pwm_stop_pin(uint8_t pin);
+
 uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C, 0x20, 0x24, 0x28, 0x2C, 0x30, 0x04, 0x08, 0x0C, 0x10};
 
 extern void __pinMode(uint8_t pin, uint8_t mode) {
+  pwm_stop_pin(pin);
   if(pin < 16){
     if(mode == SPECIAL){
       GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
@@ -77,6 +80,7 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
 }
 
 extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
+  pwm_stop_pin(pin);
   if(pin < 16){
     if(val) GPOS = (1 << pin);
     else GPOC = (1 << pin);
@@ -87,6 +91,7 @@ extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
 }
 
 extern int ICACHE_RAM_ATTR __digitalRead(uint8_t pin) {
+  pwm_stop_pin(pin);
   if(pin < 16){
     return GPIP(pin);
   } else if(pin == 16){
@@ -100,16 +105,20 @@ extern int ICACHE_RAM_ATTR __digitalRead(uint8_t pin) {
 */
 
 typedef void (*voidFuncPtr)(void);
+typedef void (*voidFuncPtrArg)(void*);
 
 typedef struct {
   uint8_t mode;
   void (*fn)(void);
+  void * arg;
 } interrupt_handler_t;
+
 
 static interrupt_handler_t interrupt_handlers[16];
 static uint32_t interrupt_reg = 0;
 
 void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
+  (void) arg;
   uint32_t status = GPIE;
   GPIEC = status;//clear them interrupts
   uint32_t levels = GPI;
@@ -127,33 +136,51 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
       // to make ISR compatible to Arduino AVR model where interrupts are disabled
       // we disable them before we call the client ISR
       uint32_t savedPS = xt_rsil(15); // stop other interrupts 
-      handler->fn();
-      xt_wsr_ps(savedPS);
+      if (handler->arg)
+      {
+    	  ((voidFuncPtrArg)handler->fn)(handler->arg);
+      }
+      else
+      {
+    	  handler->fn();
+      }
+       xt_wsr_ps(savedPS);
     }
   }
   ETS_GPIO_INTR_ENABLE();
 }
 
-extern void ICACHE_RAM_ATTR __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode) {
+extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void *arg, int mode) {
   if(pin < 16) {
+    ETS_GPIO_INTR_DISABLE();
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = mode;
     handler->fn = userFunc;
+    handler->arg = arg;
     interrupt_reg |= (1 << pin);
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
     GPIEC = (1 << pin); //Clear Interrupt for this pin
     GPC(pin) |= ((mode & 0xF) << GPCI);//INT mode "mode"
+    ETS_GPIO_INTR_ENABLE();
   }
+}
+
+extern void ICACHE_RAM_ATTR __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode )
+{
+	__attachInterruptArg (pin, userFunc, 0, mode);
 }
 
 extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
   if(pin < 16) {
+    ETS_GPIO_INTR_DISABLE();
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
     GPIEC = (1 << pin); //Clear Interrupt for this pin
     interrupt_reg &= ~(1 << pin);
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = 0;
     handler->fn = 0;
+    handler->arg = 0;
+    ETS_GPIO_INTR_ENABLE();
   }
 }
 

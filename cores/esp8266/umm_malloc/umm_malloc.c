@@ -493,6 +493,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <pgmspace.h>
 
 #include "umm_malloc.h"
 
@@ -511,6 +512,9 @@
 #  undef  DBG_LOG_LEVEL
 #  define DBG_LOG_LEVEL DBG_LOG_LEVEL
 #endif
+
+// Macro to place constant strings into PROGMEM and print them properly
+#define printf(fmt, ...)  do { static const char fstr[] PROGMEM = fmt; char rstr[sizeof(fmt)]; for (size_t i=0; i<sizeof(rstr); i++) rstr[i] = fstr[i]; printf(rstr, ##__VA_ARGS__); } while (0)
 
 /* -- dbglog {{{ */
 
@@ -841,6 +845,7 @@ static int check_poison_block( umm_block *pblock ) {
 
     pc_cur = pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE);
     if (!check_poison(pc_cur, UMM_POISON_SIZE_BEFORE, "before")) {
+      printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
       UMM_HEAP_CORRUPTION_CB();
       ok = 0;
       goto clean;
@@ -848,6 +853,7 @@ static int check_poison_block( umm_block *pblock ) {
 
     pc_cur = pc + *((UMM_POISONED_BLOCK_LEN_TYPE *)pc) - UMM_POISON_SIZE_AFTER;
     if (!check_poison(pc_cur, UMM_POISON_SIZE_AFTER, "after")) {
+	  printf("block start: %08x\n", pc + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE);
       UMM_HEAP_CORRUPTION_CB();
       ok = 0;
       goto clean;

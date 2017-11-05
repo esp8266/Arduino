@@ -156,11 +156,15 @@ public:
     int GET();
     int POST(uint8_t * payload, size_t size);
     int POST(String payload);
+    int PUT(uint8_t * payload, size_t size);
+    int PUT(String payload);
+    int PATCH(uint8_t * payload, size_t size);
+    int PATCH(String payload);
     int sendRequest(const char * type, String payload);
     int sendRequest(const char * type, uint8_t * payload = NULL, size_t size = 0);
     int sendRequest(const char * type, Stream * stream, size_t size = 0);
 
-    void addHeader(const String& name, const String& value, bool first = false);
+    void addHeader(const String& name, const String& value, bool first = false, bool replace = true);
 
     /// Response handling
     void collectHeaders(const char* headerKeys[], const size_t headerKeysCount);

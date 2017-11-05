@@ -63,7 +63,7 @@ public:
 
     bool verify(WiFiClient& client, const char* host) override
     {
-        auto wcs = reinterpret_cast<WiFiClientSecure&>(client);
+        auto wcs = static_cast<WiFiClientSecure&>(client);
         return wcs.verify(_fingerprint.c_str(), host);
     }
 
@@ -132,7 +132,6 @@ bool HTTPClient::begin(String url)
 bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 {
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
-    bool hasPort = false;
     clear();
 
     // check for : (http: or https:
@@ -336,6 +335,34 @@ int HTTPClient::POST(uint8_t * payload, size_t size)
 int HTTPClient::POST(String payload)
 {
     return POST((uint8_t *) payload.c_str(), payload.length());
+}
+
+/**
+ * sends a put request to the server
+ * @param payload uint8_t *
+ * @param size size_t
+ * @return http code
+ */
+int HTTPClient::PUT(uint8_t * payload, size_t size) {
+    return sendRequest("PUT", payload, size);
+}
+
+int HTTPClient::PUT(String payload) {
+    return PUT((uint8_t *) payload.c_str(), payload.length());
+}
+
+/**
+ * sends a patch request to the server
+ * @param payload uint8_t *
+ * @param size size_t
+ * @return http code
+ */
+int HTTPClient::PATCH(uint8_t * payload, size_t size) {
+    return sendRequest("PATCH", payload, size);
+}
+
+int HTTPClient::PATCH(String payload) {
+    return PATCH((uint8_t *) payload.c_str(), payload.length());
 }
 
 /**
@@ -706,19 +733,27 @@ String HTTPClient::errorToString(int error)
  * @param value
  * @param first
  */
-void HTTPClient::addHeader(const String& name, const String& value, bool first)
+void HTTPClient::addHeader(const String& name, const String& value, bool first, bool replace)
 {
-
     // not allow set of Header handled by code
     if(!name.equalsIgnoreCase(F("Connection")) &&
        !name.equalsIgnoreCase(F("User-Agent")) &&
        !name.equalsIgnoreCase(F("Host")) &&
        !(name.equalsIgnoreCase(F("Authorization")) && _base64Authorization.length())){
+
         String headerLine = name;
         headerLine += ": ";
+
+        if (replace) {
+            int headerStart = _headers.indexOf(headerLine);
+            if (headerStart != -1) {
+                int headerEnd = _headers.indexOf('\n', headerStart);
+                _headers = _headers.substring(0, headerStart) + _headers.substring(headerEnd + 1);
+            }
+        }
+
         headerLine += value;
         headerLine += "\r\n";
-
         if(first) {
             _headers = headerLine + _headers;
         } else {
@@ -865,6 +900,7 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     if(_base64Authorization.length()) {
+        _base64Authorization.replace("\n", "");
         header += F("Authorization: Basic ");
         header += _base64Authorization;
         header += "\r\n";
@@ -906,7 +942,8 @@ int HTTPClient::handleHeaderResponse()
                 _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
             } else if(headerLine.indexOf(':')) {
                 String headerName = headerLine.substring(0, headerLine.indexOf(':'));
-                String headerValue = headerLine.substring(headerLine.indexOf(':') + 2);
+                String headerValue = headerLine.substring(headerLine.indexOf(':') + 1);
+                headerValue.trim();
 
                 if(headerName.equalsIgnoreCase("Content-Length")) {
                     _size = headerValue.toInt();

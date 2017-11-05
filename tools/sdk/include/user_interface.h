@@ -1,5 +1,24 @@
 /*
- *  Copyright (C) 2013 -2014  Espressif System
+ * ESPRESSIF MIT License
+ *
+ * Copyright (c) 2016 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
+ *
+ * Permission is hereby granted for use on ESPRESSIF SYSTEMS ESP8266 only, in which case,
+ * it is free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -16,6 +35,7 @@
 #include "queue.h"
 #include "user_config.h"
 #include "spi_flash.h"
+#include "gpio.h"
 
 #ifndef MAC2STR
 #define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
@@ -51,7 +71,8 @@ void system_restore(void);
 void system_restart(void);
 
 bool system_deep_sleep_set_option(uint8 option);
-void system_deep_sleep(uint32 time_in_us);
+bool system_deep_sleep(uint64 time_in_us);
+bool system_deep_sleep_instant(uint64 time_in_us);
 
 uint8 system_upgrade_userbin_check(void);
 void system_upgrade_reboot(void);
@@ -96,6 +117,7 @@ void system_uart_swap(void);
 void system_uart_de_swap(void);
 
 uint16 system_adc_read(void);
+void system_adc_read_fast(uint16 *adc_addr, uint16 adc_num, uint8 adc_clk_div);
 uint16 system_get_vdd33(void);
 
 const char *system_get_sdk_version(void);
@@ -118,13 +140,17 @@ bool system_update_cpu_freq(uint8 freq);
 uint8 system_get_cpu_freq(void);
 
 enum flash_size_map {
-    FLASH_SIZE_4M_MAP_256_256 = 0,
-    FLASH_SIZE_2M,
-    FLASH_SIZE_8M_MAP_512_512,
-    FLASH_SIZE_16M_MAP_512_512,
-    FLASH_SIZE_32M_MAP_512_512,
-    FLASH_SIZE_16M_MAP_1024_1024,
-    FLASH_SIZE_32M_MAP_1024_1024
+    FLASH_SIZE_4M_MAP_256_256 = 0,  /**<  Flash size : 4Mbits. Map : 256KBytes + 256KBytes */
+    FLASH_SIZE_2M,                  /**<  Flash size : 2Mbits. Map : 256KBytes */
+    FLASH_SIZE_8M_MAP_512_512,      /**<  Flash size : 8Mbits. Map : 512KBytes + 512KBytes */
+    FLASH_SIZE_16M_MAP_512_512,     /**<  Flash size : 16Mbits. Map : 512KBytes + 512KBytes */
+    FLASH_SIZE_32M_MAP_512_512,     /**<  Flash size : 32Mbits. Map : 512KBytes + 512KBytes */
+    FLASH_SIZE_16M_MAP_1024_1024,   /**<  Flash size : 16Mbits. Map : 1024KBytes + 1024KBytes */
+    FLASH_SIZE_32M_MAP_1024_1024,    /**<  Flash size : 32Mbits. Map : 1024KBytes + 1024KBytes */
+    FLASH_SIZE_32M_MAP_2048_2048,    /**<  attention: don't support now ,just compatible for nodemcu;
+                                           Flash size : 32Mbits. Map : 2048KBytes + 2048KBytes */
+    FLASH_SIZE_64M_MAP_1024_1024,     /**<  Flash size : 64Mbits. Map : 1024KBytes + 1024KBytes */
+    FLASH_SIZE_128M_MAP_1024_1024     /**<  Flash size : 128Mbits. Map : 1024KBytes + 1024KBytes */
 };
 
 enum flash_size_map system_get_flash_size_map(void);
@@ -133,6 +159,7 @@ void system_phy_set_max_tpw(uint8 max_tpw);
 void system_phy_set_tpw_via_vdd33(uint16 vdd33);
 void system_phy_set_rfoption(uint8 option);
 void system_phy_set_powerup_option(uint8 option);
+void system_phy_freq_trace_enable(bool enable);
 
 bool system_param_save_with_protect(uint16 start_sec, void *param, uint16 len);
 bool system_param_load(uint16 start_sec, uint16 offset, void *param, uint16 len);
@@ -164,7 +191,7 @@ bool wifi_set_opmode_current(uint8 opmode);
 uint8 wifi_get_broadcast_if(void);
 bool wifi_set_broadcast_if(uint8 interface);
 
-typedef struct bss_info {
+struct bss_info {
     STAILQ_ENTRY(bss_info)     next;
 
     uint8 bssid[6];
@@ -176,8 +203,9 @@ typedef struct bss_info {
     uint8 is_hidden;
     sint16 freq_offset;
     sint16 freqcal_val;
-	uint8 *esp_mesh_ie;
-} bss_info_t;
+    uint8 *esp_mesh_ie;
+    uint8 simple_pair;
+};
 
 typedef struct _scaninfo {
     STAILQ_HEAD(, bss_info) *pbss;
@@ -208,11 +236,17 @@ bool wifi_station_disconnect(void);
 
 sint8 wifi_station_get_rssi(void);
 
+typedef enum {
+    WIFI_SCAN_TYPE_ACTIVE = 0,  /**< active scan */
+    WIFI_SCAN_TYPE_PASSIVE,     /**< passive scan */
+} wifi_scan_type_t;
+
 struct scan_config {
-    uint8 *ssid;	// Note: ssid == NULL, don't filter ssid.
-    uint8 *bssid;	// Note: bssid == NULL, don't filter bssid.
-    uint8 channel;	// Note: channel == 0, scan all channels, otherwise scan set channel.
-    uint8 show_hidden;	// Note: show_hidden == 1, can get hidden ssid routers' info.
+    uint8 *ssid;    // Note: ssid == NULL, don't filter ssid.
+    uint8 *bssid;    // Note: bssid == NULL, don't filter bssid.
+    uint8 channel;    // Note: channel == 0, scan all channels, otherwise scan set channel.
+    uint8 show_hidden;    // Note: show_hidden == 1, can get hidden ssid routers' info.
+    wifi_scan_type_t scan_type; // scan type, active or passive
 };
 
 bool wifi_station_scan(struct scan_config *config, scan_done_cb_t cb);
@@ -255,7 +289,7 @@ int wifi_station_set_cert_key(uint8 *client_cert, int client_cert_len,
     uint8 *private_key, int private_key_len,
     uint8 *private_key_passwd, int private_key_passwd_len);
 void wifi_station_clear_cert_key(void);
-int wifi_station_set_username(unsigned char*, int);
+int wifi_station_set_username(uint8 *username, int len);
 void wifi_station_clear_username(void);
 
 struct softap_config {
@@ -275,22 +309,22 @@ bool wifi_softap_set_config(struct softap_config *config);
 bool wifi_softap_set_config_current(struct softap_config *config);
 
 struct station_info {
-	STAILQ_ENTRY(station_info)	next;
+    STAILQ_ENTRY(station_info)    next;
 
-	uint8 bssid[6];
-	struct ip_addr ip;
+    uint8 bssid[6];
+    struct ip_addr ip;
 };
 
 struct dhcps_lease {
-	bool enable;
-	struct ip_addr start_ip;
-	struct ip_addr end_ip;
+    bool enable;
+    struct ip_addr start_ip;
+    struct ip_addr end_ip;
 };
 
 enum dhcps_offer_option{
-	OFFER_START = 0x00,
-	OFFER_ROUTER = 0x01,
-	OFFER_END
+    OFFER_START = 0x00,
+    OFFER_ROUTER = 0x01,
+    OFFER_END
 };
 
 uint8 wifi_softap_get_station_num(void);
@@ -362,6 +396,7 @@ void wifi_fpm_set_wakeup_cb(fpm_wakeup_cb cb);
 sint8 wifi_fpm_do_sleep(uint32 sleep_time_in_us);
 void wifi_fpm_set_sleep_type(sleep_type_t type);
 sleep_type_t wifi_fpm_get_sleep_type(void);
+void wifi_fpm_auto_sleep_set_in_null_mode(uint8 req);
 
 enum {
     EVENT_STAMODE_CONNECTED = 0,
@@ -372,6 +407,7 @@ enum {
     EVENT_SOFTAPMODE_STACONNECTED,
 	EVENT_SOFTAPMODE_STADISCONNECTED,
 	EVENT_SOFTAPMODE_PROBEREQRECVED,
+    EVENT_OPMODE_CHANGED,
     EVENT_MAX
 };
 
@@ -447,6 +483,11 @@ typedef struct {
 	uint8 mac[6];
 } Event_SoftAPMode_ProbeReqRecved_t;
 
+typedef struct {
+    uint8 old_opmode;
+    uint8 new_opmode;
+} Event_OpMode_Change_t;
+
 typedef union {
 	Event_StaMode_Connected_t			connected;
 	Event_StaMode_Disconnected_t		disconnected;
@@ -455,6 +496,7 @@ typedef union {
 	Event_SoftAPMode_StaConnected_t		sta_connected;
 	Event_SoftAPMode_StaDisconnected_t	sta_disconnected;
 	Event_SoftAPMode_ProbeReqRecved_t   ap_probereqrecved;
+    Event_OpMode_Change_t               opmode_changed;
 } Event_Info_u;
 
 typedef struct _esp_event {
@@ -479,6 +521,7 @@ enum wps_cb_status {
 	WPS_CB_ST_FAILED,
 	WPS_CB_ST_TIMEOUT,
 	WPS_CB_ST_WEP,
+	WPS_CB_ST_UNK,
 };
 
 bool wifi_wps_enable(WPS_TYPE_t wps_type);
@@ -602,5 +645,10 @@ typedef void (*user_ie_manufacturer_recv_cb_t)(uint8 type, const uint8 sa[6], co
 bool wifi_set_user_ie(bool enable, uint8 *m_oui, uint8 type, uint8 *user_ie, uint8 len);
 int wifi_register_user_ie_manufacturer_recv_cb(user_ie_manufacturer_recv_cb_t cb);
 void wifi_unregister_user_ie_manufacturer_recv_cb(void);
+
+void wifi_enable_gpio_wakeup(uint32 i, GPIO_INT_TYPE intr_status);
+void wifi_disable_gpio_wakeup(void);
+
+void uart_div_modify(uint8 uart_no, uint32 DivLatchValue);
 
 #endif

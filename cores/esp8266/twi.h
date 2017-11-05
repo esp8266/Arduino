@@ -26,12 +26,19 @@
 extern "C" {
 #endif
 
+#define I2C_OK                      0
+#define I2C_SCL_HELD_LOW            1
+#define I2C_SCL_HELD_LOW_AFTER_READ 2
+#define I2C_SDA_HELD_LOW            3
+#define I2C_SDA_HELD_LOW_AFTER_INIT 4
+
 void twi_init(unsigned char sda, unsigned char scl);
 void twi_stop(void);
 void twi_setClock(unsigned int freq);
 void twi_setClockStretchLimit(uint32_t limit);
 uint8_t twi_writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop);
 uint8_t twi_readFrom(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop);
+uint8_t twi_status();
 
 #ifdef __cplusplus
 }
