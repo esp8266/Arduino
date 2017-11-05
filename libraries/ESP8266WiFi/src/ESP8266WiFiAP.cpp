@@ -124,7 +124,7 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     }
 
     struct softap_config conf_compare;
-    if(WiFi.persistent) wifi_softap_get_config_default(&conf_compare);
+    if(WiFi._persistent) wifi_softap_get_config_default(&conf_compare);
     else wifi_softap_get_config(&conf_compare);
 
     if(!softap_config_equal(conf, conf_compare)) {
