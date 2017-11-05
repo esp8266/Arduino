@@ -309,7 +309,11 @@ void ESP8266WiFiGenericClass::persistent(bool persistent) {
  * @param m WiFiMode_t
  */
 bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
-    if(wifi_get_opmode() == (uint8) m) {
+    if(_persistent){
+        if(wifi_get_opmode() == (uint8) m && wifi_get_opmode_default() == (uint8) m){
+            return true;
+        }
+    } else if(wifi_get_opmode() == (uint8) m){
         return true;
     }
 
