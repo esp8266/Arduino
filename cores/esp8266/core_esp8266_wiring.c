@@ -71,6 +71,12 @@ unsigned long ICACHE_RAM_ATTR micros() {
     return system_get_time();
 }
 
+uint64_t ICACHE_RAM_ATTR micros64() {
+    uint64_t m = system_get_time();
+    uint64_t c = micros_overflow_count + ((m < micros_at_last_overflow_tick) ? 1 : 0);
+    return c * 4294967296 + m;    
+}
+
 void ICACHE_RAM_ATTR delayMicroseconds(unsigned int us) {
     os_delay_us(us);
 }

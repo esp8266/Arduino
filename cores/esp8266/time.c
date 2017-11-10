@@ -37,17 +37,20 @@ extern struct tm* sntp_localtime(const time_t *clock);
 
 static int s_daylightOffset_sec = 0;
 static long s_timezone_sec = 0;
-static time_t s_bootTime = 0;
+static bool s_bootTimeSet = false;
+static uint64_t s_bootTime_us = 0;
 
 // calculate offset used in gettimeofday
 static void ensureBootTimeIsSet()
 {
-    if (!s_bootTime)
+    // Check just a bool flag instead of the full 64-bit s_bootTime for zero.
+    if (!s_bootTimeSet)
     {
-        time_t now = sntp_get_current_timestamp();
-        if (now)
+        time_t now_s = sntp_get_current_timestamp();
+        if (now_s)
         {
-            s_bootTime =  now - millis() / 1000;
+            s_bootTime_us = now_s * 1000000ULL - micros64();
+            s_bootTimeSet = true;
         }
     }
 }
@@ -100,8 +103,9 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
     if (tp)
     {
         ensureBootTimeIsSet();
-        tp->tv_sec  = s_bootTime + millis() / 1000;
-        tp->tv_usec = micros();
+        uint64_t currentTime_us = s_bootTime_us + micros64();
+        tp->tv_sec = currentTime_us / 1000000;
+        tp->tv_usec = currentTime_us % 1000000;
     }
     return 0;
 }
