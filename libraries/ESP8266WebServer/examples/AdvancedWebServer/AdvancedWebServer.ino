@@ -93,6 +93,7 @@ void setup ( void ) {
 	pinMode ( led, OUTPUT );
 	digitalWrite ( led, 0 );
 	Serial.begin ( 115200 );
+	WiFi.mode ( WIFI_STA );
 	WiFi.begin ( ssid, password );
 	Serial.println ( "" );
 

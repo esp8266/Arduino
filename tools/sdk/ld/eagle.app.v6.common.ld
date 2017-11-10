@@ -177,6 +177,7 @@ SECTIONS
     *libstdc++.a:(.literal .text .literal.* .text.*)
     *liblwip_gcc.a:(.literal .text .literal.* .text.*)
     *liblwip_src.a:(.literal .text .literal.* .text.*)
+    *liblwip2.a:(.literal .text .literal.* .text.*)
     *libaxtls.a:(.literal .text .literal.* .text.*)
     *libat.a:(.literal.* .text.*)
     *libcrypto.a:(.literal.* .text.*)
