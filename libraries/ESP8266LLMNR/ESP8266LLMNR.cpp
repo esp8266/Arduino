@@ -226,14 +226,25 @@ void LLMNRResponder::_process_packet() {
         Serial.println("(no matching RRs)");
 #endif
 
+#if LWIP_VERSION_MAJOR == 1
     struct ip_info remote_ip_info;
     remote_ip_info.ip.addr = _conn->getRemoteAddress();
+#else
+    ip_addr_t remote_ip;
+    remote_ip.addr = _conn->getRemoteAddress();
+#endif
+
     struct ip_info ip_info;
     bool match_ap = false;
     if (wifi_get_opmode() & SOFTAP_MODE) {
         wifi_get_ip_info(SOFTAP_IF, &ip_info);
+#if LWIP_VERSION_MAJOR == 1        
         if (ip_info.ip.addr && ip_addr_netcmp(&remote_ip_info.ip, &ip_info.ip, &ip_info.netmask))
             match_ap = true;
+#else
+        if (ip_info.ip.addr && ip_addr_netcmp(&remote_ip, &ip_info.ip, &ip_info.netmask))
+            match_ap = true;
+#endif
     }
     if (!match_ap)
         wifi_get_ip_info(STATION_IF, &ip_info);
@@ -272,8 +283,13 @@ void LLMNRResponder::_process_packet() {
         };
         _conn->append(reinterpret_cast<const char*>(rr), sizeof(rr));
     }
+#if LWIP_VERSION_MAJOR == 1        
     _conn->setMulticastInterface(remote_ip_info.ip);
     _conn->send(&remote_ip_info.ip, _conn->getRemotePort());
+#else
+    _conn->setMulticastInterface(remote_ip);
+    _conn->send(&remote_ip, _conn->getRemotePort());
+#endif
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_LLMNR)
