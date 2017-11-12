@@ -17,6 +17,12 @@ extern "C" {
 
 #define NBNSQ_TYPE_NB (0x0020)
 #define NBNSQ_CLASS_IN (0x0001)
+#ifndef LWIP_PLATFORM_HTONS
+#define LWIP_PLATFORM_HTONS(_n)  ((u16_t)((((_n) & 0xff) << 8) | (((_n) >> 8) & 0xff)))
+#endif
+#ifndef LWIP_PLATFORM_HTONL
+#define LWIP_PLATFORM_HTONL(_n)  ((u32_t)( (((_n) & 0xff) << 24) | (((_n) & 0xff00) << 8) | (((_n) >> 8)  & 0xff00) | (((_n) >> 24) & 0xff) ))
+#endif
 
 // Definice struktury NBNS dotazu (alespon veci, ktere jsem vypozoroval):
 struct NBNSQUESTION {
@@ -168,7 +174,11 @@ void ESP8266NetBIOS::end()
     }
 }
 
-void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, u16_t port)
+#if LWIP_VERSION_MAJOR == 1 
+void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, uint16_t port)
+#else
+void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint16_t port)
+#endif
 {
     while(pb != NULL) {
         uint8_t * data = (uint8_t*)((pb)->payload);
@@ -256,7 +266,11 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, u16_t port)
     }
 }
 
+#if LWIP_VERSION_MAJOR == 1
 void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip_addr *addr, uint16_t port)
+#else
+void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip_addr_t *addr, uint16_t port)
+#endif
 {
     reinterpret_cast<ESP8266NetBIOS*>(arg)->_recv(upcb, p, addr, port);
 }
