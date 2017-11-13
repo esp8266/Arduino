@@ -17,6 +17,7 @@
  */
 
 #include <time.h>
+#include <sys/time.h>
 #include <sys/reent.h>
 #include "sntp.h"
 
@@ -76,6 +77,22 @@ void configTime(int timezone, int daylightOffset_sec, const char* server1, const
     sntp_set_timezone(timezone/3600);
     sntp_set_daylight(daylightOffset_sec);
     sntp_init();
+}
+
+int settimeofday(const struct timeval* tv, const struct timezone* tz)
+{
+    if (tz) /*before*/
+    {
+        sntp_set_timezone(tz->tz_minuteswest / 60);
+        // apparently tz->tz_dsttime is a bitfield and should not be further used (cf man)
+        sntp_set_daylight(0);
+    }
+    if (tv) /* after*/
+    {
+        sntp_set_system_time(tv->tv_sec);
+        // ignore tv->usec
+    }
+    return 0;
 }
 
 int clock_gettime(clockid_t unused, struct timespec *tp)
