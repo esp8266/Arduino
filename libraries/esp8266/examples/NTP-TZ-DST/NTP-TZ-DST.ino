@@ -48,7 +48,6 @@ extern "C" int clock_gettime(clockid_t unused, struct timespec *tp);
 void loop() {
 
         // same result as with time()
-        // but wrong with NTP
         timeval tv;
         gettimeofday(&tv, NULL);
         Serial.print("gtod:");
