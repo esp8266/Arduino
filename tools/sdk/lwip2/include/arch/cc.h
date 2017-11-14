@@ -51,10 +51,16 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
-void sntp_set_system_time (uint32_t t);
-
 #endif // defined(LWIP_BUILD)
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+void sntp_set_system_time (uint32_t t);	// also provided to user
+#ifdef __cplusplus
+}
+#endif
 
 #include "mem.h" // useful for os_malloc used in esp-arduino's mDNS
 
