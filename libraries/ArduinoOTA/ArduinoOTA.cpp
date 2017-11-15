@@ -365,7 +365,7 @@ bool ArduinoOTAClass::constantTimeEquals(const String & string1,
 
   // Preliminary check  
   if(string1.length() != string2.length()) {
-	  return false;
+    return false;
   }
   
   // Evaluates every character
