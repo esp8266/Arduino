@@ -477,6 +477,31 @@ unsigned char String::equalsIgnoreCase(const String &s2) const {
     return 1;
 }
 
+unsigned char String::equalsConstantTime(const String &s2) const {
+    // To avoid possible time-based attacks present function
+    // compares given strings in a constant time.
+    if(len != s2.len)
+        return 0;
+    if(len == 0)
+        return 1;
+    const char *p1 = buffer;
+    const char *p2 = s2.buffer;
+    unsigned int u1 = 0;
+    unsigned int u2 = 0;
+    while(*p1) {
+        if(*p1 == *p2)
+            ++u1;
+        else
+            ++u2;
+        ++p1;
+        ++p2;
+    }
+    if(u2 == 0)
+        return 0;
+    else
+        return 1;
+}
+
 unsigned char String::startsWith(const String &s2) const {
     if(len < s2.len)
         return 0;

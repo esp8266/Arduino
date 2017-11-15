@@ -93,7 +93,6 @@ class ArduinoOTAClass
     void _onRx(void);
     int parseInt(void);
     String readStringUntil(char end);
-	bool constantTimeEquals(const String &string1, const String &string2);
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ARDUINOOTA)
