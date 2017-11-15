@@ -496,10 +496,10 @@ unsigned char String::equalsConstantTime(const String &s2) const {
         ++p1;
         ++p2;
     }
-    if(u2 == 0)
-        return 0;
-    else
+    if((u1 == len) && (u2 == 0))
         return 1;
+    else
+        return 0;
 }
 
 unsigned char String::startsWith(const String &s2) const {
