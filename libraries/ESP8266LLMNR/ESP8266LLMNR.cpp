@@ -50,7 +50,7 @@ extern "C" {
 
 //#define LLMNR_DEBUG
 
-#define BIT(x) (1 << (x))
+//BIT(x) is defined in tools/sdk/c_types.h
 
 #define FLAGS_QR                BIT(15)
 #define FLAGS_OP_SHIFT          11
