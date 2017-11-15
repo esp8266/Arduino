@@ -358,6 +358,30 @@ int ArduinoOTAClass::getCommand() {
   return _cmd;
 }
 
+<<<<<<< HEAD
+=======
+// To avoid possible time-based attacks present function compares given 
+// strings in a constant time.
+bool ArduinoOTAClass::constantTimeEquals(const String & string1, 
+  const String & string2) {
+
+  // Preliminary check  
+  if(string1.length() != string2.length()) {
+    return false;
+  }
+  
+  // Evaluates every character
+  bool equals = true;
+  unsigned int len = string1.length();
+  for(unsigned int i = 0; i < len; i++){
+    equals &= (string1.charAt(i) == string2.charAt(i));
+  }
+  
+  // Return result
+  return equals;
+}
+
+>>>>>>> fe324cccfa483042104f244411c5611e06039192
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ARDUINOOTA)
 ArduinoOTAClass ArduinoOTA;
 #endif
