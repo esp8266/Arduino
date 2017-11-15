@@ -229,7 +229,7 @@ void ArduinoOTAClass::_onRx(){
     String result = _challengemd5.toString();
 
     ota_ip.addr = (uint32_t)_ota_ip;
-    if(result.equals(response)){
+    if(constantTimeEquals(result, response)){
       _state = OTA_RUNUPDATE;
     } else {
       _udp_ota->append("Authentication Failed", 21);
@@ -356,6 +356,27 @@ void ArduinoOTAClass::handle() {
 
 int ArduinoOTAClass::getCommand() {
   return _cmd;
+}
+
+bool ArduinoOTAClass::constantTimeEquals(const String & string1, 
+  const String & string2) {
+  // To avoid possible time-based attacks present function compares given 
+  // strings in a constant time.
+
+  // Preliminary check  
+  if(string1.length() != string2.length()) {
+	  return false;
+  }
+  
+  // Evaluates every character
+  bool equals = true;
+  size_t len = string1.length();
+  for(size_t i = 0; i < len; i++){
+    equals &= (string1.charAt(i) == string2.charAt(i));
+  }
+  
+  // Return result
+  return equals;
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ARDUINOOTA)
