@@ -146,7 +146,7 @@ bool ESP8266NetBIOS::begin(const char *name)
     }
 
     // presuneme jmeno zarizeni se soucasnou upravou na UPPER case
-    for (int i = 0; i < n; ++i) {
+    for (size_t  i = 0; i < n; ++i) {
         _name[i] = toupper(name[i]);
     }
     _name[n] = '\0';
@@ -180,6 +180,9 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, uint16_t po
 void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint16_t port)
 #endif
 {
+    (void)upcb;
+    (void)addr;
+    (void)port;
     while(pb != NULL) {
         uint8_t * data = (uint8_t*)((pb)->payload);
         size_t len = pb->len;

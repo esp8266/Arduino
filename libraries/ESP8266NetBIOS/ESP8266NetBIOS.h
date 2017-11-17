@@ -4,6 +4,7 @@
 
 extern "C" {
 #include "lwip/init.h" // LWIP_VERSION_
+#include <lwip/ip_addr.h>
 }
 #include <ESP8266WiFi.h>
 
@@ -18,12 +19,6 @@ extern "C" {
 
 struct udp_pcb;
 struct pbuf;
-#if LWIP_VERSION_MAJOR == 1 
-struct ip_addr;
-#else
-struct ip4_addr;
-typedef ip4_addr_t ip_addr_t;
-#endif
 
 class ESP8266NetBIOS
 {
