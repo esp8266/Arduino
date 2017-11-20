@@ -38,6 +38,7 @@ public:
   void end();
 
   uint8_t * getDataPtr();
+  uint8_t const * getConstDataPtr();
 
   template<typename T> 
   T &get(int address, T &t) {
