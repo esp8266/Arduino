@@ -83,10 +83,11 @@ void EEPROMClass::end() {
   }
   _data = 0;
   _size = 0;
+  _dirty = false;
 }
 
 
-uint8_t EEPROMClass::read(int address) {
+uint8_t EEPROMClass::read(int const address) {
   if (address < 0 || (size_t)address >= _size)
     return 0;
   if(!_data)
@@ -95,7 +96,7 @@ uint8_t EEPROMClass::read(int address) {
   return _data[address];
 }
 
-void EEPROMClass::write(int address, uint8_t value) {
+void EEPROMClass::write(int const address, uint8_t const value) {
   if (address < 0 || (size_t)address >= _size)
     return;
   if(!_data)
