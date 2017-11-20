@@ -38,7 +38,7 @@ public:
   void end();
 
   uint8_t * getDataPtr();
-  uint8_t const * getConstDataPtr();
+  uint8_t const * getConstDataPtr() const;
 
   template<typename T> 
   T &get(int const address, T &t) {

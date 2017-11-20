@@ -137,7 +137,7 @@ uint8_t * EEPROMClass::getDataPtr() {
   return &_data[0];
 }
 
-uint8_t const * EEPROMClass::getConstDataPtr() {
+uint8_t const * EEPROMClass::getConstDataPtr() const {
   return &_data[0];
 }
 
