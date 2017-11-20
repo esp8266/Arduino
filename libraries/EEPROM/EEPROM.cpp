@@ -56,16 +56,21 @@ void EEPROMClass::begin(size_t size) {
 
   size = (size + 3) & (~3);
 
-  if (_data) {
+  //In case begin() is called a 2nd+ time, don't reallocate if size is the same
+  if(_data && size != _size) {
     delete[] _data;
+    _data = new uint8_t[size];
+  } else if(!_data) {
+    _data = new uint8_t[size];
   }
 
-  _data = new uint8_t[size];
   _size = size;
 
   noInterrupts();
   spi_flash_read(_sector * SPI_FLASH_SEC_SIZE, reinterpret_cast<uint32_t*>(_data), _size);
   interrupts();
+
+  _dirty = false; //make sure dirty is cleared in case begin() is called 2nd+ time
 }
 
 void EEPROMClass::end() {
@@ -78,10 +83,11 @@ void EEPROMClass::end() {
   }
   _data = 0;
   _size = 0;
+  _dirty = false;
 }
 
 
-uint8_t EEPROMClass::read(int address) {
+uint8_t EEPROMClass::read(int const address) {
   if (address < 0 || (size_t)address >= _size)
     return 0;
   if(!_data)
@@ -90,7 +96,7 @@ uint8_t EEPROMClass::read(int address) {
   return _data[address];
 }
 
-void EEPROMClass::write(int address, uint8_t value) {
+void EEPROMClass::write(int const address, uint8_t const value) {
   if (address < 0 || (size_t)address >= _size)
     return;
   if(!_data)
@@ -128,6 +134,10 @@ bool EEPROMClass::commit() {
 
 uint8_t * EEPROMClass::getDataPtr() {
   _dirty = true;
+  return &_data[0];
+}
+
+uint8_t const * EEPROMClass::getConstDataPtr() const {
   return &_data[0];
 }
 
