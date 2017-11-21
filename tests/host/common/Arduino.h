@@ -201,10 +201,10 @@ void analogWriteRange(uint32_t range);
 
 unsigned long millis(void);
 unsigned long micros(void);
-    void delay(unsigned long);
-    void delayMicroseconds(unsigned int us);
-    unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
-    unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
+void delay(unsigned long);
+void delayMicroseconds(unsigned int us);
+unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
     
 void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
 uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
