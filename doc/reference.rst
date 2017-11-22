@@ -94,10 +94,11 @@ Serial
 ------
 
 ``Serial`` object works much the same way as on a regular Arduino. Apart
-from hardware FIFO (128 bytes for TX and RX) HardwareSerial has
+from hardware FIFO (128 bytes for TX and RX) ``Serial`` has
 additional 256-byte TX and RX buffers. Both transmit and receive is
 interrupt-driven. Write and read functions only block the sketch
-execution when the respective FIFO/buffers are full/empty.
+execution when the respective FIFO/buffers are full/empty. Note that
+the length of additional 256-bit buffer can be customized.
 
 ``Serial`` uses UART0, which is mapped to pins GPIO1 (TX) and GPIO3
 (RX). Serial may be remapped to GPIO15 (TX) and GPIO13 (RX) by calling
@@ -121,6 +122,9 @@ instead, call ``Serial1.setDebugOutput(true)``.
 You also need to use ``Serial.setDebugOutput(true)`` to enable output
 from ``printf()`` function.
 
+The method ``Serial.setRxBufferSize(size_t size)`` allows to define the
+receiving buffer depth. The default value is 256.
+
 Both ``Serial`` and ``Serial1`` objects support 5, 6, 7, 8 data bits,
 odd (O), even (E), and no (N) parity, and 1 or 2 stop bits. To set the
 desired mode, call ``Serial.begin(baudrate, SERIAL_8N1)``,
@@ -142,6 +146,8 @@ current speed. For example
     // Will print "Serial is 57600 bps"
     Serial.printf("Serial is %d bps", br);
 
+| ``Serial`` and ``Serial1`` objects are both instances of the
+  ``HardwareSerial`` class.
 | I've done this also for official ESP8266 `Software
   Serial <https://github.com/esp8266/Arduino/blob/master/doc/libraries.md#softwareserial>`__
   library, see this `pull
