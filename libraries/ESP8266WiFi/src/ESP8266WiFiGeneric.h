@@ -99,7 +99,7 @@ class ESP8266WiFiGenericClass {
 
         int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
-
+        bool getPersistent();
     protected:
 
         friend class ESP8266WiFiSTAClass;
