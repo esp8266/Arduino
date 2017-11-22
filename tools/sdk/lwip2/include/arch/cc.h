@@ -27,7 +27,7 @@ author: d. gauchard
 
 */
 
-// version for esp8266 sdk-2.0.0(656edbf)
+// version for esp8266 sdk-2.0.0(656edbf) and later
 
 #ifndef LWIP2_ARCH_CC_H
 #define LWIP2_ARCH_CC_H
@@ -48,12 +48,12 @@ extern "C"
 #include "ets_sys.h"
 #include "osapi.h"
 #include "esp-missing.h"
-#ifdef __cplusplus
-}
-#endif
 
 void sntp_set_system_time (uint32_t t);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // defined(LWIP_BUILD)
 
 #include "mem.h" // useful for os_malloc used in esp-arduino's mDNS

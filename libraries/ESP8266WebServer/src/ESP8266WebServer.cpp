@@ -119,7 +119,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
         return false;
       }
       sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equals(encoded)){
+      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
         authReq = String();
         delete[] toencode;
         delete[] encoded;
