@@ -94,7 +94,7 @@ Serial
 ------
 
 ``Serial`` object works much the same way as on a regular Arduino. Apart
-from hardware FIFO (128 bytes for TX and RX) HardwareSerial has
+from hardware FIFO (128 bytes for TX and RX) ``Serial`` has
 additional 256-byte TX and RX buffers. Both transmit and receive is
 interrupt-driven. Write and read functions only block the sketch
 execution when the respective FIFO/buffers are full/empty.
@@ -148,6 +148,9 @@ current speed. For example
   request <https://github.com/plerup/espsoftwareserial/pull/22>`__.
 | Note that this implementation is **only for ESP8266 based boards**,
   and will not works with other Arduino boards.
+
+The definitions of ``Serial`` and ``Serial1`` objects are provided in 
+  ``HardwareSerial`` class.
 
 Progmem
 -------
