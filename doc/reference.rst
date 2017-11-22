@@ -142,15 +142,14 @@ current speed. For example
     // Will print "Serial is 57600 bps"
     Serial.printf("Serial is %d bps", br);
 
+| The definitions of ``Serial`` and ``Serial1`` objects are provided in 
+  ``HardwareSerial`` class.
 | I've done this also for official ESP8266 `Software
   Serial <https://github.com/esp8266/Arduino/blob/master/doc/libraries.md#softwareserial>`__
   library, see this `pull
   request <https://github.com/plerup/espsoftwareserial/pull/22>`__.
 | Note that this implementation is **only for ESP8266 based boards**,
   and will not works with other Arduino boards.
-
-The definitions of ``Serial`` and ``Serial1`` objects are provided in 
-  ``HardwareSerial`` class.
 
 Progmem
 -------
