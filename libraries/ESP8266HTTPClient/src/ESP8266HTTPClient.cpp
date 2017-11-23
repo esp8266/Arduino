@@ -132,7 +132,6 @@ bool HTTPClient::begin(String url)
 bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 {
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
-    bool hasPort = false;
     clear();
 
     // check for : (http: or https:
@@ -350,6 +349,20 @@ int HTTPClient::PUT(uint8_t * payload, size_t size) {
 
 int HTTPClient::PUT(String payload) {
     return PUT((uint8_t *) payload.c_str(), payload.length());
+}
+
+/**
+ * sends a patch request to the server
+ * @param payload uint8_t *
+ * @param size size_t
+ * @return http code
+ */
+int HTTPClient::PATCH(uint8_t * payload, size_t size) {
+    return sendRequest("PATCH", payload, size);
+}
+
+int HTTPClient::PATCH(String payload) {
+    return PATCH((uint8_t *) payload.c_str(), payload.length());
 }
 
 /**
