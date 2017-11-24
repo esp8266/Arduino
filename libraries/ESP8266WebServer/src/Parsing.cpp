@@ -345,13 +345,13 @@ void ESP8266WebServer::_parseArguments(String data) {
 }
 
 void ESP8266WebServer::_uploadWriteByte(uint8_t b){
-  if (_currentUpload.currentSize == HTTP_UPLOAD_BUFLEN){
+  if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN){
     if(_currentHandler && _currentHandler->canUpload(_currentUri))
-      _currentHandler->upload(*this, _currentUri, _currentUpload);
-    _currentUpload.totalSize += _currentUpload.currentSize;
-    _currentUpload.currentSize = 0;
+      _currentHandler->upload(*this, _currentUri, *_currentUpload);
+    _currentUpload->totalSize += _currentUpload->currentSize;
+    _currentUpload->currentSize = 0;
   }
-  _currentUpload.buf[_currentUpload.currentSize++] = b;
+  _currentUpload->buf[_currentUpload->currentSize++] = b;
 }
 
 uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
@@ -453,21 +453,22 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
               break;
             }
           } else {
-            _currentUpload.status = UPLOAD_FILE_START;
-            _currentUpload.name = argName;
-            _currentUpload.filename = argFilename;
-            _currentUpload.type = argType;
-            _currentUpload.totalSize = 0;
-            _currentUpload.currentSize = 0;
+            _currentUpload.reset(new HTTPUpload());
+            _currentUpload->status = UPLOAD_FILE_START;
+            _currentUpload->name = argName;
+            _currentUpload->filename = argFilename;
+            _currentUpload->type = argType;
+            _currentUpload->totalSize = 0;
+            _currentUpload->currentSize = 0;
 #ifdef DEBUG_ESP_HTTP_SERVER
             DEBUG_OUTPUT.print("Start File: ");
-            DEBUG_OUTPUT.print(_currentUpload.filename);
+            DEBUG_OUTPUT.print(_currentUpload->filename);
             DEBUG_OUTPUT.print(" Type: ");
-            DEBUG_OUTPUT.println(_currentUpload.type);
+            DEBUG_OUTPUT.println(_currentUpload->type);
 #endif
             if(_currentHandler && _currentHandler->canUpload(_currentUri))
-              _currentHandler->upload(*this, _currentUri, _currentUpload);
-            _currentUpload.status = UPLOAD_FILE_WRITE;
+              _currentHandler->upload(*this, _currentUri, *_currentUpload);
+            _currentUpload->status = UPLOAD_FILE_WRITE;
             uint8_t argByte = _uploadReadByte(client);
 readfile:
             while(argByte != 0x0D){
@@ -503,18 +504,18 @@ readfile:
 
               if (strstr((const char*)endBuf, boundary.c_str()) != NULL){
                 if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, _currentUpload);
-                _currentUpload.totalSize += _currentUpload.currentSize;
-                _currentUpload.status = UPLOAD_FILE_END;
+                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
+                _currentUpload->totalSize += _currentUpload->currentSize;
+                _currentUpload->status = UPLOAD_FILE_END;
                 if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, _currentUpload);
+                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
 #ifdef DEBUG_ESP_HTTP_SERVER
                 DEBUG_OUTPUT.print("End File: ");
-                DEBUG_OUTPUT.print(_currentUpload.filename);
+                DEBUG_OUTPUT.print(_currentUpload->filename);
                 DEBUG_OUTPUT.print(" Type: ");
-                DEBUG_OUTPUT.print(_currentUpload.type);
+                DEBUG_OUTPUT.print(_currentUpload->type);
                 DEBUG_OUTPUT.print(" Size: ");
-                DEBUG_OUTPUT.println(_currentUpload.totalSize);
+                DEBUG_OUTPUT.println(_currentUpload->totalSize);
 #endif
                 line = client.readStringUntil(0x0D);
                 client.readStringUntil(0x0A);
@@ -604,8 +605,8 @@ String ESP8266WebServer::urlDecode(const String& text)
 }
 
 bool ESP8266WebServer::_parseFormUploadAborted(){
-  _currentUpload.status = UPLOAD_FILE_ABORTED;
+  _currentUpload->status = UPLOAD_FILE_ABORTED;
   if(_currentHandler && _currentHandler->canUpload(_currentUri))
-    _currentHandler->upload(*this, _currentUri, _currentUpload);
+    _currentHandler->upload(*this, _currentUri, *_currentUpload);
   return false;
 }

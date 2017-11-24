@@ -59,9 +59,11 @@ extern "C" {
 
 
 
-//#define MDNS_DEBUG_ERR
-//#define MDNS_DEBUG_TX
-//#define MDNS_DEBUG_RX
+#ifdef DEBUG_ESP_MDNS
+#define DEBUG_ESP_MDNS_ERR
+#define DEBUG_ESP_MDNS_TX
+#define DEBUG_ESP_MDNS_RX
+#endif
 
 #define MDNS_NAME_REF   0xC000
 
@@ -187,8 +189,8 @@ void MDNSResponder::_restart() {
 bool MDNSResponder::_listen() {
   // Open the MDNS socket if it isn't already open.
   if (!_conn) {
-    #ifdef MDNS_DEBUG_RX
-    Serial.println("MDNS listening");
+    #ifdef DEBUG_ESP_MDNS_RX
+    DEBUG_ESP_PORT.println("MDNS listening");
     #endif
     ip_addr_t multicast_addr;
     multicast_addr.addr = (uint32_t) MDNS_MULTICAST_ADDR;
@@ -280,8 +282,8 @@ void MDNSResponder::addService(char *name, char *proto, uint16_t port){
 }
 
 int MDNSResponder::queryService(char *service, char *proto) {
-#ifdef MDNS_DEBUG_TX
-  Serial.printf("queryService %s %s\n", service, proto);
+#ifdef DEBUG_ESP_MDNS_TX
+  DEBUG_ESP_PORT.printf("queryService %s %s\n", service, proto);
 #endif  
   
   if (_query != 0) {
@@ -359,8 +361,8 @@ int MDNSResponder::queryService(char *service, char *proto) {
     _conn->send();
   }
 
-#ifdef MDNS_DEBUG_TX
-  Serial.println("Waiting for answers..");
+#ifdef DEBUG_ESP_MDNS_TX
+  DEBUG_ESP_PORT.println("Waiting for answers..");
 #endif
   delay(1000);
 
@@ -488,13 +490,13 @@ void MDNSResponder::_parsePacket(){
   for(i=0; i<6; i++) packetHeader[i] = _conn_read16();
 
   if ((packetHeader[1] & 0x8000) != 0) { // Read answers
-#ifdef MDNS_DEBUG_RX
-    Serial.printf("Reading answers RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
+#ifdef DEBUG_ESP_MDNS_RX
+    DEBUG_ESP_PORT.printf("Reading answers RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
 #endif
 
     if (!_waitingForAnswers) {
-#ifdef MDNS_DEBUG_RX
-      Serial.println("Not expecting any answers right now, returning");
+#ifdef DEBUG_ESP_MDNS_RX
+      DEBUG_ESP_PORT.println("Not expecting any answers right now, returning");
 #endif
       _conn->flush();
       return;
@@ -503,8 +505,8 @@ void MDNSResponder::_parsePacket(){
     int numAnswers = packetHeader[3] + packetHeader[5];
     // Assume that the PTR answer always comes first and that it is always accompanied by a TXT, SRV, AAAA (optional) and A answer in the same packet.
     if (numAnswers < 4) {
-#ifdef MDNS_DEBUG_RX
-      Serial.printf("Expected a packet with 4 or more answers, got %u\n", numAnswers);
+#ifdef DEBUG_ESP_MDNS_RX
+      DEBUG_ESP_PORT.printf("Expected a packet with 4 or more answers, got %u\n", numAnswers);
 #endif
       _conn->flush();
       return;
@@ -547,26 +549,26 @@ void MDNSResponder::_parsePacket(){
           break;
         }
         if(stringsRead > 3){
-#ifdef MDNS_DEBUG_RX
-          Serial.println("failed to read the response name");
+#ifdef DEBUG_ESP_MDNS_RX
+          DEBUG_ESP_PORT.println("failed to read the response name");
 #endif
           _conn->flush();
           return;
         }
         _conn_readS(serviceName, tmp8);
         serviceName[tmp8] = '\0';
-#ifdef MDNS_DEBUG_RX
-        Serial.printf(" %d ", tmp8);
+#ifdef DEBUG_ESP_MDNS_RX
+        DEBUG_ESP_PORT.printf(" %d ", tmp8);
         for (int n = 0; n < tmp8; n++) {
-          Serial.printf("%c", serviceName[n]);
+          DEBUG_ESP_PORT.printf("%c", serviceName[n]);
         }
-        Serial.println();
+        DEBUG_ESP_PORT.println();
 #endif
         if (serviceName[0] == '_') {
           if (strcmp(&serviceName[1], _query->_service) == 0) {
             serviceMatch = true;
-#ifdef MDNS_DEBUG_RX
-            Serial.printf("found matching service: %s\n", _query->_service);
+#ifdef DEBUG_ESP_MDNS_RX
+            DEBUG_ESP_PORT.printf("found matching service: %s\n", _query->_service);
 #endif
           }
         }
@@ -585,16 +587,16 @@ void MDNSResponder::_parsePacket(){
         if(answerType == MDNS_TYPE_TXT && answerRdlength < 1460){
           while(--answerRdlength) _conn->read();
         } else {
-#ifdef MDNS_DEBUG_RX
-        Serial.printf("Data len too long! %u\n", answerRdlength);
+#ifdef DEBUG_ESP_MDNS_RX
+        DEBUG_ESP_PORT.printf("Data len too long! %u\n", answerRdlength);
 #endif
           _conn->flush();
           return;
         }
       }
 
-#ifdef MDNS_DEBUG_RX
-      Serial.printf("type: %04x rdlength: %d\n", answerType, answerRdlength);
+#ifdef DEBUG_ESP_MDNS_RX
+      DEBUG_ESP_PORT.printf("type: %04x rdlength: %d\n", answerType, answerRdlength);
 #endif
 
       if (answerType == MDNS_TYPE_PTR) {
@@ -604,24 +606,24 @@ void MDNSResponder::_parsePacket(){
           memcpy(answerHostName, hostName+1, answerRdlength-3);
           answerHostName[answerRdlength-3] = '\0';
         }
-#ifdef MDNS_DEBUG_RX
-        Serial.printf("PTR %d ", answerRdlength);
+#ifdef DEBUG_ESP_MDNS_RX
+        DEBUG_ESP_PORT.printf("PTR %d ", answerRdlength);
         for (int n = 0; n < answerRdlength; n++) {
-          Serial.printf("%c", hostName[n]);
+          DEBUG_ESP_PORT.printf("%c", hostName[n]);
         }
-        Serial.println();
+        DEBUG_ESP_PORT.println();
 #endif
       }
 
       else if (answerType == MDNS_TYPE_TXT) {
         partsCollected |= 0x02;
         _conn_readS(hostName, answerRdlength); // Read rdata
-#ifdef MDNS_DEBUG_RX
-        Serial.printf("TXT %d ", answerRdlength);
+#ifdef DEBUG_ESP_MDNS_RX
+        DEBUG_ESP_PORT.printf("TXT %d ", answerRdlength);
         for (int n = 0; n < answerRdlength; n++) {
-          Serial.printf("%c", hostName[n]);
+          DEBUG_ESP_PORT.printf("%c", hostName[n]);
         }
-        Serial.println();
+        DEBUG_ESP_PORT.println();
 #endif
       }
 
@@ -637,20 +639,20 @@ void MDNSResponder::_parsePacket(){
         // Read hostname
         tmp8 = _conn_read8();
         if (tmp8 & 0xC0) { // Compressed pointer (not supported)
-#ifdef MDNS_DEBUG_RX
-          Serial.println("Skipping compressed pointer");
+#ifdef DEBUG_ESP_MDNS_RX
+          DEBUG_ESP_PORT.println("Skipping compressed pointer");
 #endif
           tmp8 = _conn_read8();
         }
         else {
           _conn_readS(answerHostName, tmp8);
           answerHostName[tmp8] = '\0';
-#ifdef MDNS_DEBUG_RX
-          Serial.printf("SRV %d ", tmp8);
+#ifdef DEBUG_ESP_MDNS_RX
+          DEBUG_ESP_PORT.printf("SRV %d ", tmp8);
           for (int n = 0; n < tmp8; n++) {
-            Serial.printf("%02x ", answerHostName[n]);
+            DEBUG_ESP_PORT.printf("%02x ", answerHostName[n]);
           }
-          Serial.printf("\n%s\n", answerHostName);
+          DEBUG_ESP_PORT.printf("\n%s\n", answerHostName);
 #endif
           if (answerRdlength - (6 + 1 + tmp8) > 0) { // Skip any remaining rdata
             _conn_readS(hostName, answerRdlength - (6 + 1 + tmp8));
@@ -665,16 +667,16 @@ void MDNSResponder::_parsePacket(){
         }
       }
       else {
-#ifdef MDNS_DEBUG_RX
-          Serial.printf("Ignoring unsupported type %02x\n", tmp8);
+#ifdef DEBUG_ESP_MDNS_RX
+          DEBUG_ESP_PORT.printf("Ignoring unsupported type %02x\n", tmp8);
 #endif
           for (int n = 0; n < answerRdlength; n++)
 		(void)_conn_read8();
       }
 
       if ((partsCollected == 0x0F) && serviceMatch) {
-#ifdef MDNS_DEBUG_RX
-        Serial.println("All answers parsed, adding to _answers list..");
+#ifdef DEBUG_ESP_MDNS_RX
+        DEBUG_ESP_PORT.println("All answers parsed, adding to _answers list..");
 #endif
         // Add new answer to answer list
         if (_answers == 0) {
@@ -722,10 +724,10 @@ void MDNSResponder::_parsePacket(){
   }
 
   if(hostNameLen > 0 && !_hostName.equals(hostName) && !_instanceName.equals(hostName)){
-#ifdef MDNS_DEBUG_ERR
-    Serial.printf("ERR_NO_HOST: %s\n", hostName);
-    Serial.printf("hostname: %s\n", _hostName.c_str() );
-    Serial.printf("instance: %s\n", _instanceName.c_str() );
+#ifdef DEBUG_ESP_MDNS_ERR
+    DEBUG_ESP_PORT.printf("ERR_NO_HOST: %s\n", hostName);
+    DEBUG_ESP_PORT.printf("hostname: %s\n", _hostName.c_str() );
+    DEBUG_ESP_PORT.printf("instance: %s\n", _instanceName.c_str() );
 #endif
     _conn->flush();
     return;
@@ -749,15 +751,15 @@ void MDNSResponder::_parsePacket(){
         protoNameLen = 0;
         localParsed = true;
       } else {
-#ifdef MDNS_DEBUG_ERR
-        Serial.printf("ERR_FQDN: %s\n", serviceName);
+#ifdef DEBUG_ESP_MDNS_ERR
+        DEBUG_ESP_PORT.printf("ERR_FQDN: %s\n", serviceName);
 #endif
         _conn->flush();
         return;
       }
     } else {
-#ifdef MDNS_DEBUG_ERR
-      Serial.printf("ERR_SERVICE: %s\n", serviceName);
+#ifdef DEBUG_ESP_MDNS_ERR
+      DEBUG_ESP_PORT.printf("ERR_SERVICE: %s\n", serviceName);
 #endif
       _conn->flush();
       return;
@@ -778,8 +780,8 @@ void MDNSResponder::_parsePacket(){
       _replyToTypeEnumRequest(interface);
       return;
     } else {
-#ifdef MDNS_DEBUG_ERR
-      Serial.printf("ERR_PROTO: %s\n", protoName);
+#ifdef DEBUG_ESP_MDNS_ERR
+      DEBUG_ESP_PORT.printf("ERR_PROTO: %s\n", protoName);
 #endif
       _conn->flush();
       return;
@@ -795,8 +797,8 @@ void MDNSResponder::_parsePacket(){
     if(localNameLen == 5 && strcmp("local", localName) == 0 && tmp == 0){
       localParsed = true;
     } else {
-#ifdef MDNS_DEBUG_ERR
-      Serial.printf("ERR_FQDN: %s\n", localName);
+#ifdef DEBUG_ESP_MDNS_ERR
+      DEBUG_ESP_PORT.printf("ERR_FQDN: %s\n", localName);
 #endif
       _conn->flush();
       return;
@@ -806,15 +808,15 @@ void MDNSResponder::_parsePacket(){
   if(serviceNameLen > 0 && protoNameLen > 0){
     servicePort = _getServicePort(serviceName, protoName);
     if(servicePort == 0){
-#ifdef MDNS_DEBUG_ERR
-      Serial.printf("ERR_NO_SERVICE: %s\n", serviceName);
+#ifdef DEBUG_ESP_MDNS_ERR
+      DEBUG_ESP_PORT.printf("ERR_NO_SERVICE: %s\n", serviceName);
 #endif
       _conn->flush();
       return;
     }
   } else if(serviceNameLen > 0 || protoNameLen > 0){
-#ifdef MDNS_DEBUG_ERR
-    Serial.printf("ERR_SERVICE_PROTO: %s\n", serviceName);
+#ifdef DEBUG_ESP_MDNS_ERR
+    DEBUG_ESP_PORT.printf("ERR_SERVICE_PROTO: %s\n", serviceName);
 #endif
     _conn->flush();
     return;
@@ -822,8 +824,8 @@ void MDNSResponder::_parsePacket(){
 
   // RESPOND
 
-#ifdef MDNS_DEBUG_RX
-  Serial.printf("RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
+#ifdef DEBUG_ESP_MDNS_RX
+  DEBUG_ESP_PORT.printf("RX: REQ, ID:%u, Q:%u, A:%u, NS:%u, ADD:%u\n", packetHeader[0], packetHeader[2], packetHeader[3], packetHeader[4], packetHeader[5]);
 #endif
 
   uint16_t currentType;
@@ -849,25 +851,25 @@ void MDNSResponder::_parsePacket(){
       }
     }
 
-#ifdef MDNS_DEBUG_RX
-    Serial.printf("REQ: ");
-    if(hostNameLen > 0) Serial.printf("%s.", hostName);
-    if(serviceNameLen > 0) Serial.printf("_%s.", serviceName);
-    if(protoNameLen > 0) Serial.printf("_%s.", protoName);
-    Serial.printf("local. ");
+#ifdef DEBUG_ESP_MDNS_RX
+    DEBUG_ESP_PORT.printf("REQ: ");
+    if(hostNameLen > 0) DEBUG_ESP_PORT.printf("%s.", hostName);
+    if(serviceNameLen > 0) DEBUG_ESP_PORT.printf("_%s.", serviceName);
+    if(protoNameLen > 0) DEBUG_ESP_PORT.printf("_%s.", protoName);
+    DEBUG_ESP_PORT.printf("local. ");
 
-    if(currentType == MDNS_TYPE_AAAA) Serial.printf("  AAAA ");
-    else if(currentType == MDNS_TYPE_A) Serial.printf("  A ");
-    else if(currentType == MDNS_TYPE_PTR) Serial.printf("  PTR ");
-    else if(currentType == MDNS_TYPE_SRV) Serial.printf("  SRV ");
-    else if(currentType == MDNS_TYPE_TXT) Serial.printf("  TXT ");
-    else Serial.printf("  0x%04X ", currentType);
+    if(currentType == MDNS_TYPE_AAAA) DEBUG_ESP_PORT.printf("  AAAA ");
+    else if(currentType == MDNS_TYPE_A) DEBUG_ESP_PORT.printf("  A ");
+    else if(currentType == MDNS_TYPE_PTR) DEBUG_ESP_PORT.printf("  PTR ");
+    else if(currentType == MDNS_TYPE_SRV) DEBUG_ESP_PORT.printf("  SRV ");
+    else if(currentType == MDNS_TYPE_TXT) DEBUG_ESP_PORT.printf("  TXT ");
+    else DEBUG_ESP_PORT.printf("  0x%04X ", currentType);
 
-    if(currentClass == MDNS_CLASS_IN) Serial.printf("  IN ");
-    else if(currentClass == MDNS_CLASS_IN_FLUSH_CACHE) Serial.printf("  IN[F] ");
-    else Serial.printf("  0x%04X ", currentClass);
+    if(currentClass == MDNS_CLASS_IN) DEBUG_ESP_PORT.printf("  IN ");
+    else if(currentClass == MDNS_CLASS_IN_FLUSH_CACHE) DEBUG_ESP_PORT.printf("  IN[F] ");
+    else DEBUG_ESP_PORT.printf("  0x%04X ", currentClass);
 
-    Serial.printf("\n");
+    DEBUG_ESP_PORT.printf("\n");
 #endif
   }
   uint8_t questionMask = 0;
@@ -909,8 +911,8 @@ void MDNSResponder::_replyToTypeEnumRequest(IPAddress multicastInterface) {
       char *proto = servicePtr->_proto;
       //uint16_t port = servicePtr->_port;
 
-#ifdef MDNS_DEBUG_TX
-      Serial.printf("TX: service:%s, proto:%s\n", service, proto);
+#ifdef DEBUG_ESP_MDNS_TX
+      DEBUG_ESP_PORT.printf("TX: service:%s, proto:%s\n", service, proto);
 #endif
 
       char sdHostName[] = "_services";
@@ -996,8 +998,8 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
   if(questionMask == 0) return;
   if(responseMask == 0) return;
 
-#ifdef MDNS_DEBUG_TX
-    Serial.printf("TX: qmask:%01X, rmask:%01X, service:%s, proto:%s, port:%u\n", questionMask, responseMask, service, proto, port);
+#ifdef DEBUG_ESP_MDNS_TX
+    DEBUG_ESP_PORT.printf("TX: qmask:%01X, rmask:%01X, service:%s, proto:%s, port:%u\n", questionMask, responseMask, service, proto, port);
 #endif
 
 

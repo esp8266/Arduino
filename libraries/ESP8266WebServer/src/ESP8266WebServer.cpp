@@ -119,7 +119,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
         return false;
       }
       sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equals(encoded)){
+      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
         authReq = String();
         delete[] toencode;
         delete[] encoded;
@@ -276,51 +276,49 @@ void ESP8266WebServer::handleClient() {
     _statusChange = millis();
   }
 
-  if (!_currentClient.connected()) {
+  bool keepCurrentClient = false;
+  bool callYield = false;
+
+  if (_currentClient.connected()) {
+    switch (_currentStatus) {
+    case HC_WAIT_READ:
+      // Wait for data from client to become available
+      if (_currentClient.available()) {
+        if (_parseRequest(_currentClient)) {
+          _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
+          _contentLength = CONTENT_LENGTH_NOT_SET;
+          _handleRequest();
+
+          if (_currentClient.connected()) {
+            _currentStatus = HC_WAIT_CLOSE;
+            _statusChange = millis();
+            keepCurrentClient = true;
+          }
+        }
+      } else { // !_currentClient.available()
+        if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT) {
+          keepCurrentClient = true;
+        }
+        callYield = true;
+      }
+      break;
+    case HC_WAIT_CLOSE:
+      // Wait for client to close the connection
+      if (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT) {
+        keepCurrentClient = true;
+        callYield = true;
+      }
+    }
+  }
+
+  if (!keepCurrentClient) {
     _currentClient = WiFiClient();
     _currentStatus = HC_NONE;
-    return;
+    _currentUpload.reset();
   }
 
-  // Wait for data from client to become available
-  if (_currentStatus == HC_WAIT_READ) {
-    if (!_currentClient.available()) {
-      if (millis() - _statusChange > HTTP_MAX_DATA_WAIT) {
-        _currentClient = WiFiClient();
-        _currentStatus = HC_NONE;
-      }
-      yield();
-      return;
-    }
-
-    if (!_parseRequest(_currentClient)) {
-      _currentClient = WiFiClient();
-      _currentStatus = HC_NONE;
-      return;
-    }
-    _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
-    _contentLength = CONTENT_LENGTH_NOT_SET;
-    _handleRequest();
-
-    if (!_currentClient.connected()) {
-      _currentClient = WiFiClient();
-      _currentStatus = HC_NONE;
-      return;
-    } else {
-      _currentStatus = HC_WAIT_CLOSE;
-      _statusChange = millis();
-      return;
-    }
-  }
-
-  if (_currentStatus == HC_WAIT_CLOSE) {
-    if (millis() - _statusChange > HTTP_MAX_CLOSE_WAIT) {
-      _currentClient = WiFiClient();
-      _currentStatus = HC_NONE;
-    } else {
-      yield();
-      return;
-    }
+  if (callYield) {
+    yield();
   }
 }
 
