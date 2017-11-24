@@ -116,7 +116,6 @@ private:
   String _instanceName;
   struct MDNSAnswer * _answers;
   struct MDNSQuery * _query;
-  bool _newQuery;
   bool _waitingForAnswers;
   WiFiEventHandler _disconnectedHandler;
   WiFiEventHandler _gotIPHandler;
