@@ -123,7 +123,6 @@ MDNSResponder::MDNSResponder() : _conn(0) {
   _instanceName = ""; 
   _answers = 0;
   _query = 0;
-  _newQuery = false;
   _waitingForAnswers = false;
 }
 MDNSResponder::~MDNSResponder() {
@@ -285,6 +284,17 @@ int MDNSResponder::queryService(char *service, char *proto) {
 #ifdef DEBUG_ESP_MDNS_TX
   DEBUG_ESP_PORT.printf("queryService %s %s\n", service, proto);
 #endif  
+
+  // Clear answer list
+  MDNSAnswer *answer;
+  int numAnswers = _getNumAnswers();
+  for (int n = numAnswers - 1; n >= 0; n--) {
+    answer = _getAnswerFromIdx(n);
+    os_free(answer->hostname);
+    os_free(answer);
+    answer = 0;
+  }
+  _answers = 0;
   
   if (_query != 0) {
     os_free(_query);
@@ -293,7 +303,6 @@ int MDNSResponder::queryService(char *service, char *proto) {
   _query = (struct MDNSQuery*)(os_malloc(sizeof(struct MDNSQuery)));
   os_strcpy(_query->_service, service);
   os_strcpy(_query->_proto, proto);
-  _newQuery = true;
   
   char underscore[] = "_";
 
@@ -522,19 +531,6 @@ void MDNSResponder::_parsePacket(){
     uint8_t stringsRead = 0;
 
     answerHostName[0] = '\0';
-
-    // Clear answer list
-    if (_newQuery) {
-      int oldAnswers = _getNumAnswers();
-      for (int n = oldAnswers - 1; n >= 0; n--) {
-        answer = _getAnswerFromIdx(n);
-        os_free(answer->hostname);
-        os_free(answer);
-        answer = 0;
-      }
-      _answers = 0;
-      _newQuery = false;
-    }
 
     while (numAnswers--) {
       // Read name
