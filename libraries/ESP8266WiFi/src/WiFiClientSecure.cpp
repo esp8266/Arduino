@@ -656,7 +656,7 @@ void WiFiClientSecure::allowSelfSignedCerts()
 
 bool WiFiClientSecure::verifyCert(){
   _initSSLContext();
-  _ssl->verifyCert();
+  return _ssl->verifyCert();
 }
 
 extern "C" int __ax_port_read(int fd, uint8_t* buffer, size_t count)
