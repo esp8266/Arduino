@@ -63,7 +63,8 @@ public:
   bool loadPrivateKey(Stream& stream, size_t size);
 
   void allowSelfSignedCerts();
-
+  bool verifyCert();
+  
   template<typename TFile>
   bool loadCertificate(TFile& file) {
     return loadCertificate(file, file.size());
