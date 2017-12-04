@@ -44,6 +44,8 @@ public:
 
     virtual bool verify(WiFiClient& client, const char* host)
     {
+        (void)client;
+        (void)host;
         return true;
     }
 };
@@ -167,6 +169,7 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
         _host = host;
     }
     _uri = url;
+
     if (_protocol != expectedProtocol) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
         return false;
@@ -871,7 +874,7 @@ bool HTTPClient::sendHeader(const char * type)
         return false;
     }
 
-    String header = String(type) + " " + _uri + F(" HTTP/1.");
+    String header = String(type) + " " + (_uri.length() ? _uri : F("/")) + F(" HTTP/1.");
 
     if(_useHTTP10) {
         header += "0";
@@ -907,6 +910,8 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     header += _headers + "\r\n";
+
+    DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
     return (_tcp->write((const uint8_t *) header.c_str(), header.length()) == header.length());
 }
