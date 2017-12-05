@@ -76,6 +76,9 @@
             },
             {
               "name": "DigiStump Oak"
+            },
+            {
+              "name": "WiFi Slot"
             }
           ],
           "toolsDependencies": [
