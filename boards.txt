@@ -3228,3 +3228,183 @@ oak.menu.UploadSpeed.512000.windows.upload.speed=512000
 oak.menu.UploadSpeed.921600=921600
 oak.menu.UploadSpeed.921600.upload.speed=921600
 
+##############################################################
+wifi_slot.name=WiFi Slot
+
+wifi_slot.upload.tool=esptool
+wifi_slot.upload.speed=115200
+wifi_slot.upload.resetmethod=nodemcu
+wifi_slot.upload.maximum_size=434160
+wifi_slot.upload.maximum_data_size=81920
+wifi_slot.upload.wait_for_upload_port=true
+wifi_slot.serial.disableDTR=true
+wifi_slot.serial.disableRTS=true
+
+wifi_slot.build.mcu=esp8266
+wifi_slot.build.f_cpu=80000000L
+wifi_slot.build.board=ESP8266_ESP12
+wifi_slot.build.core=esp8266
+wifi_slot.build.variant=wifi_slot
+wifi_slot.build.flash_mode=dout
+wifi_slot.build.spiffs_pagesize=256
+wifi_slot.build.debug_port=
+wifi_slot.build.debug_level=
+
+wifi_slot.menu.CpuFrequency.80=80 MHz
+wifi_slot.menu.CpuFrequency.80.build.f_cpu=80000000L
+wifi_slot.menu.CpuFrequency.160=160 MHz
+wifi_slot.menu.CpuFrequency.160.build.f_cpu=160000000L
+
+wifi_slot.menu.FlashFreq.40=40MHz
+wifi_slot.menu.FlashFreq.40.build.flash_freq=40
+wifi_slot.menu.FlashFreq.80=80MHz
+wifi_slot.menu.FlashFreq.80.build.flash_freq=80
+
+wifi_slot.menu.FlashMode.dout=DOUT
+wifi_slot.menu.FlashMode.dout.build.flash_mode=dout
+wifi_slot.menu.FlashMode.dio=DIO
+wifi_slot.menu.FlashMode.dio.build.flash_mode=dio
+wifi_slot.menu.FlashMode.qio=QIO
+wifi_slot.menu.FlashMode.qio.build.flash_mode=qio
+wifi_slot.menu.FlashMode.qout=QOUT
+wifi_slot.menu.FlashMode.qout.build.flash_mode=qout
+
+wifi_slot.menu.UploadSpeed.115200=115200
+wifi_slot.menu.UploadSpeed.115200.upload.speed=115200
+wifi_slot.menu.UploadSpeed.9600=9600
+wifi_slot.menu.UploadSpeed.9600.upload.speed=9600
+wifi_slot.menu.UploadSpeed.57600=57600
+wifi_slot.menu.UploadSpeed.57600.upload.speed=57600
+wifi_slot.menu.UploadSpeed.256000.windows=256000
+wifi_slot.menu.UploadSpeed.256000.upload.speed=256000
+wifi_slot.menu.UploadSpeed.230400.linux=230400
+wifi_slot.menu.UploadSpeed.230400.macosx=230400
+wifi_slot.menu.UploadSpeed.230400.upload.speed=230400
+wifi_slot.menu.UploadSpeed.460800.linux=460800
+wifi_slot.menu.UploadSpeed.460800.macosx=460800
+wifi_slot.menu.UploadSpeed.460800.upload.speed=460800
+wifi_slot.menu.UploadSpeed.512000.windows=512000
+wifi_slot.menu.UploadSpeed.512000.upload.speed=512000
+wifi_slot.menu.UploadSpeed.921600=921600
+wifi_slot.menu.UploadSpeed.921600.upload.speed=921600
+
+wifi_slot.menu.FlashSize.1M64=1M (64K SPIFFS)
+wifi_slot.menu.FlashSize.1M64.build.flash_size=1M
+wifi_slot.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
+wifi_slot.menu.FlashSize.1M64.build.spiffs_start=0xEB000
+wifi_slot.menu.FlashSize.1M64.build.spiffs_end=0xFB000
+wifi_slot.menu.FlashSize.1M64.build.spiffs_blocksize=4096
+wifi_slot.menu.FlashSize.1M64.upload.maximum_size=958448
+
+wifi_slot.menu.FlashSize.1M128=1M (128K SPIFFS)
+wifi_slot.menu.FlashSize.1M128.build.flash_size=1M
+wifi_slot.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
+wifi_slot.menu.FlashSize.1M128.build.spiffs_start=0xDB000
+wifi_slot.menu.FlashSize.1M128.build.spiffs_end=0xFB000
+wifi_slot.menu.FlashSize.1M128.build.spiffs_blocksize=4096
+wifi_slot.menu.FlashSize.1M128.upload.maximum_size=892912
+
+wifi_slot.menu.FlashSize.1M144=1M (144K SPIFFS)
+wifi_slot.menu.FlashSize.1M144.build.flash_size=1M
+wifi_slot.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
+wifi_slot.menu.FlashSize.1M144.build.spiffs_start=0xD7000
+wifi_slot.menu.FlashSize.1M144.build.spiffs_end=0xFB000
+wifi_slot.menu.FlashSize.1M144.build.spiffs_blocksize=4096
+wifi_slot.menu.FlashSize.1M144.upload.maximum_size=876528
+
+wifi_slot.menu.FlashSize.1M160=1M (160K SPIFFS)
+wifi_slot.menu.FlashSize.1M160.build.flash_size=1M
+wifi_slot.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
+wifi_slot.menu.FlashSize.1M160.build.spiffs_start=0xD3000
+wifi_slot.menu.FlashSize.1M160.build.spiffs_end=0xFB000
+wifi_slot.menu.FlashSize.1M160.build.spiffs_blocksize=4096
+wifi_slot.menu.FlashSize.1M160.upload.maximum_size=860144
+
+wifi_slot.menu.FlashSize.1M192=1M (192K SPIFFS)
+wifi_slot.menu.FlashSize.1M192.build.flash_size=1M
+wifi_slot.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
+wifi_slot.menu.FlashSize.1M192.build.spiffs_start=0xCB000
+wifi_slot.menu.FlashSize.1M192.build.spiffs_end=0xFB000
+wifi_slot.menu.FlashSize.1M192.build.spiffs_blocksize=4096
+wifi_slot.menu.FlashSize.1M192.upload.maximum_size=827376
+
+wifi_slot.menu.FlashSize.1M256=1M (256K SPIFFS)
+wifi_slot.menu.FlashSize.1M256.build.flash_size=1M
+wifi_slot.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
+wifi_slot.menu.FlashSize.1M256.build.spiffs_start=0xBB000
+wifi_slot.menu.FlashSize.1M256.build.spiffs_end=0xFB000
+wifi_slot.menu.FlashSize.1M256.build.spiffs_blocksize=4096
+wifi_slot.menu.FlashSize.1M256.upload.maximum_size=761840
+
+wifi_slot.menu.FlashSize.1M512=1M (512K SPIFFS)
+wifi_slot.menu.FlashSize.1M512.build.flash_size=1M
+wifi_slot.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
+wifi_slot.menu.FlashSize.1M512.build.spiffs_start=0x7B000
+wifi_slot.menu.FlashSize.1M512.build.spiffs_end=0xFB000
+wifi_slot.menu.FlashSize.1M512.build.spiffs_blocksize=8192
+wifi_slot.menu.FlashSize.1M512.upload.maximum_size=499696
+
+wifi_slot.menu.FlashSize.2M=2M (1M SPIFFS)
+wifi_slot.menu.FlashSize.2M.build.flash_size=2M
+wifi_slot.menu.FlashSize.2M.build.flash_ld=eagle.flash.2m.ld
+wifi_slot.menu.FlashSize.2M.build.spiffs_start=0x100000
+wifi_slot.menu.FlashSize.2M.build.spiffs_end=0x1FB000
+wifi_slot.menu.FlashSize.2M.build.spiffs_blocksize=8192
+wifi_slot.menu.FlashSize.2M.upload.maximum_size=1044464
+
+wifi_slot.menu.FlashSize.4M1M=4M (1M SPIFFS)
+wifi_slot.menu.FlashSize.4M1M.build.flash_size=4M
+wifi_slot.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+wifi_slot.menu.FlashSize.4M1M.build.spiffs_start=0x300000
+wifi_slot.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
+wifi_slot.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
+wifi_slot.menu.FlashSize.4M1M.build.spiffs_pagesize=256
+wifi_slot.menu.FlashSize.4M1M.upload.maximum_size=1044464
+
+wifi_slot.menu.FlashSize.4M3M=4M (3M SPIFFS)
+wifi_slot.menu.FlashSize.4M3M.build.flash_size=4M
+wifi_slot.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
+wifi_slot.menu.FlashSize.4M3M.build.spiffs_start=0x100000
+wifi_slot.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
+wifi_slot.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
+wifi_slot.menu.FlashSize.4M3M.upload.maximum_size=1044464
+
+wifi_slot.menu.Debug.Disabled=Disabled
+wifi_slot.menu.Debug.Disabled.build.debug_port=
+wifi_slot.menu.Debug.Serial=Serial
+wifi_slot.menu.Debug.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+wifi_slot.menu.Debug.Serial1=Serial1
+wifi_slot.menu.Debug.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+
+wifi_slot.menu.DebugLevel.None____=None
+wifi_slot.menu.DebugLevel.None____.build.debug_level=
+wifi_slot.menu.DebugLevel.Core____=Core
+wifi_slot.menu.DebugLevel.Core____.build.debug_level=-DDEBUG_ESP_CORE
+wifi_slot.menu.DebugLevel.SSL_____=Core + SSL
+wifi_slot.menu.DebugLevel.SSL_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL
+wifi_slot.menu.DebugLevel.SSL_MEM_=Core + SSL + TLS Mem
+wifi_slot.menu.DebugLevel.SSL_MEM_.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_TLS_MEM
+wifi_slot.menu.DebugLevel.WiFic___=Core + WiFi
+wifi_slot.menu.DebugLevel.WiFic___.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI
+wifi_slot.menu.DebugLevel.WiFi____=WiFi
+wifi_slot.menu.DebugLevel.WiFi____.build.debug_level=-DDEBUG_ESP_WIFI
+wifi_slot.menu.DebugLevel.HTTPClient=HTTPClient
+wifi_slot.menu.DebugLevel.HTTPClient.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT
+wifi_slot.menu.DebugLevel.HTTPClient2=HTTPClient + SSL
+wifi_slot.menu.DebugLevel.HTTPClient2.build.debug_level=-DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_SSL
+wifi_slot.menu.DebugLevel.HTTPUpdate=HTTPUpdate
+wifi_slot.menu.DebugLevel.HTTPUpdate.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE
+wifi_slot.menu.DebugLevel.HTTPUpdate2=HTTPClient + HTTPUpdate
+wifi_slot.menu.DebugLevel.HTTPUpdate2.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE
+wifi_slot.menu.DebugLevel.HTTPUpdate3=HTTPClient + HTTPUpdate + Updater
+wifi_slot.menu.DebugLevel.HTTPUpdate3.build.debug_level=-DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER
+wifi_slot.menu.DebugLevel.HTTPServer=HTTPServer
+wifi_slot.menu.DebugLevel.HTTPServer.build.debug_level=-DDEBUG_ESP_HTTP_SERVER
+wifi_slot.menu.DebugLevel.UPDATER=Updater
+wifi_slot.menu.DebugLevel.UPDATER.build.debug_level=-DDEBUG_ESP_UPDATER
+wifi_slot.menu.DebugLevel.OTA_____=OTA
+wifi_slot.menu.DebugLevel.OTA_____.build.debug_level=-DDEBUG_ESP_OTA
+wifi_slot.menu.DebugLevel.OTA2____=OTA + Updater
+wifi_slot.menu.DebugLevel.OTA2____.build.debug_level=-DDEBUG_ESP_OTA -DDEBUG_ESP_UPDATER
+wifi_slot.menu.DebugLevel.all_____=All
+wifi_slot.menu.DebugLevel.all_____.build.debug_level=-DDEBUG_ESP_CORE -DDEBUG_ESP_SSL -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_TLS_MEM

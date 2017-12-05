@@ -383,3 +383,8 @@ Datasheet and associated downloads can be found on the 4D Systems product page.
 The gen4-IoD range can be programmed using the Arduino IDE and also the 4D Systems Workshop4 IDE, which incorporates many additional graphics benefits. GFX4d library is available, along with a number of demo applications.
   
 - Product page: http://www.4dsystems.com.au/product/gen4-IoD
+
+WiFi Slot
+---------
+
+Product page: http://wiki.amperka.ru/%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%D1%8B:wifi-slot
