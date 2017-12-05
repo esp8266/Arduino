@@ -63,6 +63,8 @@ void setup()
   Serial.println(WiFi.localIP());
 
   Serial.println("Starting UDP");
+  randomSeed(ESP.getCycleCount());    // Generate a good random seed so calls to random are in fact random.
+  localPort=random(1024,8192);        // select port between 1024 and 8192 to prevent NAT router port conflicts between multiple NTP devices
   udp.begin(localPort);
   Serial.print("Local port: ");
   Serial.println(udp.localPort());
