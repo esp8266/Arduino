@@ -261,7 +261,7 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
   return false;
 }
 
-void MDNSResponder::clearServiceTxt(char *name, char *proto){
+void MDNSResponder::clearServiceTxt(const char *name, const char *proto){
 	MDNSService* servicePtr;
 	//Find the service
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {

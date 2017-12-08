@@ -88,10 +88,7 @@ public:
     addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
   }
 
-  void clearServiceTxt(char *name, char *proto);
-  void clearServiceTxt(const char *name, const char *proto){
-    clearServiceTxt((char *)name, (char *)proto);
-  }
+  void clearServiceTxt(const char *name, const char *proto);
   void clearServiceTxt(String name, String proto){
     clearServiceTxt(name.c_str(), proto.c_str());
   }
