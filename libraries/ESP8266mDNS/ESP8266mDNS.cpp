@@ -261,6 +261,19 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
   return false;
 }
 
+void MDNSResponder::clearServiceTxt(char *name, char *proto){
+	MDNSService* servicePtr;
+	//Find the service
+  for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
+    //Checking Service names
+    if(strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
+      //found a service name match
+      servicePtr->_txts = 0;
+      servicePtr->_txtLen = 0;
+    }
+  }
+}
+
 void MDNSResponder::addService(char *name, char *proto, uint16_t port){
   if(_getServicePort(name, proto) != 0) return;
   if(os_strlen(name) > 32 || os_strlen(proto) != 3) return; //bad arguments
