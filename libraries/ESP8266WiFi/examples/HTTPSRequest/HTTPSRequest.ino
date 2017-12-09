@@ -10,7 +10,7 @@
  *  Limitations:
  *    only RSA certificates
  *    no support of Perfect Forward Secrecy (PFS)
- *    TLSv1.2 is supported since SDK 2.4.0-rc1
+ *    TLSv1.2 is supported since version 2.4.0-rc1
  *
  *  Created by Ivan Grokhotkov, 2015.
  *  This example is in public domain.
