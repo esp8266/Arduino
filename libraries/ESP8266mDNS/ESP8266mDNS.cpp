@@ -268,8 +268,20 @@ void MDNSResponder::clearServiceTxt(const char *name, const char *proto){
     //Checking Service names
     if(strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
       //found a service name match
-      servicePtr->_txts = 0;
-      servicePtr->_txtLen = 0;
+      if (servicePtr->_txts != 0) {
+      	MDNSTxt * txtPtr = servicePtr->_txts;
+      	MDNSTxt * nextPtr = txtPtr->_next;
+      	delete txtPtr;
+      	txtPtr = 0;
+      	while (nextPtr !=0) {
+      		txtPtr = nextPtr;
+      		nextPtr = txtPtr->_next;
+      		delete txtPtr;
+      		txtPtr = 0;
+      	} 
+      	servicePtr->_txts = 0;
+      	servicePtr->_txtLen = 0;
+      }
     }
   }
 }
