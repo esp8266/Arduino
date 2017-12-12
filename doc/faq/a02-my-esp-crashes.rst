@@ -235,7 +235,7 @@ Other Causes for Crashes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Interrupt Service Routines
-   By default, all functions are compiled into flash, which means that the the 
+   By default, all functions are compiled into flash, which means that the 
    cache may kick in for that code. However, the cache currently can't be used 
    during hardware interrupts. That means that, if you use a hardware ISR, such as 
    attachInterrupt(gpio, myISR, CHANGE) for a GPIO change, the ISR must have the 
@@ -254,8 +254,8 @@ Interrupt Service Routines
 
 Asynchronous Callbacks
    Asynchronous CBs, such as for the Ticker or ESPAsync* libs, have looser restrictions
-   than ISRs, but some restrictions do remain.
-   It is is not possible to execute delay() or yield() from an asynchronous callback.
+   than ISRs, but some restrictions still apply.
+   It is not possible to execute delay() or yield() from an asynchronous callback.
    Timing is not as tight as an ISR, but it should remain below a few milliseconds. This
    is a guideline. The hard timing requirements depend on the WiFi configuration and 
    amount of traffic. In general, the CPU must not be hogged by the user code, as the
@@ -264,10 +264,10 @@ Asynchronous Callbacks
 
 Memory, memory, memory
    Running out of heap is the most common cause for crashes. Because the build process for
-   the ESP leaves out exceptions (they use memory), some memory allocations can silently
-   fail. A typical example is when setting or concatenating a large String. If allocation
-   has failed internally, then the internal string copy can corrupt data, and the ESP
-   will crash.
+   the ESP leaves out exceptions (they use memory), memory allocations that fail will do
+   so silently. A typical example is when setting or concatenating a large String. If 
+   allocation has failed internally, then the internal string copy can corrupt data, and 
+   the ESP will crash.
 
    In addition, doing many String concatenations in sequence, e.g.: using operator+()
    multiple times, will cause memory fragmentation. When that happens, allocations may
@@ -279,25 +279,23 @@ Memory, memory, memory
    with the requested size, even though the sum of all holes is greater than the requested
    size.
 
-   So what about these silent failures? On the one hand, there are specific interfaces that
+   So why do these silent failures exist? On the one hand, there are specific interfaces that
    must be adhered to. For example, the String object methods don't allow for error handling
-   at the user application level (i.e.: old-school error returns).
+   at the user application level (i.e.: no old-school error returns).
    On the other hand, some libraries don't have the allocation code accessible for
    modification. For example, std::vector is available for use. The standard implementations
    rely on exceptions for error handling, which is not available for the ESP, and in any
-   case there, is no access to the underlying code.
+   case there is no access to the underlying code.
 
 *Some techniques for reducing memory usage*
 
-   * Don't use const char * with literals. Instead, use const char[] PROGMEM. This is particularly true if you intend to embed, e.g.: html strings.
+   * Don't use const char * with literals. Instead, use const char[] PROGMEM. This is particularly true if you intend to, e.g.: embed html strings.
    * Don't use global static arrays, such as uint8_t buffer[1024]. Instead, allocate dynamically. This forces you to think about the size of the array, and its scope (lifetime), so that it gets released when it's no longer needed. If you are not certain about dynamic allocation, use std libs (e.g.: std:vector, std::string), or smart pointers. They are slightly less memory efficient than dynamically allocating yourself, but the provided memory safety is well worth it.
    * If you use std libs like std::vector, make sure to call its ::reserve() method before filling it. This allows allocating only once, which reduces mem fragmentation, and makes sure that there are no empty unused slots left over in the container at the end.
 
 Stack
    The amount of stack in the ESP is tiny at only 5KB. For normal developement in large systems, it 
-   is good practice to use and abuse the stack, because it is faster for allocation/deallocation and
-   the scope of the object is well defined. However, with the tiny amount of stack available in the ESP
-   that practice is not really viable, at least not for big objects.
+   is good practice to use and abuse the stack, because it is faster for allocation/deallocation, the scope of the object is well defined, and deallocation automatically happens in reverse order as allocation, which means no mem fragmentation. However, with the tiny amount of stack available in the ESP, that practice is not really viable, at least not for big objects.
       * Large objects that have internally managed memory, such as String, std::string, std::vector, etc, are ok on the stack, because they internally allocate their buffers on the heap.
       * Large arrays on the stack, such as uint8_t buffer[2048] should be avoided on the stack and be dynamically allocated (consider smart pointers).
       * Objects that have large data members, such as large arrays, should be avoided on the stack, and be dynamicaly allocated (consider smart pointers).
