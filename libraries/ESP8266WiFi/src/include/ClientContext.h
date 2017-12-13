@@ -290,6 +290,17 @@ public:
         _rx_buf_offset = 0;
     }
 
+    void arduinoFlush()
+    {
+#if 1
+	// this is useless since _write_from_source() always exits with _datasource==NULL
+        while (state() == ESTABLISHED && _datasource && _datasource->available()) {
+            _write_some();
+            delay(1); // esp_ schedule+yield
+        }
+#endif
+    }
+
     uint8_t state() const
     {
         if(!_pcb) {
