@@ -3,8 +3,18 @@ language: bash
 os: linux
 dist: trusty
 
-env:
-  - BUILD_TYPE=build
+matrix:
+  include:
+    - env:
+      - BUILD_TYPE=build
+    - env:
+      - BUILD_TYPE=platformio
+    - env:
+      - BUILD_TYPE=docs
+    - env:
+      - BUILD_TYPE=package
+    - env:
+      - BUILD_TYPE=host_tests
 
 install:
   - pip install --user -r doc/requirements.txt
@@ -25,6 +35,7 @@ deploy:
   on:
     repo: esp8266/Arduino
     tags: true
+    condition: "$BUILD_TYPE = package"
 
 notifications:
   email:
