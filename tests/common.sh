@@ -169,31 +169,8 @@ function build_sketches_with_platformio()
     set -e
 }
 
-function run_travis_ci_build()
+function install_arduino()
 {
-    # Build documentation using Sphinx
-    echo -e "travis_fold:start:docs"
-    cd $TRAVIS_BUILD_DIR/doc
-    build_docs
-    echo -e "travis_fold:end:docs"
-
-    # Build release package
-    echo -e "travis_fold:start:build_package"
-    cd $TRAVIS_BUILD_DIR/package
-    build_package
-    echo -e "travis_fold:end:build_package"
-
-    if [ "$TRAVIS_TAG" != "" ]; then
-        echo "Skipping tests for tagged build"
-        return 0;
-    fi
-
-    # Run host side tests
-    echo -e "travis_fold:start:host_tests"
-    cd $TRAVIS_BUILD_DIR/tests
-    run_host_tests
-    echo -e "travis_fold:end:host_tests"
-
     # Install Arduino IDE and required libraries
     echo -e "travis_fold:start:sketch_test_env_prepare"
     cd $TRAVIS_BUILD_DIR
@@ -202,7 +179,10 @@ function run_travis_ci_build()
     cd $TRAVIS_BUILD_DIR
     install_libraries
     echo -e "travis_fold:end:sketch_test_env_prepare"
+}
 
+function build_sketches_with_arduino()
+{
     # Compile sketches
     echo -e "travis_fold:start:sketch_test"
     build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries"
@@ -212,20 +192,28 @@ function run_travis_ci_build()
     echo -e "travis_fold:start:size_report"
     cat size.log
     echo -e "travis_fold:end:size_report"
-
-    # PlatformIO
-    echo -e "travis_fold:start:install_platformio"
-    install_platformio
-    echo -e "travis_fold:end:install_platformio"
-
-    echo -e "travis_fold:start:build_sketches_with_platformio"
-    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
-    echo -e "travis_fold:end:build_sketches_with_platformio"
 }
 
 set -e
 
 if [ "$BUILD_TYPE" = "build" ]; then
-    run_travis_ci_build
+    install_arduino
+    build_sketches_with_arduino
+elif [ "$BUILD_TYPE" = "platformio" ]; then
+    # PlatformIO
+    install_platformio
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
+elif [ "$BUILD_TYPE" = "docs" ]; then
+    # Build documentation using Sphinx
+    cd $TRAVIS_BUILD_DIR/doc
+    build_docs
+elif [ "$BUILD_TYPE" = "package" ]; then
+        # Build release package
+    cd $TRAVIS_BUILD_DIR/package
+    build_package
+elif [ "$BUILD_TYPE" = "host_tests" ]; then
+    # Run host side tests
+    cd $TRAVIS_BUILD_DIR/tests
+    run_host_tests
 fi
 
