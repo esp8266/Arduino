@@ -433,6 +433,9 @@ void ESP8266WebServer::sendContent(const String& content) {
   _currentClient.write(content.c_str(), len);
   if(_chunked){
     _currentClient.write(footer, 2);
+    if (len == 0) {
+      _chunked = false;
+    }
   }
 }
 
@@ -453,6 +456,9 @@ void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
   _currentClient.write_P(content, size);
   if(_chunked){
     _currentClient.write(footer, 2);
+    if (size == 0) {
+      _chunked = false;
+    }
   }
 }
 
@@ -560,17 +566,25 @@ void ESP8266WebServer::_handleRequest() {
     }
 #endif
   }
-
-  if (!handled) {
-    if(_notFoundHandler) {
-      _notFoundHandler();
-    }
-    else {
-      send(404, "text/plain", String("Not found: ") + _currentUri);
-    }
+  if (!handled && _notFoundHandler) {
+    _notFoundHandler();
+    handled = true;
   }
-
+  if (!handled) {
+    send(404, "text/plain", String("Not found: ") + _currentUri);
+    handled = true;
+  }
+  if (handled) {
+    _finalizeResponse();
+  }
   _currentUri = String();
+}
+
+
+void ESP8266WebServer::_finalizeResponse() {
+  if (_chunked) {
+    sendContent("");
+  }
 }
 
 String ESP8266WebServer::_responseCodeToString(int code) {
