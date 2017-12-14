@@ -11,18 +11,25 @@ extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
 
 static const char serverIndex[] PROGMEM =
-  R"(<html><body>
+  R"(<!DOCTYPE html>
+     <html lang='en'>
+     <head>
+         <meta charset='utf-8'>
+         <meta name='viewport' content='width=device-width,initial-scale=1'/>
+     </head>
+     <body>
      <form method='POST' action='' enctype='multipart/form-data'>
-     Firmware:<br>
-                  <input type='file' accept='.bin' name='firmware'>
-                  <input type='submit' value='Update Firmware'>
-               </form>
+         Firmware:<br>
+         <input type='file' accept='.bin' name='firmware'>
+         <input type='submit' value='Update Firmware'>
+     </form>
      <form method='POST' action='' enctype='multipart/form-data'>
-     Spiffs:<br>
-                  <input type='file' accept='.bin' name='spiffs'>
-                  <input type='submit' value='Update SPIFFS'>
-               </form>
-     </body></html>)";
+         Spiffs:<br>
+         <input type='file' accept='.bin' name='spiffs'>
+         <input type='submit' value='Update SPIFFS'>
+     </form>
+     </body>
+     </html>)";
 static const char successResponse[] PROGMEM = 
   "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
 
