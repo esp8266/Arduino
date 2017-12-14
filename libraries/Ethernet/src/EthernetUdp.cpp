@@ -118,7 +118,7 @@ size_t EthernetUDP::write(const uint8_t *buffer, size_t size)
 int EthernetUDP::parsePacket()
 {
   // discard any remaining bytes in the last packet
-  clear_incoming();
+  clear_remaining();
 
   if (recvAvailable(_sock) > 0)
   {

@@ -107,7 +107,7 @@ public:
         if(this != 0) {
             DEBUGV(":ur %d\r\n", _refcnt);
             if(--_refcnt == 0) {
-                flush();
+                discard_received();
                 close();
                 if(_discard_cb) {
                     _discard_cb(_discard_cb_arg, this);
@@ -277,7 +277,7 @@ public:
         return copy_size;
     }
 
-    void flush()
+    void discard_received()
     {
         if(!_rx_buf) {
             return;
@@ -290,15 +290,20 @@ public:
         _rx_buf_offset = 0;
     }
 
-    void arduinoFlush()
+    void wait_until_sent()
     {
-#if 1
-	// this is useless since _write_from_source() always exits with _datasource==NULL
-        while (state() == ESTABLISHED && _datasource && _datasource->available()) {
+        // fix option 1 in
+        // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
+        // TODO: option 2
+
+        #define WAIT_TRIES_MS 10	// at most 10ms
+
+        int tries = 1+ WAIT_TRIES_MS;
+
+        while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --tries) {
             _write_some();
             delay(1); // esp_ schedule+yield
         }
-#endif
     }
 
     uint8_t state() const

@@ -259,7 +259,7 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
 void WiFiClient::flush()
 {
     if (_client)
-        _client->arduinoFlush();
+        _client->wait_until_sent();
 }
 
 void WiFiClient::stop()
