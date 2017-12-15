@@ -40,7 +40,7 @@ generic.menu.ResetMethod.nodemcu=nodemcu
 generic.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 generic.menu.CrystalFreq.26=26 MHz
 generic.menu.CrystalFreq.40=40 MHz
-generic.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000
+generic.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
 generic.menu.FlashFreq.40=40MHz
 generic.menu.FlashFreq.40.build.flash_freq=40
 generic.menu.FlashFreq.80=80MHz
@@ -283,7 +283,7 @@ esp8285.menu.ResetMethod.nodemcu=nodemcu
 esp8285.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 esp8285.menu.CrystalFreq.26=26 MHz
 esp8285.menu.CrystalFreq.40=40 MHz
-esp8285.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000
+esp8285.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
 esp8285.build.flash_mode=dout
 esp8285.build.flash_freq=40
 esp8285.menu.FlashSize.1M0=1M (no SPIFFS)
@@ -2859,11 +2859,11 @@ wifinfo.menu.UploadSpeed.921600.upload.speed=921600
 ##############################################################
 arduino-esp8266.name=Arduino
 arduino-esp8266.menu.BoardModel.starottodeved.build.board=ESP8266_ARDUINO_STAR_OTTO
-arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000
-arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000
+arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
 arduino-esp8266.menu.BoardModel.starottodeved.build.variant=arduino_uart
 arduino-esp8266.menu.BoardModel.unowifideved.build.board=ESP8266_ARDUINO_UNOWIFI
-arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000
+arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
 arduino-esp8266.menu.BoardModel.primo=Primo
 arduino-esp8266.menu.BoardModel.unowifideved.build.variant=arduino_uart
 arduino-esp8266.menu.BoardModel.primo.build.variant=arduino_spi
