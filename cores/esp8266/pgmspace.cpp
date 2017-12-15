@@ -24,6 +24,8 @@
 #include <stdarg.h>
 #include "pgmspace.h"
 
+extern "C" {
+
 size_t strnlen_P(PGM_P s, size_t size) {
     const char* cp;
     for (cp = s; size != 0 && pgm_read_byte(cp) != '\0'; cp++, size--);
@@ -286,3 +288,5 @@ int vsnprintf_P(char* str, size_t strSize, PGM_P formatP, va_list ap) {
 
     return ret;
 }
+
+} // extern "C"
