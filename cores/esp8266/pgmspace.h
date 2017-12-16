@@ -4,16 +4,14 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#ifdef __ets__
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifdef __ets__
+
 #include "ets_sys.h"
 #include "osapi.h"
-#ifdef __cplusplus
-}
-#endif
 
 #define PROGMEM     ICACHE_RODATA_ATTR
 #define PGM_P  		const char *
@@ -135,5 +133,9 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
 #define pgm_read_dword_far(addr) 	pgm_read_dword(addr)
 #define pgm_read_float_far(addr) 	pgm_read_float(addr)
 #define pgm_read_ptr_far(addr)		pgm_read_ptr(addr)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //__PGMSPACE_H_
