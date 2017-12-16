@@ -179,6 +179,8 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     if (!isForm){
       size_t plainLength;
       char* plainBuf = readBytesWithTimeout(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
+      if (!plainBuf)
+        return false;
       if (plainLength < contentLength) {
       	free(plainBuf);
       	return false;
