@@ -79,4 +79,4 @@ Other Function Calls
 
 Documentation for the above functions is not yet prepared.
 
-For code samples please refer to separate section with `examples <generic-examples.md>`__ dedicated specifically to the Generic Class.
+For code samples please refer to separate section with `examples <generic-examples.rst>`__ dedicated specifically to the Generic Class.
