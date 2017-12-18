@@ -288,7 +288,8 @@ public:
                 data_size -= will_copy;
             }
         }
-        pbuf_free(_tx_buf_head);
+        if (_tx_buf_head)
+            pbuf_free(_tx_buf_head);
         _tx_buf_head = 0;
         _tx_buf_cur = 0;
         _tx_buf_offset = 0;
