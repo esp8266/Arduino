@@ -65,6 +65,10 @@ bool ICACHE_FLASH_ATTR i2s_is_empty(){
   return (i2s_slc_queue_len >= SLC_BUF_CNT-1);
 }
 
+int16_t ICACHE_FLASH_ATTR i2s_available(){
+	return (SLC_BUF_CNT - i2s_slc_queue_len) * SLC_BUF_LEN;
+}
+
 uint32_t ICACHE_FLASH_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
   uint8_t i;
   uint32_t item = i2s_slc_queue[0];
