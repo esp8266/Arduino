@@ -178,4 +178,4 @@ Conclusion
 Programming a secure client is almost identical as programming a non-secure client. The difference gets down to one extra step to verify server's identity. Keep in mind limitations due to heavy memory usage that depends on the strength of the key used by the server and whether server is willing to negotiate the `TLS buffer size <https://www.igvita.com/2013/10/24/optimizing-tls-record-size-and-buffering-latency/>`__.
 
 For the list of functions provided to manage secure clients, please refer to the `Client Secure Class
-:arrow\_right: <client-secure-class.md>`__ documentation.
+:arrow\_right: <client-secure-class.rst>`__ documentation.
