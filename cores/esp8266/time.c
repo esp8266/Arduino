@@ -37,22 +37,13 @@ extern uint64_t micros64();
 // time gap in seconds from 01.01.1900 (NTP time) to 01.01.1970 (UNIX time)
 #define DIFF1900TO1970 2208988800UL
 
-bool s_bootTimeSet = false;
-static uint64_t s_bootTime_us = 0;
+bool timeshift64_is_set = false;
+static uint64_t timeshift64 = 0;
 
-// calculate offset used in gettimeofday
-static void ensureBootTimeIsSet()
+void tune_timeshift64 (uint64_t now_us)
 {
-    // Check just a bool flag instead of the full 64-bit s_bootTime for zero.
-    if (!s_bootTimeSet)
-    {
-        time_t now_s = sntp_get_current_timestamp();
-        if (now_s)
-        {
-            s_bootTime_us = now_s * 1000000ULL - micros64();
-            s_bootTimeSet = true;
-        }
-    }
+     timeshift64 = now_us - micros64();
+     timeshift64_is_set = true;
 }
 
 static void setServer(int id, const char* name_or_ip)
@@ -102,8 +93,9 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
     (void) tzp;
     if (tp)
     {
-        ensureBootTimeIsSet();
-        uint64_t currentTime_us = s_bootTime_us + micros64();
+        if (!timeshift64_is_set)
+            tune_timeshift64(sntp_get_current_timestamp() * 1000000ULL);
+        uint64_t currentTime_us = timeshift64 + micros64();
         tp->tv_sec = currentTime_us / 1000000ULL;
         tp->tv_usec = currentTime_us % 1000000ULL;
     }

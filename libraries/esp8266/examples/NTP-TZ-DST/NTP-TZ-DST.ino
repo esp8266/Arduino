@@ -12,9 +12,10 @@
   This example code is in the public domain.
 */
 
+#include <ESP8266WiFi.h>
 #include <time.h>                       // time() ctime()
 #include <sys/time.h>                   // struct timeval
-#include <ESP8266WiFi.h>
+#include <coredecls.h>                  // settimeofday_cb()
 
 ////////////////////////////////////////////////////////
 
@@ -32,8 +33,19 @@
 #define TZ_SEC          ((TZ)*3600)
 #define DST_SEC         ((DST_MN)*60)
 
+timeval cbtime;			// time set in callback
+bool cbtime_set = false;
+
+void time_is_set (void)
+{
+  gettimeofday(&cbtime, NULL);
+  cbtime_set = true;
+  Serial.println("------------------ settimeofday() was called ------------------");
+}
+
 void setup() {
   Serial.begin(115200);
+  settimeofday_cb(time_is_set);
 
 #if NTP0_OR_LOCAL1
   // local
