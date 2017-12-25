@@ -193,6 +193,12 @@ public:
         return cb;
     }
 
+    // similar to availble, but doesn't return exact size
+    bool hasData()
+    {
+        return _available > 0 || (s_io_ctx && s_io_ctx->getSize() > 0);
+    }
+
     bool loadObject(int type, Stream& stream, size_t size)
     {
         std::unique_ptr<uint8_t[]> buf(new uint8_t[size]);
@@ -458,7 +464,7 @@ err     x       N           N
 uint8_t WiFiClientSecure::connected()
 {
     if (_ssl) {
-        if (_ssl->available()) {
+        if (_ssl->hasData()) {
             return true;
         }
         if (_client && _client->state() == ESTABLISHED && _ssl->connected()) {
