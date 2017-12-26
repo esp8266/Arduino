@@ -353,7 +353,7 @@ int WiFiClientSecure::_connectSSL(const char* hostName)
         _ssl = new SSLContext;
         _ssl->ref();
     }
-    _ssl->connect(_client, hostName, 5000);
+    _ssl->connect(_client, hostName, _timeout);
 
     auto status = ssl_handshake_status(*_ssl);
     if (status != SSL_OK) {
