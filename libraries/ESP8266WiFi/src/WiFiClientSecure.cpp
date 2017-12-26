@@ -404,6 +404,8 @@ ClientContext* SSLContext::s_io_ctx = nullptr;
 
 WiFiClientSecure::WiFiClientSecure()
 {
+    // TLS handshake may take more than the 5 second default timeout
+    _timeout = 15000;
 }
 
 WiFiClientSecure::~WiFiClientSecure()
@@ -459,7 +461,7 @@ int WiFiClientSecure::_connectSSL(const char* hostName)
         _ssl = new SSLContext;
         _ssl->ref();
     }
-    _ssl->connect(_client, hostName, 5000);
+    _ssl->connect(_client, hostName, _timeout);
 
     auto status = ssl_handshake_status(*_ssl);
     if (status != SSL_OK) {
