@@ -298,6 +298,8 @@ ClientContext* SSLContext::s_io_ctx = nullptr;
 
 WiFiClientSecure::WiFiClientSecure()
 {
+    // TLS handshake may take more than the 5 second default timeout
+    _timeout = 15000;
 }
 
 WiFiClientSecure::~WiFiClientSecure()
