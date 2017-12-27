@@ -218,7 +218,7 @@ void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
 
   //!trans master, !bits mod, rece slave mod, rece msb shift, right first, msb right
   I2SC &= ~(I2STSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
-  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | ((i2s_bck_div-1) << I2SBD) | ((i2s_clock_div-1) << I2SCD);
+  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | ((i2s_bck_div) << I2SBD) | ((i2s_clock_div) << I2SCD);
 }
 
 void ICACHE_FLASH_ATTR i2s_begin(){
