@@ -142,6 +142,7 @@ template<typename T> size_t streamFile(T &file, const String& contentType){
 protected:
   void _addRequestHandler(RequestHandler* handler);
   void _handleRequest();
+  void _finalizeResponse();
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(String data);
   static String _responseCodeToString(int code);
