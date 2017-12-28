@@ -113,7 +113,6 @@ public:
     {
         SSL_EXTENSIONS* ext = ssl_ext_new();
         ssl_ext_set_host_name(ext, hostName);
-        ssl_ext_set_max_fragment_size(ext, 4096);
         if (_ssl) {
             /* Creating a new TLS session on top of a new TCP connection.
                ssl_free will want to send a close notify alert, but the old TCP connection
