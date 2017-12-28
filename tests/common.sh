@@ -122,31 +122,55 @@ function build_package()
     ./build_boards_manager_package.sh
 }
 
-function run_travis_ci_build()
+
+function install_platformio()
 {
-    # Build documentation using Sphinx
-    echo -e "travis_fold:start:docs"
-    cd $TRAVIS_BUILD_DIR/doc
-    build_docs
-    echo -e "travis_fold:end:docs"
+    pip install --user -U https://github.com/platformio/platformio/archive/develop.zip
+    platformio platform install https://github.com/platformio/platform-espressif8266.git#feature/stage
+    sed -i 's/https:\/\/github\.com\/esp8266\/Arduino\.git/*/' ~/.platformio/platforms/espressif8266/platform.json
+    ln -s $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
+    # Install dependencies:
+    # - esp8266/examples/ConfigFile
+    pio lib install ArduinoJson
+}
 
-    # Build release package
-    echo -e "travis_fold:start:build_package"
-    cd $TRAVIS_BUILD_DIR/package
-    build_package
-    echo -e "travis_fold:end:build_package"
+function build_sketches_with_platformio()
+{
+    set +e
+    local srcpath=$1
+    local build_arg=$2
+    local sketches=$(find $srcpath -name *.ino)
+    for sketch in $sketches; do
+        local sketchdir=$(dirname $sketch)
+        local sketchdirname=$(basename $sketchdir)
+        local sketchname=$(basename $sketch)
+        if [[ "${sketchdirname}.ino" != "$sketchname" ]]; then
+            echo "Skipping $sketch, beacause it is not the main sketch file";
+            continue
+        fi;
+        if [[ -f "$sketchdir/.test.skip" ]]; then
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
+            continue
+        fi
+        local build_cmd="pio ci $sketchdir $build_arg"
+        echo -e "\n ------------ Building $sketch ------------ \n";
+        echo "$build_cmd"
+        time ($build_cmd >build.log)
+        local result=$?
+        if [ $result -ne 0 ]; then
+            echo "Build failed ($1)"
+            echo "Build log:"
+            cat build.log
+            set -e
+            return $result
+        fi
+        rm build.log
+    done
+    set -e
+}
 
-    if [ "$TRAVIS_TAG" != "" ]; then
-        echo "Skipping tests for tagged build"
-        return 0;
-    fi
-
-    # Run host side tests
-    echo -e "travis_fold:start:host_tests"
-    cd $TRAVIS_BUILD_DIR/tests
-    run_host_tests
-    echo -e "travis_fold:end:host_tests"
-
+function install_arduino()
+{
     # Install Arduino IDE and required libraries
     echo -e "travis_fold:start:sketch_test_env_prepare"
     cd $TRAVIS_BUILD_DIR
@@ -155,7 +179,10 @@ function run_travis_ci_build()
     cd $TRAVIS_BUILD_DIR
     install_libraries
     echo -e "travis_fold:end:sketch_test_env_prepare"
+}
 
+function build_sketches_with_arduino()
+{
     # Compile sketches
     echo -e "travis_fold:start:sketch_test"
     build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries"
@@ -170,6 +197,23 @@ function run_travis_ci_build()
 set -e
 
 if [ "$BUILD_TYPE" = "build" ]; then
-    run_travis_ci_build
+    install_arduino
+    build_sketches_with_arduino
+elif [ "$BUILD_TYPE" = "platformio" ]; then
+    # PlatformIO
+    install_platformio
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
+elif [ "$BUILD_TYPE" = "docs" ]; then
+    # Build documentation using Sphinx
+    cd $TRAVIS_BUILD_DIR/doc
+    build_docs
+elif [ "$BUILD_TYPE" = "package" ]; then
+        # Build release package
+    cd $TRAVIS_BUILD_DIR/package
+    build_package
+elif [ "$BUILD_TYPE" = "host_tests" ]; then
+    # Run host side tests
+    cd $TRAVIS_BUILD_DIR/tests
+    run_host_tests
 fi
 

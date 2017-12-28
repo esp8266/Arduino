@@ -55,9 +55,15 @@ public:
   bool setCertificate(const uint8_t* pk, size_t size);
   bool setPrivateKey(const uint8_t* pk, size_t size);
 
+  bool setCACert_P(PGM_VOID_P pk, size_t size);
+  bool setCertificate_P(PGM_VOID_P pk, size_t size);
+  bool setPrivateKey_P(PGM_VOID_P pk, size_t size);
+
   bool loadCACert(Stream& stream, size_t size);
   bool loadCertificate(Stream& stream, size_t size);
   bool loadPrivateKey(Stream& stream, size_t size);
+
+  void allowSelfSignedCerts();
 
   template<typename TFile>
   bool loadCertificate(TFile& file) {
@@ -68,8 +74,15 @@ public:
   bool loadPrivateKey(TFile& file) {
     return loadPrivateKey(file, file.size());
   }
+  
+  template<typename TFile>
+  bool loadCACert(TFile& file) {
+    return loadCACert(file, file.size());
+  }
+
 
 protected:
+    void _initSSLContext();
     int _connectSSL(const char* hostName);
     bool _verifyDN(const char* name);
 

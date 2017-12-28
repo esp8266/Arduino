@@ -44,6 +44,8 @@ public:
 
     virtual bool verify(WiFiClient& client, const char* host)
     {
+        (void)client;
+        (void)host;
         return true;
     }
 };
@@ -167,6 +169,7 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
         _host = host;
     }
     _uri = url;
+
     if (_protocol != expectedProtocol) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
         return false;
@@ -349,6 +352,20 @@ int HTTPClient::PUT(uint8_t * payload, size_t size) {
 
 int HTTPClient::PUT(String payload) {
     return PUT((uint8_t *) payload.c_str(), payload.length());
+}
+
+/**
+ * sends a patch request to the server
+ * @param payload uint8_t *
+ * @param size size_t
+ * @return http code
+ */
+int HTTPClient::PATCH(uint8_t * payload, size_t size) {
+    return sendRequest("PATCH", payload, size);
+}
+
+int HTTPClient::PATCH(String payload) {
+    return PATCH((uint8_t *) payload.c_str(), payload.length());
 }
 
 /**
@@ -823,6 +840,7 @@ bool HTTPClient::connect(void)
     }
 
     _tcp = _transportTraits->create();
+    _tcp->setTimeout(_tcpTimeout);
 
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
@@ -837,8 +855,6 @@ bool HTTPClient::connect(void)
         return false;
     }
 
-    // set Timeout for readBytesUntil and readStringUntil
-    _tcp->setTimeout(_tcpTimeout);
 
 #ifdef ESP8266
     _tcp->setNoDelay(true);
@@ -857,7 +873,7 @@ bool HTTPClient::sendHeader(const char * type)
         return false;
     }
 
-    String header = String(type) + " " + _uri + F(" HTTP/1.");
+    String header = String(type) + " " + (_uri.length() ? _uri : F("/")) + F(" HTTP/1.");
 
     if(_useHTTP10) {
         header += "0";
@@ -893,6 +909,8 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     header += _headers + "\r\n";
+
+    DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
     return (_tcp->write((const uint8_t *) header.c_str(), header.length()) == header.length());
 }

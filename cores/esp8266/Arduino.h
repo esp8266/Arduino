@@ -178,7 +178,7 @@ void ets_intr_unlock();
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
 
-typedef unsigned int word;
+typedef uint16_t word;
 
 #define bit(b) (1UL << (b))
 #define _BV(b) (1UL << (b))
@@ -202,6 +202,7 @@ void analogWriteRange(uint32_t range);
 
 unsigned long millis(void);
 unsigned long micros(void);
+uint64_t micros64(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
@@ -236,7 +237,7 @@ void optimistic_yield(uint32_t interval_us);
 #endif
 
 #ifdef __cplusplus
-
+#include <algorithm>
 #include "pgmspace.h"
 
 #include "WCharacter.h"
@@ -247,11 +248,10 @@ void optimistic_yield(uint32_t interval_us);
 #include "Updater.h"
 #include "debug.h"
 
-#ifndef _GLIBCXX_VECTOR
-// arduino is not compatible with std::vector
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)>(b)?(a):(b))
-#endif
+using std::min;
+using std::max;
+using std::isinf;
+using std::isnan;
 
 #define _min(a,b) ((a)<(b)?(a):(b))
 #define _max(a,b) ((a)>(b)?(a):(b))

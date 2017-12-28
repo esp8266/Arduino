@@ -161,7 +161,7 @@ bool WiFiClient::getNoDelay() {
 
 size_t WiFiClient::availableForWrite ()
 {
-    return _client->availableForWrite();
+    return _client? _client->availableForWrite(): 0;
 }
 
 size_t WiFiClient::write(uint8_t b)
@@ -264,7 +264,7 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
 void WiFiClient::flush()
 {
     if (_client)
-        _client->flush();
+        _client->wait_until_sent();
 }
 
 void WiFiClient::stop()
