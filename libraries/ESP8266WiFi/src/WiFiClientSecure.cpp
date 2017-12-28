@@ -27,6 +27,7 @@ extern "C"
 #include "osapi.h"
 #include "ets_sys.h"
 }
+#include <list>
 #include <errno.h>
 #include "debug.h"
 #include "ESP8266WiFi.h"
@@ -49,6 +50,26 @@ extern "C"
 #else
 #define SSL_DEBUG_OPTS 0
 #endif
+
+
+typedef struct BufferItem
+{
+    BufferItem(const uint8_t* data_, size_t size_)
+    : size(size_), data(new uint8_t[size])
+    {
+        if (data.get() != nullptr) {
+            memcpy(data.get(), data_, size);
+        } else {
+            DEBUGV(":wcs alloc %d failed\r\n", size_);
+            size = 0;
+        }
+    }
+
+    size_t size;
+    std::unique_ptr<uint8_t[]> data;
+} BufferItem;
+
+typedef std::list<BufferItem> BufferList;
 
 class SSLContext
 {
@@ -139,6 +160,10 @@ public:
         _available -= will_copy;
         if (_available == 0) {
             _read_ptr = nullptr;
+            /* Send pending outgoing data, if any */
+            if (_hasWriteBuffers()) {
+                _writeBuffersSend();
+            }
         }
         return will_copy;
     }
@@ -155,8 +180,32 @@ public:
         --_available;
         if (_available == 0) {
             _read_ptr = nullptr;
+            /* Send pending outgoing data, if any */
+            if (_hasWriteBuffers()) {
+                _writeBuffersSend();
+            }
         }
         return result;
+    }
+
+    int write(const uint8_t* src, size_t size)
+    {
+        if (!_available) {
+            if (_hasWriteBuffers()) {
+                int rc = _writeBuffersSend();
+                if (rc < 0) {
+                    return rc;
+                }
+            }
+            return _write(src, size);
+        }
+        /* Some received data is still present in the axtls fragment buffer.
+           We can't call ssl_write now, as that will overwrite the contents of
+           the fragment buffer, corrupting the received data.
+           Save a copy of the outgoing data, and call ssl_write when all
+           recevied data has been consumed by the application.
+        */
+        return _writeBufferAdd(src, size);
     }
 
     int peek()
@@ -191,6 +240,12 @@ public:
             optimistic_yield(100);
         }
         return cb;
+    }
+
+    // similar to availble, but doesn't return exact size
+    bool hasData()
+    {
+        return _available > 0 || (s_io_ctx && s_io_ctx->getSize() > 0);
     }
 
     bool loadObject(int type, Stream& stream, size_t size)
@@ -282,12 +337,63 @@ protected:
         return _available;
     }
 
+    int _write(const uint8_t* src, size_t size)
+    {
+        if (!_ssl) {
+            return 0;
+        }
+
+        int rc = ssl_write(_ssl, src, size);
+        if (rc >= 0) {
+            return rc;
+        }
+        DEBUGV(":wcs write rc=%d\r\n", rc);
+        return rc;
+    }
+
+    int _writeBufferAdd(const uint8_t* data, size_t size)
+    {
+        if (!_ssl) {
+            return 0;
+        }
+
+        _writeBuffers.emplace_back(data, size);
+        if (_writeBuffers.back().data.get() == nullptr) {
+            _writeBuffers.pop_back();
+            return 0;
+        }
+        return size;
+    }
+
+    int _writeBuffersSend()
+    {
+        while (!_writeBuffers.empty()) {
+            auto& first = _writeBuffers.front();
+            int rc = _write(first.data.get(), first.size);
+            _writeBuffers.pop_front();
+            if (rc < 0) {
+                if (_hasWriteBuffers()) {
+                    DEBUGV(":wcs _writeBuffersSend dropping unsent data\r\n");
+                    _writeBuffers.clear();
+                }
+                return rc;
+            }
+        }
+        return 0;
+    }
+
+    bool _hasWriteBuffers()
+    {
+        return !_writeBuffers.empty();
+    }
+
     static SSL_CTX* _ssl_ctx;
     static int _ssl_ctx_refcnt;
     SSL* _ssl = nullptr;
     int _refcnt = 0;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
+    BufferList _writeBuffers;
     bool _allowSelfSignedCerts = false;
     static ClientContext* s_io_ctx;
 };
@@ -298,6 +404,8 @@ ClientContext* SSLContext::s_io_ctx = nullptr;
 
 WiFiClientSecure::WiFiClientSecure()
 {
+    // TLS handshake may take more than the 5 second default timeout
+    _timeout = 15000;
 }
 
 WiFiClientSecure::~WiFiClientSecure()
@@ -353,7 +461,7 @@ int WiFiClientSecure::_connectSSL(const char* hostName)
         _ssl = new SSLContext;
         _ssl->ref();
     }
-    _ssl->connect(_client, hostName, 5000);
+    _ssl->connect(_client, hostName, _timeout);
 
     auto status = ssl_handshake_status(*_ssl);
     if (status != SSL_OK) {
@@ -371,7 +479,7 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
         return 0;
     }
 
-    int rc = ssl_write(*_ssl, buf, size);
+    int rc = _ssl->write(buf, size);
     if (rc >= 0) {
         return rc;
     }
@@ -458,7 +566,7 @@ err     x       N           N
 uint8_t WiFiClientSecure::connected()
 {
     if (_ssl) {
-        if (_ssl->available()) {
+        if (_ssl->hasData()) {
             return true;
         }
         if (_client && _client->state() == ESTABLISHED && _ssl->connected()) {
