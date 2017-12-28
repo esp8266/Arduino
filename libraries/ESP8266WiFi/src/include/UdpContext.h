@@ -163,6 +163,9 @@ public:
 
     uint32_t getDestAddress()
     {
+        if (!_rx_buf)
+            return 0;
+
         ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
         return iphdr->dest.addr;
     }
