@@ -1,5 +1,24 @@
 /*
- *  Copyright (C) 2013 -2014  Espressif System
+ * ESPRESSIF MIT License
+ *
+ * Copyright (c) 2016 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
+ *
+ * Permission is hereby granted for use on ESPRESSIF SYSTEMS ESP8266 only, in which case,
+ * it is free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -52,7 +71,8 @@ void system_restore(void);
 void system_restart(void);
 
 bool system_deep_sleep_set_option(uint8 option);
-void system_deep_sleep(uint32 time_in_us);
+bool system_deep_sleep(uint64 time_in_us);
+bool system_deep_sleep_instant(uint64 time_in_us);
 
 uint8 system_upgrade_userbin_check(void);
 void system_upgrade_reboot(void);
@@ -120,13 +140,17 @@ bool system_update_cpu_freq(uint8 freq);
 uint8 system_get_cpu_freq(void);
 
 enum flash_size_map {
-    FLASH_SIZE_4M_MAP_256_256 = 0,
-    FLASH_SIZE_2M,
-    FLASH_SIZE_8M_MAP_512_512,
-    FLASH_SIZE_16M_MAP_512_512,
-    FLASH_SIZE_32M_MAP_512_512,
-    FLASH_SIZE_16M_MAP_1024_1024,
-    FLASH_SIZE_32M_MAP_1024_1024
+    FLASH_SIZE_4M_MAP_256_256 = 0,  /**<  Flash size : 4Mbits. Map : 256KBytes + 256KBytes */
+    FLASH_SIZE_2M,                  /**<  Flash size : 2Mbits. Map : 256KBytes */
+    FLASH_SIZE_8M_MAP_512_512,      /**<  Flash size : 8Mbits. Map : 512KBytes + 512KBytes */
+    FLASH_SIZE_16M_MAP_512_512,     /**<  Flash size : 16Mbits. Map : 512KBytes + 512KBytes */
+    FLASH_SIZE_32M_MAP_512_512,     /**<  Flash size : 32Mbits. Map : 512KBytes + 512KBytes */
+    FLASH_SIZE_16M_MAP_1024_1024,   /**<  Flash size : 16Mbits. Map : 1024KBytes + 1024KBytes */
+    FLASH_SIZE_32M_MAP_1024_1024,    /**<  Flash size : 32Mbits. Map : 1024KBytes + 1024KBytes */
+    FLASH_SIZE_32M_MAP_2048_2048,    /**<  attention: don't support now ,just compatible for nodemcu;
+                                           Flash size : 32Mbits. Map : 2048KBytes + 2048KBytes */
+    FLASH_SIZE_64M_MAP_1024_1024,     /**<  Flash size : 64Mbits. Map : 1024KBytes + 1024KBytes */
+    FLASH_SIZE_128M_MAP_1024_1024     /**<  Flash size : 128Mbits. Map : 1024KBytes + 1024KBytes */
 };
 
 enum flash_size_map system_get_flash_size_map(void);
@@ -135,6 +159,7 @@ void system_phy_set_max_tpw(uint8 max_tpw);
 void system_phy_set_tpw_via_vdd33(uint16 vdd33);
 void system_phy_set_rfoption(uint8 option);
 void system_phy_set_powerup_option(uint8 option);
+void system_phy_freq_trace_enable(bool enable);
 
 bool system_param_save_with_protect(uint16 start_sec, void *param, uint16 len);
 bool system_param_load(uint16 start_sec, uint16 offset, void *param, uint16 len);
@@ -166,8 +191,9 @@ bool wifi_set_opmode_current(uint8 opmode);
 uint8 wifi_get_broadcast_if(void);
 bool wifi_set_broadcast_if(uint8 interface);
 
-typedef struct bss_info {
-    struct bss_info* next;
+struct bss_info {
+    STAILQ_ENTRY(bss_info)     next;
+
     uint8 bssid[6];
     uint8 ssid[32];
     uint8 ssid_len;
@@ -177,16 +203,12 @@ typedef struct bss_info {
     uint8 is_hidden;
     sint16 freq_offset;
     sint16 freqcal_val;
-	uint8 *esp_mesh_ie;
-	uint8 simple_pair;
-} bss_info_t;
-
-typedef struct {
-    struct bss_info* first;
-} bss_info_head_t;
+    uint8 *esp_mesh_ie;
+    uint8 simple_pair;
+};
 
 typedef struct _scaninfo {
-	bss_info_head_t *pbss;
+    STAILQ_HEAD(, bss_info) *pbss;
     struct espconn *pespconn;
     uint8 totalpage;
     uint8 pagenum;
@@ -214,11 +236,17 @@ bool wifi_station_disconnect(void);
 
 sint8 wifi_station_get_rssi(void);
 
+typedef enum {
+    WIFI_SCAN_TYPE_ACTIVE = 0,  /**< active scan */
+    WIFI_SCAN_TYPE_PASSIVE,     /**< passive scan */
+} wifi_scan_type_t;
+
 struct scan_config {
-    uint8 *ssid;	// Note: ssid == NULL, don't filter ssid.
-    uint8 *bssid;	// Note: bssid == NULL, don't filter bssid.
-    uint8 channel;	// Note: channel == 0, scan all channels, otherwise scan set channel.
-    uint8 show_hidden;	// Note: show_hidden == 1, can get hidden ssid routers' info.
+    uint8 *ssid;    // Note: ssid == NULL, don't filter ssid.
+    uint8 *bssid;    // Note: bssid == NULL, don't filter bssid.
+    uint8 channel;    // Note: channel == 0, scan all channels, otherwise scan set channel.
+    uint8 show_hidden;    // Note: show_hidden == 1, can get hidden ssid routers' info.
+    wifi_scan_type_t scan_type; // scan type, active or passive
 };
 
 bool wifi_station_scan(struct scan_config *config, scan_done_cb_t cb);
@@ -281,21 +309,22 @@ bool wifi_softap_set_config(struct softap_config *config);
 bool wifi_softap_set_config_current(struct softap_config *config);
 
 struct station_info {
-	struct station_info* next;
-	uint8 bssid[6];
-	struct ip_addr ip;
+    STAILQ_ENTRY(station_info)    next;
+
+    uint8 bssid[6];
+    struct ip_addr ip;
 };
 
 struct dhcps_lease {
-	bool enable;
-	struct ip_addr start_ip;
-	struct ip_addr end_ip;
+    bool enable;
+    struct ip_addr start_ip;
+    struct ip_addr end_ip;
 };
 
 enum dhcps_offer_option{
-	OFFER_START = 0x00,
-	OFFER_ROUTER = 0x01,
-	OFFER_END
+    OFFER_START = 0x00,
+    OFFER_ROUTER = 0x01,
+    OFFER_END
 };
 
 uint8 wifi_softap_get_station_num(void);
@@ -378,6 +407,7 @@ enum {
     EVENT_SOFTAPMODE_STACONNECTED,
 	EVENT_SOFTAPMODE_STADISCONNECTED,
 	EVENT_SOFTAPMODE_PROBEREQRECVED,
+    EVENT_OPMODE_CHANGED,
     EVENT_MAX
 };
 
@@ -453,6 +483,11 @@ typedef struct {
 	uint8 mac[6];
 } Event_SoftAPMode_ProbeReqRecved_t;
 
+typedef struct {
+    uint8 old_opmode;
+    uint8 new_opmode;
+} Event_OpMode_Change_t;
+
 typedef union {
 	Event_StaMode_Connected_t			connected;
 	Event_StaMode_Disconnected_t		disconnected;
@@ -461,6 +496,7 @@ typedef union {
 	Event_SoftAPMode_StaConnected_t		sta_connected;
 	Event_SoftAPMode_StaDisconnected_t	sta_disconnected;
 	Event_SoftAPMode_ProbeReqRecved_t   ap_probereqrecved;
+    Event_OpMode_Change_t               opmode_changed;
 } Event_Info_u;
 
 typedef struct _esp_event {
@@ -612,5 +648,7 @@ void wifi_unregister_user_ie_manufacturer_recv_cb(void);
 
 void wifi_enable_gpio_wakeup(uint32 i, GPIO_INT_TYPE intr_status);
 void wifi_disable_gpio_wakeup(void);
+
+void uart_div_modify(uint8 uart_no, uint32 DivLatchValue);
 
 #endif

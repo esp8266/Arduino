@@ -29,12 +29,6 @@ typedef void (*discard_cb_t)(void*, ClientContext*);
 extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
-#ifdef LWIP_OPEN_SRC
-typedef err_t recv_ret_t;
-#else
-typedef int32_t recv_ret_t;
-#endif
-
 #include "DataSource.h"
 
 class ClientContext
@@ -45,7 +39,7 @@ public:
     {
         tcp_setprio(pcb, TCP_PRIO_MIN);
         tcp_arg(pcb, this);
-        tcp_recv(pcb, (tcp_recv_fn) &_s_recv);
+        tcp_recv(pcb, &_s_recv);
         tcp_sent(pcb, &_s_sent);
         tcp_err(pcb, &_s_error);
         tcp_poll(pcb, &_s_poll, 1);
@@ -78,7 +72,7 @@ public:
             tcp_poll(_pcb, NULL, 0);
             err = tcp_close(_pcb);
             if(err != ERR_OK) {
-                DEBUGV(":tc err %d\r\n", err);
+                DEBUGV(":tc err %d\r\n", (int) err);
                 tcp_abort(_pcb);
                 err = ERR_ABRT;
             }
@@ -113,7 +107,7 @@ public:
         if(this != 0) {
             DEBUGV(":ur %d\r\n", _refcnt);
             if(--_refcnt == 0) {
-                flush();
+                discard_received();
                 close();
                 if(_discard_cb) {
                     _discard_cb(_discard_cb_arg, this);
@@ -124,7 +118,25 @@ public:
         }
     }
 
-    size_t availableForWrite ()
+    int connect(ip_addr_t* addr, uint16_t port)
+    {
+        err_t err = tcp_connect(_pcb, addr, port, &ClientContext::_s_connected);
+        if (err != ERR_OK) {
+            return 0;
+        }
+        _connect_pending = 1;
+        _op_start_time = millis();
+        // This delay will be interrupted by esp_schedule in the connect callback
+        delay(_timeout_ms);
+        _connect_pending = 0;
+        if (state() != ESTABLISHED) {
+            abort();
+            return 0;
+        }
+        return 1;
+    }
+
+    size_t availableForWrite()
     {
         return _pcb? tcp_sndbuf(_pcb): 0;
     }
@@ -149,14 +161,14 @@ public:
         return tcp_nagle_disabled(_pcb);
     }
 
-    void setNonBlocking(bool nonblocking)
+    void setTimeout(int timeout_ms) 
     {
-        _noblock = nonblocking;
+        _timeout_ms = timeout_ms;
     }
 
-    bool getNonBlocking()
+    int getTimeout()
     {
-        return _noblock;
+        return _timeout_ms;
     }
 
     uint32_t getRemoteAddress()
@@ -265,7 +277,7 @@ public:
         return copy_size;
     }
 
-    void flush()
+    void discard_received()
     {
         if(!_rx_buf) {
             return;
@@ -276,6 +288,22 @@ public:
         pbuf_free(_rx_buf);
         _rx_buf = 0;
         _rx_buf_offset = 0;
+    }
+
+    void wait_until_sent()
+    {
+        // fix option 1 in
+        // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
+        // TODO: option 2
+
+        #define WAIT_TRIES_MS 10	// at most 10ms
+
+        int tries = 1+ WAIT_TRIES_MS;
+
+        while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --tries) {
+            _write_some();
+            delay(1); // esp_ schedule+yield
+        }
     }
 
     uint8_t state() const
@@ -315,9 +343,14 @@ public:
 
 protected:
 
-    void _cancel_write()
+    bool _is_timeout()
     {
-        if (_send_waiting) {
+        return millis() - _op_start_time > _timeout_ms;
+    }
+
+    void _notify_error()
+    {
+        if (_connect_pending || _send_waiting) {
             esp_schedule();
         }
     }
@@ -328,10 +361,16 @@ protected:
         assert(_send_waiting == 0);
         _datasource = ds;
         _written = 0;
+        _op_start_time = millis();
         do {
-            _write_some();
+            if (_write_some()) {
+                _op_start_time = millis();
+            }
 
-            if (!_datasource->available() || _noblock || state() == CLOSED) {
+            if (!_datasource->available() || _is_timeout() || state() == CLOSED) {
+                if (_is_timeout()) {
+                    DEBUGV(":wtmo\r\n");
+                }
                 delete _datasource;
                 _datasource = nullptr;
                 break;
@@ -344,10 +383,10 @@ protected:
         return _written;
     }
 
-    void _write_some()
+    bool _write_some()
     {
         if (!_datasource || !_pcb) {
-            return;
+            return false;
         }
 
         size_t left = _datasource->available();
@@ -367,7 +406,7 @@ protected:
                 break;
             }
             err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
-            DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, err);
+            DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, (int) err);
             _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
                 _written += next_chunk;
@@ -379,7 +418,9 @@ protected:
         }
         if( need_output ) {
             tcp_output(_pcb);
+            return true;
         }
+        return false;
     }
 
     void _write_some_from_cb()
@@ -425,13 +466,13 @@ protected:
         }
     }
 
-    recv_ret_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)
+    err_t _recv(tcp_pcb* pcb, pbuf* pb, err_t err)
     {
         (void) pcb;
         (void) err;
         if(pb == 0) { // connection closed
             DEBUGV(":rcl\r\n");
-            _cancel_write();
+            _notify_error();
             abort();
             return ERR_ABRT;
         }
@@ -450,13 +491,22 @@ protected:
     void _error(err_t err)
     {
         (void) err;
-        DEBUGV(":er %d %08x\r\n", err, (uint32_t) _datasource);
+        DEBUGV(":er %d 0x%08x\r\n", (int) err, (uint32_t) _datasource);
         tcp_arg(_pcb, NULL);
         tcp_sent(_pcb, NULL);
         tcp_recv(_pcb, NULL);
         tcp_err(_pcb, NULL);
         _pcb = NULL;
-        _cancel_write();
+        _notify_error();
+    }
+
+    err_t _connected(struct tcp_pcb *pcb, err_t err)
+    {
+        (void) err;
+        assert(pcb == _pcb);
+        assert(_connect_pending);
+        esp_schedule();
+        return ERR_OK;
     }
 
     err_t _poll(tcp_pcb*)
@@ -465,7 +515,7 @@ protected:
         return ERR_OK;
     }
 
-    static recv_ret_t _s_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *pb, err_t err)
+    static err_t _s_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *pb, err_t err)
     {
         return reinterpret_cast<ClientContext*>(arg)->_recv(tpcb, pb, err);
     }
@@ -485,6 +535,11 @@ protected:
         return reinterpret_cast<ClientContext*>(arg)->_sent(tpcb, len);
     }
 
+    static err_t _s_connected(void* arg, struct tcp_pcb *pcb, err_t err)
+    {
+        return reinterpret_cast<ClientContext*>(arg)->_connected(pcb, err);
+    }
+
 private:
     tcp_pcb* _pcb;
 
@@ -494,14 +549,16 @@ private:
     discard_cb_t _discard_cb;
     void* _discard_cb_arg;
 
-    int _refcnt;
-    ClientContext* _next;
-
     DataSource* _datasource = nullptr;
     size_t _written = 0;
     size_t _write_chunk_size = 256;
-    bool _noblock = false;
-    int _send_waiting = 0;
+    uint32_t _timeout_ms = 5000;
+    uint32_t _op_start_time = 0;
+    uint8_t _send_waiting = 0;
+    uint8_t _connect_pending = 0;
+
+    int8_t _refcnt;
+    ClientContext* _next;
 };
 
 #endif//CLIENTCONTEXT_H

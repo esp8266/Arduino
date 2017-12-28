@@ -117,6 +117,11 @@ int ICACHE_RAM_ATTR putchar(int c) {
     return c;
 }
 
+void _exit(int status) {
+    (void) status;
+    abort();
+}
+
 #if 0
 
 int ICACHE_RAM_ATTR printf(const char* format, ...) {

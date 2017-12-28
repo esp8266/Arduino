@@ -3,8 +3,18 @@ language: bash
 os: linux
 dist: trusty
 
-env:
-  - BUILD_TYPE=build
+matrix:
+  include:
+    - env:
+      - BUILD_TYPE=build
+    - env:
+      - BUILD_TYPE=platformio
+    - env:
+      - BUILD_TYPE=docs
+    - env:
+      - BUILD_TYPE=package
+    - env:
+      - BUILD_TYPE=host_tests
 
 install:
   - pip install --user -r doc/requirements.txt
@@ -15,6 +25,7 @@ script:
 deploy:
   provider: releases
   prerelease: true
+  skip_cleanup: true
   api_key:
     secure: A4FBmqyhlzy33oPeZVolg2Q/A3ZcJ3WnRQqQJ3NAPy+qGM5xcboOYtwcLL9vKaHZGfUB7lUP9QVZFGou1Wrmo9DnPvAoe3+XvCaDRGzVMxeIpu7UStbBD4Knbh98tlbMvZCXYRlT4VcusI9bMLK6UWw4sMdPislBh2FEfglTiag=
   file_glob: true
@@ -24,6 +35,7 @@ deploy:
   on:
     repo: esp8266/Arduino
     tags: true
+    condition: "$BUILD_TYPE = package"
 
 notifications:
   email:

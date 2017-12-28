@@ -49,6 +49,7 @@ void setup()
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
   Serial.println(ssid);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
   
   while (WiFi.status() != WL_CONNECTED) {
