@@ -840,6 +840,7 @@ bool HTTPClient::connect(void)
     }
 
     _tcp = _transportTraits->create();
+    _tcp->setTimeout(_tcpTimeout);
 
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
@@ -854,8 +855,6 @@ bool HTTPClient::connect(void)
         return false;
     }
 
-    // set Timeout for readBytesUntil and readStringUntil
-    _tcp->setTimeout(_tcpTimeout);
 
 #ifdef ESP8266
     _tcp->setNoDelay(true);
