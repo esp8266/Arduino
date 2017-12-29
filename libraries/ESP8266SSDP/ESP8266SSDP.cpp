@@ -25,7 +25,9 @@ License (MIT license):
   THE SOFTWARE.
 
 */
+#ifndef LWIP_OPEN_SRC
 #define LWIP_OPEN_SRC
+#endif
 #include <functional>
 #include "ESP8266SSDP.h"
 #include "WiFiUdp.h"
@@ -56,16 +58,16 @@ static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
 
 
 
-static const char* _ssdp_response_template =
+static const char _ssdp_response_template[] PROGMEM =
   "HTTP/1.1 200 OK\r\n"
   "EXT:\r\n";
 
-static const char* _ssdp_notify_template =
+static const char _ssdp_notify_template[] PROGMEM =
   "NOTIFY * HTTP/1.1\r\n"
   "HOST: 239.255.255.250:1900\r\n"
   "NTS: ssdp:alive\r\n";
 
-static const char* _ssdp_packet_template =
+static const char _ssdp_packet_template[] PROGMEM =
   "%s" // _ssdp_response_template / _ssdp_notify_template
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
@@ -74,7 +76,7 @@ static const char* _ssdp_packet_template =
   "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
 
-static const char* _ssdp_schema_template =
+static const char _ssdp_schema_template[] PROGMEM =
   "HTTP/1.1 200 OK\r\n"
   "Content-Type: text/xml\r\n"
   "Connection: close\r\n"
@@ -199,17 +201,20 @@ bool SSDPClass::begin(){
 
 void SSDPClass::_send(ssdp_method_t method){
   char buffer[1460];
-  uint32_t ip = WiFi.localIP();
+  IPAddress ip = WiFi.localIP();
 
-  int len = snprintf(buffer, sizeof(buffer),
+  char valueBuffer[strlen_P(_ssdp_notify_template)+1];
+  strcpy_P(valueBuffer, (method == NONE)?_ssdp_response_template:_ssdp_notify_template);
+
+  int len = snprintf_P(buffer, sizeof(buffer),
     _ssdp_packet_template,
-    (method == NONE)?_ssdp_response_template:_ssdp_notify_template,
+    valueBuffer,
     SSDP_INTERVAL,
     _modelName, _modelNumber,
     _uuid,
     (method == NONE)?"ST":"NT",
     _deviceType,
-    IP2STR(&ip), _port, _schemaURL
+   ip[0], ip[1], ip[2], ip[3], _port, _schemaURL
   );
 
   _server->append(buffer, len);
@@ -239,9 +244,11 @@ void SSDPClass::_send(ssdp_method_t method){
 }
 
 void SSDPClass::schema(WiFiClient client){
-  uint32_t ip = WiFi.localIP();
-  client.printf(_ssdp_schema_template,
-    IP2STR(&ip), _port,
+  IPAddress ip = WiFi.localIP();
+  char buffer[strlen_P(_ssdp_schema_template)+1];
+  strcpy_P(buffer, _ssdp_schema_template);
+  client.printf(buffer,
+    ip[0], ip[1], ip[2], ip[3], _port,
     _deviceType,
     _friendlyName,
     _presentationURL,
@@ -282,7 +289,6 @@ void SSDPClass::_update(){
         case METHOD:
           if(c == ' '){
             if(strcmp(buffer, "M-SEARCH") == 0) method = SEARCH;
-            else if(strcmp(buffer, "NOTIFY") == 0) method = NOTIFY;
 
             if(method == NONE) state = ABORT;
             else state = URI;
@@ -323,7 +329,7 @@ void SSDPClass::_update(){
 #endif
                 }
                 // if the search type matches our type, we should respond instead of ABORT
-                if(strcmp(buffer, _deviceType) == 0){
+                if(strcasecmp(buffer, _deviceType) == 0){
                   _pending = true;
                   _process_time = millis();
                   state = KEY;

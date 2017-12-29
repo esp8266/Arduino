@@ -30,6 +30,7 @@
 static volatile timercallback timer1_user_cb = NULL;
 
 void ICACHE_RAM_ATTR timer1_isr_handler(void *para){
+    (void) para;
     if ((T1C & ((1 << TCAR) | (1 << TCIT))) == 0) TEIE &= ~TEIE1;//edge int disable
     T1I = 0;
     if (timer1_user_cb) {
@@ -77,6 +78,7 @@ void ICACHE_RAM_ATTR timer1_disable(){
 static volatile timercallback timer0_user_cb = NULL;
 
 void ICACHE_RAM_ATTR timer0_isr_handler(void* para){
+    (void) para;
     if (timer0_user_cb) {
         // to make ISR compatible to Arduino AVR model where interrupts are disabled
         // we disable them before we call the client ISR

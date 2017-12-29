@@ -30,6 +30,7 @@ WiFiClient serverClients[MAX_SRV_CLIENTS];
 
 void setup() {
   Serial1.begin(115200);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial1.print("\nConnecting to "); Serial1.println(ssid);
   uint8_t i = 0;

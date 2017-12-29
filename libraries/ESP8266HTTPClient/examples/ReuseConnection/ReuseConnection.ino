@@ -34,6 +34,7 @@ void setup() {
         delay(1000);
     }
 
+    WiFi.mode(WIFI_STA);
     WiFiMulti.addAP("SSID", "PASSWORD");
 
     // allow reuse (if server supports it)

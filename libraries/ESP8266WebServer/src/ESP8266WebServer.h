@@ -25,17 +25,23 @@
 #define ESP8266WEBSERVER_H
 
 #include <functional>
+#include <memory>
 #include <ESP8266WiFi.h>
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
                         UPLOAD_FILE_ABORTED };
 enum HTTPClientStatus { HC_NONE, HC_WAIT_READ, HC_WAIT_CLOSE };
+enum HTTPAuthMethod { BASIC_AUTH, DIGEST_AUTH };
 
 #define HTTP_DOWNLOAD_UNIT_SIZE 1460
+
+#ifndef HTTP_UPLOAD_BUFLEN
 #define HTTP_UPLOAD_BUFLEN 2048
-#define HTTP_MAX_DATA_WAIT 1000 //ms to wait for the client to send the request
-#define HTTP_MAX_POST_WAIT 1000 //ms to wait for POST data to arrive
+#endif
+
+#define HTTP_MAX_DATA_WAIT 5000 //ms to wait for the client to send the request
+#define HTTP_MAX_POST_WAIT 5000 //ms to wait for POST data to arrive
 #define HTTP_MAX_SEND_WAIT 5000 //ms to wait for data chunk to be ACKed
 #define HTTP_MAX_CLOSE_WAIT 2000 //ms to wait for the client to close the connection
 
@@ -74,7 +80,7 @@ public:
   void stop();
 
   bool authenticate(const char * username, const char * password);
-  void requestAuthentication();
+  void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
 
   typedef std::function<void(void)> THandlerFunction;
   void on(const String &uri, THandlerFunction handler);
@@ -88,7 +94,7 @@ public:
   String uri() { return _currentUri; }
   HTTPMethod method() { return _currentMethod; }
   WiFiClient client() { return _currentClient; }
-  HTTPUpload& upload() { return _currentUpload; }
+  HTTPUpload& upload() { return *_currentUpload; }
 
   String arg(String name);        // get request argument value by name
   String arg(int i);              // get request argument value by number
@@ -136,6 +142,7 @@ template<typename T> size_t streamFile(T &file, const String& contentType){
 protected:
   void _addRequestHandler(RequestHandler* handler);
   void _handleRequest();
+  void _finalizeResponse();
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(String data);
   static String _responseCodeToString(int code);
@@ -145,6 +152,10 @@ protected:
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
+  
+  String _getRandomHexString();
+  // for extracting Auth parameters
+  String _exractParam(String& authReq,const String& param,const char delimit = '"');
 
   struct RequestArgument {
     String key;
@@ -168,7 +179,7 @@ protected:
 
   int              _currentArgCount;
   RequestArgument* _currentArgs;
-  HTTPUpload       _currentUpload;
+  std::unique_ptr<HTTPUpload> _currentUpload;
 
   int              _headerKeysCount;
   RequestArgument* _currentHeaders;
@@ -177,6 +188,10 @@ protected:
 
   String           _hostHeader;
   bool             _chunked;
+
+  String           _snonce;  // Store noance and opaque for future comparison
+  String           _sopaque;
+  String           _srealm;  // Store the Auth realm between Calls
 
 };
 

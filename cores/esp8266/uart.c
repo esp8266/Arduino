@@ -104,6 +104,9 @@ int uart_peek_char(uart_t* uart)
 
 int uart_read_char(uart_t* uart)
 {
+    if(uart == NULL) {
+        return -1;
+    }
     int data = uart_peek_char(uart);
     if(data != -1) {
         uart->rx_buffer->rpos = (uart->rx_buffer->rpos + 1) % uart->rx_buffer->size;
@@ -480,6 +483,7 @@ bool uart_rx_enabled(uart_t* uart)
 
 static void uart_ignore_char(char c)
 {
+    (void) c;
 }
 
 static void uart0_write_char(char c)

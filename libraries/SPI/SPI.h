@@ -53,6 +53,7 @@ public:
 class SPIClass {
 public:
   SPIClass();
+  bool pins(int8_t sck, int8_t miso, int8_t mosi, int8_t ss);
   void begin();
   void end();
   void setHwCs(bool use);
@@ -74,6 +75,7 @@ public:
   void endTransaction(void);
 private:
   bool useHwCs;
+  uint8_t pinSet;
   void writeBytes_(uint8_t * data, uint8_t size);
   void transferBytes_(uint8_t * out, uint8_t * in, uint8_t size);
   inline void setDataBits(uint16_t bits);
