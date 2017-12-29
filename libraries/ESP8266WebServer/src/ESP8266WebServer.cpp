@@ -281,6 +281,8 @@ void ESP8266WebServer::handleClient() {
 
   if (_currentClient.connected()) {
     switch (_currentStatus) {
+    case HC_NONE:
+        break;
     case HC_WAIT_READ:
       // Wait for data from client to become available
       if (_currentClient.available()) {

@@ -76,6 +76,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
         bool https, const String& httpsFingerprint, bool reboot)
 {
+    (void)https;
     rebootOnUpdate(reboot);
     if (httpsFingerprint.length() == 0) {
         return update(host, port, uri, currentVersion);
