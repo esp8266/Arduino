@@ -104,11 +104,13 @@ void __throw_bad_alloc()
 
 void __throw_logic_error(const char* str)
 {
+    (void) str;
     panic();
 }
 
 void __throw_out_of_range(const char* str)
 {
+    (void) str;
     panic();
 }
 }

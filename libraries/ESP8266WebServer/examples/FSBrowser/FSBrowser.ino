@@ -179,6 +179,7 @@ void setup(void){
   //WIFI INIT
   DBG_OUTPUT_PORT.printf("Connecting to %s\n", ssid);
   if (String(WiFi.SSID()) != String(ssid)) {
+    WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
   }
   
