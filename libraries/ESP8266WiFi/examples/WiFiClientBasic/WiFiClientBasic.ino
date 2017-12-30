@@ -54,11 +54,11 @@ void loop() {
     }
 
     // This will send the request to the server
-    client.print("Send this data to server");
+    client.println("Send this data to server");
 
     //read back one line from server
     String line = client.readStringUntil('\r');
-    client.println(line);
+    Serial.println(line);
 
     Serial.println("closing connection");
     client.stop();
