@@ -6,13 +6,13 @@
 #define _UMM_MALLOC_CFG_H
 
 #include <debug.h>
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 #include "c_types.h"
-#ifdef __cplusplus
-}
-#endif
+//#ifdef __cplusplus
+//}
+//#endif
 /*
  * There are a number of defines you can set at compile time that affect how
  * the memory allocator will operate.

@@ -102,6 +102,11 @@ int WiFiClient::connect(const char* host, uint16_t port)
     return 0;
 }
 
+int WiFiClient::connect(const String host, uint16_t port)
+{
+    return connect(host.c_str(), port);
+}
+
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
     ip_addr_t addr;
