@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifdef __ets__
 
@@ -25,6 +22,10 @@ extern "C" {
 
 #endif // __ets__
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define _SFR_BYTE(n) (n)
 
