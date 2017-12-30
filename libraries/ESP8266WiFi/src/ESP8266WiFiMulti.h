@@ -53,7 +53,7 @@ class ESP8266WiFiMulti {
         ~ESP8266WiFiMulti();
 
         bool addAP(const char* ssid, const char *passphrase = NULL);
-
+        int count(void);
         wl_status_t run(void);
 
     private:
