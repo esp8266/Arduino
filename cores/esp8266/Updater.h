@@ -107,38 +107,24 @@ class UpdaterClass {
     */
     template<typename T>
     size_t write(T &data){
-      size_t written = 0;
       if (hasError() || !isRunning())
         return 0;
 
-      size_t available = data.available();
-      while(available) {
-        if(_bufferLen + available > remaining()){
-          available = remaining() - _bufferLen;
-        }
-        if(_bufferLen + available > _bufferSize) {
-          size_t toBuff = _bufferSize - _bufferLen;
-          data.read(_buffer + _bufferLen, toBuff);
-          _bufferLen += toBuff;
-          if(!_writeBuffer())
-            return written;
-          written += toBuff;
-        } else {
-          data.read(_buffer + _bufferLen, available);
-          _bufferLen += available;
-          written += available;
-          if(_bufferLen == remaining()) {
-            if(!_writeBuffer()) {
-              return written;
-            }
-          }
-        }
-        if(remaining() == 0)
-          return written;
-        delay(1);
-        available = data.available();
+      // load exactly one _bufSize before flashing it
+      // (the last one may be smaller)
+      size_t wantedBufSize = remaining() < _bufferSize?
+        remaining():
+        _bufferSize;
+      size_t readThisTime = 0;
+
+      while (data.available() && _bufferLen < wantedBufSize) {
+        size_t got = data.read(_buffer + _bufferLen, wantedBufSize - _bufferLen);
+        _bufferLen += got;
+        readThisTime += got;
       }
-      return written;
+      if (_bufferLen == wantedBufSize && !_writeBuffer())
+          return 0;
+      return readThisTime;
     }
 
   private:
