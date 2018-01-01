@@ -25,6 +25,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <functional>
+#include <Schedule.h>
 
 extern "C" {
 	typedef struct _ETSTIMER_ ETSTimer;
@@ -35,17 +37,22 @@ class Ticker
 public:
 	Ticker();
 	~Ticker();
-	typedef void (*callback_t)(void);
-	typedef void (*callback_with_arg_t)(void*);
 
-	void attach(float seconds, callback_t callback)
+	typedef void (*callback_with_arg_t)(void*);
+	typedef std::function<void(void)> TickerFunction;
+
+	void attach(float seconds, TickerFunction tf, bool reqSchedule = false)
 	{
-		_attach_ms(seconds * 1000, true, reinterpret_cast<callback_with_arg_t>(callback), 0);
+		internalTicker = tf;
+		scheduleTicker = reqSchedule;
+		attach(seconds, internalCallback, (void*)this);
 	}
 
-	void attach_ms(uint32_t milliseconds, callback_t callback)
+	void attach_ms(uint32_t milliseconds, TickerFunction tf, bool reqSchedule = false)
 	{
-		_attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), 0);
+		internalTicker = tf;
+		scheduleTicker = reqSchedule;
+		attach_ms(milliseconds, internalCallback, (void*)this);
 	}
 
 	template<typename TArg>
@@ -67,14 +74,18 @@ public:
 		_attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), arg32);
 	}
 
-	void once(float seconds, callback_t callback)
+	void once(float seconds, TickerFunction tf, bool reqSchedule = false)
 	{
-		_attach_ms(seconds * 1000, false, reinterpret_cast<callback_with_arg_t>(callback), 0);
+		internalTicker = tf;
+		scheduleTicker = reqSchedule;
+		once(seconds, internalCallback, (void*)this);
 	}
 
-	void once_ms(uint32_t milliseconds, callback_t callback)
+	void once_ms(uint32_t milliseconds, TickerFunction tf, bool reqSchedule = false)
 	{
-		_attach_ms(milliseconds, false, reinterpret_cast<callback_with_arg_t>(callback), 0);	
+		internalTicker = tf;
+		scheduleTicker = reqSchedule;
+		once_ms(milliseconds, internalCallback, (void*)this);
 	}
 
 	template<typename TArg>
@@ -98,10 +109,14 @@ public:
 
 protected:	
 	void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg);
+	static void internalCallback (void* arg);
 
 
 protected:
 	ETSTimer* _timer;
+	TickerFunction internalTicker = nullptr;
+	bool scheduleTicker = false;
+
 };
 
 
