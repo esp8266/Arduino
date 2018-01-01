@@ -31,12 +31,14 @@ public:
 
     const uint8_t* get_buffer(size_t size) override
     {
+        (void) size;
         assert(_pos + size <= _size);
         return _data + _pos;
     }
 
     void release_buffer(const uint8_t* buffer, size_t size) override
     {
+        (void) buffer;
         assert(buffer == _data + _pos);
         _pos += size;
     }
@@ -69,6 +71,7 @@ public:
             _bufferSize = size;
         }
         size_t cb = _stream.readBytes(reinterpret_cast<char*>(_buffer.get()), size);
+        (void) cb;
         assert(cb == size);
         return _buffer.get();
     }
