@@ -38,6 +38,7 @@ extern cont_t g_cont;
 static const char* s_panic_file = 0;
 static int s_panic_line = 0;
 static const char* s_panic_func = 0;
+static const char* s_panic_what = 0;
 
 static bool s_abort_called = false;
 
@@ -85,6 +86,11 @@ void __wrap_system_restart_local() {
         ets_puts_P(s_panic_file);
         ets_printf(":%d ", s_panic_line);
         ets_puts_P(s_panic_func);
+        if (s_panic_what) {
+            ets_puts_P(PSTR(": Assertion '"));
+            ets_puts_P(s_panic_what);
+            ets_puts_P(PSTR("' failed."));
+        }
         ets_puts_P(PSTR("\n"));
     }
     else if (s_abort_called) {
@@ -203,10 +209,10 @@ void abort(){
 }
 
 void __assert_func(const char *file, int line, const char *func, const char *what) {
-    (void) what;
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
+    s_panic_what = what;
     gdb_do_break();
 }
 
