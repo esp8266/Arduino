@@ -37,21 +37,30 @@ public:
 	Ticker();
 	~Ticker();
 
+	typedef void (*callback_t)(void);
 	typedef void (*callback_with_arg_t)(void*);
-	typedef std::function<void(void)> TickerFunction;
+	typedef std::function<void(void)> callback_function_t;
 
-	void attach(float seconds, TickerFunction tf, bool reqSchedule = false)
+	void attach_scheduled(float seconds, callback_function_t callback)
 	{
-		internalTicker = tf;
-		scheduleTicker = reqSchedule;
-		attach(seconds, internalCallback, (void*)this);
+		attach(seconds,std::bind(schedule_function, callback));
 	}
 
-	void attach_ms(uint32_t milliseconds, TickerFunction tf, bool reqSchedule = false)
+	void attach(float seconds, callback_function_t callback)
 	{
-		internalTicker = tf;
-		scheduleTicker = reqSchedule;
-		attach_ms(milliseconds, internalCallback, (void*)this);
+		_callback_function = callback;
+		attach(seconds, _static_callback, (void*)this);
+	}
+
+	void attach_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
+	{
+		attach_ms(milliseconds, std::bind(schedule_function, callback));
+	}
+
+	void attach_ms(uint32_t milliseconds, callback_function_t callback)
+	{
+		_callback_function = callback;
+		attach_ms(milliseconds, _static_callback, (void*)this);
 	}
 
 	template<typename TArg>
@@ -73,18 +82,26 @@ public:
 		_attach_ms(milliseconds, true, reinterpret_cast<callback_with_arg_t>(callback), arg32);
 	}
 
-	void once(float seconds, TickerFunction tf, bool reqSchedule = false)
+	void once_scheduled(float seconds, callback_function_t callback)
 	{
-		internalTicker = tf;
-		scheduleTicker = reqSchedule;
-		once(seconds, internalCallback, (void*)this);
+		once(seconds, std::bind(schedule_function, callback));
 	}
 
-	void once_ms(uint32_t milliseconds, TickerFunction tf, bool reqSchedule = false)
+	void once(float seconds, callback_function_t callback)
 	{
-		internalTicker = tf;
-		scheduleTicker = reqSchedule;
-		once_ms(milliseconds, internalCallback, (void*)this);
+		_callback_function = callback;
+		once(seconds, _static_callback, (void*)this);
+	}
+
+	void once_ms_scheduled(uint32_t milliseconds, callback_function_t callback)
+	{
+		once_ms(milliseconds, std::bind(schedule_function, callback));
+	}
+
+	void once_ms(uint32_t milliseconds, callback_function_t callback)
+	{
+		_callback_function = callback;
+		once_ms(milliseconds, _static_callback, (void*)this);
 	}
 
 	template<typename TArg>
@@ -107,15 +124,12 @@ public:
 
 protected:	
 	void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg);
-	static void internalCallback (void* arg);
-
+	static void _static_callback (void* arg);
 
 protected:
 	ETSTimer* _timer;
-	TickerFunction internalTicker = nullptr;
-	bool scheduleTicker = false;
+	callback_function_t _callback_function = nullptr;
 
 };
-
 
 #endif//TICKER_H

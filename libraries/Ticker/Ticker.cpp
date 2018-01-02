@@ -68,25 +68,18 @@ void Ticker::detach()
 	os_timer_disarm(_timer);
 	delete _timer;
 	_timer = 0;
-	internalTicker = nullptr;
+	_callback_function = nullptr;
 }
 
-void Ticker::internalCallback(void* arg)
+void Ticker::_static_callback(void* arg)
 {
-	Ticker* pTicker = (Ticker*)arg;
-	if (pTicker == nullptr)
+	Ticker* _this = (Ticker*)arg;
+	if (_this == nullptr)
 	{
 		return;
 	}
-	if (pTicker->internalTicker)
+	if (_this->_callback_function)
 	{
-		if (pTicker->scheduleTicker)
-		{
-			schedule_function(pTicker->internalTicker);
-		}
-		else
-		{
-			pTicker->internalTicker();
-		}
+		_this->_callback_function();
 	}
 }
