@@ -118,7 +118,7 @@ SECTIONS
     *(.xt_except_desc_end)
     *(.dynamic)
     *(.gnu.version_d)
-    . = ALIGN(4);		/* this table MUST be 4-byte aligned */
+    . = ALIGN(4);       /* this table MUST be 4-byte aligned */
     _bss_table_start = ABSOLUTE(.);
     LONG(_bss_start)
     LONG(_bss_end)
@@ -157,18 +157,28 @@ SECTIONS
     *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, \
            EXCLUDE_FILE (umm_malloc.c.o) .text*)
     *.cpp.o(.literal*, .text*)
-    *.pioenvs\\*\\lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, \
-    EXCLUDE_FILE (umm_malloc.o) .text*)
-    *.pioenvs/*/lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, \
-    EXCLUDE_FILE (umm_malloc.o) .text*)
-    *.pioenvs\\*\\lib\*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, \
-    EXCLUDE_FILE (umm_malloc.o) .text*)
-    *.pioenvs/*/lib/*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, \
-    EXCLUDE_FILE (umm_malloc.o) .text*)
-    *.pioenvs\\*\\src\\*.o(EXCLUDE_FILE (umm_malloc.o) .literal*, \
-    EXCLUDE_FILE (umm_malloc.o) .text*)
-    *.pioenvs/*/src/*.o(EXCLUDE_FILE (umm_malloc.o) .literal*, \
-    EXCLUDE_FILE (umm_malloc.o) .text*)
+    /* PlatformIO */
+    /* Core <=3.5.0 (deprecated) */
+    /* framework */
+    *.pioenvs\\*\\lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
+    *.pioenvs/*/lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
+    /* project dependencies */
+    *.pioenvs\\*\\lib*\lib*.a:(.literal*, .text*)
+    *.pioenvs/*/lib*/lib*.a:(.literal*, .text*)
+    /* project source objects */
+    *.pioenvs\\*\\src\\*.o(.literal*, .text*)
+    *.pioenvs/*/src/*.o(.literal*, .text*)
+    /* Core >3.5.0 */
+    /* framework */
+    *build\\*\\lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
+    *build/*/lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
+    /* project dependencies */
+    *build\\*\\lib*\lib*.a:(.literal*, .text*)
+    *build/*/lib*/lib*.a:(.literal*, .text*)
+    /* project source objects */
+    *build\\*\\src\\*.o(.literal*, .text*)
+    *build/*/src/*.o(.literal*, .text*)
+    /* End PlatformIO */
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libgcc.a:_umoddi3.o(.literal .text)
@@ -232,12 +242,28 @@ SECTIONS
     *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
     *.cpp.o(.iram.text)
     *.c.o(.iram.text)
+    /* PlatformIO */
+    /* Core <=3.5.0 (deprecated) */
+    /* framework */
     *.pioenvs\\*\\lib*.a:(.iram.text)
     *.pioenvs/*/lib*.a:(.iram.text)
-    *.pioenvs\\*\\lib\\*.a:(.iram.text)
-    *.pioenvs/*/lib/*.a:(.iram.text)
+    /* project dependencies */
+    *.pioenvs\\*\\lib*\\lib*.a:(.iram.text)
+    *.pioenvs/*/lib*/lib*.a:(.iram.text)
+    /* project source objects */
     *.pioenvs\\*\\src\\*.o(.iram.text)
     *.pioenvs/*/src/*.o(.iram.text)
+    /* Core >3.5.0 */
+    /* framework */
+    *build\\*\\lib*.a:(.iram.text)
+    *build/*/lib*.a:(.iram.text)
+    /* project dependencies */
+    *build\\*\\lib*\\lib*.a:(.iram.text)
+    *build/*/lib*/lib*.a:(.iram.text)
+    /* project source objects */
+    *build\\*\\src\\*.o(.iram.text)
+    *build/*/src/*.o(.iram.text)
+    /* End PlatformIO */
     *(.fini.literal)
     *(.fini)
     *(.gnu.version)
