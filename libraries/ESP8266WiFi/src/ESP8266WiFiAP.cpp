@@ -69,6 +69,12 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
     if(lhs.max_connection != rhs.max_connection) {
         return false;
     }
+    if(lhs.beacon_interval != rhs.beacon_interval) {
+        return false;
+    }
+    if(lhs.authmode != rhs.authmode) {
+        return false;
+    }
     return true;
 }
 

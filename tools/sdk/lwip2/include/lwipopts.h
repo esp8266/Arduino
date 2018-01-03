@@ -1050,7 +1050,7 @@
 
 /** DNS maximum host name length supported in the name table. */
 #if !defined DNS_MAX_NAME_LENGTH || defined __DOXYGEN__
-#define DNS_MAX_NAME_LENGTH             48 // 256
+#define DNS_MAX_NAME_LENGTH             128 // 256
 #endif
 
 /** The maximum of DNS servers
@@ -1214,9 +1214,9 @@
  * when opening a connection. For the transmit size, this MSS sets
  * an upper limit on the MSS advertised by the remote host.
  */
-#if !defined TCP_MSS || defined __DOXYGEN__
-#define TCP_MSS                         536
-#endif
+//#if !defined TCP_MSS || defined __DOXYGEN__
+//#define TCP_MSS                         536
+//#endif
 
 /**
  * TCP_CALCULATE_EFF_SEND_MSS: "The maximum size of a segment that TCP really
@@ -1312,7 +1312,7 @@
  * TCP_MSS/4: Try to create 4 fragments or less per TCP packet.
  */
 #if !defined TCP_OVERSIZE || defined __DOXYGEN__
-#define TCP_OVERSIZE                    TCP_MSS
+#define TCP_OVERSIZE                    TCP_MSS	// TCP_MSS is STRONGLY SUGGESTED FOR ESP8266 BLOBS !!
 #endif
 
 /**
@@ -1506,7 +1506,7 @@
  * @todo: TCP and IP-frag do not work with this, yet:
  */
 #if !defined LWIP_NETIF_TX_SINGLE_PBUF || defined __DOXYGEN__
-#define LWIP_NETIF_TX_SINGLE_PBUF             1 // MANDATORY FOR ESP8266 BLOBS !! 
+#define LWIP_NETIF_TX_SINGLE_PBUF             1 // 1 is STRONGLY SUGGESTED FOR ESP8266 BLOBS !!
 #endif /* LWIP_NETIF_TX_SINGLE_PBUF */
 
 /**
@@ -2986,9 +2986,12 @@
    --------------------------------------------------
 */
 #define SNTP_SERVER_DNS			1				// SNTP support DNS names through sntp_setservername / sntp_getservername
-#define SNTP_SERVER_ADDRESS		"pool.ntp.org"			// default
-#define SNTP_GET_SERVERS_FROM_DHCP	1
-#define SNTP_SET_SYSTEM_TIME(t)		(sntp_set_system_time(t))	// implemented in lwip2-sntp.c
+// if SNTP_SERVER_ADDRESS is defined, it always overrides user's config
+// so we do not define it. sntp server can come from dhcp server, or by
+// user.
+//#define SNTP_SERVER_ADDRESS	"pool.ntp.org"			// default
+#define SNTP_GET_SERVERS_FROM_DHCP	3
+#define SNTP_SET_SYSTEM_TIME_US(t,us)	do { struct timeval tv = { t, us }; settimeofday(&tv, NULL); } while (0)
 
 /*
    --------------------------------------------------
@@ -2998,5 +3001,6 @@
 #include "lwip/debug.h"
 #include "arch/cc.h"
 #include "lwip-git-hash.h"
+#include <sys/time.h> // settimeofday() + struct timeval
 
 #endif // MYLWIPOPTS_H

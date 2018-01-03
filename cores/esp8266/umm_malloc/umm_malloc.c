@@ -1632,9 +1632,9 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
     if( (ptr = _umm_malloc( size )) ) {
       memcpy( ptr, oldptr, curSize );
+      _umm_free( oldptr );
     }
 
-    _umm_free( oldptr );
   }
 
   /* Release the critical section... */

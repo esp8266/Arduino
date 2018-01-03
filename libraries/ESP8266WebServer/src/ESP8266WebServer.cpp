@@ -119,7 +119,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
         return false;
       }
       sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equals(encoded)){
+      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
         authReq = String();
         delete[] toencode;
         delete[] encoded;
@@ -281,6 +281,8 @@ void ESP8266WebServer::handleClient() {
 
   if (_currentClient.connected()) {
     switch (_currentStatus) {
+    case HC_NONE:
+        break;
     case HC_WAIT_READ:
       // Wait for data from client to become available
       if (_currentClient.available()) {
@@ -433,6 +435,9 @@ void ESP8266WebServer::sendContent(const String& content) {
   _currentClient.write(content.c_str(), len);
   if(_chunked){
     _currentClient.write(footer, 2);
+    if (len == 0) {
+      _chunked = false;
+    }
   }
 }
 
@@ -453,6 +458,9 @@ void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
   _currentClient.write_P(content, size);
   if(_chunked){
     _currentClient.write(footer, 2);
+    if (size == 0) {
+      _chunked = false;
+    }
   }
 }
 
@@ -560,17 +568,25 @@ void ESP8266WebServer::_handleRequest() {
     }
 #endif
   }
-
-  if (!handled) {
-    if(_notFoundHandler) {
-      _notFoundHandler();
-    }
-    else {
-      send(404, "text/plain", String("Not found: ") + _currentUri);
-    }
+  if (!handled && _notFoundHandler) {
+    _notFoundHandler();
+    handled = true;
   }
-
+  if (!handled) {
+    send(404, "text/plain", String("Not found: ") + _currentUri);
+    handled = true;
+  }
+  if (handled) {
+    _finalizeResponse();
+  }
   _currentUri = String();
+}
+
+
+void ESP8266WebServer::_finalizeResponse() {
+  if (_chunked) {
+    sendContent("");
+  }
 }
 
 String ESP8266WebServer::_responseCodeToString(int code) {

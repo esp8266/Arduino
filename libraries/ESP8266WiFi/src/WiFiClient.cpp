@@ -102,6 +102,11 @@ int WiFiClient::connect(const char* host, uint16_t port)
     return 0;
 }
 
+int WiFiClient::connect(const String host, uint16_t port)
+{
+    return connect(host.c_str(), port);
+}
+
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
     ip_addr_t addr;
@@ -156,7 +161,7 @@ bool WiFiClient::getNoDelay() {
 
 size_t WiFiClient::availableForWrite ()
 {
-    return _client->availableForWrite();
+    return _client? _client->availableForWrite(): 0;
 }
 
 size_t WiFiClient::write(uint8_t b)
@@ -259,7 +264,7 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
 void WiFiClient::flush()
 {
     if (_client)
-        _client->flush();
+        _client->wait_until_sent();
 }
 
 void WiFiClient::stop()

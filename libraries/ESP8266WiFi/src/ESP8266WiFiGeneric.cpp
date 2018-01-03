@@ -303,6 +303,13 @@ void ESP8266WiFiGenericClass::persistent(bool persistent) {
     _persistent = persistent;
 }
 
+/**
+ * gets the persistent state
+ * @return bool
+ */
+bool ESP8266WiFiGenericClass::getPersistent(){
+    return _persistent;
+}
 
 /**
  * set new mode

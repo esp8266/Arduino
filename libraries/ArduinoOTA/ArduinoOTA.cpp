@@ -229,7 +229,7 @@ void ArduinoOTAClass::_onRx(){
     String result = _challengemd5.toString();
 
     ota_ip.addr = (uint32_t)_ota_ip;
-    if(result.equals(response)){
+    if(result.equalsConstantTime(response)) {
       _state = OTA_RUNUPDATE;
     } else {
       _udp_ota->append("Authentication Failed", 21);
