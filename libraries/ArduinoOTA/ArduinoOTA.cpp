@@ -37,7 +37,6 @@ ArduinoOTAClass::ArduinoOTAClass()
 , _size(0)
 , _cmd(0)
 , _ota_port(0)
-, _ota_udp_port(0)
 , _start_callback(NULL)
 , _end_callback(NULL)
 , _error_callback(NULL)
@@ -144,16 +143,16 @@ void ArduinoOTAClass::begin() {
 
 int ArduinoOTAClass::parseInt(){
   char data[16];
-  uint8_t index = 0;
+  uint8_t index;
   char value;
   while(_udp_ota->peek() == ' ') _udp_ota->read();
-  while(true){
+  for(index = 0; index < sizeof(data); index++){
     value = _udp_ota->peek();
     if(value < '0' || value > '9'){
       data[index++] = '\0';
       return atoi(data);
     }
-    data[index++] = _udp_ota->read();
+    data[index] = _udp_ota->read();
   }
   return 0;
 }
@@ -163,7 +162,7 @@ String ArduinoOTAClass::readStringUntil(char end){
   char value;
   while(true){
     value = _udp_ota->read();
-    if(value == '\0' || value == end){
+    if(value < '0' || value == '\0' || value == end){
       return res;
     }
     res += value;
@@ -230,7 +229,7 @@ void ArduinoOTAClass::_onRx(){
     String result = _challengemd5.toString();
 
     ota_ip.addr = (uint32_t)_ota_ip;
-    if(result.equals(response)){
+    if(result.equalsConstantTime(response)) {
       _state = OTA_RUNUPDATE;
     } else {
       _udp_ota->append("Authentication Failed", 21);
