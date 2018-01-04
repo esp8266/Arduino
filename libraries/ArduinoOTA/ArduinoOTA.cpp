@@ -152,7 +152,7 @@ int ArduinoOTAClass::parseInt(){
       data[index++] = '\0';
       return atoi(data);
     }
-    data[index++] = _udp_ota->read();
+    data[index] = _udp_ota->read();
   }
   return 0;
 }
