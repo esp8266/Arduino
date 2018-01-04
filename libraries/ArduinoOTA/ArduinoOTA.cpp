@@ -149,10 +149,10 @@ int ArduinoOTAClass::parseInt(){
   for(index = 0; index < sizeof(data); ++index){
     value = _udp_ota->peek();
     if(value < '0' || value > '9'){
-      data[index++] = '\0';
+      data[index] = '\0';
       return atoi(data);
     }
-    data[index++] = _udp_ota->read();
+    data[index] = _udp_ota->read();
   }
   return 0;
 }
