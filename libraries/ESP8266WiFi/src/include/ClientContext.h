@@ -43,6 +43,9 @@ public:
         tcp_sent(pcb, &_s_sent);
         tcp_err(pcb, &_s_error);
         tcp_poll(pcb, &_s_poll, 1);
+
+        // not enabled by default for 2.4.0
+        //keepAlive();
     }
 
     err_t abort()
@@ -339,6 +342,38 @@ public:
         }
         ProgmemStream stream(buf, size);
         return _write_from_source(new BufferedStreamDataSource<ProgmemStream>(stream, size));
+    }
+
+    void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
+    {
+        if (idle_sec && intv_sec && count) {
+            _pcb->so_options |= SOF_KEEPALIVE;
+            _pcb->keep_idle = (uint32_t)1000 * idle_sec;
+            _pcb->keep_intvl = (uint32_t)1000 * intv_sec;
+            _pcb->keep_cnt = count;
+        }
+        else
+            _pcb->so_options &= ~SOF_KEEPALIVE;
+    }
+
+    bool isKeepAliveEnabled () const
+    {
+        return !!(_pcb->so_options & SOF_KEEPALIVE);
+    }
+
+    uint16_t getKeepAliveIdle () const
+    {
+        return isKeepAliveEnabled()? (_pcb->keep_idle + 500) / 1000: 0;
+    }
+
+    uint16_t getKeepAliveInterval () const
+    {
+        return isKeepAliveEnabled()? (_pcb->keep_intvl + 500) / 1000: 0;
+    }
+
+    uint8_t getKeepAliveCount () const
+    {
+        return isKeepAliveEnabled()? _pcb->keep_cnt: 0;
     }
 
 protected:
