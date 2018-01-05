@@ -173,6 +173,20 @@ void FS::end() {
     }
 }
 
+bool FS::gc(uint32_t size) {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->gc(size);
+}
+
+bool FS::gc_quick() {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->gc_quick();
+}
+
 bool FS::format() {
     if (!_impl) {
         return false;

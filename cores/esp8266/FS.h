@@ -125,6 +125,9 @@ public:
     bool rename(const char* pathFrom, const char* pathTo);
     bool rename(const String& pathFrom, const String& pathTo);
 
+    bool gc(uint32_t size);
+    bool gc_quick();
+
 protected:
     FSImplPtr _impl;
 };
