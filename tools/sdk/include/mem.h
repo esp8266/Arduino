@@ -25,6 +25,10 @@
 #ifndef __MEM_H__
 #define __MEM_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Note: check_memleak_debug_enable is a weak function inside SDK.
  * please copy following codes to user_main.c.
 #include "mem.h"
@@ -75,6 +79,11 @@ do{\
 		pvPortZalloc(s, mem_debug_file, __LINE__);	\
 	})
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

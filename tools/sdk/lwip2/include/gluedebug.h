@@ -43,7 +43,7 @@ extern int doprint_allow;
 #define USE_OPTIMIZE_PRINTF	// at least used in arduino/esp8266
 #endif
 // os_printf_plus() missing in osapi.h (fixed in arduino's sdk-2.1):
-extern int os_printf_plus (const char * format, ...) __attribute__ ((format (printf, 1, 2)));
+//extern int os_printf_plus (const char * format, ...) __attribute__ ((format (printf, 1, 2)));
 
 #include <osapi.h> // os_printf* definitions + ICACHE_RODATA_ATTR
 

@@ -25,6 +25,10 @@
 #ifndef __PWM_H__
 #define __PWM_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*pwm.h: function and macro definition of PWM API , driver level */
 /*user_light.h: user interface for light API, user level*/
 /*user_light_adj: API for color changing and lighting effects, user level*/
@@ -53,6 +57,11 @@ uint32 pwm_get_period(void);
 
 uint32 get_pwm_version(void);
 void set_pwm_debug_en(uint8 print_en);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
