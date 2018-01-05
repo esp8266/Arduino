@@ -83,6 +83,7 @@ EspClass ESP;
 
 void EspClass::wdtEnable(uint32_t timeout_ms)
 {
+    (void) timeout_ms;
     /// This API can only be called if software watchdog is stopped
     system_soft_wdt_restart();
 }
@@ -395,23 +396,16 @@ struct rst_info * EspClass::getResetInfoPtr(void) {
 }
 
 bool EspClass::eraseConfig(void) {
-    bool ret = true;
-    size_t cfgAddr = (ESP.getFlashChipSize() - 0x4000);
-    size_t cfgSize = (8*1024);
+    const size_t cfgSize = 0x4000;
+    size_t cfgAddr = ESP.getFlashChipSize() - cfgSize;
 
-    noInterrupts();
-    while(cfgSize) {
-
-        if(spi_flash_erase_sector((cfgAddr / SPI_FLASH_SEC_SIZE)) != SPI_FLASH_RESULT_OK) {
-            ret = false;
+    for (size_t offset = 0; offset < cfgSize; offset += SPI_FLASH_SEC_SIZE) {
+        if (!flashEraseSector((cfgAddr + offset) / SPI_FLASH_SEC_SIZE)) {
+            return false;
         }
-
-        cfgSize -= SPI_FLASH_SEC_SIZE;
-        cfgAddr += SPI_FLASH_SEC_SIZE;
     }
-    interrupts();
 
-    return ret;
+    return true;
 }
 
 uint32_t EspClass::getSketchSize() {
@@ -432,7 +426,7 @@ uint32_t EspClass::getSketchSize() {
         section_index < image_header.num_segments;
         ++section_index)
     {
-        section_header_t section_header = {0};
+        section_header_t section_header = {0, 0};
         if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header))) {
             return 0;
         }

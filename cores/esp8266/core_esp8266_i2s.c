@@ -65,6 +65,10 @@ bool ICACHE_FLASH_ATTR i2s_is_empty(){
   return (i2s_slc_queue_len >= SLC_BUF_CNT-1);
 }
 
+int16_t ICACHE_FLASH_ATTR i2s_available(){
+	return (SLC_BUF_CNT - i2s_slc_queue_len) * SLC_BUF_LEN;
+}
+
 uint32_t ICACHE_FLASH_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
   uint8_t i;
   uint32_t item = i2s_slc_queue[0];
@@ -146,6 +150,10 @@ void ICACHE_FLASH_ATTR i2s_slc_end(){
   SLCIE = 0;
   SLCTXL &= ~(SLCTXLAM << SLCTXLA); // clear TX descriptor address
   SLCRXL &= ~(SLCRXLAM << SLCRXLA); // clear RX descriptor address
+
+  for (int x = 0; x<SLC_BUF_CNT; x++) {
+	  free(i2s_slc_buf_pntr[x]);
+  }
 }
 
 //This routine pushes a single, 32-bit sample to the I2S buffers. Call this at (on average) 
@@ -238,8 +246,16 @@ void ICACHE_FLASH_ATTR i2s_begin(){
 }
 
 void ICACHE_FLASH_ATTR i2s_end(){
-  i2s_slc_end();
+  I2SC &= ~I2STXS;
+
+  //Reset I2S
+  I2SC &= ~(I2SRST);
+  I2SC |= I2SRST;
+  I2SC &= ~(I2SRST);
+
   pinMode(2, INPUT);
   pinMode(3, INPUT);
   pinMode(15, INPUT);
+
+  i2s_slc_end();
 }

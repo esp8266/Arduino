@@ -94,6 +94,12 @@ void ESP8266WebServer::begin() {
     collectHeaders(0, 0);
 }
 
+String ESP8266WebServer::_exractParam(String& authReq,const String& param,const char delimit){
+  int _begin = authReq.indexOf(param);
+  if (_begin==-1) return "";
+  return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
+}
+
 bool ESP8266WebServer::authenticate(const char * username, const char * password){
   if(hasHeader(AUTHORIZATION_HEADER)){
     String authReq = header(AUTHORIZATION_HEADER);
@@ -113,7 +119,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
         return false;
       }
       sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equals(encoded)){
+      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
         authReq = String();
         delete[] toencode;
         delete[] encoded;
@@ -121,15 +127,106 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       }
       delete[] toencode;
       delete[] encoded;
+    }else if(authReq.startsWith("Digest")){
+      authReq = authReq.substring(7);
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.println(authReq);
+      #endif
+      String _username = _exractParam(authReq,"username=\"");
+      if((!_username.length())||_username!=String(username)){
+        authReq = String();
+        return false;
+      }
+      // extracting required parameters for RFC 2069 simpler Digest
+      String _realm    = _exractParam(authReq,"realm=\"");
+      String _nonce    = _exractParam(authReq,"nonce=\"");
+      String _uri      = _exractParam(authReq,"uri=\"");
+      String _response = _exractParam(authReq,"response=\"");
+      String _opaque   = _exractParam(authReq,"opaque=\"");
+
+      if((!_realm.length())||(!_nonce.length())||(!_uri.length())||(!_response.length())||(!_opaque.length())){
+        authReq = String();
+        return false;
+      }
+      if((_opaque!=_sopaque)||(_nonce!=_snonce)||(_realm!=_srealm)){
+        authReq = String();
+        return false;
+      }
+      // parameters for the RFC 2617 newer Digest
+      String _nc,_cnonce;
+      if(authReq.indexOf("qop=auth") != -1){
+        _nc = _exractParam(authReq,"nc=",',');
+        _cnonce = _exractParam(authReq,"cnonce=\"");
+      }
+      MD5Builder md5;
+      md5.begin();
+      md5.add(String(username)+":"+_realm+":"+String(password));  // md5 of the user:realm:user
+      md5.calculate();
+      String _H1 = md5.toString();
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.println("Hash of user:realm:pass=" + _H1);
+      #endif
+      md5.begin();
+      if(_currentMethod == HTTP_GET){
+        md5.add("GET:"+_uri);
+      }else if(_currentMethod == HTTP_POST){
+        md5.add("POST:"+_uri);
+      }else if(_currentMethod == HTTP_PUT){
+        md5.add("PUT:"+_uri);
+      }else if(_currentMethod == HTTP_DELETE){
+        md5.add("DELETE:"+_uri);
+      }else{
+        md5.add("GET:"+_uri);
+      }
+      md5.calculate();
+      String _H2 = md5.toString();
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
+      #endif
+      md5.begin();
+      if(authReq.indexOf("qop=auth") != -1){
+        md5.add(_H1+":"+_nonce+":"+_nc+":"+_cnonce+":auth:"+_H2);
+      }else{
+        md5.add(_H1+":"+_nonce+":"+_H2);
+      }
+      md5.calculate();
+      String _responsecheck = md5.toString();
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
+      #endif
+      if(_response==_responsecheck){
+        authReq = String();
+        return true;
+      }
     }
     authReq = String();
   }
   return false;
 }
 
-void ESP8266WebServer::requestAuthentication(){
-  sendHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
-  send(401);
+String ESP8266WebServer::_getRandomHexString(){
+  char buffer[33];  // buffer to hold 32 Hex Digit + /0
+  int i;
+  for(i=0;i<4;i++){
+    sprintf (buffer+(i*8), "%08x", RANDOM_REG32);
+  }
+  return String(buffer);
+}
+
+void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* realm, const String& authFailMsg){
+  if(realm==NULL){
+    _srealm = "Login Required";
+  }else{
+    _srealm = String(realm);
+  }
+  if(mode==BASIC_AUTH){
+    sendHeader("WWW-Authenticate", "Basic realm=\"" + _srealm + "\"");
+  }else{
+    _snonce=_getRandomHexString();
+    _sopaque=_getRandomHexString();
+    sendHeader("WWW-Authenticate", "Digest realm=\"" +_srealm + "\", qop=\"auth\", nonce=\""+_snonce+"\", opaque=\""+_sopaque+"\"");
+  }
+  send(401,"text/html",authFailMsg);
 }
 
 void ESP8266WebServer::on(const String &uri, ESP8266WebServer::THandlerFunction handler) {
@@ -179,51 +276,51 @@ void ESP8266WebServer::handleClient() {
     _statusChange = millis();
   }
 
-  if (!_currentClient.connected()) {
+  bool keepCurrentClient = false;
+  bool callYield = false;
+
+  if (_currentClient.connected()) {
+    switch (_currentStatus) {
+    case HC_NONE:
+        break;
+    case HC_WAIT_READ:
+      // Wait for data from client to become available
+      if (_currentClient.available()) {
+        if (_parseRequest(_currentClient)) {
+          _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
+          _contentLength = CONTENT_LENGTH_NOT_SET;
+          _handleRequest();
+
+          if (_currentClient.connected()) {
+            _currentStatus = HC_WAIT_CLOSE;
+            _statusChange = millis();
+            keepCurrentClient = true;
+          }
+        }
+      } else { // !_currentClient.available()
+        if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT) {
+          keepCurrentClient = true;
+        }
+        callYield = true;
+      }
+      break;
+    case HC_WAIT_CLOSE:
+      // Wait for client to close the connection
+      if (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT) {
+        keepCurrentClient = true;
+        callYield = true;
+      }
+    }
+  }
+
+  if (!keepCurrentClient) {
     _currentClient = WiFiClient();
     _currentStatus = HC_NONE;
-    return;
+    _currentUpload.reset();
   }
 
-  // Wait for data from client to become available
-  if (_currentStatus == HC_WAIT_READ) {
-    if (!_currentClient.available()) {
-      if (millis() - _statusChange > HTTP_MAX_DATA_WAIT) {
-        _currentClient = WiFiClient();
-        _currentStatus = HC_NONE;
-      }
-      yield();
-      return;
-    }
-
-    if (!_parseRequest(_currentClient)) {
-      _currentClient = WiFiClient();
-      _currentStatus = HC_NONE;
-      return;
-    }
-    _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
-    _contentLength = CONTENT_LENGTH_NOT_SET;
-    _handleRequest();
-
-    if (!_currentClient.connected()) {
-      _currentClient = WiFiClient();
-      _currentStatus = HC_NONE;
-      return;
-    } else {
-      _currentStatus = HC_WAIT_CLOSE;
-      _statusChange = millis();
-      return;
-    }
-  }
-
-  if (_currentStatus == HC_WAIT_CLOSE) {
-    if (millis() - _statusChange > HTTP_MAX_CLOSE_WAIT) {
-      _currentClient = WiFiClient();
-      _currentStatus = HC_NONE;
-    } else {
-      yield();
-      return;
-    }
+  if (callYield) {
+    yield();
   }
 }
 
@@ -338,6 +435,9 @@ void ESP8266WebServer::sendContent(const String& content) {
   _currentClient.write(content.c_str(), len);
   if(_chunked){
     _currentClient.write(footer, 2);
+    if (len == 0) {
+      _chunked = false;
+    }
   }
 }
 
@@ -358,6 +458,9 @@ void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
   _currentClient.write_P(content, size);
   if(_chunked){
     _currentClient.write(footer, 2);
+    if (size == 0) {
+      _chunked = false;
+    }
   }
 }
 
@@ -465,17 +568,25 @@ void ESP8266WebServer::_handleRequest() {
     }
 #endif
   }
-
-  if (!handled) {
-    if(_notFoundHandler) {
-      _notFoundHandler();
-    }
-    else {
-      send(404, "text/plain", String("Not found: ") + _currentUri);
-    }
+  if (!handled && _notFoundHandler) {
+    _notFoundHandler();
+    handled = true;
   }
-
+  if (!handled) {
+    send(404, "text/plain", String("Not found: ") + _currentUri);
+    handled = true;
+  }
+  if (handled) {
+    _finalizeResponse();
+  }
   _currentUri = String();
+}
+
+
+void ESP8266WebServer::_finalizeResponse() {
+  if (_chunked) {
+    sendContent("");
+  }
 }
 
 String ESP8266WebServer::_responseCodeToString(int code) {

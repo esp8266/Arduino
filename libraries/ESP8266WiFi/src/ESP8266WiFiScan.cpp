@@ -77,7 +77,7 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden) {
 
     int status = wifi_station_get_connect_status();
     if(status != STATION_GOT_IP && status != STATION_IDLE) {
-        WiFi.disconnect(false);
+        wifi_station_disconnect();
     }
 
     scanDelete();

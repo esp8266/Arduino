@@ -7,6 +7,11 @@
 #else
 #include "ip_addr.h"
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * get the seconds since Jan 01, 1970, 00:00 (GMT + 8)
  */
@@ -64,5 +69,10 @@ void sntp_setservername(unsigned char idx, char *server);
 char *sntp_getservername(unsigned char idx);
 
 #define sntp_servermode_dhcp(x)
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

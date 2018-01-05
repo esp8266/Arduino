@@ -79,7 +79,8 @@ class ArduinoOTAClass
     ota_state_t _state;
     int _size;
     int _cmd;
-    int _ota_port;
+    uint16_t _ota_port;
+    uint16_t _ota_udp_port;
     IPAddress _ota_ip;
     String _md5;
 

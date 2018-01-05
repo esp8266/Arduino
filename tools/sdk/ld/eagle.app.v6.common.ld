@@ -118,7 +118,7 @@ SECTIONS
     *(.xt_except_desc_end)
     *(.dynamic)
     *(.gnu.version_d)
-    . = ALIGN(4);		/* this table MUST be 4-byte aligned */
+    . = ALIGN(4);       /* this table MUST be 4-byte aligned */
     _bss_table_start = ABSOLUTE(.);
     LONG(_bss_start)
     LONG(_bss_end)
@@ -157,11 +157,41 @@ SECTIONS
     *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, \
            EXCLUDE_FILE (umm_malloc.c.o) .text*)
     *.cpp.o(.literal*, .text*)
+    /* PlatformIO */
+    /* framework */
+    *.pioenvs\\*\\lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
+    *.pioenvs/*/lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
+    /* project dependencies */
+    *.pioenvs\\*\\lib*\lib*.a:(.literal*, .text*)
+    *.pioenvs/*/lib*/lib*.a:(.literal*, .text*)
+    /* project source objects */
+    *.pioenvs\\*\\src\\*.o(.literal*, .text*)
+    *.pioenvs/*/src/*.o(.literal*, .text*)
+    /* End PlatformIO */
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libgcc.a:_umoddi3.o(.literal .text)
     *libgcc.a:_udivdi3.o(.literal .text)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)
+    *libstdc++.a:(.literal .text .literal.* .text.*)
+    *liblwip_gcc.a:(.literal .text .literal.* .text.*)
+    *liblwip_src.a:(.literal .text .literal.* .text.*)
+    *liblwip2.a:(.literal .text .literal.* .text.*)
+    *liblwip2_1460.a:(.literal .text .literal.* .text.*)
+    *libaxtls.a:(.literal .text .literal.* .text.*)
+    *libat.a:(.literal.* .text.*)
+    *libcrypto.a:(.literal.* .text.*)
+    *libespnow.a:(.literal.* .text.*)
+    *libjson.a:(.literal.* .text.*)
+    *liblwip.a:(.literal.* .text.*)
+    *libmesh.a:(.literal.* .text.*)
+    *libnet80211.a:(.literal.* .text.*)
+    *libsmartconfig.a:(.literal.* .text.*)
+    *libssl.a:(.literal.* .text.*)
+    *libupgrade.a:(.literal.* .text.*)
+    *libwpa.a:(.literal.* .text.*)
+    *libwpa2.a:(.literal.* .text.*)
+    *libwps.a:(.literal.* .text.*)
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text .irom.text.*)
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);
@@ -201,6 +231,17 @@ SECTIONS
     *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
     *.cpp.o(.iram.text)
     *.c.o(.iram.text)
+    /* PlatformIO */
+    /* framework */
+    *.pioenvs\\*\\lib*.a:(.iram.text)
+    *.pioenvs/*/lib*.a:(.iram.text)
+    /* project dependencies */
+    *.pioenvs\\*\\lib*\\lib*.a:(.iram.text)
+    *.pioenvs/*/lib*/lib*.a:(.iram.text)
+    /* project source objects */
+    *.pioenvs\\*\\src\\*.o(.iram.text)
+    *.pioenvs/*/src/*.o(.iram.text)
+    /* End PlatformIO */
     *(.fini.literal)
     *(.fini)
     *(.gnu.version)
