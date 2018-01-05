@@ -80,6 +80,20 @@ public:
         }
         return true;
     }
+
+    bool gc_quick() override {
+        return SPIFFS_gc_quick(&_fs, 0) == SPIFFS_OK;
+        // SPIFFS_ERR_NO_DELETED_BLOCK otherwise
+    }
+
+    bool gc(uint32_t free_size) override {
+        if (SPIFFS_gc(&_fs, free_size) == SPIFFS_ERR_FULL) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     bool info(FSInfo& info) override
     {
         info.maxOpenFiles = _maxOpenFds;
