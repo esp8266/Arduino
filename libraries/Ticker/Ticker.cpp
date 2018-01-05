@@ -21,6 +21,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "Arduino.h"
 
 extern "C" {
 #include "c_types.h"
@@ -67,4 +68,18 @@ void Ticker::detach()
 	os_timer_disarm(_timer);
 	delete _timer;
 	_timer = 0;
+	_callback_function = nullptr;
+}
+
+void Ticker::_static_callback(void* arg)
+{
+	Ticker* _this = (Ticker*)arg;
+	if (_this == nullptr)
+	{
+		return;
+	}
+	if (_this->_callback_function)
+	{
+		_this->_callback_function();
+	}
 }
