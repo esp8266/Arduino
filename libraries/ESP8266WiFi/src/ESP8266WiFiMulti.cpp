@@ -38,6 +38,7 @@ bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase) {
     return APlistAdd(ssid, passphrase);
 }
 
+
 void ESP8266WiFiMulti::cleanAPlist(void)
 {
     APlistClean();
