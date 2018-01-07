@@ -31,7 +31,7 @@ else
 endif
 
 
-all: count tests
+all: count tests test_report
 
 count:
 	@echo Running $(words $(TEST_LIST)) tests
@@ -75,6 +75,15 @@ ifneq ("$(NO_RUN)","1")
 			`test -f $(addsuffix .py, $(basename $@)) && echo "-m $(addsuffix .py, $(basename $@))" || echo ""`
 endif
 
+$(TEST_REPORT_XML): $(HARDWARE_DIR) virtualenv
+	@$(BS_DIR)/virtualenv/bin/xunitmerge $(shell find $(BUILD_DIR) -name 'test_result.xml' | xargs echo) $(TEST_REPORT_XML)
+
+$(TEST_REPORT_HTML): $(TEST_REPORT_XML) | virtualenv
+	@$(BS_DIR)/virtualenv/bin/junit2html $< $@
+
+test_report: $(TEST_REPORT_HTML)
+	@echo "Test report generated in $(TEST_REPORT_HTML)"
+
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
@@ -88,6 +97,7 @@ virtualenv:
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(HARDWARE_DIR)
+	rm -f $(TEST_REPORT_HTML) $(TEST_REPORT_XML)
 
 $(TEST_CONFIG):
 	@echo "******    "
@@ -96,4 +106,4 @@ $(TEST_CONFIG):
 	@echo "******    "
 	false
 
-.PHONY: tests all count venv $(BUILD_DIR) $(TEST_LIST)
+.PHONY: tests all count virtualenv test_report $(BUILD_DIR) $(TEST_LIST)
