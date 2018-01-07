@@ -10,9 +10,11 @@ UPLOAD_BAUD ?= 921600
 UPLOAD_BOARD ?= nodemcu
 BS_DIR ?= libraries/BSTest
 DEBUG_LEVEL ?= DebugLevel=None____
-FQBN ?= esp8266com:esp8266:generic:CpuFrequency=80,FlashFreq=40,FlashMode=DIO,UploadSpeed=115200,FlashSize=4M1M,ResetMethod=none,Debug=Serial,$(DEBUG_LEVEL)
-BUILD_TOOL = $(ARDUINO_IDE_PATH)/arduino-builder
-TEST_CONFIG = libraries/test_config/test_config.h
+FQBN ?= esp8266com:esp8266:generic:CpuFrequency=80,FlashFreq=40,FlashMode=dio,UploadSpeed=115200,FlashSize=4M1M,LwIPVariant=v2mss536,ResetMethod=none,Debug=Serial,$(DEBUG_LEVEL)
+BUILD_TOOL := $(ARDUINO_IDE_PATH)/arduino-builder
+TEST_CONFIG := libraries/test_config/test_config.h
+TEST_REPORT_XML := test_report.xml
+TEST_REPORT_HTML := test_report.html
 
 ifeq ("$(UPLOAD_PORT)","")
 $(error "Failed to detect upload port, please export UPLOAD_PORT manually")
@@ -57,6 +59,7 @@ ifneq ("$(NO_BUILD)","1")
 		$@
 endif
 ifneq ("$(NO_UPLOAD)","1")
+	@echo Uploading binary
 	$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG)  \
 		-cp $(UPLOAD_PORT) \
 		-cb $(UPLOAD_BAUD) \
