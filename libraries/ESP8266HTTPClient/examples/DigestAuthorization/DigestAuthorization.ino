@@ -1,4 +1,8 @@
 /*
+    This sketch shows how to handle HTTP Digest Authorization.
+
+    Written by Parham Alvani and Sajjad Rahnama, 2018-01-07.
+
    This example is released into public domain,
    or, at your option, CC0 licensed.
  */
