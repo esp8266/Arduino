@@ -550,15 +550,24 @@ void MDNSResponder::_parsePacket(){
         }
         if (tmp8 & 0xC0) { // Compressed pointer
           uint16_t offset = ((((uint16_t)tmp8) & ~0xC0) << 8) | _conn_read8();
-          last_bufferpos  = _conn->tell();
+          if (_conn->isValidOffset(offset)) {
+              last_bufferpos  = _conn->tell();
 #ifdef DEBUG_ESP_MDNS_RX
-          DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
-          DEBUG_ESP_PORT.print(last_bufferpos);
-          DEBUG_ESP_PORT.print(" to ");
-          DEBUG_ESP_PORT.println(offset);
+              DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
+              DEBUG_ESP_PORT.print(last_bufferpos);
+              DEBUG_ESP_PORT.print(" to ");
+              DEBUG_ESP_PORT.println(offset);
 #endif
-          _conn->seek(offset);
-          tmp8 = _conn_read8();
+              _conn->seek(offset);
+              tmp8 = _conn_read8();
+          }
+          else {
+#ifdef DEBUG_ESP_MDNS_RX
+              DEBUG_ESP_PORT.print("Skipping malformed compressed pointer");
+#endif
+              tmp8 = _conn_read8();
+              break;
+          }
         }
         if(stringsRead > 3){
 #ifdef DEBUG_ESP_MDNS_RX
@@ -661,15 +670,24 @@ void MDNSResponder::_parsePacket(){
         tmp8 = _conn_read8();
         if (tmp8 & 0xC0) { // Compressed pointer
           uint16_t offset = ((((uint16_t)tmp8) & ~0xC0) << 8) | _conn_read8();
-          last_bufferpos = _conn->tell();
+          if (_conn->isValidOffset(offset)) {
+              last_bufferpos = _conn->tell();
 #ifdef DEBUG_ESP_MDNS_RX
-          DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
-          DEBUG_ESP_PORT.print(last_bufferpos);
-          DEBUG_ESP_PORT.print(" to ");
-          DEBUG_ESP_PORT.println(offset);
+              DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
+              DEBUG_ESP_PORT.print(last_bufferpos);
+              DEBUG_ESP_PORT.print(" to ");
+              DEBUG_ESP_PORT.println(offset);
 #endif
-          _conn->seek(offset);
-          tmp8 = _conn_read8();
+              _conn->seek(offset);
+              tmp8 = _conn_read8();
+          }
+          else {
+#ifdef DEBUG_ESP_MDNS_RX
+              DEBUG_ESP_PORT.print("Skipping malformed compressed pointer");
+#endif
+              tmp8 = _conn_read8();
+              break;
+          }
         }
         _conn_readS(answerHostName, tmp8);
         answerHostName[tmp8] = '\0';

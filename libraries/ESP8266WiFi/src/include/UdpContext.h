@@ -151,8 +151,12 @@ public:
 
     void seek(const size_t pos)
     {
-        assert(pos <= _rx_buf->len);
+        assert(isValidOffset(pos));
         _rx_buf_offset = pos;
+    }
+
+    bool isValidOffset(const size_t pos) const {
+        return (pos <= _rx_buf->len);
     }
 
     uint32_t getRemoteAddress()
