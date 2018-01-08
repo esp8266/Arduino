@@ -23,6 +23,34 @@ String exractParam(String& authReq, const String& param, const char delimit){
 	return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
 
+String getDigestAuth(String& authReq, const String& username, const String& password, const String& uri) {
+	// extracting required parameters for RFC 2069 simpler Digest
+	String realm = exractParam(authReq, "realm=\"", '"');
+	String nonce = exractParam(authReq, "nonce=\"", '"');
+
+	// parameters for the RFC 2617 newer Digest
+	MD5Builder md5;
+	md5.begin();
+	md5.add(username + ":" + realm + ":" + password);  // md5 of the user:realm:user
+	md5.calculate();
+	String h1 = md5.toString();
+
+	md5.begin();
+	md5.add(String("GET:") + uri);
+	md5.calculate();
+	String h2 = md5.toString();
+
+	md5.begin();
+	md5.add(h1 + ":" + nonce + ":" + "00000001" + ":" + "gDBuFY4s" + ":" + "auth" + ":" + h2);
+	md5.calculate();
+	String response = md5.toString();
+
+	String authorization = "Digest username=\"" + username + "\", realm=\"" + realm + "\", nonce=\"" + nonce + "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=00000001, cnonce=\"gDBuFY4s\", response=\"" + response + "\"";
+	Serial.println(authorization);
+
+	return authorization;
+}
+
 void setup() {
 	Serial.begin(9600);
 
@@ -60,32 +88,11 @@ void loop() {
 		String authReq = http.header("WWW-Authenticate");
 		Serial.println(authReq);
 
-		// extracting required parameters for RFC 2069 simpler Digest
-		String realm = exractParam(authReq, "realm=\"", '"');
-		String nonce = exractParam(authReq, "nonce=\"", '"');
-
-		// parameters for the RFC 2617 newer Digest
-		MD5Builder md5;
-		md5.begin();
-		md5.add(String(username) + ":" + realm + ":" + String(password));  // md5 of the user:realm:user
-		md5.calculate();
-		String h1 = md5.toString();
-
-		md5.begin();
-		md5.add(String("GET:") + String(uri));
-		md5.calculate();
-		String h2 = md5.toString();
-
-		md5.begin();
-		md5.add(h1 + ":" + nonce + ":" + "00000001" + ":" + "gDBuFY4s" + ":" + "auth" + ":" + h2);
-		md5.calculate();
-		String response = md5.toString();
+		String authorization = getDigestAuth(authReq, String(username), String(password), String(uri));
 
 		http.end();
 		http.begin(String(server) + String(uri));
 
-		String authorization = "Digest username=\"admin\", realm=\"" + realm + "\", nonce=\"" + nonce + "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=00000001, cnonce=\"gDBuFY4s\", response=\"" + response + "\"";
-		Serial.println(authorization);
 		http.addHeader("Authorization", authorization);
 
 		int httpCode = http.GET();
