@@ -44,7 +44,8 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
   md5.calculate();
   String response = md5.toString();
 
-  String authorization = "Digest username=\"" + username + "\", realm=\"" + realm + "\", nonce=\"" + nonce + "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=00000001, cnonce=\"gDBuFY4s\", response=\"" + response + "\"";
+  String authorization = "Digest username=\"" + username + "\", realm=\"" + realm + "\", nonce=\"" + nonce +
+    "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=00000001, cnonce=\"gDBuFY4s\", response=\"" + response + "\"";
   Serial.println(authorization);
 
   return authorization;
