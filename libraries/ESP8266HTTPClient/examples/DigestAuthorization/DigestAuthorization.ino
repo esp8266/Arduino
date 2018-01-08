@@ -61,31 +61,30 @@ void loop() {
 		Serial.println(authReq);
 
 		// extracting required parameters for RFC 2069 simpler Digest
-		String _realm = exractParam(authReq, "realm=\"", '"');
-		String _nonce = exractParam(authReq, "nonce=\"", '"');
-		String _opaque = exractParam(authReq, "opaque=\"", '"');
+		String realm = exractParam(authReq, "realm=\"", '"');
+		String nonce = exractParam(authReq, "nonce=\"", '"');
 
 		// parameters for the RFC 2617 newer Digest
 		MD5Builder md5;
 		md5.begin();
-		md5.add(String(username) + ":" + _realm + ":" + String(password));  // md5 of the user:realm:user
+		md5.add(String(username) + ":" + realm + ":" + String(password));  // md5 of the user:realm:user
 		md5.calculate();
-		String _H1 = md5.toString();
+		String h1 = md5.toString();
 
 		md5.begin();
 		md5.add(String("GET:") + String(uri));
 		md5.calculate();
-		String _H2 = md5.toString();
+		String h2 = md5.toString();
 
 		md5.begin();
-		md5.add(_H1 + ":" + _nonce + ":" + "00000001" + ":" + "gDBuFY4s" + ":" + "auth" + ":" + _H2);
+		md5.add(h1 + ":" + nonce + ":" + "00000001" + ":" + "gDBuFY4s" + ":" + "auth" + ":" + h2);
 		md5.calculate();
-		String _response = md5.toString();
+		String response = md5.toString();
 
 		http.end();
 		http.begin(String(server) + String(uri));
 
-		String authorization = "Digest username=\"admin\", realm=\"" + _realm + "\", nonce=\"" + _nonce + "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=00000001, cnonce=\"gDBuFY4s\", response=\"" + _response + "\"";
+		String authorization = "Digest username=\"admin\", realm=\"" + realm + "\", nonce=\"" + nonce + "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=00000001, cnonce=\"gDBuFY4s\", response=\"" + response + "\"";
 		Serial.println(authorization);
 		http.addHeader("Authorization", authorization);
 
