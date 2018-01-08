@@ -14,8 +14,8 @@ const char* ssidPassword = "........";
 const char *username = "admin";
 const char *password = "admin";
 
-const char *server = "http://192.168.100.1";
-const char *uri = "/api/state?power=1";
+const char *server = "http://httpbin.org";
+const char *uri = "/digest-auth/auth/admin/admin/MD5";
 
 String exractParam(String& authReq, const String& param, const char delimit){
 	int _begin = authReq.indexOf(param);
