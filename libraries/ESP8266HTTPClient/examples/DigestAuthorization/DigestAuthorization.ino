@@ -9,7 +9,7 @@
 #include <ESP8266HTTPClient.h>
 
 const char* ssid = "........";
-const char* password = "........";
+const char* ssidPassword = "........";
 
 const char *username = "admin";
 const char *password = "admin";
@@ -27,7 +27,7 @@ void setup() {
 	Serial.begin(9600);
 
 	WiFi.mode(WIFI_STA);
-	WiFi.begin(ssid, password);
+	WiFi.begin(ssid, ssidPassword);
 
 	while (WiFi.status() != WL_CONNECTED) {
 		delay(500);
@@ -61,9 +61,9 @@ void loop() {
 		Serial.println(authReq);
 
 		// extracting required parameters for RFC 2069 simpler Digest
-		String _realm    = _exractParam(authReq, "realm=\"", '"');
-		String _nonce    = _exractParam(authReq, "nonce=\"", '"');
-		String _opaque   = _exractParam(authReq, "opaque=\"", '"');
+		String _realm = exractParam(authReq, "realm=\"", '"');
+		String _nonce = exractParam(authReq, "nonce=\"", '"');
+		String _opaque = exractParam(authReq, "opaque=\"", '"');
 
 		// parameters for the RFC 2617 newer Digest
 		MD5Builder md5;
@@ -91,7 +91,7 @@ void loop() {
 
 		int httpCode = http.GET();
 		if (httpCode > 0) {
-			payload = http.getString();
+			String payload = http.getString();
 			Serial.println(payload);
 		} else {
 			Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
