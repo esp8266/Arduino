@@ -82,7 +82,9 @@ void loop() {
 		md5.calculate();
 		String _response = md5.toString();
 
+		http.end();
 		http.begin(String(server) + String(uri));
+
 		String authorization = "Digest username=\"admin\", realm=\"" + _realm + "\", nonce=\"" + _nonce + "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=00000001, cnonce=\"gDBuFY4s\", response=\"" + _response + "\"";
 		Serial.println(authorization);
 		http.addHeader("Authorization", authorization);
@@ -91,9 +93,11 @@ void loop() {
 		if (httpCode > 0) {
 			payload = http.getString();
 			Serial.println(payload);
+		} else {
+			Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
 		}
 	} else {
-		USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+		Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
 	}
 
 	http.end();
