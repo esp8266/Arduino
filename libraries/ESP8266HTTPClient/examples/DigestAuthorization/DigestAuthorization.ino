@@ -40,11 +40,14 @@ String getCNonce(const int len) {
     return s;
 }
 
-String getDigestAuth(String& authReq, const String& username, const String& password, const String& uri) {
+String getDigestAuth(String& authReq, const String& username, const String& password, const String& uri, int counter) {
   // extracting required parameters for RFC 2069 simpler Digest
   String realm = exractParam(authReq, "realm=\"", '"');
   String nonce = exractParam(authReq, "nonce=\"", '"');
   String cNonce = getCNonce(8);
+
+  char nc[8];
+  sprintf(nc, "%08d", counter);
 
   // parameters for the RFC 2617 newer Digest
   MD5Builder md5;
@@ -59,12 +62,12 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
   String h2 = md5.toString();
 
   md5.begin();
-  md5.add(h1 + ":" + nonce + ":" + "00000001" + ":" + cNonce + ":" + "auth" + ":" + h2);
+  md5.add(h1 + ":" + nonce + ":" + String(nc) + ":" + cNonce + ":" + "auth" + ":" + h2);
   md5.calculate();
   String response = md5.toString();
 
   String authorization = "Digest username=\"" + username + "\", realm=\"" + realm + "\", nonce=\"" + nonce +
-    "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=00000001, cnonce=\"" + cNonce + "\", response=\"" + response + "\"";
+    "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=" + String(nc) + ", cnonce=\"" + cNonce + "\", response=\"" + response + "\"";
   Serial.println(authorization);
 
   return authorization;
@@ -107,7 +110,7 @@ void loop() {
     String authReq = http.header("WWW-Authenticate");
     Serial.println(authReq);
 
-    String authorization = getDigestAuth(authReq, String(username), String(password), String(uri));
+    String authorization = getDigestAuth(authReq, String(username), String(password), String(uri), 1);
 
     http.end();
     http.begin(String(server) + String(uri));
