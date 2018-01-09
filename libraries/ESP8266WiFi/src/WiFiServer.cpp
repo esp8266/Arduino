@@ -82,6 +82,34 @@ void WiFiServer::begin() {
     tcp_arg(listen_pcb, (void*) this);
 }
 
+void WiFiServer::begin(uint16_t port) {
+    close();
+	_port = port;
+    err_t err;
+    tcp_pcb* pcb = tcp_new();
+    if (!pcb)
+        return;
+
+    ip_addr_t local_addr;
+    local_addr.addr = (uint32_t) _addr;
+    pcb->so_options |= SOF_REUSEADDR;
+    err = tcp_bind(pcb, &local_addr, _port);
+
+    if (err != ERR_OK) {
+        tcp_close(pcb);
+        return;
+    }
+
+    tcp_pcb* listen_pcb = tcp_listen(pcb);
+    if (!listen_pcb) {
+        tcp_close(pcb);
+        return;
+    }
+    _pcb = listen_pcb;
+    tcp_accept(listen_pcb, &WiFiServer::_s_accept);
+    tcp_arg(listen_pcb, (void*) this);
+}
+
 void WiFiServer::setNoDelay(bool nodelay) {
     _noDelay = nodelay;
 }
