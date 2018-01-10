@@ -40,14 +40,14 @@ String getCNonce(const int len) {
     return s;
 }
 
-String getDigestAuth(String& authReq, const String& username, const String& password, const String& uri, int counter) {
+String getDigestAuth(String& authReq, const String& username, const String& password, const String& uri, unsigned int counter) {
   // extracting required parameters for RFC 2069 simpler Digest
   String realm = exractParam(authReq, "realm=\"", '"');
   String nonce = exractParam(authReq, "nonce=\"", '"');
   String cNonce = getCNonce(8);
 
-  char nc[8];
-  sprintf(nc, "%08x", counter);
+  char nc[9];
+  snprintf(nc, sizeof(nc), "%08x", counter);
 
   // parameters for the RFC 2617 newer Digest
   MD5Builder md5;
