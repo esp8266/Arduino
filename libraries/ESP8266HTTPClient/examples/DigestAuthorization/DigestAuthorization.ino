@@ -47,7 +47,7 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
   String cNonce = getCNonce(8);
 
   char nc[8];
-  sprintf(nc, "%08d", counter);
+  sprintf(nc, "%08x", counter);
 
   // parameters for the RFC 2617 newer Digest
   MD5Builder md5;
