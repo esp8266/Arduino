@@ -30,6 +30,10 @@
 
 #define WIFICLIENT_MAX_PACKET_SIZE 1460
 
+#define TCP_DEFAULT_KEEPALIVE_IDLE_SEC          7200 // 2 hours
+#define TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC      75   // 75 sec
+#define TCP_DEFAULT_KEEPALIVE_COUNT             9    // fault after 9 failures
+
 class ClientContext;
 class WiFiServer;
 
@@ -49,7 +53,7 @@ public:
   virtual int connect(const String host, uint16_t port);
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
-  size_t write_P(PGM_P buf, size_t size);
+  virtual size_t write_P(PGM_P buf, size_t size);
   size_t write(Stream& stream);
 
   // This one is deprecated, use write(Stream& instead)
@@ -84,6 +88,13 @@ public:
 
   static void stopAll();
   static void stopAllExcept(WiFiClient * c);
+
+  void     keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT);
+  bool     isKeepAliveEnabled () const;
+  uint16_t getKeepAliveIdle () const;
+  uint16_t getKeepAliveInterval () const;
+  uint8_t  getKeepAliveCount () const;
+  void     disableKeepAlive () { keepAlive(0, 0, 0); }
 
 protected:
 

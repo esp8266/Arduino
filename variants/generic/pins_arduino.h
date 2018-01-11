@@ -34,7 +34,10 @@
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
-static const uint8_t BUILTIN_LED = 1;
-static const uint8_t LED_BUILTIN = 1;
+#ifndef USERLED
+#define USERLED 1
+#endif
+static const uint8_t BUILTIN_LED = USERLED;
+static const uint8_t LED_BUILTIN = USERLED;
 
 #endif /* Pins_Arduino_h */

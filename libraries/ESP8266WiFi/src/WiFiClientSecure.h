@@ -44,6 +44,7 @@ public:
 
   uint8_t connected() override;
   size_t write(const uint8_t *buf, size_t size) override;
+  size_t write_P(PGM_P buf, size_t size) override;
   int read(uint8_t *buf, size_t size) override;
   int available() override;
   int read() override;
@@ -80,6 +81,10 @@ public:
     return loadCACert(file, file.size());
   }
 
+friend class WiFiServerSecure; // Needs access to custom constructor below
+protected:
+  // Only called by WiFiServerSecure
+  WiFiClientSecure(ClientContext* client, bool usePMEM, const uint8_t *rsakey, int rsakeyLen, const uint8_t *cert, int certLen);
 
 protected:
     void _initSSLContext();

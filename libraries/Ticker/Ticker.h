@@ -23,6 +23,7 @@
 #define TICKER_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 extern "C" {
@@ -93,6 +94,7 @@ public:
 	}
 
 	void detach();
+	bool active();
 
 protected:	
 	void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg);

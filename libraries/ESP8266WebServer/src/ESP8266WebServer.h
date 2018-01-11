@@ -71,12 +71,12 @@ class ESP8266WebServer
 public:
   ESP8266WebServer(IPAddress addr, int port = 80);
   ESP8266WebServer(int port = 80);
-  ~ESP8266WebServer();
+  virtual ~ESP8266WebServer();
 
-  void begin();
-  void handleClient();
+  virtual void begin();
+  virtual void handleClient();
 
-  void close();
+  virtual void close();
   void stop();
 
   bool authenticate(const char * username, const char * password);
@@ -93,7 +93,7 @@ public:
 
   String uri() { return _currentUri; }
   HTTPMethod method() { return _currentMethod; }
-  WiFiClient client() { return _currentClient; }
+  virtual WiFiClient client() { return _currentClient; }
   HTTPUpload& upload() { return *_currentUpload; }
 
   String arg(String name);        // get request argument value by name
@@ -140,6 +140,8 @@ template<typename T> size_t streamFile(T &file, const String& contentType){
 }
 
 protected:
+  virtual size_t _currentClientWrite(const char* b, size_t l) { return _currentClient.write( b, l ); }
+  virtual size_t _currentClientWrite_P(PGM_P b, size_t l) { return _currentClient.write_P( b, l ); }
   void _addRequestHandler(RequestHandler* handler);
   void _handleRequest();
   void _finalizeResponse();
