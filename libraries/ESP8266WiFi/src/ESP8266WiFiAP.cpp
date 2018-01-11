@@ -333,3 +333,23 @@ String ESP8266WiFiAPClass::softAPmacAddress(void) {
     sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     return String(macStr);
 }
+
+/**
+* Get the configured(Not-In-Flash) softAP SSID name.
+* @return String SSID.
+*/
+String ESP8266WiFiAPClass::softAPSSID() const {
+	struct softap_config config;
+	wifi_softap_get_config(&config);
+	return String(reinterpret_cast<char*>(config.ssid));
+}
+
+/**
+* Get the configurd(Not-In-Flash) softAP PSK or PASSWORD.
+* @return String psk.
+*/
+String ESP8266WiFiAPClass::softAPPSK() const {
+	struct softap_config config;
+	wifi_softap_get_config(&config);
+	return String(reinterpret_cast<char*>(config.password));
+}
