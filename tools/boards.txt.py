@@ -21,7 +21,7 @@
 #    opts:    specific entries dicts (overrides same entry in macros)
 #    macro:   common entries
 #        unmodifiable parameters:
-#            resetmethod_ck/_nodemcu:        fixed reset method
+#            resetmethod_ck/_nodemcu/_none:  fixed reset method
 #            flashmode_qio/_dio/_qout/_dout: fixed flash mode
 #            flashfreq_40/_80:               fixed flash frequency
 #        selection menu:
@@ -689,14 +689,14 @@ boards = collections.OrderedDict([
                   ],
     }),
     ( 'oak', {
-        'name': 'DigiStump Oak',
+        'name': 'Digistump Oak',
         'opts': {
             '.build.board': 'ESP8266_OAK',
             '.build.variant': 'oak',
             '.upload.maximum_size': '1040368',
             },
         'macro': [
-            'resetmethod_ck',
+            'resetmethod_none',
             'flashmode_dio',
             'flashfreq_40',
             '4M',
@@ -776,7 +776,11 @@ macros = {
     'resetmethod_nodemcu': collections.OrderedDict([
         ( '.upload.resetmethod', 'nodemcu' ),
         ]),
-
+    
+    'resetmethod_none': collections.OrderedDict([
+        ( '.upload.resetmethod', 'none' ),
+        ]),
+    
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
