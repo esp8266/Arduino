@@ -74,6 +74,7 @@ public:
   virtual ~ESP8266WebServer();
 
   virtual void begin();
+  virtual void begin(uint16_t port);
   virtual void handleClient();
 
   virtual void close();
@@ -157,7 +158,7 @@ protected:
   
   String _getRandomHexString();
   // for extracting Auth parameters
-  String _exractParam(String& authReq,const String& param,const char delimit = '"');
+  String _extractParam(String& authReq,const String& param,const char delimit = '"');
 
   struct RequestArgument {
     String key;
