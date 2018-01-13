@@ -66,7 +66,7 @@ bool ICACHE_FLASH_ATTR i2s_is_empty(){
 }
 
 int16_t ICACHE_FLASH_ATTR i2s_available(){
-	return (SLC_BUF_CNT - i2s_slc_queue_len) * SLC_BUF_LEN;
+	return (i2s_slc_queue_len * SLC_BUF_LEN) + (SLC_BUF_LEN - i2s_curr_slc_buf_pos);
 }
 
 uint32_t ICACHE_FLASH_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
@@ -194,6 +194,47 @@ bool ICACHE_FLASH_ATTR i2s_write_sample_nb(uint32_t sample) {
   i2s_curr_slc_buf[i2s_curr_slc_buf_pos++]=sample;
   return true;
 }
+
+#define MIN(a,b) (a<b?a:b)
+
+// writes a buffer of samples into the DMA memory, returns the amount of samples written
+int16_t ICACHE_FLASH_ATTR i2s_write_buffer_mono(int16_t *sample, int16_t len) {
+	int16_t samples_written=0;
+
+	for(;;)	{
+		// make sure we have room in the current buffer
+		if (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL){
+			// no room in the current buffer? if there are no buffers available then exit
+			if(i2s_slc_queue_len == 0)
+				break;
+			
+			// get a new buffer
+			ETS_SLC_INTR_DISABLE();
+			i2s_curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item();
+			ETS_SLC_INTR_ENABLE();
+			i2s_curr_slc_buf_pos=0;		
+		}
+		
+		if (len==0)
+			break;
+
+		//space available in the current buffer
+		int16_t	available = SLC_BUF_LEN - i2s_curr_slc_buf_pos;
+		
+		int16_t m = MIN(available,len);
+		
+		for(int16_t i=0;i<m;i++){
+			int16_t v =	(*sample);
+			uint32_t vv = (v<<16) | (v & 0xffff);
+			i2s_curr_slc_buf[i2s_curr_slc_buf_pos++] = vv;
+			sample++;
+		}
+		len -= m;
+		samples_written += m;
+	}	
+	return samples_written;
+}
+
 
 bool ICACHE_FLASH_ATTR i2s_write_lr(int16_t left, int16_t right){
   int sample = right & 0xFFFF;
