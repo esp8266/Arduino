@@ -3320,7 +3320,7 @@ gen4iod.menu.UploadSpeed.921600=921600
 gen4iod.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
-oak.name=DigiStump Oak
+oak.name=Digistump Oak
 oak.build.board=ESP8266_OAK
 oak.build.variant=oak
 oak.upload.maximum_size=1040368
@@ -3338,7 +3338,7 @@ oak.menu.CpuFrequency.80=80 MHz
 oak.menu.CpuFrequency.80.build.f_cpu=80000000L
 oak.menu.CpuFrequency.160=160 MHz
 oak.menu.CpuFrequency.160.build.f_cpu=160000000L
-oak.upload.resetmethod=ck
+oak.upload.resetmethod=none
 oak.build.flash_mode=dio
 oak.build.flash_freq=40
 oak.menu.FlashSize.4M1M=4M (1M SPIFFS)
