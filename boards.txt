@@ -175,16 +175,50 @@ generic.menu.FlashSize.16M15M.upload.maximum_size=1044464
 generic.menu.FlashSize.16M15M.build.spiffs_start=0x100000
 generic.menu.FlashSize.16M15M.build.spiffs_end=0xFFB000
 generic.menu.FlashSize.16M15M.build.spiffs_blocksize=8192
-generic.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-generic.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-generic.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-generic.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+generic.menu.led.2=2
+generic.menu.led.2.build.led=-DUSERLED=2
+generic.menu.led.0=0
+generic.menu.led.0.build.led=-DUSERLED=0
+generic.menu.led.1=1
+generic.menu.led.1.build.led=-DUSERLED=1
+generic.menu.led.3=3
+generic.menu.led.3.build.led=-DUSERLED=3
+generic.menu.led.4=4
+generic.menu.led.4.build.led=-DUSERLED=4
+generic.menu.led.5=5
+generic.menu.led.5.build.led=-DUSERLED=5
+generic.menu.led.6=6
+generic.menu.led.6.build.led=-DUSERLED=6
+generic.menu.led.7=7
+generic.menu.led.7.build.led=-DUSERLED=7
+generic.menu.led.8=8
+generic.menu.led.8.build.led=-DUSERLED=8
+generic.menu.led.9=9
+generic.menu.led.9.build.led=-DUSERLED=9
+generic.menu.led.10=10
+generic.menu.led.10.build.led=-DUSERLED=10
+generic.menu.led.11=11
+generic.menu.led.11.build.led=-DUSERLED=11
+generic.menu.led.12=12
+generic.menu.led.12.build.led=-DUSERLED=12
+generic.menu.led.13=13
+generic.menu.led.13.build.led=-DUSERLED=13
+generic.menu.led.14=14
+generic.menu.led.14.build.led=-DUSERLED=14
+generic.menu.led.15=15
+generic.menu.led.15.build.led=-DUSERLED=15
+generic.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+generic.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+generic.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+generic.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+generic.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+generic.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+generic.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+generic.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+generic.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 generic.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 generic.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-generic.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-generic.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-generic.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-generic.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+generic.menu.LwIPVariant.OpenSource=v1.4 Open Source
 generic.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 generic.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 generic.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -236,10 +270,12 @@ generic.menu.DebugLevel.UPDATER=UPDATER
 generic.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 generic.menu.DebugLevel.OTA=OTA
 generic.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-generic.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-generic.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-generic.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-generic.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+generic.menu.DebugLevel.OOM=OOM
+generic.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+generic.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+generic.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+generic.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+generic.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 generic.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 generic.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 generic.menu.UploadSpeed.115200=115200
@@ -349,16 +385,50 @@ esp8285.menu.FlashSize.1M512.upload.maximum_size=499696
 esp8285.menu.FlashSize.1M512.build.spiffs_start=0x7B000
 esp8285.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 esp8285.menu.FlashSize.1M512.build.spiffs_blocksize=8192
-esp8285.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-esp8285.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-esp8285.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-esp8285.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+esp8285.menu.led.2=2
+esp8285.menu.led.2.build.led=-DUSERLED=2
+esp8285.menu.led.0=0
+esp8285.menu.led.0.build.led=-DUSERLED=0
+esp8285.menu.led.1=1
+esp8285.menu.led.1.build.led=-DUSERLED=1
+esp8285.menu.led.3=3
+esp8285.menu.led.3.build.led=-DUSERLED=3
+esp8285.menu.led.4=4
+esp8285.menu.led.4.build.led=-DUSERLED=4
+esp8285.menu.led.5=5
+esp8285.menu.led.5.build.led=-DUSERLED=5
+esp8285.menu.led.6=6
+esp8285.menu.led.6.build.led=-DUSERLED=6
+esp8285.menu.led.7=7
+esp8285.menu.led.7.build.led=-DUSERLED=7
+esp8285.menu.led.8=8
+esp8285.menu.led.8.build.led=-DUSERLED=8
+esp8285.menu.led.9=9
+esp8285.menu.led.9.build.led=-DUSERLED=9
+esp8285.menu.led.10=10
+esp8285.menu.led.10.build.led=-DUSERLED=10
+esp8285.menu.led.11=11
+esp8285.menu.led.11.build.led=-DUSERLED=11
+esp8285.menu.led.12=12
+esp8285.menu.led.12.build.led=-DUSERLED=12
+esp8285.menu.led.13=13
+esp8285.menu.led.13.build.led=-DUSERLED=13
+esp8285.menu.led.14=14
+esp8285.menu.led.14.build.led=-DUSERLED=14
+esp8285.menu.led.15=15
+esp8285.menu.led.15.build.led=-DUSERLED=15
+esp8285.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+esp8285.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+esp8285.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+esp8285.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+esp8285.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+esp8285.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+esp8285.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+esp8285.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+esp8285.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 esp8285.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 esp8285.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-esp8285.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-esp8285.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-esp8285.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-esp8285.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+esp8285.menu.LwIPVariant.OpenSource=v1.4 Open Source
 esp8285.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 esp8285.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 esp8285.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -410,10 +480,12 @@ esp8285.menu.DebugLevel.UPDATER=UPDATER
 esp8285.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 esp8285.menu.DebugLevel.OTA=OTA
 esp8285.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-esp8285.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-esp8285.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-esp8285.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-esp8285.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+esp8285.menu.DebugLevel.OOM=OOM
+esp8285.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+esp8285.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+esp8285.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+esp8285.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+esp8285.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 esp8285.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 esp8285.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 esp8285.menu.UploadSpeed.115200=115200
@@ -480,16 +552,18 @@ espduino.menu.FlashSize.4M3M.upload.maximum_size=1044464
 espduino.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espduino.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espduino.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-espduino.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-espduino.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-espduino.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-espduino.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+espduino.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espduino.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+espduino.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+espduino.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+espduino.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espduino.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+espduino.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+espduino.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espduino.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 espduino.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espduino.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espduino.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-espduino.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-espduino.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-espduino.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+espduino.menu.LwIPVariant.OpenSource=v1.4 Open Source
 espduino.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espduino.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espduino.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -541,10 +615,12 @@ espduino.menu.DebugLevel.UPDATER=UPDATER
 espduino.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 espduino.menu.DebugLevel.OTA=OTA
 espduino.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-espduino.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espduino.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-espduino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espduino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+espduino.menu.DebugLevel.OOM=OOM
+espduino.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espduino.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espduino.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espduino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espduino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espduino.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espduino.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espduino.menu.UploadSpeed.115200=115200
@@ -567,7 +643,7 @@ espduino.menu.UploadSpeed.921600=921600
 espduino.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
-huzzah.name=Adafruit HUZZAH ESP8266
+huzzah.name=Adafruit Feather HUZZAH ESP8266
 huzzah.build.board=ESP8266_ESP12
 huzzah.build.variant=adafruit
 huzzah.upload.tool=esptool
@@ -603,16 +679,18 @@ huzzah.menu.FlashSize.4M3M.upload.maximum_size=1044464
 huzzah.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 huzzah.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 huzzah.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-huzzah.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-huzzah.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-huzzah.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-huzzah.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+huzzah.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+huzzah.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+huzzah.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+huzzah.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+huzzah.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+huzzah.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+huzzah.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+huzzah.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+huzzah.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 huzzah.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 huzzah.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-huzzah.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-huzzah.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-huzzah.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-huzzah.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+huzzah.menu.LwIPVariant.OpenSource=v1.4 Open Source
 huzzah.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 huzzah.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 huzzah.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -664,10 +742,12 @@ huzzah.menu.DebugLevel.UPDATER=UPDATER
 huzzah.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 huzzah.menu.DebugLevel.OTA=OTA
 huzzah.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-huzzah.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-huzzah.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-huzzah.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-huzzah.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+huzzah.menu.DebugLevel.OOM=OOM
+huzzah.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+huzzah.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+huzzah.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+huzzah.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+huzzah.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 huzzah.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 huzzah.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 huzzah.menu.UploadSpeed.115200=115200
@@ -729,16 +809,18 @@ espresso_lite_v1.menu.ResetMethod.ck=ck
 espresso_lite_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v1.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v1.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-espresso_lite_v1.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-espresso_lite_v1.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-espresso_lite_v1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+espresso_lite_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+espresso_lite_v1.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espresso_lite_v1.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+espresso_lite_v1.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espresso_lite_v1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 espresso_lite_v1.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espresso_lite_v1.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v1.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-espresso_lite_v1.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-espresso_lite_v1.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-espresso_lite_v1.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+espresso_lite_v1.menu.LwIPVariant.OpenSource=v1.4 Open Source
 espresso_lite_v1.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espresso_lite_v1.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espresso_lite_v1.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -790,10 +872,12 @@ espresso_lite_v1.menu.DebugLevel.UPDATER=UPDATER
 espresso_lite_v1.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 espresso_lite_v1.menu.DebugLevel.OTA=OTA
 espresso_lite_v1.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-espresso_lite_v1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espresso_lite_v1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-espresso_lite_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espresso_lite_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+espresso_lite_v1.menu.DebugLevel.OOM=OOM
+espresso_lite_v1.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espresso_lite_v1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espresso_lite_v1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espresso_lite_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espresso_lite_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espresso_lite_v1.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espresso_lite_v1.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espresso_lite_v1.menu.UploadSpeed.115200=115200
@@ -855,16 +939,18 @@ espresso_lite_v2.menu.ResetMethod.ck=ck
 espresso_lite_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v2.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v2.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-espresso_lite_v2.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-espresso_lite_v2.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-espresso_lite_v2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+espresso_lite_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+espresso_lite_v2.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espresso_lite_v2.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+espresso_lite_v2.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espresso_lite_v2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 espresso_lite_v2.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espresso_lite_v2.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v2.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-espresso_lite_v2.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-espresso_lite_v2.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-espresso_lite_v2.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+espresso_lite_v2.menu.LwIPVariant.OpenSource=v1.4 Open Source
 espresso_lite_v2.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espresso_lite_v2.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espresso_lite_v2.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -916,10 +1002,12 @@ espresso_lite_v2.menu.DebugLevel.UPDATER=UPDATER
 espresso_lite_v2.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 espresso_lite_v2.menu.DebugLevel.OTA=OTA
 espresso_lite_v2.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-espresso_lite_v2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espresso_lite_v2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-espresso_lite_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espresso_lite_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+espresso_lite_v2.menu.DebugLevel.OOM=OOM
+espresso_lite_v2.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espresso_lite_v2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espresso_lite_v2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espresso_lite_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espresso_lite_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espresso_lite_v2.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espresso_lite_v2.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espresso_lite_v2.menu.UploadSpeed.115200=115200
@@ -981,16 +1069,18 @@ phoenix_v1.menu.ResetMethod.ck=ck
 phoenix_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v1.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v1.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-phoenix_v1.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-phoenix_v1.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-phoenix_v1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+phoenix_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+phoenix_v1.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+phoenix_v1.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+phoenix_v1.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+phoenix_v1.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+phoenix_v1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 phoenix_v1.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 phoenix_v1.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v1.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-phoenix_v1.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-phoenix_v1.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-phoenix_v1.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+phoenix_v1.menu.LwIPVariant.OpenSource=v1.4 Open Source
 phoenix_v1.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 phoenix_v1.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 phoenix_v1.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1042,10 +1132,12 @@ phoenix_v1.menu.DebugLevel.UPDATER=UPDATER
 phoenix_v1.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 phoenix_v1.menu.DebugLevel.OTA=OTA
 phoenix_v1.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-phoenix_v1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-phoenix_v1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-phoenix_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-phoenix_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+phoenix_v1.menu.DebugLevel.OOM=OOM
+phoenix_v1.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+phoenix_v1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+phoenix_v1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+phoenix_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+phoenix_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 phoenix_v1.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 phoenix_v1.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 phoenix_v1.menu.UploadSpeed.115200=115200
@@ -1107,16 +1199,18 @@ phoenix_v2.menu.ResetMethod.ck=ck
 phoenix_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v2.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v2.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-phoenix_v2.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-phoenix_v2.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-phoenix_v2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+phoenix_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+phoenix_v2.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+phoenix_v2.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+phoenix_v2.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+phoenix_v2.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+phoenix_v2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 phoenix_v2.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 phoenix_v2.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v2.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-phoenix_v2.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-phoenix_v2.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-phoenix_v2.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+phoenix_v2.menu.LwIPVariant.OpenSource=v1.4 Open Source
 phoenix_v2.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 phoenix_v2.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 phoenix_v2.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1168,10 +1262,12 @@ phoenix_v2.menu.DebugLevel.UPDATER=UPDATER
 phoenix_v2.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 phoenix_v2.menu.DebugLevel.OTA=OTA
 phoenix_v2.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-phoenix_v2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-phoenix_v2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-phoenix_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-phoenix_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+phoenix_v2.menu.DebugLevel.OOM=OOM
+phoenix_v2.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+phoenix_v2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+phoenix_v2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+phoenix_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+phoenix_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 phoenix_v2.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 phoenix_v2.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 phoenix_v2.menu.UploadSpeed.115200=115200
@@ -1230,16 +1326,18 @@ nodemcu.menu.FlashSize.4M3M.upload.maximum_size=1044464
 nodemcu.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 nodemcu.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 nodemcu.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-nodemcu.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-nodemcu.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-nodemcu.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-nodemcu.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+nodemcu.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+nodemcu.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+nodemcu.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+nodemcu.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+nodemcu.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+nodemcu.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+nodemcu.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+nodemcu.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+nodemcu.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 nodemcu.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 nodemcu.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcu.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-nodemcu.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-nodemcu.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-nodemcu.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+nodemcu.menu.LwIPVariant.OpenSource=v1.4 Open Source
 nodemcu.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 nodemcu.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 nodemcu.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1291,10 +1389,12 @@ nodemcu.menu.DebugLevel.UPDATER=UPDATER
 nodemcu.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 nodemcu.menu.DebugLevel.OTA=OTA
 nodemcu.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-nodemcu.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-nodemcu.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-nodemcu.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-nodemcu.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+nodemcu.menu.DebugLevel.OOM=OOM
+nodemcu.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+nodemcu.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+nodemcu.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+nodemcu.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+nodemcu.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 nodemcu.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 nodemcu.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 nodemcu.menu.UploadSpeed.115200=115200
@@ -1353,16 +1453,18 @@ nodemcuv2.menu.FlashSize.4M3M.upload.maximum_size=1044464
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-nodemcuv2.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-nodemcuv2.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-nodemcuv2.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-nodemcuv2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+nodemcuv2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+nodemcuv2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+nodemcuv2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+nodemcuv2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+nodemcuv2.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+nodemcuv2.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+nodemcuv2.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+nodemcuv2.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+nodemcuv2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 nodemcuv2.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 nodemcuv2.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcuv2.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-nodemcuv2.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-nodemcuv2.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-nodemcuv2.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+nodemcuv2.menu.LwIPVariant.OpenSource=v1.4 Open Source
 nodemcuv2.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 nodemcuv2.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 nodemcuv2.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1414,10 +1516,12 @@ nodemcuv2.menu.DebugLevel.UPDATER=UPDATER
 nodemcuv2.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 nodemcuv2.menu.DebugLevel.OTA=OTA
 nodemcuv2.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-nodemcuv2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-nodemcuv2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-nodemcuv2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-nodemcuv2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+nodemcuv2.menu.DebugLevel.OOM=OOM
+nodemcuv2.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+nodemcuv2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+nodemcuv2.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+nodemcuv2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+nodemcuv2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 nodemcuv2.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 nodemcuv2.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 nodemcuv2.menu.UploadSpeed.115200=115200
@@ -1468,16 +1572,18 @@ modwifi.menu.FlashSize.2M.upload.maximum_size=1044464
 modwifi.menu.FlashSize.2M.build.spiffs_start=0x100000
 modwifi.menu.FlashSize.2M.build.spiffs_end=0x1FB000
 modwifi.menu.FlashSize.2M.build.spiffs_blocksize=8192
-modwifi.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-modwifi.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-modwifi.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-modwifi.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+modwifi.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+modwifi.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+modwifi.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+modwifi.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+modwifi.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+modwifi.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+modwifi.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+modwifi.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+modwifi.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 modwifi.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 modwifi.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-modwifi.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-modwifi.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-modwifi.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-modwifi.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+modwifi.menu.LwIPVariant.OpenSource=v1.4 Open Source
 modwifi.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 modwifi.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 modwifi.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1529,10 +1635,12 @@ modwifi.menu.DebugLevel.UPDATER=UPDATER
 modwifi.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 modwifi.menu.DebugLevel.OTA=OTA
 modwifi.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-modwifi.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-modwifi.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-modwifi.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-modwifi.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+modwifi.menu.DebugLevel.OOM=OOM
+modwifi.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+modwifi.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+modwifi.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+modwifi.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+modwifi.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 modwifi.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 modwifi.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 modwifi.menu.UploadSpeed.115200=115200
@@ -1596,16 +1704,18 @@ thing.menu.FlashSize.512K128.upload.maximum_size=368624
 thing.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 thing.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 thing.menu.FlashSize.512K128.build.spiffs_blocksize=4096
-thing.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-thing.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-thing.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-thing.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+thing.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+thing.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+thing.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+thing.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+thing.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+thing.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+thing.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+thing.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+thing.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 thing.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 thing.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-thing.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-thing.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-thing.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-thing.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+thing.menu.LwIPVariant.OpenSource=v1.4 Open Source
 thing.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 thing.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 thing.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1657,10 +1767,12 @@ thing.menu.DebugLevel.UPDATER=UPDATER
 thing.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 thing.menu.DebugLevel.OTA=OTA
 thing.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-thing.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-thing.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-thing.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-thing.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+thing.menu.DebugLevel.OOM=OOM
+thing.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+thing.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+thing.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+thing.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+thing.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 thing.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 thing.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 thing.menu.UploadSpeed.115200=115200
@@ -1724,16 +1836,18 @@ thingdev.menu.FlashSize.512K128.upload.maximum_size=368624
 thingdev.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 thingdev.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 thingdev.menu.FlashSize.512K128.build.spiffs_blocksize=4096
-thingdev.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-thingdev.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-thingdev.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-thingdev.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+thingdev.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+thingdev.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+thingdev.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+thingdev.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+thingdev.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+thingdev.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+thingdev.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+thingdev.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+thingdev.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 thingdev.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 thingdev.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-thingdev.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-thingdev.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-thingdev.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-thingdev.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+thingdev.menu.LwIPVariant.OpenSource=v1.4 Open Source
 thingdev.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 thingdev.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 thingdev.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1785,10 +1899,12 @@ thingdev.menu.DebugLevel.UPDATER=UPDATER
 thingdev.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 thingdev.menu.DebugLevel.OTA=OTA
 thingdev.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-thingdev.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-thingdev.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-thingdev.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-thingdev.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+thingdev.menu.DebugLevel.OOM=OOM
+thingdev.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+thingdev.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+thingdev.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+thingdev.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+thingdev.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 thingdev.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 thingdev.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 thingdev.menu.UploadSpeed.115200=115200
@@ -1847,16 +1963,18 @@ esp210.menu.FlashSize.4M3M.upload.maximum_size=1044464
 esp210.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 esp210.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 esp210.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-esp210.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-esp210.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-esp210.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-esp210.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+esp210.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+esp210.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+esp210.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+esp210.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+esp210.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+esp210.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+esp210.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+esp210.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+esp210.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 esp210.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 esp210.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-esp210.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-esp210.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-esp210.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-esp210.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+esp210.menu.LwIPVariant.OpenSource=v1.4 Open Source
 esp210.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 esp210.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 esp210.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1908,10 +2026,12 @@ esp210.menu.DebugLevel.UPDATER=UPDATER
 esp210.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 esp210.menu.DebugLevel.OTA=OTA
 esp210.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-esp210.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-esp210.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-esp210.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-esp210.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+esp210.menu.DebugLevel.OOM=OOM
+esp210.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+esp210.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+esp210.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+esp210.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+esp210.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 esp210.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 esp210.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 esp210.menu.UploadSpeed.57600=57600
@@ -1970,16 +2090,18 @@ d1_mini.menu.FlashSize.4M3M.upload.maximum_size=1044464
 d1_mini.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 d1_mini.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 d1_mini.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-d1_mini.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-d1_mini.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-d1_mini.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-d1_mini.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+d1_mini.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1_mini.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+d1_mini.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+d1_mini.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+d1_mini.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1_mini.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+d1_mini.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+d1_mini.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1_mini.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 d1_mini.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1_mini.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-d1_mini.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-d1_mini.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-d1_mini.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+d1_mini.menu.LwIPVariant.OpenSource=v1.4 Open Source
 d1_mini.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1_mini.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1_mini.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2031,10 +2153,12 @@ d1_mini.menu.DebugLevel.UPDATER=UPDATER
 d1_mini.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 d1_mini.menu.DebugLevel.OTA=OTA
 d1_mini.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-d1_mini.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-d1_mini.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-d1_mini.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-d1_mini.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+d1_mini.menu.DebugLevel.OOM=OOM
+d1_mini.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+d1_mini.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+d1_mini.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+d1_mini.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+d1_mini.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 d1_mini.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1_mini.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 d1_mini.menu.UploadSpeed.921600=921600
@@ -2085,16 +2209,18 @@ d1_mini_pro.menu.FlashSize.16M15M.upload.maximum_size=1044464
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_start=0x100000
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_end=0xFFB000
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_blocksize=8192
-d1_mini_pro.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-d1_mini_pro.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-d1_mini_pro.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-d1_mini_pro.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+d1_mini_pro.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1_mini_pro.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+d1_mini_pro.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+d1_mini_pro.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+d1_mini_pro.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1_mini_pro.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+d1_mini_pro.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+d1_mini_pro.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1_mini_pro.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 d1_mini_pro.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1_mini_pro.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_pro.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-d1_mini_pro.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-d1_mini_pro.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-d1_mini_pro.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+d1_mini_pro.menu.LwIPVariant.OpenSource=v1.4 Open Source
 d1_mini_pro.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1_mini_pro.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1_mini_pro.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2146,10 +2272,12 @@ d1_mini_pro.menu.DebugLevel.UPDATER=UPDATER
 d1_mini_pro.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 d1_mini_pro.menu.DebugLevel.OTA=OTA
 d1_mini_pro.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-d1_mini_pro.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-d1_mini_pro.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-d1_mini_pro.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-d1_mini_pro.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+d1_mini_pro.menu.DebugLevel.OOM=OOM
+d1_mini_pro.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+d1_mini_pro.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+d1_mini_pro.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+d1_mini_pro.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+d1_mini_pro.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 d1_mini_pro.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1_mini_pro.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 d1_mini_pro.menu.UploadSpeed.921600=921600
@@ -2172,7 +2300,7 @@ d1_mini_pro.menu.UploadSpeed.512000.windows=512000
 d1_mini_pro.menu.UploadSpeed.512000.upload.speed=512000
 
 ##############################################################
-d1_mini_lite.name=Wemos D1 mini Lite
+d1_mini_lite.name=WeMos D1 mini Lite
 d1_mini_lite.build.board=ESP8266_WEMOS_D1MINILITE
 d1_mini_lite.build.variant=d1_mini
 d1_mini_lite.upload.tool=esptool
@@ -2253,16 +2381,18 @@ d1_mini_lite.menu.FlashSize.1M512.upload.maximum_size=499696
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_start=0x7B000
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_blocksize=8192
-d1_mini_lite.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-d1_mini_lite.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-d1_mini_lite.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-d1_mini_lite.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+d1_mini_lite.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1_mini_lite.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+d1_mini_lite.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+d1_mini_lite.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+d1_mini_lite.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1_mini_lite.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+d1_mini_lite.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+d1_mini_lite.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1_mini_lite.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 d1_mini_lite.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1_mini_lite.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_lite.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-d1_mini_lite.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-d1_mini_lite.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-d1_mini_lite.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+d1_mini_lite.menu.LwIPVariant.OpenSource=v1.4 Open Source
 d1_mini_lite.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1_mini_lite.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1_mini_lite.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2314,10 +2444,12 @@ d1_mini_lite.menu.DebugLevel.UPDATER=UPDATER
 d1_mini_lite.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 d1_mini_lite.menu.DebugLevel.OTA=OTA
 d1_mini_lite.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-d1_mini_lite.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-d1_mini_lite.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-d1_mini_lite.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-d1_mini_lite.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+d1_mini_lite.menu.DebugLevel.OOM=OOM
+d1_mini_lite.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+d1_mini_lite.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+d1_mini_lite.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+d1_mini_lite.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+d1_mini_lite.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 d1_mini_lite.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1_mini_lite.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 d1_mini_lite.menu.UploadSpeed.921600=921600
@@ -2376,16 +2508,18 @@ d1.menu.FlashSize.4M3M.upload.maximum_size=1044464
 d1.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 d1.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 d1.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-d1.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-d1.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-d1.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-d1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+d1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+d1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+d1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+d1.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+d1.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+d1.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 d1.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-d1.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-d1.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-d1.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+d1.menu.LwIPVariant.OpenSource=v1.4 Open Source
 d1.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2437,10 +2571,12 @@ d1.menu.DebugLevel.UPDATER=UPDATER
 d1.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 d1.menu.DebugLevel.OTA=OTA
 d1.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-d1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-d1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-d1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-d1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+d1.menu.DebugLevel.OOM=OOM
+d1.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+d1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+d1.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+d1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+d1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 d1.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 d1.menu.UploadSpeed.921600=921600
@@ -2502,16 +2638,18 @@ espino.menu.FlashSize.4M3M.upload.maximum_size=1044464
 espino.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espino.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espino.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-espino.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-espino.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-espino.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-espino.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+espino.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espino.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+espino.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+espino.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+espino.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espino.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+espino.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+espino.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espino.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 espino.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espino.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espino.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-espino.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-espino.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-espino.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+espino.menu.LwIPVariant.OpenSource=v1.4 Open Source
 espino.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espino.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espino.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2563,10 +2701,12 @@ espino.menu.DebugLevel.UPDATER=UPDATER
 espino.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 espino.menu.DebugLevel.OTA=OTA
 espino.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-espino.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espino.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-espino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+espino.menu.DebugLevel.OOM=OOM
+espino.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espino.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espino.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espino.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espino.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espino.menu.UploadSpeed.115200=115200
@@ -2625,16 +2765,18 @@ espinotee.menu.FlashSize.4M3M.upload.maximum_size=1044464
 espinotee.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espinotee.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espinotee.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-espinotee.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-espinotee.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-espinotee.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-espinotee.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+espinotee.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espinotee.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+espinotee.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+espinotee.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+espinotee.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espinotee.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+espinotee.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+espinotee.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espinotee.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 espinotee.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espinotee.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espinotee.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-espinotee.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-espinotee.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-espinotee.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+espinotee.menu.LwIPVariant.OpenSource=v1.4 Open Source
 espinotee.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espinotee.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espinotee.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2686,10 +2828,12 @@ espinotee.menu.DebugLevel.UPDATER=UPDATER
 espinotee.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 espinotee.menu.DebugLevel.OTA=OTA
 espinotee.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-espinotee.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espinotee.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-espinotee.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-espinotee.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+espinotee.menu.DebugLevel.OOM=OOM
+espinotee.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espinotee.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espinotee.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+espinotee.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espinotee.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espinotee.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espinotee.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espinotee.menu.UploadSpeed.115200=115200
@@ -2746,6 +2890,7 @@ wifinfo.menu.CpuFrequency.80=80 MHz
 wifinfo.menu.CpuFrequency.80.build.f_cpu=80000000L
 wifinfo.menu.CpuFrequency.160=160 MHz
 wifinfo.menu.CpuFrequency.160.build.f_cpu=160000000L
+wifinfo.upload.resetmethod=nodemcu
 wifinfo.build.flash_mode=qio
 wifinfo.menu.FlashFreq.40=40MHz
 wifinfo.menu.FlashFreq.40.build.flash_freq=40
@@ -2812,16 +2957,18 @@ wifinfo.menu.FlashSize.1M512.upload.maximum_size=499696
 wifinfo.menu.FlashSize.1M512.build.spiffs_start=0x7B000
 wifinfo.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 wifinfo.menu.FlashSize.1M512.build.spiffs_blocksize=8192
-wifinfo.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-wifinfo.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-wifinfo.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-wifinfo.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+wifinfo.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+wifinfo.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+wifinfo.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+wifinfo.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+wifinfo.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+wifinfo.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+wifinfo.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+wifinfo.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+wifinfo.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 wifinfo.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 wifinfo.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-wifinfo.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-wifinfo.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-wifinfo.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-wifinfo.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+wifinfo.menu.LwIPVariant.OpenSource=v1.4 Open Source
 wifinfo.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 wifinfo.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 wifinfo.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2873,10 +3020,12 @@ wifinfo.menu.DebugLevel.UPDATER=UPDATER
 wifinfo.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 wifinfo.menu.DebugLevel.OTA=OTA
 wifinfo.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-wifinfo.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-wifinfo.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-wifinfo.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-wifinfo.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+wifinfo.menu.DebugLevel.OOM=OOM
+wifinfo.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+wifinfo.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+wifinfo.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+wifinfo.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+wifinfo.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 wifinfo.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 wifinfo.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 wifinfo.menu.UploadSpeed.115200=115200
@@ -2928,6 +3077,7 @@ arduino-esp8266.menu.CpuFrequency.80=80 MHz
 arduino-esp8266.menu.CpuFrequency.80.build.f_cpu=80000000L
 arduino-esp8266.menu.CpuFrequency.160=160 MHz
 arduino-esp8266.menu.CpuFrequency.160.build.f_cpu=160000000L
+arduino-esp8266.upload.resetmethod=ck
 arduino-esp8266.build.flash_mode=qio
 arduino-esp8266.build.flash_freq=40
 arduino-esp8266.menu.FlashSize.4M1M=4M (1M SPIFFS)
@@ -2946,16 +3096,18 @@ arduino-esp8266.menu.FlashSize.4M3M.upload.maximum_size=1044464
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-arduino-esp8266.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-arduino-esp8266.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-arduino-esp8266.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-arduino-esp8266.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+arduino-esp8266.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+arduino-esp8266.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+arduino-esp8266.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+arduino-esp8266.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+arduino-esp8266.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+arduino-esp8266.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+arduino-esp8266.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+arduino-esp8266.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+arduino-esp8266.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 arduino-esp8266.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 arduino-esp8266.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-arduino-esp8266.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-arduino-esp8266.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-arduino-esp8266.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-arduino-esp8266.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+arduino-esp8266.menu.LwIPVariant.OpenSource=v1.4 Open Source
 arduino-esp8266.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 arduino-esp8266.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 arduino-esp8266.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3007,10 +3159,12 @@ arduino-esp8266.menu.DebugLevel.UPDATER=UPDATER
 arduino-esp8266.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 arduino-esp8266.menu.DebugLevel.OTA=OTA
 arduino-esp8266.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-arduino-esp8266.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-arduino-esp8266.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-arduino-esp8266.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-arduino-esp8266.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+arduino-esp8266.menu.DebugLevel.OOM=OOM
+arduino-esp8266.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+arduino-esp8266.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+arduino-esp8266.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+arduino-esp8266.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+arduino-esp8266.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 arduino-esp8266.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 arduino-esp8266.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 arduino-esp8266.menu.UploadSpeed.115200=115200
@@ -3051,6 +3205,7 @@ gen4iod.menu.CpuFrequency.80=80 MHz
 gen4iod.menu.CpuFrequency.80.build.f_cpu=80000000L
 gen4iod.menu.CpuFrequency.160=160 MHz
 gen4iod.menu.CpuFrequency.160.build.f_cpu=160000000L
+gen4iod.upload.resetmethod=nodemcu
 gen4iod.build.flash_mode=qio
 gen4iod.build.flash_freq=80
 gen4iod.menu.FlashSize.512K0=512K (no SPIFFS)
@@ -3074,16 +3229,18 @@ gen4iod.menu.FlashSize.512K128.upload.maximum_size=368624
 gen4iod.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 gen4iod.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 gen4iod.menu.FlashSize.512K128.build.spiffs_blocksize=4096
-gen4iod.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-gen4iod.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-gen4iod.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-gen4iod.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+gen4iod.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+gen4iod.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+gen4iod.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+gen4iod.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+gen4iod.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+gen4iod.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+gen4iod.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+gen4iod.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+gen4iod.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 gen4iod.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 gen4iod.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-gen4iod.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-gen4iod.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-gen4iod.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-gen4iod.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+gen4iod.menu.LwIPVariant.OpenSource=v1.4 Open Source
 gen4iod.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 gen4iod.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 gen4iod.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3135,10 +3292,12 @@ gen4iod.menu.DebugLevel.UPDATER=UPDATER
 gen4iod.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 gen4iod.menu.DebugLevel.OTA=OTA
 gen4iod.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-gen4iod.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-gen4iod.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-gen4iod.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-gen4iod.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+gen4iod.menu.DebugLevel.OOM=OOM
+gen4iod.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+gen4iod.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+gen4iod.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+gen4iod.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+gen4iod.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 gen4iod.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 gen4iod.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 gen4iod.menu.UploadSpeed.115200=115200
@@ -3161,7 +3320,7 @@ gen4iod.menu.UploadSpeed.921600=921600
 gen4iod.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
-oak.name=DigiStump Oak
+oak.name=Digistump Oak
 oak.build.board=ESP8266_OAK
 oak.build.variant=oak
 oak.upload.maximum_size=1040368
@@ -3179,6 +3338,7 @@ oak.menu.CpuFrequency.80=80 MHz
 oak.menu.CpuFrequency.80.build.f_cpu=80000000L
 oak.menu.CpuFrequency.160=160 MHz
 oak.menu.CpuFrequency.160.build.f_cpu=160000000L
+oak.upload.resetmethod=none
 oak.build.flash_mode=dio
 oak.build.flash_freq=40
 oak.menu.FlashSize.4M1M=4M (1M SPIFFS)
@@ -3197,16 +3357,18 @@ oak.menu.FlashSize.4M3M.upload.maximum_size=1044464
 oak.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 oak.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 oak.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-oak.menu.LwIPVariant.open=v2 Prebuilt (gcc)
-oak.menu.LwIPVariant.open.build.lwip_include=lwip2/include
-oak.menu.LwIPVariant.open.build.lwip_lib=-llwip2
-oak.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt (gcc)
+oak.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+oak.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
+oak.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
+oak.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
+oak.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+oak.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
+oak.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
+oak.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+oak.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
 oak.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 oak.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-oak.menu.LwIPVariant.Espressif=v1.4 Espressif (xcc)
-oak.menu.LwIPVariant.Espressif.build.lwip_lib=-llwip
-oak.menu.LwIPVariant.Espressif.build.lwip_flags=-DLWIP_MAYBE_XCC
-oak.menu.LwIPVariant.OpenSource=v1.4 Open Source (gcc)
+oak.menu.LwIPVariant.OpenSource=v1.4 Open Source
 oak.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 oak.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 oak.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3258,10 +3420,12 @@ oak.menu.DebugLevel.UPDATER=UPDATER
 oak.menu.DebugLevel.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
 oak.menu.DebugLevel.OTA=OTA
 oak.menu.DebugLevel.OTA.build.debug_level= -DDEBUG_ESP_OTA
-oak.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-oak.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
-oak.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA
-oak.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA
+oak.menu.DebugLevel.OOM=OOM
+oak.menu.DebugLevel.OOM.build.debug_level= -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+oak.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+oak.menu.DebugLevel.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
+oak.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+oak.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 oak.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 oak.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 oak.menu.UploadSpeed.921600=921600
