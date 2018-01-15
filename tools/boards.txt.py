@@ -702,7 +702,7 @@ boards = collections.OrderedDict([
             '4M',
             ],
         'serial': '921',
-        'desc': [ 'The Oak requires an [adapter](#serial-adapter) for a serial connection or flashing; its micro USB port is only for power.',
+        'desc': [ 'The Oak requires an `Serial Adapter`_ for a serial connection or flashing; its micro USB port is only for power.',
                   '',
                   'To make a serial connection, wire the adapter\'s **TX to P3**, **RX to P4**, and **GND** to **GND**.  Supply 3.3v from the serial adapter if not already powered via USB.',
                   '',
