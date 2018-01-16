@@ -223,18 +223,26 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
 bool UpdaterClass::_writeBuffer(){
 
-  bool result = true;
+  bool eraseResult = true;
+  bool writeResult = true;
   if (_currentAddress % FLASH_SECTOR_SIZE == 0) {
     if(!_async) yield();
-    result = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
+    eraseResult = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
   }
   
-  if (result) {
+  if (eraseResult) {
     if(!_async) yield();
-    result = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+    writeResult = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+  } else { // if erase was not successful
+    _error = UPDATE_ERROR_ERASE;
+    _currentAddress = (_startAddress + _size);
+    #ifdef DEBUG_UPDATER
+    printError(DEBUG_UPDATER);
+#endif
+    return false;
   }
 
-  if (!result) {
+  if (!writeResult) {
     _error = UPDATE_ERROR_WRITE;
     _currentAddress = (_startAddress + _size);
 #ifdef DEBUG_UPDATER
