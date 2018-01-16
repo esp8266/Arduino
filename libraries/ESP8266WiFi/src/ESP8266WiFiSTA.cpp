@@ -26,7 +26,6 @@
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiSTA.h"
 
-extern "C" {
 #include "c_types.h"
 #include "ets_sys.h"
 #include "os_type.h"
@@ -34,6 +33,8 @@ extern "C" {
 #include "mem.h"
 #include "user_interface.h"
 #include "smartconfig.h"
+
+extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
 #include "lwip/init.h" // LWIP_VERSION_
@@ -62,7 +63,8 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
         return false;
     }
 
-    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0) {
+    //in case of password, use strncmp with size 64 to cover 64byte psk case (no null term)
+    if(strncmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password), sizeof(lhs.password)) != 0) {
         return false;
     }
 
@@ -116,7 +118,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
 
     if(passphrase) {
-        if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK
+        if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
             memcpy(reinterpret_cast<char*>(conf.password), passphrase, 64);
         else
             strcpy(reinterpret_cast<char*>(conf.password), passphrase);
@@ -514,7 +516,10 @@ String ESP8266WiFiSTAClass::SSID() const {
 String ESP8266WiFiSTAClass::psk() const {
     struct station_config conf;
     wifi_station_get_config(&conf);
-    return String(reinterpret_cast<char*>(conf.password));
+    char tmp[65]; //psk is 64 bytes hex => plus null term
+    memcpy(tmp, conf.password, sizeof(conf.password));
+    tmp[64] = 0; //null term in case of 64 byte psk
+    return String(reinterpret_cast<char*>(tmp));
 }
 
 /**
