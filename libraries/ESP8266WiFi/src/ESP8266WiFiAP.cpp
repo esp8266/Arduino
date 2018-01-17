@@ -341,15 +341,25 @@ String ESP8266WiFiAPClass::softAPmacAddress(void) {
 String ESP8266WiFiAPClass::softAPSSID() const {
 	struct softap_config config;
 	wifi_softap_get_config(&config);
-	return String(reinterpret_cast<char*>(config.ssid));
+	char* name = reinterpret_cast<char*>(config.ssid);
+	char ssid[sizeof(config.ssid) + 1];
+	memcpy(ssid, name, sizeof(config.ssid));
+	ssid[sizeof(config.ssid)] = '\0';
+
+	return String(ssid);
 }
 
 /**
-* Get the configurd(Not-In-Flash) softAP PSK or PASSWORD.
+* Get the configured(Not-In-Flash) softAP PSK or PASSWORD.
 * @return String psk.
 */
 String ESP8266WiFiAPClass::softAPPSK() const {
 	struct softap_config config;
 	wifi_softap_get_config(&config);
-	return String(reinterpret_cast<char*>(config.password));
+	char* pass = reinterpret_cast<char*>(config.password);
+	char psk[sizeof(config.password) + 1];
+	memcpy(psk, pass, sizeof(config.password));
+	psk[sizeof(config.password)] = '\0';
+
+	return String(psk);
 }
