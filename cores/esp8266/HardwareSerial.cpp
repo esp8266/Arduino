@@ -180,5 +180,10 @@ HardwareSerial::operator bool() const
 }
 
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
 HardwareSerial Serial(UART0);
+#endif
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL1)
 HardwareSerial Serial1(UART1);
+#endif
+
