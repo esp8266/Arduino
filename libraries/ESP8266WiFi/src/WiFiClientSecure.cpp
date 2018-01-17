@@ -27,6 +27,7 @@ extern "C"
 #include "osapi.h"
 #include "ets_sys.h"
 }
+#include <list>
 #include <errno.h>
 #include "debug.h"
 #include "ESP8266WiFi.h"
@@ -50,6 +51,26 @@ extern "C"
 #define SSL_DEBUG_OPTS 0
 #endif
 
+
+typedef struct BufferItem
+{
+    BufferItem(const uint8_t* data_, size_t size_)
+    : size(size_), data(new uint8_t[size])
+    {
+        if (data.get() != nullptr) {
+            memcpy(data.get(), data_, size);
+        } else {
+            DEBUGV(":wcs alloc %d failed\r\n", size_);
+            size = 0;
+        }
+    }
+
+    size_t size;
+    std::unique_ptr<uint8_t[]> data;
+} BufferItem;
+
+typedef std::list<BufferItem> BufferList;
+
 class SSLContext
 {
 public:
@@ -72,8 +93,6 @@ public:
         if (_ssl_ctx_refcnt == 0) {
             ssl_ctx_free(_ssl_ctx);
         }
-
-        s_io_ctx = nullptr;
     }
 
     void ref()
@@ -92,18 +111,17 @@ public:
     {
         SSL_EXTENSIONS* ext = ssl_ext_new();
         ssl_ext_set_host_name(ext, hostName);
-        ssl_ext_set_max_fragment_size(ext, 4096);
         if (_ssl) {
             /* Creating a new TLS session on top of a new TCP connection.
                ssl_free will want to send a close notify alert, but the old TCP connection
-               is already gone at this point, so reset s_io_ctx. */
-            s_io_ctx = nullptr;
+               is already gone at this point, so reset io_ctx. */
+            io_ctx = nullptr;
             ssl_free(_ssl);
             _available = 0;
             _read_ptr = nullptr;
         }
-        s_io_ctx = ctx;
-        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, ext);
+        io_ctx = ctx;
+        _ssl = ssl_client_new(_ssl_ctx, reinterpret_cast<int>(this), nullptr, 0, ext);
         uint32_t t = millis();
 
         while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
@@ -116,14 +134,32 @@ public:
         }
     }
 
+    void connectServer(ClientContext *ctx) {
+        io_ctx = ctx;
+	_ssl = ssl_server_new(_ssl_ctx, reinterpret_cast<int>(this));
+        _isServer = true;
+
+	uint32_t timeout_ms = 5000;
+        uint32_t t = millis();
+
+        while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
+            uint8_t* data;
+            int rc = ssl_read(_ssl, &data);
+            if (rc < SSL_OK) {
+                break;
+            }
+        }
+    }
+
     void stop()
     {
-        s_io_ctx = nullptr;
+        io_ctx = nullptr;
     }
 
     bool connected()
     {
-        return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
+        if (_isServer) return _ssl != nullptr;
+        else return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
     }
 
     int read(uint8_t* dst, size_t size)
@@ -139,6 +175,10 @@ public:
         _available -= will_copy;
         if (_available == 0) {
             _read_ptr = nullptr;
+            /* Send pending outgoing data, if any */
+            if (_hasWriteBuffers()) {
+                _writeBuffersSend();
+            }
         }
         return will_copy;
     }
@@ -155,8 +195,34 @@ public:
         --_available;
         if (_available == 0) {
             _read_ptr = nullptr;
+            /* Send pending outgoing data, if any */
+            if (_hasWriteBuffers()) {
+                _writeBuffersSend();
+            }
         }
         return result;
+    }
+
+    int write(const uint8_t* src, size_t size)
+    {
+        if (_isServer) {
+            return _write(src, size);
+        } else if (!_available) {
+            if (_hasWriteBuffers()) {
+                int rc = _writeBuffersSend();
+                if (rc < 0) {
+                    return rc;
+                }
+            }
+            return _write(src, size);
+        }
+        /* Some received data is still present in the axtls fragment buffer.
+           We can't call ssl_write now, as that will overwrite the contents of
+           the fragment buffer, corrupting the received data.
+           Save a copy of the outgoing data, and call ssl_write when all
+           recevied data has been consumed by the application.
+        */
+        return _writeBufferAdd(src, size);
     }
 
     int peek()
@@ -191,6 +257,12 @@ public:
             optimistic_yield(100);
         }
         return cb;
+    }
+
+    // similar to available, but doesn't return exact size
+    bool hasData()
+    {
+        return _available > 0 || (io_ctx && io_ctx->getSize() > 0);
     }
 
     bool loadObject(int type, Stream& stream, size_t size)
@@ -254,8 +326,15 @@ public:
 
     static ClientContext* getIOContext(int fd)
     {
-        (void) fd;
-        return s_io_ctx;
+        return reinterpret_cast<SSLContext*>(fd)->io_ctx;
+    }
+
+    int loadServerX509Cert(const uint8_t *cert, int len) {
+        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_X509_CERT, cert, len, NULL);
+    }
+
+    int loadServerRSAKey(const uint8_t *rsakey, int len) {
+        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_RSA_KEY, rsakey, len, NULL);
     }
 
 protected:
@@ -282,22 +361,75 @@ protected:
         return _available;
     }
 
+    int _write(const uint8_t* src, size_t size)
+    {
+        if (!_ssl) {
+            return 0;
+        }
+
+        int rc = ssl_write(_ssl, src, size);
+        if (rc >= 0) {
+            return rc;
+        }
+        DEBUGV(":wcs write rc=%d\r\n", rc);
+        return rc;
+    }
+
+    int _writeBufferAdd(const uint8_t* data, size_t size)
+    {
+        if (!_ssl) {
+            return 0;
+        }
+
+        _writeBuffers.emplace_back(data, size);
+        if (_writeBuffers.back().data.get() == nullptr) {
+            _writeBuffers.pop_back();
+            return 0;
+        }
+        return size;
+    }
+
+    int _writeBuffersSend()
+    {
+        while (!_writeBuffers.empty()) {
+            auto& first = _writeBuffers.front();
+            int rc = _write(first.data.get(), first.size);
+            _writeBuffers.pop_front();
+            if (rc < 0) {
+                if (_hasWriteBuffers()) {
+                    DEBUGV(":wcs _writeBuffersSend dropping unsent data\r\n");
+                    _writeBuffers.clear();
+                }
+                return rc;
+            }
+        }
+        return 0;
+    }
+
+    bool _hasWriteBuffers()
+    {
+        return !_writeBuffers.empty();
+    }
+
+    bool _isServer = false;
     static SSL_CTX* _ssl_ctx;
     static int _ssl_ctx_refcnt;
     SSL* _ssl = nullptr;
     int _refcnt = 0;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
+    BufferList _writeBuffers;
     bool _allowSelfSignedCerts = false;
-    static ClientContext* s_io_ctx;
+    ClientContext* io_ctx = nullptr;
 };
 
 SSL_CTX* SSLContext::_ssl_ctx = nullptr;
 int SSLContext::_ssl_ctx_refcnt = 0;
-ClientContext* SSLContext::s_io_ctx = nullptr;
 
 WiFiClientSecure::WiFiClientSecure()
 {
+    // TLS handshake may take more than the 5 second default timeout
+    _timeout = 15000;
 }
 
 WiFiClientSecure::~WiFiClientSecure()
@@ -326,6 +458,42 @@ WiFiClientSecure& WiFiClientSecure::operator=(const WiFiClientSecure& rhs)
     return *this;
 }
 
+// Only called by the WifiServerSecure, need to get the keys/certs loaded before beginning
+WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM, const uint8_t *rsakey, int rsakeyLen, const uint8_t *cert, int certLen)
+{
+    _client = client;
+    if (_ssl) {
+        _ssl->unref();
+        _ssl = nullptr;
+    }
+
+    _ssl = new SSLContext;
+    _ssl->ref();
+
+    if (usePMEM) {
+        // When using PMEM based certs, allocate stack and copy from flash to DRAM, call SSL functions to avoid
+        // heap fragmentation that would happen w/malloc()
+        uint8_t *stackData = (uint8_t*)alloca(max(certLen, rsakeyLen));
+        if (rsakey && rsakeyLen) {
+              memcpy_P(stackData, rsakey, rsakeyLen);
+              _ssl->loadServerRSAKey(stackData, rsakeyLen);
+        }
+        if (cert && certLen) {
+            memcpy_P(stackData, cert, certLen);
+            _ssl->loadServerX509Cert(stackData, certLen);
+        }
+    } else {
+        if (rsakey && rsakeyLen) {
+            _ssl->loadServerRSAKey(rsakey, rsakeyLen);
+        }
+        if (cert && certLen) {
+            _ssl->loadServerX509Cert(cert, certLen);
+        }
+    }
+    _client->ref();
+    _ssl->connectServer(client);
+}
+
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port)
 {
     if (!WiFiClient::connect(ip, port)) {
@@ -347,13 +515,18 @@ int WiFiClientSecure::connect(const char* name, uint16_t port)
     return _connectSSL(name);
 }
 
+int WiFiClientSecure::connect(const String host, uint16_t port)
+{
+    return connect(host.c_str(), port);
+}
+
 int WiFiClientSecure::_connectSSL(const char* hostName)
 {
     if (!_ssl) {
         _ssl = new SSLContext;
         _ssl->ref();
     }
-    _ssl->connect(_client, hostName, 5000);
+    _ssl->connect(_client, hostName, _timeout);
 
     auto status = ssl_handshake_status(*_ssl);
     if (status != SSL_OK) {
@@ -371,7 +544,7 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
         return 0;
     }
 
-    int rc = ssl_write(*_ssl, buf, size);
+    int rc = _ssl->write(buf, size);
     if (rc >= 0) {
         return rc;
     }
@@ -382,6 +555,14 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
     }
 
     return 0;
+}
+
+size_t WiFiClientSecure::write_P(PGM_P buf, size_t size)
+{
+    // Copy to RAM and call normal send. alloca() auto-frees on return
+    uint8_t *copy = (uint8_t*)alloca(size);
+    memcpy_P(copy, buf, size);
+    return write(copy, size);
 }
 
 int WiFiClientSecure::read(uint8_t *buf, size_t size)
@@ -458,7 +639,7 @@ err     x       N           N
 uint8_t WiFiClientSecure::connected()
 {
     if (_ssl) {
-        if (_ssl->available()) {
+        if (_ssl->hasData()) {
             return true;
         }
         if (_client && _client->state() == ESTABLISHED && _ssl->connected()) {
@@ -472,6 +653,8 @@ void WiFiClientSecure::stop()
 {
     if (_ssl) {
         _ssl->stop();
+        _ssl->unref();
+        _ssl = nullptr;
     }
     WiFiClient::stop();
 }

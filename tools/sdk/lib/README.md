@@ -10,6 +10,17 @@ xtensa-lx106-elf-ar -d libmain.a mem_manager.o
 xtensa-lx106-elf-ar -d libmain.a time.o
 ```
 
+Rename `hostname` and `default_hostname` symbols:
+
+```bash
+xtensa-lx106-elf-ar x libmain.a eagle_lwip_if.o user_interface.o
+xtensa-lx106-elf-objcopy --redefine-sym hostname=wifi_station_hostname user_interface.o 
+xtensa-lx106-elf-objcopy --redefine-sym hostname=wifi_station_hostname eagle_lwip_if.o 
+xtensa-lx106-elf-objcopy --redefine-sym default_hostname=wifi_station_default_hostname user_interface.o 
+xtensa-lx106-elf-objcopy --redefine-sym default_hostname=wifi_station_default_hostname eagle_lwip_if.o 
+xtensa-lx106-elf-ar r libmain.a eagle_lwip_if.o user_interface.o 
+```
+
 ## Updating libstdc++
 
 After building gcc using crosstool-NG, get compiled libstdc++ and remove some objects:
