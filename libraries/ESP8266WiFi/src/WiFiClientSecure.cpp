@@ -420,7 +420,7 @@ protected:
     size_t _available = 0;
     BufferList _writeBuffers;
     bool _allowSelfSignedCerts = false;
-    ClientContext* io_ctx;
+    ClientContext* io_ctx = nullptr;
 };
 
 SSL_CTX* SSLContext::_ssl_ctx = nullptr;

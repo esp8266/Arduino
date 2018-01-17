@@ -21,7 +21,7 @@
 #    opts:    specific entries dicts (overrides same entry in macros)
 #    macro:   common entries
 #        unmodifiable parameters:
-#            resetmethod_ck/_nodemcu:        fixed reset method
+#            resetmethod_ck/_nodemcu/_none:  fixed reset method
 #            flashmode_qio/_dio/_qout/_dout: fixed flash mode
 #            flashfreq_40/_80:               fixed flash frequency
 #        selection menu:
@@ -689,20 +689,20 @@ boards = collections.OrderedDict([
                   ],
     }),
     ( 'oak', {
-        'name': 'DigiStump Oak',
+        'name': 'Digistump Oak',
         'opts': {
             '.build.board': 'ESP8266_OAK',
             '.build.variant': 'oak',
             '.upload.maximum_size': '1040368',
             },
         'macro': [
-            'resetmethod_ck',
+            'resetmethod_none',
             'flashmode_dio',
             'flashfreq_40',
             '4M',
             ],
         'serial': '921',
-        'desc': [ 'The Oak requires an [adapter](#serial-adapter) for a serial connection or flashing; its micro USB port is only for power.',
+        'desc': [ 'The Oak requires an `Serial Adapter`_ for a serial connection or flashing; its micro USB port is only for power.',
                   '',
                   'To make a serial connection, wire the adapter\'s **TX to P3**, **RX to P4**, and **GND** to **GND**.  Supply 3.3v from the serial adapter if not already powered via USB.',
                   '',
@@ -776,7 +776,11 @@ macros = {
     'resetmethod_nodemcu': collections.OrderedDict([
         ( '.upload.resetmethod', 'nodemcu' ),
         ]),
-
+    
+    'resetmethod_none': collections.OrderedDict([
+        ( '.upload.resetmethod', 'none' ),
+        ]),
+    
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
