@@ -53,9 +53,9 @@ struct slc_queue_item {
   uint32  next_link_ptr;
 };
 
-static uint32_t *i2s_slc_queue;
-static uint8_t i2s_slc_queue_len;
-static uint32_t **i2s_slc_buf_pntr; //Pointer to the I2S DMA buffer data
+static uint32_t *i2s_slc_queue=NULL;
+static uint8_t i2s_slc_queue_len=NULL;
+static uint32_t **i2s_slc_buf_pntr=NULL; //Pointer to the I2S DMA buffer data
 static struct slc_queue_item *i2s_slc_items; //I2S DMA buffer descriptors
 static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
 static int i2s_curr_slc_buf_pos=0; //position in the current buffer
@@ -99,7 +99,11 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
   }
 }
 
-void ICACHE_FLASH_ATTR i2s_slc_begin(uint16_t buffers, uint16_t buffer_samples){
+void ICACHE_FLASH_ATTR i2s_slc_begin(uint16_t buffers, uint16_t buffer_samples)
+{
+  // Clean up any running I2S, free all buffers
+  i2s_end();
+
   SLC_BUF_CNT = buffers;
   SLC_BUF_LEN = buffer_samples;
 
@@ -160,13 +164,15 @@ void ICACHE_FLASH_ATTR i2s_slc_end(){
   SLCTXL &= ~(SLCTXLAM << SLCTXLA); // clear TX descriptor address
   SLCRXL &= ~(SLCRXLAM << SLCRXLA); // clear RX descriptor address
 
-  for (int x = 0; x<SLC_BUF_CNT; x++) {
-    free(i2s_slc_buf_pntr[x]);
+  if (i2s_slc_buf_pntr) {
+    for (int x = 0; x<SLC_BUF_CNT; x++) {
+      free(i2s_slc_buf_pntr[x]);
+    }
   }
-  free(i2s_slc_items);
-  i2s_slc_items = NULL;
   free(i2s_slc_buf_pntr);
   i2s_slc_buf_pntr = NULL;
+  free(i2s_slc_items);
+  i2s_slc_items = NULL;
   free(i2s_slc_queue);
   i2s_slc_queue = NULL;
 }
