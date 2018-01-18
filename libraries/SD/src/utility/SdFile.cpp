@@ -63,7 +63,7 @@ uint8_t SdFile::addDirCluster(void) {
 // return pointer to cached entry or null for failure
 dir_t* SdFile::cacheDirEntry(uint8_t action) {
   if (!SdVolume::cacheRawBlock(dirBlock_, action)) return NULL;
-  return SdVolume::cacheBuffer_.dir + dirIndex_;
+  return SdVolume::cacheBuffer_->dir + dirIndex_;
 }
 //------------------------------------------------------------------------------
 /**
@@ -323,7 +323,7 @@ uint8_t SdFile::makeDir(SdFile* dir, const char* dirName) {
   if (!SdVolume::cacheRawBlock(block, SdVolume::CACHE_FOR_WRITE)) return false;
 
   // copy '.' to block
-  memcpy(&SdVolume::cacheBuffer_.dir[0], &d, sizeof(d));
+  memcpy(&SdVolume::cacheBuffer_->dir[0], &d, sizeof(d));
 
   // make entry for '..'
   d.name[1] = '.';
@@ -335,7 +335,7 @@ uint8_t SdFile::makeDir(SdFile* dir, const char* dirName) {
     d.firstClusterHigh = dir->firstCluster_ >> 16;
   }
   // copy '..' to block
-  memcpy(&SdVolume::cacheBuffer_.dir[1], &d, sizeof(d));
+  memcpy(&SdVolume::cacheBuffer_->dir[1], &d, sizeof(d));
 
   // set position after '..'
   curPosition_ = 2 * sizeof(d);
@@ -442,7 +442,7 @@ uint8_t SdFile::open(SdFile* dirFile, const char* fileName, uint8_t oflag) {
 
     // use first entry in cluster
     dirIndex_ = 0;
-    p = SdVolume::cacheBuffer_.dir;
+    p = SdVolume::cacheBuffer_->dir;
   }
   // initialize as empty file
   memset(p, 0, sizeof(dir_t));
@@ -510,7 +510,7 @@ uint8_t SdFile::open(SdFile* dirFile, uint16_t index, uint8_t oflag) {
 // open a cached directory entry. Assumes vol_ is initializes
 uint8_t SdFile::openCachedEntry(uint8_t dirIndex, uint8_t oflag) {
   // location of entry in cache
-  dir_t* p = SdVolume::cacheBuffer_.dir + dirIndex;
+  dir_t* p = SdVolume::cacheBuffer_->dir + dirIndex;
 
   // write or truncate is an error for a directory or read-only file
   if (p->attributes & (DIR_ATT_READ_ONLY | DIR_ATT_DIRECTORY)) {
@@ -709,7 +709,7 @@ int16_t SdFile::read(void* buf, uint16_t nbyte) {
     } else {
       // read block to cache and copy data to caller
       if (!SdVolume::cacheRawBlock(block, SdVolume::CACHE_FOR_READ)) return -1;
-      uint8_t* src = SdVolume::cacheBuffer_.data + offset;
+      uint8_t* src = SdVolume::cacheBuffer_->data + offset;
       uint8_t* end = src + n;
       while (src != end) *dst++ = *src++;
     }
@@ -763,7 +763,7 @@ dir_t* SdFile::readDirCache(void) {
   curPosition_ += 31;
 
   // return pointer to entry
-  return (SdVolume::cacheBuffer_.dir + i);
+  return (SdVolume::cacheBuffer_->dir + i);
 }
 //------------------------------------------------------------------------------
 /**
@@ -1196,7 +1196,7 @@ size_t SdFile::write(const void* buf, uint16_t nbyte) {
           goto writeErrorReturn;
         }
       }
-      uint8_t* dst = SdVolume::cacheBuffer_.data + blockOffset;
+      uint8_t* dst = SdVolume::cacheBuffer_->data + blockOffset;
       uint8_t* end = dst + n;
       while (dst != end) *dst++ = *src++;
     }

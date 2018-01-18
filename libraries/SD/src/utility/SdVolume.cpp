@@ -22,7 +22,7 @@
 // raw block cache
 // init cacheBlockNumber_to invalid SD block number
 uint32_t SdVolume::cacheBlockNumber_ = 0XFFFFFFFF;
-cache_t  SdVolume::cacheBuffer_;     // 512 byte cache for Sd2Card
+cache_t* SdVolume::cacheBuffer_;     // 512 byte cache for Sd2Card
 Sd2Card* SdVolume::sdCard_;          // pointer to SD card object
 uint8_t  SdVolume::cacheDirty_ = 0;  // cacheFlush() will write block if true
 uint32_t SdVolume::cacheMirrorBlock_ = 0;  // mirror  block for second FAT
@@ -98,12 +98,12 @@ uint8_t SdVolume::allocContiguous(uint32_t count, uint32_t* curCluster) {
 //------------------------------------------------------------------------------
 uint8_t SdVolume::cacheFlush(void) {
   if (cacheDirty_) {
-    if (!sdCard_->writeBlock(cacheBlockNumber_, cacheBuffer_.data)) {
+    if (!sdCard_->writeBlock(cacheBlockNumber_, cacheBuffer_->data)) {
       return false;
     }
     // mirror FAT tables
     if (cacheMirrorBlock_) {
-      if (!sdCard_->writeBlock(cacheMirrorBlock_, cacheBuffer_.data)) {
+      if (!sdCard_->writeBlock(cacheMirrorBlock_, cacheBuffer_->data)) {
         return false;
       }
       cacheMirrorBlock_ = 0;
@@ -116,7 +116,7 @@ uint8_t SdVolume::cacheFlush(void) {
 uint8_t SdVolume::cacheRawBlock(uint32_t blockNumber, uint8_t action) {
   if (cacheBlockNumber_ != blockNumber) {
     if (!cacheFlush()) return false;
-    if (!sdCard_->readBlock(blockNumber, cacheBuffer_.data)) return false;
+    if (!sdCard_->readBlock(blockNumber, cacheBuffer_->data)) return false;
     cacheBlockNumber_ = blockNumber;
   }
   cacheDirty_ |= action;
@@ -127,9 +127,9 @@ uint8_t SdVolume::cacheRawBlock(uint32_t blockNumber, uint8_t action) {
 uint8_t SdVolume::cacheZeroBlock(uint32_t blockNumber) {
   if (!cacheFlush()) return false;
 
-  // loop take less flash than memset(cacheBuffer_.data, 0, 512);
+  // loop take less flash than memset(cacheBuffer_->data, 0, 512);
   for (uint16_t i = 0; i < 512; i++) {
-    cacheBuffer_.data[i] = 0;
+    cacheBuffer_->data[i] = 0;
   }
   cacheBlockNumber_ = blockNumber;
   cacheSetDirty();
@@ -156,9 +156,9 @@ uint8_t SdVolume::fatGet(uint32_t cluster, uint32_t* value) const {
     if (!cacheRawBlock(lba, CACHE_FOR_READ)) return false;
   }
   if (fatType_ == 16) {
-    *value = cacheBuffer_.fat16[cluster & 0XFF];
+    *value = cacheBuffer_->fat16[cluster & 0XFF];
   } else {
-    *value = cacheBuffer_.fat32[cluster & 0X7F] & FAT32MASK;
+    *value = cacheBuffer_->fat32[cluster & 0X7F] & FAT32MASK;
   }
   return true;
 }
@@ -180,9 +180,9 @@ uint8_t SdVolume::fatPut(uint32_t cluster, uint32_t value) {
   }
   // store entry
   if (fatType_ == 16) {
-    cacheBuffer_.fat16[cluster & 0XFF] = value;
+    cacheBuffer_->fat16[cluster & 0XFF] = value;
   } else {
-    cacheBuffer_.fat32[cluster & 0X7F] = value;
+    cacheBuffer_->fat32[cluster & 0X7F] = value;
   }
   cacheSetDirty();
 
@@ -232,7 +232,7 @@ uint8_t SdVolume::init(Sd2Card* dev, uint8_t part) {
   if (part) {
     if (part > 4)return false;
     if (!cacheRawBlock(volumeStartBlock, CACHE_FOR_READ)) return false;
-    part_t* p = &cacheBuffer_.mbr.part[part-1];
+    part_t* p = &cacheBuffer_->mbr.part[part-1];
     if ((p->boot & 0X7F) !=0  ||
       p->totalSectors < 100 ||
       p->firstSector == 0) {
@@ -242,7 +242,7 @@ uint8_t SdVolume::init(Sd2Card* dev, uint8_t part) {
     volumeStartBlock = p->firstSector;
   }
   if (!cacheRawBlock(volumeStartBlock, CACHE_FOR_READ)) return false;
-  bpb_t* bpb = &cacheBuffer_.fbs.bpb;
+  bpb_t* bpb = &cacheBuffer_->fbs.bpb;
   if (bpb->bytesPerSector != 512 ||
     bpb->fatCount == 0 ||
     bpb->reservedSectorCount == 0 ||

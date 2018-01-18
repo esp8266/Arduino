@@ -431,14 +431,16 @@ union cache_t {
 class SdVolume {
  public:
   /** Create an instance of SdVolume */
-  SdVolume(void) :allocSearchStart_(2), fatType_(0) {}
+  SdVolume(void) :allocSearchStart_(2), fatType_(0) { if (!cacheBuffer_) cacheBuffer_ = (cache_t *)malloc(sizeof(cache_t)); }
+  /** Delete an instance of SdVolume */
+  ~SdVolume() { free(cacheBuffer_); cacheBuffer_ = NULL; }
   /** Clear the cache and returns a pointer to the cache.  Used by the WaveRP
    *  recorder to do raw write to the SD card.  Not for normal apps.
    */
   static uint8_t* cacheClear(void) {
     cacheFlush();
     cacheBlockNumber_ = 0XFFFFFFFF;
-    return cacheBuffer_.data;
+    return cacheBuffer_->data;
   }
   /**
    * Initialize a FAT volume.  Try partition one first then try super
@@ -499,7 +501,7 @@ class SdVolume {
   // value for action argument in cacheRawBlock to indicate cache dirty
   static uint8_t const CACHE_FOR_WRITE = 1;
 
-  static cache_t cacheBuffer_;        // 512 byte cache for device blocks
+  static cache_t *cacheBuffer_;        // 512 byte cache for device blocks
   static uint32_t cacheBlockNumber_;  // Logical number of block in the cache
   static Sd2Card* sdCard_;            // Sd2Card object for cache
   static uint8_t cacheDirty_;         // cacheFlush() will write block if true
