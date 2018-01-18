@@ -37,6 +37,10 @@
 #include "spi_flash.h"
 #include "gpio.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef MAC2STR
 #define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
 #define MACSTR "%02x:%02x:%02x:%02x:%02x:%02x"
@@ -650,5 +654,10 @@ void wifi_enable_gpio_wakeup(uint32 i, GPIO_INT_TYPE intr_status);
 void wifi_disable_gpio_wakeup(void);
 
 void uart_div_modify(uint8 uart_no, uint32 DivLatchValue);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

@@ -396,7 +396,6 @@ struct rst_info * EspClass::getResetInfoPtr(void) {
 }
 
 bool EspClass::eraseConfig(void) {
-    bool ret = true;
     const size_t cfgSize = 0x4000;
     size_t cfgAddr = ESP.getFlashChipSize() - cfgSize;
 

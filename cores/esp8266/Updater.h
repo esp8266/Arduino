@@ -72,7 +72,7 @@ class UpdaterClass {
     /*
       Prints the last error to an output stream
     */
-    void printError(Stream &out);
+    void printError(Print &out);
 
     /*
       sets the expected MD5 for the firmware (hexString)

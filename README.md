@@ -28,7 +28,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0/](http://esp8266.github.io/Arduino/versions/2.3.0/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.0/](https://arduino-esp8266.readthedocs.io/en/2.4.0/)
 
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
@@ -96,7 +96,7 @@ Please provide as much context as possible:
 
 For minor fixes of code and documentation, please go ahead and submit a pull request.
 
-Check out the list of issues which are easy to fix — [easy issues for 2.4.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.4.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
+Check out the list of issues which are easy to fix — [easy issues for 2.5.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.5.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
 
 Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed by opening an issue first.
 
