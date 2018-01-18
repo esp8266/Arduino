@@ -214,60 +214,68 @@ swap(IPAddress &lhs, IPAddress &rhs)
  * @param dns1       Static DNS server 1
  * @param dns2       Static DNS server 2
  */
-bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1, IPAddress dns2) {
+bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress arg2, IPAddress arg3, IPAddress dns2) {
 
-    if(!WiFi.enableSTA(true)) {
-        return false;
-    }
+  if(!WiFi.enableSTA(true)) {
+      return false;
+  }
 
-    //Arduino has a different arg order: ip, dns, gateway, subnet. To allow compatibility, check first octet of 3rd arg. If 255, interpret as ESP order, otherwise Arduino order.
-    if(subnet[0] != 255)
-    {
-      //octet is not 255 => interpret as Arduino order
+  //ESP argument order is: ip, gateway, subnet, dns1
+  //Arduino arg order is:  ip, dns, gateway, subnet.
 
-      if(dns1[0] == 0)
-      {
-        //arg order is arduino and 4th arg not given => assign it arduino default
-        dns1 = IPAddress(255,255,255,0);
-      }
+  //first, check whether dhcp should be used, which is when ip == 0 && gateway == 0 && subnet == 0.
+  bool espOrderUseDHCP = (local_ip == 0U && arg1 == 0U && arg2 == 0U);
+  bool arduinoOrderUseDHCP = (local_ip == 0U && arg2 == 0U && arg3 == 0U);
+  if (espOrderUseDHCP || arduinoOrderUseDHCP) {
+      _useStaticIp = false;
+      wifi_station_dhcpc_start();
+      return true;
+  }
 
-      //current order is arduino:                   ip-dns-gway-subnet
-      swap(gateway, subnet); //after this, order is ip-gway-dns-subnet
-      swap(subnet, dns1);    //after this, order is ip-gway-subnet-dns (correct ESP order)
-    } 
+  //To allow compatibility, check first octet of 3rd arg. If 255, interpret as ESP order, otherwise Arduino order.
+  IPAddress gateway = arg1;
+  IPAddress subnet = arg2;
+  IPAddress dns1 = arg3;
 
-    struct ip_info info;
-    info.ip.addr = static_cast<uint32_t>(local_ip);
-    info.gw.addr = static_cast<uint32_t>(gateway);
-    info.netmask.addr = static_cast<uint32_t>(subnet);
+  if(subnet[0] != 255)
+  {
+    //octet is not 255 => interpret as Arduino order
+    gateway = arg2;
+    subnet = arg3[0] == 0 ? IPAddress(255,255,255,0) : arg3; //arg order is arduino and 4th arg not given => assign it arduino default
+    dns1 = arg1;
+  }
 
-    if (local_ip == 0U && gateway == 0U && subnet == 0U) {
-        _useStaticIp = false;
-        wifi_station_dhcpc_start();
-        return true;
-    }
+  //ip and gateway must be in the same subnet
+  if((local_ip & subnet) != (gateway & subnet)) {
+    return false;
+  }
 
-    wifi_station_dhcpc_stop();
-    if(wifi_set_ip_info(STATION_IF, &info)) {
-        _useStaticIp = true;
-    } else {
-        return false;
-    }
-    ip_addr_t d;
+  struct ip_info info;
+  info.ip.addr = static_cast<uint32_t>(local_ip);
+  info.gw.addr = static_cast<uint32_t>(gateway);
+  info.netmask.addr = static_cast<uint32_t>(subnet);
 
-    if(dns1 != (uint32_t)0x00000000) {
-        // Set DNS1-Server
-        d.addr = static_cast<uint32_t>(dns1);
-        dns_setserver(0, &d);
-    }
+  wifi_station_dhcpc_stop();
+  if(wifi_set_ip_info(STATION_IF, &info)) {
+      _useStaticIp = true;
+  } else {
+      return false;
+  }
+  ip_addr_t d;
 
-    if(dns2 != (uint32_t)0x00000000) {
-        // Set DNS2-Server
-        d.addr = static_cast<uint32_t>(dns2);
-        dns_setserver(1, &d);
-    }
+  if(dns1 != (uint32_t)0x00000000) {
+      // Set DNS1-Server
+      d.addr = static_cast<uint32_t>(dns1);
+      dns_setserver(0, &d);
+  }
 
-    return true;
+  if(dns2 != (uint32_t)0x00000000) {
+      // Set DNS2-Server
+      d.addr = static_cast<uint32_t>(dns2);
+      dns_setserver(1, &d);
+  }
+
+  return true;
 }
 
 /**
