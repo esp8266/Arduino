@@ -246,6 +246,9 @@ void optimistic_yield(uint32_t interval_us);
 #include "Updater.h"
 #include "debug.h"
 
+//the following #undefs are needed due to a possible prior #include <math.h>
+#undef isinf
+#undef isnan
 using std::min;
 using std::max;
 using std::isinf;
