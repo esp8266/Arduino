@@ -358,7 +358,7 @@ void UpdaterClass::_setError(int error){
 #endif
 }
 
-void UpdaterClass::printError(Stream &out){
+void UpdaterClass::printError(Print &out){
   out.printf_P(PSTR("ERROR[%u]: "), _error);
   if(_error == UPDATE_ERROR_OK){
     out.println(F("No Error"));
