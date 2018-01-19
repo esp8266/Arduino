@@ -131,6 +131,11 @@ public:
         _op_start_time = millis();
         // This delay will be interrupted by esp_schedule in the connect callback
         delay(_timeout_ms);
+        // WiFi may have vanished during the delay (#4078)
+        if (!this || !_pcb) {
+            DEBUGV(":vnsh\r\n");
+            return 0;
+        }
         _connect_pending = 0;
         if (state() != ESTABLISHED) {
             abort();
