@@ -43,6 +43,7 @@
 struct WifiAPEntry {
     char * ssid;
     char * passphrase;
+    uint priority;
 };
 
 typedef std::vector<WifiAPEntry> WifiAPlist;
@@ -52,13 +53,13 @@ class ESP8266WiFiMulti {
         ESP8266WiFiMulti();
         ~ESP8266WiFiMulti();
 
-        bool addAP(const char* ssid, const char *passphrase = NULL);
+        bool addAP(const char* ssid, const char *passphrase = NULL, uint priority = 255);
 
         wl_status_t run(void);
 
     private:
         WifiAPlist APlist;
-        bool APlistAdd(const char* ssid, const char *passphrase = NULL);
+        bool APlistAdd(const char* ssid, const char *passphrase = NULL, uint priority = 255);
         void APlistClean(void);
 
 };
