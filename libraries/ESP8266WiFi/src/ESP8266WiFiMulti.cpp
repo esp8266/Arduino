@@ -34,8 +34,8 @@ ESP8266WiFiMulti::~ESP8266WiFiMulti() {
     APlistClean();
 }
 
-bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase, uint priority) {
-    return APlistAdd(ssid, passphrase, priority);
+bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase, uint order) {
+    return APlistAdd(ssid, passphrase, order);
 }
 
 wl_status_t ESP8266WiFiMulti::run(void) {
@@ -91,8 +91,8 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                 for(auto entry : APlist) {
                     if(ssid_scan == entry.ssid) { // SSID match
                         known = true;
-                        if (entry.priority <= bestNetwork.priority){
-                            if(rssi_scan > bestNetworkDb || entry.priority < bestNetwork.priority) { // best network
+                        if (entry.order <= bestNetwork.order){
+                            if(rssi_scan > bestNetworkDb || entry.order < bestNetwork.order) { // best network
                                 if(sec_scan == ENC_TYPE_NONE || entry.passphrase) { // check for passphrase if not open wlan
                                     bestNetworkDb = rssi_scan;
                                     bestChannel = chan_scan;
@@ -177,7 +177,7 @@ wl_status_t ESP8266WiFiMulti::run(void) {
 
 // ##################################################################################
 
-bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase, uint priority) {
+bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase, uint order) {
 
     WifiAPEntry newAP;
 
@@ -213,7 +213,7 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase, uint 
         return false;
     }
 
-    newAP.priority = priority;
+    newAP.order = order;
 
     APlist.push_back(newAP);
     DEBUG_WIFI_MULTI("[WIFI][APlistAdd] add SSID: %s\n", newAP.ssid);
