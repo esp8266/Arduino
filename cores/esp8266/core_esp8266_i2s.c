@@ -226,8 +226,9 @@ void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
   uint8_t scd_div_best=1;
   for (uint8_t i=1; i<64; i++){
     for (uint8_t j=i; j<64; j++){
-      if (fabs(((float)scaled_base_freq/i/j) - rate) < delta_best){
-      	delta_best = fabs(((float)scaled_base_freq/i/j) - rate);
+      float new_delta = fabs(((float)scaled_base_freq/i/j) - rate);
+      if (new_delta < delta_best){
+      	delta_best = new_delta;
         sbd_div_best = i;
         scd_div_best = j;
       }
