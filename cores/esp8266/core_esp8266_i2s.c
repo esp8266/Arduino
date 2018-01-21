@@ -56,6 +56,7 @@ static uint32_t *i2s_slc_buf_pntr[SLC_BUF_CNT]; //Pointer to the I2S DMA buffer 
 static struct slc_queue_item i2s_slc_items[SLC_BUF_CNT]; //I2S DMA buffer descriptors
 static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
 static int i2s_curr_slc_buf_pos=0; //position in the current buffer
+static void (*i2s_callback) (void)=0;
 
 bool ICACHE_FLASH_ATTR i2s_is_full(){
   return (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) && (i2s_slc_queue_len == 0);
@@ -92,8 +93,13 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
       i2s_slc_queue_next_item(); //free space for finished_item
     }
     i2s_slc_queue[i2s_slc_queue_len++] = finished_item->buf_ptr;
+    if (i2s_callback) i2s_callback();
     ETS_SLC_INTR_ENABLE();
   }
+}
+
+void ICACHE_FLASH_ATTR i2s_set_callback(void (*callback) (void)){
+    i2s_callback = callback;
 }
 
 void ICACHE_FLASH_ATTR i2s_slc_begin(){
