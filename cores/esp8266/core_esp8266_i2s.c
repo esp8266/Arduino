@@ -254,7 +254,6 @@ float ICACHE_FLASH_ATTR i2s_get_real_rate(){
   return (float)I2SBASEFREQ/32/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
 }
 
-
 void ICACHE_FLASH_ATTR i2s_begin(){
   _i2s_sample_rate = 0;
   i2s_slc_begin();
