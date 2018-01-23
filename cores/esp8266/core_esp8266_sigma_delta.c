@@ -1,32 +1,3 @@
-/*
-/******************************************************************************
- * Sigma delta module
-
-This module controls the esp8266 internal sigma delta source
-Each pin can be connected to the sigma delta source
-The target duty and frequency can be modified via the register GPIO_SIGMA_DELTA
-
-THE TARGET FREQUENCY IS DEFINED AS:
-
-FREQ = 80,000,000/prescaler * target /256  HZ,     0<target<128
-FREQ = 80,000,000/prescaler * (256-target) /256  HZ,     128<target<256
-target: duty ,0-255
-prescaler: clk_div,0-255
-so the target and prescale will both affect the freq.
-
-Usage :
-1. sigma_delta_enable() : activate the sigma delta source with default prescalar (0) & target (0)
-2. sigma_delta_attachPin(pin), any pin 0..15, TBC if gpio16 supports sigma-delta source
-     This will set the pin to NORMAL output mode (pinMode(pin,OUTPUT))
-3. sigma_delta_setPrescaler(uint8_t) : reduce the output frequencies
-4. sigma_delta_setTarget(uint8_t) : set the output signal duty cycle, duty cycle = target/256
-
-5. sigma_delta_detachPin(pin), this will revert the pin to NORMAL output mode & GPIO source. 
-The sigma delta source remains on until :
-6. sigma_delta_disable()
-
-*******************************************************************************/
-
 #include "Arduino.h" // using pinMode
 
 // definitions in esp8266_peri.h style
@@ -36,23 +7,23 @@ The sigma delta source remains on until :
 #define GPSDE 16 // enable
 
 /******************************************************************************
- * FunctionName : sigma_delta_start
+ * FunctionName : sigmaDeltaEnable
  * Description  : enable the internal sigma delta source
  * Parameters   : none
  * Returns      : none
 *******************************************************************************/
-void ICACHE_FLASH_ATTR sigma_delta_enable()
+void ICACHE_FLASH_ATTR sigmaDeltaEnable()
 {
   GPSD = (0 << GPSDT) | (0 << GPSDP) | (1 << GPSDE); //SIGMA_DELTA_TARGET(0) | SIGMA_DELTA_PRESCALER(0) | SIGMA_DELTA_ENABLE(ENABLED)
 }
 
 /******************************************************************************
- * FunctionName : sigma_delta_disable
+ * FunctionName : sigmaDeltaDisable
  * Description  : stop the internal sigma delta source
  * Parameters   : none
  * Returns      : none
 *******************************************************************************/
-void ICACHE_FLASH_ATTR sigma_delta_disable()
+void ICACHE_FLASH_ATTR sigmaDeltaDisable()
 {
   GPSD = (0 << GPSDT) | (0 << GPSDP) | (0 << GPSDE); //SIGMA_DELTA_TARGET(0) | SIGMA_DELTA_PRESCALER(0) | SIGMA_DELTA_ENABLE(DISABLED)
 }
@@ -60,11 +31,12 @@ void ICACHE_FLASH_ATTR sigma_delta_disable()
 /******************************************************************************
  * FunctionName : sigma_delta_attachPin
  * Description  : connects the sigma delta source to a physical output pin
- * Parameters   : pin (0..15)
+ * Parameters   : pin (0..15), channel = unused, for compatibility with ESP32
  * Returns      : none
 *******************************************************************************/
-void ICACHE_FLASH_ATTR sigma_delta_attachPin(uint8_t pin)
+void ICACHE_FLASH_ATTR sigmaDeltaAttachPin(uint8_t pin, uint8_t channel)
 {
+  (void) channel;
   // make the chosen pin an output pin
   pinMode (pin, OUTPUT);
   if (pin < 16) {
@@ -79,7 +51,7 @@ void ICACHE_FLASH_ATTR sigma_delta_attachPin(uint8_t pin)
  * Parameters   : pin (0..16)
  * Returns      : none
 *******************************************************************************/
-void ICACHE_FLASH_ATTR sigma_delta_detachPin(uint8_t pin)
+void ICACHE_FLASH_ATTR sigmaDeltaDetachPin(uint8_t pin)
 {
   if (pin < 16) {
     // set its source to the sigma delta source
@@ -88,12 +60,12 @@ void ICACHE_FLASH_ATTR sigma_delta_detachPin(uint8_t pin)
 }
 
 /******************************************************************************
- * FunctionName : sigma_delta_isPinAttached
+ * FunctionName : sigmaDeltaIsPinAttached
  * Description  : query if pin is attached
  * Parameters   : pin (0..16)
  * Returns      : bool
 *******************************************************************************/
-bool ICACHE_FLASH_ATTR sigma_delta_isPinAttached(uint8_t pin)
+bool ICACHE_FLASH_ATTR sigmaDeltaIsPinAttached(uint8_t pin)
 {
   if (pin < 16) {
     // set its source to the sigma delta source
@@ -104,51 +76,77 @@ bool ICACHE_FLASH_ATTR sigma_delta_isPinAttached(uint8_t pin)
 }
 
 /******************************************************************************
- * FunctionName : sigma_delta_getTarget
- * Description  : get the target value from the GPIO_SIGMA_DELTA register
- * Parameters   : none
- * Returns      : uint8_t target value 0..255
+ * FunctionName : sigmaDeltaSetup
+ * Description  : start the sigma delta generator with the chosen parameters
+ * Parameters   : channel = unused (for compatibility with ESP32), 
+ *                freq : 1220-312500 (lowest frequency in the output signal's spectrum)
+ * Returns      : uint32_t the actual frequency, closest to the input parameter
 *******************************************************************************/
-uint8_t ICACHE_FLASH_ATTR sigma_delta_getTarget(void)
+uint32_t ICACHE_FLASH_ATTR sigmaDeltaSetup(uint8_t channel, uint32_t freq)
 {
+  (void) channel;
+  
+  uint32_t prescaler = ((uint32_t)10000000/(freq*32)) - 1;
+  
+  if(prescaler > 0xFF) {
+      prescaler = 0xFF;
+  }
+  sigmaDeltaEnable();
+  sigmaDeltaSetPrescaler ((uint8_t) prescaler);
+  //sigmaDeltaSetTarget ((uint8_t) 0x80); // 50% duty cycle
+  
+  return 10000000/((prescaler + 1) * 32);
+}
+
+/******************************************************************************
+ * FunctionName : sigmaDeltaWrite
+ * Description  : set the duty cycle for the sigma-delta source
+ * Parameters   : uint8 duty, 0-255, duty cycle = target/256, 
+ *                channel = unused, for compatibility with ESP32
+ * Returns      : none
+*******************************************************************************/
+void ICACHE_FLASH_ATTR sigmaDeltaWrite(uint8_t channel, uint8_t duty)
+{
+  uint32_t reg = GPSD;
+  (void) channel;
+
+  reg = (reg & ~(0xFF << GPSDT)) | ((duty & 0xFF) << GPSDT);
+  GPSD = reg;
+  
+}
+/******************************************************************************
+ * FunctionName : sigmaDeltaRead
+ * Description  : set the duty cycle for the sigma-delta source
+ * Parameters   : none, channel = unused, for compatibility with ESP32
+ * Returns      : uint8_t duty cycle value 0..255
+*******************************************************************************/
+uint8_t ICACHE_FLASH_ATTR sigmaDeltaRead(uint8_t channel)
+{
+  (void) channel;
   return (uint8_t)((GPSD >> GPSDT) & 0xFF);
 }
 
 /******************************************************************************
- * FunctionName : sigma_delta_setTarget
- * Description  : set the target (duty cycle) for the sigma-delta source
- * Parameters   : uint8 target, 0-255, duty cycle = target/256
- * Returns      : none
-*******************************************************************************/
-void ICACHE_FLASH_ATTR sigma_delta_setTarget(uint8_t target)
-{
-  uint32_t reg = GPSD;
-
-  reg = (reg & ~(0xFF << GPSDT)) | ((target & 0xFF) << GPSDT);
-  GPSD = reg;
-}
-
-/******************************************************************************
- * FunctionName : sigma_delta_getPrescaler
- * Description  : get the prescaler value from the GPIO_SIGMA_DELTA register
- * Parameters   : none
- * Returns      : uint8 prescaler, CLK_DIV , 0-255
-*******************************************************************************/
-uint8_t ICACHE_FLASH_ATTR sigma_delta_getPrescaler(uint8_t prescaler)
-{
-  return (uint8_t)((GPSD >> GPSDP) & 0xFF);
-}
-
-/******************************************************************************
- * FunctionName : sigma_delta_setPrescaler
+ * FunctionName : sigmaDeltaSetPrescaler
  * Description  : set the clock divider for the sigma-delta source
  * Parameters   : uint8 prescaler, 0-255, divides the 80MHz base clock by this amount
  * Returns      : none
 *******************************************************************************/
-void ICACHE_FLASH_ATTR sigma_delta_setPrescaler(uint8_t prescaler)
+void ICACHE_FLASH_ATTR sigmaDeltaSetPrescaler(uint8_t prescaler)
 {
   uint32_t reg = GPSD;
 
   reg = (reg & ~(0xFF << GPSDP)) | ((prescaler & 0xFF) << GPSDP);
   GPSD = reg;
+}
+
+/******************************************************************************
+ * FunctionName : sigmaDeltaGetPrescaler
+ * Description  : get the prescaler value from the GPIO_SIGMA_DELTA register
+ * Parameters   : none
+ * Returns      : uint8 prescaler, CLK_DIV , 0-255
+*******************************************************************************/
+uint8_t ICACHE_FLASH_ATTR sigmaDeltaGetPrescaler(uint8_t prescaler)
+{
+  return (uint8_t)((GPSD >> GPSDP) & 0xFF);
 }

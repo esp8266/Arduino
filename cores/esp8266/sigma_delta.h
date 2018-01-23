@@ -31,77 +31,16 @@ THE TARGET FREQUENCY IS DEFINED AS:
 
 FREQ = 80,000,000/prescaler * target /256  HZ,     0<target<128
 FREQ = 80,000,000/prescaler * (256-target) /256  HZ,     128<target<256
-target: duty ,0-255
-prescaler: clk_div,0-255
+target: duty cycle,range 0-255
+prescaler: is a clock divider, range 0-255
 so the target and prescale will both affect the freq.
+CPU_FREQ has no influence on the sigma delta frequency.
 
 Usage :
-1. sigma_delta_enable() : activate the sigma delta source with default prescalar (0) & target (0)
-2. sigma_delta_attachPin(pin), any pin 0..15, TBC if gpio16 supports sigma-delta source
+1. sigmaDeltaSetup(0,f) : activate the sigma delta source with frequency f and default duty cycle (0)
+2. sigmaDeltaAttachPin(pin), any pin 0..15, TBC if gpio16 supports sigma-delta source
      This will set the pin to NORMAL output mode (pinMode(pin,OUTPUT))
-3. sigma_delta_setPrescaler(uint8_t) : reduce the output frequencies
-4. sigma_delta_setTarget(uint8_t) : set the output signal duty cycle, duty cycle = target/256
-
-5. sigma_delta_detachPin(pin), this will revert the pin to NORMAL output mode & GPIO source. 
-The sigma delta source remains on until :
-6. sigma_delta_disable()
-
-copy this code as example :
-
-#include "sigma_delta.h"
-
-void setup() {
-
-  Serial.begin(115200);
-  pinMode(BUILTIN_LED,OUTPUT); // blinkie & sigma-delta mix
-  
-  uint32 pin = 4; //D2
-  sigma_delta_enable();
-  //sigma_delta_disable();
-  sigma_delta_attachPin(BUILTIN_LED);
-  sigma_delta_attachPin(4); // D2
-  
-  sigma_delta_setPrescaler(255);
-
-  Serial.println();
-  Serial.println("Start Sigma Delta Example\n");
-  Serial.println("Attached gpio4 to the sigma delta source\n");
-  Serial.printf("Current target = %i, prescaler = %i\n",sigma_delta_getTarget(),sigma_delta_getPrescaler());
-}
-
-void loop() {
- 
-  uint8_t target, iRepeat;
-  
-  Serial.println("Attaching the built in led to the sigma delta source now\n");
-  Serial.printf("Current target = %i, prescaler = %i\n",sigma_delta_getTarget(),sigma_delta_getPrescaler());
-  sigma_delta_attachPin(BUILTIN_LED);
-  
-  Serial.println("dimming builtin led...\n");
-  for (iRepeat=0;iRepeat<10;iRepeat++)
-  {
-    for (target=0; target<255;target=target+5)
-    {
-      sigma_delta_setTarget(target);
-      delay(10);
-    }
-    
-    for (target=255; target>0;target=target-5)
-    {
-      sigma_delta_setTarget(target);
-      delay(10);
-    }
-    
-  }
-  Serial.println("detaching builtin led & playing a blinkie\n");
-  sigma_delta_detachPin(BUILTIN_LED);
-  for (iRepeat=0;iRepeat<20;iRepeat++)
-  {
-    digitalWrite(BUILTIN_LED,!digitalRead(BUILTIN_LED));
-    delay(500);
-  }
-    
-}
+3. sigmaDeltaWrite(0,dc) : set the output signal duty cycle, duty cycle = dc/256
 
 *******************************************************************************/
 
@@ -112,15 +51,20 @@ void loop() {
 extern "C" {
 #endif
 
-void sigma_delta_enable(void);
-void sigma_delta_disable(void);
-void sigma_delta_attachPin(uint8_t pin);
-void sigma_delta_detachPin(uint8_t pin);
-bool sigma_delta_isPinAttached(uint8_t pin);
-uint8_t sigma_delta_getTarget(void);
-void sigma_delta_setTarget(uint8_t target);
-uint8_t sigma_delta_getPrescaler(void);
-void sigma_delta_setPrescaler(uint8_t prescaler);
+//channel parameter is unused (only for ESP32 compatibility) freq 1220-312500 duty 0-255
+void        sigmaDeltaEnable(void);
+void        sigmaDeltaDisable(void);
+uint32_t    sigmaDeltaSetup(uint8_t channel, uint32_t freq);
+void        sigmaDeltaWrite(uint8_t channel, uint8_t duty);
+uint8_t     sigmaDeltaRead(uint8_t channel = 0);
+void        sigmaDeltaAttachPin(uint8_t pin, uint8_t channel = 0);
+void        sigmaDeltaDetachPin(uint8_t pin);
+bool        sigmaDeltaIsPinAttached(uint8_t pin);
+
+// alternative way to control the sigma delta generator frequency
+uint8_t     sigmaDeltaGetPrescaler(void);
+void        sigmaDeltaSetPrescaler(uint8_t prescaler);
+
 
 #ifdef __cplusplus
 }
