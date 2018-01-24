@@ -21,9 +21,9 @@
 #    opts:    specific entries dicts (overrides same entry in macros)
 #    macro:   common entries
 #        unmodifiable parameters:
-#            resetmethod_ck/_nodemcu/_none:  fixed reset method
-#            flashmode_qio/_dio/_qout/_dout: fixed flash mode
-#            flashfreq_40/_80:               fixed flash frequency
+#            resetmethod_ck/_nodemcu/_none/_dtrset: fixed reset method
+#            flashmode_qio/_dio/_qout/_dout:        fixed flash mode
+#            flashfreq_40/_80:                      fixed flash frequency
 #        selection menu:
 #            resetmethod_menu            menus for reset method
 #            crystalfreq/flashfreq_menu: menus for crystal/flash frequency selection
@@ -765,6 +765,10 @@ macros = {
         ( '.menu.ResetMethod.ck.upload.resetmethod', 'ck' ),
         ( '.menu.ResetMethod.nodemcu', 'nodemcu' ),
         ( '.menu.ResetMethod.nodemcu.upload.resetmethod', 'nodemcu' ),
+        ( '.menu.ResetMethod.none', 'none' ),
+        ( '.menu.ResetMethod.none.upload.resetmethod', 'none' ),
+        ( '.menu.ResetMethod.dtrset', 'dtrset' ),
+        ( '.menu.ResetMethod.dtrset.upload.resetmethod', 'dtrset' ),
         ]),
 
     ####################### upload.resetmethod
@@ -779,6 +783,10 @@ macros = {
     
     'resetmethod_none': collections.OrderedDict([
         ( '.upload.resetmethod', 'none' ),
+        ]),
+
+    'resetmethod_dtrset': collections.OrderedDict([
+        ( '.upload.resetmethod', 'dtrset' ),
         ]),
     
     ####################### menu.FlashMode
