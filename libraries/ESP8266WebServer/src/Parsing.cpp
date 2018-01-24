@@ -190,7 +190,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
           searchStr += plainBuf;
         }
         _parseArguments(searchStr);
-        if(!isEncoded){
+        if(!isEncoded||(0==_currentArgCount)){ // @20180124OF01: Workarround for Alexa Bug
           //plain post json or other data
           RequestArgument& arg = _currentArgs[_currentArgCount++];
           arg.key = "plain";
