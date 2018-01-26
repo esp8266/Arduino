@@ -26,7 +26,7 @@
 #            flashfreq_40/_80:                      fixed flash frequency
 #        selection menu:
 #            resetmethod_menu            menus for reset method
-#            resetmethod_menu_all        menus for all reset methods
+#            resetmethod_menu_extra      menus for additional reset methods
 #            crystalfreq/flashfreq_menu: menus for crystal/flash frequency selection
 #            flashmode_menu:             menus for flashmode selection (dio/dout/qio/qout)
 #            512K/1M/2M/4M/8M/16M:       menus for flash & SPIFFS size
@@ -62,7 +62,8 @@ boards = collections.OrderedDict([
             '.build.board': 'ESP8266_GENERIC',
             },
         'macro': [
-            'resetmethod_menu_all',
+            'resetmethod_menu',
+            'resetmethod_menu_extra',
             'crystalfreq_menu',
             'flashfreq_menu',
             'flashmode_menu',
@@ -272,7 +273,8 @@ boards = collections.OrderedDict([
             '.build.board': 'ESP8266_ESP01',
             },
         'macro': [
-            'resetmethod_menu_all',
+            'resetmethod_menu',
+            'resetmethod_menu_extra',
             'crystalfreq_menu',
             'flashmode_dout',
             'flashfreq_40',
@@ -768,11 +770,7 @@ macros = {
         ( '.menu.ResetMethod.nodemcu.upload.resetmethod', 'nodemcu' ),
         ]),
 
-    'resetmethod_menu_all': collections.OrderedDict([
-        ( '.menu.ResetMethod.ck', 'ck' ),
-        ( '.menu.ResetMethod.ck.upload.resetmethod', 'ck' ),
-        ( '.menu.ResetMethod.nodemcu', 'nodemcu' ),
-        ( '.menu.ResetMethod.nodemcu.upload.resetmethod', 'nodemcu' ),
+    'resetmethod_menu_extra': collections.OrderedDict([
         ( '.menu.ResetMethod.none', 'none' ),
         ( '.menu.ResetMethod.none.upload.resetmethod', 'none' ),
         ( '.menu.ResetMethod.dtrset', 'dtrset' ),
