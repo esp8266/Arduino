@@ -63,7 +63,7 @@ void loop() {
       }
     }
     //no free/disconnected spot so reject
-    if ( i == MAX_CLIENTS) {
+    if ( i == MAX_SRV_CLIENTS) {
        WiFiClient serverClient = server.available();
        serverClient.stop();
         Serial1.println("Connection rejected ");
