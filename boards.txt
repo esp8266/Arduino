@@ -38,6 +38,10 @@ generic.menu.ResetMethod.ck=ck
 generic.menu.ResetMethod.ck.upload.resetmethod=ck
 generic.menu.ResetMethod.nodemcu=nodemcu
 generic.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+generic.menu.ResetMethod.none=none
+generic.menu.ResetMethod.none.upload.resetmethod=none
+generic.menu.ResetMethod.dtrset=dtrset
+generic.menu.ResetMethod.dtrset.upload.resetmethod=dtrset
 generic.menu.CrystalFreq.26=26 MHz
 generic.menu.CrystalFreq.40=40 MHz
 generic.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
@@ -319,6 +323,10 @@ esp8285.menu.ResetMethod.ck=ck
 esp8285.menu.ResetMethod.ck.upload.resetmethod=ck
 esp8285.menu.ResetMethod.nodemcu=nodemcu
 esp8285.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+esp8285.menu.ResetMethod.none=none
+esp8285.menu.ResetMethod.none.upload.resetmethod=none
+esp8285.menu.ResetMethod.dtrset=dtrset
+esp8285.menu.ResetMethod.dtrset.upload.resetmethod=dtrset
 esp8285.menu.CrystalFreq.26=26 MHz
 esp8285.menu.CrystalFreq.40=40 MHz
 esp8285.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
