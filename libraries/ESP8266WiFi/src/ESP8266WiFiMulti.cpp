@@ -38,10 +38,6 @@ bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase) {
     return APlistAdd(ssid, passphrase);
 }
 
-int ESP8266WiFiMulti::count(void) {
-    return APlist.size();
-}
-
 wl_status_t ESP8266WiFiMulti::run(void) {
 
     wl_status_t status = WiFi.status();
@@ -71,7 +67,7 @@ wl_status_t ESP8266WiFiMulti::run(void) {
 
         if(scanResult > 0) {
             // scan done, analyze
-            WifiAPlist_t bestNetwork { NULL, NULL };
+            WifiAPEntry bestNetwork { NULL, NULL };
             int bestNetworkDb = INT_MIN;
             uint8 bestBSSID[6];
             int32_t bestChannel;
@@ -92,16 +88,14 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                 WiFi.getNetworkInfo(i, ssid_scan, sec_scan, rssi_scan, BSSID_scan, chan_scan, hidden_scan);
 
                 bool known = false;
-                for(uint32_t x = 0; x < APlist.size(); x++) {
-                    WifiAPlist_t entry = APlist[x];
-
+                for(auto entry : APlist) {
                     if(ssid_scan == entry.ssid) { // SSID match
                         known = true;
                         if(rssi_scan > bestNetworkDb) { // best network
                             if(sec_scan == ENC_TYPE_NONE || entry.passphrase) { // check for passphrase if not open wlan
                                 bestNetworkDb = rssi_scan;
                                 bestChannel = chan_scan;
-                                memcpy((void*) &bestNetwork, (void*) &entry, sizeof(bestNetwork));
+                                bestNetwork = entry;
                                 memcpy((void*) &bestBSSID, (void*) BSSID_scan, sizeof(bestBSSID));
                             }
                         }
@@ -126,16 +120,20 @@ wl_status_t ESP8266WiFiMulti::run(void) {
             delay(0);
 
             if(bestNetwork.ssid) {
-                DEBUG_WIFI_MULTI("[WIFI] Connecting BSSID: %02X:%02X:%02X:%02X:%02X:%02X SSID: %s Channal: %d (%d)\n", bestBSSID[0], bestBSSID[1], bestBSSID[2], bestBSSID[3], bestBSSID[4], bestBSSID[5], bestNetwork.ssid, bestChannel, bestNetworkDb);
+                DEBUG_WIFI_MULTI("[WIFI] Connecting BSSID: %02X:%02X:%02X:%02X:%02X:%02X SSID: %s Channel: %d (%d)\n", bestBSSID[0], bestBSSID[1], bestBSSID[2], bestBSSID[3], bestBSSID[4], bestBSSID[5], bestNetwork.ssid, bestChannel, bestNetworkDb);
 
                 WiFi.begin(bestNetwork.ssid, bestNetwork.passphrase, bestChannel, bestBSSID);
                 status = WiFi.status();
 
-                // wait for connection or fail
-                while(status != WL_CONNECTED && status != WL_NO_SSID_AVAIL && status != WL_CONNECT_FAILED) {
+                static const uint32_t connectTimeout = 5000; //5s timeout
+                
+                auto startTime = millis();
+                // wait for connection, fail, or timeout
+                while(status != WL_CONNECTED && status != WL_NO_SSID_AVAIL && status != WL_CONNECT_FAILED && (millis() - startTime) <= connectTimeout) {
                     delay(10);
                     status = WiFi.status();
                 }
+                
 #ifdef DEBUG_ESP_WIFI
                 IPAddress ip;
                 uint8_t * mac;
@@ -183,7 +181,7 @@ wl_status_t ESP8266WiFiMulti::run(void) {
 
 bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
 
-    WifiAPlist_t newAP;
+    WifiAPEntry newAP;
 
     if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
         // fail SSID to long or missing!
@@ -191,7 +189,8 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
         return false;
     }
 
-    if(passphrase && strlen(passphrase) > 63) {
+    //for passphrase, max is 63 ascii + null. For psk, 64hex + null.
+    if(passphrase && strlen(passphrase) > 64) {
         // fail passphrase to long!
         DEBUG_WIFI_MULTI("[WIFI][APlistAdd] passphrase to long\n");
         return false;
@@ -222,8 +221,7 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
 }
 
 void ESP8266WiFiMulti::APlistClean(void) {
-    for(uint32_t i = 0; i < APlist.size(); i++) {
-        WifiAPlist_t entry = APlist[i];
+    for(auto entry : APlist) {
         if(entry.ssid) {
             free(entry.ssid);
         }

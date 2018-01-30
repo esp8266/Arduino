@@ -28,8 +28,6 @@
 #define WIFICLIENTMULTI_H_
 
 #include "ESP8266WiFi.h"
-#undef min
-#undef max
 #include <vector>
 
 #ifdef DEBUG_ESP_WIFI
@@ -42,10 +40,12 @@
 #define DEBUG_WIFI_MULTI(...)
 #endif
 
-typedef struct {
-        char * ssid;
-        char * passphrase;
-} WifiAPlist_t;
+struct WifiAPEntry {
+    char * ssid;
+    char * passphrase;
+};
+
+typedef std::vector<WifiAPEntry> WifiAPlist;
 
 class ESP8266WiFiMulti {
     public:
@@ -53,11 +53,11 @@ class ESP8266WiFiMulti {
         ~ESP8266WiFiMulti();
 
         bool addAP(const char* ssid, const char *passphrase = NULL);
-        int count(void);
+
         wl_status_t run(void);
 
     private:
-        std::vector<WifiAPlist_t> APlist;
+        WifiAPlist APlist;
         bool APlistAdd(const char* ssid, const char *passphrase = NULL);
         void APlistClean(void);
 
