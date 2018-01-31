@@ -21,11 +21,12 @@
 #    opts:    specific entries dicts (overrides same entry in macros)
 #    macro:   common entries
 #        unmodifiable parameters:
-#            resetmethod_ck/_nodemcu:        fixed reset method
-#            flashmode_qio/_dio/_qout/_dout: fixed flash mode
-#            flashfreq_40/_80:               fixed flash frequency
+#            resetmethod_ck/_nodemcu/_none/_dtrset: fixed reset method
+#            flashmode_qio/_dio/_qout/_dout:        fixed flash mode
+#            flashfreq_40/_80:                      fixed flash frequency
 #        selection menu:
 #            resetmethod_menu            menus for reset method
+#            resetmethod_menu_extra      menus for additional reset methods
 #            crystalfreq/flashfreq_menu: menus for crystal/flash frequency selection
 #            flashmode_menu:             menus for flashmode selection (dio/dout/qio/qout)
 #            512K/1M/2M/4M/8M/16M:       menus for flash & SPIFFS size
@@ -62,6 +63,7 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_menu',
+            'resetmethod_menu_extra',
             'crystalfreq_menu',
             'flashfreq_menu',
             'flashmode_menu',
@@ -272,6 +274,7 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_menu',
+            'resetmethod_menu_extra',
             'crystalfreq_menu',
             'flashmode_dout',
             'flashfreq_40',
@@ -689,20 +692,20 @@ boards = collections.OrderedDict([
                   ],
     }),
     ( 'oak', {
-        'name': 'DigiStump Oak',
+        'name': 'Digistump Oak',
         'opts': {
             '.build.board': 'ESP8266_OAK',
             '.build.variant': 'oak',
             '.upload.maximum_size': '1040368',
             },
         'macro': [
-            'resetmethod_ck',
+            'resetmethod_none',
             'flashmode_dio',
             'flashfreq_40',
             '4M',
             ],
         'serial': '921',
-        'desc': [ 'The Oak requires an [adapter](#serial-adapter) for a serial connection or flashing; its micro USB port is only for power.',
+        'desc': [ 'The Oak requires an `Serial Adapter`_ for a serial connection or flashing; its micro USB port is only for power.',
                   '',
                   'To make a serial connection, wire the adapter\'s **TX to P3**, **RX to P4**, and **GND** to **GND**.  Supply 3.3v from the serial adapter if not already powered via USB.',
                   '',
@@ -767,6 +770,13 @@ macros = {
         ( '.menu.ResetMethod.nodemcu.upload.resetmethod', 'nodemcu' ),
         ]),
 
+    'resetmethod_menu_extra': collections.OrderedDict([
+        ( '.menu.ResetMethod.none', 'none' ),
+        ( '.menu.ResetMethod.none.upload.resetmethod', 'none' ),
+        ( '.menu.ResetMethod.dtrset', 'dtrset' ),
+        ( '.menu.ResetMethod.dtrset.upload.resetmethod', 'dtrset' ),
+        ]),
+
     ####################### upload.resetmethod
 
     'resetmethod_ck': collections.OrderedDict([
@@ -776,7 +786,15 @@ macros = {
     'resetmethod_nodemcu': collections.OrderedDict([
         ( '.upload.resetmethod', 'nodemcu' ),
         ]),
+    
+    'resetmethod_none': collections.OrderedDict([
+        ( '.upload.resetmethod', 'none' ),
+        ]),
 
+    'resetmethod_dtrset': collections.OrderedDict([
+        ( '.upload.resetmethod', 'dtrset' ),
+        ]),
+    
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
@@ -906,8 +924,7 @@ def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
     listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
-    if not premerge:
-        listnocomb += [ 'OOM -include "umm_malloc/umm_malloc_cfg.h"' ]
+    listnocomb += [ 'OOM -include "umm_malloc/umm_malloc_cfg.h"' ]
     options = combn(listcomb)
     options += comb1(listnocomb)
     options += [ listcomb + listnocomb ]
@@ -1073,10 +1090,7 @@ def all_boards ():
 
     macros.update(all_flash_size())
     macros.update(all_debug())
-    if premerge:
-        macros.update({ 'led': { } })
-    else:
-        macros.update(led(led_default, led_max))
+    macros.update(led(led_default, led_max))
 
     print '#'
     print '# this file is script-generated and is likely to be overwritten by ' + sys.argv[0]
@@ -1129,6 +1143,9 @@ def all_boards ():
             for optname in macros[block]:
                 if not ('opts' in board) or not (optname in board['opts']):
                     print id + optname + '=' + macros[block][optname]
+
+        if nofloat:
+            print id + '.build.float='
 
         print ''
 
@@ -1225,8 +1242,8 @@ def usage (name,ret):
     print "	--led			- preferred default builtin led for generic boards (default %d)" % led_default
     print "	--board b		- board to modify:"
     print "		--speed	s	- change default serial speed"
-    print "	--premerge		- no OOM debug option, no led menu"
     print "	--customspeed s		- new serial speed for all boards"
+    print "	--nofloat		- disable float support in printf/scanf"
     print ""
     print "	mandatory option (at least one):"
     print ""
@@ -1267,7 +1284,7 @@ lwip = 2
 default_speed = '115'
 led_default = 2
 led_max = 16
-premerge = False
+nofloat = False
 ldgen = False
 ldshow = False
 boardsgen = False
@@ -1282,7 +1299,7 @@ customspeeds = []
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
-        [ "help", "premerge", "lwip=", "led=", "speed=", "board=", "customspeed=",
+        [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen" ])
 except getopt.GetoptError as err:
     print str(err)  # will print something like "option -a not recognized"
@@ -1295,9 +1312,6 @@ for o, a in opts:
 
     if o in ("-h", "--help"):
         usage(sys.argv[0], 0)
-
-    elif o in ("--premerge"):
-        premerge = True
 
     elif o in ("--lwip"):
         lwip = a
@@ -1324,6 +1338,9 @@ for o, a in opts:
             print "speed %s not available" % a
             usage(sys.argv[0], 1)
         boards[board]['serial'] = a
+
+    elif o in ("--nofloat"):
+        nofloat=True
 
     elif o in ("--ldshow"):
         ldshow = True

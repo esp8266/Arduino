@@ -59,12 +59,15 @@ void loop() {
         if(serverClients[i]) serverClients[i].stop();
         serverClients[i] = server.available();
         Serial1.print("New client: "); Serial1.print(i);
-        continue;
+        break;
       }
     }
     //no free/disconnected spot so reject
-    WiFiClient serverClient = server.available();
-    serverClient.stop();
+    if ( i == MAX_SRV_CLIENTS) {
+       WiFiClient serverClient = server.available();
+       serverClient.stop();
+        Serial1.println("Connection rejected ");
+    }
   }
   //check clients for data
   for(i = 0; i < MAX_SRV_CLIENTS; i++){
