@@ -111,7 +111,7 @@ void micros_overflow_tick(void* arg) {
 //    overall result, only (2) 32-bit words are needed for the accumulator.
 //
 // 3) As C++ does not intrinsically test for addition overflows, one must
-//    to code specifically to detect them. This approximation skips these
+//    code specifically to detect them. This approximation skips these
 //    overflow checks for speed, hence the sum,
 //
 //    highword( m kl ) + m kh + c kl  <  (2^64-1),  MUST NOT OVERFLOW.
