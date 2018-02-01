@@ -24,14 +24,28 @@
 
 using __cxxabiv1::__guard;
 
+// Debugging helper, last allocation which returned NULL
+extern void *umm_last_fail_alloc_addr;
+extern int umm_last_fail_alloc_size;
+
 void *operator new(size_t size)
 {
-    return malloc(size);
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+    return ret;
 }
 
 void *operator new[](size_t size)
 {
-    return malloc(size);
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+    return ret;
 }
 
 void operator delete(void * ptr)

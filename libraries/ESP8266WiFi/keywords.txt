@@ -19,6 +19,12 @@ WiFiServerSecure	KEYWORD1
 WiFiUDP	KEYWORD1
 WiFiClientSecure	KEYWORD1
 ESP8266WiFiMulti	KEYWORD1
+BearSSLX509List	KEYWORD1
+BearSSLPrivateKey	KEYWORD1
+BearSSLPublicKey	KEYWORD1
+CertStoreSPIFFSBearSSL	KEYWORD1
+CertStoreSDBearSSL	KEYWORD1
+
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
@@ -156,6 +162,28 @@ destinationIP	KEYWORD2
 localPort	KEYWORD2
 stopAll	KEYWORD2
 stopAllExcept	KEYWORD2
+
+#WiFiClientBearSSL
+setInsecure	KEYWORD2
+setKnownKey	KEYWORD2
+setFingerprint	KEYWORD2
+allowSelfSignedCerts	KEYWORD2
+setTrustAnchors	KEYWORD2
+setX509Time	KEYWORD2
+setClientRSACert	KEYWORD2
+setClientECCert	KEYWORD2
+setBufferSizes	KEYWORD2
+getLastSSLError	KEYWORD2
+setCertStore	KEYWORD2
+probeMaxFragmentLength	KEYWORD2
+
+#WiFiServerBearSSL
+setRSACert	KEYWORD2
+setECCert	KEYWORD2
+setClientTrustAnchor	KEYWORD2
+
+#CertStoreBearSSL
+initCertStore	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

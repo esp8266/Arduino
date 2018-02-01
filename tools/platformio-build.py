@@ -69,7 +69,7 @@ env.Prepend(
     ],
     LIBS=[
         "wpa2", "smartconfig", "espnow", "pp", "main", "wpa", "lwip_gcc",
-        "net80211", "wps", "crypto", "phy", "hal", "axtls", "gcc",
+        "net80211", "wps", "crypto", "phy", "hal", "bearssl", "axtls", "gcc",
         "m", "c", "stdc++"
     ]
 )
