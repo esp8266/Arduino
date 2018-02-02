@@ -396,6 +396,9 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
     if(payload && size > 0) {
         addHeader(F("Content-Length"), String(size));
     }
+    else {
+        addHeader(F("Content-Length"), "0");
+    }
 
     // send Header
     if(!sendHeader(type)) {
