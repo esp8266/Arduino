@@ -36,7 +36,9 @@
 #define DEBUG_OUTPUT Serial
 #endif
 
-const char * AUTHORIZATION_HEADER = "Authorization";
+//const char * AUTHORIZATION_HEADER = "Authorization";
+static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
+static const char qop_auth[] PROGMEM = "qop=auth";
 
 ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 : _server(addr, port)
@@ -44,13 +46,13 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
 , _statusChange(0)
-, _currentHandler(0)
-, _firstHandler(0)
-, _lastHandler(0)
+, _currentHandler(nullptr)
+, _firstHandler(nullptr)
+, _lastHandler(nullptr)
 , _currentArgCount(0)
-, _currentArgs(0)
+, _currentArgs(nullptr)
 , _headerKeysCount(0)
-, _currentHeaders(0)
+, _currentHeaders(nullptr)
 , _contentLength(0)
 , _chunked(false)
 {
@@ -62,13 +64,13 @@ ESP8266WebServer::ESP8266WebServer(int port)
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
 , _statusChange(0)
-, _currentHandler(0)
-, _firstHandler(0)
-, _lastHandler(0)
+, _currentHandler(nullptr)
+, _firstHandler(nullptr)
+, _lastHandler(nullptr)
 , _currentArgCount(0)
-, _currentArgs(0)
+, _currentArgs(nullptr)
 , _headerKeysCount(0)
-, _currentHeaders(0)
+, _currentHeaders(nullptr)
 , _contentLength(0)
 , _chunked(false)
 {
@@ -104,9 +106,9 @@ String ESP8266WebServer::_extractParam(String& authReq,const String& param,const
 }
 
 bool ESP8266WebServer::authenticate(const char * username, const char * password){
-  if(hasHeader(AUTHORIZATION_HEADER)){
-    String authReq = header(AUTHORIZATION_HEADER);
-    if(authReq.startsWith("Basic")){
+  if(hasHeader(FPSTR(AUTHORIZATION_HEADER))) {
+    String authReq = header(FPSTR(AUTHORIZATION_HEADER));
+    if(authReq.startsWith(F("Basic"))){
       authReq = authReq.substring(6);
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
@@ -130,22 +132,22 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       }
       delete[] toencode;
       delete[] encoded;
-    }else if(authReq.startsWith("Digest")){
+    }else if(authReq.startsWith(F("Digest"))){
       authReq = authReq.substring(7);
       #ifdef DEBUG_ESP_HTTP_SERVER
       DEBUG_OUTPUT.println(authReq);
       #endif
-      String _username = _extractParam(authReq,"username=\"");
+      String _username = _extractParam(authReq,F("username=\""));
       if((!_username.length())||_username!=String(username)){
         authReq = String();
         return false;
       }
       // extracting required parameters for RFC 2069 simpler Digest
-      String _realm    = _extractParam(authReq,"realm=\"");
-      String _nonce    = _extractParam(authReq,"nonce=\"");
-      String _uri      = _extractParam(authReq,"uri=\"");
-      String _response = _extractParam(authReq,"response=\"");
-      String _opaque   = _extractParam(authReq,"opaque=\"");
+      String _realm    = _extractParam(authReq,F("realm=\""));
+      String _nonce    = _extractParam(authReq,F("nonce=\""));
+      String _uri      = _extractParam(authReq,F("uri=\""));
+      String _response = _extractParam(authReq,F("response=\""));
+      String _opaque   = _extractParam(authReq,F("opaque=\""));
 
       if((!_realm.length())||(!_nonce.length())||(!_uri.length())||(!_response.length())||(!_opaque.length())){
         authReq = String();
@@ -157,7 +159,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       }
       // parameters for the RFC 2617 newer Digest
       String _nc,_cnonce;
-      if(authReq.indexOf("qop=auth") != -1){
+      if(authReq.indexOf(FPSTR(qop=auth)) != -1){
         _nc = _extractParam(authReq,"nc=",',');
         _cnonce = _extractParam(authReq,"cnonce=\"");
       }
@@ -187,7 +189,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
       #endif
       md5.begin();
-      if(authReq.indexOf("qop=auth") != -1){
+      if(authReq.indexOf(FPSTR(qop_auth)) != -1){
         md5.add(_H1+":"+_nonce+":"+_nc+":"+_cnonce+":auth:"+_H2);
       }else{
         md5.add(_H1+":"+_nonce+":"+_H2);
@@ -518,7 +520,7 @@ void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t hea
   if (_currentHeaders)
      delete[]_currentHeaders;
   _currentHeaders = new RequestArgument[_headerKeysCount];
-  _currentHeaders[0].key = AUTHORIZATION_HEADER;
+  _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
   for (int i = 1; i < _headerKeysCount; i++){
     _currentHeaders[i].key = headerKeys[i-1];
   }
