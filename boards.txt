@@ -211,18 +211,18 @@ generic.menu.led.14=14
 generic.menu.led.14.build.led=-DUSERLED=14
 generic.menu.led.15=15
 generic.menu.led.15.build.led=-DUSERLED=15
-generic.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+generic.menu.LwIPVariant.v2mss536=v2 Lower Memory
 generic.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 generic.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 generic.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-generic.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+generic.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 generic.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 generic.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 generic.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-generic.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+generic.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 generic.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 generic.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-generic.menu.LwIPVariant.OpenSource=v1.4 Open Source
+generic.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 generic.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 generic.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 generic.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -425,18 +425,18 @@ esp8285.menu.led.14=14
 esp8285.menu.led.14.build.led=-DUSERLED=14
 esp8285.menu.led.15=15
 esp8285.menu.led.15.build.led=-DUSERLED=15
-esp8285.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+esp8285.menu.LwIPVariant.v2mss536=v2 Lower Memory
 esp8285.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 esp8285.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 esp8285.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-esp8285.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+esp8285.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 esp8285.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 esp8285.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 esp8285.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-esp8285.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+esp8285.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 esp8285.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 esp8285.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-esp8285.menu.LwIPVariant.OpenSource=v1.4 Open Source
+esp8285.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 esp8285.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 esp8285.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 esp8285.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -560,18 +560,18 @@ espduino.menu.FlashSize.4M3M.upload.maximum_size=1044464
 espduino.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espduino.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espduino.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-espduino.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espduino.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espduino.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espduino.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espduino.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espduino.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espduino.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espduino.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espduino.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espduino.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espduino.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espduino.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espduino.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espduino.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espduino.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espduino.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espduino.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espduino.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espduino.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -687,18 +687,18 @@ huzzah.menu.FlashSize.4M3M.upload.maximum_size=1044464
 huzzah.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 huzzah.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 huzzah.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-huzzah.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+huzzah.menu.LwIPVariant.v2mss536=v2 Lower Memory
 huzzah.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 huzzah.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 huzzah.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-huzzah.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+huzzah.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 huzzah.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 huzzah.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 huzzah.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-huzzah.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+huzzah.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 huzzah.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 huzzah.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-huzzah.menu.LwIPVariant.OpenSource=v1.4 Open Source
+huzzah.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 huzzah.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 huzzah.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 huzzah.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -817,18 +817,18 @@ espresso_lite_v1.menu.ResetMethod.ck=ck
 espresso_lite_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v1.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espresso_lite_v1.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espresso_lite_v1.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espresso_lite_v1.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espresso_lite_v1.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espresso_lite_v1.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espresso_lite_v1.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espresso_lite_v1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espresso_lite_v1.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espresso_lite_v1.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espresso_lite_v1.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v1.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espresso_lite_v1.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espresso_lite_v1.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espresso_lite_v1.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espresso_lite_v1.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -947,18 +947,18 @@ espresso_lite_v2.menu.ResetMethod.ck=ck
 espresso_lite_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v2.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espresso_lite_v2.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espresso_lite_v2.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espresso_lite_v2.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espresso_lite_v2.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espresso_lite_v2.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espresso_lite_v2.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espresso_lite_v2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espresso_lite_v2.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espresso_lite_v2.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espresso_lite_v2.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v2.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espresso_lite_v2.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espresso_lite_v2.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espresso_lite_v2.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espresso_lite_v2.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1077,18 +1077,18 @@ phoenix_v1.menu.ResetMethod.ck=ck
 phoenix_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v1.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+phoenix_v1.menu.LwIPVariant.v2mss536=v2 Lower Memory
 phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-phoenix_v1.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+phoenix_v1.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 phoenix_v1.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 phoenix_v1.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 phoenix_v1.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-phoenix_v1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+phoenix_v1.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 phoenix_v1.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 phoenix_v1.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v1.menu.LwIPVariant.OpenSource=v1.4 Open Source
+phoenix_v1.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 phoenix_v1.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 phoenix_v1.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 phoenix_v1.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1207,18 +1207,18 @@ phoenix_v2.menu.ResetMethod.ck=ck
 phoenix_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v2.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+phoenix_v2.menu.LwIPVariant.v2mss536=v2 Lower Memory
 phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-phoenix_v2.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+phoenix_v2.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 phoenix_v2.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 phoenix_v2.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 phoenix_v2.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-phoenix_v2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+phoenix_v2.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 phoenix_v2.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 phoenix_v2.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v2.menu.LwIPVariant.OpenSource=v1.4 Open Source
+phoenix_v2.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 phoenix_v2.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 phoenix_v2.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 phoenix_v2.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1334,18 +1334,18 @@ nodemcu.menu.FlashSize.4M3M.upload.maximum_size=1044464
 nodemcu.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 nodemcu.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 nodemcu.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-nodemcu.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+nodemcu.menu.LwIPVariant.v2mss536=v2 Lower Memory
 nodemcu.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 nodemcu.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 nodemcu.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-nodemcu.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+nodemcu.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 nodemcu.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 nodemcu.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 nodemcu.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-nodemcu.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+nodemcu.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 nodemcu.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 nodemcu.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcu.menu.LwIPVariant.OpenSource=v1.4 Open Source
+nodemcu.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 nodemcu.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 nodemcu.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 nodemcu.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1461,18 +1461,18 @@ nodemcuv2.menu.FlashSize.4M3M.upload.maximum_size=1044464
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-nodemcuv2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+nodemcuv2.menu.LwIPVariant.v2mss536=v2 Lower Memory
 nodemcuv2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 nodemcuv2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 nodemcuv2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-nodemcuv2.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+nodemcuv2.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 nodemcuv2.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 nodemcuv2.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 nodemcuv2.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-nodemcuv2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+nodemcuv2.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 nodemcuv2.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 nodemcuv2.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcuv2.menu.LwIPVariant.OpenSource=v1.4 Open Source
+nodemcuv2.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 nodemcuv2.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 nodemcuv2.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 nodemcuv2.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1580,18 +1580,18 @@ modwifi.menu.FlashSize.2M.upload.maximum_size=1044464
 modwifi.menu.FlashSize.2M.build.spiffs_start=0x100000
 modwifi.menu.FlashSize.2M.build.spiffs_end=0x1FB000
 modwifi.menu.FlashSize.2M.build.spiffs_blocksize=8192
-modwifi.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+modwifi.menu.LwIPVariant.v2mss536=v2 Lower Memory
 modwifi.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 modwifi.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 modwifi.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-modwifi.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+modwifi.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 modwifi.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 modwifi.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 modwifi.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-modwifi.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+modwifi.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 modwifi.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 modwifi.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-modwifi.menu.LwIPVariant.OpenSource=v1.4 Open Source
+modwifi.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 modwifi.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 modwifi.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 modwifi.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1712,18 +1712,18 @@ thing.menu.FlashSize.512K128.upload.maximum_size=368624
 thing.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 thing.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 thing.menu.FlashSize.512K128.build.spiffs_blocksize=4096
-thing.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+thing.menu.LwIPVariant.v2mss536=v2 Lower Memory
 thing.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 thing.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 thing.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-thing.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+thing.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 thing.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 thing.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 thing.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-thing.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+thing.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 thing.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 thing.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-thing.menu.LwIPVariant.OpenSource=v1.4 Open Source
+thing.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 thing.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 thing.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 thing.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1844,18 +1844,18 @@ thingdev.menu.FlashSize.512K128.upload.maximum_size=368624
 thingdev.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 thingdev.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 thingdev.menu.FlashSize.512K128.build.spiffs_blocksize=4096
-thingdev.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+thingdev.menu.LwIPVariant.v2mss536=v2 Lower Memory
 thingdev.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 thingdev.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 thingdev.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-thingdev.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+thingdev.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 thingdev.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 thingdev.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 thingdev.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-thingdev.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+thingdev.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 thingdev.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 thingdev.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-thingdev.menu.LwIPVariant.OpenSource=v1.4 Open Source
+thingdev.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 thingdev.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 thingdev.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 thingdev.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1971,18 +1971,18 @@ esp210.menu.FlashSize.4M3M.upload.maximum_size=1044464
 esp210.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 esp210.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 esp210.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-esp210.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+esp210.menu.LwIPVariant.v2mss536=v2 Lower Memory
 esp210.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 esp210.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 esp210.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-esp210.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+esp210.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 esp210.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 esp210.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 esp210.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-esp210.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+esp210.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 esp210.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 esp210.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-esp210.menu.LwIPVariant.OpenSource=v1.4 Open Source
+esp210.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 esp210.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 esp210.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 esp210.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2098,18 +2098,18 @@ d1_mini.menu.FlashSize.4M3M.upload.maximum_size=1044464
 d1_mini.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 d1_mini.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 d1_mini.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-d1_mini.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1_mini.menu.LwIPVariant.v2mss536=v2 Lower Memory
 d1_mini.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 d1_mini.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 d1_mini.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1_mini.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 d1_mini.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 d1_mini.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 d1_mini.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-d1_mini.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+d1_mini.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 d1_mini.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1_mini.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini.menu.LwIPVariant.OpenSource=v1.4 Open Source
+d1_mini.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 d1_mini.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1_mini.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1_mini.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2217,18 +2217,18 @@ d1_mini_pro.menu.FlashSize.16M15M.upload.maximum_size=1044464
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_start=0x100000
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_end=0xFFB000
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_blocksize=8192
-d1_mini_pro.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1_mini_pro.menu.LwIPVariant.v2mss536=v2 Lower Memory
 d1_mini_pro.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 d1_mini_pro.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 d1_mini_pro.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini_pro.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1_mini_pro.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 d1_mini_pro.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 d1_mini_pro.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 d1_mini_pro.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-d1_mini_pro.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+d1_mini_pro.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 d1_mini_pro.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1_mini_pro.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_pro.menu.LwIPVariant.OpenSource=v1.4 Open Source
+d1_mini_pro.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 d1_mini_pro.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1_mini_pro.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1_mini_pro.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2389,18 +2389,18 @@ d1_mini_lite.menu.FlashSize.1M512.upload.maximum_size=499696
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_start=0x7B000
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_blocksize=8192
-d1_mini_lite.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1_mini_lite.menu.LwIPVariant.v2mss536=v2 Lower Memory
 d1_mini_lite.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 d1_mini_lite.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 d1_mini_lite.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini_lite.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1_mini_lite.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 d1_mini_lite.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 d1_mini_lite.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 d1_mini_lite.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-d1_mini_lite.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+d1_mini_lite.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 d1_mini_lite.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1_mini_lite.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_lite.menu.LwIPVariant.OpenSource=v1.4 Open Source
+d1_mini_lite.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 d1_mini_lite.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1_mini_lite.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1_mini_lite.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2516,18 +2516,18 @@ d1.menu.FlashSize.4M3M.upload.maximum_size=1044464
 d1.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 d1.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 d1.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-d1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1.menu.LwIPVariant.v2mss536=v2 Lower Memory
 d1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 d1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 d1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 d1.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 d1.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 d1.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-d1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+d1.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 d1.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1.menu.LwIPVariant.OpenSource=v1.4 Open Source
+d1.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 d1.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2646,18 +2646,18 @@ espino.menu.FlashSize.4M3M.upload.maximum_size=1044464
 espino.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espino.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espino.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-espino.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espino.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espino.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espino.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espino.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espino.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espino.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espino.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espino.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espino.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espino.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espino.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espino.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espino.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espino.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espino.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espino.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espino.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espino.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2773,18 +2773,18 @@ espinotee.menu.FlashSize.4M3M.upload.maximum_size=1044464
 espinotee.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espinotee.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espinotee.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-espinotee.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espinotee.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espinotee.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espinotee.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espinotee.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espinotee.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espinotee.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espinotee.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espinotee.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espinotee.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espinotee.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espinotee.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espinotee.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espinotee.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espinotee.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espinotee.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espinotee.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espinotee.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espinotee.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2965,18 +2965,18 @@ wifinfo.menu.FlashSize.1M512.upload.maximum_size=499696
 wifinfo.menu.FlashSize.1M512.build.spiffs_start=0x7B000
 wifinfo.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 wifinfo.menu.FlashSize.1M512.build.spiffs_blocksize=8192
-wifinfo.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+wifinfo.menu.LwIPVariant.v2mss536=v2 Lower Memory
 wifinfo.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 wifinfo.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 wifinfo.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wifinfo.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+wifinfo.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 wifinfo.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 wifinfo.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 wifinfo.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-wifinfo.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+wifinfo.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 wifinfo.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 wifinfo.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-wifinfo.menu.LwIPVariant.OpenSource=v1.4 Open Source
+wifinfo.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 wifinfo.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 wifinfo.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 wifinfo.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3104,18 +3104,18 @@ arduino-esp8266.menu.FlashSize.4M3M.upload.maximum_size=1044464
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-arduino-esp8266.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+arduino-esp8266.menu.LwIPVariant.v2mss536=v2 Lower Memory
 arduino-esp8266.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 arduino-esp8266.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 arduino-esp8266.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-arduino-esp8266.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+arduino-esp8266.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 arduino-esp8266.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 arduino-esp8266.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 arduino-esp8266.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-arduino-esp8266.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+arduino-esp8266.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 arduino-esp8266.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 arduino-esp8266.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-arduino-esp8266.menu.LwIPVariant.OpenSource=v1.4 Open Source
+arduino-esp8266.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 arduino-esp8266.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 arduino-esp8266.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 arduino-esp8266.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3237,18 +3237,18 @@ gen4iod.menu.FlashSize.512K128.upload.maximum_size=368624
 gen4iod.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 gen4iod.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 gen4iod.menu.FlashSize.512K128.build.spiffs_blocksize=4096
-gen4iod.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+gen4iod.menu.LwIPVariant.v2mss536=v2 Lower Memory
 gen4iod.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 gen4iod.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 gen4iod.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-gen4iod.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+gen4iod.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 gen4iod.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 gen4iod.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 gen4iod.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-gen4iod.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+gen4iod.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 gen4iod.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 gen4iod.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-gen4iod.menu.LwIPVariant.OpenSource=v1.4 Open Source
+gen4iod.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 gen4iod.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 gen4iod.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 gen4iod.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3365,18 +3365,18 @@ oak.menu.FlashSize.4M3M.upload.maximum_size=1044464
 oak.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 oak.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 oak.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-oak.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+oak.menu.LwIPVariant.v2mss536=v2 Lower Memory
 oak.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 oak.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 oak.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-oak.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+oak.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 oak.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 oak.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 oak.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-oak.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+oak.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 oak.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 oak.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-oak.menu.LwIPVariant.OpenSource=v1.4 Open Source
+oak.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 oak.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 oak.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 oak.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
