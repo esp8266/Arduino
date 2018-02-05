@@ -545,6 +545,7 @@ protected:
     err_t _connected(struct tcp_pcb *pcb, err_t err)
     {
         (void) err;
+        (void) pcb;
         assert(pcb == _pcb);
         assert(_connect_pending);
         esp_schedule();
