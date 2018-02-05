@@ -447,11 +447,13 @@ protected:
             }
             err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, (int) err);
-            _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
+                _datasource->release_buffer(buf, next_chunk);
                 _written += next_chunk;
                 need_output = true;
             } else {
+		// ERR_MEM(-1) is a valid error meaning
+		// "come back later". It leaves state() opened
                 break;
             }
             will_send -= next_chunk;
