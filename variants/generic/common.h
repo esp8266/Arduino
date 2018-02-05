@@ -71,4 +71,9 @@ static const uint8_t A0 = PIN_A0;
 #define SERIAL_PORT_HARDWARE       Serial
 #define SERIAL_PORT_HARDWARE_OPEN  Serial1
 
+#ifdef __cplusplus
+extern "C"
+#endif
+const int BUILTIN_LED __attribute__((deprecated, weak)) = LED_BUILTIN;
+
 #endif /* GENERIC_COMMON_H */

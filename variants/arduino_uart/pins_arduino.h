@@ -33,7 +33,6 @@
 
 #include "../generic/common.h"
 
-static const uint8_t LED_BUILTIN = 14;
-static const uint8_t BUILTIN_LED = 14;
+#define LED_BUILTIN 14
 
 #endif /* Pins_Arduino_h */
