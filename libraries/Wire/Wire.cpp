@@ -30,6 +30,13 @@ extern "C" {
 #include "twi.h"
 #include "Wire.h"
 
+
+//Some boards don't have these pins available, and hence don't support Wire.
+//Check here for compile-time error.
+#if !defined(PIN_WIRE_SDA) || !defined(PIN_WIRE_SCL)
+#error Wire library is not supported on this board
+#endif
+
 // Initialize Class Variables //////////////////////////////////////////////////
 
 uint8_t TwoWire::rxBuffer[BUFFER_LENGTH];

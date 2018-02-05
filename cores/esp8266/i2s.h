@@ -43,6 +43,8 @@ extern "C" {
 void i2s_begin();
 void i2s_end();
 void i2s_set_rate(uint32_t rate);//Sample Rate in Hz (ex 44100, 48000)
+void i2s_set_dividers(uint8_t div1, uint8_t div2);//Direct control over output rate
+float i2s_get_real_rate();//The actual Sample Rate on output
 bool i2s_write_sample(uint32_t sample);//32bit sample with channels being upper and lower 16 bits (blocking when DMA is full)
 bool i2s_write_sample_nb(uint32_t sample);//same as above but does not block when DMA is full and returns false instead
 bool i2s_write_lr(int16_t left, int16_t right);//combines both channels and calls i2s_write_sample with the result

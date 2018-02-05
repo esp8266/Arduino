@@ -283,3 +283,9 @@ extern "C" void configTime(long timezone, int daylightOffset_sec,
 #include "pins_arduino.h"
 
 #endif
+
+#ifdef DEBUG_ESP_OOM
+// reinclude *alloc redefinition because of <cstdlib> undefining them
+// this is mandatory for allowing OOM *alloc definitions in .ino files
+#include "umm_malloc/umm_malloc_cfg.h"
+#endif
