@@ -39,6 +39,10 @@
 //const char * AUTHORIZATION_HEADER = "Authorization";
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
 static const char qop_auth[] PROGMEM = "qop=auth";
+static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
+static const char colon[] PROGMEM = ":";
+static const char Content_Length[] PROGMEM = "Content-Length";
+
 
 ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 : _server(addr, port)
@@ -101,7 +105,8 @@ void ESP8266WebServer::begin(uint16_t port) {
 
 String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit){
   int _begin = authReq.indexOf(param);
-  if (_begin==-1) return "";
+  if (_begin==-1) 
+    return String();
   return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
 
@@ -132,40 +137,40 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       }
       delete[] toencode;
       delete[] encoded;
-    }else if(authReq.startsWith(F("Digest"))){
+    } else if(authReq.startsWith(F("Digest"))) {
       authReq = authReq.substring(7);
       #ifdef DEBUG_ESP_HTTP_SERVER
       DEBUG_OUTPUT.println(authReq);
       #endif
       String _username = _extractParam(authReq,F("username=\""));
-      if((!_username.length())||_username!=String(username)){
+      if(!_username.length() || _username != String(username)) {
         authReq = String();
         return false;
       }
       // extracting required parameters for RFC 2069 simpler Digest
-      String _realm    = _extractParam(authReq,F("realm=\""));
-      String _nonce    = _extractParam(authReq,F("nonce=\""));
-      String _uri      = _extractParam(authReq,F("uri=\""));
-      String _response = _extractParam(authReq,F("response=\""));
-      String _opaque   = _extractParam(authReq,F("opaque=\""));
+      String _realm    = _extractParam(authReq, F("realm=\""));
+      String _nonce    = _extractParam(authReq, F("nonce=\""));
+      String _uri      = _extractParam(authReq, F("uri=\""));
+      String _response = _extractParam(authReq, F("response=\""));
+      String _opaque   = _extractParam(authReq, F("opaque=\""));
 
-      if((!_realm.length())||(!_nonce.length())||(!_uri.length())||(!_response.length())||(!_opaque.length())){
+      if((!_realm.length()) || (!_nonce.length()) || (!_uri.length()) || (!_response.length()) || (!_opaque.length())) {
         authReq = String();
         return false;
       }
-      if((_opaque!=_sopaque)||(_nonce!=_snonce)||(_realm!=_srealm)){
+      if((_opaque != _sopaque) || (_nonce != _snonce) || (_realm != _srealm)) {
         authReq = String();
         return false;
       }
       // parameters for the RFC 2617 newer Digest
       String _nc,_cnonce;
-      if(authReq.indexOf(FPSTR(qop=auth)) != -1){
-        _nc = _extractParam(authReq,"nc=",',');
-        _cnonce = _extractParam(authReq,"cnonce=\"");
+      if(authReq.indexOf(FPSTR(qop_auth)) != -1) {
+        _nc = _extractParam(authReq, F("nc="), ',');
+        _cnonce = _extractParam(authReq, F("cnonce=\""));
       }
       MD5Builder md5;
       md5.begin();
-      md5.add(String(username)+":"+_realm+":"+String(password));  // md5 of the user:realm:user
+      md5.add(String(username) + ':' + _realm + ':' + String(password));  // md5 of the user:realm:user
       md5.calculate();
       String _H1 = md5.toString();
       #ifdef DEBUG_ESP_HTTP_SERVER
@@ -173,15 +178,15 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       #endif
       md5.begin();
       if(_currentMethod == HTTP_GET){
-        md5.add("GET:"+_uri);
+        md5.add(String(F("GET:")) + _uri);
       }else if(_currentMethod == HTTP_POST){
-        md5.add("POST:"+_uri);
+        md5.add(String(F("POST:")) + _uri);
       }else if(_currentMethod == HTTP_PUT){
-        md5.add("PUT:"+_uri);
+        md5.add(String(F("PUT:")) + _uri);
       }else if(_currentMethod == HTTP_DELETE){
-        md5.add("DELETE:"+_uri);
+        md5.add(String(F("DELETE:")) + _uri);
       }else{
-        md5.add("GET:"+_uri);
+        md5.add(String(F("GET:")) + _uri);
       }
       md5.calculate();
       String _H2 = md5.toString();
@@ -189,17 +194,17 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
       #endif
       md5.begin();
-      if(authReq.indexOf(FPSTR(qop_auth)) != -1){
-        md5.add(_H1+":"+_nonce+":"+_nc+":"+_cnonce+":auth:"+_H2);
+      if(authReq.indexOf(FPSTR(qop_auth)) != -1) {
+        md5.add(_H1 + FPSTR(colon) + _nonce + FPSTR(colon) + _nc + FPSTR(colon) + _cnonce + ':auth:' + _H2);
       }else{
-        md5.add(_H1+":"+_nonce+":"+_H2);
+        md5.add(_H1 + FPSTR(colon) + _nonce + FPSTR(colon) + _H2);
       }
       md5.calculate();
       String _responsecheck = md5.toString();
       #ifdef DEBUG_ESP_HTTP_SERVER
       DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
       #endif
-      if(_response==_responsecheck){
+      if(_response == _responsecheck){
         authReq = String();
         return true;
       }
@@ -209,29 +214,30 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
   return false;
 }
 
-String ESP8266WebServer::_getRandomHexString(){
+String ESP8266WebServer::_getRandomHexString() {
   char buffer[33];  // buffer to hold 32 Hex Digit + /0
   int i;
-  for(i=0;i<4;i++){
-    sprintf (buffer+(i*8), "%08x", RANDOM_REG32);
+  for(i = 0; i < 4; i++) {
+    sprintf (buffer + (i*8), "%08x", RANDOM_REG32);
   }
   return String(buffer);
 }
 
-void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* realm, const String& authFailMsg){
-  if(realm==NULL){
+void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* realm, const String& authFailMsg) {
+  if(realm == NULL) {
     _srealm = String(F("Login Required"));
-  }else{
+  } else {
     _srealm = String(realm);
   }
-  if(mode==BASIC_AUTH){
-    sendHeader(String(F("WWW-Authenticate")), String(F("Basic realm=\"")) + _srealm + String(F("\"")));
-  }else{
+  if(mode == BASIC_AUTH) {
+    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Basic realm=\"")) + _srealm + String(F("\"")));
+  } else {
     _snonce=_getRandomHexString();
     _sopaque=_getRandomHexString();
-    sendHeader(String(F("WWW-Authenticate")), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String(F("\"")));
+    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String(F("\"")));
   }
-  send(401,"text/html",authFailMsg);
+  using namespace mime;
+  send(401, mimeTable[html].mimeType, authFailMsg);
 }
 
 void ESP8266WebServer::on(const String &uri, ESP8266WebServer::THandlerFunction handler) {
@@ -343,9 +349,9 @@ void ESP8266WebServer::stop() {
 
 void ESP8266WebServer::sendHeader(const String& name, const String& value, bool first) {
   String headerLine = name;
-  headerLine += ": ";
+  headerLine += F(": ");
   headerLine += value;
-  headerLine += "\r\n";
+  headerLine += F("\r\n");
 
   if (first) {
     _responseHeaders = headerLine + _responseHeaders;
@@ -355,25 +361,26 @@ void ESP8266WebServer::sendHeader(const String& name, const String& value, bool 
   }
 }
 
-void ESP8266WebServer::setContentLength(size_t contentLength) {
+void ESP8266WebServer::setContentLength(const size_t contentLength) {
     _contentLength = contentLength;
 }
 
 void ESP8266WebServer::_prepareHeader(String& response, int code, const char* content_type, size_t contentLength) {
-    response = String(F("HTTP/1.")) + String(_currentVersion) + " ";
+    response = String(F("HTTP/1.")) + String(_currentVersion) + ' ';
     response += String(code);
-    response += " ";
+    response += ' ';
     response += _responseCodeToString(code);
     response += String(F("\r\n"));
 
+    using namespace mime;
     if (!content_type)
-        content_type = "text/html";
+        content_type = mimeTable[html].mimeType;
 
     sendHeader(String(F("Content-Type")), content_type, true);
     if (_contentLength == CONTENT_LENGTH_NOT_SET) {
-        sendHeader(String(F("Content-Length")), String(contentLength));
+        sendHeader(String(FPSTR(Content_Length)), String(contentLength));
     } else if (_contentLength != CONTENT_LENGTH_UNKNOWN) {
-        sendHeader(String(F("Content-Length")), String(_contentLength));
+        sendHeader(String(FPSTR(Content_Length)), String(_contentLength));
     } else if(_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion){ //HTTP/1.1 or above client
       //let's do chunked
       _chunked = true;
@@ -471,6 +478,19 @@ void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
       _chunked = false;
     }
   }
+}
+
+
+void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fileName, const String & contentType)
+{
+  using namespace mime;
+  setContentLength(fileSize);
+  if (fileName.endsWith(mimeTable[gz].endsWith) &&
+      contentType != mimeTable[gz].mimeType &&
+      contentType != mimeTable[none].mimeType) {
+    sendHeader(F("Content-Encoding"), F("gzip"));
+  }
+  send(200, contentType, "");
 }
 
 
@@ -582,7 +602,8 @@ void ESP8266WebServer::_handleRequest() {
     handled = true;
   }
   if (!handled) {
-    send(404, "text/plain", String(F("Not found: ")) + _currentUri);
+    using namespace mime;
+    send(404, mimeTable[html].mimeType, String(F("Not found: ")) + _currentUri);
     handled = true;
   }
   if (handled) {
@@ -594,7 +615,7 @@ void ESP8266WebServer::_handleRequest() {
 
 void ESP8266WebServer::_finalizeResponse() {
   if (_chunked) {
-    sendContent("");
+    sendContent(String());
   }
 }
 

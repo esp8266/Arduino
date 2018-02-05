@@ -40,8 +40,8 @@ struct Entry
 };
 
 
+extern const Entry mimeTable[maxType];
 }
 
-extern const mime::Entry mimeTable[mime::maxType];
 
 #endif
