@@ -26,6 +26,11 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
+#include "../generic/common.h"
+
+#define PIN_WIRE_SDA (2)
+#define PIN_WIRE_SCL (0)
+
 static const uint8_t P0   = 2;
 static const uint8_t P1   = 5;
 static const uint8_t P2   = 0;
@@ -39,8 +44,8 @@ static const uint8_t P9   = 14;
 static const uint8_t P10  = 16;
 static const uint8_t P11  = 17;
 
-static const uint8_t SDA = 2;
-static const uint8_t SCL = 0;
+static const uint8_t SDA = PIN_WIRE_SDA;
+static const uint8_t SCL = PIN_WIRE_SCL;
 
 static const uint8_t SS    = 15;
 static const uint8_t MOSI  = 13;
