@@ -120,16 +120,20 @@ wl_status_t ESP8266WiFiMulti::run(void) {
             delay(0);
 
             if(bestNetwork.ssid) {
-                DEBUG_WIFI_MULTI("[WIFI] Connecting BSSID: %02X:%02X:%02X:%02X:%02X:%02X SSID: %s Channal: %d (%d)\n", bestBSSID[0], bestBSSID[1], bestBSSID[2], bestBSSID[3], bestBSSID[4], bestBSSID[5], bestNetwork.ssid, bestChannel, bestNetworkDb);
+                DEBUG_WIFI_MULTI("[WIFI] Connecting BSSID: %02X:%02X:%02X:%02X:%02X:%02X SSID: %s Channel: %d (%d)\n", bestBSSID[0], bestBSSID[1], bestBSSID[2], bestBSSID[3], bestBSSID[4], bestBSSID[5], bestNetwork.ssid, bestChannel, bestNetworkDb);
 
                 WiFi.begin(bestNetwork.ssid, bestNetwork.passphrase, bestChannel, bestBSSID);
                 status = WiFi.status();
 
-                // wait for connection or fail
-                while(status != WL_CONNECTED && status != WL_NO_SSID_AVAIL && status != WL_CONNECT_FAILED) {
+                static const uint32_t connectTimeout = 5000; //5s timeout
+                
+                auto startTime = millis();
+                // wait for connection, fail, or timeout
+                while(status != WL_CONNECTED && status != WL_NO_SSID_AVAIL && status != WL_CONNECT_FAILED && (millis() - startTime) <= connectTimeout) {
                     delay(10);
                     status = WiFi.status();
                 }
+                
 #ifdef DEBUG_ESP_WIFI
                 IPAddress ip;
                 uint8_t * mac;
