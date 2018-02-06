@@ -54,7 +54,7 @@ follows:
     Error compiling for board Generic ESP8266 Module.
 
 Below is an example messages for
-`WeMos <https://github.com/esp8266/Arduino/blob/master/doc/boards.md#wemos-d1>`__:
+`WeMos <https://github.com/esp8266/Arduino/blob/master/doc/boards.rst#wemos-d1>`__:
 
 ::
 
@@ -62,7 +62,7 @@ Below is an example messages for
     Error compiling for board WeMos D1 R2 & mini.
 
 ... and another one for `Adafruit
-HUZZAH <https://github.com/esp8266/Arduino/blob/master/doc/boards.md#adafruit-huzzah-esp8266-esp-12>`__:
+HUZZAH <https://github.com/esp8266/Arduino/blob/master/doc/boards.rst#adafruit-huzzah-esp8266-esp-12>`__:
 
 ::
 
