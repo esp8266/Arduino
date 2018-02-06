@@ -475,8 +475,6 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM,
     _ssl = _new_ssl_shared;
 
     if (usePMEM) {
-        // When using PMEM based certs, allocate stack and copy from flash to DRAM, call SSL functions to avoid
-        // heap fragmentation that would happen w/malloc()
         if (rsakey && rsakeyLen) {
             _ssl->loadObject_P(SSL_OBJ_RSA_KEY, rsakey, rsakeyLen);
         }
