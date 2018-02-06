@@ -74,24 +74,41 @@ typedef std::list<BufferItem> BufferList;
 class SSLContext
 {
 public:
-    SSLContext()
+    SSLContext(bool isServer = false)
     {
-        if (_ssl_ctx_refcnt == 0) {
-            _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
+        _isServer = isServer;
+        if (!_isServer) {
+            if (_ssl_client_ctx_refcnt == 0) {
+                _ssl_client_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
+            }
+            ++_ssl_client_ctx_refcnt;
+        } else {
+            if (_ssl_svr_ctx_refcnt == 0) {
+                _ssl_svr_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
+            }
+            ++_ssl_svr_ctx_refcnt;
         }
-        ++_ssl_ctx_refcnt;
     }
 
     ~SSLContext()
     {
         if (io_ctx) {
             io_ctx->unref();
-            io_ctx = NULL;
+            io_ctx = nullptr;
         }
         _ssl = nullptr;
-        --_ssl_ctx_refcnt;
-        if (_ssl_ctx_refcnt == 0) {
-            ssl_ctx_free(_ssl_ctx);
+        if (!_isServer) {
+            --_ssl_client_ctx_refcnt;
+            if (_ssl_client_ctx_refcnt == 0) {
+                ssl_ctx_free(_ssl_client_ctx);
+                _ssl_client_ctx = nullptr;
+            }
+        } else {
+            --_ssl_svr_ctx_refcnt;
+            if (_ssl_svr_ctx_refcnt == 0) {
+                ssl_ctx_free(_ssl_svr_ctx);
+                _ssl_svr_ctx = nullptr;
+            }
         }
     }
 
@@ -117,7 +134,7 @@ public:
         ctx->ref();
 
         // Wrap the new SSL with a smart pointer, custom deleter to call ssl_free
-        SSL *_new_ssl = ssl_client_new(_ssl_ctx, reinterpret_cast<int>(this), nullptr, 0, ext);
+        SSL *_new_ssl = ssl_client_new(_ssl_client_ctx, reinterpret_cast<int>(this), nullptr, 0, ext);
         std::shared_ptr<SSL> _new_ssl_shared(_new_ssl, _delete_shared_SSL);
         _ssl = _new_ssl_shared;
 
@@ -133,18 +150,16 @@ public:
         }
     }
 
-    void connectServer(ClientContext *ctx) {
+    void connectServer(ClientContext *ctx, uint32_t timeout_ms)
+    {
         io_ctx = ctx;
         ctx->ref();
 
         // Wrap the new SSL with a smart pointer, custom deleter to call ssl_free
-	SSL *_new_ssl = ssl_server_new(_ssl_ctx, reinterpret_cast<int>(this));
+	SSL *_new_ssl = ssl_server_new(_ssl_svr_ctx, reinterpret_cast<int>(this));
         std::shared_ptr<SSL> _new_ssl_shared(_new_ssl, _delete_shared_SSL);
         _ssl = _new_ssl_shared;
 
-        _isServer = true;
-
-	uint32_t timeout_ms = 5000;
         uint32_t t = millis();
 
         while (millis() - t < timeout_ms && ssl_handshake_status(_ssl.get()) != SSL_OK) {
@@ -301,7 +316,7 @@ public:
 
     bool loadObject(int type, const uint8_t* data, size_t size)
     {
-        int rc = ssl_obj_memory_load(_ssl_ctx, type, data, static_cast<int>(size), nullptr);
+        int rc = ssl_obj_memory_load(_isServer?_ssl_svr_ctx:_ssl_client_ctx, type, data, static_cast<int>(size), nullptr);
         if (rc != SSL_OK) {
             DEBUGV("loadObject: ssl_obj_memory_load returned %d\n", rc);
             return false;
@@ -335,17 +350,9 @@ public:
 
     static ClientContext* getIOContext(int fd)
     {
-        if (!fd) return NULL;
+        if (!fd) return nullptr;
         SSLContext *thisSSL = reinterpret_cast<SSLContext*>(fd);
         return thisSSL->io_ctx;
-    }
-
-    int loadServerX509Cert(const uint8_t *cert, int len) {
-        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_X509_CERT, cert, len, NULL);
-    }
-
-    int loadServerRSAKey(const uint8_t *rsakey, int len) {
-        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_RSA_KEY, rsakey, len, NULL);
     }
 
 protected:
@@ -420,10 +427,12 @@ protected:
     {
         return !_writeBuffers.empty();
     }
-public:
+
     bool _isServer = false;
-    static SSL_CTX* _ssl_ctx;
-    static int _ssl_ctx_refcnt;
+    static SSL_CTX* _ssl_client_ctx;
+    static int _ssl_client_ctx_refcnt;
+    static SSL_CTX* _ssl_svr_ctx;
+    static int _ssl_svr_ctx_refcnt;
     std::shared_ptr<SSL> _ssl = nullptr;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
@@ -432,8 +441,10 @@ public:
     ClientContext* io_ctx = nullptr;
 };
 
-SSL_CTX* SSLContext::_ssl_ctx = nullptr;
-int SSLContext::_ssl_ctx_refcnt = 0;
+SSL_CTX* SSLContext::_ssl_client_ctx = nullptr;
+int SSLContext::_ssl_client_ctx_refcnt = 0;
+SSL_CTX* SSLContext::_ssl_svr_ctx = nullptr;
+int SSLContext::_ssl_svr_ctx_refcnt = 0;
 
 WiFiClientSecure::WiFiClientSecure()
 {
@@ -446,46 +457,41 @@ WiFiClientSecure::~WiFiClientSecure()
    _ssl = nullptr;
 }
 
-    static void _delete_shared_SSLContext(SSLContext *_to_del)
-    {
-        delete _to_del;
-    }
-
-
 // Only called by the WifiServerSecure, need to get the keys/certs loaded before beginning
-WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM, const uint8_t *rsakey, int rsakeyLen, const uint8_t *cert, int certLen)
+WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM,
+                                   const uint8_t *rsakey, int rsakeyLen,
+                                   const uint8_t *cert, int certLen)
 {
+    // TLS handshake may take more than the 5 second default timeout
+    _timeout = 15000;
+
     // We've been given the client context from the available() call
     _client = client;
     _client->ref();
 
     // Make the "_ssl" SSLContext, in the constructor there should be none yet
-    SSLContext *_new_ssl = new SSLContext;
-    std::shared_ptr<SSLContext> _new_ssl_shared(_new_ssl, _delete_shared_SSLContext);
+    SSLContext *_new_ssl = new SSLContext(true);
+    std::shared_ptr<SSLContext> _new_ssl_shared(_new_ssl);
     _ssl = _new_ssl_shared;
 
-    _ssl = std::make_shared<SSLContext>();
     if (usePMEM) {
         // When using PMEM based certs, allocate stack and copy from flash to DRAM, call SSL functions to avoid
         // heap fragmentation that would happen w/malloc()
-        uint8_t *stackData = (uint8_t*)alloca(max(certLen, rsakeyLen));
         if (rsakey && rsakeyLen) {
-              memcpy_P(stackData, rsakey, rsakeyLen);
-              _ssl->loadServerRSAKey(stackData, rsakeyLen);
+            _ssl->loadObject_P(SSL_OBJ_RSA_KEY, rsakey, rsakeyLen);
         }
         if (cert && certLen) {
-            memcpy_P(stackData, cert, certLen);
-            _ssl->loadServerX509Cert(stackData, certLen);
+            _ssl->loadObject_P(SSL_OBJ_X509_CERT, cert, certLen);
         }
     } else {
         if (rsakey && rsakeyLen) {
-            _ssl->loadServerRSAKey(rsakey, rsakeyLen);
+            _ssl->loadObject(SSL_OBJ_RSA_KEY, rsakey, rsakeyLen);
         }
         if (cert && certLen) {
-            _ssl->loadServerX509Cert(cert, certLen);
+            _ssl->loadObject(SSL_OBJ_X509_CERT, cert, certLen);
         }
     }
-    _ssl->connectServer(client);
+    _ssl->connectServer(client, _timeout);
 }
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port)
@@ -725,9 +731,9 @@ bool WiFiClientSecure::_verifyDN(const char* domain_name)
     String domain_name_str(domain_name);
     domain_name_str.toLowerCase();
 
-    const char* san = NULL;
+    const char* san = nullptr;
     int i = 0;
-    while ((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != NULL) {
+    while ((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != nullptr) {
         String san_str(san);
         san_str.toLowerCase();
         if (matchName(san_str, domain_name_str)) {
