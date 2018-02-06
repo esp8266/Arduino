@@ -340,14 +340,6 @@ public:
         return thisSSL->io_ctx;
     }
 
-    int loadServerX509Cert(const uint8_t *cert, int len) {
-        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_X509_CERT, cert, len, NULL);
-    }
-
-    int loadServerRSAKey(const uint8_t *rsakey, int len) {
-        return ssl_obj_memory_load(SSLContext::_ssl_ctx, SSL_OBJ_RSA_KEY, rsakey, len, NULL);
-    }
-
 protected:
     int _readAll()
     {
@@ -466,23 +458,18 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM, const ui
 
     _ssl = std::make_shared<SSLContext>();
     if (usePMEM) {
-        // When using PMEM based certs, allocate stack and copy from flash to DRAM, call SSL functions to avoid
-        // heap fragmentation that would happen w/malloc()
-        uint8_t *stackData = (uint8_t*)alloca(max(certLen, rsakeyLen));
         if (rsakey && rsakeyLen) {
-              memcpy_P(stackData, rsakey, rsakeyLen);
-              _ssl->loadServerRSAKey(stackData, rsakeyLen);
+            _ssl->loadObject_P(SSL_OBJ_RSA_KEY, rsakey, rsakeyLen);
         }
         if (cert && certLen) {
-            memcpy_P(stackData, cert, certLen);
-            _ssl->loadServerX509Cert(stackData, certLen);
+            _ssl->loadObject_P(SSL_OBJ_X509_CERT, cert, certLen);
         }
     } else {
         if (rsakey && rsakeyLen) {
-            _ssl->loadServerRSAKey(rsakey, rsakeyLen);
+            _ssl->loadObject(SSL_OBJ_RSA_KEY, rsakey, rsakeyLen);
         }
         if (cert && certLen) {
-            _ssl->loadServerX509Cert(cert, certLen);
+            _ssl->loadObject(SSL_OBJ_X509_CERT, cert, certLen);
         }
     }
     _ssl->connectServer(client);
