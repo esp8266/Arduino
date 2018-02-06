@@ -553,7 +553,7 @@ boards = collections.OrderedDict([
     ( 'd1', {
         'name': 'WeMos D1 R1',
         'opts': {
-            '.build.board': 'ESP8266_WEMOS_D1MINI',
+            '.build.board': 'ESP8266_WEMOS_D1R1',
             '.build.variant': 'd1',
             },
         'macro': [

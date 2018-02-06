@@ -2481,7 +2481,7 @@ d1_mini_lite.menu.UploadSpeed.512000.upload.speed=512000
 
 ##############################################################
 d1.name=WeMos D1 R1
-d1.build.board=ESP8266_WEMOS_D1MINI
+d1.build.board=ESP8266_WEMOS_D1R1
 d1.build.variant=d1
 d1.upload.tool=esptool
 d1.upload.maximum_data_size=81920
