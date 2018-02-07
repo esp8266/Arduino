@@ -87,7 +87,7 @@ extern "C" {
 //timer dividers
 #define TIM_DIV1 	0 //80MHz (80 ticks/us - 104857.588 us max)
 #define TIM_DIV16	1 //5MHz (5 ticks/us - 1677721.4 us max)
-#define TIM_DIV265	3 //312.5Khz (1 tick = 3.2us - 26843542.4 us max)
+#define TIM_DIV256	3 //312.5Khz (1 tick = 3.2us - 26843542.4 us max)
 //timer int_types
 #define TIM_EDGE	0
 #define TIM_LEVEL	1
