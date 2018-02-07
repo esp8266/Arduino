@@ -88,3 +88,31 @@ This error may pop up after switching between
 `stable <https://github.com/esp8266/Arduino#stable-version->`__ esp8266
 / Arduino package installations, or after upgrading the package version
 :doc:`Read more <a04-board-generic-is-unknown>`.
+
+
+How to clear TCP PCBs in time-wait state ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is needed with lwIP-v1.4, less needed with lwIP-v2 but timeout is still
+too high.
+
+Time-wait PCB state helps TCP not confusing two consecutive connections with the
+same (s-ip,s-port,d-ip,d-port) when the first is already closed but still
+having duplicate packets lost in internet arriving later during the second. 
+Artificially clearing them is a workaround to help saving precious heap.
+
+The following lines are compatible with both lwIP versions:
+
+.. code:: cpp
+
+    // no need for #include
+    struct tcp_pcb;
+    extern struct tcp_pcb* tcp_tw_pcbs;
+    extern "C" void tcp_abort (struct tcp_pcb* pcb);
+    
+    void tcpCleanup (void) {
+      while (tcp_tw_pcbs)
+        tcp_abort(tcp_tw_pcbs);
+    }
+
+Ref.  `#1923 <https://github.com/esp8266/Arduino/issues/1923>`__
