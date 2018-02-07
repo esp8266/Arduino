@@ -15,9 +15,10 @@ ESP8266WiFi	KEYWORD3
 WiFi	KEYWORD1
 WiFiClient	KEYWORD1
 WiFiServer	KEYWORD1
+WiFiServerSecure	KEYWORD1
 WiFiUDP	KEYWORD1
 WiFiClientSecure	KEYWORD1
-
+ESP8266WiFiMulti	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
@@ -130,9 +131,14 @@ verify	KEYWORD2
 verifyCertChain	KEYWORD2
 setCertificate	KEYWORD2
 setPrivateKey	KEYWORD2
+setCACert	KEYWORD2
+setCertificate_P	KEYWORD2
+setPrivateKey_P	KEYWORD2
+setCACert_P	KEYWORD2
 loadCertificate	KEYWORD2
 loadPrivateKey	KEYWORD2
 loadCACert	KEYWORD2
+allowSelfSignedCerts	KEYWORD2
 
 #WiFiServer
 hasClient	KEYWORD2

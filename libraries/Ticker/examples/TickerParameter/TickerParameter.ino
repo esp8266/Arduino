@@ -8,8 +8,7 @@
   This sample runs two tickers that both call one callback function,
   but with different arguments.
 
-  An LED connected to GPIO1 will be pulsing. Use a built-in LED on ESP-01
-  or connect an external one to TXD on other boards.
+  The built-in LED will be pulsing.
 */
 
 #include <Ticker.h>
@@ -18,11 +17,11 @@ Ticker tickerSetHigh;
 Ticker tickerSetLow;
 
 void setPin(int state) {
-  digitalWrite(1, state);
+  digitalWrite(LED_BUILTIN, state);
 }
 
 void setup() {
-  pinMode(1, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(1, LOW);
   
   // every 25 ms, call setPin(0) 

@@ -84,72 +84,6 @@ SECTIONS
     _data_end = ABSOLUTE(.);
   } >dram0_0_seg :dram0_0_phdr
 
-  .rodata : ALIGN(4)
-  {
-    _rodata_start = ABSOLUTE(.);
-    *(.sdk.version)
-    *(.rodata)
-    *(.rodata.*)
-    *(.gnu.linkonce.r.*)
-    *(.rodata1)
-    __XT_EXCEPTION_TABLE__ = ABSOLUTE(.);
-    *(.xt_except_table)
-    *(.gcc_except_table)
-    *(.gnu.linkonce.e.*)
-    *(.gnu.version_r)
-    *(.eh_frame)
-    . = (. + 3) & ~ 3;
-    /*  C++ constructor and destructor tables, properly ordered:  */
-    __init_array_start = ABSOLUTE(.);
-    KEEP (*crtbegin.o(.ctors))
-    KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
-    KEEP (*(SORT(.ctors.*)))
-    KEEP (*(.ctors))
-    __init_array_end = ABSOLUTE(.);
-    KEEP (*crtbegin.o(.dtors))
-    KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
-    KEEP (*(SORT(.dtors.*)))
-    KEEP (*(.dtors))
-    /*  C++ exception handlers table:  */
-    __XT_EXCEPTION_DESCS__ = ABSOLUTE(.);
-    *(.xt_except_desc)
-    *(.gnu.linkonce.h.*)
-    __XT_EXCEPTION_DESCS_END__ = ABSOLUTE(.);
-    *(.xt_except_desc_end)
-    *(.dynamic)
-    *(.gnu.version_d)
-    . = ALIGN(4);		/* this table MUST be 4-byte aligned */
-    _bss_table_start = ABSOLUTE(.);
-    LONG(_bss_start)
-    LONG(_bss_end)
-    _bss_table_end = ABSOLUTE(.);
-    _rodata_end = ABSOLUTE(.);
-  } >dram0_0_seg :dram0_0_phdr
-
-  .bss ALIGN(8) (NOLOAD) : ALIGN(4)
-  {
-    . = ALIGN (8);
-    _bss_start = ABSOLUTE(.);
-    *(.dynsbss)
-    *(.sbss)
-    *(.sbss.*)
-    *(.gnu.linkonce.sb.*)
-    *(.scommon)
-    *(.sbss2)
-    *(.sbss2.*)
-    *(.gnu.linkonce.sb2.*)
-    *(.dynbss)
-    *(.bss)
-    *(.bss.*)
-    *(.gnu.linkonce.b.*)
-    *(COMMON)
-    . = ALIGN (8);
-    _bss_end = ABSOLUTE(.);
-    _heap_start = ABSOLUTE(.);
-/*    _stack_sentry = ALIGN(0x8); */
-  } >dram0_0_seg :dram0_0_bss_phdr
-/* __stack = 0x3ffc8000; */
-
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
@@ -157,6 +91,17 @@ SECTIONS
     *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, \
            EXCLUDE_FILE (umm_malloc.c.o) .text*)
     *.cpp.o(.literal*, .text*)
+    /* PlatformIO */
+    /* framework */
+    *.pioenvs\\*\\lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
+    *.pioenvs/*/lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
+    /* project dependencies */
+    *.pioenvs\\*\\lib*\lib*.a:(.literal*, .text*)
+    *.pioenvs/*/lib*/lib*.a:(.literal*, .text*)
+    /* project source objects */
+    *.pioenvs\\*\\src\\*.o(.literal*, .text*)
+    *.pioenvs/*/src/*.o(.literal*, .text*)
+    /* End PlatformIO */
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libgcc.a:_umoddi3.o(.literal .text)
@@ -165,6 +110,22 @@ SECTIONS
     *libstdc++.a:(.literal .text .literal.* .text.*)
     *liblwip_gcc.a:(.literal .text .literal.* .text.*)
     *liblwip_src.a:(.literal .text .literal.* .text.*)
+    *liblwip2.a:(.literal .text .literal.* .text.*)
+    *liblwip2_1460.a:(.literal .text .literal.* .text.*)
+    *libaxtls.a:(.literal .text .literal.* .text.*)
+    *libat.a:(.literal.* .text.*)
+    *libcrypto.a:(.literal.* .text.*)
+    *libespnow.a:(.literal.* .text.*)
+    *libjson.a:(.literal.* .text.*)
+    *liblwip.a:(.literal.* .text.*)
+    *libmesh.a:(.literal.* .text.*)
+    *libnet80211.a:(.literal.* .text.*)
+    *libsmartconfig.a:(.literal.* .text.*)
+    *libssl.a:(.literal.* .text.*)
+    *libupgrade.a:(.literal.* .text.*)
+    *libwpa.a:(.literal.* .text.*)
+    *libwpa2.a:(.literal.* .text.*)
+    *libwps.a:(.literal.* .text.*)
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text .irom.text.*)
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);
@@ -204,12 +165,90 @@ SECTIONS
     *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
     *.cpp.o(.iram.text)
     *.c.o(.iram.text)
+    *(.rodata._ZTV*) /* C++ vtables */
+    /* PlatformIO */
+    /* framework */
+    *.pioenvs\\*\\lib*.a:(.iram.text)
+    *.pioenvs/*/lib*.a:(.iram.text)
+    /* project dependencies */
+    *.pioenvs\\*\\lib*\\lib*.a:(.iram.text)
+    *.pioenvs/*/lib*/lib*.a:(.iram.text)
+    /* project source objects */
+    *.pioenvs\\*\\src\\*.o(.iram.text)
+    *.pioenvs/*/src/*.o(.iram.text)
+    /* End PlatformIO */
     *(.fini.literal)
     *(.fini)
     *(.gnu.version)
     _text_end = ABSOLUTE(.);
     _etext = .;
   } >iram1_0_seg :iram1_0_phdr
+
+  .rodata : ALIGN(4)
+  {
+    _rodata_start = ABSOLUTE(.);
+    *(.sdk.version)
+    *(.rodata)
+    *(.rodata.*)
+    *(.gnu.linkonce.r.*)
+    *(.rodata1)
+    __XT_EXCEPTION_TABLE__ = ABSOLUTE(.);
+    *(.xt_except_table)
+    *(.gcc_except_table)
+    *(.gnu.linkonce.e.*)
+    *(.gnu.version_r)
+    *(.eh_frame)
+    . = (. + 3) & ~ 3;
+    /*  C++ constructor and destructor tables, properly ordered:  */
+    __init_array_start = ABSOLUTE(.);
+    KEEP (*crtbegin.o(.ctors))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
+    KEEP (*(SORT(.ctors.*)))
+    KEEP (*(.ctors))
+    __init_array_end = ABSOLUTE(.);
+    KEEP (*crtbegin.o(.dtors))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
+    KEEP (*(SORT(.dtors.*)))
+    KEEP (*(.dtors))
+    /*  C++ exception handlers table:  */
+    __XT_EXCEPTION_DESCS__ = ABSOLUTE(.);
+    *(.xt_except_desc)
+    *(.gnu.linkonce.h.*)
+    __XT_EXCEPTION_DESCS_END__ = ABSOLUTE(.);
+    *(.xt_except_desc_end)
+    *(.dynamic)
+    *(.gnu.version_d)
+    . = ALIGN(4);       /* this table MUST be 4-byte aligned */
+    _bss_table_start = ABSOLUTE(.);
+    LONG(_bss_start)
+    LONG(_bss_end)
+    _bss_table_end = ABSOLUTE(.);
+    _rodata_end = ABSOLUTE(.);
+  } >dram0_0_seg :dram0_0_phdr
+
+  .bss ALIGN(8) (NOLOAD) : ALIGN(4)
+  {
+    . = ALIGN (8);
+    _bss_start = ABSOLUTE(.);
+    *(.dynsbss)
+    *(.sbss)
+    *(.sbss.*)
+    *(.gnu.linkonce.sb.*)
+    *(.scommon)
+    *(.sbss2)
+    *(.sbss2.*)
+    *(.gnu.linkonce.sb2.*)
+    *(.dynbss)
+    *(.bss)
+    *(.bss.*)
+    *(.gnu.linkonce.b.*)
+    *(COMMON)
+    . = ALIGN (8);
+    _bss_end = ABSOLUTE(.);
+    _heap_start = ABSOLUTE(.);
+/*    _stack_sentry = ALIGN(0x8); */
+  } >dram0_0_seg :dram0_0_bss_phdr
+/* __stack = 0x3ffc8000; */
 
   .lit4 : ALIGN(4)
   {

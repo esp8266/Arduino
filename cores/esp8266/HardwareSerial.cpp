@@ -152,6 +152,9 @@ void HardwareSerial::flush()
     }
 
     uart_wait_tx_empty(_uart);
+    //Workaround for a bug in serial not actually being finished yet
+    //Wait for 8 data bits, 1 parity and 2 stop bits, just in case
+    delayMicroseconds(11000000 / uart_get_baudrate(_uart) + 1);
 }
 
 size_t HardwareSerial::write(uint8_t c)
@@ -177,5 +180,10 @@ HardwareSerial::operator bool() const
 }
 
 
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)
 HardwareSerial Serial(UART0);
+#endif
+#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL1)
 HardwareSerial Serial1(UART1);
+#endif
+

@@ -221,7 +221,7 @@ uint8_t Servo::attach(int pin)
     return attach(pin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
 }
 
-uint8_t Servo::attach(int pin, int minUs, int maxUs)
+uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
 {
     ServoTimerSequence timerId;
 
@@ -235,8 +235,8 @@ uint8_t Servo::attach(int pin, int minUs, int maxUs)
         // keep the min and max within 200-3000 us, these are extreme
         // ranges and should support extreme servos while maintaining
         // reasonable ranges
-        _maxUs = max(250, min(3000, maxUs));
-        _minUs = max(200, min(_maxUs, minUs));
+        _maxUs = max((uint16_t)250, min((uint16_t)3000, maxUs));
+        _minUs = max((uint16_t)200, min(_maxUs, minUs));
 
         // initialize the timerId if it has not already been initialized
         timerId = SERVO_INDEX_TO_TIMER(_servoIndex);
