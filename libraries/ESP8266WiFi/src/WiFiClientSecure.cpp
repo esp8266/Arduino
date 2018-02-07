@@ -182,8 +182,11 @@ public:
 
     bool connected()
     {
-        if (_isServer) return _ssl != nullptr;
-        else return _ssl != nullptr && ssl_handshake_status(_ssl.get()) == SSL_OK;
+        if (_isServer) {
+            return _ssl != nullptr;
+        } else {
+            return _ssl != nullptr && ssl_handshake_status(_ssl.get()) == SSL_OK;
+        }
     }
 
     int read(uint8_t* dst, size_t size)
@@ -313,7 +316,6 @@ public:
         return loadObject(type, buf.get(), size);
     }
 
-
     bool loadObject(int type, const uint8_t* data, size_t size)
     {
         int rc = ssl_obj_memory_load(_isServer?_ssl_svr_ctx:_ssl_client_ctx, type, data, static_cast<int>(size), nullptr);
@@ -350,9 +352,11 @@ public:
 
     static ClientContext* getIOContext(int fd)
     {
-        if (!fd) return nullptr;
-        SSLContext *thisSSL = reinterpret_cast<SSLContext*>(fd);
-        return thisSSL->io_ctx;
+        if (fd) {
+            SSLContext *thisSSL = reinterpret_cast<SSLContext*>(fd);
+            return thisSSL->io_ctx;
+        }
+        return nullptr;
     }
 
 protected:
