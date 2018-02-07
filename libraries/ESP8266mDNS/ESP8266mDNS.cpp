@@ -94,10 +94,10 @@ static const int MDNS_PORT = 5353;
 struct MDNSService {
   MDNSService* _next;
   char _name[32];
-  char _proto[3];
+  char _proto[4];
   uint16_t _port;
-  struct MDNSTxt * _txts;
   uint16_t _txtLen; // length of all txts 
+  struct MDNSTxt * _txts;
 };
 
 struct MDNSTxt{
@@ -213,16 +213,16 @@ bool MDNSResponder::_listen() {
 }
 
 void MDNSResponder::update() {
-  if (!_conn || !_conn->next()) {
+  if (!_conn || !_conn->next()) 
     return;
-  }
   _parsePacket();
 }
 
 
 void MDNSResponder::setInstanceName(String name){
-  if (name.length() > 63) return;
-  else _instanceName = name;
+  if (name.length() > 63) 
+    return;
+  _instanceName = name;
 }
 
 
@@ -230,13 +230,14 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
   MDNSService* servicePtr;
   
   uint8_t txtLen = os_strlen(key) + os_strlen(value) + 1; // Add one for equals sign 
-  txtLen+=1; //accounts for length byte added when building the txt responce
+  txtLen += 1; //accounts for length byte added when building the txt responce
   //Find the service
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
     //Checking Service names
-    if(strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
+    if(strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0) {
       //found a service name match
-      if (servicePtr->_txtLen + txtLen > 1300) return false;  //max txt record size
+      if (servicePtr->_txtLen + txtLen > 1300) 
+        return false;  //max txt record size
       MDNSTxt *newtxt = new MDNSTxt;
       newtxt->_txt = String(key) + "=" + String(value);
       newtxt->_next = 0;
@@ -245,10 +246,9 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
         servicePtr->_txts = newtxt;
         servicePtr->_txtLen += txtLen;
         return true;
-      }
-      else{
+      } else {
         MDNSTxt * txtPtr = servicePtr->_txts;
-        while(txtPtr->_next !=0) {
+        while(txtPtr->_next != 0) {
           txtPtr = txtPtr->_next;
         }
         //adding another TXT to service
@@ -262,8 +262,10 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
 }
 
 void MDNSResponder::addService(char *name, char *proto, uint16_t port){
-  if(_getServicePort(name, proto) != 0) return;
-  if(os_strlen(name) > 32 || os_strlen(proto) != 3) return; //bad arguments
+  if(_getServicePort(name, proto) != 0) 
+    return;
+  if(os_strlen(name) > 32 || os_strlen(proto) != 3) 
+    return; //bad arguments
   struct MDNSService *srv = (struct MDNSService*)(os_malloc(sizeof(struct MDNSService)));
   os_strcpy(srv->_name, name);
   os_strcpy(srv->_proto, proto);
@@ -272,10 +274,12 @@ void MDNSResponder::addService(char *name, char *proto, uint16_t port){
   srv->_txts = 0;
   srv->_txtLen = 0;
   
-  if(_services == 0) _services = srv;
-  else{
+  if(_services == 0) {
+    _services = srv;
+  } else {
     MDNSService* servicePtr = _services;
-    while(servicePtr->_next !=0) servicePtr = servicePtr->_next;
+    while(servicePtr->_next != 0) 
+      servicePtr = servicePtr->_next;
     servicePtr->_next = srv;
   }
   
@@ -420,10 +424,9 @@ MDNSTxt * MDNSResponder::_getServiceTxt(char *name, char *proto){
   MDNSService* servicePtr;
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
     if(servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
-      if (servicePtr->_txts == 0) return false;
-      else{
-        return servicePtr->_txts;
-      }
+      if (servicePtr->_txts == 0) 
+        return false;
+      return servicePtr->_txts;
     }
   }
   return 0;
@@ -433,10 +436,9 @@ uint16_t MDNSResponder::_getServiceTxtLen(char *name, char *proto){
   MDNSService* servicePtr;
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
     if(servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
-      if (servicePtr->_txts == 0) return false;
-      else{
-        return servicePtr->_txtLen;
-      }
+      if (servicePtr->_txts == 0) 
+        return false;
+      return servicePtr->_txtLen;
     }
   }
   return 0;
@@ -487,7 +489,8 @@ void MDNSResponder::_parsePacket(){
 
   uint16_t packetHeader[6];
 
-  for(i=0; i<6; i++) packetHeader[i] = _conn_read16();
+  for(i=0; i<6; i++) 
+    packetHeader[i] = _conn_read16();
 
   if ((packetHeader[1] & 0x8000) != 0) { // Read answers
 #ifdef DEBUG_ESP_MDNS_RX
@@ -644,6 +647,7 @@ void MDNSResponder::_parsePacket(){
 #endif
           tmp8 = _conn_read8();
         }
+
         else {
           _conn_readS(answerHostName, tmp8);
           answerHostName[tmp8] = '\0';
@@ -671,7 +675,7 @@ void MDNSResponder::_parsePacket(){
           DEBUG_ESP_PORT.printf("Ignoring unsupported type %02x\n", tmp8);
 #endif
           for (int n = 0; n < answerRdlength; n++)
-		(void)_conn_read8();
+        		(void)_conn_read8();
       }
 
       if ((partsCollected == 0x0F) && serviceMatch) {
@@ -853,21 +857,33 @@ void MDNSResponder::_parsePacket(){
 
 #ifdef DEBUG_ESP_MDNS_RX
     DEBUG_ESP_PORT.printf("REQ: ");
-    if(hostNameLen > 0) DEBUG_ESP_PORT.printf("%s.", hostName);
-    if(serviceNameLen > 0) DEBUG_ESP_PORT.printf("_%s.", serviceName);
-    if(protoNameLen > 0) DEBUG_ESP_PORT.printf("_%s.", protoName);
+    if(hostNameLen > 0) 
+      DEBUG_ESP_PORT.printf("%s.", hostName);
+    if(serviceNameLen > 0) 
+      DEBUG_ESP_PORT.printf("_%s.", serviceName);
+    if(protoNameLen > 0) 
+      DEBUG_ESP_PORT.printf("_%s.", protoName);
     DEBUG_ESP_PORT.printf("local. ");
 
-    if(currentType == MDNS_TYPE_AAAA) DEBUG_ESP_PORT.printf("  AAAA ");
-    else if(currentType == MDNS_TYPE_A) DEBUG_ESP_PORT.printf("  A ");
-    else if(currentType == MDNS_TYPE_PTR) DEBUG_ESP_PORT.printf("  PTR ");
-    else if(currentType == MDNS_TYPE_SRV) DEBUG_ESP_PORT.printf("  SRV ");
-    else if(currentType == MDNS_TYPE_TXT) DEBUG_ESP_PORT.printf("  TXT ");
-    else DEBUG_ESP_PORT.printf("  0x%04X ", currentType);
+    if(currentType == MDNS_TYPE_AAAA) 
+      DEBUG_ESP_PORT.printf("  AAAA ");
+    else if(currentType == MDNS_TYPE_A) 
+      DEBUG_ESP_PORT.printf("  A ");
+    else if(currentType == MDNS_TYPE_PTR) 
+      DEBUG_ESP_PORT.printf("  PTR ");
+    else if(currentType == MDNS_TYPE_SRV) 
+      DEBUG_ESP_PORT.printf("  SRV ");
+    else if(currentType == MDNS_TYPE_TXT) 
+      DEBUG_ESP_PORT.printf("  TXT ");
+    else 
+      DEBUG_ESP_PORT.printf("  0x%04X ", currentType);
 
-    if(currentClass == MDNS_CLASS_IN) DEBUG_ESP_PORT.printf("  IN ");
-    else if(currentClass == MDNS_CLASS_IN_FLUSH_CACHE) DEBUG_ESP_PORT.printf("  IN[F] ");
-    else DEBUG_ESP_PORT.printf("  0x%04X ", currentClass);
+    if(currentClass == MDNS_CLASS_IN) 
+      DEBUG_ESP_PORT.printf("  IN ");
+    else if(currentClass == MDNS_CLASS_IN_FLUSH_CACHE) 
+      DEBUG_ESP_PORT.printf("  IN[F] ");
+    else 
+      DEBUG_ESP_PORT.printf("  0x%04X ", currentClass);
 
     DEBUG_ESP_PORT.printf("\n");
 #endif
@@ -1035,8 +1051,10 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
   uint8_t additionalMask = responseMask & ~questionMask;
   uint8_t additionalCount = 0;
   for(i=0;i<4;i++){
-    if(answerMask & (1 << i)) answerCount++;
-    if(additionalMask & (1 << i)) additionalCount++;
+    if(answerMask & (1 << i)) 
+      answerCount++;
+    if(additionalMask & (1 << i)) 
+      additionalCount++;
   }
 
 
