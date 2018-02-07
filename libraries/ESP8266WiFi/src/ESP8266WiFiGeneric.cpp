@@ -474,7 +474,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     }
 
     if(err != 0) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, err);
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
     } else {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
     }
