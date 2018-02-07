@@ -197,15 +197,6 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
     return status();
 }
 
-static void
-swap(IPAddress &lhs, IPAddress &rhs)
-{
-  IPAddress tmp = lhs;
-  lhs = rhs;
-  rhs = tmp;
-}
-
-
 /**
  * Change IP configuration settings disabling the dhcp client
  * @param local_ip   Static ip configuration
