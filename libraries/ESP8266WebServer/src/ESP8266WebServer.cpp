@@ -106,7 +106,7 @@ void ESP8266WebServer::begin(uint16_t port) {
 String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit){
   int _begin = authReq.indexOf(param);
   if (_begin==-1) 
-    return String();
+    return "";
   return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
 
@@ -119,18 +119,18 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       char toencodeLen = strlen(username)+strlen(password)+1;
       char *toencode = new char[toencodeLen + 1];
       if(toencode == NULL){
-        authReq = String();
+        authReq = "";
         return false;
       }
       char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
       if(encoded == NULL){
-        authReq = String();
+        authReq = "";
         delete[] toencode;
         return false;
       }
       sprintf(toencode, "%s:%s", username, password);
       if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
-        authReq = String();
+        authReq = "";
         delete[] toencode;
         delete[] encoded;
         return true;
@@ -144,7 +144,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       #endif
       String _username = _extractParam(authReq,F("username=\""));
       if(!_username.length() || _username != String(username)) {
-        authReq = String();
+        authReq = "";
         return false;
       }
       // extracting required parameters for RFC 2069 simpler Digest
@@ -155,11 +155,11 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       String _opaque   = _extractParam(authReq, F("opaque=\""));
 
       if((!_realm.length()) || (!_nonce.length()) || (!_uri.length()) || (!_response.length()) || (!_opaque.length())) {
-        authReq = String();
+        authReq = "";
         return false;
       }
       if((_opaque != _sopaque) || (_nonce != _snonce) || (_realm != _srealm)) {
-        authReq = String();
+        authReq = "";
         return false;
       }
       // parameters for the RFC 2617 newer Digest
@@ -205,11 +205,11 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
       #endif
       if(_response == _responsecheck){
-        authReq = String();
+        authReq = "";
         return true;
       }
     }
-    authReq = String();
+    authReq = "";
   }
   return false;
 }
@@ -351,7 +351,7 @@ void ESP8266WebServer::sendHeader(const String& name, const String& value, bool 
   String headerLine = name;
   headerLine += F(": ");
   headerLine += value;
-  headerLine += F("\r\n");
+  headerLine += "\r\n";
 
   if (first) {
     _responseHeaders = headerLine + _responseHeaders;
@@ -370,7 +370,7 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
     response += String(code);
     response += ' ';
     response += _responseCodeToString(code);
-    response += String(F("\r\n"));
+    response += "\r\n";
 
     using namespace mime;
     if (!content_type)
@@ -391,7 +391,7 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
 
     response += _responseHeaders;
     response += "\r\n";
-    _responseHeaders = String();
+    _responseHeaders = "";
 }
 
 void ESP8266WebServer::send(int code, const char* content_type, const String& content) {
@@ -499,19 +499,19 @@ String ESP8266WebServer::arg(String name) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
   }
-  return String();
+  return "";
 }
 
 String ESP8266WebServer::arg(int i) {
   if (i < _currentArgCount)
     return _currentArgs[i].value;
-  return String();
+  return "";
 }
 
 String ESP8266WebServer::argName(int i) {
   if (i < _currentArgCount)
     return _currentArgs[i].key;
-  return String();
+  return "";
 }
 
 int ESP8266WebServer::args() {
@@ -532,7 +532,7 @@ String ESP8266WebServer::header(String name) {
     if (_currentHeaders[i].key.equalsIgnoreCase(name))
       return _currentHeaders[i].value;
   }
-  return String();
+  return "";
 }
 
 void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
@@ -549,13 +549,13 @@ void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t hea
 String ESP8266WebServer::header(int i) {
   if (i < _headerKeysCount)
     return _currentHeaders[i].value;
-  return String();
+  return "";
 }
 
 String ESP8266WebServer::headerName(int i) {
   if (i < _headerKeysCount)
     return _currentHeaders[i].key;
-  return String();
+  return "";
 }
 
 int ESP8266WebServer::headers() {
@@ -609,13 +609,13 @@ void ESP8266WebServer::_handleRequest() {
   if (handled) {
     _finalizeResponse();
   }
-  _currentUri = String();
+  _currentUri = "";
 }
 
 
 void ESP8266WebServer::_finalizeResponse() {
   if (_chunked) {
-    sendContent(String());
+    sendContent("");
   }
 }
 
