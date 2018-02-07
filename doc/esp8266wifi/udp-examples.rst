@@ -41,7 +41,7 @@ Once we have libraries in place we need to create a ``WiFiUDP`` object. Then we 
 Wi-Fi Connection
 ~~~~~~~~~~~~~~~~
 
-At the beginning of ``setup()`` let's implement typical code to connect to an access point. This has been discussed in `Quick Start <readme.md#quick-start>`__. Please refer to it if required.
+At the beginning of ``setup()`` let's implement typical code to connect to an access point. This has been discussed in `Quick Start <readme.rst#quick-start>`__. Please refer to it if required.
 
 UDP Setup
 ~~~~~~~~~

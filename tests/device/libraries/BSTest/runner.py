@@ -55,7 +55,7 @@ class BSTestRunner(object):
             return
         debug_print('got begin')
         while True:
-            res = self.sp.expect(['>>>>>bs_test_item id\=(\d+) name\="([^\"]*?)" desc="([^"]*?)"',
+            res = self.sp.expect([r'>>>>>bs_test_item id\=(\d+) name\="([^"]*?)" desc="([^"]*?)"',
                                   '>>>>>bs_test_menu_end',
                                   EOF, TIMEOUT])
             if res == 0:
@@ -118,8 +118,8 @@ class BSTestRunner(object):
         if timeout <= 0:
             raise 'test begin timeout'
         while timeout > 0:
-            res = self.sp.expect(['>>>>>bs_test_check_failure line=(\d+)',
-                            '>>>>>bs_test_end line=(\d+) result=(\d+) checks=(\d+) failed_checks=(\d+)',
+            res = self.sp.expect([r'>>>>>bs_test_check_failure line=(\d+)',
+                            r'>>>>>bs_test_end line=(\d+) result=(\d+) checks=(\d+) failed_checks=(\d+)',
                             TIMEOUT,
                             EOF,
                             'Exception',

@@ -40,10 +40,12 @@
 #define DEBUG_WIFI_MULTI(...)
 #endif
 
-typedef struct {
-        char * ssid;
-        char * passphrase;
-} WifiAPlist_t;
+struct WifiAPEntry {
+    char * ssid;
+    char * passphrase;
+};
+
+typedef std::vector<WifiAPEntry> WifiAPlist;
 
 class ESP8266WiFiMulti {
     public:
@@ -55,7 +57,7 @@ class ESP8266WiFiMulti {
         wl_status_t run(void);
 
     private:
-        std::vector<WifiAPlist_t> APlist;
+        WifiAPlist APlist;
         bool APlistAdd(const char* ssid, const char *passphrase = NULL);
         void APlistClean(void);
 

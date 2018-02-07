@@ -5,6 +5,29 @@ Client Secure Class
 
 Methods and properties described in this section are specific to ESP8266. They are not covered in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ documentation. Before they are fully documented please refer to information below.
 
+Supported crypto
+~~~~~~~~~~~~~~~~
+
+In the background the library `axtls <http://axtls.sourceforge.net>`_ is used. The library supports only rsa certificates and no new eliptic curve certificates. TLSv1.2 is supported since SDK 2.4.0-rc1.
+
+The following ciphers and digests are supported by `specification <http://axtls.sourceforge.net/specifications.htm>`_:
+
+* Symmetric Ciphers
+    * AES128-SHA
+    * AES256-SHA
+    * AES128-SHA256
+    * AES256-SHA256
+* Asymmetric Ciphers
+    * RSA 512/1024/2048/4096 bit encryption/decryption.
+    * RSA signing/verification
+* Digests
+    * SHA1
+    * MD5
+    * SHA256/384/512
+    * HMAC-SHA1
+    * HMAC-MD5
+    * HMAC-SHA256
+
 loadCertificate
 ~~~~~~~~~~~~~~~
 
@@ -75,4 +98,4 @@ Other Function Calls
 
 Documentation for the above functions is not yet prepared.
 
-For code samples please refer to separate section with `examples <client-secure-examples.md>`__ dedicated specifically to the Client Secure Class.
+For code samples please refer to separate section with `examples <client-secure-examples.rst>`__ dedicated specifically to the Client Secure Class.

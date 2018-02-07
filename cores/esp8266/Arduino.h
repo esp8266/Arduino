@@ -178,7 +178,7 @@ void ets_intr_unlock();
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
 
-typedef unsigned int word;
+typedef uint16_t word;
 
 #define bit(b) (1UL << (b))
 #define _BV(b) (1UL << (b))
@@ -282,4 +282,10 @@ extern "C" void configTime(long timezone, int daylightOffset_sec,
 
 #include "pins_arduino.h"
 
+#endif
+
+#ifdef DEBUG_ESP_OOM
+// reinclude *alloc redefinition because of <cstdlib> undefining them
+// this is mandatory for allowing OOM *alloc definitions in .ino files
+#include "umm_malloc/umm_malloc_cfg.h"
 #endif

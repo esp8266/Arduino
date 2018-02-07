@@ -1632,9 +1632,9 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
     if( (ptr = _umm_malloc( size )) ) {
       memcpy( ptr, oldptr, curSize );
+      _umm_free( oldptr );
     }
 
-    _umm_free( oldptr );
   }
 
   /* Release the critical section... */
@@ -1685,7 +1685,9 @@ void *umm_calloc( size_t num, size_t item_size ) {
 
   size += POISON_SIZE(size);
   ret = _umm_malloc(size);
-  memset(ret, 0x00, size);
+  if (ret) {
+    memset(ret, 0x00, size);
+  }
 
   ret = GET_POISONED(ret, size);
 
