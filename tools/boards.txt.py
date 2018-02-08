@@ -553,7 +553,7 @@ boards = collections.OrderedDict([
     ( 'd1', {
         'name': 'WeMos D1 R1',
         'opts': {
-            '.build.board': 'ESP8266_WEMOS_D1MINI',
+            '.build.board': 'ESP8266_WEMOS_D1R1',
             '.build.variant': 'd1',
             },
         'macro': [
@@ -829,24 +829,24 @@ macros = {
     ####################### lwip
 
     'lwip2': collections.OrderedDict([
-        ( '.menu.LwIPVariant.v2mss536', 'v2 Prebuilt (MSS=536)' ),
+        ( '.menu.LwIPVariant.v2mss536', 'v2 Lower Memory' ),
         ( '.menu.LwIPVariant.v2mss536.build.lwip_include', 'lwip2/include' ),
         ( '.menu.LwIPVariant.v2mss536.build.lwip_lib', '-llwip2' ),
         ( '.menu.LwIPVariant.v2mss536.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
-        ( '.menu.LwIPVariant.v2mss1460', 'v2 Prebuilt (MSS=1460, unstable)' ),
+        ( '.menu.LwIPVariant.v2mss1460', 'v2 Higher Bandwidth' ),
         ( '.menu.LwIPVariant.v2mss1460.build.lwip_include', 'lwip2/include' ),
         ( '.menu.LwIPVariant.v2mss1460.build.lwip_lib', '-llwip2_1460' ),
         ( '.menu.LwIPVariant.v2mss1460.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
         ]),
 
     'lwip': collections.OrderedDict([
-        ( '.menu.LwIPVariant.Prebuilt', 'v1.4 Prebuilt' ),
+        ( '.menu.LwIPVariant.Prebuilt', 'v1.4 Higher Bandwidth' ),
         ( '.menu.LwIPVariant.Prebuilt.build.lwip_lib', '-llwip_gcc' ),
         ( '.menu.LwIPVariant.Prebuilt.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
         #( '.menu.LwIPVariant.Espressif', 'v1.4 Espressif (xcc)' ),
         #( '.menu.LwIPVariant.Espressif.build.lwip_lib', '-llwip' ),
         #( '.menu.LwIPVariant.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
-        ( '.menu.LwIPVariant.OpenSource', 'v1.4 Open Source' ),
+        ( '.menu.LwIPVariant.OpenSource', 'v1.4 Compile from source' ),
         ( '.menu.LwIPVariant.OpenSource.build.lwip_lib', '-llwip_src' ),
         ( '.menu.LwIPVariant.OpenSource.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
         ( '.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
@@ -1062,14 +1062,14 @@ def all_flash_size ():
 def led (default,max):
     led = collections.OrderedDict([
                 ('.menu.led.' + str(default), str(default)),
-                ('.menu.led.' + str(default) + '.build.led', '-DUSERLED=' + str(default)),
+                ('.menu.led.' + str(default) + '.build.led', '-DLED_BUILTIN=' + str(default)),
           ]);
     for i in range(0,max):
         if not i == default:
             led.update(
                 collections.OrderedDict([
                     ('.menu.led.' + str(i), str(i)),
-                    ('.menu.led.' + str(i) + '.build.led', '-DUSERLED=' + str(i)),
+                    ('.menu.led.' + str(i) + '.build.led', '-DLED_BUILTIN=' + str(i)),
                 ]))
     return { 'led': led }
 

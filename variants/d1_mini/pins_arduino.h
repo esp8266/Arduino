@@ -34,8 +34,7 @@
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
-static const uint8_t LED_BUILTIN = 2;
-static const uint8_t BUILTIN_LED = 2;
+#define LED_BUILTIN 2
 
 static const uint8_t D0   = 16;
 static const uint8_t D1   = 5;
