@@ -263,6 +263,9 @@ const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
 #include "Updater.h"
 #include "debug.h"
 
+//the following #undefs are needed due to a possible prior #include <math.h>
+#undef isinf
+#undef isnan
 using std::min;
 using std::max;
 using std::isinf;
