@@ -26,8 +26,6 @@
  */
 #include <limits>
 #include "FS.h"
-#undef max
-#undef min
 #include "FSImpl.h"
 #include "spiffs/spiffs.h"
 #include "debug.h"

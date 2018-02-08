@@ -42,7 +42,7 @@ extern "C" {
     
 #define PWMRANGE 1023
     
-    //GPIO FUNCTIONS
+//GPIO FUNCTIONS
 #define INPUT             0x00
 #define INPUT_PULLUP      0x02
 #define INPUT_PULLDOWN_16 0x04 // PULLDOWN only possible for pin16
@@ -70,7 +70,7 @@ extern "C" {
 #define LSBFIRST 0
 #define MSBFIRST 1
     
-    //Interrupt Modes
+//Interrupt Modes
 #define DISABLED  0x00
 #define RISING    0x01
 #define FALLING   0x02
@@ -83,14 +83,14 @@ extern "C" {
 #define DEFAULT 1
 #define EXTERNAL 0
     
-    //timer dividers
+//timer dividers
 #define TIM_DIV1 	0 //80MHz (80 ticks/us - 104857.588 us max)
 #define TIM_DIV16	1 //5MHz (5 ticks/us - 1677721.4 us max)
 #define TIM_DIV265	3 //312.5Khz (1 tick = 3.2us - 26843542.4 us max)
-    //timer int_types
+//timer int_types
 #define TIM_EDGE	0
 #define TIM_LEVEL	1
-    //timer reload values
+//timer reload values
 #define TIM_SINGLE	0 //on interrupt routine you need to write a new value to start the timer again
 #define TIM_LOOP	1 //on interrupt the counter will start with the same value again
     
@@ -98,30 +98,30 @@ extern "C" {
 #define timer1_enabled()        ((T1C & (1 << TCTE)) != 0)
 #define timer1_interrupted()    ((T1C & (1 << TCIS)) != 0)
     
-    typedef void(*timercallback)(void);
+typedef void(*timercallback)(void);
     
-    void timer1_isr_init(void);
-    void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload);
-    void timer1_disable(void);
-    void timer1_attachInterrupt(timercallback userFunc);
-    void timer1_detachInterrupt(void);
-    void timer1_write(uint32_t ticks); //maximum ticks 8388607
-    
-    // timer0 is a special CPU timer that has very high resolution but with
-    // limited control.
-    // it uses CCOUNT (ESP.GetCycleCount()) as the non-resetable timer counter
-    // it does not support divide, type, or reload flags
-    // it is auto-disabled when the compare value matches CCOUNT
-    // it is auto-enabled when the compare value changes
+void timer1_isr_init(void);
+void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload);
+void timer1_disable(void);
+void timer1_attachInterrupt(timercallback userFunc);
+void timer1_detachInterrupt(void);
+void timer1_write(uint32_t ticks); //maximum ticks 8388607
+
+// timer0 is a special CPU timer that has very high resolution but with
+// limited control.
+// it uses CCOUNT (ESP.GetCycleCount()) as the non-resetable timer counter
+// it does not support divide, type, or reload flags
+// it is auto-disabled when the compare value matches CCOUNT
+// it is auto-enabled when the compare value changes
 #define timer0_interrupted()    (ETS_INTR_PENDING() & (_BV(ETS_COMPARE0_INUM)))
 #define timer0_read() ((__extension__({uint32_t count;__asm__ __volatile__("esync; rsr %0,ccompare0":"=a" (count));count;})))
 #define timer0_write(count) __asm__ __volatile__("wsr %0,ccompare0; esync"::"a" (count) : "memory")
     
-    void timer0_isr_init(void);
-    void timer0_attachInterrupt(timercallback userFunc);
-    void timer0_detachInterrupt(void);
-    
-    // undefine stdlib's abs if encountered
+void timer0_isr_init(void);
+void timer0_attachInterrupt(timercallback userFunc);
+void timer0_detachInterrupt(void);
+
+// undefine stdlib's abs if encountered
 #ifdef abs
 #undef abs
 #endif
@@ -133,26 +133,26 @@ extern "C" {
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
     
-    void ets_intr_lock();
-    void ets_intr_unlock();
+void ets_intr_lock();
+void ets_intr_unlock();
     
 #ifndef __STRINGIFY
 #define __STRINGIFY(a) #a
 #endif
     
-    // these low level routines provide a replacement for SREG interrupt save that AVR uses
-    // but are esp8266 specific. A normal use pattern is like
-    //
-    //{
-    //    uint32_t savedPS = xt_rsil(1); // this routine will allow level 2 and above
-    //    // do work here
-    //    xt_wsr_ps(savedPS); // restore the state
-    //}
-    //
-    // level (0-15), interrupts of the given level and above will be active
-    // level 15 will disable ALL interrupts,
-    // level 0 will enable ALL interrupts,
-    //
+// these low level routines provide a replacement for SREG interrupt save that AVR uses
+// but are esp8266 specific. A normal use pattern is like
+//
+//{
+//    uint32_t savedPS = xt_rsil(1); // this routine will allow level 2 and above
+//    // do work here
+//    xt_wsr_ps(savedPS); // restore the state
+//}
+//
+// level (0-15), interrupts of the given level and above will be active
+// level 15 will disable ALL interrupts,
+// level 0 will enable ALL interrupts,
+//
 #define xt_rsil(level) (__extension__({uint32_t state; __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (state)); state;}))
 #define xt_wsr_ps(state)  __asm__ __volatile__("wsr %0,ps; isync" :: "a" (state) : "memory")
     
@@ -172,51 +172,51 @@ extern "C" {
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
     
-    // avr-libc defines _NOP() since 1.6.2
+// avr-libc defines _NOP() since 1.6.2
 #ifndef _NOP
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
     
-    typedef unsigned int word;
+typedef uint16_t word;
     
 #define bit(b) (1UL << (b))
 #define _BV(b) (1UL << (b))
     
-    typedef uint8_t boolean;
-    typedef uint8_t byte;
+typedef uint8_t boolean;
+typedef uint8_t byte;
+
+void init(void);
+void initVariant(void);
+
+int atexit(void (*func)()) __attribute__((weak));
+
+void pinMode(uint8_t pin, uint8_t mode);
+void digitalWrite(uint8_t pin, uint8_t val);
+int digitalRead(uint8_t pin);
+int analogRead(uint8_t pin);
+void analogReference(uint8_t mode);
+void analogWrite(uint8_t pin, int val);
+void analogWriteFreq(uint32_t freq);
+void analogWriteRange(uint32_t range);
+
+unsigned long millis(void);
+unsigned long micros(void);
+void delay(unsigned long);
+void delayMicroseconds(unsigned int us);
+unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
     
-    void init(void);
-    void initVariant(void);
+void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
     
-    int atexit(void (*func)()) __attribute__((weak));
-    
-    void pinMode(uint8_t pin, uint8_t mode);
-    void digitalWrite(uint8_t pin, uint8_t val);
-    int digitalRead(uint8_t pin);
-    int analogRead(uint8_t pin);
-    void analogReference(uint8_t mode);
-    void analogWrite(uint8_t pin, int val);
-    void analogWriteFreq(uint32_t freq);
-    void analogWriteRange(uint32_t range);
-    
-    unsigned long millis(void);
-    unsigned long micros(void);
-    void delay(unsigned long);
-    void delayMicroseconds(unsigned int us);
-    unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
-    unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
-    
-    void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
-    uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
-    
-    void attachInterrupt(uint8_t pin, void (*)(void), int mode);
-    void detachInterrupt(uint8_t pin);
-    
-    void setup(void);
-    void loop(void);
-    
-    void yield(void);
-    void optimistic_yield(uint32_t interval_us);
+void attachInterrupt(uint8_t pin, void (*)(void), int mode);
+void detachInterrupt(uint8_t pin);
+
+void setup(void);
+void loop(void);
+
+void yield(void);
+void optimistic_yield(uint32_t interval_us);
     
 #define digitalPinToPort(pin)       (0)
 #define digitalPinToBitMask(pin)    (1UL << (pin))
@@ -235,7 +235,7 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
-
+#include <algorithm>
 #include "pgmspace.h"
 
 #include "WCharacter.h"
@@ -246,11 +246,13 @@ extern "C" {
 #include "Updater.h"
 #include "debug.h"
 
-#ifndef _GLIBCXX_VECTOR
-// arduino is not compatible with std::vector
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)>(b)?(a):(b))
-#endif
+//the following #undefs are needed due to a possible prior #include <math.h>
+#undef isinf
+#undef isnan
+using std::min;
+using std::max;
+using std::isinf;
+using std::isnan;
 
 #define _min(a,b) ((a)<(b)?(a):(b))
 #define _max(a,b) ((a)>(b)?(a):(b))
@@ -279,4 +281,4 @@ extern "C" void configTime(long timezone, int daylightOffset_sec,
 
 #include "pins_arduino.h"
 
-#endif /* Arduino_h */
+#endif
