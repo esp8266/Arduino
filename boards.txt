@@ -817,17 +817,7 @@ espresso_lite_v1.menu.ResetMethod.ck=ck
 espresso_lite_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v1.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-<<<<<<< HEAD
-espresso_lite_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
-||||||| merged common ancestors
-espresso_lite_v1.menu.ResetMethod.none=none
-espresso_lite_v1.menu.ResetMethod.none.upload.resetmethod=none
-espresso_lite_v1.menu.ResetMethod.dtrset=dtrset
-espresso_lite_v1.menu.ResetMethod.dtrset.upload.resetmethod=dtrset
-espresso_lite_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
-=======
 espresso_lite_v1.menu.LwIPVariant.v2mss536=v2 Lower Memory
->>>>>>> f6f977fb039f7c8ae08f4518902a1b0cf114ea7b
 espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
@@ -957,17 +947,7 @@ espresso_lite_v2.menu.ResetMethod.ck=ck
 espresso_lite_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v2.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-<<<<<<< HEAD
-espresso_lite_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
-||||||| merged common ancestors
-espresso_lite_v2.menu.ResetMethod.none=none
-espresso_lite_v2.menu.ResetMethod.none.upload.resetmethod=none
-espresso_lite_v2.menu.ResetMethod.dtrset=dtrset
-espresso_lite_v2.menu.ResetMethod.dtrset.upload.resetmethod=dtrset
-espresso_lite_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
-=======
 espresso_lite_v2.menu.LwIPVariant.v2mss536=v2 Lower Memory
->>>>>>> f6f977fb039f7c8ae08f4518902a1b0cf114ea7b
 espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
@@ -1097,17 +1077,7 @@ phoenix_v1.menu.ResetMethod.ck=ck
 phoenix_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v1.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-<<<<<<< HEAD
-phoenix_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
-||||||| merged common ancestors
-phoenix_v1.menu.ResetMethod.none=none
-phoenix_v1.menu.ResetMethod.none.upload.resetmethod=none
-phoenix_v1.menu.ResetMethod.dtrset=dtrset
-phoenix_v1.menu.ResetMethod.dtrset.upload.resetmethod=dtrset
-phoenix_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
-=======
 phoenix_v1.menu.LwIPVariant.v2mss536=v2 Lower Memory
->>>>>>> f6f977fb039f7c8ae08f4518902a1b0cf114ea7b
 phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
@@ -1237,17 +1207,7 @@ phoenix_v2.menu.ResetMethod.ck=ck
 phoenix_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v2.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-<<<<<<< HEAD
-phoenix_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
-||||||| merged common ancestors
-phoenix_v2.menu.ResetMethod.none=none
-phoenix_v2.menu.ResetMethod.none.upload.resetmethod=none
-phoenix_v2.menu.ResetMethod.dtrset=dtrset
-phoenix_v2.menu.ResetMethod.dtrset.upload.resetmethod=dtrset
-phoenix_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
-=======
 phoenix_v2.menu.LwIPVariant.v2mss536=v2 Lower Memory
->>>>>>> f6f977fb039f7c8ae08f4518902a1b0cf114ea7b
 phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
