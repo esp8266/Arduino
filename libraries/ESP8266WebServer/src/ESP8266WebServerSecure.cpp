@@ -27,6 +27,12 @@
 #include "WiFiClient.h"
 #include "ESP8266WebServerSecure.h"
 
+//#define DEBUG_ESP_HTTP_SERVER
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_OUTPUT DEBUG_ESP_PORT
+#else
+#define DEBUG_OUTPUT Serial
+#endif
 
 ESP8266WebServerSecure::ESP8266WebServerSecure(IPAddress addr, int port) 
 : _serverSecure(addr, port)
