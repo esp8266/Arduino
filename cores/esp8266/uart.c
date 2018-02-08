@@ -119,6 +119,16 @@ size_t uart_rx_available(uart_t* uart)
     if(uart == NULL || !uart->rx_enabled) {
         return 0;
     }
+    ETS_UART_INTR_DISABLE();
+    while((USS(uart->uart_nr) >> USRXC) & 0x7F){
+        uint8_t data = USF(uart->uart_nr);
+        size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
+        if(nextPos != uart->rx_buffer->rpos) {
+            uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
+            uart->rx_buffer->wpos = nextPos;
+        }
+    }
+    ETS_UART_INTR_ENABLE();
     if(uart->rx_buffer->wpos < uart->rx_buffer->rpos) {
       return (uart->rx_buffer->wpos + uart->rx_buffer->size) - uart->rx_buffer->rpos;
     }
