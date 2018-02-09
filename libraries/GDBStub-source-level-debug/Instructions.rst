@@ -21,8 +21,7 @@ Command line debugging
 
 The next steps should be followed:
 
-1: Download the files from the *Onedrive*-repository:
-https://1drv.ms/f/s!AgjNziQJTfNOhoJztuFNADmz1_F_1g
+1: Import or copy the gdbstub-files from directory 'src'
 
 *The directory should look like this:*
 
