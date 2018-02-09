@@ -106,15 +106,13 @@ inline size_t uart_rx_fifo_available(uart_t* uart) {
 inline void uart_rx_copy_fifo_to_buffer(uart_t* uart) {
     while(uart_rx_fifo_available(uart)){
         size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
-        if(nextPos != uart->rx_buffer->rpos) {
-            uint8_t data = USF(uart->uart_nr);
-            uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
-            uart->rx_buffer->wpos = nextPos;
-        }
-        else {
+        if(nextPos == uart->rx_buffer->rpos) {
             // Stop copying if rx buffer is full
             break;
         }
+        uint8_t data = USF(uart->uart_nr);
+        uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
+        uart->rx_buffer->wpos = nextPos;
     }
 }
 
