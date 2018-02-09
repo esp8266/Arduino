@@ -1,0 +1,5 @@
+set remote hardware-breakpoint-limit 1
+set remote hardware-watchpoint-limit 1
+set debug xtensa 4
+target remote \\.\COM9
+thb loop
