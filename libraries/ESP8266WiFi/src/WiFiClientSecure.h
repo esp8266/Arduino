@@ -32,8 +32,6 @@ class WiFiClientSecure : public WiFiClient {
 public:
   WiFiClientSecure();
   ~WiFiClientSecure() override;
-  WiFiClientSecure(const WiFiClientSecure&);
-  WiFiClientSecure& operator=(const WiFiClientSecure&);
 
   int connect(IPAddress ip, uint16_t port) override;
   int connect(const String host, uint16_t port) override;
@@ -91,7 +89,7 @@ protected:
     int _connectSSL(const char* hostName);
     bool _verifyDN(const char* name);
 
-    SSLContext* _ssl = nullptr;
+    std::shared_ptr<SSLContext> _ssl = nullptr;
 };
 
 #endif //wificlientsecure_h
