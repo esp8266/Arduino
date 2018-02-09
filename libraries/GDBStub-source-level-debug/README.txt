@@ -1,4 +1,4 @@
-This library contains all files needed to execute source level debugging.
+This library contains all files needed for source level debugging.
 As from v2.0 of esp8266-Arduino this option was not available.
 
 The scope of the instruction is limited to preparing and testing a command-line gdb-debugging session. 
