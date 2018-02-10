@@ -21,7 +21,7 @@ The next steps should be followed to start command line debugging.
 1: Download the files from github.
 *The directory should look like this:*
 
-.. image::gdbstub-lib.png
+.. figure:: gdbstub-lib.png
 
 Directory “\ *bin*\ ” contains all the files necessary to execute a
 command line debug-session.:
