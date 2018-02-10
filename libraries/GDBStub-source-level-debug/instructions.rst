@@ -106,8 +106,6 @@ After 1000 milliseconds the program will stop at function “\ *loop*\ ”.
 2: Continue executing and wait.
 *Condition reached*
 
-.. figure:: gdbstub-watchpoint-setcondition-reached.png
-
 For more extensive info about *command-line gdb* I refer to
 http://sourceware.org/gdb/onlinedocs/gdb/index.html#SEC_Contents
 
