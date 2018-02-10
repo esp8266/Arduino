@@ -26,7 +26,7 @@ The next steps should be followed to start command line debugging.
 Directory “\ *bin*\ ” contains all the files necessary to execute a
 command line debug-session.:
 
-.. image::gdbstub-dir.png
+.. figure::gdbstub-dir.png
 Copy the files of directory “\ *bin”* to a location of your choice.
 Copy the library in directory “\ *gdbstub*\ ” to a location where you normally put your libraries.
 **Mind you**: The original files from *VisualGDB* have been modified in order to reduce the IRAM-usage, and also have set the some #defines in file *gdbstub-cfg.h*.
@@ -76,7 +76,7 @@ this directory.
 7: Then download the application and verify that the debug-stub is actually
 present and has started: 
 
-.. image::gdbstub-start.png
+.. figure::gdbstub-start.png
 
 You should see: **“$ST05#b9”** on the serial port of the esp8266.
 
