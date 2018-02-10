@@ -78,38 +78,38 @@ present and has started:
 
 .. figure:: gdbstub-start.png
 
-You should see: **“$ST05#b9”** on the serial port of the esp8266.
+You should see: **“$ST05#b9”** on the debug-port of the esp8266.
 
 8: Then execute command: “\ *xtensa-lx106-elf-gdb.exe -x gdbcmds*\ ”. If
 everything goes well the application will start and stop at location
 “\ *loop*\ ”. 
 Output on the debug-port:
 
-.. image:: gdbstub-comport-output.png
+.. figure:: gdbstub-comport-output.png
 
 Output from the target:
 
-.. image:: gdbstub-breakpoint1.png
+.. figure:: gdbstub-breakpoint1.png
 
 Then execute command “\ *info break*\ ”:
 
-.. image:: gdbstub-info-break.png
+.. figure:: gdbstub-info-break.png
 And the breakpoints defined in file *gdbcmds* are shown.
 
 9: Continue the program by entering “\ *continue*\ ”
 
-.. image:: gdbstub-thb-loop.png
+.. figure:: gdbstub-thb-loop.png
 After 1000 milliseconds the program will stop at function “\ *loop*\ ”.
 
 *Add a watchpoint*
 1: Define a *watchpoint* and a *expression*
 
-.. image:: gdbstub-watchpoint-setcondition.png
+.. figure:: gdbstub-watchpoint-setcondition.png
 
 2: Continue executing and wait.
 *Condition reached*
 
-.. image:: gdbstub-watchpoint-setcondition-reached.png
+.. figure:: gdbstub-watchpoint-setcondition-reached.png
 
 For more extensive info about *command-line gdb* I refer to
 http://sourceware.org/gdb/onlinedocs/gdb/index.html#SEC_Contents
@@ -142,7 +142,7 @@ Issues, tips and tricks
    inline code (see the function calculate () as shown below)! To
    minimize these effects compile with flag “–Og” .
 
-.. image:: gdbstub-watchpoint-setcondition-reached.png
+.. figure:: gdbstub-watchpoint-setcondition-reached.png
 
 5. Function **ets\_printf()** and **Serial.printf()** behave
    differently. The serial-IO for the Arduino-IDE is based on *class
