@@ -102,7 +102,7 @@ And the breakpoints defined in file *gdbcmds* are shown.
 After 1000 milliseconds the program will stop at function “\ *loop*\ ”.
 
 *Add a watchpoint*
-1: Define a *watchpoint* and a *expression*
+1: Define a *watchpoint* and an *expression*
 2: Continue executing and wait.
 *Condition reached*
 
