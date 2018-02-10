@@ -103,9 +103,6 @@ After 1000 milliseconds the program will stop at function “\ *loop*\ ”.
 
 *Add a watchpoint*
 1: Define a *watchpoint* and a *expression*
-
-.. figure:: gdbstub-watchpoint-setcondition.png
-
 2: Continue executing and wait.
 *Condition reached*
 
