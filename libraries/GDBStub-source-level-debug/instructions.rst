@@ -38,7 +38,7 @@ Copy the library in directory “\ *gdbstub*\ ” to a location where you normal
  2.Add to function setup():
    Serial.begin(115200);
    
-   gdbstub\_init();
+   gdbstub_init();
 
 **Mind you**: After this **Serial.printf()** doesn’t work anymore as
 gdbstub\_init() takes over the UART-interrupt, instead use function
@@ -162,37 +162,3 @@ References
 6. https://visualgdb.com/tutorials/esp8266/gdbstub/
 
 7. http://gnutoolchains.com/download/
-
-.. |image0| image:: media/image1.png
-   :width: 4.64583in
-   :height: 2.17862in
-.. |image1| image:: media/image2.png
-   :width: 2.39131in
-   :height: 2.66203in
-.. |image2| image:: media/image3.png
-   :width: 2.35417in
-   :height: 1.37136in
-.. |image3| image:: media/image4.png
-   :width: 6.30000in
-   :height: 0.62531in
-.. |image4| image:: media/image5.png
-   :width: 6.30000in
-   :height: 3.57328in
-.. |image5| image:: media/image6.png
-   :width: 6.30000in
-   :height: 1.24473in
-.. |image6| image:: media/image7.png
-   :width: 7.16744in
-   :height: 0.77500in
-.. |image7| image:: media/image8.png
-   :width: 4.65417in
-   :height: 2.46305in
-.. |image8| image:: media/image9.png
-   :width: 2.55000in
-   :height: 0.21667in
-.. |image9| image:: media/image10.png
-   :width: 6.94522in
-   :height: 0.62500in
-.. |image10| image:: media/image11.png
-   :width: 7.37097in
-   :height: 1.75833in
