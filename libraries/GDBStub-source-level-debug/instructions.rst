@@ -8,6 +8,8 @@
 |    |                | Minor modifications                                                    | Version   | 0.21   | 4-2-2018    |
 +----+----------------+------------------------------------------------------------------------+-----------+--------+-------------+
 
+Status: under construction!
+
 Scope 
 ======
 The scope is limited to preparing and testing a command-line gdb-debugging session for the esp8266 processor. It does not contain an instruction on how to install an IDE for the esp8266 nor the tool chain itself.
