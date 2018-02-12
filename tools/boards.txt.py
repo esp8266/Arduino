@@ -553,7 +553,7 @@ boards = collections.OrderedDict([
     ( 'd1', {
         'name': 'WeMos D1 R1',
         'opts': {
-            '.build.board': 'ESP8266_WEMOS_D1MINI',
+            '.build.board': 'ESP8266_WEMOS_D1R1',
             '.build.variant': 'd1',
             },
         'macro': [
@@ -1062,14 +1062,14 @@ def all_flash_size ():
 def led (default,max):
     led = collections.OrderedDict([
                 ('.menu.led.' + str(default), str(default)),
-                ('.menu.led.' + str(default) + '.build.led', '-DUSERLED=' + str(default)),
+                ('.menu.led.' + str(default) + '.build.led', '-DLED_BUILTIN=' + str(default)),
           ]);
     for i in range(0,max):
         if not i == default:
             led.update(
                 collections.OrderedDict([
                     ('.menu.led.' + str(i), str(i)),
-                    ('.menu.led.' + str(i) + '.build.led', '-DUSERLED=' + str(i)),
+                    ('.menu.led.' + str(i) + '.build.led', '-DLED_BUILTIN=' + str(i)),
                 ]))
     return { 'led': led }
 
