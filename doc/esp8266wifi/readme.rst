@@ -302,7 +302,7 @@ The same sketch without ``Serial.setDebugOutput(true)`` will print out only the 
 Enable Debugging in IDE
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Arduino IDE provides convenient method to `enable debugging <https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/debugging.md>`__ for specific libraries.
+Arduino IDE provides convenient method to `enable debugging <../Troubleshooting/debugging.rst>`__ for specific libraries.
 
 What's Inside?
 --------------

@@ -83,7 +83,7 @@ is wrong, it restarts itself to tell you about it.
 There are two typical scenarios that trigger ESP restarts:
 
 -  **Exception** - when code is performing `illegal
-   operation <https://github.com/esp8266/Arduino/blob/master/doc/exception_causes.md>`__,
+   operation <../exception_causes.rst>`__,
    like trying to write to non-existent memory location.
 -  **Watchdog** - if code is `locked
    up <https://en.wikipedia.org/wiki/Watchdog_timer>`__ staying too long
@@ -104,7 +104,7 @@ Typical restart because of exception looks like follows:
    Exception cause decoding
 
 Start with looking up exception code in the `Exception Causes
-(EXCCAUSE) <https://github.com/esp8266/Arduino/blob/master/doc/exception_causes.md>`__
+(EXCCAUSE) <../exception_causes.rst>`__
 table to understand what kind of issue it is. If you have no clues what
 it's about and where it happens, then use `Arduino ESP8266/ESP32
 Exception Stack Trace
@@ -361,4 +361,4 @@ Be specific and isolate the issue. Then ask community for support. There
 are plenty of people that like to work with ESP and willing to help with
 your problem.
 
-`FAQ list :back: <readme.md>`__
+`FAQ list :back: <readme.rst>`__
