@@ -79,7 +79,7 @@ public:
   void addService(String service, String proto, uint16_t port){
     addService(service.c_str(), proto.c_str(), port);
   }
-  
+
   bool addServiceTxt(char *name, char *proto, char * key, char * value);
   bool addServiceTxt(const char *name, const char *proto, const char *key,const char * value){
     return addServiceTxt((char *)name, (char *)proto, (char *)key, (char *)value);
@@ -87,7 +87,7 @@ public:
   bool addServiceTxt(String name, String proto, String key, String value){
     return addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
   }
-  
+
   int queryService(char *service, char *proto);
   int queryService(const char *service, const char *proto){
     return queryService((char *)service, (char *)proto);
@@ -98,7 +98,7 @@ public:
   String hostname(int idx);
   IPAddress IP(int idx);
   uint16_t port(int idx);
-  
+
   void enableArduino(uint16_t port, bool auth=false);
 
   void setInstanceName(String name);
@@ -107,6 +107,10 @@ public:
   }
   void setInstanceName(char * name){
     setInstanceName(String(name));
+  }
+
+  bool started() {
+      return _started;
   }
 
 private:
@@ -120,7 +124,8 @@ private:
   bool _waitingForAnswers;
   WiFiEventHandler _disconnectedHandler;
   WiFiEventHandler _gotIPHandler;
-  
+  bool _started = false;
+
 
   uint16_t _getServicePort(char *service, char *proto);
   MDNSTxt * _getServiceTxt(char *name, char *proto);

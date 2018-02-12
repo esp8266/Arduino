@@ -171,6 +171,8 @@ bool MDNSResponder::begin(const char* hostname){
     _restart();
   });
 
+  _started = true;
+
   return _listen();
 }
 

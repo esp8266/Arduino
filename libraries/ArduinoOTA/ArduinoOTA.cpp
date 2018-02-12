@@ -127,12 +127,14 @@ void ArduinoOTAClass::begin() {
   if(!_udp_ota->listen(*IP_ADDR_ANY, _port))
     return;
   _udp_ota->onRx(std::bind(&ArduinoOTAClass::_onRx, this));
-  MDNS.begin(_hostname.c_str());
+  if(!MDNS.started()) {
+    MDNS.begin(_hostname.c_str());
 
-  if (_password.length()) {
-    MDNS.enableArduino(_port, true);
-  } else {
-    MDNS.enableArduino(_port);
+    if (_password.length()) {
+      MDNS.enableArduino(_port, true);
+    } else {
+      MDNS.enableArduino(_port);
+    }
   }
   _initialized = true;
   _state = OTA_IDLE;
@@ -253,7 +255,7 @@ void ArduinoOTAClass::_runUpdate() {
     if (_error_callback) {
       _error_callback(OTA_BEGIN_ERROR);
     }
-    
+
     StreamString ss;
     Update.printError(ss);
     _udp_ota->append("ERR: ", 5);
