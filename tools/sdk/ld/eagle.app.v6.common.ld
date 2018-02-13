@@ -96,7 +96,7 @@ SECTIONS
     *.pioenvs\\*\\lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
     *.pioenvs/*/lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
     /* project dependencies */
-    *.pioenvs\\*\\lib*\lib*.a:(.literal*, .text*)
+    *.pioenvs\\*\\lib*\\lib*.a:(.literal*, .text*)
     *.pioenvs/*/lib*/lib*.a:(.literal*, .text*)
     /* project source objects */
     *.pioenvs\\*\\src\\*.o(.literal*, .text*)
