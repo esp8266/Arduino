@@ -96,8 +96,11 @@ SECTIONS
     *.pioenvs\\*\\lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
     *.pioenvs/*/lib*.a:(EXCLUDE_FILE (umm_malloc.o) .literal*, EXCLUDE_FILE (umm_malloc.o) .text*)
     /* project dependencies */
-    *.pioenvs\\*\\lib*\lib*.a:(.literal*, .text*)
+    *.pioenvs\\*\\lib*\\lib*.a:(.literal*, .text*)
     *.pioenvs/*/lib*/lib*.a:(.literal*, .text*)
+    /* non-archived project dependencies */
+    *.pioenvs\\*\\lib*\\*.o(.literal*, .text*)
+    *.pioenvs/*/lib*/*.o(.literal*, .text*)
     /* project source objects */
     *.pioenvs\\*\\src\\*.o(.literal*, .text*)
     *.pioenvs/*/src/*.o(.literal*, .text*)
@@ -173,6 +176,9 @@ SECTIONS
     /* project dependencies */
     *.pioenvs\\*\\lib*\\lib*.a:(.iram.text)
     *.pioenvs/*/lib*/lib*.a:(.iram.text)
+    /* non-archived project dependencies */
+    *.pioenvs\\*\\lib*\\*.o(.iram.text)
+    *.pioenvs/*/lib*/*.o(.iram.text)
     /* project source objects */
     *.pioenvs\\*\\src\\*.o(.iram.text)
     *.pioenvs/*/src/*.o(.iram.text)
