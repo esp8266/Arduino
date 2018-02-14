@@ -172,7 +172,11 @@ void uart_start_isr(uart_t* uart)
     if(uart == NULL || !uart->rx_enabled) {
         return;
     }
-    USC1(uart->uart_nr) = (127 << UCFFT) | (0x02 << UCTOT) | (1 <<UCTOE );
+    // UCFFT value is when the RX fifo full interrupt triggers.  A value of 1
+    // triggers the IRS very often.  A value of 127 would not leave much time
+    // for ISR to clear fifo before the next byte is dropped.  So pick a value
+    // in the middle.
+    USC1(uart->uart_nr) = (100   << UCFFT) | (0x02 << UCTOT) | (1 <<UCTOE );
     USIC(uart->uart_nr) = 0xffff;
     USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIFR) | (1 << UITO);
     ETS_UART_INTR_ATTACH(uart_isr,  (void *)uart);
