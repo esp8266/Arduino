@@ -195,7 +195,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       #endif
       md5.begin();
       if(authReq.indexOf(FPSTR(qop_auth)) != -1) {
-        md5.add(_H1 + FPSTR(colon) + _nonce + FPSTR(colon) + _nc + FPSTR(colon) + _cnonce + ':auth:' + _H2);
+        md5.add(_H1 + FPSTR(colon) + _nonce + FPSTR(colon) + _nc + FPSTR(colon) + _cnonce + ":auth:" + _H2);
       }else{
         md5.add(_H1 + FPSTR(colon) + _nonce + FPSTR(colon) + _H2);
       }
@@ -376,7 +376,7 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
     if (!content_type)
         content_type = mimeTable[html].mimeType;
 
-    sendHeader(String(F("Content-Type")), content_type, true);
+    sendHeader(String(F("Content-Type")), String(FPSTR(content_type)), true);
     if (_contentLength == CONTENT_LENGTH_NOT_SET) {
         sendHeader(String(FPSTR(Content_Length)), String(contentLength));
     } else if (_contentLength != CONTENT_LENGTH_UNKNOWN) {
@@ -485,9 +485,9 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
 {
   using namespace mime;
   setContentLength(fileSize);
-  if (fileName.endsWith(mimeTable[gz].endsWith) &&
-      contentType != mimeTable[gz].mimeType &&
-      contentType != mimeTable[none].mimeType) {
+  if (fileName.endsWith(String(FPSTR(mimeTable[gz].endsWith))) &&
+      contentType != String(FPSTR(mimeTable[gz].mimeType)) &&
+      contentType != String(FPSTR(mimeTable[none].mimeType))) {
     sendHeader(F("Content-Encoding"), F("gzip"));
   }
   send(200, contentType, "");
