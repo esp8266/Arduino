@@ -81,6 +81,7 @@ ESP8266WebServer::ESP8266WebServer(int port)
 }
 
 ESP8266WebServer::~ESP8266WebServer() {
+  close();
   if (_currentHeaders)
     delete[]_currentHeaders;
   _headerKeysCount = 0;
@@ -90,7 +91,6 @@ ESP8266WebServer::~ESP8266WebServer() {
     delete handler;
     handler = next;
   }
-  close();
 }
 
 void ESP8266WebServer::begin() {
