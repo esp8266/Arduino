@@ -27,11 +27,12 @@ void setup()
     // It's up to the user to implement protocol for handling data length
     SPISlave.onData([](uint8_t * data, size_t len) {
         String message = String((char *)data);
+        (void) len;
         if(message.equals("Hello Slave!")) {
             SPISlave.setData("Hello Master!");
         } else if(message.equals("Are you alive?")) {
             char answer[33];
-            sprintf(answer,"Alive for %u seconds!", millis() / 1000);
+            sprintf(answer,"Alive for %lu seconds!", millis() / 1000);
             SPISlave.setData(answer);
         } else {
             SPISlave.setData("Say what?");
