@@ -53,7 +53,7 @@ env.Prepend(
         join(FRAMEWORK_DIR, "tools", "sdk", "libc", "xtensa-lx106-elf", "lib")
     ],
     LIBS=[
-        "mesh", "wpa2", "smartconfig", "espnow", "pp", "main", "wpa", "lwip_gcc",
+        "wpa2", "smartconfig", "espnow", "pp", "main", "wpa", "lwip_gcc",
         "net80211", "wps", "crypto", "phy", "hal", "axtls", "gcc",
         "m", "c", "stdc++"
     ]
