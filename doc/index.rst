@@ -21,3 +21,8 @@ Welcome to ESP8266 Arduino Core's documentation!
    Stack Dump <Troubleshooting/stack_dump>
    Using with Eclipse <eclipse/eclipse>
    Changelog <changes>
+
+-Other languages: 
+ATTENTION !!! All communications (issues and pull request) regarding the ESP8266 Arduino core should always be done in English, as it is the official language of the project. Requests are not allowed in any other language.
+
+Spanish - no official: http://esp8266-arduino-spanish.readthedocs.io/es/latest/
