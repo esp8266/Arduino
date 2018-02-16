@@ -58,6 +58,7 @@ All communications (issues and pull request) regarding the ESP8266 Arduino core 
 4.	Pull requests that address an outstanding issue, particularly an issue deemed to be severe, should be given priority
 5.	If a PR is accepted, then it should undergo review and updated based on the feedback provided, then merged
 6.   Pull requests that don't meet the above will be denied and closed
+7.   Pull request accepted and that modify something in the documentation will be marked with the label DOC, for to be able to find it easily, review it and translate it.
 
 # Other
 A table should be maintained for relating maintainers and components. When triaging, this is essential to figure out if someone in particular should be consulted about specific changes.
