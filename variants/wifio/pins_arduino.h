@@ -84,4 +84,11 @@ static const uint8_t E16 = ESP_PINS_OFFSET + 16;
 #define SERIAL_PORT_HARDWARE       Serial
 #define SERIAL_PORT_HARDWARE_OPEN  Serial
 
+#ifdef LED_BUILTIN
+#ifdef __cplusplus
+extern "C"
+#endif
+const int BUILTIN_LED __attribute__((deprecated, weak)) = LED_BUILTIN;
+#endif
+
 #endif /* Pins_Arduino_h */

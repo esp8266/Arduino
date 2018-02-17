@@ -91,7 +91,8 @@ public:
         if (!_isFile) {
             // Base URI doesn't point to a file.
             // If a directory is requested, look for index file.
-            if (requestUri.endsWith("/")) requestUri += "index.htm";
+            if (requestUri.endsWith("/")) 
+              requestUri += "index.htm";
 
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
