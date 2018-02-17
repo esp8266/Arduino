@@ -131,6 +131,16 @@ function build_package()
     ./build_boards_manager_package.sh
 }
 
+function build_boards()
+{
+    echo -e "travis_fold:start:build_boards"
+    tools/boards.txt.py --boardsgen --ldgen --packagegen --docgen
+    git diff --exit-code -- boards.txt \
+                            package/package_esp8266com_index.template.json \
+                            doc/boards.rst \
+                            tools/sdk/ld/
+    echo -e "travis_fold:end:build_boards"
+}
 
 function install_platformio()
 {
@@ -217,7 +227,9 @@ elif [ "$BUILD_TYPE" = "docs" ]; then
     cd $TRAVIS_BUILD_DIR/doc
     build_docs
 elif [ "$BUILD_TYPE" = "package" ]; then
-        # Build release package
+    # Check that boards.txt, ld scripts, package JSON template, and boards.rst are up to date
+    build_boards
+    # Build release package
     cd $TRAVIS_BUILD_DIR/package
     build_package
 elif [ "$BUILD_TYPE" = "host_tests" ]; then
