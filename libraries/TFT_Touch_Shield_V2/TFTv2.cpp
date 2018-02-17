@@ -204,10 +204,10 @@ void TFT::fillScreen(INT16U XL, INT16U XR, INT16U YU, INT16U YD, INT16U color)
         YD = YU^YD;
         YU = YU^YD;
     }
-    XL = (XL > MAX_X) ? MAX_X : XL;
-    XR = (XR > MAX_X) ? MAX_X : XR;
-    YU = (YU > MAX_Y) ? MAX_Y : YU;
-    YD = (YD > MAX_Y) ? MAX_Y : YD;
+    XL = constrain((int)XL, (int)MIN_X, (int)MAX_X);
+    XR = constrain((int)XR, (int)MIN_X, (int)MAX_X);
+    YU = constrain((int)YU, (int)MIN_Y, (int)MAX_Y);
+    YD = constrain((int)YD, (int)MIN_Y, (int)MAX_Y);
 
     XY = (XR-XL+1);
     XY = XY*(YD-YU+1);
