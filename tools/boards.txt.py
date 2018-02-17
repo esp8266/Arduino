@@ -978,7 +978,7 @@ def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, s
         ( menub + 'spiffs_pagesize', '256' ),
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
         ])
-    if spiffs_start > 0:
+    if spiffs_size > 0:
         d.update(collections.OrderedDict([
             ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
             ( menub + 'spiffs_end', "0x%05X" % (spiffs_start + spiffs_size) ),
@@ -1008,8 +1008,16 @@ def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, s
         else:
             page = 0x100
             block = 0x2000
-        print "/* file %s */" % ld
-        print "/* Flash Split for %s chips */" % optname
+
+        print "/* Flash Split for %s chips */" % display
+        print "/* sketch %dKB */" % (max_upload_size / 1024)
+        if spiffs_size > 0:
+            empty_size = spiffs_start - max_upload_size - 4096
+            if empty_size > 1024:
+                print "/* empty  %dKB */" % (empty_size / 1024)
+            print "/* spiffs %dKB */" % (spiffs_size / 1024)
+        print "/* eeprom 20KB */"
+        print ""
         print "MEMORY"
         print "{"
         print "  dport0_0_seg :                        org = 0x3FF00000, len = 0x10"
@@ -1017,6 +1025,7 @@ def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, s
         print "  iram1_0_seg :                         org = 0x40100000, len = 0x8000"
         print "  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size
         print "}"
+        print ""
         print "PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start)
         print "PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_start + spiffs_size)
         print "PROVIDE ( _SPIFFS_page = 0x%X );" % page
@@ -1031,10 +1040,10 @@ def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, s
     return d
 
 def all_flash_size ():
-    f512 =      flash_size('512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696)
+    f512 =      flash_size('512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696,   0x7B000)
     f512.update(flash_size('512K', '512K64',  'eagle.flash.512k64.ld',   '64K SPIFFS', 434160,   0x6B000,   0x10000, 4096))
     f512.update(flash_size('512K', '512K128', 'eagle.flash.512k128.ld', '128K SPIFFS', 368624,   0x5B000,   0x20000, 4096))
-    f1m =       flash_size(  '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984)
+    f1m =       flash_size(  '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984,  0xFB000)
     f1m.update( flash_size(  '1M', '1M64',    'eagle.flash.1m64.ld',     '64K SPIFFS', 958448,   0xEB000,   0x10000, 4096))
     f1m.update( flash_size(  '1M', '1M128',   'eagle.flash.1m128.ld',   '128K SPIFFS', 892912,   0xDB000,   0x20000, 4096))
     f1m.update( flash_size(  '1M', '1M144',   'eagle.flash.1m144.ld',   '144K SPIFFS', 876528,   0xD7000,   0x24000, 4096))
