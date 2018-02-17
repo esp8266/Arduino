@@ -1190,14 +1190,10 @@ def package ():
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
 
     if packagegen:
-        realstdout = sys.stdout
-        sys.stdout = open(pkgfname, 'w')
-
-    print newfilestr
-
-    if packagegen:
-        sys.stdout.close()
-        sys.stdout = realstdout
+        with open(pkgfname, 'w') as package_file:
+            package_file.write(newfilestr)
+    else:
+        sys.stdout.write(newfilestr)
 
 ################################################################
 
