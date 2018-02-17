@@ -1182,9 +1182,10 @@ def package ():
         filestr = package_file.read()
 
     substitution = '"boards": [\n'
-    for id in boards:
-        substitution += '            {\n              "name": "' + boards[id]['name'] + '"\n            },\n'
-    substitution += '          ],'
+    board_items = ['            {\n              "name": "%s"\n            }' % boards[id]['name']
+                    for id in boards]
+    substitution += ',\n'.join(board_items)        
+    substitution += '\n          ],'
 
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
 
