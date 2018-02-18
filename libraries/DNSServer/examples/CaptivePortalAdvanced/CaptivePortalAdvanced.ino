@@ -44,10 +44,10 @@ IPAddress netMsk(255, 255, 255, 0);
 boolean connect;
 
 /** Last time I tried to connect to WLAN */
-long lastConnectTry = 0;
+unsigned long lastConnectTry = 0;
 
 /** Current WLAN status */
-int status = WL_IDLE_STATUS;
+unsigned int status = WL_IDLE_STATUS;
 
 void setup() {
   delay(1000);
@@ -95,7 +95,7 @@ void loop() {
     lastConnectTry = millis();
   }
   {
-    int s = WiFi.status();
+    unsigned int s = WiFi.status();
     if (s == 0 && millis() > (lastConnectTry + 60000) ) {
       /* If WLAN disconnected and idle try to connect */
       /* Don't set retry time too low as retry interfere the softAP operation */
