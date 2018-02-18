@@ -1102,7 +1102,7 @@ def all_boards ():
     macros.update(led(led_default, led_max))
 
     print '#'
-    print '# this file is script-generated and is likely to be overwritten by ' + sys.argv[0]
+    print '# this file is script-generated and is likely to be overwritten by ' + os.path.basename(sys.argv[0])
     print '#'
     print ''
     print 'menu.BoardModel=Model'
