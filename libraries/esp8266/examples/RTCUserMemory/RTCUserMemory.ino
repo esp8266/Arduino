@@ -52,7 +52,7 @@ void setup() {
   }
 
   // Generate new data set for the struct
-  for (int i = 0; i < sizeof(rtcData.data); i++) {
+  for (size_t i = 0; i < sizeof(rtcData.data); i++) {
     rtcData.data[i] = random(0, 128);
   }
   // Update CRC32 of data
@@ -94,7 +94,7 @@ uint32_t calculateCRC32(const uint8_t *data, size_t length)
 void printMemory() {
   char buf[3];
   uint8_t *ptr = (uint8_t *)&rtcData;
-  for (int i = 0; i < sizeof(rtcData); i++) {
+  for (size_t i = 0; i < sizeof(rtcData); i++) {
     sprintf(buf, "%02X", ptr[i]);
     Serial.print(buf);
     if ((i + 1) % 32 == 0) {
