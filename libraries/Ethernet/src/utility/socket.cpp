@@ -364,6 +364,7 @@ uint16_t recvfrom(SOCKET s, uint8_t *buf, uint16_t len, uint8_t *addr, uint16_t 
  */
 void flush(SOCKET s) {
   // TODO
+  (void) s;
 }
 
 uint16_t igmpsend(SOCKET s, const uint8_t * buf, uint16_t len)

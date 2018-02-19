@@ -978,7 +978,7 @@ def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, s
         ( menub + 'spiffs_pagesize', '256' ),
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
         ])
-    if spiffs_start > 0:
+    if spiffs_size > 0:
         d.update(collections.OrderedDict([
             ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
             ( menub + 'spiffs_end', "0x%05X" % (spiffs_start + spiffs_size) ),
@@ -1008,8 +1008,16 @@ def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, s
         else:
             page = 0x100
             block = 0x2000
-        print "/* file %s */" % ld
-        print "/* Flash Split for %s chips */" % optname
+
+        print "/* Flash Split for %s chips */" % display
+        print "/* sketch %dKB */" % (max_upload_size / 1024)
+        if spiffs_size > 0:
+            empty_size = spiffs_start - max_upload_size - 4096
+            if empty_size > 1024:
+                print "/* empty  %dKB */" % (empty_size / 1024)
+            print "/* spiffs %dKB */" % (spiffs_size / 1024)
+        print "/* eeprom 20KB */"
+        print ""
         print "MEMORY"
         print "{"
         print "  dport0_0_seg :                        org = 0x3FF00000, len = 0x10"
@@ -1017,6 +1025,7 @@ def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, s
         print "  iram1_0_seg :                         org = 0x40100000, len = 0x8000"
         print "  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size
         print "}"
+        print ""
         print "PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start)
         print "PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_start + spiffs_size)
         print "PROVIDE ( _SPIFFS_page = 0x%X );" % page
@@ -1031,10 +1040,10 @@ def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, s
     return d
 
 def all_flash_size ():
-    f512 =      flash_size('512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696)
+    f512 =      flash_size('512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696,   0x7B000)
     f512.update(flash_size('512K', '512K64',  'eagle.flash.512k64.ld',   '64K SPIFFS', 434160,   0x6B000,   0x10000, 4096))
     f512.update(flash_size('512K', '512K128', 'eagle.flash.512k128.ld', '128K SPIFFS', 368624,   0x5B000,   0x20000, 4096))
-    f1m =       flash_size(  '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984)
+    f1m =       flash_size(  '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984,  0xFB000)
     f1m.update( flash_size(  '1M', '1M64',    'eagle.flash.1m64.ld',     '64K SPIFFS', 958448,   0xEB000,   0x10000, 4096))
     f1m.update( flash_size(  '1M', '1M128',   'eagle.flash.1m128.ld',   '128K SPIFFS', 892912,   0xDB000,   0x20000, 4096))
     f1m.update( flash_size(  '1M', '1M144',   'eagle.flash.1m144.ld',   '144K SPIFFS', 876528,   0xD7000,   0x24000, 4096))
@@ -1093,7 +1102,7 @@ def all_boards ():
     macros.update(led(led_default, led_max))
 
     print '#'
-    print '# this file is script-generated and is likely to be overwritten by ' + sys.argv[0]
+    print '# this file is script-generated and is likely to be overwritten by ' + os.path.basename(sys.argv[0])
     print '#'
     print ''
     print 'menu.BoardModel=Model'
@@ -1173,21 +1182,18 @@ def package ():
         filestr = package_file.read()
 
     substitution = '"boards": [\n'
-    for id in boards:
-        substitution += '            {\n              "name": "' + boards[id]['name'] + '"\n            },\n'
-    substitution += '          ],'
+    board_items = ['            {\n              "name": "%s"\n            }' % boards[id]['name']
+                    for id in boards]
+    substitution += ',\n'.join(board_items)        
+    substitution += '\n          ],'
 
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
 
     if packagegen:
-        realstdout = sys.stdout
-        sys.stdout = open(pkgfname, 'w')
-
-    print newfilestr
-
-    if packagegen:
-        sys.stdout.close()
-        sys.stdout = realstdout
+        with open(pkgfname, 'w') as package_file:
+            package_file.write(newfilestr)
+    else:
+        sys.stdout.write(newfilestr)
 
 ################################################################
 
@@ -1237,24 +1243,24 @@ def usage (name,ret):
     print ""
     print "usage: %s [options]" % name
     print ""
-    print "	-h, --help"
-    print "	--lwip			- preferred default lwIP version (default %d)" % lwip
-    print "	--led			- preferred default builtin led for generic boards (default %d)" % led_default
-    print "	--board b		- board to modify:"
-    print "		--speed	s	- change default serial speed"
-    print "	--customspeed s		- new serial speed for all boards"
-    print "	--nofloat		- disable float support in printf/scanf"
+    print " -h, --help"
+    print " --lwip          - preferred default lwIP version (default %d)" % lwip
+    print " --led           - preferred default builtin led for generic boards (default %d)" % led_default
+    print " --board b       - board to modify:"
+    print " --speed s       - change default serial speed"
+    print " --customspeed s - new serial speed for all boards"
+    print " --nofloat       - disable float support in printf/scanf"
     print ""
-    print "	mandatory option (at least one):"
+    print " mandatory option (at least one):"
     print ""
-    print "	--boards		- show boards.txt"
-    print "	--boardsgen		- replace boards.txt"
-    print "	--ld			- show ldscripts"
-    print "	--ldgen			- replace ldscripts"
-    print "	--package		- show package"
-    print "	--packagegen		- replace board:[] in package"
-    print "	--doc			- shows doc/boards.rst"
-    print "	--docgen		- replace doc/boards.rst"
+    print " --boards        - show boards.txt"
+    print " --boardsgen     - replace boards.txt"
+    print " --ld            - show ldscripts"
+    print " --ldgen         - replace ldscripts"
+    print " --package       - show package"
+    print " --packagegen    - replace board:[] in package"
+    print " --doc           - shows doc/boards.rst"
+    print " --docgen        - replace doc/boards.rst"
     print ""
 
     out = ""

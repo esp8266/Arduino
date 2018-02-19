@@ -1,5 +1,5 @@
 #
-# this file is script-generated and is likely to be overwritten by ./tools/boards.txt.py
+# this file is script-generated and is likely to be overwritten by boards.txt.py
 #
 
 menu.BoardModel=Model
