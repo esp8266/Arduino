@@ -42,7 +42,7 @@ following three things right: 1. Module is provided with enough power,
 resistors, 3. Module is put into boot loader mode.
 
 For specific details please refer to section on `Generic ESP8266
-modules <../boards.md#generic-esp8266-modules>`__. Example modules
+modules <../boards.rst#generic-esp8266-modules>`__. Example modules
 without USB to serial converter on board are shown below.
 
 .. figure:: pictures/a01-example-boards-without-usb.png
@@ -128,7 +128,7 @@ follows:
 ``ets Jan  8 2013,rst cause:2, boot mode:(1,7)``
 
 If you see similar message but different values then decode them using
-`Boot Messages and Modes <../boards.md#boot-messages-and-modes>`__. The
+`Boot Messages and Modes <../boards.rst#boot-messages-and-modes>`__. The
 key information is contained in first digit / three right-most bits of
 the boot mode message as shown below.
 
@@ -140,9 +140,9 @@ the boot mode message as shown below.
 For instance message ``boot mode (3,3)`` indicates that pins GPIO2 and
 GPIO0 are set HIGH and GPIO15 is set LOW. This is configuration for
 `normal
-operation <../boards.md#minimal-hardware-setup-for-running-only>`__ of
+operation <../boards.rst#minimal-hardware-setup-for-running-only>`__ of
 module (to execute application from flash), not for `boot
-loading <../boards.md#minimal-hardware-setup-for-bootloading-only>`__
+loading <../boards.rst#minimal-hardware-setup-for-bootloading-only>`__
 (flash programming).
 
     Note: Without having this step right you will not be able to upload
@@ -391,4 +391,4 @@ Test stand used for checking of ck reset method is shown above.
 
 No any ESP module has been harmed during preparation of this FAQ item.
 
-`FAQ list :back: <readme.md>`__
+`FAQ list :back: <readme.rst>`__
