@@ -66,7 +66,7 @@ WiFiClient::~WiFiClient()
 {
     WiFiClient::_remove(this);
     if (_client)
-        _client->unref();
+        unuse_result(_client->unref());
 }
 
 WiFiClient::WiFiClient(const WiFiClient& other)
@@ -82,7 +82,7 @@ WiFiClient::WiFiClient(const WiFiClient& other)
 WiFiClient& WiFiClient::operator=(const WiFiClient& other)
 {
    if (_client)
-        _client->unref();
+        unuse_result(_client->unref());
     _client = other._client;
     _timeout = other._timeout;
     _localPort = other._localPort;
@@ -139,7 +139,9 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     _client->setTimeout(_timeout);
     int res = _client->connect(&addr, port);
     if (res == 0) {
-        _client->unref();
+        // _client may be NULL because of asynchronous ::stop,
+        // see ClientContext::unref() which checks this
+        unuse_result(_client->unref());
         _client = nullptr;
         return 0;
     }
@@ -272,7 +274,7 @@ void WiFiClient::stop()
     if (!_client)
         return;
 
-    _client->unref();
+    unuse_result(_client->unref());
     _client = 0;
 }
 

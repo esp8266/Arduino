@@ -26,10 +26,11 @@ class WiFiClient;
 
 typedef void (*discard_cb_t)(void*, ClientContext*);
 
-extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
 #include "DataSource.h"
+
+#define unuse_result(x) ({ __typeof__(x) z = x; (void)sizeof(z); })
 
 class ClientContext
 {
@@ -105,8 +106,15 @@ public:
         DEBUGV(":ref %d\r\n", _refcnt);
     }
 
-    void unref()
+    // unref() return true if 'this->' is deleted
+    bool unref() __attribute__((warn_unused_result))
     {
+        // 'if(this != 0)' deserves an explanation:
+        //     It is very valid because it happens and is true after
+        //     *asynchronous* WiFiClient::stop() which calls ::unref then
+        //     nullify me=WiFiClient::_client *during* for example
+        //     WiFiClient::connect(). see _delay_destroyed_this().
+        //     (would WiFiClient:: check _client instead?)
         if(this != 0) {
             DEBUGV(":ur %d\r\n", _refcnt);
             if(--_refcnt == 0) {
@@ -117,8 +125,10 @@ public:
                 }
                 DEBUGV(":del\r\n");
                 delete this;
+                return true;
             }
         }
+        return false;
     }
 
     int connect(ip_addr_t* addr, uint16_t port)
@@ -130,12 +140,9 @@ public:
         _connect_pending = 1;
         _op_start_time = millis();
         // This delay will be interrupted by esp_schedule in the connect callback
-        delay(_timeout_ms);
-        // WiFi may have vanished during the delay (#4078)
-        if (!this || !_pcb) {
-            DEBUGV(":vnsh\r\n");
+        if (_delay_destroyed_this(_timeout_ms))
+            // we were deleted during the delay, 'this->' is now invalid
             return 0;
-        }
         _connect_pending = 0;
         if (state() != ESTABLISHED) {
             abort();
@@ -310,7 +317,8 @@ public:
 
         while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --tries) {
             _write_some();
-            delay(1); // esp_ schedule+yield
+            if (_delay_destroyed_this(1))
+                return;
         }
     }
 
@@ -383,18 +391,33 @@ public:
 
 protected:
 
+    // _delay_destroyed_this() fixes #4078
+    // where delay() is interrupted by disconnected AP WiFi event
+    // during which WiFiClient stops all => 'this->' becomes invalid
+    bool _delay_destroyed_this (unsigned long ms) __attribute__((warn_unused_result))
+    {
+        ref();
+        delay(ms);
+        bool destroyed = unref();
+        return destroyed;
+    }
+
     bool _is_timeout()
     {
         return millis() - _op_start_time > _timeout_ms;
     }
 
-    void _notify_error()
+    bool _notify_error_destroyed_this() __attribute__((warn_unused_result))
     {
         if (_connect_pending || _send_waiting) {
-            esp_schedule();
+            return _delay_destroyed_this(0); // was: esp_schedule()
         }
+        return false;
     }
 
+    // warning:
+    // please ensure all _write_from_source callers
+    // straightly return from the instance
     size_t _write_from_source(DataSource* ds)
     {
         assert(_datasource == nullptr);
@@ -417,7 +440,9 @@ protected:
             }
 
             ++_send_waiting;
-            esp_yield();
+            if (_delay_destroyed_this(0)) // calls esp_yield()
+                // 'this->' is no more, hence the warning above
+                return 0;
         } while(true);
         _send_waiting = 0;
         return _written;
@@ -514,9 +539,9 @@ protected:
         (void) err;
         if(pb == 0) { // connection closed
             DEBUGV(":rcl\r\n");
-            _notify_error();
-            abort();
-            return ERR_ABRT;
+            if (!_notify_error_destroyed_this())
+                abort();
+            return ERR_ABRT; // return from instance
         }
 
         if(_rx_buf) {
@@ -539,7 +564,8 @@ protected:
         tcp_recv(_pcb, NULL);
         tcp_err(_pcb, NULL);
         _pcb = NULL;
-        _notify_error();
+
+        unuse_result(_notify_error_destroyed_this()); // return from instance
     }
 
     err_t _connected(struct tcp_pcb *pcb, err_t err)
