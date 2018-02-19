@@ -107,17 +107,15 @@ public:
 
     void unref()
     {
-        if(this != 0) {
-            DEBUGV(":ur %d\r\n", _refcnt);
-            if(--_refcnt == 0) {
-                discard_received();
-                close();
-                if(_discard_cb) {
-                    _discard_cb(_discard_cb_arg, this);
-                }
-                DEBUGV(":del\r\n");
-                delete this;
+        DEBUGV(":ur %d\r\n", _refcnt);
+        if(--_refcnt == 0) {
+            discard_received();
+            close();
+            if(_discard_cb) {
+                _discard_cb(_discard_cb_arg, this);
             }
+            DEBUGV(":del\r\n");
+            delete this;
         }
     }
 
@@ -131,13 +129,13 @@ public:
         _op_start_time = millis();
         // This delay will be interrupted by esp_schedule in the connect callback
         delay(_timeout_ms);
-        // WiFi may have vanished during the delay (#4078)
-        if (!this || !_pcb) {
-            DEBUGV(":vnsh\r\n");
+        _connect_pending = 0;
+        if (!_pcb) {
+            DEBUGV(":cabrt\r\n");
             return 0;
         }
-        _connect_pending = 0;
         if (state() != ESTABLISHED) {
+            DEBUGV(":ctmo\r\n");
             abort();
             return 0;
         }
