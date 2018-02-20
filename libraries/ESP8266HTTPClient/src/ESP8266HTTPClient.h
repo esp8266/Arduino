@@ -148,6 +148,7 @@ public:
     void setUserAgent(const String& userAgent);
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
+    void setRawAuthorization(const char * rawAuth);
     void setTimeout(uint16_t timeout);
 
     void useHTTP10(bool usehttp10 = true);
@@ -213,7 +214,7 @@ protected:
     String _protocol;
     String _headers;
     String _userAgent = "ESP8266HTTPClient";
-    String _base64Authorization;
+    String _rawAuthorization;
 
     /// Response handling
     RequestArgument* _currentHeaders = nullptr;
