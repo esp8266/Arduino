@@ -24,16 +24,13 @@
               "name": "Generic ESP8266 Module"
             },
             {
-              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+              "name": "Generic ESP8285 Module"
             },
             {
-              "name": "NodeMCU 0.9 (ESP-12 Module)"
+              "name": "ESPDuino (ESP-13 Module)"
             },
             {
-              "name": "NodeMCU 1.0 (ESP-12E Module)"
-            },
-            {
-              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+              "name": "Adafruit Feather HUZZAH ESP8266"
             },
             {
               "name": "ESPresso Lite 1.0"
@@ -46,36 +43,54 @@
             },
             {
               "name": "Phoenix 2.0"
-            },                        
+            },
             {
-              "name": "SparkFun Thing"
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            },
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            },
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            },
+            {
+              "name": "SparkFun ESP8266 Thing"
+            },
+            {
+              "name": "SparkFun ESP8266 Thing Dev"
             },
             {
               "name": "SweetPea ESP-210"
             },
             {
-              "name": "WeMos D1"
+              "name": "WeMos D1 R2 & mini"
             },
             {
-              "name": "WeMos D1 mini"
+              "name": "WeMos D1 mini Pro"
+            },
+            {
+              "name": "WeMos D1 mini Lite"
+            },
+            {
+              "name": "WeMos D1 R1"
             },
             {
               "name": "ESPino (ESP-12 Module)"
             },
             {
-              "name": "ESPino (WROOM-02 Module)"
+              "name": "ThaiEasyElec's ESPino"
             },
             {
               "name": "WifInfo"
             },
             {
-              "name": "ESPDuino"
+              "name": "Arduino"
             },
             {
               "name": "4D Systems gen4 IoD Range"
             },
             {
-              "name": "DigiStump Oak"
+              "name": "Digistump Oak"
             }
           ],
           "toolsDependencies": [

@@ -36,11 +36,9 @@
 #define DEBUG_OUTPUT Serial
 #endif
 
-//const char * AUTHORIZATION_HEADER = "Authorization";
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
 static const char qop_auth[] PROGMEM = "qop=auth";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
-static const char colon[] PROGMEM = ":";
 static const char Content_Length[] PROGMEM = "Content-Length";
 
 
@@ -81,16 +79,15 @@ ESP8266WebServer::ESP8266WebServer(int port)
 }
 
 ESP8266WebServer::~ESP8266WebServer() {
+  _server.close();
   if (_currentHeaders)
     delete[]_currentHeaders;
-  _headerKeysCount = 0;
   RequestHandler* handler = _firstHandler;
   while (handler) {
     RequestHandler* next = handler->next();
     delete handler;
     handler = next;
   }
-  close();
 }
 
 void ESP8266WebServer::begin() {
@@ -105,7 +102,7 @@ void ESP8266WebServer::begin(uint16_t port) {
 
 String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit){
   int _begin = authReq.indexOf(param);
-  if (_begin==-1) 
+  if (_begin == -1) 
     return "";
   return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
@@ -195,9 +192,9 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       #endif
       md5.begin();
       if(authReq.indexOf(FPSTR(qop_auth)) != -1) {
-        md5.add(_H1 + FPSTR(colon) + _nonce + FPSTR(colon) + _nc + FPSTR(colon) + _cnonce + ':auth:' + _H2);
-      }else{
-        md5.add(_H1 + FPSTR(colon) + _nonce + FPSTR(colon) + _H2);
+        md5.add(_H1 + ':' + _nonce + ':' + _nc + ':' + _cnonce + F(":auth:") + _H2);
+      } else {
+        md5.add(_H1 + ':' + _nonce + ':' + _H2);
       }
       md5.calculate();
       String _responsecheck = md5.toString();
@@ -237,7 +234,7 @@ void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* re
     sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String(F("\"")));
   }
   using namespace mime;
-  send(401, mimeTable[html].mimeType, authFailMsg);
+  send(401, String(FPSTR(mimeTable[html].mimeType)), authFailMsg);
 }
 
 void ESP8266WebServer::on(const String &uri, ESP8266WebServer::THandlerFunction handler) {
@@ -376,7 +373,7 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
     if (!content_type)
         content_type = mimeTable[html].mimeType;
 
-    sendHeader(String(F("Content-Type")), content_type, true);
+    sendHeader(String(F("Content-Type")), String(FPSTR(content_type)), true);
     if (_contentLength == CONTENT_LENGTH_NOT_SET) {
         sendHeader(String(FPSTR(Content_Length)), String(contentLength));
     } else if (_contentLength != CONTENT_LENGTH_UNKNOWN) {
@@ -485,9 +482,9 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
 {
   using namespace mime;
   setContentLength(fileSize);
-  if (fileName.endsWith(mimeTable[gz].endsWith) &&
-      contentType != mimeTable[gz].mimeType &&
-      contentType != mimeTable[none].mimeType) {
+  if (fileName.endsWith(String(FPSTR(mimeTable[gz].endsWith))) &&
+      contentType != String(FPSTR(mimeTable[gz].mimeType)) &&
+      contentType != String(FPSTR(mimeTable[none].mimeType))) {
     sendHeader(F("Content-Encoding"), F("gzip"));
   }
   send(200, contentType, "");
@@ -603,7 +600,7 @@ void ESP8266WebServer::_handleRequest() {
   }
   if (!handled) {
     using namespace mime;
-    send(404, mimeTable[html].mimeType, String(F("Not found: ")) + _currentUri);
+    send(404, String(FPSTR(mimeTable[html].mimeType)), String(F("Not found: ")) + _currentUri);
     handled = true;
   }
   if (handled) {
