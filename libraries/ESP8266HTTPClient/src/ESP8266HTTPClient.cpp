@@ -33,7 +33,7 @@
 class TransportTraits
 {
 public:
-    virtual ~TransportTraits() 
+    virtual ~TransportTraits()
     {
     }
 
