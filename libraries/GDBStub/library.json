@@ -1,0 +1,30 @@
+{
+  "name": "GDBStub",
+  "version": "0.2",  
+  "keywords": "gdb, debug",
+  "description": "GDB server stub helps debug crashes when JTAG isn't an option.",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/esp8266/Arduino.git"
+  },
+  "export": {
+    "include": "libraries/GDBStub"
+  },  
+  "authors":
+  [
+    {
+      "name": "Jeroen Domburg"
+    },
+    {
+      "name": "Ivan Grokhotkov",
+      "email": "ivan@esp8266.com",
+      "maintainer": true
+    }
+  ],
+  "frameworks": "arduino",
+  "platforms": "espressif8266",
+  "build": {
+    "libArchive": false
+  }  
+}
