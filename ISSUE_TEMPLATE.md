@@ -2,10 +2,10 @@
 Please fill the info fields, it helps to get you faster support ;)
 
 if you have a stack dump decode it:
-https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/stack_dump.md
+https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/stack_dump.rst
 
 for better debug messages:
-https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/debugging.md
+https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/debugging.rst
 
 ----------------------------- Remove above -----------------------------
 

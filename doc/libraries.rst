@@ -11,7 +11,7 @@ ESP8266WiFi library has been developed basing on ESP8266 SDK, using naming conve
 Ticker
 ------
 
-Library for calling functions repeatedly with a certain period. Two examples included.
+Library for calling functions repeatedly with a certain period. `Two examples <https://github.com/esp8266/Arduino/tree/master/libraries/Ticker/examples>`__ included.
 
 It is currently not recommended to do blocking IO operations (network, serial, file) from Ticker callback functions. Instead, set a flag inside the ticker callback and check for that flag inside the loop function.
 
@@ -27,7 +27,7 @@ This is a bit different from standard EEPROM class. You need to call ``EEPROM.be
 
 EEPROM library uses one sector of flash located just after the SPIFFS.
 
-Three examples included.
+`Three examples <https://github.com/esp8266/Arduino/tree/master/libraries/EEPROM>`__  included.
 
 I2C (Wire library)
 ------------------
@@ -133,7 +133,7 @@ Implements a simple DNS server that can be used in both STA and AP modes. The DN
 Servo
 -----
 
-This library exposes the ability to control RC (hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support. Servo counts above 12 will use Timer1 and features that use it will be effected. While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most will not be able to run off 3.3v and will require another power source that matches their specifications. Make sure to connect the grounds between the ESP8266 and the servo motor power supply.
+This library exposes the ability to control RC (hobby) servo motors. It will support up to 24 servos on any available output pin. By default the first 12 servos will use Timer0 and currently this will not interfere with any other support. Servo counts above 12 will use Timer1 and features that use it will be affected. While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most will not be able to run off 3.3v and will require another power source that matches their specifications. Make sure to connect the grounds between the ESP8266 and the servo motor power supply.
 
 Other libraries (not included with the IDE)
 -------------------------------------------

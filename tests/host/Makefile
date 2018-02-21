@@ -4,8 +4,8 @@ CORE_PATH := ../../cores/esp8266
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
-CC  := gcc
-CXX := g++
+CC  ?= gcc
+CXX ?= g++
 endif
 GCOV ?= gcov
 

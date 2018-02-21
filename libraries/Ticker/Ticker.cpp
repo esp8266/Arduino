@@ -22,20 +22,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
-extern "C" {
 #include "c_types.h"
 #include "eagle_soc.h"
 #include "ets_sys.h"
 #include "osapi.h"
-}
 
-const int ONCE   = 0;
-const int REPEAT = 1;
+static const int ONCE   = 0;
+static const int REPEAT = 1;
 
 #include "Ticker.h"
 
 Ticker::Ticker()
-: _timer(0)
+: _timer(nullptr)
 {
 }
 
@@ -66,5 +64,10 @@ void Ticker::detach()
 
 	os_timer_disarm(_timer);
 	delete _timer;
-	_timer = 0;
+	_timer = nullptr;
+}
+
+bool Ticker::active()
+{
+	return (bool)_timer;
 }

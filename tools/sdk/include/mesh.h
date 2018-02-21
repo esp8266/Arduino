@@ -1,5 +1,5 @@
 /*
- * ESPRSSIF MIT License
+ * ESPRESSIF MIT License
  *
  * Copyright (c) 2015 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
  *
@@ -27,6 +27,7 @@
 #include "ip_addr.h"
 #include "user_interface.h"
 #include "espconn.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

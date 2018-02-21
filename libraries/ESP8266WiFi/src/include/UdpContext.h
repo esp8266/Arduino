@@ -163,6 +163,9 @@ public:
 
     uint32_t getDestAddress()
     {
+        if (!_rx_buf)
+            return 0;
+
         ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
         return iphdr->dest.addr;
     }
@@ -246,6 +249,11 @@ public:
         {
             _reserve(_tx_buf_offset + size);
         }
+        if (!_tx_buf_head || _tx_buf_head->tot_len < _tx_buf_offset + size)
+        {
+            DEBUGV("failed _reserve");
+            return 0;
+        }
 
         size_t left_to_copy = size;
         while(left_to_copy)
@@ -271,17 +279,26 @@ public:
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
-        uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
-        for (pbuf* p = _tx_buf_head; p; p = p->next) {
-            size_t will_copy = (data_size < p->len) ? data_size : p->len;
-            memcpy(dst, p->payload, will_copy);
-            dst += will_copy;
-            data_size -= will_copy;
+        if(!tx_copy){
+            DEBUGV("failed pbuf_alloc");
         }
-        pbuf_free(_tx_buf_head);
+        else{
+            uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
+            for (pbuf* p = _tx_buf_head; p; p = p->next) {
+                size_t will_copy = (data_size < p->len) ? data_size : p->len;
+                memcpy(dst, p->payload, will_copy);
+                dst += will_copy;
+                data_size -= will_copy;
+            }
+        }
+        if (_tx_buf_head)
+            pbuf_free(_tx_buf_head);
         _tx_buf_head = 0;
         _tx_buf_cur = 0;
         _tx_buf_offset = 0;
+        if(!tx_copy){
+            return false;
+        }
 
 
         if (!addr) {
@@ -296,7 +313,7 @@ public:
 #endif
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
-            DEBUGV(":ust rc=%d\r\n", err);
+            DEBUGV(":ust rc=%d\r\n", (int) err);
         }
 #ifdef LWIP_MAYBE_XCC
         _pcb->ttl = old_ttl;
@@ -313,6 +330,10 @@ private:
         if (!_tx_buf_head)
         {
             _tx_buf_head = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
+            if (!_tx_buf_head)
+            {
+                return;
+            }
             _tx_buf_cur = _tx_buf_head;
             _tx_buf_offset = 0;
         }
@@ -326,6 +347,10 @@ private:
         while(grow_size)
         {
             pbuf* pb = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
+            if (!pb)
+            {
+                return;
+            }
             pbuf_cat(_tx_buf_head, pb);
             if (grow_size < pbuf_unit_size)
                 return;
@@ -394,4 +419,4 @@ private:
 
 
 
-#endif//CLIENTCONTEXT_H
+#endif//UDPCONTEXT_H
