@@ -260,6 +260,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   return true;
 }
 
+// returns whether the key of the entry was already known (true) or not (false)
 bool ESP8266WebServer::_collectHeader(const char* headerName, const char* headerValue) {
   for (int i = 0; i < _headerKeysCount; i++) {
     if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
@@ -267,6 +268,38 @@ bool ESP8266WebServer::_collectHeader(const char* headerName, const char* header
             return true;
         }
   }
+  // key is previously unknown, so we now know one more key
+  _headerKeysCount++;
+  
+  // might be unelegant, but works well:
+  // 1. creates a new array with size n+1 for every new header
+  // 2. copies all known headers
+  // 3. adds the new entry
+  // 4. frees the old array
+
+  // create array for one more header entry:
+  RequestArgument* newHeaders = new RequestArgument[_headerKeysCount];
+  // copy all previously known header entries
+  for(int i = 0; i < (_headerKeysCount -1); i++){
+      newHeaders[i].key = _currentHeaders[i].key;
+      newHeaders[i].value = _currentHeaders[i].value;
+  }
+  // add the newly fonud header key and value
+  newHeaders[_headerKeysCount - 1].key = headerName;
+  newHeaders[_headerKeysCount - 1].value = headerValue;
+  
+  // for debugging purposes define DEBUG_ESP_HTTP_SERVER to make this show the new header name and values
+  #ifdef DEBUG_ESP_HTTP_SERVER
+  DEBUG_OUTPUT.print("added new header, headerName: ");
+  DEBUG_OUTPUT.println(headerName);
+  DEBUG_OUTPUT.print("headerValue: ");
+  DEBUG_OUTPUT.println(headerValue);
+  #endif
+  
+  // free memory of old header array
+  delete[]_currentHeaders;
+  // have _currentHeaders point to the new array of headers
+  _currentHeaders = newHeaders;
   return false;
 }
 
