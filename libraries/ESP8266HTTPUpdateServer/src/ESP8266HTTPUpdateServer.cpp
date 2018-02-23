@@ -40,6 +40,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
 
     // handler for the /update form POST (once file upload finishes)
     _server->on(path, HTTP_POST, [&](){
+      _authenticated = (_username == NULL || _password == NULL || _server->authenticate(_username, _password));
       if(!_authenticated)
         return _server->requestAuthentication();
       if (Update.hasError()) {
