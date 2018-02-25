@@ -55,7 +55,7 @@ void setup() {
                           }
                         });
 
-   ArduinoOTA.onError([](ota_error_t error) { ESP.restart(); });
+   ArduinoOTA.onError([](ota_error_t error) { (void)error; ESP.restart(); });
 
    /* setup the OTA server */
    ArduinoOTA.begin();

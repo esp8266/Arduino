@@ -26,8 +26,6 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#include "../generic/common.h"
-
 #define PIN_WIRE_SDA (4)
 #define PIN_WIRE_SCL (5)
 
@@ -40,5 +38,6 @@ static const uint8_t LED_BUILTIN_G = 4;
 static const uint8_t LED_BUILTIN_B = 5;
 static const uint8_t BUTTON_BUILTIN = 0;
 
+#include "../generic/common.h"
 
 #endif /* Pins_Arduino_h */
