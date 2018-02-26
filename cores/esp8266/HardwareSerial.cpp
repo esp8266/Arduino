@@ -35,10 +35,10 @@ HardwareSerial::HardwareSerial(int uart_nr)
     : _uart_nr(uart_nr), _rx_size(256)
 {}
 
-void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin)
+void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode mode, int tx_pin, int rx_pin)
 {
     end();
-    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
+    _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, rx_pin, _rx_size);
 }
 
 void HardwareSerial::end()
@@ -62,15 +62,15 @@ size_t HardwareSerial::setRxBufferSize(size_t size){
     return _rx_size;
 }
 
-void HardwareSerial::swap(uint8_t tx_pin)
+void HardwareSerial::swap()
 {
     if(!_uart) {
         return;
     }
-    uart_swap(_uart, tx_pin);
+    uart_swap(_uart);
 }
 
-void HardwareSerial::set_tx(uint8_t tx_pin)
+void HardwareSerial::set_tx(int tx_pin)
 {
     if(!_uart) {
         return;
@@ -78,7 +78,7 @@ void HardwareSerial::set_tx(uint8_t tx_pin)
     uart_set_tx(_uart, tx_pin);
 }
 
-void HardwareSerial::pins(uint8_t tx, uint8_t rx)
+void HardwareSerial::pins(int tx, int rx)
 {
     if(!_uart) {
         return;
