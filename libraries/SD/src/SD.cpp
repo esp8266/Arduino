@@ -350,6 +350,17 @@ boolean SDClass::begin(uint8_t csPin, uint32_t speed) {
          root.openRoot(volume);
 }
 
+// Ends SD card connection
+void SDClass::end() {
+    if(card.errorCode() == 0 && root.isOpen()) {
+        root.close();
+    }
+
+    root = SdFile();
+    volume = SdVolume();
+    card = Sd2Card();
+}
+
 // this little helper is used to traverse paths
 SdFile SDClass::getParentDir(const char *filepath, int *index) {
   // get parent directory
