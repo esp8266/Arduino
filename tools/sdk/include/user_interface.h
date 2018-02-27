@@ -47,23 +47,23 @@ extern "C" {
 #endif
 
 enum rst_reason {
-	REASON_DEFAULT_RST		= 0,	/* normal startup by power on */
-	REASON_WDT_RST			= 1,	/* hardware watch dog reset */
-	REASON_EXCEPTION_RST	= 2,	/* exception reset, GPIO status won’t change */
-	REASON_SOFT_WDT_RST   	= 3,	/* software watch dog reset, GPIO status won’t change */
-	REASON_SOFT_RESTART 	= 4,	/* software restart ,system_restart , GPIO status won’t change */
-	REASON_DEEP_SLEEP_AWAKE	= 5,	/* wake up from deep-sleep */
-	REASON_EXT_SYS_RST      = 6		/* external system reset */
+    REASON_DEFAULT_RST      = 0,    /* normal startup by power on */
+    REASON_WDT_RST          = 1,    /* hardware watch dog reset */
+    REASON_EXCEPTION_RST    = 2,    /* exception reset, GPIO status won’t change */
+    REASON_SOFT_WDT_RST     = 3,    /* software watch dog reset, GPIO status won’t change */
+    REASON_SOFT_RESTART     = 4,    /* software restart ,system_restart , GPIO status won’t change */
+    REASON_DEEP_SLEEP_AWAKE = 5,    /* wake up from deep-sleep */
+    REASON_EXT_SYS_RST      = 6     /* external system reset */
 };
 
 struct rst_info{
-	uint32 reason;
-	uint32 exccause;
-	uint32 epc1;
-	uint32 epc2;
-	uint32 epc3;
-	uint32 excvaddr;
-	uint32 depc;
+    uint32 reason;
+    uint32 exccause;
+    uint32 epc1;
+    uint32 epc2;
+    uint32 epc3;
+    uint32 excvaddr;
+    uint32 depc;
 };
 
 struct rst_info* system_get_rst_info(void);
@@ -126,19 +126,19 @@ uint16 system_get_vdd33(void);
 
 const char *system_get_sdk_version(void);
 
-#define SYS_BOOT_ENHANCE_MODE	0
-#define SYS_BOOT_NORMAL_MODE	1
+#define SYS_BOOT_ENHANCE_MODE   0
+#define SYS_BOOT_NORMAL_MODE    1
 
-#define SYS_BOOT_NORMAL_BIN		0
-#define SYS_BOOT_TEST_BIN		1
+#define SYS_BOOT_NORMAL_BIN     0
+#define SYS_BOOT_TEST_BIN       1
 
 uint8 system_get_boot_version(void);
 uint32 system_get_userbin_addr(void);
 uint8 system_get_boot_mode(void);
 bool system_restart_enhance(uint8 bin_type, uint32 bin_addr);
 
-#define SYS_CPU_80MHZ	80
-#define SYS_CPU_160MHZ	160
+#define SYS_CPU_80MHZ   80
+#define SYS_CPU_160MHZ  160
 
 bool system_update_cpu_freq(uint8 freq);
 uint8 system_get_cpu_freq(void);
@@ -188,6 +188,16 @@ typedef enum _auth_mode {
     AUTH_MAX
 } AUTH_MODE;
 
+typedef enum _cipher_type {
+    CIPHER_NONE = 0,
+    CIPHER_WEP40,
+    CIPHER_WEP104,
+    CIPHER_TKIP,
+    CIPHER_CCMP,
+    CIPHER_TKIP_CCMP,
+    CIPHER_UNKNOWN,
+} CIPHER_TYPE;
+
 uint8 wifi_get_opmode(void);
 uint8 wifi_get_opmode_default(void);
 bool wifi_set_opmode(uint8 opmode);
@@ -209,6 +219,13 @@ struct bss_info {
     sint16 freqcal_val;
     uint8 *esp_mesh_ie;
     uint8 simple_pair;
+    CIPHER_TYPE pairwise_cipher;
+    CIPHER_TYPE group_cipher;
+    uint32_t phy_11b:1;
+    uint32_t phy_11g:1;
+    uint32_t phy_11n:1;
+    uint32_t wps:1;
+    uint32_t reserved:28;
 };
 
 typedef struct _scaninfo {
@@ -222,12 +239,18 @@ typedef struct _scaninfo {
 
 typedef void (* scan_done_cb_t)(void *arg, STATUS status);
 
+typedef struct {
+    int8  rssi;
+    AUTH_MODE  authmode;
+} wifi_fast_scan_threshold_t;
+
 struct station_config {
     uint8 ssid[32];
     uint8 password[64];
-    uint8 bssid_set;	// Note: If bssid_set is 1, station will just connect to the router
+    uint8 bssid_set;    // Note: If bssid_set is 1, station will just connect to the router
                         // with both ssid[] and bssid[] matched. Please check about this.
     uint8 bssid[6];
+    wifi_fast_scan_threshold_t threshold;
 };
 
 bool wifi_station_get_config(struct station_config *config);
@@ -245,12 +268,27 @@ typedef enum {
     WIFI_SCAN_TYPE_PASSIVE,     /**< passive scan */
 } wifi_scan_type_t;
 
+/** @brief Range of active scan times per channel */
+typedef struct {
+    uint32_t min;  /**< minimum active scan time per channel, units: millisecond */
+    uint32_t max;  /**< maximum active scan time per channel, units: millisecond, values above 1500ms may
+                                          cause station to disconnect from AP and are not recommended.  */
+} wifi_active_scan_time_t;
+
+/** @brief Aggregate of active & passive scan time per channel */
+typedef union {
+    wifi_active_scan_time_t active;  /**< active scan time per channel, units: millisecond. */
+    uint32_t passive;                /**< passive scan time per channel, units: millisecond, values above 1500ms may
+                                          cause station to disconnect from AP and are not recommended. */
+} wifi_scan_time_t;
+
 struct scan_config {
     uint8 *ssid;    // Note: ssid == NULL, don't filter ssid.
     uint8 *bssid;    // Note: bssid == NULL, don't filter bssid.
     uint8 channel;    // Note: channel == 0, scan all channels, otherwise scan set channel.
     uint8 show_hidden;    // Note: show_hidden == 1, can get hidden ssid routers' info.
     wifi_scan_type_t scan_type; // scan type, active or passive
+    wifi_scan_time_t scan_time; // scan time per channel
 };
 
 bool wifi_station_scan(struct scan_config *config, scan_done_cb_t cb);
@@ -270,8 +308,8 @@ typedef enum {
 } station_status_t;
 
 enum dhcp_status {
-	DHCP_STOPPED,
-	DHCP_STARTED
+    DHCP_STOPPED,
+    DHCP_STARTED
 };
 
 station_status_t wifi_station_get_connect_status(void);
@@ -299,12 +337,12 @@ void wifi_station_clear_username(void);
 struct softap_config {
     uint8 ssid[32];
     uint8 password[64];
-    uint8 ssid_len;	// Note: Recommend to set it according to your ssid
-    uint8 channel;	// Note: support 1 ~ 13
-    AUTH_MODE authmode;	// Note: Don't support AUTH_WEP in softAP mode.
-    uint8 ssid_hidden;	// Note: default 0
-    uint8 max_connection;	// Note: default 4, max 4
-    uint16 beacon_interval;	// Note: support 100 ~ 60000 ms, default 100
+    uint8 ssid_len; // Note: Recommend to set it according to your ssid
+    uint8 channel;  // Note: support 1 ~ 13
+    AUTH_MODE authmode; // Note: Don't support AUTH_WEP in softAP mode.
+    uint8 ssid_hidden;  // Note: default 0
+    uint8 max_connection;   // Note: default 4, max 4
+    uint16 beacon_interval; // Note: support 100 ~ 60000 ms, default 100
 };
 
 bool wifi_softap_get_config(struct softap_config *config);
@@ -374,18 +412,18 @@ void wifi_set_promiscuous_rx_cb(wifi_promiscuous_cb_t cb);
 void wifi_promiscuous_set_mac(const uint8_t *address);
 
 typedef enum {
-	PHY_MODE_11B	= 1,
-	PHY_MODE_11G	= 2,
-	PHY_MODE_11N    = 3
+    PHY_MODE_11B    = 1,
+    PHY_MODE_11G    = 2,
+    PHY_MODE_11N    = 3
 } phy_mode_t;
 
 phy_mode_t wifi_get_phy_mode(void);
 bool wifi_set_phy_mode(phy_mode_t mode);
 
 typedef enum {
-	NONE_SLEEP_T	= 0,
-	LIGHT_SLEEP_T,
-	MODEM_SLEEP_T
+    NONE_SLEEP_T    = 0,
+    LIGHT_SLEEP_T,
+    MODEM_SLEEP_T
 } sleep_type_t;
 
 bool wifi_set_sleep_type(sleep_type_t type);
@@ -409,82 +447,89 @@ enum {
     EVENT_STAMODE_GOT_IP,
     EVENT_STAMODE_DHCP_TIMEOUT,
     EVENT_SOFTAPMODE_STACONNECTED,
-	EVENT_SOFTAPMODE_STADISCONNECTED,
-	EVENT_SOFTAPMODE_PROBEREQRECVED,
+    EVENT_SOFTAPMODE_STADISCONNECTED,
+    EVENT_SOFTAPMODE_PROBEREQRECVED,
     EVENT_OPMODE_CHANGED,
+    EVENT_SOFTAPMODE_DISTRIBUTE_STA_IP,
     EVENT_MAX
 };
 
 enum {
-	REASON_UNSPECIFIED              = 1,
-	REASON_AUTH_EXPIRE              = 2,
-	REASON_AUTH_LEAVE               = 3,
-	REASON_ASSOC_EXPIRE             = 4,
-	REASON_ASSOC_TOOMANY            = 5,
-	REASON_NOT_AUTHED               = 6,
-	REASON_NOT_ASSOCED              = 7,
-	REASON_ASSOC_LEAVE              = 8,
-	REASON_ASSOC_NOT_AUTHED         = 9,
-	REASON_DISASSOC_PWRCAP_BAD      = 10,  /* 11h */
-	REASON_DISASSOC_SUPCHAN_BAD     = 11,  /* 11h */
-	REASON_IE_INVALID               = 13,  /* 11i */
-	REASON_MIC_FAILURE              = 14,  /* 11i */
-	REASON_4WAY_HANDSHAKE_TIMEOUT   = 15,  /* 11i */
-	REASON_GROUP_KEY_UPDATE_TIMEOUT = 16,  /* 11i */
-	REASON_IE_IN_4WAY_DIFFERS       = 17,  /* 11i */
-	REASON_GROUP_CIPHER_INVALID     = 18,  /* 11i */
-	REASON_PAIRWISE_CIPHER_INVALID  = 19,  /* 11i */
-	REASON_AKMP_INVALID             = 20,  /* 11i */
-	REASON_UNSUPP_RSN_IE_VERSION    = 21,  /* 11i */
-	REASON_INVALID_RSN_IE_CAP       = 22,  /* 11i */
-	REASON_802_1X_AUTH_FAILED       = 23,  /* 11i */
-	REASON_CIPHER_SUITE_REJECTED    = 24,  /* 11i */
+    REASON_UNSPECIFIED              = 1,
+    REASON_AUTH_EXPIRE              = 2,
+    REASON_AUTH_LEAVE               = 3,
+    REASON_ASSOC_EXPIRE             = 4,
+    REASON_ASSOC_TOOMANY            = 5,
+    REASON_NOT_AUTHED               = 6,
+    REASON_NOT_ASSOCED              = 7,
+    REASON_ASSOC_LEAVE              = 8,
+    REASON_ASSOC_NOT_AUTHED         = 9,
+    REASON_DISASSOC_PWRCAP_BAD      = 10,  /* 11h */
+    REASON_DISASSOC_SUPCHAN_BAD     = 11,  /* 11h */
+    REASON_IE_INVALID               = 13,  /* 11i */
+    REASON_MIC_FAILURE              = 14,  /* 11i */
+    REASON_4WAY_HANDSHAKE_TIMEOUT   = 15,  /* 11i */
+    REASON_GROUP_KEY_UPDATE_TIMEOUT = 16,  /* 11i */
+    REASON_IE_IN_4WAY_DIFFERS       = 17,  /* 11i */
+    REASON_GROUP_CIPHER_INVALID     = 18,  /* 11i */
+    REASON_PAIRWISE_CIPHER_INVALID  = 19,  /* 11i */
+    REASON_AKMP_INVALID             = 20,  /* 11i */
+    REASON_UNSUPP_RSN_IE_VERSION    = 21,  /* 11i */
+    REASON_INVALID_RSN_IE_CAP       = 22,  /* 11i */
+    REASON_802_1X_AUTH_FAILED       = 23,  /* 11i */
+    REASON_CIPHER_SUITE_REJECTED    = 24,  /* 11i */
 
-	REASON_BEACON_TIMEOUT           = 200,
-	REASON_NO_AP_FOUND              = 201,
-	REASON_AUTH_FAIL				= 202,
-	REASON_ASSOC_FAIL				= 203,
-	REASON_HANDSHAKE_TIMEOUT		= 204,
+    REASON_BEACON_TIMEOUT           = 200,
+    REASON_NO_AP_FOUND              = 201,
+    REASON_AUTH_FAIL                = 202,
+    REASON_ASSOC_FAIL               = 203,
+    REASON_HANDSHAKE_TIMEOUT        = 204,
 };
 
 typedef struct {
-	uint8 ssid[32];
-	uint8 ssid_len;
-	uint8 bssid[6];
-	uint8 channel;
+    uint8 ssid[32];
+    uint8 ssid_len;
+    uint8 bssid[6];
+    uint8 channel;
 } Event_StaMode_Connected_t;
 
 typedef struct {
-	uint8 ssid[32];
-	uint8 ssid_len;
-	uint8 bssid[6];
-	uint8 reason;
+    uint8 ssid[32];
+    uint8 ssid_len;
+    uint8 bssid[6];
+    uint8 reason;
 } Event_StaMode_Disconnected_t;
 
 typedef struct {
-	uint8 old_mode;
-	uint8 new_mode;
+    uint8 old_mode;
+    uint8 new_mode;
 } Event_StaMode_AuthMode_Change_t;
 
 typedef struct {
-	struct ip_addr ip;
-	struct ip_addr mask;
-	struct ip_addr gw;
+    struct ip_addr ip;
+    struct ip_addr mask;
+    struct ip_addr gw;
 } Event_StaMode_Got_IP_t;
 
 typedef struct {
-	uint8 mac[6];
-	uint8 aid;
+    uint8 mac[6];
+    uint8 aid;
 } Event_SoftAPMode_StaConnected_t;
 
 typedef struct {
-	uint8 mac[6];
-	uint8 aid;
+    uint8 mac[6];
+    struct ip_addr ip;
+    uint8 aid;
+} Event_SoftAPMode_Distribute_Sta_IP_t;
+
+typedef struct {
+    uint8 mac[6];
+    uint8 aid;
 } Event_SoftAPMode_StaDisconnected_t;
 
 typedef struct {
-	int rssi;
-	uint8 mac[6];
+    int rssi;
+    uint8 mac[6];
 } Event_SoftAPMode_ProbeReqRecved_t;
 
 typedef struct {
@@ -493,13 +538,14 @@ typedef struct {
 } Event_OpMode_Change_t;
 
 typedef union {
-	Event_StaMode_Connected_t			connected;
-	Event_StaMode_Disconnected_t		disconnected;
-	Event_StaMode_AuthMode_Change_t		auth_change;
-	Event_StaMode_Got_IP_t				got_ip;
-	Event_SoftAPMode_StaConnected_t		sta_connected;
-	Event_SoftAPMode_StaDisconnected_t	sta_disconnected;
-	Event_SoftAPMode_ProbeReqRecved_t   ap_probereqrecved;
+    Event_StaMode_Connected_t           connected;
+    Event_StaMode_Disconnected_t        disconnected;
+    Event_StaMode_AuthMode_Change_t     auth_change;
+    Event_StaMode_Got_IP_t              got_ip;
+    Event_SoftAPMode_StaConnected_t     sta_connected;
+    Event_SoftAPMode_StaDisconnected_t  sta_disconnected;
+    Event_SoftAPMode_ProbeReqRecved_t   ap_probereqrecved;
+    Event_SoftAPMode_Distribute_Sta_IP_t   distribute_sta_ip;
     Event_OpMode_Change_t               opmode_changed;
 } Event_Info_u;
 
@@ -513,19 +559,19 @@ typedef void (* wifi_event_handler_cb_t)(System_Event_t *event);
 void wifi_set_event_handler_cb(wifi_event_handler_cb_t cb);
 
 typedef enum wps_type {
-	WPS_TYPE_DISABLE = 0,
-	WPS_TYPE_PBC,
-	WPS_TYPE_PIN,
-	WPS_TYPE_DISPLAY,
-	WPS_TYPE_MAX,
+    WPS_TYPE_DISABLE = 0,
+    WPS_TYPE_PBC,
+    WPS_TYPE_PIN,
+    WPS_TYPE_DISPLAY,
+    WPS_TYPE_MAX,
 } WPS_TYPE_t;
 
 enum wps_cb_status {
-	WPS_CB_ST_SUCCESS = 0,
-	WPS_CB_ST_FAILED,
-	WPS_CB_ST_TIMEOUT,
-	WPS_CB_ST_WEP,
-	WPS_CB_ST_UNK,
+    WPS_CB_ST_SUCCESS = 0,
+    WPS_CB_ST_FAILED,
+    WPS_CB_ST_TIMEOUT,
+    WPS_CB_ST_WEP,
+    WPS_CB_ST_UNK,
 };
 
 bool wifi_wps_enable(WPS_TYPE_t wps_type);
@@ -548,100 +594,100 @@ int wifi_register_rfid_locp_recv_cb(rfid_locp_cb_t cb);
 void wifi_unregister_rfid_locp_recv_cb(void);
 
 enum FIXED_RATE {
-        PHY_RATE_48       = 0x8,
-        PHY_RATE_24       = 0x9,
-        PHY_RATE_12       = 0xA,
-        PHY_RATE_6        = 0xB,
-        PHY_RATE_54       = 0xC,
-        PHY_RATE_36       = 0xD,
-        PHY_RATE_18       = 0xE,
-        PHY_RATE_9        = 0xF,
+    PHY_RATE_48       = 0x8,
+    PHY_RATE_24       = 0x9,
+    PHY_RATE_12       = 0xA,
+    PHY_RATE_6        = 0xB,
+    PHY_RATE_54       = 0xC,
+    PHY_RATE_36       = 0xD,
+    PHY_RATE_18       = 0xE,
+    PHY_RATE_9        = 0xF,
 };
 
-#define FIXED_RATE_MASK_NONE	0x00
-#define FIXED_RATE_MASK_STA		0x01
-#define FIXED_RATE_MASK_AP		0x02
-#define FIXED_RATE_MASK_ALL		0x03
+#define FIXED_RATE_MASK_NONE    0x00
+#define FIXED_RATE_MASK_STA     0x01
+#define FIXED_RATE_MASK_AP      0x02
+#define FIXED_RATE_MASK_ALL     0x03
 
 int wifi_set_user_fixed_rate(uint8 enable_mask, uint8 rate);
 int wifi_get_user_fixed_rate(uint8 *enable_mask, uint8 *rate);
 
 enum support_rate {
-	RATE_11B5M	= 0,
-	RATE_11B11M	= 1,
-	RATE_11B1M	= 2,
-	RATE_11B2M	= 3,
-	RATE_11G6M	= 4,
-	RATE_11G12M	= 5,
-	RATE_11G24M	= 6,
-	RATE_11G48M	= 7,
-	RATE_11G54M	= 8,
-	RATE_11G9M	= 9,
-	RATE_11G18M	= 10,
-	RATE_11G36M	= 11,
+    RATE_11B5M  = 0,
+    RATE_11B11M = 1,
+    RATE_11B1M  = 2,
+    RATE_11B2M  = 3,
+    RATE_11G6M  = 4,
+    RATE_11G12M = 5,
+    RATE_11G24M = 6,
+    RATE_11G48M = 7,
+    RATE_11G54M = 8,
+    RATE_11G9M  = 9,
+    RATE_11G18M = 10,
+    RATE_11G36M = 11,
 };
 
 int wifi_set_user_sup_rate(uint8 min, uint8 max);
 
 enum RATE_11B_ID {
-	RATE_11B_B11M	= 0,
-	RATE_11B_B5M	= 1,
-	RATE_11B_B2M	= 2,
-	RATE_11B_B1M	= 3,
+    RATE_11B_B11M   = 0,
+    RATE_11B_B5M    = 1,
+    RATE_11B_B2M    = 2,
+    RATE_11B_B1M    = 3,
 };
 
 enum RATE_11G_ID {
-	RATE_11G_G54M	= 0,
-	RATE_11G_G48M	= 1,
-	RATE_11G_G36M	= 2,
-	RATE_11G_G24M	= 3,
-	RATE_11G_G18M	= 4,
-	RATE_11G_G12M	= 5,
-	RATE_11G_G9M	= 6,
-	RATE_11G_G6M	= 7,
-	RATE_11G_B5M	= 8,
-	RATE_11G_B2M	= 9,
-	RATE_11G_B1M	= 10
+    RATE_11G_G54M   = 0,
+    RATE_11G_G48M   = 1,
+    RATE_11G_G36M   = 2,
+    RATE_11G_G24M   = 3,
+    RATE_11G_G18M   = 4,
+    RATE_11G_G12M   = 5,
+    RATE_11G_G9M    = 6,
+    RATE_11G_G6M    = 7,
+    RATE_11G_B5M    = 8,
+    RATE_11G_B2M    = 9,
+    RATE_11G_B1M    = 10
 };
 
 enum RATE_11N_ID {
-	RATE_11N_MCS7S	= 0,
-	RATE_11N_MCS7	= 1,
-	RATE_11N_MCS6	= 2,
-	RATE_11N_MCS5	= 3,
-	RATE_11N_MCS4	= 4,
-	RATE_11N_MCS3	= 5,
-	RATE_11N_MCS2	= 6,
-	RATE_11N_MCS1	= 7,
-	RATE_11N_MCS0	= 8,
-	RATE_11N_B5M	= 9,
-	RATE_11N_B2M	= 10,
-	RATE_11N_B1M	= 11
+    RATE_11N_MCS7S  = 0,
+    RATE_11N_MCS7   = 1,
+    RATE_11N_MCS6   = 2,
+    RATE_11N_MCS5   = 3,
+    RATE_11N_MCS4   = 4,
+    RATE_11N_MCS3   = 5,
+    RATE_11N_MCS2   = 6,
+    RATE_11N_MCS1   = 7,
+    RATE_11N_MCS0   = 8,
+    RATE_11N_B5M    = 9,
+    RATE_11N_B2M    = 10,
+    RATE_11N_B1M    = 11
 };
 
-#define RC_LIMIT_11B		0
-#define RC_LIMIT_11G		1
-#define RC_LIMIT_11N		2
-#define RC_LIMIT_P2P_11G	3
-#define RC_LIMIT_P2P_11N	4
-#define RC_LIMIT_NUM		5
+#define RC_LIMIT_11B        0
+#define RC_LIMIT_11G        1
+#define RC_LIMIT_11N        2
+#define RC_LIMIT_P2P_11G    3
+#define RC_LIMIT_P2P_11N    4
+#define RC_LIMIT_NUM        5
 
-#define LIMIT_RATE_MASK_NONE	0x00
-#define LIMIT_RATE_MASK_STA		0x01
-#define LIMIT_RATE_MASK_AP		0x02
-#define LIMIT_RATE_MASK_ALL		0x03
+#define LIMIT_RATE_MASK_NONE    0x00
+#define LIMIT_RATE_MASK_STA     0x01
+#define LIMIT_RATE_MASK_AP      0x02
+#define LIMIT_RATE_MASK_ALL     0x03
 
 bool wifi_set_user_rate_limit(uint8 mode, uint8 ifidx, uint8 max, uint8 min);
 uint8 wifi_get_user_limit_rate_mask(void);
 bool wifi_set_user_limit_rate_mask(uint8 enable_mask);
 
 enum {
-	USER_IE_BEACON = 0,
-	USER_IE_PROBE_REQ,
-	USER_IE_PROBE_RESP,
-	USER_IE_ASSOC_REQ,
-	USER_IE_ASSOC_RESP,
-	USER_IE_MAX
+    USER_IE_BEACON = 0,
+    USER_IE_PROBE_REQ,
+    USER_IE_PROBE_RESP,
+    USER_IE_ASSOC_REQ,
+    USER_IE_ASSOC_RESP,
+    USER_IE_MAX
 };
 
 typedef void (*user_ie_manufacturer_recv_cb_t)(uint8 type, const uint8 sa[6], const uint8 m_oui[3], uint8 *ie, uint8 ie_len, int rssi);
@@ -654,6 +700,49 @@ void wifi_enable_gpio_wakeup(uint32 i, GPIO_INT_TYPE intr_status);
 void wifi_disable_gpio_wakeup(void);
 
 void uart_div_modify(uint8 uart_no, uint32 DivLatchValue);
+
+typedef enum {
+    WIFI_COUNTRY_POLICY_AUTO,   /**< Country policy is auto, use the country info of AP to which the station is connected */
+    WIFI_COUNTRY_POLICY_MANUAL, /**< Country policy is manual, always use the configured country info */
+} WIFI_COUNTRY_POLICY;
+
+typedef struct {
+    char cc[3];               /**< country code string */
+    uint8_t schan;            /**< start channel */
+    uint8_t nchan;            /**< total channel number */
+    uint8_t policy;           /**< country policy */
+} wifi_country_t;
+
+/**
+  * @brief     configure country info
+  *
+  * @attention 1. The default country is {.cc="CN", .schan=1, .nchan=13, policy=WIFI_COUNTRY_POLICY_AUTO}
+  * @attention 2. When the country policy is WIFI_COUNTRY_POLICY_AUTO, use the country info of AP to which the station is
+  *               connected. E.g. if the configured country info is {.cc="USA", .schan=1, .nchan=11}, the country info of
+  *               the AP to which the station is connected is {.cc="JP", .schan=1, .nchan=14}, then our country info is 
+  *               {.cc="JP", .schan=1, .nchan=14}. If the station disconnected from the AP, the country info back to
+  *               {.cc="USA", .schan=1, .nchan=11} again.
+  * @attention 3. When the country policy is WIFI_COUNTRY_POLICY_MANUAL, always use the configured country info.
+  * @attention 4. When the country info is changed because of configuration or because the station connects to a different
+  *               external AP, the country IE in probe response/beacon of the soft-AP is changed also.
+  * @attention 5. The country configuration is not stored into flash
+  *
+  * @param     wifi_country_t *country: the configured country info
+  *
+  * @return  true : succeed
+  * @return false : fail
+  */
+bool wifi_set_country(wifi_country_t *country);
+
+/**
+  * @brief     get the current country info
+  *
+  * @param     wifi_country_t *country: country info
+  *
+  * @return  true : succeed
+  * @return false : fail
+  */
+bool wifi_get_country(wifi_country_t *country);
 
 #ifdef __cplusplus
 }

@@ -149,7 +149,7 @@ current speed. For example
 | ``Serial`` and ``Serial1`` objects are both instances of the
   ``HardwareSerial`` class.
 | I've done this also for official ESP8266 `Software
-  Serial <https://github.com/esp8266/Arduino/blob/master/doc/libraries.md#softwareserial>`__
+  Serial <libraries.rst#softwareserial>`__
   library, see this `pull
   request <https://github.com/plerup/espsoftwareserial/pull/22>`__.
 | Note that this implementation is **only for ESP8266 based boards**,

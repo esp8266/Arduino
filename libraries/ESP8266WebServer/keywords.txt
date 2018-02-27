@@ -7,6 +7,7 @@
 #######################################
 
 ESP8266WebServer	KEYWORD1
+ESP8266WebServerSecure	KEYWORD1
 HTTPMethod	KEYWORD1
 
 #######################################

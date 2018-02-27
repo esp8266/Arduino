@@ -98,4 +98,4 @@ Other Function Calls
 
 Documentation for the above functions is not yet prepared.
 
-For code samples please refer to separate section with `examples <client-secure-examples.md>`__ dedicated specifically to the Client Secure Class.
+For code samples please refer to separate section with `examples <client-secure-examples.rst>`__ dedicated specifically to the Client Secure Class.

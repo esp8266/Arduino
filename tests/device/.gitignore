@@ -1,2 +1,4 @@
 .build
 .hardware
+test_report.xml
+test_report.html
