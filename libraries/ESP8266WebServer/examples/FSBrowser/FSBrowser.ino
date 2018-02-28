@@ -77,7 +77,7 @@ bool handleFileRead(String path){
     if(SPIFFS.exists(pathWithGz))
       path += ".gz";
     File file = SPIFFS.open(path, "r");
-    size_t sent = server.streamFile(file, contentType);
+    server.streamFile(file, contentType);
     file.close();
     return true;
   }
@@ -179,6 +179,7 @@ void setup(void){
   //WIFI INIT
   DBG_OUTPUT_PORT.printf("Connecting to %s\n", ssid);
   if (String(WiFi.SSID()) != String(ssid)) {
+    WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
   }
   

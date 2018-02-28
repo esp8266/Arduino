@@ -25,11 +25,13 @@
  #include <stdbool.h>
  #include <string.h>
  #include "c_types.h"
+ #include "ets_sys.h"
+ #include "spi_flash.h"
 
 static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 {
     [0] = 5,  // Reserved, do not change
-    [1] = 0,  // Reserved, do not change
+    [1] = 8,  // Reserved, do not change
     [2] = 4,  // Reserved, do not change
     [3] = 2,  // Reserved, do not change
     [4] = 5,  // Reserved, do not change
@@ -66,12 +68,12 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     [32] = 0xf8, // Reserved, do not change
     [33] = 0xf8, // Reserved, do not change
 
-    [34] = 82, // target_power_qdb_0, 82 means target power is 82/4=20.5dbm
-    [35] = 78, // target_power_qdb_1, 78 means target power is 78/4=19.5dbm
-    [36] = 74, // target_power_qdb_2, 74 means target power is 74/4=18.5dbm
-    [37] = 68, // target_power_qdb_3, 68 means target power is 68/4=17dbm
-    [38] = 64, // target_power_qdb_4, 64 means target power is 64/4=16dbm
-    [39] = 56, // target_power_qdb_5, 56 means target power is 56/4=14dbm
+    [34] = 78, // target_power_qdb_0, target power is 78/4=19.5dbm
+    [35] = 74, // target_power_qdb_1, target power is 74/4=18.5dbm
+    [36] = 70, // target_power_qdb_2, target power is 70/4=17.5dbm
+    [37] = 64, // target_power_qdb_3, target power is 64/4=16dbm
+    [38] = 60, // target_power_qdb_4, target power is 60/4=15dbm
+    [39] = 56, // target_power_qdb_5, target power is 56/4=14dbm
 
     [40] = 0, // target_power_index_mcs0
     [41] = 0, // target_power_index_mcs1
@@ -86,7 +88,11 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     // 0: 40MHz
     // 1: 26MHz
     // 2: 24MHz
-    [48] = 1,
+    #if F_CRYSTAL == 40000000
+      [48] = 0,
+    #else
+      [48] = 1,
+    #endif
 
 
 
@@ -228,7 +234,7 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     // 3: auto measure frequency offset and correct it,  bbpll is 160M, it only can correct + frequency offset.
     // 5: use 113 byte force_freq_offset to correct frequency offset, bbpll is 168M, it can correct + and - frequency offset.
     // 7: use 113 byte force_freq_offset to correct frequency offset, bbpll is 160M , it only can correct + frequency offset.
-    [112] = 3,
+    [112] = 0,
 
     // force_freq_offset
     // signed, unit is 8kHz
@@ -250,14 +256,20 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 #define __get_rf_mode _Z13__get_rf_modev
 #define __run_user_rf_pre_init _Z22__run_user_rf_pre_initv
 
-extern int __real_register_chipv6_phy(uint8_t* init_data);
-extern int __wrap_register_chipv6_phy(uint8_t* init_data)
+static bool spoof_init_data = false;
+
+extern int __real_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
+extern int ICACHE_RAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size);
+
+extern int ICACHE_RAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size)
 {
-    if (init_data != NULL) {
-      memcpy(init_data, phy_init_data, sizeof(phy_init_data));
-      init_data[107] = __get_adc_mode();
+    if (!spoof_init_data || size != 128) {
+        return __real_spi_flash_read(addr, dst, size);
     }
-    return __real_register_chipv6_phy(init_data);
+
+    memcpy(dst, phy_init_data, sizeof(phy_init_data));
+    ((uint8_t*)dst)[107] = __get_adc_mode();
+    return 0;
 }
 
 extern int __get_rf_mode(void)  __attribute__((weak));
@@ -278,10 +290,16 @@ extern void __run_user_rf_pre_init(void)
     return; // default do noting
 }
 
+uint32_t user_rf_cal_sector_set(void)
+{
+    spoof_init_data = true;
+    return flashchip->chip_size/SPI_FLASH_SEC_SIZE - 4;
+}
+
 void user_rf_pre_init()
 {
     // *((volatile uint32_t*) 0x60000710) = 0;
-
+    spoof_init_data = false;
     volatile uint32_t* rtc_reg = (volatile uint32_t*) 0x60001000;
     if((rtc_reg[24] >> 16) > 4) {
         rtc_reg[24] &= 0xFFFF;
@@ -295,3 +313,6 @@ void user_rf_pre_init()
     }
     __run_user_rf_pre_init();
 }
+
+
+void ICACHE_RAM_ATTR user_spi_flash_dio_to_qio_pre_init() {}

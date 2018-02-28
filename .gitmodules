@@ -1,0 +1,3 @@
+[submodule "lwip2"]
+	path = tools/sdk/lwip2/builder
+	url = https://github.com/d-a-v/esp82xx-nonos-linklayer.git

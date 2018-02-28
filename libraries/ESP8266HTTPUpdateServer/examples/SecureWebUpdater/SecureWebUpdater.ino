@@ -1,5 +1,5 @@
 /*
-  To upload through terminal you can use: curl -F "image=@firmware.bin" esp8266-webupdate.local/update
+  To upload through terminal you can use: curl -u admin:admin -F "image=@firmware.bin" esp8266-webupdate.local/firmware
 */
 
 #include <ESP8266WiFi.h>

@@ -1,7 +1,9 @@
 # SPIFFS (SPI Flash File System) 
-**V0.3.4**
+**V0.3.7**
 
-Copyright (c) 2013-2016 Peter Andersson (pelleplutt1976 at gmail.com)
+[![Build Status](https://travis-ci.org/pellepl/spiffs.svg?branch=master)](https://travis-ci.org/pellepl/spiffs)
+
+Copyright (c) 2013-2017 Peter Andersson (pelleplutt1976 at gmail.com)
 
 For legal stuff, see [LICENSE](https://github.com/pellepl/spiffs/blob/master/LICENSE). Basically, you may do whatever you want with the source. Use, modify, sell, print it out, roll it and smoke it - as long as I won't be held responsible.
 
@@ -21,33 +23,97 @@ Spiffs is designed with following characteristics in mind:
  - Wear leveling
 
 
+## BUILDING
+
+`mkdir build; make`
+
+Otherwise, configure the `builddir` variable towards the top of `makefile` as something opposed to the default `build`. Sanity check on the host via `make test` and refer to `.travis.yml` for the official in-depth testing procedure. See the wiki for [integrating](https://github.com/pellepl/spiffs/wiki/Integrate-spiffs) spiffs into projects and [spiffsimg](https://github.com/nodemcu/nodemcu-firmware/tree/master/tools/spiffsimg) from [nodemcu](https://github.com/nodemcu) is a good example on the subject.
+
+
 ## FEATURES
 
 What spiffs does:
  - Specifically designed for low ram usage
  - Uses statically sized ram buffers, independent of number of files
  - Posix-like api: open, close, read, write, seek, stat, etc
- - It can be run on any NOR flash, not only SPI flash - theoretically also on embedded flash of an microprocessor
- - Multiple spiffs configurations can be run on same target - and even on same SPI flash device
+ - It can run on any NOR flash, not only SPI flash - theoretically also on embedded flash of a microprocessor
+ - Multiple spiffs configurations can run on same target - and even on same SPI flash device
  - Implements static wear leveling 
  - Built in file system consistency checks
+ - Highly configurable
  
 What spiffs does not:
  - Presently, spiffs does not support directories. It produces a flat structure. Creating a file with path *tmp/myfile.txt* will create a file called *tmp/myfile.txt* instead of a *myfile.txt* under directory *tmp*. 
- - It is not a realtime stack. One write operation might take much longer than another.
- - Poor scalability. Spiffs is intended for small memory devices - the normal sizes for SPI flashes. Going beyond ~128MB is probably a bad idea. This is a side effect of the design goal to use as little ram as possible.
+ - It is not a realtime stack. One write operation might last much longer than another.
+ - Poor scalability. Spiffs is intended for small memory devices - the normal sizes for SPI flashes. Going beyond ~128Mbyte is probably a bad idea. This is a side effect of the design goal to use as little ram as possible.
  - Presently, it does not detect or handle bad blocks.
+ - One configuration, one binary. There's no generic spiffs binary that handles all types of configurations.
 
  
 ## MORE INFO 
  
-See the [wiki](https://github.com/pellepl/spiffs/wiki) for configuring, integrating and using spiffs.
+See the [wiki](https://github.com/pellepl/spiffs/wiki) for [configuring](https://github.com/pellepl/spiffs/wiki/Configure-spiffs), [integrating](https://github.com/pellepl/spiffs/wiki/Integrate-spiffs), [using](https://github.com/pellepl/spiffs/wiki/Using-spiffs), and [optimizing](https://github.com/pellepl/spiffs/wiki/Performance-and-Optimizing) spiffs.
  
 For design, see [docs/TECH_SPEC](https://github.com/pellepl/spiffs/blob/master/docs/TECH_SPEC).
 
 For a generic spi flash driver, see [this](https://github.com/pellepl/spiflash_driver).
 
 ## HISTORY
+
+### 0.3.7
+- fixed prevent seeking to negative offsets #158
+- fixed file descriptor offsets not updated for multiple fds on same file #157
+- fixed cache page not closed for removed files #156
+- fixed a lseek bug when seeking exactly to end of a fully indexed first level LUT #148
+- fixed wear leveling issue #145
+- fixed attempt to write out of bounds in flash #130, 
+- set file offset when seeking over end #121 (thanks @sensslen)
+- fixed seeking in virgin files #120 (thanks @sensslen)
+- Optional file metadata #128 (thanks @cesanta)
+- AFL testing framework #100 #143 (thanks @pjsg)
+- Testframe updates
+
+New API functions:
+- `SPIFFS_update_meta, SPIFFS_fupdate_meta` - updates metadata for a file
+
+New config defines:
+- `SPIFFS_OBJ_META_LEN` - enable possibility to add extra metadata to files
+
+### 0.3.6
+- Fix range bug in index memory mapping #98
+- Add index memory mapping #97
+- Optimize SPIFFS_read for large files #96
+- Add temporal cache for opening files #95
+- More robust gc #93 (thanks @dismirlian)
+- Fixed a double write of same data in certain cache situations
+- Fixed an open bug in READ_ONLY builds
+- File not visible in SPIFFS_readdir #90 (thanks @benpicco-tmp)
+- Cache load code cleanup #92 (thanks @niclash)
+- Fixed lock/unlock asymmetry #88 #87 (thanks @JackJefferson, @dpruessner)
+- Testframe updates
+
+New API functions:
+- `SPIFFS_ix_map` - map index meta data to memory for a file
+- `SPIFFS_ix_unmap` - unmaps index meta data for a file
+- `SPIFFS_ix_remap` - changes file offset for index metadata map
+- `SPIFFS_bytes_to_ix_map_entries` - utility, get length of needed vector for given amount of bytes
+- `SPIFFS_ix_map_entries_to_bytes` - utility, get number of bytes a vector can represent given length
+ 
+New config defines:
+- `SPIFFS_IX_MAP` - enable possibility to map index meta data to memory for reading faster 
+- `SPIFFS_TEMPORAL_FD_CACHE` - enable temporal cache for opening files faster
+- `SPIFFS_TEMPORAL_CACHE_HIT_SCORE` - for tuning the temporal cache
+
+### 0.3.5
+- Fixed a bug in fs check
+- API returns actual error codes #84) (thanks @Nails)
+- Fix compiler warnings for non-gcc #83 #81 (thanks @Nails)
+- Unable to recover from full fs #82 (thanks @rojer)
+- Define SPIFFS_O_* flags #80
+- Problem with long filenames #79 (thanks @psjg)
+- Duplicate file name bug fix #74 (thanks @igrr)
+- SPIFFS_eof and SPIFFS_tell return wrong value #72 (thanks @ArtemPisarenko)
+- Bunch of testframe updates #77 #78 #86 (thanks @dpreussner, @psjg a.o)  
 
 ### 0.3.4
 - Added user callback file func.

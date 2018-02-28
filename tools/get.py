@@ -102,7 +102,7 @@ def identify_platform():
     if sys.maxsize > 2**32:
         bits = 64
     sys_name = platform.system()
-    if 'Linux' in sys_name and platform.platform().find('arm') > 0:
+    if 'Linux' in sys_name and (platform.platform().find('arm') > 0 or platform.platform().find('aarch64') > 0):
         sys_name = 'LinuxARM'
     if 'CYGWIN_NT' in sys_name:
         sys_name = 'Windows'

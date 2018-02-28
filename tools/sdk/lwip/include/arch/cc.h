@@ -65,7 +65,7 @@ typedef unsigned long   mem_ptr_t;
 #define U32_F "d"
 #define X32_F "x"
 
-
+#define LWIP_ERR_T s32_t
 
 //#define PACK_STRUCT_FIELD(x) x __attribute__((packed))
 #define PACK_STRUCT_FIELD(x) x

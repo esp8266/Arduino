@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include "eboot_command.h"
 #include "interrupts.h"
+#include "esp8266_peri.h"
 
 //#define DEBUG_UPDATER Serial
 
@@ -39,35 +40,40 @@ void UpdaterClass::_reset() {
 bool UpdaterClass::begin(size_t size, int command) {
   if(_size > 0){
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.println("[begin] already running");
+    DEBUG_UPDATER.println(F("[begin] already running"));
 #endif
     return false;
   }
 
+  /* Check boot mode; if boot mode is 1 (UART download mode),
+    we will not be able to reset into normal mode once update is done.
+    Fail early to avoid frustration.
+    https://github.com/esp8266/Arduino/issues/1017#issuecomment-200605576
+  */
+  int boot_mode = (GPI >> 16) & 0xf;
+  if (boot_mode == 1) {
+    _setError(UPDATE_ERROR_BOOTSTRAP);
+    return false;
+  }
+  
 #ifdef DEBUG_UPDATER
   if (command == U_SPIFFS) {
-    DEBUG_UPDATER.println("[begin] Update SPIFFS.");
+    DEBUG_UPDATER.println(F("[begin] Update SPIFFS."));
   }
 #endif
 
   if(size == 0) {
-    _error = UPDATE_ERROR_SIZE;
-#ifdef DEBUG_UPDATER
-    printError(DEBUG_UPDATER);
-#endif
+    _setError(UPDATE_ERROR_SIZE);
     return false;
   }
 
   if(!ESP.checkFlashConfig(false)) {
-    _error = UPDATE_ERROR_FLASH_CONFIG;
-#ifdef DEBUG_UPDATER
-    printError(DEBUG_UPDATER);
-#endif
+    _setError(UPDATE_ERROR_FLASH_CONFIG);
     return false;
   }
 
   _reset();
-  _error = 0;
+  clearError(); //  _error = 0
 
   wifi_set_sleep_type(NONE_SLEEP_T);
 
@@ -90,10 +96,7 @@ bool UpdaterClass::begin(size_t size, int command) {
 
     //make sure that the size of both sketches is less than the total space (updateEndAddress)
     if(updateStartAddress < currentSketchSize) {
-      _error = UPDATE_ERROR_SPACE;
-#ifdef DEBUG_UPDATER
-      printError(DEBUG_UPDATER);
-#endif
+      _setError(UPDATE_ERROR_SPACE);    
       return false;
     }
   }
@@ -103,7 +106,7 @@ bool UpdaterClass::begin(size_t size, int command) {
   else {
     // unknown command
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.println("[begin] Unknown update command.");
+    DEBUG_UPDATER.println(F("[begin] Unknown update command."));
 #endif
     return false;
   }
@@ -112,7 +115,12 @@ bool UpdaterClass::begin(size_t size, int command) {
   _startAddress = updateStartAddress;
   _currentAddress = _startAddress;
   _size = size;
-  _buffer = new uint8_t[FLASH_SECTOR_SIZE];
+  if (ESP.getFreeHeap() > 2 * FLASH_SECTOR_SIZE) {
+    _bufferSize = FLASH_SECTOR_SIZE;
+  } else {
+    _bufferSize = 256;
+  }
+  _buffer = new uint8_t[_bufferSize];
   _command = command;
 
 #ifdef DEBUG_UPDATER
@@ -137,7 +145,7 @@ bool UpdaterClass::setMD5(const char * expected_md5){
 bool UpdaterClass::end(bool evenIfRemaining){
   if(_size == 0){
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.println("no update");
+    DEBUG_UPDATER.println(F("no update"));
 #endif
     return false;
   }
@@ -161,10 +169,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
   _md5.calculate();
   if(_target_md5.length()) {
     if(_target_md5 != _md5.toString()){
-      _error = UPDATE_ERROR_MD5;
-#ifdef DEBUG_UPDATER
-      DEBUG_UPDATER.printf("MD5 Failed: expected:%s, calculated:%s\n", _target_md5.c_str(), _md5.toString().c_str());
-#endif
+      _setError(UPDATE_ERROR_MD5);
       _reset();
       return false;
     }
@@ -174,9 +179,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
   }
 
   if(!_verifyEnd()) {
-#ifdef DEBUG_UPDATER
-    printError(DEBUG_UPDATER);
-#endif
     _reset();
     return false;
   }
@@ -203,20 +205,24 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
 bool UpdaterClass::_writeBuffer(){
 
-  if(!_async) yield();
-  bool result = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
-  if(!_async) yield();
-  if (result) {
-      result = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+  bool eraseResult = true, writeResult = true;
+  if (_currentAddress % FLASH_SECTOR_SIZE == 0) {
+    if(!_async) yield();
+    eraseResult = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
   }
-  if(!_async) yield();
-
-  if (!result) {
-    _error = UPDATE_ERROR_WRITE;
+  
+  if (eraseResult) {
+    if(!_async) yield();
+    writeResult = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
+  } else { // if erase was unsuccessful
     _currentAddress = (_startAddress + _size);
-#ifdef DEBUG_UPDATER
-    printError(DEBUG_UPDATER);
-#endif
+    _setError(UPDATE_ERROR_ERASE);
+    return false;
+  }
+
+  if (!writeResult) {
+    _currentAddress = (_startAddress + _size);
+    _setError(UPDATE_ERROR_WRITE);
     return false;
   }
   _md5.add(_buffer, _bufferLen);
@@ -232,14 +238,14 @@ size_t UpdaterClass::write(uint8_t *data, size_t len) {
   if(len > remaining()){
     //len = remaining();
     //fail instead
-    _error = UPDATE_ERROR_SPACE;
+    _setError(UPDATE_ERROR_SPACE);
     return 0;
   }
 
   size_t left = len;
 
-  while((_bufferLen + left) > FLASH_SECTOR_SIZE) {
-    size_t toBuff = FLASH_SECTOR_SIZE - _bufferLen;
+  while((_bufferLen + left) > _bufferSize) {
+    size_t toBuff = _bufferSize - _bufferLen;
     memcpy(_buffer + _bufferLen, data + (len - left), toBuff);
     _bufferLen += toBuff;
     if(!_writeBuffer()){
@@ -264,8 +270,8 @@ bool UpdaterClass::_verifyHeader(uint8_t data) {
     if(_command == U_FLASH) {
         // check for valid first magic byte (is always 0xE9)
         if(data != 0xE9) {
-            _error = UPDATE_ERROR_MAGIC_BYTE;
             _currentAddress = (_startAddress + _size);
+            _setError(UPDATE_ERROR_MAGIC_BYTE);
             return false;
         }
         return true;
@@ -281,15 +287,15 @@ bool UpdaterClass::_verifyEnd() {
 
         uint8_t buf[4];
         if(!ESP.flashRead(_startAddress, (uint32_t *) &buf[0], 4)) {
-            _error = UPDATE_ERROR_READ;
             _currentAddress = (_startAddress);
+            _setError(UPDATE_ERROR_READ);            
             return false;
         }
 
         // check for valid first magic byte
         if(buf[0] != 0xE9) {
-            _error = UPDATE_ERROR_MAGIC_BYTE;
             _currentAddress = (_startAddress);
+            _setError(UPDATE_ERROR_MAGIC_BYTE);            
             return false;
         }
 
@@ -297,8 +303,8 @@ bool UpdaterClass::_verifyEnd() {
 
         // check if new bin fits to SPI flash
         if(bin_flash_size > ESP.getFlashChipRealSize()) {
-            _error = UPDATE_ERROR_NEW_FLASH_CONFIG;
             _currentAddress = (_startAddress);
+            _setError(UPDATE_ERROR_NEW_FLASH_CONFIG);            
             return false;
         }
 
@@ -325,22 +331,19 @@ size_t UpdaterClass::writeStream(Stream &data) {
     }
 
     while(remaining()) {
-        toRead = data.readBytes(_buffer + _bufferLen,  (FLASH_SECTOR_SIZE - _bufferLen));
+        toRead = data.readBytes(_buffer + _bufferLen,  (_bufferSize - _bufferLen));
         if(toRead == 0) { //Timeout
             delay(100);
-            toRead = data.readBytes(_buffer + _bufferLen, (FLASH_SECTOR_SIZE - _bufferLen));
+            toRead = data.readBytes(_buffer + _bufferLen, (_bufferSize - _bufferLen));
             if(toRead == 0) { //Timeout
-                _error = UPDATE_ERROR_STREAM;
                 _currentAddress = (_startAddress + _size);
-#ifdef DEBUG_UPDATER
-                printError(DEBUG_UPDATER);
-#endif
+                _setError(UPDATE_ERROR_STREAM);
                 _reset();
                 return written;
             }
         }
         _bufferLen += toRead;
-        if((_bufferLen == remaining() || _bufferLen == FLASH_SECTOR_SIZE) && !_writeBuffer())
+        if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
             return written;
         written += toRead;
         yield();
@@ -348,32 +351,42 @@ size_t UpdaterClass::writeStream(Stream &data) {
     return written;
 }
 
-void UpdaterClass::printError(Stream &out){
-  out.printf("ERROR[%u]: ", _error);
+void UpdaterClass::_setError(int error){
+  _error = error;
+#ifdef DEBUG_UPDATER
+  printError(DEBUG_UPDATER);
+#endif
+}
+
+void UpdaterClass::printError(Print &out){
+  out.printf_P(PSTR("ERROR[%u]: "), _error);
   if(_error == UPDATE_ERROR_OK){
-    out.println("No Error");
+    out.println(F("No Error"));
   } else if(_error == UPDATE_ERROR_WRITE){
-    out.println("Flash Write Failed");
+    out.println(F("Flash Write Failed"));
   } else if(_error == UPDATE_ERROR_ERASE){
-    out.println("Flash Erase Failed");
+    out.println(F("Flash Erase Failed"));
   } else if(_error == UPDATE_ERROR_READ){
-    out.println("Flash Read Failed");
+    out.println(F("Flash Read Failed"));
   } else if(_error == UPDATE_ERROR_SPACE){
-    out.println("Not Enough Space");
+    out.println(F("Not Enough Space"));
   } else if(_error == UPDATE_ERROR_SIZE){
-    out.println("Bad Size Given");
+    out.println(F("Bad Size Given"));
   } else if(_error == UPDATE_ERROR_STREAM){
-    out.println("Stream Read Timeout");
+    out.println(F("Stream Read Timeout"));
   } else if(_error == UPDATE_ERROR_MD5){
-    out.println("MD5 Check Failed");
+    //out.println(F("MD5 Check Failed"));
+    out.printf("MD5 Failed: expected:%s, calculated:%s\n", _target_md5.c_str(), _md5.toString().c_str());
   } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
-    out.printf("Flash config wrong real: %d IDE: %d\n", ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
+    out.printf_P(PSTR("Flash config wrong real: %d IDE: %d\n"), ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
   } else if(_error == UPDATE_ERROR_NEW_FLASH_CONFIG){
-    out.printf("new Flash config wrong real: %d\n", ESP.getFlashChipRealSize());
+    out.printf_P(PSTR("new Flash config wrong real: %d\n"), ESP.getFlashChipRealSize());
   } else if(_error == UPDATE_ERROR_MAGIC_BYTE){
-    out.println("Magic byte is wrong, not 0xE9");
+    out.println(F("Magic byte is wrong, not 0xE9"));
+  } else if (_error == UPDATE_ERROR_BOOTSTRAP){
+    out.println(F("Invalid bootstrapping state, reset ESP8266 before updating"));
   } else {
-    out.println("UNKNOWN");
+    out.println(F("UNKNOWN"));
   }
 }
 

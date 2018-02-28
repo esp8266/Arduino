@@ -17,6 +17,7 @@ void setup() {
     Serial.println("Arduino AVR-ISP over TCP");
     avrprog.setReset(false); // let the AVR run
 
+    WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, pass);
     while (WiFi.waitForConnectResult() != WL_CONNECTED);
 

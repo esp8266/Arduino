@@ -49,6 +49,7 @@ void setup()
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
   Serial.println(ssid);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
   
   while (WiFi.status() != WL_CONNECTED) {
@@ -128,7 +129,7 @@ void loop()
 }
 
 // send an NTP request to the time server at the given address
-unsigned long sendNTPpacket(IPAddress& address)
+void sendNTPpacket(IPAddress& address)
 {
   Serial.println("sending NTP packet...");
   // set all bytes in the buffer to 0
