@@ -126,6 +126,11 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         *conf.password = 0;
     }
 
+    conf.threshold.rssi = -127;
+
+    // TODO(#909): set authmode to AUTH_WPA_PSK if passphrase is provided
+    conf.threshold.authmode = AUTH_OPEN;
+
     if(bssid) {
         conf.bssid_set = 1;
         memcpy((void *) &conf.bssid[0], (void *) bssid, 6);
@@ -142,11 +147,6 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         ETS_UART_INTR_DISABLE();
 
         if(WiFi._persistent) {
-            // workaround for #1997: make sure the value of ap_number is updated and written to flash
-            // to be removed after SDK update
-            wifi_station_ap_number_set(2);
-            wifi_station_ap_number_set(1);
-
             wifi_station_set_config(&conf);
         } else {
             wifi_station_set_config_current(&conf);
