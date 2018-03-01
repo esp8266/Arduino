@@ -375,7 +375,7 @@
   
         function createTreeLeaf(path, name, size){
           var leaf = document.createElement("li");
-          leaf.id = (((path == "/")?"":path)+"/"+name).toLowerCase();
+          leaf.id = (((path == "/")?"":"")+"/"+name).toLowerCase();
           var label = document.createElement("span");
           label.textContent = name.toLowerCase();
           leaf.appendChild(label);
