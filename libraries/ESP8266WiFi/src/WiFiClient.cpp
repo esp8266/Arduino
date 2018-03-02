@@ -272,8 +272,7 @@ void WiFiClient::stop()
     if (!_client)
         return;
 
-    _client->unref();
-    _client = 0;
+    _client->close();
 }
 
 uint8_t WiFiClient::connected()

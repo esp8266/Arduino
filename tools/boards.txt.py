@@ -721,6 +721,7 @@ macros = {
         ( '.upload.tool', 'esptool' ),
         ( '.upload.maximum_data_size', '81920' ),
         ( '.upload.wait_for_upload_port', 'true' ),
+        ( '.upload.erase_cmd', ''),
         ( '.serial.disableDTR', 'true' ),
         ( '.serial.disableRTS', 'true' ),
         ( '.build.mcu', 'esp8266' ),
@@ -889,6 +890,17 @@ macros = {
         ( '.menu.UploadSpeed.921600.upload.speed', '921600' ),
         ]),
 
+    ####################### flash erase
+
+    'flash_erase_menu': collections.OrderedDict([
+        ( '.menu.FlashErase.none', 'Only Sketch' ),
+        ( '.menu.FlashErase.none.upload.erase_cmd', '' ),
+        ( '.menu.FlashErase.sdk', 'Sketch + WiFi Settings' ),
+        ( '.menu.FlashErase.sdk.upload.erase_cmd', '-ca "{build.rfcal_addr}" -cz 0x4000' ),
+        ( '.menu.FlashErase.all', 'All Flash Contents' ),
+        ( '.menu.FlashErase.all.upload.erase_cmd', '-ca 0x0 -cz "{build.flash_size_bytes}"' ),
+        ]),
+
     }
 
 ################################################################
@@ -968,15 +980,17 @@ def all_debug ():
 ################################################################
 # flash size
 
-def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, spiffs_size = 0, spiffs_blocksize = 0):
+def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_start = 0, spiffs_size = 0, spiffs_blocksize = 0):
     menu = '.menu.FlashSize.' + optname
     menub = menu + '.build.'
     d = collections.OrderedDict([
         ( menu, display + ' (' + desc + ')' ),
         ( menub + 'flash_size', display ),
+        ( menub + 'flash_size_bytes', "0x%X" % size_bytes ),
         ( menub + 'flash_ld', ld ),
         ( menub + 'spiffs_pagesize', '256' ),
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
+        ( menub + 'rfcal_addr', "0x%X" % (size_bytes - 0x4000))
         ])
     if spiffs_size > 0:
         d.update(collections.OrderedDict([
@@ -1040,22 +1054,22 @@ def flash_size (display, optname, ld, desc, max_upload_size, spiffs_start = 0, s
     return d
 
 def all_flash_size ():
-    f512 =      flash_size('512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696,   0x7B000)
-    f512.update(flash_size('512K', '512K64',  'eagle.flash.512k64.ld',   '64K SPIFFS', 434160,   0x6B000,   0x10000, 4096))
-    f512.update(flash_size('512K', '512K128', 'eagle.flash.512k128.ld', '128K SPIFFS', 368624,   0x5B000,   0x20000, 4096))
-    f1m =       flash_size(  '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984,  0xFB000)
-    f1m.update( flash_size(  '1M', '1M64',    'eagle.flash.1m64.ld',     '64K SPIFFS', 958448,   0xEB000,   0x10000, 4096))
-    f1m.update( flash_size(  '1M', '1M128',   'eagle.flash.1m128.ld',   '128K SPIFFS', 892912,   0xDB000,   0x20000, 4096))
-    f1m.update( flash_size(  '1M', '1M144',   'eagle.flash.1m144.ld',   '144K SPIFFS', 876528,   0xD7000,   0x24000, 4096))
-    f1m.update( flash_size(  '1M', '1M160',   'eagle.flash.1m160.ld',   '160K SPIFFS', 860144,   0xD3000,   0x28000, 4096))
-    f1m.update( flash_size(  '1M', '1M192',   'eagle.flash.1m192.ld',   '192K SPIFFS', 827376,   0xCB000,   0x30000, 4096))
-    f1m.update( flash_size(  '1M', '1M256',   'eagle.flash.1m256.ld',   '256K SPIFFS', 761840,   0xBB000,   0x40000, 4096))
-    f1m.update( flash_size(  '1M', '1M512',   'eagle.flash.1m512.ld',   '512K SPIFFS', 499696,   0x7B000,   0x80000, 8192))
-    f2m =       flash_size(  '2M', '2M',      'eagle.flash.2m.ld',        '1M SPIFFS', 1044464, 0x100000,   0xFB000, 8192)
-    f4m =       flash_size(  '4M', '4M1M',    'eagle.flash.4m1m.ld',      '1M SPIFFS', 1044464, 0x300000,   0xFB000, 8192)
-    f4m.update( flash_size(  '4M', '4M3M',    'eagle.flash.4m.ld',        '3M SPIFFS', 1044464, 0x100000,  0x2FB000, 8192))
-    f8m =       flash_size(  '8M', '8M7M',    'eagle.flash.8m.ld',        '7M SPIFFS', 1044464, 0x100000,  0x6FB000, 8192)
-    f16m =      flash_size( '16M', '16M15M',  'eagle.flash.16m.ld',      '15M SPIFFS', 1044464, 0x100000,  0xEFB000, 8192)
+    f512 =      flash_size(0x80000,  '512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696,   0x7B000)
+    f512.update(flash_size(0x80000,  '512K', '512K64',  'eagle.flash.512k64.ld',   '64K SPIFFS', 434160,   0x6B000,   0x10000, 4096))
+    f512.update(flash_size(0x80000,  '512K', '512K128', 'eagle.flash.512k128.ld', '128K SPIFFS', 368624,   0x5B000,   0x20000, 4096))
+    f1m =       flash_size(0x100000,   '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984,  0xFB000)
+    f1m.update( flash_size(0x100000,   '1M', '1M64',    'eagle.flash.1m64.ld',     '64K SPIFFS', 958448,   0xEB000,   0x10000, 4096))
+    f1m.update( flash_size(0x100000,   '1M', '1M128',   'eagle.flash.1m128.ld',   '128K SPIFFS', 892912,   0xDB000,   0x20000, 4096))
+    f1m.update( flash_size(0x100000,   '1M', '1M144',   'eagle.flash.1m144.ld',   '144K SPIFFS', 876528,   0xD7000,   0x24000, 4096))
+    f1m.update( flash_size(0x100000,   '1M', '1M160',   'eagle.flash.1m160.ld',   '160K SPIFFS', 860144,   0xD3000,   0x28000, 4096))
+    f1m.update( flash_size(0x100000,   '1M', '1M192',   'eagle.flash.1m192.ld',   '192K SPIFFS', 827376,   0xCB000,   0x30000, 4096))
+    f1m.update( flash_size(0x100000,   '1M', '1M256',   'eagle.flash.1m256.ld',   '256K SPIFFS', 761840,   0xBB000,   0x40000, 4096))
+    f1m.update( flash_size(0x100000,   '1M', '1M512',   'eagle.flash.1m512.ld',   '512K SPIFFS', 499696,   0x7B000,   0x80000, 8192))
+    f2m =       flash_size(0x200000,   '2M', '2M',      'eagle.flash.2m.ld',        '1M SPIFFS', 1044464, 0x100000,   0xFB000, 8192)
+    f4m =       flash_size(0x400000,   '4M', '4M1M',    'eagle.flash.4m1m.ld',      '1M SPIFFS', 1044464, 0x300000,   0xFB000, 8192)
+    f4m.update( flash_size(0x400000,   '4M', '4M3M',    'eagle.flash.4m.ld',        '3M SPIFFS', 1044464, 0x100000,  0x2FB000, 8192))
+    f8m =       flash_size(0x800000,   '8M', '8M7M',    'eagle.flash.8m.ld',        '7M SPIFFS', 1044464, 0x100000,  0x6FB000, 8192)
+    f16m =      flash_size(0x1000000, '16M', '16M15M',  'eagle.flash.16m.ld',      '15M SPIFFS', 1044464, 0x100000,  0xEFB000, 8192)
     return {
         '512K': f512,
           '1M':  f1m,
@@ -1118,6 +1132,7 @@ def all_boards ():
     print 'menu.DebugLevel=Debug Level'
     print 'menu.LwIPVariant=lwIP Variant'
     print 'menu.led=Builtin Led'
+    print 'menu.FlashErase=Erase Flash'
     print ''
 
     for id in boards:
@@ -1138,7 +1153,7 @@ def all_boards ():
             macrolist += [ 'lwip2', 'lwip' ]
         else:
             macrolist += [ 'lwip', 'lwip2' ]
-        macrolist += [ 'debug_menu', ]
+        macrolist += [ 'debug_menu', 'flash_erase_menu' ]
 
         for cs in customspeeds:
             print id + cs
