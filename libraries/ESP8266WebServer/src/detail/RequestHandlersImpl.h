@@ -3,6 +3,7 @@
 
 #include "RequestHandler.h"
 #include "mimetable.h"
+#include "WString.h"
 
 using namespace mime;
 
@@ -90,7 +91,8 @@ public:
         if (!_isFile) {
             // Base URI doesn't point to a file.
             // If a directory is requested, look for index file.
-            if (requestUri.endsWith("/")) requestUri += "index.htm";
+            if (requestUri.endsWith("/")) 
+              requestUri += "index.htm";
 
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
@@ -101,10 +103,10 @@ public:
 
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
         // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
-        if (!path.endsWith(mimeTable[gz].endsWith) && !_fs.exists(path))  {
-            String pathWithGz = path + mimeTable[gz].endsWith;
+        if (!path.endsWith(FPSTR(mimeTable[gz].endsWith)) && !_fs.exists(path))  {
+            String pathWithGz = path + FPSTR(mimeTable[gz].endsWith);
             if(_fs.exists(pathWithGz))
-                path += mimeTable[gz].endsWith;
+                path += FPSTR(mimeTable[gz].endsWith);
         }
 
         File f = _fs.open(path, "r");

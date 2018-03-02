@@ -26,7 +26,22 @@ http://arduino.cc/en/Reference/HomePage
 
 from os.path import isdir, join
 
+from SCons import Builder, Util
 from SCons.Script import DefaultEnvironment
+
+
+def scons_patched_match_splitext(path, suffixes=None):
+    """
+    Patch SCons Builder, append $OBJSUFFIX to the end of each target
+    """
+    tokens = Util.splitext(path)
+    if suffixes and tokens[1] and tokens[1] in suffixes:
+        return (path, tokens[1])
+    return tokens
+
+
+Builder.match_splitext = scons_patched_match_splitext
+
 
 env = DefaultEnvironment()
 platform = env.PioPlatform()
@@ -53,7 +68,7 @@ env.Prepend(
         join(FRAMEWORK_DIR, "tools", "sdk", "libc", "xtensa-lx106-elf", "lib")
     ],
     LIBS=[
-        "mesh", "wpa2", "smartconfig", "espnow", "pp", "main", "wpa", "lwip_gcc",
+        "wpa2", "smartconfig", "espnow", "pp", "main", "wpa", "lwip_gcc",
         "net80211", "wps", "crypto", "phy", "hal", "axtls", "gcc",
         "m", "c", "stdc++"
     ]
