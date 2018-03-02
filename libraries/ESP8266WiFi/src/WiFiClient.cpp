@@ -290,9 +290,9 @@ uint8_t WiFiClient::status()
     return _client->state();
 }
 
- WiFiClient::operator bool()
+WiFiClient::operator bool()
 {
-    return _client != 0;
+    return connected();
 }
 
 IPAddress WiFiClient::remoteIP()
