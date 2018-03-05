@@ -1,4 +1,7 @@
 This document describes rules that are in effect for this repository, meant for handling issues by contributors in the issue tracker and PRs.
+
+All communications (issues and pull request) regarding the ESP8266 Arduino core should always be done in English, as it is the official language of the project. Requests are not allowed in any other language.
+
 # Opening New Issues
 1.	The issue tracker is precisely that: a tool to track issues in the core code, and not a discussion forum. Opening an issue means that a problem has been found in the core code, and that it should be addressed by a contributor.
 2.	When opening an issue, a template is presented with fields to fill out. The requested information is important. If the template is ignored, or not enough info about the issue is provided, the issue may be closed due to lack of info. Example:
@@ -55,6 +58,7 @@ This document describes rules that are in effect for this repository, meant for 
 4.	Pull requests that address an outstanding issue, particularly an issue deemed to be severe, should be given priority
 5.	If a PR is accepted, then it should undergo review and updated based on the feedback provided, then merged
 6.   Pull requests that don't meet the above will be denied and closed
+7.   Pull request accepted and that modify something in the documentation will be marked with the label component: documentation, for to be able to find it easily, review it and translate it.
 
 # Other
 A table should be maintained for relating maintainers and components. When triaging, this is essential to figure out if someone in particular should be consulted about specific changes.

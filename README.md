@@ -28,7 +28,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.0/](https://arduino-esp8266.readthedocs.io/en/2.4.0/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.0/](https://arduino-esp8266.readthedocs.io/en/2.4.0/).
 
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
@@ -72,7 +72,12 @@ Using make instead of the Arduino IDE makes it easier to do automated and produc
 
 ### Documentation
 
-Documentation for latest development version: https://arduino-esp8266.readthedocs.io/en/latest/
+Documentation for latest development version: https://arduino-esp8266.readthedocs.io/en/latest/.
+
+-Other languages: 
+.. attention:: All communications (issues and pull request) regarding the ESP8266 Arduino core should always be done in English, as it is the official language of the project. Requests are not allowed in any other language.
+
+Spanish - no official: http://esp8266-arduino-spanish.readthedocs.io/es/latest/.
 
 ### Issues and support ###
 

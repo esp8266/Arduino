@@ -21,3 +21,7 @@ Welcome to ESP8266 Arduino Core's documentation!
    Stack Dump <Troubleshooting/stack_dump>
    Using with Eclipse <eclipse/eclipse>
    Changelog <changes>
+
+-Other languages: 
+
+Spanish - no official: http://esp8266-arduino-spanish.readthedocs.io/es/latest/
