@@ -70,7 +70,7 @@ compiler.elf2hex.extra_flags=
 
 ## generate file with git version number
 ## needs bash, git, and echo
-recipe.hooks.core.prebuild.1.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_VER `cd {runtime.platform.path}; git describe --tags 2>/dev/null || echo ffffffff` >{build.path}/core/core_version.h"
+recipe.hooks.core.prebuild.1.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_VER `cd {runtime.platform.path}; git describe --tags 2>/dev/null || echo nix-{version}` >{build.path}/core/core_version.h"
 ## windows-compatible version may be added later - warn: this string below has only been tested with "wine cmd.exe"
 recipe.hooks.core.prebuild.1.pattern.windows=cmd /c echo #define ARDUINO_ESP8266_GIT_VER win-{version} > {build.path}\\core\\core_version.h
 
