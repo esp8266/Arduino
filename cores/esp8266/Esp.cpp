@@ -557,24 +557,29 @@ String EspClass::getSketchMD5()
     return result;
 }
 
+static const char arduino_esp8266_git_ver [] PROGMEM = STR(ARDUINO_ESP8266_GIT_VER);
+#if LWIP_VERSION_MAJOR != 1
+static const char lwip2_version [] PROGMEM = "/lwIP:" STR(LWIP_VERSION_MAJOR) "." STR(LWIP_VERSION_MINOR) "." STR(LWIP_VERSION_REVISION);
+#endif
+
 String EspClass::getFullVersion()
 {
-    return   String("Boot:") + system_get_boot_version()
-           + "/SDK:" + system_get_sdk_version()
-           + "/Core:" STR(ARDUINO_ESP8266_GIT_VER)
+    return   String(F("Boot:")) + system_get_boot_version()
+           + F("/SDK:") + system_get_sdk_version()
+           + F("/Core:") + FPSTR(arduino_esp8266_git_ver)
 #if LWIP_VERSION_MAJOR == 1
-           + "/lwIP:" + String(LWIP_VERSION_MAJOR) + "." + String(LWIP_VERSION_MINOR) + "." + String(LWIP_VERSION_REVISION)
+           + F("/lwIP:") + String(LWIP_VERSION_MAJOR) + "." + String(LWIP_VERSION_MINOR) + "." + String(LWIP_VERSION_REVISION)
 #else
-           + "/lwIP:" STR(LWIP_VERSION_MAJOR) + "." STR(LWIP_VERSION_MINOR) + "." + STR(LWIP_VERSION_REVISION)
+           + FPSTR(lwip2_version)
 #endif
 #if LWIP_VERSION_IS_DEVELOPMENT
-             + "-dev"
+             + F("-dev")
 #endif
 #if LWIP_VERSION_IS_RC
-             + "rc" + String(LWIP_VERSION_RC)
+             + F("rc") + String(LWIP_VERSION_RC)
 #endif
 #ifdef LWIP_HASH_STR
-             + "(" LWIP_HASH_STR ")"
+             + "(" + F(LWIP_HASH_STR) + ")"
 #endif
            ;
 }
