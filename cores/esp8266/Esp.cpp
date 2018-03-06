@@ -557,6 +557,15 @@ String EspClass::getSketchMD5()
     return result;
 }
 
+#ifdef NDEBUG
+
+String EspClass::getFullVersion()
+{
+    return String();
+}
+
+#else // !NDEBUG
+
 static const char arduino_esp8266_git_ver [] PROGMEM = STR(ARDUINO_ESP8266_GIT_VER);
 #if LWIP_VERSION_MAJOR != 1
 static const char lwip2_version [] PROGMEM = "/lwIP:" STR(LWIP_VERSION_MAJOR) "." STR(LWIP_VERSION_MINOR) "." STR(LWIP_VERSION_REVISION);
@@ -583,3 +592,5 @@ String EspClass::getFullVersion()
 #endif
            ;
 }
+
+#endif // !NDEBUG
