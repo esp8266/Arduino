@@ -29,7 +29,7 @@
 #include <inttypes.h>
 #include "Arduino.h"
 #include "HardwareSerial.h"
-
+#include "Esp.h"
 
 HardwareSerial::HardwareSerial(int uart_nr)
     : _uart_nr(uart_nr), _rx_size(256)
@@ -39,6 +39,9 @@ void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode m
 {
     end();
     _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
+#ifdef DEBUG_ESP_PORT
+    println(ESP.getFullVersion());
+#endif
 }
 
 void HardwareSerial::end()
@@ -94,6 +97,9 @@ void HardwareSerial::setDebugOutput(bool en)
     if(en) {
         if(uart_tx_enabled(_uart)) {
             uart_set_debug(_uart_nr);
+#ifndef DEBUG_ESP_PORT
+            os_printf("%s\r\n", ESP.getFullVersion().c_str());
+#endif
         } else {
             uart_set_debug(UART_NO);
         }
