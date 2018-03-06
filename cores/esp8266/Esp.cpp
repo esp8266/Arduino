@@ -24,12 +24,6 @@
 #include <memory>
 #include "interrupts.h"
 #include "MD5Builder.h"
-#include <core_version.h>
-#include <lwip/init.h>      // LWIP_VERSION_*
-#include <lwipopts.h>       // LWIP_HASH_STR (lwip2)
-
-#define STRHELPER(x) #x
-#define STR(x) STRHELPER(x) // stringifier
 
 extern "C" {
 #include "user_interface.h"
@@ -556,41 +550,3 @@ String EspClass::getSketchMD5()
     result = md5.toString();
     return result;
 }
-
-#ifdef NDEBUG
-
-String EspClass::getFullVersion()
-{
-    return String();
-}
-
-#else // !NDEBUG
-
-static const char arduino_esp8266_git_ver [] PROGMEM = STR(ARDUINO_ESP8266_GIT_VER);
-#if LWIP_VERSION_MAJOR != 1
-static const char lwip2_version [] PROGMEM = "/lwIP:" STR(LWIP_VERSION_MAJOR) "." STR(LWIP_VERSION_MINOR) "." STR(LWIP_VERSION_REVISION);
-#endif
-
-String EspClass::getFullVersion()
-{
-    return   String(F("Boot:")) + system_get_boot_version()
-           + F("/SDK:") + system_get_sdk_version()
-           + F("/Core:") + FPSTR(arduino_esp8266_git_ver)
-#if LWIP_VERSION_MAJOR == 1
-           + F("/lwIP:") + String(LWIP_VERSION_MAJOR) + "." + String(LWIP_VERSION_MINOR) + "." + String(LWIP_VERSION_REVISION)
-#else
-           + FPSTR(lwip2_version)
-#endif
-#if LWIP_VERSION_IS_DEVELOPMENT
-             + F("-dev")
-#endif
-#if LWIP_VERSION_IS_RC
-             + F("rc") + String(LWIP_VERSION_RC)
-#endif
-#ifdef LWIP_HASH_STR
-             + "(" + F(LWIP_HASH_STR) + ")"
-#endif
-           ;
-}
-
-#endif // !NDEBUG

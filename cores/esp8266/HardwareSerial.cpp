@@ -40,6 +40,7 @@ void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode m
     end();
     _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
 #if defined(DEBUG_ESP_PORT) && !defined(NDEBUG)
+    println();
     println(ESP.getFullVersion());
 #endif
 }
@@ -97,9 +98,6 @@ void HardwareSerial::setDebugOutput(bool en)
     if(en) {
         if(uart_tx_enabled(_uart)) {
             uart_set_debug(_uart_nr);
-#if !defined(DEBUG_ESP_PORT) && !defined(NDEBUG)
-            os_printf("%s\r\n", ESP.getFullVersion().c_str());
-#endif
         } else {
             uart_set_debug(UART_NO);
         }

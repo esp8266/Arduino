@@ -41,7 +41,6 @@ extern "C" {
 
 struct rst_info resetInfo;
 
-#if 0
 extern "C" {
 extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
 const char* core_release = 
@@ -51,7 +50,6 @@ const char* core_release =
     NULL;
 #endif
 } // extern "C"
-#endif
 
 int atexit(void (*func)()) {
     (void) func;
@@ -152,7 +150,6 @@ void init_done() {
     system_set_os_print(1);
     gdb_init();
     do_global_ctors();
-    //printf("\n%08x\n", core_version);
     esp_schedule();
 }
 

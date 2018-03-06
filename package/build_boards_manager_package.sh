@@ -88,6 +88,7 @@ $SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' \
 ver_define=`echo $plain_ver | tr "[:lower:].\055" "[:upper:]_"`
 echo Ver define: $ver_define
 echo \#define ARDUINO_ESP8266_GIT_VER 0x`git rev-parse --short=8 HEAD 2>/dev/null` >$outdir/cores/esp8266/core_version.h
+echo \#define ARDUINO_ESP8266_GIT_DESC `git describe --tags 2>/dev/null` >>$outdir/cores/esp8266/core_version.h
 echo \#define ARDUINO_ESP8266_RELEASE_$ver_define >>$outdir/cores/esp8266/core_version.h
 echo \#define ARDUINO_ESP8266_RELEASE \"$ver_define\" >>$outdir/cores/esp8266/core_version.h
 
