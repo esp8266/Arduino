@@ -40,8 +40,12 @@ void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode m
     end();
     _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
 #if defined(DEBUG_ESP_PORT) && !defined(NDEBUG)
-    println();
-    println(ESP.getFullVersion());
+    if (this == &DEBUG_ESP_PORT)
+    {
+        setDebugOutput(true);
+        println();
+        println(ESP.getFullVersion());
+    }
 #endif
 }
 
