@@ -26,13 +26,14 @@ https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/debugging.rst
 ### Basic Infos
 
 - [ ] This issue complies with the [issue POLICY doc](https://github.com/esp8266/Arduino/blob/master/POLICY.md).
+- [ ] I have read the documentation at [readthedocs](https://arduino-esp8266.readthedocs.io/en/latest) and the issue is not addressed there.
 - [ ] I have tested that the issue is present in current master branch (aka latest git).
 - [ ] If there is a stack dump, I have decoded it.
 - [ ] I have filled out all fields below.
 
 #### Platform
 
-- Hardware:					[ESP-12]
+- Hardware:					[ESP-12|ESP-01|ESP-07|ESP8285 device|other]
 - Core Version:			[latest git hash or date]
 - Development Env:		[Arduino IDE|Platformio|Make|other]
 - Operating System:		[Windows|Ubuntu|MacOS]
@@ -40,13 +41,14 @@ https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/debugging.rst
 ### Settings in IDE
 
 - Module:  			[Generic ESP8266 Module|Wemos D1 mini r2|Nodemcu|other]
-- Flash Size: 		[4MB/1MB]
-- CPU Frequency:		[80Mhz|160MHz]
 - Flash Mode:			[qio|dio|other]
-- Flash Frequency:	[40Mhz]
-- Upload Using:		[OTA|SERIAL]
-- Upload speed:   [115200|other] (serial upload only)
+- Flash Size: 		[4MB/1MB]
+- lwip Variant:   [v1.4|v2 Lower Memory|Higher Bandwidth]
 - Reset Method:		[ck|nodemcu]
+- Flash Frequency:	[40Mhz]
+- CPU Frequency:		[80Mhz|160MHz]
+- Upload Using:		[OTA|SERIAL]
+- Upload Speed:   [115200|other] (serial upload only)
 
 
 ### Problem Description
