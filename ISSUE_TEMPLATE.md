@@ -1,36 +1,60 @@
+----------------------------- Delete below -----------------------------
 
-Please fill the info fields, it helps to get you faster support ;)
+INSTRUCTIONS
+============
+If you do not follow these instructions, your issue may be dismissed.
 
-if you have a stack dump decode it:
+1. Follow the checklist and fill in the [ ] spaces with an X.
+2. Fill in all the fields marked with [ ] (pick the correct option for you in each case, delete the others).
+3. If you haven't already done so, test your issue against current master branch (aka latest git), because it may have been already fixed.
+4. Describe your problem.
+5. If you have a STACK DUMP decode it:
+
 https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/stack_dump.rst
 
-for better debug messages:
-https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/debugging.rst
+6. Include a Minimal Complete Reproducible Example sketch that shows your issue. Do not include your entire project, or a huge piece of code.
+7. Include debug messages:
 
------------------------------ Remove above -----------------------------
+https://github.com/esp8266/Arduino/blob/master/doc/Troubleshooting/debugging.rst 
+
+8. Use markup (buttons above) and the Preview tab to check what the issue will look like.
+9. Delete these instructions from the above to the below marker lines before submitting this issue.
+
+
+----------------------------- Delete above -----------------------------
 
 ### Basic Infos
 
-#### Hardware
-Hardware:			?ESP-12?
-Core Version:      	?2.1.0-rc2?
+- [ ] This issue complies with the [issue POLICY doc](https://github.com/esp8266/Arduino/blob/master/POLICY.md).
+- [ ] I have tested that the issue is present in current master branch (aka latest git).
+- [ ] If there is a stack dump, I have decoded it.
+- [ ] I have filled out all fields below.
 
-### Description
+#### Platform
 
-Problem description
+- Hardware:					[ESP-12]
+- Core Version:			[latest git hash or date]
+- Development Env:		[Arduino IDE|Platformio|Make|other]
+- Operating System:		[Windows|Ubuntu|MacOS]
 
 ### Settings in IDE
 
-Module:  			?Generic ESP8266 Module?
-Flash Size: 		?4MB/1MB?
-CPU Frequency:		?80Mhz?
-Flash Mode:			?qio?
-Flash Frequency:	?40Mhz?
-Upload Using:		?OTA / SERIAL?
-Reset Method:		?ck / nodemcu?
+- Module:  			[Generic ESP8266 Module|Wemos D1 mini r2|Nodemcu|other]
+- Flash Size: 		[4MB/1MB]
+- CPU Frequency:		[80Mhz|160MHz]
+- Flash Mode:			[qio|dio|other]
+- Flash Frequency:	[40Mhz]
+- Upload Using:		[OTA|SERIAL]
+- Upload speed:   [115200|other] (serial upload only)
+- Reset Method:		[ck|nodemcu]
 
 
-### Sketch
+### Problem Description
+
+Detailed problem description goes here.
+
+
+### MCVE Sketch
 
 ```cpp
 
@@ -43,12 +67,13 @@ void setup() {
 void loop() {
 
 }
+
 ```
 
 ### Debug Messages
 
 ```
-messages here
+Debug messages go here
 ```
 
 
