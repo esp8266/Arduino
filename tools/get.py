@@ -108,9 +108,12 @@ def identify_platform():
         sys_name = 'Windows'
     return arduino_platform_names[sys_name][bits]
 
-if __name__ == '__main__':
+def main():
     print('Platform: {0}'.format(identify_platform()))
     tools_to_download = load_tools_list('../package/package_esp8266com_index.template.json', identify_platform())
     mkdir_p(dist_dir)
     for tool in tools_to_download:
         get_tool(tool)
+
+if __name__ == '__main__':
+    main()
