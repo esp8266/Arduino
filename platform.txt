@@ -72,8 +72,8 @@ compiler.elf2hex.extra_flags=
 ## needs bash, git, and echo
 recipe.hooks.core.prebuild.1.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_VER 0x`git --git-dir {runtime.platform.path}/.git rev-parse --short=8 HEAD 2>/dev/null || echo ffffffff` >{build.path}/core/core_version.h"
 recipe.hooks.core.prebuild.2.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_DESC `cd {runtime.platform.path}; git describe --tags 2>/dev/null || echo unix-{version}` >>{build.path}/core/core_version.h"
-## windows-compatible version without git
-recipe.hooks.core.prebuild.1.pattern.windows=cmd.exe /c mkdir {build.path}\core & (echo #define ARDUINO_ESP8266_GIT_VER 0x00000000 & echo #define ARDUINO_ESP8266_GIT_DESC win-{version} ) > {build.path}\core\core_version.h
+## windows-compatible version - HELP NEEDED: this line below does not work because of unquotable spaces in {runtime.platform.path}="C:\Program Files\..." even when calling with 'cmd.exe /c ...'
+recipe.hooks.core.prebuild.1.pattern.windows="{runtime.platform.path}\tools\MakeCoreVer.bat" "{build.path}" "{runtime.platform.path}" "{version}"
 recipe.hooks.core.prebuild.2.pattern.windows=
 
 ## Compile c files
