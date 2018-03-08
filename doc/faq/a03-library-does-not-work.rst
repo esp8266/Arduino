@@ -16,7 +16,7 @@ Introduction
 
 You would like to use this Arduino library with ESP8266 and it doesn't
 perform. It is not listed among `libraries verified to work with
-ESP8266 <../doc/libraries.md#other-libraries-not-included-with-the-ide>`__.
+ESP8266 <../libraries.rst#other-libraries-not-included-with-the-ide>`__.
 You couldn't find any evidence on internet that it is compatible.
 
 What are the odds to make it working?
@@ -77,7 +77,7 @@ Exceptions / Watchdog Resets
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To troubleshoot resets follow FAQ item `My ESP crashes running some
-code <a02-my-esp-crashes.md>`__.
+code <a02-my-esp-crashes.rst>`__.
 
 Functionality Issues
 ^^^^^^^^^^^^^^^^^^^^
@@ -109,4 +109,4 @@ the ESP8266 is shrinking. Community of ESP8266 enthusiasts is growing.
 If you are unable to resolve the issues yourself, there are very good
 odds that you will be able to find somebody else to help you.
 
-`FAQ list :back: <readme.md>`__
+`FAQ list :back: <readme.rst>`__

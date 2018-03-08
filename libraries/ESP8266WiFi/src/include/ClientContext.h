@@ -107,17 +107,15 @@ public:
 
     void unref()
     {
-        if(this != 0) {
-            DEBUGV(":ur %d\r\n", _refcnt);
-            if(--_refcnt == 0) {
-                discard_received();
-                close();
-                if(_discard_cb) {
-                    _discard_cb(_discard_cb_arg, this);
-                }
-                DEBUGV(":del\r\n");
-                delete this;
+        DEBUGV(":ur %d\r\n", _refcnt);
+        if(--_refcnt == 0) {
+            discard_received();
+            close();
+            if(_discard_cb) {
+                _discard_cb(_discard_cb_arg, this);
             }
+            DEBUGV(":del\r\n");
+            delete this;
         }
     }
 
@@ -132,7 +130,12 @@ public:
         // This delay will be interrupted by esp_schedule in the connect callback
         delay(_timeout_ms);
         _connect_pending = 0;
+        if (!_pcb) {
+            DEBUGV(":cabrt\r\n");
+            return 0;
+        }
         if (state() != ESTABLISHED) {
+            DEBUGV(":ctmo\r\n");
             abort();
             return 0;
         }
@@ -442,11 +445,13 @@ protected:
             }
             err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, (int) err);
-            _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
+                _datasource->release_buffer(buf, next_chunk);
                 _written += next_chunk;
                 need_output = true;
             } else {
+		// ERR_MEM(-1) is a valid error meaning
+		// "come back later". It leaves state() opened
                 break;
             }
             will_send -= next_chunk;
@@ -538,6 +543,7 @@ protected:
     err_t _connected(struct tcp_pcb *pcb, err_t err)
     {
         (void) err;
+        (void) pcb;
         assert(pcb == _pcb);
         assert(_connect_pending);
         esp_schedule();
