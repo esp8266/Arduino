@@ -258,7 +258,7 @@ REST signal and you will see nothing on the Serial Monitor.
 
 As for different serial terminal program you can check Arduino IDE
 add-on `Serial Monitor for
-ESP8266 <(https://github.com/esp8266/Arduino/issues/1360)>`__ developed
+ESP8266 <https://github.com/esp8266/Arduino/issues/1360>`__ developed
 by user [@mytrain](https://github.com/mytrain) and discussed in
 `#1360 <https://github.com/esp8266/Arduino/issues/1360>`__.
 
@@ -292,12 +292,12 @@ firmware upload is shown below.
    Reset Method: nodemcu, close up at the beginning of upload
 
 Please note that the reset sequence is about 10x shorter comparing to
-`ck <@ck>`__ reset (about 25ms vs. 250ms).
+`ck <#ck>`__ reset (about 25ms vs. 250ms).
 
 Next picture covers complete upload of
 `Blink.ino <https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/Blink/Blink.ino>`__
 example at 921600 baud. Except for difference of the reset signal
-sequence, the complete upload looks similar to that of `ck <@ck>`__.
+sequence, the complete upload looks similar to that of `ck <#ck>`__.
 
 .. figure:: pictures/a01-reset-nodemcu-complete.png
    :alt: Reset Method: nodemcu, complete upload
