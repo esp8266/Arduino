@@ -26,8 +26,6 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#include "../generic/common.h"
-
 #define PIN_WIRE_SDA (4)
 #define PIN_WIRE_SCL (5)
 
@@ -52,5 +50,7 @@ static const uint8_t D12  = 12;
 static const uint8_t D13  = 14;
 static const uint8_t D14  = 4;
 static const uint8_t D15  = 5;
+
+#include "../generic/common.h"
 
 #endif /* Pins_Arduino_h */
