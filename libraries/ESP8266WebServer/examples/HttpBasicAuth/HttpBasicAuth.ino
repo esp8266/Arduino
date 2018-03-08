@@ -15,16 +15,17 @@ void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  if(WiFi.waitForConnectResult() != WL_CONNECTED) {
+  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
     Serial.println("WiFi Connect Failed! Rebooting...");
     delay(1000);
     ESP.restart();
   }
   ArduinoOTA.begin();
 
-  server.on("/", [](){
-    if(!server.authenticate(www_username, www_password))
+  server.on("/", []() {
+    if (!server.authenticate(www_username, www_password)) {
       return server.requestAuthentication();
+    }
     server.send(200, "text/plain", "Login OK");
   });
   server.begin();
