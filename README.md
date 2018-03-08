@@ -28,7 +28,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.0/](https://arduino-esp8266.readthedocs.io/en/2.4.0/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.1/](https://arduino-esp8266.readthedocs.io/en/2.4.1/)
 
 ### Using git version
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
@@ -51,19 +51,19 @@ python get.py
 
 ### Using PlatformIO
 
-[PlatformIO](http://platformio.org) is an open source ecosystem for IoT
+[PlatformIO](http://platformio.org?utm_source=github&utm_medium=arduino-esp8266) is an open source ecosystem for IoT
 development with cross platform build system, library manager and full support
 for Espressif (ESP8266) development. It works on the popular host OS: macOS, Windows,
 Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-- [What is PlatformIO?](http://docs.platformio.org/page/what-is-platformio.html)
-- [PlatformIO IDE](http://platformio.org/platformio-ide)
-- Quick Start with [PlatformIO IDE](http://docs.platformio.org/page/ide/atom.html#quick-start) or [PlatformIO Core](http://docs.platformio.org/page/core.html)
-- [Advanced usage](http://docs.platformio.org/page/platforms/espressif.html) -
-  custom settings, uploading to SPIFFS, Over-the-Air (OTA) or using stage version
-- [Integration with Cloud and Standalone IDEs](http://docs.platformio.org/page/ide.html) -
-  Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
-- [Project Examples](http://docs.platformio.org/page/platforms/espressif.html#examples)
+- [What is PlatformIO?](http://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=github&utm_medium=arduino-esp8266)
+- [PlatformIO IDE](http://platformio.org/platformio-ide?utm_source=github&utm_medium=arduino-esp8266)
+- [PlatformIO Core](http://docs.platformio.org/en/latest/core.html?utm_source=github&utm_medium=arduino-esp8266) (command line tool)
+- [Advanced usage](http://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266) -
+  custom settings, uploading to SPIFFS, Over-the-Air (OTA), staging version
+- [Integration with Cloud and Standalone IDEs](http://docs.platformio.org/en/latest/ide.html?utm_source=github&utm_medium=arduino-esp8266) -
+  Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM, Visual Studio, and VSCode
+- [Project Examples](http://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266#examples)
 
 ### Building with make
 

@@ -23,6 +23,7 @@
 #include "WiFiServer.h"
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
+#include "detail/mimetable.h"
 
 //#define DEBUG_ESP_HTTP_SERVER
 #ifdef DEBUG_ESP_PORT
@@ -30,6 +31,9 @@
 #else
 #define DEBUG_OUTPUT Serial
 #endif
+
+static const char Content_Type[] PROGMEM = "Content-Type";
+static const char filename[] PROGMEM = "filename";
 
 static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& dataLength, int timeout_ms)
 {
@@ -98,15 +102,15 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   _chunked = false;
 
   HTTPMethod method = HTTP_GET;
-  if (methodStr == "POST") {
+  if (methodStr == F("POST")) {
     method = HTTP_POST;
-  } else if (methodStr == "DELETE") {
+  } else if (methodStr == F("DELETE")) {
     method = HTTP_DELETE;
-  } else if (methodStr == "OPTIONS") {
+  } else if (methodStr == F("OPTIONS")) {
     method = HTTP_OPTIONS;
-  } else if (methodStr == "PUT") {
+  } else if (methodStr == F("PUT")) {
     method = HTTP_PUT;
-  } else if (methodStr == "PATCH") {
+  } else if (methodStr == F("PATCH")) {
     method = HTTP_PATCH;
   }
   _currentMethod = method;
@@ -158,20 +162,21 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       DEBUG_OUTPUT.println(headerValue);
       #endif
 
-      if (headerName.equalsIgnoreCase("Content-Type")){
-        if (headerValue.startsWith("text/plain")){
+      if (headerName.equalsIgnoreCase(FPSTR(Content_Type))){
+        using namespace mime;
+        if (headerValue.startsWith(FPSTR(mimeTable[txt].mimeType))){
           isForm = false;
-        } else if (headerValue.startsWith("application/x-www-form-urlencoded")){
+        } else if (headerValue.startsWith(F("application/x-www-form-urlencoded"))){
           isForm = false;
           isEncoded = true;
-        } else if (headerValue.startsWith("multipart/")){
-          boundaryStr = headerValue.substring(headerValue.indexOf('=')+1);
+        } else if (headerValue.startsWith(F("multipart/"))){
+          boundaryStr = headerValue.substring(headerValue.indexOf('=') + 1);
           boundaryStr.replace("\"","");
           isForm = true;
         }
-      } else if (headerName.equalsIgnoreCase("Content-Length")){
+      } else if (headerName.equalsIgnoreCase(F("Content-Length"))){
         contentLength = headerValue.toInt();
-      } else if (headerName.equalsIgnoreCase("Host")){
+      } else if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
       }
     }
@@ -193,7 +198,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         if(!isEncoded){
           //plain post json or other data
           RequestArgument& arg = _currentArgs[_currentArgCount++];
-          arg.key = "plain";
+          arg.key = F("plain");
           arg.value = String(plainBuf);
         }
 
@@ -389,7 +394,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
 
       line = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (line.length() > 19 && line.substring(0, 19).equalsIgnoreCase("Content-Disposition")){
+      if (line.length() > 19 && line.substring(0, 19).equalsIgnoreCase(F("Content-Disposition"))){
         int nameStart = line.indexOf('=');
         if (nameStart != -1){
           argName = line.substring(nameStart+2);
@@ -405,16 +410,18 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             DEBUG_OUTPUT.println(argFilename);
 #endif
             //use GET to set the filename if uploading using blob
-            if (argFilename == "blob" && hasArg("filename")) argFilename = arg("filename");
+            if (argFilename == F("blob") && hasArg(FPSTR(filename))) 
+              argFilename = arg(FPSTR(filename));
           }
 #ifdef DEBUG_ESP_HTTP_SERVER
           DEBUG_OUTPUT.print("PostArg Name: ");
           DEBUG_OUTPUT.println(argName);
 #endif
-          argType = "text/plain";
+          using namespace mime;
+          argType = FPSTR(mimeTable[txt].mimeType);
           line = client.readStringUntil('\r');
           client.readStringUntil('\n');
-          if (line.length() > 12 && line.substring(0, 12).equalsIgnoreCase("Content-Type")){
+          if (line.length() > 12 && line.substring(0, 12).equalsIgnoreCase(FPSTR(Content_Type))){
             argType = line.substring(line.indexOf(':')+2);
             //skip next line
             client.readStringUntil('\r');
@@ -559,7 +566,8 @@ readfile:
       arg.value = postArgs[iarg].value;
     }
     _currentArgCount = iarg;
-    if (postArgs) delete[] postArgs;
+    if (postArgs) 
+      delete[] postArgs;
     return true;
   }
 #ifdef DEBUG_ESP_HTTP_SERVER
