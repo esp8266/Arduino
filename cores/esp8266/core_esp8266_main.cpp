@@ -115,9 +115,6 @@ static void loop_wrapper() {
     preloop_update_frequency();
     if(!setup_done) {
         setup();
-#ifdef DEBUG_ESP_PORT
-        DEBUG_ESP_PORT.setDebugOutput(true);
-#endif
         setup_done = true;
     }
     loop();
@@ -150,7 +147,6 @@ void init_done() {
     system_set_os_print(1);
     gdb_init();
     do_global_ctors();
-    printf("\n%08x\n", core_version);
     esp_schedule();
 }
 
