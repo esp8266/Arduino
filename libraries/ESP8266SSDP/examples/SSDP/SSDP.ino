@@ -14,13 +14,13 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  if(WiFi.waitForConnectResult() == WL_CONNECTED){
+  if (WiFi.waitForConnectResult() == WL_CONNECTED) {
 
     Serial.printf("Starting HTTP...\n");
-    HTTP.on("/index.html", HTTP_GET, [](){
+    HTTP.on("/index.html", HTTP_GET, []() {
       HTTP.send(200, "text/plain", "Hello World!");
     });
-    HTTP.on("/description.xml", HTTP_GET, [](){
+    HTTP.on("/description.xml", HTTP_GET, []() {
       SSDP.schema(HTTP.client());
     });
     HTTP.begin();
@@ -41,7 +41,9 @@ void setup() {
     Serial.printf("Ready!\n");
   } else {
     Serial.printf("WiFi Failed\n");
-    while(1) delay(100);
+    while (1) {
+      delay(100);
+    }
   }
 }
 
