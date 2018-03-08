@@ -108,6 +108,7 @@ class EspClass {
 
         const char * getSdkVersion();
         String getCoreVersion();
+        String getFullVersion();
 
         uint8_t getBootVersion();
         uint8_t getBootMode();
