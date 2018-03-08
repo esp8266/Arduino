@@ -3,6 +3,10 @@ language: bash
 os: linux
 dist: trusty
 
+cache:
+  directories:
+    - $HOME/astyle
+
 matrix:
   include:
     - env:
@@ -15,9 +19,23 @@ matrix:
       - BUILD_TYPE=package
     - env:
       - BUILD_TYPE=host_tests
+    - env:
+      - BUILD_TYPE=style_check
 
 install:
-  - pip install --user -r doc/requirements.txt
+  - >
+      [ "$BUILD_TYPE" = "docs" ] && {
+        pip install --user -r doc/requirements.txt;
+      } || true
+  - >
+      [ "$BUILD_TYPE" = "style_check" ] && {
+        [ -f $HOME/astyle/build/gcc/bin/astyle ] || {
+          wget -O astyle_3.1_linux.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz/download;
+          tar -xf astyle_3.1_linux.tar.gz -C $HOME;
+          make -C $HOME/astyle/build/gcc;
+        }
+        make -C $HOME/astyle/build/gcc prefix=$HOME install;
+      } || true
 
 script:
   - $TRAVIS_BUILD_DIR/tests/common.sh

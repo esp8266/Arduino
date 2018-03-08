@@ -1,5 +1,5 @@
 #
-# this file is script-generated and is likely to be overwritten by ./tools/boards.txt.py
+# this file is script-generated and is likely to be overwritten by boards.txt.py
 #
 
 menu.BoardModel=Model
@@ -15,6 +15,7 @@ menu.Debug=Debug port
 menu.DebugLevel=Debug Level
 menu.LwIPVariant=lwIP Variant
 menu.led=Builtin Led
+menu.FlashErase=Erase Flash
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -22,6 +23,7 @@ generic.build.board=ESP8266_GENERIC
 generic.upload.tool=esptool
 generic.upload.maximum_data_size=81920
 generic.upload.wait_for_upload_port=true
+generic.upload.erase_cmd=
 generic.serial.disableDTR=true
 generic.serial.disableRTS=true
 generic.build.mcu=esp8266
@@ -38,6 +40,10 @@ generic.menu.ResetMethod.ck=ck
 generic.menu.ResetMethod.ck.upload.resetmethod=ck
 generic.menu.ResetMethod.nodemcu=nodemcu
 generic.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+generic.menu.ResetMethod.none=none
+generic.menu.ResetMethod.none.upload.resetmethod=none
+generic.menu.ResetMethod.dtrset=dtrset
+generic.menu.ResetMethod.dtrset.upload.resetmethod=dtrset
 generic.menu.CrystalFreq.26=26 MHz
 generic.menu.CrystalFreq.40=40 MHz
 generic.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
@@ -55,170 +61,202 @@ generic.menu.FlashMode.dout=DOUT
 generic.menu.FlashMode.dout.build.flash_mode=dout
 generic.menu.FlashSize.512K0=512K (no SPIFFS)
 generic.menu.FlashSize.512K0.build.flash_size=512K
+generic.menu.FlashSize.512K0.build.flash_size_bytes=0x80000
 generic.menu.FlashSize.512K0.build.flash_ld=eagle.flash.512k0.ld
 generic.menu.FlashSize.512K0.build.spiffs_pagesize=256
 generic.menu.FlashSize.512K0.upload.maximum_size=499696
+generic.menu.FlashSize.512K0.build.rfcal_addr=0x7C000
 generic.menu.FlashSize.512K64=512K (64K SPIFFS)
 generic.menu.FlashSize.512K64.build.flash_size=512K
+generic.menu.FlashSize.512K64.build.flash_size_bytes=0x80000
 generic.menu.FlashSize.512K64.build.flash_ld=eagle.flash.512k64.ld
 generic.menu.FlashSize.512K64.build.spiffs_pagesize=256
 generic.menu.FlashSize.512K64.upload.maximum_size=434160
+generic.menu.FlashSize.512K64.build.rfcal_addr=0x7C000
 generic.menu.FlashSize.512K64.build.spiffs_start=0x6B000
 generic.menu.FlashSize.512K64.build.spiffs_end=0x7B000
 generic.menu.FlashSize.512K64.build.spiffs_blocksize=4096
 generic.menu.FlashSize.512K128=512K (128K SPIFFS)
 generic.menu.FlashSize.512K128.build.flash_size=512K
+generic.menu.FlashSize.512K128.build.flash_size_bytes=0x80000
 generic.menu.FlashSize.512K128.build.flash_ld=eagle.flash.512k128.ld
 generic.menu.FlashSize.512K128.build.spiffs_pagesize=256
 generic.menu.FlashSize.512K128.upload.maximum_size=368624
+generic.menu.FlashSize.512K128.build.rfcal_addr=0x7C000
 generic.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 generic.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 generic.menu.FlashSize.512K128.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M0=1M (no SPIFFS)
 generic.menu.FlashSize.1M0.build.flash_size=1M
+generic.menu.FlashSize.1M0.build.flash_size_bytes=0x100000
 generic.menu.FlashSize.1M0.build.flash_ld=eagle.flash.1m0.ld
 generic.menu.FlashSize.1M0.build.spiffs_pagesize=256
 generic.menu.FlashSize.1M0.upload.maximum_size=1023984
+generic.menu.FlashSize.1M0.build.rfcal_addr=0xFC000
 generic.menu.FlashSize.1M64=1M (64K SPIFFS)
 generic.menu.FlashSize.1M64.build.flash_size=1M
+generic.menu.FlashSize.1M64.build.flash_size_bytes=0x100000
 generic.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
 generic.menu.FlashSize.1M64.build.spiffs_pagesize=256
 generic.menu.FlashSize.1M64.upload.maximum_size=958448
+generic.menu.FlashSize.1M64.build.rfcal_addr=0xFC000
 generic.menu.FlashSize.1M64.build.spiffs_start=0xEB000
 generic.menu.FlashSize.1M64.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M64.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M128=1M (128K SPIFFS)
 generic.menu.FlashSize.1M128.build.flash_size=1M
+generic.menu.FlashSize.1M128.build.flash_size_bytes=0x100000
 generic.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
 generic.menu.FlashSize.1M128.build.spiffs_pagesize=256
 generic.menu.FlashSize.1M128.upload.maximum_size=892912
+generic.menu.FlashSize.1M128.build.rfcal_addr=0xFC000
 generic.menu.FlashSize.1M128.build.spiffs_start=0xDB000
 generic.menu.FlashSize.1M128.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M128.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M144=1M (144K SPIFFS)
 generic.menu.FlashSize.1M144.build.flash_size=1M
+generic.menu.FlashSize.1M144.build.flash_size_bytes=0x100000
 generic.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
 generic.menu.FlashSize.1M144.build.spiffs_pagesize=256
 generic.menu.FlashSize.1M144.upload.maximum_size=876528
+generic.menu.FlashSize.1M144.build.rfcal_addr=0xFC000
 generic.menu.FlashSize.1M144.build.spiffs_start=0xD7000
 generic.menu.FlashSize.1M144.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M144.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M160=1M (160K SPIFFS)
 generic.menu.FlashSize.1M160.build.flash_size=1M
+generic.menu.FlashSize.1M160.build.flash_size_bytes=0x100000
 generic.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
 generic.menu.FlashSize.1M160.build.spiffs_pagesize=256
 generic.menu.FlashSize.1M160.upload.maximum_size=860144
+generic.menu.FlashSize.1M160.build.rfcal_addr=0xFC000
 generic.menu.FlashSize.1M160.build.spiffs_start=0xD3000
 generic.menu.FlashSize.1M160.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M160.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M192=1M (192K SPIFFS)
 generic.menu.FlashSize.1M192.build.flash_size=1M
+generic.menu.FlashSize.1M192.build.flash_size_bytes=0x100000
 generic.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
 generic.menu.FlashSize.1M192.build.spiffs_pagesize=256
 generic.menu.FlashSize.1M192.upload.maximum_size=827376
+generic.menu.FlashSize.1M192.build.rfcal_addr=0xFC000
 generic.menu.FlashSize.1M192.build.spiffs_start=0xCB000
 generic.menu.FlashSize.1M192.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M192.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M256=1M (256K SPIFFS)
 generic.menu.FlashSize.1M256.build.flash_size=1M
+generic.menu.FlashSize.1M256.build.flash_size_bytes=0x100000
 generic.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
 generic.menu.FlashSize.1M256.build.spiffs_pagesize=256
 generic.menu.FlashSize.1M256.upload.maximum_size=761840
+generic.menu.FlashSize.1M256.build.rfcal_addr=0xFC000
 generic.menu.FlashSize.1M256.build.spiffs_start=0xBB000
 generic.menu.FlashSize.1M256.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M256.build.spiffs_blocksize=4096
 generic.menu.FlashSize.1M512=1M (512K SPIFFS)
 generic.menu.FlashSize.1M512.build.flash_size=1M
+generic.menu.FlashSize.1M512.build.flash_size_bytes=0x100000
 generic.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
 generic.menu.FlashSize.1M512.build.spiffs_pagesize=256
 generic.menu.FlashSize.1M512.upload.maximum_size=499696
+generic.menu.FlashSize.1M512.build.rfcal_addr=0xFC000
 generic.menu.FlashSize.1M512.build.spiffs_start=0x7B000
 generic.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 generic.menu.FlashSize.1M512.build.spiffs_blocksize=8192
 generic.menu.FlashSize.2M=2M (1M SPIFFS)
 generic.menu.FlashSize.2M.build.flash_size=2M
+generic.menu.FlashSize.2M.build.flash_size_bytes=0x200000
 generic.menu.FlashSize.2M.build.flash_ld=eagle.flash.2m.ld
 generic.menu.FlashSize.2M.build.spiffs_pagesize=256
 generic.menu.FlashSize.2M.upload.maximum_size=1044464
+generic.menu.FlashSize.2M.build.rfcal_addr=0x1FC000
 generic.menu.FlashSize.2M.build.spiffs_start=0x100000
 generic.menu.FlashSize.2M.build.spiffs_end=0x1FB000
 generic.menu.FlashSize.2M.build.spiffs_blocksize=8192
 generic.menu.FlashSize.4M1M=4M (1M SPIFFS)
 generic.menu.FlashSize.4M1M.build.flash_size=4M
+generic.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 generic.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 generic.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 generic.menu.FlashSize.4M1M.upload.maximum_size=1044464
+generic.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 generic.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 generic.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 generic.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 generic.menu.FlashSize.4M3M=4M (3M SPIFFS)
 generic.menu.FlashSize.4M3M.build.flash_size=4M
+generic.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 generic.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 generic.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 generic.menu.FlashSize.4M3M.upload.maximum_size=1044464
+generic.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 generic.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 generic.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 generic.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
 generic.menu.FlashSize.8M7M=8M (7M SPIFFS)
 generic.menu.FlashSize.8M7M.build.flash_size=8M
+generic.menu.FlashSize.8M7M.build.flash_size_bytes=0x800000
 generic.menu.FlashSize.8M7M.build.flash_ld=eagle.flash.8m.ld
 generic.menu.FlashSize.8M7M.build.spiffs_pagesize=256
 generic.menu.FlashSize.8M7M.upload.maximum_size=1044464
+generic.menu.FlashSize.8M7M.build.rfcal_addr=0x7FC000
 generic.menu.FlashSize.8M7M.build.spiffs_start=0x100000
 generic.menu.FlashSize.8M7M.build.spiffs_end=0x7FB000
 generic.menu.FlashSize.8M7M.build.spiffs_blocksize=8192
 generic.menu.FlashSize.16M15M=16M (15M SPIFFS)
 generic.menu.FlashSize.16M15M.build.flash_size=16M
+generic.menu.FlashSize.16M15M.build.flash_size_bytes=0x1000000
 generic.menu.FlashSize.16M15M.build.flash_ld=eagle.flash.16m.ld
 generic.menu.FlashSize.16M15M.build.spiffs_pagesize=256
 generic.menu.FlashSize.16M15M.upload.maximum_size=1044464
+generic.menu.FlashSize.16M15M.build.rfcal_addr=0xFFC000
 generic.menu.FlashSize.16M15M.build.spiffs_start=0x100000
 generic.menu.FlashSize.16M15M.build.spiffs_end=0xFFB000
 generic.menu.FlashSize.16M15M.build.spiffs_blocksize=8192
 generic.menu.led.2=2
-generic.menu.led.2.build.led=-DUSERLED=2
+generic.menu.led.2.build.led=-DLED_BUILTIN=2
 generic.menu.led.0=0
-generic.menu.led.0.build.led=-DUSERLED=0
+generic.menu.led.0.build.led=-DLED_BUILTIN=0
 generic.menu.led.1=1
-generic.menu.led.1.build.led=-DUSERLED=1
+generic.menu.led.1.build.led=-DLED_BUILTIN=1
 generic.menu.led.3=3
-generic.menu.led.3.build.led=-DUSERLED=3
+generic.menu.led.3.build.led=-DLED_BUILTIN=3
 generic.menu.led.4=4
-generic.menu.led.4.build.led=-DUSERLED=4
+generic.menu.led.4.build.led=-DLED_BUILTIN=4
 generic.menu.led.5=5
-generic.menu.led.5.build.led=-DUSERLED=5
+generic.menu.led.5.build.led=-DLED_BUILTIN=5
 generic.menu.led.6=6
-generic.menu.led.6.build.led=-DUSERLED=6
+generic.menu.led.6.build.led=-DLED_BUILTIN=6
 generic.menu.led.7=7
-generic.menu.led.7.build.led=-DUSERLED=7
+generic.menu.led.7.build.led=-DLED_BUILTIN=7
 generic.menu.led.8=8
-generic.menu.led.8.build.led=-DUSERLED=8
+generic.menu.led.8.build.led=-DLED_BUILTIN=8
 generic.menu.led.9=9
-generic.menu.led.9.build.led=-DUSERLED=9
+generic.menu.led.9.build.led=-DLED_BUILTIN=9
 generic.menu.led.10=10
-generic.menu.led.10.build.led=-DUSERLED=10
+generic.menu.led.10.build.led=-DLED_BUILTIN=10
 generic.menu.led.11=11
-generic.menu.led.11.build.led=-DUSERLED=11
+generic.menu.led.11.build.led=-DLED_BUILTIN=11
 generic.menu.led.12=12
-generic.menu.led.12.build.led=-DUSERLED=12
+generic.menu.led.12.build.led=-DLED_BUILTIN=12
 generic.menu.led.13=13
-generic.menu.led.13.build.led=-DUSERLED=13
+generic.menu.led.13.build.led=-DLED_BUILTIN=13
 generic.menu.led.14=14
-generic.menu.led.14.build.led=-DUSERLED=14
+generic.menu.led.14.build.led=-DLED_BUILTIN=14
 generic.menu.led.15=15
-generic.menu.led.15.build.led=-DUSERLED=15
-generic.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+generic.menu.led.15.build.led=-DLED_BUILTIN=15
+generic.menu.LwIPVariant.v2mss536=v2 Lower Memory
 generic.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 generic.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 generic.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-generic.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+generic.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 generic.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 generic.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 generic.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-generic.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+generic.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 generic.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 generic.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-generic.menu.LwIPVariant.OpenSource=v1.4 Open Source
+generic.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 generic.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 generic.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 generic.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -278,6 +316,12 @@ generic.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDAT
 generic.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 generic.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 generic.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+generic.menu.FlashErase.none=Only Sketch
+generic.menu.FlashErase.none.upload.erase_cmd=
+generic.menu.FlashErase.sdk=Sketch + WiFi Settings
+generic.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+generic.menu.FlashErase.all=All Flash Contents
+generic.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 generic.menu.UploadSpeed.115200=115200
 generic.menu.UploadSpeed.115200.upload.speed=115200
 generic.menu.UploadSpeed.9600=9600
@@ -303,6 +347,7 @@ esp8285.build.board=ESP8266_ESP01
 esp8285.upload.tool=esptool
 esp8285.upload.maximum_data_size=81920
 esp8285.upload.wait_for_upload_port=true
+esp8285.upload.erase_cmd=
 esp8285.serial.disableDTR=true
 esp8285.serial.disableRTS=true
 esp8285.build.mcu=esp8266
@@ -319,6 +364,10 @@ esp8285.menu.ResetMethod.ck=ck
 esp8285.menu.ResetMethod.ck.upload.resetmethod=ck
 esp8285.menu.ResetMethod.nodemcu=nodemcu
 esp8285.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
+esp8285.menu.ResetMethod.none=none
+esp8285.menu.ResetMethod.none.upload.resetmethod=none
+esp8285.menu.ResetMethod.dtrset=dtrset
+esp8285.menu.ResetMethod.dtrset.upload.resetmethod=dtrset
 esp8285.menu.CrystalFreq.26=26 MHz
 esp8285.menu.CrystalFreq.40=40 MHz
 esp8285.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
@@ -326,109 +375,125 @@ esp8285.build.flash_mode=dout
 esp8285.build.flash_freq=40
 esp8285.menu.FlashSize.1M0=1M (no SPIFFS)
 esp8285.menu.FlashSize.1M0.build.flash_size=1M
+esp8285.menu.FlashSize.1M0.build.flash_size_bytes=0x100000
 esp8285.menu.FlashSize.1M0.build.flash_ld=eagle.flash.1m0.ld
 esp8285.menu.FlashSize.1M0.build.spiffs_pagesize=256
 esp8285.menu.FlashSize.1M0.upload.maximum_size=1023984
+esp8285.menu.FlashSize.1M0.build.rfcal_addr=0xFC000
 esp8285.menu.FlashSize.1M64=1M (64K SPIFFS)
 esp8285.menu.FlashSize.1M64.build.flash_size=1M
+esp8285.menu.FlashSize.1M64.build.flash_size_bytes=0x100000
 esp8285.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
 esp8285.menu.FlashSize.1M64.build.spiffs_pagesize=256
 esp8285.menu.FlashSize.1M64.upload.maximum_size=958448
+esp8285.menu.FlashSize.1M64.build.rfcal_addr=0xFC000
 esp8285.menu.FlashSize.1M64.build.spiffs_start=0xEB000
 esp8285.menu.FlashSize.1M64.build.spiffs_end=0xFB000
 esp8285.menu.FlashSize.1M64.build.spiffs_blocksize=4096
 esp8285.menu.FlashSize.1M128=1M (128K SPIFFS)
 esp8285.menu.FlashSize.1M128.build.flash_size=1M
+esp8285.menu.FlashSize.1M128.build.flash_size_bytes=0x100000
 esp8285.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
 esp8285.menu.FlashSize.1M128.build.spiffs_pagesize=256
 esp8285.menu.FlashSize.1M128.upload.maximum_size=892912
+esp8285.menu.FlashSize.1M128.build.rfcal_addr=0xFC000
 esp8285.menu.FlashSize.1M128.build.spiffs_start=0xDB000
 esp8285.menu.FlashSize.1M128.build.spiffs_end=0xFB000
 esp8285.menu.FlashSize.1M128.build.spiffs_blocksize=4096
 esp8285.menu.FlashSize.1M144=1M (144K SPIFFS)
 esp8285.menu.FlashSize.1M144.build.flash_size=1M
+esp8285.menu.FlashSize.1M144.build.flash_size_bytes=0x100000
 esp8285.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
 esp8285.menu.FlashSize.1M144.build.spiffs_pagesize=256
 esp8285.menu.FlashSize.1M144.upload.maximum_size=876528
+esp8285.menu.FlashSize.1M144.build.rfcal_addr=0xFC000
 esp8285.menu.FlashSize.1M144.build.spiffs_start=0xD7000
 esp8285.menu.FlashSize.1M144.build.spiffs_end=0xFB000
 esp8285.menu.FlashSize.1M144.build.spiffs_blocksize=4096
 esp8285.menu.FlashSize.1M160=1M (160K SPIFFS)
 esp8285.menu.FlashSize.1M160.build.flash_size=1M
+esp8285.menu.FlashSize.1M160.build.flash_size_bytes=0x100000
 esp8285.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
 esp8285.menu.FlashSize.1M160.build.spiffs_pagesize=256
 esp8285.menu.FlashSize.1M160.upload.maximum_size=860144
+esp8285.menu.FlashSize.1M160.build.rfcal_addr=0xFC000
 esp8285.menu.FlashSize.1M160.build.spiffs_start=0xD3000
 esp8285.menu.FlashSize.1M160.build.spiffs_end=0xFB000
 esp8285.menu.FlashSize.1M160.build.spiffs_blocksize=4096
 esp8285.menu.FlashSize.1M192=1M (192K SPIFFS)
 esp8285.menu.FlashSize.1M192.build.flash_size=1M
+esp8285.menu.FlashSize.1M192.build.flash_size_bytes=0x100000
 esp8285.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
 esp8285.menu.FlashSize.1M192.build.spiffs_pagesize=256
 esp8285.menu.FlashSize.1M192.upload.maximum_size=827376
+esp8285.menu.FlashSize.1M192.build.rfcal_addr=0xFC000
 esp8285.menu.FlashSize.1M192.build.spiffs_start=0xCB000
 esp8285.menu.FlashSize.1M192.build.spiffs_end=0xFB000
 esp8285.menu.FlashSize.1M192.build.spiffs_blocksize=4096
 esp8285.menu.FlashSize.1M256=1M (256K SPIFFS)
 esp8285.menu.FlashSize.1M256.build.flash_size=1M
+esp8285.menu.FlashSize.1M256.build.flash_size_bytes=0x100000
 esp8285.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
 esp8285.menu.FlashSize.1M256.build.spiffs_pagesize=256
 esp8285.menu.FlashSize.1M256.upload.maximum_size=761840
+esp8285.menu.FlashSize.1M256.build.rfcal_addr=0xFC000
 esp8285.menu.FlashSize.1M256.build.spiffs_start=0xBB000
 esp8285.menu.FlashSize.1M256.build.spiffs_end=0xFB000
 esp8285.menu.FlashSize.1M256.build.spiffs_blocksize=4096
 esp8285.menu.FlashSize.1M512=1M (512K SPIFFS)
 esp8285.menu.FlashSize.1M512.build.flash_size=1M
+esp8285.menu.FlashSize.1M512.build.flash_size_bytes=0x100000
 esp8285.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
 esp8285.menu.FlashSize.1M512.build.spiffs_pagesize=256
 esp8285.menu.FlashSize.1M512.upload.maximum_size=499696
+esp8285.menu.FlashSize.1M512.build.rfcal_addr=0xFC000
 esp8285.menu.FlashSize.1M512.build.spiffs_start=0x7B000
 esp8285.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 esp8285.menu.FlashSize.1M512.build.spiffs_blocksize=8192
 esp8285.menu.led.2=2
-esp8285.menu.led.2.build.led=-DUSERLED=2
+esp8285.menu.led.2.build.led=-DLED_BUILTIN=2
 esp8285.menu.led.0=0
-esp8285.menu.led.0.build.led=-DUSERLED=0
+esp8285.menu.led.0.build.led=-DLED_BUILTIN=0
 esp8285.menu.led.1=1
-esp8285.menu.led.1.build.led=-DUSERLED=1
+esp8285.menu.led.1.build.led=-DLED_BUILTIN=1
 esp8285.menu.led.3=3
-esp8285.menu.led.3.build.led=-DUSERLED=3
+esp8285.menu.led.3.build.led=-DLED_BUILTIN=3
 esp8285.menu.led.4=4
-esp8285.menu.led.4.build.led=-DUSERLED=4
+esp8285.menu.led.4.build.led=-DLED_BUILTIN=4
 esp8285.menu.led.5=5
-esp8285.menu.led.5.build.led=-DUSERLED=5
+esp8285.menu.led.5.build.led=-DLED_BUILTIN=5
 esp8285.menu.led.6=6
-esp8285.menu.led.6.build.led=-DUSERLED=6
+esp8285.menu.led.6.build.led=-DLED_BUILTIN=6
 esp8285.menu.led.7=7
-esp8285.menu.led.7.build.led=-DUSERLED=7
+esp8285.menu.led.7.build.led=-DLED_BUILTIN=7
 esp8285.menu.led.8=8
-esp8285.menu.led.8.build.led=-DUSERLED=8
+esp8285.menu.led.8.build.led=-DLED_BUILTIN=8
 esp8285.menu.led.9=9
-esp8285.menu.led.9.build.led=-DUSERLED=9
+esp8285.menu.led.9.build.led=-DLED_BUILTIN=9
 esp8285.menu.led.10=10
-esp8285.menu.led.10.build.led=-DUSERLED=10
+esp8285.menu.led.10.build.led=-DLED_BUILTIN=10
 esp8285.menu.led.11=11
-esp8285.menu.led.11.build.led=-DUSERLED=11
+esp8285.menu.led.11.build.led=-DLED_BUILTIN=11
 esp8285.menu.led.12=12
-esp8285.menu.led.12.build.led=-DUSERLED=12
+esp8285.menu.led.12.build.led=-DLED_BUILTIN=12
 esp8285.menu.led.13=13
-esp8285.menu.led.13.build.led=-DUSERLED=13
+esp8285.menu.led.13.build.led=-DLED_BUILTIN=13
 esp8285.menu.led.14=14
-esp8285.menu.led.14.build.led=-DUSERLED=14
+esp8285.menu.led.14.build.led=-DLED_BUILTIN=14
 esp8285.menu.led.15=15
-esp8285.menu.led.15.build.led=-DUSERLED=15
-esp8285.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+esp8285.menu.led.15.build.led=-DLED_BUILTIN=15
+esp8285.menu.LwIPVariant.v2mss536=v2 Lower Memory
 esp8285.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 esp8285.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 esp8285.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-esp8285.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+esp8285.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 esp8285.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 esp8285.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 esp8285.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-esp8285.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+esp8285.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 esp8285.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 esp8285.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-esp8285.menu.LwIPVariant.OpenSource=v1.4 Open Source
+esp8285.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 esp8285.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 esp8285.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 esp8285.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -488,6 +553,12 @@ esp8285.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDAT
 esp8285.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 esp8285.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 esp8285.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+esp8285.menu.FlashErase.none=Only Sketch
+esp8285.menu.FlashErase.none.upload.erase_cmd=
+esp8285.menu.FlashErase.sdk=Sketch + WiFi Settings
+esp8285.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+esp8285.menu.FlashErase.all=All Flash Contents
+esp8285.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 esp8285.menu.UploadSpeed.115200=115200
 esp8285.menu.UploadSpeed.115200.upload.speed=115200
 esp8285.menu.UploadSpeed.9600=9600
@@ -523,6 +594,7 @@ espduino.menu.UploadTool.espota.upload.tool=espota
 espduino.upload.tool=esptool
 espduino.upload.maximum_data_size=81920
 espduino.upload.wait_for_upload_port=true
+espduino.upload.erase_cmd=
 espduino.serial.disableDTR=true
 espduino.serial.disableRTS=true
 espduino.build.mcu=esp8266
@@ -538,32 +610,36 @@ espduino.build.flash_mode=dio
 espduino.build.flash_freq=40
 espduino.menu.FlashSize.4M1M=4M (1M SPIFFS)
 espduino.menu.FlashSize.4M1M.build.flash_size=4M
+espduino.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 espduino.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 espduino.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 espduino.menu.FlashSize.4M1M.upload.maximum_size=1044464
+espduino.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 espduino.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 espduino.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 espduino.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 espduino.menu.FlashSize.4M3M=4M (3M SPIFFS)
 espduino.menu.FlashSize.4M3M.build.flash_size=4M
+espduino.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 espduino.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 espduino.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 espduino.menu.FlashSize.4M3M.upload.maximum_size=1044464
+espduino.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 espduino.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espduino.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espduino.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-espduino.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espduino.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espduino.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espduino.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espduino.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espduino.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espduino.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espduino.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espduino.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espduino.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espduino.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espduino.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espduino.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espduino.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espduino.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espduino.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espduino.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espduino.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espduino.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -623,6 +699,12 @@ espduino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDA
 espduino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espduino.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espduino.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+espduino.menu.FlashErase.none=Only Sketch
+espduino.menu.FlashErase.none.upload.erase_cmd=
+espduino.menu.FlashErase.sdk=Sketch + WiFi Settings
+espduino.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espduino.menu.FlashErase.all=All Flash Contents
+espduino.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 espduino.menu.UploadSpeed.115200=115200
 espduino.menu.UploadSpeed.115200.upload.speed=115200
 espduino.menu.UploadSpeed.9600=9600
@@ -649,6 +731,7 @@ huzzah.build.variant=adafruit
 huzzah.upload.tool=esptool
 huzzah.upload.maximum_data_size=81920
 huzzah.upload.wait_for_upload_port=true
+huzzah.upload.erase_cmd=
 huzzah.serial.disableDTR=true
 huzzah.serial.disableRTS=true
 huzzah.build.mcu=esp8266
@@ -665,32 +748,36 @@ huzzah.build.flash_mode=qio
 huzzah.build.flash_freq=40
 huzzah.menu.FlashSize.4M1M=4M (1M SPIFFS)
 huzzah.menu.FlashSize.4M1M.build.flash_size=4M
+huzzah.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 huzzah.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 huzzah.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 huzzah.menu.FlashSize.4M1M.upload.maximum_size=1044464
+huzzah.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 huzzah.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 huzzah.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 huzzah.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 huzzah.menu.FlashSize.4M3M=4M (3M SPIFFS)
 huzzah.menu.FlashSize.4M3M.build.flash_size=4M
+huzzah.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 huzzah.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 huzzah.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 huzzah.menu.FlashSize.4M3M.upload.maximum_size=1044464
+huzzah.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 huzzah.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 huzzah.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 huzzah.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-huzzah.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+huzzah.menu.LwIPVariant.v2mss536=v2 Lower Memory
 huzzah.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 huzzah.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 huzzah.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-huzzah.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+huzzah.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 huzzah.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 huzzah.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 huzzah.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-huzzah.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+huzzah.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 huzzah.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 huzzah.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-huzzah.menu.LwIPVariant.OpenSource=v1.4 Open Source
+huzzah.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 huzzah.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 huzzah.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 huzzah.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -750,6 +837,12 @@ huzzah.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATE
 huzzah.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 huzzah.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 huzzah.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+huzzah.menu.FlashErase.none=Only Sketch
+huzzah.menu.FlashErase.none.upload.erase_cmd=
+huzzah.menu.FlashErase.sdk=Sketch + WiFi Settings
+huzzah.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+huzzah.menu.FlashErase.all=All Flash Contents
+huzzah.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 huzzah.menu.UploadSpeed.115200=115200
 huzzah.menu.UploadSpeed.115200.upload.speed=115200
 huzzah.menu.UploadSpeed.9600=9600
@@ -776,6 +869,7 @@ espresso_lite_v1.build.variant=espresso_lite_v1
 espresso_lite_v1.upload.tool=esptool
 espresso_lite_v1.upload.maximum_data_size=81920
 espresso_lite_v1.upload.wait_for_upload_port=true
+espresso_lite_v1.upload.erase_cmd=
 espresso_lite_v1.serial.disableDTR=true
 espresso_lite_v1.serial.disableRTS=true
 espresso_lite_v1.build.mcu=esp8266
@@ -791,17 +885,21 @@ espresso_lite_v1.build.flash_mode=dio
 espresso_lite_v1.build.flash_freq=40
 espresso_lite_v1.menu.FlashSize.4M1M=4M (1M SPIFFS)
 espresso_lite_v1.menu.FlashSize.4M1M.build.flash_size=4M
+espresso_lite_v1.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 espresso_lite_v1.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 espresso_lite_v1.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 espresso_lite_v1.menu.FlashSize.4M1M.upload.maximum_size=1044464
+espresso_lite_v1.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 espresso_lite_v1.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 espresso_lite_v1.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 espresso_lite_v1.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 espresso_lite_v1.menu.FlashSize.4M3M=4M (3M SPIFFS)
 espresso_lite_v1.menu.FlashSize.4M3M.build.flash_size=4M
+espresso_lite_v1.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 espresso_lite_v1.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 espresso_lite_v1.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 espresso_lite_v1.menu.FlashSize.4M3M.upload.maximum_size=1044464
+espresso_lite_v1.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 espresso_lite_v1.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espresso_lite_v1.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espresso_lite_v1.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
@@ -809,18 +907,18 @@ espresso_lite_v1.menu.ResetMethod.ck=ck
 espresso_lite_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v1.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espresso_lite_v1.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espresso_lite_v1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espresso_lite_v1.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espresso_lite_v1.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espresso_lite_v1.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espresso_lite_v1.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espresso_lite_v1.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espresso_lite_v1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espresso_lite_v1.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espresso_lite_v1.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espresso_lite_v1.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v1.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espresso_lite_v1.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espresso_lite_v1.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espresso_lite_v1.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espresso_lite_v1.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -880,6 +978,12 @@ espresso_lite_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UP
 espresso_lite_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espresso_lite_v1.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espresso_lite_v1.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+espresso_lite_v1.menu.FlashErase.none=Only Sketch
+espresso_lite_v1.menu.FlashErase.none.upload.erase_cmd=
+espresso_lite_v1.menu.FlashErase.sdk=Sketch + WiFi Settings
+espresso_lite_v1.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espresso_lite_v1.menu.FlashErase.all=All Flash Contents
+espresso_lite_v1.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 espresso_lite_v1.menu.UploadSpeed.115200=115200
 espresso_lite_v1.menu.UploadSpeed.115200.upload.speed=115200
 espresso_lite_v1.menu.UploadSpeed.9600=9600
@@ -906,6 +1010,7 @@ espresso_lite_v2.build.variant=espresso_lite_v2
 espresso_lite_v2.upload.tool=esptool
 espresso_lite_v2.upload.maximum_data_size=81920
 espresso_lite_v2.upload.wait_for_upload_port=true
+espresso_lite_v2.upload.erase_cmd=
 espresso_lite_v2.serial.disableDTR=true
 espresso_lite_v2.serial.disableRTS=true
 espresso_lite_v2.build.mcu=esp8266
@@ -921,17 +1026,21 @@ espresso_lite_v2.build.flash_mode=dio
 espresso_lite_v2.build.flash_freq=40
 espresso_lite_v2.menu.FlashSize.4M1M=4M (1M SPIFFS)
 espresso_lite_v2.menu.FlashSize.4M1M.build.flash_size=4M
+espresso_lite_v2.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 espresso_lite_v2.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 espresso_lite_v2.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 espresso_lite_v2.menu.FlashSize.4M1M.upload.maximum_size=1044464
+espresso_lite_v2.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 espresso_lite_v2.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 espresso_lite_v2.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 espresso_lite_v2.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 espresso_lite_v2.menu.FlashSize.4M3M=4M (3M SPIFFS)
 espresso_lite_v2.menu.FlashSize.4M3M.build.flash_size=4M
+espresso_lite_v2.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 espresso_lite_v2.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 espresso_lite_v2.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 espresso_lite_v2.menu.FlashSize.4M3M.upload.maximum_size=1044464
+espresso_lite_v2.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 espresso_lite_v2.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espresso_lite_v2.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espresso_lite_v2.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
@@ -939,18 +1048,18 @@ espresso_lite_v2.menu.ResetMethod.ck=ck
 espresso_lite_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v2.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espresso_lite_v2.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espresso_lite_v2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espresso_lite_v2.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espresso_lite_v2.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espresso_lite_v2.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espresso_lite_v2.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espresso_lite_v2.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espresso_lite_v2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espresso_lite_v2.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espresso_lite_v2.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espresso_lite_v2.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espresso_lite_v2.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espresso_lite_v2.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espresso_lite_v2.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espresso_lite_v2.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espresso_lite_v2.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1010,6 +1119,12 @@ espresso_lite_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UP
 espresso_lite_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espresso_lite_v2.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espresso_lite_v2.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+espresso_lite_v2.menu.FlashErase.none=Only Sketch
+espresso_lite_v2.menu.FlashErase.none.upload.erase_cmd=
+espresso_lite_v2.menu.FlashErase.sdk=Sketch + WiFi Settings
+espresso_lite_v2.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espresso_lite_v2.menu.FlashErase.all=All Flash Contents
+espresso_lite_v2.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 espresso_lite_v2.menu.UploadSpeed.115200=115200
 espresso_lite_v2.menu.UploadSpeed.115200.upload.speed=115200
 espresso_lite_v2.menu.UploadSpeed.9600=9600
@@ -1036,6 +1151,7 @@ phoenix_v1.build.variant=phoenix_v1
 phoenix_v1.upload.tool=esptool
 phoenix_v1.upload.maximum_data_size=81920
 phoenix_v1.upload.wait_for_upload_port=true
+phoenix_v1.upload.erase_cmd=
 phoenix_v1.serial.disableDTR=true
 phoenix_v1.serial.disableRTS=true
 phoenix_v1.build.mcu=esp8266
@@ -1051,17 +1167,21 @@ phoenix_v1.build.flash_mode=dio
 phoenix_v1.build.flash_freq=40
 phoenix_v1.menu.FlashSize.4M1M=4M (1M SPIFFS)
 phoenix_v1.menu.FlashSize.4M1M.build.flash_size=4M
+phoenix_v1.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 phoenix_v1.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 phoenix_v1.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 phoenix_v1.menu.FlashSize.4M1M.upload.maximum_size=1044464
+phoenix_v1.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 phoenix_v1.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 phoenix_v1.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 phoenix_v1.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 phoenix_v1.menu.FlashSize.4M3M=4M (3M SPIFFS)
 phoenix_v1.menu.FlashSize.4M3M.build.flash_size=4M
+phoenix_v1.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 phoenix_v1.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 phoenix_v1.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 phoenix_v1.menu.FlashSize.4M3M.upload.maximum_size=1044464
+phoenix_v1.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 phoenix_v1.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 phoenix_v1.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 phoenix_v1.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
@@ -1069,18 +1189,18 @@ phoenix_v1.menu.ResetMethod.ck=ck
 phoenix_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v1.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+phoenix_v1.menu.LwIPVariant.v2mss536=v2 Lower Memory
 phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 phoenix_v1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-phoenix_v1.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+phoenix_v1.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 phoenix_v1.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 phoenix_v1.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 phoenix_v1.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-phoenix_v1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+phoenix_v1.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 phoenix_v1.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 phoenix_v1.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v1.menu.LwIPVariant.OpenSource=v1.4 Open Source
+phoenix_v1.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 phoenix_v1.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 phoenix_v1.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 phoenix_v1.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1140,6 +1260,12 @@ phoenix_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUP
 phoenix_v1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 phoenix_v1.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 phoenix_v1.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+phoenix_v1.menu.FlashErase.none=Only Sketch
+phoenix_v1.menu.FlashErase.none.upload.erase_cmd=
+phoenix_v1.menu.FlashErase.sdk=Sketch + WiFi Settings
+phoenix_v1.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+phoenix_v1.menu.FlashErase.all=All Flash Contents
+phoenix_v1.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 phoenix_v1.menu.UploadSpeed.115200=115200
 phoenix_v1.menu.UploadSpeed.115200.upload.speed=115200
 phoenix_v1.menu.UploadSpeed.9600=9600
@@ -1166,6 +1292,7 @@ phoenix_v2.build.variant=phoenix_v2
 phoenix_v2.upload.tool=esptool
 phoenix_v2.upload.maximum_data_size=81920
 phoenix_v2.upload.wait_for_upload_port=true
+phoenix_v2.upload.erase_cmd=
 phoenix_v2.serial.disableDTR=true
 phoenix_v2.serial.disableRTS=true
 phoenix_v2.build.mcu=esp8266
@@ -1181,17 +1308,21 @@ phoenix_v2.build.flash_mode=dio
 phoenix_v2.build.flash_freq=40
 phoenix_v2.menu.FlashSize.4M1M=4M (1M SPIFFS)
 phoenix_v2.menu.FlashSize.4M1M.build.flash_size=4M
+phoenix_v2.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 phoenix_v2.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 phoenix_v2.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 phoenix_v2.menu.FlashSize.4M1M.upload.maximum_size=1044464
+phoenix_v2.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 phoenix_v2.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 phoenix_v2.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 phoenix_v2.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 phoenix_v2.menu.FlashSize.4M3M=4M (3M SPIFFS)
 phoenix_v2.menu.FlashSize.4M3M.build.flash_size=4M
+phoenix_v2.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 phoenix_v2.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 phoenix_v2.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 phoenix_v2.menu.FlashSize.4M3M.upload.maximum_size=1044464
+phoenix_v2.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 phoenix_v2.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 phoenix_v2.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 phoenix_v2.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
@@ -1199,18 +1330,18 @@ phoenix_v2.menu.ResetMethod.ck=ck
 phoenix_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v2.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+phoenix_v2.menu.LwIPVariant.v2mss536=v2 Lower Memory
 phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 phoenix_v2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-phoenix_v2.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+phoenix_v2.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 phoenix_v2.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 phoenix_v2.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 phoenix_v2.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-phoenix_v2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+phoenix_v2.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 phoenix_v2.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 phoenix_v2.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-phoenix_v2.menu.LwIPVariant.OpenSource=v1.4 Open Source
+phoenix_v2.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 phoenix_v2.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 phoenix_v2.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 phoenix_v2.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1270,6 +1401,12 @@ phoenix_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUP
 phoenix_v2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 phoenix_v2.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 phoenix_v2.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+phoenix_v2.menu.FlashErase.none=Only Sketch
+phoenix_v2.menu.FlashErase.none.upload.erase_cmd=
+phoenix_v2.menu.FlashErase.sdk=Sketch + WiFi Settings
+phoenix_v2.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+phoenix_v2.menu.FlashErase.all=All Flash Contents
+phoenix_v2.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 phoenix_v2.menu.UploadSpeed.115200=115200
 phoenix_v2.menu.UploadSpeed.115200.upload.speed=115200
 phoenix_v2.menu.UploadSpeed.9600=9600
@@ -1296,6 +1433,7 @@ nodemcu.build.variant=nodemcu
 nodemcu.upload.tool=esptool
 nodemcu.upload.maximum_data_size=81920
 nodemcu.upload.wait_for_upload_port=true
+nodemcu.upload.erase_cmd=
 nodemcu.serial.disableDTR=true
 nodemcu.serial.disableRTS=true
 nodemcu.build.mcu=esp8266
@@ -1312,32 +1450,36 @@ nodemcu.build.flash_mode=qio
 nodemcu.build.flash_freq=40
 nodemcu.menu.FlashSize.4M1M=4M (1M SPIFFS)
 nodemcu.menu.FlashSize.4M1M.build.flash_size=4M
+nodemcu.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 nodemcu.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 nodemcu.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 nodemcu.menu.FlashSize.4M1M.upload.maximum_size=1044464
+nodemcu.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 nodemcu.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 nodemcu.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 nodemcu.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 nodemcu.menu.FlashSize.4M3M=4M (3M SPIFFS)
 nodemcu.menu.FlashSize.4M3M.build.flash_size=4M
+nodemcu.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 nodemcu.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 nodemcu.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 nodemcu.menu.FlashSize.4M3M.upload.maximum_size=1044464
+nodemcu.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 nodemcu.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 nodemcu.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 nodemcu.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-nodemcu.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+nodemcu.menu.LwIPVariant.v2mss536=v2 Lower Memory
 nodemcu.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 nodemcu.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 nodemcu.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-nodemcu.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+nodemcu.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 nodemcu.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 nodemcu.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 nodemcu.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-nodemcu.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+nodemcu.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 nodemcu.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 nodemcu.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcu.menu.LwIPVariant.OpenSource=v1.4 Open Source
+nodemcu.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 nodemcu.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 nodemcu.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 nodemcu.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1397,6 +1539,12 @@ nodemcu.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDAT
 nodemcu.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 nodemcu.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 nodemcu.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+nodemcu.menu.FlashErase.none=Only Sketch
+nodemcu.menu.FlashErase.none.upload.erase_cmd=
+nodemcu.menu.FlashErase.sdk=Sketch + WiFi Settings
+nodemcu.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+nodemcu.menu.FlashErase.all=All Flash Contents
+nodemcu.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 nodemcu.menu.UploadSpeed.115200=115200
 nodemcu.menu.UploadSpeed.115200.upload.speed=115200
 nodemcu.menu.UploadSpeed.9600=9600
@@ -1423,6 +1571,7 @@ nodemcuv2.build.variant=nodemcu
 nodemcuv2.upload.tool=esptool
 nodemcuv2.upload.maximum_data_size=81920
 nodemcuv2.upload.wait_for_upload_port=true
+nodemcuv2.upload.erase_cmd=
 nodemcuv2.serial.disableDTR=true
 nodemcuv2.serial.disableRTS=true
 nodemcuv2.build.mcu=esp8266
@@ -1439,32 +1588,36 @@ nodemcuv2.build.flash_mode=dio
 nodemcuv2.build.flash_freq=40
 nodemcuv2.menu.FlashSize.4M1M=4M (1M SPIFFS)
 nodemcuv2.menu.FlashSize.4M1M.build.flash_size=4M
+nodemcuv2.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 nodemcuv2.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 nodemcuv2.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 nodemcuv2.menu.FlashSize.4M1M.upload.maximum_size=1044464
+nodemcuv2.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 nodemcuv2.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 nodemcuv2.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 nodemcuv2.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 nodemcuv2.menu.FlashSize.4M3M=4M (3M SPIFFS)
 nodemcuv2.menu.FlashSize.4M3M.build.flash_size=4M
+nodemcuv2.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 nodemcuv2.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 nodemcuv2.menu.FlashSize.4M3M.upload.maximum_size=1044464
+nodemcuv2.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 nodemcuv2.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-nodemcuv2.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+nodemcuv2.menu.LwIPVariant.v2mss536=v2 Lower Memory
 nodemcuv2.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 nodemcuv2.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 nodemcuv2.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-nodemcuv2.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+nodemcuv2.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 nodemcuv2.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 nodemcuv2.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 nodemcuv2.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-nodemcuv2.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+nodemcuv2.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 nodemcuv2.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 nodemcuv2.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-nodemcuv2.menu.LwIPVariant.OpenSource=v1.4 Open Source
+nodemcuv2.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 nodemcuv2.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 nodemcuv2.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 nodemcuv2.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1524,6 +1677,12 @@ nodemcuv2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPD
 nodemcuv2.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 nodemcuv2.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 nodemcuv2.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+nodemcuv2.menu.FlashErase.none=Only Sketch
+nodemcuv2.menu.FlashErase.none.upload.erase_cmd=
+nodemcuv2.menu.FlashErase.sdk=Sketch + WiFi Settings
+nodemcuv2.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+nodemcuv2.menu.FlashErase.all=All Flash Contents
+nodemcuv2.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 nodemcuv2.menu.UploadSpeed.115200=115200
 nodemcuv2.menu.UploadSpeed.115200.upload.speed=115200
 nodemcuv2.menu.UploadSpeed.9600=9600
@@ -1549,6 +1708,7 @@ modwifi.build.board=MOD_WIFI_ESP8266
 modwifi.upload.tool=esptool
 modwifi.upload.maximum_data_size=81920
 modwifi.upload.wait_for_upload_port=true
+modwifi.upload.erase_cmd=
 modwifi.serial.disableDTR=true
 modwifi.serial.disableRTS=true
 modwifi.build.mcu=esp8266
@@ -1566,24 +1726,26 @@ modwifi.build.flash_mode=qio
 modwifi.build.flash_freq=40
 modwifi.menu.FlashSize.2M=2M (1M SPIFFS)
 modwifi.menu.FlashSize.2M.build.flash_size=2M
+modwifi.menu.FlashSize.2M.build.flash_size_bytes=0x200000
 modwifi.menu.FlashSize.2M.build.flash_ld=eagle.flash.2m.ld
 modwifi.menu.FlashSize.2M.build.spiffs_pagesize=256
 modwifi.menu.FlashSize.2M.upload.maximum_size=1044464
+modwifi.menu.FlashSize.2M.build.rfcal_addr=0x1FC000
 modwifi.menu.FlashSize.2M.build.spiffs_start=0x100000
 modwifi.menu.FlashSize.2M.build.spiffs_end=0x1FB000
 modwifi.menu.FlashSize.2M.build.spiffs_blocksize=8192
-modwifi.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+modwifi.menu.LwIPVariant.v2mss536=v2 Lower Memory
 modwifi.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 modwifi.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 modwifi.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-modwifi.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+modwifi.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 modwifi.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 modwifi.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 modwifi.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-modwifi.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+modwifi.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 modwifi.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 modwifi.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-modwifi.menu.LwIPVariant.OpenSource=v1.4 Open Source
+modwifi.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 modwifi.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 modwifi.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 modwifi.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1643,6 +1805,12 @@ modwifi.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDAT
 modwifi.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 modwifi.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 modwifi.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+modwifi.menu.FlashErase.none=Only Sketch
+modwifi.menu.FlashErase.none.upload.erase_cmd=
+modwifi.menu.FlashErase.sdk=Sketch + WiFi Settings
+modwifi.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+modwifi.menu.FlashErase.all=All Flash Contents
+modwifi.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 modwifi.menu.UploadSpeed.115200=115200
 modwifi.menu.UploadSpeed.115200.upload.speed=115200
 modwifi.menu.UploadSpeed.9600=9600
@@ -1669,6 +1837,7 @@ thing.build.variant=thing
 thing.upload.tool=esptool
 thing.upload.maximum_data_size=81920
 thing.upload.wait_for_upload_port=true
+thing.upload.erase_cmd=
 thing.serial.disableDTR=true
 thing.serial.disableRTS=true
 thing.build.mcu=esp8266
@@ -1685,37 +1854,43 @@ thing.build.flash_mode=qio
 thing.build.flash_freq=40
 thing.menu.FlashSize.512K0=512K (no SPIFFS)
 thing.menu.FlashSize.512K0.build.flash_size=512K
+thing.menu.FlashSize.512K0.build.flash_size_bytes=0x80000
 thing.menu.FlashSize.512K0.build.flash_ld=eagle.flash.512k0.ld
 thing.menu.FlashSize.512K0.build.spiffs_pagesize=256
 thing.menu.FlashSize.512K0.upload.maximum_size=499696
+thing.menu.FlashSize.512K0.build.rfcal_addr=0x7C000
 thing.menu.FlashSize.512K64=512K (64K SPIFFS)
 thing.menu.FlashSize.512K64.build.flash_size=512K
+thing.menu.FlashSize.512K64.build.flash_size_bytes=0x80000
 thing.menu.FlashSize.512K64.build.flash_ld=eagle.flash.512k64.ld
 thing.menu.FlashSize.512K64.build.spiffs_pagesize=256
 thing.menu.FlashSize.512K64.upload.maximum_size=434160
+thing.menu.FlashSize.512K64.build.rfcal_addr=0x7C000
 thing.menu.FlashSize.512K64.build.spiffs_start=0x6B000
 thing.menu.FlashSize.512K64.build.spiffs_end=0x7B000
 thing.menu.FlashSize.512K64.build.spiffs_blocksize=4096
 thing.menu.FlashSize.512K128=512K (128K SPIFFS)
 thing.menu.FlashSize.512K128.build.flash_size=512K
+thing.menu.FlashSize.512K128.build.flash_size_bytes=0x80000
 thing.menu.FlashSize.512K128.build.flash_ld=eagle.flash.512k128.ld
 thing.menu.FlashSize.512K128.build.spiffs_pagesize=256
 thing.menu.FlashSize.512K128.upload.maximum_size=368624
+thing.menu.FlashSize.512K128.build.rfcal_addr=0x7C000
 thing.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 thing.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 thing.menu.FlashSize.512K128.build.spiffs_blocksize=4096
-thing.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+thing.menu.LwIPVariant.v2mss536=v2 Lower Memory
 thing.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 thing.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 thing.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-thing.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+thing.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 thing.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 thing.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 thing.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-thing.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+thing.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 thing.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 thing.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-thing.menu.LwIPVariant.OpenSource=v1.4 Open Source
+thing.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 thing.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 thing.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 thing.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1775,6 +1950,12 @@ thing.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATER
 thing.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 thing.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 thing.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+thing.menu.FlashErase.none=Only Sketch
+thing.menu.FlashErase.none.upload.erase_cmd=
+thing.menu.FlashErase.sdk=Sketch + WiFi Settings
+thing.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+thing.menu.FlashErase.all=All Flash Contents
+thing.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 thing.menu.UploadSpeed.115200=115200
 thing.menu.UploadSpeed.115200.upload.speed=115200
 thing.menu.UploadSpeed.9600=9600
@@ -1801,6 +1982,7 @@ thingdev.build.variant=thing
 thingdev.upload.tool=esptool
 thingdev.upload.maximum_data_size=81920
 thingdev.upload.wait_for_upload_port=true
+thingdev.upload.erase_cmd=
 thingdev.serial.disableDTR=true
 thingdev.serial.disableRTS=true
 thingdev.build.mcu=esp8266
@@ -1817,37 +1999,43 @@ thingdev.build.flash_mode=dio
 thingdev.build.flash_freq=40
 thingdev.menu.FlashSize.512K0=512K (no SPIFFS)
 thingdev.menu.FlashSize.512K0.build.flash_size=512K
+thingdev.menu.FlashSize.512K0.build.flash_size_bytes=0x80000
 thingdev.menu.FlashSize.512K0.build.flash_ld=eagle.flash.512k0.ld
 thingdev.menu.FlashSize.512K0.build.spiffs_pagesize=256
 thingdev.menu.FlashSize.512K0.upload.maximum_size=499696
+thingdev.menu.FlashSize.512K0.build.rfcal_addr=0x7C000
 thingdev.menu.FlashSize.512K64=512K (64K SPIFFS)
 thingdev.menu.FlashSize.512K64.build.flash_size=512K
+thingdev.menu.FlashSize.512K64.build.flash_size_bytes=0x80000
 thingdev.menu.FlashSize.512K64.build.flash_ld=eagle.flash.512k64.ld
 thingdev.menu.FlashSize.512K64.build.spiffs_pagesize=256
 thingdev.menu.FlashSize.512K64.upload.maximum_size=434160
+thingdev.menu.FlashSize.512K64.build.rfcal_addr=0x7C000
 thingdev.menu.FlashSize.512K64.build.spiffs_start=0x6B000
 thingdev.menu.FlashSize.512K64.build.spiffs_end=0x7B000
 thingdev.menu.FlashSize.512K64.build.spiffs_blocksize=4096
 thingdev.menu.FlashSize.512K128=512K (128K SPIFFS)
 thingdev.menu.FlashSize.512K128.build.flash_size=512K
+thingdev.menu.FlashSize.512K128.build.flash_size_bytes=0x80000
 thingdev.menu.FlashSize.512K128.build.flash_ld=eagle.flash.512k128.ld
 thingdev.menu.FlashSize.512K128.build.spiffs_pagesize=256
 thingdev.menu.FlashSize.512K128.upload.maximum_size=368624
+thingdev.menu.FlashSize.512K128.build.rfcal_addr=0x7C000
 thingdev.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 thingdev.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 thingdev.menu.FlashSize.512K128.build.spiffs_blocksize=4096
-thingdev.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+thingdev.menu.LwIPVariant.v2mss536=v2 Lower Memory
 thingdev.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 thingdev.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 thingdev.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-thingdev.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+thingdev.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 thingdev.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 thingdev.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 thingdev.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-thingdev.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+thingdev.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 thingdev.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 thingdev.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-thingdev.menu.LwIPVariant.OpenSource=v1.4 Open Source
+thingdev.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 thingdev.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 thingdev.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 thingdev.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -1907,6 +2095,12 @@ thingdev.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDA
 thingdev.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 thingdev.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 thingdev.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+thingdev.menu.FlashErase.none=Only Sketch
+thingdev.menu.FlashErase.none.upload.erase_cmd=
+thingdev.menu.FlashErase.sdk=Sketch + WiFi Settings
+thingdev.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+thingdev.menu.FlashErase.all=All Flash Contents
+thingdev.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 thingdev.menu.UploadSpeed.115200=115200
 thingdev.menu.UploadSpeed.115200.upload.speed=115200
 thingdev.menu.UploadSpeed.9600=9600
@@ -1932,6 +2126,7 @@ esp210.build.board=ESP8266_ESP210
 esp210.upload.tool=esptool
 esp210.upload.maximum_data_size=81920
 esp210.upload.wait_for_upload_port=true
+esp210.upload.erase_cmd=
 esp210.serial.disableDTR=true
 esp210.serial.disableRTS=true
 esp210.build.mcu=esp8266
@@ -1949,32 +2144,36 @@ esp210.build.flash_mode=qio
 esp210.build.flash_freq=40
 esp210.menu.FlashSize.4M1M=4M (1M SPIFFS)
 esp210.menu.FlashSize.4M1M.build.flash_size=4M
+esp210.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 esp210.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 esp210.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 esp210.menu.FlashSize.4M1M.upload.maximum_size=1044464
+esp210.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 esp210.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 esp210.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 esp210.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 esp210.menu.FlashSize.4M3M=4M (3M SPIFFS)
 esp210.menu.FlashSize.4M3M.build.flash_size=4M
+esp210.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 esp210.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 esp210.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 esp210.menu.FlashSize.4M3M.upload.maximum_size=1044464
+esp210.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 esp210.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 esp210.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 esp210.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-esp210.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+esp210.menu.LwIPVariant.v2mss536=v2 Lower Memory
 esp210.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 esp210.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 esp210.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-esp210.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+esp210.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 esp210.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 esp210.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 esp210.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-esp210.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+esp210.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 esp210.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 esp210.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-esp210.menu.LwIPVariant.OpenSource=v1.4 Open Source
+esp210.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 esp210.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 esp210.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 esp210.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2034,6 +2233,12 @@ esp210.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATE
 esp210.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 esp210.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 esp210.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+esp210.menu.FlashErase.none=Only Sketch
+esp210.menu.FlashErase.none.upload.erase_cmd=
+esp210.menu.FlashErase.sdk=Sketch + WiFi Settings
+esp210.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+esp210.menu.FlashErase.all=All Flash Contents
+esp210.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 esp210.menu.UploadSpeed.57600=57600
 esp210.menu.UploadSpeed.57600.upload.speed=57600
 esp210.menu.UploadSpeed.9600=9600
@@ -2060,6 +2265,7 @@ d1_mini.build.variant=d1_mini
 d1_mini.upload.tool=esptool
 d1_mini.upload.maximum_data_size=81920
 d1_mini.upload.wait_for_upload_port=true
+d1_mini.upload.erase_cmd=
 d1_mini.serial.disableDTR=true
 d1_mini.serial.disableRTS=true
 d1_mini.build.mcu=esp8266
@@ -2076,32 +2282,36 @@ d1_mini.build.flash_mode=dio
 d1_mini.build.flash_freq=40
 d1_mini.menu.FlashSize.4M1M=4M (1M SPIFFS)
 d1_mini.menu.FlashSize.4M1M.build.flash_size=4M
+d1_mini.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 d1_mini.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 d1_mini.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 d1_mini.menu.FlashSize.4M1M.upload.maximum_size=1044464
+d1_mini.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 d1_mini.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 d1_mini.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 d1_mini.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1_mini.menu.FlashSize.4M3M=4M (3M SPIFFS)
 d1_mini.menu.FlashSize.4M3M.build.flash_size=4M
+d1_mini.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 d1_mini.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 d1_mini.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 d1_mini.menu.FlashSize.4M3M.upload.maximum_size=1044464
+d1_mini.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 d1_mini.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 d1_mini.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 d1_mini.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-d1_mini.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1_mini.menu.LwIPVariant.v2mss536=v2 Lower Memory
 d1_mini.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 d1_mini.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 d1_mini.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1_mini.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 d1_mini.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 d1_mini.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 d1_mini.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-d1_mini.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+d1_mini.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 d1_mini.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1_mini.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini.menu.LwIPVariant.OpenSource=v1.4 Open Source
+d1_mini.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 d1_mini.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1_mini.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1_mini.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2161,6 +2371,12 @@ d1_mini.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDAT
 d1_mini.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 d1_mini.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1_mini.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+d1_mini.menu.FlashErase.none=Only Sketch
+d1_mini.menu.FlashErase.none.upload.erase_cmd=
+d1_mini.menu.FlashErase.sdk=Sketch + WiFi Settings
+d1_mini.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+d1_mini.menu.FlashErase.all=All Flash Contents
+d1_mini.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 d1_mini.menu.UploadSpeed.921600=921600
 d1_mini.menu.UploadSpeed.921600.upload.speed=921600
 d1_mini.menu.UploadSpeed.9600=9600
@@ -2187,6 +2403,7 @@ d1_mini_pro.build.variant=d1_mini
 d1_mini_pro.upload.tool=esptool
 d1_mini_pro.upload.maximum_data_size=81920
 d1_mini_pro.upload.wait_for_upload_port=true
+d1_mini_pro.upload.erase_cmd=
 d1_mini_pro.serial.disableDTR=true
 d1_mini_pro.serial.disableRTS=true
 d1_mini_pro.build.mcu=esp8266
@@ -2203,24 +2420,26 @@ d1_mini_pro.build.flash_mode=dio
 d1_mini_pro.build.flash_freq=40
 d1_mini_pro.menu.FlashSize.16M15M=16M (15M SPIFFS)
 d1_mini_pro.menu.FlashSize.16M15M.build.flash_size=16M
+d1_mini_pro.menu.FlashSize.16M15M.build.flash_size_bytes=0x1000000
 d1_mini_pro.menu.FlashSize.16M15M.build.flash_ld=eagle.flash.16m.ld
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_pagesize=256
 d1_mini_pro.menu.FlashSize.16M15M.upload.maximum_size=1044464
+d1_mini_pro.menu.FlashSize.16M15M.build.rfcal_addr=0xFFC000
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_start=0x100000
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_end=0xFFB000
 d1_mini_pro.menu.FlashSize.16M15M.build.spiffs_blocksize=8192
-d1_mini_pro.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1_mini_pro.menu.LwIPVariant.v2mss536=v2 Lower Memory
 d1_mini_pro.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 d1_mini_pro.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 d1_mini_pro.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini_pro.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1_mini_pro.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 d1_mini_pro.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 d1_mini_pro.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 d1_mini_pro.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-d1_mini_pro.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+d1_mini_pro.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 d1_mini_pro.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1_mini_pro.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_pro.menu.LwIPVariant.OpenSource=v1.4 Open Source
+d1_mini_pro.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 d1_mini_pro.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1_mini_pro.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1_mini_pro.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2280,6 +2499,12 @@ d1_mini_pro.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEU
 d1_mini_pro.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 d1_mini_pro.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1_mini_pro.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+d1_mini_pro.menu.FlashErase.none=Only Sketch
+d1_mini_pro.menu.FlashErase.none.upload.erase_cmd=
+d1_mini_pro.menu.FlashErase.sdk=Sketch + WiFi Settings
+d1_mini_pro.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+d1_mini_pro.menu.FlashErase.all=All Flash Contents
+d1_mini_pro.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 d1_mini_pro.menu.UploadSpeed.921600=921600
 d1_mini_pro.menu.UploadSpeed.921600.upload.speed=921600
 d1_mini_pro.menu.UploadSpeed.9600=9600
@@ -2306,6 +2531,7 @@ d1_mini_lite.build.variant=d1_mini
 d1_mini_lite.upload.tool=esptool
 d1_mini_lite.upload.maximum_data_size=81920
 d1_mini_lite.upload.wait_for_upload_port=true
+d1_mini_lite.upload.erase_cmd=
 d1_mini_lite.serial.disableDTR=true
 d1_mini_lite.serial.disableRTS=true
 d1_mini_lite.build.mcu=esp8266
@@ -2322,77 +2548,93 @@ d1_mini_lite.build.flash_mode=dout
 d1_mini_lite.build.flash_freq=40
 d1_mini_lite.menu.FlashSize.1M0=1M (no SPIFFS)
 d1_mini_lite.menu.FlashSize.1M0.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M0.build.flash_size_bytes=0x100000
 d1_mini_lite.menu.FlashSize.1M0.build.flash_ld=eagle.flash.1m0.ld
 d1_mini_lite.menu.FlashSize.1M0.build.spiffs_pagesize=256
 d1_mini_lite.menu.FlashSize.1M0.upload.maximum_size=1023984
+d1_mini_lite.menu.FlashSize.1M0.build.rfcal_addr=0xFC000
 d1_mini_lite.menu.FlashSize.1M64=1M (64K SPIFFS)
 d1_mini_lite.menu.FlashSize.1M64.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M64.build.flash_size_bytes=0x100000
 d1_mini_lite.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
 d1_mini_lite.menu.FlashSize.1M64.build.spiffs_pagesize=256
 d1_mini_lite.menu.FlashSize.1M64.upload.maximum_size=958448
+d1_mini_lite.menu.FlashSize.1M64.build.rfcal_addr=0xFC000
 d1_mini_lite.menu.FlashSize.1M64.build.spiffs_start=0xEB000
 d1_mini_lite.menu.FlashSize.1M64.build.spiffs_end=0xFB000
 d1_mini_lite.menu.FlashSize.1M64.build.spiffs_blocksize=4096
 d1_mini_lite.menu.FlashSize.1M128=1M (128K SPIFFS)
 d1_mini_lite.menu.FlashSize.1M128.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M128.build.flash_size_bytes=0x100000
 d1_mini_lite.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
 d1_mini_lite.menu.FlashSize.1M128.build.spiffs_pagesize=256
 d1_mini_lite.menu.FlashSize.1M128.upload.maximum_size=892912
+d1_mini_lite.menu.FlashSize.1M128.build.rfcal_addr=0xFC000
 d1_mini_lite.menu.FlashSize.1M128.build.spiffs_start=0xDB000
 d1_mini_lite.menu.FlashSize.1M128.build.spiffs_end=0xFB000
 d1_mini_lite.menu.FlashSize.1M128.build.spiffs_blocksize=4096
 d1_mini_lite.menu.FlashSize.1M144=1M (144K SPIFFS)
 d1_mini_lite.menu.FlashSize.1M144.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M144.build.flash_size_bytes=0x100000
 d1_mini_lite.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
 d1_mini_lite.menu.FlashSize.1M144.build.spiffs_pagesize=256
 d1_mini_lite.menu.FlashSize.1M144.upload.maximum_size=876528
+d1_mini_lite.menu.FlashSize.1M144.build.rfcal_addr=0xFC000
 d1_mini_lite.menu.FlashSize.1M144.build.spiffs_start=0xD7000
 d1_mini_lite.menu.FlashSize.1M144.build.spiffs_end=0xFB000
 d1_mini_lite.menu.FlashSize.1M144.build.spiffs_blocksize=4096
 d1_mini_lite.menu.FlashSize.1M160=1M (160K SPIFFS)
 d1_mini_lite.menu.FlashSize.1M160.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M160.build.flash_size_bytes=0x100000
 d1_mini_lite.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
 d1_mini_lite.menu.FlashSize.1M160.build.spiffs_pagesize=256
 d1_mini_lite.menu.FlashSize.1M160.upload.maximum_size=860144
+d1_mini_lite.menu.FlashSize.1M160.build.rfcal_addr=0xFC000
 d1_mini_lite.menu.FlashSize.1M160.build.spiffs_start=0xD3000
 d1_mini_lite.menu.FlashSize.1M160.build.spiffs_end=0xFB000
 d1_mini_lite.menu.FlashSize.1M160.build.spiffs_blocksize=4096
 d1_mini_lite.menu.FlashSize.1M192=1M (192K SPIFFS)
 d1_mini_lite.menu.FlashSize.1M192.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M192.build.flash_size_bytes=0x100000
 d1_mini_lite.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
 d1_mini_lite.menu.FlashSize.1M192.build.spiffs_pagesize=256
 d1_mini_lite.menu.FlashSize.1M192.upload.maximum_size=827376
+d1_mini_lite.menu.FlashSize.1M192.build.rfcal_addr=0xFC000
 d1_mini_lite.menu.FlashSize.1M192.build.spiffs_start=0xCB000
 d1_mini_lite.menu.FlashSize.1M192.build.spiffs_end=0xFB000
 d1_mini_lite.menu.FlashSize.1M192.build.spiffs_blocksize=4096
 d1_mini_lite.menu.FlashSize.1M256=1M (256K SPIFFS)
 d1_mini_lite.menu.FlashSize.1M256.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M256.build.flash_size_bytes=0x100000
 d1_mini_lite.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
 d1_mini_lite.menu.FlashSize.1M256.build.spiffs_pagesize=256
 d1_mini_lite.menu.FlashSize.1M256.upload.maximum_size=761840
+d1_mini_lite.menu.FlashSize.1M256.build.rfcal_addr=0xFC000
 d1_mini_lite.menu.FlashSize.1M256.build.spiffs_start=0xBB000
 d1_mini_lite.menu.FlashSize.1M256.build.spiffs_end=0xFB000
 d1_mini_lite.menu.FlashSize.1M256.build.spiffs_blocksize=4096
 d1_mini_lite.menu.FlashSize.1M512=1M (512K SPIFFS)
 d1_mini_lite.menu.FlashSize.1M512.build.flash_size=1M
+d1_mini_lite.menu.FlashSize.1M512.build.flash_size_bytes=0x100000
 d1_mini_lite.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_pagesize=256
 d1_mini_lite.menu.FlashSize.1M512.upload.maximum_size=499696
+d1_mini_lite.menu.FlashSize.1M512.build.rfcal_addr=0xFC000
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_start=0x7B000
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 d1_mini_lite.menu.FlashSize.1M512.build.spiffs_blocksize=8192
-d1_mini_lite.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1_mini_lite.menu.LwIPVariant.v2mss536=v2 Lower Memory
 d1_mini_lite.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 d1_mini_lite.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 d1_mini_lite.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini_lite.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1_mini_lite.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 d1_mini_lite.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 d1_mini_lite.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 d1_mini_lite.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-d1_mini_lite.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+d1_mini_lite.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 d1_mini_lite.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1_mini_lite.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1_mini_lite.menu.LwIPVariant.OpenSource=v1.4 Open Source
+d1_mini_lite.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 d1_mini_lite.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1_mini_lite.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1_mini_lite.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2452,6 +2694,12 @@ d1_mini_lite.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATE
 d1_mini_lite.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 d1_mini_lite.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1_mini_lite.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+d1_mini_lite.menu.FlashErase.none=Only Sketch
+d1_mini_lite.menu.FlashErase.none.upload.erase_cmd=
+d1_mini_lite.menu.FlashErase.sdk=Sketch + WiFi Settings
+d1_mini_lite.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+d1_mini_lite.menu.FlashErase.all=All Flash Contents
+d1_mini_lite.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 d1_mini_lite.menu.UploadSpeed.921600=921600
 d1_mini_lite.menu.UploadSpeed.921600.upload.speed=921600
 d1_mini_lite.menu.UploadSpeed.9600=9600
@@ -2473,11 +2721,12 @@ d1_mini_lite.menu.UploadSpeed.512000.upload.speed=512000
 
 ##############################################################
 d1.name=WeMos D1 R1
-d1.build.board=ESP8266_WEMOS_D1MINI
+d1.build.board=ESP8266_WEMOS_D1R1
 d1.build.variant=d1
 d1.upload.tool=esptool
 d1.upload.maximum_data_size=81920
 d1.upload.wait_for_upload_port=true
+d1.upload.erase_cmd=
 d1.serial.disableDTR=true
 d1.serial.disableRTS=true
 d1.build.mcu=esp8266
@@ -2494,32 +2743,36 @@ d1.build.flash_mode=dio
 d1.build.flash_freq=40
 d1.menu.FlashSize.4M1M=4M (1M SPIFFS)
 d1.menu.FlashSize.4M1M.build.flash_size=4M
+d1.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 d1.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 d1.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 d1.menu.FlashSize.4M1M.upload.maximum_size=1044464
+d1.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 d1.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 d1.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 d1.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 d1.menu.FlashSize.4M3M=4M (3M SPIFFS)
 d1.menu.FlashSize.4M3M.build.flash_size=4M
+d1.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 d1.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 d1.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 d1.menu.FlashSize.4M3M.upload.maximum_size=1044464
+d1.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 d1.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 d1.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 d1.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-d1.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+d1.menu.LwIPVariant.v2mss536=v2 Lower Memory
 d1.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 d1.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 d1.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+d1.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 d1.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 d1.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 d1.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-d1.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+d1.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 d1.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 d1.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-d1.menu.LwIPVariant.OpenSource=v1.4 Open Source
+d1.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 d1.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 d1.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 d1.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2579,6 +2832,12 @@ d1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA
 d1.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 d1.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+d1.menu.FlashErase.none=Only Sketch
+d1.menu.FlashErase.none.upload.erase_cmd=
+d1.menu.FlashErase.sdk=Sketch + WiFi Settings
+d1.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+d1.menu.FlashErase.all=All Flash Contents
+d1.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 d1.menu.UploadSpeed.921600=921600
 d1.menu.UploadSpeed.921600.upload.speed=921600
 d1.menu.UploadSpeed.9600=9600
@@ -2605,6 +2864,7 @@ espino.build.variant=espino
 espino.upload.tool=esptool
 espino.upload.maximum_data_size=81920
 espino.upload.wait_for_upload_port=true
+espino.upload.erase_cmd=
 espino.serial.disableDTR=true
 espino.serial.disableRTS=true
 espino.build.mcu=esp8266
@@ -2624,32 +2884,36 @@ espino.build.flash_mode=qio
 espino.build.flash_freq=40
 espino.menu.FlashSize.4M1M=4M (1M SPIFFS)
 espino.menu.FlashSize.4M1M.build.flash_size=4M
+espino.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 espino.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 espino.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 espino.menu.FlashSize.4M1M.upload.maximum_size=1044464
+espino.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 espino.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 espino.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 espino.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 espino.menu.FlashSize.4M3M=4M (3M SPIFFS)
 espino.menu.FlashSize.4M3M.build.flash_size=4M
+espino.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 espino.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 espino.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 espino.menu.FlashSize.4M3M.upload.maximum_size=1044464
+espino.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 espino.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espino.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espino.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-espino.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espino.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espino.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espino.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espino.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espino.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espino.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espino.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espino.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espino.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espino.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espino.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espino.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espino.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espino.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espino.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espino.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espino.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espino.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2709,6 +2973,12 @@ espino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATE
 espino.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espino.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espino.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+espino.menu.FlashErase.none=Only Sketch
+espino.menu.FlashErase.none.upload.erase_cmd=
+espino.menu.FlashErase.sdk=Sketch + WiFi Settings
+espino.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espino.menu.FlashErase.all=All Flash Contents
+espino.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 espino.menu.UploadSpeed.115200=115200
 espino.menu.UploadSpeed.115200.upload.speed=115200
 espino.menu.UploadSpeed.9600=9600
@@ -2735,6 +3005,7 @@ espinotee.build.variant=espinotee
 espinotee.upload.tool=esptool
 espinotee.upload.maximum_data_size=81920
 espinotee.upload.wait_for_upload_port=true
+espinotee.upload.erase_cmd=
 espinotee.serial.disableDTR=true
 espinotee.serial.disableRTS=true
 espinotee.build.mcu=esp8266
@@ -2751,32 +3022,36 @@ espinotee.build.flash_mode=qio
 espinotee.build.flash_freq=40
 espinotee.menu.FlashSize.4M1M=4M (1M SPIFFS)
 espinotee.menu.FlashSize.4M1M.build.flash_size=4M
+espinotee.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 espinotee.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 espinotee.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 espinotee.menu.FlashSize.4M1M.upload.maximum_size=1044464
+espinotee.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 espinotee.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 espinotee.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 espinotee.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 espinotee.menu.FlashSize.4M3M=4M (3M SPIFFS)
 espinotee.menu.FlashSize.4M3M.build.flash_size=4M
+espinotee.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 espinotee.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 espinotee.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 espinotee.menu.FlashSize.4M3M.upload.maximum_size=1044464
+espinotee.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 espinotee.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 espinotee.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 espinotee.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-espinotee.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+espinotee.menu.LwIPVariant.v2mss536=v2 Lower Memory
 espinotee.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 espinotee.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 espinotee.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espinotee.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+espinotee.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 espinotee.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 espinotee.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 espinotee.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-espinotee.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+espinotee.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 espinotee.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 espinotee.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-espinotee.menu.LwIPVariant.OpenSource=v1.4 Open Source
+espinotee.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 espinotee.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 espinotee.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 espinotee.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -2836,6 +3111,12 @@ espinotee.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPD
 espinotee.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 espinotee.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 espinotee.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+espinotee.menu.FlashErase.none=Only Sketch
+espinotee.menu.FlashErase.none.upload.erase_cmd=
+espinotee.menu.FlashErase.sdk=Sketch + WiFi Settings
+espinotee.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espinotee.menu.FlashErase.all=All Flash Contents
+espinotee.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 espinotee.menu.UploadSpeed.115200=115200
 espinotee.menu.UploadSpeed.115200.upload.speed=115200
 espinotee.menu.UploadSpeed.9600=9600
@@ -2879,6 +3160,7 @@ wifinfo.menu.ESPModule.ESP07192.upload.maximum_size=827376
 wifinfo.upload.tool=esptool
 wifinfo.upload.maximum_data_size=81920
 wifinfo.upload.wait_for_upload_port=true
+wifinfo.upload.erase_cmd=
 wifinfo.serial.disableDTR=true
 wifinfo.serial.disableRTS=true
 wifinfo.build.mcu=esp8266
@@ -2898,77 +3180,93 @@ wifinfo.menu.FlashFreq.80=80MHz
 wifinfo.menu.FlashFreq.80.build.flash_freq=80
 wifinfo.menu.FlashSize.1M0=1M (no SPIFFS)
 wifinfo.menu.FlashSize.1M0.build.flash_size=1M
+wifinfo.menu.FlashSize.1M0.build.flash_size_bytes=0x100000
 wifinfo.menu.FlashSize.1M0.build.flash_ld=eagle.flash.1m0.ld
 wifinfo.menu.FlashSize.1M0.build.spiffs_pagesize=256
 wifinfo.menu.FlashSize.1M0.upload.maximum_size=1023984
+wifinfo.menu.FlashSize.1M0.build.rfcal_addr=0xFC000
 wifinfo.menu.FlashSize.1M64=1M (64K SPIFFS)
 wifinfo.menu.FlashSize.1M64.build.flash_size=1M
+wifinfo.menu.FlashSize.1M64.build.flash_size_bytes=0x100000
 wifinfo.menu.FlashSize.1M64.build.flash_ld=eagle.flash.1m64.ld
 wifinfo.menu.FlashSize.1M64.build.spiffs_pagesize=256
 wifinfo.menu.FlashSize.1M64.upload.maximum_size=958448
+wifinfo.menu.FlashSize.1M64.build.rfcal_addr=0xFC000
 wifinfo.menu.FlashSize.1M64.build.spiffs_start=0xEB000
 wifinfo.menu.FlashSize.1M64.build.spiffs_end=0xFB000
 wifinfo.menu.FlashSize.1M64.build.spiffs_blocksize=4096
 wifinfo.menu.FlashSize.1M128=1M (128K SPIFFS)
 wifinfo.menu.FlashSize.1M128.build.flash_size=1M
+wifinfo.menu.FlashSize.1M128.build.flash_size_bytes=0x100000
 wifinfo.menu.FlashSize.1M128.build.flash_ld=eagle.flash.1m128.ld
 wifinfo.menu.FlashSize.1M128.build.spiffs_pagesize=256
 wifinfo.menu.FlashSize.1M128.upload.maximum_size=892912
+wifinfo.menu.FlashSize.1M128.build.rfcal_addr=0xFC000
 wifinfo.menu.FlashSize.1M128.build.spiffs_start=0xDB000
 wifinfo.menu.FlashSize.1M128.build.spiffs_end=0xFB000
 wifinfo.menu.FlashSize.1M128.build.spiffs_blocksize=4096
 wifinfo.menu.FlashSize.1M144=1M (144K SPIFFS)
 wifinfo.menu.FlashSize.1M144.build.flash_size=1M
+wifinfo.menu.FlashSize.1M144.build.flash_size_bytes=0x100000
 wifinfo.menu.FlashSize.1M144.build.flash_ld=eagle.flash.1m144.ld
 wifinfo.menu.FlashSize.1M144.build.spiffs_pagesize=256
 wifinfo.menu.FlashSize.1M144.upload.maximum_size=876528
+wifinfo.menu.FlashSize.1M144.build.rfcal_addr=0xFC000
 wifinfo.menu.FlashSize.1M144.build.spiffs_start=0xD7000
 wifinfo.menu.FlashSize.1M144.build.spiffs_end=0xFB000
 wifinfo.menu.FlashSize.1M144.build.spiffs_blocksize=4096
 wifinfo.menu.FlashSize.1M160=1M (160K SPIFFS)
 wifinfo.menu.FlashSize.1M160.build.flash_size=1M
+wifinfo.menu.FlashSize.1M160.build.flash_size_bytes=0x100000
 wifinfo.menu.FlashSize.1M160.build.flash_ld=eagle.flash.1m160.ld
 wifinfo.menu.FlashSize.1M160.build.spiffs_pagesize=256
 wifinfo.menu.FlashSize.1M160.upload.maximum_size=860144
+wifinfo.menu.FlashSize.1M160.build.rfcal_addr=0xFC000
 wifinfo.menu.FlashSize.1M160.build.spiffs_start=0xD3000
 wifinfo.menu.FlashSize.1M160.build.spiffs_end=0xFB000
 wifinfo.menu.FlashSize.1M160.build.spiffs_blocksize=4096
 wifinfo.menu.FlashSize.1M192=1M (192K SPIFFS)
 wifinfo.menu.FlashSize.1M192.build.flash_size=1M
+wifinfo.menu.FlashSize.1M192.build.flash_size_bytes=0x100000
 wifinfo.menu.FlashSize.1M192.build.flash_ld=eagle.flash.1m192.ld
 wifinfo.menu.FlashSize.1M192.build.spiffs_pagesize=256
 wifinfo.menu.FlashSize.1M192.upload.maximum_size=827376
+wifinfo.menu.FlashSize.1M192.build.rfcal_addr=0xFC000
 wifinfo.menu.FlashSize.1M192.build.spiffs_start=0xCB000
 wifinfo.menu.FlashSize.1M192.build.spiffs_end=0xFB000
 wifinfo.menu.FlashSize.1M192.build.spiffs_blocksize=4096
 wifinfo.menu.FlashSize.1M256=1M (256K SPIFFS)
 wifinfo.menu.FlashSize.1M256.build.flash_size=1M
+wifinfo.menu.FlashSize.1M256.build.flash_size_bytes=0x100000
 wifinfo.menu.FlashSize.1M256.build.flash_ld=eagle.flash.1m256.ld
 wifinfo.menu.FlashSize.1M256.build.spiffs_pagesize=256
 wifinfo.menu.FlashSize.1M256.upload.maximum_size=761840
+wifinfo.menu.FlashSize.1M256.build.rfcal_addr=0xFC000
 wifinfo.menu.FlashSize.1M256.build.spiffs_start=0xBB000
 wifinfo.menu.FlashSize.1M256.build.spiffs_end=0xFB000
 wifinfo.menu.FlashSize.1M256.build.spiffs_blocksize=4096
 wifinfo.menu.FlashSize.1M512=1M (512K SPIFFS)
 wifinfo.menu.FlashSize.1M512.build.flash_size=1M
+wifinfo.menu.FlashSize.1M512.build.flash_size_bytes=0x100000
 wifinfo.menu.FlashSize.1M512.build.flash_ld=eagle.flash.1m512.ld
 wifinfo.menu.FlashSize.1M512.build.spiffs_pagesize=256
 wifinfo.menu.FlashSize.1M512.upload.maximum_size=499696
+wifinfo.menu.FlashSize.1M512.build.rfcal_addr=0xFC000
 wifinfo.menu.FlashSize.1M512.build.spiffs_start=0x7B000
 wifinfo.menu.FlashSize.1M512.build.spiffs_end=0xFB000
 wifinfo.menu.FlashSize.1M512.build.spiffs_blocksize=8192
-wifinfo.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+wifinfo.menu.LwIPVariant.v2mss536=v2 Lower Memory
 wifinfo.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 wifinfo.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 wifinfo.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wifinfo.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+wifinfo.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 wifinfo.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 wifinfo.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 wifinfo.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-wifinfo.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+wifinfo.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 wifinfo.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 wifinfo.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-wifinfo.menu.LwIPVariant.OpenSource=v1.4 Open Source
+wifinfo.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 wifinfo.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 wifinfo.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 wifinfo.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3028,6 +3326,12 @@ wifinfo.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDAT
 wifinfo.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 wifinfo.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 wifinfo.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+wifinfo.menu.FlashErase.none=Only Sketch
+wifinfo.menu.FlashErase.none.upload.erase_cmd=
+wifinfo.menu.FlashErase.sdk=Sketch + WiFi Settings
+wifinfo.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+wifinfo.menu.FlashErase.all=All Flash Contents
+wifinfo.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 wifinfo.menu.UploadSpeed.115200=115200
 wifinfo.menu.UploadSpeed.115200.upload.speed=115200
 wifinfo.menu.UploadSpeed.9600=9600
@@ -3065,6 +3369,7 @@ arduino-esp8266.menu.BoardModel.unowifideved=Uno WiFi
 arduino-esp8266.upload.tool=esptool
 arduino-esp8266.upload.maximum_data_size=81920
 arduino-esp8266.upload.wait_for_upload_port=true
+arduino-esp8266.upload.erase_cmd=
 arduino-esp8266.serial.disableDTR=true
 arduino-esp8266.serial.disableRTS=true
 arduino-esp8266.build.mcu=esp8266
@@ -3082,32 +3387,36 @@ arduino-esp8266.build.flash_mode=qio
 arduino-esp8266.build.flash_freq=40
 arduino-esp8266.menu.FlashSize.4M1M=4M (1M SPIFFS)
 arduino-esp8266.menu.FlashSize.4M1M.build.flash_size=4M
+arduino-esp8266.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 arduino-esp8266.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 arduino-esp8266.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 arduino-esp8266.menu.FlashSize.4M1M.upload.maximum_size=1044464
+arduino-esp8266.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 arduino-esp8266.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 arduino-esp8266.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 arduino-esp8266.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 arduino-esp8266.menu.FlashSize.4M3M=4M (3M SPIFFS)
 arduino-esp8266.menu.FlashSize.4M3M.build.flash_size=4M
+arduino-esp8266.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 arduino-esp8266.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 arduino-esp8266.menu.FlashSize.4M3M.upload.maximum_size=1044464
+arduino-esp8266.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 arduino-esp8266.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-arduino-esp8266.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+arduino-esp8266.menu.LwIPVariant.v2mss536=v2 Lower Memory
 arduino-esp8266.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 arduino-esp8266.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 arduino-esp8266.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-arduino-esp8266.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+arduino-esp8266.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 arduino-esp8266.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 arduino-esp8266.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 arduino-esp8266.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-arduino-esp8266.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+arduino-esp8266.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 arduino-esp8266.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 arduino-esp8266.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-arduino-esp8266.menu.LwIPVariant.OpenSource=v1.4 Open Source
+arduino-esp8266.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 arduino-esp8266.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 arduino-esp8266.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 arduino-esp8266.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3167,6 +3476,12 @@ arduino-esp8266.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPD
 arduino-esp8266.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 arduino-esp8266.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 arduino-esp8266.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+arduino-esp8266.menu.FlashErase.none=Only Sketch
+arduino-esp8266.menu.FlashErase.none.upload.erase_cmd=
+arduino-esp8266.menu.FlashErase.sdk=Sketch + WiFi Settings
+arduino-esp8266.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+arduino-esp8266.menu.FlashErase.all=All Flash Contents
+arduino-esp8266.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 arduino-esp8266.menu.UploadSpeed.115200=115200
 arduino-esp8266.menu.UploadSpeed.115200.upload.speed=115200
 arduino-esp8266.menu.UploadSpeed.9600=9600
@@ -3194,6 +3509,7 @@ gen4iod.build.variant=generic
 gen4iod.upload.tool=esptool
 gen4iod.upload.maximum_data_size=81920
 gen4iod.upload.wait_for_upload_port=true
+gen4iod.upload.erase_cmd=
 gen4iod.serial.disableDTR=true
 gen4iod.serial.disableRTS=true
 gen4iod.build.mcu=esp8266
@@ -3210,37 +3526,43 @@ gen4iod.build.flash_mode=qio
 gen4iod.build.flash_freq=80
 gen4iod.menu.FlashSize.512K0=512K (no SPIFFS)
 gen4iod.menu.FlashSize.512K0.build.flash_size=512K
+gen4iod.menu.FlashSize.512K0.build.flash_size_bytes=0x80000
 gen4iod.menu.FlashSize.512K0.build.flash_ld=eagle.flash.512k0.ld
 gen4iod.menu.FlashSize.512K0.build.spiffs_pagesize=256
 gen4iod.menu.FlashSize.512K0.upload.maximum_size=499696
+gen4iod.menu.FlashSize.512K0.build.rfcal_addr=0x7C000
 gen4iod.menu.FlashSize.512K64=512K (64K SPIFFS)
 gen4iod.menu.FlashSize.512K64.build.flash_size=512K
+gen4iod.menu.FlashSize.512K64.build.flash_size_bytes=0x80000
 gen4iod.menu.FlashSize.512K64.build.flash_ld=eagle.flash.512k64.ld
 gen4iod.menu.FlashSize.512K64.build.spiffs_pagesize=256
 gen4iod.menu.FlashSize.512K64.upload.maximum_size=434160
+gen4iod.menu.FlashSize.512K64.build.rfcal_addr=0x7C000
 gen4iod.menu.FlashSize.512K64.build.spiffs_start=0x6B000
 gen4iod.menu.FlashSize.512K64.build.spiffs_end=0x7B000
 gen4iod.menu.FlashSize.512K64.build.spiffs_blocksize=4096
 gen4iod.menu.FlashSize.512K128=512K (128K SPIFFS)
 gen4iod.menu.FlashSize.512K128.build.flash_size=512K
+gen4iod.menu.FlashSize.512K128.build.flash_size_bytes=0x80000
 gen4iod.menu.FlashSize.512K128.build.flash_ld=eagle.flash.512k128.ld
 gen4iod.menu.FlashSize.512K128.build.spiffs_pagesize=256
 gen4iod.menu.FlashSize.512K128.upload.maximum_size=368624
+gen4iod.menu.FlashSize.512K128.build.rfcal_addr=0x7C000
 gen4iod.menu.FlashSize.512K128.build.spiffs_start=0x5B000
 gen4iod.menu.FlashSize.512K128.build.spiffs_end=0x7B000
 gen4iod.menu.FlashSize.512K128.build.spiffs_blocksize=4096
-gen4iod.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+gen4iod.menu.LwIPVariant.v2mss536=v2 Lower Memory
 gen4iod.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 gen4iod.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 gen4iod.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-gen4iod.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+gen4iod.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 gen4iod.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 gen4iod.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 gen4iod.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-gen4iod.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+gen4iod.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 gen4iod.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 gen4iod.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-gen4iod.menu.LwIPVariant.OpenSource=v1.4 Open Source
+gen4iod.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 gen4iod.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 gen4iod.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 gen4iod.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3300,6 +3622,12 @@ gen4iod.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDAT
 gen4iod.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 gen4iod.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 gen4iod.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+gen4iod.menu.FlashErase.none=Only Sketch
+gen4iod.menu.FlashErase.none.upload.erase_cmd=
+gen4iod.menu.FlashErase.sdk=Sketch + WiFi Settings
+gen4iod.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+gen4iod.menu.FlashErase.all=All Flash Contents
+gen4iod.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 gen4iod.menu.UploadSpeed.115200=115200
 gen4iod.menu.UploadSpeed.115200.upload.speed=115200
 gen4iod.menu.UploadSpeed.9600=9600
@@ -3327,6 +3655,7 @@ oak.upload.maximum_size=1040368
 oak.upload.tool=esptool
 oak.upload.maximum_data_size=81920
 oak.upload.wait_for_upload_port=true
+oak.upload.erase_cmd=
 oak.serial.disableDTR=true
 oak.serial.disableRTS=true
 oak.build.mcu=esp8266
@@ -3343,32 +3672,36 @@ oak.build.flash_mode=dio
 oak.build.flash_freq=40
 oak.menu.FlashSize.4M1M=4M (1M SPIFFS)
 oak.menu.FlashSize.4M1M.build.flash_size=4M
+oak.menu.FlashSize.4M1M.build.flash_size_bytes=0x400000
 oak.menu.FlashSize.4M1M.build.flash_ld=eagle.flash.4m1m.ld
 oak.menu.FlashSize.4M1M.build.spiffs_pagesize=256
 oak.menu.FlashSize.4M1M.upload.maximum_size=1044464
+oak.menu.FlashSize.4M1M.build.rfcal_addr=0x3FC000
 oak.menu.FlashSize.4M1M.build.spiffs_start=0x300000
 oak.menu.FlashSize.4M1M.build.spiffs_end=0x3FB000
 oak.menu.FlashSize.4M1M.build.spiffs_blocksize=8192
 oak.menu.FlashSize.4M3M=4M (3M SPIFFS)
 oak.menu.FlashSize.4M3M.build.flash_size=4M
+oak.menu.FlashSize.4M3M.build.flash_size_bytes=0x400000
 oak.menu.FlashSize.4M3M.build.flash_ld=eagle.flash.4m.ld
 oak.menu.FlashSize.4M3M.build.spiffs_pagesize=256
 oak.menu.FlashSize.4M3M.upload.maximum_size=1044464
+oak.menu.FlashSize.4M3M.build.rfcal_addr=0x3FC000
 oak.menu.FlashSize.4M3M.build.spiffs_start=0x100000
 oak.menu.FlashSize.4M3M.build.spiffs_end=0x3FB000
 oak.menu.FlashSize.4M3M.build.spiffs_blocksize=8192
-oak.menu.LwIPVariant.v2mss536=v2 Prebuilt (MSS=536)
+oak.menu.LwIPVariant.v2mss536=v2 Lower Memory
 oak.menu.LwIPVariant.v2mss536.build.lwip_include=lwip2/include
 oak.menu.LwIPVariant.v2mss536.build.lwip_lib=-llwip2
 oak.menu.LwIPVariant.v2mss536.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-oak.menu.LwIPVariant.v2mss1460=v2 Prebuilt (MSS=1460, unstable)
+oak.menu.LwIPVariant.v2mss1460=v2 Higher Bandwidth
 oak.menu.LwIPVariant.v2mss1460.build.lwip_include=lwip2/include
 oak.menu.LwIPVariant.v2mss1460.build.lwip_lib=-llwip2_1460
 oak.menu.LwIPVariant.v2mss1460.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
-oak.menu.LwIPVariant.Prebuilt=v1.4 Prebuilt
+oak.menu.LwIPVariant.Prebuilt=v1.4 Higher Bandwidth
 oak.menu.LwIPVariant.Prebuilt.build.lwip_lib=-llwip_gcc
 oak.menu.LwIPVariant.Prebuilt.build.lwip_flags=-DLWIP_OPEN_SRC
-oak.menu.LwIPVariant.OpenSource=v1.4 Open Source
+oak.menu.LwIPVariant.OpenSource=v1.4 Compile from source
 oak.menu.LwIPVariant.OpenSource.build.lwip_lib=-llwip_src
 oak.menu.LwIPVariant.OpenSource.build.lwip_flags=-DLWIP_OPEN_SRC
 oak.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
@@ -3428,6 +3761,12 @@ oak.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROT
 oak.menu.DebugLevel.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM -include "umm_malloc/umm_malloc_cfg.h"
 oak.menu.DebugLevel.NoAssert-NDEBUG=NoAssert-NDEBUG
 oak.menu.DebugLevel.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+oak.menu.FlashErase.none=Only Sketch
+oak.menu.FlashErase.none.upload.erase_cmd=
+oak.menu.FlashErase.sdk=Sketch + WiFi Settings
+oak.menu.FlashErase.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+oak.menu.FlashErase.all=All Flash Contents
+oak.menu.FlashErase.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
 oak.menu.UploadSpeed.921600=921600
 oak.menu.UploadSpeed.921600.upload.speed=921600
 oak.menu.UploadSpeed.9600=9600
