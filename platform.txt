@@ -6,7 +6,7 @@
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
 name=ESP8266 Modules
-version=2.5.0
+version=2.5.0-dev
 
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
 runtime.tools.esptool.path={runtime.platform.path}/tools/esptool
@@ -71,8 +71,10 @@ compiler.elf2hex.extra_flags=
 ## generate file with git version number
 ## needs bash, git, and echo
 recipe.hooks.core.prebuild.1.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_VER 0x`git --git-dir {runtime.platform.path}/.git rev-parse --short=8 HEAD 2>/dev/null || echo ffffffff` >{build.path}/core/core_version.h"
-## windows-compatible version may be added later
-recipe.hooks.core.prebuild.1.pattern.windows=
+recipe.hooks.core.prebuild.2.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_DESC `cd {runtime.platform.path}; git describe --tags 2>/dev/null || echo unix-{version}` >>{build.path}/core/core_version.h"
+## windows-compatible version without git
+recipe.hooks.core.prebuild.1.pattern.windows=cmd.exe /c mkdir {build.path}\core & (echo #define ARDUINO_ESP8266_GIT_VER 0x00000000 & echo #define ARDUINO_ESP8266_GIT_DESC win-{version} ) > {build.path}\core\core_version.h
+recipe.hooks.core.prebuild.2.pattern.windows=
 
 ## Compile c files
 recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.flags} {compiler.c.flags} -DF_CPU={build.f_cpu} {build.lwip_flags} {build.debug_port} {build.debug_level} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_BOARD="{build.board}" {build.led} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"

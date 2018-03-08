@@ -36,8 +36,7 @@
 timeval cbtime;			// time set in callback
 bool cbtime_set = false;
 
-void time_is_set (void)
-{
+void time_is_set(void) {
   gettimeofday(&cbtime, NULL);
   cbtime_set = true;
   Serial.println("------------------ settimeofday() was called ------------------");
@@ -47,7 +46,7 @@ void setup() {
   Serial.begin(115200);
   settimeofday_cb(time_is_set);
 
-#if NTP0_OR_LOCAL1
+  #if NTP0_OR_LOCAL1
   // local
 
   ESP.eraseConfig();
@@ -56,14 +55,14 @@ void setup() {
   timezone tz = { TZ_MN + DST_MN, 0 };
   settimeofday(&tv, &tz);
 
-#else // ntp
+  #else // ntp
 
   configTime(TZ_SEC, DST_SEC, "pool.ntp.org");
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, SSIDPWD);
   // don't wait, observe time changing when ntp timestamp is received
 
-#endif // ntp
+  #endif // ntp
 }
 
 // for testing purpose:
@@ -73,7 +72,7 @@ extern "C" int clock_gettime(clockid_t unused, struct timespec *tp);
   Serial.print(":" #w "="); \
   Serial.print(tm->tm_##w);
 
-void printTm (const char* what, const tm* tm) {
+void printTm(const char* what, const tm* tm) {
   Serial.print(what);
   PTM(isdst); PTM(yday); PTM(wday);
   PTM(year);  PTM(mon);  PTM(mday);

@@ -1,20 +1,20 @@
 /*
- *  HTTP over TLS (HTTPS) example sketch
- *
- *  This example demonstrates how to use
- *  WiFiClientSecure class to access HTTPS API.
- *  We fetch and display the status of
- *  esp8266/Arduino project continuous integration
- *  build.
- *
- *  Limitations:
- *    only RSA certificates
- *    no support of Perfect Forward Secrecy (PFS)
- *    TLSv1.2 is supported since version 2.4.0-rc1
- *
- *  Created by Ivan Grokhotkov, 2015.
- *  This example is in public domain.
- */
+    HTTP over TLS (HTTPS) example sketch
+
+    This example demonstrates how to use
+    WiFiClientSecure class to access HTTPS API.
+    We fetch and display the status of
+    esp8266/Arduino project continuous integration
+    build.
+
+    Limitations:
+      only RSA certificates
+      no support of Perfect Forward Secrecy (PFS)
+      TLSv1.2 is supported since version 2.4.0-rc1
+
+    Created by Ivan Grokhotkov, 2015.
+    This example is in public domain.
+*/
 
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
