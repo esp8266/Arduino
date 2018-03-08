@@ -159,7 +159,7 @@ linkcheck_anchors_ignore = ["/#!"]
 #
 # on_rtd is whether we are on readthedocs.org
 env_readthedocs = os.environ.get('READTHEDOCS', None)
-print env_readthedocs
+print(env_readthedocs)
 
 if not env_readthedocs:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme

@@ -54,15 +54,15 @@ follows:
     Error compiling for board Generic ESP8266 Module.
 
 Below is an example messages for
-`WeMos <https://github.com/esp8266/Arduino/blob/master/doc/boards.md#wemos-d1>`__:
+`WeMos <../boards.rst#wemos-d1-r2-mini>`__:
 
 ::
 
     Board d1_mini (platform esp8266, package esp8266) is unknown
     Error compiling for board WeMos D1 R2 & mini.
 
-... and another one for `Adafruit
-HUZZAH <https://github.com/esp8266/Arduino/blob/master/doc/boards.md#adafruit-huzzah-esp8266-esp-12>`__:
+... and another one for `Adafruit Feather
+HUZZAH <../boards.rst#adafruit-feather-huzzah-esp8266>`__:
 
 ::
 

@@ -31,7 +31,7 @@
 static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 {
     [0] = 5,  // Reserved, do not change
-    [1] = 0,  // Reserved, do not change
+    [1] = 8,  // Reserved, do not change
     [2] = 4,  // Reserved, do not change
     [3] = 2,  // Reserved, do not change
     [4] = 5,  // Reserved, do not change
@@ -68,12 +68,12 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     [32] = 0xf8, // Reserved, do not change
     [33] = 0xf8, // Reserved, do not change
 
-    [34] = 82, // target_power_qdb_0, 82 means target power is 82/4=20.5dbm
-    [35] = 78, // target_power_qdb_1, 78 means target power is 78/4=19.5dbm
-    [36] = 74, // target_power_qdb_2, 74 means target power is 74/4=18.5dbm
-    [37] = 68, // target_power_qdb_3, 68 means target power is 68/4=17dbm
-    [38] = 64, // target_power_qdb_4, 64 means target power is 64/4=16dbm
-    [39] = 56, // target_power_qdb_5, 56 means target power is 56/4=14dbm
+    [34] = 78, // target_power_qdb_0, target power is 78/4=19.5dbm
+    [35] = 74, // target_power_qdb_1, target power is 74/4=18.5dbm
+    [36] = 70, // target_power_qdb_2, target power is 70/4=17.5dbm
+    [37] = 64, // target_power_qdb_3, target power is 64/4=16dbm
+    [38] = 60, // target_power_qdb_4, target power is 60/4=15dbm
+    [39] = 56, // target_power_qdb_5, target power is 56/4=14dbm
 
     [40] = 0, // target_power_index_mcs0
     [41] = 0, // target_power_index_mcs1

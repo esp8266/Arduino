@@ -1,14 +1,7 @@
 ## Updating SDK libraries
 
-After updating SDK libraries to a new version, do the following changes.
-
-
-Remove mem_manager.o from libmain.a to use custom heap implementation, and time.o to fix redefinition of time-related functions:
-
-```bash
-xtensa-lx106-elf-ar -d libmain.a mem_manager.o
-xtensa-lx106-elf-ar -d libmain.a time.o
-```
+- Copy .a files from SDK `lib` directory to this directory
+- Run `fix_sdk_libs.sh`
 
 ## Updating libstdc++
 

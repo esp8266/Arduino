@@ -25,6 +25,10 @@
 #ifndef __ESPCONN_H__
 #define __ESPCONN_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef sint8 err_t;
 
 typedef void *espconn_handle;
@@ -123,6 +127,7 @@ enum espconn_option{
 	ESPCONN_NODELAY = 0x02,
 	ESPCONN_COPY = 0x04,
 	ESPCONN_KEEPALIVE = 0x08,
+	ESPCONN_MANUALRECV     = 0x10,
 	ESPCONN_END
 };
 
@@ -742,5 +747,13 @@ void espconn_dns_setserver(uint8 numdns, ip_addr_t *dnsserver);
  *  Returns     : dnsserver -- IP address of the DNS server to set
 *******************************************************************************/
 ip_addr_t espconn_dns_getserver(uint8 numdns);
+
+
+#ifdef __cplusplus
+}
 #endif
+
+#endif
+
+
 

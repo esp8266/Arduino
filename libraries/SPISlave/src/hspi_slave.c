@@ -55,7 +55,6 @@ void ICACHE_RAM_ATTR _hspi_slave_isr_handler(void *arg)
         if((status & SPISWBIS) != 0 && (_hspi_slave_rx_data_cb)) {
             uint8_t i;
             uint32_t data;
-            uint8_t buffer[33];
             _hspi_slave_buffer[32] = 0;
             for(i=0; i<8; i++) {
                 data=SPI1W(i);

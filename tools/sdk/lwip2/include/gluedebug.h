@@ -8,6 +8,7 @@
 // this is needed separately from lwipopts.h
 // because it is shared by both sides of glue
 
+#define UNDEBUG		1	// 0 or 1 (1: uassert removed)
 #define UDEBUG		0	// 0 or 1 (glue debug)
 #define UDUMP		0	// 0 or 1 (glue / dump packet)
 #define UDEBUGINDEX	0	// 0 or 1 (show debug line number)
@@ -16,7 +17,7 @@
 #define ULWIPDEBUG	0	// 0 or 1 (trigger lwip debug)
 #define ULWIPASSERT	0	// 0 or 1 (trigger lwip self-check, 0 saves flash)
 
-#define STRING_IN_FLASH 0	// *print("fmt is stored in flash")
+#define STRING_IN_FLASH 1	// *print("fmt is stored in flash")
 
 #define ROTBUFLEN_BIT	11	// (UDEBUGSTORE=1) doprint()'s buffer: 11=2048B
 
@@ -43,7 +44,7 @@ extern int doprint_allow;
 #define USE_OPTIMIZE_PRINTF	// at least used in arduino/esp8266
 #endif
 // os_printf_plus() missing in osapi.h (fixed in arduino's sdk-2.1):
-extern int os_printf_plus (const char * format, ...) __attribute__ ((format (printf, 1, 2)));
+//extern int os_printf_plus (const char * format, ...) __attribute__ ((format (printf, 1, 2)));
 
 #include <osapi.h> // os_printf* definitions + ICACHE_RODATA_ATTR
 
@@ -81,8 +82,26 @@ int doprint_minus (const char* format, ...) __attribute__ ((format (printf, 1, 2
 #define uprint(x...)		do { (void)0; } while (0)
 #endif
 
+#define udoassert(assertion...)	\
+do { if ((assertion) == 0) { \
+		static const char assrt[] ICACHE_RODATA_ATTR STORE_ATTR = #assertion " wrong@"; \
+		os_printf_plus(assrt); \
+		static const char assrt_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__; \
+		os_printf_plus(assrt_file); \
+		static const char assrt_line[] ICACHE_RODATA_ATTR STORE_ATTR = ":%d\n"; \
+		os_printf_plus(assrt_line, __LINE__); \
+		uhalt(); \
+} } while (0)
+
+#if UNDEBUG
+#define uassert(assertion...)	do { (void)0; } while (0)
+#else // !defined(UNDEBUG)
+#define uassert(assertion...)	udoassert(assertion)
+#endif // !defined(UNDEBUG)
+
+#define ualwaysassert(assertion...)	udoassert(assertion)
+
 #define uerror(x...)		do { doprint(x); } while (0)
-#define uassert(assertion...)	do { if ((assertion) == 0) { os_printf_plus("assert fail: " #assertion " @%s:%d\n", __FILE__, __LINE__); uhalt(); } } while (0)
 #define uhalt() 		do { *((int*)0) = 0; /* this triggers gdb */ } while (0)
 #define nl()			do { uprint("\n"); } while (0)
 

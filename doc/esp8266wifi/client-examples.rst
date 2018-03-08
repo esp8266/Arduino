@@ -28,7 +28,7 @@ This time we are going to concentrate just on retrieving a web page contents sen
 Get Connected to Wi-Fi
 ~~~~~~~~~~~~~~~~~~~~~~
 
-We should start with connecting the module to an access point to obtain an access to internet. The code to provide this functionality has been already discussed in chapter `Quick Start <readme.md#quick-start>`__. Please refer to it for details.
+We should start with connecting the module to an access point to obtain an access to internet. The code to provide this functionality has been already discussed in chapter `Quick Start <readme.rst#quick-start>`__. Please refer to it for details.
 
 Select a Server
 ~~~~~~~~~~~~~~~
@@ -257,4 +257,4 @@ For more client examples please check
 
 - `WiFiClient.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient.ino>`__ - this sketch sends data via HTTP GET requests to data.sparkfun.com service.
 
-For the list of functions provided to manage clients, please refer to the `Client Class :arrow\_right: <client-class.md>`__ documentation.
+For the list of functions provided to manage clients, please refer to the `Client Class :arrow\_right: <client-class.rst>`__ documentation.
