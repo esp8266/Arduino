@@ -164,7 +164,7 @@ unsigned long ICACHE_RAM_ATTR millis()
      uint64_t  q;     // Accumulator, 64-bit, little endian
      uint32_t  a[2];  // ..........., 32-bit  segments
   } acc;
-  acc.a[1] = 0;      // Zero high-acc
+  acc.a[1] = 0;       // Zero high-acc
   
   // Get usec system time, usec overflow counter
   uint32_t  m = system_get_time();
@@ -177,7 +177,7 @@ unsigned long ICACHE_RAM_ATTR millis()
   acc.q  = ( (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO ) >> 32 );
 
   // (b) Offset sum, low-acc
-  acc.q += ( m * (uint64_t)MAGIC_1E3_wHI );\
+  acc.q += ( m * (uint64_t)MAGIC_1E3_wHI );
 
   // (c) Offset sum, low-acc
   acc.q += ( c * (uint64_t)MAGIC_1E3_wLO );
