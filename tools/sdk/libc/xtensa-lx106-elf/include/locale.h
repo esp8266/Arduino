@@ -1,7 +1,7 @@
 /*
 	locale.h
 	Values appropriate for the formatting of monetary and other
-	numberic quantities.
+	numeric quantities.
 */
 
 #ifndef _LOCALE_H_
