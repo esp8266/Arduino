@@ -28,9 +28,9 @@
 #include "esp8266_peri.h"
 #include "cont.h"
 #include "pgmspace.h"
+#include "gdb_hooks.h"
 
 extern void __real_system_restart_local();
-extern void gdb_do_break();
 
 extern cont_t g_cont;
 
@@ -38,16 +38,14 @@ extern cont_t g_cont;
 static const char* s_panic_file = 0;
 static int s_panic_line = 0;
 static const char* s_panic_func = 0;
-
 static bool s_abort_called = false;
 
-void uart_write_char_d(char c);
+void abort() __attribute__((noreturn));
+static void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
 static void uart1_write_char_d(char c);
 static void print_stack(uint32_t start, uint32_t end);
-//static void print_pcs(uint32_t start, uint32_t end);
-
-bool __attribute((weak)) crash_for_gdb = 0;
+static void raise_exception() __attribute__((noreturn));
 
 extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) {
     (void) rst_info;
@@ -66,8 +64,16 @@ static void ets_puts_P(const char *romString) {
 }
 
 void __wrap_system_restart_local() {
-    if (crash_for_gdb) *((int*)0) = 0;
     register uint32_t sp asm("a1");
+
+    if (gdb_present()) {
+        /* When GDBStub is present, exceptions are handled by GDBStub,
+           but Soft WDT will still call this function.
+           Trigger an exception to break into GDB.
+           TODO: check why gdb_do_break() or asm("break.n 0") do not
+           break into GDB here. */
+        raise_exception();
+    }
 
     struct rst_info rst_info = {0};
     system_rtc_mem_read(0, &rst_info, sizeof(rst_info));
@@ -129,7 +135,6 @@ void __wrap_system_restart_local() {
 
     ets_printf("sp: %08x end: %08x offset: %04x\n", sp, stack_end, offset);
 
-    // print_pcs(sp + offset, stack_end);
     print_stack(sp + offset, stack_end);
 
     custom_crash_callback( &rst_info, sp + offset, stack_end );
@@ -153,24 +158,7 @@ static void print_stack(uint32_t start, uint32_t end) {
     ets_puts_P(PSTR("<<<stack<<<\n"));
 }
 
-/*
-static void print_pcs(uint32_t start, uint32_t end) {
-    uint32_t n = 0;
-    ets_printf("\n>>>pc>>>\n");
-    for (uint32_t pos = start; pos < end; pos += 16, ++n) {
-        uint32_t* sf = (uint32_t*) pos;
-
-        uint32_t pc_ret = sf[3];
-        uint32_t sp_ret = sf[2];
-        if (pc_ret < 0x40000000 || pc_ret > 0x40f00000 || sp_ret != pos + 16)
-            continue;
-        ets_printf("%08x\n", pc_ret);
-    }
-    ets_printf("<<<pc<<<\n");
-}
-*/
-
-void uart_write_char_d(char c) {
+static void uart_write_char_d(char c) {
     uart0_write_char_d(c);
     uart1_write_char_d(c);
 }
@@ -192,14 +180,15 @@ static void uart1_write_char_d(char c) {
     }
     USF(1) = c;
 }
-void abort() __attribute__((noreturn));
 
-void abort(){
-    // cause exception
+static void raise_exception() {
+    __asm__ __volatile__ ("syscall");
+    while (1); // never reached, needed to satisfy "noreturn" attribute
+}
+
+void abort() {
     s_abort_called = true;
-    do {
-        *((int*)0) = 0;
-    } while(true);
+    raise_exception();
 }
 
 void __assert_func(const char *file, int line, const char *func, const char *what) {
@@ -207,14 +196,14 @@ void __assert_func(const char *file, int line, const char *func, const char *wha
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
-    gdb_do_break();
+    gdb_do_break();     /* if GDB is not present, this is a no-op */
 }
 
 void __panic_func(const char* file, int line, const char* func) {
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
-    gdb_do_break();
-    abort();
+    gdb_do_break();     /* if GDB is not present, this is a no-op */
+    raise_exception();
 }
 
