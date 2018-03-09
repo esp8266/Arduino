@@ -7,7 +7,7 @@ section and on `ESP8266 Community forum <http://www.esp8266.com/>`__.
 
 Where possible we are going right to the answer and provide it within
 one or two paragraphs. If it takes more than that, you will see a link
-:arrow\_right: to more details.
+to "Read more" details.
 
 Please feel free to contribute if you believe that some frequent issues
 are not covered below.
