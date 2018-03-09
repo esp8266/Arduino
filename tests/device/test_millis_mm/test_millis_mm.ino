@@ -247,9 +247,13 @@ unsigned long ICACHE_RAM_ATTR millis_corr ( void )
 
 unsigned long ICACHE_RAM_ATTR millis_test_DEBUG ( void )
 {
-  uint32_t  a[2];  // Accumulator, little endian
-  a[1] = 0;        // Zero high-acc
-  uint64_t  prd;   // Interm product
+  union {
+    uint64_t  q;     // Accumulator, 64-bit, little endian
+    uint32_t  a[2];  // ..........., 32-bit  segments
+  } acc;
+  acc.a[1] = 0;      // Zero high-acc
+  
+  uint64_t  prd;     // Interm product
   
   // Get usec system time, usec overflow counter
   uint32_t  m = system_get_timeA();
@@ -261,35 +265,35 @@ unsigned long ICACHE_RAM_ATTR millis_test_DEBUG ( void )
 
   // (a) Init. low-acc with high-word of 1st product. The right-shift
   //     falls on a byte boundary, hence is relatively quick.
-  ((uint64_t *)(&a[0]))[0]  =
-     ( (prd = (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO )) >> 32 );
+
+  acc.q  = ( (prd = (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO )) >> 32 );
 
   // DEBUG: Show both accumulator and interm product
   if( debugf )
-     view_accsum( "m kl", (uint16_t *)&a[0], (uint16_t *)&prd );
+     view_accsum( "m kl", (uint16_t *)&acc.q, (uint16_t *)&prd );
 
-  ((uint64_t *)(&a[0]))[0] +=              // (b) Offset sum, low-acc
-     ( prd = ( m * (uint64_t)MAGIC_1E3_wHI ) );
-
-  // DEBUG: Show both accumulator and interm product
-  if( debugf )
-     view_accsum( "m kh", (uint16_t *)&a[0], (uint16_t *)&prd );
-
-  ((uint64_t *)(&a[0]))[0] +=              // (c) Offset sum, low-acc
-     ( prd = ( c * (uint64_t)MAGIC_1E3_wLO ) );
+  // (b) Offset sum, low-acc
+  acc.q += ( prd = ( m * (uint64_t)MAGIC_1E3_wHI ) );
 
   // DEBUG: Show both accumulator and interm product
   if( debugf )
-     view_accsum( "c kl", (uint16_t *)&a[0], (uint16_t *)&prd );
+     view_accsum( "m kh", (uint16_t *)&acc.q, (uint16_t *)&prd );
+
+  // (c) Offset sum, low-acc
+  acc.q += ( prd = ( c * (uint64_t)MAGIC_1E3_wLO ) );
+
+  // DEBUG: Show both accumulator and interm product
+  if( debugf )
+     view_accsum( "c kl", (uint16_t *)&acc.q, (uint16_t *)&prd );
   
-  ((uint32_t *)(&a[1]))[0] +=              // (d) Truncated sum, low-acc
-     (uint32_t)( prd = ( c * (uint64_t)MAGIC_1E3_wHI ) );
+  // (d) Truncated sum, high-acc
+  acc.a[1] += (uint32_t)( prd = ( c * (uint64_t)MAGIC_1E3_wHI ) );
 
   // DEBUG: Show both accumulator and interm product
   if( debugf )
-     view_accsum( "c kh", (uint16_t *)&a[0], (uint16_t *)&prd );
+     view_accsum( "c kh", (uint16_t *)&acc.q, (uint16_t *)&prd );
 
-  return ( a[1] );  // Extract result, high-acc
+  return ( acc.a[1] );  // Extract result, high-acc
 
 } //millis_test_DEBUG
 
@@ -297,8 +301,11 @@ unsigned long ICACHE_RAM_ATTR millis_test_DEBUG ( void )
 // FOR BENCHTEST
 unsigned long ICACHE_RAM_ATTR millis_test ( void )
 {
-  uint32_t  a[2];  // Accumulator, little endian
-  a[1] = 0;        // Zero high-acc
+  union {
+    uint64_t  q;     // Accumulator, 64-bit, little endian
+    uint32_t  a[2];  // ..........., 32-bit  segments
+  } acc;
+  acc.a[1] = 0;      // Zero high-acc
 
   // Get usec system time, usec overflow counter
   uint32_t  m = system_get_time();
@@ -306,19 +313,19 @@ unsigned long ICACHE_RAM_ATTR millis_test ( void )
 
   // (a) Init. low-acc with high-word of 1st product. The right-shift
   //     falls on a byte boundary, hence is relatively quick.
-  ((uint64_t *)(&a[0]))[0]  =
-     ( (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO ) >> 32 );
-
-  ((uint64_t *)(&a[0]))[0] +=              // (b) Offset sum, low-acc
-     ( m * (uint64_t)MAGIC_1E3_wHI );
-
-  ((uint64_t *)(&a[0]))[0] +=              // (c) Offset sum, low-acc
-     ( c * (uint64_t)MAGIC_1E3_wLO );
   
-  ((uint32_t *)(&a[1]))[0] +=              // (d) Truncated sum, low-acc
-     (uint32_t)( c * (uint64_t)MAGIC_1E3_wHI );
+  acc.q  = ( (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO ) >> 32 );
 
-  return ( a[1] );  // Extract result, high-acc
+  // (b) Offset sum, low-acc
+  acc.q += ( m * (uint64_t)MAGIC_1E3_wHI );
+
+  // (c) Offset sum, low-acc
+  acc.q += ( c * (uint64_t)MAGIC_1E3_wLO );
+
+  // (d) Truncated sum, high-acc
+  acc.a[1] += (uint32_t)( c * (uint64_t)MAGIC_1E3_wHI );
+
+  return ( acc.a[1] );  // Extract result, high-acc
 
 } //millis_test
 
