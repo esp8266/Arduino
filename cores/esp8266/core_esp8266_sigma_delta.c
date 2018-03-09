@@ -166,7 +166,7 @@ void ICACHE_FLASH_ATTR sigmaDeltaSetPrescaler(uint8_t prescaler)
  * Parameters   : none
  * Returns      : uint8 prescaler, CLK_DIV , 0-255
 *******************************************************************************/
-uint8_t ICACHE_FLASH_ATTR sigmaDeltaGetPrescaler(uint8_t prescaler)
+uint8_t ICACHE_FLASH_ATTR sigmaDeltaGetPrescaler(void)
 {
   return (uint8_t)((GPSD >> GPSDP) & 0xFF);
 }
