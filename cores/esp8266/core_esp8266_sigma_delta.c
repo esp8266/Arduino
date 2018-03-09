@@ -27,6 +27,8 @@
 #define GPSDP 8  // prescaler, 8 bits
 #define GPSDE 16 // enable
 
+void sigmaDeltaSetPrescaler(uint8_t prescaler); // avoids compiler warning
+
 /******************************************************************************
  * FunctionName : sigmaDeltaEnable
  * Description  : enable the internal sigma delta source
