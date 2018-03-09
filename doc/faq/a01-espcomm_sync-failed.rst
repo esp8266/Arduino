@@ -42,7 +42,7 @@ following three things right: 1. Module is provided with enough power,
 resistors, 3. Module is put into boot loader mode.
 
 For specific details please refer to section on `Generic ESP8266
-modules <../boards.md#generic-esp8266-modules>`__. Example modules
+modules <../boards.rst#generic-esp8266-modules>`__. Example modules
 without USB to serial converter on board are shown below.
 
 .. figure:: pictures/a01-example-boards-without-usb.png
@@ -128,7 +128,7 @@ follows:
 ``ets Jan  8 2013,rst cause:2, boot mode:(1,7)``
 
 If you see similar message but different values then decode them using
-`Boot Messages and Modes <../boards.md#boot-messages-and-modes>`__. The
+`Boot Messages and Modes <../boards.rst#boot-messages-and-modes>`__. The
 key information is contained in first digit / three right-most bits of
 the boot mode message as shown below.
 
@@ -140,9 +140,9 @@ the boot mode message as shown below.
 For instance message ``boot mode (3,3)`` indicates that pins GPIO2 and
 GPIO0 are set HIGH and GPIO15 is set LOW. This is configuration for
 `normal
-operation <../boards.md#minimal-hardware-setup-for-running-only>`__ of
+operation <../boards.rst#minimal-hardware-setup-for-running-only>`__ of
 module (to execute application from flash), not for `boot
-loading <../boards.md#minimal-hardware-setup-for-bootloading-only>`__
+loading <../boards.rst#minimal-hardware-setup-for-bootloading-only>`__
 (flash programming).
 
     Note: Without having this step right you will not be able to upload
@@ -258,7 +258,7 @@ REST signal and you will see nothing on the Serial Monitor.
 
 As for different serial terminal program you can check Arduino IDE
 add-on `Serial Monitor for
-ESP8266 <(https://github.com/esp8266/Arduino/issues/1360)>`__ developed
+ESP8266 <https://github.com/esp8266/Arduino/issues/1360>`__ developed
 by user [@mytrain](https://github.com/mytrain) and discussed in
 `#1360 <https://github.com/esp8266/Arduino/issues/1360>`__.
 
@@ -292,12 +292,12 @@ firmware upload is shown below.
    Reset Method: nodemcu, close up at the beginning of upload
 
 Please note that the reset sequence is about 10x shorter comparing to
-`ck <@ck>`__ reset (about 25ms vs. 250ms).
+`ck <#ck>`__ reset (about 25ms vs. 250ms).
 
 Next picture covers complete upload of
 `Blink.ino <https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/Blink/Blink.ino>`__
 example at 921600 baud. Except for difference of the reset signal
-sequence, the complete upload looks similar to that of `ck <@ck>`__.
+sequence, the complete upload looks similar to that of `ck <#ck>`__.
 
 .. figure:: pictures/a01-reset-nodemcu-complete.png
    :alt: Reset Method: nodemcu, complete upload
@@ -391,4 +391,4 @@ Test stand used for checking of ck reset method is shown above.
 
 No any ESP module has been harmed during preparation of this FAQ item.
 
-`FAQ list :back: <readme.md>`__
+`FAQ list :back: <readme.rst>`__
