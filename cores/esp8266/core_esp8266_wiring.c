@@ -160,9 +160,12 @@ void micros_overflow_tick(void* arg) {
 
 unsigned long ICACHE_RAM_ATTR millis()
 {
-  uint32_t  a[2];  // Accumulator, little endian
-  a[1] = 0;        // Zero high-acc
-
+  union {
+     uint64_t  q;     // Accumulator, 64-bit, little endian
+     uint32_t  a[2];  // ..........., 32-bit  segments
+  } acc;
+  acc.a[1] = 0;      // Zero high-acc
+  
   // Get usec system time, usec overflow counter
   uint32_t  m = system_get_time();
   uint32_t  c = micros_overflow_count +
@@ -170,19 +173,19 @@ unsigned long ICACHE_RAM_ATTR millis()
 
   // (a) Init. low-acc with high-word of 1st product. The right-shift
   //     falls on a byte boundary, hence is relatively quick.
-  ((uint64_t *)(&a[0]))[0]  =
-     ( (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO ) >> 32 );
-
-  ((uint64_t *)(&a[0]))[0] +=              // (b) Offset sum, low-acc
-     ( m * (uint64_t)MAGIC_1E3_wHI );
-
-  ((uint64_t *)(&a[0]))[0] +=              // (c) Offset sum, low-acc
-     ( c * (uint64_t)MAGIC_1E3_wLO );
   
-  ((uint32_t *)(&a[1]))[0] +=              // (d) Truncated sum, low-acc
-     (uint32_t)( c * (uint64_t)MAGIC_1E3_wHI );
+  acc.q  = ( (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO ) >> 32 );
 
-  return ( a[1] );  // Extract result, high-acc
+  // (b) Offset sum, low-acc
+  acc.q += ( m * (uint64_t)MAGIC_1E3_wHI );\
+
+  // (c) Offset sum, low-acc
+  acc.q += ( c * (uint64_t)MAGIC_1E3_wLO );
+
+  // (d) Truncated sum, high-acc
+  acc.a[1] += (uint32_t)( c * (uint64_t)MAGIC_1E3_wHI );
+
+  return ( acc.a[1] );  // Extract result, high-acc
 
 } //millis
 
