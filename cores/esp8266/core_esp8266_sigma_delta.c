@@ -1,3 +1,24 @@
+/*
+  core_esp8266_sigma_delta.c - sigma delta library for esp8266
+  
+  Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+  This file is part of the esp8266 core for Arduino environment.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
 #include "Arduino.h" // using pinMode
 
 // definitions in esp8266_peri.h style
@@ -29,7 +50,7 @@ void ICACHE_FLASH_ATTR sigmaDeltaDisable()
 }
 
 /******************************************************************************
- * FunctionName : sigma_delta_attachPin
+ * FunctionName : sigmaDeltaAttachPin
  * Description  : connects the sigma delta source to a physical output pin
  * Parameters   : pin (0..15), channel = unused, for compatibility with ESP32
  * Returns      : none
@@ -46,7 +67,7 @@ void ICACHE_FLASH_ATTR sigmaDeltaAttachPin(uint8_t pin, uint8_t channel)
 }
 
 /******************************************************************************
- * FunctionName : sigma_delta_detachPin
+ * FunctionName : sigmaDeltaDetachPin
  * Description  : disconnects the sigma delta source from a physical output pin
  * Parameters   : pin (0..16)
  * Returns      : none
@@ -93,7 +114,6 @@ uint32_t ICACHE_FLASH_ATTR sigmaDeltaSetup(uint8_t channel, uint32_t freq)
   }
   sigmaDeltaEnable();
   sigmaDeltaSetPrescaler ((uint8_t) prescaler);
-  //sigmaDeltaSetTarget ((uint8_t) 0x80); // 50% duty cycle
   
   return 10000000/((prescaler + 1) * 32);
 }
@@ -116,8 +136,8 @@ void ICACHE_FLASH_ATTR sigmaDeltaWrite(uint8_t channel, uint8_t duty)
 }
 /******************************************************************************
  * FunctionName : sigmaDeltaRead
- * Description  : set the duty cycle for the sigma-delta source
- * Parameters   : none, channel = unused, for compatibility with ESP32
+ * Description  : get the duty cycle for the sigma-delta source
+ * Parameters   : channel = unused, for compatibility with ESP32
  * Returns      : uint8_t duty cycle value 0..255
 *******************************************************************************/
 uint8_t ICACHE_FLASH_ATTR sigmaDeltaRead(uint8_t channel)
