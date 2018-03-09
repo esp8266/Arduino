@@ -197,6 +197,7 @@ void __assert_func(const char *file, int line, const char *func, const char *wha
     s_panic_line = line;
     s_panic_func = func;
     gdb_do_break();     /* if GDB is not present, this is a no-op */
+    raise_exception();
 }
 
 void __panic_func(const char* file, int line, const char* func) {
