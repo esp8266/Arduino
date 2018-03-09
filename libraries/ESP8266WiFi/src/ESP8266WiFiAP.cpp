@@ -129,9 +129,15 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         strcpy(reinterpret_cast<char*>(conf.password), passphrase);
     }
 
-    struct softap_config conf_current;
-    wifi_softap_get_config(&conf_current);
-    if(!softap_config_equal(conf, conf_current)) {
+    struct softap_config conf_compare;
+    if(WiFi._persistent){
+        wifi_softap_get_config_default(&conf_compare);
+    }
+    else {
+        wifi_softap_get_config(&conf_compare);
+    }
+
+    if(!softap_config_equal(conf, conf_compare)) {
 
         ETS_UART_INTR_DISABLE();
         if(WiFi._persistent) {
