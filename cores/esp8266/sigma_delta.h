@@ -19,8 +19,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
  
- /*
-/******************************************************************************
+ /*******************************************************************************
  * Info Sigma delta module
 
 This module controls the esp8266 internal sigma delta source
