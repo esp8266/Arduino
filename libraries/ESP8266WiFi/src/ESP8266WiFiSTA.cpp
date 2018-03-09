@@ -138,9 +138,15 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         conf.bssid_set = 0;
     }
 
-    struct station_config current_conf;
-    wifi_station_get_config(&current_conf);
-    if(sta_config_equal(current_conf, conf)) {
+    struct station_config conf_compare;
+    if(WiFi._persistent){
+        wifi_station_get_config_default(&conf_compare);
+    }
+    else {
+        wifi_station_get_config(&conf_compare);
+    }
+
+    if(sta_config_equal(conf_compare, conf)) {
         DEBUGV("sta config unchanged");
     }
     else {
