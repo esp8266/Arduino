@@ -43,8 +43,5 @@ void loop() {
   for (iRepeat = 0; iRepeat < 20; iRepeat++) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
     delay(500);
-  }
-  
-  uint8_t prescaler = sigmaDeltaGetPrescaler();
-    
+  } 
 }
