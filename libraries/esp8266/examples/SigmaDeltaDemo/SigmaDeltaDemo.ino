@@ -27,12 +27,12 @@ void loop() {
   
   Serial.println("dimming builtin led...\n");
   for (iRepeat = 0; iRepeat < 10; iRepeat++) {
-    for (duty=0; duty < 255; duty = duty + 5) {
+    for (duty = 0; duty < 255; duty = duty + 5) {
       sigmaDeltaWrite(0, duty);
       delay(10);
     }
     
-    for (duty= 255; duty > 0; duty = duty - 5) {
+    for (duty = 255; duty > 0; duty = duty - 5) {
       sigmaDeltaWrite(0, duty);
       delay(10);
     }
