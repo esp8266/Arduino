@@ -1,0 +1,31 @@
+#######################################
+# Syntax Colouring Map For ESP_EEPROM
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ESP_EEPROM	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+doSomething	KEYWORD2
+begin	KEYWORD2
+read	KEYWORD2
+write	KEYWORD2
+commit	KEYWORD2
+commitReset	KEYWORD2
+wipe	KEYWORD2
+percentUsed	KEYWORD2
+end	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
