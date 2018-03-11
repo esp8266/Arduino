@@ -221,7 +221,7 @@ Check Return Codes
 
 Almost each function described in chapters above returns some diagnostic information.
 
-Such diagnostic may be provided as a simple ``boolean`` type ``true' or``\ false\` to indicate operation result. You may check this result as described in examples, for instance:
+Such diagnostic may be provided as a simple ``boolean`` type ``true`` or ``false`` to indicate operation result. You may check this result as described in examples, for instance:
 
 .. code:: cpp
 
