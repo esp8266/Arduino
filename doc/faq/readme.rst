@@ -40,7 +40,7 @@ entering an issue report, please perform initial troubleshooting.
 
 :doc:`Read more <a02-my-esp-crashes>`.
 
-This Arduino library doesn't work on ESP. How do I make it working?
+This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You would like to use this Arduino library with ESP8266 and it does not
@@ -59,7 +59,7 @@ total, but switching such "banks" on the fly is not easy and efficient,
 so we don't bother doing that. Besides, no one has so far complained
 about 1MB of code space being insufficient for practical purposes.
 
-The option to choose 4M or 1M SPIFFS is to optimize the upload time.
+The option to choose 3M or 1M SPIFFS is to optimize the upload time.
 Uploading 3MB takes a long time so sometimes you can just use 1MB. Other
 2MB of flash can still be used with ``ESP.flashRead`` and
 ``ESP.flashWrite`` APIs if necessary.
