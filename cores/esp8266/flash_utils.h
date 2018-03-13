@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#include "spi_flash.h"
+ 
 int SPIEraseBlock(uint32_t block);
 int SPIEraseSector(uint32_t sector);
 int SPIRead(uint32_t addr, void *dest, size_t size);
