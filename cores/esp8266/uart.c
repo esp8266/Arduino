@@ -171,8 +171,20 @@ size_t uart_rx_available(uart_t* uart)
     return uart_rx_buffer_available(uart) + uart_rx_fifo_available(uart);
 }
 
+static void ICACHE_RAM_ATTR uart_isr_handle_data(void* arg, uint8_t data)
+{
+    uart_t* uart = (uart_t*)arg;
+    if(uart == NULL || !uart->rx_enabled) {
+        return;
+    }
+    size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
+    if(nextPos != uart->rx_buffer->rpos) {
+        uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
+        uart->rx_buffer->wpos = nextPos;
+    }
+}
 
-void ICACHE_RAM_ATTR uart_isr(void * arg)
+static void ICACHE_RAM_ATTR uart_isr(void* arg)
 {
     uart_t* uart = (uart_t*)arg;
     if(uart == NULL || !uart->rx_enabled) {
@@ -180,31 +192,39 @@ void ICACHE_RAM_ATTR uart_isr(void * arg)
         ETS_UART_INTR_DISABLE();
         return;
     }
-    if(USIS(uart->uart_nr) & ((1 << UIFF) | (1 << UITO))){
+    if(USIS(uart->uart_nr) & ((1 << UIFF) | (1 << UITO))) {
         uart_rx_copy_fifo_to_buffer(uart);
     }
     USIC(uart->uart_nr) = USIS(uart->uart_nr);
 }
 
-void uart_start_isr(uart_t* uart)
+static void uart_start_isr(uart_t* uart)
 {
     if(uart == NULL || !uart->rx_enabled) {
+        return;
+    }
+    if(gdbstub_has_uart_isr_control()) {
+        gdbstub_set_uart_isr_callback(uart_isr_handle_data,  (void *)uart);
         return;
     }
     // UCFFT value is when the RX fifo full interrupt triggers.  A value of 1
     // triggers the IRS very often.  A value of 127 would not leave much time
     // for ISR to clear fifo before the next byte is dropped.  So pick a value
     // in the middle.
-    USC1(uart->uart_nr) = (100   << UCFFT) | (0x02 << UCTOT) | (1 <<UCTOE );
+    USC1(uart->uart_nr) = (100 << UCFFT) | (0x02 << UCTOT) | (1 <<UCTOE);
     USIC(uart->uart_nr) = 0xffff;
     USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIFR) | (1 << UITO);
     ETS_UART_INTR_ATTACH(uart_isr,  (void *)uart);
     ETS_UART_INTR_ENABLE();
 }
 
-void uart_stop_isr(uart_t* uart)
+static void uart_stop_isr(uart_t* uart)
 {
     if(uart == NULL || !uart->rx_enabled) {
+        return;
+    }
+    if(gdbstub_has_uart_isr_control()) {
+        gdbstub_set_uart_isr_callback(NULL, NULL);
         return;
     }
     ETS_UART_INTR_DISABLE();
@@ -214,14 +234,22 @@ void uart_stop_isr(uart_t* uart)
     ETS_UART_INTR_ATTACH(NULL, NULL);
 }
 
+static void uart_do_write_char(int uart_nr, char c)
+{
+    while((USS(uart_nr) >> USTXC) >= 0x7f) ;
+    USF(uart_nr) = c;
+}
 
 void uart_write_char(uart_t* uart, char c)
 {
     if(uart == NULL || !uart->tx_enabled) {
         return;
     }
-    while((USS(uart->uart_nr) >> USTXC) >= 0x7f);
-    USF(uart->uart_nr) = c;
+    if(gdbstub_has_uart_isr_control() && uart->uart_nr == UART0) {
+        gdbstub_write_char(c);
+        return;
+    }
+    uart_do_write_char(uart->uart_nr, c);
 }
 
 void uart_write(uart_t* uart, const char* buf, size_t size)
@@ -229,8 +257,12 @@ void uart_write(uart_t* uart, const char* buf, size_t size)
     if(uart == NULL || !uart->tx_enabled) {
         return;
     }
+    if(gdbstub_has_uart_isr_control() && uart->uart_nr == UART0) {
+        gdbstub_write(buf, size);
+        return;
+    }
     while(size--) {
-        uart_write_char(uart, *buf++);
+        uart_do_write_char(uart->uart_nr, *buf++);
     }
 }
 
@@ -271,8 +303,10 @@ void uart_flush(uart_t* uart)
         tmp |= (1 << UCTXRST);
     }
 
-    USC0(uart->uart_nr) |= (tmp);
-    USC0(uart->uart_nr) &= ~(tmp);
+    if(!gdbstub_has_uart_isr_control() || uart->uart_nr != UART0) {
+        USC0(uart->uart_nr) |= (tmp);
+        USC0(uart->uart_nr) &= ~(tmp);
+    }
 }
 
 void uart_set_baudrate(uart_t* uart, int baud_rate)
@@ -292,6 +326,43 @@ int uart_get_baudrate(uart_t* uart)
     return uart->baud_rate;
 }
 
+void uart0_enable_tx_pin(uint8_t pin)
+{
+    switch(pin) {
+    case 1:
+        pinMode(pin, SPECIAL);
+        break;
+    case 2:
+    case 15:
+        pinMode(pin, FUNCTION_4);
+        break;
+    }
+}
+
+void uart0_enable_rx_pin(uint8_t pin)
+{
+    switch(pin) {
+        case 3:
+            pinMode(pin, SPECIAL);
+            break;
+        case 13:
+            pinMode(pin, FUNCTION_4);
+            break;
+    }
+}
+
+void uart1_enable_tx_pin(uint8_t pin)
+{
+    if(pin == 2) {
+        pinMode(pin, SPECIAL);
+    }
+}
+
+void uart_disable_pin(uint8_t pin)
+{
+    pinMode(pin, INPUT);
+}
+
 uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
 {
     uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
@@ -305,7 +376,9 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
     switch(uart->uart_nr) {
     case UART0:
         ETS_UART_INTR_DISABLE();
-        ETS_UART_INTR_ATTACH(NULL, NULL);
+        if(!gdbstub_has_uart_isr_control()) {
+            ETS_UART_INTR_ATTACH(NULL, NULL);
+        }
         uart->rx_enabled = (mode != UART_TX_ONLY);
         uart->tx_enabled = (mode != UART_RX_ONLY);
         uart->rx_pin = (uart->rx_enabled)?3:255;
@@ -325,16 +398,15 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
               return NULL;
             }
             uart->rx_buffer = rx_buffer;
-            pinMode(uart->rx_pin, SPECIAL);
+            uart0_enable_rx_pin(uart->rx_pin);
         }
         if(uart->tx_enabled) {
             if (tx_pin == 2) {
                 uart->tx_pin = 2;
-                pinMode(uart->tx_pin, FUNCTION_4);
             } else {
                 uart->tx_pin = 1;
-                pinMode(uart->tx_pin, FUNCTION_0);
             }
+            uart0_enable_tx_pin(uart->tx_pin);
         } else {
             uart->tx_pin = 255;
         }
@@ -347,7 +419,7 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
         uart->rx_pin = 255;
         uart->tx_pin = (uart->tx_enabled)?2:255;  // GPIO7 as TX not possible! See GPIO pins used by UART
         if(uart->tx_enabled) {
-            pinMode(uart->tx_pin, SPECIAL);
+            uart1_enable_tx_pin(uart->tx_pin);
         }
         break;
     case UART_NO:
@@ -359,12 +431,19 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
 
     uart_set_baudrate(uart, baudrate);
     USC0(uart->uart_nr) = config;
-    uart_flush(uart);
-    USC1(uart->uart_nr) = 0;
-    USIC(uart->uart_nr) = 0xffff;
-    USIE(uart->uart_nr) = 0;
-    if(uart->uart_nr == UART0 && uart->rx_enabled) {
-        uart_start_isr(uart);
+    if(!gdbstub_has_uart_isr_control() || uart->uart_nr != UART0) {
+        uart_flush(uart);
+        USC1(uart->uart_nr) = 0;
+        USIC(uart->uart_nr) = 0xffff;
+        USIE(uart->uart_nr) = 0;
+    }
+    if(uart->uart_nr == UART0) {
+        if(uart->rx_enabled && !gdbstub_has_uart_isr_control()) {
+            uart_start_isr(uart);
+        }
+        if(gdbstub_has_uart_isr_control()) {
+            ETS_UART_INTR_ENABLE();
+        }
     }
 
     return uart;
@@ -376,31 +455,17 @@ void uart_uninit(uart_t* uart)
         return;
     }
 
-    switch(uart->rx_pin) {
-    case 3:
-        pinMode(3, INPUT);
-        break;
-    case 13:
-        pinMode(13, INPUT);
-        break;
+    if(uart->tx_enabled && (!gdbstub_has_uart_isr_control() || uart->uart_nr != UART0)) {
+        uart_disable_pin(uart->tx_pin);
     }
 
-    switch(uart->tx_pin) {
-    case 1:
-        pinMode(1, INPUT);
-        break;
-    case 2:
-        pinMode(2, INPUT);
-        break;
-    case 15:
-        pinMode(15, INPUT);
-        break;
-    }
-
-    if(uart->rx_enabled){
+    if(uart->rx_enabled) {
         free(uart->rx_buffer->buffer);
         free(uart->rx_buffer);
-        uart_stop_isr(uart);
+        if(!gdbstub_has_uart_isr_control()) {
+            uart_disable_pin(uart->rx_pin);
+            uart_stop_isr(uart);
+        }
     }
     free(uart);
 }
@@ -412,38 +477,37 @@ void uart_swap(uart_t* uart, int tx_pin)
     }
     switch(uart->uart_nr) {
     case UART0:
-        if(((uart->tx_pin == 1 || uart->tx_pin == 2) && uart->tx_enabled) || (uart->rx_pin == 3 && uart->rx_enabled)) {
+        if(uart->tx_enabled) { //TX
+            uart_disable_pin(uart->tx_pin);
+        }
+        if(uart->rx_enabled) { //RX
+            uart_disable_pin(uart->rx_pin);
+        }
+
+        if(((uart->tx_pin == 1 || uart->tx_pin == 2) && uart->tx_enabled)
+                || (uart->rx_pin == 3 && uart->rx_enabled)) {
             if(uart->tx_enabled) { //TX
-                pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = 15;
             }
             if(uart->rx_enabled) { //RX
-                pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 13;
-            }
-            if(uart->tx_enabled) {
-                pinMode(uart->tx_pin, FUNCTION_4);    //TX
-            }
-            if(uart->rx_enabled) {
-                pinMode(uart->rx_pin, FUNCTION_4);    //RX
             }
             IOSWAP |= (1 << IOSWAPU0);
         } else {
             if(uart->tx_enabled) { //TX
-                pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = (tx_pin == 2)?2:1;
             }
             if(uart->rx_enabled) { //RX
-                pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 3;
             }
-            if(uart->tx_enabled) {
-                pinMode(uart->tx_pin, (tx_pin == 2)?FUNCTION_4:SPECIAL);    //TX
-            }
-            if(uart->rx_enabled) {
-                pinMode(3, SPECIAL);    //RX
-            }
             IOSWAP &= ~(1 << IOSWAPU0);
+        }
+
+        if(uart->tx_enabled) { //TX
+            uart0_enable_tx_pin(uart->tx_pin);
+        }
+        if(uart->rx_enabled) { //RX
+            uart0_enable_rx_pin(uart->rx_pin);
         }
 
         break;
@@ -464,13 +528,13 @@ void uart_set_tx(uart_t* uart, int tx_pin)
     case UART0:
         if(uart->tx_enabled) {
             if (uart->tx_pin == 1 && tx_pin == 2) {
-                pinMode(uart->tx_pin, INPUT);
+                uart_disable_pin(uart->tx_pin);
                 uart->tx_pin = 2;
-                pinMode(uart->tx_pin, FUNCTION_4);
+                uart0_enable_tx_pin(uart->tx_pin);
             } else if (uart->tx_pin == 2 && tx_pin != 2) {
-                pinMode(uart->tx_pin, INPUT);
+                uart_disable_pin(uart->tx_pin);
                 uart->tx_pin = 1;
-                pinMode(uart->tx_pin, SPECIAL);
+                uart0_enable_tx_pin(uart->tx_pin);
             }
         }
 
@@ -491,7 +555,7 @@ void uart_set_pins(uart_t* uart, int tx, int rx)
 
     if(uart->uart_nr == UART0) { // Only UART0 allows pin changes
         if(uart->tx_enabled && uart->tx_pin != tx) {
-            if( rx == 13 && tx == 15) {
+            if(rx == 13 && tx == 15) {
                 uart_swap(uart, 15);
             } else if (rx == 3 && (tx == 1 || tx == 2)) {
                 if (uart->rx_pin != rx) {
@@ -558,20 +622,24 @@ static void uart1_write_char(char c)
 void uart_set_debug(int uart_nr)
 {
     s_uart_debug_nr = uart_nr;
+    void (*func)(char) = NULL;
     switch(s_uart_debug_nr) {
     case UART0:
-        system_set_os_print(1);
-        ets_install_putc1((void *) &uart0_write_char);
+        func = &uart0_write_char;
         break;
     case UART1:
-        system_set_os_print(1);
-        ets_install_putc1((void *) &uart1_write_char);
+        func = &uart1_write_char;
         break;
     case UART_NO:
     default:
-        system_set_os_print(0);
-        ets_install_putc1((void *) &uart_ignore_char);
+        func = &uart_ignore_char;
         break;
+    }
+    if(!gdbstub_has_putc1_control()) {
+        system_set_os_print((uint8)((uart_nr == UART0 || uart_nr == UART1)?1:0));
+        ets_install_putc1((void *) func);
+    } else {
+        gdbstub_set_putc1_callback(func);
     }
 }
 
