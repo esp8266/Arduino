@@ -31,7 +31,7 @@ int SPIRead(uint32_t addr, void *dest, size_t size);
 int SPIWrite(uint32_t addr, void *src, size_t size);
 int SPIEraseAreaEx(const uint32_t start, const uint32_t size);
 
-#define FLASH_SECTOR_SIZE 0x1000
+#define FLASH_SECTOR_SIZE SPI_FLASH_SEC_SIZE
 #define FLASH_BLOCK_SIZE 0x10000
 #define APP_START_OFFSET 0x1000
 
