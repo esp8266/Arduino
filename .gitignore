@@ -19,3 +19,4 @@ boards.local.txt
 *.gcno
 *.gcda
 *.o
+*.a
