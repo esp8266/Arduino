@@ -8,43 +8,40 @@ const char* password = "..............";
 ESP8266WebServer wwwserver(80);
 String content;
 
-static void handleRoot(void)
-{
-    content = F("<!DOCTYPE HTML>\n<html>Hello world from ESP8266");
-    content += F("<p>");
-    content += F("</html>");
+static void handleRoot(void) {
+  content = F("<!DOCTYPE HTML>\n<html>Hello world from ESP8266");
+  content += F("<p>");
+  content += F("</html>");
 
-    wwwserver.send(200, F("text/html"), content);
+  wwwserver.send(200, F("text/html"), content);
 }
 
-void setup()
-{
-    Serial.begin(115200);
+void setup() {
+  Serial.begin(115200);
 
-    // Connect to WiFi network
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password);
-    Serial.println("");
+  // Connect to WiFi network
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.println("");
 
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("");
-    Serial.print("Connected to ");
-    Serial.println(ssid);
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
+  // Wait for connection
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
 
 
-    wwwserver.on("/", handleRoot);
-    wwwserver.begin();
+  wwwserver.on("/", handleRoot);
+  wwwserver.begin();
 
-    NBNS.begin("ESP");
+  NBNS.begin("ESP");
 }
 
-void loop()
-{
-    wwwserver.handleClient();
+void loop() {
+  wwwserver.handleClient();
 }
