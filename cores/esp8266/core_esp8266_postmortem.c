@@ -45,6 +45,11 @@ static void uart_write_char_d(char c);
 static void uart0_write_char_d(char c);
 static void uart1_write_char_d(char c);
 static void print_stack(uint32_t start, uint32_t end);
+
+// From UMM, the last caller of a malloc/realloc/calloc which failed:
+extern void *umm_last_fail_alloc_addr;
+extern int umm_last_fail_alloc_size;
+
 static void raise_exception() __attribute__((noreturn));
 
 extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) {
@@ -136,6 +141,11 @@ void __wrap_system_restart_local() {
     ets_printf("sp: %08x end: %08x offset: %04x\n", sp, stack_end, offset);
 
     print_stack(sp + offset, stack_end);
+
+    // Use cap-X formatting to ensure the standard EspExceptionDecoder doesn't match the address
+    if (umm_last_fail_alloc_addr) {
+      ets_printf("\nlast failed alloc call: %08X(%d)\n", (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+    }
 
     custom_crash_callback( &rst_info, sp + offset, stack_end );
 
