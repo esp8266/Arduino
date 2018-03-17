@@ -499,6 +499,10 @@
 
 #include "umm_malloc_cfg.h"   /* user-dependent */
 
+// From UMM, the last caller of a malloc/realloc/calloc which failed:
+extern void *umm_last_fail_alloc_addr;
+extern int umm_last_fail_alloc_size;
+
 #ifndef UMM_FIRST_FIT
 #  ifndef UMM_BEST_FIT
 #    define UMM_BEST_FIT
@@ -1661,6 +1665,10 @@ void *umm_malloc( size_t size ) {
   size += POISON_SIZE(size);
 
   ret = _umm_malloc( size );
+  if (0 != size && 0 == ret) {
+    umm_last_fail_alloc_addr = __builtin_return_address(0);
+    umm_last_fail_alloc_size = size;
+  }
 
   ret = GET_POISONED(ret, size);
 
@@ -1688,6 +1696,10 @@ void *umm_calloc( size_t num, size_t item_size ) {
   if (ret) {
     memset(ret, 0x00, size);
   }
+  if (0 != size && 0 == ret) {
+    umm_last_fail_alloc_addr = __builtin_return_address(0);
+    umm_last_fail_alloc_size = size;
+  }
 
   ret = GET_POISONED(ret, size);
 
@@ -1713,6 +1725,10 @@ void *umm_realloc( void *ptr, size_t size ) {
 
   size += POISON_SIZE(size);
   ret = _umm_realloc( ptr, size );
+  if (0 != size && 0 == ret) {
+    umm_last_fail_alloc_addr = __builtin_return_address(0);
+    umm_last_fail_alloc_size = size;
+  }
 
   ret = GET_POISONED(ret, size);
 
