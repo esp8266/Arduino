@@ -16,10 +16,10 @@ void loop() {
   FlashMode_t ideMode = ESP.getFlashChipMode();
 
   Serial.printf("Flash real id:   %08X\n", ESP.getFlashChipId());
-  Serial.printf("Flash real size: %u\n\n", realSize);
+  Serial.printf("Flash real size: %u bytes\n\n", realSize);
 
-  Serial.printf("Flash ide  size: %u\n", ideSize);
-  Serial.printf("Flash ide speed: %u\n", ESP.getFlashChipSpeed());
+  Serial.printf("Flash ide  size: %u bytes\n", ideSize);
+  Serial.printf("Flash ide speed: %u Hz\n", ESP.getFlashChipSpeed());
   Serial.printf("Flash ide mode:  %s\n", (ideMode == FM_QIO ? "QIO" : ideMode == FM_QOUT ? "QOUT" : ideMode == FM_DIO ? "DIO" : ideMode == FM_DOUT ? "DOUT" : "UNKNOWN"));
 
   if (ideSize != realSize) {
