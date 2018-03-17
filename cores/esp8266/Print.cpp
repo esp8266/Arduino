@@ -34,8 +34,13 @@
 /* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size) {
     size_t n = 0;
-    while(size--) {
-        n += write(*buffer++);
+    while (size--) {
+        size_t ret = write(*buffer++);
+        if (ret == 0) {
+            // Write of last byte didn't complete, abort additional processing
+            break;
+        }
+        n += ret;
     }
     return n;
 }
