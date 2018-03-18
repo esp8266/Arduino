@@ -70,14 +70,16 @@ public:
         //Data that was already read from the stream but not released (e.g. if error occured). Otherwise this should be 0.
         const size_t stream_read = _streamPos - _pos;
 
-        if (_bufferSize < size) {
-            uint8_t *new_buffer = new uint8_t[size];
+        const size_t min_buffer_size = size > stream_read ? size : stream_read;
+
+        if (_bufferSize < min_buffer_size) {
+            uint8_t *new_buffer = new uint8_t[min_buffer_size];
             //If stream reading is ahead, than some data is already in the old buffer and needs to be copied to new resized buffer
             if (_buffer && stream_read > 0) {
                 memcpy(new_buffer, _buffer.get(), stream_read);
             }
             _buffer.reset(new_buffer);
-            _bufferSize = size;
+            _bufferSize = min_buffer_size;
         }
 
         //If error in tcp_write in ClientContext::_write_some() occured earlier and therefore release_buffer was not called, than there might not even be data needed to be read from the stream
@@ -95,10 +97,22 @@ public:
 
     void release_buffer(const uint8_t* buffer, size_t size) override
     {
+        if (size == 0) {
+            return;
+        }
+
         (void)buffer;
-        _pos += size;
-        //Release size needs to be the same as get_buffer(size)
-        assert(_pos == _streamPos);
+        _pos += size;     
+
+        //Cannot release more than acquired through get_buffer
+        assert(_pos <= _streamPos);
+
+        if (_pos < _streamPos) {
+            //Released less than acquired through get_buffer
+            // Shift unreleased stream data in buffer to begining
+            assert(_buffer);
+            memmove(_buffer.get(), _buffer.get() + size, _streamPos - _pos);
+        }
     }
 
 protected:
