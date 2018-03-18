@@ -30,8 +30,11 @@
 extern void ets_wdt_enable(void);
 extern void ets_wdt_disable(void);
 
-#define SLC_BUF_CNT (8) //Number of buffers in the I2S circular buffer
-#define SLC_BUF_LEN (64) //Length of one buffer, in 32-bit words.
+#define DEFAULT_SLC_BUF_CNT (8) //Default number of buffers in the I2S circular buffer
+#define DEFAULT_SLC_BUF_LEN (64) //Default length of one buffer, in 32-bit words.
+
+static uint16_t SLC_BUF_CNT = DEFAULT_SLC_BUF_CNT; //Number of buffers in the I2S circular buffer
+static uint16_t SLC_BUF_LEN = DEFAULT_SLC_BUF_LEN; //Length of one buffer, in 32-bit words.
 
 //We use a queue to keep track of the DMA buffers that are empty. The ISR will push buffers to the back of the queue,
 //the mp3 decode will pull them from the front and fill them. For ease, the queue will contain *pointers* to the DMA
@@ -50,10 +53,10 @@ struct slc_queue_item {
   uint32  next_link_ptr;
 };
 
-static uint32_t i2s_slc_queue[SLC_BUF_CNT-1];
-static uint8_t i2s_slc_queue_len;
-static uint32_t *i2s_slc_buf_pntr[SLC_BUF_CNT]; //Pointer to the I2S DMA buffer data
-static struct slc_queue_item i2s_slc_items[SLC_BUF_CNT]; //I2S DMA buffer descriptors
+static uint32_t *i2s_slc_queue=NULL;
+static uint8_t i2s_slc_queue_len=NULL;
+static uint32_t **i2s_slc_buf_pntr=NULL; //Pointer to the I2S DMA buffer data
+static struct slc_queue_item *i2s_slc_items; //I2S DMA buffer descriptors
 static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
 static int i2s_curr_slc_buf_pos=0; //position in the current buffer
 
@@ -96,10 +99,20 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
   }
 }
 
-void ICACHE_FLASH_ATTR i2s_slc_begin(){
+void ICACHE_FLASH_ATTR i2s_slc_begin(uint16_t buffers, uint16_t buffer_samples)
+{
+  // Clean up any running I2S, free all buffers
+  i2s_end();
+
+  SLC_BUF_CNT = buffers;
+  SLC_BUF_LEN = buffer_samples;
+
   i2s_slc_queue_len = 0;
   int x, y;
   
+  i2s_slc_queue = (uint32_t*)malloc((SLC_BUF_CNT-1) * sizeof(uint32_t));
+  i2s_slc_buf_pntr = (uint32**)malloc(SLC_BUF_CNT * sizeof(uint32_t*));
+  i2s_slc_items = (struct slc_queue_item *)malloc(SLC_BUF_CNT * sizeof(struct slc_queue_item));
   for (x=0; x<SLC_BUF_CNT; x++) {
     i2s_slc_buf_pntr[x] = malloc(SLC_BUF_LEN*4);
     for (y=0; y<SLC_BUF_LEN; y++) i2s_slc_buf_pntr[x][y] = 0;
@@ -151,9 +164,17 @@ void ICACHE_FLASH_ATTR i2s_slc_end(){
   SLCTXL &= ~(SLCTXLAM << SLCTXLA); // clear TX descriptor address
   SLCRXL &= ~(SLCRXLAM << SLCRXLA); // clear RX descriptor address
 
-  for (int x = 0; x<SLC_BUF_CNT; x++) {
-	  free(i2s_slc_buf_pntr[x]);
+  if (i2s_slc_buf_pntr) {
+    for (int x = 0; x<SLC_BUF_CNT; x++) {
+      free(i2s_slc_buf_pntr[x]);
+    }
   }
+  free(i2s_slc_buf_pntr);
+  i2s_slc_buf_pntr = NULL;
+  free(i2s_slc_items);
+  i2s_slc_items = NULL;
+  free(i2s_slc_queue);
+  i2s_slc_queue = NULL;
 }
 
 //This routine pushes a single, 32-bit sample to the I2S buffers. Call this at (on average) 
@@ -250,8 +271,12 @@ float ICACHE_FLASH_ATTR i2s_get_real_rate(){
 
 
 void ICACHE_FLASH_ATTR i2s_begin(){
+  i2s_begin_custom(DEFAULT_SLC_BUF_CNT, DEFAULT_SLC_BUF_LEN);
+}
+
+void ICACHE_FLASH_ATTR i2s_begin_custom(uint16_t buffers, uint16_t buffer_samples){
   _i2s_sample_rate = 0;
-  i2s_slc_begin();
+  i2s_slc_begin(buffers, buffer_samples);
   
   pinMode(2, FUNCTION_1); //I2SO_WS (LRCK)
   pinMode(3, FUNCTION_1); //I2SO_DATA (SDIN)
