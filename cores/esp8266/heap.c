@@ -8,10 +8,19 @@
 #include <c_types.h>
 #include <sys/reent.h>
 
+// Debugging helper, last allocation which returned NULL
+void *umm_last_fail_alloc_addr = NULL;
+int umm_last_fail_alloc_size = 0;
+
 void* _malloc_r(struct _reent* unused, size_t size)
 {
     (void) unused;
-    return malloc(size);
+    void *ret = malloc(size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+    return ret;
 }
 
 void _free_r(struct _reent* unused, void* ptr)
@@ -23,13 +32,23 @@ void _free_r(struct _reent* unused, void* ptr)
 void* _realloc_r(struct _reent* unused, void* ptr, size_t size)
 {
     (void) unused;
-    return realloc(ptr, size);
+    void *ret = realloc(ptr, size);
+    if (0 != size && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = size;
+    }
+    return ret;
 }
 
 void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 {
     (void) unused;
-    return calloc(count, size);
+    void *ret = calloc(count, size);
+    if (0 != (count * size) && 0 == ret) {
+        umm_last_fail_alloc_addr = __builtin_return_address(0);
+        umm_last_fail_alloc_size = count * size;
+    }
+    return ret;
 }
 
 void ICACHE_RAM_ATTR vPortFree(void *ptr, const char* file, int line)

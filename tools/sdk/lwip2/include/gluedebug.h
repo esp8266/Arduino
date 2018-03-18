@@ -17,7 +17,7 @@
 #define ULWIPDEBUG	0	// 0 or 1 (trigger lwip debug)
 #define ULWIPASSERT	0	// 0 or 1 (trigger lwip self-check, 0 saves flash)
 
-#define STRING_IN_FLASH 0	// *print("fmt is stored in flash")
+#define STRING_IN_FLASH 1	// *print("fmt is stored in flash")
 
 #define ROTBUFLEN_BIT	11	// (UDEBUGSTORE=1) doprint()'s buffer: 11=2048B
 
@@ -82,10 +82,7 @@ int doprint_minus (const char* format, ...) __attribute__ ((format (printf, 1, 2
 #define uprint(x...)		do { (void)0; } while (0)
 #endif
 
-#if UNDEBUG
-#define uassert(assertion...)   do { (void)0; } while (0)
-#else // !defined(UNDEBUG)
-#define uassert(assertion...)	\
+#define udoassert(assertion...)	\
 do { if ((assertion) == 0) { \
 		static const char assrt[] ICACHE_RODATA_ATTR STORE_ATTR = #assertion " wrong@"; \
 		os_printf_plus(assrt); \
@@ -95,7 +92,14 @@ do { if ((assertion) == 0) { \
 		os_printf_plus(assrt_line, __LINE__); \
 		uhalt(); \
 } } while (0)
+
+#if UNDEBUG
+#define uassert(assertion...)	do { (void)0; } while (0)
+#else // !defined(UNDEBUG)
+#define uassert(assertion...)	udoassert(assertion)
 #endif // !defined(UNDEBUG)
+
+#define ualwaysassert(assertion...)	udoassert(assertion)
 
 #define uerror(x...)		do { doprint(x); } while (0)
 #define uhalt() 		do { *((int*)0) = 0; /* this triggers gdb */ } while (0)
