@@ -56,7 +56,7 @@ static uint32_t *i2s_slc_buf_pntr[SLC_BUF_CNT]; //Pointer to the I2S DMA buffer 
 static struct slc_queue_item i2s_slc_items[SLC_BUF_CNT]; //I2S DMA buffer descriptors
 static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
 static int i2s_curr_slc_buf_pos=0; //position in the current buffer
-static void (*i2s_callback) (void)=0;
+static void (*i2s_callback) (void)=0; //Callback function should be defined as 'void ICACHE_FLASH_ATTR function_name()', placing the function in IRAM for faster execution. Avoid long computational tasks in this function, use it to set flags and process later.
 
 bool ICACHE_FLASH_ATTR i2s_is_full(){
   return (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) && (i2s_slc_queue_len == 0);
@@ -98,7 +98,7 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
   }
 }
 
-void ICACHE_FLASH_ATTR i2s_set_callback(void (*callback) (void)){
+void i2s_set_callback(void (*callback) (void)){
     i2s_callback = callback;
 }
 
