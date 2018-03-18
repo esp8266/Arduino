@@ -8,7 +8,7 @@ Introduction
 ------------
 
 The `Wi-Fi library for ESP8266 <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ has been developed basing on `ESP8266 SDK <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__, using naming convention and overall functionality philosophy of `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time the wealth Wi-Fi features ported from ESP9266 SDK to `esp8266 /
-Adruino <https://github.com/esp8266/Arduino>`__ outgrow `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ and it became apparent that we need to provide separate documentation on what is new and extra.
+Adruino <https://github.com/esp8266/Arduino>`__ outgrew `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ and it became apparent that we need to provide separate documentation on what is new and extra.
 
 This documentation will walk you through several classes, methods and properties of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. If you are new to C++ and Arduino, don't worry. We will start from general concepts and then move to detailed description of members of each particular class including usage examples.
 
