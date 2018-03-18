@@ -95,8 +95,8 @@
 //}}
 
 //GPIO reg {{
-#define GPIO_REG_READ(reg)                         READ_PERI_REG(PERIPHS_GPIO_BASEADDR + reg)
-#define GPIO_REG_WRITE(reg, val)                 WRITE_PERI_REG(PERIPHS_GPIO_BASEADDR + reg, val)
+#define GPIO_REG_READ(reg)                         READ_PERI_REG(PERIPHS_GPIO_BASEADDR + (reg))
+#define GPIO_REG_WRITE(reg, val)                 WRITE_PERI_REG(PERIPHS_GPIO_BASEADDR + (reg), val)
 #define GPIO_OUT_ADDRESS                         0x00
 #define GPIO_OUT_W1TS_ADDRESS             0x04
 #define GPIO_OUT_W1TC_ADDRESS             0x08

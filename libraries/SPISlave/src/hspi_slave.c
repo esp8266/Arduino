@@ -55,7 +55,6 @@ void ICACHE_RAM_ATTR _hspi_slave_isr_handler(void *arg)
         if((status & SPISWBIS) != 0 && (_hspi_slave_rx_data_cb)) {
             uint8_t i;
             uint32_t data;
-            uint8_t buffer[33];
             _hspi_slave_buffer[32] = 0;
             for(i=0; i<8; i++) {
                 data=SPI1W(i);
@@ -96,6 +95,23 @@ void hspi_slave_begin(uint8_t status_len, void * arg)
 
     ETS_SPI_INTR_ATTACH(_hspi_slave_isr_handler,arg);
     ETS_SPI_INTR_ENABLE();
+}
+
+void hspi_slave_end()
+{
+  ETS_SPI_INTR_DISABLE();
+  ETS_SPI_INTR_ATTACH(NULL, NULL);
+
+  pinMode(SS, INPUT);
+  pinMode(SCK, INPUT);
+  pinMode(MISO, INPUT);
+  pinMode(MOSI, INPUT);
+
+  // defaults
+  SPI1S = 0;
+  SPI1U = SPIUSSE | SPIUCOMMAND;
+  SPI1S1 = 0;
+  SPI1P = B110;
 }
 
 void hspi_slave_setStatus(uint32_t status)

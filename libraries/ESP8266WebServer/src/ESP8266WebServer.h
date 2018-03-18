@@ -74,6 +74,7 @@ public:
   virtual ~ESP8266WebServer();
 
   virtual void begin();
+  virtual void begin(uint16_t port);
   virtual void handleClient();
 
   virtual void close();
@@ -120,7 +121,7 @@ public:
   void send_P(int code, PGM_P content_type, PGM_P content);
   void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength);
 
-  void setContentLength(size_t contentLength);
+  void setContentLength(const size_t contentLength);
   void sendHeader(const String& name, const String& value, bool first = false);
   void sendContent(const String& content);
   void sendContent_P(PGM_P content);
@@ -128,17 +129,12 @@ public:
 
   static String urlDecode(const String& text);
 
-template<typename T> size_t streamFile(T &file, const String& contentType){
-  setContentLength(file.size());
-  if (String(file.name()).endsWith(".gz") &&
-      contentType != "application/x-gzip" &&
-      contentType != "application/octet-stream"){
-    sendHeader("Content-Encoding", "gzip");
+  template<typename T> 
+  size_t streamFile(T &file, const String& contentType) {
+    _streamFileCore(file.size(), file.name(), contentType);
+    return _currentClient.write(file);
   }
-  send(200, contentType, "");
-  return _currentClient.write(file);
-}
-
+  
 protected:
   virtual size_t _currentClientWrite(const char* b, size_t l) { return _currentClient.write( b, l ); }
   virtual size_t _currentClientWrite_P(PGM_P b, size_t l) { return _currentClient.write_P( b, l ); }
@@ -154,10 +150,12 @@ protected:
   uint8_t _uploadReadByte(WiFiClient& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
-  
+ 
+  void _streamFileCore(const size_t fileSize, const String & fileName, const String & contentType);
+
   String _getRandomHexString();
   // for extracting Auth parameters
-  String _exractParam(String& authReq,const String& param,const char delimit = '"');
+  String _extractParam(String& authReq,const String& param,const char delimit = '"');
 
   struct RequestArgument {
     String key;

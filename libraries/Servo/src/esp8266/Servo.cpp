@@ -251,8 +251,6 @@ uint8_t Servo::attach(int pin, uint16_t minUs, uint16_t maxUs)
 
 void Servo::detach()
 {
-    ServoTimerSequence timerId;
-
     if (s_servos[_servoIndex].info.isActive) {
         s_servos[_servoIndex].info.isDetaching = true;
     }

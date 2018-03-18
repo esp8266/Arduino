@@ -26,6 +26,9 @@
 //Start SPI SLave
 void hspi_slave_begin(uint8_t status_len, void * arg);
 
+//End SPI SLave
+void hspi_slave_end();
+
 //set the status register so the master can read it
 void hspi_slave_setStatus(uint32_t status);
 
