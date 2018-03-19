@@ -112,6 +112,7 @@ extern "C" {
 
 struct uart_;
 typedef struct uart_ uart_t;
+extern uint8_t uart_overrun; // 1=>detected, can be set to 2 once action taken, or 0 to redetect
 
 uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size);
 void uart_uninit(uart_t* uart);

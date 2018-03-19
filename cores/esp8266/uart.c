@@ -45,6 +45,7 @@
 #include "esp8266_peri.h"
 #include "user_interface.h"
 
+uint8_t uart_overrun = 0;
 static int s_uart_debug_nr = UART0;
 
 struct uart_rx_buffer_ {
@@ -102,13 +103,32 @@ inline size_t uart_rx_fifo_available(uart_t* uart) {
     return (USS(uart->uart_nr) >> USRXC) & 0x7F;
 }
 
+char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
+
 // Copy all the rx fifo bytes that fit into the rx buffer
 inline void uart_rx_copy_fifo_to_buffer(uart_t* uart) {
     while(uart_rx_fifo_available(uart)){
         size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
         if(nextPos == uart->rx_buffer->rpos) {
+
+            if (uart_overrun == 0)
+            {
+                uart_overrun = 1;
+                os_printf_plus(overrun_str);
+            }
+
+            // a choice has to be made here,
+            // do we discard newest or oldest data?
+#if 0
+            // discard newest data
             // Stop copying if rx buffer is full
+            USF(uart->uart_nr);
             break;
+#else
+            // discard oldest data
+            if (++uart->rx_buffer->rpos == uart->rx_buffer->size)
+                uart->rx_buffer->rpos = 0;
+#endif
         }
         uint8_t data = USF(uart->uart_nr);
         uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
@@ -194,7 +214,6 @@ void uart_stop_isr(uart_t* uart)
     USIE(uart->uart_nr) = 0;
     ETS_UART_INTR_ATTACH(NULL, NULL);
 }
-
 
 void uart_write_char(uart_t* uart, char c)
 {
