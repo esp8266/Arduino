@@ -214,7 +214,7 @@ void uart_stop_isr(uart_t* uart)
     ETS_UART_INTR_ATTACH(NULL, NULL);
 }
 
-inline void uart_do_write_char(uart_t* uart, char c)
+static void uart_do_write_char(uart_t* uart, char c)
 {
     while((USS(uart->uart_nr) >> USTXC) >= 0x7f);
     USF(uart->uart_nr) = c;
