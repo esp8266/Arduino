@@ -45,7 +45,6 @@
 #include "esp8266_peri.h"
 #include "user_interface.h"
 
-uint8_t uart_overrun = 0;
 static int s_uart_debug_nr = UART0;
 
 struct uart_rx_buffer_ {
@@ -60,6 +59,7 @@ struct uart_ {
     int baud_rate;
     bool rx_enabled;
     bool tx_enabled;
+    bool overrun;
     uint8_t rx_pin;
     uint8_t tx_pin;
     struct uart_rx_buffer_ * rx_buffer;
@@ -111,9 +111,8 @@ inline void uart_rx_copy_fifo_to_buffer(uart_t* uart) {
         size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
         if(nextPos == uart->rx_buffer->rpos) {
 
-            if (uart_overrun == 0)
-            {
-                uart_overrun = 1;
+            if (!uart->overrun) {
+                uart->overrun = true;
                 os_printf_plus(overrun_str);
             }
 
@@ -215,6 +214,7 @@ void uart_stop_isr(uart_t* uart)
     ETS_UART_INTR_ATTACH(NULL, NULL);
 }
 
+
 void uart_write_char(uart_t* uart, char c)
 {
     if(uart == NULL || !uart->tx_enabled) {
@@ -300,6 +300,7 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
     }
 
     uart->uart_nr = uart_nr;
+    uart->overrun = false;
 
     switch(uart->uart_nr) {
     case UART0:
@@ -523,6 +524,15 @@ bool uart_rx_enabled(uart_t* uart)
     return uart->rx_enabled;
 }
 
+bool uart_has_overrun (uart_t* uart)
+{
+    if (uart == NULL || !uart->overrun) {
+        return false;
+    }
+    // clear flag
+    uart->overrun = false;
+    return true;
+}
 
 static void uart_ignore_char(char c)
 {
