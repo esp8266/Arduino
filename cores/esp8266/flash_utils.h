@@ -21,12 +21,13 @@
 #ifndef FLASH_UTILS_H
 #define FLASH_UTILS_H
 
+#include "c_types.h"
+#include "spi_flash.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "spi_flash.h"
- 
 int SPIEraseBlock(uint32_t block);
 int SPIEraseSector(uint32_t sector);
 int SPIRead(uint32_t addr, void *dest, size_t size);
