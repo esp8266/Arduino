@@ -129,7 +129,7 @@ public:
     {
         return write((uint8_t) n);
     }
-    using Print::write; // pull in write(str) and write(buf, size) from Print
+    size_t write(const uint8_t *buffer, size_t size);
     operator bool() const;
 
     void setDebugOutput(bool);

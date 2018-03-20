@@ -167,12 +167,12 @@ void HardwareSerial::flush()
 
 size_t HardwareSerial::write(uint8_t c)
 {
-    if(!_uart || !uart_tx_enabled(_uart)) {
-        return 0;
-    }
+    return uart_write_char(_uart, c);
+}
 
-    uart_write_char(_uart, c);
-    return 1;
+size_t HardwareSerial::write(const uint8_t *buffer, size_t size)
+{
+    return uart_write(_uart, (const char*)buffer, size);
 }
 
 int HardwareSerial::baudRate(void)
