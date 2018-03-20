@@ -234,10 +234,11 @@ size_t uart_write(uart_t* uart, const char* buf, size_t size)
     if(uart == NULL || !uart->tx_enabled) {
         return 0;
     }
-    for (size_t s = size + 1; --s; ) {
+    size_t ret = size;
+    while (size--) {
         uart_do_write_char(uart, *buf++);
     }
-    return size;
+    return ret;
 }
 
 size_t uart_tx_free(uart_t* uart)
