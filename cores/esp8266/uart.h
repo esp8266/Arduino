@@ -136,6 +136,8 @@ size_t uart_tx_free(uart_t* uart);
 void uart_wait_tx_empty(uart_t* uart);
 void uart_flush(uart_t* uart);
 
+bool uart_has_overrun (uart_t* uart); // returns then clear overrun flag
+
 void uart_set_debug(int uart_nr);
 int uart_get_debug();
 
