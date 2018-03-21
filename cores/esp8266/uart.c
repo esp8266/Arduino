@@ -103,7 +103,7 @@ inline size_t uart_rx_fifo_available(uart_t* uart) {
     return (USS(uart->uart_nr) >> USRXC) & 0x7F;
 }
 
-char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
+const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
 
 // Copy all the rx fifo bytes that fit into the rx buffer
 inline void uart_rx_copy_fifo_to_buffer(uart_t* uart) {
