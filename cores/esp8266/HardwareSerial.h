@@ -137,6 +137,11 @@ public:
     bool isRxEnabled(void);
     int  baudRate(void);
 
+    bool hasOverrun(void)
+    {
+        return uart_has_overrun(_uart);
+    }
+
 protected:
     int _uart_nr;
     uart_t* _uart = nullptr;
