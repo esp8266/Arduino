@@ -576,13 +576,14 @@ size_t WiFiClientSecure::write(Stream& stream)
         return 0;
     }
     do {
-        uint8_t temp[128]; // Arbitrary temporary chunk size
+        uint8_t temp[256]; // Temporary chunk size same as ClientContext
         countSent = 0;
         countRead = stream.readBytes(temp, sizeof(temp));
         if (countRead) {
             countSent = write(temp, countRead);
             totalSent += countSent;
         }
+        yield(); // Feed the WDT
     } while ( (countSent == countRead) && (countSent > 0) );
     return totalSent;
 }
