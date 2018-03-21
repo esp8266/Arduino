@@ -59,6 +59,7 @@ struct uart_ {
     int baud_rate;
     bool rx_enabled;
     bool tx_enabled;
+    bool overrun;
     uint8_t rx_pin;
     uint8_t tx_pin;
     struct uart_rx_buffer_ * rx_buffer;
@@ -102,13 +103,31 @@ inline size_t uart_rx_fifo_available(uart_t* uart) {
     return (USS(uart->uart_nr) >> USRXC) & 0x7F;
 }
 
+char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
+
 // Copy all the rx fifo bytes that fit into the rx buffer
 inline void uart_rx_copy_fifo_to_buffer(uart_t* uart) {
     while(uart_rx_fifo_available(uart)){
         size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
         if(nextPos == uart->rx_buffer->rpos) {
+
+            if (!uart->overrun) {
+                uart->overrun = true;
+                os_printf_plus(overrun_str);
+            }
+
+            // a choice has to be made here,
+            // do we discard newest or oldest data?
+#if 0
+            // discard newest data
             // Stop copying if rx buffer is full
+            USF(uart->uart_nr);
             break;
+#else
+            // discard oldest data
+            if (++uart->rx_buffer->rpos == uart->rx_buffer->size)
+                uart->rx_buffer->rpos = 0;
+#endif
         }
         uint8_t data = USF(uart->uart_nr);
         uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
@@ -281,6 +300,7 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
     }
 
     uart->uart_nr = uart_nr;
+    uart->overrun = false;
 
     switch(uart->uart_nr) {
     case UART0:
@@ -504,6 +524,15 @@ bool uart_rx_enabled(uart_t* uart)
     return uart->rx_enabled;
 }
 
+bool uart_has_overrun (uart_t* uart)
+{
+    if (uart == NULL || !uart->overrun) {
+        return false;
+    }
+    // clear flag
+    uart->overrun = false;
+    return true;
+}
 
 static void uart_ignore_char(char c)
 {
