@@ -168,7 +168,7 @@ public:
     }
     bool isRxEnabled(void)
     {
-        return _uart && uart_rx_enabled(_uart);
+        return uart_rx_enabled(_uart);
     }
     int baudRate(void)
     {
