@@ -24,11 +24,9 @@
 #include "osapi.h"
 #include "ets_sys.h"
 
+
 #include "i2s_reg.h"
 #include "i2s.h"
-
-extern void ets_wdt_enable(void);
-extern void ets_wdt_disable(void);
 
 #define SLC_BUF_CNT (8)  // Number of buffers in the I2S circular buffer
 #define SLC_BUF_LEN (64) // Length of one buffer, in 32-bit words.
@@ -303,8 +301,7 @@ static bool _i2s_write_sample(uint32_t sample, bool nb) {
         if (tx->slc_queue_len > 0){
           break;
         } else {
-          ets_wdt_disable();
-          ets_wdt_enable();
+          optimistic_yield(10000);
         }
       }
     }
@@ -340,8 +337,7 @@ bool i2s_read_sample(uint32_t *left, uint32_t *right, bool blocking) {
         if (rx->slc_queue_len > 0){
           break;
         } else {
-          ets_wdt_disable();
-          ets_wdt_enable();
+          optimistic_yield(10000);
         }
       }
     }
