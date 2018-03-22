@@ -2,7 +2,6 @@
 #include <BSTest.h>
 #include <test_config.h>
 #include <ESP8266WiFi.h>
-#include <Ticker.h>
 
 extern "C" {
 #include "user_interface.h"
@@ -36,24 +35,25 @@ void setup()
 
 TEST_CASE("WiFi release ClientContext", "[clientcontext]")
 {
-    #define MAXLOOPS       50
+    #define MAXLOOPS     50
     #define SUCCESS_GOAL 10
+    #define srv          SERVER_IP
+    #define srv          WiFi.gatewayIP()
 
-    // will search for a tcp server these gateway's ports
-    int ports [] = { 21, 23, 80, 443, 22,
-                     0 };
     WiFiClient client;
     
-    Serial.print(WiFi.gatewayIP());
+    Serial.print(srv);
 
     // look for reachable port on gateway
     int port;
-    for (int i = 0; (port = ports[i]); i++)
-        if (client.connect(WiFi.gatewayIP(), ports[i]))
+    for (port = 8266; port <= 8285; port++)
+        if (client.connect(srv, port))
         {
             client.stop();
             break;
         }
+    if (port > 8285)
+        port = 0;
 
     Serial.printf(":%d\r\n", port);
     
