@@ -38,7 +38,6 @@ TEST_CASE("WiFi release ClientContext", "[clientcontext]")
     #define MAXLOOPS     50
     #define SUCCESS_GOAL 10
     #define srv          SERVER_IP
-    #define srv          WiFi.gatewayIP()
 
     WiFiClient client;
     
