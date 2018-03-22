@@ -93,26 +93,50 @@ public:
     {
         swap(1);
     }
-    void swap(uint8_t tx_pin);    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
+    void swap(uint8_t tx_pin)    //toggle between use of GPIO13/GPIO15 or GPIO3/GPIO(1/2) as RX and TX
+    {
+        uart_swap(_uart, tx_pin);
+    }
 
     /*
      * Toggle between use of GPIO1 and GPIO2 as TX on UART 0.
      * Note: UART 1 can't be used if GPIO2 is used with UART 0!
      */
-    void set_tx(uint8_t tx_pin);
+    void set_tx(uint8_t tx_pin)
+    {
+        uart_set_tx(_uart, tx_pin);
+    }
 
     /*
      * UART 0 possible options are (1, 3), (2, 3) or (15, 13)
      * UART 1 allows only TX on 2 if UART 0 is not (2, 3)
      */
-    void pins(uint8_t tx, uint8_t rx);
+    void pins(uint8_t tx, uint8_t rx)
+    {
+        uart_set_pins(_uart, tx, rx);
+    }
 
     int available(void) override;
-    int peek(void) override;
-    int read(void) override;
-    int availableForWrite(void);
+
+    int peek(void) override
+    {
+        // this may return -1, but that's okay
+        return uart_peek_char(_uart);
+    }
+    int read(void) override
+    {
+        // this may return -1, but that's okay
+        return uart_read_char(_uart);
+    }
+    int availableForWrite(void)
+    {
+        return static_cast<int>(uart_tx_free(_uart));
+    }
     void flush(void) override;
-    size_t write(uint8_t) override;
+    size_t write(uint8_t c) override
+    {
+        return uart_write_char(_uart, c);
+    }
     inline size_t write(unsigned long n)
     {
         return write((uint8_t) n);
@@ -129,13 +153,27 @@ public:
     {
         return write((uint8_t) n);
     }
-    using Print::write; // pull in write(str) and write(buf, size) from Print
-    operator bool() const;
-
+    size_t write(const uint8_t *buffer, size_t size)
+    {
+        return uart_write(_uart, (const char*)buffer, size);
+    }
+    operator bool() const
+    {
+        return _uart != 0;
+    }
     void setDebugOutput(bool);
-    bool isTxEnabled(void);
-    bool isRxEnabled(void);
-    int  baudRate(void);
+    bool isTxEnabled(void)
+    {
+        return uart_tx_enabled(_uart);
+    }
+    bool isRxEnabled(void)
+    {
+        return _uart && uart_rx_enabled(_uart);
+    }
+    int baudRate(void)
+    {
+        return uart_get_baudrate(_uart);
+    }
 
     bool hasOverrun(void)
     {

@@ -127,8 +127,8 @@ int uart_get_baudrate(uart_t* uart);
 
 size_t uart_resize_rx_buffer(uart_t* uart, size_t new_size);
 
-void uart_write_char(uart_t* uart, char c);
-void uart_write(uart_t* uart, const char* buf, size_t size);
+size_t uart_write_char(uart_t* uart, char c);
+size_t uart_write(uart_t* uart, const char* buf, size_t size);
 int uart_read_char(uart_t* uart);
 int uart_peek_char(uart_t* uart);
 size_t uart_rx_available(uart_t* uart);
