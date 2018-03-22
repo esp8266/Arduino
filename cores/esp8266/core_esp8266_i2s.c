@@ -53,8 +53,6 @@ typedef struct slc_queue_item {
   volatile uint32_t       owner     :  1; // DMA can change this value
   uint32_t *              buf_ptr;
   struct slc_queue_item * next_link_ptr;
-  // This is my own way of tracking item ID
-  volatile uint32_t       myid;
 } slc_queue_item_t;
 
 typedef struct i2s_state {
@@ -158,13 +156,16 @@ static void ICACHE_RAM_ATTR i2s_slc_queue_append_item(i2s_state_t *ch, uint32_t 
 }
 
 // This routine is called as soon as the DMA routine has something to tell us. All we
-// handle here is the RX_EOF_INT status, which indicate the DMA has sent a buffer whose
+// handle here is the *_EOF_INT status, which indicate the DMA has finished a buffer whose
 // descriptor has the 'EOF' field set to 1.
 void ICACHE_RAM_ATTR i2s_slc_isr(void) {
+  ETS_SLC_INTR_DISABLE();
+  // TODO - Seems like there's a chance of missed IRQ notification because the clear happens at least 1 cycle
+  //        after the status read.  Not sure if there's a HW way to prevernt this, even atomic SWAP 
+  //        won't help since these are 2 separate addresses.  Ugh!
   uint32_t slc_intr_status = SLCIS;
   SLCIC = 0xFFFFFFFF;
   if (slc_intr_status & SLCIRXEOF) {
-    ETS_SLC_INTR_DISABLE();
     tx_irqs++;
     slc_queue_item_t *finished_item = (slc_queue_item_t *)SLCRXEDA;
     memset((void *)finished_item->buf_ptr, 0x00, SLC_BUF_LEN * 4);//zero the buffer so it is mute in case of underflow
@@ -175,20 +176,17 @@ void ICACHE_RAM_ATTR i2s_slc_isr(void) {
     if (tx->callback) {
       tx->callback();
     }
-    ETS_SLC_INTR_ENABLE();
   }
   if (slc_intr_status & SLCITXEOF) {
-    ETS_SLC_INTR_DISABLE();
     rx_irqs++;
     slc_queue_item_t *finished_item = (slc_queue_item_t *)SLCTXEDA;
     finished_item->owner = 1; // Or else RX just stops
-    finished_item->myid++;
     i2s_slc_queue_append_item(rx, finished_item->buf_ptr);
     if (rx->callback) {
       rx->callback();
     }
-    ETS_SLC_INTR_ENABLE();
   }
+  ETS_SLC_INTR_ENABLE();
 }
 
 void i2s_set_callback(void (*callback) (void)){
@@ -213,14 +211,13 @@ static void _alloc_channel(i2s_state_t *ch) {
     ch->slc_items[x].blocksize = SLC_BUF_LEN * 4;
     ch->slc_items[x].buf_ptr = (uint32_t*)&ch->slc_buf_pntr[x][0];
     ch->slc_items[x].next_link_ptr = (x<(SLC_BUF_CNT-1))?(&ch->slc_items[x+1]):(&ch->slc_items[0]);
-    ch->slc_items[x].myid = 0;
   }
 }
 #if 0
 void dumprx()
 {
 for (int i=0; i<SLC_BUF_CNT; i++) {
-printf("%d: %d %d %d %d %d %d %p %p\n", i, rx->slc_items[i].myid, rx->slc_items[i].owner, rx->slc_items[i].eof, rx->slc_items[i].sub_sof, rx->slc_items[i].datalen, rx->slc_items[i].blocksize,
+printf("%d: %d %d %d %d %d %d %p %p\n", i, 0, rx->slc_items[i].owner, rx->slc_items[i].eof, rx->slc_items[i].sub_sof, rx->slc_items[i].datalen, rx->slc_items[i].blocksize,
 rx->slc_items[i].buf_ptr, rx->slc_items[i].next_link_ptr);
 }
 }
