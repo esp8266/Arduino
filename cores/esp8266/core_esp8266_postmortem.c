@@ -38,6 +38,8 @@ extern cont_t g_cont;
 static const char* s_panic_file = 0;
 static int s_panic_line = 0;
 static const char* s_panic_func = 0;
+static const char* s_panic_what = 0;
+
 static bool s_abort_called = false;
 
 void abort() __attribute__((noreturn));
@@ -60,12 +62,28 @@ extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack,
 
 extern void custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) __attribute__ ((weak, alias("__custom_crash_callback")));
 
-static void ets_puts_P(const char *romString) {
-    char c = pgm_read_byte(romString++);
-    while (c) {
-        ets_putc(c);
-        c = pgm_read_byte(romString++);
-    }
+// Single, non-inlined copy of pgm_read_byte to save IRAM space (as this is not timing critical)
+static char ICACHE_RAM_ATTR iram_read_byte (const char *addr) {
+    return pgm_read_byte(addr);
+}
+
+// Required to output the s_panic_file, it's stored in PMEM
+#define ets_puts_P(pstr) \
+{ \
+    char c; \
+    do { \
+        c = iram_read_byte(pstr++); \
+        if (c) ets_putc(c); \
+    } while (c); \
+}
+
+// Place these strings in .text because the SPI interface may be in bad shape during an exception.
+#define ets_printf_P(str, ...) \
+{ \
+    static const char istr[] ICACHE_RAM_ATTR = (str); \
+    char mstr[sizeof(str)]; \
+    for (size_t i=0; i < sizeof(str); i++) mstr[i] = iram_read_byte(&istr[i]); \
+    ets_printf(mstr, ##__VA_ARGS__); \
 }
 
 void __wrap_system_restart_local() {
@@ -92,21 +110,25 @@ void __wrap_system_restart_local() {
     ets_install_putc1(&uart_write_char_d);
 
     if (s_panic_line) {
-        ets_puts_P(PSTR("\nPanic "));
-        ets_puts_P(s_panic_file);
-        ets_printf(":%d ", s_panic_line);
-        ets_puts_P(s_panic_func);
-        ets_puts_P(PSTR("\n"));
+        ets_printf_P("\nPanic ");
+        ets_puts_P(s_panic_file); // This is in PROGMEM, need special output because ets_printf can't handle ROM parameters
+        ets_printf_P(":%d %s", s_panic_line, s_panic_func);
+        if (s_panic_what) {
+            ets_printf_P(": Assertion '");
+            ets_puts_P(s_panic_what); // This is also in PMEM
+            ets_printf_P("' failed.");
+        }
+        ets_putc('\n');
     }
     else if (s_abort_called) {
-        ets_puts_P(PSTR("Abort called\n"));
+        ets_printf_P("\nAbort called\n");
     }
     else if (rst_info.reason == REASON_EXCEPTION_RST) {
-        ets_printf("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n",
+        ets_printf_P("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n",
             rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST) {
-        ets_puts_P(PSTR("\nSoft WDT reset\n"));
+        ets_printf_P("\nSoft WDT reset\n");
     }
 
     uint32_t cont_stack_start = (uint32_t) &(g_cont.stack);
@@ -128,17 +150,17 @@ void __wrap_system_restart_local() {
     }
 
     if (sp > cont_stack_start && sp < cont_stack_end) {
-        ets_puts_P(PSTR("\nctx: cont \n"));
+        ets_printf_P("\nctx: cont \n");
         stack_end = cont_stack_end;
     }
     else {
-        ets_puts_P(("\nctx: sys \n"));
+        ets_printf_P("\nctx: sys \n");
         stack_end = 0x3fffffb0;
         // it's actually 0x3ffffff0, but the stuff below ets_run
         // is likely not really relevant to the crash
     }
 
-    ets_printf("sp: %08x end: %08x offset: %04x\n", sp, stack_end, offset);
+    ets_printf_P("sp: %08x end: %08x offset: %04x\n", sp, stack_end, offset);
 
     print_stack(sp + offset, stack_end);
 
@@ -154,18 +176,18 @@ void __wrap_system_restart_local() {
 }
 
 
-static void print_stack(uint32_t start, uint32_t end) {
-    ets_puts_P(PSTR("\n>>>stack>>>\n"));
+static void ICACHE_RAM_ATTR print_stack(uint32_t start, uint32_t end) {
+    ets_printf_P("\n>>>stack>>>\n");
     for (uint32_t pos = start; pos < end; pos += 0x10) {
         uint32_t* values = (uint32_t*)(pos);
 
         // rough indicator: stack frames usually have SP saved as the second word
         bool looksLikeStackFrame = (values[2] == pos + 0x10);
 
-        ets_printf("%08x:  %08x %08x %08x %08x %c\n",
+        ets_printf_P("%08x:  %08x %08x %08x %08x %c\n",
             pos, values[0], values[1], values[2], values[3], (looksLikeStackFrame)?'<':' ');
     }
-    ets_puts_P(PSTR("<<<stack<<<\n"));
+    ets_printf_P("<<<stack<<<\n");
 }
 
 static void uart_write_char_d(char c) {
@@ -202,10 +224,10 @@ void abort() {
 }
 
 void __assert_func(const char *file, int line, const char *func, const char *what) {
-    (void) what;
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
+    s_panic_what = what;
     gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
@@ -214,6 +236,7 @@ void __panic_func(const char* file, int line, const char* func) {
     s_panic_file = file;
     s_panic_line = line;
     s_panic_func = func;
+    s_panic_what = 0;
     gdb_do_break();     /* if GDB is not present, this is a no-op */
     raise_exception();
 }
