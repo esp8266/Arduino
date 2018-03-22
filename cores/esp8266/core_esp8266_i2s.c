@@ -58,13 +58,13 @@ typedef struct slc_queue_item {
 } slc_queue_item_t;
 
 typedef struct i2s_state {
-  uint32_t *       i2s_slc_queue[SLC_BUF_CNT];
-  volatile uint8_t i2s_slc_queue_len;
-  uint32_t *       i2s_slc_buf_pntr[SLC_BUF_CNT]; // Pointer to the I2S DMA buffer data
-  slc_queue_item_t i2s_slc_items[SLC_BUF_CNT]; // I2S DMA buffer descriptors
-  uint32_t *       i2s_curr_slc_buf; // Current buffer for writing
-  uint32_t         i2s_curr_slc_buf_pos; // Position in the current buffer
-  void             (*i2s_callback) (void);
+  uint32_t *       slc_queue[SLC_BUF_CNT];
+  volatile uint8_t slc_queue_len;
+  uint32_t *       slc_buf_pntr[SLC_BUF_CNT]; // Pointer to the I2S DMA buffer data
+  slc_queue_item_t slc_items[SLC_BUF_CNT]; // I2S DMA buffer descriptors
+  uint32_t *       curr_slc_buf; // Current buffer for writing
+  uint32_t         curr_slc_buf_pos; // Position in the current buffer
+  void             (*callback) (void);
   // Callback function should be defined as 'void ICACHE_FLASH_ATTR function_name()',
   // and be placed in IRAM for faster execution. Avoid long computational tasks in this
   // function, use it to set flags and process later.
@@ -87,7 +87,7 @@ static bool ICACHE_FLASH_ATTR _i2s_is_full(const i2s_state_t *ch) {
   if (!ch) {
     return false;
   } else {
-    return (ch->i2s_curr_slc_buf_pos==SLC_BUF_LEN || ch->i2s_curr_slc_buf==NULL) && (ch->i2s_slc_queue_len == 0);
+    return (ch->curr_slc_buf_pos==SLC_BUF_LEN || ch->curr_slc_buf==NULL) && (ch->slc_queue_len == 0);
   }
 }
 
@@ -103,7 +103,7 @@ static bool ICACHE_FLASH_ATTR _i2s_is_empty(const i2s_state_t *ch) {
   if (!ch) {
     return false;
   } else {
-    return (ch->i2s_slc_queue_len >= SLC_BUF_CNT-1);
+    return (ch->slc_queue_len >= SLC_BUF_CNT-1);
   }
 }
 
@@ -119,7 +119,7 @@ static int16_t ICACHE_FLASH_ATTR _i2s_available(const i2s_state_t *ch) {
   if (!ch) {
     return 0;
   } else {
-    return (SLC_BUF_CNT - ch->i2s_slc_queue_len) * SLC_BUF_LEN;
+    return (SLC_BUF_CNT - ch->slc_queue_len) * SLC_BUF_LEN;
   }
 }
 
@@ -134,10 +134,10 @@ int16_t ICACHE_FLASH_ATTR i2s_rx_available(){
 // Pop the top off of the queue and return it
 uint32_t * ICACHE_FLASH_ATTR i2s_slc_queue_next_item(i2s_state_t *ch) {
   uint8_t i;
-  uint32_t *item = ch->i2s_slc_queue[0];
-  ch->i2s_slc_queue_len--;
-  for ( i = 0; i < ch->i2s_slc_queue_len; i++) {
-    ch->i2s_slc_queue[i] = ch->i2s_slc_queue[i+1];
+  uint32_t *item = ch->slc_queue[0];
+  ch->slc_queue_len--;
+  for ( i = 0; i < ch->slc_queue_len; i++) {
+    ch->slc_queue[i] = ch->slc_queue[i+1];
   }
   return item;
 }
@@ -145,15 +145,15 @@ uint32_t * ICACHE_FLASH_ATTR i2s_slc_queue_next_item(i2s_state_t *ch) {
 // Append an item to the end of the queue from receive
 void ICACHE_FLASH_ATTR i2s_slc_queue_append_item(i2s_state_t *ch, uint32_t *item) {
   // Shift everything up, except for the one corresponding to this item
-  for (int i=0, dest=0; i < ch->i2s_slc_queue_len; i++) {
-    if (ch->i2s_slc_queue[i] != item) {
-      ch->i2s_slc_queue[dest++] = ch->i2s_slc_queue[i];
+  for (int i=0, dest=0; i < ch->slc_queue_len; i++) {
+    if (ch->slc_queue[i] != item) {
+      ch->slc_queue[dest++] = ch->slc_queue[i];
     }
   }
-  if (ch->i2s_slc_queue_len < SLC_BUF_CNT - 1) {
-    ch->i2s_slc_queue[ch->i2s_slc_queue_len++] = item;
+  if (ch->slc_queue_len < SLC_BUF_CNT - 1) {
+    ch->slc_queue[ch->slc_queue_len++] = item;
   } else {
-    ch->i2s_slc_queue[ch->i2s_slc_queue_len] = item;
+    ch->slc_queue[ch->slc_queue_len] = item;
   }
 }
 
@@ -168,11 +168,11 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
     tx_irqs++;
     slc_queue_item_t *finished_item = (slc_queue_item_t *)SLCRXEDA;
     memset((void *)finished_item->buf_ptr, 0x00, SLC_BUF_LEN * 4);//zero the buffer so it is mute in case of underflow
-    if (tx->i2s_slc_queue_len >= SLC_BUF_CNT-1) { //All buffers are empty. This means we have an underflow
+    if (tx->slc_queue_len >= SLC_BUF_CNT-1) { //All buffers are empty. This means we have an underflow
       i2s_slc_queue_next_item(tx); //free space for finished_item
     }
-    tx->i2s_slc_queue[tx->i2s_slc_queue_len++] = finished_item->buf_ptr;
-    if (tx->i2s_callback) tx->i2s_callback();
+    tx->slc_queue[tx->slc_queue_len++] = finished_item->buf_ptr;
+    if (tx->callback) tx->callback();
     ETS_SLC_INTR_ENABLE();
   }
   if (slc_intr_status & SLCITXEOF) {
@@ -182,44 +182,44 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
     finished_item->owner = 1; // Or else RX just stops
     finished_item->myid++;
     i2s_slc_queue_append_item(rx, finished_item->buf_ptr);
-    if (rx->i2s_callback) rx->i2s_callback();
+    if (rx->callback) rx->callback();
     ETS_SLC_INTR_ENABLE();
   }
 }
 
 void i2s_set_callback(void (*callback) (void)){
-  tx->i2s_callback = callback;
+  tx->callback = callback;
 }
 
 void i2s_rx_set_callback(void (*callback) (void)){
-  rx->i2s_callback = callback;
+  rx->callback = callback;
 }
 
 static void ICACHE_FLASH_ATTR _alloc_channel(i2s_state_t *ch) {
   int x, y;
 
-  ch->i2s_slc_queue_len = 0;
+  ch->slc_queue_len = 0;
   for (x=0; x<SLC_BUF_CNT; x++) {
-    ch->i2s_slc_buf_pntr[x] = malloc(SLC_BUF_LEN*4);
-    for (y=0; y<SLC_BUF_LEN; y++) ch->i2s_slc_buf_pntr[x][y] = 0;
+    ch->slc_buf_pntr[x] = malloc(SLC_BUF_LEN*4);
+    for (y=0; y<SLC_BUF_LEN; y++) ch->slc_buf_pntr[x][y] = 0;
 
-    ch->i2s_slc_items[x].unused = 0;
-    ch->i2s_slc_items[x].owner = 1;
-    ch->i2s_slc_items[x].eof = 1;
-    ch->i2s_slc_items[x].sub_sof = 0;
-    ch->i2s_slc_items[x].datalen = SLC_BUF_LEN * 4;
-    ch->i2s_slc_items[x].blocksize = SLC_BUF_LEN * 4;
-    ch->i2s_slc_items[x].buf_ptr = (uint32_t*)&ch->i2s_slc_buf_pntr[x][0];
-    ch->i2s_slc_items[x].next_link_ptr = (uint32_t*)((x<(SLC_BUF_CNT-1))?(&ch->i2s_slc_items[x+1]):(&ch->i2s_slc_items[0]));
-    ch->i2s_slc_items[x].myid = 0;
+    ch->slc_items[x].unused = 0;
+    ch->slc_items[x].owner = 1;
+    ch->slc_items[x].eof = 1;
+    ch->slc_items[x].sub_sof = 0;
+    ch->slc_items[x].datalen = SLC_BUF_LEN * 4;
+    ch->slc_items[x].blocksize = SLC_BUF_LEN * 4;
+    ch->slc_items[x].buf_ptr = (uint32_t*)&ch->slc_buf_pntr[x][0];
+    ch->slc_items[x].next_link_ptr = (uint32_t*)((x<(SLC_BUF_CNT-1))?(&ch->slc_items[x+1]):(&ch->slc_items[0]));
+    ch->slc_items[x].myid = 0;
   }
 }
 #if 0
 void dumprx()
 {
 for (int i=0; i<SLC_BUF_CNT; i++) {
-printf("%d: %d %d %d %d %d %d %p %p\n", i, rx->i2s_slc_items[i].myid, rx->i2s_slc_items[i].owner, rx->i2s_slc_items[i].eof, rx->i2s_slc_items[i].sub_sof, rx->i2s_slc_items[i].datalen, rx->i2s_slc_items[i].blocksize,
-rx->i2s_slc_items[i].buf_ptr, rx->i2s_slc_items[i].next_link_ptr);
+printf("%d: %d %d %d %d %d %d %p %p\n", i, rx->slc_items[i].myid, rx->slc_items[i].owner, rx->slc_items[i].eof, rx->slc_items[i].sub_sof, rx->slc_items[i].datalen, rx->slc_items[i].blocksize,
+rx->slc_items[i].buf_ptr, rx->slc_items[i].next_link_ptr);
 }
 }
 #endif
@@ -251,14 +251,14 @@ static void ICACHE_FLASH_ATTR i2s_slc_begin() {
   SLCTXL &= ~(SLCTXLAM << SLCTXLA); // clear TX descriptor address
   SLCRXL &= ~(SLCRXLAM << SLCRXLA); // clear RX descriptor address
   if (!rx) {
-    SLCTXL |= (uint32)&tx->i2s_slc_items[1] << SLCTXLA; // Set fake (unused) RX descriptor address
+    SLCTXL |= (uint32)&tx->slc_items[1] << SLCTXLA; // Set fake (unused) RX descriptor address
   } else {
-    SLCTXL |= (uint32)&rx->i2s_slc_items[0] << SLCTXLA; // Set real RX address
+    SLCTXL |= (uint32)&rx->slc_items[0] << SLCTXLA; // Set real RX address
   }
   if (!tx) {
-//    SLCRXL |= (uint32)&rx->i2s_slc_items[1] << SLCRXLA; // Set fake (ununsed) TX descriptor address
+//    SLCRXL |= (uint32)&rx->slc_items[1] << SLCRXLA; // Set fake (ununsed) TX descriptor address
   } else {
-    SLCRXL |= (uint32)&tx->i2s_slc_items[0] << SLCRXLA; // Set real TX address
+    SLCRXL |= (uint32)&tx->slc_items[0] << SLCRXLA; // Set real TX address
   }
 
   ETS_SLC_INTR_ATTACH(i2s_slc_isr, NULL);
@@ -282,12 +282,12 @@ static void ICACHE_FLASH_ATTR i2s_slc_end(){
 
   for (int x = 0; x<SLC_BUF_CNT; x++) {
     if (tx) {
-      free(tx->i2s_slc_buf_pntr[x]);
-      tx->i2s_slc_buf_pntr[x] = NULL;
+      free(tx->slc_buf_pntr[x]);
+      tx->slc_buf_pntr[x] = NULL;
     }
     if (rx) {
-      free(rx->i2s_slc_buf_pntr[x]);
-      rx->i2s_slc_buf_pntr[x] = NULL;
+      free(rx->slc_buf_pntr[x]);
+      rx->slc_buf_pntr[x] = NULL;
     }
   }
 }
@@ -297,11 +297,11 @@ static void ICACHE_FLASH_ATTR i2s_slc_end(){
 //thread if the buffer is full and resume when there's room again.
 
 static bool ICACHE_FLASH_ATTR _i2s_write_sample(uint32_t sample, bool nb) {
-  if (tx->i2s_curr_slc_buf_pos==SLC_BUF_LEN || tx->i2s_curr_slc_buf==NULL) {
-    if (tx->i2s_slc_queue_len == 0) {
+  if (tx->curr_slc_buf_pos==SLC_BUF_LEN || tx->curr_slc_buf==NULL) {
+    if (tx->slc_queue_len == 0) {
       if (nb) return false;
       while (1) {
-        if (tx->i2s_slc_queue_len > 0){
+        if (tx->slc_queue_len > 0){
           break;
         } else {
           ets_wdt_disable();
@@ -310,11 +310,11 @@ static bool ICACHE_FLASH_ATTR _i2s_write_sample(uint32_t sample, bool nb) {
       }
     }
     ETS_SLC_INTR_DISABLE();
-    tx->i2s_curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item(tx);
+    tx->curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item(tx);
     ETS_SLC_INTR_ENABLE();
-    tx->i2s_curr_slc_buf_pos=0;
+    tx->curr_slc_buf_pos=0;
   }
-  tx->i2s_curr_slc_buf[tx->i2s_curr_slc_buf_pos++]=sample;
+  tx->curr_slc_buf[tx->curr_slc_buf_pos++]=sample;
   return true;
 }
 
@@ -334,11 +334,11 @@ bool ICACHE_FLASH_ATTR i2s_write_lr(int16_t left, int16_t right){
 }
 
 bool ICACHE_FLASH_ATTR i2s_read_sample(uint32_t *left, uint32_t *right, bool blocking) {
-  if (rx->i2s_curr_slc_buf_pos==SLC_BUF_LEN || rx->i2s_curr_slc_buf==NULL) {
-    if (rx->i2s_slc_queue_len == 0) {
+  if (rx->curr_slc_buf_pos==SLC_BUF_LEN || rx->curr_slc_buf==NULL) {
+    if (rx->slc_queue_len == 0) {
       if (!blocking) return false;
       while (1) {
-        if (rx->i2s_slc_queue_len > 0){
+        if (rx->slc_queue_len > 0){
           break;
         } else {
           ets_wdt_disable();
@@ -347,15 +347,15 @@ bool ICACHE_FLASH_ATTR i2s_read_sample(uint32_t *left, uint32_t *right, bool blo
       }
     }
     ETS_SLC_INTR_DISABLE();
-    rx->i2s_curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item(rx);
+    rx->curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item(rx);
     ETS_SLC_INTR_ENABLE();
-    rx->i2s_curr_slc_buf_pos=0;
+    rx->curr_slc_buf_pos=0;
   }
 
-//  *left  = rx->i2s_slc_items[0].buf_ptr[rx->i2s_curr_slc_buf_pos++];
-//  *right = rx->i2s_slc_items[0].buf_ptr[rx->i2s_curr_slc_buf_pos++];
-  *left  = rx->i2s_curr_slc_buf[rx->i2s_curr_slc_buf_pos++];
-  *right = rx->i2s_curr_slc_buf[rx->i2s_curr_slc_buf_pos++];
+//  *left  = rx->slc_items[0].buf_ptr[rx->curr_slc_buf_pos++];
+//  *right = rx->slc_items[0].buf_ptr[rx->curr_slc_buf_pos++];
+  *left  = rx->curr_slc_buf[rx->curr_slc_buf_pos++];
+  *right = rx->curr_slc_buf[rx->curr_slc_buf_pos++];
 
   return true;
 }
