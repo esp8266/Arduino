@@ -15,7 +15,8 @@ struct tcp_pcb;
 extern struct tcp_pcb* tcp_tw_pcbs;
 extern "C" void tcp_abort (struct tcp_pcb* pcb);
 
-void tcpCleanup (void) {
+void tcpCleanup (void)
+{
   while (tcp_tw_pcbs)
     tcp_abort(tcp_tw_pcbs);
 }
@@ -35,7 +36,8 @@ void setup()
 
 TEST_CASE("WiFi release ClientContext", "[clientcontext]")
 {
-    #define LOOPS 20
+    #define MAXLOOPS       50
+    #define SUCCESS_GOAL 10
 
     // will search for a tcp server these gateway's ports
     int ports [] = { 21, 23, 80, 443, 22,
@@ -47,43 +49,47 @@ TEST_CASE("WiFi release ClientContext", "[clientcontext]")
     // look for reachable port on gateway
     int port;
     for (int i = 0; (port = ports[i]); i++)
-    	if (client.connect(WiFi.gatewayIP(), ports[i])) {
-    	    client.stop();
-    	    break;
-    	}
+        if (client.connect(WiFi.gatewayIP(), ports[i]))
+        {
+            client.stop();
+            break;
+        }
 
     Serial.printf(":%d\r\n", port);
     
     int loops = 0;
     int heapLost = 123456;
+    int success = 0;
 
-    if (port) {
-    
+    if (port)
+    {
         tcpCleanup();
         int heapStart = ESP.getFreeHeap();
         int minHeap = heapStart / 2;
         int heap = heapStart;
-	Serial.printf("heap: %d\r\n", heap);
+        Serial.printf("heap: %d\r\n", heap);
 
-        while (++loops < LOOPS && (int)ESP.getFreeHeap() > minHeap)
-            if (client.connect(WiFi.gatewayIP(), port)) {
+        while (success < SUCCESS_GOAL && ++loops <= MAXLOOPS && (int)ESP.getFreeHeap() > minHeap)
+            if (client.connect(WiFi.gatewayIP(), port))
+            {
                 client.stop();
                 tcpCleanup();
                 int newHeap = (int)ESP.getFreeHeap();
-		Serial.printf("%03d %5d %d\r\n", loops, newHeap, newHeap - heap);
-		heap = newHeap;
+                Serial.printf("%03d %5d %d\r\n", loops, newHeap, newHeap - heap);
+                if (newHeap - heap == 0)
+                    success++; 
+                heap = newHeap;
             }
 
-        heapLost = heapStart - ESP.getFreeHeap();
-
-        Serial.printf("min heap: %d\r\nheap: %d\r\nloops: %d\r\nheapLost: %d\r\n",
-            minHeap,
+        Serial.printf("heap: %d\r\nheapLost: %d\r\n"
+                      "loops: %d\r\nstable-loops: %d\r\n",
             ESP.getFreeHeap(),
+            heapLost,
             loops,
-            (int)heapLost);
+            success);
     }
 
-    REQUIRE(loops == LOOPS && heapLost <= 0);
+    REQUIRE(success >= SUCCESS_GOAL);
 }
 
 void loop()
