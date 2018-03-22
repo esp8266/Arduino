@@ -103,7 +103,7 @@ inline size_t uart_rx_fifo_available(uart_t* uart) {
     return (USS(uart->uart_nr) >> USRXC) & 0x7F;
 }
 
-char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
+const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
 
 // Copy all the rx fifo bytes that fit into the rx buffer
 inline void uart_rx_copy_fifo_to_buffer(uart_t* uart) {
@@ -214,24 +214,31 @@ void uart_stop_isr(uart_t* uart)
     ETS_UART_INTR_ATTACH(NULL, NULL);
 }
 
-
-void uart_write_char(uart_t* uart, char c)
+static void uart_do_write_char(uart_t* uart, char c)
 {
-    if(uart == NULL || !uart->tx_enabled) {
-        return;
-    }
     while((USS(uart->uart_nr) >> USTXC) >= 0x7f);
     USF(uart->uart_nr) = c;
 }
 
-void uart_write(uart_t* uart, const char* buf, size_t size)
+size_t uart_write_char(uart_t* uart, char c)
 {
     if(uart == NULL || !uart->tx_enabled) {
-        return;
+        return 0;
     }
-    while(size--) {
-        uart_write_char(uart, *buf++);
+    uart_do_write_char(uart, c);
+    return 1;
+}
+
+size_t uart_write(uart_t* uart, const char* buf, size_t size)
+{
+    if(uart == NULL || !uart->tx_enabled) {
+        return 0;
     }
+    size_t ret = size;
+    while (size--) {
+        uart_do_write_char(uart, *buf++);
+    }
+    return ret;
 }
 
 size_t uart_tx_free(uart_t* uart)
