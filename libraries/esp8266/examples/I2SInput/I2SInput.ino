@@ -1,5 +1,5 @@
 /*
-   I2S stereo microphone (input) example 
+   I2S stereo microphone (input) example
    Run using the Arduion Serial Plotter to see waveform.
    Released to the Public Domain by Earle F. Philhower, III
 */
@@ -7,8 +7,7 @@
 #include <ESP8266WiFi.h>
 #include <i2s.h>
 
-void dump()
-{
+void dump() {
   Serial.printf("I2SC:    %08x\n", I2SC);
   Serial.printf("I2SFC:   %08x\n", I2SFC);
   Serial.printf("I2SCC:   %08x\n", I2SCC);
@@ -29,12 +28,12 @@ void setup() {
   dump();
 
   delay(1000);
-  
+
   while (1) {
     uint32_t l, r;
     i2s_read_sample(&l, &r, true);
-    int16_t lh = l>>16;
-    int16_t rh = r>>16;
+    int16_t lh = l >> 16;
+    int16_t rh = r >> 16;
     char withScale[256];
     sprintf(withScale, "%d %d", lh, rh);
     Serial.println(withScale);
@@ -43,6 +42,5 @@ void setup() {
 }
 
 void loop() {
+  /* Nothing here */
 }
-
-
