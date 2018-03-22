@@ -45,16 +45,16 @@ extern void ets_wdt_disable(void);
 // placed onto the list when they're filled by DMA
 
 typedef struct slc_queue_item {
-  uint32_t blocksize : 12;
-  uint32_t datalen   : 12;
-  uint32_t unused    :  5;
-  uint32_t sub_sof   :  1;
-  volatile uint32_t eof       :  1;
-  volatile uint32_t owner     :  1;
-  uint32_t *buf_ptr;
-  uint32_t *next_link_ptr;
+  uint32_t                blocksize : 12;
+  uint32_t                datalen   : 12;
+  uint32_t                unused    :  5;
+  uint32_t                sub_sof   :  1;
+  uint32_t                eof       :  1;
+  volatile uint32_t       owner     :  1; // DMA can change this value
+  uint32_t *              buf_ptr;
+  struct slc_queue_item * next_link_ptr;
   // This is my own way of tracking item ID
-  volatile uint32_t myid;
+  volatile uint32_t       myid;
 } slc_queue_item_t;
 
 typedef struct i2s_state {
@@ -210,7 +210,7 @@ static void ICACHE_FLASH_ATTR _alloc_channel(i2s_state_t *ch) {
     ch->slc_items[x].datalen = SLC_BUF_LEN * 4;
     ch->slc_items[x].blocksize = SLC_BUF_LEN * 4;
     ch->slc_items[x].buf_ptr = (uint32_t*)&ch->slc_buf_pntr[x][0];
-    ch->slc_items[x].next_link_ptr = (uint32_t*)((x<(SLC_BUF_CNT-1))?(&ch->slc_items[x+1]):(&ch->slc_items[0]));
+    ch->slc_items[x].next_link_ptr = (x<(SLC_BUF_CNT-1))?(&ch->slc_items[x+1]):(&ch->slc_items[0]);
     ch->slc_items[x].myid = 0;
   }
 }
