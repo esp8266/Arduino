@@ -58,7 +58,6 @@ TEST_CASE("WiFi release ClientContext", "[clientcontext]")
     Serial.printf(":%d\r\n", port);
     
     int loops = 0;
-    int heapLost = 123456;
     int success = 0;
 
     if (port)
@@ -81,10 +80,9 @@ TEST_CASE("WiFi release ClientContext", "[clientcontext]")
                 heap = newHeap;
             }
 
-        Serial.printf("heap: %d\r\nheapLost: %d\r\n"
+        Serial.printf("heap: %d\r\n"
                       "loops: %d\r\nstable-loops: %d\r\n",
             ESP.getFreeHeap(),
-            heapLost,
             loops,
             success);
     }
