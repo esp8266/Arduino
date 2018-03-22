@@ -68,7 +68,7 @@ TEST_CASE("WiFi release ClientContext", "[clientcontext]")
         Serial.printf("heap: %d\r\n", heap);
 
         while (success < SUCCESS_GOAL && ++loops <= MAXLOOPS && (int)ESP.getFreeHeap() > minHeap)
-            if (client.connect(WiFi.gatewayIP(), port))
+            if (client.connect(srv, port))
             {
                 client.stop();
                 tcpCleanup();
