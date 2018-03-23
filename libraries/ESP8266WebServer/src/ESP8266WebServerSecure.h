@@ -42,6 +42,12 @@ public:
   void handleClient() override;
   void close() override;
 
+  template<typename T>
+  size_t streamFile(T &file, const String& contentType) {
+    _streamFileCore(file.size(), file.name(), contentType);
+    return _currentClientSecure.write(file);
+  }
+
 private:
   size_t _currentClientWrite (const char *bytes, size_t len) override { return _currentClientSecure.write((const uint8_t *)bytes, len); }
   size_t _currentClientWrite_P (PGM_P bytes, size_t len) override { return _currentClientSecure.write_P(bytes, len); }
