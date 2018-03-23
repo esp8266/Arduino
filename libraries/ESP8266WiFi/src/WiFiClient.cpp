@@ -112,8 +112,11 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     ip_addr_t addr;
     addr.addr = ip;
 
-    if (_client)
+    if (_client) {
         stop();
+        _client->unref();
+        _client = nullptr;
+    }
 
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
