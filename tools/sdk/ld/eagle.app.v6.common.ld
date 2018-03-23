@@ -162,6 +162,11 @@ SECTIONS
     _etext = .;
   } >iram1_0_seg :iram1_0_phdr
 
+  .sys_unused_data 0x3fffe000 :
+  {
+    *(.sys_unused)
+  }
+
   .rodata : ALIGN(4)
   {
     _rodata_start = ABSOLUTE(.);

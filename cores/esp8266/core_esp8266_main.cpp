@@ -76,7 +76,7 @@ void preloop_update_frequency() {
 extern void (*__init_array_start)(void);
 extern void (*__init_array_end)(void);
 
-cont_t g_cont __attribute__ ((aligned (16)));
+cont_t __attribute__ ((section(".sys_unused"))) g_cont __attribute__ ((aligned (16)));
 static os_event_t g_loop_queue[LOOP_QUEUE_SIZE];
 
 static uint32_t g_micros_at_task_start;
