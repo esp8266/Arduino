@@ -27,7 +27,7 @@ WiFiEventHandler
     WiFiEventHandler  onSoftAPModeStationConnected (std::function< void(const WiFiEventSoftAPModeStationConnected &)>) 
     WiFiEventHandler  onSoftAPModeStationDisconnected (std::function< void(const WiFiEventSoftAPModeStationDisconnected &)>) 
 
-To see a sample application with ``WiFiEventHandler``, please check separate section with `examples :arrow\_right: <generic-examples.md>`__ dedicated specifically to the Generic Class..
+To see a sample application with ``WiFiEventHandler``, please check separate section with `examples :arrow\_right: <generic-examples.rst>`__ dedicated specifically to the Generic Class..
 
 persistent
 ~~~~~~~~~~
@@ -79,4 +79,4 @@ Other Function Calls
 
 Documentation for the above functions is not yet prepared.
 
-For code samples please refer to separate section with `examples <generic-examples.md>`__ dedicated specifically to the Generic Class.
+For code samples please refer to separate section with `examples <generic-examples.rst>`__ dedicated specifically to the Generic Class.

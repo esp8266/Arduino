@@ -27,7 +27,7 @@ const int httpsPort = 443;
 
 // Root certificate used by api.github.com.
 // Defined in "CACert" tab.
-extern const unsigned char caCert[];
+extern const unsigned char caCert[] PROGMEM;
 extern const unsigned int caCertLen;
 
 WiFiClientSecure client;
@@ -37,6 +37,7 @@ void setup() {
   Serial.println();
   Serial.print("connecting to ");
   Serial.println(ssid);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -52,7 +53,7 @@ void setup() {
   Serial.print("Setting time using SNTP");
   configTime(8 * 3600, 0, "pool.ntp.org", "time.nist.gov");
   time_t now = time(nullptr);
-  while (now < 1000) {
+  while (now < 8 * 3600 * 2) {
     delay(500);
     Serial.print(".");
     now = time(nullptr);
@@ -64,7 +65,7 @@ void setup() {
   Serial.print(asctime(&timeinfo));
 
   // Load root certificate in DER format into WiFiClientSecure object
-  bool res = client.setCACert(caCert, caCertLen);
+  bool res = client.setCACert_P(caCert, caCertLen);
   if (!res) {
     Serial.println("Failed to load root CA certificate!");
     while (true) {

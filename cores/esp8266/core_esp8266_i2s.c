@@ -56,6 +56,7 @@ static uint32_t *i2s_slc_buf_pntr[SLC_BUF_CNT]; //Pointer to the I2S DMA buffer 
 static struct slc_queue_item i2s_slc_items[SLC_BUF_CNT]; //I2S DMA buffer descriptors
 static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
 static int i2s_curr_slc_buf_pos=0; //position in the current buffer
+static void (*i2s_callback) (void)=0; //Callback function should be defined as 'void ICACHE_FLASH_ATTR function_name()', placing the function in IRAM for faster execution. Avoid long computational tasks in this function, use it to set flags and process later.
 
 bool ICACHE_FLASH_ATTR i2s_is_full(){
   return (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) && (i2s_slc_queue_len == 0);
@@ -63,6 +64,10 @@ bool ICACHE_FLASH_ATTR i2s_is_full(){
 
 bool ICACHE_FLASH_ATTR i2s_is_empty(){
   return (i2s_slc_queue_len >= SLC_BUF_CNT-1);
+}
+
+int16_t ICACHE_FLASH_ATTR i2s_available(){
+	return (SLC_BUF_CNT - i2s_slc_queue_len) * SLC_BUF_LEN;
 }
 
 uint32_t ICACHE_FLASH_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
@@ -88,8 +93,13 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
       i2s_slc_queue_next_item(); //free space for finished_item
     }
     i2s_slc_queue[i2s_slc_queue_len++] = finished_item->buf_ptr;
+    if (i2s_callback) i2s_callback();
     ETS_SLC_INTR_ENABLE();
   }
+}
+
+void i2s_set_callback(void (*callback) (void)){
+    i2s_callback = callback;
 }
 
 void ICACHE_FLASH_ATTR i2s_slc_begin(){
@@ -208,13 +218,40 @@ static uint32_t _i2s_sample_rate;
 void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
   if(rate == _i2s_sample_rate) return;
   _i2s_sample_rate = rate;
-  uint32_t i2s_clock_div = (I2SBASEFREQ/(_i2s_sample_rate*32)) & I2SCDM;
-  uint8_t i2s_bck_div = (I2SBASEFREQ/(_i2s_sample_rate*i2s_clock_div*2)) & I2SBDM;
+
+  uint32_t scaled_base_freq = I2SBASEFREQ/32;
+  float delta_best = scaled_base_freq;
+
+  uint8_t sbd_div_best=1;
+  uint8_t scd_div_best=1;
+  for (uint8_t i=1; i<64; i++){
+    for (uint8_t j=i; j<64; j++){
+      float new_delta = fabs(((float)scaled_base_freq/i/j) - rate);
+      if (new_delta < delta_best){
+      	delta_best = new_delta;
+        sbd_div_best = i;
+        scd_div_best = j;
+      }
+    }
+  }
+
   //os_printf("Rate %u Div %u Bck %u Frq %u\n", _i2s_sample_rate, i2s_clock_div, i2s_bck_div, I2SBASEFREQ/(i2s_clock_div*i2s_bck_div*2));
 
   //!trans master, !bits mod, rece slave mod, rece msb shift, right first, msb right
   I2SC &= ~(I2STSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
-  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | ((i2s_bck_div-1) << I2SBD) | ((i2s_clock_div-1) << I2SCD);
+  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | ((sbd_div_best) << I2SBD) | ((scd_div_best) << I2SCD);
+}
+
+void ICACHE_FLASH_ATTR i2s_set_dividers(uint8_t div1, uint8_t div2){
+  div1 &= I2SBDM;
+  div2 &= I2SCDM;
+
+  I2SC &= ~(I2STSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
+  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | (div1 << I2SBD) | (div2 << I2SCD);
+}
+
+float ICACHE_FLASH_ATTR i2s_get_real_rate(){
+  return (float)I2SBASEFREQ/32/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
 }
 
 void ICACHE_FLASH_ATTR i2s_begin(){

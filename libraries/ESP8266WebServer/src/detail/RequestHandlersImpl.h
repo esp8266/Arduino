@@ -2,6 +2,10 @@
 #define REQUESTHANDLERSIMPL_H
 
 #include "RequestHandler.h"
+#include "mimetable.h"
+#include "WString.h"
+
+using namespace mime;
 
 class FunctionRequestHandler : public RequestHandler {
 public:
@@ -87,7 +91,8 @@ public:
         if (!_isFile) {
             // Base URI doesn't point to a file.
             // If a directory is requested, look for index file.
-            if (requestUri.endsWith("/")) requestUri += "index.htm";
+            if (requestUri.endsWith("/")) 
+              requestUri += "index.htm";
 
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
@@ -98,10 +103,10 @@ public:
 
         // look for gz file, only if the original specified path is not a gz.  So part only works to send gzip via content encoding when a non compressed is asked for
         // if you point the the path to gzip you will serve the gzip as content type "application/x-gzip", not text or javascript etc...
-        if (!path.endsWith(".gz") && !_fs.exists(path))  {
-            String pathWithGz = path + ".gz";
+        if (!path.endsWith(FPSTR(mimeTable[gz].endsWith)) && !_fs.exists(path))  {
+            String pathWithGz = path + FPSTR(mimeTable[gz].endsWith);
             if(_fs.exists(pathWithGz))
-                path += ".gz";
+                path += FPSTR(mimeTable[gz].endsWith);
         }
 
         File f = _fs.open(path, "r");
@@ -116,29 +121,18 @@ public:
     }
 
     static String getContentType(const String& path) {
-        if (path.endsWith(".html")) return "text/html";
-        else if (path.endsWith(".htm")) return "text/html";
-        else if (path.endsWith(".css")) return "text/css";
-        else if (path.endsWith(".txt")) return "text/plain";
-        else if (path.endsWith(".js")) return "application/javascript";
-        else if (path.endsWith(".json")) return "application/json";
-        else if (path.endsWith(".png")) return "image/png";
-        else if (path.endsWith(".gif")) return "image/gif";
-        else if (path.endsWith(".jpg")) return "image/jpeg";
-        else if (path.endsWith(".ico")) return "image/x-icon";
-        else if (path.endsWith(".svg")) return "image/svg+xml";
-        else if (path.endsWith(".ttf")) return "application/x-font-ttf";
-        else if (path.endsWith(".otf")) return "application/x-font-opentype";
-        else if (path.endsWith(".woff")) return "application/font-woff";
-        else if (path.endsWith(".woff2")) return "application/font-woff2";
-        else if (path.endsWith(".eot")) return "application/vnd.ms-fontobject";
-        else if (path.endsWith(".sfnt")) return "application/font-sfnt";
-        else if (path.endsWith(".xml")) return "text/xml";
-        else if (path.endsWith(".pdf")) return "application/pdf";
-        else if (path.endsWith(".zip")) return "application/zip";
-        else if(path.endsWith(".gz")) return "application/x-gzip";
-        else if (path.endsWith(".appcache")) return "text/cache-manifest";
-        return "application/octet-stream";
+        char buff[sizeof(mimeTable[0].mimeType)];
+        // Check all entries but last one for match, return if found
+        for (size_t i=0; i < sizeof(mimeTable)/sizeof(mimeTable[0])-1; i++) {
+            strcpy_P(buff, mimeTable[i].endsWith);
+            if (path.endsWith(buff)) {
+                strcpy_P(buff, mimeTable[i].mimeType);
+                return String(buff);
+            }
+        }
+        // Fall-through and just return default type
+        strcpy_P(buff, mimeTable[sizeof(mimeTable)/sizeof(mimeTable[0])-1].mimeType);
+        return String(buff);
     }
 
 protected:

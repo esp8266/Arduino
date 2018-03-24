@@ -303,13 +303,24 @@ void ESP8266WiFiGenericClass::persistent(bool persistent) {
     _persistent = persistent;
 }
 
+/**
+ * gets the persistent state
+ * @return bool
+ */
+bool ESP8266WiFiGenericClass::getPersistent(){
+    return _persistent;
+}
 
 /**
  * set new mode
  * @param m WiFiMode_t
  */
 bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
-    if(wifi_get_opmode() == (uint8) m) {
+    if(_persistent){
+        if(wifi_get_opmode() == (uint8) m && wifi_get_opmode_default() == (uint8) m){
+            return true;
+        }
+    } else if(wifi_get_opmode() == (uint8) m){
         return true;
     }
 
@@ -467,7 +478,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     }
 
     if(err != 0) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, err);
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
     } else {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
     }
