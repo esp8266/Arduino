@@ -89,7 +89,7 @@ For more details on the internals of SPIFFS implementation, see the [SPIFFS read
 - Go to sketch directory (choose Sketch > Show Sketch Folder).
 - Create a directory named `data` and any files you want in the file system there.
 - Make sure you have selected a board, port, and closed Serial Monitor.
-- Place your ESP8266 module in bootloader mode using the procedure advised by your module manufacturer or supplier.
+- If your board requires you to press a button (or other) to enter bootload mode for flashing a sketch, do that now.
 - Select Tools > ESP8266 Sketch Data Upload. This should start uploading the files into ESP8266 flash file system. When done, IDE status bar will display `SPIFFS Image Uploaded` message.
 
 
