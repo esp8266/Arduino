@@ -69,6 +69,12 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
     if(lhs.max_connection != rhs.max_connection) {
         return false;
     }
+    if(lhs.beacon_interval != rhs.beacon_interval) {
+        return false;
+    }
+    if(lhs.authmode != rhs.authmode) {
+        return false;
+    }
     return true;
 }
 
@@ -123,9 +129,15 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         strcpy(reinterpret_cast<char*>(conf.password), passphrase);
     }
 
-    struct softap_config conf_current;
-    wifi_softap_get_config(&conf_current);
-    if(!softap_config_equal(conf, conf_current)) {
+    struct softap_config conf_compare;
+    if(WiFi._persistent){
+        wifi_softap_get_config_default(&conf_compare);
+    }
+    else {
+        wifi_softap_get_config(&conf_compare);
+    }
+
+    if(!softap_config_equal(conf, conf_compare)) {
 
         ETS_UART_INTR_DISABLE();
         if(WiFi._persistent) {
@@ -265,6 +277,7 @@ bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
     struct softap_config conf;
     *conf.ssid = 0;
     *conf.password = 0;
+    conf.authmode = AUTH_OPEN;
     ETS_UART_INTR_DISABLE();
     if(WiFi._persistent) {
         ret = wifi_softap_set_config(&conf);
@@ -277,7 +290,7 @@ bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
         DEBUG_WIFI("[APdisconnect] set_config failed!\n");
     }
 
-    if(wifioff) {
+    if(ret && wifioff) {
         ret = WiFi.enableAP(false);
     }
 

@@ -25,7 +25,9 @@ License (MIT license):
   THE SOFTWARE.
 
 */
+#ifndef LWIP_OPEN_SRC
 #define LWIP_OPEN_SRC
+#endif
 #include <functional>
 #include "ESP8266SSDP.h"
 #include "WiFiUdp.h"
@@ -199,7 +201,7 @@ bool SSDPClass::begin(){
 
 void SSDPClass::_send(ssdp_method_t method){
   char buffer[1460];
-  uint32_t ip = WiFi.localIP();
+  IPAddress ip = WiFi.localIP();
 
   char valueBuffer[strlen_P(_ssdp_notify_template)+1];
   strcpy_P(valueBuffer, (method == NONE)?_ssdp_response_template:_ssdp_notify_template);
@@ -212,7 +214,7 @@ void SSDPClass::_send(ssdp_method_t method){
     _uuid,
     (method == NONE)?"ST":"NT",
     _deviceType,
-    IP2STR(&ip), _port, _schemaURL
+   ip[0], ip[1], ip[2], ip[3], _port, _schemaURL
   );
 
   _server->append(buffer, len);
@@ -242,11 +244,11 @@ void SSDPClass::_send(ssdp_method_t method){
 }
 
 void SSDPClass::schema(WiFiClient client){
-  uint32_t ip = WiFi.localIP();
+  IPAddress ip = WiFi.localIP();
   char buffer[strlen_P(_ssdp_schema_template)+1];
   strcpy_P(buffer, _ssdp_schema_template);
   client.printf(buffer,
-    IP2STR(&ip), _port,
+    ip[0], ip[1], ip[2], ip[3], _port,
     _deviceType,
     _friendlyName,
     _presentationURL,
@@ -287,7 +289,6 @@ void SSDPClass::_update(){
         case METHOD:
           if(c == ' '){
             if(strcmp(buffer, "M-SEARCH") == 0) method = SEARCH;
-            else if(strcmp(buffer, "NOTIFY") == 0) method = NOTIFY;
 
             if(method == NONE) state = ABORT;
             else state = URI;
@@ -328,7 +329,7 @@ void SSDPClass::_update(){
 #endif
                 }
                 // if the search type matches our type, we should respond instead of ABORT
-                if(strcmp(buffer, _deviceType) == 0){
+                if(strcasecmp(buffer, _deviceType) == 0){
                   _pending = true;
                   _process_time = millis();
                   state = KEY;

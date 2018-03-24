@@ -40,7 +40,7 @@ function build_sketches()
     local build_arg=$3
     local build_dir=build.tmp
     mkdir -p $build_dir
-    local build_cmd="python tools/build.py -b generic -v -k -p $PWD/$build_dir $build_arg "
+    local build_cmd="python tools/build.py -b generic -v -w all -k -p $PWD/$build_dir $build_arg "
     local sketches=$(find $srcpath -name *.ino)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
@@ -50,7 +50,7 @@ function build_sketches()
         local sketchdirname=$(basename $sketchdir)
         local sketchname=$(basename $sketch)
         if [[ "${sketchdirname}.ino" != "$sketchname" ]]; then
-            echo "Skipping $sketch, beacause it is not the main sketch file";
+            echo "Skipping $sketch, because it is not the main sketch file";
             continue
         fi;
         if [[ -f "$sketchdir/.test.skip" ]]; then
@@ -68,6 +68,12 @@ function build_sketches()
             cat build.log
             set -e
             return $result
+        else
+            local warns=$( grep -c warning: build.log )
+            if [ $warns -ne 0 ]; then
+                echo "Warnings detected, log follows:"
+                cat build.log
+            fi
         fi
         rm build.log
         print_size_info $build_dir/*.elf >>size.log
@@ -97,6 +103,9 @@ function install_ide()
     mkdir esp8266com
     cd esp8266com
     ln -s $core_path esp8266
+    # Set custom warnings for all builds (i.e. could add -Wextra at some point)
+    echo "compiler.c.extra_flags=-Wall -Werror" > esp8266/platform.local.txt
+    echo "compiler.cpp.extra_flags=-Wall -Werror" >> esp8266/platform.local.txt
     cd esp8266/tools
     python get.py
     export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
@@ -122,31 +131,65 @@ function build_package()
     ./build_boards_manager_package.sh
 }
 
-function run_travis_ci_build()
+function build_boards()
 {
-    # Build documentation using Sphinx
-    echo -e "travis_fold:start:docs"
-    cd $TRAVIS_BUILD_DIR/doc
-    build_docs
-    echo -e "travis_fold:end:docs"
+    echo -e "travis_fold:start:build_boards"
+    tools/boards.txt.py --boardsgen --ldgen --packagegen --docgen
+    git diff --exit-code -- boards.txt \
+                            package/package_esp8266com_index.template.json \
+                            doc/boards.rst \
+                            tools/sdk/ld/
+    echo -e "travis_fold:end:build_boards"
+}
 
-    # Build release package
-    echo -e "travis_fold:start:build_package"
-    cd $TRAVIS_BUILD_DIR/package
-    build_package
-    echo -e "travis_fold:end:build_package"
+function install_platformio()
+{
+    pip install --user -U https://github.com/platformio/platformio/archive/develop.zip
+    platformio platform install https://github.com/platformio/platform-espressif8266.git#feature/stage
+    sed -i 's/https:\/\/github\.com\/esp8266\/Arduino\.git/*/' ~/.platformio/platforms/espressif8266/platform.json
+    ln -s $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
+    # Install dependencies:
+    # - esp8266/examples/ConfigFile
+    pio lib install ArduinoJson
+}
 
-    if [ "$TRAVIS_TAG" != "" ]; then
-        echo "Skipping tests for tagged build"
-        return 0;
-    fi
+function build_sketches_with_platformio()
+{
+    set +e
+    local srcpath=$1
+    local build_arg=$2
+    local sketches=$(find $srcpath -name *.ino)
+    for sketch in $sketches; do
+        local sketchdir=$(dirname $sketch)
+        local sketchdirname=$(basename $sketchdir)
+        local sketchname=$(basename $sketch)
+        if [[ "${sketchdirname}.ino" != "$sketchname" ]]; then
+            echo "Skipping $sketch, beacause it is not the main sketch file";
+            continue
+        fi;
+        if [[ -f "$sketchdir/.test.skip" ]]; then
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
+            continue
+        fi
+        local build_cmd="pio ci $sketchdir $build_arg"
+        echo -e "\n ------------ Building $sketch ------------ \n";
+        echo "$build_cmd"
+        time ($build_cmd >build.log)
+        local result=$?
+        if [ $result -ne 0 ]; then
+            echo "Build failed ($1)"
+            echo "Build log:"
+            cat build.log
+            set -e
+            return $result
+        fi
+        rm build.log
+    done
+    set -e
+}
 
-    # Run host side tests
-    echo -e "travis_fold:start:host_tests"
-    cd $TRAVIS_BUILD_DIR/tests
-    run_host_tests
-    echo -e "travis_fold:end:host_tests"
-
+function install_arduino()
+{
     # Install Arduino IDE and required libraries
     echo -e "travis_fold:start:sketch_test_env_prepare"
     cd $TRAVIS_BUILD_DIR
@@ -155,7 +198,10 @@ function run_travis_ci_build()
     cd $TRAVIS_BUILD_DIR
     install_libraries
     echo -e "travis_fold:end:sketch_test_env_prepare"
+}
 
+function build_sketches_with_arduino()
+{
     # Compile sketches
     echo -e "travis_fold:start:sketch_test"
     build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries"
@@ -167,9 +213,56 @@ function run_travis_ci_build()
     echo -e "travis_fold:end:size_report"
 }
 
+function check_examples_style()
+{
+    echo -e "travis_fold:start:check_examples_style"
+
+    find $TRAVIS_BUILD_DIR/libraries -name '*.ino' -exec \
+        astyle \
+            --suffix=none \
+            --options=$TRAVIS_BUILD_DIR/tests/examples_style.conf {} \;
+
+    git diff --exit-code -- $TRAVIS_BUILD_DIR/libraries
+
+    echo -e "travis_fold:end:check_examples_style"
+}
+
 set -e
 
+if [ -z "$TRAVIS_BUILD_DIR" ]; then
+    echo "TRAVIS_BUILD_DIR is not set, trying to guess:"
+    pushd $(dirname $0)/../ > /dev/null
+    TRAVIS_BUILD_DIR=$PWD
+    popd > /dev/null
+    echo "TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR"
+fi
+
 if [ "$BUILD_TYPE" = "build" ]; then
-    run_travis_ci_build
+    install_arduino
+    build_sketches_with_arduino
+elif [ "$BUILD_TYPE" = "platformio" ]; then
+    # PlatformIO
+    install_platformio
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
+elif [ "$BUILD_TYPE" = "docs" ]; then
+    # Build documentation using Sphinx
+    cd $TRAVIS_BUILD_DIR/doc
+    build_docs
+elif [ "$BUILD_TYPE" = "package" ]; then
+    # Check that boards.txt, ld scripts, package JSON template, and boards.rst are up to date
+    build_boards
+    # Build release package
+    cd $TRAVIS_BUILD_DIR/package
+    build_package
+elif [ "$BUILD_TYPE" = "host_tests" ]; then
+    # Run host side tests
+    cd $TRAVIS_BUILD_DIR/tests
+    run_host_tests
+elif [ "$BUILD_TYPE" = "style_check" ]; then
+    # Check code style
+    check_examples_style
+else
+    echo "BUILD_TYPE not set"
+    exit 1
 fi
 

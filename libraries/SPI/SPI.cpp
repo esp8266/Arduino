@@ -380,7 +380,7 @@ void SPIClass::write32(uint32_t data, bool msb) {
  * @param data uint8_t *
  * @param size uint32_t
  */
-void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
+void SPIClass::writeBytes(const uint8_t * data, uint32_t size) {
     while(size) {
         if(size > 64) {
             writeBytes_(data, 64);
@@ -393,13 +393,13 @@ void SPIClass::writeBytes(uint8_t * data, uint32_t size) {
     }
 }
 
-void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
+void SPIClass::writeBytes_(const uint8_t * data, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
     // Set Bits to transfer
     setDataBits(size * 8);
 
     uint32_t * fifoPtr = (uint32_t*)&SPI1W0;
-    uint32_t * dataPtr = (uint32_t*) data;
+    const uint32_t * dataPtr = (uint32_t*) data;
     uint32_t dataSize = ((size + 3) / 4);
 
     while(dataSize--) {
@@ -418,14 +418,14 @@ void SPIClass::writeBytes_(uint8_t * data, uint8_t size) {
  * @param size uint8_t  max for size is 64Byte
  * @param repeat uint32_t
  */
-void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
+void SPIClass::writePattern(const uint8_t * data, uint8_t size, uint32_t repeat) {
     if(size > 64) return; //max Hardware FIFO
 
     while(SPI1CMD & SPIBUSY) {}
 
     uint32_t buffer[16];
     uint8_t *bufferPtr=(uint8_t *)&buffer;
-    uint8_t *dataPtr = data;
+    const uint8_t *dataPtr = data;
     volatile uint32_t * fifoPtr = &SPI1W0;
     uint8_t r;
     uint32_t repeatRem;
@@ -497,7 +497,7 @@ void SPIClass::writePattern(uint8_t * data, uint8_t size, uint32_t repeat) {
  * @param in  uint8_t *
  * @param size uint32_t
  */
-void SPIClass::transferBytes(uint8_t * out, uint8_t * in, uint32_t size) {
+void SPIClass::transferBytes(const uint8_t * out, uint8_t * in, uint32_t size) {
     while(size) {
         if(size > 64) {
             transferBytes_(out, in, 64);
@@ -511,7 +511,7 @@ void SPIClass::transferBytes(uint8_t * out, uint8_t * in, uint32_t size) {
     }
 }
 
-void SPIClass::transferBytes_(uint8_t * out, uint8_t * in, uint8_t size) {
+void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
     // Set in/out Bits to transfer
 

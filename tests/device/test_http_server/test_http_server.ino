@@ -36,8 +36,8 @@ TEST_CASE("HTTP GET Parameters", "[HTTPServer]")
             siteData = "";
             for (uint8_t i=0; i<server.args(); i++){
                 if(i > 0)
-                    siteData += "&";
-                siteData += server.argName(i) + "=" + server.arg(i);
+                    siteData += "\n";
+                siteData += server.argName(i) + " = " + server.arg(i);
             }
             siteHits++;
             server.send(200, "text/plain", siteData);
@@ -45,7 +45,7 @@ TEST_CASE("HTTP GET Parameters", "[HTTPServer]")
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
             server.handleClient();
-        REQUIRE(siteHits > 0 && siteData.equals("var1=val with spaces&var+=some%"));
+        REQUIRE(siteHits > 0 && siteData.equals("var1 = val with spaces\nva=r+ = so&me%"));
     }
 }
 
@@ -57,8 +57,8 @@ TEST_CASE("HTTP POST Parameters", "[HTTPServer]")
             siteData = "";
             for (uint8_t i=0; i<server.args(); i++){
                 if(i > 0)
-                    siteData += "&";
-                siteData += server.argName(i) + "=" + server.arg(i);
+                    siteData += "\n";
+                siteData += server.argName(i) + " = " + server.arg(i);
             }
             siteHits++;
             server.send(200, "text/plain", siteData);
@@ -66,7 +66,7 @@ TEST_CASE("HTTP POST Parameters", "[HTTPServer]")
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
             server.handleClient();
-        REQUIRE(siteHits > 0 && siteData.equals("var2=val with spaces"));
+        REQUIRE(siteHits > 0 && siteData.equals("var2 = val with spaces"));
     }
 }
 
@@ -78,8 +78,8 @@ TEST_CASE("HTTP GET+POST Parameters", "[HTTPServer]")
             siteData = "";
             for (uint8_t i=0; i<server.args(); i++){
                 if(i > 0)
-                    siteData += "&";
-                siteData += server.argName(i) + "=" + server.arg(i);
+                    siteData += "\n";
+                siteData += server.argName(i) + " = " + server.arg(i);
             }
             siteHits++;
             server.send(200, "text/plain", siteData);
@@ -87,7 +87,7 @@ TEST_CASE("HTTP GET+POST Parameters", "[HTTPServer]")
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
             server.handleClient();
-        REQUIRE(siteHits > 0 && siteData.equals("var3=val with spaces&var+=some%"));
+        REQUIRE(siteHits > 0 && siteData.equals("var3 = val with spaces\nva&r+ = so=me%"));
     }
 }
 
@@ -98,8 +98,8 @@ TEST_CASE("HTTP Upload", "[HTTPServer]")
         server.on("/upload", HTTP_POST, [](){
             for (uint8_t i=0; i<server.args(); i++){
                 if(i > 0)
-                    siteData += "&";
-                siteData += server.argName(i) + "=" + server.arg(i);
+                    siteData += "\n";
+                siteData += server.argName(i) + " = " + server.arg(i);
             }
             siteHits++;
             server.send(200, "text/plain", siteData);
@@ -110,13 +110,13 @@ TEST_CASE("HTTP Upload", "[HTTPServer]")
             } else if(upload.status == UPLOAD_FILE_END){
               siteData.concat(":");
               siteData.concat(String(upload.totalSize));
-              siteData.concat("&");
+              siteData.concat("\n");
             }
         });
         uint32_t startTime = millis();
         while(siteHits == 0 && (millis() - startTime) < 10000)
             server.handleClient();
-        REQUIRE(siteHits > 0 && siteData.equals("test.txt:16&var4=val with spaces"));
+        REQUIRE(siteHits > 0 && siteData.equals("test.txt:16\nvar4 = val with spaces"));
     }
 }
 

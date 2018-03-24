@@ -102,13 +102,21 @@ int WiFiClient::connect(const char* host, uint16_t port)
     return 0;
 }
 
+int WiFiClient::connect(const String host, uint16_t port)
+{
+    return connect(host.c_str(), port);
+}
+
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
     ip_addr_t addr;
     addr.addr = ip;
 
-    if (_client)
+    if (_client) {
         stop();
+        _client->unref();
+        _client = nullptr;
+    }
 
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
@@ -156,7 +164,7 @@ bool WiFiClient::getNoDelay() {
 
 size_t WiFiClient::availableForWrite ()
 {
-    return _client->availableForWrite();
+    return _client? _client->availableForWrite(): 0;
 }
 
 size_t WiFiClient::write(uint8_t b)
@@ -259,7 +267,7 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
 void WiFiClient::flush()
 {
     if (_client)
-        _client->flush();
+        _client->wait_until_sent();
 }
 
 void WiFiClient::stop()
@@ -267,8 +275,7 @@ void WiFiClient::stop()
     if (!_client)
         return;
 
-    _client->unref();
-    _client = 0;
+    _client->close();
 }
 
 uint8_t WiFiClient::connected()
@@ -286,9 +293,9 @@ uint8_t WiFiClient::status()
     return _client->state();
 }
 
- WiFiClient::operator bool()
+WiFiClient::operator bool()
 {
-    return _client != 0;
+    return connected();
 }
 
 IPAddress WiFiClient::remoteIP()
@@ -338,4 +345,30 @@ void WiFiClient::stopAllExcept(WiFiClient* except)
             it->stop();
         }
     }
+}
+
+
+void WiFiClient::keepAlive (uint16_t idle_sec, uint16_t intv_sec, uint8_t count)
+{
+    _client->keepAlive(idle_sec, intv_sec, count);
+}
+
+bool WiFiClient::isKeepAliveEnabled () const
+{
+    return _client->isKeepAliveEnabled();
+}
+
+uint16_t WiFiClient::getKeepAliveIdle () const
+{
+    return _client->getKeepAliveIdle();
+}
+
+uint16_t WiFiClient::getKeepAliveInterval () const
+{
+    return _client->getKeepAliveInterval();
+}
+
+uint8_t WiFiClient::getKeepAliveCount () const
+{
+    return _client->getKeepAliveCount();
 }
