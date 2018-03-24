@@ -22,6 +22,7 @@
 #include "pins_arduino.h"
 #include "wiring_private.h"
 
+unsigned int preferred_si2c_clock = 100000;
 unsigned char twi_dcount = 18;
 static unsigned char twi_sda, twi_scl;
 static uint32_t twi_clockStretchLimit;
@@ -44,6 +45,7 @@ static uint32_t twi_clockStretchLimit;
 #endif
 
 void twi_setClock(unsigned int freq){
+  preferred_si2c_clock = freq;
 #if F_CPU == FCPU80
   if(freq <= 50000) twi_dcount = 38;//about 50KHz
   else if(freq <= 100000) twi_dcount = 19;//about 100KHz
@@ -72,7 +74,7 @@ void twi_init(unsigned char sda, unsigned char scl){
   twi_scl = scl;
   pinMode(twi_sda, INPUT_PULLUP);
   pinMode(twi_scl, INPUT_PULLUP);
-  twi_setClock(100000);
+  twi_setClock(preferred_si2c_clock);
   twi_setClockStretchLimit(230); // default value is 230 uS
 }
 
@@ -231,5 +233,6 @@ uint8_t twi_status() {
     if(!twi_write_start()) 
         return I2C_SDA_HELD_LOW_AFTER_INIT;  //line busy. SDA again held low by another device. 2nd master?
 
-    return I2C_OK;                       //all ok 
+    return I2C_OK;                       //all ok
+
 }
