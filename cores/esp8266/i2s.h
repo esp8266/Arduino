@@ -51,6 +51,7 @@ bool i2s_write_lr(int16_t left, int16_t right);//combines both channels and call
 bool i2s_is_full();//returns true if DMA is full and can not take more bytes (overflow)
 bool i2s_is_empty();//returns true if DMA is empty (underflow)
 int16_t i2s_available();// returns the number of samples than can be written before blocking
+void i2s_set_callback(void (*callback) (void));
 
 #ifdef __cplusplus
 }
