@@ -176,8 +176,6 @@ void WiFiClientBearSSL::stop() {
   if (_client) {
     _client->wait_until_sent();
     _client->abort();
-    _client->unref();
-    _client = nullptr;
   }
   WiFiClient::stop();
   _freeSSL();
