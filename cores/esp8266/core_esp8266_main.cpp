@@ -33,6 +33,7 @@ extern "C" {
 #include "cont.h"
 }
 #include <core_version.h>
+#include "gdb_hooks.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
@@ -115,9 +116,6 @@ static void loop_wrapper() {
     preloop_update_frequency();
     if(!setup_done) {
         setup();
-#ifdef DEBUG_ESP_PORT
-        DEBUG_ESP_PORT.setDebugOutput(true);
-#endif
         setup_done = true;
     }
     loop();
@@ -140,17 +138,10 @@ static void do_global_ctors(void) {
         (*--p)();
 }
 
-extern "C" void __gdb_init() {}
-extern "C" void gdb_init(void) __attribute__ ((weak, alias("__gdb_init")));
-
-extern "C" void __gdb_do_break(){}
-extern "C" void gdb_do_break(void) __attribute__ ((weak, alias("__gdb_do_break")));
-
 void init_done() {
     system_set_os_print(1);
     gdb_init();
     do_global_ctors();
-    printf("\n%08x\n", core_version);
     esp_schedule();
 }
 
