@@ -9,9 +9,9 @@ all:
 	@echo "  heap: move c++ vtables to heap"
 
 heap:
-	@(echo "$(WARN)"; $(CPP) -E -DVTABLES_IN_DRAM $(COMMON).h | grep -v '^#') > $(COMMON)
+	@(echo "$(WARN)"; $(CPP) -CC -E -DVTABLES_IN_DRAM $(COMMON).h | grep -v '^#') > $(COMMON)
 	@echo "c++ vtables moved to heap"
 
 iram:
-	@(echo "$(WARN)"; $(CPP) -E -DVTABLES_IN_IRAM $(COMMON).h | grep -v '^#') > $(COMMON)
+	@(echo "$(WARN)"; $(CPP) -CC -E -DVTABLES_IN_IRAM $(COMMON).h | grep -v '^#') > $(COMMON)
 	@echo "c++ vtables moved to iram"
