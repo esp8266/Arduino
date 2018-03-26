@@ -81,11 +81,11 @@ public:
   }
   
   bool addServiceTxt(char *name, char *proto, char * key, char * value);
-  void addServiceTxt(const char *name, const char *proto, const char *key,const char * value){
-    addServiceTxt((char *)name, (char *)proto, (char *)key, (char *)value);
+  bool addServiceTxt(const char *name, const char *proto, const char *key,const char * value){
+    return addServiceTxt((char *)name, (char *)proto, (char *)key, (char *)value);
   }
-  void addServiceTxt(String name, String proto, String key, String value){
-    addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
+  bool addServiceTxt(String name, String proto, String key, String value){
+    return addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
   }
   
   int queryService(char *service, char *proto);

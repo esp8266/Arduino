@@ -542,14 +542,32 @@ void MDNSResponder::_parsePacket(){
     while (numAnswers--) {
       // Read name
       stringsRead = 0;
+      size_t last_bufferpos = 0;
       do {
         tmp8 = _conn_read8();
-        if (tmp8 & 0xC0) { // Compressed pointer (not supported)
-          tmp8 = _conn_read8();
-          break;
-        }
         if (tmp8 == 0x00) { // End of name
           break;
+        }
+        if (tmp8 & 0xC0) { // Compressed pointer
+          uint16_t offset = ((((uint16_t)tmp8) & ~0xC0) << 8) | _conn_read8();
+          if (_conn->isValidOffset(offset)) {
+              last_bufferpos  = _conn->tell();
+#ifdef DEBUG_ESP_MDNS_RX
+              DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
+              DEBUG_ESP_PORT.print(last_bufferpos);
+              DEBUG_ESP_PORT.print(" to ");
+              DEBUG_ESP_PORT.println(offset);
+#endif
+              _conn->seek(offset);
+              tmp8 = _conn_read8();
+          }
+          else {
+#ifdef DEBUG_ESP_MDNS_RX
+              DEBUG_ESP_PORT.print("Skipping malformed compressed pointer");
+#endif
+              tmp8 = _conn_read8();
+              break;
+          }
         }
         if(stringsRead > 3){
 #ifdef DEBUG_ESP_MDNS_RX
@@ -577,6 +595,14 @@ void MDNSResponder::_parsePacket(){
         }
         stringsRead++;
       } while (true);
+      if (last_bufferpos > 0)
+      {
+          _conn->seek(last_bufferpos);
+#ifdef DEBUG_ESP_MDNS_RX
+          DEBUG_ESP_PORT.print("Compressed pointer, jumping back to ");
+          DEBUG_ESP_PORT.println(last_bufferpos);
+#endif
+      }
 
       uint16_t answerType = _conn_read16(); // Read type
       uint16_t answerClass = _conn_read16(); // Read class
@@ -635,32 +661,54 @@ void MDNSResponder::_parsePacket(){
         uint16_t answerPrio = _conn_read16(); // Read priority
         uint16_t answerWeight = _conn_read16(); // Read weight
         answerPort = _conn_read16(); // Read port
+        last_bufferpos = 0;
 
         (void) answerPrio;
         (void) answerWeight;
 
         // Read hostname
         tmp8 = _conn_read8();
-        if (tmp8 & 0xC0) { // Compressed pointer (not supported)
+        if (tmp8 & 0xC0) { // Compressed pointer
+          uint16_t offset = ((((uint16_t)tmp8) & ~0xC0) << 8) | _conn_read8();
+          if (_conn->isValidOffset(offset)) {
+              last_bufferpos = _conn->tell();
 #ifdef DEBUG_ESP_MDNS_RX
-          DEBUG_ESP_PORT.println("Skipping compressed pointer");
+              DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
+              DEBUG_ESP_PORT.print(last_bufferpos);
+              DEBUG_ESP_PORT.print(" to ");
+              DEBUG_ESP_PORT.println(offset);
 #endif
-          tmp8 = _conn_read8();
+              _conn->seek(offset);
+              tmp8 = _conn_read8();
+          }
+          else {
+#ifdef DEBUG_ESP_MDNS_RX
+              DEBUG_ESP_PORT.print("Skipping malformed compressed pointer");
+#endif
+              tmp8 = _conn_read8();
+              break;
+          }
         }
-
-        else {
-          _conn_readS(answerHostName, tmp8);
-          answerHostName[tmp8] = '\0';
+        _conn_readS(answerHostName, tmp8);
+        answerHostName[tmp8] = '\0';
 #ifdef DEBUG_ESP_MDNS_RX
-          DEBUG_ESP_PORT.printf("SRV %d ", tmp8);
-          for (int n = 0; n < tmp8; n++) {
-            DEBUG_ESP_PORT.printf("%02x ", answerHostName[n]);
-          }
-          DEBUG_ESP_PORT.printf("\n%s\n", answerHostName);
+        DEBUG_ESP_PORT.printf("SRV %d ", tmp8);
+        for (int n = 0; n < tmp8; n++) {
+          DEBUG_ESP_PORT.printf("%02x ", answerHostName[n]);
+        }
+        DEBUG_ESP_PORT.printf("\n%s\n", answerHostName);
 #endif
-          if (answerRdlength - (6 + 1 + tmp8) > 0) { // Skip any remaining rdata
-            _conn_readS(hostName, answerRdlength - (6 + 1 + tmp8));
-          }
+        if (last_bufferpos > 0)
+        {
+          _conn->seek(last_bufferpos);
+          tmp8 = 2; // Size of compression octets
+#ifdef DEBUG_ESP_MDNS_RX
+          DEBUG_ESP_PORT.print("Compressed pointer, jumping back to ");
+          DEBUG_ESP_PORT.println(last_bufferpos);
+#endif
+        }
+        if (answerRdlength - (6 + 1 + tmp8) > 0) { // Skip any remaining rdata
+          _conn_readS(hostName, answerRdlength - (6 + 1 + tmp8));
         }
       }
 
@@ -675,7 +723,7 @@ void MDNSResponder::_parsePacket(){
           DEBUG_ESP_PORT.printf("Ignoring unsupported type %02x\n", tmp8);
 #endif
           for (int n = 0; n < answerRdlength; n++)
-        		(void)_conn_read8();
+		(void)_conn_read8();
       }
 
       if ((partsCollected == 0x0F) && serviceMatch) {

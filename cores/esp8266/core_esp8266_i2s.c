@@ -56,6 +56,7 @@ static uint32_t *i2s_slc_buf_pntr[SLC_BUF_CNT]; //Pointer to the I2S DMA buffer 
 static struct slc_queue_item i2s_slc_items[SLC_BUF_CNT]; //I2S DMA buffer descriptors
 static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
 static int i2s_curr_slc_buf_pos=0; //position in the current buffer
+static void (*i2s_callback) (void)=0; //Callback function should be defined as 'void ICACHE_FLASH_ATTR function_name()', placing the function in IRAM for faster execution. Avoid long computational tasks in this function, use it to set flags and process later.
 
 bool ICACHE_FLASH_ATTR i2s_is_full(){
   return (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) && (i2s_slc_queue_len == 0);
@@ -92,8 +93,13 @@ void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
       i2s_slc_queue_next_item(); //free space for finished_item
     }
     i2s_slc_queue[i2s_slc_queue_len++] = finished_item->buf_ptr;
+    if (i2s_callback) i2s_callback();
     ETS_SLC_INTR_ENABLE();
   }
+}
+
+void i2s_set_callback(void (*callback) (void)){
+    i2s_callback = callback;
 }
 
 void ICACHE_FLASH_ATTR i2s_slc_begin(){
@@ -247,7 +253,6 @@ void ICACHE_FLASH_ATTR i2s_set_dividers(uint8_t div1, uint8_t div2){
 float ICACHE_FLASH_ATTR i2s_get_real_rate(){
   return (float)I2SBASEFREQ/32/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
 }
-
 
 void ICACHE_FLASH_ATTR i2s_begin(){
   _i2s_sample_rate = 0;

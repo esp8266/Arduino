@@ -43,6 +43,7 @@ public:
   uint8_t connected() override;
   size_t write(const uint8_t *buf, size_t size) override;
   size_t write_P(PGM_P buf, size_t size) override;
+  size_t write(Stream& stream); // Note this is not virtual
   int read(uint8_t *buf, size_t size) override;
   int available() override;
   int read() override;
