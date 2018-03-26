@@ -157,6 +157,10 @@ public:
     {
         return uart_write(_uart, (const char*)buffer, size);
     }
+    size_t write(const char *buffer)
+    {
+        return buffer? uart_write(_uart, buffer, strlen(buffer)): 0;
+    }
     operator bool() const
     {
         return _uart != 0;
