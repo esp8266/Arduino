@@ -159,7 +159,7 @@ public:
     }
     size_t write(const char *buffer)
     {
-        return buffer? uart_write(_uart, buffer, strlen(size)): 0;
+        return buffer? uart_write(_uart, buffer, strlen(buffer)): 0;
     }
     operator bool() const
     {
