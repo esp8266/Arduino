@@ -100,7 +100,7 @@ inline size_t uart_rx_buffer_available(uart_t* uart) {
 }
 
 inline size_t uart_rx_fifo_available(uart_t* uart) {
-    return (USS(uart->uart_nr) >> USRXC) & 0x7F;
+    return (USS(uart->uart_nr) >> USRXC) & 0xFF;
 }
 
 const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
@@ -140,15 +140,17 @@ int uart_peek_char(uart_t* uart)
     if(uart == NULL || !uart->rx_enabled) {
         return -1;
     }
+    ETS_UART_INTR_DISABLE(); //access to rx_buffer can be interrupted by the isr (similar to a critical section), so disable interrupts here
     if (!uart_rx_available(uart)) {
+        ETS_UART_INTR_ENABLE();
         return -1;
     }
     if (uart_rx_buffer_available(uart) == 0) {
-        ETS_UART_INTR_DISABLE();
         uart_rx_copy_fifo_to_buffer(uart);
-        ETS_UART_INTR_ENABLE();
     }
-    return uart->rx_buffer->buffer[uart->rx_buffer->rpos];
+    int ret = uart->rx_buffer->buffer[uart->rx_buffer->rpos];
+    ETS_UART_INTR_ENABLE();
+    return ret;
 }
 
 int uart_read_char(uart_t* uart)
@@ -158,7 +160,9 @@ int uart_read_char(uart_t* uart)
     }
     int data = uart_peek_char(uart);
     if(data != -1) {
+        ETS_UART_INTR_DISABLE();
         uart->rx_buffer->rpos = (uart->rx_buffer->rpos + 1) % uart->rx_buffer->size;
+        ETS_UART_INTR_ENABLE();
     }
     return data;
 }
@@ -168,7 +172,11 @@ size_t uart_rx_available(uart_t* uart)
     if(uart == NULL || !uart->rx_enabled) {
         return 0;
     }
-    return uart_rx_buffer_available(uart) + uart_rx_fifo_available(uart);
+    ETS_UART_INTR_DISABLE();
+    int uartrxbufferavail = uart_rx_buffer_available(uart);
+    ETS_UART_INTR_ENABLE();
+
+    return uartrxbufferavailable + uart_rx_fifo_available(uart);
 }
 
 
@@ -186,7 +194,7 @@ void ICACHE_RAM_ATTR uart_isr(void * arg)
     USIC(uart->uart_nr) = USIS(uart->uart_nr);
 }
 
-void uart_start_isr(uart_t* uart)
+static void uart_start_isr(uart_t* uart)
 {
     if(uart == NULL || !uart->rx_enabled) {
         return;
@@ -202,7 +210,7 @@ void uart_start_isr(uart_t* uart)
     ETS_UART_INTR_ENABLE();
 }
 
-void uart_stop_isr(uart_t* uart)
+static void uart_stop_isr(uart_t* uart)
 {
     if(uart == NULL || !uart->rx_enabled) {
         return;
@@ -382,6 +390,8 @@ void uart_uninit(uart_t* uart)
     if(uart == NULL) {
         return;
     }
+
+    uart_stop_isr(uart);
 
     switch(uart->rx_pin) {
     case 3:
