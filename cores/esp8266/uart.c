@@ -173,7 +173,7 @@ size_t uart_rx_available(uart_t* uart)
         return 0;
     }
     ETS_UART_INTR_DISABLE();
-    int uartrxbufferavail = uart_rx_buffer_available(uart);
+    int uartrxbufferavailable = uart_rx_buffer_available(uart);
     ETS_UART_INTR_ENABLE();
 
     return uartrxbufferavailable + uart_rx_fifo_available(uart);
