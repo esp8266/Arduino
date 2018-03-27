@@ -443,6 +443,7 @@ boards = collections.OrderedDict([
         'name': 'Olimex MOD-WIFI-ESP8266(-DEV)',
         'opts': {
             '.build.board': 'MOD_WIFI_ESP8266',
+            '.build.variant': 'modwifi',
             },
         'macro': [
             'resetmethod_ck',
