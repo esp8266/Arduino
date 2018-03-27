@@ -27,8 +27,12 @@
 #include "i2s_reg.h"
 #include "i2s.h"
 
-extern void ets_wdt_enable(void);
-extern void ets_wdt_disable(void);
+// IOs used for I2S. Not defined in i2s.h, unfortunately.
+// Note these are internal IOs numbers and not pins on an
+// Arduino board. Users need to verify their particular wiring.
+#define I2SO_WS 2
+#define I2SO_DATA 3
+#define I2SO_BCK 15
 
 #define SLC_BUF_CNT (8) //Number of buffers in the I2S circular buffer
 #define SLC_BUF_LEN (64) //Length of one buffer, in 32-bit words.
@@ -67,7 +71,7 @@ bool i2s_is_empty(){
 }
 
 int16_t i2s_available(){
-	return (SLC_BUF_CNT - i2s_slc_queue_len) * SLC_BUF_LEN;
+  return (SLC_BUF_CNT - i2s_slc_queue_len) * SLC_BUF_LEN;
 }
 
 uint32_t ICACHE_RAM_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
@@ -173,8 +177,7 @@ bool i2s_write_sample(uint32_t sample) {
         if(i2s_slc_queue_len > 0){
           break;
         } else {
-          ets_wdt_disable();
-          ets_wdt_enable();
+          optimistic_yield(10000);
         }
       }
     }
@@ -238,11 +241,19 @@ void i2s_set_rate(uint32_t rate){ //Rate in HZ
   i2s_set_dividers( sbd_div_best, scd_div_best );
 }
 
-void i2s_set_dividers(uint8_t div1, uint8_t div2){
+void i2s_set_dividers(uint8_t div1, uint8_t div2) {
+  // Ensure dividers fit in bit fields
   div1 &= I2SBDM;
   div2 &= I2SCDM;
 
+  // !trans master(?), !bits mod(==16 bits/chanel), clear clock dividers
   I2SC &= ~(I2STSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
+
+  // I2SRF = Send/recv right channel first (? may be swapped form I2S spec of WS=0 => left)
+  // I2SMR = MSB recv/xmit first
+  // I2SRSM = Receive slave mode (?)
+  // I2SRMS, I2STMS = 1-bit delay from WS to MSB (I2S format)
+  // div1, div2 = Set I2S WS clock frequency.  BCLK seems to be generated from 32x this
   I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
 }
 
@@ -250,25 +261,28 @@ float i2s_get_real_rate(){
   return (float)I2SBASEFREQ/32/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
 }
 
-void i2s_begin(){
+void i2s_begin() {
   _i2s_sample_rate = 0;
   i2s_slc_begin();
-  
-  pinMode(2, FUNCTION_1); //I2SO_WS (LRCK)
-  pinMode(3, FUNCTION_1); //I2SO_DATA (SDIN)
-  pinMode(15, FUNCTION_1); //I2SO_BCK (SCLK)
+
+  // Redirect control of IOs to the I2S block
+  pinMode(I2SO_WS, FUNCTION_1);
+  pinMode(I2SO_DATA, FUNCTION_1);
+  pinMode(I2SO_BCK, FUNCTION_1);
   
   I2S_CLK_ENABLE();
   I2SIC = 0x3F;
   I2SIE = 0;
   
-  //Reset I2S
+  // Reset I2S
   I2SC &= ~(I2SRST);
   I2SC |= I2SRST;
   I2SC &= ~(I2SRST);
-  
-  I2SFC &= ~(I2SDE | (I2STXFMM << I2STXFM) | (I2SRXFMM << I2SRXFM)); //Set RX/TX FIFO_MOD=0 and disable DMA (FIFO only)
+
+  // I2STXFMM, I2SRXFMM=0 => 16-bit, dual channel data shifted in/out
+  I2SFC &= ~(I2SDE | (I2STXFMM << I2STXFM) | (I2SRXFMM << I2SRXFM)); //Set RX/TX FIFO_MOD=0 (16-bit) and disable DMA (FIFO only)
   I2SFC |= I2SDE; //Enable DMA
+  // I2STXCMM, I2SRXCMM=0 => Dual channel mode
   I2SCC &= ~((I2STXCMM << I2STXCM) | (I2SRXCMM << I2SRXCM)); //Set RX/TX CHAN_MOD=0
   i2s_set_rate(44100);
   I2SC |= I2STXS; //Start transmission
@@ -282,9 +296,10 @@ void i2s_end(){
   I2SC |= I2SRST;
   I2SC &= ~(I2SRST);
 
-  pinMode(2, INPUT);
-  pinMode(3, INPUT);
-  pinMode(15, INPUT);
+  // Redirect IOs to user control/GPIO
+  pinMode(I2SO_WS, INPUT);
+  pinMode(I2SO_DATA, INPUT);
+  pinMode(I2SO_BCK, INPUT);
 
   i2s_slc_end();
 }
