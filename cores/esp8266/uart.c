@@ -108,28 +108,6 @@ uart_rx_available_unsafe(uart_t* uart)
     return uart_rx_buffer_available_unsafe(uart) + uart_rx_fifo_available(uart->uart_nr);
 }
 
-inline int 
-uart_peek_char_unsafe(uart_t* uart)
-{
-    if (!uart_rx_available_unsafe(uart))
-        return -1;
-   
-    //without the following if statement and body, there is a good chance of a fifo overrun
-    if (uart_rx_buffer_available_unsafe(uart) == 0)
-        uart_rx_copy_fifo_to_buffer_unsafe(uart);
-    
-    return uart->rx_buffer->buffer[uart->rx_buffer->rpos];
-}
-
-inline int 
-uart_read_char_unsafe(uart_t* uart)
-{
-    int data = uart_peek_char_unsafe(uart);
-    if(data != -1)
-        uart->rx_buffer->rpos = (uart->rx_buffer->rpos + 1) % uart->rx_buffer->size;
-    return data;
-}
-
 
 //#define UART_DISCARD_NEWEST
 
@@ -166,6 +144,28 @@ uart_rx_copy_fifo_to_buffer_unsafe(uart_t* uart)
         uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
         uart->rx_buffer->wpos = nextPos;
     }
+}
+
+inline int 
+uart_peek_char_unsafe(uart_t* uart)
+{
+    if (!uart_rx_available_unsafe(uart))
+        return -1;
+   
+    //without the following if statement and body, there is a good chance of a fifo overrun
+    if (uart_rx_buffer_available_unsafe(uart) == 0)
+        uart_rx_copy_fifo_to_buffer_unsafe(uart);
+    
+    return uart->rx_buffer->buffer[uart->rx_buffer->rpos];
+}
+
+inline int 
+uart_read_char_unsafe(uart_t* uart)
+{
+    int data = uart_peek_char_unsafe(uart);
+    if(data != -1)
+        uart->rx_buffer->rpos = (uart->rx_buffer->rpos + 1) % uart->rx_buffer->size;
+    return data;
 }
 
 
