@@ -84,9 +84,9 @@ struct uart_
 
 
 inline size_t 
-uart_rx_fifo_available(uart_t* uart) 
+uart_rx_fifo_available(const int uart_nr) 
 {
-    return (USS(uart->uart_nr) >> USRXC) & 0xFF;
+    return (USS(uart_nr) >> USRXC) & 0xFF;
 }
 
 
@@ -105,7 +105,7 @@ uart_rx_buffer_available_unsafe(uart_t* uart)
 inline size_t
 uart_rx_available_unsafe(uart_t* uart)
 {
-    return uart_rx_buffer_available_unsafe(uart) + uart_rx_fifo_available(uart);
+    return uart_rx_buffer_available_unsafe(uart) + uart_rx_fifo_available(uart->uart_nr);
 }
 
 inline int 
@@ -137,7 +137,7 @@ uart_read_char_unsafe(uart_t* uart)
 inline void 
 uart_rx_copy_fifo_to_buffer_unsafe(uart_t* uart) 
 {
-    while(uart_rx_fifo_available(uart))
+    while(uart_rx_fifo_available(uart->uart_nr))
     {
         size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
         if(nextPos == uart->rx_buffer->rpos) 
@@ -183,7 +183,7 @@ uart_rx_available(uart_t* uart)
     int uartrxbufferavailable = uart_rx_buffer_available_unsafe(uart);
     ETS_UART_INTR_ENABLE();
 
-    return uartrxbufferavailable + uart_rx_fifo_available(uart);
+    return uartrxbufferavailable + uart_rx_fifo_available(uart->uart_nr);
 }
 
 int 
