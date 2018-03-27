@@ -95,6 +95,9 @@ SECTIONS
     *(.ver_number)
     *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, EXCLUDE_FILE (umm_malloc.c.o) .text* )
     *.cpp.o(.literal*, .text*)
+
+    *(.rodata._ZTV*) /* C++ vtables */
+
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libgcc.a:_umoddi3.o(.literal .text)
@@ -159,7 +162,7 @@ SECTIONS
     *.cpp.o(.iram.text)
     *.c.o(.iram.text)
 
-    *(.rodata._ZTV*) /* C++ vtables */
+
 
     *(.fini.literal)
     *(.fini)
