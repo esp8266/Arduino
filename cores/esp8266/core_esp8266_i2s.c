@@ -56,21 +56,21 @@ static uint32_t *i2s_slc_buf_pntr[SLC_BUF_CNT]; //Pointer to the I2S DMA buffer 
 static struct slc_queue_item i2s_slc_items[SLC_BUF_CNT]; //I2S DMA buffer descriptors
 static uint32_t *i2s_curr_slc_buf=NULL;//current buffer for writing
 static int i2s_curr_slc_buf_pos=0; //position in the current buffer
-static void (*i2s_callback) (void)=0; //Callback function should be defined as 'void ICACHE_FLASH_ATTR function_name()', placing the function in IRAM for faster execution. Avoid long computational tasks in this function, use it to set flags and process later.
+static void (*i2s_callback) (void)=0; //Callback function should be defined as 'void ICACHE_RAM_ATTR function_name()', placing the function in IRAM for faster execution. Avoid long computational tasks in this function, use it to set flags and process later.
 
-bool ICACHE_FLASH_ATTR i2s_is_full(){
+bool i2s_is_full(){
   return (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) && (i2s_slc_queue_len == 0);
 }
 
-bool ICACHE_FLASH_ATTR i2s_is_empty(){
+bool i2s_is_empty(){
   return (i2s_slc_queue_len >= SLC_BUF_CNT-1);
 }
 
-int16_t ICACHE_FLASH_ATTR i2s_available(){
+int16_t i2s_available(){
 	return (SLC_BUF_CNT - i2s_slc_queue_len) * SLC_BUF_LEN;
 }
 
-uint32_t ICACHE_FLASH_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
+uint32_t ICACHE_RAM_ATTR i2s_slc_queue_next_item(){ //pop the top off the queue
   uint8_t i;
   uint32_t item = i2s_slc_queue[0];
   i2s_slc_queue_len--;
@@ -82,13 +82,13 @@ uint32_t ICACHE_FLASH_ATTR i2s_slc_queue_next_item(){ //pop the top off the queu
 //This routine is called as soon as the DMA routine has something to tell us. All we
 //handle here is the RX_EOF_INT status, which indicate the DMA has sent a buffer whose
 //descriptor has the 'EOF' field set to 1.
-void ICACHE_FLASH_ATTR i2s_slc_isr(void) {
+void ICACHE_RAM_ATTR i2s_slc_isr(void) {
   uint32_t slc_intr_status = SLCIS;
   SLCIC = 0xFFFFFFFF;
   if (slc_intr_status & SLCIRXEOF) {
     ETS_SLC_INTR_DISABLE();
     struct slc_queue_item *finished_item = (struct slc_queue_item*)SLCRXEDA;
-    memset((void *)finished_item->buf_ptr, 0x00, SLC_BUF_LEN * 4);//zero the buffer so it is mute in case of underflow
+    ets_memset((void *)finished_item->buf_ptr, 0x00, SLC_BUF_LEN * 4);//zero the buffer so it is mute in case of underflow
     if (i2s_slc_queue_len >= SLC_BUF_CNT-1) { //All buffers are empty. This means we have an underflow
       i2s_slc_queue_next_item(); //free space for finished_item
     }
@@ -102,7 +102,7 @@ void i2s_set_callback(void (*callback) (void)){
     i2s_callback = callback;
 }
 
-void ICACHE_FLASH_ATTR i2s_slc_begin(){
+void i2s_slc_begin(){
   i2s_slc_queue_len = 0;
   int x, y;
   
@@ -150,7 +150,7 @@ void ICACHE_FLASH_ATTR i2s_slc_begin(){
   SLCRXL |= SLCRXLS;
 }
 
-void ICACHE_FLASH_ATTR i2s_slc_end(){
+void i2s_slc_end(){
   ETS_SLC_INTR_DISABLE();
   SLCIC = 0xFFFFFFFF;
   SLCIE = 0;
@@ -166,7 +166,7 @@ void ICACHE_FLASH_ATTR i2s_slc_end(){
 //at least the current sample rate. You can also call it quicker: it will suspend the calling
 //thread if the buffer is full and resume when there's room again.
 
-bool ICACHE_FLASH_ATTR i2s_write_sample(uint32_t sample) {
+bool i2s_write_sample(uint32_t sample) {
   if (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) {
     if(i2s_slc_queue_len == 0){
       while(1){
@@ -187,7 +187,7 @@ bool ICACHE_FLASH_ATTR i2s_write_sample(uint32_t sample) {
   return true;
 }
 
-bool ICACHE_FLASH_ATTR i2s_write_sample_nb(uint32_t sample) {
+bool i2s_write_sample_nb(uint32_t sample) {
   if (i2s_curr_slc_buf_pos==SLC_BUF_LEN || i2s_curr_slc_buf==NULL) {
     if(i2s_slc_queue_len == 0){
       return false;
@@ -201,7 +201,7 @@ bool ICACHE_FLASH_ATTR i2s_write_sample_nb(uint32_t sample) {
   return true;
 }
 
-bool ICACHE_FLASH_ATTR i2s_write_lr(int16_t left, int16_t right){
+bool i2s_write_lr(int16_t left, int16_t right){
   int sample = right & 0xFFFF;
   sample = sample << 16;
   sample |= left & 0xFFFF;
@@ -215,7 +215,7 @@ bool ICACHE_FLASH_ATTR i2s_write_lr(int16_t left, int16_t right){
 
 static uint32_t _i2s_sample_rate;
 
-void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
+void i2s_set_rate(uint32_t rate){ //Rate in HZ
   if(rate == _i2s_sample_rate) return;
   _i2s_sample_rate = rate;
 
@@ -235,26 +235,22 @@ void ICACHE_FLASH_ATTR i2s_set_rate(uint32_t rate){ //Rate in HZ
     }
   }
 
-  //os_printf("Rate %u Div %u Bck %u Frq %u\n", _i2s_sample_rate, i2s_clock_div, i2s_bck_div, I2SBASEFREQ/(i2s_clock_div*i2s_bck_div*2));
-
-  //!trans master, !bits mod, rece slave mod, rece msb shift, right first, msb right
-  I2SC &= ~(I2STSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
-  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | ((sbd_div_best) << I2SBD) | ((scd_div_best) << I2SCD);
+  i2s_set_dividers( sbd_div_best, scd_div_best );
 }
 
-void ICACHE_FLASH_ATTR i2s_set_dividers(uint8_t div1, uint8_t div2){
+void i2s_set_dividers(uint8_t div1, uint8_t div2){
   div1 &= I2SBDM;
   div2 &= I2SCDM;
 
   I2SC &= ~(I2STSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
-  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | (div1 << I2SBD) | (div2 << I2SCD);
+  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
 }
 
-float ICACHE_FLASH_ATTR i2s_get_real_rate(){
+float i2s_get_real_rate(){
   return (float)I2SBASEFREQ/32/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
 }
 
-void ICACHE_FLASH_ATTR i2s_begin(){
+void i2s_begin(){
   _i2s_sample_rate = 0;
   i2s_slc_begin();
   
@@ -278,7 +274,7 @@ void ICACHE_FLASH_ATTR i2s_begin(){
   I2SC |= I2STXS; //Start transmission
 }
 
-void ICACHE_FLASH_ATTR i2s_end(){
+void i2s_end(){
   I2SC &= ~I2STXS;
 
   //Reset I2S
