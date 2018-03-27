@@ -45,7 +45,7 @@
 #include "esp8266_peri.h"
 #include "user_interface.h"
 
-static const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
+const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
 static int s_uart_debug_nr = UART0;
 
 
