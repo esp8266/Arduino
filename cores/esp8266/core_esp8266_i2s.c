@@ -222,7 +222,7 @@ static void i2s_slc_begin() {
   SLCC0 &= ~(SLCMM << SLCM); // Clear DMA MODE
   SLCC0 |= (1 << SLCM); // Set DMA MODE to 1
   SLCRXDC |= SLCBINR | SLCBTNR; // Enable INFOR_NO_REPLACE and TOKEN_NO_REPLACE
-  SLCRXDC &= ~(/*SLCBRXFE |*/ SLCBRXEM | SLCBRXFM); // Disable RX_FILL, RX_EOF_MODE and RX_FILL_MODE
+  SLCRXDC &= ~(SLCBRXFE | SLCBRXEM | SLCBRXFM); // Disable RX_FILL, RX_EOF_MODE and RX_FILL_MODE
 
   //Feed DMA the 1st buffer desc addr
   //To send data to the I2S subsystem, counter-intuitively we use the RXLINK part, not the TXLINK as you might

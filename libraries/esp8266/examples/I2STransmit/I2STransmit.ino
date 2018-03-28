@@ -62,7 +62,7 @@ void loop() {
   static int cnt = 0;
   // Each loop will send 100 raw samples (400 bytes)
   // UDP needs to be < TCP_MSS which can be 500 bytes in LWIP2
-  for (int i=0; i<100; i++) {
+  for (int i = 0; i < 100; i++) {
     i2s_read_sample(&buffer[i][0], &buffer[i][1], true);
   }
   udp.beginPacket(listener, port);
