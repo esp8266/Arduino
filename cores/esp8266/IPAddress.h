@@ -79,6 +79,14 @@ class IPAddress: public Printable {
         virtual size_t printTo(Print& p) const;
         String toString() const;
 
+	/* 
+		check if input string(arg) is a valid IPV4 address or not.
+		return true on valid.
+		return false on invalid.
+	*/
+	static bool isValid(const String& arg);
+	static bool isValid(const char* arg);
+
         friend class EthernetClass;
         friend class UDP;
         friend class Client;
