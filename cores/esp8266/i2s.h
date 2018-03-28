@@ -49,7 +49,7 @@ float i2s_get_real_rate();//The actual Sample Rate on output
 bool i2s_write_sample(uint32_t sample);//32bit sample with channels being upper and lower 16 bits (blocking when DMA is full)
 bool i2s_write_sample_nb(uint32_t sample);//same as above but does not block when DMA is full and returns false instead
 bool i2s_write_lr(int16_t left, int16_t right);//combines both channels and calls i2s_write_sample with the result
-bool i2s_read_sample(uint32_t *left, uint32_t *right, bool blocking); // RX data, 2x32 bits, left-aligned
+bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking); // RX data, 2x32 bits, left-aligned
 bool i2s_is_full();//returns true if DMA is full and can not take more bytes (overflow)
 bool i2s_is_empty();//returns true if DMA is empty (underflow)
 bool i2s_rx_is_full();

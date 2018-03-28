@@ -70,9 +70,6 @@ typedef struct i2s_state {
 static i2s_state_t *rx = NULL;
 static i2s_state_t *tx = NULL;
 
-volatile uint32_t rx_irqs = 0;
-volatile uint32_t tx_irqs = 0;
-
 // IOs used for I2S. Not defined in i2s.h, unfortunately.
 // Note these are internal IOs numbers and not pins on an
 // Arduino board. Users need to verify their particular wiring.
@@ -159,7 +156,6 @@ void ICACHE_RAM_ATTR i2s_slc_isr(void) {
   uint32_t slc_intr_status = SLCIS;
   SLCIC = 0xFFFFFFFF;
   if (slc_intr_status & SLCIRXEOF) {
-    tx_irqs++;
     slc_queue_item_t *finished_item = (slc_queue_item_t *)SLCRXEDA;
     // Zero the buffer so it is mute in case of underflow
     ets_memset((void *)finished_item->buf_ptr, 0x00, SLC_BUF_LEN * 4);
@@ -173,7 +169,6 @@ void ICACHE_RAM_ATTR i2s_slc_isr(void) {
     }
   }
   if (slc_intr_status & SLCITXEOF) {
-    rx_irqs++;
     slc_queue_item_t *finished_item = (slc_queue_item_t *)SLCTXEDA;
     // Set owner back to 1 (SW) or else RX stops.  TX has no such restriction.
     finished_item->owner = 1;
@@ -209,16 +204,6 @@ static void _alloc_channel(i2s_state_t *ch) {
     ch->slc_items[x].next_link_ptr = (x<(SLC_BUF_CNT-1))?(&ch->slc_items[x+1]):(&ch->slc_items[0]);
   }
 }
-
-#if 0
-void dumprx()
-{
-for (int i=0; i<SLC_BUF_CNT; i++) {
-printf("%d: %d %d %d %d %d %d %p %p\n", i, 0, rx->slc_items[i].owner, rx->slc_items[i].eof, rx->slc_items[i].sub_sof, rx->slc_items[i].datalen, rx->slc_items[i].blocksize,
-rx->slc_items[i].buf_ptr, rx->slc_items[i].next_link_ptr);
-}
-}
-#endif
 
 static void i2s_slc_begin() {
   if (tx) {
@@ -327,7 +312,7 @@ bool i2s_write_lr(int16_t left, int16_t right){
   return i2s_write_sample(sample);
 }
 
-bool i2s_read_sample(uint32_t *left, uint32_t *right, bool blocking) {
+bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking) {
   if (rx->curr_slc_buf_pos==SLC_BUF_LEN || rx->curr_slc_buf==NULL) {
     if (rx->slc_queue_len == 0) {
       if (!blocking) return false;
@@ -345,8 +330,9 @@ bool i2s_read_sample(uint32_t *left, uint32_t *right, bool blocking) {
     rx->curr_slc_buf_pos=0;
   }
 
-  *left  = rx->curr_slc_buf[rx->curr_slc_buf_pos++];
-  *right = rx->curr_slc_buf[rx->curr_slc_buf_pos++];
+  uint32_t sample = rx->curr_slc_buf[rx->curr_slc_buf_pos++];
+  *left  = sample & 0xffff;
+  *right = sample >> 16;
 
   return true;
 }
@@ -381,7 +367,7 @@ void i2s_set_dividers(uint8_t div1, uint8_t div2) {
   div1 &= I2SBDM;
   div2 &= I2SCDM;
 
-  // !trans master(?), !recv master(?), !bits mod(==16 bits/chanel), clear clock dividers
+  // trans master(active low), recv master(active_low), !bits mod(==16 bits/chanel), clear clock dividers
   I2SC &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
 
   // I2SRF = Send/recv right channel first (? may be swapped form I2S spec of WS=0 => left)
@@ -438,7 +424,7 @@ void i2s_rxtx_begin(bool enableRx, bool enableTx) {
   
   // I2STXFMM, I2SRXFMM=0 => 16-bit, dual channel data shifted in/out
   I2SFC &= ~(I2SDE | (I2STXFMM << I2STXFM) | (I2SRXFMM << I2SRXFM)); // Set RX/TX FIFO_MOD=0 and disable DMA (FIFO only)
-  I2SFC |= I2SDE | (rx ? 2/*24bpc, 2ch*/<<I2SRXFM : 0); // Enable DMA, set RX format 24(32bits), 2 channels
+  I2SFC |= I2SDE; // Enable DMA
 
   // I2STXCMM, I2SRXCMM=0 => Dual channel mode
   I2SCC &= ~((I2STXCMM << I2STXCM) | (I2SRXCMM << I2SRXCM)); // Set RX/TX CHAN_MOD=0
@@ -446,9 +432,9 @@ void i2s_rxtx_begin(bool enableRx, bool enableTx) {
   i2s_set_rate(44100);
 
   if (rx) {
+    // Need to prime the # of samples to receive in the engine
     I2SRXEN = SLC_BUF_LEN;
   }
-//  I2SC |= (15<<I2SBM);
 
   I2SC |= (rx?I2SRXS:0) | (tx?I2STXS:0); // Start transmission/reception
 }
