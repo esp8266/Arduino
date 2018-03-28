@@ -112,51 +112,12 @@ String IPAddress::toString() const
     return String(szRet);
 }
 
-/* ref: https://code.woboq.org/userspace/glibc/resolv/inet_pton.c.html#inet_pton4 */
-static bool inet_pton4(const char *start, const char *end) {
-	bool saw_digit = false;
-	char ch;
-	uint8_t octets = 0;
-	unsigned char tmp[4], *tp;
-	*(tp = tmp) = 0;
-
-	while (start < end) {
-		ch = *start++;
-		if (isdigit(ch)) {
-			unsigned int _new = *tp * 10 + (ch - '0');
-			if (saw_digit && *tp == 0)
-				return false;
-			if (_new > 255)
-				return false;
-			*tp = _new;
-			if (!saw_digit) {
-				if (++octets > 4)
-					return false;
-				saw_digit = true;
-			}
-		} else if (ch == '.' && saw_digit) {
-			if (octets == 4)
-				return false;
-			*++tp = 0;
-			saw_digit = false;
-		} else {
-			return false;
-		}
-	}
-
-	if (octets < 4)
-		return false;
-
-	return true;
-}
-
 bool IPAddress::isValid(const String& arg) {
-	auto c_str = arg.c_str();
-	return inet_pton4(c_str, c_str + arg.length());
+	return IPAddress().fromString(arg);
 }
 
-bool IPAddress::isValid(const char* arg, size_t len) {
-	return inet_pton4(arg, arg + len);
+bool IPAddress::isValid(const char* arg) {
+	return IPAddress().fromString(arg);
 }
 
 const IPAddress INADDR_NONE(0, 0, 0, 0);

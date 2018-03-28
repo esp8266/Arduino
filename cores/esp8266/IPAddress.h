@@ -85,7 +85,7 @@ class IPAddress: public Printable {
 		return false on invalid.
 	*/
 	static bool isValid(const String& arg);
-	static bool isValid(const char* arg, size_t len);
+	static bool isValid(const char* arg);
 
         friend class EthernetClass;
         friend class UDP;
