@@ -112,4 +112,12 @@ String IPAddress::toString() const
     return String(szRet);
 }
 
+bool IPAddress::isValid(const String& arg) {
+	return IPAddress().fromString(arg);
+}
+
+bool IPAddress::isValid(const char* arg) {
+	return IPAddress().fromString(arg);
+}
+
 const IPAddress INADDR_NONE(0, 0, 0, 0);
