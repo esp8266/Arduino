@@ -381,15 +381,14 @@ void i2s_set_dividers(uint8_t div1, uint8_t div2) {
   div1 &= I2SBDM;
   div2 &= I2SCDM;
 
-  // !trans master(?), !bits mod(==16 bits/chanel), clear clock dividers
-  I2SC &= ~(I2STSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
+  // !trans master(?), !recv master(?), !bits mod(==16 bits/chanel), clear clock dividers
+  I2SC &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
 
   // I2SRF = Send/recv right channel first (? may be swapped form I2S spec of WS=0 => left)
   // I2SMR = MSB recv/xmit first
-  // I2SRSM = Receive slave mode (?)
   // I2SRMS, I2STMS = 1-bit delay from WS to MSB (I2S format)
   // div1, div2 = Set I2S WS clock frequency.  BCLK seems to be generated from 32x this
-  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
+  I2SC |= I2SRF | I2SMR | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
 }
 
 float i2s_get_real_rate(){
