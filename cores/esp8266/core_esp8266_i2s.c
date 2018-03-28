@@ -73,14 +73,15 @@ static i2s_state_t *tx = NULL;
 volatile uint32_t rx_irqs = 0;
 volatile uint32_t tx_irqs = 0;
 
-// Some constants that aren't defined in i2s_regs.h
+// IOs used for I2S. Not defined in i2s.h, unfortunately.
+// Note these are internal IOs numbers and not pins on an
+// Arduino board. Users need to verify their particular wiring.
 #define I2SO_DATA 3
 #define I2SO_BCK  15
 #define I2SO_WS   2
 #define I2SI_DATA 12
 #define I2SI_BCK  13
 #define I2SI_WS   14
-
 
 static bool _i2s_is_full(const i2s_state_t *ch) {
   if (!ch) {
@@ -153,22 +154,18 @@ static void ICACHE_RAM_ATTR i2s_slc_queue_append_item(i2s_state_t *ch, uint32_t 
   }
 }
 
-// This routine is called as soon as the DMA routine has something to tell us. All we
-// handle here is the *_EOF_INT status, which indicate the DMA has finished a buffer whose
-// descriptor has the 'EOF' field set to 1.
 void ICACHE_RAM_ATTR i2s_slc_isr(void) {
   ETS_SLC_INTR_DISABLE();
-  // TODO - Seems like there's a chance of missed IRQ notification because the clear happens at least 1 cycle
-  //        after the status read.  Not sure if there's a HW way to prevernt this, even atomic SWAP 
-  //        won't help since these are 2 separate addresses.  Ugh!
   uint32_t slc_intr_status = SLCIS;
   SLCIC = 0xFFFFFFFF;
   if (slc_intr_status & SLCIRXEOF) {
     tx_irqs++;
     slc_queue_item_t *finished_item = (slc_queue_item_t *)SLCRXEDA;
-    memset((void *)finished_item->buf_ptr, 0x00, SLC_BUF_LEN * 4);//zero the buffer so it is mute in case of underflow
-    if (tx->slc_queue_len >= SLC_BUF_CNT-1) { //All buffers are empty. This means we have an underflow
-      i2s_slc_queue_next_item(tx); //free space for finished_item
+    // Zero the buffer so it is mute in case of underflow
+    ets_memset((void *)finished_item->buf_ptr, 0x00, SLC_BUF_LEN * 4);
+    if (tx->slc_queue_len >= SLC_BUF_CNT-1) {
+      // All buffers are empty. This means we have an underflow
+      i2s_slc_queue_next_item(tx); // Free space for finished_item
     }
     tx->slc_queue[tx->slc_queue_len++] = finished_item->buf_ptr;
     if (tx->callback) {
@@ -178,7 +175,8 @@ void ICACHE_RAM_ATTR i2s_slc_isr(void) {
   if (slc_intr_status & SLCITXEOF) {
     rx_irqs++;
     slc_queue_item_t *finished_item = (slc_queue_item_t *)SLCTXEDA;
-    finished_item->owner = 1; // Or else RX just stops
+    // Set owner back to 1 (SW) or else RX stops.  TX has no such restriction.
+    finished_item->owner = 1;
     i2s_slc_queue_append_item(rx, finished_item->buf_ptr);
     if (rx->callback) {
       rx->callback();
@@ -211,6 +209,7 @@ static void _alloc_channel(i2s_state_t *ch) {
     ch->slc_items[x].next_link_ptr = (x<(SLC_BUF_CNT-1))?(&ch->slc_items[x+1]):(&ch->slc_items[0]);
   }
 }
+
 #if 0
 void dumprx()
 {
@@ -220,7 +219,6 @@ rx->slc_items[i].buf_ptr, rx->slc_items[i].next_link_ptr);
 }
 }
 #endif
-
 
 static void i2s_slc_begin() {
   if (tx) {
@@ -375,17 +373,23 @@ void i2s_set_rate(uint32_t rate){ //Rate in HZ
     }
   }
 
-  //!trans master, !bits mod, rece slave mod, rece msb shift, right first, msb right
-  I2SC &= ~(I2STSM | I2SRSM | /*(I2SBMM << I2SBM) |*/ (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
-  I2SC |= I2SRF | I2SMR | I2SRMS | ((sbd_div_best) << I2SBD) | ((scd_div_best) << I2SCD);
+  i2s_set_dividers( sbd_div_best, scd_div_best );
 }
 
-void i2s_set_dividers(uint8_t div1, uint8_t div2){
+void i2s_set_dividers(uint8_t div1, uint8_t div2) {
+  // Ensure dividers fit in bit fields
   div1 &= I2SBDM;
   div2 &= I2SCDM;
 
-  I2SC &= ~(I2STSM | I2SRSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
-  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | (div1 << I2SBD) | (div2 << I2SCD);
+  // !trans master(?), !bits mod(==16 bits/chanel), clear clock dividers
+  I2SC &= ~(I2STSM | (I2SBMM << I2SBM) | (I2SBDM << I2SBD) | (I2SCDM << I2SCD));
+
+  // I2SRF = Send/recv right channel first (? may be swapped form I2S spec of WS=0 => left)
+  // I2SMR = MSB recv/xmit first
+  // I2SRSM = Receive slave mode (?)
+  // I2SRMS, I2STMS = 1-bit delay from WS to MSB (I2S format)
+  // div1, div2 = Set I2S WS clock frequency.  BCLK seems to be generated from 32x this
+  I2SC |= I2SRF | I2SMR | I2SRSM | I2SRMS | I2STMS | (div1 << I2SBD) | (div2 << I2SCD);
 }
 
 float i2s_get_real_rate(){
@@ -433,9 +437,11 @@ void i2s_rxtx_begin(bool enableRx, bool enableTx) {
   I2SC |= I2SRST;
   I2SC &= ~(I2SRST);
   
+  // I2STXFMM, I2SRXFMM=0 => 16-bit, dual channel data shifted in/out
   I2SFC &= ~(I2SDE | (I2STXFMM << I2STXFM) | (I2SRXFMM << I2SRXFM)); // Set RX/TX FIFO_MOD=0 and disable DMA (FIFO only)
   I2SFC |= I2SDE | (rx ? 2/*24bpc, 2ch*/<<I2SRXFM : 0); // Enable DMA, set RX format 24(32bits), 2 channels
 
+  // I2STXCMM, I2SRXCMM=0 => Dual channel mode
   I2SCC &= ~((I2STXCMM << I2STXCM) | (I2SRXCMM << I2SRXCM)); // Set RX/TX CHAN_MOD=0
 
   i2s_set_rate(44100);
@@ -453,7 +459,9 @@ void i2s_begin() {
 }
 
 void i2s_end() {
-  I2SC &= ~I2STXS;
+  // Disable any I2S send or receive
+  // ? Maybe not needed since we're resetting on the next line...
+  I2SC &= ~(I2STXS | I2SRXS);
 
   // Reset I2S
   I2SC &= ~(I2SRST);
