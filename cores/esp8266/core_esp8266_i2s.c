@@ -70,8 +70,11 @@ typedef struct i2s_state {
 static i2s_state_t *rx = NULL;
 static i2s_state_t *tx = NULL;
 
+// Last I2S sample rate requested
+static uint32_t _i2s_sample_rate;
+
 // IOs used for I2S. Not defined in i2s.h, unfortunately.
-// Note these are internal IOs numbers and not pins on an
+// Note these are internal GPIO numbers and not pins on an
 // Arduino board. Users need to verify their particular wiring.
 #define I2SO_DATA 3
 #define I2SO_BCK  15
@@ -151,7 +154,7 @@ static void ICACHE_RAM_ATTR i2s_slc_queue_append_item(i2s_state_t *ch, uint32_t 
   }
 }
 
-void ICACHE_RAM_ATTR i2s_slc_isr(void) {
+static void ICACHE_RAM_ATTR i2s_slc_isr(void) {
   ETS_SLC_INTR_DISABLE();
   uint32_t slc_intr_status = SLCIS;
   SLCIC = 0xFFFFFFFF;
@@ -180,18 +183,22 @@ void ICACHE_RAM_ATTR i2s_slc_isr(void) {
   ETS_SLC_INTR_ENABLE();
 }
 
-void i2s_set_callback(void (*callback) (void)){
+void i2s_set_callback(void (*callback) (void)) {
   tx->callback = callback;
 }
 
-void i2s_rx_set_callback(void (*callback) (void)){
+void i2s_rx_set_callback(void (*callback) (void)) {
   rx->callback = callback;
 }
 
-static void _alloc_channel(i2s_state_t *ch) {
+static bool _alloc_channel(i2s_state_t *ch) {
   ch->slc_queue_len = 0;
   for (int x=0; x<SLC_BUF_CNT; x++) {
-    ch->slc_buf_pntr[x] = malloc(SLC_BUF_LEN*4);
+    ch->slc_buf_pntr[x] = (uint32_t *)malloc(SLC_BUF_LEN * sizeof(ch->slc_buf_pntr[0][0]));
+    if (!ch->slc_buf_pntr[x]) {
+      // OOM, the upper layer will free up any partially allocated channels.
+      return false;
+    }
     memset(ch->slc_buf_pntr[x], 0, SLC_BUF_LEN * sizeof(ch->slc_buf_pntr[x][0]));
 
     ch->slc_items[x].unused = 0;
@@ -203,14 +210,19 @@ static void _alloc_channel(i2s_state_t *ch) {
     ch->slc_items[x].buf_ptr = (uint32_t*)&ch->slc_buf_pntr[x][0];
     ch->slc_items[x].next_link_ptr = (x<(SLC_BUF_CNT-1))?(&ch->slc_items[x+1]):(&ch->slc_items[0]);
   }
+  return true;
 }
 
-static void i2s_slc_begin() {
+static bool i2s_slc_begin() {
   if (tx) {
-    _alloc_channel(tx);
+    if (!_alloc_channel(tx)) {
+      return false;
+    }
   }
   if (rx) {
-    _alloc_channel(rx);
+    if (!_alloc_channel(rx)) {
+      return false;
+    }
   }
 
   ETS_SLC_INTR_DISABLE();
@@ -236,7 +248,7 @@ static void i2s_slc_begin() {
     SLCTXL |= (uint32)&rx->slc_items[0] << SLCTXLA; // Set real RX address
   }
   if (!tx) {
-    SLCRXL |= (uint32)&rx->slc_items[1] << SLCRXLA; // Set fake (ununsed) TX descriptor address
+    SLCRXL |= (uint32)&rx->slc_items[1] << SLCRXLA; // Set fake (unused) TX descriptor address
   } else {
     SLCRXL |= (uint32)&tx->slc_items[0] << SLCRXLA; // Set real TX address
   }
@@ -251,6 +263,8 @@ static void i2s_slc_begin() {
   if (tx) {
     SLCRXL |= SLCRXLS;
   }
+
+  return true;
 }
 
 static void i2s_slc_end(){
@@ -272,16 +286,21 @@ static void i2s_slc_end(){
   }
 }
 
-//This routine pushes a single, 32-bit sample to the I2S buffers. Call this at (on average) 
-//at least the current sample rate. You can also call it quicker: it will suspend the calling
-//thread if the buffer is full and resume when there's room again.
-
+// These routines push a single, 32-bit sample to the I2S buffers. Call at (on average)
+// at least the current sample rate.
 static bool _i2s_write_sample(uint32_t sample, bool nb) {
+  if (!tx) {
+    return false;
+  }
+
   if (tx->curr_slc_buf_pos==SLC_BUF_LEN || tx->curr_slc_buf==NULL) {
     if (tx->slc_queue_len == 0) {
-      if (nb) return false;
+      if (nb) {
+        // Don't wait if nonblocking, just notify upper levels
+        return false;
+      }
       while (1) {
-        if (tx->slc_queue_len > 0){
+        if (tx->slc_queue_len > 0) {
           break;
         } else {
           optimistic_yield(10000);
@@ -297,11 +316,11 @@ static bool _i2s_write_sample(uint32_t sample, bool nb) {
   return true;
 }
 
-bool ICACHE_FLASH_ATTR i2s_write_sample(uint32_t sample) {
+bool i2s_write_sample(uint32_t sample) {
   return _i2s_write_sample(sample, false);
 }
 
-bool ICACHE_FLASH_ATTR i2s_write_sample_nb(uint32_t sample) {
+bool i2s_write_sample_nb(uint32_t sample) {
   return _i2s_write_sample(sample, true);
 }
 
@@ -313,9 +332,14 @@ bool i2s_write_lr(int16_t left, int16_t right){
 }
 
 bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking) {
+  if (!rx) {
+    return false;
+  }
   if (rx->curr_slc_buf_pos==SLC_BUF_LEN || rx->curr_slc_buf==NULL) {
     if (rx->slc_queue_len == 0) {
-      if (!blocking) return false;
+      if (!blocking) {
+        return false;
+      }
       while (1) {
         if (rx->slc_queue_len > 0){
           break;
@@ -331,16 +355,21 @@ bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking) {
   }
 
   uint32_t sample = rx->curr_slc_buf[rx->curr_slc_buf_pos++];
-  *left  = sample & 0xffff;
-  *right = sample >> 16;
+  if (left) {
+    *left  = sample & 0xffff;
+  }
+  if (right) {
+    *right = sample >> 16;
+  }
 
   return true;
 }
 
-static uint32_t _i2s_sample_rate;
 
-void i2s_set_rate(uint32_t rate){ //Rate in HZ
-  if(rate == _i2s_sample_rate) return;
+void i2s_set_rate(uint32_t rate) { //Rate in HZ
+  if (rate == _i2s_sample_rate) {
+    return;
+  }
   _i2s_sample_rate = rate;
 
   uint32_t scaled_base_freq = I2SBASEFREQ/32;
@@ -348,8 +377,8 @@ void i2s_set_rate(uint32_t rate){ //Rate in HZ
 
   uint8_t sbd_div_best=1;
   uint8_t scd_div_best=1;
-  for (uint8_t i=1; i<64; i++){
-    for (uint8_t j=i; j<64; j++){
+  for (uint8_t i=1; i<64; i++) {
+    for (uint8_t j=i; j<64; j++) {
       float new_delta = fabs(((float)scaled_base_freq/i/j) - rate);
       if (new_delta < delta_best){
       	delta_best = new_delta;
@@ -381,7 +410,7 @@ float i2s_get_real_rate(){
   return (float)I2SBASEFREQ/32/((I2SC>>I2SBD) & I2SBDM)/((I2SC >> I2SCD) & I2SCDM);
 }
 
-void i2s_rxtx_begin(bool enableRx, bool enableTx) {
+bool i2s_rxtx_begin(bool enableRx, bool enableTx) {
   if (tx || rx) {
     i2s_end(); // Stop and free any ongoing stuff
   }
@@ -389,7 +418,8 @@ void i2s_rxtx_begin(bool enableRx, bool enableTx) {
   if (enableTx) {
     tx = (i2s_state_t*)calloc(1, sizeof(*tx));
     if (!tx) {
-      return; // OOM Error!
+      // Nothing to clean up yet
+      return false; // OOM Error!
     }
     pinMode(I2SO_WS, FUNCTION_1);
     pinMode(I2SO_DATA, FUNCTION_1);
@@ -398,9 +428,8 @@ void i2s_rxtx_begin(bool enableRx, bool enableTx) {
   if (enableRx) {
     rx = (i2s_state_t*)calloc(1, sizeof(*rx));
     if (!rx) {
-      free(tx);
-      tx = NULL;
-      return; // OOM error!
+      i2s_end(); // Clean up any TX or pin changes
+      return false; // OOM error!
     }
     pinMode(I2SI_WS, OUTPUT);
     pinMode(I2SI_BCK, OUTPUT);
@@ -411,7 +440,11 @@ void i2s_rxtx_begin(bool enableRx, bool enableTx) {
   }
 
   _i2s_sample_rate = 0;
-  i2s_slc_begin();
+  if (!i2s_slc_begin()) {
+    // OOM in SLC memory allocations, tear it all down and abort!
+    i2s_end();
+    return false;
+  }
   
   I2S_CLK_ENABLE();
   I2SIC = 0x3F;
@@ -437,6 +470,8 @@ void i2s_rxtx_begin(bool enableRx, bool enableTx) {
   }
 
   I2SC |= (rx?I2SRXS:0) | (tx?I2STXS:0); // Start transmission/reception
+
+  return true;
 }
 
 void i2s_begin() {
