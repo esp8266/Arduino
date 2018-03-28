@@ -45,16 +45,20 @@
 #include "esp8266_peri.h"
 #include "user_interface.h"
 
+const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
 static int s_uart_debug_nr = UART0;
 
-struct uart_rx_buffer_ {
+
+struct uart_rx_buffer_ 
+{
     size_t size;
     size_t rpos;
     size_t wpos;
     uint8_t * buffer;
 };
 
-struct uart_ {
+struct uart_ 
+{
     int uart_nr;
     int baud_rate;
     bool rx_enabled;
@@ -65,132 +69,201 @@ struct uart_ {
     struct uart_rx_buffer_ * rx_buffer;
 };
 
-size_t uart_resize_rx_buffer(uart_t* uart, size_t new_size)
+
+/*
+   In the context of the naming conventions in this file, "_unsafe" means two things:
+   1. the input arguments are not checked. It is up to the caller to check argument sanity.
+   2. The function body is not interrupt-safe, i.e.: the isr could fire anywhen during the
+      body execution, leading to corruption of the data shared between the body and the isr
+      (parts of the rx_buffer).
+
+   The unsafe versions of the functions are private to this TU. There are "safe" versions that
+   wrap the unsafe ones with disabling/enabling of the uart interrupt for safe public use.
+*/
+
+
+
+inline size_t 
+uart_rx_fifo_available(const int uart_nr) 
 {
-    if(uart == NULL || !uart->rx_enabled) {
-        return 0;
-    }
-    if(uart->rx_buffer->size == new_size) {
-        return uart->rx_buffer->size;
-    }
-    uint8_t * new_buf = (uint8_t*)malloc(new_size);
-    if(!new_buf) {
-        return uart->rx_buffer->size;
-    }
-    size_t new_wpos = 0;
-    ETS_UART_INTR_DISABLE();
-    while(uart_rx_available(uart) && new_wpos < new_size) {
-        new_buf[new_wpos++] = uart_read_char(uart);
-    }
-    uint8_t * old_buf = uart->rx_buffer->buffer;
-    uart->rx_buffer->rpos = 0;
-    uart->rx_buffer->wpos = new_wpos;
-    uart->rx_buffer->size = new_size;
-    uart->rx_buffer->buffer = new_buf;
-    free(old_buf);
-    ETS_UART_INTR_ENABLE();
-    return uart->rx_buffer->size;
+    return (USS(uart_nr) >> USRXC) & 0xFF;
 }
 
-inline size_t uart_rx_buffer_available(uart_t* uart) {
-    if(uart->rx_buffer->wpos < uart->rx_buffer->rpos) {
-      return (uart->rx_buffer->wpos + uart->rx_buffer->size) - uart->rx_buffer->rpos;
-    }
-    return uart->rx_buffer->wpos - uart->rx_buffer->rpos;
+
+/**********************************************************/
+/************ UNSAFE FUNCTIONS ****************************/
+/**********************************************************/
+inline size_t 
+uart_rx_buffer_available_unsafe(const struct uart_rx_buffer_ * rx_buffer) 
+{
+    if(rx_buffer->wpos < rx_buffer->rpos) 
+      return (rx_buffer->wpos + rx_buffer->size) - rx_buffer->rpos;
+    
+    return rx_buffer->wpos - rx_buffer->rpos;
 }
 
-inline size_t uart_rx_fifo_available(uart_t* uart) {
-    return (USS(uart->uart_nr) >> USRXC) & 0x7F;
+inline size_t
+uart_rx_available_unsafe(uart_t* uart)
+{
+    return uart_rx_buffer_available_unsafe(uart->rx_buffer) + uart_rx_fifo_available(uart->uart_nr);
 }
 
-const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
+
+//#define UART_DISCARD_NEWEST
 
 // Copy all the rx fifo bytes that fit into the rx buffer
-inline void uart_rx_copy_fifo_to_buffer(uart_t* uart) {
-    while(uart_rx_fifo_available(uart)){
-        size_t nextPos = (uart->rx_buffer->wpos + 1) % uart->rx_buffer->size;
-        if(nextPos == uart->rx_buffer->rpos) {
+inline void 
+uart_rx_copy_fifo_to_buffer_unsafe(uart_t* uart) 
+{
+    struct uart_rx_buffer_ *rx_buffer = uart->rx_buffer;
 
-            if (!uart->overrun) {
+    while(uart_rx_fifo_available(uart->uart_nr))
+    {
+        size_t nextPos = (rx_buffer->wpos + 1) % rx_buffer->size;
+        if(nextPos == rx_buffer->rpos) 
+        {
+
+            if (!uart->overrun) 
+            {
                 uart->overrun = true;
                 os_printf_plus(overrun_str);
             }
 
             // a choice has to be made here,
             // do we discard newest or oldest data?
-#if 0
+#ifdef UART_DISCARD_NEWEST
             // discard newest data
             // Stop copying if rx buffer is full
             USF(uart->uart_nr);
             break;
 #else
             // discard oldest data
-            if (++uart->rx_buffer->rpos == uart->rx_buffer->size)
-                uart->rx_buffer->rpos = 0;
+            if (++rx_buffer->rpos == rx_buffer->size)
+                rx_buffer->rpos = 0;
 #endif
         }
         uint8_t data = USF(uart->uart_nr);
-        uart->rx_buffer->buffer[uart->rx_buffer->wpos] = data;
-        uart->rx_buffer->wpos = nextPos;
+        rx_buffer->buffer[rx_buffer->wpos] = data;
+        rx_buffer->wpos = nextPos;
     }
 }
 
-int uart_peek_char(uart_t* uart)
+inline int 
+uart_peek_char_unsafe(uart_t* uart)
 {
-    if(uart == NULL || !uart->rx_enabled) {
+    if (!uart_rx_available_unsafe(uart))
         return -1;
-    }
-    if (!uart_rx_available(uart)) {
-        return -1;
-    }
-    if (uart_rx_buffer_available(uart) == 0) {
-        ETS_UART_INTR_DISABLE();
-        uart_rx_copy_fifo_to_buffer(uart);
-        ETS_UART_INTR_ENABLE();
-    }
+   
+    //without the following if statement and body, there is a good chance of a fifo overrun
+    if (uart_rx_buffer_available_unsafe(uart->rx_buffer) == 0)
+        uart_rx_copy_fifo_to_buffer_unsafe(uart);
+    
     return uart->rx_buffer->buffer[uart->rx_buffer->rpos];
 }
 
-int uart_read_char(uart_t* uart)
+inline int 
+uart_read_char_unsafe(uart_t* uart)
 {
-    if(uart == NULL) {
-        return -1;
-    }
-    int data = uart_peek_char(uart);
-    if(data != -1) {
+    int data = uart_peek_char_unsafe(uart);
+    if(data != -1)
         uart->rx_buffer->rpos = (uart->rx_buffer->rpos + 1) % uart->rx_buffer->size;
-    }
     return data;
 }
 
-size_t uart_rx_available(uart_t* uart)
+
+/**********************************************************/
+
+
+
+size_t 
+uart_rx_available(uart_t* uart)
 {
-    if(uart == NULL || !uart->rx_enabled) {
+    if(uart == NULL || !uart->rx_enabled)
         return 0;
-    }
-    return uart_rx_buffer_available(uart) + uart_rx_fifo_available(uart);
+    
+    ETS_UART_INTR_DISABLE();
+    int uartrxbufferavailable = uart_rx_buffer_available_unsafe(uart->rx_buffer);
+    ETS_UART_INTR_ENABLE();
+
+    return uartrxbufferavailable + uart_rx_fifo_available(uart->uart_nr);
+}
+
+int 
+uart_peek_char(uart_t* uart)
+{
+    if(uart == NULL || !uart->rx_enabled)
+        return -1;
+    
+    ETS_UART_INTR_DISABLE(); //access to rx_buffer can be interrupted by the isr (similar to a critical section), so disable interrupts here
+    int ret = uart_peek_char_unsafe(uart);
+    ETS_UART_INTR_ENABLE();
+    return ret;
+}
+
+int 
+uart_read_char(uart_t* uart)
+{
+    if(uart == NULL || !uart->rx_enabled)
+        return -1;
+    
+    ETS_UART_INTR_DISABLE();
+    int data = uart_read_char_unsafe(uart);
+    ETS_UART_INTR_ENABLE();
+    return data;
+}
+
+size_t 
+uart_resize_rx_buffer(uart_t* uart, size_t new_size)
+{
+    if(uart == NULL || !uart->rx_enabled) 
+        return 0;
+
+    if(uart->rx_buffer->size == new_size) 
+        return uart->rx_buffer->size;
+
+    uint8_t * new_buf = (uint8_t*)malloc(new_size);
+    if(!new_buf)
+        return uart->rx_buffer->size;
+    
+    size_t new_wpos = 0;
+    ETS_UART_INTR_DISABLE();
+    while(uart_rx_available_unsafe(uart) && new_wpos < new_size)
+        new_buf[new_wpos++] = uart_read_char_unsafe(uart); //if uart_rx_available_unsafe() returns non-0, uart_read_char_unsafe() can't return -1
+    
+    uint8_t * old_buf = uart->rx_buffer->buffer;
+    uart->rx_buffer->rpos = 0;
+    uart->rx_buffer->wpos = new_wpos;
+    uart->rx_buffer->size = new_size;
+    uart->rx_buffer->buffer = new_buf;
+    ETS_UART_INTR_ENABLE();
+    free(old_buf);
+    return uart->rx_buffer->size;
 }
 
 
-void ICACHE_RAM_ATTR uart_isr(void * arg)
+
+void ICACHE_RAM_ATTR 
+uart_isr(void * arg)
 {
     uart_t* uart = (uart_t*)arg;
-    if(uart == NULL || !uart->rx_enabled) {
+    if(uart == NULL || !uart->rx_enabled) 
+    {
         USIC(uart->uart_nr) = USIS(uart->uart_nr);
         ETS_UART_INTR_DISABLE();
         return;
     }
-    if(USIS(uart->uart_nr) & ((1 << UIFF) | (1 << UITO))){
-        uart_rx_copy_fifo_to_buffer(uart);
-    }
+    if(USIS(uart->uart_nr) & ((1 << UIFF) | (1 << UITO)))
+        uart_rx_copy_fifo_to_buffer_unsafe(uart);
+    
     USIC(uart->uart_nr) = USIS(uart->uart_nr);
 }
 
-void uart_start_isr(uart_t* uart)
+static void 
+uart_start_isr(uart_t* uart)
 {
-    if(uart == NULL || !uart->rx_enabled) {
+    if(uart == NULL || !uart->rx_enabled)
         return;
-    }
+
     // UCFFT value is when the RX fifo full interrupt triggers.  A value of 1
     // triggers the IRS very often.  A value of 127 would not leave much time
     // for ISR to clear fifo before the next byte is dropped.  So pick a value
@@ -202,11 +275,12 @@ void uart_start_isr(uart_t* uart)
     ETS_UART_INTR_ENABLE();
 }
 
-void uart_stop_isr(uart_t* uart)
+static void 
+uart_stop_isr(uart_t* uart)
 {
-    if(uart == NULL || !uart->rx_enabled) {
+    if(uart == NULL || !uart->rx_enabled)
         return;
-    }
+
     ETS_UART_INTR_DISABLE();
     USC1(uart->uart_nr) = 0;
     USIC(uart->uart_nr) = 0xffff;
@@ -214,59 +288,90 @@ void uart_stop_isr(uart_t* uart)
     ETS_UART_INTR_ATTACH(NULL, NULL);
 }
 
-static void uart_do_write_char(uart_t* uart, char c)
+
+
+/*
+  Reference for uart_tx_fifo_available() and uart_tx_fifo_full():
+  -Espressif Techinical Reference doc, chapter 11.3.7
+  -tools/sdk/uart_register.h
+  -cores/esp8266/esp8266_peri.h
+  */
+inline size_t
+uart_tx_fifo_available(const int uart_nr)
 {
-    while((USS(uart->uart_nr) >> USTXC) >= 0x7f);
-    USF(uart->uart_nr) = c;
+    return (USS(uart_nr) >> USTXC) & 0xff;
 }
 
-size_t uart_write_char(uart_t* uart, char c)
+inline bool
+uart_tx_fifo_full(const int uart_nr)
 {
-    if(uart == NULL || !uart->tx_enabled) {
+    return uart_tx_fifo_available(uart_nr) >= 0x7f;
+}
+
+
+static void 
+uart_do_write_char(const int uart_nr, char c)
+{
+    while(uart_tx_fifo_full(uart_nr));
+
+    USF(uart_nr) = c;
+}
+
+size_t 
+uart_write_char(uart_t* uart, char c)
+{
+    if(uart == NULL || !uart->tx_enabled)
         return 0;
-    }
-    uart_do_write_char(uart, c);
+
+    uart_do_write_char(uart->uart_nr, c);
     return 1;
 }
 
-size_t uart_write(uart_t* uart, const char* buf, size_t size)
+size_t 
+uart_write(uart_t* uart, const char* buf, size_t size)
 {
-    if(uart == NULL || !uart->tx_enabled) {
+    if(uart == NULL || !uart->tx_enabled)
         return 0;
-    }
+
     size_t ret = size;
-    while (size--) {
-        uart_do_write_char(uart, *buf++);
-    }
+    const int uart_nr = uart->uart_nr;
+    while (size--)
+        uart_do_write_char(uart_nr, *buf++);
+
     return ret;
 }
 
-size_t uart_tx_free(uart_t* uart)
+
+
+size_t 
+uart_tx_free(uart_t* uart)
 {
-    if(uart == NULL || !uart->tx_enabled) {
+    if(uart == NULL || !uart->tx_enabled)
         return 0;
-    }
-    return UART_TX_FIFO_SIZE - ((USS(uart->uart_nr) >> USTXC) & 0xff);
+
+    return UART_TX_FIFO_SIZE - uart_tx_fifo_available(uart->uart_nr);
 }
 
-void uart_wait_tx_empty(uart_t* uart)
+void 
+uart_wait_tx_empty(uart_t* uart)
 {
-    if(uart == NULL || !uart->tx_enabled) {
+    if(uart == NULL || !uart->tx_enabled)
         return;
-    }
-    while(((USS(uart->uart_nr) >> USTXC) & 0xff) > 0) {
+
+    while(uart_tx_fifo_available(uart->uart_nr) > 0)
         delay(0);
-    }
+
 }
 
-void uart_flush(uart_t* uart)
+void 
+uart_flush(uart_t* uart)
 {
-    if(uart == NULL) {
+    if(uart == NULL)
         return;
-    }
 
     uint32_t tmp = 0x00000000;
-    if(uart->rx_enabled) {
+    if(uart->rx_enabled) 
+    {
         tmp |= (1 << UCRXRST);
         ETS_UART_INTR_DISABLE();
         uart->rx_buffer->rpos = 0;
@@ -274,51 +379,55 @@ void uart_flush(uart_t* uart)
         ETS_UART_INTR_ENABLE();
     }
 
-    if(uart->tx_enabled) {
+    if(uart->tx_enabled)
         tmp |= (1 << UCTXRST);
-    }
 
     USC0(uart->uart_nr) |= (tmp);
     USC0(uart->uart_nr) &= ~(tmp);
 }
 
-void uart_set_baudrate(uart_t* uart, int baud_rate)
+void 
+uart_set_baudrate(uart_t* uart, int baud_rate)
 {
-    if(uart == NULL) {
+    if(uart == NULL)
         return;
-    }
+
     uart->baud_rate = baud_rate;
     USD(uart->uart_nr) = (ESP8266_CLOCK / uart->baud_rate);
 }
 
-int uart_get_baudrate(uart_t* uart)
+int 
+uart_get_baudrate(uart_t* uart)
 {
-    if(uart == NULL) {
+    if(uart == NULL)
         return 0;
-    }
+
     return uart->baud_rate;
 }
 
-uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
+uart_t* 
+uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size)
 {
     uart_t* uart = (uart_t*) malloc(sizeof(uart_t));
-    if(uart == NULL) {
+    if(uart == NULL)
         return NULL;
-    }
 
     uart->uart_nr = uart_nr;
     uart->overrun = false;
 
-    switch(uart->uart_nr) {
+    switch(uart->uart_nr) 
+    {
     case UART0:
         ETS_UART_INTR_DISABLE();
         ETS_UART_INTR_ATTACH(NULL, NULL);
         uart->rx_enabled = (mode != UART_TX_ONLY);
         uart->tx_enabled = (mode != UART_RX_ONLY);
         uart->rx_pin = (uart->rx_enabled)?3:255;
-        if(uart->rx_enabled) {
+        if(uart->rx_enabled) 
+        {
             struct uart_rx_buffer_ * rx_buffer = (struct uart_rx_buffer_ *)malloc(sizeof(struct uart_rx_buffer_));
-            if(rx_buffer == NULL) {
+            if(rx_buffer == NULL) 
+            {
               free(uart);
               return NULL;
             }
@@ -326,7 +435,8 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
             rx_buffer->rpos = 0;
             rx_buffer->wpos = 0;
             rx_buffer->buffer = (uint8_t *)malloc(rx_buffer->size);
-            if(rx_buffer->buffer == NULL) {
+            if(rx_buffer->buffer == NULL) 
+            {
               free(rx_buffer);
               free(uart);
               return NULL;
@@ -334,29 +444,37 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
             uart->rx_buffer = rx_buffer;
             pinMode(uart->rx_pin, SPECIAL);
         }
-        if(uart->tx_enabled) {
-            if (tx_pin == 2) {
+        if(uart->tx_enabled) 
+        {
+            if (tx_pin == 2) 
+            {
                 uart->tx_pin = 2;
                 pinMode(uart->tx_pin, FUNCTION_4);
-            } else {
+            } 
+            else 
+            {
                 uart->tx_pin = 1;
                 pinMode(uart->tx_pin, FUNCTION_0);
             }
-        } else {
+        } 
+        else 
+        {
             uart->tx_pin = 255;
         }
         IOSWAP &= ~(1 << IOSWAPU0);
         break;
+
     case UART1:
         // Note: uart_interrupt_handler does not support RX on UART 1.
         uart->rx_enabled = false;
         uart->tx_enabled = (mode != UART_RX_ONLY);
         uart->rx_pin = 255;
         uart->tx_pin = (uart->tx_enabled)?2:255;  // GPIO7 as TX not possible! See GPIO pins used by UART
-        if(uart->tx_enabled) {
+        if(uart->tx_enabled)
             pinMode(uart->tx_pin, SPECIAL);
-        }
+
         break;
+
     case UART_NO:
     default:
         // big fail!
@@ -370,20 +488,22 @@ uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, s
     USC1(uart->uart_nr) = 0;
     USIC(uart->uart_nr) = 0xffff;
     USIE(uart->uart_nr) = 0;
-    if(uart->uart_nr == UART0 && uart->rx_enabled) {
+    if(uart->uart_nr == UART0 && uart->rx_enabled)
         uart_start_isr(uart);
-    }
 
     return uart;
 }
 
-void uart_uninit(uart_t* uart)
+void 
+uart_uninit(uart_t* uart)
 {
-    if(uart == NULL) {
+    if(uart == NULL)
         return;
-    }
 
-    switch(uart->rx_pin) {
+    uart_stop_isr(uart);
+
+    switch(uart->rx_pin) 
+    {
     case 3:
         pinMode(3, INPUT);
         break;
@@ -392,7 +512,8 @@ void uart_uninit(uart_t* uart)
         break;
     }
 
-    switch(uart->tx_pin) {
+    switch(uart->tx_pin) 
+    {
     case 1:
         pinMode(1, INPUT);
         break;
@@ -404,52 +525,62 @@ void uart_uninit(uart_t* uart)
         break;
     }
 
-    if(uart->rx_enabled){
+    if(uart->rx_enabled)
+    {
+        uart_stop_isr(uart);
         free(uart->rx_buffer->buffer);
         free(uart->rx_buffer);
-        uart_stop_isr(uart);
     }
     free(uart);
 }
 
-void uart_swap(uart_t* uart, int tx_pin)
+void 
+uart_swap(uart_t* uart, int tx_pin)
 {
-    if(uart == NULL) {
+    if(uart == NULL)
         return;
-    }
-    switch(uart->uart_nr) {
+
+    switch(uart->uart_nr) 
+    {
     case UART0:
-        if(((uart->tx_pin == 1 || uart->tx_pin == 2) && uart->tx_enabled) || (uart->rx_pin == 3 && uart->rx_enabled)) {
-            if(uart->tx_enabled) { //TX
+        if(((uart->tx_pin == 1 || uart->tx_pin == 2) && uart->tx_enabled) || (uart->rx_pin == 3 && uart->rx_enabled)) 
+        {
+            if(uart->tx_enabled) //TX
+            {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = 15;
             }
-            if(uart->rx_enabled) { //RX
+            if(uart->rx_enabled) //RX
+            {
                 pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 13;
             }
-            if(uart->tx_enabled) {
+            if(uart->tx_enabled) 
                 pinMode(uart->tx_pin, FUNCTION_4);    //TX
-            }
-            if(uart->rx_enabled) {
+
+            if(uart->rx_enabled)
                 pinMode(uart->rx_pin, FUNCTION_4);    //RX
-            }
+            
             IOSWAP |= (1 << IOSWAPU0);
-        } else {
-            if(uart->tx_enabled) { //TX
+        } 
+        else 
+        {
+            if(uart->tx_enabled) //TX
+            {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = (tx_pin == 2)?2:1;
             }
-            if(uart->rx_enabled) { //RX
+            if(uart->rx_enabled) //RX
+            {
                 pinMode(uart->rx_pin, INPUT);
                 uart->rx_pin = 3;
             }
-            if(uart->tx_enabled) {
+            if(uart->tx_enabled)
                 pinMode(uart->tx_pin, (tx_pin == 2)?FUNCTION_4:SPECIAL);    //TX
-            }
-            if(uart->rx_enabled) {
+
+            if(uart->rx_enabled) 
                 pinMode(3, SPECIAL);    //RX
-            }
+
             IOSWAP &= ~(1 << IOSWAPU0);
         }
 
@@ -462,19 +593,25 @@ void uart_swap(uart_t* uart, int tx_pin)
     }
 }
 
-void uart_set_tx(uart_t* uart, int tx_pin)
+void 
+uart_set_tx(uart_t* uart, int tx_pin)
 {
-    if(uart == NULL) {
+    if(uart == NULL)
         return;
-    }
-    switch(uart->uart_nr) {
+
+    switch(uart->uart_nr) 
+    {
     case UART0:
-        if(uart->tx_enabled) {
-            if (uart->tx_pin == 1 && tx_pin == 2) {
+        if(uart->tx_enabled) 
+        {
+            if (uart->tx_pin == 1 && tx_pin == 2) 
+            {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = 2;
                 pinMode(uart->tx_pin, FUNCTION_4);
-            } else if (uart->tx_pin == 2 && tx_pin != 2) {
+            } 
+            else if (uart->tx_pin == 2 && tx_pin != 2) 
+            {
                 pinMode(uart->tx_pin, INPUT);
                 uart->tx_pin = 1;
                 pinMode(uart->tx_pin, SPECIAL);
@@ -490,82 +627,97 @@ void uart_set_tx(uart_t* uart, int tx_pin)
     }
 }
 
-void uart_set_pins(uart_t* uart, int tx, int rx)
+void 
+uart_set_pins(uart_t* uart, int tx, int rx)
 {
-    if(uart == NULL) {
+    if(uart == NULL)
         return;
-    }
 
-    if(uart->uart_nr == UART0) { // Only UART0 allows pin changes
-        if(uart->tx_enabled && uart->tx_pin != tx) {
-            if( rx == 13 && tx == 15) {
+    if(uart->uart_nr == UART0) // Only UART0 allows pin changes
+    {
+        if(uart->tx_enabled && uart->tx_pin != tx) 
+        {
+            if( rx == 13 && tx == 15) 
+            {
                 uart_swap(uart, 15);
-            } else if (rx == 3 && (tx == 1 || tx == 2)) {
-                if (uart->rx_pin != rx) {
+            } 
+            else if (rx == 3 && (tx == 1 || tx == 2)) 
+            {
+                if (uart->rx_pin != rx)
                     uart_swap(uart, tx);
-                } else {
+                else
                     uart_set_tx(uart, tx);
-                }
             }
         }
-        if(uart->rx_enabled && uart->rx_pin != rx && rx == 13 && tx == 15) {
+        if(uart->rx_enabled && uart->rx_pin != rx && rx == 13 && tx == 15)
             uart_swap(uart, 15);
-        }
     }
 }
 
 
-bool uart_tx_enabled(uart_t* uart)
+bool 
+uart_tx_enabled(uart_t* uart)
 {
-    if(uart == NULL) {
+    if(uart == NULL)
         return false;
-    }
+
     return uart->tx_enabled;
 }
 
-bool uart_rx_enabled(uart_t* uart)
+bool 
+uart_rx_enabled(uart_t* uart)
 {
-    if(uart == NULL) {
+    if(uart == NULL)
         return false;
-    }
+
     return uart->rx_enabled;
 }
 
-bool uart_has_overrun (uart_t* uart)
+bool 
+uart_has_overrun (uart_t* uart)
 {
-    if (uart == NULL || !uart->overrun) {
+    if (uart == NULL || !uart->overrun)
         return false;
-    }
+
     // clear flag
     uart->overrun = false;
     return true;
 }
 
-static void uart_ignore_char(char c)
+static void 
+uart_ignore_char(char c)
 {
     (void) c;
 }
 
-static void uart0_write_char(char c)
+inline void
+uart_write_char_delay(const int uart_nr, char c)
 {
-    while(((USS(0) >> USTXC) & 0xff) >= 0x7F) {
+    while(uart_tx_fifo_full(uart_nr))
         delay(0);
-    }
-    USF(0) = c;
+
+    USF(uart_nr) = c;
+
 }
 
-static void uart1_write_char(char c)
+static void 
+uart0_write_char(char c)
 {
-    while(((USS(1) >> USTXC) & 0xff) >= 0x7F) {
-        delay(0);
-    }
-    USF(1) = c;
+    uart_write_char_delay(0, c);
 }
 
-void uart_set_debug(int uart_nr)
+static void 
+uart1_write_char(char c)
+{
+    uart_write_char_delay(1, c);
+}
+
+void 
+uart_set_debug(int uart_nr)
 {
     s_uart_debug_nr = uart_nr;
-    switch(s_uart_debug_nr) {
+    switch(s_uart_debug_nr) 
+    {
     case UART0:
         system_set_os_print(1);
         ets_install_putc1((void *) &uart0_write_char);
@@ -582,7 +734,8 @@ void uart_set_debug(int uart_nr)
     }
 }
 
-int uart_get_debug()
+int 
+uart_get_debug()
 {
     return s_uart_debug_nr;
 }
