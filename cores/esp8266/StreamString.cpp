@@ -39,23 +39,28 @@ size_t StreamString::write(uint8_t data) {
     return concat((char) data);
 }
 
+size_t StreamString::readBytes(char *buffer, size_t length) {
+    size_t cpylen = min(length, (size_t)available());
+    memcpy(buffer, begin()+_offset, cpylen);
+    _offset += cpylen;
+    return cpylen;
+}
+
 int StreamString::available() {
-    return length();
+    return length() - _offset;
 }
 
 int StreamString::read() {
-    if(length()) {
-        char c = charAt(0);
-        remove(0, 1);
+    if(available()) {
+        char c = charAt(_offset++);
         return c;
-
     }
     return -1;
 }
 
 int StreamString::peek() {
-    if(length()) {
-        char c = charAt(0);
+    if(available()) {
+        char c = charAt(_offset);
         return c;
     }
     return -1;

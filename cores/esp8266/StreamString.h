@@ -25,14 +25,20 @@
 
 
 class StreamString: public Stream, public String {
+protected:
+    size_t _offset = 0;
 public:
     size_t write(const uint8_t *buffer, size_t size) override;
     size_t write(uint8_t data) override;
+
+    size_t readBytes(char *buffer, size_t length) override;
 
     int available() override;
     int read() override;
     int peek() override;
     void flush() override;
+
+    void reset() { _offset = 0; }
 };
 
 
