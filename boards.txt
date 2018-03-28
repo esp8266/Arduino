@@ -1795,6 +1795,7 @@ nodemcuv2.menu.UploadSpeed.921600.upload.speed=921600
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
 modwifi.build.board=MOD_WIFI_ESP8266
+modwifi.build.variant=modwifi
 modwifi.upload.tool=esptool
 modwifi.upload.maximum_data_size=81920
 modwifi.upload.wait_for_upload_port=true
@@ -1803,7 +1804,6 @@ modwifi.serial.disableDTR=true
 modwifi.serial.disableRTS=true
 modwifi.build.mcu=esp8266
 modwifi.build.core=esp8266
-modwifi.build.variant=generic
 modwifi.build.spiffs_pagesize=256
 modwifi.build.debug_port=
 modwifi.build.debug_level=
