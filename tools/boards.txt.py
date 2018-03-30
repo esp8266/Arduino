@@ -726,7 +726,7 @@ boards = collections.OrderedDict([
             '4M',
             ],
         'serial': '921',
-        'desc': [ 'Product page: https://www.wifiduino.com/' ],
+        'desc': [ 'Product page: http://wifiduino.com/esp8266/' ],
     }),
     ])
 
