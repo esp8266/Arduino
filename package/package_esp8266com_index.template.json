@@ -92,6 +92,10 @@
             {
               "name": "Digistump Oak"
             }
+            ,
+            {
+              "name": "WiFiduino"
+            }
           ],
           "toolsDependencies": [
             {
