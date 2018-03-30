@@ -23,7 +23,7 @@
 #include <SD.h>
 
 CertStoreSDBearSSL::CertStoreSDBearSSL() : CertStoreBearSSL() {
-  path[0] = 0;
+  path = "";
 }
 
 CertStoreSDBearSSL::~CertStoreSDBearSSL() {
@@ -56,19 +56,15 @@ int CertStoreSDBearSSL::initCertStore(const char *subdir) {
   int count = 0;
 
   // We want path to have a leading slash and a trailing one
-  String cleaned(subdir);
-  if (cleaned[0] != '/') {
-    cleaned = "/" + cleaned;
+  path = subdir;
+  if (path[0] != '/') {
+    path = "/" + path;
   }
-  if (!cleaned.endsWith("/")) {
-    cleaned = cleaned + "/";
+  if (!path.endsWith("/")) {
+    path += "/";
   }
-  strncpy(path, cleaned.c_str(), sizeof(path));
-  path[sizeof(path) - 1] = 0;
 
-  char tblName[64];
-  snprintf(tblName, sizeof(tblName), "%sca_tbl.bin", path);
-  tblName[sizeof(tblName) - 1] = 0;
+  String tblName = path + "ca_tbl.bin";
 
   File tbl = SD.open(tblName, FILE_WRITE);
   if (!tbl) {
@@ -100,9 +96,7 @@ const br_x509_trust_anchor *CertStoreSDBearSSL::findHashedTA(void *ctx, void *ha
   CertStoreSDBearSSL *cs = static_cast<CertStoreSDBearSSL*>(ctx);
   CertInfo ci;
 
-  char tblName[64];
-  snprintf(tblName, sizeof(tblName), "%sca_tbl.bin", cs->path);
-  tblName[sizeof(tblName) - 1] = 0;
+  String tblName = cs->path + "ca_tbl.bin";
 
   if (len != sizeof(ci.sha256) || !SD.exists(tblName)) {
     return nullptr;

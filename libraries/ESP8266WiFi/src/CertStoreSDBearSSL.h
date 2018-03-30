@@ -37,7 +37,7 @@ class CertStoreSDBearSSL : public CertStoreBearSSL {
     virtual void installCertStore(br_x509_minimal_context *ctx) override;
 
   private:
-    char path[64];
+    String path;
     CertInfo preprocessCert(File *f);
     // These need to be static as they are callbacks from BearSSL C code
     static const br_x509_trust_anchor *findHashedTA(void *ctx, void *hashed_dn, size_t len);
