@@ -4093,3 +4093,4 @@ wifiduino.menu.UploadSpeed.460800.macosx=460800
 wifiduino.menu.UploadSpeed.460800.upload.speed=460800
 wifiduino.menu.UploadSpeed.512000.windows=512000
 wifiduino.menu.UploadSpeed.512000.upload.speed=512000
+
