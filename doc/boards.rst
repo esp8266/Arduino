@@ -387,5 +387,5 @@ To put the board into bootloader mode, configure a serial connection as above, c
 WiFiduino
 ---------
 
-Product page: https://wifiduino.com/esp8266/
+Product page: https://wifiduino.com/esp8266
 
