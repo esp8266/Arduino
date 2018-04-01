@@ -384,3 +384,8 @@ To make a serial connection, wire the adapter's **TX to P3**, **RX to P4**, and 
 
 To put the board into bootloader mode, configure a serial connection as above, connect **P2 to GND**, then re-apply power.  Once flashing is complete, remove the connection from P2 to GND, then re-apply power to boot into normal mode.
 
+WiFiduino
+---------
+
+Product page: https://wifiduino.com/esp8266
+
