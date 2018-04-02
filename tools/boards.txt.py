@@ -757,6 +757,15 @@ macros = {
         ( '.menu.CpuFrequency.160.build.f_cpu', '160000000L' ),
         ]),
 
+    'vtable_menu': collections.OrderedDict([
+        ( '.menu.VTable.flash', 'Flash'),
+        ( '.menu.VTable.flash.build.vtable_flags', '-DVTABLES_IN_FLASH'),
+        ( '.menu.VTable.heap', 'Heap'),
+        ( '.menu.VTable.heap.build.vtable_flags', '-DVTABLES_IN_DRAM'),
+        ( '.menu.VTable.iram', 'IRAM'),
+        ( '.menu.VTable.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
+        ]),
+
     'crystalfreq_menu': collections.OrderedDict([
         ( '.menu.CrystalFreq.26', '26 MHz' ),
         ( '.menu.CrystalFreq.40', '40 MHz' ),
@@ -1147,6 +1156,7 @@ def all_boards ():
     print 'menu.Debug=Debug port'
     print 'menu.DebugLevel=Debug Level'
     print 'menu.LwIPVariant=lwIP Variant'
+    print 'menu.VTable=VTables'
     print 'menu.led=Builtin Led'
     print 'menu.FlashErase=Erase Flash'
     print ''
@@ -1162,7 +1172,7 @@ def all_boards ():
                 print id + optname + '=' + board['opts'][optname]
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:
