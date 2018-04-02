@@ -22,7 +22,7 @@
 
 #include "CertStoreBearSSL.h"
 
-class File; // Defined in SD.h
+class File;
 
 // SD cert store can be in a subdirectory as there are fewer limits
 // Note that SD.begin() MUST be called before doing initCertStore because

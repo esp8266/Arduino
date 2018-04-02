@@ -1,5 +1,3 @@
-// Removed to make Platform.IO not barf
-#if 1
 /*
   CertStoreSDBearSSL.cpp - Library for Arduino ESP8266
   Copyright (c) 2018 Earle F. Philhower, III
@@ -19,8 +17,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "CertStoreSDBearSSL.h"
 #include <SD.h>
+#include "CertStoreSDBearSSL.h"
 
 CertStoreSDBearSSL::CertStoreSDBearSSL() : CertStoreBearSSL() {
   path = "";
@@ -141,4 +139,3 @@ void CertStoreSDBearSSL::freeHashedTA(void *ctx, const br_x509_trust_anchor *ta)
   (void) ctx; // not needed
   CertStoreBearSSL::freeTrustAnchor(ta);
 }
-#endif

@@ -145,8 +145,8 @@ function build_boards()
 function install_platformio()
 {
     pip install --user -U https://github.com/platformio/platformio/archive/develop.zip
-    platformio platform install https://github.com/platformio/platform-espressif8266.git#feature/stage
-    sed -i "s:https\://github\.com/esp8266/Arduino\.git:file\://$TRAVIS_BUILD_DIR:" ~/.platformio/platforms/espressif8266/platform.json
+    platformio platform install "https://github.com/platformio/platform-espressif8266.git#feature/stage"
+    sed -i 's/https:\/\/github\.com\/esp8266\/Arduino\.git/*/' ~/.platformio/platforms/espressif8266/platform.json
     ln -s $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
     # Install dependencies:
     # - esp8266/examples/ConfigFile
@@ -243,7 +243,7 @@ if [ "$BUILD_TYPE" = "build" ]; then
 elif [ "$BUILD_TYPE" = "platformio" ]; then
     # PlatformIO
     install_platformio
-    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --project-option=lib_ldf_mode=deep+ --verbose"
 elif [ "$BUILD_TYPE" = "docs" ]; then
     # Build documentation using Sphinx
     cd $TRAVIS_BUILD_DIR/doc
