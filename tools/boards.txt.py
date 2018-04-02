@@ -713,6 +713,21 @@ boards = collections.OrderedDict([
                   'To put the board into bootloader mode, configure a serial connection as above, connect **P2 to GND**, then re-apply power.  Once flashing is complete, remove the connection from P2 to GND, then re-apply power to boot into normal mode.',
                   ],
     }),
+    ( 'wifiduino', {
+        'name': 'WiFiduino',
+        'opts': {
+            '.build.board': 'WIFIDUINO_ESP8266',
+            '.build.variant': 'wifiduino',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'serial': '921',
+        'desc': [ 'Product page: https://wifiduino.com/esp8266' ],
+    }),
     ])
 
 ################################################################
