@@ -1,5 +1,5 @@
 // Removed to make Platform.IO not barf
-#if 0
+#if 1
 /*
   CertStoreSDBearSSL.cpp - Library for Arduino ESP8266
   Copyright (c) 2018 Earle F. Philhower, III
