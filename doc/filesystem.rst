@@ -53,6 +53,8 @@ which is selected in IDE, you have the following options for flash size:
 +---------------------------------+--------------------------+---------------------------+
 | ESPDuino                        | 4M                       | 1M, 3M                    |
 +---------------------------------+--------------------------+---------------------------+
+| WiFiduino                       | 4M                       | 1M, 3M                    |
++---------------------------------+--------------------------+---------------------------+
 
 **Note:** to use any of file system functions in the sketch, add the
 following include to the sketch:
