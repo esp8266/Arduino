@@ -94,6 +94,9 @@ SECTIONS
     *(.ver_number)
     *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, EXCLUDE_FILE (umm_malloc.c.o) .text* )
     *.cpp.o(.literal*, .text*)
+#ifdef VTABLES_IN_FLASH
+    *(.rodata._ZTV*) /* C++ vtables */
+#endif
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libgcc.a:_umoddi3.o(.literal .text)
@@ -167,7 +170,7 @@ SECTIONS
     _etext = .;
   } >iram1_0_seg :iram1_0_phdr
 
-#ifdef VTABLES_IN_IRAM
+#if defined(VTABLES_IN_IRAM) || defined(VTABLES_IN_FLASH)
 #include "eagle.app.v6.common.ld.vtables.h"
 #endif
 
