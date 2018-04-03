@@ -40,7 +40,7 @@ function build_sketches()
     local build_arg=$3
     local build_dir=build.tmp
     mkdir -p $build_dir
-    local build_cmd="python tools/build.py -b generic -v -k -p $PWD/$build_dir $build_arg "
+    local build_cmd="python tools/build.py -b generic -v -w all -k -p $PWD/$build_dir $build_arg "
     local sketches=$(find $srcpath -name *.ino)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
@@ -50,7 +50,7 @@ function build_sketches()
         local sketchdirname=$(basename $sketchdir)
         local sketchname=$(basename $sketch)
         if [[ "${sketchdirname}.ino" != "$sketchname" ]]; then
-            echo "Skipping $sketch, beacause it is not the main sketch file";
+            echo "Skipping $sketch, because it is not the main sketch file";
             continue
         fi;
         if [[ -f "$sketchdir/.test.skip" ]]; then
@@ -68,6 +68,12 @@ function build_sketches()
             cat build.log
             set -e
             return $result
+        else
+            local warns=$( grep -c warning: build.log )
+            if [ $warns -ne 0 ]; then
+                echo "Warnings detected, log follows:"
+                cat build.log
+            fi
         fi
         rm build.log
         print_size_info $build_dir/*.elf >>size.log
@@ -97,6 +103,9 @@ function install_ide()
     mkdir esp8266com
     cd esp8266com
     ln -s $core_path esp8266
+    # Set custom warnings for all builds (i.e. could add -Wextra at some point)
+    echo "compiler.c.extra_flags=-Wall -Werror" > esp8266/platform.local.txt
+    echo "compiler.cpp.extra_flags=-Wall -Werror" >> esp8266/platform.local.txt
     cd esp8266/tools
     python get.py
     export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
@@ -122,6 +131,16 @@ function build_package()
     ./build_boards_manager_package.sh
 }
 
+function build_boards()
+{
+    echo -e "travis_fold:start:build_boards"
+    tools/boards.txt.py --boardsgen --ldgen --packagegen --docgen
+    git diff --exit-code -- boards.txt \
+                            package/package_esp8266com_index.template.json \
+                            doc/boards.rst \
+                            tools/sdk/ld/
+    echo -e "travis_fold:end:build_boards"
+}
 
 function install_platformio()
 {
@@ -194,7 +213,29 @@ function build_sketches_with_arduino()
     echo -e "travis_fold:end:size_report"
 }
 
+function check_examples_style()
+{
+    echo -e "travis_fold:start:check_examples_style"
+
+    find $TRAVIS_BUILD_DIR/libraries -name '*.ino' -exec \
+        astyle \
+            --suffix=none \
+            --options=$TRAVIS_BUILD_DIR/tests/examples_style.conf {} \;
+
+    git diff --exit-code -- $TRAVIS_BUILD_DIR/libraries
+
+    echo -e "travis_fold:end:check_examples_style"
+}
+
 set -e
+
+if [ -z "$TRAVIS_BUILD_DIR" ]; then
+    echo "TRAVIS_BUILD_DIR is not set, trying to guess:"
+    pushd $(dirname $0)/../ > /dev/null
+    TRAVIS_BUILD_DIR=$PWD
+    popd > /dev/null
+    echo "TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR"
+fi
 
 if [ "$BUILD_TYPE" = "build" ]; then
     install_arduino
@@ -208,12 +249,20 @@ elif [ "$BUILD_TYPE" = "docs" ]; then
     cd $TRAVIS_BUILD_DIR/doc
     build_docs
 elif [ "$BUILD_TYPE" = "package" ]; then
-        # Build release package
+    # Check that boards.txt, ld scripts, package JSON template, and boards.rst are up to date
+    build_boards
+    # Build release package
     cd $TRAVIS_BUILD_DIR/package
     build_package
 elif [ "$BUILD_TYPE" = "host_tests" ]; then
     # Run host side tests
     cd $TRAVIS_BUILD_DIR/tests
     run_host_tests
+elif [ "$BUILD_TYPE" = "style_check" ]; then
+    # Check code style
+    check_examples_style
+else
+    echo "BUILD_TYPE not set"
+    exit 1
 fi
 

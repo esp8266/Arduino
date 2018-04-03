@@ -86,7 +86,7 @@ bool UpdaterClass::begin(size_t size, int command) {
     //size of the update rounded to a sector
     uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address where we will start writing the update
-    updateStartAddress = updateEndAddress - roundedSize;
+    updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
 #ifdef DEBUG_UPDATER
         DEBUG_UPDATER.printf("[begin] roundedSize:       0x%08X (%d)\n", roundedSize, roundedSize);

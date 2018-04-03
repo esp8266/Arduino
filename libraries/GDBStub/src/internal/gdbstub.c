@@ -792,5 +792,11 @@ void ATTR_GDBFN gdbstub_do_break_wrapper() {
 	gdbstub_do_break();
 }
 
-extern void gdb_do_break() __attribute__((weak, alias("gdbstub_do_break_wrapper")));
-extern void gdb_init() __attribute__((weak, alias("gdbstub_init")));
+bool ATTR_GDBINIT gdb_present()
+{
+	return true;
+}
+
+extern void gdb_do_break() __attribute__((alias("gdbstub_do_break_wrapper")));
+extern void gdb_init() __attribute__((alias("gdbstub_init")));
+
