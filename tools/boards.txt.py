@@ -443,6 +443,7 @@ boards = collections.OrderedDict([
         'name': 'Olimex MOD-WIFI-ESP8266(-DEV)',
         'opts': {
             '.build.board': 'MOD_WIFI_ESP8266',
+            '.build.variant': 'modwifi',
             },
         'macro': [
             'resetmethod_ck',
@@ -712,6 +713,21 @@ boards = collections.OrderedDict([
                   'To put the board into bootloader mode, configure a serial connection as above, connect **P2 to GND**, then re-apply power.  Once flashing is complete, remove the connection from P2 to GND, then re-apply power to boot into normal mode.',
                   ],
     }),
+    ( 'wifiduino', {
+        'name': 'WiFiduino',
+        'opts': {
+            '.build.board': 'WIFIDUINO_ESP8266',
+            '.build.variant': 'wifiduino',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'serial': '921',
+        'desc': [ 'Product page: https://wifiduino.com/esp8266' ],
+    }),
     ])
 
 ################################################################
@@ -739,6 +755,15 @@ macros = {
         ( '.menu.CpuFrequency.80.build.f_cpu', '80000000L' ),
         ( '.menu.CpuFrequency.160', '160 MHz' ),
         ( '.menu.CpuFrequency.160.build.f_cpu', '160000000L' ),
+        ]),
+
+    'vtable_menu': collections.OrderedDict([
+        ( '.menu.VTable.flash', 'Flash'),
+        ( '.menu.VTable.flash.build.vtable_flags', '-DVTABLES_IN_FLASH'),
+        ( '.menu.VTable.heap', 'Heap'),
+        ( '.menu.VTable.heap.build.vtable_flags', '-DVTABLES_IN_DRAM'),
+        ( '.menu.VTable.iram', 'IRAM'),
+        ( '.menu.VTable.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
         ]),
 
     'crystalfreq_menu': collections.OrderedDict([
@@ -934,9 +959,8 @@ def comb1 (lst):
 
 def all_debug ():
     listcomb = [ 'SSL', 'TLS_MEM', 'HTTP_CLIENT', 'HTTP_SERVER' ]
-    listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA' ]
+    listnocomb = [ 'CORE', 'WIFI', 'HTTP_UPDATE', 'UPDATER', 'OTA', 'OOM' ]
     listsingle = [ 'NoAssert-NDEBUG' ]
-    listnocomb += [ 'OOM -include "umm_malloc/umm_malloc_cfg.h"' ]
     options = combn(listcomb)
     options += comb1(listnocomb)
     options += [ listcomb + listnocomb ]
@@ -1132,6 +1156,7 @@ def all_boards ():
     print 'menu.Debug=Debug port'
     print 'menu.DebugLevel=Debug Level'
     print 'menu.LwIPVariant=lwIP Variant'
+    print 'menu.VTable=VTables'
     print 'menu.led=Builtin Led'
     print 'menu.FlashErase=Erase Flash'
     print ''
@@ -1147,7 +1172,7 @@ def all_boards ():
                 print id + optname + '=' + board['opts'][optname]
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:

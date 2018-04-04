@@ -53,6 +53,7 @@ class ESP8266WiFiSTAClass {
         bool getAutoConnect();
 
         bool setAutoReconnect(bool autoReconnect);
+        bool getAutoReconnect();
 
         uint8_t waitForConnectResult();
 

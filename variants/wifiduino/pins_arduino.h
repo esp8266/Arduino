@@ -32,25 +32,25 @@
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
-//new ESP-12E GPIO2
-#define LED_BUILTIN 2
+static const uint8_t LED_BUILTIN = 2;
+static const uint8_t BUILTIN_LED = 2;
 
 static const uint8_t D0   = 3;
 static const uint8_t D1   = 1;
-static const uint8_t D2   = 16;
-static const uint8_t D3   = 5;
+static const uint8_t D2   = 2;
+static const uint8_t D3   = 0;
 static const uint8_t D4   = 4;
-static const uint8_t D5   = 14;
-static const uint8_t D6   = 12;
-static const uint8_t D7   = 13;
-static const uint8_t D8   = 0;
-static const uint8_t D9   = 2;
+static const uint8_t D5   = 5;
+static const uint8_t D6   = 16;
+static const uint8_t D7   = 14;
+static const uint8_t D8   = 12;
+static const uint8_t D9   = 13;
 static const uint8_t D10  = 15;
 static const uint8_t D11  = 13;
 static const uint8_t D12  = 12;
 static const uint8_t D13  = 14;
-static const uint8_t D14  = 4;
-static const uint8_t D15  = 5;
+static const uint8_t RX   = 3;
+static const uint8_t TX   = 1;
 
 #include "../generic/common.h"
 

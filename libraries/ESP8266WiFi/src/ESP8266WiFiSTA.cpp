@@ -357,6 +357,14 @@ bool ESP8266WiFiSTAClass::setAutoReconnect(bool autoReconnect) {
 }
 
 /**
+ * get whether reconnect or not when the ESP8266 station is disconnected from AP.
+ * @return autoreconnect
+ */
+bool ESP8266WiFiSTAClass::getAutoReconnect() {
+    return wifi_station_get_reconnect_policy();
+}
+
+/**
  * Wait for WiFi connection to reach a result
  * returns the status reached or disconnect if STA is off
  * @return wl_status_t
