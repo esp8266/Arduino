@@ -128,6 +128,14 @@ public:
         // this may return -1, but that's okay
         return uart_read_char(_uart);
     }
+    size_t readBytes(char* buffer, size_t size) override
+    {
+        return uart_read(_uart, buffer, size);
+    }
+    size_t readBytes(uint8_t* buffer, size_t size) override
+    {
+        return uart_read(_uart, (char*)buffer, size);
+    }
     int availableForWrite(void)
     {
         return static_cast<int>(uart_tx_free(_uart));

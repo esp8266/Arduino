@@ -45,7 +45,6 @@
 #include "esp8266_peri.h"
 #include "user_interface.h"
 
-const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
 static int s_uart_debug_nr = UART0;
 
 
@@ -83,7 +82,8 @@ struct uart_
 
 
 
-inline size_t 
+// called by ISR
+inline size_t ICACHE_RAM_ATTR
 uart_rx_fifo_available(const int uart_nr) 
 {
     return (USS(uart_nr) >> USRXC) & 0xFF;
@@ -108,11 +108,11 @@ uart_rx_available_unsafe(uart_t* uart)
     return uart_rx_buffer_available_unsafe(uart->rx_buffer) + uart_rx_fifo_available(uart->uart_nr);
 }
 
-
 //#define UART_DISCARD_NEWEST
 
 // Copy all the rx fifo bytes that fit into the rx buffer
-inline void 
+// called by ISR
+inline void ICACHE_RAM_ATTR
 uart_rx_copy_fifo_to_buffer_unsafe(uart_t* uart) 
 {
     struct uart_rx_buffer_ *rx_buffer = uart->rx_buffer;
@@ -122,12 +122,7 @@ uart_rx_copy_fifo_to_buffer_unsafe(uart_t* uart)
         size_t nextPos = (rx_buffer->wpos + 1) % rx_buffer->size;
         if(nextPos == rx_buffer->rpos) 
         {
-
-            if (!uart->overrun) 
-            {
-                uart->overrun = true;
-                os_printf_plus(overrun_str);
-            }
+            uart->overrun = true;
 
             // a choice has to be made here,
             // do we discard newest or oldest data?
@@ -156,20 +151,33 @@ uart_peek_char_unsafe(uart_t* uart)
    
     //without the following if statement and body, there is a good chance of a fifo overrun
     if (uart_rx_buffer_available_unsafe(uart->rx_buffer) == 0)
+        // hw fifo can't be peeked, data need to be copied to sw
         uart_rx_copy_fifo_to_buffer_unsafe(uart);
     
     return uart->rx_buffer->buffer[uart->rx_buffer->rpos];
 }
 
-inline int 
+// taking data straight from hw fifo: loopback-test BW jumps by 19%
+inline int
 uart_read_char_unsafe(uart_t* uart)
 {
-    int data = uart_peek_char_unsafe(uart);
-    if(data != -1)
+    if (uart_rx_buffer_available_unsafe(uart->rx_buffer))
+    {
+        // take oldest sw data
+        int ret = uart->rx_buffer->buffer[uart->rx_buffer->rpos];
         uart->rx_buffer->rpos = (uart->rx_buffer->rpos + 1) % uart->rx_buffer->size;
-    return data;
-}
+        return ret;
+    }
 
+    if (uart_rx_fifo_available(uart->uart_nr))
+    {
+        // no sw data, take from hw fifo
+        return USF(uart->uart_nr);
+    }
+
+    // unavailable
+    return -1;
+}
 
 /**********************************************************/
 
@@ -212,6 +220,44 @@ uart_read_char(uart_t* uart)
     return data;
 }
 
+// loopback-test BW jumps by 190%
+size_t
+uart_read(uart_t* uart, char* userbuffer, size_t usersize)
+{
+    if(uart == NULL || !uart->rx_enabled)
+        return -1;
+
+    size_t ret = 0;
+    ETS_UART_INTR_DISABLE();
+
+    while (ret < usersize && uart_rx_available_unsafe(uart))
+    {
+        if (!uart_rx_buffer_available_unsafe(uart->rx_buffer))
+        {
+            // no more data in sw buffer, take them from hw fifo
+            while (ret < usersize && uart_rx_fifo_available(uart->uart_nr))
+                userbuffer[ret++] = USF(uart->uart_nr);
+
+            // no more sw/hw data available
+            break;
+        }
+
+        // pour sw buffer to user's buffer
+        // get largest linear length from sw buffer
+        size_t chunk = uart->rx_buffer->rpos < uart->rx_buffer->wpos?
+                           uart->rx_buffer->wpos - uart->rx_buffer->rpos:
+                           uart->rx_buffer->size - uart->rx_buffer->rpos;
+        if (ret + chunk > usersize)
+            chunk = usersize - ret;
+        memcpy(userbuffer + ret, uart->rx_buffer->buffer + uart->rx_buffer->rpos, chunk);
+        uart->rx_buffer->rpos = (uart->rx_buffer->rpos + chunk) % uart->rx_buffer->size;
+        ret += chunk;
+    }
+
+    ETS_UART_INTR_ENABLE();
+    return ret;
+}
+
 size_t 
 uart_resize_rx_buffer(uart_t* uart, size_t new_size)
 {
@@ -252,7 +298,7 @@ uart_isr(void * arg)
         ETS_UART_INTR_DISABLE();
         return;
     }
-    if(USIS(uart->uart_nr) & ((1 << UIFF) | (1 << UITO)))
+    if(USIS(uart->uart_nr) & (1 << UIFF))
         uart_rx_copy_fifo_to_buffer_unsafe(uart);
     
     USIC(uart->uart_nr) = USIS(uart->uart_nr);
@@ -268,9 +314,16 @@ uart_start_isr(uart_t* uart)
     // triggers the IRS very often.  A value of 127 would not leave much time
     // for ISR to clear fifo before the next byte is dropped.  So pick a value
     // in the middle.
-    USC1(uart->uart_nr) = (100   << UCFFT) | (0x02 << UCTOT) | (1 <<UCTOE );
+    // update: with direct peeking and loopback test @ 3Mbauds/8n1 (=2343Kibits/s):
+    // when high, allows to directly peek into hw buffer, avoiding two copies
+    // - 4..120 give 2300Kibits/s
+    // - 1, 2, 3 are below
+    // - far below 2000 without direct peeking
+    #define INTRIGGER 100
+
+    USC1(uart->uart_nr) = (INTRIGGER << UCFFT);
     USIC(uart->uart_nr) = 0xffff;
-    USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIFR) | (1 << UITO);
+    USIE(uart->uart_nr) = (1 << UIFF);
     ETS_UART_INTR_ATTACH(uart_isr,  (void *)uart);
     ETS_UART_INTR_ENABLE();
 }
