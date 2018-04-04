@@ -88,6 +88,10 @@ public:
     void end();
 
     size_t setRxBufferSize(size_t size);
+    size_t getRxBufferSize()
+    {
+        return uart_get_rx_buffer_size(_uart);
+    }
 
     void swap()
     {
@@ -127,6 +131,14 @@ public:
     {
         // this may return -1, but that's okay
         return uart_read_char(_uart);
+    }
+    size_t readBytes (char* buffer, size_t size) override
+    {
+        return uart_read(_uart, buffer, size);
+    }
+    size_t readBytes (uint8_t* buffer, size_t size) override
+    {
+        return uart_read(_uart, (char*)buffer, size);
     }
     int availableForWrite(void)
     {
