@@ -113,6 +113,17 @@ typedef struct {
   void * arg;
 } interrupt_handler_t;
 
+//duplicate from functionalInterrupt.h keep in sync
+typedef struct InterruptInfo {
+	uint8_t pin;
+	uint8_t value;
+	uint32_t micro;
+} InterruptInfo;
+
+typedef struct {
+	InterruptInfo* interruptInfo;
+	void* functionInfo;
+} ArgStructure;
 
 static interrupt_handler_t interrupt_handlers[16];
 static uint32_t interrupt_reg = 0;
@@ -135,7 +146,14 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
          (handler->mode & 1) == !!(levels & (1 << i)))) {
       // to make ISR compatible to Arduino AVR model where interrupts are disabled
       // we disable them before we call the client ISR
-      uint32_t savedPS = xt_rsil(15); // stop other interrupts 
+      uint32_t savedPS = xt_rsil(15); // stop other interrupts
+      ArgStructure* localArg = (ArgStructure*)handler->arg;
+      if (localArg->interruptInfo)
+      {
+         localArg->interruptInfo->pin = i;
+         localArg->interruptInfo->value = __digitalRead(i);
+         localArg->interruptInfo->micro = micros();
+      }
       if (handler->arg)
       {
     	  ((voidFuncPtrArg)handler->fn)(handler->arg);
@@ -170,6 +188,8 @@ extern void ICACHE_RAM_ATTR __attachInterrupt(uint8_t pin, voidFuncPtr userFunc,
 	__attachInterruptArg (pin, userFunc, 0, mode);
 }
 
+extern void cleanupFunctional(void* arg);
+
 extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
   if(pin < 16) {
     ETS_GPIO_INTR_DISABLE();
@@ -179,6 +199,10 @@ extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = 0;
     handler->fn = 0;
+    if (handler->arg)
+		{
+		  cleanupFunctional(handler->arg);
+		}
     handler->arg = 0;
     ETS_GPIO_INTR_ENABLE();
   }
