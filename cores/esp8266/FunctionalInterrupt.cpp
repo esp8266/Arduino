@@ -1,5 +1,5 @@
 #include <FunctionalInterrupt.h>
-#include <schedule.h>
+#include <Schedule.h>
 #include "Arduino.h"
 
 // Duplicate typedefs from core_esp8266_wiring_digital_c
