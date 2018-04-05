@@ -27,6 +27,7 @@ extern "C" {
 void esp_yield();
 void esp_schedule();
 #include "lwip/init.h" // LWIP_VERSION_
+#include <assert.h>
 }
 
 
@@ -143,6 +144,21 @@ public:
         return _rx_buf->len - _rx_buf_offset;
     }
 
+    size_t tell() const
+    {
+        return _rx_buf_offset;
+    }
+
+    void seek(const size_t pos)
+    {
+        assert(isValidOffset(pos));
+        _rx_buf_offset = pos;
+    }
+
+    bool isValidOffset(const size_t pos) const {
+        return (pos <= _rx_buf->len);
+    }
+
     uint32_t getRemoteAddress()
     {
         if (!_rx_buf)
@@ -203,7 +219,7 @@ public:
 
     int read()
     {
-        if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
+        if (!_rx_buf || _rx_buf_offset >= _rx_buf->len)
             return -1;
 
         char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
@@ -361,6 +377,9 @@ private:
     void _consume(size_t size)
     {
         _rx_buf_offset += size;
+        if (_rx_buf_offset > _rx_buf->len) {
+            _rx_buf_offset = _rx_buf->len;
+        }
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,

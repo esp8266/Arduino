@@ -126,6 +126,11 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         *conf.password = 0;
     }
 
+    conf.threshold.rssi = -127;
+
+    // TODO(#909): set authmode to AUTH_WPA_PSK if passphrase is provided
+    conf.threshold.authmode = AUTH_OPEN;
+
     if(bssid) {
         conf.bssid_set = 1;
         memcpy((void *) &conf.bssid[0], (void *) bssid, 6);
@@ -133,20 +138,21 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         conf.bssid_set = 0;
     }
 
-    struct station_config current_conf;
-    wifi_station_get_config(&current_conf);
-    if(sta_config_equal(current_conf, conf)) {
+    struct station_config conf_compare;
+    if(WiFi._persistent){
+        wifi_station_get_config_default(&conf_compare);
+    }
+    else {
+        wifi_station_get_config(&conf_compare);
+    }
+
+    if(sta_config_equal(conf_compare, conf)) {
         DEBUGV("sta config unchanged");
     }
     else {
         ETS_UART_INTR_DISABLE();
 
         if(WiFi._persistent) {
-            // workaround for #1997: make sure the value of ap_number is updated and written to flash
-            // to be removed after SDK update
-            wifi_station_ap_number_set(2);
-            wifi_station_ap_number_set(1);
-
             wifi_station_set_config(&conf);
         } else {
             wifi_station_set_config_current(&conf);
@@ -196,15 +202,6 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
     }
     return status();
 }
-
-static void
-swap(IPAddress &lhs, IPAddress &rhs)
-{
-  IPAddress tmp = lhs;
-  lhs = rhs;
-  rhs = tmp;
-}
-
 
 /**
  * Change IP configuration settings disabling the dhcp client
@@ -357,6 +354,14 @@ bool ESP8266WiFiSTAClass::getAutoConnect() {
  */
 bool ESP8266WiFiSTAClass::setAutoReconnect(bool autoReconnect) {
     return wifi_station_set_reconnect_policy(autoReconnect);
+}
+
+/**
+ * get whether reconnect or not when the ESP8266 station is disconnected from AP.
+ * @return autoreconnect
+ */
+bool ESP8266WiFiSTAClass::getAutoReconnect() {
+    return wifi_station_get_reconnect_policy();
 }
 
 /**
