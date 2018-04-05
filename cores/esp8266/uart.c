@@ -83,7 +83,8 @@ struct uart_
 
 
 
-inline size_t 
+// called by ISR
+inline size_t ICACHE_RAM_ATTR
 uart_rx_fifo_available(const int uart_nr) 
 {
     return (USS(uart_nr) >> USRXC) & 0xFF;
@@ -109,7 +110,8 @@ uart_rx_available_unsafe(uart_t* uart)
 }
 
 // Copy all the rx fifo bytes that fit into the rx buffer
-inline void 
+// called by ISR
+inline void ICACHE_RAM_ATTR
 uart_rx_copy_fifo_to_buffer_unsafe(uart_t* uart) 
 {
     struct uart_rx_buffer_ *rx_buffer = uart->rx_buffer;
