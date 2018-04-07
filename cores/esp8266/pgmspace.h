@@ -112,8 +112,8 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
 }
 
 // Make sure, that libraries checking existence of this macro are not failing
-#define pgm_read_byte(addr) pgm_read_byte_inlined(addr)
-#define pgm_read_word(addr) pgm_read_word_inlined(addr)
+#define pgm_read_byte(addr) pgm_read_byte_inlined((const void*)(addr))
+#define pgm_read_word(addr) pgm_read_word_inlined((const void*)(addr))
 
 #else //__ets__
 #define pgm_read_byte(addr)     (*reinterpret_cast<const uint8_t*>(addr))
