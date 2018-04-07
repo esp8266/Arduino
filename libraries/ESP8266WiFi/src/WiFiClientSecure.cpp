@@ -564,6 +564,30 @@ size_t WiFiClientSecure::write_P(PGM_P buf, size_t size)
     return write(copy, size);
 }
 
+// The axTLS bare libs don't understand anything about Arduino Streams,
+// so we have to manually read and send individual chunks.
+size_t WiFiClientSecure::write(Stream& stream)
+{
+    size_t totalSent = 0;
+    size_t countRead;
+    size_t countSent;
+    if (!_ssl)
+    {
+        return 0;
+    }
+    do {
+        uint8_t temp[256]; // Temporary chunk size same as ClientContext
+        countSent = 0;
+        countRead = stream.readBytes(temp, sizeof(temp));
+        if (countRead) {
+            countSent = write(temp, countRead);
+            totalSent += countSent;
+        }
+        yield(); // Feed the WDT
+    } while ( (countSent == countRead) && (countSent > 0) );
+    return totalSent;
+}
+
 int WiFiClientSecure::read(uint8_t *buf, size_t size)
 {
     if (!_ssl) {
