@@ -51,6 +51,8 @@ extern "C"
 #define SSL_DEBUG_OPTS 0
 #endif
 
+namespace axTLS {
+
 
 typedef struct BufferItem
 {
@@ -905,3 +907,5 @@ extern "C" void __ax_wdt_feed()
     optimistic_yield(10000);
 }
 extern "C" void ax_wdt_feed() __attribute__ ((weak, alias("__ax_wdt_feed")));
+
+};

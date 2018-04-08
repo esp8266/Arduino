@@ -17,5 +17,32 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "WiFiServerSecureAxTLS.h"
+#ifndef wifiserversecure_h
+#define wifiserversecure_h
+
+#include "WiFiServer.h"
+
+namespace axTLS {
+
+class WiFiClientSecure;
+
+class WiFiServerSecure : public WiFiServer {
+public:
+  WiFiServerSecure(IPAddress addr, uint16_t port);
+  WiFiServerSecure(uint16_t port);
+  void setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
+  void setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
+  virtual ~WiFiServerSecure() {}
+  WiFiClientSecure available(uint8_t* status = NULL);
+private:
+  bool usePMEM = false;
+  const uint8_t *rsakey = nullptr;
+  int rsakeyLen = 0;
+  const uint8_t *cert = nullptr;
+  int certLen = 0;
+};
+
+};
+
+#endif
 

@@ -36,6 +36,9 @@ extern "C" {
 #include "include/ClientContext.h"
 #include "WiFiServerSecure.h"
 
+
+namespace axTLS {
+
 WiFiServerSecure::WiFiServerSecure(IPAddress addr, uint16_t port) : WiFiServer(addr, port)
 {
 }
@@ -77,3 +80,4 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status)
     return WiFiClientSecure();
 }
 
+};
