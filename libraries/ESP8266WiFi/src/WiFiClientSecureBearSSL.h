@@ -28,6 +28,8 @@
 #include "BearSSLHelpers.h"
 #include "CertStoreBearSSL.h"
 
+namespace BearSSL {
+
 class WiFiClientBearSSL : public WiFiClient {
   public:
     WiFiClientBearSSL();
@@ -172,4 +174,7 @@ class WiFiClientBearSSL : public WiFiClient {
     // The local copy, only used to enable a reference count
     std::shared_ptr<uint8_t> _local_bearssl_stack;
 };
+
+};
+
 #endif

@@ -21,9 +21,11 @@
 #define wifiserverbearssl_h
 
 #include "WiFiServer.h"
-#include "WiFiClientBearSSL.h"
+#include "WiFiClientSecureBearSSL.h"
 #include "BearSSLHelpers.h"
 #include <bearssl/bearssl.h>
+
+namespace BearSSL {
 
 class WiFiClientBearSSL;
 
@@ -62,6 +64,8 @@ class WiFiServerBearSSL : public WiFiServer {
     int _iobuf_in_size = BR_SSL_BUFSIZE_INPUT;
     int _iobuf_out_size = 837;
     const BearSSLX509List *_client_CA_ta = nullptr;
+};
+
 };
 
 #endif

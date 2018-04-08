@@ -33,7 +33,7 @@ extern "C" {
 #include "debug.h"
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"
-#include "WiFiClientBearSSL.h"
+#include "WiFiClientSecureBearSSL.h"
 #include "lwip/opt.h"
 #include "lwip/ip.h"
 #include "lwip/tcp.h"
@@ -41,6 +41,8 @@ extern "C" {
 #include "lwip/netif.h"
 #include "include/ClientContext.h"
 #include "c_types.h"
+
+namespace BearSSL {
 
 // BearSSL needs a very large stack, larger than the entire ESP8266 Arduino
 // default one.  This shared_pointer is allocated on first use and cleared
@@ -1210,3 +1212,4 @@ extern "C" {
   }
 };
 
+};

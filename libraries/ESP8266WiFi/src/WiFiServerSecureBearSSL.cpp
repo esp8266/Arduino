@@ -34,7 +34,9 @@ extern "C" {
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include "include/ClientContext.h"
-#include "WiFiServerBearSSL.h"
+#include "WiFiServerSecureBearSSL.h"
+
+namespace BearSSL {
 
 // Only need to call the standard server constructor
 WiFiServerBearSSL::WiFiServerBearSSL(IPAddress addr, uint16_t port) : WiFiServer(addr, port) {
@@ -87,3 +89,4 @@ WiFiClientBearSSL WiFiServerBearSSL::available(uint8_t* status) {
   return WiFiClientBearSSL();
 }
 
+};

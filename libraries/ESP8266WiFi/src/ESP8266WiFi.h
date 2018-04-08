@@ -40,8 +40,6 @@ extern "C" {
 #include "WiFiServer.h"
 #include "WiFiServerSecure.h"
 #include "WiFiClientSecure.h"
-#include "WiFiServerBearSSL.h"
-#include "WiFiClientBearSSL.h"
 #include "BearSSLHelpers.h"
 #include "CertStoreBearSSL.h"
 
