@@ -7,7 +7,7 @@ section and on `ESP8266 Community forum <http://www.esp8266.com/>`__.
 
 Where possible we are going right to the answer and provide it within
 one or two paragraphs. If it takes more than that, you will see a link
-:arrow\_right: to more details.
+to "Read more" details.
 
 Please feel free to contribute if you believe that some frequent issues
 are not covered below.
@@ -40,7 +40,7 @@ entering an issue report, please perform initial troubleshooting.
 
 :doc:`Read more <a02-my-esp-crashes>`.
 
-This Arduino library doesn't work on ESP. How do I make it working?
+This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You would like to use this Arduino library with ESP8266 and it does not
@@ -59,7 +59,7 @@ total, but switching such "banks" on the fly is not easy and efficient,
 so we don't bother doing that. Besides, no one has so far complained
 about 1MB of code space being insufficient for practical purposes.
 
-The option to choose 4M or 1M SPIFFS is to optimize the upload time.
+The option to choose 3M or 1M SPIFFS is to optimize the upload time.
 Uploading 3MB takes a long time so sometimes you can just use 1MB. Other
 2MB of flash can still be used with ``ESP.flashRead`` and
 ``ESP.flashWrite`` APIs if necessary.
@@ -88,3 +88,31 @@ This error may pop up after switching between
 `stable <https://github.com/esp8266/Arduino#stable-version->`__ esp8266
 / Arduino package installations, or after upgrading the package version
 :doc:`Read more <a04-board-generic-is-unknown>`.
+
+
+How to clear TCP PCBs in time-wait state ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is needed with lwIP-v1.4, less needed with lwIP-v2 but timeout is still
+too high.
+
+Time-wait PCB state helps TCP not confusing two consecutive connections with the
+same (s-ip,s-port,d-ip,d-port) when the first is already closed but still
+having duplicate packets lost in internet arriving later during the second. 
+Artificially clearing them is a workaround to help saving precious heap.
+
+The following lines are compatible with both lwIP versions:
+
+.. code:: cpp
+
+    // no need for #include
+    struct tcp_pcb;
+    extern struct tcp_pcb* tcp_tw_pcbs;
+    extern "C" void tcp_abort (struct tcp_pcb* pcb);
+    
+    void tcpCleanup (void) {
+      while (tcp_tw_pcbs)
+        tcp_abort(tcp_tw_pcbs);
+    }
+
+Ref.  `#1923 <https://github.com/esp8266/Arduino/issues/1923>`__

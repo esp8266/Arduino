@@ -7,6 +7,7 @@
 #######################################
 
 ESP8266WebServer	KEYWORD1
+ESP8266WebServerSecure	KEYWORD1
 HTTPMethod	KEYWORD1
 
 #######################################
@@ -34,3 +35,4 @@ onNotFound	KEYWORD2
 HTTP_GET	LITERAL1
 HTTP_POST	LITERAL1
 HTTP_ANY	LITERAL1
+CONTENT_LENGTH_UNKNOWN	LITERAL1

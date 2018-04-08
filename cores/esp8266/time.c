@@ -17,9 +17,10 @@
  */
 
 #include <time.h>
+#include <sys/time.h>
 #include <sys/reent.h>
 #include "sntp.h"
-
+#include "coredecls.h"
 
 #ifndef _TIMEVAL_DEFINED
 #define _TIMEVAL_DEFINED
@@ -31,25 +32,18 @@ struct timeval {
 
 extern char* sntp_asctime(const struct tm *t);
 extern struct tm* sntp_localtime(const time_t *clock);
+extern uint64_t micros64();
 
 // time gap in seconds from 01.01.1900 (NTP time) to 01.01.1970 (UNIX time)
 #define DIFF1900TO1970 2208988800UL
 
-static int s_daylightOffset_sec = 0;
-static long s_timezone_sec = 0;
-static time_t s_bootTime = 0;
+bool timeshift64_is_set = false;
+static uint64_t timeshift64 = 0;
 
-// calculate offset used in gettimeofday
-static void ensureBootTimeIsSet()
+void tune_timeshift64 (uint64_t now_us)
 {
-    if (!s_bootTime)
-    {
-        time_t now = sntp_get_current_timestamp();
-        if (now)
-        {
-            s_bootTime =  now - millis() / 1000;
-        }
-    }
+     timeshift64 = now_us - micros64();
+     timeshift64_is_set = true;
 }
 
 static void setServer(int id, const char* name_or_ip)
@@ -69,17 +63,17 @@ void configTime(int timezone, int daylightOffset_sec, const char* server1, const
     setServer(1, server2);
     setServer(2, server3);
 
-    s_timezone_sec = timezone;
-    s_daylightOffset_sec = daylightOffset_sec;
     sntp_set_timezone(timezone/3600);
+    sntp_set_daylight(daylightOffset_sec);
     sntp_init();
 }
 
 int clock_gettime(clockid_t unused, struct timespec *tp)
 {
     (void) unused;
-    tp->tv_sec  = millis() / 1000;
-    tp->tv_nsec = micros() * 1000;
+    uint64_t m = micros64();
+    tp->tv_sec = m / 1000000;
+    tp->tv_nsec = (m % 1000000) * 1000;
     return 0;
 }
 
@@ -99,9 +93,11 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
     (void) tzp;
     if (tp)
     {
-        ensureBootTimeIsSet();
-        tp->tv_sec  = s_bootTime + millis() / 1000;
-        tp->tv_usec = micros();
+        if (!timeshift64_is_set)
+            tune_timeshift64(sntp_get_current_timestamp() * 1000000ULL);
+        uint64_t currentTime_us = timeshift64 + micros64();
+        tp->tv_sec = currentTime_us / 1000000ULL;
+        tp->tv_usec = currentTime_us % 1000000ULL;
     }
     return 0;
 }

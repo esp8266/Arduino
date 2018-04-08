@@ -25,6 +25,10 @@
 #ifndef __SMARTCONFIG_H__
 #define __SMARTCONFIG_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     SC_STATUS_WAIT = 0,
     SC_STATUS_FIND_CHANNEL,
@@ -46,5 +50,10 @@ bool smartconfig_start(sc_callback_t cb, ...);
 bool smartconfig_stop(void);
 bool esptouch_set_timeout(uint8 time_s); //15s~255s, offset:45s
 bool smartconfig_set_type(sc_type type);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

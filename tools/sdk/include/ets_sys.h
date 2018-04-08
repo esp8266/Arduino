@@ -29,6 +29,10 @@
 #include "eagle_soc.h"
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef uint32_t ETSSignal;
 typedef uint32_t ETSParam;
 
@@ -212,5 +216,9 @@ int ets_putc(int);
 bool ets_task(ETSTask task, uint8 prio, ETSEvent *queue, uint8 qlen);
 bool ets_post(uint8 prio, ETSSignal sig, ETSParam par);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _ETS_SYS_H */

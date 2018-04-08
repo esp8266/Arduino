@@ -43,6 +43,9 @@ public:
         tcp_sent(pcb, &_s_sent);
         tcp_err(pcb, &_s_error);
         tcp_poll(pcb, &_s_poll, 1);
+
+        // not enabled by default for 2.4.0
+        //keepAlive();
     }
 
     err_t abort()
@@ -104,17 +107,15 @@ public:
 
     void unref()
     {
-        if(this != 0) {
-            DEBUGV(":ur %d\r\n", _refcnt);
-            if(--_refcnt == 0) {
-                flush();
-                close();
-                if(_discard_cb) {
-                    _discard_cb(_discard_cb_arg, this);
-                }
-                DEBUGV(":del\r\n");
-                delete this;
+        DEBUGV(":ur %d\r\n", _refcnt);
+        if(--_refcnt == 0) {
+            discard_received();
+            close();
+            if(_discard_cb) {
+                _discard_cb(_discard_cb_arg, this);
             }
+            DEBUGV(":del\r\n");
+            delete this;
         }
     }
 
@@ -129,7 +130,12 @@ public:
         // This delay will be interrupted by esp_schedule in the connect callback
         delay(_timeout_ms);
         _connect_pending = 0;
+        if (!_pcb) {
+            DEBUGV(":cabrt\r\n");
+            return 0;
+        }
         if (state() != ESTABLISHED) {
+            DEBUGV(":ctmo\r\n");
             abort();
             return 0;
         }
@@ -277,7 +283,7 @@ public:
         return copy_size;
     }
 
-    void flush()
+    void discard_received()
     {
         if(!_rx_buf) {
             return;
@@ -288,6 +294,22 @@ public:
         pbuf_free(_rx_buf);
         _rx_buf = 0;
         _rx_buf_offset = 0;
+    }
+
+    void wait_until_sent()
+    {
+        // fix option 1 in
+        // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
+        // TODO: option 2
+
+        #define WAIT_TRIES_MS 10	// at most 10ms
+
+        int tries = 1+ WAIT_TRIES_MS;
+
+        while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --tries) {
+            _write_some();
+            delay(1); // esp_ schedule+yield
+        }
     }
 
     uint8_t state() const
@@ -323,6 +345,38 @@ public:
         }
         ProgmemStream stream(buf, size);
         return _write_from_source(new BufferedStreamDataSource<ProgmemStream>(stream, size));
+    }
+
+    void keepAlive (uint16_t idle_sec = TCP_DEFAULT_KEEPALIVE_IDLE_SEC, uint16_t intv_sec = TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC, uint8_t count = TCP_DEFAULT_KEEPALIVE_COUNT)
+    {
+        if (idle_sec && intv_sec && count) {
+            _pcb->so_options |= SOF_KEEPALIVE;
+            _pcb->keep_idle = (uint32_t)1000 * idle_sec;
+            _pcb->keep_intvl = (uint32_t)1000 * intv_sec;
+            _pcb->keep_cnt = count;
+        }
+        else
+            _pcb->so_options &= ~SOF_KEEPALIVE;
+    }
+
+    bool isKeepAliveEnabled () const
+    {
+        return !!(_pcb->so_options & SOF_KEEPALIVE);
+    }
+
+    uint16_t getKeepAliveIdle () const
+    {
+        return isKeepAliveEnabled()? (_pcb->keep_idle + 500) / 1000: 0;
+    }
+
+    uint16_t getKeepAliveInterval () const
+    {
+        return isKeepAliveEnabled()? (_pcb->keep_intvl + 500) / 1000: 0;
+    }
+
+    uint8_t getKeepAliveCount () const
+    {
+        return isKeepAliveEnabled()? _pcb->keep_cnt: 0;
     }
 
 protected:
@@ -391,11 +445,13 @@ protected:
             }
             err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, (int) err);
-            _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
+                _datasource->release_buffer(buf, next_chunk);
                 _written += next_chunk;
                 need_output = true;
             } else {
+		// ERR_MEM(-1) is a valid error meaning
+		// "come back later". It leaves state() opened
                 break;
             }
             will_send -= next_chunk;
@@ -487,6 +543,7 @@ protected:
     err_t _connected(struct tcp_pcb *pcb, err_t err)
     {
         (void) err;
+        (void) pcb;
         assert(pcb == _pcb);
         assert(_connect_pending);
         esp_schedule();

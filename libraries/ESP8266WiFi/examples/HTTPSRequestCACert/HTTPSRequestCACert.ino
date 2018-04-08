@@ -37,6 +37,7 @@ void setup() {
   Serial.println();
   Serial.print("connecting to ");
   Serial.println(ssid);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -52,7 +53,7 @@ void setup() {
   Serial.print("Setting time using SNTP");
   configTime(8 * 3600, 0, "pool.ntp.org", "time.nist.gov");
   time_t now = time(nullptr);
-  while (now < 1000) {
+  while (now < 8 * 3600 * 2) {
     delay(500);
     Serial.print(".");
     now = time(nullptr);

@@ -25,6 +25,10 @@
 #ifndef SPI_FLASH_H
 #define SPI_FLASH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
     SPI_FLASH_RESULT_OK,
     SPI_FLASH_RESULT_ERR,
@@ -59,5 +63,10 @@ void spi_flash_set_read_func(user_spi_flash_read read);
 
 bool spi_flash_erase_protect_enable(void);
 bool spi_flash_erase_protect_disable(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

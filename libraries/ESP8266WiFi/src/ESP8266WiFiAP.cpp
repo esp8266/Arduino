@@ -69,6 +69,12 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
     if(lhs.max_connection != rhs.max_connection) {
         return false;
     }
+    if(lhs.beacon_interval != rhs.beacon_interval) {
+        return false;
+    }
+    if(lhs.authmode != rhs.authmode) {
+        return false;
+    }
     return true;
 }
 
@@ -123,9 +129,15 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
         strcpy(reinterpret_cast<char*>(conf.password), passphrase);
     }
 
-    struct softap_config conf_current;
-    wifi_softap_get_config(&conf_current);
-    if(!softap_config_equal(conf, conf_current)) {
+    struct softap_config conf_compare;
+    if(WiFi._persistent){
+        wifi_softap_get_config_default(&conf_compare);
+    }
+    else {
+        wifi_softap_get_config(&conf_compare);
+    }
+
+    if(!softap_config_equal(conf, conf_compare)) {
 
         ETS_UART_INTR_DISABLE();
         if(WiFi._persistent) {
@@ -265,6 +277,7 @@ bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
     struct softap_config conf;
     *conf.ssid = 0;
     *conf.password = 0;
+    conf.authmode = AUTH_OPEN;
     ETS_UART_INTR_DISABLE();
     if(WiFi._persistent) {
         ret = wifi_softap_set_config(&conf);
@@ -277,7 +290,7 @@ bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff) {
         DEBUG_WIFI("[APdisconnect] set_config failed!\n");
     }
 
-    if(wifioff) {
+    if(ret && wifioff) {
         ret = WiFi.enableAP(false);
     }
 
@@ -325,4 +338,34 @@ String ESP8266WiFiAPClass::softAPmacAddress(void) {
 
     sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     return String(macStr);
+}
+
+/**
+ * Get the configured(Not-In-Flash) softAP SSID name.
+ * @return String SSID.
+ */
+String ESP8266WiFiAPClass::softAPSSID() const {
+	struct softap_config config;
+	wifi_softap_get_config(&config);
+	char* name = reinterpret_cast<char*>(config.ssid);
+	char ssid[sizeof(config.ssid) + 1];
+	memcpy(ssid, name, sizeof(config.ssid));
+	ssid[sizeof(config.ssid)] = '\0';
+
+	return String(ssid);
+}
+
+/**
+ * Get the configured(Not-In-Flash) softAP PSK or PASSWORD.
+ * @return String psk.
+ */
+String ESP8266WiFiAPClass::softAPPSK() const {
+	struct softap_config config;
+	wifi_softap_get_config(&config);
+	char* pass = reinterpret_cast<char*>(config.password);
+	char psk[sizeof(config.password) + 1];
+	memcpy(psk, pass, sizeof(config.password));
+	psk[sizeof(config.password)] = '\0';
+
+	return String(psk);
 }

@@ -27,6 +27,7 @@ extern "C"
 #include "osapi.h"
 #include "ets_sys.h"
 }
+#include <list>
 #include <errno.h>
 #include "debug.h"
 #include "ESP8266WiFi.h"
@@ -50,65 +51,120 @@ extern "C"
 #define SSL_DEBUG_OPTS 0
 #endif
 
+
+typedef struct BufferItem
+{
+    BufferItem(const uint8_t* data_, size_t size_)
+    : size(size_), data(new uint8_t[size])
+    {
+        if (data.get() != nullptr) {
+            memcpy(data.get(), data_, size);
+        } else {
+            DEBUGV(":wcs alloc %d failed\r\n", size_);
+            size = 0;
+        }
+    }
+
+    size_t size;
+    std::unique_ptr<uint8_t[]> data;
+} BufferItem;
+
+typedef std::list<BufferItem> BufferList;
+
 class SSLContext
 {
 public:
-    SSLContext()
+    SSLContext(bool isServer = false)
     {
-        if (_ssl_ctx_refcnt == 0) {
-            _ssl_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
+        _isServer = isServer;
+        if (!_isServer) {
+            if (_ssl_client_ctx_refcnt == 0) {
+                _ssl_client_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
+            }
+            ++_ssl_client_ctx_refcnt;
+        } else {
+            if (_ssl_svr_ctx_refcnt == 0) {
+                _ssl_svr_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
+            }
+            ++_ssl_svr_ctx_refcnt;
         }
-        ++_ssl_ctx_refcnt;
     }
 
     ~SSLContext()
     {
-        if (_ssl) {
-            ssl_free(_ssl);
-            _ssl = nullptr;
+        if (io_ctx) {
+            io_ctx->unref();
+            io_ctx = nullptr;
         }
-
-        --_ssl_ctx_refcnt;
-        if (_ssl_ctx_refcnt == 0) {
-            ssl_ctx_free(_ssl_ctx);
+        _ssl = nullptr;
+        if (!_isServer) {
+            --_ssl_client_ctx_refcnt;
+            if (_ssl_client_ctx_refcnt == 0) {
+                ssl_ctx_free(_ssl_client_ctx);
+                _ssl_client_ctx = nullptr;
+            }
+        } else {
+            --_ssl_svr_ctx_refcnt;
+            if (_ssl_svr_ctx_refcnt == 0) {
+                ssl_ctx_free(_ssl_svr_ctx);
+                _ssl_svr_ctx = nullptr;
+            }
         }
-
-        s_io_ctx = nullptr;
     }
 
-    void ref()
+    static void _delete_shared_SSL(SSL *_to_del)
     {
-        ++_refcnt;
-    }
-
-    void unref()
-    {
-        if (--_refcnt == 0) {
-            delete this;
-        }
+        ssl_free(_to_del);
     }
 
     void connect(ClientContext* ctx, const char* hostName, uint32_t timeout_ms)
     {
         SSL_EXTENSIONS* ext = ssl_ext_new();
         ssl_ext_set_host_name(ext, hostName);
-        ssl_ext_set_max_fragment_size(ext, 4096);
         if (_ssl) {
             /* Creating a new TLS session on top of a new TCP connection.
                ssl_free will want to send a close notify alert, but the old TCP connection
-               is already gone at this point, so reset s_io_ctx. */
-            s_io_ctx = nullptr;
-            ssl_free(_ssl);
+               is already gone at this point, so reset io_ctx. */
+            io_ctx = nullptr;
+            _ssl = nullptr;
             _available = 0;
             _read_ptr = nullptr;
         }
-        s_io_ctx = ctx;
-        _ssl = ssl_client_new(_ssl_ctx, 0, nullptr, 0, ext);
+        io_ctx = ctx;
+        ctx->ref();
+
+        // Wrap the new SSL with a smart pointer, custom deleter to call ssl_free
+        SSL *_new_ssl = ssl_client_new(_ssl_client_ctx, reinterpret_cast<int>(this), nullptr, 0, ext);
+        std::shared_ptr<SSL> _new_ssl_shared(_new_ssl, _delete_shared_SSL);
+        _ssl = _new_ssl_shared;
+
         uint32_t t = millis();
 
-        while (millis() - t < timeout_ms && ssl_handshake_status(_ssl) != SSL_OK) {
+        while (millis() - t < timeout_ms && ssl_handshake_status(_ssl.get()) != SSL_OK) {
             uint8_t* data;
-            int rc = ssl_read(_ssl, &data);
+            int rc = ssl_read(_ssl.get(), &data);
+            if (rc < SSL_OK) {
+                ssl_display_error(rc);
+                break;
+            }
+        }
+    }
+
+    void connectServer(ClientContext *ctx, uint32_t timeout_ms)
+    {
+        io_ctx = ctx;
+        ctx->ref();
+
+        // Wrap the new SSL with a smart pointer, custom deleter to call ssl_free
+	SSL *_new_ssl = ssl_server_new(_ssl_svr_ctx, reinterpret_cast<int>(this));
+        std::shared_ptr<SSL> _new_ssl_shared(_new_ssl, _delete_shared_SSL);
+        _ssl = _new_ssl_shared;
+
+        uint32_t t = millis();
+
+        while (millis() - t < timeout_ms && ssl_handshake_status(_ssl.get()) != SSL_OK) {
+            uint8_t* data;
+            int rc = ssl_read(_ssl.get(), &data);
             if (rc < SSL_OK) {
                 ssl_display_error(rc);
                 break;
@@ -118,12 +174,19 @@ public:
 
     void stop()
     {
-        s_io_ctx = nullptr;
+        if (io_ctx) {
+            io_ctx->unref();
+        }
+        io_ctx = nullptr;
     }
 
     bool connected()
     {
-        return _ssl != nullptr && ssl_handshake_status(_ssl) == SSL_OK;
+        if (_isServer) {
+            return _ssl != nullptr;
+        } else {
+            return _ssl != nullptr && ssl_handshake_status(_ssl.get()) == SSL_OK;
+        }
     }
 
     int read(uint8_t* dst, size_t size)
@@ -139,6 +202,10 @@ public:
         _available -= will_copy;
         if (_available == 0) {
             _read_ptr = nullptr;
+            /* Send pending outgoing data, if any */
+            if (_hasWriteBuffers()) {
+                _writeBuffersSend();
+            }
         }
         return will_copy;
     }
@@ -155,8 +222,34 @@ public:
         --_available;
         if (_available == 0) {
             _read_ptr = nullptr;
+            /* Send pending outgoing data, if any */
+            if (_hasWriteBuffers()) {
+                _writeBuffersSend();
+            }
         }
         return result;
+    }
+
+    int write(const uint8_t* src, size_t size)
+    {
+        if (_isServer) {
+            return _write(src, size);
+        } else if (!_available) {
+            if (_hasWriteBuffers()) {
+                int rc = _writeBuffersSend();
+                if (rc < 0) {
+                    return rc;
+                }
+            }
+            return _write(src, size);
+        }
+        /* Some received data is still present in the axtls fragment buffer.
+           We can't call ssl_write now, as that will overwrite the contents of
+           the fragment buffer, corrupting the received data.
+           Save a copy of the outgoing data, and call ssl_write when all
+           recevied data has been consumed by the application.
+        */
+        return _writeBufferAdd(src, size);
     }
 
     int peek()
@@ -193,6 +286,12 @@ public:
         return cb;
     }
 
+    // similar to available, but doesn't return exact size
+    bool hasData()
+    {
+        return _available > 0 || (io_ctx && io_ctx->getSize() > 0);
+    }
+
     bool loadObject(int type, Stream& stream, size_t size)
     {
         std::unique_ptr<uint8_t[]> buf(new uint8_t[size]);
@@ -217,10 +316,9 @@ public:
         return loadObject(type, buf.get(), size);
     }
 
-
     bool loadObject(int type, const uint8_t* data, size_t size)
     {
-        int rc = ssl_obj_memory_load(_ssl_ctx, type, data, static_cast<int>(size), nullptr);
+        int rc = ssl_obj_memory_load(_isServer?_ssl_svr_ctx:_ssl_client_ctx, type, data, static_cast<int>(size), nullptr);
         if (rc != SSL_OK) {
             DEBUGV("loadObject: ssl_obj_memory_load returned %d\n", rc);
             return false;
@@ -230,7 +328,7 @@ public:
 
     bool verifyCert()
     {
-        int rc = ssl_verify_cert(_ssl);
+        int rc = ssl_verify_cert(_ssl.get());
         if (_allowSelfSignedCerts && rc == SSL_X509_ERROR(X509_VFY_ERROR_SELF_SIGNED)) {
             DEBUGV("Allowing self-signed certificate\n");
             return true;
@@ -249,13 +347,16 @@ public:
 
     operator SSL*()
     {
-        return _ssl;
+        return _ssl.get();
     }
 
     static ClientContext* getIOContext(int fd)
     {
-        (void) fd;
-        return s_io_ctx;
+        if (fd) {
+            SSLContext *thisSSL = reinterpret_cast<SSLContext*>(fd);
+            return thisSSL->io_ctx;
+        }
+        return nullptr;
     }
 
 protected:
@@ -268,10 +369,9 @@ protected:
         optimistic_yield(100);
 
         uint8_t* data;
-        int rc = ssl_read(_ssl, &data);
+        int rc = ssl_read(_ssl.get(), &data);
         if (rc <= 0) {
             if (rc < SSL_OK && rc != SSL_CLOSE_NOTIFY && rc != SSL_ERROR_CONN_LOST) {
-                ssl_free(_ssl);
                 _ssl = nullptr;
             }
             return 0;
@@ -282,48 +382,118 @@ protected:
         return _available;
     }
 
-    static SSL_CTX* _ssl_ctx;
-    static int _ssl_ctx_refcnt;
-    SSL* _ssl = nullptr;
-    int _refcnt = 0;
+    int _write(const uint8_t* src, size_t size)
+    {
+        if (!_ssl) {
+            return 0;
+        }
+
+        int rc = ssl_write(_ssl.get(), src, size);
+        if (rc >= 0) {
+            return rc;
+        }
+        DEBUGV(":wcs write rc=%d\r\n", rc);
+        return rc;
+    }
+
+    int _writeBufferAdd(const uint8_t* data, size_t size)
+    {
+        if (!_ssl) {
+            return 0;
+        }
+
+        _writeBuffers.emplace_back(data, size);
+        if (_writeBuffers.back().data.get() == nullptr) {
+            _writeBuffers.pop_back();
+            return 0;
+        }
+        return size;
+    }
+
+    int _writeBuffersSend()
+    {
+        while (!_writeBuffers.empty()) {
+            auto& first = _writeBuffers.front();
+            int rc = _write(first.data.get(), first.size);
+            _writeBuffers.pop_front();
+            if (rc < 0) {
+                if (_hasWriteBuffers()) {
+                    DEBUGV(":wcs _writeBuffersSend dropping unsent data\r\n");
+                    _writeBuffers.clear();
+                }
+                return rc;
+            }
+        }
+        return 0;
+    }
+
+    bool _hasWriteBuffers()
+    {
+        return !_writeBuffers.empty();
+    }
+
+    bool _isServer = false;
+    static SSL_CTX* _ssl_client_ctx;
+    static int _ssl_client_ctx_refcnt;
+    static SSL_CTX* _ssl_svr_ctx;
+    static int _ssl_svr_ctx_refcnt;
+    std::shared_ptr<SSL> _ssl = nullptr;
     const uint8_t* _read_ptr = nullptr;
     size_t _available = 0;
+    BufferList _writeBuffers;
     bool _allowSelfSignedCerts = false;
-    static ClientContext* s_io_ctx;
+    ClientContext* io_ctx = nullptr;
 };
 
-SSL_CTX* SSLContext::_ssl_ctx = nullptr;
-int SSLContext::_ssl_ctx_refcnt = 0;
-ClientContext* SSLContext::s_io_ctx = nullptr;
+SSL_CTX* SSLContext::_ssl_client_ctx = nullptr;
+int SSLContext::_ssl_client_ctx_refcnt = 0;
+SSL_CTX* SSLContext::_ssl_svr_ctx = nullptr;
+int SSLContext::_ssl_svr_ctx_refcnt = 0;
 
 WiFiClientSecure::WiFiClientSecure()
 {
+    // TLS handshake may take more than the 5 second default timeout
+    _timeout = 15000;
 }
 
 WiFiClientSecure::~WiFiClientSecure()
 {
-    if (_ssl) {
-        _ssl->unref();
-    }
+   _ssl = nullptr;
 }
 
-WiFiClientSecure::WiFiClientSecure(const WiFiClientSecure& other)
-    : WiFiClient(static_cast<const WiFiClient&>(other))
+// Only called by the WifiServerSecure, need to get the keys/certs loaded before beginning
+WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM,
+                                   const uint8_t *rsakey, int rsakeyLen,
+                                   const uint8_t *cert, int certLen)
 {
-    _ssl = other._ssl;
-    if (_ssl) {
-        _ssl->ref();
-    }
-}
+    // TLS handshake may take more than the 5 second default timeout
+    _timeout = 15000;
 
-WiFiClientSecure& WiFiClientSecure::operator=(const WiFiClientSecure& rhs)
-{
-    (WiFiClient&) *this = rhs;
-    _ssl = rhs._ssl;
-    if (_ssl) {
-        _ssl->ref();
+    // We've been given the client context from the available() call
+    _client = client;
+    _client->ref();
+
+    // Make the "_ssl" SSLContext, in the constructor there should be none yet
+    SSLContext *_new_ssl = new SSLContext(true);
+    std::shared_ptr<SSLContext> _new_ssl_shared(_new_ssl);
+    _ssl = _new_ssl_shared;
+
+    if (usePMEM) {
+        if (rsakey && rsakeyLen) {
+            _ssl->loadObject_P(SSL_OBJ_RSA_KEY, rsakey, rsakeyLen);
+        }
+        if (cert && certLen) {
+            _ssl->loadObject_P(SSL_OBJ_X509_CERT, cert, certLen);
+        }
+    } else {
+        if (rsakey && rsakeyLen) {
+            _ssl->loadObject(SSL_OBJ_RSA_KEY, rsakey, rsakeyLen);
+        }
+        if (cert && certLen) {
+            _ssl->loadObject(SSL_OBJ_X509_CERT, cert, certLen);
+        }
     }
-    return *this;
+    _ssl->connectServer(client, _timeout);
 }
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port)
@@ -347,17 +517,20 @@ int WiFiClientSecure::connect(const char* name, uint16_t port)
     return _connectSSL(name);
 }
 
+int WiFiClientSecure::connect(const String host, uint16_t port)
+{
+    return connect(host.c_str(), port);
+}
+
 int WiFiClientSecure::_connectSSL(const char* hostName)
 {
     if (!_ssl) {
-        _ssl = new SSLContext;
-        _ssl->ref();
+        _ssl = std::make_shared<SSLContext>();
     }
-    _ssl->connect(_client, hostName, 5000);
+    _ssl->connect(_client, hostName, _timeout);
 
     auto status = ssl_handshake_status(*_ssl);
     if (status != SSL_OK) {
-        _ssl->unref();
         _ssl = nullptr;
         return 0;
     }
@@ -371,17 +544,48 @@ size_t WiFiClientSecure::write(const uint8_t *buf, size_t size)
         return 0;
     }
 
-    int rc = ssl_write(*_ssl, buf, size);
+    int rc = _ssl->write(buf, size);
     if (rc >= 0) {
         return rc;
     }
 
     if (rc != SSL_CLOSE_NOTIFY) {
-        _ssl->unref();
         _ssl = nullptr;
     }
 
     return 0;
+}
+
+size_t WiFiClientSecure::write_P(PGM_P buf, size_t size)
+{
+    // Copy to RAM and call normal send. alloca() auto-frees on return
+    uint8_t *copy = (uint8_t*)alloca(size);
+    memcpy_P(copy, buf, size);
+    return write(copy, size);
+}
+
+// The axTLS bare libs don't understand anything about Arduino Streams,
+// so we have to manually read and send individual chunks.
+size_t WiFiClientSecure::write(Stream& stream)
+{
+    size_t totalSent = 0;
+    size_t countRead;
+    size_t countSent;
+    if (!_ssl)
+    {
+        return 0;
+    }
+    do {
+        uint8_t temp[256]; // Temporary chunk size same as ClientContext
+        countSent = 0;
+        countRead = stream.readBytes(temp, sizeof(temp));
+        if (countRead) {
+            countSent = write(temp, countRead);
+            totalSent += countSent;
+        }
+        yield(); // Feed the WDT
+    } while ( (countSent == countRead) && (countSent > 0) );
+    return totalSent;
 }
 
 int WiFiClientSecure::read(uint8_t *buf, size_t size)
@@ -458,7 +662,7 @@ err     x       N           N
 uint8_t WiFiClientSecure::connected()
 {
     if (_ssl) {
-        if (_ssl->available()) {
+        if (_ssl->hasData()) {
             return true;
         }
         if (_client && _client->state() == ESTABLISHED && _ssl->connected()) {
@@ -553,9 +757,9 @@ bool WiFiClientSecure::_verifyDN(const char* domain_name)
     String domain_name_str(domain_name);
     domain_name_str.toLowerCase();
 
-    const char* san = NULL;
+    const char* san = nullptr;
     int i = 0;
-    while ((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != NULL) {
+    while ((san = ssl_get_cert_subject_alt_dnsname(*_ssl, i)) != nullptr) {
         String san_str(san);
         san_str.toLowerCase();
         if (matchName(san_str, domain_name_str)) {
@@ -589,8 +793,7 @@ bool WiFiClientSecure::verifyCertChain(const char* domain_name)
 void WiFiClientSecure::_initSSLContext()
 {
     if (!_ssl) {
-        _ssl = new SSLContext;
-        _ssl->ref();
+        _ssl = std::make_shared<SSLContext>();
     }
 }
 
