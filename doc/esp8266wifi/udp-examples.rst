@@ -85,7 +85,7 @@ For each received packet we are sending back an acknowledge packet:
 .. code:: cpp
 
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.write(replyPacekt);
+    Udp.write(replyPacket);
     Udp.endPacket();
 
 Please note we are sending reply to the IP and port of the sender by using ``Udp.remoteIP()`` and ``Udp.remotePort()``.
