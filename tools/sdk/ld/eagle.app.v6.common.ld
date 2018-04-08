@@ -1,6 +1,5 @@
 /* This linker script generated from xt-genldscripts.tpp for LSP . */
 /* Linker Script for ld -N */
-
 PHDRS
 {
   dport0_0_phdr PT_LOAD;
@@ -9,8 +8,6 @@ PHDRS
   iram1_0_phdr PT_LOAD;
   irom0_0_phdr PT_LOAD;
 }
-
-
 /*  Default entry point:  */
 ENTRY(call_user_start)
 EXTERN(_DebugExceptionVector)
@@ -37,10 +34,8 @@ _memmap_cacheattr_wb_allvalid = 0x22222112;
 _memmap_cacheattr_wt_allvalid = 0x22222112;
 _memmap_cacheattr_bp_allvalid = 0x22222222;
 PROVIDE(_memmap_cacheattr_reset = _memmap_cacheattr_wb_trapnull);
-
 SECTIONS
 {
-
   .dport0.rodata : ALIGN(4)
   {
     _dport0_rodata_start = ABSOLUTE(.);
@@ -48,7 +43,6 @@ SECTIONS
     *(.dport.rodata)
     _dport0_rodata_end = ABSOLUTE(.);
   } >dport0_0_seg :dport0_0_phdr
-
   .dport0.literal : ALIGN(4)
   {
     _dport0_literal_start = ABSOLUTE(.);
@@ -56,7 +50,6 @@ SECTIONS
     *(.dport.literal)
     _dport0_literal_end = ABSOLUTE(.);
   } >dport0_0_seg :dport0_0_phdr
-
   .dport0.data : ALIGN(4)
   {
     _dport0_data_start = ABSOLUTE(.);
@@ -64,7 +57,6 @@ SECTIONS
     *(.dport.data)
     _dport0_data_end = ABSOLUTE(.);
   } >dport0_0_seg :dport0_0_phdr
-
   .data : ALIGN(4)
   {
     _data_start = ABSOLUTE(.);
@@ -83,14 +75,13 @@ SECTIONS
     _Pri_3_HandlerAddress = ABSOLUTE(.);
     _data_end = ABSOLUTE(.);
   } >dram0_0_seg :dram0_0_phdr
-
   .irom0.text : ALIGN(4)
   {
     _irom0_text_start = ABSOLUTE(.);
     *(.ver_number)
-    *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, \
-           EXCLUDE_FILE (umm_malloc.c.o) .text*)
+    *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, EXCLUDE_FILE (umm_malloc.c.o) .text* )
     *.cpp.o(.literal*, .text*)
+    *(.rodata._ZTV*) /* C++ vtables */
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libgcc.a:_umoddi3.o(.literal .text)
@@ -119,7 +110,6 @@ SECTIONS
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);
   } >irom0_0_seg :irom0_0_phdr
-
   .text : ALIGN(4)
   {
     _stext = .;
@@ -154,14 +144,12 @@ SECTIONS
     *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
     *.cpp.o(.iram.text)
     *.c.o(.iram.text)
-    *(.rodata._ZTV*) /* C++ vtables */
     *(.fini.literal)
     *(.fini)
     *(.gnu.version)
     _text_end = ABSOLUTE(.);
     _etext = .;
   } >iram1_0_seg :iram1_0_phdr
-
   .rodata : ALIGN(4)
   {
     _rodata_start = ABSOLUTE(.);
@@ -196,14 +184,13 @@ SECTIONS
     *(.xt_except_desc_end)
     *(.dynamic)
     *(.gnu.version_d)
-    . = ALIGN(4);       /* this table MUST be 4-byte aligned */
+    . = ALIGN(4); /* this table MUST be 4-byte aligned */
     _bss_table_start = ABSOLUTE(.);
     LONG(_bss_start)
     LONG(_bss_end)
     _bss_table_end = ABSOLUTE(.);
     _rodata_end = ABSOLUTE(.);
   } >dram0_0_seg :dram0_0_phdr
-
   .bss ALIGN(8) (NOLOAD) : ALIGN(4)
   {
     . = ALIGN (8);
@@ -227,7 +214,6 @@ SECTIONS
 /*    _stack_sentry = ALIGN(0x8); */
   } >dram0_0_seg :dram0_0_bss_phdr
 /* __stack = 0x3ffc8000; */
-
   .lit4 : ALIGN(4)
   {
     _lit4_start = ABSOLUTE(.);
@@ -236,9 +222,6 @@ SECTIONS
     *(.gnu.linkonce.lit4.*)
     _lit4_end = ABSOLUTE(.);
   } >iram1_0_seg :iram1_0_phdr
-
-
 }
-
 /* get ROM code address */
 INCLUDE "../ld/eagle.rom.addr.v6.ld"

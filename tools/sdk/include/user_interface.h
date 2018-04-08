@@ -297,6 +297,7 @@ uint8 wifi_station_get_auto_connect(void);
 bool wifi_station_set_auto_connect(uint8 set);
 
 bool wifi_station_set_reconnect_policy(bool set);
+bool wifi_station_get_reconnect_policy();
 
 typedef enum {
     STATION_IDLE = 0,
