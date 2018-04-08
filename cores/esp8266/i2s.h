@@ -40,7 +40,8 @@ speed.
 extern "C" {
 #endif
 
-void i2s_begin();
+void i2s_begin(); // Enable TX only, for compatibility
+bool i2s_rxtx_begin(bool enableRx, bool enableTx); // Allow TX and/or RX, returns false on OOM error
 void i2s_end();
 void i2s_set_rate(uint32_t rate);//Sample Rate in Hz (ex 44100, 48000)
 void i2s_set_dividers(uint8_t div1, uint8_t div2);//Direct control over output rate
@@ -48,9 +49,15 @@ float i2s_get_real_rate();//The actual Sample Rate on output
 bool i2s_write_sample(uint32_t sample);//32bit sample with channels being upper and lower 16 bits (blocking when DMA is full)
 bool i2s_write_sample_nb(uint32_t sample);//same as above but does not block when DMA is full and returns false instead
 bool i2s_write_lr(int16_t left, int16_t right);//combines both channels and calls i2s_write_sample with the result
+bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking); // RX data returned in both 16-bit outputs.
 bool i2s_is_full();//returns true if DMA is full and can not take more bytes (overflow)
 bool i2s_is_empty();//returns true if DMA is empty (underflow)
+bool i2s_rx_is_full();
+bool i2s_rx_is_empty();
 int16_t i2s_available();// returns the number of samples than can be written before blocking
+int16_t i2s_rx_available();// returns the number of samples than can be written before blocking
+void i2s_set_callback(void (*callback) (void));
+void i2s_rx_set_callback(void (*callback) (void));
 
 #ifdef __cplusplus
 }

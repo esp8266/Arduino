@@ -133,7 +133,15 @@ Implements a simple DNS server that can be used in both STA and AP modes. The DN
 Servo
 -----
 
-This library exposes the ability to control RC (hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support. Servo counts above 12 will use Timer1 and features that use it will be effected. While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most will not be able to run off 3.3v and will require another power source that matches their specifications. Make sure to connect the grounds between the ESP8266 and the servo motor power supply.
+This library exposes the ability to control RC (hobby) servo motors. It will support up to 24 servos on any available output pin. By default the first 12 servos will use Timer0 and currently this will not interfere with any other support. Servo counts above 12 will use Timer1 and features that use it will be affected. While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most will not be able to run off 3.3v and will require another power source that matches their specifications. Make sure to connect the grounds between the ESP8266 and the servo motor power supply.
+
+Improved EEPROM library for ESP (ESP_EEPROM)
+--------------------------------------------
+
+An improved EEPROM library for ESPxxxx.  Uses flash memory as per the standard ESP EEPROM library but reduces reflash - so reducing wear and improving commit() performance.  
+
+As actions on the flash need to stop the interrupts, an EEPROM reflash could noticably affect anything using PWM, etc.
+
 
 Other libraries (not included with the IDE)
 -------------------------------------------

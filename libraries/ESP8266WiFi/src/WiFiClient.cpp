@@ -112,8 +112,11 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     ip_addr_t addr;
     addr.addr = ip;
 
-    if (_client)
+    if (_client) {
         stop();
+        _client->unref();
+        _client = nullptr;
+    }
 
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
@@ -272,8 +275,7 @@ void WiFiClient::stop()
     if (!_client)
         return;
 
-    _client->unref();
-    _client = 0;
+    _client->close();
 }
 
 uint8_t WiFiClient::connected()
@@ -291,9 +293,9 @@ uint8_t WiFiClient::status()
     return _client->state();
 }
 
- WiFiClient::operator bool()
+WiFiClient::operator bool()
 {
-    return _client != 0;
+    return connected();
 }
 
 IPAddress WiFiClient::remoteIP()

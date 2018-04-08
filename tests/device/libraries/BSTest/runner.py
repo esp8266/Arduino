@@ -32,6 +32,7 @@ class BSTestRunner(object):
     FAIL = 1
     TIMEOUT = 2
     CRASH = 3
+    BEGINTIMEOUT = 4
 
     def __init__(self, spawn_obj, name, mocks):
         self.sp = spawn_obj
@@ -116,7 +117,7 @@ class BSTestRunner(object):
             time.sleep(0.1)
             timeout -= 0.1
         if timeout <= 0:
-            raise 'test begin timeout'
+            return BSTestRunner.BEGINTIMEOUT
         while timeout > 0:
             res = self.sp.expect([r'>>>>>bs_test_check_failure line=(\d+)',
                             r'>>>>>bs_test_end line=(\d+) result=(\d+) checks=(\d+) failed_checks=(\d+)',
