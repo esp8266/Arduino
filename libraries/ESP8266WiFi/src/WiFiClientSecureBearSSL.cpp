@@ -70,6 +70,7 @@ void WiFiClientSecure::_clear() {
   _recvapp_buf = nullptr;
   _recvapp_len = 0;
   _oom_err = false;
+  _deleteChainKeyTA = false;
 }
 
 void WiFiClientSecure::_clearAuthenticationSettings() {
@@ -109,6 +110,11 @@ WiFiClientSecure::~WiFiClientSecure() {
   }
   _freeSSL();
   _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
+  if (_deleteChainKeyTA) {
+    delete _ta;
+    delete _chain;
+    delete _sk;
+  }
 }
 
 WiFiClientSecure::WiFiClientSecure(ClientContext* client,
@@ -1164,6 +1170,83 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
   }
   return _SendAbort(probe, supportsLen);
 }
+
+
+// AXTLS compatibility interfaces
+bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size) {
+  if (_ta && _deleteChainKeyTA) {
+    delete _ta;
+    _ta = nullptr;
+  }
+  _ta = new BearSSLX509List(pk, size);
+  _deleteChainKeyTA = true;
+  return _ta ? true : false;
+}
+
+bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size) {
+  if (_chain && _deleteChainKeyTA) {
+    delete _chain;
+    _chain = nullptr;
+  }
+  _chain = new BearSSLX509List(pk, size);
+  _deleteChainKeyTA = true;
+  return _chain ? true : false;
+}
+
+bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size) {
+  if (_sk && _deleteChainKeyTA) {
+    delete _sk;
+    _sk = nullptr;
+  }
+  _sk = new BearSSLPrivateKey(pk, size);
+  _deleteChainKeyTA = true;
+  return _sk ? true : false;
+
+}
+
+uint8_t *WiFiClientSecure::_streamLoad(Stream& stream, size_t size) {
+  uint8_t *dest = (uint8_t*)malloc(size);
+  if (!dest) {
+    return nullptr;
+  }
+  if (size != stream.readBytes(dest, size)) {
+    free(dest);
+    return nullptr;
+  }
+  return dest;
+}
+
+bool WiFiClientSecure::loadCACert(Stream& stream, size_t size) {
+  uint8_t *dest = _streamLoad(stream, size);
+  bool ret = false;
+  if (dest) {
+    ret = setCACert(dest, size);
+  }
+  free(dest);
+  return ret;
+}
+
+bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size) {
+  uint8_t *dest = _streamLoad(stream, size);
+  bool ret = false;
+  if (dest) {
+    ret = setCertificate(dest, size);
+  }
+  free(dest);
+  return ret;
+}
+
+bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
+  uint8_t *dest = _streamLoad(stream, size);
+  bool ret = false;
+  if (dest) {
+    ret = setPrivateKey(dest, size);
+  }
+  free(dest);
+  return ret;
+}
+
+
 
 
 // Debug printout helpers for BearSSL library when libbearssl.a is compiled in debug mode

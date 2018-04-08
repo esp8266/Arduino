@@ -104,6 +104,36 @@ class WiFiClientSecure : public WiFiClient {
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String host, uint16_t port, uint16_t len);
 
+    // AXTLS compatbile wrappers
+    bool verify(const char* fingerprint, const char* domain_name) { (void) fingerprint; (void) domain_name; return false; } // Can't handle this case, need app code changes
+    bool verifyCertChain(const char* domain_name) { (void)domain_name; return connected(); } // If we're connected, the cert passed validation during handshake
+
+    bool setCACert(const uint8_t* pk, size_t size);
+    bool setCertificate(const uint8_t* pk, size_t size);
+    bool setPrivateKey(const uint8_t* pk, size_t size);
+
+    bool setCACert_P(PGM_VOID_P pk, size_t size) { return setCACert((const uint8_t *)pk, size); }
+    bool setCertificate_P(PGM_VOID_P pk, size_t size) { return setCertificate((const uint8_t *)pk, size); }
+    bool setPrivateKey_P(PGM_VOID_P pk, size_t size) { return setPrivateKey((const uint8_t *)pk, size); }
+
+    bool loadCACert(Stream& stream, size_t size);
+    bool loadCertificate(Stream& stream, size_t size);
+    bool loadPrivateKey(Stream& stream, size_t size);
+
+    template<typename TFile>
+    bool loadCertificate(TFile& file) {
+      return loadCertificate(file, file.size());
+    }
+
+    template<typename TFile>
+    bool loadPrivateKey(TFile& file) {
+      return loadPrivateKey(file, file.size());
+    }
+
+    template<typename TFile>
+    bool loadCACert(TFile& file) {
+      return loadCACert(file, file.size());
+    }
 
   private:
     void _clear();
@@ -167,6 +197,11 @@ class WiFiClientSecure : public WiFiClient {
     // X.509 validators differ from server to client
     bool _installClientX509Validator(); // Set up X509 validator for a client conn.
     bool _installServerX509Validator(const BearSSLX509List *client_CA_ta); // Setup X509 client cert validation, if supplied
+
+    uint8_t *_streamLoad(Stream& stream, size_t size);
+
+    // AXTLS compatible mode needs to delete the stored certs and keys on destruction
+    bool _deleteChainKeyTA;
 
   private:
     // Single memory buffer used for BearSSL auxilliary stack, insead of growing main Arduino stack for all apps
