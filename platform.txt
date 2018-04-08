@@ -21,6 +21,8 @@ build.lwip_lib=-llwip_gcc
 build.lwip_include=lwip/include
 build.lwip_flags=-DLWIP_OPEN_SRC
 
+build.vtable_flags=-DVTABLES_IN_FLASH
+
 build.float=-u _printf_float -u _scanf_float
 build.led=
 
@@ -75,6 +77,9 @@ recipe.hooks.core.prebuild.2.pattern=bash -c "mkdir -p {build.path}/core && echo
 ## windows-compatible version without git
 recipe.hooks.core.prebuild.1.pattern.windows=cmd.exe /c mkdir {build.path}\core & (echo #define ARDUINO_ESP8266_GIT_VER 0x00000000 & echo #define ARDUINO_ESP8266_GIT_DESC win-{version} ) > {build.path}\core\core_version.h
 recipe.hooks.core.prebuild.2.pattern.windows=
+
+## Build the app.ld linker file
+recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld"
 
 ## Compile c files
 recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.flags} {compiler.c.flags} -DF_CPU={build.f_cpu} {build.lwip_flags} {build.debug_port} {build.debug_level} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_BOARD="{build.board}" {build.led} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"

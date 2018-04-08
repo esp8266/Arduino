@@ -677,7 +677,7 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
-            'flashmode_qio',
+            'flashmode_dio',
             'flashfreq_80',
             '512K',
             ],
@@ -755,6 +755,15 @@ macros = {
         ( '.menu.CpuFrequency.80.build.f_cpu', '80000000L' ),
         ( '.menu.CpuFrequency.160', '160 MHz' ),
         ( '.menu.CpuFrequency.160.build.f_cpu', '160000000L' ),
+        ]),
+
+    'vtable_menu': collections.OrderedDict([
+        ( '.menu.VTable.flash', 'Flash'),
+        ( '.menu.VTable.flash.build.vtable_flags', '-DVTABLES_IN_FLASH'),
+        ( '.menu.VTable.heap', 'Heap'),
+        ( '.menu.VTable.heap.build.vtable_flags', '-DVTABLES_IN_DRAM'),
+        ( '.menu.VTable.iram', 'IRAM'),
+        ( '.menu.VTable.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
         ]),
 
     'crystalfreq_menu': collections.OrderedDict([
@@ -1147,6 +1156,7 @@ def all_boards ():
     print 'menu.Debug=Debug port'
     print 'menu.DebugLevel=Debug Level'
     print 'menu.LwIPVariant=lwIP Variant'
+    print 'menu.VTable=VTables'
     print 'menu.led=Builtin Led'
     print 'menu.FlashErase=Erase Flash'
     print ''
@@ -1162,7 +1172,7 @@ def all_boards ():
                 print id + optname + '=' + board['opts'][optname]
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:
@@ -1205,8 +1215,11 @@ def package ():
     if packagegen:
         pkgfname_read = pkgfname + '.orig'
         # check if backup already exists
-        if not os.path.isfile(pkgfname_read):
-            os.rename(pkgfname, pkgfname_read)
+        if os.path.isfile(pkgfname_read):
+            print "package file is in the way, please move it"
+            print "    %s" % pkgfname_read
+            sys.exit(1)
+        os.rename(pkgfname, pkgfname_read)
 
     # read package file
     with open (pkgfname_read, "r") as package_file:
@@ -1292,6 +1305,8 @@ def usage (name,ret):
     print " --packagegen    - replace board:[] in package"
     print " --doc           - shows doc/boards.rst"
     print " --docgen        - replace doc/boards.rst"
+    print " --allgen        - generate and replace everything"
+    print "                   (useful for pushing on github)"
     print ""
 
     out = ""
@@ -1337,7 +1352,8 @@ customspeeds = []
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
-          "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen" ])
+          "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
+          "allgen"] )
 except getopt.GetoptError as err:
     print str(err)  # will print something like "option -a not recognized"
     usage(sys.argv[0], 1)
@@ -1404,6 +1420,16 @@ for o, a in opts:
         docshow = True
 
     elif o in ("--docgen"):
+        docshow = True
+        docgen = True
+
+    elif o in ("--allgen"):
+        ldshow = True
+        ldgen = True
+        boardsshow = True
+        boardsgen = True
+        packageshow = True
+        packagegen = True
         docshow = True
         docgen = True
 
