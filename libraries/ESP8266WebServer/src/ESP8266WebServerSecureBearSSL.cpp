@@ -25,7 +25,7 @@
 #include <libb64/cencode.h>
 #include "WiFiServer.h"
 #include "WiFiClient.h"
-#include "ESP8266WebServerSecure.h"
+#include "ESP8266WebServerSecureBearSSL.h"
 
 //#define DEBUG_ESP_HTTP_SERVER
 #ifdef DEBUG_ESP_PORT
@@ -33,6 +33,8 @@
 #else
 #define DEBUG_OUTPUT Serial
 #endif
+
+namespace BearSSL {
 
 ESP8266WebServerSecure::ESP8266WebServerSecure(IPAddress addr, int port) 
 : _serverSecure(addr, port)
@@ -44,14 +46,19 @@ ESP8266WebServerSecure::ESP8266WebServerSecure(int port)
 {
 }
 
-void ESP8266WebServerSecure::setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen)
+void ESP8266WebServerSecure::setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk)
 {
-    _serverSecure.setServerKeyAndCert_P(key, keyLen, cert, certLen);
+  _serverSecure.setRSACert(chain, sk);
 }
 
-void ESP8266WebServerSecure::setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen)
+void ESP8266WebServerSecure::setECCert(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk)
 {
-    _serverSecure.setServerKeyAndCert(key, keyLen, cert, certLen);
+  _serverSecure.setECCert(chain, cert_issuer_key_type, sk);
+}
+
+void ESP8266WebServerSecure::setBufferSizes(int recv, int xmit)
+{
+  _serverSecure.setBufferSizes(recv, xmit);
 }
 
 ESP8266WebServerSecure::~ESP8266WebServerSecure() {
@@ -76,7 +83,7 @@ void ESP8266WebServerSecure::begin() {
 
 void ESP8266WebServerSecure::handleClient() {
   if (_currentStatus == HC_NONE) {
-    WiFiClientSecure client = _serverSecure.available();
+    BearSSL::WiFiClientSecure client = _serverSecure.available();
     if (!client) {
       return;
     }
@@ -129,7 +136,7 @@ void ESP8266WebServerSecure::handleClient() {
   }
 
   if (!keepCurrentClient) {
-    _currentClientSecure = WiFiClientSecure();
+    _currentClientSecure = BearSSL::WiFiClientSecure();
     _currentStatus = HC_NONE;
     _currentUpload.reset();
   }
@@ -140,7 +147,19 @@ void ESP8266WebServerSecure::handleClient() {
 }
 
 void ESP8266WebServerSecure::close() {
+  _currentClientSecure.flush();
   _currentClientSecure.stop();
   _serverSecure.close();
 }
 
+
+void ESP8266WebServerSecure::setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) {
+  _serverSecure.setServerKeyAndCert_P(key, keyLen, cert, certLen);
+}
+
+void ESP8266WebServerSecure::setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen)
+{
+  _serverSecure.setServerKeyAndCert(key, keyLen, cert, certLen);
+}
+
+};

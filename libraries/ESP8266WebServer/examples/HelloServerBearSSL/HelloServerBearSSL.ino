@@ -11,13 +11,13 @@
 */
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include <ESP8266WebServerBearSSL.h>
+#include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
 
 const char* ssid = "....";
 const char* password = "....";
 
-ESP8266WebServerBearSSL server(443);
+BearSSL::ESP8266WebServerSecure server(443);
 
 static const char serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----

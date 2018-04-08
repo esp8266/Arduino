@@ -60,12 +60,12 @@ public:
 
     std::unique_ptr<WiFiClient> create() override
     {
-        return std::unique_ptr<WiFiClient>(new WiFiClientSecure());
+        return std::unique_ptr<WiFiClient>(new axTLS::WiFiClientSecure());
     }
 
     bool verify(WiFiClient& client, const char* host) override
     {
-        auto wcs = static_cast<WiFiClientSecure&>(client);
+        auto wcs = static_cast<axTLS::WiFiClientSecure&>(client);
         return wcs.verify(_fingerprint.c_str(), host);
     }
 
@@ -83,7 +83,7 @@ public:
 
     std::unique_ptr<WiFiClient> create() override
     {
-        WiFiClientBearSSL *client = new WiFiClientBearSSL();
+        BearSSL::WiFiClientSecure *client = new BearSSL::WiFiClientSecure();
         client->setFingerprint(_fingerprint);
         return std::unique_ptr<WiFiClient>(client);
     }

@@ -66,7 +66,7 @@ int fetchMaxFragmentLength() {
   // sizes assuming you can ensure the server never transmits fragments larger
   // than the size (i.e. by using HTTP GET RANGE methods, etc.).
 
-  BearSSLWiFiClientSecure client;
+  BearSSL::WiFiClientSecure client;
   client.setInsecure();
   bool mfln = client.probeMaxFragmentLength("tls.mbed.org", 443, 1024);
   Serial.printf("\nConnecting to https://tls.mbed.org\n");

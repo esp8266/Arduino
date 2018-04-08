@@ -25,7 +25,7 @@
 #include <libb64/cencode.h>
 #include "WiFiServer.h"
 #include "WiFiClient.h"
-#include "ESP8266WebServerBearSSL.h"
+#include "ESP8266WebServerSecure.h"
 
 //#define DEBUG_ESP_HTTP_SERVER
 #ifdef DEBUG_ESP_PORT
@@ -34,33 +34,29 @@
 #define DEBUG_OUTPUT Serial
 #endif
 
-ESP8266WebServerBearSSL::ESP8266WebServerBearSSL(IPAddress addr, int port) 
+namespace axTLS {
+
+ESP8266WebServerSecure::ESP8266WebServerSecure(IPAddress addr, int port) 
 : _serverSecure(addr, port)
 {
 }
 
-ESP8266WebServerBearSSL::ESP8266WebServerBearSSL(int port)
+ESP8266WebServerSecure::ESP8266WebServerSecure(int port)
 : _serverSecure(port)
 {
 }
 
-
-void ESP8266WebServerBearSSL::setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk)
+void ESP8266WebServerSecure::setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen)
 {
-  _serverSecure.setRSACert(chain, sk);
+    _serverSecure.setServerKeyAndCert_P(key, keyLen, cert, certLen);
 }
 
-void ESP8266WebServerBearSSL::setECCert(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk)
+void ESP8266WebServerSecure::setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen)
 {
-  _serverSecure.setECCert(chain, cert_issuer_key_type, sk);
+    _serverSecure.setServerKeyAndCert(key, keyLen, cert, certLen);
 }
 
-void ESP8266WebServerBearSSL::setBufferSizes(int recv, int xmit)
-{
-  _serverSecure.setBufferSizes(recv, xmit);
-}
-
-ESP8266WebServerBearSSL::~ESP8266WebServerBearSSL() {
+ESP8266WebServerSecure::~ESP8266WebServerSecure() {
   // Nothing to do here.
   // Base class's destructor will be called to clean up itself
 }
@@ -73,16 +69,16 @@ ESP8266WebServerBearSSL::~ESP8266WebServerBearSSL() {
 // to know the size of memory to allocate on the stack for this local variable
 // there's not realy anything else it could do).
 
-void ESP8266WebServerBearSSL::begin() {
+void ESP8266WebServerSecure::begin() {
   _currentStatus = HC_NONE;
   _serverSecure.begin();
   if(!_headerKeysCount)
     collectHeaders(0, 0);
 }
 
-void ESP8266WebServerBearSSL::handleClient() {
+void ESP8266WebServerSecure::handleClient() {
   if (_currentStatus == HC_NONE) {
-    WiFiClientBearSSL client = _serverSecure.available();
+    WiFiClientSecure client = _serverSecure.available();
     if (!client) {
       return;
     }
@@ -135,7 +131,7 @@ void ESP8266WebServerBearSSL::handleClient() {
   }
 
   if (!keepCurrentClient) {
-    _currentClientSecure = WiFiClientBearSSL();
+    _currentClientSecure = WiFiClientSecure();
     _currentStatus = HC_NONE;
     _currentUpload.reset();
   }
@@ -145,9 +141,9 @@ void ESP8266WebServerBearSSL::handleClient() {
   }
 }
 
-void ESP8266WebServerBearSSL::close() {
-  _currentClientSecure.flush();
+void ESP8266WebServerSecure::close() {
   _currentClientSecure.stop();
   _serverSecure.close();
 }
 
+};

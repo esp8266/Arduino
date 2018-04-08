@@ -25,14 +25,16 @@
 
 #include <ESP8266WebServer.h>
 #include <BearSSLHelpers.h>
-#include <WiFiServerBearSSL.h>
+#include <WiFiServerSecureBearSSL.h>
 
-class ESP8266WebServerBearSSL : public ESP8266WebServer
+namespace BearSSL {
+
+class ESP8266WebServerSecure : public ESP8266WebServer
 {
 public:
-  ESP8266WebServerBearSSL(IPAddress addr, int port = 443);
-  ESP8266WebServerBearSSL(int port = 443);
-  virtual ~ESP8266WebServerBearSSL();
+  ESP8266WebServerSecure(IPAddress addr, int port = 443);
+  ESP8266WebServerSecure(int port = 443);
+  virtual ~ESP8266WebServerSecure();
 
   void setBufferSizes(int recv, int xmit);
   void setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk);
@@ -50,14 +52,18 @@ public:
     return _currentClientSecure.write(file);
   }
 
+  // AXTLS Compatibility
+  void setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
+  void setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen);
+
 private:
   size_t _currentClientWrite (const char *bytes, size_t len) override { return _currentClientSecure.write((const uint8_t *)bytes, len); }
   size_t _currentClientWrite_P (PGM_P bytes, size_t len) override { return _currentClientSecure.write_P(bytes, len); }
 
 protected:
-  WiFiServerBearSSL _serverSecure;
-  WiFiClientBearSSL _currentClientSecure;
+  BearSSL::WiFiServerSecure _serverSecure;
+  BearSSL::WiFiClientSecure _currentClientSecure;
 };
 
-
+};
 #endif //ESP8266WEBSERVERSECURE_H

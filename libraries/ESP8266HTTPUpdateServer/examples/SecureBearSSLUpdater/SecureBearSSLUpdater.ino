@@ -15,7 +15,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include <ESP8266WebServerBearSSL.h>
+#include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
 
@@ -26,7 +26,7 @@ const char* update_password = "admin";
 const char* ssid = "........";
 const char* password = "........";
 
-ESP8266WebServerBearSSL httpServer(443);
+BearSSL::ESP8266WebServerSecure httpServer(443);
 ESP8266HTTPUpdateServer httpUpdater;
 
 static const char serverCert[] PROGMEM = R"EOF(
