@@ -677,7 +677,7 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
-            'flashmode_qio',
+            'flashmode_dio',
             'flashfreq_80',
             '512K',
             ],
