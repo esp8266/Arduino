@@ -47,11 +47,11 @@ namespace BearSSL {
 // BearSSL needs a very large stack, larger than the entire ESP8266 Arduino
 // default one.  This shared_pointer is allocated on first use and cleared
 // on last cleanup, with only one stack no matter how many SSL objects.
-std::shared_ptr<uint8_t> WiFiClientBearSSL::_bearssl_stack = nullptr;
+std::shared_ptr<uint8_t> WiFiClientSecure::_bearssl_stack = nullptr;
 
 
 
-void WiFiClientBearSSL::_clear() {
+void WiFiClientSecure::_clear() {
   // TLS handshake may take more than the 5 second default timeout
   _timeout = 15000;
 
@@ -72,7 +72,7 @@ void WiFiClientBearSSL::_clear() {
   _oom_err = false;
 }
 
-void WiFiClientBearSSL::_clearAuthenticationSettings() {
+void WiFiClientSecure::_clearAuthenticationSettings() {
   _use_insecure = false;
   _use_fingerprint = false;
   _use_self_signed = false;
@@ -81,7 +81,7 @@ void WiFiClientBearSSL::_clearAuthenticationSettings() {
 }
 
 
-WiFiClientBearSSL::WiFiClientBearSSL() : WiFiClient() {
+WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
@@ -102,7 +102,7 @@ WiFiClientBearSSL::WiFiClientBearSSL() : WiFiClient() {
   _local_bearssl_stack = _bearssl_stack;
 }
 
-WiFiClientBearSSL::~WiFiClientBearSSL() {
+WiFiClientSecure::~WiFiClientSecure() {
   if (_client) {
     _client->unref();
     _client = nullptr;
@@ -111,7 +111,7 @@ WiFiClientBearSSL::~WiFiClientBearSSL() {
   _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
 }
 
-WiFiClientBearSSL::WiFiClientBearSSL(ClientContext* client,
+WiFiClientSecure::WiFiClientSecure(ClientContext* client,
                                      const BearSSLX509List *chain, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
   _clear();
@@ -127,7 +127,7 @@ WiFiClientBearSSL::WiFiClientBearSSL(ClientContext* client,
   }
 }
 
-WiFiClientBearSSL::WiFiClientBearSSL(ClientContext *client,
+WiFiClientSecure::WiFiClientSecure(ClientContext *client,
                                      const BearSSLX509List *chain,
                                      unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
@@ -144,12 +144,12 @@ WiFiClientBearSSL::WiFiClientBearSSL(ClientContext *client,
   }
 }
 
-void WiFiClientBearSSL::setClientRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk) {
+void WiFiClientSecure::setClientRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk) {
   _chain = chain;
   _sk = sk;
 }
 
-void WiFiClientBearSSL::setClientECCert(const BearSSLX509List *chain,
+void WiFiClientSecure::setClientECCert(const BearSSLX509List *chain,
                                         const BearSSLPrivateKey *sk, unsigned allowed_usages, unsigned cert_issuer_key_type) {
   _chain = chain;
   _sk = sk;
@@ -157,7 +157,7 @@ void WiFiClientBearSSL::setClientECCert(const BearSSLX509List *chain,
   _cert_issuer_key_type = cert_issuer_key_type;
 }
 
-void WiFiClientBearSSL::setBufferSizes(int recv, int xmit) {
+void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
   // Following constants taken from bearssl/src/ssl/ssl_engine.c (not exported unfortunately)
   const int MAX_OUT_OVERHEAD = 85;
   const int MAX_IN_OVERHEAD = 325;
@@ -173,7 +173,7 @@ void WiFiClientBearSSL::setBufferSizes(int recv, int xmit) {
   _iobuf_out_size = xmit;
 }
 
-void WiFiClientBearSSL::stop() {
+void WiFiClientSecure::stop() {
   flush();
   if (_client) {
     _client->wait_until_sent();
@@ -183,19 +183,19 @@ void WiFiClientBearSSL::stop() {
   _freeSSL();
 }
 
-void WiFiClientBearSSL::flush() {
+void WiFiClientSecure::flush() {
   (void) _run_until(BR_SSL_SENDAPP);
   WiFiClient::flush();
 }
 
-int WiFiClientBearSSL::connect(IPAddress ip, uint16_t port) {
+int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
   if (!WiFiClient::connect(ip, port)) {
     return 0;
   }
   return _connectSSL(nullptr);
 }
 
-int WiFiClientBearSSL::connect(const char* name, uint16_t port) {
+int WiFiClientSecure::connect(const char* name, uint16_t port) {
   IPAddress remote_addr;
   if (!WiFi.hostByName(name, remote_addr)) {
     return 0;
@@ -206,11 +206,11 @@ int WiFiClientBearSSL::connect(const char* name, uint16_t port) {
   return _connectSSL(name);
 }
 
-int WiFiClientBearSSL::connect(const String host, uint16_t port) {
+int WiFiClientSecure::connect(const String host, uint16_t port) {
   return connect(host.c_str(), port);
 }
 
-void WiFiClientBearSSL::_freeSSL() {
+void WiFiClientSecure::_freeSSL() {
   // These are smart pointers and will free if refcnt==0
   _sc = nullptr;
   _sc_svr = nullptr;
@@ -226,11 +226,11 @@ void WiFiClientBearSSL::_freeSSL() {
   _handshake_done = false;
 }
 
-bool WiFiClientBearSSL::_clientConnected() {
+bool WiFiClientSecure::_clientConnected() {
   return (_client && _client->state() == ESTABLISHED);
 }
 
-uint8_t WiFiClientBearSSL::connected() {
+uint8_t WiFiClientSecure::connected() {
   if (_recvapp_len) {
     return true;
   }
@@ -240,7 +240,7 @@ uint8_t WiFiClientBearSSL::connected() {
   return false;
 }
 
-size_t WiFiClientBearSSL::_write(const uint8_t *buf, size_t size, bool pmem) {
+size_t WiFiClientSecure::_write(const uint8_t *buf, size_t size, bool pmem) {
   if (!connected() || !size || !_handshake_done) {
     return 0;
   }
@@ -267,16 +267,16 @@ size_t WiFiClientBearSSL::_write(const uint8_t *buf, size_t size, bool pmem) {
   return 0;
 }
 
-size_t WiFiClientBearSSL::write(const uint8_t *buf, size_t size) {
+size_t WiFiClientSecure::write(const uint8_t *buf, size_t size) {
   return _write(buf, size, false);
 }
 
-size_t WiFiClientBearSSL::write_P(PGM_P buf, size_t size) {
+size_t WiFiClientSecure::write_P(PGM_P buf, size_t size) {
   return _write((const uint8_t *)buf, size, true);
 }
 
 // We have to manually read and send individual chunks.
-size_t WiFiClientBearSSL::write(Stream& stream) {
+size_t WiFiClientSecure::write(Stream& stream) {
   size_t totalSent = 0;
   size_t countRead;
   size_t countSent;
@@ -298,7 +298,7 @@ size_t WiFiClientBearSSL::write(Stream& stream) {
   return totalSent;
 }
 
-int WiFiClientBearSSL::read(uint8_t *buf, size_t size) {
+int WiFiClientSecure::read(uint8_t *buf, size_t size) {
   if (!ctx_present() || !_handshake_done) {
     return -1;
   }
@@ -325,7 +325,7 @@ int WiFiClientBearSSL::read(uint8_t *buf, size_t size) {
   return conn ? 0 : -1; // If we're connected, no error but no read. OTW error
 }
 
-int WiFiClientBearSSL::read() {
+int WiFiClientSecure::read() {
   uint8_t c;
   if (1 == read(&c, 1)) {
     return c;
@@ -333,7 +333,7 @@ int WiFiClientBearSSL::read() {
   return -1;
 }
 
-int WiFiClientBearSSL::available() {
+int WiFiClientSecure::available() {
   if (_recvapp_buf) {
     return _recvapp_len;  // Anything from last call?
   }
@@ -354,7 +354,7 @@ int WiFiClientBearSSL::available() {
   return 0;
 }
 
-int WiFiClientBearSSL::peek() {
+int WiFiClientSecure::peek() {
   if (!ctx_present() || !available()) {
     return -1;
   }
@@ -364,7 +364,7 @@ int WiFiClientBearSSL::peek() {
   return -1;
 }
 
-size_t WiFiClientBearSSL::peekBytes(uint8_t *buffer, size_t length) {
+size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length) {
   size_t to_copy = 0;
   if (!ctx_present()) {
     return 0;
@@ -386,7 +386,7 @@ size_t WiFiClientBearSSL::peekBytes(uint8_t *buffer, size_t length) {
    combination of both (the combination matches either). When a match is
    achieved, this function returns 0. On error, it returns -1.
 */
-int WiFiClientBearSSL::_run_until(unsigned target, bool blocking) {
+int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
   if (!ctx_present()) {
     return -1;
   }
@@ -492,7 +492,7 @@ int WiFiClientBearSSL::_run_until(unsigned target, bool blocking) {
   return -1;
 }
 
-bool WiFiClientBearSSL::_wait_for_handshake() {
+bool WiFiClientSecure::_wait_for_handshake() {
   _handshake_done = false;
   while (!_handshake_done && _clientConnected()) {
     int ret = _run_until(BR_SSL_SENDAPP);
@@ -712,7 +712,7 @@ extern "C" {
 }
 
 // Installs the appropriate X509 cert validation method for a client connection
-bool WiFiClientBearSSL::_installClientX509Validator() {
+bool WiFiClientSecure::_installClientX509Validator() {
   if (_use_insecure || _use_fingerprint || _use_self_signed) {
     // Use common insecure x509 authenticator
     _x509_insecure = std::make_shared<struct br_x509_insecure_context>();
@@ -757,7 +757,7 @@ bool WiFiClientBearSSL::_installClientX509Validator() {
 
 // Called by connect() to do the actual SSL setup and handshake.
 // Returns if the SSL handshake succeeded.
-bool WiFiClientBearSSL::_connectSSL(const char* hostName) {
+bool WiFiClientSecure::_connectSSL(const char* hostName) {
   _freeSSL();
   _oom_err = false;
 
@@ -800,7 +800,7 @@ bool WiFiClientBearSSL::_connectSSL(const char* hostName) {
 
 // Slightly different X509 setup for servers who want to validate client
 // certificates, so factor it out as it's used in RSA and EC servers.
-bool WiFiClientBearSSL::_installServerX509Validator(const BearSSLX509List *client_CA_ta) {
+bool WiFiClientSecure::_installServerX509Validator(const BearSSLX509List *client_CA_ta) {
   if (client_CA_ta) {
     _ta = client_CA_ta;
     // X509 minimal validator.  Checks dates, cert chain for trusted CA, etc.
@@ -827,7 +827,7 @@ bool WiFiClientBearSSL::_installServerX509Validator(const BearSSLX509List *clien
 }
 
 // Called by WiFiServerBearSSL when an RSA cert/key is specified.
-bool WiFiClientBearSSL::_connectSSLServerRSA(const BearSSLX509List *chain,
+bool WiFiClientSecure::_connectSSLServerRSA(const BearSSLX509List *chain,
     const BearSSLPrivateKey *sk,
     const BearSSLX509List *client_CA_ta) {
   _freeSSL();
@@ -857,7 +857,7 @@ bool WiFiClientBearSSL::_connectSSLServerRSA(const BearSSLX509List *chain,
 }
 
 // Called by WiFiServerBearSSL when an elliptic curve cert/key is specified.
-bool WiFiClientBearSSL::_connectSSLServerEC(const BearSSLX509List *chain,
+bool WiFiClientSecure::_connectSSLServerEC(const BearSSLX509List *chain,
     unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk,
     const BearSSLX509List *client_CA_ta) {
   _freeSSL();
@@ -889,7 +889,7 @@ bool WiFiClientBearSSL::_connectSSLServerEC(const BearSSLX509List *chain,
 
 // Returns an error ID and possibly a string (if dest != null) of the last
 // BearSSL reported error.
-int WiFiClientBearSSL::getLastSSLError(char *dest, size_t len) {
+int WiFiClientSecure::getLastSSLError(char *dest, size_t len) {
   int err = 0;
   const char *t = PSTR("OK");
   if (_sc || _sc_svr) {
@@ -967,16 +967,16 @@ int WiFiClientBearSSL::getLastSSLError(char *dest, size_t len) {
   return err;
 }
 
-bool WiFiClientBearSSL::probeMaxFragmentLength(const char* name, uint16_t port, uint16_t len) {
+bool WiFiClientSecure::probeMaxFragmentLength(const char* name, uint16_t port, uint16_t len) {
   IPAddress remote_addr;
   if (!WiFi.hostByName(name, remote_addr)) {
     return false;
   }
-  return WiFiClientBearSSL::probeMaxFragmentLength(remote_addr, port, len);
+  return WiFiClientSecure::probeMaxFragmentLength(remote_addr, port, len);
 }
 
-bool WiFiClientBearSSL::probeMaxFragmentLength(const String host, uint16_t port, uint16_t len) {
-  return WiFiClientBearSSL::probeMaxFragmentLength(host.c_str(), port, len);
+bool WiFiClientSecure::probeMaxFragmentLength(const String host, uint16_t port, uint16_t len) {
+  return WiFiClientSecure::probeMaxFragmentLength(host.c_str(), port, len);
 }
 
 
@@ -1012,7 +1012,7 @@ static bool _SendAbort(WiFiClient& probe, bool supportsLen) {
 // TODO - Check the type of returned extensions and that the MFL is the exact
 //      same one we sent.  Not critical as only horribly broken servers would
 //      return changed or add their own extensions.
-bool WiFiClientBearSSL::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len) {
+bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len) {
   // Hardcoded TLS 1.2 packets used throughout
   static const uint8_t clientHelloHead_P[] PROGMEM = {
     0x16, 0x03, 0x03, 0x00, 0, // TLS header, change last 2 bytes to len

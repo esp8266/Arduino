@@ -30,10 +30,10 @@
 
 namespace BearSSL {
 
-class WiFiClientBearSSL : public WiFiClient {
+class WiFiClientSecure : public WiFiClient {
   public:
-    WiFiClientBearSSL();
-    ~WiFiClientBearSSL() override;
+    WiFiClientSecure();
+    ~WiFiClientSecure() override;
 
     int connect(IPAddress ip, uint16_t port) override;
     int connect(const String host, uint16_t port) override;
@@ -152,10 +152,10 @@ class WiFiClientBearSSL : public WiFiClient {
     unsigned _cert_issuer_key_type;
 
     // Methods for handling server.available() call which returns a client connection.
-    friend class WiFiServerBearSSL; // Server needs to access these constructors
-    WiFiClientBearSSL(ClientContext *client, const BearSSLX509List *chain, unsigned cert_issuer_key_type,
+    friend class WiFiServerSecure; // Server needs to access these constructors
+    WiFiClientSecure(ClientContext *client, const BearSSLX509List *chain, unsigned cert_issuer_key_type,
                       const BearSSLPrivateKey *sk, int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta);
-    WiFiClientBearSSL(ClientContext* client, const BearSSLX509List *chain, const BearSSLPrivateKey *sk,
+    WiFiClientSecure(ClientContext* client, const BearSSLX509List *chain, const BearSSLPrivateKey *sk,
                       int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta);
 
     // RSA keyed server

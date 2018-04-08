@@ -27,13 +27,13 @@
 
 namespace BearSSL {
 
-class WiFiClientBearSSL;
+class WiFiClientSecure;
 
-class WiFiServerBearSSL : public WiFiServer {
+class WiFiServerSecure : public WiFiServer {
   public:
-    WiFiServerBearSSL(IPAddress addr, uint16_t port);
-    WiFiServerBearSSL(uint16_t port);
-    virtual ~WiFiServerBearSSL() {}
+    WiFiServerSecure(IPAddress addr, uint16_t port);
+    WiFiServerSecure(uint16_t port);
+    virtual ~WiFiServerSecure() {}
 
     // Override the default buffer sizes, if you know what you're doing...
     void setBufferSizes(int recv, int xmit) {
@@ -55,7 +55,7 @@ class WiFiServerBearSSL : public WiFiServer {
     }
 
     // If awaiting connection available and authenticated (i.e. client cert), return it.
-    WiFiClientBearSSL available(uint8_t* status = NULL);
+    WiFiClientSecure available(uint8_t* status = NULL);
 
   private:
     const BearSSLX509List *_chain = nullptr;

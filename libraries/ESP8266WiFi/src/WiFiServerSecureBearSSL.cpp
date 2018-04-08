@@ -39,23 +39,23 @@ extern "C" {
 namespace BearSSL {
 
 // Only need to call the standard server constructor
-WiFiServerBearSSL::WiFiServerBearSSL(IPAddress addr, uint16_t port) : WiFiServer(addr, port) {
+WiFiServerSecure::WiFiServerSecure(IPAddress addr, uint16_t port) : WiFiServer(addr, port) {
 }
 
 // Only need to call the standard server constructor
-WiFiServerBearSSL::WiFiServerBearSSL(uint16_t port) : WiFiServer(port) {
+WiFiServerSecure::WiFiServerSecure(uint16_t port) : WiFiServer(port) {
 }
 
 // Specify a RSA-signed certificate and key for the server.  Only copies the pointer, the
 // caller needs to preserve this chain and key for the life of the object.
-void WiFiServerBearSSL::setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk) {
+void WiFiServerSecure::setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk) {
   _chain = chain;
   _sk = sk;
 }
 
 // Specify a EC-signed certificate and key for the server.  Only copies the pointer, the
 // caller needs to preserve this chain and key for the life of the object.
-void WiFiServerBearSSL::setECCert(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk) {
+void WiFiServerSecure::setECCert(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk) {
   _chain = chain;
   _cert_issuer_key_type = cert_issuer_key_type;
   _sk = sk;
@@ -63,17 +63,17 @@ void WiFiServerBearSSL::setECCert(const BearSSLX509List *chain, unsigned cert_is
 
 // Return a client if there's an available connection waiting.  If one is returned,
 // then any validation (i.e. client cert checking) will have succeeded.
-WiFiClientBearSSL WiFiServerBearSSL::available(uint8_t* status) {
+WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
   (void) status; // Unused
   if (_unclaimed) {
     if (_sk && _sk->isRSA()) {
-      WiFiClientBearSSL result(_unclaimed, _chain, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
+      WiFiClientSecure result(_unclaimed, _chain, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
       return result;
     } else if (_sk && _sk->isEC()) {
-      WiFiClientBearSSL result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
+      WiFiClientSecure result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
@@ -86,7 +86,7 @@ WiFiClientBearSSL WiFiServerBearSSL::available(uint8_t* status) {
 
   // Something weird, return a no-op object
   optimistic_yield(1000);
-  return WiFiClientBearSSL();
+  return WiFiClientSecure();
 }
 
 };
