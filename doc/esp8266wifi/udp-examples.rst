@@ -36,7 +36,7 @@ Once we have libraries in place we need to create a ``WiFiUDP`` object. Then we 
     WiFiUDP Udp;
     unsigned int localUdpPort = 4210;
     char incomingPacket[255];
-    char  replyPacekt[] = "Hi there! Got the message :-)";
+    char replyPacket[] = "Hi there! Got the message :-)";
 
 Wi-Fi Connection
 ~~~~~~~~~~~~~~~~
