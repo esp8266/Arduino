@@ -46,6 +46,14 @@ WiFiServerSecure::WiFiServerSecure(IPAddress addr, uint16_t port) : WiFiServer(a
 WiFiServerSecure::WiFiServerSecure(uint16_t port) : WiFiServer(port) {
 }
 
+// Destructor only checks if we need to delete compatibilty cert/key
+WiFiServerSecure::~WiFiServerSecure() {
+  if (_deleteChainAndKey) {
+    delete _chain;
+    delete _sk;
+  }
+}
+
 // Specify a RSA-signed certificate and key for the server.  Only copies the pointer, the
 // caller needs to preserve this chain and key for the life of the object.
 void WiFiServerSecure::setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk) {
@@ -88,5 +96,24 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
   optimistic_yield(1000);
   return WiFiClientSecure();
 }
+
+
+void WiFiServerSecure::setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) {
+  BearSSLX509List *chain = new BearSSLX509List(cert, certLen);
+  BearSSLPrivateKey *sk = new BearSSLPrivateKey(key, keyLen);
+  if (!chain || !key) {
+    // OOM, fail gracefully
+    delete chain;
+    delete sk;
+    return;
+  }
+  _deleteChainAndKey = true;
+  setRSACert(chain, sk);
+}
+
+void WiFiServerSecure::setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) {
+  setServerKeyAndCert(key, keyLen, cert, certLen);
+}
+
 
 };
