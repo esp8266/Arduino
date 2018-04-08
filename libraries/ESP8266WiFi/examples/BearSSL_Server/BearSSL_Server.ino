@@ -41,7 +41,7 @@ const char *ssid = "....";
 const char *pass = "....";
 
 // The HTTPS server
-WiFiServerBearSSL server(443);
+BearSSL::WiFiServerSecure server(443);
 
 // The server's private key which must be kept secret
 const char server_private_key[] PROGMEM = R"EOF(
@@ -142,7 +142,7 @@ static const char *HTTP_RES =
         "</html>\r\n";
 
 void loop() {
-  WiFiClientBearSSL incoming = server.available();
+  BearSSL::WiFiClientSecure incoming = server.available();
   if (!incoming) {
     return;
   }

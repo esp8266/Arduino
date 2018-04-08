@@ -69,7 +69,7 @@ const char *ssid = "....";
 const char *pass = "....";
 
 // The server which will require a client cert signed by the trusted CA
-WiFiServerBearSSL server(443);
+BearSSL::WiFiServerSecure server(443);
 
 // The hardcoded certificate authority for this example.
 // Don't use it on your own apps!!!!!
@@ -222,7 +222,7 @@ static const char *HTTP_RES =
         "</html>\r\n";
 
 void loop() {
-  WiFiClientBearSSL incoming = server.available();
+  BearSSL::WiFiClientSecure incoming = server.available();
   if (!incoming) {
     return;
   }

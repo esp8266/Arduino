@@ -33,7 +33,7 @@ void setClock() {
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump HTTP response
-void fetchURL(WiFiClientBearSSL *client, const char *host, const uint16_t port, const char *path) {
+void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
   if (!path) {
     path = "/";
   }
@@ -80,7 +80,7 @@ void fetchNoConfig() {
 If there are no CAs or insecure options specified, BearSSL will not connect.
 Expect the following call to fail as none have been configured.
 )EOF");
-  WiFiClientBearSSL client;
+  BearSSL::WiFiClientSecure client;
   fetchURL(&client, host, port, path);
 }
 
@@ -90,7 +90,7 @@ This is absolutely *insecure*, but you can tell BearSSL not to check the
 certificate of the server.  In this mode it will accept ANY certificate,
 which is subject to man-in-the-middle (MITM) attacks.
 )EOF");
-  WiFiClientBearSSL client;
+  BearSSL::WiFiClientSecure client;
   client.setInsecure();
   fetchURL(&client, host, port, path);
 }
@@ -101,7 +101,7 @@ The SHA-1 fingerprint of an X.509 certificate can be used to validate it
 instead of the while certificate.  This is not nearly as secure as real
 X.509 validation, but is better than nothing.
 )EOF");
-  WiFiClientBearSSL client;
+  BearSSL::WiFiClientSecure client;
   const uint8_t fp[20] = {0x35, 0x85, 0x74, 0xEF, 0x67, 0x35, 0xA7, 0xCE, 0x40, 0x69, 0x50, 0xF3, 0xC0, 0xF6, 0x80, 0xCF, 0x80, 0x3B, 0x2E, 0x19};
   client.setFingerprint(fp);
   fetchURL(&client, host, port, path);
@@ -112,7 +112,7 @@ void fetchSelfSigned() {
 It is also possible to accept *any* self-signed certificate.  This is
 absolutely insecure as anyone can make a self-signed certificate.
 )EOF");
-  WiFiClientBearSSL client;
+  BearSSL::WiFiClientSecure client;
   Serial.printf("First, try and connect to a badssl.com self-signed website (will fail):\n");
   fetchURL(&client, "self-signed.badssl.com", 443, "/");
   Serial.printf("Now we'll enable self-signed certs (will pass)\n");
@@ -140,7 +140,7 @@ YA07oFWmuSOalgh00Wh8PUjuRGrcNxWpmgfALQHHFYgoDcD+a8+GoJk+GdJd3ong
 ZQIDAQAB
 -----END PUBLIC KEY-----
 )KEY";
-  WiFiClientBearSSL client;
+  BearSSL::WiFiClientSecure client;
   BearSSLPublicKey key(pubkey);
   client.setKnownKey(&key);
   fetchURL(&client, host, port, path);
@@ -182,7 +182,7 @@ can also be used.  ESP8266 time needs to be valid for checks to pass as
 BearSSL does verify the notValidBefore/After fields.
 )EOF");
 
-  WiFiClientBearSSL client;
+  BearSSL::WiFiClientSecure client;
   BearSSLX509List cert(digicert);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");

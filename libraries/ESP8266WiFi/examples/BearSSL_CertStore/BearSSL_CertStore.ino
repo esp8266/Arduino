@@ -61,7 +61,7 @@ void setClock() {
 }
 
 // Try and connect using a WiFiClientBearSSL to specified host:port and dump URL
-void fetchURL(WiFiClientBearSSL *client, const char *host, const uint16_t port, const char *path) {
+void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_t port, const char *path) {
   if (!path) {
     path = "/";
   }
@@ -133,7 +133,7 @@ void setup() {
     return; // Can't connect to anything w/o certs!
   }
 
-  WiFiClientBearSSL *bear = new WiFiClientBearSSL();
+  BearSSL::WiFiClientSecure *bear = new BearSSL::WiFiClientSecure();
   // Integrate the cert store with this connection
   bear->setCertStore(&certStore);
   Serial.printf("Attempting to fetch https://www.github.com/...\n");
@@ -149,7 +149,7 @@ void loop() {
   } while (site == "");
   Serial.printf("https://%s/\n", site.c_str());
 
-  WiFiClientBearSSL *bear = new WiFiClientBearSSL();
+  BearSSL::WiFiClientSecure *bear = new BearSSL::WiFiClientSecure();
   // Integrate the cert store with this connection
   bear->setCertStore(&certStore);
   fetchURL(bear, site.c_str(), 443, "/");

@@ -22,3 +22,6 @@
 
 #include "WiFiClientSecureAxTLS.h"
 #include "WiFiClientSecureBearSSL.h"
+
+using namespace axTLS;
+// using namespace BearSSL;

@@ -9,7 +9,7 @@
 const char *ssid = "....";
 const char *pass = "....";
 
-void fetch(WiFiClientBearSSL *client) {
+void fetch(BearSSL::WiFiClientSecure *client) {
   client->write("GET / HTTP/1.0\r\nHost: tls.mbed.org\r\nUser-Agent: ESP8266\r\n\r\n");
   client->flush();
   uint32_t to = millis() + 5000;
@@ -33,7 +33,7 @@ int fetchNoMaxFragmentLength() {
   Serial.printf("\nConnecting to https://tls.mbed.org\n");
   Serial.printf("No MFLN attempted\n");
 
-  WiFiClientBearSSL client;
+  BearSSL::WiFiClientSecure client;
   client.setInsecure();
   client.connect("tls.mbed.org", 443);
   if (client.connected()) {
@@ -66,7 +66,7 @@ int fetchMaxFragmentLength() {
   // sizes assuming you can ensure the server never transmits fragments larger
   // than the size (i.e. by using HTTP GET RANGE methods, etc.).
 
-  WiFiClientBearSSL client;
+  BearSSLWiFiClientSecure client;
   client.setInsecure();
   bool mfln = client.probeMaxFragmentLength("tls.mbed.org", 443, 1024);
   Serial.printf("\nConnecting to https://tls.mbed.org\n");
