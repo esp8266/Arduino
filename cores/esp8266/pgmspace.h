@@ -29,6 +29,8 @@ extern "C" {
 
 #define _SFR_BYTE(n) (n)
 
+#ifdef __PROG_TYPES_COMPAT__
+
 typedef void prog_void;
 typedef char prog_char;
 typedef unsigned char prog_uchar;
@@ -38,6 +40,8 @@ typedef int16_t prog_int16_t;
 typedef uint16_t prog_uint16_t;
 typedef int32_t prog_int32_t;
 typedef uint32_t prog_uint32_t;
+
+#endif // defined(__PROG_TYPES_COMPAT__)
 
 #define SIZE_IRRELEVANT 0x7fffffff
 
