@@ -93,19 +93,27 @@ class BSTestRunner(object):
                 self.sp.logfile = test_output
                 print('running test "{}"'.format(name))
                 if should_update_env:
-                    res = self.update_env()
+                    res = self.update_env(self.env_vars)
                     if res != BSTestRunner.SUCCESS:
                         print('failed to set environment variables')
                         break;
                     should_update_env = False
                 if name in self.mocks:
                     debug_print('setting up mocks')
+                    self.mocks[name]['request_env'] = self.request_env
                     self.mocks[name]['setup']()
+                    extra_env = mock_decorators.get_all_envs(name)
+                    if extra_env is not None:
+                        self.update_env(extra_env)
                 t_start = time.time()
                 result = self.run_test(index)
                 if name in self.mocks:
                     debug_print('tearing down mocks')
-                    self.mocks[name]['teardown']()
+                    try:
+                        self.mocks[name]['teardown']()
+                    except AssertionError:
+                        debug_print('teardown assert failure')
+                        result = BSTestRunner.FAIL
                 t_stop = time.time()
                 self.sp.logfile = None
                 test_case.elapsed_sec = t_stop - t_start
@@ -167,12 +175,12 @@ class BSTestRunner(object):
         if timeout <= 0:
             return BSTestRunner.TIMEOUT
 
-    def update_env(self):
-        for env_kv in self.env_vars:
+    def update_env(self, env_to_set):
+        for env_kv in env_to_set:
             self.sp.sendline('setenv "{}" "{}"'.format(env_kv[0], env_kv[1]))
             timeout = 10
             while timeout > 0:
-                res = self.sp.expect(['>>>>>bs_test_setenv ok', EOF, TIMEOUT])
+                res = self.sp.expect(['>>>>>bs_test_setenv', EOF, TIMEOUT])
                 if res == 0:
                     break
                 time.sleep(0.1)
@@ -182,6 +190,20 @@ class BSTestRunner(object):
             else:
                 return BSTestRunner.TIMEOUT
         return BSTestRunner.SUCCESS
+
+    def request_env(self, key):
+        self.sp.sendline('getenv "{}"'.format(key))
+        timeout = 10
+        while timeout > 0:
+            res = self.sp.expect([r'>>>>>bs_test_getenv value=\"(.+)\"', EOF, TIMEOUT])
+            if res == 0:
+                break
+            time.sleep(0.1)
+            timeout -= 0.1
+        if res != 0:
+            return None
+        return self.sp.match.group(1)
+
 
 ser = None
 
