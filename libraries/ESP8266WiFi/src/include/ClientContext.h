@@ -58,7 +58,7 @@ public:
             tcp_err(_pcb, NULL);
             tcp_poll(_pcb, NULL, 0);
             tcp_abort(_pcb);
-            _pcb = 0;
+            _pcb = nullptr;
         }
         return ERR_ABRT;
     }
@@ -79,7 +79,7 @@ public:
                 tcp_abort(_pcb);
                 err = ERR_ABRT;
             }
-            _pcb = 0;
+            _pcb = nullptr;
         }
         return err;
     }
@@ -536,7 +536,7 @@ protected:
         tcp_sent(_pcb, NULL);
         tcp_recv(_pcb, NULL);
         tcp_err(_pcb, NULL);
-        _pcb = NULL;
+        _pcb = nullptr;
         _notify_error();
     }
 
