@@ -48,7 +48,14 @@ void output_menu_end(IO& io)
 template<typename IO>
 void output_setenv_result(IO& io, const char* key, const char* value)
 {
-    io.printf(BS_LINE_PREFIX "setenv ok key='%s' value='%s'\n", key, value);
+    io.printf(BS_LINE_PREFIX "setenv key=\"%s\" value=\"%s\"\n", key, value);
+}
+
+template<typename IO>
+void output_getenv_result(IO& io, const char* key, const char* value)
+{
+    (void) key;
+    io.printf(BS_LINE_PREFIX "getenv value=\"%s\"\n", value);
 }
 
 template<typename IO>
@@ -72,6 +79,15 @@ bool input_handle(IO& io, char* line_buf, size_t line_buf_size, int& test_num)
         test_num = -1;
         return false;   /* we didn't get the test number yet, so return false */
     }
+    if (strcmp(argv[0], "getenv") == 0) {
+        if (argc != 2) {
+            return false;
+        }
+        const char* value = getenv(argv[1]);
+        output_getenv_result(io, argv[1], (value != NULL) ? value : "");
+        return false;
+    }
+    /* not one of the commands, try to parse as test number */
     char* endptr;
     test_num = (int) strtol(argv[0], &endptr, 10);
     if (endptr != argv[0] + strlen(argv[0])) {
