@@ -9,6 +9,11 @@ import argparse
 import serial
 import subprocess
 import imp
+try:
+    from configparser import ConfigParser
+except:
+    from ConfigParser import ConfigParser
+import itertools
 from urlparse import urlparse
 from junit_xml import TestSuite, TestCase
 try:
@@ -34,12 +39,13 @@ class BSTestRunner(object):
     CRASH = 3
     BEGINTIMEOUT = 4
 
-    def __init__(self, spawn_obj, name, mocks):
+    def __init__(self, spawn_obj, name, mocks, env_vars):
         self.sp = spawn_obj
         self.tests = []
         self.reset_timeout = 2
         self.name = name
         self.mocks = mocks
+        self.env_vars = env_vars
 
     def get_test_list(self):
         self.sp.sendline('-1')
@@ -73,6 +79,7 @@ class BSTestRunner(object):
 
     def run_tests(self):
         test_cases = []
+        should_update_env = True
         for test in self.tests:
             desc = test['desc']
             name = test['name']
@@ -84,13 +91,20 @@ class BSTestRunner(object):
             else:
                 test_output = StringIO()
                 self.sp.logfile = test_output
+                print('running test "{}"'.format(name))
+                if should_update_env:
+                    res = self.update_env()
+                    if res != BSTestRunner.SUCCESS:
+                        print('failed to set environment variables')
+                        break;
+                    should_update_env = False
                 if name in self.mocks:
-                    print('setting up mocks')
+                    debug_print('setting up mocks')
                     self.mocks[name]['setup']()
                 t_start = time.time()
                 result = self.run_test(index)
                 if name in self.mocks:
-                    print('tearing down mocks')
+                    debug_print('tearing down mocks')
                     self.mocks[name]['teardown']()
                 t_stop = time.time()
                 self.sp.logfile = None
@@ -103,6 +117,7 @@ class BSTestRunner(object):
                 else:
                     print('test "{}" failed'.format(name))
                     test_case.add_failure_info('Test failed', output=test_output.getvalue())
+                    should_update_env = True
                 test_output.close()
             test_cases += [test_case];
         return TestSuite(self.name, test_cases)
@@ -152,6 +167,22 @@ class BSTestRunner(object):
         if timeout <= 0:
             return BSTestRunner.TIMEOUT
 
+    def update_env(self):
+        for env_kv in self.env_vars:
+            self.sp.sendline('setenv "{}" "{}"'.format(env_kv[0], env_kv[1]))
+            timeout = 10
+            while timeout > 0:
+                res = self.sp.expect(['>>>>>bs_test_setenv ok', EOF, TIMEOUT])
+                if res == 0:
+                    break
+                time.sleep(0.1)
+                timeout -= 0.1
+            if res == 0:
+                continue
+            else:
+                return BSTestRunner.TIMEOUT
+        return BSTestRunner.SUCCESS
+
 ser = None
 
 def spawn_port(port_name, baudrate=115200):
@@ -162,8 +193,8 @@ def spawn_port(port_name, baudrate=115200):
 def spawn_exec(name):
     return pexpect.spawn(name, timeout=0)
 
-def run_tests(spawn, name, mocks):
-    tw = BSTestRunner(spawn, name, mocks)
+def run_tests(spawn, name, mocks, env_vars):
+    tw = BSTestRunner(spawn, name, mocks, env_vars)
     tw.get_test_list()
     return tw.run_tests()
 
@@ -175,6 +206,7 @@ def parse_args():
     parser.add_argument('-n', '--name', help='Test run name')
     parser.add_argument('-o', '--output', help='Output JUnit format test report')
     parser.add_argument('-m', '--mock', help='Set python script to use for mocking purposes')
+    parser.add_argument('--env-file', help='File containing a list of environment variables to set', type=argparse.FileType('r'))
     return parser.parse_args()
 
 def main():
@@ -194,12 +226,19 @@ def main():
     if spawn_func is None:
         debug_print("Please specify port or executable", file=sys.stderr)
         return 1
+    env_vars = []
+    if args.env_file is not None:
+        cfg = ConfigParser()
+        cfg.optionxform = str
+        with args.env_file as fp:
+            cfg.readfp(fp)
+        env_vars = cfg.items('global')
     mocks = {}
     if args.mock is not None:
         mocks_mod = imp.load_source('mocks', args.mock)
         mocks = mock_decorators.env
     with spawn_func(spawn_arg) as sp:
-        ts = run_tests(sp, name, mocks)
+        ts = run_tests(sp, name, mocks, env_vars)
         if args.output:
             with open(args.output, "w") as f:
                 TestSuite.to_file(f, [ts])

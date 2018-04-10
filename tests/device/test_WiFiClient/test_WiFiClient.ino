@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <BSTest.h>
-#include <test_config.h>
 #include <ESP8266WiFi.h>
 #include <Ticker.h>
 
@@ -16,7 +15,7 @@ void setup()
     Serial.setDebugOutput(true);
     WiFi.persistent(false);
     WiFi.mode(WIFI_STA);
-    WiFi.begin(STA_SSID, STA_PASS);
+    WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
