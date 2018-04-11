@@ -87,18 +87,9 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
   if (!_bearssl_stack) {
-    #if 1
     const int stacksize = 4500; // Empirically determined stack for EC and RSA connections
     _bearssl_stack = std::shared_ptr<uint8_t>(new uint8_t[stacksize], std::default_delete<uint8_t[]>());
     br_esp8266_stack_proxy_init(_bearssl_stack.get(), stacksize);
-    #else
-    // TODO - DANGEROUS - EVIL
-    // Steal memory from the SYS stack instead of allocating HEAP
-    const int stacksize = 0x1200; // Empirically determined stack for EC and RSA connections
-    _bearssl_stack = std::shared_ptr<uint8_t>(new uint8_t[1 /* just placeholder, real space is sys_space */], std::default_delete<uint8_t[]>());
-    uint8_t *sys_space = (uint8_t*)0x3fffe000;
-    br_esp8266_stack_proxy_init(sys_space, stacksize);
-    #endif
   }
   _local_bearssl_stack = _bearssl_stack;
 }

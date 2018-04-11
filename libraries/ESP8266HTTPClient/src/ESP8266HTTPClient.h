@@ -133,11 +133,14 @@ public:
     HTTPClient();
     ~HTTPClient();
 
+    // Plain HTTP connection, unencrypted
     bool begin(String url);
-    bool begin(String url, String httpsFingerprint);
-    bool begin(String url, const uint8_t httpsFingerprint[20]);
     bool begin(String host, uint16_t port, String uri = "/");
+    // Use axTLS for secure HTTPS connection
+    bool begin(String url, String httpsFingerprint);
     bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
+    // Use BearSSL for secure HTTPS connection
+    bool begin(String url, const uint8_t httpsFingerprint[20]);
     bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20]);
     // deprecated, use the overload above instead
     bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));

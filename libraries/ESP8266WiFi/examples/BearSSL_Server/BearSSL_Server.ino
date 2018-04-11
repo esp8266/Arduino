@@ -153,10 +153,10 @@ void loop() {
   int lcwn = 0;
   for (;;) {
     unsigned char x=0;
-    if (millis() > timeout) {
-      goto client_drop;
-    } else if (incoming.available() && incoming.read(&x, 1) < 0) {
-      goto client_drop;
+    if ((millis() > timeout) || (incoming.available() && incoming.read(&x, 1) < 0)) {
+      incoming.stop();
+      Serial.printf("Connection error, closed\n");
+      return;
     } else if (!x) {
       yield();
       continue;
@@ -172,8 +172,6 @@ void loop() {
   }
   incoming.write((uint8_t*)HTTP_RES, strlen(HTTP_RES));
   incoming.flush();
-
-client_drop:
   incoming.stop();
   Serial.printf("Connection closed.\n");
 }
