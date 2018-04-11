@@ -106,7 +106,14 @@ BSTest library also contains a Python script which can "talk" to the ESP8266 boa
 
 ### Test configuration
 
-Some tests need to connect to WiFi AP or to the PC running the tests. This configuration should be set in tests/device/libraries/test_config/test_config.h. This file is not tracked in Git. Create it by copying from tests/device/libraries/test_config/test_config.h.template, and modifying settings in that file.
+Some tests need to connect to WiFi AP or to the PC running the tests. In the test code, this configuration is read from environment variables (the ones set using C `getenv`/`setenv` functions). There are two ways environment variables can be set.
+
+- Environment variables which apply to all or most of the tests can be defined in `tests/device/test_env.cfg` file. This file is not present in Git by default. Make a copy of `tests/device/test_env.cfg.template` and change the values to suit your environment.
+
+- Environment variables which apply to a specific test can be set dynamically by the `setup` host side helper (see section below). This is done using `setenv` function defined in `mock_decorators`.
+
+Environment variables can also be used to pass some information from the test code to the host side helper. To do that, test code can set an environment variable using `setenv` C function. Then the `teardown` host side helper can obtain the value of that variable using `request_env` function defined in `mock_decorators`.
+
 
 ### Building and running the tests
 
@@ -135,15 +142,41 @@ Here are some of the supported targets:
 Some tests running on the device need a matching part running on the host. For example, HTTP client test might need a web server running on the host to connect to. TCP server test might need to be connected to by TCP client running on the host. To support such use cases, for each test file, an optional Python test file can be provided. This Python file defines setup and teardown functions which have to be run before and after the test is run on the device. `setup` and `teardown` decorators bind setup/teardown functions to the test with specified name:
 
 ```python
-from mock_decorators import setup, teardown
+from mock_decorators import setup, teardown, setenv, request_env
 
 @setup('WiFiClient test')
 def setup_wificlient_test(e):
     # create a TCP server
+    # pass environment variable to the test
+    setenv(e, 'SERVER_PORT', '10000')
+    setenv(e, 'SERVER_IP', repr(server_ip))
 
 @teardown('WiFiClient test')
 def teardown_wificlient_test(e):
     # delete TCP server
+    # request environment variable from the test, compare to the expected value
+    read_bytes = request_env(e, 'READ_BYTES')
+    assert(read_bytes == '4096')
+```
+
+Corresponding test code might look like this:
+
+```c++
+
+TEST_CASE("WiFiClient test", "[wificlient]")
+{
+    const char* server_ip = getenv("SERVER_IP");
+    int server_port = (int) strtol(getenv("SERVER_PORT"), NULL, 0);
+
+    WiFiClient client;
+    REQUIRE(client.connect(server_ip, server_port));
+
+    // read data from server
+    // ...
+
+    // Save the result back so that host side helper can read it
+    setenv("READ_BYTES", String(read_bytes).c_str(), 1);
+}
 ```
 
 
