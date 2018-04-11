@@ -75,7 +75,7 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
         REQUIRE(payload == "hello!!!");
     }
     {
-        // request which returns 8000 bytes
+        // request which returns 4000 bytes
         HTTPClient http;
         http.begin(getenv("SERVER_IP"), 8088, "/data?size=4000", fp);
         auto httpCode = http.GET();
