@@ -413,6 +413,7 @@ namespace brssl {
     }
 
     const br_rsa_public_key *rk = nullptr;
+    const br_ec_public_key *ek = nullptr;
     switch (br_pkey_decoder_key_type(dc.get())) {
       case BR_KEYTYPE_RSA:
         rk = br_pkey_decoder_get_rsa(dc.get());
@@ -436,8 +437,20 @@ namespace brssl {
         return pk;
 
       case BR_KEYTYPE_EC:
-        // TODO - not parsed yet in .T0 file
-        return nullptr;
+        ek = br_pkey_decoder_get_ec(dc.get());
+        pk = (public_key*)malloc(sizeof * pk);
+        if (!pk) {
+          return nullptr;
+        }
+        pk->key_type = BR_KEYTYPE_EC;
+        pk->key.ec.q = (uint8_t*)malloc(ek->qlen);
+        if (!pk->key.ec.q) {
+          free(pk);
+          return nullptr;
+        }
+        memcpy(pk->key.ec.q, ek->q, ek->qlen);
+        pk->key.ec.qlen = ek->qlen;
+        return pk;
 
       default:
         return nullptr;
@@ -450,7 +463,7 @@ namespace brssl {
         free(pk->key.rsa.n);
         free(pk->key.rsa.e);
       } else if (pk->key_type == BR_KEYTYPE_EC) {
-        // TODO - EC public keys not implemented
+        free(pk->key.ec.q);
       }
       free(pk);
     }
