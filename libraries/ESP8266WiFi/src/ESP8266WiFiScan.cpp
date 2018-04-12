@@ -64,51 +64,8 @@ std::function<void(int)> ESP8266WiFiScanClass::_onComplete;
  * Start scan WiFi networks available
  * @param async         run in async mode
  * @param show_hidden   show hidden networks
- * @return Number of discovered networks
- */
-int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden) {
-    if(ESP8266WiFiScanClass::_scanStarted) {
-        return WIFI_SCAN_RUNNING;
-    }
-
-    ESP8266WiFiScanClass::_scanAsync = async;
-
-    WiFi.enableSTA(true);
-
-    int status = wifi_station_get_connect_status();
-    if(status != STATION_GOT_IP && status != STATION_IDLE) {
-        wifi_station_disconnect();
-    }
-
-    scanDelete();
-
-    struct scan_config config;
-    memset(&config, 0, sizeof(config));
-    config.show_hidden = show_hidden;
-    if(wifi_station_scan(&config, reinterpret_cast<scan_done_cb_t>(&ESP8266WiFiScanClass::_scanDone))) {
-        ESP8266WiFiScanClass::_scanComplete = false;
-        ESP8266WiFiScanClass::_scanStarted = true;
-
-        if(ESP8266WiFiScanClass::_scanAsync) {
-            delay(0); // time for the OS to trigger the scan
-            return WIFI_SCAN_RUNNING;
-        }
-
-        esp_yield();
-        return ESP8266WiFiScanClass::_scanCount;
-    } else {
-        return WIFI_SCAN_FAILED;
-    }
-
-}
-
-/**
- * Start scan WiFi networks available
- * @param async         run in async mode
- * @param show_hidden   show hidden networks
  * @param channel       scan only this channel (0 for all channels)
- * @param ssid*         scan for only this ssid
-
+ * @param ssid*         scan for only this ssid (NULL for all ssid's)
  * @return Number of discovered networks
  */
 int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 channel, uint8* ssid) {
