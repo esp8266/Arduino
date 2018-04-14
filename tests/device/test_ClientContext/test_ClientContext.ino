@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <BSTest.h>
-#include <test_config.h>
 #include <ESP8266WiFi.h>
 
 extern "C" {
@@ -26,7 +25,7 @@ void setup()
     Serial.setDebugOutput(true);
     WiFi.persistent(false);
     WiFi.mode(WIFI_STA);
-    WiFi.begin(STA_SSID, STA_PASS);
+    WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
@@ -37,7 +36,7 @@ TEST_CASE("WiFi release ClientContext", "[clientcontext]")
 {
     #define MAXLOOPS     50
     #define SUCCESS_GOAL 10
-    #define srv          SERVER_IP
+    #define srv          getenv("SERVER_IP")
 
     WiFiClient client;
     
