@@ -55,6 +55,9 @@
 #include <Arduino.h>
 #include "core_esp8266_waveform.h"
 
+// Need speed, not size, here
+#pragma GCC optimize ("O3")
+
 // Map the IRQ stuff to standard terminology
 #define cli() ets_intr_lock()
 #define sei() ets_intr_unlock()
@@ -63,7 +66,7 @@
 #define MAXIRQUS (10000)
 
 // If the cycles from now to an event are below this value, perform it anyway since IRQs take longer than this
-#define CYCLES_FLUFF (200)
+#define CYCLES_FLUFF (100)
 
 // Macro to get count of predefined array elements
 #define countof(a) ((size_t)(sizeof(a)/sizeof(a[0])))
@@ -77,34 +80,36 @@
 
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
-  uint32_t nextEventCycles;
+  uint32_t nextServiceCycle;
   uint32_t timeHighCycles;
   uint32_t timeLowCycles;
   uint32_t timeLeftCycles;
   // To ensure stable change, only copy these over on low->high transition
-  unsigned gpioPin            : 4; // Check gpioPin16 first
-  unsigned nextTimeHighCycles : 28;
-  unsigned gpioPin16          : 1; // Special case for weird IO16
+  uint16_t gpioMask;
+  uint16_t gpio16Mask;
+//  unsigned gpioPin            : 4; // Check gpioPin16 first
   unsigned state              : 1;
+  unsigned nextTimeHighCycles : 31;
+//  unsigned gpioPin16          : 1; // Special case for weird IO16
   unsigned enabled            : 1;
-  unsigned nextTimeLowCycles  : 28;
+  unsigned nextTimeLowCycles  : 31;
 } Waveform;
 
 // These can be accessed in interrupts, so ensure to bracket access with SEI/CLI
 static Waveform waveform[] = {
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // GPIO0
-  {0, 0, 0, 0, 1, 0, 0, 0, 0, 0}, // GPIO1
-  {0, 0, 0, 0, 2, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 3, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 4, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 5, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 1<<0, 0, 0, 0, 0, 0}, // GPIO0
+  {0, 0, 0, 0, 1<<1, 0, 0, 0, 0, 0}, // GPIO1
+  {0, 0, 0, 0, 1<<2, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 1<<3, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 1<<4, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 1<<5, 0, 0, 0, 0, 0},
   // GPIOS 6-11 not allowed, used for flash
-  {0, 0, 0, 0, 12, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 13, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 14, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 15, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 1, 0, 0, 0}
-}; // GPIO16
+  {0, 0, 0, 0, 1<<12, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 1<<13, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 1<<14, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 1<<15, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 1, 0, 0, 0, 0}  // GPIO16
+};
 
 
 // Maximum umber of moves per stepper queue
@@ -164,8 +169,20 @@ static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
   return b;
 }
 
+static inline ICACHE_RAM_ATTR uint32_t min_s32(int32_t a, int32_t b) {
+  if (a < b) {
+    return a;
+  }
+  return b;
+}
+
 static inline ICACHE_RAM_ATTR void ReloadTimer(uint32_t a) {
-  timer1_write(a);
+  // Below a threshold you actually miss the edge IRQ, so ensure enough time
+  if (a > 32) {
+    timer1_write(a);
+  } else {
+    timer1_write(32);
+  }
 }
 
 static inline ICACHE_RAM_ATTR uint32_t GetCycleCount() {
@@ -220,7 +237,7 @@ static inline ICACHE_RAM_ATTR void PopStepper(int i) {
 }
 
 // Called by the user to detach a stepper and free memory
-int removeStepper(int pin) {
+int removeStepper(uint8_t pin) {
   sei();
   for (int i = 0; i < stepQCnt; i++) {
     if (stepQ[i].gpioPin == pin) {
@@ -231,6 +248,7 @@ int removeStepper(int pin) {
       return true;
     }
   }
+  cli();
   return false;
 }
 
@@ -295,7 +313,11 @@ static int PushStepper(int gpioPin, const Motion *nextMove) {
 }
 
 // Called by user to add a PWL move to the queue, returns false if there is no space left
-int pushStepperMove(int pin, int dir, int sync, uint16_t pulses, float j, float a0, float v0) {
+int pushStepperMove(uint8_t pin, int dir, int sync, uint16_t pulses, float j, float a0, float v0) {
+  if (pin > 15) {
+    // Only GPIO 0...15 allowed
+    return false;
+  }
   Motion m;
   m.pulses = pulses;
   m.j_2 = j / 2.0;
@@ -307,7 +329,7 @@ int pushStepperMove(int pin, int dir, int sync, uint16_t pulses, float j, float 
 }
 
 // Assign a pin to stepper DIR
-int setStepperDirPin(int pin) {
+int setStepperDirPin(uint8_t pin) {
   if (pin > 16) {
     return false;
   }
@@ -321,7 +343,7 @@ int setStepperDirPin(int pin) {
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
   Waveform *wave = NULL;
   for (size_t i = 0; i < countof(waveform); i++) {
-    if (((pin == 16) && waveform[i].gpioPin16) || ((pin != 16) && (waveform[i].gpioPin == pin))) {
+    if (((pin == 16) && waveform[i].gpio16Mask==1) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
       wave = (Waveform*) & (waveform[i]);
       break;
     }
@@ -334,16 +356,16 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
   wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS);
   wave->timeLeftCycles = MicrosecondsToCycles(runTimeUS);
   if (!wave->enabled) {
-    wave->state = 1;
-    digitalWrite(pin, 1);
-    wave->timeHighCycles = MicrosecondsToCycles(timeHighUS);
-    wave->timeLowCycles = MicrosecondsToCycles(timeLowUS);
-    wave->nextEventCycles = wave->timeHighCycles;
+    wave->state = 0;
+    // Actually set the pin high or low in the IRQ service to guarantee times
+    wave->timeHighCycles = MicrosecondsToCycles(timeHighUS) - 30; // Sub off some of the codepath time
+    wave->timeLowCycles = MicrosecondsToCycles(timeLowUS) - 30; // Sub off some of the codepath time
+    wave->nextServiceCycle = GetCycleCount() + MicrosecondsToCycles(1);
     wave->enabled = 1;
     if (!timerRunning) {
       initTimer();
     }
-    ReloadTimer(10); // Cause an interrupt post-haste
+    ReloadTimer(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
   }
   cli();
   return true;
@@ -352,7 +374,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
 // Stops a waveform on a pin
 int stopWaveform(uint8_t pin) {
   for (size_t i = 0; i < countof(waveform); i++) {
-    if (((pin == 16) && waveform[i].gpioPin16) || ((pin != 16) && (waveform[i].gpioPin == pin))) {
+    if (((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
       sei();
       waveform[i].enabled = 0;
       int cnt = stepQCnt;
@@ -366,6 +388,7 @@ int stopWaveform(uint8_t pin) {
       return true;
     }
   }
+  cli();
   return false;
 }
 
@@ -463,65 +486,70 @@ static ICACHE_RAM_ATTR uint32_t ProcessSteppers(uint32_t deltaCycles) {
 }
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
+  uint32_t nextEventCycles;
+  #if F_CPU == 160000000
+  uint8_t cnt = 20;
+  #else
+  uint8_t cnt = 10;
+  #endif
+
+  do {
+    nextEventCycles = MicrosecondsToCycles(MAXIRQUS);
+    for (size_t i = 0; i < countof(waveform); i++) {
+      Waveform *wave = &waveform[i];
+      uint32_t now;
+
+      // If it's not on, ignore!
+      if (!wave->enabled) {
+        continue;
+      }
+
+      // Check for toggles
+      now = GetCycleCount();
+      if (now >= wave->nextServiceCycle) {
+        wave->state = !wave->state;
+        if (wave->state) {
+          SetGPIO(wave->gpioMask);
+          if (wave->gpio16Mask) {
+            GP16O |= wave->gpio16Mask; // GPIO16 write slow as it's RMW
+          }
+          wave->nextServiceCycle = now + wave->timeHighCycles;
+          wave->timeHighCycles = wave->nextTimeHighCycles;
+          nextEventCycles = min_u32(nextEventCycles, wave->timeHighCycles);
+        } else {
+          ClearGPIO(wave->gpioMask);
+          if (wave->gpio16Mask) {
+            GP16O &= ~wave->gpio16Mask;
+          }
+          wave->nextServiceCycle = now + wave->timeLowCycles;
+          wave->timeLowCycles = wave->nextTimeLowCycles;
+          nextEventCycles = min_u32(nextEventCycles, wave->timeLowCycles);
+        }
+      } else {
+        uint32_t deltaCycles = wave->nextServiceCycle - now;
+        nextEventCycles = min_u32(nextEventCycles, deltaCycles);
+      }
+    }
+  } while (--cnt && (nextEventCycles < MicrosecondsToCycles(4)));
+
   uint32_t curCycleCount = GetCycleCount();
   uint32_t deltaCycles = curCycleCount - lastCycleCount;
   lastCycleCount = curCycleCount;
 
+  // Check for timed-out waveforms out of the high-frequency toggle loop
   for (size_t i = 0; i < countof(waveform); i++) {
     Waveform *wave = &waveform[i];
-
-    // If it's not on, ignore!
-    if (!wave->enabled) {
-      continue;
-    }
-
-    // Check for timed-out waveforms
     if (wave->timeLeftCycles) {
-      uint32_t newTimeLeftCycles = wave->timeLeftCycles - deltaCycles;
       // Check for unsigned underflow with new > old
-      if ((deltaCycles >= wave->timeLeftCycles) || (newTimeLeftCycles <= CYCLES_FLUFF)) {
+      if (deltaCycles >= wave->timeLeftCycles) {
         // Done, remove!
         wave->enabled = false;
-        if (wave->gpioPin16) {
-          GP16O &= ~1;
-        } else {
-          ClearGPIO(1 << wave->gpioPin);
-        }
+        ClearGPIO(wave->gpioMask);
+        GP16O &= ~wave->gpio16Mask;
       } else {
+        uint32_t newTimeLeftCycles = wave->timeLeftCycles - deltaCycles;
         wave->timeLeftCycles = newTimeLeftCycles;
       }
-    }
-
-    // Check for toggles
-    uint32_t newNextEventCycles = wave->nextEventCycles - deltaCycles;
-    if ((deltaCycles >= wave->nextEventCycles) || (newNextEventCycles <= CYCLES_FLUFF)) {
-      wave->state = !wave->state;
-      if (wave->state) {
-        if (wave->gpioPin16) {
-          GP16O |= 1;
-        } else {
-          SetGPIO(1 << wave->gpioPin);
-        }
-        wave->nextEventCycles = wave->timeHighCycles;
-        wave->timeHighCycles = wave->nextTimeHighCycles;
-      } else {
-        if (wave->gpioPin16) {
-          GP16O &= ~1;
-        } else {
-          ClearGPIO(1 << wave->gpioPin);
-        }
-        wave->nextEventCycles = wave->timeLowCycles;
-        wave->timeLowCycles = wave->nextTimeLowCycles;
-      }
-    } else {
-      wave->nextEventCycles = newNextEventCycles;
-    }
-  }
-
-  uint32_t nextEventCycles = MicrosecondsToCycles(MAXIRQUS);
-  for (size_t i = 0; i < countof(waveform); i++) {
-    if (waveform[i].enabled) {
-      nextEventCycles = min_u32(nextEventCycles, waveform[i].nextEventCycles);
     }
   }
 
@@ -529,29 +557,21 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     nextEventCycles = min_u32(nextEventCycles, ProcessSteppers(deltaCycles));
   }
 
-  // Adjust back by the time we spent in here
-  deltaCycles = GetCycleCount() - lastCycleCount;
-  // Add in IRQ delay, from measurements on idle system
   #if F_CPU == 160000000
-  deltaCycles += MicrosecondsToCycles(1) + (MicrosecondsToCycles(1) >> 1);
-  #else
-  deltaCycles += MicrosecondsToCycles(3);
-  #endif
-  if (nextEventCycles > deltaCycles) {
-    nextEventCycles -= deltaCycles;
+  if (nextEventCycles <= 5 * MicrosecondsToCycles(1)) {
+    nextEventCycles = MicrosecondsToCycles(1) / 2;
   } else {
-    nextEventCycles = CYCLES_FLUFF;
+    nextEventCycles -= 5 * MicrosecondsToCycles(1);
   }
-
-  // Keep next call within sane min/max time
-  if (nextEventCycles < CYCLES_FLUFF) {
-    nextEventCycles = CYCLES_FLUFF;
-  } else if (nextEventCycles > MicrosecondsToCycles(MAXIRQUS)) {
-    nextEventCycles = MicrosecondsToCycles(MAXIRQUS);
-  }
-  #if F_CPU == 160000000
   nextEventCycles = nextEventCycles >> 1;
+  #else
+  if (nextEventCycles <= 6 * MicrosecondsToCycles(1)) {
+    nextEventCycles = MicrosecondsToCycles(1) / 2;
+  } else {
+    nextEventCycles -= 6 * MicrosecondsToCycles(1);
+  }
   #endif
+
   ReloadTimer(nextEventCycles);
 }
 

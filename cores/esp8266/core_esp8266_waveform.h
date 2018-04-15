@@ -64,9 +64,9 @@ extern "C" {
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS);
 int stopWaveform(uint8_t pin);
 
-int setStepperDirPin(int pin);
-int pushStepperMove(int pin, int dir, int sync, uint16_t pulses, float j, float a0, float v0);
-int removeStepper(int pin);
+int setStepperDirPin(uint8_t pin);
+int pushStepperMove(uint8_t pin, int dir, int sync, uint16_t pulses, float j, float a0, float v0);
+int removeStepper(uint8_t pin);
 
 #ifdef __cplusplus
 }
