@@ -280,7 +280,7 @@ void WiFiClient::stop()
 
 uint8_t WiFiClient::connected()
 {
-    if (!_client)
+    if (!_client || _client->state() == CLOSED)
         return 0;
 
     return _client->state() == ESTABLISHED || available();
