@@ -80,35 +80,30 @@
 
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
-  uint32_t nextServiceCycle;
-  uint32_t timeHighCycles;
-  uint32_t timeLowCycles;
-  uint32_t timeLeftCycles;
-  // To ensure stable change, only copy these over on low->high transition
-  uint16_t gpioMask;
-  uint16_t gpio16Mask;
-//  unsigned gpioPin            : 4; // Check gpioPin16 first
-  unsigned state              : 1;
-  unsigned nextTimeHighCycles : 31;
-//  unsigned gpioPin16          : 1; // Special case for weird IO16
-  unsigned enabled            : 1;
-  unsigned nextTimeLowCycles  : 31;
+  uint32_t nextServiceCycle;        // ESP cycle timer when a transition required
+  uint32_t timeLeftCycles;          // For time-limited waveform, how many ESP cycles left
+  uint16_t gpioMask;                // Mask instead of value to speed IRQ loop
+  uint16_t gpio16Mask;              // Mask instead of value to speed IRQ loop
+  unsigned state              : 1;  // Current state of this pin
+  unsigned nextTimeHighCycles : 31; // Copy over low->high to keep smooth waveform
+  unsigned enabled            : 1;  // Is this GPIO generating a waveform?
+  unsigned nextTimeLowCycles  : 31; // Copy over high->low to keep smooth waveform
 } Waveform;
 
 // These can be accessed in interrupts, so ensure to bracket access with SEI/CLI
 static Waveform waveform[] = {
-  {0, 0, 0, 0, 1<<0, 0, 0, 0, 0, 0}, // GPIO0
-  {0, 0, 0, 0, 1<<1, 0, 0, 0, 0, 0}, // GPIO1
-  {0, 0, 0, 0, 1<<2, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 1<<3, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 1<<4, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 1<<5, 0, 0, 0, 0, 0},
+  {0, 0, 1<<0, 0, 0, 0, 0, 0}, // GPIO0
+  {0, 0, 1<<1, 0, 0, 0, 0, 0}, // GPIO1
+  {0, 0, 1<<2, 0, 0, 0, 0, 0},
+  {0, 0, 1<<3, 0, 0, 0, 0, 0},
+  {0, 0, 1<<4, 0, 0, 0, 0, 0},
+  {0, 0, 1<<5, 0, 0, 0, 0, 0},
   // GPIOS 6-11 not allowed, used for flash
-  {0, 0, 0, 0, 1<<12, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 1<<13, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 1<<14, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 1<<15, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 1, 0, 0, 0, 0}  // GPIO16
+  {0, 0, 1<<12, 0, 0, 0, 0, 0},
+  {0, 0, 1<<13, 0, 0, 0, 0, 0},
+  {0, 0, 1<<14, 0, 0, 0, 0, 0},
+  {0, 0, 1<<15, 0, 0, 0, 0, 0},
+  {0, 0, 0, 1, 0, 0, 0, 0}  // GPIO16
 };
 
 
@@ -137,20 +132,20 @@ typedef struct {
   uint32_t nextEventCycles;
 
   // Copied from head for fast access
-  uint16_t pulses;
-  uint32_t cumCycles;
-  float    j_2;
-  float    a0;
-  float    v0;
-  unsigned sync : 1;
-  unsigned dir  : 1;
+  uint16_t pulses;       // Pulses remaining
+  uint32_t cumCycles;    // The "t" in our equations
+  float    j_2;          // j/2 (jerk divided by 2.0)
+  float    a0;           // Initial constant acceleration
+  float    v0;           // Initial constant velocity
+  unsigned sync : 1;     // Wait for all steppers to finish before advancing
+  unsigned dir  : 1;     // CCW or CW
 
-  unsigned gpioPin    : 4;
-  unsigned finished   : 1;
+  unsigned finished : 1; // Done with all moves, on next hit pop another motion
+  unsigned gpioPin  : 5; // Allow all GPIOs, we're going to be slow no matter what
 
-  uint8_t  readPtr;
-  uint8_t  writePtr;
-  uint8_t  validEntries;
+  uint8_t  readPtr;      // Read queue index
+  uint8_t  writePtr;     // Push queue spot
+  uint8_t  validEntries; // How many entries present
 } StepperQueue;
 
 static volatile StepperQueue *stepQ = NULL;
@@ -254,9 +249,10 @@ int removeStepper(uint8_t pin) {
 
 // Add a stepper move, return TRUE on success, FALSE on out of space
 // Calling application needs to ensure IRQS are disabled for the call!
-static int PushStepper(int gpioPin, const Motion *nextMove) {
+static int PushStepper(uint8_t gpioPin, const Motion *nextMove) {
   StepperQueue *q = NULL;
   int i;
+  // gpioPin already validated in calling function
   sei();
   // Determine which queue it should be on, or maybe add one if needed
   for (i = 0; i < stepQCnt; i++) {
@@ -314,10 +310,10 @@ static int PushStepper(int gpioPin, const Motion *nextMove) {
 
 // Called by user to add a PWL move to the queue, returns false if there is no space left
 int pushStepperMove(uint8_t pin, int dir, int sync, uint16_t pulses, float j, float a0, float v0) {
-  if (pin > 15) {
-    // Only GPIO 0...15 allowed
+  if (pin > 16) {
     return false;
   }
+
   Motion m;
   m.pulses = pulses;
   m.j_2 = j / 2.0;
@@ -351,15 +347,12 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
   if (!wave) {
     return false;
   }
-  sei();
-  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS);
-  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS);
+  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) - 70;  // Take out some time for IRQ codepath
+  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) - 70;  // Take out some time for IRQ codepath
   wave->timeLeftCycles = MicrosecondsToCycles(runTimeUS);
   if (!wave->enabled) {
     wave->state = 0;
     // Actually set the pin high or low in the IRQ service to guarantee times
-    wave->timeHighCycles = MicrosecondsToCycles(timeHighUS) - 30; // Sub off some of the codepath time
-    wave->timeLowCycles = MicrosecondsToCycles(timeLowUS) - 30; // Sub off some of the codepath time
     wave->nextServiceCycle = GetCycleCount() + MicrosecondsToCycles(1);
     wave->enabled = 1;
     if (!timerRunning) {
@@ -367,7 +360,6 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
     }
     ReloadTimer(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
   }
-  cli();
   return true;
 }
 
@@ -375,7 +367,6 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
 int stopWaveform(uint8_t pin) {
   for (size_t i = 0; i < countof(waveform); i++) {
     if (((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
-      sei();
       waveform[i].enabled = 0;
       int cnt = stepQCnt;
       for (size_t i = 0; i < countof(waveform); i++) {
@@ -384,7 +375,6 @@ int stopWaveform(uint8_t pin) {
       if (!cnt) {
         deinitTimer();
       }
-      cli();
       return true;
     }
   }
@@ -397,8 +387,8 @@ int stopWaveform(uint8_t pin) {
 // Send pulses for specific direction.
 // Stepper direction pin needs to be set before calling (helps ensure setup time)
 static ICACHE_RAM_ATTR void AdvanceSteppers(uint32_t deltaCycles, int dir) {
-  static uint16_t toClear = 0; // Store last call's pins to allow us to meet hold time by clearing on the processing of the other dir
-  uint16_t pulseGPIO = 0;
+  static uint32_t toClear = 0; // Store last call's pins to allow us to meet hold time by clearing on the processing of the other dir
+  uint32_t pulseGPIO = 0;
   for (size_t i = 0; i < stepQCnt; i++) {
     StepperQueue *q = (StepperQueue*)&stepQ[i];
     if (q->dir != dir || q->finished) {
@@ -443,8 +433,14 @@ static ICACHE_RAM_ATTR void AdvanceSteppers(uint32_t deltaCycles, int dir) {
       q->nextEventCycles = newNextEventCycles;
     }
   }
-  ClearGPIO(toClear);
-  SetGPIO(pulseGPIO);
+  ClearGPIO(toClear & 0xffff);
+  if (toClear & 0x80000) {
+    GP16O &= ~1; // RMW is slow, only do if needed
+  }
+  SetGPIO(pulseGPIO & 0xffff);
+  if (pulseGPIO & 0x80000) {
+    GP16O |= 1; // RMW is slow, only do if needed
+  }
   toClear = pulseGPIO;
 }
 
@@ -513,17 +509,15 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
           if (wave->gpio16Mask) {
             GP16O |= wave->gpio16Mask; // GPIO16 write slow as it's RMW
           }
-          wave->nextServiceCycle = now + wave->timeHighCycles;
-          wave->timeHighCycles = wave->nextTimeHighCycles;
-          nextEventCycles = min_u32(nextEventCycles, wave->timeHighCycles);
+          wave->nextServiceCycle = now + wave->nextTimeHighCycles;
+          nextEventCycles = min_u32(nextEventCycles, wave->nextTimeHighCycles);
         } else {
           ClearGPIO(wave->gpioMask);
           if (wave->gpio16Mask) {
             GP16O &= ~wave->gpio16Mask;
           }
-          wave->nextServiceCycle = now + wave->timeLowCycles;
-          wave->timeLowCycles = wave->nextTimeLowCycles;
-          nextEventCycles = min_u32(nextEventCycles, wave->timeLowCycles);
+          wave->nextServiceCycle = now + wave->nextTimeLowCycles;
+          nextEventCycles = min_u32(nextEventCycles, wave->nextTimeLowCycles);
         }
       } else {
         uint32_t deltaCycles = wave->nextServiceCycle - now;
