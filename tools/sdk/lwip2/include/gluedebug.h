@@ -2,6 +2,7 @@
 #ifndef __GLUE_DEBUG_H
 #define __GLUE_DEBUG_H
 
+// this file is commonly included by both sides of the glue
 /////////////////////////////////////////////////////////////////////////////
 // user-definable
 
@@ -26,6 +27,15 @@
 //#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH)
 #define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON)
 #endif
+
+/////////////////////////////////////////////////////////////////////////////
+// user-redefinable, called by esp side of the glue
+#include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C"
+#endif
+void phy_capture (int netif_idx, const char* data, size_t len, int out, int success) __attribute__((weak));
 
 /////////////////////////////////////////////////////////////////////////////
 
