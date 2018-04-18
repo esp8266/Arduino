@@ -9,7 +9,7 @@ PHDRS
   irom0_0_phdr PT_LOAD;
 }
 /*  Default entry point:  */
-ENTRY(call_user_start)
+ENTRY(app_entry)
 EXTERN(_DebugExceptionVector)
 EXTERN(_DoubleExceptionVector)
 EXTERN(_KernelExceptionVector)
@@ -74,6 +74,10 @@ SECTIONS
     . = ALIGN(4);
     _Pri_3_HandlerAddress = ABSOLUTE(.);
     _data_end = ABSOLUTE(.);
+  } >dram0_0_seg :dram0_0_phdr
+  .noinit : ALIGN(4)
+  {
+    *(.noinit)
   } >dram0_0_seg :dram0_0_phdr
   .irom0.text : ALIGN(4)
   {

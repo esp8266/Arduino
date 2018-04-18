@@ -80,7 +80,8 @@ env.Append(
     ],
     LINKFLAGS=[
         "-Wl,-wrap,system_restart_local",
-        "-Wl,-wrap,spi_flash_read"
+        "-Wl,-wrap,spi_flash_read",
+        "-u,app_entry"
     ]
 )
 
