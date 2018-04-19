@@ -52,7 +52,7 @@ assert isdir(FRAMEWORK_DIR)
 
 env.Prepend(
     CPPDEFINES=[
-        ("ARDUINO", 10600),
+        ("ARDUINO", 10805),
         "LWIP_OPEN_SRC"
     ],
     CPPPATH=[
