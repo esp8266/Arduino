@@ -161,6 +161,7 @@ extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFu
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
     GPIEC = (1 << pin); //Clear Interrupt for this pin
     GPC(pin) |= ((mode & 0xF) << GPCI);//INT mode "mode"
+    ETS_GPIO_INTR_ATTACH(interrupt_handler, &interrupt_reg);
     ETS_GPIO_INTR_ENABLE();
   }
 }
@@ -180,7 +181,8 @@ extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
     handler->mode = 0;
     handler->fn = 0;
     handler->arg = 0;
-    ETS_GPIO_INTR_ENABLE();
+    if (interrupt_reg)
+      ETS_GPIO_INTR_ENABLE();
   }
 }
 
@@ -197,9 +199,6 @@ void initPins() {
   for (int i = 12; i <= 16; ++i) {
     pinMode(i, INPUT);
   }
-  
-  ETS_GPIO_INTR_ATTACH(interrupt_handler, &interrupt_reg);
-  ETS_GPIO_INTR_ENABLE();
 }
 
 extern void pinMode(uint8_t pin, uint8_t mode) __attribute__ ((weak, alias("__pinMode")));

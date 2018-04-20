@@ -52,7 +52,7 @@ assert isdir(FRAMEWORK_DIR)
 
 env.Prepend(
     CPPDEFINES=[
-        ("ARDUINO", 10600),
+        ("ARDUINO", 10805),
         "LWIP_OPEN_SRC"
     ],
     CPPPATH=[
@@ -80,7 +80,8 @@ env.Append(
     ],
     LINKFLAGS=[
         "-Wl,-wrap,system_restart_local",
-        "-Wl,-wrap,spi_flash_read"
+        "-Wl,-wrap,spi_flash_read",
+        "-u,app_entry"
     ]
 )
 
