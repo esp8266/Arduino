@@ -61,18 +61,18 @@ class UpdaterClass {
       If all bytes are written
       this call will write the config to eboot
       and return true
-      If there is already an update running but is not finished and !evenIfRemainanig
+      If there is already an update running but is not finished and !evenIfRemaining
       or there is an error
       this will clear everything and return false
       the last error is available through getError()
-      evenIfRemaining is helpfull when you update without knowing the final size first
+      evenIfRemaining is helpful when you update without knowing the final size first
     */
     bool end(bool evenIfRemaining = false);
 
     /*
       Prints the last error to an output stream
     */
-    void printError(Stream &out);
+    void printError(Print &out);
 
     /*
       sets the expected MD5 for the firmware (hexString)
@@ -147,6 +147,8 @@ class UpdaterClass {
 
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
+
+    void _setError(int error);    
 
     bool _async;
     uint8_t _error;

@@ -4,16 +4,11 @@
 #include <stdint.h>
 #include <stdio.h>
 
+
 #ifdef __ets__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include "ets_sys.h"
 #include "osapi.h"
-#ifdef __cplusplus
-}
-#endif
 
 #define PROGMEM     ICACHE_RODATA_ATTR
 #define PGM_P  		const char *
@@ -28,7 +23,13 @@ extern "C" {
 #endif // __ets__
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define _SFR_BYTE(n) (n)
+
+#ifdef __PROG_TYPES_COMPAT__
 
 typedef void prog_void;
 typedef char prog_char;
@@ -39,6 +40,8 @@ typedef int16_t prog_int16_t;
 typedef uint16_t prog_uint16_t;
 typedef int32_t prog_int32_t;
 typedef uint32_t prog_uint32_t;
+
+#endif // defined(__PROG_TYPES_COMPAT__)
 
 #define SIZE_IRRELEVANT 0x7fffffff
 
@@ -113,8 +116,13 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
 }
 
 // Make sure, that libraries checking existence of this macro are not failing
+#ifdef __PROG_TYPES_COMPAT__
+#define pgm_read_byte(addr) pgm_read_byte_inlined((const void*)(addr))
+#define pgm_read_word(addr) pgm_read_word_inlined((const void*)(addr))
+#else
 #define pgm_read_byte(addr) pgm_read_byte_inlined(addr)
 #define pgm_read_word(addr) pgm_read_word_inlined(addr)
+#endif
 
 #else //__ets__
 #define pgm_read_byte(addr)     (*reinterpret_cast<const uint8_t*>(addr))
@@ -135,5 +143,9 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
 #define pgm_read_dword_far(addr) 	pgm_read_dword(addr)
 #define pgm_read_float_far(addr) 	pgm_read_float(addr)
 #define pgm_read_ptr_far(addr)		pgm_read_ptr(addr)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //__PGMSPACE_H_

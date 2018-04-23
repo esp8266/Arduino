@@ -329,7 +329,7 @@ public:
         if (mode == SeekEnd) {
             offset = -offset;
         }
-        auto rc = SPIFFS_lseek(_fs->getFs(), _fd, pos, (int) mode);
+        auto rc = SPIFFS_lseek(_fs->getFs(), _fd, offset, (int) mode);
         if (rc < 0) {
             DEBUGV("SPIFFS_lseek rc=%d\r\n", rc);
             return false;

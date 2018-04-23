@@ -18,7 +18,7 @@ const char* password = "........";
 ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
 
-void setup(void){
+void setup(void) {
 
   Serial.begin(115200);
   Serial.println();
@@ -26,7 +26,7 @@ void setup(void){
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, password);
 
-  while(WiFi.waitForConnectResult() != WL_CONNECTED){
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     WiFi.begin(ssid, password);
     Serial.println("WiFi failed, retrying.");
   }
@@ -40,6 +40,6 @@ void setup(void){
   Serial.printf("HTTPUpdateServer ready! Open http://%s.local%s in your browser and login with username '%s' and password '%s'\n", host, update_path, update_username, update_password);
 }
 
-void loop(void){
+void loop(void) {
   httpServer.handleClient();
 }

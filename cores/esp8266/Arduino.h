@@ -85,9 +85,13 @@ extern "C" {
 #define EXTERNAL 0
 
 //timer dividers
-#define TIM_DIV1 	0 //80MHz (80 ticks/us - 104857.588 us max)
-#define TIM_DIV16	1 //5MHz (5 ticks/us - 1677721.4 us max)
-#define TIM_DIV265	3 //312.5Khz (1 tick = 3.2us - 26843542.4 us max)
+enum TIM_DIV_ENUM {
+  TIM_DIV1 = 0,   //80MHz (80 ticks/us - 104857.588 us max)
+  TIM_DIV16 = 1,  //5MHz (5 ticks/us - 1677721.4 us max)
+  TIM_DIV256 = 3 //312.5Khz (1 tick = 3.2us - 26843542.4 us max)
+};
+
+
 //timer int_types
 #define TIM_EDGE	0
 #define TIM_LEVEL	1
@@ -178,7 +182,7 @@ void ets_intr_unlock();
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
 
-typedef unsigned int word;
+typedef uint16_t word;
 
 #define bit(b) (1UL << (b))
 #define _BV(b) (1UL << (b))
@@ -202,6 +206,7 @@ void analogWriteRange(uint32_t range);
 
 unsigned long millis(void);
 unsigned long micros(void);
+uint64_t micros64(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
@@ -235,8 +240,18 @@ void optimistic_yield(uint32_t interval_us);
 } // extern "C"
 #endif
 
+
+//for compatibility, below 4 lines to be removed in release 3.0.0
+#ifdef __cplusplus
+extern "C"
+#endif
+const int TIM_DIV265 __attribute__((deprecated, weak)) = TIM_DIV256;
+
+
+
 #ifdef __cplusplus
 
+#include <algorithm>
 #include "pgmspace.h"
 
 #include "WCharacter.h"
@@ -247,11 +262,10 @@ void optimistic_yield(uint32_t interval_us);
 #include "Updater.h"
 #include "debug.h"
 
-#ifndef _GLIBCXX_VECTOR
-// arduino is not compatible with std::vector
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)>(b)?(a):(b))
-#endif
+using std::min;
+using std::max;
+using std::isinf;
+using std::isnan;
 
 #define _min(a,b) ((a)<(b)?(a):(b))
 #define _max(a,b) ((a)>(b)?(a):(b))
@@ -282,4 +296,10 @@ extern "C" void configTime(long timezone, int daylightOffset_sec,
 
 #include "pins_arduino.h"
 
+#endif
+
+#ifdef DEBUG_ESP_OOM
+// reinclude *alloc redefinition because of <cstdlib> undefining them
+// this is mandatory for allowing OOM *alloc definitions in .ino files
+#include "umm_malloc/umm_malloc_cfg.h"
 #endif

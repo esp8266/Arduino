@@ -36,12 +36,12 @@ Once we have libraries in place we need to create a ``WiFiUDP`` object. Then we 
     WiFiUDP Udp;
     unsigned int localUdpPort = 4210;
     char incomingPacket[255];
-    char  replyPacekt[] = "Hi there! Got the message :-)";
+    char replyPacket[] = "Hi there! Got the message :-)";
 
 Wi-Fi Connection
 ~~~~~~~~~~~~~~~~
 
-At the beginning of ``setup()`` let's implement typical code to connect to an access point. This has been discussed in `Quick Start <readme.md#quick-start>`__. Please refer to it if required.
+At the beginning of ``setup()`` let's implement typical code to connect to an access point. This has been discussed in `Quick Start <readme.rst#quick-start>`__. Please refer to it if required.
 
 UDP Setup
 ~~~~~~~~~
@@ -85,7 +85,7 @@ For each received packet we are sending back an acknowledge packet:
 .. code:: cpp
 
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.write(replyPacekt);
+    Udp.write(replyPacket);
     Udp.endPacket();
 
 Please note we are sending reply to the IP and port of the sender by using ``Udp.remoteIP()`` and ``Udp.remotePort()``.
@@ -106,7 +106,7 @@ The sketch performing all described functionality is presented below:
     WiFiUDP Udp;
     unsigned int localUdpPort = 4210;  // local port to listen on
     char incomingPacket[255];  // buffer for incoming packets
-    char  replyPacekt[] = "Hi there! Got the message :-)";  // a reply string to send back
+    char  replyPacket[] = "Hi there! Got the message :-)";  // a reply string to send back
 
 
     void setup()
@@ -144,7 +144,7 @@ The sketch performing all described functionality is presented below:
 
         // send back a reply, to the IP address and port we got the packet from
         Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        Udp.write(replyPacekt);
+        Udp.write(replyPacket);
         Udp.endPacket();
       }
     }

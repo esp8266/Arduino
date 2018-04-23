@@ -107,11 +107,20 @@ void EspClass::wdtFeed(void)
 
 extern "C" void esp_yield();
 
-void EspClass::deepSleep(uint32_t time_us, WakeMode mode)
+void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
     esp_yield();
+}
+
+//this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
+//Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t.
+uint64_t EspClass::deepSleepMax()
+{
+  //cali*(2^31-1)/(2^12)
+  return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
+
 }
 
 bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
@@ -396,23 +405,16 @@ struct rst_info * EspClass::getResetInfoPtr(void) {
 }
 
 bool EspClass::eraseConfig(void) {
-    bool ret = true;
-    size_t cfgAddr = (ESP.getFlashChipSize() - 0x4000);
-    size_t cfgSize = (8*1024);
+    const size_t cfgSize = 0x4000;
+    size_t cfgAddr = ESP.getFlashChipSize() - cfgSize;
 
-    noInterrupts();
-    while(cfgSize) {
-
-        if(spi_flash_erase_sector((cfgAddr / SPI_FLASH_SEC_SIZE)) != SPI_FLASH_RESULT_OK) {
-            ret = false;
+    for (size_t offset = 0; offset < cfgSize; offset += SPI_FLASH_SEC_SIZE) {
+        if (!flashEraseSector((cfgAddr + offset) / SPI_FLASH_SEC_SIZE)) {
+            return false;
         }
-
-        cfgSize -= SPI_FLASH_SEC_SIZE;
-        cfgAddr += SPI_FLASH_SEC_SIZE;
     }
-    interrupts();
 
-    return ret;
+    return true;
 }
 
 uint32_t EspClass::getSketchSize() {
