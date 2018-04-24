@@ -174,6 +174,10 @@ extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFu
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = mode;
     handler->fn = userFunc;
+    if (handler->arg)  // Clean when new attach without detach
+	{
+	  cleanupFunctional(handler->arg);
+	}
     handler->arg = arg;
     interrupt_reg |= (1 << pin);
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
