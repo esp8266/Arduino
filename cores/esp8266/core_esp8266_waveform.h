@@ -4,7 +4,7 @@
 
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
-  The code idea is to have a programmable waveform generator with a unique
+  The core idea is to have a programmable waveform generator with a unique
   high and low period (defined in microseconds).  TIMER1 is set to 1-shot
   mode and is always loaded with the time until the next edge of any live
   waveforms or Stepper motors.
@@ -61,17 +61,26 @@
 extern "C" {
 #endif
 
+// Start or change a waveform of the specified high and low times on specific pin.
+// If runtimeUS > 0 then automatically stop it after that many usecs.
+// Returns true or false on success or failure.
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS);
+// Stop a waveform, if any, on the specified pin.
+// Returns true or false on success or failure.
 int stopWaveform(uint8_t pin);
 
-int setStepperDirPin(uint8_t pin);
-int pushStepperMove(uint8_t pin, int dir, int sync, uint16_t pulses, float j, float a0, float v0);
-int removeStepper(uint8_t pin);
+// Add a callback function to be called on *EVERY* timer1 trigger.  The
+// callback returns the number of microseconds until the next desired call.
+// However, since it is called every timer1 interrupt, it may be called
+// again before this period.  It should therefore use the ESP Cycle Counter
+// to determine whether or not to perform an operation.
+// Pass in NULL to disable the callback and, if no other waveforms being
+// generated, stop the timer as well.
+// Make sure the CBN function has the ICACHE_RAM_ATTR decorator.
+void setTimer1Callback(uint32_t (*fn)());
 
 #ifdef __cplusplus
 }
 #endif
 
-
 #endif
-

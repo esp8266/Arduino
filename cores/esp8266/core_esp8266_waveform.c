@@ -4,7 +4,7 @@
 
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
-  The code idea is to have a programmable waveform generator with a unique
+  The core idea is to have a programmable waveform generator with a unique
   high and low period (defined in microseconds).  TIMER1 is set to 1-shot
   mode and is always loaded with the time until the next edge of any live
   waveforms or Stepper motors.
@@ -106,51 +106,8 @@ static Waveform waveform[] = {
   {0, 0, 0, 1, 0, 0, 0, 0}  // GPIO16
 };
 
+static uint32_t (*timer1CB)() = NULL;;
 
-// Maximum umber of moves per stepper queue
-#define STEPPERQUEUESIZE 16
-
-// Stepper generator can send # of steps with given velocity and linear acceleration
-// Can do any piecewise linear acceleration profile
-typedef struct {
-  float    j_2;         // Jerk value/2, pulses/sec/sec/sec
-  float    a0;          // Initial acceleration, pulses/sec/sec
-  float    v0;          // Initial velocity, pulses/sec
-  unsigned pulses : 16; // Total # of pulses to emit
-  unsigned sync : 1;    // Wait for all channels to have a sync before popping next move
-  unsigned dir  : 1;    // CW=0 or CCW=1
-} Motion;
-
-// Minimum clock cycles per step.
-#define MINSTEPCYCLES (4000)
-// Maxmimum clock cycles per step.
-#define MAXSTEPCYCLES (1000000000)
-
-// Pre-allocated circular buffer
-typedef struct {
-  Motion * move;
-  uint32_t nextEventCycles;
-
-  // Copied from head for fast access
-  uint16_t pulses;       // Pulses remaining
-  uint32_t cumCycles;    // The "t" in our equations
-  float    j_2;          // j/2 (jerk divided by 2.0)
-  float    a0;           // Initial constant acceleration
-  float    v0;           // Initial constant velocity
-  unsigned sync : 1;     // Wait for all steppers to finish before advancing
-  unsigned dir  : 1;     // CCW or CW
-
-  unsigned finished : 1; // Done with all moves, on next hit pop another motion
-  unsigned gpioPin  : 5; // Allow all GPIOs, we're going to be slow no matter what
-
-  uint8_t  readPtr;      // Read queue index
-  uint8_t  writePtr;     // Push queue spot
-  uint8_t  validEntries; // How many entries present
-} StepperQueue;
-
-static volatile StepperQueue *stepQ = NULL;
-static volatile uint8_t stepQCnt = 0;
-static uint8_t stepDirPin = 16; // The weird one
 
 // Helper functions
 static inline ICACHE_RAM_ATTR uint32_t MicrosecondsToCycles(uint32_t microseconds) {
@@ -207,130 +164,21 @@ static void deinitTimer() {
   timerRunning = false;
 }
 
-// Called by the IRQ to move the next Motion to the head
-static inline ICACHE_RAM_ATTR void PopStepper(int i) {
-  StepperQueue *q = (StepperQueue *)&stepQ[i];
-  if (q->validEntries == 0) {
-    q->sync = false;
-    q->finished = true;
-    q->nextEventCycles = 0;
-    return;
-  }
-  q->finished = false;
-
-  Motion *head = &q->move[q->readPtr];
-  q->pulses = head->pulses;
-  q->cumCycles = 0;
-  q->j_2 = head->j_2;
-  q->a0 = head->a0;
-  q->v0 = head->v0;
-  q->sync = head->sync;
-  q->dir = head->dir;
-  q->nextEventCycles = 0; // (uint32_t)((clockCyclesPerMicrosecond()*1000000.0) / q->v0);
-  q->readPtr = (q->readPtr + 1) & (STEPPERQUEUESIZE - 1);
-  q->validEntries--;
-}
-
-// Called by the user to detach a stepper and free memory
-int removeStepper(uint8_t pin) {
-  sei();
-  for (int i = 0; i < stepQCnt; i++) {
-    if (stepQ[i].gpioPin == pin) {
-      memmove((void*)&stepQ[i], (void*)&stepQ[i + 1], (stepQCnt - i - 1) * sizeof(stepQ[0]));
-      stepQ = (StepperQueue*)realloc((void*)stepQ, (stepQCnt - 1) * sizeof(stepQ[0]));
-      stepQCnt--;
-      cli();
-      return true;
-    }
-  }
-  cli();
-  return false;
-}
-
-// Add a stepper move, return TRUE on success, FALSE on out of space
-// Calling application needs to ensure IRQS are disabled for the call!
-static int PushStepper(uint8_t gpioPin, const Motion *nextMove) {
-  StepperQueue *q = NULL;
-  int i;
-  // gpioPin already validated in calling function
-  sei();
-  // Determine which queue it should be on, or maybe add one if needed
-  for (i = 0; i < stepQCnt; i++) {
-    if (stepQ[i].gpioPin == gpioPin) {
-      q = (StepperQueue *)&stepQ[i];
-      break;
-    }
-  }
-  if (q == NULL) {
-    // Make the stepper move array
-    Motion *move = (Motion*)malloc(sizeof(stepQ[0].move) * STEPPERQUEUESIZE);
-    if (!move) {
-      cli();
-      return false;
-    }
-
-    // Add a queue
-    StepperQueue *newStepQ = (StepperQueue*)realloc((void*)stepQ, (stepQCnt + 1) * sizeof(stepQ[0]));
-    if (!newStepQ) {
-      cli();
-      free(move);
-      return false;
-    }
-    stepQ = newStepQ;
-    q = (StepperQueue*) & (stepQ[stepQCnt]); // The one just added
-    memset(q, 0, sizeof(*q));
-    q->move = move;
-    q->readPtr = 0;
-    q->writePtr = 0;
-    q->validEntries = 0;
-    q->gpioPin = gpioPin;
-    q->finished = true;
-    i = stepQCnt;
-    stepQCnt++;
-  }
-  // Have queue ready, can we fit this new one in?
-  if (q->validEntries == STEPPERQUEUESIZE) {
-    return false;
-  }
-
-  // Store and record
-  q->move[q->writePtr] = *nextMove; // Copy actual values
-  q->validEntries++;
-  q->writePtr = (q->writePtr + 1) & (STEPPERQUEUESIZE - 1);
-  if (!timerRunning) {
+// Set a callback.  Pass in NULL to stop it
+void setTimer1Callback(uint32_t (*fn)()) {
+  timer1CB = fn;
+  if (!timerRunning && fn) {
     initTimer();
-    ReloadTimer(10); // Cause an interrupt post-haste
+  } else if (timerRunning && !fn) {
+    int cnt = 0;
+    for (size_t i = 0; i < countof(waveform); i++) {
+      cnt += waveform[i].enabled ? 1 : 0;
+    }
+    if (!cnt) {
+      deinitTimer();
+    }
   }
-  if (!q->sync) {
-    PopStepper(i); // If there's only this in the queue and we're not waiting for sync, start it up
-  }
-  cli();
-  return true;
-}
-
-// Called by user to add a PWL move to the queue, returns false if there is no space left
-int pushStepperMove(uint8_t pin, int dir, int sync, uint16_t pulses, float j, float a0, float v0) {
-  if (pin > 16) {
-    return false;
-  }
-
-  Motion m;
-  m.pulses = pulses;
-  m.j_2 = j / 2.0;
-  m.a0 = a0;
-  m.v0 = v0;
-  m.sync = sync ? 1 : 0;
-  m.dir = dir ? 1 : 0;
-  return PushStepper(pin, &m);
-}
-
-// Assign a pin to stepper DIR
-int setStepperDirPin(uint8_t pin) {
-  if (pin > 16) {
-    return false;
-  }
-  stepDirPin = pin;
-  return true;
+  ReloadTimer(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
 }
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
@@ -368,7 +216,7 @@ int stopWaveform(uint8_t pin) {
   for (size_t i = 0; i < countof(waveform); i++) {
     if (((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
       waveform[i].enabled = 0;
-      int cnt = stepQCnt;
+      int cnt = timer1CB?1:0;
       for (size_t i = 0; i < countof(waveform); i++) {
         cnt += waveform[i].enabled ? 1 : 0;
       }
@@ -380,105 +228,6 @@ int stopWaveform(uint8_t pin) {
   }
   cli();
   return false;
-}
-
-
-
-// Send pulses for specific direction.
-// Stepper direction pin needs to be set before calling (helps ensure setup time)
-static ICACHE_RAM_ATTR void AdvanceSteppers(uint32_t deltaCycles, int dir) {
-  static uint32_t toClear = 0; // Store last call's pins to allow us to meet hold time by clearing on the processing of the other dir
-  uint32_t pulseGPIO = 0;
-  for (size_t i = 0; i < stepQCnt; i++) {
-    StepperQueue *q = (StepperQueue*)&stepQ[i];
-    if (q->dir != dir || q->finished) {
-      continue;
-    }
-    q->cumCycles += deltaCycles;
-    uint32_t newNextEventCycles = q->nextEventCycles - deltaCycles;
-    if ((deltaCycles >= q->nextEventCycles) || (newNextEventCycles <= CYCLES_FLUFF)) {
-      // If there are no more pulses in the current motion, try to pop next one here
-      if (!q->pulses) {
-        if (!q->sync) {
-          PopStepper(i);
-          if (!q->pulses) {
-            // We tried to pop, but there's nothing left, done!
-            continue;
-          }
-          // We will generate the first pulse of the next motion later on in this loop
-        } else {
-          // Sync won't allow us to advance here.  The main loop will have to
-          // call this loop *again* after all are processed the first time
-          // if we are sync'd.
-          q->nextEventCycles = 0; // Don't look at this for timing
-          continue;
-        }
-      }
-      pulseGPIO |= 1 << q->gpioPin;
-      q->pulses--;
-
-      // Forgive me for going w/FP.  The dynamic range for fixed math would require many 64 bit multiplies
-      static const float cycPerSec = 1000000.0 * clockCyclesPerMicrosecond();
-      static const float secPerCyc = 1.0 / (1000000.0 * clockCyclesPerMicrosecond());
-      float t = q->cumCycles * secPerCyc;
-      float newVel = ((q->j_2 * t) + q->a0) * t + q->v0;
-      uint32_t newPeriodCycles = (uint32_t)(cycPerSec / newVel);
-      if (newPeriodCycles < MINSTEPCYCLES) {
-        newPeriodCycles = MINSTEPCYCLES;
-      } else if (newPeriodCycles > MAXSTEPCYCLES) {
-        newPeriodCycles = MAXSTEPCYCLES;
-      }
-      q->nextEventCycles = newPeriodCycles;
-    } else {
-      q->nextEventCycles = newNextEventCycles;
-    }
-  }
-  ClearGPIO(toClear & 0xffff);
-  if (toClear & 0x80000) {
-    GP16O &= ~1; // RMW is slow, only do if needed
-  }
-  SetGPIO(pulseGPIO & 0xffff);
-  if (pulseGPIO & 0x80000) {
-    GP16O |= 1; // RMW is slow, only do if needed
-  }
-  toClear = pulseGPIO;
-}
-
-
-static ICACHE_RAM_ATTR uint32_t ProcessSteppers(uint32_t deltaCycles) {
-  ClearGPIOPin(stepDirPin);
-  AdvanceSteppers(deltaCycles, 0);
-  SetGPIOPin(stepDirPin);
-  AdvanceSteppers(deltaCycles, 1);
-
-  // Check for sync, and if all set and 0 steps clear it
-  bool haveSync = true;
-  bool wantSync = false;
-  for (int i = 0; i < stepQCnt; i++) {
-    haveSync &= stepQ[i].sync && stepQ[i].finished;
-    wantSync |= stepQ[i].sync;
-  }
-
-  if (wantSync && haveSync) { // Sync requested, and hit
-    for (int i = 0; i < stepQCnt; i++) {
-      PopStepper(i);
-      stepQ[i].nextEventCycles = 1; // Cause the pulse to fire immediately
-    }
-    // Hokey, but here only now could we know it was time to fire everyone again
-    ClearGPIOPin(stepDirPin);
-    AdvanceSteppers(deltaCycles, 0);
-    SetGPIOPin(stepDirPin);
-    AdvanceSteppers(deltaCycles, 1);
-  }
-  // When's the next event?
-  uint32_t nextEventCycles = MicrosecondsToCycles(MAXIRQUS);
-  for (size_t i = 0; i < stepQCnt; i++) {
-    if (stepQ[i].nextEventCycles) {
-      nextEventCycles = min_u32(nextEventCycles, stepQ[i].nextEventCycles);
-    }
-  }
-
-  return nextEventCycles;
 }
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
@@ -547,8 +296,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     }
   }
 
-  if (stepQCnt) {
-    nextEventCycles = min_u32(nextEventCycles, ProcessSteppers(deltaCycles));
+  if (timer1CB) {
+    nextEventCycles = min_u32(nextEventCycles, timer1CB());
   }
 
   #if F_CPU == 160000000
@@ -568,4 +317,3 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
   ReloadTimer(nextEventCycles);
 }
-
