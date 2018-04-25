@@ -29,13 +29,13 @@
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// user-redefinable, called by esp side of the glue
+// packet capture callback from esp side
 #include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C"
 #endif
-void phy_capture (int netif_idx, const char* data, size_t len, int out, int success) __attribute__((weak));
+void (*phy_capture) (int netif_idx, const char* data, size_t len, int out, int success);
 
 /////////////////////////////////////////////////////////////////////////////
 
