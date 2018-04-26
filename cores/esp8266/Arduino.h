@@ -38,6 +38,7 @@ extern "C" {
 #include "esp8266_peri.h"
 #include "twi.h"
 #include "core_esp8266_features.h"
+#include "core_health.h"
 
 #define HIGH 0x1
 #define LOW  0x0
