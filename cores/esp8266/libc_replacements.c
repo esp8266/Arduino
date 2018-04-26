@@ -122,39 +122,7 @@ void _exit(int status) {
     abort();
 }
 
-#if 0
-
-int ICACHE_RAM_ATTR printf(const char* format, ...) {
-    va_list arglist;
-    va_start(arglist, format);
-    int ret = ets_vprintf(ets_putc, format, arglist);
-    va_end(arglist);
-    return ret;
+int atexit(void (*func)()) {
+    (void) func;
+    return 0;
 }
-
-int ICACHE_RAM_ATTR sprintf(char* buffer, const char* format, ...) {
-    int ret;
-    va_list arglist;
-    va_start(arglist, format);
-    ret = ets_vsprintf(buffer, format, arglist);
-    va_end(arglist);
-    return ret;
-}
-
-int ICACHE_RAM_ATTR snprintf(char* buffer, size_t size, const char* format, ...) {
-    int ret;
-    va_list arglist;
-    va_start(arglist, format);
-    ret = ets_vsnprintf(buffer, size, format, arglist);
-    va_end(arglist);
-    return ret;
-}
-
-int ICACHE_RAM_ATTR vprintf(const char * format, va_list arg) {
-    return ets_vprintf(ets_putc, format, arg);
-}
-
-int ICACHE_RAM_ATTR vsnprintf(char * buffer, size_t size, const char * format, va_list arg) {
-    return ets_vsnprintf(buffer, size, format, arg);
-}
-#endif
