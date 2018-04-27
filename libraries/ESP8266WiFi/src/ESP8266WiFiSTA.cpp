@@ -104,7 +104,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         return WL_CONNECT_FAILED;
     }
 
-    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
         // fail SSID too long or missing!
         return WL_CONNECT_FAILED;
     }
@@ -519,7 +519,10 @@ wl_status_t ESP8266WiFiSTAClass::status() {
 String ESP8266WiFiSTAClass::SSID() const {
     struct station_config conf;
     wifi_station_get_config(&conf);
-    return String(reinterpret_cast<char*>(conf.ssid));
+    char tmp[33]; //SSID is 32 chars plus null term
+    memcpy(tmp, conf.ssid, sizeof(conf.ssid));
+    tmp[32] = 0; //null term in case of 32 byte ssid
+    return String(reinterpret_cast<char*>(tmp));
 }
 
 /**
