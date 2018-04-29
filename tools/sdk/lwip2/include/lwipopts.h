@@ -2688,9 +2688,11 @@
  * Return ERR_OK if packet is accepted, any error code otherwise.
  * Payload points to ethernet header!
  */
-#ifdef __DOXYGEN__
-#define LWIP_HOOK_UNKNOWN_ETH_PROTOCOL(pbuf, netif)
-#endif
+//#ifdef __DOXYGEN__
+//#define LWIP_HOOK_UNKNOWN_ETH_PROTOCOL(pbuf, netif)
+//#endif
+#define LWIP_HOOK_UNKNOWN_ETH_PROTOCOL(pbuf, netif) lwip_unhandled_packet((pbuf), (netif))
+
 /**
  * @}
  */
@@ -3002,5 +3004,13 @@
 #include "arch/cc.h"
 #include "lwip-git-hash.h"
 #include <sys/time.h> // settimeofday() + struct timeval
+
+// allow to handle special packets (user redefinable)
+struct pbuf;
+struct netif;
+#ifndef LWIP_ERR_T
+#define LWIP_ERR_T s8
+#endif
+LWIP_ERR_T lwip_unhandled_packet (struct pbuf* pbuf, struct netif* netif) __attribute__((weak));
 
 #endif // MYLWIPOPTS_H
