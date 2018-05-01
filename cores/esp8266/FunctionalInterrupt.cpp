@@ -1,6 +1,7 @@
 #include <FunctionalInterrupt.h>
 #include <Schedule.h>
 #include "Arduino.h"
+#include <ScheduledFunctions.h>
 
 // Duplicate typedefs from core_esp8266_wiring_digital_c
 typedef void (*voidFuncPtr)(void);
@@ -15,7 +16,7 @@ void interruptFunctional(void* arg)
     ArgStructure* localArg = (ArgStructure*)arg;
 	if (localArg->functionInfo->reqScheduledFunction)
 	{
-      schedule_function(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))));
+      scheduledInterrupts->scheduleFunctionReg(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))), false, true);
 	}
 	if (localArg->functionInfo->reqFunction)
 	{
@@ -52,7 +53,10 @@ void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode
 
 void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode)
 {
-
+	if (!scheduledInterrupts)
+	{
+		scheduledInterrupts = new ScheduledFunctions(32);
+	}
 	InterruptInfo* ii = new InterruptInfo;
 
 	FunctionInfo* fi = new FunctionInfo;

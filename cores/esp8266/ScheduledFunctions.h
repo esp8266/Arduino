@@ -27,6 +27,7 @@ public:
 
 	struct ScheduledElement
 	{
+		ScheduledFunctions* _this;
 		bool continuous;
 		ScheduledRegistration registration;
 		ScheduledFunction function;
@@ -37,7 +38,7 @@ public:
 	bool scheduleFunction(ScheduledFunction sf, bool continuous, bool front);
 	bool scheduleFunction(ScheduledFunction sf);
 	ScheduledRegistration scheduleFunctionReg (ScheduledFunction sf, bool continuous, bool front);
-	void runScheduledFunctions();
+	static void runScheduledFunctions();
 	void removeFunction(ScheduledRegistration sr);
 
 

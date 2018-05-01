@@ -51,7 +51,7 @@ std::list<ScheduledFunctions::ScheduledElement>::iterator ScheduledFunctions::er
 
 bool ScheduledFunctions::scheduleFunction(ScheduledFunction sf, bool continuous, bool front)
 {
-	return (insertElement({continuous,nullptr,sf}, front) == nullptr);
+	return (insertElement({this,continuous,nullptr,sf}, front) == nullptr);
 }
 
 bool ScheduledFunctions::scheduleFunction(ScheduledFunction sf)
@@ -61,7 +61,7 @@ bool ScheduledFunctions::scheduleFunction(ScheduledFunction sf)
 
 ScheduledRegistration ScheduledFunctions::scheduleFunctionReg (ScheduledFunction sf, bool continuous, bool front)
 {
-	return insertElement({continuous,std::make_shared<int>(1),sf},front);
+	return insertElement({this,continuous,std::make_shared<int>(1),sf},front);
 }
 
 void ScheduledFunctions::runScheduledFunctions()
@@ -88,7 +88,7 @@ void ScheduledFunctions::runScheduledFunctions()
 		}
 		if ((!it->continuous) || (erase))
 		{
-			it = eraseElement(it);
+			it = it->_this->eraseElement(it);
 		}
 		else
 		{
