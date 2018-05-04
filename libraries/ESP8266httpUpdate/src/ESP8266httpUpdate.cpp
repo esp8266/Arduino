@@ -30,13 +30,13 @@ extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
+        : _httpClientTimeout(8000)
 {
-    this->_http_client_timeout=8000;
 }
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
+        : _httpClientTimeout(httpClientTimeout)
 {
-    this->_http_client_timeout = httpClientTimeout;
 }
 
 ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void)
@@ -176,7 +176,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
     // use HTTP/1.0 for update since the update handler not support any transfer Encoding
     http.useHTTP10(true);
-    http.setTimeout(this->_http_client_timeout);
+    http.setTimeout(this->_httpClientTimeout);
     http.setUserAgent(F("ESP8266-http-Update"));
     http.addHeader(F("x-ESP8266-STA-MAC"), WiFi.macAddress());
     http.addHeader(F("x-ESP8266-AP-MAC"), WiFi.softAPmacAddress());

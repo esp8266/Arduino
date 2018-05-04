@@ -105,7 +105,7 @@ protected:
     int _lastError;
     bool _rebootOnUpdate = true;
 private:
-    int _http_client_timeout;
+    int _httpClientTimeout;
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_HTTPUPDATE)
