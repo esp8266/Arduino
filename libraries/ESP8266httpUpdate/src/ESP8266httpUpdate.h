@@ -64,6 +64,7 @@ class ESP8266HTTPUpdate
 {
 public:
     ESP8266HTTPUpdate(void);
+    ESP8266HTTPUpdate(int httpClientTimeout);
     ~ESP8266HTTPUpdate(void);
 
     void rebootOnUpdate(bool reboot)
@@ -103,6 +104,8 @@ protected:
 
     int _lastError;
     bool _rebootOnUpdate = true;
+private:
+    int _httpClientTimeout;
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_HTTPUPDATE)
