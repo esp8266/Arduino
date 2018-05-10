@@ -4,6 +4,7 @@
   is passed in both directions, but it is up to the user what the data sent is and how it is dealt with.
  
   Copyright (c) 2015 Julian Fell. All rights reserved.
+  Updated 2018 by Anders Löfgren.
  
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -28,48 +29,69 @@
 class ESP8266WiFiMesh {
 
 private:
-	String _ssid;
-	String _ssid_prefix;
-	uint32_t _chip_id;
+  String _ssid;
+  String _ssid_prefix;
+  uint32_t _chip_id;
+  bool _verbose_mode;
 
-	std::function<String(String)> _handler;
-	
-	WiFiServer  _server;
-	WiFiClient  _client;
+  bool DHCP_activated;
 
-	void connectToNode(String target_ssid, String message);
-	bool exchangeInfo(String message, WiFiClient curr_client);
-	bool waitForClient(WiFiClient curr_client, int max_wait);
+  IPAddress static_IP;
+  IPAddress gateway;
+  IPAddress subnet_mask;
+
+  String last_ssid;
+
+  std::function<String(String)> _requestHandler;
+  std::function<void(String)> _responseHandler;
+  
+  WiFiServer  _server;
+  WiFiClient  _client;
+
+  void fullStop(WiFiClient curr_client);
+  void connectToNode(String target_ssid, String message, int target_channel, uint8_t *target_bssid);
+  bool exchangeInfo(String message, WiFiClient curr_client);
+  bool waitForClient(WiFiClient curr_client, int max_wait);
+  bool attemptDataTransfer(String message);
+  bool attemptDataTransferKernel(String message);
 
 public:
 
-	/**
-	 * WiFiMesh Constructor method. Creates a WiFi Mesh Node, ready to be initialised.
-	 *
-	 * @chip_id A unique identifier number for the node.
-	 * @handler The callback handler for dealing with received messages. Takes a string as an argument which
-	 *          is the string received from another node and returns the string to send back.
-	 * 
-	 */
-	ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> handler);
+  /**
+   * WiFiMesh Constructor method. Creates a WiFi Mesh Node, ready to be initialised.
+   *
+   * @chip_id A unique identifier number for the node.
+   * @requestHandler The callback handler for dealing with received requests. Takes a string as an argument which
+   *          is the request string received from another node and returns the string to send back.
+   * @responseHandler The callback handler for dealing with received responses. Takes a string as an argument which
+   *          is the response string received from another node.
+   * @verbose_mode Determines if we should print the events occurring in the library to Serial. Off by default.
+   * 
+   */
+  ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> requestHandler, std::function<void(String)> responseHandler, bool verbose_mode = false);
 
-	/**
-	 * Initialises the node.
-	 */
-	void begin();
+  /**
+   * Initialises the node.
+   */
+  void begin();
 
-	/**
-	 * Scan for other nodes, and exchange the chosen message with any that are found.
-	 *
-	 * @message The message to send to all other nodes.
-	 * 
-	 */
-	void attemptScan(String message);
+  /**
+   * If AP connection exists, send message to AP.
+   * Otherwise, scan for other nodes and exchange the chosen message with any that are found.
+   *
+   * @message The message to send to other nodes.
+   * 
+   */
+  void attemptTransmission(String message);
 
-	/**
-	 * If any clients are connected, accept their requests and call the hander function for each one.
-	 */
-	void acceptRequest();
+  /**
+   * If any clients are connected, accept their requests and call the requestHandler function for each one.
+   */
+  void acceptRequest();
+
+  // IP needs to be at the same subnet as server gateway
+  void setStaticIP(IPAddress new_ip);
+  IPAddress getStaticIP();
 };
 
 #endif

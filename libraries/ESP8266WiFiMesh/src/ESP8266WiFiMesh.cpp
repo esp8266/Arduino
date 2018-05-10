@@ -4,6 +4,7 @@
   is passed in both directions, but it is up to the user what the data sent is and how it is dealt with.
  
   Copyright (c) 2015 Julian Fell. All rights reserved.
+  Updated 2018 by Anders Löfgren.
  
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -25,24 +26,55 @@
 
 #include "ESP8266WiFiMesh.h"
 
-#define SSID_PREFIX      		"Mesh_Node"
-#define SERVER_IP_ADDR			"192.168.4.1"
-#define SERVER_PORT				4011
+#define SSID_PREFIX          "Mesh_Node"
+#define SERVER_IP_ADDR      "192.168.4.1"
+#define SERVER_PORT        4011
 
-ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> handler)
-: _server(SERVER_PORT)
+const char mesh_password[] = "TODOChangeToSomethingBetter";
+
+ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> requestHandler, std::function<void(String)> responseHandler, bool verbose_mode)
+: _server(SERVER_PORT), DHCP_activated(false), last_ssid(""), static_IP(192,168,4,22), gateway(192,168,4,1), subnet_mask(255,255,255,0) // IP needs to be at the same subnet as server gateway (192.168.4 in this case). Station gateway ip must match ip for server.
 {
-	_chip_id = chip_id;
-	_ssid = String( String( SSID_PREFIX ) + String( _chip_id ) );
-	_ssid_prefix = String( SSID_PREFIX );
-	_handler = handler;
+  _chip_id = chip_id;
+  _ssid = String( String( SSID_PREFIX ) + String( _chip_id ) );
+  _ssid_prefix = String( SSID_PREFIX );
+  _requestHandler = requestHandler;
+  _responseHandler = responseHandler;
+  _verbose_mode = verbose_mode;
+}
+
+void ESP8266WiFiMesh::setStaticIP(IPAddress new_ip)
+{
+  static_IP = new_ip;
+}
+
+IPAddress ESP8266WiFiMesh::getStaticIP()
+{
+  return static_IP;
 }
 
 void ESP8266WiFiMesh::begin()
 {
-	WiFi.mode(WIFI_AP_STA);
-	WiFi.softAP( _ssid.c_str() );
-  	_server.begin();
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP( _ssid.c_str(), mesh_password ); // Note that a maximum of 5 stations can be connected at a time to each AP
+  _server.begin();
+  
+  // Comment out the line below to remove static IP and use DHCP instead. 
+  // DHCP makes WiFi connection happen slower, but there is no need to care about manually giving different IPs to the nodes and less need to worry about used IPs giving "Server unavailable" issues. 
+  // Static IP is faster and will make sending of data to a node that is already transmitting data happen more reliably. 
+  // Note that after WiFi.config(static_IP, gateway, subnet_mask) is used, static IP will always be active, even for new connections, unless WiFi.config(0u,0u,0u); is called.
+  WiFi.config(static_IP, gateway, subnet_mask); 
+}
+
+/**
+ * Disconnect completely from a network.
+ */
+void ESP8266WiFiMesh::fullStop(WiFiClient curr_client)
+{
+  curr_client.stop();
+  yield();
+  WiFi.disconnect();
+  yield();
 }
 
 /**
@@ -53,20 +85,24 @@ void ESP8266WiFiMesh::begin()
  */
 bool ESP8266WiFiMesh::waitForClient(WiFiClient curr_client, int max_wait)
 {
-	int wait = max_wait;
-	while(curr_client.connected() && !curr_client.available() && wait--)
-		delay(3);
+  int wait = max_wait;
+  while(curr_client.connected() && !curr_client.available() && wait--)
+    delay(3);
 
-	/* Return false if the client isn't ready to communicate */
-	if (WiFi.status() == WL_DISCONNECTED || !curr_client.connected())
-		return false;
-	
-	return true;
+  /* Return false if the client isn't ready to communicate */
+  if (WiFi.status() == WL_DISCONNECTED || !curr_client.connected())
+  {
+    if(_verbose_mode)
+      Serial.println("Disconnected!"); 
+    return false;
+  }
+  
+  return true;
 }
 
 /**
  * Send the supplied message then read back the other node's response
- * and pass that to the user-supplied handler.
+ * and pass that to the user-supplied responseHandler.
  *
  * @target_ssid The name of the AP the other node has set up.
  * @message The string to send to the node.
@@ -75,94 +111,203 @@ bool ESP8266WiFiMesh::waitForClient(WiFiClient curr_client, int max_wait)
  */
 bool ESP8266WiFiMesh::exchangeInfo(String message, WiFiClient curr_client)
 {
-	curr_client.println( message.c_str() );
+  if(_verbose_mode)
+    Serial.println("Transmitting");
+    
+  curr_client.print(message + "\r");
+  yield();
 
-	if (!waitForClient(curr_client, 1000))
-		return false;
+  if (!waitForClient(curr_client, 1000))
+  {
+    fullStop(curr_client);
+    return false;
+  }
 
-	String response = curr_client.readStringUntil('\r');
-	curr_client.readStringUntil('\n');
+  String response = curr_client.readStringUntil('\r');
+  yield();
+  curr_client.flush();
 
-	if (response.length() <= 2) 
-		return false;
+  if (response.length() <= 2) 
+  {
+    if(_verbose_mode)
+      Serial.println("Small response!");
+    return false;
+  }
 
-	/* Pass data to user callback */
-	_handler(response);
-	return true;
+  /* Pass data to user callback */
+  _responseHandler(response);
+  return true;
 }
 
 /**
- * Connect to the AP at ssid, send them a message then disconnect.
+ * Handle data transfer process with a connected AP.
+ *
+ * @message The string to send to the AP.
+ * @returns: True if data transfer process successful, false otherwise.
+ */
+bool ESP8266WiFiMesh::attemptDataTransfer(String message)
+{
+  // Unlike WiFi.mode(WIFI_AP);, WiFi.mode(WIFI_AP_STA); allows us to stay connected to the AP we connected to in STA mode, at the same time as we can receive connections from other stations. 
+  // We cannot send data to the AP in STA_AP mode though, that requires STA mode. 
+  // Switching to STA mode will disconnect all stations connected to the node AP (though they can request a reconnect even while we are in STA mode).
+  WiFi.mode(WIFI_STA);
+  delay(100);
+  bool result = attemptDataTransferKernel(message);
+  WiFi.mode(WIFI_AP_STA); 
+  delay(100);
+  
+  return result;
+}
+
+/**
+ * Helper function that contains the core functionality for the data transfer process with a connected AP.
+ *
+ * @message The string to send to the AP.
+ * @returns: True if data transfer process successful, false otherwise.
+ */
+bool ESP8266WiFiMesh::attemptDataTransferKernel(String message)
+{
+  WiFiClient curr_client;
+  
+  /* Connect to the node's server */
+  if (!curr_client.connect(SERVER_IP_ADDR, SERVER_PORT)) 
+  {
+    fullStop(curr_client);
+    if(_verbose_mode)
+      Serial.println("Server unavailable");
+    return false;
+  }  
+  
+  if (!exchangeInfo(message, curr_client))
+  {
+    if(_verbose_mode)
+      Serial.println("Transmission failed during exchangeInfo.");
+    return false;
+  }
+  
+  curr_client.stop();
+  yield();
+
+  return true;
+}
+
+/**
+ * Connect to the AP at ssid and send them a message.
  *
  * @target_ssid The name of the AP the other node has set up.
  * @message The string to send to the node.
+ * @target_channel The WiFI channel of the AP the other node has set up.
+ * @target_bssid The mac address of the AP the other node has set up.
  * 
  */
-void ESP8266WiFiMesh::connectToNode(String target_ssid, String message)
+void ESP8266WiFiMesh::connectToNode(String target_ssid, String message, int target_channel, uint8_t *target_bssid)
 {
-	WiFiClient curr_client;
-	WiFi.begin( target_ssid.c_str() );
+  if(!DHCP_activated && last_ssid != "" && last_ssid != target_ssid)
+  {
+    WiFi.config(0u,0u,0u); // Deactivate static IP so that we can connect to other servers via DHCP (DHCP is slower but required for connecting to more than one server, it seems (possible bug?)).
+    yield();
+    DHCP_activated = true; // So we only do this once, in case there is a performance impact.
+    if(_verbose_mode)
+      Serial.println("\nConnecting to a second network. Static IP deactivated.");
+  }
+  last_ssid = target_ssid;
 
-	int wait = 1500;
-	while((WiFi.status() == WL_DISCONNECTED) && wait--)
-		delay(3);
+  if(_verbose_mode)
+    Serial.print("Connecting... ");
+  WiFi.begin( target_ssid.c_str(), mesh_password, target_channel, target_bssid ); // Without giving channel and bssid, connection time is longer.
 
-	/* If the connection timed out */
-	if (WiFi.status() != 3)
-		return;
+  int connection_start_time = millis();
+  int attempt_number = 1;
 
-	/* Connect to the node's server */
-	if (!curr_client.connect(SERVER_IP_ADDR, SERVER_PORT)) 
-		return;
+  int waiting_time = millis() - connection_start_time;
+  while((WiFi.status() == WL_DISCONNECTED) && waiting_time <= 10000)
+  {
+    if(waiting_time > attempt_number * 10000) // 10000 can be lowered if you want to limit the time allowed for each connection attempt.
+    {
+      if(_verbose_mode)
+        Serial.print("... ");
+      WiFi.disconnect();
+      yield();
+      WiFi.begin( target_ssid.c_str(), mesh_password, target_channel, target_bssid ); // Without giving channel and bssid, connection time is longer.
+      attempt_number++;
+    }
+    delay(1);
+    waiting_time = millis() - connection_start_time;
+  }
 
-	if (!exchangeInfo(message, curr_client))
-		return;
+  if(_verbose_mode)
+    Serial.println(waiting_time);
+  
+  /* If the connection timed out */
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    if(_verbose_mode)
+      Serial.println("Timeout");
+    return;
+  }
 
-	curr_client.stop();
-	WiFi.disconnect();
+  attemptDataTransfer(message);
 }
 
-void ESP8266WiFiMesh::attemptScan(String message)
+void ESP8266WiFiMesh::attemptTransmission(String message)
 {
-	/* Scan for APs */
-	int n = WiFi.scanNetworks();
+  if(WiFi.status() == WL_CONNECTED)
+  {
+    attemptDataTransfer(message);
+  }
+  else
+  {
+    if(_verbose_mode)
+      Serial.print("Scanning... ");
+    
+    /* Scan for APs */
+    int n = WiFi.scanNetworks(); // Scanning causes the WiFi radio to cycle through all WiFi channels which means existing WiFi connections are likely to break or work poorly if done frequently.
+  
+    for (int i = 0; i < n; ++i) 
+    {
+      String current_ssid = WiFi.SSID(i);
+      int index = current_ssid.indexOf( _ssid_prefix );
+      uint32_t target_chip_id = (current_ssid.substring(index + _ssid_prefix.length())).toInt();
+  
+      /* Connect to any _suitable_ APs which contain _ssid_prefix */
+      if (index >= 0 && (target_chip_id < _chip_id)) 
+      {
+        if(_verbose_mode)
+          Serial.printf("First match: %s, Ch:%d (%ddBm) %s... ", WiFi.SSID(i).c_str(), WiFi.channel(i), WiFi.RSSI(i), WiFi.encryptionType(i) == ENC_TYPE_NONE ? "open" : "");
 
-	for (int i = 0; i < n; ++i) {
-		String current_ssid = WiFi.SSID(i);
-		int index = current_ssid.indexOf( _ssid_prefix );
-		uint32_t target_chip_id = (current_ssid.substring(index + _ssid_prefix.length())).toInt();
-
-		/* Connect to any _suitable_ APs which contain _ssid_prefix */
-		if (index >= 0 && (target_chip_id < _chip_id)) {
-
-			WiFi.mode(WIFI_STA);
-			delay(100);
-			connectToNode(current_ssid, message);
-			WiFi.mode(WIFI_AP_STA);
-			delay(100);
-		}
-	}
+        connectToNode(current_ssid, message, WiFi.channel(i), WiFi.BSSID(i));
+       
+        break;
+      }
+    }
+  }
 }
 
 void ESP8266WiFiMesh::acceptRequest()
 {
-	while (true) {
-		_client = _server.available();
-		if (!_client)
-			break;
+  while (true) {
+    _client = _server.available();
+    if (!_client)
+      break;
 
-		if (!waitForClient(_client, 1500)) {
-			continue;
-		}
+    if (!waitForClient(_client, 1500)) {
+      continue;
+    }
 
-		/* Read in request and pass it to the supplied handler */
-		String request = _client.readStringUntil('\r');
-		_client.readStringUntil('\n');
+    /* Read in request and pass it to the supplied requestHandler */
+    String request = _client.readStringUntil('\r');
+    yield();
+    _client.flush();
 
-		String response = _handler(request);
+    String response = _requestHandler(request);
 
-		/* Send the response back to the client */
-		if (_client.connected())
-			_client.println(response);
-	}
+    /* Send the response back to the client */
+    if (_client.connected())
+    {
+      if(_verbose_mode)
+        Serial.println("Responding");
+      _client.print(response + "\r");
+      yield();
+    }
+  }
 }

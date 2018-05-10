@@ -19,5 +19,7 @@ ESP8266WiFiMesh	KEYWORD1
 #######################################
 
 begin	KEYWORD2
-attemptScan	KEYWORD2
+attemptTransmission	KEYWORD2
 acceptRequest	KEYWORD2
+setStaticIP	KEYWORD2
+getStaticIP	KEYWORD2
