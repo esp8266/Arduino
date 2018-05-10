@@ -34,19 +34,18 @@ private:
   uint32_t _chip_id;
   bool _verbose_mode;
 
+  WiFiServer  _server;
+  WiFiClient  _client;
+
   bool DHCP_activated;
+  String last_ssid;
 
   IPAddress static_IP;
   IPAddress gateway;
   IPAddress subnet_mask;
 
-  String last_ssid;
-
   std::function<String(String)> _requestHandler;
   std::function<void(String)> _responseHandler;
-  
-  WiFiServer  _server;
-  WiFiClient  _client;
 
   void fullStop(WiFiClient curr_client);
   void connectToNode(String target_ssid, String message, int target_channel, uint8_t *target_bssid);
