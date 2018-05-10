@@ -15,7 +15,7 @@ ESP8266WiFiMesh mesh_node = ESP8266WiFiMesh(ESP.getChipId(), manageRequest, mana
 
    @request The request string received from another node in the mesh
    @returns The string to send back to the other node
- */
+*/
 String manageRequest(String request) {
   /* Print out received message */
   Serial.print("Request received: ");
@@ -31,7 +31,7 @@ String manageRequest(String request) {
    Callback for when you get a response from other nodes
 
    @response The response string received from another node in the mesh
- */
+*/
 void manageResponse(String response) {
   /* Print out received message */
   Serial.print("Response received: ");
@@ -41,7 +41,7 @@ void manageResponse(String response) {
 }
 
 void setup() {
-  // Prevents the flash memory from being worn out, see: https://github.com/esp8266/Arduino/issues/1054 . 
+  // Prevents the flash memory from being worn out, see: https://github.com/esp8266/Arduino/issues/1054 .
   // This will however delay node WiFi start-up by about 700 ms. The delay is 900 ms if we otherwise would have stored the WiFi network we want to connect to.
   WiFi.persistent(false);
 
@@ -57,7 +57,7 @@ void setup() {
                  "Please use the setStaticIP method to ensure that nodes connecting to the same AP have distinct static IP:s.\n"
                  "Also, remember to change the default mesh network password!\n\n");
 
-  Serial.println("Please use lwIP v1.4 with this library for now (can be changed in the Tools menu of Arduino IDE).\n" 
+  Serial.println("Please use lwIP v1.4 with this library for now (can be changed in the Tools menu of Arduino IDE).\n"
                  "Nodes seem to be unable to connect to more than one other node when using lwIP 2.0!\n\n");
 
   Serial.println("Setting up mesh node...");
@@ -71,7 +71,7 @@ int32_t time_of_last_scan = -10000;
 void loop() {
   if (millis() - time_of_last_scan > 3000 // Give other nodes some time to connect between data transfers.
       || (WiFi.status() != WL_CONNECTED && millis() - time_of_last_scan > 1000)) { // Scan for networks once per second when not already connected.
-    /* 
+    /*
       attemptTransmission(request) will either scan for other nodes and send the request to the first node it connects to
       or if connection to an AP already exists just send the request to that AP.
     */
