@@ -32,12 +32,12 @@ private:
   String _ssid;
   String _ssid_prefix;
   uint32_t _chip_id;
+  String _mesh_password;
   bool _verbose_mode;
 
   WiFiServer  _server;
   WiFiClient  _client;
 
-  bool DHCP_activated;
   String last_ssid;
 
   IPAddress static_IP;
@@ -64,10 +64,11 @@ public:
    *          is the request string received from another node and returns the string to send back.
    * @responseHandler The callback handler for dealing with received responses. Takes a string as an argument which
    *          is the response string received from another node.
+   * @mesh_password The WiFi password for the mesh network.
    * @verbose_mode Determines if we should print the events occurring in the library to Serial. Off by default.
    * 
    */
-  ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> requestHandler, std::function<void(String)> responseHandler, bool verbose_mode = false);
+  ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> requestHandler, std::function<void(String)> responseHandler, String mesh_password, bool verbose_mode = false);
 
   /**
    * Initialises the node.
@@ -88,8 +89,12 @@ public:
    */
   void acceptRequest();
 
-  // IP needs to be at the same subnet as server gateway
-  void setStaticIP(IPAddress new_ip);
+  /**
+   * Set a static IP address for the node and activate use of static IP.
+   * The static IP needs to be at the same subnet as the server's gateway.
+   */
+  void setStaticIP(IPAddress new_IP);
+  
   IPAddress getStaticIP();
 };
 

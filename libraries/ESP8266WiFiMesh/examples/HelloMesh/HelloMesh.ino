@@ -8,7 +8,7 @@ String manageRequest(String request);
 void manageResponse(String response);
 
 /* Create the mesh node object */
-ESP8266WiFiMesh mesh_node = ESP8266WiFiMesh(ESP.getChipId(), manageRequest, manageResponse, true);
+ESP8266WiFiMesh mesh_node = ESP8266WiFiMesh(ESP.getChipId(), manageRequest, manageResponse, "ChangeThisWiFiPassword_TODO", true);
 
 /**
    Callback for when other nodes send you a request
@@ -63,14 +63,14 @@ void setup() {
   Serial.println("Setting up mesh node...");
 
   /* Initialise the mesh node */
-  mesh_node.setStaticIP(IPAddress(192, 168, 4, 22));
   mesh_node.begin();
+  mesh_node.setStaticIP(IPAddress(192, 168, 4, 22)); // Activate static IP mode for faster initial connection.
 }
 
 int32_t time_of_last_scan = -10000;
 void loop() {
   if (millis() - time_of_last_scan > 3000 // Give other nodes some time to connect between data transfers.
-      || (WiFi.status() != WL_CONNECTED && millis() - time_of_last_scan > 1000)) { // Scan for networks once per second when not already connected.
+      || (WiFi.status() != WL_CONNECTED && millis() - time_of_last_scan > 2000)) { // Scan for networks with two second intervals when not already connected.
     /*
       attemptTransmission(request) will either scan for other nodes and send the request to the first node it connects to
       or if connection to an AP already exists just send the request to that AP.

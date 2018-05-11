@@ -12,9 +12,9 @@ See the included example. The main functions to modify are manageRequest and man
 
 If using Arduino core for ESP8266 version 2.4.1, opt for lwIP v1.4 for now (can be changed in the Tools menu of Arduino IDE). Nodes seem to be unable to connect to more than one other node when using lwIP 2.0!
 
-Note that this library uses static IP:s for the nodes to speed up initial connection. Please use the setStaticIP method to ensure that nodes connecting to the same AP have distinct static IP:s. Node IP:s need to be at the same subnet as the server gateway (192.168.4 for this library by default). Station gateway IP must match the IP for the server on the nodes.
+Note that this library can use static IP:s for the nodes to speed up initial connection. To enable this, use the setStaticIP method after calling the begin method, as in the included example. Ensure that nodes connecting to the same AP have distinct static IP:s. Node IP:s need to be at the same subnet as the server gateway (192.168.4 for this library by default). It may also be worth noting that station gateway IP must match the IP for the server on the nodes, though this is the default setting for the library.
 
-Also, remember to change the default mesh network password!
+Also, remember to change the default mesh network WiFi password!
 
 Some things to keep in mind
 ---------------------------

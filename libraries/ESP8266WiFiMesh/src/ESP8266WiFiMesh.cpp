@@ -30,22 +30,29 @@
 #define SERVER_IP_ADDR      "192.168.4.1"
 #define SERVER_PORT        4011
 
-const char mesh_password[] = "TODOChangeToSomethingBetter";
+const IPAddress empty_IP = IPAddress();
 
-ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> requestHandler, std::function<void(String)> responseHandler, bool verbose_mode)
-: _server(SERVER_PORT), DHCP_activated(false), last_ssid(""), static_IP(192,168,4,22), gateway(192,168,4,1), subnet_mask(255,255,255,0) // IP needs to be at the same subnet as server gateway (192.168.4 in this case). Station gateway ip must match ip for server.
+ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> requestHandler, std::function<void(String)> responseHandler, String mesh_password, bool verbose_mode)
+: _server(SERVER_PORT), last_ssid(""), static_IP(empty_IP), gateway(192,168,4,1), subnet_mask(255,255,255,0) // IP needs to be at the same subnet as server gateway (192.168.4 in this case). Station gateway ip must match ip for server.
 {
   _chip_id = chip_id;
   _ssid = String( String( SSID_PREFIX ) + String( _chip_id ) );
   _ssid_prefix = String( SSID_PREFIX );
   _requestHandler = requestHandler;
   _responseHandler = responseHandler;
+  _mesh_password = mesh_password;
   _verbose_mode = verbose_mode;
 }
 
-void ESP8266WiFiMesh::setStaticIP(IPAddress new_ip)
+void ESP8266WiFiMesh::setStaticIP(IPAddress new_IP)
 {
-  static_IP = new_ip;
+  // Comment out the line below to remove static IP and use DHCP instead. 
+  // DHCP makes WiFi connection happen slower, but there is no need to care about manually giving different IPs to the nodes and less need to worry about used IPs giving "Server unavailable" issues. 
+  // Static IP is faster and will make sending of data to a node that is already transmitting data happen more reliably. 
+  // Note that after WiFi.config(static_IP, gateway, subnet_mask) is used, static IP will always be active, even for new connections, unless WiFi.config(0u,0u,0u); is called.
+  WiFi.config(new_IP, gateway, subnet_mask); 
+  
+  static_IP = new_IP;
 }
 
 IPAddress ESP8266WiFiMesh::getStaticIP()
@@ -56,14 +63,8 @@ IPAddress ESP8266WiFiMesh::getStaticIP()
 void ESP8266WiFiMesh::begin()
 {
   WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP( _ssid.c_str(), mesh_password ); // Note that a maximum of 5 stations can be connected at a time to each AP
+  WiFi.softAP( _ssid.c_str(), _mesh_password.c_str() ); // Note that a maximum of 5 stations can be connected at a time to each AP
   _server.begin();
-  
-  // Comment out the line below to remove static IP and use DHCP instead. 
-  // DHCP makes WiFi connection happen slower, but there is no need to care about manually giving different IPs to the nodes and less need to worry about used IPs giving "Server unavailable" issues. 
-  // Static IP is faster and will make sending of data to a node that is already transmitting data happen more reliably. 
-  // Note that after WiFi.config(static_IP, gateway, subnet_mask) is used, static IP will always be active, even for new connections, unless WiFi.config(0u,0u,0u); is called.
-  WiFi.config(static_IP, gateway, subnet_mask); 
 }
 
 /**
@@ -202,19 +203,19 @@ bool ESP8266WiFiMesh::attemptDataTransferKernel(String message)
  */
 void ESP8266WiFiMesh::connectToNode(String target_ssid, String message, int target_channel, uint8_t *target_bssid)
 {
-  if(!DHCP_activated && last_ssid != "" && last_ssid != target_ssid)
+  if(static_IP != empty_IP && last_ssid != "" && last_ssid != target_ssid)
   {
     WiFi.config(0u,0u,0u); // Deactivate static IP so that we can connect to other servers via DHCP (DHCP is slower but required for connecting to more than one server, it seems (possible bug?)).
     yield();
-    DHCP_activated = true; // So we only do this once, in case there is a performance impact.
+    static_IP = empty_IP; // So we only do this once, in case there is a performance impact.
     if(_verbose_mode)
-      Serial.println("\nConnecting to a second network. Static IP deactivated.");
+      Serial.println("\nConnecting to a second network. Static IP deactivated to make this possible.");
   }
   last_ssid = target_ssid;
 
   if(_verbose_mode)
     Serial.print("Connecting... ");
-  WiFi.begin( target_ssid.c_str(), mesh_password, target_channel, target_bssid ); // Without giving channel and bssid, connection time is longer.
+  WiFi.begin( target_ssid.c_str(), _mesh_password.c_str(), target_channel, target_bssid ); // Without giving channel and bssid, connection time is longer.
 
   int connection_start_time = millis();
   int attempt_number = 1;
@@ -228,7 +229,7 @@ void ESP8266WiFiMesh::connectToNode(String target_ssid, String message, int targ
         Serial.print("... ");
       WiFi.disconnect();
       yield();
-      WiFi.begin( target_ssid.c_str(), mesh_password, target_channel, target_bssid ); // Without giving channel and bssid, connection time is longer.
+      WiFi.begin( target_ssid.c_str(), _mesh_password.c_str(), target_channel, target_bssid ); // Without giving channel and bssid, connection time is longer.
       attempt_number++;
     }
     delay(1);
