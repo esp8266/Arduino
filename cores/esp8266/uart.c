@@ -240,16 +240,69 @@ uart_resize_rx_buffer(uart_t* uart, size_t new_size)
     return uart->rx_buffer->size;
 }
 
+static ets_isr_t s_isr_ptr[2];
+static void * s_isr_arg[2];
 
+static void ICACHE_RAM_ATTR
+uart_isr_dispatcher(void *)
+{
+    for (int nr = 0; nr < 2; ++nr)
+    {
+        if (USIS(nr))
+        {
+            if (s_isr_ptr[nr])
+            {
+                s_isr_ptr[nr](s_isr_arg[nr]);
+            }
+            else
+            {
+                USIE(nr) = 0;
+                USIC(nr) = USIS(nr);
+            }
+        }
+    }
+}
+
+void
+uart_isr_attach(uart_t* uart, void (*isr)(void*), void *arg)
+{
+    int nr = uart->uart_nr;
+    ETS_UART_INTR_DISABLE();
+    if (s_isr_ptr[0] == NULL && s_isr_ptr[1] == NULL)
+    {
+        ETS_UART_INTR_ATTACH(uart_isr_dispatcher, NULL);
+    }
+    s_isr_ptr[nr] = isr;
+    s_isr_arg[nr] = arg;
+    ETS_UART_INTR_ENABLE();
+}
+
+void
+uart_isr_detach(uart_t* uart)
+{
+    int nr = uart->uart_nr;
+    ETS_UART_INTR_DISABLE();
+    s_isr_ptr[nr] = NULL;
+    s_isr_arg[nr] = NULL;
+    USIE(nr) = 0;
+    USIC(nr) = USIS(nr);
+    if (s_isr_ptr[0] == NULL &&  s_isr_ptr[1] == NULL)
+    {
+        ETS_UART_INTR_ATTACH(NULL, NULL);
+    }
+    else
+    {
+        ETS_UART_INTR_ENABLE();
+    }
+}
 
 void ICACHE_RAM_ATTR 
 uart_isr(void * arg)
 {
     uart_t* uart = (uart_t*)arg;
-    if(uart == NULL || !uart->rx_enabled) 
+    if(!uart->rx_enabled)
     {
-        USIC(uart->uart_nr) = USIS(uart->uart_nr);
-        ETS_UART_INTR_DISABLE();
+        uart_isr_detach(uart);
         return;
     }
     if(USIS(uart->uart_nr) & ((1 << UIFF) | (1 << UITO)))
@@ -271,21 +324,15 @@ uart_start_isr(uart_t* uart)
     USC1(uart->uart_nr) = (100   << UCFFT) | (0x02 << UCTOT) | (1 <<UCTOE );
     USIC(uart->uart_nr) = 0xffff;
     USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIFR) | (1 << UITO);
-    ETS_UART_INTR_ATTACH(uart_isr,  (void *)uart);
-    ETS_UART_INTR_ENABLE();
+    uart_isr_attach(uart, uart_isr, uart);
 }
 
 static void 
 uart_stop_isr(uart_t* uart)
 {
-    if(uart == NULL || !uart->rx_enabled)
-        return;
-
-    ETS_UART_INTR_DISABLE();
-    USC1(uart->uart_nr) = 0;
-    USIC(uart->uart_nr) = 0xffff;
-    USIE(uart->uart_nr) = 0;
-    ETS_UART_INTR_ATTACH(NULL, NULL);
+    uart_isr_detach(uart);
+    if(uart->rx_enabled)
+        USC1(uart->uart_nr) = 0;
 }
 
 
@@ -527,7 +574,6 @@ uart_uninit(uart_t* uart)
 
     if(uart->rx_enabled)
     {
-        uart_stop_isr(uart);
         free(uart->rx_buffer->buffer);
         free(uart->rx_buffer);
     }
