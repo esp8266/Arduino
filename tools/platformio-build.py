@@ -78,29 +78,29 @@ env.Append(
 
     LIBS=[
         "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
-        "wps", "axtls", "espnow", "smartconfig", "airkiss", "wpa2",
+        "wps", "bearssl", "axtls", "espnow", "smartconfig", "airkiss", "wpa2",
         "stdc++", "m", "c", "gcc"
     ],
 
     LIBSOURCE_DIRS=[
         join(FRAMEWORK_DIR, "libraries")
+    ],
+
+    LINKFLAGS=[
+        "-Wl,-wrap,system_restart_local",
+        "-Wl,-wrap,spi_flash_read",
+        "-u", "app_entry"
     ]
 )
 
-env.Replace(
-    LINKFLAGS=[
-        "-Os",
-        "-nostdlib",
-        "-Wl,--no-check-sections",
-        "-Wl,-static",
-        "-Wl,--gc-sections",
-        "-Wl,-wrap,system_restart_local",
-        "-Wl,-wrap,spi_flash_read",
-        "-u", "app_entry",
-        "-u", "_printf_float",
-        "-u", "_scanf_float"
-    ]
-)
+# remove LINKFLAGS defined in main.py and keep user custom flags
+try:
+    index = env['LINKFLAGS'].index("call_user_start")
+    if index > 0 and env['LINKFLAGS'][index - 1] == "-u":
+        del env['LINKFLAGS'][index - 1]
+        env['LINKFLAGS'].remove("call_user_start")
+except IndexError:
+    pass
 
 flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
 
