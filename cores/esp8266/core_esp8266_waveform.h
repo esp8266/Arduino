@@ -1,38 +1,23 @@
 /*
-  esp8266_waveform - General purpose waveform generation and stepper motor
-                     control, supporting outputs on all pins in parallel.
+  esp8266_waveform - General purpose waveform generation and control,
+                     supporting outputs on all pins in parallel.
 
   Copyright (c) 2018 Earle F. Philhower, III.  All rights reserved.
 
   The core idea is to have a programmable waveform generator with a unique
   high and low period (defined in microseconds).  TIMER1 is set to 1-shot
   mode and is always loaded with the time until the next edge of any live
-  waveforms or Stepper motors.
+  waveforms.
 
-  Up to one waveform generator or stepper driver per pin supported.
+  Up to one waveform generator per pin supported.
 
   Each waveform generator is synchronized to the ESP cycle counter, not the
   timer.  This allows for removing interrupt jitter and delay as the counter
   always increments once per 80MHz clock.  Changes to a waveform are
-  contiguous and only take effect on the next low->high waveform transition,
+  contiguous and only take effect on the next waveform transition,
   allowing for smooth transitions.
 
   This replaces older tone(), analogWrite(), and the Servo classes.
-
-  The stepper driver supports a constant jerk (da/dt, in ticks/sec^3) to
-  produce a smooth acceleration curve and as well as a constant initial
-  acceleration and velocity and number of pulses.
-
-  The stepper driver can also force all steppers to wait for completion
-  by the use of a SYNC option (i.e. when completing a move where the X and
-  Y need to hit at one point before moving to the next X and Y).
-
-  The user application is responsible for actually calculating the proper
-  motion profiles (a general-purpose S-curve planner is left as an exercise
-  for the reader).
-
-  The steppers should be wired using an A4988 or DRV8825 controller and
-  with a single, shared direction pin.
 
   Everywhere in the code where "cycles" is used, it means ESP.getCycleTime()
   cycles, not TIMER1 cycles (which may be 2 CPU clocks @ 160MHz).
@@ -76,7 +61,7 @@ int stopWaveform(uint8_t pin);
 // to determine whether or not to perform an operation.
 // Pass in NULL to disable the callback and, if no other waveforms being
 // generated, stop the timer as well.
-// Make sure the CBN function has the ICACHE_RAM_ATTR decorator.
+// Make sure the CB function has the ICACHE_RAM_ATTR decorator.
 void setTimer1Callback(uint32_t (*fn)());
 
 #ifdef __cplusplus
