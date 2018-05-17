@@ -65,7 +65,22 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& curr
     return handleUpdate(http, currentVersion, false);
 }
 
+HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
+        const uint8_t httpsFingerprint[20])
+{
+    HTTPClient http;
+    http.begin(url, httpsFingerprint);
+    return handleUpdate(http, currentVersion, false);
+}
+
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint)
+{
+    HTTPClient http;
+    http.begin(url, httpsFingerprint);
+    return handleUpdate(http, currentVersion, true);
+}
+
+HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const uint8_t httpsFingerprint[20])
 {
     HTTPClient http;
     http.begin(url, httpsFingerprint);
@@ -98,13 +113,21 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, co
     http.begin(host, port, uri);
     return handleUpdate(http, currentVersion, false);
 }
+
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& url,
         const String& currentVersion, const String& httpsFingerprint)
 {
     HTTPClient http;
     http.begin(host, port, url, httpsFingerprint);
     return handleUpdate(http, currentVersion, false);
+}
 
+HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& url,
+        const String& currentVersion, const uint8_t httpsFingerprint[20])
+{
+    HTTPClient http;
+    http.begin(host, port, url, httpsFingerprint);
+    return handleUpdate(http, currentVersion, false);
 }
 
 /**

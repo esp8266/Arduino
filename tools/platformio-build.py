@@ -78,7 +78,7 @@ env.Append(
 
     LIBS=[
         "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
-        "wps", "axtls", "espnow", "smartconfig", "airkiss", "wpa2",
+        "wps", "bearssl", "axtls", "espnow", "smartconfig", "airkiss", "wpa2",
         "stdc++", "m", "c", "gcc"
     ],
 
