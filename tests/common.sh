@@ -40,7 +40,7 @@ function build_sketches()
     local build_arg=$3
     local build_dir=build.tmp
     mkdir -p $build_dir
-    local build_cmd="python tools/build.py -b generic -v -w all -k -p $PWD/$build_dir $build_arg "
+    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k -p $PWD/$build_dir $build_arg "
     local sketches=$(find $srcpath -name *.ino)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
@@ -145,7 +145,7 @@ function build_boards()
 function install_platformio()
 {
     pip install --user -U https://github.com/platformio/platformio/archive/develop.zip
-    platformio platform install https://github.com/platformio/platform-espressif8266.git#feature/stage
+    platformio platform install "https://github.com/platformio/platform-espressif8266.git#feature/stage"
     sed -i 's/https:\/\/github\.com\/esp8266\/Arduino\.git/*/' ~/.platformio/platforms/espressif8266/platform.json
     ln -s $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
     # Install dependencies:
@@ -243,7 +243,7 @@ if [ "$BUILD_TYPE" = "build" ]; then
 elif [ "$BUILD_TYPE" = "platformio" ]; then
     # PlatformIO
     install_platformio
-    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --project-option=lib_ldf_mode=deep+ --verbose"
 elif [ "$BUILD_TYPE" = "docs" ]; then
     # Build documentation using Sphinx
     cd $TRAVIS_BUILD_DIR/doc
