@@ -125,6 +125,9 @@ bool uart_rx_enabled(uart_t* uart);
 void uart_set_baudrate(uart_t* uart, int baud_rate);
 int uart_get_baudrate(uart_t* uart);
 
+void uart_isr_attach(uart_t* uart, void (*isr)(void*), void *arg);
+void uart_isr_detach(uart_t* uart);
+
 size_t uart_resize_rx_buffer(uart_t* uart, size_t new_size);
 
 size_t uart_write_char(uart_t* uart, char c);

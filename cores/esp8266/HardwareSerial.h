@@ -184,6 +184,16 @@ public:
         return uart_has_overrun(_uart);
     }
 
+    void attachIsr(void (*isr)(void*), void *arg)
+    {
+	uart_isr_attach(_uart, isr, arg);
+    }
+
+    void detachIsr()
+    {
+	uart_isr_detach(_uart);
+    }
+
 protected:
     int _uart_nr;
     uart_t* _uart = nullptr;
