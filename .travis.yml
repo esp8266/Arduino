@@ -10,7 +10,9 @@ cache:
 matrix:
   include:
     - env:
-      - BUILD_TYPE=build
+      - BUILD_TYPE=build_even
+    - env:
+      - BUILD_TYPE=build_odd
     - env:
       - BUILD_TYPE=platformio
     - env:
