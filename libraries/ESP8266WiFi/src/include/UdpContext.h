@@ -90,14 +90,14 @@ public:
         }
     }
 
-    bool connect(ip_addr_t addr, uint16_t port)
+    bool connect(ip4_addr_t addr, uint16_t port)
     {
-        ip_addr_copy(_pcb->remote_ip, addr);
+        ip4_addr_copy(_pcb->remote_ip, addr);
         _pcb->remote_port = port;
         return true;
     }
 
-    bool listen(ip_addr_t addr, uint16_t port)
+    bool listen(ip4_addr_t addr, uint16_t port)
     {
         udp_recv(_pcb, &_s_recv, (void *) this);
         err_t err = udp_bind(_pcb, &addr, port);
@@ -110,12 +110,12 @@ public:
     }
 
 #if LWIP_VERSION_MAJOR == 1
-    void setMulticastInterface(ip_addr_t addr)
+    void setMulticastInterface(ip4_addr_t addr)
     {
         udp_set_multicast_netif_addr(_pcb, addr);
     }
 #else
-    void setMulticastInterface(const ip_addr_t& addr)
+    void setMulticastInterface(const ip4_addr_t& addr)
     {
         udp_set_multicast_netif_addr(_pcb, &addr);
     }
@@ -291,7 +291,7 @@ public:
         return size;
     }
 
-    bool send(ip_addr_t* addr = 0, uint16_t port = 0)
+    bool send(ip4_addr_t* addr = 0, uint16_t port = 0)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
@@ -323,7 +323,7 @@ public:
         }
 #ifdef LWIP_MAYBE_XCC
         uint16_t old_ttl = _pcb->ttl;
-        if (ip_addr_ismulticast(addr)) {
+        if (ip4_addr_ismulticast(addr)) {
             _pcb->ttl = _mcast_ttl;
         }
 #endif
@@ -383,7 +383,7 @@ private:
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
-            const ip_addr_t *addr, u16_t port)
+            const ip4_addr_t *addr, u16_t port)
     {
         (void) upcb;
         (void) addr;
@@ -411,11 +411,11 @@ private:
 #if LWIP_VERSION_MAJOR == 1
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            ip_addr_t *addr, u16_t port)
+            ip4_addr_t *addr, u16_t port)
 #else
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            const ip_addr_t *addr, u16_t port)
+            const ip4_addr_t *addr, u16_t port)
 #endif
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, addr, port);

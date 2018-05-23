@@ -68,7 +68,7 @@ AVRISPState_t ESP8266AVRISP::update() {
             if (_server.hasClient()) {
                 _client = _server.available();
                 _client.setNoDelay(true);
-                ip_addr_t lip;
+                ip4_addr_t lip;
                 lip.addr = _client.remoteIP();
                 AVRISP_DEBUG("client connect %d.%d.%d.%d:%d", IP2STR(&lip), _client.remotePort());
                 (void) lip; // Avoid unused warning when not in debug mode

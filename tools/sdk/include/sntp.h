@@ -3,9 +3,9 @@
 
 #include "os_type.h"
 #ifdef LWIP_OPEN_SRC
-#include "lwip/ip_addr.h"
+#include "lwip/ip4_addr.h"
 #else
-#include "ip_addr.h"
+#include "ip4_addr.h"
 #endif
 
 #ifdef __cplusplus
@@ -43,15 +43,15 @@ void sntp_stop(void);
  * @param numdns the index of the NTP server to set must be < SNTP_MAX_SERVERS
  * @param dnsserver IP address of the NTP server to set
  */
-void sntp_setserver(unsigned char idx, ip_addr_t *addr);
+void sntp_setserver(unsigned char idx, ip4_addr_t *addr);
 /**
  * Obtain one of the currently configured by IP address (or DHCP) NTP servers
  *
  * @param numdns the index of the NTP server
- * @return IP address of the indexed NTP server or "ip_addr_any" if the NTP
+ * @return IP address of the indexed NTP server or "ip4_addr_any" if the NTP
  *         server has not been configured by address (or at all).
  */
-ip_addr_t sntp_getserver(unsigned char idx);
+ip4_addr_t sntp_getserver(unsigned char idx);
 /**
  * Initialize one of the NTP servers by name
  *

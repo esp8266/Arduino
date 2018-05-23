@@ -258,7 +258,7 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
   } else {
       return false;
   }
-  ip_addr_t d;
+  ip4_addr_t d;
 
   if(dns1 != (uint32_t)0x00000000) {
       // Set DNS1-Server
@@ -441,10 +441,10 @@ IPAddress ESP8266WiFiSTAClass::gatewayIP() {
  */
 IPAddress ESP8266WiFiSTAClass::dnsIP(uint8_t dns_no) {
 #if LWIP_VERSION_MAJOR == 1
-    ip_addr_t dns_ip = dns_getserver(dns_no);
+    ip4_addr_t dns_ip = dns_getserver(dns_no);
     return IPAddress(dns_ip.addr);
 #else
-    const ip_addr_t* dns_ip = dns_getserver(dns_no);
+    const ip4_addr_t* dns_ip = dns_getserver(dns_no);
     return IPAddress(dns_ip->addr);
 #endif
 }
