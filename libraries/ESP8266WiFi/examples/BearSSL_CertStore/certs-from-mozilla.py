@@ -9,8 +9,8 @@
 # Script by Earle F. Philhower, III.  Released to the public domain.
 
 import csv
-from os import mkdir
-from subprocess import Popen, PIPE
+import os
+from subprocess import Popen, PIPE, call
 import urllib2
 try:
     # for Python 2.x
@@ -40,12 +40,27 @@ try:
 except:
     pass
 
+derFiles = []
+idx = 0
 # Process the text PEM using openssl into DER files
 for i in range(0, len(pems)):
-    certName = "data/ca_%03d.der" % (i);
+    certName = "data/ca_%03d.der" % (idx);
     thisPem = pems[i].replace("'", "")
     print names[i] + " -> " + certName
-    pipe = Popen(['openssl','x509','-inform','PEM','-outform','DER','-out', certName], shell = False, stdin = PIPE).stdin
+    ssl = Popen(['openssl','x509','-inform','PEM','-outform','DER','-out', certName], shell = False, stdin = PIPE)
+    pipe = ssl.stdin
     pipe.write(thisPem)
-    pipe.close
+    pipe.close()
+    ssl.wait()
+    if os.path.exists(certName):
+        derFiles.append(certName)
+        idx = idx + 1
 
+if os.path.exists("data/certs.ar"):
+    os.unlink("data/certs.ar");
+
+arCmd = ['ar', 'mcs', 'data/certs.ar'] + derFiles;
+call( arCmd )
+
+for der in derFiles:
+    os.unlink(der)

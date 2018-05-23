@@ -21,40 +21,65 @@
 #define _CERTSTORE_BEARSSL_H
 
 #include <Arduino.h>
+#include <BearSSLHelpers.h>
 #include <bearssl/bearssl.h>
 
-// Virtual base class for the certificate stores, which allow use
+// Base class for the certificate stores, which allow use
 // of a large set of certificates stored on SPIFFS of SD card to
 // be dynamically used when validating a X509 certificate
 
-// Templates for child classes not possible due to the difference in SD
-// and FS in terms of directory parsing and interating.  Dir doesn't
-// exist in SD, everything is a file (which might support get-next-entry()
-// or not).
+namespace BearSSL {
 
-// This class should not be instantiated directly, only via its children.
-class CertStoreBearSSL {
+// Subclass this and provide virtual functions appropriate for your storage.
+// Required because there are conflicting definitions for a "File" in the
+// Arduino setup, and there is no simple way to work around the minor
+// differences.
+// See the examples for implementations to use in your own code.
+class CertStoreFile {
   public:
-    CertStoreBearSSL() {}
-    virtual ~CertStoreBearSSL() {}
+    CertStoreFile() {};
+    virtual ~CertStoreFile() {};
 
-    // Preprocess the certs from the flash, returns number parsed
-    virtual int initCertStore(const char *dir) = 0;
+    // The main API
+    virtual bool open(bool write=false) = 0;
+    virtual bool seek(size_t absolute_pos) = 0;
+    virtual ssize_t read(void *dest, size_t bytes) = 0;
+    virtual ssize_t write(void *dest, size_t bytes) = 0;
+    virtual void close() = 0;
+};
+
+
+class CertStore {
+  public:
+    CertStore() { };
+    ~CertStore() { };
+
+    // Set the file interface instances, do preprocessing
+    int initCertStore(CertStoreFile *index, CertStoreFile *data);
 
     // Installs the cert store into the X509 decoder (normally via static function callbacks)
-    virtual void installCertStore(br_x509_minimal_context *ctx) = 0;
+    void installCertStore(br_x509_minimal_context *ctx);
 
   protected:
-    // The binary format of the pre-computed file
+    CertStoreFile *_index = nullptr;
+    CertStoreFile *_data = nullptr;
+    BearSSLX509List *_x509 = nullptr;
+
+    // These need to be static as they are callbacks from BearSSL C code
+    static const br_x509_trust_anchor *findHashedTA(void *ctx, void *hashed_dn, size_t len);
+    static void freeHashedTA(void *ctx, const br_x509_trust_anchor *ta);
+
+    // The binary format of the index file
     class CertInfo {
     public:
       uint8_t sha256[32];
-      char    fname[64];
+      uint32_t offset;
+      uint32_t length;
     };
+    static CertInfo _preprocessCert(uint32_t length, uint32_t offset, const void *raw);
 
-    CertInfo preprocessCert(const char *fname, const void *raw, size_t sz);
-    static br_x509_trust_anchor *makeTrustAnchor(const void *der, size_t der_len, const CertInfo *ci);
-    static void freeTrustAnchor(const br_x509_trust_anchor *ta);
+};
+
 };
 
 #endif
