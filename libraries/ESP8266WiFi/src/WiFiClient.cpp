@@ -109,7 +109,7 @@ int WiFiClient::connect(const String host, uint16_t port)
 
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
-    ip_addr_t addr;
+    ip4_addr_t addr;
     addr.addr = ip;
 
     if (_client) {

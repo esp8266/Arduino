@@ -432,9 +432,9 @@ bool ESP8266WiFiGenericClass::forceSleepWake() {
 // -----------------------------------------------------------------------------------------------------------------------
 
 #if LWIP_VERSION_MAJOR == 1
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg);
+void wifi_dns_found_callback(const char *name, ip4_addr_t *ipaddr, void *callback_arg);
 #else
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
+void wifi_dns_found_callback(const char *name, const ip4_addr_t *ipaddr, void *callback_arg);
 #endif
 
 static bool _dns_lookup_pending = false;
@@ -454,7 +454,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
 
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
-    ip_addr_t addr;
+    ip4_addr_t addr;
     aResult = static_cast<uint32_t>(0);
 
     if(aResult.fromString(aHostname)) {
@@ -493,9 +493,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param callback_arg
  */
 #if LWIP_VERSION_MAJOR == 1
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg)
+void wifi_dns_found_callback(const char *name, ip4_addr_t *ipaddr, void *callback_arg)
 #else
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
+void wifi_dns_found_callback(const char *name, const ip4_addr_t *ipaddr, void *callback_arg)
 #endif
 {
     (void) name;

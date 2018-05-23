@@ -31,16 +31,16 @@
 extern "C" {
 #endif
 
-struct ip_addr {
+struct ip4_addr {
     uint32 addr;
 };
 
-typedef struct ip_addr ip_addr_t;
+typedef struct ip4_addr ip4_addr_t;
 
 struct ip_info {
-    struct ip_addr ip;
-    struct ip_addr netmask;
-    struct ip_addr gw;
+    struct ip4_addr ip;
+    struct ip4_addr netmask;
+    struct ip4_addr gw;
 };
 
 /**
@@ -51,7 +51,7 @@ struct ip_info {
  * @arg mask network identifier mask
  * @return !0 if the network identifiers of both address match
  */
-#define ip_addr_netcmp(addr1, addr2, mask) (((addr1)->addr & \
+#define ip4_addr_netcmp(addr1, addr2, mask) (((addr1)->addr & \
         (mask)->addr) == \
         ((addr2)->addr & \
          (mask)->addr))

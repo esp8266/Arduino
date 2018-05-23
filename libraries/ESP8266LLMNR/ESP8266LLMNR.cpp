@@ -109,7 +109,7 @@ bool LLMNRResponder::_restart() {
         _conn = 0;
     }
 
-    ip_addr_t multicast_addr;
+    ip4_addr_t multicast_addr;
     multicast_addr.addr = (uint32_t)LLMNR_MULTICAST_ADDR;
 
     if (igmp_joingroup(IP_ADDR_ANY, &multicast_addr) != ERR_OK)
@@ -229,14 +229,14 @@ void LLMNRResponder::_process_packet() {
         Serial.println("(no matching RRs)");
 #endif
 
-    ip_addr_t remote_ip;
+    ip4_addr_t remote_ip;
     remote_ip.addr = _conn->getRemoteAddress();
 
     struct ip_info ip_info;
     bool match_ap = false;
     if (wifi_get_opmode() & SOFTAP_MODE) {
         wifi_get_ip_info(SOFTAP_IF, &ip_info);
-    if (ip_info.ip.addr && ip_addr_netcmp(&remote_ip, &ip_info.ip, &ip_info.netmask))
+    if (ip_info.ip.addr && ip4_addr_netcmp(&remote_ip, &ip_info.ip, &ip_info.netmask))
         match_ap = true;
     }
     if (!match_ap)

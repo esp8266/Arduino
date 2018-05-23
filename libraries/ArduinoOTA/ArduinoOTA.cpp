@@ -172,7 +172,7 @@ String ArduinoOTAClass::readStringUntil(char end){
 
 void ArduinoOTAClass::_onRx(){
   if(!_udp_ota->next()) return;
-  ip_addr_t ota_ip;
+  ip4_addr_t ota_ip;
 
   if (_state == OTA_IDLE) {
     int cmd = parseInt();
@@ -243,7 +243,7 @@ void ArduinoOTAClass::_onRx(){
 }
 
 void ArduinoOTAClass::_runUpdate() {
-  ip_addr_t ota_ip;
+  ip4_addr_t ota_ip;
   ota_ip.addr = (uint32_t)_ota_ip;
 
   if (!Update.begin(_size, _cmd)) {

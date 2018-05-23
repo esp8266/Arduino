@@ -4,7 +4,7 @@
 
 extern "C" {
 #include "lwip/init.h" // LWIP_VERSION_
-#include <lwip/ip_addr.h>
+#include <lwip/ip4_addr.h>
 }
 #include <ESP8266WiFi.h>
 
@@ -29,11 +29,11 @@ protected:
     void _makenbname(char *name, char *nbname, uint8_t outlen);
    
 #if LWIP_VERSION_MAJOR == 1 
-    void _recv(udp_pcb *upcb, pbuf *pb, struct ip_addr *addr, uint16_t port);
-    static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip_addr *addr, uint16_t port);
+    void _recv(udp_pcb *upcb, pbuf *pb, struct ip4_addr *addr, uint16_t port);
+    static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip4_addr *addr, uint16_t port);
 #else
-    void _recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint16_t port);
-    static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip_addr_t *addr, uint16_t port);
+    void _recv(udp_pcb *upcb, pbuf *pb, const ip4_addr_t *addr, uint16_t port);
+    static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip4_addr_t *addr, uint16_t port);
 #endif
 public:
     ESP8266NetBIOS();
