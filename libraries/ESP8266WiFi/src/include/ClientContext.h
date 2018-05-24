@@ -40,7 +40,7 @@ public:
         tcp_setprio(pcb, TCP_PRIO_MIN);
         tcp_arg(pcb, this);
         tcp_recv(pcb, &_s_recv);
-        tcp_sent(pcb, &_s_sent);
+        tcp_sent(pcb, &_s_acked);
         tcp_err(pcb, &_s_error);
         tcp_poll(pcb, &_s_poll, 1);
 
@@ -58,7 +58,7 @@ public:
             tcp_err(_pcb, NULL);
             tcp_poll(_pcb, NULL, 0);
             tcp_abort(_pcb);
-            _pcb = 0;
+            _pcb = nullptr;
         }
         return ERR_ABRT;
     }
@@ -79,7 +79,7 @@ public:
                 tcp_abort(_pcb);
                 err = ERR_ABRT;
             }
-            _pcb = 0;
+            _pcb = nullptr;
         }
         return err;
     }
@@ -471,11 +471,11 @@ protected:
         }
     }
 
-    err_t _sent(tcp_pcb* pcb, uint16_t len)
+    err_t _acked(tcp_pcb* pcb, uint16_t len)
     {
         (void) pcb;
         (void) len;
-        DEBUGV(":sent %d\r\n", len);
+        DEBUGV(":ack %d\r\n", len);
         _write_some_from_cb();
         return ERR_OK;
     }
@@ -536,7 +536,7 @@ protected:
         tcp_sent(_pcb, NULL);
         tcp_recv(_pcb, NULL);
         tcp_err(_pcb, NULL);
-        _pcb = NULL;
+        _pcb = nullptr;
         _notify_error();
     }
 
@@ -571,9 +571,9 @@ protected:
         return reinterpret_cast<ClientContext*>(arg)->_poll(tpcb);
     }
 
-    static err_t _s_sent(void *arg, struct tcp_pcb *tpcb, uint16_t len)
+    static err_t _s_acked(void *arg, struct tcp_pcb *tpcb, uint16_t len)
     {
-        return reinterpret_cast<ClientContext*>(arg)->_sent(tpcb, len);
+        return reinterpret_cast<ClientContext*>(arg)->_acked(tpcb, len);
     }
 
     static err_t _s_connected(void* arg, struct tcp_pcb *pcb, err_t err)

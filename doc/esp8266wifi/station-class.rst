@@ -427,7 +427,13 @@ Return the status of Wi-Fi connection.
 
     WiFi.status()
 
-Function returns one of the following connection statuses: \* ``WL_CONNECTED`` after successful connection is established \* ``WL_NO_SSID_AVAIL``\ in case configured SSID cannot be reached \* ``WL_CONNECT_FAILED`` if password is incorrect \* ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses \* ``WL_DISCONNECTED`` if module is not configured in station mode
+Function returns one of the following connection statuses: 
+
+- ``WL_CONNECTED`` after successful connection is established
+- ``WL_NO_SSID_AVAIL`` in case configured SSID cannot be reached
+- ``WL_CONNECT_FAILED`` if password is incorrect
+- ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses
+- ``WL_DISCONNECTED`` if module is not configured in station mode
 
 Returned value is type of ``wl_status_t`` defined in `wl\_definitions.h <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/include/wl_definitions.h>`__
 

@@ -32,7 +32,7 @@
 
 extern void __real_system_restart_local();
 
-extern cont_t g_cont;
+extern cont_t* g_pcont;
 
 // These will be pointers to PROGMEM const strings
 static const char* s_panic_file = 0;
@@ -131,8 +131,8 @@ void __wrap_system_restart_local() {
         ets_printf_P("\nSoft WDT reset\n");
     }
 
-    uint32_t cont_stack_start = (uint32_t) &(g_cont.stack);
-    uint32_t cont_stack_end = (uint32_t) g_cont.stack_end;
+    uint32_t cont_stack_start = (uint32_t) &(g_pcont->stack);
+    uint32_t cont_stack_end = (uint32_t) g_pcont->stack_end;
     uint32_t stack_end;
 
     // amount of stack taken by interrupt or exception handler
