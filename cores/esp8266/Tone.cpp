@@ -27,25 +27,48 @@
 // Which pins have a tone running on them?
 static uint32_t _toneMap = 0;
 
-void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
+
+static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, unsigned long duration) {
   if (_pin > 16) {
     return;
   }
 
-  if (frequency == 0) {
-    noTone(_pin);
-    return;
-  }
+  pinMode(_pin, OUTPUT);
 
-  uint32_t halfCycle = 500000L / frequency;
-  if (halfCycle < 100) {
-    halfCycle = 100;
-  }
+  high = std::max(high, (uint32_t)100);
+  low = std::max(low, (uint32_t)100);
 
-  if (startWaveform(_pin, halfCycle, halfCycle, (uint32_t) duration * 1000)) {
+  if (startWaveform(_pin, high, low, (uint32_t) duration * 1000)) {
     _toneMap |= 1 << _pin;
   }
 }
+
+
+void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
+  if (frequency == 0) {
+    noTone(_pin);
+  } else {
+    uint32_t period = 1000000L / frequency;
+    uint32_t high = period / 2;
+    uint32_t low = period - high;
+    _startTone(_pin, high, low, duration);
+  }
+}
+
+
+// Separate tone(float) to hopefully not pull in floating point libs unless
+// it's called with a float.
+void tone(uint8_t _pin, double frequency, unsigned long duration) {
+  if (frequency < 1.0) { // FP means no exact comparisons
+    noTone(_pin);
+  } else {
+    double period = 1000000.0 / frequency;
+    uint32_t high = (uint32_t)((period / 2.0) + 0.5);
+    uint32_t low = (uint32_t)(period + 0.5) - high;
+    _startTone(_pin, high, low, duration);
+  }
+}
+
 
 void noTone(uint8_t _pin) {
   if (_pin > 16) {
