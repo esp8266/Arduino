@@ -35,10 +35,11 @@ Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.1/](https://arduin
 
 - Install the current upstream Arduino IDE at the 1.8 level or later. The current version is at the [Arduino website](http://www.arduino.cc/en/main/software).
 - Go to Arduino application directory
-  - For Mac OS X normally: 
-  ```bash
-  cd /Applications/Arduino.app/Contents/Java
-  ```
+  - For Mac OS X, it is `Arduino.app` showing as the Arduino icon.  
+    This location may be your `~/Downloads`, `~/Desktop` or even `/Applications`.
+    ```bash
+    cd <application-directory>/Arduino.app/Contents/Java
+    ```
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash
 cd hardware
