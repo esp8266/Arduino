@@ -389,7 +389,3 @@ WiFiduino
 
 Product page: https://wifiduino.com/esp8266
 
-WiFi Slot
----------
-
-Product page: http://wiki.amperka.ru/wifi-slot

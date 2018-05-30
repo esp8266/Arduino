@@ -94,9 +94,6 @@
             },
             {
               "name": "WiFiduino"
-            },
-            {
-              "name": "WiFi Slot"
             }
           ],
           "toolsDependencies": [
