@@ -736,9 +736,9 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
-            'flashmode_dio',
-            'flashfreq_40',
-            '1M',
+            'flashfreq_menu',
+            'flashmode_menu',
+            '1M', '2M',
             ],
         'desc': [ 'Product page: http://wiki.amperka.ru/wifi-slot' ],
     }),
