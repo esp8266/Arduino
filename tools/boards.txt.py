@@ -728,6 +728,20 @@ boards = collections.OrderedDict([
         'serial': '921',
         'desc': [ 'Product page: https://wifiduino.com/esp8266' ],
     }),
+    ( 'wifi_slot', {
+        'name': 'Amperka WiFi Slot',
+        'opts': {
+            '.build.board': 'AMPERKA_WIFI_SLOT',
+            '.build.variant': 'wifi_slot',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '1M',
+            ],
+        'desc': [ 'Product page: http://wiki.amperka.ru/wifi-slot' ],
+    }),
     ])
 
 ################################################################
