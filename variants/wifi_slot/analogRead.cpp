@@ -34,7 +34,6 @@ extern "C" int analogRead(uint8_t pin) {
   }
   currentAin = ain;
   return __analogRead(ANALOG_INPUT_HARDWARE);
-  
 }
 
 void initVariant() {
