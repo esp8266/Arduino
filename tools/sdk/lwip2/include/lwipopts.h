@@ -2997,6 +2997,7 @@
 
 /*
    --------------------------------------------------
+   ------------- End of original lwipopts -----------
    --------------------------------------------------
 */
 
@@ -3012,5 +3013,35 @@ struct netif;
 #define LWIP_ERR_T s8
 #endif
 LWIP_ERR_T lwip_unhandled_packet (struct pbuf* pbuf, struct netif* netif) __attribute__((weak));
+
+/*
+   --------------------------------------------------
+   ----------------- TIME-WAIT tweak ----------------
+   --------------------------------------------------
+   port @me-no-dev time-wait tweak
+   https://github.com/esp8266/Arduino/commit/07f4d4c241df2c552899857f39a4295164f686f2#diff-f8258e71e25fb9985ca3799e3d8b88ecR399
+*/
+
+void tcp_kill_timewait (void);
+#define TCP_TW_LIMIT(l)                \
+  if (l) do {                          \
+    u32_t count_plus_1 = 1;            \
+    struct tcp_pcb* tmp = tcp_tw_pcbs; \
+    if (tmp)                           \
+      while ((tmp = tmp->next))        \
+        ++count_plus_1;                \
+    while (--count_plus_1 > (l))       \
+      /* kill the oldest */            \
+      /* pcb in TW state */            \
+      tcp_kill_timewait();             \
+  } while (0)
+
+/**
+ * MEMP_NUM_TCP_PCB_TIME_WAIT: the number of TCP pcbs in TIME_WAIT state.
+ * (requires the LWIP_TCP option, 0 = disabled)
+ */
+#ifndef MEMP_NUM_TCP_PCB_TIME_WAIT
+#define MEMP_NUM_TCP_PCB_TIME_WAIT       5
+#endif
 
 #endif // MYLWIPOPTS_H

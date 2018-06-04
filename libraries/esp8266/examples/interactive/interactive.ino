@@ -85,7 +85,7 @@ void loop() {
     case 'n': DO(WiFi.setSleepMode(WIFI_NONE_SLEEP));
     case 'l': DO(WiFi.setSleepMode(WIFI_LIGHT_SLEEP));
     case 'm': DO(WiFi.setSleepMode(WIFI_MODEM_SLEEP));
-    case 's': DO(WiFi.config(staticip, gateway, subnet));
-    case 'D': DO(wifi_station_dhcpc_start());
+    case 'S': DO(WiFi.config(staticip, gateway, subnet)); // use static address
+    case 's': DO(WiFi.config(0u, 0u, 0u));                // back to dhcp client
   }
 }

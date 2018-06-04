@@ -93,8 +93,15 @@ This error may pop up after switching between
 How to clear TCP PCBs in time-wait state ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is needed with lwIP-v1.4, less needed with lwIP-v2 but timeout is still
-too high.
+This is not needed anymore:
+
+PCBs in time-wait state are limited to 5 and removed when that number is
+exceeded.
+
+Ref.  `lwIP-v1.4 <https://github.com/esp8266/Arduino/commit/07f4d4c241df2c552899857f39a4295164f686f2#diff-f8258e71e25fb9985ca3799e3d8b88ecR399>`__,
+`lwIP-v2 <https://github.com/d-a-v/esp82xx-nonos-linklayer/commit/420960dfc0dbe07114f7364845836ac333bc84f7>`__
+
+For reference:
 
 Time-wait PCB state helps TCP not confusing two consecutive connections with the
 same (s-ip,s-port,d-ip,d-port) when the first is already closed but still
