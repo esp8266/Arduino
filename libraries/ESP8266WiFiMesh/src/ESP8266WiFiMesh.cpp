@@ -79,19 +79,19 @@ void ESP8266WiFiMesh::fullStop(WiFiClient curr_client)
 }
 
 /**
- * Wait for a WiFiClient to connect
+ * Wait for a WiFiClient to transmit
  *
  * @returns: True if the client is ready, false otherwise.
  * 
  */
-bool ESP8266WiFiMesh::waitForClient(WiFiClient curr_client, int max_wait)
+bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient curr_client, int max_wait)
 {
   int wait = max_wait;
   while(curr_client.connected() && !curr_client.available() && wait--)
     delay(3);
 
   /* Return false if the client isn't ready to communicate */
-  if (WiFi.status() == WL_DISCONNECTED || !curr_client.connected())
+  if (WiFi.status() == WL_DISCONNECTED && !curr_client.available())
   {
     if(_verbose_mode)
       Serial.println("Disconnected!"); 
@@ -118,22 +118,22 @@ bool ESP8266WiFiMesh::exchangeInfo(String message, WiFiClient curr_client)
   curr_client.print(message + "\r");
   yield();
 
-  if (!waitForClient(curr_client, 1000))
+  if (!waitForClientTransmission(curr_client, 1000))
   {
     fullStop(curr_client);
     return false;
   }
 
+  if (!curr_client.available()) 
+  {
+    if(_verbose_mode)
+      Serial.println("No response!");
+    return false; // WiFi.status() != WL_DISCONNECTED so we do not want to use fullStop(curr_client) here since that would force the node to scan for WiFi networks.
+  }
+
   String response = curr_client.readStringUntil('\r');
   yield();
   curr_client.flush();
-
-  if (response.length() <= 2) 
-  {
-    if(_verbose_mode)
-      Serial.println("Small response!");
-    return false;
-  }
 
   /* Pass data to user callback */
   _responseHandler(response);
@@ -291,7 +291,7 @@ void ESP8266WiFiMesh::acceptRequest()
     if (!_client)
       break;
 
-    if (!waitForClient(_client, 1500)) {
+    if (!waitForClientTransmission(_client, 1500) || !_client.available()) {
       continue;
     }
 
@@ -308,6 +308,7 @@ void ESP8266WiFiMesh::acceptRequest()
       if(_verbose_mode)
         Serial.println("Responding");
       _client.print(response + "\r");
+      _client.flush();
       yield();
     }
   }

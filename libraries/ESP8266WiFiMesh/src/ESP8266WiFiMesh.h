@@ -50,7 +50,7 @@ private:
   void fullStop(WiFiClient curr_client);
   void connectToNode(String target_ssid, String message, int target_channel, uint8_t *target_bssid);
   bool exchangeInfo(String message, WiFiClient curr_client);
-  bool waitForClient(WiFiClient curr_client, int max_wait);
+  bool waitForClientTransmission(WiFiClient curr_client, int max_wait);
   bool attemptDataTransfer(String message);
   bool attemptDataTransferKernel(String message);
 
