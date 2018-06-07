@@ -52,7 +52,7 @@ Instructions - Windows 10
 ~~~~~~~~~~~~
 
 -  Open a command prompt (cmd) and go to Arduino default directory. This is typically the
-   *sketchbook* directory (usually ``C:\users\{username}\Documents\``)
+   *sketchbook* directory (usually ``C:\users\{username}\Documents\`` where the environment variable ``%USERPROFILE%`` usually contains ``C:\users\{username}``)
    
 -  Clone this repository into hardware/esp8266com/esp8266 directory.
 
@@ -98,6 +98,8 @@ Instructions - Windows 10
        python get.py
 
 -  Restart Arduino
+
+- If using the [Arduino IDE for Visual Studio](https://www.visualmicro.com), be sure to click Tools - Visual Micro - Rescan Toolchains and Libraries
 
 -  When later updating your local library, goto the esp8266 directory and do a git pull
 
