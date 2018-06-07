@@ -35,11 +35,7 @@ This is the suggested installation method for contributors and library developer
 
 ### Instructions
 
-- Open the console and go to Arduino directory. This can be either your *sketchbook* directory (usually `<Documents>` or `<Documents>/Arduino`), or the directory of Arduino application itself, the choice is up to you. For Windows 10 the directory will typically be:  `C:\Users\{username}\Documents\hardware\`
-
-- Note that although the Arduino installer will use (for Windows)  
-`C:\Users\{username}\AppData\Local\Arduino15\packages\esp8266\hardware` this is not the recommended directory for the git version. (and it is probably best not to install both)
-
+- Open the console and go to Arduino directory. This can be either your *sketchbook* directory (usually `<Documents>/Arduino`), or the directory of Arduino application itself, the choice is up to you.
 - Clone this repository into hardware/esp8266com/esp8266 directory. Alternatively, clone it elsewhere and create a symlink, if your OS supports them.
 
     ```bash
