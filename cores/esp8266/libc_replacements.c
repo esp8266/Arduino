@@ -83,6 +83,7 @@ int ICACHE_RAM_ATTR _read_r(struct _reent* unused, int file, char *ptr, int len)
 }
 
 int ICACHE_RAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
+    (void) r;
     if (file == STDOUT_FILENO) {
         while(len--) {
             ets_putc(*ptr);
@@ -93,6 +94,7 @@ int ICACHE_RAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
 }
 
 int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) {
+    (void) r;
     if (file->_file == STDOUT_FILENO) {
         return ets_putc(c);
     }
@@ -115,39 +117,12 @@ int ICACHE_RAM_ATTR putchar(int c) {
     return c;
 }
 
-#if 0
-
-int ICACHE_RAM_ATTR printf(const char* format, ...) {
-    va_list arglist;
-    va_start(arglist, format);
-    int ret = ets_vprintf(ets_putc, format, arglist);
-    va_end(arglist);
-    return ret;
+void _exit(int status) {
+    (void) status;
+    abort();
 }
 
-int ICACHE_RAM_ATTR sprintf(char* buffer, const char* format, ...) {
-    int ret;
-    va_list arglist;
-    va_start(arglist, format);
-    ret = ets_vsprintf(buffer, format, arglist);
-    va_end(arglist);
-    return ret;
+int atexit(void (*func)()) {
+    (void) func;
+    return 0;
 }
-
-int ICACHE_RAM_ATTR snprintf(char* buffer, size_t size, const char* format, ...) {
-    int ret;
-    va_list arglist;
-    va_start(arglist, format);
-    ret = ets_vsnprintf(buffer, size, format, arglist);
-    va_end(arglist);
-    return ret;
-}
-
-int ICACHE_RAM_ATTR vprintf(const char * format, va_list arg) {
-    return ets_vprintf(ets_putc, format, arg);
-}
-
-int ICACHE_RAM_ATTR vsnprintf(char * buffer, size_t size, const char * format, va_list arg) {
-    return ets_vsnprintf(buffer, size, format, arg);
-}
-#endif

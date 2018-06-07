@@ -1,9 +1,0 @@
-#pragma once
-
-#define STA_SSID "test_wifi"
-#define STA_PASS "test_wifi_pass"
-
-#define AP_SSID "test_wifi_ap"
-#define AP_PASS "test_wifi_ap_pass"
-
-#define SERVER_IP "192.168.10.1"

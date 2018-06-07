@@ -187,7 +187,7 @@ extern void __analogWrite(uint8_t pin, int value)
     }
     if((pwm_mask & (1 << pin)) == 0) {
         if(pwm_mask == 0) {
-            memset(&_pwm_isr_data, 0, sizeof(struct pwm_isr_data*));
+            memset(&_pwm_isr_data, 0, sizeof(_pwm_isr_data));
             start_timer = true;
         }
         pinMode(pin, OUTPUT);

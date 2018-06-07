@@ -47,7 +47,9 @@ static const uint8_t MOSI  = PIN_SPI_MOSI;
 static const uint8_t MISO  = PIN_SPI_MISO;
 static const uint8_t SCK   = PIN_SPI_SCK;
 
+#ifndef PIN_A0
 #define PIN_A0 (17)
+#endif /* PIN_A0 */
 
 static const uint8_t A0 = PIN_A0;
 
@@ -70,5 +72,12 @@ static const uint8_t A0 = PIN_A0;
 #define SERIAL_PORT_USBVIRTUAL     Serial
 #define SERIAL_PORT_HARDWARE       Serial
 #define SERIAL_PORT_HARDWARE_OPEN  Serial1
+
+#ifdef LED_BUILTIN
+#ifdef __cplusplus
+extern "C"
+#endif
+const int BUILTIN_LED __attribute__((deprecated, weak)) = LED_BUILTIN;
+#endif
 
 #endif /* GENERIC_COMMON_H */

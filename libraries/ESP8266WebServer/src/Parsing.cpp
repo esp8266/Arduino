@@ -23,6 +23,7 @@
 #include "WiFiServer.h"
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
+#include "detail/mimetable.h"
 
 //#define DEBUG_ESP_HTTP_SERVER
 #ifdef DEBUG_ESP_PORT
@@ -30,6 +31,9 @@
 #else
 #define DEBUG_OUTPUT Serial
 #endif
+
+static const char Content_Type[] PROGMEM = "Content-Type";
+static const char filename[] PROGMEM = "filename";
 
 static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& dataLength, int timeout_ms)
 {
@@ -91,22 +95,22 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   String searchStr = "";
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
-    searchStr = urlDecode(url.substring(hasSearch + 1));
+    searchStr = url.substring(hasSearch + 1);
     url = url.substring(0, hasSearch);
   }
   _currentUri = url;
   _chunked = false;
 
   HTTPMethod method = HTTP_GET;
-  if (methodStr == "POST") {
+  if (methodStr == F("POST")) {
     method = HTTP_POST;
-  } else if (methodStr == "DELETE") {
+  } else if (methodStr == F("DELETE")) {
     method = HTTP_DELETE;
-  } else if (methodStr == "OPTIONS") {
+  } else if (methodStr == F("OPTIONS")) {
     method = HTTP_OPTIONS;
-  } else if (methodStr == "PUT") {
+  } else if (methodStr == F("PUT")) {
     method = HTTP_PUT;
-  } else if (methodStr == "PATCH") {
+  } else if (methodStr == F("PATCH")) {
     method = HTTP_PATCH;
   }
   _currentMethod = method;
@@ -158,19 +162,21 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       DEBUG_OUTPUT.println(headerValue);
       #endif
 
-      if (headerName.equalsIgnoreCase("Content-Type")){
-        if (headerValue.startsWith("text/plain")){
+      if (headerName.equalsIgnoreCase(FPSTR(Content_Type))){
+        using namespace mime;
+        if (headerValue.startsWith(FPSTR(mimeTable[txt].mimeType))){
           isForm = false;
-        } else if (headerValue.startsWith("application/x-www-form-urlencoded")){
+        } else if (headerValue.startsWith(F("application/x-www-form-urlencoded"))){
           isForm = false;
           isEncoded = true;
-        } else if (headerValue.startsWith("multipart/")){
-          boundaryStr = headerValue.substring(headerValue.indexOf('=')+1);
+        } else if (headerValue.startsWith(F("multipart/"))){
+          boundaryStr = headerValue.substring(headerValue.indexOf('=') + 1);
+          boundaryStr.replace("\"","");
           isForm = true;
         }
-      } else if (headerName.equalsIgnoreCase("Content-Length")){
+      } else if (headerName.equalsIgnoreCase(F("Content-Length"))){
         contentLength = headerValue.toInt();
-      } else if (headerName.equalsIgnoreCase("Host")){
+      } else if (headerName.equalsIgnoreCase(F("Host"))){
         _hostHeader = headerValue;
       }
     }
@@ -183,20 +189,16 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       	return false;
       }
       if (contentLength > 0) {
-        if (searchStr != "") searchStr += '&';
         if(isEncoded){
           //url encoded form
-          String decoded = urlDecode(plainBuf);
-          size_t decodedLen = decoded.length();
-          memcpy(plainBuf, decoded.c_str(), decodedLen);
-          plainBuf[decodedLen] = 0;
+          if (searchStr != "") searchStr += '&';
           searchStr += plainBuf;
         }
         _parseArguments(searchStr);
         if(!isEncoded){
           //plain post json or other data
           RequestArgument& arg = _currentArgs[_currentArgCount++];
-          arg.key = "plain";
+          arg.key = F("plain");
           arg.value = String(plainBuf);
         }
 
@@ -205,6 +207,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         DEBUG_OUTPUT.println(plainBuf);
   #endif
         free(plainBuf);
+      } else {
+        // No content - but we can still have arguments in the URL.
+        _parseArguments(searchStr);
       }
     }
 
@@ -317,8 +322,8 @@ void ESP8266WebServer::_parseArguments(String data) {
       continue;
     }
     RequestArgument& arg = _currentArgs[iarg];
-    arg.key = data.substring(pos, equal_sign_index);
-	arg.value = data.substring(equal_sign_index + 1, next_arg_index);
+    arg.key = urlDecode(data.substring(pos, equal_sign_index));
+    arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
 #ifdef DEBUG_ESP_HTTP_SERVER
     DEBUG_OUTPUT.print("arg ");
     DEBUG_OUTPUT.print(iarg);
@@ -341,13 +346,13 @@ void ESP8266WebServer::_parseArguments(String data) {
 }
 
 void ESP8266WebServer::_uploadWriteByte(uint8_t b){
-  if (_currentUpload.currentSize == HTTP_UPLOAD_BUFLEN){
+  if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN){
     if(_currentHandler && _currentHandler->canUpload(_currentUri))
-      _currentHandler->upload(*this, _currentUri, _currentUpload);
-    _currentUpload.totalSize += _currentUpload.currentSize;
-    _currentUpload.currentSize = 0;
+      _currentHandler->upload(*this, _currentUri, *_currentUpload);
+    _currentUpload->totalSize += _currentUpload->currentSize;
+    _currentUpload->currentSize = 0;
   }
-  _currentUpload.buf[_currentUpload.currentSize++] = b;
+  _currentUpload->buf[_currentUpload->currentSize++] = b;
 }
 
 uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
@@ -361,7 +366,7 @@ uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
 }
 
 bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t len){
-
+  (void) len;
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");
   DEBUG_OUTPUT.print(boundary);
@@ -389,7 +394,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
 
       line = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (line.length() > 19 && line.substring(0, 19).equalsIgnoreCase("Content-Disposition")){
+      if (line.length() > 19 && line.substring(0, 19).equalsIgnoreCase(F("Content-Disposition"))){
         int nameStart = line.indexOf('=');
         if (nameStart != -1){
           argName = line.substring(nameStart+2);
@@ -405,16 +410,18 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             DEBUG_OUTPUT.println(argFilename);
 #endif
             //use GET to set the filename if uploading using blob
-            if (argFilename == "blob" && hasArg("filename")) argFilename = arg("filename");
+            if (argFilename == F("blob") && hasArg(FPSTR(filename))) 
+              argFilename = arg(FPSTR(filename));
           }
 #ifdef DEBUG_ESP_HTTP_SERVER
           DEBUG_OUTPUT.print("PostArg Name: ");
           DEBUG_OUTPUT.println(argName);
 #endif
-          argType = "text/plain";
+          using namespace mime;
+          argType = FPSTR(mimeTable[txt].mimeType);
           line = client.readStringUntil('\r');
           client.readStringUntil('\n');
-          if (line.length() > 12 && line.substring(0, 12).equalsIgnoreCase("Content-Type")){
+          if (line.length() > 12 && line.substring(0, 12).equalsIgnoreCase(FPSTR(Content_Type))){
             argType = line.substring(line.indexOf(':')+2);
             //skip next line
             client.readStringUntil('\r');
@@ -449,21 +456,22 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
               break;
             }
           } else {
-            _currentUpload.status = UPLOAD_FILE_START;
-            _currentUpload.name = argName;
-            _currentUpload.filename = argFilename;
-            _currentUpload.type = argType;
-            _currentUpload.totalSize = 0;
-            _currentUpload.currentSize = 0;
+            _currentUpload.reset(new HTTPUpload());
+            _currentUpload->status = UPLOAD_FILE_START;
+            _currentUpload->name = argName;
+            _currentUpload->filename = argFilename;
+            _currentUpload->type = argType;
+            _currentUpload->totalSize = 0;
+            _currentUpload->currentSize = 0;
 #ifdef DEBUG_ESP_HTTP_SERVER
             DEBUG_OUTPUT.print("Start File: ");
-            DEBUG_OUTPUT.print(_currentUpload.filename);
+            DEBUG_OUTPUT.print(_currentUpload->filename);
             DEBUG_OUTPUT.print(" Type: ");
-            DEBUG_OUTPUT.println(_currentUpload.type);
+            DEBUG_OUTPUT.println(_currentUpload->type);
 #endif
             if(_currentHandler && _currentHandler->canUpload(_currentUri))
-              _currentHandler->upload(*this, _currentUri, _currentUpload);
-            _currentUpload.status = UPLOAD_FILE_WRITE;
+              _currentHandler->upload(*this, _currentUri, *_currentUpload);
+            _currentUpload->status = UPLOAD_FILE_WRITE;
             uint8_t argByte = _uploadReadByte(client);
 readfile:
             while(argByte != 0x0D){
@@ -499,18 +507,18 @@ readfile:
 
               if (strstr((const char*)endBuf, boundary.c_str()) != NULL){
                 if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, _currentUpload);
-                _currentUpload.totalSize += _currentUpload.currentSize;
-                _currentUpload.status = UPLOAD_FILE_END;
+                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
+                _currentUpload->totalSize += _currentUpload->currentSize;
+                _currentUpload->status = UPLOAD_FILE_END;
                 if(_currentHandler && _currentHandler->canUpload(_currentUri))
-                  _currentHandler->upload(*this, _currentUri, _currentUpload);
+                  _currentHandler->upload(*this, _currentUri, *_currentUpload);
 #ifdef DEBUG_ESP_HTTP_SERVER
                 DEBUG_OUTPUT.print("End File: ");
-                DEBUG_OUTPUT.print(_currentUpload.filename);
+                DEBUG_OUTPUT.print(_currentUpload->filename);
                 DEBUG_OUTPUT.print(" Type: ");
-                DEBUG_OUTPUT.print(_currentUpload.type);
+                DEBUG_OUTPUT.print(_currentUpload->type);
                 DEBUG_OUTPUT.print(" Size: ");
-                DEBUG_OUTPUT.println(_currentUpload.totalSize);
+                DEBUG_OUTPUT.println(_currentUpload->totalSize);
 #endif
                 line = client.readStringUntil(0x0D);
                 client.readStringUntil(0x0A);
@@ -558,7 +566,8 @@ readfile:
       arg.value = postArgs[iarg].value;
     }
     _currentArgCount = iarg;
-    if (postArgs) delete[] postArgs;
+    if (postArgs) 
+      delete[] postArgs;
     return true;
   }
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -600,8 +609,8 @@ String ESP8266WebServer::urlDecode(const String& text)
 }
 
 bool ESP8266WebServer::_parseFormUploadAborted(){
-  _currentUpload.status = UPLOAD_FILE_ABORTED;
+  _currentUpload->status = UPLOAD_FILE_ABORTED;
   if(_currentHandler && _currentHandler->canUpload(_currentUri))
-    _currentHandler->upload(*this, _currentUri, _currentUpload);
+    _currentHandler->upload(*this, _currentUri, *_currentUpload);
   return false;
 }

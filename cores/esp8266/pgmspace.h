@@ -4,16 +4,11 @@
 #include <stdint.h>
 #include <stdio.h>
 
+
 #ifdef __ets__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include "ets_sys.h"
 #include "osapi.h"
-#ifdef __cplusplus
-}
-#endif
 
 #define PROGMEM     ICACHE_RODATA_ATTR
 #define PGM_P  		const char *
@@ -28,7 +23,13 @@ extern "C" {
 #endif // __ets__
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define _SFR_BYTE(n) (n)
+
+#ifdef __PROG_TYPES_COMPAT__
 
 typedef void prog_void;
 typedef char prog_char;
@@ -39,6 +40,8 @@ typedef int16_t prog_int16_t;
 typedef uint16_t prog_uint16_t;
 typedef int32_t prog_int32_t;
 typedef uint32_t prog_uint32_t;
+
+#endif // defined(__PROG_TYPES_COMPAT__)
 
 #define SIZE_IRRELEVANT 0x7fffffff
 
@@ -87,23 +90,40 @@ int	vsnprintf_P(char *str, size_t strSize, PGM_P formatP, va_list ap) __attribut
 //     w1,     w0
 
 #ifdef __ets__
-#define pgm_read_byte(addr) 		                                           \
-(__extension__({                                                               \
-    PGM_P __local = (PGM_P)(addr);  /* isolate varible for macro expansion */         \
-    ptrdiff_t __offset = ((uint32_t)__local & 0x00000003); /* byte aligned mask */            \
-    const uint32_t* __addr32 = (const uint32_t*)((const uint8_t*)(__local)-__offset); \
-    uint8_t __result = ((*__addr32) >> (__offset * 8));                        \
-    __result;                                                                  \
-}))
 
-#define pgm_read_word(addr) 		                                           \
-(__extension__({                                                               \
-    PGM_P __local = (PGM_P)(addr); /* isolate varible for macro expansion */          \
-    ptrdiff_t __offset = ((uint32_t)__local & 0x00000002);   /* word aligned mask */          \
-    const uint32_t* __addr32 = (const uint32_t*)((const uint8_t*)(__local) - __offset); \
-    uint16_t __result = ((*__addr32) >> (__offset * 8));                       \
-    __result;                                                                  \
-}))	
+#define pgm_read_with_offset(addr, res) \
+  asm("extui    %0, %1, 0, 2\n"     /* Extract offset within word (in bytes) */ \
+      "sub      %1, %1, %0\n"       /* Subtract offset from addr, yielding an aligned address */ \
+      "l32i.n   %1, %1, 0x0\n"      /* Load word from aligned address */ \
+      "slli     %0, %0, 3\n"        /* Mulitiply offset by 8, yielding an offset in bits */ \
+      "ssr      %0\n"               /* Prepare to shift by offset (in bits) */ \
+      "srl      %0, %1\n"           /* Shift right; now the requested byte is the first one */ \
+      :"=r"(res), "=r"(addr) \
+      :"1"(addr) \
+      :);
+
+static inline uint8_t pgm_read_byte_inlined(const void* addr) {
+  register uint32_t res;
+  pgm_read_with_offset(addr, res);
+  return (uint8_t) res;     /* This masks the lower byte from the returned word */
+}
+
+/* Although this says "word", it's actually 16 bit, i.e. half word on Xtensa */
+static inline uint16_t pgm_read_word_inlined(const void* addr) {
+  register uint32_t res;
+  pgm_read_with_offset(addr, res);
+  return (uint16_t) res;    /* This masks the lower half-word from the returned word */
+}
+
+// Make sure, that libraries checking existence of this macro are not failing
+#ifdef __PROG_TYPES_COMPAT__
+#define pgm_read_byte(addr) pgm_read_byte_inlined((const void*)(addr))
+#define pgm_read_word(addr) pgm_read_word_inlined((const void*)(addr))
+#else
+#define pgm_read_byte(addr) pgm_read_byte_inlined(addr)
+#define pgm_read_word(addr) pgm_read_word_inlined(addr)
+#endif
+
 #else //__ets__
 #define pgm_read_byte(addr)     (*reinterpret_cast<const uint8_t*>(addr))
 #define pgm_read_word(addr)     (*reinterpret_cast<const uint16_t*>(addr))
@@ -123,5 +143,9 @@ int	vsnprintf_P(char *str, size_t strSize, PGM_P formatP, va_list ap) __attribut
 #define pgm_read_dword_far(addr) 	pgm_read_dword(addr)
 #define pgm_read_float_far(addr) 	pgm_read_float(addr)
 #define pgm_read_ptr_far(addr)		pgm_read_ptr(addr)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //__PGMSPACE_H_

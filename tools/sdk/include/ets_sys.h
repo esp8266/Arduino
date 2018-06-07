@@ -1,7 +1,24 @@
 /*
- * copyright (c) 2008 - 2011 Espressif System
+ * ESPRESSIF MIT License
  *
- * Define user specified Event signals and Task priorities here
+ * Copyright (c) 2016 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
+ *
+ * Permission is hereby granted for use on ESPRESSIF SYSTEMS ESP8266 only, in which case,
+ * it is free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -11,6 +28,10 @@
 #include "c_types.h"
 #include "eagle_soc.h"
 #include <stddef.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef uint32_t ETSSignal;
 typedef uint32_t ETSParam;
@@ -50,6 +71,14 @@ typedef void (*int_handler_t)(void*);
 #define ETS_SOFT_INUM       7
 #define ETS_WDT_INUM        8
 #define ETS_FRC_TIMER1_INUM 9  /* use edge*/
+
+typedef void (* ets_isr_t)(void *);
+
+void ets_intr_lock(void);
+void ets_intr_unlock(void);
+void ets_isr_attach(int i, ets_isr_t func, void *arg);
+
+void NmiTimSetFunc(void (*func)(void));
 
 #define ETS_INTR_LOCK() \
     ets_intr_lock()
@@ -176,7 +205,6 @@ int ets_sprintf(char *str, const char *format, ...)  __attribute__ ((format (pri
 int os_snprintf(char *str, size_t size, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
 int ets_printf(const char *format, ...)  __attribute__ ((format (printf, 1, 2)));
 void ets_install_putc1(void* routine);
-void uart_div_modify(int no, int freq);
 void ets_isr_mask(int intr);
 void ets_isr_unmask(int intr);
 void ets_isr_attach(int intr, int_handler_t handler, void *arg);
@@ -187,6 +215,11 @@ int ets_vprintf(int (*print_function)(int), const char * format, va_list arg) __
 int ets_putc(int);
 bool ets_task(ETSTask task, uint8 prio, ETSEvent *queue, uint8 qlen);
 bool ets_post(uint8 prio, ETSSignal sig, ETSParam par);
+void ets_update_cpu_frequency(uint32_t ticks_per_us);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _ETS_SYS_H */

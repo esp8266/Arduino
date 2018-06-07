@@ -20,19 +20,22 @@
 
 #include "cont.h"
 #include <stddef.h>
+#include <string.h>
 #include "ets_sys.h"
 
 
 #define CONT_STACKGUARD 0xfeefeffe
 
-void ICACHE_RAM_ATTR cont_init(cont_t* cont) {
+void cont_init(cont_t* cont) {
+    memset(cont, 0, sizeof(cont_t));
+    
     cont->stack_guard1 = CONT_STACKGUARD;
     cont->stack_guard2 = CONT_STACKGUARD;
     cont->stack_end = cont->stack + (sizeof(cont->stack) / 4);
     cont->struct_start = (unsigned*) cont;
     
     // fill stack with magic values to check high water mark
-    for(int pos = 0; pos < sizeof(cont->stack) / 4; pos++)
+    for(int pos = 0; pos < (int)(sizeof(cont->stack) / 4); pos++)
     {
         cont->stack[pos] = CONT_STACKGUARD;
     }
