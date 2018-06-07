@@ -42,14 +42,10 @@ developers.
 Prerequisites
 ~~~~~~~~~~~~~
 
--  Arduino 1.6.8 (or newer, if you know what you are doing)
+-  Arduino 1.6.8 (or newer, current working version is 1.8.5)
 -  git
--  Python_ 2.7.
-
-.. _Python: http://www.python.org/
-
-__ Python_ 
--  terminal, console, or command prompt (depending on you OS)
+-  Python_ 2.7 (http://python.org)
+-  terminal, console, or command prompt (depending on your OS)
 -  Internet connection
 
 Instructions - Windows 10
