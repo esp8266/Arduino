@@ -48,7 +48,69 @@ Prerequisites
 -  terminal, console, or command prompt (depending on you OS)
 -  Internet connection
 
-Instructions
+Instructions - Windows 10
+~~~~~~~~~~~~
+
+-  Open a command prompt (cmd) and go to Arduino default directory. This is typically the
+   *sketchbook* directory (usually ``C:\users\{username}\Documents\``)
+   
+-  Clone this repository into hardware/esp8266com/esp8266 directory.
+
+   .. code:: bash
+      
+       cd %USERPROFILE%\Documents\
+       cd hardware
+       mkdir esp8266com
+       cd esp8266com
+       git clone https://github.com/esp8266/Arduino.git esp8266
+
+   You should end up with the following directory structure in ``C:\Users\{your username}\``:
+
+   .. code:: bash
+
+       Documents
+       |
+       --- hardware
+           |
+           --- esp8266com
+               |
+               --- esp8266
+                   |
+                   --- bootloaders
+                   --- cores
+                   --- doc
+                   --- libraries
+                   --- package
+                   --- tests
+                   --- tools
+                   --- variants
+                   --- platform.txt
+                   --- programmers.txt
+                   --- README.md
+                   --- boards.txt
+                   --- LICENSE
+
+-  Download binary tools
+
+   .. code:: bash
+
+       cd esp8266/tools
+       python get.py
+
+-  Restart Arduino
+
+-  When later updating your local library, goto the esp8266 directory and do a git pull
+
+   .. code:: bash
+
+       cd %USERPROFILE%\Documents\hardware\esp8266com\esp8266
+       git status
+       git pull
+
+Note that you could, in theory install in ``C:\Program Files (x86)\Arduino\hardware`` however this has security implications, not to mention the directory often gets blown away when re-installing Arduino IDE. It does have the benefit (or drawback, depending on your perspective) - of being available to all users on your PC that use Arduino.
+
+
+Instructions - Other OS
 ~~~~~~~~~~~~
 
 -  Open the console and go to Arduino directory. This can be either your
