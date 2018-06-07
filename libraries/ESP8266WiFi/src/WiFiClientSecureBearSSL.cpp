@@ -228,10 +228,7 @@ bool WiFiClientSecure::_clientConnected() {
 }
 
 uint8_t WiFiClientSecure::connected() {
-  if (_recvapp_len) {
-    return true;
-  }
-  if (_client && _client->state() == ESTABLISHED && _handshake_done) {
+  if (available() || (_clientConnected() && _handshake_done)) {
     return true;
   }
   return false;
@@ -400,7 +397,7 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
     }
 
     if (!(_client->state() == ESTABLISHED) && !WiFiClient::available()) {
-      return -1;
+      return (state & target) ? 0 : -1;
     }
 
     /*
