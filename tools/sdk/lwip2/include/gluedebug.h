@@ -35,6 +35,7 @@
 #ifdef __cplusplus
 extern "C"
 #endif
+#define HAS_PHY_CAPTURE 1
 void (*phy_capture) (int netif_idx, const char* data, size_t len, int out, int success);
 
 /////////////////////////////////////////////////////////////////////////////
