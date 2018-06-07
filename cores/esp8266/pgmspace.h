@@ -29,6 +29,8 @@ extern "C" {
 
 #define _SFR_BYTE(n) (n)
 
+#ifdef __PROG_TYPES_COMPAT__
+
 typedef void prog_void;
 typedef char prog_char;
 typedef unsigned char prog_uchar;
@@ -38,6 +40,8 @@ typedef int16_t prog_int16_t;
 typedef uint16_t prog_uint16_t;
 typedef int32_t prog_int32_t;
 typedef uint32_t prog_uint32_t;
+
+#endif // defined(__PROG_TYPES_COMPAT__)
 
 #define SIZE_IRRELEVANT 0x7fffffff
 
@@ -112,8 +116,13 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
 }
 
 // Make sure, that libraries checking existence of this macro are not failing
+#ifdef __PROG_TYPES_COMPAT__
+#define pgm_read_byte(addr) pgm_read_byte_inlined((const void*)(addr))
+#define pgm_read_word(addr) pgm_read_word_inlined((const void*)(addr))
+#else
 #define pgm_read_byte(addr) pgm_read_byte_inlined(addr)
 #define pgm_read_word(addr) pgm_read_word_inlined(addr)
+#endif
 
 #else //__ets__
 #define pgm_read_byte(addr)     (*reinterpret_cast<const uint8_t*>(addr))
