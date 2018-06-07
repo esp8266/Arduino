@@ -44,7 +44,11 @@ Prerequisites
 
 -  Arduino 1.6.8 (or newer, if you know what you are doing)
 -  git
--  python 2.7
+-  Python_ 2.7.
+
+.. _Python: http://www.python.org/
+
+__ Python_ 
 -  terminal, console, or command prompt (depending on you OS)
 -  Internet connection
 
@@ -99,7 +103,7 @@ Instructions - Windows 10
 
 -  Restart Arduino
 
-- If using the [Arduino IDE for Visual Studio](https://www.visualmicro.com), be sure to click Tools - Visual Micro - Rescan Toolchains and Libraries
+- If using the Arduino IDE for Visual Studio (https://www.visualmicro.com/), be sure to click Tools - Visual Micro - Rescan Toolchains and Libraries 
 
 -  When later updating your local library, goto the esp8266 directory and do a git pull
 
