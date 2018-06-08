@@ -124,9 +124,9 @@ Station (STA) mode is used to get ESP module connected to a Wi-Fi network establ
 
 Station class has several features to facilitate management of Wi-Fi connection. In case the connection is lost, ESP8266 will automatically reconnect to the last used access point, once it is again available. The same happens on module reboot. This is possible since ESP is saving credentials to last used access point in flash (non-volatile) memory. Using the saved data ESP will also reconnect if sketch has been changed but code does not alter the Wi-Fi mode or credentials.
 
-:doc:`Station Class documentation <station-class>`
+`Station Class documentation <station-class.rst>`__
 
-Check out separate section with :doc:`examples <station-examples>`.
+Check out separate section with `examples <station-examples.rst>`__.
 
 Soft Access Point
 ~~~~~~~~~~~~~~~~~
@@ -143,18 +143,18 @@ The soft-AP mode is often used and an intermediate step before connecting ESP to
 
 Another handy application of soft-AP mode is to set up `mesh networks <https://en.wikipedia.org/wiki/Mesh_networking>`__. ESP can operate in both soft-AP and Station mode so it can act as a node of a mesh network.
 
-:doc:`Soft Access Point Class documentation <soft-access-point-class>`
+`Soft Access Point Class documentation <soft-access-point-class.rst>`__
 
-Check out separate section with :doc:`examples <soft-access-point-examples>`.
+Check out separate section with `examples <soft-access-point-examples.rst>`__.
 
 Scan
 ~~~~
 
 To connect a mobile phone to a hot spot, you typically open Wi-Fi settings app, list available networks and pick the hot spot you need. Then enter a password (or not) and you are in. You can do the same with ESP. Functionality of scanning for, and listing of available networks in range is implemented by the Scan Class.
 
-:doc:`Scan Class documentation <scan-class>`.
+`Scan Class documentation <scan-class.rst>`__
 
-Check out separate section with :doc:`examples <scan-examples>`.
+Check out separate section with `examples <scan-examples.rst>`__.
 
 Client
 ~~~~~~
@@ -166,8 +166,7 @@ The Client class creates `clients <https://en.wikipedia.org/wiki/Client_(computi
 
    alt text
 
-Check out separate section with :doc:`examples <client-examples>` / :doc:`list of functions
-<client-class>`
+Check out separate section with `examples <client-examples.rst>`__ / `list of functions <client-class.rst>`__
 
 Client Secure
 ~~~~~~~~~~~~~
@@ -181,7 +180,7 @@ The Client Secure is an extension of `Client Class <#client>`__ where connection
 
 Secure applications have additional memory (and processing) overhead due to the need to run cryptography algorithms. The stronger the certificate's key, the more overhead is needed. In practice it is not possible to run more than a single secure client at a time. The problem concerns RAM memory we can not add, the flash memory size is usually not the issue. If you like to learn how `client secure library <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h>`__ has been developed, access to what servers have been tested, and how memory limitations have been overcame, read fascinating issue report `#43 <https://github.com/esp8266/Arduino/issues/43>`__.
 
-Check out separate section with :doc:`examples <client-secure-examples>` / :doc:`list of functions <client-secure-class>`
+Check out separate section with `examples <client-secure-examples.rst>`__ / `list of functions <client-secure-class.rst>`__
 
 Server
 ~~~~~~
@@ -195,21 +194,21 @@ The Server Class creates `servers <https://en.wikipedia.org/wiki/Server_(computi
 
 Clients connect to sever to send and receive data and access provided functionality.
 
-Check out separate section with :doc:`examples <server-examples>` / :doc:`list of functions <server-class>`.
+Check out separate section with `examples <server-examples>`__ / `list of functions <server-class>`__.
 
 UDP
 ~~~
 
 The UDP Class enables the `User Datagram Protocol (UDP) <https://en.wikipedia.org/wiki/User_Datagram_Protocol>`__ messages to be sent and received. The UDP uses a simple "fire and forget" transmission model with no guarantee of delivery, ordering, or duplicate protection. UDP provides checksums for data integrity, and port numbers for addressing different functions at the source and destination of the datagram.
 
-Check out separate section with :doc:`examples <udp-examples>` / :doc:`list of functions <udp-class>`.
+Check out separate section with `examples <udp-examples.rst>`__ / `list of functions <udp-class.rst>`__.
 
 Generic
 ~~~~~~~
 
 There are several functions offered by ESP8266's `SDK <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__ and not present in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__. If such function does not fit into one of classes discussed above, it will likely be in Generic Class. Among them is handler to manage Wi-Fi events like connection, disconnection or obtaining an IP, Wi-Fi mode changes, functions to manage module sleep mode, hostname to an IP address resolution, etc.
 
-Check out separate section with :doc:`examples <generic-examples>` / :doc:`list of functions <generic-class>`.
+Check out separate section with `examples <generic-examples.rst>`__ / `list of functions <generic-class.rst>`__.
 
 Diagnostics
 -----------
@@ -271,7 +270,7 @@ Use this function to provide snapshot of Wi-Fi status in these parts of applicat
 Enable Wi-Fi Diagnostic
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-By default the diagnostic output from Wi-Fi libraries is disabled when you call ``Serial.begin``. To enable debug output again, call ``Serial.setDebugOutput(true)``. To redirect debug output to ``Serial1`` instead, call ``Serial1.setDebugOutput(true)``. For additional details regarding diagnostics using serial ports please refer to :doc:`the documentation <../reference>`.
+By default the diagnostic output from Wi-Fi libraries is disabled when you call ``Serial.begin``. To enable debug output again, call ``Serial.setDebugOutput(true)``. To redirect debug output to ``Serial1`` instead, call ``Serial1.setDebugOutput(true)``. For additional details regarding diagnostics using serial ports please refer to `the documentation <../reference.rst>`__.
 
 Below is an example of output for sample sketch discussed in `Quick Start <#quick-start>`__ above with ``Serial.setDebugOutput(true)``:
 
