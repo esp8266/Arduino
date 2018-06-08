@@ -51,7 +51,6 @@ In the line ``WiFi.begin("network-name", "pass-to-network")`` replace ``network-
 .. figure:: pictures/wifi-simple-connect-terminal.png
    :alt: Connection log on Arduino IDE's Serial Monitor
 
-   alt text
 
 How does it work? In the first line of sketch ``#include <ESP8266WiFi.h>`` we are including `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library. This library provides ESP8266 specific Wi-Fi routines we are calling to connect to network.
 
@@ -95,8 +94,6 @@ ESP8266 module can operate as a station, so we can connect it to the Wi-Fi netwo
 .. figure:: pictures/esp8266-station-soft-access-point.png
    :alt: ESP8266 operating in the Station + Soft Access Point mode
 
-   alt text
-
 The `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ library provides wide collection of C++
 `methods <https://en.wikipedia.org/wiki/Method_(computer_programming)>`__ (functions) and `properties <https://en.wikipedia.org/wiki/Property_(programming)>`__ to configure and operate an ESP8266 module in station and / or soft access point mode. They are described in the following chapters.
 
@@ -108,8 +105,6 @@ The `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP82
 .. figure:: pictures/doxygen-class-index.png
    :alt: Index of classes of ESP8266WiFi library
 
-   alt text
-
 Chapters below describe all function calls (`methods <https://en.wikipedia.org/wiki/Method_(computer_programming)>`__ and `properties <https://en.wikipedia.org/wiki/Property_(programming)>`__ in C++ terms) listed in particular classes of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__. Description is illustrated with application examples and code snippets to show how to use functions in practice. Most of this information is broken up into separate documents. Please follow to access them.
 
 Station
@@ -119,8 +114,6 @@ Station (STA) mode is used to get ESP module connected to a Wi-Fi network establ
 
 .. figure:: pictures/esp8266-station.png
    :alt: ESP8266 operating in the Station mode
-
-   alt text
 
 Station class has several features to facilitate management of Wi-Fi connection. In case the connection is lost, ESP8266 will automatically reconnect to the last used access point, once it is again available. The same happens on module reboot. This is possible since ESP is saving credentials to last used access point in flash (non-volatile) memory. Using the saved data ESP will also reconnect if sketch has been changed but code does not alter the Wi-Fi mode or credentials.
 
@@ -136,8 +129,6 @@ and connects them further to a wired network. ESP8266 can provide similar functi
 
 .. figure:: pictures/esp8266-soft-access-point.png
    :alt: ESP8266 operating in the Soft Access Point mode
-
-   alt text
 
 The soft-AP mode is often used and an intermediate step before connecting ESP to a Wi-Fi in a station mode. This is when SSID and password to such network is not known upfront. ESP first boots in soft-AP mode, so we can connect to it using a laptop or a mobile phone. Then we are able to provide credentials to the target network. Once done ESP is switched to the station mode and can connect to the target Wi-Fi.
 
@@ -164,8 +155,6 @@ The Client class creates `clients <https://en.wikipedia.org/wiki/Client_(computi
 .. figure:: pictures/esp8266-client.png
    :alt: ESP8266 operating as the Client
 
-   alt text
-
 Check out separate section with `examples <client-examples.rst>`__ / `list of functions <client-class.rst>`__
 
 Client Secure
@@ -175,8 +164,6 @@ The Client Secure is an extension of `Client Class <#client>`__ where connection
 
 .. figure:: pictures/esp8266-client-secure.png
    :alt: ESP8266 operating as the Client Secure
-
-   alt text
 
 Secure applications have additional memory (and processing) overhead due to the need to run cryptography algorithms. The stronger the certificate's key, the more overhead is needed. In practice it is not possible to run more than a single secure client at a time. The problem concerns RAM memory we can not add, the flash memory size is usually not the issue. If you like to learn how `client secure library <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h>`__ has been developed, access to what servers have been tested, and how memory limitations have been overcame, read fascinating issue report `#43 <https://github.com/esp8266/Arduino/issues/43>`__.
 
@@ -189,8 +176,6 @@ The Server Class creates `servers <https://en.wikipedia.org/wiki/Server_(computi
 
 .. figure:: pictures/esp8266-server.png
    :alt: ESP8266 operating as the Server
-
-   alt text
 
 Clients connect to sever to send and receive data and access provided functionality.
 
@@ -313,25 +298,17 @@ To make the analysis easier, rather than looking into individual header or sourc
 .. figure:: pictures/doxygen-esp8266wifi-documentation.png
    :alt: Example of documentation prepared by Doxygen
 
-   alt text
-
 The tool crawls through all header and source files collecting information from formatted comment blocks. If developer of particular class annotated the code, you will see it like in examples below.
 
 .. figure:: pictures/doxygen-example-station-begin.png
    :alt: Example of documentation for station begin method by Doxygen
 
-   alt text
-
 .. figure:: pictures/doxygen-example-station-hostname.png
    :alt: Example of documentation for station hostname propert by Doxygen
-
-   alt text
 
 If code is not annotated, you will still see the function prototype including types of arguments, and can use provided links to jump straight to the source code to check it out on your own. Doxygen provides really excellent navigation between members of library.
 
 .. figure:: pictures/doxygen-example-udp-begin.png
    :alt: Example of documentation for UDP begin method (not annotaed in code)by Doxygen
-
-   alt text
 
 Several classes of `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi>`__ are not annotated. When preparing this document, `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`__ has been tremendous help to quickly navigate through almost 30 files that make this library.
