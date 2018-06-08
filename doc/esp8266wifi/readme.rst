@@ -179,7 +179,7 @@ The Server Class creates `servers <https://en.wikipedia.org/wiki/Server_(computi
 
 Clients connect to sever to send and receive data and access provided functionality.
 
-Check out separate section with `examples <server-examples>`__ / `list of functions <server-class>`__.
+Check out separate section with `examples <server-examples.rst>`__ / `list of functions <server-class.rst>`__.
 
 UDP
 ~~~
