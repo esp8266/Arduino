@@ -57,7 +57,7 @@ Basic Requirements
 
 Flash chip size should be able to hold the old sketch (currently running) and the new sketch (OTA) at the same time.
 
-Keep in mind that the File system and EEPROM for example needs space too (one time) see :ref:`Flash layout`.
+Keep in mind that the File system and EEPROM for example needs space too (one time) see `Flash layout <../filesystem.rst#flash-layout>`__.
 
 .. code:: cpp
 
@@ -224,7 +224,12 @@ Instead of the log as on the above screen you may see the following:
 
 If this is the case, then most likely ESP module has not been reset after initial upload using serial port.
 
-The most common causes of OTA failure are as follows: \* not enough physical memory on the chip (e.g. ESP01 with 512K flash memory is not enough for OTA), \* too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see `Update process - memory view <#update-process-memory-view>`__, \* too little memory declared in Arduino IDE for your selected board (i.e. less than physical size), \* not resetting the ESP module after initial upload using serial port.
+The most common causes of OTA failure are as follows:
+
+- not enough physical memory on the chip (e.g. ESP01 with 512K flash memory is not enough for OTA).
+- too much memory declared for SPIFFS so new sketch will not fit between existing sketch and SPIFFS – see `Update process - memory view <#update-process-memory-view>`__.
+- too little memory declared in Arduino IDE for your selected board (i.e. less than physical size).
+- not resetting the ESP module after initial upload using serial port.
 
 For more details regarding flash memory layout please check `File system <../filesystem.rst>`__. For overview where new sketch is stored, how it is copied and how memory is organized for the purpose of OTA see `Update process - memory view <#update-process-memory-view>`__.
 
