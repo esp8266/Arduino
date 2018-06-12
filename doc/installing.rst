@@ -33,6 +33,10 @@ You may optionally use *staging* boards manager package link:
 This may contain some new features, but at the same time, some things
 might be broken.
 
+For more information on the Arduino Board Manager, see:
+
+- https://www.arduino.cc/en/Guide/Libraries
+
 Using git version
 -----------------
 
@@ -50,26 +54,33 @@ Prerequisites
 
 Instructions - Windows 10
 ~~~~~~~~~~~~
+- First, make sure you don't already have the ESP8266 library installed using the Board Manager (see above)
+
+- Install git for Windows (if not already; see https://git-scm.com/download/win)
 
 -  Open a command prompt (cmd) and go to Arduino default directory. This is typically the
-   *sketchbook* directory (usually ``C:\users\{username}\Documents\`` where the environment variable ``%USERPROFILE%`` usually contains ``C:\users\{username}``)
+   *sketchbook* directory (usually ``C:\users\{username}\Documents\Arduino`` where the environment variable ``%USERPROFILE%`` usually contains ``C:\users\{username}``)
    
 -  Clone this repository into hardware/esp8266com/esp8266 directory.
 
    .. code:: bash
       
-       cd %USERPROFILE%\Documents\
+       cd %USERPROFILE%\Documents\Arduino\
+       mkdir hardware
        cd hardware
        mkdir esp8266com
        cd esp8266com
        git clone https://github.com/esp8266/Arduino.git esp8266
 
-   You should end up with the following directory structure in ``C:\Users\{your username}\``:
+   You should end up with the following directory structure in
+   
+   ``C:\Users\{your username}\Documents\``
 
    .. code:: bash
 
-       Documents
+       Arduino
        |
+       --- libraries
        --- hardware
            |
            --- esp8266com
