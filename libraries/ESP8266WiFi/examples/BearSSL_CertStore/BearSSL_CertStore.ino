@@ -45,6 +45,10 @@ BearSSL::CertStore certStore;
 // Uncomment below to use the SD card to store the certs
 // #define USE_SDCARD 1
 
+// NOTE: The CertStoreFile virtual class may migrate to a templated
+// model in a future release. Expect some changes to the interface,
+// no matter what, as the SD and SPIFFS filesystem get unified.
+
 #ifdef USE_SDCARD
 
 #include <SD.h>

@@ -35,6 +35,10 @@ namespace BearSSL {
 // Arduino setup, and there is no simple way to work around the minor
 // differences.
 // See the examples for implementations to use in your own code.
+//
+// NOTE: This virtual class may migrate to a templated model in a future
+// release.  Expect some changes to the interface, no matter what, as the
+// SD and SPIFFS filesystem get unified.
 class CertStoreFile {
   public:
     CertStoreFile() {};
