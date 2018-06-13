@@ -259,7 +259,7 @@ elif [ "$BUILD_TYPE" = "build_odd" ]; then
 elif [ "$BUILD_TYPE" = "platformio" ]; then
     # PlatformIO
     install_platformio
-    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --project-option=lib_ldf_mode=deep+ --verbose"
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
 elif [ "$BUILD_TYPE" = "docs" ]; then
     # Build documentation using Sphinx
     cd $TRAVIS_BUILD_DIR/doc

@@ -7,7 +7,7 @@
 //
 // Why would you need a CertStore?
 //
-// If you know the exact serve being connected to, or you
+// If you know the exact server being connected to, or you
 // are generating your own self-signed certificates and aren't
 // allowing connections to HTTPS/TLS servers out of your
 // control, then you do NOT want a CertStore.  Hardcode the
@@ -15,7 +15,7 @@
 //
 // However, if you don't know what specific sites the system
 // will be required to connect to and verify, a
-// CertStore{SPIFFS,SD}BearSSL can allow you to select from
+// CertStore can allow you to select from among
 // 10s or 100s of CAs against which you can check the
 // target's X.509, without taking any more RAM than a single
 // certificate.  This is the same way that standard browsers
@@ -31,7 +31,7 @@
 // Released to the public domain
 
 #include <ESP8266WiFi.h>
-#include <CertStoreSPIFFSBearSSL.h>
+#include <CertStoreBearSSL.h>
 #include <time.h>
 
 const char *ssid = "....";
@@ -40,7 +40,87 @@ const char *pass = "....";
 // A single, global CertStore which can be used by all
 // connections.  Needs to stay live the entire time any of
 // the WiFiClientBearSSLs are present.
-CertStoreSPIFFSBearSSL certStore;
+BearSSL::CertStore certStore;
+
+// Uncomment below to use the SD card to store the certs
+// #define USE_SDCARD 1
+
+// NOTE: The CertStoreFile virtual class may migrate to a templated
+// model in a future release. Expect some changes to the interface,
+// no matter what, as the SD and SPIFFS filesystem get unified.
+
+#ifdef USE_SDCARD
+
+#include <SD.h>
+class SDCertStoreFile : public BearSSL::CertStoreFile {
+  public:
+    SDCertStoreFile(const char *name) {
+      _name = name;
+    };
+    virtual ~SDCertStoreFile() override {};
+
+    // The main API
+    virtual bool open(bool write = false) override {
+      _file = SD.open(_name, write ? FILE_WRITE : FILE_READ);
+      return _file;
+    }
+    virtual bool seek(size_t absolute_pos) override {
+      return _file.seek(absolute_pos);
+    }
+    virtual ssize_t read(void *dest, size_t bytes) override {
+      return _file.read(dest, bytes);
+    }
+    virtual ssize_t write(void *dest, size_t bytes) override {
+      return _file.write((const uint8_t*)dest, bytes);
+    }
+    virtual void close() override {
+      _file.close();
+    }
+
+  private:
+    File _file;
+    const char *_name;
+};
+
+SDCertStoreFile certs_idx("/certs.idx");
+SDCertStoreFile certs_ar("/certs.ar");
+
+#else
+
+#include <FS.h>
+class SPIFFSCertStoreFile : public BearSSL::CertStoreFile {
+  public:
+    SPIFFSCertStoreFile(const char *name) {
+      _name = name;
+    };
+    virtual ~SPIFFSCertStoreFile() override {};
+
+    // The main API
+    virtual bool open(bool write = false) override {
+      _file = SPIFFS.open(_name, write ? "w" : "r");
+      return _file;
+    }
+    virtual bool seek(size_t absolute_pos) override {
+      return _file.seek(absolute_pos, SeekSet);
+    }
+    virtual ssize_t read(void *dest, size_t bytes) override {
+      return _file.readBytes((char*)dest, bytes);
+    }
+    virtual ssize_t write(void *dest, size_t bytes) override {
+      return _file.write((uint8_t*)dest, bytes);
+    }
+    virtual void close() override {
+      _file.close();
+    }
+
+  private:
+    File _file;
+    const char *_name;
+};
+
+SPIFFSCertStoreFile certs_idx("/certs.idx");
+SPIFFSCertStoreFile certs_ar("/certs.ar");
+#endif
 
 // Set time via NTP, as required for x.509 validation
 void setClock() {
@@ -108,6 +188,12 @@ void setup() {
   Serial.println();
   Serial.println();
 
+  #ifdef USE_SDCARD
+  SD.begin();
+  #else
+  SPIFFS.begin();
+  #endif
+
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -126,7 +212,7 @@ void setup() {
 
   setClock(); // Required for X.509 validation
 
-  int numCerts = certStore.initCertStore();
+  int numCerts = certStore.initCertStore(&certs_idx, &certs_ar);
   Serial.printf("Number of CA certs read: %d\n", numCerts);
   if (numCerts == 0) {
     Serial.printf("No certs found. Did you run certs-from-mozill.py and upload the SPIFFS directory before running?\n");
