@@ -66,9 +66,9 @@ Instructions - Windows 10
    .. code:: bash
       
        cd %USERPROFILE%\Documents\Arduino\
-       mkdir hardware
+       if not exist hardware mkdir hardware
        cd hardware
-       mkdir esp8266com
+       if not exist esp8266com mkdir esp8266com
        cd esp8266com
        git clone https://github.com/esp8266/Arduino.git esp8266
 
