@@ -20,21 +20,18 @@
 #include "CertStoreBearSSL.h"
 #include <memory>
 
+namespace BearSSL {
+
 extern "C" {
-  // Callbacks for the x509 decoder
+  // Callback for the x509 decoder
   static void dn_append(void *ctx, const void *buf, size_t len) {
     br_sha256_context *sha1 = (br_sha256_context*)ctx;
     br_sha256_update(sha1, buf, len);
   }
-  static void dn_append_null(void *ctx, const void *buf, size_t len) {
-    (void) ctx;
-    (void) buf;
-    (void) len;
-  }
 }
 
-CertStoreBearSSL::CertInfo CertStoreBearSSL::preprocessCert(const char *fname, const void *raw, size_t sz) {
-  CertStoreBearSSL::CertInfo ci;
+CertStore::CertInfo CertStore::_preprocessCert(uint32_t length, uint32_t offset, const void *raw) {
+  CertStore::CertInfo ci;
 
   // Clear the CertInfo
   memset(&ci, 0, sizeof(ci));
@@ -44,11 +41,12 @@ CertStoreBearSSL::CertInfo CertStoreBearSSL::preprocessCert(const char *fname, c
   br_sha256_context *sha256 = new br_sha256_context;
   br_sha256_init(sha256);
   br_x509_decoder_init(ctx, dn_append, sha256, nullptr, nullptr);
-  br_x509_decoder_push(ctx, (const void*)raw, sz);
+  br_x509_decoder_push(ctx, (const void*)raw, length);
 
   // Copy result to structure
   br_sha256_out(sha256, &ci.sha256);
-  strcpy(ci.fname, fname);
+  ci.length = length;
+  ci.offset = offset;
 
   // Clean up allocated memory
   delete sha256;
@@ -58,84 +56,139 @@ CertStoreBearSSL::CertInfo CertStoreBearSSL::preprocessCert(const char *fname, c
   return ci;
 }
 
-br_x509_trust_anchor *CertStoreBearSSL::makeTrustAnchor(const void *der, size_t der_len, const CertInfo *ci) {
-  // std::unique_ptr will free dc when we exit scope, automatically
-  std::unique_ptr<br_x509_decoder_context> dc(new br_x509_decoder_context);
-  br_x509_decoder_init(dc.get(), dn_append_null, nullptr, nullptr, nullptr);
-  br_x509_decoder_push(dc.get(), der, der_len);
-  br_x509_pkey *pk = br_x509_decoder_get_pkey(dc.get());
-  if (!pk) {
-    return nullptr;
+// The certs.ar file is a UNIX ar format file, concatenating all the 
+// individual certificates into a single blob in a space-efficient way.
+int CertStore::initCertStore(CertStoreFile *index, CertStoreFile *data) {
+  int count = 0;
+  uint32_t offset = 0;
+
+  _index = index;
+  _data = data;
+
+  if (!_index || !data) {
+    return 0;
   }
 
-  br_x509_trust_anchor *ta = (br_x509_trust_anchor*)malloc(sizeof(br_x509_trust_anchor));
-  if (!ta) {
-    return nullptr;
-  }
-  memset(ta, 0, sizeof(*ta));
-  ta->dn.data = (uint8_t*)malloc(sizeof(ci->sha256));
-  if (!ta->dn.data) {
-    free(ta);
-    return nullptr;
-  }
-  memcpy(ta->dn.data, ci->sha256, sizeof(ci->sha256));
-  ta->dn.len = sizeof(ci->sha256);
-
-  ta->flags = 0;
-  if (br_x509_decoder_isCA(dc.get())) {
-    ta->flags |= BR_X509_TA_CA;
+  if (!_index->open(true)) {
+    return 0;
   }
 
-  switch (pk->key_type) {
-    case BR_KEYTYPE_RSA:
-      ta->pkey.key_type = BR_KEYTYPE_RSA;
-      ta->pkey.key.rsa.n = (uint8_t*)malloc(pk->key.rsa.nlen);
-      if (!ta->pkey.key.rsa.n) {
-        free(ta->dn.data);
-        free(ta);
-        return nullptr;
-      }
-      memcpy(ta->pkey.key.rsa.n, pk->key.rsa.n, pk->key.rsa.nlen);
-      ta->pkey.key.rsa.nlen = pk->key.rsa.nlen;
-      ta->pkey.key.rsa.e = (uint8_t*)malloc(pk->key.rsa.elen);
-      if (!ta->pkey.key.rsa.e) {
-        free(ta->pkey.key.rsa.n);
-        free(ta->dn.data);
-        free(ta);
-        return nullptr;
-      }
-      memcpy(ta->pkey.key.rsa.e, pk->key.rsa.e, pk->key.rsa.elen);
-      ta->pkey.key.rsa.elen = pk->key.rsa.elen;
-      return ta;
-    case BR_KEYTYPE_EC:
-      ta->pkey.key_type = BR_KEYTYPE_EC;
-      ta->pkey.key.ec.curve = pk->key.ec.curve;
-      ta->pkey.key.ec.q = (uint8_t*)malloc(pk->key.ec.qlen);
-      if (!ta->pkey.key.ec.q) {
-        free(ta->dn.data);
-        free(ta);
-        return nullptr;
-      }
-      memcpy(ta->pkey.key.ec.q, pk->key.ec.q, pk->key.ec.qlen);
-      ta->pkey.key.ec.qlen = pk->key.ec.qlen;
-      return ta;
-    default:
-      free(ta->dn.data);
-      free(ta);
-      return nullptr;
+  if (!_data->open(false)) {
+    _index->close();
+    return 0;
   }
+
+  char magic[8];
+  if (_data->read(magic, sizeof(magic)) != sizeof(magic) ||
+      memcmp(magic, "!<arch>\n", sizeof(magic)) ) {
+    _data->close();
+    _index->close();
+    return 0;
+  }
+  offset += sizeof(magic);
+
+  while (true) {
+    char fileHeader[60];
+    // 0..15 = filename in ASCII
+    // 48...57 = length in decimal ASCII
+    uint32_t length;
+    if (data->read(fileHeader, sizeof(fileHeader)) != sizeof(fileHeader)) {
+      break;
+    }
+    offset += sizeof(fileHeader);
+    fileHeader[58] = 0;
+    if (1 != sscanf(fileHeader + 48, "%d", &length) || !length) {
+      break;
+    }
+
+    void *raw = malloc(length);
+    if (!raw) {
+      break;
+    }
+    if (_data->read(raw, length) != (ssize_t)length) {
+      free(raw);
+      break;
+    }
+
+    // If the filename starts with "//" then this is a rename file, skip it
+    if (fileHeader[0] != '/' || fileHeader[1] != '/') {
+      CertStore::CertInfo ci = _preprocessCert(length, offset, raw);
+      if (_index->write(&ci, sizeof(ci)) != (ssize_t)sizeof(ci)) {
+        free(raw);
+        break;
+      }
+      count++;
+    }
+
+    offset += length;
+    free(raw);
+    if (offset & 1) {
+      char x;
+      _data->read(&x, 1);
+      offset++;
+    }
+  }
+  _data->close();
+  _index->close();
+  return count;
 }
 
-void CertStoreBearSSL::freeTrustAnchor(const br_x509_trust_anchor *ta) {
-  switch (ta->pkey.key_type) {
-    case BR_KEYTYPE_RSA:
-      free(ta->pkey.key.rsa.e);
-      free(ta->pkey.key.rsa.n);
-      break;
-    case BR_KEYTYPE_EC:
-      free(ta->pkey.key.ec.q);
-      break;
+void CertStore::installCertStore(br_x509_minimal_context *ctx) {
+  br_x509_minimal_set_dynamic(ctx, (void*)this, findHashedTA, freeHashedTA);
+}
+
+const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, size_t len) {
+  CertStore *cs = static_cast<CertStore*>(ctx);
+  CertStore::CertInfo ci;
+
+  if (!cs || len != sizeof(ci.sha256) || !cs->_index || !cs->_data) {
+    return nullptr;
   }
-  free(ta->dn.data);
-  free((void*)ta);
+
+  if (!cs->_index->open(false)) {
+    return nullptr;
+  }
+
+  while (cs->_index->read(&ci, sizeof(ci)) == sizeof(ci)) {
+    if (!memcmp(ci.sha256, hashed_dn, sizeof(ci.sha256))) {
+      cs->_index->close();
+      uint8_t *der = (uint8_t*)malloc(ci.length);
+      if (!der) {
+        return nullptr;
+      }
+      if (!cs->_data->open(false)) {
+        free(der);
+        return nullptr;
+      }
+      if (!cs->_data->seek(ci.offset)) {
+        cs->_data->close();
+        free(der);
+        return nullptr;
+      }
+      if (cs->_data->read(der, ci.length) != (ssize_t)ci.length) {
+        free(der);
+        return nullptr;
+      }
+      cs->_data->close();
+      cs->_x509 = new BearSSLX509List(der, ci.length);
+      free(der);
+
+      br_x509_trust_anchor *ta = (br_x509_trust_anchor*)cs->_x509->getTrustAnchors();
+      memcpy(ta->dn.data, ci.sha256, sizeof(ci.sha256));
+      ta->dn.len = sizeof(ci.sha256);
+
+      return ta;
+    }
+  }
+  cs->_index->close();
+  return nullptr;
+}
+
+void CertStore::freeHashedTA(void *ctx, const br_x509_trust_anchor *ta) {
+  CertStore *cs = static_cast<CertStore*>(ctx);
+  (void) ta; // Unused
+  delete cs->_x509;
+  cs->_x509 = nullptr;
+}
+
 }
