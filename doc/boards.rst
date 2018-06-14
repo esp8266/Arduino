@@ -323,7 +323,7 @@ WeMos D1 mini Lite
 Parameters in Arduino IDE:
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Card: "WEMOS D1 Mini Light"
+- Card: "WEMOS D1 Mini Lite"
 - Flash Size: "1M (512K SPIFFS)"
 - CPU Frequency: "80 Mhz"
 - Upload Speed: "230400"
