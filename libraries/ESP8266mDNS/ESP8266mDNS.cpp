@@ -551,7 +551,8 @@ void MDNSResponder::_parsePacket(){
         if (tmp8 & 0xC0) { // Compressed pointer
           uint16_t offset = ((((uint16_t)tmp8) & ~0xC0) << 8) | _conn_read8();
           if (_conn->isValidOffset(offset)) {
-              last_bufferpos  = _conn->tell();
+              if (0 == last_bufferpos)
+                last_bufferpos  = _conn->tell();
 #ifdef DEBUG_ESP_MDNS_RX
               DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
               DEBUG_ESP_PORT.print(last_bufferpos);
