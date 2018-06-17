@@ -94,6 +94,9 @@
             },
             {
               "name": "WiFiduino"
+            },
+            {
+              "name": "Amperka WiFi Slot"
             }
           ],
           "toolsDependencies": [
