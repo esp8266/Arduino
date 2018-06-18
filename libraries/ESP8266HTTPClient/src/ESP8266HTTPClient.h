@@ -198,8 +198,8 @@ public:
     int getSize(void);
 
 #ifdef KEEP_PRESENT_API
-    WiFiClient& getStream(void)  __attribute__ ((deprecated));
-    WiFiClient* getStreamPtr(void)  __attribute__ ((deprecated));
+    WiFiClient& getStream(void);
+    WiFiClient* getStreamPtr(void);
 #endif
     int writeToStream(Stream* stream);
     String getString(void);
