@@ -95,7 +95,7 @@ class WiFiClientSecure : public WiFiClient {
     int getLastSSLError(char *dest = NULL, size_t len = 0);
 
     // Attach a preconfigured certificate store
-    void setCertStore(CertStoreBearSSL *certStore) {
+    void setCertStore(CertStore *certStore) {
       _certStore = certStore;
     }
 
@@ -152,7 +152,7 @@ class WiFiClientSecure : public WiFiClient {
     std::shared_ptr<unsigned char> _iobuf_out;
     time_t _now;
     const BearSSLX509List *_ta;
-    CertStoreBearSSL *_certStore;
+    CertStore *_certStore;
     int _iobuf_in_size;
     int _iobuf_out_size;
     bool _handshake_done;
