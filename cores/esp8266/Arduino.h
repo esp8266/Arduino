@@ -279,6 +279,7 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout = 100000
 unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
 
 void tone(uint8_t _pin, unsigned int frequency, unsigned long duration = 0);
+void tone(uint8_t _pin, double frequency, unsigned long duration = 0);
 void noTone(uint8_t _pin);
 
 // WMath prototypes
