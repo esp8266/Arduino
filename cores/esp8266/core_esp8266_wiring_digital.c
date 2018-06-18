@@ -168,6 +168,8 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
   ETS_GPIO_INTR_ENABLE();
 }
 
+extern void cleanupFunctional(void* arg);
+
 extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void *arg, int mode) {
   if(pin < 16) {
     ETS_GPIO_INTR_DISABLE();
@@ -192,8 +194,6 @@ extern void ICACHE_RAM_ATTR __attachInterrupt(uint8_t pin, voidFuncPtr userFunc,
 {
 	__attachInterruptArg (pin, userFunc, 0, mode);
 }
-
-extern void cleanupFunctional(void* arg);
 
 extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
   if(pin < 16) {
