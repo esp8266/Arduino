@@ -20,14 +20,22 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
+ * Modified by Jeroen Döll, June 2018
  */
 
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
+#define KEEP_DEPRECIATED_API
+
 #include <memory>
 #include <Arduino.h>
+
+#ifdef KEEP_DEPRECIATED_API
 #include <WiFiClient.h>
+#else
+#include <Client.h>
+#endif
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
@@ -124,8 +132,10 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
+#ifdef KEEP_DEPRECIATED_API
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
+#endif
 
 class HTTPClient
 {
@@ -133,17 +143,22 @@ public:
     HTTPClient();
     ~HTTPClient();
 
+    bool begin(Client &client, String url);
+    bool begin(Client &client, String host, uint16_t port, String uri = "/", bool https = false);
+
+#ifdef KEEP_DEPRECIATED_API
     // Plain HTTP connection, unencrypted
-    bool begin(String url);
-    bool begin(String host, uint16_t port, String uri = "/");
+    bool begin(String url)  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
     // Use axTLS for secure HTTPS connection
-    bool begin(String url, String httpsFingerprint);
-    bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
+    bool begin(String url, String httpsFingerprint)  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri, String httpsFingerprint)  __attribute__ ((deprecated));
     // Use BearSSL for secure HTTPS connection
-    bool begin(String url, const uint8_t httpsFingerprint[20]);
-    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20]);
+    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
     // deprecated, use the overload above instead
     bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
+#endif
 
     void end(void);
 
@@ -182,8 +197,10 @@ public:
 
     int getSize(void);
 
-    WiFiClient& getStream(void);
-    WiFiClient* getStreamPtr(void);
+#ifdef KEEP_DEPRECIATED_API
+    WiFiClient& getStream(void)  __attribute__ ((deprecated));
+    WiFiClient* getStreamPtr(void)  __attribute__ ((deprecated));
+#endif
     int writeToStream(Stream* stream);
     String getString(void);
 
@@ -204,8 +221,11 @@ protected:
     int writeToStreamDataBlock(Stream * stream, int len);
 
 
+#ifdef KEEP_DEPRECIATED_API
     TransportTraitsPtr _transportTraits;
-    std::unique_ptr<WiFiClient> _tcp;
+    std::unique_ptr<WiFiClient> _tcpDepreciated;
+#endif
+    Client* _tcp;
 
     /// request handling
     String _host;

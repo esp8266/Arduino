@@ -21,15 +21,19 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
-#include <StreamString.h>
-#include <base64.h>
 
 #include "ESP8266HTTPClient.h"
 
+#ifdef KEEP_DEPRECIATED_API
+#include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h>
+#endif
+
+#include <StreamString.h>
+#include <base64.h>
+
+#ifdef KEEP_DEPRECIATED_API
 class TransportTraits
 {
 public:
@@ -100,6 +104,7 @@ public:
 protected:
     uint8_t _fingerprint[20];
 };
+#endif
 
 /**
  * constructor
@@ -129,9 +134,70 @@ void HTTPClient::clear()
 }
 
 
+/**
+ * parsing the url for all needed parameters
+ * @param client Client&
+ * @param url String
+ * @param https bool
+ * @return success bool
+ */
+bool HTTPClient::begin(Client &client, String url) {
+#ifdef KEEP_DEPRECIATED_API
+    _tcpDepreciated.reset(nullptr);
+    _transportTraits.reset(nullptr);
+#endif
+    _tcp = &client;
+
+    // check for : (http: or https:)
+    int index = url.indexOf(':');
+    if(index < 0) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] failed to parse protocol\n");
+        return false;
+    }
+
+    String protocol = url.substring(0, index);
+    if(protocol != "http" && protocol != "https") {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unknown protocol '%s'\n", protocol.c_str());
+        return false;
+    }
+
+    _port = (protocol == "https" ? 443 : 80);
+    return beginInternal(url, protocol.c_str());
+}
+
+
+/**
+ * directly supply all needed parameters
+ * @param client Client&
+ * @param host String
+ * @param port uint16_t
+ * @param uri String
+ * @param https bool
+ * @return success bool
+ */
+bool HTTPClient::begin(Client &client, String host, uint16_t port, String uri, bool https)
+{
+#ifdef KEEP_DEPRECIATED_API
+    _tcpDepreciated.reset(nullptr);
+    _transportTraits.reset(nullptr);
+#endif
+    _tcp = &client;
+
+     clear();
+    _host = host;
+    _port = port;
+    _uri = uri;
+    _protocol = (https ? "https" : "http");
+    return true;
+}
+
+
+#ifdef KEEP_DEPRECIATED_API
 bool HTTPClient::begin(String url, String httpsFingerprint)
 {
+    _tcp = nullptr;
     _transportTraits.reset(nullptr);
+
     _port = 443;
     if (httpsFingerprint.length() == 0) {
         return false;
@@ -147,7 +213,9 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
 
 bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
 {
+    _tcp = nullptr;
     _transportTraits.reset(nullptr);
+
     _port = 443;
     if (!beginInternal(url, "https")) {
         return false;
@@ -168,7 +236,9 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
  */
 bool HTTPClient::begin(String url)
 {
+    _tcp = nullptr;
     _transportTraits.reset(nullptr);
+
     _port = 80;
     if (!beginInternal(url, "http")) {
         return false;
@@ -176,6 +246,7 @@ bool HTTPClient::begin(String url)
     _transportTraits = TransportTraitsPtr(new TransportTraits());
     return true;
 }
+#endif
 
 bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 {
@@ -224,8 +295,11 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
     return true;
 }
 
+#ifdef KEEP_DEPRECIATED_API
 bool HTTPClient::begin(String host, uint16_t port, String uri)
 {
+    _tcp = nullptr;
+
     clear();
     _host = host;
     _port = port;
@@ -246,6 +320,8 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, Strin
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFingerprint)
 {
+    _tcp = nullptr;
+
     clear();
     _host = host;
     _port = port;
@@ -261,6 +337,8 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])
 {
+    _tcp = nullptr;
+
     clear();
     _host = host;
     _port = port;
@@ -274,7 +352,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t htt
     DEBUG_HTTPCLIENT("\n");
     return true;
 }
-
+#endif
 
 /**
  * end
@@ -624,6 +702,7 @@ int HTTPClient::getSize(void)
     return _size;
 }
 
+#ifdef KEEP_DEPRECIATED_API
 /**
  * returns the stream of the tcp connection
  * @return WiFiClient
@@ -631,7 +710,7 @@ int HTTPClient::getSize(void)
 WiFiClient& HTTPClient::getStream(void)
 {
     if(connected()) {
-        return *_tcp;
+        return *_tcpDepreciated;
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client] getStream: not connected\n");
@@ -646,12 +725,13 @@ WiFiClient& HTTPClient::getStream(void)
 WiFiClient* HTTPClient::getStreamPtr(void)
 {
     if(connected()) {
-        return _tcp.get();
+        return (WiFiClient*)_tcpDepreciated.get();
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client] getStreamPtr: not connected\n");
     return nullptr;
 }
+#endif
 
 /**
  * write all  message body / payload to Stream
@@ -897,12 +977,21 @@ bool HTTPClient::connect(void)
         return true;
     }
 
-    if (!_transportTraits) {
+#ifdef KEEP_DEPRECIATED_API
+    if (!_tcp && !_transportTraits) {
+#else
+    if(!_tcp) {
+#endif
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
         return false;
     }
 
-    _tcp = _transportTraits->create();
+#ifdef KEEP_DEPRECIATED_API
+    if(!_tcp) {
+        _tcpDepreciated = _transportTraits->create();
+        _tcp = _tcpDepreciated.get();
+    }
+#endif
     _tcp->setTimeout(_tcpTimeout);
 
     if(!_tcp->connect(_host.c_str(), _port)) {
@@ -912,15 +1001,22 @@ bool HTTPClient::connect(void)
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
-    if (!_transportTraits->verify(*_tcp, _host.c_str())) {
+#ifdef KEEP_DEPRECIATED_API
+    if (_tcpDepreciated && _transportTraits && !_transportTraits->verify(*_tcpDepreciated, _host.c_str())) {
         DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
         _tcp->stop();
         return false;
     }
+#endif
 
 
 #ifdef ESP8266
-    _tcp->setNoDelay(true);
+#ifdef KEEP_DEPRECIATED_API
+    if(_tcpDepreciated)
+        _tcpDepreciated->setNoDelay(true);
+#else
+//	Client has no setNoDelay(), is this important???????????????
+#endif
 #endif
     return connected();
 }
