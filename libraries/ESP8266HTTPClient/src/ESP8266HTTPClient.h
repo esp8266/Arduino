@@ -26,12 +26,12 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
-#define KEEP_DEPRECIATED_API
+#define KEEP_PRESENT_API
 
 #include <memory>
 #include <Arduino.h>
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
 #include <WiFiClient.h>
 #else
 #include <Client.h>
@@ -132,7 +132,7 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 #endif
@@ -146,16 +146,16 @@ public:
     bool begin(Client &client, String url);
     bool begin(Client &client, String host, uint16_t port, String uri = "/", bool https = false);
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
     // Plain HTTP connection, unencrypted
-    bool begin(String url)  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
+    bool begin(String url);
+    bool begin(String host, uint16_t port, String uri = "/");
     // Use axTLS for secure HTTPS connection
-    bool begin(String url, String httpsFingerprint)  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri, String httpsFingerprint)  __attribute__ ((deprecated));
+    bool begin(String url, String httpsFingerprint);
+    bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
     // Use BearSSL for secure HTTPS connection
-    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
+    bool begin(String url, const uint8_t httpsFingerprint[20]);
+    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20]);
     // deprecated, use the overload above instead
     bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
 #endif
@@ -197,7 +197,7 @@ public:
 
     int getSize(void);
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
     WiFiClient& getStream(void)  __attribute__ ((deprecated));
     WiFiClient* getStreamPtr(void)  __attribute__ ((deprecated));
 #endif
@@ -221,7 +221,7 @@ protected:
     int writeToStreamDataBlock(Stream * stream, int len);
 
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
     TransportTraitsPtr _transportTraits;
     std::unique_ptr<WiFiClient> _tcpDepreciated;
 #endif

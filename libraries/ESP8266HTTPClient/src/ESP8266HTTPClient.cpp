@@ -25,7 +25,7 @@
 
 #include "ESP8266HTTPClient.h"
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #endif
@@ -33,7 +33,7 @@
 #include <StreamString.h>
 #include <base64.h>
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
 class TransportTraits
 {
 public:
@@ -142,7 +142,7 @@ void HTTPClient::clear()
  * @return success bool
  */
 bool HTTPClient::begin(Client &client, String url) {
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
     _tcpDepreciated.reset(nullptr);
     _transportTraits.reset(nullptr);
 #endif
@@ -177,7 +177,7 @@ bool HTTPClient::begin(Client &client, String url) {
  */
 bool HTTPClient::begin(Client &client, String host, uint16_t port, String uri, bool https)
 {
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
     _tcpDepreciated.reset(nullptr);
     _transportTraits.reset(nullptr);
 #endif
@@ -192,7 +192,7 @@ bool HTTPClient::begin(Client &client, String host, uint16_t port, String uri, b
 }
 
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
 bool HTTPClient::begin(String url, String httpsFingerprint)
 {
     _tcp = nullptr;
@@ -295,7 +295,7 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
     return true;
 }
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
 bool HTTPClient::begin(String host, uint16_t port, String uri)
 {
     _tcp = nullptr;
@@ -702,7 +702,7 @@ int HTTPClient::getSize(void)
     return _size;
 }
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
 /**
  * returns the stream of the tcp connection
  * @return WiFiClient
@@ -977,7 +977,7 @@ bool HTTPClient::connect(void)
         return true;
     }
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
     if (!_tcp && !_transportTraits) {
 #else
     if(!_tcp) {
@@ -986,7 +986,7 @@ bool HTTPClient::connect(void)
         return false;
     }
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
     if(!_tcp) {
         _tcpDepreciated = _transportTraits->create();
         _tcp = _tcpDepreciated.get();
@@ -1001,7 +1001,7 @@ bool HTTPClient::connect(void)
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
     if (_tcpDepreciated && _transportTraits && !_transportTraits->verify(*_tcpDepreciated, _host.c_str())) {
         DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
         _tcp->stop();
@@ -1011,7 +1011,7 @@ bool HTTPClient::connect(void)
 
 
 #ifdef ESP8266
-#ifdef KEEP_DEPRECIATED_API
+#ifdef KEEP_PRESENT_API
     if(_tcpDepreciated)
         _tcpDepreciated->setNoDelay(true);
 #else
