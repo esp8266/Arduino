@@ -13,7 +13,6 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 
-#include <Time.h>
 #include <time.h>
 
 #define USE_SERIAL Serial
@@ -72,8 +71,6 @@ void setClock() {
     USE_SERIAL.print(F("."));
     now = time(nullptr);
   }
-
-  setTime(now);
 
   USE_SERIAL.println(F(""));
   struct tm timeinfo;
