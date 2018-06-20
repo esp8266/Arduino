@@ -57,8 +57,8 @@ void loop() {
     const uint8_t fingerprint[20] = {0xEB, 0xD9, 0xDF, 0x37, 0xC2, 0xCC, 0x84, 0x89, 0x00, 0xA0, 0x58, 0x52, 0x24, 0x04, 0xE4, 0x37, 0x3E, 0x2B, 0xF1, 0x41};
     client.setFingerprint(fingerprint);
 
+    //if (http.begin("jigsaw.w3.org", 443, "/HTTP/connection.html", true)) {
     if (http.begin((Client&) client, "https://tls.mbed.org/")) {
-    //if(http.begin("jigsaw.w3.org", 443, "/HTTP/connection.html", true)) {
 
       USE_SERIAL.print("[HTTP] GET...\n");
       // start connection and send HTTP header
