@@ -46,7 +46,7 @@ void loop() {
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
     WiFiClient client;
-    
+
     http.begin((Client&) client, "http://192.168.1.12/test.html");
     //http.begin((Client&) client, "192.168.1.12", 80, "/test.html");
 
