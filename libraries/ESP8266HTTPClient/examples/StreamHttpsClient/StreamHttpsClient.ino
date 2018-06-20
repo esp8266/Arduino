@@ -50,7 +50,7 @@ void loop() {
     if (mfln) {
       client.setBufferSizes(1024, 1024);
     }
-
+    
     USE_SERIAL.print("[HTTP] begin...\n");
 
     // configure server and url
@@ -58,7 +58,7 @@ void loop() {
     client.setFingerprint(fingerprint);
 
     if (http.begin((Client&) client, "https://tls.mbed.org/")) {
-    //if (http.begin("jigsaw.w3.org", 443, "/HTTP/connection.html", true)) {
+    //if(http.begin("jigsaw.w3.org", 443, "/HTTP/connection.html", true)) {
 
       USE_SERIAL.print("[HTTP] GET...\n");
       // start connection and send HTTP header
