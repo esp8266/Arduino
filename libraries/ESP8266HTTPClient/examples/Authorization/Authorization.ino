@@ -12,6 +12,8 @@
 
 #include <ESP8266HTTPClient.h>
 
+#include <WiFiClient.h>
+
 #define USE_SERIAL Serial
 
 ESP8266WiFiMulti WiFiMulti;
@@ -40,22 +42,24 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
+    WiFiClient client;
+
     HTTPClient http;
 
     USE_SERIAL.print("[HTTP] begin...\n");
     // configure traged server and url
 
 
-    http.begin("http://user:password@192.168.1.12/test.html");
+    http.begin((Client&)client, "http://guest:guest@jigsaw.w3.org/HTTP/Basic/");
 
     /*
       // or
-      http.begin("http://192.168.1.12/test.html");
-      http.setAuthorization("user", "password");
+      http.begin("http://jigsaw.w3.org/HTTP/Basic/");
+      http.setAuthorization("guest", "guest");
 
       // or
-      http.begin("http://192.168.1.12/test.html");
-      http.setAuthorization("dXNlcjpwYXN3b3Jk");
+      http.begin("http://jigsaw.w3.org/HTTP/Basic/");
+      http.setAuthorization("Z3Vlc3Q6Z3Vlc3Q=");
     */
 
 
@@ -82,4 +86,3 @@ void loop() {
 
   delay(10000);
 }
-

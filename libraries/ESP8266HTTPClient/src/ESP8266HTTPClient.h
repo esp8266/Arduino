@@ -223,7 +223,7 @@ protected:
 
 #ifdef KEEP_PRESENT_API
     TransportTraitsPtr _transportTraits;
-    std::unique_ptr<WiFiClient> _tcpDepreciated;
+    std::unique_ptr<WiFiClient> _tcpDeprecated;
 #endif
     Client* _tcp;
 

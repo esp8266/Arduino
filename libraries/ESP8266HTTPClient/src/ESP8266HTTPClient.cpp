@@ -143,7 +143,7 @@ void HTTPClient::clear()
  */
 bool HTTPClient::begin(Client &client, String url) {
 #ifdef KEEP_PRESENT_API
-    _tcpDepreciated.reset(nullptr);
+    _tcpDeprecated.reset(nullptr);
     _transportTraits.reset(nullptr);
 #endif
     _tcp = &client;
@@ -178,7 +178,7 @@ bool HTTPClient::begin(Client &client, String url) {
 bool HTTPClient::begin(Client &client, String host, uint16_t port, String uri, bool https)
 {
 #ifdef KEEP_PRESENT_API
-    _tcpDepreciated.reset(nullptr);
+    _tcpDeprecated.reset(nullptr);
     _transportTraits.reset(nullptr);
 #endif
     _tcp = &client;
@@ -710,7 +710,7 @@ int HTTPClient::getSize(void)
 WiFiClient& HTTPClient::getStream(void)
 {
     if(connected()) {
-        return *_tcpDepreciated;
+        return *_tcpDeprecated;
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client] getStream: not connected\n");
@@ -725,7 +725,7 @@ WiFiClient& HTTPClient::getStream(void)
 WiFiClient* HTTPClient::getStreamPtr(void)
 {
     if(connected()) {
-        return (WiFiClient*)_tcpDepreciated.get();
+        return (WiFiClient*)_tcpDeprecated.get();
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client] getStreamPtr: not connected\n");
@@ -988,8 +988,8 @@ bool HTTPClient::connect(void)
 
 #ifdef KEEP_PRESENT_API
     if(!_tcp) {
-        _tcpDepreciated = _transportTraits->create();
-        _tcp = _tcpDepreciated.get();
+        _tcpDeprecated = _transportTraits->create();
+        _tcp = _tcpDeprecated.get();
     }
 #endif
     _tcp->setTimeout(_tcpTimeout);
@@ -1002,7 +1002,7 @@ bool HTTPClient::connect(void)
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
 #ifdef KEEP_PRESENT_API
-    if (_tcpDepreciated && _transportTraits && !_transportTraits->verify(*_tcpDepreciated, _host.c_str())) {
+    if (_tcpDeprecated && _transportTraits && !_transportTraits->verify(*_tcpDeprecated, _host.c_str())) {
         DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
         _tcp->stop();
         return false;
@@ -1012,8 +1012,8 @@ bool HTTPClient::connect(void)
 
 #ifdef ESP8266
 #ifdef KEEP_PRESENT_API
-    if(_tcpDepreciated)
-        _tcpDepreciated->setNoDelay(true);
+    if(_tcpDeprecated)
+        _tcpDeprecated->setNoDelay(true);
 #else
 //	Client has no setNoDelay(), is this important???????????????
 #endif
