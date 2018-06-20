@@ -19,6 +19,8 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 
+#define FORMER_SSL_WITH_AXTLS 0  // use 1 for old axTLS, 0 for new BearSSL
+
 const char* ssid = "........";
 const char* password = "........";
 
@@ -46,9 +48,12 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Use WiFiClientSecure class to create TLS connection
-  WiFiClientSecure client;
   Serial.print("connecting to ");
   Serial.println(host);
+
+#if FORMER_SSL_WITH_AXTLS
+
+  axTLS::WiFiClientSecure client;
   if (!client.connect(host, httpsPort)) {
     Serial.println("connection failed");
     return;
@@ -59,6 +64,20 @@ void setup() {
   } else {
     Serial.println("certificate doesn't match");
   }
+
+#else // new SSL api with BearSSL
+
+  BearSSL::WiFiClientSecure client;
+
+  //client.setInsecure(); <-- this is default
+  client.setFingerprint(fingerprint);
+
+  if (!client.connect(host, httpsPort)) {
+    Serial.println("connection failed");
+    return;
+  }
+
+#endif
 
   String url = "/repos/esp8266/Arduino/commits/master/status";
   Serial.print("requesting URL: ");

@@ -92,6 +92,7 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
     br_esp8266_stack_proxy_init(_bearssl_stack.get(), stacksize);
   }
   _local_bearssl_stack = _bearssl_stack;
+  _use_insecure = true; // default https client behaviour
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
