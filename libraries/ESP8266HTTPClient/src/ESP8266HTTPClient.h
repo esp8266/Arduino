@@ -200,6 +200,8 @@ public:
 #ifdef KEEP_PRESENT_API
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
+#else
+    Client* getStreamPtr(void);
 #endif
     int writeToStream(Stream* stream);
     String getString(void);
