@@ -9,6 +9,7 @@ tools/sdk/lib/liblwip_src.a
 tools/sdk/lwip/src/build
 tools/sdk/lwip/src/liblwip_src.a
 tools/sdk/ld/backup
+tools/sdk/ld/eagle.app.v6.common.ld
 
 *.pyc
 *.gch
@@ -19,3 +20,4 @@ boards.local.txt
 *.gcno
 *.gcda
 *.o
+*.a
