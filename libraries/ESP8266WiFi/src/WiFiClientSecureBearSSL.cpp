@@ -768,6 +768,11 @@ bool WiFiClientSecure::_installClientX509Validator() {
 bool WiFiClientSecure::_connectSSL(const char* hostName) {
   _freeSSL();
   _oom_err = false;
+#ifdef DEBUG_ESP_SSL
+  if (!_use_insecure && !_use_fingerprint && !_use_self_signed && !_knownkey && !_sk) {
+    DEBUG_ESP_PORT.println(FPSTR("BearSSL: connection *will* fail, no authentication method is setup"));
+  }
+#endif
 
   _sc = std::make_shared<br_ssl_client_context>();
   _eng = &_sc->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
