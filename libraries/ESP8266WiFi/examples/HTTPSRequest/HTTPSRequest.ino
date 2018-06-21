@@ -19,7 +19,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 
-#define FORMER_SSL_WITH_AXTLS 0  // use 1 for old axTLS, 0 for new BearSSL
+#define DEPRECATED_SSL_WITH_AXTLS 0  // use 1 for axTLS, 0 for BearSSL
 
 const char* ssid = "........";
 const char* password = "........";
@@ -29,7 +29,22 @@ const int httpsPort = 443;
 
 // Use web browser to view and copy
 // SHA1 fingerprint of the certificate
+
+#if DEPRECATED_SSL_WITH_AXTLS
+
+// no separator, or space, or ":", in iram:
 const char* fingerprint = "35 85 74 EF 67 35 A7 CE 40 69 50 F3 C0 F6 80 CF 80 3B 2E 19";
+
+#else // with BearSSL
+
+// compatible with axTLS:
+//const char* fingerprint = "35 85 74 EF 67 35 A7 CE 40 69 50 F3 C0 F6 80 CF 80 3B 2E 19";
+// flash is allowed:
+//#define fingerprint FPSTR("358574EF67:35:A7:CE:40:69:50:F3-C0-F6-80-CF-80-3B 2E 19")
+// or an array in iram:
+const uint8_t fingerprint [] = { 0x35, 0x85, 0x74, 0xEF, 0x67, 0x35, 0xA7, 0xCE, 0x40, 0x69, 0x50, 0xF3, 0xC0, 0xF6, 0x80, 0xCF, 0x80, 0x3B, 0x2E, 0x19 };
+
+#endif
 
 void setup() {
   Serial.begin(115200);
@@ -51,7 +66,8 @@ void setup() {
   Serial.print("connecting to ");
   Serial.println(host);
 
-#if FORMER_SSL_WITH_AXTLS
+  ////////////////////////// axTLS (soon deprecated)
+  #if DEPRECATED_SSL_WITH_AXTLS
 
   axTLS::WiFiClientSecure client;
   if (!client.connect(host, httpsPort)) {
@@ -65,11 +81,19 @@ void setup() {
     Serial.println("certificate doesn't match");
   }
 
-#else // new SSL api with BearSSL
+  ////////////////////////// BearSSL
+  #else // new SSL api with BearSSL
 
   BearSSL::WiFiClientSecure client;
 
-  //client.setInsecure(); <-- this is default
+  // WARNING:
+  // - axTLS was insecure by default,
+  //   and fingerprint could be checked after a successful connection
+  // - BearSSL is not:
+  //   "If there are no CAs or insecure options specified, BearSSL will not connect."
+  //   Check the BearSSL_Validation.ino example for more details
+  //   Insecure connection is available with `client.setInsecure()`
+  //   Semi-secure checking using fingerprint:
   client.setFingerprint(fingerprint);
 
   if (!client.connect(host, httpsPort)) {
@@ -77,7 +101,8 @@ void setup() {
     return;
   }
 
-#endif
+  #endif
+  //////////////////////////
 
   String url = "/repos/esp8266/Arduino/commits/master/status";
   Serial.print("requesting URL: ");

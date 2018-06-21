@@ -67,15 +67,13 @@ class WiFiClientSecure : public WiFiClient {
       _knownkey_usages = usages;
     }
     // Only check SHA1 fingerprint of certificate
-    void setFingerprint(const char* fingerprint);
+    void setFingerprint(const String& fingerprint);
     void setFingerprint(const uint8_t fingerprint[20]) {
-      _use_insecure = false;
       _use_fingerprint = true;
       memcpy_P(_fingerprint, fingerprint, 20);
     }
     // Accept any certificate that's self-signed
     void allowSelfSignedCerts() {
-      _use_insecure = false;
       _use_self_signed = true;
     }
     // Install certificates of trusted CAs or specific site
@@ -109,10 +107,10 @@ class WiFiClientSecure : public WiFiClient {
 
     // AXTLS compatible wrappers
     bool verifyCertChain(const char* domain_name) { (void)domain_name; return connected(); } // If we're connected, the cert passed validation during handshake
-    bool verify(const char* fingerprint, const char* domain_name) { 
+    bool verify(const String& fingerprint, const String& domain_name) { 
         (void) fingerprint;
         (void) domain_name;
-        WiFiClientSecure::verify__is_unavailable_with_BearSSL__use_setFingerprint_instead();
+        WiFiClientSecure_verify__is_unavailable_with_BearSSL__use_setFingerprint_instead();
         return false;
     }
 
@@ -217,7 +215,7 @@ class WiFiClientSecure : public WiFiClient {
     // The local copy, only used to enable a reference count
     std::shared_ptr<uint8_t> _local_bearssl_stack;
 
-    void verify__is_unavailable_with_BearSSL__use_setFingerprint_instead (void);
+    void WiFiClientSecure_verify__is_unavailable_with_BearSSL__use_setFingerprint_instead (void);
 };
 
 };

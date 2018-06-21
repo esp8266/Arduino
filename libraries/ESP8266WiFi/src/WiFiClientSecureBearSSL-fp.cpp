@@ -11,25 +11,24 @@ static uint8_t htoi (unsigned char c)
          : 255;
 }
 
-void WiFiClientSecure::setFingerprint(const char* fingerprint) {
+void WiFiClientSecure::setFingerprint(const String& fingerprint) {
 
     uint8_t fp [20];
     uint8_t c, d;
     int idx = 0;
+    const char* _fingerprint = fingerprint.c_str();
 
-    while (idx < 20 && (c = *fingerprint++) && (d = *fingerprint++)) {
-    	c = htoi(c);
-    	d = htoi(d);
+    while (idx < 20 && (c = *_fingerprint++) && (d = *_fingerprint++)) {
+        c = htoi(c);
+        d = htoi(d);
         if (c > 15 || d > 15) {
             // skip separator
-            fingerprint--;
+            _fingerprint--;
             continue;
         }
         fp[idx++] = (c << 4) + d;
     }
 
-    _use_insecure = false; // even with bad fingerprint
-    
     if (idx == 20)
         setFingerprint(fp);
 }
