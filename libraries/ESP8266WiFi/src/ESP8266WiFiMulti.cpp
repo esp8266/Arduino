@@ -38,6 +38,11 @@ bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase) {
     return APlistAdd(ssid, passphrase);
 }
 
+void ESP8266WiFiMulti::addConnectionCallbackFunc(GeneralFunction func) {
+    
+    ConnectionCallbackFunc = func;
+}
+
 wl_status_t ESP8266WiFiMulti::run(void) {
 
     wl_status_t status = WiFi.status();
@@ -130,7 +135,18 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                 auto startTime = millis();
                 // wait for connection, fail, or timeout
                 while(status != WL_CONNECTED && status != WL_NO_SSID_AVAIL && status != WL_CONNECT_FAILED && (millis() - startTime) <= connectTimeout) {
-                    delay(10);
+                    
+                    //delay(10);
+                    
+                    if (ConnectionCallbackFunc != NULL) {
+                      
+                      ConnectionCallbackFunc();
+                    }
+                    else {
+                      
+                      delay(10);
+                    }
+                    
                     status = WiFi.status();
                 }
                 
@@ -231,4 +247,5 @@ void ESP8266WiFiMulti::APlistClean(void) {
     }
     APlist.clear();
 }
+
 
