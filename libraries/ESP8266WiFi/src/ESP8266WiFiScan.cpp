@@ -145,6 +145,7 @@ void ESP8266WiFiScanClass::scanDelete() {
         ESP8266WiFiScanClass::_scanCount = 0;
     }
     _scanComplete = false;
+    _scanStarted = false;
 }
 
 
