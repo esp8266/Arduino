@@ -46,6 +46,7 @@ struct WifiAPEntry {
 };
 
 typedef std::vector<WifiAPEntry> WifiAPlist;
+typedef void (*GeneralFunction) ();
 
 class ESP8266WiFiMulti {
     public:
@@ -53,11 +54,13 @@ class ESP8266WiFiMulti {
         ~ESP8266WiFiMulti();
 
         bool addAP(const char* ssid, const char *passphrase = NULL);
+        void addConnectionCallbackFunc(GeneralFunction func);
 
         wl_status_t run(void);
 
     private:
         WifiAPlist APlist;
+        GeneralFunction ConnectionCallbackFunc = NULL;
         bool APlistAdd(const char* ssid, const char *passphrase = NULL);
         void APlistClean(void);
 
