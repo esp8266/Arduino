@@ -30,6 +30,12 @@ extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
+        : _httpClientTimeout(8000)
+{
+}
+
+ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
+        : _httpClientTimeout(httpClientTimeout)
 {
 }
 
@@ -59,7 +65,22 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& curr
     return handleUpdate(http, currentVersion, false);
 }
 
+HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
+        const uint8_t httpsFingerprint[20])
+{
+    HTTPClient http;
+    http.begin(url, httpsFingerprint);
+    return handleUpdate(http, currentVersion, false);
+}
+
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint)
+{
+    HTTPClient http;
+    http.begin(url, httpsFingerprint);
+    return handleUpdate(http, currentVersion, true);
+}
+
+HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const uint8_t httpsFingerprint[20])
 {
     HTTPClient http;
     http.begin(url, httpsFingerprint);
@@ -92,13 +113,21 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, co
     http.begin(host, port, uri);
     return handleUpdate(http, currentVersion, false);
 }
+
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& url,
         const String& currentVersion, const String& httpsFingerprint)
 {
     HTTPClient http;
     http.begin(host, port, url, httpsFingerprint);
     return handleUpdate(http, currentVersion, false);
+}
 
+HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& url,
+        const String& currentVersion, const uint8_t httpsFingerprint[20])
+{
+    HTTPClient http;
+    http.begin(host, port, url, httpsFingerprint);
+    return handleUpdate(http, currentVersion, false);
 }
 
 /**
@@ -170,7 +199,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
     // use HTTP/1.0 for update since the update handler not support any transfer Encoding
     http.useHTTP10(true);
-    http.setTimeout(8000);
+    http.setTimeout(_httpClientTimeout);
     http.setUserAgent(F("ESP8266-http-Update"));
     http.addHeader(F("x-ESP8266-STA-MAC"), WiFi.macAddress());
     http.addHeader(F("x-ESP8266-AP-MAC"), WiFi.softAPmacAddress());
