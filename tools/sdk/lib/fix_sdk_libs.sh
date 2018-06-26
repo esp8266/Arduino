@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export PATH=../../xtensa-lx106-elf/bin/:$PATH
+
 # Remove mem_manager.o from libmain.a to use custom heap implementation,
 # and time.o to fix redefinition of time-related functions:
 xtensa-lx106-elf-ar d libmain.a mem_manager.o
