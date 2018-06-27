@@ -251,6 +251,7 @@ struct station_config {
                         // with both ssid[] and bssid[] matched. Please check about this.
     uint8 bssid[6];
     wifi_fast_scan_threshold_t threshold;
+    bool open_and_wep_mode_disable; // must be true for WPA
 };
 
 bool wifi_station_get_config(struct station_config *config);

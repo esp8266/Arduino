@@ -127,6 +127,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     conf.threshold.rssi = -127;
+    conf.open_and_wep_mode_disable = true;
 
     // TODO(#909): set authmode to AUTH_WPA_PSK if passphrase is provided
     conf.threshold.authmode = AUTH_OPEN;
