@@ -1,0 +1,11 @@
+#!/bin/sh
+
+sdk="$1"
+me="$0"
+core=${me%/*}/../../../..
+
+[ -r "$sdk/lib/libnet80211.a" ] || { echo "usage: $0 <esp-open-sdk path>"; exit 1; }
+
+for f in $(cd "$sdk"; find include -type f); do
+	diff -bu "$sdk/$f" "$core/tools/sdk/$f"
+done

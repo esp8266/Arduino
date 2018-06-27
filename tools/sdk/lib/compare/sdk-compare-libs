@@ -1,0 +1,71 @@
+#!/bin/bash
+
+sdk="$1"
+me="$0"
+core=../../${me%/*}/../../..
+
+[ -r "$sdk/lib/libnet80211.a" ] || { echo "usage: $0 <esp-open-sdk path>"; exit 1; }
+
+tmp=TEMPSDK.$$
+
+commits="$2"
+
+md5()
+{
+	mkdir temp
+	cd temp
+	PATH="../$core/tools/xtensa-lx106-elf/bin:$PATH" xtensa-lx106-elf-ar x "../$1"
+	rm -f mem_manager.o time.o user_interface.o eagle_lwip_if.o
+	cat *.o | md5sum
+	cd ..
+	rm -rf temp
+}
+
+search()
+{
+	git clone $sdk $tmp 1>&2
+	cd $tmp
+	git reset --hard 1>&2
+
+	corelibs=$(cd "$core/tools/sdk/lib"; ls *.a)
+	[ -z "$commits" ] && commits=$(git log|grep commit\  | sed 's,commit ,,')
+
+	for f in $corelibs; do
+		
+		git checkout master 1>&2 # needed
+
+		if [ -r lib/$f ]; then
+
+			coremd5=$(md5 "$core/tools/sdk/lib/$f")
+			found=false
+
+			for i in $commits; do
+				git reset --hard 1>&2
+				git checkout $i 1>&2
+				
+				[ -d lib ] || continue
+
+				cd lib
+				PATH="../$core/tools/xtensa-lx106-elf/bin:$PATH" "../$core/tools/sdk/lib/fix_sdk_libs.sh"
+				cd ..
+				
+				espmd5=$(md5 "lib/$f")
+				if [ "$espmd5" = "$coremd5" ]; then
+					tag=$(git describe --tag)
+					echo "$tag - https://github.com/espressif/ESP8266_NONOS_SDK/commit/$i - $f"
+					found=true
+					break
+				fi
+			done
+
+			$found || echo "NOTFOUND - $f"
+		fi
+		
+	done
+	
+	cd ..
+	rm -rf "$tmp"
+}
+
+#search
+search 2>/dev/null
