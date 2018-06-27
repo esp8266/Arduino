@@ -29,5 +29,5 @@ done | sed \
 	-e 's/^+#ifdef.*cplusplus//g' \
 	-e 's/^+extern "C"//g' \
 	-e 's/^+}$//g' \
-	-e 's/^+#endif//g' \
+	-e 's/^+#endif$//g' \
 	-e 's/^+[ \t]*$//g' \
