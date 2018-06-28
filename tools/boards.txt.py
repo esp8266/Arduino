@@ -549,7 +549,30 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'serial': '921',
-        'desc': [ 'Product page: https://www.wemos.cc/' ],
+        'desc': [ 
+			'Parameters in Arduino IDE:',
+			'~~~~~~~~~~~~~~~~~~~~~~~~~',
+			'',
+			'- Card: "WEMOS D1 Mini Lite"',
+			'- Flash Size: "1M (512K SPIFFS)"',
+			'- CPU Frequency: "80 Mhz"',
+			'- Upload Speed: "230400"',
+			'',
+			'Power:',
+			'~~~~~',
+			'',
+			'- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input',
+			'- 3V3 pin : 3.3V 500mA regulated output',
+			'- Digital pins : 3.3V 30mA.',
+			'',
+			'links:',
+			'~~~~~',
+			'',
+			'- Product page: https://www.wemos.cc/',
+			'- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf',
+			'- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf',
+			'- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf',
+        ],
     }),
     ( 'd1', {
         'name': 'WeMos D1 R1',
@@ -677,7 +700,7 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
-            'flashmode_qio',
+            'flashmode_dio',
             'flashfreq_80',
             '512K',
             ],
@@ -727,6 +750,20 @@ boards = collections.OrderedDict([
             ],
         'serial': '921',
         'desc': [ 'Product page: https://wifiduino.com/esp8266' ],
+    }),
+    ( 'wifi_slot', {
+        'name': 'Amperka WiFi Slot',
+        'opts': {
+            '.build.board': 'AMPERKA_WIFI_SLOT',
+            '.build.variant': 'wifi_slot',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashfreq_menu',
+            'flashmode_menu',
+            '1M', '2M',
+            ],
+        'desc': [ 'Product page: http://wiki.amperka.ru/wifi-slot' ],
     }),
     ])
 
@@ -1215,8 +1252,11 @@ def package ():
     if packagegen:
         pkgfname_read = pkgfname + '.orig'
         # check if backup already exists
-        if not os.path.isfile(pkgfname_read):
-            os.rename(pkgfname, pkgfname_read)
+        if os.path.isfile(pkgfname_read):
+            print "package file is in the way, please move it"
+            print "    %s" % pkgfname_read
+            sys.exit(1)
+        os.rename(pkgfname, pkgfname_read)
 
     # read package file
     with open (pkgfname_read, "r") as package_file:
@@ -1302,6 +1342,8 @@ def usage (name,ret):
     print " --packagegen    - replace board:[] in package"
     print " --doc           - shows doc/boards.rst"
     print " --docgen        - replace doc/boards.rst"
+    print " --allgen        - generate and replace everything"
+    print "                   (useful for pushing on github)"
     print ""
 
     out = ""
@@ -1347,7 +1389,8 @@ customspeeds = []
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
-          "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen" ])
+          "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
+          "allgen"] )
 except getopt.GetoptError as err:
     print str(err)  # will print something like "option -a not recognized"
     usage(sys.argv[0], 1)
@@ -1414,6 +1457,16 @@ for o, a in opts:
         docshow = True
 
     elif o in ("--docgen"):
+        docshow = True
+        docgen = True
+
+    elif o in ("--allgen"):
+        ldshow = True
+        ldgen = True
+        boardsshow = True
+        boardsgen = True
+        packageshow = True
+        packagegen = True
         docshow = True
         docgen = True
 

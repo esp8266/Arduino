@@ -320,7 +320,28 @@ Product page: https://www.wemos.cc/
 WeMos D1 mini Lite
 ------------------
 
-Product page: https://www.wemos.cc/
+Parameters in Arduino IDE:
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Card: "WEMOS D1 Mini Lite"
+- Flash Size: "1M (512K SPIFFS)"
+- CPU Frequency: "80 Mhz"
+- Upload Speed: "230400"
+
+Power:
+~~~~~
+
+- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input
+- 3V3 pin : 3.3V 500mA regulated output
+- Digital pins : 3.3V 30mA.
+
+links:
+~~~~~
+
+- Product page: https://www.wemos.cc/
+- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf
+- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf
+- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf
 
 WeMos D1 R1
 -----------
@@ -388,4 +409,9 @@ WiFiduino
 ---------
 
 Product page: https://wifiduino.com/esp8266
+
+Amperka WiFi Slot
+-----------------
+
+Product page: http://wiki.amperka.ru/wifi-slot
 
