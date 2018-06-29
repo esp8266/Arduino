@@ -156,11 +156,21 @@ void init_done() {
  * Peripherals (except for SPI0 and UART0) are not initialized.
  * This function does not return.
  */
+#define EXTRA_4K_HEAP 1
+
+#if !EXTRA_4K_HEAP
+cont_t g_cont __attribute__ ((aligned (16)));
+#endif
+
 extern "C" void ICACHE_RAM_ATTR app_entry(void)
 {
     /* Allocate continuation context on this stack, and save pointer to it. */
+#if EXTRA_4K_HEAP
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
+#else
+    g_pcont = &g_cont;
+#endif
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
