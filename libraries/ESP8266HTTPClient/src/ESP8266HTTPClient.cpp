@@ -1026,7 +1026,7 @@ int HTTPClient::handleHeaderResponse()
 
                 for(size_t i = 0; i < _headerKeysCount; i++) {
                     if(_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
-                        _currentHeaders[i].value = headerValue;
+                        _currentHeaders[i].value += headerValue + ";";
                         break;
                     }
                 }
