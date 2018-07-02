@@ -274,6 +274,7 @@ According to the manufacturer, "with a micro USB cable, you can connect NodeMCU 
 RST, then releasing FLASH, then releasing RST. This forces the CP2102 device to power cycle and to be re-numbered by Linux.
 
 The board also features a NCP1117 voltage regulator, a blue LED on GPIO16 and a 220k/100k Ohm voltage divider on the ADC input pin.
+The ESP-12E has sometimes a led connected on GPIO2.
 
 Full pinout and PDF schematics can be found `here <https://github.com/nodemcu/nodemcu-devkit-v1.0>`__
 
