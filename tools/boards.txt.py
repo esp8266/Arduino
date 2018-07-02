@@ -435,6 +435,7 @@ boards = collections.OrderedDict([
                   'RST, then releasing FLASH, then releasing RST. This forces the CP2102 device to power cycle and to be re-numbered by Linux.',
                   '',
                   'The board also features a NCP1117 voltage regulator, a blue LED on GPIO16 and a 220k/100k Ohm voltage divider on the ADC input pin.',
+                  'The ESP-12E has sometimes a led connected on GPIO2',
                   '',
                   'Full pinout and PDF schematics can be found `here <https://github.com/nodemcu/nodemcu-devkit-v1.0>`__',
                   ],
@@ -1116,6 +1117,7 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
 
 def all_flash_size ():
     f512 =      flash_size(0x80000,  '512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696,   0x7B000)
+    f512.update(flash_size(0x80000,  '512K', '512K32',  'eagle.flash.512k32.ld',   '32K SPIFFS', 466928,   0x73000,   0x8000,  4096))
     f512.update(flash_size(0x80000,  '512K', '512K64',  'eagle.flash.512k64.ld',   '64K SPIFFS', 434160,   0x6B000,   0x10000, 4096))
     f512.update(flash_size(0x80000,  '512K', '512K128', 'eagle.flash.512k128.ld', '128K SPIFFS', 368624,   0x5B000,   0x20000, 4096))
     f1m =       flash_size(0x100000,   '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984,  0xFB000)
