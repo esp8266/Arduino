@@ -43,10 +43,6 @@
 // Need speed, not size, here
 #pragma GCC optimize ("O3")
 
-// Map the IRQ stuff to standard terminology
-#define cli() ets_intr_lock()
-#define sei() ets_intr_unlock()
-
 // Maximum delay between IRQs
 #define MAXIRQUS (10000)
 
@@ -180,6 +176,12 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
   if (!wave) {
     return false;
   }
+
+  // To safely update the packed bitfields we need to stop interrupts while setting them as we could
+  // get an IRQ in the middle of a multi-instruction mask-and-set required to change them which would
+  // then cause an IRQ update of these values (.enabled only, for now) to be lost.
+  ets_intr_lock();
+
   wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) - 70;  // Take out some time for IRQ codepath
   wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) - 70;  // Take out some time for IRQ codepath
   wave->timeLeftCycles = MicrosecondsToCycles(runTimeUS);
@@ -193,6 +195,10 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
     }
     ReloadTimer(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
   }
+
+  // Re-enable interrupts here since we're done with the update
+  ets_intr_unlock();
+
   return true;
 }
 
@@ -200,6 +206,8 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
 int stopWaveform(uint8_t pin) {
   for (size_t i = 0; i < countof(waveform); i++) {
     if (((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
+      // Note that there is no interrupt unsafety here.  The IRQ can only ever change .enabled from 1->0
+      // We're also doing that, so even if an IRQ occurred it would still stay as 0.
       waveform[i].enabled = 0;
       int cnt = timer1CB?1:0;
       for (size_t i = 0; i < countof(waveform); i++) {
@@ -211,7 +219,6 @@ int stopWaveform(uint8_t pin) {
       return true;
     }
   }
-  cli();
   return false;
 }
 
