@@ -33,4 +33,4 @@ Multicast UDP
 
 The ``WiFiUDP`` class supports sending and receiving multicast packets on STA interface. When sending a multicast packet, replace ``udp.beginPacket(addr, port)`` with ``udp.beginPacketMulticast(addr, port, WiFi.localIP())``. When listening to multicast packets, replace ``udp.begin(port)`` with ``udp.beginMulticast(WiFi.localIP(), multicast_ip_addr, port)``. You can use ``udp.destinationIP()`` to tell whether the packet received was sent to the multicast or unicast address.
 
-For code samples please refer to separate section with :doc:`examples <udp-examples>` dedicated specifically to the UDP Class.
+For code samples please refer to separate section with `examples <udp-examples.rst>`__ dedicated specifically to the UDP Class.

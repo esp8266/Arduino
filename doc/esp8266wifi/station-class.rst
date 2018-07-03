@@ -46,7 +46,7 @@ Table of Contents
 
 Points below provide description and code snippets how to use particular methods.
 
-For more code samples please refer to separate section with :doc:`examples <station-examples>` dedicated specifically to the Station Class.
+For more code samples please refer to separate section with `examples <station-examples.rst>`__ dedicated specifically to the Station Class.
 
 Start Here
 ~~~~~~~~~~

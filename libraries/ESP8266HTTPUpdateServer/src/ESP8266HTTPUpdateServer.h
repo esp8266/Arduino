@@ -25,6 +25,12 @@ class ESP8266HTTPUpdateServer
 
     void setup(ESP8266WebServer *server, const char * path, const char * username, const char * password);
 
+    void updateCredentials(const char * username, const char * password)
+    {
+      _username = (char *)username;
+      _password = (char *)password;
+    }
+
   protected:
     void _setUpdaterError();
 

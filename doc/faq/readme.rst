@@ -20,7 +20,7 @@ This message indicates issue with uploading ESP module over a serial
 connection. There are couple of possible causes, that depend on the type
 of your module, if you use separate USB to serial converter.
 
-:doc:`Read more <a01-espcomm_sync-failed>`.
+`Read more <a01-espcomm_sync-failed.rst>`__.
 
 Why esptool is not listed in "Programmer" menu? How do I upload ESP without it?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,7 +38,7 @@ My ESP crashes running some code. How to troubleshoot it?
 The code may crash because of s/w bug or issue with your h/w. Before
 entering an issue report, please perform initial troubleshooting.
 
-:doc:`Read more <a02-my-esp-crashes>`.
+`Read more <a02-my-esp-crashes.rst>`__.
 
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,7 +46,7 @@ This Arduino library doesn't work on ESP. How do I make it work?
 You would like to use this Arduino library with ESP8266 and it does not
 perform. It is not listed among libraries verified to work with ESP8266.
 
-:doc:`Read more <a03-library-does-not-work>`.
+`Read more <a03-library-does-not-work.rst>`__.
 
 In the IDE, for ESP-12E that has 4M flash, I can choose 4M (1M SPIFFS) or 4M (3M SPIFFS). No matter what I select, the IDE tells me the maximum code space is about 1M. Where does my flash go?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,14 +87,21 @@ This error may pop up after switching between
 `staging <https://github.com/esp8266/Arduino#staging-version->`__ and
 `stable <https://github.com/esp8266/Arduino#stable-version->`__ esp8266
 / Arduino package installations, or after upgrading the package version
-:doc:`Read more <a04-board-generic-is-unknown>`.
+`Read more <a04-board-generic-is-unknown.rst>`__.
 
 
 How to clear TCP PCBs in time-wait state ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is needed with lwIP-v1.4, less needed with lwIP-v2 but timeout is still
-too high.
+This is not needed anymore:
+
+PCBs in time-wait state are limited to 5 and removed when that number is
+exceeded.
+
+Ref.  `lwIP-v1.4 <https://github.com/esp8266/Arduino/commit/07f4d4c241df2c552899857f39a4295164f686f2#diff-f8258e71e25fb9985ca3799e3d8b88ecR399>`__,
+`lwIP-v2 <https://github.com/d-a-v/esp82xx-nonos-linklayer/commit/420960dfc0dbe07114f7364845836ac333bc84f7>`__
+
+For reference:
 
 Time-wait PCB state helps TCP not confusing two consecutive connections with the
 same (s-ip,s-port,d-ip,d-port) when the first is already closed but still
