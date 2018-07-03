@@ -235,30 +235,44 @@ uint8_t WiFiClientSecure::connected() {
 }
 
 size_t WiFiClientSecure::_write(const uint8_t *buf, size_t size, bool pmem) {
+  size_t sent_bytes = 0;
+
   if (!connected() || !size || !_handshake_done) {
     return 0;
   }
 
-  if (_run_until(BR_SSL_SENDAPP) < 0) {
-    return 0;
-  }
-
-  if (br_ssl_engine_current_state(_eng) & BR_SSL_SENDAPP) {
-    size_t sendapp_len;
-    unsigned char *sendapp_buf = br_ssl_engine_sendapp_buf(_eng, &sendapp_len);
-    int to_send = size > sendapp_len ? sendapp_len : size;
-    if (pmem) {
-      memcpy_P(sendapp_buf, buf, to_send);
-    } else {
-      memcpy(sendapp_buf, buf, to_send);
+  do {
+    // Ensure we yield if we need multiple fragments to avoid WDT
+    if (sent_bytes) {
+      optimistic_yield(1000);
     }
-    br_ssl_engine_sendapp_ack(_eng, to_send);
-    br_ssl_engine_flush(_eng, 0);
-    flush();
-    return to_send;
-  }
 
-  return 0;
+    // Get BearSSL to a state where we can send
+    if (_run_until(BR_SSL_SENDAPP) < 0) {
+      break;
+    }
+
+    if (br_ssl_engine_current_state(_eng) & BR_SSL_SENDAPP) {
+      size_t sendapp_len;
+      unsigned char *sendapp_buf = br_ssl_engine_sendapp_buf(_eng, &sendapp_len);
+      int to_send = size > sendapp_len ? sendapp_len : size;
+      if (pmem) {
+        memcpy_P(sendapp_buf, buf, to_send);
+      } else {
+        memcpy(sendapp_buf, buf, to_send);
+      }
+      br_ssl_engine_sendapp_ack(_eng, to_send);
+      br_ssl_engine_flush(_eng, 0);
+      flush();
+      buf += to_send;
+      sent_bytes += to_send;
+      size -= to_send;
+    } else {
+      break;
+    }
+  } while (size);
+
+  return sent_bytes;
 }
 
 size_t WiFiClientSecure::write(const uint8_t *buf, size_t size) {
