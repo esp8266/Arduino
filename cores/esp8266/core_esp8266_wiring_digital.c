@@ -147,7 +147,7 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
       // we disable them before we call the client ISR
       uint32_t savedPS = xt_rsil(15); // stop other interrupts
       ArgStructure* localArg = (ArgStructure*)handler->arg;
-      if (localArg->interruptInfo)
+      if (localArg && localArg->interruptInfo)
       {
          localArg->interruptInfo->pin = i;
          localArg->interruptInfo->value = __digitalRead(i);

@@ -42,7 +42,7 @@ void loop() {
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
     t_httpUpdate_return ret = ESPhttpUpdate.update("http://server/file.bin");
-    //t_httpUpdate_return  ret = ESPhttpUpdate.update("https://server/file.bin");
+    //t_httpUpdate_return  ret = ESPhttpUpdate.update("https://server/file.bin", "", "fingerprint");
 
     switch (ret) {
       case HTTP_UPDATE_FAILED:
