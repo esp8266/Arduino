@@ -224,4 +224,4 @@ Optionally you can use function without any parameters that returns a ``String``
 
     MAC address = 5E:CF:7F:8B:10:13
 
-For code samples please refer to separate section with :doc:`examples <soft-access-point-examples>` dedicated specifically to the Soft Access Point Class.
+For code samples please refer to separate section with `examples <soft-access-point-examples.rst>`__ dedicated specifically to the Soft Access Point Class.

@@ -91,6 +91,12 @@
             },
             {
               "name": "Digistump Oak"
+            },
+            {
+              "name": "WiFiduino"
+            },
+            {
+              "name": "Amperka WiFi Slot"
             }
           ],
           "toolsDependencies": [
