@@ -43,12 +43,10 @@ entering an issue report, please perform initial troubleshooting.
 How can I get some extra KBs in flash ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using `*printf()` with floats is enabled by default.  Some KBs of flash can
-be saved by using the option `--nofloat` with the boards generator:
+Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
+be saved by using the option ``--nofloat`` with the boards generator:
 
-```
-./tools/boards.txt.py --nofloat --allgen
-```
+``./tools/boards.txt.py --nofloat --allgen``
 
 Why can't I use WPS ?
 ~~~~~~~~~~~~~~~~~~~~~
@@ -56,9 +54,7 @@ Why can't I use WPS ?
 WPS is disabled by default, this offers an extra 4KB in ram/heap.  To enable
 WPS, use this boards generator option:
 
-```
-./tools/boards.txt.py --noextra4kheap --allgen
-```
+``./tools/boards.txt.py --noextra4kheap --allgen``
 
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
