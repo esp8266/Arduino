@@ -571,6 +571,8 @@ int32_t ESP8266WiFiSTAClass::RSSI(void) {
 // -------------------------------------------------- STA remote configure -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
+#ifdef NO_EXTRA_4K_HEAP
+
 void wifi_wps_status_cb(wps_cb_status status);
 
 /**
@@ -650,7 +652,7 @@ void wifi_wps_status_cb(wps_cb_status status) {
     esp_schedule(); // resume the beginWPSConfig function
 }
 
-
+#endif // NO_EXTRA_4K_HEAP
 
 bool ESP8266WiFiSTAClass::_smartConfigStarted = false;
 bool ESP8266WiFiSTAClass::_smartConfigDone = false;

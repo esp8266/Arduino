@@ -575,9 +575,16 @@ enum wps_cb_status {
     WPS_CB_ST_UNK,
 };
 
+#ifdef NO_EXTRA_4K_HEAP
 bool wifi_wps_enable(WPS_TYPE_t wps_type);
 bool wifi_wps_disable(void);
 bool wifi_wps_start(void);
+#else
+bool WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool ();
+#define wifi_wps_enable(...) WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool()
+#define wifi_wps_disable() WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool()
+#define wifi_wps_start() WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool()
+#endif
 
 typedef void (*wps_st_cb_t)(int status);
 bool wifi_set_wps_cb(wps_st_cb_t cb);

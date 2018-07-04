@@ -1236,6 +1236,9 @@ def all_boards ():
         if nofloat:
             print id + '.build.float='
 
+        if noextra4kheap:
+            print id + '.build.noextra4kheap=-DNO_EXTRA_4K_HEAP'
+
         print ''
 
     if boardsgen:
@@ -1253,11 +1256,8 @@ def package ():
 
     if packagegen:
         pkgfname_read = pkgfname + '.orig'
-        # check if backup already exists
         if os.path.isfile(pkgfname_read):
-            print "package file is in the way, please move it"
-            print "    %s" % pkgfname_read
-            sys.exit(1)
+            os.remove(pkgfname_read)
         os.rename(pkgfname, pkgfname_read)
 
     # read package file
@@ -1333,6 +1333,7 @@ def usage (name,ret):
     print " --speed s       - change default serial speed"
     print " --customspeed s - new serial speed for all boards"
     print " --nofloat       - disable float support in printf/scanf"
+    print " --noextra4kheap - disable extra 4k heap (will enable WPS)"
     print ""
     print " mandatory option (at least one):"
     print ""
@@ -1376,6 +1377,7 @@ default_speed = '115'
 led_default = 2
 led_max = 16
 nofloat = False
+noextra4kheap = False
 ldgen = False
 ldshow = False
 boardsgen = False
@@ -1391,6 +1393,7 @@ customspeeds = []
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
+          "noextra4kheap",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
           "allgen"] )
 except getopt.GetoptError as err:
@@ -1433,6 +1436,9 @@ for o, a in opts:
 
     elif o in ("--nofloat"):
         nofloat=True
+
+    elif o in ("--noextra4kheap"):
+        noextra4kheap=True
 
     elif o in ("--ldshow"):
         ldshow = True
