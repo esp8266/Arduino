@@ -27,7 +27,7 @@
 #include <limits.h>
 #include <string.h>
 
-ESP8266WiFiMulti::ESP8266WiFiMulti() {
+ESP8266WiFiMulti::ESP8266WiFiMulti() : connect_timeout_ms(0) {
 }
 
 ESP8266WiFiMulti::~ESP8266WiFiMulti() {
@@ -116,21 +116,25 @@ void ESP8266WiFiMulti::selectBest(BestNetwork& best, int8_t scanResult) {
 }
 
 wl_status_t ESP8266WiFiMulti::connectLoop() {
-    static const uint32_t connectTimeout = 5000; //5s timeout
-
-    auto startTime = millis();
     wl_status_t status = WiFi.status();
     // wait for connection, fail, or timeout
-    while(status != WL_CONNECTED && status != WL_NO_SSID_AVAIL && status != WL_CONNECT_FAILED && (millis() - startTime) <= connectTimeout) {
-        delay(10);
-        status = WiFi.status();
+    if (status == WL_CONNECTED      ||
+        status == WL_NO_SSID_AVAIL  ||
+        status == WL_CONNECT_FAILED ||
+        (millis() > connect_timeout_ms))
+    {
+        handleConnectComplete(status);
+        connect_timeout_ms = 0;
     }
 
-    handleConnectComplete(status);
     return status;
 }
 
 wl_status_t ESP8266WiFiMulti::run(void) {
+
+    if (connect_timeout_ms != 0) {
+        return connectLoop();
+    }
 
     wl_status_t status = WiFi.status();
     if(status == WL_DISCONNECTED || status == WL_NO_SSID_AVAIL || status == WL_IDLE_STATUS || status == WL_CONNECT_FAILED) {
@@ -158,6 +162,8 @@ wl_status_t ESP8266WiFiMulti::run(void) {
         } 
 
         if(scanResult > 0) {
+            static const uint32_t connectTimeout = 5000; // 5s timeout
+
             // scan done, analyze
             BestNetwork best;
 
@@ -177,8 +183,8 @@ wl_status_t ESP8266WiFiMulti::run(void) {
                 DEBUG_WIFI_MULTI("[WIFI] Connecting BSSID: %02X:%02X:%02X:%02X:%02X:%02X SSID: %s Channel: %d (%d)\n", best.BSSID[0], best.BSSID[1], best.BSSID[2], best.BSSID[3], best.BSSID[4], best.BSSID[5], best.Network.ssid, best.Channel, best.NetworkDb);
 
                 WiFi.begin(best.Network.ssid, best.Network.passphrase, best.Channel, best.BSSID);
+                connect_timeout_ms = millis() + connectTimeout;
 
-                status = connectLoop();
             } else {
                 DEBUG_WIFI_MULTI("[WIFI] no matching wifi found!\n");
             }

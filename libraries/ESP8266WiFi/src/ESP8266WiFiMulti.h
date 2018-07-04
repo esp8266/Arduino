@@ -60,6 +60,7 @@ class ESP8266WiFiMulti {
 
     private:
         WifiAPlist APlist;
+        unsigned long connect_timeout_ms;
 
         void selectBest(BestNetwork& best, int8_t scanResult);
         void handleConnectComplete(wl_status_t status);
