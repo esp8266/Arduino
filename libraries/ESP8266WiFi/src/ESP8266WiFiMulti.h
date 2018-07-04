@@ -47,6 +47,8 @@ struct WifiAPEntry {
 
 typedef std::vector<WifiAPEntry> WifiAPlist;
 
+struct BestNetwork;
+
 class ESP8266WiFiMulti {
     public:
         ESP8266WiFiMulti();
@@ -58,6 +60,11 @@ class ESP8266WiFiMulti {
 
     private:
         WifiAPlist APlist;
+
+        void selectBest(BestNetwork& best, int8_t scanResult);
+        void handleConnectComplete(wl_status_t status);
+        wl_status_t connectLoop();
+
         bool APlistAdd(const char* ssid, const char *passphrase = NULL);
         void APlistClean(void);
 
