@@ -289,7 +289,15 @@ int MDNSResponder::queryService(char *service, char *proto) {
 #ifdef DEBUG_ESP_MDNS_TX
   DEBUG_ESP_PORT.printf("queryService %s %s\n", service, proto);
 #endif  
-  
+  MDNSAnswer *answer;
+  int numAnswers = _getNumAnswers();
+  for (int n = numAnswers - 1; n >= 0; n--) {
+    answer = _getAnswerFromIdx(n);
+    os_free(answer->hostname);
+    os_free(answer);
+    answer = 0;
+  }
+  _answers = 0;
   if (_query != 0) {
     os_free(_query);
     _query = 0;
