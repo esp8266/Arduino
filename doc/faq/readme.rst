@@ -52,7 +52,7 @@ Why can't I use WPS ?
 ~~~~~~~~~~~~~~~~~~~~~
 
 WPS is disabled by default, this offers an extra 4KB in ram/heap.  To enable
-WPS, use this boards generator option:
+WPS (and loose 4KB of useable ram), use this boards generator option:
 
 ``./tools/boards.txt.py --allowWPS --allgen``
 
