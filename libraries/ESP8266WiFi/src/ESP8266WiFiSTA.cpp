@@ -572,6 +572,7 @@ int32_t ESP8266WiFiSTAClass::RSSI(void) {
 // -----------------------------------------------------------------------------------------------------------------------
 
 #ifdef NO_EXTRA_4K_HEAP
+/* NO_EXTRA_4K_HEAP's description in cores/esp8266/core_esp8266_main.cpp */
 
 void wifi_wps_status_cb(wps_cb_status status);
 
