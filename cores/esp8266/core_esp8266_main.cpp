@@ -167,7 +167,7 @@ void init_done() {
    Some clever fellows found that the SYS stack was a large and quite unused
    piece of ram that we could use for the user stack, and proposed to use it
    to store the user stack instead of using the users' main memory, thus
-   saving around 4KB or ram/heap.
+   saving around 4KB on ram/heap.
 
    A problem arose later, which is that this stack is heavily used by the
    system for some features.  One of these features is WPS.  We still don't
