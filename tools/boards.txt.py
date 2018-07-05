@@ -1334,6 +1334,7 @@ def usage (name,ret):
     print " --customspeed s - new serial speed for all boards"
     print " --nofloat       - disable float support in printf/scanf"
     print " --noextra4kheap - disable extra 4k heap (will enable WPS)"
+    print " --allowWPS      - synonym for --noextra4kheap"
     print ""
     print " mandatory option (at least one):"
     print ""
@@ -1393,7 +1394,7 @@ customspeeds = []
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
-          "noextra4kheap",
+          "noextra4kheap", "allowWPS",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
           "allgen"] )
 except getopt.GetoptError as err:
@@ -1437,7 +1438,7 @@ for o, a in opts:
     elif o in ("--nofloat"):
         nofloat=True
 
-    elif o in ("--noextra4kheap"):
+    elif o in ("--noextra4kheap", "--allowWPS"):
         noextra4kheap=True
 
     elif o in ("--ldshow"):

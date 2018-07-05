@@ -156,10 +156,40 @@ void init_done() {
  * Peripherals (except for SPI0 and UART0) are not initialized.
  * This function does not return.
  */
+/*
+   A bit of explanation for this entry point:
 
-/* provided or not by boards.txt */
-/* #define NO_EXTRA_4K_HEAP */
+   SYS is the RTOS task/context used by the upperlying system to run its
+   administrative tasks (at least WLAN and lwip's receive callbacks and
+   Ticker).  NONOS-SDK is designed to run users's non-threaded code in
+   another specific task/context with its own stack in BSS.
 
+   Some clever fellows found that the SYS stack was a large and quite unused
+   piece of ram that we could use for the user stack, and proposed to use it
+   to store the user stack instead of using the users' main memory, thus
+   saving around 4KB or ram/heap.
+
+   A problem arose later, which is that this stack is heavily used by the
+   system for some features.  One of these features is WPS.  We still don't
+   know if other features are using this, or if this memory is going to be
+   used in future releases.
+
+   WPS beeing flawed by its poor security, or not beeing used by lots of
+   users, it has been decided that we are still going to use that memory for
+   the users's stack and disable the use of WPS, with an option to revert
+   that back at the user's discretion.  This selection can be done by using
+   the board generator script.  This could be also done by setting up a new
+   option in the IDE's Tools menu.
+
+   The behavior is controlled by the globally NO_EXTRA_4K_HEAP define below.
+
+   References:
+   https://github.com/esp8266/Arduino/pull/4553
+   https://github.com/esp8266/Arduino/pull/4622
+   https://github.com/esp8266/Arduino/issues/4779
+   https://github.com/esp8266/Arduino/pull/4889
+
+*/
 
 #ifdef NO_EXTRA_4K_HEAP
 /* this is the default NONOS-SDK user's heap location */
@@ -169,12 +199,19 @@ cont_t g_cont __attribute__ ((aligned (16)));
 extern "C" void ICACHE_RAM_ATTR app_entry(void)
 {
 #ifdef NO_EXTRA_4K_HEAP
+
+    /* this is the default NONOS-SDK user's heap location */
     g_pcont = &g_cont;
+
 #else
-    /* Allocate continuation context on this stack, and save pointer to it. */
+
+    /* Allocate continuation context on this SYS stack,
+       and save pointer to it. */
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
+
 #endif
+
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
