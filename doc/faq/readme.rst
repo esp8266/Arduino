@@ -40,6 +40,22 @@ entering an issue report, please perform initial troubleshooting.
 
 `Read more <a02-my-esp-crashes.rst>`__.
 
+How can I get some extra KBs in flash ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
+be saved by using the option ``--nofloat`` with the boards generator:
+
+``./tools/boards.txt.py --nofloat --allgen``
+
+Why can't I use WPS ?
+~~~~~~~~~~~~~~~~~~~~~
+
+WPS is disabled by default, this offers an extra 4KB in ram/heap.  To enable
+WPS (and lose 4KB of useable ram), use this boards generator option:
+
+``./tools/boards.txt.py --allowWPS --allgen``
+
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
