@@ -296,7 +296,6 @@ int MDNSResponder::queryService(char *service, char *proto) {
     os_free(currAnswer);
     currAnswer = 0;
   }
-  _answers = 0;
   if (_query != 0) {
     os_free(_query);
     _query = 0;
