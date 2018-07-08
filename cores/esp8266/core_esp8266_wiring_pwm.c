@@ -46,7 +46,7 @@ extern void __analogWriteFreq(uint32_t freq) {
 }
 
 extern void __analogWrite(uint8_t pin, int val) {
-  if (pin >= 16) {
+  if (pin > 16) {
     return;
   }
   uint32_t analogPeriod = 1000000L / analogFreq;

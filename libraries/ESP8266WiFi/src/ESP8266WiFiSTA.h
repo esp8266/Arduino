@@ -26,6 +26,7 @@
 
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
+#include "user_interface.h"
 
 
 class ESP8266WiFiSTAClass {
@@ -92,7 +93,13 @@ class ESP8266WiFiSTAClass {
 
     public:
 
+#ifdef NO_EXTRA_4K_HEAP
         bool beginWPSConfig(void);
+#else
+        inline bool beginWPSConfig(void) __attribute__((always_inline)) {
+            return WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool();
+        }
+#endif
 
         bool beginSmartConfig();
         bool stopSmartConfig();
