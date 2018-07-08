@@ -37,7 +37,7 @@ extern "C" {
  * # The TLS PRF
  *
  * The "PRF" is the pseudorandom function used internally during the
- * SSL/TLS handshake, notably to expand negociated shared secrets into
+ * SSL/TLS handshake, notably to expand negotiated shared secrets into
  * the symmetric encryption keys that will be used to process the
  * application data.
  *
