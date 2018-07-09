@@ -279,7 +279,7 @@ typedef int (*br_prng_seeder)(const br_prng_class **ctx);
  * is returned.
  *
  * If `name` is not `NULL`, then `*name` is set to a symbolic string
- * that identifies the seeder implemention. If no seeder is returned
+ * that identifies the seeder implementation. If no seeder is returned
  * and `name` is not `NULL`, then `*name` is set to a pointer to the
  * constant string `"none"`.
  *
