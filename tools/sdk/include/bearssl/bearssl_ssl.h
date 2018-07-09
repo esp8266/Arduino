@@ -1278,7 +1278,7 @@ br_ssl_engine_get_hash(br_ssl_engine_context *ctx, int id)
 /**
  * \brief Set the PRF implementation (for TLS 1.0 and 1.1).
  *
- * This function sets (or removes, if `impl` is `NULL`) the implemenation
+ * This function sets (or removes, if `impl` is `NULL`) the implementation
  * for the PRF used in TLS 1.0 and 1.1.
  *
  * \param cc     SSL engine context.
@@ -1293,7 +1293,7 @@ br_ssl_engine_set_prf10(br_ssl_engine_context *cc, br_tls_prf_impl impl)
 /**
  * \brief Set the PRF implementation with SHA-256 (for TLS 1.2).
  *
- * This function sets (or removes, if `impl` is `NULL`) the implemenation
+ * This function sets (or removes, if `impl` is `NULL`) the implementation
  * for the SHA-256 variant of the PRF used in TLS 1.2.
  *
  * \param cc     SSL engine context.
@@ -1308,7 +1308,7 @@ br_ssl_engine_set_prf_sha256(br_ssl_engine_context *cc, br_tls_prf_impl impl)
 /**
  * \brief Set the PRF implementation with SHA-384 (for TLS 1.2).
  *
- * This function sets (or removes, if `impl` is `NULL`) the implemenation
+ * This function sets (or removes, if `impl` is `NULL`) the implementation
  * for the SHA-384 variant of the PRF used in TLS 1.2.
  *
  * \param cc     SSL engine context.
@@ -1916,7 +1916,7 @@ br_ssl_engine_last_error(const br_ssl_engine_context *cc)
  *      Informs the engine that 'len' bytes have been read from the buffer
  *      (extract operation) or written to the buffer (inject operation).
  *      The 'len' value MUST NOT be zero. The 'len' value MUST NOT exceed
- *      that which was obtained from a preceeding br_ssl_engine_xxx_buf()
+ *      that which was obtained from a preceding br_ssl_engine_xxx_buf()
  *      call.
  */
 
@@ -2517,7 +2517,7 @@ struct br_ssl_client_context_ {
  *     then bit `x` is set (hash function ID is 0 for the special MD5+SHA-1,
  *     or 2 to 6 for the SHA family).
  *
- *   - If ECDSA is suported with hash function of ID `x`, then bit `8+x`
+ *   - If ECDSA is supported with hash function of ID `x`, then bit `8+x`
  *     is set.
  *
  *   - Newer algorithms are symbolic 16-bit identifiers that do not
@@ -3564,7 +3564,7 @@ br_ssl_server_get_client_suites(const br_ssl_server_context *cc, size_t *num)
  *     then bit `x` is set (hash function ID is 0 for the special MD5+SHA-1,
  *     or 2 to 6 for the SHA family).
  *
- *   - If ECDSA is suported with hash function of ID `x`, then bit `8+x`
+ *   - If ECDSA is supported with hash function of ID `x`, then bit `8+x`
  *     is set.
  *
  *   - Newer algorithms are symbolic 16-bit identifiers that do not
