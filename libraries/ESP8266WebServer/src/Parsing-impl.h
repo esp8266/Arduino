@@ -35,7 +35,8 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
-static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& dataLength, int timeout_ms)
+template <class ServerClass, class ClientClass>
+static char* readBytesWithTimeout(ClientClass& client, size_t maxLength, size_t& dataLength, int timeout_ms)
 {
   char *buf = nullptr;
   dataLength = 0;
@@ -67,7 +68,8 @@ static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& 
   return buf;
 }
 
-bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
+template <class ServerClass, class ClientClass>
+bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseRequest(ClientClass& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
   client.readStringUntil('\n');
@@ -102,15 +104,15 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   _chunked = false;
 
   HTTPMethod method = HTTP_GET;
-  if (methodStr == F("POST")) {
+  if (methodStr == ("POST")) {
     method = HTTP_POST;
-  } else if (methodStr == F("DELETE")) {
+  } else if (methodStr == ("DELETE")) {
     method = HTTP_DELETE;
-  } else if (methodStr == F("OPTIONS")) {
+  } else if (methodStr == ("OPTIONS")) {
     method = HTTP_OPTIONS;
-  } else if (methodStr == F("PUT")) {
+  } else if (methodStr == ("PUT")) {
     method = HTTP_PUT;
-  } else if (methodStr == F("PATCH")) {
+  } else if (methodStr == ("PATCH")) {
     method = HTTP_PATCH;
   }
   _currentMethod = method;
@@ -125,7 +127,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 #endif
 
   //attach handler
-  RequestHandler* handler;
+  RequestHandler<ServerClass, ClientClass>* handler;
   for (handler = _firstHandler; handler; handler = handler->next()) {
     if (handler->canHandle(_currentMethod, _currentUri))
       break;
@@ -166,24 +168,24 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         using namespace mime;
         if (headerValue.startsWith(FPSTR(mimeTable[txt].mimeType))){
           isForm = false;
-        } else if (headerValue.startsWith(F("application/x-www-form-urlencoded"))){
+        } else if (headerValue.startsWith(("application/x-www-form-urlencoded"))){
           isForm = false;
           isEncoded = true;
-        } else if (headerValue.startsWith(F("multipart/"))){
+        } else if (headerValue.startsWith(("multipart/"))){
           boundaryStr = headerValue.substring(headerValue.indexOf('=') + 1);
           boundaryStr.replace("\"","");
           isForm = true;
         }
-      } else if (headerName.equalsIgnoreCase(F("Content-Length"))){
+      } else if (headerName.equalsIgnoreCase(("Content-Length"))){
         contentLength = headerValue.toInt();
-      } else if (headerName.equalsIgnoreCase(F("Host"))){
+      } else if (headerName.equalsIgnoreCase(("Host"))){
         _hostHeader = headerValue;
       }
     }
 
     if (!isForm){
       size_t plainLength;
-      char* plainBuf = readBytesWithTimeout(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
+      char* plainBuf = readBytesWithTimeout<ServerClass, ClientClass>(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
       if (plainLength < contentLength) {
       	free(plainBuf);
       	return false;
@@ -198,7 +200,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         if(!isEncoded){
           //plain post json or other data
           RequestArgument& arg = _currentArgs[_currentArgCount++];
-          arg.key = F("plain");
+          arg.key = ("plain");
           arg.value = String(plainBuf);
         }
 
@@ -260,7 +262,8 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   return true;
 }
 
-bool ESP8266WebServer::_collectHeader(const char* headerName, const char* headerValue) {
+template <class ServerClass, class ClientClass>
+bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_collectHeader(const char* headerName, const char* headerValue) {
   for (int i = 0; i < _headerKeysCount; i++) {
     if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
             _currentHeaders[i].value=headerValue;
@@ -270,7 +273,8 @@ bool ESP8266WebServer::_collectHeader(const char* headerName, const char* header
   return false;
 }
 
-void ESP8266WebServer::_parseArguments(String data) {
+template <class ServerClass, class ClientClass>
+void ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseArguments(String data) {
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("args: ");
   DEBUG_OUTPUT.println(data);
@@ -345,7 +349,8 @@ void ESP8266WebServer::_parseArguments(String data) {
 
 }
 
-void ESP8266WebServer::_uploadWriteByte(uint8_t b){
+template <class ServerClass, class ClientClass>
+void ESP8266WebServerTemplate<ServerClass, ClientClass>::_uploadWriteByte(uint8_t b){
   if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN){
     if(_currentHandler && _currentHandler->canUpload(_currentUri))
       _currentHandler->upload(*this, _currentUri, *_currentUpload);
@@ -355,7 +360,8 @@ void ESP8266WebServer::_uploadWriteByte(uint8_t b){
   _currentUpload->buf[_currentUpload->currentSize++] = b;
 }
 
-uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
+template <class ServerClass, class ClientClass>
+uint8_t ESP8266WebServerTemplate<ServerClass, ClientClass>::_uploadReadByte(ClientClass& client){
   int res = client.read();
   if(res == -1){
     while(!client.available() && client.connected())
@@ -365,7 +371,8 @@ uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
   return (uint8_t)res;
 }
 
-bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t len){
+template <class ServerClass, class ClientClass>
+bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseForm(ClientClass& client, String boundary, uint32_t len){
   (void) len;
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");
@@ -394,7 +401,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
 
       line = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (line.length() > 19 && line.substring(0, 19).equalsIgnoreCase(F("Content-Disposition"))){
+      if (line.length() > 19 && line.substring(0, 19).equalsIgnoreCase(("Content-Disposition"))){
         int nameStart = line.indexOf('=');
         if (nameStart != -1){
           argName = line.substring(nameStart+2);
@@ -410,7 +417,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             DEBUG_OUTPUT.println(argFilename);
 #endif
             //use GET to set the filename if uploading using blob
-            if (argFilename == F("blob") && hasArg(FPSTR(filename))) 
+            if (argFilename == ("blob") && hasArg(FPSTR(filename))) 
               argFilename = arg(FPSTR(filename));
           }
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -577,7 +584,8 @@ readfile:
   return false;
 }
 
-String ESP8266WebServer::urlDecode(const String& text)
+template <class ServerClass, class ClientClass>
+String ESP8266WebServerTemplate<ServerClass, ClientClass>::urlDecode(const String& text)
 {
 	String decoded = "";
 	char temp[] = "0x00";
@@ -608,7 +616,8 @@ String ESP8266WebServer::urlDecode(const String& text)
 	return decoded;
 }
 
-bool ESP8266WebServer::_parseFormUploadAborted(){
+template <class ServerClass, class ClientClass>
+bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseFormUploadAborted(){
   _currentUpload->status = UPLOAD_FILE_ABORTED;
   if(_currentHandler && _currentHandler->canUpload(_currentUri))
     _currentHandler->upload(*this, _currentUri, *_currentUpload);

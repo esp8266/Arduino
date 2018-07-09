@@ -48,7 +48,7 @@ enum HTTPAuthMethod { BASIC_AUTH, DIGEST_AUTH };
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
 
-class ESP8266WebServer;
+template<class ServerClass, class ClientClass> class ESP8266WebServerTemplate;
 
 typedef struct {
   HTTPUploadStatus status;
@@ -66,18 +66,19 @@ namespace fs {
 class FS;
 }
 
-class ESP8266WebServer
+template<class ServerClass, class ClientClass>
+class ESP8266WebServerTemplate
 {
 public:
-  ESP8266WebServer(IPAddress addr, int port = 80);
-  ESP8266WebServer(int port = 80);
-  virtual ~ESP8266WebServer();
+  ESP8266WebServerTemplate(IPAddress addr, int port = 80);
+  ESP8266WebServerTemplate(int port = 80);
+  ~ESP8266WebServerTemplate();
 
-  virtual void begin();
-  virtual void begin(uint16_t port);
-  virtual void handleClient();
+  void begin();
+  void begin(uint16_t port);
+  void handleClient();
 
-  virtual void close();
+  void close();
   void stop();
 
   bool authenticate(const char * username, const char * password);
@@ -87,14 +88,14 @@ public:
   void on(const String &uri, THandlerFunction handler);
   void on(const String &uri, HTTPMethod method, THandlerFunction fn);
   void on(const String &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
-  void addHandler(RequestHandler* handler);
+  void addHandler(RequestHandler<ServerClass, ClientClass>* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
 
   String uri() { return _currentUri; }
   HTTPMethod method() { return _currentMethod; }
-  virtual WiFiClient client() { return _currentClient; }
+  ClientClass client() { return _currentClient; }
   HTTPUpload& upload() { return *_currentUpload; }
 
   String arg(String name);        // get request argument value by name
@@ -134,20 +135,26 @@ public:
     _streamFileCore(file.size(), file.name(), contentType);
     return _currentClient.write(file);
   }
-  
+
+  // AXTLS and BearSSL only
+  void setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) { }
+  void setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) { }
+  // BearSSL only
+  void setBufferSizes(int recv, int xmit) { };
+  void setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk) { };
+  void setECCert(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk) { };
+
 protected:
-  virtual size_t _currentClientWrite(const char* b, size_t l) { return _currentClient.write( b, l ); }
-  virtual size_t _currentClientWrite_P(PGM_P b, size_t l) { return _currentClient.write_P( b, l ); }
-  void _addRequestHandler(RequestHandler* handler);
+  void _addRequestHandler(RequestHandler<ServerClass, ClientClass>* handler);
   void _handleRequest();
   void _finalizeResponse();
-  bool _parseRequest(WiFiClient& client);
+  bool _parseRequest(ClientClass& client);
   void _parseArguments(String data);
   static String _responseCodeToString(int code);
-  bool _parseForm(WiFiClient& client, String boundary, uint32_t len);
+  bool _parseForm(ClientClass& client, String boundary, uint32_t len);
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
-  uint8_t _uploadReadByte(WiFiClient& client);
+  uint8_t _uploadReadByte(ClientClass& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
  
@@ -162,18 +169,18 @@ protected:
     String value;
   };
 
-  WiFiServer  _server;
+  ServerClass _server;
 
-  WiFiClient  _currentClient;
+  ClientClass _currentClient;
   HTTPMethod  _currentMethod;
   String      _currentUri;
   uint8_t     _currentVersion;
   HTTPClientStatus _currentStatus;
   unsigned long _statusChange;
 
-  RequestHandler*  _currentHandler;
-  RequestHandler*  _firstHandler;
-  RequestHandler*  _lastHandler;
+  RequestHandler<ServerClass, ClientClass>*  _currentHandler;
+  RequestHandler<ServerClass, ClientClass>*  _firstHandler;
+  RequestHandler<ServerClass, ClientClass>*  _lastHandler;
   THandlerFunction _notFoundHandler;
   THandlerFunction _fileUploadHandler;
 
@@ -195,5 +202,9 @@ protected:
 
 };
 
+#include "ESP8266WebServer-impl.h"
+#include "Parsing-impl.h"
+
+typedef ESP8266WebServerTemplate<WiFiServer, WiFiClient> ESP8266WebServer;
 
 #endif //ESP8266WEBSERVER_H
