@@ -93,7 +93,7 @@ extern "C" {
  *   - `br_xxx_out(const br_xxx_context *ctx, void *out)`
  *
  *     Complete the hash computation and write the result in the provided
- *     buffer. The output buffer MUST be large enough to accomodate the
+ *     buffer. The output buffer MUST be large enough to accommodate the
  *     result. The context is NOT modified by this operation, so this
  *     function can be used to get a "partial hash" while still keeping
  *     the possibility of adding more bytes to the input.

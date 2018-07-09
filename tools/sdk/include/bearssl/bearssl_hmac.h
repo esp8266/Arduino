@@ -155,7 +155,7 @@ void br_hmac_update(br_hmac_context *ctx, const void *data, size_t len);
 /**
  * \brief Compute the HMAC output.
  *
- * The destination buffer MUST be large enough to accomodate the result;
+ * The destination buffer MUST be large enough to accommodate the result;
  * its length is at most the "natural length" of HMAC (i.e. the output
  * length of the underlying hash function). The context is NOT modified;
  * further bytes may be processed. Thus, "partial HMAC" values can be
