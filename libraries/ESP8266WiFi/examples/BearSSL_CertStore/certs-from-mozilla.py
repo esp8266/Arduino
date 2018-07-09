@@ -59,7 +59,7 @@ for i in range(0, len(pems)):
 if os.path.exists("data/certs.ar"):
     os.unlink("data/certs.ar");
 
-arCmd = ['ar', 'mcs', 'data/certs.ar'] + derFiles;
+arCmd = ['ar', 'q', 'data/certs.ar'] + derFiles;
 call( arCmd )
 
 for der in derFiles:

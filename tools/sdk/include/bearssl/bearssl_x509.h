@@ -360,7 +360,7 @@ typedef struct {
  *   - `end_chain()` is called when the last certificate in the chain
  *     was processed.
  *   - `get_pkey()` is called after chain processing, if the chain
- *     validation was succesfull.
+ *     validation was successful.
  *
  * A context structure may be reused; the `start_chain()` method shall
  * ensure (re)initialisation.
