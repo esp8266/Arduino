@@ -13,13 +13,37 @@ ESP8266WiFiMesh	KEYWORD3
 #######################################
 
 ESP8266WiFiMesh	KEYWORD1
+NetworkInfo	KEYWORD1
+TransmissionResult	KEYWORD1
+transmission_status_t	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
+connection_queue	KEYWORD2
+latest_transmission_outcomes	KEYWORD2
 begin	KEYWORD2
+activateAP	KEYWORD2
+deactivateAP	KEYWORD2
+restartAP	KEYWORD2
+getMeshName	KEYWORD2
+getNodeID	KEYWORD2
+getMessage	KEYWORD2
+setMessage	KEYWORD2
 attemptTransmission	KEYWORD2
 acceptRequest	KEYWORD2
 setStaticIP	KEYWORD2
 getStaticIP	KEYWORD2
+disableStaticIP->KEYWORD2
+Uint64ToString	KEYWORD2
+StringToUint64	KEYWORD2
+getNetworkFilter	KEYWORD2
+setNetworkFilter	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+empty_IP	LITERAL1
+NETWORK_INFO_DEFAULT_INT	LITERAL1
