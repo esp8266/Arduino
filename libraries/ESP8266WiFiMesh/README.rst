@@ -14,7 +14,7 @@ The node receives messages from other nodes by calling the ``acceptRequest`` met
 
 For more details, see the included example. The main functions to modify in the example are ``manageRequest`` (``requestHandler``), ``manageResponse`` (``responseHandler``) and ``networkFilter``.
 
-Note that this library can use static IP:s for the nodes to speed up connection times. To enable this, use the ``setStaticIP`` method after calling the begin method, as in the included example. Ensure that nodes connecting to the same AP have distinct static IP:s. Node IP:s need to be at the same subnet as the server gateway (192.168.4 for this library by default). It may also be worth noting that station gateway IP must match the IP for the server on the nodes, though this is the default setting for the library.
+Note that this library can use static IP:s for the nodes to speed up connection times. To enable this, use the ``setStaticIP`` method after calling the ``begin`` method, as in the included example. Ensure that nodes connecting to the same AP have distinct static IP:s. Node IP:s need to be at the same subnet as the server gateway (192.168.4 for this library by default). It may also be worth noting that station gateway IP must match the IP for the server on the nodes, though this is the default setting for the library.
 
 When Arduino core for ESP8266 version 2.4.2 or higher is used, there are optimizations available for WiFi scans and static IP use to reduce the time it takes for nodes to connect to each other. These optimizations are enabled by default. To take advantage of the static IP optimizations you also need to use lwIP2. The lwIP version can be changed in the Tools menu of Arduino IDE.
 
@@ -22,7 +22,7 @@ If you are using a core version prior to 2.4.2 it is possible to disable the WiF
 
 It is possible to have several ESP8266WiFiMesh instances running on every ESP8266 (e.g. to communicate with different mesh networks). However, because the ESP8266 has one WiFi radio only one AP per ESP8266 can be active at a time. Also note that if the ESP8266WiFiMesh instances use different WiFi channels, active APs are forced to use the same WiFi channel as active stations, possibly causing AP disconnections.
 
-While it is possible to connect to other nodes only by giving their SSID, e.g. ``ESP8266WiFiMesh::connection_queue.push_back(NetworkInfo("NodeSSID"));``, it is recommended that AP WiFi channel and AP BSSID are given to minimize connection delay.
+While it is possible to connect to other nodes by only giving their SSID, e.g. ``ESP8266WiFiMesh::connection_queue.push_back(NetworkInfo("NodeSSID"));``, it is recommended that AP WiFi channel and AP BSSID are given as well, to minimize connection delay.
 
 Also, remember to change the default mesh network WiFi password!
 
