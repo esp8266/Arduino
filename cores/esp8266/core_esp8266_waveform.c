@@ -205,7 +205,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
 // Stops a waveform on a pin
 int stopWaveform(uint8_t pin) {
   for (size_t i = 0; i < countof(waveform); i++) {
-    if (((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
+    if ((((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) && waveform[i].enabled) {
       // Note that there is no interrupt unsafety here.  The IRQ can only ever change .enabled from 1->0
       // We're also doing that, so even if an IRQ occurred it would still stay as 0.
       waveform[i].enabled = 0;
