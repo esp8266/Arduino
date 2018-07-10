@@ -1180,7 +1180,9 @@ def all_boards ():
     macros.update(led(led_default, led_max))
 
     print '#'
-    print '# this file is script-generated and is likely to be overwritten by ' + os.path.basename(sys.argv[0])
+    print '# Do not create pull-requests for this file only, CI will not accept them.'
+    print '# You *must* edit/modify/run ' + os.path.basename(sys.argv[0]) + ' to regenerate boards.txt.'
+    print '# All modified files after running with option "--allgen" must be included in the pull-request.'
     print '#'
     print ''
     print 'menu.BoardModel=Model'
