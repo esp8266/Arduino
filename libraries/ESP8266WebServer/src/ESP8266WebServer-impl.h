@@ -515,7 +515,7 @@ void ESP8266WebServerTemplate<ServerClass, ClientClass>::_streamFileCore(const s
   if (fileName.endsWith(String(FPSTR(mimeTable[gz].endsWith))) &&
       contentType != String(FPSTR(mimeTable[gz].mimeType)) &&
       contentType != String(FPSTR(mimeTable[none].mimeType))) {
-    sendHeader(F("Content-Encoding"), F("gzip"));
+    sendHeader(("Content-Encoding"), ("gzip"));
   }
   send(200, contentType, "");
 }

@@ -21,6 +21,9 @@
 
 #include "ESP8266WebServer.h"
 
+#ifndef ESP8266SECUREWEBSERVER_H
+#define ESP8266SECUREWEBSERVER_H
+
 namespace axTLS {
   typedef ESP8266WebServerTemplate<WiFiServerSecure, WiFiClientSecure> ESP8266WebServerSecure;
 };
@@ -29,3 +32,4 @@ namespace BearSSL {
   typedef ESP8266WebServerTemplate<WiFiServerSecure, WiFiClientSecure> ESP8266WebServerSecure;
 };
 
+#endif

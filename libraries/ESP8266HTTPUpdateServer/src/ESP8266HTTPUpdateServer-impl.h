@@ -6,17 +6,17 @@
 #include "StreamString.h"
 #include "ESP8266HTTPUpdateServer.h"
 
-
-static const char serverIndex[] PROGMEM =
+static const char serverIndex[] =
   R"(<html><body><form method='POST' action='' enctype='multipart/form-data'>
                   <input type='file' name='update'>
                   <input type='submit' value='Update'>
                </form>
          </body></html>)";
-static const char successResponse[] PROGMEM = 
+static const char successResponse[] = 
   "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
 
-ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
+template <class ServerClass, class ClientClass>
+ESP8266HTTPUpdateServerTemplate<ServerClass, ClientClass>::ESP8266HTTPUpdateServerTemplate(bool serial_debug)
 {
   _serial_output = serial_debug;
   _server = NULL;
@@ -25,7 +25,8 @@ ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
   _authenticated = false;
 }
 
-void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path, const char * username, const char * password)
+template <class ServerClass, class ClientClass>
+void ESP8266HTTPUpdateServerTemplate<ServerClass, ClientClass>::setup(ESP8266WebServerTemplate<ServerClass, ClientClass> *server, const char * path, const char * username, const char * password)
 {
     _server = server;
     _username = (char *)username;
@@ -35,7 +36,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
     _server->on(path, HTTP_GET, [&](){
       if(_username != NULL && _password != NULL && !_server->authenticate(_username, _password))
         return _server->requestAuthentication();
-      _server->send_P(200, PSTR("text/html"), serverIndex);
+      _server->send_P(200, ("text/html"), serverIndex);
     });
 
     // handler for the /update form POST (once file upload finishes)
@@ -43,10 +44,10 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
       if(!_authenticated)
         return _server->requestAuthentication();
       if (Update.hasError()) {
-        _server->send(200, F("text/html"), String(F("Update error: ")) + _updaterError);
+        _server->send(200, ("text/html"), String(("Update error: ")) + _updaterError);
       } else {
         _server->client().setNoDelay(true);
-        _server->send_P(200, PSTR("text/html"), successResponse);
+        _server->send_P(200, ("text/html"), successResponse);
         delay(100);
         _server->client().stop();
         ESP.restart();
@@ -95,7 +96,8 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char * path,
     });
 }
 
-void ESP8266HTTPUpdateServer::_setUpdaterError()
+template <class ServerClass, class ClientClass>
+void ESP8266HTTPUpdateServerTemplate<ServerClass, ClientClass>::_setUpdaterError()
 {
   if (_serial_output) Update.printError(Serial);
   StreamString str;
