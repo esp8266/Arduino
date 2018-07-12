@@ -323,6 +323,18 @@ uint16_t SPIClass::transfer16(uint16_t data) {
     return out.val;
 }
 
+void SPIClass::transfer(void *buf, uint16_t count) {
+    uint8_t *cbuf = reinterpret_cast<uint8_t*>(buf);
+    for (; ((long)cbuf) & 3; cbuf++, count--)
+        *cbuf = transfer(*cbuf);
+    uint16_t count4 = count & ~3;
+    transferBytes(cbuf, cbuf, count4);
+    cbuf += count4;
+    count -= count4;
+    for (; count; cbuf++, count--)
+        *cbuf = transfer(*cbuf);
+}
+
 void SPIClass::write(uint8_t data) {
     while(SPI1CMD & SPIBUSY) {}
     // reset to 8Bit mode
