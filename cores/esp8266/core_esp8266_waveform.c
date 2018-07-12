@@ -63,8 +63,8 @@
 typedef struct {
   uint32_t nextServiceCycle;        // ESP cycle timer when a transition required
   uint32_t timeLeftCycles;          // For time-limited waveform, how many ESP cycles left
-  uint16_t gpioMask;                // Mask instead of value to speed IRQ loop
-  uint16_t gpio16Mask;              // Mask instead of value to speed IRQ loop
+  const uint16_t gpioMask;          // Mask instead of value to speed IRQ loop
+  const uint16_t gpio16Mask;        // Mask instead of value to speed IRQ loop
   unsigned state              : 1;  // Current state of this pin
   unsigned nextTimeHighCycles : 31; // Copy over low->high to keep smooth waveform
   unsigned enabled            : 1;  // Is this GPIO generating a waveform?
@@ -204,13 +204,21 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
 
 // Stops a waveform on a pin
 int stopWaveform(uint8_t pin) {
+  // Can't possibly need to stop anything if there is no timer active
+  if (!timerRunning) {
+    return false;
+  }
+
   for (size_t i = 0; i < countof(waveform); i++) {
-    if ((((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) && waveform[i].enabled) {
+    if (!waveform[i].enabled) {
+      continue; // Skip fast to next one, can't need to stop this one since it's not running
+    }
+    if (((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
       // Note that there is no interrupt unsafety here.  The IRQ can only ever change .enabled from 1->0
       // We're also doing that, so even if an IRQ occurred it would still stay as 0.
       waveform[i].enabled = 0;
-      int cnt = timer1CB?1:0;
-      for (size_t i = 0; i < countof(waveform); i++) {
+      int cnt = timer1CB ? 1 : 0;
+      for (size_t i = 0; (cnt == 0) && (i < countof(waveform)); i++) {
         cnt += waveform[i].enabled ? 1 : 0;
       }
       if (!cnt) {
