@@ -333,6 +333,7 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
+            'crystalfreq_menu',
             'flashmode_qio',
             'flashfreq_40',
             '4M',

@@ -32,7 +32,9 @@
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
-#define LED_BUILTIN 5
+#define	LED_BUILTIN 5
+#define	LED_GREEN 13
+#define LED_RED 12
 
 #include "../generic/common.h"
 
