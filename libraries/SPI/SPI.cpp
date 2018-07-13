@@ -537,9 +537,9 @@ void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
 
     setDataBits(size * 8);
     uint8_t dataSize = ((size + 3) / 4);
+    volatile uint32_t * fifoPtr = &SPI1W0;
 
     if(out) {
-        volatile uint32_t * fifoPtr = &SPI1W0;
         uint32_t * dataPtr = (uint32_t*) out;
         while(dataSize--) {
             *fifoPtr = *dataPtr;
@@ -558,8 +558,8 @@ void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
 
     if(in) {
-        volatile uint32_t * fifoPtr = &SPI1W0;
         uint32_t * dataPtr = (uint32_t*) in;
+        fifoPtr = &SPI1W0;
         dataSize = ((size + 3) / 4);
         while(dataSize--) {
             *dataPtr = *fifoPtr;
