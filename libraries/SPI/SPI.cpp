@@ -523,16 +523,23 @@ void SPIClass::transferBytes(const uint8_t * out, uint8_t * in, uint32_t size) {
     }
 }
 
+/**
+ * Note:
+ *  in and out need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param out uint8_t *
+ * @param in  uint8_t *
+ * @param size uint8_t (max 64)
+ */
 void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
     // Set in/out Bits to transfer
 
     setDataBits(size * 8);
-
-    volatile uint32_t * fifoPtr = &SPI1W0;
     uint8_t dataSize = ((size + 3) / 4);
 
     if(out) {
+        volatile uint32_t * fifoPtr = &SPI1W0;
         uint32_t * dataPtr = (uint32_t*) out;
         while(dataSize--) {
             *fifoPtr = *dataPtr;
@@ -551,12 +558,13 @@ void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
 
     if(in) {
-        volatile uint8_t * fifoPtr8 = (volatile uint8_t *) &SPI1W0;
-        dataSize = size;
+        volatile uint32_t * fifoPtr = &SPI1W0;
+        uint32_t * dataPtr = (uint32_t*) in;
+        dataSize = ((size + 3) / 4);
         while(dataSize--) {
-            *in = *fifoPtr8;
-            in++;
-            fifoPtr8++;
+            *dataPtr = *fifoPtr;
+            dataPtr++;
+            fifoPtr++;
         }
     }
 }
