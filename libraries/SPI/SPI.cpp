@@ -325,7 +325,7 @@ uint16_t SPIClass::transfer16(uint16_t data) {
 
 void SPIClass::transfer(void *buf, uint16_t count) {
     uint8_t *cbuf = reinterpret_cast<uint8_t*>(buf);
-    for (; ((long)cbuf) & 3; cbuf++, count--)
+    for (; (((unsigned long)cbuf) & 3) && count; cbuf++, count--)
         *cbuf = transfer(*cbuf);
     uint16_t count4 = count & ~3;
     transferBytes(cbuf, cbuf, count4);
