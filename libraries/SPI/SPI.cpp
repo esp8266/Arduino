@@ -325,10 +325,17 @@ uint16_t SPIClass::transfer16(uint16_t data) {
 
 void SPIClass::transfer(void *buf, uint16_t count) {
     uint8_t *cbuf = reinterpret_cast<uint8_t*>(buf);
+
+    // cbuf may not be 32bits-aligned
     for (; (((unsigned long)cbuf) & 3) && count; cbuf++, count--)
         *cbuf = transfer(*cbuf);
+
+    // cbuf is now aligned
+    // count may not be a multiple of 4
     uint16_t count4 = count & ~3;
     transferBytes(cbuf, cbuf, count4);
+
+    // finish the last <4 bytes
     cbuf += count4;
     count -= count4;
     for (; count; cbuf++, count--)
@@ -536,8 +543,9 @@ void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
     // Set in/out Bits to transfer
 
     setDataBits(size * 8);
-    uint8_t dataSize = ((size + 3) / 4);
+
     volatile uint32_t * fifoPtr = &SPI1W0;
+    uint8_t dataSize = ((size + 3) / 4);
 
     if(out) {
         uint32_t * dataPtr = (uint32_t*) out;
