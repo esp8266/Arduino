@@ -1,5 +1,7 @@
 #
-# this file is script-generated and is likely to be overwritten by boards.txt.py
+# Do not create pull-requests for this file only, CI will not accept them.
+# You *must* edit/modify/run boards.txt.py to regenerate boards.txt.
+# All modified files after running with option "--allgen" must be included in the pull-request.
 #
 
 menu.BoardModel=Model
@@ -73,6 +75,16 @@ generic.menu.FlashSize.512K0.build.flash_ld=eagle.flash.512k0.ld
 generic.menu.FlashSize.512K0.build.spiffs_pagesize=256
 generic.menu.FlashSize.512K0.upload.maximum_size=499696
 generic.menu.FlashSize.512K0.build.rfcal_addr=0x7C000
+generic.menu.FlashSize.512K32=512K (32K SPIFFS)
+generic.menu.FlashSize.512K32.build.flash_size=512K
+generic.menu.FlashSize.512K32.build.flash_size_bytes=0x80000
+generic.menu.FlashSize.512K32.build.flash_ld=eagle.flash.512k32.ld
+generic.menu.FlashSize.512K32.build.spiffs_pagesize=256
+generic.menu.FlashSize.512K32.upload.maximum_size=466928
+generic.menu.FlashSize.512K32.build.rfcal_addr=0x7C000
+generic.menu.FlashSize.512K32.build.spiffs_start=0x73000
+generic.menu.FlashSize.512K32.build.spiffs_end=0x7B000
+generic.menu.FlashSize.512K32.build.spiffs_blocksize=4096
 generic.menu.FlashSize.512K64=512K (64K SPIFFS)
 generic.menu.FlashSize.512K64.build.flash_size=512K
 generic.menu.FlashSize.512K64.build.flash_size_bytes=0x80000
@@ -2022,6 +2034,16 @@ thing.menu.FlashSize.512K0.build.flash_ld=eagle.flash.512k0.ld
 thing.menu.FlashSize.512K0.build.spiffs_pagesize=256
 thing.menu.FlashSize.512K0.upload.maximum_size=499696
 thing.menu.FlashSize.512K0.build.rfcal_addr=0x7C000
+thing.menu.FlashSize.512K32=512K (32K SPIFFS)
+thing.menu.FlashSize.512K32.build.flash_size=512K
+thing.menu.FlashSize.512K32.build.flash_size_bytes=0x80000
+thing.menu.FlashSize.512K32.build.flash_ld=eagle.flash.512k32.ld
+thing.menu.FlashSize.512K32.build.spiffs_pagesize=256
+thing.menu.FlashSize.512K32.upload.maximum_size=466928
+thing.menu.FlashSize.512K32.build.rfcal_addr=0x7C000
+thing.menu.FlashSize.512K32.build.spiffs_start=0x73000
+thing.menu.FlashSize.512K32.build.spiffs_end=0x7B000
+thing.menu.FlashSize.512K32.build.spiffs_blocksize=4096
 thing.menu.FlashSize.512K64=512K (64K SPIFFS)
 thing.menu.FlashSize.512K64.build.flash_size=512K
 thing.menu.FlashSize.512K64.build.flash_size_bytes=0x80000
@@ -2173,6 +2195,16 @@ thingdev.menu.FlashSize.512K0.build.flash_ld=eagle.flash.512k0.ld
 thingdev.menu.FlashSize.512K0.build.spiffs_pagesize=256
 thingdev.menu.FlashSize.512K0.upload.maximum_size=499696
 thingdev.menu.FlashSize.512K0.build.rfcal_addr=0x7C000
+thingdev.menu.FlashSize.512K32=512K (32K SPIFFS)
+thingdev.menu.FlashSize.512K32.build.flash_size=512K
+thingdev.menu.FlashSize.512K32.build.flash_size_bytes=0x80000
+thingdev.menu.FlashSize.512K32.build.flash_ld=eagle.flash.512k32.ld
+thingdev.menu.FlashSize.512K32.build.spiffs_pagesize=256
+thingdev.menu.FlashSize.512K32.upload.maximum_size=466928
+thingdev.menu.FlashSize.512K32.build.rfcal_addr=0x7C000
+thingdev.menu.FlashSize.512K32.build.spiffs_start=0x73000
+thingdev.menu.FlashSize.512K32.build.spiffs_end=0x7B000
+thingdev.menu.FlashSize.512K32.build.spiffs_blocksize=4096
 thingdev.menu.FlashSize.512K64=512K (64K SPIFFS)
 thingdev.menu.FlashSize.512K64.build.flash_size=512K
 thingdev.menu.FlashSize.512K64.build.flash_size_bytes=0x80000
@@ -3820,6 +3852,16 @@ gen4iod.menu.FlashSize.512K0.build.flash_ld=eagle.flash.512k0.ld
 gen4iod.menu.FlashSize.512K0.build.spiffs_pagesize=256
 gen4iod.menu.FlashSize.512K0.upload.maximum_size=499696
 gen4iod.menu.FlashSize.512K0.build.rfcal_addr=0x7C000
+gen4iod.menu.FlashSize.512K32=512K (32K SPIFFS)
+gen4iod.menu.FlashSize.512K32.build.flash_size=512K
+gen4iod.menu.FlashSize.512K32.build.flash_size_bytes=0x80000
+gen4iod.menu.FlashSize.512K32.build.flash_ld=eagle.flash.512k32.ld
+gen4iod.menu.FlashSize.512K32.build.spiffs_pagesize=256
+gen4iod.menu.FlashSize.512K32.upload.maximum_size=466928
+gen4iod.menu.FlashSize.512K32.build.rfcal_addr=0x7C000
+gen4iod.menu.FlashSize.512K32.build.spiffs_start=0x73000
+gen4iod.menu.FlashSize.512K32.build.spiffs_end=0x7B000
+gen4iod.menu.FlashSize.512K32.build.spiffs_blocksize=4096
 gen4iod.menu.FlashSize.512K64=512K (64K SPIFFS)
 gen4iod.menu.FlashSize.512K64.build.flash_size=512K
 gen4iod.menu.FlashSize.512K64.build.flash_size_bytes=0x80000

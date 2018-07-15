@@ -156,11 +156,59 @@ void init_done() {
  * Peripherals (except for SPI0 and UART0) are not initialized.
  * This function does not return.
  */
+/*
+   A bit of explanation for this entry point:
+
+   SYS is the SDK task/context used by the upperlying system to run its
+   administrative tasks (at least WLAN and lwip's receive callbacks and
+   Ticker).  NONOS-SDK is designed to run user's non-threaded code in
+   another specific task/context with its own stack in BSS.
+
+   Some clever fellows found that the SYS stack was a large and quite unused
+   piece of ram that we could use for the user's stack instead of using user's
+   main memory, thus saving around 4KB on ram/heap.
+
+   A problem arose later, which is that this stack can heavily be used by
+   the SDK for some features.  One of these features is WPS.  We still don't
+   know if other features are using this, or if this memory is going to be
+   used in future SDK releases.
+
+   WPS beeing flawed by its poor security, or not beeing used by lots of
+   users, it has been decided that we are still going to use that memory for
+   user's stack and disable the use of WPS, with an option to revert that
+   back at the user's discretion.  This selection can be done with the
+   global define NO_EXTRA_4K_HEAP.  An option has been added to the board
+   generator script.
+
+   References:
+   https://github.com/esp8266/Arduino/pull/4553
+   https://github.com/esp8266/Arduino/pull/4622
+   https://github.com/esp8266/Arduino/issues/4779
+   https://github.com/esp8266/Arduino/pull/4889
+
+*/
+
+#ifdef NO_EXTRA_4K_HEAP
+/* this is the default NONOS-SDK user's heap location */
+cont_t g_cont __attribute__ ((aligned (16)));
+#endif
+
 extern "C" void ICACHE_RAM_ATTR app_entry(void)
 {
-    /* Allocate continuation context on this stack, and save pointer to it. */
+#ifdef NO_EXTRA_4K_HEAP
+
+    /* this is the default NONOS-SDK user's heap location */
+    g_pcont = &g_cont;
+
+#else
+
+    /* Allocate continuation context on this SYS stack,
+       and save pointer to it. */
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
+
+#endif
+
     /* Call the entry point of the SDK code. */
     call_user_start();
 }
