@@ -89,7 +89,6 @@ extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
 }
 
 extern int ICACHE_RAM_ATTR __digitalRead(uint8_t pin) {
-  stopWaveform(pin);
   if(pin < 16){
     return GPIP(pin);
   } else if(pin == 16){
