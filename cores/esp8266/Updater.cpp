@@ -204,11 +204,35 @@ bool UpdaterClass::end(bool evenIfRemaining){
 }
 
 bool UpdaterClass::_writeBuffer(){
+  #define FLASH_MODE_PAGE  0
+  #define FLASH_MODE_OFFSET  2
 
   bool eraseResult = true, writeResult = true;
   if (_currentAddress % FLASH_SECTOR_SIZE == 0) {
     if(!_async) yield();
     eraseResult = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
+  }
+
+  // If the flash settings don't match what we already have, modify them.
+  // But restore them after the modification, so the hash isn't affected.
+  // This is analogous to what esptool.py does when it receives a --flash_mode argument.
+  bool modifyFlashMode = false;
+  FlashMode_t flashMode = FM_QIO;
+  FlashMode_t bufferFlashMode = FM_QIO;
+  if (_currentAddress == _startAddress + FLASH_MODE_PAGE) {
+    flashMode = ESP.getFlashChipMode();
+    #ifdef DEBUG_UPDATER
+      DEBUG_UPDATER.printf("Header: 0x%1X %1X %1X %1X\n", _buffer[0], _buffer[1], _buffer[2], _buffer[3]);
+    #endif
+    bufferFlashMode = ESP.magicFlashChipMode(_buffer[FLASH_MODE_OFFSET]);
+    if (bufferFlashMode != flashMode) {
+      #ifdef DEBUG_UPDATER
+        DEBUG_UPDATER.printf("Set flash mode from 0x%1X to 0x%1X\n", bufferFlashMode, flashMode);
+      #endif
+
+      _buffer[FLASH_MODE_OFFSET] = flashMode;
+      modifyFlashMode = true;
+    }
   }
   
   if (eraseResult) {
@@ -218,6 +242,12 @@ bool UpdaterClass::_writeBuffer(){
     _currentAddress = (_startAddress + _size);
     _setError(UPDATE_ERROR_ERASE);
     return false;
+  }
+
+  // Restore the old flash mode, if we modified it.
+  // Ensures that the MD5 hash will still match what was sent.
+  if (modifyFlashMode) {
+    _buffer[FLASH_MODE_OFFSET] = bufferFlashMode;
   }
 
   if (!writeResult) {

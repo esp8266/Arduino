@@ -1,0 +1,109 @@
+#!/bin/bash
+
+set -e
+
+# released to public domain
+
+help()
+{
+	cat << eof
+
+usage: $1 [-v] <esp-open-sdk path>
+
+For each binary-only library file from ESP-NONOS-SDK, this script searches for
+the exact commits and reports matching versions and commit urls.
+
+The argument must be the ESP-NONOS-SDK git-cloned directory.  It is left
+unmodified, and is locally cloned to work with.  The local copy is then
+removed.
+
+Because of libmain.a local tweaks, comparison is done for each .a file by
+extracting object files, removing the potentially modified ones
+(mem_manager.o time.o user_interface.o eagle_lwip_if.o) and doing a md5
+check against the core files.
+
+eof
+	exit 1
+}
+
+
+verbose=false
+[ "$1" = "-v" ] && { shift; verbose=true; }
+sdk="$1"
+me="$0"
+core=$(cd ${me%/*}/../../../..; pwd)
+
+
+[ -r "$sdk/lib/libnet80211.a" ] || help "$0"
+[ -r "$core/tools/xtensa-lx106-elf/bin" ] || help "$0"
+
+tmp=$(pwd)/NONOSDK.deleteme
+
+cat << eof
+
+nonos-sdk                 = '$sdk'
+core root directory       = '$core'
+temporary nonos-sdk clone = '$tmp'
+
+If libmain.a is not found, it should be the one around the same libpp.a's commit
+
+eof
+
+md5()
+{
+	mkdir temp
+	cd temp
+	PATH="$core/tools/xtensa-lx106-elf/bin:$PATH" xtensa-lx106-elf-ar x "$1"
+	rm -f mem_manager.o time.o user_interface.o eagle_lwip_if.o
+	cat *.o | md5sum
+	cd ..
+	rm -rf temp
+}
+
+search()
+{
+	rm -rf "$tmp"
+	git clone $sdk "$tmp" 1>&2
+	cd "$tmp"
+	git reset --hard 1>&2
+
+	corelibs=$(cd "$core/tools/sdk/lib"; ls *.a)
+	commits=$(git log|grep ^commit\  | tac | sed 's,commit ,,')
+
+	for f in $corelibs; do
+		
+		git checkout master 1>&2 # needed
+
+		if [ -r "$tmp/lib/$f" ]; then
+
+			coremd5=$(md5 "$core/tools/sdk/lib/$f")
+			found=false
+
+			for i in $commits; do
+				git reset --hard 1>&2
+				git checkout $i 1>&2
+				
+				[ -d "$tmp/lib" ] || continue
+
+				espmd5=$(md5 "$tmp/lib/$f")
+				if [ "$espmd5" = "$coremd5" ]; then
+					tag=$(git describe --tag)
+					echo "$tag - https://github.com/espressif/ESP8266_NONOS_SDK/commit/$i - $f"
+					found=true
+					break
+				fi
+			done
+
+			$found || echo "NOTFOUND - $f"
+		fi
+		
+	done
+	
+	cd ..
+	rm -rf "$tmp"
+}
+
+$verbose && search
+$verbose || search 2>/dev/null
+
+echo "all done"

@@ -43,10 +43,6 @@
 // Need speed, not size, here
 #pragma GCC optimize ("O3")
 
-// Map the IRQ stuff to standard terminology
-#define cli() ets_intr_lock()
-#define sei() ets_intr_unlock()
-
 // Maximum delay between IRQs
 #define MAXIRQUS (10000)
 
@@ -67,8 +63,8 @@
 typedef struct {
   uint32_t nextServiceCycle;        // ESP cycle timer when a transition required
   uint32_t timeLeftCycles;          // For time-limited waveform, how many ESP cycles left
-  uint16_t gpioMask;                // Mask instead of value to speed IRQ loop
-  uint16_t gpio16Mask;              // Mask instead of value to speed IRQ loop
+  const uint16_t gpioMask;          // Mask instead of value to speed IRQ loop
+  const uint16_t gpio16Mask;        // Mask instead of value to speed IRQ loop
   unsigned state              : 1;  // Current state of this pin
   unsigned nextTimeHighCycles : 31; // Copy over low->high to keep smooth waveform
   unsigned enabled            : 1;  // Is this GPIO generating a waveform?
@@ -180,6 +176,12 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
   if (!wave) {
     return false;
   }
+
+  // To safely update the packed bitfields we need to stop interrupts while setting them as we could
+  // get an IRQ in the middle of a multi-instruction mask-and-set required to change them which would
+  // then cause an IRQ update of these values (.enabled only, for now) to be lost.
+  ets_intr_lock();
+
   wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) - 70;  // Take out some time for IRQ codepath
   wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) - 70;  // Take out some time for IRQ codepath
   wave->timeLeftCycles = MicrosecondsToCycles(runTimeUS);
@@ -193,16 +195,30 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
     }
     ReloadTimer(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
   }
+
+  // Re-enable interrupts here since we're done with the update
+  ets_intr_unlock();
+
   return true;
 }
 
 // Stops a waveform on a pin
 int stopWaveform(uint8_t pin) {
+  // Can't possibly need to stop anything if there is no timer active
+  if (!timerRunning) {
+    return false;
+  }
+
   for (size_t i = 0; i < countof(waveform); i++) {
+    if (!waveform[i].enabled) {
+      continue; // Skip fast to next one, can't need to stop this one since it's not running
+    }
     if (((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
+      // Note that there is no interrupt unsafety here.  The IRQ can only ever change .enabled from 1->0
+      // We're also doing that, so even if an IRQ occurred it would still stay as 0.
       waveform[i].enabled = 0;
-      int cnt = timer1CB?1:0;
-      for (size_t i = 0; i < countof(waveform); i++) {
+      int cnt = timer1CB ? 1 : 0;
+      for (size_t i = 0; (cnt == 0) && (i < countof(waveform)); i++) {
         cnt += waveform[i].enabled ? 1 : 0;
       }
       if (!cnt) {
@@ -211,7 +227,6 @@ int stopWaveform(uint8_t pin) {
       return true;
     }
   }
-  cli();
   return false;
 }
 
