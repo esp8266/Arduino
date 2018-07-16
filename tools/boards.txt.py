@@ -325,6 +325,24 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
+    ( 'cw01', {
+        'name': 'XinaBox CW01',
+        'opts': {
+            '.build.board': 'ESP8266_GENERIC',
+            '.build.variant': 'xinabox',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'crystalfreq_menu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The XinaBox CW01 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12F, clocked at 80 MHz at 3.3V logic. It also has an onboard RGB LED.',
+                  '',
+                  'Product page: https://xinabox.cc/products/cw01'
+                  ],
+    }),		
     ( 'espresso_lite_v1', {
         'name': 'ESPresso Lite 1.0',
         'opts': {
