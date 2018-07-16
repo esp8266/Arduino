@@ -877,7 +877,7 @@ extern const br_aead_class br_eax_vtable;
  *     can still be provided by chunks, but the total size must match
  *     the value provided upon initialisation.
  *
- *   - The nonce length is constrained betwen 7 and 13 bytes (inclusive).
+ *   - The nonce length is constrained between 7 and 13 bytes (inclusive).
  *     Furthermore, the plaintext length, when encoded, must fit over
  *     15-nonceLen bytes; thus, if the nonce has length 13 bytes, then
  *     the plaintext length cannot exceed 65535 bytes.
