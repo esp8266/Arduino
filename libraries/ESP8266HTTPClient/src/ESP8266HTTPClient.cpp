@@ -372,6 +372,7 @@ void HTTPClient::end(void)
         } else {
             DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp stop\n");
             _tcp->stop();
+            _tcp = nullptr;
         }
     } else {
         DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp is closed\n");
