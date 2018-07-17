@@ -722,7 +722,7 @@ void String::remove(unsigned int index, unsigned int count) {
     }
     char *writeTo = buffer + index;
     len = len - count;
-    strncpy(writeTo, buffer + index + count, len - index);
+    memmove(writeTo, buffer + index + count, len - index);
     buffer[len] = 0;
 }
 

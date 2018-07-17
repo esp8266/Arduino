@@ -21,7 +21,9 @@
 #define Character_h
 
 #include <ctype.h>
+#undef isascii
 #define isascii(__c) ((unsigned)(__c)<=0177)
+#undef toascii
 #define toascii(__c)  ((__c)&0177)
 
 // WCharacter.h prototypes
