@@ -92,7 +92,7 @@ class EspClass {
         void wdtDisable();
         void wdtFeed();
 
-        void deepSleep(uint64_t time_us, RFMode mode = RF_DEFAULT);
+        bool deepSleep(uint64_t time_us, RFMode mode = RF_DEFAULT);
         uint64_t deepSleepMax();
 
         bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
