@@ -107,11 +107,22 @@ void EspClass::wdtFeed(void)
 
 extern "C" void esp_yield();
 
-void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
+bool EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
-    system_deep_sleep_set_option(static_cast<int>(mode));
-    system_deep_sleep(time_us);
-    esp_yield();
+    if (time_us > deepSleepMax())
+    {
+       #ifdef DEBUG_SERIAL
+          DEBUG_SERIAL.println("Error: max sleeptime exceeded");
+       #endif
+       return 0; // error: max sleeptime exceeded
+    }
+   else
+   {
+      system_deep_sleep_set_option(static_cast<int>(mode));
+      system_deep_sleep(time_us);
+      esp_yield();
+      return 1; // never gets called
+   }
 }
 
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
