@@ -219,6 +219,13 @@ The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development b
 
 Product page: https://www.adafruit.com/product/2821
 
+XinaBox CW01
+------------
+
+The XinaBox CW01 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard RGB led.
+
+Product page: https://xinabox.cc/products/CW01
+
 ESPresso Lite 1.0
 -----------------
 
