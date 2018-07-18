@@ -753,7 +753,7 @@ void String::trim(void) {
         end--;
     len = end + 1 - begin;
     if(begin > buffer)
-        memcpy(buffer, begin, len);
+        memmove(buffer, begin, len);
     buffer[len] = 0;
 }
 
