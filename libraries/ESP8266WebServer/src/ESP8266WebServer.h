@@ -183,6 +183,9 @@ protected:
 
   int              _headerKeysCount;
   RequestArgument* _currentHeaders;
+  int              _postArgsLen;
+  RequestArgument* _postArgs;
+    
   size_t           _contentLength;
   String           _responseHeaders;
 
