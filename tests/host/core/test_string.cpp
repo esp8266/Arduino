@@ -16,6 +16,7 @@
 #include <catch.hpp>
 #include <string.h>
 #include <WString.h>
+#include <limits.h>
 
 TEST_CASE("String::trim", "[core][String]")
 {
@@ -45,6 +46,41 @@ TEST_CASE("String(value, base)", "[core][String]")
     REQUIRE(strbase8 == "23417");
     REQUIRE(strbase10 == "9999");
     REQUIRE(strbase16 == "270f");
+    String strnegi(-9999);
+    String strnegf(-2.123, 3);
+    REQUIRE(strnegi == "-9999");
+    REQUIRE(strnegf == "-2.123");
 }
 
+TEST_CASE("String constructors", "[core][String]")
+{
+    String s1 = "abcd";
+    String s2 = s1;
+    REQUIRE(s1 == s2);
+    String *s3 = new String("manos");
+    s2 = *s3;
+    delete s3;
+    REQUIRE(s2 == "manos");
+    s3 = new String("thisismuchlongerthantheother");
+    s2 = s3->c_str();
+    delete s3;
+    REQUIRE(s2 == "thisismuchlongerthantheother");
+}
+
+TEST_CASE("String concantenation", "[core][String]")
+{
+    String str;
+    REQUIRE(str.length() == 0);
+    str.reserve(1000);
+    REQUIRE(str.length() == 0);
+    str.reserve(0);
+    REQUIRE(str.length() == 0);
+    str += 'a';
+    str += "bcde";
+    str += str;
+    str += 987;
+    str += (int)INT_MAX;
+    str += (int)INT_MIN;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648");
+}
 

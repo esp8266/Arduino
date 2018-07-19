@@ -71,7 +71,7 @@ CPP_OBJECTS = $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_TESTS)
 OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS)
 COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 
-all: build-info $(OUTPUT_BINARY) test gcov valgrind
+all: build-info $(OUTPUT_BINARY) valgrind test gcov
 
 test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
