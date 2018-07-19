@@ -8,6 +8,7 @@ CC  ?= gcc
 CXX ?= g++
 endif
 GCOV ?= gcov
+VALGRIND ?= valgrind
 
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	StreamString.cpp \
@@ -49,11 +50,12 @@ TEST_CPP_FILES := \
 	fs/test_fs.cpp \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
+	core/test_string.cpp
 
-
-CXXFLAGS += -std=c++11 -Wall -coverage -O0 -fno-common
-CFLAGS += -std=c99 -Wall -coverage -O0 -fno-common
+CXXFLAGS += -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g -Wreorder
+CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g
 LDFLAGS += -coverage -O0
+VALGRINDFLAGS += --leak-check=full --track-origins=yes --verbose --error-limit=no --show-leak-kinds=all --error-exitcode=999
 
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
@@ -69,7 +71,7 @@ CPP_OBJECTS = $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_TESTS)
 OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS)
 COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 
-all: build-info $(OUTPUT_BINARY) test gcov
+all: build-info $(OUTPUT_BINARY) test gcov valgrind
 
 test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
@@ -85,6 +87,9 @@ clean-coverage:
 
 gcov: test
 	find $(CORE_PATH) -name "*.gcno" -exec $(GCOV) -r -pb {} +
+
+valgrind: $(OUTPUT_BINARY)
+	$(VALGRIND) $(VALGRINDFLAGS) $(OUTPUT_BINARY)
 
 build-info:
 	@echo "-------- build tools info --------"
