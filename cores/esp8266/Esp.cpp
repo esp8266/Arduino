@@ -119,6 +119,7 @@ bool EspClass::deepSleep(uint64_t time_us, WakeMode mode)
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
     esp_yield();
+    return 1; // never gets called
 }
 
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
