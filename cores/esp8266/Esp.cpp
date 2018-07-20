@@ -114,12 +114,12 @@ bool EspClass::deepSleep(uint64_t time_us, WakeMode mode)
        #ifdef DEBUG_SERIAL
           DEBUG_SERIAL.println("Error: max sleeptime exceeded");
        #endif
-       return 0; // error: max sleeptime exceeded
+       return false; // error: max sleeptime exceeded
     }
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
     esp_yield();
-    return 1; // never gets called
+    return true; // never gets called
 }
 
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
