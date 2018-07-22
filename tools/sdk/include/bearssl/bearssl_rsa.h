@@ -278,6 +278,57 @@ typedef uint32_t (*br_rsa_pkcs1_vrfy)(const unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk, unsigned char *hash_out);
 
 /**
+ * \brief Type for a RSA encryption engine (OAEP).
+ *
+ * Parameters are:
+ *
+ *   - A source of random bytes. The source must be already initialized.
+ *
+ *   - A hash function, used internally with the mask generation function
+ *     (MGF1).
+ *
+ *   - A label. The `label` pointer may be `NULL` if `label_len` is zero
+ *     (an empty label, which is the default in PKCS#1 v2.2).
+ *
+ *   - The public key.
+ *
+ *   - The destination buffer. Its maximum length (in bytes) is provided;
+ *     if that length is lower than the public key length, then an error
+ *     is reported.
+ *
+ *   - The source message.
+ *
+ * The encrypted message output has exactly the same length as the modulus
+ * (mathematical length, in bytes, not counting extra leading zeros in the
+ * modulus representation in the public key).
+ *
+ * The source message (`src`, length `src_len`) may overlap with the
+ * destination buffer (`dst`, length `dst_max_len`).
+ *
+ * This function returns the actual encrypted message length, in bytes;
+ * on error, zero is returned. An error is reported if the output buffer
+ * is not large enough, or the public is invalid, or the public key
+ * modulus exceeds the maximum supported RSA size.
+ *
+ * \param rnd           source of random bytes.
+ * \param dig           hash function to use with MGF1.
+ * \param label         label value (may be `NULL` if `label_len` is zero).
+ * \param label_len     label length, in bytes.
+ * \param pk            RSA public key.
+ * \param dst           destination buffer.
+ * \param dst_max_len   destination buffer length (maximum encrypted data size).
+ * \param src           message to encrypt.
+ * \param src_len       source message length (in bytes).
+ * \return  encrypted message length (in bytes), or 0 on error.
+ */
+typedef size_t (*br_rsa_oaep_encrypt)(
+	const br_prng_class **rnd, const br_hash_class *dig,
+	const void *label, size_t label_len,
+	const br_rsa_public_key *pk,
+	void *dst, size_t dst_max_len,
+	const void *src, size_t src_len);
+
+/**
  * \brief Type for a RSA private key engine.
  *
  * The `x[]` buffer is modified in place, and its length is inferred from
@@ -361,6 +412,47 @@ typedef uint32_t (*br_rsa_pkcs1_sign)(const unsigned char *hash_oid,
  */
 #define BR_HASH_OID_SHA512   \
 	((const unsigned char *)"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x03")
+
+/**
+ * \brief Type for a RSA decryption engine (OAEP).
+ *
+ * Parameters are:
+ *
+ *   - A hash function, used internally with the mask generation function
+ *     (MGF1).
+ *
+ *   - A label. The `label` pointer may be `NULL` if `label_len` is zero
+ *     (an empty label, which is the default in PKCS#1 v2.2).
+ *
+ *   - The private key.
+ *
+ *   - The source and destination buffer. The buffer initially contains
+ *     the encrypted message; the buffer contents are altered, and the
+ *     decrypted message is written at the start of that buffer
+ *     (decrypted message is always shorter than the encrypted message).
+ *
+ * If decryption fails in any way, then `*len` is unmodified, and the
+ * function returns 0. Otherwise, `*len` is set to the decrypted message
+ * length, and 1 is returned. The implementation is responsible for
+ * checking that the input message length matches the key modulus length,
+ * and that the padding is correct.
+ *
+ * Implementations MUST use constant-time check of the validity of the
+ * OAEP padding, at least until the leading byte and hash value have
+ * been checked. Whether overall decryption worked, and the length of
+ * the decrypted message, may leak.
+ *
+ * \param dig         hash function to use with MGF1.
+ * \param label       label value (may be `NULL` if `label_len` is zero).
+ * \param label_len   label length, in bytes.
+ * \param sk          RSA private key.
+ * \param data        input/output buffer.
+ * \param len         encrypted/decrypted message length.
+ * \return  1 on success, 0 on error.
+ */
+typedef uint32_t (*br_rsa_oaep_decrypt)(
+	const br_hash_class *dig, const void *label, size_t label_len,
+	const br_rsa_private_key *sk, void *data, size_t *len);
 
 /*
  * RSA "i32" engine. Integers are internally represented as arrays of
@@ -501,7 +593,7 @@ uint32_t br_rsa_i31_pkcs1_sign(const unsigned char *hash_oid,
  *
  * This function is defined only on architecture that offer a 64x64->128
  * opcode. Use `br_rsa_i62_public_get()` to dynamically obtain a pointer
- * to that functiom.
+ * to that function.
  *
  * \see br_rsa_public
  *
@@ -518,7 +610,7 @@ uint32_t br_rsa_i62_public(unsigned char *x, size_t xlen,
  *
  * This function is defined only on architecture that offer a 64x64->128
  * opcode. Use `br_rsa_i62_pkcs1_vrfy_get()` to dynamically obtain a pointer
- * to that functiom.
+ * to that function.
  *
  * \see br_rsa_pkcs1_vrfy
  *
@@ -539,7 +631,7 @@ uint32_t br_rsa_i62_pkcs1_vrfy(const unsigned char *x, size_t xlen,
  *
  * This function is defined only on architecture that offer a 64x64->128
  * opcode. Use `br_rsa_i62_private_get()` to dynamically obtain a pointer
- * to that functiom.
+ * to that function.
  *
  * \see br_rsa_private
  *
@@ -555,7 +647,7 @@ uint32_t br_rsa_i62_private(unsigned char *x,
  *
  * This function is defined only on architecture that offer a 64x64->128
  * opcode. Use `br_rsa_i62_pkcs1_sign_get()` to dynamically obtain a pointer
- * to that functiom.
+ * to that function.
  *
  * \see br_rsa_pkcs1_sign
  *
@@ -601,6 +693,22 @@ br_rsa_private br_rsa_i62_private_get(void);
  * \return  the implementation, or 0.
  */
 br_rsa_pkcs1_sign br_rsa_i62_pkcs1_sign_get(void);
+
+/**
+ * \brief Get the RSA "i62" implementation (OAEP encryption),
+ * if available.
+ *
+ * \return  the implementation, or 0.
+ */
+br_rsa_oaep_encrypt br_rsa_i62_oaep_encrypt_get(void);
+
+/**
+ * \brief Get the RSA "i62" implementation (OAEP decryption),
+ * if available.
+ *
+ * \return  the implementation, or 0.
+ */
+br_rsa_oaep_decrypt br_rsa_i62_oaep_decrypt_get(void);
 
 /*
  * RSA "i15" engine. Integers are represented as 15-bit integers, so
@@ -707,6 +815,26 @@ br_rsa_pkcs1_vrfy br_rsa_pkcs1_vrfy_get_default(void);
 br_rsa_pkcs1_sign br_rsa_pkcs1_sign_get_default(void);
 
 /**
+ * \brief Get "default" RSA implementation (OAEP encryption).
+ *
+ * This returns the preferred implementation of RSA (OAEP encryption)
+ * on the current system.
+ *
+ * \return  the default implementation.
+ */
+br_rsa_oaep_encrypt br_rsa_oaep_encrypt_get_default(void);
+
+/**
+ * \brief Get "default" RSA implementation (OAEP decryption).
+ *
+ * This returns the preferred implementation of RSA (OAEP decryption)
+ * on the current system.
+ *
+ * \return  the default implementation.
+ */
+br_rsa_oaep_decrypt br_rsa_oaep_decrypt_get_default(void);
+
+/**
  * \brief RSA decryption helper, for SSL/TLS.
  *
  * This function performs the RSA decryption for a RSA-based key exchange
@@ -735,6 +863,174 @@ br_rsa_pkcs1_sign br_rsa_pkcs1_sign_get_default(void);
  */
 uint32_t br_rsa_ssl_decrypt(br_rsa_private core, const br_rsa_private_key *sk,
 	unsigned char *data, size_t len);
+
+/**
+ * \brief RSA encryption (OAEP) with the "i15" engine.
+ *
+ * \see br_rsa_oaep_encrypt
+ *
+ * \param rnd           source of random bytes.
+ * \param dig           hash function to use with MGF1.
+ * \param label         label value (may be `NULL` if `label_len` is zero).
+ * \param label_len     label length, in bytes.
+ * \param pk            RSA public key.
+ * \param dst           destination buffer.
+ * \param dst_max_len   destination buffer length (maximum encrypted data size).
+ * \param src           message to encrypt.
+ * \param src_len       source message length (in bytes).
+ * \return  encrypted message length (in bytes), or 0 on error.
+ */
+size_t br_rsa_i15_oaep_encrypt(
+	const br_prng_class **rnd, const br_hash_class *dig,
+	const void *label, size_t label_len,
+	const br_rsa_public_key *pk,
+	void *dst, size_t dst_max_len,
+	const void *src, size_t src_len);
+
+/**
+ * \brief RSA decryption (OAEP) with the "i15" engine.
+ *
+ * \see br_rsa_oaep_decrypt
+ *
+ * \param dig         hash function to use with MGF1.
+ * \param label       label value (may be `NULL` if `label_len` is zero).
+ * \param label_len   label length, in bytes.
+ * \param sk          RSA private key.
+ * \param data        input/output buffer.
+ * \param len         encrypted/decrypted message length.
+ * \return  1 on success, 0 on error.
+ */
+uint32_t br_rsa_i15_oaep_decrypt(
+	const br_hash_class *dig, const void *label, size_t label_len,
+	const br_rsa_private_key *sk, void *data, size_t *len);
+
+/**
+ * \brief RSA encryption (OAEP) with the "i31" engine.
+ *
+ * \see br_rsa_oaep_encrypt
+ *
+ * \param rnd           source of random bytes.
+ * \param dig           hash function to use with MGF1.
+ * \param label         label value (may be `NULL` if `label_len` is zero).
+ * \param label_len     label length, in bytes.
+ * \param pk            RSA public key.
+ * \param dst           destination buffer.
+ * \param dst_max_len   destination buffer length (maximum encrypted data size).
+ * \param src           message to encrypt.
+ * \param src_len       source message length (in bytes).
+ * \return  encrypted message length (in bytes), or 0 on error.
+ */
+size_t br_rsa_i31_oaep_encrypt(
+	const br_prng_class **rnd, const br_hash_class *dig,
+	const void *label, size_t label_len,
+	const br_rsa_public_key *pk,
+	void *dst, size_t dst_max_len,
+	const void *src, size_t src_len);
+
+/**
+ * \brief RSA decryption (OAEP) with the "i31" engine.
+ *
+ * \see br_rsa_oaep_decrypt
+ *
+ * \param dig         hash function to use with MGF1.
+ * \param label       label value (may be `NULL` if `label_len` is zero).
+ * \param label_len   label length, in bytes.
+ * \param sk          RSA private key.
+ * \param data        input/output buffer.
+ * \param len         encrypted/decrypted message length.
+ * \return  1 on success, 0 on error.
+ */
+uint32_t br_rsa_i31_oaep_decrypt(
+	const br_hash_class *dig, const void *label, size_t label_len,
+	const br_rsa_private_key *sk, void *data, size_t *len);
+
+/**
+ * \brief RSA encryption (OAEP) with the "i32" engine.
+ *
+ * \see br_rsa_oaep_encrypt
+ *
+ * \param rnd           source of random bytes.
+ * \param dig           hash function to use with MGF1.
+ * \param label         label value (may be `NULL` if `label_len` is zero).
+ * \param label_len     label length, in bytes.
+ * \param pk            RSA public key.
+ * \param dst           destination buffer.
+ * \param dst_max_len   destination buffer length (maximum encrypted data size).
+ * \param src           message to encrypt.
+ * \param src_len       source message length (in bytes).
+ * \return  encrypted message length (in bytes), or 0 on error.
+ */
+size_t br_rsa_i32_oaep_encrypt(
+	const br_prng_class **rnd, const br_hash_class *dig,
+	const void *label, size_t label_len,
+	const br_rsa_public_key *pk,
+	void *dst, size_t dst_max_len,
+	const void *src, size_t src_len);
+
+/**
+ * \brief RSA decryption (OAEP) with the "i32" engine.
+ *
+ * \see br_rsa_oaep_decrypt
+ *
+ * \param dig         hash function to use with MGF1.
+ * \param label       label value (may be `NULL` if `label_len` is zero).
+ * \param label_len   label length, in bytes.
+ * \param sk          RSA private key.
+ * \param data        input/output buffer.
+ * \param len         encrypted/decrypted message length.
+ * \return  1 on success, 0 on error.
+ */
+uint32_t br_rsa_i32_oaep_decrypt(
+	const br_hash_class *dig, const void *label, size_t label_len,
+	const br_rsa_private_key *sk, void *data, size_t *len);
+
+/**
+ * \brief RSA encryption (OAEP) with the "i62" engine.
+ *
+ * This function is defined only on architecture that offer a 64x64->128
+ * opcode. Use `br_rsa_i62_oaep_encrypt_get()` to dynamically obtain a pointer
+ * to that function.
+ *
+ * \see br_rsa_oaep_encrypt
+ *
+ * \param rnd           source of random bytes.
+ * \param dig           hash function to use with MGF1.
+ * \param label         label value (may be `NULL` if `label_len` is zero).
+ * \param label_len     label length, in bytes.
+ * \param pk            RSA public key.
+ * \param dst           destination buffer.
+ * \param dst_max_len   destination buffer length (maximum encrypted data size).
+ * \param src           message to encrypt.
+ * \param src_len       source message length (in bytes).
+ * \return  encrypted message length (in bytes), or 0 on error.
+ */
+size_t br_rsa_i62_oaep_encrypt(
+	const br_prng_class **rnd, const br_hash_class *dig,
+	const void *label, size_t label_len,
+	const br_rsa_public_key *pk,
+	void *dst, size_t dst_max_len,
+	const void *src, size_t src_len);
+
+/**
+ * \brief RSA decryption (OAEP) with the "i62" engine.
+ *
+ * This function is defined only on architecture that offer a 64x64->128
+ * opcode. Use `br_rsa_i62_oaep_decrypt_get()` to dynamically obtain a pointer
+ * to that function.
+ *
+ * \see br_rsa_oaep_decrypt
+ *
+ * \param dig         hash function to use with MGF1.
+ * \param label       label value (may be `NULL` if `label_len` is zero).
+ * \param label_len   label length, in bytes.
+ * \param sk          RSA private key.
+ * \param data        input/output buffer.
+ * \param len         encrypted/decrypted message length.
+ * \return  1 on success, 0 on error.
+ */
+uint32_t br_rsa_i62_oaep_decrypt(
+	const br_hash_class *dig, const void *label, size_t label_len,
+	const br_rsa_private_key *sk, void *data, size_t *len);
 
 #ifdef __cplusplus
 }

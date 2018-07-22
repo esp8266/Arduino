@@ -219,6 +219,13 @@ The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development b
 
 Product page: https://www.adafruit.com/product/2821
 
+XinaBox CW01
+------------
+
+The XinaBox CW01 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard RGB led.
+
+Product page: https://xinabox.cc/products/CW01
+
 ESPresso Lite 1.0
 -----------------
 
@@ -415,4 +422,13 @@ Amperka WiFi Slot
 -----------------
 
 Product page: http://wiki.amperka.ru/wifi-slot
+
+Seeed Wio Link
+--------------
+
+Wio Link is designed to simplify your IoT development. It is an ESP8266 based open-source Wi-Fi development board to create IoT applications by virtualizing plug-n-play modules to RESTful APIs with mobile APPs. Wio Link is also compatible with the Arduino IDE.
+
+Please DO NOTICE that you MUST pull up pin 15 to enable the power for Grove ports, the board is designed like this for the purpose of peripherals power management.
+
+Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html
 
