@@ -66,6 +66,6 @@ This library uses the standard Arduino core for ESP8266 WiFi functions. Therefor
 
 A maximum of 5 stations can be connected at a time to each AP.
 
-Unlike `WiFi.mode(WIFI_AP)`, the `WiFi.mode(WIFI_AP_STA)` which is used in this library allows nodes to stay connected to an AP they connect to while in STA mode, at the same time as they can receive connections from other stations. Nodes cannot send data to an AP while in STA_AP mode though, that requires STA mode. Switching to STA mode will disconnect all stations connected to the node AP (though they can request a reconnect even while the previous AP node is in STA mode).
+Unlike `WiFi.mode(WIFI_AP)`, the `WiFi.mode(WIFI_AP_STA)` which is used in this library allows nodes to stay connected to an AP they connect to while in STA mode, at the same time as they can receive connections from other stations. Nodes cannot send data to an AP while in STA_AP mode though, that requires STA mode. Switching to STA mode will sometimes disconnect stations connected to the node AP (though they can request a reconnect even while the previous AP node is in STA mode).
 
 Scanning for networks (e.g. via the `attemptTransmission` method) without the WiFi scan optimizations for core version 2.4.2 mentioned above, causes the WiFi radio to cycle through all WiFi channels which means existing WiFi connections are likely to break or work poorly if done frequently.

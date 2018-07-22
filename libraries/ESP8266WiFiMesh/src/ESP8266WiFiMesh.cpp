@@ -205,7 +205,7 @@ void ESP8266WiFiMesh::begin()
     }
     else
     {
-      verboseModePrint("lwIP version is less than 2.0.3. Static ip optimizations disabled.\n");
+      verboseModePrint("lwIP version is less than 2.0.3. Static ip optimizations DISABLED.\n");
     }
     #endif
   }
