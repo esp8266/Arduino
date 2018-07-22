@@ -186,18 +186,29 @@ void ESP8266WiFiMesh::disableStaticIP()
 
 void ESP8266WiFiMesh::begin()
 {
-  WiFi.mode(WIFI_AP_STA);
-  
-  #ifdef ENABLE_STATIC_IP_OPTIMIZATION
-  if(atLeastLwipVersion(lwip_version_203_signature))
+  ////////////////////////////<DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
+  if(_handler != NULL)
   {
-    verboseModePrint("lwIP version is at least 2.0.3. Static ip optimizations enabled.\n");
+    WiFi.mode(WIFI_AP_STA);
+    WiFi.softAP( _ssid.c_str() );
+    _server.begin();
   }
   else
   {
-    verboseModePrint("lwIP version is less than 2.0.3. Static ip optimizations disabled.\n");
+  ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
+    WiFi.mode(WIFI_AP_STA);
+    
+    #ifdef ENABLE_STATIC_IP_OPTIMIZATION
+    if(atLeastLwipVersion(lwip_version_203_signature))
+    {
+      verboseModePrint("lwIP version is at least 2.0.3. Static ip optimizations enabled.\n");
+    }
+    else
+    {
+      verboseModePrint("lwIP version is less than 2.0.3. Static ip optimizations disabled.\n");
+    }
+    #endif
   }
-  #endif
 }
 
 void ESP8266WiFiMesh::activateAP(String new_mesh_name, String new_node_id)
@@ -524,30 +535,57 @@ void ESP8266WiFiMesh::attemptTransmission(String message, bool concluding_discon
 
 void ESP8266WiFiMesh::acceptRequest()
 {
-  while (true) {
-    WiFiClient _client = _server.available();
-    
-    if (!_client)
-      break;
+  ////////////////////////////<DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
+  if(_handler != NULL)
+  {
+    while (true) {
+      _client = _server.available();
+      if (!_client)
+        break;
 
-    if (!waitForClientTransmission(_client, 1500) || !_client.available()) {
-      continue;
+      if (!waitForClient(_client, 1500)) {
+        continue;
+      }
+
+      /* Read in request and pass it to the supplied handler */
+      String request = _client.readStringUntil('\r');
+      _client.readStringUntil('\n');
+
+      String response = _handler(request);
+
+      /* Send the response back to the client */
+      if (_client.connected())
+        _client.println(response);
     }
+  }
+  else
+  {
+  ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
+    while (true) {
+      WiFiClient _client = _server.available();
+      
+      if (!_client)
+        break;
 
-    /* Read in request and pass it to the supplied requestHandler */
-    String request = _client.readStringUntil('\r');
-    yield();
-    _client.flush();
+      if (!waitForClientTransmission(_client, 1500) || !_client.available()) {
+        continue;
+      }
 
-    String response = _requestHandler(request, this);
-
-    /* Send the response back to the client */
-    if (_client.connected())
-    {
-      verboseModePrint("Responding");
-      _client.print(response + "\r");
-      _client.flush();
+      /* Read in request and pass it to the supplied requestHandler */
+      String request = _client.readStringUntil('\r');
       yield();
+      _client.flush();
+
+      String response = _requestHandler(request, this);
+
+      /* Send the response back to the client */
+      if (_client.connected())
+      {
+        verboseModePrint("Responding");
+        _client.print(response + "\r");
+        _client.flush();
+        yield();
+      }
     }
   }
 }

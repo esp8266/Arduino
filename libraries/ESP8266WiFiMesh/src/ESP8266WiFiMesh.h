@@ -41,7 +41,7 @@ private:
   String _mesh_password;
   uint8 _mesh_wifi_channel;
   bool _verbose_mode;
-  WiFiServer  _server;
+  WiFiServer _server;
   uint32_t _lwip_version[3];
   static const uint32_t lwip_version_203_signature[3];
   String _message = "";
@@ -68,7 +68,49 @@ private:
   void storeLwipVersion();
   bool atLeastLwipVersion(const uint32_t min_lwip_version[3]);
   
+  
+  
+  
+  ////////////////////////////<DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
+  
+  String _ssid_prefix;
+  uint32_t _chip_id;
+  
+  std::function<String(String)> _handler = NULL;
+  
+  WiFiClient  _client;
+  
+  void connectToNode(String target_ssid, String message);
+  bool exchangeInfo(String message, WiFiClient curr_client);
+  bool waitForClient(WiFiClient curr_client, int max_wait);
+  
+  ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
+  
+  
+  
 public:
+
+  ////////////////////////////<DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
+  
+  /**
+   * WiFiMesh Constructor method. Creates a WiFi Mesh Node, ready to be initialised.
+   *
+   * @chip_id A unique identifier number for the node.
+   * @handler The callback handler for dealing with received messages. Takes a string as an argument which
+   *          is the string received from another node and returns the string to send back.
+   * 
+   */
+  ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> handler);
+
+  /**
+   * Scan for other nodes, and exchange the chosen message with any that are found.
+   *
+   * @message The message to send to all other nodes.
+   * 
+   */
+  void attemptScan(String message);
+  
+  ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
 
   /**
    * WiFiMesh Constructor method. Creates a WiFi Mesh Node, ready to be initialised.

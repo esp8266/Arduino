@@ -5,6 +5,8 @@ A library for turning your ESP8266 into a mesh network node.
 
 The library has been tested and works with Arduino core for ESP8266 version 2.3.0 (with default lwIP) and 2.4.2 or higher (with lwIP 1.4 and lwIP2).
 
+**Note:** This mesh library has been rewritten for core release 2.4.2. The old method signatures have been retained for compatibility purposes, but will be removed in core release 2.5.0. If you are still using these old method signatures please consider migrating to the new API shown in the `ESP8266WiFiMesh.h` source file.
+
 Usage
 -----
 
