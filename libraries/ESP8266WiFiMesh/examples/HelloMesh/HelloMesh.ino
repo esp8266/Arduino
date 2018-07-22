@@ -16,8 +16,8 @@ ESP8266WiFiMesh mesh_node = ESP8266WiFiMesh(manageRequest, manageResponse, netwo
 /**
    Callback for when other nodes send you a request
 
-   @request The request string received from another node in the mesh
-   @mesh_instance The "this" pointer of the ESP8266WiFiMesh instance that called the function.
+   @param request The request string received from another node in the mesh
+   @param mesh_instance The "this" pointer of the ESP8266WiFiMesh instance that called the function.
    @returns The string to send back to the other node
 */
 String manageRequest(String request, ESP8266WiFiMesh *mesh_instance) {
@@ -34,8 +34,8 @@ String manageRequest(String request, ESP8266WiFiMesh *mesh_instance) {
 /**
    Callback used to decide which networks to connect to once a WiFi scan has been completed.
 
-   @number_of_networks The number of networks found in the WiFi scan.
-   @mesh_instance The "this" pointer of the ESP8266WiFiMesh instance that called the function.
+   @param number_of_networks The number of networks found in the WiFi scan.
+   @param mesh_instance The "this" pointer of the ESP8266WiFiMesh instance that called the function.
 */
 void networkFilter(int number_of_networks, ESP8266WiFiMesh *mesh_instance) {
   for (int i = 0; i < number_of_networks; ++i) {
@@ -56,8 +56,8 @@ void networkFilter(int number_of_networks, ESP8266WiFiMesh *mesh_instance) {
 /**
    Callback for when you get a response from other nodes
 
-   @response The response string received from another node in the mesh
-   @mesh_instance The "this" pointer of the ESP8266WiFiMesh instance that called the function.
+   @param response The response string received from another node in the mesh
+   @param mesh_instance The "this" pointer of the ESP8266WiFiMesh instance that called the function.
    @returns The status code resulting from the response, as an int
 */
 transmission_status_t manageResponse(String response, ESP8266WiFiMesh *mesh_instance) {

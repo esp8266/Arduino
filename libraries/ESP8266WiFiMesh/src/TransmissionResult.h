@@ -43,7 +43,7 @@ public:
   transmission_status_t transmission_status;
 
   /**
-   * @autofill Automatically fill in the rest of the network info using _network_index and the WiFi scan results.
+   * @param autofill Automatically fill in the rest of the network info using _network_index and the WiFi scan results.
    */
   TransmissionResult(int new_network_index, transmission_status_t new_transmission_status, bool autofill = true);
 

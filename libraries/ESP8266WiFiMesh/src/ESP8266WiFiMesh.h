@@ -73,26 +73,28 @@ public:
   /**
    * WiFiMesh Constructor method. Creates a WiFi Mesh Node, ready to be initialised.
    *
-   * @requestHandler The callback handler for dealing with received requests. Takes a string as an argument which
+   * @param requestHandler The callback handler for dealing with received requests. Takes a string as an argument which
    *          is the request string received from another node and returns the string to send back.
-   * @responseHandler The callback handler for dealing with received responses. Takes a string as an argument which
+   * @param responseHandler The callback handler for dealing with received responses. Takes a string as an argument which
    *          is the response string received from another node. Returns a transmission status code as a transmission_status_t.
-   * @networkFilter The callback handler for deciding which WiFi networks to connect to.
-   * @mesh_password The WiFi password for the mesh network.
-   * @mesh_name The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example network filter function.
-   * @node_id The id for this mesh node. Used as suffix for the node SSID. If set to "", the id will default to ESP.getChipId().
-   * @verbose_mode Determines if we should print the events occurring in the library to Serial. Off by default.
-   * @mesh_wifi_channel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
+   * @param networkFilter The callback handler for deciding which WiFi networks to connect to.
+   * @param mesh_password The WiFi password for the mesh network.
+   * @param mesh_name The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example network filter function.
+   * @param node_id The id for this mesh node. Used as suffix for the node SSID. If set to "", the id will default to ESP.getChipId().
+   * @param verbose_mode Determines if we should print the events occurring in the library to Serial. Off by default.
+   * @param mesh_wifi_channel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
    *                    WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
    *                    This can cause problems if several ESP8266WiFiMesh instances exist on the same ESP8266 and use different WiFi channels. 
    *                    In such a case, whenever the station of one ESP8266WiFiMesh instance connects to an AP, it will silently force the 
    *                    WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
    *                    make it impossible for other stations to detect the APs whose WiFi channels have changed.
-   * @server_port The server port used by the AP of the ESP8266WiFiMesh instance. If multiple APs exist on a single ESP8266, each requires a separate server port. 
+   * @param server_port The server port used by the AP of the ESP8266WiFiMesh instance. If multiple APs exist on a single ESP8266, each requires a separate server port. 
    *              If two AP:s on the same ESP8266 are using the same server port, you must call deactivateAP on the active AP before calling activateAP on the inactive AP.                   
    * 
    */
-  ESP8266WiFiMesh(std::function<String(String, ESP8266WiFiMesh *)> requestHandler, std::function<transmission_status_t(String, ESP8266WiFiMesh *)> responseHandler, std::function<void(int, ESP8266WiFiMesh *)> networkFilter, String mesh_password, String mesh_name = "Mesh_Node", String node_id = "", bool verbose_mode = false, uint8 mesh_wifi_channel = 1, int server_port = 4011);
+  ESP8266WiFiMesh(std::function<String(String, ESP8266WiFiMesh *)> requestHandler, std::function<transmission_status_t(String, ESP8266WiFiMesh *)> responseHandler, 
+                  std::function<void(int, ESP8266WiFiMesh *)> networkFilter, String mesh_password, String mesh_name = "Mesh_Node", String node_id = "", 
+                  bool verbose_mode = false, uint8 mesh_wifi_channel = 1, int server_port = 4011);
   
   /** 
   * A vector that contains the WiFi-scan network indicies to connect to. 
@@ -132,10 +134,10 @@ public:
    * If AP connection already exists, send message only to this AP.
    * Otherwise, scan for other networks, send the scan result to networkFilter and then transmit the message to the networks found in connection_queue.
    *
-   * @message The message to send to other nodes. It will be stored in the class instance until replaced via attemptTransmission or setMessage.
-   * @concluding_disconnect Disconnect from AP once transmission is complete.
-   * @initial_disconnect Disconnect from any currently connected AP before attempting transmission.
-   * @no_scan Do not scan for new networks and do not call networkFilter function. Will only use the data already in connection_queue for the transmission.
+   * @param message The message to send to other nodes. It will be stored in the class instance until replaced via attemptTransmission or setMessage.
+   * @param concluding_disconnect Disconnect from AP once transmission is complete.
+   * @param initial_disconnect Disconnect from any currently connected AP before attempting transmission.
+   * @param no_scan Do not scan for new networks and do not call networkFilter function. Will only use the data already in connection_queue for the transmission.
    */
   void attemptTransmission(String message, bool concluding_disconnect = true, bool initial_disconnect = false, bool no_scan = false);
 

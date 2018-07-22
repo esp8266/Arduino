@@ -44,7 +44,7 @@ public:
   int network_index = NETWORK_INFO_DEFAULT_INT;
 
   /**
-   * @autofill Automatically fill in the rest of the network info using _network_index and the WiFi scan results.
+   * @param autofill Automatically fill in the rest of the network info using _network_index and the WiFi scan results.
    */
   NetworkInfo(int new_network_index, bool autofill = true);
 

@@ -69,8 +69,8 @@ void ESP8266WiFiMesh::verboseModePrint(String string_to_print, bool newline)
 /**
  * Note that using a base higher than 16 increases likelihood of randomly generating ssid strings containing controversial words. 
  * 
- * @number The number to convert to a string with radix "base".
- * @base The radix to convert "number" into. Must be between 2 and 36.
+ * @param number The number to convert to a string with radix "base".
+ * @param base The radix to convert "number" into. Must be between 2 and 36.
  * @returns A string of "number" encoded in radix "base".
  */
 String ESP8266WiFiMesh::Uint64ToString(uint64_t number, byte base)
@@ -89,8 +89,8 @@ String ESP8266WiFiMesh::Uint64ToString(uint64_t number, byte base)
 /**
  * Note that using a base higher than 16 increases likelihood of randomly generating ssid strings containing controversial words. 
  * 
- * @string The string to convert to uint64_t. String must use radix "base".
- * @base The radix of "string". Must be between 2 and 36.
+ * @param string The string to convert to uint64_t. String must use radix "base".
+ * @param base The radix of "string". Must be between 2 and 36.
  * @returns A uint64_t of the string, using radix "base" during decoding.
  */
 uint64_t ESP8266WiFiMesh::StringToUint64(String string, byte base)
@@ -270,7 +270,7 @@ bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient curr_client, int max_
  * Send the mesh instance's current message then read back the other node's response
  * and pass that to the user-supplied responseHandler.
  *
- * @curr_client The client to which the message should be transmitted.
+ * @param curr_client The client to which the message should be transmitted.
  * @returns: A status code based on the outcome of the exchange.
  * 
  */
@@ -363,9 +363,9 @@ void ESP8266WiFiMesh::initiateConnectionToAP(String target_ssid, int target_chan
 /**
  * Connect to the AP at ssid and transmit the mesh instance's current message.
  *
- * @target_ssid The name of the AP the other node has set up.
- * @target_channel The WiFI channel of the AP the other node has set up.
- * @target_bssid The mac address of the AP the other node has set up.
+ * @param target_ssid The name of the AP the other node has set up.
+ * @param target_channel The WiFI channel of the AP the other node has set up.
+ * @param target_bssid The mac address of the AP the other node has set up.
  * @returns: A status code based on the outcome of the connection and data transfer process.
  * 
  */
