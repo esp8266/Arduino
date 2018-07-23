@@ -439,7 +439,7 @@ transmission_status_t ESP8266WiFiMesh::connectToNode(String target_ssid, int tar
   return attemptDataTransfer();
 }
 
-void ESP8266WiFiMesh::attemptTransmission(String message, bool concluding_disconnect, bool initial_disconnect, bool no_scan)
+void ESP8266WiFiMesh::attemptTransmission(String message, bool concluding_disconnect, bool initial_disconnect, bool no_scan, bool scan_all_wifi_channels)
 {
   setMessage(message);
   
@@ -467,11 +467,19 @@ void ESP8266WiFiMesh::attemptTransmission(String message, bool concluding_discon
 
       // If Arduino core for ESP8266 version < 2.4.2 scanning will cause the WiFi radio to cycle through all WiFi channels.
       // This means existing WiFi connections are likely to break or work poorly if done frequently.
+      int n = 0;
       #ifdef ENABLE_WIFI_SCAN_OPTIMIZATION
-      // Scan function argument overview: scanNetworks(bool async = false, bool show_hidden = false, uint8 channel = 0, uint8* ssid = NULL)
-      int n = WiFi.scanNetworks(false, false, _mesh_wifi_channel);
+      if(scan_all_wifi_channels)
+      {
+        n = WiFi.scanNetworks();
+      }
+      else
+      {
+        // Scan function argument overview: scanNetworks(bool async = false, bool show_hidden = false, uint8 channel = 0, uint8* ssid = NULL)
+        n = WiFi.scanNetworks(false, false, _mesh_wifi_channel);
+      }
       #else
-      int n = WiFi.scanNetworks();
+      n = WiFi.scanNetworks();
       #endif
       
       _networkFilter(n, this); // Update the connection_queue.

@@ -180,8 +180,12 @@ public:
    * @param concluding_disconnect Disconnect from AP once transmission is complete.
    * @param initial_disconnect Disconnect from any currently connected AP before attempting transmission.
    * @param no_scan Do not scan for new networks and do not call networkFilter function. Will only use the data already in connection_queue for the transmission.
+   * @param scan_all_wifi_channels Scan all WiFi channels during a WiFi scan, instead of just the channel the ESP8266WiFiMesh instance is using.
+   *                               Scanning all WiFi channels takes about 2100 ms, compared to just 60 ms if only channel 1 (standard) is scanned.
+   *                               Note that if the ESP8266 has an active AP, that AP will switch WiFi channel to match that of any other AP the ESP8266 connects to.
+   *                               This can make it impossible for other nodes to detect the AP if they are scanning the wrong WiFi channel.
    */
-  void attemptTransmission(String message, bool concluding_disconnect = true, bool initial_disconnect = false, bool no_scan = false);
+  void attemptTransmission(String message, bool concluding_disconnect = true, bool initial_disconnect = false, bool no_scan = false, bool scan_all_wifi_channels = false);
 
   /**
    * If any clients are connected, accept their requests and call the requestHandler function for each one.
