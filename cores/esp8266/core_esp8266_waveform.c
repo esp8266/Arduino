@@ -102,13 +102,6 @@ static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
   return b;
 }
 
-static inline ICACHE_RAM_ATTR uint32_t min_s32(int32_t a, int32_t b) {
-  if (a < b) {
-    return a;
-  }
-  return b;
-}
-
 static inline ICACHE_RAM_ATTR void ReloadTimer(uint32_t a) {
   // Below a threshold you actually miss the edge IRQ, so ensure enough time
   if (a > 32) {
@@ -251,7 +244,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
       // Check for toggles
       now = GetCycleCount();
-      if (now >= wave->nextServiceCycle) {
+      int32_t cyclesToGo = wave->nextServiceCycle - now;
+      if (cyclesToGo < 0) {
         wave->state = !wave->state;
         if (wave->state) {
           SetGPIO(wave->gpioMask);
