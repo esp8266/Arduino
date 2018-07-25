@@ -83,4 +83,3 @@ TEST_CASE("String concantenation", "[core][String]")
     str += (int)INT_MIN;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648");
 }
-

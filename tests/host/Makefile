@@ -52,10 +52,10 @@ TEST_CPP_FILES := \
 	core/test_md5builder.cpp \
 	core/test_string.cpp
 
-CXXFLAGS += -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g -Wreorder
+CXXFLAGS += -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g
 CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g
 LDFLAGS += -coverage -O0
-VALGRINDFLAGS += --leak-check=full --track-origins=yes --verbose --error-limit=no --show-leak-kinds=all --error-exitcode=999
+VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
