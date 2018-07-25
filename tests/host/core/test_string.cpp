@@ -54,8 +54,18 @@ TEST_CASE("String(value, base)", "[core][String]")
 
 TEST_CASE("String constructors", "[core][String]")
 {
-    String s1 = "abcd";
-    String s2 = s1;
+    String s0('c');
+    REQUIRE(s0 == "c");
+    String bin((unsigned char)5, 4);
+    REQUIRE(bin == "11");
+    String ib((unsigned int)999, 16);
+    REQUIRE(ib == "3e7");
+    String lb((unsigned long)3000000000, 8);
+    REQUIRE(lb == "26264057000");
+    String sl1((long)-2000000000, 10);
+    REQUIRE(sl1 == "-2000000000");
+    String s1("abcd");
+    String s2(s1);
     REQUIRE(s1 == s2);
     String *s3 = new String("manos");
     s2 = *s3;
@@ -82,4 +92,21 @@ TEST_CASE("String concantenation", "[core][String]")
     str += (int)INT_MAX;
     str += (int)INT_MIN;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648");
+}
+
+TEST_CASE("String comparison", "[core][String]")
+{
+    String alpha("I like fish!");
+    REQUIRE(alpha < "I like tacos!");
+    REQUIRE(alpha > "I like bacon!");
+    REQUIRE(alpha.equalsIgnoreCase("i LiKe FiSh!"));
+    REQUIRE(alpha.equalsConstantTime("I like fish!"));
+    REQUIRE(alpha != "I like fish?");
+    REQUIRE(alpha.startsWith("I like"));
+    REQUIRE(!alpha.startsWith("I lick"));
+    REQUIRE(alpha.startsWith("fish", 7));
+    REQUIRE(!alpha.startsWith("fish?", 7));
+    REQUIRE(alpha.endsWith("!"));
+    REQUIRE(alpha.endsWith("fish!"));
+    REQUIRE(!alpha.endsWith("sh?"));
 }

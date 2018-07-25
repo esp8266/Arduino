@@ -1,4 +1,5 @@
 BINARY_DIRECTORY := bin
+LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
 CORE_PATH := ../../cores/esp8266
 
@@ -83,10 +84,13 @@ clean-objects:
 	rm -rf $(OBJECTS)
 
 clean-coverage:
-	rm -rf $(COVERAGE_FILES) *.gcov
+	rm -rf $(COVERAGE_FILES) $(LCOV_DIRECTORY) *.gcov
 
 gcov: test
 	find $(CORE_PATH) -name "*.gcno" -exec $(GCOV) -r -pb {} +
+	mkdir -p $(LCOV_DIRECTORY)
+	lcov --directory $(CORE_PATH) --capture --output-file $(LCOV_DIRECTORY)/app.info
+	genhtml $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
 valgrind: $(OUTPUT_BINARY)
 	$(VALGRIND) $(VALGRINDFLAGS) $(OUTPUT_BINARY)
