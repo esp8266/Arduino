@@ -107,19 +107,18 @@ void EspClass::wdtFeed(void)
 
 extern "C" void esp_yield();
 
-bool EspClass::deepSleep(uint64_t time_us, WakeMode mode)
+void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
-    if (time_us > deepSleepMax())
+    if (time_us > deepSleepMax()) \\ we need to prevent the esp8266 from not waking up from deepsleep
     {
+       time_us = (deepSleepMax() - (round(deepSleepMax() * 5 / 100)); // 5% correction because of inaccurate timekeeping by the esp8266
        #ifdef DEBUG_SERIAL
-          DEBUG_SERIAL.println("Error: max sleeptime exceeded");
+          DEBUG_SERIAL.println("Warning: max sleeptime exceeded; sleeptime has been adjusted to max possible sleeptime!");
        #endif
-       return false; // error: max sleeptime exceeded
     }
     system_deep_sleep_set_option(static_cast<int>(mode));
     system_deep_sleep(time_us);
     esp_yield();
-    return true; // never gets called
 }
 
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
