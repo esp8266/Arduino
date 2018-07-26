@@ -10,6 +10,8 @@ CXX ?= g++
 endif
 GCOV ?= gcov
 VALGRIND ?= valgrind
+LCOV ?= lcov
+GENHTML ?= genhtml
 
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	StreamString.cpp \
@@ -88,12 +90,13 @@ clean-coverage:
 
 gcov: test
 	find $(CORE_PATH) -name "*.gcno" -exec $(GCOV) -r -pb {} +
-	mkdir -p $(LCOV_DIRECTORY)
-	lcov --directory $(CORE_PATH) --capture --output-file $(LCOV_DIRECTORY)/app.info
-	genhtml $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
 valgrind: $(OUTPUT_BINARY)
+	mkdir -p $(LCOV_DIRECTORY)
+	$(LCOV) --directory ../../cores/esp8266/ --zerocounters
 	$(VALGRIND) $(VALGRINDFLAGS) $(OUTPUT_BINARY)
+	$(LCOV) --directory $(CORE_PATH) --capture --output-file $(LCOV_DIRECTORY)/app.info
+	$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
 build-info:
 	@echo "-------- build tools info --------"

@@ -81,6 +81,8 @@ TEST_CASE("String constructors", "[core][String]")
     REQUIRE(strf == "3.14159");
     String ssh(strf + "_" + s1);
     REQUIRE(ssh == "3.14159_abcd");
+    String flash = (F("hello from flash"));
+    REQUIRE(flash == "hello from flash");
 }
 
 TEST_CASE("String concantenation", "[core][String]")
@@ -102,6 +104,17 @@ TEST_CASE("String concantenation", "[core][String]")
     REQUIRE(str == "abcdeabcde9872147483647-214748364869");
     str += (unsigned int)1969;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648691969");
+    str += (long)-123;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123");
+    str += (unsigned long)321;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321");
+    str += (float)-1.01;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.01");
+    str += (double)1.01;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969-123321-1.011.01");
+    str = "clean";
+    REQUIRE(str.concat(str) == true);
+    REQUIRE(str == "cleanclean");
 }
 
 TEST_CASE("String comparison", "[core][String]")
@@ -134,6 +147,84 @@ TEST_CASE("String byte access", "[core][String]")
     s.getBytes(buff, 4, 6);
     REQUIRE(!memcmp(buff, "Cat", 4));
     s = "Never E";
+    memset(buff, 0, 4);
     s.getBytes(buff, 4, 6);
-    REQUIRE(!memcmp(buff, "E", 2));
+    bool ok = (buff[0] == 'E') && (buff[1] == 0) && (buff[2] == 0) && (buff[3] == 0);
+    REQUIRE(ok == true);
 }
+
+TEST_CASE("String conversion", "[core][String]")
+{
+    String s = "12345";
+    long l = s.toInt();
+    REQUIRE(l == 12345);
+    s = "2147483647";
+    l = s.toInt();
+    REQUIRE(l == INT_MAX);
+    s = "-2147483647";
+    l = s.toInt();
+    REQUIRE(l == -2147483647);
+    s = "-2147483648";
+    l = s.toInt();
+    REQUIRE(l == INT_MIN);
+    s = "3.14159";
+    float f = s.toFloat();
+    REQUIRE( fabs(f - 3.14159) < 0.0001 );
+}
+
+TEST_CASE("String case", "[core][String]")
+{
+    String s = "aBc_123";
+    s.toLowerCase();
+    REQUIRE(s == "abc_123");
+    s = "aBc_123";
+    s.toUpperCase();
+    REQUIRE(s == "ABC_123");
+}
+
+TEST_CASE("String nulls", "[core][String]")
+{
+    String s;
+    REQUIRE(s == "");
+    REQUIRE(s.toFloat() == 0);
+    REQUIRE(s.toInt() == 0);
+    s.trim();
+    s.toUpperCase();
+    s.toLowerCase();
+    s.remove(1,1);
+    s.remove(10);
+    s.replace("taco", "burrito");
+    s.replace('a', 'b');
+    REQUIRE(s.substring(10, 20) == "");
+    REQUIRE(s.lastIndexOf("tacos", 1) == -1);
+    REQUIRE(s.lastIndexOf("tacos") == -1);
+    REQUIRE(s.lastIndexOf('t', 0) == -1);
+    REQUIRE(s.lastIndexOf('t') == -1);
+    REQUIRE(s.indexOf("tacos", 1) == -1);
+    REQUIRE(s.indexOf("tacos") == -1);
+    REQUIRE(s.indexOf('t', 1) == -1);
+    REQUIRE(s.indexOf('t') == -1);
+    s.getBytes(NULL, 100, 0);
+    s[0] = 't';
+    REQUIRE(s == "");
+    REQUIRE(s.length() == 0);
+    s.setCharAt(1, 't');
+    REQUIRE(s.startsWith("abc",0) == false);
+    REQUIRE(s.startsWith("def") == false);
+    REQUIRE(s.equalsConstantTime("def") == false);
+    REQUIRE(s.equalsConstantTime("") == true);
+    REQUIRE(s.equalsConstantTime(s) == true);
+    REQUIRE(s.equalsIgnoreCase(s) == true);
+    REQUIRE(s.equals("def") == false);
+    REQUIRE(s.equals("") == true);
+    REQUIRE(s.equals(s) == true);
+    String t = s;
+    REQUIRE(s.equals(t) == true);
+    REQUIRE((s <= ""));
+    REQUIRE(!(s < ""));
+    REQUIRE((s >= ""));
+    REQUIRE(!(s > ""));
+    s += "abc";
+    REQUIRE(s == "abc");
+}
+
