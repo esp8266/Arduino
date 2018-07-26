@@ -50,6 +50,8 @@ TEST_CASE("String(value, base)", "[core][String]")
     String strnegf(-2.123, 3);
     REQUIRE(strnegi == "-9999");
     REQUIRE(strnegf == "-2.123");
+    String strbase16l((long)999999,16);
+    REQUIRE(strbase16l == "f423f");
 }
 
 TEST_CASE("String constructors", "[core][String]")
@@ -75,6 +77,10 @@ TEST_CASE("String constructors", "[core][String]")
     s2 = s3->c_str();
     delete s3;
     REQUIRE(s2 == "thisismuchlongerthantheother");
+    String strf((float)3.14159, 5);
+    REQUIRE(strf == "3.14159");
+    String ssh(strf + "_" + s1);
+    REQUIRE(ssh == "3.14159_abcd");
 }
 
 TEST_CASE("String concantenation", "[core][String]")
@@ -92,6 +98,10 @@ TEST_CASE("String concantenation", "[core][String]")
     str += (int)INT_MAX;
     str += (int)INT_MIN;
     REQUIRE(str == "abcdeabcde9872147483647-2147483648");
+    str += (unsigned char)69;
+    REQUIRE(str == "abcdeabcde9872147483647-214748364869");
+    str += (unsigned int)1969;
+    REQUIRE(str == "abcdeabcde9872147483647-2147483648691969");
 }
 
 TEST_CASE("String comparison", "[core][String]")
@@ -109,4 +119,21 @@ TEST_CASE("String comparison", "[core][String]")
     REQUIRE(alpha.endsWith("!"));
     REQUIRE(alpha.endsWith("fish!"));
     REQUIRE(!alpha.endsWith("sh?"));
+}
+
+TEST_CASE("String byte access", "[core][String]")
+{
+    String s;
+    s.reserve(1000);
+    s = "Never Eat Soggy Waffles";
+    REQUIRE(s[0] == 'N');
+    REQUIRE(s[999] == 0);
+    s[6] = 'C';
+    REQUIRE(!strcmp(s.c_str(), "Never Cat Soggy Waffles"));
+    unsigned char buff[4];
+    s.getBytes(buff, 4, 6);
+    REQUIRE(!memcmp(buff, "Cat", 4));
+    s = "Never E";
+    s.getBytes(buff, 4, 6);
+    REQUIRE(!memcmp(buff, "E", 2));
 }
