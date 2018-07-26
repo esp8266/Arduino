@@ -111,7 +111,7 @@ void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
     if (time_us > deepSleepMax()) // we need to prevent the esp8266 from not waking up from deepsleep
     {
-       time_us = (deepSleepMax() - (round(deepSleepMax() * 5 / 100)); // 5% correction because of inaccurate timekeeping by the esp8266
+       time_us = (deepSleepMax() - (round(deepSleepMax() * 5 / 100))); // 5% correction because of inaccurate timekeeping by the esp8266
        #ifdef DEBUG_SERIAL
           DEBUG_SERIAL.println("Warning: max sleeptime exceeded; sleeptime has been adjusted to max possible sleeptime!");
        #endif
