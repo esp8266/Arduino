@@ -38,6 +38,7 @@ install:
         }
         make -C $HOME/astyle/build/gcc prefix=$HOME install;
       } || true
+  - sudo apt-get install valgrind lcov
 
 script:
   - $TRAVIS_BUILD_DIR/tests/common.sh
