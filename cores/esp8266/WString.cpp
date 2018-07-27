@@ -270,8 +270,9 @@ unsigned char String::concat(const String &s) {
             return 1;
         if (!reserve(newlen))
             return 0;
-        memcpy(s.buffer + len, s.buffer, len);
+        memcpy(buffer + len, buffer, len);
         len = newlen;
+        buffer[len] = 0;
         return 1;
     } else {
         return concat(s.buffer, s.len);
