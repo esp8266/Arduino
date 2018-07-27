@@ -397,6 +397,7 @@ pbuf_alloc(pbuf_layer layer, u16_t length, pbuf_type type)
     p->len = p->tot_len = length;
     p->next = NULL;
     p->type = type;
+    p->eb = NULL;
     break;
   default:
     LWIP_ASSERT("pbuf_alloc: erroneous type", 0);
@@ -626,7 +627,7 @@ pbuf_header(struct pbuf *p, s16_t header_size_increment)
     } else {
       /* cannot expand payload to front (yet!)
        * bail out unsuccesfully */
-      if (type == PBUF_REF) {
+      if ((type == PBUF_REF) && (p->eb != NULL)) {
     	  /* increase payload pointer */
         p->payload = (u8_t *)p->payload - header_size_increment;
       } else {
@@ -747,7 +748,10 @@ pbuf_free(struct pbuf *p)
 #endif //EBUF_LWIP
       ) {
 #ifdef EBUF_LWIP
-        system_pp_recycle_rx_pkt(p->eb);
+	if(p->eb)
+	{
+      	  system_pp_recycle_rx_pkt(p->eb);
+	}
 #endif //EBUF_LWIP
         memp_free(MEMP_PBUF, p);
       /* type == PBUF_RAM */
