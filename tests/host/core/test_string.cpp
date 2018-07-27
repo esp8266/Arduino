@@ -228,3 +228,34 @@ TEST_CASE("String nulls", "[core][String]")
     REQUIRE(s == "abc");
 }
 
+TEST_CASE("String sizes near 8b", "[core][String]")
+{
+    // Test that proper amount of space allocated (including trailing 0)
+    // Need valgrind to verify no out-of-bounds errors, the strcmp()s will
+    // access each byte and cause an exception of the space was not properly
+    // allocated.
+    String s7("123456");
+    String s8("1234567");
+    String s9("12345678");
+    String s15("12345678901234");
+    String s16("123456789012345");
+    String s17("1234567890123456");
+    REQUIRE(!strcmp(s7.c_str(),"123456"));
+    REQUIRE(!strcmp(s8.c_str(),"1234567"));
+    REQUIRE(!strcmp(s9.c_str(),"12345678"));
+    REQUIRE(!strcmp(s15.c_str(),"12345678901234"));
+    REQUIRE(!strcmp(s16.c_str(),"123456789012345"));
+    REQUIRE(!strcmp(s17.c_str(),"1234567890123456"));
+    s7 += '_';
+    s8 += '_';
+    s9 += '_';
+    s15 += '_';
+    s16 += '_';
+    s17 += '_';
+    REQUIRE(!strcmp(s7.c_str(),"123456_"));
+    REQUIRE(!strcmp(s8.c_str(),"1234567_"));
+    REQUIRE(!strcmp(s9.c_str(),"12345678_"));
+    REQUIRE(!strcmp(s15.c_str(),"12345678901234_"));
+    REQUIRE(!strcmp(s16.c_str(),"123456789012345_"));
+    REQUIRE(!strcmp(s17.c_str(),"1234567890123456_"));
+}
