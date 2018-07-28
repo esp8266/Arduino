@@ -323,6 +323,25 @@ uint16_t SPIClass::transfer16(uint16_t data) {
     return out.val;
 }
 
+void SPIClass::transfer(void *buf, uint16_t count) {
+    uint8_t *cbuf = reinterpret_cast<uint8_t*>(buf);
+
+    // cbuf may not be 32bits-aligned
+    for (; (((unsigned long)cbuf) & 3) && count; cbuf++, count--)
+        *cbuf = transfer(*cbuf);
+
+    // cbuf is now aligned
+    // count may not be a multiple of 4
+    uint16_t count4 = count & ~3;
+    transferBytes(cbuf, cbuf, count4);
+
+    // finish the last <4 bytes
+    cbuf += count4;
+    count -= count4;
+    for (; count; cbuf++, count--)
+        *cbuf = transfer(*cbuf);
+}
+
 void SPIClass::write(uint8_t data) {
     while(SPI1CMD & SPIBUSY) {}
     // reset to 8Bit mode
@@ -511,6 +530,14 @@ void SPIClass::transferBytes(const uint8_t * out, uint8_t * in, uint32_t size) {
     }
 }
 
+/**
+ * Note:
+ *  in and out need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
+ * @param out uint8_t *
+ * @param in  uint8_t *
+ * @param size uint8_t (max 64)
+ */
 void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
     // Set in/out Bits to transfer
@@ -539,12 +566,13 @@ void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
     while(SPI1CMD & SPIBUSY) {}
 
     if(in) {
-        volatile uint8_t * fifoPtr8 = (volatile uint8_t *) &SPI1W0;
-        dataSize = size;
+        uint32_t * dataPtr = (uint32_t*) in;
+        fifoPtr = &SPI1W0;
+        dataSize = ((size + 3) / 4);
         while(dataSize--) {
-            *in = *fifoPtr8;
-            in++;
-            fifoPtr8++;
+            *dataPtr = *fifoPtr;
+            dataPtr++;
+            fifoPtr++;
         }
     }
 }
