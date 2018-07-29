@@ -43,6 +43,7 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void)
 {
 }
 
+#ifdef ESP8266HTTPUPDATE_KEEP_CURRENT_API
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
         const String& httpsFingerprint, bool reboot)
 {
@@ -72,7 +73,16 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& curr
     http.begin(url, httpsFingerprint);
     return handleUpdate(http, currentVersion, false);
 }
+#endif
 
+HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& url, const String& currentVersion)
+{
+    HTTPClient http;
+    http.begin(client, url);
+    return handleUpdate(http, currentVersion, false);
+}
+
+#ifdef ESP8266HTTPUPDATE_KEEP_CURRENT_API
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint)
 {
     HTTPClient http;
@@ -93,7 +103,16 @@ HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String
     http.begin(url);
     return handleUpdate(http, currentVersion, true);
 }
+#endif
 
+HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(WiFiClient& client, const String& url, const String& currentVersion)
+{
+    HTTPClient http;
+    http.begin(client, url);
+    return handleUpdate(http, currentVersion, true);
+}
+
+#ifdef ESP8266HTTPUPDATE_KEEP_CURRENT_API
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
         bool https, const String& httpsFingerprint, bool reboot)
 {
@@ -127,6 +146,15 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, co
 {
     HTTPClient http;
     http.begin(host, port, url, httpsFingerprint);
+    return handleUpdate(http, currentVersion, false);
+}
+#endif
+
+HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& host, uint16_t port, const String& uri,
+        const String& currentVersion)
+{
+    HTTPClient http;
+    http.begin(client, host, port, uri);
     return handleUpdate(http, currentVersion, false);
 }
 
