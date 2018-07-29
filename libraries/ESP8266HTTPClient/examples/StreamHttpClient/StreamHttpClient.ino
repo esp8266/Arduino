@@ -42,11 +42,13 @@ void loop() {
 
     HTTPClient http;
 
+    WiFiClient client;
+
     USE_SERIAL.print("[HTTP] begin...\n");
 
     // configure server and url
-    http.begin("http://192.168.1.12/test.html");
-    //http.begin("192.168.1.12", 80, "/test.html");
+    http.begin((Client&) client, "http://jigsaw.w3.org/HTTP/connection.html");
+    //http.begin("jigsaw.w3.org", 80, "/HTTP/connection.html");
 
     USE_SERIAL.print("[HTTP] GET...\n");
     // start connection and send HTTP header
@@ -65,7 +67,7 @@ void loop() {
         uint8_t buff[128] = { 0 };
 
         // get tcp stream
-        WiFiClient * stream = http.getStreamPtr();
+        WiFiClient * stream = &client;
 
         // read all data from server
         while (http.connected() && (len > 0 || len == -1)) {
@@ -99,4 +101,3 @@ void loop() {
 
   delay(10000);
 }
-
