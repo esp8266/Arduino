@@ -45,8 +45,10 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    http.begin("http://192.168.1.12/test.html");
-    //http.begin("192.168.1.12", 80, "/test.html");
+    WiFiClient client;
+
+    http.begin(client, "http://192.168.1.12/test.html");
+    //http.begin(client, "192.168.1.12", 80, "/test.html");
 
     int httpCode = http.GET();
     if (httpCode > 0) {
@@ -65,6 +67,3 @@ void loop() {
 
   delay(1000);
 }
-
-
-
