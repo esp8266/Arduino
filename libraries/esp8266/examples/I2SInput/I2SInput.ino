@@ -18,7 +18,7 @@
    IS2I_BCK      = GPIO13
    I2SI_WS/LRCLK = GPIO14
 
-   On the D1 mini the I2SI pins map to the following D pins:
+   On the D1 mini the I2S pins map to the following D pins:
    I2SI_DATA     = GPIO12 = D6
    IS2I_BCK      = GPIO13 = D7
    I2SI_WS/LRCLK = GPIO14 = D5
