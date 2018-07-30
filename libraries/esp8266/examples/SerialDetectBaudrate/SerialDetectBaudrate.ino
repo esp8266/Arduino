@@ -10,10 +10,12 @@ void setup() {
   unsigned long detectedBaudrate = Serial.detectBaudrate(TIMEOUT);
 
   if (detectedBaudrate) {
-    Serial.printf("\nDetected baudrate is %d, switching to that baudrate now...\n", detectedBaudrate);
+    Serial.printf("\nDetected baudrate is %lu, switching to that baudrate now...\n", detectedBaudrate);
 
     // Wait for printf to finish
-    while (Serial.availableForWrite() != UART_TX_FIFO_SIZE) yield();
+    while (Serial.availableForWrite() != UART_TX_FIFO_SIZE) {
+        yield();
+    }
 
     // Clear Tx buffer to avoid extra characters being printed
     Serial.flush();
