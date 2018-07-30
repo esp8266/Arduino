@@ -10,7 +10,7 @@ My ESP crashes running some code. How to troubleshoot it?
 -  `Exception <#exception>`__
 -  `Watchdog <#watchdog>`__
 -  `Check Where the Code Crashes <#check-where-the-code-crashes>`__
--  `Other **Common** Causes for Crashes <#other-causes-for-crashes>`__
+-  `Other Common Causes for Crashes <#other-causes-for-crashes>`__
 -  `If at the Wall, Enter an Issue
    Report <#if-at-the-wall-enter-an-issue-report>`__
 -  `Conclusion <#conclusion>`__
