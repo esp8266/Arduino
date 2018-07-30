@@ -744,6 +744,13 @@ uart_get_debug()
 /*
 To start detection of baud rate with the UART the UART_AUTOBAUD_EN bit needs to be cleared and set. The ROM function uart_baudrate_detect() does this only once, so on a next call the UartDev.rcv_state is not equal to BAUD_RATE_DET. Instead of poking around in the UartDev struct with unknown effect, the UART_AUTOBAUD_EN bit is directly triggered by the function uart_detect_baudrate().
 */
+void
+uart_start_detect_baudrate(int uart_nr)
+{
+    USA(uart_nr) &= ~(UART_GLITCH_FILT << UART_GLITCH_FILT_S | UART_AUTOBAUD_EN);
+    USA(uart_nr) = 0x08 << UART_GLITCH_FILT_S | UART_AUTOBAUD_EN;
+}
+
 int
 uart_detect_baudrate(int uart_nr)
 {
@@ -751,8 +758,7 @@ uart_detect_baudrate(int uart_nr)
 
     if(doTrigger)
     {
-        USA(uart_nr) &= ~(UART_GLITCH_FILT << UART_GLITCH_FILT_S | UART_AUTOBAUD_EN);
-        USA(uart_nr) = 0x08 << UART_GLITCH_FILT_S | UART_AUTOBAUD_EN;
+        uart_start_detect_baudrate(uart_nr);
         doTrigger = false;
     }
 
