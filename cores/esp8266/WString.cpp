@@ -781,6 +781,57 @@ void String::trim(void) {
     buffer[len] = 0;
 }
 
+/************************************************************/
+/*  TridentTD's split : split by delimiters to String Array */
+/************************************************************/
+// Version 2.3
+/* example 
+ *      String data = "Hello Test; 18:00:48; 16/10/2018";
+ *      String *data_split = NULL;
+ *      int count = data.td_split( " ;:/", &data_split );   // split  data to  data_split by space or semicolon or colon or slash
+ *      if( count > 1 )
+ *      for(int i =0; i< count ; ++i)
+ *         Serial.println( data_split[i] );
+ */
+
+int String::td_split(String delimiter, String** str_array) {
+  if(*str_array != NULL) {
+    delete[] *str_array;
+    *str_array = NULL;
+  }
+
+  if(!buffer || len == 0) {
+    *str_array = new String[1];
+    (*str_array)[0] = "";
+    return 0;
+  }
+
+  String input = String(buffer); 
+  int token_size = 0;
+
+  char *pChar = strtok( (char*)input.c_str(), (char*)delimiter.c_str());
+  while ( pChar != NULL ) {
+    pChar = strtok( NULL, (char*)delimiter.c_str());
+    ++token_size;
+  }
+  
+  if(token_size == 0) {
+    *str_array = new String[1]; (*str_array)[0] = input;
+    return 1;
+  }
+
+  *str_array = new String[token_size];
+  input = String(buffer); 
+  token_size = 0;
+
+  pChar = strtok( (char*) input.c_str(), (char*)delimiter.c_str());
+  while ( pChar != NULL ) {
+    (*str_array)[token_size] = String(pChar);
+    pChar = strtok( NULL, (char*)delimiter.c_str());
+    ++token_size;
+  }
+  return token_size;
+}
 // /*********************************************/
 // /*  Parsing / Conversion                     */
 // /*********************************************/
