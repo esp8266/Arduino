@@ -88,7 +88,7 @@ Functionality Issues
 integers are 16 bit, and on ESPs they are 32 bit (just like on ARM).
 
 *Issue:* Some device with time critical control like a servo drive or a
-strip pf LEDs does not operate smoothly and tends to randomly change
+strip of LEDs does not operate smoothly and tends to randomly change
 position or displayed pattern.
 
 *Solution:*: Check for usage of interrupts that may get in conflict with
