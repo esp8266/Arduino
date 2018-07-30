@@ -12,6 +12,7 @@ How can I run the script ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Python 2 needs to be installed on your system.
+
 The script is located in the ``tools`` subdirectory of the core's root installation.
 It needs to be run from the root directory,
 
@@ -30,19 +31,25 @@ generally self-explanatory.
 What can I do with it ?
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-As of today you can
+As of today you can:
+
 * in the IDE: change the default serial programming speed of any board
+
 * in the IDE: add new serial programming speed
+
 * increase available flash space by disabling floats in ``*printf`` functions
+
 * enable WPS which is now disabled by default (at the cost of a smaller heap by 4KB)
+
 * change led pin ``LED_BUILTIN`` for the two generic boards
+
 * change the default lwIP version (1.4 or 2)
 
 
 When do I need to mess with it ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The board generator is used to automate configuration files when it is
+The board generator is used to automate configuration files generatiom when it is
 possible to. It needs to be edited for:
 
 * All the specific board informations.  This is the only place where a new
@@ -52,7 +59,7 @@ possible to. It needs to be edited for:
 * Memory mapping for ldscripts (flash and spiffs size combinations)
 
 
-Why are my pull-request failing continuous-integration ?
+Why is my pull-request failing continuous-integration ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The generator is able to update a number of files (see list in help), and
