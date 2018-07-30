@@ -10,7 +10,7 @@ My ESP crashes running some code. How to troubleshoot it?
 -  `Exception <#exception>`__
 -  `Watchdog <#watchdog>`__
 -  `Check Where the Code Crashes <#check-where-the-code-crashes>`__
--  `Other Causes for Crashes <#other-causes-for-crashes>`__
+-  `Other *Common* Causes for Crashes <#other-causes-for-crashes>`__
 -  `If at the Wall, Enter an Issue
    Report <#if-at-the-wall-enter-an-issue-report>`__
 -  `Conclusion <#conclusion>`__
@@ -263,7 +263,7 @@ Asynchronous Callbacks
    can happen.
 
 Memory, memory, memory
-   Running out of heap is the most common cause for crashes. Because the build process for
+   Running out of heap is the **most common cause for crashes**. Because the build process for
    the ESP leaves out exceptions (they use memory), memory allocations that fail will do
    so silently. A typical example is when setting or concatenating a large String. If 
    allocation has failed internally, then the internal string copy can corrupt data, and 
@@ -286,6 +286,9 @@ Memory, memory, memory
    modification. For example, std::vector is available for use. The standard implementations
    rely on exceptions for error handling, which is not available for the ESP, and in any
    case there is no access to the underlying code.
+   
+   Instrumenting the code with the OOM debug option and calls to ``ESP.getFreeHeap()`` will
+   help the process of finding leaks.
 
 *Some techniques for reducing memory usage*
 
