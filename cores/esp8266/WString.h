@@ -238,8 +238,6 @@ class String {
         void toUpperCase(void);
         void trim(void);
         
-        int td_split(String delimiter, String** str_array); // v2.3   split String to String Array by multi-delimiters
-        // parsing/conversion
         long toInt(void) const;
         float toFloat(void) const;
 
