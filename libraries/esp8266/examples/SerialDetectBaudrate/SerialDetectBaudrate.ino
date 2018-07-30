@@ -14,7 +14,7 @@ void setup() {
 
     // Wait for printf to finish
     while (Serial.availableForWrite() != UART_TX_FIFO_SIZE) {
-        yield();
+      yield();
     }
 
     // Clear Tx buffer to avoid extra characters being printed
