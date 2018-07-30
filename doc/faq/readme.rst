@@ -141,3 +141,17 @@ The following lines are compatible with both lwIP versions:
     }
 
 Ref.  `#1923 <https://github.com/esp8266/Arduino/issues/1923>`__
+
+
+Why is there a board generator and what about it ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The board generator is a python script originally intended to ease the
+Arduino IDE's `boards.txt` configuration file about the multitude of
+available board, especially when common data have to be updated for all of
+them.
+
+This script is also used to manage uncommon options that will not find their
+place into the IDE menu.
+
+`Read more <a05-board-generator.rst>`__.
