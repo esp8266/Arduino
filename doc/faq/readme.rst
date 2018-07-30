@@ -43,10 +43,12 @@ entering an issue report, please perform initial troubleshooting.
 How can I get some extra KBs in flash ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
-be saved by using the option ``--nofloat`` with the boards generator:
+* Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
+  be saved by using the option ``--nofloat`` with the boards generator:
 
-``./tools/boards.txt.py --nofloat --allgen``
+  ``./tools/boards.txt.py --nofloat --allgen``
+
+* Use the debug level option ``NoAssert-NDEBUG`` (in the Tools menu)
 
 Why can't I use WPS ?
 ~~~~~~~~~~~~~~~~~~~~~
