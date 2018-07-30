@@ -64,8 +64,11 @@ class SSDPClass{
     void schema(WiFiClient client);
     void setDeviceType(const String& deviceType) { setDeviceType(deviceType.c_str()); }
     void setDeviceType(const char *deviceType);
+	
+	/*To define a custom UUID, you must call the method before begin(). Otherwise an automatic UUID based on CHIPID will be generated.*/
 	void setUUID(const String& uuid)	{ setUUID(uuid.c_str()); }
 	void setUUID(const char *uuid);
+	
 	void setName(const String& name) { setName(name.c_str()); }
     void setName(const char *name);
     void setURL(const String& url) { setURL(url.c_str()); }
