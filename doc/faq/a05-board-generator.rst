@@ -16,7 +16,7 @@ Python 2 needs to be installed on your system.
 The script is located in the ``tools`` subdirectory of the core's root installation.
 It needs to be run from the root directory,
 
-:: 
+::
 
     $ tools/boards.txt.py
 
@@ -55,7 +55,7 @@ possible to. It needs to be edited for:
 * All the specific board informations.  This is the only place where a new
   board (definition, description) can be updated or added to the existing
   list.
-  
+
 * Memory mapping for ldscripts (flash and spiffs size combinations)
 
 
