@@ -5,11 +5,11 @@ Board generator
 
 The board generator is a python script originally intended to ease the
 Arduino IDE's `boards.txt` configuration file about the multitude of
-available board, especially when common data have to be updated for all of
-them.
+available boards, especially when common parameters have to be updated for
+all of them.
 
-This script is also used to manage uncommon options that will not find their
-place into the IDE menu.
+This script is also used to manage uncommon options that are currently not
+available in the IDE menu.
 
 -  `How can I run the script ? <#how-can-i-run-the-script>`__
 -  `What can I do with it ? <#what-can-i-do-with-it>`__
@@ -31,6 +31,7 @@ It needs to be run from the root directory,
 ::
 
     C:\...> tools\boards.txt.py
+    C:\...> python tools\boards.txt.py
 
 Running without parameters will show the command line help.  They are
 generally self-explanatory.
@@ -57,10 +58,10 @@ As of today you can:
 When do I need to mess with it ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The board generator is used to automate configuration files generation when it is
-possible to. It needs to be edited for:
+The board generator is used to automate generation of configuration files
+when possible.  It needs to be edited for:
 
-* All the specific board informations.  This is the only place where a new
+* All information for specific boards.  This is the only place where a new
   board (definition, description) can be updated or added to the existing
   list.
 
