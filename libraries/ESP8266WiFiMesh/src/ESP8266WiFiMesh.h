@@ -89,9 +89,10 @@ private:
   
   WiFiClient  _client;
   
-  void connectToNode(const String &target_ssid, String &message);
-  bool exchangeInfo(String &message, WiFiClient &curr_client);
+  void connectToNode(const String &target_ssid, const char *message);
+  bool exchangeInfo(const char *message, WiFiClient &curr_client);
   bool waitForClient(WiFiClient &curr_client, int max_wait);
+  void attemptScanKernel(const char *message);
   
   ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
   
@@ -117,7 +118,11 @@ public:
    * @message The message to send to all other nodes.
    * 
    */
-  void attemptScan(String message);
+  void attemptScan(String &message);
+  void attemptScan(char *message);
+  
+  template<size_t Size>
+  void attemptScan(char (&message)[Size]);
   
   ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
 

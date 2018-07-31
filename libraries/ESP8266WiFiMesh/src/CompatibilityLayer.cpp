@@ -4,6 +4,7 @@
   is passed in both directions, but it is up to the user what the data sent is and how it is dealt with.
  
   Copyright (c) 2015 Julian Fell. All rights reserved.
+  Updated 2018 by Anders Löfgren.
  
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -88,9 +89,9 @@ bool ESP8266WiFiMesh::waitForClient(WiFiClient &curr_client, int max_wait)
  * 
  */
 // DEPRECATED!
-bool ESP8266WiFiMesh::exchangeInfo(String &message, WiFiClient &curr_client)
+bool ESP8266WiFiMesh::exchangeInfo(const char *message, WiFiClient &curr_client)
 {
-	curr_client.println( message.c_str() );
+	curr_client.println( message );
 
 	if (!waitForClient(curr_client, 1000))
 		return false;
@@ -114,7 +115,7 @@ bool ESP8266WiFiMesh::exchangeInfo(String &message, WiFiClient &curr_client)
  * 
  */
 // DEPRECATED!
-void ESP8266WiFiMesh::connectToNode(const String &target_ssid, String &message)
+void ESP8266WiFiMesh::connectToNode(const String &target_ssid, const char *message)
 {
 	WiFiClient curr_client;
 	WiFi.begin( target_ssid.c_str() );
@@ -139,7 +140,7 @@ void ESP8266WiFiMesh::connectToNode(const String &target_ssid, String &message)
 }
 
 // DEPRECATED!
-void ESP8266WiFiMesh::attemptScan(String message)
+void ESP8266WiFiMesh::attemptScanKernel(const char *message)
 {
 	/* Scan for APs */
 	int n = WiFi.scanNetworks();
@@ -159,4 +160,23 @@ void ESP8266WiFiMesh::attemptScan(String message)
 			delay(100);
 		}
 	}
+}
+
+// DEPRECATED!
+void ESP8266WiFiMesh::attemptScan(String &message)
+{
+  attemptScanKernel(message.c_str());
+}
+
+// DEPRECATED!
+void ESP8266WiFiMesh::attemptScan(char *message)
+{
+  attemptScanKernel(message);
+}
+
+// DEPRECATED!
+template<size_t Size>
+void ESP8266WiFiMesh::attemptScan(char (&message)[Size])
+{
+  attemptScanKernel(message);
 }
