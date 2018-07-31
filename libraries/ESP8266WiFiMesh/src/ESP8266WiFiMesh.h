@@ -118,7 +118,7 @@ public:
    * @message The message to send to all other nodes.
    * 
    */
-  void attemptScan(String &message);
+  void attemptScan(const String &message);
   void attemptScan(char *message);
   
   template<size_t Size>

@@ -163,7 +163,7 @@ void ESP8266WiFiMesh::attemptScanKernel(const char *message)
 }
 
 // DEPRECATED!
-void ESP8266WiFiMesh::attemptScan(String &message)
+void ESP8266WiFiMesh::attemptScan(const String &message)
 {
   attemptScanKernel(message.c_str());
 }
