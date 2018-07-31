@@ -291,8 +291,8 @@ public:
    */
   static const IPAddress emptyIP;
 
-  static String Uint64ToString(uint64_t number, byte base = 16);
-  static uint64_t StringToUint64(const String &string, byte base = 16);
+  static String uint64ToString(uint64_t number, byte base = 16);
+  static uint64_t stringToUint64(const String &string, byte base = 16);
 
   networkFilterType getNetworkFilter();
   void setNetworkFilter(networkFilterType networkFilter);

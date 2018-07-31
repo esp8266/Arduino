@@ -57,7 +57,7 @@ ESP8266WiFiMesh::ESP8266WiFiMesh(ESP8266WiFiMesh::requestHandlerType requestHand
 {
   storeLwipVersion();
   
-  updateNetworkNames(meshName, (nodeID != "" ? nodeID : Uint64ToString(ESP.getChipId())));
+  updateNetworkNames(meshName, (nodeID != "" ? nodeID : uint64ToString(ESP.getChipId())));
   _requestHandler = requestHandler;
   _responseHandler = responseHandler;
   setWiFiChannel(meshWiFiChannel);

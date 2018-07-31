@@ -44,7 +44,7 @@ void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline
  * @param base The radix to convert "number" into. Must be between 2 and 36.
  * @returns A string of "number" encoded in radix "base".
  */
-String ESP8266WiFiMesh::Uint64ToString(uint64_t number, byte base)
+String ESP8266WiFiMesh::uint64ToString(uint64_t number, byte base)
 {
   assert(2 <= base && base <= 36);
   
@@ -66,7 +66,7 @@ String ESP8266WiFiMesh::Uint64ToString(uint64_t number, byte base)
  * @param base The radix of "string". Must be between 2 and 36.
  * @returns A uint64_t of the string, using radix "base" during decoding.
  */
-uint64_t ESP8266WiFiMesh::StringToUint64(const String &string, byte base)
+uint64_t ESP8266WiFiMesh::stringToUint64(const String &string, byte base)
 {
   assert(2 <= base && base <= 36);
   

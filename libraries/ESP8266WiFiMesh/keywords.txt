@@ -43,8 +43,8 @@ acceptRequest	KEYWORD2
 setStaticIP	KEYWORD2
 getStaticIP	KEYWORD2
 disableStaticIP->KEYWORD2
-Uint64ToString	KEYWORD2
-StringToUint64	KEYWORD2
+uint64ToString	KEYWORD2
+stringToUint64	KEYWORD2
 getNetworkFilter	KEYWORD2
 setNetworkFilter	KEYWORD2
 

@@ -42,9 +42,9 @@ void networkFilter(int numberOfNetworks, ESP8266WiFiMesh &meshInstance) {
 
     /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
     if (meshNameIndex >= 0) {
-      uint64_t targetNodeID = ESP8266WiFiMesh::StringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
+      uint64_t targetNodeID = ESP8266WiFiMesh::stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
 
-      if (targetNodeID < ESP8266WiFiMesh::StringToUint64(meshInstance.getNodeID())) {
+      if (targetNodeID < ESP8266WiFiMesh::stringToUint64(meshInstance.getNodeID())) {
         ESP8266WiFiMesh::connectionQueue.push_back(NetworkInfo(i));
       }
     }
