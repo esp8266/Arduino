@@ -21,6 +21,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h> 
 #include <WiFiServer.h>
+#include <assert.h>
 
 #include "ESP8266WiFiMesh.h"
 
@@ -36,152 +37,48 @@ bool ESP8266WiFiMesh::static_IP_activated = false;
 IPAddress ESP8266WiFiMesh::static_IP = empty_IP;
 IPAddress ESP8266WiFiMesh::gateway = IPAddress(192,168,4,1);
 IPAddress ESP8266WiFiMesh::subnet_mask = IPAddress(255,255,255,0);
+ESP8266WiFiMesh *ESP8266WiFiMesh::apController = nullptr;
 
 std::vector<NetworkInfo> ESP8266WiFiMesh::connection_queue = {};
 std::vector<TransmissionResult> ESP8266WiFiMesh::latest_transmission_outcomes = {};
 
-ESP8266WiFiMesh::ESP8266WiFiMesh(std::function<String(String, ESP8266WiFiMesh *)> requestHandler, std::function<transmission_status_t(String, ESP8266WiFiMesh *)> responseHandler, 
-                                 std::function<void(int, ESP8266WiFiMesh *)> networkFilter, String mesh_password, String mesh_name, String node_id, bool verbose_mode, uint8 mesh_wifi_channel, int server_port) 
+ESP8266WiFiMesh::~ESP8266WiFiMesh()
+{
+  if(isAPController())
+  {
+    apController = nullptr;
+  }
+}
+
+ESP8266WiFiMesh::ESP8266WiFiMesh(ESP8266WiFiMesh::requestHandlerType requestHandler, ESP8266WiFiMesh::responseHandlerType responseHandler, 
+                                 ESP8266WiFiMesh::networkFilterType networkFilter, const String &mesh_password, const String &mesh_name, 
+                                 const String &node_id, bool verbose_mode, uint8 mesh_wifi_channel, int server_port) 
                                  : _server(server_port), _lwip_version{0, 0, 0}
 {
+  storeLwipVersion();
+  
   updateNetworkNames(mesh_name, (node_id != "" ? node_id : Uint64ToString(ESP.getChipId())));
   _requestHandler = requestHandler;
   _responseHandler = responseHandler;
-  _mesh_wifi_channel = mesh_wifi_channel;
+  setWiFiChannel(mesh_wifi_channel);
   _server_port = server_port;
   _mesh_password = mesh_password;
   _verbose_mode = verbose_mode;
   _networkFilter = networkFilter;
-  storeLwipVersion();
 }
 
-void ESP8266WiFiMesh::verboseModePrint(String string_to_print, bool newline)
+void ESP8266WiFiMesh::updateNetworkNames(const String &new_mesh_name, const String &new_node_id)
 {
-  if(_verbose_mode)
-  {
-    if(newline)
-      Serial.println(string_to_print);
-    else
-      Serial.print(string_to_print);
-  }
-}
-
-/**
- * Note that using a base higher than 16 increases likelihood of randomly generating ssid strings containing controversial words. 
- * 
- * @param number The number to convert to a string with radix "base".
- * @param base The radix to convert "number" into. Must be between 2 and 36.
- * @returns A string of "number" encoded in radix "base".
- */
-String ESP8266WiFiMesh::Uint64ToString(uint64_t number, byte base)
-{
-  String result = "";
-
-  while(number > 0)
-  {
-    result = String((uint32_t)(number % base), base) + result;
-    number /= base;
-  }
-
-  return (result == "" ? "0" : result);
-}
-
-/**
- * Note that using a base higher than 16 increases likelihood of randomly generating ssid strings containing controversial words. 
- * 
- * @param string The string to convert to uint64_t. String must use radix "base".
- * @param base The radix of "string". Must be between 2 and 36.
- * @returns A uint64_t of the string, using radix "base" during decoding.
- */
-uint64_t ESP8266WiFiMesh::StringToUint64(String string, byte base)
-{
-  uint64_t result = 0;
-
-  char current_character[1];
-  for(uint32_t i = 0; i < string.length(); i++)
-  {
-    result *= base;
-    current_character[0] = string.charAt(i);
-    result += strtoul(current_character, NULL, base);
-  }
-  
-  return result;
-}
-
-/**
- * Calculate the current lwIP version number and store the numbers in the _lwip_version array.
- * lwIP version can be changed in the "Tools" menu of Arduino IDE.
- */
-void ESP8266WiFiMesh::storeLwipVersion()
-{
-  // ESP.getFullVersion() looks something like: 
-  // SDK:2.2.1(cfd48f3)/Core:win-2.5.0-dev/lwIP:2.0.3(STABLE-2_0_3_RELEASE/glue:arduino-2.4.1-10-g0c0d8c2)/BearSSL:94e9704
-  String full_version = ESP.getFullVersion();
-
-  int i = full_version.indexOf("lwIP:") + 5;
-  char current_char = full_version.charAt(i);
-
-  for(int version_part = 0; version_part < 3; version_part++)
-  {
-    while(!isdigit(current_char))
-    {
-      current_char = full_version.charAt(++i);
-    }
-    while(isdigit(current_char))
-    {
-      _lwip_version[version_part] = 10 * _lwip_version[version_part] + (current_char - '0'); // Left shift and add digit value, in base 10.
-      current_char = full_version.charAt(++i);
-    }
-  }
-}
-
-/**
- * Check if the code is running on a version of lwIP that is at least min_lwip_version.
- */
-bool ESP8266WiFiMesh::atLeastLwipVersion(const uint32_t min_lwip_version[3])
-{ 
-  for(int version_part = 0; version_part < 3; version_part++)
-  {
-    if(_lwip_version[version_part] > min_lwip_version[version_part])
-      return true;
-    else if(_lwip_version[version_part] < min_lwip_version[version_part])
-      return false;
-  }
-
-  return true;
-}
-
-void ESP8266WiFiMesh::updateNetworkNames(String new_mesh_name, String new_node_id)
-{
-  _mesh_name = new_mesh_name;
-  _node_id = new_node_id;
+  if(new_mesh_name != "")
+    _mesh_name = new_mesh_name;
+  if(new_node_id != "")
+    _node_id = new_node_id;
+    
   _ssid = _mesh_name + _node_id;
-}
 
-void ESP8266WiFiMesh::setStaticIP(IPAddress new_IP)
-{
-  // Comment out the line below to remove static IP and use DHCP instead. 
-  // DHCP makes WiFi connection happen slower, but there is no need to care about manually giving different IPs to the nodes and less need to worry about used IPs giving "Server unavailable" issues. 
-  // Static IP has faster connection times (50 % of DHCP) and will make sending of data to a node that is already transmitting data happen more reliably. 
-  // Note that after WiFi.config(static_IP, gateway, subnet_mask) is used, static IP will always be active, even for new connections, unless WiFi.config(0u,0u,0u); is called.
-  WiFi.config(new_IP, gateway, subnet_mask); 
-  static_IP_activated = true;
-  static_IP = new_IP;
-}
-
-IPAddress ESP8266WiFiMesh::getStaticIP()
-{
-  if(static_IP_activated)
-    return static_IP;
-
-  return empty_IP;
-}
-
-void ESP8266WiFiMesh::disableStaticIP()
-{
-  WiFi.config(0u,0u,0u);
-  yield();
-  static_IP_activated = false;
+  // Apply SSID changes to active AP.
+  if(isAPController())
+    restartAP();
 }
 
 void ESP8266WiFiMesh::begin()
@@ -211,43 +108,119 @@ void ESP8266WiFiMesh::begin()
   }
 }
 
-void ESP8266WiFiMesh::activateAP(String new_mesh_name, String new_node_id)
+void ESP8266WiFiMesh::setStaticIP(const IPAddress &new_IP)
 {
-  if(new_mesh_name != "" || new_node_id != "")
-    updateNetworkNames(new_mesh_name != "" ? new_mesh_name : _mesh_name, new_node_id  != "" ? new_node_id : _node_id);
-    
+  // Comment out the line below to remove static IP and use DHCP instead. 
+  // DHCP makes WiFi connection happen slower, but there is no need to care about manually giving different IPs to the nodes and less need to worry about used IPs giving "Server unavailable" issues. 
+  // Static IP has faster connection times (50 % of DHCP) and will make sending of data to a node that is already transmitting data happen more reliably. 
+  // Note that after WiFi.config(static_IP, gateway, subnet_mask) is used, static IP will always be active, even for new connections, unless WiFi.config(0u,0u,0u); is called.
+  WiFi.config(new_IP, gateway, subnet_mask); 
+  static_IP_activated = true;
+  static_IP = new_IP;
+}
+
+IPAddress ESP8266WiFiMesh::getStaticIP()
+{
+  if(static_IP_activated)
+    return static_IP;
+
+  return empty_IP;
+}
+
+void ESP8266WiFiMesh::disableStaticIP()
+{
+  WiFi.config(0u,0u,0u);
+  yield();
+  static_IP_activated = false;
+}
+
+void ESP8266WiFiMesh::activateAP()
+{
+  // Deactivate active AP to avoid two servers using the same port, which can lead to crashes.
+  if(ESP8266WiFiMesh *currentAPController = ESP8266WiFiMesh::getAPController())
+    currentAPController->deactivateAP();
+  
   WiFi.softAP( _ssid.c_str(), _mesh_password.c_str(), _mesh_wifi_channel ); // Note that a maximum of 5 stations can be connected at a time to each AP
   _server.begin(); // Actually calls _server.stop()/_server.close() first.
+
+  apController = this;
 }
 
-void ESP8266WiFiMesh::deactivateAP(String new_mesh_name, String new_node_id)
+void ESP8266WiFiMesh::deactivateAP()
 {
-  _server.stop();
-  WiFi.softAPdisconnect();
+  if(isAPController())
+  {
+    _server.stop();
+    WiFi.softAPdisconnect();
 
-  if(new_mesh_name != "" || new_node_id != "")
-    updateNetworkNames(new_mesh_name != "" ? new_mesh_name : _mesh_name, new_node_id  != "" ? new_node_id : _node_id);
+    // Since there is no active AP controller now, make the apController variable point to nothing. 
+    apController = nullptr;
+  }
 }
 
-void ESP8266WiFiMesh::restartAP(String new_mesh_name, String new_node_id)
+void ESP8266WiFiMesh::restartAP()
 {
-  deactivateAP(new_mesh_name, new_node_id);
+  deactivateAP();
+  yield();
   activateAP();
+  yield();
+}
+
+ESP8266WiFiMesh * ESP8266WiFiMesh::getAPController()
+{
+  return apController; 
+}
+
+bool ESP8266WiFiMesh::isAPController()
+{
+  return (this == apController);
+}
+
+uint8 ESP8266WiFiMesh::getWiFiChannel()
+{
+  return _mesh_wifi_channel;
+}
+
+void ESP8266WiFiMesh::setWiFiChannel(uint8 new_wifi_channel)
+{
+  assert(1 <= new_wifi_channel && new_wifi_channel <= 13);
+  
+  _mesh_wifi_channel = new_wifi_channel;
+
+  // Apply changes to active AP.
+  if(isAPController())
+    restartAP();
 }
 
 String ESP8266WiFiMesh::getMeshName() {return _mesh_name;}
+
+void ESP8266WiFiMesh::setMeshName(const String &new_mesh_name)
+{
+  updateNetworkNames(new_mesh_name);
+}
+
 String ESP8266WiFiMesh::getNodeID() {return _node_id;}
 
-String ESP8266WiFiMesh::getMessage() {return _message;}
-void ESP8266WiFiMesh::setMessage(String new_message) {_message = new_message;}
+void ESP8266WiFiMesh::setNodeID(const String &new_node_id)
+{
+  updateNetworkNames("", new_node_id);
+}
 
-std::function<void(int, ESP8266WiFiMesh *)> ESP8266WiFiMesh::getNetworkFilter() {return _networkFilter;}
-void ESP8266WiFiMesh::setNetworkFilter(std::function<void(int, ESP8266WiFiMesh *)> networkFilter) {_networkFilter = networkFilter;}
+void ESP8266WiFiMesh::setSSID(const String &new_mesh_name, const String &new_node_id)
+{
+  updateNetworkNames(new_mesh_name, new_node_id);
+}
+
+String ESP8266WiFiMesh::getMessage() {return _message;}
+void ESP8266WiFiMesh::setMessage(const String &new_message) {_message = new_message;}
+
+ESP8266WiFiMesh::networkFilterType ESP8266WiFiMesh::getNetworkFilter() {return _networkFilter;}
+void ESP8266WiFiMesh::setNetworkFilter(ESP8266WiFiMesh::networkFilterType networkFilter) {_networkFilter = networkFilter;}
 
 /**
  * Disconnect completely from a network.
  */
-void ESP8266WiFiMesh::fullStop(WiFiClient curr_client)
+void ESP8266WiFiMesh::fullStop(WiFiClient &curr_client)
 {
   curr_client.stop();
   yield();
@@ -261,7 +234,7 @@ void ESP8266WiFiMesh::fullStop(WiFiClient curr_client)
  * @returns: True if the client is ready, false otherwise.
  * 
  */
-bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient curr_client, int max_wait)
+bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient &curr_client, int max_wait)
 {
   int wait = max_wait;
   while(curr_client.connected() && !curr_client.available() && wait--)
@@ -285,7 +258,7 @@ bool ESP8266WiFiMesh::waitForClientTransmission(WiFiClient curr_client, int max_
  * @returns: A status code based on the outcome of the exchange.
  * 
  */
-transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient curr_client)
+transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient &curr_client)
 {
   verboseModePrint("Transmitting");
     
@@ -309,7 +282,7 @@ transmission_status_t ESP8266WiFiMesh::exchangeInfo(WiFiClient curr_client)
   curr_client.flush();
 
   /* Pass data to user callback */
-  return _responseHandler(response, this);
+  return _responseHandler(response, *this);
 }
 
 /**
@@ -361,7 +334,7 @@ transmission_status_t ESP8266WiFiMesh::attemptDataTransferKernel()
   return transmission_outcome;
 }
 
-void ESP8266WiFiMesh::initiateConnectionToAP(String target_ssid, int target_channel, uint8_t *target_bssid)
+void ESP8266WiFiMesh::initiateConnectionToAP(const String &target_ssid, int target_channel, uint8_t *target_bssid)
 {
   if(target_channel == NETWORK_INFO_DEFAULT_INT)
     WiFi.begin( target_ssid.c_str(), _mesh_password.c_str() ); // Without giving channel and bssid, connection time is longer.
@@ -380,7 +353,7 @@ void ESP8266WiFiMesh::initiateConnectionToAP(String target_ssid, int target_chan
  * @returns: A status code based on the outcome of the connection and data transfer process.
  * 
  */
-transmission_status_t ESP8266WiFiMesh::connectToNode(String target_ssid, int target_channel, uint8_t *target_bssid)
+transmission_status_t ESP8266WiFiMesh::connectToNode(const String &target_ssid, int target_channel, uint8_t *target_bssid)
 {
   if(static_IP_activated && last_ssid != "" && last_ssid != target_ssid) // So we only do this once per connection, in case there is a performance impact.
   {
@@ -439,7 +412,7 @@ transmission_status_t ESP8266WiFiMesh::connectToNode(String target_ssid, int tar
   return attemptDataTransfer();
 }
 
-void ESP8266WiFiMesh::attemptTransmission(String message, bool concluding_disconnect, bool initial_disconnect, bool no_scan, bool scan_all_wifi_channels)
+void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding_disconnect, bool initial_disconnect, bool no_scan, bool scan_all_wifi_channels)
 {
   setMessage(message);
   
@@ -482,7 +455,7 @@ void ESP8266WiFiMesh::attemptTransmission(String message, bool concluding_discon
       n = WiFi.scanNetworks();
       #endif
       
-      _networkFilter(n, this); // Update the connection_queue.
+      _networkFilter(n, *this); // Update the connection_queue.
     }
     
     for(NetworkInfo &current_network : connection_queue)
@@ -584,7 +557,7 @@ void ESP8266WiFiMesh::acceptRequest()
       yield();
       _client.flush();
 
-      String response = _requestHandler(request, this);
+      String response = _requestHandler(request, *this);
 
       /* Send the response back to the client */
       if (_client.connected())

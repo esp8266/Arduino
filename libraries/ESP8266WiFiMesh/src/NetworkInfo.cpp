@@ -31,7 +31,7 @@ void NetworkInfo::copyBSSID(uint8_t new_bssid[6])
   {
     if(bssid == NULL)
     {
-      bssid = bssid_array;
+      bssid = _bssid_array;
     }
     
     for(int i = 0; i < 6; i++)
@@ -55,7 +55,7 @@ NetworkInfo::NetworkInfo(int new_network_index, bool autofill) : network_index(n
   }
 }
 
-NetworkInfo::NetworkInfo(String new_ssid, int new_wifi_channel, uint8_t new_bssid[6], int new_network_index) : 
+NetworkInfo::NetworkInfo(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], int new_network_index) : 
   ssid(new_ssid), wifi_channel(new_wifi_channel), network_index(new_network_index)
 {
   copyBSSID(new_bssid);

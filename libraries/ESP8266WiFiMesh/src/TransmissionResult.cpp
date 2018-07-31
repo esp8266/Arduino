@@ -29,11 +29,11 @@ TransmissionResult::TransmissionResult(int new_network_index, transmission_statu
   NetworkInfo(new_network_index, autofill), transmission_status(new_transmission_status)
 { }
 
-TransmissionResult::TransmissionResult(String new_ssid, int new_wifi_channel, uint8_t new_bssid[6], transmission_status_t new_transmission_status) : 
+TransmissionResult::TransmissionResult(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], transmission_status_t new_transmission_status) : 
   NetworkInfo(new_ssid, new_wifi_channel, new_bssid), transmission_status(new_transmission_status)
 { }
 
-TransmissionResult::TransmissionResult(String new_ssid, int new_wifi_channel, uint8_t new_bssid[6], int new_network_index, transmission_status_t new_transmission_status) :
+TransmissionResult::TransmissionResult(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], int new_network_index, transmission_status_t new_transmission_status) :
   NetworkInfo(new_ssid, new_wifi_channel, new_bssid, new_network_index), transmission_status(new_transmission_status)
 { }
 

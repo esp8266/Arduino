@@ -34,7 +34,7 @@ class NetworkInfo {
 
 private:
 
-  uint8_t bssid_array[6] {0};
+  uint8_t _bssid_array[6] {0};
 
 public:
 
@@ -51,7 +51,7 @@ public:
   /**
    * Without giving channel and bssid, connection time is longer.
    */
-  NetworkInfo(String new_ssid, int new_wifi_channel = NETWORK_INFO_DEFAULT_INT, uint8_t new_bssid[6] = NULL, int new_network_index = NETWORK_INFO_DEFAULT_INT);
+  NetworkInfo(const String &new_ssid, int new_wifi_channel = NETWORK_INFO_DEFAULT_INT, uint8_t new_bssid[6] = NULL, int new_network_index = NETWORK_INFO_DEFAULT_INT);
 
   NetworkInfo(const NetworkInfo &other);
 

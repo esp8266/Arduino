@@ -53,7 +53,12 @@ ESP8266WiFiMesh(std::function<String(String, ESP8266WiFiMesh *)> requestHandler,
 
   If you are using a core version prior to 2.4.2 it is possible to disable the WiFi scan and static IP optimizations by commenting out the `ENABLE_STATIC_IP_OPTIMIZATION` and `ENABLE_WIFI_SCAN_OPTIMIZATION` defines in ESP8266WiFiMesh.h. Press Ctrl+K in the Arduino IDE while an example from the mesh library is opened, to open the library folder (or click "Show Sketch Folder" in the Sketch menu). ESP8266WiFiMesh.h can then be found at ESP8266WiFiMesh/src. Edit the file with any text editor.
 
-* The WiFi scan optimization mentioned above works by making WiFi scans only search through the same WiFi channel as the ESP8266WiFiMesh instance is using. If you would like to scan all WiFi channels instead, set the `scan_all_wifi_channels` argument of the `attemptTransmission` method to `true`. Note that scanning all WiFi channels will slow down scans considerably and make it more likely that existing WiFi connections will break during scans. Also note that if the ESP8266 has an active AP, that AP will switch WiFi channel to match that of any other AP the ESP8266 connects to (compare next bullet point). This can make it impossible for other nodes to detect the AP if they are scanning the wrong WiFi channel. To remedy this, use the `restartAP` method to force the AP back on the original channel once the ESP8266 has disconnected from the other AP.
+* The WiFi scan optimization mentioned above works by making WiFi scans only search through the same WiFi channel as the ESP8266WiFiMesh instance is using. If you would like to scan all WiFi channels instead, set the `scan_all_wifi_channels` argument of the `attemptTransmission` method to `true`. Note that scanning all WiFi channels will slow down scans considerably and make it more likely that existing WiFi connections will break during scans. Also note that if the ESP8266 has an active AP, that AP will switch WiFi channel to match that of any other AP the ESP8266 connects to (compare next bullet point). This can make it impossible for other nodes to detect the AP if they are scanning the wrong WiFi channel. To remedy this, force the AP back on the original channel by using the `restartAP` method of the current AP controller once the ESP8266 has disconnected from the other AP. This would typically be done like so:
+
+  ```
+  if(ESP8266WiFiMesh *apController = ESP8266WiFiMesh::getAPController()) // Make sure apController is not nullptr
+    apController->restartAP();
+  ```
 
 * It is possible to have several ESP8266WiFiMesh instances running on every ESP8266 (e.g. to communicate with different mesh networks). However, because the ESP8266 has one WiFi radio only one AP per ESP8266 can be active at a time. Also note that if the ESP8266WiFiMesh instances use different WiFi channels, active APs are forced to use the same WiFi channel as active stations, possibly causing AP disconnections.
 
@@ -64,10 +69,10 @@ ESP8266WiFiMesh(std::function<String(String, ESP8266WiFiMesh *)> requestHandler,
 General Information
 ---------------------------
 
-This library uses the standard Arduino core for ESP8266 WiFi functions. Therefore, other code that also uses these WiFi functions may cause conflicts with the library, resulting in strange behaviour.
+* This library uses the standard Arduino core for ESP8266 WiFi functions. Therefore, other code that also uses these WiFi functions may cause conflicts with the library, resulting in strange behaviour.
 
-A maximum of 5 stations can be connected at a time to each AP.
+* A maximum of 5 stations can be connected at a time to each AP.
 
-Unlike `WiFi.mode(WIFI_AP)`, the `WiFi.mode(WIFI_AP_STA)` which is used in this library allows nodes to stay connected to an AP they connect to while in STA mode, at the same time as they can receive connections from other stations. Nodes cannot send data to an AP while in STA_AP mode though, that requires STA mode. Switching to STA mode will sometimes disconnect stations connected to the node AP (though they can request a reconnect even while the previous AP node is in STA mode).
+* Unlike `WiFi.mode(WIFI_AP)`, the `WiFi.mode(WIFI_AP_STA)` which is used in this library allows nodes to stay connected to an AP they connect to while in STA mode, at the same time as they can receive connections from other stations. Nodes cannot send data to an AP while in STA_AP mode though, that requires STA mode. Switching to STA mode will sometimes disconnect stations connected to the node AP (though they can request a reconnect even while the previous AP node is in STA mode).
 
-Scanning for networks (e.g. via the `attemptTransmission` method) without the WiFi scan optimizations for core version 2.4.2 mentioned above, causes the WiFi radio to cycle through all WiFi channels which means existing WiFi connections are likely to break or work poorly if done frequently.
+* Scanning for networks (e.g. via the `attemptTransmission` method) without the WiFi scan optimizations for core version 2.4.2 mentioned above, causes the WiFi radio to cycle through all WiFi channels which means existing WiFi connections are likely to break or work poorly if done frequently.

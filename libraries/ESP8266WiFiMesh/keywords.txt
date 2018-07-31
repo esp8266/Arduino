@@ -27,8 +27,15 @@ begin	KEYWORD2
 activateAP	KEYWORD2
 deactivateAP	KEYWORD2
 restartAP	KEYWORD2
+getAPController	KEYWORD2
+isAPController	KEYWORD2
+getWiFiChannel	KEYWORD2
+setWiFiChannel	KEYWORD2
 getMeshName	KEYWORD2
+setMeshName	KEYWORD2
 getNodeID	KEYWORD2
+setNodeID	KEYWORD2
+setSSID	KEYWORD2
 getMessage	KEYWORD2
 setMessage	KEYWORD2
 attemptTransmission	KEYWORD2
@@ -47,3 +54,4 @@ setNetworkFilter	KEYWORD2
 
 empty_IP	LITERAL1
 NETWORK_INFO_DEFAULT_INT	LITERAL1
+WIFI_MESH_EMPTY_STRING	LITERAL1

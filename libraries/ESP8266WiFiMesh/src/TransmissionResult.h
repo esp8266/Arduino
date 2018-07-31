@@ -47,9 +47,9 @@ public:
    */
   TransmissionResult(int new_network_index, transmission_status_t new_transmission_status, bool autofill = true);
 
-  TransmissionResult(String new_ssid, int new_wifi_channel, uint8_t new_bssid[6], transmission_status_t new_transmission_status);
+  TransmissionResult(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], transmission_status_t new_transmission_status);
 
-  TransmissionResult(String new_ssid, int new_wifi_channel, uint8_t new_bssid[6], int new_network_index, transmission_status_t new_transmission_status);
+  TransmissionResult(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], int new_network_index, transmission_status_t new_transmission_status);
 
   TransmissionResult(const NetworkInfo& origin, transmission_status_t new_transmission_status);
 };

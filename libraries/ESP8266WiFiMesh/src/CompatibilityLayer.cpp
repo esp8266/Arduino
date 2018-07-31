@@ -49,7 +49,7 @@
 #define SERVER_PORT				4011
 
 // DEPRECATED!
-ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)> handler)
+ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chip_id, ESP8266WiFiMesh::compatibilityLayerHandlerType handler)
 : _server(SERVER_PORT)
 {
 	_chip_id = chip_id;
@@ -65,7 +65,7 @@ ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chip_id, std::function<String(String)>
  * 
  */
 // DEPRECATED!
-bool ESP8266WiFiMesh::waitForClient(WiFiClient curr_client, int max_wait)
+bool ESP8266WiFiMesh::waitForClient(WiFiClient &curr_client, int max_wait)
 {
 	int wait = max_wait;
 	while(curr_client.connected() && !curr_client.available() && wait--)
@@ -88,7 +88,7 @@ bool ESP8266WiFiMesh::waitForClient(WiFiClient curr_client, int max_wait)
  * 
  */
 // DEPRECATED!
-bool ESP8266WiFiMesh::exchangeInfo(String message, WiFiClient curr_client)
+bool ESP8266WiFiMesh::exchangeInfo(String &message, WiFiClient &curr_client)
 {
 	curr_client.println( message.c_str() );
 
@@ -114,7 +114,7 @@ bool ESP8266WiFiMesh::exchangeInfo(String message, WiFiClient curr_client)
  * 
  */
 // DEPRECATED!
-void ESP8266WiFiMesh::connectToNode(String target_ssid, String message)
+void ESP8266WiFiMesh::connectToNode(const String &target_ssid, String &message)
 {
 	WiFiClient curr_client;
 	WiFi.begin( target_ssid.c_str() );
