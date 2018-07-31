@@ -50,6 +50,8 @@ How can I get some extra KBs in flash ?
 
 * Use the debug level option ``NoAssert-NDEBUG`` (in the Tools menu)
 
+`Read more <a05-board-generator.rst>`__.
+
 Why can't I use WPS ?
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -57,6 +59,8 @@ WPS is disabled by default, this offers an extra 4KB in ram/heap.  To enable
 WPS (and lose 4KB of useable ram), use this boards generator option:
 
 ``./tools/boards.txt.py --allowWPS --allgen``
+
+`Read more <a05-board-generator.rst>`__.
 
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
