@@ -268,6 +268,20 @@
               "size": "43609"
             }
           ]
+        },
+        {
+          "name": "esptoolpy",
+          "version": "2.5.0",
+          "systems": [
+            {
+              "host": "any",
+              "url": "https://github.com/espressif/esptool/archive/v2.5.0.zip",
+              "archiveFileName": "esptoolpy-v2.5.0.zip",
+              "checksum": "SHA-256:d50fb1e8d82885dc27df4f65967c3b394afa16be038750e84c6d94a0eea27fbe",
+              "size": "4059878",
+              "rename": "esptoolpy"
+            }
+          ]
         }
       ]
     }

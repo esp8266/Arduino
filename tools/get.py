@@ -43,7 +43,7 @@ def report_progress(count, blockSize, totalSize):
     sys.stdout.write("\r%d%%" % percent)
     sys.stdout.flush()
 
-def unpack(filename, destination):
+def unpack(filename, destination, rename = ''):
     dirname = ''
     print('Extracting {0}'.format(filename))
     if filename.endswith('tar.gz'):
@@ -57,8 +57,12 @@ def unpack(filename, destination):
     else:
         raise NotImplementedError('Unsupported archive type')
 
-    # a little trick to rename tool directories so they don't contain version number
-    rename_to = re.match(r'^([a-z][^\-]*\-*)+', dirname).group(0).strip('-')
+    if len(rename) > 0:
+        rename_to = rename
+    else:
+        # a little trick to rename tool directories so they don't contain version number
+        rename_to = re.match(r'^([a-z][^\-]*\-*)+', dirname).group(0).strip('-')
+
     if rename_to != dirname:
         print('Renaming {0} to {1}'.format(dirname, rename_to))
         if os.path.isdir(rename_to):
@@ -81,13 +85,19 @@ def get_tool(tool):
     if local_hash != real_hash:
         print('Hash mismatch for {0}, delete the file and try again'.format(local_path))
         raise RuntimeError()
-    unpack(local_path, '.')
+    print('name='+tool['archiveFileName'])
+    if 'rename' in tool:
+        unpack(local_path, '.', tool['rename'])
+    else:
+        unpack(local_path, '.')
 
 def load_tools_list(filename, platform):
     tools_info = json.load(open(filename))['packages'][0]['tools']
     tools_to_download = []
     for t in tools_info:
-        tool_platform = [p for p in t['systems'] if p['host'] == platform]
+        for p in t['systems']:
+            print('host=' + p['host'])
+        tool_platform = [p for p in t['systems'] if p['host'] == platform or p['host'] == "any" ]
         if len(tool_platform) == 0:
             continue
         tools_to_download.append(tool_platform[0])
