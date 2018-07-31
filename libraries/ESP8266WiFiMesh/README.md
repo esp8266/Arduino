@@ -37,12 +37,13 @@ For more details, see the included example. The main functions to modify in the 
 *                    WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
 *                    make it impossible for other stations to detect the APs whose WiFi channels have changed.
 * @param server_port The server port used by the AP of the ESP8266WiFiMesh instance. If multiple APs exist on a single ESP8266, each requires a separate server port. 
-*              If two AP:s on the same ESP8266 are using the same server port, you must call deactivateAP on the active AP before calling activateAP on the inactive AP.
+*                    If two AP:s on the same ESP8266 are using the same server port, they will not be able to have both server instances active at the same time.
+*                    This is managed automatically by the activateAP method.
 * 
 */
-ESP8266WiFiMesh(std::function<String(String, ESP8266WiFiMesh *)> requestHandler, std::function<transmission_status_t(String, ESP8266WiFiMesh *)> responseHandler, 
-                std::function<void(int, ESP8266WiFiMesh *)> networkFilter, String mesh_password, String mesh_name = "Mesh_Node", String node_id = "", 
-                bool verbose_mode = false, uint8 mesh_wifi_channel = 1, int server_port = 4011);
+ESP8266WiFiMesh(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, 
+                const String &mesh_password, const String &mesh_name = "MeshNode_", const String &node_id = WIFI_MESH_EMPTY_STRING, bool verbose_mode = false, 
+                uint8 mesh_wifi_channel = 1, int server_port = 4011);
 ```
 
 ### Note
