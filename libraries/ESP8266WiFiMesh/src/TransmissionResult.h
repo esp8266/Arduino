@@ -40,18 +40,18 @@ class TransmissionResult : public NetworkInfo {
 
 public:
 
-  transmission_status_t transmission_status;
+  transmission_status_t transmissionStatus;
 
   /**
-   * @param autofill Automatically fill in the rest of the network info using _network_index and the WiFi scan results.
+   * @param autofill Automatically fill in the rest of the network info using newNetworkIndex and the WiFi scan results.
    */
-  TransmissionResult(int new_network_index, transmission_status_t new_transmission_status, bool autofill = true);
+  TransmissionResult(int newNetworkIndex, transmission_status_t newTransmissionStatus, bool autofill = true);
 
-  TransmissionResult(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], transmission_status_t new_transmission_status);
+  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], transmission_status_t newTransmissionStatus);
 
-  TransmissionResult(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], int new_network_index, transmission_status_t new_transmission_status);
+  TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], int newNetworkIndex, transmission_status_t newTransmissionStatus);
 
-  TransmissionResult(const NetworkInfo& origin, transmission_status_t new_transmission_status);
+  TransmissionResult(const NetworkInfo& origin, transmission_status_t newTransmissionStatus);
 };
 
 #endif

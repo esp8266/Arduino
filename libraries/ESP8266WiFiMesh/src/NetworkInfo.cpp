@@ -25,53 +25,53 @@
 
 #include "NetworkInfo.h"
 
-void NetworkInfo::copyBSSID(uint8_t new_bssid[6])
+void NetworkInfo::copyBSSID(uint8_t newBSSID[6])
 {
-  if(new_bssid != NULL)
+  if(newBSSID != NULL)
   {
-    if(bssid == NULL)
+    if(BSSID == NULL)
     {
-      bssid = _bssid_array;
+      BSSID = _bssidArray;
     }
     
     for(int i = 0; i < 6; i++)
     {
-      bssid[i] = new_bssid[i];
+      BSSID[i] = newBSSID[i];
     }
   }
   else
   {
-    bssid = NULL;
+    BSSID = NULL;
   }
 }
 
-NetworkInfo::NetworkInfo(int new_network_index, bool autofill) : network_index(new_network_index)
+NetworkInfo::NetworkInfo(int newNetworkIndex, bool autofill) : networkIndex(newNetworkIndex)
 { 
   if(autofill)
   {
-    ssid = WiFi.SSID(new_network_index);
-    wifi_channel = WiFi.channel(new_network_index);
-    copyBSSID(WiFi.BSSID(new_network_index)); 
+    SSID = WiFi.SSID(newNetworkIndex);
+    wifiChannel = WiFi.channel(newNetworkIndex);
+    copyBSSID(WiFi.BSSID(newNetworkIndex)); 
   }
 }
 
-NetworkInfo::NetworkInfo(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], int new_network_index) : 
-  ssid(new_ssid), wifi_channel(new_wifi_channel), network_index(new_network_index)
+NetworkInfo::NetworkInfo(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], int newNetworkIndex) : 
+  SSID(newSSID), wifiChannel(newWiFiChannel), networkIndex(newNetworkIndex)
 {
-  copyBSSID(new_bssid);
+  copyBSSID(newBSSID);
 }
 
-NetworkInfo::NetworkInfo(const NetworkInfo &other) : ssid(other.ssid), wifi_channel(other.wifi_channel), network_index(other.network_index)
+NetworkInfo::NetworkInfo(const NetworkInfo &other) : SSID(other.SSID), wifiChannel(other.wifiChannel), networkIndex(other.networkIndex)
 {
-  copyBSSID(other.bssid);
+  copyBSSID(other.BSSID);
 }
 
 NetworkInfo & NetworkInfo::operator=(const NetworkInfo &other)
 {
-  ssid = other.ssid;
-  wifi_channel = other.wifi_channel;
-  copyBSSID(other.bssid);
-  network_index = other.network_index;
+  SSID = other.SSID;
+  wifiChannel = other.wifiChannel;
+  copyBSSID(other.BSSID);
+  networkIndex = other.networkIndex;
   return *this;
 }
 

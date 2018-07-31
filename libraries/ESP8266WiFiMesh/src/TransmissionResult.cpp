@@ -25,18 +25,18 @@
 
 #include "TransmissionResult.h"
 
-TransmissionResult::TransmissionResult(int new_network_index, transmission_status_t new_transmission_status, bool autofill) : 
-  NetworkInfo(new_network_index, autofill), transmission_status(new_transmission_status)
+TransmissionResult::TransmissionResult(int newNetworkIndex, transmission_status_t newTransmissionStatus, bool autofill) : 
+  NetworkInfo(newNetworkIndex, autofill), transmissionStatus(newTransmissionStatus)
 { }
 
-TransmissionResult::TransmissionResult(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], transmission_status_t new_transmission_status) : 
-  NetworkInfo(new_ssid, new_wifi_channel, new_bssid), transmission_status(new_transmission_status)
+TransmissionResult::TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], transmission_status_t newTransmissionStatus) : 
+  NetworkInfo(newSSID, newWiFiChannel, newBSSID), transmissionStatus(newTransmissionStatus)
 { }
 
-TransmissionResult::TransmissionResult(const String &new_ssid, int new_wifi_channel, uint8_t new_bssid[6], int new_network_index, transmission_status_t new_transmission_status) :
-  NetworkInfo(new_ssid, new_wifi_channel, new_bssid, new_network_index), transmission_status(new_transmission_status)
+TransmissionResult::TransmissionResult(const String &newSSID, int newWiFiChannel, uint8_t newBSSID[6], int newNetworkIndex, transmission_status_t newTransmissionStatus) :
+  NetworkInfo(newSSID, newWiFiChannel, newBSSID, newNetworkIndex), transmissionStatus(newTransmissionStatus)
 { }
 
-TransmissionResult::TransmissionResult(const NetworkInfo& origin, transmission_status_t new_transmission_status) : 
-  NetworkInfo(origin), transmission_status(new_transmission_status)
+TransmissionResult::TransmissionResult(const NetworkInfo& origin, transmission_status_t newTransmissionStatus) : 
+  NetworkInfo(origin), transmissionStatus(newTransmissionStatus)
 { }

@@ -34,24 +34,24 @@ class NetworkInfo {
 
 private:
 
-  uint8_t _bssid_array[6] {0};
+  uint8_t _bssidArray[6] {0};
 
 public:
 
-  String ssid = "";
-  int wifi_channel = NETWORK_INFO_DEFAULT_INT;
-  uint8_t *bssid = NULL;
-  int network_index = NETWORK_INFO_DEFAULT_INT;
+  String SSID = "";
+  int wifiChannel = NETWORK_INFO_DEFAULT_INT;
+  uint8_t *BSSID = NULL;
+  int networkIndex = NETWORK_INFO_DEFAULT_INT;
 
   /**
-   * @param autofill Automatically fill in the rest of the network info using _network_index and the WiFi scan results.
+   * @param autofill Automatically fill in the rest of the network info using newNetworkIndex and the WiFi scan results.
    */
-  NetworkInfo(int new_network_index, bool autofill = true);
+  NetworkInfo(int newNetworkIndex, bool autofill = true);
 
   /**
-   * Without giving channel and bssid, connection time is longer.
+   * Without giving channel and BSSID, connection time is longer.
    */
-  NetworkInfo(const String &new_ssid, int new_wifi_channel = NETWORK_INFO_DEFAULT_INT, uint8_t new_bssid[6] = NULL, int new_network_index = NETWORK_INFO_DEFAULT_INT);
+  NetworkInfo(const String &newSSID, int newWiFiChannel = NETWORK_INFO_DEFAULT_INT, uint8_t newBSSID[6] = NULL, int newNetworkIndex = NETWORK_INFO_DEFAULT_INT);
 
   NetworkInfo(const NetworkInfo &other);
 
@@ -60,10 +60,10 @@ public:
   // No need for explicit destructor with current class design
 
   /**
-   * Copy new_bssid into bssid. 
+   * Copy newBSSID into BSSID. 
    * Prefer this method for changing NetworkInfo BSSID, unless you actually want to change the BSSID pointer.
    */
-  void copyBSSID(uint8_t new_bssid[6]);
+  void copyBSSID(uint8_t newBSSID[6]);
 };
 
 #endif

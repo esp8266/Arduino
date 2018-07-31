@@ -36,23 +36,23 @@ const String WIFI_MESH_EMPTY_STRING = "";
 class ESP8266WiFiMesh {
 
 private:
-  String _ssid;
-  String _mesh_name;
-  String _node_id;
-  int _server_port;
-  String _mesh_password;
-  uint8 _mesh_wifi_channel;
-  bool _verbose_mode;
+  String _SSID;
+  String _meshName;
+  String _nodeID;
+  int _serverPort;
+  String _meshPassword;
+  uint8 _meshWiFiChannel;
+  bool _verboseMode;
   WiFiServer _server;
-  uint32_t _lwip_version[3];
-  static const uint32_t lwip_version_203_signature[3];
+  uint32_t _lwipVersion[3];
+  static const uint32_t lwipVersion203Signature[3];
   String _message = WIFI_MESH_EMPTY_STRING;
 
-  static String last_ssid;
-  static bool static_IP_activated;
-  static IPAddress static_IP;
+  static String lastSSID;
+  static bool staticIPActivated;
+  static IPAddress staticIP;
   static IPAddress gateway;
-  static IPAddress subnet_mask;
+  static IPAddress subnetMask;
   static ESP8266WiFiMesh *apController;
 
   typedef std::function<String(const String &, ESP8266WiFiMesh &)> requestHandlerType;
@@ -63,17 +63,17 @@ private:
   responseHandlerType _responseHandler;
   networkFilterType _networkFilter;
 
-  void updateNetworkNames(const String &new_mesh_name = WIFI_MESH_EMPTY_STRING, const String &new_node_id = WIFI_MESH_EMPTY_STRING);
-  void verboseModePrint(const String &string_to_print, bool newline = true);
-  void fullStop(WiFiClient &curr_client);
-  void initiateConnectionToAP(const String &target_ssid, int target_channel = NETWORK_INFO_DEFAULT_INT, uint8_t *target_bssid = NULL);
-  transmission_status_t connectToNode(const String &target_ssid, int target_channel = NETWORK_INFO_DEFAULT_INT, uint8_t *target_bssid = NULL);
-  transmission_status_t exchangeInfo(WiFiClient &curr_client);
-  bool waitForClientTransmission(WiFiClient &curr_client, int max_wait);
+  void updateNetworkNames(const String &newMeshName = WIFI_MESH_EMPTY_STRING, const String &newNodeID = WIFI_MESH_EMPTY_STRING);
+  void verboseModePrint(const String &stringToPrint, bool newline = true);
+  void fullStop(WiFiClient &currClient);
+  void initiateConnectionToAP(const String &targetSSID, int targetChannel = NETWORK_INFO_DEFAULT_INT, uint8_t *targetBSSID = NULL);
+  transmission_status_t connectToNode(const String &targetSSID, int targetChannel = NETWORK_INFO_DEFAULT_INT, uint8_t *targetBSSID = NULL);
+  transmission_status_t exchangeInfo(WiFiClient &currClient);
+  bool waitForClientTransmission(WiFiClient &currClient, int maxWait);
   transmission_status_t attemptDataTransfer();
   transmission_status_t attemptDataTransferKernel();
   void storeLwipVersion();
-  bool atLeastLwipVersion(const uint32_t min_lwip_version[3]);
+  bool atLeastLwipVersion(const uint32_t minLwipVersion[3]);
   
   
   
@@ -82,16 +82,16 @@ private:
   
   typedef std::function<String(String)> compatibilityLayerHandlerType;
   
-  String _ssid_prefix;
-  uint32_t _chip_id;
+  String _ssidPrefix;
+  uint32_t _chipID;
   
   compatibilityLayerHandlerType _handler = NULL;
   
   WiFiClient  _client;
   
-  void connectToNode(const String &target_ssid, const char *message);
-  bool exchangeInfo(const char *message, WiFiClient &curr_client);
-  bool waitForClient(WiFiClient &curr_client, int max_wait);
+  void connectToNode(const String &targetSSID, const char *message);
+  bool exchangeInfo(const char *message, WiFiClient &currClient);
+  bool waitForClient(WiFiClient &currClient, int maxWait);
   void attemptScanKernel(const char *message);
   
   ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
@@ -105,12 +105,12 @@ public:
   /**
    * WiFiMesh Constructor method. Creates a WiFi Mesh Node, ready to be initialised.
    *
-   * @chip_id A unique identifier number for the node.
+   * @chipID A unique identifier number for the node.
    * @handler The callback handler for dealing with received messages. Takes a string as an argument which
    *          is the string received from another node and returns the string to send back.
    * 
    */
-  ESP8266WiFiMesh(uint32_t chip_id, compatibilityLayerHandlerType handler);
+  ESP8266WiFiMesh(uint32_t chipID, compatibilityLayerHandlerType handler);
 
   /**
    * Scan for other nodes, and exchange the chosen message with any that are found.
@@ -136,40 +136,40 @@ public:
    * @param responseHandler The callback handler for dealing with received responses. Takes a string as an argument which
    *          is the response string received from another node. Returns a transmission status code as a transmission_status_t.
    * @param networkFilter The callback handler for deciding which WiFi networks to connect to.
-   * @param mesh_password The WiFi password for the mesh network.
-   * @param mesh_name The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example network filter function.
-   * @param node_id The id for this mesh node. Used as suffix for the node SSID. If set to "", the id will default to ESP.getChipId().
-   * @param verbose_mode Determines if we should print the events occurring in the library to Serial. Off by default.
-   * @param mesh_wifi_channel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
+   * @param meshPassword The WiFi password for the mesh network.
+   * @param meshName The name of the mesh network. Used as prefix for the node SSID and to find other network nodes in the example network filter function.
+   * @param nodeID The id for this mesh node. Used as suffix for the node SSID. If set to "", the id will default to ESP.getChipId().
+   * @param verboseMode Determines if we should print the events occurring in the library to Serial. Off by default.
+   * @param meshWiFiChannel The WiFi channel used by the mesh network. Valid values are integers from 1 to 13. Defaults to 1.
    *                    WARNING: The ESP8266 has only one WiFi channel, and the the station/client mode is always prioritized for channel selection.
    *                    This can cause problems if several ESP8266WiFiMesh instances exist on the same ESP8266 and use different WiFi channels. 
    *                    In such a case, whenever the station of one ESP8266WiFiMesh instance connects to an AP, it will silently force the 
    *                    WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
    *                    make it impossible for other stations to detect the APs whose WiFi channels have changed.
-   * @param server_port The server port used by the AP of the ESP8266WiFiMesh instance. If multiple APs exist on a single ESP8266, each requires a separate server port. 
+   * @param serverPort The server port used by the AP of the ESP8266WiFiMesh instance. If multiple APs exist on a single ESP8266, each requires a separate server port. 
    *                    If two AP:s on the same ESP8266 are using the same server port, they will not be able to have both server instances active at the same time.                  
    *                    This is managed automatically by the activateAP method.
    * 
    */
   ESP8266WiFiMesh(requestHandlerType requestHandler, responseHandlerType responseHandler, networkFilterType networkFilter, 
-                  const String &mesh_password, const String &mesh_name = "MeshNode_", const String &node_id = WIFI_MESH_EMPTY_STRING, bool verbose_mode = false, 
-                  uint8 mesh_wifi_channel = 1, int server_port = 4011);
+                  const String &meshPassword, const String &meshName = "MeshNode_", const String &nodeID = WIFI_MESH_EMPTY_STRING, bool verboseMode = false, 
+                  uint8 meshWiFiChannel = 1, int serverPort = 4011);
   
   /** 
-  * A vector that contains the WiFi-scan network indicies to connect to. 
-  * The connection_queue vector is cleared before each new scan and filled via the networkFilter callback function once the scan completes.
-  * WiFi connections will start with connection_queue[0] and then incrementally proceed to higher vector positions. 
+  * A vector that contains the NetworkInfo for each WiFi network to connect to. 
+  * The connectionQueue vector is cleared before each new scan and filled via the networkFilter callback function once the scan completes.
+  * WiFi connections will start with connectionQueue[0] and then incrementally proceed to higher vector positions. 
   * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
   */
-  static std::vector<NetworkInfo> connection_queue;
+  static std::vector<NetworkInfo> connectionQueue;
 
   /** 
   * A vector with the TransmissionResult for each AP to which a transmission was attempted during the latest attemptTransmission call.
-  * The latest_transmission_outcomes vector is cleared before each new transmission attempt.
+  * The latestTransmissionOutcomes vector is cleared before each new transmission attempt.
   * Connection attempts are indexed in the same order they were attempted.
   * Note that old network indicies often are invalidated whenever a new WiFi network scan occurs.
   */
-  static std::vector<TransmissionResult> latest_transmission_outcomes;
+  static std::vector<TransmissionResult> latestTransmissionOutcomes;
 
   /**
    * Initialises the node.
@@ -177,7 +177,8 @@ public:
   void begin();
 
   /**
-   * Each AP requires a separate server port. If two AP:s are using the same server port, you must call deactivateAP on the active AP before calling activateAP on the inactive AP.
+   * Each AP requires a separate server port. If two AP:s are using the same server port, they will not be able to have both server instances active at the same time.
+   * This is managed automatically by the activateAP method.
    */
   void activateAP();
   void deactivateAP();
@@ -213,10 +214,10 @@ public:
    * WiFi channel of any active AP on the ESP8266 to match that of the station. This will cause disconnects and possibly 
    * make it impossible for other stations to detect the APs whose WiFi channels have changed.
    * 
-   * @param new_wifi_channel The WiFi channel to change to. Valid values are integers from 1 to 13.
+   * @param newWiFiChannel The WiFi channel to change to. Valid values are integers from 1 to 13.
    *                          
    */
-  void setWiFiChannel(uint8 new_wifi_channel);
+  void setWiFiChannel(uint8 newWiFiChannel);
 
   String getMeshName();
 
@@ -224,9 +225,9 @@ public:
    * Change the mesh name used by this ESP8266WiFiMesh instance. 
    * Will also change the AP mesh name (SSID prefix) if this ESP8266WiFiMesh instance is the current AP controller.
    *
-   * @param new_mesh_name The mesh name to change to.                        
+   * @param newMeshName The mesh name to change to.                        
    */
-  void setMeshName(const String &new_mesh_name);
+  void setMeshName(const String &newMeshName);
   
   String getNodeID();
   
@@ -234,42 +235,42 @@ public:
    * Change the node id used by this ESP8266WiFiMesh instance. 
    * Will also change the AP node id (SSID suffix) if this ESP8266WiFiMesh instance is the current AP controller.
    *
-   * @param new_node_id The node id to change to.                        
+   * @param newNodeID The node id to change to.                        
    */
-  void setNodeID(const String &new_node_id);
+  void setNodeID(const String &newNodeID);
   
   /**
    * Change the SSID (mesh name + node id) used by this ESP8266WiFiMesh instance. 
    * Will also change the AP SSID if this ESP8266WiFiMesh instance is the current AP controller.
    *
-   * @param new_mesh_name The mesh name to change to. Will be the SSID prefix.                    
-   * @param new_node_id The node id to change to. Will be the SSID suffix.
+   * @param newMeshName The mesh name to change to. Will be the SSID prefix.                    
+   * @param newNodeID The node id to change to. Will be the SSID suffix.
    */  
-  void setSSID(const String &new_mesh_name, const String &new_node_id);
+  void setSSID(const String &newMeshName, const String &newNodeID);
 
   String getMessage();
 
   /**
    * Set the message that will be sent to other nodes when calling attemptTransmission.
    * 
-   * @param new_message The message to send.
+   * @param newMessage The message to send.
    */
-  void setMessage(const String &new_message);
+  void setMessage(const String &newMessage);
 
   /**
-   * If AP connection already exists, send message only to this AP.
-   * Otherwise, scan for other networks, send the scan result to networkFilter and then transmit the message to the networks found in connection_queue.
+   * If AP connection already exists, and the initialDisconnect argument is set to false, send message only to the already connected AP.
+   * Otherwise, scan for other networks, send the scan result to networkFilter and then transmit the message to the networks found in connectionQueue.
    *
    * @param message The message to send to other nodes. It will be stored in the class instance until replaced via attemptTransmission or setMessage.
-   * @param concluding_disconnect Disconnect from AP once transmission is complete.
-   * @param initial_disconnect Disconnect from any currently connected AP before attempting transmission.
-   * @param no_scan Do not scan for new networks and do not call networkFilter function. Will only use the data already in connection_queue for the transmission.
-   * @param scan_all_wifi_channels Scan all WiFi channels during a WiFi scan, instead of just the channel the ESP8266WiFiMesh instance is using.
+   * @param concludingDisconnect Disconnect from AP once transmission is complete.
+   * @param initialDisconnect Disconnect from any currently connected AP before attempting transmission.
+   * @param noScan Do not scan for new networks and do not call networkFilter function. Will only use the data already in connectionQueue for the transmission.
+   * @param scanAllWiFiChannels Scan all WiFi channels during a WiFi scan, instead of just the channel the ESP8266WiFiMesh instance is using.
    *                               Scanning all WiFi channels takes about 2100 ms, compared to just 60 ms if only channel 1 (standard) is scanned.
    *                               Note that if the ESP8266 has an active AP, that AP will switch WiFi channel to match that of any other AP the ESP8266 connects to.
    *                               This can make it impossible for other nodes to detect the AP if they are scanning the wrong WiFi channel.
    */
-  void attemptTransmission(const String &message, bool concluding_disconnect = true, bool initial_disconnect = false, bool no_scan = false, bool scan_all_wifi_channels = false);
+  void attemptTransmission(const String &message, bool concludingDisconnect = true, bool initialDisconnect = false, bool noScan = false, bool scanAllWiFiChannels = false);
 
   /**
    * If any clients are connected, accept their requests and call the requestHandler function for each one.
@@ -280,7 +281,7 @@ public:
    * Set a static IP address for the ESP8266 and activate use of static IP.
    * The static IP needs to be at the same subnet as the server's gateway.
    */
-  void setStaticIP(const IPAddress &new_IP);
+  void setStaticIP(const IPAddress &newIP);
   
   IPAddress getStaticIP();
   void disableStaticIP();
@@ -288,7 +289,7 @@ public:
   /**
    * An empty IPAddress. Used as default when no IP is set.
    */
-  static const IPAddress empty_IP;
+  static const IPAddress emptyIP;
 
   static String Uint64ToString(uint64_t number, byte base = 16);
   static uint64_t StringToUint64(const String &string, byte base = 16);

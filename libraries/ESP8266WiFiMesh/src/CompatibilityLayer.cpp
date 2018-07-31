@@ -50,12 +50,12 @@
 #define SERVER_PORT				4011
 
 // DEPRECATED!
-ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chip_id, ESP8266WiFiMesh::compatibilityLayerHandlerType handler)
+ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chipID, ESP8266WiFiMesh::compatibilityLayerHandlerType handler)
 : _server(SERVER_PORT)
 {
-	_chip_id = chip_id;
-	_ssid = String( String( SSID_PREFIX ) + String( _chip_id ) );
-	_ssid_prefix = String( SSID_PREFIX );
+	_chipID = chipID;
+	_SSID = String( String( SSID_PREFIX ) + String( _chipID ) );
+	_ssidPrefix = String( SSID_PREFIX );
 	_handler = handler;
 }
 
@@ -66,14 +66,14 @@ ESP8266WiFiMesh::ESP8266WiFiMesh(uint32_t chip_id, ESP8266WiFiMesh::compatibilit
  * 
  */
 // DEPRECATED!
-bool ESP8266WiFiMesh::waitForClient(WiFiClient &curr_client, int max_wait)
+bool ESP8266WiFiMesh::waitForClient(WiFiClient &currClient, int maxWait)
 {
-	int wait = max_wait;
-	while(curr_client.connected() && !curr_client.available() && wait--)
+	int wait = maxWait;
+	while(currClient.connected() && !currClient.available() && wait--)
 		delay(3);
 
 	/* Return false if the client isn't ready to communicate */
-	if (WiFi.status() == WL_DISCONNECTED || !curr_client.connected())
+	if (WiFi.status() == WL_DISCONNECTED || !currClient.connected())
 		return false;
 	
 	return true;
@@ -83,21 +83,20 @@ bool ESP8266WiFiMesh::waitForClient(WiFiClient &curr_client, int max_wait)
  * Send the supplied message then read back the other node's response
  * and pass that to the user-supplied handler.
  *
- * @target_ssid The name of the AP the other node has set up.
  * @message The string to send to the node.
  * @returns: True if the exchange was a succes, false otherwise.
  * 
  */
 // DEPRECATED!
-bool ESP8266WiFiMesh::exchangeInfo(const char *message, WiFiClient &curr_client)
+bool ESP8266WiFiMesh::exchangeInfo(const char *message, WiFiClient &currClient)
 {
-	curr_client.println( message );
+	currClient.println( message );
 
-	if (!waitForClient(curr_client, 1000))
+	if (!waitForClient(currClient, 1000))
 		return false;
 
-	String response = curr_client.readStringUntil('\r');
-	curr_client.readStringUntil('\n');
+	String response = currClient.readStringUntil('\r');
+	currClient.readStringUntil('\n');
 
 	if (response.length() <= 2) 
 		return false;
@@ -110,15 +109,15 @@ bool ESP8266WiFiMesh::exchangeInfo(const char *message, WiFiClient &curr_client)
 /**
  * Connect to the AP at ssid, send them a message then disconnect.
  *
- * @target_ssid The name of the AP the other node has set up.
+ * @targetSSID The name of the AP the other node has set up.
  * @message The string to send to the node.
  * 
  */
 // DEPRECATED!
-void ESP8266WiFiMesh::connectToNode(const String &target_ssid, const char *message)
+void ESP8266WiFiMesh::connectToNode(const String &targetSSID, const char *message)
 {
-	WiFiClient curr_client;
-	WiFi.begin( target_ssid.c_str() );
+	WiFiClient currClient;
+	WiFi.begin( targetSSID.c_str() );
 
 	int wait = 1500;
 	while((WiFi.status() == WL_DISCONNECTED) && wait--)
@@ -129,13 +128,13 @@ void ESP8266WiFiMesh::connectToNode(const String &target_ssid, const char *messa
 		return;
 
 	/* Connect to the node's server */
-	if (!curr_client.connect(SERVER_IP_ADDR, SERVER_PORT)) 
+	if (!currClient.connect(SERVER_IP_ADDR, SERVER_PORT)) 
 		return;
 
-	if (!exchangeInfo(message, curr_client))
+	if (!exchangeInfo(message, currClient))
 		return;
 
-	curr_client.stop();
+	currClient.stop();
 	WiFi.disconnect();
 }
 
@@ -146,16 +145,16 @@ void ESP8266WiFiMesh::attemptScanKernel(const char *message)
 	int n = WiFi.scanNetworks();
 
 	for (int i = 0; i < n; ++i) {
-		String current_ssid = WiFi.SSID(i);
-		int index = current_ssid.indexOf( _ssid_prefix );
-		uint32_t target_chip_id = (current_ssid.substring(index + _ssid_prefix.length())).toInt();
+		String currentSSID = WiFi.SSID(i);
+		int index = currentSSID.indexOf( _ssidPrefix );
+		uint32_t targetChipID = (currentSSID.substring(index + _ssidPrefix.length())).toInt();
 
-		/* Connect to any _suitable_ APs which contain _ssid_prefix */
-		if (index >= 0 && (target_chip_id < _chip_id)) {
+		/* Connect to any _suitable_ APs which contain _ssidPrefix */
+		if (index >= 0 && (targetChipID < _chipID)) {
 
 			WiFi.mode(WIFI_STA);
 			delay(100);
-			connectToNode(current_ssid, message);
+			connectToNode(currentSSID, message);
 			WiFi.mode(WIFI_AP_STA);
 			delay(100);
 		}

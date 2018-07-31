@@ -21,8 +21,8 @@ transmission_status_t	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-connection_queue	KEYWORD2
-latest_transmission_outcomes	KEYWORD2
+connectionQueue	KEYWORD2
+latestTransmissionOutcomes	KEYWORD2
 begin	KEYWORD2
 activateAP	KEYWORD2
 deactivateAP	KEYWORD2
@@ -52,6 +52,6 @@ setNetworkFilter	KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
-empty_IP	LITERAL1
+emptyIP	LITERAL1
 NETWORK_INFO_DEFAULT_INT	LITERAL1
 WIFI_MESH_EMPTY_STRING	LITERAL1

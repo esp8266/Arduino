@@ -26,19 +26,19 @@
 #include "ESP8266WiFiMesh.h"
 #include <assert.h>
 
-void ESP8266WiFiMesh::verboseModePrint(const String &string_to_print, bool newline)
+void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline)
 {
-  if(_verbose_mode)
+  if(_verboseMode)
   {
     if(newline)
-      Serial.println(string_to_print);
+      Serial.println(stringToPrint);
     else
-      Serial.print(string_to_print);
+      Serial.print(stringToPrint);
   }
 }
 
 /**
- * Note that using a base higher than 16 increases likelihood of randomly generating ssid strings containing controversial words. 
+ * Note that using a base higher than 16 increases likelihood of randomly generating SSID strings containing controversial words. 
  * 
  * @param number The number to convert to a string with radix "base".
  * @param base The radix to convert "number" into. Must be between 2 and 36.
@@ -60,7 +60,7 @@ String ESP8266WiFiMesh::Uint64ToString(uint64_t number, byte base)
 }
 
 /**
- * Note that using a base higher than 16 increases likelihood of randomly generating ssid strings containing controversial words. 
+ * Note that using a base higher than 16 increases likelihood of randomly generating SSID strings containing controversial words. 
  * 
  * @param string The string to convert to uint64_t. String must use radix "base".
  * @param base The radix of "string". Must be between 2 and 36.
@@ -72,54 +72,54 @@ uint64_t ESP8266WiFiMesh::StringToUint64(const String &string, byte base)
   
   uint64_t result = 0;
 
-  char current_character[1];
+  char currentCharacter[1];
   for(uint32_t i = 0; i < string.length(); i++)
   {
     result *= base;
-    current_character[0] = string.charAt(i);
-    result += strtoul(current_character, NULL, base);
+    currentCharacter[0] = string.charAt(i);
+    result += strtoul(currentCharacter, NULL, base);
   }
   
   return result;
 }
 
 /**
- * Calculate the current lwIP version number and store the numbers in the _lwip_version array.
+ * Calculate the current lwIP version number and store the numbers in the _lwipVersion array.
  * lwIP version can be changed in the "Tools" menu of Arduino IDE.
  */
 void ESP8266WiFiMesh::storeLwipVersion()
 {
   // ESP.getFullVersion() looks something like: 
   // SDK:2.2.1(cfd48f3)/Core:win-2.5.0-dev/lwIP:2.0.3(STABLE-2_0_3_RELEASE/glue:arduino-2.4.1-10-g0c0d8c2)/BearSSL:94e9704
-  String full_version = ESP.getFullVersion();
+  String fullVersion = ESP.getFullVersion();
 
-  int i = full_version.indexOf("lwIP:") + 5;
-  char current_char = full_version.charAt(i);
+  int i = fullVersion.indexOf("lwIP:") + 5;
+  char currentChar = fullVersion.charAt(i);
 
-  for(int version_part = 0; version_part < 3; version_part++)
+  for(int versionPart = 0; versionPart < 3; versionPart++)
   {
-    while(!isdigit(current_char))
+    while(!isdigit(currentChar))
     {
-      current_char = full_version.charAt(++i);
+      currentChar = fullVersion.charAt(++i);
     }
-    while(isdigit(current_char))
+    while(isdigit(currentChar))
     {
-      _lwip_version[version_part] = 10 * _lwip_version[version_part] + (current_char - '0'); // Left shift and add digit value, in base 10.
-      current_char = full_version.charAt(++i);
+      _lwipVersion[versionPart] = 10 * _lwipVersion[versionPart] + (currentChar - '0'); // Left shift and add digit value, in base 10.
+      currentChar = fullVersion.charAt(++i);
     }
   }
 }
 
 /**
- * Check if the code is running on a version of lwIP that is at least min_lwip_version.
+ * Check if the code is running on a version of lwIP that is at least minLwipVersion.
  */
-bool ESP8266WiFiMesh::atLeastLwipVersion(const uint32_t min_lwip_version[3])
+bool ESP8266WiFiMesh::atLeastLwipVersion(const uint32_t minLwipVersion[3])
 { 
-  for(int version_part = 0; version_part < 3; version_part++)
+  for(int versionPart = 0; versionPart < 3; versionPart++)
   {
-    if(_lwip_version[version_part] > min_lwip_version[version_part])
+    if(_lwipVersion[versionPart] > minLwipVersion[versionPart])
       return true;
-    else if(_lwip_version[version_part] < min_lwip_version[version_part])
+    else if(_lwipVersion[versionPart] < minLwipVersion[versionPart])
       return false;
   }
 
