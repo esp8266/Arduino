@@ -85,7 +85,6 @@ def get_tool(tool):
     if local_hash != real_hash:
         print('Hash mismatch for {0}, delete the file and try again'.format(local_path))
         raise RuntimeError()
-    print('name='+tool['archiveFileName'])
     if 'rename' in tool:
         unpack(local_path, '.', tool['rename'])
     else:
@@ -95,8 +94,6 @@ def load_tools_list(filename, platform):
     tools_info = json.load(open(filename))['packages'][0]['tools']
     tools_to_download = []
     for t in tools_info:
-        for p in t['systems']:
-            print('host=' + p['host'])
         tool_platform = [p for p in t['systems'] if p['host'] == platform or p['host'] == "any" ]
         if len(tool_platform) == 0:
             continue

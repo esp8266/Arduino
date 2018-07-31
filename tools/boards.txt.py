@@ -807,202 +807,6 @@ boards = collections.OrderedDict([
 
 ################################################################
 
-macros = {
-    'defaults': collections.OrderedDict([
-        ( '.upload.tool', 'esptool' ),
-        ( '.upload.maximum_data_size', '81920' ),
-        ( '.upload.wait_for_upload_port', 'true' ),
-        ( '.upload.erase_cmd', ''),
-        ( '.serial.disableDTR', 'true' ),
-        ( '.serial.disableRTS', 'true' ),
-        ( '.build.mcu', 'esp8266' ),
-        ( '.build.core', 'esp8266' ),
-        ( '.build.variant', 'generic' ),
-        ( '.build.spiffs_pagesize', '256' ),
-        ( '.build.debug_port', '' ),
-        ( '.build.debug_level', '' ),
-        ]),
-
-    #######################
-
-    'cpufreq_menu': collections.OrderedDict([
-        ( '.menu.CpuFrequency.80', '80 MHz' ),
-        ( '.menu.CpuFrequency.80.build.f_cpu', '80000000L' ),
-        ( '.menu.CpuFrequency.160', '160 MHz' ),
-        ( '.menu.CpuFrequency.160.build.f_cpu', '160000000L' ),
-        ]),
-
-    'vtable_menu': collections.OrderedDict([
-        ( '.menu.VTable.flash', 'Flash'),
-        ( '.menu.VTable.flash.build.vtable_flags', '-DVTABLES_IN_FLASH'),
-        ( '.menu.VTable.heap', 'Heap'),
-        ( '.menu.VTable.heap.build.vtable_flags', '-DVTABLES_IN_DRAM'),
-        ( '.menu.VTable.iram', 'IRAM'),
-        ( '.menu.VTable.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
-        ]),
-
-    'crystalfreq_menu': collections.OrderedDict([
-        ( '.menu.CrystalFreq.26', '26 MHz' ),
-        ( '.menu.CrystalFreq.40', '40 MHz' ),
-        ( '.menu.CrystalFreq.40.build.extra_flags', '-DF_CRYSTAL=40000000 -DESP8266' ),
-        ]),
-
-    'flashfreq_menu': collections.OrderedDict([
-        ( '.menu.FlashFreq.40', '40MHz' ),
-        ( '.menu.FlashFreq.40.build.flash_freq', '40' ),
-        ( '.menu.FlashFreq.80', '80MHz' ),
-        ( '.menu.FlashFreq.80.build.flash_freq', '80' ),
-        ]),
-
-    'flashfreq_40': collections.OrderedDict([
-        ( '.build.flash_freq', '40' ),
-        ]),
-
-    'flashfreq_80': collections.OrderedDict([
-        ( '.build.flash_freq', '80' ),
-        ]),
-
-    ####################### menu.resetmethod
-
-    'resetmethod_menu': collections.OrderedDict([
-        ( '.menu.ResetMethod.ck', 'ck' ),
-        ( '.menu.ResetMethod.ck.upload.resetmethod', 'ck' ),
-        ( '.menu.ResetMethod.nodemcu', 'nodemcu' ),
-        ( '.menu.ResetMethod.nodemcu.upload.resetmethod', 'nodemcu' ),
-        ]),
-
-    'resetmethod_menu_extra': collections.OrderedDict([
-        ( '.menu.ResetMethod.none', 'none' ),
-        ( '.menu.ResetMethod.none.upload.resetmethod', 'none' ),
-        ( '.menu.ResetMethod.dtrset', 'dtrset' ),
-        ( '.menu.ResetMethod.dtrset.upload.resetmethod', 'dtrset' ),
-        ]),
-
-    ####################### upload.resetmethod
-
-    'resetmethod_ck': collections.OrderedDict([
-        ( '.upload.resetmethod', 'ck' ),
-        ]),
-
-    'resetmethod_nodemcu': collections.OrderedDict([
-        ( '.upload.resetmethod', 'nodemcu' ),
-        ]),
-    
-    'resetmethod_none': collections.OrderedDict([
-        ( '.upload.resetmethod', 'none' ),
-        ]),
-
-    'resetmethod_dtrset': collections.OrderedDict([
-        ( '.upload.resetmethod', 'dtrset' ),
-        ]),
-    
-    ####################### menu.FlashMode
-
-    'flashmode_menu': collections.OrderedDict([
-        ( '.menu.FlashMode.qio', 'QIO' ),
-        ( '.menu.FlashMode.qio.build.flash_mode', 'qio' ),
-        ( '.menu.FlashMode.qout', 'QOUT' ),
-        ( '.menu.FlashMode.qout.build.flash_mode', 'qout' ),
-        ( '.menu.FlashMode.dio', 'DIO' ),
-        ( '.menu.FlashMode.dio.build.flash_mode', 'dio' ),
-        ( '.menu.FlashMode.dout', 'DOUT' ),
-        ( '.menu.FlashMode.dout.build.flash_mode', 'dout' ),
-        ]),
-
-    ####################### default flash_mode
-
-    'flashmode_dio': collections.OrderedDict([
-        ( '.build.flash_mode', 'dio' ),
-        ]),
-
-    'flashmode_qio': collections.OrderedDict([
-        ( '.build.flash_mode', 'qio' ),
-        ]),
-
-    'flashmode_dout': collections.OrderedDict([
-        ( '.build.flash_mode', 'dout' ),
-        ]),
-
-    'flashmode_qout': collections.OrderedDict([
-        ( '.build.flash_mode', 'qout' ),
-        ]),
-
-    ####################### lwip
-
-    'lwip2': collections.OrderedDict([
-        ( '.menu.LwIPVariant.v2mss536', 'v2 Lower Memory' ),
-        ( '.menu.LwIPVariant.v2mss536.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.LwIPVariant.v2mss536.build.lwip_lib', '-llwip2' ),
-        ( '.menu.LwIPVariant.v2mss536.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
-        ( '.menu.LwIPVariant.v2mss1460', 'v2 Higher Bandwidth' ),
-        ( '.menu.LwIPVariant.v2mss1460.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.LwIPVariant.v2mss1460.build.lwip_lib', '-llwip2_1460' ),
-        ( '.menu.LwIPVariant.v2mss1460.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
-        ]),
-
-    'lwip': collections.OrderedDict([
-        ( '.menu.LwIPVariant.Prebuilt', 'v1.4 Higher Bandwidth' ),
-        ( '.menu.LwIPVariant.Prebuilt.build.lwip_lib', '-llwip_gcc' ),
-        ( '.menu.LwIPVariant.Prebuilt.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        #( '.menu.LwIPVariant.Espressif', 'v1.4 Espressif (xcc)' ),
-        #( '.menu.LwIPVariant.Espressif.build.lwip_lib', '-llwip' ),
-        #( '.menu.LwIPVariant.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
-        ( '.menu.LwIPVariant.OpenSource', 'v1.4 Compile from source' ),
-        ( '.menu.LwIPVariant.OpenSource.build.lwip_lib', '-llwip_src' ),
-        ( '.menu.LwIPVariant.OpenSource.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        ( '.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
-        ]),
-
-    ####################### serial
-
-    's9': collections.OrderedDict([
-        ( '.menu.UploadSpeed.9600', '9600' ),
-        ( '.menu.UploadSpeed.9600.upload.speed', '9600' ),
-        ]),
-    's57': collections.OrderedDict([
-        ( '.menu.UploadSpeed.57600', '57600' ),
-        ( '.menu.UploadSpeed.57600.upload.speed', '57600' ),
-        ]),
-    's115': collections.OrderedDict([
-        ( '.menu.UploadSpeed.115200', '115200' ),
-        ( '.menu.UploadSpeed.115200.upload.speed', '115200' ),
-        ]),
-    's256': collections.OrderedDict([
-        ( '.menu.UploadSpeed.256000.windows', '256000' ),
-        ( '.menu.UploadSpeed.256000.upload.speed', '256000' ),
-        ]),
-    's230': collections.OrderedDict([
-        ( '.menu.UploadSpeed.230400.linux', '230400' ),
-        ( '.menu.UploadSpeed.230400.macosx', '230400' ),
-        ( '.menu.UploadSpeed.230400.upload.speed', '230400' ),
-        ]),
-    's460': collections.OrderedDict([
-        ( '.menu.UploadSpeed.460800.linux', '460800' ),
-        ( '.menu.UploadSpeed.460800.macosx', '460800' ),
-        ( '.menu.UploadSpeed.460800.upload.speed', '460800' ),
-        ]),
-    's512': collections.OrderedDict([
-        ( '.menu.UploadSpeed.512000.windows', '512000' ),
-        ( '.menu.UploadSpeed.512000.upload.speed', '512000' ),
-        ]),
-    's921': collections.OrderedDict([
-        ( '.menu.UploadSpeed.921600', '921600' ),
-        ( '.menu.UploadSpeed.921600.upload.speed', '921600' ),
-        ]),
-
-    ####################### flash erase
-
-    'flash_erase_menu': collections.OrderedDict([
-        ( '.menu.FlashErase.none', 'Only Sketch' ),
-        ( '.menu.FlashErase.none.upload.erase_cmd', '' ),
-        ( '.menu.FlashErase.sdk', 'Sketch + WiFi Settings' ),
-        ( '.menu.FlashErase.sdk.upload.erase_cmd', '-ca "{build.rfcal_addr}" -cz 0x4000' ),
-        ( '.menu.FlashErase.all', 'All Flash Contents' ),
-        ( '.menu.FlashErase.all.upload.erase_cmd', '-ca 0x0 -cz "{build.flash_size_bytes}"' ),
-        ]),
-
-    }
-
 ################################################################
 # defs
 
@@ -1201,6 +1005,202 @@ def led (default,max):
 
 def all_boards ():
 
+    macros = {
+        'defaults': collections.OrderedDict([
+            ( '.upload.tool', esptool ),
+            ( '.upload.maximum_data_size', '81920' ),
+            ( '.upload.wait_for_upload_port', 'true' ),
+            ( '.upload.erase_cmd', ''),
+            ( '.serial.disableDTR', 'true' ),
+            ( '.serial.disableRTS', 'true' ),
+            ( '.build.mcu', 'esp8266' ),
+            ( '.build.core', 'esp8266' ),
+            ( '.build.variant', 'generic' ),
+            ( '.build.spiffs_pagesize', '256' ),
+            ( '.build.debug_port', '' ),
+            ( '.build.debug_level', '' ),
+            ]),
+
+        #######################
+
+        'cpufreq_menu': collections.OrderedDict([
+            ( '.menu.CpuFrequency.80', '80 MHz' ),
+            ( '.menu.CpuFrequency.80.build.f_cpu', '80000000L' ),
+            ( '.menu.CpuFrequency.160', '160 MHz' ),
+            ( '.menu.CpuFrequency.160.build.f_cpu', '160000000L' ),
+            ]),
+
+        'vtable_menu': collections.OrderedDict([
+            ( '.menu.VTable.flash', 'Flash'),
+            ( '.menu.VTable.flash.build.vtable_flags', '-DVTABLES_IN_FLASH'),
+            ( '.menu.VTable.heap', 'Heap'),
+            ( '.menu.VTable.heap.build.vtable_flags', '-DVTABLES_IN_DRAM'),
+            ( '.menu.VTable.iram', 'IRAM'),
+            ( '.menu.VTable.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
+            ]),
+
+        'crystalfreq_menu': collections.OrderedDict([
+            ( '.menu.CrystalFreq.26', '26 MHz' ),
+            ( '.menu.CrystalFreq.40', '40 MHz' ),
+            ( '.menu.CrystalFreq.40.build.extra_flags', '-DF_CRYSTAL=40000000 -DESP8266' ),
+            ]),
+
+        'flashfreq_menu': collections.OrderedDict([
+            ( '.menu.FlashFreq.40', '40MHz' ),
+            ( '.menu.FlashFreq.40.build.flash_freq', '40' ),
+            ( '.menu.FlashFreq.80', '80MHz' ),
+            ( '.menu.FlashFreq.80.build.flash_freq', '80' ),
+            ]),
+
+        'flashfreq_40': collections.OrderedDict([
+            ( '.build.flash_freq', '40' ),
+            ]),
+
+        'flashfreq_80': collections.OrderedDict([
+            ( '.build.flash_freq', '80' ),
+            ]),
+
+        ####################### menu.resetmethod
+
+        'resetmethod_menu': collections.OrderedDict([
+            ( '.menu.ResetMethod.ck', 'ck' ),
+            ( '.menu.ResetMethod.ck.upload.resetmethod', 'ck' ),
+            ( '.menu.ResetMethod.nodemcu', 'nodemcu' ),
+            ( '.menu.ResetMethod.nodemcu.upload.resetmethod', 'nodemcu' ),
+            ]),
+
+        'resetmethod_menu_extra': collections.OrderedDict([
+            ( '.menu.ResetMethod.none', 'none' ),
+            ( '.menu.ResetMethod.none.upload.resetmethod', 'none' ),
+            ( '.menu.ResetMethod.dtrset', 'dtrset' ),
+            ( '.menu.ResetMethod.dtrset.upload.resetmethod', 'dtrset' ),
+            ]),
+
+        ####################### upload.resetmethod
+
+        'resetmethod_ck': collections.OrderedDict([
+            ( '.upload.resetmethod', 'ck' ),
+            ]),
+
+        'resetmethod_nodemcu': collections.OrderedDict([
+            ( '.upload.resetmethod', 'nodemcu' ),
+            ]),
+
+        'resetmethod_none': collections.OrderedDict([
+            ( '.upload.resetmethod', 'none' ),
+            ]),
+
+        'resetmethod_dtrset': collections.OrderedDict([
+            ( '.upload.resetmethod', 'dtrset' ),
+            ]),
+
+        ####################### menu.FlashMode
+
+        'flashmode_menu': collections.OrderedDict([
+            ( '.menu.FlashMode.qio', 'QIO' ),
+            ( '.menu.FlashMode.qio.build.flash_mode', 'qio' ),
+            ( '.menu.FlashMode.qout', 'QOUT' ),
+            ( '.menu.FlashMode.qout.build.flash_mode', 'qout' ),
+            ( '.menu.FlashMode.dio', 'DIO' ),
+            ( '.menu.FlashMode.dio.build.flash_mode', 'dio' ),
+            ( '.menu.FlashMode.dout', 'DOUT' ),
+            ( '.menu.FlashMode.dout.build.flash_mode', 'dout' ),
+            ]),
+
+        ####################### default flash_mode
+
+        'flashmode_dio': collections.OrderedDict([
+            ( '.build.flash_mode', 'dio' ),
+            ]),
+
+        'flashmode_qio': collections.OrderedDict([
+            ( '.build.flash_mode', 'qio' ),
+            ]),
+
+        'flashmode_dout': collections.OrderedDict([
+            ( '.build.flash_mode', 'dout' ),
+            ]),
+
+        'flashmode_qout': collections.OrderedDict([
+            ( '.build.flash_mode', 'qout' ),
+            ]),
+
+        ####################### lwip
+
+        'lwip2': collections.OrderedDict([
+            ( '.menu.LwIPVariant.v2mss536', 'v2 Lower Memory' ),
+            ( '.menu.LwIPVariant.v2mss536.build.lwip_include', 'lwip2/include' ),
+            ( '.menu.LwIPVariant.v2mss536.build.lwip_lib', '-llwip2' ),
+            ( '.menu.LwIPVariant.v2mss536.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
+            ( '.menu.LwIPVariant.v2mss1460', 'v2 Higher Bandwidth' ),
+            ( '.menu.LwIPVariant.v2mss1460.build.lwip_include', 'lwip2/include' ),
+            ( '.menu.LwIPVariant.v2mss1460.build.lwip_lib', '-llwip2_1460' ),
+            ( '.menu.LwIPVariant.v2mss1460.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
+            ]),
+
+        'lwip': collections.OrderedDict([
+            ( '.menu.LwIPVariant.Prebuilt', 'v1.4 Higher Bandwidth' ),
+            ( '.menu.LwIPVariant.Prebuilt.build.lwip_lib', '-llwip_gcc' ),
+            ( '.menu.LwIPVariant.Prebuilt.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
+            #( '.menu.LwIPVariant.Espressif', 'v1.4 Espressif (xcc)' ),
+            #( '.menu.LwIPVariant.Espressif.build.lwip_lib', '-llwip' ),
+            #( '.menu.LwIPVariant.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
+            ( '.menu.LwIPVariant.OpenSource', 'v1.4 Compile from source' ),
+            ( '.menu.LwIPVariant.OpenSource.build.lwip_lib', '-llwip_src' ),
+            ( '.menu.LwIPVariant.OpenSource.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
+            ( '.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
+            ]),
+
+        ####################### serial
+
+        's9': collections.OrderedDict([
+            ( '.menu.UploadSpeed.9600', '9600' ),
+            ( '.menu.UploadSpeed.9600.upload.speed', '9600' ),
+            ]),
+        's57': collections.OrderedDict([
+            ( '.menu.UploadSpeed.57600', '57600' ),
+            ( '.menu.UploadSpeed.57600.upload.speed', '57600' ),
+            ]),
+        's115': collections.OrderedDict([
+            ( '.menu.UploadSpeed.115200', '115200' ),
+            ( '.menu.UploadSpeed.115200.upload.speed', '115200' ),
+            ]),
+        's256': collections.OrderedDict([
+            ( '.menu.UploadSpeed.256000.windows', '256000' ),
+            ( '.menu.UploadSpeed.256000.upload.speed', '256000' ),
+            ]),
+        's230': collections.OrderedDict([
+            ( '.menu.UploadSpeed.230400.linux', '230400' ),
+            ( '.menu.UploadSpeed.230400.macosx', '230400' ),
+            ( '.menu.UploadSpeed.230400.upload.speed', '230400' ),
+            ]),
+        's460': collections.OrderedDict([
+            ( '.menu.UploadSpeed.460800.linux', '460800' ),
+            ( '.menu.UploadSpeed.460800.macosx', '460800' ),
+            ( '.menu.UploadSpeed.460800.upload.speed', '460800' ),
+            ]),
+        's512': collections.OrderedDict([
+            ( '.menu.UploadSpeed.512000.windows', '512000' ),
+            ( '.menu.UploadSpeed.512000.upload.speed', '512000' ),
+            ]),
+        's921': collections.OrderedDict([
+            ( '.menu.UploadSpeed.921600', '921600' ),
+            ( '.menu.UploadSpeed.921600.upload.speed', '921600' ),
+            ]),
+
+        ####################### flash erase
+
+        'flash_erase_menu': collections.OrderedDict([
+            ( '.menu.FlashErase.none', 'Only Sketch' ),
+            ( '.menu.FlashErase.none.upload.erase_cmd', '' ),
+            ( '.menu.FlashErase.sdk', 'Sketch + WiFi Settings' ),
+            ( '.menu.FlashErase.sdk.upload.erase_cmd', '-ca "{build.rfcal_addr}" -cz 0x4000' ),
+            ( '.menu.FlashErase.all', 'All Flash Contents' ),
+            ( '.menu.FlashErase.all.upload.erase_cmd', '-ca 0x0 -cz "{build.flash_size_bytes}"' ),
+            ]),
+
+        }
+
     if boardsgen:
 
         checkdir()
@@ -1374,6 +1374,7 @@ def usage (name,ret):
     print " --nofloat       - disable float support in printf/scanf"
     print " --noextra4kheap - disable extra 4k heap (will enable WPS)"
     print " --allowWPS      - synonym for --noextra4kheap"
+    print " --esptoolpy     - use esptool.py for flashing"
     print ""
     print " mandatory option (at least one):"
     print ""
@@ -1418,6 +1419,7 @@ led_default = 2
 led_max = 16
 nofloat = False
 noextra4kheap = False
+esptool = 'esptool'
 ldgen = False
 ldshow = False
 boardsgen = False
@@ -1433,7 +1435,7 @@ customspeeds = []
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
-          "noextra4kheap", "allowWPS",
+          "noextra4kheap", "allowWPS", "esptoolpy",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
           "allgen"] )
 except getopt.GetoptError as err:
@@ -1475,10 +1477,13 @@ for o, a in opts:
         boards[board]['serial'] = a
 
     elif o in ("--nofloat"):
-        nofloat=True
+        nofloat = True
 
     elif o in ("--noextra4kheap", "--allowWPS"):
-        noextra4kheap=True
+        noextra4kheap = True
+
+    elif o in ("--esptoolpy"):
+        esptool = 'esptoolpy'
 
     elif o in ("--ldshow"):
         ldshow = True
