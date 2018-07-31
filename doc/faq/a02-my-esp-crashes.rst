@@ -292,8 +292,8 @@ Memory, memory, memory
    case there is no access to the underlying code.
 
    Instrumenting the code with the OOM debug option and calls to ``ESP.getFreeHeap()`` will
-   help the process of finding leaks.
-
+   help the process of finding leaks. Now is time to re-read about the
+   `exception decoder <#exception-decoder>`__.
 
 
 *Some techniques for reducing memory usage*
