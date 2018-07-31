@@ -88,9 +88,9 @@ void setup() {
   Serial.println();
 
   Serial.println("Note that this library can use static IP:s for the nodes to speed up connection times.\n"
-                  "Use the setStaticIP method as shown in this example to enable this.\n"
-                  "Ensure that nodes connecting to the same AP have distinct static IP:s.\n"
-                  "Also, remember to change the default mesh network password!\n\n");
+                 "Use the setStaticIP method as shown in this example to enable this.\n"
+                 "Ensure that nodes connecting to the same AP have distinct static IP:s.\n"
+                 "Also, remember to change the default mesh network password!\n\n");
 
   Serial.println("Setting up mesh node...");
 
