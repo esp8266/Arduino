@@ -3,6 +3,14 @@
 Board generator
 ---------------
 
+The board generator is a python script originally intended to ease the
+Arduino IDE's `boards.txt` configuration file about the multitude of
+available board, especially when common data have to be updated for all of
+them.
+
+This script is also used to manage uncommon options that will not find their
+place into the IDE menu.
+
 -  `How can I run the script ? <#how-can-i-run-the-script>`__
 -  `What can I do with it ? <#what-can-i-do-with-it>`__
 -  `When do I need to update it ? <#when-do-i-need-to-mess-with-it>`__
