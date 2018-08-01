@@ -113,7 +113,7 @@ void HardwareSerial::startDetectBaudrate()
     uart_start_detect_baudrate(_uart_nr);
 }
 
-unsigned long HardwareSerial::detectBaudrate()
+unsigned long HardwareSerial::testBaudrate()
 {
     return uart_detect_baudrate(_uart_nr);
 }
@@ -123,7 +123,7 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
     time_t startMillis = millis();
     unsigned long detectedBaudrate;
     while ((time_t) millis() - startMillis < timeoutMillis) {
-        if ((detectedBaudrate = detectBaudrate())) break;
+        if ((detectedBaudrate = testBaudrate())) break;
         yield();
         delay(100);
     }    

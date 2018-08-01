@@ -186,7 +186,7 @@ public:
 
     void startDetectBaudrate();
 
-    unsigned long detectBaudrate();
+    unsigned long testBaudrate();
 
     unsigned long detectBaudrate(time_t timeoutMillis);
 
