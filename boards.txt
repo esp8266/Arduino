@@ -2633,7 +2633,7 @@ esp210.menu.UploadSpeed.921600=921600
 esp210.menu.UploadSpeed.921600.upload.speed=921600
 
 ##############################################################
-d1_mini.name=WeMos D1 R2 & mini
+d1_mini.name=LOLIN(WEMOS) D1 R2 & mini
 d1_mini.build.board=ESP8266_WEMOS_D1MINI
 d1_mini.build.variant=d1_mini
 d1_mini.upload.tool=esptool
@@ -2787,7 +2787,7 @@ d1_mini.menu.UploadSpeed.512000.windows=512000
 d1_mini.menu.UploadSpeed.512000.upload.speed=512000
 
 ##############################################################
-d1_mini_pro.name=WeMos D1 mini Pro
+d1_mini_pro.name=LOLIN(WEMOS) D1 mini Pro
 d1_mini_pro.build.board=ESP8266_WEMOS_D1MINIPRO
 d1_mini_pro.build.variant=d1_mini
 d1_mini_pro.upload.tool=esptool
@@ -2921,7 +2921,7 @@ d1_mini_pro.menu.UploadSpeed.512000.windows=512000
 d1_mini_pro.menu.UploadSpeed.512000.upload.speed=512000
 
 ##############################################################
-d1_mini_lite.name=WeMos D1 mini Lite
+d1_mini_lite.name=LOLIN(WEMOS) D1 mini Lite
 d1_mini_lite.build.board=ESP8266_WEMOS_D1MINILITE
 d1_mini_lite.build.variant=d1_mini
 d1_mini_lite.upload.tool=esptool
