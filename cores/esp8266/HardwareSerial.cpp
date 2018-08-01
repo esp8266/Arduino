@@ -123,7 +123,9 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
     time_t startMillis = millis();
     unsigned long detectedBaudrate;
     while ((time_t) millis() - startMillis < timeoutMillis) {
-        if ((detectedBaudrate = testBaudrate())) break;
+        if ((detectedBaudrate = testBaudrate())) {
+          break;
+        }
         yield();
         delay(100);
     }    

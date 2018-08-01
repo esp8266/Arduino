@@ -763,7 +763,9 @@ uart_detect_baudrate(int uart_nr)
     }
 
     int32_t divisor = uart_baudrate_detect(uart_nr, 1);
-    if (!divisor) return 0;
+    if (!divisor) {
+        return 0;
+    }
 
     doTrigger = true;    // Initialize for a next round
     int32_t baudrate = UART_CLK_FREQ / divisor;
@@ -775,7 +777,9 @@ uart_detect_baudrate(int uart_nr)
     {
         if (baudrate <= default_rates[i])
         {
-            if (baudrate - default_rates[i - 1] < default_rates[i] - baudrate) i--;
+            if (baudrate - default_rates[i - 1] < default_rates[i] - baudrate) {
+                i--;
+            }
             break;
         }
     }
