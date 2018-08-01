@@ -315,18 +315,18 @@ SweetPea ESP-210
 
 *TODO*
 
-WeMos D1 R2 & mini
-------------------
+LOLIN(WEMOS) D1 R2 & mini
+-------------------------
 
 Product page: https://www.wemos.cc/
 
-WeMos D1 mini Pro
------------------
+LOLIN(WEMOS) D1 mini Pro
+------------------------
 
 Product page: https://www.wemos.cc/
 
-WeMos D1 mini Lite
-------------------
+LOLIN(WEMOS) D1 mini Lite
+-------------------------
 
 Parameters in Arduino IDE:
 ~~~~~~~~~~~~~~~~~~~~~~~~~
