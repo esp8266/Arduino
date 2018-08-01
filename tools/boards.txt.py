@@ -526,7 +526,7 @@ boards = collections.OrderedDict([
         'desc': [ '*TODO*' ],
     }),
     ( 'd1_mini', {
-        'name': 'WeMos D1 R2 & mini',
+        'name': 'LOLIN(WEMOS) D1 R2 & mini',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINI',
             '.build.variant': 'd1_mini',
@@ -541,7 +541,7 @@ boards = collections.OrderedDict([
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_pro', {
-        'name': 'WeMos D1 mini Pro',
+        'name': 'LOLIN(WEMOS) D1 mini Pro',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINIPRO',
             '.build.variant': 'd1_mini',
@@ -556,7 +556,7 @@ boards = collections.OrderedDict([
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_lite', {
-        'name': 'WeMos D1 mini Lite',
+        'name': 'LOLIN(WEMOS) D1 mini Lite',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINILITE',
             '.build.variant': 'd1_mini',
