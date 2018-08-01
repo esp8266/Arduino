@@ -9,8 +9,8 @@ My ESP crashes running some code. How to troubleshoot it?
 -  `What is the Cause of Restart? <#what-is-the-cause-of-restart>`__
 -  `Exception <#exception>`__
 -  `Watchdog <#watchdog>`__
--  `Check Where the Code Crashes <#check-where-the-code-crashes>`__
--  `Other Causes for Crashes <#other-causes-for-crashes>`__
+-  `Exception Decoder <#exception-decoder>`__
+-  `Other Common Causes for Crashes <#other-causes-for-crashes>`__
 -  `If at the Wall, Enter an Issue
    Report <#if-at-the-wall-enter-an-issue-report>`__
 -  `Conclusion <#conclusion>`__
@@ -161,8 +161,8 @@ out before restart, you should be able to narrow down part of code
 firing the h/w wdt reset. If diagnosed application or library has debug
 option then switch it on to aid this troubleshooting.
 
-Check Where the Code Crashes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Exception Decoder
+~~~~~~~~~~~~~~~~~
 
 Decoding of ESP stack trace is now easy and available to everybody
 thanks to great `Arduino ESP8266/ESP32 Exception Stack Trace
@@ -183,8 +183,10 @@ If you don't have any code for troubleshooting, use the example below:
       Serial.println();
       Serial.println("Let's provoke the s/w wdt firing...");
       //
-      // wait for s/w wdt in infinite loop below
+      // provoke an OOM, will be recorded as the last occured one
+      char* out_of_memory_failure = (char*)malloc(1000000);
       //
+      // wait for s/w wdt in infinite loop below
       while(true);
       //
       Serial.println("This line will not ever print out");
@@ -192,12 +194,14 @@ If you don't have any code for troubleshooting, use the example below:
 
     void loop(){}
 
-Upload this code to your ESP (Ctrl+U) and start Serial Monitor
-(Ctrl+Shift+M). You should shortly see ESP restarting every couple of
-seconds and ``Soft WDT reset`` message together with stack trace showing
-up on each restart. Click the Autoscroll check-box on Serial Monitor to
-stop the messages scrolling up. Select and copy the stack trace, go to
-the *Tools* and open the *ESP Exception Decoder*.
+Enable the Out-Of-Memory (*OOM*) debug option (in the *Tools > Debug Level*
+menu), compile/flash/upload this code to your ESP (Ctrl+U) and start Serial
+Monitor (Ctrl+Shift+M).  You should shortly see ESP restarting every couple
+of seconds and ``Soft WDT reset`` message together with stack trace showing
+up on each restart.  Click the Autoscroll check-box on Serial Monitor to
+stop the messages scrolling up.  Select and copy the stack trace, including
+the ``last failed alloc call: ...`` line, go to the *Tools* and open the
+*ESP Exception Decoder*.
 
 .. figure:: pictures/a02-decode-stack-tace-1-2.png
    :alt: Decode the stack trace, steps 1 and 2
@@ -263,7 +267,7 @@ Asynchronous Callbacks
    can happen.
 
 Memory, memory, memory
-   Running out of heap is the most common cause for crashes. Because the build process for
+   Running out of heap is the **most common cause for crashes**. Because the build process for
    the ESP leaves out exceptions (they use memory), memory allocations that fail will do
    so silently. A typical example is when setting or concatenating a large String. If 
    allocation has failed internally, then the internal string copy can corrupt data, and 
@@ -286,6 +290,11 @@ Memory, memory, memory
    modification. For example, std::vector is available for use. The standard implementations
    rely on exceptions for error handling, which is not available for the ESP, and in any
    case there is no access to the underlying code.
+
+   Instrumenting the code with the OOM debug option and calls to ``ESP.getFreeHeap()`` will
+   help the process of finding leaks. Now is time to re-read about the
+   `exception decoder <#exception-decoder>`__.
+
 
 *Some techniques for reducing memory usage*
 
