@@ -155,7 +155,8 @@ current speed. For example
 | Note that this implementation is **only for ESP8266 based boards**,
   and will not works with other Arduino boards.
 
-To detect an unknown baudrate of data coming into Serial use ``Serial.detectBaudrate(time_t timeoutMillis)``. This method tries to detect the baudrate for a maximum timeoutMillis ms. It returns zero if no baudrate was detected, or the detected baudrate otherwise. The ``detectBaudrate()`` function may be called before ``Serial.begin()`` is called, because it does not need the receive buffer nor the SerialConfig parameters.
+
+To detect an unknown baudrate of data coming into Serial use ``Serial.detectBaudrate(time_t timeoutMillis)``. This method tries to detect the baudrate for a maximum of timeoutMillis ms. It returns zero if no baudrate was detected, or the detected baudrate otherwise. The ``detectBaudrate()`` function may be called before ``Serial.begin()`` is called, because it does not need the receive buffer nor the SerialConfig parameters.
 
 The uart can not detect other parameters like number of start- or stopbits, number of data bits or parity.
 
