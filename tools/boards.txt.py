@@ -1008,7 +1008,7 @@ macros = {
 
 def checkdir ():
     if not os.path.isfile("boards.txt"):
-        print "please run me from boards.txt directory (like: ./tools/boards.txt.py -...)"
+        print("please run me from boards.txt directory (like: ./tools/boards.txt.py -...)")
         sys.exit(1)
 
 ################################################################
@@ -1122,29 +1122,29 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
             page = 0x100
             block = 0x2000
 
-        print "/* Flash Split for %s chips */" % display
-        print "/* sketch %dKB */" % (max_upload_size / 1024)
+        print("/* Flash Split for %s chips */" % display)
+        print("/* sketch %dKB */" % (max_upload_size / 1024))
         if spiffs_size > 0:
             empty_size = spiffs_start - max_upload_size - 4096
             if empty_size > 1024:
-                print "/* empty  %dKB */" % (empty_size / 1024)
-            print "/* spiffs %dKB */" % (spiffs_size / 1024)
-        print "/* eeprom 20KB */"
-        print ""
-        print "MEMORY"
-        print "{"
-        print "  dport0_0_seg :                        org = 0x3FF00000, len = 0x10"
-        print "  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000"
-        print "  iram1_0_seg :                         org = 0x40100000, len = 0x8000"
-        print "  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size
-        print "}"
-        print ""
-        print "PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start)
-        print "PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_start + spiffs_size)
-        print "PROVIDE ( _SPIFFS_page = 0x%X );" % page
-        print "PROVIDE ( _SPIFFS_block = 0x%X );" % block
-        print ""
-        print 'INCLUDE "../ld/eagle.app.v6.common.ld"'
+                print("/* empty  %dKB */" % (empty_size / 1024))
+            print("/* spiffs %dKB */" % (spiffs_size / 1024))
+        print("/* eeprom 20KB */")
+        print("")
+        print("MEMORY")
+        print("{")
+        print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
+        print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
+        print("  iram1_0_seg :                         org = 0x40100000, len = 0x8000")
+        print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
+        print("}")
+        print("")
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_start + spiffs_size))
+        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
+        print("")
+        print('INCLUDE "../ld/eagle.app.v6.common.ld"')
 
         if ldgen:
             sys.stdout.close()
@@ -1216,38 +1216,38 @@ def all_boards ():
     macros.update(all_debug())
     macros.update(led(led_default, led_max))
 
-    print '#'
-    print '# Do not create pull-requests for this file only, CI will not accept them.'
-    print '# You *must* edit/modify/run ' + os.path.basename(sys.argv[0]) + ' to regenerate boards.txt.'
-    print '# All modified files after running with option "--allgen" must be included in the pull-request.'
-    print '#'
-    print ''
-    print 'menu.BoardModel=Model'
-    print 'menu.UploadSpeed=Upload Speed'
-    print 'menu.CpuFrequency=CPU Frequency'
-    print 'menu.CrystalFreq=Crystal Frequency'
-    print 'menu.FlashSize=Flash Size'
-    print 'menu.FlashMode=Flash Mode'
-    print 'menu.FlashFreq=Flash Frequency'
-    print 'menu.ResetMethod=Reset Method'
-    print 'menu.ESPModule=Module'
-    print 'menu.Debug=Debug port'
-    print 'menu.DebugLevel=Debug Level'
-    print 'menu.LwIPVariant=lwIP Variant'
-    print 'menu.VTable=VTables'
-    print 'menu.led=Builtin Led'
-    print 'menu.FlashErase=Erase Flash'
-    print ''
+    print('#')
+    print('# Do not create pull-requests for this file only, CI will not accept them.')
+    print('# You *must* edit/modify/run ' + os.path.basename(sys.argv[0]) + ' to regenerate boards.txt.')
+    print('# All modified files after running with option "--allgen" must be included in the pull-request.')
+    print('#')
+    print('')
+    print('menu.BoardModel=Model')
+    print('menu.UploadSpeed=Upload Speed')
+    print('menu.CpuFrequency=CPU Frequency')
+    print('menu.CrystalFreq=Crystal Frequency')
+    print('menu.FlashSize=Flash Size')
+    print('menu.FlashMode=Flash Mode')
+    print('menu.FlashFreq=Flash Frequency')
+    print('menu.ResetMethod=Reset Method')
+    print('menu.ESPModule=Module')
+    print('menu.Debug=Debug port')
+    print('menu.DebugLevel=Debug Level')
+    print('menu.LwIPVariant=lwIP Variant')
+    print('menu.VTable=VTables')
+    print('menu.led=Builtin Led')
+    print('menu.FlashErase=Erase Flash')
+    print('')
 
     for id in boards:
-        print '##############################################################'
+        print('##############################################################')
         board = boards[id]
-        print id + '.name=' + board['name']
+        print(id + '.name=' + board['name'])
 
         # standalone options
         if 'opts' in board:
             for optname in board['opts']:
-                print id + optname + '=' + board['opts'][optname]
+                print(id + optname + '=' + board['opts'][optname])
 
         # macros
         macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu' ]
@@ -1260,7 +1260,7 @@ def all_boards ():
         macrolist += [ 'debug_menu', 'flash_erase_menu' ]
 
         for cs in customspeeds:
-            print id + cs
+            print(id + cs)
 
         if 'serial' in board:
             macrolist += speeds[board['serial']]
@@ -1270,15 +1270,15 @@ def all_boards ():
         for block in macrolist:
             for optname in macros[block]:
                 if not ('opts' in board) or not (optname in board['opts']):
-                    print id + optname + '=' + macros[block][optname]
+                    print(id + optname + '=' + macros[block][optname])
 
         if nofloat:
-            print id + '.build.float='
+            print(id + '.build.float=')
 
         if noextra4kheap:
-            print id + '.build.noextra4kheap=-DNO_EXTRA_4K_HEAP'
+            print(id + '.build.noextra4kheap=-DNO_EXTRA_4K_HEAP')
 
-        print ''
+        print('')
 
     if boardsgen:
         sys.stdout.close()
@@ -1332,25 +1332,25 @@ def doc ():
         realstdout = sys.stdout
         sys.stdout = open("doc/boards.rst", 'w')
 
-    print 'Boards'
-    print '======'
-    print ''
+    print('Boards')
+    print('======')
+    print('')
 
     for id in boards:
         board = boards[id]
-        print board['name']
+        print(board['name'])
         dash = ""
         for i in range(len(board['name'])):
             dash += '-'
-        print dash
+        print(dash)
 
-        print ''
+        print('')
         if 'desc' in board:
             for line in board['desc']:
-                print line
+                print(line)
         else:
-            print 'No description'
-        print ''
+            print('No description')
+        print('')
 
     if docgen:
         sys.stdout.close()
@@ -1360,39 +1360,39 @@ def doc ():
 # help / usage
 
 def usage (name,ret):
-    print ""
-    print "boards.txt generator for esp8266/Arduino"
-    print ""
-    print "usage: %s [options]" % name
-    print ""
-    print " -h, --help"
-    print " --lwip          - preferred default lwIP version (default %d)" % lwip
-    print " --led           - preferred default builtin led for generic boards (default %d)" % led_default
-    print " --board b       - board to modify:"
-    print " --speed s       - change default serial speed"
-    print " --customspeed s - new serial speed for all boards"
-    print " --nofloat       - disable float support in printf/scanf"
-    print " --noextra4kheap - disable extra 4k heap (will enable WPS)"
-    print " --allowWPS      - synonym for --noextra4kheap"
-    print ""
-    print " mandatory option (at least one):"
-    print ""
-    print " --boards        - show boards.txt"
-    print " --boardsgen     - replace boards.txt"
-    print " --ld            - show ldscripts"
-    print " --ldgen         - replace ldscripts"
-    print " --package       - show package"
-    print " --packagegen    - replace board:[] in package"
-    print " --doc           - shows doc/boards.rst"
-    print " --docgen        - replace doc/boards.rst"
-    print " --allgen        - generate and replace everything"
-    print "                   (useful for pushing on github)"
-    print ""
+    print("")
+    print("boards.txt generator for esp8266/Arduino")
+    print("")
+    print("usage: %s [options]" % name)
+    print("")
+    print(" -h, --help")
+    print(" --lwip          - preferred default lwIP version (default %d)" % lwip)
+    print(" --led           - preferred default builtin led for generic boards (default %d)" % led_default)
+    print(" --board b       - board to modify:")
+    print(" --speed s       - change default serial speed")
+    print(" --customspeed s - new serial speed for all boards")
+    print(" --nofloat       - disable float support in printf/scanf")
+    print(" --noextra4kheap - disable extra 4k heap (will enable WPS)")
+    print(" --allowWPS      - synonym for --noextra4kheap")
+    print("")
+    print(" mandatory option (at least one):")
+    print("")
+    print(" --boards        - show boards.txt")
+    print(" --boardsgen     - replace boards.txt")
+    print(" --ld            - show ldscripts")
+    print(" --ldgen         - replace ldscripts")
+    print(" --package       - show package")
+    print(" --packagegen    - replace board:[] in package")
+    print(" --doc           - shows doc/boards.rst")
+    print(" --docgen        - replace doc/boards.rst")
+    print(" --allgen        - generate and replace everything")
+    print("                   (useful for pushing on github)")
+    print("")
 
     out = ""
     for s in speeds:
         out += s + ' '
-    print "available serial speed options (kbps):", out
+    print("available serial speed options (kbps):", out)
 
     out = ""
     for b in boards:
@@ -1402,9 +1402,9 @@ def usage (name,ret):
         else:
             out += default_speed
         out += 'k) '
-    print "available board names:", out
+    print("available board names:", out)
 
-    print ""
+    print("")
 
     sys.exit(ret)
 
@@ -1437,7 +1437,7 @@ try:
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
           "allgen"] )
 except getopt.GetoptError as err:
-    print str(err)  # will print something like "option -a not recognized"
+    print(str(err)) # will print something like "option -a not recognized"
     usage(sys.argv[0], 1)
 
 no = '(not set)'
@@ -1461,16 +1461,16 @@ for o, a in opts:
 
     elif o in ("--board"):
         if not a in boards:
-            print "board %s not available" % a
+            print("board %s not available" % a)
             usage(sys.argv[0], 1)
         board = a
 
     elif o in ("--speed"):
         if board == no:
-            print "board not set"
+            print("board not set")
             usage(sys.argv[0], 1)
         if not a in speeds:
-            print "speed %s not available" % a
+            print("speed %s not available" % a)
             usage(sys.argv[0], 1)
         boards[board]['serial'] = a
 
