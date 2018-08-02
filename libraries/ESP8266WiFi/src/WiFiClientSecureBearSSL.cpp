@@ -79,6 +79,7 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
   _use_self_signed = false;
   _knownkey = nullptr;
   _sk = nullptr;
+  _ta = nullptr;
 }
 
 
@@ -177,6 +178,7 @@ void WiFiClientSecure::stop() {
     _client->abort();
   }
   WiFiClient::stop();
+  _clearAuthenticationSettings();
   _freeSSL();
 }
 
@@ -510,6 +512,7 @@ bool WiFiClientSecure::_wait_for_handshake() {
     if (br_ssl_engine_current_state(_eng) & BR_SSL_SENDAPP) {
       _handshake_done = true;
     }
+    optimistic_yield(1000);
   }
   return _handshake_done;
 }

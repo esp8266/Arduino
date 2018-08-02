@@ -40,6 +40,28 @@ entering an issue report, please perform initial troubleshooting.
 
 `Read more <a02-my-esp-crashes.rst>`__.
 
+How can I get some extra KBs in flash ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
+  be saved by using the option ``--nofloat`` with the boards generator:
+
+  ``./tools/boards.txt.py --nofloat --allgen``
+
+* Use the debug level option ``NoAssert-NDEBUG`` (in the Tools menu)
+
+`Read more <a05-board-generator.rst>`__.
+
+Why can't I use WPS ?
+~~~~~~~~~~~~~~~~~~~~~
+
+WPS is disabled by default, this offers an extra 4KB in ram/heap.  To enable
+WPS (and lose 4KB of useable ram), use this boards generator option:
+
+``./tools/boards.txt.py --allowWPS --allgen``
+
+`Read more <a05-board-generator.rst>`__.
+
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -123,3 +145,17 @@ The following lines are compatible with both lwIP versions:
     }
 
 Ref.  `#1923 <https://github.com/esp8266/Arduino/issues/1923>`__
+
+
+Why is there a board generator and what about it ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The board generator is a python script originally intended to ease the
+Arduino IDE's `boards.txt` configuration file about the multitude of
+available boards, especially when common parameters have to be updated for
+all of them.
+
+This script is also used to manage uncommon options that are currently not
+available in the IDE menu.
+
+`Read more <a05-board-generator.rst>`__.

@@ -325,6 +325,24 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
+    ( 'cw01', {
+        'name': 'XinaBox CW01',
+        'opts': {
+            '.build.board': 'ESP8266_GENERIC',
+            '.build.variant': 'xinabox',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'crystalfreq_menu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The XinaBox CW01 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard RGB led.',
+                  '',
+                  'Product page: https://xinabox.cc/products/CW01'
+                  ],
+    }),  
     ( 'espresso_lite_v1', {
         'name': 'ESPresso Lite 1.0',
         'opts': {
@@ -435,6 +453,7 @@ boards = collections.OrderedDict([
                   'RST, then releasing FLASH, then releasing RST. This forces the CP2102 device to power cycle and to be re-numbered by Linux.',
                   '',
                   'The board also features a NCP1117 voltage regulator, a blue LED on GPIO16 and a 220k/100k Ohm voltage divider on the ADC input pin.',
+                  'The ESP-12E usually has a led connected on GPIO2.',
                   '',
                   'Full pinout and PDF schematics can be found `here <https://github.com/nodemcu/nodemcu-devkit-v1.0>`__',
                   ],
@@ -507,7 +526,7 @@ boards = collections.OrderedDict([
         'desc': [ '*TODO*' ],
     }),
     ( 'd1_mini', {
-        'name': 'WeMos D1 R2 & mini',
+        'name': 'LOLIN(WEMOS) D1 R2 & mini',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINI',
             '.build.variant': 'd1_mini',
@@ -522,7 +541,7 @@ boards = collections.OrderedDict([
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_pro', {
-        'name': 'WeMos D1 mini Pro',
+        'name': 'LOLIN(WEMOS) D1 mini Pro',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINIPRO',
             '.build.variant': 'd1_mini',
@@ -537,7 +556,7 @@ boards = collections.OrderedDict([
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_lite', {
-        'name': 'WeMos D1 mini Lite',
+        'name': 'LOLIN(WEMOS) D1 mini Lite',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINILITE',
             '.build.variant': 'd1_mini',
@@ -765,6 +784,25 @@ boards = collections.OrderedDict([
             ],
         'desc': [ 'Product page: http://wiki.amperka.ru/wifi-slot' ],
     }),
+    ( 'wiolink', {
+        'name': 'Seeed Wio Link',
+        'opts': {
+            '.build.board': 'ESP8266_WIO_LINK',
+            '.build.variant': 'wiolink',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'Wio Link is designed to simplify your IoT development. It is an ESP8266 based open-source Wi-Fi development board to create IoT applications by virtualizing plug-n-play modules to RESTful APIs with mobile APPs. Wio Link is also compatible with the Arduino IDE.',
+                  '',
+                  'Please DO NOTICE that you MUST pull up pin 15 to enable the power for Grove ports, the board is designed like this for the purpose of peripherals power management.',
+                  '',
+                  'Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html'
+                ],
+    })
     ])
 
 ################################################################
@@ -1116,6 +1154,7 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
 
 def all_flash_size ():
     f512 =      flash_size(0x80000,  '512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696,   0x7B000)
+    f512.update(flash_size(0x80000,  '512K', '512K32',  'eagle.flash.512k32.ld',   '32K SPIFFS', 466928,   0x73000,   0x8000,  4096))
     f512.update(flash_size(0x80000,  '512K', '512K64',  'eagle.flash.512k64.ld',   '64K SPIFFS', 434160,   0x6B000,   0x10000, 4096))
     f512.update(flash_size(0x80000,  '512K', '512K128', 'eagle.flash.512k128.ld', '128K SPIFFS', 368624,   0x5B000,   0x20000, 4096))
     f1m =       flash_size(0x100000,   '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984,  0xFB000)
@@ -1178,7 +1217,9 @@ def all_boards ():
     macros.update(led(led_default, led_max))
 
     print '#'
-    print '# this file is script-generated and is likely to be overwritten by ' + os.path.basename(sys.argv[0])
+    print '# Do not create pull-requests for this file only, CI will not accept them.'
+    print '# You *must* edit/modify/run ' + os.path.basename(sys.argv[0]) + ' to regenerate boards.txt.'
+    print '# All modified files after running with option "--allgen" must be included in the pull-request.'
     print '#'
     print ''
     print 'menu.BoardModel=Model'
@@ -1234,6 +1275,9 @@ def all_boards ():
         if nofloat:
             print id + '.build.float='
 
+        if noextra4kheap:
+            print id + '.build.noextra4kheap=-DNO_EXTRA_4K_HEAP'
+
         print ''
 
     if boardsgen:
@@ -1251,11 +1295,8 @@ def package ():
 
     if packagegen:
         pkgfname_read = pkgfname + '.orig'
-        # check if backup already exists
         if os.path.isfile(pkgfname_read):
-            print "package file is in the way, please move it"
-            print "    %s" % pkgfname_read
-            sys.exit(1)
+            os.remove(pkgfname_read)
         os.rename(pkgfname, pkgfname_read)
 
     # read package file
@@ -1331,6 +1372,8 @@ def usage (name,ret):
     print " --speed s       - change default serial speed"
     print " --customspeed s - new serial speed for all boards"
     print " --nofloat       - disable float support in printf/scanf"
+    print " --noextra4kheap - disable extra 4k heap (will enable WPS)"
+    print " --allowWPS      - synonym for --noextra4kheap"
     print ""
     print " mandatory option (at least one):"
     print ""
@@ -1374,6 +1417,7 @@ default_speed = '115'
 led_default = 2
 led_max = 16
 nofloat = False
+noextra4kheap = False
 ldgen = False
 ldshow = False
 boardsgen = False
@@ -1389,6 +1433,7 @@ customspeeds = []
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
+          "noextra4kheap", "allowWPS",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
           "allgen"] )
 except getopt.GetoptError as err:
@@ -1431,6 +1476,9 @@ for o, a in opts:
 
     elif o in ("--nofloat"):
         nofloat=True
+
+    elif o in ("--noextra4kheap", "--allowWPS"):
+        noextra4kheap=True
 
     elif o in ("--ldshow"):
         ldshow = True
