@@ -19,7 +19,7 @@ available in the IDE menu.
 How can I run the script ?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Python 2 needs to be installed on your system.
+Python needs to be installed on your system.
 
 The script is located in the ``tools`` subdirectory of the core's root installation.
 It needs to be run from the root directory,
