@@ -94,6 +94,7 @@ class EspClass {
 
         void deepSleep(uint64_t time_us, RFMode mode = RF_DEFAULT);
         uint64_t deepSleepMax();
+        uint64_t safe_deepSleepMax();
 
         bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
         bool rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size);
