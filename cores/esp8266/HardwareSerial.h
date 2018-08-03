@@ -184,6 +184,12 @@ public:
         return uart_has_overrun(_uart);
     }
 
+    void startDetectBaudrate();
+
+    unsigned long testBaudrate();
+
+    unsigned long detectBaudrate(time_t timeoutMillis);
+
 protected:
     int _uart_nr;
     uart_t* _uart = nullptr;
