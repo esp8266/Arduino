@@ -109,11 +109,11 @@ extern "C" void esp_yield();
 
 void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
-    if (time_us > deepSleepMax()) // we need to prevent the esp8266 from not waking up from deepsleep
+    if (time_us > safe_deepSleepMax()) // we need to prevent the esp8266 from not waking up from deepsleep
     {
-       time_us = deepSleepMax() - (deepSleepMax() / 20); // 5% correction because of inaccurate timekeeping by the esp8266
+       time_us = safe_deepSleepMax();
        #ifdef DEBUG_SERIAL
-          DEBUG_SERIAL.println("Warning: max sleeptime exceeded; sleeptime has been adjusted to max possible sleeptime!");
+          DEBUG_SERIAL.println("Warning: max sleeptime (possibly) exceeded; risking esp8266 never waking from deepsleep; sleeptime has been adjusted to safest max possible sleeptime!");
        #endif
     }
     system_deep_sleep_set_option(static_cast<int>(mode));
@@ -127,7 +127,17 @@ uint64_t EspClass::deepSleepMax()
 {
   //cali*(2^31-1)/(2^12)
   return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
+}
 
+uint64_t EspClass::safe_deepSleepMax()
+{
+ //(time_in_us / cali) << 12 < 2^31 - 1 (api reference)
+ //time_in_us < (cali << (31-12))
+ //time_in_us < (cali<<19)
+ //time_in_s * 1000000 < cali * 524288
+ //time_in_s < cali * 0.524288
+ //assured by time_in_s < cali/2
+  return (uint64_t)system_rtc_clock_cali_proc()/2*(0xF4240)-1;
 }
 
 bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
