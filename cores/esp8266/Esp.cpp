@@ -127,8 +127,11 @@ uint64_t EspClass::deepSleepMax()
   //Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t. 
   //cali*(2^31-1)/(2^12)
   //return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
+  //
   //At this moment using time_us >= (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000) can result in the esp8266 never waking up from deepsleep.
-  //Therefore a safe calculation of max deepsleep has been derived:
+  //This issue seems to be a problem in the Espressif api and has been mentioned at git espressif/ESP8266_NONOS_SDK under #157.
+  //
+  //A safe calculation of max deepsleep has been derived:
   //(time_in_us / cali) << 12 < 2^31 - 1 (api reference)
   //time_in_us < (cali << (31-12))
   //time_in_us < (cali<<19)
