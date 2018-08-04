@@ -109,9 +109,9 @@ extern "C" void esp_yield();
 
 void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
-    if (time_us > safe_deepSleepMax()) // we need to prevent the esp8266 from not waking up from deepsleep
+    if (time_us > deepSleepMax()) // we need to prevent the esp8266 from not waking up from deepsleep
     {
-       time_us = safe_deepSleepMax();
+       time_us = deepSleepMax();
        #ifdef DEBUG_SERIAL
           DEBUG_SERIAL.println("Warning: max sleeptime (possibly) exceeded; risking esp8266 never waking from deepsleep; sleeptime has been adjusted to safest max possible sleeptime!");
        #endif
@@ -121,23 +121,21 @@ void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
     esp_yield();
 }
 
-//this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
-//Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t.
 uint64_t EspClass::deepSleepMax()
 {
+  //This calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
+  //Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t. 
   //cali*(2^31-1)/(2^12)
-  return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
-}
-
-uint64_t EspClass::safe_deepSleepMax()
-{
- //(time_in_us / cali) << 12 < 2^31 - 1 (api reference)
- //time_in_us < (cali << (31-12))
- //time_in_us < (cali<<19)
- //time_in_s * 1000000 < cali * 524288
- //time_in_s < cali * 0.524288
- //assured by time_in_s < cali/2
-  return (uint64_t)system_rtc_clock_cali_proc()/2*(0xF4240)-1;
+  //return (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000);
+  //At this moment using time_us >= (uint64_t)system_rtc_clock_cali_proc()*(0x80000000-1)/(0x1000) can result in the esp8266 never waking up from deepsleep.
+  //Therefore a safe calculation of max deepsleep has been derived:
+  //(time_in_us / cali) << 12 < 2^31 - 1 (api reference)
+  //time_in_us < (cali << (31-12))
+  //time_in_us < (cali<<19)
+  //time_in_s * 1000000 < cali * 524288
+  //time_in_s < cali * 0.524288
+  //assured by time_in_s < cali/2
+  return ((uint64_t)system_rtc_clock_cali_proc()/2*(0xF4240ULL)-1);
 }
 
 bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
