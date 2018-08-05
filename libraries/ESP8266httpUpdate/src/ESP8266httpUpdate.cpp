@@ -30,12 +30,12 @@ extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
-        : _httpClientTimeout(8000)
+        : _httpClientTimeout(8000), _followRedirects(false)
 {
 }
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
-        : _httpClientTimeout(httpClientTimeout)
+        : _httpClientTimeout(httpClientTimeout), _followRedirects(false)
 {
 }
 
@@ -219,7 +219,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
         http.addHeader(F("x-ESP8266-version"), currentVersion);
     }
 
-    const char * headerkeys[] = { "x-MD5" };
+    const char * headerkeys[] = { "x-MD5" , "Location"};
     size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
 
     // track these headers
@@ -227,6 +227,19 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
 
     int code = http.GET();
+    while(_followRedirects && (code == 302 || code == 301))
+    {
+        String location = http.header("Location");
+        DEBUG_HTTP_UPDATE("[httpUpdate] HTTP redirect(%d): %s\n", code, location.c_str());
+        http.end();
+        if (!http.setURL(location))
+        {
+            DEBUG_HTTP_UPDATE("[httpUpdate] Bad redirect location: '%s'", location.c_str());
+            _lastError = code;
+            return HTTP_UPDATE_FAILED;
+        }
+        code = http.GET();
+    }
     int len = http.getSize();
 
     if(code <= 0) {

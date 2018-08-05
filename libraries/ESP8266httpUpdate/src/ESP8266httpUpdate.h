@@ -72,6 +72,11 @@ public:
         _rebootOnUpdate = reboot;
     }
 
+    void followRedirects(bool follow)
+    {
+    	_followRedirects = follow;
+    }
+
     // This function is deprecated, use rebootOnUpdate and the next one instead
     t_httpUpdate_return update(const String& url, const String& currentVersion,
                                const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
@@ -111,6 +116,7 @@ protected:
     bool _rebootOnUpdate = true;
 private:
     int _httpClientTimeout;
+    bool _followRedirects;
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_HTTPUPDATE)

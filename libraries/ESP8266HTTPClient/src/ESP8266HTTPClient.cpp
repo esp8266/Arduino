@@ -370,6 +370,29 @@ void HTTPClient::setTimeout(uint16_t timeout)
 }
 
 /**
+ * set the URL to a new value. Handy for following redirects.
+ * @param url
+ */
+bool HTTPClient::setURL(String url)
+{
+    // check for : (http: or https:)
+    int index = url.indexOf(':');
+    if(index < 0) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] failed to parse protocol\n");
+        return false;
+    }
+
+    String protocol = url.substring(0, index);
+    if(protocol != "http" && protocol != "https") {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unknown protocol '%s'\n", protocol.c_str());
+        return false;
+    }
+
+    _port = (protocol == "https" ? 443 : 80);
+    return beginInternal(url, protocol.c_str());
+}
+
+/**
  * use HTTP1.0
  * @param timeout
  */

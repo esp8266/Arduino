@@ -154,7 +154,7 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
-
+    bool setURL(String url); // handy for handling redirects
     void useHTTP10(bool usehttp10 = true);
 
     /// request handling
