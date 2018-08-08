@@ -45,6 +45,12 @@ typedef struct cont_ {
         unsigned* struct_start;
 } cont_t;
 
+/* Not static, used in core_esp8266_postmortem.c.
+ * Placed into noinit section because we assign value to this variable
+ * before .bss is zero-filled, and need to preserve the value.
+ */
+extern cont_t* g_pcont __attribute__((section(".noinit")));
+
 // Initialize the cont_t structure before calling cont_run
 void cont_init(cont_t*);
 

@@ -27,7 +27,9 @@
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
 #include "user_interface.h"
+#include "coredecls.h" // disable_extra4k_at_link_time()
 
+extern bool beginWPSConfig(void);
 
 class ESP8266WiFiSTAClass {
         // ----------------------------------------------------------------------------------------------
@@ -93,14 +95,12 @@ class ESP8266WiFiSTAClass {
 
     public:
 
-#ifdef NO_EXTRA_4K_HEAP
-        bool beginWPSConfig(void);
-#else
-        inline bool beginWPSConfig(void) __attribute__((always_inline)) {
-            return WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool();
+        inline bool beginWPSConfig(void) __attribute__((always_inline))
+        {
+            disable_extra4k_at_link_time(); // this call must always be inlined
+            return ::beginWPSConfig();
         }
-#endif
-
+        
         bool beginSmartConfig();
         bool stopSmartConfig();
         bool smartConfigDone();

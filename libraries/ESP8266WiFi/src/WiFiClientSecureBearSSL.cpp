@@ -1260,13 +1260,13 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
 
 extern "C" {
 #include <cont.h>
-  extern cont_t g_cont;
+  extern cont_t *g_pcont;
   extern size_t br_esp8266_stack_proxy_usage();
 
   void _BearSSLCheckStack(const char *fcn, const char *file, int line) {
     static int cnt = 0;
     register uint32_t *sp asm("a1");
-    int freestack = 4 * (sp - g_cont.stack);
+    int freestack = 4 * (sp - g_pcont->stack);
     int freeheap = ESP.getFreeHeap();
     static int laststack, lastheap, laststack2;
     if ((laststack != freestack) || (lastheap != freeheap) || (laststack2 != (int)br_esp8266_stack_proxy_usage())) {
