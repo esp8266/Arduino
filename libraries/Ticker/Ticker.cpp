@@ -21,6 +21,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "Arduino.h"
 
 #include "c_types.h"
 #include "eagle_soc.h"
@@ -70,4 +71,24 @@ void Ticker::detach()
 bool Ticker::active()
 {
 	return (bool)_timer;
+}
+
+void Ticker::internalCallback(void* arg)
+{
+	Ticker* pTicker = (Ticker*)arg;
+	if (pTicker == nullptr)
+	{
+		return;
+	}
+	if (pTicker->internalTicker)
+	{
+		if (pTicker->scheduleTicker)
+		{
+			schedule_function(pTicker->internalTicker);
+		}
+		else
+		{
+			pTicker->internalTicker();
+		}
+	}
 }
