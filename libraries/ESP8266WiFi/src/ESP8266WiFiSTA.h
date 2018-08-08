@@ -100,7 +100,7 @@ class ESP8266WiFiSTAClass {
             disable_extra4k_at_link_time(); // this call must always be inlined
             return ::beginWPSConfig();
         }
-        
+
         bool beginSmartConfig();
         bool stopSmartConfig();
         bool smartConfigDone();

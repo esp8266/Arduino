@@ -46,21 +46,25 @@ How can I get some extra KBs in flash ?
 * Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
   be saved by using the option ``--nofloat`` with the boards generator:
 
-  ``./tools/boards.txt.py --nofloat --allgen``
+  ``./tools/boards.txt.py --nofloat --boardsgen``
 
 * Use the debug level option ``NoAssert-NDEBUG`` (in the Tools menu)
 
 `Read more <a05-board-generator.rst>`__.
 
-Why can't I use WPS ?
-~~~~~~~~~~~~~~~~~~~~~
+About WPS
+~~~~~~~~~
 
-WPS is disabled by default, this offers an extra 4KB in ram/heap.  To enable
-WPS (and lose 4KB of useable ram), use this boards generator option:
+In release 2.4.2 only, WPS is disabled by default.  To enable WPS, use this
+boards generator option:
 
-``./tools/boards.txt.py --allowWPS --allgen``
+``./tools/boards.txt.py --allowWPS --boardsgen``
 
 `Read more <a05-board-generator.rst>`__.
+
+From release 2.4.2 and ahead, using WPS will reduce available heap space to
+user by around 4.5KB.  In other words, from release 2.4.2 without using WPS,
+an extra ~4.5KB is available in user's heap space.
 
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
