@@ -46,7 +46,7 @@ How can I get some extra KBs in flash ?
 * Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
   be saved by using the option ``--nofloat`` with the boards generator:
 
-  ``./tools/boards.txt.py --nofloat --allgen``
+  ``./tools/boards.txt.py --nofloat --boardsgen``
 
 * Use the debug level option ``NoAssert-NDEBUG`` (in the Tools menu)
 
@@ -58,7 +58,7 @@ Why can't I use WPS ?
 WPS is disabled by default, this offers an extra 4KB in ram/heap.  To enable
 WPS (and lose 4KB of useable ram), use this boards generator option:
 
-``./tools/boards.txt.py --allowWPS --allgen``
+``./tools/boards.txt.py --allowWPS --boardsgen``
 
 `Read more <a05-board-generator.rst>`__.
 
