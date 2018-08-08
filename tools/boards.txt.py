@@ -1294,6 +1294,9 @@ def package ():
     checkdir()
 
     if packagegen:
+        if not os.path.isfile(pkgfname):
+            print('will not regenerate non-existing file: ' + pkgfname)
+            return
         pkgfname_read = pkgfname + '.orig'
         if os.path.isfile(pkgfname_read):
             os.remove(pkgfname_read)
@@ -1327,6 +1330,9 @@ def doc ():
 
         # check if backup already exists
         if not os.path.isfile("doc/boards.rst.orig"):
+            if not os.path.isfile("doc/boards.rst"):
+                print('will not regenerate non-existing file: doc/boards.rst')
+                return
             os.rename("doc/boards.rst", "doc/boards.rst.orig")
 
         realstdout = sys.stdout
