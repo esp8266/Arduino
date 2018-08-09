@@ -53,7 +53,7 @@ void setup() {
   delay(1000);
   Serial.begin(9600);
   Serial.println();
-  Serial.print("Configuring access point...");
+  Serial.println("Configuring access point...");
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAPConfig(apIP, apIP, netMsk);
   WiFi.softAP(softAP_ssid, softAP_password);
