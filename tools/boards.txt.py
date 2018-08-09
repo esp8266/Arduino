@@ -1472,7 +1472,7 @@ for o, a in opts:
         nofloat=True
 
     elif o in ("--noextra4kheap", "--allowWPS"):
-        print('option ' + o + ' is now useless')
+        print('option ' + o + ' is now deprecated, without effect, and will be removed')
 
     elif o in ("--ldshow"):
         ldshow = True
