@@ -42,7 +42,11 @@ either to read voltage at ADC pin, or to read module supply voltage
 (VCC).
 
 To read external voltage applied to ADC pin, use ``analogRead(A0)``.
-Input voltage range is 0 — 1.0V or 0 — 3.3V.
+Input voltage range is 0 — 1.0V or 0 — 3.3V (Be aware that some boards 
+use internal voltage dividers. Exposing ESP8266 A0 pin to 3.3V might 
+damage it. Please refer to the documentation of your board or try 
+readings with 1.0V first to see if the value is 1024 or way less (e.g. 
+~320)).
 
 To read VCC voltage, use ``ESP.getVcc()`` and ADC pin must be kept
 unconnected. Additionally, the following line has to be added to the
