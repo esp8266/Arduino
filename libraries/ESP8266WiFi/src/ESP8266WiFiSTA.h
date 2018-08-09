@@ -28,8 +28,6 @@
 #include "ESP8266WiFiGeneric.h"
 #include "user_interface.h"
 
-extern bool beginWPSConfig(void);
-
 class ESP8266WiFiSTAClass {
         // ----------------------------------------------------------------------------------------------
         // ---------------------------------------- STA function ----------------------------------------
