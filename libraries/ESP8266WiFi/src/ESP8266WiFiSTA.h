@@ -27,7 +27,6 @@
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
 #include "user_interface.h"
-#include "coredecls.h" // disable_extra4k_at_link_time()
 
 extern bool beginWPSConfig(void);
 

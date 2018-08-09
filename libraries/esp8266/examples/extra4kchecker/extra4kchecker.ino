@@ -28,12 +28,16 @@ void setup() {
 
   Serial.printf("FreeHeap: %d (~52112 without WPS, ~46832 with)\n", ESP.getFreeHeap());
 
-#if USE_WPS
+  #if USE_WPS
+
   Serial.printf("starting WPS...\n");
   Serial.printf("wps: %d\n", WiFi.beginWPSConfig());
-#else
+
+  #else
+
   Serial.printf("done\n");
-#endif
+
+  #endif
 }
 
 void loop() {

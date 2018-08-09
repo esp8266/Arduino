@@ -16,8 +16,6 @@ void esp_yield();
 void esp_schedule();
 void tune_timeshift64 (uint64_t now_us);
 void settimeofday_cb (void (*cb)(void));
-
-// calls to this function must *always* be inlined
 void disable_extra4k_at_link_time (void) __attribute__((noinline));
 
 #ifdef __cplusplus

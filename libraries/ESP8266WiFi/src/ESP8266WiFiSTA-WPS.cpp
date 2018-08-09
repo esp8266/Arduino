@@ -26,6 +26,7 @@
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiSTA.h"
+#include "coredecls.h" // disable_extra4k_at_link_time()
 
 /**
  * WPS config

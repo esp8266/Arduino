@@ -41,6 +41,7 @@ extern "C" {
 #include "lwip/netif.h"
 #include "include/ClientContext.h"
 #include "c_types.h"
+#include "coredecls.h"
 
 namespace BearSSL {
 
