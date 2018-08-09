@@ -15,8 +15,6 @@
 
 #define USE_WPS 0 // try me with 0 or 1
 
-extern cont_t* g_pcont;
-
 void setup() {
 
   Serial.begin(115200);

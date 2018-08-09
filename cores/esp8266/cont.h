@@ -27,6 +27,10 @@
 #define CONT_STACKSIZE 4096
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct cont_ {
         void (*pc_ret)(void);
         unsigned* sp_ret;
@@ -73,5 +77,9 @@ int cont_get_free_stack(cont_t* cont);
 // Check if yield() may be called. Returns true if we are running inside
 // continuation stack
 bool cont_can_yield(cont_t* cont);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CONT_H_ */

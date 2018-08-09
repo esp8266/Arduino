@@ -1,23 +1,48 @@
+/*
+ ESP8266WiFiSTA-WPS.cpp - WiFi library for esp8266
+
+ Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+ This file is part of the esp8266 core for Arduino environment.
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+ Reworked on 28 Dec 2015 by Markus Sattler
+
+ */
+
 
 #include "ESP8266WiFi.h"
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiSTA.h"
-
-void wifi_wps_status_cb(wps_cb_status status);
 
 /**
  * WPS config
  * so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
  * @return ok
  */
-bool beginWPSConfig(void) {
+bool ESP8266WiFiSTAClass::beginWPSConfig(void) {
+
+    // SYS ram is used by WPS, let's configure user stack inside user's HEAP
+    disable_extra4k_at_link_time();
 
     if(!WiFi.enableSTA(true)) {
         // enable STA failed
         return false;
     }
 
-    WiFi.disconnect();
+    disconnect();
 
     DEBUGV("wps begin\n");
 
@@ -32,7 +57,7 @@ bool beginWPSConfig(void) {
         return false;
     }
 
-    if(!wifi_set_wps_cb((wps_st_cb_t) &wifi_wps_status_cb)) {
+    if(!wifi_set_wps_cb((wps_st_cb_t) &WPSStatusCB)) {
         DEBUGV("wps cb failed\n");
         return false;
     }
@@ -52,7 +77,7 @@ bool beginWPSConfig(void) {
  * WPS callback
  * @param status wps_cb_status
  */
-void wifi_wps_status_cb(wps_cb_status status) {
+void ESP8266WiFiSTAClass::WPSStatusCB(wps_cb_status status) {
     DEBUGV("wps cb status: %d\r\n", status);
     switch(status) {
         case WPS_CB_ST_SUCCESS:
@@ -81,4 +106,3 @@ void wifi_wps_status_cb(wps_cb_status status) {
 
     esp_schedule(); // resume the beginWPSConfig function
 }
-

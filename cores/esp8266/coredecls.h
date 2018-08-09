@@ -8,6 +8,8 @@ extern "C" {
 
 // TODO: put declarations here, get rid of -Wno-implicit-function-declaration
 
+#include <cont.h> // g_pcont declaration
+
 extern bool timeshift64_is_set;
 
 void esp_yield();

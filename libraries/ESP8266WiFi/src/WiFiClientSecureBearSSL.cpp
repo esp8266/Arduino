@@ -1259,8 +1259,6 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
 // SSL debugging which should focus on the WiFiClientBearSSL objects.
 
 extern "C" {
-#include <cont.h>
-  extern cont_t *g_pcont;
   extern size_t br_esp8266_stack_proxy_usage();
 
   void _BearSSLCheckStack(const char *fcn, const char *file, int line) {

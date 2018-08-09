@@ -10,7 +10,7 @@
 #include "cont.h"
 #include "coredecls.h"
 
-// calls to this function must *always* be inlined
+// callers to this function must *always* be inlined
 void disable_extra4k_at_link_time (void)
 {
     /*
@@ -30,7 +30,6 @@ static cont_t g_cont __attribute__ ((aligned (16)));
 
 extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void)
 {
-    /* this is the default NONOS-SDK user's heap location */
     g_pcont = &g_cont;
 
     /* Call the entry point of the SDK code. */

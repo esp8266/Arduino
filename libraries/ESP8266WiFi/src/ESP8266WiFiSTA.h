@@ -87,20 +87,19 @@ class ESP8266WiFiSTAClass {
 
     protected:
 
-      static bool _useStaticIp;
+        static bool _useStaticIp;
 
     // ----------------------------------------------------------------------------------------------
     // ------------------------------------ STA remote configure  -----------------------------------
     // ----------------------------------------------------------------------------------------------
 
+    protected:
+    
+        static void WPSStatusCB(wps_cb_status status);
+
     public:
 
-        inline bool beginWPSConfig(void) __attribute__((always_inline))
-        {
-            disable_extra4k_at_link_time(); // this call must always be inlined
-            return ::beginWPSConfig();
-        }
-
+        bool beginWPSConfig(void);
         bool beginSmartConfig();
         bool stopSmartConfig();
         bool smartConfigDone();
