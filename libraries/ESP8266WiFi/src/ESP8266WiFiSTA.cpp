@@ -374,8 +374,9 @@ uint8_t ESP8266WiFiSTAClass::waitForConnectResult(uint32_t wait_secs) {
     if((wifi_get_opmode() & 1) == 0) {
         return WL_DISCONNECTED;
     }
-    int i = 0; int try_times = wait_secs*10;
-    while((!status() || status() >= WL_DISCONNECTED) && ((wait_secs!=0)? (i++ < try_times): true )) {
+    int i = 0; 
+    int try_times = wait_secs*10;
+    while((!status() || status() >= WL_DISCONNECTED) && ((wait_secs==0)? true : (i++ < try_times))) {
         delay(100);
     }
     return status();
