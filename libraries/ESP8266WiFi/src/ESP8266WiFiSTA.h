@@ -91,10 +91,6 @@ class ESP8266WiFiSTAClass {
     // ------------------------------------ STA remote configure  -----------------------------------
     // ----------------------------------------------------------------------------------------------
 
-    protected:
-    
-        static void WPSStatusCB(wps_cb_status status);
-
     public:
 
         bool beginWPSConfig(void);

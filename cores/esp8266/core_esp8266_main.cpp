@@ -183,7 +183,7 @@ void init_done() {
 
    (note: setting app_entry() itself as "weak" is not sufficient and always
     ends up with the other "noextra4k" one linked, maybe because it has a
-    default value in linker scripts).
+    default ENTRY(app_entry) value in linker scripts).
 
    References:
    https://github.com/esp8266/Arduino/pull/4553

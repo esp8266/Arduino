@@ -28,6 +28,8 @@
 #include "ESP8266WiFiSTA.h"
 #include "coredecls.h" // disable_extra4k_at_link_time()
 
+static void wifi_wps_status_cb(wps_cb_status status);
+
 /**
  * WPS config
  * so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
@@ -58,7 +60,7 @@ bool ESP8266WiFiSTAClass::beginWPSConfig(void) {
         return false;
     }
 
-    if(!wifi_set_wps_cb((wps_st_cb_t) &WPSStatusCB)) {
+    if(!wifi_set_wps_cb((wps_st_cb_t) &wifi_wps_status_cb)) {
         DEBUGV("wps cb failed\n");
         return false;
     }
@@ -78,7 +80,7 @@ bool ESP8266WiFiSTAClass::beginWPSConfig(void) {
  * WPS callback
  * @param status wps_cb_status
  */
-void ESP8266WiFiSTAClass::WPSStatusCB(wps_cb_status status) {
+void wifi_wps_status_cb(wps_cb_status status) {
     DEBUGV("wps cb status: %d\r\n", status);
     switch(status) {
         case WPS_CB_ST_SUCCESS:
