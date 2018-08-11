@@ -21,19 +21,22 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "Arduino.h"
 
+extern "C" {
 #include "c_types.h"
 #include "eagle_soc.h"
 #include "ets_sys.h"
 #include "osapi.h"
+}
 
-static const int ONCE   = 0;
-static const int REPEAT = 1;
+const int ONCE   = 0;
+const int REPEAT = 1;
 
 #include "Ticker.h"
 
 Ticker::Ticker()
-: _timer(nullptr)
+: _timer(0)
 {
 }
 
@@ -64,10 +67,19 @@ void Ticker::detach()
 
 	os_timer_disarm(_timer);
 	delete _timer;
-	_timer = nullptr;
+	_timer = 0;
+	_callback_function = nullptr;
 }
 
-bool Ticker::active()
+void Ticker::_static_callback(void* arg)
 {
-	return (bool)_timer;
+	Ticker* _this = (Ticker*)arg;
+	if (_this == nullptr)
+	{
+		return;
+	}
+	if (_this->_callback_function)
+	{
+		_this->_callback_function();
+	}
 }
