@@ -14,14 +14,14 @@ class ExampleClass {
       pinMode(_pin, OUTPUT);
       _myTicker.attach_ms(_duration, std::bind(&ExampleClass::classBlink, this));
     }
-    ~ExampleClass(){};
+    ~ExampleClass() {};
 
     int _pin, _duration;
     Ticker _myTicker;
 
     void classBlink() {
       digitalWrite(_pin, !digitalRead(_pin));
-	}
+    }
 };
 
 void staticBlink() {
