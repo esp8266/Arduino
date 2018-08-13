@@ -10,11 +10,11 @@
 
 class ExampleClass {
   public:
-    ExampleClass(int pin, int duration) : _pin(pin), _duration(duration){
-    pinMode(_pin, OUTPUT);
-     _myTicker.attach_ms(_duration, std::bind(&ExampleClass::classBlink, this));
-	}
-	~ExampleClass(){};
+    ExampleClass(int pin, int duration) : _pin(pin), _duration(duration) {
+      pinMode(_pin, OUTPUT);
+      _myTicker.attach_ms(_duration, std::bind(&ExampleClass::classBlink, this));
+    }
+    ~ExampleClass(){};
 
     int _pin, _duration;
     Ticker _myTicker;
@@ -55,7 +55,7 @@ void setup() {
   parameterTicker.attach_ms(100, std::bind(parameterBlink, LED4));
 
   pinMode(LED5, OUTPUT);
-  lambdaTicker.attach_ms(100, [](){
+  lambdaTicker.attach_ms(100, []() {
     digitalWrite(LED5, !digitalRead(LED5));
   });
 }
