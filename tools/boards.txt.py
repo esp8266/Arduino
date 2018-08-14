@@ -325,6 +325,24 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
+    ( 'cw01', {
+        'name': 'XinaBox CW01',
+        'opts': {
+            '.build.board': 'ESP8266_GENERIC',
+            '.build.variant': 'xinabox',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'crystalfreq_menu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The XinaBox CW01 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard RGB led.',
+                  '',
+                  'Product page: https://xinabox.cc/products/CW01'
+                  ],
+    }),  
     ( 'espresso_lite_v1', {
         'name': 'ESPresso Lite 1.0',
         'opts': {
@@ -508,7 +526,7 @@ boards = collections.OrderedDict([
         'desc': [ '*TODO*' ],
     }),
     ( 'd1_mini', {
-        'name': 'WeMos D1 R2 & mini',
+        'name': 'LOLIN(WEMOS) D1 R2 & mini',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINI',
             '.build.variant': 'd1_mini',
@@ -523,7 +541,7 @@ boards = collections.OrderedDict([
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_pro', {
-        'name': 'WeMos D1 mini Pro',
+        'name': 'LOLIN(WEMOS) D1 mini Pro',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINIPRO',
             '.build.variant': 'd1_mini',
@@ -538,7 +556,7 @@ boards = collections.OrderedDict([
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_lite', {
-        'name': 'WeMos D1 mini Lite',
+        'name': 'LOLIN(WEMOS) D1 mini Lite',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINILITE',
             '.build.variant': 'd1_mini',
@@ -766,6 +784,25 @@ boards = collections.OrderedDict([
             ],
         'desc': [ 'Product page: http://wiki.amperka.ru/wifi-slot' ],
     }),
+    ( 'wiolink', {
+        'name': 'Seeed Wio Link',
+        'opts': {
+            '.build.board': 'ESP8266_WIO_LINK',
+            '.build.variant': 'wiolink',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'Wio Link is designed to simplify your IoT development. It is an ESP8266 based open-source Wi-Fi development board to create IoT applications by virtualizing plug-n-play modules to RESTful APIs with mobile APPs. Wio Link is also compatible with the Arduino IDE.',
+                  '',
+                  'Please DO NOTICE that you MUST pull up pin 15 to enable the power for Grove ports, the board is designed like this for the purpose of peripherals power management.',
+                  '',
+                  'Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html'
+                ],
+    })
     ])
 
 ################################################################
@@ -971,7 +1008,7 @@ macros = {
 
 def checkdir ():
     if not os.path.isfile("boards.txt"):
-        print "please run me from boards.txt directory (like: ./tools/boards.txt.py -...)"
+        print("please run me from boards.txt directory (like: ./tools/boards.txt.py -...)")
         sys.exit(1)
 
 ################################################################
@@ -1085,29 +1122,29 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
             page = 0x100
             block = 0x2000
 
-        print "/* Flash Split for %s chips */" % display
-        print "/* sketch %dKB */" % (max_upload_size / 1024)
+        print("/* Flash Split for %s chips */" % display)
+        print("/* sketch %dKB */" % (max_upload_size / 1024))
         if spiffs_size > 0:
             empty_size = spiffs_start - max_upload_size - 4096
             if empty_size > 1024:
-                print "/* empty  %dKB */" % (empty_size / 1024)
-            print "/* spiffs %dKB */" % (spiffs_size / 1024)
-        print "/* eeprom 20KB */"
-        print ""
-        print "MEMORY"
-        print "{"
-        print "  dport0_0_seg :                        org = 0x3FF00000, len = 0x10"
-        print "  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000"
-        print "  iram1_0_seg :                         org = 0x40100000, len = 0x8000"
-        print "  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size
-        print "}"
-        print ""
-        print "PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start)
-        print "PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_start + spiffs_size)
-        print "PROVIDE ( _SPIFFS_page = 0x%X );" % page
-        print "PROVIDE ( _SPIFFS_block = 0x%X );" % block
-        print ""
-        print 'INCLUDE "../ld/eagle.app.v6.common.ld"'
+                print("/* empty  %dKB */" % (empty_size / 1024))
+            print("/* spiffs %dKB */" % (spiffs_size / 1024))
+        print("/* eeprom 20KB */")
+        print("")
+        print("MEMORY")
+        print("{")
+        print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
+        print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
+        print("  iram1_0_seg :                         org = 0x40100000, len = 0x8000")
+        print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
+        print("}")
+        print("")
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_start + spiffs_size))
+        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
+        print("")
+        print('INCLUDE "../ld/eagle.app.v6.common.ld"')
 
         if ldgen:
             sys.stdout.close()
@@ -1179,36 +1216,38 @@ def all_boards ():
     macros.update(all_debug())
     macros.update(led(led_default, led_max))
 
-    print '#'
-    print '# this file is script-generated and is likely to be overwritten by ' + os.path.basename(sys.argv[0])
-    print '#'
-    print ''
-    print 'menu.BoardModel=Model'
-    print 'menu.UploadSpeed=Upload Speed'
-    print 'menu.CpuFrequency=CPU Frequency'
-    print 'menu.CrystalFreq=Crystal Frequency'
-    print 'menu.FlashSize=Flash Size'
-    print 'menu.FlashMode=Flash Mode'
-    print 'menu.FlashFreq=Flash Frequency'
-    print 'menu.ResetMethod=Reset Method'
-    print 'menu.ESPModule=Module'
-    print 'menu.Debug=Debug port'
-    print 'menu.DebugLevel=Debug Level'
-    print 'menu.LwIPVariant=lwIP Variant'
-    print 'menu.VTable=VTables'
-    print 'menu.led=Builtin Led'
-    print 'menu.FlashErase=Erase Flash'
-    print ''
+    print('#')
+    print('# Do not create pull-requests for this file only, CI will not accept them.')
+    print('# You *must* edit/modify/run ' + os.path.basename(sys.argv[0]) + ' to regenerate boards.txt.')
+    print('# All modified files after running with option "--allgen" must be included in the pull-request.')
+    print('#')
+    print('')
+    print('menu.BoardModel=Model')
+    print('menu.UploadSpeed=Upload Speed')
+    print('menu.CpuFrequency=CPU Frequency')
+    print('menu.CrystalFreq=Crystal Frequency')
+    print('menu.FlashSize=Flash Size')
+    print('menu.FlashMode=Flash Mode')
+    print('menu.FlashFreq=Flash Frequency')
+    print('menu.ResetMethod=Reset Method')
+    print('menu.ESPModule=Module')
+    print('menu.Debug=Debug port')
+    print('menu.DebugLevel=Debug Level')
+    print('menu.LwIPVariant=lwIP Variant')
+    print('menu.VTable=VTables')
+    print('menu.led=Builtin Led')
+    print('menu.FlashErase=Erase Flash')
+    print('')
 
     for id in boards:
-        print '##############################################################'
+        print('##############################################################')
         board = boards[id]
-        print id + '.name=' + board['name']
+        print(id + '.name=' + board['name'])
 
         # standalone options
         if 'opts' in board:
             for optname in board['opts']:
-                print id + optname + '=' + board['opts'][optname]
+                print(id + optname + '=' + board['opts'][optname])
 
         # macros
         macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu' ]
@@ -1221,7 +1260,7 @@ def all_boards ():
         macrolist += [ 'debug_menu', 'flash_erase_menu' ]
 
         for cs in customspeeds:
-            print id + cs
+            print(id + cs)
 
         if 'serial' in board:
             macrolist += speeds[board['serial']]
@@ -1231,12 +1270,15 @@ def all_boards ():
         for block in macrolist:
             for optname in macros[block]:
                 if not ('opts' in board) or not (optname in board['opts']):
-                    print id + optname + '=' + macros[block][optname]
+                    print(id + optname + '=' + macros[block][optname])
 
         if nofloat:
-            print id + '.build.float='
+            print(id + '.build.float=')
 
-        print ''
+        if noextra4kheap:
+            print(id + '.build.noextra4kheap=-DNO_EXTRA_4K_HEAP')
+
+        print('')
 
     if boardsgen:
         sys.stdout.close()
@@ -1253,11 +1295,8 @@ def package ():
 
     if packagegen:
         pkgfname_read = pkgfname + '.orig'
-        # check if backup already exists
         if os.path.isfile(pkgfname_read):
-            print "package file is in the way, please move it"
-            print "    %s" % pkgfname_read
-            sys.exit(1)
+            os.remove(pkgfname_read)
         os.rename(pkgfname, pkgfname_read)
 
     # read package file
@@ -1293,25 +1332,25 @@ def doc ():
         realstdout = sys.stdout
         sys.stdout = open("doc/boards.rst", 'w')
 
-    print 'Boards'
-    print '======'
-    print ''
+    print('Boards')
+    print('======')
+    print('')
 
     for id in boards:
         board = boards[id]
-        print board['name']
+        print(board['name'])
         dash = ""
         for i in range(len(board['name'])):
             dash += '-'
-        print dash
+        print(dash)
 
-        print ''
+        print('')
         if 'desc' in board:
             for line in board['desc']:
-                print line
+                print(line)
         else:
-            print 'No description'
-        print ''
+            print('No description')
+        print('')
 
     if docgen:
         sys.stdout.close()
@@ -1321,37 +1360,39 @@ def doc ():
 # help / usage
 
 def usage (name,ret):
-    print ""
-    print "boards.txt generator for esp8266/Arduino"
-    print ""
-    print "usage: %s [options]" % name
-    print ""
-    print " -h, --help"
-    print " --lwip          - preferred default lwIP version (default %d)" % lwip
-    print " --led           - preferred default builtin led for generic boards (default %d)" % led_default
-    print " --board b       - board to modify:"
-    print " --speed s       - change default serial speed"
-    print " --customspeed s - new serial speed for all boards"
-    print " --nofloat       - disable float support in printf/scanf"
-    print ""
-    print " mandatory option (at least one):"
-    print ""
-    print " --boards        - show boards.txt"
-    print " --boardsgen     - replace boards.txt"
-    print " --ld            - show ldscripts"
-    print " --ldgen         - replace ldscripts"
-    print " --package       - show package"
-    print " --packagegen    - replace board:[] in package"
-    print " --doc           - shows doc/boards.rst"
-    print " --docgen        - replace doc/boards.rst"
-    print " --allgen        - generate and replace everything"
-    print "                   (useful for pushing on github)"
-    print ""
+    print("")
+    print("boards.txt generator for esp8266/Arduino")
+    print("")
+    print("usage: %s [options]" % name)
+    print("")
+    print(" -h, --help")
+    print(" --lwip          - preferred default lwIP version (default %d)" % lwip)
+    print(" --led           - preferred default builtin led for generic boards (default %d)" % led_default)
+    print(" --board b       - board to modify:")
+    print(" --speed s       - change default serial speed")
+    print(" --customspeed s - new serial speed for all boards")
+    print(" --nofloat       - disable float support in printf/scanf")
+    print(" --noextra4kheap - disable extra 4k heap (will enable WPS)")
+    print(" --allowWPS      - synonym for --noextra4kheap")
+    print("")
+    print(" mandatory option (at least one):")
+    print("")
+    print(" --boards        - show boards.txt")
+    print(" --boardsgen     - replace boards.txt")
+    print(" --ld            - show ldscripts")
+    print(" --ldgen         - replace ldscripts")
+    print(" --package       - show package")
+    print(" --packagegen    - replace board:[] in package")
+    print(" --doc           - shows doc/boards.rst")
+    print(" --docgen        - replace doc/boards.rst")
+    print(" --allgen        - generate and replace everything")
+    print("                   (useful for pushing on github)")
+    print("")
 
     out = ""
     for s in speeds:
         out += s + ' '
-    print "available serial speed options (kbps):", out
+    print("available serial speed options (kbps):", out)
 
     out = ""
     for b in boards:
@@ -1361,9 +1402,9 @@ def usage (name,ret):
         else:
             out += default_speed
         out += 'k) '
-    print "available board names:", out
+    print("available board names:", out)
 
-    print ""
+    print("")
 
     sys.exit(ret)
 
@@ -1376,6 +1417,7 @@ default_speed = '115'
 led_default = 2
 led_max = 16
 nofloat = False
+noextra4kheap = False
 ldgen = False
 ldshow = False
 boardsgen = False
@@ -1391,10 +1433,11 @@ customspeeds = []
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
+          "noextra4kheap", "allowWPS",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
           "allgen"] )
 except getopt.GetoptError as err:
-    print str(err)  # will print something like "option -a not recognized"
+    print(str(err)) # will print something like "option -a not recognized"
     usage(sys.argv[0], 1)
 
 no = '(not set)'
@@ -1418,21 +1461,24 @@ for o, a in opts:
 
     elif o in ("--board"):
         if not a in boards:
-            print "board %s not available" % a
+            print("board %s not available" % a)
             usage(sys.argv[0], 1)
         board = a
 
     elif o in ("--speed"):
         if board == no:
-            print "board not set"
+            print("board not set")
             usage(sys.argv[0], 1)
         if not a in speeds:
-            print "speed %s not available" % a
+            print("speed %s not available" % a)
             usage(sys.argv[0], 1)
         boards[board]['serial'] = a
 
     elif o in ("--nofloat"):
         nofloat=True
+
+    elif o in ("--noextra4kheap", "--allowWPS"):
+        noextra4kheap=True
 
     elif o in ("--ldshow"):
         ldshow = True
