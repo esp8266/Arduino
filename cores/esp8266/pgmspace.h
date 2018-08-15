@@ -21,7 +21,7 @@
 #define __STRINGIZE_NX(A) #A
 #define __STRINGIZE(A) __STRINGIZE_NX(A)
 
-#define PROGMEM      __attribute__((section( ".irom.text." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__))))
+#define PROGMEM      __attribute__((section( "\".irom.text." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\"")))
 
 #define PGM_P  		const char *
 #define PGM_VOID_P  const void *
