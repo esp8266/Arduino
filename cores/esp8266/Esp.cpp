@@ -107,14 +107,17 @@ void EspClass::wdtFeed(void)
 
 extern "C" void esp_yield();
 
-void EspClass::deepSleep(uint64_t time_us, WakeMode mode, bool instantly)
+void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
 {
     system_deep_sleep_set_option(static_cast<int>(mode));
-    if (instantly) {
-      system_deep_sleep_instant(time_us);
-    } else {
-      system_deep_sleep(time_us);
-    }
+    system_deep_sleep(time_us);
+    esp_yield();
+}
+
+void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
+{
+    system_deep_sleep_set_option(static_cast<int>(mode));
+    system_deep_sleep_instant(time_us);
     esp_yield();
 }
 
