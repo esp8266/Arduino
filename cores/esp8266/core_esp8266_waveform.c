@@ -79,7 +79,11 @@ static Waveform waveform[] = {
   {0, 0, 1<<3, 0, 0, 0, 0, 0},
   {0, 0, 1<<4, 0, 0, 0, 0, 0},
   {0, 0, 1<<5, 0, 0, 0, 0, 0},
-  // GPIOS 6-11 not allowed, used for flash
+  // GPIOS 6-8 not allowed, used for flash
+  // GPIO 9 and 10 only allowed in 2-bit flash mode
+  {0, 0, 1<<9, 0, 0, 0, 0, 0},
+  {0, 0, 1<<10, 0, 0, 0, 0, 0},
+  // GPIO 11 not allowed, used for flash
   {0, 0, 1<<12, 0, 0, 0, 0, 0},
   {0, 0, 1<<13, 0, 0, 0, 0, 0},
   {0, 0, 1<<14, 0, 0, 0, 0, 0},
