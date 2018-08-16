@@ -48,7 +48,7 @@ extern void (*__init_array_end)(void);
 /* Not static, used in Esp.cpp */
 struct rst_info resetInfo;
 
-/* Not static, used in core_esp8266_postmortem.c.
+/* Not static, used in core_esp8266_postmortem.c and other places.
  * Placed into noinit section because we assign value to this variable
  * before .bss is zero-filled, and need to preserve the value.
  */
