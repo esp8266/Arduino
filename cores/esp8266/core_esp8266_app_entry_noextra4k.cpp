@@ -10,7 +10,6 @@
 #include "cont.h"
 #include "coredecls.h"
 
-// callers to this function must *always* be inlined
 void disable_extra4k_at_link_time (void)
 {
     /*
