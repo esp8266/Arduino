@@ -164,7 +164,7 @@ void __wrap_system_restart_local() {
 
     // Use cap-X formatting to ensure the standard EspExceptionDecoder doesn't match the address
     if (umm_last_fail_alloc_addr) {
-      ets_printf("\nlast failed alloc call: %08X(%d)\n", (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+      ets_printf_P("\nlast failed alloc call: %08X(%d)\n", (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
     }
 
     custom_crash_callback( &rst_info, sp + offset, stack_end );
