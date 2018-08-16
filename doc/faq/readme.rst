@@ -55,16 +55,19 @@ How can I get some extra KBs in flash ?
 About WPS
 ~~~~~~~~~
 
-In release 2.4.2 only, WPS is disabled by default.  To enable WPS, use this
-boards generator option:
+From release 2.4.2 and ahead, not using WPS will give an exra ~4.5KB in
+heap.
+
+In release 2.4.2 only, WPS is disabled by default and the board generator is
+required to enable it:
 
 ``./tools/boards.txt.py --allowWPS --boardsgen``
 
 `Read more <a05-board-generator.rst>`__.
 
-From release 2.4.2 and ahead, using WPS will reduce available heap space to
-user by around 4.5KB.  In other words, from release 2.4.2 without using WPS,
-an extra ~4.5KB is available in user's heap space.
+This manual selection is not needed starting from 2.5.0 (and in git
+version).  WPS is always available, and not using it will give an extra
+~4.5KB compared to releases until 2.4.1 included.
 
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
