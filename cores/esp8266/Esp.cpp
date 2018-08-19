@@ -114,6 +114,13 @@ void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
     esp_yield();
 }
 
+void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
+{
+    system_deep_sleep_set_option(static_cast<int>(mode));
+    system_deep_sleep_instant(time_us);
+    esp_yield();
+}
+
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
 //Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t.
 uint64_t EspClass::deepSleepMax()
