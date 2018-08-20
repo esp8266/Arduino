@@ -48,8 +48,6 @@ As of today you can:
 
 * increase available flash space by disabling floats in ``*printf`` functions
 
-* enable WPS which is now disabled by default (at the cost of a smaller heap by ~4KB)
-
 * change led pin ``LED_BUILTIN`` for the two generic boards
 
 * change the default lwIP version (1.4 or 2)
