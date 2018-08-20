@@ -296,7 +296,7 @@ public:
         _rx_buf_offset = 0;
     }
 
-    bool wait_until_sent(int max_wait_ms = 100)
+    bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
         // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
         // option 1 done
