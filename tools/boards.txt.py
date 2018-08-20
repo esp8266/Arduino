@@ -1144,7 +1144,7 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
         print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
         print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
         print("")
-        print('INCLUDE "../ld/eagle.app.v6.common.ld"')
+        print('INCLUDE "eagle.app.v6.common.ld"')
 
         if ldgen:
             sys.stdout.close()
