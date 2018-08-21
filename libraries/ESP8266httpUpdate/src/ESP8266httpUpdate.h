@@ -26,7 +26,7 @@
 #ifndef ESP8266HTTPUPDATE_H_
 #define ESP8266HTTPUPDATE_H_
 
-#define ESP8266HTTPUPDATE_KEEP_CURRENT_API
+#define HTTPUPDATE_1_2_COMPATIBLE
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
@@ -74,40 +74,40 @@ public:
         _rebootOnUpdate = reboot;
     }
 
-#ifdef ESP8266HTTPUPDATE_KEEP_CURRENT_API
+#ifdef HTTPUPDATE_1_2_COMPATIBLE
     // This function is deprecated, use rebootOnUpdate and the next one instead
     t_httpUpdate_return update(const String& url, const String& currentVersion,
                                const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
-    t_httpUpdate_return update(const String& url, const String& currentVersion = "");
+    t_httpUpdate_return update(const String& url, const String& currentVersion = "") __attribute__((deprecated));
     t_httpUpdate_return update(const String& url, const String& currentVersion,
-                               const String& httpsFingerprint);
+                               const String& httpsFingerprint) __attribute__((deprecated));
     t_httpUpdate_return update(const String& url, const String& currentVersion,
-                               const uint8_t httpsFingerprint[20]); // BearSSL
+                               const uint8_t httpsFingerprint[20]) __attribute__((deprecated)); // BearSSL
 #endif
     t_httpUpdate_return update(WiFiClient& client, const String& url, const String& currentVersion = "");
 
-#ifdef ESP8266HTTPUPDATE_KEEP_CURRENT_API
+#ifdef HTTPUPDATE_1_2_COMPATIBLE
     // This function is deprecated, use one of the overloads below along with rebootOnUpdate
     t_httpUpdate_return update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
                                bool https, const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
 
     t_httpUpdate_return update(const String& host, uint16_t port, const String& uri = "/",
-                               const String& currentVersion = "");
+                               const String& currentVersion = "") __attribute__((deprecated));
     t_httpUpdate_return update(const String& host, uint16_t port, const String& url,
-                               const String& currentVersion, const String& httpsFingerprint);
+                               const String& currentVersion, const String& httpsFingerprint) __attribute__((deprecated));
     t_httpUpdate_return update(const String& host, uint16_t port, const String& url,
-                               const String& currentVersion, const uint8_t httpsFingerprint[20]); // BearSSL
+                               const String& currentVersion, const uint8_t httpsFingerprint[20]) __attribute__((deprecated)); // BearSSL
 #endif
     t_httpUpdate_return update(WiFiClient& client, const String& host, uint16_t port, const String& uri = "/",
                                const String& currentVersion = "");
 
-#ifdef ESP8266HTTPUPDATE_KEEP_CURRENT_API
+#ifdef HTTPUPDATE_1_2_COMPATIBLE
     // This function is deprecated, use rebootOnUpdate and the next one instead
     t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion,
                                      const String& httpsFingerprint, bool reboot) __attribute__((deprecated));
-    t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion = "");
-    t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint);
-    t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion, const uint8_t httpsFingerprint[20]); // BearSSL
+    t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion = "") __attribute__((deprecated));
+    t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint) __attribute__((deprecated));
+    t_httpUpdate_return updateSpiffs(const String& url, const String& currentVersion, const uint8_t httpsFingerprint[20]) __attribute__((deprecated)); // BearSSL
 #endif
     t_httpUpdate_return updateSpiffs(WiFiClient& client, const String& url, const String& currentVersion = "");
 
