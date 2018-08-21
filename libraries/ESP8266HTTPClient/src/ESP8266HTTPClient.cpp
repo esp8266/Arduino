@@ -315,6 +315,8 @@ bool HTTPClient::begin(String host, uint16_t port, String uri)
     return true;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
 bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)
 {
     if (https) {
@@ -323,6 +325,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, Strin
         return begin(host, port, uri);
     }
 }
+#pragma GCC diagnostic pop
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFingerprint)
 {
