@@ -5,7 +5,7 @@
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
-name=ESP8266 Modules
+name=ESP8266 Boards (2.5.0-dev)
 version=2.5.0-dev
 
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
@@ -25,7 +25,6 @@ build.vtable_flags=-DVTABLES_IN_FLASH
 
 build.float=-u _printf_float -u _scanf_float
 build.led=
-build.noextra4kheap=
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk
@@ -33,7 +32,7 @@ compiler.libc.path={runtime.platform.path}/tools/sdk/libc/xtensa-lx106-elf
 compiler.cpreprocessor.flags=-D__ets__ -DICACHE_FLASH -U__STRICT_ANSI__ "-I{compiler.sdk.path}/include" "-I{compiler.sdk.path}/{build.lwip_include}" "-I{compiler.libc.path}/include" "-I{build.path}/core"
 
 compiler.c.cmd=xtensa-lx106-elf-gcc
-compiler.c.flags=-c {compiler.warning_flags} {build.noextra4kheap} -Os -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -std=gnu99 -ffunction-sections -fdata-sections
+compiler.c.flags=-c {compiler.warning_flags} -Os -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -falign-functions=4 -MMD -std=gnu99 -ffunction-sections -fdata-sections
 
 compiler.S.cmd=xtensa-lx106-elf-gcc
 compiler.S.flags=-c -g -x assembler-with-cpp -MMD -mlongcalls
@@ -44,7 +43,7 @@ compiler.c.elf.cmd=xtensa-lx106-elf-gcc
 compiler.c.elf.libs=-lhal -lphy -lpp -lnet80211 {build.lwip_lib} -lwpa -lcrypto -lmain -lwps -lbearssl -laxtls -lespnow -lsmartconfig -lairkiss -lwpa2 -lstdc++ -lm -lc -lgcc
 
 compiler.cpp.cmd=xtensa-lx106-elf-g++
-compiler.cpp.flags=-c {compiler.warning_flags} {build.noextra4kheap} -Os -g -mlongcalls -mtext-section-literals -fno-exceptions -fno-rtti -falign-functions=4 -std=c++11 -MMD -ffunction-sections -fdata-sections
+compiler.cpp.flags=-c {compiler.warning_flags} -Os -g -mlongcalls -mtext-section-literals -fno-exceptions -fno-rtti -falign-functions=4 -std=c++11 -MMD -ffunction-sections -fdata-sections
 
 compiler.as.cmd=xtensa-lx106-elf-as
 
@@ -74,13 +73,13 @@ compiler.elf2hex.extra_flags=
 ## generate file with git version number
 ## needs bash, git, and echo
 recipe.hooks.core.prebuild.1.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_VER 0x`git --git-dir {runtime.platform.path}/.git rev-parse --short=8 HEAD 2>/dev/null || echo ffffffff` >{build.path}/core/core_version.h"
-recipe.hooks.core.prebuild.2.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_DESC `cd {runtime.platform.path}; git describe --tags 2>/dev/null || echo unix-{version}` >>{build.path}/core/core_version.h"
+recipe.hooks.core.prebuild.2.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_DESC `cd "{runtime.platform.path}"; git describe --tags 2>/dev/null || echo unix-{version}` >>{build.path}/core/core_version.h"
 ## windows-compatible version without git
 recipe.hooks.core.prebuild.1.pattern.windows=cmd.exe /c mkdir {build.path}\core & (echo #define ARDUINO_ESP8266_GIT_VER 0x00000000 & echo #define ARDUINO_ESP8266_GIT_DESC win-{version} ) > {build.path}\core\core_version.h
 recipe.hooks.core.prebuild.2.pattern.windows=
 
 ## Build the app.ld linker file
-recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld"
+recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/eagle.app.v6.common.ld"
 
 ## Compile c files
 recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.flags} {compiler.c.flags} -DF_CPU={build.f_cpu} {build.lwip_flags} {build.debug_port} {build.debug_level} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_BOARD="{build.board}" {build.led} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
@@ -92,10 +91,10 @@ recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpreprocessor
 recipe.S.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.flags} {compiler.S.flags} -DF_CPU={build.f_cpu} {build.lwip_flags} {build.debug_port} {build.debug_level} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_BOARD="{build.board}" {build.led} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Create archives
-recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{build.path}/arduino.ar" "{object_file}"
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{build.path}/arduino.ar" {compiler.c.elf.libs} -Wl,--end-group  "-L{build.path}"
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} -Wl,--end-group  "-L{build.path}"
 
 ## Create eeprom
 recipe.objcopy.eep.pattern=
