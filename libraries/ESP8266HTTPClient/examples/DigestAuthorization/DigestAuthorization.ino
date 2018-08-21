@@ -117,7 +117,7 @@ void loop() {
     String authorization = getDigestAuth(authReq, String(username), String(password), String(uri), 1);
 
     http.end();
-    http.begin(String(server) + String(uri));
+    http.begin(client, String(server) + String(uri));
 
     http.addHeader("Authorization", authorization);
 
