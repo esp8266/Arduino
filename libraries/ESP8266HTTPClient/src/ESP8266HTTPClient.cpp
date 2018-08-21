@@ -316,7 +316,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri)
 }
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Werror=deprecated-declarations"
+#pragma GCC diagnostic ignored "-Wno-deprecated-declarations"
 bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)
 {
     if (https) {
