@@ -427,23 +427,26 @@ protected:
             return false;
         }
 
-//        DEBUGV(":wr %d %d %d\r\n", will_send, left, _written);
+        DEBUGV(":wr %d %d %d\r\n", will_send, left, _written);
         bool has_written = false;
+
         while (_datasource) {
             if (state() == CLOSED)
                 return false;
-                
-            size_t next_chunk = tcp_sndbuf(_pcb);
-            if (next_chunk > _datasource->available())
-                next_chunk = _datasource->available();
-            if (!next_chunk)
+            size_t next_chunk_size = std::min((size_t)tcp_sndbuf(_pcb), _datasource->available());
+#if LWIP_VERSION_MAJOR == 1
+            if (next_chunk_size > 256)
+                // phy not quickly emptied by lwip1.4 (could be removed after tests)
+                next_chunk_size = 256;
+#endif
+            if (!next_chunk_size)
                 break;
-            const uint8_t* buf = _datasource->get_buffer(next_chunk);
-            err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE);
-            DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, (int) err);
+            const uint8_t* buf = _datasource->get_buffer(next_chunk_size);
+            err_t err = tcp_write(_pcb, buf, next_chunk_size, TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE);
+            DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, will_send, (int)err);
             if (err == ERR_OK) {
-                _datasource->release_buffer(buf, next_chunk);
-                _written += next_chunk;
+                _datasource->release_buffer(buf, next_chunk_size);
+                _written += next_chunk_size;
                 has_written = true;
             } else {
 		// ERR_MEM(-1) is a valid error meaning
@@ -452,7 +455,7 @@ protected:
             }
         }
 
-        if (has_written)
+        if (/*nagle*/0 && has_written)
             // lwIP: "Find out what we can send and send it"
             tcp_output(_pcb);
 
