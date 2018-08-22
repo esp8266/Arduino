@@ -40,22 +40,22 @@ void loop() {
 
     HTTPClient http;
 
-    BearSSL::WiFiClientSecure client;
+    BearSSL::WiFiClientSecure *client = new BearSSL::WiFiClientSecure ;
 
-    bool mfln = client.probeMaxFragmentLength("tls.mbed.org", 443, 1024);
+    bool mfln = client->probeMaxFragmentLength("tls.mbed.org", 443, 1024);
     Serial.printf("\nConnecting to https://tls.mbed.org\n");
     Serial.printf("Maximum fragment Length negotiation supported: %s\n", mfln ? "yes" : "no");
     if (mfln) {
-      client.setBufferSizes(1024, 1024);
+      client->setBufferSizes(1024, 1024);
     }
 
     Serial.print("[HTTPS] begin...\n");
 
     // configure server and url
     const uint8_t fingerprint[20] = {0xEB, 0xD9, 0xDF, 0x37, 0xC2, 0xCC, 0x84, 0x89, 0x00, 0xA0, 0x58, 0x52, 0x24, 0x04, 0xE4, 0x37, 0x3E, 0x2B, 0xF1, 0x41};
-    client.setFingerprint(fingerprint);
+    client->setFingerprint(fingerprint);
 
-    if (http.begin(client, "https://tls.mbed.org/")) {
+    if (http.begin(*client, "https://tls.mbed.org/")) {
 
       Serial.print("[HTTPS] GET...\n");
       // start connection and send HTTP header
@@ -74,7 +74,7 @@ void loop() {
           static uint8_t buff[128] = { 0 };
 
           // get tcp stream
-          WiFiClient * stream = &client;
+          WiFiClient * stream = client;
 
           // read all data from server
           while (http.connected() && (len > 0 || len == -1)) {
@@ -107,6 +107,8 @@ void loop() {
     } else {
       Serial.printf("Unable to connect\n");
     }
+
+    delete client;
   }
 
   delay(10000);
