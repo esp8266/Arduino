@@ -427,48 +427,47 @@ protected:
             return false;
         }
 
-        size_t left = _datasource->available();
-        size_t can_send = tcp_sndbuf(_pcb);
-        if (_pcb->snd_queuelen >= TCP_SND_QUEUELEN) {
-            can_send = 0;
-        }
-        size_t will_send = (can_send < left) ? can_send : left;
-        DEBUGV(":wr %d %d %d\r\n", will_send, left, _written);
-        bool need_output = false;
-        while( will_send && _datasource) {
-            size_t next_chunk =
-                will_send > _write_chunk_size ? _write_chunk_size : will_send;
-            const uint8_t* buf = _datasource->get_buffer(next_chunk);
-            if (state() == CLOSED) {
-                need_output = false;
+//        DEBUGV(":wr %d %d %d\r\n", will_send, left, _written);
+        bool has_written = false;
+        while (_datasource) {
+            if (state() == CLOSED)
+                return false;
+                
+            size_t next_chunk = tcp_sndbuf(_pcb);
+            if (next_chunk > _datasource->available())
+                next_chunk = _datasource->available();
+            if (!next_chunk)
                 break;
-            }
-            err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
+            const uint8_t* buf = _datasource->get_buffer(next_chunk);
+            err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, (int) err);
             if (err == ERR_OK) {
                 _datasource->release_buffer(buf, next_chunk);
                 _written += next_chunk;
-                need_output = true;
+                has_written = true;
             } else {
 		// ERR_MEM(-1) is a valid error meaning
 		// "come back later". It leaves state() opened
                 break;
             }
-            will_send -= next_chunk;
         }
-        if( need_output ) {
+
+        if (has_written)
+            // lwIP: "Find out what we can send and send it"
             tcp_output(_pcb);
-            return true;
-        }
-        return false;
+
+        return has_written;
     }
 
     void _write_some_from_cb()
     {
+        // lwIP needs feeding
+        _write_some();
+        
         if (_send_waiting == 1) {
             _send_waiting--;
-            esp_schedule();
         }
+        esp_schedule();
     }
 
     err_t _acked(tcp_pcb* pcb, uint16_t len)
@@ -592,7 +591,7 @@ private:
 
     DataSource* _datasource = nullptr;
     size_t _written = 0;
-    size_t _write_chunk_size = 256;
+    //size_t _write_chunk_size = 256;
     uint32_t _timeout_ms = 5000;
     uint32_t _op_start_time = 0;
     uint8_t _send_waiting = 0;
