@@ -767,10 +767,9 @@ WiFiClient& HTTPClient::getStream(void)
 {
     if(connected()) {
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
-        return _client ? *_client : *_tcpDeprecated;
-#else
-        return *_client;
+        if(_tcpDeprecated) return *_tcpDeprecated;
 #endif
+        return *_client;
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client] getStream: not connected\n");
@@ -786,10 +785,9 @@ WiFiClient* HTTPClient::getStreamPtr(void)
 {
     if(connected()) {
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
-        return _tcpDeprecated.get();
-#else
-        return _client;
+        if(_tcpDeprecated) return _tcpDeprecated.get();
 #endif
+        return _client;
     }
 
     DEBUG_HTTPCLIENT("[HTTP-Client] getStreamPtr: not connected\n");
