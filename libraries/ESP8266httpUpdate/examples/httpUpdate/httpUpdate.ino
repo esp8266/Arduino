@@ -35,18 +35,22 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("SSID", "PASSWORD");
 
+
 }
 
 void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    t_httpUpdate_return ret = ESPhttpUpdate.update("http://server/file.bin");
+    WiFiClient client;
+//    t_httpUpdate_return ret = ESPhttpUpdate.update("http://server/file.bin");
+    t_httpUpdate_return ret = ESPhttpUpdate.update("https://iot-hub.metriot.nl/devices/update/12345/", "IoT_Embedded_Software_018.ino.generic.bin");
+
     //t_httpUpdate_return  ret = ESPhttpUpdate.update("https://server/file.bin", "", "fingerprint");
 
     switch (ret) {
       case HTTP_UPDATE_FAILED:
-        USE_SERIAL.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+        USE_SERIAL.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
         break;
 
       case HTTP_UPDATE_NO_UPDATES:

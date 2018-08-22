@@ -11,7 +11,7 @@ The purpose of the release process is to generate the following outputs from the
 
 * Github Release for esp8266/Arduino project. This is used to host the boards manager package mentioned above, and also contains the release notes.
 
-Here is an overview of the release process.
+Here is an overview of the release process. See the section below for detailed instructions.
 
 1. Release process starts when a maintainer pushes a tag into the repository.
 
@@ -51,29 +51,39 @@ Here is an overview of the release process.
 
    * Not all commit descriptions which come from `git log` will explain changes well. Reword items as necessary, with the goal that a general user of this project should be able to understand what the change is related to. Preserve references to PRs or issues (`#XXXX`).
 
-   * Don't include fixes for issues which have been introduced since last release.
+   * Don't include fixes for regressions which have been introduced since last release.
 
    * Aggregate minor fixes (e.g. typos, small documentation changes) in a few items. Focus on preparing a good overview of the release for the users, rather than mentioning every change.
 
    * When done, put release notes into a private Gist and send the link to other maintainers for review.
 
-2. Tag the latest commit. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-rcN` for release versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
+2. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-rcN` for release versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
 
    ```
    git tag -a -m "Release 2.4.0" 2.4.0
    ```
-   
-   Push the tag to esp8266/Arduino Github repository.
 
+3. Push the tag created in step 2 to esp8266/Arduino Github repository:
 
-3. Wait for Travis CI build for the tag to pass. Check that the new (draft) release has been created. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
+   ```
+   git push origin 2.4.0
+   ```
 
-4. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266_index.json contains an entry for the new version (it may not be the first one).
+4. Wait for Travis CI build for the tag to pass. Check that the new (draft) release has been created. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
 
-5. Navigate to release list in Github, press "Edit" button to edit release description, paste release notes. Remove "draft" status of the release and publish it.
+5. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266_index.json contains an entry for the new version (it may not be the first one).
 
-6. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version.
+6. Navigate to release list in Github, press "Edit" button to edit release description, paste release notes. Remove "draft" status of the release and publish it.
 
-7. Make a commit to master branch, updating the version in platform.txt file. This should correspond to the version of the *next* milestone.
+7. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version.
 
+8. Create a commit to the master branch, updating:
+
+   * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `2.5.0-dev`.
+
+   * In main README.md:
+
+     - in "Contributing" section, update the "easy issues" link to point to the next milestone.
+
+     - in "Latest release" section, change version number in the readthedocs link to the version which was just released.
 

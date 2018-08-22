@@ -12,22 +12,20 @@
 
 #include <ESP8266HTTPClient.h>
 
-#define USE_SERIAL Serial
-
 ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
 
-  USE_SERIAL.begin(115200);
-  // USE_SERIAL.setDebugOutput(true);
+  Serial.begin(115200);
+  // Serial.setDebugOutput(true);
 
-  USE_SERIAL.println();
-  USE_SERIAL.println();
-  USE_SERIAL.println();
+  Serial.println();
+  Serial.println();
+  Serial.println();
 
   for (uint8_t t = 4; t > 0; t--) {
-    USE_SERIAL.printf("[SETUP] WAIT %d...\n", t);
-    USE_SERIAL.flush();
+    Serial.printf("[SETUP] WAIT %d...\n", t);
+    Serial.flush();
     delay(1000);
   }
 
@@ -45,27 +43,26 @@ void loop() {
     BearSSL::WiFiClientSecure client;
 
     bool mfln = client.probeMaxFragmentLength("tls.mbed.org", 443, 1024);
-    USE_SERIAL.printf("\nConnecting to https://tls.mbed.org\n");
-    USE_SERIAL.printf("MFLN supported: %s\n", mfln ? "yes" : "no");
+    Serial.printf("\nConnecting to https://tls.mbed.org\n");
+    Serial.printf("Maximum fragment Length negotiation supported: %s\n", mfln ? "yes" : "no");
     if (mfln) {
       client.setBufferSizes(1024, 1024);
     }
 
-    USE_SERIAL.print("[HTTP] begin...\n");
+    Serial.print("[HTTPS] begin...\n");
 
     // configure server and url
     const uint8_t fingerprint[20] = {0xEB, 0xD9, 0xDF, 0x37, 0xC2, 0xCC, 0x84, 0x89, 0x00, 0xA0, 0x58, 0x52, 0x24, 0x04, 0xE4, 0x37, 0x3E, 0x2B, 0xF1, 0x41};
     client.setFingerprint(fingerprint);
 
-    //if (http.begin(client, "jigsaw.w3.org", 443, "/HTTP/connection.html", true)) {
     if (http.begin(client, "https://tls.mbed.org/")) {
 
-      USE_SERIAL.print("[HTTP] GET...\n");
+      Serial.print("[HTTPS] GET...\n");
       // start connection and send HTTP header
       int httpCode = http.GET();
       if (httpCode > 0) {
         // HTTP header has been send and Server response header has been handled
-        USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
+        Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
 
         // file found at server
         if (httpCode == HTTP_CODE_OK) {
@@ -74,7 +71,7 @@ void loop() {
           int len = http.getSize();
 
           // create buffer for read
-          uint8_t buff[128] = { 0 };
+          static uint8_t buff[128] = { 0 };
 
           // get tcp stream
           WiFiClient * stream = &client;
@@ -89,7 +86,7 @@ void loop() {
               int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
 
               // write it to Serial
-              USE_SERIAL.write(buff, c);
+              Serial.write(buff, c);
 
               if (len > 0) {
                 len -= c;
@@ -98,17 +95,17 @@ void loop() {
             delay(1);
           }
 
-          USE_SERIAL.println();
-          USE_SERIAL.print("[HTTP] connection closed or file end.\n");
+          Serial.println();
+          Serial.print("[HTTPS] connection closed or file end.\n");
 
         }
       } else {
-        USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        Serial.printf("[HTTPS] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
       }
 
       http.end();
     } else {
-      USE_SERIAL.printf("Unable to connect\n");
+      Serial.printf("Unable to connect\n");
     }
   }
 

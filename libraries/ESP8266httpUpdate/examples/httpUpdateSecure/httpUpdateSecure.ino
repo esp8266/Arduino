@@ -93,7 +93,8 @@ void setup() {
   }
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP("SSID", "PASSWORD");
+//  WiFiMulti.addAP("SSID", "PASSWORD");
+  WiFiMulti.addAP("H369A394602", "445396E996F9");
 
   SPIFFS.begin();
 
@@ -119,7 +120,10 @@ void loop() {
     }
     client.setCertStore(&certStore);
 
-    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "https://server/file.bin");
+//    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "https://server/file.bin");
+//    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "https://iot-hub.metriot.nl/devices/update/12345/IoT_Embedded_Software_018.ino.generic.bin");
+  t_httpUpdate_return ret = ESPhttpUpdate.update(client, "iot-hub.metriot.nl", 443, "/devices/update/12345", "IoT_Embedded_Software_017.ino.generic.bin");
+
 
     switch (ret) {
       case HTTP_UPDATE_FAILED:
