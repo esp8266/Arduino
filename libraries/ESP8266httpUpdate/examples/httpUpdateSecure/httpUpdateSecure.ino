@@ -119,9 +119,9 @@ void loop() {
     }
     client.setCertStore(&certStore);
 
-//    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "https://server/file.bin");
+    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "https://server/file.bin");
     // Or:
-//  t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 443, "file.bin");
+    //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 443, "file.bin");
 
 
     switch (ret) {

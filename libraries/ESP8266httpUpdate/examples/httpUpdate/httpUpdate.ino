@@ -43,9 +43,9 @@ void loop() {
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
     WiFiClient client;
-    t_httpUpdate_return ret = ESPhttpUpdate.update("http://server/file.bin");
+    t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://server/file.bin");
     // Or:
-//  t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
+    //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
 
     switch (ret) {
       case HTTP_UPDATE_FAILED:
