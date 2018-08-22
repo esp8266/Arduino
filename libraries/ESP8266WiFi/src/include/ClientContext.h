@@ -455,7 +455,7 @@ protected:
             }
         }
 
-        if (/*nagle*/0 && has_written)
+        if (tcp_nagle_disabled(_pcb) && has_written)
             // lwIP: "Find out what we can send and send it"
             tcp_output(_pcb);
 
