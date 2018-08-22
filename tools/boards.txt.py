@@ -1144,7 +1144,7 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
         print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
         print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
         print("")
-        print('INCLUDE "../ld/eagle.app.v6.common.ld"')
+        print('INCLUDE "eagle.app.v6.common.ld"')
 
         if ldgen:
             sys.stdout.close()
@@ -1275,9 +1275,6 @@ def all_boards ():
         if nofloat:
             print(id + '.build.float=')
 
-        if noextra4kheap:
-            print(id + '.build.noextra4kheap=-DNO_EXTRA_4K_HEAP')
-
         print('')
 
     if boardsgen:
@@ -1372,8 +1369,6 @@ def usage (name,ret):
     print(" --speed s       - change default serial speed")
     print(" --customspeed s - new serial speed for all boards")
     print(" --nofloat       - disable float support in printf/scanf")
-    print(" --noextra4kheap - disable extra 4k heap (will enable WPS)")
-    print(" --allowWPS      - synonym for --noextra4kheap")
     print("")
     print(" mandatory option (at least one):")
     print("")
@@ -1417,7 +1412,6 @@ default_speed = '115'
 led_default = 2
 led_max = 16
 nofloat = False
-noextra4kheap = False
 ldgen = False
 ldshow = False
 boardsgen = False
@@ -1478,7 +1472,7 @@ for o, a in opts:
         nofloat=True
 
     elif o in ("--noextra4kheap", "--allowWPS"):
-        noextra4kheap=True
+        print('option ' + o + ' is now deprecated, without effect, and will be removed')
 
     elif o in ("--ldshow"):
         ldshow = True
