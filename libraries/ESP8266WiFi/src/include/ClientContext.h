@@ -434,14 +434,11 @@ protected:
             if (state() == CLOSED)
                 return false;
             size_t next_chunk_size = std::min((size_t)tcp_sndbuf(_pcb), _datasource->available());
-#if LWIP_VERSION_MAJOR == 1
-            if (next_chunk_size > 256)
-                // phy not quickly emptied by lwip1.4 (could be removed after tests)
-                next_chunk_size = 256;
-#endif
             if (!next_chunk_size)
                 break;
             const uint8_t* buf = _datasource->get_buffer(next_chunk_size);
+            // TCP_WRITE_FLAG_MORE to remove PUSH flag from packet
+            // TCP_WRITE_FLAG_MORE implicitely disables nagle (see lwIP's tcp_out.c)
             err_t err = tcp_write(_pcb, buf, next_chunk_size, TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, will_send, (int)err);
             if (err == ERR_OK) {
@@ -456,7 +453,8 @@ protected:
         }
 
         if (tcp_nagle_disabled(_pcb) && has_written)
-            // lwIP: "Find out what we can send and send it"
+            // handle nagle manually because of TCP_WRITE_FLAG_MORE
+            // lwIP's tcp_output: "Find out what we can send and send it"
             tcp_output(_pcb);
 
         return has_written;
