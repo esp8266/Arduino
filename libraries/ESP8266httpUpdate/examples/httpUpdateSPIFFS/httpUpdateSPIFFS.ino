@@ -42,10 +42,13 @@ void loop() {
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
     USE_SERIAL.println("Update SPIFFS...");
-    t_httpUpdate_return ret = ESPhttpUpdate.updateSpiffs("http://server/spiffs.bin");
+
+    WiFiClient client;
+
+    t_httpUpdate_return ret = ESPhttpUpdate.updateSpiffs(client, "http://server/spiffs.bin");
     if (ret == HTTP_UPDATE_OK) {
       USE_SERIAL.println("Update sketch...");
-      ret = ESPhttpUpdate.update("http://server/file.bin");
+      ret = ESPhttpUpdate.update(client, "http://server/file.bin");
 
       switch (ret) {
         case HTTP_UPDATE_FAILED:
