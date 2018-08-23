@@ -48,7 +48,10 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& curr
         const String& httpsFingerprint, bool reboot)
 {
     rebootOnUpdate(reboot);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     return update(url, currentVersion, httpsFingerprint);
+#pragma GCC diagnostic pop
 }
 
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion)
@@ -137,9 +140,12 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, co
     (void)https;
     rebootOnUpdate(reboot);
     if (httpsFingerprint.length() == 0) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
         return update(host, port, uri, currentVersion);
     } else {
         return update(host, port, uri, currentVersion, httpsFingerprint);
+#pragma GCC diagnostic pop
     }
 }
 
