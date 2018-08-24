@@ -212,6 +212,24 @@ extern "C" void ICACHE_RAM_ATTR app_entry (void)
     return app_entry_custom();
 }
 
+extern "C" void user_pre_init (void)
+{
+// NOT WORKING
+// 4M
+#define SPI_FLASH_SIZE_MAP 4
+#define SYSTEM_PARTITION_RF_CAL_ADDR           (0x400000 - 0x3000 - 0x1000 - 0x1000)
+#define SYSTEM_PARTITION_PHY_DATA_ADDR         (0x400000 - 0x3000 - 0x1000)
+#define SYSTEM_PARTITION_SYSTEM_PARAMETER_ADDR (0x400000 - 0x3000)
+    static const partition_item_t partitions[] = {
+        { SYSTEM_PARTITION_BOOTLOADER, 	0x0, 0x1000},
+        { SYSTEM_PARTITION_RF_CAL, SYSTEM_PARTITION_RF_CAL_ADDR, 0x1000},
+        { SYSTEM_PARTITION_PHY_DATA, SYSTEM_PARTITION_PHY_DATA_ADDR, 0x1000},
+        { SYSTEM_PARTITION_SYSTEM_PARAMETER,SYSTEM_PARTITION_SYSTEM_PARAMETER_ADDR, 0x3000},
+        { SYSTEM_PARTITION_CUSTOMER_BEGIN, 0x1000, 0x8000},
+    };
+    system_partition_table_regist(partitions, sizeof(partitions) / sizeof(partitions[0]), SPI_FLASH_SIZE_MAP);
+}
+
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
