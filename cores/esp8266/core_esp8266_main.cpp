@@ -214,7 +214,8 @@ extern "C" void ICACHE_RAM_ATTR app_entry (void)
 
 extern "C" void user_pre_init (void)
 {
-// NOT WORKING
+// need to get those numbers from board/generator
+// NOT WORKING - need to get numbers from board/generator
 // 4M
 #define SPI_FLASH_SIZE_MAP 4
 #define SYSTEM_PARTITION_RF_CAL_ADDR           (0x400000 - 0x3000 - 0x1000 - 0x1000)
@@ -227,7 +228,11 @@ extern "C" void user_pre_init (void)
         { SYSTEM_PARTITION_SYSTEM_PARAMETER,SYSTEM_PARTITION_SYSTEM_PARAMETER_ADDR, 0x3000},
         { SYSTEM_PARTITION_CUSTOMER_BEGIN, 0x1000, 0x8000},
     };
-    system_partition_table_regist(partitions, sizeof(partitions) / sizeof(partitions[0]), SPI_FLASH_SIZE_MAP);
+    if (!system_partition_table_regist(partitions, sizeof(partitions) / sizeof(partitions[0]), SPI_FLASH_SIZE_MAP))
+    {
+        os_printf("system_partition_table_regist: failed\n");
+        while(1);
+    }
 }
 
 extern "C" void user_init(void) {
