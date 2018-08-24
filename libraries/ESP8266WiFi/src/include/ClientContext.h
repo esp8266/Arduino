@@ -437,9 +437,17 @@ protected:
             if (!next_chunk_size)
                 break;
             const uint8_t* buf = _datasource->get_buffer(next_chunk_size);
-            // TCP_WRITE_FLAG_MORE to remove PUSH flag from packet
-            // TCP_WRITE_FLAG_MORE implicitely disables nagle (see lwIP's tcp_out.c)
-            err_t err = tcp_write(_pcb, buf, next_chunk_size, TCP_WRITE_FLAG_COPY | TCP_WRITE_FLAG_MORE);
+            // TCP_WRITE_FLAG_MORE to remove PUSH flag from packet (lwIP's doc), implicitely disables nagle (see lwIP's tcp_out.c)
+            // Notes:
+            //   PUSH is for peer, telling to give to user app as soon as received
+            //   PUSH may be set when sender has finished sending a meaningful data block
+            //   Nagle is for delaying local stack, to send less and bigger packets
+            uint8_t flags = TCP_WRITE_FLAG_COPY;
+           if (!tcp_nagle_disabled(_pcb))
+                // nagle enabled, delayed, buffering, bigger packets
+                // (When should we use PUSH?)
+                flags |= TCP_WRITE_FLAG_MORE;
+            err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, will_send, (int)err);
             if (err == ERR_OK) {
                 _datasource->release_buffer(buf, next_chunk_size);
@@ -452,7 +460,7 @@ protected:
             }
         }
 
-        if (tcp_nagle_disabled(_pcb) && has_written)
+        if (has_written && tcp_nagle_disabled(_pcb))
             // handle nagle manually because of TCP_WRITE_FLAG_MORE
             // lwIP's tcp_output: "Find out what we can send and send it"
             tcp_output(_pcb);
@@ -482,14 +490,13 @@ protected:
 
     void _consume(size_t size)
     {
+        if(_pcb)
+            tcp_recved(_pcb, size);
         ptrdiff_t left = _rx_buf->len - _rx_buf_offset - size;
         if(left > 0) {
             _rx_buf_offset += size;
         } else if(!_rx_buf->next) {
             DEBUGV(":c0 %d, %d\r\n", size, _rx_buf->tot_len);
-            if(_pcb) {
-                tcp_recved(_pcb, _rx_buf->len);
-            }
             pbuf_free(_rx_buf);
             _rx_buf = 0;
             _rx_buf_offset = 0;
@@ -499,9 +506,6 @@ protected:
             _rx_buf = _rx_buf->next;
             _rx_buf_offset = 0;
             pbuf_ref(_rx_buf);
-            if(_pcb) {
-                tcp_recved(_pcb, head->len);
-            }
             pbuf_free(head);
         }
     }
