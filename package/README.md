@@ -57,37 +57,33 @@ Here is an overview of the release process. See the section below for detailed i
 
    * When done, put release notes into a private Gist and send the link to other maintainers for review.
 
-2. Create a commit on the master branch, making the following changes:
-
-   * Set version in platform.txt to the version about to be released. E.g. change from `2.4.0-dev` to `2.4.0`
-
-   * In main README.md, in "Latest release" section, change version number in the readthedocs link to the version which is about to be created.
-
-   * Commit message should be `Release X.Y.Z`
-
-3. Tag the commit created in step 2. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-rcN` for release versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
+2. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-rcN` for release versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
 
    ```
    git tag -a -m "Release 2.4.0" 2.4.0
    ```
 
-4. Push the commit created in step 2 and the tag created in step 3 to esp8266/Arduino Github repository:
+3. Push the tag created in step 2 to esp8266/Arduino Github repository:
 
    ```
-   git push origin --follow-tags master
+   git push origin 2.4.0
    ```
 
-5. Wait for Travis CI build for the tag to pass. Check that the new (draft) release has been created. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
+4. Wait for Travis CI build for the tag to pass. Check that the new (draft) release has been created. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
 
-6. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266_index.json contains an entry for the new version (it may not be the first one).
+5. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266_index.json contains an entry for the new version (it may not be the first one).
 
-7. Navigate to release list in Github, press "Edit" button to edit release description, paste release notes. Remove "draft" status of the release and publish it.
+6. Navigate to release list in Github, press "Edit" button to edit release description, paste release notes. Remove "draft" status of the release and publish it.
 
-8. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version.
+7. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version.
 
-9. Create a commit to the master branch, updating:
+8. Create a commit to the master branch, updating:
 
    * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `2.5.0-dev`.
 
-   * In main README.md, in "Contributing" section, update the "easy issues" link to point to the next milestone.
+   * In main README.md:
+
+     - in "Contributing" section, update the "easy issues" link to point to the next milestone.
+
+     - in "Latest release" section, change version number in the readthedocs link to the version which was just released.
 

@@ -32,8 +32,6 @@
 
 extern void __real_system_restart_local();
 
-extern cont_t* g_pcont;
-
 // These will be pointers to PROGMEM const strings
 static const char* s_panic_file = 0;
 static int s_panic_line = 0;
