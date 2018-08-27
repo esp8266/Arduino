@@ -2,13 +2,6 @@
  * Configuration for umm_malloc
  */
 
-// with DEBUG_ESP_OOM debug option activated,
-// implying gcc option '-include this-file'
-// this file is included in *every* source file
-// *before* any other include file
-
-#ifndef __ASSEMBLER__
-
 #ifndef _UMM_MALLOC_CFG_H
 #define _UMM_MALLOC_CFG_H
 
@@ -184,11 +177,9 @@ extern char _heap_start;
 #ifdef DEBUG_ESP_OOM
 // this must be outside from "#ifndef _UMM_MALLOC_CFG_H"
 // because Arduino.h's <cstdlib> does #undef *alloc
-// so Arduino.h recall us to redefine them
-#define malloc(s) ({ static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__; malloc_loc(s, mem_debug_file, __LINE__); })
-#define calloc(n,s) ({ static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__; calloc_loc(n, s, mem_debug_file, __LINE__); })
-#define realloc(p,s) ({ static const char mem_debug_file[] ICACHE_RODATA_ATTR STORE_ATTR = __FILE__; realloc_loc(p, s, mem_debug_file, __LINE__); })
-
-#endif
-
-#endif /* !__ASSEMBLER__ */
+// Arduino.h recall us to redefine them
+#include <pgmspace.h>
+#define malloc(s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; malloc_loc(s, mem_debug_file, __LINE__); })
+#define calloc(n,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; calloc_loc(n, s, mem_debug_file, __LINE__); })
+#define realloc(p,s) ({ static const char mem_debug_file[] PROGMEM STORE_ATTR = __FILE__; realloc_loc(p, s, mem_debug_file, __LINE__); })
+#endif /* DEBUG_ESP_OOM */

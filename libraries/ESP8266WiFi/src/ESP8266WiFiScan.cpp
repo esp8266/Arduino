@@ -64,9 +64,11 @@ std::function<void(int)> ESP8266WiFiScanClass::_onComplete;
  * Start scan WiFi networks available
  * @param async         run in async mode
  * @param show_hidden   show hidden networks
+ * @param channel       scan only this channel (0 for all channels)
+ * @param ssid*         scan for only this ssid (NULL for all ssid's)
  * @return Number of discovered networks
  */
-int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden) {
+int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 channel, uint8* ssid) {
     if(ESP8266WiFiScanClass::_scanStarted) {
         return WIFI_SCAN_RUNNING;
     }
@@ -83,9 +85,9 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden) {
     scanDelete();
 
     struct scan_config config;
-    config.ssid = 0;
-    config.bssid = 0;
-    config.channel = 0;
+    memset(&config, 0, sizeof(config));
+    config.ssid = ssid;
+    config.channel = channel;
     config.show_hidden = show_hidden;
     if(wifi_station_scan(&config, reinterpret_cast<scan_done_cb_t>(&ESP8266WiFiScanClass::_scanDone))) {
         ESP8266WiFiScanClass::_scanComplete = false;

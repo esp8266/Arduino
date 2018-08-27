@@ -24,16 +24,16 @@
               "name": "Generic ESP8266 Module"
             },
             {
-              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+              "name": "Generic ESP8285 Module"
             },
             {
-              "name": "NodeMCU 0.9 (ESP-12 Module)"
+              "name": "ESPDuino (ESP-13 Module)"
             },
             {
-              "name": "NodeMCU 1.0 (ESP-12E Module)"
+              "name": "Adafruit Feather HUZZAH ESP8266"
             },
             {
-              "name": "Adafruit HUZZAH ESP8266 (ESP-12)"
+              "name": "XinaBox CW01"
             },
             {
               "name": "ESPresso Lite 1.0"
@@ -46,43 +46,70 @@
             },
             {
               "name": "Phoenix 2.0"
-            },                        
+            },
             {
-              "name": "SparkFun Thing"
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            },
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            },
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            },
+            {
+              "name": "SparkFun ESP8266 Thing"
+            },
+            {
+              "name": "SparkFun ESP8266 Thing Dev"
             },
             {
               "name": "SweetPea ESP-210"
             },
             {
-              "name": "WeMos D1"
+              "name": "LOLIN(WEMOS) D1 R2 & mini"
             },
             {
-              "name": "WeMos D1 mini"
+              "name": "LOLIN(WEMOS) D1 mini Pro"
+            },
+            {
+              "name": "LOLIN(WEMOS) D1 mini Lite"
+            },
+            {
+              "name": "WeMos D1 R1"
             },
             {
               "name": "ESPino (ESP-12 Module)"
             },
             {
-              "name": "ESPino (WROOM-02 Module)"
+              "name": "ThaiEasyElec's ESPino"
             },
             {
               "name": "WifInfo"
             },
             {
-              "name": "ESPDuino"
+              "name": "Arduino"
             },
             {
               "name": "4D Systems gen4 IoD Range"
             },
             {
-              "name": "DigiStump Oak"
+              "name": "Digistump Oak"
+            },
+            {
+              "name": "WiFiduino"
+            },
+            {
+              "name": "Amperka WiFi Slot"
+            },
+            {
+              "name": "Seeed Wio Link"
             }
           ],
           "toolsDependencies": [
             {
               "packager": "esp8266",
               "name": "esptool",
-              "version": "0.4.12"
+              "version": "0.4.13"
             },
             {
               "packager": "esp8266",
@@ -100,49 +127,49 @@
       "tools": [
         {
           "name": "esptool",
-          "version": "0.4.12",
+          "version": "0.4.13",
           "systems": [
             {
               "host": "i686-mingw32",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-win32.zip",
-              "archiveFileName": "esptool-0.4.12-win32.zip",
-              "checksum": "SHA-256:f47b3bcf7c29c7a184859bbea68c9d468cf3346ca41e202ed60a0a49d987f223",
-              "size": "16537"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-win32.zip",
+              "archiveFileName": "esptool-0.4.13-win32.zip",
+              "checksum": "SHA-256:17c1035aacd8f6dbfbc04ed899f5db0ceba60820592705a9c6011476ab8d1687",
+              "size": "16660"
             },
             {
               "host": "x86_64-apple-darwin",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-osx.tar.gz",
-              "archiveFileName": "esptool-0.4.12-osx.tar.gz",
-              "checksum": "SHA-256:8232a70611768dca49321f488e3ada29648e28aa83a6d826fcbb871aed4a9c08",
-              "size": "31981"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-osx.tar.gz",
+              "archiveFileName": "esptool-0.4.13-osx.tar.gz",
+              "checksum": "SHA-256:a24a973c3b2671992a8b66f4e7c9ffd24065972f241469f45e94a0a66d118d23",
+              "size": "32362"
             },
             {
               "host": "i386-apple-darwin",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-osx.tar.gz",
-              "archiveFileName": "esptool-0.4.12-osx.tar.gz",
-              "checksum": "SHA-256:8232a70611768dca49321f488e3ada29648e28aa83a6d826fcbb871aed4a9c08",
-              "size": "31981"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-osx.tar.gz",
+              "archiveFileName": "esptool-0.4.13-osx.tar.gz",
+              "checksum": "SHA-256:a24a973c3b2671992a8b66f4e7c9ffd24065972f241469f45e94a0a66d118d23",
+              "size": "32362"
             },
             {
               "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-linux64.tar.gz",
-              "archiveFileName": "esptool-0.4.12-linux64.tar.gz",
-              "checksum": "SHA-256:f7ca7666557139bda7b2130022623a004a30d20ea47e1612b9b365783f00d8cb",
-              "size": "15542"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-linux64.tar.gz",
+              "archiveFileName": "esptool-0.4.13-linux64.tar.gz",
+              "checksum": "SHA-256:3c35f366ffdaa1328b1e96e28c9a97f60c98109095ccc18352fb5615e582a786",
+              "size": "15743"
             },
             {
               "host": "i686-pc-linux-gnu",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-linux32.tar.gz",
-              "archiveFileName": "esptool-0.4.12-linux32.tar.gz",
-              "checksum": "SHA-256:2d9970c8574908c35656e35f433082aeb7d79c1967067d7d2cff83f5ed2acbaa",
-              "size": "14668"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-linux32.tar.gz",
+              "archiveFileName": "esptool-0.4.13-linux32.tar.gz",
+              "checksum": "SHA-256:041f661a41a2efb40c89fc34acf0059bbb5e1eb1c050efaa69af677f79c966fb",
+              "size": "14884"
             },
             {
               "host": "arm-linux-gnueabihf",
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.12/esptool-0.4.12-linux-armhf.tar.gz",
-              "archiveFileName": "esptool-0.4.12-linux-armhf.tar.gz",
-              "checksum": "SHA-256:2ab4784c10020cdfc467175fe8885db702e7dd95fa5bdc428ec549257eae1a0e",
-              "size": "13097"
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-linux-armhf.tar.gz",
+              "archiveFileName": "esptool-0.4.13-linux-armhf.tar.gz",
+              "checksum": "SHA-256:3a627e2678e0c317122543883ae8a00e82149769414b9d5733f23526fb28a423",
+              "size": "13259"
             }
           ]
         },

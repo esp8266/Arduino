@@ -43,7 +43,8 @@ bool ICACHE_FLASH_ATTR check_memleak_debug_enable(void)
 #define os_malloc malloc
 #define os_calloc calloc
 #define os_realloc realloc
-#define os_zalloc zalloc
+#define os_zalloc(s) calloc(1,s)
+#define zalloc(s) calloc(1,s)
 
 #ifndef MEMLEAK_DEBUG
 #define MEMLEAK_DEBUG_ENABLE	0

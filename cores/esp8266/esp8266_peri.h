@@ -754,7 +754,7 @@ extern uint8_t esp8266_gpioToFn[16];
 #define i2c_bbpll_en_audio_clock_out_msb  7
 #define i2c_bbpll_en_audio_clock_out_lsb  7
 #define I2S_CLK_ENABLE()                  i2c_writeReg_Mask_def(i2c_bbpll, i2c_bbpll_en_audio_clock_out, 1)
-#define I2SBASEFREQ                       (12000000L)
+#define I2SBASEFREQ                       (160000000L)
 
 #define I2STXF  ESP8266_REG(0xe00) //I2STXFIFO (32bit)
 #define I2SRXF  ESP8266_REG(0xe04) //I2SRXFIFO (32bit)

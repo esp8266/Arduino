@@ -20,78 +20,8 @@
 
 */
 
-#ifndef wificlientsecure_h
-#define wificlientsecure_h
-#include "WiFiClient.h"
-#include "include/ssl.h"
+#include "WiFiClientSecureAxTLS.h"
+#include "WiFiClientSecureBearSSL.h"
 
-
-class SSLContext;
-
-class WiFiClientSecure : public WiFiClient {
-public:
-  WiFiClientSecure();
-  ~WiFiClientSecure() override;
-  WiFiClientSecure(const WiFiClientSecure&);
-  WiFiClientSecure& operator=(const WiFiClientSecure&);
-
-  int connect(IPAddress ip, uint16_t port) override;
-  int connect(const String host, uint16_t port) override;
-  int connect(const char* name, uint16_t port) override;
-
-  bool verify(const char* fingerprint, const char* domain_name);
-  bool verifyCertChain(const char* domain_name);
-
-  uint8_t connected() override;
-  size_t write(const uint8_t *buf, size_t size) override;
-  size_t write_P(PGM_P buf, size_t size) override;
-  int read(uint8_t *buf, size_t size) override;
-  int available() override;
-  int read() override;
-  int peek() override;
-  size_t peekBytes(uint8_t *buffer, size_t length) override;
-  void stop() override;
-
-  bool setCACert(const uint8_t* pk, size_t size);
-  bool setCertificate(const uint8_t* pk, size_t size);
-  bool setPrivateKey(const uint8_t* pk, size_t size);
-
-  bool setCACert_P(PGM_VOID_P pk, size_t size);
-  bool setCertificate_P(PGM_VOID_P pk, size_t size);
-  bool setPrivateKey_P(PGM_VOID_P pk, size_t size);
-
-  bool loadCACert(Stream& stream, size_t size);
-  bool loadCertificate(Stream& stream, size_t size);
-  bool loadPrivateKey(Stream& stream, size_t size);
-
-  void allowSelfSignedCerts();
-
-  template<typename TFile>
-  bool loadCertificate(TFile& file) {
-    return loadCertificate(file, file.size());
-  }
-
-  template<typename TFile>
-  bool loadPrivateKey(TFile& file) {
-    return loadPrivateKey(file, file.size());
-  }
-  
-  template<typename TFile>
-  bool loadCACert(TFile& file) {
-    return loadCACert(file, file.size());
-  }
-
-friend class WiFiServerSecure; // Needs access to custom constructor below
-protected:
-  // Only called by WiFiServerSecure
-  WiFiClientSecure(ClientContext* client, bool usePMEM, const uint8_t *rsakey, int rsakeyLen, const uint8_t *cert, int certLen);
-
-protected:
-    void _initSSLContext();
-    int _connectSSL(const char* hostName);
-    bool _verifyDN(const char* name);
-
-    SSLContext* _ssl = nullptr;
-};
-
-#endif //wificlientsecure_h
+using namespace axTLS;
+// using namespace BearSSL;

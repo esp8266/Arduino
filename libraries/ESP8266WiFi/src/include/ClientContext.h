@@ -40,7 +40,7 @@ public:
         tcp_setprio(pcb, TCP_PRIO_MIN);
         tcp_arg(pcb, this);
         tcp_recv(pcb, &_s_recv);
-        tcp_sent(pcb, &_s_sent);
+        tcp_sent(pcb, &_s_acked);
         tcp_err(pcb, &_s_error);
         tcp_poll(pcb, &_s_poll, 1);
 
@@ -58,7 +58,7 @@ public:
             tcp_err(_pcb, NULL);
             tcp_poll(_pcb, NULL, 0);
             tcp_abort(_pcb);
-            _pcb = 0;
+            _pcb = nullptr;
         }
         return ERR_ABRT;
     }
@@ -79,7 +79,7 @@ public:
                 tcp_abort(_pcb);
                 err = ERR_ABRT;
             }
-            _pcb = 0;
+            _pcb = nullptr;
         }
         return err;
     }
@@ -107,17 +107,15 @@ public:
 
     void unref()
     {
-        if(this != 0) {
-            DEBUGV(":ur %d\r\n", _refcnt);
-            if(--_refcnt == 0) {
-                discard_received();
-                close();
-                if(_discard_cb) {
-                    _discard_cb(_discard_cb_arg, this);
-                }
-                DEBUGV(":del\r\n");
-                delete this;
+        DEBUGV(":ur %d\r\n", _refcnt);
+        if(--_refcnt == 0) {
+            discard_received();
+            close();
+            if(_discard_cb) {
+                _discard_cb(_discard_cb_arg, this);
             }
+            DEBUGV(":del\r\n");
+            delete this;
         }
     }
 
@@ -132,7 +130,12 @@ public:
         // This delay will be interrupted by esp_schedule in the connect callback
         delay(_timeout_ms);
         _connect_pending = 0;
+        if (!_pcb) {
+            DEBUGV(":cabrt\r\n");
+            return 0;
+        }
         if (state() != ESTABLISHED) {
+            DEBUGV(":ctmo\r\n");
             abort();
             return 0;
         }
@@ -442,11 +445,13 @@ protected:
             }
             err_t err = tcp_write(_pcb, buf, next_chunk, TCP_WRITE_FLAG_COPY);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk, will_send, (int) err);
-            _datasource->release_buffer(buf, next_chunk);
             if (err == ERR_OK) {
+                _datasource->release_buffer(buf, next_chunk);
                 _written += next_chunk;
                 need_output = true;
             } else {
+		// ERR_MEM(-1) is a valid error meaning
+		// "come back later". It leaves state() opened
                 break;
             }
             will_send -= next_chunk;
@@ -466,11 +471,11 @@ protected:
         }
     }
 
-    err_t _sent(tcp_pcb* pcb, uint16_t len)
+    err_t _acked(tcp_pcb* pcb, uint16_t len)
     {
         (void) pcb;
         (void) len;
-        DEBUGV(":sent %d\r\n", len);
+        DEBUGV(":ack %d\r\n", len);
         _write_some_from_cb();
         return ERR_OK;
     }
@@ -531,13 +536,14 @@ protected:
         tcp_sent(_pcb, NULL);
         tcp_recv(_pcb, NULL);
         tcp_err(_pcb, NULL);
-        _pcb = NULL;
+        _pcb = nullptr;
         _notify_error();
     }
 
     err_t _connected(struct tcp_pcb *pcb, err_t err)
     {
         (void) err;
+        (void) pcb;
         assert(pcb == _pcb);
         assert(_connect_pending);
         esp_schedule();
@@ -565,9 +571,9 @@ protected:
         return reinterpret_cast<ClientContext*>(arg)->_poll(tpcb);
     }
 
-    static err_t _s_sent(void *arg, struct tcp_pcb *tpcb, uint16_t len)
+    static err_t _s_acked(void *arg, struct tcp_pcb *tpcb, uint16_t len)
     {
-        return reinterpret_cast<ClientContext*>(arg)->_sent(tpcb, len);
+        return reinterpret_cast<ClientContext*>(arg)->_acked(tpcb, len);
     }
 
     static err_t _s_connected(void* arg, struct tcp_pcb *pcb, err_t err)

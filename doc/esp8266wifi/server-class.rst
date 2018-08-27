@@ -46,4 +46,4 @@ Other Function Calls
 
 Documentation for the above functions is not yet prepared.
 
-For code samples please refer to separate section with :doc:`examples <server-examples>` dedicated specifically to the Server Class.
+For code samples please refer to separate section with `examples <server-examples.rst>`__ dedicated specifically to the Server Class.

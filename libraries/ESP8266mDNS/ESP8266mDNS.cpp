@@ -94,10 +94,10 @@ static const int MDNS_PORT = 5353;
 struct MDNSService {
   MDNSService* _next;
   char _name[32];
-  char _proto[3];
+  char _proto[4];
   uint16_t _port;
-  struct MDNSTxt * _txts;
   uint16_t _txtLen; // length of all txts 
+  struct MDNSTxt * _txts;
 };
 
 struct MDNSTxt{
@@ -213,16 +213,16 @@ bool MDNSResponder::_listen() {
 }
 
 void MDNSResponder::update() {
-  if (!_conn || !_conn->next()) {
+  if (!_conn || !_conn->next()) 
     return;
-  }
   _parsePacket();
 }
 
 
 void MDNSResponder::setInstanceName(String name){
-  if (name.length() > 63) return;
-  else _instanceName = name;
+  if (name.length() > 63) 
+    return;
+  _instanceName = name;
 }
 
 
@@ -230,13 +230,14 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
   MDNSService* servicePtr;
   
   uint8_t txtLen = os_strlen(key) + os_strlen(value) + 1; // Add one for equals sign 
-  txtLen+=1; //accounts for length byte added when building the txt responce
+  txtLen += 1; //accounts for length byte added when building the txt responce
   //Find the service
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
     //Checking Service names
-    if(strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
+    if(strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0) {
       //found a service name match
-      if (servicePtr->_txtLen + txtLen > 1300) return false;  //max txt record size
+      if (servicePtr->_txtLen + txtLen > 1300) 
+        return false;  //max txt record size
       MDNSTxt *newtxt = new MDNSTxt;
       newtxt->_txt = String(key) + "=" + String(value);
       newtxt->_next = 0;
@@ -245,10 +246,9 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
         servicePtr->_txts = newtxt;
         servicePtr->_txtLen += txtLen;
         return true;
-      }
-      else{
+      } else {
         MDNSTxt * txtPtr = servicePtr->_txts;
-        while(txtPtr->_next !=0) {
+        while(txtPtr->_next != 0) {
           txtPtr = txtPtr->_next;
         }
         //adding another TXT to service
@@ -262,8 +262,10 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
 }
 
 void MDNSResponder::addService(char *name, char *proto, uint16_t port){
-  if(_getServicePort(name, proto) != 0) return;
-  if(os_strlen(name) > 32 || os_strlen(proto) != 3) return; //bad arguments
+  if(_getServicePort(name, proto) != 0) 
+    return;
+  if(os_strlen(name) > 32 || os_strlen(proto) != 3) 
+    return; //bad arguments
   struct MDNSService *srv = (struct MDNSService*)(os_malloc(sizeof(struct MDNSService)));
   os_strcpy(srv->_name, name);
   os_strcpy(srv->_proto, proto);
@@ -272,10 +274,12 @@ void MDNSResponder::addService(char *name, char *proto, uint16_t port){
   srv->_txts = 0;
   srv->_txtLen = 0;
   
-  if(_services == 0) _services = srv;
-  else{
+  if(_services == 0) {
+    _services = srv;
+  } else {
     MDNSService* servicePtr = _services;
-    while(servicePtr->_next !=0) servicePtr = servicePtr->_next;
+    while(servicePtr->_next != 0) 
+      servicePtr = servicePtr->_next;
     servicePtr->_next = srv;
   }
   
@@ -285,7 +289,13 @@ int MDNSResponder::queryService(char *service, char *proto) {
 #ifdef DEBUG_ESP_MDNS_TX
   DEBUG_ESP_PORT.printf("queryService %s %s\n", service, proto);
 #endif  
-  
+  while(_answers!=0){
+    MDNSAnswer *currAnswer = _answers;
+    _answers = _answers->next;
+    os_free(currAnswer->hostname);
+    os_free(currAnswer);
+    currAnswer = 0;
+  }
   if (_query != 0) {
     os_free(_query);
     _query = 0;
@@ -420,10 +430,9 @@ MDNSTxt * MDNSResponder::_getServiceTxt(char *name, char *proto){
   MDNSService* servicePtr;
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
     if(servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
-      if (servicePtr->_txts == 0) return false;
-      else{
-        return servicePtr->_txts;
-      }
+      if (servicePtr->_txts == 0) 
+        return false;
+      return servicePtr->_txts;
     }
   }
   return 0;
@@ -433,10 +442,9 @@ uint16_t MDNSResponder::_getServiceTxtLen(char *name, char *proto){
   MDNSService* servicePtr;
   for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next) {
     if(servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0){
-      if (servicePtr->_txts == 0) return false;
-      else{
-        return servicePtr->_txtLen;
-      }
+      if (servicePtr->_txts == 0) 
+        return false;
+      return servicePtr->_txtLen;
     }
   }
   return 0;
@@ -487,7 +495,8 @@ void MDNSResponder::_parsePacket(){
 
   uint16_t packetHeader[6];
 
-  for(i=0; i<6; i++) packetHeader[i] = _conn_read16();
+  for(i=0; i<6; i++) 
+    packetHeader[i] = _conn_read16();
 
   if ((packetHeader[1] & 0x8000) != 0) { // Read answers
 #ifdef DEBUG_ESP_MDNS_RX
@@ -539,14 +548,33 @@ void MDNSResponder::_parsePacket(){
     while (numAnswers--) {
       // Read name
       stringsRead = 0;
+      size_t last_bufferpos = 0;
       do {
         tmp8 = _conn_read8();
-        if (tmp8 & 0xC0) { // Compressed pointer (not supported)
-          tmp8 = _conn_read8();
-          break;
-        }
         if (tmp8 == 0x00) { // End of name
           break;
+        }
+        if (tmp8 & 0xC0) { // Compressed pointer
+          uint16_t offset = ((((uint16_t)tmp8) & ~0xC0) << 8) | _conn_read8();
+          if (_conn->isValidOffset(offset)) {
+              if (0 == last_bufferpos)
+                last_bufferpos  = _conn->tell();
+#ifdef DEBUG_ESP_MDNS_RX
+              DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
+              DEBUG_ESP_PORT.print(last_bufferpos);
+              DEBUG_ESP_PORT.print(" to ");
+              DEBUG_ESP_PORT.println(offset);
+#endif
+              _conn->seek(offset);
+              tmp8 = _conn_read8();
+          }
+          else {
+#ifdef DEBUG_ESP_MDNS_RX
+              DEBUG_ESP_PORT.print("Skipping malformed compressed pointer");
+#endif
+              tmp8 = _conn_read8();
+              break;
+          }
         }
         if(stringsRead > 3){
 #ifdef DEBUG_ESP_MDNS_RX
@@ -574,6 +602,14 @@ void MDNSResponder::_parsePacket(){
         }
         stringsRead++;
       } while (true);
+      if (last_bufferpos > 0)
+      {
+          _conn->seek(last_bufferpos);
+#ifdef DEBUG_ESP_MDNS_RX
+          DEBUG_ESP_PORT.print("Compressed pointer, jumping back to ");
+          DEBUG_ESP_PORT.println(last_bufferpos);
+#endif
+      }
 
       uint16_t answerType = _conn_read16(); // Read type
       uint16_t answerClass = _conn_read16(); // Read class
@@ -632,31 +668,54 @@ void MDNSResponder::_parsePacket(){
         uint16_t answerPrio = _conn_read16(); // Read priority
         uint16_t answerWeight = _conn_read16(); // Read weight
         answerPort = _conn_read16(); // Read port
+        last_bufferpos = 0;
 
         (void) answerPrio;
         (void) answerWeight;
 
         // Read hostname
         tmp8 = _conn_read8();
-        if (tmp8 & 0xC0) { // Compressed pointer (not supported)
+        if (tmp8 & 0xC0) { // Compressed pointer
+          uint16_t offset = ((((uint16_t)tmp8) & ~0xC0) << 8) | _conn_read8();
+          if (_conn->isValidOffset(offset)) {
+              last_bufferpos = _conn->tell();
 #ifdef DEBUG_ESP_MDNS_RX
-          DEBUG_ESP_PORT.println("Skipping compressed pointer");
+              DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
+              DEBUG_ESP_PORT.print(last_bufferpos);
+              DEBUG_ESP_PORT.print(" to ");
+              DEBUG_ESP_PORT.println(offset);
 #endif
-          tmp8 = _conn_read8();
+              _conn->seek(offset);
+              tmp8 = _conn_read8();
+          }
+          else {
+#ifdef DEBUG_ESP_MDNS_RX
+              DEBUG_ESP_PORT.print("Skipping malformed compressed pointer");
+#endif
+              tmp8 = _conn_read8();
+              break;
+          }
         }
-        else {
-          _conn_readS(answerHostName, tmp8);
-          answerHostName[tmp8] = '\0';
+        _conn_readS(answerHostName, tmp8);
+        answerHostName[tmp8] = '\0';
 #ifdef DEBUG_ESP_MDNS_RX
-          DEBUG_ESP_PORT.printf("SRV %d ", tmp8);
-          for (int n = 0; n < tmp8; n++) {
-            DEBUG_ESP_PORT.printf("%02x ", answerHostName[n]);
-          }
-          DEBUG_ESP_PORT.printf("\n%s\n", answerHostName);
+        DEBUG_ESP_PORT.printf("SRV %d ", tmp8);
+        for (int n = 0; n < tmp8; n++) {
+          DEBUG_ESP_PORT.printf("%02x ", answerHostName[n]);
+        }
+        DEBUG_ESP_PORT.printf("\n%s\n", answerHostName);
 #endif
-          if (answerRdlength - (6 + 1 + tmp8) > 0) { // Skip any remaining rdata
-            _conn_readS(hostName, answerRdlength - (6 + 1 + tmp8));
-          }
+        if (last_bufferpos > 0)
+        {
+          _conn->seek(last_bufferpos);
+          tmp8 = 2; // Size of compression octets
+#ifdef DEBUG_ESP_MDNS_RX
+          DEBUG_ESP_PORT.print("Compressed pointer, jumping back to ");
+          DEBUG_ESP_PORT.println(last_bufferpos);
+#endif
+        }
+        if (answerRdlength - (6 + 1 + tmp8) > 0) { // Skip any remaining rdata
+          _conn_readS(hostName, answerRdlength - (6 + 1 + tmp8));
         }
       }
 
@@ -853,21 +912,33 @@ void MDNSResponder::_parsePacket(){
 
 #ifdef DEBUG_ESP_MDNS_RX
     DEBUG_ESP_PORT.printf("REQ: ");
-    if(hostNameLen > 0) DEBUG_ESP_PORT.printf("%s.", hostName);
-    if(serviceNameLen > 0) DEBUG_ESP_PORT.printf("_%s.", serviceName);
-    if(protoNameLen > 0) DEBUG_ESP_PORT.printf("_%s.", protoName);
+    if(hostNameLen > 0) 
+      DEBUG_ESP_PORT.printf("%s.", hostName);
+    if(serviceNameLen > 0) 
+      DEBUG_ESP_PORT.printf("_%s.", serviceName);
+    if(protoNameLen > 0) 
+      DEBUG_ESP_PORT.printf("_%s.", protoName);
     DEBUG_ESP_PORT.printf("local. ");
 
-    if(currentType == MDNS_TYPE_AAAA) DEBUG_ESP_PORT.printf("  AAAA ");
-    else if(currentType == MDNS_TYPE_A) DEBUG_ESP_PORT.printf("  A ");
-    else if(currentType == MDNS_TYPE_PTR) DEBUG_ESP_PORT.printf("  PTR ");
-    else if(currentType == MDNS_TYPE_SRV) DEBUG_ESP_PORT.printf("  SRV ");
-    else if(currentType == MDNS_TYPE_TXT) DEBUG_ESP_PORT.printf("  TXT ");
-    else DEBUG_ESP_PORT.printf("  0x%04X ", currentType);
+    if(currentType == MDNS_TYPE_AAAA) 
+      DEBUG_ESP_PORT.printf("  AAAA ");
+    else if(currentType == MDNS_TYPE_A) 
+      DEBUG_ESP_PORT.printf("  A ");
+    else if(currentType == MDNS_TYPE_PTR) 
+      DEBUG_ESP_PORT.printf("  PTR ");
+    else if(currentType == MDNS_TYPE_SRV) 
+      DEBUG_ESP_PORT.printf("  SRV ");
+    else if(currentType == MDNS_TYPE_TXT) 
+      DEBUG_ESP_PORT.printf("  TXT ");
+    else 
+      DEBUG_ESP_PORT.printf("  0x%04X ", currentType);
 
-    if(currentClass == MDNS_CLASS_IN) DEBUG_ESP_PORT.printf("  IN ");
-    else if(currentClass == MDNS_CLASS_IN_FLUSH_CACHE) DEBUG_ESP_PORT.printf("  IN[F] ");
-    else DEBUG_ESP_PORT.printf("  0x%04X ", currentClass);
+    if(currentClass == MDNS_CLASS_IN) 
+      DEBUG_ESP_PORT.printf("  IN ");
+    else if(currentClass == MDNS_CLASS_IN_FLUSH_CACHE) 
+      DEBUG_ESP_PORT.printf("  IN[F] ");
+    else 
+      DEBUG_ESP_PORT.printf("  0x%04X ", currentClass);
 
     DEBUG_ESP_PORT.printf("\n");
 #endif
@@ -1035,8 +1106,10 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
   uint8_t additionalMask = responseMask & ~questionMask;
   uint8_t additionalCount = 0;
   for(i=0;i<4;i++){
-    if(answerMask & (1 << i)) answerCount++;
-    if(additionalMask & (1 << i)) additionalCount++;
+    if(answerMask & (1 << i)) 
+      answerCount++;
+    if(additionalMask & (1 << i)) 
+      additionalCount++;
   }
 
 

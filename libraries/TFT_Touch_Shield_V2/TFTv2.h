@@ -194,7 +194,7 @@ public:
 	INT8U readID(void);
 	
 	void drawChar(INT8U ascii,INT16U poX, INT16U poY,INT16U size, INT16U fgcolor);
-    void drawString(char *string,INT16U poX, INT16U poY,INT16U size,INT16U fgcolor);
+    void drawString(const char *string,INT16U poX, INT16U poY,INT16U size,INT16U fgcolor);
 	void fillRectangle(INT16U poX, INT16U poY, INT16U length, INT16U width, INT16U color);
 	
 	void drawLine(INT16U x0,INT16U y0,INT16U x1,INT16U y1,INT16U color);
