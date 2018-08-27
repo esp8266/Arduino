@@ -35,7 +35,7 @@ class ClientContext
 {
 public:
     ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
-        _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0)
+        _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0), _sync(WiFiClient::getDefaultSync())
     {
         tcp_setprio(pcb, TCP_PRIO_MIN);
         tcp_arg(pcb, this);
@@ -44,7 +44,7 @@ public:
         tcp_err(pcb, &_s_error);
         tcp_poll(pcb, &_s_poll, 1);
 
-        // not enabled by default for 2.4.0
+        // keep-alive not enabled by default
         //keepAlive();
     }
 
@@ -159,7 +159,7 @@ public:
         }
     }
 
-    bool getNoDelay()
+    bool getNoDelay() const
     {
         if(!_pcb) {
             return false;
@@ -172,12 +172,12 @@ public:
         _timeout_ms = timeout_ms;
     }
 
-    int getTimeout()
+    int getTimeout() const
     {
         return _timeout_ms;
     }
 
-    uint32_t getRemoteAddress()
+    uint32_t getRemoteAddress() const
     {
         if(!_pcb) {
             return 0;
@@ -186,7 +186,7 @@ public:
         return _pcb->remote_ip.addr;
     }
 
-    uint16_t getRemotePort()
+    uint16_t getRemotePort() const
     {
         if(!_pcb) {
             return 0;
@@ -195,7 +195,7 @@ public:
         return _pcb->remote_port;
     }
 
-    uint32_t getLocalAddress()
+    uint32_t getLocalAddress() const
     {
         if(!_pcb) {
             return 0;
@@ -204,7 +204,7 @@ public:
         return _pcb->local_ip.addr;
     }
 
-    uint16_t getLocalPort()
+    uint16_t getLocalPort() const
     {
         if(!_pcb) {
             return 0;
@@ -257,7 +257,7 @@ public:
         return size_read;
     }
 
-    char peek()
+    char peek() const
     {
         if(!_rx_buf) {
             return 0;
@@ -266,7 +266,7 @@ public:
         return reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
     }
 
-    size_t peekBytes(char *dst, size_t size)
+    size_t peekBytes(char *dst, size_t size) const
     {
         if(!_rx_buf) {
             return 0;
@@ -307,7 +307,7 @@ public:
         int tries = 1+ WAIT_TRIES_MS;
 
         while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --tries) {
-            _write_some();
+            //_write_some();
             delay(1); // esp_ schedule+yield
         }
     }
@@ -320,7 +320,6 @@ public:
 
         return _pcb->state;
     }
-
 
     size_t write(const uint8_t* data, size_t size)
     {
@@ -379,6 +378,16 @@ public:
         return isKeepAliveEnabled()? _pcb->keep_cnt: 0;
     }
 
+    bool getSync () const
+    {
+        return _sync;
+    }
+
+    void setSync (bool sync)
+    {
+        _sync = sync;
+    }
+
 protected:
 
     bool _is_timeout()
@@ -418,6 +427,10 @@ protected:
             esp_yield();
         } while(true);
         _send_waiting = 0;
+
+        if (_sync)
+            wait_until_sent();
+
         return _written;
     }
 
@@ -442,11 +455,9 @@ protected:
             //   PUSH is for peer, telling to give to user app as soon as received
             //   PUSH may be set when sender has finished sending a meaningful data block
             //   Nagle is for delaying local stack, to send less and bigger packets
-            uint8_t flags = TCP_WRITE_FLAG_COPY;
-           if (!tcp_nagle_disabled(_pcb))
-                // nagle enabled, delayed, buffering, bigger packets
-                // (When should we use PUSH?)
-                flags |= TCP_WRITE_FLAG_MORE;
+            uint8_t flags = TCP_WRITE_FLAG_MORE; // do not tcp-PuSH (XXX always?)
+            if (!_sync)
+                flags |= TCP_WRITE_FLAG_COPY;
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, will_send, (int)err);
             if (err == ERR_OK) {
@@ -460,10 +471,12 @@ protected:
             }
         }
 
-        if (has_written && tcp_nagle_disabled(_pcb))
+        if (has_written && (_sync || tcp_nagle_disabled(_pcb)))
+        {
             // handle nagle manually because of TCP_WRITE_FLAG_MORE
             // lwIP's tcp_output: "Find out what we can send and send it"
             tcp_output(_pcb);
+        }
 
         return has_written;
     }
@@ -472,7 +485,7 @@ protected:
     {
         // lwIP needs feeding
         _write_some();
-        
+
         if (_send_waiting == 1) {
             _send_waiting--;
         }
@@ -596,7 +609,6 @@ private:
 
     DataSource* _datasource = nullptr;
     size_t _written = 0;
-    //size_t _write_chunk_size = 256;
     uint32_t _timeout_ms = 5000;
     uint32_t _op_start_time = 0;
     uint8_t _send_waiting = 0;
@@ -604,6 +616,8 @@ private:
 
     int8_t _refcnt;
     ClientContext* _next;
+
+    bool _sync;
 };
 
 #endif//CLIENTCONTEXT_H
