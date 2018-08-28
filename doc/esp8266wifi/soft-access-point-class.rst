@@ -131,7 +131,7 @@ Get the count of the stations that are connected to the soft-AP interface.
 
     Stations connected to soft-AP = 2
 
-Note: the maximum number of stations that may be connected to ESP8266 soft-AP is 4 by default. This can be changed from 1 to 4 via the ``max_connection`` argument of the soft-AP constructor.
+Note: the maximum number of stations that may be connected to ESP8266 soft-AP is 4 by default. This can be changed from 1 to 4 via the ``max_connection`` argument of the softAP method.
 
 softAPdisconnect
 ^^^^^^^^^^^^^^^^
