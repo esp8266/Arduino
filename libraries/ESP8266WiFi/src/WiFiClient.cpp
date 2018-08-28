@@ -42,7 +42,7 @@ extern "C"
 #include "c_types.h"
 
 uint16_t WiFiClient::_localPort = 0;
-bool WiFiClient::_defaultNoDelay = false;
+bool WiFiClient::_defaultNoDelay = true;
 bool WiFiClient::_defaultSync = false;
 
 template<>
