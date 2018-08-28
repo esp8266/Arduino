@@ -296,20 +296,30 @@ public:
         _rx_buf_offset = 0;
     }
 
-    void wait_until_sent()
+    bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
-        // fix option 1 in
+        if (!_pcb)
+            return;
+        tcp_output(_pcb);
+
         // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
-        // TODO: option 2
+        // option 1 done
+        // option 2 / _write_some() not necessary since _datasource is always nullptr here
 
-        #define WAIT_TRIES_MS 10	// at most 10ms
+        max_wait_ms++;
 
-        int tries = 1+ WAIT_TRIES_MS;
-
-        while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --tries) {
-            //_write_some();
+        // wait for peer's acks flushing lwIP's output buffer
+        while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --max_wait_ms)
             delay(1); // esp_ schedule+yield
+
+        #ifdef DEBUGV
+        if (max_wait_ms == 0) {
+            // wait until sent: timeout
+            DEBUGV(":wustmo\n");
         }
+        #endif
+
+        return max_wait_ms > 0;
     }
 
     uint8_t state() const
