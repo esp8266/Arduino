@@ -48,7 +48,7 @@ To set up password protected network, or to configure additional network paramet
 
 The first parameter of this function is required, remaining four are optional.
 
-Meaning of all parameters is as follows: - ``ssid`` - character string containing network SSID (max. 63 characters) \* ``password`` - optional character string with a password. For WPA2-PSK network it should be at least 8 character long. If not specified, the access point will be open for anybody to connect. \* ``channel`` - optional parameter to set Wi-Fi channel, from 1 to 13. Default channel = 1. \* ``hidden`` - optional parameter, if set to ``true`` will hide SSID. \* ``max_connection`` - optional parameter to set max simultaneous connected clients, from 1 to 4. Defaults to 4.
+Meaning of all parameters is as follows: - ``ssid`` - character string containing network SSID (max. 63 characters) \* ``password`` - optional character string with a password. For WPA2-PSK network it should be at least 8 character long. If not specified, the access point will be open for anybody to connect. \* ``channel`` - optional parameter to set Wi-Fi channel, from 1 to 13. Default channel = 1. \* ``hidden`` - optional parameter, if set to ``true`` will hide SSID. \* ``max_connection`` - optional parameter to set max simultaneous connected stations, from 1 to 4. Defaults to 4. Once the max number has been reached, any other station that wants to connect will be forced to wait until an already connected station disconnects.
 
 Function will return ``true`` or ``false`` depending on result of setting the soft-AP.
 
