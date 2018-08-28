@@ -976,7 +976,10 @@ static void *get_unpoisoned( unsigned char *ptr ) {
  */
 
 UMM_HEAP_INFO ummHeapInfo;
+
+#ifdef DEBUG_ESP_PORT
 uint64_t ummFreeSize2;
+#endif
 
 void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
 
@@ -1025,8 +1028,11 @@ void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
     if( UMM_NBLOCK(blockNo) & UMM_FREELIST_MASK ) {
       ++ummHeapInfo.freeEntries;
       ummHeapInfo.freeBlocks += curBlocks;
+
+#ifdef DEBUG_ESP_PORT
       if (ummFreeSize2)
         ummFreeSize2 += (uint64_t)curBlocks * (uint64_t)sizeof(umm_block) * (uint64_t)curBlocks * (uint64_t)sizeof(umm_block);
+#endif
 
       if (ummHeapInfo.maxFreeContiguousBlocks < curBlocks) {
         ummHeapInfo.maxFreeContiguousBlocks = curBlocks;
@@ -1207,8 +1213,9 @@ void umm_init( void ) {
   umm_heap = (umm_block *)UMM_MALLOC_CFG__HEAP_ADDR;
   umm_numblocks = (UMM_MALLOC_CFG__HEAP_SIZE / sizeof(umm_block));
   memset(umm_heap, 0x00, UMM_MALLOC_CFG__HEAP_SIZE);
+#ifdef DEBUG_ESP_PORT
   ummFreeSize2 = 0;
-
+#endif
   /* setup initial blank heap structure */
   {
     /* index of the 0th `umm_block` */
@@ -1765,8 +1772,12 @@ size_t ICACHE_FLASH_ATTR umm_free_heap_size( void ) {
   return (size_t)ummHeapInfo.freeBlocks * sizeof(umm_block);
 }
 
+#ifdef DEBUG_ESP_PORT
+
 size_t ICACHE_FLASH_ATTR umm_block_size( void ) {
   return sizeof(umm_block);
 }
+
+#endif
 
 /* ------------------------------------------------------------------------ */

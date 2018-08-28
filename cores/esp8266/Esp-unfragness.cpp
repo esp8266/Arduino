@@ -18,6 +18,8 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifdef DEBUG_ESP_PORT
+
 #include "umm_malloc/umm_malloc.h"
 #include "umm_malloc/umm_malloc_cfg.h"
 #include "coredecls.h"
@@ -35,3 +37,5 @@ uint16_t EspClass::getHeapUnfragness(uint32_t* freeHeap)
         *freeHeap = fh;
     return ret;
 }
+
+#endif // defined(DEBUG_ESP_PORT)

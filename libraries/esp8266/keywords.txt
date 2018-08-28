@@ -33,6 +33,7 @@ getHeapUnfragness	KEYWORD2
 getChipId	KEYWORD2
 getSdkVersion	KEYWORD2
 getCoreVersion	KEYWORD2
+getFullVersion	KEYWORD2
 getBootVersion	KEYWORD2
 getBootMode	KEYWORD2
 getCpuFreqMHz	KEYWORD2
