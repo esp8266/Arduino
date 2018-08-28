@@ -104,7 +104,7 @@ class EspClass {
 
         uint16_t getVcc();
         uint32_t getFreeHeap();
-        uint16_t getHeapUnfragness(uint32_t* freeHeap);
+        uint16_t getHeapUnfragness(uint32_t* freeHeap = nullptr);
 
         uint32_t getChipId();
 
