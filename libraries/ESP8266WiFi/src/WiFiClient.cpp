@@ -171,14 +171,14 @@ bool WiFiClient::getNoDelay() const {
 
 void WiFiClient::setSync(bool sync)
 {
-    if(!_client)
+    if (!_client)
         return;
     _client->setSync(sync);
 }
 
 bool WiFiClient::getSync() const
 {
-    if(!_client)
+    if (!_client)
         return false;
     return _client->getSync();
 }
@@ -285,21 +285,19 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
     return _client->peekBytes((char *)buffer, count);
 }
 
-bool WiFiClient::flush(int maxWaitMs)
+void WiFiClient::flush()
 {
     if (_client)
-        return !_client || _client->wait_until_sent(maxWaitMs);
-    return true;
+        _client->wait_until_sent();
 }
 
-bool WiFiClient::stop(int maxWaitMs)
+void WiFiClient::stop()
 {
     if (!_client)
-        return true;
+        return;
 
-    bool ok = _client->wait_until_sent(maxWaitMs);
-    ok &= _client->close() == ERR_OK;
-    return ok;
+    _client->wait_until_sent();
+    _client->close();
 }
 
 uint8_t WiFiClient::connected()

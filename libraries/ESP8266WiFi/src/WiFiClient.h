@@ -72,10 +72,8 @@ public:
   size_t peekBytes(char *buffer, size_t length) {
     return peekBytes((uint8_t *) buffer, length);
   }
-  bool flush(int maxWaitMs);
-  bool stop(int maxWaitMs);
-  virtual void flush() { flush(WIFICLIENT_MAX_FLUSH_WAIT_MS); }
-  virtual void stop() { stop(WIFICLIENT_MAX_FLUSH_WAIT_MS); }
+  virtual void flush();
+  virtual void stop();
   virtual uint8_t connected();
   virtual operator bool();
 

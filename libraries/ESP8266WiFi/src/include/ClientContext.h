@@ -296,22 +296,22 @@ public:
         _rx_buf_offset = 0;
     }
 
-    bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
+    void wait_until_sent()
     {
-        if (!_pcb)
-            return true;
-
-        tcp_output(_pcb);
-
         // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
         // option 1 done
         // option 2 / _write_some() not necessary since _datasource is always nullptr here
 
-        max_wait_ms++;
+        if (!_pcb)
+            return;
+
+        tcp_output(_pcb);
+
+        int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS + 1;
 
         // wait for peer's acks flushing lwIP's output buffer
         while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --max_wait_ms)
-            delay(1); // esp_ schedule+yield
+            delay(1); // yields
 
         #ifdef DEBUGV
         if (max_wait_ms == 0) {
@@ -319,8 +319,6 @@ public:
             DEBUGV(":wustmo\n");
         }
         #endif
-
-        return max_wait_ms > 0;
     }
 
     uint8_t state() const
@@ -461,13 +459,15 @@ protected:
             if (!next_chunk_size)
                 break;
             const uint8_t* buf = _datasource->get_buffer(next_chunk_size);
-            // TCP_WRITE_FLAG_MORE to remove PUSH flag from packet (lwIP's doc), implicitely disables nagle (see lwIP's tcp_out.c)
+            // use TCP_WRITE_FLAG_MORE to remove PUSH flag from packet (lwIP's doc),
+            // because PUSH implicitely disables nagle (see lwIP's tcp_out.c)
             // Notes:
-            //   PUSH is for peer, telling to give to user app as soon as received
-            //   PUSH may be set when sender has finished sending a meaningful data block
-            //   Nagle is for delaying local stack, to send less and bigger packets
-            uint8_t flags = TCP_WRITE_FLAG_MORE; // do not tcp-PuSH (XXX always?)
+            //   PUSH is for peer, telling to give data to user app as soon as received
+            //   PUSH "may be set" when sender has finished sending a meaningful data block
+            //   Nagle is for delaying local data, to send less/bigger packets
+            uint8_t flags = TCP_WRITE_FLAG_MORE; // do not tcp-PuSH
             if (!_sync)
+                // user data will not stay in place when data are sent but not acknowledged
                 flags |= TCP_WRITE_FLAG_COPY;
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, will_send, (int)err);
@@ -484,8 +484,8 @@ protected:
 
         if (has_written && (_sync || tcp_nagle_disabled(_pcb)))
         {
-            // handle nagle manually because of TCP_WRITE_FLAG_MORE
-            // lwIP's tcp_output: "Find out what we can send and send it"
+            // handle no-Nagle manually because of TCP_WRITE_FLAG_MORE
+            // lwIP's tcp_output doc: "Find out what we can send and send it"
             tcp_output(_pcb);
         }
 
@@ -494,13 +494,10 @@ protected:
 
     void _write_some_from_cb()
     {
-        // lwIP needs feeding
-        _write_some();
-
         if (_send_waiting == 1) {
             _send_waiting--;
+            esp_schedule();
         }
-        esp_schedule();
     }
 
     err_t _acked(tcp_pcb* pcb, uint16_t len)
