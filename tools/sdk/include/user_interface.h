@@ -577,24 +577,10 @@ enum wps_cb_status {
 
 typedef void (*wps_st_cb_t)(int status);
 
-#ifdef NO_EXTRA_4K_HEAP
-/* check cores/esp8266/core_esp8266_main.cpp for comments about this */
-
 bool wifi_wps_enable(WPS_TYPE_t wps_type);
 bool wifi_wps_disable(void);
 bool wifi_wps_start(void);
 bool wifi_set_wps_cb(wps_st_cb_t cb);
-
-#else
-
-bool WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool ();
-#define wifi_wps_enable(...) WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool()
-#define wifi_wps_disable() WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool()
-#define wifi_wps_start() WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool()
-#define wifi_set_wps_cb(...) WPS_is_unavailable_in_this_configuration__Please_check_FAQ_or_board_generator_tool()
-
-#endif
-
 
 typedef void (*freedom_outside_cb_t)(uint8 status);
 int wifi_register_send_pkt_freedom_cb(freedom_outside_cb_t cb);

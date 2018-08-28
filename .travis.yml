@@ -50,6 +50,8 @@ deploy:
     api_key:
       secure: A4FBmqyhlzy33oPeZVolg2Q/A3ZcJ3WnRQqQJ3NAPy+qGM5xcboOYtwcLL9vKaHZGfUB7lUP9QVZFGou1Wrmo9DnPvAoe3+XvCaDRGzVMxeIpu7UStbBD4Knbh98tlbMvZCXYRlT4VcusI9bMLK6UWw4sMdPislBh2FEfglTiag=
     file_glob: true
+    tag_name: $TRAVIS_TAG
+    target_commitish: $TRAVIS_COMMIT
     file:
       - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
       - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
