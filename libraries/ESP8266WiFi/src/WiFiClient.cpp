@@ -285,18 +285,21 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
     return _client->peekBytes((char *)buffer, count);
 }
 
-void WiFiClient::flush()
+bool WiFiClient::flush(int maxWaitMs)
 {
     if (_client)
-        _client->wait_until_sent();
+        return !_client || _client->wait_until_sent(maxWaitMs);
+    return true;
 }
 
-void WiFiClient::stop()
+bool WiFiClient::stop(int maxWaitMs)
 {
     if (!_client)
-        return;
+        return true;
 
-    _client->close();
+    bool ok = _client->wait_until_sent(maxWaitMs);
+    ok &= _client->close() == ERR_OK;
+    return ok;
 }
 
 uint8_t WiFiClient::connected()
