@@ -299,7 +299,8 @@ public:
     bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
         if (!_pcb)
-            return;
+            return true;
+
         tcp_output(_pcb);
 
         // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
