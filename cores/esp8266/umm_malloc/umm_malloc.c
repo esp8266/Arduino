@@ -1761,12 +1761,8 @@ size_t ICACHE_FLASH_ATTR umm_free_heap_size( void ) {
   return (size_t)ummHeapInfo.freeBlocks * sizeof(umm_block);
 }
 
-#ifdef DEBUG_ESP_PORT
-
 size_t ICACHE_FLASH_ATTR umm_block_size( void ) {
   return sizeof(umm_block);
 }
-
-#endif
 
 /* ------------------------------------------------------------------------ */

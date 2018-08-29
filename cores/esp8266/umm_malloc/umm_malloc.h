@@ -43,10 +43,7 @@ void *umm_realloc( void *ptr, size_t size );
 void umm_free( void *ptr );
 
 size_t umm_free_heap_size( void );
-
-#ifdef DEBUG_ESP_PORT
 size_t umm_block_size ( void );
-#endif
 
 #ifdef __cplusplus
 }
