@@ -26,6 +26,8 @@ typedef struct UMM_HEAP_INFO_t {
   unsigned short int freeBlocks;
 
   unsigned short int maxFreeContiguousBlocks;
+
+  uint32_t ummFreeSize2;
 }
 UMM_HEAP_INFO;
 
@@ -43,7 +45,6 @@ void umm_free( void *ptr );
 size_t umm_free_heap_size( void );
 
 #ifdef DEBUG_ESP_PORT
-extern uint64_t ummFreeSize2;
 size_t umm_block_size ( void );
 #endif
 

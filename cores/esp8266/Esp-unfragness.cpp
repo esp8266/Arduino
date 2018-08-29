@@ -18,8 +18,6 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifdef DEBUG_ESP_PORT
-
 #include "umm_malloc/umm_malloc.h"
 #include "umm_malloc/umm_malloc_cfg.h"
 #include "coredecls.h"
@@ -27,15 +25,13 @@
 
 uint16_t EspClass::getHeapUnfragness(uint32_t* freeHeap)
 {
-    ummFreeSize2 = 1; // enable processing
+    // L2 / Euclidian norm of free block sizes.
+    // Having getFreeHeap()=sum(hole-size), un-fragmentation is given by
+    // sqrt(sum(hole-size²)) / sum(hole-size)
+
     umm_info(NULL, 0);
-    ummFreeSize2 -= 1;
     uint32_t fh = ummHeapInfo.freeBlocks * umm_block_size();
-    uint16_t ret = 1000.0 * sqrt(ummFreeSize2) / fh;
-    ummFreeSize2 = 0; // disable processing
     if (freeHeap)
         *freeHeap = fh;
-    return ret;
+    return (isqrt32(ummHeapInfo.ummFreeSize2) * 1000) / fh;
 }
-
-#endif // defined(DEBUG_ESP_PORT)
