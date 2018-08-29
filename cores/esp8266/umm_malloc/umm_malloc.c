@@ -1205,6 +1205,7 @@ void umm_init( void ) {
   umm_heap = (umm_block *)UMM_MALLOC_CFG__HEAP_ADDR;
   umm_numblocks = (UMM_MALLOC_CFG__HEAP_SIZE / sizeof(umm_block));
   memset(umm_heap, 0x00, UMM_MALLOC_CFG__HEAP_SIZE);
+
   /* setup initial blank heap structure */
   {
     /* index of the 0th `umm_block` */
