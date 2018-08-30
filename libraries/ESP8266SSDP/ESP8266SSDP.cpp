@@ -172,9 +172,9 @@ bool SSDPClass::begin() {
   _server = new UdpContext;
   _server->ref();
 
-  ip4_addr_t ifaddr;
+  ipv4_addr_t ifaddr;
   ifaddr.addr = WiFi.localIP();
-  ip4_addr_t multicast_addr;
+  ipv4_addr_t multicast_addr;
   multicast_addr.addr = (uint32_t) SSDP_MULTICAST_ADDR;
   if (igmp_joingroup(&ifaddr, &multicast_addr) != ERR_OK ) {
     DEBUGV("SSDP failed to join igmp group");
@@ -218,7 +218,7 @@ void SSDPClass::_send(ssdp_method_t method) {
 
   _server->append(buffer, len);
 
-  ip4_addr_t remoteAddr;
+  ipv4_addr_t remoteAddr;
   uint16_t remotePort;
   if (method == NONE) {
     remoteAddr.addr = _respondToAddr;

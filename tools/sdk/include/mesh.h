@@ -24,7 +24,7 @@
 #ifndef __LWIP_API_MESH_H__
 #define __LWIP_API_MESH_H__
 
-#include "ip4_addr.h"
+#include "ipv4_addr.h"
 #include "user_interface.h"
 #include "espconn.h"
 
@@ -81,12 +81,12 @@ struct mesh_scan_para_type {
   * @attention 1. The range of mesh local IP address is 2.255.255.* ~ max_hop.255.255.*.
   * @attention 2. IP pointer should not be NULL. If the IP pointer is NULL, it will return false.
   *
-  * @param     struct ip4_addr *ip : IP address
+  * @param     struct ipv4_addr *ip : IP address
   *
   * @return    true  : the IP address is mesh local IP address
   * @return    false : the IP address is not mesh local IP address
   */
-bool espconn_mesh_local_addr(struct ip4_addr *ip);
+bool espconn_mesh_local_addr(struct ipv4_addr *ip);
 
 /**
   * @brief     Get the information of router used by mesh network.
@@ -120,13 +120,13 @@ bool espconn_mesh_set_router(struct station_config *router);
   *                 but the function must be called before espconn_mesh_enable.
   *                 at the same time, users need to implement the server.
   *
-  * @param     struct ip4_addr *ip : ip address of server.
+  * @param     struct ipv4_addr *ip : ip address of server.
   * @param     uint16_t port : port used by server.
   *
   * @return  true  : succeed
   * @return  false : fail
   */
-bool espconn_mesh_server_init(struct ip4_addr *ip, uint16_t port);
+bool espconn_mesh_server_init(struct ipv4_addr *ip, uint16_t port);
 
 /**
   * @brief   Get the information of mesh node.
