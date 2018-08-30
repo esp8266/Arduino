@@ -24,6 +24,8 @@
 #include <WString.h>
 #include <Printable.h>
 
+#include <lwip/ip_addr.h>
+
 // A class to make it easier to handle and pass around IP addresses
 
 class IPAddress: public Printable {
@@ -47,6 +49,7 @@ class IPAddress: public Printable {
         IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
         IPAddress(uint32_t address);
         IPAddress(const uint8_t *address);
+        IPAddress(const ip_addr_t* lwip_addr);
 
         bool fromString(const char *address);
         bool fromString(const String &address) { return fromString(address.c_str()); }
@@ -93,6 +96,11 @@ class IPAddress: public Printable {
         friend class Server;
         friend class DhcpClass;
         friend class DNSClient;
+
+        /*
+               lwIP address compatibility
+        */
+        const ip_addr_t* getLwipAddr ();
 };
 
 extern const IPAddress INADDR_NONE;

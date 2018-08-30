@@ -90,14 +90,19 @@ public:
         }
     }
 
-    bool connect(ipv4_addr_t addr, uint16_t port)
+    bool connect(const ip_addr_t* addr, uint16_t port)
     {
-        ip4_addr_copy(_pcb->remote_ip, addr);
+#if 0
+        ip_addr_copy(&_pcb->remote_ip, addr);
+#else
+        #warning WTF
+        *_pcb->remote_ip = *addr;
+#endif
         _pcb->remote_port = port;
         return true;
     }
 
-    bool listen(ipv4_addr_t addr, uint16_t port)
+    bool listen(ip_addr_t addr, uint16_t port)
     {
         udp_recv(_pcb, &_s_recv, (void *) this);
         err_t err = udp_bind(_pcb, &addr, port);
@@ -115,7 +120,7 @@ public:
         udp_set_multicast_netif_addr(_pcb, addr);
     }
 #else
-    void setMulticastInterface(const ipv4_addr_t& addr)
+    void setMulticastInterface(const ip_addr_t& addr)
     {
         udp_set_multicast_netif_addr(_pcb, &addr);
     }
@@ -291,7 +296,7 @@ public:
         return size;
     }
 
-    bool send(ipv4_addr_t* addr = 0, uint16_t port = 0)
+    bool send(ip_addr_t* addr = 0, uint16_t port = 0)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
@@ -383,7 +388,7 @@ private:
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
-            const ipv4_addr_t *addr, u16_t port)
+            const ip_addr_t *addr, u16_t port)
     {
         (void) upcb;
         (void) addr;
@@ -415,7 +420,7 @@ private:
 #else
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            const ipv4_addr_t *addr, u16_t port)
+            const ip_addr_t *addr, u16_t port)
 #endif
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, addr, port);

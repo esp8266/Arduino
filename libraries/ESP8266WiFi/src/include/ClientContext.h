@@ -119,7 +119,7 @@ public:
         }
     }
 
-    int connect(ipv4_addr_t* addr, uint16_t port)
+    int connect(ip_addr_t* addr, uint16_t port)
     {
         err_t err = tcp_connect(_pcb, addr, port, &ClientContext::_s_connected);
         if (err != ERR_OK) {
@@ -177,13 +177,13 @@ public:
         return _timeout_ms;
     }
 
-    uint32_t getRemoteAddress()
+    const ip_addr_t* getRemoteAddress()
     {
         if(!_pcb) {
             return 0;
         }
 
-        return _pcb->remote_ip.addr;
+        return &_pcb->remote_ip;
     }
 
     uint16_t getRemotePort()
@@ -195,13 +195,13 @@ public:
         return _pcb->remote_port;
     }
 
-    uint32_t getLocalAddress()
+    const ip_addr_t* getLocalAddress()
     {
         if(!_pcb) {
             return 0;
         }
 
-        return _pcb->local_ip.addr;
+        return &_pcb->local_ip;
     }
 
     uint16_t getLocalPort()

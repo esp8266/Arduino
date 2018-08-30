@@ -67,10 +67,8 @@ void WiFiServer::begin(uint16_t port) {
     if (!pcb)
         return;
 
-    ipv4_addr_t local_addr;
-    local_addr.addr = (uint32_t) _addr;
     pcb->so_options |= SOF_REUSEADDR;
-    err = tcp_bind(pcb, &local_addr, _port);
+    err = tcp_bind(pcb, _addr.getLwipAddr(), _port);
 
     if (err != ERR_OK) {
         tcp_close(pcb);
