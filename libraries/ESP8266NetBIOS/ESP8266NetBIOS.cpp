@@ -154,7 +154,7 @@ bool ESP8266NetBIOS::begin(const char *name)
     if(_pcb != NULL) {
         return true;
     }
-    ip4_addr_t addr;
+    ip_addr_t addr;
     addr.addr = INADDR_ANY;
     _pcb = udp_new();
     udp_recv(_pcb, &_s_recv, (void *) this);
@@ -175,9 +175,9 @@ void ESP8266NetBIOS::end()
 }
 
 #if LWIP_VERSION_MAJOR == 1 
-void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip4_addr_t *addr, uint16_t port)
+void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, uint16_t port)
 #else
-void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip4_addr_t *addr, uint16_t port)
+void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint16_t port)
 #endif
 {
     (void)upcb;
@@ -187,7 +187,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip4_addr_t *addr, uint
         uint8_t * data = (uint8_t*)((pb)->payload);
         size_t len = pb->len;
         ip_hdr* iphdr = reinterpret_cast<ip_hdr*>(data - UDP_HLEN - IP_HLEN);
-        ip4_addr_t saddr;
+        ip_addr_t saddr;
         saddr.addr = iphdr->src.addr;
 
         if (len >= sizeof(struct NBNSQUESTION)) {
@@ -270,9 +270,9 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip4_addr_t *addr, uint
 }
 
 #if LWIP_VERSION_MAJOR == 1
-void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip4_addr *addr, uint16_t port)
+void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip_addr *addr, uint16_t port)
 #else
-void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip4_addr_t *addr, uint16_t port)
+void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip_addr_t *addr, uint16_t port)
 #endif
 {
     reinterpret_cast<ESP8266NetBIOS*>(arg)->_recv(upcb, p, addr, port);
