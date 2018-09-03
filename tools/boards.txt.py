@@ -826,10 +826,10 @@ macros = {
     #######################
 
     'cpufreq_menu': collections.OrderedDict([
-        ( '.menu.cpuHz.80', '80 MHz' ),
-        ( '.menu.cpuHz.80.build.f_cpu', '80000000L' ),
-        ( '.menu.cpuHz.160', '160 MHz' ),
-        ( '.menu.cpuHz.160.build.f_cpu', '160000000L' ),
+        ( '.menu.xtal.80', '80 MHz' ),
+        ( '.menu.xtal.80.build.f_cpu', '80000000L' ),
+        ( '.menu.xtal.160', '160 MHz' ),
+        ( '.menu.xtal.160.build.f_cpu', '160000000L' ),
         ]),
 
     'vtable_menu': collections.OrderedDict([
@@ -1272,7 +1272,7 @@ def all_boards ():
     print('')
     print('menu.BoardModel=Model')
     print('menu.baud=Upload Speed')
-    print('menu.cpuHz=CPU Frequency')
+    print('menu.xtal=CPU Frequency')
     print('menu.CrystalFreq=Crystal Frequency')
     print('menu.eesz=Flash Size')
     print('menu.FlashMode=Flash Mode')
