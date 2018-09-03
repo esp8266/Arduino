@@ -826,19 +826,19 @@ macros = {
     #######################
 
     'cpufreq_menu': collections.OrderedDict([
-        ( '.menu.CpuFrequency.80', '80 MHz' ),
-        ( '.menu.CpuFrequency.80.build.f_cpu', '80000000L' ),
-        ( '.menu.CpuFrequency.160', '160 MHz' ),
-        ( '.menu.CpuFrequency.160.build.f_cpu', '160000000L' ),
+        ( '.menu.cpuHz.80', '80 MHz' ),
+        ( '.menu.cpuHz.80.build.f_cpu', '80000000L' ),
+        ( '.menu.cpuHz.160', '160 MHz' ),
+        ( '.menu.cpuHz.160.build.f_cpu', '160000000L' ),
         ]),
 
     'vtable_menu': collections.OrderedDict([
-        ( '.menu.VTable.flash', 'Flash'),
-        ( '.menu.VTable.flash.build.vtable_flags', '-DVTABLES_IN_FLASH'),
-        ( '.menu.VTable.heap', 'Heap'),
-        ( '.menu.VTable.heap.build.vtable_flags', '-DVTABLES_IN_DRAM'),
-        ( '.menu.VTable.iram', 'IRAM'),
-        ( '.menu.VTable.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
+        ( '.menu.vt.flash', 'Flash'),
+        ( '.menu.vt.flash.build.vtable_flags', '-DVTABLES_IN_FLASH'),
+        ( '.menu.vt.heap', 'Heap'),
+        ( '.menu.vt.heap.build.vtable_flags', '-DVTABLES_IN_DRAM'),
+        ( '.menu.vt.iram', 'IRAM'),
+        ( '.menu.vt.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
         ]),
 
     'crystalfreq_menu': collections.OrderedDict([
@@ -930,75 +930,75 @@ macros = {
     ####################### lwip
 
     'lwip2': collections.OrderedDict([
-        ( '.menu.LwIPVariant.v2mss536', 'v2 Lower Memory' ),
-        ( '.menu.LwIPVariant.v2mss536.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.LwIPVariant.v2mss536.build.lwip_lib', '-llwip2' ),
-        ( '.menu.LwIPVariant.v2mss536.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
-        ( '.menu.LwIPVariant.v2mss1460', 'v2 Higher Bandwidth' ),
-        ( '.menu.LwIPVariant.v2mss1460.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.LwIPVariant.v2mss1460.build.lwip_lib', '-llwip2_1460' ),
-        ( '.menu.LwIPVariant.v2mss1460.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
+        ( '.menu.lwIP.lm2', 'v2 Lower Memory' ),
+        ( '.menu.lwIP.lm2.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.lwIP.lm2.build.lwip_lib', '-llwip2' ),
+        ( '.menu.lwIP.lm2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
+        ( '.menu.lwIP.hb2', 'v2 Higher Bandwidth' ),
+        ( '.menu.lwIP.hb2.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.lwIP.hb2.build.lwip_lib', '-llwip2_1460' ),
+        ( '.menu.lwIP.hb2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
         ]),
 
     'lwip': collections.OrderedDict([
-        ( '.menu.LwIPVariant.Prebuilt', 'v1.4 Higher Bandwidth' ),
-        ( '.menu.LwIPVariant.Prebuilt.build.lwip_lib', '-llwip_gcc' ),
-        ( '.menu.LwIPVariant.Prebuilt.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        #( '.menu.LwIPVariant.Espressif', 'v1.4 Espressif (xcc)' ),
-        #( '.menu.LwIPVariant.Espressif.build.lwip_lib', '-llwip' ),
-        #( '.menu.LwIPVariant.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
-        ( '.menu.LwIPVariant.OpenSource', 'v1.4 Compile from source' ),
-        ( '.menu.LwIPVariant.OpenSource.build.lwip_lib', '-llwip_src' ),
-        ( '.menu.LwIPVariant.OpenSource.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        ( '.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
+        ( '.menu.lwIP.hb1', 'v1.4 Higher Bandwidth' ),
+        ( '.menu.lwIP.hb1.build.lwip_lib', '-llwip_gcc' ),
+        ( '.menu.lwIP.hb1.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
+        #( '.menu.lwIP.Espressif', 'v1.4 Espressif (xcc)' ),
+        #( '.menu.lwIP.Espressif.build.lwip_lib', '-llwip' ),
+        #( '.menu.lwIP.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
+        ( '.menu.lwIP.src', 'v1.4 Compile from source' ),
+        ( '.menu.lwIP.src.build.lwip_lib', '-llwip_src' ),
+        ( '.menu.lwIP.src.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
+        ( '.menu.lwIP.src.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
         ]),
 
     ####################### serial
 
     's9': collections.OrderedDict([
-        ( '.menu.UploadSpeed.9600', '9600' ),
-        ( '.menu.UploadSpeed.9600.upload.speed', '9600' ),
+        ( '.menu.baud.9600', '9600' ),
+        ( '.menu.baud.9600.upload.speed', '9600' ),
         ]),
     's57': collections.OrderedDict([
-        ( '.menu.UploadSpeed.57600', '57600' ),
-        ( '.menu.UploadSpeed.57600.upload.speed', '57600' ),
+        ( '.menu.baud.57600', '57600' ),
+        ( '.menu.baud.57600.upload.speed', '57600' ),
         ]),
     's115': collections.OrderedDict([
-        ( '.menu.UploadSpeed.115200', '115200' ),
-        ( '.menu.UploadSpeed.115200.upload.speed', '115200' ),
+        ( '.menu.baud.115200', '115200' ),
+        ( '.menu.baud.115200.upload.speed', '115200' ),
         ]),
     's256': collections.OrderedDict([
-        ( '.menu.UploadSpeed.256000.windows', '256000' ),
-        ( '.menu.UploadSpeed.256000.upload.speed', '256000' ),
+        ( '.menu.baud.256000.windows', '256000' ),
+        ( '.menu.baud.256000.upload.speed', '256000' ),
         ]),
     's230': collections.OrderedDict([
-        ( '.menu.UploadSpeed.230400.linux', '230400' ),
-        ( '.menu.UploadSpeed.230400.macosx', '230400' ),
-        ( '.menu.UploadSpeed.230400.upload.speed', '230400' ),
+        ( '.menu.baud.230400.linux', '230400' ),
+        ( '.menu.baud.230400.macosx', '230400' ),
+        ( '.menu.baud.230400.upload.speed', '230400' ),
         ]),
     's460': collections.OrderedDict([
-        ( '.menu.UploadSpeed.460800.linux', '460800' ),
-        ( '.menu.UploadSpeed.460800.macosx', '460800' ),
-        ( '.menu.UploadSpeed.460800.upload.speed', '460800' ),
+        ( '.menu.baud.460800.linux', '460800' ),
+        ( '.menu.baud.460800.macosx', '460800' ),
+        ( '.menu.baud.460800.upload.speed', '460800' ),
         ]),
     's512': collections.OrderedDict([
-        ( '.menu.UploadSpeed.512000.windows', '512000' ),
-        ( '.menu.UploadSpeed.512000.upload.speed', '512000' ),
+        ( '.menu.baud.512000.windows', '512000' ),
+        ( '.menu.baud.512000.upload.speed', '512000' ),
         ]),
     's921': collections.OrderedDict([
-        ( '.menu.UploadSpeed.921600', '921600' ),
-        ( '.menu.UploadSpeed.921600.upload.speed', '921600' ),
+        ( '.menu.baud.921600', '921600' ),
+        ( '.menu.baud.921600.upload.speed', '921600' ),
         ]),
 
     ####################### flash erase
 
     'flash_erase_menu': collections.OrderedDict([
-        ( '.menu.FlashErase.none', 'Only Sketch' ),
-        ( '.menu.FlashErase.none.upload.erase_cmd', '' ),
-        ( '.menu.FlashErase.sdk', 'Sketch + WiFi Settings' ),
-        ( '.menu.FlashErase.sdk.upload.erase_cmd', '-ca "{build.rfcal_addr}" -cz 0x4000' ),
-        ( '.menu.FlashErase.all', 'All Flash Contents' ),
-        ( '.menu.FlashErase.all.upload.erase_cmd', '-ca 0x0 -cz "{build.flash_size_bytes}"' ),
+        ( '.menu.wipe.none', 'Only Sketch' ),
+        ( '.menu.wipe.none.upload.erase_cmd', '' ),
+        ( '.menu.wipe.sdk', 'Sketch + WiFi Settings' ),
+        ( '.menu.wipe.sdk.upload.erase_cmd', '-ca "{build.rfcal_addr}" -cz 0x4000' ),
+        ( '.menu.wipe.all', 'All Flash Contents' ),
+        ( '.menu.wipe.all.upload.erase_cmd', '-ca 0x0 -cz "{build.flash_size_bytes}"' ),
         ]),
 
     }
@@ -1041,14 +1041,14 @@ def all_debug ():
     options += [ listcomb + listnocomb ]
     options += [ listsingle ]
     debugmenu = collections.OrderedDict([
-            ( '.menu.Debug.Disabled', 'Disabled' ),
-            ( '.menu.Debug.Disabled.build.debug_port', '' ),
-            ( '.menu.Debug.Serial', 'Serial' ),
-            ( '.menu.Debug.Serial.build.debug_port', '-DDEBUG_ESP_PORT=Serial' ),
-            ( '.menu.Debug.Serial1', 'Serial1' ),
-            ( '.menu.Debug.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1' ),
-            ( '.menu.DebugLevel.None____', 'None' ),
-            ( '.menu.DebugLevel.None____.build.debug_level', '' ),
+            ( '.menu.dbg.Disabled', 'Disabled' ),
+            ( '.menu.dbg.Disabled.build.debug_port', '' ),
+            ( '.menu.dbg.Serial', 'Serial' ),
+            ( '.menu.dbg.Serial.build.debug_port', '-DDEBUG_ESP_PORT=Serial' ),
+            ( '.menu.dbg.Serial1', 'Serial1' ),
+            ( '.menu.dbg.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1' ),
+            ( '.menu.lvl.None____', 'None' ),
+            ( '.menu.lvl.None____.build.debug_level', '' ),
         ])
 
     for optlist in options:
@@ -1071,8 +1071,8 @@ def all_debug ():
             else:
                 debugdefs += ' -DDEBUG_ESP_' + opt
         debugmenu.update(collections.OrderedDict([
-            ( '.menu.DebugLevel.' + debugname, debugmenuname ),
-            ( '.menu.DebugLevel.' + debugname + '.build.debug_level', debugdefs )
+            ( '.menu.lvl.' + debugname, debugmenuname ),
+            ( '.menu.lvl.' + debugname + '.build.debug_level', debugdefs )
             ]))
     return { 'debug_menu': debugmenu }
 
@@ -1103,7 +1103,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
     strspiffs_strip = str(spiffs_kb / 1024) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) if (spiffs_kb > 0) else ''
 
     ld = 'eagle.flash.' + strsize.lower() + strspiffs_strip.lower() + '.ld'
-    menu = '.menu.FlashSize.' + strsize + strspiffs_strip
+    menu = '.menu.eesz.' + strsize + strspiffs_strip
     menub = menu + '.build.'
     desc = 'no' if (spiffs_kb == 0) else strspiffs
     d = collections.OrderedDict([
@@ -1271,20 +1271,20 @@ def all_boards ():
     print('#')
     print('')
     print('menu.BoardModel=Model')
-    print('menu.UploadSpeed=Upload Speed')
-    print('menu.CpuFrequency=CPU Frequency')
+    print('menu.baud=Upload Speed')
+    print('menu.cpuHz=CPU Frequency')
     print('menu.CrystalFreq=Crystal Frequency')
-    print('menu.FlashSize=Flash Size')
+    print('menu.eesz=Flash Size')
     print('menu.FlashMode=Flash Mode')
     print('menu.FlashFreq=Flash Frequency')
     print('menu.ResetMethod=Reset Method')
     print('menu.ESPModule=Module')
-    print('menu.Debug=Debug port')
-    print('menu.DebugLevel=Debug Level')
-    print('menu.LwIPVariant=lwIP Variant')
-    print('menu.VTable=VTables')
+    print('menu.dbg=Debug port')
+    print('menu.lvl=Debug Level')
+    print('menu.lwIP=lwIP Variant')
+    print('menu.vt=VTables')
     print('menu.led=Builtin Led')
-    print('menu.FlashErase=Erase Flash')
+    print('menu.wipe=Erase Flash')
     print('')
 
     for id in boards:
@@ -1502,8 +1502,8 @@ for o, a in opts:
 
     elif o in ("--customspeed"):
         customspeeds += [
-            '.menu.UploadSpeed.' + a + '=' + a,
-            '.menu.UploadSpeed.' + a + '.upload.speed' + '=' + a ]
+            '.menu.baud.' + a + '=' + a,
+            '.menu.baud.' + a + '.upload.speed' + '=' + a ]
 
     elif o in ("--board"):
         if not a in boards:
