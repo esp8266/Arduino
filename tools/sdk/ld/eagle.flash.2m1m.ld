@@ -1,7 +1,9 @@
 /* Flash Split for 2M chips */
 /* sketch 1019KB */
 /* spiffs 1024KB */
-/* eeprom 4KB rfcal 16KB */
+/* eeprom @0x1FB000 (4KB) */
+/* rfcal @0x1FC000 (4KB) */
+/* sdk wifi settings @0x1FD000 (12KB) */
 
 MEMORY
 {

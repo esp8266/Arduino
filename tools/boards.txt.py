@@ -930,27 +930,27 @@ macros = {
     ####################### lwip
 
     'lwip2': collections.OrderedDict([
-        ( '.menu.lwIP.lm2', 'v2 Lower Memory' ),
-        ( '.menu.lwIP.lm2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.lwIP.lm2.build.lwip_lib', '-llwip2' ),
-        ( '.menu.lwIP.lm2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
-        ( '.menu.lwIP.hb2', 'v2 Higher Bandwidth' ),
-        ( '.menu.lwIP.hb2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.lwIP.hb2.build.lwip_lib', '-llwip2_1460' ),
-        ( '.menu.lwIP.hb2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
+        ( '.menu.ip.lm2', 'v2 Lower Memory' ),
+        ( '.menu.ip.lm2.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2.build.lwip_lib', '-llwip2' ),
+        ( '.menu.ip.lm2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
+        ( '.menu.ip.hb2', 'v2 Higher Bandwidth' ),
+        ( '.menu.ip.hb2.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2.build.lwip_lib', '-llwip2_1460' ),
+        ( '.menu.ip.hb2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
         ]),
 
     'lwip': collections.OrderedDict([
-        ( '.menu.lwIP.hb1', 'v1.4 Higher Bandwidth' ),
-        ( '.menu.lwIP.hb1.build.lwip_lib', '-llwip_gcc' ),
-        ( '.menu.lwIP.hb1.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        #( '.menu.lwIP.Espressif', 'v1.4 Espressif (xcc)' ),
-        #( '.menu.lwIP.Espressif.build.lwip_lib', '-llwip' ),
-        #( '.menu.lwIP.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
-        ( '.menu.lwIP.src', 'v1.4 Compile from source' ),
-        ( '.menu.lwIP.src.build.lwip_lib', '-llwip_src' ),
-        ( '.menu.lwIP.src.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        ( '.menu.lwIP.src.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
+        ( '.menu.ip.hb1', 'v1.4 Higher Bandwidth' ),
+        ( '.menu.ip.hb1.build.lwip_lib', '-llwip_gcc' ),
+        ( '.menu.ip.hb1.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
+        #( '.menu.ip.Espressif', 'v1.4 Espressif (xcc)' ),
+        #( '.menu.ip.Espressif.build.lwip_lib', '-llwip' ),
+        #( '.menu.ip.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
+        ( '.menu.ip.src', 'v1.4 Compile from source' ),
+        ( '.menu.ip.src.build.lwip_lib', '-llwip_src' ),
+        ( '.menu.ip.src.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
+        ( '.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
         ]),
 
     ####################### serial
@@ -1082,15 +1082,16 @@ def all_debug ():
 def flash_map (flashsize_kb, spiffs_kb = 0):
 
     # mapping:
-    # | flash | reserved | empty | spiffs | eeprom | rf
+    # flash | reserved | empty | spiffs | eeprom | rf-cal | sdk-wifi-settings
 
-    eeprom_size_kb = 4
-    rf_size_kb = 16
     reserved = 4112
-    spiffs_end = (flashsize_kb - rf_size_kb - eeprom_size_kb) * 1024
-    rfcal_addr = (flashsize_kb - rf_size_kb) * 1024
+    eeprom_size_kb = 4
+    rfcal_size_kb = 4
+    sdkwifi_size_kb = 12
+    spiffs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+    rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
     if flashsize_kb <= 1024:
-        max_upload_size = (flashsize_kb - (spiffs_kb + rf_size_kb + eeprom_size_kb)) * 1024 - reserved
+        max_upload_size = (flashsize_kb - (spiffs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
         spiffs_start = spiffs_end - spiffs_kb * 1024
         spiffs_blocksize = 4096
     else:
@@ -1152,7 +1153,9 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
             if empty_size > 1024:
                 print("/* empty  %dKB */" % (empty_size / 1024))
             print("/* spiffs %dKB */" % spiffs_kb)
-        print("/* eeprom %dKB rfcal %dKB */" % (eeprom_size_kb, rf_size_kb))
+        print("/* eeprom @0x%X (%dKB) */" % (rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
+        print("/* rfcal @0x%X (%dKB) */" % (rfcal_addr, rfcal_size_kb))
+        print("/* sdk wifi settings @0x%X (%dKB) */" % (rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
         print("")
         print("MEMORY")
         print("{")
@@ -1281,7 +1284,7 @@ def all_boards ():
     print('menu.ESPModule=Module')
     print('menu.dbg=Debug port')
     print('menu.lvl=Debug Level')
-    print('menu.lwIP=lwIP Variant')
+    print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
     print('menu.led=Builtin Led')
     print('menu.wipe=Erase Flash')

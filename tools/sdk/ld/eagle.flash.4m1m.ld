@@ -2,7 +2,9 @@
 /* sketch 1019KB */
 /* empty  2048KB */
 /* spiffs 1024KB */
-/* eeprom 4KB rfcal 16KB */
+/* eeprom @0x3FB000 (4KB) */
+/* rfcal @0x3FC000 (4KB) */
+/* sdk wifi settings @0x3FD000 (12KB) */
 
 MEMORY
 {
