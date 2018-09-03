@@ -1084,6 +1084,8 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
     # mapping:
     # flash | reserved | empty | spiffs | eeprom | rf-cal | sdk-wifi-settings
 
+    spi = 0x40200000 # https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map
+
     reserved = 4112
     eeprom_size_kb = 4
     rfcal_size_kb = 4
@@ -1147,15 +1149,15 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
             block = 0x2000
 
         print("/* Flash Split for %s chips */" % strsize)
-        print("/* sketch %dKB */" % (max_upload_size / 1024))
+        print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
         if spiffs_kb > 0:
-            empty_size = spiffs_start - max_upload_size - 4096
+            empty_size = spiffs_start - max_upload_size
             if empty_size > 1024:
-                print("/* empty  %dKB */" % (empty_size / 1024))
-            print("/* spiffs %dKB */" % spiffs_kb)
-        print("/* eeprom @0x%X (%dKB) */" % (rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
-        print("/* rfcal @0x%X (%dKB) */" % (rfcal_addr, rfcal_size_kb))
-        print("/* sdk wifi settings @0x%X (%dKB) */" % (rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
+                print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
+            print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + spiffs_start, ((spiffs_end - spiffs_start) / 1024), spiffs_end - spiffs_start))
+        print("/* eeprom @0x%X (=%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
+        print("/* rfcal  @0x%X (=%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
+        print("/* wifi   @0x%X (=%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
         print("")
         print("MEMORY")
         print("{")
