@@ -1079,22 +1079,46 @@ def all_debug ():
 ################################################################
 # flash size
 
-def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_start = 0, spiffs_size = 0, spiffs_blocksize = 0):
-    menu = '.menu.FlashSize.' + optname
+def flash_map (flashsize_kb, spiffs_kb = 0):
+
+    # mapping:
+    # | flash | reserved | empty | spiffs | eeprom | rf
+
+    eeprom_size_kb = 4
+    rf_size_kb = 16
+    reserved = 4112
+    spiffs_end = (flashsize_kb - rf_size_kb - eeprom_size_kb) * 1024
+    rfcal_addr = (flashsize_kb - rf_size_kb) * 1024
+    if flashsize_kb <= 1024:
+        max_upload_size = (flashsize_kb - (spiffs_kb + rf_size_kb + eeprom_size_kb)) * 1024 - reserved
+        spiffs_start = spiffs_end - spiffs_kb * 1024
+        spiffs_blocksize = 4096
+    else:
+        max_upload_size = 1024 * 1024 - reserved
+        spiffs_start = (flashsize_kb - spiffs_kb) * 1024
+        spiffs_blocksize = 8192
+
+    strsize = str(flashsize_kb / 1024) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
+    strspiffs = str(spiffs_kb / 1024) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
+    strspiffs_strip = str(spiffs_kb / 1024) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) if (spiffs_kb > 0) else ''
+
+    ld = 'eagle.flash.' + strsize.lower() + strspiffs_strip.lower() + '.ld'
+    menu = '.menu.FlashSize.' + strsize + strspiffs_strip
     menub = menu + '.build.'
+    desc = 'no' if (spiffs_kb == 0) else strspiffs
     d = collections.OrderedDict([
-        ( menu, display + ' (' + desc + ')' ),
-        ( menub + 'flash_size', display ),
-        ( menub + 'flash_size_bytes', "0x%X" % size_bytes ),
+        ( menu, strsize + ' (' + desc + ' SPIFFS)' ),
+        ( menub + 'flash_size', strsize ),
+        ( menub + 'flash_size_bytes', "0x%X" % (flashsize_kb * 1024)),
         ( menub + 'flash_ld', ld ),
         ( menub + 'spiffs_pagesize', '256' ),
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
-        ( menub + 'rfcal_addr', "0x%X" % (size_bytes - 0x4000))
+        ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
         ])
-    if spiffs_size > 0:
+    if spiffs_kb > 0:
         d.update(collections.OrderedDict([
             ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
-            ( menub + 'spiffs_end', "0x%05X" % (spiffs_start + spiffs_size) ),
+            ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
             ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
             ]))
 
@@ -1103,7 +1127,6 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
 
             checkdir()
 
-            lddir = "tools/sdk/ld/"
             ldbackupdir = lddir + "backup/"
             if not os.path.isdir(ldbackupdir):
                 os.mkdir(ldbackupdir)
@@ -1112,24 +1135,24 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
             realstdout = sys.stdout
             sys.stdout = open(lddir + ld, 'w')
 
-        if spiffs_size == 0:
+        if spiffs_kb == 0:
             page = 0
             block = 0
-        elif spiffs_size < 0x80000:
+        elif spiffs_kb < 0x80000 / 1024:
             page = 0x100
             block = 0x1000
         else:
             page = 0x100
             block = 0x2000
 
-        print("/* Flash Split for %s chips */" % display)
+        print("/* Flash Split for %s chips */" % strsize)
         print("/* sketch %dKB */" % (max_upload_size / 1024))
-        if spiffs_size > 0:
+        if spiffs_kb > 0:
             empty_size = spiffs_start - max_upload_size - 4096
             if empty_size > 1024:
                 print("/* empty  %dKB */" % (empty_size / 1024))
-            print("/* spiffs %dKB */" % (spiffs_size / 1024))
-        print("/* eeprom 20KB */")
+            print("/* spiffs %dKB */" % spiffs_kb)
+        print("/* eeprom %dKB rfcal %dKB */" % (eeprom_size_kb, rf_size_kb))
         print("")
         print("MEMORY")
         print("{")
@@ -1139,10 +1162,11 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
-        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
-        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_start + spiffs_size))
-        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
-        print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
+        if spiffs_kb > 0:
+            print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
+            print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_end))
+            print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+            print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
         print("")
         print('INCLUDE "eagle.app.v6.common.ld"')
 
@@ -1152,25 +1176,49 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
 
     return d
 
-def all_flash_size ():
-    f512 =      flash_size(0x80000,  '512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696,   0x7B000)
-    f512.update(flash_size(0x80000,  '512K', '512K32',  'eagle.flash.512k32.ld',   '32K SPIFFS', 466928,   0x73000,   0x8000,  4096))
-    f512.update(flash_size(0x80000,  '512K', '512K64',  'eagle.flash.512k64.ld',   '64K SPIFFS', 434160,   0x6B000,   0x10000, 4096))
-    f512.update(flash_size(0x80000,  '512K', '512K128', 'eagle.flash.512k128.ld', '128K SPIFFS', 368624,   0x5B000,   0x20000, 4096))
-    f1m =       flash_size(0x100000,   '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984,  0xFB000)
-    f1m.update( flash_size(0x100000,   '1M', '1M64',    'eagle.flash.1m64.ld',     '64K SPIFFS', 958448,   0xEB000,   0x10000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M128',   'eagle.flash.1m128.ld',   '128K SPIFFS', 892912,   0xDB000,   0x20000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M144',   'eagle.flash.1m144.ld',   '144K SPIFFS', 876528,   0xD7000,   0x24000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M160',   'eagle.flash.1m160.ld',   '160K SPIFFS', 860144,   0xD3000,   0x28000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M192',   'eagle.flash.1m192.ld',   '192K SPIFFS', 827376,   0xCB000,   0x30000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M256',   'eagle.flash.1m256.ld',   '256K SPIFFS', 761840,   0xBB000,   0x40000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M512',   'eagle.flash.1m512.ld',   '512K SPIFFS', 499696,   0x7B000,   0x80000, 8192))
-    f2m =       flash_size(0x200000,   '2M', '2M',      'eagle.flash.2m.ld',        '1M SPIFFS', 1044464, 0x100000,   0xFB000, 8192)
-    f4m =       flash_size(0x400000,   '4M', '4M1M',    'eagle.flash.4m1m.ld',      '1M SPIFFS', 1044464, 0x300000,   0xFB000, 8192)
-    f4m.update( flash_size(0x400000,   '4M', '4M2M',    'eagle.flash.4m2m.ld',      '2M SPIFFS', 1044464, 0x200000,  0x1FB000, 8192))
-    f4m.update( flash_size(0x400000,   '4M', '4M3M',    'eagle.flash.4m.ld',        '3M SPIFFS', 1044464, 0x100000,  0x2FB000, 8192))
-    f8m =       flash_size(0x800000,   '8M', '8M7M',    'eagle.flash.8m.ld',        '7M SPIFFS', 1044464, 0x100000,  0x6FB000, 8192)
-    f16m =      flash_size(0x1000000, '16M', '16M15M',  'eagle.flash.16m.ld',      '15M SPIFFS', 1044464, 0x100000,  0xEFB000, 8192)
+def all_flash_map ():
+
+    f512 = collections.OrderedDict([])
+    f1m  = collections.OrderedDict([])
+    f2m  = collections.OrderedDict([])
+    f4m  = collections.OrderedDict([])
+    f8m  = collections.OrderedDict([])
+    f16m = collections.OrderedDict([])
+
+    #                      flash(KB) spiffs(KB)
+
+    f512.update(flash_map(     512))
+    f512.update(flash_map(     512,      32 ))
+    f512.update(flash_map(     512,      64 ))
+    f512.update(flash_map(     512,     128 ))
+
+    f1m.update( flash_map(    1024))
+    f1m.update( flash_map(    1024,      64 ))
+    f1m.update( flash_map(    1024,     128 ))
+    f1m.update( flash_map(    1024,     144 ))
+    f1m.update( flash_map(    1024,     160 ))
+    f1m.update( flash_map(    1024,     192 ))
+    f1m.update( flash_map(    1024,     256 ))
+    f1m.update( flash_map(    1024,     512 ))
+
+    f2m.update( flash_map(  2*1024))
+    f2m.update( flash_map(  2*1024,     512 ))
+    f2m.update( flash_map(  2*1024,    1024 ))
+
+    f4m.update( flash_map(  4*1024))
+    f4m.update( flash_map(  4*1024,    1024 ))
+    f4m.update( flash_map(  4*1024,  2*1024 ))
+    f4m.update( flash_map(  4*1024,  3*1024 ))
+
+    f8m.update( flash_map(  8*1024,  6*1024 ))
+    f8m.update( flash_map(  8*1024,  7*1024 ))
+
+    f16m.update(flash_map( 16*1024, 14*1024 ))
+    f16m.update(flash_map( 16*1024, 15*1024 ))
+
+    if ldgen:
+        print("generated: ldscripts (in %s)" % lddir)
+
     return {
         '512K': f512,
           '1M':  f1m,
@@ -1212,7 +1260,7 @@ def all_boards ():
         realstdout = sys.stdout
         sys.stdout = open("boards.txt", 'w')
 
-    macros.update(all_flash_size())
+    macros.update(all_flash_map())
     macros.update(all_debug())
     macros.update(led(led_default, led_max))
 
@@ -1280,6 +1328,7 @@ def all_boards ():
     if boardsgen:
         sys.stdout.close()
         sys.stdout = realstdout
+        print("generated: boards.txt")
 
 ################################################################
 
@@ -1311,6 +1360,7 @@ def package ():
     if packagegen:
         with open(pkgfname, 'w') as package_file:
             package_file.write(newfilestr)
+        print("updated:   %s" % pkgfname)
     else:
         sys.stdout.write(newfilestr)
 
@@ -1352,6 +1402,7 @@ def doc ():
     if docgen:
         sys.stdout.close()
         sys.stdout = realstdout
+        print("generated: doc/boards.rst")
 
 ################################################################
 # help / usage
@@ -1421,6 +1472,7 @@ packagegen = False
 docshow = False
 docgen = False
 customspeeds = []
+lddir = "tools/sdk/ld/"
 
 #### vvvv cmdline parsing starts
 
@@ -1520,7 +1572,7 @@ for o, a in opts:
 did = False
 
 if ldshow:
-    all_flash_size()
+    all_flash_map()
     did = True
 
 if boardsshow:

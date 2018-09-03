@@ -1,7 +1,7 @@
 /* Flash Split for 16M chips */
 /* sketch 1019KB */
-/* spiffs 15340KB */
-/* eeprom 20KB */
+/* spiffs 15360KB */
+/* eeprom 4KB rfcal 16KB */
 
 MEMORY
 {

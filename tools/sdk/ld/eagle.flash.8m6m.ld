@@ -1,7 +1,8 @@
 /* Flash Split for 8M chips */
 /* sketch 1019KB */
-/* spiffs 7148KB */
-/* eeprom 20KB */
+/* empty  1024KB */
+/* spiffs 6144KB */
+/* eeprom 4KB rfcal 16KB */
 
 MEMORY
 {
@@ -11,7 +12,7 @@ MEMORY
   irom0_0_seg :                         org = 0x40201010, len = 0xfeff0
 }
 
-PROVIDE ( _SPIFFS_start = 0x40300000 );
+PROVIDE ( _SPIFFS_start = 0x40400000 );
 PROVIDE ( _SPIFFS_end = 0x409FB000 );
 PROVIDE ( _SPIFFS_page = 0x100 );
 PROVIDE ( _SPIFFS_block = 0x2000 );

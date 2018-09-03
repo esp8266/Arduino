@@ -1,8 +1,8 @@
 /* Flash Split for 4M chips */
 /* sketch 1019KB */
 /* empty  2048KB */
-/* spiffs 1004KB */
-/* eeprom 20KB */
+/* spiffs 1024KB */
+/* eeprom 4KB rfcal 16KB */
 
 MEMORY
 {
