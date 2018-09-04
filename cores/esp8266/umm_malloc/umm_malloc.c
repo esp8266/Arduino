@@ -1762,6 +1762,11 @@ size_t ICACHE_FLASH_ATTR umm_free_heap_size( void ) {
   return (size_t)ummHeapInfo.freeBlocks * sizeof(umm_block);
 }
 
+uint16_t ICACHE_FLASH_ATTR umm_max_block_size( void ) {
+  umm_info(NULL, 0);
+  return ummHeapInfo.maxFreeContiguousBlocks * sizeof(umm_block);
+}
+
 size_t ICACHE_FLASH_ATTR umm_block_size( void ) {
   return sizeof(umm_block);
 }

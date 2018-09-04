@@ -23,15 +23,18 @@
 #include "coredecls.h"
 #include "Esp.h"
 
-uint16_t EspClass::getHeapUnfragness(uint32_t* freeHeap)
+uint8_t EspClass::getHeapFragmentation (uint32_t* freeHeap, uint16_t* maxBlock)
 {
     // L2 / Euclidian norm of free block sizes.
     // Having getFreeHeap()=sum(hole-size), un-fragmentation is given by
     // sqrt(sum(hole-size²)) / sum(hole-size)
 
     umm_info(NULL, 0);
-    uint32_t fh = ummHeapInfo.freeBlocks * umm_block_size();
+    uint32_t block_size = umm_block_size();
+    uint32_t fh = ummHeapInfo.freeBlocks * block_size;
     if (freeHeap)
         *freeHeap = fh;
-    return (isqrt32(ummHeapInfo.ummFreeSize2) * 1000) / fh;
+    if (maxBlock)
+        *maxBlock = ummHeapInfo.maxFreeContiguousBlocks * block_size;
+    return 100 - (sqrt32(ummHeapInfo.ummFreeSize2) * 100) / fh;
 }

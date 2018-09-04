@@ -171,6 +171,11 @@ uint32_t EspClass::getFreeHeap(void)
     return system_get_free_heap_size();
 }
 
+uint16_t EspClass::getMaxFreeBlockSize(void)
+{
+    return system_get_free_heap_size();
+}
+
 uint32_t EspClass::getChipId(void)
 {
     return system_get_chip_id();
