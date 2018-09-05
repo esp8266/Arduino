@@ -83,29 +83,25 @@ uint8_t WiFiUDP::begin(uint16_t port)
 
     _ctx = new UdpContext;
     _ctx->ref();
-    ip_addr_t addr = INADDR_ANY;
-    return (_ctx->listen(addr, port)) ? 1 : 0;
+    ip_addr_t addr = IPADDR4_INIT(INADDR_ANY);
+    return (_ctx->listen(&addr, port)) ? 1 : 0;
 }
 
-uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port)
+uint8_t WiFiUDP::beginMulticast(const IPAddress& interfaceAddr, const IPAddress& multicast, uint16_t port)
 {
     if (_ctx) {
         _ctx->unref();
         _ctx = 0;
     }
 
-    ipv4_addr_t ifaddr;
-    ifaddr.addr = (uint32_t) interfaceAddr;
-    ipv4_addr_t multicast_addr;
-    multicast_addr.addr = (uint32_t) multicast;
-
-    if (igmp_joingroup(&ifaddr, &multicast_addr)!= ERR_OK) {
+    if (igmp_joingroup(interfaceAddr.getLwipAddr(), multicast.getLwipAddr())!= ERR_OK) {
         return 0;
     }
 
     _ctx = new UdpContext;
     _ctx->ref();
-    if (!_ctx->listen(*IP_ADDR_ANY, port)) {
+    ip_addr_t addr = IPADDR4_INIT(INADDR_ANY);
+    if (!_ctx->listen(&addr, port)) {
         return 0;
     }
 
@@ -150,20 +146,17 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port)
     return 0;
 }
 
-int WiFiUDP::beginPacket(IPAddress ip, uint16_t port)
+int WiFiUDP::beginPacket(const IPAddress& ip, uint16_t port)
 {
-    ipv4_addr_t addr;
-    addr.addr = ip;
-
     if (!_ctx) {
         _ctx = new UdpContext;
         _ctx->ref();
     }
-    return (_ctx->connect(addr, port)) ? 1 : 0;
+    return (_ctx->connect(ip.getLwipAddr(), port)) ? 1 : 0;
 }
 
-int WiFiUDP::beginPacketMulticast(IPAddress multicastAddress, uint16_t port,
-    IPAddress interfaceAddress, int ttl)
+int WiFiUDP::beginPacketMulticast(const IPAddress& multicastAddress, uint16_t port,
+    const IPAddress& interfaceAddress, int ttl)
 {
     ipv4_addr_t mcastAddr;
     mcastAddr.addr = multicastAddress;
@@ -263,13 +256,10 @@ uint16_t WiFiUDP::remotePort()
 
 IPAddress WiFiUDP::destinationIP()
 {
-    IPAddress addr;
-
     if (!_ctx)
-        return addr;
+        return IPAddress(0U);
 
-    addr = _ctx->getDestAddress();
-    return addr;
+    return IPAddress(_ctx->getDestAddress());
 }
 
 uint16_t WiFiUDP::localPort()

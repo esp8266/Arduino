@@ -115,9 +115,9 @@ public:
         udp_set_multicast_netif_addr(_pcb, addr);
     }
 #else
-    void setMulticastInterface(const ip_addr_t& addr)
+    void setMulticastInterface(const ip_addr_t* addr)
     {
-        udp_set_multicast_netif_addr(_pcb, &addr);
+        udp_set_multicast_netif_addr(_pcb, ip_2_ip4(addr));
     }
 #endif
 
@@ -159,13 +159,13 @@ public:
         return (pos <= _rx_buf->len);
     }
 
-    uint32_t getRemoteAddress()
+    const ip_addr_t* getRemoteAddress()
     {
         if (!_rx_buf)
             return 0;
 
         ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return iphdr->src.addr;
+        return iphdr->src;
     }
 
     uint16_t getRemotePort()
@@ -177,13 +177,13 @@ public:
         return ntohs(udphdr->src);
     }
 
-    uint32_t getDestAddress()
+    const ip_addr_t* getDestAddress()
     {
         if (!_rx_buf)
             return 0;
 
         ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return iphdr->dest.addr;
+        return iphdr->dest;
     }
 
     uint16_t getLocalPort()
