@@ -119,7 +119,7 @@ public:
         }
     }
 
-    int connect(ip_addr_t* addr, uint16_t port)
+    int connect(const ip_addr_t* addr, uint16_t port)
     {
         err_t err = tcp_connect(_pcb, addr, port, &ClientContext::_s_connected);
         if (err != ERR_OK) {
