@@ -35,8 +35,8 @@ class WiFiClientSecure : public WiFiClient {
     WiFiClientSecure();
     ~WiFiClientSecure() override;
 
-    int connect(IPAddress ip, uint16_t port) override;
-    int connect(const String host, uint16_t port) override;
+    int connect(const IPAddress& ip, uint16_t port) override;
+    int connect(const String& host, uint16_t port) override;
     int connect(const char* name, uint16_t port) override;
 
     uint8_t connected() override;

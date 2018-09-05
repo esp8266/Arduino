@@ -92,20 +92,15 @@ public:
 
     bool connect(const ip_addr_t* addr, uint16_t port)
     {
-#if 0
-        ip_addr_copy(&_pcb->remote_ip, addr);
-#else
-        #warning WTF
-        *_pcb->remote_ip = *addr;
-#endif
+        _pcb->remote_ip = *addr;
         _pcb->remote_port = port;
         return true;
     }
 
-    bool listen(ip_addr_t addr, uint16_t port)
+    bool listen(const ip_addr_t* addr, uint16_t port)
     {
         udp_recv(_pcb, &_s_recv, (void *) this);
-        err_t err = udp_bind(_pcb, &addr, port);
+        err_t err = udp_bind(_pcb, addr, port);
         return err == ERR_OK;
     }
 

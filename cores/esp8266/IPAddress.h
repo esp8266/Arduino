@@ -100,7 +100,7 @@ class IPAddress: public Printable {
         /*
                lwIP address compatibility
         */
-        const ip_addr_t* getLwipAddr ();
+        const ip_addr_t* getLwipAddr() const;
 };
 
 extern const IPAddress INADDR_NONE;
