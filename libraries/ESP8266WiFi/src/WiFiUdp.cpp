@@ -83,8 +83,7 @@ uint8_t WiFiUDP::begin(uint16_t port)
 
     _ctx = new UdpContext;
     _ctx->ref();
-    ipv4_addr_t addr;
-    addr.addr = INADDR_ANY;
+    ip_addr_t addr = INADDR_ANY;
     return (_ctx->listen(addr, port)) ? 1 : 0;
 }
 

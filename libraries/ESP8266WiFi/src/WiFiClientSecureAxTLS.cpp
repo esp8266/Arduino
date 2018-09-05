@@ -498,7 +498,7 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client, bool usePMEM,
     _ssl->connectServer(client, _timeout);
 }
 
-int WiFiClientSecure::connect(IPAddress ip, uint16_t port)
+int WiFiClientSecure::connect(const IPAddress& ip, uint16_t port)
 {
     if (!WiFiClient::connect(ip, port)) {
         return 0;
@@ -519,7 +519,7 @@ int WiFiClientSecure::connect(const char* name, uint16_t port)
     return _connectSSL(name);
 }
 
-int WiFiClientSecure::connect(const String host, uint16_t port)
+int WiFiClientSecure::connect(const String& host, uint16_t port)
 {
     return connect(host.c_str(), port);
 }
