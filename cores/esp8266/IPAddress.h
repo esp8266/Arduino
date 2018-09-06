@@ -110,9 +110,13 @@ class IPAddress: public Printable {
         /*
                lwIP address compatibility
         */
+        IPAddress(ipv4_addr fw_addr);
+        IPAddress(const ipv4_addr* fw_addr);
+        void ipv4Only() { IP_SET_TYPE_VAL(_ip, IPADDR_TYPE_V4); }
+
         IPAddress(const ip_addr_t* lwip_addr) { _ip = *lwip_addr; }
         operator const ip_addr_t*() const { return &_ip; }
-
+        
 #if LWIP_IPV6
         // when not IPv6, ip_addr_t == ip4_addr_t so this one would be ambiguous
         // required otherwise
