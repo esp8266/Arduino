@@ -34,6 +34,9 @@ void esp_schedule();
 #define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);
 #define GET_UDP_HDR(pb) reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN);
 
+#pragma message "FIXME"
+static ip_addr_t blark;
+
 class UdpContext
 {
 public:
@@ -158,9 +161,6 @@ public:
     bool isValidOffset(const size_t pos) const {
         return (pos <= _rx_buf->len);
     }
-
-#pragma message "FIXME"
-static ip_addr_t blark;
 
     const ip_addr_t* getRemoteAddress()
     {
@@ -296,7 +296,7 @@ static ip_addr_t blark;
         return size;
     }
 
-    bool send(ip_addr_t* addr = 0, uint16_t port = 0)
+    bool send(const ip_addr_t* addr = 0, uint16_t port = 0)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);

@@ -137,7 +137,7 @@ int WiFiClient::connect(const IPAddress& ip, uint16_t port)
     _client = new ClientContext(pcb, nullptr, nullptr);
     _client->ref();
     _client->setTimeout(_timeout);
-    int res = _client->connect(ip.getLwipAddr(), port);
+    int res = _client->connect(ip, port);
     if (res == 0) {
         _client->unref();
         _client = nullptr;
