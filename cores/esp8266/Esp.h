@@ -103,11 +103,12 @@ class EspClass {
         void restart();
 
         uint16_t getVcc();
+        uint32_t getChipId();
+
         uint32_t getFreeHeap();
         uint16_t getMaxFreeBlockSize();
-        uint8_t getHeapFragmentation(uint32_t* freeHeap = nullptr, uint16_t* maxBlock = nullptr); // in %
-
-        uint32_t getChipId();
+        uint8_t getHeapFragmentation(); // in %
+        void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr);
 
         const char * getSdkVersion();
         String getCoreVersion();

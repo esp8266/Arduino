@@ -5,8 +5,7 @@
 uint32_t sqrt32 (uint32_t n)
 {
     // http://www.codecodex.com/wiki/Calculate_an_integer_square_root#C
-    // Another very fast algorithm donated by Tristan Muntsinger
-    // (Tristan.Muntsinger@gmail.com) is below.
+    // Another very fast algorithm donated by Tristan.Muntsinger@gmail.com
     // (note: tested across the full 32 bits range, see comment below)
 
     // 15 iterations (c=1<<15)
@@ -25,7 +24,9 @@ uint32_t sqrt32 (uint32_t n)
     }
 }
 
-/* tested with:
+/*
+ * tested with:
+ *
 
 #include <stdio.h>
 #include <stdint.h>
@@ -50,4 +51,6 @@ int main (void)
 
     printf("\n");
 }
-*/
+
+ *
+ */
