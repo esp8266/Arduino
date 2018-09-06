@@ -261,12 +261,12 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
 
   if(dns1 != (uint32_t)0x00000000) {
       // Set DNS1-Server
-      dns_setserver(0, dns1.getLwipAddr());
+      dns_setserver(0, dns1);
   }
 
   if(dns2 != (uint32_t)0x00000000) {
       // Set DNS2-Server
-      dns_setserver(1, dns2.getLwipAddr());
+      dns_setserver(1, dns2);
   }
 
   return true;

@@ -27,24 +27,31 @@
 #include <lwip/init.h>
 #include <lwip/ip_addr.h>
 
+#if LWIP_VERSION_MAJOR == 1
+#define ip_2_ip4(x) (x)
+#endif
+
 // A class to make it easier to handle and pass around IP addresses
+// based on lwip's ip address (ipv4, limited compatibility with ipv6)
 
 class IPAddress: public Printable {
     private:
 
         ip_addr_t _ip;
 
-        //uint32_t& ipv4() { return ip_2_ip4(&_ip)->addr; } __attribute__((always_inline));
-
-        u32_t& ipv4()       { return ip_2_ip4(&_ip)->addr; } __attribute__((always_inline));
-        u32_t  ipv4() const { return ip_2_ip4(&_ip)->addr; } __attribute__((always_inline));
+        // generic IPv4 wrapper to uint32-view like arduino loves to see it
+        const u32_t& ipv4() const { return ip_2_ip4(&_ip)->addr; }
+              u32_t& ipv4()       { return ip_2_ip4(&_ip)->addr; }
 
         // Access the raw byte array containing the address.  Because this returns a pointer
         // to the internal structure rather than a copy of the address this function should only
         // be used when you know that the usage of the returned uint8_t* will be transient and not
         // stored.
         uint8_t* raw_address() {
-            return reinterpret_cast<uint8_t*>(ipv4());
+            return reinterpret_cast<uint8_t*>(&ipv4());
+        }
+        const uint8_t* raw_address() const {
+            return reinterpret_cast<const uint8_t*>(&ipv4());
         }
 
     public:
@@ -72,7 +79,7 @@ class IPAddress: public Printable {
 
         // Overloaded index operator to allow getting and setting individual octets of the address
         uint8_t operator[](int index) const {
-            return (ipv4() >> (index << 3)) & 0xff;
+            return *(raw_address() + index);
         }
         uint8_t& operator[](int index) {
             return *(raw_address() + index);
@@ -104,7 +111,13 @@ class IPAddress: public Printable {
                lwIP address compatibility
         */
         IPAddress(const ip_addr_t* lwip_addr) { _ip = *lwip_addr; }
-        const ip_addr_t* getLwipAddr() const { return &_ip; }
+        operator const ip_addr_t*() const { return &_ip; }
+
+#if LWIP_IPV6
+        // when not IPv6, ip_addr_t == ip4_addr_t so this one would be ambiguous
+        // required otherwise
+        operator const ip4_addr_t*() const { return ip_2_ip4(&_ip); }
+#endif
 };
 
 extern const IPAddress INADDR_NONE;

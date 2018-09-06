@@ -94,7 +94,7 @@ uint8_t WiFiUDP::beginMulticast(const IPAddress& interfaceAddr, const IPAddress&
         _ctx = 0;
     }
 
-    if (igmp_joingroup(ip_2_ip4(interfaceAddr.getLwipAddr()), ip_2_ip4(multicast.getLwipAddr()))!= ERR_OK) {
+    if (igmp_joingroup(interfaceAddr, multicast)!= ERR_OK) {
         return 0;
     }
 
@@ -152,7 +152,7 @@ int WiFiUDP::beginPacket(const IPAddress& ip, uint16_t port)
         _ctx = new UdpContext;
         _ctx->ref();
     }
-    return (_ctx->connect(ip.getLwipAddr(), port)) ? 1 : 0;
+    return (_ctx->connect(ip, port)) ? 1 : 0;
 }
 
 int WiFiUDP::beginPacketMulticast(const IPAddress& multicastAddress, uint16_t port,
@@ -162,10 +162,10 @@ int WiFiUDP::beginPacketMulticast(const IPAddress& multicastAddress, uint16_t po
         _ctx = new UdpContext;
         _ctx->ref();
     }
-    if (!_ctx->connect(multicastAddress.getLwipAddr(), port)) {
+    if (!_ctx->connect(multicastAddress, port)) {
         return 0;
     }
-    _ctx->setMulticastInterface(interfaceAddress.getLwipAddr());
+    _ctx->setMulticastInterface(interfaceAddress);
     _ctx->setMulticastTTL(ttl);
     return 1;
 }
