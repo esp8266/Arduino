@@ -113,7 +113,7 @@ bool LLMNRResponder::_restart() {
 
     IPAddress llmnr(LLMNR_MULTICAST_ADDR);
 
-    if (igmp_joingroup(IP_ADDR_ANY, llmnr) != ERR_OK)
+    if (igmp_joingroup(IPAddress(IP_ADDR_ANY), llmnr) != ERR_OK)
         return false;
 
     _conn = new UdpContext;
@@ -234,10 +234,12 @@ void LLMNRResponder::_process_packet() {
 
     struct ip_info ip_info;
     bool match_ap = false;
-    if (wifi_get_opmode() & SOFTAP_MODE) {
+    if (ip_info.ip.addr && (wifi_get_opmode() & SOFTAP_MODE)) {
         wifi_get_ip_info(SOFTAP_IF, &ip_info);
-    if (ip_info.ip.addr && ip_addr_netcmp(remote_ip, &ip_info.ip, &ip_info.netmask))
-        match_ap = true;
+        IPAddress infoIp(ip_info.ip);
+        IPAddress infoMask(ip_info.netmask);
+        if (ip_addr_netcmp(remote_ip, infoIp, infoMask))
+            match_ap = true;
     }
     if (!match_ap)
         wifi_get_ip_info(STATION_IF, &ip_info);

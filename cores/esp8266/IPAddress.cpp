@@ -22,10 +22,12 @@
 #include <Print.h>
 
 IPAddress::IPAddress() {
+    ipv4Only();
     ipv4() = 0;
 }
 
 IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet) {
+    ipv4Only();
     (*this)[0] = first_octet;
     (*this)[1] = second_octet;
     (*this)[2] = third_octet;
@@ -33,14 +35,17 @@ IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_oc
 }
 
 IPAddress::IPAddress(uint32_t address) {
+    ipv4Only();
     ipv4() = address;
 }
 
 IPAddress::IPAddress(const uint8_t *address) {
+    ipv4Only();
     ipv4() = *reinterpret_cast<const uint32_t*>(address);
 }
 
 bool IPAddress::fromString(const char *address) {
+    ipv4Only();
     // TODO: add support for "a", "a.b", "a.b.c" formats
 
     uint16_t acc = 0; // Accumulator
@@ -82,17 +87,19 @@ bool IPAddress::fromString(const char *address) {
 }
 
 IPAddress& IPAddress::operator=(const uint8_t *address) {
+    ipv4Only();
     ipv4() = *reinterpret_cast<const uint32_t*>(address);
     return *this;
 }
 
 IPAddress& IPAddress::operator=(uint32_t address) {
+    ipv4Only();
     ipv4() = address;
     return *this;
 }
 
 bool IPAddress::operator==(const uint8_t* addr) const {
-    return ipv4() == *reinterpret_cast<const uint32_t*>(addr);
+    return IP_IS_V4_VAL(_ip) && ipv4() == *reinterpret_cast<const uint32_t*>(addr);
 }
 
 size_t IPAddress::printTo(Print& p) const {
@@ -121,3 +128,15 @@ bool IPAddress::isValid(const char* arg) {
 }
 
 const IPAddress INADDR_NONE(0, 0, 0, 0);
+
+/* lwip */
+
+IPAddress::IPAddress(ipv4_addr fw_addr) {
+    ipv4Only();
+    ipv4() = fw_addr.addr;
+}
+
+IPAddress::IPAddress(const ipv4_addr* fw_addr) {
+    ipv4Only();
+    ipv4() = fw_addr->addr;
+}
