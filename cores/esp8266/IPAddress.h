@@ -24,23 +24,27 @@
 #include <WString.h>
 #include <Printable.h>
 
+#include <lwip/init.h>
 #include <lwip/ip_addr.h>
 
 // A class to make it easier to handle and pass around IP addresses
 
 class IPAddress: public Printable {
     private:
-        union {
-                uint8_t bytes[4];  // IPv4 address
-                uint32_t dword;
-        } _address;
+
+        ip_addr_t _ip;
+
+        //uint32_t& ipv4() { return ip_2_ip4(&_ip)->addr; } __attribute__((always_inline));
+
+        u32_t& ipv4()       { return ip_2_ip4(&_ip)->addr; } __attribute__((always_inline));
+        u32_t  ipv4() const { return ip_2_ip4(&_ip)->addr; } __attribute__((always_inline));
 
         // Access the raw byte array containing the address.  Because this returns a pointer
         // to the internal structure rather than a copy of the address this function should only
         // be used when you know that the usage of the returned uint8_t* will be transient and not
         // stored.
         uint8_t* raw_address() {
-            return _address.bytes;
+            return reinterpret_cast<uint8_t*>(ipv4());
         }
 
     public:
@@ -49,7 +53,6 @@ class IPAddress: public Printable {
         IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
         IPAddress(uint32_t address);
         IPAddress(const uint8_t *address);
-        IPAddress(const ip_addr_t* lwip_addr);
 
         bool fromString(const char *address);
         bool fromString(const String &address) { return fromString(address.c_str()); }
@@ -57,22 +60,22 @@ class IPAddress: public Printable {
         // Overloaded cast operator to allow IPAddress objects to be used where a pointer
         // to a four-byte uint8_t array is expected
         operator uint32_t() const {
-            return _address.dword;
+            return ipv4();
         }
         bool operator==(const IPAddress& addr) const {
-            return _address.dword == addr._address.dword;
+            return ipv4() == addr.ipv4();
         }
         bool operator==(uint32_t addr) const {
-            return _address.dword == addr;
+            return ipv4() == addr;
         }
         bool operator==(const uint8_t* addr) const;
 
         // Overloaded index operator to allow getting and setting individual octets of the address
         uint8_t operator[](int index) const {
-            return _address.bytes[index];
+            return (ipv4() >> (index << 3)) & 0xff;
         }
         uint8_t& operator[](int index) {
-            return _address.bytes[index];
+            return *(raw_address() + index);
         }
 
         // Overloaded copy operators to allow initialisation of IPAddress objects from other types
@@ -100,7 +103,8 @@ class IPAddress: public Printable {
         /*
                lwIP address compatibility
         */
-        const ip_addr_t* getLwipAddr() const;
+        IPAddress(const ip_addr_t* lwip_addr) { _ip = *lwip_addr; }
+        const ip_addr_t* getLwipAddr() const { return &_ip; }
 };
 
 extern const IPAddress INADDR_NONE;

@@ -22,22 +22,22 @@
 #include <Print.h>
 
 IPAddress::IPAddress() {
-    _address.dword = 0;
+    ipv4() = 0;
 }
 
 IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet) {
-    _address.bytes[0] = first_octet;
-    _address.bytes[1] = second_octet;
-    _address.bytes[2] = third_octet;
-    _address.bytes[3] = fourth_octet;
+    (*this)[0] = first_octet;
+    (*this)[1] = second_octet;
+    (*this)[2] = third_octet;
+    (*this)[3] = fourth_octet;
 }
 
 IPAddress::IPAddress(uint32_t address) {
-    _address.dword = address;
+    ipv4() = address;
 }
 
 IPAddress::IPAddress(const uint8_t *address) {
-    memcpy(_address.bytes, address, sizeof(_address.bytes));
+    ipv4() = *reinterpret_cast<const uint32_t*>(address);
 }
 
 bool IPAddress::fromString(const char *address) {
@@ -63,7 +63,7 @@ bool IPAddress::fromString(const char *address) {
                 // Too much dots (there must be 3 dots)
                 return false;
             }
-            _address.bytes[dots++] = acc;
+            (*this)[dots++] = acc;
             acc = 0;
         }
         else
@@ -77,38 +77,38 @@ bool IPAddress::fromString(const char *address) {
         // Too few dots (there must be 3 dots)
         return false;
     }
-    _address.bytes[3] = acc;
+    (*this)[3] = acc;
     return true;
 }
 
 IPAddress& IPAddress::operator=(const uint8_t *address) {
-    memcpy(_address.bytes, address, sizeof(_address.bytes));
+    ipv4() = *reinterpret_cast<const uint32_t*>(address);
     return *this;
 }
 
 IPAddress& IPAddress::operator=(uint32_t address) {
-    _address.dword = address;
+    ipv4() = address;
     return *this;
 }
 
 bool IPAddress::operator==(const uint8_t* addr) const {
-    return memcmp(addr, _address.bytes, sizeof(_address.bytes)) == 0;
+    return ipv4() == *reinterpret_cast<const uint32_t*>(addr);
 }
 
 size_t IPAddress::printTo(Print& p) const {
     size_t n = 0;
     for(int i = 0; i < 3; i++) {
-        n += p.print(_address.bytes[i], DEC);
+        n += p.print((*this)[i], DEC);
         n += p.print('.');
     }
-    n += p.print(_address.bytes[3], DEC);
+    n += p.print((*this)[3], DEC);
     return n;
 }
 
 String IPAddress::toString() const
 {
     char szRet[16];
-    sprintf(szRet,"%u.%u.%u.%u", _address.bytes[0], _address.bytes[1], _address.bytes[2], _address.bytes[3]);
+    sprintf(szRet,"%u.%u.%u.%u", (*this)[0], (*this)[1], (*this)[2], (*this)[3]);
     return String(szRet);
 }
 
