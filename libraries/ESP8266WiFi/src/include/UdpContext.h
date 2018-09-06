@@ -159,13 +159,17 @@ public:
         return (pos <= _rx_buf->len);
     }
 
+#pragma message "FIXME"
+static ip_addr_t blark;
+
     const ip_addr_t* getRemoteAddress()
     {
         if (!_rx_buf)
             return 0;
 
-        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return iphdr->src;
+        //ip_hdr* iphdr = GET_IP_HDRs(_rx_buf);
+        //return iphdr->src;
+        return &blark;
     }
 
     uint16_t getRemotePort()
@@ -182,8 +186,9 @@ public:
         if (!_rx_buf)
             return 0;
 
-        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return iphdr->dest;
+        //ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
+        //return iphdr->dest;
+        return &blark;
     }
 
     uint16_t getLocalPort()

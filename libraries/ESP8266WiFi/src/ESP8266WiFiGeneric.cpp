@@ -466,7 +466,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
     if(err == ERR_OK) {
-        aResult = addr.addr;
+        aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
         delay(timeout_ms);
@@ -503,7 +503,7 @@ void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *ca
         return;
     }
     if(ipaddr) {
-        (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
+        (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
     }
     esp_schedule(); // resume the hostByName function
 }
