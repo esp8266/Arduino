@@ -22,12 +22,12 @@
 #include <Print.h>
 
 IPAddress::IPAddress() {
-    ipv4Only();
-    ipv4() = 0;
+    setV4();
+    v4() = 0;
 }
 
 IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet) {
-    ipv4Only();
+    setV4();
     (*this)[0] = first_octet;
     (*this)[1] = second_octet;
     (*this)[2] = third_octet;
@@ -35,17 +35,17 @@ IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_oc
 }
 
 IPAddress::IPAddress(uint32_t address) {
-    ipv4Only();
-    ipv4() = address;
+    setV4();
+    v4() = address;
 }
 
 IPAddress::IPAddress(const uint8_t *address) {
-    ipv4Only();
-    ipv4() = *reinterpret_cast<const uint32_t*>(address);
+    setV4();
+    v4() = *reinterpret_cast<const uint32_t*>(address);
 }
 
 bool IPAddress::fromString(const char *address) {
-    ipv4Only();
+    setV4();
     // TODO: add support for "a", "a.b", "a.b.c" formats
 
     uint16_t acc = 0; // Accumulator
@@ -87,19 +87,19 @@ bool IPAddress::fromString(const char *address) {
 }
 
 IPAddress& IPAddress::operator=(const uint8_t *address) {
-    ipv4Only();
-    ipv4() = *reinterpret_cast<const uint32_t*>(address);
+    setV4();
+    v4() = *reinterpret_cast<const uint32_t*>(address);
     return *this;
 }
 
 IPAddress& IPAddress::operator=(uint32_t address) {
-    ipv4Only();
-    ipv4() = address;
+    setV4();
+    v4() = address;
     return *this;
 }
 
 bool IPAddress::operator==(const uint8_t* addr) const {
-    return IP_IS_V4_VAL(_ip) && ipv4() == *reinterpret_cast<const uint32_t*>(addr);
+    return isV4() && v4() == *reinterpret_cast<const uint32_t*>(addr);
 }
 
 size_t IPAddress::printTo(Print& p) const {
@@ -129,14 +129,74 @@ bool IPAddress::isValid(const char* arg) {
 
 const IPAddress INADDR_NONE(0, 0, 0, 0);
 
+/**************************************/
+
 /* lwip */
 
 IPAddress::IPAddress(ipv4_addr fw_addr) {
-    ipv4Only();
-    ipv4() = fw_addr.addr;
+    setV4();
+    v4() = fw_addr.addr;
 }
 
 IPAddress::IPAddress(const ipv4_addr* fw_addr) {
-    ipv4Only();
-    ipv4() = fw_addr->addr;
+    setV4();
+    v4() = fw_addr->addr;
 }
+
+/* ipv6 */
+
+#if LWIP_IPV6
+
+bool IPAddress::fromString6(const char *address) {
+    setV6();
+    // TODO: test test test
+
+    uint32_t acc = 0; // Accumulator
+    uint8_t dots = 0;
+
+    while (*address)
+    {
+        char c = tolower(*address++);
+        if (isalnum(c))
+        {
+            if (c >= 'a')
+                c -= 'a' - '0' - 10;
+            acc = acc * 16 + (c - '0');
+            if (acc > 0xffff)
+                // Value out of range
+                return false;
+        }
+        else if (c == ':')
+        {
+            if (dots == 7)
+                return false;
+            raw6()[dots++] = acc;
+            acc = 0;
+        }
+        else
+        {
+            // Invalid char
+            return false;
+        }
+    }
+
+    if (dots != 3) {
+        // Too few dots (there must be 3 dots)
+        return false;
+    }
+    (*this)[3] = acc;
+    return true;
+}
+
+size_t IPAddress::print6To(Print& p) const {
+    const uint16_t* raw = raw6();
+    size_t n = 0;
+    for(int i = 0; i < 8; i++) {
+        n += p.printf("%x", raw[i]);
+        if (i != 7)
+            n += p.print(':');
+    }
+    return n;
+}
+
+#endif
