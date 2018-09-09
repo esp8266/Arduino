@@ -23,7 +23,7 @@
 #include "coredecls.h"
 #include "Esp.h"
 
-void EspClass::getHeapStats(uint32_t* free, uint16_t* max, uint8_t* frag)
+void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
 {
     // L2 / Euclidian norm of free block sizes.
     // Having getFreeHeap()=sum(hole-size), fragmentation is given by
@@ -32,17 +32,17 @@ void EspClass::getHeapStats(uint32_t* free, uint16_t* max, uint8_t* frag)
     umm_info(NULL, 0);
     uint8_t block_size = umm_block_size();
     uint32_t fh = ummHeapInfo.freeBlocks * block_size;
-    if (free)
-        *free = fh;
-    if (max)
-        *max = ummHeapInfo.maxFreeContiguousBlocks * block_size;
-    if (frag)
-        *frag = 100 - (sqrt32(ummHeapInfo.ummFreeSize2) * 100) / fh;
+    if (hfree)
+        *hfree = fh;
+    if (hmax)
+        *hmax = ummHeapInfo.maxFreeContiguousBlocks * block_size;
+    if (hfrag)
+        *hfrag = 100 - (sqrt32(ummHeapInfo.freeSize2) * 100) / fh;
 }
 
 uint8_t EspClass::getHeapFragmentation()
 {
-    uint8_t frag;
-    getHeapStats(nullptr, nullptr, &frag);
-    return frag;
+    uint8_t hfrag;
+    getHeapStats(nullptr, nullptr, &hfrag);
+    return hfrag;
 }
