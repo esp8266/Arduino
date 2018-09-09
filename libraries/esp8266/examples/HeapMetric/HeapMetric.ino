@@ -4,7 +4,7 @@
 
 #include <ESP8266WiFi.h>
 
-void stats (const char* what) {
+void stats(const char* what) {
   // we could use getFreeHeap() getMaxFreeBlockSize() and getHeapFragmentation()
   // or all at once:
   uint32_t free;
@@ -17,7 +17,7 @@ void stats (const char* what) {
   Serial.println(what);
 }
 
-void tryit (int blocksize) {
+void tryit(int blocksize) {
   void** p;
   int blocks;
 
@@ -75,5 +75,5 @@ void setup() {
   tryit(15);
 }
 
-void loop () {
+void loop() {
 }
