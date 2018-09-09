@@ -271,6 +271,7 @@ boards = collections.OrderedDict([
         'name': 'Generic ESP8285 Module',
         'opts': {
             '.build.board': 'ESP8266_ESP01',
+            '.build.variant': 'esp8285'
             },
         'macro': [
             'resetmethod_menu',
