@@ -40,7 +40,8 @@ class IPAddress: public Printable {
         ip_addr_t _ip;
 
         // generic IPv4 wrapper to uint32-view like arduino loves to see it
-        const u32_t& v4() const { return ip_2_ip4(&_ip)->addr; }
+        const u32_t& v4() const { return ip_2_ip4(&_ip)->addr; } // for raw_address(const)
+        //    u32_t  v4() const { return ip_2_ip4(&_ip)->addr; } // cannot overload the above
               u32_t& v4()       { return ip_2_ip4(&_ip)->addr; }
 
         // Access the raw byte array containing the address.  Because this returns a pointer
@@ -122,8 +123,6 @@ class IPAddress: public Printable {
         void setV4() { IP_SET_TYPE_VAL(_ip, IPADDR_TYPE_V4); }
  
 #if LWIP_IPV6
-
-        size_t print6To(Print& p) const;
 
         bool fromString6(const char *address);
 
