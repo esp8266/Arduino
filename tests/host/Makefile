@@ -20,7 +20,6 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	Print.cpp \
 	FS.cpp \
 	spiffs_api.cpp \
-	pgmspace.cpp \
 	MD5Builder.cpp \
 )
 
@@ -45,6 +44,7 @@ MOCK_C_FILES := $(addprefix common/,\
 )
 
 INC_PATHS += $(addprefix -I, \
+	. \
 	common \
 	$(CORE_PATH) \
 )
@@ -96,7 +96,7 @@ valgrind: $(OUTPUT_BINARY)
 	$(LCOV) --directory ../../cores/esp8266/ --zerocounters
 	$(VALGRIND) $(VALGRINDFLAGS) $(OUTPUT_BINARY)
 	$(LCOV) --directory $(CORE_PATH) --capture --output-file $(LCOV_DIRECTORY)/app.info
-	$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
+	-$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
 build-info:
 	@echo "-------- build tools info --------"
