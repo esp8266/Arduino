@@ -24,6 +24,7 @@
 #include <memory>
 #include "interrupts.h"
 #include "MD5Builder.h"
+#include "umm_malloc/umm_malloc.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -169,6 +170,11 @@ uint16_t EspClass::getVcc(void)
 uint32_t EspClass::getFreeHeap(void)
 {
     return system_get_free_heap_size();
+}
+
+uint16_t EspClass::getMaxFreeBlockSize(void)
+{
+    return umm_max_block_size();
 }
 
 uint32_t EspClass::getChipId(void)
