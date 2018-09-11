@@ -65,6 +65,8 @@ required to enable it:
 
 `Read more <a05-board-generator.rst>`__.
 
+For platformIO (and maybe other build environments), you will also need to add the build flag: -D NO_EXTRA_4K_HEAP
+
 This manual selection is not needed starting from 2.5.0 (and in git
 version).  WPS is always available, and not using it will give an extra
 ~4.5KB compared to releases until 2.4.1 included.
