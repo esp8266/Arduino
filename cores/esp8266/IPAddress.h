@@ -117,7 +117,9 @@ class IPAddress: public Printable {
         IPAddress(const ip_addr_t& lwip_addr) { _ip = lwip_addr; }
         IPAddress(const ip_addr_t* lwip_addr) { _ip = *lwip_addr; }
         
+        operator       ip_addr_t () const { return  _ip; }
         operator const ip_addr_t*() const { return &_ip; }
+        operator       ip_addr_t*()       { return &_ip; }
 
         bool isV4() const { return IP_IS_V4_VAL(_ip); }
         void setV4() { IP_SET_TYPE_VAL(_ip, IPADDR_TYPE_V4); }
