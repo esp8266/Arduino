@@ -2,9 +2,9 @@
 /* sketch @0x40200000 (~1019KB) (1044464B) */
 /* empty  @0x402FEFF0 (~1028KB) (1052688B) */
 /* spiffs @0x40400000 (~14316KB) (14659584B) */
-/* eeprom @0x411FB000 (=4KB) */
-/* rfcal  @0x411FC000 (=4KB) */
-/* wifi   @0x411FD000 (=12KB) */
+/* eeprom @0x411FB000 (4KB) */
+/* rfcal  @0x411FC000 (4KB) */
+/* wifi   @0x411FD000 (12KB) */
 
 MEMORY
 {
