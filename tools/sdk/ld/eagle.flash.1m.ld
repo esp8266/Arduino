@@ -1,8 +1,10 @@
 /* Flash Split for 1M chips */
 /* sketch @0x40200000 (~999KB) (1023984B) */
-/* eeprom @0x402FB000 (=4KB) */
-/* rfcal  @0x402FC000 (=4KB) */
-/* wifi   @0x402FD000 (=12KB) */
+/* empty  @0x402F9FF0 (~4KB) (4112B) */
+/* spiffs @0x402FB000 (~0KB) (0B) */
+/* eeprom @0x402FB000 (4KB) */
+/* rfcal  @0x402FC000 (4KB) */
+/* wifi   @0x402FD000 (12KB) */
 
 MEMORY
 {
@@ -12,5 +14,9 @@ MEMORY
   irom0_0_seg :                         org = 0x40201010, len = 0xf9ff0
 }
 
+PROVIDE ( _SPIFFS_start = 0x402FB000 );
+PROVIDE ( _SPIFFS_end = 0x402FB000 );
+PROVIDE ( _SPIFFS_page = 0x0 );
+PROVIDE ( _SPIFFS_block = 0x0 );
 
 INCLUDE "eagle.app.v6.common.ld"

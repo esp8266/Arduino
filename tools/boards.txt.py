@@ -1119,12 +1119,12 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
         ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
         ])
-    if spiffs_kb > 0:
-        d.update(collections.OrderedDict([
-            ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
-            ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
-            ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
-            ]))
+    #if spiffs_kb > 0:
+    #    d.update(collections.OrderedDict([
+    #        ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
+    #        ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
+    #        ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
+    #        ]))
 
     if ldshow:
         if ldgen:
@@ -1151,14 +1151,13 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
 
         print("/* Flash Split for %s chips */" % strsize)
         print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
-        if spiffs_kb > 0:
-            empty_size = spiffs_start - max_upload_size
-            if empty_size > 1024:
-                print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
-            print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + spiffs_start, ((spiffs_end - spiffs_start) / 1024), spiffs_end - spiffs_start))
-        print("/* eeprom @0x%X (=%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
-        print("/* rfcal  @0x%X (=%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
-        print("/* wifi   @0x%X (=%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
+        empty_size = spiffs_start - max_upload_size
+        if empty_size > 0:
+            print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
+        print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + spiffs_start, ((spiffs_end - spiffs_start) / 1024), spiffs_end - spiffs_start))
+        print("/* eeprom @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
+        print("/* rfcal  @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
+        print("/* wifi   @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
         print("")
         print("MEMORY")
         print("{")
@@ -1168,11 +1167,10 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
-        if spiffs_kb > 0:
-            print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
-            print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_end))
-            print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
-            print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_end))
+        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
         print("")
         print('INCLUDE "eagle.app.v6.common.ld"')
 
