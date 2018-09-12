@@ -276,7 +276,7 @@
  * not only for internal pools defined in memp_std.h)!
  */
 #if !defined MEMP_MEM_MALLOC || defined __DOXYGEN__
-#define MEMP_MEM_MALLOC                 1
+#define MEMP_MEM_MALLOC                 1 // 0
 #endif
 
 /**
@@ -750,7 +750,7 @@
  * via IP_FRAG.
  */
 #if !defined IP_REASSEMBLY || defined __DOXYGEN__
-#define IP_REASSEMBLY                   1
+#define IP_REASSEMBLY                   0 // 1
 #endif
 
 /**
@@ -759,7 +759,7 @@
  * controlled via IP_REASSEMBLY.
  */
 #if !defined IP_FRAG || defined __DOXYGEN__
-#define IP_FRAG                         1
+#define IP_FRAG                         0 // 1
 #endif
 
 #if !LWIP_IPV4
