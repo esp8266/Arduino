@@ -179,7 +179,7 @@ struct pppol2tp_pcb_s {
   u16_t tunnel_port;           /* Tunnel port */
   u16_t our_ns;                /* NS to peer */
   u16_t peer_nr;               /* NR from peer */
-  u16_t peer_ns;               /* NS from peer */
+  u16_t peer_ns;               /* Expected NS from peer */
   u16_t source_tunnel_id;      /* Tunnel ID assigned by peer */
   u16_t remote_tunnel_id;      /* Tunnel ID assigned to peer */
   u16_t source_session_id;     /* Session ID assigned by peer */

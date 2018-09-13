@@ -45,8 +45,11 @@ IPAddress::IPAddress(const uint8_t *address) {
 }
 
 bool IPAddress::fromString(const char *address) {
-    setV4();
-    // TODO: add support for "a", "a.b", "a.b.c" formats
+    // TODO: (IPv4) add support for "a", "a.b", "a.b.c" formats
+
+#if LWIP_IPV6
+    const char *org = address;
+#endif
 
     uint16_t acc = 0; // Accumulator
     uint8_t dots = 0;
@@ -74,7 +77,11 @@ bool IPAddress::fromString(const char *address) {
         else
         {
             // Invalid char
+#if LWIP_IPV6
+            return fromString6(org);
+#else
             return false;
+#endif
         }
     }
 
@@ -83,6 +90,8 @@ bool IPAddress::fromString(const char *address) {
         return false;
     }
     (*this)[3] = acc;
+
+    setV4();
     return true;
 }
 
@@ -104,6 +113,19 @@ bool IPAddress::operator==(const uint8_t* addr) const {
 
 size_t IPAddress::printTo(Print& p) const {
     size_t n = 0;
+
+#if LWIP_IPV6
+    if (isV6()) {
+        const uint16_t* raw = raw6();
+        for(int i = 0; i < 8; i++) {
+            n += p.printf("%x", PP_NTOHS(raw[i]));
+            if (i != 7)
+                n += p.print(':');
+        }
+        return n;
+    }
+#endif
+
     for(int i = 0; i < 3; i++) {
         n += p.print((*this)[i], DEC);
         n += p.print('.');
@@ -148,8 +170,8 @@ IPAddress::IPAddress(const ipv4_addr* fw_addr) {
 #if LWIP_IPV6
 
 bool IPAddress::fromString6(const char *address) {
-    setV6();
     // TODO: test test test
+    // TODO: "::"
 
     uint32_t acc = 0; // Accumulator
     uint8_t dots = 0;
@@ -169,34 +191,25 @@ bool IPAddress::fromString6(const char *address) {
         else if (c == ':')
         {
             if (dots == 7)
+                // too many separators
                 return false;
-            raw6()[dots++] = acc;
+            raw6()[dots++] = PP_HTONS(acc);
             acc = 0;
         }
         else
-        {
             // Invalid char
             return false;
-        }
     }
 
-    if (dots != 3) {
-        // Too few dots (there must be 3 dots)
+    if (dots != 7)
+        // Too few separators
         return false;
-    }
-    (*this)[3] = acc;
-    return true;
-}
+    raw6()[7] = PP_HTONS(acc);
 
-size_t IPAddress::print6To(Print& p) const {
-    const uint16_t* raw = raw6();
-    size_t n = 0;
-    for(int i = 0; i < 8; i++) {
-        n += p.printf("%x", raw[i]);
-        if (i != 7)
-            n += p.print(':');
-    }
-    return n;
+//os_printf("(%x:%x:%x:%x:%x:%x:%x:%x)", (*this)[0]
+
+    setV6();
+    return true;
 }
 
 #endif
