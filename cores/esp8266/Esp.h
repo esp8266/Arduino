@@ -110,6 +110,8 @@ class EspClass {
         uint8_t getHeapFragmentation(); // in %
         void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr);
 
+        uint32_t getFreeContStack();
+
         const char * getSdkVersion();
         String getCoreVersion();
         String getFullVersion();
