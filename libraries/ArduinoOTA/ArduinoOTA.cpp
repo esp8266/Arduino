@@ -318,6 +318,7 @@ void ArduinoOTAClass::_runUpdate() {
 
   if (Update.end()) {
     client.print("OK");
+    client.flush();
     client.stop();
     delay(10);
 #ifdef OTA_DEBUG
