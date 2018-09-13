@@ -180,7 +180,6 @@ uint16_t EspClass::getMaxFreeBlockSize(void)
 
 uint32_t EspClass::getFreeContStack()
 {
-//    extern cont_t* g_pcont;
     return cont_get_free_stack(g_pcont);
 }
 
