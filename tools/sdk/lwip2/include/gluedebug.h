@@ -15,7 +15,7 @@
 #define UDEBUGINDEX	0	// 0 or 1 (show debug line number)
 #define UDEBUGSTORE	0	// 0 or 1 (store debug into buffer until doprint_allow=1=serial-available)
 
-#define ULWIPDEBUG	0	// 0 or 1 (trigger lwip debug)
+#define ULWIPDEBUG	1	// 0 or 1 (trigger lwip debug)
 #define ULWIPASSERT	0	// 0 or 1 (trigger lwip self-check, 0 saves flash)
 
 #define STRING_IN_FLASH 1	// *print("fmt is stored in flash")

@@ -932,7 +932,7 @@ macros = {
     'lwip2': collections.OrderedDict([
         ( '.menu.ip.lm2', 'v2 Lower Memory' ),
         ( '.menu.ip.lm2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.lm2.build.lwip_lib', '-llwip2' ),
+        ( '.menu.ip.lm2.build.lwip_lib', '-llwip2_536' ),
         ( '.menu.ip.lm2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_IPV6=0' ),
         ( '.menu.ip.hb2', 'v2 Higher Bandwidth' ),
         ( '.menu.ip.hb2.build.lwip_include', 'lwip2/include' ),

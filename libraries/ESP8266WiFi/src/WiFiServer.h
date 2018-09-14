@@ -38,7 +38,7 @@ class WiFiServer : public Server {
   // Secure server needs access to all the private entries here
 protected:
   uint16_t _port;
-  IPAddress _addr;
+  const ip_addr_t* _addr;
   tcp_pcb* _pcb;
 
   ClientContext* _unclaimed;
@@ -46,7 +46,7 @@ protected:
   bool _noDelay = false;
 
 public:
-  WiFiServer(IPAddress addr, uint16_t port);
+  WiFiServer(const IPAddress& addr, uint16_t port);
   WiFiServer(uint16_t port);
   virtual ~WiFiServer() {}
   WiFiClient available(uint8_t* status = NULL);
