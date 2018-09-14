@@ -28,7 +28,12 @@
 #include "IPAddress.h"
 #include "include/slist.h"
 
-#define WIFICLIENT_MAX_PACKET_SIZE 1460
+#ifndef TCP_MSS
+#define TCP_MSS 1460 // lwip1.4
+#endif
+
+#define WIFICLIENT_MAX_PACKET_SIZE TCP_MSS
+#define WIFICLIENT_MAX_FLUSH_WAIT_MS 100
 
 #define TCP_DEFAULT_KEEPALIVE_IDLE_SEC          7200 // 2 hours
 #define TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC      75   // 75 sec
@@ -76,8 +81,11 @@ public:
   uint16_t  remotePort();
   IPAddress localIP();
   uint16_t  localPort();
-  bool getNoDelay();
+  bool getNoDelay() const;
   void setNoDelay(bool nodelay);
+  bool getSync() const;
+  void setSync(bool sync);
+
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
   size_t availableForWrite();
@@ -96,6 +104,11 @@ public:
   uint8_t  getKeepAliveCount () const;
   void     disableKeepAlive () { keepAlive(0, 0, 0); }
 
+  static void setDefaultNoDelay (bool noDelay) { _defaultNoDelay = noDelay; }
+  static void setDefaultSync    (bool sync)    { _defaultSync = sync; }
+  static bool getDefaultNoDelay ()             { return _defaultNoDelay; }
+  static bool getDefaultSync    ()             { return _defaultSync; }
+
 protected:
 
   static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
@@ -106,6 +119,9 @@ protected:
 
   ClientContext* _client;
   static uint16_t _localPort;
+
+  static bool _defaultNoDelay;
+  static bool _defaultSync;
 };
 
 #endif

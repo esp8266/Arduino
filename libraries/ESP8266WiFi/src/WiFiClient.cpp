@@ -42,6 +42,8 @@ extern "C"
 #include "c_types.h"
 
 uint16_t WiFiClient::_localPort = 0;
+bool WiFiClient::_defaultNoDelay = true;
+bool WiFiClient::_defaultSync = false;
 
 template<>
 WiFiClient* SList<WiFiClient>::_s_first = 0;
@@ -60,6 +62,9 @@ WiFiClient::WiFiClient(ClientContext* client)
     _timeout = 5000;
     _client->ref();
     WiFiClient::_add(this);
+
+    setSync(_defaultSync);
+    setNoDelay(_defaultNoDelay);
 }
 
 WiFiClient::~WiFiClient()
@@ -90,7 +95,6 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
         _client->ref();
     return *this;
 }
-
 
 int WiFiClient::connect(const char* host, uint16_t port)
 {
@@ -144,6 +148,9 @@ int WiFiClient::connect(const IPAddress& ip, uint16_t port)
         return 0;
     }
 
+    setSync(_defaultSync);
+    setNoDelay(_defaultNoDelay);
+
     return 1;
 }
 
@@ -153,10 +160,24 @@ void WiFiClient::setNoDelay(bool nodelay) {
     _client->setNoDelay(nodelay);
 }
 
-bool WiFiClient::getNoDelay() {
+bool WiFiClient::getNoDelay() const {
     if (!_client)
         return false;
     return _client->getNoDelay();
+}
+
+void WiFiClient::setSync(bool sync)
+{
+    if (!_client)
+        return;
+    _client->setSync(sync);
+}
+
+bool WiFiClient::getSync() const
+{
+    if (!_client)
+        return false;
+    return _client->getSync();
 }
 
 size_t WiFiClient::availableForWrite ()
@@ -272,6 +293,7 @@ void WiFiClient::stop()
     if (!_client)
         return;
 
+    _client->wait_until_sent();
     _client->close();
 }
 
