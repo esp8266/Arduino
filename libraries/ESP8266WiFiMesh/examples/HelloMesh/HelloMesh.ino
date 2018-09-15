@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMesh.h>
+#include <assert.h>
 
 String exampleMeshName("MeshNode_");
 
@@ -30,28 +31,6 @@ String manageRequest(const String &request, ESP8266WiFiMesh &meshInstance) {
 }
 
 /**
-   Callback used to decide which networks to connect to once a WiFi scan has been completed.
-
-   @param numberOfNetworks The number of networks found in the WiFi scan.
-   @param meshInstance The ESP8266WiFiMesh instance that called the function.
-*/
-void networkFilter(int numberOfNetworks, ESP8266WiFiMesh &meshInstance) {
-  for (int i = 0; i < numberOfNetworks; ++i) {
-    String currentSSID = WiFi.SSID(i);
-    int meshNameIndex = currentSSID.indexOf(meshInstance.getMeshName());
-
-    /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
-    if (meshNameIndex >= 0) {
-      uint64_t targetNodeID = ESP8266WiFiMesh::stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
-
-      if (targetNodeID < ESP8266WiFiMesh::stringToUint64(meshInstance.getNodeID())) {
-        ESP8266WiFiMesh::connectionQueue.push_back(NetworkInfo(i));
-      }
-    }
-  }
-}
-
-/**
    Callback for when you get a response from other nodes
 
    @param response The response string received from another node in the mesh
@@ -74,6 +53,28 @@ transmission_status_t manageResponse(const String &response, ESP8266WiFiMesh &me
   return statusCode;
 }
 
+/**
+   Callback used to decide which networks to connect to once a WiFi scan has been completed.
+
+   @param numberOfNetworks The number of networks found in the WiFi scan.
+   @param meshInstance The ESP8266WiFiMesh instance that called the function.
+*/
+void networkFilter(int numberOfNetworks, ESP8266WiFiMesh &meshInstance) {
+  for (int networkIndex = 0; networkIndex < numberOfNetworks; ++networkIndex) {
+    String currentSSID = WiFi.SSID(networkIndex);
+    int meshNameIndex = currentSSID.indexOf(meshInstance.getMeshName());
+
+    /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
+    if (meshNameIndex >= 0) {
+      uint64_t targetNodeID = ESP8266WiFiMesh::stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
+
+      if (targetNodeID < ESP8266WiFiMesh::stringToUint64(meshInstance.getNodeID())) {
+        ESP8266WiFiMesh::connectionQueue.push_back(NetworkInfo(networkIndex));
+      }
+    }
+  }
+}
+
 void setup() {
   // Prevents the flash memory from being worn out, see: https://github.com/esp8266/Arduino/issues/1054 .
   // This will however delay node WiFi start-up by about 700 ms. The delay is 900 ms if we otherwise would have stored the WiFi network we want to connect to.
@@ -83,6 +84,10 @@ void setup() {
   delay(50); // Wait for Serial.
 
   //yield(); // Use this if you don't want to wait for Serial.
+
+  // The WiFi.disconnect() ensures that the WiFi is working correctly. If this is not done before receiving WiFi connections,
+  // those WiFi connections will take a long time to make or sometimes will not work at all.
+  WiFi.disconnect();
 
   Serial.println();
   Serial.println();
@@ -108,6 +113,12 @@ void loop() {
     meshNode.attemptTransmission(request, false);
     timeOfLastScan = millis();
 
+    // One way to check how attemptTransmission worked out
+    if (ESP8266WiFiMesh::latestTransmissionSuccessful()) {
+      Serial.println("Transmission successful.");
+    }
+
+    // Another way to check how attemptTransmission worked out
     if (ESP8266WiFiMesh::latestTransmissionOutcomes.empty()) {
       Serial.println("No mesh AP found.");
     } else {
@@ -120,6 +131,7 @@ void loop() {
           // No need to do anything, transmission was successful.
         } else {
           Serial.println("Invalid transmission status for " + transmissionResult.SSID + "!");
+          assert("Invalid transmission status returned from responseHandler!" && false);
         }
       }
     }

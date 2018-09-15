@@ -23,6 +23,7 @@ transmission_status_t	KEYWORD1
 
 connectionQueue	KEYWORD2
 latestTransmissionOutcomes	KEYWORD2
+latestTransmissionSuccessful	KEYWORD2
 begin	KEYWORD2
 activateAP	KEYWORD2
 deactivateAP	KEYWORD2
@@ -35,6 +36,7 @@ getMeshName	KEYWORD2
 setMeshName	KEYWORD2
 getNodeID	KEYWORD2
 setNodeID	KEYWORD2
+getSSID	KEYWORD2
 setSSID	KEYWORD2
 getMessage	KEYWORD2
 setMessage	KEYWORD2
@@ -45,8 +47,24 @@ getStaticIP	KEYWORD2
 disableStaticIP->KEYWORD2
 uint64ToString	KEYWORD2
 stringToUint64	KEYWORD2
+getRequestHandler	KEYWORD2
+setRequestHandler	KEYWORD2
+getResponseHandler	KEYWORD2
+setResponseHandler	KEYWORD2
 getNetworkFilter	KEYWORD2
 setNetworkFilter	KEYWORD2
+setScanHidden	KEYWORD2
+getScanHidden	KEYWORD2
+setAPHidden	KEYWORD2
+getAPHidden	KEYWORD2
+setMaxAPStations	KEYWORD2
+getMaxAPStations	KEYWORD2
+setConnectionAttemptTimeout	KEYWORD2
+getConnectionAttemptTimeout	KEYWORD2
+setStationModeTimeout	KEYWORD2
+getStationModeTimeout	KEYWORD2
+setAPModeTimeout	KEYWORD2
+getAPModeTimeout	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

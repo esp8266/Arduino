@@ -1,5 +1,5 @@
 /*
- * TransmissionResult
+ * TypeConversionFunctions
  * Copyright (C) 2018 Anders Löfgren
  *
  * License (MIT license):
@@ -24,18 +24,6 @@
  */
 
 #include "TypeConversionFunctions.h"
-#include "ESP8266WiFiMesh.h"
-
-void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline)
-{
-  if(_verboseMode)
-  {
-    if(newline)
-      Serial.println(stringToPrint);
-    else
-      Serial.print(stringToPrint);
-  }
-}
 
 /**
  * Note that using a base higher than 16 increases likelihood of randomly generating SSID strings containing controversial words. 
@@ -44,9 +32,19 @@ void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline
  * @param base The radix to convert "number" into. Must be between 2 and 36.
  * @returns A string of "number" encoded in radix "base".
  */
-String ESP8266WiFiMesh::uint64ToString(uint64_t number, byte base)
+String uint64ToString(uint64_t number, byte base)
 {
-  return ::uint64ToString(number, base);
+  assert(2 <= base && base <= 36);
+  
+  String result = "";
+
+  while(number > 0)
+  {
+    result = String((uint32_t)(number % base), base) + result;
+    number /= base;
+  }
+  
+  return (result == "" ? "0" : result);
 }
 
 /**
@@ -56,50 +54,19 @@ String ESP8266WiFiMesh::uint64ToString(uint64_t number, byte base)
  * @param base The radix of "string". Must be between 2 and 36.
  * @returns A uint64_t of the string, using radix "base" during decoding.
  */
-uint64_t ESP8266WiFiMesh::stringToUint64(const String &string, byte base)
+uint64_t stringToUint64(const String &string, byte base)
 {
-  return ::stringToUint64(string, base);
-}
+  assert(2 <= base && base <= 36);
+  
+  uint64_t result = 0;
 
-/**
- * Calculate the current lwIP version number and store the numbers in the _lwipVersion array.
- * lwIP version can be changed in the "Tools" menu of Arduino IDE.
- */
-void ESP8266WiFiMesh::storeLwipVersion()
-{
-  // ESP.getFullVersion() looks something like: 
-  // SDK:2.2.1(cfd48f3)/Core:win-2.5.0-dev/lwIP:2.0.3(STABLE-2_0_3_RELEASE/glue:arduino-2.4.1-10-g0c0d8c2)/BearSSL:94e9704
-  String fullVersion = ESP.getFullVersion();
-
-  int i = fullVersion.indexOf("lwIP:") + 5;
-  char currentChar = fullVersion.charAt(i);
-
-  for(int versionPart = 0; versionPart < 3; versionPart++)
+  char currentCharacter[1];
+  for(uint32_t i = 0; i < string.length(); i++)
   {
-    while(!isdigit(currentChar))
-    {
-      currentChar = fullVersion.charAt(++i);
-    }
-    while(isdigit(currentChar))
-    {
-      _lwipVersion[versionPart] = 10 * _lwipVersion[versionPart] + (currentChar - '0'); // Left shift and add digit value, in base 10.
-      currentChar = fullVersion.charAt(++i);
-    }
+    result *= base;
+    currentCharacter[0] = string.charAt(i);
+    result += strtoul(currentCharacter, NULL, base);
   }
-}
-
-/**
- * Check if the code is running on a version of lwIP that is at least minLwipVersion.
- */
-bool ESP8266WiFiMesh::atLeastLwipVersion(const uint32_t minLwipVersion[3])
-{ 
-  for(int versionPart = 0; versionPart < 3; versionPart++)
-  {
-    if(_lwipVersion[versionPart] > minLwipVersion[versionPart])
-      return true;
-    else if(_lwipVersion[versionPart] < minLwipVersion[versionPart])
-      return false;
-  }
-
-  return true;
+  
+  return result;
 }
