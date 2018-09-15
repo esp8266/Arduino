@@ -181,11 +181,6 @@ bool ESP8266WiFiMesh::isAPController()
   return (this == apController);
 }
 
-uint8 ESP8266WiFiMesh::getWiFiChannel()
-{
-  return _meshWiFiChannel;
-}
-
 void ESP8266WiFiMesh::setWiFiChannel(uint8 newWiFiChannel)
 {
   assert(1 <= newWiFiChannel && newWiFiChannel <= 13);
@@ -203,38 +198,43 @@ void ESP8266WiFiMesh::setWiFiChannel(uint8 newWiFiChannel)
   }
 }
 
-String ESP8266WiFiMesh::getMeshName() {return _meshName;}
+uint8 ESP8266WiFiMesh::getWiFiChannel()
+{
+  return _meshWiFiChannel;
+}
 
 void ESP8266WiFiMesh::setMeshName(const String &newMeshName)
 {
   updateNetworkNames(newMeshName);
 }
 
-String ESP8266WiFiMesh::getNodeID() {return _nodeID;}
+String ESP8266WiFiMesh::getMeshName() {return _meshName;}
 
 void ESP8266WiFiMesh::setNodeID(const String &newNodeID)
 {
   updateNetworkNames("", newNodeID);
 }
 
-String ESP8266WiFiMesh::getSSID() {return _SSID;}
+String ESP8266WiFiMesh::getNodeID() {return _nodeID;}
 
 void ESP8266WiFiMesh::setSSID(const String &newMeshName, const String &newNodeID)
 {
   updateNetworkNames(newMeshName, newNodeID);
 }
 
-String ESP8266WiFiMesh::getMessage() {return _message;}
+String ESP8266WiFiMesh::getSSID() {return _SSID;}
+
 void ESP8266WiFiMesh::setMessage(const String &newMessage) {_message = newMessage;}
+String ESP8266WiFiMesh::getMessage() {return _message;}
 
-ESP8266WiFiMesh::requestHandlerType ESP8266WiFiMesh::getRequestHandler() {return _requestHandler;}
 void ESP8266WiFiMesh::setRequestHandler(ESP8266WiFiMesh::requestHandlerType requestHandler) {_requestHandler = requestHandler;}
+ESP8266WiFiMesh::requestHandlerType ESP8266WiFiMesh::getRequestHandler() {return _requestHandler;}
 
-ESP8266WiFiMesh::responseHandlerType ESP8266WiFiMesh::getResponseHandler() {return _responseHandler;}
 void ESP8266WiFiMesh::setResponseHandler(ESP8266WiFiMesh::responseHandlerType responseHandler) {_responseHandler = responseHandler;}
+ESP8266WiFiMesh::responseHandlerType ESP8266WiFiMesh::getResponseHandler() {return _responseHandler;}
 
-ESP8266WiFiMesh::networkFilterType ESP8266WiFiMesh::getNetworkFilter() {return _networkFilter;}
 void ESP8266WiFiMesh::setNetworkFilter(ESP8266WiFiMesh::networkFilterType networkFilter) {_networkFilter = networkFilter;}
+ESP8266WiFiMesh::networkFilterType ESP8266WiFiMesh::getNetworkFilter() {return _networkFilter;}
 
 void ESP8266WiFiMesh::setScanHidden(bool scanHidden)
 {

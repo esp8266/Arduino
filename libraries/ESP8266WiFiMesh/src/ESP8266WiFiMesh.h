@@ -213,8 +213,6 @@ public:
    */
   bool isAPController();
 
-  uint8 getWiFiChannel();
-  
   /**
    * Change the WiFi channel used by this ESP8266WiFiMesh instance. 
    * Will also change the WiFi channel for the active AP if this ESP8266WiFiMesh instance is the current AP controller and it is possible to change channel.
@@ -229,8 +227,7 @@ public:
    *                          
    */
   void setWiFiChannel(uint8 newWiFiChannel);
-
-  String getMeshName();
+  uint8 getWiFiChannel();
 
   /**
    * Change the mesh name used by this ESP8266WiFiMesh instance. 
@@ -239,9 +236,8 @@ public:
    * @param newMeshName The mesh name to change to.                        
    */
   void setMeshName(const String &newMeshName);
-  
-  String getNodeID();
-  
+  String getMeshName();
+      
   /**
    * Change the node id used by this ESP8266WiFiMesh instance. 
    * Will also change the node id (SSID suffix) for the active AP if this ESP8266WiFiMesh instance is the current AP controller.
@@ -249,9 +245,8 @@ public:
    * @param newNodeID The node id to change to.                        
    */
   void setNodeID(const String &newNodeID);
-
-  String getSSID();
-  
+  String getNodeID();
+    
   /**
    * Change the SSID (mesh name + node id) used by this ESP8266WiFiMesh instance. 
    * Will also change the SSID for the active AP if this ESP8266WiFiMesh instance is the current AP controller.
@@ -260,15 +255,15 @@ public:
    * @param newNodeID The node id to change to. Will be the SSID suffix.
    */  
   void setSSID(const String &newMeshName, const String &newNodeID);
-
-  String getMessage();
-
+  String getSSID();
+  
   /**
    * Set the message that will be sent to other nodes when calling attemptTransmission.
    * 
    * @param newMessage The message to send.
    */
   void setMessage(const String &newMessage);
+  String getMessage();
 
   /**
    * If AP connection already exists, and the initialDisconnect argument is set to false, send message only to the already connected AP.
@@ -295,7 +290,6 @@ public:
    * The static IP needs to be at the same subnet as the server's gateway.
    */
   void setStaticIP(const IPAddress &newIP);
-  
   IPAddress getStaticIP();
   void disableStaticIP();
 
@@ -306,15 +300,15 @@ public:
 
   static String uint64ToString(uint64_t number, byte base = 16);
   static uint64_t stringToUint64(const String &string, byte base = 16);
-
-  requestHandlerType getRequestHandler();
-  void setRequestHandler(requestHandlerType requestHandler);
-
-  responseHandlerType getResponseHandler();
-  void setResponseHandler(responseHandlerType responseHandler);
   
-  networkFilterType getNetworkFilter();
+  void setRequestHandler(requestHandlerType requestHandler);
+  requestHandlerType getRequestHandler();
+  
+  void setResponseHandler(responseHandlerType responseHandler);
+  responseHandlerType getResponseHandler();
+    
   void setNetworkFilter(networkFilterType networkFilter);
+  networkFilterType getNetworkFilter();
 
   /**
    * Set whether scan results from this ESP8266WiFiMesh instance will include WiFi networks with hidden SSIDs.
