@@ -83,6 +83,11 @@ class ESP8266WiFiSTAClass {
 
         int32_t RSSI();
 
+#if LWIP_IPV6
+        IPAddress localIP6Link();
+        IPAddress localIP6Global();
+#endif
+
     protected:
 
         static bool _useStaticIp;

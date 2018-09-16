@@ -38,6 +38,9 @@ extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
 #include "lwip/init.h" // LWIP_VERSION_
+#if LWIP_IPV6
+#include "lwip/netif.h" // struct netif
+#endif
 }
 
 #include "debug.h"
@@ -387,6 +390,27 @@ IPAddress ESP8266WiFiSTAClass::localIP() {
     return IPAddress(ip.ip.addr);
 }
 
+#if LWIP_IPV6
+
+extern "C" struct netif netif_git[2]; // lwip2 interfaces
+
+/**
+ * Get the station interface IPv6 link-local address.
+ * @return IPAddress station local-scope IPv6
+ */
+IPAddress ESP8266WiFiSTAClass::localIP6Link() {
+    return IPAddress(netif_git[STATION_IF].ip6_addr[0]);
+}
+
+/**
+ * Get the station interface IPv6 global address.
+ * @return IPAddress station global-scope IPv6
+ */
+IPAddress ESP8266WiFiSTAClass::localIP6Global() {
+    return IPAddress(netif_git[STATION_IF].ip6_addr[1]);
+}
+
+#endif // LWIP_IPV6
 
 /**
  * Get the station interface MAC address.

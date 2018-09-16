@@ -116,29 +116,42 @@ size_t IPAddress::printTo(Print& p) const {
 
 #if LWIP_IPV6
     if (isV6()) {
-        const uint16_t* raw = raw6();
-        for(int i = 0; i < 8; i++) {
-            n += p.printf("%x", PP_NTOHS(raw[i]));
-            if (i != 7)
+        int count0 = 0;
+        for (int i = 0; i < 8; i++) {
+            uint16_t bit = PP_NTOHS(raw6()[i]);
+            if (bit || count0 < 0) {
+                n += p.printf("%x", bit);
+                if (count0 > 0)
+                    // no more hiding 0
+                    count0 = -8;
+            } else
+                count0++;
+            if ((i != 7 && count0 < 2) || count0 == 7)
                 n += p.print(':');
         }
         return n;
     }
 #endif
 
-    for(int i = 0; i < 3; i++) {
+    for(int i = 0; i < 4; i++) {
         n += p.print((*this)[i], DEC);
-        n += p.print('.');
+        if (i != 3)
+            n += p.print('.');
     }
-    n += p.print((*this)[3], DEC);
     return n;
 }
 
 String IPAddress::toString() const
 {
-    char szRet[16];
-    sprintf(szRet,"%u.%u.%u.%u", (*this)[0], (*this)[1], (*this)[2], (*this)[3]);
-    return String(szRet);
+    if (isV4()) {
+        char szRet[16];
+        sprintf(szRet,"%u.%u.%u.%u", (*this)[0], (*this)[1], (*this)[2], (*this)[3]);
+        return String(szRet);
+    }
+#if LWIP_IPV6
+    else
+        return "(v6todo)"; // do we have stringprint? (==c++stringstream)
+#endif
 }
 
 bool IPAddress::isValid(const String& arg) {
@@ -174,13 +187,12 @@ bool IPAddress::fromString6(const char *address) {
     // TODO: "::"
 
     uint32_t acc = 0; // Accumulator
-    uint8_t dots = 0;
+    int dots = 0, doubledots = -1;
 
     while (*address)
     {
         char c = tolower(*address++);
-        if (isalnum(c))
-        {
+        if (isalnum(c)) {
             if (c >= 'a')
                 c -= 'a' - '0' - 10;
             acc = acc * 16 + (c - '0');
@@ -188,8 +200,15 @@ bool IPAddress::fromString6(const char *address) {
                 // Value out of range
                 return false;
         }
-        else if (c == ':')
-        {
+        else if (c == ':') {
+            if (*address == ':') {
+                if (doubledots >= 0)
+                    // :: allowed once
+                    return false;
+                // remember location
+                doubledots = dots + !!acc;
+                address++;
+            }
             if (dots == 7)
                 // too many separators
                 return false;
@@ -201,12 +220,17 @@ bool IPAddress::fromString6(const char *address) {
             return false;
     }
 
-    if (dots != 7)
+    if (doubledots == -1 && dots != 7)
         // Too few separators
         return false;
-    raw6()[7] = PP_HTONS(acc);
+    raw6()[dots++] = PP_HTONS(acc);
 
-//os_printf("(%x:%x:%x:%x:%x:%x:%x:%x)", (*this)[0]
+    if (doubledots != -1) {
+        for (int i = dots - doubledots - 1; i >= 0; i--)
+            raw6()[8 - dots + doubledots + i] = raw6()[doubledots + i];
+        for (int i = doubledots; i < 8 - dots + doubledots; i++)
+            raw6()[i] = 0;
+    }
 
     setV6();
     return true;

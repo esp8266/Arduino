@@ -126,17 +126,15 @@ class IPAddress: public Printable {
  
 #if LWIP_IPV6
 
-        bool fromString6(const char *address);
-
         uint16_t* raw6()
         {
             setV6();
-            return isV6()? reinterpret_cast<uint16_t*>(ip_2_ip6(&_ip)): 0;
+            return reinterpret_cast<uint16_t*>(ip_2_ip6(&_ip));
         }
 
         const uint16_t* raw6() const
         {
-            return reinterpret_cast<const uint16_t*>(ip_2_ip6(&_ip));
+            return isV6()? reinterpret_cast<const uint16_t*>(ip_2_ip6(&_ip)): 0;
         }
 
         // when not IPv6, ip_addr_t == ip4_addr_t so this one would be ambiguous
@@ -145,6 +143,10 @@ class IPAddress: public Printable {
         
         bool isV6() const { return IP_IS_V6_VAL(_ip); }
         void setV6() { IP_SET_TYPE_VAL(_ip, IPADDR_TYPE_V6); }
+
+    protected:
+
+        bool fromString6(const char *address);
 
 #endif
 };
