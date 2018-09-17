@@ -88,14 +88,15 @@ void ESP8266WiFiMesh::begin()
   ////////////////////////////<DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
   if(_handler != NULL)
   {
-    WiFi.mode(WIFI_STA); // WIFI_AP_STA mode automatically sets up an AP, so we can't use that as default.
+    WiFi.mode(WIFI_AP_STA);
     WiFi.softAP( _SSID.c_str() );
     _server.begin();
   }
   else
   {
   ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
-    WiFi.mode(WIFI_STA); // WIFI_AP_STA mode automatically sets up an AP, so we can't use that as default.
+    if(!ESP8266WiFiMesh::getAPController()) // If there is no active AP controller
+      WiFi.mode(WIFI_STA); // WIFI_AP_STA mode automatically sets up an AP, so we can't use that as default.
     
     #ifdef ENABLE_STATIC_IP_OPTIMIZATION
     if(atLeastLwipVersion(lwipVersion203Signature))
@@ -145,6 +146,7 @@ void ESP8266WiFiMesh::activateAP()
   WiFi.softAP( _SSID.c_str(), _meshPassword.c_str(), _meshWiFiChannel, _apHidden, _maxAPStations ); // Note that a maximum of 8 stations can be connected at a time to each AP
   WiFi.mode(WIFI_AP_STA);
 
+  _server = WiFiServer(_serverPort); // Fixes an occasional crash bug that occurs when using the copy constructor to duplicate the AP controller.
   _server.begin(); // Actually calls _server.stop()/_server.close() first.
 
   apController = this;
