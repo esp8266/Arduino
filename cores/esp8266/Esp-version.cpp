@@ -40,17 +40,14 @@ String EspClass::getFullVersion()
            + F("/Core:") + FPSTR(arduino_esp8266_git_ver)
 #if LWIP_VERSION_MAJOR == 1
            + F("/lwIP:") + String(LWIP_VERSION_MAJOR) + "." + String(LWIP_VERSION_MINOR) + "." + String(LWIP_VERSION_REVISION)
-#else
-           + FPSTR(lwip2_version)
-#endif
 #if LWIP_VERSION_IS_DEVELOPMENT
              + F("-dev")
 #endif
 #if LWIP_VERSION_IS_RC
              + F("rc") + String(LWIP_VERSION_RC)
 #endif
-#ifdef LWIP_HASH_STR
-             + "(" + F(LWIP_HASH_STR) + ")"
+#else // LWIP_VERSION_MAJOR != 1
+             + F("/lwIP:") + F(LWIP_HASH_STR)
 #endif
              + FPSTR(bearssl_version)
            ;
