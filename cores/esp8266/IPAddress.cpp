@@ -22,8 +22,7 @@
 #include <Print.h>
 
 IPAddress::IPAddress() {
-    setV4();
-    v4() = 0;
+    _ip = ip_addr_any_type;
 }
 
 IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet) {
@@ -143,15 +142,13 @@ size_t IPAddress::printTo(Print& p) const {
 
 String IPAddress::toString() const
 {
-    if (isV4()) {
-        char szRet[16];
-        sprintf(szRet,"%u.%u.%u.%u", (*this)[0], (*this)[1], (*this)[2], (*this)[3]);
-        return String(szRet);
-    }
 #if LWIP_IPV6
-    else
+    if (isV6())
         return "(v6todo)"; // do we have stringprint? (==c++stringstream)
 #endif
+    char szRet[16];
+    sprintf(szRet,"%u.%u.%u.%u", (*this)[0], (*this)[1], (*this)[2], (*this)[3]);
+    return String(szRet);
 }
 
 bool IPAddress::isValid(const String& arg) {
