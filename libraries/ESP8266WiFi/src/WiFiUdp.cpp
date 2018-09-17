@@ -40,7 +40,6 @@ extern "C"
 #include "lwip/mem.h"
 #include "include/UdpContext.h"
 
-
 template<>
 WiFiUDP* SList<WiFiUDP>::_s_first = 0;
 
@@ -83,12 +82,7 @@ uint8_t WiFiUDP::begin(uint16_t port)
 
     _ctx = new UdpContext;
     _ctx->ref();
-#if LWIP_VERSION_MAJOR == 1
-    ip_addr_t addr = IPADDR4_INIT(INADDR_ANY);
     return (_ctx->listen(IP_ANY_TYPE, port)) ? 1 : 0;
-#else
-    return (_ctx->listen(&ip_addr_any_type, port)) ? 1 : 0;
-#endif
 }
 
 uint8_t WiFiUDP::beginMulticast(const IPAddress& interfaceAddr, const IPAddress& multicast, uint16_t port)

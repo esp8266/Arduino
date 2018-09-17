@@ -22,7 +22,7 @@
 #include <Print.h>
 
 IPAddress::IPAddress() {
-    _ip = ip_addr_any_type;
+    _ip = *IP_ANY_TYPE; // lwIP's v4-or-v6 generic address
 }
 
 IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet) {
