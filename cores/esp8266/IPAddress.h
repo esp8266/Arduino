@@ -49,11 +49,6 @@ class IPAddress: public Printable {
 
         ip_addr_t _ip;
 
-        // generic IPv4 wrapper to uint32-view like arduino loves to see it
-        const u32_t& v4() const { return ip_2_ip4(&_ip)->addr; } // for raw_address(const)
-        //    u32_t  v4() const { return ip_2_ip4(&_ip)->addr; } // cannot overload the above
-              u32_t& v4()       { return ip_2_ip4(&_ip)->addr; }
-
         // Access the raw byte array containing the address.  Because this returns a pointer
         // to the internal structure rather than a copy of the address this function should only
         // be used when you know that the usage of the returned uint8_t* will be transient and not
@@ -80,11 +75,25 @@ class IPAddress: public Printable {
         operator uint32_t() const {
             return isV4()? v4(): 0;
         }
+
+        // the above uint32_t() cast can be ambiguous
+        // if gcc complains, use instead isSet() or v4() according to what's relevant
+        bool isSet () const;
+        // generic IPv4 wrapper to uint32-view like arduino loves to see it
+        const u32_t& v4() const { return ip_2_ip4(&_ip)->addr; } // for raw_address(const)
+              u32_t& v4()       { return ip_2_ip4(&_ip)->addr; }
+
         bool operator==(const IPAddress& addr) const {
             return ip_addr_cmp(&_ip, &addr._ip);
         }
+        bool operator!=(const IPAddress& addr) const {
+            return !ip_addr_cmp(&_ip, &addr._ip);
+        }
         bool operator==(uint32_t addr) const {
             return isV4() && v4() == addr;
+        }
+        bool operator!=(uint32_t addr) const {
+            return !(isV4() && v4() == addr);
         }
         bool operator==(const uint8_t* addr) const;
 
@@ -104,7 +113,7 @@ class IPAddress: public Printable {
         virtual size_t printTo(Print& p) const;
         String toString() const;
 
-        /* 
+        /*
                 check if input string(arg) is a valid IPV4 address or not.
                 return true on valid.
                 return false on invalid.
@@ -129,13 +138,14 @@ class IPAddress: public Printable {
         IPAddress(ipv4_addr fw_addr)          { setV4(); v4() = fw_addr.addr; }
         IPAddress(const ip_addr_t* lwip_addr) { _ip = *lwip_addr; }
 #endif
+
         operator       ip_addr_t () const { return  _ip; }
         operator const ip_addr_t*() const { return &_ip; }
         operator       ip_addr_t*()       { return &_ip; }
 
         bool isV4() const { return IP_IS_V4_VAL(_ip); }
         void setV4() { IP_SET_TYPE_VAL(_ip, IPADDR_TYPE_V4); }
- 
+
 #if LWIP_IPV6
 
         uint16_t* raw6()
@@ -152,7 +162,7 @@ class IPAddress: public Printable {
         // when not IPv6, ip_addr_t == ip4_addr_t so this one would be ambiguous
         // required otherwise
         operator const ip4_addr_t*() const { return isV4()? ip_2_ip4(&_ip): nullptr; }
-        
+
         bool isV6() const { return IP_IS_V6_VAL(_ip); }
         void setV6() { IP_SET_TYPE_VAL(_ip, IPADDR_TYPE_V6); }
 

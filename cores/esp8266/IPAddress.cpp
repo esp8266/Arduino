@@ -25,6 +25,10 @@ IPAddress::IPAddress() {
     _ip = *IP_ANY_TYPE; // lwIP's v4-or-v6 generic address
 }
 
+bool IPAddress::isSet () const {
+    return !ip_addr_cmp(&_ip, IP_ANY_TYPE);
+}
+
 IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet) {
     setV4();
     (*this)[0] = first_octet;

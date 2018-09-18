@@ -246,14 +246,14 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
   }
 
   //ip and gateway must be in the same subnet
-  if((local_ip & subnet) != (gateway & subnet)) {
+  if((local_ip.v4() & subnet.v4()) != (gateway.v4() & subnet.v4())) {
     return false;
   }
 
   struct ip_info info;
-  info.ip.addr = static_cast<uint32_t>(local_ip);
-  info.gw.addr = static_cast<uint32_t>(gateway);
-  info.netmask.addr = static_cast<uint32_t>(subnet);
+  info.ip.addr = local_ip.v4();
+  info.gw.addr = gateway.v4();
+  info.netmask.addr = subnet.v4();
 
   wifi_station_dhcpc_stop();
   if(wifi_set_ip_info(STATION_IF, &info)) {
