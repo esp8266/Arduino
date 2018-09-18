@@ -238,7 +238,7 @@ void LLMNRResponder::_process_packet() {
         wifi_get_ip_info(SOFTAP_IF, &ip_info);
         IPAddress infoIp(ip_info.ip);
         IPAddress infoMask(ip_info.netmask);
-        if (ip_addr_netcmp((const ip_addr_t*)remote_ip, (const ip_addr_t*)infoIp, ip_2_ip4((const ip_addr_t*)infoMask)))
+        if (ip_info.ip.addr && ip_addr_netcmp((const ip_addr_t*)remote_ip, (const ip_addr_t*)infoIp, ip_2_ip4((const ip_addr_t*)infoMask)))
             match_ap = true;
     }
     if (!match_ap)
