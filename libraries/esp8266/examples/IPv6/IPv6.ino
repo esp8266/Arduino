@@ -35,7 +35,7 @@
 WiFiServer statusServer(TCP_PORT);
 WiFiUDP udp;
 
-void fqdn (Print& out, const String& fqdn) {
+void fqdn(Print& out, const String& fqdn) {
   out.print(F("resolving "));
   out.print(fqdn);
   out.print(F(": "));
@@ -43,11 +43,12 @@ void fqdn (Print& out, const String& fqdn) {
   if (WiFi.hostByName(fqdn.c_str(), result)) {
     result.printTo(out);
     out.println();
-  } else
+  } else {
     out.println(F("timeout or not found"));
+  }
 }
 
-void status (Print& out) {
+void status(Print& out) {
   out.println();
 
   out.print(F("address= "));
@@ -68,7 +69,7 @@ void status (Print& out) {
     out.println();
   }
 
-#if LWIP_IPV6
+  #if LWIP_IPV6
   out.println(F("Try me at these addresses:"));
   out.println(F("(with 'telnet <addr>')"));
   out.println(F("(with 'nc -u <addr> 1111')"));
@@ -78,7 +79,7 @@ void status (Print& out) {
   out.print(F("IPV6 global-scope(internet)= "));
   WiFi.localIP6Global().printTo(out);
   out.println();
-#endif
+  #endif
 
   // lwIP's dns client will ask for IPv4 first (by default)
   // an example is provided with a fqdn which does not resolve with IPv4
@@ -96,8 +97,7 @@ void setup() {
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PSK);
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);
   }
