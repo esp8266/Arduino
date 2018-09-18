@@ -29,9 +29,6 @@
 #define STR(x) STRHELPER(x) // stringifier
 
 static const char arduino_esp8266_git_ver [] PROGMEM = STR(ARDUINO_ESP8266_GIT_DESC);
-#if LWIP_VERSION_MAJOR != 1
-static const char lwip2_version [] PROGMEM = "/lwIP:" STR(LWIP_VERSION_MAJOR) "." STR(LWIP_VERSION_MINOR) "." STR(LWIP_VERSION_REVISION);
-#endif
 static const char bearssl_version [] PROGMEM = "/BearSSL:" STR(BEARSSL_GIT);
 
 String EspClass::getFullVersion()
@@ -47,7 +44,11 @@ String EspClass::getFullVersion()
              + F("rc") + String(LWIP_VERSION_RC)
 #endif
 #else // LWIP_VERSION_MAJOR != 1
-             + F("/lwIP:") + F(LWIP_HASH_STR)
+             + F("/lwIP:")
+#if LWIP_IPV6
+             + F("IPv6+")
+#endif
+             + F(LWIP_HASH_STR)
 #endif
              + FPSTR(bearssl_version)
            ;
