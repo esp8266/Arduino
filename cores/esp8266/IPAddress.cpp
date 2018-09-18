@@ -148,7 +148,7 @@ String IPAddress::toString() const
 {
 #if LWIP_IPV6
     if (isV6())
-        return "(v6todo)"; // do we have stringprint? (==c++stringstream)
+        return F("(v6todo)"); // do we have stringprint? (==c++stringstream)
 #endif
     char szRet[16];
     sprintf(szRet,"%u.%u.%u.%u", (*this)[0], (*this)[1], (*this)[2], (*this)[3]);
@@ -171,7 +171,6 @@ const IPAddress INADDR_NONE(0, 0, 0, 0);
 
 bool IPAddress::fromString6(const char *address) {
     // TODO: test test test
-    // TODO: "::"
 
     uint32_t acc = 0; // Accumulator
     int dots = 0, doubledots = -1;
