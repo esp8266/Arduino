@@ -449,7 +449,8 @@ protected:
             return false;
         }
 
-        DEBUGV(":wr %d %d %d\r\n", will_send, left, _written);
+        DEBUGV(":wr %d %d\r\n", _datasource->available(), _written);
+
         bool has_written = false;
 
         while (_datasource) {
@@ -470,7 +471,7 @@ protected:
                 // user data will not stay in place when data are sent but not acknowledged
                 flags |= TCP_WRITE_FLAG_COPY;
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
-            DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, will_send, (int)err);
+            DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->available(), (int)err);
             if (err == ERR_OK) {
                 _datasource->release_buffer(buf, next_chunk_size);
                 _written += next_chunk_size;

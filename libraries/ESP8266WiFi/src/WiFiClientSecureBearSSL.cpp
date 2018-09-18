@@ -179,7 +179,10 @@ void WiFiClientSecure::stop() {
     _client->abort();
   }
   WiFiClient::stop();
-  _clearAuthenticationSettings();
+  // Only if we've already connected, clear the connection options
+  if (_handshake_done) {
+    _clearAuthenticationSettings();
+  }
   _freeSSL();
 }
 
