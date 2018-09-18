@@ -449,7 +449,8 @@ protected:
             return false;
         }
 
-        DEBUGV(":wr %d %d %d\r\n", will_send, left, _written);
+        DEBUGV(":wr %d %d\r\n", _datasource->available(), _written);
+
         bool has_written = false;
 
         while (_datasource) {

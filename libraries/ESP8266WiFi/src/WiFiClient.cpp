@@ -42,6 +42,8 @@ extern "C"
 #include "c_types.h"
 
 uint16_t WiFiClient::_localPort = 0;
+bool WiFiClient::_defaultNoDelay = true;
+bool WiFiClient::_defaultSync = false;
 
 static bool _defaultNoDelay = false; // false == Nagle enabled by default
 static bool _defaultSync = false;
