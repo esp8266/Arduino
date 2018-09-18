@@ -112,7 +112,7 @@ function install_ide()
     cd esp8266com
     ln -s $core_path esp8266
     local debug_flags=""
-    if [ "$debug" -eq "debug" ]; then
+    if [ "$debug" = "debug" ]; then
         debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
     fi
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
