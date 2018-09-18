@@ -173,6 +173,6 @@ class IPAddress: public Printable {
 #endif
 };
 
-extern const IPAddress INADDR_NONE;
+extern constv2 IPAddress IPNoAddress;
 
 #endif

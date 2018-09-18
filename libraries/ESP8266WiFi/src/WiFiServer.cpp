@@ -37,9 +37,9 @@ extern "C" {
 #include "lwip/inet.h"
 #include "include/ClientContext.h"
 
-WiFiServer::WiFiServer(constv2 IPAddress& addr, uint16_t port)
+WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
 : _port(port)
-, _addr((constv2 ip_addr_t*)addr)
+, _addr(addr)
 , _pcb(nullptr)
 , _unclaimed(nullptr)
 , _discarded(nullptr)
@@ -48,11 +48,7 @@ WiFiServer::WiFiServer(constv2 IPAddress& addr, uint16_t port)
 
 WiFiServer::WiFiServer(uint16_t port)
 : _port(port)
-#if LWIP_IPV6
 , _addr(IP_ANY_TYPE)
-#else
-, _addr(IPADDR_ANY)
-#endif
 , _pcb(nullptr)
 , _unclaimed(nullptr)
 , _discarded(nullptr)

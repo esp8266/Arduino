@@ -30,10 +30,6 @@ void esp_schedule();
 #include <assert.h>
 }
 
-#if !LWIP_IPV6
-#define GET_IP_HDR(pb) (reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN))
-#endif
-
 #define GET_UDP_HDR(pb) (reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN))
 
 class UdpContext
@@ -161,20 +157,12 @@ public:
         return (pos <= _rx_buf->len);
     }
 
-    const IPAddress getRemoteAddress()
+    constv2 IPAddress& getRemoteAddress() constv2
     {
-#if LWIP_IPV6
         return _src_addr;
-#else // IPv4:
-        if (!_rx_buf)
-            return IPAddress();
-
-        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return IPAddress(iphdr->src.addr);
-#endif // IPv4
     }
 
-    uint16_t getRemotePort()
+    uint16_t getRemotePort() const
     {
         if (!_rx_buf)
             return 0;
@@ -183,20 +171,12 @@ public:
         return ntohs(udphdr->src);
     }
 
-    const IPAddress getDestAddress()
+    const IPAddress& getDestAddress() const
     {
-#if LWIP_IPV6
         return _dst_addr;
-#else // IPv4 only
-        if (!_rx_buf)
-            return IPAddress();
-
-        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return IPAddress(iphdr->dest.addr);
-#endif // IPv4 only
     }
 
-    uint16_t getLocalPort()
+    uint16_t getLocalPort() const
     {
         if (!_pcb)
             return 0;
@@ -251,7 +231,7 @@ public:
         return size;
     }
 
-    int peek()
+    int peek() const
     {
         if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
             return -1;
@@ -411,17 +391,19 @@ private:
             _rx_buf_offset = 0;
         }
 
-#if LWIP_IPV6
         // --> Arduino's UDP is a stream but UDP is not <--
-        
         // When IPv6 is enabled, we store addresses from here
         // because lwIP's macro are valid only in this callback
-        // (there's no easy way to safely guess if packet is from v4 or v6)
-        
-        // Because of this stream-ed way this is inacurate when user does not
-        // swallow data quickly enough.  However the former way (still here
-        // when IPv6 is not enabled) suffers from the exact same issue.
+        // (there's no easy way to safely guess whether packet
+        //  is from v4 or v6 when we have only access to payload)
+        // Because of this stream-ed way this is inacurate when
+        // user does not swallow data quickly enough (the former
+        // IPv4-only way suffers from the exact same issue.
 
+#if LWIP_VERSION_MAJOR == 1
+        _src_addr = current_iphdr_src;
+        _dst_addr = current_iphdr_dest;
+#else
         _src_addr = ip_data.current_iphdr_src;
         _dst_addr = ip_data.current_iphdr_dest;
 #endif
@@ -452,9 +434,7 @@ private:
 #ifdef LWIP_MAYBE_XCC
     uint16_t _mcast_ttl;
 #endif
-#if LWIP_IPV6
-    ip_addr_t _src_addr, _dst_addr;
-#endif
+    IPAddress _src_addr, _dst_addr;
 };
 
 

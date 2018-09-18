@@ -163,7 +163,7 @@ bool IPAddress::isValid(const char* arg) {
 	return IPAddress().fromString(arg);
 }
 
-const IPAddress INADDR_NONE(0, 0, 0, 0);
+constv2 IPAddress IPNoAddress; // generic "0.0.0.0" for v4 & v6
 
 /**************************************/
 

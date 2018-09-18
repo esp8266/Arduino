@@ -142,7 +142,7 @@ public:
         return 1;
     }
 
-    size_t availableForWrite()
+    size_t availableForWrite() const
     {
         return _pcb? tcp_sndbuf(_pcb): 0;
     }
@@ -177,7 +177,7 @@ public:
         return _timeout_ms;
     }
 
-    const ip_addr_t* getRemoteAddress()
+    const ip_addr_t* getRemoteAddress() const
     {
         if(!_pcb) {
             return 0;
@@ -195,7 +195,7 @@ public:
         return _pcb->remote_port;
     }
 
-    const ip_addr_t* getLocalAddress()
+    const ip_addr_t* getLocalAddress() const
     {
         if(!_pcb) {
             return 0;

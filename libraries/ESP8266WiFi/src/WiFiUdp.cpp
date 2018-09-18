@@ -144,7 +144,7 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port)
     return 0;
 }
 
-int WiFiUDP::beginPacket(const IPAddress& ip, uint16_t port)
+int WiFiUDP::beginPacket(constv2 IPAddress& ip, uint16_t port)
 {
     if (!_ctx) {
         _ctx = new UdpContext;
@@ -231,15 +231,15 @@ void WiFiUDP::flush()
     endPacket();
 }
 
-IPAddress WiFiUDP::remoteIP()
+constv2 IPAddress& WiFiUDP::remoteIP() const
 {
     if (!_ctx)
-        return IPAddress(0U);
+        return IPNoAddress;
 
-    return IPAddress(_ctx->getRemoteAddress());
+    return _ctx->getRemoteAddress();
 }
 
-uint16_t WiFiUDP::remotePort()
+uint16_t WiFiUDP::remotePort() const
 {
     if (!_ctx)
         return 0;
@@ -247,15 +247,15 @@ uint16_t WiFiUDP::remotePort()
     return _ctx->getRemotePort();
 }
 
-IPAddress WiFiUDP::destinationIP()
+const IPAddress& WiFiUDP::destinationIP() const
 {
     if (!_ctx)
-        return IPAddress(0U);
+        return IPNoAddress;
 
-    return IPAddress(_ctx->getDestAddress());
+    return _ctx->getDestAddress();
 }
 
-uint16_t WiFiUDP::localPort()
+uint16_t WiFiUDP::localPort() const
 {
     if (!_ctx)
         return 0;
