@@ -30,7 +30,8 @@
 #define NUM_DIGITAL_PINS        17
 #define NUM_ANALOG_INPUTS       1
 
-#define isFlashInterfacePin(p)      ((p) >= 6 && (p) <= 11)
+// Pins 9 and 10 are available, go to positive logic since it's clearer 
+#define isFlashInterfacePin(p)      ((p) == 6 || (p) == 7 || (p) == 8 || (p) == 11)
 
 #define analogInputToDigitalPin(p)  ((p > 0) ? NOT_A_PIN : 0)
 #define digitalPinToInterrupt(p)    (((p) < EXTERNAL_NUM_INTERRUPTS)? (p) : NOT_AN_INTERRUPT)
