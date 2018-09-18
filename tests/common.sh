@@ -118,6 +118,9 @@ function install_ide()
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
     echo "compiler.c.extra_flags=-Wall -Werror $debug_flags" > esp8266/platform.local.txt
     echo "compiler.cpp.extra_flags=-Wall -Werror $debug_flags" >> esp8266/platform.local.txt
+    echo -e "\n----platform.local.txt----"
+    cat esp8266/platform.local.txt
+    echo -e "\n----\n"
     cd esp8266/tools
     python get.py
     export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
