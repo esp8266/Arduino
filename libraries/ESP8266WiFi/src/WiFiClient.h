@@ -53,7 +53,7 @@ public:
   WiFiClient& operator=(const WiFiClient&);
 
   uint8_t status();
-  virtual int connect(const IPAddress& ip, uint16_t port);
+  virtual int connect(constv2 IPAddress& ip, uint16_t port);
   virtual int connect(const char *host, uint16_t port);
   virtual int connect(const String& host, uint16_t port);
   virtual size_t write(uint8_t);

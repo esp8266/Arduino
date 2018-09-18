@@ -47,7 +47,7 @@ public:
   // Finish with the UDP connetion
   virtual void stop();
   // join a multicast group and listen on the given port
-  uint8_t beginMulticast(const IPAddress& interfaceAddr, const IPAddress& multicast, uint16_t port);
+  uint8_t beginMulticast(constv2 IPAddress& interfaceAddr, constv2 IPAddress& multicast, uint16_t port);
 
   // Sending UDP packets
   

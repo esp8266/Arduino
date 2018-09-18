@@ -113,7 +113,7 @@ bool LLMNRResponder::_restart() {
 
     IPAddress llmnr(LLMNR_MULTICAST_ADDR);
 
-    if (igmp_joingroup(IPAddress(IP_ADDR_ANY), llmnr) != ERR_OK)
+    if (igmp_joingroup(IP4_ADDR_ANY4, llmnr) != ERR_OK)
         return false;
 
     _conn = new UdpContext;
@@ -230,15 +230,15 @@ void LLMNRResponder::_process_packet() {
         Serial.println("(no matching RRs)");
 #endif
 
-    const ip_addr_t* remote_ip = _conn->getRemoteAddress();
+    IPAddress remote_ip = _conn->getRemoteAddress();
 
     struct ip_info ip_info;
     bool match_ap = false;
-    if (ip_info.ip.addr && (wifi_get_opmode() & SOFTAP_MODE)) {
+    if (wifi_get_opmode() & SOFTAP_MODE) {
         wifi_get_ip_info(SOFTAP_IF, &ip_info);
         IPAddress infoIp(ip_info.ip);
         IPAddress infoMask(ip_info.netmask);
-        if (ip_addr_netcmp(remote_ip, infoIp, infoMask))
+        if (ip_addr_netcmp((const ip_addr_t*)remote_ip, (const ip_addr_t*)infoIp, ip_2_ip4((const ip_addr_t*)infoMask)))
             match_ap = true;
     }
     if (!match_ap)

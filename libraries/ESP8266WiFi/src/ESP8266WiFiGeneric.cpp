@@ -431,11 +431,7 @@ bool ESP8266WiFiGenericClass::forceSleepWake() {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-#if LWIP_VERSION_MAJOR == 1
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg);
-#else
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
-#endif
+void wifi_dns_found_callback(const char *name, constv2 ip_addr_t *ipaddr, void *callback_arg);
 
 static bool _dns_lookup_pending = false;
 
@@ -492,11 +488,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-#if LWIP_VERSION_MAJOR == 1
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg)
-#else
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
-#endif
+void wifi_dns_found_callback(const char *name, constv2 ip_addr_t *ipaddr, void *callback_arg)
 {
     (void) name;
     if (!_dns_lookup_pending) {

@@ -4,11 +4,11 @@
 #include "os_type.h"
 
 #include "lwip/init.h"
-#if LWIP_VERSION_MAJOR == 1
-#define ipv4_addr ip_addr
-#endif
 #include "lwip/ip_addr.h"
-#if LWIP_VERSION_MAJOR != 1
+
+#if LWIP_VERSION_MAJOR == 1
+#define ipv4_addr_t ip_addr_t
+#else
 typedef struct ip4_addr ipv4_addr_t;
 #endif
 

@@ -191,7 +191,7 @@ void WiFiClientSecure::flush() {
   WiFiClient::flush();
 }
 
-int WiFiClientSecure::connect(const IPAddress& ip, uint16_t port) {
+int WiFiClientSecure::connect(constv2 IPAddress& ip, uint16_t port) {
   if (!WiFiClient::connect(ip, port)) {
     return 0;
   }

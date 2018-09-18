@@ -82,10 +82,10 @@ uint8_t WiFiUDP::begin(uint16_t port)
 
     _ctx = new UdpContext;
     _ctx->ref();
-    return (_ctx->listen(IP_ANY_TYPE, port)) ? 1 : 0;
+    return (_ctx->listen(IPAddress(), port)) ? 1 : 0;
 }
 
-uint8_t WiFiUDP::beginMulticast(const IPAddress& interfaceAddr, const IPAddress& multicast, uint16_t port)
+uint8_t WiFiUDP::beginMulticast(constv2 IPAddress& interfaceAddr, constv2 IPAddress& multicast, uint16_t port)
 {
     if (_ctx) {
         _ctx->unref();

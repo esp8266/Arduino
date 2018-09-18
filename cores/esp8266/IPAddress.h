@@ -28,7 +28,17 @@
 #include <lwip/ip_addr.h>
 
 #if LWIP_VERSION_MAJOR == 1
+// compatibility macros to make lwIP-v1 compiling lwIP-v2 API
 #define ip_2_ip4(x) (x)
+#define ipv4_addr ip_addr
+#define IP_IS_V4_VAL(x) (1)
+#define IP_SET_TYPE_VAL(x,y) do { (void)0; } while (0)
+#define IP_ANY_TYPE (&ip_addr_any)
+#define IP4_ADDR_ANY4 IPADDR_ANY
+#define IPADDR4_INIT(x) { x }
+#define constv2 /* nothing: lwIP-v1 does not use const */
+#else
+#define constv2 const
 #endif
 
 // A class to make it easier to handle and pass around IP addresses
@@ -112,11 +122,13 @@ class IPAddress: public Printable {
         /*
                lwIP address compatibility
         */
-        IPAddress(ipv4_addr fw_addr);
-        IPAddress(const ipv4_addr* fw_addr);
+        IPAddress(const ipv4_addr* fw_addr)   { setV4(); v4() = fw_addr->addr; }
         IPAddress(const ip_addr_t& lwip_addr) { _ip = lwip_addr; }
+
+#if LWIP_VERSION_MAJOR != 1
+        IPAddress(ipv4_addr fw_addr)          { setV4(); v4() = fw_addr.addr; }
         IPAddress(const ip_addr_t* lwip_addr) { _ip = *lwip_addr; }
-        
+#endif
         operator       ip_addr_t () const { return  _ip; }
         operator const ip_addr_t*() const { return &_ip; }
         operator       ip_addr_t*()       { return &_ip; }

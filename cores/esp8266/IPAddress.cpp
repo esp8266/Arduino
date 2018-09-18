@@ -163,20 +163,6 @@ const IPAddress INADDR_NONE(0, 0, 0, 0);
 
 /**************************************/
 
-/* lwip */
-
-IPAddress::IPAddress(ipv4_addr fw_addr) {
-    setV4();
-    v4() = fw_addr.addr;
-}
-
-IPAddress::IPAddress(const ipv4_addr* fw_addr) {
-    setV4();
-    v4() = fw_addr->addr;
-}
-
-/* ipv6 */
-
 #if LWIP_IPV6
 
 bool IPAddress::fromString6(const char *address) {

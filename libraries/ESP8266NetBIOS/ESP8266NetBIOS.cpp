@@ -174,11 +174,7 @@ void ESP8266NetBIOS::end()
     }
 }
 
-#if LWIP_VERSION_MAJOR == 1 
-void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, ip_addr_t *addr, uint16_t port)
-#else
-void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint16_t port)
-#endif
+void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, constv2 ip_addr_t *addr, uint16_t port)
 {
     (void)upcb;
     (void)addr;
@@ -269,11 +265,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, const ip_addr_t *addr, uint1
     }
 }
 
-#if LWIP_VERSION_MAJOR == 1
-void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, struct ip_addr *addr, uint16_t port)
-#else
-void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, const ip_addr_t *addr, uint16_t port)
-#endif
+void ESP8266NetBIOS::_s_recv(void *arg, udp_pcb *upcb, pbuf *p, constv2 ip_addr_t *addr, uint16_t port)
 {
     reinterpret_cast<ESP8266NetBIOS*>(arg)->_recv(upcb, p, addr, port);
 }

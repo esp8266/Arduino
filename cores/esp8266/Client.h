@@ -26,7 +26,7 @@
 class Client: public Stream {
 
     public:
-        virtual int connect(const IPAddress& ip, uint16_t port) =0;
+        virtual int connect(constv2 IPAddress& ip, uint16_t port) =0;
         virtual int connect(const char *host, uint16_t port) =0;
         virtual size_t write(uint8_t) =0;
         virtual size_t write(const uint8_t *buf, size_t size) =0;
