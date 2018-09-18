@@ -48,7 +48,7 @@ class UDP: public Stream {
 
         // Start building up a packet to send to the remote host specific in ip and port
         // Returns 1 if successful, 0 if there was a problem with the supplied IP address or port
-        virtual int beginPacket(const IPAddress& ip, uint16_t port) =0;
+        virtual int beginPacket(constv2 IPAddress& ip, uint16_t port) =0;
         // Start building up a packet to send to the remote host specific in host and port
         // Returns 1 if successful, 0 if there was a problem resolving the hostname or port
         virtual int beginPacket(const char *host, uint16_t port) =0;
@@ -82,7 +82,7 @@ class UDP: public Stream {
         // Return the port of the host who sent the current incoming packet
         virtual uint16_t remotePort() =0;
     protected:
-        uint8_t* rawIPAddress(IPAddress& addr) {
+        constv2 uint8_t* rawIPAddress(constv2 IPAddress& addr) {
             return addr.raw_address();
         }
 };

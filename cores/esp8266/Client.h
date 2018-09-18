@@ -39,7 +39,7 @@ class Client: public Stream {
         virtual uint8_t connected() = 0;
         virtual operator bool() = 0;
     protected:
-        uint8_t* rawIPAddress(IPAddress& addr) {
+        constv2 uint8_t* rawIPAddress(constv2 IPAddress& addr) {
             return addr.raw_address();
         }
         ;

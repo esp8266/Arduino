@@ -92,7 +92,7 @@ int EthernetUDP::beginPacket(const char *host, uint16_t port)
   }
 }
 
-int EthernetUDP::beginPacket(IPAddress ip, uint16_t port)
+int EthernetUDP::beginPacket(constv2 IPAddress& ip, uint16_t port)
 {
   _offset = 0;
   return startUDP(_sock, rawIPAddress(ip), port);
