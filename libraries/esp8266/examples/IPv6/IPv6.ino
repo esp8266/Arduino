@@ -118,9 +118,7 @@ void loop() {
 
   if (statusServer.hasClient()) {
     WiFiClient cli = statusServer.available();
-    cli.setNoDelay(0); // should be default, was not default
     status(cli);
-    cli.flush(); // not needed before .stop()
     cli.stop();
   }
 
