@@ -81,10 +81,6 @@ public:
   uint16_t  remotePort();
   IPAddress localIP();
   uint16_t  localPort();
-  bool getNoDelay() const;
-  void setNoDelay(bool nodelay);
-  bool getSync() const;
-  void setSync(bool sync);
 
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
@@ -104,10 +100,23 @@ public:
   uint8_t  getKeepAliveCount () const;
   void     disableKeepAlive () { keepAlive(0, 0, 0); }
 
-  static void setDefaultNoDelay (bool noDelay) { _defaultNoDelay = noDelay; }
-  static void setDefaultSync    (bool sync)    { _defaultSync = sync; }
-  static bool getDefaultNoDelay ()             { return _defaultNoDelay; }
-  static bool getDefaultSync    ()             { return _defaultSync; }
+  // default NoDelay=False (Nagle=True=!NoDelay)
+  // Nagle is for shortly delaying outgoing data, to send less/bigger packets
+  // Nagle should be disabled for telnet-like/interactive streams
+  // Nagle is meaningless/ignored when Sync=true
+  static void setDefaultNoDelay (bool noDelay);
+  static bool getDefaultNoDelay ();
+  bool getNoDelay() const;
+  void setNoDelay(bool nodelay);
+
+  // default Sync=false
+  // When sync is true, all writes are automatically flushed.
+  // This is slower but also does not allocate
+  // temporary memory for sending data
+  static void setDefaultSync (bool sync);
+  static bool getDefaultSync ();
+  bool getSync() const;
+  void setSync(bool sync);
 
 protected:
 
@@ -119,9 +128,6 @@ protected:
 
   ClientContext* _client;
   static uint16_t _localPort;
-
-  static bool _defaultNoDelay;
-  static bool _defaultSync;
 };
 
 #endif

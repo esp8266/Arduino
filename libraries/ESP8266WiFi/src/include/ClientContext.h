@@ -31,11 +31,14 @@ extern "C" void esp_schedule();
 
 #include "DataSource.h"
 
+bool getDefaultPrivateGlobalSyncValue ();
+
 class ClientContext
 {
 public:
     ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
-        _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0), _sync(WiFiClient::getDefaultSync())
+        _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0),
+        _sync(::getDefaultPrivateGlobalSyncValue())
     {
         tcp_setprio(pcb, TCP_PRIO_MIN);
         tcp_arg(pcb, this);
@@ -461,14 +464,16 @@ protected:
                 break;
             const uint8_t* buf = _datasource->get_buffer(next_chunk_size);
             // use TCP_WRITE_FLAG_MORE to remove PUSH flag from packet (lwIP's doc),
-            // because PUSH implicitely disables nagle (see lwIP's tcp_out.c)
+            // because PUSH code implicitely disables Nagle code (see lwIP's tcp_out.c)
             // Notes:
-            //   PUSH is for peer, telling to give data to user app as soon as received
+            //   PUSH is meant for peer, telling to give data to user app as soon as received
             //   PUSH "may be set" when sender has finished sending a meaningful data block
-            //   Nagle is for delaying local data, to send less/bigger packets
+            //   PUSH is quite unclear in its application
+            //   Nagle is for shortly delaying outgoing data, to send less/bigger packets
             uint8_t flags = TCP_WRITE_FLAG_MORE; // do not tcp-PuSH
             if (!_sync)
-                // user data will not stay in place when data are sent but not acknowledged
+                // user data must be copied when data are sent but not yet acknowledged
+                // (with sync, we wait for acknowledgment before returning to user)
                 flags |= TCP_WRITE_FLAG_COPY;
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
             DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->available(), (int)err);
