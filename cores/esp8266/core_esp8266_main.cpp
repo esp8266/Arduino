@@ -48,7 +48,7 @@ extern void (*__init_array_end)(void);
 /* Not static, used in Esp.cpp */
 struct rst_info resetInfo;
 
-/* Not static, used in core_esp8266_postmortem.c.
+/* Not static, used in core_esp8266_postmortem.c and other places.
  * Placed into noinit section because we assign value to this variable
  * before .bss is zero-filled, and need to preserve the value.
  */
@@ -175,10 +175,15 @@ void init_done() {
 
    WPS beeing flawed by its poor security, or not beeing used by lots of
    users, it has been decided that we are still going to use that memory for
-   user's stack and disable the use of WPS, with an option to revert that
-   back at the user's discretion.  This selection can be done with the
-   global define NO_EXTRA_4K_HEAP.  An option has been added to the board
-   generator script.
+   user's stack and disable the use of WPS.
+
+   app_entry() jumps to app_entry_custom() defined as "weakref" calling
+   itself a weak customizable function, allowing to use another one when
+   this is required (see core_esp8266_app_entry_noextra4k.cpp, used by WPS).
+
+   (note: setting app_entry() itself as "weak" is not sufficient and always
+    ends up with the other "noextra4k" one linked, maybe because it has a
+    default ENTRY(app_entry) value in linker scripts).
 
    References:
    https://github.com/esp8266/Arduino/pull/4553
@@ -188,29 +193,23 @@ void init_done() {
 
 */
 
-#ifdef NO_EXTRA_4K_HEAP
-/* this is the default NONOS-SDK user's heap location */
-cont_t g_cont __attribute__ ((aligned (16)));
-#endif
-
-extern "C" void ICACHE_RAM_ATTR app_entry(void)
+extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void) __attribute__((weak));
+extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void)
 {
-#ifdef NO_EXTRA_4K_HEAP
-
-    /* this is the default NONOS-SDK user's heap location */
-    g_pcont = &g_cont;
-
-#else
-
     /* Allocate continuation context on this SYS stack,
        and save pointer to it. */
     cont_t s_cont __attribute__((aligned(16)));
     g_pcont = &s_cont;
 
-#endif
-
     /* Call the entry point of the SDK code. */
     call_user_start();
+}
+
+static void ICACHE_RAM_ATTR app_entry_custom (void) __attribute__((weakref("app_entry_redefinable")));
+
+extern "C" void ICACHE_RAM_ATTR app_entry (void)
+{
+    return app_entry_custom();
 }
 
 extern "C" void user_init(void) {

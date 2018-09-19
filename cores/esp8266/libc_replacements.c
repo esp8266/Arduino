@@ -84,14 +84,17 @@ int ICACHE_RAM_ATTR _read_r(struct _reent* unused, int file, char *ptr, int len)
 
 int ICACHE_RAM_ATTR _write_r(struct _reent* r, int file, char *ptr, int len) {
     (void) r;
+    int pos = len;
     if (file == STDOUT_FILENO) {
-        while(len--) {
+        while(pos--) {
             ets_putc(*ptr);
             ++ptr;
         }
     }
     return len;
 }
+
+int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) __attribute__((weak));
 
 int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file) {
     (void) r;
