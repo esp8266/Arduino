@@ -42,30 +42,33 @@ extern "C"
 #include "c_types.h"
 
 uint16_t WiFiClient::_localPort = 0;
-bool WiFiClient::_defaultNoDelay = true;
-bool WiFiClient::_defaultSync = false;
 
-static bool _defaultNoDelay = false; // false == Nagle enabled by default
-static bool _defaultSync = false;
+static bool defaultNoDelay = false; // false == Nagle enabled by default
+static bool defaultSync = false;
+
+bool getDefaultPrivateGlobalSyncValue ()
+{
+    return defaultSync;
+}
 
 void WiFiClient::setDefaultNoDelay (bool noDelay)
 {
-    _defaultNoDelay = noDelay;
+    defaultNoDelay = noDelay;
 }
 
 void WiFiClient::setDefaultSync (bool sync)
 {
-    _defaultSync = sync;
+    defaultSync = sync;
 }
 
 bool WiFiClient::getDefaultNoDelay ()
 {
-    return _defaultNoDelay;
+    return defaultNoDelay;
 }
 
 bool WiFiClient::getDefaultSync ()
 {
-    return _defaultSync;
+    return defaultSync;
 }
 
 template<>
@@ -86,8 +89,8 @@ WiFiClient::WiFiClient(ClientContext* client)
     _client->ref();
     WiFiClient::_add(this);
 
-    setSync(_defaultSync);
-    setNoDelay(_defaultNoDelay);
+    setSync(defaultSync);
+    setNoDelay(defaultNoDelay);
 }
 
 WiFiClient::~WiFiClient()
@@ -174,8 +177,8 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
         return 0;
     }
 
-    setSync(_defaultSync);
-    setNoDelay(_defaultNoDelay);
+    setSync(defaultSync);
+    setNoDelay(defaultNoDelay);
 
     return 1;
 }

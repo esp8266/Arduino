@@ -128,9 +128,6 @@ protected:
 
   ClientContext* _client;
   static uint16_t _localPort;
-
-  static bool _defaultNoDelay;
-  static bool _defaultSync;
 };
 
 #endif

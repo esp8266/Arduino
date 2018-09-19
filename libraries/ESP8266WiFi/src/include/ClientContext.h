@@ -31,11 +31,14 @@ extern "C" void esp_schedule();
 
 #include "DataSource.h"
 
+bool getDefaultPrivateGlobalSyncValue ();
+
 class ClientContext
 {
 public:
     ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
-        _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0), _sync(WiFiClient::getDefaultSync())
+        _pcb(pcb), _rx_buf(0), _rx_buf_offset(0), _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0),
+        _sync(::getDefaultPrivateGlobalSyncValue())
     {
         tcp_setprio(pcb, TCP_PRIO_MIN);
         tcp_arg(pcb, this);
@@ -473,7 +476,7 @@ protected:
                 // (with sync, we wait for acknowledgment before returning to user)
                 flags |= TCP_WRITE_FLAG_COPY;
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
-            DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, will_send, (int)err);
+            DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->available(), (int)err);
             if (err == ERR_OK) {
                 _datasource->release_buffer(buf, next_chunk_size);
                 _written += next_chunk_size;
