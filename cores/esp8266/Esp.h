@@ -114,7 +114,7 @@ class EspClass {
         void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr);
 
         uint32_t getFreeContStack();
-		uint32_t getFreeSysStack();
+        uint32_t getFreeSysStack();
 
         const char * getSdkVersion();
         String getCoreVersion();
