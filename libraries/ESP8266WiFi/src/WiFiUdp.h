@@ -95,12 +95,12 @@ public:
   virtual void flush();	// Finish reading the current packet
 
   // Return the IP address of the host who sent the current incoming packet
-  virtual constv2 IPAddress& remoteIP() const;
+  virtual IPAddress remoteIP() const;
   // Return the port of the host who sent the current incoming packet
   virtual uint16_t remotePort() const;
   // Return the destination address for incoming packets,
   // useful to distinguish multicast and ordinary packets
-  const IPAddress& destinationIP() const;
+  IPAddress destinationIP() const;
   // Return the local port for outgoing packets
   uint16_t localPort() const;
 

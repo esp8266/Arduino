@@ -231,7 +231,7 @@ void WiFiUDP::flush()
     endPacket();
 }
 
-constv2 IPAddress& WiFiUDP::remoteIP() const
+IPAddress WiFiUDP::remoteIP() const
 {
     if (!_ctx)
         return IPNoAddress;
@@ -247,7 +247,7 @@ uint16_t WiFiUDP::remotePort() const
     return _ctx->getRemotePort();
 }
 
-const IPAddress& WiFiUDP::destinationIP() const
+IPAddress WiFiUDP::destinationIP() const
 {
     if (!_ctx)
         return IPNoAddress;

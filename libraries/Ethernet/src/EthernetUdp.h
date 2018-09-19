@@ -62,7 +62,7 @@ public:
   
   // Start building up a packet to send to the remote host specific in ip and port
   // Returns 1 if successful, 0 if there was a problem with the supplied IP address or port
-  virtual int beginPacket(constv2 IPAddress& ip, uint16_t port);
+  virtual int beginPacket(IPAddress ip, uint16_t port);
   // Start building up a packet to send to the remote host specific in host and port
   // Returns 1 if successful, 0 if there was a problem resolving the hostname or port
   virtual int beginPacket(const char *host, uint16_t port);
@@ -94,9 +94,9 @@ public:
   virtual void flush();	// Finish reading the current packet
 
   // Return the IP address of the host who sent the current incoming packet
-  virtual IPAddress remoteIP() { return _remoteIP; };
+  virtual IPAddress remoteIP() const { return _remoteIP; };
   // Return the port of the host who sent the current incoming packet
-  virtual uint16_t remotePort() { return _remotePort; };
+  virtual uint16_t remotePort() const { return _remotePort; };
 };
 
 #endif
