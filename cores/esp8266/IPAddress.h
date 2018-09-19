@@ -156,7 +156,7 @@ class IPAddress: public Printable {
 
         const uint16_t* raw6() const
         {
-            return isV6()? reinterpret_cast<const uint16_t*>(ip_2_ip6(&_ip)): 0;
+            return isV6()? reinterpret_cast<const uint16_t*>(ip_2_ip6(&_ip)): nullptr;
         }
 
         // when not IPv6, ip_addr_t == ip4_addr_t so this one would be ambiguous
