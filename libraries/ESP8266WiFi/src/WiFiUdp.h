@@ -47,13 +47,13 @@ public:
   // Finish with the UDP connetion
   virtual void stop();
   // join a multicast group and listen on the given port
-  uint8_t beginMulticast(constv2 IPAddress& interfaceAddr, constv2 IPAddress& multicast, uint16_t port);
+  uint8_t beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port);
 
   // Sending UDP packets
   
   // Start building up a packet to send to the remote host specific in ip and port
   // Returns 1 if successful, 0 if there was a problem with the supplied IP address or port
-  virtual int beginPacket(constv2 IPAddress& ip, uint16_t port);
+  virtual int beginPacket(IPAddress ip, uint16_t port);
   // Start building up a packet to send to the remote host specific in host and port
   // Returns 1 if successful, 0 if there was a problem resolving the hostname or port
   virtual int beginPacket(const char *host, uint16_t port);
@@ -63,9 +63,9 @@ public:
   //                    use WiFi.localIP() or WiFi.softAPIP() depending on the interface you need
   // ttl              - multicast packet TTL (default is 1)
   // Returns 1 if successful, 0 if there was a problem with the supplied IP address or port
-  virtual int beginPacketMulticast(const IPAddress& multicastAddress,
+  virtual int beginPacketMulticast(IPAddress multicastAddress,
                                    uint16_t port, 
-                                   const IPAddress& interfaceAddress,
+                                   IPAddress interfaceAddress,
                                    int ttl = 1);
   // Finish off this packet and send it
   // Returns 1 if the packet was sent successfully, 0 if there was an error

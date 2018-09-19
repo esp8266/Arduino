@@ -85,7 +85,7 @@ uint8_t WiFiUDP::begin(uint16_t port)
     return (_ctx->listen(IPAddress(), port)) ? 1 : 0;
 }
 
-uint8_t WiFiUDP::beginMulticast(constv2 IPAddress& interfaceAddr, constv2 IPAddress& multicast, uint16_t port)
+uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port)
 {
     if (_ctx) {
         _ctx->unref();
@@ -144,7 +144,7 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port)
     return 0;
 }
 
-int WiFiUDP::beginPacket(constv2 IPAddress& ip, uint16_t port)
+int WiFiUDP::beginPacket(IPAddress ip, uint16_t port)
 {
     if (!_ctx) {
         _ctx = new UdpContext;
@@ -153,8 +153,8 @@ int WiFiUDP::beginPacket(constv2 IPAddress& ip, uint16_t port)
     return (_ctx->connect(ip, port)) ? 1 : 0;
 }
 
-int WiFiUDP::beginPacketMulticast(const IPAddress& multicastAddress, uint16_t port,
-    const IPAddress& interfaceAddress, int ttl)
+int WiFiUDP::beginPacketMulticast(IPAddress multicastAddress, uint16_t port,
+    IPAddress interfaceAddress, int ttl)
 {
     if (!_ctx) {
         _ctx = new UdpContext;
