@@ -27,10 +27,10 @@
 #define PSK  "psk"
 
 #define FQDN  F("www.google.com") // with both IPv4 & IPv6 addresses
-#define FQDN6 F("par21s04-in-x04.1e100.net") // does not resolve in IPv4 (wanted: better example)
+#define FQDN6 F("ipv6.google.com") // does not resolve in IPv4
 #define STATUSDELAY_MS 30000
 #define TCP_PORT 23
-#define UDP_PORT 1111
+#define UDP_PORT 23
 
 WiFiServer statusServer(TCP_PORT);
 WiFiUDP udp;
@@ -49,30 +49,29 @@ void fqdn(Print& out, const String& fqdn) {
 }
 
 void status(Print& out) {
-  out.println();
-
-  out.print(F("address= "));
+  out.println(ESP.getFullVersion());
+  out.print(F("IPv4: "));
   WiFi.localIP().printTo(out);
-  out.println();
-  out.print(F("gateway= "));
+  out.print(F("/"));
   WiFi.gatewayIP().printTo(out);
-  out.println();
-  out.print(F("netmask= "));
+  out.print(F("/"));
   WiFi.subnetMask().printTo(out);
   out.println();
 
   for (int i = 0; i < 3; i++) {
-    out.print(F("dns"));
-    out.print(i);
-    out.print(F("= "));
-    WiFi.dnsIP(i).printTo(out);
-    out.println();
+    IPAddress dns = WiFi.dnsIP(i);
+    if (dns.isSet()) {
+      out.print(F("dns"));
+      out.print(i);
+      out.print(F("="));
+      dns.printTo(out);
+      out.println();
+    }
   }
 
   #if LWIP_IPV6
   out.println(F("Try me at these addresses:"));
-  out.println(F("(with 'telnet <addr>')"));
-  out.println(F("(with 'nc -u <addr> 1111')"));
+  out.println(F("(with 'telnet <addr>' or 'nc -u <addr> 23')"));
   out.print(F("IPv6   link-scope(intranet)= "));
   WiFi.localIP6Link().printTo(out);
   out.println();
@@ -131,24 +130,17 @@ void loop() {
     udp.remoteIP().printTo(Serial);
     Serial.print(F(" :"));
     Serial.println(udp.remotePort());
-
-    char* buffer = (char*)malloc(packetSize + 1);
-    if (buffer) {
-      udp.read(buffer, packetSize);
-      buffer[packetSize] = 0;
-      Serial.println(F("Contents:"));
-      Serial.println(buffer);
-
-      // send a reply, to the IP address and port that sent us the packet we received
-      udp.beginPacket(udp.remoteIP(), udp.remotePort());
-      udp.write(buffer, packetSize);
-      udp.endPacket();
-      free(buffer);
-    } else {
-      Serial.println(F("udp: malloc failed"));
-      while (udp.read() >= 0);
+    int  c;
+    while ((c = udp.read()) >= 0) {
+      Serial.write(c);
     }
+
+    // send a reply, to the IP address and port that sent us the packet we received
+    udp.beginPacket(udp.remoteIP(), udp.remotePort());
+    status(udp);
+    udp.endPacket();
   }
+
 
   unsigned long now = millis();
   if (now > statusTimeMs) {
