@@ -183,6 +183,11 @@ uint32_t EspClass::getFreeContStack()
     return cont_get_free_stack(g_pcont);
 }
 
+uint32_t EspClass::getFreeSysStack()
+{
+	register volatile uint32_t stackAddress asm("a1");
+	return stackAddress-SYSTEM_STACK_END_ADDRESS;
+}
 uint32_t EspClass::getChipId(void)
 {
     return system_get_chip_id();

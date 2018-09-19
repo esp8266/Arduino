@@ -65,6 +65,9 @@ enum RFMode {
 #define WAKE_NO_RFCAL    RF_NO_CAL
 #define WAKE_RF_DISABLED RF_DISABLED
 
+// for getFreeSysStack
+#define SYSTEM_STACK_END_ADDRESS 0x3FFFC000
+
 enum ADCMode {
     ADC_TOUT = 33,
     ADC_TOUT_3V3 = 33,
@@ -111,6 +114,7 @@ class EspClass {
         void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr);
 
         uint32_t getFreeContStack();
+		uint32_t getFreeSysStack();
 
         const char * getSdkVersion();
         String getCoreVersion();
