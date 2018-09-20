@@ -687,8 +687,8 @@ extern "C" {
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
   };
 
-  // For apps which want to use less secure but faster axTLS ciphers, only
-  static const uint16_t axtls_suites_P[] PROGMEM = {
+  // For apps which want to use less secure but faster ciphers, only
+  static const uint16_t faster_suites_P[] PROGMEM = {
     BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_128_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_256_CBC_SHA,
@@ -735,10 +735,10 @@ extern "C" {
 
 }
 
-// Set the AXTLS ciphers as the only ones allowed
-void WiFiClientSecure::setAxTLSCiphers()
+// Set the faster ciphers as the only ones allowed
+void WiFiClientSecure::setCiphersLessSecure()
 {
-  setCiphers(axtls_suites_P, sizeof(axtls_suites_P)/sizeof(axtls_suites_P[0]));
+  setCiphers(faster_suites_P, sizeof(faster_suites_P)/sizeof(faster_suites_P[0]));
 }
 
 // Installs the appropriate X509 cert validation method for a client connection

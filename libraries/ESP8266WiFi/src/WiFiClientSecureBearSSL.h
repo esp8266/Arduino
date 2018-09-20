@@ -107,7 +107,7 @@ class WiFiClientSecure : public WiFiClient {
     // Select specific ciphers (i.e. optimize for speed over security)
     // These may be in PROGMEM or RAM, either will run properly
     void setCiphers(const uint16_t *cipherAry, int cipherCount) { _cipher_list = cipherAry; _cipher_cnt = cipherCount; }
-    void setAxTLSCiphers(); // Only use the limited set of axTLS ciphers
+    void setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
 
     // Check for Maximum Fragment Length support for given len
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);

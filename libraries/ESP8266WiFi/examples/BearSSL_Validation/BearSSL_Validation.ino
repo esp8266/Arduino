@@ -193,11 +193,12 @@ BearSSL does verify the notValidBefore/After fields.
   fetchURL(&client, host, port, path);
 }
 
-void fetchAxTLS() {
+void fetchFaster() {
   Serial.printf(R"EOF(
 The ciphers used to set up the SSL connection can be configured to
-be the same as axTLS. They are faster, but less secure, so if you care
-about security you won't want to do this.
+only support faster but less secure ciphers.  If you care about security
+you won't want to do this.  If you need to maximize battery life, these
+may make sense
 )EOF");
   BearSSL::WiFiClientSecure client;
   client.setInsecure();
@@ -206,10 +207,10 @@ about security you won't want to do this.
   uint32_t delta = millis() - now;
   now = millis();
   client.setInsecure();
-  client.setAxTLSCiphers();
+  client.setCiphersLessSecure();
   fetchURL(&client, host, port, path);
   uint32_t delta2 = millis() - now;
-  Serial.printf("Using more secure: %dms\nUsiing axTLS ciphers: %dms\n", delta, delta2);
+  Serial.printf("Using more secure: %dms\nUsing less secure ciphers: %dms\n", delta, delta2);
 }
 
 void setup() {
@@ -239,7 +240,7 @@ void setup() {
   fetchSelfSigned();
   fetchKnownKey();
   fetchCertAuthority();
-  fetchAxTLS();
+  fetchFaster();
 }
 
 
