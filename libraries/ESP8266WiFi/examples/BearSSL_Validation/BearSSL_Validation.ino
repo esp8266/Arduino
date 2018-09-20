@@ -205,12 +205,18 @@ may make sense
   uint32_t now = millis();
   fetchURL(&client, host, port, path);
   uint32_t delta = millis() - now;
-  now = millis();
   client.setInsecure();
   client.setCiphersLessSecure();
+  now = millis();
   fetchURL(&client, host, port, path);
   uint32_t delta2 = millis() - now;
-  Serial.printf("Using more secure: %dms\nUsing less secure ciphers: %dms\n", delta, delta2);
+  std::vector<uint16_t> myCustomList = { BR_TLS_RSA_WITH_AES_256_CBC_SHA256, BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA };
+  client.setInsecure();
+  client.setCiphers(myCustomList);
+  now = millis();
+  fetchURL(&client, host, port, path);
+  uint32_t delta3 = millis() - now;
+  Serial.printf("Using more secure: %dms\nUsing less secure ciphers: %dms\nUsing custom cipher list: %dms\n", delta, delta2, delta3);
 }
 
 void setup() {

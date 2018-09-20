@@ -103,6 +103,7 @@ WiFiClientSecure::~WiFiClientSecure() {
     _client->unref();
     _client = nullptr;
   }
+  free(_cipher_list);
   _freeSSL();
   _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
   if (_deleteChainKeyTA) {
@@ -735,10 +736,24 @@ extern "C" {
 
 }
 
-// Set the faster ciphers as the only ones allowed
-void WiFiClientSecure::setCiphersLessSecure()
-{
-  setCiphers(faster_suites_P, sizeof(faster_suites_P)/sizeof(faster_suites_P[0]));
+// Set custom list of ciphers
+bool WiFiClientSecure::setCiphers(const uint16_t *cipherAry, int cipherCount) {
+  free(_cipher_list);
+  _cipher_list = (uint16_t *)malloc(cipherCount * sizeof(uint16_t));
+  if (!_cipher_list) {
+    return false;
+  }
+  memcpy_P(_cipher_list, cipherAry, cipherCount * sizeof(uint16_t));
+  _cipher_cnt = cipherCount;
+  return true;
+}
+
+bool WiFiClientSecure::setCiphersLessSecure() {
+  return setCiphers(faster_suites_P, sizeof(faster_suites_P)/sizeof(faster_suites_P[0]));
+}
+
+bool WiFiClientSecure::setCiphers(std::vector<uint16_t> list) {
+  return setCiphers(&list[0], list.size());
 }
 
 // Installs the appropriate X509 cert validation method for a client connection
@@ -804,9 +819,10 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
 
   // If no cipher list yet set, use defaults
   if (_cipher_list == NULL) {
-    setCiphers(suites_P, sizeof(suites_P) / sizeof(uint16_t));
+    br_ssl_client_base_init(_sc.get(), suites_P, sizeof(suites_P) / sizeof(uint16_t));
+  } else {
+    br_ssl_client_base_init(_sc.get(), _cipher_list, _cipher_cnt);
   }
-  br_ssl_client_base_init(_sc.get(), _cipher_list, _cipher_cnt);
   // Only failure possible in the installation is OOM
   if (!_installClientX509Validator()) {
     _freeSSL();
