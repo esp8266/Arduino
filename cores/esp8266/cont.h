@@ -60,7 +60,7 @@ void cont_run(cont_t*, void (*pfn)(void));
 
 // Return to the point where cont_run was called, saving the
 // execution state (registers and stack)
-void cont_yield(cont_t*);
+void cont_yield(cont_t*) __attribute__((returns_twice));
 
 // Check guard bytes around the stack. Return 0 in case everything is ok,
 // return 1 if guard bytes were overwritten.
