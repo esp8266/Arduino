@@ -168,7 +168,7 @@ assert current_vtables
 
 # Build the eagle.app.v6.common.ld linker file
 app_ld = env.Command(
-    join("$BUILD_DIR", "ld", "eagle.app.v6.common.ld"),
+    join("$BUILD_DIR", "ld", "local.eagle.app.v6.common.ld"),
     join(FRAMEWORK_DIR, "tools", "sdk", "ld", "eagle.app.v6.common.ld.h"),
     env.VerboseAction(
         "$CC -CC -E -P -D%s $SOURCE -o $TARGET" % current_vtables,
