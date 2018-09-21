@@ -360,6 +360,7 @@ generic.menu.baud.921600.upload.speed=921600
 ##############################################################
 esp8285.name=Generic ESP8285 Module
 esp8285.build.board=ESP8266_ESP01
+esp8285.build.variant=esp8285
 esp8285.upload.tool=esptool
 esp8285.upload.maximum_data_size=81920
 esp8285.upload.wait_for_upload_port=true
@@ -368,7 +369,6 @@ esp8285.serial.disableDTR=true
 esp8285.serial.disableRTS=true
 esp8285.build.mcu=esp8266
 esp8285.build.core=esp8266
-esp8285.build.variant=generic
 esp8285.build.spiffs_pagesize=256
 esp8285.build.debug_port=
 esp8285.build.debug_level=
