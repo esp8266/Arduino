@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include "ESP8266WiFiMesh.h"
+#include "TypeConversionFunctions.h"
 
 #define SERVER_IP_ADDR      "192.168.4.1"
 

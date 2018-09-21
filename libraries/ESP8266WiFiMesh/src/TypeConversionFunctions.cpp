@@ -25,13 +25,6 @@
 
 #include "TypeConversionFunctions.h"
 
-/**
- * Note that using a base higher than 16 increases likelihood of randomly generating SSID strings containing controversial words. 
- * 
- * @param number The number to convert to a string with radix "base".
- * @param base The radix to convert "number" into. Must be between 2 and 36.
- * @returns A string of "number" encoded in radix "base".
- */
 String uint64ToString(uint64_t number, byte base)
 {
   assert(2 <= base && base <= 36);
@@ -47,13 +40,6 @@ String uint64ToString(uint64_t number, byte base)
   return (result == "" ? "0" : result);
 }
 
-/**
- * Note that using a base higher than 16 increases likelihood of randomly generating SSID strings containing controversial words. 
- * 
- * @param string The string to convert to uint64_t. String must use radix "base".
- * @param base The radix of "string". Must be between 2 and 36.
- * @returns A uint64_t of the string, using radix "base" during decoding.
- */
 uint64_t stringToUint64(const String &string, byte base)
 {
   assert(2 <= base && base <= 36);

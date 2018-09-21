@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMesh.h>
+#include <TypeConversionFunctions.h>
 #include <assert.h>
 
 /**
@@ -84,9 +85,9 @@ void networkFilter(int numberOfNetworks, ESP8266WiFiMesh &meshInstance) {
 
     /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
     if (meshNameIndex >= 0) {
-      uint64_t targetNodeID = ESP8266WiFiMesh::stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
+      uint64_t targetNodeID = stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
 
-      if (targetNodeID < ESP8266WiFiMesh::stringToUint64(meshInstance.getNodeID())) {
+      if (targetNodeID < stringToUint64(meshInstance.getNodeID())) {
         ESP8266WiFiMesh::connectionQueue.push_back(NetworkInfo(networkIndex));
       }
     }
