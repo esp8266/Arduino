@@ -79,7 +79,7 @@ recipe.hooks.core.prebuild.1.pattern.windows=cmd.exe /c mkdir {build.path}\core 
 recipe.hooks.core.prebuild.2.pattern.windows=
 
 ## Build the app.ld linker file
-recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/eagle.app.v6.common.ld"
+recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/local.eagle.app.v6.common.ld"
 
 ## Compile c files
 recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.cpreprocessor.flags} {compiler.c.flags} -DF_CPU={build.f_cpu} {build.lwip_flags} {build.debug_port} {build.debug_level} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_BOARD="{build.board}" {build.led} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
