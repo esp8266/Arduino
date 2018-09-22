@@ -54,8 +54,8 @@ class WiFiClientSecure : public WiFiClient {
     int read() override;
     int peek() override;
     size_t peekBytes(uint8_t *buffer, size_t length) override;
-    void stop() override;
-    void flush() override;
+    bool flush(unsigned int maxWaitMs = 0) override;
+    bool stop(unsigned int maxWaitMs = 0) override;
 
     // Don't validate the chain, just accept whatever is given.  VERY INSECURE!
     void setInsecure() {

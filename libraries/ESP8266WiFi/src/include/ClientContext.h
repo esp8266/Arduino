@@ -299,18 +299,17 @@ public:
         _rx_buf_offset = 0;
     }
 
-    void wait_until_sent()
+    bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
         // https://github.com/esp8266/Arduino/pull/3967#pullrequestreview-83451496
         // option 1 done
         // option 2 / _write_some() not necessary since _datasource is always nullptr here
 
         if (!_pcb)
-            return;
+            return true;
 
         tcp_output(_pcb);
-
-        int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS + 1;
+        max_wait_ms++;
 
         // wait for peer's acks flushing lwIP's output buffer
         while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --max_wait_ms)
@@ -322,6 +321,8 @@ public:
             DEBUGV(":wustmo\n");
         }
         #endif
+
+        return max_wait_ms > 0;
     }
 
     uint8_t state() const

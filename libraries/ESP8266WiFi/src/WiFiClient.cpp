@@ -311,19 +311,20 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
     return _client->peekBytes((char *)buffer, count);
 }
 
-void WiFiClient::flush()
+bool WiFiClient::flush(unsigned int maxWaitMs)
 {
-    if (_client)
-        _client->wait_until_sent();
+    return !_client || _client->wait_until_sent(maxWaitMs?: WIFICLIENT_MAX_FLUSH_WAIT_MS);
 }
 
-void WiFiClient::stop()
+bool WiFiClient::stop(unsigned int maxWaitMs)
 {
     if (!_client)
-        return;
+        return true;
 
-    _client->wait_until_sent();
-    _client->close();
+    bool ret = flush(maxWaitMs); // virtual, may be ssl's
+    if (_client->close() != ERR_OK)
+        ret = false;
+    return ret;
 }
 
 uint8_t WiFiClient::connected()
