@@ -335,7 +335,7 @@ public:
    * The more stations that are connected, the more memory is required.
    * Will also change the setting for the active AP if this ESP8266WiFiMesh instance is the current AP controller.
    *
-   * @param maxAPStations The maximum number of simultaneous station connections allowed. Valid values are 1 to 8.
+   * @param maxAPStations The maximum number of simultaneous station connections allowed. Valid values are 0 to 8.
    */
   void setMaxAPStations(uint8_t maxAPStations);
   bool getMaxAPStations();

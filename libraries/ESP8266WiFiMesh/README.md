@@ -74,7 +74,7 @@ General Information
 
 * This library uses the standard Arduino core for ESP8266 WiFi functions. Therefore, other code that also uses these WiFi functions may cause conflicts with the library, resulting in strange behaviour.
 
-* By default, a maximum of 4 stations can be connected at a time to each AP. This can be changed to a value in the range 1 to 8 via the `setMaxAPStations` method. Once the max number has been reached, any other station that wants to connect will be forced to wait until an already connected station disconnects. The more stations that are connected, the more memory is required.
+* By default, a maximum of 4 stations can be connected at a time to each AP. This can be changed to a value in the range 0 to 8 via the `setMaxAPStations` method. Once the max number has been reached, any other station that wants to connect will be forced to wait until an already connected station disconnects. The more stations that are connected, the more memory is required.
 
 * Unlike `WiFi.mode(WIFI_AP)`, the `WiFi.mode(WIFI_AP_STA)` which is used in this library allows nodes to stay connected to an AP they connect to while in STA mode, at the same time as they can receive connections from other stations. Nodes cannot send data to an AP while in STA_AP mode though, that requires STA mode. Switching to STA mode will sometimes disconnect stations connected to the node AP (though they can request a reconnect even while the previous AP node is in STA mode).
 

@@ -262,7 +262,7 @@ bool ESP8266WiFiMesh::getAPHidden() {return _apHidden;}
 
 void ESP8266WiFiMesh::setMaxAPStations(uint8_t maxAPStations)
 {
-  assert(1 <= maxAPStations && maxAPStations <= 8);
+  assert(0 <= maxAPStations && maxAPStations <= 8);
   
   if(_maxAPStations != maxAPStations)
   {
