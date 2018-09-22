@@ -90,3 +90,4 @@ void ESP8266WiFiClass::printDiag(Print& p) {
 }
 
 ESP8266WiFiClass WiFi;
+IfListClass ifList;

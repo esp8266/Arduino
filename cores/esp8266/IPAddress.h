@@ -29,6 +29,7 @@
 
 #if LWIP_VERSION_MAJOR == 1
 // compatibility macros to make lwIP-v1 compiling lwIP-v2 API
+#define LWIP_IPV6_NUM_ADDRESSES 0
 #define ip_2_ip4(x) (x)
 #define ipv4_addr ip_addr
 #define IP_IS_V4_VAL(x) (1)
@@ -145,6 +146,8 @@ class IPAddress: public Printable {
 
         bool isV4() const { return IP_IS_V4_VAL(_ip); }
         void setV4() { IP_SET_TYPE_VAL(_ip, IPADDR_TYPE_V4); }
+
+        bool isRoutable () const { return !ip_addr_islinklocal(&_ip); }
 
 #if LWIP_IPV6
 
