@@ -14,6 +14,10 @@ matrix:
     - env:
       - BUILD_TYPE=build_odd
     - env:
+      - BUILD_TYPE=debug_even
+    - env:
+      - BUILD_TYPE=debug_odd
+    - env:
       - BUILD_TYPE=platformio
     - env:
       - BUILD_TYPE=docs
