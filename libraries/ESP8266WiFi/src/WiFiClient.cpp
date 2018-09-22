@@ -275,6 +275,7 @@ void WiFiClient::stop()
     if (!_client)
         return;
 
+    flush();
     _client->close();
 }
 
