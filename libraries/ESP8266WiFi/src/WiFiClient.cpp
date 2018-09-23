@@ -313,7 +313,12 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
 
 bool WiFiClient::flush(unsigned int maxWaitMs)
 {
-    return !_client || _client->wait_until_sent(maxWaitMs?: WIFICLIENT_MAX_FLUSH_WAIT_MS);
+    if (!_client)
+        return true;
+
+    if (maxWaitMs == 0)
+        maxWaitMs = WIFICLIENT_MAX_FLUSH_WAIT_MS;
+    return _client->wait_until_sent(maxWaitMs);
 }
 
 bool WiFiClient::stop(unsigned int maxWaitMs)
