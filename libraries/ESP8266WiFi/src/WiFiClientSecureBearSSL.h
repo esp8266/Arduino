@@ -23,6 +23,7 @@
 
 #ifndef wificlientbearssl_h
 #define wificlientbearssl_h
+#include <vector>
 #include "WiFiClient.h"
 #include <bearssl/bearssl.h>
 #include "BearSSLHelpers.h"
@@ -104,12 +105,18 @@ class WiFiClientSecure : public WiFiClient {
       _certStore = certStore;
     }
 
+    // Select specific ciphers (i.e. optimize for speed over security)
+    // These may be in PROGMEM or RAM, either will run properly
+    bool setCiphers(const uint16_t *cipherAry, int cipherCount);
+    bool setCiphers(std::vector<uint16_t> list);
+    bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
+
     // Check for Maximum Fragment Length support for given len
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String host, uint16_t port, uint16_t len);
 
-    // AXTLS compatbile wrappers
+    // AXTLS compatible wrappers
     bool verify(const char* fingerprint, const char* domain_name) { (void) fingerprint; (void) domain_name; return false; } // Can't handle this case, need app code changes
     bool verifyCertChain(const char* domain_name) { (void)domain_name; return connected(); } // If we're connected, the cert passed validation during handshake
 
@@ -169,6 +176,10 @@ class WiFiClientSecure : public WiFiClient {
     bool _use_self_signed;
     const BearSSLPublicKey *_knownkey;
     unsigned _knownkey_usages;
+
+    // Custom cipher list pointer or NULL if default
+    uint16_t *_cipher_list;
+    uint8_t _cipher_cnt;
 
     unsigned char *_recvapp_buf;
     size_t _recvapp_len;
