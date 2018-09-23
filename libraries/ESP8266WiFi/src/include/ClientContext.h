@@ -170,7 +170,7 @@ public:
         return tcp_nagle_disabled(_pcb);
     }
 
-    void setTimeout(int timeout_ms) 
+    void setTimeout(int timeout_ms)
     {
         _timeout_ms = timeout_ms;
     }
@@ -308,15 +308,33 @@ public:
         if (!_pcb)
             return true;
 
-        tcp_output(_pcb);
+        int loop = -1;
+        int prevsndbuf = -1;
         max_wait_ms++;
 
-        // wait for peer's acks flushing lwIP's output buffer
-        while (state() == ESTABLISHED && tcp_sndbuf(_pcb) != TCP_SND_BUF && --max_wait_ms)
-            delay(1); // yields
+        // wait for peer's acks to flush lwIP's output buffer
+
+        while (1) {
+
+            // force lwIP to send what can be sent
+            tcp_output(_pcb);
+
+            int sndbuf = tcp_sndbuf(_pcb);
+            if (sndbuf != prevsndbuf) {
+                // send buffer has changed (or first iteration)
+                // we received an ack: restart the loop counter
+                prevsndbuf = sndbuf;
+                loop = max_wait_ms;
+            }
+
+            if (state() != ESTABLISHED || sndbuf == TCP_SND_BUF || --loop <= 0)
+                break;
+
+            delay(1);
+        }
 
         #ifdef DEBUGV
-        if (max_wait_ms == 0) {
+        if (loop <= 0) {
             // wait until sent: timeout
             DEBUGV(":wustmo\n");
         }
