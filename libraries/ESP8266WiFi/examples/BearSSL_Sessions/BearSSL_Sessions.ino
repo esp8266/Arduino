@@ -120,10 +120,10 @@ vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep
   uint32_t start, finish;
   BearSSL::WiFiClientSecure client;
   BearSSLX509List cert(digicert);
-  client.setTrustAnchors(&cert);
 
   Serial.printf("Connecting without sessions...");
   start = millis();
+  client.setTrustAnchors(&cert);
   fetchURL(&client, host, port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
@@ -132,18 +132,21 @@ vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep
   client.setSession(&session);
   Serial.printf("Connecting with an unitialized session...");
   start = millis();
+  client.setTrustAnchors(&cert);
   fetchURL(&client, host, port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
   Serial.printf("Connecting with the just initialized session...");
   start = millis();
+  client.setTrustAnchors(&cert);
   fetchURL(&client, host, port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
   Serial.printf("Connecting again with the initialized session...");
   start = millis();
+  client.setTrustAnchors(&cert);
   fetchURL(&client, host, port, path);
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
