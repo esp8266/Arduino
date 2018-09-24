@@ -99,7 +99,7 @@ static void onSdaChange(void);
 static ETSEvent eventTaskQueue[EVENTTASK_QUEUE_SIZE];
 static void eventTask(ETSEvent *e);
 static ETSTimer timer;
-static void onTimer(void *timer_arg);
+static void onTimer();
 
 #define SDA_LOW()   (GPES = (1 << twi_sda)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
 #define SDA_HIGH()  (GPEC = (1 << twi_sda)) //Disable SDA (becomes input and since it has pullup it will go high)
@@ -119,14 +119,17 @@ static void onTimer(void *timer_arg);
 #endif
 
 void twi_setClock(unsigned int freq){
+  preferred_si2c_clock = freq;
 #if F_CPU == FCPU80
-  if(freq <= 100000) twi_dcount = 19;//about 100KHz
+  if(freq <= 50000) twi_dcount = 38;//about 50KHz
+  else if(freq <= 100000) twi_dcount = 19;//about 100KHz
   else if(freq <= 200000) twi_dcount = 8;//about 200KHz
   else if(freq <= 300000) twi_dcount = 3;//about 300KHz
   else if(freq <= 400000) twi_dcount = 1;//about 400KHz
   else twi_dcount = 1;//about 400KHz
 #else
-  if(freq <= 100000) twi_dcount = 32;//about 100KHz
+  if(freq <= 50000) twi_dcount = 64;//about 50KHz
+  else if(freq <= 100000) twi_dcount = 32;//about 100KHz
   else if(freq <= 200000) twi_dcount = 14;//about 200KHz
   else if(freq <= 300000) twi_dcount = 8;//about 300KHz
   else if(freq <= 400000) twi_dcount = 5;//about 400KHz
@@ -142,12 +145,12 @@ void twi_setClockStretchLimit(uint32_t limit){
 
 void twi_init(unsigned char sda, unsigned char scl)
 {
-  // set timer function 
+  // set timer function
   ets_timer_setfn(&timer, onTimer, NULL);
-  
+
   // create event task
   ets_task(eventTask, EVENTTASK_QUEUE_PRIO, eventTaskQueue, EVENTTASK_QUEUE_SIZE);
-	
+
   twi_sda = sda;
   twi_scl = scl;
   pinMode(twi_sda, INPUT_PULLUP);
@@ -159,7 +162,7 @@ void twi_init(unsigned char sda, unsigned char scl)
   //pinMode(13, OUTPUT);
   //digitalWrite(2, HIGH);
   twi_setClockStretchLimit(230); // default value is 230 uS
-  
+
   if (twi_addr != 0)
   {
 	attachInterrupt(scl, onSclChange, CHANGE);
@@ -298,19 +301,19 @@ unsigned char twi_readFrom(unsigned char address, unsigned char* buf, unsigned i
   return 0;
 }
 
-uint8_t twi_status(){           
+uint8_t twi_status(){
     if (SCL_READ()==0)     return I2C_SCL_HELD_LOW;       		//SCL held low by another device, no procedure available to recover
-    int clockCount = 20;                   
+    int clockCount = 20;
 
     while (SDA_READ()==0 && clockCount>0){                      //if SDA low, read the bits slaves have to sent to a max
-        twi_read_bit();                    
+        twi_read_bit();
         if (SCL_READ()==0) return I2C_SCL_HELD_LOW_AFTER_READ;  //I2C bus error. SCL held low beyond slave clock stretch time
     }
 
     if (SDA_READ()==0)     return I2C_SDA_HELD_LOW;       		//I2C bus error. SDA line held low by slave/another_master after n bits.
 
     if(!twi_write_start()) return I2C_SDA_HELD_LOW_AFTER_INIT;  //line busy. SDA again held low by another device. 2nd master?
-    else                   return I2C_OK;       				//all ok 
+    else                   return I2C_OK;       				//all ok
 }
 
 uint8_t twi_transmit(const uint8_t* data, uint8_t length)
@@ -321,18 +324,18 @@ uint8_t twi_transmit(const uint8_t* data, uint8_t length)
   if (length > TWI_BUFFER_LENGTH) {
     return 1;
   }
-  
+
   // ensure we are currently a slave transmitter
   if (twi_state != TWI_STX) {
     return 2;
   }
-  
+
   // set length and copy data into tx buffer
   twi_txBufferLength = length;
   for (i = 0; i < length; ++i) {
     twi_txBuffer[i] = data[i];
   }
-  
+
   return 0;
 }
 
@@ -393,52 +396,6 @@ void ICACHE_RAM_ATTR twi_releaseBus(void)
 	twi_state = TWI_READY;
 }
 
-void ICACHE_RAM_ATTR onTimer(void *timer_arg)
-{
-	//digitalWrite(13, HIGH);
-	twi_releaseBus();
-	//ets_timer_disarm(&timer);
-
-	twip_status = TW_BUS_ERROR;
-	twi_onTwipEvent(twip_status);
-	twip_mode = TWIPM_WAIT;
-	twip_state = TWIP_BUS_ERR;
-	//digitalWrite(13, LOW);
-}
-
-static void eventTask(ETSEvent *e)
-{
-	//digitalWrite(14, HIGH);
-	
-	if (e == NULL) {
-		return;
-	}
-
-	switch (e->sig)
-	{
-		case TWI_SIG_TX:
-			twi_onSlaveTransmit();
-
-			// if they didn't change buffer & length, initialize it
-			if (twi_txBufferLength == 0) {
-				twi_txBufferLength = 1;
-				twi_txBuffer[0] = 0x00;
-			}
-			
-			// Initiate transmission
-			twi_onTwipEvent(TW_ST_DATA_ACK);
-			
-			break;
-
-		case TWI_SIG_RX:
-			// ack future responses and leave slave receiver state
-			twi_releaseBus();
-			twi_onSlaveReceive(twi_rxBuffer, e->par);
-			break;
-	}
-
-	//digitalWrite(14, LOW);
-}
 
 void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
 {
@@ -457,7 +414,7 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
     // Master Transmitter
     case TW_MT_SLA_ACK:  // slave receiver acked address
     case TW_MT_DATA_ACK: // slave receiver acked data
-      // if there is data to send, send it, otherwise stop 
+      // if there is data to send, send it, otherwise stop
       if(twi_masterBufferIndex < twi_masterBufferLength){
         // copy data to output register and ack
         TWDR = twi_masterBuffer[twi_masterBufferIndex++];
@@ -467,7 +424,7 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
           twi_stop();
 	else {
 	  twi_inRepStart = true;	// we're gonna send the START
-	  // don't enable the interrupt. We'll generate the start, but we 
+	  // don't enable the interrupt. We'll generate the start, but we
 	  // avoid handling the interrupt until we're in the next transaction,
 	  // at the point where we would normally issue the start.
 	  TWCR = _BV(TWINT) | _BV(TWSTA)| _BV(TWEN) ;
@@ -507,12 +464,12 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
           twi_stop();
 	else {
 	  twi_inRepStart = true;	// we're gonna send the START
-	  // don't enable the interrupt. We'll generate the start, but we 
+	  // don't enable the interrupt. We'll generate the start, but we
 	  // avoid handling the interrupt until we're in the next transaction,
 	  // at the point where we would normally issue the start.
 	  TWCR = _BV(TWINT) | _BV(TWSTA)| _BV(TWEN) ;
 	  twi_state = TWI_READY;
-	}    
+	}
 	break;
     case TW_MR_SLA_NACK: // address sent, nack received
       twi_stop();
@@ -555,13 +512,13 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
       // since we submit rx buffer to "wire" library, we can reset it
       twi_rxBufferIndex = 0;
       break;
-	  
+
     case TW_SR_DATA_NACK:       // data received, returned nack
     case TW_SR_GCALL_DATA_NACK: // data received generally, returned nack
       // nack back at master
       twi_reply(0);
       break;
-    
+
     // Slave Transmitter
     case TW_ST_SLA_ACK:          // addressed, returned ack
     case TW_ST_ARB_LOST_SLA_ACK: // arbitration lost, returned ack
@@ -576,7 +533,7 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
       // note: user must call twi_transmit(bytes, length) to do this
 	  ets_post(EVENTTASK_QUEUE_PRIO, TWI_SIG_TX, 0);
 	  break;
-	  
+
 	case TW_ST_DATA_ACK: // byte sent, ack returned
       // copy data to output register
       TWDR = twi_txBuffer[twi_txBufferIndex++];
@@ -584,7 +541,7 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
 	  bitCount = 8;
 	  bitCount--;
 	  (twi_data & 0x80) ? SDA_HIGH() : SDA_LOW();
-	  twi_data <<= 1;		
+	  twi_data <<= 1;
 
       // if there is more to send, ack, otherwise nack
       if(twi_txBufferIndex < twi_txBufferLength){
@@ -593,7 +550,7 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
         twi_reply(0);
       }
       break;
-    case TW_ST_DATA_NACK: // received nack, we are done 
+    case TW_ST_DATA_NACK: // received nack, we are done
     case TW_ST_LAST_DATA: // received ack, but we are done already!
       // leave slave receiver state
       twi_releaseBus();
@@ -610,20 +567,65 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
   //digitalWrite(13, LOW);
 }
 
+void ICACHE_RAM_ATTR onTimer()
+{
+	//digitalWrite(13, HIGH);
+	twi_releaseBus();
+	twip_status = TW_BUS_ERROR;
+	twi_onTwipEvent(twip_status);
+	twip_mode = TWIPM_WAIT;
+	twip_state = TWIP_BUS_ERR;
+	//digitalWrite(13, LOW);
+}
+
+static void eventTask(ETSEvent *e)
+{
+	//digitalWrite(14, HIGH);
+
+	if (e == NULL) {
+		return;
+	}
+
+	switch (e->sig)
+	{
+		case TWI_SIG_TX:
+			twi_onSlaveTransmit();
+
+			// if they didn't change buffer & length, initialize it
+			if (twi_txBufferLength == 0) {
+				twi_txBufferLength = 1;
+				twi_txBuffer[0] = 0x00;
+			}
+
+			// Initiate transmission
+			twi_onTwipEvent(TW_ST_DATA_ACK);
+
+			break;
+
+		case TWI_SIG_RX:
+			// ack future responses and leave slave receiver state
+			twi_releaseBus();
+			twi_onSlaveReceive(twi_rxBuffer, e->par);
+			break;
+	}
+
+	//digitalWrite(14, LOW);
+}
+
 void ICACHE_RAM_ATTR onSclChange(void)
 {
 	static uint8_t sda;
 	static uint8_t scl;
-	
+
 	//digitalWrite(2, LOW);
 	//digitalWrite(2, HIGH);
-	
+
 	sda	= SDA_READ();
 	scl = SCL_READ();
-	
+
 	//digitalWrite(12, scl);
 	//digitalWrite(14, LOW);
-	
+
 	twip_status = 0xF8;		// reset TWI status
 
 	switch (twip_state)
@@ -633,7 +635,7 @@ void ICACHE_RAM_ATTR onSclChange(void)
 		case TWIP_BUS_ERR:
 			// ignore
 			break;
-			
+
 		case TWIP_START:
 		case TWIP_REP_START:
 		case TWIP_SLA_W:
@@ -652,7 +654,7 @@ void ICACHE_RAM_ATTR onSclChange(void)
 				}
 			}
 			break;
-		
+
 		case TWIP_SEND_ACK:
 			if (scl) {
 				// ignore
@@ -673,7 +675,7 @@ void ICACHE_RAM_ATTR onSclChange(void)
 				twip_state = TWIP_WAIT_ACK;
 			}
 			break;
-			
+
 		case TWIP_WAIT_ACK:
 			if (scl) {
 				// ignore
@@ -714,7 +716,7 @@ void ICACHE_RAM_ATTR onSclChange(void)
 				}
 			}
 			break;
-		
+
 		case TWIP_SLA_R:
 		case TWIP_WRITE:
 			if (scl) {
@@ -722,8 +724,8 @@ void ICACHE_RAM_ATTR onSclChange(void)
 			} else {
 				bitCount--;
 				(twi_data & 0x80) ? SDA_HIGH() : SDA_LOW();
-				twi_data <<= 1;		
-				
+				twi_data <<= 1;
+
 				if (bitCount != 0) {
 					// continue
 				} else {
@@ -731,7 +733,7 @@ void ICACHE_RAM_ATTR onSclChange(void)
 				}
 			}
 			break;
-			
+
 		case TWIP_REC_ACK:
 			if (scl) {
 				// ignore
@@ -740,7 +742,7 @@ void ICACHE_RAM_ATTR onSclChange(void)
 				twip_state = TWIP_READ_ACK;
 			}
 			break;
-			
+
 		case TWIP_READ_ACK:
 			if (!scl) {
 				// ignore
@@ -749,7 +751,7 @@ void ICACHE_RAM_ATTR onSclChange(void)
 				twip_state = TWIP_RWAIT_ACK;
 			}
 			break;
-			
+
 		case TWIP_RWAIT_ACK:
 			if (scl) {
 				// ignore
@@ -765,10 +767,10 @@ void ICACHE_RAM_ATTR onSclChange(void)
 					twi_onTwipEvent(twip_status);
 					twip_mode = TWIPM_WAIT;
 					twip_state = TWIP_WAIT_STOP;
-				}					
+				}
 			}
 			break;
-			
+
 		default:
 			break;
 	}
@@ -780,9 +782,9 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 	static uint8_t scl;
 	sda	= SDA_READ();
 	scl = SCL_READ();
-	
+
 	//digitalWrite(2, sda);
-	
+
 	switch (twip_state)
 	{
 		case TWIP_IDLE:
@@ -799,7 +801,7 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 				//digitalWrite(14, LOW);
 			}
 			break;
-			
+
 		case TWIP_START:
 		case TWIP_REP_START:
 		case TWIP_SEND_ACK:
@@ -820,7 +822,7 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 				twip_state = TWIP_BUS_ERR;
 			}
 			break;
-		
+
 		case TWIP_WAIT_STOP:
 		case TWIP_BUS_ERR:
 			if (!scl) {
@@ -845,7 +847,7 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 				}
 			}
 			break;
-		
+
 		case TWIP_SLA_W:
 		case TWIP_READ:
 			if (!scl) {
