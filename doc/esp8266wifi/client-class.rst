@@ -21,10 +21,13 @@ Methods and properties described further down are specific to ESP8266. They are 
 flush and stop
 ~~~~~~~~~~~~~~
 
-`flush(timeoutMs)` and `stop(timeoutMs)` both have now an optional argument: timeout in millisecond and both return a boolean.
+``flush(timeoutMs)`` and ``stop(timeoutMs)`` both have now an optional argument: timeout in millisecond and both return a boolean.
+
 Default input value 0 means that effective value is left at the discretion of the implementer.
-`flush()` returning `true` indicates that output data have effectively been sent, and `false` that a timeout has occurred.
-`stop()` returns `false` in case of an issue closing the client. Depending on implementation, its parameter is given to `flush()` or ignored.
+
+``flush()`` returning ``true`` indicates that output data have effectively been sent, and ``false`` that a timeout has occurred.
+
+``stop()`` returns ``false`` in case of an issue when closing the client (for instance a timed-out ``flush``). Depending on implementation, its parameter can be passed to ``flush()``.
 
 setNoDelay
 ~~~~~~~~~~

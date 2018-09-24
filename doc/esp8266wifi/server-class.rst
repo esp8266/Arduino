@@ -32,7 +32,7 @@ This algorithm is intended to reduce TCP/IP traffic of small packets sent over t
     server.begin();
     server.setNoDelay(true);
 
-By default, NoDelay value will depends on global ``WiFiClient::getDefaultNoDelay()`` (currently false by default).
+By default, ``nodelay`` value will depends on global ``WiFiClient::getDefaultNoDelay()`` (currently false by default).
 
 However, a call to ``wiFiServer.setNoDelay()`` will override ``NoDelay`` for all new ``WiFiClient`` provided by the calling instance (``wiFiServer``).
 
