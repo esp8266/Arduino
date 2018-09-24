@@ -46,6 +46,11 @@ This algorithm is intended to reduce TCP/IP traffic of small packets sent over t
 
     client.setNoDelay(true);
 
+getNoDelay
+~~~~~~~~~~
+
+Returns whether NoDelay is enabled or not for the current connection.
+
 setSync
 ~~~~~~~
 
@@ -61,6 +66,10 @@ When set to ``true`` in ``WiFiClient`` implementation,
 - It also allows to avoid a temporary copy of data that otherwise consumes
   at most ``TCP_SND_BUF`` = (2 * ``MSS``) bytes per connection,
 
+getSync
+~~~~~~~
+
+Returns whether Sync is enabled or not for the current connection.
 
 setDefaultNoDelay and setDefaultSync
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,6 +82,10 @@ Default values are false for both ``NoDelay`` and ``Sync``.
 
 This means that Nagle is enabled by default *for all new connections*.
 
+getDefaultNoDelay and getDefaultSync
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Return the values to be used as default for NoDelay and Sync for all future connections.
 
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
@@ -93,14 +106,6 @@ Other Function Calls
     uint16_t  remotePort () 
     IPAddress  localIP () 
     uint16_t  localPort () 
-    bool  setNoDelay (bool noDelay) 
-    bool  getNoDelay () 
-    bool  setSync (bool sync) 
-    bool  getSync () 
-    (static) bool  setDefaultNoDelay (bool noDelay) 
-    (static) bool  getDefaultNoDelay () 
-    (static) bool  setDefaultSync (bool sync) 
-    (static) bool  getDefaultSync () 
 
 Documentation for the above functions is not yet prepared.
 
