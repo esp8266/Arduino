@@ -319,7 +319,7 @@ void WiFiClient::stop()
     if (!_client)
         return;
 
-    _client->wait_until_sent();
+    flush();
     _client->close();
 }
 
