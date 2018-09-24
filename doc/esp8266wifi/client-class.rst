@@ -59,7 +59,7 @@ When set to ``true`` in ``WiFiClient`` implementation,
 - It slows down transfers, and implicitely disable the Nagle algorithm.
 
 - It also allows to avoid a temporary copy of data that otherwise consumes
-  at most ``TCP_SND_BUF`` = (2*``MSS``) bytes per connection,
+  at most ``TCP_SND_BUF`` = (2 * ``MSS``) bytes per connection,
 
 
 setDefaultNoDelay and setDefaultSync
@@ -71,7 +71,7 @@ every future instance of ``WiFiClient`` (including those coming from
 
 Default values are false for both ``NoDelay`` and ``Sync``.
 
-This means that *Nagle is enabled by default* for all new connections.
+This means that Nagle is enabled by default *for all new connections*.
 
 
 Other Function Calls
