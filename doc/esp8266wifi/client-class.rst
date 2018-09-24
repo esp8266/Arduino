@@ -21,7 +21,7 @@ Methods and properties described further down are specific to ESP8266. They are 
 flush and stop
 ~~~~~~~~~~~~~~
 
-``flush(timeoutMs)`` and ``stop(timeoutMs)`` both have now an optional argument: timeout in millisecond and both return a boolean.
+``flush(timeoutMs)`` and ``stop(timeoutMs)`` both have now an optional argument: ``timeout`` in millisecond, and both return a boolean.
 
 Default input value 0 means that effective value is left at the discretion of the implementer.
 
@@ -54,23 +54,24 @@ In this mode, every ``write()`` is flushed.  It means that after a call to
 ``write()``, data are ensured to be received where they went sent to (that is
 ``flush`` semantic).
 
-In ``WiFiClient`` implementation,
+When set to ``true`` in ``WiFiClient`` implementation,
+
+- It slows down transfers, and implicitely disable the Nagle algorithm.
 
 - It also allows to avoid a temporary copy of data that otherwise consumes
-  at most TCP_SND_BUF = (2*MSS) bytes per connection,
-
-- When set to true, it slows down transfers, and implicitely disable the
-  Nagle algorithm.
+  at most ``TCP_SND_BUF`` = (2*``MSS``) bytes per connection,
 
 
 setDefaultNoDelay and setDefaultSync
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-These set the default value for both setSync and setNoDelay for every future
-instance of ``WiFiClient`` (including those coming from ``WiFiServer.available()``).
+These set the default value for both ``setSync`` and ``setNoDelay`` for
+every future instance of ``WiFiClient`` (including those coming from
+``WiFiServer.available()`` by default).
 
-Default value are false for both ``NoDelay`` and ``Sync``.  *This means that
-Nagle is enabled by default for all new connections*.
+Default values are false for both ``NoDelay`` and ``Sync``.
+
+This means that *Nagle is enabled by default* for all new connections.
 
 
 Other Function Calls
