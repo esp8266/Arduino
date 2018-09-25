@@ -33,7 +33,7 @@
 #endif
 
 #define WIFICLIENT_MAX_PACKET_SIZE TCP_MSS
-#define WIFICLIENT_MAX_FLUSH_WAIT_MS 100
+#define WIFICLIENT_MAX_FLUSH_WAIT_MS 300
 
 #define TCP_DEFAULT_KEEPALIVE_IDLE_SEC          7200 // 2 hours
 #define TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC      75   // 75 sec
@@ -72,8 +72,8 @@ public:
   size_t peekBytes(char *buffer, size_t length) {
     return peekBytes((uint8_t *) buffer, length);
   }
-  virtual void flush();
-  virtual void stop();
+  virtual bool flush(unsigned int maxWaitMs = 0);
+  virtual bool stop(unsigned int maxWaitMs = 0);
   virtual uint8_t connected();
   virtual operator bool();
 
