@@ -175,23 +175,19 @@ void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
   _iobuf_out_size = xmit;
 }
 
-void WiFiClientSecure::stop() {
-  flush();
-  if (_client) {
-    _client->wait_until_sent();
-    _client->abort();
-  }
-  WiFiClient::stop();
+bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
+  bool ret = WiFiClient::stop(maxWaitMs); // calls our virtual flush()
   // Only if we've already connected, clear the connection options
   if (_handshake_done) {
     _clearAuthenticationSettings();
   }
   _freeSSL();
+  return ret;
 }
 
-void WiFiClientSecure::flush() {
+bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
   (void) _run_until(BR_SSL_SENDAPP);
-  WiFiClient::flush();
+  return WiFiClient::flush(maxWaitMs);
 }
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
