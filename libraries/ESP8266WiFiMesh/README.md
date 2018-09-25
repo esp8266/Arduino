@@ -50,7 +50,7 @@ ESP8266WiFiMesh(requestHandlerType requestHandler, responseHandlerType responseH
 
 * This library can use static IP:s for the nodes to speed up connection times. To enable this, use the `setStaticIP` method after calling the `begin` method, as in the included example. Ensure that nodes connecting to the same AP have distinct static IP:s. Node IP:s need to be at the same subnet as the server gateway (192.168.4 for this library by default). It may also be worth noting that station gateway IP must match the IP for the server on the nodes, though this is the default setting for the library.
 
-  At the moment static IP is a global setting, meaning that all ESP8266WiFiMesh instances on a single ESP8266 share the same static IP settings.
+  At the moment static IP is a global setting, meaning that all ESP8266WiFiMesh instances on the same ESP8266 share the same static IP settings.
 
 * When Arduino core for ESP8266 version 2.4.2 or higher is used, there are optimizations available for WiFi scans and static IP use to reduce the time it takes for nodes to connect to each other. These optimizations are enabled by default. To take advantage of the static IP optimizations you also need to use lwIP2. The lwIP version can be changed in the Tools menu of Arduino IDE.
 
@@ -74,7 +74,7 @@ General Information
 
 * This library uses the standard Arduino core for ESP8266 WiFi functions. Therefore, other code that also uses these WiFi functions may cause conflicts with the library, resulting in strange behaviour.
 
-* A maximum of 5 stations can be connected at a time to each AP.
+* By default, a maximum of 4 stations can be connected at a time to each AP. This can be changed to a value in the range 0 to 8 via the `setMaxAPStations` method. Once the max number has been reached, any other station that wants to connect will be forced to wait until an already connected station disconnects. The more stations that are connected, the more memory is required.
 
 * Unlike `WiFi.mode(WIFI_AP)`, the `WiFi.mode(WIFI_AP_STA)` which is used in this library allows nodes to stay connected to an AP they connect to while in STA mode, at the same time as they can receive connections from other stations. Nodes cannot send data to an AP while in STA_AP mode though, that requires STA mode. Switching to STA mode will sometimes disconnect stations connected to the node AP (though they can request a reconnect even while the previous AP node is in STA mode).
 
