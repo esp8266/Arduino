@@ -308,13 +308,19 @@ public:
         if (!_pcb)
             return true;
 
-        int loop = -1;
         int prevsndbuf = -1;
         max_wait_ms++;
 
         // wait for peer's acks to flush lwIP's output buffer
-
+        uint32_t last_sent = millis();
         while (1) {
+            if (millis() - last_sent > (uint32_t) max_wait_ms) {
+#ifdef DEBUGV
+                // wait until sent: timeout
+                DEBUGV(":wustmo\n");
+#endif
+                break;
+            }
 
             // force lwIP to send what can be sent
             tcp_output(_pcb);
@@ -322,23 +328,17 @@ public:
             int sndbuf = tcp_sndbuf(_pcb);
             if (sndbuf != prevsndbuf) {
                 // send buffer has changed (or first iteration)
-                // we received an ack: restart the loop counter
+                // we received an ack: restart the timeout
                 prevsndbuf = sndbuf;
-                loop = max_wait_ms;
+                last_sent = millis(); // We just sent a bit, move timeout forward
             }
 
-            if (state() != ESTABLISHED || sndbuf == TCP_SND_BUF || --loop <= 0)
+            yield();
+
+            if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
                 break;
-
-            delay(1);
+            }
         }
-
-        #ifdef DEBUGV
-        if (loop <= 0) {
-            // wait until sent: timeout
-            DEBUGV(":wustmo\n");
-        }
-        #endif
 
         return max_wait_ms > 0;
     }
