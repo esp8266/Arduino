@@ -271,6 +271,7 @@ boards = collections.OrderedDict([
         'name': 'Generic ESP8285 Module',
         'opts': {
             '.build.board': 'ESP8266_ESP01',
+            '.build.variant': 'esp8285'
             },
         'macro': [
             'resetmethod_menu',
@@ -1171,7 +1172,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
         print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
         print("")
-        print('INCLUDE "eagle.app.v6.common.ld"')
+        print('INCLUDE "local.eagle.app.v6.common.ld"')
 
         if ldgen:
             sys.stdout.close()
