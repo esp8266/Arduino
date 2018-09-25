@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 #ifndef CONT_STACKSIZE
-#define CONT_STACKSIZE 4096
+#define CONT_STACKSIZE (4096+4500)
 #endif
 
 #ifdef __cplusplus

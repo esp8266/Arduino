@@ -85,17 +85,18 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
 
 
 WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
+    disable_extra4k_at_link_time();
   _cipher_list = NULL;
   _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
-  if (!_bearssl_stack) {
-    const int stacksize = 4500; // Empirically determined stack for EC and RSA connections
-    _bearssl_stack = std::shared_ptr<uint8_t>(new uint8_t[stacksize], std::default_delete<uint8_t[]>());
-    br_esp8266_stack_proxy_init(_bearssl_stack.get(), stacksize);
-  }
-  _local_bearssl_stack = _bearssl_stack;
+//  if (!_bearssl_stack) {
+//    const int stacksize = 4500; // Empirically determined stack for EC and RSA connections
+//    _bearssl_stack = std::shared_ptr<uint8_t>(new uint8_t[stacksize], std::default_delete<uint8_t[]>());
+//    br_esp8266_stack_proxy_init(_bearssl_stack.get(), stacksize);
+//  }
+//  _local_bearssl_stack = _bearssl_stack;
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
@@ -105,7 +106,7 @@ WiFiClientSecure::~WiFiClientSecure() {
   }
   free(_cipher_list);
   _freeSSL();
-  _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
+//  _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
   if (_deleteChainKeyTA) {
     delete _ta;
     delete _chain;
