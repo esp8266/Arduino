@@ -271,12 +271,12 @@ uint8_t WiFiClientSecure::connected()
     return false;
 }
 
-void WiFiClientSecure::stop()
+bool WiFiClientSecure::stop(unsigned int maxWaitMs)
 {
     if (_ssl) {
         _ssl->stop();
     }
-    WiFiClient::stop();
+    return WiFiClient::stop(maxWaitMs);
 }
 
 static bool parseHexNibble(char pb, uint8_t* res)
