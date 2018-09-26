@@ -51,7 +51,7 @@ public:
   int read() override;
   int peek() override;
   size_t peekBytes(uint8_t *buffer, size_t length) override;
-  void stop() override;
+  bool stop(unsigned int maxWaitMs = 0) override;
 
   bool setCACert(const uint8_t* pk, size_t size);
   bool setCertificate(const uint8_t* pk, size_t size);
