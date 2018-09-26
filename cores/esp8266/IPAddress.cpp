@@ -26,7 +26,7 @@ IPAddress::IPAddress() {
 }
 
 bool IPAddress::isSet () const {
-    return !ip_addr_cmp(&_ip, IP_ANY_TYPE);
+    return !ip_addr_isany(&_ip);
 }
 
 IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet) {

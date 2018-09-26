@@ -85,6 +85,8 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
 
 
 WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
+  _cipher_list = NULL;
+  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
@@ -101,6 +103,7 @@ WiFiClientSecure::~WiFiClientSecure() {
     _client->unref();
     _client = nullptr;
   }
+  free(_cipher_list);
   _freeSSL();
   _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
   if (_deleteChainKeyTA) {
@@ -172,23 +175,19 @@ void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
   _iobuf_out_size = xmit;
 }
 
-void WiFiClientSecure::stop() {
-  flush();
-  if (_client) {
-    _client->wait_until_sent();
-    _client->abort();
-  }
-  WiFiClient::stop();
+bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
+  bool ret = WiFiClient::stop(maxWaitMs); // calls our virtual flush()
   // Only if we've already connected, clear the connection options
   if (_handshake_done) {
     _clearAuthenticationSettings();
   }
   _freeSSL();
+  return ret;
 }
 
-void WiFiClientSecure::flush() {
+bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
   (void) _run_until(BR_SSL_SENDAPP);
-  WiFiClient::flush();
+  return WiFiClient::flush(maxWaitMs);
 }
 
 int WiFiClientSecure::connect(constv2 IPAddress& ip, uint16_t port) {
@@ -685,6 +684,13 @@ extern "C" {
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
   };
 
+  // For apps which want to use less secure but faster ciphers, only
+  static const uint16_t faster_suites_P[] PROGMEM = {
+    BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
+    BR_TLS_RSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_RSA_WITH_AES_256_CBC_SHA,
+    BR_TLS_RSA_WITH_AES_128_CBC_SHA };
+
   // Install hashes into the SSL engine
   static void br_ssl_client_install_hashes(br_ssl_engine_context *eng) {
     br_ssl_engine_set_hash(eng, br_md5_ID, &br_md5_vtable);
@@ -705,9 +711,9 @@ extern "C" {
   }
 
   // Default initializion for our SSL clients
-  static void br_ssl_client_base_init(br_ssl_client_context *cc) {
-    uint16_t suites[sizeof(suites_P) / sizeof(uint16_t)];
-    memcpy_P(suites, suites_P, sizeof(suites_P));
+  static void br_ssl_client_base_init(br_ssl_client_context *cc, const uint16_t *cipher_list, int cipher_cnt) {
+    uint16_t suites[cipher_cnt];
+    memcpy_P(suites, cipher_list, cipher_cnt * sizeof(cipher_list[0]));
     br_ssl_client_zero(cc);
     br_ssl_engine_set_versions(&cc->eng, BR_TLS10, BR_TLS12);
     br_ssl_engine_set_suites(&cc->eng, suites, (sizeof suites) / (sizeof suites[0]));
@@ -724,6 +730,26 @@ extern "C" {
     br_ssl_engine_set_default_chapol(&cc->eng);
   }
 
+}
+
+// Set custom list of ciphers
+bool WiFiClientSecure::setCiphers(const uint16_t *cipherAry, int cipherCount) {
+  free(_cipher_list);
+  _cipher_list = (uint16_t *)malloc(cipherCount * sizeof(uint16_t));
+  if (!_cipher_list) {
+    return false;
+  }
+  memcpy_P(_cipher_list, cipherAry, cipherCount * sizeof(uint16_t));
+  _cipher_cnt = cipherCount;
+  return true;
+}
+
+bool WiFiClientSecure::setCiphersLessSecure() {
+  return setCiphers(faster_suites_P, sizeof(faster_suites_P)/sizeof(faster_suites_P[0]));
+}
+
+bool WiFiClientSecure::setCiphers(std::vector<uint16_t> list) {
+  return setCiphers(&list[0], list.size());
 }
 
 // Installs the appropriate X509 cert validation method for a client connection
@@ -787,7 +813,12 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
     return false;
   }
 
-  br_ssl_client_base_init(_sc.get());
+  // If no cipher list yet set, use defaults
+  if (_cipher_list == NULL) {
+    br_ssl_client_base_init(_sc.get(), suites_P, sizeof(suites_P) / sizeof(uint16_t));
+  } else {
+    br_ssl_client_base_init(_sc.get(), _cipher_list, _cipher_cnt);
+  }
   // Only failure possible in the installation is OOM
   if (!_installClientX509Validator()) {
     _freeSSL();

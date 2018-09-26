@@ -23,7 +23,13 @@ extern "C" {
     #include "mem.h"
 }
 
+#ifdef malloc
+  #undef malloc
+#endif
 #define malloc      os_malloc
+#ifdef free
+  #undef free
+#endif
 #define free        os_free
 
 // #define AVRISP_DEBUG(fmt, ...)     os_printf("[AVRP] " fmt "\r\n", ##__VA_ARGS__ )

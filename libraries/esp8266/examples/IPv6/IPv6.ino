@@ -27,10 +27,10 @@
 #define PSK  "psk"
 
 #define FQDN  F("www.google.com") // with both IPv4 & IPv6 addresses
-#define FQDN6 F("par21s04-in-x04.1e100.net") // does not resolve in IPv4 (wanted: better example)
+#define FQDN6 F("ipv6.google.com") // does not resolve in IPv4
 #define STATUSDELAY_MS 30000
 #define TCP_PORT 23
-#define UDP_PORT 1111
+#define UDP_PORT 23
 
 WiFiServer statusServer(TCP_PORT);
 WiFiUDP udp;
@@ -49,47 +49,50 @@ void fqdn(Print& out, const String& fqdn) {
 }
 
 void status(Print& out) {
-  out.println();
-
-  out.print(F("address= "));
-  WiFi.localIP().printTo(out);
-  out.println();
-  out.print(F("gateway= "));
-  WiFi.gatewayIP().printTo(out);
-  out.println();
-  out.print(F("netmask= "));
-  WiFi.subnetMask().printTo(out);
-  out.println();
+  out.println(F("------------------------------"));
+  out.println(ESP.getFullVersion());
 
   for (int i = 0; i < 3; i++) {
-    out.print(F("dns"));
-    out.print(i);
-    out.print(F("= "));
-    WiFi.dnsIP(i).printTo(out);
-    out.println();
+    IPAddress dns = WiFi.dnsIP(i);
+    if (dns.isSet()) {
+      out.print(F("dns"));
+      out.print(i);
+      out.print(F("="));
+      dns.printTo(out);
+      out.println();
+    }
   }
 
-  #if LWIP_IPV6
   out.println(F("Try me at these addresses:"));
-  out.println(F("(with 'telnet <addr>')"));
-  out.println(F("(with 'nc -u <addr> 1111')"));
-  out.print(F("IPv6   link-scope(intranet)= "));
-  WiFi.localIP6Link().printTo(out);
-  out.println();
-  out.print(F("IPV6 global-scope(internet)= "));
-  WiFi.localIP6Global().printTo(out);
-  out.println();
-  #endif
+  out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
+  for (auto a : ifList) {
+    out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= ",
+               a->iface().c_str(),
+               !a->addr().isV4(),
+               a->addr().isLocal(),
+               a->hostname());
+    a->addr().printTo(out);
+
+    if (a->isLegacy()) {
+      out.print(F(" / mask:"));
+      a->netmask().printTo(out);
+      out.print(F(" / gw:"));
+      a->gw().printTo(out);
+    }
+    out.println();
+  }
 
   // lwIP's dns client will ask for IPv4 first (by default)
   // an example is provided with a fqdn which does not resolve with IPv4
   fqdn(out, FQDN);
   fqdn(out, FQDN6);
 
-  out.println();
+  out.println(F("------------------------------"));
 }
 
 void setup() {
+  WiFi.hostname("ipv6test");
+
   Serial.begin(115200);
   Serial.println();
   Serial.println(ESP.getFullVersion());
@@ -97,6 +100,9 @@ void setup() {
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PSK);
+
+  status(Serial);
+
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);
@@ -131,24 +137,17 @@ void loop() {
     udp.remoteIP().printTo(Serial);
     Serial.print(F(" :"));
     Serial.println(udp.remotePort());
-
-    char* buffer = (char*)malloc(packetSize + 1);
-    if (buffer) {
-      udp.read(buffer, packetSize);
-      buffer[packetSize] = 0;
-      Serial.println(F("Contents:"));
-      Serial.println(buffer);
-
-      // send a reply, to the IP address and port that sent us the packet we received
-      udp.beginPacket(udp.remoteIP(), udp.remotePort());
-      udp.write(buffer, packetSize);
-      udp.endPacket();
-      free(buffer);
-    } else {
-      Serial.println(F("udp: malloc failed"));
-      while (udp.read() >= 0);
+    int  c;
+    while ((c = udp.read()) >= 0) {
+      Serial.write(c);
     }
+
+    // send a reply, to the IP address and port that sent us the packet we received
+    udp.beginPacket(udp.remoteIP(), udp.remotePort());
+    status(udp);
+    udp.endPacket();
   }
+
 
   unsigned long now = millis();
   if (now > statusTimeMs) {
