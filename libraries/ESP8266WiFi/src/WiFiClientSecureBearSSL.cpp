@@ -116,6 +116,8 @@ WiFiClientSecure::~WiFiClientSecure() {
 WiFiClientSecure::WiFiClientSecure(ClientContext* client,
                                      const BearSSLX509List *chain, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
+  _cipher_list = NULL;
+  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _iobuf_in_size = iobuf_in_size;
@@ -133,6 +135,8 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
                                      const BearSSLX509List *chain,
                                      unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
+  _cipher_list = NULL;
+  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _iobuf_in_size = iobuf_in_size;
@@ -175,23 +179,19 @@ void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
   _iobuf_out_size = xmit;
 }
 
-void WiFiClientSecure::stop() {
-  flush();
-  if (_client) {
-    _client->wait_until_sent();
-    _client->abort();
-  }
-  WiFiClient::stop();
+bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
+  bool ret = WiFiClient::stop(maxWaitMs); // calls our virtual flush()
   // Only if we've already connected, clear the connection options
   if (_handshake_done) {
     _clearAuthenticationSettings();
   }
   _freeSSL();
+  return ret;
 }
 
-void WiFiClientSecure::flush() {
+bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
   (void) _run_until(BR_SSL_SENDAPP);
-  WiFiClient::flush();
+  return WiFiClient::flush(maxWaitMs);
 }
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
