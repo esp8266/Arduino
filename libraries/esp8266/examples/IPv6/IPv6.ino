@@ -49,14 +49,8 @@ void fqdn(Print& out, const String& fqdn) {
 }
 
 void status(Print& out) {
+  out.println(F("------------------------------"));
   out.println(ESP.getFullVersion());
-  out.print(F("IPv4: "));
-  WiFi.localIP().printTo(out);
-  out.print(F("/"));
-  WiFi.gatewayIP().printTo(out);
-  out.print(F("/"));
-  WiFi.subnetMask().printTo(out);
-  out.println();
 
   for (int i = 0; i < 3; i++) {
     IPAddress dns = WiFi.dnsIP(i);
@@ -69,26 +63,36 @@ void status(Print& out) {
     }
   }
 
-  #if LWIP_IPV6
   out.println(F("Try me at these addresses:"));
-  out.println(F("(with 'telnet <addr>' or 'nc -u <addr> 23')"));
-  out.print(F("IPv6   link-scope(intranet)= "));
-  WiFi.localIP6Link().printTo(out);
-  out.println();
-  out.print(F("IPV6 global-scope(internet)= "));
-  WiFi.localIP6Global().printTo(out);
-  out.println();
-  #endif
+  out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
+  for (auto a : ifList) {
+    out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= ",
+               a->iface().c_str(),
+               !a->addr().isV4(),
+               a->addr().isLocal(),
+               a->hostname());
+    a->addr().printTo(out);
+
+    if (a->isLegacy()) {
+      out.print(F(" / mask:"));
+      a->netmask().printTo(out);
+      out.print(F(" / gw:"));
+      a->gw().printTo(out);
+    }
+    out.println();
+  }
 
   // lwIP's dns client will ask for IPv4 first (by default)
   // an example is provided with a fqdn which does not resolve with IPv4
   fqdn(out, FQDN);
   fqdn(out, FQDN6);
 
-  out.println();
+  out.println(F("------------------------------"));
 }
 
 void setup() {
+  WiFi.hostname("ipv6test");
+
   Serial.begin(115200);
   Serial.println();
   Serial.println(ESP.getFullVersion());
@@ -96,6 +100,9 @@ void setup() {
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PSK);
+
+  status(Serial);
+
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);
