@@ -96,7 +96,6 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
 
 
 WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
-    disable_extra4k_at_link_time();
   _cipher_list = NULL;
   _cipher_cnt = 0;
   _clear();

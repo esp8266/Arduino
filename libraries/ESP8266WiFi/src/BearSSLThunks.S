@@ -34,7 +34,7 @@ _saveStack: .word 0x00000000
 
 
 /* void SetThunkStackEnd(unsigned int *end);
- *  
+ *
  * Stores the address of the user-allocated thunking stack (be sure to pass
  * in the *end* of the stack (highest value) since stacks move down on this
  * architecture.
@@ -62,21 +62,21 @@ SetThunkStackEnd:
   .align 4
   thunk_\fcnName:
     addi a1, a1, -16      /* Allocate space for saved registers on stack */
-    
+
     s32i a0, a1, 12       /* Store A0, trounced by calls */
     s32i a15, a1, 8       /* Store A15 (our temporary one) */
-  
+
     movi a15, _saveStack  /* Store A1(SP) in temp space */
     s32i a1, a15, 0
-  
+
     movi a15, _stackEnd   /* Load A1(SP) with thunk stack */
     l32i.n a1, a15, 0
-  
+
     call0 \fcnName        /* Do the call */
-  
+
     movi a15, _saveStack  /* Restore A1(SP) */
     l32i.n a1, a15, 0
-    
+
     l32i.n a15, a1, 8     /* Restore the saved registers */
     l32i.n a0, a1, 12
 
