@@ -94,7 +94,7 @@
  * lwIP functions/structures from more than one context at a time!)
  */
 #if !defined NO_SYS || defined __DOXYGEN__
-#define NO_SYS                          1
+#define NO_SYS                          1 // 0
 #endif
 /**
  * @}
@@ -2419,28 +2419,28 @@
  * LWIP_IPV6_NUM_ADDRESSES: Number of IPv6 addresses per netif.
  */
 #if !defined LWIP_IPV6_NUM_ADDRESSES || defined __DOXYGEN__
-#define LWIP_IPV6_NUM_ADDRESSES         3
+#define LWIP_IPV6_NUM_ADDRESSES         4 // 3
 #endif
 
 /**
  * LWIP_IPV6_FORWARD==1: Forward IPv6 packets across netifs
  */
 #if !defined LWIP_IPV6_FORWARD || defined __DOXYGEN__
-#define LWIP_IPV6_FORWARD               0
+#define LWIP_IPV6_FORWARD               0 // 0
 #endif
 
 /**
  * LWIP_IPV6_FRAG==1: Fragment outgoing IPv6 packets that are too big.
  */
 #if !defined LWIP_IPV6_FRAG || defined __DOXYGEN__
-#define LWIP_IPV6_FRAG                  1
+#define LWIP_IPV6_FRAG                  0 // 1
 #endif
 
 /**
  * LWIP_IPV6_REASS==1: reassemble incoming IPv6 packets that fragmented
  */
 #if !defined LWIP_IPV6_REASS || defined __DOXYGEN__
-#define LWIP_IPV6_REASS                 LWIP_IPV6
+#define LWIP_IPV6_REASS                 0 // LWIP_IPV6
 #endif
 
 /**
@@ -2546,7 +2546,7 @@
  * is being resolved.
  */
 #if !defined LWIP_ND6_QUEUEING || defined __DOXYGEN__
-#define LWIP_ND6_QUEUEING               LWIP_IPV6
+#define LWIP_ND6_QUEUEING               0 // LWIP_IPV6
 #endif
 
 /**
@@ -2560,14 +2560,14 @@
  * LWIP_ND6_NUM_NEIGHBORS: Number of entries in IPv6 neighbor cache
  */
 #if !defined LWIP_ND6_NUM_NEIGHBORS || defined __DOXYGEN__
-#define LWIP_ND6_NUM_NEIGHBORS          10
+#define LWIP_ND6_NUM_NEIGHBORS          4 // 10
 #endif
 
 /**
  * LWIP_ND6_NUM_DESTINATIONS: number of entries in IPv6 destination cache
  */
 #if !defined LWIP_ND6_NUM_DESTINATIONS || defined __DOXYGEN__
-#define LWIP_ND6_NUM_DESTINATIONS       10
+#define LWIP_ND6_NUM_DESTINATIONS       5 // 10
 #endif
 
 /**
@@ -2581,7 +2581,7 @@
  * LWIP_ND6_NUM_ROUTERS: number of entries in IPv6 default router cache
  */
 #if !defined LWIP_ND6_NUM_ROUTERS || defined __DOXYGEN__
-#define LWIP_ND6_NUM_ROUTERS            3
+#define LWIP_ND6_NUM_ROUTERS            2 // 3
 #endif
 
 /**
@@ -2660,7 +2660,7 @@
  * servers to the DNS module.
  */
 #if !defined LWIP_ND6_RDNSS_MAX_DNS_SERVERS || defined __DOXYGEN__
-#define LWIP_ND6_RDNSS_MAX_DNS_SERVERS  0
+#define LWIP_ND6_RDNSS_MAX_DNS_SERVERS  0 // 0
 #endif
 /**
  * @}
@@ -2675,7 +2675,7 @@
  * LWIP_IPV6_DHCP6==1: enable DHCPv6 stateful/stateless address autoconfiguration.
  */
 #if !defined LWIP_IPV6_DHCP6 || defined __DOXYGEN__
-#define LWIP_IPV6_DHCP6                 0
+#define LWIP_IPV6_DHCP6                 1 // 0
 #endif
 
 /**
@@ -2699,7 +2699,7 @@
  * void dhcp6_set_ntp_servers(u8_t num_ntp_servers, ip_addr_t* ntp_server_addrs);
 */
 #if !defined LWIP_DHCP6_GET_NTP_SRV || defined __DOXYGEN__
-#define LWIP_DHCP6_GET_NTP_SRV          0
+#define LWIP_DHCP6_GET_NTP_SRV          0 // with 1: dhcp6_set_ntp_servers() must be implemented
 #endif
 
 /**

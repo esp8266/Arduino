@@ -39,6 +39,8 @@
 #define LWIP_HDR_PROT_DHCP_H
 
 #include "lwip/opt.h"
+#include "lwip/arch.h"
+#include "lwip/prot/ip4.h"
 
 #ifdef __cplusplus
 extern "C" {
