@@ -34,6 +34,7 @@ extern "C" {
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"
 #include "WiFiClientSecureBearSSL.h"
+#include "BearSSLThunks.h"
 #include "lwip/opt.h"
 #include "lwip/ip.h"
 #include "lwip/tcp.h"
@@ -42,6 +43,16 @@ extern "C" {
 #include "include/ClientContext.h"
 #include "c_types.h"
 #include "coredecls.h"
+
+#define br_ssl_engine_recvapp_ack thunk_br_ssl_engine_recvapp_ack
+#define br_ssl_engine_recvapp_buf thunk_br_ssl_engine_recvapp_buf
+#define br_ssl_engine_recvrec_ack thunk_br_ssl_engine_recvrec_ack
+#define br_ssl_engine_recvrec_buf thunk_br_ssl_engine_recvrec_buf
+#define br_ssl_engine_sendapp_ack thunk_br_ssl_engine_sendapp_ack
+#define br_ssl_engine_sendapp_buf thunk_br_ssl_engine_sendapp_buf
+#define br_ssl_engine_sendrec_ack thunk_br_ssl_engine_sendrec_ack
+#define br_ssl_engine_sendrec_buf thunk_br_ssl_engine_sendrec_buf
+
 
 namespace BearSSL {
 
@@ -91,12 +102,14 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
-//  if (!_bearssl_stack) {
-//    const int stacksize = 4500; // Empirically determined stack for EC and RSA connections
-//    _bearssl_stack = std::shared_ptr<uint8_t>(new uint8_t[stacksize], std::default_delete<uint8_t[]>());
-//    br_esp8266_stack_proxy_init(_bearssl_stack.get(), stacksize);
-//  }
-//  _local_bearssl_stack = _bearssl_stack;
+  if (!_bearssl_stack) {
+    const int stacksize = 4500; // Empirically determined stack for EC and RSA connections
+    _bearssl_stack = std::shared_ptr<uint8_t>(new uint8_t[stacksize], std::default_delete<uint8_t[]>());
+    unsigned int *endOfStack = (unsigned int *)_bearssl_stack.get();
+    endOfStack += (stacksize/4) - 1;
+    SetThunkStackEnd(endOfStack);
+  }
+  _local_bearssl_stack = _bearssl_stack;
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
@@ -106,7 +119,7 @@ WiFiClientSecure::~WiFiClientSecure() {
   }
   free(_cipher_list);
   _freeSSL();
-//  _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
+  _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
   if (_deleteChainKeyTA) {
     delete _ta;
     delete _chain;

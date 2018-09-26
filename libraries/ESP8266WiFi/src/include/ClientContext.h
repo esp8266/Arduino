@@ -327,10 +327,10 @@ public:
                 loop = max_wait_ms;
             }
 
+            delay(1);
             if (state() != ESTABLISHED || sndbuf == TCP_SND_BUF || --loop <= 0)
                 break;
 
-            delay(1);
         }
 
         #ifdef DEBUGV
