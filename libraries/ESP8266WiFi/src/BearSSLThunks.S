@@ -40,6 +40,8 @@ _saveStack: .word 0x00000000
  * architecture.
  */
 .text
+.literal_position
+
 .global SetThunkStackEnd
 .type SetThunkStackEnd, @function
 .align 4
