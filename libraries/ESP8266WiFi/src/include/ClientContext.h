@@ -508,10 +508,11 @@ protected:
             }
         }
 
-        if (has_written && (_sync || tcp_nagle_disabled(_pcb)))
+        if (has_written)
         {
-            // handle no-Nagle manually because of TCP_WRITE_FLAG_MORE
             // lwIP's tcp_output doc: "Find out what we can send and send it"
+            // *with respect to Nagle*
+            // more insights: https://lists.gnu.org/archive/html/lwip-users/2017-11/msg00134.html
             tcp_output(_pcb);
         }
 
