@@ -24,8 +24,6 @@
   Modified 8 May 2015 by Hristo Gochkov (proper post and file upload handling)
 */
 
-#ifdef ESP8266
-
 /* We need to keep track of the end of the thunking stack and the */
 /* original stack pointer (A1). Keep them local here. */
 .data
@@ -98,5 +96,3 @@ thunk br_ssl_engine_sendapp_ack
 thunk br_ssl_engine_sendapp_buf
 thunk br_ssl_engine_sendrec_ack
 thunk br_ssl_engine_sendrec_buf
-
-#endif
