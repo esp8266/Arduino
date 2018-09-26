@@ -29,7 +29,6 @@ extern "C" {
 }
 
 #include "IPAddress.h"
-#include "IfList.h"
 
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiSTA.h"

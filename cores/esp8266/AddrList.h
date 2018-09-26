@@ -1,5 +1,5 @@
 /*
- IfList.h - cycle through lwIP netif's ip addresses like a c++ list
+ AddrList.h - cycle through lwIP netif's ip addresses like a c++ list
  Copyright (c) 2018 david gauchard.  All right reserved.
 
  This library is free software; you can redistribute it and/or
@@ -21,15 +21,15 @@
   This class allows to explore all configured IP addresses
   in lwIP netifs, with that kind of c++ loop:
 
-  for (auto a: ifList) {
+  for (auto a: addrList) {
     out.printf("IF='%s' n=%d legacy=%d IPv4=%d local=%d hostname='%s' addr= ",
-               a->iface().c_str(),
-               a->number(),
-               a->addr().isLegacy(),
-               a->addr().isV4(),
-               a->addr().isLocal(),
+               a->ifname().c_str(),
+               a->ifnumber(),
+               a->isLegacy(),
+               a->isV4(),
+               a->isLocal(),
                a->hostname().c_str());
-    a->addr().printTo(out);
+    a->printTo(out);
     out.println();
   }
 
@@ -39,35 +39,35 @@
           Serial.print('.');
           delay(500);
       }
-  
+
   can be replaced with:
 
       for (bool configured = false; !configured; ) {
-          for (auto iface: ifList)
-              if ((configured = !iface->addr().isLocal())
+          for (auto addr: addrList)
+              if ((configured = !addr->isLocal())
                   break;
           Serial.print('.');
           delay(500);
       }
 
-  waiting for an IPv6 global address:              
+  waiting for an IPv6 global address:
 
       for (bool configured = false; !configured; ) {
-          for (auto iface: ifList)
-              if ((configured = (   !iface->addr()->isV4()
-                                 && !iface->addr().isLocal())))
+          for (auto addr: addrList)
+              if ((configured = (   !addr->addr()->isV4()
+                                 && !addr->isLocal())))
                   break;
           Serial.print('.');
           delay(500);
       }
-      
+
   waiting for an IPv6 global address, on a specific interface:
 
       for (bool configured = false; !configured; ) {
-          for (auto iface: ifList)
-              if ((configured = (   !iface->addr()->isV4()
-                                 && !iface->addr().isLocal()
-                                 && iface->number() == STATION_IF)))
+          for (auto addr: addrList)
+              if ((configured = (   !addr->addr()->isV4()
+                                 && !addr->isLocal()
+                                 && addr->ifnumber() == STATION_IF)))
                   break;
           Serial.print('.');
           delay(500);
@@ -87,11 +87,11 @@
 #endif
 
 
-class IfListClass {
+class AddrListClass {
 
     // no member in this class
     // lwIP's global 'struct netif* netif_list' is used
-    // designed to be used with 'for (auto x: ifList)'
+    // designed to be used with 'for (auto x: addrList)'
 
     public:
 
@@ -99,6 +99,7 @@ class IfListClass {
 
             public:
 
+                ////////////////////////////////////////////////
                 // iterator operations:
 
                 const_iterator (bool begin = true): _netif(begin? netif_list: nullptr), _num(-1) { ++*this; }
@@ -114,7 +115,7 @@ class IfListClass {
                     return ret;
                 }
 
-		const_iterator& operator++() {
+                const_iterator& operator++() {
                     while (_netif) {
                         if (++_num == IF_NUM_ADDRESSES) {
                             _num = -1;
@@ -127,19 +128,41 @@ class IfListClass {
                     return *this;
                 }
 
+                ////////////////////////////////////////////////
                 // (*iterator) emulation:
 
                 const const_iterator& operator*  () const { return *this; }
                 const const_iterator* operator-> () const { return  this; }
 
+                // legacy members (IPv4 mask/gw)
+
                 bool isLegacy() const { return _num == 0; }
-                IPAddress addr () const { return _ip_from_netif_num(); }
                 IPAddress netmask () const { return _netif->netmask; }
                 IPAddress gw () const { return _netif->gw; }
-                String iface () const { return String(_netif->name[0]) + _netif->name[1]; }
-                const char* hostname () const { return _netif->hostname?: ""; }
-                const char* mac () const { return (const char*)_netif->hwaddr; }
-                int number () const { return _netif->num; }
+
+                ////////////////////////////////////////////////
+                // common to all addresses on current interface
+
+                String ifname () const { return String(_netif->name[0]) + _netif->name[1]; }
+                const char* ifhostname () const { return _netif->hostname?: ""; }
+                const char* ifmac () const { return (const char*)_netif->hwaddr; }
+
+                // this number is STATION_IF / SOFTAP_IF / ethernet...
+                int ifnumber () const { return _netif->num; }
+
+                ////////////////////////////////////////////////
+                // access to the iterated address 
+
+                IPAddress addr () const { return _ip_from_netif_num(); }
+
+                ////////////////////////////////////////////////
+                // bring IPAddress interface to simplify arduino code
+
+                bool isV4() const { return addr().isV4(); }
+                bool isLocal() const { return addr().isLocal(); }
+                size_t printTo(Print& p) const { return addr().printTo(p); }
+
+                ////////////////////////////////////////////////
 
             protected:
 
@@ -147,7 +170,7 @@ class IfListClass {
                     return    _netif == o._netif
                            && (!_netif || _num == o._num);
                 }
-                
+
                 const ip_addr_t* _ip_from_netif_num () const {
 #if LWIP_IPV6
                     return _num? &_netif->ip6_addr[_num - 1]: &_netif->ip_addr;
@@ -160,10 +183,13 @@ class IfListClass {
                 int _num; // address index (0 is legacy, _num-1 is ip6_addr[]'s index)
         };
 
+         ////////////////////////////////////////////////
+         // pseudo iterators: begin() and end()
+         
         const const_iterator begin () const { return const_iterator(true);  }
         const const_iterator end   () const { return const_iterator(false); }
 };
 
-extern IfListClass ifList;
+extern AddrListClass addrList;
 
 #endif // __IFLIST_H

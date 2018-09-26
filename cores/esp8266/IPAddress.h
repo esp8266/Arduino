@@ -178,6 +178,6 @@ class IPAddress: public Printable {
 
 extern constv2 IPAddress IPNoAddress;
 
-#include <IfList.h>
+#include <AddrList.h>
 
 #endif

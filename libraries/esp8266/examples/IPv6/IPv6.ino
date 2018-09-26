@@ -65,12 +65,13 @@ void status(Print& out) {
 
   out.println(F("Try me at these addresses:"));
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
-  for (auto a : ifList) {
-    out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= ",
-               a->iface().c_str(),
-               !a->addr().isV4(),
-               a->addr().isLocal(),
-               a->hostname());
+  for (auto a : addrList) {
+    out.printf("IF='%s'(%d) IPv6=%d local=%d hostname='%s' addr= ",
+               a->ifname().c_str(),
+               a->ifnumber(),
+               !a->isV4(),
+               a->isLocal(),
+               a->ifhostname());
     a->addr().printTo(out);
 
     if (a->isLegacy()) {
