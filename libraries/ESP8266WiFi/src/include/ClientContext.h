@@ -483,20 +483,24 @@ protected:
             if (!next_chunk_size)
                 break;
             const uint8_t* buf = _datasource->get_buffer(next_chunk_size);
-            // use TCP_WRITE_FLAG_MORE to remove PUSH flag from packet (lwIP's doc),
-            // because PUSH code implicitely disables Nagle code (see lwIP's tcp_out.c)
-            // Notes:
-            //   PUSH is meant for peer, telling to give data to user app as soon as received
-            //   PUSH "may be set" when sender has finished sending a meaningful data block
-            //   PUSH is quite unclear in its application
-            //   Nagle is for shortly delaying outgoing data, to send less/bigger packets
-            uint8_t flags = TCP_WRITE_FLAG_MORE; // do not tcp-PuSH
+
+            uint8_t flags = 0;
+            if (next_chunk_size < _datasource->available())
+                //   PUSH is meant for peer, telling to give data to user app as soon as received
+                //   PUSH "may be set" when sender has finished sending a "meaningful" data block
+                //   PUSH does not break Nagle
+                //   #5173: windows needs this flag
+                //   more info: https://lists.gnu.org/archive/html/lwip-users/2009-11/msg00018.html
+                flags |= TCP_WRITE_FLAG_MORE; // do not tcp-PuSH (yet)
             if (!_sync)
                 // user data must be copied when data are sent but not yet acknowledged
                 // (with sync, we wait for acknowledgment before returning to user)
                 flags |= TCP_WRITE_FLAG_COPY;
+
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
+
             DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->available(), (int)err);
+
             if (err == ERR_OK) {
                 _datasource->release_buffer(buf, next_chunk_size);
                 _written += next_chunk_size;
@@ -512,7 +516,7 @@ protected:
         {
             // lwIP's tcp_output doc: "Find out what we can send and send it"
             // *with respect to Nagle*
-            // more insights: https://lists.gnu.org/archive/html/lwip-users/2017-11/msg00134.html
+            // more info: https://lists.gnu.org/archive/html/lwip-users/2017-11/msg00134.html
             tcp_output(_pcb);
         }
 
