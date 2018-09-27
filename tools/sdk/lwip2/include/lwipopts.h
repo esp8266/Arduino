@@ -1276,14 +1276,14 @@
  * Define to 0 if your device is low on memory.
  */
 #if !defined TCP_QUEUE_OOSEQ || defined __DOXYGEN__
-#define TCP_QUEUE_OOSEQ                 LWIP_TCP
+#define TCP_QUEUE_OOSEQ                 LWIP_TCP_SACK_OUT // LWIP_TCP
 #endif
 
 /**
  * LWIP_TCP_SACK_OUT==1: TCP will support sending selective acknowledgements (SACKs).
  */
 #if !defined LWIP_TCP_SACK_OUT || defined __DOXYGEN__
-#define LWIP_TCP_SACK_OUT               1 // 0
+#error LWIP_TCP_SACK_OUT must be defined
 #endif
 
 /**
@@ -1308,7 +1308,7 @@
  * an upper limit on the MSS advertised by the remote host.
  */
 #if !defined TCP_MSS || defined __DOXYGEN__
-//#define TCP_MSS                         536  defined at compile time
+#error TCP_MSS must be defined
 #endif
 
 /**

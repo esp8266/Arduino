@@ -931,14 +931,22 @@ macros = {
     ####################### lwip
 
     'lwip2': collections.OrderedDict([
-        ( '.menu.ip.lm2', 'v2 Lower Memory' ),
-        ( '.menu.ip.lm2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.lm2.build.lwip_lib', '-llwip2' ),
-        ( '.menu.ip.lm2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
-        ( '.menu.ip.hb2', 'v2 Higher Bandwidth' ),
-        ( '.menu.ip.hb2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.hb2.build.lwip_lib', '-llwip2_1460' ),
-        ( '.menu.ip.hb2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
+        ( '.menu.ip.lm2s', 'v2 Lower Memory' ),
+        ( '.menu.ip.lm2s.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2s.build.lwip_lib', '-llwip2-536-sack' ),
+        ( '.menu.ip.lm2s.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1' ),
+        ( '.menu.ip.hb2s', 'v2 Higher Bandwidth' ),
+        ( '.menu.ip.hb2s.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2s.build.lwip_lib', '-llwip2-1460-sack' ),
+        ( '.menu.ip.hb2s.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1' ),
+        ( '.menu.ip.lm2n', 'v2 Lower Memory (no SACK)' ),
+        ( '.menu.ip.lm2n.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2n.build.lwip_lib', '-llwip2-536' ),
+        ( '.menu.ip.lm2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0' ),
+        ( '.menu.ip.hb2n', 'v2 Higher Bandwidth (no SACK)' ),
+        ( '.menu.ip.hb2n.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2n.build.lwip_lib', '-llwip2-1460' ),
+        ( '.menu.ip.hb2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0' ),
         ]),
 
     'lwip': collections.OrderedDict([

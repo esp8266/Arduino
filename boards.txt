@@ -261,14 +261,22 @@ generic.menu.led.14=14
 generic.menu.led.14.build.led=-DLED_BUILTIN=14
 generic.menu.led.15=15
 generic.menu.led.15.build.led=-DLED_BUILTIN=15
-generic.menu.ip.lm2=v2 Lower Memory
-generic.menu.ip.lm2.build.lwip_include=lwip2/include
-generic.menu.ip.lm2.build.lwip_lib=-llwip2
-generic.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-generic.menu.ip.hb2=v2 Higher Bandwidth
-generic.menu.ip.hb2.build.lwip_include=lwip2/include
-generic.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-generic.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+generic.menu.ip.lm2s=v2 Lower Memory
+generic.menu.ip.lm2s.build.lwip_include=lwip2/include
+generic.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+generic.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+generic.menu.ip.hb2s=v2 Higher Bandwidth
+generic.menu.ip.hb2s.build.lwip_include=lwip2/include
+generic.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+generic.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+generic.menu.ip.lm2n=v2 Lower Memory (no SACK)
+generic.menu.ip.lm2n.build.lwip_include=lwip2/include
+generic.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+generic.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+generic.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+generic.menu.ip.hb2n.build.lwip_include=lwip2/include
+generic.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+generic.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 generic.menu.ip.hb1=v1.4 Higher Bandwidth
 generic.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 generic.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -483,14 +491,22 @@ esp8285.menu.led.14=14
 esp8285.menu.led.14.build.led=-DLED_BUILTIN=14
 esp8285.menu.led.15=15
 esp8285.menu.led.15.build.led=-DLED_BUILTIN=15
-esp8285.menu.ip.lm2=v2 Lower Memory
-esp8285.menu.ip.lm2.build.lwip_include=lwip2/include
-esp8285.menu.ip.lm2.build.lwip_lib=-llwip2
-esp8285.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-esp8285.menu.ip.hb2=v2 Higher Bandwidth
-esp8285.menu.ip.hb2.build.lwip_include=lwip2/include
-esp8285.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-esp8285.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+esp8285.menu.ip.lm2s=v2 Lower Memory
+esp8285.menu.ip.lm2s.build.lwip_include=lwip2/include
+esp8285.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+esp8285.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+esp8285.menu.ip.hb2s=v2 Higher Bandwidth
+esp8285.menu.ip.hb2s.build.lwip_include=lwip2/include
+esp8285.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+esp8285.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+esp8285.menu.ip.lm2n=v2 Lower Memory (no SACK)
+esp8285.menu.ip.lm2n.build.lwip_include=lwip2/include
+esp8285.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+esp8285.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+esp8285.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+esp8285.menu.ip.hb2n.build.lwip_include=lwip2/include
+esp8285.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+esp8285.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 esp8285.menu.ip.hb1=v1.4 Higher Bandwidth
 esp8285.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 esp8285.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -643,14 +659,22 @@ espduino.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 espduino.menu.eesz.4M3M.build.spiffs_pagesize=256
 espduino.menu.eesz.4M3M.upload.maximum_size=1044464
 espduino.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-espduino.menu.ip.lm2=v2 Lower Memory
-espduino.menu.ip.lm2.build.lwip_include=lwip2/include
-espduino.menu.ip.lm2.build.lwip_lib=-llwip2
-espduino.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espduino.menu.ip.hb2=v2 Higher Bandwidth
-espduino.menu.ip.hb2.build.lwip_include=lwip2/include
-espduino.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espduino.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espduino.menu.ip.lm2s=v2 Lower Memory
+espduino.menu.ip.lm2s.build.lwip_include=lwip2/include
+espduino.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+espduino.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+espduino.menu.ip.hb2s=v2 Higher Bandwidth
+espduino.menu.ip.hb2s.build.lwip_include=lwip2/include
+espduino.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+espduino.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+espduino.menu.ip.lm2n=v2 Lower Memory (no SACK)
+espduino.menu.ip.lm2n.build.lwip_include=lwip2/include
+espduino.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espduino.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+espduino.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+espduino.menu.ip.hb2n.build.lwip_include=lwip2/include
+espduino.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espduino.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 espduino.menu.ip.hb1=v1.4 Higher Bandwidth
 espduino.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espduino.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -795,14 +819,22 @@ huzzah.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 huzzah.menu.eesz.4M3M.build.spiffs_pagesize=256
 huzzah.menu.eesz.4M3M.upload.maximum_size=1044464
 huzzah.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-huzzah.menu.ip.lm2=v2 Lower Memory
-huzzah.menu.ip.lm2.build.lwip_include=lwip2/include
-huzzah.menu.ip.lm2.build.lwip_lib=-llwip2
-huzzah.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-huzzah.menu.ip.hb2=v2 Higher Bandwidth
-huzzah.menu.ip.hb2.build.lwip_include=lwip2/include
-huzzah.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-huzzah.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+huzzah.menu.ip.lm2s=v2 Lower Memory
+huzzah.menu.ip.lm2s.build.lwip_include=lwip2/include
+huzzah.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+huzzah.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+huzzah.menu.ip.hb2s=v2 Higher Bandwidth
+huzzah.menu.ip.hb2s.build.lwip_include=lwip2/include
+huzzah.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+huzzah.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+huzzah.menu.ip.lm2n=v2 Lower Memory (no SACK)
+huzzah.menu.ip.lm2n.build.lwip_include=lwip2/include
+huzzah.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+huzzah.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+huzzah.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+huzzah.menu.ip.hb2n.build.lwip_include=lwip2/include
+huzzah.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+huzzah.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 huzzah.menu.ip.hb1=v1.4 Higher Bandwidth
 huzzah.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 huzzah.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -950,14 +982,22 @@ cw01.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 cw01.menu.eesz.4M3M.build.spiffs_pagesize=256
 cw01.menu.eesz.4M3M.upload.maximum_size=1044464
 cw01.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-cw01.menu.ip.lm2=v2 Lower Memory
-cw01.menu.ip.lm2.build.lwip_include=lwip2/include
-cw01.menu.ip.lm2.build.lwip_lib=-llwip2
-cw01.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-cw01.menu.ip.hb2=v2 Higher Bandwidth
-cw01.menu.ip.hb2.build.lwip_include=lwip2/include
-cw01.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-cw01.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+cw01.menu.ip.lm2s=v2 Lower Memory
+cw01.menu.ip.lm2s.build.lwip_include=lwip2/include
+cw01.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+cw01.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+cw01.menu.ip.hb2s=v2 Higher Bandwidth
+cw01.menu.ip.hb2s.build.lwip_include=lwip2/include
+cw01.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+cw01.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+cw01.menu.ip.lm2n=v2 Lower Memory (no SACK)
+cw01.menu.ip.lm2n.build.lwip_include=lwip2/include
+cw01.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+cw01.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+cw01.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+cw01.menu.ip.hb2n.build.lwip_include=lwip2/include
+cw01.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+cw01.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 cw01.menu.ip.hb1=v1.4 Higher Bandwidth
 cw01.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 cw01.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1105,14 +1145,22 @@ espresso_lite_v1.menu.ResetMethod.ck=ck
 espresso_lite_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v1.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v1.menu.ip.lm2=v2 Lower Memory
-espresso_lite_v1.menu.ip.lm2.build.lwip_include=lwip2/include
-espresso_lite_v1.menu.ip.lm2.build.lwip_lib=-llwip2
-espresso_lite_v1.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espresso_lite_v1.menu.ip.hb2=v2 Higher Bandwidth
-espresso_lite_v1.menu.ip.hb2.build.lwip_include=lwip2/include
-espresso_lite_v1.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espresso_lite_v1.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espresso_lite_v1.menu.ip.lm2s=v2 Lower Memory
+espresso_lite_v1.menu.ip.lm2s.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+espresso_lite_v1.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+espresso_lite_v1.menu.ip.hb2s=v2 Higher Bandwidth
+espresso_lite_v1.menu.ip.hb2s.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+espresso_lite_v1.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+espresso_lite_v1.menu.ip.lm2n=v2 Lower Memory (no SACK)
+espresso_lite_v1.menu.ip.lm2n.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espresso_lite_v1.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+espresso_lite_v1.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+espresso_lite_v1.menu.ip.hb2n.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espresso_lite_v1.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 espresso_lite_v1.menu.ip.hb1=v1.4 Higher Bandwidth
 espresso_lite_v1.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espresso_lite_v1.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1260,14 +1308,22 @@ espresso_lite_v2.menu.ResetMethod.ck=ck
 espresso_lite_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v2.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v2.menu.ip.lm2=v2 Lower Memory
-espresso_lite_v2.menu.ip.lm2.build.lwip_include=lwip2/include
-espresso_lite_v2.menu.ip.lm2.build.lwip_lib=-llwip2
-espresso_lite_v2.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espresso_lite_v2.menu.ip.hb2=v2 Higher Bandwidth
-espresso_lite_v2.menu.ip.hb2.build.lwip_include=lwip2/include
-espresso_lite_v2.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espresso_lite_v2.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espresso_lite_v2.menu.ip.lm2s=v2 Lower Memory
+espresso_lite_v2.menu.ip.lm2s.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+espresso_lite_v2.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+espresso_lite_v2.menu.ip.hb2s=v2 Higher Bandwidth
+espresso_lite_v2.menu.ip.hb2s.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+espresso_lite_v2.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+espresso_lite_v2.menu.ip.lm2n=v2 Lower Memory (no SACK)
+espresso_lite_v2.menu.ip.lm2n.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espresso_lite_v2.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+espresso_lite_v2.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+espresso_lite_v2.menu.ip.hb2n.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espresso_lite_v2.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 espresso_lite_v2.menu.ip.hb1=v1.4 Higher Bandwidth
 espresso_lite_v2.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espresso_lite_v2.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1415,14 +1471,22 @@ phoenix_v1.menu.ResetMethod.ck=ck
 phoenix_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v1.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v1.menu.ip.lm2=v2 Lower Memory
-phoenix_v1.menu.ip.lm2.build.lwip_include=lwip2/include
-phoenix_v1.menu.ip.lm2.build.lwip_lib=-llwip2
-phoenix_v1.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-phoenix_v1.menu.ip.hb2=v2 Higher Bandwidth
-phoenix_v1.menu.ip.hb2.build.lwip_include=lwip2/include
-phoenix_v1.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-phoenix_v1.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+phoenix_v1.menu.ip.lm2s=v2 Lower Memory
+phoenix_v1.menu.ip.lm2s.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+phoenix_v1.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+phoenix_v1.menu.ip.hb2s=v2 Higher Bandwidth
+phoenix_v1.menu.ip.hb2s.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+phoenix_v1.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+phoenix_v1.menu.ip.lm2n=v2 Lower Memory (no SACK)
+phoenix_v1.menu.ip.lm2n.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+phoenix_v1.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+phoenix_v1.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+phoenix_v1.menu.ip.hb2n.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+phoenix_v1.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 phoenix_v1.menu.ip.hb1=v1.4 Higher Bandwidth
 phoenix_v1.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 phoenix_v1.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1570,14 +1634,22 @@ phoenix_v2.menu.ResetMethod.ck=ck
 phoenix_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v2.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v2.menu.ip.lm2=v2 Lower Memory
-phoenix_v2.menu.ip.lm2.build.lwip_include=lwip2/include
-phoenix_v2.menu.ip.lm2.build.lwip_lib=-llwip2
-phoenix_v2.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-phoenix_v2.menu.ip.hb2=v2 Higher Bandwidth
-phoenix_v2.menu.ip.hb2.build.lwip_include=lwip2/include
-phoenix_v2.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-phoenix_v2.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+phoenix_v2.menu.ip.lm2s=v2 Lower Memory
+phoenix_v2.menu.ip.lm2s.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+phoenix_v2.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+phoenix_v2.menu.ip.hb2s=v2 Higher Bandwidth
+phoenix_v2.menu.ip.hb2s.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+phoenix_v2.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+phoenix_v2.menu.ip.lm2n=v2 Lower Memory (no SACK)
+phoenix_v2.menu.ip.lm2n.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+phoenix_v2.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+phoenix_v2.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+phoenix_v2.menu.ip.hb2n.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+phoenix_v2.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 phoenix_v2.menu.ip.hb1=v1.4 Higher Bandwidth
 phoenix_v2.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 phoenix_v2.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1722,14 +1794,22 @@ nodemcu.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 nodemcu.menu.eesz.4M3M.build.spiffs_pagesize=256
 nodemcu.menu.eesz.4M3M.upload.maximum_size=1044464
 nodemcu.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-nodemcu.menu.ip.lm2=v2 Lower Memory
-nodemcu.menu.ip.lm2.build.lwip_include=lwip2/include
-nodemcu.menu.ip.lm2.build.lwip_lib=-llwip2
-nodemcu.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-nodemcu.menu.ip.hb2=v2 Higher Bandwidth
-nodemcu.menu.ip.hb2.build.lwip_include=lwip2/include
-nodemcu.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-nodemcu.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+nodemcu.menu.ip.lm2s=v2 Lower Memory
+nodemcu.menu.ip.lm2s.build.lwip_include=lwip2/include
+nodemcu.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+nodemcu.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+nodemcu.menu.ip.hb2s=v2 Higher Bandwidth
+nodemcu.menu.ip.hb2s.build.lwip_include=lwip2/include
+nodemcu.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+nodemcu.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+nodemcu.menu.ip.lm2n=v2 Lower Memory (no SACK)
+nodemcu.menu.ip.lm2n.build.lwip_include=lwip2/include
+nodemcu.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+nodemcu.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+nodemcu.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+nodemcu.menu.ip.hb2n.build.lwip_include=lwip2/include
+nodemcu.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+nodemcu.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 nodemcu.menu.ip.hb1=v1.4 Higher Bandwidth
 nodemcu.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 nodemcu.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1874,14 +1954,22 @@ nodemcuv2.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 nodemcuv2.menu.eesz.4M3M.build.spiffs_pagesize=256
 nodemcuv2.menu.eesz.4M3M.upload.maximum_size=1044464
 nodemcuv2.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-nodemcuv2.menu.ip.lm2=v2 Lower Memory
-nodemcuv2.menu.ip.lm2.build.lwip_include=lwip2/include
-nodemcuv2.menu.ip.lm2.build.lwip_lib=-llwip2
-nodemcuv2.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-nodemcuv2.menu.ip.hb2=v2 Higher Bandwidth
-nodemcuv2.menu.ip.hb2.build.lwip_include=lwip2/include
-nodemcuv2.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-nodemcuv2.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+nodemcuv2.menu.ip.lm2s=v2 Lower Memory
+nodemcuv2.menu.ip.lm2s.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+nodemcuv2.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+nodemcuv2.menu.ip.hb2s=v2 Higher Bandwidth
+nodemcuv2.menu.ip.hb2s.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+nodemcuv2.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+nodemcuv2.menu.ip.lm2n=v2 Lower Memory (no SACK)
+nodemcuv2.menu.ip.lm2n.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+nodemcuv2.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+nodemcuv2.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+nodemcuv2.menu.ip.hb2n.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+nodemcuv2.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 nodemcuv2.menu.ip.hb1=v1.4 Higher Bandwidth
 nodemcuv2.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 nodemcuv2.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2019,14 +2107,22 @@ modwifi.menu.eesz.2M1M.build.flash_ld=eagle.flash.2m1m.ld
 modwifi.menu.eesz.2M1M.build.spiffs_pagesize=256
 modwifi.menu.eesz.2M1M.upload.maximum_size=1044464
 modwifi.menu.eesz.2M1M.build.rfcal_addr=0x1FC000
-modwifi.menu.ip.lm2=v2 Lower Memory
-modwifi.menu.ip.lm2.build.lwip_include=lwip2/include
-modwifi.menu.ip.lm2.build.lwip_lib=-llwip2
-modwifi.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-modwifi.menu.ip.hb2=v2 Higher Bandwidth
-modwifi.menu.ip.hb2.build.lwip_include=lwip2/include
-modwifi.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-modwifi.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+modwifi.menu.ip.lm2s=v2 Lower Memory
+modwifi.menu.ip.lm2s.build.lwip_include=lwip2/include
+modwifi.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+modwifi.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+modwifi.menu.ip.hb2s=v2 Higher Bandwidth
+modwifi.menu.ip.hb2s.build.lwip_include=lwip2/include
+modwifi.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+modwifi.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+modwifi.menu.ip.lm2n=v2 Lower Memory (no SACK)
+modwifi.menu.ip.lm2n.build.lwip_include=lwip2/include
+modwifi.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+modwifi.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+modwifi.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+modwifi.menu.ip.hb2n.build.lwip_include=lwip2/include
+modwifi.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+modwifi.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 modwifi.menu.ip.hb1=v1.4 Higher Bandwidth
 modwifi.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 modwifi.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2171,14 +2267,22 @@ thing.menu.eesz.512K128.build.flash_ld=eagle.flash.512k128.ld
 thing.menu.eesz.512K128.build.spiffs_pagesize=256
 thing.menu.eesz.512K128.upload.maximum_size=368624
 thing.menu.eesz.512K128.build.rfcal_addr=0x7C000
-thing.menu.ip.lm2=v2 Lower Memory
-thing.menu.ip.lm2.build.lwip_include=lwip2/include
-thing.menu.ip.lm2.build.lwip_lib=-llwip2
-thing.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-thing.menu.ip.hb2=v2 Higher Bandwidth
-thing.menu.ip.hb2.build.lwip_include=lwip2/include
-thing.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-thing.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+thing.menu.ip.lm2s=v2 Lower Memory
+thing.menu.ip.lm2s.build.lwip_include=lwip2/include
+thing.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+thing.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+thing.menu.ip.hb2s=v2 Higher Bandwidth
+thing.menu.ip.hb2s.build.lwip_include=lwip2/include
+thing.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+thing.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+thing.menu.ip.lm2n=v2 Lower Memory (no SACK)
+thing.menu.ip.lm2n.build.lwip_include=lwip2/include
+thing.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+thing.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+thing.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+thing.menu.ip.hb2n.build.lwip_include=lwip2/include
+thing.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+thing.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 thing.menu.ip.hb1=v1.4 Higher Bandwidth
 thing.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 thing.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2323,14 +2427,22 @@ thingdev.menu.eesz.512K128.build.flash_ld=eagle.flash.512k128.ld
 thingdev.menu.eesz.512K128.build.spiffs_pagesize=256
 thingdev.menu.eesz.512K128.upload.maximum_size=368624
 thingdev.menu.eesz.512K128.build.rfcal_addr=0x7C000
-thingdev.menu.ip.lm2=v2 Lower Memory
-thingdev.menu.ip.lm2.build.lwip_include=lwip2/include
-thingdev.menu.ip.lm2.build.lwip_lib=-llwip2
-thingdev.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-thingdev.menu.ip.hb2=v2 Higher Bandwidth
-thingdev.menu.ip.hb2.build.lwip_include=lwip2/include
-thingdev.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-thingdev.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+thingdev.menu.ip.lm2s=v2 Lower Memory
+thingdev.menu.ip.lm2s.build.lwip_include=lwip2/include
+thingdev.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+thingdev.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+thingdev.menu.ip.hb2s=v2 Higher Bandwidth
+thingdev.menu.ip.hb2s.build.lwip_include=lwip2/include
+thingdev.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+thingdev.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+thingdev.menu.ip.lm2n=v2 Lower Memory (no SACK)
+thingdev.menu.ip.lm2n.build.lwip_include=lwip2/include
+thingdev.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+thingdev.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+thingdev.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+thingdev.menu.ip.hb2n.build.lwip_include=lwip2/include
+thingdev.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+thingdev.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 thingdev.menu.ip.hb1=v1.4 Higher Bandwidth
 thingdev.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 thingdev.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2475,14 +2587,22 @@ esp210.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 esp210.menu.eesz.4M3M.build.spiffs_pagesize=256
 esp210.menu.eesz.4M3M.upload.maximum_size=1044464
 esp210.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-esp210.menu.ip.lm2=v2 Lower Memory
-esp210.menu.ip.lm2.build.lwip_include=lwip2/include
-esp210.menu.ip.lm2.build.lwip_lib=-llwip2
-esp210.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-esp210.menu.ip.hb2=v2 Higher Bandwidth
-esp210.menu.ip.hb2.build.lwip_include=lwip2/include
-esp210.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-esp210.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+esp210.menu.ip.lm2s=v2 Lower Memory
+esp210.menu.ip.lm2s.build.lwip_include=lwip2/include
+esp210.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+esp210.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+esp210.menu.ip.hb2s=v2 Higher Bandwidth
+esp210.menu.ip.hb2s.build.lwip_include=lwip2/include
+esp210.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+esp210.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+esp210.menu.ip.lm2n=v2 Lower Memory (no SACK)
+esp210.menu.ip.lm2n.build.lwip_include=lwip2/include
+esp210.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+esp210.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+esp210.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+esp210.menu.ip.hb2n.build.lwip_include=lwip2/include
+esp210.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+esp210.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 esp210.menu.ip.hb1=v1.4 Higher Bandwidth
 esp210.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 esp210.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2627,14 +2747,22 @@ d1_mini.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 d1_mini.menu.eesz.4M3M.build.spiffs_pagesize=256
 d1_mini.menu.eesz.4M3M.upload.maximum_size=1044464
 d1_mini.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-d1_mini.menu.ip.lm2=v2 Lower Memory
-d1_mini.menu.ip.lm2.build.lwip_include=lwip2/include
-d1_mini.menu.ip.lm2.build.lwip_lib=-llwip2
-d1_mini.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini.menu.ip.hb2=v2 Higher Bandwidth
-d1_mini.menu.ip.hb2.build.lwip_include=lwip2/include
-d1_mini.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-d1_mini.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1_mini.menu.ip.lm2s=v2 Lower Memory
+d1_mini.menu.ip.lm2s.build.lwip_include=lwip2/include
+d1_mini.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+d1_mini.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+d1_mini.menu.ip.hb2s=v2 Higher Bandwidth
+d1_mini.menu.ip.hb2s.build.lwip_include=lwip2/include
+d1_mini.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+d1_mini.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+d1_mini.menu.ip.lm2n=v2 Lower Memory (no SACK)
+d1_mini.menu.ip.lm2n.build.lwip_include=lwip2/include
+d1_mini.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+d1_mini.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+d1_mini.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+d1_mini.menu.ip.hb2n.build.lwip_include=lwip2/include
+d1_mini.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+d1_mini.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 d1_mini.menu.ip.hb1=v1.4 Higher Bandwidth
 d1_mini.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 d1_mini.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2765,14 +2893,22 @@ d1_mini_pro.menu.eesz.16M15M.build.flash_ld=eagle.flash.16m15m.ld
 d1_mini_pro.menu.eesz.16M15M.build.spiffs_pagesize=256
 d1_mini_pro.menu.eesz.16M15M.upload.maximum_size=1044464
 d1_mini_pro.menu.eesz.16M15M.build.rfcal_addr=0xFFC000
-d1_mini_pro.menu.ip.lm2=v2 Lower Memory
-d1_mini_pro.menu.ip.lm2.build.lwip_include=lwip2/include
-d1_mini_pro.menu.ip.lm2.build.lwip_lib=-llwip2
-d1_mini_pro.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini_pro.menu.ip.hb2=v2 Higher Bandwidth
-d1_mini_pro.menu.ip.hb2.build.lwip_include=lwip2/include
-d1_mini_pro.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-d1_mini_pro.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1_mini_pro.menu.ip.lm2s=v2 Lower Memory
+d1_mini_pro.menu.ip.lm2s.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+d1_mini_pro.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+d1_mini_pro.menu.ip.hb2s=v2 Higher Bandwidth
+d1_mini_pro.menu.ip.hb2s.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+d1_mini_pro.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+d1_mini_pro.menu.ip.lm2n=v2 Lower Memory (no SACK)
+d1_mini_pro.menu.ip.lm2n.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+d1_mini_pro.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+d1_mini_pro.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+d1_mini_pro.menu.ip.hb2n.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+d1_mini_pro.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 d1_mini_pro.menu.ip.hb1=v1.4 Higher Bandwidth
 d1_mini_pro.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 d1_mini_pro.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2945,14 +3081,22 @@ d1_mini_lite.menu.eesz.1M512.build.flash_ld=eagle.flash.1m512.ld
 d1_mini_lite.menu.eesz.1M512.build.spiffs_pagesize=256
 d1_mini_lite.menu.eesz.1M512.upload.maximum_size=499696
 d1_mini_lite.menu.eesz.1M512.build.rfcal_addr=0xFC000
-d1_mini_lite.menu.ip.lm2=v2 Lower Memory
-d1_mini_lite.menu.ip.lm2.build.lwip_include=lwip2/include
-d1_mini_lite.menu.ip.lm2.build.lwip_lib=-llwip2
-d1_mini_lite.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini_lite.menu.ip.hb2=v2 Higher Bandwidth
-d1_mini_lite.menu.ip.hb2.build.lwip_include=lwip2/include
-d1_mini_lite.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-d1_mini_lite.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1_mini_lite.menu.ip.lm2s=v2 Lower Memory
+d1_mini_lite.menu.ip.lm2s.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+d1_mini_lite.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+d1_mini_lite.menu.ip.hb2s=v2 Higher Bandwidth
+d1_mini_lite.menu.ip.hb2s.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+d1_mini_lite.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+d1_mini_lite.menu.ip.lm2n=v2 Lower Memory (no SACK)
+d1_mini_lite.menu.ip.lm2n.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+d1_mini_lite.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+d1_mini_lite.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+d1_mini_lite.menu.ip.hb2n.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+d1_mini_lite.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 d1_mini_lite.menu.ip.hb1=v1.4 Higher Bandwidth
 d1_mini_lite.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 d1_mini_lite.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3097,14 +3241,22 @@ d1.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 d1.menu.eesz.4M3M.build.spiffs_pagesize=256
 d1.menu.eesz.4M3M.upload.maximum_size=1044464
 d1.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-d1.menu.ip.lm2=v2 Lower Memory
-d1.menu.ip.lm2.build.lwip_include=lwip2/include
-d1.menu.ip.lm2.build.lwip_lib=-llwip2
-d1.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1.menu.ip.hb2=v2 Higher Bandwidth
-d1.menu.ip.hb2.build.lwip_include=lwip2/include
-d1.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-d1.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1.menu.ip.lm2s=v2 Lower Memory
+d1.menu.ip.lm2s.build.lwip_include=lwip2/include
+d1.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+d1.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+d1.menu.ip.hb2s=v2 Higher Bandwidth
+d1.menu.ip.hb2s.build.lwip_include=lwip2/include
+d1.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+d1.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+d1.menu.ip.lm2n=v2 Lower Memory (no SACK)
+d1.menu.ip.lm2n.build.lwip_include=lwip2/include
+d1.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+d1.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+d1.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+d1.menu.ip.hb2n.build.lwip_include=lwip2/include
+d1.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+d1.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 d1.menu.ip.hb1=v1.4 Higher Bandwidth
 d1.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 d1.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3252,14 +3404,22 @@ espino.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 espino.menu.eesz.4M3M.build.spiffs_pagesize=256
 espino.menu.eesz.4M3M.upload.maximum_size=1044464
 espino.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-espino.menu.ip.lm2=v2 Lower Memory
-espino.menu.ip.lm2.build.lwip_include=lwip2/include
-espino.menu.ip.lm2.build.lwip_lib=-llwip2
-espino.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espino.menu.ip.hb2=v2 Higher Bandwidth
-espino.menu.ip.hb2.build.lwip_include=lwip2/include
-espino.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espino.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espino.menu.ip.lm2s=v2 Lower Memory
+espino.menu.ip.lm2s.build.lwip_include=lwip2/include
+espino.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+espino.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+espino.menu.ip.hb2s=v2 Higher Bandwidth
+espino.menu.ip.hb2s.build.lwip_include=lwip2/include
+espino.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+espino.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+espino.menu.ip.lm2n=v2 Lower Memory (no SACK)
+espino.menu.ip.lm2n.build.lwip_include=lwip2/include
+espino.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espino.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+espino.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+espino.menu.ip.hb2n.build.lwip_include=lwip2/include
+espino.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espino.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 espino.menu.ip.hb1=v1.4 Higher Bandwidth
 espino.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espino.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3404,14 +3564,22 @@ espinotee.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 espinotee.menu.eesz.4M3M.build.spiffs_pagesize=256
 espinotee.menu.eesz.4M3M.upload.maximum_size=1044464
 espinotee.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-espinotee.menu.ip.lm2=v2 Lower Memory
-espinotee.menu.ip.lm2.build.lwip_include=lwip2/include
-espinotee.menu.ip.lm2.build.lwip_lib=-llwip2
-espinotee.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espinotee.menu.ip.hb2=v2 Higher Bandwidth
-espinotee.menu.ip.hb2.build.lwip_include=lwip2/include
-espinotee.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espinotee.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espinotee.menu.ip.lm2s=v2 Lower Memory
+espinotee.menu.ip.lm2s.build.lwip_include=lwip2/include
+espinotee.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+espinotee.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+espinotee.menu.ip.hb2s=v2 Higher Bandwidth
+espinotee.menu.ip.hb2s.build.lwip_include=lwip2/include
+espinotee.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+espinotee.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+espinotee.menu.ip.lm2n=v2 Lower Memory (no SACK)
+espinotee.menu.ip.lm2n.build.lwip_include=lwip2/include
+espinotee.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espinotee.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+espinotee.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+espinotee.menu.ip.hb2n.build.lwip_include=lwip2/include
+espinotee.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espinotee.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 espinotee.menu.ip.hb1=v1.4 Higher Bandwidth
 espinotee.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espinotee.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3604,14 +3772,22 @@ wifinfo.menu.eesz.1M512.build.flash_ld=eagle.flash.1m512.ld
 wifinfo.menu.eesz.1M512.build.spiffs_pagesize=256
 wifinfo.menu.eesz.1M512.upload.maximum_size=499696
 wifinfo.menu.eesz.1M512.build.rfcal_addr=0xFC000
-wifinfo.menu.ip.lm2=v2 Lower Memory
-wifinfo.menu.ip.lm2.build.lwip_include=lwip2/include
-wifinfo.menu.ip.lm2.build.lwip_lib=-llwip2
-wifinfo.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wifinfo.menu.ip.hb2=v2 Higher Bandwidth
-wifinfo.menu.ip.hb2.build.lwip_include=lwip2/include
-wifinfo.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-wifinfo.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+wifinfo.menu.ip.lm2s=v2 Lower Memory
+wifinfo.menu.ip.lm2s.build.lwip_include=lwip2/include
+wifinfo.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+wifinfo.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+wifinfo.menu.ip.hb2s=v2 Higher Bandwidth
+wifinfo.menu.ip.hb2s.build.lwip_include=lwip2/include
+wifinfo.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+wifinfo.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+wifinfo.menu.ip.lm2n=v2 Lower Memory (no SACK)
+wifinfo.menu.ip.lm2n.build.lwip_include=lwip2/include
+wifinfo.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+wifinfo.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+wifinfo.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+wifinfo.menu.ip.hb2n.build.lwip_include=lwip2/include
+wifinfo.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+wifinfo.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 wifinfo.menu.ip.hb1=v1.4 Higher Bandwidth
 wifinfo.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 wifinfo.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3768,14 +3944,22 @@ arduino-esp8266.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 arduino-esp8266.menu.eesz.4M3M.build.spiffs_pagesize=256
 arduino-esp8266.menu.eesz.4M3M.upload.maximum_size=1044464
 arduino-esp8266.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-arduino-esp8266.menu.ip.lm2=v2 Lower Memory
-arduino-esp8266.menu.ip.lm2.build.lwip_include=lwip2/include
-arduino-esp8266.menu.ip.lm2.build.lwip_lib=-llwip2
-arduino-esp8266.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-arduino-esp8266.menu.ip.hb2=v2 Higher Bandwidth
-arduino-esp8266.menu.ip.hb2.build.lwip_include=lwip2/include
-arduino-esp8266.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-arduino-esp8266.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+arduino-esp8266.menu.ip.lm2s=v2 Lower Memory
+arduino-esp8266.menu.ip.lm2s.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+arduino-esp8266.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+arduino-esp8266.menu.ip.hb2s=v2 Higher Bandwidth
+arduino-esp8266.menu.ip.hb2s.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+arduino-esp8266.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+arduino-esp8266.menu.ip.lm2n=v2 Lower Memory (no SACK)
+arduino-esp8266.menu.ip.lm2n.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+arduino-esp8266.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+arduino-esp8266.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+arduino-esp8266.menu.ip.hb2n.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+arduino-esp8266.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 arduino-esp8266.menu.ip.hb1=v1.4 Higher Bandwidth
 arduino-esp8266.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 arduino-esp8266.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3921,14 +4105,22 @@ gen4iod.menu.eesz.512K128.build.flash_ld=eagle.flash.512k128.ld
 gen4iod.menu.eesz.512K128.build.spiffs_pagesize=256
 gen4iod.menu.eesz.512K128.upload.maximum_size=368624
 gen4iod.menu.eesz.512K128.build.rfcal_addr=0x7C000
-gen4iod.menu.ip.lm2=v2 Lower Memory
-gen4iod.menu.ip.lm2.build.lwip_include=lwip2/include
-gen4iod.menu.ip.lm2.build.lwip_lib=-llwip2
-gen4iod.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-gen4iod.menu.ip.hb2=v2 Higher Bandwidth
-gen4iod.menu.ip.hb2.build.lwip_include=lwip2/include
-gen4iod.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-gen4iod.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+gen4iod.menu.ip.lm2s=v2 Lower Memory
+gen4iod.menu.ip.lm2s.build.lwip_include=lwip2/include
+gen4iod.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+gen4iod.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+gen4iod.menu.ip.hb2s=v2 Higher Bandwidth
+gen4iod.menu.ip.hb2s.build.lwip_include=lwip2/include
+gen4iod.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+gen4iod.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+gen4iod.menu.ip.lm2n=v2 Lower Memory (no SACK)
+gen4iod.menu.ip.lm2n.build.lwip_include=lwip2/include
+gen4iod.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+gen4iod.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+gen4iod.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+gen4iod.menu.ip.hb2n.build.lwip_include=lwip2/include
+gen4iod.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+gen4iod.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 gen4iod.menu.ip.hb1=v1.4 Higher Bandwidth
 gen4iod.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 gen4iod.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -4074,14 +4266,22 @@ oak.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 oak.menu.eesz.4M3M.build.spiffs_pagesize=256
 oak.menu.eesz.4M3M.upload.maximum_size=1044464
 oak.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-oak.menu.ip.lm2=v2 Lower Memory
-oak.menu.ip.lm2.build.lwip_include=lwip2/include
-oak.menu.ip.lm2.build.lwip_lib=-llwip2
-oak.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-oak.menu.ip.hb2=v2 Higher Bandwidth
-oak.menu.ip.hb2.build.lwip_include=lwip2/include
-oak.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-oak.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+oak.menu.ip.lm2s=v2 Lower Memory
+oak.menu.ip.lm2s.build.lwip_include=lwip2/include
+oak.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+oak.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+oak.menu.ip.hb2s=v2 Higher Bandwidth
+oak.menu.ip.hb2s.build.lwip_include=lwip2/include
+oak.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+oak.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+oak.menu.ip.lm2n=v2 Lower Memory (no SACK)
+oak.menu.ip.lm2n.build.lwip_include=lwip2/include
+oak.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+oak.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+oak.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+oak.menu.ip.hb2n.build.lwip_include=lwip2/include
+oak.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+oak.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 oak.menu.ip.hb1=v1.4 Higher Bandwidth
 oak.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 oak.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -4226,14 +4426,22 @@ wifiduino.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 wifiduino.menu.eesz.4M3M.build.spiffs_pagesize=256
 wifiduino.menu.eesz.4M3M.upload.maximum_size=1044464
 wifiduino.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-wifiduino.menu.ip.lm2=v2 Lower Memory
-wifiduino.menu.ip.lm2.build.lwip_include=lwip2/include
-wifiduino.menu.ip.lm2.build.lwip_lib=-llwip2
-wifiduino.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wifiduino.menu.ip.hb2=v2 Higher Bandwidth
-wifiduino.menu.ip.hb2.build.lwip_include=lwip2/include
-wifiduino.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-wifiduino.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+wifiduino.menu.ip.lm2s=v2 Lower Memory
+wifiduino.menu.ip.lm2s.build.lwip_include=lwip2/include
+wifiduino.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+wifiduino.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+wifiduino.menu.ip.hb2s=v2 Higher Bandwidth
+wifiduino.menu.ip.hb2s.build.lwip_include=lwip2/include
+wifiduino.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+wifiduino.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+wifiduino.menu.ip.lm2n=v2 Lower Memory (no SACK)
+wifiduino.menu.ip.lm2n.build.lwip_include=lwip2/include
+wifiduino.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+wifiduino.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+wifiduino.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+wifiduino.menu.ip.hb2n.build.lwip_include=lwip2/include
+wifiduino.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+wifiduino.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 wifiduino.menu.ip.hb1=v1.4 Higher Bandwidth
 wifiduino.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 wifiduino.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -4437,14 +4645,22 @@ wifi_slot.menu.eesz.2M1M.build.flash_ld=eagle.flash.2m1m.ld
 wifi_slot.menu.eesz.2M1M.build.spiffs_pagesize=256
 wifi_slot.menu.eesz.2M1M.upload.maximum_size=1044464
 wifi_slot.menu.eesz.2M1M.build.rfcal_addr=0x1FC000
-wifi_slot.menu.ip.lm2=v2 Lower Memory
-wifi_slot.menu.ip.lm2.build.lwip_include=lwip2/include
-wifi_slot.menu.ip.lm2.build.lwip_lib=-llwip2
-wifi_slot.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wifi_slot.menu.ip.hb2=v2 Higher Bandwidth
-wifi_slot.menu.ip.hb2.build.lwip_include=lwip2/include
-wifi_slot.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-wifi_slot.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+wifi_slot.menu.ip.lm2s=v2 Lower Memory
+wifi_slot.menu.ip.lm2s.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+wifi_slot.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+wifi_slot.menu.ip.hb2s=v2 Higher Bandwidth
+wifi_slot.menu.ip.hb2s.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+wifi_slot.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+wifi_slot.menu.ip.lm2n=v2 Lower Memory (no SACK)
+wifi_slot.menu.ip.lm2n.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+wifi_slot.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+wifi_slot.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+wifi_slot.menu.ip.hb2n.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+wifi_slot.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 wifi_slot.menu.ip.hb1=v1.4 Higher Bandwidth
 wifi_slot.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 wifi_slot.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -4589,14 +4805,22 @@ wiolink.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
 wiolink.menu.eesz.4M3M.build.spiffs_pagesize=256
 wiolink.menu.eesz.4M3M.upload.maximum_size=1044464
 wiolink.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
-wiolink.menu.ip.lm2=v2 Lower Memory
-wiolink.menu.ip.lm2.build.lwip_include=lwip2/include
-wiolink.menu.ip.lm2.build.lwip_lib=-llwip2
-wiolink.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wiolink.menu.ip.hb2=v2 Higher Bandwidth
-wiolink.menu.ip.hb2.build.lwip_include=lwip2/include
-wiolink.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-wiolink.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+wiolink.menu.ip.lm2s=v2 Lower Memory
+wiolink.menu.ip.lm2s.build.lwip_include=lwip2/include
+wiolink.menu.ip.lm2s.build.lwip_lib=-llwip2-536-sack
+wiolink.menu.ip.lm2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=1
+wiolink.menu.ip.hb2s=v2 Higher Bandwidth
+wiolink.menu.ip.hb2s.build.lwip_include=lwip2/include
+wiolink.menu.ip.hb2s.build.lwip_lib=-llwip2-1460-sack
+wiolink.menu.ip.hb2s.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=1
+wiolink.menu.ip.lm2n=v2 Lower Memory (no SACK)
+wiolink.menu.ip.lm2n.build.lwip_include=lwip2/include
+wiolink.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+wiolink.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_TCP_SACK_OUT=0
+wiolink.menu.ip.hb2n=v2 Higher Bandwidth (no SACK)
+wiolink.menu.ip.hb2n.build.lwip_include=lwip2/include
+wiolink.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+wiolink.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_TCP_SACK_OUT=0
 wiolink.menu.ip.hb1=v1.4 Higher Bandwidth
 wiolink.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 wiolink.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
