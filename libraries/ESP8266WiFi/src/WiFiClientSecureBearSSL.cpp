@@ -72,6 +72,9 @@ void WiFiClientSecure::_clear() {
   _recvapp_len = 0;
   _oom_err = false;
   _deleteChainKeyTA = false;
+  _session = nullptr;
+  _cipher_list = NULL;
+  _cipher_cnt = 0;
 }
 
 void WiFiClientSecure::_clearAuthenticationSettings() {
@@ -85,8 +88,6 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
 
 
 WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
-  _cipher_list = NULL;
-  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
@@ -116,8 +117,6 @@ WiFiClientSecure::~WiFiClientSecure() {
 WiFiClientSecure::WiFiClientSecure(ClientContext* client,
                                      const BearSSLX509List *chain, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
-  _cipher_list = NULL;
-  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _iobuf_in_size = iobuf_in_size;
@@ -135,8 +134,6 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
                                      const BearSSLX509List *chain,
                                      unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
-  _cipher_list = NULL;
-  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _iobuf_in_size = iobuf_in_size;
@@ -181,8 +178,11 @@ void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
 
 bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
   bool ret = WiFiClient::stop(maxWaitMs); // calls our virtual flush()
-  // Only if we've already connected, clear the connection options
+  // Only if we've already connected, store session params and clear the connection options
   if (_handshake_done) {
+    if (_session) {
+      br_ssl_engine_get_session_parameters(_eng, _session->getSession());
+    }
     _clearAuthenticationSettings();
   }
   _freeSSL();
@@ -869,7 +869,12 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
                                 _cert_issuer_key_type, br_ec_get_default(), br_ecdsa_sign_asn1_get_default());
   }
 
-  if (!br_ssl_client_reset(_sc.get(), hostName, 0)) {
+  // Restore session from the storage spot, if present
+  if (_session) {
+    br_ssl_engine_set_session_parameters(_eng, _session->getSession());
+  }
+
+  if (!br_ssl_client_reset(_sc.get(), hostName, _session?1:0)) {
     _freeSSL();
     return false;
   }
