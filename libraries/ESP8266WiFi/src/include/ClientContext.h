@@ -308,13 +308,19 @@ public:
         if (!_pcb)
             return true;
 
-        int loop = -1;
         int prevsndbuf = -1;
-        max_wait_ms++;
 
         // wait for peer's acks to flush lwIP's output buffer
-
+        uint32_t last_sent = millis();
         while (1) {
+            if (millis() - last_sent > (uint32_t) max_wait_ms) {
+#ifdef DEBUGV
+                // wait until sent: timeout
+                DEBUGV(":wustmo\n");
+#endif
+                // All data was not flushed, timeout hit
+                return false;
+            }
 
             // force lwIP to send what can be sent
             tcp_output(_pcb);
@@ -322,25 +328,20 @@ public:
             int sndbuf = tcp_sndbuf(_pcb);
             if (sndbuf != prevsndbuf) {
                 // send buffer has changed (or first iteration)
-                // we received an ack: restart the loop counter
                 prevsndbuf = sndbuf;
-                loop = max_wait_ms;
+                // We just sent a bit, move timeout forward
+                last_sent = millis();
             }
 
-            if (state() != ESTABLISHED || sndbuf == TCP_SND_BUF || --loop <= 0)
+            yield();
+
+            if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
                 break;
-
-            delay(1);
+            }
         }
 
-        #ifdef DEBUGV
-        if (loop <= 0) {
-            // wait until sent: timeout
-            DEBUGV(":wustmo\n");
-        }
-        #endif
-
-        return max_wait_ms > 0;
+        // All data flushed
+        return true;
     }
 
     uint8_t state() const
@@ -482,20 +483,24 @@ protected:
             if (!next_chunk_size)
                 break;
             const uint8_t* buf = _datasource->get_buffer(next_chunk_size);
-            // use TCP_WRITE_FLAG_MORE to remove PUSH flag from packet (lwIP's doc),
-            // because PUSH code implicitely disables Nagle code (see lwIP's tcp_out.c)
-            // Notes:
-            //   PUSH is meant for peer, telling to give data to user app as soon as received
-            //   PUSH "may be set" when sender has finished sending a meaningful data block
-            //   PUSH is quite unclear in its application
-            //   Nagle is for shortly delaying outgoing data, to send less/bigger packets
-            uint8_t flags = TCP_WRITE_FLAG_MORE; // do not tcp-PuSH
+
+            uint8_t flags = 0;
+            if (next_chunk_size < _datasource->available())
+                //   PUSH is meant for peer, telling to give data to user app as soon as received
+                //   PUSH "may be set" when sender has finished sending a "meaningful" data block
+                //   PUSH does not break Nagle
+                //   #5173: windows needs this flag
+                //   more info: https://lists.gnu.org/archive/html/lwip-users/2009-11/msg00018.html
+                flags |= TCP_WRITE_FLAG_MORE; // do not tcp-PuSH (yet)
             if (!_sync)
                 // user data must be copied when data are sent but not yet acknowledged
                 // (with sync, we wait for acknowledgment before returning to user)
                 flags |= TCP_WRITE_FLAG_COPY;
+
             err_t err = tcp_write(_pcb, buf, next_chunk_size, flags);
+
             DEBUGV(":wrc %d %d %d\r\n", next_chunk_size, _datasource->available(), (int)err);
+
             if (err == ERR_OK) {
                 _datasource->release_buffer(buf, next_chunk_size);
                 _written += next_chunk_size;
@@ -507,10 +512,11 @@ protected:
             }
         }
 
-        if (has_written && (_sync || tcp_nagle_disabled(_pcb)))
+        if (has_written)
         {
-            // handle no-Nagle manually because of TCP_WRITE_FLAG_MORE
             // lwIP's tcp_output doc: "Find out what we can send and send it"
+            // *with respect to Nagle*
+            // more info: https://lists.gnu.org/archive/html/lwip-users/2017-11/msg00134.html
             tcp_output(_pcb);
         }
 
