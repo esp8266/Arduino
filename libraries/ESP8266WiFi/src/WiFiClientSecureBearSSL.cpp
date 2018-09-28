@@ -72,6 +72,7 @@ void WiFiClientSecure::_clear() {
   _recvapp_len = 0;
   _oom_err = false;
   _deleteChainKeyTA = false;
+  _session = nullptr;
   _cipher_list = NULL;
   _cipher_cnt = 0;
 }
@@ -177,8 +178,11 @@ void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
 
 bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
   bool ret = WiFiClient::stop(maxWaitMs); // calls our virtual flush()
-  // Only if we've already connected, clear the connection options
+  // Only if we've already connected, store session params and clear the connection options
   if (_handshake_done) {
+    if (_session) {
+      br_ssl_engine_get_session_parameters(_eng, _session->getSession());
+    }
     _clearAuthenticationSettings();
   }
   _freeSSL();
@@ -865,7 +869,12 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
                                 _cert_issuer_key_type, br_ec_get_default(), br_ecdsa_sign_asn1_get_default());
   }
 
-  if (!br_ssl_client_reset(_sc.get(), hostName, 0)) {
+  // Restore session from the storage spot, if present
+  if (_session) {
+    br_ssl_engine_set_session_parameters(_eng, _session->getSession());
+  }
+
+  if (!br_ssl_client_reset(_sc.get(), hostName, _session?1:0)) {
     _freeSSL();
     return false;
   }
