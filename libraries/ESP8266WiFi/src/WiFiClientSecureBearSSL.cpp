@@ -116,6 +116,8 @@ WiFiClientSecure::~WiFiClientSecure() {
 WiFiClientSecure::WiFiClientSecure(ClientContext* client,
                                      const BearSSLX509List *chain, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
+  _cipher_list = NULL;
+  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _iobuf_in_size = iobuf_in_size;
@@ -133,6 +135,8 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
                                      const BearSSLX509List *chain,
                                      unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
+  _cipher_list = NULL;
+  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _iobuf_in_size = iobuf_in_size;
@@ -175,23 +179,19 @@ void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
   _iobuf_out_size = xmit;
 }
 
-void WiFiClientSecure::stop() {
-  flush();
-  if (_client) {
-    _client->wait_until_sent();
-    _client->abort();
-  }
-  WiFiClient::stop();
+bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
+  bool ret = WiFiClient::stop(maxWaitMs); // calls our virtual flush()
   // Only if we've already connected, clear the connection options
   if (_handshake_done) {
     _clearAuthenticationSettings();
   }
   _freeSSL();
+  return ret;
 }
 
-void WiFiClientSecure::flush() {
+bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
   (void) _run_until(BR_SSL_SENDAPP);
-  WiFiClient::flush();
+  return WiFiClient::flush(maxWaitMs);
 }
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
@@ -648,6 +648,26 @@ extern "C" {
 
   // Some constants uses to init the server/client contexts
   // Note that suites_P needs to be copied to RAM before use w/BearSSL!
+  // List copied verbatim from BearSSL/ssl_client_full.c
+  /*
+   * The "full" profile supports all implemented cipher suites.
+   *
+   * Rationale for suite order, from most important to least
+   * important rule:
+   *
+   * -- Don't use 3DES if AES or ChaCha20 is available.
+   * -- Try to have Forward Secrecy (ECDHE suite) if possible.
+   * -- When not using Forward Secrecy, ECDH key exchange is
+   *    better than RSA key exchange (slightly more expensive on the
+   *    client, but much cheaper on the server, and it implies smaller
+   *    messages).
+   * -- ChaCha20+Poly1305 is better than AES/GCM (faster, smaller code).
+   * -- GCM is better than CCM and CBC. CCM is better than CBC.
+   * -- CCM is preferable over CCM_8 (with CCM_8, forgeries may succeed
+   *    with probability 2^(-64)).
+   * -- AES-128 is preferred over AES-256 (AES-128 is already
+   *    strong enough, and AES-256 is 40% more expensive).
+   */
   static const uint16_t suites_P[] PROGMEM = {
     BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
     BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
@@ -655,6 +675,10 @@ extern "C" {
     BR_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
     BR_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
     BR_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8,
     BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
     BR_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
     BR_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,
@@ -677,6 +701,10 @@ extern "C" {
     BR_TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,
     BR_TLS_RSA_WITH_AES_128_GCM_SHA256,
     BR_TLS_RSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_RSA_WITH_AES_128_CCM,
+    BR_TLS_RSA_WITH_AES_256_CCM,
+    BR_TLS_RSA_WITH_AES_128_CCM_8,
+    BR_TLS_RSA_WITH_AES_256_CCM_8,
     BR_TLS_RSA_WITH_AES_128_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_128_CBC_SHA,
@@ -730,6 +758,7 @@ extern "C" {
     br_ssl_engine_set_prf_sha384(&cc->eng, &br_tls12_sha384_prf);
     br_ssl_engine_set_default_aes_cbc(&cc->eng);
     br_ssl_engine_set_default_aes_gcm(&cc->eng);
+    br_ssl_engine_set_default_aes_ccm(&cc->eng);
     br_ssl_engine_set_default_des_cbc(&cc->eng);
     br_ssl_engine_set_default_chapol(&cc->eng);
   }
@@ -819,7 +848,7 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
 
   // If no cipher list yet set, use defaults
   if (_cipher_list == NULL) {
-    br_ssl_client_base_init(_sc.get(), suites_P, sizeof(suites_P) / sizeof(uint16_t));
+    br_ssl_client_base_init(_sc.get(), suites_P, sizeof(suites_P) / sizeof(suites_P[0]));
   } else {
     br_ssl_client_base_init(_sc.get(), _cipher_list, _cipher_cnt);
   }
