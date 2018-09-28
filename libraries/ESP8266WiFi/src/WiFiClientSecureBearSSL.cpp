@@ -72,6 +72,8 @@ void WiFiClientSecure::_clear() {
   _recvapp_len = 0;
   _oom_err = false;
   _deleteChainKeyTA = false;
+  _cipher_list = NULL;
+  _cipher_cnt = 0;
 }
 
 void WiFiClientSecure::_clearAuthenticationSettings() {
@@ -85,8 +87,6 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
 
 
 WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
-  _cipher_list = NULL;
-  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
@@ -116,8 +116,6 @@ WiFiClientSecure::~WiFiClientSecure() {
 WiFiClientSecure::WiFiClientSecure(ClientContext* client,
                                      const BearSSLX509List *chain, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
-  _cipher_list = NULL;
-  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _iobuf_in_size = iobuf_in_size;
@@ -135,8 +133,6 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
                                      const BearSSLX509List *chain,
                                      unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
-  _cipher_list = NULL;
-  _cipher_cnt = 0;
   _clear();
   _clearAuthenticationSettings();
   _iobuf_in_size = iobuf_in_size;
