@@ -133,7 +133,6 @@ void HTTPClient::clear()
 bool HTTPClient::begin(String url, String httpsFingerprint)
 {
     _transportTraits.reset(nullptr);
-    _port = 443;
     if (httpsFingerprint.length() == 0) {
         return false;
     }
@@ -149,7 +148,6 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
 bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
 {
     _transportTraits.reset(nullptr);
-    _port = 443;
     if (!beginInternal(url, "https")) {
         return false;
     }
@@ -170,7 +168,6 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
 bool HTTPClient::begin(String url)
 {
     _transportTraits.reset(nullptr);
-    _port = 80;
     if (!beginInternal(url, "http")) {
         return false;
     }
@@ -192,6 +189,17 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 
     _protocol = url.substring(0, index);
     url.remove(0, (index + 3)); // remove http:// or https://
+
+    if (_protocol == "http") {
+        // set default port for 'http'
+        _port = 80;
+    } else if (_protocol == "https") {
+        // set default port for 'https'
+        _port = 443;
+    } else {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unsupported protocol: %s\n", _protocol.c_str());
+        return false;
+    }
 
     index = url.indexOf('/');
     String host = url.substring(0, index);
@@ -217,7 +225,7 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
     }
     _uri = url;
 
-    if (_protocol != expectedProtocol) {
+    if ( expectedProtocol != nullptr && _protocol != expectedProtocol) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
         return false;
     }
@@ -386,21 +394,11 @@ void HTTPClient::setTimeout(uint16_t timeout)
  */
 bool HTTPClient::setURL(String url)
 {
-    // check for : (http: or https:)
-    int index = url.indexOf(':');
-    if(index < 0) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] failed to parse protocol\n");
+    if (!url.startsWith(_protocol + ":")) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][setURL] new URL not the same protocol, expected '%s', URL: '%s'\n", _protocol.c_str(), url.c_str());
         return false;
     }
-
-    String protocol = url.substring(0, index);
-    if(protocol != "http" && protocol != "https") {
-        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unknown protocol '%s'\n", protocol.c_str());
-        return false;
-    }
-
-    _port = (protocol == "https" ? 443 : 80);
-    return beginInternal(url, protocol.c_str());
+    return beginInternal(url, nullptr);
 }
 
 /**
