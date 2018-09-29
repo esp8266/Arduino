@@ -27,7 +27,7 @@ const int httpsPort = 443;
 
 // Use web browser to view and copy
 // SHA1 fingerprint of the certificate
-const char* fingerprint = "35 85 74 EF 67 35 A7 CE 40 69 50 F3 C0 F6 80 CF 80 3B 2E 19";
+const char* fingerprint = "5F F1 60 31 09 04 3E F2 90 D2 B0 8A 50 38 04 E8 37 9F BC 76";
 
 void setup() {
   Serial.begin(115200);

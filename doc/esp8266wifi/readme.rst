@@ -125,7 +125,7 @@ Soft Access Point
 ~~~~~~~~~~~~~~~~~
 
 An `access point (AP) <https://en.wikipedia.org/wiki/Wireless_access_point>`__ is a device that provides access to Wi-Fi network to other devices (stations)
-and connects them further to a wired network. ESP8266 can provide similar functionality except it does not have interface to a wired network. Such mode of operation is called soft access point (soft-AP). The maximum number of stations connected to the soft-AP is five.
+and connects them further to a wired network. ESP8266 can provide similar functionality except it does not have interface to a wired network. Such mode of operation is called soft access point (soft-AP). The maximum number of stations that can simultaneously be connected to the soft-AP can be set `from 1 to 8 <https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832>`__, but defaults to 4.
 
 .. figure:: pictures/esp8266-soft-access-point.png
    :alt: ESP8266 operating in the Soft Access Point mode
