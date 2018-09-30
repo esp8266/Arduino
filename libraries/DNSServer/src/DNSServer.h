@@ -42,6 +42,9 @@ class DNSServer
 {
   public:
     DNSServer();
+    ~DNSServer() {
+        stop();
+    };
     void processNextRequest();
     void setErrorReplyCode(const DNSReplyCode &replyCode);
     void setTTL(const uint32_t &ttl);
