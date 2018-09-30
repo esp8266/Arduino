@@ -225,13 +225,6 @@ class WiFiClientSecure : public WiFiClient {
 
     // AXTLS compatible mode needs to delete the stored certs and keys on destruction
     bool _deleteChainKeyTA;
-
-  private:
-    // Single memory buffer used for BearSSL auxilliary stack, insead of growing main Arduino stack for all apps
-    static std::shared_ptr<uint8_t> _bearssl_stack;
-    void _ensureStackAvailable(); // Allocate the stack if necessary
-    // The local copy, only used to enable a reference count
-    std::shared_ptr<uint8_t> _local_bearssl_stack;
 };
 
 };

@@ -1,5 +1,5 @@
 /*
-  esp8266_thunks.h - Allow use second stack for BearSSL calls
+  BearSSLThunks.h - Allow use second stack for BearSSL calls
 
   BearSSL uses a significant amount of stack space, much larger than
   the default Arduino core stack. These routines handle swapping
@@ -31,7 +31,9 @@ extern "C" {
 
 #include <bearssl/bearssl.h>
 
-extern void SetThunkStackEnd(unsigned int *end);
+extern void br_thunk_add_ref();
+extern void br_thunk_del_ref();
+extern uint32_t br_thunk_get_max_usage();
 
 extern unsigned char *thunk_br_ssl_engine_recvapp_buf( const br_ssl_engine_context *cc, size_t *len);
 extern void thunk_br_ssl_engine_recvapp_ack(br_ssl_engine_context *cc, size_t len);
