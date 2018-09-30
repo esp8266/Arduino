@@ -102,6 +102,11 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
+  _ensureStackAvailable();
+  _local_bearssl_stack = _bearssl_stack;
+}
+
+void WiFiClientSecure::_ensureStackAvailable() {
   if (!_bearssl_stack) {
     const int stacksize = 4500; // Empirically determined stack for EC and RSA connections
     _bearssl_stack = std::shared_ptr<uint8_t>(new uint8_t[stacksize], std::default_delete<uint8_t[]>());
@@ -109,7 +114,6 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
     endOfStack += (stacksize/4) - 1;
     SetThunkStackEnd(endOfStack);
   }
-  _local_bearssl_stack = _bearssl_stack;
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
@@ -119,7 +123,11 @@ WiFiClientSecure::~WiFiClientSecure() {
   }
   free(_cipher_list);
   _freeSSL();
-  _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
+  _local_bearssl_stack = nullptr;
+  // If there are no other uses than the initial creation, free the stack
+  if (_bearssl_stack.use_count() == 1) {
+    _bearssl_stack = nullptr;
+  }
   if (_deleteChainKeyTA) {
     delete _ta;
     delete _chain;
@@ -132,6 +140,8 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
+  _ensureStackAvailable();
+  _local_bearssl_stack = _bearssl_stack;
   _iobuf_in_size = iobuf_in_size;
   _iobuf_out_size = iobuf_out_size;
   _client = client;
@@ -149,6 +159,8 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
+  _ensureStackAvailable();
+  _local_bearssl_stack = _bearssl_stack;
   _iobuf_in_size = iobuf_in_size;
   _iobuf_out_size = iobuf_out_size;
   _client = client;
