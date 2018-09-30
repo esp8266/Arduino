@@ -59,7 +59,7 @@ void loop() {
     int httpCode = http.GET();
 
     // As long as we get redirects, follow them
-    while(httpCode == 301 || httpCode == 302 || httpCode == 307) {
+    while (httpCode == 301 || httpCode == 302 || httpCode == 307) {
       String location = http.header("Location");
       Serial.printf("[HTTP] redirect(%d): %s\n", httpCode, location.c_str());
       http.end();
