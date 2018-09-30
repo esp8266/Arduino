@@ -65,9 +65,9 @@ class DNSServer
     DNSReplyCode _errorReplyCode;
 
     void downcaseAndRemoveWwwPrefix(String &domainName);
-    String getDomainNameWithoutWwwPrefix(const uint8_t* buffer, int packetSize);
+    String getDomainNameWithoutWwwPrefix(const uint8_t* buffer, size_t packetSize);
     bool requestIncludesOnlyOneQuestion(const DNSHeader* dnsHeader);
-    void replyWithIP(uint8_t* buffer, int packetSize);
-    void replyWithCustomCode(uint8_t* buffer, int packetSize);
+    void replyWithIP(uint8_t* buffer, size_t packetSize);
+    void replyWithCustomCode(uint8_t* buffer, size_t packetSize);
 };
 #endif

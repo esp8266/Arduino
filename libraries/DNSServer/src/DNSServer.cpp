@@ -46,9 +46,9 @@ void DNSServer::downcaseAndRemoveWwwPrefix(String &domainName)
 
 void DNSServer::processNextRequest()
 {
-  int packetSize = _udp.parsePacket();
+  size_t packetSize = _udp.parsePacket();
 
-  if (packetSize)
+  if (packetSize >= sizeof(DNSHeader))
   {
     uint8_t* buffer = reinterpret_cast<uint8_t*>(malloc(packetSize));
     if (buffer == NULL) return;
@@ -82,7 +82,7 @@ bool DNSServer::requestIncludesOnlyOneQuestion(const DNSHeader* dnsHeader)
          dnsHeader->ARCount == 0;
 }
 
-String DNSServer::getDomainNameWithoutWwwPrefix(const uint8_t* buffer, int packetSize)
+String DNSServer::getDomainNameWithoutWwwPrefix(const uint8_t* buffer, size_t packetSize)
 {
   String parsedDomainName;
   
@@ -135,7 +135,7 @@ String DNSServer::getDomainNameWithoutWwwPrefix(const uint8_t* buffer, int packe
   }
 }
 
-void DNSServer::replyWithIP(uint8_t* buffer, int packetSize)
+void DNSServer::replyWithIP(uint8_t* buffer, size_t packetSize)
 {
   DNSHeader* dnsHeader = reinterpret_cast<DNSHeader*>(buffer);
 
@@ -170,8 +170,13 @@ void DNSServer::replyWithIP(uint8_t* buffer, int packetSize)
   #endif
 }
 
-void DNSServer::replyWithCustomCode(uint8_t* buffer, int packetSize)
+void DNSServer::replyWithCustomCode(uint8_t* buffer, size_t packetSize)
 {
+  if (packetSize < sizeof(DNSHeader))
+  {
+    return;
+  }
+
   DNSHeader* dnsHeader = reinterpret_cast<DNSHeader*>(buffer);
 
   dnsHeader->QR = DNS_QR_RESPONSE;
