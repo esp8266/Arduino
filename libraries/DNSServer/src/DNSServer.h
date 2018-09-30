@@ -6,6 +6,8 @@
 #define DNS_QR_RESPONSE 1
 #define DNS_OPCODE_QUERY 0
 
+#define MAX_DNSNAME_LENGTH 253
+
 enum class DNSReplyCode
 {
   NoError = 0,
@@ -56,16 +58,13 @@ class DNSServer
     uint16_t _port;
     String _domainName;
     unsigned char _resolvedIP[4];
-    int _currentPacketSize;
-    unsigned char* _buffer;
-    DNSHeader* _dnsHeader;
     uint32_t _ttl;
     DNSReplyCode _errorReplyCode;
 
     void downcaseAndRemoveWwwPrefix(String &domainName);
-    String getDomainNameWithoutWwwPrefix();
-    bool requestIncludesOnlyOneQuestion();
-    void replyWithIP();
-    void replyWithCustomCode();
+    String getDomainNameWithoutWwwPrefix(const uint8_t* buffer, int packetSize);
+    bool requestIncludesOnlyOneQuestion(const DNSHeader* dnsHeader);
+    void replyWithIP(uint8_t* buffer, int packetSize);
+    void replyWithCustomCode(uint8_t* buffer, int packetSize);
 };
 #endif
