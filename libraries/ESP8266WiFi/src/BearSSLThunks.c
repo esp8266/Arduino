@@ -29,9 +29,10 @@
 
 static uint32_t *_stackPtr = NULL;
 static uint32_t *_stackTop = NULL;
+static uint32_t *_saveStack = NULL;  /* Saved A1 while in BearSSL */
 static uint32_t _refcnt = 0;
 
-#define _stackSize (4500/4)
+#define _stackSize (4600/4)
 #define _stackPaint 0xdeadbeef
 
 /* Add a reference, and allocate the stack if necessary */
@@ -44,6 +45,7 @@ void br_thunk_add_ref()
     for (int i=0; i < _stackSize; i++) {
       _stackPtr[i] = _stackPaint;
     }
+    _saveStack = NULL;
   }
 }
 
@@ -59,7 +61,25 @@ void br_thunk_del_ref()
     free(_stackPtr);
     _stackPtr = NULL;
     _stackTop = NULL;
+    _saveStack = NULL;
   }
+}
+
+/* Simple accessor functions used by postmortem */
+uint32_t br_thunk_get_refcnt() {
+  return _refcnt;
+}
+
+uint32_t br_thunk_get_stack_top() {
+  return (uint32_t)_stackTop;
+}
+
+uint32_t br_thunk_get_stack_bot() {
+  return (uint32_t)_stackPtr;
+}
+
+uint32_t br_thunk_get_cont_sp() {
+  return (uint32_t)_saveStack;
 }
 
 /* Return the number of bytes ever used since the stack was created */
@@ -79,10 +99,6 @@ uint32_t br_thunk_get_max_usage()
 }
 
 __asm("\n\
-.data\n\
-.align 4\n\
-_saveStack: .word 0x00000000\n\
-\n\
 .text\n\
 .literal_position\n\
 \n\

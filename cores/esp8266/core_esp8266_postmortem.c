@@ -30,6 +30,11 @@
 #include "pgmspace.h"
 #include "gdb_hooks.h"
 
+// From BearSSLThunks.c
+extern uint32_t br_thunk_get_stack_top();
+extern uint32_t br_thunk_get_stack_bot();
+extern uint32_t br_thunk_get_cont_sp();
+
 extern void __real_system_restart_local();
 
 // These will be pointers to PROGMEM const strings
@@ -145,6 +150,15 @@ void __wrap_system_restart_local() {
     }
     else if (rst_info.reason == REASON_WDT_RST) {
         offset = 0x10;
+    }
+
+    if (sp > br_thunk_get_stack_bot() && sp <= br_thunk_get_stack_top()) {
+        // BearSSL we dump the BSSL second stack and then reset SP back to the main cont stack
+        ets_printf_P("\nctx: bearssl \n");
+        ets_printf_P("sp: %08x end: %08x offset: %04x\n", sp, br_thunk_get_stack_top(), offset);
+        print_stack(sp + offset, br_thunk_get_stack_top());
+        offset = 0; // No offset needed anymore, the exception info was stored in the bssl stack
+        sp = br_thunk_get_cont_sp();
     }
 
     if (sp > cont_stack_start && sp < cont_stack_end) {
