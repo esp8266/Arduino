@@ -4,7 +4,7 @@
   released to public domain
 
   output is like:
-  
+
   SDK:2.2.1(cfd48f3)/Core:2.4.2-141-g4f97603/lwIP:IPv6+STABLE-2_1_0_RC1/glue:arduino-2.4.2-30-ga53619c/BearSSL:6d1cefc
   dns0=10.43.1.254
   Try me at these addresses:
