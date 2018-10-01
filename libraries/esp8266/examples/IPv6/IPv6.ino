@@ -4,20 +4,16 @@
   released to public domain
 
   output is like:
-
-  address= 192.168.1.239
-  gateway= 192.168.1.254
-  netmask= 255.255.255.0
-  dns0= 192.168.1.8
-  dns1= 208.67.222.222
-  dns2= 0.0.0.0
-
-  Try me at these addresses (with 'telnet <addr>'):
-  IPv6   link-scope(intranet)= fe80::6201:94ff:fe1a:8bcd
-  IPV6 global-scope(internet)= 2xxx:xxxx:xxxx:xxxx:6201:94ff:fe1a:8bcd
-
-  resolving www.google.com: 216.58.208.196
-  resolving par21s04-in-x04.1e100.net: 2a00:1450:4007:811::2004
+  
+  SDK:2.2.1(cfd48f3)/Core:2.4.2-141-g4f97603/lwIP:IPv6+STABLE-2_1_0_RC1/glue:arduino-2.4.2-30-ga53619c/BearSSL:6d1cefc
+  dns0=10.43.1.254
+  Try me at these addresses:
+  (with 'telnet <addr> or 'nc -u <addr> 23')
+  IF='st'(0) IPv6=0 local=0 hostname='ipv6test' addr= 10.43.1.244 / mask:255.255.255.0 / gw:10.43.1.254
+  IF='st'(0) IPv6=1 local=1 hostname='ipv6test' addr= fe80::1afe:34ff:fed1:cec7
+  IF='st'(0) IPV6=1 local=0 hostname='ipv6test' addr= 2xxx:xxxx:xxxx:xxxx:1afe:34ff:fed1:cec7
+  resolving www.google.com: 216.58.205.100
+  resolving ipv6.google.com: 2a00:1450:4002:808::200e
 */
 
 #include <ESP8266WiFi.h>
@@ -64,15 +60,15 @@ void status(Print& out) {
   }
 
   out.println(F("Try me at these addresses:"));
-  out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
+  out.println(F("(with 'telnet <addr>' or 'nc -u <addr> 23')"));
   for (auto a : addrList) {
     out.printf("IF='%s'(%d) IPv6=%d local=%d hostname='%s' addr= ",
                a->ifname().c_str(),
                a->ifnumber(),
-               !a->isV4(),
+               a->isV6(),
                a->isLocal(),
                a->ifhostname());
-    a->addr().printTo(out);
+    a->printTo(out);
 
     if (a->isLegacy()) {
       out.print(F(" / mask:"));
@@ -104,10 +100,38 @@ void setup() {
 
   status(Serial);
 
+  #if 0
+
+  // legacy loop (still valid with IPv4 only)
+
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);
   }
+
+  #else
+
+  // Use this loop instead to wait for an IPv6 routable address
+
+  // addr->isLocal() (meaning "not routable on internet") is true with:
+  // - IPV4 DHCP autoconfigured address 169.254.x.x
+  //   (false for any other including 192.168./16 and 10./24 since NAT may be in the equation)
+  // - IPV6 link-local addresses (fe80::/64)
+
+  for (bool configured = false; !configured;) {
+    for (auto addr : addrList)
+      if ((configured = !addr->isLocal()
+                        // && addr->isV6() // uncomment when IPv6 is mandatory
+                        // && addr->ifnumber() == STATION_IF
+          )) {
+        break;
+      }
+    Serial.print('.');
+    delay(500);
+  }
+
+  #endif
+
   Serial.println(F("connected: "));
 
   statusServer.begin();

@@ -173,6 +173,15 @@ class IPAddress: public Printable {
 
         bool fromString6(const char *address);
 
+#else
+
+        // allow portable code when IPv6 is not enabled
+
+        uint16_t* raw6() { return nullptr; }
+        const uint16_t* raw6() const { return nullptr; }
+        bool isV6() const { return false; }
+        void setV6() { }
+
 #endif
 };
 

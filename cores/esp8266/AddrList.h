@@ -44,7 +44,7 @@
 
       for (bool configured = false; !configured; ) {
           for (auto addr: addrList)
-              if ((configured = !addr->isLocal())
+              if ((configured = !addr->isLocal()))
                   break;
           Serial.print('.');
           delay(500);
@@ -54,7 +54,7 @@
 
       for (bool configured = false; !configured; ) {
           for (auto addr: addrList)
-              if ((configured = (   !addr->addr()->isV4()
+              if ((configured = (   addr->isV6()
                                  && !addr->isLocal())))
                   break;
           Serial.print('.');
@@ -65,7 +65,7 @@
 
       for (bool configured = false; !configured; ) {
           for (auto addr: addrList)
-              if ((configured = (   !addr->addr()->isV4()
+              if ((configured = (   addr->isV6()
                                  && !addr->isLocal()
                                  && addr->ifnumber() == STATION_IF)))
                   break;
@@ -159,6 +159,7 @@ class AddrListClass {
                 // bring IPAddress interface to simplify arduino code
 
                 bool isV4() const { return addr().isV4(); }
+                bool isV6() const { return addr().isV6(); }
                 bool isLocal() const { return addr().isLocal(); }
                 size_t printTo(Print& p) const { return addr().printTo(p); }
 
