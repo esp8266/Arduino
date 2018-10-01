@@ -293,7 +293,7 @@ What's Inside?
 
 If you like to analyze in detail what is inside of the ESP8266WiFi library, go directly to the `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi/src>`__ folder of esp8266 / Arduino repository on the GitHub.
 
-To make the analysis easier, rather than looking into individual header or source files, use one of free tools to automatically generate documentation. The class index in chapter `Class Description <class-description>`__ above has been prepared in no time using great `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`__, that is the de facto standard tool for generating documentation from annotated C++ sources.
+To make the analysis easier, rather than looking into individual header or source files, use one of free tools to automatically generate documentation. The class index in chapter `Class Description`_ above has been prepared in no time using great `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`__, that is the de facto standard tool for generating documentation from annotated C++ sources.
 
 .. figure:: pictures/doxygen-esp8266wifi-documentation.png
    :alt: Example of documentation prepared by Doxygen
