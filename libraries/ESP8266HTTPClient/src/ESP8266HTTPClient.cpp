@@ -37,7 +37,7 @@
 class TransportTraits
 {
 public:
-    virtual ~TransportTraits() 
+    virtual ~TransportTraits()
     {
     }
 
@@ -140,6 +140,7 @@ void HTTPClient::clear()
     _returnCode = 0;
     _size = -1;
     _headers = "";
+    _payload.reset();
 }
 
 
@@ -371,6 +372,16 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t htt
  */
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
 void HTTPClient::end(void)
+{
+    disconnect();
+    clear();
+}
+
+/**
+ * disconnect
+ * close the TCP socket
+ */
+void HTTPClient::disconnect()
 {
     if(connected()) {
         if(_client) {
@@ -875,7 +886,7 @@ int HTTPClient::writeToStream(Stream * stream)
         return returnError(HTTPC_ERROR_ENCODING);
     }
 
-    end();
+    disconnect();
     return ret;
 }
 
@@ -883,20 +894,24 @@ int HTTPClient::writeToStream(Stream * stream)
  * return all payload as String (may need lot of ram or trigger out of memory!)
  * @return String
  */
-String HTTPClient::getString(void)
+const String& HTTPClient::getString(void)
 {
-    StreamString sstring;
+    if (_payload) {
+        return *_payload;
+    }
+
+    _payload.reset(new StreamString());
 
     if(_size) {
         // try to reserve needed memmory
-        if(!sstring.reserve((_size + 1))) {
+        if(!_payload->reserve((_size + 1))) {
             DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
-            return "";
+            return *_payload;
         }
     }
 
-    writeToStream(&sstring);
-    return sstring;
+    writeToStream(_payload.get());
+    return *_payload;
 }
 
 /**

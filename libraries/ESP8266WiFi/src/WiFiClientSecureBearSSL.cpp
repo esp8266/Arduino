@@ -72,6 +72,9 @@ void WiFiClientSecure::_clear() {
   _recvapp_len = 0;
   _oom_err = false;
   _deleteChainKeyTA = false;
+  _session = nullptr;
+  _cipher_list = NULL;
+  _cipher_cnt = 0;
 }
 
 void WiFiClientSecure::_clearAuthenticationSettings() {
@@ -88,12 +91,16 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
+  _ensureStackAvailable();
+  _local_bearssl_stack = _bearssl_stack;
+}
+
+void WiFiClientSecure::_ensureStackAvailable() {
   if (!_bearssl_stack) {
     const int stacksize = 4500; // Empirically determined stack for EC and RSA connections
     _bearssl_stack = std::shared_ptr<uint8_t>(new uint8_t[stacksize], std::default_delete<uint8_t[]>());
     br_esp8266_stack_proxy_init(_bearssl_stack.get(), stacksize);
   }
-  _local_bearssl_stack = _bearssl_stack;
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
@@ -101,8 +108,13 @@ WiFiClientSecure::~WiFiClientSecure() {
     _client->unref();
     _client = nullptr;
   }
+  free(_cipher_list);
   _freeSSL();
-  _local_bearssl_stack = nullptr; // Potentially delete it if we're the last SSL object
+  _local_bearssl_stack = nullptr;
+  // If there are no other uses than the initial creation, free the stack
+  if (_bearssl_stack.use_count() == 1) {
+    _bearssl_stack = nullptr;
+  }
   if (_deleteChainKeyTA) {
     delete _ta;
     delete _chain;
@@ -115,6 +127,8 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
+  _ensureStackAvailable();
+  _local_bearssl_stack = _bearssl_stack;
   _iobuf_in_size = iobuf_in_size;
   _iobuf_out_size = iobuf_out_size;
   _client = client;
@@ -132,6 +146,8 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
+  _ensureStackAvailable();
+  _local_bearssl_stack = _bearssl_stack;
   _iobuf_in_size = iobuf_in_size;
   _iobuf_out_size = iobuf_out_size;
   _client = client;
@@ -172,20 +188,22 @@ void WiFiClientSecure::setBufferSizes(int recv, int xmit) {
   _iobuf_out_size = xmit;
 }
 
-void WiFiClientSecure::stop() {
-  flush();
-  if (_client) {
-    _client->wait_until_sent();
-    _client->abort();
+bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
+  bool ret = WiFiClient::stop(maxWaitMs); // calls our virtual flush()
+  // Only if we've already connected, store session params and clear the connection options
+  if (_handshake_done) {
+    if (_session) {
+      br_ssl_engine_get_session_parameters(_eng, _session->getSession());
+    }
+    _clearAuthenticationSettings();
   }
-  WiFiClient::stop();
-  _clearAuthenticationSettings();
   _freeSSL();
+  return ret;
 }
 
-void WiFiClientSecure::flush() {
+bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
   (void) _run_until(BR_SSL_SENDAPP);
-  WiFiClient::flush();
+  return WiFiClient::flush(maxWaitMs);
 }
 
 int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
@@ -642,6 +660,26 @@ extern "C" {
 
   // Some constants uses to init the server/client contexts
   // Note that suites_P needs to be copied to RAM before use w/BearSSL!
+  // List copied verbatim from BearSSL/ssl_client_full.c
+  /*
+   * The "full" profile supports all implemented cipher suites.
+   *
+   * Rationale for suite order, from most important to least
+   * important rule:
+   *
+   * -- Don't use 3DES if AES or ChaCha20 is available.
+   * -- Try to have Forward Secrecy (ECDHE suite) if possible.
+   * -- When not using Forward Secrecy, ECDH key exchange is
+   *    better than RSA key exchange (slightly more expensive on the
+   *    client, but much cheaper on the server, and it implies smaller
+   *    messages).
+   * -- ChaCha20+Poly1305 is better than AES/GCM (faster, smaller code).
+   * -- GCM is better than CCM and CBC. CCM is better than CBC.
+   * -- CCM is preferable over CCM_8 (with CCM_8, forgeries may succeed
+   *    with probability 2^(-64)).
+   * -- AES-128 is preferred over AES-256 (AES-128 is already
+   *    strong enough, and AES-256 is 40% more expensive).
+   */
   static const uint16_t suites_P[] PROGMEM = {
     BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
     BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
@@ -649,6 +687,10 @@ extern "C" {
     BR_TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
     BR_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
     BR_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8,
+    BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8,
     BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,
     BR_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
     BR_TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,
@@ -671,6 +713,10 @@ extern "C" {
     BR_TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,
     BR_TLS_RSA_WITH_AES_128_GCM_SHA256,
     BR_TLS_RSA_WITH_AES_256_GCM_SHA384,
+    BR_TLS_RSA_WITH_AES_128_CCM,
+    BR_TLS_RSA_WITH_AES_256_CCM,
+    BR_TLS_RSA_WITH_AES_128_CCM_8,
+    BR_TLS_RSA_WITH_AES_256_CCM_8,
     BR_TLS_RSA_WITH_AES_128_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_128_CBC_SHA,
@@ -681,6 +727,13 @@ extern "C" {
     BR_TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA,
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
   };
+
+  // For apps which want to use less secure but faster ciphers, only
+  static const uint16_t faster_suites_P[] PROGMEM = {
+    BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
+    BR_TLS_RSA_WITH_AES_128_CBC_SHA256,
+    BR_TLS_RSA_WITH_AES_256_CBC_SHA,
+    BR_TLS_RSA_WITH_AES_128_CBC_SHA };
 
   // Install hashes into the SSL engine
   static void br_ssl_client_install_hashes(br_ssl_engine_context *eng) {
@@ -702,9 +755,9 @@ extern "C" {
   }
 
   // Default initializion for our SSL clients
-  static void br_ssl_client_base_init(br_ssl_client_context *cc) {
-    uint16_t suites[sizeof(suites_P) / sizeof(uint16_t)];
-    memcpy_P(suites, suites_P, sizeof(suites_P));
+  static void br_ssl_client_base_init(br_ssl_client_context *cc, const uint16_t *cipher_list, int cipher_cnt) {
+    uint16_t suites[cipher_cnt];
+    memcpy_P(suites, cipher_list, cipher_cnt * sizeof(cipher_list[0]));
     br_ssl_client_zero(cc);
     br_ssl_engine_set_versions(&cc->eng, BR_TLS10, BR_TLS12);
     br_ssl_engine_set_suites(&cc->eng, suites, (sizeof suites) / (sizeof suites[0]));
@@ -717,10 +770,31 @@ extern "C" {
     br_ssl_engine_set_prf_sha384(&cc->eng, &br_tls12_sha384_prf);
     br_ssl_engine_set_default_aes_cbc(&cc->eng);
     br_ssl_engine_set_default_aes_gcm(&cc->eng);
+    br_ssl_engine_set_default_aes_ccm(&cc->eng);
     br_ssl_engine_set_default_des_cbc(&cc->eng);
     br_ssl_engine_set_default_chapol(&cc->eng);
   }
 
+}
+
+// Set custom list of ciphers
+bool WiFiClientSecure::setCiphers(const uint16_t *cipherAry, int cipherCount) {
+  free(_cipher_list);
+  _cipher_list = (uint16_t *)malloc(cipherCount * sizeof(uint16_t));
+  if (!_cipher_list) {
+    return false;
+  }
+  memcpy_P(_cipher_list, cipherAry, cipherCount * sizeof(uint16_t));
+  _cipher_cnt = cipherCount;
+  return true;
+}
+
+bool WiFiClientSecure::setCiphersLessSecure() {
+  return setCiphers(faster_suites_P, sizeof(faster_suites_P)/sizeof(faster_suites_P[0]));
+}
+
+bool WiFiClientSecure::setCiphers(std::vector<uint16_t> list) {
+  return setCiphers(&list[0], list.size());
 }
 
 // Installs the appropriate X509 cert validation method for a client connection
@@ -784,7 +858,12 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
     return false;
   }
 
-  br_ssl_client_base_init(_sc.get());
+  // If no cipher list yet set, use defaults
+  if (_cipher_list == NULL) {
+    br_ssl_client_base_init(_sc.get(), suites_P, sizeof(suites_P) / sizeof(suites_P[0]));
+  } else {
+    br_ssl_client_base_init(_sc.get(), _cipher_list, _cipher_cnt);
+  }
   // Only failure possible in the installation is OOM
   if (!_installClientX509Validator()) {
     _freeSSL();
@@ -802,7 +881,12 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
                                 _cert_issuer_key_type, br_ec_get_default(), br_ecdsa_sign_asn1_get_default());
   }
 
-  if (!br_ssl_client_reset(_sc.get(), hostName, 0)) {
+  // Restore session from the storage spot, if present
+  if (_session) {
+    br_ssl_engine_set_session_parameters(_eng, _session->getSession());
+  }
+
+  if (!br_ssl_client_reset(_sc.get(), hostName, _session?1:0)) {
     _freeSSL();
     return false;
   }
