@@ -137,15 +137,15 @@ flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
 #
 if "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_TCP_SACK_OUT", 1)],
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-536-sack"]
+        LIBS=["lwip2-536-feat"]
     )
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_TCP_SACK_OUT", 1)],
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-1460-sack"]
+        LIBS=["lwip2-1460-feat"]
     )
 else:
     env.Append(
