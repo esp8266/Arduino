@@ -27,7 +27,9 @@
 #ifndef _BearSSLThunks_H
 #define _BearSSLThunks_H
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 #include <bearssl/bearssl.h>
 
@@ -49,6 +51,8 @@ extern void thunk_br_ssl_engine_sendapp_ack(br_ssl_engine_context *cc, size_t le
 extern unsigned char *thunk_br_ssl_engine_sendrec_buf( const br_ssl_engine_context *cc, size_t *len);
 extern void thunk_br_ssl_engine_sendrec_ack(br_ssl_engine_context *cc, size_t len);
 
+#ifdef __cplusplus
 }
+#endif
 
 #endif

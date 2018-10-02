@@ -29,11 +29,7 @@
 #include "cont.h"
 #include "pgmspace.h"
 #include "gdb_hooks.h"
-
-// From BearSSLThunks.c
-extern uint32_t br_thunk_get_stack_top();
-extern uint32_t br_thunk_get_stack_bot();
-extern uint32_t br_thunk_get_cont_sp();
+#include "BearSSLThunks.h"
 
 extern void __real_system_restart_local();
 
