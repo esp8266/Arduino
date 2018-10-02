@@ -58,6 +58,9 @@ class WiFiClientSecure : public WiFiClient {
     bool flush(unsigned int maxWaitMs = 0) override;
     bool stop(unsigned int maxWaitMs = 0) override;
 
+    // Allow sessions to be saved/restored automatically to a memory area
+    void setSession(BearSSLSession *session) { _session = session; }
+
     // Don't validate the chain, just accept whatever is given.  VERY INSECURE!
     void setInsecure() {
       _clearAuthenticationSettings();
@@ -170,6 +173,10 @@ class WiFiClientSecure : public WiFiClient {
     bool _handshake_done;
     bool _oom_err;
 
+    // Optional storage space pointer for session parameters
+    // Will be used on connect and updated on close
+    BearSSLSession *_session;
+
     bool _use_insecure;
     bool _use_fingerprint;
     uint8_t _fingerprint[20];
@@ -222,6 +229,7 @@ class WiFiClientSecure : public WiFiClient {
   private:
     // Single memory buffer used for BearSSL auxilliary stack, insead of growing main Arduino stack for all apps
     static std::shared_ptr<uint8_t> _bearssl_stack;
+    void _ensureStackAvailable(); // Allocate the stack if necessary
     // The local copy, only used to enable a reference count
     std::shared_ptr<uint8_t> _local_bearssl_stack;
 };
