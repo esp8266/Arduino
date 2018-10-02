@@ -41,6 +41,7 @@ extern uint32_t br_thunk_get_stack_top();
 extern uint32_t br_thunk_get_stack_bot();
 extern uint32_t br_thunk_get_cont_sp();
 extern uint32_t br_thunk_get_max_usage();
+extern void br_thunk_dump_stack();
 
 extern unsigned char *thunk_br_ssl_engine_recvapp_buf( const br_ssl_engine_context *cc, size_t *len);
 extern void thunk_br_ssl_engine_recvapp_ack(br_ssl_engine_context *cc, size_t len);

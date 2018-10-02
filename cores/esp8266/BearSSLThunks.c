@@ -98,6 +98,23 @@ uint32_t br_thunk_get_max_usage()
   return 4 * (_stackSize - cnt);
 }
 
+/* Print the stack from the first used 16-byte chunk to the top, decodable by the exception decoder */
+void br_thunk_dump_stack()
+{
+  uint32_t *pos = _stackTop;
+  while (pos < _stackPtr) {
+    if ((pos[0] != _stackPaint) || (pos[1] != _stackPaint) || (pos[2] != _stackPaint) || (pos[3] != _stackPaint))
+      break;
+    pos += 4;
+  }
+  ets_printf(">>>stack>>>\n");
+  while (pos < _stackPtr) {
+    ets_printf("%08x:  %08x %08x %08x %08x\n", pos, pos[0], pos[1], pos[2], pos[3]);
+    pos += 4;
+  }
+  ets_printf("<<<stack<<<\n");
+}
+
 __asm("\n\
 .text\n\
 .literal_position\n\
