@@ -38,7 +38,7 @@ Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.2/](https://arduin
   - For Mac OS X, it is `Arduino.app` showing as the Arduino icon.  
     This location may be your `~/Downloads`, `~/Desktop` or even `/Applications`.
     ```bash
-    cd <application-directory>/Arduino.app/Contents/Java
+    cd <application-directory>/Arduino.app/Contents/
     ```
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash

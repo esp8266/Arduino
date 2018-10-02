@@ -1,7 +1,21 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMesh.h>
+#include <TypeConversionFunctions.h>
+#include <assert.h>
 
-String exampleMeshName("MeshNode_");
+/**
+   NOTE: Although we could define the strings below as normal String variables,
+   here we are using PROGMEM combined with the FPSTR() macro (and also just the F() macro further down in the file).
+   The reason is that this approach will place the strings in flash memory which will help save RAM during program execution.
+   Reading strings from flash will be slower than reading them from RAM,
+   but this will be a negligible difference when printing them to Serial.
+
+   More on F(), FPSTR() and PROGMEM:
+   https://github.com/esp8266/Arduino/issues/1143
+   https://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
+*/
+const char exampleMeshName[] PROGMEM = "MeshNode_";
+const char exampleWiFiPassword[] PROGMEM = "ChangeThisWiFiPassword_TODO";
 
 unsigned int requestNumber = 0;
 unsigned int responseNumber = 0;
@@ -11,7 +25,7 @@ transmission_status_t manageResponse(const String &response, ESP8266WiFiMesh &me
 void networkFilter(int numberOfNetworks, ESP8266WiFiMesh &meshInstance);
 
 /* Create the mesh node object */
-ESP8266WiFiMesh meshNode = ESP8266WiFiMesh(manageRequest, manageResponse, networkFilter, "ChangeThisWiFiPassword_TODO", exampleMeshName, "", true);
+ESP8266WiFiMesh meshNode = ESP8266WiFiMesh(manageRequest, manageResponse, networkFilter, FPSTR(exampleWiFiPassword), FPSTR(exampleMeshName), "", true);
 
 /**
    Callback for when other nodes send you a request
@@ -21,34 +35,17 @@ ESP8266WiFiMesh meshNode = ESP8266WiFiMesh(manageRequest, manageResponse, networ
    @returns The string to send back to the other node
 */
 String manageRequest(const String &request, ESP8266WiFiMesh &meshInstance) {
+  // We do not store strings in flash (via F()) in this function.
+  // The reason is that the other node will be waiting for our response,
+  // so keeping the strings in RAM will give a (small) improvement in response time.
+  // Of course, it is advised to adjust this approach based on RAM requirements.
+
   /* Print out received message */
   Serial.print("Request received: ");
   Serial.println(request);
 
   /* return a string to send back */
   return ("Hello world response #" + String(responseNumber++) + " from " + meshInstance.getMeshName() + meshInstance.getNodeID() + ".");
-}
-
-/**
-   Callback used to decide which networks to connect to once a WiFi scan has been completed.
-
-   @param numberOfNetworks The number of networks found in the WiFi scan.
-   @param meshInstance The ESP8266WiFiMesh instance that called the function.
-*/
-void networkFilter(int numberOfNetworks, ESP8266WiFiMesh &meshInstance) {
-  for (int i = 0; i < numberOfNetworks; ++i) {
-    String currentSSID = WiFi.SSID(i);
-    int meshNameIndex = currentSSID.indexOf(meshInstance.getMeshName());
-
-    /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
-    if (meshNameIndex >= 0) {
-      uint64_t targetNodeID = ESP8266WiFiMesh::stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
-
-      if (targetNodeID < ESP8266WiFiMesh::stringToUint64(meshInstance.getNodeID())) {
-        ESP8266WiFiMesh::connectionQueue.push_back(NetworkInfo(i));
-      }
-    }
-  }
 }
 
 /**
@@ -62,16 +59,39 @@ transmission_status_t manageResponse(const String &response, ESP8266WiFiMesh &me
   transmission_status_t statusCode = TS_TRANSMISSION_COMPLETE;
 
   /* Print out received message */
-  Serial.print("Request sent: ");
+  Serial.print(F("Request sent: "));
   Serial.println(meshInstance.getMessage());
-  Serial.print("Response received: ");
+  Serial.print(F("Response received: "));
   Serial.println(response);
 
   // Our last request got a response, so time to create a new request.
-  meshInstance.setMessage("Hello world request #" + String(++requestNumber) + " from " + meshInstance.getMeshName() + meshInstance.getNodeID() + ".");
+  meshInstance.setMessage(String(F("Hello world request #")) + String(++requestNumber) + String(F(" from "))
+                          + meshInstance.getMeshName() + meshInstance.getNodeID() + String(F(".")));
 
   // (void)meshInstance; // This is useful to remove a "unused parameter" compiler warning. Does nothing else.
   return statusCode;
+}
+
+/**
+   Callback used to decide which networks to connect to once a WiFi scan has been completed.
+
+   @param numberOfNetworks The number of networks found in the WiFi scan.
+   @param meshInstance The ESP8266WiFiMesh instance that called the function.
+*/
+void networkFilter(int numberOfNetworks, ESP8266WiFiMesh &meshInstance) {
+  for (int networkIndex = 0; networkIndex < numberOfNetworks; ++networkIndex) {
+    String currentSSID = WiFi.SSID(networkIndex);
+    int meshNameIndex = currentSSID.indexOf(meshInstance.getMeshName());
+
+    /* Connect to any _suitable_ APs which contain meshInstance.getMeshName() */
+    if (meshNameIndex >= 0) {
+      uint64_t targetNodeID = stringToUint64(currentSSID.substring(meshNameIndex + meshInstance.getMeshName().length()));
+
+      if (targetNodeID < stringToUint64(meshInstance.getNodeID())) {
+        ESP8266WiFiMesh::connectionQueue.push_back(NetworkInfo(networkIndex));
+      }
+    }
+  }
 }
 
 void setup() {
@@ -84,15 +104,19 @@ void setup() {
 
   //yield(); // Use this if you don't want to wait for Serial.
 
+  // The WiFi.disconnect() ensures that the WiFi is working correctly. If this is not done before receiving WiFi connections,
+  // those WiFi connections will take a long time to make or sometimes will not work at all.
+  WiFi.disconnect();
+
   Serial.println();
   Serial.println();
 
-  Serial.println("Note that this library can use static IP:s for the nodes to speed up connection times.\n"
-                 "Use the setStaticIP method as shown in this example to enable this.\n"
-                 "Ensure that nodes connecting to the same AP have distinct static IP:s.\n"
-                 "Also, remember to change the default mesh network password!\n\n");
+  Serial.println(F("Note that this library can use static IP:s for the nodes to speed up connection times.\n"
+                   "Use the setStaticIP method as shown in this example to enable this.\n"
+                   "Ensure that nodes connecting to the same AP have distinct static IP:s.\n"
+                   "Also, remember to change the default mesh network password!\n\n"));
 
-  Serial.println("Setting up mesh node...");
+  Serial.println(F("Setting up mesh node..."));
 
   /* Initialise the mesh node */
   meshNode.begin();
@@ -104,22 +128,29 @@ int32_t timeOfLastScan = -10000;
 void loop() {
   if (millis() - timeOfLastScan > 3000 // Give other nodes some time to connect between data transfers.
       || (WiFi.status() != WL_CONNECTED && millis() - timeOfLastScan > 2000)) { // Scan for networks with two second intervals when not already connected.
-    String request = "Hello world request #" + String(requestNumber) + " from " + meshNode.getMeshName() + meshNode.getNodeID() + ".";
+    String request = String(F("Hello world request #")) + String(requestNumber) + String(F(" from ")) + meshNode.getMeshName() + meshNode.getNodeID() + String(F("."));
     meshNode.attemptTransmission(request, false);
     timeOfLastScan = millis();
 
+    // One way to check how attemptTransmission worked out
+    if (ESP8266WiFiMesh::latestTransmissionSuccessful()) {
+      Serial.println(F("Transmission successful."));
+    }
+
+    // Another way to check how attemptTransmission worked out
     if (ESP8266WiFiMesh::latestTransmissionOutcomes.empty()) {
-      Serial.println("No mesh AP found.");
+      Serial.println(F("No mesh AP found."));
     } else {
       for (TransmissionResult &transmissionResult : ESP8266WiFiMesh::latestTransmissionOutcomes) {
         if (transmissionResult.transmissionStatus == TS_TRANSMISSION_FAILED) {
-          Serial.println("Transmission failed to mesh AP " + transmissionResult.SSID);
+          Serial.println(String(F("Transmission failed to mesh AP ")) + transmissionResult.SSID);
         } else if (transmissionResult.transmissionStatus == TS_CONNECTION_FAILED) {
-          Serial.println("Connection failed to mesh AP " + transmissionResult.SSID);
+          Serial.println(String(F("Connection failed to mesh AP ")) + transmissionResult.SSID);
         } else if (transmissionResult.transmissionStatus == TS_TRANSMISSION_COMPLETE) {
           // No need to do anything, transmission was successful.
         } else {
-          Serial.println("Invalid transmission status for " + transmissionResult.SSID + "!");
+          Serial.println(String(F("Invalid transmission status for ")) + transmissionResult.SSID + String(F("!")));
+          assert(F("Invalid transmission status returned from responseHandler!") && false);
         }
       }
     }

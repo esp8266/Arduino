@@ -271,6 +271,7 @@ boards = collections.OrderedDict([
         'name': 'Generic ESP8285 Module',
         'opts': {
             '.build.board': 'ESP8266_ESP01',
+            '.build.variant': 'esp8285'
             },
         'macro': [
             'resetmethod_menu',
@@ -1118,12 +1119,12 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
         ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
         ])
-    #if spiffs_kb > 0:
-    #    d.update(collections.OrderedDict([
-    #        ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
-    #        ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
-    #        ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
-    #        ]))
+    if spiffs_kb > 0:
+        d.update(collections.OrderedDict([
+            ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
+            ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
+            ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
+            ]))
 
     if ldshow:
         if ldgen:
@@ -1171,7 +1172,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
         print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
         print("")
-        print('INCLUDE "eagle.app.v6.common.ld"')
+        print('INCLUDE "local.eagle.app.v6.common.ld"')
 
         if ldgen:
             sys.stdout.close()
