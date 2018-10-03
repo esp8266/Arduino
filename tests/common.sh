@@ -103,6 +103,7 @@ function install_ide()
 {
     local ide_path=$1
     local core_path=$2
+    local debug=$3
     wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
     tar xf arduino.tar.xz
     mv arduino-nightly $ide_path
@@ -110,9 +111,16 @@ function install_ide()
     mkdir esp8266com
     cd esp8266com
     ln -s $core_path esp8266
+    local debug_flags=""
+    if [ "$debug" = "debug" ]; then
+        debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
+    fi
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
-    echo "compiler.c.extra_flags=-Wall -Werror" > esp8266/platform.local.txt
-    echo "compiler.cpp.extra_flags=-Wall -Werror" >> esp8266/platform.local.txt
+    echo "compiler.c.extra_flags=-Wall -Wextra -Werror $debug_flags" > esp8266/platform.local.txt
+    echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror $debug_flags" >> esp8266/platform.local.txt
+    echo -e "\n----platform.local.txt----"
+    cat esp8266/platform.local.txt
+    echo -e "\n----\n"
     cd esp8266/tools
     python get.py
     export PATH="$ide_path:$core_path/tools/xtensa-lx106-elf/bin:$PATH"
@@ -197,10 +205,11 @@ function build_sketches_with_platformio()
 
 function install_arduino()
 {
+    local debug=$1
     # Install Arduino IDE and required libraries
     echo -e "travis_fold:start:sketch_test_env_prepare"
     cd $TRAVIS_BUILD_DIR
-    install_ide $HOME/arduino_ide $TRAVIS_BUILD_DIR
+    install_ide $HOME/arduino_ide $TRAVIS_BUILD_DIR $debug
     which arduino
     cd $TRAVIS_BUILD_DIR
     install_libraries
@@ -248,13 +257,19 @@ if [ -z "$TRAVIS_BUILD_DIR" ]; then
 fi
 
 if [ "$BUILD_TYPE" = "build" ]; then
-    install_arduino
+    install_arduino nodebug
     build_sketches_with_arduino 1 0
 elif [ "$BUILD_TYPE" = "build_even" ]; then
-    install_arduino
+    install_arduino nodebug
     build_sketches_with_arduino 2 0
 elif [ "$BUILD_TYPE" = "build_odd" ]; then
-    install_arduino
+    install_arduino nodebug
+    build_sketches_with_arduino 2 1
+elif [ "$BUILD_TYPE" = "debug_even" ]; then
+    install_arduino debug
+    build_sketches_with_arduino 2 0
+elif [ "$BUILD_TYPE" = "debug_odd" ]; then
+    install_arduino debug
     build_sketches_with_arduino 2 1
 elif [ "$BUILD_TYPE" = "platformio" ]; then
     # PlatformIO

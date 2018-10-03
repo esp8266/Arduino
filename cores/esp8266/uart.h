@@ -141,6 +141,9 @@ bool uart_has_overrun (uart_t* uart); // returns then clear overrun flag
 void uart_set_debug(int uart_nr);
 int uart_get_debug();
 
+void uart_start_detect_baudrate(int uart_nr);
+int uart_detect_baudrate(int uart_nr);
+
 
 #if defined (__cplusplus)
 } // extern "C"

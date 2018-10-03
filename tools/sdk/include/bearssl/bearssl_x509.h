@@ -360,7 +360,7 @@ typedef struct {
  *   - `end_chain()` is called when the last certificate in the chain
  *     was processed.
  *   - `get_pkey()` is called after chain processing, if the chain
- *     validation was succesfull.
+ *     validation was successful.
  *
  * A context structure may be reused; the `start_chain()` method shall
  * ensure (re)initialisation.
@@ -1443,6 +1443,147 @@ br_pkey_decoder_get_ec(const br_pkey_decoder_context *ctx)
 		return NULL;
 	}
 }
+
+/**
+ * \brief Encode an RSA private key (raw DER format).
+ *
+ * This function encodes the provided key into the "raw" format specified
+ * in PKCS#1 (RFC 8017, Appendix C, type `RSAPrivateKey`), with DER
+ * encoding rules.
+ *
+ * The key elements are:
+ *
+ *  - `sk`: the private key (`p`, `q`, `dp`, `dq` and `iq`)
+ *
+ *  - `pk`: the public key (`n` and `e`)
+ *
+ *  - `d` (size: `dlen` bytes): the private exponent
+ *
+ * The public key elements, and the private exponent `d`, can be
+ * recomputed from the private key (see `br_rsa_compute_modulus()`,
+ * `br_rsa_compute_pubexp()` and `br_rsa_compute_privexp()`).
+ *
+ * If `dest` is not `NULL`, then the encoded key is written at that
+ * address, and the encoded length (in bytes) is returned. If `dest` is
+ * `NULL`, then nothing is written, but the encoded length is still
+ * computed and returned.
+ *
+ * \param dest   the destination buffer (or `NULL`).
+ * \param sk     the RSA private key.
+ * \param pk     the RSA public key.
+ * \param d      the RSA private exponent.
+ * \param dlen   the RSA private exponent length (in bytes).
+ * \return  the encoded key length (in bytes).
+ */
+size_t br_encode_rsa_raw_der(void *dest, const br_rsa_private_key *sk,
+	const br_rsa_public_key *pk, const void *d, size_t dlen);
+
+/**
+ * \brief Encode an RSA private key (PKCS#8 DER format).
+ *
+ * This function encodes the provided key into the PKCS#8 format
+ * (RFC 5958, type `OneAsymmetricKey`). It wraps around the "raw DER"
+ * format for the RSA key, as implemented by `br_encode_rsa_raw_der()`.
+ *
+ * The key elements are:
+ *
+ *  - `sk`: the private key (`p`, `q`, `dp`, `dq` and `iq`)
+ *
+ *  - `pk`: the public key (`n` and `e`)
+ *
+ *  - `d` (size: `dlen` bytes): the private exponent
+ *
+ * The public key elements, and the private exponent `d`, can be
+ * recomputed from the private key (see `br_rsa_compute_modulus()`,
+ * `br_rsa_compute_pubexp()` and `br_rsa_compute_privexp()`).
+ *
+ * If `dest` is not `NULL`, then the encoded key is written at that
+ * address, and the encoded length (in bytes) is returned. If `dest` is
+ * `NULL`, then nothing is written, but the encoded length is still
+ * computed and returned.
+ *
+ * \param dest   the destination buffer (or `NULL`).
+ * \param sk     the RSA private key.
+ * \param pk     the RSA public key.
+ * \param d      the RSA private exponent.
+ * \param dlen   the RSA private exponent length (in bytes).
+ * \return  the encoded key length (in bytes).
+ */
+size_t br_encode_rsa_pkcs8_der(void *dest, const br_rsa_private_key *sk,
+	const br_rsa_public_key *pk, const void *d, size_t dlen);
+
+/**
+ * \brief Encode an EC private key (raw DER format).
+ *
+ * This function encodes the provided key into the "raw" format specified
+ * in RFC 5915 (type `ECPrivateKey`), with DER encoding rules.
+ *
+ * The private key is provided in `sk`, the public key being `pk`. If
+ * `pk` is `NULL`, then the encoded key will not include the public key
+ * in its `publicKey` field (which is nominally optional).
+ *
+ * If `dest` is not `NULL`, then the encoded key is written at that
+ * address, and the encoded length (in bytes) is returned. If `dest` is
+ * `NULL`, then nothing is written, but the encoded length is still
+ * computed and returned.
+ *
+ * If the key cannot be encoded (e.g. because there is no known OBJECT
+ * IDENTIFIER for the used curve), then 0 is returned.
+ *
+ * \param dest   the destination buffer (or `NULL`).
+ * \param sk     the EC private key.
+ * \param pk     the EC public key (or `NULL`).
+ * \return  the encoded key length (in bytes), or 0.
+ */
+size_t br_encode_ec_raw_der(void *dest,
+	const br_ec_private_key *sk, const br_ec_public_key *pk);
+
+/**
+ * \brief Encode an EC private key (PKCS#8 DER format).
+ *
+ * This function encodes the provided key into the PKCS#8 format
+ * (RFC 5958, type `OneAsymmetricKey`). The curve is identified
+ * by an OID provided as parameters to the `privateKeyAlgorithm`
+ * field. The private key value (contents of the `privateKey` field)
+ * contains the DER encoding of the `ECPrivateKey` type defined in
+ * RFC 5915, without the `parameters` field (since they would be
+ * redundant with the information in `privateKeyAlgorithm`).
+ *
+ * The private key is provided in `sk`, the public key being `pk`. If
+ * `pk` is not `NULL`, then the encoded public key is included in the
+ * `publicKey` field of the private key value (but not in the `publicKey`
+ * field of the PKCS#8 `OneAsymmetricKey` wrapper).
+ *
+ * If `dest` is not `NULL`, then the encoded key is written at that
+ * address, and the encoded length (in bytes) is returned. If `dest` is
+ * `NULL`, then nothing is written, but the encoded length is still
+ * computed and returned.
+ *
+ * If the key cannot be encoded (e.g. because there is no known OBJECT
+ * IDENTIFIER for the used curve), then 0 is returned.
+ *
+ * \param dest   the destination buffer (or `NULL`).
+ * \param sk     the EC private key.
+ * \param pk     the EC public key (or `NULL`).
+ * \return  the encoded key length (in bytes), or 0.
+ */
+size_t br_encode_ec_pkcs8_der(void *dest,
+	const br_ec_private_key *sk, const br_ec_public_key *pk);
+
+/**
+ * \brief PEM banner for RSA private key (raw).
+ */
+#define BR_ENCODE_PEM_RSA_RAW      "RSA PRIVATE KEY"
+
+/**
+ * \brief PEM banner for EC private key (raw).
+ */
+#define BR_ENCODE_PEM_EC_RAW       "EC PRIVATE KEY"
+
+/**
+ * \brief PEM banner for an RSA or EC private key in PKCS#8 format.
+ */
+#define BR_ENCODE_PEM_PKCS8        "PRIVATE KEY"
 
 #ifdef __cplusplus
 }

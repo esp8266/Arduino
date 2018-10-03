@@ -301,10 +301,7 @@ void user_rf_pre_init()
     // *((volatile uint32_t*) 0x60000710) = 0;
     spoof_init_data = false;
     volatile uint32_t* rtc_reg = (volatile uint32_t*) 0x60001000;
-    if((rtc_reg[24] >> 16) > 4) {
-        rtc_reg[24] &= 0xFFFF;
-        rtc_reg[30] = 0;
-    }
+    rtc_reg[30] = 0;
 
     system_set_os_print(0);
     int rf_mode = __get_rf_mode();

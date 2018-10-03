@@ -41,11 +41,13 @@
  *
  */
 #include "Arduino.h"
+#include <pgmspace.h>
 #include "uart.h"
 #include "esp8266_peri.h"
 #include "user_interface.h"
+#include "uart_register.h"
 
-const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
+const char overrun_str [] PROGMEM STORE_ATTR = "uart input full!\r\n";
 static int s_uart_debug_nr = UART0;
 
 
@@ -738,4 +740,50 @@ int
 uart_get_debug()
 {
     return s_uart_debug_nr;
+}
+
+/*
+To start detection of baud rate with the UART the UART_AUTOBAUD_EN bit needs to be cleared and set. The ROM function uart_baudrate_detect() does this only once, so on a next call the UartDev.rcv_state is not equal to BAUD_RATE_DET. Instead of poking around in the UartDev struct with unknown effect, the UART_AUTOBAUD_EN bit is directly triggered by the function uart_detect_baudrate().
+*/
+void
+uart_start_detect_baudrate(int uart_nr)
+{
+    USA(uart_nr) &= ~(UART_GLITCH_FILT << UART_GLITCH_FILT_S | UART_AUTOBAUD_EN);
+    USA(uart_nr) = 0x08 << UART_GLITCH_FILT_S | UART_AUTOBAUD_EN;
+}
+
+int
+uart_detect_baudrate(int uart_nr)
+{
+    static bool doTrigger = true;
+
+    if (doTrigger)
+    {
+        uart_start_detect_baudrate(uart_nr);
+        doTrigger = false;
+    }
+
+    int32_t divisor = uart_baudrate_detect(uart_nr, 1);
+    if (!divisor) {
+        return 0;
+    }
+
+    doTrigger = true;    // Initialize for a next round
+    int32_t baudrate = UART_CLK_FREQ / divisor;
+
+    static const int default_rates[] = {300, 600, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 74880, 115200, 230400, 256000, 460800, 921600, 1843200, 3686400};
+
+    size_t i;
+    for (i = 1; i < sizeof(default_rates) / sizeof(default_rates[0]) - 1; i++)	// find the nearest real baudrate
+    {
+        if (baudrate <= default_rates[i])
+        {
+            if (baudrate - default_rates[i - 1] < default_rates[i] - baudrate) {
+                i--;
+            }
+            break;
+        }
+    }
+
+    return default_rates[i];
 }

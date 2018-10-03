@@ -290,6 +290,8 @@ void ArduinoOTAClass::_runUpdate() {
     }
     _state = OTA_IDLE;
   }
+  // OTA sends little packets
+  client.setNoDelay(true);
 
   uint32_t written, total = 0;
   while (!Update.isFinished() && client.connected()) {
