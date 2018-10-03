@@ -79,7 +79,13 @@ static Waveform waveform[] = {
   {0, 0, 1<<3, 0, 0, 0, 0, 0},
   {0, 0, 1<<4, 0, 0, 0, 0, 0},
   {0, 0, 1<<5, 0, 0, 0, 0, 0},
-  // GPIOS 6-11 not allowed, used for flash
+  // GPIOS 6-8 not allowed, used for flash
+  // GPIO 9 and 10 only allowed in 2-bit flash mode
+#if !isFlashInterfacePin(9)
+  {0, 0, 1<<9, 0, 0, 0, 0, 0},
+  {0, 0, 1<<10, 0, 0, 0, 0, 0},
+#endif
+  // GPIO 11 not allowed, used for flash
   {0, 0, 1<<12, 0, 0, 0, 0, 0},
   {0, 0, 1<<13, 0, 0, 0, 0, 0},
   {0, 0, 1<<14, 0, 0, 0, 0, 0},
@@ -96,13 +102,6 @@ static inline ICACHE_RAM_ATTR uint32_t MicrosecondsToCycles(uint32_t microsecond
 }
 
 static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
-  if (a < b) {
-    return a;
-  }
-  return b;
-}
-
-static inline ICACHE_RAM_ATTR uint32_t min_s32(int32_t a, int32_t b) {
   if (a < b) {
     return a;
   }
@@ -251,7 +250,8 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 
       // Check for toggles
       now = GetCycleCount();
-      if (now >= wave->nextServiceCycle) {
+      int32_t cyclesToGo = wave->nextServiceCycle - now;
+      if (cyclesToGo < 0) {
         wave->state = !wave->state;
         if (wave->state) {
           SetGPIO(wave->gpioMask);

@@ -43,7 +43,7 @@ protected:
 
   ClientContext* _unclaimed;
   ClientContext* _discarded;
-  bool _noDelay = false;
+  enum { _ndDefault, _ndFalse, _ndTrue } _noDelay = _ndDefault;
 
 public:
   WiFiServer(IPAddress addr, uint16_t port);

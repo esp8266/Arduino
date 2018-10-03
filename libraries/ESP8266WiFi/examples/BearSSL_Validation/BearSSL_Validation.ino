@@ -131,13 +131,13 @@ able to establish communications.
   // Extracted by: openssl x509 -pubkey -noout -in servercert.pem
   static const char pubkey[] PROGMEM = R"KEY(
 -----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqcCPMEktuxLoDAxdHQgI
-95FweH4Fa6+LslU2qmmUBF+pu4ZOUvpIQxVU5wqdWaxZauxG1nYUTrAWdPb1n0um
-gLsGE7WYXJnQPJewIK4Qhua0LsrirIdHkcwHQ83NEYj+lswhg0fUQURt06Uta5ak
-LovDdJPLqTuTS/nshOa76hR0ouWnrqucLL1szcvX/obB+Nsbmr58Mrg8prQfRoK6
-ibzlZysV88qPcCpc57lq6QBKQ2F9WgQMssQigXfTNm8lAAQ+L6gCZngd4KfHYPSJ
-YA07oFWmuSOalgh00Wh8PUjuRGrcNxWpmgfALQHHFYgoDcD+a8+GoJk+GdJd3ong
-ZQIDAQAB
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy+3Up8qBkIn/7S9AfWlH
+Od8SdXmnWx+JCIHvnWzjFcLeLvQb2rMqqCDL5XDlvkyC5SZ8ZyLITemej5aJYuBv
+zcKPzyZ0QfYZiskU9nzL2qBQj8alzJJ/Cc32AWuuWrPrzVxBmOEW9gRCGFCD3m0z
+53y6GjcmBS2wcX7RagqbD7g2frEGko4G7kmW96H6dyh2j9Rou8TwAK6CnbiXPAM/
+5Q6dyfdYlHOCgP75F7hhdKB5gpprm9A/OnQsmZjUPzy4u0EKCxE8MfhBerZrZdod
+88ZdDG3CvTgm050bc+lGlbsT+s09lp0dgxSZIeI8+syV2Owt4YF/PdjeeymtzQdI
+wQIDAQAB
 -----END PUBLIC KEY-----
 )KEY";
   BearSSL::WiFiClientSecure client;
@@ -193,6 +193,32 @@ BearSSL does verify the notValidBefore/After fields.
   fetchURL(&client, host, port, path);
 }
 
+void fetchFaster() {
+  Serial.printf(R"EOF(
+The ciphers used to set up the SSL connection can be configured to
+only support faster but less secure ciphers.  If you care about security
+you won't want to do this.  If you need to maximize battery life, these
+may make sense
+)EOF");
+  BearSSL::WiFiClientSecure client;
+  client.setInsecure();
+  uint32_t now = millis();
+  fetchURL(&client, host, port, path);
+  uint32_t delta = millis() - now;
+  client.setInsecure();
+  client.setCiphersLessSecure();
+  now = millis();
+  fetchURL(&client, host, port, path);
+  uint32_t delta2 = millis() - now;
+  std::vector<uint16_t> myCustomList = { BR_TLS_RSA_WITH_AES_256_CBC_SHA256, BR_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA };
+  client.setInsecure();
+  client.setCiphers(myCustomList);
+  now = millis();
+  fetchURL(&client, host, port, path);
+  uint32_t delta3 = millis() - now;
+  Serial.printf("Using more secure: %dms\nUsing less secure ciphers: %dms\nUsing custom cipher list: %dms\n", delta, delta2, delta3);
+}
+
 void setup() {
   Serial.begin(115200);
   Serial.println();
@@ -220,6 +246,7 @@ void setup() {
   fetchSelfSigned();
   fetchKnownKey();
   fetchCertAuthority();
+  fetchFaster();
 }
 
 
