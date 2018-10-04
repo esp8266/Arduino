@@ -883,6 +883,13 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
   _freeSSL();
   _oom_err = false;
 
+#ifdef DEBUG_ESP_SSL
+  // BearSSL will reject all connections unless an authentication option is set, warn in DEBUG builds
+  if (!_use_insecure && !_use_fingerprint && !_use_self_signed && !_knownkey && !_certStore && !_ta) {
+    DEBUGV("BSSL: Connection *will* fail, no authentication method is setup");
+  }
+#endif
+
   _sc = std::make_shared<br_ssl_client_context>();
   _eng = &_sc->eng; // Allocation/deallocation taken care of by the _sc shared_ptr
   _iobuf_in = std::shared_ptr<unsigned char>(new unsigned char[_iobuf_in_size], std::default_delete<unsigned char[]>());
