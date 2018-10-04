@@ -45,14 +45,14 @@ def compile(tmp_dir, sketch, tools_dir, hardware_dir, ide_path, f, args):
         cmd += '-hardware "' + hardware_dir + '" '
     # Debug=Serial,DebugLevel=Core____
     cmd += '-fqbn=esp8266com:esp8266:{board_name}:' \
-            'CpuFrequency={cpu_freq},' \
+            'xtal={cpu_freq},' \
             'FlashFreq={flash_freq},' \
             'FlashMode={flash_mode},' \
-            'UploadSpeed=921600,' \
-            'FlashSize={flash_size},' \
+            'baud=921600,' \
+            'eesz={flash_size},' \
             'ResetMethod=nodemcu'.format(**vars(args))
     if args.debug_port and args.debug_level:
-        cmd += 'Debug={debug_port},DebugLevel={debug_level}'.format(**vars(args))
+        cmd += 'dbg={debug_port},lvl={debug_level}'.format(**vars(args))
     cmd += ' '
     cmd += '-ide-version=10607 '
     cmd += '-warnings={warnings} '.format(**vars(args))

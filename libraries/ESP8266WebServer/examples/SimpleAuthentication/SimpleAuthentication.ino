@@ -8,18 +8,18 @@ const char* password = "........";
 ESP8266WebServer server(80);
 
 //Check if header is present and correct
-bool is_authentified() {
-  Serial.println("Enter is_authentified");
+bool is_authenticated() {
+  Serial.println("Enter is_authenticated");
   if (server.hasHeader("Cookie")) {
     Serial.print("Found cookie: ");
     String cookie = server.header("Cookie");
     Serial.println(cookie);
     if (cookie.indexOf("ESPSESSIONID=1") != -1) {
-      Serial.println("Authentification Successful");
+      Serial.println("Authentication Successful");
       return true;
     }
   }
-  Serial.println("Authentification Failed");
+  Serial.println("Authentication Failed");
   return false;
 }
 
@@ -59,11 +59,11 @@ void handleLogin() {
   server.send(200, "text/html", content);
 }
 
-//root page can be accessed only if authentification is ok
+//root page can be accessed only if authentication is ok
 void handleRoot() {
   Serial.println("Enter handleRoot");
   String header;
-  if (!is_authentified()) {
+  if (!is_authenticated()) {
     server.sendHeader("Location", "/login");
     server.sendHeader("Cache-Control", "no-cache");
     server.send(301);
@@ -77,7 +77,7 @@ void handleRoot() {
   server.send(200, "text/html", content);
 }
 
-//no need authentification
+//no need authentication
 void handleNotFound() {
   String message = "File Not Found\n\n";
   message += "URI: ";
@@ -114,7 +114,7 @@ void setup(void) {
   server.on("/", handleRoot);
   server.on("/login", handleLogin);
   server.on("/inline", []() {
-    server.send(200, "text/plain", "this works without need of authentification");
+    server.send(200, "text/plain", "this works without need of authentication");
   });
 
   server.onNotFound(handleNotFound);

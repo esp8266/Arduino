@@ -33,6 +33,9 @@
               "name": "Adafruit Feather HUZZAH ESP8266"
             },
             {
+              "name": "XinaBox CW01"
+            },
+            {
               "name": "ESPresso Lite 1.0"
             },
             {
@@ -63,13 +66,13 @@
               "name": "SweetPea ESP-210"
             },
             {
-              "name": "WeMos D1 R2 & mini"
+              "name": "LOLIN(WEMOS) D1 R2 & mini"
             },
             {
-              "name": "WeMos D1 mini Pro"
+              "name": "LOLIN(WEMOS) D1 mini Pro"
             },
             {
-              "name": "WeMos D1 mini Lite"
+              "name": "LOLIN(WEMOS) D1 mini Lite"
             },
             {
               "name": "WeMos D1 R1"
@@ -97,6 +100,9 @@
             },
             {
               "name": "Amperka WiFi Slot"
+            },
+            {
+              "name": "Seeed Wio Link"
             }
           ],
           "toolsDependencies": [
