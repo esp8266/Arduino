@@ -575,11 +575,11 @@ enum wps_cb_status {
     WPS_CB_ST_UNK,
 };
 
+typedef void (*wps_st_cb_t)(int status);
+
 bool wifi_wps_enable(WPS_TYPE_t wps_type);
 bool wifi_wps_disable(void);
 bool wifi_wps_start(void);
-
-typedef void (*wps_st_cb_t)(int status);
 bool wifi_set_wps_cb(wps_st_cb_t cb);
 
 typedef void (*freedom_outside_cb_t)(uint8 status);

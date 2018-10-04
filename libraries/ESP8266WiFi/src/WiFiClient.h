@@ -28,7 +28,12 @@
 #include "IPAddress.h"
 #include "include/slist.h"
 
-#define WIFICLIENT_MAX_PACKET_SIZE 1460
+#ifndef TCP_MSS
+#define TCP_MSS 1460 // lwip1.4
+#endif
+
+#define WIFICLIENT_MAX_PACKET_SIZE TCP_MSS
+#define WIFICLIENT_MAX_FLUSH_WAIT_MS 300
 
 #define TCP_DEFAULT_KEEPALIVE_IDLE_SEC          7200 // 2 hours
 #define TCP_DEFAULT_KEEPALIVE_INTERVAL_SEC      75   // 75 sec
@@ -67,8 +72,8 @@ public:
   size_t peekBytes(char *buffer, size_t length) {
     return peekBytes((uint8_t *) buffer, length);
   }
-  virtual void flush();
-  virtual void stop();
+  virtual bool flush(unsigned int maxWaitMs = 0);
+  virtual bool stop(unsigned int maxWaitMs = 0);
   virtual uint8_t connected();
   virtual operator bool();
 
@@ -76,8 +81,7 @@ public:
   uint16_t  remotePort();
   IPAddress localIP();
   uint16_t  localPort();
-  bool getNoDelay();
-  void setNoDelay(bool nodelay);
+
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
   size_t availableForWrite();
@@ -95,6 +99,24 @@ public:
   uint16_t getKeepAliveInterval () const;
   uint8_t  getKeepAliveCount () const;
   void     disableKeepAlive () { keepAlive(0, 0, 0); }
+
+  // default NoDelay=False (Nagle=True=!NoDelay)
+  // Nagle is for shortly delaying outgoing data, to send less/bigger packets
+  // Nagle should be disabled for telnet-like/interactive streams
+  // Nagle is meaningless/ignored when Sync=true
+  static void setDefaultNoDelay (bool noDelay);
+  static bool getDefaultNoDelay ();
+  bool getNoDelay() const;
+  void setNoDelay(bool nodelay);
+
+  // default Sync=false
+  // When sync is true, all writes are automatically flushed.
+  // This is slower but also does not allocate
+  // temporary memory for sending data
+  static void setDefaultSync (bool sync);
+  static bool getDefaultSync ();
+  bool getSync() const;
+  void setSync(bool sync);
 
 protected:
 

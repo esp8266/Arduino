@@ -12,7 +12,7 @@ PHDRS
 
 
 /*  Default entry point:  */
-ENTRY(call_user_start)
+ENTRY(app_entry)
 EXTERN(_DebugExceptionVector)
 EXTERN(_DoubleExceptionVector)
 EXTERN(_KernelExceptionVector)
@@ -83,6 +83,11 @@ SECTIONS
     _Pri_3_HandlerAddress = ABSOLUTE(.);
     _data_end = ABSOLUTE(.);
   } >dram0_0_seg :dram0_0_phdr
+
+  .noinit : ALIGN(4)
+  {
+    *(.noinit)
+  } >dram0_0_seg :dram0_0_phdr
   
 #ifdef VTABLES_IN_DRAM
 #include "eagle.app.v6.common.ld.vtables.h"
@@ -107,6 +112,7 @@ SECTIONS
     *liblwip_src.a:(.literal .text .literal.* .text.*)
     *liblwip2.a:(.literal .text .literal.* .text.*)
     *liblwip2_1460.a:(.literal .text .literal.* .text.*)
+    *libbearssl.a:(.literal .text .literal.* .text.*)
     *libaxtls.a:(.literal .text .literal.* .text.*)
     *libat.a:(.literal.* .text.*)
     *libcrypto.a:(.literal.* .text.*)
@@ -121,7 +127,7 @@ SECTIONS
     *libwpa.a:(.literal.* .text.*)
     *libwpa2.a:(.literal.* .text.*)
     *libwps.a:(.literal.* .text.*)
-    *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text .irom.text.*)
+    *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom0.text.* .irom.text .irom.text.*)
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);
   } >irom0_0_seg :irom0_0_phdr
