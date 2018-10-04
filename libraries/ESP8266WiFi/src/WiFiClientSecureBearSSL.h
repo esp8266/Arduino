@@ -73,11 +73,13 @@ class WiFiClientSecure : public WiFiClient {
       _knownkey_usages = usages;
     }
     // Only check SHA1 fingerprint of certificate
-    void setFingerprint(const uint8_t fingerprint[20]) {
+    bool setFingerprint(const uint8_t fingerprint[20]) {
       _clearAuthenticationSettings();
       _use_fingerprint = true;
       memcpy_P(_fingerprint, fingerprint, 20);
+      return true;
     }
+    bool setFingerprint(const char *fpStr);
     // Accept any certificate that's self-signed
     void allowSelfSignedCerts() {
       _clearAuthenticationSettings();
