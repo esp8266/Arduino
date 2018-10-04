@@ -567,7 +567,7 @@ bool WiFiClientSecure::setFingerprint(const char *fpStr) {
       fpStr++;
     }
   }
-  if ((idx != 20) || pgm_read_byte(_fingerprint)) {
+  if ((idx != 20) || pgm_read_byte(fpStr)) {
     return false; // Garbage at EOL or we didn't have enough hex digits
   }
   return setFingerprint(fp);
