@@ -536,6 +536,42 @@ bool WiFiClientSecure::_wait_for_handshake() {
   return _handshake_done;
 }
 
+static uint8_t htoi (unsigned char c)
+{
+  if (c>='0' && c <='9') return c - '0';
+  else if (c>='A' && c<='F') return 10 + c - 'A';
+  else if (c>='a' && c<='f') return 10 + c - 'a';
+  else return 255;
+}
+
+// Set a fingerprint by parsing an ASCII string
+bool WiFiClientSecure::setFingerprint(const char *fpStr) {
+  int idx = 0;
+  uint8_t c, d;
+  uint8_t fp[20];
+
+  while (idx < 20) {
+    c = pgm_read_byte(fpStr++);
+    if (!c) break; // String ended, done processing
+    d = pgm_read_byte(fpStr++);
+    if (!d) return false; // Only half of the last hex digit, error
+    c = htoi(c);
+    d = htoi(d);
+    if ((c>15) || (d>15)) {
+      return false; // Error in one of the hex characters
+    }
+    fp[idx++] = (c<<4)|d;
+
+    // Skip 0 or more spaces or colons
+    while ( pgm_read_byte(fpStr) && (pgm_read_byte(fpStr)==' ' || pgm_read_byte(fpStr)==':') ) {
+      fpStr++;
+    }
+  }
+  if ((idx != 20) || pgm_read_byte(fpStr)) {
+    return false; // Garbage at EOL or we didn't have enough hex digits
+  }
+  return setFingerprint(fp);
+}
 
 extern "C" {
 
