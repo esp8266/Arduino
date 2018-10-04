@@ -56,7 +56,12 @@ WiFiServer::WiFiServer(uint16_t port)
 }
 
 void WiFiServer::begin() {
+	begin(_port);
+}
+
+void WiFiServer::begin(uint16_t port) {
     close();
+	_port = port;
     err_t err;
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
@@ -83,11 +88,16 @@ void WiFiServer::begin() {
 }
 
 void WiFiServer::setNoDelay(bool nodelay) {
-    _noDelay = nodelay;
+    _noDelay = nodelay? _ndTrue: _ndFalse;
 }
 
 bool WiFiServer::getNoDelay() {
-    return _noDelay;
+    switch (_noDelay)
+    {
+    case _ndFalse: return false;
+    case _ndTrue: return true;
+    default: return WiFiClient::getDefaultNoDelay();
+    }
 }
 
 bool WiFiServer::hasClient() {
@@ -101,7 +111,7 @@ WiFiClient WiFiServer::available(byte* status) {
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
         _unclaimed = _unclaimed->next();
-        result.setNoDelay(_noDelay);
+        result.setNoDelay(getNoDelay());
         DEBUGV("WS:av\r\n");
         return result;
     }
@@ -151,7 +161,7 @@ T* slist_append_tail(T* head, T* item) {
     return head;
 }
 
-int8_t WiFiServer::_accept(tcp_pcb* apcb, int8_t err) {
+long WiFiServer::_accept(tcp_pcb* apcb, long err) {
     (void) err;
     DEBUGV("WS:ac\r\n");
     ClientContext* client = new ClientContext(apcb, &WiFiServer::_s_discard, this);
@@ -166,7 +176,7 @@ void WiFiServer::_discard(ClientContext* client) {
     DEBUGV("WS:dis\r\n");
 }
 
-int8_t WiFiServer::_s_accept(void *arg, tcp_pcb* newpcb, int8_t err) {
+long WiFiServer::_s_accept(void *arg, tcp_pcb* newpcb, long err) {
     return reinterpret_cast<WiFiServer*>(arg)->_accept(newpcb, err);
 }
 

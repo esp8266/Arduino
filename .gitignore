@@ -10,8 +10,20 @@ tools/sdk/lib/liblwip_src.a
 tools/sdk/lwip/src/build
 tools/sdk/lwip/src/liblwip_src.a
 tests/host/bin
+tools/sdk/ld/backup
+tools/sdk/ld/eagle.app.v6.common.ld
+tests/host/lcov/
 
 *.o
 *.gc??
 *.gc??
 *.pyc
+*.gch
+
+boards.local.txt
+
+*.gcov
+*.gcno
+*.gcda
+*.o
+*.a

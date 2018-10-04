@@ -30,8 +30,10 @@ import sys
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
-
+extensions = [
+    'nbsphinx',
+    'sphinx.ext.mathjax',
+]
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -159,7 +161,7 @@ linkcheck_anchors_ignore = ["/#!"]
 #
 # on_rtd is whether we are on readthedocs.org
 env_readthedocs = os.environ.get('READTHEDOCS', None)
-print env_readthedocs
+print(env_readthedocs)
 
 if not env_readthedocs:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme

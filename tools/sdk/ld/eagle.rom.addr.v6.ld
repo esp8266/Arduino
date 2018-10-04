@@ -322,7 +322,6 @@ PROVIDE ( timer_insert = 0x40002c64 );
 PROVIDE ( uartAttach = 0x4000383c );
 PROVIDE ( uart_baudrate_detect = 0x40003924 );
 PROVIDE ( uart_buff_switch = 0x400038a4 );
-PROVIDE ( uart_div_modify = 0x400039d8 );
 PROVIDE ( uart_rx_intr_handler = 0x40003bbc );
 PROVIDE ( uart_rx_one_char = 0x40003b8c );
 PROVIDE ( uart_rx_one_char_block = 0x40003b64 );
