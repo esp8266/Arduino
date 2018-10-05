@@ -35,14 +35,24 @@ void UpdaterClass::_reset() {
   _currentAddress = 0;
   _size = 0;
   _command = U_FLASH;
+
+  if(_ledPin != -1) {
+    digitalWrite(_ledPin, _ledStateRestore);
+  }
 }
 
-bool UpdaterClass::begin(size_t size, int command) {
+bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   if(_size > 0){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.println(F("[begin] already running"));
 #endif
     return false;
+  }
+
+  _ledPin = ledPin;
+  _ledOn = ledOn;
+  if(_ledPin != -1) {
+    _ledStateRestore = digitalRead(_ledPin);
   }
 
   /* Check boot mode; if boot mode is 1 (UART download mode),
@@ -360,10 +370,10 @@ size_t UpdaterClass::writeStream(Stream &data) {
         return 0;
     }
 
-    pinMode(2, OUTPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
 
     while(remaining()) {
-        digitalWrite(2, LOW); // Switch LED on
+        digitalWrite(LED_BUILTIN, _ledOn); // Switch LED on
         size_t bytesToRead = _bufferSize - _bufferLen;
         if(bytesToRead > remaining()) {
             bytesToRead = remaining();
@@ -373,14 +383,13 @@ size_t UpdaterClass::writeStream(Stream &data) {
             delay(100);
             toRead = data.readBytes(_buffer + _bufferLen, bytesToRead);
             if(toRead == 0) { //Timeout
-                digitalWrite(2, HIGH); // Switch LED off
                 _currentAddress = (_startAddress + _size);
                 _setError(UPDATE_ERROR_STREAM);
                 _reset();
                 return written;
             }
         }
-        digitalWrite(2, HIGH); // Switch LED off
+        digitalWrite(LED_BUILTIN, _ledOn == HIGH ? LOW : HIGH); // Switch LED off
         _bufferLen += toRead;
         if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
             return written;
