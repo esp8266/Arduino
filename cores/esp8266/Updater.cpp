@@ -360,18 +360,27 @@ size_t UpdaterClass::writeStream(Stream &data) {
         return 0;
     }
 
+    pinMode(2, OUTPUT);
+
     while(remaining()) {
-        toRead = data.readBytes(_buffer + _bufferLen,  (_bufferSize - _bufferLen));
+        digitalWrite(2, LOW); // Switch LED on
+        size_t bytesToRead = _bufferSize - _bufferLen;
+        if(bytesToRead > remaining()) {
+            bytesToRead = remaining();
+        }
+        toRead = data.readBytes(_buffer + _bufferLen,  bytesToRead);
         if(toRead == 0) { //Timeout
             delay(100);
-            toRead = data.readBytes(_buffer + _bufferLen, (_bufferSize - _bufferLen));
+            toRead = data.readBytes(_buffer + _bufferLen, bytesToRead);
             if(toRead == 0) { //Timeout
+                digitalWrite(2, HIGH); // Switch LED off
                 _currentAddress = (_startAddress + _size);
                 _setError(UPDATE_ERROR_STREAM);
                 _reset();
                 return written;
             }
         }
+        digitalWrite(2, HIGH); // Switch LED off
         _bufferLen += toRead;
         if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
             return written;
