@@ -122,14 +122,12 @@ HTTPClient::HTTPClient()
  */
 HTTPClient::~HTTPClient()
 {
+Serial.printf("Destructor client is %s\n", _client? "not null" : "null");
     if(_client) {
+Serial.println("Before stop");
         _client->stop();
+Serial.println("After stop");
     }
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
-    if(_tcpDeprecated) {
-        _tcpDeprecated->stop();
-    }
-#endif
     if(_currentHeaders) {
         delete[] _currentHeaders;
     }
@@ -370,7 +368,6 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t htt
  * end
  * called after the payload is handled
  */
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
 void HTTPClient::end(void)
 {
     disconnect();
@@ -393,14 +390,6 @@ void HTTPClient::disconnect()
             }
 
         }
-        if(_tcpDeprecated) {
-            if(_tcpDeprecated->available() > 0) {
-                DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _tcpDeprecated->available());
-                while(_tcpDeprecated->available() > 0) {
-                    _tcpDeprecated->read();
-                }
-            }
-        }
         if(_reuse && _canReuse) {
             DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
         } else {
@@ -409,38 +398,18 @@ void HTTPClient::disconnect()
                 _client->stop();
                 _client = nullptr;
             }
+#ifdef HTTPCLIENT_1_1_COMPATIBLE
             if(_tcpDeprecated) {
-                _tcpDeprecated->stop();
                 _transportTraits.reset(nullptr);
                 _tcpDeprecated.reset(nullptr);
             }
-        }
-    } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp is closed\n");
-    }
-}
-#else
-void HTTPClient::end(void)
-{
-    if(connected()) {
-        if(_client->available() > 0) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _client->available());
-            while(_client->available() > 0) {
-                _client->read();
-            }
-        }
-        if(_reuse && _canReuse) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
-        } else {
-            DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp stop\n");
-            _client->stop();
-            _client = nullptr;
-        }
-    } else {
-        DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp is closed\n");
-    }
-}
 #endif
+        }
+    } else {
+        DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp is closed\n");
+    }
+}
+
 /**
  * connected
  * @return connected status
@@ -450,11 +419,6 @@ bool HTTPClient::connected()
     if(_client) {
         return (_client->connected() || (_client->available() > 0));
     }
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
-    if(_tcpDeprecated) {
-        return (_tcpDeprecated->connected() || (_tcpDeprecated->available() > 0));
-    }
-#endif
     return false;
 }
 
@@ -777,9 +741,6 @@ int HTTPClient::getSize(void)
 WiFiClient& HTTPClient::getStream(void)
 {
     if(connected()) {
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
-        if(_tcpDeprecated) return *_tcpDeprecated;
-#endif
         return *_client;
     }
 
@@ -795,9 +756,6 @@ WiFiClient& HTTPClient::getStream(void)
 WiFiClient* HTTPClient::getStreamPtr(void)
 {
     if(connected()) {
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
-        if(_tcpDeprecated) return _tcpDeprecated.get();
-#endif
         return _client;
     }
 
@@ -1044,7 +1002,6 @@ bool HTTPClient::hasHeader(const char* name)
  */
 bool HTTPClient::connect(void)
 {
-
     if(connected()) {
         DEBUG_HTTPCLIENT("[HTTP-Client] connect. already connected, try reuse!\n");
         while(_client->available() > 0) {
@@ -1053,11 +1010,7 @@ bool HTTPClient::connect(void)
         return true;
     }
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
-    if (!_client && !_transportTraits) {
-#else
     if(!_client) {
-#endif
         DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
         return false;
     }
@@ -1068,6 +1021,7 @@ bool HTTPClient::connect(void)
         _client = _tcpDeprecated.get();
     }
 #endif
+
     _client->setTimeout(_tcpTimeout);
 
     if(!_client->connect(_host.c_str(), _port)) {
@@ -1078,7 +1032,7 @@ bool HTTPClient::connect(void)
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
-    if (_tcpDeprecated && _transportTraits && !_transportTraits->verify(*_tcpDeprecated, _host.c_str())) {
+    if (_tcpDeprecated && !_transportTraits->verify(*_tcpDeprecated, _host.c_str())) {
         DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
         _client->stop();
         return false;
@@ -1087,13 +1041,7 @@ bool HTTPClient::connect(void)
 
 
 #ifdef ESP8266
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
-    if(_tcpDeprecated)
-        _tcpDeprecated->setNoDelay(true);
-#else
-    if(_client)
-        _client->setNoDelay(true);
-#endif
+    _client->setNoDelay(true);
 #endif
     return connected();
 }
