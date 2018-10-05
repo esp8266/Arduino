@@ -122,11 +122,8 @@ HTTPClient::HTTPClient()
  */
 HTTPClient::~HTTPClient()
 {
-Serial.printf("Destructor client is %s\n", _client? "not null" : "null");
     if(_client) {
-Serial.println("Before stop");
         _client->stop();
-Serial.println("After stop");
     }
     if(_currentHeaders) {
         delete[] _currentHeaders;
