@@ -1147,8 +1147,13 @@ int HTTPClient::handleHeaderResponse()
 
                 for(size_t i = 0; i < _headerKeysCount; i++) {
                     if(_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
-                        _currentHeaders[i].value = headerValue;
-                        break;
+                        if (_currentHeaders[i].value != "") {
+                            // Existing value, append this one with a comma
+                            _currentHeaders[i].value += "," + headerValue;
+                        } else {
+                            _currentHeaders[i].value = headerValue;
+                        }
+                        break; // We found a match, stop looking
                     }
                 }
             }
