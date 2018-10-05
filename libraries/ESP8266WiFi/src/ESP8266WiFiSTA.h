@@ -26,6 +26,7 @@
 
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
+#include "user_interface.h"
 
 
 class ESP8266WiFiSTAClass {
@@ -96,7 +97,6 @@ class ESP8266WiFiSTAClass {
     public:
 
         bool beginWPSConfig(void);
-
         bool beginSmartConfig();
         bool stopSmartConfig();
         bool smartConfigDone();

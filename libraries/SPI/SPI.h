@@ -64,6 +64,7 @@ public:
   void beginTransaction(SPISettings settings);
   uint8_t transfer(uint8_t data);
   uint16_t transfer16(uint16_t data);
+  void transfer(void *buf, uint16_t count);
   void write(uint8_t data);
   void write16(uint16_t data);
   void write16(uint16_t data, bool msb);

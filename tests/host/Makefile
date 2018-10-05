@@ -1,4 +1,5 @@
 BINARY_DIRECTORY := bin
+LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
 CORE_PATH := ../../cores/esp8266
 
@@ -8,6 +9,9 @@ CC  ?= gcc
 CXX ?= g++
 endif
 GCOV ?= gcov
+VALGRIND ?= valgrind
+LCOV ?= lcov
+GENHTML ?= genhtml
 
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	StreamString.cpp \
@@ -49,11 +53,12 @@ TEST_CPP_FILES := \
 	fs/test_fs.cpp \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
+	core/test_string.cpp
 
-
-CXXFLAGS += -std=c++11 -Wall -coverage -O0 -fno-common
-CFLAGS += -std=c99 -Wall -coverage -O0 -fno-common
+CXXFLAGS += -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g
+CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g
 LDFLAGS += -coverage -O0
+VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
@@ -69,7 +74,7 @@ CPP_OBJECTS = $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_TESTS)
 OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS)
 COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 
-all: build-info $(OUTPUT_BINARY) test gcov
+all: build-info $(OUTPUT_BINARY) valgrind test gcov
 
 test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
@@ -81,10 +86,17 @@ clean-objects:
 	rm -rf $(OBJECTS)
 
 clean-coverage:
-	rm -rf $(COVERAGE_FILES) *.gcov
+	rm -rf $(COVERAGE_FILES) $(LCOV_DIRECTORY) *.gcov
 
 gcov: test
 	find $(CORE_PATH) -name "*.gcno" -exec $(GCOV) -r -pb {} +
+
+valgrind: $(OUTPUT_BINARY)
+	mkdir -p $(LCOV_DIRECTORY)
+	$(LCOV) --directory ../../cores/esp8266/ --zerocounters
+	$(VALGRIND) $(VALGRINDFLAGS) $(OUTPUT_BINARY)
+	$(LCOV) --directory $(CORE_PATH) --capture --output-file $(LCOV_DIRECTORY)/app.info
+	$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
 build-info:
 	@echo "-------- build tools info --------"

@@ -127,6 +127,8 @@ typedef enum {
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 
+class StreamString;
+
 class HTTPClient
 {
 public:
@@ -185,7 +187,7 @@ public:
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
     int writeToStream(Stream* stream);
-    String getString(void);
+    const String& getString(void);
 
     static String errorToString(int error);
 
@@ -196,6 +198,7 @@ protected:
     };
 
     bool beginInternal(String url, const char* expectedProtocol);
+    void disconnect();
     void clear();
     int returnError(int error);
     bool connect(void);
@@ -228,6 +231,7 @@ protected:
     int _size = -1;
     bool _canReuse = false;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
+    std::unique_ptr<StreamString> _payload;
 };
 
 
