@@ -11,7 +11,7 @@ extern "C" {
 // these auto classes wrap up xt_rsil so your code can be simplier, but can only be
 // used in an ino or cpp files. 
 
-// InterruptLock is used when you want to completely disable locks
+// InterruptLock is used when you want to completely disable interrupts
 //{
 //    {
 //      InterruptLock lock; 

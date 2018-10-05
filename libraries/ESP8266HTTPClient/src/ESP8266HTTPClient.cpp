@@ -33,7 +33,7 @@
 class TransportTraits
 {
 public:
-    virtual ~TransportTraits() 
+    virtual ~TransportTraits()
     {
     }
 
@@ -44,6 +44,8 @@ public:
 
     virtual bool verify(WiFiClient& client, const char* host)
     {
+        (void)client;
+        (void)host;
         return true;
     }
 };
@@ -58,17 +60,45 @@ public:
 
     std::unique_ptr<WiFiClient> create() override
     {
-        return std::unique_ptr<WiFiClient>(new WiFiClientSecure());
+        return std::unique_ptr<WiFiClient>(new axTLS::WiFiClientSecure());
     }
 
     bool verify(WiFiClient& client, const char* host) override
     {
-        auto wcs = static_cast<WiFiClientSecure&>(client);
+        auto wcs = static_cast<axTLS::WiFiClientSecure&>(client);
         return wcs.verify(_fingerprint.c_str(), host);
     }
 
 protected:
     String _fingerprint;
+};
+
+class BearSSLTraits : public TransportTraits
+{
+public:
+    BearSSLTraits(const uint8_t fingerprint[20])
+    {
+        memcpy(_fingerprint, fingerprint, sizeof(_fingerprint));
+    }
+
+    std::unique_ptr<WiFiClient> create() override
+    {
+        BearSSL::WiFiClientSecure *client = new BearSSL::WiFiClientSecure();
+        client->setFingerprint(_fingerprint);
+        return std::unique_ptr<WiFiClient>(client);
+    }
+
+    bool verify(WiFiClient& client, const char* host) override
+    {
+        // No-op.  BearSSL will not connect if the fingerprint doesn't match.
+        // So if you get to here you've already connected and it matched
+        (void) client;
+        (void) host;
+        return true;
+    }
+
+protected:
+    uint8_t _fingerprint[20];
 };
 
 /**
@@ -96,6 +126,7 @@ void HTTPClient::clear()
     _returnCode = 0;
     _size = -1;
     _headers = "";
+    _payload.reset();
 }
 
 
@@ -113,6 +144,24 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] httpsFingerprint: %s\n", httpsFingerprint.c_str());
     return true;
 }
+
+
+bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
+{
+    _transportTraits.reset(nullptr);
+    _port = 443;
+    if (!beginInternal(url, "https")) {
+        return false;
+    }
+    _transportTraits = TransportTraitsPtr(new BearSSLTraits(httpsFingerprint));
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] BearSSL-httpsFingerprint:");
+    for (size_t i=0; i < 20; i++) {
+        DEBUG_HTTPCLIENT(" %02x", httpsFingerprint[i]);
+    }
+    DEBUG_HTTPCLIENT("\n");
+    return true;
+}
+
 
 /**
  * parsing the url for all needed parameters
@@ -132,7 +181,6 @@ bool HTTPClient::begin(String url)
 bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 {
     DEBUG_HTTPCLIENT("[HTTP-Client][begin] url: %s\n", url.c_str());
-    bool hasPort = false;
     clear();
 
     // check for : (http: or https:
@@ -168,6 +216,7 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
         _host = host;
     }
     _uri = url;
+
     if (_protocol != expectedProtocol) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
         return false;
@@ -211,11 +260,38 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
     return true;
 }
 
+bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])
+{
+    clear();
+    _host = host;
+    _port = port;
+    _uri = uri;
+
+    _transportTraits = TransportTraitsPtr(new BearSSLTraits(httpsFingerprint));
+    DEBUG_HTTPCLIENT("[HTTP-Client][begin] host: %s port: %d url: %s BearSSL-httpsFingerprint:", host.c_str(), port, uri.c_str());
+    for (size_t i=0; i < 20; i++) {
+        DEBUG_HTTPCLIENT(" %02x", httpsFingerprint[i]);
+    }
+    DEBUG_HTTPCLIENT("\n");
+    return true;
+}
+
+
 /**
  * end
  * called after the payload is handled
  */
 void HTTPClient::end(void)
+{
+    disconnect();
+    clear();
+}
+
+/**
+ * disconnect
+ * close the TCP socket
+ */
+void HTTPClient::disconnect()
 {
     if(connected()) {
         if(_tcp->available() > 0) {
@@ -350,6 +426,20 @@ int HTTPClient::PUT(uint8_t * payload, size_t size) {
 
 int HTTPClient::PUT(String payload) {
     return PUT((uint8_t *) payload.c_str(), payload.length());
+}
+
+/**
+ * sends a patch request to the server
+ * @param payload uint8_t *
+ * @param size size_t
+ * @return http code
+ */
+int HTTPClient::PATCH(uint8_t * payload, size_t size) {
+    return sendRequest("PATCH", payload, size);
+}
+
+int HTTPClient::PATCH(String payload) {
+    return PATCH((uint8_t *) payload.c_str(), payload.length());
 }
 
 /**
@@ -655,7 +745,7 @@ int HTTPClient::writeToStream(Stream * stream)
         return returnError(HTTPC_ERROR_ENCODING);
     }
 
-    end();
+    disconnect();
     return ret;
 }
 
@@ -663,20 +753,24 @@ int HTTPClient::writeToStream(Stream * stream)
  * return all payload as String (may need lot of ram or trigger out of memory!)
  * @return String
  */
-String HTTPClient::getString(void)
+const String& HTTPClient::getString(void)
 {
-    StreamString sstring;
+    if (_payload) {
+        return *_payload;
+    }
+
+    _payload.reset(new StreamString());
 
     if(_size) {
         // try to reserve needed memmory
-        if(!sstring.reserve((_size + 1))) {
+        if(!_payload->reserve((_size + 1))) {
             DEBUG_HTTPCLIENT("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\n", (_size + 1));
-            return "";
+            return *_payload;
         }
     }
 
-    writeToStream(&sstring);
-    return sstring;
+    writeToStream(_payload.get());
+    return *_payload;
 }
 
 /**
@@ -824,6 +918,7 @@ bool HTTPClient::connect(void)
     }
 
     _tcp = _transportTraits->create();
+    _tcp->setTimeout(_tcpTimeout);
 
     if(!_tcp->connect(_host.c_str(), _port)) {
         DEBUG_HTTPCLIENT("[HTTP-Client] failed connect to %s:%u\n", _host.c_str(), _port);
@@ -838,8 +933,6 @@ bool HTTPClient::connect(void)
         return false;
     }
 
-    // set Timeout for readBytesUntil and readStringUntil
-    _tcp->setTimeout(_tcpTimeout);
 
 #ifdef ESP8266
     _tcp->setNoDelay(true);
@@ -858,7 +951,7 @@ bool HTTPClient::sendHeader(const char * type)
         return false;
     }
 
-    String header = String(type) + " " + _uri + F(" HTTP/1.");
+    String header = String(type) + " " + (_uri.length() ? _uri : F("/")) + F(" HTTP/1.");
 
     if(_useHTTP10) {
         header += "0";
@@ -894,6 +987,8 @@ bool HTTPClient::sendHeader(const char * type)
     }
 
     header += _headers + "\r\n";
+
+    DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
     return (_tcp->write((const uint8_t *) header.c_str(), header.length()) == header.length());
 }
@@ -946,8 +1041,13 @@ int HTTPClient::handleHeaderResponse()
 
                 for(size_t i = 0; i < _headerKeysCount; i++) {
                     if(_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
-                        _currentHeaders[i].value = headerValue;
-                        break;
+                        if (_currentHeaders[i].value != "") {
+                            // Existing value, append this one with a comma
+                            _currentHeaders[i].value += "," + headerValue;
+                        } else {
+                            _currentHeaders[i].value = headerValue;
+                        }
+                        break; // We found a match, stop looking
                     }
                 }
             }

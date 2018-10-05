@@ -81,11 +81,11 @@ public:
   }
   
   bool addServiceTxt(char *name, char *proto, char * key, char * value);
-  void addServiceTxt(const char *name, const char *proto, const char *key,const char * value){
-    addServiceTxt((char *)name, (char *)proto, (char *)key, (char *)value);
+  bool addServiceTxt(const char *name, const char *proto, const char *key,const char * value){
+    return addServiceTxt((char *)name, (char *)proto, (char *)key, (char *)value);
   }
-  void addServiceTxt(String name, String proto, String key, String value){
-    addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
+  bool addServiceTxt(String name, String proto, String key, String value){
+    return addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
   }
   
   int queryService(char *service, char *proto);
@@ -125,9 +125,10 @@ private:
   uint16_t _getServicePort(char *service, char *proto);
   MDNSTxt * _getServiceTxt(char *name, char *proto);
   uint16_t _getServiceTxtLen(char *name, char *proto);
+  IPAddress _getRequestMulticastInterface();
   void _parsePacket();
-  void _reply(uint8_t replyMask, char * service, char *proto, uint16_t port, uint32_t ip);
-  size_t advertiseServices(); // advertise all hosted services
+  void _replyToTypeEnumRequest(IPAddress multicastInterface);
+  void _replyToInstanceRequest(uint8_t questionMask, uint8_t responseMask, char * service, char *proto, uint16_t port, IPAddress multicastInterface);
   MDNSAnswer* _getAnswerFromIdx(int idx);
   int _getNumAnswers();
   bool _listen();

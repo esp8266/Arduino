@@ -30,6 +30,13 @@ extern "C" {
 #include "twi.h"
 #include "Wire.h"
 
+
+//Some boards don't have these pins available, and hence don't support Wire.
+//Check here for compile-time error.
+#if !defined(PIN_WIRE_SDA) || !defined(PIN_WIRE_SCL)
+#error Wire library is not supported on this board
+#endif
+
 // Initialize Class Variables //////////////////////////////////////////////////
 
 uint8_t TwoWire::rxBuffer[BUFFER_LENGTH];
@@ -71,6 +78,7 @@ void TwoWire::begin(void){
 }
 
 void TwoWire::begin(uint8_t address){
+  (void)address;
   // twi_setAddress(address);
   // twi_attachSlaveTxEvent(onRequestService);
   // twi_attachSlaveRxEvent(onReceiveService);
@@ -206,6 +214,8 @@ void TwoWire::flush(void){
 
 void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
 {
+  (void)inBytes;
+  (void)numBytes;
   // don't bother if user hasn't registered a callback
   // if(!user_onReceive){
   //   return;
@@ -242,10 +252,12 @@ void TwoWire::onRequestService(void){
 }
 
 void TwoWire::onReceive( void (*function)(int) ){
+  (void)function;
   //user_onReceive = function;
 }
 
 void TwoWire::onRequest( void (*function)(void) ){
+  (void)function;
   //user_onRequest = function;
 }
 

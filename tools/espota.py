@@ -95,7 +95,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   sent = sock2.sendto(message.encode(), remote_address)
   sock2.settimeout(10)
   try:
-    data = sock2.recv(37).decode()
+    data = sock2.recv(128).decode()
   except:
     logging.error('No Answer')
     sock2.close()
@@ -171,10 +171,14 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
 
     sys.stderr.write('\n')
     logging.info('Waiting for result...')
+    # libraries/ArduinoOTA/ArduinoOTA.cpp L311 L320
+    # only sends digits or 'OK'. We must not not close
+    # the connection before receiving the 'O' of 'OK'
     try:
       connection.settimeout(60)
-      data = connection.recv(32).decode()
-      logging.info('Result: %s' ,data)
+      while True:
+        if connection.recv(32).decode().find('O') >= 0: break
+      logging.info('Result: OK')
       connection.close()
       f.close()
       sock.close()

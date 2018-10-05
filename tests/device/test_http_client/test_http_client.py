@@ -58,7 +58,7 @@ def setup_http_get(e):
     def flaskThread():
         p = os.path.dirname(os.path.abspath(__file__))
         context = (p + '/server.crt', p + '/server.key')
-        print context
+        print(context)
         app.run(host='0.0.0.0', port=8088, ssl_context=context)    
     th = Thread(target=flaskThread)
     th.start()

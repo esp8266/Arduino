@@ -8,7 +8,12 @@ For details, see http://sourceforge.net/projects/libb64
 #ifndef BASE64_CENCODE_H
 #define BASE64_CENCODE_H
 
-#define base64_encode_expected_len(n) ((((4 * n) / 3) + 3) & ~3)
+#define BASE64_CHARS_PER_LINE 72
+
+#define base64_encode_expected_len_nonewlines(n) ((((4 * (n)) / 3) + 3) & ~3)
+#define base64_encode_expected_len(n) \
+       (base64_encode_expected_len_nonewlines(n) + ((n / ((BASE64_CHARS_PER_LINE * 3) / 4)) + 1))
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,9 +27,11 @@ typedef struct {
   base64_encodestep step;
   char result;
   int stepcount;
+  int stepsnewline;
 } base64_encodestate;
 
 void base64_init_encodestate(base64_encodestate* state_in);
+void base64_init_encodestate_nonewlines(base64_encodestate* state_in);
 
 char base64_encode_value(char value_in);
 

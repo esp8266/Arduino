@@ -1,0 +1,6 @@
+[submodule "lwip2"]
+	path = tools/sdk/lwip2/builder
+	url = https://github.com/d-a-v/esp82xx-nonos-linklayer.git
+[submodule "tools/sdk/ssl/bearssl"]
+	path = tools/sdk/ssl/bearssl
+	url = https://github.com/earlephilhower/bearssl-esp8266

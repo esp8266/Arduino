@@ -19,7 +19,7 @@ int gdbstub_del_hw_watchpoint(int addr);
 extern void* gdbstub_do_break_breakpoint_addr;
 
 #ifdef __cplusplus
-{
+}
 #endif
 
 #endif

@@ -5,6 +5,7 @@
 #include <WiFiUdp.h>
 #include "ArduinoOTA.h"
 #include "MD5Builder.h"
+#include "StreamString.h"
 
 extern "C" {
   #include "osapi.h"
@@ -142,29 +143,29 @@ void ArduinoOTAClass::begin() {
 
 int ArduinoOTAClass::parseInt(){
   char data[16];
-  uint8_t index = 0;
+  uint8_t index;
   char value;
   while(_udp_ota->peek() == ' ') _udp_ota->read();
-  while(true){
+  for(index = 0; index < sizeof(data); ++index){
     value = _udp_ota->peek();
     if(value < '0' || value > '9'){
-      data[index++] = '\0';
+      data[index] = '\0';
       return atoi(data);
     }
-    data[index++] = _udp_ota->read();
+    data[index] = _udp_ota->read();
   }
   return 0;
 }
 
 String ArduinoOTAClass::readStringUntil(char end){
   String res = "";
-  char value;
+  int value;
   while(true){
     value = _udp_ota->read();
-    if(value == '\0' || value == end){
+    if(value < 0 || value == '\0' || value == end){
       return res;
     }
-    res += value;
+    res += static_cast<char>(value);
   }
   return res;
 }
@@ -180,6 +181,7 @@ void ArduinoOTAClass::_onRx(){
     _ota_ip = _udp_ota->getRemoteAddress();
     _cmd  = cmd;
     _ota_port = parseInt();
+    _ota_udp_port = _udp_ota->getRemotePort();
     _size = parseInt();
     _udp_ota->read();
     _md5 = readStringUntil('\n');
@@ -199,12 +201,10 @@ void ArduinoOTAClass::_onRx(){
       char auth_req[38];
       sprintf(auth_req, "AUTH %s", _nonce.c_str());
       _udp_ota->append((const char *)auth_req, strlen(auth_req));
-      _udp_ota->send(&ota_ip, _udp_ota->getRemotePort());
+      _udp_ota->send(&ota_ip, _ota_udp_port);
       _state = OTA_WAITAUTH;
       return;
     } else {
-      _udp_ota->append("OK", 2);
-      _udp_ota->send(&ota_ip, _udp_ota->getRemotePort());
       _state = OTA_RUNUPDATE;
     }
   } else if (_state == OTA_WAITAUTH) {
@@ -229,13 +229,11 @@ void ArduinoOTAClass::_onRx(){
     String result = _challengemd5.toString();
 
     ota_ip.addr = (uint32_t)_ota_ip;
-    if(result.equals(response)){
-      _udp_ota->append("OK", 2);
-      _udp_ota->send(&ota_ip, _udp_ota->getRemotePort());
+    if(result.equalsConstantTime(response)) {
       _state = OTA_RUNUPDATE;
     } else {
       _udp_ota->append("Authentication Failed", 21);
-      _udp_ota->send(&ota_ip, _udp_ota->getRemotePort());
+      _udp_ota->send(&ota_ip, _ota_udp_port);
       if (_error_callback) _error_callback(OTA_AUTH_ERROR);
       _state = OTA_IDLE;
     }
@@ -245,6 +243,9 @@ void ArduinoOTAClass::_onRx(){
 }
 
 void ArduinoOTAClass::_runUpdate() {
+  ip_addr_t ota_ip;
+  ota_ip.addr = (uint32_t)_ota_ip;
+
   if (!Update.begin(_size, _cmd)) {
 #ifdef OTA_DEBUG
     OTA_DEBUG.println("Update Begin Error");
@@ -252,10 +253,21 @@ void ArduinoOTAClass::_runUpdate() {
     if (_error_callback) {
       _error_callback(OTA_BEGIN_ERROR);
     }
+    
+    StreamString ss;
+    Update.printError(ss);
+    _udp_ota->append("ERR: ", 5);
+    _udp_ota->append(ss.c_str(), ss.length());
+    _udp_ota->send(&ota_ip, _ota_udp_port);
+    delay(100);
     _udp_ota->listen(*IP_ADDR_ANY, _port);
     _state = OTA_IDLE;
     return;
   }
+  _udp_ota->append("OK", 2);
+  _udp_ota->send(&ota_ip, _ota_udp_port);
+  delay(100);
+
   Update.setMD5(_md5.c_str());
   WiFiUDP::stopAll();
   WiFiClient::stopAll();
@@ -278,6 +290,8 @@ void ArduinoOTAClass::_runUpdate() {
     }
     _state = OTA_IDLE;
   }
+  // OTA sends little packets
+  client.setNoDelay(true);
 
   uint32_t written, total = 0;
   while (!Update.isFinished() && client.connected()) {
