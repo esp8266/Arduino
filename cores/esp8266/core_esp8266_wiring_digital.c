@@ -24,13 +24,11 @@
 #include "c_types.h"
 #include "eagle_soc.h"
 #include "ets_sys.h"
-
-extern void pwm_stop_pin(uint8_t pin);
+#include "core_esp8266_waveform.h"
 
 uint8_t esp8266_gpioToFn[16] = {0x34, 0x18, 0x38, 0x14, 0x3C, 0x40, 0x1C, 0x20, 0x24, 0x28, 0x2C, 0x30, 0x04, 0x08, 0x0C, 0x10};
 
 extern void __pinMode(uint8_t pin, uint8_t mode) {
-  pwm_stop_pin(pin);
   if(pin < 16){
     if(mode == SPECIAL){
       GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
@@ -80,7 +78,7 @@ extern void __pinMode(uint8_t pin, uint8_t mode) {
 }
 
 extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
-  pwm_stop_pin(pin);
+  stopWaveform(pin);
   if(pin < 16){
     if(val) GPOS = (1 << pin);
     else GPOC = (1 << pin);
@@ -91,7 +89,6 @@ extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val) {
 }
 
 extern int ICACHE_RAM_ATTR __digitalRead(uint8_t pin) {
-  pwm_stop_pin(pin);
   if(pin < 16){
     return GPIP(pin);
   } else if(pin == 16){
@@ -113,6 +110,17 @@ typedef struct {
   void * arg;
 } interrupt_handler_t;
 
+//duplicate from functionalInterrupt.h keep in sync
+typedef struct InterruptInfo {
+	uint8_t pin;
+	uint8_t value;
+	uint32_t micro;
+} InterruptInfo;
+
+typedef struct {
+	InterruptInfo* interruptInfo;
+	void* functionInfo;
+} ArgStructure;
 
 static interrupt_handler_t interrupt_handlers[16];
 static uint32_t interrupt_reg = 0;
@@ -135,7 +143,14 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
          (handler->mode & 1) == !!(levels & (1 << i)))) {
       // to make ISR compatible to Arduino AVR model where interrupts are disabled
       // we disable them before we call the client ISR
-      uint32_t savedPS = xt_rsil(15); // stop other interrupts 
+      uint32_t savedPS = xt_rsil(15); // stop other interrupts
+      ArgStructure* localArg = (ArgStructure*)handler->arg;
+      if (localArg && localArg->interruptInfo)
+      {
+         localArg->interruptInfo->pin = i;
+         localArg->interruptInfo->value = __digitalRead(i);
+         localArg->interruptInfo->micro = micros();
+      }
       if (handler->arg)
       {
     	  ((voidFuncPtrArg)handler->fn)(handler->arg);
@@ -150,17 +165,24 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
   ETS_GPIO_INTR_ENABLE();
 }
 
+extern void cleanupFunctional(void* arg);
+
 extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void *arg, int mode) {
   if(pin < 16) {
     ETS_GPIO_INTR_DISABLE();
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = mode;
     handler->fn = userFunc;
+    if (handler->arg)  // Clean when new attach without detach
+	{
+	  cleanupFunctional(handler->arg);
+	}
     handler->arg = arg;
     interrupt_reg |= (1 << pin);
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
     GPIEC = (1 << pin); //Clear Interrupt for this pin
     GPC(pin) |= ((mode & 0xF) << GPCI);//INT mode "mode"
+    ETS_GPIO_INTR_ATTACH(interrupt_handler, &interrupt_reg);
     ETS_GPIO_INTR_ENABLE();
   }
 }
@@ -179,8 +201,13 @@ extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = 0;
     handler->fn = 0;
+    if (handler->arg)
+		{
+		  cleanupFunctional(handler->arg);
+		}
     handler->arg = 0;
-    ETS_GPIO_INTR_ENABLE();
+    if (interrupt_reg)
+      ETS_GPIO_INTR_ENABLE();
   }
 }
 
@@ -197,9 +224,6 @@ void initPins() {
   for (int i = 12; i <= 16; ++i) {
     pinMode(i, INPUT);
   }
-  
-  ETS_GPIO_INTR_ATTACH(interrupt_handler, &interrupt_reg);
-  ETS_GPIO_INTR_ENABLE();
 }
 
 extern void pinMode(uint8_t pin, uint8_t mode) __attribute__ ((weak, alias("__pinMode")));

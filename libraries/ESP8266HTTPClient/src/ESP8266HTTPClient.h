@@ -127,16 +127,23 @@ typedef enum {
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 
+class StreamString;
+
 class HTTPClient
 {
 public:
     HTTPClient();
     ~HTTPClient();
 
+    // Plain HTTP connection, unencrypted
     bool begin(String url);
-    bool begin(String url, String httpsFingerprint);
     bool begin(String host, uint16_t port, String uri = "/");
+    // Use axTLS for secure HTTPS connection
+    bool begin(String url, String httpsFingerprint);
     bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
+    // Use BearSSL for secure HTTPS connection
+    bool begin(String url, const uint8_t httpsFingerprint[20]);
+    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20]);
     // deprecated, use the overload above instead
     bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
 
@@ -180,7 +187,7 @@ public:
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
     int writeToStream(Stream* stream);
-    String getString(void);
+    const String& getString(void);
 
     static String errorToString(int error);
 
@@ -191,6 +198,7 @@ protected:
     };
 
     bool beginInternal(String url, const char* expectedProtocol);
+    void disconnect();
     void clear();
     int returnError(int error);
     bool connect(void);
@@ -223,6 +231,7 @@ protected:
     int _size = -1;
     bool _canReuse = false;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
+    std::unique_ptr<StreamString> _payload;
 };
 
 

@@ -1,5 +1,4 @@
 #include <BSTest.h>
-#include <test_config.h>
 #include <Schedule.h>
 
 BS_ENV_DECLARE();
