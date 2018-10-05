@@ -54,7 +54,7 @@ git clone https://github.com/esp8266/Arduino.git esp8266
 - Download binary tools (you need Python 2.7)
 ```bash
 cd esp8266/tools
-python get.py
+python3 get.py
 ```
 - Restart Arduino
 
