@@ -74,6 +74,12 @@ public:
         _rebootOnUpdate = reboot;
     }
 
+    void setLedPin(int ledPin = -1, uint8_t ledOn = HIGH)
+    {
+        _ledPin = ledPin;
+        _ledOn = ledOn;
+    }
+
 #ifdef HTTPUPDATE_1_2_COMPATIBLE
     // This function is deprecated, use rebootOnUpdate and the next one instead
     t_httpUpdate_return update(const String& url, const String& currentVersion,
@@ -123,6 +129,9 @@ protected:
     bool _rebootOnUpdate = true;
 private:
     int _httpClientTimeout;
+
+    int _ledPin;
+    uint8_t _ledOn;
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_HTTPUPDATE)

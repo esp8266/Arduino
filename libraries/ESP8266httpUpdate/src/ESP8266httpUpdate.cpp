@@ -30,12 +30,12 @@ extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
-        : _httpClientTimeout(8000)
+        : _httpClientTimeout(8000), _ledPin(-1)
 {
 }
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
-        : _httpClientTimeout(httpClientTimeout)
+        : _httpClientTimeout(httpClientTimeout), _ledPin(-1)
 {
 }
 
@@ -438,7 +438,7 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int com
 
     StreamString error;
 
-    if(!Update.begin(size, command)) {
+    if(!Update.begin(size, command, _ledPin, _ledOn)) {
         _lastError = Update.getError();
         Update.printError(error);
         error.trim(); // remove line ending
