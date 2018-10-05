@@ -370,10 +370,14 @@ size_t UpdaterClass::writeStream(Stream &data) {
         return 0;
     }
 
-    pinMode(LED_BUILTIN, OUTPUT);
+    if(_ledPin != -1) {
+        pinMode(_ledPin, OUTPUT);
+    }
 
     while(remaining()) {
-        digitalWrite(LED_BUILTIN, _ledOn); // Switch LED on
+        if(_ledPin != -1) {
+            digitalWrite(LED_BUILTIN, _ledOn); // Switch LED on
+        }
         size_t bytesToRead = _bufferSize - _bufferLen;
         if(bytesToRead > remaining()) {
             bytesToRead = remaining();
@@ -389,7 +393,9 @@ size_t UpdaterClass::writeStream(Stream &data) {
                 return written;
             }
         }
-        digitalWrite(LED_BUILTIN, _ledOn == HIGH ? LOW : HIGH); // Switch LED off
+        if(_ledPin != -1) {
+            digitalWrite(LED_BUILTIN, _ledOn == HIGH ? LOW : HIGH); // Switch LED off
+        }
         _bufferLen += toRead;
         if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
             return written;
