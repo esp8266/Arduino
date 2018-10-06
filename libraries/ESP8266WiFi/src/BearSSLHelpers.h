@@ -24,6 +24,8 @@
 #define _BEARSSLHELPERS_H
 
 #include <bearssl/bearssl.h>
+#include <Updater.h>
+
 
 // Internal opaque structures, not needed by user applications
 namespace brssl {
@@ -134,6 +136,31 @@ class BearSSLSession {
     br_ssl_session_parameters *getSession() { return &_session; }
     // The actual BearSSL ession information
     br_ssl_session_parameters _session;
+};
+
+
+// Updater SHA256 hash and signature verification
+class BearSSLHashSHA256 : public UpdaterHashClass {
+  public:
+    virtual void begin() override;
+    virtual void add(const void *data, uint32_t len) override;
+    virtual void end() override;
+    virtual int len() override;
+    virtual void *hash() override;
+  private:
+    br_sha256_context _cc;
+    unsigned char _sha256[32];
+};
+
+class BearSSLVerifier : public UpdaterVerifyClass {
+  public:
+    virtual bool verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) override;
+
+  public:
+    BearSSLVerifier(BearSSLPublicKey *pubKey) { _pubKey = pubKey; }
+
+  private:
+    BearSSLPublicKey *_pubKey;
 };
 
 #endif

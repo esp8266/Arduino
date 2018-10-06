@@ -23,6 +23,8 @@ UpdaterClass::UpdaterClass()
 , _startAddress(0)
 , _currentAddress(0)
 , _command(U_FLASH)
+, _hash(nullptr)
+, _verify(nullptr)
 {
 }
 
@@ -140,6 +142,9 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 #endif
 
   _md5.begin();
+  if (_hash) {
+    _hash->begin();
+  }
   return true;
 }
 
@@ -176,6 +181,42 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _size = progress();
   }
 
+
+  uint32_t sigLen = 0;
+  if (_verify) {
+    ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
+#ifdef DEBUG_UPDATER
+    DEBUG_UPDATER.printf("[Updater] sigLen: %d\n", sigLen);
+#endif
+    if (!sigLen  || sigLen > 256) {
+      _setError(UPDATE_ERROR_SIGN);
+      _reset();
+      return false;
+    }
+  }
+
+  int binSize = _size;
+  if (_hash) {
+    _hash->begin();
+    binSize -= sigLen + sizeof(uint32_t);
+  }
+#ifdef DEBUG_UPDATER
+  DEBUG_UPDATER.printf("[Updater] Adjusted binsize: %d\n", binSize);
+#endif
+  // Calculate the MD5 and hash using proper size
+  uint8_t buff[32];
+  for(int i = 0; i < binSize; i += 32) {
+    ESP.flashRead(_startAddress + i, (uint32_t *)buff, 32);
+
+    int read = binSize - i;
+    if(read > 32) {
+      read = 32;
+    }
+    _md5.add(buff, read);
+    if (_hash) {
+      _hash->add(buff, read);
+    }
+  }
   _md5.calculate();
   if(_target_md5.length()) {
     if(_target_md5 != _md5.toString()){
@@ -186,6 +227,29 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     else DEBUG_UPDATER.printf("MD5 Success: %s\n", _target_md5.c_str());
 #endif
+  }
+
+  if (_verify && _hash) {
+    _hash->end();
+#ifdef DEBUG_UPDATER
+    unsigned char *ret = (unsigned char *)_hash->hash();
+    DEBUG_UPDATER.printf("[Updater] Computed Hash:");
+    for (int i=0; i<_hash->len(); i++) DEBUG_UPDATER.printf(" %02x", ret[i]);
+    DEBUG_UPDATER.printf("\n");
+#endif
+    uint8_t sig[256];
+    ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
+#ifdef DEBUG_UPDATER
+    DEBUG_UPDATER.printf("[Updater] sig[]:");
+    for (size_t i=0; i<sigLen; i++) {
+      DEBUG_UPDATER.printf(" %02x", sig[i]);
+    }
+    DEBUG_UPDATER.printf("\n");
+#endif
+    if (!_verify->verify(_hash, (void *)sig, sigLen)) {
+      _setError(UPDATE_ERROR_SIGN);
+      return false;
+    }
   }
 
   if(!_verifyEnd()) {
@@ -266,6 +330,9 @@ bool UpdaterClass::_writeBuffer(){
     return false;
   }
   _md5.add(_buffer, _bufferLen);
+  if (_hash) {
+    _hash->add(_buffer, _bufferLen);
+  }
   _currentAddress += _bufferLen;
   _bufferLen = 0;
   return true;
@@ -431,6 +498,8 @@ void UpdaterClass::printError(Print &out){
   } else if(_error == UPDATE_ERROR_MD5){
     //out.println(F("MD5 Check Failed"));
     out.printf("MD5 Failed: expected:%s, calculated:%s\n", _target_md5.c_str(), _md5.toString().c_str());
+  } else if(_error == UPDATE_ERROR_SIGN){
+    out.printf("Signature verification failed\n");
   } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
     out.printf_P(PSTR("Flash config wrong real: %d IDE: %d\n"), ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
   } else if(_error == UPDATE_ERROR_NEW_FLASH_CONFIG){

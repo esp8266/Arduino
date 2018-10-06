@@ -819,3 +819,36 @@ bool BearSSLX509List::append(const uint8_t *derCert, size_t derLen) {
 
   return true;
 }
+
+
+// SHA256 hash for updater
+void BearSSLHashSHA256::begin() {
+  br_sha256_init( &_cc );
+  memset( _sha256, 0, sizeof(_sha256) );
+}
+
+void BearSSLHashSHA256::add(const void *data, uint32_t len) {
+  br_sha256_update( &_cc, data, len );
+}
+
+void BearSSLHashSHA256::end() {
+  br_sha256_out( &_cc, _sha256 );
+}
+
+int BearSSLHashSHA256::len() {
+  return sizeof(_sha256);
+}
+
+void *BearSSLHashSHA256::hash() {
+  return (void*) _sha256;
+}
+
+// SHA256 verifier
+bool BearSSLVerifier::verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) {
+  if (!_pubKey || !hash || !signature || signatureLen != 256) return false;
+  br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
+  unsigned char vrf[32];
+  bool ret = vrfy((const unsigned char *)signature, signatureLen, NULL, sizeof(vrf), _pubKey->getRSA(), vrf);
+  if (!ret) return false;
+  return !memcmp(vrf, hash->hash(), sizeof(vrf));
+};
