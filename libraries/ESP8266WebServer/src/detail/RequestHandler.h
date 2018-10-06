@@ -2,6 +2,7 @@
 #define REQUESTHANDLER_H
 
 #include <ESP8266WebServer.h>
+#include <vector>
 
 template<typename ServerType>
 class RequestHandler {
