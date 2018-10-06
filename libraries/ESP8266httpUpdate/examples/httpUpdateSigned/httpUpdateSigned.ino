@@ -1,8 +1,11 @@
-/**
-   httpUpdate.ino
+/*
+   httpUpdateSigned.ino - Earle F. Philhower, III
+   Released into the Public Domain
 
-    Created on: 27.11.2015
-
+   Shows how to use a public key extracted from your private certificate to
+   only allow updates that you have signed to be applied over HTTP.  Remote
+   updates will require your private key to sign them, but of course
+   **ANYONE WITH PHYSICAL ACCESS CAN UPDATE THE 8266 VIA THE SERIAL PORT**.
 */
 
 #include <Arduino.h>
@@ -13,10 +16,11 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 
-#define USE_SERIAL Serial
-
 ESP8266WiFiMulti WiFiMulti;
 
+// This key is taken from the server public certificate in BearSSL examples
+// You should make your own private/public key pair and guard the private
+// key (never upload it to the 8266).
 const char pubkey[] PROGMEM = R"EOF(
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyW5a4OO7xd6pRDTETO7h
@@ -30,20 +34,20 @@ TQIDAQAB
 )EOF";
 BearSSLPublicKey *signPubKey = nullptr;
 BearSSLHashSHA256 *hash;
-BearSSLVerifier *sign;
+BearSSLSigningVerifier *sign;
 
 void setup() {
 
-  USE_SERIAL.begin(115200);
-  // USE_SERIAL.setDebugOutput(true);
+  Serial.begin(115200);
+  // Serial.setDebugOutput(true);
 
-  USE_SERIAL.println();
-  USE_SERIAL.println();
-  USE_SERIAL.println();
+  Serial.println();
+  Serial.println();
+  Serial.println();
 
   for (uint8_t t = 4; t > 0; t--) {
-    USE_SERIAL.printf("[SETUP] WAIT %d...\n", t);
-    USE_SERIAL.flush();
+    Serial.printf("[SETUP] WAIT %d...\n", t);
+    Serial.flush();
     delay(1000);
   }
 
@@ -52,7 +56,7 @@ void setup() {
 
   signPubKey = new BearSSLPublicKey(pubkey);
   hash = new BearSSLHashSHA256();
-  sign = new BearSSLVerifier(signPubKey);
+  sign = new BearSSLSigningVerifier(signPubKey);
 }
 
 
@@ -62,32 +66,24 @@ void loop() {
 
     WiFiClient client;
 
-
+    // Ensure all updates are signed appropriately.  W/o this call, all will be accepted.
     Update.installSignature(hash, sign);
 
-    // The line below is optional. It can be used to blink the LED on the board during flashing
-    // The LED will be on during download of one buffer of data from the network. The LED will
-    // be off during writing that buffer to flash
-    // On a good connection the LED should flash regularly. On a bad connection the LED will be
-    // on much longer than it will be off. Other pins than LED_BUILTIN may be used. The second
-    // value is used to put the LED on. If the LED is on with HIGH, that value should be passed
     ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
 
     t_httpUpdate_return ret = ESPhttpUpdate.update(client, "http://192.168.1.8/esp8266.bin");
-    // Or:
-    //t_httpUpdate_return ret = ESPhttpUpdate.update(client, "server", 80, "file.bin");
 
     switch (ret) {
       case HTTP_UPDATE_FAILED:
-        USE_SERIAL.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+        Serial.printf("HTTP_UPDATE_FAILED Error (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
         break;
 
       case HTTP_UPDATE_NO_UPDATES:
-        USE_SERIAL.println("HTTP_UPDATE_NO_UPDATES");
+        Serial.println("HTTP_UPDATE_NO_UPDATES");
         break;
 
       case HTTP_UPDATE_OK:
-        USE_SERIAL.println("HTTP_UPDATE_OK");
+        Serial.println("HTTP_UPDATE_OK");
         break;
     }
   }

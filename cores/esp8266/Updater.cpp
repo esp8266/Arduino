@@ -141,10 +141,6 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", _size, _size);
 #endif
 
-  _md5.begin();
-  if (_hash) {
-    _hash->begin();
-  }
   return true;
 }
 
@@ -188,13 +184,14 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.printf("[Updater] sigLen: %d\n", sigLen);
 #endif
-    if (!sigLen  || sigLen > 256) {
+    if (sigLen != _verify->length()) {
       _setError(UPDATE_ERROR_SIGN);
       _reset();
       return false;
     }
   }
 
+  _md5.begin();
   int binSize = _size;
   if (_hash) {
     _hash->begin();
@@ -204,13 +201,13 @@ bool UpdaterClass::end(bool evenIfRemaining){
   DEBUG_UPDATER.printf("[Updater] Adjusted binsize: %d\n", binSize);
 #endif
   // Calculate the MD5 and hash using proper size
-  uint8_t buff[32];
-  for(int i = 0; i < binSize; i += 32) {
-    ESP.flashRead(_startAddress + i, (uint32_t *)buff, 32);
+  uint8_t buff[128];
+  for(int i = 0; i < binSize; i += sizeof(buff)) {
+    ESP.flashRead(_startAddress + i, (uint32_t *)buff, sizeof(buff));
 
-    int read = binSize - i;
-    if(read > 32) {
-      read = 32;
+    size_t read = binSize - i;
+    if(read > sizeof(buff)) {
+      read = sizeof(buff);
     }
     _md5.add(buff, read);
     if (_hash) {
@@ -237,10 +234,15 @@ bool UpdaterClass::end(bool evenIfRemaining){
     for (int i=0; i<_hash->len(); i++) DEBUG_UPDATER.printf(" %02x", ret[i]);
     DEBUG_UPDATER.printf("\n");
 #endif
-    uint8_t sig[256];
+    uint8_t *sig = (uint8_t*)malloc(sigLen);
+    if (!sig) {
+      _setError(UPDATE_ERROR_SIGN);
+      _reset();
+      return false;
+    }
     ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("[Updater] sig[]:");
+    DEBUG_UPDATER.printf("[Updater] Received Signature:");
     for (size_t i=0; i<sigLen; i++) {
       DEBUG_UPDATER.printf(" %02x", sig[i]);
     }
@@ -248,6 +250,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
     if (!_verify->verify(_hash, (void *)sig, sigLen)) {
       _setError(UPDATE_ERROR_SIGN);
+      _reset();
       return false;
     }
   }
@@ -328,10 +331,6 @@ bool UpdaterClass::_writeBuffer(){
     _currentAddress = (_startAddress + _size);
     _setError(UPDATE_ERROR_WRITE);
     return false;
-  }
-  _md5.add(_buffer, _bufferLen);
-  if (_hash) {
-    _hash->add(_buffer, _bufferLen);
   }
   _currentAddress += _bufferLen;
   _bufferLen = 0;

@@ -29,6 +29,7 @@
 #endif
 #endif
 
+// Abstract class to implement whatever signing hash desired
 class UpdaterHashClass {
   public:
     virtual void begin() = 0;
@@ -38,9 +39,11 @@ class UpdaterHashClass {
     virtual void *hash() = 0;
 };
 
+// Abstract class to implement a signature verifier
 class UpdaterVerifyClass {
   public:
-    virtual bool verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) = 0;
+    virtual uint32_t length() = 0; // How many bytes of signature are expected
+    virtual bool verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) = 0; // Verify, return "true" on success
 };
 
 class UpdaterClass {

@@ -844,11 +844,35 @@ void *BearSSLHashSHA256::hash() {
 }
 
 // SHA256 verifier
-bool BearSSLVerifier::verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) {
-  if (!_pubKey || !hash || !signature || signatureLen != 256) return false;
-  br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
-  unsigned char vrf[32];
-  bool ret = vrfy((const unsigned char *)signature, signatureLen, NULL, sizeof(vrf), _pubKey->getRSA(), vrf);
-  if (!ret) return false;
-  return !memcmp(vrf, hash->hash(), sizeof(vrf));
+uint32_t BearSSLSigningVerifier::length()
+{
+  if (!_pubKey) {
+    return 0;
+  } else if (_pubKey->isRSA()) {
+    return _pubKey->getRSA()->nlen;
+  } else if (_pubKey->isEC()) {
+    return _pubKey->getEC()->qlen;
+  } else {
+    return 0;
+  }
+}
+
+bool BearSSLSigningVerifier::verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) {
+  if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
+
+  if (_pubKey->isRSA()) {
+    bool ret;
+    unsigned char vrf[hash->len()];
+    br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
+    ret = vrfy((const unsigned char *)signature, signatureLen, NULL, sizeof(vrf), _pubKey->getRSA(), vrf);
+    if (!ret || memcmp(vrf, hash->hash(), sizeof(vrf)) ) {
+      return false;
+    } else {
+      return true;
+    }
+  } else {
+    br_ecdsa_vrfy vrfy = br_ecdsa_vrfy_raw_get_default();
+    // The EC verifier actually does the compare, unlike the RSA one
+    return vrfy(br_ec_get_default(), hash->hash(), hash->len(), _pubKey->getEC(), (const unsigned char *)signature, signatureLen);
+  }
 };

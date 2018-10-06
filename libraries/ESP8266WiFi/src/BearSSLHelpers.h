@@ -152,12 +152,13 @@ class BearSSLHashSHA256 : public UpdaterHashClass {
     unsigned char _sha256[32];
 };
 
-class BearSSLVerifier : public UpdaterVerifyClass {
+class BearSSLSigningVerifier : public UpdaterVerifyClass {
   public:
+    virtual uint32_t length() override;
     virtual bool verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) override;
 
   public:
-    BearSSLVerifier(BearSSLPublicKey *pubKey) { _pubKey = pubKey; }
+    BearSSLSigningVerifier(BearSSLPublicKey *pubKey) { _pubKey = pubKey; }
 
   private:
     BearSSLPublicKey *_pubKey;
