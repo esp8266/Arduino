@@ -10,8 +10,7 @@ ESP8266WebServer server(80);
 
 const int led = 2;
 
-void setup(void)
-{
+void setup(void) {
     pinMode(led, OUTPUT);
     digitalWrite(led, 0);
     Serial.begin(9600);
@@ -20,8 +19,7 @@ void setup(void)
     Serial.println("");
 
     // Wait for connection
-    while (WiFi.status() != WL_CONNECTED)
-    {
+    while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
     }
@@ -31,8 +29,7 @@ void setup(void)
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
 
-    if (MDNS.begin("esp8266"))
-    {
+    if (MDNS.begin("esp8266")) {
         Serial.println("MDNS responder started");
     }
 
@@ -42,20 +39,15 @@ void setup(void)
 
     server.on("/led/2/actions/{}", []() {
         String action = server.pathArg(0);
-        if (action == "on")
-        {
+        if (action == "on") {
             // /led/2/actions/on
             digitalWrite(led, 1);
             server.send(200, "text/plain", "Led 2 on");
-        }
-        else if (action == "off")
-        {
+        } else if (action == "off") {
             // /led/2/actions/off
             digitalWrite(led, 0);
             server.send(200, "text/plain", "Led 2 off");
-        }
-        else
-        {
+        } else {
             server.send(404, "text/plain", "Action '" + action + "' was not found");
         }
     });
@@ -64,7 +56,6 @@ void setup(void)
     Serial.println("HTTP server started");
 }
 
-void loop(void)
-{
+void loop(void) {
     server.handleClient();
 }

@@ -19,11 +19,9 @@ public:
     , _method(method)
     {
 		int numParams = 0, start = 0;
-        do
-        {
+        do {
             start = _uri.indexOf("{}", start);
-            if (start > 0)
-            {
+            if (start > 0) {
                 numParams++;
                 start += 2;
             }
@@ -41,8 +39,7 @@ public:
         int listIndex = 0;
         int length = _uri.length();
         int j = 0;
-        for (int i = 0; i < length; i++, j++)
-        {
+        for (int i = 0; i < length; i++, j++) {
             char uriChar = _uri[i];
             char requestUriChar = requestUri[j];
 
@@ -53,14 +50,11 @@ public:
                 return false;
 
             i += 2; // index of char after '}'
-            if (i >= length)
-            {
+            if (i >= length) {
                 // there is no char after '}'
                 pathArgs[listIndex] = requestUri.substring(j);
                 return true;
-            }
-            else
-            {
+            } else {
                 char charEnd = _uri[i];
                 int uriIndex = requestUri.indexOf(charEnd, j);
                 if (uriIndex < 0)
