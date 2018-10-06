@@ -61,7 +61,7 @@ Other Function Calls
 .. code:: cpp
 
     int32_t  channel (void)
-    bool  setSleepMode (WiFiSleepType_t type)
+    bool  setSleepMode (WiFiSleepType_t type, int listenInterval=-1) (DTIM setting for LIGHT or MODEM sleep mode)
     WiFiSleepType_t  getSleepMode ()
     bool  setPhyMode (WiFiPhyMode_t mode)
     WiFiPhyMode_t  getPhyMode ()
@@ -72,6 +72,13 @@ Other Function Calls
     bool  forceSleepBegin (uint32 sleepUs=0)
     bool  forceSleepWake ()
     int  hostByName (const char *aHostname, IPAddress &aResult)
+
+    appeared in SDK pre-V3, for reference (prefer using setSleepMode(type,DTIM)):
+    uint8_t getListenInterval ();
+    void setListenInterval (uint8_t listenInterval);
+    bool isSleepLevelMax ();
+    void setSleepLevelMax (bool setToMax);
+
 
 Documentation for the above functions is not yet prepared.
 

@@ -66,13 +66,19 @@ class ESP8266WiFiGenericClass {
 
         int32_t channel(void);
 
-        bool setSleepMode(WiFiSleepType_t type);
+        bool setSleepMode(WiFiSleepType_t type, int listenInterval = -1);
         WiFiSleepType_t getSleepMode();
 
         bool setPhyMode(WiFiPhyMode_t mode);
         WiFiPhyMode_t getPhyMode();
 
         void setOutputPower(float dBm);
+
+        uint8_t getListenInterval ();
+        void setListenInterval (uint8_t listenInterval);
+
+        bool isSleepLevelMax ();
+        void setSleepLevelMax (bool setToMax);
 
         void persistent(bool persistent);
 
