@@ -36,33 +36,34 @@ public:
         if (_uri == requestUri)
             return true;
 
-        int listIndex = 0;
-        int length = _uri.length();
-        int j = 0;
-        for (int i = 0; i < length; i++, j++) {
+        size_t uriLength = _uri.length();
+        unsigned int pathArgIndex = 0;
+        unsigned int j = 0;
+        for (unsigned int i = 0; i < uriLength; i++, j++) {
             char uriChar = _uri[i];
             char requestUriChar = requestUri[j];
 
             if (uriChar == requestUriChar)
                 continue;
-			
             if (uriChar != '{')
                 return false;
 
             i += 2; // index of char after '}'
-            if (i >= length) {
+            if (i >= uriLength) {
                 // there is no char after '}'
-                pathArgs[listIndex] = requestUri.substring(j);
+                pathArgs[pathArgIndex] = requestUri.substring(j);
                 return true;
-            } else {
+            }
+            else
+            {
                 char charEnd = _uri[i];
                 int uriIndex = requestUri.indexOf(charEnd, j);
                 if (uriIndex < 0)
                     return false;
-                pathArgs[listIndex] = requestUri.substring(j, uriIndex);
-                j = uriIndex;
+                pathArgs[pathArgIndex] = requestUri.substring(j, uriIndex);
+                j = (unsigned int) uriIndex;
             }
-            listIndex++;
+            pathArgIndex++;
         }
 
         return j >= requestUri.length();
