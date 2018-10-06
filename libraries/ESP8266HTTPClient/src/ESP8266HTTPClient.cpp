@@ -1007,17 +1007,17 @@ bool HTTPClient::connect(void)
         return true;
     }
 
-    if(!_client) {
-        DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
-        return false;
-    }
-
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
     if(!_client) {
         _tcpDeprecated = _transportTraits->create();
         _client = _tcpDeprecated.get();
     }
 #endif
+
+    if(!_client) {
+        DEBUG_HTTPCLIENT("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\n");
+        return false;
+    }
 
     _client->setTimeout(_tcpTimeout);
 
