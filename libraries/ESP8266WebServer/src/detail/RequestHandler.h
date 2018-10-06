@@ -18,6 +18,16 @@ public:
 
 private:
     RequestHandler<ServerType>* _next = nullptr;
+	
+protected:
+    std::vector<String> pathArgs;
+
+public:
+    String pathArg(int i) { 
+        if (i < pathArgs.size())
+            return pathArgs[i];
+        return "";
+    }
 };
 
 #endif //REQUESTHANDLER_H

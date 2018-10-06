@@ -18,16 +18,60 @@ public:
     , _uri(uri)
     , _method(method)
     {
+		int numParams = 0, start = 0;
+        do
+        {
+            start = _uri.indexOf("{}", start);
+            if (start > 0)
+            {
+                numParams++;
+                start += 2;
+            }
+        } while (start > 0);
+        pathArgs = std::vector<String>(numParams);
     }
 
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
         if (_method != HTTP_ANY && _method != requestMethod)
             return false;
 
-        if (requestUri != _uri)
-            return false;
+        if (_uri == requestUri)
+            return true;
 
-        return true;
+        int listIndex = 0;
+        int length = _uri.length();
+        int j = 0;
+        for (int i = 0; i < length; i++, j++)
+        {
+            char uriChar = _uri[i];
+            char requestUriChar = requestUri[j];
+
+            if (uriChar == requestUriChar)
+                continue;
+			
+            if (uriChar != '{')
+                return false;
+
+            i += 2; // index of char after '}'
+            if (i >= length)
+            {
+                // there is no char after '}'
+                pathArgs[listIndex] = requestUri.substring(j);
+                return true;
+            }
+            else
+            {
+                char charEnd = _uri[i];
+                int uriIndex = requestUri.indexOf(charEnd, j);
+                if (uriIndex < 0)
+                    return false;
+                pathArgs[listIndex] = requestUri.substring(j, uriIndex);
+                j = uriIndex;
+            }
+            listIndex++;
+        }
+
+        return j >= requestUri.length();
     }
 
     bool canUpload(String requestUri) override  {
