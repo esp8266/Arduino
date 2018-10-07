@@ -95,6 +95,11 @@ int File::read(void *buf, uint16_t nbyte) {
   return 0;
 }
 
+size_t File::readBytes(char *buffer, size_t length) {
+  int result = read(buffer, (uint16_t)length);
+  return result < 0 ? 0 : (size_t)result;
+}
+
 int File::available() {
   if (! _file) return 0;
 

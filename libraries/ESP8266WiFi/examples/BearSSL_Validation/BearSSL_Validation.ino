@@ -102,7 +102,7 @@ instead of the while certificate.  This is not nearly as secure as real
 X.509 validation, but is better than nothing.
 )EOF");
   BearSSL::WiFiClientSecure client;
-  const uint8_t fp[20] = {0x5F, 0xF1, 0x60, 0x31, 0x09, 0x04, 0x3E, 0xF2, 0x90, 0xD2, 0xB0, 0x8A, 0x50, 0x38, 0x04, 0xE8, 0x37, 0x9F, 0xBC, 0x76};
+  static const char fp[] PROGMEM = "5F:F1:60:31:09:04:3E:F2:90:D2:B0:8A:50:38:04:E8:37:9F:BC:76";
   client.setFingerprint(fp);
   fetchURL(&client, host, port, path);
 }
