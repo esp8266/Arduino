@@ -36,14 +36,14 @@ class UpdaterHashClass {
     virtual void add(const void *data, uint32_t len) = 0;
     virtual void end() = 0;
     virtual int len() = 0;
-    virtual void *hash() = 0;
+    virtual const void *hash() = 0;
 };
 
 // Abstract class to implement a signature verifier
 class UpdaterVerifyClass {
   public:
     virtual uint32_t length() = 0; // How many bytes of signature are expected
-    virtual bool verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) = 0; // Verify, return "true" on success
+    virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) = 0; // Verify, return "true" on success
 };
 
 class UpdaterClass {

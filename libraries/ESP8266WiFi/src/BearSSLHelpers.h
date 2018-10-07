@@ -146,7 +146,7 @@ class BearSSLHashSHA256 : public UpdaterHashClass {
     virtual void add(const void *data, uint32_t len) override;
     virtual void end() override;
     virtual int len() override;
-    virtual void *hash() override;
+    virtual const void *hash() override;
   private:
     br_sha256_context _cc;
     unsigned char _sha256[32];
@@ -155,7 +155,7 @@ class BearSSLHashSHA256 : public UpdaterHashClass {
 class BearSSLSigningVerifier : public UpdaterVerifyClass {
   public:
     virtual uint32_t length() override;
-    virtual bool verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) override;
+    virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) override;
 
   public:
     BearSSLSigningVerifier(BearSSLPublicKey *pubKey) { _pubKey = pubKey; }

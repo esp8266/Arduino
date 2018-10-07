@@ -839,8 +839,8 @@ int BearSSLHashSHA256::len() {
   return sizeof(_sha256);
 }
 
-void *BearSSLHashSHA256::hash() {
-  return (void*) _sha256;
+const void *BearSSLHashSHA256::hash() {
+  return (const void*) _sha256;
 }
 
 // SHA256 verifier
@@ -857,7 +857,7 @@ uint32_t BearSSLSigningVerifier::length()
   }
 }
 
-bool BearSSLSigningVerifier::verify(UpdaterHashClass *hash, void *signature, uint32_t signatureLen) {
+bool BearSSLSigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
   if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
 
   if (_pubKey->isRSA()) {
