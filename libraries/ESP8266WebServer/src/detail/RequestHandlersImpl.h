@@ -38,10 +38,10 @@ public:
 
         size_t uriLength = _uri.length();
         unsigned int pathArgIndex = 0;
-        unsigned int j = 0;
-        for (unsigned int i = 0; i < uriLength; i++, j++) {
+        unsigned int requestUriIndex = 0;
+        for (unsigned int i = 0; i < uriLength; i++, requestUriIndex++) {
             char uriChar = _uri[i];
-            char requestUriChar = requestUri[j];
+            char requestUriChar = requestUri[requestUriIndex];
 
             if (uriChar == requestUriChar)
                 continue;
@@ -51,22 +51,22 @@ public:
             i += 2; // index of char after '}'
             if (i >= uriLength) {
                 // there is no char after '}'
-                pathArgs[pathArgIndex] = requestUri.substring(j);
+                pathArgs[pathArgIndex] = requestUri.substring(requestUriIndex);
                 return true;
             }
             else
             {
                 char charEnd = _uri[i];
-                int uriIndex = requestUri.indexOf(charEnd, j);
+                int uriIndex = requestUri.indexOf(charEnd, requestUriIndex);
                 if (uriIndex < 0)
                     return false;
-                pathArgs[pathArgIndex] = requestUri.substring(j, uriIndex);
-                j = (unsigned int) uriIndex;
+                pathArgs[pathArgIndex] = requestUri.substring(requestUriIndex, uriIndex);
+                requestUriIndex = (unsigned int) uriIndex;
             }
             pathArgIndex++;
         }
 
-        return j >= requestUri.length();
+        return requestUriIndex >= requestUri.length();
     }
 
     bool canUpload(String requestUri) override  {
