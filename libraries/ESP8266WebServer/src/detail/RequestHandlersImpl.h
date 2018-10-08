@@ -26,7 +26,7 @@ public:
                 start += 2;
             }
         } while (start > 0);
-        pathArgs = std::vector<String>(numParams);
+        pathArgs.resize(numParams);
     }
 
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
