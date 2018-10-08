@@ -40,7 +40,7 @@ void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode m
     end();
     _uart = uart_init(_uart_nr, baud, (int) config, (int) mode, tx_pin, _rx_size);
 #if defined(DEBUG_ESP_PORT) && !defined(NDEBUG)
-    if (this == &DEBUG_ESP_PORT)
+    if (static_cast<void*>(this) == static_cast<void*>(&DEBUG_ESP_PORT))
     {
         setDebugOutput(true);
         println();
@@ -106,6 +106,30 @@ void HardwareSerial::flush()
     //Workaround for a bug in serial not actually being finished yet
     //Wait for 8 data bits, 1 parity and 2 stop bits, just in case
     delayMicroseconds(11000000 / uart_get_baudrate(_uart) + 1);
+}
+
+void HardwareSerial::startDetectBaudrate()
+{
+    uart_start_detect_baudrate(_uart_nr);
+}
+
+unsigned long HardwareSerial::testBaudrate()
+{
+    return uart_detect_baudrate(_uart_nr);
+}
+
+unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
+{
+    time_t startMillis = millis();
+    unsigned long detectedBaudrate;
+    while ((time_t) millis() - startMillis < timeoutMillis) {
+        if ((detectedBaudrate = testBaudrate())) {
+          break;
+        }
+        yield();
+        delay(100);
+    }    
+    return detectedBaudrate;
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)

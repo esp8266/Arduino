@@ -3,7 +3,6 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <BSTest.h>
-#include <test_config.h>
 #include <pgmspace.h>
 
 BS_ENV_DECLARE();
@@ -17,7 +16,7 @@ void setup()
     Serial.begin(115200);
     Serial.setDebugOutput(true);
     WiFi.persistent(false);
-    WiFi.begin(STA_SSID, STA_PASS);
+    WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }

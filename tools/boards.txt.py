@@ -271,6 +271,7 @@ boards = collections.OrderedDict([
         'name': 'Generic ESP8285 Module',
         'opts': {
             '.build.board': 'ESP8266_ESP01',
+            '.build.variant': 'esp8285'
             },
         'macro': [
             'resetmethod_menu',
@@ -325,6 +326,24 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
+    ( 'cw01', {
+        'name': 'XinaBox CW01',
+        'opts': {
+            '.build.board': 'ESP8266_GENERIC',
+            '.build.variant': 'xinabox',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'crystalfreq_menu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The XinaBox CW01 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard RGB led.',
+                  '',
+                  'Product page: https://xinabox.cc/products/CW01'
+                  ],
+    }),  
     ( 'espresso_lite_v1', {
         'name': 'ESPresso Lite 1.0',
         'opts': {
@@ -435,6 +454,7 @@ boards = collections.OrderedDict([
                   'RST, then releasing FLASH, then releasing RST. This forces the CP2102 device to power cycle and to be re-numbered by Linux.',
                   '',
                   'The board also features a NCP1117 voltage regulator, a blue LED on GPIO16 and a 220k/100k Ohm voltage divider on the ADC input pin.',
+                  'The ESP-12E usually has a led connected on GPIO2.',
                   '',
                   'Full pinout and PDF schematics can be found `here <https://github.com/nodemcu/nodemcu-devkit-v1.0>`__',
                   ],
@@ -507,7 +527,7 @@ boards = collections.OrderedDict([
         'desc': [ '*TODO*' ],
     }),
     ( 'd1_mini', {
-        'name': 'WeMos D1 R2 & mini',
+        'name': 'LOLIN(WEMOS) D1 R2 & mini',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINI',
             '.build.variant': 'd1_mini',
@@ -522,7 +542,7 @@ boards = collections.OrderedDict([
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_pro', {
-        'name': 'WeMos D1 mini Pro',
+        'name': 'LOLIN(WEMOS) D1 mini Pro',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINIPRO',
             '.build.variant': 'd1_mini',
@@ -537,7 +557,7 @@ boards = collections.OrderedDict([
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_lite', {
-        'name': 'WeMos D1 mini Lite',
+        'name': 'LOLIN(WEMOS) D1 mini Lite',
         'opts': {
             '.build.board': 'ESP8266_WEMOS_D1MINILITE',
             '.build.variant': 'd1_mini',
@@ -549,7 +569,30 @@ boards = collections.OrderedDict([
             '1M',
             ],
         'serial': '921',
-        'desc': [ 'Product page: https://www.wemos.cc/' ],
+        'desc': [ 
+			'Parameters in Arduino IDE:',
+			'~~~~~~~~~~~~~~~~~~~~~~~~~',
+			'',
+			'- Card: "WEMOS D1 Mini Lite"',
+			'- Flash Size: "1M (512K SPIFFS)"',
+			'- CPU Frequency: "80 Mhz"',
+			'- Upload Speed: "230400"',
+			'',
+			'Power:',
+			'~~~~~',
+			'',
+			'- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input',
+			'- 3V3 pin : 3.3V 500mA regulated output',
+			'- Digital pins : 3.3V 30mA.',
+			'',
+			'links:',
+			'~~~~~',
+			'',
+			'- Product page: https://www.wemos.cc/',
+			'- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf',
+			'- ESP8285 datasheet: https://www.espressif.com/sites/default/files/0a-esp8285_datasheet_en_v1.0_20160422.pdf',
+			'- Voltage regulator datasheet: http://pdf-datasheet.datasheet.netdna-cdn.com/pdf-down/M/E/6/ME6211-Microne.pdf',
+        ],
     }),
     ( 'd1', {
         'name': 'WeMos D1 R1',
@@ -677,7 +720,7 @@ boards = collections.OrderedDict([
             },
         'macro': [
             'resetmethod_nodemcu',
-            'flashmode_qio',
+            'flashmode_dio',
             'flashfreq_80',
             '512K',
             ],
@@ -713,6 +756,54 @@ boards = collections.OrderedDict([
                   'To put the board into bootloader mode, configure a serial connection as above, connect **P2 to GND**, then re-apply power.  Once flashing is complete, remove the connection from P2 to GND, then re-apply power to boot into normal mode.',
                   ],
     }),
+    ( 'wifiduino', {
+        'name': 'WiFiduino',
+        'opts': {
+            '.build.board': 'WIFIDUINO_ESP8266',
+            '.build.variant': 'wifiduino',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'serial': '921',
+        'desc': [ 'Product page: https://wifiduino.com/esp8266' ],
+    }),
+    ( 'wifi_slot', {
+        'name': 'Amperka WiFi Slot',
+        'opts': {
+            '.build.board': 'AMPERKA_WIFI_SLOT',
+            '.build.variant': 'wifi_slot',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashfreq_menu',
+            'flashmode_menu',
+            '1M', '2M',
+            ],
+        'desc': [ 'Product page: http://wiki.amperka.ru/wifi-slot' ],
+    }),
+    ( 'wiolink', {
+        'name': 'Seeed Wio Link',
+        'opts': {
+            '.build.board': 'ESP8266_WIO_LINK',
+            '.build.variant': 'wiolink',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_qio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'Wio Link is designed to simplify your IoT development. It is an ESP8266 based open-source Wi-Fi development board to create IoT applications by virtualizing plug-n-play modules to RESTful APIs with mobile APPs. Wio Link is also compatible with the Arduino IDE.',
+                  '',
+                  'Please DO NOTICE that you MUST pull up pin 15 to enable the power for Grove ports, the board is designed like this for the purpose of peripherals power management.',
+                  '',
+                  'Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html'
+                ],
+    })
     ])
 
 ################################################################
@@ -736,10 +827,19 @@ macros = {
     #######################
 
     'cpufreq_menu': collections.OrderedDict([
-        ( '.menu.CpuFrequency.80', '80 MHz' ),
-        ( '.menu.CpuFrequency.80.build.f_cpu', '80000000L' ),
-        ( '.menu.CpuFrequency.160', '160 MHz' ),
-        ( '.menu.CpuFrequency.160.build.f_cpu', '160000000L' ),
+        ( '.menu.xtal.80', '80 MHz' ),
+        ( '.menu.xtal.80.build.f_cpu', '80000000L' ),
+        ( '.menu.xtal.160', '160 MHz' ),
+        ( '.menu.xtal.160.build.f_cpu', '160000000L' ),
+        ]),
+
+    'vtable_menu': collections.OrderedDict([
+        ( '.menu.vt.flash', 'Flash'),
+        ( '.menu.vt.flash.build.vtable_flags', '-DVTABLES_IN_FLASH'),
+        ( '.menu.vt.heap', 'Heap'),
+        ( '.menu.vt.heap.build.vtable_flags', '-DVTABLES_IN_DRAM'),
+        ( '.menu.vt.iram', 'IRAM'),
+        ( '.menu.vt.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
         ]),
 
     'crystalfreq_menu': collections.OrderedDict([
@@ -831,75 +931,75 @@ macros = {
     ####################### lwip
 
     'lwip2': collections.OrderedDict([
-        ( '.menu.LwIPVariant.v2mss536', 'v2 Lower Memory' ),
-        ( '.menu.LwIPVariant.v2mss536.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.LwIPVariant.v2mss536.build.lwip_lib', '-llwip2' ),
-        ( '.menu.LwIPVariant.v2mss536.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
-        ( '.menu.LwIPVariant.v2mss1460', 'v2 Higher Bandwidth' ),
-        ( '.menu.LwIPVariant.v2mss1460.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.LwIPVariant.v2mss1460.build.lwip_lib', '-llwip2_1460' ),
-        ( '.menu.LwIPVariant.v2mss1460.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
+        ( '.menu.ip.lm2', 'v2 Lower Memory' ),
+        ( '.menu.ip.lm2.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2.build.lwip_lib', '-llwip2' ),
+        ( '.menu.ip.lm2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
+        ( '.menu.ip.hb2', 'v2 Higher Bandwidth' ),
+        ( '.menu.ip.hb2.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2.build.lwip_lib', '-llwip2_1460' ),
+        ( '.menu.ip.hb2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
         ]),
 
     'lwip': collections.OrderedDict([
-        ( '.menu.LwIPVariant.Prebuilt', 'v1.4 Higher Bandwidth' ),
-        ( '.menu.LwIPVariant.Prebuilt.build.lwip_lib', '-llwip_gcc' ),
-        ( '.menu.LwIPVariant.Prebuilt.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        #( '.menu.LwIPVariant.Espressif', 'v1.4 Espressif (xcc)' ),
-        #( '.menu.LwIPVariant.Espressif.build.lwip_lib', '-llwip' ),
-        #( '.menu.LwIPVariant.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
-        ( '.menu.LwIPVariant.OpenSource', 'v1.4 Compile from source' ),
-        ( '.menu.LwIPVariant.OpenSource.build.lwip_lib', '-llwip_src' ),
-        ( '.menu.LwIPVariant.OpenSource.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
-        ( '.menu.LwIPVariant.OpenSource.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
+        ( '.menu.ip.hb1', 'v1.4 Higher Bandwidth' ),
+        ( '.menu.ip.hb1.build.lwip_lib', '-llwip_gcc' ),
+        ( '.menu.ip.hb1.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
+        #( '.menu.ip.Espressif', 'v1.4 Espressif (xcc)' ),
+        #( '.menu.ip.Espressif.build.lwip_lib', '-llwip' ),
+        #( '.menu.ip.Espressif.build.lwip_flags', '-DLWIP_MAYBE_XCC' ),
+        ( '.menu.ip.src', 'v1.4 Compile from source' ),
+        ( '.menu.ip.src.build.lwip_lib', '-llwip_src' ),
+        ( '.menu.ip.src.build.lwip_flags', '-DLWIP_OPEN_SRC' ),
+        ( '.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern', 'make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"' ),
         ]),
 
     ####################### serial
 
     's9': collections.OrderedDict([
-        ( '.menu.UploadSpeed.9600', '9600' ),
-        ( '.menu.UploadSpeed.9600.upload.speed', '9600' ),
+        ( '.menu.baud.9600', '9600' ),
+        ( '.menu.baud.9600.upload.speed', '9600' ),
         ]),
     's57': collections.OrderedDict([
-        ( '.menu.UploadSpeed.57600', '57600' ),
-        ( '.menu.UploadSpeed.57600.upload.speed', '57600' ),
+        ( '.menu.baud.57600', '57600' ),
+        ( '.menu.baud.57600.upload.speed', '57600' ),
         ]),
     's115': collections.OrderedDict([
-        ( '.menu.UploadSpeed.115200', '115200' ),
-        ( '.menu.UploadSpeed.115200.upload.speed', '115200' ),
+        ( '.menu.baud.115200', '115200' ),
+        ( '.menu.baud.115200.upload.speed', '115200' ),
         ]),
     's256': collections.OrderedDict([
-        ( '.menu.UploadSpeed.256000.windows', '256000' ),
-        ( '.menu.UploadSpeed.256000.upload.speed', '256000' ),
+        ( '.menu.baud.256000.windows', '256000' ),
+        ( '.menu.baud.256000.upload.speed', '256000' ),
         ]),
     's230': collections.OrderedDict([
-        ( '.menu.UploadSpeed.230400.linux', '230400' ),
-        ( '.menu.UploadSpeed.230400.macosx', '230400' ),
-        ( '.menu.UploadSpeed.230400.upload.speed', '230400' ),
+        ( '.menu.baud.230400.linux', '230400' ),
+        ( '.menu.baud.230400.macosx', '230400' ),
+        ( '.menu.baud.230400.upload.speed', '230400' ),
         ]),
     's460': collections.OrderedDict([
-        ( '.menu.UploadSpeed.460800.linux', '460800' ),
-        ( '.menu.UploadSpeed.460800.macosx', '460800' ),
-        ( '.menu.UploadSpeed.460800.upload.speed', '460800' ),
+        ( '.menu.baud.460800.linux', '460800' ),
+        ( '.menu.baud.460800.macosx', '460800' ),
+        ( '.menu.baud.460800.upload.speed', '460800' ),
         ]),
     's512': collections.OrderedDict([
-        ( '.menu.UploadSpeed.512000.windows', '512000' ),
-        ( '.menu.UploadSpeed.512000.upload.speed', '512000' ),
+        ( '.menu.baud.512000.windows', '512000' ),
+        ( '.menu.baud.512000.upload.speed', '512000' ),
         ]),
     's921': collections.OrderedDict([
-        ( '.menu.UploadSpeed.921600', '921600' ),
-        ( '.menu.UploadSpeed.921600.upload.speed', '921600' ),
+        ( '.menu.baud.921600', '921600' ),
+        ( '.menu.baud.921600.upload.speed', '921600' ),
         ]),
 
     ####################### flash erase
 
     'flash_erase_menu': collections.OrderedDict([
-        ( '.menu.FlashErase.none', 'Only Sketch' ),
-        ( '.menu.FlashErase.none.upload.erase_cmd', '' ),
-        ( '.menu.FlashErase.sdk', 'Sketch + WiFi Settings' ),
-        ( '.menu.FlashErase.sdk.upload.erase_cmd', '-ca "{build.rfcal_addr}" -cz 0x4000' ),
-        ( '.menu.FlashErase.all', 'All Flash Contents' ),
-        ( '.menu.FlashErase.all.upload.erase_cmd', '-ca 0x0 -cz "{build.flash_size_bytes}"' ),
+        ( '.menu.wipe.none', 'Only Sketch' ),
+        ( '.menu.wipe.none.upload.erase_cmd', '' ),
+        ( '.menu.wipe.sdk', 'Sketch + WiFi Settings' ),
+        ( '.menu.wipe.sdk.upload.erase_cmd', '-ca "{build.rfcal_addr}" -cz 0x4000' ),
+        ( '.menu.wipe.all', 'All Flash Contents' ),
+        ( '.menu.wipe.all.upload.erase_cmd', '-ca 0x0 -cz "{build.flash_size_bytes}"' ),
         ]),
 
     }
@@ -909,7 +1009,7 @@ macros = {
 
 def checkdir ():
     if not os.path.isfile("boards.txt"):
-        print "please run me from boards.txt directory (like: ./tools/boards.txt.py -...)"
+        print("please run me from boards.txt directory (like: ./tools/boards.txt.py -...)")
         sys.exit(1)
 
 ################################################################
@@ -942,14 +1042,14 @@ def all_debug ():
     options += [ listcomb + listnocomb ]
     options += [ listsingle ]
     debugmenu = collections.OrderedDict([
-            ( '.menu.Debug.Disabled', 'Disabled' ),
-            ( '.menu.Debug.Disabled.build.debug_port', '' ),
-            ( '.menu.Debug.Serial', 'Serial' ),
-            ( '.menu.Debug.Serial.build.debug_port', '-DDEBUG_ESP_PORT=Serial' ),
-            ( '.menu.Debug.Serial1', 'Serial1' ),
-            ( '.menu.Debug.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1' ),
-            ( '.menu.DebugLevel.None____', 'None' ),
-            ( '.menu.DebugLevel.None____.build.debug_level', '' ),
+            ( '.menu.dbg.Disabled', 'Disabled' ),
+            ( '.menu.dbg.Disabled.build.debug_port', '' ),
+            ( '.menu.dbg.Serial', 'Serial' ),
+            ( '.menu.dbg.Serial.build.debug_port', '-DDEBUG_ESP_PORT=Serial' ),
+            ( '.menu.dbg.Serial1', 'Serial1' ),
+            ( '.menu.dbg.Serial1.build.debug_port', '-DDEBUG_ESP_PORT=Serial1' ),
+            ( '.menu.lvl.None____', 'None' ),
+            ( '.menu.lvl.None____.build.debug_level', '' ),
         ])
 
     for optlist in options:
@@ -972,30 +1072,57 @@ def all_debug ():
             else:
                 debugdefs += ' -DDEBUG_ESP_' + opt
         debugmenu.update(collections.OrderedDict([
-            ( '.menu.DebugLevel.' + debugname, debugmenuname ),
-            ( '.menu.DebugLevel.' + debugname + '.build.debug_level', debugdefs )
+            ( '.menu.lvl.' + debugname, debugmenuname ),
+            ( '.menu.lvl.' + debugname + '.build.debug_level', debugdefs )
             ]))
     return { 'debug_menu': debugmenu }
 
 ################################################################
 # flash size
 
-def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_start = 0, spiffs_size = 0, spiffs_blocksize = 0):
-    menu = '.menu.FlashSize.' + optname
+def flash_map (flashsize_kb, spiffs_kb = 0):
+
+    # mapping:
+    # flash | reserved | empty | spiffs | eeprom | rf-cal | sdk-wifi-settings
+
+    spi = 0x40200000 # https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map
+
+    reserved = 4112
+    eeprom_size_kb = 4
+    rfcal_size_kb = 4
+    sdkwifi_size_kb = 12
+    spiffs_end = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb - eeprom_size_kb) * 1024
+    rfcal_addr = (flashsize_kb - sdkwifi_size_kb - rfcal_size_kb) * 1024
+    if flashsize_kb <= 1024:
+        max_upload_size = (flashsize_kb - (spiffs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
+        spiffs_start = spiffs_end - spiffs_kb * 1024
+        spiffs_blocksize = 4096
+    else:
+        max_upload_size = 1024 * 1024 - reserved
+        spiffs_start = (flashsize_kb - spiffs_kb) * 1024
+        spiffs_blocksize = 8192
+
+    strsize = str(flashsize_kb / 1024) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
+    strspiffs = str(spiffs_kb / 1024) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
+    strspiffs_strip = str(spiffs_kb / 1024) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) if (spiffs_kb > 0) else ''
+
+    ld = 'eagle.flash.' + strsize.lower() + strspiffs_strip.lower() + '.ld'
+    menu = '.menu.eesz.' + strsize + strspiffs_strip
     menub = menu + '.build.'
+    desc = 'no' if (spiffs_kb == 0) else strspiffs
     d = collections.OrderedDict([
-        ( menu, display + ' (' + desc + ')' ),
-        ( menub + 'flash_size', display ),
-        ( menub + 'flash_size_bytes', "0x%X" % size_bytes ),
+        ( menu, strsize + ' (' + desc + ' SPIFFS)' ),
+        ( menub + 'flash_size', strsize ),
+        ( menub + 'flash_size_bytes', "0x%X" % (flashsize_kb * 1024)),
         ( menub + 'flash_ld', ld ),
         ( menub + 'spiffs_pagesize', '256' ),
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
-        ( menub + 'rfcal_addr', "0x%X" % (size_bytes - 0x4000))
+        ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
         ])
-    if spiffs_size > 0:
+    if spiffs_kb > 0:
         d.update(collections.OrderedDict([
             ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
-            ( menub + 'spiffs_end', "0x%05X" % (spiffs_start + spiffs_size) ),
+            ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
             ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
             ]))
 
@@ -1004,7 +1131,6 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
 
             checkdir()
 
-            lddir = "tools/sdk/ld/"
             ldbackupdir = lddir + "backup/"
             if not os.path.isdir(ldbackupdir):
                 os.mkdir(ldbackupdir)
@@ -1013,39 +1139,40 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
             realstdout = sys.stdout
             sys.stdout = open(lddir + ld, 'w')
 
-        if spiffs_size == 0:
+        if spiffs_kb == 0:
             page = 0
             block = 0
-        elif spiffs_size < 0x80000:
+        elif spiffs_kb < 0x80000 / 1024:
             page = 0x100
             block = 0x1000
         else:
             page = 0x100
             block = 0x2000
 
-        print "/* Flash Split for %s chips */" % display
-        print "/* sketch %dKB */" % (max_upload_size / 1024)
-        if spiffs_size > 0:
-            empty_size = spiffs_start - max_upload_size - 4096
-            if empty_size > 1024:
-                print "/* empty  %dKB */" % (empty_size / 1024)
-            print "/* spiffs %dKB */" % (spiffs_size / 1024)
-        print "/* eeprom 20KB */"
-        print ""
-        print "MEMORY"
-        print "{"
-        print "  dport0_0_seg :                        org = 0x3FF00000, len = 0x10"
-        print "  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000"
-        print "  iram1_0_seg :                         org = 0x40100000, len = 0x8000"
-        print "  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size
-        print "}"
-        print ""
-        print "PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start)
-        print "PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_start + spiffs_size)
-        print "PROVIDE ( _SPIFFS_page = 0x%X );" % page
-        print "PROVIDE ( _SPIFFS_block = 0x%X );" % block
-        print ""
-        print 'INCLUDE "../ld/eagle.app.v6.common.ld"'
+        print("/* Flash Split for %s chips */" % strsize)
+        print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
+        empty_size = spiffs_start - max_upload_size
+        if empty_size > 0:
+            print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
+        print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + spiffs_start, ((spiffs_end - spiffs_start) / 1024), spiffs_end - spiffs_start))
+        print("/* eeprom @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
+        print("/* rfcal  @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
+        print("/* wifi   @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
+        print("")
+        print("MEMORY")
+        print("{")
+        print("  dport0_0_seg :                        org = 0x3FF00000, len = 0x10")
+        print("  dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000")
+        print("  iram1_0_seg :                         org = 0x40100000, len = 0x8000")
+        print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
+        print("}")
+        print("")
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_end))
+        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
+        print("")
+        print('INCLUDE "local.eagle.app.v6.common.ld"')
 
         if ldgen:
             sys.stdout.close()
@@ -1053,24 +1180,49 @@ def flash_size (size_bytes, display, optname, ld, desc, max_upload_size, spiffs_
 
     return d
 
-def all_flash_size ():
-    f512 =      flash_size(0x80000,  '512K', '512K0',   'eagle.flash.512k0.ld',     'no SPIFFS', 499696,   0x7B000)
-    f512.update(flash_size(0x80000,  '512K', '512K64',  'eagle.flash.512k64.ld',   '64K SPIFFS', 434160,   0x6B000,   0x10000, 4096))
-    f512.update(flash_size(0x80000,  '512K', '512K128', 'eagle.flash.512k128.ld', '128K SPIFFS', 368624,   0x5B000,   0x20000, 4096))
-    f1m =       flash_size(0x100000,   '1M', '1M0',     'eagle.flash.1m0.ld',       'no SPIFFS', 1023984,  0xFB000)
-    f1m.update( flash_size(0x100000,   '1M', '1M64',    'eagle.flash.1m64.ld',     '64K SPIFFS', 958448,   0xEB000,   0x10000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M128',   'eagle.flash.1m128.ld',   '128K SPIFFS', 892912,   0xDB000,   0x20000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M144',   'eagle.flash.1m144.ld',   '144K SPIFFS', 876528,   0xD7000,   0x24000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M160',   'eagle.flash.1m160.ld',   '160K SPIFFS', 860144,   0xD3000,   0x28000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M192',   'eagle.flash.1m192.ld',   '192K SPIFFS', 827376,   0xCB000,   0x30000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M256',   'eagle.flash.1m256.ld',   '256K SPIFFS', 761840,   0xBB000,   0x40000, 4096))
-    f1m.update( flash_size(0x100000,   '1M', '1M512',   'eagle.flash.1m512.ld',   '512K SPIFFS', 499696,   0x7B000,   0x80000, 8192))
-    f2m =       flash_size(0x200000,   '2M', '2M',      'eagle.flash.2m.ld',        '1M SPIFFS', 1044464, 0x100000,   0xFB000, 8192)
-    f4m =       flash_size(0x400000,   '4M', '4M1M',    'eagle.flash.4m1m.ld',      '1M SPIFFS', 1044464, 0x300000,   0xFB000, 8192)
-    f4m.update( flash_size(0x400000,   '4M', '4M2M',    'eagle.flash.4m2m.ld',      '2M SPIFFS', 1044464, 0x200000,  0x1FB000, 8192))
-    f4m.update( flash_size(0x400000,   '4M', '4M3M',    'eagle.flash.4m.ld',        '3M SPIFFS', 1044464, 0x100000,  0x2FB000, 8192))
-    f8m =       flash_size(0x800000,   '8M', '8M7M',    'eagle.flash.8m.ld',        '7M SPIFFS', 1044464, 0x100000,  0x6FB000, 8192)
-    f16m =      flash_size(0x1000000, '16M', '16M15M',  'eagle.flash.16m.ld',      '15M SPIFFS', 1044464, 0x100000,  0xEFB000, 8192)
+def all_flash_map ():
+
+    f512 = collections.OrderedDict([])
+    f1m  = collections.OrderedDict([])
+    f2m  = collections.OrderedDict([])
+    f4m  = collections.OrderedDict([])
+    f8m  = collections.OrderedDict([])
+    f16m = collections.OrderedDict([])
+
+    #                      flash(KB) spiffs(KB)
+
+    f512.update(flash_map(     512))
+    f512.update(flash_map(     512,      32 ))
+    f512.update(flash_map(     512,      64 ))
+    f512.update(flash_map(     512,     128 ))
+
+    f1m.update( flash_map(    1024))
+    f1m.update( flash_map(    1024,      64 ))
+    f1m.update( flash_map(    1024,     128 ))
+    f1m.update( flash_map(    1024,     144 ))
+    f1m.update( flash_map(    1024,     160 ))
+    f1m.update( flash_map(    1024,     192 ))
+    f1m.update( flash_map(    1024,     256 ))
+    f1m.update( flash_map(    1024,     512 ))
+
+    f2m.update( flash_map(  2*1024))
+    f2m.update( flash_map(  2*1024,     512 ))
+    f2m.update( flash_map(  2*1024,    1024 ))
+
+    f4m.update( flash_map(  4*1024))
+    f4m.update( flash_map(  4*1024,    1024 ))
+    f4m.update( flash_map(  4*1024,  2*1024 ))
+    f4m.update( flash_map(  4*1024,  3*1024 ))
+
+    f8m.update( flash_map(  8*1024,  6*1024 ))
+    f8m.update( flash_map(  8*1024,  7*1024 ))
+
+    f16m.update(flash_map( 16*1024, 14*1024 ))
+    f16m.update(flash_map( 16*1024, 15*1024 ))
+
+    if ldgen:
+        print("generated: ldscripts (in %s)" % lddir)
+
     return {
         '512K': f512,
           '1M':  f1m,
@@ -1112,42 +1264,45 @@ def all_boards ():
         realstdout = sys.stdout
         sys.stdout = open("boards.txt", 'w')
 
-    macros.update(all_flash_size())
+    macros.update(all_flash_map())
     macros.update(all_debug())
     macros.update(led(led_default, led_max))
 
-    print '#'
-    print '# this file is script-generated and is likely to be overwritten by ' + os.path.basename(sys.argv[0])
-    print '#'
-    print ''
-    print 'menu.BoardModel=Model'
-    print 'menu.UploadSpeed=Upload Speed'
-    print 'menu.CpuFrequency=CPU Frequency'
-    print 'menu.CrystalFreq=Crystal Frequency'
-    print 'menu.FlashSize=Flash Size'
-    print 'menu.FlashMode=Flash Mode'
-    print 'menu.FlashFreq=Flash Frequency'
-    print 'menu.ResetMethod=Reset Method'
-    print 'menu.ESPModule=Module'
-    print 'menu.Debug=Debug port'
-    print 'menu.DebugLevel=Debug Level'
-    print 'menu.LwIPVariant=lwIP Variant'
-    print 'menu.led=Builtin Led'
-    print 'menu.FlashErase=Erase Flash'
-    print ''
+    print('#')
+    print('# Do not create pull-requests for this file only, CI will not accept them.')
+    print('# You *must* edit/modify/run ' + os.path.basename(sys.argv[0]) + ' to regenerate boards.txt.')
+    print('# All modified files after running with option "--allgen" must be included in the pull-request.')
+    print('#')
+    print('')
+    print('menu.BoardModel=Model')
+    print('menu.baud=Upload Speed')
+    print('menu.xtal=CPU Frequency')
+    print('menu.CrystalFreq=Crystal Frequency')
+    print('menu.eesz=Flash Size')
+    print('menu.FlashMode=Flash Mode')
+    print('menu.FlashFreq=Flash Frequency')
+    print('menu.ResetMethod=Reset Method')
+    print('menu.ESPModule=Module')
+    print('menu.dbg=Debug port')
+    print('menu.lvl=Debug Level')
+    print('menu.ip=lwIP Variant')
+    print('menu.vt=VTables')
+    print('menu.led=Builtin Led')
+    print('menu.wipe=Erase Flash')
+    print('')
 
     for id in boards:
-        print '##############################################################'
+        print('##############################################################')
         board = boards[id]
-        print id + '.name=' + board['name']
+        print(id + '.name=' + board['name'])
 
         # standalone options
         if 'opts' in board:
             for optname in board['opts']:
-                print id + optname + '=' + board['opts'][optname]
+                print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:
@@ -1157,7 +1312,7 @@ def all_boards ():
         macrolist += [ 'debug_menu', 'flash_erase_menu' ]
 
         for cs in customspeeds:
-            print id + cs
+            print(id + cs)
 
         if 'serial' in board:
             macrolist += speeds[board['serial']]
@@ -1167,16 +1322,17 @@ def all_boards ():
         for block in macrolist:
             for optname in macros[block]:
                 if not ('opts' in board) or not (optname in board['opts']):
-                    print id + optname + '=' + macros[block][optname]
+                    print(id + optname + '=' + macros[block][optname])
 
         if nofloat:
-            print id + '.build.float='
+            print(id + '.build.float=')
 
-        print ''
+        print('')
 
     if boardsgen:
         sys.stdout.close()
         sys.stdout = realstdout
+        print("generated: boards.txt")
 
 ################################################################
 
@@ -1189,9 +1345,9 @@ def package ():
 
     if packagegen:
         pkgfname_read = pkgfname + '.orig'
-        # check if backup already exists
-        if not os.path.isfile(pkgfname_read):
-            os.rename(pkgfname, pkgfname_read)
+        if os.path.isfile(pkgfname_read):
+            os.remove(pkgfname_read)
+        os.rename(pkgfname, pkgfname_read)
 
     # read package file
     with open (pkgfname_read, "r") as package_file:
@@ -1208,6 +1364,7 @@ def package ():
     if packagegen:
         with open(pkgfname, 'w') as package_file:
             package_file.write(newfilestr)
+        print("updated:   %s" % pkgfname)
     else:
         sys.stdout.write(newfilestr)
 
@@ -1226,63 +1383,66 @@ def doc ():
         realstdout = sys.stdout
         sys.stdout = open("doc/boards.rst", 'w')
 
-    print 'Boards'
-    print '======'
-    print ''
+    print('Boards')
+    print('======')
+    print('')
 
     for id in boards:
         board = boards[id]
-        print board['name']
+        print(board['name'])
         dash = ""
         for i in range(len(board['name'])):
             dash += '-'
-        print dash
+        print(dash)
 
-        print ''
+        print('')
         if 'desc' in board:
             for line in board['desc']:
-                print line
+                print(line)
         else:
-            print 'No description'
-        print ''
+            print('No description')
+        print('')
 
     if docgen:
         sys.stdout.close()
         sys.stdout = realstdout
+        print("generated: doc/boards.rst")
 
 ################################################################
 # help / usage
 
 def usage (name,ret):
-    print ""
-    print "boards.txt generator for esp8266/Arduino"
-    print ""
-    print "usage: %s [options]" % name
-    print ""
-    print " -h, --help"
-    print " --lwip          - preferred default lwIP version (default %d)" % lwip
-    print " --led           - preferred default builtin led for generic boards (default %d)" % led_default
-    print " --board b       - board to modify:"
-    print " --speed s       - change default serial speed"
-    print " --customspeed s - new serial speed for all boards"
-    print " --nofloat       - disable float support in printf/scanf"
-    print ""
-    print " mandatory option (at least one):"
-    print ""
-    print " --boards        - show boards.txt"
-    print " --boardsgen     - replace boards.txt"
-    print " --ld            - show ldscripts"
-    print " --ldgen         - replace ldscripts"
-    print " --package       - show package"
-    print " --packagegen    - replace board:[] in package"
-    print " --doc           - shows doc/boards.rst"
-    print " --docgen        - replace doc/boards.rst"
-    print ""
+    print("")
+    print("boards.txt generator for esp8266/Arduino")
+    print("")
+    print("usage: %s [options]" % name)
+    print("")
+    print(" -h, --help")
+    print(" --lwip          - preferred default lwIP version (default %d)" % lwip)
+    print(" --led           - preferred default builtin led for generic boards (default %d)" % led_default)
+    print(" --board b       - board to modify:")
+    print(" --speed s       - change default serial speed")
+    print(" --customspeed s - new serial speed for all boards")
+    print(" --nofloat       - disable float support in printf/scanf")
+    print("")
+    print(" mandatory option (at least one):")
+    print("")
+    print(" --boards        - show boards.txt")
+    print(" --boardsgen     - replace boards.txt")
+    print(" --ld            - show ldscripts")
+    print(" --ldgen         - replace ldscripts")
+    print(" --package       - show package")
+    print(" --packagegen    - replace board:[] in package")
+    print(" --doc           - shows doc/boards.rst")
+    print(" --docgen        - replace doc/boards.rst")
+    print(" --allgen        - generate and replace everything")
+    print("                   (useful for pushing on github)")
+    print("")
 
     out = ""
     for s in speeds:
         out += s + ' '
-    print "available serial speed options (kbps):", out
+    print("available serial speed options (kbps):", out)
 
     out = ""
     for b in boards:
@@ -1292,9 +1452,9 @@ def usage (name,ret):
         else:
             out += default_speed
         out += 'k) '
-    print "available board names:", out
+    print("available board names:", out)
 
-    print ""
+    print("")
 
     sys.exit(ret)
 
@@ -1316,15 +1476,18 @@ packagegen = False
 docshow = False
 docgen = False
 customspeeds = []
+lddir = "tools/sdk/ld/"
 
 #### vvvv cmdline parsing starts
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
-          "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen" ])
+          "noextra4kheap", "allowWPS",
+          "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
+          "allgen"] )
 except getopt.GetoptError as err:
-    print str(err)  # will print something like "option -a not recognized"
+    print(str(err)) # will print something like "option -a not recognized"
     usage(sys.argv[0], 1)
 
 no = '(not set)'
@@ -1343,26 +1506,29 @@ for o, a in opts:
 
     elif o in ("--customspeed"):
         customspeeds += [
-            '.menu.UploadSpeed.' + a + '=' + a,
-            '.menu.UploadSpeed.' + a + '.upload.speed' + '=' + a ]
+            '.menu.baud.' + a + '=' + a,
+            '.menu.baud.' + a + '.upload.speed' + '=' + a ]
 
     elif o in ("--board"):
         if not a in boards:
-            print "board %s not available" % a
+            print("board %s not available" % a)
             usage(sys.argv[0], 1)
         board = a
 
     elif o in ("--speed"):
         if board == no:
-            print "board not set"
+            print("board not set")
             usage(sys.argv[0], 1)
         if not a in speeds:
-            print "speed %s not available" % a
+            print("speed %s not available" % a)
             usage(sys.argv[0], 1)
         boards[board]['serial'] = a
 
     elif o in ("--nofloat"):
         nofloat=True
+
+    elif o in ("--noextra4kheap", "--allowWPS"):
+        print('option ' + o + ' is now deprecated, without effect, and will be removed')
 
     elif o in ("--ldshow"):
         ldshow = True
@@ -1392,6 +1558,16 @@ for o, a in opts:
         docshow = True
         docgen = True
 
+    elif o in ("--allgen"):
+        ldshow = True
+        ldgen = True
+        boardsshow = True
+        boardsgen = True
+        packageshow = True
+        packagegen = True
+        docshow = True
+        docgen = True
+
     else:
         assert False, "unhandled option"
 
@@ -1400,7 +1576,7 @@ for o, a in opts:
 did = False
 
 if ldshow:
-    all_flash_size()
+    all_flash_map()
     did = True
 
 if boardsshow:
