@@ -18,7 +18,7 @@ public:
     , _uri(uri)
     , _method(method)
     {
-		int numParams = 0, start = 0;
+        int numParams = 0, start = 0;
         do {
             start = _uri.indexOf("{}", start);
             if (start > 0) {
