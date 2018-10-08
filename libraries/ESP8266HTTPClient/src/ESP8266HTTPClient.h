@@ -20,13 +20,17 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
+ * Modified by Jeroen Döll, June 2018
  */
 
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
+#define HTTPCLIENT_1_1_COMPATIBLE
+
 #include <memory>
 #include <Arduino.h>
+
 #include <WiFiClient.h>
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
@@ -124,8 +128,12 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
+#ifdef HTTPCLIENT_1_1_COMPATIBLE
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
+#endif
+
+class StreamString;
 
 class HTTPClient
 {
@@ -133,17 +141,26 @@ public:
     HTTPClient();
     ~HTTPClient();
 
+/*
+ * Since both begin() functions take a reference to client as a parameter, you need to 
+ * ensure the client object lives the entire time of the HTTPClient
+ */
+    bool begin(WiFiClient &client, String url);
+    bool begin(WiFiClient &client, String host, uint16_t port, String uri = "/", bool https = false);
+
+#ifdef HTTPCLIENT_1_1_COMPATIBLE
     // Plain HTTP connection, unencrypted
-    bool begin(String url);
-    bool begin(String host, uint16_t port, String uri = "/");
+    bool begin(String url)  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
     // Use axTLS for secure HTTPS connection
-    bool begin(String url, String httpsFingerprint);
-    bool begin(String host, uint16_t port, String uri, String httpsFingerprint);
+    bool begin(String url, String httpsFingerprint)  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri, String httpsFingerprint)  __attribute__ ((deprecated));
     // Use BearSSL for secure HTTPS connection
-    bool begin(String url, const uint8_t httpsFingerprint[20]);
-    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20]);
+    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
     // deprecated, use the overload above instead
     bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
+#endif
 
     void end(void);
 
@@ -185,7 +202,7 @@ public:
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
     int writeToStream(Stream* stream);
-    String getString(void);
+    const String& getString(void);
 
     static String errorToString(int error);
 
@@ -196,6 +213,7 @@ protected:
     };
 
     bool beginInternal(String url, const char* expectedProtocol);
+    void disconnect();
     void clear();
     int returnError(int error);
     bool connect(void);
@@ -204,8 +222,11 @@ protected:
     int writeToStreamDataBlock(Stream * stream, int len);
 
 
+#ifdef HTTPCLIENT_1_1_COMPATIBLE
     TransportTraitsPtr _transportTraits;
-    std::unique_ptr<WiFiClient> _tcp;
+    std::unique_ptr<WiFiClient> _tcpDeprecated;
+#endif
+    WiFiClient* _client;
 
     /// request handling
     String _host;
@@ -228,6 +249,7 @@ protected:
     int _size = -1;
     bool _canReuse = false;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
+    std::unique_ptr<StreamString> _payload;
 };
 
 

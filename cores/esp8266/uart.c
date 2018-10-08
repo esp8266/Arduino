@@ -41,12 +41,13 @@
  *
  */
 #include "Arduino.h"
+#include <pgmspace.h>
 #include "uart.h"
 #include "esp8266_peri.h"
 #include "user_interface.h"
 #include "uart_register.h"
 
-const char overrun_str [] ICACHE_RODATA_ATTR STORE_ATTR = "uart input full!\r\n";
+const char overrun_str [] PROGMEM STORE_ATTR = "uart input full!\r\n";
 static int s_uart_debug_nr = UART0;
 
 
