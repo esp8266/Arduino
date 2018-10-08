@@ -73,11 +73,13 @@ class WiFiClientSecure : public WiFiClient {
       _knownkey_usages = usages;
     }
     // Only check SHA1 fingerprint of certificate
-    void setFingerprint(const uint8_t fingerprint[20]) {
+    bool setFingerprint(const uint8_t fingerprint[20]) {
       _clearAuthenticationSettings();
       _use_fingerprint = true;
       memcpy_P(_fingerprint, fingerprint, 20);
+      return true;
     }
+    bool setFingerprint(const char *fpStr);
     // Accept any certificate that's self-signed
     void allowSelfSignedCerts() {
       _clearAuthenticationSettings();
@@ -120,7 +122,7 @@ class WiFiClientSecure : public WiFiClient {
     static bool probeMaxFragmentLength(const String host, uint16_t port, uint16_t len);
 
     // AXTLS compatible wrappers
-    bool verify(const char* fingerprint, const char* domain_name) { (void) fingerprint; (void) domain_name; return false; } // Can't handle this case, need app code changes
+    // Cannot implement this mode, we need FP before we can connect: bool verify(const char* fingerprint, const char* domain_name)
     bool verifyCertChain(const char* domain_name) { (void)domain_name; return connected(); } // If we're connected, the cert passed validation during handshake
 
     bool setCACert(const uint8_t* pk, size_t size);
