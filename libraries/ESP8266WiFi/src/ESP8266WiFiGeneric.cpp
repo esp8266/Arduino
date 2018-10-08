@@ -249,14 +249,64 @@ int32_t ESP8266WiFiGenericClass::channel(void) {
  * @param type sleep_type_t
  * @return bool
  */
-bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, int listenInterval) {
-    if (listenInterval >= 0 && listenInterval <= 255 &&
-        (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP)) {
-        // in this order (datasheet)
-        wifi_set_sleep_level(MAX_SLEEP_T);
-        wifi_set_listen_interval(listenInterval);
+bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenInterval) {
+
+   /**
+    * datasheet:
+    *
+   wifi_set_sleep_level():
+   Set sleep level of modem sleep and light sleep
+   This configuration should be called before calling wifi_set_sleep_type
+   Modem-sleep and light sleep mode have minimum and maximum sleep levels.
+   - In minimum sleep level, station wakes up at every DTIM to receive
+     beacon.  Broadcast data will not be lost because it is transmitted after
+     DTIM.  However, it can not save much more power if DTIM period is short,
+     as specified in AP.
+   - In maximum sleep level, station wakes up at every listen interval to
+     receive beacon.  Broadcast data may be lost because station may be in sleep
+     state at DTIM time.  If listen interval is longer, more power will be saved, but
+     it’s very likely to lose more broadcast data.
+   - Default setting is minimum sleep level.
+   Further reading: https://routerguide.net/dtim-interval-period-best-setting/
+
+   wifi_set_listen_interval():
+   Set listen interval of maximum sleep level for modem sleep and light sleep
+   It only works when sleep level is set as MAX_SLEEP_T
+   It should be called following the order:
+     wifi_set_sleep_level(MAX_SLEEP_T)
+     wifi_set_listen_interval
+     wifi_set_sleep_type
+   forum: https://github.com/espressif/ESP8266_NONOS_SDK/issues/165#issuecomment-416121920
+   default value seems to be 3 (as recommended by https://routerguide.net/dtim-interval-period-best-setting/)
+    */
+
+#ifdef DEBUG_ESP_WIFI
+    if (listenInterval && type == WIFI_NONE_SLEEP)
+        DEBUG_WIFI_GENERIC("listenInterval not usable with WIFI_NONE_SLEEP\n");
+#endif
+
+    if (listenInterval && (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP)) {
+        // datasheet: listen_interval in [1..10], keep following ordered api calls:
+        if (!wifi_set_sleep_level(MAX_SLEEP_T)) {
+            DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MAX_SLEEP_T): error\n");
+            return false;
+        }
+        if (listenInterval > 10) {
+            DEBUG_WIFI_GENERIC("listenInterval must be in [1..10]\n");
+#ifndef DEBUG_ESP_WIFI
+            // stay within datasheet range when not in debug mode
+            listenInterval = 10;
+#endif
+        }
+        if (!wifi_set_listen_interval(listenInterval)) {
+            DEBUG_WIFI_GENERIC("wifi_set_listen_interval(%d): error\n", listenInterval);
+            return false;
+        }
     }
-    return wifi_set_sleep_type((sleep_type_t) type);
+    bool ret = wifi_set_sleep_type((sleep_type_t) type);
+    if (!ret)
+        DEBUG_WIFI_GENERIC("wifi_set_sleep_type(%d): error\n", (int)sleep_type_t);
+    return ret;
 }
 
 /**
@@ -441,22 +491,6 @@ uint8_t ESP8266WiFiGenericClass::getListenInterval () {
 }
 
 /**
- * Set listen interval of maximum sleep level for modem sleep and light sleep.
- * PREFER using setSleepMode()
- * datasheet:
-   It only works when sleep level is set as MAX_SLEEP_T
-   It should be called following the order:
-     wifi_set_sleep_level(MAX_SLEEP_T)
-     wifi_set_listen_interval
-     wifi_set_sleep_type
-   forum: https://github.com/espressif/ESP8266_NONOS_SDK/issues/165#issuecomment-416121920
-   default value seems to be 3 (as recommended by https://routerguide.net/dtim-interval-period-best-setting/)
- */
-void ESP8266WiFiGenericClass::setListenInterval (uint8_t listenInterval) {
-    wifi_set_listen_interval(listenInterval);
-}
-
-/**
  * Get sleep level of modem sleep and light sleep
  * @return true if max level
  */
@@ -464,33 +498,6 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
     return wifi_get_sleep_level() == MAX_SLEEP_T;
 }
 
-/**
- * Set sleep level of modem sleep and light sleep
- * PREFER using setSleepMode()
- * datasheet:
-
-   This configuration should be called before calling wifi_set_sleep_type
-
-   Modem-sleep and light sleep mode have minimum and maximum sleep levels.
-
-   - In minimum sleep level, station wakes up at every DTIM to receive
-     beacon.  Broadcast data will not be lost because it is transmitted after
-     DTIM.  However, it can not save much more power if DTIM period is short,
-     as specified in AP.
-
-   - In maximum sleep level, station wakes up at every listen interval to
-     receive beacon.  Broadcast data may be lost because station may be in sleep
-     state at DTIM time.  If listen interval is longer, more power will be saved, but
-     it’s very likely to lose more broadcast data.
-
-   - Default setting is minimum sleep level.
-
-   Further reading: https://routerguide.net/dtim-interval-period-best-setting/
-
- */
-void ESP8266WiFiGenericClass::setSleepLevelMax (bool setToMax) {
-    wifi_set_sleep_level(setToMax? MAX_SLEEP_T: MIN_SLEEP_T);
-}
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------ Generic Network function ---------------------------------------------

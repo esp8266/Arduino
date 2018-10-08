@@ -55,13 +55,22 @@ mode
 -  ``WiFi.getMode()``: return current Wi-Fi mode (one out of four modes
    above)
 
+WiFi power management, listen-interval / DTIM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool setSleepMode (WiFiSleepType_t type, int listenInterval=0)
+
+Sleep mode type is ``WIFI_NONE_SLEEP``, ``WIFI_LIGHT_SLEEP`` or ``WIFI_MODEM_SLEEP``.
+With ``LIGHT`` or ``MODEM``, `listenInterval` can be set within [1..10] (nothing/default = 0 = disabled)..
+
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
 
 .. code:: cpp
 
     int32_t  channel (void)
-    bool  setSleepMode (WiFiSleepType_t type, int listenInterval=-1) (DTIM setting for LIGHT or MODEM sleep mode)
     WiFiSleepType_t  getSleepMode ()
     bool  setPhyMode (WiFiPhyMode_t mode)
     WiFiPhyMode_t  getPhyMode ()
@@ -73,11 +82,9 @@ Other Function Calls
     bool  forceSleepWake ()
     int  hostByName (const char *aHostname, IPAddress &aResult)
 
-    appeared in SDK pre-V3, for reference (prefer using setSleepMode(type,DTIM)):
+    appeared with SDK pre-V3:
     uint8_t getListenInterval ();
-    void setListenInterval (uint8_t listenInterval);
     bool isSleepLevelMax ();
-    void setSleepLevelMax (bool setToMax);
 
 
 Documentation for the above functions is not yet prepared.
