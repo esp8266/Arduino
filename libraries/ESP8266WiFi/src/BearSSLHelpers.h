@@ -119,4 +119,21 @@ class BearSSLX509List {
     br_x509_trust_anchor *_ta;
 };
 
+// Opaque object which wraps the BearSSL SSL session to make repeated connections
+// significantly faster.  Completely optional.
+namespace BearSSL {
+  class WiFiClientSecure;
+};
+
+class BearSSLSession {
+  friend class BearSSL::WiFiClientSecure;
+
+  public:
+    BearSSLSession() { memset(&_session, 0, sizeof(_session)); }
+  private:
+    br_ssl_session_parameters *getSession() { return &_session; }
+    // The actual BearSSL ession information
+    br_ssl_session_parameters _session;
+};
+
 #endif

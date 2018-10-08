@@ -39,6 +39,7 @@
  * | :-------------- | :------------------------------------------------ |
  * | bearssl_hash.h  | Hash functions                                    |
  * | bearssl_hmac.h  | HMAC                                              |
+ * | bearssl_kdf.h   | Key Derivation Functions                          |
  * | bearssl_rand.h  | Pseudorandom byte generators                      |
  * | bearssl_prf.h   | PRF implementations (for SSL/TLS)                 |
  * | bearssl_block.h | Symmetric encryption                              |
@@ -125,6 +126,7 @@
 
 #include "bearssl_hash.h"
 #include "bearssl_hmac.h"
+#include "bearssl_kdf.h"
 #include "bearssl_rand.h"
 #include "bearssl_prf.h"
 #include "bearssl_block.h"
