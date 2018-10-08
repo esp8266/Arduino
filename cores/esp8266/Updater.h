@@ -187,8 +187,8 @@ class UpdaterClass {
 
     int _ledPin;
     uint8_t _ledOn;
-    int _ledStateRestore;
 
+    // Optional signed binary verification
     UpdaterHashClass *_hash;
     UpdaterVerifyClass *_verify;
 };

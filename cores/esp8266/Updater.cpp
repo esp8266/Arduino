@@ -39,7 +39,7 @@ void UpdaterClass::_reset() {
   _command = U_FLASH;
 
   if(_ledPin != -1) {
-    digitalWrite(_ledPin, _ledStateRestore);
+    digitalWrite(_ledPin, !_ledOn); // off
   }
 }
 
@@ -52,10 +52,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   }
 
   _ledPin = ledPin;
-  _ledOn = ledOn;
-  if(_ledPin != -1) {
-    _ledStateRestore = digitalRead(_ledPin);
-  }
+  _ledOn = !!ledOn; // 0(LOW) or 1(HIGH)
 
   /* Check boot mode; if boot mode is 1 (UART download mode),
     we will not be able to reset into normal mode once update is done.
@@ -442,7 +439,7 @@ size_t UpdaterClass::writeStream(Stream &data) {
 
     while(remaining()) {
         if(_ledPin != -1) {
-            digitalWrite(LED_BUILTIN, _ledOn); // Switch LED on
+            digitalWrite(_ledPin, _ledOn); // Switch LED on
         }
         size_t bytesToRead = _bufferSize - _bufferLen;
         if(bytesToRead > remaining()) {
@@ -460,7 +457,7 @@ size_t UpdaterClass::writeStream(Stream &data) {
             }
         }
         if(_ledPin != -1) {
-            digitalWrite(LED_BUILTIN, _ledOn == HIGH ? LOW : HIGH); // Switch LED off
+            digitalWrite(_ledPin, !_ledOn); // Switch LED off
         }
         _bufferLen += toRead;
         if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
