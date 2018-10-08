@@ -8,7 +8,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
-  - [Using git version](#using-git-version)
+  - [Using git version](#using-git-version-basic-instructions)
   - [Using PlatformIO](#using-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
