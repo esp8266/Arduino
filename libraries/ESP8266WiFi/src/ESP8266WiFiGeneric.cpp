@@ -285,21 +285,28 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
         DEBUG_WIFI_GENERIC("listenInterval not usable with WIFI_NONE_SLEEP\n");
 #endif
 
-    if (listenInterval && (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP)) {
-        if (!wifi_set_sleep_level(MAX_SLEEP_T)) {
-            DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MAX_SLEEP_T): error\n");
-            return false;
-        }
-        if (listenInterval > 10) {
-            DEBUG_WIFI_GENERIC("listenInterval must be in [1..10]\n");
+      if (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP) {
+        if (listenInterval) {
+            if (!wifi_set_sleep_level(MAX_SLEEP_T)) {
+                DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MAX_SLEEP_T): error\n");
+                return false;
+            }
+            if (listenInterval > 10) {
+                DEBUG_WIFI_GENERIC("listenInterval must be in [1..10]\n");
 #ifndef DEBUG_ESP_WIFI
-            // stay within datasheet range when not in debug mode
-            listenInterval = 10;
+                // stay within datasheet range when not in debug mode
+                listenInterval = 10;
 #endif
-        }
-        if (!wifi_set_listen_interval(listenInterval)) {
-            DEBUG_WIFI_GENERIC("wifi_set_listen_interval(%d): error\n", listenInterval);
-            return false;
+            }
+            if (!wifi_set_listen_interval(listenInterval)) {
+                DEBUG_WIFI_GENERIC("wifi_set_listen_interval(%d): error\n", listenInterval);
+                return false;
+            }
+        } else {
+            if (!wifi_set_sleep_level(MIN_SLEEP_T)) {
+                DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MIN_SLEEP_T): error\n");
+                return false;
+            }
         }
     }
     bool ret = wifi_set_sleep_type((sleep_type_t) type);

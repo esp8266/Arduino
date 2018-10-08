@@ -87,8 +87,8 @@ class ESP8266WiFiSTAClass {
 
     protected:
 
-      static bool _useStaticIp;
-      static bool _useInsecureWEP;
+        static bool _useStaticIp;
+        static bool _useInsecureWEP;
 
     // ----------------------------------------------------------------------------------------------
     // ------------------------------------ STA remote configure  -----------------------------------
