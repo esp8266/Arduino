@@ -286,7 +286,6 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
 #endif
 
     if (listenInterval && (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP)) {
-        // datasheet: listen_interval in [1..10], keep following ordered api calls:
         if (!wifi_set_sleep_level(MAX_SLEEP_T)) {
             DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MAX_SLEEP_T): error\n");
             return false;
@@ -304,8 +303,9 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
         }
     }
     bool ret = wifi_set_sleep_type((sleep_type_t) type);
-    if (!ret)
-        DEBUG_WIFI_GENERIC("wifi_set_sleep_type(%d): error\n", (int)sleep_type_t);
+    if (!ret) {
+        DEBUG_WIFI_GENERIC("wifi_set_sleep_type(%d): error\n", (int)type);
+    }
     return ret;
 }
 
