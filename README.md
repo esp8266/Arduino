@@ -8,7 +8,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
-  - [Using git version](#using-git-version)
+  - [Using git version](#using-git-version-basic-instructions)
   - [Using PlatformIO](#using-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
@@ -128,3 +128,5 @@ ESP8266 core files are licensed under LGPL.
 [umm_malloc](https://github.com/rhempel/umm_malloc) memory management library written by Ralph Hempel is used in this project. It is distributed under MIT license.
 
 [axTLS](http://axtls.sourceforge.net/) library written by Cameron Rich, built from https://github.com/igrr/axtls-8266, is used in this project. It is distributed under [BSD license](https://github.com/igrr/axtls-8266/blob/master/LICENSE).
+
+[BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).
