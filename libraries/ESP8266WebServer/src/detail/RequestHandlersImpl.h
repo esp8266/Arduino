@@ -52,7 +52,7 @@ public:
             if (i >= uriLength) {
                 // there is no char after '}'
                 pathArgs[pathArgIndex] = requestUri.substring(requestUriIndex);
-                return true;
+                return pathArgs[pathArgIndex].indexOf("/") == -1; // path argument may not contain a '/'
             }
             else
             {

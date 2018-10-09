@@ -8,11 +8,7 @@ const char *password = "........";
 
 ESP8266WebServer server(80);
 
-const int led = 2;
-
 void setup(void) {
-  pinMode(led, OUTPUT);
-  digitalWrite(led, 0);
   Serial.begin(9600);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -37,19 +33,15 @@ void setup(void) {
     server.send(200, "text/plain", "hello from esp8266!");
   });
 
-  server.on("/led/2/actions/{}", []() {
-    String action = server.pathArg(0);
-    if (action == "on") {
-      // /led/2/actions/on
-      digitalWrite(led, 1);
-      server.send(200, "text/plain", "Led 2 on");
-    } else if (action == "off") {
-      // /led/2/actions/off
-      digitalWrite(led, 0);
-      server.send(200, "text/plain", "Led 2 off");
-    } else {
-      server.send(404, "text/plain", "Action '" + action + "' was not found");
-    }
+  server.on("/users/{}", []() {
+    String user = server.pathArg(0);
+    server.send(200, "text/plain", "User: '" + user + "'");
+  });
+  
+  server.on("/users/{}/devices/{}", []() {
+    String user = server.pathArg(0);
+    String device = server.pathArg(1);
+    server.send(200, "text/plain", "User: '" + user + "' and Device: '" + device + "'");
   });
 
   server.begin();
