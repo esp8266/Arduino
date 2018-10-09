@@ -69,11 +69,9 @@ V2 revision of nonos-sdk before V3)
 
 Quoting nonos-sdk datasheet:
 
-* ``NONE``:
-  * disable power saving
+* ``NONE``: disable power saving
 
-* ``LIGHT`` or ``MODEM``:
-  * TCP timer rate raised from 250ms to 3s
+* ``LIGHT`` or ``MODEM``: TCP timer rate raised from 250ms to 3s
 
 When ``listenInterval`` is set to 1..10, in ``LIGHT`` or ``MODEM`` mode,
 station wakes up every (DTIM-interval * ``listenInterval``).  This saves
