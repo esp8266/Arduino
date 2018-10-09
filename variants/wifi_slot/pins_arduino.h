@@ -83,4 +83,7 @@ static const uint8_t analog_pin_to_mux_channel[] = {
 
 #include "../generic/common.h"
 
+#undef NUM_ANALOG_INPUTS
+#define NUM_ANALOG_INPUTS 8
+
 #endif /* Pins_Arduino_h */
