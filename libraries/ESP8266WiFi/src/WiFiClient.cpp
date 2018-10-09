@@ -43,6 +43,34 @@ extern "C"
 
 uint16_t WiFiClient::_localPort = 0;
 
+static bool defaultNoDelay = false; // false == Nagle enabled by default
+static bool defaultSync = false;
+
+bool getDefaultPrivateGlobalSyncValue ()
+{
+    return defaultSync;
+}
+
+void WiFiClient::setDefaultNoDelay (bool noDelay)
+{
+    defaultNoDelay = noDelay;
+}
+
+void WiFiClient::setDefaultSync (bool sync)
+{
+    defaultSync = sync;
+}
+
+bool WiFiClient::getDefaultNoDelay ()
+{
+    return defaultNoDelay;
+}
+
+bool WiFiClient::getDefaultSync ()
+{
+    return defaultSync;
+}
+
 template<>
 WiFiClient* SList<WiFiClient>::_s_first = 0;
 
@@ -60,6 +88,9 @@ WiFiClient::WiFiClient(ClientContext* client)
     _timeout = 5000;
     _client->ref();
     WiFiClient::_add(this);
+
+    setSync(defaultSync);
+    setNoDelay(defaultNoDelay);
 }
 
 WiFiClient::~WiFiClient()
@@ -90,7 +121,6 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
         _client->ref();
     return *this;
 }
-
 
 int WiFiClient::connect(const char* host, uint16_t port)
 {
@@ -147,6 +177,9 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
         return 0;
     }
 
+    setSync(defaultSync);
+    setNoDelay(defaultNoDelay);
+
     return 1;
 }
 
@@ -156,10 +189,24 @@ void WiFiClient::setNoDelay(bool nodelay) {
     _client->setNoDelay(nodelay);
 }
 
-bool WiFiClient::getNoDelay() {
+bool WiFiClient::getNoDelay() const {
     if (!_client)
         return false;
     return _client->getNoDelay();
+}
+
+void WiFiClient::setSync(bool sync)
+{
+    if (!_client)
+        return;
+    _client->setSync(sync);
+}
+
+bool WiFiClient::getSync() const
+{
+    if (!_client)
+        return false;
+    return _client->getSync();
 }
 
 size_t WiFiClient::availableForWrite ()
@@ -264,18 +311,25 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
     return _client->peekBytes((char *)buffer, count);
 }
 
-void WiFiClient::flush()
-{
-    if (_client)
-        _client->wait_until_sent();
-}
-
-void WiFiClient::stop()
+bool WiFiClient::flush(unsigned int maxWaitMs)
 {
     if (!_client)
-        return;
+        return true;
 
-    _client->close();
+    if (maxWaitMs == 0)
+        maxWaitMs = WIFICLIENT_MAX_FLUSH_WAIT_MS;
+    return _client->wait_until_sent(maxWaitMs);
+}
+
+bool WiFiClient::stop(unsigned int maxWaitMs)
+{
+    if (!_client)
+        return true;
+
+    bool ret = flush(maxWaitMs); // virtual, may be ssl's
+    if (_client->close() != ERR_OK)
+        ret = false;
+    return ret;
 }
 
 uint8_t WiFiClient::connected()

@@ -291,9 +291,12 @@ Memory, memory, memory
    rely on exceptions for error handling, which is not available for the ESP, and in any
    case there is no access to the underlying code.
 
-   Instrumenting the code with the OOM debug option and calls to ``ESP.getFreeHeap()`` will
-   help the process of finding leaks. Now is time to re-read about the
-   `exception decoder <#exception-decoder>`__.
+   Instrumenting the code with the OOM debug option and calls to
+   ``ESP.getFreeHeap()`` / ``ESP.getHeapFragmentation()`` /
+   ``ESP.getMaxFreeBlockSize()`` will help the process of finding memory issues.
+
+   Now is time to re-read about the `exception decoder
+   <#exception-decoder>`__.
 
 
 *Some techniques for reducing memory usage*
