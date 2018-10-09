@@ -25,9 +25,8 @@ protected:
 
 public:
     String pathArg(unsigned int i) { 
-        if (i < pathArgs.size())
-            return pathArgs[i];
-        return "";
+        assert(i < pathArgs.size());
+        return pathArgs[i];
     }
 };
 
