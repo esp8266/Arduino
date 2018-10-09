@@ -43,7 +43,10 @@
 #endif
 
 // A class to make it easier to handle and pass around IP addresses
-// based on lwip's ip address (ipv4, limited compatibility with ipv6)
+// IPv6 update:
+// IPAddress is now a decorator class for lwIP's ip_addr_t
+// fully backward compatible with legacy IPv4-only Arduino's
+// with unchanged footprint when IPv6 is disabled
 
 class IPAddress: public Printable {
     private:

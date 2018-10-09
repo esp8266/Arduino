@@ -39,8 +39,8 @@
           Serial.print('.');
           delay(500);
       }
-  
-  can be replaced with:
+
+  can be replaced by:
 
       for (bool configured = false; !configured; ) {
           for (auto iface: ifList)
@@ -50,7 +50,7 @@
           delay(500);
       }
 
-  waiting for an IPv6 global address:              
+  waiting for an IPv6 global address:
 
       for (bool configured = false; !configured; ) {
           for (auto iface: ifList)
@@ -60,7 +60,7 @@
           Serial.print('.');
           delay(500);
       }
-      
+
   waiting for an IPv6 global address, on a specific interface:
 
       for (bool configured = false; !configured; ) {
@@ -114,7 +114,7 @@ class IfListClass {
                     return ret;
                 }
 
-		const_iterator& operator++() {
+                const_iterator& operator++() {
                     while (_netif) {
                         if (++_num == IF_NUM_ADDRESSES) {
                             _num = -1;
@@ -147,7 +147,7 @@ class IfListClass {
                     return    _netif == o._netif
                            && (!_netif || _num == o._num);
                 }
-                
+
                 const ip_addr_t* _ip_from_netif_num () const {
 #if LWIP_IPV6
                     return _num? &_netif->ip6_addr[_num - 1]: &_netif->ip_addr;
