@@ -3,6 +3,7 @@
 
 #include <ESP8266WebServer.h>
 #include <vector>
+#include <assert.h>
 
 template<typename ServerType>
 class RequestHandler {
