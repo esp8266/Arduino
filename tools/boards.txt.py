@@ -931,22 +931,30 @@ macros = {
     ####################### lwip
 
     'lwip2': collections.OrderedDict([
-        ( '.menu.ip.lm2', 'v2 Lower Memory' ),
-        ( '.menu.ip.lm2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.lm2.build.lwip_lib', '-llwip2_536' ),
-        ( '.menu.ip.lm2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_IPV6=0' ),
-        ( '.menu.ip.hb2', 'v2 Higher Bandwidth' ),
-        ( '.menu.ip.hb2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.hb2.build.lwip_lib', '-llwip2_1460' ),
-        ( '.menu.ip.hb2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_IPV6=0' ),
-        ( '.menu.ip.lm6', 'v2 IPv6 Lower Memory' ),
-        ( '.menu.ip.lm6.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.lm6.build.lwip_lib', '-llwip6_536' ),
-        ( '.menu.ip.lm6.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_IPV6=1' ),
-        ( '.menu.ip.hb6', 'v2 IPv6 Higher Bandwidth' ),
-        ( '.menu.ip.hb6.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.hb6.build.lwip_lib', '-llwip6_1460' ),
-        ( '.menu.ip.hb6.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_IPV6=1' ),
+        ( '.menu.ip.lm2f', 'v2 Lower Memory' ),
+        ( '.menu.ip.lm2f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2f.build.lwip_lib', '-llwip2-536-feat' ),
+        ( '.menu.ip.lm2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0' ),
+        ( '.menu.ip.hb2f', 'v2 Higher Bandwidth' ),
+        ( '.menu.ip.hb2f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2f.build.lwip_lib', '-llwip2-1460-feat' ),
+        ( '.menu.ip.hb2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0' ),
+        ( '.menu.ip.lm2n', 'v2 Lower Memory (no features)' ),
+        ( '.menu.ip.lm2n.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2n.build.lwip_lib', '-llwip2-536' ),
+        ( '.menu.ip.lm2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0' ),
+        ( '.menu.ip.hb2n', 'v2 Higher Bandwidth (no features)' ),
+        ( '.menu.ip.hb2n.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2n.build.lwip_lib', '-llwip2-1460' ),
+        ( '.menu.ip.hb2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0' ),
+        ( '.menu.ip.lm6f', 'v2 IPv6 Lower Memory' ),
+        ( '.menu.ip.lm6f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm6f.build.lwip_lib', '-llwip6-536-feat' ),
+        ( '.menu.ip.lm6f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1' ),
+        ( '.menu.ip.hb6f', 'v2 IPv6 Higher Bandwidth' ),
+        ( '.menu.ip.hb6f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb6f.build.lwip_lib', '-llwip6-1460-feat' ),
+        ( '.menu.ip.hb6f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1' ),
         ]),
 
     'lwip': collections.OrderedDict([
@@ -1127,12 +1135,12 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
         ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
         ])
-    #if spiffs_kb > 0:
-    #    d.update(collections.OrderedDict([
-    #        ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
-    #        ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
-    #        ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
-    #        ]))
+    if spiffs_kb > 0:
+        d.update(collections.OrderedDict([
+            ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
+            ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
+            ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
+            ]))
 
     if ldshow:
         if ldgen:

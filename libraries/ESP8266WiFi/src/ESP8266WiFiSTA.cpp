@@ -89,6 +89,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
 // -----------------------------------------------------------------------------------------------------------------------
 
 bool ESP8266WiFiSTAClass::_useStaticIp = false;
+bool ESP8266WiFiSTAClass::_useInsecureWEP = false;
 
 /**
  * Start Wifi connection
@@ -130,6 +131,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     conf.threshold.rssi = -127;
+    conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
 
     // TODO(#909): set authmode to AUTH_WPA_PSK if passphrase is provided
     conf.threshold.authmode = AUTH_OPEN;
@@ -389,28 +391,6 @@ IPAddress ESP8266WiFiSTAClass::localIP() {
     wifi_get_ip_info(STATION_IF, &ip);
     return IPAddress(ip.ip.addr);
 }
-
-#if LWIP_IPV6
-
-extern "C" struct netif netif_git[2]; // lwip2 interfaces
-
-/**
- * Get the station interface IPv6 link-local address.
- * @return IPAddress station local-scope IPv6
- */
-IPAddress ESP8266WiFiSTAClass::localIP6Link() {
-    return IPAddress(netif_git[STATION_IF].ip6_addr[0]);
-}
-
-/**
- * Get the station interface IPv6 global address.
- * @return IPAddress station global-scope IPv6
- */
-IPAddress ESP8266WiFiSTAClass::localIP6Global() {
-    return IPAddress(netif_git[STATION_IF].ip6_addr[1]);
-}
-
-#endif // LWIP_IPV6
 
 /**
  * Get the station interface MAC address.

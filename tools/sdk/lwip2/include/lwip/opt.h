@@ -931,16 +931,6 @@
 #endif
 
 /**
- * LWIP_DHCP_CHECK_LINK_UP==1: dhcp_start() only really starts if the netif has
- * NETIF_FLAG_LINK_UP set in its flags. As this is only an optimization and
- * netif drivers might not set this flag, the default is off. If enabled,
- * netif_set_link_up() must be called to continue dhcp starting.
- */
-#if !defined LWIP_DHCP_CHECK_LINK_UP
-#define LWIP_DHCP_CHECK_LINK_UP         0
-#endif
-
-/**
  * LWIP_DHCP_BOOTP_FILE==1: Store offered_si_addr and boot_file_name.
  */
 #if !defined LWIP_DHCP_BOOTP_FILE || defined __DOXYGEN__
@@ -1489,15 +1479,19 @@
 #define LWIP_TCP_PCB_NUM_EXT_ARGS       0
 #endif
 
-/** LWIP_ALTCP==1: enable the altcp API
+/** LWIP_ALTCP==1: enable the altcp API.
  * altcp is an abstraction layer that prevents applications linking against the
  * tcp.h functions but provides the same functionality. It is used to e.g. add
  * SSL/TLS or proxy-connect support to an application written for the tcp callback
  * API without that application knowing the protocol details.
- * Applications written against the altcp API are directly linked against the
- * tcp callback API for LWIP_ALTCP==0, but then cannot use layered protocols.
+ *
+ * With LWIP_ALTCP==0, applications written against the altcp API can still be
+ * compiled but are directly linked against the tcp.h callback API and then
+ * cannot use layered protocols.
+ *
+ * See @ref altcp_api
  */
-#ifndef LWIP_ALTCP
+#if !defined LWIP_ALTCP || defined __DOXYGEN__
 #define LWIP_ALTCP                      0
 #endif
 
@@ -1506,7 +1500,7 @@
  * A port to ARM mbedtls is provided with lwIP, see apps/altcp_tls/ directory
  * and LWIP_ALTCP_TLS_MBEDTLS option.
  */
-#ifndef LWIP_ALTCP_TLS
+#if !defined LWIP_ALTCP_TLS || defined __DOXYGEN__
 #define LWIP_ALTCP_TLS                  0
 #endif
 
@@ -1558,7 +1552,7 @@
  * LWIP_PBUF_REF_T: Refcount type in pbuf.
  * Default width of u8_t can be increased if 255 refs are not enough for you.
  */
-#ifndef LWIP_PBUF_REF_T
+#if !defined LWIP_PBUF_REF_T || defined __DOXYGEN__
 #define LWIP_PBUF_REF_T                 u8_t
 #endif
 /**
@@ -2392,6 +2386,18 @@
  * LWIP_IPV6_SCOPES==1: Enable support for IPv6 address scopes, ensuring that
  * e.g. link-local addresses are really treated as link-local. Disable this
  * setting only for single-interface configurations.
+ * All addresses that have a scope according to the default policy (link-local
+ * unicast addresses, interface-local and link-local multicast addresses) should
+ * now have a zone set on them before being passed to the core API, although
+ * lwIP will currently attempt to select a zone on the caller's behalf when 
+ * necessary. Applications that directly assign IPv6 addresses to interfaces
+ * (which is NOT recommended) must now ensure that link-local addresses carry
+ * the netif's zone. See the new ip6_zone.h header file for more information and
+ * relevant macros. For now it is still possible to turn off scopes support
+ * through the new LWIP_IPV6_SCOPES option. When upgrading an implementation that
+ * uses the core API directly, it is highly recommended to enable
+ * LWIP_IPV6_SCOPES_DEBUG at least for a while, to ensure e.g. proper address
+ * initialization.
  */
 #if !defined LWIP_IPV6_SCOPES || defined __DOXYGEN__
 #define LWIP_IPV6_SCOPES                (LWIP_IPV6 && !LWIP_SINGLE_NETIF)

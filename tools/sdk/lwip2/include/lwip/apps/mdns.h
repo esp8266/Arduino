@@ -41,6 +41,10 @@
 #include "lwip/apps/mdns_opts.h"
 #include "lwip/netif.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if LWIP_MDNS_RESPONDER
 
 enum mdns_sd_proto {
@@ -93,5 +97,9 @@ void mdns_resp_announce(struct netif *netif);
 #define mdns_resp_netif_settings_changed(netif) mdns_resp_announce(netif)
 
 #endif /* LWIP_MDNS_RESPONDER */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LWIP_HDR_APPS_MDNS_H */

@@ -43,7 +43,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-   
+
 /** This is the packed version of ip6_addr_t,
     used in network headers that are itself packed */
 #ifdef PACK_STRUCT_USE_INCLUDES
