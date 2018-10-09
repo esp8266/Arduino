@@ -1,9 +1,13 @@
 /**
  * @file
- * NETBIOS name service responder options
+ * Base TCP API definitions shared by TCP and ALTCP\n
+ * See also @ref tcp_raw
  */
 
 /*
+ * Copyright (c) 2001-2004 Swedish Institute of Computer Science.
+ * All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
@@ -28,32 +32,57 @@
  *
  * This file is part of the lwIP TCP/IP stack.
  *
+ * Author: Adam Dunkels <adam@sics.se>
+ *
  */
-#ifndef LWIP_HDR_APPS_NETBIOS_OPTS_H
-#define LWIP_HDR_APPS_NETBIOS_OPTS_H
+#ifndef LWIP_HDR_TCPBASE_H
+#define LWIP_HDR_TCPBASE_H
 
 #include "lwip/opt.h"
 
-/**
- * @defgroup netbiosns_opts Options
- * @ingroup netbiosns
- * @{
- */
+#if LWIP_TCP /* don't build if not configured for use in lwipopts.h */
 
-/** NetBIOS name of lwip device
- * This must be uppercase until NETBIOS_STRCMP() is defined to a string
- * comparision function that is case insensitive.
- * If you want to use the netif's hostname, use this (with LWIP_NETIF_HOSTNAME):
- * (ip_current_netif() != NULL ? ip_current_netif()->hostname != NULL ? ip_current_netif()->hostname : "" : "")
- *
- * If this is not defined, netbiosns_set_name() can be called at runtime to change the name.
- */
-#ifdef __DOXYGEN__
-#define NETBIOS_LWIP_NAME "NETBIOSLWIPDEV"
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-/**
- * @}
- */
 
-#endif /* LWIP_HDR_APPS_NETBIOS_OPTS_H */
+#if LWIP_WND_SCALE
+typedef u32_t tcpwnd_size_t;
+#else
+typedef u16_t tcpwnd_size_t;
+#endif
+
+enum tcp_state {
+  CLOSED      = 0,
+  LISTEN      = 1,
+  SYN_SENT    = 2,
+  SYN_RCVD    = 3,
+  ESTABLISHED = 4,
+  FIN_WAIT_1  = 5,
+  FIN_WAIT_2  = 6,
+  CLOSE_WAIT  = 7,
+  CLOSING     = 8,
+  LAST_ACK    = 9,
+  TIME_WAIT   = 10
+};
+/* ATTENTION: this depends on state number ordering! */
+#define TCP_STATE_IS_CLOSING(state) ((state) >= FIN_WAIT_1)
+
+/* Flags for "apiflags" parameter in tcp_write */
+#define TCP_WRITE_FLAG_COPY 0x01
+#define TCP_WRITE_FLAG_MORE 0x02
+
+#define TCP_PRIO_MIN    1
+#define TCP_PRIO_NORMAL 64
+#define TCP_PRIO_MAX    127
+
+const char* tcp_debug_state_str(enum tcp_state s);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* LWIP_TCP */
+
+#endif /* LWIP_HDR_TCPBASE_H */

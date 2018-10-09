@@ -1,10 +1,13 @@
 /**
  * @file
- * SNMP MIB2 API
+ * IEEE assigned numbers
+ *
+ * @defgroup ieee IEEE assigned numbers
+ * @ingroup infrastructure
  */
 
 /*
- * Copyright (c) 2001-2004 Swedish Institute of Computer Science.
+ * Copyright (c) 2017 Dirk Ziegelmeier.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -34,45 +37,55 @@
  * Author: Dirk Ziegelmeier <dziegel@gmx.de>
  *
  */
-#ifndef LWIP_HDR_APPS_SNMP_MIB2_H
-#define LWIP_HDR_APPS_SNMP_MIB2_H
 
-#include "lwip/apps/snmp_opts.h"
+#ifndef LWIP_HDR_PROT_IEEE_H
+#define LWIP_HDR_PROT_IEEE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if LWIP_SNMP /* don't build if not configured for use in lwipopts.h */
-#if SNMP_LWIP_MIB2
-
-#include "lwip/apps/snmp_core.h"
-
-extern const struct snmp_mib mib2;
-
-#if SNMP_USE_NETCONN
-#include "lwip/apps/snmp_threadsync.h"
-void snmp_mib2_lwip_synchronizer(snmp_threadsync_called_fn fn, void* arg);
-extern struct snmp_threadsync_instance snmp_mib2_lwip_locks;
-#endif
-
-#ifndef SNMP_SYSSERVICES
-#define SNMP_SYSSERVICES ((1 << 6) | (1 << 3) | ((IP_FORWARD) << 2))
-#endif
-
-void snmp_mib2_set_sysdescr(const u8_t* str, const u16_t* len); /* read-only be defintion */
-void snmp_mib2_set_syscontact(u8_t *ocstr, u16_t *ocstrlen, u16_t bufsize);
-void snmp_mib2_set_syscontact_readonly(const u8_t *ocstr, const u16_t *ocstrlen);
-void snmp_mib2_set_sysname(u8_t *ocstr, u16_t *ocstrlen, u16_t bufsize);
-void snmp_mib2_set_sysname_readonly(const u8_t *ocstr, const u16_t *ocstrlen);
-void snmp_mib2_set_syslocation(u8_t *ocstr, u16_t *ocstrlen, u16_t bufsize);
-void snmp_mib2_set_syslocation_readonly(const u8_t *ocstr, const u16_t *ocstrlen);
-
-#endif /* SNMP_LWIP_MIB2 */
-#endif /* LWIP_SNMP */
+/**
+ * @ingroup ieee
+ * A list of often ethtypes (although lwIP does not use all of them).
+ */
+enum lwip_ieee_eth_type {
+  /** Internet protocol v4 */
+  ETHTYPE_IP        = 0x0800U,
+  /** Address resolution protocol */
+  ETHTYPE_ARP       = 0x0806U, 
+  /** Wake on lan */
+  ETHTYPE_WOL       = 0x0842U,
+  /** RARP */
+  ETHTYPE_RARP      = 0x8035U,
+  /** Virtual local area network */
+  ETHTYPE_VLAN      = 0x8100U,
+  /** Internet protocol v6 */
+  ETHTYPE_IPV6      = 0x86DDU,
+  /** PPP Over Ethernet Discovery Stage */
+  ETHTYPE_PPPOEDISC = 0x8863U,
+  /** PPP Over Ethernet Session Stage */
+  ETHTYPE_PPPOE     = 0x8864U,
+  /** Jumbo Frames */
+  ETHTYPE_JUMBO     = 0x8870U,
+  /** Process field network */
+  ETHTYPE_PROFINET  = 0x8892U,
+  /** Ethernet for control automation technology */
+  ETHTYPE_ETHERCAT  = 0x88A4U,
+  /** Link layer discovery protocol */
+  ETHTYPE_LLDP      = 0x88CCU,
+  /** Serial real-time communication system */
+  ETHTYPE_SERCOS    = 0x88CDU,
+  /** Media redundancy protocol */
+  ETHTYPE_MRP       = 0x88E3U,
+  /** Precision time protocol */
+  ETHTYPE_PTP       = 0x88F7U,
+  /** Q-in-Q, 802.1ad */
+  ETHTYPE_QINQ      = 0x9100U
+};
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LWIP_HDR_APPS_SNMP_MIB2_H */
+#endif /* LWIP_HDR_PROT_IEEE_H */
