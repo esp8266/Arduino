@@ -96,8 +96,6 @@ typedef enum {
   ERR_ARG        = -16
 } err_enum_t;
 
-#define ERR_IS_FATAL(e) ((e) <= ERR_ABRT)
-
 /**
  * @}
  */
