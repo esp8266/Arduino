@@ -138,6 +138,9 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", _size, _size);
 #endif
 
+  if (!_verify) {
+    _md5.begin();
+  }
   return true;
 }
 
@@ -186,44 +189,19 @@ bool UpdaterClass::end(bool evenIfRemaining){
       _reset();
       return false;
     }
-  }
 
-  _md5.begin();
-  int binSize = _size;
-  if (_hash) {
+    int binSize = _size - sigLen - sizeof(uint32_t) /* The siglen word */;
     _hash->begin();
-    binSize -= sigLen + sizeof(uint32_t);
-  }
 #ifdef DEBUG_UPDATER
-  DEBUG_UPDATER.printf("[Updater] Adjusted binsize: %d\n", binSize);
+    DEBUG_UPDATER.printf("[Updater] Adjusted binsize: %d\n", binSize);
 #endif
-  // Calculate the MD5 and hash using proper size
-  uint8_t buff[128];
-  for(int i = 0; i < binSize; i += sizeof(buff)) {
-    ESP.flashRead(_startAddress + i, (uint32_t *)buff, sizeof(buff));
-
-    size_t read = binSize - i;
-    if(read > sizeof(buff)) {
-      read = sizeof(buff);
-    }
-    _md5.add(buff, read);
-    if (_hash) {
+      // Calculate the MD5 and hash using proper size
+    uint8_t buff[128];
+    for(int i = 0; i < binSize; i += sizeof(buff)) {
+      ESP.flashRead(_startAddress + i, (uint32_t *)buff, sizeof(buff));
+      size_t read = std::min((int)sizeof(buff), binSize - i);
       _hash->add(buff, read);
     }
-  }
-  _md5.calculate();
-  if(_target_md5.length()) {
-    if(_target_md5 != _md5.toString()){
-      _setError(UPDATE_ERROR_MD5);
-      _reset();
-      return false;
-    }
-#ifdef DEBUG_UPDATER
-    else DEBUG_UPDATER.printf("MD5 Success: %s\n", _target_md5.c_str());
-#endif
-  }
-
-  if (_verify && _hash) {
     _hash->end();
 #ifdef DEBUG_UPDATER
     unsigned char *ret = (unsigned char *)_hash->hash();
@@ -250,6 +228,19 @@ bool UpdaterClass::end(bool evenIfRemaining){
       _reset();
       return false;
     }
+#ifdef DEBUG_UPDATER
+    DEBUG_UPDATER.printf("[Updater] Signature matches\n");
+#endif
+  } else if (_target_md5.length()) {
+    _md5.calculate();
+    if(_target_md5 != _md5.toString()){
+      _setError(UPDATE_ERROR_MD5);
+      _reset();
+      return false;
+    }
+#ifdef DEBUG_UPDATER
+    else DEBUG_UPDATER.printf("MD5 Success: %s\n", _target_md5.c_str());
+#endif
   }
 
   if(!_verifyEnd()) {
@@ -328,6 +319,9 @@ bool UpdaterClass::_writeBuffer(){
     _currentAddress = (_startAddress + _size);
     _setError(UPDATE_ERROR_WRITE);
     return false;
+  }
+  if (!_verify) {
+    _md5.add(_buffer, _bufferLen);
   }
   _currentAddress += _bufferLen;
   _bufferLen = 0;
