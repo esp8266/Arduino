@@ -337,6 +337,14 @@ void ESP8266WebServer::_parseArguments(String data) {
       break;
     pos = next_arg_index + 1;
   }
+  if (iarg == 0) {
+#ifdef DEBUG_ESP_HTTP_SERVER
+     DEBUG_OUTPUT.println("add plain data");
+#endif
+     RequestArgument& arg = _currentArgs[iarg++];
+     arg.key = "plain";
+     arg.value = data;
+  }
   _currentArgCount = iarg;
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("args count: ");
