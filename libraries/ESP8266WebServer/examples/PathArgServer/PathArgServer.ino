@@ -37,7 +37,7 @@ void setup(void) {
     String user = server.pathArg(0);
     server.send(200, "text/plain", "User: '" + user + "'");
   });
-  
+
   server.on("/users/{}/devices/{}", []() {
     String user = server.pathArg(0);
     String device = server.pathArg(1);
