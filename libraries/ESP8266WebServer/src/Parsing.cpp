@@ -270,26 +270,27 @@ bool ESP8266WebServer::_collectHeader(const char* headerName, const char* header
   return false;
 }
 
-int ESP8266WebServer::_parseArguments(const String& data, bool store) {
-  // when store is true, a recursive call
-  // with store=false is recursively called first
-  // to evaluate the number of arguments
-  // should we use a vector instead?
+void ESP8266WebServer::_parseArguments(const String& data) {
+  int counted = _parseArgumentsPrivate(data, 0);
+  (void)_parseArgumentsPrivate(data, counted);
+}
+
+int ESP8266WebServer::_parseArgumentsPrivate(const String& data, int counted) {
+// counted==0: parsing only, return counted arguments
+// counted!=0: parsing and storing "counted" arguments
 
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("args: ");
   DEBUG_OUTPUT.println(data);
 #endif
 
-  if (store) {
+  if (counted > 0) {
     if (_currentArgs)
       delete[] _currentArgs;
     _currentArgs = 0;
-  }
 
-  if (store) {
-    _currentArgCount = _parseArguments(data, false);
-    _currentArgs = new RequestArgument[_currentArgCount+1];
+    // allocate one more, this is needed (search "plainBuf" in this file) 
+    _currentArgs = new RequestArgument[(_currentArgCount = counted) + 1];
   }
 
   size_t pos = 0;
@@ -319,7 +320,7 @@ int ESP8266WebServer::_parseArguments(const String& data, bool store) {
     if (keyEndPos >= (int)pos) {
       // do not store or count empty ending key ("url?x=y;")
 
-      if (store) {
+      if (counted > 0) {
         RequestArgument& arg = _currentArgs[arg_total];
         arg.key = urlDecode(data.substring(pos, keyEndPos));
         if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
@@ -347,7 +348,7 @@ int ESP8266WebServer::_parseArguments(const String& data, bool store) {
   DEBUG_OUTPUT.println(arg_total);
 #endif
 
-  if (store)
+  if (counted > 0)
     _currentArgCount = arg_total;
 
   return arg_total;
