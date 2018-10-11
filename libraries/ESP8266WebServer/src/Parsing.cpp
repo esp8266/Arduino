@@ -305,24 +305,24 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, int counted) {
 
     // locate separators
     int equal_index = data.indexOf('=', pos);
-    int keyEndPos = equal_index;
+    int key_end_pos = equal_index;
     int next_index = data.indexOf('&', pos);
     int next_index2 = data.indexOf(';', pos);
     if ((next_index == -1) || (next_index2 != -1 && next_index2 < next_index))
       next_index = next_index2;
-    if ((keyEndPos == -1) || ((keyEndPos > next_index) && (next_index != -1)))
-      keyEndPos = next_index;
-    if (keyEndPos == -1)
-      keyEndPos = data.length();
-    keyEndPos--;
+    if ((key_end_pos == -1) || ((key_end_pos > next_index) && (next_index != -1)))
+      key_end_pos = next_index;
+    if (key_end_pos == -1)
+      key_end_pos = data.length();
+    key_end_pos--;
 
     // handle key/value
-    if (keyEndPos >= (int)pos) {
+    if (key_end_pos >= (int)pos) {
       // do not store or count empty ending key ("url?x=y;")
 
       if (counted > 0) {
         RequestArgument& arg = _currentArgs[arg_total];
-        arg.key = urlDecode(data.substring(pos, keyEndPos));
+        arg.key = urlDecode(data.substring(pos, key_end_pos));
         if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
           arg.value = urlDecode(data.substring(equal_index + 1, next_index - 1));
 #ifdef DEBUG_ESP_HTTP_SERVER
