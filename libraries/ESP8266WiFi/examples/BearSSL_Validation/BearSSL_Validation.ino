@@ -6,7 +6,6 @@
 
 #include <ESP8266WiFi.h>
 #include <time.h>
-#include <cont.h>
 
 const char *ssid = "....";
 const char *pass = "....";
@@ -39,8 +38,8 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     path = "/";
   }
 
-  cont_repaint_stack(g_pcont);
-  uint32_t freeStackStart = cont_get_free_stack(g_pcont);
+  ESP.resetFreeContStack();
+  uint32_t freeStackStart = ESP.getFreeContStack();
   Serial.printf("Trying: %s:443...", host);
   client->connect(host, port);
   if (!client->connected()) {
@@ -75,7 +74,7 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     } while (millis() < to);
   }
   client->stop();
-  uint32_t freeStackEnd = cont_get_free_stack(g_pcont);
+  uint32_t freeStackEnd = ESP.getFreeContStack();
   Serial.printf("\nCONT stack used: %d\n-------\n\n", freeStackStart - freeStackEnd);
 }
 
