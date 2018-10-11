@@ -84,7 +84,7 @@ static uint8_t twi_rxBuffer[TWI_BUFFER_LENGTH];
 static volatile uint8_t twi_rxBufferIndex;
 
 static void (*twi_onSlaveTransmit)(void);
-static void (*twi_onSlaveReceive)(uint8_t*, int);
+static void (*twi_onSlaveReceive)(uint8_t*, size_t);
 
 static void onSclChange(void);
 static void onSdaChange(void);
@@ -156,11 +156,6 @@ void twi_init(unsigned char sda, unsigned char scl)
   pinMode(twi_sda, INPUT_PULLUP);
   pinMode(twi_scl, INPUT_PULLUP);
   twi_setClock(preferred_si2c_clock);
-  //pinMode(2, OUTPUT);
-  //pinMode(12, OUTPUT);
-  //pinMode(14, OUTPUT);
-  //pinMode(13, OUTPUT);
-  //digitalWrite(2, HIGH);
   twi_setClockStretchLimit(230); // default value is 230 uS
 
   if (twi_addr != 0)
@@ -176,26 +171,23 @@ void twi_setAddress(uint8_t address)
   twi_addr = address << 1;
 }
 
-#if 0
-void twi_stop(void){
-  pinMode(twi_sda, INPUT);
-  pinMode(twi_scl, INPUT);
-}
-#endif
-
 static void ICACHE_RAM_ATTR twi_delay(unsigned char v){
   unsigned int i;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
   unsigned int reg;
-  for(i=0;i<v;i++) reg = GPI;
+  for (i = 0; i < v; i++) {
+    reg = GPI;
+  }
 #pragma GCC diagnostic pop
 }
 
 static bool twi_write_start(void) {
   SCL_HIGH();
   SDA_HIGH();
-  if (SDA_READ() == 0) return false;
+  if (SDA_READ() == 0) {
+    return false;
+  }
   twi_delay(twi_dcount);
   SDA_LOW();
   twi_delay(twi_dcount);
@@ -212,7 +204,6 @@ static bool twi_write_stop(void){
   twi_delay(twi_dcount);
   SDA_HIGH();
   twi_delay(twi_dcount);
-
   return true;
 }
 
@@ -301,19 +292,25 @@ unsigned char twi_readFrom(unsigned char address, unsigned char* buf, unsigned i
   return 0;
 }
 
-uint8_t twi_status(){
-    if (SCL_READ()==0)     return I2C_SCL_HELD_LOW;       		//SCL held low by another device, no procedure available to recover
-    int clockCount = 20;
-
-    while (SDA_READ()==0 && clockCount>0){                      //if SDA low, read the bits slaves have to sent to a max
-        twi_read_bit();
-        if (SCL_READ()==0) return I2C_SCL_HELD_LOW_AFTER_READ;  //I2C bus error. SCL held low beyond slave clock stretch time
+uint8_t twi_status() {
+    if (SCL_READ()==0) {
+      return I2C_SCL_HELD_LOW; // SCL held low by another device, no procedure available to recover
     }
-
-    if (SDA_READ()==0)     return I2C_SDA_HELD_LOW;       		//I2C bus error. SDA line held low by slave/another_master after n bits.
-
-    if(!twi_write_start()) return I2C_SDA_HELD_LOW_AFTER_INIT;  //line busy. SDA again held low by another device. 2nd master?
-    else                   return I2C_OK;       				//all ok
+    int clockCount = 20;
+    while (SDA_READ()==0 && clockCount>0) { // if SDA low, read the bits slaves have to sent to a max
+        twi_read_bit();
+        if (SCL_READ()==0) {
+          return I2C_SCL_HELD_LOW_AFTER_READ; // I2C bus error. SCL held low beyond slave clock stretch time
+        }
+    }
+    if (SDA_READ()==0) {
+      return I2C_SDA_HELD_LOW; // I2C bus error. SDA line held low by slave/another_master after n bits.
+    }
+    if (!twi_write_start()) {
+      return I2C_SDA_HELD_LOW_AFTER_INIT;  // line busy. SDA again held low by another device. 2nd master?
+    } else {
+      return I2C_OK;
+    }
 }
 
 uint8_t twi_transmit(const uint8_t* data, uint8_t length)
@@ -363,7 +360,6 @@ void ICACHE_RAM_ATTR twi_reply(uint8_t ack)
   }
 }
 
-#if 1
 void ICACHE_RAM_ATTR twi_stop(void)
 {
 	// send stop condition
@@ -372,17 +368,9 @@ void ICACHE_RAM_ATTR twi_stop(void)
 	twi_ack = 1;	// _BV(TWEA)
 	twi_delay(5);	// Maybe this should be here
 	SDA_HIGH();		// _BV(TWSTO)
-
-	// wait for stop condition to be exectued on bus
-	// TWINT is not set after a stop condition!
-	while (false) { //TWCR & _BV(TWSTO)){
-		continue;
-	}
-
 	// update twi state
 	twi_state = TWI_READY;
 }
-#endif
 
 void ICACHE_RAM_ATTR twi_releaseBus(void)
 {
@@ -399,84 +387,7 @@ void ICACHE_RAM_ATTR twi_releaseBus(void)
 
 void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
 {
-  //digitalWrite(13, HIGH);
-  //switch(TW_STATUS){
   switch(status) {
-#if 0
-    // All Master
-    case TW_START:     // sent start condition
-    case TW_REP_START: // sent repeated start condition
-      // copy device address and r/w bit to output register and ack
-      TWDR = twi_slarw;
-      twi_reply(1);
-      break;
-
-    // Master Transmitter
-    case TW_MT_SLA_ACK:  // slave receiver acked address
-    case TW_MT_DATA_ACK: // slave receiver acked data
-      // if there is data to send, send it, otherwise stop
-      if(twi_masterBufferIndex < twi_masterBufferLength){
-        // copy data to output register and ack
-        TWDR = twi_masterBuffer[twi_masterBufferIndex++];
-        twi_reply(1);
-      }else{
-	if (twi_sendStop)
-          twi_stop();
-	else {
-	  twi_inRepStart = true;	// we're gonna send the START
-	  // don't enable the interrupt. We'll generate the start, but we
-	  // avoid handling the interrupt until we're in the next transaction,
-	  // at the point where we would normally issue the start.
-	  TWCR = _BV(TWINT) | _BV(TWSTA)| _BV(TWEN) ;
-	  twi_state = TWI_READY;
-	}
-      }
-      break;
-    case TW_MT_SLA_NACK:  // address sent, nack received
-      twi_error = TW_MT_SLA_NACK;
-      twi_stop();
-      break;
-    case TW_MT_DATA_NACK: // data sent, nack received
-      twi_error = TW_MT_DATA_NACK;
-      twi_stop();
-      break;
-    case TW_MT_ARB_LOST: // lost bus arbitration
-      twi_error = TW_MT_ARB_LOST;
-      twi_releaseBus();
-      break;
-
-    // Master Receiver
-    case TW_MR_DATA_ACK: // data received, ack sent
-      // put byte into buffer
-      twi_masterBuffer[twi_masterBufferIndex++] = TWDR;
-    case TW_MR_SLA_ACK:  // address sent, ack received
-      // ack if more bytes are expected, otherwise nack
-      if(twi_masterBufferIndex < twi_masterBufferLength){
-        twi_reply(1);
-      }else{
-        twi_reply(0);
-      }
-      break;
-    case TW_MR_DATA_NACK: // data received, nack sent
-      // put final byte into buffer
-      twi_masterBuffer[twi_masterBufferIndex++] = TWDR;
-	if (twi_sendStop)
-          twi_stop();
-	else {
-	  twi_inRepStart = true;	// we're gonna send the START
-	  // don't enable the interrupt. We'll generate the start, but we
-	  // avoid handling the interrupt until we're in the next transaction,
-	  // at the point where we would normally issue the start.
-	  TWCR = _BV(TWINT) | _BV(TWSTA)| _BV(TWEN) ;
-	  twi_state = TWI_READY;
-	}
-	break;
-    case TW_MR_SLA_NACK: // address sent, nack received
-      twi_stop();
-      break;
-    // TW_MR_ARB_LOST handled by TW_MT_ARB_LOST case
-#endif
-
     // Slave Receiver
     case TW_SR_SLA_ACK:   // addressed, returned ack
     case TW_SR_GCALL_ACK: // addressed generally, returned ack
@@ -564,23 +475,19 @@ void ICACHE_RAM_ATTR twi_onTwipEvent(uint8_t status)
       twi_stop();
       break;
   }
-  //digitalWrite(13, LOW);
 }
 
 void ICACHE_RAM_ATTR onTimer()
 {
-	//digitalWrite(13, HIGH);
 	twi_releaseBus();
 	twip_status = TW_BUS_ERROR;
 	twi_onTwipEvent(twip_status);
 	twip_mode = TWIPM_WAIT;
 	twip_state = TWIP_BUS_ERR;
-	//digitalWrite(13, LOW);
 }
 
 static void eventTask(ETSEvent *e)
 {
-	//digitalWrite(14, HIGH);
 
 	if (e == NULL) {
 		return;
@@ -608,8 +515,6 @@ static void eventTask(ETSEvent *e)
 			twi_onSlaveReceive(twi_rxBuffer, e->par);
 			break;
 	}
-
-	//digitalWrite(14, LOW);
 }
 
 void ICACHE_RAM_ATTR onSclChange(void)
@@ -617,14 +522,8 @@ void ICACHE_RAM_ATTR onSclChange(void)
 	static uint8_t sda;
 	static uint8_t scl;
 
-	//digitalWrite(2, LOW);
-	//digitalWrite(2, HIGH);
-
 	sda	= SDA_READ();
 	scl = SCL_READ();
-
-	//digitalWrite(12, scl);
-	//digitalWrite(14, LOW);
 
 	twip_status = 0xF8;		// reset TWI status
 
@@ -783,8 +682,6 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 	sda	= SDA_READ();
 	scl = SCL_READ();
 
-	//digitalWrite(2, sda);
-
 	switch (twip_state)
 	{
 		case TWIP_IDLE:
@@ -796,9 +693,7 @@ void ICACHE_RAM_ATTR onSdaChange(void)
 				// START
 				bitCount = 8;
 				twip_state = TWIP_START;
-				//digitalWrite(14, HIGH);
 				ets_timer_arm_new(&timer, twi_timeout_ms, false, true); // Once, ms
-				//digitalWrite(14, LOW);
 			}
 			break;
 
