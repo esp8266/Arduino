@@ -270,79 +270,87 @@ bool ESP8266WebServer::_collectHeader(const char* headerName, const char* header
   return false;
 }
 
-void ESP8266WebServer::_parseArguments(String data) {
+int ESP8266WebServer::_parseArguments(const String& data, bool store) {
+  // when store is true, a recursive call
+  // with store=false is recursively called first
+  // to evaluate the number of arguments
+  // should we use a vector instead?
+
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("args: ");
   DEBUG_OUTPUT.println(data);
 #endif
-  if (_currentArgs)
-    delete[] _currentArgs;
-  _currentArgs = 0;
-  if (data.length() == 0) {
-    _currentArgCount = 0;
-    _currentArgs = new RequestArgument[1];
-    return;
-  }
-  _currentArgCount = 1;
 
-  for (int i = 0; i < (int)data.length(); ) {
-    i = data.indexOf('&', i);
-    if (i == -1)
-      break;
-    ++i;
-    ++_currentArgCount;
+  if (store) {
+    if (_currentArgs)
+      delete[] _currentArgs;
+    _currentArgs = 0;
   }
-#ifdef DEBUG_ESP_HTTP_SERVER
-  DEBUG_OUTPUT.print("args count: ");
-  DEBUG_OUTPUT.println(_currentArgCount);
-#endif
 
-  _currentArgs = new RequestArgument[_currentArgCount+1];
-  int pos = 0;
-  int iarg;
-  for (iarg = 0; iarg < _currentArgCount;) {
-    int equal_sign_index = data.indexOf('=', pos);
-    int next_arg_index = data.indexOf('&', pos);
-#ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.print("pos ");
-    DEBUG_OUTPUT.print(pos);
-    DEBUG_OUTPUT.print("=@ ");
-    DEBUG_OUTPUT.print(equal_sign_index);
-    DEBUG_OUTPUT.print(" &@ ");
-    DEBUG_OUTPUT.println(next_arg_index);
-#endif
-    if ((equal_sign_index == -1) || ((equal_sign_index > next_arg_index) && (next_arg_index != -1))) {
-#ifdef DEBUG_ESP_HTTP_SERVER
-      DEBUG_OUTPUT.print("arg missing value: ");
-      DEBUG_OUTPUT.println(iarg);
-#endif
-      if (next_arg_index == -1)
+  if (store) {
+    _currentArgCount = _parseArguments(data, false);
+    _currentArgs = new RequestArgument[_currentArgCount+1];
+  }
+
+  size_t pos = 0;
+  int arg_total = 0;
+
+  while (true) {
+
+    // skip empty expression
+    while (data[pos] == '&' || data[pos] == ';')
+      if (++pos >= data.length())
         break;
-      pos = next_arg_index + 1;
-      continue;
-    }
-    RequestArgument& arg = _currentArgs[iarg];
-    arg.key = urlDecode(data.substring(pos, equal_sign_index));
-    arg.value = urlDecode(data.substring(equal_sign_index + 1, next_arg_index));
+
+    // locate separators
+    int equal_index = data.indexOf('=', pos);
+    int keyEndPos = equal_index;
+    int next_index = data.indexOf('&', pos);
+    int next_index2 = data.indexOf(';', pos);
+    if ((next_index == -1) || (next_index2 != -1 && next_index2 < next_index))
+      next_index = next_index2;
+    if ((keyEndPos == -1) || ((keyEndPos > next_index) && (next_index != -1)))
+      keyEndPos = next_index;
+    if (keyEndPos == -1)
+      keyEndPos = data.length();
+    keyEndPos--;
+
+    // handle key/value
+    if (keyEndPos >= (int)pos) {
+      // do not store or count empty ending key ("url?x=y;")
+
+      if (store) {
+        RequestArgument& arg = _currentArgs[arg_total];
+        arg.key = urlDecode(data.substring(pos, keyEndPos));
+        if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
+          arg.value = urlDecode(data.substring(equal_index + 1, next_index - 1));
 #ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.print("arg ");
-    DEBUG_OUTPUT.print(iarg);
-    DEBUG_OUTPUT.print(" key: ");
-    DEBUG_OUTPUT.print(arg.key);
-    DEBUG_OUTPUT.print(" value: ");
-    DEBUG_OUTPUT.println(arg.value);
+        DEBUG_OUTPUT.print("arg ");
+        DEBUG_OUTPUT.print(arg_total);
+        DEBUG_OUTPUT.print(" key: ");
+        DEBUG_OUTPUT.print(arg.key);
+        DEBUG_OUTPUT.print(" value: ");
+        DEBUG_OUTPUT.println(arg.value);
 #endif
-    ++iarg;
-    if (next_arg_index == -1)
+      }
+
+      ++arg_total;
+      pos = next_index + 1;
+    }
+
+    if (next_index == -1)
       break;
-    pos = next_arg_index + 1;
   }
-  _currentArgCount = iarg;
+
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("args count: ");
-  DEBUG_OUTPUT.println(_currentArgCount);
+  DEBUG_OUTPUT.println(arg_total);
 #endif
 
+  if (store)
+    _currentArgCount = arg_total;
+
+  return arg_total;
 }
 
 void ESP8266WebServer::_uploadWriteByte(uint8_t b){
