@@ -123,7 +123,7 @@ HTTPClient::HTTPClient()
 HTTPClient::~HTTPClient()
 {
     if(_client) {
-        _client->stop();
+        DEBUG_HTTPCLIENT("[HTTP-Client][~HTTPClient] end() not called before destruction of HTTPClient\n");
     }
     if(_currentHeaders) {
         delete[] _currentHeaders;
@@ -196,7 +196,7 @@ bool HTTPClient::begin(WiFiClient &client, String host, uint16_t port, String ur
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
 bool HTTPClient::begin(String url, String httpsFingerprint)
 {
-    if(_client) _canReuse = false;
+    _canReuse = false;
     end();
 
     _port = 443;
@@ -214,7 +214,7 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
 
 bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
 {
-    if(_client) _canReuse = false;
+    _canReuse = false;
     end();
 
     _port = 443;
@@ -237,7 +237,7 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
  */
 bool HTTPClient::begin(String url)
 {
-    if(_client) _canReuse = false;
+    _canReuse = false;
     end();
 
     _port = 80;
@@ -299,7 +299,7 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
 bool HTTPClient::begin(String host, uint16_t port, String uri)
 {
-    if(_client) _canReuse = false;
+    _canReuse = false;
     end();
 
     clear();
@@ -325,7 +325,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, Strin
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFingerprint)
 {
-    if(_client) _canReuse = false;
+    _canReuse = false;
     end();
 
     clear();
@@ -343,7 +343,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])
 {
-    if(_client) _canReuse = false;
+    _canReuse = false;
     end();
 
     clear();
@@ -367,6 +367,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t htt
  */
 void HTTPClient::end(void)
 {
+    _canReuse = false;
     disconnect();
     clear();
 }
