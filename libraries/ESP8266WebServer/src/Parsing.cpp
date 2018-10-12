@@ -196,7 +196,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
         }
         _parseArguments(searchStr);
         if (   !isEncoded
-            || (0 == _currentArgCount) // Alexa fix https://github.com/arendst/Sonoff-Tasmota/issues/1639#issuecomment-359253011
+            || (hasSearch == -1) // Alexa fix (malformed header with form content)
            ) {
           //plain post json or other data
           RequestArgument& arg = _currentArgs[_currentArgCount++];
