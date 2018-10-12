@@ -62,6 +62,7 @@ typedef uint32_t sys_prot_t;	// not really used
 #define SYS_ARCH_DECL_PROTECT(lev)
 #define SYS_ARCH_PROTECT(lev) os_intr_lock()
 #define SYS_ARCH_UNPROTECT(lev) os_intr_unlock()
+#define LWIP_NO_CTYPE_H 1
 
 ///////////////////////////////
 //// DEBUG

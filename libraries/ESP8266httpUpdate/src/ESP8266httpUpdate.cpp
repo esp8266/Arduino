@@ -30,12 +30,12 @@ extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
-        : _httpClientTimeout(8000)
+        : _httpClientTimeout(8000), _ledPin(-1)
 {
 }
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
-        : _httpClientTimeout(httpClientTimeout)
+        : _httpClientTimeout(httpClientTimeout), _ledPin(-1)
 {
 }
 
@@ -43,17 +43,24 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void)
 {
 }
 
+#ifdef HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
         const String& httpsFingerprint, bool reboot)
 {
     rebootOnUpdate(reboot);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     return update(url, currentVersion, httpsFingerprint);
+#pragma GCC diagnostic pop
 }
 
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, false);
 }
 
@@ -61,7 +68,10 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& curr
         const String& httpsFingerprint)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url, httpsFingerprint);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, false);
 }
 
@@ -69,40 +79,73 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& curr
         const uint8_t httpsFingerprint[20])
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url, httpsFingerprint);
+#pragma GCC diagnostic pop
+    return handleUpdate(http, currentVersion, false);
+}
+#endif
+
+HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& url, const String& currentVersion)
+{
+    HTTPClient http;
+    http.begin(client, url);
     return handleUpdate(http, currentVersion, false);
 }
 
+#ifdef HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url, httpsFingerprint);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, true);
 }
 
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const uint8_t httpsFingerprint[20])
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url, httpsFingerprint);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, true);
 }
 
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url);
+#pragma GCC diagnostic pop
+    return handleUpdate(http, currentVersion, true);
+}
+#endif
+
+HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(WiFiClient& client, const String& url, const String& currentVersion)
+{
+    HTTPClient http;
+    http.begin(client, url);
     return handleUpdate(http, currentVersion, true);
 }
 
+#ifdef HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
         bool https, const String& httpsFingerprint, bool reboot)
 {
     (void)https;
     rebootOnUpdate(reboot);
     if (httpsFingerprint.length() == 0) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
         return update(host, port, uri, currentVersion);
     } else {
         return update(host, port, uri, currentVersion, httpsFingerprint);
+#pragma GCC diagnostic pop
     }
 }
 
@@ -110,7 +153,10 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, co
         const String& currentVersion)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(host, port, uri);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, false);
 }
 
@@ -118,7 +164,10 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, co
         const String& currentVersion, const String& httpsFingerprint)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(host, port, url, httpsFingerprint);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, false);
 }
 
@@ -126,7 +175,19 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, co
         const String& currentVersion, const uint8_t httpsFingerprint[20])
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(host, port, url, httpsFingerprint);
+#pragma GCC diagnostic pop
+    return handleUpdate(http, currentVersion, false);
+}
+#endif
+
+HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& host, uint16_t port, const String& uri,
+        const String& currentVersion)
+{
+    HTTPClient http;
+    http.begin(client, host, port, uri);
     return handleUpdate(http, currentVersion, false);
 }
 
@@ -321,7 +382,6 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                         return HTTP_UPDATE_FAILED;
                     }
                 }
-
                 if(runUpdate(*tcp, len, http.header("x-MD5"), command)) {
                     ret = HTTP_UPDATE_OK;
                     DEBUG_HTTP_UPDATE("[httpUpdate] Update ok\n");
@@ -378,7 +438,7 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int com
 
     StreamString error;
 
-    if(!Update.begin(size, command)) {
+    if(!Update.begin(size, command, _ledPin, _ledOn)) {
         _lastError = Update.getError();
         Update.printError(error);
         error.trim(); // remove line ending

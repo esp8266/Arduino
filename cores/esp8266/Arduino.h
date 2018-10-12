@@ -224,12 +224,13 @@ void loop(void);
 void yield(void);
 void optimistic_yield(uint32_t interval_us);
 
-#define digitalPinToPort(pin)       (0)
-#define digitalPinToBitMask(pin)    (1UL << (pin))
+#define _PORT_GPIO16    1
+#define digitalPinToPort(pin)       (((pin)==16)?(_PORT_GPIO16):(0))
+#define digitalPinToBitMask(pin)    (((pin)==16)?(1):(1UL << (pin)))
 #define digitalPinToTimer(pin)      (0)
-#define portOutputRegister(port)    ((volatile uint32_t*) &GPO)
-#define portInputRegister(port)     ((volatile uint32_t*) &GPI)
-#define portModeRegister(port)      ((volatile uint32_t*) &GPE)
+#define portOutputRegister(port)    (((port)==_PORT_GPIO16)?((volatile uint32_t*) &GP16O):((volatile uint32_t*) &GPO))
+#define portInputRegister(port)     (((port)==_PORT_GPIO16)?((volatile uint32_t*) &GP16I):((volatile uint32_t*) &GPI))
+#define portModeRegister(port)      (((port)==_PORT_GPIO16)?((volatile uint32_t*) &GP16E):((volatile uint32_t*) &GPE))
 
 #define NOT_A_PIN -1
 #define NOT_A_PORT -1
