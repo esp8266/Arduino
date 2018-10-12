@@ -26,6 +26,7 @@
 
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
+#include "user_interface.h"
 
 
 class ESP8266WiFiSTAClass {
@@ -53,6 +54,7 @@ class ESP8266WiFiSTAClass {
         bool getAutoConnect();
 
         bool setAutoReconnect(bool autoReconnect);
+        bool getAutoReconnect();
 
         uint8_t waitForConnectResult();
 
@@ -81,9 +83,12 @@ class ESP8266WiFiSTAClass {
 
         int32_t RSSI();
 
+        static void enableInsecureWEP (bool enable = true) { _useInsecureWEP = enable; }
+
     protected:
 
-      static bool _useStaticIp;
+        static bool _useStaticIp;
+        static bool _useInsecureWEP;
 
     // ----------------------------------------------------------------------------------------------
     // ------------------------------------ STA remote configure  -----------------------------------
@@ -92,7 +97,6 @@ class ESP8266WiFiSTAClass {
     public:
 
         bool beginWPSConfig(void);
-
         bool beginSmartConfig();
         bool stopSmartConfig();
         bool smartConfigDone();

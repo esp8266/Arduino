@@ -14,6 +14,10 @@
 #include "BSStdio.h"
 #endif
 
+#ifndef BS_LINE_BUF_SIZE
+#define BS_LINE_BUF_SIZE 80
+#endif
+
 namespace bs
 {
 typedef void(*test_case_func_t)();
@@ -143,7 +147,8 @@ protected:
         protocol::output_menu_end(m_io);
         while(true) {
             int id;
-            if (!protocol::input_menu_choice(m_io, id)) {
+            char line_buf[BS_LINE_BUF_SIZE];
+            if (!protocol::input_handle(m_io, line_buf, sizeof(line_buf), id)) {
                 continue;
             }
             if (id < 0) {
@@ -214,4 +219,5 @@ inline void require(bool condition, size_t line)
 
 #define BS_ENV_DECLARE() namespace bs { Env g_env; }
 #define BS_RUN(...) do { bs::IOHelper helper = bs::IOHelper(__VA_ARGS__); bs::Runner<bs::IOHelper> runner(helper); runner.run(); } while(0);
+
 #endif //BSTEST_H

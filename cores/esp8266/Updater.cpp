@@ -35,15 +35,22 @@ void UpdaterClass::_reset() {
   _currentAddress = 0;
   _size = 0;
   _command = U_FLASH;
+
+  if(_ledPin != -1) {
+    digitalWrite(_ledPin, !_ledOn); // off
+  }
 }
 
-bool UpdaterClass::begin(size_t size, int command) {
+bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   if(_size > 0){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.println(F("[begin] already running"));
 #endif
     return false;
   }
+
+  _ledPin = ledPin;
+  _ledOn = !!ledOn; // 0(LOW) or 1(HIGH)
 
   /* Check boot mode; if boot mode is 1 (UART download mode),
     we will not be able to reset into normal mode once update is done.
@@ -86,7 +93,7 @@ bool UpdaterClass::begin(size_t size, int command) {
     //size of the update rounded to a sector
     uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address where we will start writing the update
-    updateStartAddress = updateEndAddress - roundedSize;
+    updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
 #ifdef DEBUG_UPDATER
         DEBUG_UPDATER.printf("[begin] roundedSize:       0x%08X (%d)\n", roundedSize, roundedSize);
@@ -204,11 +211,35 @@ bool UpdaterClass::end(bool evenIfRemaining){
 }
 
 bool UpdaterClass::_writeBuffer(){
+  #define FLASH_MODE_PAGE  0
+  #define FLASH_MODE_OFFSET  2
 
   bool eraseResult = true, writeResult = true;
   if (_currentAddress % FLASH_SECTOR_SIZE == 0) {
     if(!_async) yield();
     eraseResult = ESP.flashEraseSector(_currentAddress/FLASH_SECTOR_SIZE);
+  }
+
+  // If the flash settings don't match what we already have, modify them.
+  // But restore them after the modification, so the hash isn't affected.
+  // This is analogous to what esptool.py does when it receives a --flash_mode argument.
+  bool modifyFlashMode = false;
+  FlashMode_t flashMode = FM_QIO;
+  FlashMode_t bufferFlashMode = FM_QIO;
+  if (_currentAddress == _startAddress + FLASH_MODE_PAGE) {
+    flashMode = ESP.getFlashChipMode();
+    #ifdef DEBUG_UPDATER
+      DEBUG_UPDATER.printf("Header: 0x%1X %1X %1X %1X\n", _buffer[0], _buffer[1], _buffer[2], _buffer[3]);
+    #endif
+    bufferFlashMode = ESP.magicFlashChipMode(_buffer[FLASH_MODE_OFFSET]);
+    if (bufferFlashMode != flashMode) {
+      #ifdef DEBUG_UPDATER
+        DEBUG_UPDATER.printf("Set flash mode from 0x%1X to 0x%1X\n", bufferFlashMode, flashMode);
+      #endif
+
+      _buffer[FLASH_MODE_OFFSET] = flashMode;
+      modifyFlashMode = true;
+    }
   }
   
   if (eraseResult) {
@@ -218,6 +249,12 @@ bool UpdaterClass::_writeBuffer(){
     _currentAddress = (_startAddress + _size);
     _setError(UPDATE_ERROR_ERASE);
     return false;
+  }
+
+  // Restore the old flash mode, if we modified it.
+  // Ensures that the MD5 hash will still match what was sent.
+  if (modifyFlashMode) {
+    _buffer[FLASH_MODE_OFFSET] = bufferFlashMode;
   }
 
   if (!writeResult) {
@@ -330,17 +367,31 @@ size_t UpdaterClass::writeStream(Stream &data) {
         return 0;
     }
 
+    if(_ledPin != -1) {
+        pinMode(_ledPin, OUTPUT);
+    }
+
     while(remaining()) {
-        toRead = data.readBytes(_buffer + _bufferLen,  (_bufferSize - _bufferLen));
+        if(_ledPin != -1) {
+            digitalWrite(_ledPin, _ledOn); // Switch LED on
+        }
+        size_t bytesToRead = _bufferSize - _bufferLen;
+        if(bytesToRead > remaining()) {
+            bytesToRead = remaining();
+        }
+        toRead = data.readBytes(_buffer + _bufferLen,  bytesToRead);
         if(toRead == 0) { //Timeout
             delay(100);
-            toRead = data.readBytes(_buffer + _bufferLen, (_bufferSize - _bufferLen));
+            toRead = data.readBytes(_buffer + _bufferLen, bytesToRead);
             if(toRead == 0) { //Timeout
                 _currentAddress = (_startAddress + _size);
                 _setError(UPDATE_ERROR_STREAM);
                 _reset();
                 return written;
             }
+        }
+        if(_ledPin != -1) {
+            digitalWrite(_ledPin, !_ledOn); // Switch LED off
         }
         _bufferLen += toRead;
         if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
