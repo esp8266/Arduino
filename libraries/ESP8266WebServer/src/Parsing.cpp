@@ -191,13 +191,15 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       if (contentLength > 0) {
         if(isEncoded){
           //url encoded form
-          if (searchStr != "") searchStr += '&';
+          if (searchStr.length())
+            searchStr += '&';
+          else
+            // workaround: x-www-form-urlencoded without data
+            searchStr = F("plain=");
           searchStr += plainBuf;
         }
         _parseArguments(searchStr);
-        if (   !isEncoded
-            || (hasSearch == -1) // Alexa fix (malformed header with form content)
-           ) {
+        if (!isEncoded) {
           //plain post json or other data
           RequestArgument& arg = _currentArgs[_currentArgCount++];
           arg.key = F("plain");
@@ -328,12 +330,7 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, int counted) {
         if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
           arg.value = urlDecode(data.substring(equal_index + 1, next_index - 1));
 #ifdef DEBUG_ESP_HTTP_SERVER
-        DEBUG_OUTPUT.print("arg ");
-        DEBUG_OUTPUT.print(arg_total);
-        DEBUG_OUTPUT.print(" key: ");
-        DEBUG_OUTPUT.print(arg.key);
-        DEBUG_OUTPUT.print(" value: ");
-        DEBUG_OUTPUT.println(arg.value);
+        DEBUG_OUTPUT.printf("arg %d key: '%s' value: '%s'\r\n", arg_total, arg.key.c_str(), arg.value.c_str());
 #endif
       }
 
