@@ -316,17 +316,16 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, int counted) {
       key_end_pos = next_index;
     if (key_end_pos == -1)
       key_end_pos = data.length();
-    key_end_pos--;
 
     // handle key/value
-    if (key_end_pos >= (int)pos) {
+    if ( (int)pos <= key_end_pos) {
       // do not store or count empty ending key ("url?x=y;")
 
       if (counted > 0) {
         RequestArgument& arg = _currentArgs[arg_total];
         arg.key = urlDecode(data.substring(pos, key_end_pos));
         if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
-          arg.value = urlDecode(data.substring(equal_index + 1, next_index - 1));
+          arg.value = urlDecode(data.substring(equal_index + 1, next_index));
 #ifdef DEBUG_ESP_HTTP_SERVER
         DEBUG_OUTPUT.print("arg ");
         DEBUG_OUTPUT.print(arg_total);
