@@ -35,6 +35,16 @@
 
 using namespace fs;
 
+extern "C" uint32_t _SPIFFS_start;
+extern "C" uint32_t _SPIFFS_end;
+extern "C" uint32_t _SPIFFS_page;
+extern "C" uint32_t _SPIFFS_block;
+
+#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
+#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
+#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
+#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
+
 extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
 extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size);
 extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst);
@@ -114,6 +124,14 @@ public:
 
     bool begin() override
     {
+        return begin(true);
+    }
+
+    bool begin(bool autoformat)
+    {
+        if (_SPIFFS_start <= _SPIFFS_end)
+            return false;
+
         if (SPIFFS_mounted(&_fs) != 0) {
             return true;
         }
@@ -123,6 +141,9 @@ public:
         }
         if (_tryMount()) {
             return true;
+        }
+        if (!autoformat) {
+            return false;
         }
         auto rc = SPIFFS_format(&_fs);
         if (rc != SPIFFS_OK) {
