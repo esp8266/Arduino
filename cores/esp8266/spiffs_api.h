@@ -124,12 +124,7 @@ public:
 
     bool begin() override
     {
-        return begin(true);
-    }
-
-    bool begin(bool autoformat)
-    {
-        if (_SPIFFS_start <= _SPIFFS_end)
+        if (&_SPIFFS_end <= &_SPIFFS_start)
             return false;
 
         if (SPIFFS_mounted(&_fs) != 0) {
@@ -141,9 +136,6 @@ public:
         }
         if (_tryMount()) {
             return true;
-        }
-        if (!autoformat) {
-            return false;
         }
         auto rc = SPIFFS_format(&_fs);
         if (rc != SPIFFS_OK) {
