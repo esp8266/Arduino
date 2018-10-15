@@ -35,6 +35,7 @@
 
 using namespace fs;
 
+#ifdef ARDUINO
 extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
 extern "C" uint32_t _SPIFFS_page;
@@ -44,6 +45,7 @@ extern "C" uint32_t _SPIFFS_block;
 #define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
 #define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
 #define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
+#endif
 
 extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
 extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size);
@@ -124,9 +126,10 @@ public:
 
     bool begin() override
     {
+#ifdef ARDUINO
         if (&_SPIFFS_end <= &_SPIFFS_start)
             return false;
-
+#endif
         if (SPIFFS_mounted(&_fs) != 0) {
             return true;
         }
