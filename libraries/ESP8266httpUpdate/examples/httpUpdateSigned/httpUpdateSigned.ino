@@ -18,6 +18,13 @@
 
 ESP8266WiFiMulti WiFiMulti;
 
+#define MANUAL_SIGNING 0
+
+// This example is now configured to use the automated signing support
+// present in the Arduino IDE by having a "private.key" and "public.key"
+// in the sketch folder.  You can also programmatically enable signing
+// using the method shown here.
+
 // This key is taken from the server public certificate in BearSSL examples
 // You should make your own private/public key pair and guard the private
 // key (never upload it to the 8266).
@@ -32,9 +39,11 @@ cuWNgTnDQd6KUzV0E4it2fNG+cHN4kEvofN6gHx8IbOrXwFttlpAH/o7bcfCnUVh
 TQIDAQAB
 -----END PUBLIC KEY-----
 )EOF";
+#if MANUAL_SIGNING
 BearSSLPublicKey *signPubKey = nullptr;
 BearSSLHashSHA256 *hash;
 BearSSLSigningVerifier *sign;
+#endif
 
 void setup() {
 
@@ -54,9 +63,11 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFiMulti.addAP("SSID", "PASS");
 
+  #if MANUAL_SIGNING
   signPubKey = new BearSSLPublicKey(pubkey);
   hash = new BearSSLHashSHA256();
   sign = new BearSSLSigningVerifier(signPubKey);
+  #endif
 }
 
 
@@ -66,8 +77,12 @@ void loop() {
 
     WiFiClient client;
 
+    #if MANUAL_SIGNING
     // Ensure all updates are signed appropriately.  W/o this call, all will be accepted.
     Update.installSignature(hash, sign);
+    #endif
+    // If the key files are present in the build directory, signing will be
+    // enabled using them automatically
 
     ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
 

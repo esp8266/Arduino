@@ -30,9 +30,9 @@ def main():
                     val += "0x%02x, \n" % ord(i)
                 val = val[:-3]
                 val +="\n};\n"
-                print "Enabling binary signing\n"
+                sys.stderr.write("Enabling binary signing\n")
         except:
-            print "Not enabling binary signing\n"
+            sys.stderr.write("Not enabling binary signing\n")
             val += "#define ARDUINO_SIGNING 0\n"
         with open(args.out, "w") as f:
             f.write(val)
@@ -43,7 +43,7 @@ def main():
             with open(args.bin, "rb") as b:
                 bin = b.read()
                 sha256 = hashlib.sha256(bin)
-                print "Binary SHA256 = " + sha256.hexdigest()
+                sys.stderr.write("Signing SHA256 = " + sha256.hexdigest() + "\n");
                 signcmd = [ 'openssl', 'rsautl', '-sign', '-inkey', args.privatekey ]
                 proc = subprocess.Popen(signcmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
                 signout = proc.communicate(input=sha256.digest())[0]
@@ -51,12 +51,12 @@ def main():
                     out.write(bin)
                     out.write(signout)
                     out.write(b'\x00\x01\x00\x00')
-                    print "Signed binary: " + args.out
+                    sys.stderr.write("Signed binary: " + args.out + "\n")
         except:
-            print "Not signing the generated binary\n"
+            sys.stderr.write("Not signing the generated binary\n")
         return 0
     else:
-        print "ERROR: Mode not specified as header or sign\n"
+        sys.stderr.write("ERROR: Mode not specified as header or sign\n")
 
 if __name__ == '__main__':
     sys.exit(main())

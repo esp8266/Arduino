@@ -6,6 +6,18 @@
 
 //#define DEBUG_UPDATER Serial
 
+#include <Updater_Signing.h>
+#ifndef ARDUINO_SIGNING
+  #define ARDUINO_SIGNING 0
+#endif
+
+#if ARDUINO_SIGNING
+  #include "../../libraries/ESP8266WiFi/src/BearSSLHelpers.h"
+  static BearSSLPublicKey signPubKey(signing_pubkey);
+  static BearSSLHashSHA256 hash;
+  static BearSSLSigningVerifier sign(&signPubKey);
+#endif
+
 extern "C" {
     #include "c_types.h"
     #include "spi_flash.h"
@@ -26,6 +38,9 @@ UpdaterClass::UpdaterClass()
 , _hash(nullptr)
 , _verify(nullptr)
 {
+#if ARDUINO_SIGNING
+  installSignature(&hash, &sign);
+#endif
 }
 
 void UpdaterClass::_reset() {
