@@ -41,13 +41,14 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    BearSSL::WiFiClientSecure client;
-    client.setFingerprint(fingerprint);
+    BearSSL::WiFiClientSecure *client = new BearSSL::WiFiClientSecure;
+
+    client->setFingerprint(fingerprint);
 
     HTTPClient https;
 
     Serial.print("[HTTPS] begin...\n");
-    if (https.begin(client, "https://jigsaw.w3.org/HTTP/connection.html")) {  // HTTPS
+    if (https.begin(*client, "https://jigsaw.w3.org/HTTP/connection.html")) {  // HTTPS
 
 
       Serial.print("[HTTPS] GET...\n");
@@ -72,6 +73,8 @@ void loop() {
     } else {
       Serial.printf("[HTTPS] Unable to connect\n");
     }
+
+    delete client;
   }
 
   delay(10000);
