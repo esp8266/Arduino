@@ -279,7 +279,10 @@ struct storeArgHandler
 
 struct nullArgHandler
 {
-  void operator() (String& key, String& value, const String& data, int equal_index, int pos, int key_end_pos, int next_index) { }
+  void operator() (String& key, String& value, const String& data, int equal_index, int pos, int key_end_pos, int next_index) {
+    (void)key; (void)value; (void)data; (void)equal_index; (void)pos; (void)key_end_pos; (void)next_index;
+    // do nothing
+  }
 };
 
 void ESP8266WebServer::_parseArguments(const String& data) {
@@ -288,17 +291,13 @@ void ESP8266WebServer::_parseArguments(const String& data) {
 
   _currentArgCount = _parseArgumentsPrivate(data, nullArgHandler());
 
-  // allocate one more (even if counted==0)
-  // this is needed because {"plain": plainBuf} is always added
+  // allocate one more, this is needed because {"plain": plainBuf} is always added
   _currentArgs = new RequestArgument[_currentArgCount + 1];
 
   (void)_parseArgumentsPrivate(data, storeArgHandler());
 }
 
-
 int ESP8266WebServer::_parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler) {
-// counted<0: parse only, return counted arguments
-// counted>=0: allocate counted+1, parse and store "counted" arguments
 
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("args: ");
@@ -329,9 +328,9 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, std::function<v
 
     // handle key/value
     if ((int)pos < key_end_pos) {
-      // do not store or count empty ending key ("url?x=y;")
 
-      handler(_currentArgs[arg_total].key, _currentArgs[arg_total].value, data, equal_index, pos, key_end_pos, next_index); 
+      RequestArgument& arg = _currentArgs[arg_total];
+      handler(arg.key, arg.value, data, equal_index, pos, key_end_pos, next_index);
 
       ++arg_total;
       pos = next_index + 1;
@@ -414,7 +413,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t 
             DEBUG_OUTPUT.println(argFilename);
 #endif
             //use GET to set the filename if uploading using blob
-            if (argFilename == F("blob") && hasArg(FPSTR(filename))) 
+            if (argFilename == F("blob") && hasArg(FPSTR(filename)))
               argFilename = arg(FPSTR(filename));
           }
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -570,7 +569,7 @@ readfile:
       arg.value = postArgs[iarg].value;
     }
     _currentArgCount = iarg;
-    if (postArgs) 
+    if (postArgs)
       delete[] postArgs;
     return true;
   }
