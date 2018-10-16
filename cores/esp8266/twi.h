@@ -1,9 +1,9 @@
-/* 
+/*
   twi.h - Software I2C library for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -48,7 +48,7 @@ uint8_t twi_status();
 
 uint8_t twi_transmit(const uint8_t*, uint8_t);
 
-void twi_attachSlaveRxEvent( void (*)(uint8_t*, int) );
+void twi_attachSlaveRxEvent( void (*)(uint8_t*, size_t) );
 void twi_attachSlaveTxEvent( void (*)(void) );
 void twi_reply(uint8_t);
 //void twi_stop(void);
