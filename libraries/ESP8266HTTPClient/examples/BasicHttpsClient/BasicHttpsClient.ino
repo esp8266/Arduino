@@ -45,7 +45,8 @@ void loop() {
 
     client->setFingerprint(fingerprint);
 
-    { // Create a block arround HTTPClient, so it is destroyed before WiFiClientSecure *client is deleted
+    {
+      // Create a block arround HTTPClient, so it is destroyed before WiFiClientSecure *client is deleted
       HTTPClient https;
 
       Serial.print("[HTTPS] begin...\n");
@@ -73,7 +74,9 @@ void loop() {
       } else {
         Serial.printf("[HTTPS] Unable to connect\n");
       }
-    } // End block around HTTPClient
+
+      // End block around HTTPClient
+    }
     delete client;
   }
 

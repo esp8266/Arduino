@@ -53,7 +53,8 @@ void loop() {
     const uint8_t fingerprint[20] = {0xEB, 0xD9, 0xDF, 0x37, 0xC2, 0xCC, 0x84, 0x89, 0x00, 0xA0, 0x58, 0x52, 0x24, 0x04, 0xE4, 0x37, 0x3E, 0x2B, 0xF1, 0x41};
     client->setFingerprint(fingerprint);
 
-    { // Create a block arround HTTPClient, so it is destroyed before WiFiClientSecure *client is deleted
+    {
+      // Create a block arround HTTPClient, so it is destroyed before WiFiClientSecure *client is deleted
       HTTPClient https;
 
       if (https.begin(*client, "https://tls.mbed.org/")) {
@@ -108,7 +109,9 @@ void loop() {
       } else {
         Serial.printf("Unable to connect\n");
       }
-    } // End block around HTTPCLient
+
+      // End block around HTTPCLient
+    }
 
     delete client;
   }
