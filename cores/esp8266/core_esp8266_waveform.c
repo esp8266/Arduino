@@ -41,7 +41,7 @@
 #include "core_esp8266_waveform.h"
 
 // Need speed, not size, here
-#pragma GCC optimize ("O3")
+#pragma GCC optimize ("O2")
 
 // Maximum delay between IRQs
 #define MAXIRQUS (10000)
