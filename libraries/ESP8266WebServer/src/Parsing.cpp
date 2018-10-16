@@ -267,12 +267,36 @@ bool ESP8266WebServer::_collectHeader(const char* headerName, const char* header
   return false;
 }
 
+struct storeArgHandler
+{
+  void operator() (String& key, String& value, const String& data, int equal_index, int pos, int key_end_pos, int next_index)
+  {
+    key = ESP8266WebServer::urlDecode(data.substring(pos, key_end_pos));
+    if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
+      value = ESP8266WebServer::urlDecode(data.substring(equal_index + 1, next_index));
+  }
+};
+
+struct nullArgHandler
+{
+  void operator() (String& key, String& value, const String& data, int equal_index, int pos, int key_end_pos, int next_index) { }
+};
+
 void ESP8266WebServer::_parseArguments(const String& data) {
-  int counted = _parseArgumentsPrivate(data, -1);
-  (void)_parseArgumentsPrivate(data, counted);
+  if (_currentArgs)
+    delete[] _currentArgs;
+
+  _currentArgCount = _parseArgumentsPrivate(data, nullArgHandler());
+
+  // allocate one more (even if counted==0)
+  // this is needed because {"plain": plainBuf} is always added
+  _currentArgs = new RequestArgument[_currentArgCount + 1];
+
+  (void)_parseArgumentsPrivate(data, storeArgHandler());
 }
 
-int ESP8266WebServer::_parseArgumentsPrivate(const String& data, int counted) {
+
+int ESP8266WebServer::_parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler) {
 // counted<0: parse only, return counted arguments
 // counted>=0: allocate counted+1, parse and store "counted" arguments
 
@@ -280,17 +304,6 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, int counted) {
   DEBUG_OUTPUT.print("args: ");
   DEBUG_OUTPUT.println(data);
 #endif
-
-  if (counted >= 0) {
-    if (_currentArgs)
-      delete[] _currentArgs;
-    _currentArgs = 0;
-    _currentArgCount = counted;
-
-    // allocate one more (even if counted==0)
-    // this is needed because {"plain": plainBuf} is always added
-    _currentArgs = new RequestArgument[_currentArgCount + 1];
-  }
 
   size_t pos = 0;
   int arg_total = 0;
@@ -317,15 +330,8 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, int counted) {
     // handle key/value
     if ((int)pos < key_end_pos) {
       // do not store or count empty ending key ("url?x=y;")
-      if (counted >= 0) {
-        RequestArgument& arg = _currentArgs[arg_total];
-        arg.key = urlDecode(data.substring(pos, key_end_pos));
-        if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
-          arg.value = urlDecode(data.substring(equal_index + 1, next_index));
-#ifdef DEBUG_ESP_HTTP_SERVER
-        DEBUG_OUTPUT.printf("arg %d key: '%s' value: '%s'\r\n", arg_total, arg.key.c_str(), arg.value.c_str());
-#endif
-      }
+
+      handler(_currentArgs[arg_total].key, _currentArgs[arg_total].value, data, equal_index, pos, key_end_pos, next_index); 
 
       ++arg_total;
       pos = next_index + 1;
