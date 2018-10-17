@@ -136,6 +136,10 @@ This method mounts SPIFFS file system. It must be called before any
 other FS APIs are used. Returns *true* if file system was mounted
 successfully, false otherwise.
 
+This will by default format filesystem when SPIFFS is used the first time. 
+Note that this can be disabled with a call to
+``ESP.setAutoFormatSPIFFS(false);`` prior to ``SPIFFS.begin()``.
+
 end
 ~~~
 
