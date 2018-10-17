@@ -142,7 +142,8 @@ protected:
   void _handleRequest();
   void _finalizeResponse();
   bool _parseRequest(WiFiClient& client);
-  void _parseArguments(String data);
+  void _parseArguments(const String& data);
+  int _parseArgumentsPrivate(const String& data, bool store);
   static String _responseCodeToString(int code);
   bool _parseForm(WiFiClient& client, String boundary, uint32_t len);
   bool _parseFormUploadAborted();
