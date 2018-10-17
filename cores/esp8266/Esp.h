@@ -153,6 +153,9 @@ class EspClass {
         bool eraseConfig();
 
         inline uint32_t getCycleCount();
+
+        bool getAutoFormatSPIFFS ();
+        void setAutoFormatSPIFFS (bool autoFormat);
 };
 
 uint32_t EspClass::getCycleCount()

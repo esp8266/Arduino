@@ -574,3 +574,13 @@ String EspClass::getSketchMD5()
     result = md5.toString();
     return result;
 }
+
+bool _spiffsAutoFormat = true;
+
+void EspClass::setAutoFormatSPIFFS (bool autoFormat) {
+    _spiffsAutoFormat = autoFormat;
+}
+
+bool EspClass::getAutoFormatSPIFFS () {
+    return _spiffsAutoFormat;
+}
