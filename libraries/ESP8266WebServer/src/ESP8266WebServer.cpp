@@ -500,13 +500,13 @@ String ESP8266WebServer::arg(String name) {
 }
 
 String ESP8266WebServer::arg(int i) {
-  if (i < _currentArgCount)
+  if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].value;
   return "";
 }
 
 String ESP8266WebServer::argName(int i) {
-  if (i < _currentArgCount)
+  if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].key;
   return "";
 }
