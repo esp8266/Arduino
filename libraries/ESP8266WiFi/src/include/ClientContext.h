@@ -331,11 +331,9 @@ public:
                 prevsndbuf = sndbuf;
                 // We just sent a bit, move timeout forward
                 last_sent = millis();
-
-                // yield because we are staying longer
-                // (only if possible because we can be called from events)
-                esp_yield();
             }
+
+            esp_yield(); // from sys or os context
 
             if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
                 break;
