@@ -32,7 +32,7 @@
 #include "spiffs/spiffs.h"
 #include "debug.h"
 #include "flash_utils.h"
-#include "Esp.h" // ESP.getAutoFormatSPIFFS()
+#include "coredecls.h" // _spiffsAutoFormat
 
 using namespace fs;
 
@@ -125,7 +125,7 @@ public:
         if (_tryMount()) {
             return true;
         }
-        if (!ESP.getAutoFormatSPIFFS()) {
+        if (!_spiffsAutoFormat) {
             return false;
         }
         auto rc = SPIFFS_format(&_fs);

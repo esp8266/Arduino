@@ -12,6 +12,7 @@ extern "C" {
 #include <cont.h> // g_pcont declaration
 
 extern bool timeshift64_is_set;
+extern bool _spiffsAutoFormat;
 
 void esp_yield();
 void esp_schedule();

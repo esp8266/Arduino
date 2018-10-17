@@ -25,7 +25,7 @@
 #include "interrupts.h"
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
-#include "cont.h"
+#include "coredecls.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -574,8 +574,6 @@ String EspClass::getSketchMD5()
     result = md5.toString();
     return result;
 }
-
-bool _spiffsAutoFormat = true;
 
 void EspClass::setAutoFormatSPIFFS (bool autoFormat) {
     _spiffsAutoFormat = autoFormat;

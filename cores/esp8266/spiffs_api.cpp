@@ -23,6 +23,8 @@
  */
 #include "spiffs_api.h"
 
+bool _spiffsAutoFormat = true;
+
 using namespace fs;
 
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
