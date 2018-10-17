@@ -60,6 +60,8 @@ getResetInfo	KEYWORD2
 getResetInfoPtr	KEYWORD2
 eraseConfig	KEYWORD2
 getCycleCount	KEYWORD2
+setAutoFormatSPIFFS	KEYWORD2
+getAutoFormatSPIFFS	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
