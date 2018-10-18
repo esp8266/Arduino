@@ -110,8 +110,10 @@ SECTIONS
     *libstdc++.a:(.literal .text .literal.* .text.*)
     *liblwip_gcc.a:(.literal .text .literal.* .text.*)
     *liblwip_src.a:(.literal .text .literal.* .text.*)
-    *liblwip2.a:(.literal .text .literal.* .text.*)
-    *liblwip2_1460.a:(.literal .text .literal.* .text.*)
+    *liblwip2-536.a:(.literal .text .literal.* .text.*)
+    *liblwip2-1460.a:(.literal .text .literal.* .text.*)
+    *liblwip2-536-feat.a:(.literal .text .literal.* .text.*)
+    *liblwip2-1460-feat.a:(.literal .text .literal.* .text.*)
     *libbearssl.a:(.literal .text .literal.* .text.*)
     *libaxtls.a:(.literal .text .literal.* .text.*)
     *libat.a:(.literal.* .text.*)
@@ -163,9 +165,7 @@ SECTIONS
     *(.entry.text)
     *(.init.literal)
     *(.init)
-    *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
-    *.cpp.o(.iram.text .iram.text.*)
-    *.c.o(.iram.text .iram.text.*)
+    *(.literal .text .iram.text .iram.text.* .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
 #ifdef VTABLES_IN_IRAM
     *(.rodata._ZTV*) /* C++ vtables */
 #endif

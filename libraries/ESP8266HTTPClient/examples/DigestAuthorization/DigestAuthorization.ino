@@ -11,8 +11,8 @@
 
 #include <ESP8266HTTPClient.h>
 
-const char* ssid = "........";
-const char* ssidPassword = "........";
+const char* ssid = "SSID";
+const char* ssidPassword = "PASSWORD";
 
 const char *username = "admin";
 const char *password = "admin";
@@ -76,7 +76,7 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, ssidPassword);
@@ -95,10 +95,12 @@ void setup() {
 void loop() {
   HTTPClient http;
 
+  WiFiClient client;
+
   Serial.print("[HTTP] begin...\n");
 
   // configure traged server and url
-  http.begin(String(server) + String(uri));
+  http.begin(client, String(server) + String(uri));
 
 
   const char *keys[] = {"WWW-Authenticate"};
@@ -115,7 +117,7 @@ void loop() {
     String authorization = getDigestAuth(authReq, String(username), String(password), String(uri), 1);
 
     http.end();
-    http.begin(String(server) + String(uri));
+    http.begin(client, String(server) + String(uri));
 
     http.addHeader("Authorization", authorization);
 
