@@ -40,7 +40,7 @@ void loop() {
 
     std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
 
-    bool mfln = client->probeMaxFragmentLength("jigsaw.w3.org", 443, 1024);
+    bool mfln = client->probeMaxFragmentLength("tls.mbed.org", 443, 1024);
     Serial.printf("\nConnecting to https://tls.mbed.org\n");
     Serial.printf("Maximum fragment Length negotiation supported: %s\n", mfln ? "yes" : "no");
     if (mfln) {
@@ -50,13 +50,13 @@ void loop() {
     Serial.print("[HTTPS] begin...\n");
 
     // configure server and url
-    const uint8_t fingerprint[20] = {0x5A, 0xCF, 0xFE, 0xF0, 0xF1, 0xA6, 0xF4, 0x5F, 0xD2, 0x11, 0x11, 0xC6, 0x1D, 0x2F, 0x0E, 0xBC, 0x39, 0x8D, 0x50, 0xE0};
+    const uint8_t fingerprint[20] = {0xEB, 0xD9, 0xDF, 0x37, 0xC2, 0xCC, 0x84, 0x89, 0x00, 0xA0, 0x58, 0x52, 0x24, 0x04, 0xE4, 0x37, 0x3E, 0x2B, 0xF1, 0x41};
 
     client->setFingerprint(fingerprint);
 
     HTTPClient https;
 
-    if (https.begin(*client, "https://jigsaw.w3.org/HTTP/connection.html")) {
+    if (https.begin(*client, "https://tls.mbed.org/")) {
 
       Serial.print("[HTTPS] GET...\n");
       // start connection and send HTTP header
