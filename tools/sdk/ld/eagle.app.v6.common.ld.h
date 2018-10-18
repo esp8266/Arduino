@@ -110,8 +110,10 @@ SECTIONS
     *libstdc++.a:(.literal .text .literal.* .text.*)
     *liblwip_gcc.a:(.literal .text .literal.* .text.*)
     *liblwip_src.a:(.literal .text .literal.* .text.*)
-    *liblwip2.a:(.literal .text .literal.* .text.*)
-    *liblwip2_1460.a:(.literal .text .literal.* .text.*)
+    *liblwip2-536.a:(.literal .text .literal.* .text.*)
+    *liblwip2-1460.a:(.literal .text .literal.* .text.*)
+    *liblwip2-536-feat.a:(.literal .text .literal.* .text.*)
+    *liblwip2-1460-feat.a:(.literal .text .literal.* .text.*)
     *libbearssl.a:(.literal .text .literal.* .text.*)
     *libaxtls.a:(.literal .text .literal.* .text.*)
     *libat.a:(.literal.* .text.*)
@@ -127,7 +129,7 @@ SECTIONS
     *libwpa.a:(.literal.* .text.*)
     *libwpa2.a:(.literal.* .text.*)
     *libwps.a:(.literal.* .text.*)
-    *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text .irom.text.*)
+    *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom0.text.* .irom.text .irom.text.*)
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);
   } >irom0_0_seg :irom0_0_phdr
@@ -163,9 +165,7 @@ SECTIONS
     *(.entry.text)
     *(.init.literal)
     *(.init)
-    *(.literal .text .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
-    *.cpp.o(.iram.text)
-    *.c.o(.iram.text)
+    *(.literal .text .iram.text .iram.text.* .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
 #ifdef VTABLES_IN_IRAM
     *(.rodata._ZTV*) /* C++ vtables */
 #endif

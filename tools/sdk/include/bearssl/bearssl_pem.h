@@ -236,6 +236,57 @@ br_pem_decoder_name(br_pem_decoder_context *ctx)
 	return ctx->name;
 }
 
+/**
+ * \brief Encode an object in PEM.
+ *
+ * This function encodes the provided binary object (`data`, of length `len`
+ * bytes) into PEM. The `banner` text will be included in the header and
+ * footer (e.g. use `"CERTIFICATE"` to get a `"BEGIN CERTIFICATE"` header).
+ *
+ * The length (in characters) of the PEM output is returned; that length
+ * does NOT include the terminating zero, that this function nevertheless
+ * adds. If using the returned value for allocation purposes, the allocated
+ * buffer size MUST be at least one byte larger than the returned size.
+ *
+ * If `dest` is `NULL`, then the encoding does not happen; however, the
+ * length of the encoded object is still computed and returned.
+ *
+ * The `data` pointer may be `NULL` only if `len` is zero (when encoding
+ * an object of length zero, which is not very useful), or when `dest`
+ * is `NULL` (in that case, source data bytes are ignored).
+ *
+ * Some `flags` can be specified to alter the encoding behaviour:
+ *
+ *   - If `BR_PEM_LINE64` is set, then line-breaking will occur after
+ *     every 64 characters of output, instead of the default of 76.
+ *
+ *   - If `BR_PEM_CRLF` is set, then end-of-line sequence will use
+ *     CR+LF instead of a single LF.
+ *
+ * The `data` and `dest` buffers may overlap, in which case the source
+ * binary data is destroyed in the process. Note that the PEM-encoded output
+ * is always larger than the source binary.
+ *
+ * \param dest     the destination buffer (or `NULL`).
+ * \param data     the source buffer (can be `NULL` in some cases).
+ * \param len      the source length (in bytes).
+ * \param banner   the PEM banner expression.
+ * \param flags    the behavioural flags.
+ * \return  the PEM object length (in characters), EXCLUDING the final zero.
+ */
+size_t br_pem_encode(void *dest, const void *data, size_t len,
+	const char *banner, unsigned flags);
+
+/**
+ * \brief PEM encoding flag: split lines at 64 characters.
+ */
+#define BR_PEM_LINE64   0x0001
+
+/**
+ * \brief PEM encoding flag: use CR+LF line endings.
+ */
+#define BR_PEM_CRLF     0x0002
+
 #ifdef __cplusplus
 }
 #endif

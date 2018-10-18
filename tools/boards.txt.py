@@ -271,6 +271,7 @@ boards = collections.OrderedDict([
         'name': 'Generic ESP8285 Module',
         'opts': {
             '.build.board': 'ESP8266_ESP01',
+            '.build.variant': 'esp8285'
             },
         'macro': [
             'resetmethod_menu',
@@ -930,14 +931,22 @@ macros = {
     ####################### lwip
 
     'lwip2': collections.OrderedDict([
-        ( '.menu.ip.lm2', 'v2 Lower Memory' ),
-        ( '.menu.ip.lm2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.lm2.build.lwip_lib', '-llwip2' ),
-        ( '.menu.ip.lm2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
-        ( '.menu.ip.hb2', 'v2 Higher Bandwidth' ),
-        ( '.menu.ip.hb2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.hb2.build.lwip_lib', '-llwip2_1460' ),
-        ( '.menu.ip.hb2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
+        ( '.menu.ip.lm2f', 'v2 Lower Memory' ),
+        ( '.menu.ip.lm2f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2f.build.lwip_lib', '-llwip2-536-feat' ),
+        ( '.menu.ip.lm2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1' ),
+        ( '.menu.ip.hb2f', 'v2 Higher Bandwidth' ),
+        ( '.menu.ip.hb2f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2f.build.lwip_lib', '-llwip2-1460-feat' ),
+        ( '.menu.ip.hb2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1' ),
+        ( '.menu.ip.lm2n', 'v2 Lower Memory (no features)' ),
+        ( '.menu.ip.lm2n.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2n.build.lwip_lib', '-llwip2-536' ),
+        ( '.menu.ip.lm2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0' ),
+        ( '.menu.ip.hb2n', 'v2 Higher Bandwidth (no features)' ),
+        ( '.menu.ip.hb2n.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2n.build.lwip_lib', '-llwip2-1460' ),
+        ( '.menu.ip.hb2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0' ),
         ]),
 
     'lwip': collections.OrderedDict([
@@ -1150,14 +1159,13 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
 
         print("/* Flash Split for %s chips */" % strsize)
         print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
-        if spiffs_kb > 0:
-            empty_size = spiffs_start - max_upload_size
-            if empty_size > 1024:
-                print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
-            print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + spiffs_start, ((spiffs_end - spiffs_start) / 1024), spiffs_end - spiffs_start))
-        print("/* eeprom @0x%X (=%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
-        print("/* rfcal  @0x%X (=%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
-        print("/* wifi   @0x%X (=%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
+        empty_size = spiffs_start - max_upload_size
+        if empty_size > 0:
+            print("/* empty  @0x%X (~%dKB) (%dB) */" % (spi + max_upload_size, empty_size / 1024, empty_size))
+        print("/* spiffs @0x%X (~%dKB) (%dB) */" % (spi + spiffs_start, ((spiffs_end - spiffs_start) / 1024), spiffs_end - spiffs_start))
+        print("/* eeprom @0x%X (%dKB) */" % (spi + rfcal_addr - eeprom_size_kb * 1024, eeprom_size_kb))
+        print("/* rfcal  @0x%X (%dKB) */" % (spi + rfcal_addr, rfcal_size_kb))
+        print("/* wifi   @0x%X (%dKB) */" % (spi + rfcal_addr + rfcal_size_kb * 1024, sdkwifi_size_kb))
         print("")
         print("MEMORY")
         print("{")
@@ -1167,13 +1175,12 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         print("  irom0_0_seg :                         org = 0x40201010, len = 0x%x" % max_upload_size)
         print("}")
         print("")
-        if spiffs_kb > 0:
-            print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
-            print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_end))
-            print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
-            print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
+        print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
+        print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_end))
+        print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
         print("")
-        print('INCLUDE "eagle.app.v6.common.ld"')
+        print('INCLUDE "local.eagle.app.v6.common.ld"')
 
         if ldgen:
             sys.stdout.close()

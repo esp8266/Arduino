@@ -55,13 +55,46 @@ mode
 -  ``WiFi.getMode()``: return current Wi-Fi mode (one out of four modes
    above)
 
+WiFi power management, DTIM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool setSleepMode (WiFiSleepType_t type, int listenInterval=0)
+
+Sleep mode type is ``WIFI_NONE_SLEEP``, ``WIFI_LIGHT_SLEEP`` or ``WIFI_MODEM_SLEEP``.
+
+(``listenInterval`` appeared in esp8266-arduino core v2.5.0 using the last
+V2 revision of nonos-sdk before V3)
+
+Quoting nonos-sdk datasheet:
+
+* ``NONE``: disable power saving
+
+* ``LIGHT`` or ``MODEM``: TCP timer rate raised from 250ms to 3s
+
+When ``listenInterval`` is set to 1..10, in ``LIGHT`` or ``MODEM`` mode,
+station wakes up every (DTIM-interval * ``listenInterval``).  This saves
+power but station interface may miss broadcast data.
+
+Otherwise (default value 0), station wakes up at every DTIM-interval
+(configured in the access-point).
+
+Quoting wikipedia:
+
+A Delivery Traffic Indication Map (DTIM) is a kind of Traffic Indication Map
+(TIM) which informs the clients about the presence of buffered
+multicast/broadcast data on the access point.  It is generated within the
+periodic beacon at a frequency specified by the DTIM Interval.  Beacons are
+packets sent by an access point to synchronize a wireless network.
+
+
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
 
 .. code:: cpp
 
     int32_t  channel (void)
-    bool  setSleepMode (WiFiSleepType_t type)
     WiFiSleepType_t  getSleepMode ()
     bool  setPhyMode (WiFiPhyMode_t mode)
     WiFiPhyMode_t  getPhyMode ()
@@ -72,6 +105,11 @@ Other Function Calls
     bool  forceSleepBegin (uint32 sleepUs=0)
     bool  forceSleepWake ()
     int  hostByName (const char *aHostname, IPAddress &aResult)
+
+    appeared with SDK pre-V3:
+    uint8_t getListenInterval ();
+    bool isSleepLevelMax ();
+
 
 Documentation for the above functions is not yet prepared.
 

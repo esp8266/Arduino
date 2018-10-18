@@ -64,3 +64,18 @@ bool ICACHE_RAM_ATTR cont_can_yield(cont_t* cont) {
     return !ETS_INTR_WITHINISR() &&
            cont->pc_ret != 0 && cont->pc_yield == 0;
 }
+
+// No need for this to be in IRAM, not expected to be IRQ called
+void cont_repaint_stack(cont_t *cont)
+{
+    register uint32_t *sp asm("a1");
+    // Ensure 64 bytes adjacent to the current SP don't get touched to endure
+    // we don't accidentally trounce over locals or IRQ temps.
+    uint32_t sp_safe = CONT_STACKSIZE/4 - ((sp - &cont->stack[0] - 64)/4);
+
+    // Fill stack with magic values
+    for(uint32_t pos = 0; pos < sp_safe; pos++)
+    {
+        cont->stack[pos] = CONT_STACKGUARD;
+    }
+}

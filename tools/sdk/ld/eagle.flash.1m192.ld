@@ -2,9 +2,9 @@
 /* sketch @0x40200000 (~807KB) (827376B) */
 /* empty  @0x402C9FF0 (~4KB) (4112B) */
 /* spiffs @0x402CB000 (~192KB) (196608B) */
-/* eeprom @0x402FB000 (=4KB) */
-/* rfcal  @0x402FC000 (=4KB) */
-/* wifi   @0x402FD000 (=12KB) */
+/* eeprom @0x402FB000 (4KB) */
+/* rfcal  @0x402FC000 (4KB) */
+/* wifi   @0x402FD000 (12KB) */
 
 MEMORY
 {
@@ -19,4 +19,4 @@ PROVIDE ( _SPIFFS_end = 0x402FB000 );
 PROVIDE ( _SPIFFS_page = 0x100 );
 PROVIDE ( _SPIFFS_block = 0x1000 );
 
-INCLUDE "eagle.app.v6.common.ld"
+INCLUDE "local.eagle.app.v6.common.ld"
