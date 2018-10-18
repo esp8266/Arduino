@@ -38,9 +38,9 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    BearSSL::WiFiClientSecure *client = new BearSSL::WiFiClientSecure ;
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
 
-    bool mfln = client->probeMaxFragmentLength("tls.mbed.org", 443, 1024);
+    bool mfln = client->probeMaxFragmentLength("jigsaw.w3.org", 443, 1024);
     Serial.printf("\nConnecting to https://tls.mbed.org\n");
     Serial.printf("Maximum fragment Length negotiation supported: %s\n", mfln ? "yes" : "no");
     if (mfln) {
@@ -50,70 +50,61 @@ void loop() {
     Serial.print("[HTTPS] begin...\n");
 
     // configure server and url
-    const uint8_t fingerprint[20] = {0xEB, 0xD9, 0xDF, 0x37, 0xC2, 0xCC, 0x84, 0x89, 0x00, 0xA0, 0x58, 0x52, 0x24, 0x04, 0xE4, 0x37, 0x3E, 0x2B, 0xF1, 0x41};
+    const uint8_t fingerprint[20] = {0x5A, 0xCF, 0xFE, 0xF0, 0xF1, 0xA6, 0xF4, 0x5F, 0xD2, 0x11, 0x11, 0xC6, 0x1D, 0x2F, 0x0E, 0xBC, 0x39, 0x8D, 0x50, 0xE0};
+
     client->setFingerprint(fingerprint);
 
-    {
-      // Create a block arround HTTPClient, so it is destroyed before WiFiClientSecure *client is deleted
-      HTTPClient https;
+    HTTPClient https;
 
-      if (https.begin(*client, "https://tls.mbed.org/")) {
+    if (https.begin(*client, "https://jigsaw.w3.org/HTTP/connection.html")) {
 
-        Serial.print("[HTTPS] GET...\n");
-        // start connection and send HTTP header
-        int httpCode = https.GET();
-        if (httpCode > 0) {
-          // HTTP header has been send and Server response header has been handled
-          Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+      Serial.print("[HTTPS] GET...\n");
+      // start connection and send HTTP header
+      int httpCode = https.GET();
+      if (httpCode > 0) {
+        // HTTP header has been send and Server response header has been handled
+        Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
 
-          // file found at server
-          if (httpCode == HTTP_CODE_OK) {
+        // file found at server
+        if (httpCode == HTTP_CODE_OK) {
 
-            // get lenght of document (is -1 when Server sends no Content-Length header)
-            int len = https.getSize();
+          // get lenght of document (is -1 when Server sends no Content-Length header)
+          int len = https.getSize();
 
-            // create buffer for read
-            static uint8_t buff[128] = { 0 };
+          // create buffer for read
+          static uint8_t buff[128] = { 0 };
 
-            // get tcp stream
-            WiFiClient * stream = client;
+          // read all data from server
+          while (https.connected() && (len > 0 || len == -1)) {
+            // get available data size
+            size_t size = client->available();
 
-            // read all data from server
-            while (https.connected() && (len > 0 || len == -1)) {
-              // get available data size
-              size_t size = stream->available();
+            if (size) {
+              // read up to 128 byte
+              int c = client->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
 
-              if (size) {
-                // read up to 128 byte
-                int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+              // write it to Serial
+              Serial.write(buff, c);
 
-                // write it to Serial
-                Serial.write(buff, c);
-
-                if (len > 0) {
-                  len -= c;
-                }
+              if (len > 0) {
+                len -= c;
               }
-              delay(1);
             }
-
-            Serial.println();
-            Serial.print("[HTTPS] connection closed or file end.\n");
-
+            delay(1);
           }
-        } else {
-          Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
-        }
 
-        https.end();
+          Serial.println();
+          Serial.print("[HTTPS] connection closed or file end.\n");
+
+        }
       } else {
-        Serial.printf("Unable to connect\n");
+        Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
       }
 
-      // End block around HTTPCLient
+      https.end();
+    } else {
+      Serial.printf("Unable to connect\n");
     }
-
-    delete client;
   }
 
   Serial.println("Wait 10s before the next round...");
