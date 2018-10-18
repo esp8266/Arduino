@@ -333,7 +333,7 @@ public:
                 last_sent = millis();
             }
 
-            esp_yield(); // from sys or os context
+            delay(0); // from sys or os context
 
             if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
                 break;
