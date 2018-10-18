@@ -26,7 +26,6 @@ class WiFiClient;
 
 typedef void (*discard_cb_t)(void*, ClientContext*);
 
-extern "C" void esp_yield();
 extern "C" void esp_schedule();
 
 #include "DataSource.h"
@@ -333,7 +332,7 @@ public:
                 last_sent = millis();
             }
 
-            esp_yield(); // from sys or os context
+            delay(0); // from sys or os context
 
             if ((state() != ESTABLISHED) || (sndbuf == TCP_SND_BUF)) {
                 break;
@@ -456,7 +455,7 @@ protected:
             }
 
             ++_send_waiting;
-            esp_yield();
+            delay(0);
         } while(true);
         _send_waiting = 0;
 
