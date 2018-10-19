@@ -35,6 +35,7 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
+// XXX todo build a String instead of malloc/realloc and because final result is now put in a string
 static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& dataLength, int timeout_ms)
 {
   char *buf = nullptr;
@@ -70,6 +71,10 @@ static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& 
 bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
+#ifdef DEBUG_ESP_HTTP_SERVER
+    DEBUG_OUTPUT.print("request: ");
+    DEBUG_OUTPUT.println(req);
+#endif
   client.readStringUntil('\n');
   //reset header value
   for (int i = 0; i < _headerKeysCount; ++i) {
@@ -82,8 +87,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   int addr_end = req.indexOf(' ', addr_start + 1);
   if (addr_start == -1 || addr_end == -1) {
 #ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.print("Invalid request: ");
-    DEBUG_OUTPUT.println(req);
+    DEBUG_OUTPUT.println("Invalid request");
 #endif
     return false;
   }
@@ -139,7 +143,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     String headerName;
     String headerValue;
     bool isForm = false;
-    //bool isEncoded = false;
+    bool isEncoded = false;
     uint32_t contentLength = 0;
     //parse headers
     while(1){
@@ -168,7 +172,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
           isForm = false;
         } else if (headerValue.startsWith(F("application/x-www-form-urlencoded"))){
           isForm = false;
-          //isEncoded = true;
+          isEncoded = true;
         } else if (headerValue.startsWith(F("multipart/"))){
           boundaryStr = headerValue.substring(headerValue.indexOf('=') + 1);
           boundaryStr.replace("\"","");
@@ -181,34 +185,40 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       }
     }
 
-    // always parse url for key/value pairs
+    String plainBuf;
+    if (!isForm) {
+      // read content into plainBuf
+      size_t plainLength;
+      char* plainBufTmp = readBytesWithTimeout(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
+      plainBuf = plainBufTmp;
+      free(plainBufTmp);
+      if (plainBuf.length() < contentLength)
+        return false;
+    }
+
+    if (isEncoded) {
+        // isEncoded => !isForm => plainBuf is not empty
+        // add plainBuf in search str
+        if (searchStr.length())
+          searchStr += '&';
+        searchStr += plainBuf;
+    }
+
+    // parse searchStr for key/value pairs
     _parseArguments(searchStr);
 
     if (!isForm) {
       if (contentLength) {
-
         // add key=value: plain={body} (post json or other data)
-
-        size_t plainLength;
-        char* plainBuf = readBytesWithTimeout(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
-        if (plainLength < contentLength) {
-          free(plainBuf);
-          return false;
-        }
-
         RequestArgument& arg = _currentArgs[_currentArgCount++];
         arg.key = F("plain");
-        arg.value = String(plainBuf);
-
-        free(plainBuf);
-
+        arg.value = plainBuf;
       }
     } else { // isForm is true
-
+      // here: content is not yet read (plainBuf is still empty)
       if (!_parseForm(client, boundaryStr, contentLength)) {
         return false;
       }
-
     }
   } else {
     String headerName;
