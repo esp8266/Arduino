@@ -35,37 +35,24 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
-// XXX todo build a String instead of malloc/realloc and because final result is now put in a string
-static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& dataLength, int timeout_ms)
+static bool readBytesWithTimeout(WiFiClient& client, size_t maxLength, String& data, int timeout_ms)
 {
-  char *buf = nullptr;
-  dataLength = 0;
-  while (dataLength < maxLength) {
+  if (!data.reserve(maxLength + 1))
+    return false;
+  data[0] = 0;  // data.clear()??
+  while (data.length() < maxLength) {
     int tries = timeout_ms;
-    size_t newLength;
-    while (!(newLength = client.available()) && tries--) delay(1);
-    if (!newLength) {
+    size_t avail;
+    while (!(avail = client.available()) && tries--)
+      delay(1);
+    if (!avail)
       break;
-    }
-    if (!buf) {
-      buf = (char *) malloc(newLength + 1);
-      if (!buf) {
-        return nullptr;
-      }
-    }
-    else {
-      char* newBuf = (char *) realloc(buf, dataLength + newLength + 1);
-      if (!newBuf) {
-        free(buf);
-        return nullptr;
-      }
-      buf = newBuf;
-    }
-    client.readBytes(buf + dataLength, newLength);
-    dataLength += newLength;
-    buf[dataLength] = '\0';
+    if (data.length() + avail > maxLength)
+      avail = maxLength - data.length();
+    while (avail--)
+      data += (char)client.read();
   }
-  return buf;
+  return data.length() == maxLength;
 }
 
 bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
@@ -186,13 +173,13 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     }
 
     String plainBuf;
-    if (!isForm) {
-      // read content into plainBuf
-      size_t plainLength;
-      char* plainBufTmp = readBytesWithTimeout(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
-      plainBuf = plainBufTmp;
-      free(plainBufTmp);
-      if (plainBuf.length() < contentLength)
+    if (   !isForm
+        && // read content into plainBuf
+           (   !readBytesWithTimeout(client, contentLength, plainBuf, HTTP_MAX_POST_WAIT)
+            || (plainBuf.length() < contentLength)
+           )
+       )
+    {
         return false;
     }
 
@@ -378,7 +365,7 @@ uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
   return (uint8_t)res;
 }
 
-bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t len){
+bool ESP8266WebServer::_parseForm(WiFiClient& client, const String& boundary, uint32_t len){
   (void) len;
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");

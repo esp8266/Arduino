@@ -796,3 +796,7 @@ float String::toFloat(void) const {
         return atof(buffer);
     return 0;
 }
+
+// global empty string to allow returning const String& with nothing
+
+const String emptyString;
