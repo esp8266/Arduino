@@ -92,6 +92,9 @@ public:
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
 
+  typedef std::function<bool(void)> TCheckHandlerFunction;
+  void onBefore(TCheckHandlerFunction fn); //called before a .on is executed, if returns false, .on is not handled
+  
   String uri() { return _currentUri; }
   HTTPMethod method() { return _currentMethod; }
   virtual WiFiClient client() { return _currentClient; }
@@ -178,6 +181,8 @@ protected:
   THandlerFunction _notFoundHandler;
   THandlerFunction _fileUploadHandler;
 
+  TCheckHandlerFunction _onBeforeHandler;
+  
   int              _currentArgCount;
   RequestArgument* _currentArgs;
   std::unique_ptr<HTTPUpload> _currentUpload;
@@ -198,3 +203,4 @@ protected:
 
 
 #endif //ESP8266WEBSERVER_H
+
