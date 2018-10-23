@@ -123,7 +123,7 @@ HTTPClient::HTTPClient()
 HTTPClient::~HTTPClient()
 {
     if(_client) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][~HTTPClient] end() not called before destruction of HTTPClient\n");
+        _client->stop();
     }
     if(_currentHeaders) {
         delete[] _currentHeaders;
@@ -147,7 +147,13 @@ void HTTPClient::clear()
  * @return success bool
  */
 bool HTTPClient::begin(WiFiClient &client, String url) {
-    end();
+#ifdef HTTPCLIENT_1_1_COMPATIBLE
+    if(_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
+#endif
 
     _client = &client;
 
@@ -180,7 +186,13 @@ bool HTTPClient::begin(WiFiClient &client, String url) {
  */
 bool HTTPClient::begin(WiFiClient &client, String host, uint16_t port, String uri, bool https)
 {
-    end();
+#ifdef HTTPCLIENT_1_1_COMPATIBLE
+    if(_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
+#endif
 
     _client = &client;
 
@@ -196,8 +208,11 @@ bool HTTPClient::begin(WiFiClient &client, String host, uint16_t port, String ur
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
 bool HTTPClient::begin(String url, String httpsFingerprint)
 {
-    _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     _port = 443;
     if (httpsFingerprint.length() == 0) {
@@ -214,8 +229,11 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
 
 bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
 {
-    _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     _port = 443;
     if (!beginInternal(url, "https")) {
@@ -237,8 +255,11 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
  */
 bool HTTPClient::begin(String url)
 {
-    _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     _port = 80;
     if (!beginInternal(url, "http")) {
@@ -299,8 +320,11 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
 bool HTTPClient::begin(String host, uint16_t port, String uri)
 {
-    _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     clear();
     _host = host;
@@ -325,8 +349,11 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, Strin
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFingerprint)
 {
-    _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     clear();
     _host = host;
@@ -343,8 +370,11 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])
 {
-    _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     clear();
     _host = host;
@@ -367,7 +397,6 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t htt
  */
 void HTTPClient::end(void)
 {
-    _canReuse = false;
     disconnect();
     clear();
 }
@@ -379,15 +408,13 @@ void HTTPClient::end(void)
 void HTTPClient::disconnect()
 {
     if(connected()) {
-        if(_client) {
-            if(_client->available() > 0) {
-                DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _client->available());
-                while(_client->available() > 0) {
-                    _client->read();
-                }
+        if(_client->available() > 0) {
+            DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _client->available());
+            while(_client->available() > 0) {
+                _client->read();
             }
-
         }
+
         if(_reuse && _canReuse) {
             DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
         } else {

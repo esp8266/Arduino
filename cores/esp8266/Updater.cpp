@@ -175,7 +175,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
   _md5.calculate();
   if(_target_md5.length()) {
-    if(_target_md5 != _md5.toString()){
+    if(strcasecmp(_target_md5.c_str(), _md5.toString().c_str()) != 0){
       _setError(UPDATE_ERROR_MD5);
       _reset();
       return false;
