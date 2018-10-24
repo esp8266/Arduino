@@ -294,5 +294,7 @@ class StringSumHelper: public String {
         }
 };
 
+extern const String emptyString;
+
 #endif  // __cplusplus
 #endif  // String_class_h
