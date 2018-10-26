@@ -30,7 +30,7 @@ extern "C" {
 
 #include "twi.h"
 #include "Wire.h"
-
+#include"SPI.h" 
 
 //Some boards don't have these pins available, and hence don't support Wire.
 //Check here for compile-time error.
