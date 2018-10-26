@@ -192,7 +192,6 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _size = progress();
   }
 
-
   uint32_t sigLen = 0;
   if (_verify) {
     ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
@@ -248,7 +247,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 #endif
   } else if (_target_md5.length()) {
     _md5.calculate();
-    if(_target_md5 != _md5.toString()){
+    if (strcasecmp(_target_md5.c_str(), _md5.toString().c_str())) {
       _setError(UPDATE_ERROR_MD5);
       _reset();
       return false;

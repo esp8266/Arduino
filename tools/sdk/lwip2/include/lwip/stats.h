@@ -308,7 +308,7 @@ void stats_init(void);
 
 #define STATS_INC(x) ++lwip_stats.x
 #define STATS_DEC(x) --lwip_stats.x
-#define STATS_INC_USED(x, y) do { lwip_stats.x.used += y; \
+#define STATS_INC_USED(x, y, type) do { lwip_stats.x.used = (type)(lwip_stats.x.used + y); \
                                 if (lwip_stats.x.max < lwip_stats.x.used) { \
                                     lwip_stats.x.max = lwip_stats.x.used; \
                                 } \
@@ -318,7 +318,7 @@ void stats_init(void);
 #define stats_init()
 #define STATS_INC(x)
 #define STATS_DEC(x)
-#define STATS_INC_USED(x)
+#define STATS_INC_USED(x, y, type)
 #endif /* LWIP_STATS */
 
 #if TCP_STATS
@@ -387,9 +387,9 @@ void stats_init(void);
 
 #if MEM_STATS
 #define MEM_STATS_AVAIL(x, y) lwip_stats.mem.x = y
-#define MEM_STATS_INC(x) SYS_ARCH_INC(lwip_stats.mem.x, 1)
-#define MEM_STATS_INC_USED(x, y) SYS_ARCH_INC(lwip_stats.mem.x, y)
-#define MEM_STATS_DEC_USED(x, y) SYS_ARCH_DEC(lwip_stats.mem.x, y)
+#define MEM_STATS_INC(x) STATS_INC(mem.x)
+#define MEM_STATS_INC_USED(x, y) STATS_INC_USED(mem, y, mem_size_t)
+#define MEM_STATS_DEC_USED(x, y) lwip_stats.mem.x = (mem_size_t)((lwip_stats.mem.x) - (y))
 #define MEM_STATS_DISPLAY() stats_display_mem(&lwip_stats.mem, "HEAP")
 #else
 #define MEM_STATS_AVAIL(x, y)
@@ -412,7 +412,7 @@ void stats_init(void);
 #if SYS_STATS
 #define SYS_STATS_INC(x) STATS_INC(sys.x)
 #define SYS_STATS_DEC(x) STATS_DEC(sys.x)
-#define SYS_STATS_INC_USED(x) STATS_INC_USED(sys.x, 1)
+#define SYS_STATS_INC_USED(x) STATS_INC_USED(sys.x, 1, STAT_COUNTER)
 #define SYS_STATS_DISPLAY() stats_display_sys(&lwip_stats.sys)
 #else
 #define SYS_STATS_INC(x)

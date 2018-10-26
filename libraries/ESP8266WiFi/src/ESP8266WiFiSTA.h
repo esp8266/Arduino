@@ -83,9 +83,12 @@ class ESP8266WiFiSTAClass {
 
         int32_t RSSI();
 
+        static void enableInsecureWEP (bool enable = true) { _useInsecureWEP = enable; }
+
     protected:
 
         static bool _useStaticIp;
+        static bool _useInsecureWEP;
 
     // ----------------------------------------------------------------------------------------------
     // ------------------------------------ STA remote configure  -----------------------------------
