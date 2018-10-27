@@ -29,7 +29,7 @@
 #include "cont.h"
 #include "pgmspace.h"
 #include "gdb_hooks.h"
-#include "BearSSLThunks.h"
+#include "StackThunk.h"
 
 extern void __real_system_restart_local();
 
@@ -150,13 +150,13 @@ void __wrap_system_restart_local() {
 
     ets_printf_P("\n>>>stack>>>\n");
 
-    if (sp > br_thunk_get_stack_bot() && sp <= br_thunk_get_stack_top()) {
+    if (sp > stack_thunk_get_stack_bot() && sp <= stack_thunk_get_stack_top()) {
         // BearSSL we dump the BSSL second stack and then reset SP back to the main cont stack
         ets_printf_P("\nctx: bearssl \n");
-        ets_printf_P("sp: %08x end: %08x offset: %04x\n", sp, br_thunk_get_stack_top(), offset);
-        print_stack(sp + offset, br_thunk_get_stack_top());
+        ets_printf_P("sp: %08x end: %08x offset: %04x\n", sp, stack_thunk_get_stack_top(), offset);
+        print_stack(sp + offset, stack_thunk_get_stack_top());
         offset = 0; // No offset needed anymore, the exception info was stored in the bssl stack
-        sp = br_thunk_get_cont_sp();
+        sp = stack_thunk_get_cont_sp();
     }
 
     if (sp > cont_stack_start && sp < cont_stack_end) {

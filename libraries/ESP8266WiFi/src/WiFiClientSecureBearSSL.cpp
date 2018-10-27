@@ -34,7 +34,7 @@ extern "C" {
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"
 #include "WiFiClientSecureBearSSL.h"
-#include "BearSSLThunks.h"
+#include "StackThunk.h"
 #include "lwip/opt.h"
 #include "lwip/ip.h"
 #include "lwip/tcp.h"
@@ -95,7 +95,7 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
-  br_thunk_add_ref();
+  stack_thunk_add_ref();
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
@@ -106,7 +106,7 @@ WiFiClientSecure::~WiFiClientSecure() {
   free(_cipher_list);
   _freeSSL();
   // Serial.printf("Max stack usage: %d bytes\n", br_thunk_get_max_usage());
-  br_thunk_del_ref();
+  stack_thunk_del_ref();
   if (_deleteChainKeyTA) {
     delete _ta;
     delete _chain;
@@ -119,7 +119,7 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
-  br_thunk_add_ref();
+  stack_thunk_add_ref();
   _iobuf_in_size = iobuf_in_size;
   _iobuf_out_size = iobuf_out_size;
   _client = client;
@@ -137,7 +137,7 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
                                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
-  br_thunk_add_ref();
+  stack_thunk_add_ref();
   _iobuf_in_size = iobuf_in_size;
   _iobuf_out_size = iobuf_out_size;
   _client = client;

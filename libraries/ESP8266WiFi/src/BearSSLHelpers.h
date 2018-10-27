@@ -136,4 +136,19 @@ class BearSSLSession {
     br_ssl_session_parameters _session;
 };
 
+
+// Stack thunked versions of calls
+extern "C" {
+
+extern unsigned char *thunk_br_ssl_engine_recvapp_buf( const br_ssl_engine_context *cc, size_t *len);
+extern void thunk_br_ssl_engine_recvapp_ack(br_ssl_engine_context *cc, size_t len);
+extern unsigned char *thunk_br_ssl_engine_recvrec_buf( const br_ssl_engine_context *cc, size_t *len);
+extern void thunk_br_ssl_engine_recvrec_ack(br_ssl_engine_context *cc, size_t len);
+extern unsigned char *thunk_br_ssl_engine_sendapp_buf( const br_ssl_engine_context *cc, size_t *len);
+extern void thunk_br_ssl_engine_sendapp_ack(br_ssl_engine_context *cc, size_t len);
+extern unsigned char *thunk_br_ssl_engine_sendrec_buf( const br_ssl_engine_context *cc, size_t *len);
+extern void thunk_br_ssl_engine_sendrec_ack(br_ssl_engine_context *cc, size_t len);
+
+};
+
 #endif
