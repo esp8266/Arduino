@@ -34,6 +34,17 @@
  * Author: Adam Dunkels <adam@sics.se>
  *
  */
+
+/**
+ * @defgroup perf Performance measurement
+ * @ingroup sys_layer
+ * All defines related to this section must not be placed in lwipopts.h,
+ * but in arch/perf.h!
+ * Measurement calls made throughout lwip, these can be defined to nothing.
+ * - PERF_START: start measuring something.
+ * - PERF_STOP(x): stop measuring something, and record the result.
+ */
+
 #ifndef LWIP_HDR_DEF_H
 #define LWIP_HDR_DEF_H
 
@@ -94,12 +105,12 @@ u32_t lwip_htonl(u32_t x);
 /* These macros should be calculated by the preprocessor and are used
    with compile-time constants only (so that there is no little-endian
    overhead at runtime). */
-#define PP_HTONS(x) ((((x) & 0x00ffUL) << 8) | (((x) & 0xff00UL) >> 8))
+#define PP_HTONS(x) ((u16_t)((((x) & (u16_t)0x00ffU) << 8) | (((x) & (u16_t)0xff00U) >> 8)))
 #define PP_NTOHS(x) PP_HTONS(x)
-#define PP_HTONL(x) ((((x) & 0x000000ffUL) << 24) | \
-                     (((x) & 0x0000ff00UL) <<  8) | \
-                     (((x) & 0x00ff0000UL) >>  8) | \
-                     (((x) & 0xff000000UL) >> 24))
+#define PP_HTONL(x) ((((x) & (u32_t)0x000000ffUL) << 24) | \
+                     (((x) & (u32_t)0x0000ff00UL) <<  8) | \
+                     (((x) & (u32_t)0x00ff0000UL) >>  8) | \
+                     (((x) & (u32_t)0xff000000UL) >> 24))
 #define PP_NTOHL(x) PP_HTONL(x)
 #endif /* BYTE_ORDER == BIG_ENDIAN */
 

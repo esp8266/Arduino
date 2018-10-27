@@ -41,7 +41,7 @@
 #include "core_esp8266_waveform.h"
 
 // Need speed, not size, here
-#pragma GCC optimize ("O3")
+#pragma GCC optimize ("O2")
 
 // Maximum delay between IRQs
 #define MAXIRQUS (10000)
@@ -137,7 +137,7 @@ static void initTimer() {
   timerRunning = true;
 }
 
-static void deinitTimer() {
+static void ICACHE_RAM_ATTR deinitTimer() {
   timer1_attachInterrupt(NULL);
   timer1_disable();
   timer1_isr_init();
@@ -202,7 +202,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
 }
 
 // Stops a waveform on a pin
-int stopWaveform(uint8_t pin) {
+int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   // Can't possibly need to stop anything if there is no timer active
   if (!timerRunning) {
     return false;
