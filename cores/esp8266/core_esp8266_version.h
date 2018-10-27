@@ -23,10 +23,6 @@
 #define __CORE_ESP8266_VERSION_H
 
 #include <core_version.h>
-// examples:
-//#define ARDUINO_ESP8266_GIT_DESC 2.4.2-91-gcb05b86d
-//#define ARDUINO_ESP8266_GIT_DESC 2.5.0rc3-1-gcb05b86d
-//#define ARDUINO_ESP8266_GIT_DESC 2.5.0
 
 #define STRHELPER(x) #x
 #define STR(x) STRHELPER(x)
@@ -35,92 +31,127 @@
 extern "C++"
 {
 
+// Following constexpr functions are compiled and executed
+// *after* pre-processing and *during* compilation
+//
+// Their result is treated like a numeric constant in final binary code.
+// git tags must be in the form:
+// - <major>.<minor>.<revision>       (2.4.2) (2.5.0)
+// - <major>.<minor>.<revision>-rc<rc> (2.5.0-rc1) (2.5.0-rc2)
+//
+// "git describe" = ARDUINO_ESP8266_GIT_DESC will thus be in the form:
+// - <tag> (2.4.2) (2.5.0)
+// - <tag>-<numberOfCommits>-g<git-hash> (2.4.2-91-gcb05b86d) (2.5.0-rc3-1-gcb05b86d)
+//
+// Examples:
+// case 2.4.2 (fresh version/tag)
+//     esp8266CoreVersionSubRevision() is 0   Numeric is: 20402000
+// case 2.4.2-91-gcb05b86d:
+//     esp8266CoreVersionSubRevision() is -91 Numeric is: 20402091
+// case 2.5.0-rc3-1-gcb05b86d:
+//     esp8266CoreVersionSubRevision() is 3   Numeric is: 20499903
+// case 2.5.0:
+//     esp8266CoreVersionSubRevision() is 0   Numeric is: 20500000
+
+constexpr
+bool constexpr_isDecimal (const char c)
+{
+    return c >= '0' && c <= '9';
+}
+
 template<unsigned N> constexpr
-int eVAL (const char (&arr) [N], unsigned i)
+bool constexpr_isMinus (const char (&arr) [N], unsigned i)
+{
+    return arr[i] == '-' && constexpr_isDecimal(arr[i+1]);
+}
+
+template<unsigned N> constexpr
+int constexpr_atoi (const char (&arr) [N], unsigned i)
 {
     return ({ // <= c++11 requires a "return statement"
         int ret = 0;
         int sign = 1;
-        if (arr[i] == '-') 
+        if (arr[i] == '-')
         {
             sign = -1;
             i++;
         }
-        while (arr[i] >= '0' && arr[i] <= '9')
+        while (constexpr_isDecimal(arr[i]))
             ret = 10*ret + arr[i++] - '0';
         ret * sign;
     });
 }
 
 template<unsigned N> constexpr
-int fIELDEVAL (const char (&arr) [N], unsigned f)
+int constexpr_extract_int (const char (&arr) [N], unsigned f)
 {
     return ({ // <= c++11 requires a "return statement"
         unsigned i = 0;
         while (f && arr[i])
         {
-            if (arr[i] == '-')
+            if (constexpr_isMinus(arr, i))
                 i++;
-            for (; arr[i] >= '0' && arr[i] <= '9'; i++);
+            for (; constexpr_isDecimal(arr[i]); i++);
             f--;
-            for (; arr[i] && arr[i] != '-' && (arr[i] < '0' || arr[i] > '9'); i++);
+            for (; arr[i] && !constexpr_isMinus(arr, i) && !constexpr_isDecimal(arr[i]); i++);
         }
-        eVAL(arr, i);
+        constexpr_atoi(arr, i);
     });
 }
 
 /*
  * version major
  */
-constexpr int mAJOR () { return fIELDEVAL(STR(ARDUINO_ESP8266_GIT_DESC), 0); }
+constexpr
+int esp8266CoreVersionMajor ()
+{
+    return constexpr_extract_int(STR(ARDUINO_ESP8266_GIT_DESC), 0);
+}
 
 /*
  * version minor
  */
-constexpr int mINOR () { return fIELDEVAL(STR(ARDUINO_ESP8266_GIT_DESC), 1); }
+constexpr
+int esp8266CoreVersionMinor ()
+{
+    return constexpr_extract_int(STR(ARDUINO_ESP8266_GIT_DESC), 1);
+}
 
 /*
  * version revision
  */
-constexpr int rEV   () { return fIELDEVAL(STR(ARDUINO_ESP8266_GIT_DESC), 2); }
+constexpr
+int esp8266CoreVersionRevision ()
+{
+    return constexpr_extract_int(STR(ARDUINO_ESP8266_GIT_DESC), 2);
+}
 
 /*
- * git commit number since last tag (negative) or RC-number (positive)
+ * git commit number since last tag (negative)
+ * or RC-number (positive)
  */
-constexpr int gIT   () { return fIELDEVAL(STR(ARDUINO_ESP8266_GIT_DESC), 3); }
+constexpr
+int esp8266CoreVersionSubRevision ()
+{
+    return constexpr_extract_int(STR(ARDUINO_ESP8266_GIT_DESC), 3);
+}
 
 /*
  * unique revision indentifier (never decreases)
  */
-constexpr int uNIQ  ()
+constexpr
+int esp8266CoreVersionNumeric ()
 {
-    return   mAJOR() * 100000
-           + mINOR() *  10000
-           + rEV()   *   1000
-           + (gIT() < 0? -gIT(): gIT()? gIT() - 1000: 0);
+    return   esp8266CoreVersionMajor()    * 10000000
+           + esp8266CoreVersionMinor()    *   100000
+           + esp8266CoreVersionRevision() *     1000
+           + (esp8266CoreVersionSubRevision() < 0 ?
+               -esp8266CoreVersionSubRevision() :
+               esp8266CoreVersionSubRevision() ?
+                   esp8266CoreVersionSubRevision() - 100 :
+                   0);
 }
 
 } // extern "C++"
 #endif // __cplusplus
-
-#if TESTMEWITHGCC
-
-/*
-"2.4.2-91-gcb05b86d" => 2 . 4 . 2 - -91 = 242091
-"2.5.0rc3-1-gcb05b86d" => 2 . 5 . 0 - 3 = 249003
-"2.5.0" =>                2 . 5 . 0 - 0 = 250000
-*/
-
-int main (void)
-{
-    printf("%d . %d . %d - %d = %d\n",
-        mAJOR(),
-        mINOR(),
-        rEV(),
-        gIT(),
-        uNIQ());
-    return 0;
-}
-#endif // testme
-
 #endif // __CORE_ESP8266_ESP8266_VERSION_H

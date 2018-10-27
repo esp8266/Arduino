@@ -57,7 +57,7 @@ Here is an overview of the release process. See the section below for detailed i
 
    * When done, put release notes into a private Gist and send the link to other maintainers for review.
 
-   * Update versions in cores/esp8266/core_esp8266_version.h -and- platform.txt, and commit
+   * Update `version` to the release in platform.txt and commit. E.g. `2.5.0`.
 
 2. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-rcN` for release versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
 
@@ -82,8 +82,6 @@ Here is an overview of the release process. See the section below for detailed i
 8. Create a commit to the master branch, updating:
 
    * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `2.5.0-dev`.
-
-   * The version in cores/esp8266/core_esp8266_version.h. This should correspond to the current version + 1 (e.g. 24200 -> 24201)
 
    * In main README.md:
 
