@@ -59,6 +59,9 @@ extern "C" {
 
 
 
+namespace Legacy_MDNSResponder {
+
+
 #ifdef DEBUG_ESP_MDNS
 #define DEBUG_ESP_MDNS_ERR
 #define DEBUG_ESP_MDNS_TX
@@ -965,12 +968,24 @@ void MDNSResponder::_parsePacket(){
   return _replyToInstanceRequest(questionMask, responseMask, serviceName, protoName, servicePort, interface);
 }
 
+
+/**
+ * STRINGIZE
+ */
+#ifndef STRINGIZE
+    #define STRINGIZE(x) #x
+#endif
+#ifndef STRINGIZE_VALUE_OF
+    #define STRINGIZE_VALUE_OF(x) STRINGIZE(x)
+#endif
+
+
 void MDNSResponder::enableArduino(uint16_t port, bool auth){
 
   addService("arduino", "tcp", port);
   addServiceTxt("arduino", "tcp", "tcp_check", "no");
   addServiceTxt("arduino", "tcp", "ssh_upload", "no");
-  addServiceTxt("arduino", "tcp", "board", ARDUINO_BOARD);
+  addServiceTxt("arduino", "tcp", "board", STRINGIZE_VALUE_OF(ARDUINO_BOARD));
   addServiceTxt("arduino", "tcp", "auth_upload", (auth) ? "yes":"no");
 }
 
@@ -1272,3 +1287,9 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
 MDNSResponder MDNS;
 #endif
+
+}	// namespace Legacy_MDNSResponder
+
+
+
+

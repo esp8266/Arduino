@@ -1,142 +1,49 @@
 /*
-ESP8266 Multicast DNS (port of CC3000 Multicast DNS library)
-Version 1.1
-Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
-ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
-Extended MDNS-SD support 2016 Lars Englund (lars.englund@gmail.com)
+  ESP8266mDNS.h - mDNSResponder for ESP8266 family
+  This file is part of the esp8266 core for Arduino environment.
 
-This is a simple implementation of multicast DNS query support for an Arduino
-running on ESP8266 chip. Only support for resolving address queries is currently
-implemented.
+  Legacy_ESP8266mDNS:
+  The well known, thouroughly tested (yet no flawless) default mDNS library for the ESP8266 family
 
-Requirements:
-- ESP8266WiFi library
+  LEA_ESP8266mDNS:
+  An (currently) experimental mDNS implementation, that supports a lot more of mDNS features than Legacy_ESP8266mDNS, like:
+  - Presenting a DNS-SD service to interested observers, eg. a http server by presenting _http._tcp service
+  - Support for multi-level compressed names in input; in output only a very simple one-leven full-name compression is implemented
+  - Probing host and service domains for uniqueness in the local network
+  - Tiebreaking while probing is supportet in a very minimalistic way (the 'higher' IP address wins the tiebreak)
+  - Announcing available services after successful probing
+  - Using fixed service TXT items or
+  - Using dynamic service TXT items for presented services (via callback)
+  - Remove services (and un-announcing them to the observers by sending goodbye-messages)
+  - Static queries for DNS-SD services (creating a fixed answer set after a certain timeout period)
+  - Dynamic queries for DNS-SD services with cached and updated answers and user notifications
+  - Support for multi-homed client host domains
 
-Usage:
-- Include the ESP8266 Multicast DNS library in the sketch.
-- Call the begin method in the sketch's setup and provide a domain name (without
-  the '.local' suffix, i.e. just provide 'foo' to resolve 'foo.local'), and the
-  Adafruit CC3000 class instance.  Optionally provide a time to live (in seconds)
-  for the DNS record--the default is 1 hour.
-- Call the update method in each iteration of the sketch's loop function.
+  See 'LEA_ESP8266mDNS/EPS8266mDNS.h' for more implementation details and usage informations.
+  See 'examples/mDNS_Clock' and 'examples/mDNS_ServiceMonitor' for implementation examples of the advanced features.
 
-License (MIT license):
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
+  LEA_ESP8266mDNS is (mostly) client source code compatible to 'Legacy_ESP8266mDNS', so it could be
+  use as a 'drop-in' replacement in existing projects.
 
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-  THE SOFTWARE.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 */
-#ifndef ESP8266MDNS_H
-#define ESP8266MDNS_H
 
-#include "ESP8266WiFi.h"
-#include "WiFiUdp.h"
+#include "Legacy_MDNSResponder/ESP8266MDNS.h"
+#include "LEA_MDNSResponder/ESP8266MDNS.h"
 
-//this should be defined at build time
-#ifndef ARDUINO_BOARD
-#define ARDUINO_BOARD "generic"
-#endif
-
-class UdpContext;
-
-struct MDNSService;
-struct MDNSTxt;
-struct MDNSAnswer;
-
-class MDNSResponder {
-public:
-  MDNSResponder();
-  ~MDNSResponder();
-  bool begin(const char* hostName);
-  //for compatibility
-  bool begin(const char* hostName, IPAddress ip, uint32_t ttl=120){
-    (void) ip;
-    (void) ttl;
-    return begin(hostName);
-  }
-  /* Application should call this whenever AP is configured/disabled */
-  void notifyAPChange();
-  void update();
-
-  void addService(char *service, char *proto, uint16_t port);
-  void addService(const char *service, const char *proto, uint16_t port){
-    addService((char *)service, (char *)proto, port);
-  }
-  void addService(String service, String proto, uint16_t port){
-    addService(service.c_str(), proto.c_str(), port);
-  }
-  
-  bool addServiceTxt(char *name, char *proto, char * key, char * value);
-  bool addServiceTxt(const char *name, const char *proto, const char *key,const char * value){
-    return addServiceTxt((char *)name, (char *)proto, (char *)key, (char *)value);
-  }
-  bool addServiceTxt(String name, String proto, String key, String value){
-    return addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
-  }
-  
-  int queryService(char *service, char *proto);
-  int queryService(const char *service, const char *proto){
-    return queryService((char *)service, (char *)proto);
-  }
-  int queryService(String service, String proto){
-    return queryService(service.c_str(), proto.c_str());
-  }
-  String hostname(int idx);
-  IPAddress IP(int idx);
-  uint16_t port(int idx);
-  
-  void enableArduino(uint16_t port, bool auth=false);
-
-  void setInstanceName(String name);
-  void setInstanceName(const char * name){
-    setInstanceName(String(name));
-  }
-  void setInstanceName(char * name){
-    setInstanceName(String(name));
-  }
-
-private:
-  struct MDNSService * _services;
-  UdpContext* _conn;
-  String _hostName;
-  String _instanceName;
-  struct MDNSAnswer * _answers;
-  struct MDNSQuery * _query;
-  bool _newQuery;
-  bool _waitingForAnswers;
-  WiFiEventHandler _disconnectedHandler;
-  WiFiEventHandler _gotIPHandler;
-  
-
-  uint16_t _getServicePort(char *service, char *proto);
-  MDNSTxt * _getServiceTxt(char *name, char *proto);
-  uint16_t _getServiceTxtLen(char *name, char *proto);
-  IPAddress _getRequestMulticastInterface();
-  void _parsePacket();
-  void _replyToTypeEnumRequest(IPAddress multicastInterface);
-  void _replyToInstanceRequest(uint8_t questionMask, uint8_t responseMask, char * service, char *proto, uint16_t port, IPAddress multicastInterface);
-  MDNSAnswer* _getAnswerFromIdx(int idx);
-  int _getNumAnswers();
-  bool _listen();
-  void _restart();
-};
-
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
-extern MDNSResponder MDNS;
-#endif
-
-#endif //ESP8266MDNS_H
+using namespace Legacy_MDNSResponder;
+//using namespace LEA_MDNSResponder;
