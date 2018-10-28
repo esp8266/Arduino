@@ -32,7 +32,7 @@
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
-#define LED_BUILTIN 16
+#define LED_BUILTIN 2
 
 static const uint8_t D1   = 15;
 static const uint8_t D2   = 0;
@@ -46,6 +46,7 @@ static const uint8_t D9   = 16;
 static const uint8_t RX  = 3;
 static const uint8_t TX = 1;
 static const uint8_t A0 = 0;
+/*Analog pins for Onboard ADC*/
 static const uint8_t A1 = 1;
 static const uint8_t A2 = 2;
 static const uint8_t A3 = 3;
