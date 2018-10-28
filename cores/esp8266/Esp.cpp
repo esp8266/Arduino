@@ -183,6 +183,11 @@ uint32_t EspClass::getFreeContStack()
     return cont_get_free_stack(g_pcont);
 }
 
+void EspClass::resetFreeContStack()
+{
+    cont_repaint_stack(g_pcont);
+}
+
 uint32_t EspClass::getChipId(void)
 {
     return system_get_chip_id();
