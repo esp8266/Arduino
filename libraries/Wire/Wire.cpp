@@ -212,7 +212,7 @@ void TwoWire::flush(void){
   txBufferLength = 0;
 }
 
-void TwoWire::onReceiveService(uint8_t* inBytes, int numBytes)
+void TwoWire::onReceiveService(uint8_t* inBytes, size_t numBytes)
 {
   // don't bother if user hasn't registered a callback
   if (!user_onReceive) {
