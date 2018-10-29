@@ -13,7 +13,6 @@ const uint16_t port = 17;
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
 
   // We start by connecting to a WiFi network
 
