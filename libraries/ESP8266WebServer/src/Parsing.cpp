@@ -35,41 +35,33 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
-static char* readBytesWithTimeout(WiFiClient& client, size_t maxLength, size_t& dataLength, int timeout_ms)
+static bool readBytesWithTimeout(WiFiClient& client, size_t maxLength, String& data, int timeout_ms)
 {
-  char *buf = nullptr;
-  dataLength = 0;
-  while (dataLength < maxLength) {
+  if (!data.reserve(maxLength + 1))
+    return false;
+  data[0] = 0;  // data.clear()??
+  while (data.length() < maxLength) {
     int tries = timeout_ms;
-    size_t newLength;
-    while (!(newLength = client.available()) && tries--) delay(1);
-    if (!newLength) {
+    size_t avail;
+    while (!(avail = client.available()) && tries--)
+      delay(1);
+    if (!avail)
       break;
-    }
-    if (!buf) {
-      buf = (char *) malloc(newLength + 1);
-      if (!buf) {
-        return nullptr;
-      }
-    }
-    else {
-      char* newBuf = (char *) realloc(buf, dataLength + newLength + 1);
-      if (!newBuf) {
-        free(buf);
-        return nullptr;
-      }
-      buf = newBuf;
-    }
-    client.readBytes(buf + dataLength, newLength);
-    dataLength += newLength;
-    buf[dataLength] = '\0';
+    if (data.length() + avail > maxLength)
+      avail = maxLength - data.length();
+    while (avail--)
+      data += (char)client.read();
   }
-  return buf;
+  return data.length() == maxLength;
 }
 
 bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
+#ifdef DEBUG_ESP_HTTP_SERVER
+    DEBUG_OUTPUT.print("request: ");
+    DEBUG_OUTPUT.println(req);
+#endif
   client.readStringUntil('\n');
   //reset header value
   for (int i = 0; i < _headerKeysCount; ++i) {
@@ -82,8 +74,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   int addr_end = req.indexOf(' ', addr_start + 1);
   if (addr_start == -1 || addr_end == -1) {
 #ifdef DEBUG_ESP_HTTP_SERVER
-    DEBUG_OUTPUT.print("Invalid request: ");
-    DEBUG_OUTPUT.println(req);
+    DEBUG_OUTPUT.println("Invalid request");
 #endif
     return false;
   }
@@ -139,7 +130,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     String headerName;
     String headerValue;
     bool isForm = false;
-    //bool isEncoded = false;
+    bool isEncoded = false;
     uint32_t contentLength = 0;
     //parse headers
     while(1){
@@ -168,7 +159,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
           isForm = false;
         } else if (headerValue.startsWith(F("application/x-www-form-urlencoded"))){
           isForm = false;
-          //isEncoded = true;
+          isEncoded = true;
         } else if (headerValue.startsWith(F("multipart/"))){
           boundaryStr = headerValue.substring(headerValue.indexOf('=') + 1);
           boundaryStr.replace("\"","");
@@ -181,34 +172,40 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
       }
     }
 
-    // always parse url for key/value pairs
+    String plainBuf;
+    if (   !isForm
+        && // read content into plainBuf
+           (   !readBytesWithTimeout(client, contentLength, plainBuf, HTTP_MAX_POST_WAIT)
+            || (plainBuf.length() < contentLength)
+           )
+       )
+    {
+        return false;
+    }
+
+    if (isEncoded) {
+        // isEncoded => !isForm => plainBuf is not empty
+        // add plainBuf in search str
+        if (searchStr.length())
+          searchStr += '&';
+        searchStr += plainBuf;
+    }
+
+    // parse searchStr for key/value pairs
     _parseArguments(searchStr);
 
     if (!isForm) {
       if (contentLength) {
-
         // add key=value: plain={body} (post json or other data)
-
-        size_t plainLength;
-        char* plainBuf = readBytesWithTimeout(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
-        if (plainLength < contentLength) {
-          free(plainBuf);
-          return false;
-        }
-
         RequestArgument& arg = _currentArgs[_currentArgCount++];
         arg.key = F("plain");
-        arg.value = String(plainBuf);
-
-        free(plainBuf);
-
+        arg.value = plainBuf;
       }
     } else { // isForm is true
-
+      // here: content is not yet read (plainBuf is still empty)
       if (!_parseForm(client, boundaryStr, contentLength)) {
         return false;
       }
-
     }
   } else {
     String headerName;
@@ -368,7 +365,7 @@ uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
   return (uint8_t)res;
 }
 
-bool ESP8266WebServer::_parseForm(WiFiClient& client, String boundary, uint32_t len){
+bool ESP8266WebServer::_parseForm(WiFiClient& client, const String& boundary, uint32_t len){
   (void) len;
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");
