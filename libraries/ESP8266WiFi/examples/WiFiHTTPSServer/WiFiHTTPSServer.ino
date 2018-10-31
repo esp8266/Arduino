@@ -114,7 +114,6 @@ WiFiServerSecure server(443);
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
 
   // prepare GPIO2
   pinMode(2, OUTPUT);
