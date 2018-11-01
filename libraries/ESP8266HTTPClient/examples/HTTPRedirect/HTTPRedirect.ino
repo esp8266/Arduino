@@ -41,6 +41,7 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
+    WiFiClient client;
     HTTPClient http;
 
     // we need the Location header to handle redirects
@@ -52,7 +53,7 @@ void loop() {
 
     Serial.print("[HTTP] begin...\n");
     // configure url
-    http.begin("http://jigsaw.w3.org/HTTP/300/307.html"); //HTTP
+    http.begin(client, "http://jigsaw.w3.org/HTTP/300/307.html"); //HTTP
 
     Serial.print("[HTTP] GET...\n");
     // start connection and send HTTP header
