@@ -100,10 +100,10 @@ void ESP8266WebServer::begin(uint16_t port) {
   _server.begin(port);
 }
 
-String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit){
+String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit) const {
   int _begin = authReq.indexOf(param);
-  if (_begin == -1) 
-    return "";
+  if (_begin == -1)
+    return emptyString;
   return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
 
@@ -487,35 +487,35 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
       contentType != String(FPSTR(mimeTable[none].mimeType))) {
     sendHeader(F("Content-Encoding"), F("gzip"));
   }
-  send(200, contentType, "");
+  send(200, contentType, emptyString);
 }
 
 
-String ESP8266WebServer::arg(String name) {
+const String& ESP8266WebServer::arg(String name) const {
   for (int i = 0; i < _currentArgCount; ++i) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
   }
-  return "";
+  return emptyString;
 }
 
-String ESP8266WebServer::arg(int i) {
-  if (i < _currentArgCount)
+const String& ESP8266WebServer::arg(int i) const {
+  if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].value;
-  return "";
+  return emptyString;
 }
 
-String ESP8266WebServer::argName(int i) {
-  if (i < _currentArgCount)
+const String& ESP8266WebServer::argName(int i) const {
+  if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].key;
-  return "";
+  return emptyString;
 }
 
-int ESP8266WebServer::args() {
+int ESP8266WebServer::args() const {
   return _currentArgCount;
 }
 
-bool ESP8266WebServer::hasArg(String  name) {
+bool ESP8266WebServer::hasArg(const String& name) const {
   for (int i = 0; i < _currentArgCount; ++i) {
     if (_currentArgs[i].key == name)
       return true;
@@ -524,12 +524,12 @@ bool ESP8266WebServer::hasArg(String  name) {
 }
 
 
-String ESP8266WebServer::header(String name) {
+const String& ESP8266WebServer::header(String name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if (_currentHeaders[i].key.equalsIgnoreCase(name))
       return _currentHeaders[i].value;
   }
-  return "";
+  return emptyString;
 }
 
 void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
@@ -543,23 +543,23 @@ void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t hea
   }
 }
 
-String ESP8266WebServer::header(int i) {
+const String& ESP8266WebServer::header(int i) const {
   if (i < _headerKeysCount)
     return _currentHeaders[i].value;
-  return "";
+  return emptyString;
 }
 
-String ESP8266WebServer::headerName(int i) {
+const String& ESP8266WebServer::headerName(int i) const {
   if (i < _headerKeysCount)
     return _currentHeaders[i].key;
-  return "";
+  return emptyString;
 }
 
-int ESP8266WebServer::headers() {
+int ESP8266WebServer::headers() const {
   return _headerKeysCount;
 }
 
-bool ESP8266WebServer::hasHeader(String name) {
+bool ESP8266WebServer::hasHeader(String name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if ((_currentHeaders[i].key.equalsIgnoreCase(name)) &&  (_currentHeaders[i].value.length() > 0))
       return true;
@@ -567,7 +567,7 @@ bool ESP8266WebServer::hasHeader(String name) {
   return false;
 }
 
-String ESP8266WebServer::hostHeader() {
+const String& ESP8266WebServer::hostHeader() const {
   return _hostHeader;
 }
 
@@ -612,11 +612,11 @@ void ESP8266WebServer::_handleRequest() {
 
 void ESP8266WebServer::_finalizeResponse() {
   if (_chunked) {
-    sendContent("");
+    sendContent(emptyString);
   }
 }
 
-String ESP8266WebServer::_responseCodeToString(int code) {
+const String ESP8266WebServer::_responseCodeToString(int code) {
   switch (code) {
     case 100: return F("Continue");
     case 101: return F("Switching Protocols");

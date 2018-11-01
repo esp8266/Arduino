@@ -55,8 +55,11 @@ class WiFiClientSecure : public WiFiClient {
     int read() override;
     int peek() override;
     size_t peekBytes(uint8_t *buffer, size_t length) override;
-    void stop() override;
-    void flush() override;
+    bool flush(unsigned int maxWaitMs = 0) override;
+    bool stop(unsigned int maxWaitMs = 0) override;
+
+    // Allow sessions to be saved/restored automatically to a memory area
+    void setSession(BearSSLSession *session) { _session = session; }
 
     // Don't validate the chain, just accept whatever is given.  VERY INSECURE!
     void setInsecure() {
@@ -70,11 +73,13 @@ class WiFiClientSecure : public WiFiClient {
       _knownkey_usages = usages;
     }
     // Only check SHA1 fingerprint of certificate
-    void setFingerprint(const uint8_t fingerprint[20]) {
+    bool setFingerprint(const uint8_t fingerprint[20]) {
       _clearAuthenticationSettings();
       _use_fingerprint = true;
       memcpy_P(_fingerprint, fingerprint, 20);
+      return true;
     }
+    bool setFingerprint(const char *fpStr);
     // Accept any certificate that's self-signed
     void allowSelfSignedCerts() {
       _clearAuthenticationSettings();
@@ -117,7 +122,7 @@ class WiFiClientSecure : public WiFiClient {
     static bool probeMaxFragmentLength(const String host, uint16_t port, uint16_t len);
 
     // AXTLS compatible wrappers
-    bool verify(const char* fingerprint, const char* domain_name) { (void) fingerprint; (void) domain_name; return false; } // Can't handle this case, need app code changes
+    // Cannot implement this mode, we need FP before we can connect: bool verify(const char* fingerprint, const char* domain_name)
     bool verifyCertChain(const char* domain_name) { (void)domain_name; return connected(); } // If we're connected, the cert passed validation during handshake
 
     bool setCACert(const uint8_t* pk, size_t size);
@@ -169,6 +174,10 @@ class WiFiClientSecure : public WiFiClient {
     int _iobuf_out_size;
     bool _handshake_done;
     bool _oom_err;
+
+    // Optional storage space pointer for session parameters
+    // Will be used on connect and updated on close
+    BearSSLSession *_session;
 
     bool _use_insecure;
     bool _use_fingerprint;
@@ -222,6 +231,7 @@ class WiFiClientSecure : public WiFiClient {
   private:
     // Single memory buffer used for BearSSL auxilliary stack, insead of growing main Arduino stack for all apps
     static std::shared_ptr<uint8_t> _bearssl_stack;
+    void _ensureStackAvailable(); // Allocate the stack if necessary
     // The local copy, only used to enable a reference count
     std::shared_ptr<uint8_t> _local_bearssl_stack;
 };
