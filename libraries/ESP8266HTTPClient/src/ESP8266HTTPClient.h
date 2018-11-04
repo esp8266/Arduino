@@ -171,6 +171,8 @@ public:
     void setAuthorization(const char * user, const char * password);
     void setAuthorization(const char * auth);
     void setTimeout(uint16_t timeout);
+    void setFollowRedirects(bool follow);
+    void setRedirectLimit(uint16_t limit); // max redirects to follow for a single request
     bool setURL(String url); // handy for handling redirects
     void useHTTP10(bool usehttp10 = true);
 
@@ -198,12 +200,12 @@ public:
 
 
     int getSize(void);
+    const String& getLocation(void); // Location header from redirect if 3XX
 
     WiFiClient& getStream(void);
     WiFiClient* getStreamPtr(void);
     int writeToStream(Stream* stream);
     const String& getString(void);
-
     static String errorToString(int error);
 
 protected:
@@ -213,7 +215,7 @@ protected:
     };
 
     bool beginInternal(String url, const char* expectedProtocol);
-    void disconnect();
+    void disconnect(bool preserveClient = false);
     void clear();
     int returnError(int error);
     bool connect(void);
@@ -248,6 +250,10 @@ protected:
     int _returnCode = 0;
     int _size = -1;
     bool _canReuse = false;
+    bool _followRedirects = false;
+    uint16_t _redirectCount = 0;
+    uint16_t _redirectLimit = 10;
+    String _location;
     transferEncoding_t _transferEncoding = HTTPC_TE_IDENTITY;
     std::unique_ptr<StreamString> _payload;
 };
