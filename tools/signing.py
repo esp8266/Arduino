@@ -43,7 +43,6 @@ def main():
             with open(args.bin, "rb") as b:
                 bin = b.read()
                 sha256 = hashlib.sha256(bin)
-                sys.stderr.write("Signing SHA256 = " + sha256.hexdigest() + "\n");
                 signcmd = [ 'openssl', 'rsautl', '-sign', '-inkey', args.privatekey ]
                 proc = subprocess.Popen(signcmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
                 signout = proc.communicate(input=sha256.digest())[0]
