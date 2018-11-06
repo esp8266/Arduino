@@ -44,20 +44,20 @@ Make your own risk analysis and depending on application decide what library fun
 Advanced Security - Signed Updates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-While the above password-based security will dissuade casual hacking attempts, it is not highly secure.  For applications where a higher level of security is needed, cryptographically signed OTA updates can be required.  This is a significantly higher level of security for your application than the basic levels described above.  It uses SHA256 hashing in place of MD5 (which is known to be cryptographically broken) and RSA-2048 bit level encryption to guarantee only the holder of a cryptographic private key can generate code accepted by the OTA update mechanisms.
+While the above password-based security will dissuade casual hacking attempts, it is not highly secure.  For applications where a higher level of security is needed, cryptographically signed OTA updates can be required.  It uses SHA256 hashing in place of MD5 (which is known to be cryptographically broken) and RSA-2048 bit level encryption to guarantee only the holder of a cryptographic private key can generate code accepted by the OTA update mechanisms.
 
 These are updates whose compiled binary are signed with a private key (held by the developer) and verified with a public key (stored in the application and available for all to see).  The signing process computes a hash of the binary code, encrypts the hash with the developer's private key, and appends this encrypted hash to the binary that is uploaded (via OTA, web, or HTTP server).  If the code is modified or replaced in any way by anyone by the developer with the key, the hash will not match and the ESP8266 will reject the upload and not accept it.
 
 Cryptographic signing only protects against tampering of binaries delivered OTA.  If someone has physical access they will always be able to flash the device over the serial port.  Signing also does not encrypt anything but the hash (so that it can't be modified), so this does not provide protection for code inside the device.  Again, if a user has physical access they can read out your program.
 
-Securing your private key is paramount.  The same private/public keypair needs to be used to sign binaries as the original upload.  Loss of the private key associated with a binary means that you will not be able to OTA to update any of your devices in the field.  Alternatively, if the private key is copied, then the copy can be used to sign binaries which will be accepted.
+**Securing your private key is paramount.  The same private/public keypair needs to be used to sign binaries as the original upload.  Loss of the private key associated with a binary means that you will not be able to OTA to update any of your devices in the field.  Alternatively, if the private key is copied, then the copy can be used to sign binaries which will be accepted.**
 
 Signed Binary Format
 ^^^^^^^^^^^^^^^^^^^^
 
 The format of a signed binary is compatible with the standard binary format, and can be uploaded to a non-signed ESP8266 via serial or OTA without any conditions.  Note, however, that once an unsigned OTA app is overwritten by this signed version, further updates will require signing.
 
-As shown below, the signed hash is appended to the unsigned binary followed by the total length of the signed hash and length dword (i.e. if the signed has was 64 bytes, then this uint32 will contain 64+4=68).  This format allows for extensibility (such as adding in a CA-based validation scheme allowing multiple signing keys all based off of a trust anchor), and pull requests are always welcome.
+As shown below, the signed hash is appended to the unsigned binary followed by the total length of the signed hash (i.e. if the signed has was 64 bytes, then this uint32 will contain 64).  This format allows for extensibility (such as adding in a CA-based validation scheme allowing multiple signing keys all based off of a trust anchor), and pull requests are always welcome.
 
 .. code::
 
@@ -83,24 +83,27 @@ The simplest way of implementing signing is to use the automatic mode.  This mod
 To enable this mode, just include `private.key` and `public.key` in the sketch `.ino` directory.  The IDE will call a helper script (`tools/signing.py`) before the build begins to create a header to enable key validation using the given public key, and after the build process to actually do the signing, generating a `sketch.bin.signed` file.  When OTA is enabled (ArduinoOTA, Web, or HTTP) the binary will only accept signed updates automatically.
 
 When the signing process starts, the message:
+
 .. code::
 
     Enabling binary signing
 
 Will appear in the IDE window before a compile is launched, and at the completion of the build the signed binary file well be displayed in the IDE build window as:
+
 .. code::
 
     Signed binary: /full/path/to/sketch.bin.signed
 
 If you receive either of the following messages in the IDE window, the signing was not completed and you will need to verify the `public.key` and `private.key`:
+
 .. code::
 
     Not enabling binary signing
     ... or ...
     Not signing the generated binary
 
-Manual Signing
-^^^^^^^^^^^^^^
+Manual Signing Binaries
+^^^^^^^^^^^^^^^^^^^^^^^
 
 Users may also manually sign executables and require the OTA process to verify their signature.  In the main code, before enabling any update methods, add the call:
 
@@ -116,7 +119,7 @@ Users may also manually sign executables and require the OTA process to verify t
 
 The above snipped creates a BearSSL public key, a SHA256 hash verifier, and tells the Update object to use them to validate any updates it receives from any method.
 
-Compile the sketch normally and, onve a `.bin` file is available, sign it using the signer script:
+Compile the sketch normally and, once a `.bin` file is available, sign it using the signer script:
 
 .. code:: bash
 
