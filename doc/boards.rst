@@ -200,6 +200,8 @@ the first value respects the pin setup of the Pins 0, 2 and 15.
 
 note: - number = ((GPIO15 << 2) \| (GPIO0 << 1) \| GPIO2);
 
+The second value .... what about the fucking second value???
+
 Generic ESP8285 Module
 ----------------------
 
