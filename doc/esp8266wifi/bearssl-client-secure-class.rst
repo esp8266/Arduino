@@ -5,12 +5,12 @@ BearSSL WiFi Classes
 
 Methods and properties described in this section are specific to ESP8266. They are not covered in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ documentation. Before they are fully documented please refer to information below.
 
-The `BearSSL <https://bearssl.org>`__ library (with modifications for ESP8266 compatibility and to use ROM tables whenver possible) is used to perform all cryptography and TLS operations.
+The `BearSSL <https://bearssl.org>`__ library (with modifications for ESP8266 compatibility and to use ROM tables whenever possible) is used to perform all cryptography and TLS operations.  The main ported repo is available `on GitHub <https://github.com/earlephilhower/bearssl-esp8266>`__.
 
 CPU Requirements
 ~~~~~~~~~~~~~~~~
 
-SSL operations take significant CPU cycles to run, so it is recommended that all TLS/SSL sketches to run at `160 Mhz` and not the default `80 Mhz`.  Even at 160 MHz, certain key exchanges can take multiple *seconds* of runtime to complete.  There is no special cryptographic hardware in the ESP8266, nor is there a 32x32=>64 multiplier, nor is the program stored in onboard RAM, so there is little that can be done to speed this up.  See the secton on limiting cryptographic negotiation for ways of ensuring faster modes are used.
+SSL operations take significant CPU cycles to run, so it is recommended that all TLS/SSL sketches to run at `160 Mhz` and not the default `80 Mhz`.  Even at 160 MHz, certain key exchanges can take multiple *seconds* of runtime to complete.  There is no special cryptographic hardware in the ESP8266, nor is there a 32x32=>64 multiplier, nor is the program stored in onboard RAM, so there is little that can be done to speed this up.  See the section on limiting cryptographic negotiation for ways of ensuring faster modes are used.
 
 Memory Requirements
 ~~~~~~~~~~~~~~~~~~~
@@ -43,12 +43,12 @@ Because the pointer to the local object `x509` no longer is valid after setup(),
 
 As a rule, either keep your objects global, use `new` to create them, or ensure that all objects needed live inside the same scope as the client.
 
-TLS and HTTPS basics
+TLS and HTTPS Basics
 ~~~~~~~~~~~~~~~~~~~~
 
 The following discussion is only intended to give a rough idea of TLS/HTTPS(which is just HTTP over a TLS connection) and the components an application needs to manage to make a TLS connection.  For more detailed information, please check the relevant `RFC 5246 <https://www.ietf.org/rfc/rfc5246>`__ and others.
 
-TLS can be broken into two stages: verifying the identities of server (and potentially client), and then encrypting clocks of data bidirectionally.
+TLS can be broken into two stages: verifying the identities of server (and potentially client), and then encrypting clocks of data bidirectionally.  Verifying the identity of the other partner is handled via keys encoded in X509 certificates, optionally signed by a series of other entities.
 
 
 Public and Private Keys
@@ -71,7 +71,7 @@ TLS Sessions
 
 TLS supports the notion of a session (completely independent and different from HTTP sessions) which allow clients to reconnect to a server without having to renegotiate encryption settings or validate X509 certificates.  This can save significant time (3-4 seconds in the case of EC keys) and can help save power by allowing the ESP8266 to sleep for a long time, reconnect and transmit some samples using the SSL session, and then jump back to sleep quicker.
 
-`BearSSLSession` is an opaque class.  Use the `BearSSL::WiFiClientSecure.setSession(&BearSSLSession)` method to apply it before the first `BearSSL::WiFiClientSecure.connect()` and it will be updated with session parameters during the operation of the connection.  After the connection had had `.close()` called on it, serialize the `BearSSLSession` object to stable store (EEPROM, RTC RAM, etc) and restore it before trying to resonnect.  See the `BearSSL_Sessions` example for a detailed example.
+`BearSSLSession` is an opaque class.  Use the `BearSSL::WiFiClientSecure.setSession(&BearSSLSession)` method to apply it before the first `BearSSL::WiFiClientSecure.connect()` and it will be updated with session parameters during the operation of the connection.  After the connection has had `.close()` called on it, serialize the `BearSSLSession` object to stable storage (EEPROM, RTC RAM, etc.) and restore it before trying to reconnect.  See the `BearSSL_Sessions` example for a detailed example.
 
 
 X.509 Certificate(s)
@@ -79,7 +79,7 @@ X.509 Certificate(s)
 
 X509 certificates are used to identify peers in TLS connections.  Normally only the server identifies itself, but the client can also supply an X509 certificate if desired (this is often done in MQTT applications).  The certificate contains many fields, but the most interesting in our applications are the name, the public key, and potentially a chain of signing that leads back to a trusted authority (like a global internet CA or a company-wide private certificate authority).
 
-Any call that takes an X509 certificate can also take a list of X509 certificates, so there is no special `X509` class, simply `BearSSLX509List` (which may only contain a sincle certificate).
+Any call that takes an X509 certificate can also take a list of X509 certificates, so there is no special `X509` class, simply `BearSSLX509List` (which may only contain a single certificate).
 
 Generating a certificate to be used to validate using the constructor
 
@@ -89,7 +89,7 @@ Generating a certificate to be used to validate using the constructor
     ...or...
     BearSSLX509List(const uint8_t *derCert, size_t derLen);
 
-If you need to add additional certificates (unlikely in normal operation, the `::append()` operation can be used.
+If you need to add additional certificates (unlikely in normal operation), the `::append()` operation can be used.
 
 
 Certificate Stores
@@ -101,7 +101,7 @@ In many cases your application will know the specific CA it needs to validate we
 
 However, there are cases where you will not know beforehand which CA you will need (i.e. a user enters a website through a keypad), and you need to keep the list of CAs just like your web browser.  In those cases, you need to generate a certificate bundle on the PC while compiling your application, upload the `certs.ar` bundle to SPIFFS or SD when uploading your application binary, and pass it to a `BearSSL::CertStore()` in order to validate TLS peers.
 
-See the `BearSSL_CertStore` example for full details as the `BearSSL::CertStore` requires the creation of a cookie-cutter object for filesystem access (because the SD and SPIFFS filesystems are presently incompatible with each other).  At a high level in your `setup()` you will call `BearSSL::initCertStore()` on a global object, and then pass this global certificate store to `client.setCertStore(&gCA)` before every connection attempt to enable it as a validatiaon option.
+See the `BearSSL_CertStore` example for full details as the `BearSSL::CertStore` requires the creation of a cookie-cutter object for filesystem access (because the SD and SPIFFS filesystems are presently incompatible with each other).  At a high level in your `setup()` you will call `BearSSL::initCertStore()` on a global object, and then pass this global certificate store to `client.setCertStore(&gCA)` before every connection attempt to enable it as a validation option.
 
 Supported Crypto
 ~~~~~~~~~~~~~~~~
@@ -117,7 +117,7 @@ BearSSL::WiFiClientSecure Class
 Validating X509 Certificates (Am I talking to the server I think I'm talking to?)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to connecting to a server, the `BearSSL::WiFiClientSecure` needs to be told how to verify the identity of the other machine.  **By default BearSSL will not validate any connections and will refuse to connect to any server.**  This is a significant difference from the earlier `axTLS::WiFiClientSecure` in that the deprecated axTLS client would connect to any server and would only attempt to validate the identidy of the remote server if asked to, after connection.
+Prior to connecting to a server, the `BearSSL::WiFiClientSecure` needs to be told how to verify the identity of the other machine.  **By default BearSSL will not validate any connections and will refuse to connect to any server.**  This is a significant difference from the earlier `axTLS::WiFiClientSecure` in that the deprecated axTLS client would connect to any server and would only attempt to validate the identity of the remote server if asked to, after connection.
 
 There are multiple modes to tell BearSSL how to verify the identity of the remote server.  See the `BearSSL_Validation` example for real uses of the following methods:
 
@@ -134,7 +134,7 @@ Assume the server is using the specific public key.  This does not verify the id
 setFingerprint(const uint8_t fp[20]) / setFingerprint(const char *fpStr)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Verify the SHA1 fingerprint of the certificate returned matches this one.  If the server certificate changes, it will fail.  If an array of 20 bytes are sent in, it is assumed they are the binary SHA1 values.  If a `char*` string is passed in, it is parsed as a series of human-readable hex values separated by spaces or colons (i.e. `setFingerprint("00:01:02:03:...:1f");`)
+Verify the SHA1 fingerprint of the certificate returned matches this one.  If the server certificate changes, it will fail.  If an array of 20 bytes are sent in, it is assumed they are the binary SHA1 values.  If a `char*` string is passed in, it is parsed as a series of human-readable hex values separated by spaces or colons (e.g. `setFingerprint("00:01:02:03:...:1f");`)
 
 setTrustAnchors(BearSSLX509List *ta)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -149,12 +149,12 @@ For `setTrustAnchors` and `CertStore` , the current time (set via SNTP) is used 
 Client Certificates (Proving I'm who I say I am to the server)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TLS servers can request that a client identify themselves with an X509 certificate signed by a trust anchor it honors (i.e. a global TA or a private CA).  This is commonly done for applicaitons like MQTT.  By default the client doesn't sent a certificate, and in cases where a certificate is required the server will disconnect and no connection will be possible.
+TLS servers can request that a client identify themselves with an X509 certificate signed by a trust anchor it honors (i.e. a global TA or a private CA).  This is commonly done for applications like MQTT.  By default the client doesn't send a certificate, and in cases where a certificate is required the server will disconnect and no connection will be possible.
 
 setClientRSACert / setClientECCert
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sets a client certificate to send to a TLS server that requests one.  It should be called before `connect()` to add a certificate to the client in case the server requests is.  Note that certificates include both a certificate and a private key.  Both should be provided to you by your certificate generator.  Elliptic Curve (EC) keys require additional information, as shown in the prototype.
+Sets a client certificate to send to a TLS server that requests one.  It should be called before `connect()` to add a certificate to the client in case the server requests it.  Note that certificates include both a certificate and a private key.  Both should be provided to you by your certificate generator.  Elliptic Curve (EC) keys require additional information, as shown in the prototype.
 
 MFLN or Maximum Fragment Length Negotiation (Saving RAM)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,19 +163,19 @@ Because TLS was developed on systems with many megabytes of memory, they require
 
 We can (and do) minimize the transmission buffer down to slightly more than 512 bytes to save memory, since BearSSL can internally ensure transmissions larger than that are broken up into smaller chunks that do fit.  But that still leaves the 16KB receive buffer requirement since we cannot in general guarantee the TLS peer will send in smaller chunks.
 
-TLS 1.2 added MFLN, which lets a client negotiate smaller buffers with a server and reduce the memory requirements on the ESP8266.  Unfortunatly, BearSSL needs to know the buffer sizes before it begins connection, so applications that want to use smaller buffers need to check the remote server's support before `connect()` .
+TLS 1.2 added MFLN, which lets a client negotiate smaller buffers with a server and reduce the memory requirements on the ESP8266.  Unfortunately, BearSSL needs to know the buffer sizes before it begins connection, so applications that want to use smaller buffers need to check the remote server's support before `connect()` .
 
 probeMaxFragmentLength(host, port, len)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use one of these calls **before** connection to determine if a specific fragment length is supported (len must be a power of two from 512 to 4096, per the TLC specification).  This does **not** initiate a SSL connection, it simply opens a TCP port and performs a trial handshake to check support.
+Use one of these calls **before** connection to determine if a specific fragment length is supported (len must be a power of two from 512 to 4096, per the specification).  This does **not** initiate a SSL connection, it simply opens a TCP port and performs a trial handshake to check support.
 
 setBufferSizes(int recv, int xmit)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Once you have verified (or know beforehand) that MFLN is supported you can use this call to set the size of memory buffers allocated by the connection object.  This must be called **before** `connect()` or it will be ignored.
 
-In certain applications where the TLS server does not support MFLN (not many do as of this writing as it is relatively new to OpenSSL) but you control both the ESP8266 and the server to which it is communicating, you may still be able to `setBufferSizes()` smaller if you guarantee no chunk of data will overflow those buffers.
+In certain applications where the TLS server does not support MFLN (not many do as of this writing as it is relatively new to OpenSSL), but you control both the ESP8266 and the server to which it is communicating, you may still be able to `setBufferSizes()` smaller if you guarantee no chunk of data will overflow those buffers.
 
 Sessions (Resuming connections fast)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -183,7 +183,7 @@ Sessions (Resuming connections fast)
 setSession(BearSSLSession &sess)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you are connecting to a server repeatedly in a fixed time period (usually 30 or 60 minuntes, but normally configurable at the server), a TLS session can be used to cache crypto settings and speed up connections significantly.
+If you are connecting to a server repeatedly in a fixed time period (usually 30 or 60 minutes, but normally configurable at the server), a TLS session can be used to cache crypto settings and speed up connections significantly.
 
 Errors
 ~~~~~~
@@ -193,7 +193,7 @@ BearSSL can fail in many more unique and interesting ways then the deprecated ax
 getLastSSLError(char *dest = NULL, size_t len = 0)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Returns the last BearSSL error code encountered, and if passed in a pointer to a character array and length it will also give a human-readable form of the error for display.
+Returns the last BearSSL error code encountered and optionally set a user-allocated buffer to a human-readable form of the error.  To only get the last error integer code, just call without any parameters (`int errCode = getLastSSLError();`).
 
 Limiting Ciphers (New connections faster)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
