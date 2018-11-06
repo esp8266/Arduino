@@ -125,7 +125,7 @@ class X509List {
 // significantly faster.  Completely optional.
 class WiFiClientSecure;
 
-class SSLSession {
+class Session {
   friend class WiFiClientSecure;
 
   public:
