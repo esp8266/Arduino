@@ -12,7 +12,7 @@ CPU Requirements
 
 SSL operations take significant CPU cycles to run, so it is recommended that all TLS/SSL sketches to run at `160 Mhz` and not the default `80 Mhz`.  Even at 160 MHz, certain key exchanges can take multiple *seconds* of runtime to complete.  There is no special cryptographic hardware in the ESP8266, nor is there a 32x32=>64 multiplier, nor is the program stored in onboard RAM, so there is little that can be done to speed this up.
 
-See the section on `sessions <sessions-resuming-connections-fast>`__ and `limiting cryptographic negotiation <limiting-ciphers-new-connections-faster>`__ for ways of ensuring faster modes are used.
+See the section on `sessions <#sessions-resuming-connections-fast>`__ and `limiting cryptographic negotiation <#limiting-ciphers-new-connections-faster>`__ for ways of ensuring faster modes are used.
 
 Memory Requirements
 ~~~~~~~~~~~~~~~~~~~
@@ -22,7 +22,7 @@ BearSSL doesn't perform memory allocations at runtime, but it does require alloc
 
 The per-application secondary stack is approximately 5.6KB in size and is used for temporary variables during BearSSL processing.  Only one stack is required, and it will be allocated whenever any `BearSSL::WiFiClientSecure` or `BearSSL::WiFiServerSecure` are instantiated.  So, in the case of a global client or server, the memory will be allocated before `setup()` is called.
 
-The per-connection buffers are approximately 22KB in size, but in certain circumstances it can be reduced dramatically by using MFLN or limiting message sizes.  See the `MLFN section <mfln-or-maximum-fragment-length-negotiation-saving-ram>`__ below for more information.
+The per-connection buffers are approximately 22KB in size, but in certain circumstances it can be reduced dramatically by using MFLN or limiting message sizes.  See the `MLFN section <#mfln-or-maximum-fragment-length-negotiation-saving-ram>`__ below for more information.
 
 Object Lifetimes
 ~~~~~~~~~~~~~~~~
@@ -75,7 +75,7 @@ TLS supports the notion of a session (completely independent and different from 
 
 `BearSSLSession` is an opaque class.  Use the `BearSSL::WiFiClientSecure.setSession(&BearSSLSession)` method to apply it before the first `BearSSL::WiFiClientSecure.connect()` and it will be updated with session parameters during the operation of the connection.  After the connection has had `.close()` called on it, serialize the `BearSSLSession` object to stable storage (EEPROM, RTC RAM, etc.) and restore it before trying to reconnect.  See the `BearSSL_Sessions` example for a detailed example.
 
-`Sessions <sessions-resuming-connections-fast>`__ contains additional information on the sessions API.
+`Sessions <#sessions-resuming-connections-fast>`__ contains additional information on the sessions API.
 
 X.509 Certificate(s)
 ~~~~~~~~~~~~~~~~~~~~
