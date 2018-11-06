@@ -60,7 +60,7 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         http.end();
 
         httpCode = http.POST("bar");
-        // its not expected to work but should not ccrash
+        // its not expected to work but should not crash
         REQUIRE(httpCode == HTTPC_ERROR_CONNECTION_REFUSED);
         http.end();
     }
