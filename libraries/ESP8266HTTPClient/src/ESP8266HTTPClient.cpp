@@ -1120,7 +1120,7 @@ bool HTTPClient::connect(void)
     }
 
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
-    if(!_client) {
+    if(!_client && _transportTraits) {
         _tcpDeprecated = _transportTraits->create();
         _client = _tcpDeprecated.get();
     }
