@@ -34,7 +34,7 @@ There are many configuration options that require passing in a pointer to an obj
     BearSSL::WiFiClientSecure client;
     const char x509CA PROGMEM = ".......";
     void setup() {
-        BearSSLX509List x509(x509CA);
+        BearSSL::X509List x509(x509CA);
         client.setTrustAnchor(&x509);
     }
     void loop() {
@@ -73,7 +73,7 @@ TLS Sessions
 
 TLS supports the notion of a session (completely independent and different from HTTP sessions) which allow clients to reconnect to a server without having to renegotiate encryption settings or validate X509 certificates.  This can save significant time (3-4 seconds in the case of EC keys) and can help save power by allowing the ESP8266 to sleep for a long time, reconnect and transmit some samples using the SSL session, and then jump back to sleep quicker.
 
-`BearSSLSession` is an opaque class.  Use the `BearSSL::WiFiClientSecure.setSession(&BearSSLSession)` method to apply it before the first `BearSSL::WiFiClientSecure.connect()` and it will be updated with session parameters during the operation of the connection.  After the connection has had `.close()` called on it, serialize the `BearSSLSession` object to stable storage (EEPROM, RTC RAM, etc.) and restore it before trying to reconnect.  See the `BearSSL_Sessions` example for a detailed example.
+`BearSSL::Session` is an opaque class.  Use the `BearSSL::WiFiClientSecure.setSession(&BearSSLSession)` method to apply it before the first `BearSSL::WiFiClientSecure.connect()` and it will be updated with session parameters during the operation of the connection.  After the connection has had `.close()` called on it, serialize the `BearSSL::Session` object to stable storage (EEPROM, RTC RAM, etc.) and restore it before trying to reconnect.  See the `BearSSL_Sessions` example for a detailed example.
 
 `Sessions <#sessions-resuming-connections-fast>`__ contains additional information on the sessions API.
 
@@ -82,15 +82,15 @@ X.509 Certificate(s)
 
 X509 certificates are used to identify peers in TLS connections.  Normally only the server identifies itself, but the client can also supply an X509 certificate if desired (this is often done in MQTT applications).  The certificate contains many fields, but the most interesting in our applications are the name, the public key, and potentially a chain of signing that leads back to a trusted authority (like a global internet CA or a company-wide private certificate authority).
 
-Any call that takes an X509 certificate can also take a list of X509 certificates, so there is no special `X509` class, simply `BearSSLX509List` (which may only contain a single certificate).
+Any call that takes an X509 certificate can also take a list of X509 certificates, so there is no special `X509` class, simply `BearSSL::X509List` (which may only contain a single certificate).
 
 Generating a certificate to be used to validate using the constructor
 
 .. code:: cpp
 
-    BearSSLX509List(const char *pemX509);
+    BearSSL::X509List(const char *pemX509);
     ...or...
-    BearSSLX509List(const uint8_t *derCert, size_t derLen);
+    BearSSL::X509List(const uint8_t *derCert, size_t derLen);
 
 If you need to add additional certificates (unlikely in normal operation), the `::append()` operation can be used.
 
@@ -100,7 +100,7 @@ Certificate Stores
 
 The web browser you're using to read this document keeps a list of 100s of certification authorities (CAs) worldwide that it trusts to attest to the identity of websites.
 
-In many cases your application will know the specific CA it needs to validate web or MQTT servers against (often just a single, self-signing CA private to your institution).  Simply load your private CA in a `BearSSLX509List` and use that as your trust anchor.
+In many cases your application will know the specific CA it needs to validate web or MQTT servers against (often just a single, self-signing CA private to your institution).  Simply load your private CA in a `BearSSL::X509List` and use that as your trust anchor.
 
 However, there are cases where you will not know beforehand which CA you will need (i.e. a user enters a website through a keypad), and you need to keep the list of CAs just like your web browser.  In those cases, you need to generate a certificate bundle on the PC while compiling your application, upload the `certs.ar` bundle to SPIFFS or SD when uploading your application binary, and pass it to a `BearSSL::CertStore()` in order to validate TLS peers.
 
@@ -129,7 +129,7 @@ setInsecure()
 
 Don't verify any X509 certificates.  There is no guarantee that the server connected to is the one you think it is in this case, but this call will mimic the behavior of the deprecated axTLS code.
 
-setKnownKey(const BearSSLPublicKey *pk)
+setKnownKey(const BearSSL::PublicKey *pk)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Assume the server is using the specific public key.  This does not verify the identity of the server or the X509 certificate it sends, it simply assumes that its public key is the one given.  If the server updates its public key at a later point then connections will fail.
@@ -139,7 +139,7 @@ setFingerprint(const uint8_t fp[20]) / setFingerprint(const char *fpStr)
 
 Verify the SHA1 fingerprint of the certificate returned matches this one.  If the server certificate changes, it will fail.  If an array of 20 bytes are sent in, it is assumed they are the binary SHA1 values.  If a `char*` string is passed in, it is parsed as a series of human-readable hex values separated by spaces or colons (e.g. `setFingerprint("00:01:02:03:...:1f");`)
 
-setTrustAnchors(BearSSLX509List *ta)
+setTrustAnchors(BearSSL::X509List *ta)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Use the passed-in certificate(s) as a trust anchor, accepting remote certificates signed by any of these.  If you have many trust anchors it may make sense to use a `BearSSL::CertStore` because it will only require RAM for a single trust anchor (while the `setTrustAnchors` call requires memory for all certificates in the list).
@@ -183,7 +183,7 @@ In certain applications where the TLS server does not support MFLN (not many do 
 Sessions (Resuming connections fast)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-setSession(BearSSLSession &sess)
+setSession(BearSSL::Session &sess)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you are connecting to a server repeatedly in a fixed time period (usually 30 or 60 minutes, but normally configurable at the server), a TLS session can be used to cache crypto settings and speed up connections significantly.
@@ -212,5 +212,3 @@ setCiphersLessSecure()
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Helper function which essentially limits BearSSL to ciphers that were supported by the deprecated axTLS.  These may be less secure than the ones BearSSL would natively choose, but they may be helpful and faster if your server depended on specific axTLS crypto options.
-
-
