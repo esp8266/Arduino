@@ -864,6 +864,14 @@ int HTTPClient::getSize(void)
 }
 
 /**
+ * Location if redirect
+ */
+const String& HTTPClient::getLocation(void)
+{
+    return _location;
+}
+
+/**
  * returns the stream of the tcp connection
  * @return WiFiClient
  */
