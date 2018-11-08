@@ -640,6 +640,13 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
     bool redirect = false;
     int code = 0;
     do {
+        // wipe out any existing headers from previous request
+        for(size_t i = 0; i < _headerKeysCount; i++) {
+            if (_currentHeaders[i].value.length() > 0) {
+                _currentHeaders[i].value = "";
+            }
+        }
+
         redirect = false;
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] type: '%s' redirCount: %d\n", type, _redirectCount);
 
@@ -669,15 +676,17 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
 
         //
         // We can follow redirects for 301/302/307 for GET and HEAD requests and
-        // and we have not exceeded the redirect limit. (prevent infinite loop.
+        // and we have not exceeded the redirect limit preventing an infinite
+        // redirect loop.
         //
         // https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
         //
         if (_followRedirects &&
                 (_redirectCount < _redirectLimit) &&
-                (code == 301 || code == 302 || code == 307) &&
                 (_location.length() > 0) &&
-                (!strcmp(type, "GET") || !strcmp(type, "HEAD"))) {
+                (code == 301 || code == 302 || code == 307) &&
+                (!strcmp(type, "GET") || !strcmp(type, "HEAD"))
+                ) {
             _redirectCount += 1; // increment the count for redirect.
             redirect = true;
             DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect:: '%s' redirCount: %d\n", _location.c_str(), _redirectCount);
@@ -689,7 +698,18 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
 
     } while (redirect);
 
-    // TBD: handle 303 redirect for non GET/HEAD by changing to GET and requesting
+    // handle 303 redirect for non GET/HEAD by changing to GET and requesting new url
+    if (_followRedirects &&
+            (_redirectCount < _redirectLimit) &&
+            (_location.length() > 0) &&
+            (code == 303) &&
+            strcmp(type, "GET") && strcmp(type, "HEAD")
+            ) {
+        _redirectCount += 1;
+        if (setURL(_location)) {
+            code = sendRequest("GET");
+        }
+    }
 
     // handle Server Response (Header)
     return returnError(code);
