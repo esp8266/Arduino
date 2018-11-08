@@ -123,3 +123,47 @@ $(BINARY_DIRECTORY)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 
 $(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/core.a
 	$(CXX) $(LDFLAGS) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/core.a $(LIBS) -o $(OUTPUT_BINARY)
+
+#################################################
+# building ino sources
+-include Makefile.inc.ino
+
+%.ino-host: %.ino-host.o
+
+SDK_PATH := core-mock ../../tools/sdk/include
+CORE_LIB_PATH := ../../libraries/ESP8266WiFi/src
+
+INC_CORE_PATHS += $(addprefix -I, \
+	$(CORE_LIB_PATH) \
+	$(SDK_PATH) \
+)
+
+%.ino-host.o: %.ino-host.cpp
+	$(CXX) -include core-mock/mock.h $(CXXFLAGS) $(INC_PATHS) $(INC_CORE_PATHS) -c -o $@ $<
+
+.PRECIOUS: %-host.cpp
+%.ino-host.cpp: %.ino
+	cp $< $@
+
+#################################################
+# Makefile.inc.ino generation
+
+# default "examples" rule (overridden in Makefile.inc.ino when built)
+.PHONY: examples
+examples:
+	# copy examples locally
+	rm -f Makefile.inc.ino
+	all=""; \
+	for dir in ../../libraries/*/examples; do \
+		exampledir=$${dir%/*}; \
+		exampledirname=$${exampledir##*/}; \
+		for subdir in $$dir/*; do \
+			exname=$${subdir##*/}; \
+			mkdir -p examples/$$exampledirname/$$exname; \
+			(cd $$subdir && tar cf - .) | (cd examples/$$exampledirname/$$exname; tar xf -); \
+			echo examples/$$exampledirname/$$exname/$$exname-host: examples/$$exampledirname/$$exname/$$exname.ino >> Makefile.inc.ino; \
+			all="$$all examples/$$exampledirname/$$exname/$$exname.ino-host"; \
+		done; \
+	done; \
+	echo "$@: $$all" >> Makefile.inc.ino
+	$(MAKE) $@
