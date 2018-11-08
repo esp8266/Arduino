@@ -170,7 +170,7 @@ const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, 
         return nullptr;
       }
       cs->_data->close();
-      cs->_x509 = new BearSSLX509List(der, ci.length);
+      cs->_x509 = new X509List(der, ci.length);
       free(der);
 
       br_x509_trust_anchor *ta = (br_x509_trust_anchor*)cs->_x509->getTrustAnchors();

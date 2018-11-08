@@ -282,7 +282,7 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
   // Check for timed-out waveforms out of the high-frequency toggle loop
   for (size_t i = 0; i < countof(waveform); i++) {
     Waveform *wave = &waveform[i];
-    if (wave->timeLeftCycles) {
+    if (wave->enabled && wave->timeLeftCycles) {
       // Check for unsigned underflow with new > old
       if (deltaCycles >= wave->timeLeftCycles) {
         // Done, remove!
