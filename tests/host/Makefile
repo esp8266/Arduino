@@ -33,10 +33,20 @@ CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
 	spiffs/spiffs_nucleus.c \
 )
 
-MOCK_CPP_FILES := $(addprefix common/,\
+MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	Arduino.cpp \
 	spiffs_mock.cpp \
 	WMath.cpp \
+	HardwareSerial.cpp \
+)
+
+MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
+	ArduinoCatch.cpp \
+)
+
+MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
+	ArduinoMain.cpp \
+	user_interface.cpp \
 )
 
 MOCK_C_FILES := $(addprefix common/,\
@@ -44,16 +54,28 @@ MOCK_C_FILES := $(addprefix common/,\
 	noniso.c \
 )
 
-INC_PATHS += $(addprefix -I, \
+INC_PATHS := $(addprefix -I,\
 	common \
 	$(CORE_PATH) \
+	$(shell echo ../../libraries/*/src) \
+	$(shell echo ../../libraries/*) \
+	../../tools/sdk/include \
 )
+
+INC_PATHS += -DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 \
+	$(addprefix -I,\
+		../../tools/sdk/lwip2/include \
+	)
 
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
 	core/test_string.cpp
+
+PREINCLUDES := \
+	-include common/mock.h \
+	-include common/c_types.h \
 
 CXXFLAGS += -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g
 CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g
@@ -80,7 +102,7 @@ test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
 
 clean: clean-objects clean-coverage
-	rm -rf $(BINARY_DIRECTORY)
+	rm -rf $(BINARY_DIRECTORY) examples
 
 clean-objects:
 	rm -rf $(OBJECTS)
@@ -111,11 +133,13 @@ build-info:
 $(BINARY_DIRECTORY):
 	mkdir -p $@
 
-$(C_OBJECTS): %.c.o: %.c
-	$(CC) $(CFLAGS) $(INC_PATHS) -c -o $@ $<
+#$(C_OBJECTS): %.c.o: %.c
+%.c.o: %.c
+	$(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -c -o $@ $<
 
-$(CPP_OBJECTS): %.cpp.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
+#$(CPP_OBJECTS): %.cpp.o: %.cpp
+%.cpp.o: %.cpp
+	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
 
 $(BINARY_DIRECTORY)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 	ar -rcu $@ $(C_OBJECTS) $(CPP_OBJECTS_CORE)
@@ -123,3 +147,72 @@ $(BINARY_DIRECTORY)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 
 $(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/core.a
 	$(CXX) $(LDFLAGS) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/core.a $(LIBS) -o $(OUTPUT_BINARY)
+
+#################################################
+# building ino sources
+-include examples/Makefile.inc.ino
+
+MOCK_ARDUINO_LIBS := $(addprefix ../../libraries/ESP8266WiFi/src/,\
+	ESP8266WiFi.cpp \
+	ESP8266WiFiAP.cpp \
+	ESP8266WiFiGeneric.cpp \
+	ESP8266WiFiMulti.cpp \
+	ESP8266WiFiSTA-WPS.cpp \
+	ESP8266WiFiSTA.cpp \
+	ESP8266WiFiScan.cpp \
+	WiFiServer.cpp \
+	WiFiClient.cpp \
+)
+#	WiFiUdp.cpp \
+
+MOCK_ARDUINO_LIBS += $(addprefix ../../libraries/ESP8266WiFi/src/,\
+)
+
+MOCK_ARDUINO_LIBS += $(addprefix $(CORE_PATH)/,\
+	IPAddress.cpp \
+)
+
+CPP_OBJECTS_CORE_EMU_SOURCE = \
+	$(MOCK_CPP_FILES_EMU) \
+	$(CORE_CPP_FILES) \
+	$(MOCK_ARDUINO_LIBS) \
+
+CPP_OBJECTS_CORE_EMU = $(CPP_OBJECTS_CORE_EMU_SOURCE:.cpp=.cpp.o)
+
+common/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
+	ar -rcu $@ $^
+	ranlib -c $@
+
+%.ino-host: %.ino-host.o common/fullcore.a
+	$(CXX) $(LDFLAGS) $^ -o $@
+
+%.ino-host.o: %.ino-host.cpp
+	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
+
+.PRECIOUS: %-host.cpp
+%.ino-host.cpp: %.ino
+	cp $< $@
+
+#################################################
+# Makefile.inc.ino generation
+
+.PHONY: examples
+
+# default "examples" rule (overridden in Makefile.inc.ino when built)
+examples:
+	# copy examples locally
+	rm -f Makefile.inc.ino
+	all=""; \
+	for dir in ../../libraries/*/$@; do \
+		exampledir=$${dir%/*}; \
+		exampledirname=$${exampledir##*/}; \
+		for subdir in $$dir/*; do \
+			exname=$${subdir##*/}; \
+			mkdir -p $@/$$exampledirname/$$exname; \
+			(cd $$subdir && tar cf - .) | (cd $@/$$exampledirname/$$exname; tar xf -); \
+			echo $@/$$exampledirname/$$exname/$$exname-host: $@/$$exampledirname/$$exname/$$exname.ino >> $@/Makefile.inc.ino; \
+			all="$$all $@/$$exampledirname/$$exname/$$exname.ino-host"; \
+		done; \
+	done; \
+	echo "$@: $$all" >> $@/Makefile.inc.ino
+	$(MAKE) $@
