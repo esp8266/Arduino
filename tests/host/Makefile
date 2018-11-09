@@ -2,6 +2,12 @@ BINARY_DIRECTORY := bin
 LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
 CORE_PATH := ../../cores/esp8266
+OPT := -O0
+
+INC_PATHS += $(addprefix -I,\
+	$(shell echo ../../libraries/*/src) \
+	$(shell echo ../../libraries/*) \
+)
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
@@ -33,10 +39,19 @@ CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
 	spiffs/spiffs_nucleus.c \
 )
 
-MOCK_CPP_FILES := $(addprefix common/,\
+MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	Arduino.cpp \
 	spiffs_mock.cpp \
 	WMath.cpp \
+	HardwareSerial.cpp \
+)
+
+MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
+	ArduinoCatch.cpp \
+)
+
+MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
+	ArduinoMain.cpp \
 )
 
 MOCK_C_FILES := $(addprefix common/,\
@@ -47,6 +62,7 @@ MOCK_C_FILES := $(addprefix common/,\
 INC_PATHS += $(addprefix -I, \
 	common \
 	$(CORE_PATH) \
+	../../tools/sdk/include \
 )
 
 TEST_CPP_FILES := \
@@ -111,11 +127,13 @@ build-info:
 $(BINARY_DIRECTORY):
 	mkdir -p $@
 
-$(C_OBJECTS): %.c.o: %.c
+#$(C_OBJECTS): %.c.o: %.c
+%.c.o: %.c
 	$(CC) $(CFLAGS) $(INC_PATHS) -c -o $@ $<
 
-$(CPP_OBJECTS): %.cpp.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
+#$(CPP_OBJECTS): %.cpp.o: %.cpp
+%.cpp.o: %.cpp
+	$(CXX) -include common/mock.h $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
 
 $(BINARY_DIRECTORY)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 	ar -rcu $@ $(C_OBJECTS) $(CPP_OBJECTS_CORE)
@@ -126,20 +144,19 @@ $(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/c
 
 #################################################
 # building ino sources
--include Makefile.inc.ino
+-include examples/Makefile.inc.ino
 
-%.ino-host: %.ino-host.o
+CPP_OBJECTS_CORE_EMU = $(MOCK_CPP_FILES_EMU:.cpp=.cpp.o) $(CORE_CPP_FILES:.cpp=.cpp.o)
 
-SDK_PATH := core-mock ../../tools/sdk/include
-CORE_LIB_PATH := ../../libraries/ESP8266WiFi/src
+common/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
+	ar -rcu $@ $^
+	ranlib -c $@
 
-INC_CORE_PATHS += $(addprefix -I, \
-	$(CORE_LIB_PATH) \
-	$(SDK_PATH) \
-)
+%.ino-host: %.ino-host.o common/fullcore.a
+	$(CXX) $(LDFLAGS) $^ -o $@
 
 %.ino-host.o: %.ino-host.cpp
-	$(CXX) -include core-mock/mock.h $(CXXFLAGS) $(INC_PATHS) $(INC_CORE_PATHS) -c -o $@ $<
+	$(CXX) -include common/mock.h $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
 
 .PRECIOUS: %-host.cpp
 %.ino-host.cpp: %.ino
@@ -148,22 +165,23 @@ INC_CORE_PATHS += $(addprefix -I, \
 #################################################
 # Makefile.inc.ino generation
 
-# default "examples" rule (overridden in Makefile.inc.ino when built)
 .PHONY: examples
+
+# default "examples" rule (overridden in Makefile.inc.ino when built)
 examples:
 	# copy examples locally
 	rm -f Makefile.inc.ino
 	all=""; \
-	for dir in ../../libraries/*/examples; do \
+	for dir in ../../libraries/*/$@; do \
 		exampledir=$${dir%/*}; \
 		exampledirname=$${exampledir##*/}; \
 		for subdir in $$dir/*; do \
 			exname=$${subdir##*/}; \
-			mkdir -p examples/$$exampledirname/$$exname; \
-			(cd $$subdir && tar cf - .) | (cd examples/$$exampledirname/$$exname; tar xf -); \
-			echo examples/$$exampledirname/$$exname/$$exname-host: examples/$$exampledirname/$$exname/$$exname.ino >> Makefile.inc.ino; \
-			all="$$all examples/$$exampledirname/$$exname/$$exname.ino-host"; \
+			mkdir -p $@/$$exampledirname/$$exname; \
+			(cd $$subdir && tar cf - .) | (cd $@/$$exampledirname/$$exname; tar xf -); \
+			echo $@/$$exampledirname/$$exname/$$exname-host: $@/$$exampledirname/$$exname/$$exname.ino >> $@/Makefile.inc.ino; \
+			all="$$all $@/$$exampledirname/$$exname/$$exname.ino-host"; \
 		done; \
 	done; \
-	echo "$@: $$all" >> Makefile.inc.ino
+	echo "$@: $$all" >> $@/Makefile.inc.ino
 	$(MAKE) $@
