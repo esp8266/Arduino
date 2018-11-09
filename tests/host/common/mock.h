@@ -2,7 +2,9 @@
 // include host's STL before any other include file
 // because core definition like max() is in the way
 
+#ifdef __cplusplus
 #include <vector>
+#endif
 
 // exotic typedefs used in the sdk
 

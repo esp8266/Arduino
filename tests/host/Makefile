@@ -2,12 +2,6 @@ BINARY_DIRECTORY := bin
 LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
 CORE_PATH := ../../cores/esp8266
-OPT := -O0
-
-INC_PATHS += $(addprefix -I,\
-	$(shell echo ../../libraries/*/src) \
-	$(shell echo ../../libraries/*) \
-)
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
@@ -52,6 +46,7 @@ MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 
 MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 	ArduinoMain.cpp \
+	user_interface.cpp \
 )
 
 MOCK_C_FILES := $(addprefix common/,\
@@ -59,17 +54,28 @@ MOCK_C_FILES := $(addprefix common/,\
 	noniso.c \
 )
 
-INC_PATHS += $(addprefix -I, \
+INC_PATHS := $(addprefix -I,\
 	common \
 	$(CORE_PATH) \
+	$(shell echo ../../libraries/*/src) \
+	$(shell echo ../../libraries/*) \
 	../../tools/sdk/include \
 )
+
+INC_PATHS += -DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 \
+	$(addprefix -I,\
+		../../tools/sdk/lwip2/include \
+	)
 
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
 	core/test_string.cpp
+
+PREINCLUDES := \
+	-include common/mock.h \
+	-include common/c_types.h \
 
 CXXFLAGS += -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g
 CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g
@@ -96,7 +102,7 @@ test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
 
 clean: clean-objects clean-coverage
-	rm -rf $(BINARY_DIRECTORY)
+	rm -rf $(BINARY_DIRECTORY) examples
 
 clean-objects:
 	rm -rf $(OBJECTS)
@@ -129,11 +135,11 @@ $(BINARY_DIRECTORY):
 
 #$(C_OBJECTS): %.c.o: %.c
 %.c.o: %.c
-	$(CC) $(CFLAGS) $(INC_PATHS) -c -o $@ $<
+	$(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -c -o $@ $<
 
 #$(CPP_OBJECTS): %.cpp.o: %.cpp
 %.cpp.o: %.cpp
-	$(CXX) -include common/mock.h $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
+	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
 
 $(BINARY_DIRECTORY)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 	ar -rcu $@ $(C_OBJECTS) $(CPP_OBJECTS_CORE)
@@ -146,7 +152,32 @@ $(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/c
 # building ino sources
 -include examples/Makefile.inc.ino
 
-CPP_OBJECTS_CORE_EMU = $(MOCK_CPP_FILES_EMU:.cpp=.cpp.o) $(CORE_CPP_FILES:.cpp=.cpp.o)
+MOCK_ARDUINO_LIBS := $(addprefix ../../libraries/ESP8266WiFi/src/,\
+	ESP8266WiFi.cpp \
+	ESP8266WiFiAP.cpp \
+	ESP8266WiFiGeneric.cpp \
+	ESP8266WiFiMulti.cpp \
+	ESP8266WiFiSTA-WPS.cpp \
+	ESP8266WiFiSTA.cpp \
+	ESP8266WiFiScan.cpp \
+	WiFiServer.cpp \
+	WiFiClient.cpp \
+)
+#	WiFiUdp.cpp \
+
+MOCK_ARDUINO_LIBS += $(addprefix ../../libraries/ESP8266WiFi/src/,\
+)
+
+MOCK_ARDUINO_LIBS += $(addprefix $(CORE_PATH)/,\
+	IPAddress.cpp \
+)
+
+CPP_OBJECTS_CORE_EMU_SOURCE = \
+	$(MOCK_CPP_FILES_EMU) \
+	$(CORE_CPP_FILES) \
+	$(MOCK_ARDUINO_LIBS) \
+
+CPP_OBJECTS_CORE_EMU = $(CPP_OBJECTS_CORE_EMU_SOURCE:.cpp=.cpp.o)
 
 common/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	ar -rcu $@ $^
@@ -156,7 +187,7 @@ common/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	$(CXX) $(LDFLAGS) $^ -o $@
 
 %.ino-host.o: %.ino-host.cpp
-	$(CXX) -include common/mock.h $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
+	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
 
 .PRECIOUS: %-host.cpp
 %.ino-host.cpp: %.ino
