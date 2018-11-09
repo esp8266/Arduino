@@ -249,7 +249,7 @@ In case server's web address is incorrect, or server is not accessible, you shou
 Conclusion
 ~~~~~~~~~~
 
-With this simple example we have demonstrated how to set up a client program, connect it to a server, request a web page and retrieve it. Now you should be able to write your own client program for ESP8266 and move to more advanced dialogue with a server, like e.g. using `HTTPS <https://en.wikipedia.org/wiki/HTTPS>`__ protocol with the :doc:`Client Secure <client-secure-examples>` .
+With this simple example we have demonstrated how to set up a client program, connect it to a server, request a web page and retrieve it. Now you should be able to write your own client program for ESP8266 and move to more advanced dialogue with a server, like e.g. using `HTTPS <https://en.wikipedia.org/wiki/HTTPS>`__ protocol with the `Client Secure <client-secure-examples.rst>`__ .
 
 For more client examples please check
 

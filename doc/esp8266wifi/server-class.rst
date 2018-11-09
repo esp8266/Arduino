@@ -32,6 +32,10 @@ This algorithm is intended to reduce TCP/IP traffic of small packets sent over t
     server.begin();
     server.setNoDelay(true);
 
+By default, ``nodelay`` value will depends on global ``WiFiClient::getDefaultNoDelay()`` (currently false by default).
+
+However, a call to ``wiFiServer.setNoDelay()`` will override ``NoDelay`` for all new ``WiFiClient`` provided by the calling instance (``wiFiServer``).
+
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -46,4 +50,4 @@ Other Function Calls
 
 Documentation for the above functions is not yet prepared.
 
-For code samples please refer to separate section with :doc:`examples <server-examples>` dedicated specifically to the Server Class.
+For code samples please refer to separate section with `examples <server-examples.rst>`__ dedicated specifically to the Server Class.

@@ -10,7 +10,19 @@
 #include "ets_sys.h"
 #include "osapi.h"
 
-#define PROGMEM     ICACHE_RODATA_ATTR
+// Since __section__ is supposed to be only use for global variables,
+// there could be conflicts when a static/inlined function has them in the
+// same file as a non-static PROGMEM object.
+// Ref: https://gcc.gnu.org/onlinedocs/gcc-3.2/gcc/Variable-Attributes.html
+// Place each progmem object into its own named section, avoiding conflicts
+
+// The following two macros cause a parameter to be enclosed in quotes
+// by the preopressor (i.e. for concatenating ints to strings)
+#define __STRINGIZE_NX(A) #A
+#define __STRINGIZE(A) __STRINGIZE_NX(A)
+
+#define PROGMEM      __attribute__((section( "\".irom.text." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\"")))
+
 #define PGM_P  		const char *
 #define PGM_VOID_P  const void *
 #define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
@@ -29,6 +41,8 @@ extern "C" {
 
 #define _SFR_BYTE(n) (n)
 
+#ifdef __PROG_TYPES_COMPAT__
+
 typedef void prog_void;
 typedef char prog_char;
 typedef unsigned char prog_uchar;
@@ -38,6 +52,8 @@ typedef int16_t prog_int16_t;
 typedef uint16_t prog_uint16_t;
 typedef int32_t prog_int32_t;
 typedef uint32_t prog_uint32_t;
+
+#endif // defined(__PROG_TYPES_COMPAT__)
 
 #define SIZE_IRRELEVANT 0x7fffffff
 
@@ -112,8 +128,13 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
 }
 
 // Make sure, that libraries checking existence of this macro are not failing
+#ifdef __PROG_TYPES_COMPAT__
+#define pgm_read_byte(addr) pgm_read_byte_inlined((const void*)(addr))
+#define pgm_read_word(addr) pgm_read_word_inlined((const void*)(addr))
+#else
 #define pgm_read_byte(addr) pgm_read_byte_inlined(addr)
 #define pgm_read_word(addr) pgm_read_word_inlined(addr)
+#endif
 
 #else //__ets__
 #define pgm_read_byte(addr)     (*reinterpret_cast<const uint8_t*>(addr))

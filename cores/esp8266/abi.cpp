@@ -127,7 +127,24 @@ void __throw_out_of_range(const char* str)
     (void) str;
     panic();
 }
+
+void __throw_bad_cast(void)
+{
+    panic();
 }
+
+void __throw_ios_failure(const char* str)
+{
+    (void) str;
+    panic();
+}
+
+void __throw_runtime_error(const char* str)
+{
+    (void) str;
+    panic();
+}
+} // namespace std
 
 // TODO: rebuild windows toolchain to make this unnecessary:
 void* __dso_handle;
