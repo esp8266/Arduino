@@ -110,9 +110,9 @@ Users may also manually sign executables and require the OTA process to verify t
 .. code:: cpp
 
     <in globals>
-    BearSSLPublicKey signPubKey( ... key contents ... );
-    BearSSLHashSHA256 hash;
-    BearSSLSigningVerifier sign( &signPubKey );
+    BearSSL::PublicKey signPubKey( ... key contents ... );
+    BearSSL::HashSHA256 hash;
+    BearSSL::SigningVerifier sign( &signPubKey );
     ...
     <in setup()>
     Update.installSignature( &hash, &sign );

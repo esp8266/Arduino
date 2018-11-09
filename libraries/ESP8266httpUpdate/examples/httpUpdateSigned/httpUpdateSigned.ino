@@ -40,9 +40,9 @@ TQIDAQAB
 -----END PUBLIC KEY-----
 )EOF";
 #if MANUAL_SIGNING
-BearSSLPublicKey *signPubKey = nullptr;
-BearSSLHashSHA256 *hash;
-BearSSLSigningVerifier *sign;
+BearSSL::PublicKey *signPubKey = nullptr;
+BearSSL::HashSHA256 *hash;
+BearSSL::SigningVerifier *sign;
 #endif
 
 void setup() {
@@ -64,9 +64,9 @@ void setup() {
   WiFiMulti.addAP("SSID", "PASS");
 
   #if MANUAL_SIGNING
-  signPubKey = new BearSSLPublicKey(pubkey);
-  hash = new BearSSLHashSHA256();
-  sign = new BearSSLSigningVerifier(signPubKey);
+  signPubKey = new BearSSL::PublicKey(pubkey);
+  hash = new BearSSL::HashSHA256();
+  sign = new BearSSL::SigningVerifier(signPubKey);
   #endif
 }
 

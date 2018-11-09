@@ -13,9 +13,9 @@
 
 #if ARDUINO_SIGNING
   #include "../../libraries/ESP8266WiFi/src/BearSSLHelpers.h"
-  static BearSSLPublicKey signPubKey(signing_pubkey);
-  static BearSSLHashSHA256 hash;
-  static BearSSLSigningVerifier sign(&signPubKey);
+  static BearSSL::PublicKey signPubKey(signing_pubkey);
+  static BearSSL::HashSHA256 hash;
+  static BearSSL::SigningVerifier sign(&signPubKey);
 #endif
 
 extern "C" {

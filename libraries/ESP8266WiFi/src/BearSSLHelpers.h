@@ -139,7 +139,7 @@ class Session {
 };
 
 // Updater SHA256 hash and signature verification
-class BearSSLHashSHA256 : public UpdaterHashClass {
+class HashSHA256 : public UpdaterHashClass {
   public:
     virtual void begin() override;
     virtual void add(const void *data, uint32_t len) override;
@@ -151,16 +151,16 @@ class BearSSLHashSHA256 : public UpdaterHashClass {
     unsigned char _sha256[32];
 };
 
-class BearSSLSigningVerifier : public UpdaterVerifyClass {
+class SigningVerifier : public UpdaterVerifyClass {
   public:
     virtual uint32_t length() override;
     virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) override;
 
   public:
-    BearSSLSigningVerifier(BearSSLPublicKey *pubKey) { _pubKey = pubKey; }
+    SigningVerifier(PublicKey *pubKey) { _pubKey = pubKey; }
 
   private:
-    BearSSLPublicKey *_pubKey;
+    PublicKey *_pubKey;
 };
 
 };

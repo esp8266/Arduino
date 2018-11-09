@@ -826,29 +826,29 @@ bool X509List::append(const uint8_t *derCert, size_t derLen) {
 }
 
 // SHA256 hash for updater
-void BearSSLHashSHA256::begin() {
+void HashSHA256::begin() {
   br_sha256_init( &_cc );
   memset( _sha256, 0, sizeof(_sha256) );
 }
 
-void BearSSLHashSHA256::add(const void *data, uint32_t len) {
+void HashSHA256::add(const void *data, uint32_t len) {
   br_sha256_update( &_cc, data, len );
 }
 
-void BearSSLHashSHA256::end() {
+void HashSHA256::end() {
   br_sha256_out( &_cc, _sha256 );
 }
 
-int BearSSLHashSHA256::len() {
+int HashSHA256::len() {
   return sizeof(_sha256);
 }
 
-const void *BearSSLHashSHA256::hash() {
+const void *HashSHA256::hash() {
   return (const void*) _sha256;
 }
 
 // SHA256 verifier
-uint32_t BearSSLSigningVerifier::length()
+uint32_t SigningVerifier::length()
 {
   if (!_pubKey) {
     return 0;
@@ -861,7 +861,7 @@ uint32_t BearSSLSigningVerifier::length()
   }
 }
 
-bool BearSSLSigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
+bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
   if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
 
   if (_pubKey->isRSA()) {
