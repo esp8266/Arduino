@@ -197,12 +197,12 @@ void setup() {
   setClock(); // Required for X.509 validation
 
   // Attach the server private cert/key combo
-  BearSSLX509List *serverCertList = new BearSSLX509List(server_cert);
-  BearSSLPrivateKey *serverPrivKey = new BearSSLPrivateKey(server_private_key);
+  BearSSL::X509List *serverCertList = new BearSSL::X509List(server_cert);
+  BearSSL::PrivateKey *serverPrivKey = new BearSSL::PrivateKey(server_private_key);
   server.setRSACert(serverCertList, serverPrivKey);
 
   // Require a certificate validated by the trusted CA
-  BearSSLX509List *serverTrustedCA = new BearSSLX509List(ca_cert);
+  BearSSL::X509List *serverTrustedCA = new BearSSL::X509List(ca_cert);
   server.setClientTrustAnchor(serverTrustedCA);
 
   // Actually start accepting connections

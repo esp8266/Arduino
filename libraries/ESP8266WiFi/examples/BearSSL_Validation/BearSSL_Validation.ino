@@ -144,7 +144,7 @@ wQIDAQAB
 -----END PUBLIC KEY-----
 )KEY";
   BearSSL::WiFiClientSecure client;
-  BearSSLPublicKey key(pubkey);
+  BearSSL::PublicKey key(pubkey);
   client.setKnownKey(&key);
   fetchURL(&client, host, port, path);
 }
@@ -186,7 +186,7 @@ BearSSL does verify the notValidBefore/After fields.
 )EOF");
 
   BearSSL::WiFiClientSecure client;
-  BearSSLX509List cert(digicert);
+  BearSSL::X509List cert(digicert);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
   fetchURL(&client, host, port, path);
