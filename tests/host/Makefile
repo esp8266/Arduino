@@ -167,6 +167,7 @@ MOCK_ARDUINO_LIBS := $(addprefix ../../libraries/ESP8266WiFi/src/,\
 
 MOCK_ARDUINO_LIBS += \
 	common/MockClientContext.cpp \
+	common/MockClientContextSocket.cpp \
 
 ARDUINO_LIBS += $(addprefix $(CORE_PATH)/,\
 	IPAddress.cpp \

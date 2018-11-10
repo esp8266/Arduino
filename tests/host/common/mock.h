@@ -18,3 +18,8 @@ typedef uint32_t uint32;
 
 #define lwip_htons htons
 #define lwip_htonl htonl
+
+int mockConnect (uint32_t addr, int& sock, int port);
+size_t mockReadReady (int sock);
+size_t mockRead (int sock, char* dst, size_t size, int timeout_ms);
+size_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms);
