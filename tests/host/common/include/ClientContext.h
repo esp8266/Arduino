@@ -131,9 +131,9 @@ public:
         return 0;
     }
 
-    size_t getSize() const
+    size_t getSize()
     {
-        return mockReadReady(_sock)? 16: 0; //XXXFIXMEDIRTYBUFFERIZE!
+    	return _inbufsize?: mockFillInBuf(_sock, _inbuf, _inbufsize);
     }
 
     char read()
@@ -146,23 +146,20 @@ public:
 
     size_t read (char* dst, size_t size)
     {
-        return mockRead(_sock, dst, size, _timeout_ms);
+        return mockRead(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
     }
 
-    char peek() const
+    int peek()
     {
-        // mock implementation will be more complex because of this
-        fprintf(stderr, MOCK "ClientContext::peek !\n");
-        ::abort();
-        return -1;
+        char c;
+        if (!mockPeekBytes(_sock, &c, 1, _timeout_ms, _inbuf, _inbufsize))
+            return -1;
+        return c;
     }
 
-    size_t peekBytes(char *dst, size_t size) const
+    size_t peekBytes(char *dst, size_t size)
     {
-        // mock implementation will be more complex because of this
-        fprintf(stderr, MOCK "ClientContext::peek !\n");
-        ::abort();
-        return 0;
+        return mockPeekBytes(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
     }
 
     void discard_received()
@@ -186,8 +183,19 @@ public:
 
     size_t write(Stream& stream)
     {
-        fprintf(stderr, MOCK "TODO ClientContext::write(Stream)\n");
-        return 0;
+        size_t avail = stream.available();
+        uint8_t buf [avail];
+        avail = stream.readBytes(buf, avail);
+        size_t totwrote = 0;
+        uint8_t* w = buf;
+        while (avail)
+        {
+            size_t wrote = write(w, avail);
+            w += wrote;
+            avail -= wrote;
+            totwrote += wrote;
+    	}
+        return totwrote;
     }
 
     size_t write_P(PGM_P buf, size_t size)
@@ -252,6 +260,9 @@ private:
     
     int _sock = -1;
     int _timeout_ms = 5000;
+
+    char _inbuf [CCBUFSIZE];
+    size_t _inbufsize = 0;
 };
 
 #endif//CLIENTCONTEXT_H
