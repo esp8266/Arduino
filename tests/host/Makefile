@@ -165,10 +165,10 @@ MOCK_ARDUINO_LIBS := $(addprefix ../../libraries/ESP8266WiFi/src/,\
 )
 #	WiFiUdp.cpp \
 
-MOCK_ARDUINO_LIBS += $(addprefix ../../libraries/ESP8266WiFi/src/,\
-)
+MOCK_ARDUINO_LIBS += \
+	common/MockClientContext.cpp \
 
-MOCK_ARDUINO_LIBS += $(addprefix $(CORE_PATH)/,\
+ARDUINO_LIBS += $(addprefix $(CORE_PATH)/,\
 	IPAddress.cpp \
 )
 
@@ -176,6 +176,7 @@ CPP_OBJECTS_CORE_EMU_SOURCE = \
 	$(MOCK_CPP_FILES_EMU) \
 	$(CORE_CPP_FILES) \
 	$(MOCK_ARDUINO_LIBS) \
+	$(ARDUINO_LIBS) \
 
 CPP_OBJECTS_CORE_EMU = $(CPP_OBJECTS_CORE_EMU_SOURCE:.cpp=.cpp.o)
 

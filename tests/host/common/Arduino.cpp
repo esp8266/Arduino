@@ -16,6 +16,7 @@
 #include <sys/time.h>
 #include "Arduino.h"
 
+#include <unistd.h>
 
 extern "C" unsigned long millis()
 {
@@ -36,4 +37,5 @@ extern "C" void __panic_func(const char* file, int line, const char* func) {
 
 extern "C" void delay(unsigned long ms)
 {
+    usleep(ms * 1000);
 }

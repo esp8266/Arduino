@@ -38,7 +38,7 @@ size_t uart_write_char(uart_t* uart, char c)
 {
 	//XXXTODO
 	(void)uart;
-	putchar(c);
+	write(1, &c, 1);
 	return 1;
 }
 

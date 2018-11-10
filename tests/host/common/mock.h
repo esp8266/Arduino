@@ -16,3 +16,5 @@ typedef uint32_t uint32;
 
 #include <Arduino.h>
 
+#define lwip_htons htons
+#define lwip_htonl htonl
