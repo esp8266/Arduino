@@ -1,6 +1,6 @@
-BINARY_DIRECTORY := bin
+BINDIR := bin
 LCOV_DIRECTORY := lcov
-OUTPUT_BINARY := $(BINARY_DIRECTORY)/host_tests
+OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := ../../cores/esp8266
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
@@ -12,6 +12,8 @@ GCOV ?= gcov
 VALGRIND ?= valgrind
 LCOV ?= lcov
 GENHTML ?= genhtml
+
+$(shell mkdir -p $(BINDIR))
 
 CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	StreamString.cpp \
@@ -102,10 +104,10 @@ test: $(OUTPUT_BINARY)
 	$(OUTPUT_BINARY)
 
 clean: clean-objects clean-coverage
-	rm -rf $(BINARY_DIRECTORY) examples
+	rm -rf $(BINDIR)
 
 clean-objects:
-	rm -rf $(OBJECTS)
+	rm -rf $(OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 
 clean-coverage:
 	rm -rf $(COVERAGE_FILES) $(LCOV_DIRECTORY) *.gcov
@@ -130,27 +132,23 @@ build-info:
 	$(GCOV) -v
 	@echo "----------------------------------"
 
-$(BINARY_DIRECTORY):
-	mkdir -p $@
+-include $(BINDIR)/.*.d
 
-#$(C_OBJECTS): %.c.o: %.c
 %.c.o: %.c
-	$(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -c -o $@ $<
+	$(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
-#$(CPP_OBJECTS): %.cpp.o: %.cpp
 %.cpp.o: %.cpp
-	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
+	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
-$(BINARY_DIRECTORY)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
+$(BINDIR)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 	ar -rcu $@ $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 	ranlib -c $@
 
-$(OUTPUT_BINARY): $(BINARY_DIRECTORY) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/core.a
-	$(CXX) $(LDFLAGS) $(CPP_OBJECTS_TESTS) $(BINARY_DIRECTORY)/core.a $(LIBS) -o $(OUTPUT_BINARY)
+$(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
+	$(CXX) $(LDFLAGS) $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a $(LIBS) -o $@
 
 #################################################
 # building ino sources
--include examples/Makefile.inc.ino
 
 MOCK_ARDUINO_LIBS := $(addprefix ../../libraries/ESP8266WiFi/src/,\
 	ESP8266WiFi.cpp \
@@ -173,48 +171,43 @@ ARDUINO_LIBS += $(addprefix $(CORE_PATH)/,\
 	IPAddress.cpp \
 )
 
-CPP_OBJECTS_CORE_EMU_SOURCE = \
+CPP_SOURCES_CORE_EMU = \
 	$(MOCK_CPP_FILES_EMU) \
 	$(CORE_CPP_FILES) \
 	$(MOCK_ARDUINO_LIBS) \
 	$(ARDUINO_LIBS) \
 
-CPP_OBJECTS_CORE_EMU = $(CPP_OBJECTS_CORE_EMU_SOURCE:.cpp=.cpp.o)
+CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o)
 
 common/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	ar -rcu $@ $^
 	ranlib -c $@
 
-%.ino-host: %.ino-host.o common/fullcore.a
-	$(CXX) $(LDFLAGS) $^ -o $@
+.PRECIOUS: %.cpp.o
+%: %.cpp.o common/fullcore.a
+	$(CXX) $(LDFLAGS) $< common/fullcore.a -o $@
+	ln -s ../$@ $(BINDIR)
 
-%.ino-host.o: %.ino-host.cpp
-	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -c -o $@ $<
-
-.PRECIOUS: %-host.cpp
-%.ino-host.cpp: %.ino
+.PRECIOUS: %.cpp
+%.cpp: %.ino
 	cp $< $@
 
 #################################################
 # Makefile.inc.ino generation
+-include $(BINDIR)/Makefile.inc.ino
 
-.PHONY: examples
-
-# default "examples" rule (overridden in Makefile.inc.ino when built)
-examples:
+$(BINDIR)/Makefile.inc.ino:
 	# copy examples locally
-	rm -f Makefile.inc.ino
 	all=""; \
-	for dir in ../../libraries/*/$@; do \
+	for dir in ../../libraries/*/examples; do \
 		exampledir=$${dir%/*}; \
 		exampledirname=$${exampledir##*/}; \
 		for subdir in $$dir/*; do \
 			exname=$${subdir##*/}; \
-			mkdir -p $@/$$exampledirname/$$exname; \
-			(cd $$subdir && tar cf - .) | (cd $@/$$exampledirname/$$exname; tar xf -); \
-			echo $@/$$exampledirname/$$exname/$$exname-host: $@/$$exampledirname/$$exname/$$exname.ino >> $@/Makefile.inc.ino; \
-			all="$$all $@/$$exampledirname/$$exname/$$exname.ino-host"; \
+			all="$$all $$subdir/$$exname"; \
 		done; \
 	done; \
-	echo "$@: $$all" >> $@/Makefile.inc.ino
+	echo "examples: $$all" > $@
+
+examples: $(BINDIR)/Makefile.inc.ino
 	$(MAKE) $@
