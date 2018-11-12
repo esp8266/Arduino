@@ -155,7 +155,15 @@ offset is the user block number (block size is 4 bytes) must be >= 0 and <128
 data is a pointer to data, 4-byte aligned
 size is number of bytes in the block pointed to by data
 
-Same for write
+Same for write.
+
+Note: If the Updater class is in play, e.g.: the application uses OTA, the eboot
+command will be stored into the first 128 bytes of user data, then it will be
+retrieved by eboot on boot. That means that user data present there will be lost.
+Ref: 
+- discussion in PR #5330.
+- https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map#memmory-mapped-io-registers
+- Arduino/bootloaders/eboot/eboot_command.h RTC_MEM definition
 */
 
 bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
