@@ -25,11 +25,17 @@ public:
         (void)pcb;
         _sock = -1;
     }
-
+    
+    ClientContext (int sock)
+    {
+    	_sock = sock;
+    }
+    
     err_t abort()
     {
         if (_sock >= 0)
             ::close(_sock);
+        _sock = -1;
         return ERR_ABRT;
     }
 
@@ -67,9 +73,8 @@ public:
         if(--_refcnt == 0) {
             discard_received();
             close();
-            if(_discard_cb) {
-                _discard_cb(_discard_cb_arg, this);
-            }
+            if (_discard_cb)
+                 _discard_cb(_discard_cb_arg, this);
             DEBUGV(":del\r\n");
             delete this;
         }
@@ -173,7 +178,7 @@ public:
 
     uint8_t state() const
     {
-        return 0;
+        return _sock >= 0? ESTABLISHED: CLOSED;
     }
 
     size_t write(const uint8_t* data, size_t size)
@@ -246,10 +251,8 @@ public:
 
 private:
 
-    discard_cb_t _discard_cb;
-    void* _discard_cb_arg;
-
-    DataSource* _datasource = nullptr;
+    discard_cb_t _discard_cb = nullptr;
+    void* _discard_cb_arg = nullptr;
 
     int8_t _refcnt;
     ClientContext* _next;
@@ -265,4 +268,4 @@ private:
     size_t _inbufsize = 0;
 };
 
-#endif//CLIENTCONTEXT_H
+#endif //CLIENTCONTEXT_H

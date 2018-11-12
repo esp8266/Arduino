@@ -133,6 +133,7 @@ build-info:
 	@echo "----------------------------------"
 
 -include $(BINDIR)/.*.d
+.SUFFIXES:
 
 %.c.o: %.c
 	$(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
@@ -150,7 +151,8 @@ $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
 #################################################
 # building ino sources
 
-MOCK_ARDUINO_LIBS := $(addprefix ../../libraries/ESP8266WiFi/src/,\
+MOCK_ARDUINO_LIBS := \
+$(addprefix ../../libraries/ESP8266WiFi/src/,\
 	ESP8266WiFi.cpp \
 	ESP8266WiFiAP.cpp \
 	ESP8266WiFiGeneric.cpp \
@@ -158,14 +160,20 @@ MOCK_ARDUINO_LIBS := $(addprefix ../../libraries/ESP8266WiFi/src/,\
 	ESP8266WiFiSTA-WPS.cpp \
 	ESP8266WiFiSTA.cpp \
 	ESP8266WiFiScan.cpp \
-	WiFiServer.cpp \
 	WiFiClient.cpp \
-)
-#	WiFiUdp.cpp \
+) \
+$(addprefix ../../libraries/ESP8266WebServer/src/,\
+	ESP8266WebServer.cpp \
+	Parsing.cpp \
+	detail/mimetable.cpp \
+) \
 
 MOCK_ARDUINO_LIBS += \
-	common/MockClientContext.cpp \
 	common/MockClientContextSocket.cpp \
+	common/MockClientContext.cpp \
+	common/MockWiFiServerSocket.cpp \
+	common/MockWiFiServer.cpp \
+	common/ArduinoWire.cpp \
 
 ARDUINO_LIBS += $(addprefix $(CORE_PATH)/,\
 	IPAddress.cpp \
@@ -179,14 +187,14 @@ CPP_SOURCES_CORE_EMU = \
 
 CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o)
 
-common/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
+bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	ar -rcu $@ $^
 	ranlib -c $@
 
 .PRECIOUS: %.cpp.o
-%: %.cpp.o common/fullcore.a
-	$(CXX) $(LDFLAGS) $< common/fullcore.a -o $@
-	ln -s ../$@ $(BINDIR)
+%: %.cpp.o bin/fullcore.a
+	$(CXX) $(LDFLAGS) $< bin/fullcore.a -o $@
+	ln -sf ../$@ $(BINDIR)
 
 .PRECIOUS: %.cpp
 %.cpp: %.ino

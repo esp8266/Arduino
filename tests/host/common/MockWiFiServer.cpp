@@ -1,0 +1,30 @@
+
+#include <WiFiClient.h>
+#include <WiFiServer.h>
+
+#include <lwip/err.h>
+#include <lwip/ip_addr.h>
+
+#include <include/ClientContext.h>
+
+#define int2pcb(x) ((tcp_pcb*)(long)(x))
+#define pcb2int(x) ((int)(long)(x))
+
+WiFiServer::WiFiServer (uint16_t port)
+{
+	if (port < 1024)
+	{
+		int newport = port + 9000;
+		fprintf(stderr, MOCK "WiFiServer port: %d -> %d\n", port, newport);
+		port = newport;
+	}
+	_port = port;
+}
+
+WiFiClient WiFiServer::available (uint8_t* status)
+{
+	(void)status;
+	if (hasClient())
+		return WiFiClient(new ClientContext(serverAccept(pcb2int(_pcb))));
+	return WiFiClient();
+}

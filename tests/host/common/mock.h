@@ -19,6 +19,11 @@ typedef uint32_t uint32;
 #define lwip_htons htons
 #define lwip_htonl htonl
 
+#include <stdlib.h>
+#define RANDOM_REG32 ((uint32_t)random())
+
+//
+
 #ifdef __cplusplus
 #ifndef CCBUFSIZE
 #define CCBUFSIZE 512
@@ -29,3 +34,5 @@ size_t mockPeekBytes (int sock, char* dst, size_t size, int timeout_ms, char* bu
 size_t mockRead      (int sock, char* dst, size_t size, int timeout_ms, char* buf, size_t& bufsize);
 size_t mockWrite     (int sock, const uint8_t* data, size_t size, int timeout_ms);
 #endif
+
+int serverAccept (int sock);
