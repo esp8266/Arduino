@@ -115,8 +115,8 @@ WiFiClientSecure::~WiFiClientSecure() {
 }
 
 WiFiClientSecure::WiFiClientSecure(ClientContext* client,
-                                     const BearSSLX509List *chain, const BearSSLPrivateKey *sk,
-                                     int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
+                                     const X509List *chain, const PrivateKey *sk,
+                                     int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -132,9 +132,9 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client,
 }
 
 WiFiClientSecure::WiFiClientSecure(ClientContext *client,
-                                     const BearSSLX509List *chain,
-                                     unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk,
-                                     int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta) {
+                                     const X509List *chain,
+                                     unsigned cert_issuer_key_type, const PrivateKey *sk,
+                                     int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
   stack_thunk_add_ref();
@@ -149,13 +149,13 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
   }
 }
 
-void WiFiClientSecure::setClientRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk) {
+void WiFiClientSecure::setClientRSACert(const X509List *chain, const PrivateKey *sk) {
   _chain = chain;
   _sk = sk;
 }
 
-void WiFiClientSecure::setClientECCert(const BearSSLX509List *chain,
-                                        const BearSSLPrivateKey *sk, unsigned allowed_usages, unsigned cert_issuer_key_type) {
+void WiFiClientSecure::setClientECCert(const X509List *chain,
+                                        const PrivateKey *sk, unsigned allowed_usages, unsigned cert_issuer_key_type) {
   _chain = chain;
   _sk = sk;
   _allowed_usages = allowed_usages;
@@ -929,7 +929,7 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
 
 // Slightly different X509 setup for servers who want to validate client
 // certificates, so factor it out as it's used in RSA and EC servers.
-bool WiFiClientSecure::_installServerX509Validator(const BearSSLX509List *client_CA_ta) {
+bool WiFiClientSecure::_installServerX509Validator(const X509List *client_CA_ta) {
   if (client_CA_ta) {
     _ta = client_CA_ta;
     // X509 minimal validator.  Checks dates, cert chain for trusted CA, etc.
@@ -956,9 +956,9 @@ bool WiFiClientSecure::_installServerX509Validator(const BearSSLX509List *client
 }
 
 // Called by WiFiServerBearSSL when an RSA cert/key is specified.
-bool WiFiClientSecure::_connectSSLServerRSA(const BearSSLX509List *chain,
-    const BearSSLPrivateKey *sk,
-    const BearSSLX509List *client_CA_ta) {
+bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
+    const PrivateKey *sk,
+    const X509List *client_CA_ta) {
   _freeSSL();
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
@@ -986,9 +986,9 @@ bool WiFiClientSecure::_connectSSLServerRSA(const BearSSLX509List *chain,
 }
 
 // Called by WiFiServerBearSSL when an elliptic curve cert/key is specified.
-bool WiFiClientSecure::_connectSSLServerEC(const BearSSLX509List *chain,
-    unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk,
-    const BearSSLX509List *client_CA_ta) {
+bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
+    unsigned cert_issuer_key_type, const PrivateKey *sk,
+    const X509List *client_CA_ta) {
   _freeSSL();
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
@@ -1301,7 +1301,7 @@ bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size) {
     delete _ta;
     _ta = nullptr;
   }
-  _ta = new BearSSLX509List(pk, size);
+  _ta = new X509List(pk, size);
   _deleteChainKeyTA = true;
   return _ta ? true : false;
 }
@@ -1311,7 +1311,7 @@ bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size) {
     delete _chain;
     _chain = nullptr;
   }
-  _chain = new BearSSLX509List(pk, size);
+  _chain = new X509List(pk, size);
   _deleteChainKeyTA = true;
   return _chain ? true : false;
 }
@@ -1321,7 +1321,7 @@ bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size) {
     delete _sk;
     _sk = nullptr;
   }
-  _sk = new BearSSLPrivateKey(pk, size);
+  _sk = new PrivateKey(pk, size);
   _deleteChainKeyTA = true;
   return _sk ? true : false;
 

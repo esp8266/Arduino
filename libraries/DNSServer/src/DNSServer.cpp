@@ -2,6 +2,11 @@
 #include <lwip/def.h>
 #include <Arduino.h>
 
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_OUTPUT DEBUG_ESP_PORT
+#else
+#define DEBUG_OUTPUT Serial
+#endif
 
 DNSServer::DNSServer()
 {
@@ -165,7 +170,7 @@ void DNSServer::replyWithIP(uint8_t* buffer, size_t packetSize)
   _udp.endPacket();
 
   #ifdef DEBUG_ESP_DNS
-    DEBUG_ESP_PORT.printf("DNS responds: %s for %s\n",
+    DEBUG_OUTPUT.printf("DNS responds: %s for %s\n",
             IPAddress(_resolvedIP).toString().c_str(), getDomainNameWithoutWwwPrefix(buffer, packetSize).c_str() );
   #endif
 }
