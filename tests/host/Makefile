@@ -33,6 +33,7 @@ CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
 	spiffs/spiffs_gc.c \
 	spiffs/spiffs_hydrogen.c \
 	spiffs/spiffs_nucleus.c \
+	libb64/cencode.c \
 )
 
 MOCK_CPP_FILES_COMMON := $(addprefix common/,\
@@ -83,6 +84,8 @@ CXXFLAGS += -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g
 CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g
 LDFLAGS += -coverage -O0
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
+#
+CXXFLAGS += -Wno-nonnull-compare # libraries/ESP8266WiFi/src/include/UdpContext.h:85:9: error: nonnull argument ‘this’ compared to NULL [-Werror=nonnull-compare] -- (if(this != 0))
 
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
@@ -152,28 +155,35 @@ $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
 # building ino sources
 
 MOCK_ARDUINO_LIBS := \
-$(addprefix ../../libraries/ESP8266WiFi/src/,\
-	ESP8266WiFi.cpp \
-	ESP8266WiFiAP.cpp \
-	ESP8266WiFiGeneric.cpp \
-	ESP8266WiFiMulti.cpp \
-	ESP8266WiFiSTA-WPS.cpp \
-	ESP8266WiFiSTA.cpp \
-	ESP8266WiFiScan.cpp \
-	WiFiClient.cpp \
-) \
-$(addprefix ../../libraries/ESP8266WebServer/src/,\
-	ESP8266WebServer.cpp \
-	Parsing.cpp \
-	detail/mimetable.cpp \
-) \
+	$(addprefix ../../libraries/,\
+		$(addprefix ESP8266WiFi/src/,\
+			ESP8266WiFi.cpp \
+			ESP8266WiFiAP.cpp \
+			ESP8266WiFiGeneric.cpp \
+			ESP8266WiFiMulti.cpp \
+			ESP8266WiFiSTA-WPS.cpp \
+			ESP8266WiFiSTA.cpp \
+			ESP8266WiFiScan.cpp \
+			WiFiClient.cpp \
+		) \
+		$(addprefix ESP8266WebServer/src/,\
+			ESP8266WebServer.cpp \
+			Parsing.cpp \
+			detail/mimetable.cpp \
+		) \
+	)
+
+#		ESP8266mDNS/ESP8266mDNS.cpp \
+
 
 MOCK_ARDUINO_LIBS += \
 	common/MockClientContextSocket.cpp \
 	common/MockClientContext.cpp \
 	common/MockWiFiServerSocket.cpp \
 	common/MockWiFiServer.cpp \
+	common/MockUDPSocket.cpp \
 	common/ArduinoWire.cpp \
+	common/MockTools.cpp \
 
 ARDUINO_LIBS += $(addprefix $(CORE_PATH)/,\
 	IPAddress.cpp \

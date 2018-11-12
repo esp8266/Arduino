@@ -54,7 +54,7 @@ size_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char
 	if (usersize > CCBUFSIZE)
 		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %d bytes (-> %d)\n", CCBUFSIZE, (int)usersize - CCBUFSIZE, (int)usersize);
 
-        struct pollfd p;
+	struct pollfd p;
 	size_t retsize = 0;
 	do
 	{
@@ -75,8 +75,8 @@ size_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char
 		}
 		
 		// wait for more data until timeout
-	        p.fd = sock;
-	        p.events = POLLIN;
+		p.fd = sock;
+		p.events = POLLIN;
 	} while (poll(&p, 1, timeout_ms) == 1);
 	
 	memcpy(dst, ccinbuf, retsize);
@@ -94,23 +94,28 @@ size_t mockRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf
 	
 size_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 {
-        struct pollfd p;
-        p.fd = sock;
-        p.events = POLLOUT;
-        int ret = poll(&p, 1, timeout_ms);
-        if (ret == -1)
-        {
-            fprintf(stderr, MOCK "ClientContext::write: poll(%d): %s\n", sock, strerror(errno));
-            return 0;
-        }
-        if (ret)
-        {
-            ret = ::write(sock, data, size);
-            if (ret == -1)
-            {
-                fprintf(stderr, MOCK "ClientContext::read: write(%d): %s\n", sock, strerror(errno));
-                return 0;
-            }
-        }
-        return ret;
+	struct pollfd p;
+	p.fd = sock;
+	p.events = POLLOUT;
+	int ret = poll(&p, 1, timeout_ms);
+	if (ret == -1)
+	{
+		fprintf(stderr, MOCK "ClientContext::write: poll(%d): %s\n", sock, strerror(errno));
+		return 0;
+	}
+	if (ret)
+	{
+		ret = ::write(sock, data, size);
+		if (ret == -1)
+		{
+			fprintf(stderr, MOCK "ClientContext::read: write(%d): %s\n", sock, strerror(errno));
+			return 0;
+		}
+		if (ret != (int)size)
+		{
+			fprintf(stderr, MOCK "ClientContext::write: short write (%d < %d) (TODO)\n", (int)ret, (int)size);
+			exit(EXIT_FAILURE);
+		}
+	}
+	return ret;
 }

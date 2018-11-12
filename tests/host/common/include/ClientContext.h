@@ -20,15 +20,15 @@ class ClientContext
 public:
     ClientContext(tcp_pcb* pcb, discard_cb_t discard_cb, void* discard_cb_arg) :
         _discard_cb(discard_cb), _discard_cb_arg(discard_cb_arg), _refcnt(0), _next(0),
-        _sync(::getDefaultPrivateGlobalSyncValue())
+        _sync(::getDefaultPrivateGlobalSyncValue()), _sock(-1)
     {
         (void)pcb;
-        _sock = -1;
     }
     
-    ClientContext (int sock)
+    ClientContext (int sock) :
+        _discard_cb(nullptr), _discard_cb_arg(nullptr), _refcnt(0), _next(nullptr),
+        _sync(::getDefaultPrivateGlobalSyncValue()), _sock(sock)
     {
-    	_sock = sock;
     }
     
     err_t abort()
@@ -141,25 +141,21 @@ public:
     	return _inbufsize?: mockFillInBuf(_sock, _inbuf, _inbufsize);
     }
 
-    char read()
+    int read()
     {
         char c;
-        if (read(&c, 1))
-            return c;
-        return 0;
+        return read(&c, 1)? c: -1;
     }
 
     size_t read (char* dst, size_t size)
     {
-        return mockRead(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
+        return mockRead(_sock, dst, size, 0, _inbuf, _inbufsize);
     }
 
     int peek()
     {
         char c;
-        if (!mockPeekBytes(_sock, &c, 1, _timeout_ms, _inbuf, _inbufsize))
-            return -1;
-        return c;
+        return peekBytes(&c, 1)? c: -1;
     }
 
     size_t peekBytes(char *dst, size_t size)
@@ -169,6 +165,7 @@ public:
 
     void discard_received()
     {
+        fprintf(stderr, MOCK "TODO: ClientContext::discard_received()\n");
     }
 
     bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)

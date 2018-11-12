@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <poll.h>
+#include <unistd.h>
 
 #define int2pcb(x) ((tcp_pcb*)(long)(x))
 #define pcb2int(x) ((int)(long)(x))
@@ -21,6 +22,12 @@ int serverAccept (int srvsock)
 		exit(EXIT_FAILURE);
 	}
 	return clisock;
+}
+
+void WiFiServer::begin (uint16_t port)
+{
+	_port = port;
+	return begin();
 }
 
 void WiFiServer::begin ()
@@ -78,4 +85,11 @@ size_t WiFiServer::write (const uint8_t *buf, size_t size)
 {
 	fprintf(stderr, MOCK "todo: WiFiServer::write(%p, %d)\n", buf, (int)size);
 	return 0;
+}
+
+void WiFiServer::close ()
+{
+	if (pcb2int(_pcb) >= 0)
+		::close(pcb2int(_pcb));
+	_pcb = int2pcb(-1);
 }

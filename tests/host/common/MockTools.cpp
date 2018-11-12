@@ -1,0 +1,15 @@
+
+#include <arpa/inet.h>
+
+extern "C"
+{
+
+uint32_t lwip_htonl (uint32_t hostlong)  { return htonl(hostlong);  }
+uint16_t lwip_htons (uint16_t hostshort) { return htons(hostshort); }
+uint32_t lwip_ntohl (uint32_t netlong)   { return ntohl(netlong);   }
+uint16_t lwip_ntohs (uint16_t netshort)  { return ntohs(netshort);  }
+
+char* ets_strcpy (char* d, const char* s) { return strcpy(d, s); }
+size_t ets_strlen (const char* s) { return strlen(s); }
+
+};
