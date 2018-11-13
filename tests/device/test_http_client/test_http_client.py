@@ -4,6 +4,7 @@ from threading import Thread
 import urllib2
 import os
 import ssl
+import time
 
 @setup('HTTP GET & POST requests')
 def setup_http_get(e):
@@ -34,6 +35,7 @@ def setup_http_get(e):
 def teardown_http_get(e):
     response = urllib2.urlopen('http://localhost:8088/shutdown')
     html = response.read()
+    time.sleep(30)
 
 
 @setup('HTTPS GET request')
@@ -58,7 +60,7 @@ def setup_http_get(e):
     def flaskThread():
         p = os.path.dirname(os.path.abspath(__file__))
         context = (p + '/server.crt', p + '/server.key')
-        print context
+        print(context)
         app.run(host='0.0.0.0', port=8088, ssl_context=context)    
     th = Thread(target=flaskThread)
     th.start()

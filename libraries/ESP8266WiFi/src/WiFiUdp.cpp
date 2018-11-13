@@ -243,8 +243,7 @@ int WiFiUDP::peek()
 
 void WiFiUDP::flush()
 {
-    if (_ctx)
-        _ctx->flush();
+    endPacket();
 }
 
 IPAddress WiFiUDP::remoteIP()

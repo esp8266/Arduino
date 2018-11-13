@@ -66,8 +66,11 @@ class ESP8266WiFiGenericClass {
 
         int32_t channel(void);
 
-        bool setSleepMode(WiFiSleepType_t type);
+        bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
+
         WiFiSleepType_t getSleepMode();
+        uint8_t getListenInterval ();
+        bool isSleepLevelMax ();
 
         bool setPhyMode(WiFiPhyMode_t mode);
         WiFiPhyMode_t getPhyMode();
@@ -99,7 +102,7 @@ class ESP8266WiFiGenericClass {
 
         int hostByName(const char* aHostname, IPAddress& aResult);
         int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
-
+        bool getPersistent();
     protected:
 
         friend class ESP8266WiFiSTAClass;

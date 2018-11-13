@@ -26,6 +26,7 @@
 
 #include "ESP8266WiFiType.h"
 #include "ESP8266WiFiGeneric.h"
+#include "user_interface.h"
 
 
 class ESP8266WiFiSTAClass {
@@ -39,6 +40,9 @@ class ESP8266WiFiSTAClass {
         wl_status_t begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL, bool connect = true);
         wl_status_t begin();
 
+        //The argument order for ESP is not the same as for Arduino. However, there is compatibility code under the hood 
+        //to detect Arduino arg order, and handle it correctly. Be aware that the Arduino default value handling doesn't 
+        //work here (see Arduino docs for gway/subnet defaults). In other words: at least 3 args must always be given.
         bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = (uint32_t)0x00000000, IPAddress dns2 = (uint32_t)0x00000000);
 
         bool reconnect();
@@ -50,6 +54,7 @@ class ESP8266WiFiSTAClass {
         bool getAutoConnect();
 
         bool setAutoReconnect(bool autoReconnect);
+        bool getAutoReconnect();
 
         uint8_t waitForConnectResult();
 
@@ -78,9 +83,12 @@ class ESP8266WiFiSTAClass {
 
         int32_t RSSI();
 
+        static void enableInsecureWEP (bool enable = true) { _useInsecureWEP = enable; }
+
     protected:
 
-      static bool _useStaticIp;
+        static bool _useStaticIp;
+        static bool _useInsecureWEP;
 
     // ----------------------------------------------------------------------------------------------
     // ------------------------------------ STA remote configure  -----------------------------------
@@ -89,7 +97,6 @@ class ESP8266WiFiSTAClass {
     public:
 
         bool beginWPSConfig(void);
-
         bool beginSmartConfig();
         bool stopSmartConfig();
         bool smartConfigDone();

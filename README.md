@@ -8,7 +8,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
-  - [Using git version](#using-git-version)
+  - [Using git version](#using-git-version-basic-instructions)
   - [Using PlatformIO](#using-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
@@ -28,13 +28,22 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [http://esp8266.github.io/Arduino/versions/2.3.0/](http://esp8266.github.io/Arduino/versions/2.3.0/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.2/](https://arduino-esp8266.readthedocs.io/en/2.4.2/)
 
-### Using git version
+### Using git version (basic instructions)
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
-- Install Arduino 1.8.2 from the [Arduino website](http://www.arduino.cc/en/main/software).
+- Install the current upstream Arduino IDE at the 1.8 level or later. The current version is at the [Arduino website](http://www.arduino.cc/en/main/software).
 - Go to Arduino directory
+  - For Mac OS X, it is `Arduino.app` showing as the Arduino icon.  
+    This location may be your `~/Downloads`, `~/Desktop` or even `/Applications`.
+    ```bash
+    cd <application-directory>/Arduino.app/Contents/Java
+    ```
+  - For Linux, it is ~/arduino by default.
+    ```bash
+    cd ~arduino
+    ```
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash
 cd hardware
@@ -51,19 +60,19 @@ python get.py
 
 ### Using PlatformIO
 
-[PlatformIO](http://platformio.org) is an open source ecosystem for IoT
+[PlatformIO](http://platformio.org?utm_source=github&utm_medium=arduino-esp8266) is an open source ecosystem for IoT
 development with cross platform build system, library manager and full support
 for Espressif (ESP8266) development. It works on the popular host OS: macOS, Windows,
 Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-- [What is PlatformIO?](http://docs.platformio.org/page/what-is-platformio.html)
-- [PlatformIO IDE](http://platformio.org/platformio-ide)
-- Quick Start with [PlatformIO IDE](http://docs.platformio.org/page/ide/atom.html#quick-start) or [PlatformIO Core](http://docs.platformio.org/page/core.html)
-- [Advanced usage](http://docs.platformio.org/page/platforms/espressif.html) -
-  custom settings, uploading to SPIFFS, Over-the-Air (OTA) or using stage version
-- [Integration with Cloud and Standalone IDEs](http://docs.platformio.org/page/ide.html) -
-  Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM and Visual Studio
-- [Project Examples](http://docs.platformio.org/page/platforms/espressif.html#examples)
+- [What is PlatformIO?](http://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=github&utm_medium=arduino-esp8266)
+- [PlatformIO IDE](http://platformio.org/platformio-ide?utm_source=github&utm_medium=arduino-esp8266)
+- [PlatformIO Core](http://docs.platformio.org/en/latest/core.html?utm_source=github&utm_medium=arduino-esp8266) (command line tool)
+- [Advanced usage](http://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266) -
+  custom settings, uploading to SPIFFS, Over-the-Air (OTA), staging version
+- [Integration with Cloud and Standalone IDEs](http://docs.platformio.org/en/latest/ide.html?utm_source=github&utm_medium=arduino-esp8266) -
+  Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM, Visual Studio, and VSCode
+- [Project Examples](http://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266#examples)
 
 ### Building with make
 
@@ -96,7 +105,7 @@ Please provide as much context as possible:
 
 For minor fixes of code and documentation, please go ahead and submit a pull request.
 
-Check out the list of issues which are easy to fix — [easy issues for 2.4.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.4.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
+Check out the list of issues which are easy to fix — [easy issues for 2.5.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.5.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
 
 Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed by opening an issue first.
 
@@ -119,3 +128,5 @@ ESP8266 core files are licensed under LGPL.
 [umm_malloc](https://github.com/rhempel/umm_malloc) memory management library written by Ralph Hempel is used in this project. It is distributed under MIT license.
 
 [axTLS](http://axtls.sourceforge.net/) library written by Cameron Rich, built from https://github.com/igrr/axtls-8266, is used in this project. It is distributed under [BSD license](https://github.com/igrr/axtls-8266/blob/master/LICENSE).
+
+[BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).

@@ -26,7 +26,6 @@
 #include "ESP8266WiFiGeneric.h"
 #include "ESP8266WiFiSTA.h"
 
-extern "C" {
 #include "c_types.h"
 #include "ets_sys.h"
 #include "os_type.h"
@@ -34,6 +33,8 @@ extern "C" {
 #include "mem.h"
 #include "user_interface.h"
 #include "smartconfig.h"
+
+extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
 #include "lwip/init.h" // LWIP_VERSION_
@@ -62,7 +63,8 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
         return false;
     }
 
-    if(strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0) {
+    //in case of password, use strncmp with size 64 to cover 64byte psk case (no null term)
+    if(strncmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password), sizeof(lhs.password)) != 0) {
         return false;
     }
 
@@ -84,6 +86,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
 // -----------------------------------------------------------------------------------------------------------------------
 
 bool ESP8266WiFiSTAClass::_useStaticIp = false;
+bool ESP8266WiFiSTAClass::_useInsecureWEP = false;
 
 /**
  * Start Wifi connection
@@ -114,15 +117,21 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
 
     struct station_config conf;
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
+    
+    conf.threshold.authmode = AUTH_OPEN;
 
     if(passphrase) {
-        if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK
+        conf.threshold.authmode = AUTH_WPA_PSK;
+        if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
             memcpy(reinterpret_cast<char*>(conf.password), passphrase, 64);
         else
             strcpy(reinterpret_cast<char*>(conf.password), passphrase);
     } else {
         *conf.password = 0;
     }
+
+    conf.threshold.rssi = -127;
+    conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
 
     if(bssid) {
         conf.bssid_set = 1;
@@ -131,20 +140,21 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         conf.bssid_set = 0;
     }
 
-    struct station_config current_conf;
-    wifi_station_get_config(&current_conf);
-    if(sta_config_equal(current_conf, conf)) {
+    struct station_config conf_compare;
+    if(WiFi._persistent){
+        wifi_station_get_config_default(&conf_compare);
+    }
+    else {
+        wifi_station_get_config(&conf_compare);
+    }
+
+    if(sta_config_equal(conf_compare, conf)) {
         DEBUGV("sta config unchanged");
     }
     else {
         ETS_UART_INTR_DISABLE();
 
         if(WiFi._persistent) {
-            // workaround for #1997: make sure the value of ap_number is updated and written to flash
-            // to be removed after SDK update
-            wifi_station_ap_number_set(2);
-            wifi_station_ap_number_set(1);
-
             wifi_station_set_config(&conf);
         } else {
             wifi_station_set_config_current(&conf);
@@ -195,7 +205,6 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
     return status();
 }
 
-
 /**
  * Change IP configuration settings disabling the dhcp client
  * @param local_ip   Static ip configuration
@@ -204,44 +213,68 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
  * @param dns1       Static DNS server 1
  * @param dns2       Static DNS server 2
  */
-bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1, IPAddress dns2) {
+bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress arg2, IPAddress arg3, IPAddress dns2) {
 
-    if(!WiFi.enableSTA(true)) {
-        return false;
-    }
+  if(!WiFi.enableSTA(true)) {
+      return false;
+  }
 
-    struct ip_info info;
-    info.ip.addr = static_cast<uint32_t>(local_ip);
-    info.gw.addr = static_cast<uint32_t>(gateway);
-    info.netmask.addr = static_cast<uint32_t>(subnet);
+  //ESP argument order is: ip, gateway, subnet, dns1
+  //Arduino arg order is:  ip, dns, gateway, subnet.
 
-    if (local_ip == 0U && gateway == 0U && subnet == 0U) {
-        _useStaticIp = false;
-        wifi_station_dhcpc_start();
-        return true;
-    }
+  //first, check whether dhcp should be used, which is when ip == 0 && gateway == 0 && subnet == 0.
+  bool espOrderUseDHCP = (local_ip == 0U && arg1 == 0U && arg2 == 0U);
+  bool arduinoOrderUseDHCP = (local_ip == 0U && arg2 == 0U && arg3 == 0U);
+  if (espOrderUseDHCP || arduinoOrderUseDHCP) {
+      _useStaticIp = false;
+      wifi_station_dhcpc_start();
+      return true;
+  }
 
-    wifi_station_dhcpc_stop();
-    if(wifi_set_ip_info(STATION_IF, &info)) {
-        _useStaticIp = true;
-    } else {
-        return false;
-    }
-    ip_addr_t d;
+  //To allow compatibility, check first octet of 3rd arg. If 255, interpret as ESP order, otherwise Arduino order.
+  IPAddress gateway = arg1;
+  IPAddress subnet = arg2;
+  IPAddress dns1 = arg3;
 
-    if(dns1 != (uint32_t)0x00000000) {
-        // Set DNS1-Server
-        d.addr = static_cast<uint32_t>(dns1);
-        dns_setserver(0, &d);
-    }
+  if(subnet[0] != 255)
+  {
+    //octet is not 255 => interpret as Arduino order
+    gateway = arg2;
+    subnet = arg3[0] == 0 ? IPAddress(255,255,255,0) : arg3; //arg order is arduino and 4th arg not given => assign it arduino default
+    dns1 = arg1;
+  }
 
-    if(dns2 != (uint32_t)0x00000000) {
-        // Set DNS2-Server
-        d.addr = static_cast<uint32_t>(dns2);
-        dns_setserver(1, &d);
-    }
+  //ip and gateway must be in the same subnet
+  if((local_ip & subnet) != (gateway & subnet)) {
+    return false;
+  }
 
-    return true;
+  struct ip_info info;
+  info.ip.addr = static_cast<uint32_t>(local_ip);
+  info.gw.addr = static_cast<uint32_t>(gateway);
+  info.netmask.addr = static_cast<uint32_t>(subnet);
+
+  wifi_station_dhcpc_stop();
+  if(wifi_set_ip_info(STATION_IF, &info)) {
+      _useStaticIp = true;
+  } else {
+      return false;
+  }
+  ip_addr_t d;
+
+  if(dns1 != (uint32_t)0x00000000) {
+      // Set DNS1-Server
+      d.addr = static_cast<uint32_t>(dns1);
+      dns_setserver(0, &d);
+  }
+
+  if(dns2 != (uint32_t)0x00000000) {
+      // Set DNS2-Server
+      d.addr = static_cast<uint32_t>(dns2);
+      dns_setserver(1, &d);
+  }
+
+  return true;
 }
 
 /**
@@ -323,6 +356,14 @@ bool ESP8266WiFiSTAClass::getAutoConnect() {
  */
 bool ESP8266WiFiSTAClass::setAutoReconnect(bool autoReconnect) {
     return wifi_station_set_reconnect_policy(autoReconnect);
+}
+
+/**
+ * get whether reconnect or not when the ESP8266 station is disconnected from AP.
+ * @return autoreconnect
+ */
+bool ESP8266WiFiSTAClass::getAutoReconnect() {
+    return wifi_station_get_reconnect_policy();
 }
 
 /**
@@ -490,7 +531,10 @@ String ESP8266WiFiSTAClass::SSID() const {
 String ESP8266WiFiSTAClass::psk() const {
     struct station_config conf;
     wifi_station_get_config(&conf);
-    return String(reinterpret_cast<char*>(conf.password));
+    char tmp[65]; //psk is 64 bytes hex => plus null term
+    memcpy(tmp, conf.password, sizeof(conf.password));
+    tmp[64] = 0; //null term in case of 64 byte psk
+    return String(reinterpret_cast<char*>(tmp));
 }
 
 /**
@@ -528,87 +572,6 @@ int32_t ESP8266WiFiSTAClass::RSSI(void) {
 // -----------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------- STA remote configure -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
-
-void wifi_wps_status_cb(wps_cb_status status);
-
-/**
- * WPS config
- * so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
- * @return ok
- */
-bool ESP8266WiFiSTAClass::beginWPSConfig(void) {
-
-    if(!WiFi.enableSTA(true)) {
-        // enable STA failed
-        return false;
-    }
-
-    disconnect();
-
-    DEBUGV("wps begin\n");
-
-    if(!wifi_wps_disable()) {
-        DEBUGV("wps disable failed\n");
-        return false;
-    }
-
-    // so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
-    if(!wifi_wps_enable(WPS_TYPE_PBC)) {
-        DEBUGV("wps enable failed\n");
-        return false;
-    }
-
-    if(!wifi_set_wps_cb((wps_st_cb_t) &wifi_wps_status_cb)) {
-        DEBUGV("wps cb failed\n");
-        return false;
-    }
-
-    if(!wifi_wps_start()) {
-        DEBUGV("wps start failed\n");
-        return false;
-    }
-
-    esp_yield();
-    // will return here when wifi_wps_status_cb fires
-
-    return true;
-}
-
-/**
- * WPS callback
- * @param status wps_cb_status
- */
-void wifi_wps_status_cb(wps_cb_status status) {
-    DEBUGV("wps cb status: %d\r\n", status);
-    switch(status) {
-        case WPS_CB_ST_SUCCESS:
-            if(!wifi_wps_disable()) {
-                DEBUGV("wps disable failed\n");
-            }
-            wifi_station_connect();
-            break;
-        case WPS_CB_ST_FAILED:
-            DEBUGV("wps FAILED\n");
-            break;
-        case WPS_CB_ST_TIMEOUT:
-            DEBUGV("wps TIMEOUT\n");
-            break;
-        case WPS_CB_ST_WEP:
-            DEBUGV("wps WEP\n");
-            break;
-        case WPS_CB_ST_UNK:
-            DEBUGV("wps UNKNOWN\n");
-            if(!wifi_wps_disable()) {
-                DEBUGV("wps disable failed\n");
-            }
-            break;
-    }
-    // TODO user function to get status
-
-    esp_schedule(); // resume the beginWPSConfig function
-}
-
-
 
 bool ESP8266WiFiSTAClass::_smartConfigStarted = false;
 bool ESP8266WiFiSTAClass::_smartConfigDone = false;

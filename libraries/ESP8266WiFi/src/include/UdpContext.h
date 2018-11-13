@@ -27,6 +27,7 @@ extern "C" {
 void esp_yield();
 void esp_schedule();
 #include "lwip/init.h" // LWIP_VERSION_
+#include <assert.h>
 }
 
 
@@ -143,6 +144,21 @@ public:
         return _rx_buf->len - _rx_buf_offset;
     }
 
+    size_t tell() const
+    {
+        return _rx_buf_offset;
+    }
+
+    void seek(const size_t pos)
+    {
+        assert(isValidOffset(pos));
+        _rx_buf_offset = pos;
+    }
+
+    bool isValidOffset(const size_t pos) const {
+        return (pos <= _rx_buf->len);
+    }
+
     uint32_t getRemoteAddress()
     {
         if (!_rx_buf)
@@ -163,6 +179,9 @@ public:
 
     uint32_t getDestAddress()
     {
+        if (!_rx_buf)
+            return 0;
+
         ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
         return iphdr->dest.addr;
     }
@@ -200,7 +219,7 @@ public:
 
     int read()
     {
-        if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
+        if (!_rx_buf || _rx_buf_offset >= _rx_buf->len)
             return -1;
 
         char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
@@ -288,7 +307,8 @@ public:
                 data_size -= will_copy;
             }
         }
-        pbuf_free(_tx_buf_head);
+        if (_tx_buf_head)
+            pbuf_free(_tx_buf_head);
         _tx_buf_head = 0;
         _tx_buf_cur = 0;
         _tx_buf_offset = 0;
@@ -309,7 +329,7 @@ public:
 #endif
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
-            DEBUGV(":ust rc=%d\r\n", err);
+            DEBUGV(":ust rc=%d\r\n", (int) err);
         }
 #ifdef LWIP_MAYBE_XCC
         _pcb->ttl = old_ttl;
@@ -357,6 +377,9 @@ private:
     void _consume(size_t size)
     {
         _rx_buf_offset += size;
+        if (_rx_buf_offset > _rx_buf->len) {
+            _rx_buf_offset = _rx_buf->len;
+        }
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
@@ -415,4 +438,4 @@ private:
 
 
 
-#endif//CLIENTCONTEXT_H
+#endif//UDPCONTEXT_H

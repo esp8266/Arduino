@@ -113,6 +113,19 @@ typedef struct SSL_EXTENSIONS_ SSL_EXTENSIONS;
 #define SSL_X509_OFFSET                         -512
 #define SSL_X509_ERROR(A)                       (SSL_X509_OFFSET+A)
 
+#define X509_OK                             0
+#define X509_NOT_OK                         -1
+#define X509_VFY_ERROR_NO_TRUSTED_CERT      -2
+#define X509_VFY_ERROR_BAD_SIGNATURE        -3
+#define X509_VFY_ERROR_NOT_YET_VALID        -4
+#define X509_VFY_ERROR_EXPIRED              -5
+#define X509_VFY_ERROR_SELF_SIGNED          -6
+#define X509_VFY_ERROR_INVALID_CHAIN        -7
+#define X509_VFY_ERROR_UNSUPPORTED_DIGEST   -8
+#define X509_INVALID_PRIV_KEY               -9
+#define X509_MAX_CERTS                      -10
+#define X509_VFY_ERROR_BASIC_CONSTRAINT     -11
+
 /* alert types that are recognized */
 #define SSL_ALERT_TYPE_WARNING                  1
 #define SLL_ALERT_TYPE_FATAL                    2

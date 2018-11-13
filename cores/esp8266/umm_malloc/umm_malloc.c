@@ -499,6 +499,10 @@
 
 #include "umm_malloc_cfg.h"   /* user-dependent */
 
+// From UMM, the last caller of a malloc/realloc/calloc which failed:
+extern void *umm_last_fail_alloc_addr;
+extern int umm_last_fail_alloc_size;
+
 #ifndef UMM_FIRST_FIT
 #  ifndef UMM_BEST_FIT
 #    define UMM_BEST_FIT
@@ -1020,6 +1024,10 @@ void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
     if( UMM_NBLOCK(blockNo) & UMM_FREELIST_MASK ) {
       ++ummHeapInfo.freeEntries;
       ummHeapInfo.freeBlocks += curBlocks;
+      ummHeapInfo.freeSize2 += (unsigned int)curBlocks
+                             * (unsigned int)sizeof(umm_block)
+                             * (unsigned int)curBlocks
+                             * (unsigned int)sizeof(umm_block);
 
       if (ummHeapInfo.maxFreeContiguousBlocks < curBlocks) {
         ummHeapInfo.maxFreeContiguousBlocks = curBlocks;
@@ -1632,9 +1640,9 @@ static void *_umm_realloc( void *ptr, size_t size ) {
 
     if( (ptr = _umm_malloc( size )) ) {
       memcpy( ptr, oldptr, curSize );
+      _umm_free( oldptr );
     }
 
-    _umm_free( oldptr );
   }
 
   /* Release the critical section... */
@@ -1661,6 +1669,10 @@ void *umm_malloc( size_t size ) {
   size += POISON_SIZE(size);
 
   ret = _umm_malloc( size );
+  if (0 != size && 0 == ret) {
+    umm_last_fail_alloc_addr = __builtin_return_address(0);
+    umm_last_fail_alloc_size = size;
+  }
 
   ret = GET_POISONED(ret, size);
 
@@ -1685,7 +1697,13 @@ void *umm_calloc( size_t num, size_t item_size ) {
 
   size += POISON_SIZE(size);
   ret = _umm_malloc(size);
-  memset(ret, 0x00, size);
+  if (ret) {
+    memset(ret, 0x00, size);
+  }
+  if (0 != size && 0 == ret) {
+    umm_last_fail_alloc_addr = __builtin_return_address(0);
+    umm_last_fail_alloc_size = size;
+  }
 
   ret = GET_POISONED(ret, size);
 
@@ -1711,6 +1729,10 @@ void *umm_realloc( void *ptr, size_t size ) {
 
   size += POISON_SIZE(size);
   ret = _umm_realloc( ptr, size );
+  if (0 != size && 0 == ret) {
+    umm_last_fail_alloc_addr = __builtin_return_address(0);
+    umm_last_fail_alloc_size = size;
+  }
 
   ret = GET_POISONED(ret, size);
 
@@ -1741,6 +1763,15 @@ void umm_free( void *ptr ) {
 size_t ICACHE_FLASH_ATTR umm_free_heap_size( void ) {
   umm_info(NULL, 0);
   return (size_t)ummHeapInfo.freeBlocks * sizeof(umm_block);
+}
+
+size_t ICACHE_FLASH_ATTR umm_max_block_size( void ) {
+  umm_info(NULL, 0);
+  return ummHeapInfo.maxFreeContiguousBlocks * sizeof(umm_block);
+}
+
+size_t ICACHE_FLASH_ATTR umm_block_size( void ) {
+  return sizeof(umm_block);
 }
 
 /* ------------------------------------------------------------------------ */

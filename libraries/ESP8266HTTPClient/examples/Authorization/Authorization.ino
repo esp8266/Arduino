@@ -1,9 +1,9 @@
 /**
- * Authorization.ino
- *
- *  Created on: 09.12.2015
- *
- */
+   Authorization.ino
+
+    Created on: 09.12.2015
+
+*/
 
 #include <Arduino.h>
 
@@ -12,73 +12,75 @@
 
 #include <ESP8266HTTPClient.h>
 
-#define USE_SERIAL Serial
+#include <WiFiClient.h>
 
 ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
 
-    USE_SERIAL.begin(115200);
-   // USE_SERIAL.setDebugOutput(true);
+  Serial.begin(115200);
+  // Serial.setDebugOutput(true);
 
-    USE_SERIAL.println();
-    USE_SERIAL.println();
-    USE_SERIAL.println();
+  Serial.println();
+  Serial.println();
+  Serial.println();
 
-    for(uint8_t t = 4; t > 0; t--) {
-        USE_SERIAL.printf("[SETUP] WAIT %d...\n", t);
-        USE_SERIAL.flush();
-        delay(1000);
-    }
+  for (uint8_t t = 4; t > 0; t--) {
+    Serial.printf("[SETUP] WAIT %d...\n", t);
+    Serial.flush();
+    delay(1000);
+  }
 
-    WiFiMulti.addAP("SSID", "PASSWORD");
+  WiFi.mode(WIFI_STA);
+  WiFiMulti.addAP("SSID", "PASSWORD");
 
 }
 
 void loop() {
-    // wait for WiFi connection
-    if((WiFiMulti.run() == WL_CONNECTED)) {
+  // wait for WiFi connection
+  if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-        HTTPClient http;
+    WiFiClient client;
 
-        USE_SERIAL.print("[HTTP] begin...\n");
-        // configure traged server and url
+    HTTPClient http;
 
-
-        http.begin("http://user:password@192.168.1.12/test.html");
-
-        /*
-          // or
-          http.begin("http://192.168.1.12/test.html");
-          http.setAuthorization("user", "password");
-
-          // or
-          http.begin("http://192.168.1.12/test.html");
-          http.setAuthorization("dXNlcjpwYXN3b3Jk");
-         */
+    Serial.print("[HTTP] begin...\n");
+    // configure traged server and url
 
 
-        USE_SERIAL.print("[HTTP] GET...\n");
-        // start connection and send HTTP header
-        int httpCode = http.GET();
+    http.begin(client, "http://guest:guest@jigsaw.w3.org/HTTP/Basic/");
 
-        // httpCode will be negative on error
-        if(httpCode > 0) {
-            // HTTP header has been send and Server response header has been handled
-            USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
+    /*
+      // or
+      http.begin(client, "http://jigsaw.w3.org/HTTP/Basic/");
+      http.setAuthorization("guest", "guest");
 
-            // file found at server
-            if(httpCode == HTTP_CODE_OK) {
-                String payload = http.getString();
-                USE_SERIAL.println(payload);
-            }
-        } else {
-            USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
+      // or
+      http.begin(client, "http://jigsaw.w3.org/HTTP/Basic/");
+      http.setAuthorization("Z3Vlc3Q6Z3Vlc3Q=");
+    */
 
-        http.end();
+
+    Serial.print("[HTTP] GET...\n");
+    // start connection and send HTTP header
+    int httpCode = http.GET();
+
+    // httpCode will be negative on error
+    if (httpCode > 0) {
+      // HTTP header has been send and Server response header has been handled
+      Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
+      // file found at server
+      if (httpCode == HTTP_CODE_OK) {
+        String payload = http.getString();
+        Serial.println(payload);
+      }
+    } else {
+      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
     }
 
-    delay(10000);
-}
+    http.end();
+  }
 
+  delay(10000);
+}

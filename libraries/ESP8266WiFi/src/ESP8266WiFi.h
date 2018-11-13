@@ -38,7 +38,10 @@ extern "C" {
 
 #include "WiFiClient.h"
 #include "WiFiServer.h"
+#include "WiFiServerSecure.h"
 #include "WiFiClientSecure.h"
+#include "BearSSLHelpers.h"
+#include "CertStoreBearSSL.h"
 
 #ifdef DEBUG_ESP_WIFI
 #ifdef DEBUG_ESP_PORT
