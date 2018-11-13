@@ -53,7 +53,7 @@ public:
         }
     }
 
-    bool connect(ip_addr_t addr, uint16_t port)
+    bool connect (ip_addr_t addr, uint16_t port)
     {
         _dst = addr;
         _dstport = port;
@@ -62,7 +62,7 @@ public:
 
     bool listen(ip_addr_t addr, uint16_t port)
     {
-        return mockUDPListen(_sock, addr.addr, port);
+        return mockUDPListen(_sock, addr.addr, port, staticMCastAddr);
     }
 
     void disconnect()
@@ -90,7 +90,7 @@ public:
 
     size_t getSize()
     {
-    	return _inbufsize?: mockFillInBuf(_sock, _inbuf, _inbufsize);
+    	return _inbufsize;
     }
 
     size_t tell() const
@@ -114,14 +114,12 @@ public:
 
     uint32_t getRemoteAddress()
     {
-	fprintf(stderr, MOCK "TODO: implement getRemoteAddress\n");
-        return 0; //ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
+        return _dst.addr;
     }
 
     uint16_t getRemotePort()
     {
-	fprintf(stderr, MOCK "TODO: implement UDP getRemotePort\n");
-        return 0; //udp_hdr* udphdr = GET_UDP_HDR(_rx_buf);
+        return _dstport;
     }
 
     uint32_t getDestAddress()
@@ -138,10 +136,14 @@ public:
 
     bool next()
     {
-	uint32_t a;
         _inbufsize = 0;
-    	mockUDPFillInBuf(_sock, _inbuf, _inbufsize, &a);
-    	return _inbufsize > 0;
+    	mockUDPFillInBuf(_sock, _inbuf, _inbufsize, addrsize, addr, _dstport);
+    	if (_inbufsize > 0)
+    	{
+    	    translate_addr();
+    	    return true;
+    	}
+    	return false;
     }
 
     int read()
@@ -152,16 +154,13 @@ public:
 
     size_t read(char* dst, size_t size)
     {
-	uint32_t a;
-        size_t ret = mockUDPRead(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize, (void*)&a);
-        return ret;
+        return mockUDPRead(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
     }
 
     int peek()
     {
         char c;
-	uint32_t a;
-        return mockUDPPeekBytes(_sock, &c, 1, _timeout_ms, _inbuf, _inbufsize, &a)? c: -1;
+        return mockUDPPeekBytes(_sock, &c, 1, _timeout_ms, _inbuf, _inbufsize)?: -1;
     }
 
     void flush()
@@ -187,13 +186,27 @@ public:
 
     bool send (ip_addr_t* addr = 0, uint16_t port = 0)
     {
-        uint32_t a = lwip_htonl(addr? addr->addr: 0);
-    	size_t ret = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, &a);
+	uint32_t dst = addr? addr->addr: _dst.addr;
+	uint16_t dstport = port?: _dstport;
+    	size_t ret = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
     	_outbufsize = 0;
     	return ret > 0;
     }
 
+public:
+
+    static uint32_t staticMCastAddr;
+
 private:
+
+    void translate_addr ()
+    {
+        if (addrsize == 4)
+            ip4_addr_set_u32(&ip_2_ip4(_dst), *(uint32_t*)addr); // XXX should use lwip_ntohl?
+        else
+            fprintf(stderr, MOCK "TODO unhandled udp address of size %d\n", (int)addrsize);
+    }
+
     int _sock = -1;
     rxhandler_t _on_rx;
     int _refcnt = 0;
@@ -207,6 +220,16 @@ private:
     size_t _outbufsize = 0;
 
     int _timeout_ms = 0;
+    
+    uint8_t addrsize;
+    uint8_t addr[16];
 };
+
+inline err_t igmp_joingroup (const ip4_addr_t *ifaddr, const ip4_addr_t *groupaddr)
+{
+	(void)ifaddr;
+	UdpContext::staticMCastAddr = groupaddr->addr;
+	return ERR_OK;
+}
 
 #endif//UDPCONTEXT_H

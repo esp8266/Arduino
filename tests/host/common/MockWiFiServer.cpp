@@ -41,3 +41,9 @@ WiFiClient WiFiServer::available (uint8_t* status)
 		return WiFiClient(new ClientContext(serverAccept(pcb2int(_pcb))));
 	return WiFiClient();
 }
+
+// static declaration
+
+#include <include/UdpContext.h>
+uint32_t UdpContext::staticMCastAddr = 0;
+

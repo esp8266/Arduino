@@ -82,7 +82,7 @@ PREINCLUDES := \
 
 CXXFLAGS += -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g
 CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g
-LDFLAGS += -coverage -O0
+LDFLAGS += -coverage -O0 -g
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 #
 CXXFLAGS += -Wno-nonnull-compare # libraries/ESP8266WiFi/src/include/UdpContext.h:85:9: error: nonnull argument ‘this’ compared to NULL [-Werror=nonnull-compare] -- (if(this != 0))
@@ -165,6 +165,7 @@ MOCK_ARDUINO_LIBS := \
 			ESP8266WiFiSTA.cpp \
 			ESP8266WiFiScan.cpp \
 			WiFiClient.cpp \
+			WiFiUdp.cpp \
 		) \
 		$(addprefix ESP8266WebServer/src/,\
 			ESP8266WebServer.cpp \

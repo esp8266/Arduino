@@ -38,7 +38,7 @@ extern "C"
 #include "lwip/inet.h"
 #include "lwip/igmp.h"
 #include "lwip/mem.h"
-#include "include/UdpContext.h"
+#include <include/UdpContext.h>
 
 
 template<>
@@ -106,7 +106,9 @@ uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, ui
 
     _ctx = new UdpContext;
     _ctx->ref();
-    if (!_ctx->listen(*IP_ADDR_ANY, port)) {
+    ip_addr_t addr;
+    addr.addr = INADDR_ANY;
+    if (!_ctx->listen(addr, port)) {
         return 0;
     }
 

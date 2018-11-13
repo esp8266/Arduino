@@ -34,7 +34,7 @@ typedef uint32_t uint32;
 
 #ifdef __cplusplus
 #ifndef CCBUFSIZE
-#define CCBUFSIZE 512
+#define CCBUFSIZE 8192
 #endif
 
 // tcp
@@ -48,10 +48,9 @@ int serverAccept (int sock);
 // udp
 #define ADDRBUFSIZE	32	// ipv6:16 ipv4:4
 int mockUDPSocket ();
-bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port);
-size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, void* addrbuf);
-size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize, void* addrbuf);
-size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize, void* addrbuf);
-size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, const void* addrbuf);
-
+bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast = 0);
+size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize, uint8_t addr[16], uint16_t& port);
+size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
+size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
+size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port);
 #endif // __cplusplus
