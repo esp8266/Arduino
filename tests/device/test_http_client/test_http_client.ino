@@ -2,7 +2,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <BSTest.h>
-#include <test_config.h>
 #include <pgmspace.h>
 
 BS_ENV_DECLARE();
@@ -12,7 +11,7 @@ void setup()
     Serial.begin(115200);
     Serial.setDebugOutput(true);
     WiFi.persistent(false);
-    WiFi.begin(STA_SSID, STA_PASS);
+    WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
@@ -25,8 +24,9 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
 {
     {
         // small request
+        WiFiClient client;
         HTTPClient http;
-        http.begin(SERVER_IP, 8088, "/");
+        http.begin(client, getenv("SERVER_IP"), 8088, "/");
         auto httpCode = http.GET();
         REQUIRE(httpCode == HTTP_CODE_OK);
         String payload = http.getString();
@@ -34,8 +34,9 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
     }
     {
         // request which returns 8000 bytes
+        WiFiClient client;
         HTTPClient http;
-        http.begin(SERVER_IP, 8088, "/data?size=8000");
+        http.begin(client, getenv("SERVER_IP"), 8088, "/data?size=8000");
         auto httpCode = http.GET();
         REQUIRE(httpCode == HTTP_CODE_OK);
         String payload = http.getString();
@@ -49,8 +50,9 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
     }
     {
         // can do two POST requests with one HTTPClient object (#1902)
+        WiFiClient client;
         HTTPClient http;
-        http.begin(SERVER_IP, 8088, "/");
+        http.begin(client, getenv("SERVER_IP"), 8088, "/");
         http.addHeader("Content-Type", "text/plain");
         auto httpCode = http.POST("foo");
         Serial.println(httpCode);
@@ -58,7 +60,8 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
         http.end();
 
         httpCode = http.POST("bar");
-        REQUIRE(httpCode == HTTP_CODE_OK);
+        // its not expected to work but should not crash
+        REQUIRE(httpCode == HTTPC_ERROR_CONNECTION_REFUSED);
         http.end();
     }
 }
@@ -66,19 +69,26 @@ TEST_CASE("HTTP GET & POST requests", "[HTTPClient]")
 
 TEST_CASE("HTTPS GET request", "[HTTPClient]")
 {
+    //
+    // Tests with BearSSL
+    //
     {
         // small request
+        BearSSL::WiFiClientSecure client;
+        client.setFingerprint(fp);
         HTTPClient http;
-        http.begin(SERVER_IP, 8088, "/", fp);
+        http.begin(client, getenv("SERVER_IP"), 8088, "/", fp);
         auto httpCode = http.GET();
         REQUIRE(httpCode == HTTP_CODE_OK);
         String payload = http.getString();
         REQUIRE(payload == "hello!!!");
     }
     {
-        // request which returns 8000 bytes
+        // request which returns 4000 bytes
+        BearSSL::WiFiClientSecure client;
+        client.setFingerprint(fp);
         HTTPClient http;
-        http.begin(SERVER_IP, 8088, "/data?size=4000", fp);
+        http.begin(client, getenv("SERVER_IP"), 8088, "/data?size=4000", fp);
         auto httpCode = http.GET();
         REQUIRE(httpCode == HTTP_CODE_OK);
         String payload = http.getString();
@@ -90,7 +100,35 @@ TEST_CASE("HTTPS GET request", "[HTTPClient]")
             }
         }
     }
-
+    //
+    // Same tests with axTLS
+    //
+    {
+        // small request
+        axTLS::WiFiClientSecure client;
+        HTTPClient http;
+        http.begin(client, getenv("SERVER_IP"), 8088, "/", fp);
+        auto httpCode = http.GET();
+        REQUIRE(httpCode == HTTP_CODE_OK);
+        String payload = http.getString();
+        REQUIRE(payload == "hello!!!");
+    }
+    {
+        // request which returns 4000 bytes
+        axTLS::WiFiClientSecure client;
+        HTTPClient http;
+        http.begin(client, getenv("SERVER_IP"), 8088, "/data?size=4000", fp);
+        auto httpCode = http.GET();
+        REQUIRE(httpCode == HTTP_CODE_OK);
+        String payload = http.getString();
+        auto len = payload.length();
+        REQUIRE(len == 4000);
+        for (int i = 0; i < len; ++i) {
+            if (payload[i] != 'a') {
+                REQUIRE(false);
+            }
+        }
+    }
 }
 
 void loop()

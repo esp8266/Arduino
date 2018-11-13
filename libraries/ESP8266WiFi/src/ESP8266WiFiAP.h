@@ -47,6 +47,9 @@ class ESP8266WiFiAPClass {
         uint8_t* softAPmacAddress(uint8_t* mac);
         String softAPmacAddress(void);
 
+	String softAPSSID() const;
+	String softAPPSK() const;
+
     protected:
 
 };

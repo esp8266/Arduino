@@ -3,10 +3,20 @@ language: bash
 os: linux
 dist: trusty
 
+cache:
+  directories:
+    - $HOME/astyle
+
 matrix:
   include:
     - env:
-      - BUILD_TYPE=build
+      - BUILD_TYPE=build_even
+    - env:
+      - BUILD_TYPE=build_odd
+    - env:
+      - BUILD_TYPE=debug_even
+    - env:
+      - BUILD_TYPE=debug_odd
     - env:
       - BUILD_TYPE=platformio
     - env:
@@ -15,27 +25,53 @@ matrix:
       - BUILD_TYPE=package
     - env:
       - BUILD_TYPE=host_tests
+    - env:
+      - BUILD_TYPE=style_check
 
 install:
-  - pip install --user -r doc/requirements.txt
+  - >
+      [ "$BUILD_TYPE" = "docs" ] && {
+        pip install --user -r doc/requirements.txt;
+      } || true
+  - >
+      [ "$BUILD_TYPE" = "style_check" ] && {
+        [ -f $HOME/astyle/build/gcc/bin/astyle ] || {
+          wget -O astyle_3.1_linux.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz/download;
+          tar -xf astyle_3.1_linux.tar.gz -C $HOME;
+          make -C $HOME/astyle/build/gcc;
+        }
+        make -C $HOME/astyle/build/gcc prefix=$HOME install;
+      } || true
+  - sudo apt-get install valgrind lcov
 
 script:
   - $TRAVIS_BUILD_DIR/tests/common.sh
 
 deploy:
-  provider: releases
-  prerelease: true
-  skip_cleanup: true
-  api_key:
-    secure: A4FBmqyhlzy33oPeZVolg2Q/A3ZcJ3WnRQqQJ3NAPy+qGM5xcboOYtwcLL9vKaHZGfUB7lUP9QVZFGou1Wrmo9DnPvAoe3+XvCaDRGzVMxeIpu7UStbBD4Knbh98tlbMvZCXYRlT4VcusI9bMLK6UWw4sMdPislBh2FEfglTiag=
-  file_glob: true
-  file:
-    - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
-    - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
-  on:
-    repo: esp8266/Arduino
-    tags: true
-    condition: "$BUILD_TYPE = package"
+  - provider: releases
+    draft: true
+    skip_cleanup: true
+    api_key:
+      secure: A4FBmqyhlzy33oPeZVolg2Q/A3ZcJ3WnRQqQJ3NAPy+qGM5xcboOYtwcLL9vKaHZGfUB7lUP9QVZFGou1Wrmo9DnPvAoe3+XvCaDRGzVMxeIpu7UStbBD4Knbh98tlbMvZCXYRlT4VcusI9bMLK6UWw4sMdPislBh2FEfglTiag=
+    file_glob: true
+    tag_name: $TRAVIS_TAG
+    target_commitish: $TRAVIS_COMMIT
+    file:
+      - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
+      - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
+    on:
+      repo: esp8266/Arduino
+      tags: true
+      condition: "$BUILD_TYPE = package"
+  
+  - provider: script
+    skip_cleanup: true
+    script: bash package/deploy_package_index.sh
+    on:
+      repo: esp8266/Arduino
+      tags: true
+      condition: "$BUILD_TYPE = package"
+
 
 notifications:
   email:

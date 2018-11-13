@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 void __panic_func(const char* file, int line, const char* func) __attribute__((noreturn));
-#define panic() __panic_func(__FILE__, __LINE__, __func__)
+#define panic() __panic_func(PSTR(__FILE__), __LINE__, __func__)
 
 #ifdef __cplusplus
 }

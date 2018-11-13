@@ -31,27 +31,29 @@ which is selected in IDE, you have the following options for flash size:
 +---------------------------------+--------------------------+---------------------------+
 | Generic module                  | 2M                       | 1M                        |
 +---------------------------------+--------------------------+---------------------------+
-| Generic module                  | 4M                       | 3M                        |
+| Generic module                  | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| Adafruit HUZZAH                 | 4M                       | 1M, 3M                    |
+| Adafruit HUZZAH                 | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| ESPresso Lite 1.0               | 4M                       | 1M, 3M                    |
+| ESPresso Lite 1.0               | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| ESPresso Lite 2.0               | 4M                       | 1M, 3M                    |
+| ESPresso Lite 2.0               | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| NodeMCU 0.9                     | 4M                       | 1M, 3M                    |
+| NodeMCU 0.9                     | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| NodeMCU 1.0                     | 4M                       | 1M, 3M                    |
+| NodeMCU 1.0                     | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
 | Olimex MOD-WIFI-ESP8266(-DEV)   | 2M                       | 1M                        |
 +---------------------------------+--------------------------+---------------------------+
 | SparkFun Thing                  | 512k                     | 64k                       |
 +---------------------------------+--------------------------+---------------------------+
-| SweetPea ESP-210                | 4M                       | 1M, 3M                    |
+| SweetPea ESP-210                | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| WeMos D1 & D1 mini              | 4M                       | 1M, 3M                    |
+| WeMos D1 R1, R2 & mini          | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
-| ESPDuino                        | 4M                       | 1M, 3M                    |
+| ESPDuino                        | 4M                       | 1M, 2M, 3M                |
++---------------------------------+--------------------------+---------------------------+
+| WiFiduino                       | 4M                       | 1M, 2M, 3M                |
 +---------------------------------+--------------------------+---------------------------+
 
 **Note:** to use any of file system functions in the sketch, add the
@@ -276,7 +278,7 @@ Directory object (Dir)
 ----------------------
 
 The purpose of *Dir* object is to iterate over files inside a directory.
-It provides three methods: ``next()``, ``fileName()``, and
+It provides the methods: ``next()``, ``fileName()``, ``fileSize()`` , and
 ``openFile(mode)``.
 
 The following example shows how it should be used:
@@ -286,21 +288,41 @@ The following example shows how it should be used:
     Dir dir = SPIFFS.openDir("/data");
     while (dir.next()) {
         Serial.print(dir.fileName());
-        File f = dir.openFile("r");
-        Serial.println(f.size());
+        if(dir.fileSize()) {
+            File f = dir.openFile("r");
+            Serial.println(f.size());
+        }
     }
 
-``dir.next()`` returns true while there are files in the directory to
-iterate over. It must be called before calling ``fileName`` and
-``openFile`` functions.
+next
+~~~~
 
-``openFile`` method takes *mode* argument which has the same meaning as
-for ``SPIFFS.open`` function.
+Returns true while there are files in the directory to
+iterate over. It must be called before calling ``fileName()``, ``fileSize()``,
+and ``openFile()`` functions.
+
+fileName
+~~~~~~~~~
+
+Returns the name of the current file pointed to
+by the internal iterator.
+
+fileSize
+~~~~~~~~
+
+Returns the size of the current file pointed to
+by the internal iterator.
+
+openFile
+~~~~~~~~
+
+This method takes *mode* argument which has the same meaning as
+for ``SPIFFS.open()`` function.
 
 File object
 -----------
 
-``SPIFFS.open`` and ``dir.openFile`` functions return a *File* object.
+``SPIFFS.open()`` and ``dir.openFile()`` functions return a *File* object.
 This object supports all the functions of *Stream*, so you can use
 ``readBytes``, ``findUntil``, ``parseInt``, ``println``, and all other
 *Stream* methods.

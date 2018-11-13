@@ -34,6 +34,7 @@ public:
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
   virtual int read();
+  virtual size_t readBytes(char *buffer, size_t length);
   virtual int peek();
   virtual int available();
   virtual void flush();

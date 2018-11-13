@@ -24,6 +24,8 @@
 #include <memory>
 #include "interrupts.h"
 #include "MD5Builder.h"
+#include "umm_malloc/umm_malloc.h"
+#include "cont.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -114,6 +116,13 @@ void EspClass::deepSleep(uint64_t time_us, WakeMode mode)
     esp_yield();
 }
 
+void EspClass::deepSleepInstant(uint64_t time_us, WakeMode mode)
+{
+    system_deep_sleep_set_option(static_cast<int>(mode));
+    system_deep_sleep_instant(time_us);
+    esp_yield();
+}
+
 //this calculation was taken verbatim from the SDK api reference for SDK 2.1.0.
 //Note: system_rtc_clock_cali_proc() returns a uint32_t, even though system_deep_sleep() takes a uint64_t.
 uint64_t EspClass::deepSleepMax()
@@ -162,6 +171,21 @@ uint16_t EspClass::getVcc(void)
 uint32_t EspClass::getFreeHeap(void)
 {
     return system_get_free_heap_size();
+}
+
+uint16_t EspClass::getMaxFreeBlockSize(void)
+{
+    return umm_max_block_size();
+}
+
+uint32_t EspClass::getFreeContStack()
+{
+    return cont_get_free_stack(g_pcont);
+}
+
+void EspClass::resetFreeContStack()
+{
+    cont_repaint_stack(g_pcont);
 }
 
 uint32_t EspClass::getChipId(void)
