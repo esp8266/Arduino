@@ -153,7 +153,6 @@ size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms,
 	peer.sin_family = AF_INET;
 	peer.sin_addr.s_addr = ipv4; //XXFIXME should use lwip_htonl?
 	peer.sin_port = htons(port);
-fprintf(stderr, MOCK "------------------> UDP send %d bytes on sock=%d\n", (int)size, sock);
 	int ret = ::sendto(sock, data, size, 0/*flags*/, (const sockaddr*)&peer, sizeof(peer));
 	if (ret == -1)
 	{

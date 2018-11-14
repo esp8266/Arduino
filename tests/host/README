@@ -19,12 +19,11 @@ run it:
 	./bin/Blink -h
 
 Non exhaustive list of working examples:
-	make D=1 ../../libraries/esp8266/examples/Blink/Blink
+	make D=1 ../../libraries/ESP8266WiFi/examples/udp/udp
 	make D=1 ../../libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient
 	make D=1 ../../libraries/ESP8266WebServer/examples/HelloServer/HelloServer
 	make D=1 ../../libraries/ESP8266WebServer/examples/AdvancedWebServer/AdvancedWebServer
+	make D=1 ../../libraries/ESP8266mDNS/examples/mDNS_Web_Server/mDNS_Web_Server
 	
-	TO CHECK: mDNS is implemented, receive and sends UDP packets
-	
-Compile your sketches (remove the '.ino' part of the sketch file name):
+Compile your own sketches (remove the '.ino' part of the sketch file name):
 	make D=1 ULIBDIR=/path/to/your/arduino/libraries:/path/to/another/one /path/to/your/sketchdir/sketch/sketch

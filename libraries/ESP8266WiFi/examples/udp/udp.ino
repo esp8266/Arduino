@@ -11,20 +11,15 @@
 
   This code is in the public domain.
   
-  adapted from Ethernet library
+  adapted from Ethernet library examples
 */
 
 
+#include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-//#define UDP_TX_PACKET_MAX_SIZE 1024
-
-// Enter a MAC address and IP address for your controller below.
-// The IP address will be dependent on your local network:
-byte mac[] = {
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED
-};
-IPAddress ip(192, 168, 1, 177);
+#define SSID "ssid"
+#define PSK  "psk"
 
 unsigned int localPort = 8888;      // local port to listen on
 
@@ -32,14 +27,20 @@ unsigned int localPort = 8888;      // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
 char  ReplyBuffer[] = "acknowledged\r\n";       // a string to send back
 
-// An EthernetUDP instance to let us send and receive packets over UDP
 WiFiUDP Udp;
 
 void setup() {
-  // start the Ethernet and UDP:
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(SSID, PSK);
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print('.');
+    delay(500);
+  }
+  Serial.print("Connected! IP address: ");
+  Serial.println(WiFi.localIP());
+  Serial.printf("UDP server on port %d\n", localPort);
   Udp.begin(localPort);
-
-  Serial.begin(9600);
 }
 
 void loop() {

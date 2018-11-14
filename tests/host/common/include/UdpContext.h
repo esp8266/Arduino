@@ -81,13 +81,13 @@ public:
 
     void setMulticastInterface(const ip_addr_t& addr)
     {
-    	// not needed on posix, multicast is associated with
-    	// socket and its address (0.0.0.0) = all interfaces
+        // user multicast, and this is how it works with posix: send to multicast address:
+        _dst.addr = staticMCastAddr;
     }
 
     void setMulticastTTL(int ttl)
     {
-        fprintf(stderr, MOCK "TODO: UdpContext::setMulticastTTL\n");
+        //fprintf(stderr, MOCK "TODO: UdpContext::setMulticastTTL\n");
     }
 
     // warning: handler is called from tcp stack context
@@ -98,7 +98,7 @@ public:
 
     size_t getSize()
     {
-    	return _inbufsize;
+        return _inbufsize;
     }
 
     size_t tell() const
@@ -108,7 +108,7 @@ public:
 
     void seek(const size_t pos)
     {
-	fprintf(stderr, MOCK "TODO: implement UDP offset\n");
+        fprintf(stderr, MOCK "TODO: implement UDP offset\n");
         if (!isValidOffset(pos))
         {
             fprintf(stderr, MOCK "UDPContext::seek too far (%d >= %d)\n", (int)pos, (int)_inbufsize);
@@ -132,26 +132,26 @@ public:
 
     uint32_t getDestAddress()
     {
-	fprintf(stderr, MOCK "TODO: implement UDP getDestAddress\n");
+        fprintf(stderr, MOCK "TODO: implement UDP getDestAddress\n");
         return 0; //ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
     }
 
     uint16_t getLocalPort()
     {
-	fprintf(stderr, MOCK "TODO: implement UDP getLocalPort\n");
-    	return 0; //
+        fprintf(stderr, MOCK "TODO: implement UDP getLocalPort\n");
+        return 0; //
     }
 
     bool next()
     {
         _inbufsize = 0;
-    	mockUDPFillInBuf(_sock, _inbuf, _inbufsize, addrsize, addr, _dstport);
-    	if (_inbufsize > 0)
-    	{
-    	    translate_addr();
-    	    return true;
-    	}
-    	return false;
+        mockUDPFillInBuf(_sock, _inbuf, _inbufsize, addrsize, addr, _dstport);
+        if (_inbufsize > 0)
+        {
+            translate_addr();
+            return true;
+        }
+        return false;
     }
 
     int read()
@@ -173,37 +173,37 @@ public:
 
     void flush()
     {
-	//fprintf(stderr, MOCK "UdpContext::flush() does not follow arduino's flush concept\n");
-	//exit(EXIT_FAILURE);
-	// would be:
+        //fprintf(stderr, MOCK "UdpContext::flush() does not follow arduino's flush concept\n");
+        //exit(EXIT_FAILURE);
+        // would be:
         _inbufsize = 0;
     }
 
     size_t append (const char* data, size_t size)
     {
-    	if (size + _outbufsize > sizeof _outbuf)
-    	{
-    	    fprintf(stderr, MOCK "UdpContext::append: increase CCBUFSIZE (%d -> %d)\n", CCBUFSIZE, (int)(size + _outbufsize));
-    	    exit(EXIT_FAILURE);
-    	}
-    	
-    	memcpy(_outbuf + _outbufsize, data, size);
-    	_outbufsize += size;
-    	return size;
+        if (size + _outbufsize > sizeof _outbuf)
+        {
+            fprintf(stderr, MOCK "UdpContext::append: increase CCBUFSIZE (%d -> %d)\n", CCBUFSIZE, (int)(size + _outbufsize));
+            exit(EXIT_FAILURE);
+        }
+
+        memcpy(_outbuf + _outbufsize, data, size);
+        _outbufsize += size;
+        return size;
     }
 
     bool send (ip_addr_t* addr = 0, uint16_t port = 0)
     {
-	uint32_t dst = addr? addr->addr: _dst.addr;
-	uint16_t dstport = port?: _dstport;
-    	size_t ret = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
-    	_outbufsize = 0;
-    	return ret > 0;
+    uint32_t dst = addr? addr->addr: _dst.addr;
+    uint16_t dstport = port?: _dstport;
+        size_t ret = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
+        _outbufsize = 0;
+        return ret > 0;
     }
     
     void mock_cb (void)
     {
-    	if (_on_rx) _on_rx();
+        if (_on_rx) _on_rx();
     }
 
 public:
@@ -240,9 +240,9 @@ private:
 
 inline err_t igmp_joingroup (const ip4_addr_t *ifaddr, const ip4_addr_t *groupaddr)
 {
-	(void)ifaddr;
-	UdpContext::staticMCastAddr = groupaddr->addr;
-	return ERR_OK;
+    (void)ifaddr;
+    UdpContext::staticMCastAddr = groupaddr->addr;
+    return ERR_OK;
 }
 
 #endif//UDPCONTEXT_H
