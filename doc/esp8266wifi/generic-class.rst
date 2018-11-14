@@ -12,7 +12,6 @@ onEvent
 
     void  onEvent (WiFiEventCb cb, WiFiEvent_t event=WIFI_EVENT_ANY) __attribute__((deprecated))
 
-To see how to use ``onEvent`` please check example sketch `WiFiClientEvents.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiClientEvents/WiFiClientEvents.ino>`__ available inside examples folder of the ESP8266WiFi library.
 
 WiFiEventHandler
 ~~~~~~~~~~~~~~~~
@@ -27,7 +26,14 @@ WiFiEventHandler
     WiFiEventHandler  onSoftAPModeStationConnected (std::function< void(const WiFiEventSoftAPModeStationConnected &)>)
     WiFiEventHandler  onSoftAPModeStationDisconnected (std::function< void(const WiFiEventSoftAPModeStationDisconnected &)>)
 
-To see a sample application with ``WiFiEventHandler``, please check separate section with `examples :arrow\_right: <generic-examples.rst>`__ dedicated specifically to the Generic Class..
+It should be noted that when an WiFi interface goes down, all WiFiClients are stopped, and all WiFiServers stop serving. When the interface comes up, it is up to the user to reconnect the relevant WiFiClients and bring the WiFiServers back up. 
+For the WiFi station interface, it is suggested to set a callback for onStationModeDisconnected() that shuts down the user app's WiFiClients and WiFiServers (resource cleanup), and another callback for onStationModeGotIP() that brings them back up.
+For the SoftAP interface, when the interface is brought up, any servers should be brought up as well.
+
+A detailed explanation of ``WiFiEventHandler`` can be found in the section with `examples :arrow\_right: <generic-examples.rst>`__ dedicated specifically to the Generic Class..
+
+Alternatively, check the example sketch `WiFiEvents.ino <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiEvents/WiFiEvents.ino>`__ available inside examples folder of the ESP8266WiFi library.
+
 
 persistent
 ~~~~~~~~~~
@@ -55,13 +61,46 @@ mode
 -  ``WiFi.getMode()``: return current Wi-Fi mode (one out of four modes
    above)
 
+WiFi power management, DTIM
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: cpp
+
+    bool setSleepMode (WiFiSleepType_t type, int listenInterval=0)
+
+Sleep mode type is ``WIFI_NONE_SLEEP``, ``WIFI_LIGHT_SLEEP`` or ``WIFI_MODEM_SLEEP``.
+
+(``listenInterval`` appeared in esp8266-arduino core v2.5.0 using the last
+V2 revision of nonos-sdk before V3)
+
+Quoting nonos-sdk datasheet:
+
+* ``NONE``: disable power saving
+
+* ``LIGHT`` or ``MODEM``: TCP timer rate raised from 250ms to 3s
+
+When ``listenInterval`` is set to 1..10, in ``LIGHT`` or ``MODEM`` mode,
+station wakes up every (DTIM-interval * ``listenInterval``).  This saves
+power but station interface may miss broadcast data.
+
+Otherwise (default value 0), station wakes up at every DTIM-interval
+(configured in the access-point).
+
+Quoting wikipedia:
+
+A Delivery Traffic Indication Map (DTIM) is a kind of Traffic Indication Map
+(TIM) which informs the clients about the presence of buffered
+multicast/broadcast data on the access point.  It is generated within the
+periodic beacon at a frequency specified by the DTIM Interval.  Beacons are
+packets sent by an access point to synchronize a wireless network.
+
+
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
 
 .. code:: cpp
 
     int32_t  channel (void)
-    bool  setSleepMode (WiFiSleepType_t type)
     WiFiSleepType_t  getSleepMode ()
     bool  setPhyMode (WiFiPhyMode_t mode)
     WiFiPhyMode_t  getPhyMode ()
@@ -72,6 +111,11 @@ Other Function Calls
     bool  forceSleepBegin (uint32 sleepUs=0)
     bool  forceSleepWake ()
     int  hostByName (const char *aHostname, IPAddress &aResult)
+
+    appeared with SDK pre-V3:
+    uint8_t getListenInterval ();
+    bool isSleepLevelMax ();
+
 
 Documentation for the above functions is not yet prepared.
 
