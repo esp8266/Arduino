@@ -21,6 +21,8 @@
 #ifndef UDPCONTEXT_H
 #define UDPCONTEXT_H
 
+#include <functional>
+
 class UdpContext;
 
 #define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);

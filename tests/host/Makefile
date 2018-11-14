@@ -80,8 +80,10 @@ PREINCLUDES := \
 	-include common/mock.h \
 	-include common/c_types.h \
 
+ifneq ($(D),)
 DEBUG += -DDEBUG_ESP_PORT=Serial
 DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_MDNS
+endif
 
 CXXFLAGS += $(DEBUG) -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g
 CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g
@@ -89,6 +91,7 @@ LDFLAGS += -coverage -O0 -g
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 #
 CXXFLAGS += -Wno-nonnull-compare # libraries/ESP8266WiFi/src/include/UdpContext.h:85:9: error: nonnull argument ‘this’ compared to NULL [-Werror=nonnull-compare] -- (if(this != 0))
+CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24: error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
 
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
@@ -157,7 +160,11 @@ $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
 #################################################
 # building ino sources
 
-MOCK_ARDUINO_LIBS := \
+ARDUINO_LIBS := \
+	$(addprefix $(CORE_PATH)/,\
+		IPAddress.cpp \
+		Updater.cpp \
+	) \
 	$(addprefix ../../libraries/,\
 		$(addprefix ESP8266WiFi/src/,\
 			ESP8266WiFi.cpp \
@@ -176,11 +183,15 @@ MOCK_ARDUINO_LIBS := \
 			detail/mimetable.cpp \
 		) \
 		ESP8266mDNS/ESP8266mDNS.cpp \
-	)
+		ArduinoOTA/ArduinoOTA.cpp \
+		DNSServer/src/DNSServer.cpp \
+		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
+		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
+	) \
 
 
 
-MOCK_ARDUINO_LIBS += \
+MOCK_ARDUINO_LIBS := \
 	common/MockClientContextSocket.cpp \
 	common/MockClientContext.cpp \
 	common/MockWiFiServerSocket.cpp \
@@ -188,11 +199,11 @@ MOCK_ARDUINO_LIBS += \
 	common/MockUDPSocket.cpp \
 	common/ArduinoWire.cpp \
 	common/MockTools.cpp \
+	common/MockEsp.cpp \
+	common/MockEEPROM.cpp \
+	common/MockSPI.cpp \
 
-ARDUINO_LIBS += $(addprefix $(CORE_PATH)/,\
-	IPAddress.cpp \
-)
-
+ARDUINO_LIBS += 
 CPP_SOURCES_CORE_EMU = \
 	$(MOCK_CPP_FILES_EMU) \
 	$(CORE_CPP_FILES) \
@@ -206,17 +217,36 @@ bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	ranlib -c $@
 
 .PRECIOUS: %.cpp.o
-%: %.cpp.o bin/fullcore.a
+%: %.ino.cpp.o bin/fullcore.a
 	$(CXX) $(LDFLAGS) $< bin/fullcore.a -o $@
 	ln -sf ../$@ $(BINDIR)
 
 .PRECIOUS: %.cpp
-%.cpp: %.ino
-	cp $< $@
+%.ino.cpp: %.ino
+	@s=$<; \
+	n=$${s##*/}; \
+	(cd $${s%/*}; \
+	echo "#include \"$$n\""; \
+	for i in *.ino; do \
+		test "$$i" = "$$n" || echo "#include \"$$i\""; \
+	done; \
+	) > $@
 
 #################################################
 # Makefile.inc.ino generation
 -include $(BINDIR)/Makefile.inc.ino
+
+.PHONY: list
+list:
+	# copy examples locally
+	@for dir in ../../libraries/*/examples; do \
+		exampledir=$${dir%/*}; \
+		exampledirname=$${exampledir##*/}; \
+		for subdir in $$dir/*; do \
+			exname=$${subdir##*/}; \
+			echo "$$subdir/$$exname"; \
+		done; \
+	done; \
 
 $(BINDIR)/Makefile.inc.ino:
 	# copy examples locally

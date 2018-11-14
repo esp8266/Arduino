@@ -1,6 +1,15 @@
 
 #include <lwip/def.h>
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <arpa/inet.h>
+
+
 extern "C"
 {
 
@@ -74,20 +83,49 @@ void wifi_fpm_set_sleep_type (sleep_type_t type)
 
 bool wifi_get_ip_info (uint8 if_index, struct ip_info *info)
 {
-	//XXXTODO
-	if (if_index != STATION_IF)
-		fprintf(stderr, "we are not AP");
+	struct ifaddrs * ifAddrStruct = NULL, * ifa = NULL;
+	uint32_t ipv4 = lwip_htonl(0x7f000001);
+	uint32_t mask = lwip_htonl(0xff000000);
+
+	if (getifaddrs(&ifAddrStruct) != 0)
+	{
+		perror("getifaddrs");
+		exit(EXIT_FAILURE);
+	}
+	for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next)
+	{
+		if (   ifa->ifa_addr
+		    && ifa->ifa_addr->sa_family == AF_INET // ip_info is IPv4 only
+		   )
+		{
+			if (lwip_ntohl(*(uint32_t*)&((struct sockaddr_in*) ifa->ifa_netmask)->sin_addr) != 0xff000000)
+			{
+				if (ipv4 == lwip_htonl(0x7f000001))
+				{
+					// take the first by default
+					ipv4 = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
+					mask = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
+				}
+				if (host_interface && strcmp(ifa->ifa_name, host_interface) == 0)
+				{
+					// .. or the one specified by user on cmdline
+					ipv4 = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
+					mask = *(uint32_t*)&((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr;
+					break;
+				}
+			}
+		}
+	}
+	if (ifAddrStruct != NULL)
+		freeifaddrs(ifAddrStruct);
+
+	//if (if_index != STATION_IF)
+	//	fprintf(stderr, "we are not AP");
 	
-	//XXXTODO (give ip address of default route's interface?)
-#if 1
-	info->ip.addr = lwip_htonl(0xc0a80108);
-	info->netmask.addr = lwip_htonl(0xffffff00);
-	info->gw.addr = lwip_htonl(0xc0a801fe);
-#else
-	info->ip.addr = lwip_htonl(0x7f000001);
-	info->netmask.addr = lwip_htonl(0xff000000);
-	info->gw.addr = lwip_htonl(0x7f000001);
-#endif
+	info->ip.addr = ipv4;
+	info->netmask.addr = mask;
+	info->gw.addr = ipv4;
+
 	return true;
 }
 
@@ -249,6 +287,82 @@ void system_phy_set_max_tpw (uint8 max_tpw)
 {
 	(void)max_tpw;
 }
+
+bool wifi_softap_dhcps_start(void)
+{
+	return true;
+}
+
+enum dhcp_status wifi_softap_dhcps_status(void)
+{
+	return DHCP_STARTED;
+}
+
+bool wifi_softap_dhcps_stop(void)
+{
+	return true;
+}
+
+bool wifi_softap_get_config(struct softap_config *config)
+{
+	strcpy((char*)config->ssid, "apssid");
+	strcpy((char*)config->password, "appasswd");
+	config->ssid_len = strlen("appasswd");
+	config->channel = 1;
+	config->authmode = AUTH_WPA2_PSK;
+	config->ssid_hidden = 0;
+	config->max_connection = 4;
+	config->beacon_interval = 100;
+	return true;
+}
+
+bool wifi_softap_get_config_default(struct softap_config *config)
+{
+	return wifi_softap_get_config(config);
+}
+
+uint8 wifi_softap_get_station_num(void)
+{
+	return 2;
+}
+
+bool wifi_softap_set_config(struct softap_config *config)
+{
+	(void)config;
+	return true;
+}
+
+bool wifi_softap_set_config_current(struct softap_config *config)
+{
+	(void)config;
+	return true;
+}
+
+bool wifi_softap_set_dhcps_lease(struct dhcps_lease *please)
+{
+	(void)please;
+	return true;
+}
+
+bool wifi_softap_set_dhcps_lease_time(uint32 minute)
+{
+	(void)minute;
+	return true;
+}
+
+bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg)
+{
+	(void)level;
+	(void)optarg;
+	return true;
+}
+
+bool wifi_station_scan(struct scan_config *config, scan_done_cb_t cb)
+{
+	cb(nullptr, FAIL);
+	return false;
+}
+
 
 ///////////////////////////////////////
 // not user_interface

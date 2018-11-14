@@ -24,3 +24,18 @@ void digitalWrite(uint8_t pin, uint8_t val)
 	fprintf(stderr, MOCK "digitalWrite(pin=%d val=%d)\n", pin, val);
 }
 
+void analogWrite(uint8_t pin, int val)
+{
+	fprintf(stderr, MOCK "analogWrite(pin=%d, val=%d\n", pin, val);
+}
+
+int analogRead(uint8_t pin)
+{
+	(void)pin;
+	return 512;
+}
+
+void analogWriteRange(uint32_t range)
+{
+	fprintf(stderr, MOCK "analogWriteRange(range=%d)\n", range);
+}

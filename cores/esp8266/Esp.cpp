@@ -22,7 +22,7 @@
 #include "flash_utils.h"
 #include "eboot_command.h"
 #include <memory>
-#include "interrupts.h"
+#include <interrupts.h>
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
@@ -165,6 +165,7 @@ void EspClass::restart(void)
 uint16_t EspClass::getVcc(void)
 {
     InterruptLock lock;
+    (void)lock;
     return system_get_vdd33();
 }
 
@@ -480,7 +481,7 @@ uint32_t EspClass::getFreeSketchSpace() {
     uint32_t usedSize = getSketchSize();
     // round one sector up
     uint32_t freeSpaceStart = (usedSize + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
-    uint32_t freeSpaceEnd = (uint32_t)&_SPIFFS_start - 0x40200000;
+    uint32_t freeSpaceEnd = (uint32_t)(unsigned long)&_SPIFFS_start - 0x40200000;
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("usedSize=%u freeSpaceStart=%u freeSpaceEnd=%u\r\n", usedSize, freeSpaceStart, freeSpaceEnd);

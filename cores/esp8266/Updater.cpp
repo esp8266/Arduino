@@ -1,8 +1,8 @@
 #include "Updater.h"
 #include "Arduino.h"
 #include "eboot_command.h"
-#include "interrupts.h"
-#include "esp8266_peri.h"
+#include <interrupts.h>
+#include <esp8266_peri.h>
 
 //#define DEBUG_UPDATER Serial
 
@@ -89,7 +89,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     //size of current sketch rounded to a sector
     uint32_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address of the end of the space available for sketch and update
-    uint32_t updateEndAddress = (uint32_t)&_SPIFFS_start - 0x40200000;
+    uint32_t updateEndAddress = (uint32_t)(unsigned long)&_SPIFFS_start - 0x40200000;
     //size of the update rounded to a sector
     uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address where we will start writing the update
@@ -108,7 +108,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     }
   }
   else if (command == U_SPIFFS) {
-     updateStartAddress = (uint32_t)&_SPIFFS_start - 0x40200000;
+     updateStartAddress = (uint32_t)(unsigned long)&_SPIFFS_start - 0x40200000;
   }
   else {
     // unknown command
@@ -133,7 +133,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 #ifdef DEBUG_UPDATER
   DEBUG_UPDATER.printf("[begin] _startAddress:     0x%08X (%d)\n", _startAddress, _startAddress);
   DEBUG_UPDATER.printf("[begin] _currentAddress:   0x%08X (%d)\n", _currentAddress, _currentAddress);
-  DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", _size, _size);
+  DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", (unsigned)_size, (unsigned)_size);
 #endif
 
   _md5.begin();
@@ -159,7 +159,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
   if(hasError() || (!isFinished() && !evenIfRemaining)){
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("premature end: res:%u, pos:%u/%u\n", getError(), progress(), _size);
+    DEBUG_UPDATER.printf("premature end: res:%u, pos:%u/%u\n", getError(), (unsigned)progress(), (unsigned)_size);
 #endif
 
     _reset();
@@ -199,10 +199,10 @@ bool UpdaterClass::end(bool evenIfRemaining){
     eboot_command_write(&ebcmd);
 
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08X\n", _startAddress, _size);
+    DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08X\n", _startAddress, (unsigned)_size);
   }
   else if (_command == U_SPIFFS) {
-    DEBUG_UPDATER.printf("SPIFFS: address:0x%08X, size:0x%08X\n", _startAddress, _size);
+    DEBUG_UPDATER.printf("SPIFFS: address:0x%08X, size:0x%08X\n", _startAddress, (unsigned)_size);
 #endif
   }
 

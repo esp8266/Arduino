@@ -37,6 +37,9 @@ extern "C" {
 #endif
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus ets_printf
+
+extern const char* host_interface; // cmdline parameter
+
 #ifdef __cplusplus
 }
 #endif
@@ -67,6 +70,16 @@ size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccin
 size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port);
 
 class UdpContext;
-void register_udp (int sock, UdpContext* udp);
+void register_udp (int sock, UdpContext* udp = nullptr);
+
+class InterruptLock { };
+
+//
+
+#define ESP8266
+#define A0 0
+#define LED_BUILTIN 0
+
+//
 
 #endif // __cplusplus
