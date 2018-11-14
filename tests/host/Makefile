@@ -21,10 +21,10 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	WString.cpp \
 	Print.cpp \
 	FS.cpp \
-	spiffs_api.cpp \
 	pgmspace.cpp \
 	MD5Builder.cpp \
 )
+#	spiffs_api.cpp \
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
 	core_esp8266_noniso.c \
@@ -189,8 +189,6 @@ ARDUINO_LIBS := \
 		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
 	) \
 
-
-
 MOCK_ARDUINO_LIBS := \
 	common/MockClientContextSocket.cpp \
 	common/MockClientContext.cpp \
@@ -210,7 +208,12 @@ CPP_SOURCES_CORE_EMU = \
 	$(MOCK_ARDUINO_LIBS) \
 	$(ARDUINO_LIBS) \
 
-CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o)
+
+ULIBPATHS = $(shell echo $(ULIBDIR) | sed 's,:, ,g')
+USERLIBDIR = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS)/* $(ULIBPATHS)/*/src; do test -d $$d && echo -I$$d; done)
+INC_PATHS += $(USERLIBDIR)
+
+CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIB:.cpp=.cpp.o)
 
 bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	ar -rcu $@ $^
@@ -219,9 +222,9 @@ bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 .PRECIOUS: %.cpp.o
 %: %.ino.cpp.o bin/fullcore.a
 	$(CXX) $(LDFLAGS) $< bin/fullcore.a -o $@
-	ln -sf ../$@ $(BINDIR)
+	test -r $@ && ln -sf ../$@ $(BINDIR) || ln -sf $@ $(BINDIR)
 
-.PRECIOUS: %.cpp
+.PRECIOUS: %.ino.cpp
 %.ino.cpp: %.ino
 	@s=$<; \
 	n=$${s##*/}; \

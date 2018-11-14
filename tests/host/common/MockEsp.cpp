@@ -136,3 +136,8 @@ uint32_t EspClass::getFlashChipSize(void)
 {
 	return magicFlashChipSize(4);
 }
+
+String EspClass::getFullVersion ()
+{
+	return "host-emulation";
+}

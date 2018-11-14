@@ -17,6 +17,11 @@ void HardwareSerial::begin (unsigned long baud, SerialConfig config, SerialMode 
 		fprintf(stderr, MOCK "FIXME HardwareSerial::begin(baud=%ld config=0x%x mode=0x%x)\n", baud, (int)config, (int)mode);
 }
 
+void HardwareSerial::setDebugOutput (bool on)
+{
+	(void)on;
+}
+
 int HardwareSerial::available (void)
 {
 	printf(MOCK "TODO HardwareSerial::available\n");

@@ -2,6 +2,8 @@
 Host emulation (WIP)
 --------------------
 
+All results are stored or linked from ./bin/ .
+
 Regular host test:
 	make <no argument>
 
@@ -16,7 +18,6 @@ Build one example
 run it:
 	./bin/Blink -h
 
-
 Interesting examples:
 	make D=1 ../../libraries/esp8266/examples/Blink/Blink
 	make D=1 ../../libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient
@@ -25,3 +26,7 @@ Interesting examples:
 Needs tweaking:
 	make D=1 ../../libraries/ESP8266WebServer/examples/AdvancedWebServer/AdvancedWebServer
 		(declare 'void drawGraph();' on top of file)
+
+Compile your sketches (remove the .ino part of the sketch file name):
+	make D=1 ULIBDIR=/path/to/your/arduino/libraries:/path/to/another/one /path/to/your/sketchdir/sketch
+

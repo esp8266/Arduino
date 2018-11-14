@@ -363,6 +363,7 @@ bool wifi_station_scan(struct scan_config *config, scan_done_cb_t cb)
 	return false;
 }
 
+uint32_t core_version = 1;
 
 ///////////////////////////////////////
 // not user_interface
