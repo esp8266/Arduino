@@ -1,5 +1,6 @@
 
 #include <Arduino.h>
+#include <user_interface.h> // wifi_get_ip_info()
 
 #include <functional>
 #include "lwip/opt.h"
@@ -33,7 +34,8 @@ void help (const char* argv0, int exitcode)
 		"%s - compiled with esp8266/arduino emulator\n"
 		"options:\n"
 		"	-h\n"
-		"	-i <interface>\n"
+		"	-i <interface> - use this interface for IP address\n"
+		"	-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
 		,argv0);
 	exit(exitcode);
 }
@@ -41,6 +43,7 @@ void help (const char* argv0, int exitcode)
 static struct option options[] =
 {
 	{ "help",		no_argument,		NULL, 'h' },
+	{ "local",		required_argument,	NULL, 'l' },
 	{ "interface",		required_argument,	NULL, 'i' },
 };
 
@@ -48,7 +51,7 @@ int main (int argc, char* const argv [])
 {
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hi:", options, NULL);
+		int n = getopt_long(argc, argv, "hli:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -59,8 +62,17 @@ int main (int argc, char* const argv [])
 		case 'i':
 			host_interface = optarg;
 			break;
+		case 'l':
+			global_ipv4_netfmt = NO_GLOBAL_BINDING;
+			break;
+		default:
+			fprintf(stderr, MOCK "bad option '%c'\n", n);
+			exit(EXIT_FAILURE);
 		}
 	}
+	
+	// setup global global_ipv4_netfmt
+	wifi_get_ip_info(0, nullptr);
 
 	setup();
 	while (true)

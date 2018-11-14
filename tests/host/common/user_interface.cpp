@@ -81,6 +81,8 @@ void wifi_fpm_set_sleep_type (sleep_type_t type)
 	(void)type;
 }
 
+uint32_t global_ipv4_netfmt = 0; // global binding
+
 bool wifi_get_ip_info (uint8 if_index, struct ip_info *info)
 {
 	struct ifaddrs * ifAddrStruct = NULL, * ifa = NULL;
@@ -119,12 +121,19 @@ bool wifi_get_ip_info (uint8 if_index, struct ip_info *info)
 	if (ifAddrStruct != NULL)
 		freeifaddrs(ifAddrStruct);
 
+	(void)if_index;
 	//if (if_index != STATION_IF)
 	//	fprintf(stderr, "we are not AP");
 	
-	info->ip.addr = ipv4;
-	info->netmask.addr = mask;
-	info->gw.addr = ipv4;
+	if (global_ipv4_netfmt == NO_GLOBAL_BINDING)
+		global_ipv4_netfmt = ipv4;
+
+	if (info)
+	{
+		info->ip.addr = ipv4;
+		info->netmask.addr = mask;
+		info->gw.addr = ipv4;
+	}
 
 	return true;
 }

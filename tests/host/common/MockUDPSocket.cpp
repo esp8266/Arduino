@@ -23,23 +23,24 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 {
 	int optval = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1)
-		fprintf(stderr, MOCK "SO_REUSEPORT failed for udp port %d\n", port);
+		fprintf(stderr, MOCK "SO_REUSEPORT failed\n");
 	optval = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
-		fprintf(stderr, MOCK "SO_REUSEADDR failed for udp port %d\n", port);
+		fprintf(stderr, MOCK "SO_REUSEADDR failed\n");
 
 	struct sockaddr_in servaddr;
 	memset(&servaddr, 0, sizeof(servaddr)); 
 	
 	// Filling server information 
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = dstaddr;
+	//servaddr.sin_addr.s_addr = global_ipv4_netfmt?: dstaddr;
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servaddr.sin_port = htons(port);
 	
 	// Bind the socket with the server address 
 	if (bind(sock, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
 	{
-		fprintf(stderr, MOCK "UDP bind to port %d failed: %s\n", port, strerror(errno)); 
+		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", port, strerror(errno)); 
 		return false;
 	}
 	else
@@ -48,9 +49,20 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	if (mcast)
 	{
 		// https://web.cs.wpi.edu/~claypool/courses/4514-B99/samples/multicast.c
+		// https://stackoverflow.com/questions/12681097/c-choose-interface-for-udp-multicast-socket
+		
 		struct ip_mreq mreq;
 		mreq.imr_multiaddr.s_addr = mcast;
-		mreq.imr_interface.s_addr = 0;//htonl(INADDR_ANY);         
+		//mreq.imr_interface.s_addr = global_ipv4_netfmt?: htonl(INADDR_ANY);
+		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+		if (global_ipv4_netfmt)
+		{
+			if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, host_interface, strlen(host_interface)) == -1)
+				fprintf(stderr, MOCK "UDP multicast: can't setup bind/output on interface %s: %s\n", host_interface, strerror(errno));
+			if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, &mreq.imr_interface, sizeof(struct in_addr)) == -1)
+				fprintf(stderr, MOCK "UDP multicast: can't setup bind/input on interface %s: %s\n", host_interface, strerror(errno));
+		}
+
 		if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0)
 		{
 			fprintf(stderr, MOCK "can't join multicast group addr %08x\n", (int)mcast);
@@ -136,33 +148,23 @@ size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccin
 
 size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port)
 {
-	struct pollfd p;
-	p.fd = sock;
-	p.events = POLLOUT;
-	int ret = poll(&p, 1, timeout_ms);
+	// Filling server information 
+	struct sockaddr_in peer;
+	peer.sin_family = AF_INET;
+	peer.sin_addr.s_addr = ipv4; //XXFIXME should use lwip_htonl?
+	peer.sin_port = htons(port);
+fprintf(stderr, MOCK "------------------> UDP send %d bytes on sock=%d\n", (int)size, sock);
+	int ret = ::sendto(sock, data, size, 0/*flags*/, (const sockaddr*)&peer, sizeof(peer));
 	if (ret == -1)
 	{
-		 fprintf(stderr, MOCK "UDPContext::write: poll(%d): %s\n", sock, strerror(errno));
-		 return 0;
+		fprintf(stderr, MOCK "UDPContext::write: write(%d): %s\n", sock, strerror(errno));
+		return 0;
 	}
-	if (ret)
+	if (ret != (int)size)
 	{
-		// Filling server information 
-		struct sockaddr_in peer;
-		peer.sin_family = AF_INET;
-		peer.sin_addr.s_addr = ipv4; //XXFIXME should use lwip_htonl?
-		peer.sin_port = htons(port);
-		ret = ::sendto(sock, data, size, 0/*flags*/, (const sockaddr*)&peer, sizeof(peer));
-		if (ret == -1)
-		{
-			fprintf(stderr, MOCK "UDPContext::write: write(%d): %s\n", sock, strerror(errno));
-			return 0;
-		}
-		if (ret != (int)size)
-		{
-			fprintf(stderr, MOCK "UDPContext::write: short write (%d < %d) (TODO)\n", (int)ret, (int)size);
-			exit(EXIT_FAILURE);
-		}
+		fprintf(stderr, MOCK "UDPContext::write: short write (%d < %d) (TODO)\n", (int)ret, (int)size);
+		exit(EXIT_FAILURE);
 	}
+
 	return ret;
 }

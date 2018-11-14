@@ -18,16 +18,13 @@ typedef uint32_t uint32;
 
 //
 
-// htontoh code in common/MockTools.cpp
-#define LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
-
-//
-
 #include <stdlib.h>
 #define RANDOM_REG32 ((uint32_t)random())
 
-//
+// net tweak
 
+// htontoh code in common/MockTools.cpp
+#define LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
 #undef INADDR_NONE
 
 //
@@ -39,6 +36,9 @@ int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus ets_printf
 
 extern const char* host_interface; // cmdline parameter
+
+#define NO_GLOBAL_BINDING 0xffffffff
+extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
 
 #ifdef __cplusplus
 }
