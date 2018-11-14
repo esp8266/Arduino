@@ -1,0 +1,27 @@
+
+Host emulation (WIP)
+--------------------
+
+Regular host test:
+	make <no argument>
+
+Build all examples with debug enabled: (WIP)
+	make D=1 examples
+
+Show the example list:
+	make list
+
+Build one example
+	make D=1 ../../libraries/esp8266/examples/Blink/Blink
+run it:
+	./bin/Blink -h
+
+
+Interesting examples:
+	make D=1 ../../libraries/esp8266/examples/Blink/Blink
+	make D=1 ../../libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient
+	make D=1 ../../libraries/ESP8266WebServer/examples/HelloServer/HelloServer
+	
+Needs tweaking:
+	make D=1 ../../libraries/ESP8266WebServer/examples/AdvancedWebServer/AdvancedWebServer
+		(declare 'void drawGraph();' on top of file)

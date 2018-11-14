@@ -21,6 +21,13 @@ int mockUDPSocket ()
 
 bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 {
+	int optval = 1;
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1)
+		fprintf(stderr, MOCK "SO_REUSEPORT failed for udp port %d\n", port);
+	optval = 1;
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+		fprintf(stderr, MOCK "SO_REUSEADDR failed for udp port %d\n", port);
+
 	struct sockaddr_in servaddr;
 	memset(&servaddr, 0, sizeof(servaddr)); 
 	
