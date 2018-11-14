@@ -84,9 +84,9 @@ void* ICACHE_RAM_ATTR pvPortZalloc(size_t size, const char* file, int line)
 #undef calloc
 #undef realloc
 
-static const char oom_fmt[]   ICACHE_RODATA_ATTR STORE_ATTR = ":oom(%d)@?\n";
-static const char oom_fmt_1[] ICACHE_RODATA_ATTR STORE_ATTR = ":oom(%d)@";
-static const char oom_fmt_2[] ICACHE_RODATA_ATTR STORE_ATTR = ":%d\n";
+static const char oom_fmt[]   PROGMEM STORE_ATTR = ":oom(%d)@?\n";
+static const char oom_fmt_1[] PROGMEM STORE_ATTR = ":oom(%d)@";
+static const char oom_fmt_2[] PROGMEM STORE_ATTR = ":%d\n";
 
 void* malloc (size_t s)
 {

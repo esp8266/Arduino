@@ -82,7 +82,7 @@ static std::list<WiFiEventHandler> sCbEventList;
 bool ESP8266WiFiGenericClass::_persistent = true;
 WiFiMode_t ESP8266WiFiGenericClass::_forceSleepLastMode = WIFI_OFF;
 
-ESP8266WiFiGenericClass::ESP8266WiFiGenericClass() 
+ESP8266WiFiGenericClass::ESP8266WiFiGenericClass()
 {
     wifi_set_event_handler_cb((wifi_event_handler_cb_t) &ESP8266WiFiGenericClass::_eventCallback);
 }
@@ -214,7 +214,7 @@ WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeProbeRequestReceived(std::
  * callback for WiFi events
  * @param arg
  */
-void ESP8266WiFiGenericClass::_eventCallback(void* arg) 
+void ESP8266WiFiGenericClass::_eventCallback(void* arg)
 {
     System_Event_t* event = reinterpret_cast<System_Event_t*>(arg);
     DEBUG_WIFI("wifi evt: %d\n", event->event);
@@ -249,8 +249,71 @@ int32_t ESP8266WiFiGenericClass::channel(void) {
  * @param type sleep_type_t
  * @return bool
  */
-bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type) {
-    return wifi_set_sleep_type((sleep_type_t) type);
+bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenInterval) {
+
+   /**
+    * datasheet:
+    *
+   wifi_set_sleep_level():
+   Set sleep level of modem sleep and light sleep
+   This configuration should be called before calling wifi_set_sleep_type
+   Modem-sleep and light sleep mode have minimum and maximum sleep levels.
+   - In minimum sleep level, station wakes up at every DTIM to receive
+     beacon.  Broadcast data will not be lost because it is transmitted after
+     DTIM.  However, it can not save much more power if DTIM period is short,
+     as specified in AP.
+   - In maximum sleep level, station wakes up at every listen interval to
+     receive beacon.  Broadcast data may be lost because station may be in sleep
+     state at DTIM time.  If listen interval is longer, more power will be saved, but
+     it’s very likely to lose more broadcast data.
+   - Default setting is minimum sleep level.
+   Further reading: https://routerguide.net/dtim-interval-period-best-setting/
+
+   wifi_set_listen_interval():
+   Set listen interval of maximum sleep level for modem sleep and light sleep
+   It only works when sleep level is set as MAX_SLEEP_T
+   It should be called following the order:
+     wifi_set_sleep_level(MAX_SLEEP_T)
+     wifi_set_listen_interval
+     wifi_set_sleep_type
+   forum: https://github.com/espressif/ESP8266_NONOS_SDK/issues/165#issuecomment-416121920
+   default value seems to be 3 (as recommended by https://routerguide.net/dtim-interval-period-best-setting/)
+    */
+
+#ifdef DEBUG_ESP_WIFI
+    if (listenInterval && type == WIFI_NONE_SLEEP)
+        DEBUG_WIFI_GENERIC("listenInterval not usable with WIFI_NONE_SLEEP\n");
+#endif
+
+      if (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP) {
+        if (listenInterval) {
+            if (!wifi_set_sleep_level(MAX_SLEEP_T)) {
+                DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MAX_SLEEP_T): error\n");
+                return false;
+            }
+            if (listenInterval > 10) {
+                DEBUG_WIFI_GENERIC("listenInterval must be in [1..10]\n");
+#ifndef DEBUG_ESP_WIFI
+                // stay within datasheet range when not in debug mode
+                listenInterval = 10;
+#endif
+            }
+            if (!wifi_set_listen_interval(listenInterval)) {
+                DEBUG_WIFI_GENERIC("wifi_set_listen_interval(%d): error\n", listenInterval);
+                return false;
+            }
+        } else {
+            if (!wifi_set_sleep_level(MIN_SLEEP_T)) {
+                DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MIN_SLEEP_T): error\n");
+                return false;
+            }
+        }
+    }
+    bool ret = wifi_set_sleep_type((sleep_type_t) type);
+    if (!ret) {
+        DEBUG_WIFI_GENERIC("wifi_set_sleep_type(%d): error\n", (int)type);
+    }
+    return ret;
 }
 
 /**
@@ -426,6 +489,22 @@ bool ESP8266WiFiGenericClass::forceSleepWake() {
     return false;
 }
 
+/**
+ * Get listen interval of maximum sleep level for modem sleep and light sleep.
+ * @return interval
+ */
+uint8_t ESP8266WiFiGenericClass::getListenInterval () {
+    return wifi_get_listen_interval();
+}
+
+/**
+ * Get sleep level of modem sleep and light sleep
+ * @return true if max level
+ */
+bool ESP8266WiFiGenericClass::isSleepLevelMax () {
+    return wifi_get_sleep_level() == MAX_SLEEP_T;
+}
+
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------ Generic Network function ---------------------------------------------
@@ -444,7 +523,7 @@ static bool _dns_lookup_pending = false;
  * @param aHostname     Name to be resolved
  * @param aResult       IPAddress structure to store the returned IP address
  * @return 1 if aIPAddrString was successfully converted to an IP address,
- *          else error code
+ *          else 0
  */
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
 {

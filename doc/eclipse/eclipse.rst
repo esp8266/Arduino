@@ -6,7 +6,7 @@ What to Download
 
 -  `arduino IDE <https://www.arduino.cc/en/Main/Software>`__
 -  `Eclipse IDE for C/C++
-   Developers <http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/marsr>`__
+   Developers <http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/oxygen3a>`__
 -  `Java <http://www.java.com/>`__
 
 Setup Arduino

@@ -61,7 +61,7 @@ rm exclude.txt
 # Get additional libraries (TODO: add them as git submodule or subtree?)
 
 # SoftwareSerial library
-curl -L -o SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/3.3.1.zip
+curl -L -o SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/3.4.1.zip
 unzip -q SoftwareSerial.zip
 rm -rf SoftwareSerial.zip
 mv espsoftwareserial-* SoftwareSerial
@@ -82,7 +82,9 @@ $SED 's/runtime.tools.esptool.path={runtime.platform.path}\/tools\/esptool//g' |
 $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool.path=\{runtime.tools.esptool.path\}/g' | \
 $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
 $SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' |\
-$SED 's/recipe.hooks.core.prebuild.2.pattern.*//g' \
+$SED 's/recipe.hooks.core.prebuild.2.pattern.*//g' |\
+$SED "s/version=.*/version=$ver/g" |\
+$SED -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1($ver)/g"\
  > $outdir/platform.txt
 
 # Put core version and short hash of git version into core_version.h

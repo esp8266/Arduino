@@ -20,12 +20,15 @@
 
 #include "cont.h"
 #include <stddef.h>
+#include <string.h>
 #include "ets_sys.h"
 
 
 #define CONT_STACKGUARD 0xfeefeffe
 
-void ICACHE_RAM_ATTR cont_init(cont_t* cont) {
+void cont_init(cont_t* cont) {
+    memset(cont, 0, sizeof(cont_t));
+    
     cont->stack_guard1 = CONT_STACKGUARD;
     cont->stack_guard2 = CONT_STACKGUARD;
     cont->stack_end = cont->stack + (sizeof(cont->stack) / 4);
@@ -60,4 +63,19 @@ int ICACHE_RAM_ATTR cont_get_free_stack(cont_t* cont) {
 bool ICACHE_RAM_ATTR cont_can_yield(cont_t* cont) {
     return !ETS_INTR_WITHINISR() &&
            cont->pc_ret != 0 && cont->pc_yield == 0;
+}
+
+// No need for this to be in IRAM, not expected to be IRQ called
+void cont_repaint_stack(cont_t *cont)
+{
+    register uint32_t *sp asm("a1");
+    // Ensure 64 bytes adjacent to the current SP don't get touched to endure
+    // we don't accidentally trounce over locals or IRQ temps.
+    uint32_t sp_safe = CONT_STACKSIZE/4 - ((sp - &cont->stack[0] - 64)/4);
+
+    // Fill stack with magic values
+    for(uint32_t pos = 0; pos < sp_safe; pos++)
+    {
+        cont->stack[pos] = CONT_STACKGUARD;
+    }
 }

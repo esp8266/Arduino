@@ -127,8 +127,8 @@ int uart_get_baudrate(uart_t* uart);
 
 size_t uart_resize_rx_buffer(uart_t* uart, size_t new_size);
 
-void uart_write_char(uart_t* uart, char c);
-void uart_write(uart_t* uart, const char* buf, size_t size);
+size_t uart_write_char(uart_t* uart, char c);
+size_t uart_write(uart_t* uart, const char* buf, size_t size);
 int uart_read_char(uart_t* uart);
 int uart_peek_char(uart_t* uart);
 size_t uart_rx_available(uart_t* uart);
@@ -136,8 +136,13 @@ size_t uart_tx_free(uart_t* uart);
 void uart_wait_tx_empty(uart_t* uart);
 void uart_flush(uart_t* uart);
 
+bool uart_has_overrun (uart_t* uart); // returns then clear overrun flag
+
 void uart_set_debug(int uart_nr);
 int uart_get_debug();
+
+void uart_start_detect_baudrate(int uart_nr);
+int uart_detect_baudrate(int uart_nr);
 
 
 #if defined (__cplusplus)

@@ -4,11 +4,11 @@
 # Replace your-name-here with somethine appropriate before running and use
 # the generated .H files in your code as follows:
 #
-#      static const uint8_t rsakey[]  ICACHE_RODATA_ATTR = {
+#      static const uint8_t rsakey[] PROGMEM = {
 #        #include "key.h"
 #      };
 #
-#      static const uint8_t x509[] ICACHE_RODATA_ATTR = {
+#      static const uint8_t x509[] PROGMEM = {
 #        #include "x509.h"
 #      };
 #
