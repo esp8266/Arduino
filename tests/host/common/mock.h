@@ -76,10 +76,11 @@ class InterruptLock { };
 
 //
 
-#define ARDUINO 1
+#define ARDUINO 267
 #define ESP8266 1
 #define A0 0
 #define LED_BUILTIN 0
+#define F_CPU 80000000
 
 //
 
