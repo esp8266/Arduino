@@ -62,19 +62,25 @@ public:
 
     bool listen(ip_addr_t addr, uint16_t port)
     {
-        return mockUDPListen(_sock, addr.addr, port, staticMCastAddr);
+        bool ret = mockUDPListen(_sock, addr.addr, port, staticMCastAddr);
+        register_udp(_sock, this);
+        return ret;
     }
 
     void disconnect()
     {
         if (_sock >= 0)
+        {
             close(_sock);
+            register_udp(_sock, nullptr);
+        }
         _sock = -1;
     }
 
     void setMulticastInterface(const ip_addr_t& addr)
     {
-        fprintf(stderr, MOCK "TODO: UdpContext::setMulticastInterface\n");
+    	// not needed on posix, multicast is associated with
+    	// socket and its address (0.0.0.0) = all interfaces
     }
 
     void setMulticastTTL(int ttl)
@@ -165,8 +171,8 @@ public:
 
     void flush()
     {
-	fprintf(stderr, MOCK "UdpContext::flush() does not follow arduino's flush concept\n");
-	exit(EXIT_FAILURE);
+	//fprintf(stderr, MOCK "UdpContext::flush() does not follow arduino's flush concept\n");
+	//exit(EXIT_FAILURE);
 	// would be:
         _inbufsize = 0;
     }
@@ -191,6 +197,11 @@ public:
     	size_t ret = mockUDPWrite(_sock, (const uint8_t*)_outbuf, _outbufsize, _timeout_ms, dst, dstport);
     	_outbufsize = 0;
     	return ret > 0;
+    }
+    
+    void mock_cb (void)
+    {
+    	if (_on_rx) _on_rx();
     }
 
 public:

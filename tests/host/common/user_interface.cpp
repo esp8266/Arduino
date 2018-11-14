@@ -79,10 +79,15 @@ bool wifi_get_ip_info (uint8 if_index, struct ip_info *info)
 		fprintf(stderr, "we are not AP");
 	
 	//XXXTODO (give ip address of default route's interface?)
+#if 1
+	info->ip.addr = lwip_htonl(0xc0a80108);
+	info->netmask.addr = lwip_htonl(0xffffff00);
+	info->gw.addr = lwip_htonl(0xc0a801fe);
+#else
 	info->ip.addr = lwip_htonl(0x7f000001);
 	info->netmask.addr = lwip_htonl(0xff000000);
 	info->gw.addr = lwip_htonl(0x7f000001);
-
+#endif
 	return true;
 }
 

@@ -1,5 +1,6 @@
 
 #include <arpa/inet.h>
+#include <stdarg.h>
 
 extern "C"
 {
@@ -11,5 +12,14 @@ uint16_t lwip_ntohs (uint16_t netshort)  { return ntohs(netshort);  }
 
 char* ets_strcpy (char* d, const char* s) { return strcpy(d, s); }
 size_t ets_strlen (const char* s) { return strlen(s); }
+
+int ets_printf (const char* fmt, ...)
+{
+        va_list ap;
+        va_start(ap, fmt);
+	int len = vprintf(fmt, ap);
+	va_end(ap);
+	return len;
+}
 
 };

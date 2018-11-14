@@ -26,7 +26,7 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	
 	// Filling server information 
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htonl(dstaddr);
+	servaddr.sin_addr.s_addr = dstaddr;
 	servaddr.sin_port = htons(port);
 	
 	// Bind the socket with the server address 
@@ -42,8 +42,8 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	{
 		// https://web.cs.wpi.edu/~claypool/courses/4514-B99/samples/multicast.c
 		struct ip_mreq mreq;
-		mreq.imr_multiaddr.s_addr = htonl(mcast);
-		mreq.imr_interface.s_addr = htonl(INADDR_ANY);         
+		mreq.imr_multiaddr.s_addr = mcast;
+		mreq.imr_interface.s_addr = 0;//htonl(INADDR_ANY);         
 		if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0)
 		{
 			fprintf(stderr, MOCK "can't join multicast group addr %08x\n", (int)mcast);

@@ -221,8 +221,8 @@ protected:
 
         if (!_workBuf) {
             DEBUGV("SPIFFSImpl: allocating %d+%d+%d=%d bytes\r\n",
-                   workBufSize, fdsBufSize, cacheBufSize,
-                   workBufSize + fdsBufSize + cacheBufSize);
+                   (int)workBufSize, (int)fdsBufSize, (int)cacheBufSize,
+                   (int)(workBufSize + fdsBufSize + cacheBufSize));
             _workBuf.reset(new uint8_t[workBufSize]);
             _fdsBuf.reset(new uint8_t[fdsBufSize]);
             _cacheBuf.reset(new uint8_t[cacheBufSize]);

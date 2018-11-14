@@ -33,6 +33,18 @@ typedef uint32_t uint32;
 //
 
 #ifdef __cplusplus
+extern "C" {
+#endif
+int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
+#define os_printf_plus ets_printf
+#ifdef __cplusplus
+}
+#endif
+
+//
+
+#ifdef __cplusplus
+
 #ifndef CCBUFSIZE
 #define CCBUFSIZE 8192
 #endif
@@ -53,4 +65,8 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
 size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
 size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port);
+
+class UdpContext;
+void register_udp (int sock, UdpContext* udp);
+
 #endif // __cplusplus

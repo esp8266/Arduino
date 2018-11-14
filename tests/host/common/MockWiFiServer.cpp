@@ -7,6 +7,8 @@
 
 #include <include/ClientContext.h>
 
+extern "C" const ip_addr_t ip_addr_any = IPADDR4_INIT(IPADDR_ANY);
+
 #define int2pcb(x) ((tcp_pcb*)(long)(x))
 #define pcb2int(x) ((int)(long)(x))
 

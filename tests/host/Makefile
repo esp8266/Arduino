@@ -80,7 +80,10 @@ PREINCLUDES := \
 	-include common/mock.h \
 	-include common/c_types.h \
 
-CXXFLAGS += -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g
+DEBUG += -DDEBUG_ESP_PORT=Serial
+DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_MDNS
+
+CXXFLAGS += $(DEBUG) -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g
 CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g
 LDFLAGS += -coverage -O0 -g
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
@@ -172,9 +175,9 @@ MOCK_ARDUINO_LIBS := \
 			Parsing.cpp \
 			detail/mimetable.cpp \
 		) \
+		ESP8266mDNS/ESP8266mDNS.cpp \
 	)
 
-#		ESP8266mDNS/ESP8266mDNS.cpp \
 
 
 MOCK_ARDUINO_LIBS += \
