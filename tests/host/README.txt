@@ -13,7 +13,7 @@ environment.  Network (tcp, udp, including ssl and multicast) is linked to
 local host interfaces.  WiFi is trivialy emulated and reported as "just"
 already connected and usable.
 
-Cuurrently network emulation is a complete rewrite of
+Currently network emulation is a complete rewrite of
 WiFiClient+WiFiServer/ClientContext and WifiUdp/UdpContext using socket
 posix API.  Further work will optionally propose native lwIP library
 instead.
