@@ -1389,6 +1389,17 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
 extern "C" {
   extern size_t br_esp8266_stack_proxy_usage();
 
+#if CORE_MOCK
+  void br_esp8266_stack_proxy_init(uint8_t *space, uint16_t size) {
+    (void)space;
+    (void)size;
+  }
+  void _BearSSLCheckStack(const char *fcn, const char *file, int line) {
+    (void)fcn;
+    (void)file;
+    (void)line;
+  }
+#else
   void _BearSSLCheckStack(const char *fcn, const char *file, int line) {
     static int cnt = 0;
     register uint32_t *sp asm("a1");
@@ -1396,7 +1407,7 @@ extern "C" {
     int freeheap = ESP.getFreeHeap();
     static int laststack, lastheap, laststack2;
     if ((laststack != freestack) || (lastheap != freeheap) || (laststack2 != (int)br_esp8266_stack_proxy_usage())) {
-      Serial.printf("%s:%s(%d): FREESTACK=%d, STACK2USAGE=%d, FREEHEAP=%d\n", file, fcn, line, freestack, br_esp8266_stack_proxy_usage(), freeheap);
+      Serial.printf("%s:%s(%d): FREESTACK=%d, STACK2USAGE=%d, FREEHEAP=%d\n", file, fcn, line, freestack, (int)br_esp8266_stack_proxy_usage(), freeheap);
       if (freestack < 256) {
         Serial.printf("!!! Out of main stack space\n");
       }
@@ -1414,6 +1425,7 @@ extern "C" {
       cnt++;
     }
   }
+#endif
 
   void _BearSSLSerialPrint(const char *str) {
     static int cnt = 0;

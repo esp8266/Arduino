@@ -61,7 +61,6 @@ size_t mockWrite     (int sock, const uint8_t* data, size_t size, int timeout_ms
 int serverAccept (int sock);
 
 // udp
-#define ADDRBUFSIZE	32	// ipv6:16 ipv4:4
 int mockUDPSocket ();
 bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast = 0);
 size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize, uint8_t addr[16], uint16_t& port);
@@ -75,6 +74,8 @@ void register_udp (int sock, UdpContext* udp = nullptr);
 class InterruptLock { };
 
 //
+
+#define CORE_MOCK 1
 
 #define ARDUINO 267
 #define ESP8266 1
