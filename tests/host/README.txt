@@ -33,7 +33,7 @@ run it:
 	./bin/Blink -h
 
 
-Optionnal 'D=1' enables core debug.
+Optional 'D=1' enables core debug.
 
 
 Non exhaustive list of working examples:
@@ -47,6 +47,7 @@ Non exhaustive list of working examples:
 Compile other sketches:
 - library paths are specified using ULIBDIRS variable, separated by ':'
 - call 'make path-to-the-sketch-file' to build (without its '.ino' extension):
+- CAVEAT: functions must be declared *before* being called (arduino builder is not around)
 
 	make D=1  ULIBDIRS=/path/to/your/arduino/libraries:/path/to/another/one  /path/to/your/sketchdir/sketch/sketch
   or
