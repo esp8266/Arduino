@@ -23,3 +23,6 @@ version-header:
 
 native: bearssl/README.txt
 	cd bearssl && make
+
+native32: bearssl/README.txt
+	cd bearssl && make CONF=Unix32

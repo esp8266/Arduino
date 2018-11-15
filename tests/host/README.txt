@@ -42,7 +42,7 @@ Non exhaustive list of working examples:
 	make D=1 ../../libraries/ESP8266WebServer/examples/HelloServer/HelloServer
 	make D=1 ../../libraries/ESP8266WebServer/examples/AdvancedWebServer/AdvancedWebServer
 	make D=1 ../../libraries/ESP8266mDNS/examples/mDNS_Web_Server/mDNS_Web_Server
-	
+	make D=1 ../../libraries/ESP8266WiFi/examples/BearSSL_CertStore/BearSSL_CertStore
 
 Compile other sketches:
 - library paths are specified using ULIBDIRS variable, separated by ':'

@@ -66,22 +66,26 @@ void help (const char* argv0, int exitcode)
 		"	-h\n"
 		"	-i <interface> - use this interface for IP address\n"
 		"	-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
-		,argv0);
+		"	-f             - no throttle (possibly 100%%CPU)\n"
+		, argv0);
 	exit(exitcode);
 }
 
 static struct option options[] =
 {
 	{ "help",		no_argument,		NULL, 'h' },
-	{ "local",		required_argument,	NULL, 'l' },
+	{ "fast",		no_argument,		NULL, 'f' },
+	{ "local",		no_argument,		NULL, 'l' },
 	{ "interface",		required_argument,	NULL, 'i' },
 };
 
 int main (int argc, char* const argv [])
 {
+	bool fast = false;
+
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hli:", options, NULL);
+		int n = getopt_long(argc, argv, "hlfi:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -95,6 +99,9 @@ int main (int argc, char* const argv [])
 		case 'l':
 			global_ipv4_netfmt = NO_GLOBAL_BINDING;
 			break;
+		case 'f':
+			fast = true;
+			break;
 		default:
 			fprintf(stderr, MOCK "bad option '%c'\n", n);
 			exit(EXIT_FAILURE);
@@ -107,7 +114,8 @@ int main (int argc, char* const argv [])
 	setup();
 	while (true)
 	{
-		usleep(10000); // not 100% cpu
+		if (!fast)
+			usleep(10000); // not 100% cpu
 		
 		loop();
 		

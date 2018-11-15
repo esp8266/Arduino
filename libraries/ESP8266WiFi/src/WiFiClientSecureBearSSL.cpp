@@ -44,6 +44,8 @@ extern "C" {
 #include "c_types.h"
 #include "coredecls.h"
 
+#if !CORE_MOCK
+
 // The BearSSL thunks in use for now
 #define br_ssl_engine_recvapp_ack thunk_br_ssl_engine_recvapp_ack
 #define br_ssl_engine_recvapp_buf thunk_br_ssl_engine_recvapp_buf
@@ -53,6 +55,8 @@ extern "C" {
 #define br_ssl_engine_sendapp_buf thunk_br_ssl_engine_sendapp_buf
 #define br_ssl_engine_sendrec_ack thunk_br_ssl_engine_sendrec_ack
 #define br_ssl_engine_sendrec_buf thunk_br_ssl_engine_sendrec_buf
+
+#endif
 
 namespace BearSSL {
 
@@ -1377,9 +1381,9 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
 // SSL debugging which should focus on the WiFiClientBearSSL objects.
 
 extern "C" {
-  extern size_t br_esp8266_stack_proxy_usage();
 
 #if CORE_MOCK
+
   void br_esp8266_stack_proxy_init(uint8_t *space, uint16_t size) {
     (void)space;
     (void)size;
@@ -1389,7 +1393,11 @@ extern "C" {
     (void)file;
     (void)line;
   }
-#else
+
+#else // !CORE_MOCK
+
+  extern size_t br_esp8266_stack_proxy_usage();
+
   void _BearSSLCheckStack(const char *fcn, const char *file, int line) {
     static int cnt = 0;
     register uint32_t *sp asm("a1");
@@ -1415,7 +1423,8 @@ extern "C" {
       cnt++;
     }
   }
-#endif
+
+#endif // !CORE_MOCK
 
   void _BearSSLSerialPrint(const char *str) {
     static int cnt = 0;

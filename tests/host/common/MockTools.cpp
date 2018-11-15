@@ -62,4 +62,18 @@ extern "C" void configTime(long timezone, int daylightOffset_sec,
 	fprintf(stderr, MOCK "configTime: TODO (tz=%dH offset=%dS) (time will be host's)\n", (int)timezone, daylightOffset_sec);
 }
 
+void stack_thunk_add_ref() { }
+void stack_thunk_del_ref() { }
+void stack_thunk_repaint() { }
+
+uint32_t stack_thunk_get_refcnt() { return 0; }
+uint32_t stack_thunk_get_stack_top() { return 0; }
+uint32_t stack_thunk_get_stack_bot() { return 0; }
+uint32_t stack_thunk_get_cont_sp() { return 0; }
+uint32_t stack_thunk_get_max_usage() { return 0; }
+void stack_thunk_dump_stack() { }
+
+// Thunking macro
+#define make_stack_thunk(fcnToThunk)
+
 };
