@@ -24,6 +24,6 @@ Non exhaustive list of working examples:
 	make D=1 ../../libraries/ESP8266WebServer/examples/HelloServer/HelloServer
 	make D=1 ../../libraries/ESP8266WebServer/examples/AdvancedWebServer/AdvancedWebServer
 	make D=1 ../../libraries/ESP8266mDNS/examples/mDNS_Web_Server/mDNS_Web_Server
-	
+
 Compile your own sketches (remove the '.ino' part of the sketch file name):
 	make D=1 ULIBDIR=/path/to/your/arduino/libraries:/path/to/another/one /path/to/your/sketchdir/sketch/sketch

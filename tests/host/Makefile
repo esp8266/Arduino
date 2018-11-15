@@ -65,10 +65,9 @@ INC_PATHS := $(addprefix -I,\
 	../../tools/sdk/include \
 )
 
-INC_PATHS += -DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 \
-	$(addprefix -I,\
-		../../tools/sdk/lwip2/include \
-	)
+INC_PATHS += $(addprefix -I,\
+	../../tools/sdk/lwip2/include \
+)
 
 TEST_CPP_FILES := \
 	fs/test_fs.cpp \
@@ -201,7 +200,6 @@ MOCK_ARDUINO_LIBS := \
 	common/MockEEPROM.cpp \
 	common/MockSPI.cpp \
 
-ARDUINO_LIBS += 
 CPP_SOURCES_CORE_EMU = \
 	$(MOCK_CPP_FILES_EMU) \
 	$(CORE_CPP_FILES) \
@@ -241,7 +239,6 @@ bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 
 .PHONY: list
 list:
-	# copy examples locally
 	@for dir in ../../libraries/*/examples; do \
 		exampledir=$${dir%/*}; \
 		exampledirname=$${exampledir##*/}; \
@@ -252,7 +249,6 @@ list:
 	done; \
 
 $(BINDIR)/Makefile.inc.ino:
-	# copy examples locally
 	all=""; \
 	for dir in ../../libraries/*/examples; do \
 		exampledir=$${dir%/*}; \
