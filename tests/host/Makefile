@@ -106,12 +106,14 @@ CPP_OBJECTS = $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_TESTS)
 OBJECTS = $(C_OBJECTS) $(CPP_OBJECTS)
 COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 
-all: build-info $(OUTPUT_BINARY) valgrind test gcov
+all: help
 
-test: $(OUTPUT_BINARY)
+CI: build-info $(OUTPUT_BINARY) valgrind test gcov	# run CI
+
+test: $(OUTPUT_BINARY)			# run host test for CI
 	$(OUTPUT_BINARY)
 
-clean: clean-objects clean-coverage
+clean: clean-objects clean-coverage	# clean everything
 	rm -rf $(BINDIR)
 
 clean-objects:
@@ -120,7 +122,7 @@ clean-objects:
 clean-coverage:
 	rm -rf $(COVERAGE_FILES) $(LCOV_DIRECTORY) *.gcov
 
-gcov: test
+gcov: test				# run coverage for CI
 	find $(CORE_PATH) -name "*.gcno" -exec $(GCOV) -r -pb {} +
 
 valgrind: $(OUTPUT_BINARY)
@@ -130,7 +132,7 @@ valgrind: $(OUTPUT_BINARY)
 	$(LCOV) --directory $(CORE_PATH) --capture --output-file $(LCOV_DIRECTORY)/app.info
 	$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
-build-info:
+build-info:				# show toolchain version
 	@echo "-------- build tools info --------"
 	@echo "CC: " $(CC)
 	$(CC) -v
@@ -175,6 +177,10 @@ ARDUINO_LIBS := \
 			ESP8266WiFiScan.cpp \
 			WiFiClient.cpp \
 			WiFiUdp.cpp \
+			WiFiClientSecureBearSSL.cpp \
+			WiFiServerSecureBearSSL.cpp \
+			BearSSLHelpers.cpp \
+			CertStoreBearSSL.cpp \
 		) \
 		$(addprefix ESP8266WebServer/src/,\
 			ESP8266WebServer.cpp \
@@ -207,9 +213,18 @@ CPP_SOURCES_CORE_EMU = \
 	$(ARDUINO_LIBS) \
 
 
-ULIBPATHS = $(shell echo $(ULIBDIR) | sed 's,:, ,g')
-USERLIBDIR = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS)/* $(ULIBPATHS)/*/src; do test -d $$d && echo -I$$d; done)
-INC_PATHS += $(USERLIBDIR)
+ULIBPATHS = $(shell echo $(ULIBDIRS) | sed 's,:, ,g')
+USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d/* $$d/*/src; do test -d $$dd && echo -I$$dd || echo "WARNING: '$$dd' is not a directory" 1>&2; done; done)
+INC_PATHS += $(USERLIBDIRS)
+
+LIBSSLFILE = ../../tools/sdk/ssl/bearssl/build/libbearssl.a
+ifeq (,$(wildcard $(LIBSSLFILE)))
+LIBSSL =
+else
+LIBSSL = $(LIBSSLFILE)
+endif
+ssl:							# download source and build BearSSL
+	cd ../../tools/sdk/ssl && make native
 
 CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIB:.cpp=.cpp.o)
 
@@ -219,7 +234,7 @@ bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 
 .PRECIOUS: %.cpp.o
 %: %.ino.cpp.o bin/fullcore.a
-	$(CXX) $(LDFLAGS) $< bin/fullcore.a -o $@
+	$(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@
 	test -r $@ && ln -sf ../$@ $(BINDIR) || ln -sf $@ $(BINDIR)
 
 .PRECIOUS: %.ino.cpp
@@ -238,7 +253,7 @@ bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 -include $(BINDIR)/Makefile.inc.ino
 
 .PHONY: list
-list:
+list:							# show core example list
 	@for dir in ../../libraries/*/examples; do \
 		exampledir=$${dir%/*}; \
 		exampledirname=$${exampledir##*/}; \
@@ -249,7 +264,7 @@ list:
 	done; \
 
 $(BINDIR)/Makefile.inc.ino:
-	all=""; \
+	@all=""; \
 	for dir in ../../libraries/*/examples; do \
 		exampledir=$${dir%/*}; \
 		exampledirname=$${exampledir##*/}; \
@@ -260,5 +275,19 @@ $(BINDIR)/Makefile.inc.ino:
 	done; \
 	echo "examples: $$all" > $@
 
-examples: $(BINDIR)/Makefile.inc.ino
+examples: $(BINDIR)/Makefile.inc.ino			# build all core examples
 	$(MAKE) $@
+
+#################################################
+# help
+
+MAKEFILE = $(word 1, $(MAKEFILE_LIST))
+
+.PHONY: help
+help:
+	@cat README.txt
+	@echo ""
+	@echo "Make rules:"
+	@echo ""
+	@sed -rne 's,([^: \t]*):[^=#]*#[\t ]*(.*),\1 - \2,p' $(MAKEFILE)
+	@echo ""

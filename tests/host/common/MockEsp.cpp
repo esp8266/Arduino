@@ -171,3 +171,13 @@ String EspClass::getFullVersion ()
 {
 	return "host-emulation";
 }
+
+uint32_t EspClass::getFreeContStack()
+{
+    return 4000;
+}
+
+void EspClass::resetFreeContStack()
+{
+}
+

@@ -134,7 +134,7 @@ function build_docs()
 function run_host_tests()
 {
     pushd host
-    make
+    make CI
     make clean-objects
     popd
 }

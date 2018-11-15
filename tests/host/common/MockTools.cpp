@@ -52,4 +52,14 @@ int ets_printf (const char* fmt, ...)
 	return len;
 }
 
+extern "C" void configTime(long timezone, int daylightOffset_sec,
+                           const char* server1, const char* server2, const char* server3)
+{
+	(void)server1;
+	(void)server2;
+	(void)server3;
+	
+	fprintf(stderr, MOCK "configTime: TODO (tz=%dH offset=%dS) (time will be host's)\n", (int)timezone, daylightOffset_sec);
+}
+
 };
