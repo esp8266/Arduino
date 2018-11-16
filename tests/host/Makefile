@@ -2,11 +2,16 @@ BINDIR := bin
 LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := ../../cores/esp8266
-ARCH32 = 1
+ARCH32 ?= 1
 
 ifeq ($(ARCH32),1)
+ABILITY32 = $(shell echo 'int main(){return sizeof(long);}'|cc -m32 -x c - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
+ifneq ($(ABILITY32),4)
+$(warning Cannot compile in 32 bit mode, switching to native mode)
+else
 N32 = 32
 M32 = -m32
+endif
 endif
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
