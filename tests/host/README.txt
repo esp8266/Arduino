@@ -5,8 +5,8 @@ Host Tests for Continuous Integration
 	make CI
 
 
-Host emulation (WIP)
---------------------
+Sketch emulation on host
+------------------------
 
 This environment let compile esp8266/Arduino sketches into native
 environment.  Network (tcp, udp, including ssl and multicast) is linked to
@@ -42,7 +42,7 @@ Non exhaustive list of working examples:
 	make D=1 ../../libraries/ESP8266WebServer/examples/HelloServer/HelloServer
 	make D=1 ../../libraries/ESP8266WebServer/examples/AdvancedWebServer/AdvancedWebServer
 	make D=1 ../../libraries/ESP8266mDNS/examples/mDNS_Web_Server/mDNS_Web_Server
-	make D=1 ../../libraries/ESP8266WiFi/examples/BearSSL_CertStore/BearSSL_CertStore
+	make D=1 ../../libraries/ESP8266WiFi/examples/BearSSL_Validation/BearSSL_Validation
 
 Compile other sketches:
 - library paths are specified using ULIBDIRS variable, separated by ':'
@@ -64,18 +64,6 @@ Build all examples with debug enabled (D=1): (not fully working yet)
 Running a sketch
 ----------------
 
-- SPIFFS
-  (already done, to check)
-  
-- SDCARD
-  (TODO)
-
-- EEPROM
-  (to check) a file named 'eeprom' is created in current directory for reading and writing.
-
-- Serial:
-  for now Serial.read() returns -1. Serial.write() will printf().
-
 - GPIOs
   read as 0(digital) or 512(analog).
   output is printed on console.
@@ -87,8 +75,19 @@ Options are available:
 	-h
 	-i eth0		bind servers to this interface (WIP)
 	-l		bind Multicast to the above interface (WIP)
+	-f              no throttle (possibly 100%CPU)
 
 TODO
 ----
 A lot.
 Make fun, propose PRs.
+
+- spiffs in a file (done, need to initialize and check)
+- EEPROM in a file (partly done)
+- SDCARD on Host filesystem ?
+- nice curses interface to display/change gpios ?
+- display device emulation (like ssd1306)
+- optionaly use arduino-builder ?
+- store sketch objects and binaries outside from the source directories
+- compile and use lwIP on host
+#1715
