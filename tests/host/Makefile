@@ -4,16 +4,6 @@ OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := ../../cores/esp8266
 ARCH32 ?= 1
 
-ifeq ($(ARCH32),1)
-ABILITY32 = $(shell echo 'int main(){return sizeof(long);}'|cc -m32 -x c - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
-ifneq ($(ABILITY32),4)
-$(warning Cannot compile in 32 bit mode, switching to native mode)
-else
-N32 = 32
-M32 = -m32
-endif
-endif
-
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
 CC  ?= gcc
@@ -23,6 +13,22 @@ GCOV ?= gcov
 VALGRIND ?= valgrind
 LCOV ?= lcov
 GENHTML ?= genhtml
+
+ifeq ($(ARCH32),1)
+ABILITY32 = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
+ifneq ($(ABILITY32),4)
+$(warning Cannot compile in 32 bit mode, switching to native mode)
+else
+N32 = 32
+M32 = -m32
+endif
+endif
+
+ifeq ($(N32),32)
+$(warning compiling in 32 bits mode)
+else
+$(warning compiling in native mode)
+endif
 
 $(shell mkdir -p $(BINDIR))
 
@@ -99,9 +105,8 @@ CXXFLAGS += $(DEBUG) -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g $(M32
 CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g $(M32)
 LDFLAGS += -coverage -O0 -g $(M32)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
-#
-CXXFLAGS += -Wno-nonnull-compare # libraries/ESP8266WiFi/src/include/UdpContext.h:85:9: error: nonnull argument ‘this’ compared to NULL [-Werror=nonnull-compare] -- (if(this != 0))
-CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24: error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
+CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24:   error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
+#CXXFLAGS += -Wno-format-security      # cores/esp8266/Print.cpp:42:40: warning: format not a string literal and no format arguments [-Wformat-security] -- (os_printf_plus(not_the_best_way))
 
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
 
