@@ -2,7 +2,8 @@ BINDIR := bin
 LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := ../../cores/esp8266
-ARCH32 ?= 1
+FORCE32 ?= 1
+OPTZ ?= -Os
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
@@ -14,7 +15,7 @@ VALGRIND ?= valgrind
 LCOV ?= lcov
 GENHTML ?= genhtml
 
-ifeq ($(ARCH32),1)
+ifeq ($(FORCE32),1)
 ABILITY32 = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
 ifneq ($(ABILITY32),4)
 $(warning Cannot compile in 32 bit mode, switching to native mode)
@@ -98,13 +99,14 @@ PREINCLUDES := \
 	-include common/c_types.h \
 
 ifneq ($(D),)
+OPTZ=-O0
 DEBUG += -DDEBUG_ESP_PORT=Serial
 DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_MDNS
 endif
 
-CXXFLAGS += $(DEBUG) -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g $(M32)
-CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g $(M32)
-LDFLAGS += -coverage -O0 -g $(M32)
+CXXFLAGS += $(DEBUG) -std=c++11 -Wall -Werror -coverage $(OPTZ) -fno-common -g $(M32)
+CFLAGS += -std=c99 -Wall -Werror -coverage $(OPTZ) -fno-common -g $(M32)
+LDFLAGS += -coverage $(OPTZ) -g $(M32)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24:   error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
 #CXXFLAGS += -Wno-format-security      # cores/esp8266/Print.cpp:42:40: warning: format not a string literal and no format arguments [-Wformat-security] -- (os_printf_plus(not_the_best_way))

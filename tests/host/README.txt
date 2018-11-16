@@ -2,8 +2,9 @@
 Host Tests for Continuous Integration
 -------------------------------------
 
-	make CI
+	make FORCE32=0 OPTZ=-O0 CI
 
+	(FORCE32=0: https://bugs.launchpad.net/ubuntu/+source/valgrind/+bug/948004)
 
 Sketch emulation on host
 ------------------------

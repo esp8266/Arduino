@@ -215,7 +215,13 @@ private:
     void translate_addr ()
     {
         if (addrsize == 4)
-            ip4_addr_set_u32(&ip_2_ip4(_dst), *(uint32_t*)addr); // XXX should use lwip_ntohl?
+        {
+            uint32_t ipv4;
+            memcpy(&ipv4, addr, 4);
+            ip4_addr_set_u32(&ip_2_ip4(_dst), ipv4);
+            // ^ this is a workaround for "type-punned pointer" with "*(uint32*)addr"
+            //ip4_addr_set_u32(&ip_2_ip4(_dst), *(uint32_t*)addr);
+        }
         else
             fprintf(stderr, MOCK "TODO unhandled udp address of size %d\n", (int)addrsize);
     }
