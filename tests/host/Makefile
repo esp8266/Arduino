@@ -117,7 +117,7 @@ clean: clean-objects clean-coverage	# clean everything
 	rm -rf $(BINDIR)
 
 clean-objects:
-	rm -rf $(OBJECTS) $(CPP_OBJECTS_CORE_EMU)
+	rm -rf $(C_OBJECTS) $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_CORE_EMU)
 
 clean-coverage:
 	rm -rf $(COVERAGE_FILES) $(LCOV_DIRECTORY) *.gcov
@@ -152,11 +152,11 @@ build-info:				# show toolchain version
 	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
 $(BINDIR)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
-	ar -rcu $@ $(C_OBJECTS) $(CPP_OBJECTS_CORE)
+	ar -rcu $@ $^
 	ranlib -c $@
 
 $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
-	$(CXX) $(LDFLAGS) $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a $(LIBS) -o $@
+	$(CXX) $(LDFLAGS) $^ -o $@
 
 #################################################
 # building ino sources
@@ -237,7 +237,7 @@ bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	$(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@
 	test -r $@ && ln -sf ../$@ $(BINDIR) || ln -sf $@ $(BINDIR)
 
-.PRECIOUS: %.ino.cpp
+#.PRECIOUS: %.ino.cpp
 %.ino.cpp: %.ino
 	@s=$<; \
 	n=$${s##*/}; \
