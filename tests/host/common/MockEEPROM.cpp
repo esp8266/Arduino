@@ -90,13 +90,6 @@ void EEPROMClass::write (int x, uint8_t c)
 		fprintf(stderr, MOCK "eeprom: %s\n\r", strerror(errno));
 }
 
-#if 0
-void EEPROMClass::update (int x, char c)
-{
-	put(x, c);
-}
-#endif
-		
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_EEPROM)
 EEPROMClass EEPROM;
 #endif
