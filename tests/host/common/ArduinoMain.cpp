@@ -46,6 +46,12 @@
 
 #include <map>
 
+#if 0
+#include "../common/spiffs_mock.h"
+#include <spiffs/spiffs.h>
+SPIFFS_MOCK_DECLARE(/*size_kb*/1024, /(blovk_kb*/8, /*page_b*/512);
+#endif
+
 std::map<int,UdpContext*> udps;
 
 void register_udp (int sock, UdpContext* udp)

@@ -38,10 +38,10 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	WString.cpp \
 	Print.cpp \
 	FS.cpp \
+	spiffs_api.cpp \
 	pgmspace.cpp \
 	MD5Builder.cpp \
 )
-#	spiffs_api.cpp \
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
 	core_esp8266_noniso.c \
@@ -58,6 +58,7 @@ MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	spiffs_mock.cpp \
 	WMath.cpp \
 	HardwareSerial.cpp \
+	MockTools.cpp \
 )
 
 MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
@@ -77,12 +78,12 @@ MOCK_C_FILES := $(addprefix common/,\
 INC_PATHS := $(addprefix -I,\
 	common \
 	$(CORE_PATH) \
-	$(shell echo ../../libraries/*/src) \
-	$(shell echo ../../libraries/*) \
-	../../tools/sdk/include \
 )
 
 INC_PATHS += $(addprefix -I,\
+	$(shell echo ../../libraries/*/src) \
+	$(shell echo ../../libraries/*) \
+	../../tools/sdk/include \
 	../../tools/sdk/lwip2/include \
 )
 
@@ -133,7 +134,7 @@ clean: clean-objects clean-coverage	# clean everything
 	rm -rf $(BINDIR)
 
 clean-objects:
-	rm -rf $(C_OBJECTS) $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_CORE_EMU)
+	rm -rf $(C_OBJECTS) $(CPP_OBJECTS_CORE) $(CPP_OBJECTS_CORE_EMU) $(CPP_OBJECTS_TESTS)
 
 clean-coverage:
 	rm -rf $(COVERAGE_FILES) $(LCOV_DIRECTORY) *.gcov
@@ -217,7 +218,6 @@ MOCK_ARDUINO_LIBS := \
 	common/MockWiFiServer.cpp \
 	common/MockUDPSocket.cpp \
 	common/ArduinoWire.cpp \
-	common/MockTools.cpp \
 	common/MockEsp.cpp \
 	common/MockEEPROM.cpp \
 	common/MockSPI.cpp \
