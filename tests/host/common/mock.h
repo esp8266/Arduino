@@ -63,7 +63,7 @@ typedef uint32_t uint32;
 extern "C" {
 #endif
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
-#define os_printf_plus ets_printf
+#define os_printf_plus printf
 
 extern const char* host_interface; // cmdline parameter
 
