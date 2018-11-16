@@ -2,6 +2,12 @@ BINDIR := bin
 LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := ../../cores/esp8266
+ARCH32 = 1
+
+ifeq ($(ARCH32),1)
+N32 = 32
+M32 = -m32
+endif
 
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
@@ -84,9 +90,9 @@ DEBUG += -DDEBUG_ESP_PORT=Serial
 DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_MDNS
 endif
 
-CXXFLAGS += $(DEBUG) -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g -m32
-CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g -m32
-LDFLAGS += -coverage -O0 -g -m32
+CXXFLAGS += $(DEBUG) -std=c++11 -Wall -Werror -coverage -O0 -fno-common -g $(M32)
+CFLAGS += -std=c99 -Wall -Werror -coverage -O0 -fno-common -g $(M32)
+LDFLAGS += -coverage -O0 -g $(M32)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 #
 CXXFLAGS += -Wno-nonnull-compare # libraries/ESP8266WiFi/src/include/UdpContext.h:85:9: error: nonnull argument ‘this’ compared to NULL [-Werror=nonnull-compare] -- (if(this != 0))
@@ -217,14 +223,14 @@ ULIBPATHS = $(shell echo $(ULIBDIRS) | sed 's,:, ,g')
 USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d/* $$d/*/src; do test -d $$dd && echo -I$$dd || echo "WARNING: '$$dd' is not a directory" 1>&2; done; done)
 INC_PATHS += $(USERLIBDIRS)
 
-LIBSSLFILE = ../../tools/sdk/ssl/bearssl/build32/libbearssl.a
+LIBSSLFILE = ../../tools/sdk/ssl/bearssl/build$(N32)/libbearssl.a
 ifeq (,$(wildcard $(LIBSSLFILE)))
 LIBSSL =
 else
 LIBSSL = $(LIBSSLFILE)
 endif
 ssl:							# download source and build BearSSL
-	cd ../../tools/sdk/ssl && make native32
+	cd ../../tools/sdk/ssl && make native$(N32)
 
 CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIB:.cpp=.cpp.o)
 
