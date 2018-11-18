@@ -114,6 +114,7 @@ Some tests need to connect to WiFi AP or to the PC running the tests. In the tes
 
 Environment variables can also be used to pass some information from the test code to the host side helper. To do that, test code can set an environment variable using `setenv` C function. Then the `teardown` host side helper can obtain the value of that variable using `request_env` function defined in `mock_decorators`.
 
+A SPIFFS filesystem may be generated on the host and uploade before a test by including a file called `make_spiffs.py` in the individual test directory.
 
 ### Building and running the tests
 
