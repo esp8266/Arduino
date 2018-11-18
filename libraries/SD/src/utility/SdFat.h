@@ -439,8 +439,8 @@ class SdVolume {
   }
   /** Delete an instance of SdVolume */
   ~SdVolume() {
-    cacheBufferRefCnt--;
-    if (!cacheBufferRefCnt) {
+    cacheBufferRefCnt_--;
+    if (!cacheBufferRefCnt_) {
       free(cacheBuffer_);
       cacheBuffer_ = NULL;
     }

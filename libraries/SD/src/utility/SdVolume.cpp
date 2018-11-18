@@ -22,7 +22,7 @@
 // raw block cache
 // init cacheBlockNumber_to invalid SD block number
 uint32_t SdVolume::cacheBlockNumber_ = 0XFFFFFFFF;
-uint8_t SdVolume::cacheBufferRefCnt = 0; // No users of the object yet
+uint8_t SdVolume::cacheBufferRefCnt_ = 0; // No users of the object yet
 cache_t* SdVolume::cacheBuffer_ = NULL; // 512 byte cache for Sd2Card
 Sd2Card* SdVolume::sdCard_;          // pointer to SD card object
 uint8_t  SdVolume::cacheDirty_ = 0;  // cacheFlush() will write block if true
