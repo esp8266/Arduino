@@ -84,12 +84,12 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 
   wifi_set_sleep_type(NONE_SLEEP_T);
 
-  uint32_t updateStartAddress = 0;
+  uintptr_t updateStartAddress = 0;
   if (command == U_FLASH) {
     //size of current sketch rounded to a sector
     uint32_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address of the end of the space available for sketch and update
-    uint32_t updateEndAddress = (uint32_t)(unsigned long)&_SPIFFS_start - 0x40200000;
+    uintptr_t updateEndAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
     //size of the update rounded to a sector
     uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address where we will start writing the update
@@ -97,7 +97,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 
 #ifdef DEBUG_UPDATER
         DEBUG_UPDATER.printf("[begin] roundedSize:       0x%08X (%d)\n", roundedSize, roundedSize);
-        DEBUG_UPDATER.printf("[begin] updateEndAddress:  0x%08X (%d)\n", updateEndAddress, updateEndAddress);
+        DEBUG_UPDATER.printf("[begin] updateEndAddress:  0x%08X (%d)\n", (int)updateEndAddress, (int)updateEndAddress);
         DEBUG_UPDATER.printf("[begin] currentSketchSize: 0x%08X (%d)\n", currentSketchSize, currentSketchSize);
 #endif
 
@@ -108,7 +108,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     }
   }
   else if (command == U_SPIFFS) {
-     updateStartAddress = (uint32_t)(unsigned long)&_SPIFFS_start - 0x40200000;
+     updateStartAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
   }
   else {
     // unknown command
@@ -133,7 +133,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 #ifdef DEBUG_UPDATER
   DEBUG_UPDATER.printf("[begin] _startAddress:     0x%08X (%d)\n", _startAddress, _startAddress);
   DEBUG_UPDATER.printf("[begin] _currentAddress:   0x%08X (%d)\n", _currentAddress, _currentAddress);
-  DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", (unsigned)_size, (unsigned)_size);
+  DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", (int)_size, (int)_size);
 #endif
 
   _md5.begin();
