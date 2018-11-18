@@ -104,23 +104,6 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 }
 
 
-size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, void* addrbuf, uint32_t* addrbufsize)
-{
-	socklen_t realaddrbufsize = addrbufsize? *addrbufsize: 0;
-
-	size_t maxread = CCBUFSIZE - ccinbufsize;
-	ssize_t ret = ::recvfrom(sock, ccinbuf + ccinbufsize, maxread, 0/*flags*/, (sockaddr*)addrbuf, &realaddrbufsize);
-	*addrbufsize = realaddrbufsize;
-	if (ret == -1)
-	{
-		if (errno != EAGAIN)
-			fprintf(stderr, MOCK "UDPContext::(read/peek): filling buffer for %d bytes: %s\n", (int)maxread, strerror(errno));
-		ret = 0;
-	}
-
-	return ccinbufsize += ret;
-}
-
 size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize, uint8_t addr[16], uint16_t& port)
 {
 	struct sockaddr_storage addrbuf;
