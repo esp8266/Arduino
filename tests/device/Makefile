@@ -5,6 +5,7 @@ ESP8266_CORE_PATH ?= ../..
 BUILD_DIR ?= $(PWD)/.build
 HARDWARE_DIR ?= $(PWD)/.hardware
 ESPTOOL ?= $(ESP8266_CORE_PATH)/tools/esptool/esptool
+MKSPIFFS ?= $(ESP8266_CORE_PATH)/tools/mkspiffs/mkspiffs
 UPLOAD_PORT ?= $(shell ls /dev/tty* | grep -m 1 -i USB)
 UPLOAD_BAUD ?= 921600
 UPLOAD_BOARD ?= nodemcu
@@ -55,6 +56,16 @@ ifneq ("$(NO_BUILD)","1")
 endif
 ifneq ("$(NO_UPLOAD)","1")
 	@test -n "$(UPLOAD_PORT)" || (echo "Failed to detect upload port, please export UPLOAD_PORT manually" && exit 1)
+	@test -e $(dir $@)/make_spiffs.py && (echo "Generating and uploading SPIFFS" && \
+		(cd $(dir $@) && python ./make_spiffs.py) && \
+		$(MKSPIFFS) --create $(dir $@)data/ --size 0xFB000 \
+			--block 8192 --page 256 $(LOCAL_BUILD_DIR)/spiffs.img && \
+		$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) \
+			-cp $(UPLOAD_PORT) \
+			-cb $(UPLOAD_BAUD) \
+			-cd $(UPLOAD_BOARD) \
+			-ca 0x300000 \
+			-cf $(LOCAL_BUILD_DIR)/spiffs.img ) || (echo "No SPIFFS to upload")
 	@echo Uploading binary
 	$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG)  \
 		-cp $(UPLOAD_PORT) \

@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Arduino.h>
+#include <StackThunk.h>
 #include "BearSSLHelpers.h"
 
 namespace brssl {
@@ -880,5 +881,15 @@ bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint
     return vrfy(br_ec_get_default(), hash->hash(), hash->len(), _pubKey->getEC(), (const unsigned char *)signature, signatureLen);
   }
 };
+
+// Second stack thunked helpers
+make_stack_thunk(br_ssl_engine_recvapp_ack);
+make_stack_thunk(br_ssl_engine_recvapp_buf);
+make_stack_thunk(br_ssl_engine_recvrec_ack);
+make_stack_thunk(br_ssl_engine_recvrec_buf);
+make_stack_thunk(br_ssl_engine_sendapp_ack);
+make_stack_thunk(br_ssl_engine_sendapp_buf);
+make_stack_thunk(br_ssl_engine_sendrec_ack);
+make_stack_thunk(br_ssl_engine_sendrec_buf);
 
 };
