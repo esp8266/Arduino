@@ -1,5 +1,5 @@
 /*
- * ESP8266mDNS Transfer.cpp
+ * LEAmDNS_Transfer.cpp
  *
  *  License (MIT license):
  *    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,13 +28,13 @@ extern "C" {
 
 #include "lwip/prot/dns.h"  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
 
-#include "ESP8266mDNS Priv.h"
+#include "LEAmDNS_Priv.h"
 
 
 /*
- * namespace LEA_MDNSResponder
+ * namespace LEAmDNS
  */
-namespace LEA_MDNSResponder {
+namespace LEAmDNS {
 
 /**
  *  CONST STRINGS
@@ -1624,7 +1624,7 @@ bool MDNSResponder::_writeMDNSAnswer_SRV(MDNSResponder::stcMDNSService& p_rServi
     return bResult;
 }
 
-}   // namespace LEA_MDNSResponder
+}   // namespace LEAmDNS
 
 
 

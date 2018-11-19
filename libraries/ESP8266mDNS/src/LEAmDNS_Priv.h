@@ -1,5 +1,5 @@
 /*
- * ESP8266mDNS Priv.h
+ * LEAmDNS_Priv.h
  *
  *  License (MIT license):
  *    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,13 +22,13 @@
  *
  */
 
-#ifndef ESP8266MDNS_PRIV_H
-#define ESP8266MDNS_PRIV_H
+#ifndef LEAMDNS_PRIV_H
+#define LEAMDNS_PRIV_H
 
 /*
- * namespace LEA_MDNSResponder
+ * namespace LEAmDNS
  */
-namespace LEA_MDNSResponder {
+namespace LEAmDNS {
 
 // Enable class debug functions
 #define ESP_8266_MDNS_INCLUDE
@@ -153,14 +153,14 @@ namespace LEA_MDNSResponder {
     #define F(A)    A
 #endif
 
-}   // namespace LEA_MDNSResponder
+}   // namespace LEAmDNS
 
 
 // Include the main header, so the submodlues only need to include this header
-#include "ESP8266mDNS.h"
+#include "LEAmDNS.h"
 
 
-#endif  // ESP8266MDNS_PRIV_H
+#endif  // LEAMDNS_PRIV_H
 
 
 

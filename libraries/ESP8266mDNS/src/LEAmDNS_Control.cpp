@@ -1,5 +1,5 @@
 /*
- * ESP8266mDNS Control.cpp
+ * LEAmDNS_Control.cpp
  *
  *  License (MIT license):
  *    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,8 +29,6 @@
 #include <WString.h>
 #include <cstdint>
 
-#include "ESP8266mDNS.h"
-
 /*
  * ESP8266mDNS Control.cpp
  */
@@ -41,13 +39,13 @@ extern "C" {
 
 #include "lwip/prot/dns.h"  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
 
-#include "ESP8266mDNS Priv.h"
+#include "LEAmDNS_Priv.h"
 
 
 /*
- * namespace LEA_MDNSResponder
+ * namespace LEAmDNS
  */
-namespace LEA_MDNSResponder {
+namespace LEAmDNS {
 
 /**
  * CONTROL
@@ -74,7 +72,7 @@ bool MDNSResponder::_process(bool p_bUserContext) {
         
         bResult = _parseMessage();
         if (p_bUserContext) {
-            yield();
+            esp_yield();
         }
         //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _parsePacket %s\n"), (bResult ? "succeeded" : "FAILED")););
     }
@@ -274,7 +272,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
         else {
             DEBUG_EX_ERR(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _parseQuery: FAILED to read question!\n")););
         }
-        esp_yield();
+        //*esp_yield();
     }   // for questions
 
     //DEBUG_EX_INFO(if (u8HostOrServiceReplies) { DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _parseQuery: Reply needed: %u (%s: %s->%s)\n"), u8HostOrServiceReplies, clsTimeSyncer::timestr(), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str(), IPAddress(m_pUDPContext->getDestAddress()).toString().c_str()); } );
@@ -476,7 +474,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
             delete pKnownRRAnswer;
             pKnownRRAnswer = 0;
         }
-        esp_yield();
+        //*esp_yield();
     }   // for answers
 
     if (bResult) {
@@ -571,7 +569,7 @@ bool MDNSResponder::_parseResponse(const MDNSResponder::stcMDNS_MsgHeader& p_Msg
         for (uint16_t qd=0; ((bResult) && (qd<p_MsgHeader.m_u16QDCount)); ++qd) {
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _parseResponse: Received a response containing a question... ignoring!\n")););
             bResult = _readRRQuestion(dummyRRQ);
-            esp_yield();
+            //*esp_yield();
         }   // for queries
         
         //
@@ -594,7 +592,7 @@ bool MDNSResponder::_parseResponse(const MDNSResponder::stcMDNS_MsgHeader& p_Msg
                 }
                 bResult = false;
             }
-            esp_yield();
+            //*esp_yield();
         }   // for answers
         
         //
@@ -739,7 +737,7 @@ bool MDNSResponder::_processAnswers(const MDNSResponder::stcMDNS_RRAnswer* p_pAn
                 
                 pRRAnswer = pRRAnswer->m_pNext; // Next collected answer
             }   // while (answers)
-            esp_yield();
+            //*esp_yield();
         } while ((bFoundNewKeyAnswer) &&
                  (bResult));
     }   // else: No answers provided
@@ -923,7 +921,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
             while (pServiceQuery) {
                 stcMDNSServiceQuery::stcAnswer* pSQAnswer = pServiceQuery->findAnswerForHostDomain(p_pAAnswer->m_Header.m_Domain);
                 if (pSQAnswer) {    // Answer for this host domain (eg. esp8266.local) available
-                	stcMDNSServiceQuery::stcAnswer::stcIP4Address*  pIP4Address = pSQAnswer->findIP4Address(p_pAAnswer->m_IPAddress);
+                    stcMDNSServiceQuery::stcAnswer::stcIP4Address*  pIP4Address = pSQAnswer->findIP4Address(p_pAAnswer->m_IPAddress);
                     if (pIP4Address) {
                         // Already known IP4 address
                         if (p_pAAnswer->m_u32TTL) { // Valid TTL -> Update answers TTL
@@ -1546,7 +1544,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                 while ((pIP4Address) &&
                        (bResult)) {
                            
-                	stcMDNSServiceQuery::stcAnswer::stcIP4Address*  pNextIP4Address = pIP4Address->m_pNext; // Get 'next' early, as 'current' may be deleted at the end...
+                    stcMDNSServiceQuery::stcAnswer::stcIP4Address*  pNextIP4Address = pIP4Address->m_pNext; // Get 'next' early, as 'current' may be deleted at the end...
                     
                     if (pIP4Address->m_TTL.has80Percent(u32Now)) {      // Needs update
                         if ((bAUpdateQuerySent) ||
@@ -1583,7 +1581,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                 while ((pIP6Address) &&
                        (bResult)) {
                            
-                	stcMDNSServiceQuery::stcAnswer::stcIP6Address*  pNextIP6Address = pIP6Address->m_pNext; // Get 'next' early, as 'current' may be deleted at the end...
+                    stcMDNSServiceQuery::stcAnswer::stcIP6Address*  pNextIP6Address = pIP6Address->m_pNext; // Get 'next' early, as 'current' may be deleted at the end...
                     
                     if (pIP6Address->m_TTL.has80Percent(u32Now)) {      // Needs update
                         if ((bAAAAUpdateQuerySent) ||
@@ -1750,7 +1748,7 @@ uint8_t MDNSResponder::_replyMaskForService(const MDNSResponder::stcMDNS_RRHeade
     return u8ReplyMask;
 }
 
-}   // namespace LEA_MDNSResponder
+}   // namespace LEAmDNS
 
 
 

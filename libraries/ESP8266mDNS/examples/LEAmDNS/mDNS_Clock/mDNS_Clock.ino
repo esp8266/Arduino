@@ -38,14 +38,14 @@
 
 /*
  * Include the MDNSResponder (the library needs to be included also)
- * As LEA_MDNSResponder is experimantal in the ESP8266 environment currently, the
+ * As LEA MDNSResponder is experimantal in the ESP8266 environment currently, the
  * legacy MDNSResponder is defaulted in th include file.
- * There are two ways to access LEA_MDNSResponder:
+ * There are two ways to access LEA MDNSResponder:
  * 1. Prepend every declaration and call to global declarations or functions with the namespace, like:
- *    'LEA_MDNSResponder::MDNSResponder::hMDNSService  hMDNSService;'
+ *    'LEAmDNS::MDNSResponder::hMDNSService  hMDNSService;'
  *    This way is used in the example. But be careful, if the namespace declaration is missing
  *    somewhere, the call might go to the legacy implementation...
- * 2. Open 'ESP8266mDNS.h' and set LEA_MDNSResponder to default.
+ * 2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
  *
  */
 #include <ESP8266mDNS.h>
@@ -54,19 +54,19 @@
  * Global defines and vars
  */
 
-#define TIMEZONE_OFFSET     1                               	// CET
-#define DST_OFFSET          1                               	// CEST
+#define TIMEZONE_OFFSET     1                                   // CET
+#define DST_OFFSET          1                                   // CEST
 #define UPDATE_CYCLE        (1 * 1000)                          // every second
 
-#define SERVICE_PORT        80                              	// HTTP port
+#define SERVICE_PORT        80                                  // HTTP port
 
 
-const char*                                     ssid					= "............";
-const char*                                     password				= "............";
+const char*                                     ssid                    = "............";
+const char*                                     password                = "............";
 
-char*                                           pcHostDomain			= 0;       	// Negociated host domain
-bool                                            bHostDomainConfirmed	= false;	// Flags the confirmation of the host domain
-LEA_MDNSResponder::MDNSResponder::hMDNSService  hMDNSService			= 0;       	// The handle of the clock service in the MDNS responder
+char*                                           pcHostDomain            = 0;        // Negociated host domain
+bool                                            bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
+LEAmDNS::MDNSResponder::hMDNSService            hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
 // TCP server at port 'SERVICE_PORT' will respond to HTTP requests
 WiFiServer                                      server(SERVICE_PORT);
@@ -77,13 +77,13 @@ WiFiServer                                      server(SERVICE_PORT);
  */
 const char* getTimeString(void) {
 
-  static char	acTimeString[32];
+  static char   acTimeString[32];
   time_t now = time(nullptr);
   ctime_r(&now, acTimeString);
   size_t    stLength;
   while (((stLength = os_strlen(acTimeString))) &&
          ('\n' == acTimeString[stLength - 1])) {
-    acTimeString[stLength - 1] = 0;	// Remove trailing line break...
+    acTimeString[stLength - 1] = 0; // Remove trailing line break...
   }
   return acTimeString;
 }
@@ -131,8 +131,8 @@ bool setStationHostname(const char* p_pcHostname) {
  * This can be triggered by calling MDNS.announce().
  *
  */
-bool MDNSDynamicServiceTxtCallback(LEA_MDNSResponder::MDNSResponder* p_pMDNSResponder,
-                                   const LEA_MDNSResponder::MDNSResponder::hMDNSService p_hService,
+bool MDNSDynamicServiceTxtCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
+                                   const LEAmDNS::MDNSResponder::hMDNSService p_hService,
                                    void* p_pUserdata) {
   Serial.println("MDNSDynamicServiceTxtCallback");
   (void) p_pUserdata;
@@ -156,9 +156,9 @@ bool MDNSDynamicServiceTxtCallback(LEA_MDNSResponder::MDNSResponder* p_pMDNSResp
  * restarted via p_pMDNSResponder->setHostname().
  *
  */
-bool MDNSProbeResultCallback(LEA_MDNSResponder::MDNSResponder* p_pMDNSResponder,
+bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
                              const char* p_pcDomainName,
-                             const LEA_MDNSResponder::MDNSResponder::hMDNSService p_hService,
+                             const LEAmDNS::MDNSResponder::hMDNSService p_hService,
                              bool p_bProbeResult,
                              void* p_pUserdata) {
   Serial.println("MDNSProbeResultCallback");
@@ -188,7 +188,7 @@ bool MDNSProbeResultCallback(LEA_MDNSResponder::MDNSResponder* p_pMDNSResponder,
       }
       else {
         // Change hostname, use '-' as divider between base name and index
-        if (LEA_MDNSResponder::MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+        if (LEAmDNS::MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
           p_pMDNSResponder->setHostname(pcHostDomain);
         }
         else {
@@ -283,10 +283,10 @@ void setup(void) {
   setClock();
   
   // Setup MDNS responder
-  LEA_MDNSResponder::MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
+  LEAmDNS::MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
   // Init the (currently empty) host domain string with 'esp8266'
-  if ((!LEA_MDNSResponder::MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
-      (!LEA_MDNSResponder::MDNS.begin(pcHostDomain))) {
+  if ((!LEAmDNS::MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
+      (!LEAmDNS::MDNS.begin(pcHostDomain))) {
     Serial.println("Error setting up MDNS responder!");
     while (1) { // STOP
       delay(1000);
@@ -311,7 +311,7 @@ void loop(void) {
   }
   
   // Allow MDNS processing
-  LEA_MDNSResponder::MDNS.update();
+  LEAmDNS::MDNS.update();
   
   // Update time (if needed)
   static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
@@ -320,7 +320,7 @@ void loop(void) {
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
-      LEA_MDNSResponder::MDNS.announce();
+      LEAmDNS::MDNS.announce();
     }
     ulNextTimeUpdate = (millis() + UPDATE_CYCLE);   // Set update 'timer'
   }

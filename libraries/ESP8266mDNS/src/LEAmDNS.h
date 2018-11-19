@@ -1,5 +1,5 @@
 /*
- * ESP8266mDNS.h
+ * LEAmDNS.h
  * (c) 2018, LaborEtArs
  *
  * Version 0.9 beta
@@ -99,8 +99,8 @@
  *
  */
 
-#ifndef LEA_ESP8266MDNS_H
-#define LEA_ESP8266MDNS_H
+#ifndef LEAMDNS_H
+#define LEAMDNS_H
 
 #include <functional>   // for UdpContext.h
 #include "WiFiUdp.h"
@@ -111,9 +111,9 @@
 #include "ESP8266WiFi.h"
 
 /**
- * LEA_MDNSResponder
+ * LEAmDNS
  */
-namespace LEA_MDNSResponder {
+namespace LEAmDNS {
 
 //this should be defined at build time
 #ifndef ARDUINO_BOARD
@@ -1247,9 +1247,9 @@ protected:
     extern MDNSResponder MDNS;
 #endif
 
-}   // namespace LEA_MDNSResponder
+}   // namespace LEAmDNS
 
-#endif // LEA_ESP8266MDNS_H
+#endif // LEAMDNS_H
 
 
 

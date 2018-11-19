@@ -1,5 +1,5 @@
 /*
- * ESP8266mDNS Helpers.cpp
+ * LEAmDNS_Helpers.cpp
  *
  *  License (MIT license):
  *    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,12 +25,12 @@
 #include "lwip/igmp.h"
 #include "lwip/prot/dns.h"  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
 
-#include "ESP8266mDNS Priv.h"
+#include "LEAmDNS_Priv.h"
 
 /*
- * namespace LEA_MDNSResponder
+ * namespace LEAmDNS
  */
-namespace LEA_MDNSResponder {
+namespace LEAmDNS {
 
 /**
  * HELPERS
@@ -81,7 +81,7 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
                                            const char* p_pcDivider /*= "-"*/,
                                            const char* p_pcDefaultDomain /*= 0*/) {
 
-    bool	bResult = false;
+    bool    bResult = false;
 
     // Ensure a divider exists; use '-' as default
     const char*   pcDivider = (p_pcDivider ?: "-");
@@ -119,7 +119,7 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
         }
 
         if (!pFoundDivider) {   // not yet extended (or failed to increment extension) -> start indexing
-            size_t    stLength = os_strlen(p_rpcDomain) + (os_strlen(pcDivider) + 1 + 1);	// Name + Divider + '2' + '\0'
+            size_t    stLength = os_strlen(p_rpcDomain) + (os_strlen(pcDivider) + 1 + 1);   // Name + Divider + '2' + '\0'
             char*     pNewHostname = new char[stLength];
             if (pNewHostname) {
                 sprintf(pNewHostname, "%s%s2", p_rpcDomain, pcDivider);
@@ -138,7 +138,7 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
         // No given host domain, use base or default
         const char* cpcDefaultName = (p_pcDefaultDomain ?: "esp8266");
 
-        size_t      stLength = os_strlen(cpcDefaultName) + 1;	// '\0'
+        size_t      stLength = os_strlen(cpcDefaultName) + 1;   // '\0'
         p_rpcDomain = new char[stLength];
         if (p_rpcDomain) {
             os_strncpy(p_rpcDomain, cpcDefaultName, stLength);
@@ -159,7 +159,7 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
 
 bool MDNSResponder::_callProcess(void) {
 
-	return _process(false);
+    return _process(false);
 }
 
 /*
@@ -722,7 +722,7 @@ bool MDNSResponder::_releaseTempServiceTxts(MDNSResponder::stcMDNSService& p_rSe
     }
 #endif
 
-}   // namespace LEA_MDNSResponder
+}   // namespace LEAmDNS
 
 
 

@@ -1,5 +1,5 @@
 /*
- * ESP8266mDNS Structs.cpp
+ * LEAmDNS_Structs.cpp
  *
  *  License (MIT license):
  *    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,13 +22,13 @@
  *
  */
 
-#include "ESP8266mDNS Priv.h"
+#include "LEAmDNS_Priv.h"
 
 
 /*
- * namespace LEA_MDNSResponder
+ * namespace LEAmDNS
  */
-namespace LEA_MDNSResponder {
+namespace LEAmDNS {
 
 /**
  * STRUCTS
@@ -1446,7 +1446,7 @@ MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcAnswer(void)
 #ifdef MDNS_IP6_SUPPORT
     m_pIP6Addresses(0),
 #endif
-	m_u32ContentFlags(0) {
+    m_u32ContentFlags(0) {
 }
 
 /*
@@ -2104,7 +2104,7 @@ uint16_t MDNSResponder::_stcMDNSSendParameter::findCachedDomainOffset(const void
     return (pCacheItem ? pCacheItem->m_u16Offset : 0);
 }
 
-}   // namespace LEA_MDNSResponder
+}   // namespace LEAmDNS
 
 
 

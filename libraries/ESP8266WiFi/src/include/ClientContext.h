@@ -127,8 +127,21 @@ public:
         }
         _connect_pending = 1;
         _op_start_time = millis();
+        /*LEA*/
+        //Serial.print("\nClientContext::connect (A)");
+        uint32_t    nextPrint = (_op_start_time + 100);
+        while ((millis() < (_op_start_time + _timeout_ms)) &&
+               (state() != ESTABLISHED)) {
+            yield();
+            if (millis() > nextPrint) {
+                //Serial.printf(".");
+                nextPrint = (millis() + 100);
+            }
+        }
+        //Serial.println("\nClientContext::connect (B)");
         // This delay will be interrupted by esp_schedule in the connect callback
-        delay(_timeout_ms);
+        //delay(_timeout_ms);
+        /*LEA*/
         _connect_pending = 0;
         if (!_pcb) {
             DEBUGV(":cabrt\r\n");
@@ -139,6 +152,7 @@ public:
             abort();
             return 0;
         }
+        //Serial.println("ClientContext::connect (C)");
         return 1;
     }
 

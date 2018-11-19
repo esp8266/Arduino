@@ -1,5 +1,5 @@
 /*
- * ESP8266mDNS.cpp
+ * LEAmDNS.cpp
  *
  *  License (MIT license):
  *    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,12 +22,12 @@
  *
  */
 
-#include "ESP8266mDNS Priv.h"
+#include "LEAmDNS_Priv.h"
 
 /*
- * LEA_MDNSResponder
+ * LEAmDNS
  */
-namespace LEA_MDNSResponder {
+namespace LEAmDNS {
 
 /**
  * STRINGIZE
@@ -1114,7 +1114,7 @@ MDNSResponder::hMDNSService MDNSResponder::enableArduino(uint16_t p_u16Port,
 MDNSResponder   MDNS;
 #endif
 
-}   // namespace LEA_MDNSResponder
+}   // namespace LEAmDNS
 
 
 
