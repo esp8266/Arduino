@@ -22,7 +22,7 @@ instead.
 How to compile a sketch
 -----------------------
 
-All results are stored or linked from ./bin/ .
+All results are stored in ./bin/ .
 
 Show the core example list:
 	make list
@@ -50,11 +50,11 @@ Compile other sketches:
 - call 'make path-to-the-sketch-file' to build (without its '.ino' extension):
 - CAVEAT: functions must be declared *before* being called (arduino builder is not around)
 
-	make D=1  ULIBDIRS=/path/to/your/arduino/libraries:/path/to/another/one  /path/to/your/sketchdir/sketch/sketch
+	make D=1  ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  /path/to/your/sketchdir/sketch/sketch
   or
-	ULIBDIRS=/path/to/your/arduino/libraries:/path/to/another/one  make  D=1  /path/to/your/sketchdir/sketch/sketch
+	ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  make  D=1  /path/to/your/sketchdir/sketch/sketch
   or
-	export ULIBDIRS=/path/to/your/arduino/libraries:/path/to/another/one
+	export ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2
 	make  D=1  /path/to/your/sketchdir/sketch/sketch
 
 

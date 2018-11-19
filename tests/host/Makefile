@@ -5,6 +5,8 @@ CORE_PATH := ../../cores/esp8266
 FORCE32 ?= 1
 OPTZ ?= -Os
 
+MAKEFILE = $(word 1, $(MAKEFILE_LIST))
+
 # I wasn't able to build with clang when -coverage flag is enabled, forcing GCC on OS X
 ifeq ($(shell uname -s),Darwin)
 CC  ?= gcc
@@ -167,6 +169,7 @@ build-info:				# show toolchain version
 %.c.o: %.c
 	$(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
+.PRECIOUS: %.cpp.o
 %.cpp.o: %.cpp
 	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
@@ -231,10 +234,6 @@ CPP_SOURCES_CORE_EMU = \
 	$(ARDUINO_LIBS) \
 
 
-ULIBPATHS = $(shell echo $(ULIBDIRS) | sed 's,:, ,g')
-USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d/* $$d/*/src; do test -d $$dd && echo -I$$dd || echo "WARNING: '$$dd' is not a directory" 1>&2; done; done)
-INC_PATHS += $(USERLIBDIRS)
-
 LIBSSLFILE = ../../tools/sdk/ssl/bearssl/build$(N32)/libbearssl.a
 ifeq (,$(wildcard $(LIBSSLFILE)))
 LIBSSL =
@@ -244,31 +243,60 @@ endif
 ssl:							# download source and build BearSSL
 	cd ../../tools/sdk/ssl && make native$(N32)
 
-CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIB:.cpp=.cpp.o)
+ULIBPATHS = $(shell echo $(ULIBDIRS) | sed 's,:, ,g')
+USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d $$d/src; do test -d $$dd && { echo -I$$dd; echo "userlib: using directory '$$dd'" 1>&2; } done; done)
+USERLIBSRCS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for ss in $$d/*.cpp $$d/src/*.cpp; do test -r $$ss && echo $$ss; done; done)
+INC_PATHS += $(USERLIBDIRS)
+CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIBSRCS:.cpp=.cpp.o)
 
 bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
 	ar -rcu $@ $^
 	ranlib -c $@
 
-.PRECIOUS: %.cpp.o
 %: %.ino.cpp.o bin/fullcore.a
 	$(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@
-	test -r $@ && ln -sf ../$@ $(BINDIR) || ln -sf $@ $(BINDIR)
-
-#.PRECIOUS: %.ino.cpp
-%.ino.cpp: %.ino
-	@s=$<; \
-	n=$${s##*/}; \
-	(cd $${s%/*}; \
-	echo "#include \"$$n\""; \
-	for i in *.ino; do \
-		test "$$i" = "$$n" || echo "#include \"$$i\""; \
-	done; \
-	) > $@
+	@echo "----> $@ <----"
 
 #################################################
-# Makefile.inc.ino generation
--include $(BINDIR)/Makefile.inc.ino
+# are we in primary make call ?
+ifeq ($(INO),)
+
+%: %.ino
+	@# recursive 'make' with paths
+	$(MAKE) -f $(MAKEFILE) INODIR=$(dir $@) INO=$(notdir $@) $(BINDIR)/$(notdir $@)/$(notdir $@)
+	@# see below the new build rule with fixed output path outside from core location
+
+#####################
+# recursive call on ino targer
+else
+
+$(BINDIR)/$(INO)/$(INO).ino.cpp:
+	@# arduino builder would come around here (.ino -> .ino.cpp)
+	@mkdir -p $(BINDIR)/$(INO); \
+	( \
+		echo "#include \"$(INODIR)/$(INO).ino\""; \
+		for i in $(INODIR)/*.ino; do \
+			test "$$i" = $(INODIR)/$(INO).ino || echo "#include \"$$i\""; \
+		done; \
+	) > $(BINDIR)/$(INO)/$(INO).ino.cpp
+	
+endif # recursive
+#####################
+
+#################################################
+# (debug)
+
+# https://lists.gnu.org/archive/html/help-make/2002-11/msg00062.html
+# Bad gmake, never *ever* try to get a file out of source control by yourself.
+#%: %,v
+#%: RCS/%,v
+#%: RCS/%
+#%: s.%
+#%: SCCS/s.%
+
+#Makefile: ;
+
+#################################################
 
 .PHONY: list
 list:							# show core example list
@@ -281,25 +309,8 @@ list:							# show core example list
 		done; \
 	done; \
 
-$(BINDIR)/Makefile.inc.ino:
-	@all=""; \
-	for dir in ../../libraries/*/examples; do \
-		exampledir=$${dir%/*}; \
-		exampledirname=$${exampledir##*/}; \
-		for subdir in $$dir/*; do \
-			exname=$${subdir##*/}; \
-			all="$$all $$subdir/$$exname"; \
-		done; \
-	done; \
-	echo "examples: $$all" > $@
-
-examples: $(BINDIR)/Makefile.inc.ino			# build all core examples
-	$(MAKE) $@
-
 #################################################
 # help
-
-MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
 .PHONY: help
 help:
