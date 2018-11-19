@@ -331,6 +331,45 @@ bool i2s_write_lr(int16_t left, int16_t right){
   return i2s_write_sample(sample);
 }
 
+#define MIN(a,b) (a<b?a:b)
+
+// writes a buffer of samples into the DMA memory, returns the amount of samples written
+int16_t i2s_write_buffer_mono(int16_t *sample, int16_t len) {
+    int16_t samples_written=0;
+
+    for(;;)	{
+        if (len==0)
+            break;
+    
+        // make sure we have room in the current buffer
+        if (tx->curr_slc_buf_pos==SLC_BUF_LEN || tx->curr_slc_buf==NULL) {
+            // no room in the current buffer? if there are no buffers available then exit
+            if (tx->slc_queue_len == 0)
+                break;
+            
+            // get a new buffer
+            ETS_SLC_INTR_DISABLE();
+            tx->curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item(tx);
+            ETS_SLC_INTR_ENABLE();
+            tx->curr_slc_buf_pos=0;
+        }       
+
+		//space available in the current buffer
+		int16_t	available = _i2s_available( tx );
+		
+		int16_t m = MIN(available,len);
+		
+		for(int16_t i=0;i<m;i++){
+			int16_t v =	(*sample);
+			tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v<<16) | (v & 0xffff);
+			sample++;
+		}
+		len -= m;
+		samples_written += m;
+	}	
+	return samples_written;
+}
+
 bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking) {
   if (!rx) {
     return false;

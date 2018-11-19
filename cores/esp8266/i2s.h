@@ -58,6 +58,8 @@ int16_t i2s_available();// returns the number of samples than can be written bef
 int16_t i2s_rx_available();// returns the number of samples than can be written before blocking
 void i2s_set_callback(void (*callback) (void));
 void i2s_rx_set_callback(void (*callback) (void));
+int16_t i2s_write_buffer_mono(int16_t *sample, int16_t len); //writes a number of samplers in the the DMA mem, returns the numner of written samples
+
 
 #ifdef __cplusplus
 }
