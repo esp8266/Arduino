@@ -51,11 +51,51 @@ assert isdir(FRAMEWORK_DIR)
 
 
 env.Append(
+    ASFLAGS=["-x", "assembler-with-cpp"],
+
+    CFLAGS=[
+        "-std=gnu99",
+        "-Wpointer-arith",
+        "-Wno-implicit-function-declaration",
+        "-Wl,-EL",
+        "-fno-inline-functions",
+        "-nostdlib"
+    ],
+
     CCFLAGS=[
+        "-Os",  # optimize for size
+        "-mlongcalls",
+        "-mtext-section-literals",
+        "-falign-functions=4",
+        "-U__STRICT_ANSI__",
+        "-ffunction-sections",
+        "-fdata-sections",
         "-Wall"
     ],
 
+    CXXFLAGS=[
+        "-fno-rtti",
+        "-fno-exceptions",
+        "-std=c++11"
+    ],
+
+    LINKFLAGS=[
+        "-Os",
+        "-nostdlib",
+        "-Wl,--no-check-sections",
+        "-Wl,-static",
+        "-Wl,--gc-sections",
+        "-Wl,-wrap,system_restart_local",
+        "-Wl,-wrap,spi_flash_read",
+        "-u", "app_entry",
+        "-u", "_printf_float",
+        "-u", "_scanf_float"
+    ],
+
     CPPDEFINES=[
+        ("F_CPU", "$BOARD_F_CPU"),
+        "__ets__",
+        "ICACHE_FLASH",
         ("ARDUINO", 10805),
         ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"'
             % env.BoardConfig().id.upper()),
@@ -84,45 +124,46 @@ env.Append(
 
     LIBSOURCE_DIRS=[
         join(FRAMEWORK_DIR, "libraries")
-    ],
-
-    LINKFLAGS=[
-        "-Wl,-wrap,system_restart_local",
-        "-Wl,-wrap,spi_flash_read",
-        "-u", "app_entry"
     ]
 )
 
-# remove LINKFLAGS defined in main.py and keep user custom flags
-try:
-    index = env['LINKFLAGS'].index("call_user_start")
-    if index > 0 and env['LINKFLAGS'][index - 1] == "-u":
-        del env['LINKFLAGS'][index - 1]
-        env['LINKFLAGS'].remove("call_user_start")
-except IndexError:
-    pass
+# copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
+env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
 flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
 
 #
 # lwIP
 #
-if "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY" in flatten_cppdefines:
-    env.Append(
-        CPPDEFINES=[("TCP_MSS", 536)],
-        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2"]
-    )
-elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH" in flatten_cppdefines:
-    env.Append(
-        CPPDEFINES=[("TCP_MSS", 1460)],
-        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2_1460"]
-    )
-else:
+if "PIO_FRAMEWORK_ARDUINO_LWIP_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip", "include")],
         LIBS=["lwip_gcc"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-1460-feat"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY_LOW_FLASH" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 0)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-536"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH_LOW_FLASH" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 0)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-1460"]
+    )
+# PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY (default)
+else:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-536-feat"]
     )
 
 #
@@ -140,7 +181,7 @@ assert current_vtables
 
 # Build the eagle.app.v6.common.ld linker file
 app_ld = env.Command(
-    join("$BUILD_DIR", "ld", "eagle.app.v6.common.ld"),
+    join("$BUILD_DIR", "ld", "local.eagle.app.v6.common.ld"),
     join(FRAMEWORK_DIR, "tools", "sdk", "ld", "eagle.app.v6.common.ld.h"),
     env.VerboseAction(
         "$CC -CC -E -P -D%s $SOURCE -o $TARGET" % current_vtables,

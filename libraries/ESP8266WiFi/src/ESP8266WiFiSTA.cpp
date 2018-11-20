@@ -86,6 +86,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
 // -----------------------------------------------------------------------------------------------------------------------
 
 bool ESP8266WiFiSTAClass::_useStaticIp = false;
+bool ESP8266WiFiSTAClass::_useInsecureWEP = false;
 
 /**
  * Start Wifi connection
@@ -116,8 +117,11 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
 
     struct station_config conf;
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
+    
+    conf.threshold.authmode = AUTH_OPEN;
 
     if(passphrase) {
+        conf.threshold.authmode = AUTH_WPA_PSK;
         if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
             memcpy(reinterpret_cast<char*>(conf.password), passphrase, 64);
         else
@@ -127,9 +131,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     conf.threshold.rssi = -127;
-
-    // TODO(#909): set authmode to AUTH_WPA_PSK if passphrase is provided
-    conf.threshold.authmode = AUTH_OPEN;
+    conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
 
     if(bssid) {
         conf.bssid_set = 1;
@@ -570,90 +572,6 @@ int32_t ESP8266WiFiSTAClass::RSSI(void) {
 // -----------------------------------------------------------------------------------------------------------------------
 // -------------------------------------------------- STA remote configure -----------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
-
-#ifdef NO_EXTRA_4K_HEAP
-/* NO_EXTRA_4K_HEAP's description in cores/esp8266/core_esp8266_main.cpp */
-
-void wifi_wps_status_cb(wps_cb_status status);
-
-/**
- * WPS config
- * so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
- * @return ok
- */
-bool ESP8266WiFiSTAClass::beginWPSConfig(void) {
-
-    if(!WiFi.enableSTA(true)) {
-        // enable STA failed
-        return false;
-    }
-
-    disconnect();
-
-    DEBUGV("wps begin\n");
-
-    if(!wifi_wps_disable()) {
-        DEBUGV("wps disable failed\n");
-        return false;
-    }
-
-    // so far only WPS_TYPE_PBC is supported (SDK 1.2.0)
-    if(!wifi_wps_enable(WPS_TYPE_PBC)) {
-        DEBUGV("wps enable failed\n");
-        return false;
-    }
-
-    if(!wifi_set_wps_cb((wps_st_cb_t) &wifi_wps_status_cb)) {
-        DEBUGV("wps cb failed\n");
-        return false;
-    }
-
-    if(!wifi_wps_start()) {
-        DEBUGV("wps start failed\n");
-        return false;
-    }
-
-    esp_yield();
-    // will return here when wifi_wps_status_cb fires
-
-    return true;
-}
-
-/**
- * WPS callback
- * @param status wps_cb_status
- */
-void wifi_wps_status_cb(wps_cb_status status) {
-    DEBUGV("wps cb status: %d\r\n", status);
-    switch(status) {
-        case WPS_CB_ST_SUCCESS:
-            if(!wifi_wps_disable()) {
-                DEBUGV("wps disable failed\n");
-            }
-            wifi_station_connect();
-            break;
-        case WPS_CB_ST_FAILED:
-            DEBUGV("wps FAILED\n");
-            break;
-        case WPS_CB_ST_TIMEOUT:
-            DEBUGV("wps TIMEOUT\n");
-            break;
-        case WPS_CB_ST_WEP:
-            DEBUGV("wps WEP\n");
-            break;
-        case WPS_CB_ST_UNK:
-            DEBUGV("wps UNKNOWN\n");
-            if(!wifi_wps_disable()) {
-                DEBUGV("wps disable failed\n");
-            }
-            break;
-    }
-    // TODO user function to get status
-
-    esp_schedule(); // resume the beginWPSConfig function
-}
-
-#endif // NO_EXTRA_4K_HEAP
 
 bool ESP8266WiFiSTAClass::_smartConfigStarted = false;
 bool ESP8266WiFiSTAClass::_smartConfigDone = false;

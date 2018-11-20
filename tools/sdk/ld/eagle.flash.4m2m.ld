@@ -1,8 +1,10 @@
 /* Flash Split for 4M chips */
-/* sketch 1019KB */
-/* empty  1024KB */
-/* spiffs 2028KB */
-/* eeprom 20KB */
+/* sketch @0x40200000 (~1019KB) (1044464B) */
+/* empty  @0x402FEFF0 (~1028KB) (1052688B) */
+/* spiffs @0x40400000 (~2028KB) (2076672B) */
+/* eeprom @0x405FB000 (4KB) */
+/* rfcal  @0x405FC000 (4KB) */
+/* wifi   @0x405FD000 (12KB) */
 
 MEMORY
 {
@@ -17,4 +19,4 @@ PROVIDE ( _SPIFFS_end = 0x405FB000 );
 PROVIDE ( _SPIFFS_page = 0x100 );
 PROVIDE ( _SPIFFS_block = 0x2000 );
 
-INCLUDE "../ld/eagle.app.v6.common.ld"
+INCLUDE "local.eagle.app.v6.common.ld"

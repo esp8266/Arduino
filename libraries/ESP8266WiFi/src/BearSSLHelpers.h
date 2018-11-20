@@ -31,15 +31,17 @@ namespace brssl {
   class private_key;
 };
 
+namespace BearSSL {
+
 // Holds either a single public RSA or EC key for use when BearSSL wants a pubkey.
 // Copies all associated data so no need to keep input PEM/DER keys.
 // All inputs can be either in RAM or PROGMEM.
-class BearSSLPublicKey {
+class PublicKey {
   public:
-    BearSSLPublicKey();
-    BearSSLPublicKey(const char *pemKey);
-    BearSSLPublicKey(const uint8_t *derKey, size_t derLen);
-    ~BearSSLPublicKey();
+    PublicKey();
+    PublicKey(const char *pemKey);
+    PublicKey(const uint8_t *derKey, size_t derLen);
+    ~PublicKey();
 
     bool parse(const char *pemKey);
     bool parse(const uint8_t *derKey, size_t derLen);
@@ -51,7 +53,7 @@ class BearSSLPublicKey {
     const br_ec_public_key *getEC() const;
 
     // Disable the copy constructor, we're pointer based
-    BearSSLPublicKey(const BearSSLPublicKey& that) = delete;
+    PublicKey(const PublicKey& that) = delete;
 
   private:
     brssl::public_key *_key;
@@ -60,12 +62,12 @@ class BearSSLPublicKey {
 // Holds either a single private RSA or EC key for use when BearSSL wants a secretkey.
 // Copies all associated data so no need to keep input PEM/DER keys.
 // All inputs can be either in RAM or PROGMEM.
-class BearSSLPrivateKey {
+class PrivateKey {
   public:
-    BearSSLPrivateKey();
-    BearSSLPrivateKey(const char *pemKey);
-    BearSSLPrivateKey(const uint8_t *derKey, size_t derLen);
-    ~BearSSLPrivateKey();
+    PrivateKey();
+    PrivateKey(const char *pemKey);
+    PrivateKey(const uint8_t *derKey, size_t derLen);
+    ~PrivateKey();
 
     bool parse(const char *pemKey);
     bool parse(const uint8_t *derKey, size_t derLen);
@@ -77,7 +79,7 @@ class BearSSLPrivateKey {
     const br_ec_private_key *getEC() const;
 
     // Disable the copy constructor, we're pointer based
-    BearSSLPrivateKey(const BearSSLPrivateKey& that) = delete;
+    PrivateKey(const PrivateKey& that) = delete;
 
   private:
     brssl::private_key *_key;
@@ -89,12 +91,12 @@ class BearSSLPrivateKey {
 // for a more memory efficient way).
 // Copies all associated data so no need to keep input PEM/DER certs.
 // All inputs can be either in RAM or PROGMEM.
-class BearSSLX509List {
+class X509List {
   public:
-    BearSSLX509List();
-    BearSSLX509List(const char *pemCert);
-    BearSSLX509List(const uint8_t *derCert, size_t derLen);
-    ~BearSSLX509List();
+    X509List();
+    X509List(const char *pemCert);
+    X509List(const uint8_t *derCert, size_t derLen);
+    ~X509List();
 
     bool append(const char *pemCert);
     bool append(const uint8_t *derCert, size_t derLen);
@@ -111,12 +113,41 @@ class BearSSLX509List {
     }
 
     // Disable the copy constructor, we're pointer based
-    BearSSLX509List(const BearSSLX509List& that) = delete;
+    X509List(const X509List& that) = delete;
 
   private:
     size_t _count;
     br_x509_certificate *_cert;
     br_x509_trust_anchor *_ta;
+};
+
+// Opaque object which wraps the BearSSL SSL session to make repeated connections
+// significantly faster.  Completely optional.
+class WiFiClientSecure;
+
+class Session {
+  friend class WiFiClientSecure;
+
+  public:
+    Session() { memset(&_session, 0, sizeof(_session)); }
+  private:
+    br_ssl_session_parameters *getSession() { return &_session; }
+    // The actual BearSSL ession information
+    br_ssl_session_parameters _session;
+};
+
+// Stack thunked versions of calls
+extern "C" {
+extern unsigned char *thunk_br_ssl_engine_recvapp_buf( const br_ssl_engine_context *cc, size_t *len);
+extern void thunk_br_ssl_engine_recvapp_ack(br_ssl_engine_context *cc, size_t len);
+extern unsigned char *thunk_br_ssl_engine_recvrec_buf( const br_ssl_engine_context *cc, size_t *len);
+extern void thunk_br_ssl_engine_recvrec_ack(br_ssl_engine_context *cc, size_t len);
+extern unsigned char *thunk_br_ssl_engine_sendapp_buf( const br_ssl_engine_context *cc, size_t *len);
+extern void thunk_br_ssl_engine_sendapp_ack(br_ssl_engine_context *cc, size_t len);
+extern unsigned char *thunk_br_ssl_engine_sendrec_buf( const br_ssl_engine_context *cc, size_t *len);
+extern void thunk_br_ssl_engine_sendrec_ack(br_ssl_engine_context *cc, size_t len);
+};
+
 };
 
 #endif

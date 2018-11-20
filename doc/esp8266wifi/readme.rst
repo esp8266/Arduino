@@ -125,7 +125,7 @@ Soft Access Point
 ~~~~~~~~~~~~~~~~~
 
 An `access point (AP) <https://en.wikipedia.org/wiki/Wireless_access_point>`__ is a device that provides access to Wi-Fi network to other devices (stations)
-and connects them further to a wired network. ESP8266 can provide similar functionality except it does not have interface to a wired network. Such mode of operation is called soft access point (soft-AP). The maximum number of stations connected to the soft-AP is five.
+and connects them further to a wired network. ESP8266 can provide similar functionality except it does not have interface to a wired network. Such mode of operation is called soft access point (soft-AP). The maximum number of stations that can simultaneously be connected to the soft-AP can be set `from 0 to 8 <https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832>`__, but defaults to 4.
 
 .. figure:: pictures/esp8266-soft-access-point.png
    :alt: ESP8266 operating in the Soft Access Point mode
@@ -157,17 +157,31 @@ The Client class creates `clients <https://en.wikipedia.org/wiki/Client_(computi
 
 Check out separate section with `examples <client-examples.rst>`__ / `list of functions <client-class.rst>`__
 
-Client Secure
-~~~~~~~~~~~~~
+axTLS Client Secure - DEPRECATED
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Client Secure is an extension of `Client Class <#client>`__ where connection and data exchange with servers is done using a `secure protocol <https://en.wikipedia.org/wiki/Transport_Layer_Security>`__. It supports `TLS 1.1 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.1>`__. The `TLS 1.2 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2>`__ is not supported.
+The following section details axTLS, the older TLS library used by the project.  It is still supported, but additional fixes and documentation will generally not be undertaken.  See the following section for the updated TLS client object.
 
-.. figure:: pictures/esp8266-client-secure.png
-   :alt: ESP8266 operating as the Client Secure
+The axTLS Client Secure is an extension of `Client Class <#client>`__ where connection and data exchange with servers is done using a `secure protocol <https://en.wikipedia.org/wiki/Transport_Layer_Security>`__. It supports `TLS 1.1 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.1>`__. The `TLS 1.2 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2>`__ is not supported.
 
 Secure applications have additional memory (and processing) overhead due to the need to run cryptography algorithms. The stronger the certificate's key, the more overhead is needed. In practice it is not possible to run more than a single secure client at a time. The problem concerns RAM memory we can not add, the flash memory size is usually not the issue. If you like to learn how `client secure library <https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h>`__ has been developed, access to what servers have been tested, and how memory limitations have been overcame, read fascinating issue report `#43 <https://github.com/esp8266/Arduino/issues/43>`__.
 
 Check out separate section with `examples <client-secure-examples.rst>`__ / `list of functions <client-secure-class.rst>`__
+
+
+BearSSL Client Secure and Server Secure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`BearSSL::WiFiClientSecure` and `BearSSL::WiFiServerSecure` are extensions of the standard `Client <#client>`__ and `Server <#server>`__ classes where connection and data exchange with servers and clients using `secure protocol <https://en.wikipedia.org/wiki/Transport_Layer_Security>`__.  It supports `TLS 1.2 <https://en.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.2>`__ using a wide variety of modern ciphers, hashes, and key types.
+
+.. figure:: pictures/esp8266-client-secure.png
+   :alt: ESP8266 operating as the Client Secure
+
+Secure clients and servers require siginificant amounts of additional memory and processing to enable their cryptographic algorithms.  In general only a single secure client or server connection at a time can be processed given the little RAM present on the ESP8266, but there are methods of reducing this RAM requirement detailed in the relevant sections.
+
+`BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst>`__ contains more information on using and configuring TLS connections.
+
+`BearSSL::WiFiServerSecure <bearssl-server-secure-class.rst>`__ discusses the TLS server mode available.  Please read and understand the `BearSSL::WiFiClientSecure <bearssl-client-secure-class.rst>`__ first as the server uses most of the same concepts.
 
 Server
 ~~~~~~
@@ -293,7 +307,7 @@ What's Inside?
 
 If you like to analyze in detail what is inside of the ESP8266WiFi library, go directly to the `ESP8266WiFi <https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi/src>`__ folder of esp8266 / Arduino repository on the GitHub.
 
-To make the analysis easier, rather than looking into individual header or source files, use one of free tools to automatically generate documentation. The class index in chapter `Class Description <class-description>`__ above has been prepared in no time using great `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`__, that is the de facto standard tool for generating documentation from annotated C++ sources.
+To make the analysis easier, rather than looking into individual header or source files, use one of free tools to automatically generate documentation. The class index in chapter `Class Description`_ above has been prepared in no time using great `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`__, that is the de facto standard tool for generating documentation from annotated C++ sources.
 
 .. figure:: pictures/doxygen-esp8266wifi-documentation.png
    :alt: Example of documentation prepared by Doxygen
