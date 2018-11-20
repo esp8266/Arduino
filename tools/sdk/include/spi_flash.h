@@ -25,7 +25,7 @@
 #ifndef SPI_FLASH_H
 #define SPI_FLASH_H
 
-#include "spi_flash_sec_size.h"
+#include <spi_flash_geometry.h>
 
 #ifdef __cplusplus
 extern "C" {
