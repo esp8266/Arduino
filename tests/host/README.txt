@@ -34,6 +34,7 @@ run it:
 	./bin/Blink -h
 
 
+Optional 'V=1' enables makefile verbosity
 Optional 'D=1' enables core debug (same as IDE's tools menu)
 Optional 'OPTZ=-O2' will update gcc -O option (default is -Os, D=1 implies -O0)
 Optional 'FORCE32=0' will use native/default gcc (default is FORCE32=1 unless gcc-multilib is not detected)
@@ -86,6 +87,7 @@ TODO
 A lot.
 Make fun, propose PRs.
 
+- replace some "fprintf(stderr" with redirectable log functions
 - spiffs in a file (done, need to initialize and check)
 - EEPROM in a file (partly done)
 - SDCARD on Host filesystem ? or in an image ?

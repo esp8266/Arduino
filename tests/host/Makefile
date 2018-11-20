@@ -4,6 +4,7 @@ OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := ../../cores/esp8266
 FORCE32 ?= 1
 OPTZ ?= -Os
+V ?= 0
 
 MAKEFILE = $(word 1, $(MAKEFILE_LIST))
 
@@ -31,6 +32,18 @@ ifeq ($(N32),32)
 $(warning compiling in 32 bits mode)
 else
 $(warning compiling in native mode)
+endif
+
+ifeq ($(V), 0)
+VERBC   = @echo "C   $@";
+VERBCXX = @echo "C++ $@";
+VERBLD  = @echo "LD  $@";
+VERBAR  = @echo "AR  $@";
+else
+VERBC   =
+VERBCXX =
+VERBLD  =
+VERBAR  =
 endif
 
 $(shell mkdir -p $(BINDIR))
@@ -167,18 +180,18 @@ build-info:				# show toolchain version
 .SUFFIXES:
 
 %.c.o: %.c
-	$(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
+	$(VERBC) $(CC) $(PREINCLUDES) $(CFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
 .PRECIOUS: %.cpp.o
 %.cpp.o: %.cpp
-	$(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
+	$(VERBCXX) $(CXX) $(PREINCLUDES) $(CXXFLAGS) $(INC_PATHS) -MD -MF $(BINDIR)/.$(notdir $<).d -c -o $@ $<
 
 $(BINDIR)/core.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE)
 	ar -rcu $@ $^
 	ranlib -c $@
 
 $(OUTPUT_BINARY): $(CPP_OBJECTS_TESTS) $(BINDIR)/core.a
-	$(CXX) $(LDFLAGS) $^ -o $@
+	$(VERBLD) $(CXX) $(LDFLAGS) $^ -o $@
 
 #################################################
 # building ino sources
@@ -250,11 +263,11 @@ INC_PATHS += $(USERLIBDIRS)
 CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIBSRCS:.cpp=.cpp.o)
 
 bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
-	ar -rcu $@ $^
-	ranlib -c $@
+	$(VERBAR) ar -rcu $@ $^
+	$(VERBAR) ranlib -c $@
 
 %: %.ino.cpp.o bin/fullcore.a
-	$(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@
+	$(VERBLD) $(CXX) $(LDFLAGS) $< bin/fullcore.a $(LIBSSL) -o $@
 	@echo "----> $@ <----"
 
 #################################################
@@ -282,19 +295,6 @@ $(BINDIR)/$(INO)/$(INO).ino.cpp:
 	
 endif # recursive
 #####################
-
-#################################################
-# (debug)
-
-# https://lists.gnu.org/archive/html/help-make/2002-11/msg00062.html
-# Bad gmake, never *ever* try to get a file out of source control by yourself.
-#%: %,v
-#%: RCS/%,v
-#%: RCS/%
-#%: s.%
-#%: SCCS/s.%
-
-#Makefile: ;
 
 #################################################
 
