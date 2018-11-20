@@ -387,7 +387,7 @@ int16_t _i2s_write_buffer(int16_t *frames, int16_t frame_count, bool mono, bool 
             }
         }
         
-        len -= fc;
+        frame_count -= fc;
         frames_written += fc;
     }
     return frames_written;
@@ -399,7 +399,7 @@ int16_t i2s_write_buffer_mono(int16_t *frames, int16_t frame_count) { return _i2
 
 int16_t i2s_write_buffer_nb(int16_t *frames, int16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, true); }
 
-int16_t i2s_write_buffer(int16_t *frames, int16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false false); }
+int16_t i2s_write_buffer(int16_t *frames, int16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, false); }
 
 bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking) {
   if (!rx) {
