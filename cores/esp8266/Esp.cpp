@@ -22,7 +22,7 @@
 #include "flash_utils.h"
 #include "eboot_command.h"
 #include <memory>
-#include "interrupts.h"
+#include <interrupts.h>
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
@@ -165,6 +165,7 @@ void EspClass::restart(void)
 uint16_t EspClass::getVcc(void)
 {
     InterruptLock lock;
+    (void)lock;
     return system_get_vdd33();
 }
 
