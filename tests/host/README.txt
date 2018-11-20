@@ -34,7 +34,9 @@ run it:
 	./bin/Blink -h
 
 
-Optional 'D=1' enables core debug.
+Optional 'D=1' enables core debug (same as IDE's tools menu)
+Optional 'OPTZ=-O2' will update gcc -O option (default is -Os, D=1 implies -O0)
+Optional 'FORCE32=0' will use native/default gcc (default is FORCE32=1 unless gcc-multilib is not detected)
 
 
 Non exhaustive list of working examples:
@@ -51,15 +53,16 @@ Compile other sketches:
 - CAVEAT: functions must be declared *before* being called (arduino builder is not around)
 
 	make D=1  ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  /path/to/your/sketchdir/sketch/sketch
-  or
+  or:
 	ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  make  D=1  /path/to/your/sketchdir/sketch/sketch
-  or
+
+  or (preferred):
 	export ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2
-	make  D=1  /path/to/your/sketchdir/sketch/sketch
-
-
-Build all examples with debug enabled (D=1): (not fully working yet)
-	make D=1 examples
+	export D=1
+	export OPTZ=-O2
+	make clean
+	make /path/to/your/sketchdir/sketch/sketch
+	./bin/sketch/sketch
 
 
 Running a sketch
@@ -85,10 +88,11 @@ Make fun, propose PRs.
 
 - spiffs in a file (done, need to initialize and check)
 - EEPROM in a file (partly done)
-- SDCARD on Host filesystem ?
+- SDCARD on Host filesystem ? or in an image ?
 - nice curses interface to display/change gpios ?
 - display device emulation (like ssd1306)
 - optionaly use arduino-builder ?
-- store sketch objects and binaries outside from the source directories
+- store sketch objects and binaries outside from the source directories (done for sketches)
 - compile and use lwIP on host
-#1715
+- easily debug HTTP classes
+- https://github.com/esp8266/Arduino/issues/1715

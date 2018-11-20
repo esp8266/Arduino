@@ -37,8 +37,10 @@
 #include <poll.h>
 #include <unistd.h>
 
-#define int2pcb(x) ((tcp_pcb*)(long)(x))
-#define pcb2int(x) ((int)(long)(x))
+#define int2pcb(x) ((tcp_pcb*)(intptr_t)(x))
+#define pcb2int(x) ((int)(intptr_t)(x))
+
+// host socket internal side of WiFiServer
 
 int serverAccept (int srvsock)
 {

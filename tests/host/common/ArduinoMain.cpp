@@ -133,7 +133,7 @@ int main (int argc, char* const argv [])
 			p.events = POLLIN;
 			if (poll(&p, 1, 0) && p.revents == POLLIN)
 			{
-				fprintf(stderr, MOCK "UDP poll(%d) -> cb\n", (int)p.fd);
+				fprintf(stderr, MOCK "UDP poll(%d) -> cb\r", (int)p.fd);
 				udp.second->mock_cb();
 			}
 		}

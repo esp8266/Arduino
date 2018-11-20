@@ -40,8 +40,6 @@ ESP8266WebServer server(80);
 
 const int led = 13;
 
-void drawGraph();
-
 void handleRoot() {
   digitalWrite(led, 1);
   char temp[400];

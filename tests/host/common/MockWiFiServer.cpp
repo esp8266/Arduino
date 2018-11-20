@@ -39,8 +39,10 @@
 
 extern "C" const ip_addr_t ip_addr_any = IPADDR4_INIT(IPADDR_ANY);
 
-#define int2pcb(x) ((tcp_pcb*)(long)(x))
-#define pcb2int(x) ((int)(long)(x))
+#define int2pcb(x) ((tcp_pcb*)(intptr_t)(x))
+#define pcb2int(x) ((int)(intptr_t)(x))
+
+// lwIP API side of WiFiServer
 
 WiFiServer::WiFiServer (IPAddress addr, uint16_t port)
 {

@@ -5,17 +5,6 @@
 #include <ESP8266mDNS.h>
 #include <EEPROM.h>
 
-boolean isIp(String str);
-String toStringIp(IPAddress ip);
-void loadCredentials();
-void saveCredentials();
-void handleRoot();
-boolean captivePortal();
-void handleWifi();
-void handleWifiSave();
-void handleNotFound();
-
-
 /*
    This example serves a "hello world" on a WLAN and a SoftAP at the same time.
    The SoftAP allow you to configure WLAN parameters at run time. They are not setup in the sketch but saved on EEPROM.

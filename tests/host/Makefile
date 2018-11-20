@@ -217,12 +217,12 @@ ARDUINO_LIBS := \
 	) \
 
 MOCK_ARDUINO_LIBS := \
-	common/MockClientContextSocket.cpp \
-	common/MockClientContext.cpp \
+	common/ClientContextSocket.cpp \
+	common/ClientContextTools.cpp \
 	common/MockWiFiServerSocket.cpp \
 	common/MockWiFiServer.cpp \
-	common/MockUDPSocket.cpp \
-	common/ArduinoWire.cpp \
+	common/UdpContextSocket.cpp \
+	common/MockWire.cpp \
 	common/MockEsp.cpp \
 	common/MockEEPROM.cpp \
 	common/MockSPI.cpp \
