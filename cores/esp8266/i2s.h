@@ -58,8 +58,13 @@ int16_t i2s_available();// returns the number of samples than can be written bef
 int16_t i2s_rx_available();// returns the number of samples than can be written before blocking
 void i2s_set_callback(void (*callback) (void));
 void i2s_rx_set_callback(void (*callback) (void));
-int16_t i2s_write_buffer_mono(int16_t *sample, int16_t len); //writes a number of samplers in the the DMA mem, returns the numner of written samples
 
+// writes a buffer of frames into the DMA memory, returns the amount of frames written
+// A frame is just a int16_t for mono, for stereo a frame is two int16_t, one for each channel.
+int16_t i2s_write_buffer_mono(int16_t *frames, int16_t frame_count);
+int16_t i2s_write_buffer_mono_nb(int16_t *frames, int16_t frame_count);
+int16_t i2s_write_buffer(int16_t *frames, int16_t frame_count);
+int16_t i2s_write_buffer_nb(int16_t *frames, int16_t frame_count); 
 
 #ifdef __cplusplus
 }
