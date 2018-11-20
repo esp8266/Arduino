@@ -10,7 +10,7 @@
 
 DNSServer::DNSServer()
 {
-  _ttl = htonl(60);
+  _ttl = lwip_htonl(60);
   _errorReplyCode = DNSReplyCode::NonExistentDomain;
 }
 
@@ -35,7 +35,7 @@ void DNSServer::setErrorReplyCode(const DNSReplyCode &replyCode)
 
 void DNSServer::setTTL(const uint32_t &ttl)
 {
-  _ttl = htonl(ttl);
+  _ttl = lwip_htonl(ttl);
 }
 
 void DNSServer::stop()
@@ -81,7 +81,7 @@ void DNSServer::processNextRequest()
 
 bool DNSServer::requestIncludesOnlyOneQuestion(const DNSHeader* dnsHeader)
 {
-  return ntohs(dnsHeader->QDCount) == 1 &&
+  return lwip_ntohs(dnsHeader->QDCount) == 1 &&
          dnsHeader->ANCount == 0 &&
          dnsHeader->NSCount == 0 &&
          dnsHeader->ARCount == 0;
