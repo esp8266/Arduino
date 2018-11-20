@@ -111,7 +111,7 @@ public:
         fprintf(stderr, MOCK "TODO: implement UDP offset\n");
         if (!isValidOffset(pos))
         {
-            fprintf(stderr, MOCK "UDPContext::seek too far (%d >= %d)\n", (int)pos, (int)_inbufsize);
+            fprintf(stderr, MOCK "UDPContext::seek too far (%zd >= %zd)\n", pos, _inbufsize);
             exit(EXIT_FAILURE);
         }
     }
@@ -183,7 +183,7 @@ public:
     {
         if (size + _outbufsize > sizeof _outbuf)
         {
-            fprintf(stderr, MOCK "UdpContext::append: increase CCBUFSIZE (%d -> %d)\n", CCBUFSIZE, (int)(size + _outbufsize));
+            fprintf(stderr, MOCK "UdpContext::append: increase CCBUFSIZE (%d -> %zd)\n", CCBUFSIZE, (size + _outbufsize));
             exit(EXIT_FAILURE);
         }
 
@@ -200,7 +200,7 @@ public:
         _outbufsize = 0;
         return ret > 0;
     }
-    
+
     void mock_cb (void)
     {
         if (_on_rx) _on_rx();
@@ -232,14 +232,14 @@ private:
 
     ip_addr_t _dst;
     uint16_t _dstport;
-    
+
     char _inbuf [CCBUFSIZE];
     size_t _inbufsize = 0;
     char _outbuf [CCBUFSIZE];
     size_t _outbufsize = 0;
 
     int _timeout_ms = 0;
-    
+
     uint8_t addrsize;
     uint8_t addr[16];
 };

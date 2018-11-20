@@ -66,7 +66,7 @@ void WiFiServer::begin ()
 {
 	int sock;
 	struct sockaddr_in server;
-	
+
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		perror(MOCK "socket()");
@@ -79,7 +79,7 @@ void WiFiServer::begin ()
 		perror(MOCK "reuseport");
 		exit(EXIT_FAILURE);
 	}
-    
+
     	server.sin_family = AF_INET;
 	server.sin_port = htons(_port);
 	server.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -88,7 +88,7 @@ void WiFiServer::begin ()
 		perror(MOCK "bind()");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	if (listen(sock, 1) == -1)
 	{
 		perror(MOCK "listen()");
@@ -115,7 +115,7 @@ size_t WiFiServer::write (uint8_t c)
 
 size_t WiFiServer::write (const uint8_t *buf, size_t size)
 {
-	fprintf(stderr, MOCK "todo: WiFiServer::write(%p, %d)\n", buf, (int)size);
+	fprintf(stderr, MOCK "todo: WiFiServer::write(%p, %zd)\n", buf, size);
 	return 0;
 }
 

@@ -73,7 +73,7 @@ size_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 	if (ret == -1)
 	{
 		if (errno != EAGAIN)
-			fprintf(stderr, MOCK "ClientContext::(read/peek): filling buffer for %d bytes: %s\n", (int)maxread, strerror(errno));
+			fprintf(stderr, MOCK "ClientContext::(read/peek): filling buffer for %zd bytes: %s\n", maxread, strerror(errno));
 		ret = 0;
 	}
 	return ccinbufsize += ret;
@@ -82,7 +82,7 @@ size_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 size_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
 	if (usersize > CCBUFSIZE)
-		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %d bytes (-> %d)\n", CCBUFSIZE, (int)usersize - CCBUFSIZE, (int)usersize);
+		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
 	struct pollfd p;
 	size_t retsize = 0;
@@ -143,7 +143,7 @@ size_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 		}
 		if (ret != (int)size)
 		{
-			fprintf(stderr, MOCK "ClientContext::write: short write (%d < %d) (TODO)\n", (int)ret, (int)size);
+			fprintf(stderr, MOCK "ClientContext::write: short write (%d < %zd) (TODO)\n", ret, size);
 			exit(EXIT_FAILURE);
 		}
 	}

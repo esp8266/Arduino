@@ -1405,7 +1405,7 @@ extern "C" {
     int freeheap = ESP.getFreeHeap();
     static int laststack, lastheap, laststack2;
     if ((laststack != freestack) || (lastheap != freeheap) || (laststack2 != (int)br_esp8266_stack_proxy_usage())) {
-      Serial.printf("%s:%s(%d): FREESTACK=%d, STACK2USAGE=%d, FREEHEAP=%d\n", file, fcn, line, freestack, (int)br_esp8266_stack_proxy_usage(), freeheap);
+      Serial.printf("%s:%s(%d): FREESTACK=%d, STACK2USAGE=%zd, FREEHEAP=%d\n", file, fcn, line, freestack, br_esp8266_stack_proxy_usage(), freeheap);
       if (freestack < 256) {
         Serial.printf("!!! Out of main stack space\n");
       }

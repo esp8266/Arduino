@@ -59,28 +59,28 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 		fprintf(stderr, MOCK "SO_REUSEADDR failed\n");
 
 	struct sockaddr_in servaddr;
-	memset(&servaddr, 0, sizeof(servaddr)); 
-	
-	// Filling server information 
+	memset(&servaddr, 0, sizeof(servaddr));
+
+	// Filling server information
 	servaddr.sin_family = AF_INET;
 	//servaddr.sin_addr.s_addr = global_ipv4_netfmt?: dstaddr;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servaddr.sin_port = htons(port);
-	
-	// Bind the socket with the server address 
+
+	// Bind the socket with the server address
 	if (bind(sock, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
 	{
-		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", port, strerror(errno)); 
+		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", port, strerror(errno));
 		return false;
 	}
 	else
-		fprintf(stderr, MOCK "UDP server on port %d (sock=%d)\n", (int)port, (int)sock);
-	
+		fprintf(stderr, MOCK "UDP server on port %d (sock=%d)\n", (int)port, sock);
+
 	if (mcast)
 	{
 		// https://web.cs.wpi.edu/~claypool/courses/4514-B99/samples/multicast.c
 		// https://stackoverflow.com/questions/12681097/c-choose-interface-for-udp-multicast-socket
-		
+
 		struct ip_mreq mreq;
 		mreq.imr_multiaddr.s_addr = mcast;
 		//mreq.imr_interface.s_addr = global_ipv4_netfmt?: htonl(INADDR_ANY);
@@ -99,7 +99,7 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -114,10 +114,10 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 	if (ret == -1)
 	{
 		if (errno != EAGAIN)
-			fprintf(stderr, MOCK "UDPContext::(read/peek): filling buffer for %d bytes: %s\n", (int)maxread, strerror(errno));
+			fprintf(stderr, MOCK "UDPContext::(read/peek): filling buffer for %zd bytes: %s\n", maxread, strerror(errno));
 		ret = 0;
 	}
-	
+
 	if (ret > 0)
 	{
 		port = ntohs(((sockaddr_in*)&addrbuf)->sin_port);
@@ -136,7 +136,7 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
 	if (usersize > CCBUFSIZE)
-		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %d bytes (-> %d)\n", CCBUFSIZE, (int)usersize - CCBUFSIZE, (int)usersize);
+		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
 	size_t retsize = 0;
 	if (ccinbufsize)
@@ -161,7 +161,7 @@ size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccin
 
 size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port)
 {
-	// Filling server information 
+	// Filling server information
 	struct sockaddr_in peer;
 	peer.sin_family = AF_INET;
 	peer.sin_addr.s_addr = ipv4; //XXFIXME should use lwip_htonl?
@@ -174,7 +174,7 @@ size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms,
 	}
 	if (ret != (int)size)
 	{
-		fprintf(stderr, MOCK "UDPContext::write: short write (%d < %d) (TODO)\n", (int)ret, (int)size);
+		fprintf(stderr, MOCK "UDPContext::write: short write (%d < %zd) (TODO)\n", ret, size);
 		exit(EXIT_FAILURE);
 	}
 

@@ -439,7 +439,7 @@ void ESP8266WebServer::sendContent(const String& content) {
   size_t len = content.length();
   if(_chunked) {
     char chunkSize[11];
-    sprintf(chunkSize, "%x\r\n", (unsigned)len);
+    sprintf(chunkSize, "%zx\r\n", len);
     _currentClientWrite(chunkSize, strlen(chunkSize));
   }
   _currentClientWrite(content.c_str(), len);
@@ -459,7 +459,7 @@ void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
   const char * footer = "\r\n";
   if(_chunked) {
     char chunkSize[11];
-    sprintf(chunkSize, "%x\r\n", (unsigned)size);
+    sprintf(chunkSize, "%zx\r\n", size);
     _currentClientWrite(chunkSize, strlen(chunkSize));
   }
   _currentClientWrite_P(content, size);

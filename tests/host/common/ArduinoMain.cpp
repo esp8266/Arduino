@@ -113,7 +113,7 @@ int main (int argc, char* const argv [])
 			exit(EXIT_FAILURE);
 		}
 	}
-	
+
 	// setup global global_ipv4_netfmt
 	wifi_get_ip_info(0, nullptr);
 
@@ -122,9 +122,9 @@ int main (int argc, char* const argv [])
 	{
 		if (!fast)
 			usleep(10000); // not 100% cpu
-		
+
 		loop();
-		
+
 		// check incoming udp
 		for (auto& udp: udps)
 		{
@@ -133,11 +133,10 @@ int main (int argc, char* const argv [])
 			p.events = POLLIN;
 			if (poll(&p, 1, 0) && p.revents == POLLIN)
 			{
-				fprintf(stderr, MOCK "UDP poll(%d) -> cb\r", (int)p.fd);
+				fprintf(stderr, MOCK "UDP poll(%d) -> cb\r", p.fd);
 				udp.second->mock_cb();
 			}
 		}
-		
 	}
 	return 0;
 }

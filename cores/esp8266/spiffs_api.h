@@ -220,9 +220,9 @@ protected:
         size_t cacheBufSize = SPIFFS_buffer_bytes_for_cache(&_fs, _maxOpenFds);
 
         if (!_workBuf) {
-            DEBUGV("SPIFFSImpl: allocating %d+%d+%d=%d bytes\r\n",
-                   (int)workBufSize, (int)fdsBufSize, (int)cacheBufSize,
-                   (int)(workBufSize + fdsBufSize + cacheBufSize));
+            DEBUGV("SPIFFSImpl: allocating %zd+%zd+%zd=%zd bytes\r\n",
+                   workBufSize, fdsBufSize, cacheBufSize,
+                   workBufSize + fdsBufSize + cacheBufSize);
             _workBuf.reset(new uint8_t[workBufSize]);
             _fdsBuf.reset(new uint8_t[fdsBufSize]);
             _cacheBuf.reset(new uint8_t[cacheBufSize]);

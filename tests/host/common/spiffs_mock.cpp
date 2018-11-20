@@ -1,14 +1,14 @@
 /*
  spiffs_mock.cpp - SPIFFS HAL mock for host side testing
  Copyright © 2016 Ivan Grokhotkov
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
 */
@@ -42,7 +42,7 @@ FS SPIFFS(nullptr);
 
 SpiffsMock::SpiffsMock(size_t fs_size, size_t fs_block, size_t fs_page, bool storage)
 {
-    fprintf(stderr, "SPIFFS: %d bytes\n", (int)fs_size);
+    fprintf(stderr, "SPIFFS: %zd bytes\n", fs_size);
 
     m_storage = storage;
     m_fs = new uint8_t[m_fs_size = fs_size];
@@ -62,7 +62,7 @@ void SpiffsMock::reset()
     if (m_storage)
         load();
 }
-    
+
 SpiffsMock::~SpiffsMock()
 {
     if (m_storage)
@@ -92,9 +92,9 @@ void SpiffsMock::load ()
         fprintf(stderr, "SPIFFS: loading '%s': %s\n", fname, strerror(errno));
         return;
     }
-    fprintf(stderr, "SPIFFS: loading %i bytes from '%s'\n", (int)m_fs_size, fname);
+    fprintf(stderr, "SPIFFS: loading %zi bytes from '%s'\n", m_fs_size, fname);
     if (::read(fs, &m_fs[0], m_fs_size) != (ssize_t)m_fs_size)
-        fprintf(stderr, "SPIFFS: reading %i bytes: %s\n", (int)m_fs_size, strerror(errno));
+        fprintf(stderr, "SPIFFS: reading %zi bytes: %s\n", m_fs_size, strerror(errno));
     ::close(fs);
 }
 
@@ -112,13 +112,13 @@ void SpiffsMock::save ()
         fprintf(stderr, "SPIFFS: saving '%s': %s\n", fname, strerror(errno));
         return;
     }
-    fprintf(stderr, "SPIFFS: saving %i bytes to '%s'\n", (int)m_fs_size, fname);
+    fprintf(stderr, "SPIFFS: saving %zi bytes to '%s'\n", m_fs_size, fname);
 
 // this can be a valgrind error, I don't understand how it happens
-//for (size_t i = 0; i < m_fs_size; i++) printf("\r%d:%d   ",(int)i, (int)m_fs[i]);
+//for (size_t i = 0; i < m_fs_size; i++) printf("\r%zd:%d   ", i, (int)m_fs[i]);
 
     if (::write(fs, &m_fs[0], m_fs_size) != (ssize_t)m_fs_size)
-        fprintf(stderr, "SPIFFS: writing %i bytes: %s\n", (int)m_fs_size, strerror(errno));
+        fprintf(stderr, "SPIFFS: writing %zi bytes: %s\n", m_fs_size, strerror(errno));
     if (::close(fs) == -1)
         fprintf(stderr, "SPIFFS: closing %s: %s\n", fname, strerror(errno));
 }

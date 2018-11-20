@@ -60,7 +60,7 @@ MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	Arduino.cpp \
 	spiffs_mock.cpp \
 	WMath.cpp \
-	HardwareSerial.cpp \
+	MockSerial.cpp \
 	MockTools.cpp \
 )
 
@@ -222,7 +222,7 @@ MOCK_ARDUINO_LIBS := \
 	common/MockWiFiServerSocket.cpp \
 	common/MockWiFiServer.cpp \
 	common/UdpContextSocket.cpp \
-	common/MockWire.cpp \
+	common/HostWiring.cpp \
 	common/MockEsp.cpp \
 	common/MockEEPROM.cpp \
 	common/MockSPI.cpp \

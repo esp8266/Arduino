@@ -58,8 +58,8 @@ extern "C" void configTime(long timezone, int daylightOffset_sec,
 	(void)server1;
 	(void)server2;
 	(void)server3;
-	
-	fprintf(stderr, MOCK "configTime: TODO (tz=%dH offset=%dS) (time will be host's)\n", (int)timezone, daylightOffset_sec);
+
+	fprintf(stderr, MOCK "configTime: TODO (tz=%ldH offset=%dS) (time will be host's)\n", timezone, daylightOffset_sec);
 }
 
 void stack_thunk_add_ref() { }

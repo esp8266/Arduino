@@ -87,18 +87,18 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   uintptr_t updateStartAddress = 0;
   if (command == U_FLASH) {
     //size of current sketch rounded to a sector
-    uint32_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+    size_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address of the end of the space available for sketch and update
     uintptr_t updateEndAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
     //size of the update rounded to a sector
-    uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+    size_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address where we will start writing the update
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
 #ifdef DEBUG_UPDATER
-        DEBUG_UPDATER.printf("[begin] roundedSize:       0x%08X (%d)\n", roundedSize, roundedSize);
-        DEBUG_UPDATER.printf("[begin] updateEndAddress:  0x%08X (%d)\n", (int)updateEndAddress, (int)updateEndAddress);
-        DEBUG_UPDATER.printf("[begin] currentSketchSize: 0x%08X (%d)\n", currentSketchSize, currentSketchSize);
+        DEBUG_UPDATER.printf("[begin] roundedSize:       0x%08zX (%zd)\n", roundedSize, roundedSize);
+        DEBUG_UPDATER.printf("[begin] updateEndAddress:  0x%08zX (%zd)\n", updateEndAddress, updateEndAddress);
+        DEBUG_UPDATER.printf("[begin] currentSketchSize: 0x%08zX (%zd)\n", currentSketchSize, currentSketchSize);
 #endif
 
     //make sure that the size of both sketches is less than the total space (updateEndAddress)
@@ -133,7 +133,7 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
 #ifdef DEBUG_UPDATER
   DEBUG_UPDATER.printf("[begin] _startAddress:     0x%08X (%d)\n", _startAddress, _startAddress);
   DEBUG_UPDATER.printf("[begin] _currentAddress:   0x%08X (%d)\n", _currentAddress, _currentAddress);
-  DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", (int)_size, (int)_size);
+  DEBUG_UPDATER.printf("[begin] _size:             0x%08zX (%zd)\n", _size, _size);
 #endif
 
   _md5.begin();
@@ -159,7 +159,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
   if(hasError() || (!isFinished() && !evenIfRemaining)){
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("premature end: res:%u, pos:%u/%u\n", getError(), (unsigned)progress(), (unsigned)_size);
+    DEBUG_UPDATER.printf("premature end: res:%u, pos:%zu/%zu\n", getError(), progress(), _size);
 #endif
 
     _reset();
@@ -199,10 +199,10 @@ bool UpdaterClass::end(bool evenIfRemaining){
     eboot_command_write(&ebcmd);
 
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08X\n", _startAddress, (unsigned)_size);
+    DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08zX\n", _startAddress, _size);
   }
   else if (_command == U_SPIFFS) {
-    DEBUG_UPDATER.printf("SPIFFS: address:0x%08X, size:0x%08X\n", _startAddress, (unsigned)_size);
+    DEBUG_UPDATER.printf("SPIFFS: address:0x%08X, size:0x%08zX\n", _startAddress, _size);
 #endif
   }
 
