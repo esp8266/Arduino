@@ -19,8 +19,8 @@ WiFiClient+WiFiServer/ClientContext and WifiUdp/UdpContext using socket
 posix API.  Further work will optionally propose native lwIP library
 instead.
 
-How to compile a sketch
------------------------
+How to compile and run a sketch
+-------------------------------
 
 All results are stored in ./bin/ .
 
@@ -31,7 +31,7 @@ Show the core example list:
 Build one example
 	make D=1 ../../libraries/esp8266/examples/Blink/Blink
 run it:
-	./bin/Blink -h
+	./bin/Blink/Blink -h
 
 
 Optional 'V=1' enables makefile verbosity
@@ -66,15 +66,8 @@ Compile other sketches:
 	./bin/sketch/sketch
 
 
-Running a sketch
-----------------
-
-- GPIOs
-  read as 0(digital) or 512(analog).
-  output is printed on console.
-
-Once a sketch is compiled, just run it:
-	/path/to/your/sketchdir/sketch/sketch
+Executable location is always in bin/. Once a sketch is compiled, just run it:
+	bin/sketch/sketch
 
 Options are available:
 	-h
@@ -98,3 +91,6 @@ Make fun, propose PRs.
 - compile and use lwIP on host
 - easily debug HTTP classes
 - https://github.com/esp8266/Arduino/issues/1715
+- gpio, currently:
+  read as 0(digital) or 512(analog).
+  output is printed on console.
