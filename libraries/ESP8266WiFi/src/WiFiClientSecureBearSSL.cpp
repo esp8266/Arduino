@@ -40,9 +40,11 @@ extern "C" {
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include "lwip/netif.h"
-#include "include/ClientContext.h"
+#include <include/ClientContext.h>
 #include "c_types.h"
 #include "coredecls.h"
+
+#if !CORE_MOCK
 
 // The BearSSL thunks in use for now
 #define br_ssl_engine_recvapp_ack thunk_br_ssl_engine_recvapp_ack
@@ -53,6 +55,8 @@ extern "C" {
 #define br_ssl_engine_sendapp_buf thunk_br_ssl_engine_sendapp_buf
 #define br_ssl_engine_sendrec_ack thunk_br_ssl_engine_sendrec_ack
 #define br_ssl_engine_sendrec_buf thunk_br_ssl_engine_sendrec_buf
+
+#endif
 
 namespace BearSSL {
 
@@ -1377,6 +1381,21 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
 // SSL debugging which should focus on the WiFiClientBearSSL objects.
 
 extern "C" {
+
+#if CORE_MOCK
+
+  void br_esp8266_stack_proxy_init(uint8_t *space, uint16_t size) {
+    (void)space;
+    (void)size;
+  }
+  void _BearSSLCheckStack(const char *fcn, const char *file, int line) {
+    (void)fcn;
+    (void)file;
+    (void)line;
+  }
+
+#else // !CORE_MOCK
+
   extern size_t br_esp8266_stack_proxy_usage();
 
   void _BearSSLCheckStack(const char *fcn, const char *file, int line) {
@@ -1386,7 +1405,7 @@ extern "C" {
     int freeheap = ESP.getFreeHeap();
     static int laststack, lastheap, laststack2;
     if ((laststack != freestack) || (lastheap != freeheap) || (laststack2 != (int)br_esp8266_stack_proxy_usage())) {
-      Serial.printf("%s:%s(%d): FREESTACK=%d, STACK2USAGE=%d, FREEHEAP=%d\n", file, fcn, line, freestack, br_esp8266_stack_proxy_usage(), freeheap);
+      Serial.printf("%s:%s(%d): FREESTACK=%d, STACK2USAGE=%zd, FREEHEAP=%d\n", file, fcn, line, freestack, br_esp8266_stack_proxy_usage(), freeheap);
       if (freestack < 256) {
         Serial.printf("!!! Out of main stack space\n");
       }
@@ -1404,6 +1423,8 @@ extern "C" {
       cnt++;
     }
   }
+
+#endif // !CORE_MOCK
 
   void _BearSSLSerialPrint(const char *str) {
     static int cnt = 0;
