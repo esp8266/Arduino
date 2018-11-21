@@ -226,8 +226,7 @@ void setup() {
 
   delay(2000);
 
-  Wire.pins(WIRE_SDA, WIRE_SCL);
-  Wire.begin(I2C_MASTER); // join i2c bus (address optional for master)
+  Wire.begin(WIRE_SDA, WIRE_SCL, I2C_MASTER); // join i2c bus (address optional for master)
   Wire.onReceive(receiveEvent);
 
   Serial.begin(230400); // keep serial fast as possible for debug logging
