@@ -51,6 +51,7 @@ class TwoWire : public Stream
   public:
     TwoWire();
     void begin(int sda, int scl);
+    void begin(int sda, int scl, uint8_t address);
     void pins(int sda, int scl) __attribute__((deprecated)); // use begin(sda, scl) in new code
     void begin();
     void begin(uint8_t);
@@ -68,7 +69,7 @@ class TwoWire : public Stream
     uint8_t requestFrom(uint8_t, uint8_t, uint8_t);
     uint8_t requestFrom(int, int);
     uint8_t requestFrom(int, int, int);
-    
+
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t *, size_t);
     virtual int available(void);
@@ -90,4 +91,3 @@ extern TwoWire Wire;
 #endif
 
 #endif
-

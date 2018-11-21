@@ -60,8 +60,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 
-  // Wire.pins(WIRE_SDA, WIRE_SCL); // should set pins before address init
-  Wire.begin(I2C_ADDRESS); // address required for slave
+  Wire.begin(SDA_PIN, SCL_PIN, I2C_ADDRESS); // address required for slave
 
   Serial.begin(230400);
   //while (!Serial); if you want to wait for first messages
