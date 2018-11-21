@@ -333,13 +333,11 @@ bool i2s_write_lr(int16_t left, int16_t right){
 
 // writes a buffer of frames into the DMA memory, returns the amount of frames written
 // A frame is just a int16_t for mono, for stereo a frame is two int16_t, one for each channel.
-int16_t _i2s_write_buffer(int16_t *frames, int16_t frame_count, bool mono, bool nb) {
+static int16_t _i2s_write_buffer(int16_t *frames, int16_t frame_count, bool mono, bool nb) {
     int16_t frames_written=0;
 
-    for(;;) {
-        if (frame_count==0)
-            break;
-    
+    while(frame_count>0) {
+   
         // make sure we have room in the current buffer
         if (tx->curr_slc_buf_pos==SLC_BUF_LEN || tx->curr_slc_buf==NULL) {
             // no room in the current buffer? if there are no buffers available then exit
@@ -368,24 +366,25 @@ int16_t _i2s_write_buffer(int16_t *frames, int16_t frame_count, bool mono, bool 
         }       
 
         //space available in the current buffer
-        int16_t	available = _i2s_available( tx );
+        int16_t	available = SLC_BUF_LEN - tx->curr_slc_buf_pos;
 
         int16_t fc = (available < frame_count) ? available : frame_count;
 
         if (mono) {
             for(int16_t i=0;i<fc;i++){
-                int16_t v =	*frames++;
-                tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v << 16) | (v & 0xffff);
-            }
+                uint16_t v = (uint16_t)(*frames);
+                tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v << 16) | (v & 0xffff);;                
+                frames++; 
+            }                
         }
         else
         {        
             for(int16_t i=0;i<fc;i++){
-                int16_t v1 = *frames++;
-                int16_t v2 = *frames++;
+                uint32_t v1 = *frames++;
+                uint16_t v2 = *frames++;
                 tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v1 << 16) | (v2 & 0xffff);
             }
-        }
+        }        
         
         frame_count -= fc;
         frames_written += fc;
