@@ -226,7 +226,7 @@ void setup() {
 
   delay(2000);
 
-  Wire.pins(WIRE_SDA, WIRE_SCL);
+  // Wire.pins(WIRE_SDA, WIRE_SCL); // should set pins before address init
   Wire.begin(I2C_MASTER); // join i2c bus (address optional for master)
   Wire.onReceive(receiveEvent);
 
