@@ -1,21 +1,20 @@
-/* 
- * ESP8266 I2C master-slave communication, requires Arduno Core with I2C Slave Support (2.5.0+) 
- * 
+/*
+ * ESP8266 I2C master-slave communication, requires Arduno Core with I2C Slave Support (2.5.0+)
+ *
  * Expects two ESP8266 devices with three pins connected: GND, SDA and SCL. This is slave.
- * Will wait for "MESA" message and then respond with "PONG" message, 
+ * Will wait for "MESA" message and then respond with "PONG" message,
  * or request retransfer if message was misunderstood (e.g. CRC check failed).
  * Message can be up to 26 bytes long (plus wrapper).
- * 
+ *
  * 21-11-2018: initial drop by Matej Sychra (github.com/suculent)
  */
 
 #include <Wire.h>
-
 #include "crc16.h"
 
-#define SDA_PIN D1
-#define SCL_PIN D2
-#define LED_PIN D4
+#define SDA_PIN 4 // D1
+#define SCL_PIN 5 // D2
+#define LED_PIN 12 // D4
 
 const uint16_t I2C_ADDRESS = 0x08;
 const uint16_t I2C_MASTER = 0x42;
@@ -48,7 +47,7 @@ MESSAGE_DATA validateMessage(char* bytes_message);
 uint16_t calculateCRC16(uint8_t *data, size_t length) {
   crc.clearCrc();
   unsigned short value = crc.XModemCrc(data, 0, length);
-  Serial.print("crc = 0x"); Serial.println(value, HEX);  
+  Serial.print("crc = 0x"); Serial.println(value, HEX);
   return (uint16_t)value;
 }
 
@@ -57,19 +56,19 @@ void setup() {
   // Enable internal pullup (there's always one from the master side)
   //digitalWrite(SDA_PIN, HIGH);
   //digitalWrite(SCL_PIN, HIGH);
-  
+
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 
   Wire.pins(SDA_PIN, SCL_PIN);
   Wire.begin(I2C_ADDRESS); // address required for slave
-  
+
   Serial.begin(230400);
   //while (!Serial); if you want to wait for first messages
-  
+
   delay(2000);
   digitalWrite(LED_PIN, HIGH);
-  
+
   Wire.onReceive(receiveEvent);
 
   Serial.print("I2C Slave started on address: 0x0");
@@ -78,13 +77,13 @@ void setup() {
 
 // should be in shared header
 MESSAGE_DATA encodeMessage(String bytes) {
-  
+
   msgdata.terminator = '.';
 
-  int datasize = sizeof(msgdata.data);
+  unsigned int datasize = sizeof(msgdata.data);
   Serial.print("Encoding data of size: ");
   Serial.println(datasize);
-  
+
   // Generate new data set for the struct
   for (size_t i = 0; i < datasize; i++) {
     if (bytes.length() >= i) {
@@ -94,7 +93,7 @@ MESSAGE_DATA encodeMessage(String bytes) {
     }
     Serial.print(msgdata.data[i]);
     Serial.print(" ");
-  }  
+  }
   Serial.println();
   msgdata.crc16 = calculateCRC16((uint8_t*) &msgdata.data[0], datasize);
   Serial.print("Outgoing Message CRC16: "); Serial.println(msgdata.crc16, HEX);
@@ -121,7 +120,7 @@ MESSAGE_DATA validateMessage(char* bytes_message) {
   if (datasize != 28) {
     Serial.print("Data of size: "); Serial.println(datasize);
     if (datasize > 28) {
-      datasize == 28;
+      datasize = 28;
     }
   }
 
@@ -129,12 +128,12 @@ MESSAGE_DATA validateMessage(char* bytes_message) {
   uint16_t data_crc = calculateCRC16((uint8_t*) &tmp.data[0], sizeof(datasize));
 
   // should be only when CRC is good like commented below
-  char inmsg[datasize];  
+  char inmsg[datasize];
   memcpy(inmsg, &tmp.data, datasize);
-    
+
   // Validate incoming data CRC against remote CRC
   if (tmp.crc16 == data_crc) {
-    Serial.println("[OK] Data CRC valid.");    
+    Serial.println("[OK] Data CRC valid.");
     Serial.print("SLAVE Incoming message: "); Serial.println(String(inmsg));
   } else {
     Serial.print("CRC-A = 0x");
@@ -233,7 +232,6 @@ void receiveEvent(int howMany) {
 
   }
 
-  int error = 0;
   Serial.print("Decoding data of size: "); Serial.println(sizeof(chars));
   message = validateMessage(chars); // &error
 
@@ -257,7 +255,7 @@ void sendMessage(int seq, String msg) {
   memcpy(b, &struct_data, sizeof(struct_data));
   Serial.print("Sending message of size "); Serial.print(sizeof(struct_data)); Serial.println();
   Serial.print("'");
-  for (int i = 0; i < sizeof(struct_data); i++) {
+  for (unsigned int i = 0; i < sizeof(struct_data); i++) {
     Wire.write(b[i]);
     Serial.print(b[i]);
   }
