@@ -43,8 +43,13 @@
 
 #include <ESP8266WiFi.h>
 
-const char* ssid = "your-ssid";
-const char* password = "your-password";
+#ifndef SSID
+#define SSID "your-ssid"
+#define PSK  "your-password"
+#endif
+
+const char* ssid = SSID;
+const char* password = PSK;
 
 // The certificate is stored in PMEM
 static const uint8_t x509[] PROGMEM = {

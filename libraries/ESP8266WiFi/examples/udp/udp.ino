@@ -18,8 +18,10 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-#define SSID "ssid"
-#define PSK  "psk"
+#ifndef SSID
+#define SSID "your-ssid"
+#define PSK  "your-password"
+#endif
 
 unsigned int localPort = 8888;      // local port to listen on
 
@@ -75,6 +77,6 @@ void loop() {
 
 /*
   test (shell/netcat):
-  ---------------
+  --------------------
 	  nc -u 192.168.esp.address 8888
 */

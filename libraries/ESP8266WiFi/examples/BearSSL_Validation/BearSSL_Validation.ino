@@ -7,8 +7,13 @@
 #include <ESP8266WiFi.h>
 #include <time.h>
 
-const char *ssid = "....";
-const char *pass = "....";
+#ifndef SSID
+#define SSID "your-ssid"
+#define PSK  "your-password"
+#endif
+
+const char *ssid = SSID;
+const char *pass = PSK;
 
 const char *   host = "api.github.com";
 const uint16_t port = 443;

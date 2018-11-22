@@ -23,5 +23,15 @@
 #include "WiFiClientSecureAxTLS.h"
 #include "WiFiClientSecureBearSSL.h"
 
+//using namespace axTLS;
+using namespace BearSSL;
+
+/* !! Now BearSSL is the default !!
+ 
+   While not advised,
+   to keep legacy code without updating, use:
+
+#include "WiFiClientSecureAxTLS.h"
 using namespace axTLS;
-// using namespace BearSSL;
+
+*/

@@ -5,8 +5,13 @@
 
 #include <ESP8266WiFi.h>
 
-const char* ssid     = "your-ssid";
-const char* password = "your-password";
+#ifndef SSID
+#define SSID "your-ssid"
+#define PSK  "your-password"
+#endif
+
+const char* ssid     = SSID;
+const char* password = PSK;
 
 const char* host = "djxmmx.net";
 const uint16_t port = 17;
@@ -54,7 +59,10 @@ void loop() {
 
   // This will send a string to the server
   Serial.println("sending data to server");
-  client.println("hello from ESP8266");
+  if (client.connected())
+      client.println("hello from ESP8266");
+
+  // wait for data to be available
   unsigned long timeout = millis();
   while (client.available() == 0) {
     if (millis() - timeout > 5000) {
@@ -67,6 +75,7 @@ void loop() {
 
   // Read all the lines of the reply from server and print them to Serial
   Serial.println("receiving from remote server");
+  // not testing 'client.connected()' since we do not need to send data here
   while (client.available()) {
     char ch = static_cast<char>(client.read());
     Serial.print(ch);

@@ -20,83 +20,129 @@
 */
 #include <ESP8266WiFi.h>
 
-//how many clients should be able to telnet to this ESP8266
-#define MAX_SRV_CLIENTS 1
-const char* ssid = "**********";
-const char* password = "**********";
+#ifndef SSID
+#define SSID "your-ssid"
+#define PSK  "your-password"
+#endif
 
-WiFiServer server(23);
+/* SWAP_PINS:
+ * 0: use Serial1 for logging (legacy example)
+ * 1: configure Serial port on RX:GPIO13 TX:GPIO15
+ *    and use SoftwareSerial for logging on standard serial pins
+ */
+#define SWAP_PINS 1
+
+#if SWAP_PINS
+#include <SoftwareSerial.h>
+SoftwareSerial* logguer = nullptr;
+#else
+#define logguer (&Serial1)
+#endif
+
+#define STACK_PROTECTOR  512 // bytes
+
+//how many clients should be able to telnet to this ESP8266
+#define MAX_SRV_CLIENTS 2
+const char* ssid = SSID;
+const char* password = PSK;
+
+const int port = 23;
+
+WiFiServer server(port);
 WiFiClient serverClients[MAX_SRV_CLIENTS];
 
 void setup() {
-  Serial1.begin(115200);
+
+#if SWAP_PINS
+  Serial.swap();
+  // Hardware serial is now on RX:GPIO13 TX:GPIO15
+  // use SoftwareSerial on regular RX(3)/TX(1) for logging
+  logger = new SoftwareSerial(3, 1);
+#endif
+  logger->begin(115200);
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial1.print("\nConnecting to "); Serial1.println(ssid);
+  logger->print("\nConnecting to ");
+  logger->println(ssid);
   uint8_t i = 0;
-  while (WiFi.status() != WL_CONNECTED && i++ < 20) {
+  while (WiFi.status() != WL_CONNECTED) {
+    logger->print('.');
     delay(500);
   }
-  if (i == 21) {
-    Serial1.print("Could not connect to"); Serial1.println(ssid);
-    while (1) {
-      delay(500);
-    }
-  }
+  logger->println();
+  logger->println("connected, address=" + WiFi.localIP());
+
   //start UART and the server
   Serial.begin(115200);
   server.begin();
   server.setNoDelay(true);
 
-  Serial1.print("Ready! Use 'telnet ");
-  Serial1.print(WiFi.localIP());
-  Serial1.println(" 23' to connect");
+  logger->print("Ready! Use 'telnet ");
+  logger->print(WiFi.localIP());
+  logger->printf(" %d' to connect", port);
 }
 
 void loop() {
   uint8_t i;
   //check if there are any new clients
   if (server.hasClient()) {
-    for (i = 0; i < MAX_SRV_CLIENTS; i++) {
-      //find free/disconnected spot
-      if (!serverClients[i] || !serverClients[i].connected()) {
-        if (serverClients[i]) {
-          serverClients[i].stop();
-        }
+    //find free/disconnected spot
+    for (i = 0; i < MAX_SRV_CLIENTS; i++)
+      if (!serverClients[i]) { // equivalent to !serverClients[i].connected()
         serverClients[i] = server.available();
-        Serial1.print("New client: "); Serial1.print(i);
+        logger->print("New client: ");
+        logger->print(i);
         break;
       }
-    }
+
     //no free/disconnected spot so reject
     if (i == MAX_SRV_CLIENTS) {
-      WiFiClient serverClient = server.available();
-      serverClient.stop();
-      Serial1.println("Connection rejected ");
+      server.available()->println("busy");
+      // hints: server.available() is a WiFiClient with short-term scope
+      // when out of scope, a WiFiClient will
+      // - flush() - all data will be sent
+      // - stop() - automatically too
+      logger->printf("server is busy with %d active connections\n", MAX_SRV_CLIENTS);
     }
   }
-  //check clients for data
-  for (i = 0; i < MAX_SRV_CLIENTS; i++) {
-    if (serverClients[i] && serverClients[i].connected()) {
-      if (serverClients[i].available()) {
-        //get data from the telnet client and push it to the UART
-        while (serverClients[i].available()) {
-          Serial.write(serverClients[i].read());
-        }
+
+  //check TCP clients for data
+  for (i = 0; i < MAX_SRV_CLIENTS; i++)
+    while (serverClients[i].available() && Serial.availableForWrite() > 0)
+      // working char by char is not very efficient
+      // every single read() will send a TCP ACK
+      Serial.write(serverClients[i].read());
+
+  // determine maximum output size "fair TCP use"
+  // client.availableForWrite() returns 0 when !client.connected()
+  size_t maxToTcp = 0;
+  for (i = 0; i < MAX_SRV_CLIENTS; i++)
+    if (serverClients[i]) {
+      size_t afw = serverClients[i].availableForWrite();
+      if (afw) {
+        if (!maxToTcp)
+          maxToTcp = afw;
+        else
+          maxToTcp = std::min(maxToTcp, afw);
+      } else {
+        // warn but ignore congested clients
+        logguer->println("one client is congested");
       }
     }
-  }
+
   //check UART for data
-  if (Serial.available()) {
-    size_t len = Serial.available();
+  size_t len = std::min(Serial.available(), maxToTcp);
+  len = std::min(len, STACK_PROTECTOR);
+  if (len) {
     uint8_t sbuf[len];
     Serial.readBytes(sbuf, len);
-    //push UART data to all connected telnet clients
-    for (i = 0; i < MAX_SRV_CLIENTS; i++) {
-      if (serverClients[i] && serverClients[i].connected()) {
+    // push UART data to all connected telnet clients
+    for (i = 0; i < MAX_SRV_CLIENTS; i++)
+      // if client.availableForWrite() was 0 (congested)
+      // and increased since then,
+      // ensure write space is sufficient:
+      if (serverClient[i].availableForWrite() >= len)
         serverClients[i].write(sbuf, len);
-        delay(1);
-      }
-    }
   }
 }

@@ -17,10 +17,21 @@
 
 #include <time.h>
 #include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
 
-const char* ssid = "........";
-const char* password = "........";
+// force use of AxTLS (BearSSL is now default)
+#include <WiFiClientSecureAxTLS.h>
+using namespace AxTLS;
+
+// uncomment the line below to run the sketch
+#error Keeping this example for history, watch BearSSL_Validation example instead
+
+#ifndef SSID
+#define SSID "your-ssid"
+#define PSK  "your-password"
+#endif
+
+const char* ssid = SSID;
+const char* password = PSK;
 
 const char* host = "api.github.com";
 const int httpsPort = 443;
