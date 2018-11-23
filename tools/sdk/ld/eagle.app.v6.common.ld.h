@@ -140,6 +140,7 @@ SECTIONS
     . = ALIGN(4);
     __eh_frame = ABSOLUTE(.);
     KEEP(*(.eh_frame))
+    . = (. + 7) & ~ 3;  /* Add a 0 entry to terminate the list */
 
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);
