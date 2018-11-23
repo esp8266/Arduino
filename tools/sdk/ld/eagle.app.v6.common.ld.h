@@ -102,12 +102,16 @@ SECTIONS
 #ifdef VTABLES_IN_FLASH
     *(.rodata._ZTV*) /* C++ vtables */
 #endif
+
+    *libgcc.a:unwind-dw2.o(.literal .text .rodata .literal.* .text.* .rodata.*)
+    *libgcc.a:unwind-dw2-fde.o(.literal .text .rodata .literal.* .text.* .rodata.*)
+
     *libc.a:(.literal .text .literal.* .text.*)
     *libm.a:(.literal .text .literal.* .text.*)
     *libgcc.a:_umoddi3.o(.literal .text)
     *libgcc.a:_udivdi3.o(.literal .text)
+    *libstdc++.a:( .literal .text .literal.* .text.*)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)
-    *libstdc++.a:(.literal .text .literal.* .text.*)
     *liblwip_gcc.a:(.literal .text .literal.* .text.*)
     *liblwip_src.a:(.literal .text .literal.* .text.*)
     *liblwip2-536.a:(.literal .text .literal.* .text.*)
@@ -130,6 +134,13 @@ SECTIONS
     *libwpa2.a:(.literal.* .text.*)
     *libwps.a:(.literal.* .text.*)
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom0.text.* .irom.text .irom.text.*)
+
+    . = ALIGN(4);
+    *(.gcc_except_table .gcc_except_table.*)
+    . = ALIGN(4);
+    __eh_frame = ABSOLUTE(.);
+    KEEP(*(.eh_frame))
+
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);
   } >irom0_0_seg :irom0_0_phdr

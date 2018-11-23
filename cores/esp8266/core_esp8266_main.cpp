@@ -134,11 +134,25 @@ static void loop_task(os_event_t *events) {
         panic();
     }
 }
+extern "C" {
+
+struct object { long placeholder[ 10 ]; };
+void __register_frame_info (const void *begin, struct object *ob);
+extern char __eh_frame[];
+}
 
 static void do_global_ctors(void) {
+    static struct object ob;
+    __register_frame_info( __eh_frame, &ob );
+
     void (**p)(void) = &__init_array_end;
     while (p != &__init_array_start)
         (*--p)();
+}
+
+void __gnu_cxx::__verbose_terminate_handler ()
+{
+      panic();
 }
 
 void init_done() {
