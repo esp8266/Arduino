@@ -43,12 +43,12 @@
 
 #include <ESP8266WiFi.h>
 
-#ifndef SSID
-#define SSID "your-ssid"
+#ifndef STASSID
+#define STASSID "your-ssid"
 #define PSK  "your-password"
 #endif
 
-const char* ssid = SSID;
+const char* ssid = STASSID;
 const char* password = PSK;
 
 // The certificate is stored in PMEM

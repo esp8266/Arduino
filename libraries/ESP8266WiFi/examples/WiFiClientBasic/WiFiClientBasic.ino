@@ -7,12 +7,12 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 
-#ifndef SSID
-#define SSID "your-ssid"
+#ifndef STASSID
+#define STASSID "your-ssid"
 #define PSK  "your-password"
 #endif
 
-const char* ssid     = SSID;
+const char* ssid     = STASSID;
 const char* password = PSK;
 
 const char* host = "192.168.1.1";

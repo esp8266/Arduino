@@ -6,12 +6,12 @@
 #include <ESP8266WiFi.h>
 #include <time.h>
 
-#ifndef SSID
-#define SSID "your-ssid"
+#ifndef STASSID
+#define STASSID "your-ssid"
 #define PSK  "your-password"
 #endif
 
-const char *ssid = SSID;
+const char *ssid = STASSID;
 const char *pass = PSK;
 
 const char *   host = "api.github.com";

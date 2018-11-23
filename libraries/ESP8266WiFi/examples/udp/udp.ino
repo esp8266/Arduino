@@ -18,8 +18,8 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-#ifndef SSID
-#define SSID "your-ssid"
+#ifndef STASSID
+#define STASSID "your-ssid"
 #define PSK  "your-password"
 #endif
 
@@ -34,7 +34,7 @@ WiFiUDP Udp;
 void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(SSID, PSK);
+  WiFi.begin(STASSID, PSK);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);

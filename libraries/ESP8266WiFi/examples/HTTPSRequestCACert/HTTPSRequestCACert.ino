@@ -25,12 +25,12 @@ using namespace AxTLS;
 // uncomment the line below to run the sketch
 #error Keeping this example for history, watch BearSSL_Validation example instead
 
-#ifndef SSID
-#define SSID "your-ssid"
+#ifndef STASSID
+#define STASSID "your-ssid"
 #define PSK  "your-password"
 #endif
 
-const char* ssid = SSID;
+const char* ssid = STASSID;
 const char* password = PSK;
 
 const char* host = "api.github.com";
