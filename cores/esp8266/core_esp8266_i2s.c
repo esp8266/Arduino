@@ -372,17 +372,16 @@ static int16_t _i2s_write_buffer(int16_t *frames, int16_t frame_count, bool mono
 
         if (mono) {
             for(int16_t i=0;i<fc;i++){
-                uint16_t v = (uint16_t)(*frames);
-                tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v << 16) | (v & 0xffff);;                
-                frames++; 
+                uint16_t v = (uint16_t)(*frames++);
+                tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v << 16) | v;               
             }                
         }
         else
         {        
             for(int16_t i=0;i<fc;i++){
-                uint32_t v1 = *frames++;
+                uint16_t v1 = *frames++;
                 uint16_t v2 = *frames++;
-                tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v1 << 16) | (v2 & 0xffff);
+                tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v1 << 16) | v2;
             }
         }        
         
