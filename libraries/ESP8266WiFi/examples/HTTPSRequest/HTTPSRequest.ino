@@ -54,13 +54,14 @@ void setup() {
   WiFiClientSecure client;
   Serial.print("connecting to ");
   Serial.println(host);
+
+  Serial.printf("Using fingerprint '%s'\n", fingerprint);
+  client.setFingerprint(fingerprint);
+
   if (!client.connect(host, httpsPort)) {
     Serial.println("connection failed");
     return;
   }
-
-  Serial.printf("Using fingerprint '%s'\n", fingerprint);
-  client.setFingerprint(fingerprint);
 
   String url = "/repos/esp8266/Arduino/commits/master/status";
   Serial.print("requesting URL: ");
