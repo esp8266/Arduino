@@ -38,7 +38,7 @@ extern "C"
 #include "lwip/inet.h"
 #include "lwip/igmp.h"
 #include "lwip/mem.h"
-#include "include/UdpContext.h"
+#include <include/UdpContext.h>
 
 
 template<>
@@ -106,7 +106,9 @@ uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, ui
 
     _ctx = new UdpContext;
     _ctx->ref();
-    if (!_ctx->listen(*IP_ADDR_ANY, port)) {
+    ip_addr_t addr;
+    addr.addr = INADDR_ANY;
+    if (!_ctx->listen(addr, port)) {
         return 0;
     }
 
@@ -284,7 +286,7 @@ uint16_t WiFiUDP::localPort()
 void WiFiUDP::stopAll()
 {
     for (WiFiUDP* it = _s_first; it; it = it->_next) {
-        DEBUGV("%s %08x %08x\n", __func__, (uint32_t) it, (uint32_t) _s_first);
+        DEBUGV("%s %p %p\n", __func__, it, _s_first);
         it->stop();
     }
 }
@@ -292,7 +294,7 @@ void WiFiUDP::stopAll()
 void WiFiUDP::stopAllExcept(WiFiUDP * exC) {
     for (WiFiUDP* it = _s_first; it; it = it->_next) {
         if (it->_ctx != exC->_ctx) {
-            DEBUGV("%s %08x %08x\n", __func__, (uint32_t) it, (uint32_t) _s_first);
+            DEBUGV("%s %p %p\n", __func__, it, _s_first);
             it->stop();
         }
     }
