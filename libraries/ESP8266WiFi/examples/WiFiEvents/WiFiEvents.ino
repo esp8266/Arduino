@@ -17,8 +17,8 @@
 #include <stdio.h>
 
 #ifndef APSSID
-  #define APSSID "esp8266"
-  #define APPSK  "esp8266"
+#define APSSID "esp8266"
+#define APPSK  "esp8266"
 #endif
 
 const char* ssid     = APSSID;

@@ -19,8 +19,8 @@
 #include <WiFiUdp.h>
 
 #ifndef STASSID
-  #define STASSID "your-ssid"
-  #define PSK  "your-password"
+#define STASSID "your-ssid"
+#define PSK  "your-password"
 #endif
 
 unsigned int localPort = 8888;      // local port to listen on

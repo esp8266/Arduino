@@ -44,8 +44,8 @@
 #include <ESP8266WiFi.h>
 
 #ifndef STASSID
-  #define STASSID "your-ssid"
-  #define PSK  "your-password"
+#define STASSID "your-ssid"
+#define PSK  "your-password"
 #endif
 
 const char* ssid = STASSID;

@@ -38,8 +38,8 @@
 #include <time.h>
 
 #ifndef STASSID
-  #define STASSID "your-ssid"
-  #define PSK  "your-password"
+#define STASSID "your-ssid"
+#define PSK  "your-password"
 #endif
 
 const char *ssid = STASSID;
@@ -197,11 +197,11 @@ void setup() {
   Serial.println();
   Serial.println();
 
-  #ifdef USE_SDCARD
+#ifdef USE_SDCARD
   SD.begin();
-  #else
+#else
   SPIFFS.begin();
-  #endif
+#endif
 
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");

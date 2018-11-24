@@ -90,13 +90,13 @@ bool loadConfig(String *ssid, String *pass) {
   ssid->trim();
   pass->trim();
 
-  #ifdef SERIAL_VERBOSE
+#ifdef SERIAL_VERBOSE
   Serial.println("----- file content -----");
   Serial.println(content);
   Serial.println("----- file content -----");
   Serial.println("ssid: " + *ssid);
   Serial.println("psk:  " + *pass);
-  #endif
+#endif
 
   return true;
 } // loadConfig

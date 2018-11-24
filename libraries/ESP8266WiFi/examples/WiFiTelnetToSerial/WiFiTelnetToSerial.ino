@@ -23,8 +23,8 @@
 #include <algorithm>
 
 #ifndef STASSID
-  #define STASSID "your-ssid"
-  #define PSK  "your-password"
+#define STASSID "your-ssid"
+#define PSK  "your-password"
 #endif
 
 /*
@@ -52,16 +52,16 @@
 ////////////////////////////////////////////////////////////
 
 #if SERIAL_LOOPBACK
-  #undef BAUD_SERIAL
-  #define BAUD_SERIAL 3000000
-  #include <esp8266_peri.h>
+#undef BAUD_SERIAL
+#define BAUD_SERIAL 3000000
+#include <esp8266_peri.h>
 #endif
 
 #if SWAP_PINS
-  #include <SoftwareSerial.h>
-  SoftwareSerial* logger = nullptr;
+#include <SoftwareSerial.h>
+SoftwareSerial* logger = nullptr;
 #else
-  #define logger (&Serial1)
+#define logger (&Serial1)
 #endif
 
 #define STACK_PROTECTOR  512 // bytes
@@ -81,25 +81,25 @@ void setup() {
   Serial.begin(BAUD_SERIAL);
   Serial.setRxBufferSize(RXBUFFERSIZE);
 
-  #if SWAP_PINS
+#if SWAP_PINS
   Serial.swap();
   // Hardware serial is now on RX:GPIO13 TX:GPIO15
   // use SoftwareSerial on regular RX(3)/TX(1) for logging
   logger = new SoftwareSerial(3, 1);
   logger->begin(BAUD_LOGGER);
   logger->println("\n\nUsing SoftwareSerial for logging");
-  #else
+#else
   logger->begin(BAUD_LOGGER);
   logger->println("\n\nUsing Serial1 for logging");
-  #endif
+#endif
   logger->println(ESP.getFullVersion());
   logger->printf("Serial baud: %d (8n1: %d KB/s)\n", BAUD_SERIAL, BAUD_SERIAL * 8 / 10 / 1024);
   logger->printf("Serial receive buffer size: %d bytes\n", RXBUFFERSIZE);
 
-  #if SERIAL_LOOPBACK
+#if SERIAL_LOOPBACK
   USC0(0) |= (1 << UCLBE); // incomplete HardwareSerial API
   logger->println("Serial Internal Loopback enabled");
-  #endif
+#endif
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -147,16 +147,15 @@ void loop() {
   }
 
   //check TCP clients for data
-  #if 1
+#if 1
   // Incredibly, this code is faster than the bufferred one below - #4620 is needed
   // loopback/3000000baud average 348KB/s
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
-    while (serverClients[i].available() && Serial.availableForWrite() > 0)
-    {
+    while (serverClients[i].available() && Serial.availableForWrite() > 0) {
       // working char by char is not very efficient
       Serial.write(serverClients[i].read());
     }
-  #else
+#else
   // loopback/3000000baud average: 312KB/s
   for (int i = 0; i < MAX_SRV_CLIENTS; i++)
     while (serverClients[i].available() && Serial.availableForWrite() > 0) {
@@ -169,7 +168,7 @@ void loop() {
         logger->printf("len mismatch: available:%zd tcp-read:%zd serial-write:%zd\n", maxToSerial, tcp_got, serial_sent);
       }
     }
-  #endif
+#endif
 
   // determine maximum output size "fair TCP use"
   // client.availableForWrite() returns 0 when !client.connected()

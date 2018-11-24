@@ -35,8 +35,8 @@
 #include <ESP8266WebServer.h>
 
 #ifndef APSSID
-  #define APSSID "ESPap"
-  #define APPSK  "thereisnospoon"
+#define APSSID "ESPap"
+#define APPSK  "thereisnospoon"
 #endif
 
 /* Set these to your desired credentials. */
