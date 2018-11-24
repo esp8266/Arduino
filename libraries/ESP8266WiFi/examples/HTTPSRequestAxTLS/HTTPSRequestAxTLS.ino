@@ -54,7 +54,10 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Use WiFiClientSecure class to create TLS connection
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
   WiFiClientSecure client;
+#pragma GCC diagnostic pop
   Serial.print("connecting to ");
   Serial.println(host);
   if (!client.connect(host, httpsPort)) {
