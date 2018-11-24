@@ -54,10 +54,17 @@ bool i2s_is_full();//returns true if DMA is full and can not take more bytes (ov
 bool i2s_is_empty();//returns true if DMA is empty (underflow)
 bool i2s_rx_is_full();
 bool i2s_rx_is_empty();
-int16_t i2s_available();// returns the number of samples than can be written before blocking
-int16_t i2s_rx_available();// returns the number of samples than can be written before blocking
+uint16_t i2s_available();// returns the number of samples than can be written before blocking
+uint16_t i2s_rx_available();// returns the number of samples than can be written before blocking
 void i2s_set_callback(void (*callback) (void));
 void i2s_rx_set_callback(void (*callback) (void));
+
+// writes a buffer of frames into the DMA memory, returns the amount of frames written
+// A frame is just a int16_t for mono, for stereo a frame is two int16_t, one for each channel.
+uint16_t i2s_write_buffer_mono(int16_t *frames, uint16_t frame_count);
+uint16_t i2s_write_buffer_mono_nb(int16_t *frames, uint16_t frame_count);
+uint16_t i2s_write_buffer(int16_t *frames, uint16_t frame_count);
+uint16_t i2s_write_buffer_nb(int16_t *frames, uint16_t frame_count); 
 
 #ifdef __cplusplus
 }

@@ -22,9 +22,10 @@
 #include "flash_utils.h"
 #include "eboot_command.h"
 #include <memory>
-#include "interrupts.h"
+#include <interrupts.h>
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
+#include "cont.h"
 
 extern "C" {
 #include "user_interface.h"
@@ -164,6 +165,7 @@ void EspClass::restart(void)
 uint16_t EspClass::getVcc(void)
 {
     InterruptLock lock;
+    (void)lock;
     return system_get_vdd33();
 }
 
@@ -175,6 +177,16 @@ uint32_t EspClass::getFreeHeap(void)
 uint16_t EspClass::getMaxFreeBlockSize(void)
 {
     return umm_max_block_size();
+}
+
+uint32_t EspClass::getFreeContStack()
+{
+    return cont_get_free_stack(g_pcont);
+}
+
+void EspClass::resetFreeContStack()
+{
+    cont_repaint_stack(g_pcont);
 }
 
 uint32_t EspClass::getChipId(void)

@@ -271,6 +271,7 @@ boards = collections.OrderedDict([
         'name': 'Generic ESP8285 Module',
         'opts': {
             '.build.board': 'ESP8266_ESP01',
+            '.build.variant': 'esp8285'
             },
         'macro': [
             'resetmethod_menu',
@@ -323,6 +324,23 @@ boards = collections.OrderedDict([
         'desc': [ 'The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Adafruit Feather HUZZAH ESP8266 will automatically recharge a connected battery when USB power is available.',
                   '',
                   'Product page: https://www.adafruit.com/product/2821'
+                  ],
+    }),
+	( 'inventone', {
+        'name': 'Invent One',
+        'opts': {
+            '.build.board': 'ESP8266_GENERIC',
+            '.build.variant': 'inventone',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng',
+                  '',
+                  'Product page: https://inventone.ng'
                   ],
     }),
     ( 'cw01', {
@@ -930,14 +948,22 @@ macros = {
     ####################### lwip
 
     'lwip2': collections.OrderedDict([
-        ( '.menu.ip.lm2', 'v2 Lower Memory' ),
-        ( '.menu.ip.lm2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.lm2.build.lwip_lib', '-llwip2' ),
-        ( '.menu.ip.lm2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536' ),
-        ( '.menu.ip.hb2', 'v2 Higher Bandwidth' ),
-        ( '.menu.ip.hb2.build.lwip_include', 'lwip2/include' ),
-        ( '.menu.ip.hb2.build.lwip_lib', '-llwip2_1460' ),
-        ( '.menu.ip.hb2.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460' ),
+        ( '.menu.ip.lm2f', 'v2 Lower Memory' ),
+        ( '.menu.ip.lm2f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2f.build.lwip_lib', '-llwip2-536-feat' ),
+        ( '.menu.ip.lm2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1' ),
+        ( '.menu.ip.hb2f', 'v2 Higher Bandwidth' ),
+        ( '.menu.ip.hb2f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2f.build.lwip_lib', '-llwip2-1460-feat' ),
+        ( '.menu.ip.hb2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1' ),
+        ( '.menu.ip.lm2n', 'v2 Lower Memory (no features)' ),
+        ( '.menu.ip.lm2n.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm2n.build.lwip_lib', '-llwip2-536' ),
+        ( '.menu.ip.lm2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0' ),
+        ( '.menu.ip.hb2n', 'v2 Higher Bandwidth (no features)' ),
+        ( '.menu.ip.hb2n.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb2n.build.lwip_lib', '-llwip2-1460' ),
+        ( '.menu.ip.hb2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0' ),
         ]),
 
     'lwip': collections.OrderedDict([
@@ -1118,12 +1144,12 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         ( menu + '.upload.maximum_size', "%i" % max_upload_size ),
         ( menub + 'rfcal_addr', "0x%X" % rfcal_addr)
         ])
-    #if spiffs_kb > 0:
-    #    d.update(collections.OrderedDict([
-    #        ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
-    #        ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
-    #        ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
-    #        ]))
+    if spiffs_kb > 0:
+        d.update(collections.OrderedDict([
+            ( menub + 'spiffs_start', "0x%05X" % spiffs_start ),
+            ( menub + 'spiffs_end', "0x%05X" % spiffs_end ),
+            ( menub + 'spiffs_blocksize', "%i" % spiffs_blocksize ),
+            ]))
 
     if ldshow:
         if ldgen:
@@ -1171,7 +1197,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
         print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
         print("")
-        print('INCLUDE "eagle.app.v6.common.ld"')
+        print('INCLUDE "local.eagle.app.v6.common.ld"')
 
         if ldgen:
             sys.stdout.close()

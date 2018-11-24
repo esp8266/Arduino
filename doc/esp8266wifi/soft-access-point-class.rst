@@ -50,11 +50,11 @@ The first parameter of this function is required, remaining four are optional.
 
 Meaning of all parameters is as follows:
 
-- ``ssid`` - character string containing network SSID (max. 63 characters) 
-- ``password`` - optional character string with a password. For WPA2-PSK network it should be at least 8 character long. If not specified, the access point will be open for anybody to connect. 
+- ``ssid`` - character string containing network SSID (max. 31 characters) 
+- ``password`` - optional character string with a password. For WPA2-PSK network it should be at least 8 character long. If not specified, the access point will be open for anybody to connect, (max. 63 characters). 
 - ``channel`` - optional parameter to set Wi-Fi channel, from 1 to 13. Default channel = 1. 
 - ``hidden`` - optional parameter, if set to ``true`` will hide SSID. 
-- ``max_connection`` - optional parameter to set max simultaneous connected stations, `from 1 to 8 <https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832>`__. Defaults to 4. Once the max number has been reached, any other station that wants to connect will be forced to wait until an already connected station disconnects.
+- ``max_connection`` - optional parameter to set max simultaneous connected stations, `from 0 to 8 <https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832>`__. Defaults to 4. Once the max number has been reached, any other station that wants to connect will be forced to wait until an already connected station disconnects.
 
 Function will return ``true`` or ``false`` depending on result of setting the soft-AP.
 
@@ -141,7 +141,7 @@ Get the count of the stations that are connected to the soft-AP interface.
 
     Stations connected to soft-AP = 2
 
-Note: the maximum number of stations that may be connected to ESP8266 soft-AP is 4 by default. This can be changed from 1 to 8 via the ``max_connection`` argument of the softAP method.
+Note: the maximum number of stations that may be connected to ESP8266 soft-AP is 4 by default. This can be changed from 0 to 8 via the ``max_connection`` argument of the softAP method.
 
 softAPdisconnect
 ^^^^^^^^^^^^^^^^

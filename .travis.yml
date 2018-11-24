@@ -1,4 +1,3 @@
-sudo: false
 language: bash
 os: linux
 dist: trusty
@@ -13,6 +12,10 @@ matrix:
       - BUILD_TYPE=build_even
     - env:
       - BUILD_TYPE=build_odd
+    - env:
+      - BUILD_TYPE=debug_even
+    - env:
+      - BUILD_TYPE=debug_odd
     - env:
       - BUILD_TYPE=platformio
     - env:

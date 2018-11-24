@@ -1,8 +1,8 @@
 #include "Updater.h"
 #include "Arduino.h"
 #include "eboot_command.h"
-#include "interrupts.h"
-#include "esp8266_peri.h"
+#include <interrupts.h>
+#include <esp8266_peri.h>
 
 //#define DEBUG_UPDATER Serial
 
@@ -35,15 +35,22 @@ void UpdaterClass::_reset() {
   _currentAddress = 0;
   _size = 0;
   _command = U_FLASH;
+
+  if(_ledPin != -1) {
+    digitalWrite(_ledPin, !_ledOn); // off
+  }
 }
 
-bool UpdaterClass::begin(size_t size, int command) {
+bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   if(_size > 0){
 #ifdef DEBUG_UPDATER
     DEBUG_UPDATER.println(F("[begin] already running"));
 #endif
     return false;
   }
+
+  _ledPin = ledPin;
+  _ledOn = !!ledOn; // 0(LOW) or 1(HIGH)
 
   /* Check boot mode; if boot mode is 1 (UART download mode),
     we will not be able to reset into normal mode once update is done.
@@ -77,21 +84,21 @@ bool UpdaterClass::begin(size_t size, int command) {
 
   wifi_set_sleep_type(NONE_SLEEP_T);
 
-  uint32_t updateStartAddress = 0;
+  uintptr_t updateStartAddress = 0;
   if (command == U_FLASH) {
     //size of current sketch rounded to a sector
-    uint32_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+    size_t currentSketchSize = (ESP.getSketchSize() + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address of the end of the space available for sketch and update
-    uint32_t updateEndAddress = (uint32_t)&_SPIFFS_start - 0x40200000;
+    uintptr_t updateEndAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
     //size of the update rounded to a sector
-    uint32_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
+    size_t roundedSize = (size + FLASH_SECTOR_SIZE - 1) & (~(FLASH_SECTOR_SIZE - 1));
     //address where we will start writing the update
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
 #ifdef DEBUG_UPDATER
-        DEBUG_UPDATER.printf("[begin] roundedSize:       0x%08X (%d)\n", roundedSize, roundedSize);
-        DEBUG_UPDATER.printf("[begin] updateEndAddress:  0x%08X (%d)\n", updateEndAddress, updateEndAddress);
-        DEBUG_UPDATER.printf("[begin] currentSketchSize: 0x%08X (%d)\n", currentSketchSize, currentSketchSize);
+        DEBUG_UPDATER.printf("[begin] roundedSize:       0x%08zX (%zd)\n", roundedSize, roundedSize);
+        DEBUG_UPDATER.printf("[begin] updateEndAddress:  0x%08zX (%zd)\n", updateEndAddress, updateEndAddress);
+        DEBUG_UPDATER.printf("[begin] currentSketchSize: 0x%08zX (%zd)\n", currentSketchSize, currentSketchSize);
 #endif
 
     //make sure that the size of both sketches is less than the total space (updateEndAddress)
@@ -101,7 +108,7 @@ bool UpdaterClass::begin(size_t size, int command) {
     }
   }
   else if (command == U_SPIFFS) {
-     updateStartAddress = (uint32_t)&_SPIFFS_start - 0x40200000;
+     updateStartAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
   }
   else {
     // unknown command
@@ -126,7 +133,7 @@ bool UpdaterClass::begin(size_t size, int command) {
 #ifdef DEBUG_UPDATER
   DEBUG_UPDATER.printf("[begin] _startAddress:     0x%08X (%d)\n", _startAddress, _startAddress);
   DEBUG_UPDATER.printf("[begin] _currentAddress:   0x%08X (%d)\n", _currentAddress, _currentAddress);
-  DEBUG_UPDATER.printf("[begin] _size:             0x%08X (%d)\n", _size, _size);
+  DEBUG_UPDATER.printf("[begin] _size:             0x%08zX (%zd)\n", _size, _size);
 #endif
 
   _md5.begin();
@@ -152,7 +159,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
   if(hasError() || (!isFinished() && !evenIfRemaining)){
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("premature end: res:%u, pos:%u/%u\n", getError(), progress(), _size);
+    DEBUG_UPDATER.printf("premature end: res:%u, pos:%zu/%zu\n", getError(), progress(), _size);
 #endif
 
     _reset();
@@ -168,7 +175,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
   _md5.calculate();
   if(_target_md5.length()) {
-    if(_target_md5 != _md5.toString()){
+    if(strcasecmp(_target_md5.c_str(), _md5.toString().c_str()) != 0){
       _setError(UPDATE_ERROR_MD5);
       _reset();
       return false;
@@ -192,10 +199,10 @@ bool UpdaterClass::end(bool evenIfRemaining){
     eboot_command_write(&ebcmd);
 
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08X\n", _startAddress, _size);
+    DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08zX\n", _startAddress, _size);
   }
   else if (_command == U_SPIFFS) {
-    DEBUG_UPDATER.printf("SPIFFS: address:0x%08X, size:0x%08X\n", _startAddress, _size);
+    DEBUG_UPDATER.printf("SPIFFS: address:0x%08X, size:0x%08zX\n", _startAddress, _size);
 #endif
   }
 
@@ -360,17 +367,31 @@ size_t UpdaterClass::writeStream(Stream &data) {
         return 0;
     }
 
+    if(_ledPin != -1) {
+        pinMode(_ledPin, OUTPUT);
+    }
+
     while(remaining()) {
-        toRead = data.readBytes(_buffer + _bufferLen,  (_bufferSize - _bufferLen));
+        if(_ledPin != -1) {
+            digitalWrite(_ledPin, _ledOn); // Switch LED on
+        }
+        size_t bytesToRead = _bufferSize - _bufferLen;
+        if(bytesToRead > remaining()) {
+            bytesToRead = remaining();
+        }
+        toRead = data.readBytes(_buffer + _bufferLen,  bytesToRead);
         if(toRead == 0) { //Timeout
             delay(100);
-            toRead = data.readBytes(_buffer + _bufferLen, (_bufferSize - _bufferLen));
+            toRead = data.readBytes(_buffer + _bufferLen, bytesToRead);
             if(toRead == 0) { //Timeout
                 _currentAddress = (_startAddress + _size);
                 _setError(UPDATE_ERROR_STREAM);
                 _reset();
                 return written;
             }
+        }
+        if(_ledPin != -1) {
+            digitalWrite(_ledPin, !_ledOn); // Switch LED off
         }
         _bufferLen += toRead;
         if((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())

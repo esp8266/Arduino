@@ -121,8 +121,8 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Attach the server private cert/key combo
-  BearSSLX509List *serverCertList = new BearSSLX509List(server_cert);
-  BearSSLPrivateKey *serverPrivKey = new BearSSLPrivateKey(server_private_key);
+  BearSSL::X509List *serverCertList = new BearSSL::X509List(server_cert);
+  BearSSL::PrivateKey *serverPrivKey = new BearSSL::PrivateKey(server_private_key);
   server.setRSACert(serverCertList, serverPrivKey);
 
   // Actually start accepting connections

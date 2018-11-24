@@ -23,6 +23,7 @@
 
 #ifndef wificlientbearssl_h
 #define wificlientbearssl_h
+#include <vector>
 #include "WiFiClient.h"
 #include <bearssl/bearssl.h>
 #include "BearSSLHelpers.h"
@@ -54,8 +55,11 @@ class WiFiClientSecure : public WiFiClient {
     int read() override;
     int peek() override;
     size_t peekBytes(uint8_t *buffer, size_t length) override;
-    void stop() override;
-    void flush() override;
+    bool flush(unsigned int maxWaitMs = 0) override;
+    bool stop(unsigned int maxWaitMs = 0) override;
+
+    // Allow sessions to be saved/restored automatically to a memory area
+    void setSession(Session *session) { _session = session; }
 
     // Don't validate the chain, just accept whatever is given.  VERY INSECURE!
     void setInsecure() {
@@ -63,24 +67,26 @@ class WiFiClientSecure : public WiFiClient {
       _use_insecure = true;
     }
     // Assume a given public key, don't validate or use cert info at all
-    void setKnownKey(const BearSSLPublicKey *pk, unsigned usages = BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN) {
+    void setKnownKey(const PublicKey *pk, unsigned usages = BR_KEYTYPE_KEYX | BR_KEYTYPE_SIGN) {
       _clearAuthenticationSettings();
       _knownkey = pk;
       _knownkey_usages = usages;
     }
     // Only check SHA1 fingerprint of certificate
-    void setFingerprint(const uint8_t fingerprint[20]) {
+    bool setFingerprint(const uint8_t fingerprint[20]) {
       _clearAuthenticationSettings();
       _use_fingerprint = true;
       memcpy_P(_fingerprint, fingerprint, 20);
+      return true;
     }
+    bool setFingerprint(const char *fpStr);
     // Accept any certificate that's self-signed
     void allowSelfSignedCerts() {
       _clearAuthenticationSettings();
       _use_self_signed = true;
     }
     // Install certificates of trusted CAs or specific site
-    void setTrustAnchors(const BearSSLX509List *ta) {
+    void setTrustAnchors(const X509List *ta) {
       _clearAuthenticationSettings();
       _ta = ta;
     }
@@ -89,8 +95,8 @@ class WiFiClientSecure : public WiFiClient {
       _now = now;
     }
     // Install a client certificate for this connection, in case the server requires it (i.e. MQTT)
-    void setClientRSACert(const BearSSLX509List *cert, const BearSSLPrivateKey *sk);
-    void setClientECCert(const BearSSLX509List *cert, const BearSSLPrivateKey *sk,
+    void setClientRSACert(const X509List *cert, const PrivateKey *sk);
+    void setClientECCert(const X509List *cert, const PrivateKey *sk,
                          unsigned allowed_usages, unsigned cert_issuer_key_type);
 
     // Sets the requested buffer size for transmit and receive
@@ -104,13 +110,19 @@ class WiFiClientSecure : public WiFiClient {
       _certStore = certStore;
     }
 
+    // Select specific ciphers (i.e. optimize for speed over security)
+    // These may be in PROGMEM or RAM, either will run properly
+    bool setCiphers(const uint16_t *cipherAry, int cipherCount);
+    bool setCiphers(std::vector<uint16_t> list);
+    bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
+
     // Check for Maximum Fragment Length support for given len
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String host, uint16_t port, uint16_t len);
 
-    // AXTLS compatbile wrappers
-    bool verify(const char* fingerprint, const char* domain_name) { (void) fingerprint; (void) domain_name; return false; } // Can't handle this case, need app code changes
+    // AXTLS compatible wrappers
+    // Cannot implement this mode, we need FP before we can connect: bool verify(const char* fingerprint, const char* domain_name)
     bool verifyCertChain(const char* domain_name) { (void)domain_name; return connected(); } // If we're connected, the cert passed validation during handshake
 
     bool setCACert(const uint8_t* pk, size_t size);
@@ -156,19 +168,27 @@ class WiFiClientSecure : public WiFiClient {
     std::shared_ptr<unsigned char> _iobuf_in;
     std::shared_ptr<unsigned char> _iobuf_out;
     time_t _now;
-    const BearSSLX509List *_ta;
+    const X509List *_ta;
     CertStore *_certStore;
     int _iobuf_in_size;
     int _iobuf_out_size;
     bool _handshake_done;
     bool _oom_err;
 
+    // Optional storage space pointer for session parameters
+    // Will be used on connect and updated on close
+    Session *_session;
+
     bool _use_insecure;
     bool _use_fingerprint;
     uint8_t _fingerprint[20];
     bool _use_self_signed;
-    const BearSSLPublicKey *_knownkey;
+    const PublicKey *_knownkey;
     unsigned _knownkey_usages;
+
+    // Custom cipher list pointer or NULL if default
+    uint16_t *_cipher_list;
+    uint8_t _cipher_cnt;
 
     unsigned char *_recvapp_buf;
     size_t _recvapp_len;
@@ -181,38 +201,32 @@ class WiFiClientSecure : public WiFiClient {
     bool _wait_for_handshake(); // Sets and return the _handshake_done after connecting
 
     // Optional client certificate
-    const BearSSLX509List *_chain;
-    const BearSSLPrivateKey *_sk;
+    const X509List *_chain;
+    const PrivateKey *_sk;
     unsigned _allowed_usages;
     unsigned _cert_issuer_key_type;
 
     // Methods for handling server.available() call which returns a client connection.
     friend class WiFiServerSecure; // Server needs to access these constructors
-    WiFiClientSecure(ClientContext *client, const BearSSLX509List *chain, unsigned cert_issuer_key_type,
-                      const BearSSLPrivateKey *sk, int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta);
-    WiFiClientSecure(ClientContext* client, const BearSSLX509List *chain, const BearSSLPrivateKey *sk,
-                      int iobuf_in_size, int iobuf_out_size, const BearSSLX509List *client_CA_ta);
+    WiFiClientSecure(ClientContext *client, const X509List *chain, unsigned cert_issuer_key_type,
+                      const PrivateKey *sk, int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta);
+    WiFiClientSecure(ClientContext* client, const X509List *chain, const PrivateKey *sk,
+                      int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta);
 
     // RSA keyed server
-    bool _connectSSLServerRSA(const BearSSLX509List *chain, const BearSSLPrivateKey *sk, const BearSSLX509List *client_CA_ta);
+    bool _connectSSLServerRSA(const X509List *chain, const PrivateKey *sk, const X509List *client_CA_ta);
     // EC keyed server
-    bool _connectSSLServerEC(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk,
-                             const BearSSLX509List *client_CA_ta);
+    bool _connectSSLServerEC(const X509List *chain, unsigned cert_issuer_key_type, const PrivateKey *sk,
+                             const X509List *client_CA_ta);
 
     // X.509 validators differ from server to client
     bool _installClientX509Validator(); // Set up X509 validator for a client conn.
-    bool _installServerX509Validator(const BearSSLX509List *client_CA_ta); // Setup X509 client cert validation, if supplied
+    bool _installServerX509Validator(const X509List *client_CA_ta); // Setup X509 client cert validation, if supplied
 
     uint8_t *_streamLoad(Stream& stream, size_t size);
 
     // AXTLS compatible mode needs to delete the stored certs and keys on destruction
     bool _deleteChainKeyTA;
-
-  private:
-    // Single memory buffer used for BearSSL auxilliary stack, insead of growing main Arduino stack for all apps
-    static std::shared_ptr<uint8_t> _bearssl_stack;
-    // The local copy, only used to enable a reference count
-    std::shared_ptr<uint8_t> _local_bearssl_stack;
 };
 
 };
