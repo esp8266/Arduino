@@ -102,9 +102,13 @@ SECTIONS
 #ifdef VTABLES_IN_FLASH
     *(.rodata._ZTV*) /* C++ vtables */
 #endif
-    *(.rodata._ZTIN10__cxxabiv*) /* exception stuff */
-    *(.rodata._ZTSN10__cxxabiv*) /* exception stuff */
-    *(.rodata._ZZSt*) /* exception stuff */
+    /* Exception stuff */
+    *(.rodata._ZTIN*)
+    *(.rodata._ZTSN*)
+    *(.rodata._ZZSt*)
+    *(.rodata._ZTISt*)
+    *(.rodata._ZTIN*)
+    *(.rodata._ZTSSt*)
 
     *libgcc.a:unwind-dw2.o(.literal .text .rodata .literal.* .text.* .rodata.*)
     *libgcc.a:unwind-dw2-fde.o(.literal .text .rodata .literal.* .text.* .rodata.*)
