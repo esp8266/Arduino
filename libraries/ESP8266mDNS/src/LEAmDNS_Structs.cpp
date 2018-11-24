@@ -1370,21 +1370,17 @@ bool MDNSResponder::_stcMDNSService::releaseProtocol(void) {
 /*
  * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::_stcTTL constructor
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::_stcTTL(uint32_t p_u32TTL /*= 0*//*,
-                                                                  uint32_t p_u32Millis*/ /*= 0*/)
+MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::_stcTTL(uint32_t p_u32TTL /*= 0*/)
 :   m_bUpdateScheduled(false) {
     
-    set(p_u32TTL * 1000/*, p_u32Millis*/);
+    set(p_u32TTL * 1000);
 }
 
 /*
  * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::set
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::set(uint32_t p_u32TTL/*,
-                                                                   uint32_t p_u32Millis*/) {
+bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::set(uint32_t p_u32TTL) {
     
-    /*m_u32TTL = p_u32TTL;
-    m_u32Millis = p_u32Millis;*/
     m_TTLTimeFlag.restart(p_u32TTL * 1000);
     m_bUpdateScheduled = false;
 
@@ -1394,11 +1390,8 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::set(uint32_t p_u3
 /*
  * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::has80Percent
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::has80Percent(void/*uint32_t p_u32Now*/) const {
+bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::has80Percent(void) const {
     
-    /*return ((m_u32Millis) &&
-            (!m_bUpdateScheduled) &&
-            ((p_u32Now - m_u32Millis) > (m_u32TTL * 800)));*/ // s * 1000ms/s * 80%(0.8, 8/10) = 1000 * 8 / 10 = 100 * 8 = 800
     return ((m_TTLTimeFlag.timeout()) &&
             (!m_bUpdateScheduled) &&
             (m_TTLTimeFlag.hypotheticalTimeout((m_TTLTimeFlag.timeout() * 800) / 1000)));
@@ -1407,10 +1400,8 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::has80Percent(void
 /*
  * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::isOutdated
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::isOutdated(void/*uint32_t p_u32Now*/) const {
+bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::isOutdated(void) const {
     
-    /*return ((m_u32Millis) &&
-            ((p_u32Now - m_u32Millis) > (m_u32TTL * 1000)));*/
     return ((m_TTLTimeFlag.timeout()) &&
             (m_TTLTimeFlag.flagged()));
 }
@@ -1426,11 +1417,10 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::isOutdated(void/*
  * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address::_stcIP4Address constructor
  */
 MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address::_stcIP4Address(IPAddress p_IPAddress,
-                                                                                uint32_t p_u32TTL /*= 0*//*,
-                                                                                uint32_t p_u32Millis*/ /*= 0*/)
+                                                                                uint32_t p_u32TTL /*= 0*/)
 :   m_pNext(0),
     m_IPAddress(p_IPAddress),
-    m_TTL(p_u32TTL/*, p_u32Millis*/) {
+    m_TTL(p_u32TTL) {
 }
 #endif
 
