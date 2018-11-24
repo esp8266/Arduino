@@ -22,8 +22,8 @@
 #include <WiFiUdp.h>
 
 #ifndef STASSID
-#define STASSID "your-ssid"
-#define PSK  "your-password"
+  #define STASSID "your-ssid"
+  #define PSK  "your-password"
 #endif
 
 char ssid[] = STASSID; // your network SSID (name)

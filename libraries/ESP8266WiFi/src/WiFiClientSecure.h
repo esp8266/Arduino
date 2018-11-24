@@ -28,7 +28,7 @@ using namespace BearSSL;
 
 /**********************************
  * !! Now BearSSL is the default !!
- 
+
    While not advised,
    Use legacy API without updating with:
 

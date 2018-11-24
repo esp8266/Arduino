@@ -6,8 +6,8 @@
 #include <ESP8266WiFi.h>
 
 #ifndef STASSID
-#define STASSID "your-ssid"
-#define PSK  "your-password"
+  #define STASSID "your-ssid"
+  #define PSK  "your-password"
 #endif
 
 const char* ssid     = STASSID;
@@ -59,8 +59,9 @@ void loop() {
 
   // This will send a string to the server
   Serial.println("sending data to server");
-  if (client.connected())
-      client.println("hello from ESP8266");
+  if (client.connected()) {
+    client.println("hello from ESP8266");
+  }
 
   // wait for data to be available
   unsigned long timeout = millis();

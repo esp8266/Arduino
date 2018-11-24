@@ -10,8 +10,8 @@
 #include <ESP8266WiFi.h>
 
 #ifndef STASSID
-#define STASSID "your-ssid"
-#define PSK  "your-password"
+  #define STASSID "your-ssid"
+  #define PSK  "your-password"
 #endif
 
 const char* ssid = STASSID;
@@ -59,7 +59,7 @@ void loop() {
     return;
   }
   Serial.println("new client");
-  
+
   client.setTimeout(5000); // default is 1000
 
   // Read the first line of the request
@@ -86,14 +86,16 @@ void loop() {
   // do not client.flush(): it is for output only, see below
   while (client.available())
     // byte by byte is not very efficient
+  {
     client.read();
+  }
 
   // Send the response to the client
   // it is OK for multiple small client.print/write,
   // because nagle algorithm will group them into one single packet
   // ::print*_P(F("string")) is always usable and saves RAM
   client.print_P(F("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>\r\nGPIO is now "));
-  client.print_P((val) ? F("high" ): F("low"));
+  client.print_P((val) ? F("high") : F("low"));
   client.print_P(F("</html>\n"));
 
   // The client will actually be *flushed* then disconnected
