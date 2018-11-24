@@ -38,7 +38,10 @@ const int httpsPort = 443;
 extern const unsigned char caCert[] PROGMEM;
 extern const unsigned int caCertLen;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
 WiFiClientSecure client;
+#pragma GCC diagnostic pop
 
 void setup() {
   Serial.begin(115200);

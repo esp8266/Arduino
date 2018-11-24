@@ -9,6 +9,7 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
+#include <WiFiClientSecure.h>
 
 #include <ESP8266HTTPClient.h>
 
