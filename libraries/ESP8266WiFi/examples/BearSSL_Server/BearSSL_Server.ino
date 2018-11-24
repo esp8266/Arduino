@@ -35,6 +35,7 @@
 */
 
 #include <ESP8266WiFi.h>
+#include <WiFiServerSecure.h>
 #include <time.h>
 
 #ifndef STASSID

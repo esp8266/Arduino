@@ -5,6 +5,7 @@
 // Released to the public domain
 
 #include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"

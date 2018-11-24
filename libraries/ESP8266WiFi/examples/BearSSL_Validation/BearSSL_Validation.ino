@@ -5,6 +5,7 @@
 // Released to the public domain
 
 #include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h>
 #include <time.h>
 
 #ifndef STASSID

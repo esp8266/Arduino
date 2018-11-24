@@ -34,6 +34,7 @@
 // Released to the public domain
 
 #include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h>
 #include <CertStoreBearSSL.h>
 #include <time.h>
 
