@@ -42,6 +42,7 @@
 */
 
 #include <ESP8266WiFi.h>
+#include <WiFiServerSecure.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
