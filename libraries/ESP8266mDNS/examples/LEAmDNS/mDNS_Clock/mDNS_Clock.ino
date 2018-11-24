@@ -49,6 +49,7 @@
  *
  */
 #include <ESP8266mDNS.h>
+#include <LEATimeFlag.h>
 
 /*
  * Global defines and vars
@@ -314,15 +315,17 @@ void loop(void) {
   LEAmDNS::MDNS.update();
   
   // Update time (if needed)
-  static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
-  if (ulNextTimeUpdate < millis()) {
+  //static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
+  static clsLEATimeFlag timeFlag(UPDATE_CYCLE);
+  if (timeFlag.flagged()/*ulNextTimeUpdate < millis()*/) {
       
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
       LEAmDNS::MDNS.announce();
     }
-    ulNextTimeUpdate = (millis() + UPDATE_CYCLE);   // Set update 'timer'
+    //ulNextTimeUpdate = (millis() + UPDATE_CYCLE);   // Set update 'timer'
+    timeFlag.restart();
   }
 }
 

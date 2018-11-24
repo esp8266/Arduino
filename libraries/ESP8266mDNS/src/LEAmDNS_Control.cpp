@@ -765,7 +765,7 @@ bool MDNSResponder::_processPTRAnswer(const MDNSResponder::stcMDNS_RRAnswerPTR* 
                 stcMDNSServiceQuery::stcAnswer* pSQAnswer = pServiceQuery->findAnswerForServiceDomain(p_pPTRAnswer->m_PTRDomain);
                 if (pSQAnswer) {    // existing answer
                     if (p_pPTRAnswer->m_u32TTL) {   // Received update message
-                        pSQAnswer->m_TTLServiceDomain.set(p_pPTRAnswer->m_u32TTL, millis());    // Update TTL tag
+                        pSQAnswer->m_TTLServiceDomain.set(p_pPTRAnswer->m_u32TTL/*, millis()*/);    // Update TTL tag
                         DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processPTRAnswer: Updated TTL for "));
                                 _printRRDomain(pSQAnswer->m_ServiceDomain);
@@ -773,7 +773,7 @@ bool MDNSResponder::_processPTRAnswer(const MDNSResponder::stcMDNS_RRAnswerPTR* 
                         );
                     }
                     else {                      // received goodbye-message
-                        pSQAnswer->m_TTLServiceDomain.set(1, millis());             // See RFC 6762, 10.1
+                        pSQAnswer->m_TTLServiceDomain.set(1/*, millis()*/);             // See RFC 6762, 10.1
                         pSQAnswer->m_TTLServiceDomain.m_bUpdateScheduled = true;    // Avoid 'cache update' query
                         DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processPTRAnswer: 'Goodbye' received for "));
@@ -786,7 +786,7 @@ bool MDNSResponder::_processPTRAnswer(const MDNSResponder::stcMDNS_RRAnswerPTR* 
                          ((pSQAnswer = new stcMDNSServiceQuery::stcAnswer))) {      // Not yet included -> add answer
                     pSQAnswer->m_ServiceDomain = p_pPTRAnswer->m_PTRDomain;
                     pSQAnswer->m_u32ContentFlags |= ServiceQueryAnswerType_ServiceDomain;
-                    pSQAnswer->m_TTLServiceDomain.set(p_pPTRAnswer->m_u32TTL, millis());
+                    pSQAnswer->m_TTLServiceDomain.set(p_pPTRAnswer->m_u32TTL/*, millis()*/);
                     pSQAnswer->releaseServiceDomain();
                     
                     bResult = pServiceQuery->addAnswer(pSQAnswer);
@@ -820,7 +820,7 @@ bool MDNSResponder::_processSRVAnswer(const MDNSResponder::stcMDNS_RRAnswerSRV* 
             stcMDNSServiceQuery::stcAnswer* pSQAnswer = pServiceQuery->findAnswerForServiceDomain(p_pSRVAnswer->m_Header.m_Domain);
             if (pSQAnswer) {    // Answer for this service domain (eg. MyESP._http._tcp.local) available
                 if (p_pSRVAnswer->m_u32TTL) {   // First or update message (TTL != 0)
-                    pSQAnswer->m_TTLHostDomainAndPort.set(p_pSRVAnswer->m_u32TTL, millis());    // Update TTL tag
+                    pSQAnswer->m_TTLHostDomainAndPort.set(p_pSRVAnswer->m_u32TTL/*, millis()*/);    // Update TTL tag
                     DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processSRVAnswer: Updated TTL for "));
                             _printRRDomain(pSQAnswer->m_ServiceDomain);
@@ -842,7 +842,7 @@ bool MDNSResponder::_processSRVAnswer(const MDNSResponder::stcMDNS_RRAnswerSRV* 
                     }
                 }
                 else {                      // Goodby message
-                    pSQAnswer->m_TTLHostDomainAndPort.set(1, millis());             // See RFC 6762, 10.1
+                    pSQAnswer->m_TTLHostDomainAndPort.set(1/*, millis()*/);             // See RFC 6762, 10.1
                     pSQAnswer->m_TTLHostDomainAndPort.m_bUpdateScheduled = true;    // Avoid 'cache update' query
                     DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processSRVAnswer: 'Goodbye' received for "));
@@ -873,7 +873,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
             stcMDNSServiceQuery::stcAnswer* pSQAnswer = pServiceQuery->findAnswerForServiceDomain(p_pTXTAnswer->m_Header.m_Domain);
             if (pSQAnswer) {    // Answer for this service domain (eg. MyESP._http._tcp.local) available
                 if (p_pTXTAnswer->m_u32TTL) {   // First or update message
-                    pSQAnswer->m_TTLTxts.set(p_pTXTAnswer->m_u32TTL, millis()); // Update TTL tag
+                    pSQAnswer->m_TTLTxts.set(p_pTXTAnswer->m_u32TTL/*, millis()*/); // Update TTL tag
                     DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processTXTAnswer: Updated TTL for "));
                             _printRRDomain(pSQAnswer->m_ServiceDomain);
@@ -890,7 +890,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                     }
                 }
                 else {                      // Goodby message
-                    pSQAnswer->m_TTLTxts.set(1, millis());          // See RFC 6762, 10.1
+                    pSQAnswer->m_TTLTxts.set(1/*, millis()*/);          // See RFC 6762, 10.1
                     pSQAnswer->m_TTLTxts.m_bUpdateScheduled = true; // Avoid 'cache update' query
                     DEBUG_EX_INFO(
                             DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processTXTAnswer: 'Goodbye' received for "));
@@ -925,7 +925,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                     if (pIP4Address) {
                         // Already known IP4 address
                         if (p_pAAnswer->m_u32TTL) { // Valid TTL -> Update answers TTL
-                            pIP4Address->m_TTL.set(p_pAAnswer->m_u32TTL, millis());
+                            pIP4Address->m_TTL.set(p_pAAnswer->m_u32TTL/*, millis()*/);
                             DEBUG_EX_INFO(
                                     DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processAAnswer: Updated TTL for "));
                                     _printRRDomain(pSQAnswer->m_ServiceDomain);
@@ -933,7 +933,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                             );
                         }
                         else {                      // 'Goodbye' message for known IP4 address
-                            pIP4Address->m_TTL.set(1, millis());            // See RFC 6762, 10.1
+                            pIP4Address->m_TTL.set(1/*, millis()*/);            // See RFC 6762, 10.1
                             pIP4Address->m_TTL.m_bUpdateScheduled = true;   // Avoid 'cache update' query
                             DEBUG_EX_INFO(
                                     DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processAAnswer: 'Goodbye' received for "));
@@ -945,7 +945,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                     else {
                         // Until now unknown IP4 address -> Add (if the message isn't just a 'Goodbye' note)
                         if (p_pAAnswer->m_u32TTL) { // NOT just a 'Goodbye' message
-                            pIP4Address = new stcMDNSServiceQuery::stcAnswer::stcIP4Address(p_pAAnswer->m_IPAddress, p_pAAnswer->m_u32TTL, millis());
+                            pIP4Address = new stcMDNSServiceQuery::stcAnswer::stcIP4Address(p_pAAnswer->m_IPAddress, p_pAAnswer->m_u32TTL/*, millis()*/);
                             if ((pIP4Address) &&
                                 (pSQAnswer->addIP4Address(pIP4Address))) {
                                 
@@ -988,7 +988,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                     if (pIP6Address) {
                         // Already known IP6 address
                         if (p_pAAAAAnswer->m_u32TTL) { // Valid TTL -> Update answers TTL
-                            pIP6Address->m_TTL.set(p_pAAAAAnswer->m_u32TTL, millis());
+                            pIP6Address->m_TTL.set(p_pAAAAAnswer->m_u32TTL/*, millis()*/);
                             DEBUG_EX_INFO(
                                     DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processAAnswer: Updated TTL for "));
                                     _printRRDomain(pSQAnswer->m_ServiceDomain);
@@ -996,7 +996,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                             );
                         }
                         else {                      // 'Goodbye' message for known IP6 address
-                            pIP6Address->m_TTL.set(1, millis());            // See RFC 6762, 10.1
+                            pIP6Address->m_TTL.set(1/*, millis()*/);            // See RFC 6762, 10.1
                             pIP6Address->m_TTL.m_bUpdateScheduled = true;   // Avoid 'cache update' query
                             DEBUG_EX_INFO(
                                     DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _processAAnswer: 'Goodbye' received for "));
@@ -1008,7 +1008,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                     else {
                         // Until now unknown IP6 address -> Add (if the message isn't just a 'Goodbye' note)
                         if (p_pAAAAAnswer->m_u32TTL) { // NOT just a 'Goodbye' message
-                            pIP6Address = new stcIP6Address(p_pAAAAAnswer->m_IPAddress, p_pAAAAAnswer->m_u32TTL, millis());
+                            pIP6Address = new stcIP6Address(p_pAAAAAnswer->m_IPAddress, p_pAAAAAnswer->m_u32TTL/*, millis()*/);
                             if ((pIP6Address) &&
                                 (pSQAnswer->addIP6Address(pIP6Address))) {
                                 
@@ -1060,22 +1060,27 @@ bool MDNSResponder::_updateProbeStatus(void) {
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _updateProbeStatus: Starting host probing...\n")););
 
         // First probe delay SHOULD be random 0-250 ms
-        m_HostProbeInformation.m_ulNextProbeTimeout = (millis() + (rand() % MDNS_PROBE_DELAY));
+        //m_HostProbeInformation.m_ulNextProbeTimeout = (millis() + (rand() % MDNS_PROBE_DELAY));
+        m_HostProbeInformation.m_NextProbeTimeFlag.restart(rand() % MDNS_PROBE_DELAY);
         m_HostProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
     }
     else if ((ProbingStatus_InProgress == m_HostProbeInformation.m_ProbingStatus) &&                // Probing AND
-             (m_HostProbeInformation.m_ulNextProbeTimeout < millis())) {                            // Time for next probe
+             (m_HostProbeInformation.m_NextProbeTimeFlag.flagged())) {                              // Time for next probe
+             //(m_HostProbeInformation.m_ulNextProbeTimeout < millis())) {                            // Time for next probe
 
         if (MDNS_PROBE_COUNT > m_HostProbeInformation.m_u8ProbesSent) {                             // Send next probe
             if ((bResult = _sendHostProbe())) {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _updateProbeStatus: Did sent host probe\n")););
-                m_HostProbeInformation.m_ulNextProbeTimeout = (millis() + MDNS_PROBE_DELAY);
+                //m_HostProbeInformation.m_ulNextProbeTimeout = (millis() + MDNS_PROBE_DELAY);
+                m_HostProbeInformation.m_NextProbeTimeFlag.restart(MDNS_PROBE_DELAY);
                 ++m_HostProbeInformation.m_u8ProbesSent;
             }
         }
         else {                                                                                      // Probing finished
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _updateProbeStatus: Done host probing.\n")););
             m_HostProbeInformation.m_ProbingStatus = ProbingStatus_Done;
+            m_HostProbeInformation.m_NextProbeTimeFlag.reset();
+
             if (m_HostProbeInformation.m_fnProbeResultCallback) {
                 m_HostProbeInformation.m_fnProbeResultCallback(this, m_pcHostname, 0, true, m_HostProbeInformation.m_pProbeResultCallbackUserdata);
             }
@@ -1089,22 +1094,26 @@ bool MDNSResponder::_updateProbeStatus(void) {
     for (stcMDNSService* pService=m_pServices; ((bResult) && (pService)); pService=pService->m_pNext) {
         if (ProbingStatus_ReadyToStart == pService->m_ProbeInformation.m_ProbingStatus) {       // Ready to get started
 
-            pService->m_ProbeInformation.m_ulNextProbeTimeout = (millis() + MDNS_PROBE_DELAY);  // More or equal than first probe for host domain
+            //pService->m_ProbeInformation.m_ulNextProbeTimeout = (millis() + MDNS_PROBE_DELAY);  // More or equal than first probe for host domain
+            pService->m_ProbeInformation.m_NextProbeTimeFlag.restart(MDNS_PROBE_DELAY);           // More or equal than first probe for host domain
             pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
         }
         else if ((ProbingStatus_InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&  // Probing AND
-                 (pService->m_ProbeInformation.m_ulNextProbeTimeout < millis())) {              // Time for next probe
+                 (pService->m_ProbeInformation.m_NextProbeTimeFlag.flagged())) {                // Time for next probe
+                 //(pService->m_ProbeInformation.m_ulNextProbeTimeout < millis())) {              // Time for next probe
 
             if (MDNS_PROBE_COUNT > pService->m_ProbeInformation.m_u8ProbesSent) {                           // Send next probe
                 if ((bResult = _sendServiceProbe(*pService))) {
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _updateProbeStatus: Did sent service probe (%u)\n"), (pService->m_ProbeInformation.m_u8ProbesSent + 1)););
-                    pService->m_ProbeInformation.m_ulNextProbeTimeout = (millis() + MDNS_PROBE_DELAY);
+                    //pService->m_ProbeInformation.m_ulNextProbeTimeout = (millis() + MDNS_PROBE_DELAY);
+                    pService->m_ProbeInformation.m_NextProbeTimeFlag.restart(MDNS_PROBE_DELAY);
                     ++pService->m_ProbeInformation.m_u8ProbesSent;
                 }
             }
             else {                                                                                      // Probing finished
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _updateProbeStatus: Done service probing %s.%s.%s\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
                 pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_Done;
+                pService->m_ProbeInformation.m_NextProbeTimeFlag.reset();
 
                 MDNSProbeResultCallbackFn   fnProbeResultCallback = 0;
                 void*                       pProbeResultCallbackUserdata = 0;
@@ -1437,7 +1446,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
     
     bool        bResult = true;
     
-    uint32_t    u32Now = millis();
+    //uint32_t    u32Now = millis();
     for (stcMDNSServiceQuery* pServiceQuery=m_pServiceQueries; ((bResult) && (pServiceQuery)); pServiceQuery=pServiceQuery->m_pNext) {
         if (pServiceQuery->m_bAwaitingAnswers) {
             stcMDNSServiceQuery::stcAnswer* pSQAnswer = pServiceQuery->m_pAnswers;
@@ -1447,7 +1456,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                 
                 // 1. level answer
                 if ((bResult) &&
-                    (pSQAnswer->m_TTLServiceDomain.has80Percent(u32Now))) {
+                    (pSQAnswer->m_TTLServiceDomain.has80Percent(/*u32Now*/))) {
                     
                     bResult = ((_sendMDNSServiceQuery(*pServiceQuery)) &&
                                ((pSQAnswer->m_TTLServiceDomain.m_bUpdateScheduled = true)));
@@ -1458,7 +1467,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                     );
                 }
                 else if ((bResult) &&
-                         (pSQAnswer->m_TTLServiceDomain.isOutdated(u32Now))) {
+                         (pSQAnswer->m_TTLServiceDomain.isOutdated(/*u32Now*/))) {
                     
                     // Delete
                     if (pServiceQuery->m_fnCallback) {
@@ -1472,7 +1481,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                 // 2. level answers
                 // HostDomain & Port (from SRV)
                 if ((bResult) &&
-                    (pSQAnswer->m_TTLHostDomainAndPort.has80Percent(u32Now))) {
+                    (pSQAnswer->m_TTLHostDomainAndPort.has80Percent(/*u32Now*/))) {
                     
                     bResult = ((_sendMDNSQuery(pSQAnswer->m_ServiceDomain, DNS_RRTYPE_SRV)) &&
                                ((pSQAnswer->m_TTLHostDomainAndPort.m_bUpdateScheduled = true)));
@@ -1483,13 +1492,13 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                     );
                 }
                 else if ((bResult) &&
-                         (pSQAnswer->m_TTLHostDomainAndPort.isOutdated(u32Now))) {
+                         (pSQAnswer->m_TTLHostDomainAndPort.isOutdated(/*u32Now*/))) {
                     
                     // Delete
                     pSQAnswer->m_HostDomain.clear();
                     pSQAnswer->releaseHostDomain();
                     pSQAnswer->m_u16Port = 0;
-                    pSQAnswer->m_TTLHostDomainAndPort.set(0, 0);
+                    pSQAnswer->m_TTLHostDomainAndPort.set(0/*, 0*/);
                     uint32_t    u32ContentFlags = ServiceQueryAnswerType_HostDomainAndPort;
                     // As the host domain is the base for the IP4- and IP6Address, remove these too
 #ifdef MDNS_IP4_SUPPORT
@@ -1511,7 +1520,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                 
                 // Txts (from TXT)
                 if ((bResult) &&
-                    (pSQAnswer->m_TTLTxts.has80Percent(u32Now))) {
+                    (pSQAnswer->m_TTLTxts.has80Percent(/*u32Now*/))) {
                     
                     bResult = ((_sendMDNSQuery(pSQAnswer->m_ServiceDomain, DNS_RRTYPE_TXT)) &&
                                ((pSQAnswer->m_TTLTxts.m_bUpdateScheduled = true)));
@@ -1522,11 +1531,11 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                     );
                 }
                 else if ((bResult) &&
-                         (pSQAnswer->m_TTLTxts.isOutdated(u32Now))) {
+                         (pSQAnswer->m_TTLTxts.isOutdated(/*u32Now*/))) {
                     
                     // Delete
                     pSQAnswer->m_Txts.clear();
-                    pSQAnswer->m_TTLTxts.set(0, 0);
+                    pSQAnswer->m_TTLTxts.set(0/*, 0*/);
                     
                     // Remove content flags for deleted answer parts
                     pSQAnswer->m_u32ContentFlags &= ~ServiceQueryAnswerType_Txts;
@@ -1546,7 +1555,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                            
                     stcMDNSServiceQuery::stcAnswer::stcIP4Address*  pNextIP4Address = pIP4Address->m_pNext; // Get 'next' early, as 'current' may be deleted at the end...
                     
-                    if (pIP4Address->m_TTL.has80Percent(u32Now)) {      // Needs update
+                    if (pIP4Address->m_TTL.has80Percent(/*u32Now*/)) {      // Needs update
                         if ((bAUpdateQuerySent) ||
                             ((bResult = _sendMDNSQuery(pSQAnswer->m_HostDomain, DNS_RRTYPE_A)))) {
                             
@@ -1560,7 +1569,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                             );
                         }
                     }
-                    else if (pIP4Address->m_TTL.isOutdated(u32Now)) {   // Outdated: can be deleted
+                    else if (pIP4Address->m_TTL.isOutdated(/*u32Now*/)) {   // Outdated: can be deleted
                         pSQAnswer->removeIP4Address(pIP4Address);
                         if (!pSQAnswer->m_pIP4Addresses) {  // NO IP4 address left -> remove content flag
                             pSQAnswer->m_u32ContentFlags &= ~ServiceQueryAnswerType_IP4Address;
@@ -1583,7 +1592,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                            
                     stcMDNSServiceQuery::stcAnswer::stcIP6Address*  pNextIP6Address = pIP6Address->m_pNext; // Get 'next' early, as 'current' may be deleted at the end...
                     
-                    if (pIP6Address->m_TTL.has80Percent(u32Now)) {      // Needs update
+                    if (pIP6Address->m_TTL.has80Percent(/*u32Now*/)) {      // Needs update
                         if ((bAAAAUpdateQuerySent) ||
                             ((bResult = _sendMDNSQuery(pSQAnswer->m_HostDomain, DNS_RRTYPE_AAAA)))) {
                             
@@ -1597,7 +1606,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                             );
                         }
                     }
-                    else if (pIP6Address->m_TTL.isOutdated(u32Now)) {   // Outdated: can be deleted
+                    else if (pIP6Address->m_TTL.isOutdated(/*u32Now*/)) {   // Outdated: can be deleted
                         pSQAnswer->removeIP6Address(pIP6Address);
                         if (!pSQAnswer->m_pIP6Addresses) {  // NO IP6 address left -> remove content flag
                             pSQAnswer->m_u32ContentFlags &= ~ServiceQueryAnswerType_IP6Address;

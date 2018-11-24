@@ -107,6 +107,7 @@
 #include "lwip/udp.h"
 #include "debug.h"
 #include "include/UdpContext.h"
+#include "LEATimeFlag.h"
 
 #include "ESP8266WiFi.h"
 
@@ -770,7 +771,8 @@ protected:
     typedef struct _stcProbeInformation {
         enuProbingStatus                m_ProbingStatus;
         uint8_t                         m_u8ProbesSent;
-        unsigned long                   m_ulNextProbeTimeout;
+        //unsigned long                   m_ulNextProbeTimeout;
+        clsLEATimeFlag                  m_NextProbeTimeFlag;
         bool                            m_bConflict;
         bool                            m_bTiebreakNeeded;
         MDNSProbeResultCallbackFn       m_fnProbeResultCallback;
@@ -825,17 +827,18 @@ protected:
              * stcTTL
              */
             typedef struct _stcTTL {
-                uint32_t    m_u32TTL;
-                uint32_t    m_u32Millis;
-                bool        m_bUpdateScheduled;
+                //uint32_t    m_u32TTL;
+                //uint32_t    m_u32Millis;
+                clsLEATimeFlag  m_TTLTimeFlag;
+                bool            m_bUpdateScheduled;
 
-                _stcTTL(uint32_t p_u32TTL = 0,
-                        uint32_t p_u32Millis = 0);
-                bool set(uint32_t p_u32TTL,
-                        uint32_t p_u32Millis);
+                _stcTTL(uint32_t p_u32TTL = 0/*,
+                        uint32_t p_u32Millis = 0*/);
+                bool set(uint32_t p_u32TTL/*,
+                        uint32_t p_u32Millis*/);
 
-                bool has80Percent(uint32_t p_u32Now) const;
-                bool isOutdated(uint32_t p_u32Now) const;
+                bool has80Percent(void/*uint32_t p_u32Now*/) const;
+                bool isOutdated(void/*uint32_t p_u32Now*/) const;
             } stcTTL;
 #ifdef MDNS_IP4_SUPPORT
             /**
@@ -847,8 +850,8 @@ protected:
                 stcTTL          m_TTL;
                 
                 _stcIP4Address(IPAddress p_IPAddress,
-                               uint32_t p_u32TTL = 0,
-                               uint32_t p_u32Millis = 0);
+                               uint32_t p_u32TTL = 0/*,
+                               uint32_t p_u32Millis = 0*/);
             } stcIP4Address;
 #endif
 #ifdef MDNS_IP6_SUPPORT
