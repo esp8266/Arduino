@@ -121,10 +121,6 @@ class WiFiClientSecure : public WiFiClient {
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String host, uint16_t port, uint16_t len);
 
-    // AXTLS compatible wrappers
-    // Cannot implement this mode, we need FP before we can connect: bool verify(const char* fingerprint, const char* domain_name)
-    bool verifyCertChain(const char* domain_name) { (void)domain_name; return connected(); } // If we're connected, the cert passed validation during handshake
-
     bool setCACert(const uint8_t* pk, size_t size);
     bool setCertificate(const uint8_t* pk, size_t size);
     bool setPrivateKey(const uint8_t* pk, size_t size);
@@ -150,6 +146,21 @@ class WiFiClientSecure : public WiFiClient {
     template<typename TFile>
     bool loadCACert(TFile& file) {
       return loadCACert(file, file.size());
+    }
+
+    // AxTLS API deprecated warnings to help upgrading
+
+    bool verify(const char* fingerprint, const char* domain_name)
+      __attribute__((deprecated("This is deprecated AxTLS API, check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99"))) {
+      (void)fingerprint;
+      (void)domain_name;
+      return connected();
+    }
+
+    bool verifyCertChain(const char* domain_name)
+      __attribute__((deprecated("This is deprecated AxTLS API, check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99"))) {
+      (void)domain_name;
+      return connected();
     }
 
   private:

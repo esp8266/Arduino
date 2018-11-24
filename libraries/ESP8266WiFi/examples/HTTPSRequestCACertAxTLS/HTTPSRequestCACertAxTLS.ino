@@ -20,10 +20,7 @@
 
 // force use of AxTLS (BearSSL is now default)
 #include <WiFiClientSecureAxTLS.h>
-using namespace AxTLS;
-
-// uncomment the line below to run the sketch
-#error Keeping this example for history, watch BearSSL_Validation example instead
+using namespace axTLS;
 
 #ifndef STASSID
 #define STASSID "your-ssid"
