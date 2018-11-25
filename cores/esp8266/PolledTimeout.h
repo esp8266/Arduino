@@ -5,7 +5,7 @@
 /*
  PolledTimeout.h - Encapsulation of a polled Timeout
  
- Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+ Copyright (c) 2018 Daniel Salazar. All rights reserved.
  This file is part of the esp8266 core for Arduino environment.
 
  This library is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ struct YieldOrSkip
 
 
 
-template<bool PeriodicT, typename YieldPolicy = polledTimeoutPolicy::DoNothing>  
+template <bool PeriodicT, typename YieldPolicy = polledTimeoutPolicy::DoNothing>  
 class polledTimeout
 {
 public:
@@ -58,8 +58,8 @@ public:
 
   bool expired()
   {
-    YieldPolicy::execute(); //in case of DoNothing gets optimized away
-    if(PeriodicT)           //in case of false gets optimized away
+    YieldPolicy::execute(); //in case of DoNothing: gets optimized away
+    if(PeriodicT)           //in case of false: gets optimized away
       return expiredRetrigger();
     return expiredOneShot();
   }
@@ -91,7 +91,7 @@ protected:
     timeType current = millis();
     if(checkExpired(current))
     {
-      unsigned int n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
+      unsigned long n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
       _start += n  * _timeout;
       return true;
     }
@@ -111,7 +111,7 @@ protected:
 using polledTimeoutOneShot = polledTimeout<false>;
 using polledTimeoutPeriodic = polledTimeout<true>;
 
-/* A timeout that auto-yields when in CONT can be built as follows:
+/* A 1-shot timeout that auto-yields when in CONT can be built as follows:
  * using polledTimeoutOneShotYield = polledTimeout<false, YieldOrSkip>;
  *
  * Other policies can be implemented by the user, and the polledTimeout types built as needed as shown above, without modifying this file.
