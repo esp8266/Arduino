@@ -35,7 +35,7 @@
       standard Serial pins RX:GPIO3 and TX:GPIO1
 */
 
-#define SWAP_PINS 1
+#define SWAP_PINS 0
 
 /*
     SERIAL_LOOPBACK

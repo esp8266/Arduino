@@ -19,8 +19,13 @@
 
 ////////////////////////////////////////////////////////
 
-#define SSID            "open"
-#define SSIDPWD         ""
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+#define SSID            STASSID
+#define SSIDPWD         STAPSK
 #define TZ              1       // (utc+) TZ in hours
 #define DST_MN          60      // use 60mn for summer time in some countries
 

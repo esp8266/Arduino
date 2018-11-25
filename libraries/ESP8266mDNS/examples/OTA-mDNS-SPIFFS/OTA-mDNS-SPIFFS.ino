@@ -12,6 +12,11 @@
 
 */
 
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
 // includes
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -31,8 +36,8 @@
    @brief Default WiFi connection information.
    @{
 */
-const char* ap_default_ssid = "esp8266"; ///< Default SSID.
-const char* ap_default_psk = "esp8266esp8266"; ///< Default PSK.
+const char* ap_default_ssid = STASSID; ///< Default SSID.
+const char* ap_default_psk = STAPSK; ///< Default PSK.
 /// @}
 
 /// Uncomment the next line for verbose output over UART.
