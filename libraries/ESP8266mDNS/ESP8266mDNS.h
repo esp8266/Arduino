@@ -76,7 +76,7 @@ public:
   void addService(const char *service, const char *proto, uint16_t port){
     addService((char *)service, (char *)proto, port);
   }
-  void addService(String service, String proto, uint16_t port){
+  void addService(String& service, String& proto, uint16_t port){
     addService(service.c_str(), proto.c_str(), port);
   }
   
@@ -84,7 +84,7 @@ public:
   bool addServiceTxt(const char *name, const char *proto, const char *key,const char * value){
     return addServiceTxt((char *)name, (char *)proto, (char *)key, (char *)value);
   }
-  bool addServiceTxt(String name, String proto, String key, String value){
+  bool addServiceTxt(String& name, String& proto, String& key, String& value){
     return addServiceTxt(name.c_str(), proto.c_str(), key.c_str(), value.c_str());
   }
   
@@ -92,7 +92,7 @@ public:
   int queryService(const char *service, const char *proto){
     return queryService((char *)service, (char *)proto);
   }
-  int queryService(String service, String proto){
+  int queryService(String& service, String& proto){
     return queryService(service.c_str(), proto.c_str());
   }
   String hostname(int idx);

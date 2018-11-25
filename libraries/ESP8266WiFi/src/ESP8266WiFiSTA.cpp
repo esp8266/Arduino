@@ -487,7 +487,7 @@ bool ESP8266WiFiSTAClass::hostname(const char* aHostname) {
  * @param aHostname max length:32
  * @return ok
  */
-bool ESP8266WiFiSTAClass::hostname(String aHostname) {
+bool ESP8266WiFiSTAClass::hostname(String& aHostname) {
     return hostname((char*) aHostname.c_str());
 }
 
