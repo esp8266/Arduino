@@ -27,7 +27,7 @@
 
 #ifdef HTTPCLIENT_1_1_COMPATIBLE
 #include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
+#include <WiFiClientSecureAxTLS.h>
 #endif
 
 #include <StreamString.h>
@@ -64,7 +64,10 @@ public:
 
     std::unique_ptr<WiFiClient> create() override
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
         return std::unique_ptr<WiFiClient>(new axTLS::WiFiClientSecure());
+#pragma GCC diagnostic pop
     }
 
     bool verify(WiFiClient& client, const char* host) override
