@@ -23,11 +23,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define PSK  "your-password"
+#define STAPSK  "your-password"
 #endif
 
 char ssid[] = STASSID; // your network SSID (name)
-char pass[] = PSK;     // your network password
+char pass[] = STAPSK;     // your network password
 
 
 unsigned int localPort = 2390;      // local port to listen for UDP packets

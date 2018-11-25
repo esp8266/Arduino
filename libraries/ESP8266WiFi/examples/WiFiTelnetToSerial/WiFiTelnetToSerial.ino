@@ -20,11 +20,11 @@
 */
 #include <ESP8266WiFi.h>
 
-#include <algorithm>
+#include <algorithm> // std::min
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define PSK  "your-password"
+#define STAPSK  "your-password"
 #endif
 
 /*
@@ -69,7 +69,7 @@ SoftwareSerial* logger = nullptr;
 //how many clients should be able to telnet to this ESP8266
 #define MAX_SRV_CLIENTS 2
 const char* ssid = STASSID;
-const char* password = PSK;
+const char* password = STAPSK;
 
 const int port = 23;
 

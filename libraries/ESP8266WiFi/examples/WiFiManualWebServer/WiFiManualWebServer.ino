@@ -11,11 +11,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define PSK  "your-password"
+#define STAPSK  "your-password"
 #endif
 
 const char* ssid = STASSID;
-const char* password = PSK;
+const char* password = STAPSK;
 
 // Create an instance of the server
 // specify the port to listen on as an argument

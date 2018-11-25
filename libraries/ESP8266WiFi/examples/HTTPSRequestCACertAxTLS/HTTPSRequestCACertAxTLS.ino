@@ -15,6 +15,7 @@
     This example is in public domain.
 */
 
+#define USING_AXTLS
 #include <time.h>
 #include <ESP8266WiFi.h>
 
@@ -24,11 +25,11 @@ using namespace axTLS;
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define PSK  "your-password"
+#define STAPSK  "your-password"
 #endif
 
 const char* ssid = STASSID;
-const char* password = PSK;
+const char* password = STAPSK;
 
 const char* host = "api.github.com";
 const int httpsPort = 443;

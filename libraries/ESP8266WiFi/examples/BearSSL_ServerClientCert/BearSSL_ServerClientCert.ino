@@ -63,16 +63,15 @@
 */
 
 #include <ESP8266WiFi.h>
-#include <WiFiServerSecure.h>
 #include <time.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define PSK  "your-password"
+#define STAPSK  "your-password"
 #endif
 
 const char *ssid = STASSID;
-const char *pass = PSK;
+const char *pass = STAPSK;
 
 // The server which will require a client cert signed by the trusted CA
 BearSSL::WiFiServerSecure server(443);

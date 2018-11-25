@@ -4,16 +4,15 @@
 // Released to the public domain
 
 #include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
 #include <time.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define PSK  "your-password"
+#define STAPSK  "your-password"
 #endif
 
 const char *ssid = STASSID;
-const char *pass = PSK;
+const char *pass = STAPSK;
 
 const char *   host = "api.github.com";
 const uint16_t port = 443;

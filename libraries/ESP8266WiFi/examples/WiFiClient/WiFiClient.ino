@@ -7,11 +7,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define PSK  "your-password"
+#define STAPSK  "your-password"
 #endif
 
 const char* ssid     = STASSID;
-const char* password = PSK;
+const char* password = STAPSK;
 
 const char* host = "djxmmx.net";
 const uint16_t port = 17;

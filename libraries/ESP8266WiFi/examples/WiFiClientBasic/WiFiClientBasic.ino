@@ -9,11 +9,11 @@
 
 #ifndef STASSID
 #define STASSID "your-ssid"
-#define PSK  "your-password"
+#define STAPSK  "your-password"
 #endif
 
 const char* ssid     = STASSID;
-const char* password = PSK;
+const char* password = STAPSK;
 
 const char* host = "192.168.1.1";
 const uint16_t port = 3000;
