@@ -83,8 +83,7 @@ void loop() {
 
   // read/ignore the rest of the request
   // do not client.flush(): it is for output only, see below
-  while (client.available())
-  {
+  while (client.available()) {
     // byte by byte is not very efficient
     client.read();
   }
