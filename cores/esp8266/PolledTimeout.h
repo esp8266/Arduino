@@ -1,14 +1,56 @@
 #ifndef __POLLEDTIMING_H__
 #define __POLLEDTIMING_H__
 
+
+/*
+ PolledTimeout.h - Encapsulation of a polled Timeout
+ 
+ Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+ This file is part of the esp8266 core for Arduino environment.
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+
+
 namespace esp8266
 {
 
-template<bool PeriodicT>  
+namespace polledTimeoutPolicy
+{
+
+struct DoNothing
+{
+  static void execute() {}
+};
+
+struct YieldOrSkip
+{
+  static void execute() {delay(0);}
+};
+
+
+}
+
+
+
+template<bool PeriodicT, typename YieldPolicy = polledTimeoutPolicy::DoNothing>  
 class polledTimeout
 {
 public:
-  using timeType = unsigned int;
+  using timeType = decltype(millis());
   
   polledTimeout(timeType timeout) 
     : _timeout(timeout), _start(millis())  
@@ -16,7 +58,8 @@ public:
 
   bool expired()
   {
-    if(PeriodicT)
+    YieldPolicy::execute(); //in case of DoNothing gets optimized away
+    if(PeriodicT)           //in case of false gets optimized away
       return expiredRetrigger();
     return expiredOneShot();
   }
@@ -26,9 +69,15 @@ public:
     return expired(); 
   }
   
-  bool reset()
+  void reset(timeType newTimeout)
   {
-    _start = millis();  
+    _timeout = newTimeout;
+    reset();
+  }
+
+  void reset()
+  {
+    _start = millis(); 
   }
   
 protected:
@@ -62,6 +111,11 @@ protected:
 using polledTimeoutOneShot = polledTimeout<false>;
 using polledTimeoutPeriodic = polledTimeout<true>;
 
+/* A timeout that auto-yields when in CONT can be built as follows:
+ * using polledTimeoutOneShotYield = polledTimeout<false, YieldOrSkip>;
+ *
+ * Other policies can be implemented by the user, and the polledTimeout types built as needed as shown above, without modifying this file.
+ */
 
 }//esp8266
 
