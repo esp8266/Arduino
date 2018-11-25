@@ -25,8 +25,8 @@ void setup() {
   Serial.begin(115200);
 
   // prepare LED
-  pinMode(BUILTIN_LED, OUTPUT);
-  digitalWrite(BUILTIN_LED, 0);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, 0);
 
   // Connect to WiFi network
   Serial.println();
@@ -80,7 +80,7 @@ void loop() {
   }
 
   // Set LED according to the request
-  digitalWrite(BUILTIN_LED, val);
+  digitalWrite(LED_BUILTIN, val);
 
   // read/ignore the rest of the request
   // do not client.flush(): it is for output only, see below
