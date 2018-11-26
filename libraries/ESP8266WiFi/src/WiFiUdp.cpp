@@ -38,7 +38,7 @@ extern "C"
 #include "lwip/inet.h"
 #include "lwip/igmp.h"
 #include "lwip/mem.h"
-#include "include/UdpContext.h"
+#include <include/UdpContext.h>
 
 template<>
 WiFiUDP* SList<WiFiUDP>::_s_first = 0;
@@ -266,7 +266,7 @@ uint16_t WiFiUDP::localPort() const
 void WiFiUDP::stopAll()
 {
     for (WiFiUDP* it = _s_first; it; it = it->_next) {
-        DEBUGV("%s %08x %08x\n", __func__, (uint32_t) it, (uint32_t) _s_first);
+        DEBUGV("%s %p %p\n", __func__, it, _s_first);
         it->stop();
     }
 }
@@ -274,7 +274,7 @@ void WiFiUDP::stopAll()
 void WiFiUDP::stopAllExcept(WiFiUDP * exC) {
     for (WiFiUDP* it = _s_first; it; it = it->_next) {
         if (it->_ctx != exC->_ctx) {
-            DEBUGV("%s %08x %08x\n", __func__, (uint32_t) it, (uint32_t) _s_first);
+            DEBUGV("%s %p %p\n", __func__, it, _s_first);
             it->stop();
         }
     }

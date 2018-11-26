@@ -519,7 +519,7 @@ static bool _dns_lookup_pending = false;
  * @param aHostname     Name to be resolved
  * @param aResult       IPAddress structure to store the returned IP address
  * @return 1 if aIPAddrString was successfully converted to an IP address,
- *          else error code
+ *          else 0
  */
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
 {

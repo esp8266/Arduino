@@ -326,6 +326,23 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
+	( 'inventone', {
+        'name': 'Invent One',
+        'opts': {
+            '.build.board': 'ESP8266_GENERIC',
+            '.build.variant': 'inventone',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng',
+                  '',
+                  'Product page: https://inventone.ng'
+                  ],
+    }),
     ( 'cw01', {
         'name': 'XinaBox CW01',
         'opts': {

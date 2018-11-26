@@ -2,10 +2,15 @@
 #include <lwip/def.h>
 #include <Arduino.h>
 
+#ifdef DEBUG_ESP_PORT
+#define DEBUG_OUTPUT DEBUG_ESP_PORT
+#else
+#define DEBUG_OUTPUT Serial
+#endif
 
 DNSServer::DNSServer()
 {
-  _ttl = htonl(60);
+  _ttl = lwip_htonl(60);
   _errorReplyCode = DNSReplyCode::NonExistentDomain;
 }
 
@@ -30,7 +35,7 @@ void DNSServer::setErrorReplyCode(const DNSReplyCode &replyCode)
 
 void DNSServer::setTTL(const uint32_t &ttl)
 {
-  _ttl = htonl(ttl);
+  _ttl = lwip_htonl(ttl);
 }
 
 void DNSServer::stop()
@@ -76,7 +81,7 @@ void DNSServer::processNextRequest()
 
 bool DNSServer::requestIncludesOnlyOneQuestion(const DNSHeader* dnsHeader)
 {
-  return ntohs(dnsHeader->QDCount) == 1 &&
+  return lwip_ntohs(dnsHeader->QDCount) == 1 &&
          dnsHeader->ANCount == 0 &&
          dnsHeader->NSCount == 0 &&
          dnsHeader->ARCount == 0;
@@ -165,7 +170,7 @@ void DNSServer::replyWithIP(uint8_t* buffer, size_t packetSize)
   _udp.endPacket();
 
   #ifdef DEBUG_ESP_DNS
-    DEBUG_ESP_PORT.printf("DNS responds: %s for %s\n",
+    DEBUG_OUTPUT.printf("DNS responds: %s for %s\n",
             IPAddress(_resolvedIP).toString().c_str(), getDomainNameWithoutWwwPrefix(buffer, packetSize).c_str() );
   #endif
 }

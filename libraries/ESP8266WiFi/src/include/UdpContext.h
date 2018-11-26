@@ -168,7 +168,7 @@ public:
             return 0;
 
         udp_hdr* udphdr = GET_UDP_HDR(_rx_buf);
-        return ntohs(udphdr->src);
+        return lwip_ntohs(udphdr->src);
     }
 
     const IPAddress& getDestAddress() const
@@ -241,6 +241,7 @@ public:
 
     void flush()
     {
+        //XXX this does not follow Arduino's flush definition
         if (!_rx_buf)
             return;
 
