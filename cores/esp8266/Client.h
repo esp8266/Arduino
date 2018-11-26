@@ -26,7 +26,7 @@
 class Client: public Stream {
 
     public:
-        virtual int connect(constv2 IPAddress& ip, uint16_t port) =0;
+        virtual int connect(CONST IPAddress& ip, uint16_t port) =0;
         virtual int connect(const char *host, uint16_t port) =0;
         virtual size_t write(uint8_t) =0;
         virtual size_t write(const uint8_t *buf, size_t size) =0;
@@ -39,7 +39,7 @@ class Client: public Stream {
         virtual uint8_t connected() = 0;
         virtual operator bool() = 0;
     protected:
-        constv2 uint8_t* rawIPAddress(constv2 IPAddress& addr) {
+        CONST uint8_t* rawIPAddress(CONST IPAddress& addr) {
             return addr.raw_address();
         }
         ;

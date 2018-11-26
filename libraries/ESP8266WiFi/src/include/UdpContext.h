@@ -95,7 +95,7 @@ public:
         return true;
     }
 
-    bool listen(constv2 ip_addr_t* addr, uint16_t port)
+    bool listen(CONST ip_addr_t* addr, uint16_t port)
     {
         udp_recv(_pcb, &_s_recv, (void *) this);
         err_t err = udp_bind(_pcb, addr, port);
@@ -157,7 +157,7 @@ public:
         return (pos <= _rx_buf->len);
     }
 
-    constv2 IPAddress& getRemoteAddress() constv2
+    CONST IPAddress& getRemoteAddress() CONST
     {
         return _src_addr;
     }
@@ -280,7 +280,7 @@ public:
         return size;
     }
 
-    bool send(constv2 ip_addr_t* addr = 0, uint16_t port = 0)
+    bool send(CONST ip_addr_t* addr = 0, uint16_t port = 0)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
@@ -417,7 +417,7 @@ private:
 
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            constv2 ip_addr_t *addr, u16_t port)
+            CONST ip_addr_t *addr, u16_t port)
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, addr, port);
     }

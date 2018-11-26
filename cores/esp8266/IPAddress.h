@@ -37,9 +37,9 @@
 #define IP_ANY_TYPE (&ip_addr_any)
 #define IP4_ADDR_ANY4 IPADDR_ANY
 #define IPADDR4_INIT(x) { x }
-#define constv2 /* nothing: lwIP-v1 does not use const */
+#define CONST /* nothing: lwIP-v1 does not use const */
 #else
-#define constv2 const
+#define CONST const
 #endif
 
 // A class to make it easier to handle and pass around IP addresses
@@ -188,7 +188,7 @@ class IPAddress: public Printable {
 #endif
 };
 
-extern constv2 IPAddress IPNoAddress;
+extern CONST IPAddress IPNoAddress;
 
 #include <AddrList.h>
 

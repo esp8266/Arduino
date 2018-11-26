@@ -82,7 +82,7 @@ class UDP: public Stream {
         // Return the port of the host who sent the current incoming packet
         virtual uint16_t remotePort() const =0;
     protected:
-        constv2 uint8_t* rawIPAddress(constv2 IPAddress& addr) {
+        CONST uint8_t* rawIPAddress(CONST IPAddress& addr) {
             return addr.raw_address();
         }
 };

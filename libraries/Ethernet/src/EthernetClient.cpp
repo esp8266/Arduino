@@ -35,7 +35,7 @@ int EthernetClient::connect(const char* host, uint16_t port) {
   }
 }
 
-int EthernetClient::connect(constv2 IPAddress& ip, uint16_t port) {
+int EthernetClient::connect(CONST IPAddress& ip, uint16_t port) {
   if (_sock != MAX_SOCK_NUM)
     return 0;
 

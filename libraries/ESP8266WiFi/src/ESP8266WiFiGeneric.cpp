@@ -510,7 +510,7 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-void wifi_dns_found_callback(const char *name, constv2 ip_addr_t *ipaddr, void *callback_arg);
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
 
 static bool _dns_lookup_pending = false;
 
@@ -567,7 +567,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, constv2 ip_addr_t *ipaddr, void *callback_arg)
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
 {
     (void) name;
     if (!_dns_lookup_pending) {
