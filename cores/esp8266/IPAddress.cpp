@@ -20,6 +20,7 @@
 #include <Arduino.h>
 #include <IPAddress.h>
 #include <Print.h>
+#include <StreamString.h>
 
 IPAddress::IPAddress() {
     _ip = *IP_ANY_TYPE; // lwIP's v4-or-v6 generic address
@@ -120,6 +121,9 @@ bool IPAddress::operator==(const uint8_t* addr) const {
 size_t IPAddress::printTo(Print& p) const {
     size_t n = 0;
 
+    if (!isSet())
+        return p.print(F("(IP unset)"));
+
 #if LWIP_IPV6
     if (isV6()) {
         int count0 = 0;
@@ -149,13 +153,15 @@ size_t IPAddress::printTo(Print& p) const {
 
 String IPAddress::toString() const
 {
+    StreamString sstr;
 #if LWIP_IPV6
     if (isV6())
-        return F("(v6todo)"); // do we have stringprint? (==c++stringstream)
+        sstr.reserve(40); // 8 shorts x 4 chars each + 7 colons + nullterm
+    else
 #endif
-    char szRet[16];
-    sprintf(szRet,"%u.%u.%u.%u", (*this)[0], (*this)[1], (*this)[2], (*this)[3]);
-    return String(szRet);
+        sstr.reserve(16); // 4 bytes with 3 chars max + 3 dots + nullterm, or '(IP unset)'
+    printTo(sstr);
+    return sstr;
 }
 
 bool IPAddress::isValid(const String& arg) {
