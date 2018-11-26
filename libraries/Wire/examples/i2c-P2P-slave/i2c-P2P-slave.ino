@@ -16,20 +16,19 @@
 #define SCL_PIN 5 // D2
 #define LED_PIN 12 // D4
 
-const uint16_t I2C_ADDRESS = 0x08;
+const uint16_t I2C_SLAVE = 0x08;
 const uint16_t I2C_MASTER = 0x42;
-uint16_t local_address = I2C_ADDRESS; // slave
 
 // Keep this structure in sync with the i2c-P2P-master example. Should be in shared header.
-struct MESSAGE_DATA {
+struct MessageData {
   uint8_t sequence;
   uint16_t crc16;
   uint8_t data[26];
   uint8_t terminator;
 };
 
-MESSAGE_DATA message;
-MESSAGE_DATA msgdata;
+MessageData message;
+MessageData msgdata;
 
 Crc16 crc;
 byte seq = 0;
@@ -38,8 +37,8 @@ byte seq = 0;
 uint16_t calculateCRC16(uint8_t *data, size_t length);
 void sendEvent(int a, String msg);
 void sendMessage(int seq, String msg);
-void receiveEvent(int howMany);
-MESSAGE_DATA validateMessage(char* bytes_message);
+void receiveEvent(const size_t howMany);
+MessageData validateMessage(char* message_bytes);
 
 //
 
@@ -53,6 +52,10 @@ uint16_t calculateCRC16(uint8_t *data, size_t length) {
 
 void setup() {
 
+  Serial.begin(230400);
+  while (!Serial); // if you want to wait for first messages
+  delay(2000);
+  
   // Enable internal pullup (there's always one from the master side)
   //digitalWrite(SDA_PIN, HIGH);
   //digitalWrite(SCL_PIN, HIGH);
@@ -60,22 +63,22 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 
-  Wire.begin(SDA_PIN, SCL_PIN, I2C_ADDRESS); // address required for slave
-
-  Serial.begin(230400);
-  //while (!Serial); if you want to wait for first messages
-
-  delay(2000);
+  Wire.pins(SDA_PIN, SCL_PIN);
+  Serial.println("I2C Slave begin...");
+  Wire.begin(I2C_SLAVE);
+  //Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE); // new syntax: join i2c bus (address required for slave)  
+  
   digitalWrite(LED_PIN, HIGH);
 
+  Serial.println("I2C Slave attaching callback...");
   Wire.onReceive(receiveEvent);
 
   Serial.print("I2C Slave started on address: 0x0");
-  Serial.println(I2C_ADDRESS, HEX);
+  Serial.println(I2C_SLAVE, HEX);
 }
 
 // should be in shared header
-MESSAGE_DATA encodeMessage(String bytes) {
+MessageData encodeMessage(String bytes) {
 
   msgdata.terminator = '.';
 
@@ -84,7 +87,7 @@ MESSAGE_DATA encodeMessage(String bytes) {
   Serial.println(datasize);
 
   // Generate new data set for the struct
-  for (size_t i = 0; i < datasize; i++) {
+  for (size_t i = 0; i < datasize; ++i) {
     if (bytes.length() >= i) {
       msgdata.data[i] = bytes[i];
     } else {
@@ -100,10 +103,10 @@ MESSAGE_DATA encodeMessage(String bytes) {
 }
 
 // should be in shared header
-MESSAGE_DATA validateMessage(char* bytes_message) {
+MessageData validateMessage(char* message_bytes) {
 
-  MESSAGE_DATA tmp;
-  memcpy(&tmp, bytes_message, sizeof(tmp));
+  MessageData tmp;
+  memcpy(&tmp, message_bytes, sizeof(tmp));
 
   // Validate terminator
   if (tmp.terminator == '.') {
@@ -158,7 +161,7 @@ MESSAGE_DATA validateMessage(char* bytes_message) {
 
 }
 
-void receiveEvent(int howMany) {
+void receiveEvent(const size_t howMany) {
 
   Serial.print("Received "); Serial.print(howMany); Serial.println(" bytes...");
   char c;
@@ -171,8 +174,8 @@ void receiveEvent(int howMany) {
 
   bool requestRetransfer = false;
 
-  unsigned long rtimeout = millis() + 200; // skip 100ms timeouts
-  while (millis() < rtimeout) {
+  unsigned long rtimeout = millis();
+  while (millis() - rtimeout < 200) { // accept timeouts (may deprecate)
     while (0 < Wire.available()) { // loop through all but the last
       //digitalWrite(LED_PIN, LOW);
       c = Wire.read();
@@ -214,13 +217,12 @@ void receiveEvent(int howMany) {
           seq = c;
         }
         seq = c;
-
-      } // if 0
+      }
 
       digitalWrite(LED_PIN, HIGH);
-      index++;
-    } // while
-  } // while
+      ++index;
+    }
+  }
 
   Serial.println(String(chars));
 
@@ -234,7 +236,7 @@ void receiveEvent(int howMany) {
   Serial.print("Decoding data of size: "); Serial.println(sizeof(chars));
   message = validateMessage(chars); // &error
 
-  // TODO: Do something with the message.
+  // Do something with the message.
   char inmessage[5] = {0};
   memcpy(inmessage, (const char*)&message.data, 4);
   String inmsg = String(inmessage);
@@ -246,15 +248,15 @@ void receiveEvent(int howMany) {
 }
 
 void sendMessage(int seq, String msg) {
-  Wire.beginTransmission(0x42); // transmit to device #8
-  //Sending Side
-  MESSAGE_DATA struct_data = encodeMessage(msg);
+  Wire.beginTransmission(I2C_MASTER); // transmit to I2C device with our predefined master address
+  // Sending Side
+  MessageData struct_data = encodeMessage(msg);
   struct_data.sequence = seq;
   char b[sizeof(struct_data)];
   memcpy(b, &struct_data, sizeof(struct_data));
   Serial.print("Sending message of size "); Serial.print(sizeof(struct_data)); Serial.println();
   Serial.print("'");
-  for (unsigned int i = 0; i < sizeof(struct_data); i++) {
+  for (unsigned int i = 0; i < sizeof(struct_data); ++i) {
     Wire.write(b[i]);
     Serial.print(b[i]);
   }
@@ -264,9 +266,8 @@ void sendMessage(int seq, String msg) {
 
 // wire_transmit
 void sendEvent(int a, String msg) {
-  Serial.print("Sending ");
-  Serial.println(msg);
-  Wire.beginTransmission(0x42); // transmit to master
+  Serial.print("Sending "); Serial.println(msg);
+  Wire.beginTransmission(I2C_MASTER); // transmit to master
   Wire.write(a);
   Wire.write(";");        // sends five bytes
   Wire.write(msg.c_str());
