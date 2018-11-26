@@ -107,7 +107,8 @@ TEST_CPP_FILES := \
 	fs/test_fs.cpp \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
-	core/test_string.cpp
+	core/test_string.cpp \
+  core/test_PolledTimeout.cpp
 
 PREINCLUDES := \
 	-include common/mock.h \
