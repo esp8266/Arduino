@@ -52,7 +52,7 @@ void setup() {
 
   //STEP2: wait for ON timeout
   oneShot timeoutOn(2000);
-  while(!timeoutOn) {
+  while (!timeoutOn) {
     yield();
   }
 
@@ -61,7 +61,7 @@ void setup() {
 
   //STEP4: wait for OFF timeout to assure the led is kept off for this time before exiting setup
   oneShot timeoutOff(2000);
-  while(!timeoutOff) {
+  while (!timeoutOff) {
     yield();
   }
 
@@ -72,7 +72,7 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  if(halfPeriod) {
+  if (halfPeriod) {
     ledToggle();
   }
 }
