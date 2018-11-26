@@ -79,9 +79,11 @@ WAKE_RF_DISABLED	LITERAL1
 ADC_VCC	LITERAL1
 ADC_TOUT	LITERAL1
 
-# constexpr
-esp8266CoreVersionMajor	LITERAL1
-esp8266CoreVersionMinor	LITERAL1
-esp8266CoreVersionRevision	LITERAL1
-esp8266CoreVersionSubRevision	LITERAL1
-esp8266CoreVersionNumeric	LITERAL1
+#######################################
+# namespace esp8266
+#######################################
+coreVersionMajor	LITERAL1
+coreVersionMinor	LITERAL1
+coreVersionRevision	LITERAL1
+coreVersionSubRevision	LITERAL1
+coreVersionNumeric	LITERAL1

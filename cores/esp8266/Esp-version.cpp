@@ -35,6 +35,7 @@ String EspClass::getFullVersion()
 {
     return   String(F("SDK:")) + system_get_sdk_version()
            + F("/Core:") + FPSTR(arduino_esp8266_git_ver)
+           + F("=") + String(esp8266::coreVersionNumeric())
 #if LWIP_VERSION_MAJOR == 1
            + F("/lwIP:") + String(LWIP_VERSION_MAJOR) + "." + String(LWIP_VERSION_MINOR) + "." + String(LWIP_VERSION_REVISION)
 #if LWIP_VERSION_IS_DEVELOPMENT

@@ -53,20 +53,22 @@ extern "C++"
 // case 2.5.0:
 //     esp8266CoreVersionSubRevision() is 0   Numeric is: 20500000
 
+namespace conststr {
+
 constexpr
-bool constexpr_isDecimal (const char c)
+bool isDecimal (const char c)
 {
     return c >= '0' && c <= '9';
 }
 
 template<unsigned N> constexpr
-bool constexpr_isMinus (const char (&arr) [N], unsigned i)
+bool isMinus (const char (&arr) [N], unsigned i)
 {
-    return arr[i] == '-' && constexpr_isDecimal(arr[i+1]);
+    return arr[i] == '-' && isDecimal(arr[i+1]);
 }
 
 template<unsigned N> constexpr
-int constexpr_atoi (const char (&arr) [N], unsigned i)
+int atoi (const char (&arr) [N], unsigned i)
 {
     return ({ // <= c++11 requires a "return statement"
         int ret = 0;
@@ -76,54 +78,58 @@ int constexpr_atoi (const char (&arr) [N], unsigned i)
             sign = -1;
             i++;
         }
-        while (constexpr_isDecimal(arr[i]))
+        while (isDecimal(arr[i]))
             ret = 10*ret + arr[i++] - '0';
         ret * sign;
     });
 }
 
 template<unsigned N> constexpr
-int constexpr_extract_int (const char (&arr) [N], unsigned f)
+int parseNthInteger (const char (&arr) [N], unsigned f)
 {
     return ({ // <= c++11 requires a "return statement"
         unsigned i = 0;
         while (f && arr[i])
         {
-            if (constexpr_isMinus(arr, i))
+            if (isMinus(arr, i))
                 i++;
-            for (; constexpr_isDecimal(arr[i]); i++);
+            for (; isDecimal(arr[i]); i++);
             f--;
-            for (; arr[i] && !constexpr_isMinus(arr, i) && !constexpr_isDecimal(arr[i]); i++);
+            for (; arr[i] && !isMinus(arr, i) && !isDecimal(arr[i]); i++);
         }
-        constexpr_atoi(arr, i);
+        atoi(arr, i);
     });
 }
+
+}; // namespace conststr
+
+namespace esp8266 {
 
 /*
  * version major
  */
 constexpr
-int esp8266CoreVersionMajor ()
+int coreVersionMajor ()
 {
-    return constexpr_extract_int(STR(ARDUINO_ESP8266_GIT_DESC), 0);
+    return conststr::parseNthInteger(STR(ARDUINO_ESP8266_GIT_DESC), 0);
 }
 
 /*
  * version minor
  */
 constexpr
-int esp8266CoreVersionMinor ()
+int coreVersionMinor ()
 {
-    return constexpr_extract_int(STR(ARDUINO_ESP8266_GIT_DESC), 1);
+    return conststr::parseNthInteger(STR(ARDUINO_ESP8266_GIT_DESC), 1);
 }
 
 /*
  * version revision
  */
 constexpr
-int esp8266CoreVersionRevision ()
+int coreVersionRevision ()
 {
-    return constexpr_extract_int(STR(ARDUINO_ESP8266_GIT_DESC), 2);
+    return conststr::parseNthInteger(STR(ARDUINO_ESP8266_GIT_DESC), 2);
 }
 
 /*
@@ -131,26 +137,28 @@ int esp8266CoreVersionRevision ()
  * or RC-number (positive)
  */
 constexpr
-int esp8266CoreVersionSubRevision ()
+int coreVersionSubRevision ()
 {
-    return constexpr_extract_int(STR(ARDUINO_ESP8266_GIT_DESC), 3);
+    return conststr::parseNthInteger(STR(ARDUINO_ESP8266_GIT_DESC), 3);
 }
 
 /*
  * unique revision indentifier (never decreases)
  */
 constexpr
-int esp8266CoreVersionNumeric ()
+int coreVersionNumeric ()
 {
-    return   esp8266CoreVersionMajor()    * 10000000
-           + esp8266CoreVersionMinor()    *   100000
-           + esp8266CoreVersionRevision() *     1000
-           + (esp8266CoreVersionSubRevision() < 0 ?
-               -esp8266CoreVersionSubRevision() :
-               esp8266CoreVersionSubRevision() ?
-                   esp8266CoreVersionSubRevision() - 100 :
-                   0);
+    return   coreVersionMajor()    * 10000000
+           + coreVersionMinor()    *   100000
+           + coreVersionRevision() *     1000
+           + (coreVersionSubRevision() < 0 ?
+               -coreVersionSubRevision() :
+               coreVersionSubRevision() ?
+                 coreVersionSubRevision() - 100 :
+                 0);
 }
+
+}; // namespace esp8266
 
 } // extern "C++"
 #endif // __cplusplus
