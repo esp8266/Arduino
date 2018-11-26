@@ -65,7 +65,7 @@ MessageData encodeMessage(const String &instring) {
 
   msgdata.terminator = '.';
 
-  int datasize = sizeof(msgdata.data);
+  size_t datasize = sizeof(msgdata.data);
   Serial.print("\nEncoding data of size: ");
   Serial.println(datasize);
 
@@ -85,7 +85,10 @@ MessageData encodeMessage(const String &instring) {
 }
 
 // should be in shared header
-bool validateMessage(const char* bytes, MessageData &tmp) {
+bool validateMessage(char* message_bytes, MessageData &tmp) {
+
+  MessageData tmp;
+  memcpy(&tmp, message_bytes, sizeof(tmp));
 
   // Validate PROTOCOL terminator
   if (tmp.terminator != '.') {
@@ -116,7 +119,7 @@ bool validateMessage(const char* bytes, MessageData &tmp) {
     Serial.print("tmp CRC16: ");
     Serial.println(tmp.crc16, HEX);
     Serial.println("[ERROR] Request retransfer exception.");
-    return true;
+    return false;
   }
 
   // Validate sequence number
@@ -152,7 +155,7 @@ void sendMessage(const int seq, const String &msg) {
   Serial.print("Encoding struct of size: ");
   Serial.println(sizeof(struct_data));
   memcpy(buf, &struct_data, sizeof(struct_data));
-  for (int i = 0; i < sizeof(struct_data); ++i) {
+  for (unsigned int i = 0; i < sizeof(struct_data); ++i) {
     Wire.write(buf[i]);
     Serial.print(buf[i]);
     Serial.print(" ");
@@ -167,7 +170,7 @@ void receiveEvent(const size_t howMany) {
 
   char incoming[howMany];
   incoming[howMany - 1] = '\0';
-  int index = 0;
+  unsigned int index = 0;
 
   digitalWrite(LED_PIN, LOW);
 
@@ -229,9 +232,9 @@ void setup() {
 
   delay(2000);
 
-  Wire.pins(SDA_PIN, SCL_PIN);
-  Wire.begin(I2C_MASTER);
-  //Wire.begin(SDA_PIN, SCL_PIN, I2C_MASTER); // new syntax: join i2c bus (address optional for master)
+  //Wire.pins(SDA_PIN, SCL_PIN);
+  //Wire.begin(I2C_MASTER);
+  Wire.begin(SDA_PIN, SCL_PIN, I2C_MASTER); // new syntax: join i2c bus (address optional for master)
   Wire.onReceive(receiveEvent);
 
   Serial.begin(230400); // keep serial fast as possible for debug logging
@@ -240,31 +243,32 @@ void setup() {
   digitalWrite(LED_PIN, HIGH);
 }
 
-unsigned long secondTimer = millis() + 1000;
+unsigned long second_timer = millis() + 1000;
+
 void loop() {
 
-  if (millis() > secondTimer) {
+  if (millis() > second_timer) {
     Serial.print("Errors/Bytes: ");
-    Serial.print(errorCount);
+    Serial.print(error_count);
     Serial.print("/");
-    Serial.print(byteCount);
+    Serial.print(byte_count);
     Serial.println(" per second");
-    errorCount = 0;
-    byteCount = 0;
-    secondTimer = millis() + 1000;
+    error_count = 0;
+    byte_count = 0;
+    second_timer = millis() + 1000;
   }
 
-  if (millis() > nextPing) {
+  if (millis() > next_ping) {
     digitalWrite(LED_PIN, LOW);
-    nextPing = millis() + 200;
+    next_ping = millis() + 200;
     Serial.print("[MASTER] Sequence » ");
     Serial.println(sequence);
     digitalWrite(LED_PIN, HIGH);
     sendMessage(sequence, "MESA");
-    if (expectPong) {
-      errorCount++;
+    if (expect_pong) {
+      error_count++;
     }
-    expectPong = true;
+    expect_pong = true;
     sequence++;
   }
 

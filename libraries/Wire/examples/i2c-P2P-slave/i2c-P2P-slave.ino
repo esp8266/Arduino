@@ -38,7 +38,7 @@ uint16_t calculateCRC16(uint8_t *data, size_t length);
 void sendEvent(int a, String msg);
 void sendMessage(int seq, String msg);
 void receiveEvent(const size_t howMany);
-MessageData validateMessage(char* message_bytes);
+MessageData validateMessage(char* bytes_message);
 
 //
 
@@ -54,8 +54,7 @@ void setup() {
 
   Serial.begin(230400);
   while (!Serial); // if you want to wait for first messages
-  delay(2000);
-  
+
   // Enable internal pullup (there's always one from the master side)
   //digitalWrite(SDA_PIN, HIGH);
   //digitalWrite(SCL_PIN, HIGH);
@@ -63,14 +62,13 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 
-  Wire.pins(SDA_PIN, SCL_PIN);
-  Serial.println("I2C Slave begin...");
-  Wire.begin(I2C_SLAVE);
-  //Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE); // new syntax: join i2c bus (address required for slave)  
-  
+  //Wire.pins(SDA_PIN, SCL_PIN);
+  //Wire.begin(I2C_SLAVE);
+  Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE); // new syntax: join i2c bus (address required for slave)
+
+  delay(2000);
   digitalWrite(LED_PIN, HIGH);
 
-  Serial.println("I2C Slave attaching callback...");
   Wire.onReceive(receiveEvent);
 
   Serial.print("I2C Slave started on address: 0x0");
@@ -103,10 +101,10 @@ MessageData encodeMessage(String bytes) {
 }
 
 // should be in shared header
-MessageData validateMessage(char* message_bytes) {
+bool validateMessage(const char* bytes, MessageData &tmp) {
 
   MessageData tmp;
-  memcpy(&tmp, message_bytes, sizeof(tmp));
+  memcpy(&tmp, bytes_message, sizeof(tmp));
 
   // Validate terminator
   if (tmp.terminator == '.') {
@@ -145,8 +143,8 @@ MessageData validateMessage(char* message_bytes) {
     Serial.print("tmp CRC16: ");
     Serial.println(tmp.crc16, HEX);
     Serial.print("SLAVE Incoming message: "); Serial.println(String(inmsg));
-    Serial.println("[ERROR] TODO: Request retransfer exception.");
-    return tmp;
+    Serial.println("[ERROR] Request retransfer exception.");
+    return false;
   }
 
   // Validate sequence number ( should be already updated from byteParser )
@@ -155,10 +153,7 @@ MessageData validateMessage(char* message_bytes) {
     Serial.println((char*)tmp.data);
   }
 
-  msgdata = tmp; // tmp is valid, assign to result address
-
-  return msgdata;
-
+  return true;
 }
 
 void receiveEvent(const size_t howMany) {
