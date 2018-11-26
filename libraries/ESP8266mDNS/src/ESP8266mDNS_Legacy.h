@@ -53,6 +53,10 @@ License (MIT license):
 
 class UdpContext;
 
+
+namespace Legacy_MDNSResponder {
+
+
 struct MDNSService;
 struct MDNSTxt;
 struct MDNSAnswer;
@@ -139,4 +143,9 @@ private:
 extern MDNSResponder MDNS;
 #endif
 
+}	// namespace Legacy_MDNSResponder
+
 #endif //ESP8266MDNS_H
+
+
+
