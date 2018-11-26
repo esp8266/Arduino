@@ -21,17 +21,15 @@
   This class allows to explore all configured IP addresses
   in lwIP netifs, with that kind of c++ loop:
 
-  for (auto a: ifList) {
-    out.printf("IF='%s' n=%d legacy=%d IPv4=%d local=%d hostname='%s' addr= ",
+  for (auto a: ifList)
+    out.printf("IF='%s' index=%d legacy=%d IPv4=%d local=%d hostname='%s' addr= %s\n",
                a->iface().c_str(),
                a->number(),
                a->addr().isLegacy(),
                a->addr().isV4(),
                a->addr().isLocal(),
-               a->hostname().c_str());
-    a->addr().printTo(out);
-    out.println();
-  }
+               a->hostname().c_str(),
+               a->addr().toString().c_str());
 
   This loop:
 
@@ -137,7 +135,7 @@ class IfListClass {
                 IPAddress netmask () const { return _netif->netmask; }
                 IPAddress gw () const { return _netif->gw; }
                 String iface () const { return String(_netif->name[0]) + _netif->name[1]; }
-                const char* hostname () const { return _netif->hostname?: ""; }
+                const char* hostname () const { return _netif->hostname?: emptyString.c_str(); }
                 const char* mac () const { return (const char*)_netif->hwaddr; }
                 int number () const { return _netif->num; }
 
