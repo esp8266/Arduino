@@ -1,6 +1,14 @@
 #include <catch.hpp>
 #include "PolledTimeout.h"
 
+//This won't work for
+template<typename argT>
+inline bool
+fuzzycomp(argT a, argT b)
+{
+  const argT epsilon = 10;
+  return (std::max(a,b) - std::min(a,b) <= epsilon);
+}
 
 TEST_CASE("OneShot Timeout 3000ms", "[polledTimeout]")
 {
@@ -10,34 +18,30 @@ TEST_CASE("OneShot Timeout 3000ms", "[polledTimeout]")
 
   Serial.println("OneShot Timeout 3000ms");
 
-  Serial.print("before while 1\n");
   polledTimeoutOneShot timeout(3000);
   before = millis();
   while(!timeout.expired())
     yield();
   after = millis();
-  Serial.print("after while 1\n");
 
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
-  REQUIRE(delta == 3000);
+  REQUIRE(fuzzycomp(delta, (timeType)3000));
 
 
   Serial.print("reset\n");
 
-  Serial.print("before while 2\n");  
   timeout.reset();
   before = millis();
   while(!timeout)
     yield();
   after = millis();
-  Serial.print("after while 2\n");
 
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
-  REQUIRE(delta == 3000);
+  REQUIRE(fuzzycomp(delta, (timeType)3000));
 }
 
 TEST_CASE("OneShot Timeout 3000ms reset to 1000ms", "[polledTimeout]")
@@ -48,34 +52,30 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms", "[polledTimeout]")
 
   Serial.println("OneShot Timeout 3000ms");
 
-  Serial.print("before while 1\n");
   polledTimeoutOneShot timeout(3000);
   before = millis();
   while(!timeout.expired())
     yield();
   after = millis();
-  Serial.print("after while 1\n");
 
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
-  REQUIRE(delta == 3000);
+  REQUIRE(fuzzycomp(delta, (timeType)3000));
 
 
   Serial.print("reset\n");
 
-  Serial.print("before while 2\n");  
   timeout.reset(1000);
   before = millis();
   while(!timeout)
     yield();
   after = millis();
-  Serial.print("after while 2\n");
 
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
-  REQUIRE(delta == 1000);
+  REQUIRE(fuzzycomp(delta, (timeType)1000));
 }
 
 TEST_CASE("Periodic Timeout 1T 3000ms", "[polledTimeout]")
@@ -86,32 +86,28 @@ TEST_CASE("Periodic Timeout 1T 3000ms", "[polledTimeout]")
 
   Serial.println("Periodic Timeout 1T 3000ms");
 
-  Serial.print("before while 1\n");
   polledTimeoutPeriodic timeout(3000);
   before = millis();
   while(!timeout)
     yield();
   after = millis();
-  Serial.print("after while 1\n");
 
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
-  REQUIRE(delta == 3000);
+  REQUIRE(fuzzycomp(delta, (timeType)3000));
 
   Serial.print("no reset needed\n");
 
-  Serial.print("before while 2\n");  
   before = millis();
   while(!timeout)
     yield();
   after = millis();
-  Serial.print("after while 2\n");
   
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
-  REQUIRE(delta == 3000);
+  REQUIRE(fuzzycomp(delta, (timeType)3000));
 }
 
 TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
@@ -140,7 +136,7 @@ TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
   
   delta = after - before;
   Serial.printf("\ndelta = %lu\n", delta);
-  REQUIRE(delta == 10000);
+  REQUIRE(fuzzycomp(delta, (timeType)10000));
 }
 
 TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout]")
@@ -153,31 +149,27 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout
   Serial.println("OneShot Timeout 3000ms");
 
 
-  Serial.print("before while 1\n");
   polledTimeoutOneShotYield timeout(3000);
   before = millis();
   while(!timeout.expired());
   after = millis();
-  Serial.print("after while 1\n");
   
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
-  REQUIRE(delta == 3000);
+  REQUIRE(fuzzycomp(delta, (timeType)3000));
 
 
   Serial.print("reset\n");
 
-  Serial.print("before while 2\n");  
   timeout.reset(1000);
   before = millis();
   while(!timeout);
   after = millis();
-  Serial.print("after while 2\n");
   
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
-  REQUIRE(delta == 1000);
+  REQUIRE(fuzzycomp(delta, (timeType)1000));
 }
 
