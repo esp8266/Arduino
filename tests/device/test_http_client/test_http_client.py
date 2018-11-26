@@ -4,6 +4,7 @@ from threading import Thread
 import urllib2
 import os
 import ssl
+import time
 
 @setup('HTTP GET & POST requests')
 def setup_http_get(e):
@@ -34,6 +35,7 @@ def setup_http_get(e):
 def teardown_http_get(e):
     response = urllib2.urlopen('http://localhost:8088/shutdown')
     html = response.read()
+    time.sleep(30)
 
 
 @setup('HTTPS GET request')

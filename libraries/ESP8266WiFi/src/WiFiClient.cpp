@@ -38,7 +38,7 @@ extern "C"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include "lwip/netif.h"
-#include "include/ClientContext.h"
+#include <include/ClientContext.h>
 #include "c_types.h"
 
 uint16_t WiFiClient::_localPort = 0;
@@ -132,7 +132,7 @@ int WiFiClient::connect(const char* host, uint16_t port)
     return 0;
 }
 
-int WiFiClient::connect(const String host, uint16_t port)
+int WiFiClient::connect(const String& host, uint16_t port)
 {
     return connect(host.c_str(), port);
 }

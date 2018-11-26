@@ -113,18 +113,18 @@ bool i2s_rx_is_empty() {
   return _i2s_is_empty( rx );
 }
 
-static int16_t _i2s_available(const i2s_state_t *ch) {
+static uint16_t _i2s_available(const i2s_state_t *ch) {
   if (!ch) {
     return 0;
   }
   return (SLC_BUF_CNT - ch->slc_queue_len) * SLC_BUF_LEN;
 }
 
-int16_t i2s_available(){
+uint16_t i2s_available(){
   return _i2s_available( tx );
 }
 
-int16_t i2s_rx_available(){
+uint16_t i2s_rx_available(){
   return _i2s_available( rx );
 }
 
@@ -330,6 +330,74 @@ bool i2s_write_lr(int16_t left, int16_t right){
   sample |= left & 0xFFFF;
   return i2s_write_sample(sample);
 }
+
+// writes a buffer of frames into the DMA memory, returns the amount of frames written
+// A frame is just a int16_t for mono, for stereo a frame is two int16_t, one for each channel.
+static uint16_t _i2s_write_buffer(int16_t *frames, uint16_t frame_count, bool mono, bool nb) {
+    uint16_t frames_written=0;
+
+    while(frame_count>0) {
+   
+        // make sure we have room in the current buffer
+        if (tx->curr_slc_buf_pos==SLC_BUF_LEN || tx->curr_slc_buf==NULL) {
+            // no room in the current buffer? if there are no buffers available then exit
+            if (tx->slc_queue_len == 0)
+            {
+                if (nb) {
+                    // if nonblocking just return the number of frames written so far
+                    break;
+                }
+                else {
+                    while (1) {
+                        if (tx->slc_queue_len > 0) {
+                          break;
+                        } else {
+                          optimistic_yield(10000);
+                        }
+                    }
+                }
+            }
+            
+            // get a new buffer
+            ETS_SLC_INTR_DISABLE();
+            tx->curr_slc_buf = (uint32_t *)i2s_slc_queue_next_item(tx);
+            ETS_SLC_INTR_ENABLE();
+            tx->curr_slc_buf_pos=0;
+        }       
+
+        //space available in the current buffer
+        uint16_t	available = SLC_BUF_LEN - tx->curr_slc_buf_pos;
+
+        uint16_t fc = (available < frame_count) ? available : frame_count;
+
+        if (mono) {
+            for(uint16_t i=0;i<fc;i++){
+                uint16_t v = (uint16_t)(*frames++);
+                tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v << 16) | v;               
+            }                
+        }
+        else
+        {        
+            for(uint16_t i=0;i<fc;i++){
+                uint16_t v1 = (uint16_t)(*frames++);
+                uint16_t v2 = (uint16_t)(*frames++);
+                tx->curr_slc_buf[tx->curr_slc_buf_pos++] = (v1 << 16) | v2;
+            }
+        }        
+        
+        frame_count -= fc;
+        frames_written += fc;
+    }
+    return frames_written;
+}
+
+uint16_t i2s_write_buffer_mono_nb(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, true); }
+
+uint16_t i2s_write_buffer_mono(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, true, false); }
+
+uint16_t i2s_write_buffer_nb(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, true); }
+
+uint16_t i2s_write_buffer(int16_t *frames, uint16_t frame_count) { return _i2s_write_buffer(frames, frame_count, false, false); }
 
 bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking) {
   if (!rx) {
