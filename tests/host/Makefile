@@ -93,7 +93,6 @@ MOCK_C_FILES := $(addprefix common/,\
 
 INC_PATHS += $(addprefix -I, \
 	. \
-
 	common \
 	$(CORE_PATH) \
 )
@@ -110,7 +109,7 @@ TEST_CPP_FILES := \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
 	core/test_string.cpp \
-  core/test_PolledTimeout.cpp
+	core/test_PolledTimeout.cpp
 
 PREINCLUDES := \
 	-include common/mock.h \
