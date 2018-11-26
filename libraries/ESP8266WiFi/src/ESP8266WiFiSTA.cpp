@@ -121,7 +121,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     conf.threshold.authmode = AUTH_OPEN;
 
     if(passphrase) {
-        conf.threshold.authmode = AUTH_WPA_PSK;
+        conf.threshold.authmode = _useInsecureWEP ? AUTH_WEP : AUTH_WPA_PSK;
         if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
             memcpy(reinterpret_cast<char*>(conf.password), passphrase, 64);
         else
@@ -487,7 +487,7 @@ bool ESP8266WiFiSTAClass::hostname(const char* aHostname) {
  * @param aHostname max length:32
  * @return ok
  */
-bool ESP8266WiFiSTAClass::hostname(String aHostname) {
+bool ESP8266WiFiSTAClass::hostname(const String& aHostname) {
     return hostname((char*) aHostname.c_str());
 }
 
