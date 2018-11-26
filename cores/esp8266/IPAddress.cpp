@@ -48,11 +48,18 @@ IPAddress::IPAddress(const uint8_t *address) {
 }
 
 bool IPAddress::fromString(const char *address) {
-    // TODO: (IPv4) add support for "a", "a.b", "a.b.c" formats
-
+    if (!fromString4(address)) {
 #if LWIP_IPV6
-    const char *org = address;
+        return fromString6(address);
+#else
+        return false;
 #endif
+    }
+    return true;
+}
+
+bool IPAddress::fromString4(const char *address) {
+    // TODO: (IPv4) add support for "a", "a.b", "a.b.c" formats
 
     uint16_t acc = 0; // Accumulator
     uint8_t dots = 0;
@@ -80,11 +87,7 @@ bool IPAddress::fromString(const char *address) {
         else
         {
             // Invalid char
-#if LWIP_IPV6
-            return fromString6(org);
-#else
             return false;
-#endif
         }
     }
 
