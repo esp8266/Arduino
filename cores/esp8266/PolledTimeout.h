@@ -28,7 +28,11 @@
 namespace esp8266
 {
 
-namespace polledTimeoutPolicy
+
+namespace polledTimeout
+{
+
+namespace YieldPolicy
 {
 
 struct DoNothing
@@ -41,24 +45,22 @@ struct YieldOrSkip
   static void execute() {delay(0);}
 };
 
-
-}
-
+} //YieldPolicy
 
 
-template <bool PeriodicT, typename YieldPolicy = polledTimeoutPolicy::DoNothing>  
-class polledTimeout
+template <bool PeriodicT, typename YieldPolicyT = YieldPolicy::DoNothing>  
+class timeoutTemplate
 {
 public:
   using timeType = decltype(millis());
   
-  polledTimeout(timeType timeout) 
+  timeoutTemplate(timeType timeout) 
     : _timeout(timeout), _start(millis())  
   {} 
 
   bool expired()
   {
-    YieldPolicy::execute(); //in case of DoNothing: gets optimized away
+    YieldPolicyT::execute(); //in case of DoNothing: gets optimized away
     if(PeriodicT)           //in case of false: gets optimized away
       return expiredRetrigger();
     return expiredOneShot();
@@ -107,14 +109,16 @@ protected:
   timeType _start;
 };
 
+using oneShot = polledTimeout::timeoutTemplate<false>;
+using periodic = polledTimeout::timeoutTemplate<true>;
 
-using polledTimeoutOneShot = polledTimeout<false>;
-using polledTimeoutPeriodic = polledTimeout<true>;
+} //polledTimeout
+
 
 /* A 1-shot timeout that auto-yields when in CONT can be built as follows:
- * using polledTimeoutOneShotYield = polledTimeout<false, YieldOrSkip>;
+ * using oneShotYield = esp8266::polledTimeout::timeoutTemplate<false, esp8266::polledTimeout::YieldPolicy::YieldOrSkip>;
  *
- * Other policies can be implemented by the user, and the polledTimeout types built as needed as shown above, without modifying this file.
+ * Other policies can be implemented by the user, e.g.: simple yield that panics in SYS, and the polledTimeout types built as needed as shown above, without modifying this file.
  */
 
 }//esp8266
