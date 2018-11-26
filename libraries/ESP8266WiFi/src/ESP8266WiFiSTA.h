@@ -71,7 +71,7 @@ class ESP8266WiFiSTAClass {
         String hostname();
         bool hostname(char* aHostname);
         bool hostname(const char* aHostname);
-        bool hostname(String aHostname);
+        bool hostname(const String& aHostname);
 
         // STA WiFi info
         wl_status_t status();
