@@ -89,6 +89,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
 // -----------------------------------------------------------------------------------------------------------------------
 
 bool ESP8266WiFiSTAClass::_useStaticIp = false;
+bool ESP8266WiFiSTAClass::_useInsecureWEP = false;
 
 /**
  * Start Wifi connection
@@ -119,8 +120,11 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
 
     struct station_config conf;
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
+    
+    conf.threshold.authmode = AUTH_OPEN;
 
     if(passphrase) {
+        conf.threshold.authmode = _useInsecureWEP ? AUTH_WEP : AUTH_WPA_PSK;
         if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
             memcpy(reinterpret_cast<char*>(conf.password), passphrase, 64);
         else
@@ -130,9 +134,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     conf.threshold.rssi = -127;
-
-    // TODO(#909): set authmode to AUTH_WPA_PSK if passphrase is provided
-    conf.threshold.authmode = AUTH_OPEN;
+    conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
 
     if(bssid) {
         conf.bssid_set = 1;
@@ -390,28 +392,6 @@ IPAddress ESP8266WiFiSTAClass::localIP() {
     return IPAddress(ip.ip.addr);
 }
 
-#if LWIP_IPV6
-
-extern "C" struct netif netif_git[2]; // lwip2 interfaces
-
-/**
- * Get the station interface IPv6 link-local address.
- * @return IPAddress station local-scope IPv6
- */
-IPAddress ESP8266WiFiSTAClass::localIP6Link() {
-    return IPAddress(netif_git[STATION_IF].ip6_addr[0]);
-}
-
-/**
- * Get the station interface IPv6 global address.
- * @return IPAddress station global-scope IPv6
- */
-IPAddress ESP8266WiFiSTAClass::localIP6Global() {
-    return IPAddress(netif_git[STATION_IF].ip6_addr[1]);
-}
-
-#endif // LWIP_IPV6
-
 /**
  * Get the station interface MAC address.
  * @param mac   pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
@@ -505,7 +485,7 @@ bool ESP8266WiFiSTAClass::hostname(const char* aHostname) {
  * @param aHostname max length:32
  * @return ok
  */
-bool ESP8266WiFiSTAClass::hostname(String aHostname) {
+bool ESP8266WiFiSTAClass::hostname(const String& aHostname) {
     return hostname((char*) aHostname.c_str());
 }
 

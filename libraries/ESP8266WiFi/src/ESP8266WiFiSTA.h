@@ -71,7 +71,7 @@ class ESP8266WiFiSTAClass {
         String hostname();
         bool hostname(char* aHostname);
         bool hostname(const char* aHostname);
-        bool hostname(String aHostname);
+        bool hostname(const String& aHostname);
 
         // STA WiFi info
         wl_status_t status();
@@ -83,14 +83,12 @@ class ESP8266WiFiSTAClass {
 
         int32_t RSSI();
 
-#if LWIP_IPV6
-        IPAddress localIP6Link();
-        IPAddress localIP6Global();
-#endif
+        static void enableInsecureWEP (bool enable = true) { _useInsecureWEP = enable; }
 
     protected:
 
         static bool _useStaticIp;
+        static bool _useInsecureWEP;
 
     // ----------------------------------------------------------------------------------------------
     // ------------------------------------ STA remote configure  -----------------------------------

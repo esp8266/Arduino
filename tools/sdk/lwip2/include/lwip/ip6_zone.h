@@ -85,6 +85,10 @@
 #ifndef LWIP_HDR_IP6_ZONE_H
 #define LWIP_HDR_IP6_ZONE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @defgroup ip6_zones IPv6 Zones
  * @ingroup ip6
@@ -292,5 +296,9 @@ enum lwip_ipv6_scope_type
 #endif /* LWIP_IPV6_SCOPES && LWIP_IPV6_SCOPES_DEBUG */
 
 #endif /* LWIP_IPV6 */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LWIP_HDR_IP6_ZONE_H */

@@ -47,6 +47,10 @@
 #include "lwip/err.h"
 #include "lwip/netif.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** period (in milliseconds) of the application calling dhcp6_tmr() */
 #define DHCP6_TIMER_MSECS   500
 
@@ -90,6 +94,10 @@ extern void dhcp6_set_ntp_servers(u8_t num_ntp_servers, const ip_addr_t* ntp_ser
 #endif /* LWIP_DHCP6_GET_NTP_SRV */
 
 #define netif_dhcp6_data(netif) ((struct dhcp6*)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP6))
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LWIP_IPV6_DHCP6 */
 

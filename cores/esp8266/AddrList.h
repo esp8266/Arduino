@@ -40,7 +40,7 @@
           delay(500);
       }
 
-  can be replaced with:
+  can be replaced by:
 
       for (bool configured = false; !configured; ) {
           for (auto addr: addrList)
