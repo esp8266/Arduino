@@ -120,7 +120,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
 
     struct station_config conf;
     strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
-    
+
     conf.threshold.authmode = AUTH_OPEN;
 
     if(passphrase) {
@@ -247,6 +247,11 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
     dns1 = arg1;
   }
 
+  // check whether all is IPv4 (or gateway not set)
+  if (!(local_ip.isV4() && subnet.isV4() && (!gateway.isSet() || gateway.isV4()))) {
+    return false;
+  }
+
   //ip and gateway must be in the same subnet
   if((local_ip.v4() & subnet.v4()) != (gateway.v4() & subnet.v4())) {
     return false;
@@ -264,12 +269,12 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
       return false;
   }
 
-  if(dns1 != (uint32_t)0x00000000) {
+  if(dns1.isSet()) {
       // Set DNS1-Server
       dns_setserver(0, dns1);
   }
 
-  if(dns2 != (uint32_t)0x00000000) {
+  if(dns2.isSet()) {
       // Set DNS2-Server
       dns_setserver(1, dns2);
   }
