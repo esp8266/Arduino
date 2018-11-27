@@ -200,7 +200,7 @@ bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
   return WiFiClient::flush(maxWaitMs);
 }
 
-int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
+int WiFiClientSecure::connect(CONST IPAddress& ip, uint16_t port) {
   if (!WiFiClient::connect(ip, port)) {
     return 0;
   }
@@ -218,7 +218,7 @@ int WiFiClientSecure::connect(const char* name, uint16_t port) {
   return _connectSSL(name);
 }
 
-int WiFiClientSecure::connect(const String host, uint16_t port) {
+int WiFiClientSecure::connect(const String& host, uint16_t port) {
   return connect(host.c_str(), port);
 }
 
@@ -1108,7 +1108,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(const char* name, uint16_t port, u
   return WiFiClientSecure::probeMaxFragmentLength(remote_addr, port, len);
 }
 
-bool WiFiClientSecure::probeMaxFragmentLength(const String host, uint16_t port, uint16_t len) {
+bool WiFiClientSecure::probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len) {
   return WiFiClientSecure::probeMaxFragmentLength(host.c_str(), port, len);
 }
 
