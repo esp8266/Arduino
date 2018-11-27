@@ -18,9 +18,12 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <PolledTimeout.h>
 
-#define SSID "ssid"
-#define PSK  "psk"
+#ifndef STASSID
+  #define STASSID "your-ssid"
+  #define STAPSK  "your-password"
+#endif
 
 #define FQDN  F("www.google.com") // with both IPv4 & IPv6 addresses
 #define FQDN6 F("ipv6.google.com") // does not resolve in IPv4
@@ -30,6 +33,7 @@
 
 WiFiServer statusServer(TCP_PORT);
 WiFiUDP udp;
+esp8266::polledTimeout::periodic statusPeriod(STATUSDELAY_MS);
 
 void fqdn(Print& out, const String& fqdn) {
   out.print(F("resolving "));
@@ -60,15 +64,14 @@ void status(Print& out) {
   }
 
   out.println(F("Try me at these addresses:"));
-  out.println(F("(with 'telnet <addr>' or 'nc -u <addr> 23')"));
-  for (auto a : addrList) {
-    out.printf("IF='%s'(%d) IPv6=%d local=%d hostname='%s' addr= ",
-               a->ifname().c_str(),
-               a->ifnumber(),
-               a->isV6(),
-               a->isLocal(),
-               a->ifhostname());
-    a->printTo(out);
+  out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
+  for (auto a : ifList) {
+    out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
+               a->iface().c_str(),
+               !a->addr().isV4(),
+               a->addr().isLocal(),
+               a->hostname(),
+               a->addr().toString().c_str());
 
     if (a->isLegacy()) {
       out.print(F(" / mask:"));
@@ -96,7 +99,7 @@ void setup() {
 
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(SSID, PSK);
+  WiFi.begin(STASSID, STAPSK);
 
   status(Serial);
 
@@ -141,6 +144,8 @@ void setup() {
   Serial.print(TCP_PORT);
   Serial.print(F(" - UDP server on port "));
   Serial.println(UDP_PORT);
+
+  statusPeriod.reset();
 }
 
 unsigned long statusTimeMs = 0;
@@ -174,9 +179,7 @@ void loop() {
   }
 
 
-  unsigned long now = millis();
-  if (now > statusTimeMs) {
-    statusTimeMs = now + STATUSDELAY_MS;
+  if (statusPeriod) {
     status(Serial);
   }
 

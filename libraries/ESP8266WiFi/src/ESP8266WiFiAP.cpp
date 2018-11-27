@@ -201,6 +201,15 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     }
     bool ret = true;
 
+    if (   !local_ip.isV4()
+        || !subnet.isV4()
+#if LWIP_IPV6
+        // uninitialized gateway is valid
+        || gateway.isV6()
+#endif
+       ) {
+        return false;
+    }
     struct ip_info info;
     info.ip.addr = local_ip.v4();
     info.gw.addr = gateway.v4();

@@ -173,7 +173,6 @@ class IPAddress: public Printable {
         void setV6() { IP_SET_TYPE_VAL(_ip, IPADDR_TYPE_V6); }
 
     protected:
-
         bool fromString6(const char *address);
 
 #else
@@ -186,6 +185,10 @@ class IPAddress: public Printable {
         void setV6() { }
 
 #endif
+
+    protected:
+        bool fromString4(const char *address);
+
 };
 
 extern CONST IPAddress IPNoAddress;
