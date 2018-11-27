@@ -19,6 +19,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include <PolledTimeout.h>
+#include <lwip/dns.h>
 
 #ifndef STASSID
   #define STASSID "your-ssid"
@@ -27,7 +28,7 @@
 
 #define FQDN  F("www.google.com") // with both IPv4 & IPv6 addresses
 #define FQDN6 F("ipv6.google.com") // does not resolve in IPv4
-#define STATUSDELAY_MS 30000
+#define STATUSDELAY_MS 10000
 #define TCP_PORT 23
 #define UDP_PORT 23
 
@@ -52,20 +53,18 @@ void status(Print& out) {
   out.println(F("------------------------------"));
   out.println(ESP.getFullVersion());
 
-  for (int i = 0; i < 3; i++) {
+  dns_setserver(DNS_MAX_SERVERS - 1, IPAddress(8, 8, 8, 8));
+
+  for (int i = 0; i < DNS_MAX_SERVERS; i++) {
     IPAddress dns = WiFi.dnsIP(i);
     if (dns.isSet()) {
-      out.print(F("dns"));
-      out.print(i);
-      out.print(F("="));
-      dns.printTo(out);
-      out.println();
+      out.printf("dns%d: %s\n", i, dns.toString().c_str());
     }
   }
 
   out.println(F("Try me at these addresses:"));
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
-  for (auto a : ifList) {
+  for (auto a : addrList) {
     out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
                a->iface().c_str(),
                !a->addr().isV4(),
@@ -74,11 +73,11 @@ void status(Print& out) {
                a->addr().toString().c_str());
 
     if (a->isLegacy()) {
-      out.print(F(" / mask:"));
-      a->netmask().printTo(out);
-      out.print(F(" / gw:"));
-      a->gw().printTo(out);
+      out.printf(" / mask:%s / gw:%s",
+                 a->netmask().toString().c_str(),
+                 a->gw().toString().c_str());
     }
+
     out.println();
   }
 
@@ -97,7 +96,6 @@ void setup() {
   Serial.println();
   Serial.println(ESP.getFullVersion());
 
-  WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
 
@@ -155,7 +153,6 @@ void loop() {
   if (statusServer.hasClient()) {
     WiFiClient cli = statusServer.available();
     status(cli);
-    cli.stop();
   }
 
   // if there's data available, read a packet
