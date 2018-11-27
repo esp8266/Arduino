@@ -102,15 +102,6 @@ SECTIONS
 #ifdef VTABLES_IN_FLASH
     *(.rodata._ZTV*) /* C++ vtables */
 #endif
-    /* Exception stuff */
-    *(.rodata._ZTIN*)
-    *(.rodata._ZTSN*)
-    *(.rodata._ZZSt*)
-    *(.rodata._ZTISt*)
-    *(.rodata._ZTIN*)
-    *(.rodata._ZTSSt*)
-    /* __FUNCTION__ locals */
-    *(.rodata._ZZ*__FUNCTION__)
 
     *libgcc.a:unwind-dw2.o(.literal .text .rodata .literal.* .text.* .rodata.*)
     *libgcc.a:unwind-dw2-fde.o(.literal .text .rodata .literal.* .text.* .rodata.*)
@@ -143,6 +134,18 @@ SECTIONS
     *libwpa2.a:(.literal.* .text.*)
     *libwps.a:(.literal.* .text.*)
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom0.text.* .irom.text .irom.text.*)
+
+    /* __FUNCTION__ locals */
+    *(.rodata._ZZ*__FUNCTION__)
+
+    /* std::* exception strings, in their own section to allow string coalescing */
+    *(.irom.exceptiontext)
+
+    /* c++ typeof IDs, etc. */
+    *(.rodata._ZTIN* .rodata._ZTSN10* .rodata._ZTISt* .rodata._ZTSSt*)
+
+    /* Fundamental type info */
+    *(.rodata._ZTIPKc .rodata._ZTIc .rodata._ZTIv .rodata._ZTSv .rodata._ZTSc .rodata._ZTSPKc .rodata._ZTSi .rodata._ZTIi)
 
     . = ALIGN(4);
     *(.gcc_except_table .gcc_except_table.*)
