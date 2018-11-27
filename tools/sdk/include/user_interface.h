@@ -38,8 +38,7 @@ typedef struct ip4_addr ipv4_addr_t;
 #endif
 
 #else
-#include "ip_addr.h"
-#error
+#error LWIP_OPEN_SRC must be defined
 #endif
 
 #include "queue.h"
