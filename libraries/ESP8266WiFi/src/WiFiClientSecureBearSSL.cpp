@@ -34,23 +34,31 @@ extern "C" {
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"
 #include "WiFiClientSecureBearSSL.h"
+#include "StackThunk.h"
 #include "lwip/opt.h"
 #include "lwip/ip.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include "lwip/netif.h"
-#include "include/ClientContext.h"
+#include <include/ClientContext.h>
 #include "c_types.h"
 #include "coredecls.h"
 
+#if !CORE_MOCK
+
+// The BearSSL thunks in use for now
+#define br_ssl_engine_recvapp_ack thunk_br_ssl_engine_recvapp_ack
+#define br_ssl_engine_recvapp_buf thunk_br_ssl_engine_recvapp_buf
+#define br_ssl_engine_recvrec_ack thunk_br_ssl_engine_recvrec_ack
+#define br_ssl_engine_recvrec_buf thunk_br_ssl_engine_recvrec_buf
+#define br_ssl_engine_sendapp_ack thunk_br_ssl_engine_sendapp_ack
+#define br_ssl_engine_sendapp_buf thunk_br_ssl_engine_sendapp_buf
+#define br_ssl_engine_sendrec_ack thunk_br_ssl_engine_sendrec_ack
+#define br_ssl_engine_sendrec_buf thunk_br_ssl_engine_sendrec_buf
+
+#endif
+
 namespace BearSSL {
-
-// BearSSL needs a very large stack, larger than the entire ESP8266 Arduino
-// default one.  This shared_pointer is allocated on first use and cleared
-// on last cleanup, with only one stack no matter how many SSL objects.
-std::shared_ptr<uint8_t> WiFiClientSecure::_bearssl_stack = nullptr;
-
-
 
 void WiFiClientSecure::_clear() {
   // TLS handshake may take more than the 5 second default timeout
@@ -91,16 +99,7 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   _clear();
   _clearAuthenticationSettings();
   _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
-  _ensureStackAvailable();
-  _local_bearssl_stack = _bearssl_stack;
-}
-
-void WiFiClientSecure::_ensureStackAvailable() {
-  if (!_bearssl_stack) {
-    const int stacksize = 4500; // Empirically determined stack for EC and RSA connections
-    _bearssl_stack = std::shared_ptr<uint8_t>(new uint8_t[stacksize], std::default_delete<uint8_t[]>());
-    br_esp8266_stack_proxy_init(_bearssl_stack.get(), stacksize);
-  }
+  stack_thunk_add_ref();
 }
 
 WiFiClientSecure::~WiFiClientSecure() {
@@ -110,11 +109,8 @@ WiFiClientSecure::~WiFiClientSecure() {
   }
   free(_cipher_list);
   _freeSSL();
-  _local_bearssl_stack = nullptr;
-  // If there are no other uses than the initial creation, free the stack
-  if (_bearssl_stack.use_count() == 1) {
-    _bearssl_stack = nullptr;
-  }
+  // Serial.printf("Max stack usage: %d bytes\n", br_thunk_get_max_usage());
+  stack_thunk_del_ref();
   if (_deleteChainKeyTA) {
     delete _ta;
     delete _chain;
@@ -127,8 +123,7 @@ WiFiClientSecure::WiFiClientSecure(ClientContext* client,
                                      int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
-  _ensureStackAvailable();
-  _local_bearssl_stack = _bearssl_stack;
+  stack_thunk_add_ref();
   _iobuf_in_size = iobuf_in_size;
   _iobuf_out_size = iobuf_out_size;
   _client = client;
@@ -146,8 +141,7 @@ WiFiClientSecure::WiFiClientSecure(ClientContext *client,
                                      int iobuf_in_size, int iobuf_out_size, const X509List *client_CA_ta) {
   _clear();
   _clearAuthenticationSettings();
-  _ensureStackAvailable();
-  _local_bearssl_stack = _bearssl_stack;
+  stack_thunk_add_ref();
   _iobuf_in_size = iobuf_in_size;
   _iobuf_out_size = iobuf_out_size;
   _client = client;
@@ -224,7 +218,7 @@ int WiFiClientSecure::connect(const char* name, uint16_t port) {
   return _connectSSL(name);
 }
 
-int WiFiClientSecure::connect(const String host, uint16_t port) {
+int WiFiClientSecure::connect(const String& host, uint16_t port) {
   return connect(host.c_str(), port);
 }
 
@@ -1114,7 +1108,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(const char* name, uint16_t port, u
   return WiFiClientSecure::probeMaxFragmentLength(remote_addr, port, len);
 }
 
-bool WiFiClientSecure::probeMaxFragmentLength(const String host, uint16_t port, uint16_t len) {
+bool WiFiClientSecure::probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len) {
   return WiFiClientSecure::probeMaxFragmentLength(host.c_str(), port, len);
 }
 
@@ -1378,52 +1372,5 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
   free(dest);
   return ret;
 }
-
-
-
-
-// Debug printout helpers for BearSSL library when libbearssl.a is compiled in debug mode
-// This is really only for debugging the core BearSSL library itself, and not the IDE
-// SSL debugging which should focus on the WiFiClientBearSSL objects.
-
-extern "C" {
-  extern size_t br_esp8266_stack_proxy_usage();
-
-  void _BearSSLCheckStack(const char *fcn, const char *file, int line) {
-    static int cnt = 0;
-    register uint32_t *sp asm("a1");
-    int freestack = 4 * (sp - g_pcont->stack);
-    int freeheap = ESP.getFreeHeap();
-    static int laststack, lastheap, laststack2;
-    if ((laststack != freestack) || (lastheap != freeheap) || (laststack2 != (int)br_esp8266_stack_proxy_usage())) {
-      Serial.printf("%s:%s(%d): FREESTACK=%d, STACK2USAGE=%d, FREEHEAP=%d\n", file, fcn, line, freestack, br_esp8266_stack_proxy_usage(), freeheap);
-      if (freestack < 256) {
-        Serial.printf("!!! Out of main stack space\n");
-      }
-      if (freeheap < 1024) {
-        Serial.printf("!!! Out of heap space\n");
-      }
-      Serial.flush();
-      laststack = freestack;
-      lastheap = freeheap;
-      laststack2 = (int)br_esp8266_stack_proxy_usage();
-    }
-    // BearSSL debug can get very chatty, add yields to avoid WDT
-    if (cnt == 100) {
-      yield();
-      cnt++;
-    }
-  }
-
-  void _BearSSLSerialPrint(const char *str) {
-    static int cnt = 0;
-    Serial.printf("%s", str);
-    // BearSSL debug can get very chatty, add yields to avoid WDT
-    if (cnt == 100) {
-      yield();
-      cnt++;
-    }
-  }
-};
 
 };

@@ -37,7 +37,7 @@ class WiFiClientSecure : public WiFiClient {
     ~WiFiClientSecure() override;
 
     int connect(IPAddress ip, uint16_t port) override;
-    int connect(const String host, uint16_t port) override;
+    int connect(const String& host, uint16_t port) override;
     int connect(const char* name, uint16_t port) override;
 
     uint8_t connected() override;
@@ -119,7 +119,7 @@ class WiFiClientSecure : public WiFiClient {
     // Check for Maximum Fragment Length support for given len
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
-    static bool probeMaxFragmentLength(const String host, uint16_t port, uint16_t len);
+    static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
 
     // AXTLS compatible wrappers
     // Cannot implement this mode, we need FP before we can connect: bool verify(const char* fingerprint, const char* domain_name)
@@ -227,13 +227,6 @@ class WiFiClientSecure : public WiFiClient {
 
     // AXTLS compatible mode needs to delete the stored certs and keys on destruction
     bool _deleteChainKeyTA;
-
-  private:
-    // Single memory buffer used for BearSSL auxilliary stack, insead of growing main Arduino stack for all apps
-    static std::shared_ptr<uint8_t> _bearssl_stack;
-    void _ensureStackAvailable(); // Allocate the stack if necessary
-    // The local copy, only used to enable a reference count
-    std::shared_ptr<uint8_t> _local_bearssl_stack;
 };
 
 };

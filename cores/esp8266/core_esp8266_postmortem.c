@@ -29,6 +29,7 @@
 #include "cont.h"
 #include "pgmspace.h"
 #include "gdb_hooks.h"
+#include "StackThunk.h"
 
 extern void __real_system_restart_local();
 
@@ -147,6 +148,17 @@ void __wrap_system_restart_local() {
         offset = 0x10;
     }
 
+    ets_printf_P("\n>>>stack>>>\n");
+
+    if (sp > stack_thunk_get_stack_bot() && sp <= stack_thunk_get_stack_top()) {
+        // BearSSL we dump the BSSL second stack and then reset SP back to the main cont stack
+        ets_printf_P("\nctx: bearssl \n");
+        ets_printf_P("sp: %08x end: %08x offset: %04x\n", sp, stack_thunk_get_stack_top(), offset);
+        print_stack(sp + offset, stack_thunk_get_stack_top());
+        offset = 0; // No offset needed anymore, the exception info was stored in the bssl stack
+        sp = stack_thunk_get_cont_sp();
+    }
+
     if (sp > cont_stack_start && sp < cont_stack_end) {
         ets_printf_P("\nctx: cont \n");
         stack_end = cont_stack_end;
@@ -162,6 +174,8 @@ void __wrap_system_restart_local() {
 
     print_stack(sp + offset, stack_end);
 
+    ets_printf_P("<<<stack<<<\n");
+
     // Use cap-X formatting to ensure the standard EspExceptionDecoder doesn't match the address
     if (umm_last_fail_alloc_addr) {
       ets_printf_P("\nlast failed alloc call: %08X(%d)\n", (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
@@ -175,7 +189,6 @@ void __wrap_system_restart_local() {
 
 
 static void ICACHE_RAM_ATTR print_stack(uint32_t start, uint32_t end) {
-    ets_printf_P("\n>>>stack>>>\n");
     for (uint32_t pos = start; pos < end; pos += 0x10) {
         uint32_t* values = (uint32_t*)(pos);
 
@@ -185,7 +198,6 @@ static void ICACHE_RAM_ATTR print_stack(uint32_t start, uint32_t end) {
         ets_printf_P("%08x:  %08x %08x %08x %08x %c\n",
             pos, values[0], values[1], values[2], values[3], (looksLikeStackFrame)?'<':' ');
     }
-    ets_printf_P("<<<stack<<<\n");
 }
 
 static void uart_write_char_d(char c) {
