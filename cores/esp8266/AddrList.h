@@ -1,5 +1,5 @@
 /*
- IfList.h - cycle through lwIP netif's ip addresses like a c++ list
+ AddrList.h - cycle through lwIP netif's ip addresses like a c++ list
  Copyright (c) 2018 david gauchard.  All right reserved.
 
  This library is free software; you can redistribute it and/or
@@ -72,8 +72,8 @@
       }
 */
 
-#ifndef __IFLIST_H
-#define __IFLIST_H
+#ifndef __ADDRLIST_H
+#define __ADDRLIST_H
 
 #include <IPAddress.h>
 #include <lwip/netif.h>
@@ -85,7 +85,7 @@
 #endif
 
 
-class IfListClass {
+class AddrListClass {
 
     // no member in this class
     // lwIP's global 'struct netif* netif_list' is used
@@ -131,6 +131,7 @@ class IfListClass {
                 const const_iterator* operator-> () const { return  this; }
 
                 bool isLegacy() const { return _num == 0; }
+                bool isLocal() const { return addr().isLocal(); }
                 IPAddress addr () const { return _ip_from_netif_num(); }
                 IPAddress netmask () const { return _netif->netmask; }
                 IPAddress gw () const { return _netif->gw; }
@@ -162,6 +163,6 @@ class IfListClass {
         const const_iterator end   () const { return const_iterator(false); }
 };
 
-extern IfListClass ifList;
+extern AddrListClass addrList;
 
-#endif // __IFLIST_H
+#endif // __ADDRLIST_H
