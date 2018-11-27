@@ -124,3 +124,8 @@ void _exit(int status) {
     (void) status;
     abort();
 }
+
+int atexit(void (*func)()) {
+    (void) func;
+    return 0;
+}
