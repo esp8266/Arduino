@@ -150,14 +150,14 @@ static void do_global_ctors(void) {
         (*--p)();
 }
 
-void __gnu_cxx::__verbose_terminate_handler ()
-{
-      panic();
-}
+extern "C" { extern void __unhandled_exception(); }
+
+
 
 void init_done() {
     system_set_os_print(1);
     gdb_init();
+    std::set_terminate(__unhandled_exception);
     do_global_ctors();
     esp_schedule();
 }
