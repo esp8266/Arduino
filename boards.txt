@@ -1119,19 +1119,27 @@ inventone.menu.eesz.4M3M.build.spiffs_blocksize=8192
 inventone.menu.ip.lm2f=v2 Lower Memory
 inventone.menu.ip.lm2f.build.lwip_include=lwip2/include
 inventone.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
-inventone.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1
+inventone.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
 inventone.menu.ip.hb2f=v2 Higher Bandwidth
 inventone.menu.ip.hb2f.build.lwip_include=lwip2/include
 inventone.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
-inventone.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1
+inventone.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
 inventone.menu.ip.lm2n=v2 Lower Memory (no features)
 inventone.menu.ip.lm2n.build.lwip_include=lwip2/include
 inventone.menu.ip.lm2n.build.lwip_lib=-llwip2-536
-inventone.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0
+inventone.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
 inventone.menu.ip.hb2n=v2 Higher Bandwidth (no features)
 inventone.menu.ip.hb2n.build.lwip_include=lwip2/include
 inventone.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
-inventone.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0
+inventone.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+inventone.menu.ip.lm6f=v2 IPv6 Lower Memory
+inventone.menu.ip.lm6f.build.lwip_include=lwip2/include
+inventone.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+inventone.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+inventone.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+inventone.menu.ip.hb6f.build.lwip_include=lwip2/include
+inventone.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+inventone.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 inventone.menu.ip.hb1=v1.4 Higher Bandwidth
 inventone.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 inventone.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
