@@ -510,11 +510,7 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-#if LWIP_VERSION_MAJOR == 1
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg);
-#else
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
-#endif
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
 
 static bool _dns_lookup_pending = false;
 
@@ -545,13 +541,13 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
     if(err == ERR_OK) {
-        aResult = addr.addr;
+        aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
         _dns_lookup_pending = true;
         delay(timeout_ms);
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
-        if(aResult != 0) {
+        if(aResult.isSet()) {
             err = ERR_OK;
         }
     }
@@ -571,18 +567,14 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-#if LWIP_VERSION_MAJOR == 1
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg)
-#else
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
-#endif
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
 {
     (void) name;
     if (!_dns_lookup_pending) {
         return;
     }
     if(ipaddr) {
-        (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
+        (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
     }
     esp_schedule(); // resume the hostByName function
 }
