@@ -2378,7 +2378,7 @@
  * LWIP_IPV6==1: Enable IPv6
  */
 #if !defined LWIP_IPV6 || defined __DOXYGEN__
-#define LWIP_IPV6                       0
+#error LWIP_IPV6 must be defined
 #endif
 
 /**
@@ -3531,7 +3531,7 @@
 */
 
 #ifndef LWIP_FEATURES
-#error LWIP_FEATURES is not defined
+#error LWIP_FEATURES must be defined
 #endif
 
 /*
