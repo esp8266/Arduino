@@ -109,6 +109,8 @@ SECTIONS
     *(.rodata._ZTISt*)
     *(.rodata._ZTIN*)
     *(.rodata._ZTSSt*)
+    /* __FUNCTION__ locals */
+    *(.rodata._ZZ*__FUNCTION__)
 
     *libgcc.a:unwind-dw2.o(.literal .text .rodata .literal.* .text.* .rodata.*)
     *libgcc.a:unwind-dw2-fde.o(.literal .text .rodata .literal.* .text.* .rodata.*)
