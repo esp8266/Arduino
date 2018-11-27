@@ -77,7 +77,7 @@ class IPAddress: public Printable {
         // Overloaded cast operator to allow IPAddress objects to be used where a pointer
         // to a four-byte uint8_t array is expected
         operator uint32_t() const {
-            return isV4()? v4(): 0;
+            return isV4()? v4(): (uint32_t)0;
         }
 
         // the above uint32_t() cast can be ambiguous
