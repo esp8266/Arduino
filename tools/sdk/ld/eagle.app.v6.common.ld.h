@@ -118,6 +118,8 @@ SECTIONS
     *liblwip2-1460.a:(.literal .text .literal.* .text.*)
     *liblwip2-536-feat.a:(.literal .text .literal.* .text.*)
     *liblwip2-1460-feat.a:(.literal .text .literal.* .text.*)
+    *liblwip6-536-feat.a:(.literal .text .literal.* .text.*)
+    *liblwip6-1460-feat.a:(.literal .text .literal.* .text.*)
     *libbearssl.a:(.literal .text .literal.* .text.*)
     *libaxtls.a:(.literal .text .literal.* .text.*)
     *libat.a:(.literal.* .text.*)
