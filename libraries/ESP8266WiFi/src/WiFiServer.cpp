@@ -68,6 +68,8 @@ void WiFiServer::begin(uint16_t port) {
         return;
 
     pcb->so_options |= SOF_REUSEADDR;
+
+    // (IPAddress _addr) operator-converted to (const ip_addr_t*)
     err = tcp_bind(pcb, _addr, _port);
 
     if (err != ERR_OK) {
