@@ -9,7 +9,7 @@
   A 'clock' service in announced via the MDNS responder and the current
   time is set as a TXT item (eg. 'curtime=Mon Oct 15 19:54:35 2018').
   The time value is updated every second!
-  
+
   The ESP is initially announced to clients as 'esp8266.local', if this host domain
   is already used in the local network, another host domain is negociated. Keep an
   eye to the serial output to learn the final host domain for the clock service.
@@ -37,23 +37,23 @@
 #include <time.h>
 
 /*
- * Include the MDNSResponder (the library needs to be included also)
- * As LEA MDNSResponder is experimantal in the ESP8266 environment currently, the
- * legacy MDNSResponder is defaulted in th include file.
- * There are two ways to access LEA MDNSResponder:
- * 1. Prepend every declaration and call to global declarations or functions with the namespace, like:
- *    'LEAmDNS::MDNSResponder::hMDNSService  hMDNSService;'
- *    This way is used in the example. But be careful, if the namespace declaration is missing
- *    somewhere, the call might go to the legacy implementation...
- * 2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
- *
- */
+   Include the MDNSResponder (the library needs to be included also)
+   As LEA MDNSResponder is experimantal in the ESP8266 environment currently, the
+   legacy MDNSResponder is defaulted in th include file.
+   There are two ways to access LEA MDNSResponder:
+   1. Prepend every declaration and call to global declarations or functions with the namespace, like:
+      'LEAmDNS::MDNSResponder::hMDNSService  hMDNSService;'
+      This way is used in the example. But be careful, if the namespace declaration is missing
+      somewhere, the call might go to the legacy implementation...
+   2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
+
+*/
 #include <ESP8266mDNS.h>
 #include <LEATimeFlag.h>
 
 /*
- * Global defines and vars
- */
+   Global defines and vars
+*/
 
 #define TIMEZONE_OFFSET     1                                   // CET
 #define DST_OFFSET          1                                   // CEST
@@ -62,8 +62,8 @@
 #define SERVICE_PORT        80                                  // HTTP port
 
 #ifndef STASSID
-#define STASSID "your-ssid"
-#define STAPSK  "your-password"
+  #define STASSID "your-ssid"
+  #define STAPSK  "your-password"
 #endif
 
 const char*                                     ssid                    = STASSID;
@@ -78,8 +78,8 @@ WiFiServer                                      server(SERVICE_PORT);
 
 
 /*
- * getTimeString
- */
+   getTimeString
+*/
 const char* getTimeString(void) {
 
   static char   acTimeString[32];
@@ -95,10 +95,10 @@ const char* getTimeString(void) {
 
 
 /*
- * setClock
- *
- * Set time via NTP
- */
+   setClock
+
+   Set time via NTP
+*/
 void setClock(void) {
   configTime((TIMEZONE_OFFSET * 3600), (DST_OFFSET * 3600), "pool.ntp.org", "time.nist.gov", "time.windows.com");
 
@@ -115,8 +115,8 @@ void setClock(void) {
 
 
 /*
- * setStationHostname
- */
+   setStationHostname
+*/
 bool setStationHostname(const char* p_pcHostname) {
 
   if (p_pcHostname) {
@@ -128,20 +128,20 @@ bool setStationHostname(const char* p_pcHostname) {
 
 
 /*
- * MDNSDynamicServiceTxtCallback
- *
- * Add a dynamic MDNS TXT item 'ct' to the clock service.
- * The callback function is called every time, the TXT items for the clock service
- * are needed.
- * This can be triggered by calling MDNS.announce().
- *
- */
+   MDNSDynamicServiceTxtCallback
+
+   Add a dynamic MDNS TXT item 'ct' to the clock service.
+   The callback function is called every time, the TXT items for the clock service
+   are needed.
+   This can be triggered by calling MDNS.announce().
+
+*/
 bool MDNSDynamicServiceTxtCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
                                    const LEAmDNS::MDNSResponder::hMDNSService p_hService,
                                    void* p_pUserdata) {
   Serial.println("MDNSDynamicServiceTxtCallback");
   (void) p_pUserdata;
-  
+
   if ((p_pMDNSResponder) &&
       (hMDNSService == p_hService)) {
     Serial.printf("Updating curtime TXT item to: %s\n", getTimeString());
@@ -152,15 +152,15 @@ bool MDNSDynamicServiceTxtCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
 
 
 /*
- * MDNSProbeResultCallback
- *
- * Probe result callback for the host domain.
- * If the domain is free, the host domain is set and the clock service is
- * added.
- * If the domain is already used, a new name is created and the probing is
- * restarted via p_pMDNSResponder->setHostname().
- *
- */
+   MDNSProbeResultCallback
+
+   Probe result callback for the host domain.
+   If the domain is free, the host domain is set and the clock service is
+   added.
+   If the domain is already used, a new name is created and the probing is
+   restarted via p_pMDNSResponder->setHostname().
+
+*/
 bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
                              const char* p_pcDomainName,
                              const LEAmDNS::MDNSResponder::hMDNSService p_hService,
@@ -168,7 +168,7 @@ bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
                              void* p_pUserdata) {
   Serial.println("MDNSProbeResultCallback");
   (void) p_pUserdata;
-  
+
   if ((p_pMDNSResponder) &&
       (0 == p_hService)) {  // Called for host domain
     Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName, (p_bProbeResult ? "free" : "already USED!"));
@@ -190,13 +190,11 @@ bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
             p_pMDNSResponder->setDynamicServiceTxtCallback(hMDNSService, MDNSDynamicServiceTxtCallback, 0);
           }
         }
-      }
-      else {
+      } else {
         // Change hostname, use '-' as divider between base name and index
         if (LEAmDNS::MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
           p_pMDNSResponder->setHostname(pcHostDomain);
-        }
-        else {
+        } else {
           Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
         }
       }
@@ -207,8 +205,8 @@ bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
 
 
 /*
- * handleHTTPClient
- */
+   handleHTTPClient
+*/
 void handleHTTPClient(WiFiClient& client) {
   Serial.println("");
   Serial.println("New client");
@@ -239,7 +237,7 @@ void handleHTTPClient(WiFiClient& client) {
   time_t now = time(nullptr);;
   struct tm timeinfo;
   gmtime_r(&now, &timeinfo);
- 
+
   String s;
   if (req == "/") {
     IPAddress ip = WiFi.localIP();
@@ -263,11 +261,11 @@ void handleHTTPClient(WiFiClient& client) {
 
 
 /*
- * setup
- */
+   setup
+*/
 void setup(void) {
   Serial.begin(115200);
-  
+
   // Connect to WiFi network
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -283,10 +281,10 @@ void setup(void) {
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-  
+
   // Sync clock
   setClock();
-  
+
   // Setup MDNS responder
   LEAmDNS::MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
   // Init the (currently empty) host domain string with 'esp8266'
@@ -306,23 +304,23 @@ void setup(void) {
 
 
 /*
- * loop
- */
+   loop
+*/
 void loop(void) {
   // Check if a client has connected
   WiFiClient    client = server.available();
   if (client) {
     handleHTTPClient(client);
   }
-  
+
   // Allow MDNS processing
   LEAmDNS::MDNS.update();
-  
+
   // Update time (if needed)
   //static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
   static clsLEATimeFlag timeFlag(UPDATE_CYCLE);
   if (timeFlag.flagged()/*ulNextTimeUpdate < millis()*/) {
-      
+
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item

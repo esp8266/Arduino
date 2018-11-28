@@ -9,7 +9,7 @@
   A list of 'HTTP' services in the local network is created and kept up to date.
   In addition to this, a (very simple) HTTP server is set up on port 80
   and announced as a service.
-  
+
   The ESP itself is initially announced to clients as 'esp8266.local', if this host domain
   is already used in the local network, another host domain is negociated. Keep an
   eye to the serial output to learn the final host domain for the HTTP service.
@@ -34,28 +34,28 @@
 #include <WiFiClient.h>
 
 /*
- * Include the MDNSResponder (the library needs to be included also)
- * As LEA MDNSResponder is experimantal in the ESP8266 environment currently, the
- * legacy MDNSResponder is defaulted in th include file.
- * There are two ways to access LEA MDNSResponder:
- * 1. Prepend every declaration and call to global declarations or functions with the namespace, like:
- *    'LEAmDNS:MDNSResponder::hMDNSService  hMDNSService;'
- *    This way is used in the example. But be careful, if the namespace declaration is missing
- *    somewhere, the call might go to the legacy implementation...
- * 2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
- *
- */
+   Include the MDNSResponder (the library needs to be included also)
+   As LEA MDNSResponder is experimantal in the ESP8266 environment currently, the
+   legacy MDNSResponder is defaulted in th include file.
+   There are two ways to access LEA MDNSResponder:
+   1. Prepend every declaration and call to global declarations or functions with the namespace, like:
+      'LEAmDNS:MDNSResponder::hMDNSService  hMDNSService;'
+      This way is used in the example. But be careful, if the namespace declaration is missing
+      somewhere, the call might go to the legacy implementation...
+   2. Open 'ESP8266mDNS.h' and set LEAmDNS to default.
+
+*/
 #include <ESP8266mDNS.h>
 
 /*
- * Global defines and vars
- */
+   Global defines and vars
+*/
 
 #define SERVICE_PORT                                    80                                  // HTTP port
 
 #ifndef STASSID
-#define STASSID "your-ssid"
-#define STAPSK  "your-password"
+  #define STASSID "your-ssid"
+  #define STAPSK  "your-password"
 #endif
 
 const char*                                             ssid                    = STASSID;
@@ -74,8 +74,8 @@ WiFiServer                                              server(SERVICE_PORT);
 
 
 /*
- * setStationHostname
- */
+   setStationHostname
+*/
 bool setStationHostname(const char* p_pcHostname) {
 
   if (p_pcHostname) {
@@ -87,8 +87,8 @@ bool setStationHostname(const char* p_pcHostname) {
 
 
 /*
- * MDNSServiceQueryCallback
- */
+   MDNSServiceQueryCallback
+*/
 bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,                           // The MDNS responder object
                               const LEAmDNS::MDNSResponder::hMDNSServiceQuery p_hServiceQuery,    // Handle to the service query
                               uint32_t p_u32AnswerIndex,                                          // Index of the updated answer
@@ -97,59 +97,53 @@ bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,         
                               void* p_pUserdata) {                                                // pUserdata; here '0', as none set via 'installServiceQuery'
   (void) p_pUserdata;
   Serial.printf("MDNSServiceQueryCallback\n");
-  
+
   if ((p_pMDNSResponder) &&
       (hMDNSServiceQuery == p_hServiceQuery)) {
-    
+
     if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_ServiceDomain & p_u32ServiceQueryAnswerMask) {
       Serial.printf("MDNSServiceQueryCallback: Service domain '%s' %s index %u\n",
                     p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex),
                     (p_bSetContent ? "added at" : "removed from"),
                     p_u32AnswerIndex);
-    }
-    else if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort & p_u32ServiceQueryAnswerMask) {
+    } else if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort & p_u32ServiceQueryAnswerMask) {
       if (p_bSetContent) {
         Serial.printf("MDNSServiceQueryCallback: Host domain and port added/updated for service '%s': %s:%u\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex),
                       p_pMDNSResponder->answerHostDomain(p_hServiceQuery, p_u32AnswerIndex),
                       p_pMDNSResponder->answerPort(p_hServiceQuery, p_u32AnswerIndex));
-      }
-      else {
+      } else {
         Serial.printf("MDNSServiceQueryCallback: Host domain and port removed from service '%s'\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex));
       }
-    }
-    else if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_IP4Address & p_u32ServiceQueryAnswerMask) {
+    } else if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_IP4Address & p_u32ServiceQueryAnswerMask) {
       if (p_bSetContent) {
         Serial.printf("MDNSServiceQueryCallback: IP4 address added/updated for service '%s':\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex));
-        for (uint32_t u=0; u<p_pMDNSResponder->answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex); ++u) {
+        for (uint32_t u = 0; u < p_pMDNSResponder->answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex); ++u) {
           Serial.printf("- %s\n", p_pMDNSResponder->answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u).toString().c_str());
         }
-      }
-      else {
+      } else {
         Serial.printf("MDNSServiceQueryCallback: IP4 address removed from service '%s'\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex));
       }
-    }
-    else if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_Txts & p_u32ServiceQueryAnswerMask) {
+    } else if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_Txts & p_u32ServiceQueryAnswerMask) {
       if (p_bSetContent) {
         Serial.printf("MDNSServiceQueryCallback: TXT items added/updated for service '%s': %s\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex),
                       p_pMDNSResponder->answerTxts(p_hServiceQuery, p_u32AnswerIndex));
-      }
-      else {
+      } else {
         Serial.printf("MDNSServiceQueryCallback: TXT items removed from service '%s'\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex));
       }
     }
-    
+
     //
     // Create the current list of 'http.tcp' services
     uint32_t    u32Answers = p_pMDNSResponder->answerCount(p_hServiceQuery);
     if (u32Answers) {
       strHTTPServices = "";
-      for (uint32_t u=0; u<u32Answers; ++u) {
+      for (uint32_t u = 0; u < u32Answers; ++u) {
         // Index and service domain
         strHTTPServices += u;
         strHTTPServices += ": ";
@@ -157,7 +151,7 @@ bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,         
         // Host domain and port
         if ((p_pMDNSResponder->hasAnswerHostDomain(p_hServiceQuery, u)) &&
             (p_pMDNSResponder->hasAnswerPort(p_hServiceQuery, u))) {
-          
+
           strHTTPServices += " at ";
           strHTTPServices += p_pMDNSResponder->answerHostDomain(p_hServiceQuery, u);
           strHTTPServices += ":";
@@ -166,7 +160,7 @@ bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,         
         // IP4 address
         if (p_pMDNSResponder->hasAnswerIP4Address(p_hServiceQuery, u)) {
           strHTTPServices += " IP4: ";
-          for (uint32_t u2=0; u2<p_pMDNSResponder->answerIP4AddressCount(p_hServiceQuery, u); ++u2) {
+          for (uint32_t u2 = 0; u2 < p_pMDNSResponder->answerIP4AddressCount(p_hServiceQuery, u); ++u2) {
             if (0 != u2) {
               strHTTPServices += ", ";
             }
@@ -180,8 +174,7 @@ bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,         
         }
         strHTTPServices += "<br/>";
       }
-    }
-    else {
+    } else {
       strHTTPServices = cstrNoHTTPServices;
     }
   }
@@ -190,27 +183,27 @@ bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,         
 
 
 /*
- * MDNSProbeResultCallback
- *
- * Probe result callback for the host domain.
- * If the domain is free, the host domain is set and the http service is
- * added.
- * If the domain is already used, a new name is created and the probing is
- * restarted via p_pMDNSResponder->setHostname().
- *
- */
+   MDNSProbeResultCallback
+
+   Probe result callback for the host domain.
+   If the domain is free, the host domain is set and the http service is
+   added.
+   If the domain is already used, a new name is created and the probing is
+   restarted via p_pMDNSResponder->setHostname().
+
+*/
 bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
                              const char* p_pcDomainName,
                              const LEAmDNS::MDNSResponder::hMDNSService p_hService,
                              bool p_bProbeResult,
                              void* p_pUserdata) {
   (void) p_pUserdata;
-  
+
   if ((p_pMDNSResponder) &&
       (0 == p_hService)) {  // Called for host domain
-    
+
     Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName, (p_bProbeResult ? "free" : "already USED!"));
-    
+
     if (true == p_bProbeResult) {
       // Set station hostname
       setStationHostname(pcHostDomain);
@@ -229,25 +222,22 @@ bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
             p_pMDNSResponder->addServiceTxt(hMDNSService, "password", "");
             p_pMDNSResponder->addServiceTxt(hMDNSService, "path", "/");
           }
-          
+
           // Install dynamic 'http.tcp' service query
           if (!hMDNSServiceQuery) {
             hMDNSServiceQuery = p_pMDNSResponder->installServiceQuery("http", "tcp", MDNSServiceQueryCallback, 0);
             if (hMDNSServiceQuery) {
               Serial.printf("MDNSProbeResultCallback: Service query for 'http.tcp' services installed.\n");
-            }
-            else {
+            } else {
               Serial.printf("MDNSProbeResultCallback: FAILED to install service query for 'http.tcp' services!\n");
             }
           }
         }
-      }
-      else {
+      } else {
         // Change hostname, use '-' as divider between base name and index
         if (LEAmDNS::MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
           p_pMDNSResponder->setHostname(pcHostDomain);
-        }
-        else {
+        } else {
           Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
         }
       }
@@ -258,8 +248,8 @@ bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
 
 
 /*
- * handleHTTPClient
- */
+   handleHTTPClient
+*/
 void handleHTTPClient(WiFiClient& client) {
   Serial.println("");
   Serial.println("New client");
@@ -285,7 +275,7 @@ void handleHTTPClient(WiFiClient& client) {
   Serial.print("Request: ");
   Serial.println(req);
   client.flush();
- 
+
   String s;
   if (req == "/") {
     IPAddress ip = WiFi.localIP();
@@ -309,12 +299,12 @@ void handleHTTPClient(WiFiClient& client) {
 
 
 /*
- * setup
- */
+   setup
+*/
 void setup(void) {
   Serial.begin(115200);
   Serial.setDebugOutput(false);
-  
+
   // Connect to WiFi network
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -330,7 +320,7 @@ void setup(void) {
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-  
+
   // Setup MDNS responder
   LEAmDNS::MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
   // Init the (currently empty) host domain string with 'esp8266'
@@ -350,15 +340,15 @@ void setup(void) {
 
 
 /*
- * loop
- */
+   loop
+*/
 void loop(void) {
   // Check if a client has connected
   WiFiClient    client = server.available();
   if (client) {
     handleHTTPClient(client);
   }
-  
+
   // Allow MDNS processing
   LEAmDNS::MDNS.update();
 }
