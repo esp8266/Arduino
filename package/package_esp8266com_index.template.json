@@ -178,49 +178,49 @@
         },
         {
           "name": "xtensa-lx106-elf-gcc",
-          "version": "1.20.0-26-gb404fb9-2",
+          "version": "2.5.0-b95d7d6",
           "systems": [
             {
-              "host": "i686-mingw32",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "archiveFileName": "win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "checksum": "SHA-256:10476b9c11a7a90f40883413ddfb409f505b20692e316c4e597c4c175b4be09c",
-              "size": "153527527"
-            },
-            {
-              "host": "x86_64-apple-darwin",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
-              "size": "35385382"
-            },
-            {
-              "host": "i386-apple-darwin",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
-              "size": "35385382"
-            },
-            {
-              "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0/x86_64-linux-gnu.xtensa-lx106-elf-8fb0c7a.tar.gz",
-              "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-8fb0c7a.tar.gz",
-              "checksum": "SHA-256:e90e785d57e1c9aa10acbb946501626a84eb26328e70caf3ffce7b14d67f8963",
-              "size": "39481780"
-            },
-            {
-              "host": "i686-pc-linux-gnu",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/linux32-xtensa-lx106-elf.tar.gz",
-              "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz",
-              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a",
-              "size": "32734156"
+              "host": "aarch64-linux-gnu",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0/aarch64-linux-gnu.xtensa-lx106-elf-b95d7d6.tar.gz",
+              "archiveFileName": "aarch64-linux-gnu.xtensa-lx106-elf-b95d7d6.tar.gz",
+              "checksum": "SHA-256:7adcb977bb75a3bc40d0c9d1a2f39ae709478c74ed9d9f48d06cfd35445dfcc4",
+              "size": "38099401"
             },
             {
               "host": "arm-linux-gnueabihf",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
-              "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
-              "checksum": "SHA-256:f693946288f2ffa17288ef75ae16fa08573993f2b0a2a5e6bc35a68dc6087443",
-              "size": "34938475"
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0/arm-linux-gnueabihf.xtensa-lx106-elf-b95d7d6.tar.gz",
+              "archiveFileName": "arm-linux-gnueabihf.xtensa-lx106-elf-b95d7d6.tar.gz",
+              "checksum": "SHA-256:f83890f4f888ff505ac04902f529f14a97b11145b2c5f0388bc9816799da2fbd",
+              "size": "34024967"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0/i686-w64-mingw32.xtensa-lx106-elf-b95d7d6.zip",
+              "archiveFileName": "i686-w64-mingw32.xtensa-lx106-elf-b95d7d6.zip",
+              "checksum": "SHA-256:a9d5a384b54c2b75e6c3c5d34483f773a8d4c08cf69ae46bbe8d79adfcbada3f",
+              "size": "69353057"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0/x86_64-apple-darwin14.xtensa-lx106-elf-b95d7d6.tar.gz",
+              "archiveFileName": "x86_64-apple-darwin14.xtensa-lx106-elf-b95d7d6.tar.gz",
+              "checksum": "SHA-256:7b862ea1233e4d128cfff54b5d667df2ff0408e3f5b92fda76dfbeb729dfff3d",
+              "size": "41797628"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0/x86_64-linux-gnu.xtensa-lx106-elf-b95d7d6.tar.gz",
+              "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-b95d7d6.tar.gz",
+              "checksum": "SHA-256:d9563286931abc126198796af312b1e118a8646a8a0f9d9da80a73d054960a4a",
+              "size": "40552715"
+            },
+            {
+              "host": "x86_64-mingw32",
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0/x86_64-w64-mingw32.xtensa-lx106-elf-b95d7d6.zip",
+              "archiveFileName": "x86_64-w64-mingw32.xtensa-lx106-elf-b95d7d6.zip",
+              "checksum": "SHA-256:c98ef31d32bd518810a918f2f4882ce1ca6d22975d67170ce91bec31c9b3d06e",
+              "size": "73636243"
             }
           ]
         },
