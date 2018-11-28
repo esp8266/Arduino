@@ -23,7 +23,7 @@
  */
 
 #include "LEAmDNS_Priv.h"
-
+#include "LEAmDNS_lwIPdefs.h"
 
 /*
  * namespace LEAmDNS

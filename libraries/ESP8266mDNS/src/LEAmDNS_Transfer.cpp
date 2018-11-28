@@ -26,8 +26,7 @@ extern "C" {
     #include "user_interface.h"
 }
 
-#include "lwip/prot/dns.h"  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
-
+#include "LEAmDNS_lwIPdefs.h"
 #include "LEAmDNS_Priv.h"
 
 
@@ -118,7 +117,11 @@ bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParamet
     ip_addr_t   ifFromAddress;
     ifFromAddress.addr = _getResponseMulticastInterface(p_iWiFiOpMode);
     IPAddress   fromIPAddress(ifFromAddress.addr);
+#if LWIP_VERSION_MAJOR == 1
+    m_pUDPContext->setMulticastInterface(ifFromAddress);
+#else
     m_pUDPContext->setMulticastInterface(&ifFromAddress);
+#endif
 
     ip_addr_t   toMulticastAddress;
 #ifdef MDNS_IP4_SUPPORT

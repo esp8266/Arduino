@@ -23,8 +23,8 @@
  */
 
 #include "lwip/igmp.h"
-#include "lwip/prot/dns.h"  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
 
+#include "LEAmDNS_lwIPdefs.h"
 #include "LEAmDNS_Priv.h"
 
 /*

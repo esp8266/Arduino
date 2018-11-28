@@ -9,6 +9,7 @@ extern "C" {
 // TODO: put declarations here, get rid of -Wno-implicit-function-declaration
 
 #include <stdint.h>
+#include <stdlib.h> // size_t
 #include <cont.h> // g_pcont declaration
 
 extern bool timeshift64_is_set;
@@ -20,6 +21,9 @@ void settimeofday_cb (void (*cb)(void));
 void disable_extra4k_at_link_time (void) __attribute__((noinline));
 
 uint32_t sqrt32 (uint32_t n);
+
+// backported from lwIP-v2 for LEA's mDNS
+int lwip_strnicmp(const char* str1, const char* str2, size_t len);
 
 #ifdef __cplusplus
 }
