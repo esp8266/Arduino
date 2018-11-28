@@ -53,12 +53,14 @@ class ESP8266WiFiMulti {
         ~ESP8266WiFiMulti();
 
         bool addAP(const char* ssid, const char *passphrase = NULL);
+        bool existsAP(const char* ssid, const char *passphrase = NULL);
 
         wl_status_t run(void);
 
     private:
         WifiAPlist APlist;
         bool APlistAdd(const char* ssid, const char *passphrase = NULL);
+        bool APlistExists(const char* ssid, const char *passphrase = NULL);
         void APlistClean(void);
 
 };

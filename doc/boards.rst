@@ -219,6 +219,13 @@ The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development b
 
 Product page: https://www.adafruit.com/product/2821
 
+Invent One
+----------
+
+The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng
+
+Product page: https://inventone.ng
+
 XinaBox CW01
 ------------
 

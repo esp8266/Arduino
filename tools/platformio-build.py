@@ -135,34 +135,47 @@ flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
 #
 # lwIP
 #
-if "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY" in flatten_cppdefines:
+if "PIO_FRAMEWORK_ARDUINO_LWIP_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip", "include")],
+        LIBS=["lwip_gcc"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
-        LIBS=["lwip2-536-feat"]
+        LIBS=["lwip6-536-feat"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_HIGHER_BANDWIDTH" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip6-1460-feat"]
     )
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1)],
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
         LIBS=["lwip2-1460-feat"]
     )
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY_LOW_FLASH" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 0)],
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
         LIBS=["lwip2-536"]
     )
 elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH_LOW_FLASH" in flatten_cppdefines:
     env.Append(
-        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 0)],
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
         CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
         LIBS=["lwip2-1460"]
     )
+# PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY (default)
 else:
     env.Append(
-        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip", "include")],
-        LIBS=["lwip_gcc"]
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-536-feat"]
     )
 
 #

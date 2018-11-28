@@ -326,6 +326,23 @@ boards = collections.OrderedDict([
                   'Product page: https://www.adafruit.com/product/2821'
                   ],
     }),
+	( 'inventone', {
+        'name': 'Invent One',
+        'opts': {
+            '.build.board': 'ESP8266_GENERIC',
+            '.build.variant': 'inventone',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng',
+                  '',
+                  'Product page: https://inventone.ng'
+                  ],
+    }),
     ( 'cw01', {
         'name': 'XinaBox CW01',
         'opts': {
@@ -934,19 +951,27 @@ macros = {
         ( '.menu.ip.lm2f', 'v2 Lower Memory' ),
         ( '.menu.ip.lm2f.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.lm2f.build.lwip_lib', '-llwip2-536-feat' ),
-        ( '.menu.ip.lm2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1' ),
+        ( '.menu.ip.lm2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0' ),
         ( '.menu.ip.hb2f', 'v2 Higher Bandwidth' ),
         ( '.menu.ip.hb2f.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.hb2f.build.lwip_lib', '-llwip2-1460-feat' ),
-        ( '.menu.ip.hb2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1' ),
+        ( '.menu.ip.hb2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0' ),
         ( '.menu.ip.lm2n', 'v2 Lower Memory (no features)' ),
         ( '.menu.ip.lm2n.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.lm2n.build.lwip_lib', '-llwip2-536' ),
-        ( '.menu.ip.lm2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0' ),
+        ( '.menu.ip.lm2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0' ),
         ( '.menu.ip.hb2n', 'v2 Higher Bandwidth (no features)' ),
         ( '.menu.ip.hb2n.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.hb2n.build.lwip_lib', '-llwip2-1460' ),
-        ( '.menu.ip.hb2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0' ),
+        ( '.menu.ip.hb2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0' ),
+        ( '.menu.ip.lm6f', 'v2 IPv6 Lower Memory' ),
+        ( '.menu.ip.lm6f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm6f.build.lwip_lib', '-llwip6-536-feat' ),
+        ( '.menu.ip.lm6f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1' ),
+        ( '.menu.ip.hb6f', 'v2 IPv6 Higher Bandwidth' ),
+        ( '.menu.ip.hb6f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb6f.build.lwip_lib', '-llwip6-1460-feat' ),
+        ( '.menu.ip.hb6f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1' ),
         ]),
 
     'lwip': collections.OrderedDict([
