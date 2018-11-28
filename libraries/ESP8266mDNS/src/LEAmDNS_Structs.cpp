@@ -692,7 +692,7 @@ bool MDNSResponder::_stcMDNS_RRDomain::compare(const _stcMDNS_RRDomain& p_Other)
         while ((pT) &&
                (pO) &&
                (*((unsigned char*)pT) == *((unsigned char*)pO)) &&                  // Same length AND
-               (0 == lwip_strnicmp((pT + 1), (pO + 1), *((unsigned char*)pT)))) {   // Same content
+               (0 == strncasecmp((pT + 1), (pO + 1), *((unsigned char*)pT)))) {   // Same content
             if (*((unsigned char*)pT)) {            // Not 0
                 pT += (1 + *((unsigned char*)pT));  // Shift by length byte and lenght
                 pO += (1 + *((unsigned char*)pO));
