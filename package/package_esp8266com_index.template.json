@@ -203,10 +203,10 @@
             },
             {
               "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/esp8266/Arduino/releases/download/2.3.0/linux64-xtensa-lx106-elf-gb404fb9.tgz",
-              "archiveFileName": "linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
-              "checksum": "SHA-256:46f057fbd8b320889a26167daf325038912096d09940b2a95489db92431473b7",
-              "size": "30262903"
+              "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0/x86_64-linux-gnu.xtensa-lx106-elf-8fb0c7a.tar.gz",
+              "archiveFileName": "x86_64-linux-gnu.xtensa-lx106-elf-8fb0c7a.tar.gz",
+              "checksum": "SHA-256:e90e785d57e1c9aa10acbb946501626a84eb26328e70caf3ffce7b14d67f8963",
+              "size": "39481780"
             },
             {
               "host": "i686-pc-linux-gnu",
