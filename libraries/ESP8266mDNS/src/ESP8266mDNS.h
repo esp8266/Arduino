@@ -42,7 +42,7 @@
 
 */
 
-#include "ESP8266MDNS_Legacy.h"
+#include "ESP8266mDNS_Legacy.h"
 #include "LEAmDNS.h"
 
 using namespace Legacy_MDNSResponder;

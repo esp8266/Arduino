@@ -37,7 +37,7 @@ extern "C" {
     #include "user_interface.h"
 }
 
-#include "lwip/prot/dns.h"  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
+#include <lwip/prot/dns.h>  // DNS_RRTYPE_xxx, DNS_MQUERY_PORT
 
 #include "LEAmDNS_Priv.h"
 
@@ -356,7 +356,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                                 m_HostProbeInformation.m_bTiebreakNeeded = false;
                             }
                             else {
-                                if (((stcMDNS_RRAnswerA*)pKnownRRAnswer)->m_IPAddress > localIPAddress) { // The OTHER IP is 'higher' -> LOST
+                                if ((uint32_t)(((stcMDNS_RRAnswerA*)pKnownRRAnswer)->m_IPAddress) > (uint32_t)localIPAddress) { // The OTHER IP is 'higher' -> LOST
                                     // LOST tiebreak
                                     DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _parseQuery: Tiebreak (IP4) LOST (lower)!\n")););
                                     _cancelProbingForHost();

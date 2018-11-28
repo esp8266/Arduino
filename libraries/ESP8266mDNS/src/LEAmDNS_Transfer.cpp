@@ -118,7 +118,7 @@ bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParamet
     ip_addr_t   ifFromAddress;
     ifFromAddress.addr = _getResponseMulticastInterface(p_iWiFiOpMode);
     IPAddress   fromIPAddress(ifFromAddress.addr);
-    m_pUDPContext->setMulticastInterface(ifFromAddress);
+    m_pUDPContext->setMulticastInterface(&ifFromAddress);
 
     ip_addr_t   toMulticastAddress;
 #ifdef MDNS_IP4_SUPPORT

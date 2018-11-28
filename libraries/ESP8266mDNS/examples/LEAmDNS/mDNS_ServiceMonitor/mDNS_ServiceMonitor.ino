@@ -53,9 +53,13 @@
 
 #define SERVICE_PORT                                    80                                  // HTTP port
 
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
 
-const char*                                             ssid                    = "............";
-const char*                                             password                = "............";
+const char*                                             ssid                    = STASSID;
+const char*                                             password                = STAPSK;
 
 char*                                                   pcHostDomain            = 0;        // Negociated host domain
 bool                                                    bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
