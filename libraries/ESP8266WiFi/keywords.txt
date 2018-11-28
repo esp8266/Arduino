@@ -69,6 +69,7 @@ softAPgetStationNum	KEYWORD2
 
 #ESP8266WiFiMulti
 addAP	KEYWORD2
+existsAP	KEYWORD2
 run	KEYWORD2
 
 #ESP8266WiFiScan

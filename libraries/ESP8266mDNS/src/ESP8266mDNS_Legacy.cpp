@@ -195,22 +195,22 @@ bool MDNSResponder::_listen() {
     #ifdef DEBUG_ESP_MDNS_RX
     DEBUG_ESP_PORT.println("MDNS listening");
     #endif
-    ip_addr_t multicast_addr;
-    multicast_addr.addr = (uint32_t) MDNS_MULTICAST_ADDR;
 
-    if (igmp_joingroup(IP_ADDR_ANY, &multicast_addr)!= ERR_OK) {
+    IPAddress mdns(MDNS_MULTICAST_ADDR);
+
+    if (igmp_joingroup(IP4_ADDR_ANY4, mdns)!= ERR_OK) {
       return false;
     }
 
     _conn = new UdpContext;
     _conn->ref();
 
-    if (!_conn->listen(*IP_ADDR_ANY, MDNS_PORT)) {
+    if (!_conn->listen(IP_ADDR_ANY, MDNS_PORT)) {
       return false;
     }
     _conn->setMulticastTTL(MDNS_MULTICAST_TTL);
     _conn->onRx(std::bind(&MDNSResponder::update, this));
-    _conn->connect(multicast_addr, MDNS_PORT);
+    _conn->connect(mdns, MDNS_PORT);
   }
   return true;
 }
@@ -335,13 +335,11 @@ int MDNSResponder::queryService(char *service, char *proto) {
   _waitingForAnswers = true;
   for (int itfn = 0; itfn < 2; itfn++) {
     struct ip_info ip_info;
-    ip_addr_t ifaddr;
 
     wifi_get_ip_info((!itfn) ? SOFTAP_IF : STATION_IF, &ip_info);
     if (!ip_info.ip.addr)
       continue;
-    ifaddr.addr = ip_info.ip.addr;
-    _conn->setMulticastInterface(ifaddr);
+    _conn->setMulticastInterface(IPAddress(ip_info.ip.addr));
 
     // Write the header
     _conn->flush();
@@ -467,10 +465,11 @@ IPAddress MDNSResponder::_getRequestMulticastInterface(){
   struct ip_info ip_info;
   bool match_ap = false;
   if (wifi_get_opmode() & SOFTAP_MODE) {
-    struct ip_info remote_ip_info;
-    remote_ip_info.ip.addr = _conn->getRemoteAddress();
+    const IPAddress& remote_ip = _conn->getRemoteAddress();
     wifi_get_ip_info(SOFTAP_IF, &ip_info);
-    if (ip_info.ip.addr && ip_addr_netcmp(&remote_ip_info.ip, &ip_info.ip, &ip_info.netmask))
+    IPAddress infoIp(ip_info.ip);
+    IPAddress infoMask(ip_info.netmask);
+    if (ip_info.ip.addr && ip_addr_netcmp((const ip_addr_t*)remote_ip, (const ip_addr_t*)infoIp, ip_2_ip4((const ip_addr_t*)infoMask)))
       match_ap = true;
   }
   if (!match_ap)
@@ -1071,9 +1070,7 @@ void MDNSResponder::_replyToTypeEnumRequest(IPAddress multicastInterface) {
       _conn->append(reinterpret_cast<const char*>(localName), localNameLen);   // "local"
       _conn->append(reinterpret_cast<const char*>(&terminator), 1);            // terminator
 
-      ip_addr_t ifaddr;
-      ifaddr.addr = multicastInterface;
-      _conn->setMulticastInterface(ifaddr);
+      _conn->setMulticastInterface(multicastInterface);
       _conn->send();
     }
   }
@@ -1278,9 +1275,7 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
     }
   }
 
-  ip_addr_t ifaddr;
-  ifaddr.addr = multicastInterface;
-  _conn->setMulticastInterface(ifaddr);
+  _conn->setMulticastInterface(multicastInterface);
   _conn->send();
 }
 
