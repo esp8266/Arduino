@@ -22,7 +22,7 @@
 #include "flash_utils.h"
 #include "eboot_command.h"
 #include <memory>
-#include <interrupts.h>
+#include "interrupts.h"
 #include "MD5Builder.h"
 #include "umm_malloc/umm_malloc.h"
 #include "cont.h"
@@ -132,9 +132,43 @@ uint64_t EspClass::deepSleepMax()
 
 }
 
+/* 
+Layout of RTC Memory is as follows:
+Ref: Espressif doc 2C-ESP8266_Non_OS_SDK_API_Reference, section 3.3.23 (system_rtc_mem_write)
+
+|<------system data (256 bytes)------->|<-----------------user data (512 bytes)--------------->|
+
+SDK function signature:   
+bool	system_rtc_mem_read	(
+				uint32	des_addr,	
+				void	*	src_addr,	
+				uint32	save_size
+)   
+
+The system data section can't be used by the user, so:
+des_addr must be >=64 (i.e.: 256/4) and <192 (i.e.: 768/4)
+src_addr is a pointer to data
+save_size is the number of bytes to write
+
+For the method interface:
+offset is the user block number (block size is 4 bytes) must be >= 0 and <128
+data is a pointer to data, 4-byte aligned
+size is number of bytes in the block pointed to by data
+
+Same for write
+
+Note: If the Updater class is in play, e.g.: the application uses OTA, the eboot
+command will be stored into the first 128 bytes of user data, then it will be
+retrieved by eboot on boot. That means that user data present there will be lost.
+Ref: 
+- discussion in PR #5330.
+- https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map#memmory-mapped-io-registers
+- Arduino/bootloaders/eboot/eboot_command.h RTC_MEM definition
+*/
+
 bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
 {
-    if (size + offset > 512) {
+    if (offset * 4 + size > 512 || size == 0) {
         return false;
     } else {
         return system_rtc_mem_read(64 + offset, data, size);
@@ -143,12 +177,14 @@ bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
 
 bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
 {
-    if (size + offset > 512) {
+    if (offset * 4 + size > 512 || size == 0) {
         return false;
     } else {
         return system_rtc_mem_write(64 + offset, data, size);
     }
 }
+
+
 
 extern "C" void __real_system_restart_local();
 void EspClass::reset(void)

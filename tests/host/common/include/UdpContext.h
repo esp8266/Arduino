@@ -55,16 +55,16 @@ public:
         }
     }
 
-    bool connect (ip_addr_t addr, uint16_t port)
+    bool connect (const ip_addr_t* addr, uint16_t port)
     {
-        _dst = addr;
+        _dst = *addr;
         _dstport = port;
         return true;
     }
 
-    bool listen(ip_addr_t addr, uint16_t port)
+    bool listen(const ip_addr_t* addr, uint16_t port)
     {
-        bool ret = mockUDPListen(_sock, addr.addr, port, staticMCastAddr);
+        bool ret = mockUDPListen(_sock, addr->addr, port, staticMCastAddr);
         register_udp(_sock, this);
         return ret;
     }

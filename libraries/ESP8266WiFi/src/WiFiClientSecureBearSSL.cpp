@@ -199,7 +199,7 @@ bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
   return WiFiClient::flush(maxWaitMs);
 }
 
-int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
+int WiFiClientSecure::connect(CONST IPAddress& ip, uint16_t port) {
   if (!WiFiClient::connect(ip, port)) {
     return 0;
   }
@@ -217,7 +217,7 @@ int WiFiClientSecure::connect(const char* name, uint16_t port) {
   return _connectSSL(name);
 }
 
-int WiFiClientSecure::connect(const String host, uint16_t port) {
+int WiFiClientSecure::connect(const String& host, uint16_t port) {
   return connect(host.c_str(), port);
 }
 
@@ -1107,7 +1107,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(const char* name, uint16_t port, u
   return WiFiClientSecure::probeMaxFragmentLength(remote_addr, port, len);
 }
 
-bool WiFiClientSecure::probeMaxFragmentLength(const String host, uint16_t port, uint16_t len) {
+bool WiFiClientSecure::probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len) {
   return WiFiClientSecure::probeMaxFragmentLength(host.c_str(), port, len);
 }
 
@@ -1371,69 +1371,5 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
   free(dest);
   return ret;
 }
-
-
-
-
-// Debug printout helpers for BearSSL library when libbearssl.a is compiled in debug mode
-// This is really only for debugging the core BearSSL library itself, and not the IDE
-// SSL debugging which should focus on the WiFiClientBearSSL objects.
-
-extern "C" {
-
-#if CORE_MOCK
-
-  void br_esp8266_stack_proxy_init(uint8_t *space, uint16_t size) {
-    (void)space;
-    (void)size;
-  }
-  void _BearSSLCheckStack(const char *fcn, const char *file, int line) {
-    (void)fcn;
-    (void)file;
-    (void)line;
-  }
-
-#else // !CORE_MOCK
-
-  extern size_t br_esp8266_stack_proxy_usage();
-
-  void _BearSSLCheckStack(const char *fcn, const char *file, int line) {
-    static int cnt = 0;
-    register uint32_t *sp asm("a1");
-    int freestack = 4 * (sp - g_pcont->stack);
-    int freeheap = ESP.getFreeHeap();
-    static int laststack, lastheap, laststack2;
-    if ((laststack != freestack) || (lastheap != freeheap) || (laststack2 != (int)br_esp8266_stack_proxy_usage())) {
-      Serial.printf("%s:%s(%d): FREESTACK=%d, STACK2USAGE=%zd, FREEHEAP=%d\n", file, fcn, line, freestack, br_esp8266_stack_proxy_usage(), freeheap);
-      if (freestack < 256) {
-        Serial.printf("!!! Out of main stack space\n");
-      }
-      if (freeheap < 1024) {
-        Serial.printf("!!! Out of heap space\n");
-      }
-      Serial.flush();
-      laststack = freestack;
-      lastheap = freeheap;
-      laststack2 = (int)br_esp8266_stack_proxy_usage();
-    }
-    // BearSSL debug can get very chatty, add yields to avoid WDT
-    if (cnt == 100) {
-      yield();
-      cnt++;
-    }
-  }
-
-#endif // !CORE_MOCK
-
-  void _BearSSLSerialPrint(const char *str) {
-    static int cnt = 0;
-    Serial.printf("%s", str);
-    // BearSSL debug can get very chatty, add yields to avoid WDT
-    if (cnt == 100) {
-      yield();
-      cnt++;
-    }
-  }
-};
 
 };
