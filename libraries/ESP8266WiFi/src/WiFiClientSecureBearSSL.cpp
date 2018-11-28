@@ -189,7 +189,6 @@ bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
     if (_session) {
       br_ssl_engine_get_session_parameters(_eng, _session->getSession());
     }
-    _clearAuthenticationSettings();
   }
   _freeSSL();
   return ret;
