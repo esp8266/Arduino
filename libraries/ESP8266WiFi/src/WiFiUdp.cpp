@@ -40,7 +40,6 @@ extern "C"
 #include "lwip/mem.h"
 #include <include/UdpContext.h>
 
-
 template<>
 WiFiUDP* SList<WiFiUDP>::_s_first = 0;
 
@@ -83,9 +82,7 @@ uint8_t WiFiUDP::begin(uint16_t port)
 
     _ctx = new UdpContext;
     _ctx->ref();
-    ip_addr_t addr;
-    addr.addr = INADDR_ANY;
-    return (_ctx->listen(addr, port)) ? 1 : 0;
+    return (_ctx->listen(IPAddress(), port)) ? 1 : 0;
 }
 
 uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port)
@@ -95,20 +92,14 @@ uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, ui
         _ctx = 0;
     }
 
-    ip_addr_t ifaddr;
-    ifaddr.addr = (uint32_t) interfaceAddr;
-    ip_addr_t multicast_addr;
-    multicast_addr.addr = (uint32_t) multicast;
-
-    if (igmp_joingroup(&ifaddr, &multicast_addr)!= ERR_OK) {
+    if (igmp_joingroup(interfaceAddr, multicast)!= ERR_OK) {
         return 0;
     }
 
     _ctx = new UdpContext;
     _ctx->ref();
-    ip_addr_t addr;
-    addr.addr = INADDR_ANY;
-    if (!_ctx->listen(addr, port)) {
+    ip_addr_t addr = IPADDR4_INIT(INADDR_ANY);
+    if (!_ctx->listen(&addr, port)) {
         return 0;
     }
 
@@ -155,32 +146,24 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port)
 
 int WiFiUDP::beginPacket(IPAddress ip, uint16_t port)
 {
-    ip_addr_t addr;
-    addr.addr = ip;
-
     if (!_ctx) {
         _ctx = new UdpContext;
         _ctx->ref();
     }
-    return (_ctx->connect(addr, port)) ? 1 : 0;
+    return (_ctx->connect(ip, port)) ? 1 : 0;
 }
 
 int WiFiUDP::beginPacketMulticast(IPAddress multicastAddress, uint16_t port,
     IPAddress interfaceAddress, int ttl)
 {
-    ip_addr_t mcastAddr;
-    mcastAddr.addr = multicastAddress;
-    ip_addr_t ifaceAddr;
-    ifaceAddr.addr = interfaceAddress;
-
     if (!_ctx) {
         _ctx = new UdpContext;
         _ctx->ref();
     }
-    if (!_ctx->connect(mcastAddr, port)) {
+    if (!_ctx->connect(multicastAddress, port)) {
         return 0;
     }
-    _ctx->setMulticastInterface(ifaceAddr);
+    _ctx->setMulticastInterface(interfaceAddress);
     _ctx->setMulticastTTL(ttl);
     return 1;
 }
@@ -248,15 +231,15 @@ void WiFiUDP::flush()
     endPacket();
 }
 
-IPAddress WiFiUDP::remoteIP()
+IPAddress WiFiUDP::remoteIP() const
 {
     if (!_ctx)
-        return IPAddress(0U);
+        return IPNoAddress;
 
-    return IPAddress(_ctx->getRemoteAddress());
+    return _ctx->getRemoteAddress();
 }
 
-uint16_t WiFiUDP::remotePort()
+uint16_t WiFiUDP::remotePort() const
 {
     if (!_ctx)
         return 0;
@@ -264,18 +247,15 @@ uint16_t WiFiUDP::remotePort()
     return _ctx->getRemotePort();
 }
 
-IPAddress WiFiUDP::destinationIP()
+IPAddress WiFiUDP::destinationIP() const
 {
-    IPAddress addr;
-
     if (!_ctx)
-        return addr;
+        return IPNoAddress;
 
-    addr = _ctx->getDestAddress();
-    return addr;
+    return _ctx->getDestAddress();
 }
 
-uint16_t WiFiUDP::localPort()
+uint16_t WiFiUDP::localPort() const
 {
     if (!_ctx)
         return 0;
