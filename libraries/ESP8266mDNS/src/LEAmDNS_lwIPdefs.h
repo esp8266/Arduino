@@ -28,7 +28,6 @@
 #include <lwip/init.h>
 #if LWIP_VERSION_MAJOR == 1
 
-#include <coredecls.h>      // lwip_strnicmp()
 #include <lwip/mdns.h>      // DNS_RRTYPE_xxx
 
 // cherry pick from lwip1 dns.c/mdns.c source files:
