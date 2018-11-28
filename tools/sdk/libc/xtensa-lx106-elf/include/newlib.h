@@ -31,7 +31,7 @@
 
 /* Optional reentrant struct support.  Used mostly on platforms with
    very restricted storage.  */
-#define _WANT_REENT_SMALL 1
+/* #undef _WANT_REENT_SMALL */
 
 /* Multibyte supported */
 /* #undef _MB_CAPABLE */
@@ -87,7 +87,7 @@
 /* #undef _REENT_GLOBAL_ATEXIT */
 
 /* Define if small footprint nano-formatted-IO implementation used.  */
-#define _NANO_FORMATTED_IO 1
+/* #undef _NANO_FORMATTED_IO */
 
 /*
  * Iconv encodings enabled ("to" direction)
