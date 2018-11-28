@@ -44,7 +44,7 @@ extern "C" const ip_addr_t ip_addr_any = IPADDR4_INIT(IPADDR_ANY);
 
 // lwIP API side of WiFiServer
 
-WiFiServer::WiFiServer (IPAddress addr, uint16_t port)
+WiFiServer::WiFiServer (const IPAddress& addr, uint16_t port)
 {
 	(void)addr;
 	if (port < 1024)

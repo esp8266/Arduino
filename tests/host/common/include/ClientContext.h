@@ -98,7 +98,7 @@ public:
         }
     }
 
-    int connect(ip_addr_t* addr, uint16_t port)
+    int connect(const ip_addr_t* addr, uint16_t port)
     {
         return mockConnect(addr->addr, _sock, port);
     }
