@@ -33,6 +33,7 @@ def compile(tmp_dir, sketch, tools_dir, hardware_dir, ide_path, f, args):
     cmd = ide_path + '/arduino-builder '
     cmd += '-compile -logger=human '
     cmd += '-build-path "' + tmp_dir + '" '
+    cmd += '-build-cache "' + tmp_dir + '" '
     cmd += '-tools "' +  ide_path + '/tools-builder" '
     if args.library_path:
         for lib_dir in args.library_path:
