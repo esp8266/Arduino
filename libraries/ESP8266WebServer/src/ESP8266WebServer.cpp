@@ -53,6 +53,8 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _postArgsLen(0)
+, _postArgs(nullptr)
 , _headerKeysCount(0)
 , _currentHeaders(nullptr)
 , _contentLength(0)
@@ -71,6 +73,8 @@ ESP8266WebServer::ESP8266WebServer(int port)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _postArgsLen(0)
+, _postArgs(nullptr)
 , _headerKeysCount(0)
 , _currentHeaders(nullptr)
 , _contentLength(0)
@@ -486,6 +490,10 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
 
 
 const String& ESP8266WebServer::arg(String name) const {
+  for (int j = 0; j < _postArgsLen; ++j) {
+    if ( _postArgs[j].key == name )
+      return _postArgs[j].value;
+  }
   for (int i = 0; i < _currentArgCount; ++i) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
@@ -510,6 +518,10 @@ int ESP8266WebServer::args() const {
 }
 
 bool ESP8266WebServer::hasArg(const String& name) const {
+  for (int j = 0; j < _postArgsLen; ++j) {
+    if (_postArgs[j].key == name)
+      return true;
+  }
   for (int i = 0; i < _currentArgCount; ++i) {
     if (_currentArgs[i].key == name)
       return true;

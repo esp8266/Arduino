@@ -25,7 +25,7 @@
 
 #include "ESP8266HTTPClient.h"
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecureAxTLS.h>
 #endif
@@ -33,7 +33,7 @@
 #include <StreamString.h>
 #include <base64.h>
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
 class TransportTraits
 {
 public:
@@ -115,7 +115,7 @@ protected:
 HTTPClient::HTTPClient()
 {
     _client = nullptr;
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
     _tcpDeprecated.reset(nullptr);
 #endif
 }
@@ -150,7 +150,7 @@ void HTTPClient::clear()
  * @return success bool
  */
 bool HTTPClient::begin(WiFiClient &client, String url) {
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
     if(_tcpDeprecated) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
         _canReuse = false;
@@ -189,7 +189,7 @@ bool HTTPClient::begin(WiFiClient &client, String url) {
  */
 bool HTTPClient::begin(WiFiClient &client, String host, uint16_t port, String uri, bool https)
 {
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
     if(_tcpDeprecated) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
         _canReuse = false;
@@ -208,7 +208,7 @@ bool HTTPClient::begin(WiFiClient &client, String host, uint16_t port, String ur
 }
 
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
 bool HTTPClient::begin(String url, String httpsFingerprint)
 {
     if(_client && !_tcpDeprecated) {
@@ -320,7 +320,7 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
     return true;
 }
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
 bool HTTPClient::begin(String host, uint16_t port, String uri)
 {
     if(_client && !_tcpDeprecated) {
@@ -426,7 +426,7 @@ void HTTPClient::disconnect()
                 _client->stop();
                 _client = nullptr;
             }
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
             if(_tcpDeprecated) {
                 _transportTraits.reset(nullptr);
                 _tcpDeprecated.reset(nullptr);
@@ -1038,7 +1038,7 @@ bool HTTPClient::connect(void)
         return true;
     }
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
     if(!_client && _transportTraits) {
         _tcpDeprecated = _transportTraits->create();
         _client = _tcpDeprecated.get();
@@ -1059,7 +1059,7 @@ bool HTTPClient::connect(void)
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
     if (_tcpDeprecated && !_transportTraits->verify(*_tcpDeprecated, _host.c_str())) {
         DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
         _client->stop();

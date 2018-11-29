@@ -35,6 +35,7 @@ String EspClass::getFullVersion()
 {
     return   String(F("SDK:")) + system_get_sdk_version()
            + F("/Core:") + FPSTR(arduino_esp8266_git_ver)
+           + F("=") + String(esp8266::coreVersionNumeric())
 #if LWIP_VERSION_MAJOR == 1
            + F("/lwIP:") + String(LWIP_VERSION_MAJOR) + "." + String(LWIP_VERSION_MINOR) + "." + String(LWIP_VERSION_REVISION)
 #if LWIP_VERSION_IS_DEVELOPMENT
@@ -47,9 +48,9 @@ String EspClass::getFullVersion()
              + F("/lwIP:")
 #if LWIP_IPV6
              + F("IPv6+")
-#endif
+#endif // LWIP_IPV6
              + F(LWIP_HASH_STR)
-#endif
+#endif // LWIP_VERSION_MAJOR != 1
              + FPSTR(bearssl_version)
            ;
 }
