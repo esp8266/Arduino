@@ -882,6 +882,8 @@ bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint
   }
 };
 
+#if !CORE_MOCK
+
 // Second stack thunked helpers
 make_stack_thunk(br_ssl_engine_recvapp_ack);
 make_stack_thunk(br_ssl_engine_recvapp_buf);
@@ -891,5 +893,7 @@ make_stack_thunk(br_ssl_engine_sendapp_ack);
 make_stack_thunk(br_ssl_engine_sendapp_buf);
 make_stack_thunk(br_ssl_engine_sendrec_ack);
 make_stack_thunk(br_ssl_engine_sendrec_buf);
+
+#endif
 
 };
