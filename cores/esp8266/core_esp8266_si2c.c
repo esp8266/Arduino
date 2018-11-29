@@ -267,6 +267,7 @@ unsigned char twi_writeTo(unsigned char address, unsigned char * buf, unsigned i
     SCL_LOW();
     twi_delay(twi_dcount);
     SCL_HIGH();
+    unsigned int t=0; while(SCL_READ()==0 && (t++)<twi_clockStretchLimit); // twi_clockStretchLimit
     twi_delay(twi_dcount);
   }
   return 0;
@@ -287,6 +288,7 @@ unsigned char twi_readFrom(unsigned char address, unsigned char* buf, unsigned i
     SCL_LOW();
     twi_delay(twi_dcount);
     SCL_HIGH();
+    unsigned int t=0; while(SCL_READ()==0 && (t++)<twi_clockStretchLimit); // twi_clockStretchLimit
     twi_delay(twi_dcount);
   }
   return 0;

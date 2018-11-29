@@ -65,7 +65,9 @@ extern "C" {
 #define _conn_read8() _conn->read()
 #define _conn_readS(b, l) _conn->read((b), (l));
 
-static const IPAddress LLMNR_MULTICAST_ADDR(224, 0, 0, 252);
+// llmnr ipv6 is FF02:0:0:0:0:0:1:3
+// lwip-v2's igmp_joingroup only supports IPv4
+#define LLMNR_MULTICAST_ADDR 224, 0, 0, 252
 static const int LLMNR_MULTICAST_TTL = 1;
 static const int LLMNR_PORT = 5355;
 
@@ -109,21 +111,20 @@ bool LLMNRResponder::_restart() {
         _conn = 0;
     }
 
-    ip_addr_t multicast_addr;
-    multicast_addr.addr = (uint32_t)LLMNR_MULTICAST_ADDR;
+    IPAddress llmnr(LLMNR_MULTICAST_ADDR);
 
-    if (igmp_joingroup(IP_ADDR_ANY, &multicast_addr) != ERR_OK)
+    if (igmp_joingroup(IP4_ADDR_ANY4, llmnr) != ERR_OK)
         return false;
 
     _conn = new UdpContext;
     _conn->ref();
 
-    if (!_conn->listen(*IP_ADDR_ANY, LLMNR_PORT))
+    if (!_conn->listen(IP_ADDR_ANY, LLMNR_PORT))
         return false;
 
     _conn->setMulticastTTL(LLMNR_MULTICAST_TTL);
     _conn->onRx(std::bind(&LLMNRResponder::_process_packet, this));
-    _conn->connect(multicast_addr, LLMNR_PORT);
+    _conn->connect(llmnr, LLMNR_PORT);
     return true;
 }
 
@@ -229,15 +230,16 @@ void LLMNRResponder::_process_packet() {
         Serial.println("(no matching RRs)");
 #endif
 
-    ip_addr_t remote_ip;
-    remote_ip.addr = _conn->getRemoteAddress();
+    IPAddress remote_ip = _conn->getRemoteAddress();
 
     struct ip_info ip_info;
     bool match_ap = false;
     if (wifi_get_opmode() & SOFTAP_MODE) {
         wifi_get_ip_info(SOFTAP_IF, &ip_info);
-    if (ip_info.ip.addr && ip_addr_netcmp(&remote_ip, &ip_info.ip, &ip_info.netmask))
-        match_ap = true;
+        IPAddress infoIp(ip_info.ip);
+        IPAddress infoMask(ip_info.netmask);
+        if (ip_info.ip.addr && ip_addr_netcmp((const ip_addr_t*)remote_ip, (const ip_addr_t*)infoIp, ip_2_ip4((const ip_addr_t*)infoMask)))
+            match_ap = true;
     }
     if (!match_ap)
         wifi_get_ip_info(STATION_IF, &ip_info);
@@ -277,7 +279,7 @@ void LLMNRResponder::_process_packet() {
         _conn->append(reinterpret_cast<const char*>(rr), sizeof(rr));
     }
     _conn->setMulticastInterface(remote_ip);
-    _conn->send(&remote_ip, _conn->getRemotePort());
+    _conn->send(remote_ip, _conn->getRemotePort());
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_LLMNR)
