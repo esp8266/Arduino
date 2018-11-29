@@ -500,10 +500,9 @@ void UpdaterClass::printError(Print &out){
   } else if(_error == UPDATE_ERROR_STREAM){
     out.println(F("Stream Read Timeout"));
   } else if(_error == UPDATE_ERROR_MD5){
-    //out.println(F("MD5 Check Failed"));
-    out.printf("MD5 Failed: expected:%s, calculated:%s\n", _target_md5.c_str(), _md5.toString().c_str());
+    out.printf_P(PSTR("MD5 Failed: expected:%s, calculated:%s\n"), _target_md5.c_str(), _md5.toString().c_str());
   } else if(_error == UPDATE_ERROR_SIGN){
-    out.printf("Signature verification failed\n");
+    out.println(F("Signature verification failed"));
   } else if(_error == UPDATE_ERROR_FLASH_CONFIG){
     out.printf_P(PSTR("Flash config wrong real: %d IDE: %d\n"), ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
   } else if(_error == UPDATE_ERROR_NEW_FLASH_CONFIG){
