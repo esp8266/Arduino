@@ -17,7 +17,6 @@ ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
 
   // We start by connecting to a WiFi network
   WiFi.mode(WIFI_STA);

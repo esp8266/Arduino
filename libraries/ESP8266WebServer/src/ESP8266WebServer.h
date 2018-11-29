@@ -181,9 +181,12 @@ protected:
   int              _currentArgCount;
   RequestArgument* _currentArgs;
   std::unique_ptr<HTTPUpload> _currentUpload;
-
+  int              _postArgsLen;
+  RequestArgument* _postArgs;
+    
   int              _headerKeysCount;
   RequestArgument* _currentHeaders;
+ 
   size_t           _contentLength;
   String           _responseHeaders;
 

@@ -57,6 +57,8 @@ Here is an overview of the release process. See the section below for detailed i
 
    * When done, put release notes into a private Gist and send the link to other maintainers for review.
 
+   * Update `version` to the release in platform.txt and commit. E.g. `2.5.0`.
+
 2. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-rcN` for release versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
 
    ```
