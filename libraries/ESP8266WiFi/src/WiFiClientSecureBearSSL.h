@@ -124,8 +124,7 @@ class WiFiClientSecure : public WiFiClient {
     ////////////////////////////////////////////////////
     // AxTLS API deprecated warnings to help upgrading
 
-#define AXTLS_DEPRECATED
-    #define xAXTLS_DEPRECATED \
+    #define AXTLS_DEPRECATED \
       __attribute__((deprecated( \
         "This is deprecated AxTLS API, " \
         "check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99")))
@@ -153,22 +152,22 @@ class WiFiClientSecure : public WiFiClient {
       return setPrivateKey((const uint8_t *)pk, size);
     }
 
+#pragma GCC diagnostic pop
+
     template<typename TFile>
-    bool loadCertificate(TFile& file) AXTLS_DEPRECATED {
+    bool loadCertificate(TFile& file) {
       return loadCertificate(file, file.size());
     }
 
     template<typename TFile>
-    bool loadPrivateKey(TFile& file) AXTLS_DEPRECATED {
+    bool loadPrivateKey(TFile& file) {
       return loadPrivateKey(file, file.size());
     }
 
     template<typename TFile>
-    bool loadCACert(TFile& file) AXTLS_DEPRECATED {
+    bool loadCACert(TFile& file) {
       return loadCACert(file, file.size());
     }
-
-#pragma GCC diagnostic pop
 
     bool verify(const char* fingerprint, const char* domain_name) AXTLS_DEPRECATED {
       (void)fingerprint;
