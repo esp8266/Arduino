@@ -121,47 +121,68 @@ class WiFiClientSecure : public WiFiClient {
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
 
-    bool setCACert(const uint8_t* pk, size_t size);
-    bool setCertificate(const uint8_t* pk, size_t size);
-    bool setPrivateKey(const uint8_t* pk, size_t size);
+    ////////////////////////////////////////////////////
+    // AxTLS API deprecated warnings to help upgrading
 
-    bool setCACert_P(PGM_VOID_P pk, size_t size) { return setCACert((const uint8_t *)pk, size); }
-    bool setCertificate_P(PGM_VOID_P pk, size_t size) { return setCertificate((const uint8_t *)pk, size); }
-    bool setPrivateKey_P(PGM_VOID_P pk, size_t size) { return setPrivateKey((const uint8_t *)pk, size); }
+#define AXTLS_DEPRECATED
+    #define xAXTLS_DEPRECATED \
+      __attribute__((deprecated( \
+        "This is deprecated AxTLS API, " \
+        "check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99")))
 
-    bool loadCACert(Stream& stream, size_t size);
-    bool loadCertificate(Stream& stream, size_t size);
-    bool loadPrivateKey(Stream& stream, size_t size);
+    bool setCACert(const uint8_t* pk, size_t size)      AXTLS_DEPRECATED;
+    bool setCertificate(const uint8_t* pk, size_t size) AXTLS_DEPRECATED;
+    bool setPrivateKey(const uint8_t* pk, size_t size)  AXTLS_DEPRECATED;
+
+    bool loadCACert(Stream& stream, size_t size)        AXTLS_DEPRECATED;
+    bool loadCertificate(Stream& stream, size_t size)   AXTLS_DEPRECATED;
+    bool loadPrivateKey(Stream& stream, size_t size)    AXTLS_DEPRECATED;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
+
+    bool setCACert_P(PGM_VOID_P pk, size_t size) AXTLS_DEPRECATED {
+      return setCACert((const uint8_t *)pk, size);
+    }
+
+    bool setCertificate_P(PGM_VOID_P pk, size_t size) AXTLS_DEPRECATED {
+      return setCertificate((const uint8_t *)pk, size);
+    }
+
+    bool setPrivateKey_P(PGM_VOID_P pk, size_t size) AXTLS_DEPRECATED {
+      return setPrivateKey((const uint8_t *)pk, size);
+    }
 
     template<typename TFile>
-    bool loadCertificate(TFile& file) {
+    bool loadCertificate(TFile& file) AXTLS_DEPRECATED {
       return loadCertificate(file, file.size());
     }
 
     template<typename TFile>
-    bool loadPrivateKey(TFile& file) {
+    bool loadPrivateKey(TFile& file) AXTLS_DEPRECATED {
       return loadPrivateKey(file, file.size());
     }
 
     template<typename TFile>
-    bool loadCACert(TFile& file) {
+    bool loadCACert(TFile& file) AXTLS_DEPRECATED {
       return loadCACert(file, file.size());
     }
 
-    // AxTLS API deprecated warnings to help upgrading
+#pragma GCC diagnostic pop
 
-    bool verify(const char* fingerprint, const char* domain_name)
-      __attribute__((deprecated("This is deprecated AxTLS API, check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99"))) {
+    bool verify(const char* fingerprint, const char* domain_name) AXTLS_DEPRECATED {
       (void)fingerprint;
       (void)domain_name;
       return connected();
     }
 
-    bool verifyCertChain(const char* domain_name)
-      __attribute__((deprecated("This is deprecated AxTLS API, check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99"))) {
+    bool verifyCertChain(const char* domain_name) AXTLS_DEPRECATED {
       (void)domain_name;
       return connected();
     }
+
+    // AxTLS API deprecated section end
+    /////////////////////////////////////
 
   private:
     void _clear();
