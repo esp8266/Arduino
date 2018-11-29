@@ -29,7 +29,7 @@ Show the core example list:
 
 
 Build one example
-	make -j D=1 ../../libraries/esp8266/examples/Blink/Blink
+	make D=1 ../../libraries/esp8266/examples/Blink/Blink
 run it:
 	./bin/Blink/Blink -h
 
@@ -41,19 +41,19 @@ Optional 'FORCE32=0' will use native/default gcc (default is FORCE32=1 unless gc
 
 
 Non exhaustive list of working examples:
-	make -j D=1 ../../libraries/ESP8266WiFi/examples/udp/udp
-	make -j D=1 ../../libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient
-	make -j D=1 ../../libraries/ESP8266WebServer/examples/HelloServer/HelloServer
-	make -j D=1 ../../libraries/ESP8266WebServer/examples/AdvancedWebServer/AdvancedWebServer
-	make -j D=1 ../../libraries/ESP8266mDNS/examples/mDNS_Web_Server/mDNS_Web_Server
-	make -j D=1 ../../libraries/ESP8266WiFi/examples/BearSSL_Validation/BearSSL_Validation
+	make D=1 ../../libraries/ESP8266WiFi/examples/udp/udp
+	make D=1 ../../libraries/ESP8266WiFi/examples/WiFiClient/WiFiClient
+	make D=1 ../../libraries/ESP8266WebServer/examples/HelloServer/HelloServer
+	make D=1 ../../libraries/ESP8266WebServer/examples/AdvancedWebServer/AdvancedWebServer
+	make D=1 ../../libraries/ESP8266mDNS/examples/mDNS_Web_Server/mDNS_Web_Server
+	make D=1 ../../libraries/ESP8266WiFi/examples/BearSSL_Validation/BearSSL_Validation
 
 Compile other sketches:
 - library paths are specified using ULIBDIRS variable, separated by ':'
 - call 'make path-to-the-sketch-file' to build (without its '.ino' extension):
 - CAVEAT: functions must be declared *before* being called (arduino builder is not around)
 
-	make -j D=1  ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  /path/to/your/sketchdir/sketch/sketch
+	make D=1  ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  /path/to/your/sketchdir/sketch/sketch
   or:
 	ULIBDIRS=/path/to/your/arduino/libraries/lib1:/path/to/another/place/lib2  make  D=1  /path/to/your/sketchdir/sketch/sketch
 
@@ -62,7 +62,7 @@ Compile other sketches:
 	export D=1
 	export OPTZ=-O2
 	make clean
-	make -j /path/to/your/sketchdir/sketch/sketch
+	make /path/to/your/sketchdir/sketch/sketch
 	./bin/sketch/sketch
 
 
