@@ -113,9 +113,9 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     updateStartAddress = (updateEndAddress > roundedSize)? (updateEndAddress - roundedSize) : 0;
 
 #ifdef DEBUG_UPDATER
-        DEBUG_UPDATER.printf("[begin] roundedSize:       0x%08zX (%zd)\n", roundedSize, roundedSize);
-        DEBUG_UPDATER.printf("[begin] updateEndAddress:  0x%08zX (%zd)\n", updateEndAddress, updateEndAddress);
-        DEBUG_UPDATER.printf("[begin] currentSketchSize: 0x%08zX (%zd)\n", currentSketchSize, currentSketchSize);
+        DEBUG_UPDATER.printf_P(PSTR("[begin] roundedSize:       0x%08zX (%zd)\n"), roundedSize, roundedSize);
+        DEBUG_UPDATER.printf_P(PSTR("[begin] updateEndAddress:  0x%08zX (%zd)\n"), updateEndAddress, updateEndAddress);
+        DEBUG_UPDATER.printf_P(PSTR("[begin] currentSketchSize: 0x%08zX (%zd)\n"), currentSketchSize, currentSketchSize);
 #endif
 
     //make sure that the size of both sketches is less than the total space (updateEndAddress)
@@ -148,9 +148,9 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
   _command = command;
 
 #ifdef DEBUG_UPDATER
-  DEBUG_UPDATER.printf("[begin] _startAddress:     0x%08X (%d)\n", _startAddress, _startAddress);
-  DEBUG_UPDATER.printf("[begin] _currentAddress:   0x%08X (%d)\n", _currentAddress, _currentAddress);
-  DEBUG_UPDATER.printf("[begin] _size:             0x%08zX (%zd)\n", _size, _size);
+  DEBUG_UPDATER.printf_P(PSTR("[begin] _startAddress:     0x%08X (%d)\n"), _startAddress, _startAddress);
+  DEBUG_UPDATER.printf_P(PSTR("[begin] _currentAddress:   0x%08X (%d)\n"), _currentAddress, _currentAddress);
+  DEBUG_UPDATER.printf_P(PSTR("[begin] _size:             0x%08zX (%zd)\n"), _size, _size);
 #endif
 
   if (!_verify) {
@@ -178,7 +178,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
 
   if(hasError() || (!isFinished() && !evenIfRemaining)){
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("premature end: res:%u, pos:%zu/%zu\n", getError(), progress(), _size);
+    DEBUG_UPDATER.printf_P(PSTR("premature end: res:%u, pos:%zu/%zu\n"), getError(), progress(), _size);
 #endif
 
     _reset();
@@ -196,7 +196,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
   if (_verify) {
     ESP.flashRead(_startAddress + _size - sizeof(uint32_t), &sigLen, sizeof(uint32_t));
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("[Updater] sigLen: %d\n", sigLen);
+    DEBUG_UPDATER.printf_P(PSTR("[Updater] sigLen: %d\n"), sigLen);
 #endif
     if (sigLen != _verify->length()) {
       _setError(UPDATE_ERROR_SIGN);
@@ -207,7 +207,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     int binSize = _size - sigLen - sizeof(uint32_t) /* The siglen word */;
     _hash->begin();
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("[Updater] Adjusted binsize: %d\n", binSize);
+    DEBUG_UPDATER.printf_P(PSTR("[Updater] Adjusted binsize: %d\n"), binSize);
 #endif
       // Calculate the MD5 and hash using proper size
     uint8_t buff[128];
@@ -219,7 +219,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     _hash->end();
 #ifdef DEBUG_UPDATER
     unsigned char *ret = (unsigned char *)_hash->hash();
-    DEBUG_UPDATER.printf("[Updater] Computed Hash:");
+    DEBUG_UPDATER.printf_P(PSTR("[Updater] Computed Hash:"));
     for (int i=0; i<_hash->len(); i++) DEBUG_UPDATER.printf(" %02x", ret[i]);
     DEBUG_UPDATER.printf("\n");
 #endif
@@ -231,7 +231,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
     }
     ESP.flashRead(_startAddress + binSize, (uint32_t *)sig, sigLen);
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("[Updater] Received Signature:");
+    DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
     for (size_t i=0; i<sigLen; i++) {
       DEBUG_UPDATER.printf(" %02x", sig[i]);
     }
@@ -243,7 +243,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return false;
     }
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("[Updater] Signature matches\n");
+    DEBUG_UPDATER.printf_P(PSTR("[Updater] Signature matches\n"));
 #endif
   } else if (_target_md5.length()) {
     _md5.calculate();
@@ -253,7 +253,7 @@ bool UpdaterClass::end(bool evenIfRemaining){
       return false;
     }
 #ifdef DEBUG_UPDATER
-    else DEBUG_UPDATER.printf("MD5 Success: %s\n", _target_md5.c_str());
+    else DEBUG_UPDATER.printf_P(PSTR("MD5 Success: %s\n"), _target_md5.c_str());
 #endif
   }
 
@@ -271,10 +271,10 @@ bool UpdaterClass::end(bool evenIfRemaining){
     eboot_command_write(&ebcmd);
 
 #ifdef DEBUG_UPDATER
-    DEBUG_UPDATER.printf("Staged: address:0x%08X, size:0x%08zX\n", _startAddress, _size);
+    DEBUG_UPDATER.printf_P(PSTR("Staged: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
   }
   else if (_command == U_SPIFFS) {
-    DEBUG_UPDATER.printf("SPIFFS: address:0x%08X, size:0x%08zX\n", _startAddress, _size);
+    DEBUG_UPDATER.printf_P(PSTR("SPIFFS: address:0x%08X, size:0x%08zX\n"), _startAddress, _size);
 #endif
   }
 
@@ -301,12 +301,12 @@ bool UpdaterClass::_writeBuffer(){
   if (_currentAddress == _startAddress + FLASH_MODE_PAGE) {
     flashMode = ESP.getFlashChipMode();
     #ifdef DEBUG_UPDATER
-      DEBUG_UPDATER.printf("Header: 0x%1X %1X %1X %1X\n", _buffer[0], _buffer[1], _buffer[2], _buffer[3]);
+      DEBUG_UPDATER.printf_P(PSTR("Header: 0x%1X %1X %1X %1X\n"), _buffer[0], _buffer[1], _buffer[2], _buffer[3]);
     #endif
     bufferFlashMode = ESP.magicFlashChipMode(_buffer[FLASH_MODE_OFFSET]);
     if (bufferFlashMode != flashMode) {
       #ifdef DEBUG_UPDATER
-        DEBUG_UPDATER.printf("Set flash mode from 0x%1X to 0x%1X\n", bufferFlashMode, flashMode);
+        DEBUG_UPDATER.printf_P(PSTR("Set flash mode from 0x%1X to 0x%1X\n"), bufferFlashMode, flashMode);
       #endif
 
       _buffer[FLASH_MODE_OFFSET] = flashMode;
