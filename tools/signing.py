@@ -33,7 +33,10 @@ def main():
                 val +="\n};\n"
                 sys.stderr.write("Enabling binary signing\n")
         except:
-            sys.stderr.write("Not enabling binary signing\n")
+# Silence the default case to avoid people thinking something is wrong.
+# Only people who care about signing will know what it means, anyway,
+# and they can check for the positive acknowledgement above.
+#            sys.stderr.write("Not enabling binary signing\n")
             val += "#define ARDUINO_SIGNING 0\n"
         with open(args.out, "w") as f:
             f.write(val)
