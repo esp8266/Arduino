@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-import sys
 import argparse
-import subprocess
 import hashlib
+import os
+import subprocess
+import sys
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Binary signing tool')
@@ -39,19 +40,25 @@ def main():
         return 0
     elif args.mode == "sign":
         val = ""
+        if not os.path.isfile(args.privatekey):
+            return
         try:
             with open(args.bin, "rb") as b:
                 bin = b.read()
                 sha256 = hashlib.sha256(bin)
                 signcmd = [ 'openssl', 'rsautl', '-sign', '-inkey', args.privatekey ]
                 proc = subprocess.Popen(signcmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-                signout = proc.communicate(input=sha256.digest())[0]
-                with open(args.out, "wb") as out:
-                    out.write(bin)
-                    out.write(signout)
-                    out.write(b'\x00\x01\x00\x00')
-                    sys.stderr.write("Signed binary: " + args.out + "\n")
-        except:
+                signout, signerr = proc.communicate(input=sha256.digest())
+                if proc.returncode:
+                    sys.stderr.write("OpenSSL returned an error signing the binary: " + str(proc.returncode) + "\nSTDERR: " + str(signerr))
+                else:
+                    with open(args.out, "wb") as out:
+                        out.write(bin)
+                        out.write(signout)
+                        out.write(b'\x00\x01\x00\x00')
+                        sys.stderr.write("Signed binary: " + args.out + "\n")
+        except Exception as e:
+            sys.stderr.write(str(e))
             sys.stderr.write("Not signing the generated binary\n")
         return 0
     else:
