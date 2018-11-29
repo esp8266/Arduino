@@ -78,3 +78,12 @@ WAKE_NO_RFCAL	LITERAL1
 WAKE_RF_DISABLED	LITERAL1
 ADC_VCC	LITERAL1
 ADC_TOUT	LITERAL1
+
+#######################################
+# namespace esp8266
+#######################################
+coreVersionMajor	LITERAL1
+coreVersionMinor	LITERAL1
+coreVersionRevision	LITERAL1
+coreVersionSubRevision	LITERAL1
+coreVersionNumeric	LITERAL1
