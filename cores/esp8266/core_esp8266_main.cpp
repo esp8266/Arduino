@@ -150,14 +150,31 @@ static void do_global_ctors(void) {
         (*--p)();
 }
 
-extern "C" { extern void __unhandled_exception(); }
+extern "C" {
+extern void __unhandled_exception(const char *str);
 
+static void  __unhandled_exception_cpp()
+{
+    static bool terminating;
+    if (terminating)
+        abort();
+    terminating = true;
+    /* Use a trick from vterminate.cc to get any std::exception what() */
+    try {
+        __throw_exception_again;
+    } catch (const std::exception& e) {
+        __unhandled_exception( e.what() );
+    } catch (...) {
+        __unhandled_exception( "" );
+    }
+}
 
+}
 
 void init_done() {
     system_set_os_print(1);
     gdb_init();
-    std::set_terminate(__unhandled_exception);
+    std::set_terminate(__unhandled_exception_cpp);
     do_global_ctors();
     esp_schedule();
 }
