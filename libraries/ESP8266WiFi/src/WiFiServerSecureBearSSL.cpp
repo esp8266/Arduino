@@ -26,6 +26,7 @@ extern "C" {
 #include "ets_sys.h"
 }
 
+#include <StackThunk.h>
 #include "debug.h"
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"
@@ -33,21 +34,24 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
-#include "include/ClientContext.h"
+#include <include/ClientContext.h>
 #include "WiFiServerSecureBearSSL.h"
 
 namespace BearSSL {
 
 // Only need to call the standard server constructor
 WiFiServerSecure::WiFiServerSecure(IPAddress addr, uint16_t port) : WiFiServer(addr, port) {
+  stack_thunk_add_ref();
 }
 
 // Only need to call the standard server constructor
 WiFiServerSecure::WiFiServerSecure(uint16_t port) : WiFiServer(port) {
+  stack_thunk_add_ref();
 }
 
 // Destructor only checks if we need to delete compatibilty cert/key
 WiFiServerSecure::~WiFiServerSecure() {
+  stack_thunk_del_ref();
   if (_deleteChainAndKey) {
     delete _chain;
     delete _sk;

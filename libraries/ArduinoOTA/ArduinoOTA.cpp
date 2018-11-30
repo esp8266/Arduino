@@ -124,7 +124,7 @@ void ArduinoOTAClass::begin() {
   _udp_ota = new UdpContext;
   _udp_ota->ref();
 
-  if(!_udp_ota->listen(*IP_ADDR_ANY, _port))
+  if(!_udp_ota->listen(IP_ADDR_ANY, _port))
     return;
   _udp_ota->onRx(std::bind(&ArduinoOTAClass::_onRx, this));
   MDNS.begin(_hostname.c_str());
@@ -172,7 +172,7 @@ String ArduinoOTAClass::readStringUntil(char end){
 
 void ArduinoOTAClass::_onRx(){
   if(!_udp_ota->next()) return;
-  ip_addr_t ota_ip;
+  IPAddress ota_ip;
 
   if (_state == OTA_IDLE) {
     int cmd = parseInt();
@@ -189,7 +189,7 @@ void ArduinoOTAClass::_onRx(){
     if(_md5.length() != 32)
       return;
 
-    ota_ip.addr = (uint32_t)_ota_ip;
+    ota_ip = _ota_ip;
 
     if (_password.length()){
       MD5Builder nonce_md5;
@@ -201,7 +201,7 @@ void ArduinoOTAClass::_onRx(){
       char auth_req[38];
       sprintf(auth_req, "AUTH %s", _nonce.c_str());
       _udp_ota->append((const char *)auth_req, strlen(auth_req));
-      _udp_ota->send(&ota_ip, _ota_udp_port);
+      _udp_ota->send(ota_ip, _ota_udp_port);
       _state = OTA_WAITAUTH;
       return;
     } else {
@@ -228,12 +228,12 @@ void ArduinoOTAClass::_onRx(){
     _challengemd5.calculate();
     String result = _challengemd5.toString();
 
-    ota_ip.addr = (uint32_t)_ota_ip;
+    ota_ip = _ota_ip;
     if(result.equalsConstantTime(response)) {
       _state = OTA_RUNUPDATE;
     } else {
       _udp_ota->append("Authentication Failed", 21);
-      _udp_ota->send(&ota_ip, _ota_udp_port);
+      _udp_ota->send(ota_ip, _ota_udp_port);
       if (_error_callback) _error_callback(OTA_AUTH_ERROR);
       _state = OTA_IDLE;
     }
@@ -243,8 +243,7 @@ void ArduinoOTAClass::_onRx(){
 }
 
 void ArduinoOTAClass::_runUpdate() {
-  ip_addr_t ota_ip;
-  ota_ip.addr = (uint32_t)_ota_ip;
+  IPAddress ota_ip = _ota_ip;
 
   if (!Update.begin(_size, _cmd)) {
 #ifdef OTA_DEBUG
@@ -258,14 +257,14 @@ void ArduinoOTAClass::_runUpdate() {
     Update.printError(ss);
     _udp_ota->append("ERR: ", 5);
     _udp_ota->append(ss.c_str(), ss.length());
-    _udp_ota->send(&ota_ip, _ota_udp_port);
+    _udp_ota->send(ota_ip, _ota_udp_port);
     delay(100);
-    _udp_ota->listen(*IP_ADDR_ANY, _port);
+    _udp_ota->listen(IP_ADDR_ANY, _port);
     _state = OTA_IDLE;
     return;
   }
   _udp_ota->append("OK", 2);
-  _udp_ota->send(&ota_ip, _ota_udp_port);
+  _udp_ota->send(ota_ip, _ota_udp_port);
   delay(100);
 
   Update.setMD5(_md5.c_str());
@@ -284,7 +283,7 @@ void ArduinoOTAClass::_runUpdate() {
 #ifdef OTA_DEBUG
     OTA_DEBUG.printf("Connect Failed\n");
 #endif
-    _udp_ota->listen(*IP_ADDR_ANY, _port);
+    _udp_ota->listen(IP_ADDR_ANY, _port);
     if (_error_callback) {
       _error_callback(OTA_CONNECT_ERROR);
     }
@@ -302,7 +301,7 @@ void ArduinoOTAClass::_runUpdate() {
 #ifdef OTA_DEBUG
       OTA_DEBUG.printf("Receive Failed\n");
 #endif
-      _udp_ota->listen(*IP_ADDR_ANY, _port);
+      _udp_ota->listen(IP_ADDR_ANY, _port);
       if (_error_callback) {
         _error_callback(OTA_RECEIVE_ERROR);
       }
@@ -337,7 +336,7 @@ void ArduinoOTAClass::_runUpdate() {
       ESP.restart();
     }
   } else {
-    _udp_ota->listen(*IP_ADDR_ANY, _port);
+    _udp_ota->listen(IP_ADDR_ANY, _port);
     if (_error_callback) {
       _error_callback(OTA_END_ERROR);
     }
