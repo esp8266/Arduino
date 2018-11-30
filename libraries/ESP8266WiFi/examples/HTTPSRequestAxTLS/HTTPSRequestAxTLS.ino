@@ -2,35 +2,41 @@
     HTTP over TLS (HTTPS) example sketch
 
     This example demonstrates how to use
-    WiFiClientSecure class to connect to a TLS server.
-
-    This example verifies server certificate using the
-    root CA certificate.
-
+    WiFiClientSecure class to access HTTPS API.
     We fetch and display the status of
     esp8266/Arduino project continuous integration
     build.
 
-    Created by Ivan Grokhotkov, 2017.
+    Limitations:
+      only RSA certificates
+      no support of Perfect Forward Secrecy (PFS)
+      TLSv1.2 is supported since version 2.4.0-rc1
+
+    Created by Ivan Grokhotkov, 2015.
     This example is in public domain.
 */
 
-#include <time.h>
+#define USING_AXTLS
 #include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
 
-const char* ssid = "........";
-const char* password = "........";
+// force use of AxTLS (BearSSL is now default)
+#include <WiFiClientSecureAxTLS.h>
+using namespace axTLS;
+
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 const char* host = "api.github.com";
 const int httpsPort = 443;
 
-// Root certificate used by api.github.com.
-// Defined in "CACert" tab.
-extern const unsigned char caCert[] PROGMEM;
-extern const unsigned int caCertLen;
-
-WiFiClientSecure client;
+// Use web browser to view and copy
+// SHA1 fingerprint of the certificate
+const char* fingerprint = "5F F1 60 31 09 04 3E F2 90 D2 B0 8A 50 38 04 E8 37 9F BC 76";
 
 void setup() {
   Serial.begin(115200);
@@ -48,34 +54,11 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  // Synchronize time useing SNTP. This is necessary to verify that
-  // the TLS certificates offered by the server are currently valid.
-  Serial.print("Setting time using SNTP");
-  configTime(8 * 3600, 0, "pool.ntp.org", "time.nist.gov");
-  time_t now = time(nullptr);
-  while (now < 8 * 3600 * 2) {
-    delay(500);
-    Serial.print(".");
-    now = time(nullptr);
-  }
-  Serial.println("");
-  struct tm timeinfo;
-  gmtime_r(&now, &timeinfo);
-  Serial.print("Current time: ");
-  Serial.print(asctime(&timeinfo));
-
-  // Load root certificate in DER format into WiFiClientSecure object
-  bool res = client.setCACert_P(caCert, caCertLen);
-  if (!res) {
-    Serial.println("Failed to load root CA certificate!");
-    while (true) {
-      yield();
-    }
-  }
-}
-
-void loop() {
-  // Connect to remote server
+  // Use WiFiClientSecure class to create TLS connection
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
+  WiFiClientSecure client;
+#pragma GCC diagnostic pop
   Serial.print("connecting to ");
   Serial.println(host);
   if (!client.connect(host, httpsPort)) {
@@ -83,12 +66,10 @@ void loop() {
     return;
   }
 
-  // Verify validity of server's certificate
-  if (client.verifyCertChain(host)) {
-    Serial.println("Server certificate verified");
+  if (client.verify(fingerprint, host)) {
+    Serial.println("certificate matches");
   } else {
-    Serial.println("ERROR: certificate verification failed!");
-    return;
+    Serial.println("certificate doesn't match");
   }
 
   String url = "/repos/esp8266/Arduino/commits/master/status";
@@ -118,16 +99,8 @@ void loop() {
   Serial.println("==========");
   Serial.println(line);
   Serial.println("==========");
-  Serial.println();
-
-  static int repeat = 0;
-  if (++repeat == 3) {
-    Serial.println("Done");
-    while (true) {
-      delay(1000);
-    }
-  }
-  delay(10000);
+  Serial.println("closing connection");
 }
 
-
+void loop() {
+}

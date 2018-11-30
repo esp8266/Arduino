@@ -468,6 +468,7 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, const String& boundary, ui
             _currentUpload->type = argType;
             _currentUpload->totalSize = 0;
             _currentUpload->currentSize = 0;
+            _currentUpload->contentLength = len;
 #ifdef DEBUG_ESP_HTTP_SERVER
             DEBUG_OUTPUT.print("Start File: ");
             DEBUG_OUTPUT.print(_currentUpload->filename);

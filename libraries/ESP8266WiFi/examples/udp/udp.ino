@@ -18,8 +18,10 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-#define SSID "ssid"
-#define PSK  "psk"
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
 
 unsigned int localPort = 8888;      // local port to listen on
 
@@ -32,7 +34,7 @@ WiFiUDP Udp;
 void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(SSID, PSK);
+  WiFi.begin(STASSID, STAPSK);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print('.');
     delay(500);
@@ -75,6 +77,6 @@ void loop() {
 
 /*
   test (shell/netcat):
-  ---------------
+  --------------------
 	  nc -u 192.168.esp.address 8888
 */

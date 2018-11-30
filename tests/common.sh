@@ -94,7 +94,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    wget https://github.com/bblanchon/ArduinoJson/releases/download/v4.6.1/ArduinoJson-v4.6.1.zip && unzip ArduinoJson-v4.6.1.zip
+    { test -r ArduinoJson-v4.6.1.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v4.6.1/ArduinoJson-v4.6.1.zip; } && unzip ArduinoJson-v4.6.1.zip
 
     popd
 }
@@ -104,7 +104,7 @@ function install_ide()
     local ide_path=$1
     local core_path=$2
     local debug=$3
-    wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+    test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
     tar xf arduino.tar.xz
     mv arduino-nightly $ide_path
     cd $ide_path/hardware

@@ -34,7 +34,8 @@ extern "C" {
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include "include/ClientContext.h"
-#include "WiFiServerSecure.h"
+#include "WiFiClientSecureAxTLS.h"
+#include "WiFiServerSecureAxTLS.h"
 
 
 namespace axTLS {
@@ -77,7 +78,10 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status)
     }
 
     optimistic_yield(1000);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     return WiFiClientSecure();
+#pragma GCC diagnostic pop
 }
 
 };
