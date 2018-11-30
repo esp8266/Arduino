@@ -2,6 +2,11 @@
    httpUpdateSigned.ino - Earle F. Philhower, III
    Released into the Public Domain
 
+   For use while building under Linux or Mac.
+
+   Automatic code signing is not supported on Windows, so this example
+   DOES NOT WORK UNDER WINDOWS.
+
    Shows how to use a public key extracted from your private certificate to
    only allow updates that you have signed to be applied over HTTP.  Remote
    updates will require your private key to sign them, but of course

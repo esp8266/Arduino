@@ -75,10 +75,10 @@ Signing requires the generation of an RSA-2048 key (other bit lengths are suppor
     openssl genrsa -out private.key 2048
     openssl rsa -in private.key -outform PEM -pubout -out public.key
 
-Automatic Signing
-^^^^^^^^^^^^^^^^^
+Automatic Signing -- Only available on Linux and Mac
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The simplest way of implementing signing is to use the automatic mode.  This mode uses the IDE to configure the source code to enable sigining verification with a given public key, and signs binaries as part of the standard build process using a given public key.
+The simplest way of implementing signing is to use the automatic mode, which is only possible on Linux and Mac presently due to missing tools under Windows.  This mode uses the IDE to configure the source code to enable sigining verification with a given public key, and signs binaries as part of the standard build process using a given public key.
 
 To enable this mode, just include `private.key` and `public.key` in the sketch `.ino` directory.  The IDE will call a helper script (`tools/signing.py`) before the build begins to create a header to enable key validation using the given public key, and after the build process to actually do the signing, generating a `sketch.bin.signed` file.  When OTA is enabled (ArduinoOTA, Web, or HTTP) the binary will only accept signed updates automatically.
 
