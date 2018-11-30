@@ -219,7 +219,7 @@ uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
 void attachInterrupt(uint8_t pin, void (*)(void), int mode);
 void detachInterrupt(uint8_t pin);
 
-void early_setup(void);
+void early_init(void);
 void setup(void);
 void loop(void);
 

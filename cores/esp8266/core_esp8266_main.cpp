@@ -145,7 +145,6 @@ void init_done() {
     system_set_os_print(1);
     gdb_init();
     do_global_ctors();
-    early_setup(); // <-- here after global constructors, or in user_init() ?
     esp_schedule();
 }
 
@@ -214,7 +213,7 @@ extern "C" void ICACHE_RAM_ATTR app_entry (void)
 }
 
 extern "C" void early_setup (void) __attribute__((weak));
-extern "C" void early_setup (void)
+extern "C" void early_init (void)
 {
     /* do nothing by default */
 }
@@ -230,6 +229,8 @@ extern "C" void user_init(void) {
     initVariant();
 
     cont_init(g_pcont);
+
+    early_init(); // user redefinable
 
     ets_task(loop_task,
         LOOP_TASK_PRIORITY, s_loop_queue,
