@@ -1,0 +1,35 @@
+#######################################
+# Syntax Coloring Map For ESP8266AVRISP
+#######################################
+
+#######################################
+# Library (KEYWORD3)
+#######################################
+
+ESP8266AVRISP	KEYWORD3		RESERVED_WORD
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+AVRISPState_t	KEYWORD1		DATA_TYPE
+AVRISP_parameter_t	KEYWORD1		DATA_TYPE
+ESP8266AVRISP	KEYWORD1		DATA_TYPE
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+setSpiFrequency	KEYWORD2
+setReset	KEYWORD2
+update	KEYWORD2
+serve	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+AVRISP_STATE_IDLE	LITERAL1		RESERVED_WORD_2
+AVRISP_STATE_PENDING	LITERAL1		RESERVED_WORD_2
+AVRISP_STATE_ACTIVE	LITERAL1		RESERVED_WORD_2

@@ -1,0 +1,9 @@
+[global]
+
+STA_SSID = my_ssid
+STA_PASS = my_password
+
+AP_SSID = test_wifi_ap
+AP_PASS = test_wifi_ap_pass
+
+SERVER_IP = 192.168.1.100

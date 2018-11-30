@@ -93,6 +93,7 @@ class EspClass {
         void wdtFeed();
 
         void deepSleep(uint64_t time_us, RFMode mode = RF_DEFAULT);
+        void deepSleepInstant(uint64_t time_us, RFMode mode = RF_DEFAULT);
         uint64_t deepSleepMax();
 
         bool rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size);
@@ -102,9 +103,15 @@ class EspClass {
         void restart();
 
         uint16_t getVcc();
-        uint32_t getFreeHeap();
-
         uint32_t getChipId();
+
+        uint32_t getFreeHeap();
+        uint16_t getMaxFreeBlockSize();
+        uint8_t getHeapFragmentation(); // in %
+        void getHeapStats(uint32_t* free = nullptr, uint16_t* max = nullptr, uint8_t* frag = nullptr);
+
+        uint32_t getFreeContStack();
+        void resetFreeContStack();
 
         const char * getSdkVersion();
         String getCoreVersion();

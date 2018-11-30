@@ -17,6 +17,11 @@
 
 ESP8266WiFiMulti WiFiMulti;
 
+#ifndef APSSID
+#define APSSID "APSSID"
+#define APPSK  "APPSK"
+#endif
+
 void setup() {
 
   USE_SERIAL.begin(115200);
@@ -33,7 +38,7 @@ void setup() {
   }
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP("SSID", "PASSWORD");
+  WiFiMulti.addAP(APSSID, APPSK);
 
 }
 
@@ -42,10 +47,21 @@ void loop() {
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
     USE_SERIAL.println("Update SPIFFS...");
-    t_httpUpdate_return ret = ESPhttpUpdate.updateSpiffs("http://server/spiffs.bin");
+
+    WiFiClient client;
+
+    // The line below is optional. It can be used to blink the LED on the board during flashing
+    // The LED will be on during download of one buffer of data from the network. The LED will
+    // be off during writing that buffer to flash
+    // On a good connection the LED should flash regularly. On a bad connection the LED will be
+    // on much longer than it will be off. Other pins than LED_BUILTIN may be used. The second
+    // value is used to put the LED on. If the LED is on with HIGH, that value should be passed
+    ESPhttpUpdate.setLedPin(LED_BUILTIN, LOW);
+
+    t_httpUpdate_return ret = ESPhttpUpdate.updateSpiffs(client, "http://server/spiffs.bin");
     if (ret == HTTP_UPDATE_OK) {
       USE_SERIAL.println("Update sketch...");
-      ret = ESPhttpUpdate.update("http://server/file.bin");
+      ret = ESPhttpUpdate.update(client, "http://server/file.bin");
 
       switch (ret) {
         case HTTP_UPDATE_FAILED:
