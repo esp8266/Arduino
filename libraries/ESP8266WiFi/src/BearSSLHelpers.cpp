@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Arduino.h>
+#include <StackThunk.h>
 #include "BearSSLHelpers.h"
 
 namespace brssl {
@@ -825,5 +826,18 @@ bool X509List::append(const uint8_t *derCert, size_t derLen) {
   return true;
 }
 
-};
+#if !CORE_MOCK
 
+// Second stack thunked helpers
+make_stack_thunk(br_ssl_engine_recvapp_ack);
+make_stack_thunk(br_ssl_engine_recvapp_buf);
+make_stack_thunk(br_ssl_engine_recvrec_ack);
+make_stack_thunk(br_ssl_engine_recvrec_buf);
+make_stack_thunk(br_ssl_engine_sendapp_ack);
+make_stack_thunk(br_ssl_engine_sendapp_buf);
+make_stack_thunk(br_ssl_engine_sendrec_ack);
+make_stack_thunk(br_ssl_engine_sendrec_buf);
+
+#endif
+
+};

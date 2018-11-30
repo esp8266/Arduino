@@ -109,6 +109,7 @@ bool isSpiffsFilenameValid(const char* name)
 }
 
 // these symbols should be defined in the linker script for each flash layout
+#ifndef CORE_MOCK
 #ifdef ARDUINO
 #ifndef SPIFFS_MAX_OPEN_FILES
 #define SPIFFS_MAX_OPEN_FILES 5
@@ -121,6 +122,7 @@ FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(
                              SPIFFS_PHYS_PAGE,
                              SPIFFS_PHYS_BLOCK,
                              SPIFFS_MAX_OPEN_FILES)));
-#endif
+#endif // ARDUINO
+#endif // !CORE_MOCK
 
 #endif
