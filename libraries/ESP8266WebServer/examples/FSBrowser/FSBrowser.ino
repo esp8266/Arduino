@@ -30,8 +30,13 @@
 
 #define DBG_OUTPUT_PORT Serial
 
-const char* ssid = "wifi-ssid";
-const char* password = "wifi-password";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 const char* host = "esp8266fs";
 
 ESP8266WebServer server(80);

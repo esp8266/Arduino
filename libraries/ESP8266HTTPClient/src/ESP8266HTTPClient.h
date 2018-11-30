@@ -26,7 +26,9 @@
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
 
-#define HTTPCLIENT_1_1_COMPATIBLE
+#ifndef HTTPCLIENT_1_1_COMPATIBLE
+#define HTTPCLIENT_1_1_COMPATIBLE 1
+#endif
 
 #include <memory>
 #include <Arduino.h>
@@ -35,7 +37,7 @@
 
 #ifdef DEBUG_ESP_HTTP_CLIENT
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_HTTPCLIENT(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_HTTPCLIENT(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ## __VA_ARGS__ )
 #endif
 #endif
 
@@ -128,7 +130,7 @@ typedef enum {
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
 class TransportTraits;
 typedef std::unique_ptr<TransportTraits> TransportTraitsPtr;
 #endif
@@ -148,7 +150,7 @@ public:
     bool begin(WiFiClient &client, String url);
     bool begin(WiFiClient &client, String host, uint16_t port, String uri = "/", bool https = false);
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
     // Plain HTTP connection, unencrypted
     bool begin(String url)  __attribute__ ((deprecated));
     bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
@@ -222,7 +224,7 @@ protected:
     int writeToStreamDataBlock(Stream * stream, int len);
 
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
     TransportTraitsPtr _transportTraits;
     std::unique_ptr<WiFiClient> _tcpDeprecated;
 #endif
