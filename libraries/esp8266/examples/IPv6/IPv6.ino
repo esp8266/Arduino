@@ -22,8 +22,8 @@
 #include <lwip/dns.h>
 
 #ifndef STASSID
-  #define STASSID "your-ssid"
-  #define STAPSK  "your-password"
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
 #endif
 
 #define FQDN  F("www.google.com") // with both IPv4 & IPv6 addresses
@@ -101,7 +101,7 @@ void setup() {
 
   status(Serial);
 
-  #if 0
+#if 0
 
   // legacy loop (still valid with IPv4 only)
 
@@ -110,7 +110,7 @@ void setup() {
     delay(500);
   }
 
-  #else
+#else
 
   // Use this loop instead to wait for an IPv6 routable address
 
@@ -131,7 +131,7 @@ void setup() {
     delay(500);
   }
 
-  #endif
+#endif
 
   Serial.println(F("connected: "));
 
