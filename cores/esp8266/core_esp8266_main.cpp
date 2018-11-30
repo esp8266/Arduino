@@ -212,7 +212,7 @@ extern "C" void ICACHE_RAM_ATTR app_entry (void)
     return app_entry_custom();
 }
 
-extern "C" void early_setup (void) __attribute__((weak));
+extern "C" void early_init (void) __attribute__((weak));
 extern "C" void early_init (void)
 {
     /* do nothing by default */
