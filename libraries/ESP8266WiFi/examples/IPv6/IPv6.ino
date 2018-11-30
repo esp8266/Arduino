@@ -66,10 +66,10 @@ void status(Print& out) {
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
   for (auto a : addrList) {
     out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
-               a->iface().c_str(),
+               a->ifname().c_str(),
                !a->addr().isV4(),
                a->addr().isLocal(),
-               a->hostname(),
+               a->ifhostname(),
                a->addr().toString().c_str());
 
     if (a->isLegacy()) {
@@ -95,6 +95,8 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
   Serial.println(ESP.getFullVersion());
+
+  Serial.printf("IPV6 is%s enabled\n", LWIP_IPV6? emptyString.c_str(): " NOT");
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
