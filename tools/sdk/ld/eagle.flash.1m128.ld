@@ -1,4 +1,4 @@
-/* Flash Split for 1.0M chips */
+/* Flash Split for 1M chips */
 /* sketch @0x40200000 (~871KB) (892912B) */
 /* empty  @0x402D9FF0 (~4KB) (4112B) */
 /* spiffs @0x402DB000 (~128KB) (131072B) */
