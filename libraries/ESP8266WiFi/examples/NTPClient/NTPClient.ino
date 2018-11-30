@@ -26,8 +26,8 @@
 #define STAPSK  "your-password"
 #endif
 
-const char ssid[] = STASSID; // your network SSID (name)
-const char pass[] = STAPSK;  // your network password
+const char * ssid = STASSID; // your network SSID (name)
+const char * pass = STAPSK;  // your network password
 
 
 unsigned int localPort = 2390;      // local port to listen for UDP packets
