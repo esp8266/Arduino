@@ -90,6 +90,24 @@ public:
   // before other methods are used.
   boolean begin(uint8_t csPin = SD_CHIP_SELECT_PIN, uint32_t speed = SPI_HALF_SPEED);
 
+/*
+  In the following sequence:
+  //Insert SD Card A
+  SD.begin()
+  //do operations
+  //remove card A
+  //insert SD card B
+  SD.end()
+
+  It is possible that card A becomes corrupted due to removal before calling SD.end().
+  It is possible that card B becomes corrupted if there were ops pending for card A at the time SD.end() is called.
+
+  Call SD.end() or SD.end(true) to shut everything down.
+  Call SD.end(false) to shut everything but the SPI object down.
+ */
+  void end(bool closeSPI = true);
+
+
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Returns a File object for interacting with the file.
   // Note that currently only one file can be open at a time.
