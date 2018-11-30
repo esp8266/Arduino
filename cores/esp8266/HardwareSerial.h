@@ -124,12 +124,12 @@ public:
 
     int peek(void) override
     {
-        // this may return -1, but that's okay
+        // return -1 when data is unvailable (arduino api)
         return uart_peek_char(_uart);
     }
     int read(void) override
     {
-        // this may return -1, but that's okay
+        // return -1 when data is unvailable (arduino api)
         return uart_read_char(_uart);
     }
     size_t readBytes(char* buffer, size_t size) override
