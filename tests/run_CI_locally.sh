@@ -33,7 +33,7 @@ if [ -d ${TMPCI} ]; then
 	echo ""
 	echo " -- updating CI directory in ${TMPCI} --"
 	echo ""
-	(cd ${TMPCI}; git checkout ${branch}; git pull)
+	(cd ${TMPCI}; git checkout master; git branch -D ${branch}; git checkout -b ${branch}; git pull origin ${branch})
 else
 	echo ""
 	echo " -- installing CI directory in ${TMPCI} --"
