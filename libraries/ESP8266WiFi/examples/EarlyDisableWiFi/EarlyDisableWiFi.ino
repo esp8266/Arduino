@@ -37,7 +37,7 @@ void early_init() {
   // use WiFi.forceSleepWake() to wake WiFi up
 }
 
-void setup () {
+void setup() {
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   Serial.println("sleeping 5s");
@@ -74,5 +74,5 @@ void setup () {
 
 }
 
-void loop () {
+void loop() {
 }
