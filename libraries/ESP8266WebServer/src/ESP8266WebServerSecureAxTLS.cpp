@@ -25,7 +25,7 @@
 #include <libb64/cencode.h>
 #include "WiFiServer.h"
 #include "WiFiClient.h"
-#include "ESP8266WebServerSecure.h"
+#include "ESP8266WebServerSecureAxTLS.h"
 
 //#define DEBUG_ESP_HTTP_SERVER
 #ifdef DEBUG_ESP_PORT
@@ -36,6 +36,9 @@
 
 namespace axTLS {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
+
 ESP8266WebServerSecure::ESP8266WebServerSecure(IPAddress addr, int port) 
 : _serverSecure(addr, port)
 {
@@ -45,6 +48,8 @@ ESP8266WebServerSecure::ESP8266WebServerSecure(int port)
 : _serverSecure(port)
 {
 }
+
+#pragma GCC diagnostic pop
 
 void ESP8266WebServerSecure::setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen)
 {
@@ -131,7 +136,10 @@ void ESP8266WebServerSecure::handleClient() {
   }
 
   if (!keepCurrentClient) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     _currentClientSecure = WiFiClientSecure();
+#pragma GCC diagnostic pop
     _currentStatus = HC_NONE;
     _currentUpload.reset();
   }

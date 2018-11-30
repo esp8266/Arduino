@@ -32,7 +32,7 @@
 
 #ifdef DEBUG_ESP_WIFI
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_WIFI_MULTI(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_WIFI_MULTI(fmt, ...) DEBUG_ESP_PORT.printf( (PGM_P)PSTR(fmt), ##__VA_ARGS__ )
 #endif
 #endif
 

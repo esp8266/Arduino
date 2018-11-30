@@ -69,7 +69,7 @@ void loop() {
   if (Udp.parsePacket()) {
     // We've received a packet, read the data from it
     Udp.read((byte *)&packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
-    #if 0 // just for debugging
+#if 0 // just for debugging
     Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdelay_main), HEX);
     Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdelay_fraction), HEX);
     Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdispersion_main), HEX);
@@ -82,7 +82,7 @@ void loop() {
     Serial.println(ENDIAN_SWAP_32(packetBuffer.receivetimestamp_fraction), HEX);
     Serial.println(ENDIAN_SWAP_32(packetBuffer.transmittimestamp_main), HEX);
     Serial.println(ENDIAN_SWAP_32(packetBuffer.transmittimestamp_fraction), HEX);
-    #endif
+#endif
     Serial.print("Delay ");
     Serial.print(ENDIAN_SWAP_16(packetBuffer.rootdelay_main)); Serial.print("."); Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdelay_fraction));
     Serial.print("Seconds since Jan 1 1900 = ");
