@@ -53,6 +53,8 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _postArgsLen(0)
+, _postArgs(nullptr)
 , _headerKeysCount(0)
 , _currentHeaders(nullptr)
 , _contentLength(0)
@@ -71,6 +73,8 @@ ESP8266WebServer::ESP8266WebServer(int port)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _postArgsLen(0)
+, _postArgs(nullptr)
 , _headerKeysCount(0)
 , _currentHeaders(nullptr)
 , _contentLength(0)
@@ -438,12 +442,9 @@ void ESP8266WebServer::sendContent(const String& content) {
   const char * footer = "\r\n";
   size_t len = content.length();
   if(_chunked) {
-    char * chunkSize = (char *)malloc(11);
-    if(chunkSize){
-      sprintf(chunkSize, "%x%s", len, footer);
-      _currentClientWrite(chunkSize, strlen(chunkSize));
-      free(chunkSize);
-    }
+    char chunkSize[11];
+    sprintf(chunkSize, "%zx\r\n", len);
+    _currentClientWrite(chunkSize, strlen(chunkSize));
   }
   _currentClientWrite(content.c_str(), len);
   if(_chunked){
@@ -461,12 +462,9 @@ void ESP8266WebServer::sendContent_P(PGM_P content) {
 void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
   const char * footer = "\r\n";
   if(_chunked) {
-    char * chunkSize = (char *)malloc(11);
-    if(chunkSize){
-      sprintf(chunkSize, "%x%s", size, footer);
-      _currentClientWrite(chunkSize, strlen(chunkSize));
-      free(chunkSize);
-    }
+    char chunkSize[11];
+    sprintf(chunkSize, "%zx\r\n", size);
+    _currentClientWrite(chunkSize, strlen(chunkSize));
   }
   _currentClientWrite_P(content, size);
   if(_chunked){
@@ -492,6 +490,10 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
 
 
 const String& ESP8266WebServer::arg(String name) const {
+  for (int j = 0; j < _postArgsLen; ++j) {
+    if ( _postArgs[j].key == name )
+      return _postArgs[j].value;
+  }
   for (int i = 0; i < _currentArgCount; ++i) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
@@ -516,6 +518,10 @@ int ESP8266WebServer::args() const {
 }
 
 bool ESP8266WebServer::hasArg(const String& name) const {
+  for (int j = 0; j < _postArgsLen; ++j) {
+    if (_postArgs[j].key == name)
+      return true;
+  }
   for (int i = 0; i < _currentArgCount; ++i) {
     if (_currentArgs[i].key == name)
       return true;

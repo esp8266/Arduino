@@ -136,7 +136,6 @@
 #include "bearssl_ssl.h"
 #include "bearssl_x509.h"
 #include "bearssl_pem.h"
-#include "bearssl_port.h"
 
 /** \brief Type for a configuration option.
  *

@@ -24,7 +24,8 @@
 #define ESP8266WEBSERVERSECURE_H
 
 #include <ESP8266WebServer.h>
-#include <WiFiServerSecure.h>
+#include <WiFiServerSecureAxTLS.h>
+#include <WiFiClientSecureAxTLS.h>
 
 namespace axTLS {
 

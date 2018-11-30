@@ -60,8 +60,13 @@
 #include <ESP8266WebServer.h>
 #include <WiFiClient.h>
 
-const char* ssid = "replace_me";
-const char* password = "replace_me";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 ESP8266WebServer web_server(80);
 
