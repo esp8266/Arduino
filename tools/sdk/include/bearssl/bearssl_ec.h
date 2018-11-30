@@ -28,6 +28,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "bearssl_rand.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -796,6 +798,83 @@ br_ecdsa_vrfy br_ecdsa_vrfy_asn1_get_default(void);
  * \return  the default implementation.
  */
 br_ecdsa_vrfy br_ecdsa_vrfy_raw_get_default(void);
+
+/**
+ * \brief Maximum size for EC private key element buffer.
+ *
+ * This is the largest number of bytes that `br_ec_keygen()` may need or
+ * ever return.
+ */
+#define BR_EC_KBUF_PRIV_MAX_SIZE   72
+
+/**
+ * \brief Maximum size for EC public key element buffer.
+ *
+ * This is the largest number of bytes that `br_ec_compute_public()` may
+ * need or ever return.
+ */
+#define BR_EC_KBUF_PUB_MAX_SIZE    145
+
+/**
+ * \brief Generate a new EC private key.
+ *
+ * If the specified `curve` is not supported by the elliptic curve
+ * implementation (`impl`), then this function returns zero.
+ *
+ * The `sk` structure fields are set to the new private key data. In
+ * particular, `sk.x` is made to point to the provided key buffer (`kbuf`),
+ * in which the actual private key data is written. That buffer is assumed
+ * to be large enough. The `BR_EC_KBUF_PRIV_MAX_SIZE` defines the maximum
+ * size for all supported curves.
+ *
+ * The number of bytes used in `kbuf` is returned. If `kbuf` is `NULL`, then
+ * the private key is not actually generated, and `sk` may also be `NULL`;
+ * the minimum length for `kbuf` is still computed and returned.
+ *
+ * If `sk` is `NULL` but `kbuf` is not `NULL`, then the private key is
+ * still generated and stored in `kbuf`.
+ *
+ * \param rng_ctx   source PRNG context (already initialized).
+ * \param impl      the elliptic curve implementation.
+ * \param sk        the private key structure to fill, or `NULL`.
+ * \param kbuf      the key element buffer, or `NULL`.
+ * \param curve     the curve identifier.
+ * \return  the key data length (in bytes), or zero.
+ */
+size_t br_ec_keygen(const br_prng_class **rng_ctx,
+	const br_ec_impl *impl, br_ec_private_key *sk,
+	void *kbuf, int curve);
+
+/**
+ * \brief Compute EC public key from EC private key.
+ *
+ * This function uses the provided elliptic curve implementation (`impl`)
+ * to compute the public key corresponding to the private key held in `sk`.
+ * The public key point is written into `kbuf`, which is then linked from
+ * the `*pk` structure. The size of the public key point, i.e. the number
+ * of bytes used in `kbuf`, is returned.
+ *
+ * If `kbuf` is `NULL`, then the public key point is NOT computed, and
+ * the public key structure `*pk` is unmodified (`pk` may be `NULL` in
+ * that case). The size of the public key point is still returned.
+ *
+ * If `pk` is `NULL` but `kbuf` is not `NULL`, then the public key
+ * point is computed and stored in `kbuf`, and its size is returned.
+ *
+ * If the curve used by the private key is not supported by the curve
+ * implementation, then this function returns zero.
+ *
+ * The private key MUST be valid. An off-range private key value is not
+ * necessarily detected, and leads to unpredictable results.
+ *
+ * \param impl   the elliptic curve implementation.
+ * \param pk     the public key structure to fill (or `NULL`).
+ * \param kbuf   the public key point buffer (or `NULL`).
+ * \param sk     the source private key.
+ * \return  the public key point length (in bytes), or zero.
+ */
+size_t br_ec_compute_pub(const br_ec_impl *impl, br_ec_public_key *pk,
+	void *kbuf, const br_ec_private_key *sk);
 
 #ifdef __cplusplus
 }

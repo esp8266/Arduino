@@ -30,7 +30,6 @@
 #define NUM_DIGITAL_PINS        17
 #define NUM_ANALOG_INPUTS       1
 
-// TODO: this should be <= 9 if flash is in DIO mode
 #define isFlashInterfacePin(p)      ((p) >= 6 && (p) <= 11)
 
 #define analogInputToDigitalPin(p)  ((p > 0) ? NOT_A_PIN : 0)
@@ -77,7 +76,7 @@ static const uint8_t A0 = PIN_A0;
 #ifdef __cplusplus
 extern "C"
 #endif
-const int BUILTIN_LED __attribute__((deprecated, weak)) = LED_BUILTIN;
+const int BUILTIN_LED __attribute__((deprecated("use LED_BUILTIN"), weak)) = LED_BUILTIN;
 #endif
 
 #endif /* GENERIC_COMMON_H */

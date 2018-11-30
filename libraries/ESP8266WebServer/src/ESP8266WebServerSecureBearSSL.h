@@ -37,8 +37,8 @@ public:
   virtual ~ESP8266WebServerSecure();
 
   void setBufferSizes(int recv, int xmit);
-  void setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk);
-  void setECCert(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk);
+  void setRSACert(const X509List *chain, const PrivateKey *sk);
+  void setECCert(const X509List *chain, unsigned cert_issuer_key_type, const PrivateKey *sk);
 
   WiFiClient client() override { return _currentClientSecure; }
 
@@ -61,8 +61,8 @@ private:
   size_t _currentClientWrite_P (PGM_P bytes, size_t len) override { return _currentClientSecure.write_P(bytes, len); }
 
 protected:
-  BearSSL::WiFiServerSecure _serverSecure;
-  BearSSL::WiFiClientSecure _currentClientSecure;
+  WiFiServerSecure _serverSecure;
+  WiFiClientSecure _currentClientSecure;
 };
 
 };

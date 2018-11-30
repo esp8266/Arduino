@@ -62,6 +62,7 @@ typedef uint32_t sys_prot_t;	// not really used
 #define SYS_ARCH_DECL_PROTECT(lev)
 #define SYS_ARCH_PROTECT(lev) os_intr_lock()
 #define SYS_ARCH_UNPROTECT(lev) os_intr_unlock()
+#define LWIP_NO_CTYPE_H 1
 
 ///////////////////////////////
 //// DEBUG
@@ -89,14 +90,14 @@ typedef uint32_t sys_prot_t;	// not really used
     ip4_addr3_16(ipaddr), \
     ip4_addr4_16(ipaddr)
 
-// ip_addr / ip_info: do not exist in lwip2 (only in lwip1.4)
-struct ip_addr {
+// ipv4_addr / ip_info: do not exist in lwip2 (only in lwip1.4)
+struct ipv4_addr {
   uint32_t addr;
 };
 struct ip_info {
-    struct ip_addr ip;
-    struct ip_addr netmask;
-    struct ip_addr gw;
+    struct ipv4_addr ip;
+    struct ipv4_addr netmask;
+    struct ipv4_addr gw;
 };
 
 ///////////////////////////////

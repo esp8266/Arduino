@@ -1024,6 +1024,10 @@ void ICACHE_FLASH_ATTR *umm_info( void *ptr, int force ) {
     if( UMM_NBLOCK(blockNo) & UMM_FREELIST_MASK ) {
       ++ummHeapInfo.freeEntries;
       ummHeapInfo.freeBlocks += curBlocks;
+      ummHeapInfo.freeSize2 += (unsigned int)curBlocks
+                             * (unsigned int)sizeof(umm_block)
+                             * (unsigned int)curBlocks
+                             * (unsigned int)sizeof(umm_block);
 
       if (ummHeapInfo.maxFreeContiguousBlocks < curBlocks) {
         ummHeapInfo.maxFreeContiguousBlocks = curBlocks;
@@ -1759,6 +1763,15 @@ void umm_free( void *ptr ) {
 size_t ICACHE_FLASH_ATTR umm_free_heap_size( void ) {
   umm_info(NULL, 0);
   return (size_t)ummHeapInfo.freeBlocks * sizeof(umm_block);
+}
+
+size_t ICACHE_FLASH_ATTR umm_max_block_size( void ) {
+  umm_info(NULL, 0);
+  return ummHeapInfo.maxFreeContiguousBlocks * sizeof(umm_block);
+}
+
+size_t ICACHE_FLASH_ATTR umm_block_size( void ) {
+  return sizeof(umm_block);
 }
 
 /* ------------------------------------------------------------------------ */

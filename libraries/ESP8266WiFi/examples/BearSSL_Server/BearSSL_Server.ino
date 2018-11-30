@@ -37,8 +37,13 @@
 #include <ESP8266WiFi.h>
 #include <time.h>
 
-const char *ssid = "....";
-const char *pass = "....";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char *ssid = STASSID;
+const char *pass = STAPSK;
 
 // The HTTPS server
 BearSSL::WiFiServerSecure server(443);
@@ -121,8 +126,8 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   // Attach the server private cert/key combo
-  BearSSLX509List *serverCertList = new BearSSLX509List(server_cert);
-  BearSSLPrivateKey *serverPrivKey = new BearSSLPrivateKey(server_private_key);
+  BearSSL::X509List *serverCertList = new BearSSL::X509List(server_cert);
+  BearSSL::PrivateKey *serverPrivKey = new BearSSL::PrivateKey(server_private_key);
   server.setRSACert(serverCertList, serverPrivKey);
 
   // Actually start accepting connections

@@ -11,6 +11,8 @@ tools/sdk/lwip/src/liblwip_src.a
 tools/sdk/ld/backup
 tools/sdk/ld/eagle.app.v6.common.ld
 
+tests/hosts/lcov/
+
 *.pyc
 *.gch
 

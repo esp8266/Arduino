@@ -4,7 +4,7 @@ Stack Dumps
 Introduction
 ------------
 
-If the ESP crash the Exception Cause will be shown and the current stack will be dumped.
+If the ESP crashes the Exception Cause will be shown and the current stack will be dumped.
 
 Example:
 

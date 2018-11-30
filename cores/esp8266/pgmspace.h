@@ -10,7 +10,19 @@
 #include "ets_sys.h"
 #include "osapi.h"
 
-#define PROGMEM     ICACHE_RODATA_ATTR
+// Since __section__ is supposed to be only use for global variables,
+// there could be conflicts when a static/inlined function has them in the
+// same file as a non-static PROGMEM object.
+// Ref: https://gcc.gnu.org/onlinedocs/gcc-3.2/gcc/Variable-Attributes.html
+// Place each progmem object into its own named section, avoiding conflicts
+
+// The following two macros cause a parameter to be enclosed in quotes
+// by the preopressor (i.e. for concatenating ints to strings)
+#define __STRINGIZE_NX(A) #A
+#define __STRINGIZE(A) __STRINGIZE_NX(A)
+
+#define PROGMEM      __attribute__((section( "\".irom.text." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\"")))
+
 #define PGM_P  		const char *
 #define PGM_VOID_P  const void *
 #define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
