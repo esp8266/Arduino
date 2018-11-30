@@ -15,8 +15,8 @@
 #define STAPSK  "your-password"
 #endif
 
-const char SSID[] = STASSID;
-const char PSK[] = STAPSK;
+const char * SSID = STASSID;
+const char * PSK = STAPSK;
 
 IPAddress staticip(192, 168, 1, 123);
 IPAddress gateway(192, 168, 1, 254);
