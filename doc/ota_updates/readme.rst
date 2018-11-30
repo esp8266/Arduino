@@ -57,7 +57,7 @@ Signed Binary Format
 
 The format of a signed binary is compatible with the standard binary format, and can be uploaded to a non-signed ESP8266 via serial or OTA without any conditions.  Note, however, that once an unsigned OTA app is overwritten by this signed version, further updates will require signing.
 
-As shown below, the signed hash is appended to the unsigned binary followed by the total length of the signed hash (i.e. if the signed has was 64 bytes, then this uint32 will contain 64).  This format allows for extensibility (such as adding in a CA-based validation scheme allowing multiple signing keys all based off of a trust anchor), and pull requests are always welcome.
+As shown below, the signed hash is appended to the unsigned binary followed by the total length of the signed hash (i.e. if the signed hash was 64 bytes, then this uint32 will contain 64).  This format allows for extensibility (such as adding in a CA-based validation scheme allowing multiple signing keys all based off of a trust anchor), and pull requests are always welcome.
 
 .. code::
 
