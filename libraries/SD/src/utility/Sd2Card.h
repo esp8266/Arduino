@@ -201,7 +201,7 @@ class Sd2Card {
   uint8_t init(uint8_t sckRateID, uint8_t chipSelectPin);
   #endif
 
-  void end(bool endSPI = false);
+  void end(bool endSPI = true);
 
   void partialBlockRead(uint8_t value);
   /** Returns the current value, true or false, for partial block read. */

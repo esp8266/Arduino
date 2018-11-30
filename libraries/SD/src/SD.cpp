@@ -351,13 +351,13 @@ boolean SDClass::begin(uint8_t csPin, uint32_t speed) {
 }
 
 //Warning: see comment in SD.h about possible card corruption.
-void SdClass::end(bool closeSPI)
+void SdClass::end(bool endSPI)
 {
   if(card.errorCode() == 0 && root.isOpen()) {
     root.close(); //Warning: this calls sync(), see above comment about corruption.
   }
   
-  card.end(closeSPI);
+  card.end(endSPI);
 }
 
 

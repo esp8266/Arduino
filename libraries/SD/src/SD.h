@@ -105,7 +105,7 @@ public:
   Call SD.end() or SD.end(true) to shut everything down.
   Call SD.end(false) to shut everything but the SPI object down.
  */
-  void end(bool closeSPI = true);
+  void end(bool endSPI = true);
 
 
   // Open the specified file/directory with the supplied mode (e.g. read or
