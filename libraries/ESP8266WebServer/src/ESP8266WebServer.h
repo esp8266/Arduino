@@ -55,8 +55,9 @@ typedef struct {
   String  filename;
   String  name;
   String  type;
-  size_t  totalSize;    // file size
+  size_t  totalSize;    // total size of uploaded file so far
   size_t  currentSize;  // size of data currently in buf
+  size_t  contentLength; // size of entire post request, file size + headers and other request data.
   uint8_t buf[HTTP_UPLOAD_BUFLEN];
 } HTTPUpload;
 
