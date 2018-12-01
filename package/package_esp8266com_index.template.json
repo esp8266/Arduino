@@ -106,6 +106,9 @@
             },
             {
               "name": "Seeed Wio Link"
+            },
+            {
+              "name": "ESPectro Core"
             }
           ],
           "toolsDependencies": [
