@@ -202,6 +202,7 @@ class IPAddress: public Printable {
 
 extern CONST IPAddress IPNoAddress;
 
-#include <AddrList.h>
+#include <lwip/inet.h> // bring definition of INADDR_NONE
+#include <AddrList.h>  // bring interface iterator
 
 #endif
