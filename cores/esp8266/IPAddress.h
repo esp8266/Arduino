@@ -99,7 +99,13 @@ class IPAddress: public Printable {
         bool operator==(uint32_t addr) const {
             return isV4() && v4() == addr;
         }
+        bool operator==(u32_t addr) const {
+            return isV4() && v4() == addr;
+        }
         bool operator!=(uint32_t addr) const {
+            return !(isV4() && v4() == addr);
+        }
+        bool operator!=(u32_t addr) const {
             return !(isV4() && v4() == addr);
         }
         bool operator==(const uint8_t* addr) const;
