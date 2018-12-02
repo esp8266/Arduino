@@ -1129,10 +1129,13 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
     if flashsize_kb <= 1024:
         max_upload_size = (flashsize_kb - (spiffs_kb + eeprom_size_kb + rfcal_size_kb + sdkwifi_size_kb)) * 1024 - reserved
         spiffs_start = spiffs_end - spiffs_kb * 1024
-        spiffs_blocksize = 4096
     else:
         max_upload_size = 1024 * 1024 - reserved
         spiffs_start = (flashsize_kb - spiffs_kb) * 1024
+
+    if spiffs_kb < 1024:
+        spiffs_blocksize = 4096
+    else:
         spiffs_blocksize = 8192
 
     strsize = str(flashsize_kb / 1024) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
