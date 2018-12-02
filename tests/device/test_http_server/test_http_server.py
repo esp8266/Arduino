@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from mock_decorators import setup, teardown
 from threading import Thread
 from poster.encode import MultipartParam
@@ -24,7 +25,7 @@ def http_test(res, url, get=None, post=None):
 @setup('HTTP GET Parameters')
 def setup_http_get_params(e):
     def testRun():
-        return http_test('var1 = val with spaces\nva=r+ = so&me%', 'http://etd.local/get', {'var1' : 'val with spaces', 'va=r+' : 'so&me%'})
+        return http_test('var1 = val with spaces\nva=r+ = so&me%', 'http://etd.local/get', OrderedDict([('var1', 'val with spaces'), ('va=r+', 'so&me%')]))
     Thread(target=testRun).start()
 
 @teardown('HTTP GET Parameters')
