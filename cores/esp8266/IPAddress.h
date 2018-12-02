@@ -38,9 +38,12 @@
 #define IP4_ADDR_ANY4 IPADDR_ANY
 #define IPADDR4_INIT(x) { x }
 #define CONST /* nothing: lwIP-v1 does not use const */
-#else
+#else // lwIP-v2+
 #define CONST const
-#endif
+#if !LWIP_IPV6
+#define ip_addr ipv4_addr
+#endif // !LWIP_IPV6
+#endif // lwIP-v2+
 
 // A class to make it easier to handle and pass around IP addresses
 // IPv6 update:
@@ -96,7 +99,13 @@ class IPAddress: public Printable {
         bool operator==(uint32_t addr) const {
             return isV4() && v4() == addr;
         }
+        bool operator==(u32_t addr) const {
+            return isV4() && v4() == addr;
+        }
         bool operator!=(uint32_t addr) const {
+            return !(isV4() && v4() == addr);
+        }
+        bool operator!=(u32_t addr) const {
             return !(isV4() && v4() == addr);
         }
         bool operator==(const uint8_t* addr) const;
@@ -193,6 +202,7 @@ class IPAddress: public Printable {
 
 extern CONST IPAddress IPNoAddress;
 
-#include <AddrList.h>
+#include <lwip/inet.h> // bring definition of INADDR_NONE
+#include <AddrList.h>  // bring interface iterator
 
 #endif
