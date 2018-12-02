@@ -173,8 +173,15 @@ function build_sketches_with_platformio()
     set +e
     local srcpath=$1
     local build_arg=$2
-    local sketches=$(find $srcpath -name *.ino)
+    local build_mod=$3
+    local build_rem=$4
+    local sketches=$(find $srcpath -name *.ino | sort)
+    local testcnt=0
     for sketch in $sketches; do
+        testcnt=$(( ($testcnt + 1) % $build_mod ))
+        if [ $testcnt -ne $build_rem ]; then
+            continue  # Not ours to do
+        fi
         local sketchdir=$(dirname $sketch)
         local sketchdirname=$(basename $sketchdir)
         local sketchname=$(basename $sketch)
@@ -274,7 +281,15 @@ elif [ "$BUILD_TYPE" = "debug_odd" ]; then
 elif [ "$BUILD_TYPE" = "platformio" ]; then
     # PlatformIO
     install_platformio
-    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 1 0
+elif [ "$BUILD_TYPE" = "platformio_even" ]; then
+    # PlatformIO
+    install_platformio
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 2 0
+elif [ "$BUILD_TYPE" = "platformio_odd" ]; then
+    # PlatformIO
+    install_platformio
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 2 1
 elif [ "$BUILD_TYPE" = "docs" ]; then
     # Build documentation using Sphinx
     cd $TRAVIS_BUILD_DIR/doc
