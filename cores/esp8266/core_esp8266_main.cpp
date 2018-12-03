@@ -212,8 +212,8 @@ extern "C" void ICACHE_RAM_ATTR app_entry (void)
     return app_entry_custom();
 }
 
-extern "C" void early_init (void) __attribute__((weak));
-extern "C" void early_init (void)
+extern "C" void preinit (void) __attribute__((weak));
+extern "C" void preinit (void)
 {
     /* do nothing by default */
 }
@@ -230,7 +230,7 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
-    early_init(); // user redefinable
+    preinit(); // user redefinable
 
     ets_task(loop_task,
         LOOP_TASK_PRIORITY, s_loop_queue,

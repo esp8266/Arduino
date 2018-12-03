@@ -1,10 +1,10 @@
 
 #include <ESP8266WiFi.h>
 
-// early_init() is called before system startup
+// preinit() is called before system startup
 // from nonos-sdk's user entry point user_init()
 
-void early_init() {
+void preinit() {
   // Global constructors are not called yet
   // (global class instances like WiFi, Serial... are not yet initialized).
   // In this function, we must only use nonos-sdk API.
