@@ -66,16 +66,16 @@ void status(Print& out) {
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
   for (auto a : addrList) {
     out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
-               a->iface().c_str(),
-               !a->addr().isV4(),
-               a->addr().isLocal(),
-               a->hostname(),
-               a->addr().toString().c_str());
+               a.iface().c_str(),
+               !a.addr().isV4(),
+               a.addr().isLocal(),
+               a.hostname(),
+               a.addr().toString().c_str());
 
-    if (a->isLegacy()) {
+    if (a.isLegacy()) {
       out.printf(" / mask:%s / gw:%s",
-                 a->netmask().toString().c_str(),
-                 a->gw().toString().c_str());
+                 a.netmask().toString().c_str(),
+                 a.gw().toString().c_str());
     }
 
     out.println();
@@ -121,9 +121,9 @@ void setup() {
 
   for (bool configured = false; !configured;) {
     for (auto addr : addrList)
-      if ((configured = !addr->isLocal()
-                        // && addr->isV6() // uncomment when IPv6 is mandatory
-                        // && addr->ifnumber() == STATION_IF
+      if ((configured = !addr.isLocal()
+                        // && addr.isV6() // uncomment when IPv6 is mandatory
+                        // && addr.ifnumber() == STATION_IF
           )) {
         break;
       }

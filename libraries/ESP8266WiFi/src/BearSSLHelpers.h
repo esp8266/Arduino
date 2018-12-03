@@ -24,6 +24,8 @@
 #define _BEARSSLHELPERS_H
 
 #include <bearssl/bearssl.h>
+#include <Updater.h>
+
 
 // Internal opaque structures, not needed by user applications
 namespace brssl {
@@ -136,6 +138,31 @@ class Session {
     br_ssl_session_parameters _session;
 };
 
+// Updater SHA256 hash and signature verification
+class HashSHA256 : public UpdaterHashClass {
+  public:
+    virtual void begin() override;
+    virtual void add(const void *data, uint32_t len) override;
+    virtual void end() override;
+    virtual int len() override;
+    virtual const void *hash() override;
+  private:
+    br_sha256_context _cc;
+    unsigned char _sha256[32];
+};
+
+class SigningVerifier : public UpdaterVerifyClass {
+  public:
+    virtual uint32_t length() override;
+    virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) override;
+
+  public:
+    SigningVerifier(PublicKey *pubKey) { _pubKey = pubKey; }
+
+  private:
+    PublicKey *_pubKey;
+};
+  
 // Stack thunked versions of calls
 extern "C" {
 extern unsigned char *thunk_br_ssl_engine_recvapp_buf( const br_ssl_engine_context *cc, size_t *len);
