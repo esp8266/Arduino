@@ -67,11 +67,16 @@ class IPAddress: public Printable {
             return reinterpret_cast<const uint8_t*>(&v4());
         }
 
+        void ctor32 (uint32_t);
+
     public:
         // Constructors
         IPAddress();
+        IPAddress(const IPAddress& from);
         IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
-        IPAddress(uint32_t address);
+        IPAddress(uint32_t address) { ctor32(address); }
+        IPAddress(u32_t address) { ctor32(address); }
+        IPAddress(int address) { ctor32(address); }
         IPAddress(const uint8_t *address);
 
         bool fromString(const char *address);
@@ -200,9 +205,9 @@ class IPAddress: public Printable {
 
 };
 
-extern CONST IPAddress IPNoAddress;
+extern CONST IPAddress INADDR_ANY;
+extern const IPAddress INADDR_NONE;
 
-#include <lwip/inet.h> // bring definition of INADDR_NONE
 #include <AddrList.h>  // bring interface iterator
 
 #endif

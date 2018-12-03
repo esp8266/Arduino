@@ -17,6 +17,7 @@
 #define UPDATE_ERROR_NEW_FLASH_CONFIG   (9)
 #define UPDATE_ERROR_MAGIC_BYTE         (10)
 #define UPDATE_ERROR_BOOTSTRAP          (11)
+#define UPDATE_ERROR_SIGN               (12)
 
 #define U_FLASH   0
 #define U_SPIFFS  100
@@ -28,9 +29,30 @@
 #endif
 #endif
 
+// Abstract class to implement whatever signing hash desired
+class UpdaterHashClass {
+  public:
+    virtual void begin() = 0;
+    virtual void add(const void *data, uint32_t len) = 0;
+    virtual void end() = 0;
+    virtual int len() = 0;
+    virtual const void *hash() = 0;
+};
+
+// Abstract class to implement a signature verifier
+class UpdaterVerifyClass {
+  public:
+    virtual uint32_t length() = 0; // How many bytes of signature are expected
+    virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) = 0; // Verify, return "true" on success
+};
+
 class UpdaterClass {
   public:
     UpdaterClass();
+
+    /* Optionally add a cryptographic signature verification hash and method */
+    void installSignature(UpdaterHashClass *hash, UpdaterVerifyClass *verify) {  _hash = hash;  _verify = verify; }
+
     /*
       Call this to check the space needed for the update
       Will return false if there is not enough space
@@ -165,6 +187,10 @@ class UpdaterClass {
 
     int _ledPin;
     uint8_t _ledOn;
+
+    // Optional signed binary verification
+    UpdaterHashClass *_hash;
+    UpdaterVerifyClass *_verify;
 };
 
 extern UpdaterClass Update;
