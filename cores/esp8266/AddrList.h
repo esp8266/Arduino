@@ -104,7 +104,7 @@ struct netifWrapper
         return *this;
     }
 
-    bool equal(const netifWrapper& o) 
+    bool equal(const netifWrapper& o)
     {
         return _netif == o._netif && (!_netif || _num == o._num);
     }
@@ -127,7 +127,7 @@ struct netifWrapper
     const char* ifmac () const      { return (const char*)_netif->hwaddr; }
     int ifnumber () const           { return _netif->num; }
 
-    const ip_addr_t* ipFromNetifNum () const 
+    const ip_addr_t* ipFromNetifNum () const
     {
 #if LWIP_IPV6
         return _num ? &_netif->ip6_addr[_num - 1] : &_netif->ip_addr;
@@ -138,7 +138,7 @@ struct netifWrapper
 
     // lwIP interface
     netif* _netif;
-    
+
     // address index within interface
     // 0: legacy address (IPv4)
     // n>0: (_num-1) is IPv6 index for netif->ip6_addr[]
@@ -167,7 +167,7 @@ public:
 
     AddressListIterator& operator= (const AddressListIterator& o) { netIf = o.netIf; return *this; }
 
-    AddressListIterator operator++ (int) 
+    AddressListIterator operator++ (int)
     {
         AddressListIterator ret = *this;
         (void)operator++();
@@ -176,9 +176,9 @@ public:
 
     AddressListIterator& operator++ ()
     {
-        while (netIf._netif) 
+        while (netIf._netif)
         {
-            if (++netIf._num == IF_NUM_ADDRESSES) 
+            if (++netIf._num == IF_NUM_ADDRESSES)
             {
                 // all addresses from current interface were iterated,
                 // switching to next interface
