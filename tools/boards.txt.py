@@ -1133,7 +1133,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         max_upload_size = 1024 * 1024 - reserved
         spiffs_start = (flashsize_kb - spiffs_kb) * 1024
 
-    if spiffs_kb < 1024:
+    if spiffs_kb < 512:
         spiffs_blocksize = 4096
     else:
         spiffs_blocksize = 8192
