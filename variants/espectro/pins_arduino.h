@@ -31,7 +31,7 @@
 static const uint8_t SDA = 4;
 static const uint8_t SCL = 5;
 
-#define LED_BUILTIN 15;
+#define LED_BUILTIN 15
 
 #if ESPECTRO_CORE_VERSION == 3
 static const uint8_t BUTTON_BUILTIN = 0;
