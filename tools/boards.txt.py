@@ -820,6 +820,26 @@ boards = collections.OrderedDict([
                   '',
                   'Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html'
                 ],
+    }),
+    ('espectro', {
+        'name': 'ESPectro Core',
+        'opts': {
+            '.build.board': 'ESP8266_ESPECTRO_CORE',
+            '.build.variant': 'espectro',
+        },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+        ],
+        'desc': [
+            'ESPectro Core is ESP8266 development board as the culmination of our 3+ year experience in exploring and developing products with ESP8266 MCU.',
+            '',
+            'Initially designed for kids in mind, everybody should be able to use it. Yet it\'s still hacker-friendly as we break out all ESP8266 ESP-12F pins.',
+            '',
+            'More details at https://shop.makestro.com/product/espectrocore/',
+        ],
     })
     ])
 
