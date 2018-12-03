@@ -115,6 +115,7 @@ struct netifWrapper
     bool isLocal () const           { return addr().isLocal(); }
     bool isV4 () const              { return addr().isV4(); }
     bool isV6 () const              { return !addr().isV4(); }
+    String toString() const         { return addr().toString(); }
 
     // related to legacy address (_num=0, ipv4)
     IPAddress netmask () const      { return _netif->netmask; }

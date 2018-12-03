@@ -88,6 +88,8 @@ class ESP8266WiFiGenericClass {
         bool forceSleepBegin(uint32 sleepUs = 0);
         bool forceSleepWake();
 
+        static void preinit_wifi_off ();
+
     protected:
         static bool _persistent;
         static WiFiMode_t _forceSleepLastMode;
