@@ -24,7 +24,7 @@
   for (auto a: ifList)
     out.printf("IF='%s' index=%d legacy=%d IPv4=%d local=%d hostname='%s' addr= %s\n",
                a->iface().c_str(),
-               a->number(),
+               a->ifnumber(),
                a->addr().isLegacy(),
                a->addr().isV4(),
                a->addr().isLocal(),
@@ -65,7 +65,7 @@
           for (auto iface: ifList)
               if ((configured = (   !iface->addr()->isV4()
                                  && !iface->addr().isLocal()
-                                 && iface->number() == STATION_IF)))
+                                 && iface->ifnumber() == STATION_IF)))
                   break;
           Serial.print('.');
           delay(500);
@@ -126,19 +126,23 @@ class AddrListClass {
                 }
 
                 // (*iterator) emulation:
-
                 const const_iterator& operator*  () const { return *this; }
                 const const_iterator* operator-> () const { return  this; }
 
+                // iterated address
                 bool isLegacy() const { return _num == 0; }
                 bool isLocal() const { return addr().isLocal(); }
                 IPAddress addr () const { return _ip_from_netif_num(); }
+                
+                // properties of legacy/IPv4 address (one per interface)
                 IPAddress netmask () const { return _netif->netmask; }
                 IPAddress gw () const { return _netif->gw; }
-                String iface () const { return String(_netif->name[0]) + _netif->name[1]; }
-                const char* hostname () const { return _netif->hostname?: emptyString.c_str(); }
-                const char* mac () const { return (const char*)_netif->hwaddr; }
-                int number () const { return _netif->num; }
+
+                // interface properties (common to all addresses in the interface)
+                String ifname () const { return String(_netif->name[0]) + _netif->name[1]; }
+                const char* ifhostname () const { return _netif->hostname?: emptyString.c_str(); }
+                const char* ifmac () const { return (const char*)_netif->hwaddr; }
+                int ifnumber () const { return _netif->num; }
 
             protected:
 
