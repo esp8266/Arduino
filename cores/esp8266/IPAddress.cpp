@@ -38,7 +38,7 @@ IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_oc
     (*this)[3] = fourth_octet;
 }
 
-IPAddress::IPAddress(uint32_t address) {
+void IPAddress::ctor32(uint32_t address) {
     setV4();
     v4() = address;
 }
@@ -172,7 +172,8 @@ bool IPAddress::isValid(const char* arg) {
 	return IPAddress().fromString(arg);
 }
 
-CONST IPAddress IPNoAddress; // generic "0.0.0.0" for v4 & v6
+CONST IPAddress INADDR_ANY; // generic "0.0.0.0" for IPv4 & IPv6
+const IPAddress INADDR_NONE(255,255,255,255);
 
 /**************************************/
 
