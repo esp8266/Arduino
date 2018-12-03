@@ -66,11 +66,11 @@ void status(Print& out) {
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
   for (auto a : addrList) {
     out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
-               a.iface().c_str(),
-               !a.addr().isV4(),
-               a.addr().isLocal(),
-               a.hostname(),
-               a.addr().toString().c_str());
+               a.ifname().c_str(),
+               a.isV6(),
+               a.isLocal(),
+               a.ifhostname(),
+               a.toString().c_str());
 
     if (a.isLegacy()) {
       out.printf(" / mask:%s / gw:%s",
@@ -79,6 +79,7 @@ void status(Print& out) {
     }
 
     out.println();
+
   }
 
   // lwIP's dns client will ask for IPv4 first (by default)
@@ -96,12 +97,14 @@ void setup() {
   Serial.println();
   Serial.println(ESP.getFullVersion());
 
+  Serial.printf("IPV6 is%s enabled\n", LWIP_IPV6 ? emptyString.c_str() : " NOT");
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
 
   status(Serial);
 
-#if 0
+#if 0 // 0: legacy connecting loop - 1: wait for IPv6
 
   // legacy loop (still valid with IPv4 only)
 

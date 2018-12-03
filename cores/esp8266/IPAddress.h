@@ -72,6 +72,7 @@ class IPAddress: public Printable {
     public:
         // Constructors
         IPAddress();
+        IPAddress(const IPAddress& from);
         IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
         IPAddress(uint32_t address) { ctor32(address); }
         IPAddress(u32_t address) { ctor32(address); }
