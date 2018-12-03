@@ -72,13 +72,19 @@ void ESP8266WiFiClass::printDiag(Print& p) {
     struct station_config conf;
     wifi_station_get_config(&conf);
 
-    const char* ssid = reinterpret_cast<const char*>(conf.ssid);
+    char ssid[33]; //ssid can be up to 32chars, => plus null term
+    memcpy(ssid, conf.ssid, sizeof(conf.ssid));
+    ssid[32] = 0; //nullterm in case of 32 char ssid
+ 
     p.print("SSID (");
     p.print(strlen(ssid));
     p.print("): ");
     p.println(ssid);
 
-    const char* passphrase = reinterpret_cast<const char*>(conf.password);
+    char passphrase[65];
+    memcpy(passphrase, conf.password, sizeof(conf.password));
+    passphrase[64] = 0;
+
     p.print("Passphrase (");
     p.print(strlen(passphrase));
     p.print("): ");

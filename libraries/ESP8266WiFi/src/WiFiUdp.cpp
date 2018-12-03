@@ -234,7 +234,7 @@ void WiFiUDP::flush()
 IPAddress WiFiUDP::remoteIP() const
 {
     if (!_ctx)
-        return IPNoAddress;
+        return INADDR_ANY;
 
     return _ctx->getRemoteAddress();
 }
@@ -250,7 +250,7 @@ uint16_t WiFiUDP::remotePort() const
 IPAddress WiFiUDP::destinationIP() const
 {
     if (!_ctx)
-        return IPNoAddress;
+        return INADDR_ANY;
 
     return _ctx->getDestAddress();
 }
