@@ -151,9 +151,9 @@ function build_boards()
     echo -e "travis_fold:start:build_boards"
     tools/boards.txt.py --boardsgen --ldgen --packagegen --docgen
     git diff --exit-code -- boards.txt \
-                            package/package_esp8266com_index.template.json \
                             doc/boards.rst \
                             tools/sdk/ld/
+    git diff --exit-code -w -- package/package_esp8266com_index.template.json
     echo -e "travis_fold:end:build_boards"
 }
 

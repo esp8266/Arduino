@@ -134,16 +134,47 @@ static void loop_task(os_event_t *events) {
         panic();
     }
 }
+extern "C" {
+
+struct object { long placeholder[ 10 ]; };
+void __register_frame_info (const void *begin, struct object *ob);
+extern char __eh_frame[];
+}
 
 static void do_global_ctors(void) {
+    static struct object ob;
+    __register_frame_info( __eh_frame, &ob );
+
     void (**p)(void) = &__init_array_end;
     while (p != &__init_array_start)
         (*--p)();
 }
 
+extern "C" {
+extern void __unhandled_exception(const char *str);
+
+static void  __unhandled_exception_cpp()
+{
+    static bool terminating;
+    if (terminating)
+        abort();
+    terminating = true;
+    /* Use a trick from vterminate.cc to get any std::exception what() */
+    try {
+        __throw_exception_again;
+    } catch (const std::exception& e) {
+        __unhandled_exception( e.what() );
+    } catch (...) {
+        __unhandled_exception( "" );
+    }
+}
+
+}
+
 void init_done() {
     system_set_os_print(1);
     gdb_init();
+    std::set_terminate(__unhandled_exception_cpp);
     do_global_ctors();
     esp_schedule();
 }

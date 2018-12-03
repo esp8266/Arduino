@@ -65,20 +65,22 @@ void status(Print& out) {
   out.println(F("Try me at these addresses:"));
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
   for (auto a : addrList) {
-    out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
-               a->ifname().c_str(),
-               !a->addr().isV4(),
-               a->addr().isLocal(),
-               a->ifhostname(),
-               a->addr().toString().c_str());
+    out.printf("IF='%s' set=%d IPv6=%d local=%d hostname='%s' addr= %s",
+               a.ifname().c_str(),
+               a.addr().isSet(),
+               a.isV6(),
+               a.isLocal(),
+               a.ifhostname(),
+               a.addr().toString().c_str());
 
-    if (a->isLegacy()) {
+    if (a.isLegacy()) {
       out.printf(" / mask:%s / gw:%s",
-                 a->netmask().toString().c_str(),
-                 a->gw().toString().c_str());
+                 a.netmask().toString().c_str(),
+                 a.gw().toString().c_str());
     }
 
     out.println();
+
   }
 
   // lwIP's dns client will ask for IPv4 first (by default)
@@ -103,7 +105,7 @@ void setup() {
 
   status(Serial);
 
-#if 0
+#if 0 // 0: legacy connecting loop - 1: wait for IPv6
 
   // legacy loop (still valid with IPv4 only)
 
@@ -123,9 +125,9 @@ void setup() {
 
   for (bool configured = false; !configured;) {
     for (auto addr : addrList)
-      if ((configured = !addr->isLocal()
-                        // && addr->isV6() // uncomment when IPv6 is mandatory
-                        // && addr->ifnumber() == STATION_IF
+      if ((configured = !addr.isLocal()
+                        // && addr.isV6() // uncomment when IPv6 is mandatory
+                        // && addr.ifnumber() == STATION_IF
           )) {
         break;
       }
