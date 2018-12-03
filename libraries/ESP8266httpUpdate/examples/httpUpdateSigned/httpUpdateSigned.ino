@@ -21,6 +21,11 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266httpUpdate.h>
 
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
 ESP8266WiFiMulti WiFiMulti;
 
 #define MANUAL_SIGNING 0
@@ -66,7 +71,7 @@ void setup() {
   }
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP("SSID", "PASS");
+  WiFiMulti.addAP(STASSID, STAPSK);
 
   #if MANUAL_SIGNING
   signPubKey = new BearSSL::PublicKey(pubkey);
