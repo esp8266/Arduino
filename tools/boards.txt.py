@@ -37,6 +37,7 @@ import sys
 import collections
 import getopt
 import re
+import json
 
 # serial upload speed order in menu
 # default is 115 for every board unless specified with 'serial' in board
@@ -1419,9 +1420,11 @@ def package ():
 
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
 
+    # To get consistent indent/formatting read the JSON and write it out programattically
     if packagegen:
         with open(pkgfname, 'w') as package_file:
-            package_file.write(newfilestr)
+            filejson = json.loads(filestr, object_pairs_hook=collections.OrderedDict)
+            package_file.write(json.dumps(filejson, indent=3, separators=(',',': ')))
         print("updated:   %s" % pkgfname)
     else:
         sys.stdout.write(newfilestr)
