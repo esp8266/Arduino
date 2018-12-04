@@ -12,7 +12,8 @@
 void preinit() {
   // Global WiFi constructors are not called yet
   // (global class instances like WiFi, Serial... are not yet initialized)..
-  ESP8266WiFiClass::preinit_wifi_off();
+  // No global object methods or C++ exceptions can be called in here!
+  ESP8266WiFiClass::preinitWiFiOff();
 }
 
 void setup() {
