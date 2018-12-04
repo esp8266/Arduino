@@ -155,6 +155,9 @@ extern void __unhandled_exception(const char *str);
 
 static void  __unhandled_exception_cpp()
 {
+#ifndef __EXCEPTIONS
+	abort();
+#else
     static bool terminating;
     if (terminating)
         abort();
@@ -167,6 +170,7 @@ static void  __unhandled_exception_cpp()
     } catch (...) {
         __unhandled_exception( "" );
     }
+#endif
 }
 
 }
