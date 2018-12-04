@@ -17,7 +17,7 @@ menu.dbg=Debug port
 menu.lvl=Debug Level
 menu.ip=lwIP Variant
 menu.vt=VTables
-menu.exception=Enabled
+menu.exception=Exceptions
 menu.led=Builtin Led
 menu.wipe=Erase Flash
 
