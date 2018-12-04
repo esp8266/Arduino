@@ -62,8 +62,8 @@
 #define SERVICE_PORT        80                                  // HTTP port
 
 #ifndef STASSID
-  #define STASSID "your-ssid"
-  #define STAPSK  "your-password"
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
 #endif
 
 const char*                                     ssid                    = STASSID;
