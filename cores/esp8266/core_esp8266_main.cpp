@@ -261,7 +261,7 @@ extern "C" void user_init(void) {
 
     cont_init(g_pcont);
 
-    preinit(); // user redefinable
+    preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 
     ets_task(loop_task,
         LOOP_TASK_PRIORITY, s_loop_queue,
