@@ -41,7 +41,7 @@
 #else // lwIP-v2+
 #define CONST const
 #if !LWIP_IPV6
-#define ip_addr ipv4_addr
+typedef ipv4_addr ip_addr;
 #endif // !LWIP_IPV6
 #endif // lwIP-v2+
 

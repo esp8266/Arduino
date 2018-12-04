@@ -23,6 +23,7 @@
  */
 
 #include <arch/cc.h>
+#include <sys/time.h>
 #include <HardwareSerial.h>
 #include <IPAddress.h>
 #include <lwip/ip_addr.h>
