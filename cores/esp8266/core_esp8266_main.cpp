@@ -255,7 +255,7 @@ extern "C" void user_init(void) {
 
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 
-    init(); // in core_esp8266_wiring.c
+    init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
 
