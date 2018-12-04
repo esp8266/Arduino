@@ -579,8 +579,8 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
     esp_schedule(); // resume the hostByName function
 }
 
-
-void ESP8266WiFiGenericClass::preinit_wifi_off () {
+//meant to be called from user-defined preinit()
+void ESP8266WiFiGenericClass::preinitWiFiOff () {
   // https://github.com/esp8266/Arduino/issues/2111#issuecomment-224251391
   // WiFi.persistent(false);
   // WiFi.mode(WIFI_OFF);
