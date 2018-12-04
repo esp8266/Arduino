@@ -63,7 +63,7 @@ static uint32_t s_micros_at_task_start;
 
 extern "C" {
 extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
-const char* core_release = 
+const char* core_release =
 #ifdef ARDUINO_ESP8266_RELEASE
     ARDUINO_ESP8266_RELEASE;
 #else
@@ -243,17 +243,25 @@ extern "C" void ICACHE_RAM_ATTR app_entry (void)
     return app_entry_custom();
 }
 
+extern "C" void preinit (void) __attribute__((weak));
+extern "C" void preinit (void)
+{
+    /* do nothing by default */
+}
+
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
 
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 
-    init();
+    init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
 
     cont_init(g_pcont);
+
+    preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 
     ets_task(loop_task,
         LOOP_TASK_PRIORITY, s_loop_queue,

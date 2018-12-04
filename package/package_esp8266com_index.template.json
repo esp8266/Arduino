@@ -15,97 +15,97 @@
                "architecture": "esp8266",
                "archiveFileName": "",
                "boards": [
-                  {
-                     "name": "Generic ESP8266 Module"
-                  },
-                  {
-                     "name": "Generic ESP8285 Module"
-                  },
-                  {
-                     "name": "ESPDuino (ESP-13 Module)"
-                  },
-                  {
-                     "name": "Adafruit Feather HUZZAH ESP8266"
-                  },
-                  {
-                     "name": "Invent One"
-                  },
-                  {
-                     "name": "XinaBox CW01"
-                  },
-                  {
-                     "name": "ESPresso Lite 1.0"
-                  },
-                  {
-                     "name": "ESPresso Lite 2.0"
-                  },
-                  {
-                     "name": "Phoenix 1.0"
-                  },
-                  {
-                     "name": "Phoenix 2.0"
-                  },
-                  {
-                     "name": "NodeMCU 0.9 (ESP-12 Module)"
-                  },
-                  {
-                     "name": "NodeMCU 1.0 (ESP-12E Module)"
-                  },
-                  {
-                     "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
-                  },
-                  {
-                     "name": "SparkFun ESP8266 Thing"
-                  },
-                  {
-                     "name": "SparkFun ESP8266 Thing Dev"
-                  },
-                  {
-                     "name": "SweetPea ESP-210"
-                  },
-                  {
-                     "name": "LOLIN(WEMOS) D1 R2 & mini"
-                  },
-                  {
-                     "name": "LOLIN(WEMOS) D1 mini Pro"
-                  },
-                  {
-                     "name": "LOLIN(WEMOS) D1 mini Lite"
-                  },
-                  {
-                     "name": "WeMos D1 R1"
-                  },
-                  {
-                     "name": "ESPino (ESP-12 Module)"
-                  },
-                  {
-                     "name": "ThaiEasyElec's ESPino"
-                  },
-                  {
-                     "name": "WifInfo"
-                  },
-                  {
-                     "name": "Arduino"
-                  },
-                  {
-                     "name": "4D Systems gen4 IoD Range"
-                  },
-                  {
-                     "name": "Digistump Oak"
-                  },
-                  {
-                     "name": "WiFiduino"
-                  },
-                  {
-                     "name": "Amperka WiFi Slot"
-                  },
-                  {
-                     "name": "Seeed Wio Link"
-                  },
-                  {
-                     "name": "ESPectro Core"
-                  }
-               ],
+            {
+              "name": "Generic ESP8266 Module"
+            },
+            {
+              "name": "Generic ESP8285 Module"
+            },
+            {
+              "name": "ESPDuino (ESP-13 Module)"
+            },
+            {
+              "name": "Adafruit Feather HUZZAH ESP8266"
+            },
+            {
+              "name": "Invent One"
+            },
+            {
+              "name": "XinaBox CW01"
+            },
+            {
+              "name": "ESPresso Lite 1.0"
+            },
+            {
+              "name": "ESPresso Lite 2.0"
+            },
+            {
+              "name": "Phoenix 1.0"
+            },
+            {
+              "name": "Phoenix 2.0"
+            },
+            {
+              "name": "NodeMCU 0.9 (ESP-12 Module)"
+            },
+            {
+              "name": "NodeMCU 1.0 (ESP-12E Module)"
+            },
+            {
+              "name": "Olimex MOD-WIFI-ESP8266(-DEV)"
+            },
+            {
+              "name": "SparkFun ESP8266 Thing"
+            },
+            {
+              "name": "SparkFun ESP8266 Thing Dev"
+            },
+            {
+              "name": "SweetPea ESP-210"
+            },
+            {
+              "name": "LOLIN(WEMOS) D1 R2 & mini"
+            },
+            {
+              "name": "LOLIN(WEMOS) D1 mini Pro"
+            },
+            {
+              "name": "LOLIN(WEMOS) D1 mini Lite"
+            },
+            {
+              "name": "WeMos D1 R1"
+            },
+            {
+              "name": "ESPino (ESP-12 Module)"
+            },
+            {
+              "name": "ThaiEasyElec's ESPino"
+            },
+            {
+              "name": "WifInfo"
+            },
+            {
+              "name": "Arduino"
+            },
+            {
+              "name": "4D Systems gen4 IoD Range"
+            },
+            {
+              "name": "Digistump Oak"
+            },
+            {
+              "name": "WiFiduino"
+            },
+            {
+              "name": "Amperka WiFi Slot"
+            },
+            {
+              "name": "Seeed Wio Link"
+            },
+            {
+              "name": "ESPectro Core"
+            }
+          ],
                "toolsDependencies": [
                   {
                      "packager": "esp8266",
@@ -133,6 +133,13 @@
                "version": "0.4.13",
                "name": "esptool",
                "systems": [
+                  {
+                     "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-win32.zip",
+                     "checksum": "SHA-256:17c1035aacd8f6dbfbc04ed899f5db0ceba60820592705a9c6011476ab8d1687",
+                     "host": "x86_64-mingw32",
+                     "archiveFileName": "esptool-0.4.13-win32.zip",
+                     "size": "16660"
+                  },
                   {
                      "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-win32.zip",
                      "checksum": "SHA-256:17c1035aacd8f6dbfbc04ed899f5db0ceba60820592705a9c6011476ab8d1687",
@@ -233,6 +240,13 @@
                      "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-windows.zip",
                      "checksum": "SHA-256:4fbe17d2be4229c0eebb3939d14e9d96e74ba17724ab34276eb6d019006ce900",
                      "host": "i686-mingw32",
+                     "archiveFileName": "mkspiffs-0.2.0-no_magic_length-windows.zip",
+                     "size": "347038"
+                  },
+                  {
+                     "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-windows.zip",
+                     "checksum": "SHA-256:4fbe17d2be4229c0eebb3939d14e9d96e74ba17724ab34276eb6d019006ce900",
+                     "host": "x86_64-mingw32",
                      "archiveFileName": "mkspiffs-0.2.0-no_magic_length-windows.zip",
                      "size": "347038"
                   },
