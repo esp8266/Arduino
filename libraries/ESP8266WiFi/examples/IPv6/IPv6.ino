@@ -22,8 +22,8 @@
 #include <lwip/dns.h>
 
 #ifndef STASSID
-  #define STASSID "your-ssid"
-  #define STAPSK  "your-password"
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
 #endif
 
 #define FQDN  F("www.google.com") // with both IPv4 & IPv6 addresses
@@ -66,19 +66,20 @@ void status(Print& out) {
   out.println(F("(with 'telnet <addr> or 'nc -u <addr> 23')"));
   for (auto a : addrList) {
     out.printf("IF='%s' IPv6=%d local=%d hostname='%s' addr= %s",
-               a->iface().c_str(),
-               !a->addr().isV4(),
-               a->addr().isLocal(),
-               a->hostname(),
-               a->addr().toString().c_str());
+               a.ifname().c_str(),
+               a.isV6(),
+               a.isLocal(),
+               a.ifhostname(),
+               a.toString().c_str());
 
-    if (a->isLegacy()) {
+    if (a.isLegacy()) {
       out.printf(" / mask:%s / gw:%s",
-                 a->netmask().toString().c_str(),
-                 a->gw().toString().c_str());
+                 a.netmask().toString().c_str(),
+                 a.gw().toString().c_str());
     }
 
     out.println();
+
   }
 
   // lwIP's dns client will ask for IPv4 first (by default)
@@ -96,12 +97,14 @@ void setup() {
   Serial.println();
   Serial.println(ESP.getFullVersion());
 
+  Serial.printf("IPV6 is%s enabled\n", LWIP_IPV6 ? emptyString.c_str() : " NOT");
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);
 
   status(Serial);
 
-  #if 0
+#if 0 // 0: legacy connecting loop - 1: wait for IPv6
 
   // legacy loop (still valid with IPv4 only)
 
@@ -110,7 +113,7 @@ void setup() {
     delay(500);
   }
 
-  #else
+#else
 
   // Use this loop instead to wait for an IPv6 routable address
 
@@ -121,9 +124,9 @@ void setup() {
 
   for (bool configured = false; !configured;) {
     for (auto addr : addrList)
-      if ((configured = !addr->isLocal()
-                        // && addr->isV6() // uncomment when IPv6 is mandatory
-                        // && addr->ifnumber() == STATION_IF
+      if ((configured = !addr.isLocal()
+                        // && addr.isV6() // uncomment when IPv6 is mandatory
+                        // && addr.ifnumber() == STATION_IF
           )) {
         break;
       }
@@ -131,7 +134,7 @@ void setup() {
     delay(500);
   }
 
-  #endif
+#endif
 
   Serial.println(F("connected: "));
 

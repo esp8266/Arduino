@@ -55,8 +55,9 @@ typedef struct {
   String  filename;
   String  name;
   String  type;
-  size_t  totalSize;    // file size
+  size_t  totalSize;    // total size of uploaded file so far
   size_t  currentSize;  // size of data currently in buf
+  size_t  contentLength; // size of entire post request, file size + headers and other request data.
   uint8_t buf[HTTP_UPLOAD_BUFLEN];
 } HTTPUpload;
 
@@ -180,9 +181,12 @@ protected:
   int              _currentArgCount;
   RequestArgument* _currentArgs;
   std::unique_ptr<HTTPUpload> _currentUpload;
-
+  int              _postArgsLen;
+  RequestArgument* _postArgs;
+    
   int              _headerKeysCount;
   RequestArgument* _currentHeaders;
+ 
   size_t           _contentLength;
   String           _responseHeaders;
 

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClientSecureAxTLS.h>
 #include <BSTest.h>
 #include <pgmspace.h>
 

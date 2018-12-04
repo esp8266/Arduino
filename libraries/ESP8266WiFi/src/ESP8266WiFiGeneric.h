@@ -29,7 +29,7 @@
 
 #ifdef DEBUG_ESP_WIFI
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_WIFI_GENERIC(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_WIFI_GENERIC(fmt, ...) DEBUG_ESP_PORT.printf( (PGM_P)PSTR(fmt), ##__VA_ARGS__ )
 #endif
 #endif
 
@@ -87,6 +87,8 @@ class ESP8266WiFiGenericClass {
 
         bool forceSleepBegin(uint32 sleepUs = 0);
         bool forceSleepWake();
+
+        static void preinitWiFiOff (); //meant to be called in user-defined preinit()
 
     protected:
         static bool _persistent;
