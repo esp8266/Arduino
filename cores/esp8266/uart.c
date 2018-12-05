@@ -175,9 +175,8 @@ uart_read_char_unsafe(uart_t* uart)
         uart->rx_buffer->rpos = (uart->rx_buffer->rpos + 1) % uart->rx_buffer->size;
         return ret;
     }
-
     // unavailable
-    return -3;
+    return -1;
 }
 
 size_t 
@@ -208,13 +207,8 @@ uart_peek_char(uart_t* uart)
 int 
 uart_read_char(uart_t* uart)
 {
-    if(uart == NULL || !uart->rx_enabled)
-        return -1;
-    
-    ETS_UART_INTR_DISABLE();
-    int data = uart_read_char_unsafe(uart);
-    ETS_UART_INTR_ENABLE();
-    return data;
+    uint8_t ret;
+    return uart_read(uart, (char*)&ret, 1)? ret: -1;
 }
 
 // loopback-test BW jumps by 190%
@@ -222,7 +216,7 @@ size_t
 uart_read(uart_t* uart, char* userbuffer, size_t usersize)
 {
     if(uart == NULL || !uart->rx_enabled)
-        return -1;
+        return 0;
 
     size_t ret = 0;
     ETS_UART_INTR_DISABLE();
@@ -272,6 +266,8 @@ uart_resize_rx_buffer(uart_t* uart, size_t new_size)
     ETS_UART_INTR_DISABLE();
     while(uart_rx_available_unsafe(uart) && new_wpos < new_size)
         new_buf[new_wpos++] = uart_read_char_unsafe(uart); //if uart_rx_available_unsafe() returns non-0, uart_read_char_unsafe() can't return -1
+    if (new_wpos == new_size)
+        new_wpos = 0;
     
     uint8_t * old_buf = uart->rx_buffer->buffer;
     uart->rx_buffer->rpos = 0;
