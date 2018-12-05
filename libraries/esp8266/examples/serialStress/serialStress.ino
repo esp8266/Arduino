@@ -21,6 +21,7 @@
 
 uint8_t buf [BUFFER_SIZE];
 uint8_t temp [BUFFER_SIZE];
+bool reading = true;
 
 static size_t out_idx = 0, in_idx = 0;
 static size_t local_receive_size = 0;
@@ -33,20 +34,20 @@ static uint64_t timeout;
 Stream* logger;
 
 void error(const char* what) {
-  logger->printf("\r\nerror: %s after %ld minutes\r\nread idx:  %d\r\nwrite idx: %d\r\ntotal:     %ld\r\nlast read: %d\r\nmaxavail:  %d\r\n",
+  logger->printf("\nerror: %s after %ld minutes\nread idx:  %d\nwrite idx: %d\ntotal:     %ld\nlast read: %d\nmaxavail:  %d\n",
                  what, (long)((millis() - start_ms) / 60000), in_idx, out_idx, (long)in_total, (int)local_receive_size, maxavail);
   if (Serial.hasOverrun()) {
-    logger->printf("overrun!\r\n");
+    logger->printf("overrun!\n");
   }
-  logger->printf("should be (size=%d idx=%d..%d):\r\n    ", BUFFER_SIZE, in_idx, in_idx + local_receive_size - 1);
+  logger->printf("should be (size=%d idx=%d..%d):\n    ", BUFFER_SIZE, in_idx, in_idx + local_receive_size - 1);
   for (size_t i = in_idx; i < in_idx + local_receive_size; i++) {
     logger->printf("%02x(%c) ", buf[i], (unsigned char)((buf[i] > 31 && buf[i] < 128) ? buf[i] : '.'));
   }
-  logger->print("\r\n\r\nis: ");
+  logger->print("\n\nis: ");
   for (size_t i = 0; i < local_receive_size; i++) {
     logger->printf("%02x(%c) ", temp[i], (unsigned char)((temp[i] > 31 && temp[i] < 128) ? temp[i] : '.'));
   }
-  logger->println("\r\n\r\n");
+  logger->println("\n\n");
 
   while (true) {
     delay(1000);
@@ -72,15 +73,15 @@ void setup() {
   ss->begin(SSBAUD);
   logger = ss;
   logger->println();
-  logger->printf("\r\n\r\nOn Software Serial for logging\r\n");
+  logger->printf("\n\nOn Software Serial for logging\n");
 
   int baud = Serial.baudRate();
   logger->printf(ESP.getFullVersion().c_str());
-  logger->printf("\r\n\r\nBAUD: %d - CoreRxBuffer: %d bytes - TestBuffer: %d bytes\r\n",
+  logger->printf("\n\nBAUD: %d - CoreRxBuffer: %d bytes - TestBuffer: %d bytes\n",
                  baud, SERIAL_SIZE_RX, BUFFER_SIZE);
 
   size_for_1sec = baud / 10; // 8n1=10baudFor8bits
-  logger->printf("led changes state every %zd bytes (= 1 second)\r\n", size_for_1sec);
+  logger->printf("led changes state every %zd bytes (= 1 second)\n", size_for_1sec);
 
   // prepare send/compare buffer
   for (size_t i = 0; i < sizeof buf; i++) {
@@ -92,7 +93,7 @@ void setup() {
 
   while (Serial.read() == -1);
   if (Serial.hasOverrun()) {
-    logger->print("overrun?\r\n");
+    logger->print("overrun?\n");
   }
 
   timeout = (start_ms = last_ms = millis()) + TIMEOUT;
@@ -114,7 +115,7 @@ void loop() {
   }
   DEBUG(logger->printf("(aw%i/w%i", Serial.availableForWrite(), maxlen));
   size_t local_written_size = Serial.write(buf + out_idx, maxlen);
-  DEBUG(logger->printf(":w%i/aw%i/ar%i)\r\n", local_written_size, Serial.availableForWrite(), Serial.available()));
+  DEBUG(logger->printf(":w%i/aw%i/ar%i)\n", local_written_size, Serial.availableForWrite(), Serial.available()));
   if (local_written_size > maxlen) {
     error("bad write");
   }
@@ -123,37 +124,40 @@ void loop() {
   }
   delay(0);
 
-  DEBUG(logger->printf("----------\r\n"));
+  DEBUG(logger->printf("----------\n"));
 
   if (Serial.hasOverrun()) {
-    logger->printf("overrun!\r\n");
+    logger->printf("overrun!\n");
   }
 
-  // receive data
-  maxlen = Serial.available();
-  if (maxlen > maxavail) {
-    maxavail = maxlen;
-  }
-  // check space in temp receive buffer
-  if (maxlen > BUFFER_SIZE - in_idx) {
-    maxlen = BUFFER_SIZE - in_idx;
-  }
-  DEBUG(logger->printf("(ar%i/r%i", Serial.available(), maxlen));
-  local_receive_size = Serial.readBytes(temp, maxlen);
-  DEBUG(logger->printf(":r%i/ar%i)\r\n", local_receive_size, Serial.available()));
-  if (local_receive_size > maxlen) {
-    error("bad read");
-  }
-  if (local_receive_size) {
-    if (memcmp(buf + in_idx, temp, local_receive_size) != 0) {
-      error("fail");
+  if (reading)
+  {
+    // receive data
+    maxlen = Serial.available();
+    if (maxlen > maxavail) {
+      maxavail = maxlen;
     }
-    if ((in_idx += local_receive_size) == BUFFER_SIZE) {
-      in_idx = 0;
+    // check space in temp receive buffer
+    if (maxlen > BUFFER_SIZE - in_idx) {
+      maxlen = BUFFER_SIZE - in_idx;
     }
-    in_total += local_receive_size;
+    DEBUG(logger->printf("(ar%i/r%i", Serial.available(), maxlen));
+    local_receive_size = Serial.readBytes(temp, maxlen);
+    DEBUG(logger->printf(":r%i/ar%i)\n", local_receive_size, Serial.available()));
+    if (local_receive_size > maxlen) {
+      error("bad read");
+    }
+    if (local_receive_size) {
+      if (memcmp(buf + in_idx, temp, local_receive_size) != 0) {
+        error("fail");
+      }
+      if ((in_idx += local_receive_size) == BUFFER_SIZE) {
+        in_idx = 0;
+      }
+      in_total += local_receive_size;
+    }
+    DEBUG(logger->printf("r(%d) ok\n", local_receive_size));
   }
-  DEBUG(logger->printf("r(%d) ok\r\n", local_receive_size));
 
   // say something on data every second
   if ((size_for_led += local_written_size) >= size_for_1sec || millis() > timeout) {
@@ -161,15 +165,21 @@ void loop() {
     size_for_led = 0;
 
     if (in_prev == in_total) {
-      error("receiving nothing?\r\n");
+      error("receiving nothing?\n");
     }
 
     unsigned long now_ms = millis();
     int bwkbps_avg = ((((uint64_t)in_total) * 8000) / (now_ms - start_ms)) >> 10;
     int bwkbps_now = (((in_total - in_prev) * 8000) / (now_ms - last_ms)) >> 10 ;
-    logger->printf("bwavg=%d bwnow=%d kbps maxavail=%i\r\n", bwkbps_avg, bwkbps_now, maxavail);
+    logger->printf("bwavg=%d bwnow=%d kbps maxavail=%i\n", bwkbps_avg, bwkbps_now, maxavail);
 
     in_prev = in_total;
     timeout = (last_ms = now_ms) + TIMEOUT;
+  }
+
+  if (logger->read() == 's')
+  {
+    logger->println("now stopping reading, keeping writing");
+    reading = false;
   }
 }
