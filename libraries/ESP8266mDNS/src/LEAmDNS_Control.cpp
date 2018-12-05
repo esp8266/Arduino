@@ -485,7 +485,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
 
             if ((u8ReplyNeeded) &&
                 (0 == os_strcmp("hap", pService->m_pcService))) {
-                DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _parseQuery: Sending service reply for (%s.%s.%s): %u (%s)\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, u8ReplyNeeded, IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str());
+                DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _parseQuery: Sending service reply for (%s.%s.%s): %u (%s)\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, u8ReplyNeeded, IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str()););
             }
         }
 
