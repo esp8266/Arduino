@@ -349,6 +349,24 @@ uint8_t Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   chipSelectHigh();
   return false;
 }
+
+//------------------------------------------------------------------------------
+/**
+ * Shut down Sd2Card, which at this point means end SPI.
+ *
+ * \param[in] endSPI The value true (non-zero) or FALSE (zero).
+
+  Call card.end() or card.end(true) to shut everything down.
+  Call card.end(false) to shut everything but the SPI object down.
+ */
+void Sd2Card::end(bool endSPI)
+{
+  if(endSPI)
+    SPI.end();
+}
+
+
+
 //------------------------------------------------------------------------------
 /**
  * Enable or disable partial block reads.

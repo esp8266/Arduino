@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Arduino.h>
+#include <StackThunk.h>
 #include "BearSSLHelpers.h"
 
 namespace brssl {
@@ -825,5 +826,74 @@ bool X509List::append(const uint8_t *derCert, size_t derLen) {
   return true;
 }
 
+// SHA256 hash for updater
+void HashSHA256::begin() {
+  br_sha256_init( &_cc );
+  memset( _sha256, 0, sizeof(_sha256) );
+}
+
+void HashSHA256::add(const void *data, uint32_t len) {
+  br_sha256_update( &_cc, data, len );
+}
+
+void HashSHA256::end() {
+  br_sha256_out( &_cc, _sha256 );
+}
+
+int HashSHA256::len() {
+  return sizeof(_sha256);
+}
+
+const void *HashSHA256::hash() {
+  return (const void*) _sha256;
+}
+
+// SHA256 verifier
+uint32_t SigningVerifier::length()
+{
+  if (!_pubKey) {
+    return 0;
+  } else if (_pubKey->isRSA()) {
+    return _pubKey->getRSA()->nlen;
+  } else if (_pubKey->isEC()) {
+    return _pubKey->getEC()->qlen;
+  } else {
+    return 0;
+  }
+}
+
+bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
+  if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
+
+  if (_pubKey->isRSA()) {
+    bool ret;
+    unsigned char vrf[hash->len()];
+    br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
+    ret = vrfy((const unsigned char *)signature, signatureLen, NULL, sizeof(vrf), _pubKey->getRSA(), vrf);
+    if (!ret || memcmp(vrf, hash->hash(), sizeof(vrf)) ) {
+      return false;
+    } else {
+      return true;
+    }
+  } else {
+    br_ecdsa_vrfy vrfy = br_ecdsa_vrfy_raw_get_default();
+    // The EC verifier actually does the compare, unlike the RSA one
+    return vrfy(br_ec_get_default(), hash->hash(), hash->len(), _pubKey->getEC(), (const unsigned char *)signature, signatureLen);
+  }
 };
 
+#if !CORE_MOCK
+
+// Second stack thunked helpers
+make_stack_thunk(br_ssl_engine_recvapp_ack);
+make_stack_thunk(br_ssl_engine_recvapp_buf);
+make_stack_thunk(br_ssl_engine_recvrec_ack);
+make_stack_thunk(br_ssl_engine_recvrec_buf);
+make_stack_thunk(br_ssl_engine_sendapp_ack);
+make_stack_thunk(br_ssl_engine_sendapp_buf);
+make_stack_thunk(br_ssl_engine_sendrec_ack);
+make_stack_thunk(br_ssl_engine_sendrec_buf);
+
+#endif
+
+};
