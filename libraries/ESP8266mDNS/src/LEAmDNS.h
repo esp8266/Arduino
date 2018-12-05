@@ -204,10 +204,16 @@ public:
         bool addService(String p_strServiceName,
                         String p_strProtocol,
                         uint16_t p_u16Port);
+    
+
     // Change the services instance name (and restart probing).
     bool setServiceName(const hMDNSService p_hService,
                         const char* p_pcInstanceName);
-
+        //for compatibility
+        //Warning: this has the side effect of changing the hostname.
+        //TODO: implement instancename different from hostname
+        void setInstanceName(const char* p_pcHostname) {setHostname(p_pcHostname);}
+    
     /**
      * hMDNSTxt (opaque handle to access the TXT items)
      */
@@ -235,6 +241,7 @@ public:
     hMDNSTxt addServiceTxt(const hMDNSService p_hService,
                            const char* p_pcKey,
                            int8_t p_i8Value);
+    
     // Remove an existing (static) MDNS TXT item from the service
     bool removeServiceTxt(const hMDNSService p_hService,
                           const hMDNSTxt p_hTxt);
