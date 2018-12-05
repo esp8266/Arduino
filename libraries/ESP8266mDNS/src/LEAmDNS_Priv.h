@@ -32,7 +32,7 @@ namespace LEAmDNS {
 
 // Enable class debug functions
 #define ESP_8266_MDNS_INCLUDE
-#define DEBUG_ESP_MDNS_RESPONDER
+// #define DEBUG_ESP_MDNS_RESPONDER
 
 
 #ifndef LWIP_OPEN_SRC
