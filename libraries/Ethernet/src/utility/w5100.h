@@ -260,7 +260,7 @@ private:
   static inline uint8_t readSn(SOCKET _s, uint16_t _addr);
   static inline uint8_t writeSn(SOCKET _s, uint16_t _addr, uint8_t _data);
   static inline uint16_t readSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t len);
-  static inline uint16_t writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t len);
+  static inline uint16_t writeSn(SOCKET _s, uint16_t _addr, const uint8_t *_buf, uint16_t len);
 
   static const uint16_t CH_BASE = 0x0400;
   static const uint16_t CH_SIZE = 0x0100;
@@ -286,7 +286,7 @@ private:
     return res;                                              \
   }
 #define __SOCKET_REGISTER_N(name, address, size)             \
-  static uint16_t write##name(SOCKET _s, uint8_t *_buff) {   \
+  static uint16_t write##name(SOCKET _s, const uint8_t *_buff) {   \
     return writeSn(_s, address, _buff, size);                \
   }                                                          \
   static uint16_t read##name(SOCKET _s, uint8_t *_buff) {    \
@@ -371,7 +371,7 @@ uint16_t W5100Class::readSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t _
   return read(CH_BASE + _s * CH_SIZE + _addr, _buf, _len);
 }
 
-uint16_t W5100Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t _len) {
+uint16_t W5100Class::writeSn(SOCKET _s, uint16_t _addr, const uint8_t *_buf, uint16_t _len) {
   return write(CH_BASE + _s * CH_SIZE + _addr, _buf, _len);
 }
 

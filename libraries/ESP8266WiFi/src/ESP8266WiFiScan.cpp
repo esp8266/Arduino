@@ -186,8 +186,11 @@ String ESP8266WiFiScanClass::SSID(uint8_t i) {
     if(!it) {
         return "";
     }
+    char tmp[33]; //ssid can be up to 32chars, => plus null term
+    memcpy(tmp, it->ssid, sizeof(it->ssid));
+    tmp[32] = 0; //nullterm in case of 32 char ssid
 
-    return String(reinterpret_cast<const char*>(it->ssid));
+    return String(reinterpret_cast<const char*>(tmp));
 }
 
 

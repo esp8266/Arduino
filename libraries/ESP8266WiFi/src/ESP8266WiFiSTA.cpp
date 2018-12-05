@@ -38,6 +38,9 @@ extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
 #include "lwip/init.h" // LWIP_VERSION_
+#if LWIP_IPV6
+#include "lwip/netif.h" // struct netif
+#endif
 }
 
 #include "debug.h"
@@ -59,7 +62,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
  * @return equal
  */
 static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
-    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0) {
+    if(strncmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid), sizeof(lhs.ssid)) != 0) {
         return false;
     }
 
@@ -105,7 +108,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         return WL_CONNECT_FAILED;
     }
 
-    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
         // fail SSID too long or missing!
         return WL_CONNECT_FAILED;
     }
@@ -116,10 +119,12 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     struct station_config conf;
-    strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
-    
-    conf.threshold.authmode = AUTH_OPEN;
+    if(strlen(ssid) == 32)
+        memcpy(reinterpret_cast<char*>(conf.ssid), ssid, 32); //copied in without null term
+    else
+        strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
 
+    conf.threshold.authmode = AUTH_OPEN;
     if(passphrase) {
         conf.threshold.authmode = _useInsecureWEP ? AUTH_WEP : AUTH_WPA_PSK;
         if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
@@ -244,15 +249,20 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
     dns1 = arg1;
   }
 
+  // check whether all is IPv4 (or gateway not set)
+  if (!(local_ip.isV4() && subnet.isV4() && (!gateway.isSet() || gateway.isV4()))) {
+    return false;
+  }
+
   //ip and gateway must be in the same subnet
-  if((local_ip & subnet) != (gateway & subnet)) {
+  if((local_ip.v4() & subnet.v4()) != (gateway.v4() & subnet.v4())) {
     return false;
   }
 
   struct ip_info info;
-  info.ip.addr = static_cast<uint32_t>(local_ip);
-  info.gw.addr = static_cast<uint32_t>(gateway);
-  info.netmask.addr = static_cast<uint32_t>(subnet);
+  info.ip.addr = local_ip.v4();
+  info.gw.addr = gateway.v4();
+  info.netmask.addr = subnet.v4();
 
   wifi_station_dhcpc_stop();
   if(wifi_set_ip_info(STATION_IF, &info)) {
@@ -260,18 +270,15 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
   } else {
       return false;
   }
-  ip_addr_t d;
 
-  if(dns1 != (uint32_t)0x00000000) {
+  if(dns1.isSet()) {
       // Set DNS1-Server
-      d.addr = static_cast<uint32_t>(dns1);
-      dns_setserver(0, &d);
+      dns_setserver(0, dns1);
   }
 
-  if(dns2 != (uint32_t)0x00000000) {
+  if(dns2.isSet()) {
       // Set DNS2-Server
-      d.addr = static_cast<uint32_t>(dns2);
-      dns_setserver(1, &d);
+      dns_setserver(1, dns2);
   }
 
   return true;
@@ -392,7 +399,6 @@ IPAddress ESP8266WiFiSTAClass::localIP() {
     return IPAddress(ip.ip.addr);
 }
 
-
 /**
  * Get the station interface MAC address.
  * @param mac   pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
@@ -446,8 +452,7 @@ IPAddress ESP8266WiFiSTAClass::dnsIP(uint8_t dns_no) {
     ip_addr_t dns_ip = dns_getserver(dns_no);
     return IPAddress(dns_ip.addr);
 #else
-    const ip_addr_t* dns_ip = dns_getserver(dns_no);
-    return IPAddress(dns_ip->addr);
+    return IPAddress(dns_getserver(dns_no));
 #endif
 }
 
@@ -521,7 +526,10 @@ wl_status_t ESP8266WiFiSTAClass::status() {
 String ESP8266WiFiSTAClass::SSID() const {
     struct station_config conf;
     wifi_station_get_config(&conf);
-    return String(reinterpret_cast<char*>(conf.ssid));
+    char tmp[33]; //ssid can be up to 32chars, => plus null term
+    memcpy(tmp, conf.ssid, sizeof(conf.ssid));
+    tmp[32] = 0; //nullterm in case of 32 char ssid
+    return String(reinterpret_cast<char*>(tmp));
 }
 
 /**
