@@ -1,5 +1,6 @@
 
 #include <ESP8266WiFi.h>
+#include <AddrList.h>
 
 #ifndef STASSID
 #define STASSID "your-ssid"

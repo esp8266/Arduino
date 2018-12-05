@@ -19,6 +19,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 #include <PolledTimeout.h>
+#include <AddrList.h>
 #include <lwip/dns.h>
 
 #ifndef STASSID
