@@ -880,6 +880,15 @@ macros = {
         ( '.menu.vt.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
         ]),
 
+    'exception_menu': collections.OrderedDict([
+        ( '.menu.exception.enabled', 'Enabled' ),
+        ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
+        ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++' ),
+        ( '.menu.exception.disabled', 'Disabled' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++-nox' ),
+        ]),
+
     'crystalfreq_menu': collections.OrderedDict([
         ( '.menu.CrystalFreq.26', '26 MHz' ),
         ( '.menu.CrystalFreq.40', '40 MHz' ),
@@ -1346,6 +1355,7 @@ def all_boards ():
     print('menu.lvl=Debug Level')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
+    print('menu.exception=Exceptions')
     print('menu.led=Builtin Led')
     print('menu.wipe=Erase Flash')
     print('')
@@ -1361,7 +1371,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:
