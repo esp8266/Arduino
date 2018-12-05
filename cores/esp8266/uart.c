@@ -322,10 +322,10 @@ uart_start_isr(uart_t* uart)
     // for ISR to clear fifo before the next byte is dropped.  So pick a value
     // in the middle.
     // update: loopback test @ 3Mbauds/8n1 (=2343Kibits/s):
-    // - 4..120 give 2300Kibits/s
+    // - 4..120 give > 2300Kibits/s
     // - 1, 2, 3 are below
-    // was 100, use 8 to stay away from overrun
-    #define INTRIGG 8
+    // was 100, use 16 to stay away from overrun
+    #define INTRIGG 16
 
     //was:USC1(uart->uart_nr) = (INTRIGG << UCFFT) | (0x02 << UCTOT) | (1 <<UCTOE);
     USC1(uart->uart_nr) = (INTRIGG << UCFFT);
