@@ -22,6 +22,11 @@
 #include <Print.h>
 #include <StreamString.h>
 
+IPAddress::IPAddress(const IPAddress& from)
+{
+    ip_addr_copy(_ip, from._ip);
+}
+
 IPAddress::IPAddress() {
     _ip = *IP_ANY_TYPE; // lwIP's v4-or-v6 generic address
 }
@@ -38,14 +43,17 @@ IPAddress::IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_oc
     (*this)[3] = fourth_octet;
 }
 
-IPAddress::IPAddress(uint32_t address) {
+void IPAddress::ctor32(uint32_t address) {
     setV4();
     v4() = address;
 }
 
 IPAddress::IPAddress(const uint8_t *address) {
     setV4();
-    v4() = *reinterpret_cast<const uint32_t*>(address);
+    (*this)[0] = address[0];
+    (*this)[1] = address[1];
+    (*this)[2] = address[2];
+    (*this)[3] = address[3];
 }
 
 bool IPAddress::fromString(const char *address) {
@@ -172,7 +180,8 @@ bool IPAddress::isValid(const char* arg) {
 	return IPAddress().fromString(arg);
 }
 
-CONST IPAddress IPNoAddress; // generic "0.0.0.0" for v4 & v6
+CONST IPAddress INADDR_ANY; // generic "0.0.0.0" for IPv4 & IPv6
+const IPAddress INADDR_NONE(255,255,255,255);
 
 /**************************************/
 

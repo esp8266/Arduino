@@ -187,7 +187,7 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
 
     WifiAPEntry newAP;
 
-    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
         // fail SSID too long or missing!
         DEBUG_WIFI_MULTI("[WIFI][APlistAdd] no ssid or ssid too long\n");
         return false;
@@ -230,7 +230,7 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
 }
 
 bool ESP8266WiFiMulti::APlistExists(const char* ssid, const char *passphrase) {
-    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
         // fail SSID too long or missing!
         DEBUG_WIFI_MULTI("[WIFI][APlistExists] no ssid or ssid too long\n");
         return false;
