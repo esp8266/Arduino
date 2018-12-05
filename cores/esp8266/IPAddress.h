@@ -41,7 +41,7 @@
 #else // lwIP-v2+
 #define CONST const
 #if !LWIP_IPV6
-#define ip_addr ipv4_addr
+struct ip_addr: ipv4_addr { };
 #endif // !LWIP_IPV6
 #endif // lwIP-v2+
 
@@ -72,6 +72,7 @@ class IPAddress: public Printable {
     public:
         // Constructors
         IPAddress();
+        IPAddress(const IPAddress& from);
         IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
         IPAddress(uint32_t address) { ctor32(address); }
         IPAddress(u32_t address) { ctor32(address); }
@@ -206,7 +207,5 @@ class IPAddress: public Printable {
 
 extern CONST IPAddress INADDR_ANY;
 extern const IPAddress INADDR_NONE;
-
-#include <AddrList.h>  // bring interface iterator
 
 #endif

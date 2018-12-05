@@ -136,6 +136,13 @@
                   {
                      "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-win32.zip",
                      "checksum": "SHA-256:17c1035aacd8f6dbfbc04ed899f5db0ceba60820592705a9c6011476ab8d1687",
+                     "host": "x86_64-mingw32",
+                     "archiveFileName": "esptool-0.4.13-win32.zip",
+                     "size": "16660"
+                  },
+                  {
+                     "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.13/esptool-0.4.13-win32.zip",
+                     "checksum": "SHA-256:17c1035aacd8f6dbfbc04ed899f5db0ceba60820592705a9c6011476ab8d1687",
                      "host": "i686-mingw32",
                      "archiveFileName": "esptool-0.4.13-win32.zip",
                      "size": "16660"
@@ -233,6 +240,13 @@
                      "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-windows.zip",
                      "checksum": "SHA-256:4fbe17d2be4229c0eebb3939d14e9d96e74ba17724ab34276eb6d019006ce900",
                      "host": "i686-mingw32",
+                     "archiveFileName": "mkspiffs-0.2.0-no_magic_length-windows.zip",
+                     "size": "347038"
+                  },
+                  {
+                     "url": "https://github.com/igrr/mkspiffs/releases/download/0.2.0/mkspiffs-0.2.0-no_magic_length-windows.zip",
+                     "checksum": "SHA-256:4fbe17d2be4229c0eebb3939d14e9d96e74ba17724ab34276eb6d019006ce900",
+                     "host": "x86_64-mingw32",
                      "archiveFileName": "mkspiffs-0.2.0-no_magic_length-windows.zip",
                      "size": "347038"
                   },
