@@ -126,7 +126,7 @@ public:
 
     bool begin() override
     {
-#ifdef ARDUINO
+#if defined(ARDUINO) && !defined(CORE_MOCK)
         if (&_SPIFFS_end <= &_SPIFFS_start)
             return false;
 #endif
