@@ -196,6 +196,11 @@ public:
         return uart_has_overrun(_uart);
     }
 
+    bool hasRxError(void)
+    {
+        return uart_has_rx_error(_uart);
+    }
+
     void startDetectBaudrate();
 
     unsigned long testBaudrate();

@@ -127,7 +127,10 @@ void loop() {
   DEBUG(logger->printf("----------\n"));
 
   if (Serial.hasOverrun()) {
-    logger->printf("overrun!\n");
+    logger->printf("rx overrun!\n");
+  }
+  if (Serial.hasRxError()) {
+    logger->printf("rx error!\n");
   }
 
   if (reading)

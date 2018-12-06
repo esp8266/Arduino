@@ -47,7 +47,7 @@
 #include "user_interface.h"
 #include "uart_register.h"
 
-const char overrun_str [] PROGMEM STORE_ATTR = "uart input full!\r\n";
+//const char overrun_str [] PROGMEM STORE_ATTR = "uart input full!\r\n";
 static int s_uart_debug_nr = UART0;
 
 
@@ -65,7 +65,8 @@ struct uart_
     int baud_rate;
     bool rx_enabled;
     bool tx_enabled;
-    bool overrun;
+    bool rx_overrun;
+    bool rx_error;
     uint8_t rx_pin;
     uint8_t tx_pin;
     struct uart_rx_buffer_ * rx_buffer;
@@ -125,10 +126,10 @@ uart_rx_copy_fifo_to_buffer_unsafe(uart_t* uart)
         size_t nextPos = (rx_buffer->wpos + 1) % rx_buffer->size;
         if(nextPos == rx_buffer->rpos) 
         {
-            if (!uart->overrun) 
+            if (!uart->rx_overrun)
             {
-                uart->overrun = true;
-                os_printf_plus(overrun_str);
+                uart->rx_overrun = true;
+                //os_printf_plus(overrun_str);
             }
 
             // a choice has to be made here,
@@ -302,12 +303,15 @@ uart_isr(void * arg)
     if(usis & (1 << UIFF))
         uart_rx_copy_fifo_to_buffer_unsafe(uart);
 
-    if((usis & (1 << UIOF)) && !uart->overrun)
+    if((usis & (1 << UIOF)) && !uart->rx_overrun)
     {
-        uart->overrun = true;
-//        os_printf_plus(overrun_str);
+        uart->rx_overrun = true;
+        //os_printf_plus(overrun_str);
     }
     
+    if (usis & ((1 << UIFR) | (1 << UIPE) | (1 << UITO)))
+        uart->rx_error = true;
+
     USIC(uart->uart_nr) = usis;
 }
 
@@ -331,7 +335,12 @@ uart_start_isr(uart_t* uart)
     USC1(uart->uart_nr) = (INTRIGG << UCFFT);
     USIC(uart->uart_nr) = 0xffff;
     //was: USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIFR) | (1 << UITO);
-    USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIOF);
+    // UIFF: rx fifo full
+    // UIOF: rx fifo overflow (=overrun)
+    // UIFR: frame error
+    // UIPE: parity error
+    // UITO: rx fifo timeout
+    USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIOF) | (1 << UIFR) | (1 << UIPE) | (1 << UITO);
     ETS_UART_INTR_ATTACH(uart_isr,  (void *)uart);
     ETS_UART_INTR_ENABLE();
 }
@@ -474,7 +483,8 @@ uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx
         return NULL;
 
     uart->uart_nr = uart_nr;
-    uart->overrun = false;
+    uart->rx_overrun = false;
+    uart->rx_error = false;
 
     switch(uart->uart_nr) 
     {
@@ -737,11 +747,22 @@ uart_rx_enabled(uart_t* uart)
 bool 
 uart_has_overrun (uart_t* uart)
 {
-    if (uart == NULL || !uart->overrun)
+    if (uart == NULL || !uart->rx_overrun)
         return false;
 
     // clear flag
-    uart->overrun = false;
+    uart->rx_overrun = false;
+    return true;
+}
+
+bool
+uart_has_rx_error (uart_t* uart)
+{
+    if (uart == NULL || !uart->rx_error)
+        return false;
+
+    // clear flag
+    uart->rx_error = false;
     return true;
 }
 

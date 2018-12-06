@@ -139,6 +139,7 @@ void uart_wait_tx_empty(uart_t* uart);
 void uart_flush(uart_t* uart);
 
 bool uart_has_overrun (uart_t* uart); // returns then clear overrun flag
+bool uart_has_rx_error (uart_t* uart); // returns then clear rxerror flag
 
 void uart_set_debug(int uart_nr);
 int uart_get_debug();
