@@ -40,6 +40,7 @@ static const char* s_panic_func = 0;
 static const char* s_panic_what = 0;
 
 static bool s_abort_called = false;
+static const char* s_unhandled_exception = NULL;
 
 void abort() __attribute__((noreturn));
 static void uart_write_char_d(char c);
@@ -118,6 +119,9 @@ void __wrap_system_restart_local() {
             ets_printf_P("' failed.");
         }
         ets_putc('\n');
+    }
+    else if (s_unhandled_exception) {
+        ets_printf_P("\nUnhandled exception: %s\n", s_unhandled_exception);
     }
     else if (s_abort_called) {
         ets_printf_P("\nAbort called\n");
@@ -230,6 +234,11 @@ static void raise_exception() {
 
 void abort() {
     s_abort_called = true;
+    raise_exception();
+}
+
+void __unhandled_exception(const char *str) {
+    s_unhandled_exception = str;
     raise_exception();
 }
 

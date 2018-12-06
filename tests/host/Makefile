@@ -55,7 +55,6 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	Print.cpp \
 	FS.cpp \
 	spiffs_api.cpp \
-	pgmspace.cpp \
 	MD5Builder.cpp \
 )
 
@@ -91,7 +90,9 @@ MOCK_C_FILES := $(addprefix common/,\
 	noniso.c \
 )
 
-INC_PATHS := $(addprefix -I,\
+
+INC_PATHS += $(addprefix -I, \
+	. \
 	common \
 	$(CORE_PATH) \
 )
@@ -108,7 +109,7 @@ TEST_CPP_FILES := \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
 	core/test_string.cpp \
-  core/test_PolledTimeout.cpp
+	core/test_PolledTimeout.cpp
 
 PREINCLUDES := \
 	-include common/mock.h \
@@ -172,7 +173,7 @@ valgrind: $(OUTPUT_BINARY)
 	$(LCOV) --directory ../../cores/esp8266/ --zerocounters
 	$(VALGRIND) $(VALGRINDFLAGS) $(OUTPUT_BINARY)
 	$(LCOV) --directory $(CORE_PATH) --capture --output-file $(LCOV_DIRECTORY)/app.info
-	$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
+	-$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
 build-info:				# show toolchain version
 	@echo "-------- build tools info --------"

@@ -62,7 +62,7 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
  * @return equal
  */
 static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
-    if(strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0) {
+    if(strncmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid), sizeof(lhs.ssid)) != 0) {
         return false;
     }
 
@@ -108,7 +108,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         return WL_CONNECT_FAILED;
     }
 
-    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
         // fail SSID too long or missing!
         return WL_CONNECT_FAILED;
     }
@@ -119,10 +119,12 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     struct station_config conf;
-    strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
+    if(strlen(ssid) == 32)
+        memcpy(reinterpret_cast<char*>(conf.ssid), ssid, 32); //copied in without null term
+    else
+        strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
 
     conf.threshold.authmode = AUTH_OPEN;
-
     if(passphrase) {
         conf.threshold.authmode = _useInsecureWEP ? AUTH_WEP : AUTH_WPA_PSK;
         if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
@@ -524,7 +526,10 @@ wl_status_t ESP8266WiFiSTAClass::status() {
 String ESP8266WiFiSTAClass::SSID() const {
     struct station_config conf;
     wifi_station_get_config(&conf);
-    return String(reinterpret_cast<char*>(conf.ssid));
+    char tmp[33]; //ssid can be up to 32chars, => plus null term
+    memcpy(tmp, conf.ssid, sizeof(conf.ssid));
+    tmp[32] = 0; //nullterm in case of 32 char ssid
+    return String(reinterpret_cast<char*>(tmp));
 }
 
 /**

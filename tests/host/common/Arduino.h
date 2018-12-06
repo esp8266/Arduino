@@ -238,7 +238,7 @@ extern "C" {
 
 #ifdef __cplusplus
 
-#include "pgmspace.h"
+#include <pgmspace.h>
 
 #include "WCharacter.h"
 #include "WString.h"

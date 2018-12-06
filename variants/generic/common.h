@@ -76,7 +76,7 @@ static const uint8_t A0 = PIN_A0;
 #ifdef __cplusplus
 extern "C"
 #endif
-const int BUILTIN_LED __attribute__((deprecated, weak)) = LED_BUILTIN;
+const int BUILTIN_LED __attribute__((deprecated("use LED_BUILTIN"), weak)) = LED_BUILTIN;
 #endif
 
 #endif /* GENERIC_COMMON_H */
