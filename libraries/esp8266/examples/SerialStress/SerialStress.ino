@@ -82,6 +82,7 @@ void setup() {
 
   size_for_1sec = baud / 10; // 8n1=10baudFor8bits
   logger->printf("led changes state every %zd bytes (= 1 second)\n", size_for_1sec);
+  logger->printf("press 's' to stop reading, not writing (induces overrun)\n");
 
   // prepare send/compare buffer
   for (size_t i = 0; i < sizeof buf; i++) {
