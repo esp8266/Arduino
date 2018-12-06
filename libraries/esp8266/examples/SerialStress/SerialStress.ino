@@ -134,8 +134,7 @@ void loop() {
     logger->printf("rx error!\n");
   }
 
-  if (reading)
-  {
+  if (reading) {
     // receive data
     maxlen = Serial.available();
     if (maxlen > maxavail) {
@@ -181,8 +180,7 @@ void loop() {
     timeout = (last_ms = now_ms) + TIMEOUT;
   }
 
-  if (logger->read() == 's')
-  {
+  if (logger->read() == 's') {
     logger->println("now stopping reading, keeping writing");
     reading = false;
   }
