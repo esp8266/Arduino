@@ -94,7 +94,7 @@ function install_libraries()
     pushd $HOME/Arduino/libraries
 
     # install ArduinoJson library
-    wget https://github.com/bblanchon/ArduinoJson/releases/download/v4.6.1/ArduinoJson-v4.6.1.zip && unzip ArduinoJson-v4.6.1.zip
+    { test -r ArduinoJson-v4.6.1.zip || wget https://github.com/bblanchon/ArduinoJson/releases/download/v4.6.1/ArduinoJson-v4.6.1.zip; } && unzip ArduinoJson-v4.6.1.zip
 
     popd
 }
@@ -104,7 +104,7 @@ function install_ide()
     local ide_path=$1
     local core_path=$2
     local debug=$3
-    wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
+    test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
     tar xf arduino.tar.xz
     mv arduino-nightly $ide_path
     cd $ide_path/hardware
@@ -116,8 +116,8 @@ function install_ide()
         debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
     fi
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
-    echo "compiler.c.extra_flags=-Wall -Wextra -Werror $debug_flags" > esp8266/platform.local.txt
-    echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror $debug_flags" >> esp8266/platform.local.txt
+    echo "compiler.c.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=0 $debug_flags" > esp8266/platform.local.txt
+    echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=0 $debug_flags" >> esp8266/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
@@ -134,7 +134,7 @@ function build_docs()
 function run_host_tests()
 {
     pushd host
-    make
+    make CI
     make clean-objects
     popd
 }
@@ -151,9 +151,9 @@ function build_boards()
     echo -e "travis_fold:start:build_boards"
     tools/boards.txt.py --boardsgen --ldgen --packagegen --docgen
     git diff --exit-code -- boards.txt \
-                            package/package_esp8266com_index.template.json \
                             doc/boards.rst \
                             tools/sdk/ld/
+    git diff --exit-code -w -- package/package_esp8266com_index.template.json
     echo -e "travis_fold:end:build_boards"
 }
 
@@ -173,8 +173,15 @@ function build_sketches_with_platformio()
     set +e
     local srcpath=$1
     local build_arg=$2
-    local sketches=$(find $srcpath -name *.ino)
+    local build_mod=$3
+    local build_rem=$4
+    local sketches=$(find $srcpath -name *.ino | sort)
+    local testcnt=0
     for sketch in $sketches; do
+        testcnt=$(( ($testcnt + 1) % $build_mod ))
+        if [ $testcnt -ne $build_rem ]; then
+            continue  # Not ours to do
+        fi
         local sketchdir=$(dirname $sketch)
         local sketchdirname=$(basename $sketchdir)
         local sketchname=$(basename $sketch)
@@ -274,7 +281,15 @@ elif [ "$BUILD_TYPE" = "debug_odd" ]; then
 elif [ "$BUILD_TYPE" = "platformio" ]; then
     # PlatformIO
     install_platformio
-    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose"
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 1 0
+elif [ "$BUILD_TYPE" = "platformio_even" ]; then
+    # PlatformIO
+    install_platformio
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 2 0
+elif [ "$BUILD_TYPE" = "platformio_odd" ]; then
+    # PlatformIO
+    install_platformio
+    build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 2 1
 elif [ "$BUILD_TYPE" = "docs" ]; then
     # Build documentation using Sphinx
     cd $TRAVIS_BUILD_DIR/doc

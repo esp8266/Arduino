@@ -12,9 +12,14 @@
 #include <WiFiUdp.h>
 #include <i2s.h>
 
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
 // Set your network here
-const char *SSID = "....";
-const char *PASS = "....";
+const char *SSID = STASSID;
+const char *PASS = STAPSK;
 
 WiFiUDP udp;
 // Set your listener PC's IP here:

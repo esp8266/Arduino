@@ -53,7 +53,10 @@ extern "C" {
 #define SSDP_URI_SIZE     2
 #define SSDP_BUFFER_SIZE  64
 #define SSDP_MULTICAST_TTL 2
-static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
+
+// ssdp ipv6 is FF05::C
+// lwip-v2's igmp_joingroup only supports IPv4
+#define SSDP_MULTICAST_ADDR 239, 255, 255, 250
 
 static const char _ssdp_response_template[] PROGMEM =
   "HTTP/1.1 200 OK\r\n"
@@ -96,7 +99,7 @@ static const char _ssdp_schema_template[] PROGMEM =
   "<modelURL>%s</modelURL>"
   "<manufacturer>%s</manufacturer>"
   "<manufacturerURL>%s</manufacturerURL>"
-  "<UDN>UUID: %s</UDN>"
+  "<UDN>uuid:%s</UDN>"
   "</device>"
  //"<iconList>"	
  //"<icon>"	
@@ -172,23 +175,22 @@ bool SSDPClass::begin() {
   _server = new UdpContext;
   _server->ref();
 
-  ip_addr_t ifaddr;
-  ifaddr.addr = WiFi.localIP();
-  ip_addr_t multicast_addr;
-  multicast_addr.addr = (uint32_t) SSDP_MULTICAST_ADDR;
-  if (igmp_joingroup(&ifaddr, &multicast_addr) != ERR_OK ) {
+  IPAddress local = WiFi.localIP();
+  IPAddress mcast(SSDP_MULTICAST_ADDR);
+
+  if (igmp_joingroup(local, mcast) != ERR_OK ) {
     DEBUGV("SSDP failed to join igmp group");
     return false;
   }
 
-  if (!_server->listen(*IP_ADDR_ANY, SSDP_PORT)) {
+  if (!_server->listen(IP_ADDR_ANY, SSDP_PORT)) {
     return false;
   }
 
-  _server->setMulticastInterface(ifaddr);
+  _server->setMulticastInterface(local);
   _server->setMulticastTTL(_ttl);
   _server->onRx(std::bind(&SSDPClass::_update, this));
-  if (!_server->connect(multicast_addr, SSDP_PORT)) {
+  if (!_server->connect(mcast, SSDP_PORT)) {
     return false;
   }
 
@@ -209,7 +211,7 @@ void SSDPClass::_send(ssdp_method_t method) {
                        valueBuffer,
                        SSDP_INTERVAL,
                        _modelName,
-					   _modelNumber,
+                       _modelNumber,
                        _uuid,
                        (method == NONE) ? "ST" : "NT",
                        _deviceType,
@@ -218,28 +220,28 @@ void SSDPClass::_send(ssdp_method_t method) {
 
   _server->append(buffer, len);
 
-  ip_addr_t remoteAddr;
+  IPAddress remoteAddr;
   uint16_t remotePort;
   if (method == NONE) {
-    remoteAddr.addr = _respondToAddr;
+    remoteAddr = _respondToAddr;
     remotePort = _respondToPort;
 #ifdef DEBUG_SSDP
     DEBUG_SSDP.print("Sending Response to ");
 #endif
   } else {
-    remoteAddr.addr = SSDP_MULTICAST_ADDR;
+    remoteAddr = IPAddress(SSDP_MULTICAST_ADDR);
     remotePort = SSDP_PORT;
 #ifdef DEBUG_SSDP
     DEBUG_SSDP.println("Sending Notify to ");
 #endif
   }
 #ifdef DEBUG_SSDP
-  DEBUG_SSDP.print(IPAddress(remoteAddr.addr));
+  DEBUG_SSDP.print(IPAddress(remoteAddr));
   DEBUG_SSDP.print(":");
   DEBUG_SSDP.println(remotePort);
 #endif
 
-  _server->send(&remoteAddr, remotePort);
+  _server->send(remoteAddr, remotePort);
 }
 
 void SSDPClass::schema(WiFiClient client) {
