@@ -121,6 +121,19 @@ const char* File::name() const {
     return _p->name();
 }
 
+String File::readString()
+{
+    size_t sz = size() - position() - 1;
+    String str;
+    str.reserve(sz);
+	size_t pos=0;
+	while (pos++ < sz)
+    {
+        str += (char)read();
+    }
+    return str;
+}
+
 File Dir::openFile(const char* mode) {
     if (!_impl) {
         return File();
