@@ -76,4 +76,8 @@ EOF
 	test -z "$BUILD_TYPE" || break
 done
 
-HOME=${TMPCI} TRAVIS_BUILD_DIR=${TMPCI} BUILD_TYPE=$BUILD_TYPE tests/common.sh
+# use pip2 for python2 with python3 is around, platformio doesn't like it
+cp tests/common.sh tests/common-custom.sh
+sed -i 's,pip ,pip2 ,g' tests/common-custom.sh
+
+HOME=${TMPCI} TRAVIS_BUILD_DIR=${TMPCI} BUILD_TYPE=$BUILD_TYPE tests/common-custom.sh
