@@ -125,6 +125,8 @@ String File::readString()
 {
     size_t sz = size() - position() - 1;
     String str;
+    if (sz<1)
+		return str;
     str.reserve(sz);
 	size_t pos=0;
 	while (pos++ < sz)
