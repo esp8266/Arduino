@@ -123,16 +123,15 @@ const char* File::name() const {
 
 String File::readString()
 {
-    size_t sz = size() - position() + 1;
-    String str;
-    if (sz < 1)
-        return str;
-    str.reserve(sz);
-    while (available())
+    String ret;
+    ret.reserve(size() - position());
+    int c  = read();
+    while (c >= 0)
     {
-        str += (char)read();
+        ret += (char) c;
+        c  = read();
     }
-    return str;
+    return ret;
 }
 
 File Dir::openFile(const char* mode) {
