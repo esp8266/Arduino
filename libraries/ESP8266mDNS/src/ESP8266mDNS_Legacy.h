@@ -40,8 +40,8 @@ License (MIT license):
   THE SOFTWARE.
 
 */
-#ifndef ESP8266MDNS_H
-#define ESP8266MDNS_H
+#ifndef ESP8266MDNS_LEGACY_H
+#define ESP8266MDNS_LEGACY_H
 
 #include "ESP8266WiFi.h"
 #include "WiFiUdp.h"
@@ -138,10 +138,6 @@ private:
   bool _listen();
   void _restart();
 };
-
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
-extern MDNSResponder MDNS;
-#endif
 
 }	// namespace Legacy_MDNSResponder
 

@@ -23,7 +23,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
+#include <Arduino.h>
 
 namespace esp8266
 {
@@ -71,7 +71,7 @@ public:
     return expired(); 
   }
   
-  void reset(timeType newTimeout)
+  void reset(const timeType newTimeout)
   {
     _timeout = newTimeout;
     reset();
@@ -81,12 +81,18 @@ public:
   {
     _start = millis(); 
   }
+
+  const timeType getTimeout() const
+  {
+    return _timeout;
+  }
   
-protected:
-  bool checkExpired(timeType t) const
+  bool checkExpired(const timeType t) const
   {
     return (t - _start) >=  _timeout;
   }
+ 
+protected:
   
   bool expiredRetrigger()
   {
