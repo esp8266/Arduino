@@ -82,7 +82,7 @@ public:
     _start = millis(); 
   }
 
-  const timeType getTimeout() const
+  timeType getTimeout() const
   {
     return _timeout;
   }
