@@ -47,4 +47,33 @@ if [ "$branch" != "$branch" ]; then
 	exit 1
 fi
 rm -rf arduino_ide arduino-nightly Arduino/libraries/ArduinoJson
-HOME=${TMPCI} TRAVIS_BUILD_DIR=${TMPCI} BUILD_TYPE=build tests/common.sh
+
+while true; do
+
+	cat << EOF
+Which build?
+1. main
+2. debug even
+3. debug odd
+4. platformio
+5. package
+6. host
+7. style
+EOF
+
+	read ans
+
+	BUILD_TYPE=""
+	case "$ans" in
+		1) BUILD_TYPE=build;;
+		2) BUILD_TYPE=debug_even;;
+		3) BUILD_TYPE=debug_odd;;
+		4) BUILD_TYPE=platformio;;
+		5) BUILD_TYPE=package;;
+		6) BUILD_TYPE=host;;
+		7) BUILD_TYPE=style;;
+	esac
+	test -z "$BUILD_TYPE" || break
+done
+
+HOME=${TMPCI} TRAVIS_BUILD_DIR=${TMPCI} BUILD_TYPE=$BUILD_TYPE tests/common.sh
