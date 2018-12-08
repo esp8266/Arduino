@@ -22,13 +22,16 @@
  *
  */
 
-#ifndef LEAMDNS_PRIV_H
-#define LEAMDNS_PRIV_H
+#ifndef MDNS_PRIV_H
+#define MDNS_PRIV_H
+
+namespace esp8266 {
 
 /*
- * namespace LEAmDNS
+ * LEAmDNS
  */
-namespace LEAmDNS {
+
+namespace MDNSImplementation {
 
 // Enable class debug functions
 #define ESP_8266_MDNS_INCLUDE
@@ -153,16 +156,12 @@ namespace LEAmDNS {
     #define F(A)    A
 #endif
 
-}   // namespace LEAmDNS
+}   // namespace MDNSImplementation
 
+} // namespace esp8266
 
 // Include the main header, so the submodlues only need to include this header
 #include "LEAmDNS.h"
 
 
-#endif  // LEAMDNS_PRIV_H
-
-
-
-
-
+#endif  // MDNS_PRIV_H
