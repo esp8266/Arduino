@@ -28,14 +28,7 @@
 #include "os_type.h"
 #ifdef LWIP_OPEN_SRC
 
-#include "lwip/init.h"
-#if LWIP_VERSION_MAJOR == 1
-#define ipv4_addr ip_addr
-#endif
-#include "lwip/ip_addr.h"
-#if LWIP_VERSION_MAJOR != 1
-typedef struct ip4_addr ipv4_addr_t;
-#endif
+#include "ipv4_addr.h"
 
 #else
 #error LWIP_OPEN_SRC must be defined
