@@ -18,7 +18,7 @@
 
 const int16_t I2C_MASTER = 0x42;
 const int16_t I2C_SLAVE = 0x08;
-int16_t slave_address = I2C_SLAVE; 
+int16_t slave_address = I2C_SLAVE;
 
 // Keep this structure in sync with the i2c-P2P-slave example. Should be in shared header.
 struct MessageData {
@@ -87,7 +87,6 @@ MessageData encodeMessage(const String &instring) {
 // should be in shared header
 bool validateMessage(char* message_bytes, MessageData &tmp) {
 
-  MessageData tmp;
   memcpy(&tmp, message_bytes, sizeof(tmp));
 
   // Validate PROTOCOL terminator
@@ -249,26 +248,26 @@ void loop() {
 
   if (millis() > second_timer) {
     Serial.print("Errors/Bytes: ");
-    Serial.print(error_count);
+    Serial.print(errorCount);
     Serial.print("/");
-    Serial.print(byte_count);
+    Serial.print(byteCount);
     Serial.println(" per second");
-    error_count = 0;
-    byte_count = 0;
+    errorCount = 0;
+    byteCount = 0;
     second_timer = millis() + 1000;
   }
 
-  if (millis() > next_ping) {
+  if (millis() > nextPing) {
     digitalWrite(LED_PIN, LOW);
-    next_ping = millis() + 200;
+    nextPing = millis() + 200;
     Serial.print("[MASTER] Sequence » ");
     Serial.println(sequence);
     digitalWrite(LED_PIN, HIGH);
     sendMessage(sequence, "MESA");
-    if (expect_pong) {
-      error_count++;
+    if (expectPong) {
+      errorCount++;
     }
-    expect_pong = true;
+    expectPong = true;
     sequence++;
   }
 

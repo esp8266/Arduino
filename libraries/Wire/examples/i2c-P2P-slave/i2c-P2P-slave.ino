@@ -38,7 +38,7 @@ uint16_t calculateCRC16(uint8_t *data, size_t length);
 void sendEvent(int a, String msg);
 void sendMessage(int seq, String msg);
 void receiveEvent(const size_t howMany);
-MessageData validateMessage(char* bytes_message);
+bool validateMessage(const char* bytes, MessageData &tmp);
 
 //
 
@@ -48,31 +48,6 @@ uint16_t calculateCRC16(uint8_t *data, size_t length) {
   unsigned short value = crc.XModemCrc(data, 0, length);
   Serial.print("crc = 0x"); Serial.println(value, HEX);
   return (uint16_t)value;
-}
-
-void setup() {
-
-  Serial.begin(230400);
-  while (!Serial); // if you want to wait for first messages
-
-  // Enable internal pullup (there's always one from the master side)
-  //digitalWrite(SDA_PIN, HIGH);
-  //digitalWrite(SCL_PIN, HIGH);
-
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
-
-  //Wire.pins(SDA_PIN, SCL_PIN);
-  //Wire.begin(I2C_SLAVE);
-  Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE); // new syntax: join i2c bus (address required for slave)
-
-  delay(2000);
-  digitalWrite(LED_PIN, HIGH);
-
-  Wire.onReceive(receiveEvent);
-
-  Serial.print("I2C Slave started on address: 0x0");
-  Serial.println(I2C_SLAVE, HEX);
 }
 
 // should be in shared header
@@ -103,8 +78,7 @@ MessageData encodeMessage(String bytes) {
 // should be in shared header
 bool validateMessage(const char* bytes, MessageData &tmp) {
 
-  MessageData tmp;
-  memcpy(&tmp, bytes_message, sizeof(tmp));
+  memcpy(&tmp, bytes, sizeof(tmp));
 
   // Validate terminator
   if (tmp.terminator == '.') {
@@ -113,7 +87,7 @@ bool validateMessage(const char* bytes, MessageData &tmp) {
     Serial.print("[ERROR] Terminator invalid: '");
     Serial.print(tmp.terminator);
     Serial.println("'");
-    return tmp;
+    return false;
   }
 
   int datasize = sizeof(tmp.data);
@@ -227,17 +201,19 @@ void receiveEvent(const size_t howMany) {
     } else {
 
   }
-
+    
   Serial.print("Decoding data of size: "); Serial.println(sizeof(chars));
-  message = validateMessage(chars); // &error
+  bool success = validateMessage(chars, message);
 
-  // Do something with the message.
-  char inmessage[5] = {0};
-  memcpy(inmessage, (const char*)&message.data, 4);
-  String inmsg = String(inmessage);
-  if (inmsg.indexOf("MESA") == 0) {
-    String event = String("PONG");
-    sendMessage(seq, event);
+  if (success) {
+    // Do something with the message.
+    char inmessage[5] = {0};
+    memcpy(inmessage, (const char*)&message.data, 4);
+    String inmsg = String(inmessage);
+    if (inmsg.indexOf("MESA") == 0) {
+      String event = String("PONG");
+      sendMessage(seq, event);
+    }
   }
 
 }
@@ -267,6 +243,31 @@ void sendEvent(int a, String msg) {
   Wire.write(";");        // sends five bytes
   Wire.write(msg.c_str());
   Wire.endTransmission();    // stop transmitting
+}
+
+void setup() {
+
+  Serial.begin(230400);
+  while (!Serial); // if you want to wait for first messages
+
+  // Enable internal pullup (there's always one from the master side)
+  //digitalWrite(SDA_PIN, HIGH);
+  //digitalWrite(SCL_PIN, HIGH);
+
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+
+  //Wire.pins(SDA_PIN, SCL_PIN);
+  //Wire.begin(I2C_SLAVE);
+  Wire.begin(SDA_PIN, SCL_PIN, I2C_SLAVE); // new syntax: join i2c bus (address required for slave)
+
+  delay(2000);
+  digitalWrite(LED_PIN, HIGH);
+
+  Wire.onReceive(receiveEvent);
+
+  Serial.print("I2C Slave started on address: 0x0");
+  Serial.println(I2C_SLAVE, HEX);
 }
 
 void loop() {
