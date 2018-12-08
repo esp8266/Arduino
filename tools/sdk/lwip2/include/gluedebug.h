@@ -39,6 +39,7 @@ extern "C"
 void (*phy_capture) (int netif_idx, const char* data, size_t len, int out, int success);
 
 /////////////////////////////////////////////////////////////////////////////
+#include <sys/pgmspace.h>
 
 #if UDEBUG && UDEBUGSTORE
 #warning use 'doprint_allow=1' right after Serial is enabled
