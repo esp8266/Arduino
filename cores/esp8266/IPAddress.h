@@ -152,11 +152,6 @@ class IPAddress: public Printable {
         IPAddress(const ipv4_addr* fw_addr)   { setV4(); v4() = fw_addr->addr; }
         IPAddress(const ip_addr_t& lwip_addr) { _ip = lwip_addr; }
 
-#if LWIP_VERSION_MAJOR != 1
-        IPAddress(ipv4_addr fw_addr)          { setV4(); v4() = fw_addr.addr; }
-        IPAddress(const ip_addr_t* lwip_addr) { _ip = *lwip_addr; }
-#endif
-
         operator       ip_addr_t () const { return  _ip; }
         operator const ip_addr_t*() const { return &_ip; }
         operator       ip_addr_t*()       { return &_ip; }
