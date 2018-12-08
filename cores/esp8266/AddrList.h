@@ -21,15 +21,15 @@
   This class allows to explore all configured IP addresses
   in lwIP netifs, with that kind of c++ loop:
 
-  for (auto a: ifList)
+  for (auto a: addrList)
     out.printf("IF='%s' index=%d legacy=%d IPv4=%d local=%d hostname='%s' addr= %s\n",
-               a->iface().c_str(),
-               a->number(),
-               a->addr().isLegacy(),
-               a->addr().isV4(),
-               a->addr().isLocal(),
-               a->hostname().c_str(),
-               a->addr().toString().c_str());
+               a.iface().c_str(),
+               a.ifnumber(),
+               a.addr().isLegacy(),
+               a.addr().isV4(),
+               a.addr().isLocal(),
+               a.hostname().c_str(),
+               a.addr().toString().c_str());
 
   This loop:
 
@@ -41,8 +41,8 @@
   can be replaced by:
 
       for (bool configured = false; !configured; ) {
-          for (auto iface: ifList)
-              if ((configured = !iface->addr().isLocal())
+          for (auto iface: addrList)
+              if ((configured = !iface.addr().isLocal())
                   break;
           Serial.print('.');
           delay(500);
@@ -51,9 +51,9 @@
   waiting for an IPv6 global address:
 
       for (bool configured = false; !configured; ) {
-          for (auto iface: ifList)
-              if ((configured = (   !iface->addr()->isV4()
-                                 && !iface->addr().isLocal())))
+          for (auto iface: addrList)
+              if ((configured = (   !iface.addr().isV4()
+                                 && !iface.addr().isLocal())))
                   break;
           Serial.print('.');
           delay(500);
@@ -62,10 +62,10 @@
   waiting for an IPv6 global address, on a specific interface:
 
       for (bool configured = false; !configured; ) {
-          for (auto iface: ifList)
-              if ((configured = (   !iface->addr()->isV4()
-                                 && !iface->addr().isLocal()
-                                 && iface->number() == STATION_IF)))
+          for (auto iface: addrList)
+              if ((configured = (   !iface.addr().isV4()
+                                 && !iface.addr().isLocal()
+                                 && iface.ifnumber() == STATION_IF)))
                   break;
           Serial.print('.');
           delay(500);
@@ -85,84 +85,136 @@
 #endif
 
 
-class AddrListClass {
+namespace esp8266
+{
 
-    // no member in this class
-    // lwIP's global 'struct netif* netif_list' is used
-    // designed to be used with 'for (auto x: ifList)'
+namespace AddressListImplementation
+{
 
-    public:
 
-        class const_iterator {
+struct netifWrapper
+{
+    netifWrapper (netif* netif) : _netif(netif), _num(-1) {}
+    netifWrapper (const netifWrapper& o) : _netif(o._netif), _num(o._num) {}
 
-            public:
+    netifWrapper& operator= (const netifWrapper& o)
+    {
+        _netif = o._netif;
+        _num = o._num;
+        return *this;
+    }
 
-                // iterator operations:
+    bool equal(const netifWrapper& o)
+    {
+        return _netif == o._netif && (!_netif || _num == o._num);
+    }
 
-                const_iterator (bool begin = true): _netif(begin? netif_list: nullptr), _num(-1) { ++*this; }
-                const_iterator (const const_iterator& o): _netif(o._netif), _num(o._num) { }
-                const_iterator& operator= (const const_iterator& o) { _netif = o._netif; _num = o._num; return *this; }
+    // address properties
+    IPAddress addr () const         { return ipFromNetifNum(); }
+    bool isLegacy () const          { return _num == 0; }
+    bool isLocal () const           { return addr().isLocal(); }
+    bool isV4 () const              { return addr().isV4(); }
+    bool isV6 () const              { return !addr().isV4(); }
+    String toString() const         { return addr().toString(); }
 
-                bool operator!= (const const_iterator& o) { return !equal(o); }
-                bool operator== (const const_iterator& o) { return  equal(o); }
+    // related to legacy address (_num=0, ipv4)
+    IPAddress netmask () const      { return _netif->netmask; }
+    IPAddress gw () const           { return _netif->gw; }
 
-                const_iterator operator++(int) {
-                    const_iterator ret = *this;
-                    ++(*this);
-                    return ret;
-                }
+    // common to all addresses of this interface
+    String ifname () const          { return String(_netif->name[0]) + _netif->name[1]; }
+    const char* ifhostname () const { return _netif->hostname?: emptyString.c_str(); }
+    const char* ifmac () const      { return (const char*)_netif->hwaddr; }
+    int ifnumber () const           { return _netif->num; }
 
-                const_iterator& operator++() {
-                    while (_netif) {
-                        if (++_num == IF_NUM_ADDRESSES) {
-                            _num = -1;
-                            _netif = _netif->next;
-                            continue;
-                        }
-                        if (!ip_addr_isany(_ip_from_netif_num()))
-                            break;
-                    }
-                    return *this;
-                }
-
-                // (*iterator) emulation:
-
-                const const_iterator& operator*  () const { return *this; }
-                const const_iterator* operator-> () const { return  this; }
-
-                bool isLegacy() const { return _num == 0; }
-                bool isLocal() const { return addr().isLocal(); }
-                IPAddress addr () const { return _ip_from_netif_num(); }
-                IPAddress netmask () const { return _netif->netmask; }
-                IPAddress gw () const { return _netif->gw; }
-                String iface () const { return String(_netif->name[0]) + _netif->name[1]; }
-                const char* hostname () const { return _netif->hostname?: emptyString.c_str(); }
-                const char* mac () const { return (const char*)_netif->hwaddr; }
-                int number () const { return _netif->num; }
-
-            protected:
-
-                bool equal (const const_iterator& o) {
-                    return    _netif == o._netif
-                           && (!_netif || _num == o._num);
-                }
-
-                const ip_addr_t* _ip_from_netif_num () const {
+    const ip_addr_t* ipFromNetifNum () const
+    {
 #if LWIP_IPV6
-                    return _num? &_netif->ip6_addr[_num - 1]: &_netif->ip_addr;
+        return _num ? &_netif->ip6_addr[_num - 1] : &_netif->ip_addr;
 #else
-                    return &_netif->ip_addr;
+        return &_netif->ip_addr;
 #endif
-                }
+    }
 
-                netif* _netif;
-                int _num; // address index (0 is legacy, _num-1 is ip6_addr[]'s index)
-        };
+    // lwIP interface
+    netif* _netif;
 
-        const const_iterator begin () const { return const_iterator(true);  }
-        const const_iterator end   () const { return const_iterator(false); }
+    // address index within interface
+    // 0: legacy address (IPv4)
+    // n>0: (_num-1) is IPv6 index for netif->ip6_addr[]
+    int _num;
 };
 
-extern AddrListClass addrList;
 
-#endif // __ADDRLIST_H
+class AddressListIterator
+{
+public:
+    AddressListIterator (const netifWrapper& o) : netIf(o) {}
+    AddressListIterator (netif* netif) : netIf(netif)
+    {
+        // This constructor is called with lwIP's global netif_list, or
+        // nullptr.  operator++() is designed to loop through _configured_
+        // addresses.  That's why netIf's _num is initialized to -1 to allow
+        // returning the first usable address to AddressList::begin().
+        (void)operator++();
+    }
+
+    const netifWrapper& operator*  () const { return netIf; }
+    const netifWrapper* operator-> () const { return &netIf; }
+
+    bool operator== (AddressListIterator& o) { return netIf.equal(*o); }
+    bool operator!= (AddressListIterator& o) { return !netIf.equal(*o); }
+
+    AddressListIterator& operator= (const AddressListIterator& o) { netIf = o.netIf; return *this; }
+
+    AddressListIterator operator++ (int)
+    {
+        AddressListIterator ret = *this;
+        (void)operator++();
+        return ret;
+    }
+
+    AddressListIterator& operator++ ()
+    {
+        while (netIf._netif)
+        {
+            if (++netIf._num == IF_NUM_ADDRESSES)
+            {
+                // all addresses from current interface were iterated,
+                // switching to next interface
+                netIf = netifWrapper(netIf._netif->next);
+                continue;
+            }
+            if (!ip_addr_isany(netIf.ipFromNetifNum()))
+                // found an initialized address
+                break;
+        }
+        return *this;
+    }
+
+    netifWrapper netIf;
+};
+
+
+class AddressList
+{
+public:
+  using const_iterator = const AddressListIterator;
+
+  const_iterator begin () const { return const_iterator(netif_list); }
+  const_iterator   end () const { return const_iterator(nullptr); }
+
+};
+
+inline AddressList::const_iterator begin (const AddressList& a) { return a.begin(); }
+inline AddressList::const_iterator   end (const AddressList& a) { return a.end(); }
+
+
+} // AddressListImplementation
+
+} // esp8266
+
+extern esp8266::AddressListImplementation::AddressList addrList;
+
+
+#endif

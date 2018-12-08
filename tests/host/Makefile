@@ -55,7 +55,6 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	Print.cpp \
 	FS.cpp \
 	spiffs_api.cpp \
-	pgmspace.cpp \
 	MD5Builder.cpp \
 )
 
@@ -91,7 +90,9 @@ MOCK_C_FILES := $(addprefix common/,\
 	noniso.c \
 )
 
-INC_PATHS := $(addprefix -I,\
+
+INC_PATHS += $(addprefix -I, \
+	. \
 	common \
 	$(CORE_PATH) \
 )
@@ -108,7 +109,7 @@ TEST_CPP_FILES := \
 	core/test_pgmspace.cpp \
 	core/test_md5builder.cpp \
 	core/test_string.cpp \
-  core/test_PolledTimeout.cpp
+	core/test_PolledTimeout.cpp
 
 PREINCLUDES := \
 	-include common/mock.h \
@@ -120,8 +121,12 @@ DEBUG += -DDEBUG_ESP_PORT=Serial
 DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_MDNS
 endif
 
-CXXFLAGS += $(DEBUG) -std=c++11 -Wall -Werror -coverage $(OPTZ) -fno-common -g $(M32)
-CFLAGS += -std=c99 -Wall -Werror -coverage $(OPTZ) -fno-common -g $(M32)
+FLAGS += $(DEBUG) -Wall -coverage $(OPTZ) -fno-common -g $(M32)
+FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
+FLAGS += -DLWIP_IPV6=0
+FLAGS += $(MKFLAGS)
+CXXFLAGS += -std=c++11 $(FLAGS)
+CFLAGS += -std=c99 $(FLAGS)
 LDFLAGS += -coverage $(OPTZ) -g $(M32)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24:   error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))
@@ -143,7 +148,10 @@ COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 
 all: help
 
-CI: build-info $(OUTPUT_BINARY) valgrind test gcov	# run CI
+CI:
+	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Werror FORCE32=0 OPTZ=-O0 doCI
+
+doCI: build-info $(OUTPUT_BINARY) valgrind test gcov	# run CI
 
 test: $(OUTPUT_BINARY)			# run host test for CI
 	$(OUTPUT_BINARY)
@@ -165,7 +173,7 @@ valgrind: $(OUTPUT_BINARY)
 	$(LCOV) --directory ../../cores/esp8266/ --zerocounters
 	$(VALGRIND) $(VALGRINDFLAGS) $(OUTPUT_BINARY)
 	$(LCOV) --directory $(CORE_PATH) --capture --output-file $(LCOV_DIRECTORY)/app.info
-	$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
+	-$(GENHTML) $(LCOV_DIRECTORY)/app.info -o $(LCOV_DIRECTORY)
 
 build-info:				# show toolchain version
 	@echo "-------- build tools info --------"
@@ -201,6 +209,7 @@ ARDUINO_LIBS := \
 	$(addprefix $(CORE_PATH)/,\
 		IPAddress.cpp \
 		Updater.cpp \
+		base64.cpp \
 	) \
 	$(addprefix ../../libraries/,\
 		$(addprefix ESP8266WiFi/src/,\
@@ -261,6 +270,7 @@ ULIBPATHS = $(shell echo $(ULIBDIRS) | sed 's,:, ,g')
 USERLIBDIRS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for dd in $$d $$d/src; do test -d $$dd && { echo -I$$dd; echo "userlib: using directory '$$dd'" 1>&2; } done; done)
 USERLIBSRCS = $(shell test -z "$(ULIBPATHS)" || for d in $(ULIBPATHS); do for ss in $$d/*.cpp $$d/src/*.cpp; do test -r $$ss && echo $$ss; done; done)
 INC_PATHS += $(USERLIBDIRS)
+INC_PATHS += -I$(INODIR)/..
 CPP_OBJECTS_CORE_EMU = $(CPP_SOURCES_CORE_EMU:.cpp=.cpp.o) $(USERLIBSRCS:.cpp=.cpp.o)
 
 bin/fullcore.a: $(C_OBJECTS) $(CPP_OBJECTS_CORE_EMU)
@@ -277,18 +287,18 @@ ifeq ($(INO),)
 
 %: %.ino
 	@# recursive 'make' with paths
-	$(MAKE) -f $(MAKEFILE) INODIR=$(dir $@) INO=$(notdir $@) $(BINDIR)/$(notdir $@)/$(notdir $@)
+	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Wextra INODIR=$(dir $@) INO=$(notdir $@) $(BINDIR)/$(notdir $@)/$(notdir $@)
 	@# see below the new build rule with fixed output path outside from core location
 
 #####################
-# recursive call on ino targer
+# recursive call on ino target
 else
 
 $(BINDIR)/$(INO)/$(INO).ino.cpp:
 	@# arduino builder would come around here (.ino -> .ino.cpp)
 	@mkdir -p $(BINDIR)/$(INO); \
 	( \
-		echo "#include \"$(INODIR)/$(INO).ino\""; \
+		echo "#include <$(INODIR)/$(INO).ino>"; \
 		for i in $(INODIR)/*.ino; do \
 			test "$$i" = $(INODIR)/$(INO).ino || echo "#include \"$$i\""; \
 		done; \

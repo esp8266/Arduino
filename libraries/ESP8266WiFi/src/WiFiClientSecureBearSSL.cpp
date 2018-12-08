@@ -189,7 +189,6 @@ bool WiFiClientSecure::stop(unsigned int maxWaitMs) {
     if (_session) {
       br_ssl_engine_get_session_parameters(_eng, _session->getSession());
     }
-    _clearAuthenticationSettings();
   }
   _freeSSL();
   return ret;
@@ -1347,7 +1346,10 @@ bool WiFiClientSecure::loadCACert(Stream& stream, size_t size) {
   uint8_t *dest = _streamLoad(stream, size);
   bool ret = false;
   if (dest) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     ret = setCACert(dest, size);
+#pragma GCC diagnostic pop
   }
   free(dest);
   return ret;
@@ -1357,7 +1359,10 @@ bool WiFiClientSecure::loadCertificate(Stream& stream, size_t size) {
   uint8_t *dest = _streamLoad(stream, size);
   bool ret = false;
   if (dest) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     ret = setCertificate(dest, size);
+#pragma GCC diagnostic pop
   }
   free(dest);
   return ret;
@@ -1367,7 +1372,10 @@ bool WiFiClientSecure::loadPrivateKey(Stream& stream, size_t size) {
   uint8_t *dest = _streamLoad(stream, size);
   bool ret = false;
   if (dest) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     ret = setPrivateKey(dest, size);
+#pragma GCC diagnostic pop
   }
   free(dest);
   return ret;
