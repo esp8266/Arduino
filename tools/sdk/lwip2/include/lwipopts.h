@@ -987,12 +987,12 @@
  * LWIP_AUTOIP==1: Enable AUTOIP module.
  */
 #if !defined LWIP_AUTOIP || defined __DOXYGEN__
-#define LWIP_AUTOIP                     0
+#define LWIP_AUTOIP                     LWIP_FEATURES // 0
 #endif
 #if !LWIP_IPV4
 /* disable AUTOIP when IPv4 is disabled */
 #undef LWIP_AUTOIP
-#define LWIP_AUTOIP                     0
+#define LWIP_AUTOIP 0
 #endif /* !LWIP_IPV4 */
 
 /**
@@ -1000,7 +1000,7 @@
  * the same interface at the same time.
  */
 #if !defined LWIP_DHCP_AUTOIP_COOP || defined __DOXYGEN__
-#define LWIP_DHCP_AUTOIP_COOP           0
+#define LWIP_DHCP_AUTOIP_COOP           LWIP_FEATURES // 0
 #endif
 
 /**
@@ -3539,13 +3539,21 @@
    ------------------ SNTP options ------------------
    --------------------------------------------------
 */
-#define SNTP_SERVER_DNS			1				// SNTP support DNS names through sntp_setservername / sntp_getservername
+
 // if SNTP_SERVER_ADDRESS is defined, it always overrides user's config
 // so we do not define it. sntp server can come from dhcp server, or by
 // user.
-//#define SNTP_SERVER_ADDRESS	"pool.ntp.org"			// default
-#define SNTP_GET_SERVERS_FROM_DHCP	3
+//#define SNTP_SERVER_ADDRESS	"pool.ntp.org"   // default
+//#define SNTP_GET_SERVERS_FROM_DHCP	// implicitely enabled by LWIP_DHCP_GET_NTP_SRV
+
+#define SNTP_SERVER_DNS			1        // enable SNTP support DNS names through sntp_setservername / sntp_getservername
+
 #define SNTP_SET_SYSTEM_TIME_US(t,us)	do { struct timeval tv = { t, us }; settimeofday(&tv, NULL); } while (0)
+
+#if LWIP_FEATURES
+// lwip-1.4 had 3 possible SNTP servers (constant was harcoded)
+#define SNTP_MAX_SERVERS                3
+#endif
 
 /*
    --------------------------------------------------
