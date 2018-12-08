@@ -26,22 +26,11 @@
 #define __IP_ADDR_H__
 
 #include "c_types.h"
+#include "ipv4_addr.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-struct ipv4_addr {
-    uint32 addr;
-};
-
-typedef struct ipv4_addr ipv4_addr_t;
-
-struct ip_info {
-    struct ipv4_addr ip;
-    struct ipv4_addr netmask;
-    struct ipv4_addr gw;
-};
 
 /**
  * Determine if two address are on the same network.
