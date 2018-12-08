@@ -24,10 +24,12 @@
 
 #include "LEAmDNS_Priv.h"
 
+namespace esp8266 {
+
 /*
  * LEAmDNS
  */
-namespace LEAmDNS {
+namespace MDNSImplementation {
 
 /**
  * STRINGIZE
@@ -1107,14 +1109,9 @@ MDNSResponder::hMDNSService MDNSResponder::enableArduino(uint16_t p_u16Port,
     return hService;
 }
 
-/*
- * MDNS responder global instance
- */
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
-MDNSResponder   MDNS;
-#endif
 
-}   // namespace LEAmDNS
+} //namespace MDNSImplementation
 
+} //namespace esp8266
 
 

@@ -58,19 +58,19 @@
 #define STAPSK  "your-password"
 #endif
 
-const char*                                             ssid                    = STASSID;
-const char*                                             password                = STAPSK;
+const char*                                    ssid                    = STASSID;
+const char*                                    password                = STAPSK;
 
-char*                                                   pcHostDomain            = 0;        // Negociated host domain
-bool                                                    bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-LEAmDNS::MDNSResponder::hMDNSService                    hMDNSService            = 0;        // The handle of the http service in the MDNS responder
-LEAmDNS::MDNSResponder::hMDNSServiceQuery               hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
+char*                                          pcHostDomain            = 0;        // Negociated host domain
+bool                                           bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
+MDNSResponder::hMDNSService                    hMDNSService            = 0;        // The handle of the http service in the MDNS responder
+MDNSResponder::hMDNSServiceQuery               hMDNSServiceQuery       = 0;        // The handle of the 'http.tcp' service query in the MDNS responder
 
-const String                                            cstrNoHTTPServices      = "Currently no 'http.tcp' services in the local network!<br/>";
-String                                                  strHTTPServices         = cstrNoHTTPServices;
+const String                                   cstrNoHTTPServices      = "Currently no 'http.tcp' services in the local network!<br/>";
+String                                         strHTTPServices         = cstrNoHTTPServices;
 
 // TCP server at port 'SERVICE_PORT' will respond to HTTP requests
-WiFiServer                                              server(SERVICE_PORT);
+WiFiServer                                     server(SERVICE_PORT);
 
 
 /*
@@ -89,24 +89,24 @@ bool setStationHostname(const char* p_pcHostname) {
 /*
    MDNSServiceQueryCallback
 */
-bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,                           // The MDNS responder object
-                              const LEAmDNS::MDNSResponder::hMDNSServiceQuery p_hServiceQuery,    // Handle to the service query
-                              uint32_t p_u32AnswerIndex,                                          // Index of the updated answer
-                              uint32_t p_u32ServiceQueryAnswerMask,                               // Mask for the updated component
-                              bool p_bSetContent,                                                 // true: Component set, false: component deleted
-                              void* p_pUserdata) {                                                // pUserdata; here '0', as none set via 'installServiceQuery'
+bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                           // The MDNS responder object
+                              const MDNSResponder::hMDNSServiceQuery p_hServiceQuery,    // Handle to the service query
+                              uint32_t p_u32AnswerIndex,                                 // Index of the updated answer
+                              uint32_t p_u32ServiceQueryAnswerMask,                      // Mask for the updated component
+                              bool p_bSetContent,                                        // true: Component set, false: component deleted
+                              void* p_pUserdata) {                                       // pUserdata; here '0', as none set via 'installServiceQuery'
   (void) p_pUserdata;
   Serial.printf("MDNSServiceQueryCallback\n");
 
   if ((p_pMDNSResponder) &&
       (hMDNSServiceQuery == p_hServiceQuery)) {
 
-    if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_ServiceDomain & p_u32ServiceQueryAnswerMask) {
+    if (MDNSResponder::ServiceQueryAnswerType_ServiceDomain & p_u32ServiceQueryAnswerMask) {
       Serial.printf("MDNSServiceQueryCallback: Service domain '%s' %s index %u\n",
                     p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex),
                     (p_bSetContent ? "added at" : "removed from"),
                     p_u32AnswerIndex);
-    } else if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort & p_u32ServiceQueryAnswerMask) {
+    } else if (MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort & p_u32ServiceQueryAnswerMask) {
       if (p_bSetContent) {
         Serial.printf("MDNSServiceQueryCallback: Host domain and port added/updated for service '%s': %s:%u\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex),
@@ -116,7 +116,7 @@ bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,         
         Serial.printf("MDNSServiceQueryCallback: Host domain and port removed from service '%s'\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex));
       }
-    } else if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_IP4Address & p_u32ServiceQueryAnswerMask) {
+    } else if (MDNSResponder::ServiceQueryAnswerType_IP4Address & p_u32ServiceQueryAnswerMask) {
       if (p_bSetContent) {
         Serial.printf("MDNSServiceQueryCallback: IP4 address added/updated for service '%s':\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex));
@@ -127,7 +127,7 @@ bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,         
         Serial.printf("MDNSServiceQueryCallback: IP4 address removed from service '%s'\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex));
       }
-    } else if (LEAmDNS::MDNSResponder::ServiceQueryAnswerType_Txts & p_u32ServiceQueryAnswerMask) {
+    } else if (MDNSResponder::ServiceQueryAnswerType_Txts & p_u32ServiceQueryAnswerMask) {
       if (p_bSetContent) {
         Serial.printf("MDNSServiceQueryCallback: TXT items added/updated for service '%s': %s\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex),
@@ -192,9 +192,9 @@ bool MDNSServiceQueryCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,         
    restarted via p_pMDNSResponder->setHostname().
 
 */
-bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
+bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
                              const char* p_pcDomainName,
-                             const LEAmDNS::MDNSResponder::hMDNSService p_hService,
+                             const MDNSResponder::hMDNSService p_hService,
                              bool p_bProbeResult,
                              void* p_pUserdata) {
   (void) p_pUserdata;
@@ -235,7 +235,7 @@ bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
         }
       } else {
         // Change hostname, use '-' as divider between base name and index
-        if (LEAmDNS::MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+        if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
           p_pMDNSResponder->setHostname(pcHostDomain);
         } else {
           Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
@@ -322,10 +322,10 @@ void setup(void) {
   Serial.println(WiFi.localIP());
 
   // Setup MDNS responder
-  LEAmDNS::MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
+  MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
   // Init the (currently empty) host domain string with 'esp8266'
-  if ((!LEAmDNS::MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
-      (!LEAmDNS::MDNS.begin(pcHostDomain))) {
+  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
+      (!MDNS.begin(pcHostDomain))) {
     Serial.println("Error setting up MDNS responder!");
     while (1) { // STOP
       delay(1000);
@@ -350,7 +350,7 @@ void loop(void) {
   }
 
   // Allow MDNS processing
-  LEAmDNS::MDNS.update();
+  MDNS.update();
 }
 
 
