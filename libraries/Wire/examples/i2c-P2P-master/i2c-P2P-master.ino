@@ -1,13 +1,13 @@
 /*
- * ESP8266 I2C master-slave communication, requires Arduno Core with I2C Slave Support (2.5.0+)
- *
- * Expects two ESP8266 devices with three pins connected: GND, SDA and SCL. This is master.
- * Will send "MESA" messages to predefined slave address and then expect "PONG" response,
- * or request to retransfer if message was misunderstood (e.g. CRC check failed).
- * Message can be up to 26 bytes long (plus wrapper).
- *
- * 21-11-2018: initial drop by Matej Sychra (github.com/suculent)
- */
+  ESP8266 I2C master-slave communication, requires Arduno Core with I2C Slave Support (2.5.0+)
+
+  Expects two ESP8266 devices with three pins connected: GND, SDA and SCL. This is master.
+  Will send "MESA" messages to predefined slave address and then expect "PONG" response,
+  or request to retransfer if message was misunderstood (e.g. CRC check failed).
+  Message can be up to 26 bytes long (plus wrapper).
+
+  09-12-2018: initial drop by Matej Sychra (github.com/suculent)
+*/
 
 #include <Wire.h>
 #include "crc16.h"
@@ -52,7 +52,7 @@ bool validateMessage(const char* bytes, MessageData &tmp);
 // should be in shared header
 uint16_t calculateCRC16(uint8_t *data, size_t length) {
   crc.clearCrc();
-  uint16_t value = (uint16_t)crc.XModemCrc(data,0,length);
+  uint16_t value = (uint16_t)crc.XModemCrc(data, 0, length);
   Serial.print("crc = 0x");
   Serial.println(value, HEX);
   return value;
@@ -176,8 +176,8 @@ void receiveEvent(const size_t howMany) {
   unsigned long interval = 100;
   unsigned long currentMillis = millis();
   unsigned long previousMillis = millis();
- // message duration may not exceed 100 ms (100 bytes, 3x buffer retransferred)
-  if(currentMillis - previousMillis > interval) {
+  // message duration may not exceed 100 ms (100 bytes, 3x buffer retransferred)
+  if (currentMillis - previousMillis > interval) {
     previousMillis = currentMillis;
     // this must be fast, keep free from logging to serial here if possible
     while (0 < Wire.available()) { // loop through all but the last

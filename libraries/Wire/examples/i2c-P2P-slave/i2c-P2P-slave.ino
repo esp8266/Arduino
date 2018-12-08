@@ -1,13 +1,13 @@
 /*
- * ESP8266 I2C master-slave communication, requires Arduno Core with I2C Slave Support (2.5.0+)
- *
- * Expects two ESP8266 devices with three pins connected: GND, SDA and SCL. This is slave.
- * Will wait for "MESA" message and then respond with "PONG" message,
- * or request retransfer if message was misunderstood (e.g. CRC check failed).
- * Message can be up to 26 bytes long (plus wrapper).
- *
- * 21-11-2018: initial drop by Matej Sychra (github.com/suculent)
- */
+  ESP8266 I2C master-slave communication, requires Arduno Core with I2C Slave Support (2.5.0+)
+
+  Expects two ESP8266 devices with three pins connected: GND, SDA and SCL. This is slave.
+  Will wait for "MESA" message and then respond with "PONG" message,
+  or request retransfer if message was misunderstood (e.g. CRC check failed).
+  Message can be up to 26 bytes long (plus wrapper).
+
+  09-12-2018: initial drop by Matej Sychra (github.com/suculent)
+*/
 
 #include <Wire.h>
 #include "crc16.h"
@@ -156,9 +156,9 @@ void receiveEvent(const size_t howMany) {
       // Parses first byte for sequence number, contains recovery logic...
       if (index == 0) {
 
-         Serial.print("Remote Sequence: "); Serial.println((int)c);
+        Serial.print("Remote Sequence: "); Serial.println((int)c);
 
-         if ( c!= seq && ((c > seq - 4) || (c < seq + 4)) && c != seq + 1) {
+        if ( c != seq && ((c > seq - 4) || (c < seq + 4)) && c != seq + 1) {
           Serial.print("[DIFF] Sequence offset [!]: ");
           Serial.println(c - seq);
           Serial.print("Re-assigning sequence number: ");
@@ -196,12 +196,12 @@ void receiveEvent(const size_t howMany) {
   Serial.println(String(chars));
 
   if (requestRetransfer) {
-      String event = String("R") + String(seq) + String('\0');
-      sendMessage(seq, event);
-    } else {
+    String event = String("R") + String(seq) + String('\0');
+    sendMessage(seq, event);
+  } else {
 
   }
-    
+
   Serial.print("Decoding data of size: "); Serial.println(sizeof(chars));
   bool success = validateMessage(chars, message);
 
