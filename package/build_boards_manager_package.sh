@@ -16,6 +16,8 @@ else
     plain_ver=$ver
 fi
 
+set -e
+
 package_name=esp8266-$ver
 echo "Version: $ver"
 echo "Package name: $package_name"
@@ -44,10 +46,20 @@ srcdir=$PWD
 rm -rf package/versions/$ver
 mkdir -p $outdir
 
+# Get submodules
+modules=libraries/SoftwareSerial
+for mod in $modules; do
+    echo "refreshing submodule: $mod"
+    git submodule update --init -- $mod
+    (cd $mod && git reset --hard)
+done
+echo "done with submodules"
+
 # Some files should be excluded from the package
 cat << EOF > exclude.txt
 .git
 .gitignore
+.gitmodules
 .travis.yml
 package
 doc
@@ -57,15 +69,6 @@ git ls-files --other --directory >> exclude.txt
 # Now copy files to $outdir
 rsync -a --exclude-from 'exclude.txt' $srcdir/ $outdir/
 rm exclude.txt
-
-# Get additional libraries (TODO: add them as git submodule or subtree?)
-
-# SoftwareSerial library
-curl -L -o SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/3.4.1.zip
-unzip -q SoftwareSerial.zip
-rm -rf SoftwareSerial.zip
-mv espsoftwareserial-* SoftwareSerial
-mv SoftwareSerial $outdir/libraries
 
 # For compatibility, on OS X we need GNU sed which is usually called 'gsed'
 if [ "$(uname)" == "Darwin" ]; then
@@ -154,3 +157,5 @@ python ../../merge_packages.py $new_json $old_json >tmp && mv tmp $new_json && r
 
 popd
 popd
+
+echo "All done"
