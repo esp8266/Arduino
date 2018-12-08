@@ -27,14 +27,8 @@
 #include "LEAmDNS_lwIPdefs.h"
 #include "LEAmDNS_Priv.h"
 
-/*
- * namespace LEAmDNS
- */
-namespace LEAmDNS {
 
-/**
- * HELPERS
- */
+namespace {
 
 /*
  * strrstr (static)
@@ -43,7 +37,7 @@ namespace LEAmDNS {
  * Based on: https://stackoverflow.com/a/1634398/2778898
  *
  */
-static const char* strrstr(const char*__restrict p_pcString, const char*__restrict p_pcPattern) {
+const char* strrstr(const char*__restrict p_pcString, const char*__restrict p_pcPattern) {
     
     const char* pcResult = 0;
     
@@ -64,6 +58,24 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
     }
     return pcResult;
 }
+
+
+} // anonymous
+
+
+
+
+
+namespace esp8266 {
+
+/*
+ * LEAmDNS
+ */
+namespace MDNSImplementation {
+
+/**
+ * HELPERS
+ */
 
 /*
  * MDNSResponder::indexDomain (static)
@@ -722,7 +734,9 @@ bool MDNSResponder::_releaseTempServiceTxts(MDNSResponder::stcMDNSService& p_rSe
     }
 #endif
 
-}   // namespace LEAmDNS
+}   // namespace MDNSImplementation
+
+} // namespace esp8266
 
 
 

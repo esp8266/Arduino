@@ -1,62 +1,60 @@
 /*
  * LEATimeFlag.h
  */
-#ifndef __LEATIMEFLAG_H
-#define __LEATIMEFLAG_H
+#ifndef __MDNSTIMEFLAG_H
+#define __MDNSTIMEFLAG_H
 
 
-#include <Arduino.h>
+#include <limits>
+#include <PolledTimeout.h>
 
 
-/**
- * clsLEATimeFlag
+/* Wrapper class around PolledTimeout
+ * MDNS requires behavior that is slightly different from the default in PolledTimeout
  */
-class clsLEATimeFlag {
+class clsMDNSTimeFlag {
+protected:
+    using oneShot = esp8266::polledTimeout::oneShot;
+    oneShot m_clsPolledTimeout;
+
 public:
-    // constructor
-    clsLEATimeFlag(unsigned long p_ulTimeout = (unsigned long)(-1))
-    :   m_ulStart(millis()),
-        m_ulTimeout(p_ulTimeout) {
+    using timeType = oneShot::timeType;
+
+    clsMDNSTimeFlag(timeType p_Timeout)
+      : m_clsPolledTimeout(p_Timeout) {
     }
-    // operator bool
-    operator bool(void) const {
+    clsMDNSTimeFlag()
+      : m_clsPolledTimeout(std::numeric_limits<timeType>::max()) {
+    }
+
+    operator bool() const {
         return flagged();
     }
-    // flagged
-    bool flagged(void) const {
-        return ((millis() - m_ulStart) > m_ulTimeout);
+
+    bool flagged() const {
+        return m_clsPolledTimeout.checkExpired(millis());
     }
-    // restart
-    void restart(unsigned long p_ulNewTimeout = (unsigned long)(-1)) {
-        if ((unsigned long)(-1) != p_ulNewTimeout) {
-            m_ulTimeout = p_ulNewTimeout;
-        }
-        m_ulStart = millis();
-    }
-    void reset(void) {
-        m_ulTimeout = (unsigned long)(-1);
-        m_ulStart = millis();
-    }
-    
-    unsigned long start(void) const {
-        return m_ulStart;
-    }
-    unsigned long timeout(void) const {
-        return m_ulTimeout;
-    }
-    bool hypotheticalTimeout(unsigned long p_ulHypotheticalTimeout) const {
-        return ((millis() - m_ulStart) > p_ulHypotheticalTimeout);
+  
+    void restart() {
+        m_clsPolledTimeout.reset();
     }
 
-protected:
-    unsigned long   m_ulStart;
-    unsigned long   m_ulTimeout;
+    void restart(const timeType p_Timeout) {
+        m_clsPolledTimeout.reset(p_Timeout);
+    }
+
+    void reset() {
+        m_clsPolledTimeout.reset(std::numeric_limits<timeType>::max());
+    }
+
+    timeType getTimeout() const {
+        return m_clsPolledTimeout.getTimeout();
+    }
+
+    bool hypotheticalTimeout(const timeType p_Timeout) const {
+      return m_clsPolledTimeout.checkExpired(p_Timeout);
+    }
 };
 
-#endif  // __LEATIMEFLAG_H
 
-
-
-
-
-
+#endif  // __MDNSTIMEFLAG_H
