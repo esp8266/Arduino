@@ -199,6 +199,11 @@ void receiveEvent(const size_t howMany) {
 
   bool success = validateMessage(incoming, message);
 
+  if (!success) {
+    Serial.println("I2C message failed to validate.");
+    return;
+  }
+
   char inmsg[sizeof(message.data)];
   memcpy(inmsg, &message.data, sizeof(message.data));
   if (inmsg[0] == 'R') {

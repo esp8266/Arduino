@@ -158,7 +158,7 @@ void receiveEvent(const size_t howMany) {
 
         Serial.print("Remote Sequence: "); Serial.println((int)c);
 
-        if ( c != seq && ((c > seq - 4) || (c < seq + 4)) && c != seq + 1) {
+         if (c != seq && ((c > seq - 4) || (c < seq + 4)) && c != seq + 1) {
           Serial.print("[DIFF] Sequence offset [!]: ");
           Serial.println(c - seq);
           Serial.print("Re-assigning sequence number: ");
