@@ -69,6 +69,16 @@ void TwoWire::begin(int sda, int scl){
   flush();
 }
 
+void TwoWire::begin(int sda, int scl, uint8_t address){
+  default_sda_pin = sda;
+  default_scl_pin = scl;
+  twi_setAddress(address);
+  twi_init(sda, scl);
+  twi_attachSlaveTxEvent(onRequestService);
+  twi_attachSlaveRxEvent(onReceiveService);
+  flush();
+}
+
 void TwoWire::pins(int sda, int scl){
   default_sda_pin = sda;
   default_scl_pin = scl;
