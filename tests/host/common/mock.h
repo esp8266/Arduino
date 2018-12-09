@@ -118,4 +118,16 @@ class InterruptLock { };
 
 //
 
+#define D0 0
+#define D1 1
+#define D2 3
+#define D3 3
+#define D4 4
+#define D5 5
+#define D6 6
+#define D7 7
+#define D8 8
+
+//
+
 #endif // __cplusplus
