@@ -27,8 +27,6 @@
 #include <inttypes.h>
 #include "Stream.h"
 
-
-
 #define BUFFER_LENGTH 32
 
 class TwoWire : public Stream
@@ -45,12 +43,13 @@ class TwoWire : public Stream
 
     static uint8_t transmitting;
     static void (*user_onRequest)(void);
-    static void (*user_onReceive)(int);
+    static void (*user_onReceive)(size_t);
     static void onRequestService(void);
     static void onReceiveService(uint8_t*, size_t);
   public:
     TwoWire();
     void begin(int sda, int scl);
+    void begin(int sda, int scl, uint8_t address);
     void pins(int sda, int scl) __attribute__((deprecated)); // use begin(sda, scl) in new code
     void begin();
     void begin(uint8_t);
@@ -68,14 +67,14 @@ class TwoWire : public Stream
     uint8_t requestFrom(uint8_t, uint8_t, uint8_t);
     uint8_t requestFrom(int, int);
     uint8_t requestFrom(int, int, int);
-    
+
     virtual size_t write(uint8_t);
     virtual size_t write(const uint8_t *, size_t);
     virtual int available(void);
     virtual int read(void);
     virtual int peek(void);
     virtual void flush(void);
-    void onReceive( void (*)(int) );
+    void onReceive( void (*)(size_t) );
     void onRequest( void (*)(void) );
 
     inline size_t write(unsigned long n) { return write((uint8_t)n); }
@@ -90,4 +89,3 @@ extern TwoWire Wire;
 #endif
 
 #endif
-
