@@ -40,19 +40,19 @@ static void ping_done(void* options, void* resp)
 
 TEST_CASE("pings sent/answered", "[lwip]")
 {
-	IPAddress address;
+    IPAddress address;
     if (WiFi.hostByName(getenv("SERVER_IP"), address))
     {
-		po.ip = address;
-		po.count = PING_COUNT;
-		po.coarse_time = 1;
-		po.sent_function = &ping_done;
-		po.recv_function = &ping_recv;
-		ping_start(&po);
-		delay((PING_COUNT+2)*1000);
+        po.ip = address;
+        po.count = PING_COUNT;
+        po.coarse_time = 1;
+        po.sent_function = &ping_done;
+        po.recv_function = &ping_recv;
+        ping_start(&po);
+        delay((PING_COUNT+2)*1000);
     }
-	REQUIRE(recv_count == PING_COUNT);
-	REQUIRE(done_count == PING_COUNT);
+    REQUIRE(recv_count == PING_COUNT);
+    REQUIRE(done_count == PING_COUNT);
 }
 
 void loop()
