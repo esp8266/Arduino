@@ -146,9 +146,6 @@ namespace MDNSImplementation {
 #define USE_PGM_PRINTF
 
 #ifdef USE_PGM_PRINTF
-// See: https://github.com/esp8266/Arduino/issues/3369
-#define PROGMEM_LEA __attribute__((section(".irom.text.LEA")))
-#define PSTR_LEA(s) (__extension__({static const char __c[] PROGMEM_LEA = (s); &__c[0];}))
 #else
     #ifdef F
         #undef F
