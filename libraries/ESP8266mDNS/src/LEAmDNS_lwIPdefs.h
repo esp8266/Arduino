@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef LEAMDNS_LWIPDEFS_H
-#define LEAMDNS_LWIPDEFS_H
+#ifndef MDNS_LWIPDEFS_H
+#define MDNS_LWIPDEFS_H
 
 #include <lwip/init.h>
 #if LWIP_VERSION_MAJOR == 1
@@ -41,4 +41,4 @@
 
 #endif
 
-#endif // LEAMDNS_LWIPDEFS_H
+#endif // MDNS_LWIPDEFS_H
