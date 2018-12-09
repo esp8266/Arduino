@@ -14,7 +14,6 @@
 extern "C" {                  // SDK functions for Arduino IDE access
 #include "osapi.h"
 #include "user_interface.h"
-#include "espconn.h"
 }  //end, 'extern C'
 
 //---------------------------------------------------------------------------
