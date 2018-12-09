@@ -41,11 +41,11 @@ extern "C" {
 #include "LEAmDNS_lwIPdefs.h"
 #include "LEAmDNS_Priv.h"
 
-
+namespace esp8266 {
 /*
- * namespace LEAmDNS
+ * LEAmDNS
  */
-namespace LEAmDNS {
+namespace MDNSImplementation {
 
 /**
  * CONTROL
@@ -1056,6 +1056,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
     //
     // Probe host domain
     if ((ProbingStatus_ReadyToStart == m_HostProbeInformation.m_ProbingStatus) &&                   // Ready to get started AND
+        //TODO: Fix the following to allow Ethernet shield or other interfaces
         (_getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE) != IPAddress())) {              // Has IP address
         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _updateProbeStatus: Starting host probing...\n")););
 
@@ -1750,7 +1751,6 @@ uint8_t MDNSResponder::_replyMaskForService(const MDNSResponder::stcMDNS_RRHeade
     return u8ReplyMask;
 }
 
-}   // namespace LEAmDNS
+} // namespace MDNSImplementation
 
-
-
+} // namespace esp8266
