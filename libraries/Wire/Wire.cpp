@@ -51,7 +51,7 @@ uint8_t TwoWire::txBufferLength = 0;
 
 uint8_t TwoWire::transmitting = 0;
 void (*TwoWire::user_onRequest)(void);
-void (*TwoWire::user_onReceive)(int);
+void (*TwoWire::user_onReceive)(size_t);
 
 static int default_sda_pin = SDA;
 static int default_scl_pin = SCL;
@@ -224,17 +224,17 @@ void TwoWire::onReceiveService(uint8_t* inBytes, size_t numBytes)
   // if(rxBufferIndex < rxBufferLength){
   //   return;
   // }
-  
+
   // copy twi rx buffer into local read buffer
   // this enables new reads to happen in parallel
   for (uint8_t i = 0; i < numBytes; ++i) {
 	rxBuffer[i] = inBytes[i];
   }
-  
+
   // set rx iterator vars
   rxBufferIndex = 0;
   rxBufferLength = numBytes;
-  
+
   // alert user program
   user_onReceive(numBytes);
 }
@@ -245,17 +245,17 @@ void TwoWire::onRequestService(void)
 	if (!user_onRequest) {
 		return;
 	}
-	
+
 	// reset tx buffer iterator vars
 	// !!! this will kill any pending pre-master sendTo() activity
 	txBufferIndex = 0;
 	txBufferLength = 0;
-	
+
 	// alert user program
 	user_onRequest();
 }
 
-void TwoWire::onReceive( void (*function)(int) ) {
+void TwoWire::onReceive( void (*function)(size_t) ) {
   user_onReceive = function;
 }
 
