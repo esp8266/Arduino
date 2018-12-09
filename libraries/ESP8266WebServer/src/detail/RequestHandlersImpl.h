@@ -1,6 +1,7 @@
 #ifndef REQUESTHANDLERSIMPL_H
 #define REQUESTHANDLERSIMPL_H
 
+#include <fnmatch.h>
 #include "RequestHandler.h"
 #include "mimetable.h"
 #include "WString.h"
@@ -21,8 +22,8 @@ public:
         if (_method != HTTP_ANY && _method != requestMethod)
             return false;
 
-        if (requestUri != _uri)
-            return false;
+        if(fnmatch(_uri.c_str(), requestUri.c_str(), 0) != 0)
+          return false;
 
         return true;
     }
