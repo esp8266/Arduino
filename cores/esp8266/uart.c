@@ -51,7 +51,7 @@
 static int s_uart_debug_nr = UART0;
 
 
-struct uart_rx_buffer_ 
+struct uart_rx_buffer_
 {
     size_t size;
     size_t rpos;
