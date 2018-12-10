@@ -9,6 +9,8 @@ cache:
 matrix:
   include:
     - env:
+      - BUILD_TYPE=package
+    - env:
       - BUILD_TYPE=build_even
     - env:
       - BUILD_TYPE=build_odd
@@ -22,8 +24,6 @@ matrix:
       - BUILD_TYPE=platformio_odd
     - env:
       - BUILD_TYPE=docs
-    - env:
-      - BUILD_TYPE=package
     - env:
       - BUILD_TYPE=host_tests
     - env:
