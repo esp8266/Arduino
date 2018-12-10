@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 
+set -x
+
 # Extract next version from platform.txt
 next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
 
