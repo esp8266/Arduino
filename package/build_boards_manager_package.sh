@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 
+#set -x
+
 # Extract next version from platform.txt
 next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
 
@@ -15,6 +17,9 @@ if [ $? -ne 0 ]; then
 else
     plain_ver=$ver
 fi
+
+# 'set -e' breaks CI but not local tests
+#set -e
 
 package_name=esp8266-$ver
 echo "Version: $ver"
@@ -44,10 +49,20 @@ srcdir=$PWD
 rm -rf package/versions/$ver
 mkdir -p $outdir
 
+# Get submodules
+modules=libraries/SoftwareSerial
+for mod in $modules; do
+    echo "refreshing submodule: $mod"
+    git submodule update --init -- $mod
+    (cd $mod && git reset --hard)
+done
+echo "done with submodules"
+
 # Some files should be excluded from the package
 cat << EOF > exclude.txt
 .git
 .gitignore
+.gitmodules
 .travis.yml
 package
 doc
@@ -57,15 +72,6 @@ git ls-files --other --directory >> exclude.txt
 # Now copy files to $outdir
 rsync -a --exclude-from 'exclude.txt' $srcdir/ $outdir/
 rm exclude.txt
-
-# Get additional libraries (TODO: add them as git submodule or subtree?)
-
-# SoftwareSerial library
-curl -L -o SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/3.4.1.zip
-unzip -q SoftwareSerial.zip
-rm -rf SoftwareSerial.zip
-mv espsoftwareserial-* SoftwareSerial
-mv SoftwareSerial $outdir/libraries
 
 # For compatibility, on OS X we need GNU sed which is usually called 'gsed'
 if [ "$(uname)" == "Darwin" ]; then
@@ -83,6 +89,7 @@ $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool
 $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
 $SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' |\
 $SED 's/recipe.hooks.core.prebuild.2.pattern.*//g' |\
+$SED 's/recipe.hooks.core.prebuild.3.pattern.*//g' |\
 $SED "s/version=.*/version=$ver/g" |\
 $SED -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1($ver)/g"\
  > $outdir/platform.txt
@@ -154,3 +161,5 @@ python ../../merge_packages.py $new_json $old_json >tmp && mv tmp $new_json && r
 
 popd
 popd
+
+echo "All done"

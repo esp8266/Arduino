@@ -109,4 +109,11 @@ size_t uart_write (uart_t* uart, const char* buf, size_t size)
 	return write(1, buf, size);
 }
 
+size_t uart_read(uart_t* uart, char* userbuffer, size_t usersize)
+{
+	///XXXTODO
+	(void)uart;
+	return read(0, userbuffer, usersize);
+}
+
 } // extern "C"
