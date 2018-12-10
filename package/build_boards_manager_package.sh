@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 
-set -x
+#set -x
 
 # Extract next version from platform.txt
 next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
@@ -18,7 +18,8 @@ else
     plain_ver=$ver
 fi
 
-set -e
+# 'set -e' breaks CI but not local tests
+#set -e
 
 package_name=esp8266-$ver
 echo "Version: $ver"
@@ -88,6 +89,7 @@ $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool
 $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
 $SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' |\
 $SED 's/recipe.hooks.core.prebuild.2.pattern.*//g' |\
+$SED 's/recipe.hooks.core.prebuild.3.pattern.*//g' |\
 $SED "s/version=.*/version=$ver/g" |\
 $SED -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1($ver)/g"\
  > $outdir/platform.txt
