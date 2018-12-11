@@ -17,6 +17,10 @@ stages:
 #  - build
   - deploy
 
+env:
+    global:
+      - secure: "vt6StBC+ghqnh8YrreNo3wAzGGddJ2S4YpVZkz4S84xLEGWkIEghQhTrjlhzjBsrnHfLNko4tz9EsNx0yQ8yBlPOdReETGAkqnAU7PSPFss0qGcCRUXYtozNjbFQq6TWIxECK4xq40R9tE6NyeOpm9AYJtwF/v18u2T+T9qSgGQ="
+
 jobs:
   include:
     # Build stage. To save time, run all kinds of builds and tests in parallel.
@@ -91,8 +95,8 @@ jobs:
       - provider: releases
         draft: true
         skip_cleanup: true
-        api_key:
-          secure: kYsxX/N21fwLSTLpbb0c96PnQHn1CIMqZstm02hfUhCX83FygWSh4vs3gzW28DMpjQMZ6vC4g+jtfosYU2tUhht/bynurDH4edpEyGeMyK+fzCI9pAr4JT0RbKQI84EC18ScpgP/UP0jTc1LJ+xl8UMwSiDE0mzHx7xJ4mMNQbA=
+        #api_key:
+        #  secure: kYsxX/N21fwLSTLpbb0c96PnQHn1CIMqZstm02hfUhCX83FygWSh4vs3gzW28DMpjQMZ6vC4g+jtfosYU2tUhht/bynurDH4edpEyGeMyK+fzCI9pAr4JT0RbKQI84EC18ScpgP/UP0jTc1LJ+xl8UMwSiDE0mzHx7xJ4mMNQbA=
         file_glob: true
         tag_name: $TRAVIS_TAG
         target_commitish: $TRAVIS_COMMIT
