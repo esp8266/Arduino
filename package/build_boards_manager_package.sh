@@ -1,8 +1,6 @@
 #!/bin/bash
 #
 
-#set -x
-
 # Extract next version from platform.txt
 next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
 
@@ -18,8 +16,7 @@ else
     plain_ver=$ver
 fi
 
-# 'set -e' breaks CI but not local tests
-#set -e
+set -e
 
 package_name=esp8266-$ver
 echo "Version: $ver"
@@ -50,13 +47,14 @@ rm -rf package/versions/$ver
 mkdir -p $outdir
 
 # Get submodules
-modules=libraries/SoftwareSerial
-for mod in $modules; do
-    echo "refreshing submodule: $mod"
-    git submodule update --init -- $mod
-    (cd $mod && git reset --hard)
-done
-echo "done with submodules"
+# useless: already cloned by travis
+#modules=libraries/SoftwareSerial
+#for mod in $modules; do
+#    echo "refreshing submodule: $mod"
+#    git submodule update --init -- $mod
+#    (cd $mod && git reset --hard)
+#done
+#echo "done with submodules"
 
 # Some files should be excluded from the package
 cat << EOF > exclude.txt
@@ -134,8 +132,20 @@ fi
 cat $srcdir/package/package_esp8266com_index.template.json | \
     jq "$jq_arg" > package_esp8266com_index.json
 
+# Use Github API token, if available
+curl_gh_token_arg=""
+if [ ! -z "$CI_GITHUB_API_KEY" ]; then
+    echo "Authorization using CI_GITHUB_API_KEY"
+    curl_gh_token_arg="-H \"Authorization: token $CI_GITHUB_API_KEY\""
+else
+    echo "Warning: CI_GITHUB_API_KEY not set"
+fi
+#echo "===================================="
+#curl $curl_gh_token_arg -D - https://api.github.com/repos/esp8266/Arduino/releases
+#echo "===================================="
 # Get previous release name
-curl --silent https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+echo "debug: curl --silent -D /dev/stderr $curl_gh_token_arg https://api.github.com/repos/esp8266/Arduino/releases"
+curl --silent -D /dev/stderr $curl_gh_token_arg https://api.github.com/repos/esp8266/Arduino/releases > releases.json
 # Previous final release (prerelase == false)
 prev_release=$(jq -r '. | map(select(.draft == false and .prerelease == false)) | sort_by(.created_at | - fromdateiso8601) | .[0].tag_name' releases.json)
 # Previous release (possibly a pre-release)

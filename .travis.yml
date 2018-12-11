@@ -6,73 +6,110 @@ cache:
   directories:
     - $HOME/astyle
 
-matrix:
+git:
+  depth: 1
+  submodules: false
+
+before_install:
+  - git submodule update --init
+
+stages:
+#  - build
+  - deploy
+
+jobs:
   include:
-    - env:
-      - BUILD_TYPE=package
-    - env:
-      - BUILD_TYPE=build_even
-    - env:
-      - BUILD_TYPE=build_odd
-    - env:
-      - BUILD_TYPE=debug_even
-    - env:
-      - BUILD_TYPE=debug_odd
-    - env:
-      - BUILD_TYPE=platformio_even
-    - env:
-      - BUILD_TYPE=platformio_odd
-    - env:
-      - BUILD_TYPE=docs
-    - env:
-      - BUILD_TYPE=host_tests
-    - env:
-      - BUILD_TYPE=style_check
+    # Build stage. To save time, run all kinds of builds and tests in parallel.
+    #
+    # TODO: since we can now call different script for each job,
+    # split the do-it-all common.sh into separate scripts responsible
+    # for different types of jobs below:
+    - name: "Host tests"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=host_tests
+      install:
+        - sudo apt-get install valgrind lcov
 
-install:
-  - >
-      [ "$BUILD_TYPE" = "docs" ] && {
-        pip install --user -r doc/requirements.txt;
-      } || true
-  - >
-      [ "$BUILD_TYPE" = "style_check" ] && {
-        [ -f $HOME/astyle/build/gcc/bin/astyle ] || {
-          wget -O astyle_3.1_linux.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz/download;
-          tar -xf astyle_3.1_linux.tar.gz -C $HOME;
-          make -C $HOME/astyle/build/gcc;
-        }
-        make -C $HOME/astyle/build/gcc prefix=$HOME install;
-      } || true
-  - sudo apt-get install valgrind lcov
+    - name: "Build (1)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=build_even
+    - name: "Build (2)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=build_odd
+    - name: "Debug (1)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=debug_even
+    - name: "Debug (2)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=debug_odd
+    - name: "Platformio (1)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=platformio_even
+    - name: "Platformio (2)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=platformio_odd
 
-script:
-  - $TRAVIS_BUILD_DIR/tests/common.sh
+    - name: "Docs"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=docs
+      install:
+        - pip install --user -r doc/requirements.txt;
 
-deploy:
-  - provider: releases
-    draft: true
-    skip_cleanup: true
-    api_key:
-      secure: A4FBmqyhlzy33oPeZVolg2Q/A3ZcJ3WnRQqQJ3NAPy+qGM5xcboOYtwcLL9vKaHZGfUB7lUP9QVZFGou1Wrmo9DnPvAoe3+XvCaDRGzVMxeIpu7UStbBD4Knbh98tlbMvZCXYRlT4VcusI9bMLK6UWw4sMdPislBh2FEfglTiag=
-    file_glob: true
-    tag_name: $TRAVIS_TAG
-    target_commitish: $TRAVIS_COMMIT
-    file:
-      - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
-      - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
-    on:
-      repo: esp8266/Arduino
-      tags: true
-      condition: "$BUILD_TYPE = package"
-  
-  - provider: script
-    skip_cleanup: true
-    script: bash package/deploy_package_index.sh
-    on:
-      repo: esp8266/Arduino
-      tags: true
-      condition: "$BUILD_TYPE = package"
+    - name: "Style check"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=style_check
+      install:
+        - >
+            [ "$BUILD_TYPE" = "style_check" ] && {
+              [ -f $HOME/astyle/build/gcc/bin/astyle ] || {
+                wget -O astyle_3.1_linux.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz/download;
+                tar -xf astyle_3.1_linux.tar.gz -C $HOME;
+                make -C $HOME/astyle/build/gcc;
+              }
+              make -C $HOME/astyle/build/gcc prefix=$HOME install;
+            } || true
 
+    # Deploy stage.
+    # Here we build the package JSON (always) and do the deployments
+    - name: "Package / deploy"
+      stage: deploy
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env: BUILD_TYPE=package
+      if: env(CI_GITHUB_API_KEY) IS present
+      deploy:
+      # Create Github release, upload artifacts
+      - provider: releases
+        draft: true
+        skip_cleanup: true
+        api_key:
+          secure: vt6StBC+ghqnh8YrreNo3wAzGGddJ2S4YpVZkz4S84xLEGWkIEghQhTrjlhzjBsrnHfLNko4tz9EsNx0yQ8yBlPOdReETGAkqnAU7PSPFss0qGcCRUXYtozNjbFQq6TWIxECK4xq40R9tE6NyeOpm9AYJtwF/v18u2T+T9qSgGQ=
+        file_glob: true
+        tag_name: $TRAVIS_TAG
+        target_commitish: $TRAVIS_COMMIT
+        file:
+          - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
+          - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
+        on:
+          repo: esp8266/Arduino
+          tags: true
+
+      # Update the package index URL to point to the new version
+      - provider: script
+        skip_cleanup: true
+        script: bash package/deploy_package_index.sh
+        on:
+          repo: esp8266/Arduino
+          tags: true
 
 notifications:
   email:
