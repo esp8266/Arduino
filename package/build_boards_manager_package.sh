@@ -141,6 +141,9 @@ if [ ! -z "$CI_GITHUB_API_KEY" ]; then
 else
     echo "Warning: CI_GITHUB_API_KEY not set"
 fi
+echo "===================================="
+curl $curl_gh_token_arg -D - https://api.github.com/repos/esp8266/Arduino/releases
+echo "===================================="
 # Get previous release name
 curl --silent $curl_gh_token_arg https://api.github.com/repos/esp8266/Arduino/releases > releases.json
 # Previous final release (prerelase == false)
