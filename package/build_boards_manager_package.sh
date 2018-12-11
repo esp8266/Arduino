@@ -18,8 +18,7 @@ else
     plain_ver=$ver
 fi
 
-# 'set -e' breaks CI but not local tests
-#set -e
+set -e
 
 package_name=esp8266-$ver
 echo "Version: $ver"
@@ -134,8 +133,13 @@ fi
 cat $srcdir/package/package_esp8266com_index.template.json | \
     jq "$jq_arg" > package_esp8266com_index.json
 
+# Use Github API token, if available
+curl_gh_token_arg=()
+if [ ! -z "$CI_GITHUB_API_KEY" ]; then
+    curl_gh_token_arg=(-H "Authorization: token $CI_GITHUB_API_KEY")
+fi
 # Get previous release name
-curl --silent https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+curl --silent "${curl_gh_token_arg[@]}" https://api.github.com/repos/esp8266/Arduino/releases > releases.json
 # Previous final release (prerelase == false)
 prev_release=$(jq -r '. | map(select(.draft == false and .prerelease == false)) | sort_by(.created_at | - fromdateiso8601) | .[0].tag_name' releases.json)
 # Previous release (possibly a pre-release)
