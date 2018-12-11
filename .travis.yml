@@ -10,24 +10,6 @@ matrix:
   include:
     - env:
       - BUILD_TYPE=package
-    - env:
-      - BUILD_TYPE=build_even
-    - env:
-      - BUILD_TYPE=build_odd
-    - env:
-      - BUILD_TYPE=debug_even
-    - env:
-      - BUILD_TYPE=debug_odd
-    - env:
-      - BUILD_TYPE=platformio_even
-    - env:
-      - BUILD_TYPE=platformio_odd
-    - env:
-      - BUILD_TYPE=docs
-    - env:
-      - BUILD_TYPE=host_tests
-    - env:
-      - BUILD_TYPE=style_check
 
 install:
   - >
