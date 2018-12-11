@@ -1,6 +1,6 @@
 language: bash
 os: linux
-dist: trusty
+dist: xenial
 
 cache:
   directories:

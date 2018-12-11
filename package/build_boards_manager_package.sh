@@ -18,8 +18,7 @@ else
     plain_ver=$ver
 fi
 
-# 'set -e' breaks CI but not local tests
-#set -e
+set -e
 
 package_name=esp8266-$ver
 echo "Version: $ver"
