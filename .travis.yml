@@ -12,12 +12,18 @@ stages:
 
 jobs:
   include:
-    - stage: build
     # Build stage. To save time, run all kinds of builds and tests in parallel.
     #
     # TODO: since we can now call different script for each job,
     # split the do-it-all common.sh into separate scripts responsible
     # for different types of jobs below:
+    - name: "Host tests"
+      stage: build
+      env:
+        - BUILD_TYPE=host_tests
+      install:
+        - sudo apt-get install valgrind lcov
+
     - name: "Build (1)"
       env:
         - BUILD_TYPE=build_even
@@ -43,12 +49,6 @@ jobs:
       install:
         - pip install --user -r doc/requirements.txt;
 
-    - name: "Host tests"
-      env:
-        - BUILD_TYPE=host_tests
-      install:
-        - sudo apt-get install valgrind lcov
-
     - name: "Style check"
       env:
         - BUILD_TYPE=style_check
@@ -65,8 +65,8 @@ jobs:
 
     # Deploy stage.
     # Here we build the package JSON (always) and do the deployments
-    - stage: deploy
     - name: "Package / deploy"
+      stage: deploy
       script: $TRAVIS_BUILD_DIR/tests/common.sh
       env: BUILD_TYPE=package
       deploy:
