@@ -3,6 +3,8 @@
 
 #set -x
 
+CI_GITHUB_API_KEY="vt6StBC+ghqnh8YrreNo3wAzGGddJ2S4YpVZkz4S84xLEGWkIEghQhTrjlhzjBsrnHfLNko4tz9EsNx0yQ8yBlPOdReETGAkqnAU7PSPFss0qGcCRUXYtozNjbFQq6TWIxECK4xq40R9tE6NyeOpm9AYJtwF/v18u2T+T9qSgGQ="
+
 # Extract next version from platform.txt
 next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
 
