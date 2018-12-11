@@ -6,6 +6,13 @@ cache:
   directories:
     - $HOME/astyle
 
+git:
+  depth: 1
+  submodules: false
+
+before_install:
+  - git submodule update --init
+
 stages:
   - build
   - deploy
