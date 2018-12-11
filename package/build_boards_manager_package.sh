@@ -135,7 +135,8 @@ cat $srcdir/package/package_esp8266com_index.template.json | \
 
 # Use Github API token, if available
 curl_gh_token_arg=""
-if [ ! -z "$CI_GITHUB_API_KEY" ]; then
+if [ ! -z "$1" ]; then
+    CI_GITHUB_API_KEY="$1"
     curl_gh_token_arg="-H \"Authorization: token $CI_GITHUB_API_KEY\""
     echo "curl_gh_token_arg='$curl_gh_token_arg'"
 fi
