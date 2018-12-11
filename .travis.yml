@@ -66,9 +66,8 @@ jobs:
     # Deploy stage.
     # Here we build the package JSON (always) and do the deployments
     - stage: deploy
-      if: env(TRAVIS_SECURE_ENV_VARS) = true
-    - script: $TRAVIS_BUILD_DIR/tests/common.sh
-      name: "Package / deploy"
+    - name: "Package / deploy"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
       env: BUILD_TYPE=package
       deploy:
       # Create Github release, upload artifacts
