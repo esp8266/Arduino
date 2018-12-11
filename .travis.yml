@@ -14,7 +14,7 @@ before_install:
   - git submodule update --init
 
 stages:
-#  - build
+  - build
   - deploy
 
 jobs:
@@ -91,7 +91,7 @@ jobs:
       - provider: releases
         draft: true
         skip_cleanup: true
-        #api_key:
+        #api_key:              -CURRENTLY HARDCODED IN package/deploy_package_index.sh
         #  secure: kYsxX/N21fwLSTLpbb0c96PnQHn1CIMqZstm02hfUhCX83FygWSh4vs3gzW28DMpjQMZ6vC4g+jtfosYU2tUhht/bynurDH4edpEyGeMyK+fzCI9pAr4JT0RbKQI84EC18ScpgP/UP0jTc1LJ+xl8UMwSiDE0mzHx7xJ4mMNQbA=
         file_glob: true
         tag_name: $TRAVIS_TAG
