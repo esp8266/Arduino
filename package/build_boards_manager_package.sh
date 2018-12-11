@@ -23,6 +23,8 @@ set -e
 package_name=esp8266-$ver
 echo "Version: $ver"
 echo "Package name: $package_name"
+echo -n "jq version: "
+jq -V
 
 # Set REMOTE_URL environment variable to the address where the package will be
 # available for download. This gets written into package json file.
