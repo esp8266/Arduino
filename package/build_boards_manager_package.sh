@@ -136,7 +136,13 @@ cat $srcdir/package/package_esp8266com_index.template.json | \
     jq "$jq_arg" > package_esp8266com_index.json
 
 # Get previous release name
-curl --silent https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+#curl --silent https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+curl https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+
+echo "---- current releases.json -----"
+cat releases.json
+echo "--------------------------------"
+
 # Previous final release (prerelase == false)
 prev_release=$(jq -r '. | map(select(.draft == false and .prerelease == false)) | sort_by(.created_at | - fromdateiso8601) | .[0].tag_name' releases.json)
 # Previous release (possibly a pre-release)
@@ -156,10 +162,6 @@ echo "Downloading base package: $base_ver"
 old_json=package_esp8266com_index_stable.json
 curl -L -o $old_json "https://github.com/esp8266/Arduino/releases/download/${base_ver}/package_esp8266com_index.json"
 new_json=package_esp8266com_index.json
-
-echo "---- ${base_ver} json content ----"
-cat $old_json
-echo "----------------------------------"
 
 set +e
 python ../../merge_packages.py $new_json $old_json >tmp && mv tmp $new_json && rm $old_json
