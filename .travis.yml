@@ -8,8 +8,7 @@ cache:
 
 stages:
   - build
-  - name: deploy
-    if: env(TRAVIS_SECURE_ENV_VARS) is present
+  - deploy
 
 jobs:
   include:
@@ -68,8 +67,9 @@ jobs:
     # Here we build the package JSON (always) and do the deployments
     - stage: deploy
       if: env(TRAVIS_SECURE_ENV_VARS) = true
+    - script: $TRAVIS_BUILD_DIR/tests/common.sh
+      name: "Package / deploy"
       env: BUILD_TYPE=package
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
       deploy:
       # Create Github release, upload artifacts
       - provider: releases
@@ -94,10 +94,6 @@ jobs:
         on:
           repo: esp8266/Arduino
           tags: true
-
-# This is to catch jobs which accidentally don't specify the script to run
-script:
-  - false
 
 notifications:
   email:
