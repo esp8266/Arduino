@@ -7,70 +7,10 @@ cache:
     - $HOME/astyle
 
 stages:
-  - build
   - deploy
 
 jobs:
   include:
-    # Build stage. To save time, run all kinds of builds and tests in parallel.
-    #
-    # TODO: since we can now call different script for each job,
-    # split the do-it-all common.sh into separate scripts responsible
-    # for different types of jobs below:
-    - name: "Host tests"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=host_tests
-      install:
-        - sudo apt-get install valgrind lcov
-
-    - name: "Build (1)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=build_even
-    - name: "Build (2)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=build_odd
-    - name: "Debug (1)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=debug_even
-    - name: "Debug (2)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=debug_odd
-    - name: "Platformio (1)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=platformio_even
-    - name: "Platformio (2)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=platformio_odd
-
-    - name: "Docs"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=docs
-      install:
-        - pip install --user -r doc/requirements.txt;
-
-    - name: "Style check"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=style_check
-      install:
-        - >
-            [ "$BUILD_TYPE" = "style_check" ] && {
-              [ -f $HOME/astyle/build/gcc/bin/astyle ] || {
-                wget -O astyle_3.1_linux.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz/download;
-                tar -xf astyle_3.1_linux.tar.gz -C $HOME;
-                make -C $HOME/astyle/build/gcc;
-              }
-              make -C $HOME/astyle/build/gcc prefix=$HOME install;
-            } || true
 
     # Deploy stage.
     # Here we build the package JSON (always) and do the deployments
