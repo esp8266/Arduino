@@ -157,6 +157,10 @@ old_json=package_esp8266com_index_stable.json
 curl -L -o $old_json "https://github.com/esp8266/Arduino/releases/download/${base_ver}/package_esp8266com_index.json"
 new_json=package_esp8266com_index.json
 
+echo "---- ${base_ver} json content ----"
+cat $old_json
+echo "----------------------------------"
+
 set +e
 python ../../merge_packages.py $new_json $old_json >tmp && mv tmp $new_json && rm $old_json
 
