@@ -8,7 +8,8 @@ cache:
 
 stages:
   - build
-  - deploy
+  - name: deploy
+    if: env(TRAVIS_SECURE_ENV_VARS) is present
 
 jobs:
   include:
