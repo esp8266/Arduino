@@ -45,7 +45,7 @@ jobs:
       # Update the package index URL to point to the new version
       - provider: script
         skip_cleanup: true
-        script: bash package/deploy_package_index.sh
+        script: CI_GITHUB_API_KEY=$CI_GITHUB_API_KEY bash package/deploy_package_index.sh
         on:
           repo: esp8266/Arduino
           tags: true

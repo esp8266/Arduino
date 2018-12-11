@@ -249,7 +249,8 @@ function check_examples_style()
             --options=$TRAVIS_BUILD_DIR/tests/examples_style.conf {} \;
 
     # we have no control over submodules
-    git submodule foreach --recursive git reset --hard
+    #git submodule foreach --recursive git reset --hard
+    git submodule foreach git reset --hard
 
     git diff --exit-code -- $TRAVIS_BUILD_DIR/libraries
 
