@@ -184,7 +184,13 @@ bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
     }
 }
 
+uint64_t getRTCTime() {
+	uint64_t cali = system_rtc_clock_cali_proc();
+	uint64_t cycles = system_get_rtc_time();
+	cali = (cali * 1000) >> 12;
 
+	return (cali * cycles) / 1000;
+}
 
 extern "C" void __real_system_restart_local();
 void EspClass::reset(void)
