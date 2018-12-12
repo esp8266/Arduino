@@ -14,7 +14,7 @@ cache:
     - $HOME/astyle
 
 stages:
-#  - build
+  - build
   - deploy
 
 jobs:

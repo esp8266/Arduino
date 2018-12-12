@@ -124,15 +124,11 @@ fi
 cat $srcdir/package/package_esp8266com_index.template.json | \
     jq "$jq_arg" > package_esp8266com_index.json
 
-#force
-#echo "1=${CI_GITHUB_API_KEY}"
-#CI_GITHUB_API_KEY="vt6StBC+ghqnh8YrreNo3wAzGGddJ2S4YpVZkz4S84xLEGWkIEghQhTrjlhzjBsrnHfLNko4tz9EsNx0yQ8yBlPOdReETGAkqnAU7PSPFss0qGcCRUXYtozNjbFQq6TWIxECK4xq40R9tE6NyeOpm9AYJtwF/v18u2T+T9qSgGQ="
-#echo "2=${CI_GITHUB_API_KEY}"
-
 # Use Github API token, if available
 curl_gh_token_arg=()
 if [ -z "$CI_GITHUB_API_KEY" ]; then
-    echo "curl: not using API key"
+    echo "curl: API key not present, exit with no error"
+    exit 0
 else
     curl_gh_token_arg=(-H "Authorization: token $CI_GITHUB_API_KEY")
 fi
