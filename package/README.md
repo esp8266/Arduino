@@ -90,9 +90,4 @@ The following points assume work in a direct clone of the repository, and not in
 
    * In main README.md:
 
-     - in "Latest release" section, change version number in the readthedocs link to the version which was just released.
-
-     - Replace any other instances of the version number in the doc.
-     
-     - Check that links to the latest readthedocs build are correct.
-
+     - in "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
