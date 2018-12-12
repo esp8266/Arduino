@@ -92,7 +92,7 @@ void hspi_slave_begin(uint8_t status_len, void * arg)
     SPI1S1 = (((status_len * 8) - 1) << SPIS1LSTA) | (0xff << SPIS1LBUF) | (7 << SPIS1LWBA) | (7 << SPIS1LRBA) | SPIS1RSTA;
     SPI1P = (1 << 19);
     SPI1CMD = SPIBUSY;
-
+    SPI1C2=(0x2<<SPIC2MOSIDN_S) | (0x1<<SPIC2MISODM_S); // GuaAck. 30.10.2018; timing of MISO 
     ETS_SPI_INTR_ATTACH(_hspi_slave_isr_handler,arg);
     ETS_SPI_INTR_ENABLE();
 }
@@ -114,7 +114,7 @@ void hspi_slave_end()
   SPI1P = B110;
 }
 
-void hspi_slave_setStatus(uint32_t status)
+void ICACHE_RAM_ATTR hspi_slave_setStatus(uint32_t status) // GuaAck. 30.10.2018
 {
     SPI1WS = status;
 }
