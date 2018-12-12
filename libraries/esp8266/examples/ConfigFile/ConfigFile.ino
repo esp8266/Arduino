@@ -20,6 +20,7 @@ bool loadConfig() {
   size_t size = configFile.size();
   if (size > 1024) {
     Serial.println("Config file size is too large");
+    configFile.close();
     return false;
   }
 
@@ -36,6 +37,7 @@ bool loadConfig() {
 
   if (!json.success()) {
     Serial.println("Failed to parse config file");
+    configFile.close();
     return false;
   }
 
@@ -49,6 +51,7 @@ bool loadConfig() {
   Serial.println(serverName);
   Serial.print("Loaded accessToken: ");
   Serial.println(accessToken);
+  configFile.close();
   return true;
 }
 
@@ -65,6 +68,7 @@ bool saveConfig() {
   }
 
   json.printTo(configFile);
+  configFile.close();
   return true;
 }
 
