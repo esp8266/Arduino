@@ -1,5 +1,35 @@
 # Release tools
 
+## Release model
+
+The release model is linear. That means that there is only one main code branch, and releases are snapshots of that branch at specific points in the sequence of commits.
+The advantage of this model is that the maintenance effort is greately reduced compared to other release models, such as a branched model.
+The disadvantage is that progress is ever only forward, and fixes can't be backported to prior releases. this means there is no such thing as a "stable" release (however, see Sub releases below).
+
+There are 4 types of releases:
+
+*Major releases*
+
+These contain breaking changes, such as big API changes, both in function signature and data representation. When this happens, user apps will require changes to continue to work, and those changes could be significant.
+Major releases happen seldom, e.g.: every few years.
+In addition, a Major can contain changes from Minor releases.
+
+*Minor releases*
+
+These contain new features and bug fixes. Breaking changes should not be included here. The one exception is breaking changes for a feature that is too broken and is not worth fixing, especially if that feature is causing maintenance overhead.
+Minor releases happen maybe 1-3 times per year.
+In addition, a Minor release can contain changes from Sub releases.
+
+*Sub releases*
+
+Sub releases are mostly meant for stabilization purposes. Once a Major or Minor release is out, it is possible that critical bugs or issues are found. Given that fixes can't be backported, a sub release is made that includes such critical bug fixes.
+Sub releases happen a few weeks after a Major or Minor release.
+
+*Beta releases*
+
+Depending on the number of changes that have been merged since the last release, and on how big and disruptive those changes are, a beta release could be done prior to a Major or Minor. Beta releases are meant to provide an outlook of what the upcoming release will look like, in order to allow users to do early testing and provide feedback. This helps in identifying big issues early on, thereby allowing time to fix them before the final Major or Minor release.
+Beta releases should not be done for Sub releases.
+
 ## Overview
 
 This directory contains scripts used to automate the release process of esp8266/Arduino project.
