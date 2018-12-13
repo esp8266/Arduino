@@ -134,8 +134,12 @@ else
 fi
 
 # Get previous release name
-echo "======== curl dumped header"
-if ! curl --silent -D /dev/stderr ${curl_gh_token_arg[@]} https://api.github.com/repos/esp8266/Arduino/releases > releases.json; then
+echo "running: 'curl --silent -D curl-headers.txt ${curl_gh_token_arg[@]} https://api.github.com/repos/esp8266/Arduino/releases > releases.json'"
+curl --silent -D curl-headers.txt ${curl_gh_token_arg[@]} https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+echo "======== >>> curl dumped header >>>"
+cat curl-headers.txt
+echo "======== <<< curl dumped header <<<"
+if ! grep "200 OK$" curl-headers.txt > /dev/null; then
     if [ -z "$CI_GITHUB_API_KEY" ]; then
         echo "---- Bad moon phase, in a PR, exit successfully"
         exit 0
@@ -144,7 +148,6 @@ if ! curl --silent -D /dev/stderr ${curl_gh_token_arg[@]} https://api.github.com
         exit 1
     fi
 fi
-echo "======== curl"
 
 # Previous final release (prerelase == false)
 prev_release=$(jq -r '. | map(select(.draft == false and .prerelease == false)) | sort_by(.created_at | - fromdateiso8601) | .[0].tag_name' releases.json)
