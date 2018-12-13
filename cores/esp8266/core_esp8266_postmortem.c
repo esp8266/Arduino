@@ -63,7 +63,7 @@ extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack,
 extern void custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) __attribute__ ((weak, alias("__custom_crash_callback")));
 
 // Single, non-inlined copy of pgm_read_byte to save IRAM space (as this is not timing critical)
-static char ICACHE_RAM_ATTR iram_read_byte (const char *addr) {
+static __attribute__ ((noinline)) char ICACHE_RAM_ATTR iram_read_byte (const char *addr) {
     return pgm_read_byte(addr);
 }
 

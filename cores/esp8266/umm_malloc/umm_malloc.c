@@ -1202,8 +1202,9 @@ static unsigned short int umm_assimilate_down( unsigned short int c, unsigned sh
 }
 
 /* ------------------------------------------------------------------------- */
-
-void umm_init( void ) {
+/* This function called only one time during OS startup after flash is */
+/* enabled.  No need to keep it in IRAM. */
+void ICACHE_FLASH_ATTR umm_init( void ) {
   /* init heap pointer and size, and memset it to 0 */
   umm_heap = (umm_block *)UMM_MALLOC_CFG__HEAP_ADDR;
   umm_numblocks = (UMM_MALLOC_CFG__HEAP_SIZE / sizeof(umm_block));
