@@ -83,7 +83,7 @@ jobs:
     # Deploy stage.
     # Here we build the package JSON (always) and do the deployments
     - name: "Package / deploy"
-      if: env(TRAVIS_PULL_REQUEST) = "false"
+      if: env(CI_GITHUB_API_KEY) IS present
       stage: deploy
       script: $TRAVIS_BUILD_DIR/tests/common.sh
       env: BUILD_TYPE=package
