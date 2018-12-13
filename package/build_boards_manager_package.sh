@@ -133,8 +133,9 @@ fi
 curl_gh_token_arg=(-H "Authorization: token $CI_GITHUB_API_KEY")
 
 # test
-echo "key was '$CI_GITHUB_API_KEY'"
-CI_GITHUB_API_KEY="vt6StBC+ghqnh8YrreNo3wAzGGddJ2S4YpVZkz4S84xLEGWkIEghQhTrjlhzjBsrnHfLNko4tz9EsNx0yQ8yBlPOdReETGAkqnAU7PSPFss0qGcCRUXYtozNjbFQq6TWIxECK4xq40R9tE6NyeOpm9AYJtwF/v18u2T+T9qSgGQ="
+#echo "key was '$CI_GITHUB_API_KEY'"
+# this key (below) is working, the overwritten key is not empty
+#CI_GITHUB_API_KEY="vt6StBC+ghqnh8YrreNo3wAzGGddJ2S4YpVZkz4S84xLEGWkIEghQhTrjlhzjBsrnHfLNko4tz9EsNx0yQ8yBlPOdReETGAkqnAU7PSPFss0qGcCRUXYtozNjbFQq6TWIxECK4xq40R9tE6NyeOpm9AYJtwF/v18u2T+T9qSgGQ="
 
 # Get previous release name
 echo "======== curl dumped header"

@@ -83,11 +83,13 @@ jobs:
     # Deploy stage.
     # Here we build the package JSON (always) and do the deployments
     - name: "Package / deploy"
-      if: env(CI_GITHUB_API_KEY) IS present
+      # TRAVIS_PULL_REQUEST_BRANCH:
+      # if the current job is a pull request, the name of the branch from which the PR originated.
+      # if the current job is a push build, this variable is empty ("").
+      if: env(TRAVIS_PULL_REQUEST_BRANCH) = ""
       stage: deploy
       script: $TRAVIS_BUILD_DIR/tests/common.sh
       env: BUILD_TYPE=package
-      # TRAVIS_PULL_REQUEST is set to the pull request number if the current job is a pull request build, or false if it’s not.
       deploy:
       # Create Github release, upload artifacts
       - provider: releases
