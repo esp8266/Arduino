@@ -61,7 +61,7 @@ The following points assume work in a direct clone of the repository, and not in
 
 2. Update `version` to the release in platform.txt and commit. E.g. `2.5.0`. Then git push origin to get the commit merged to master.
 
-3. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-rcN` for release versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
+3. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-betaN` for release candiate versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
 
    ```
    git tag -a -m "Release 2.5.0" 2.5.0
