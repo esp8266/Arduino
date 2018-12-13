@@ -13,9 +13,9 @@ cache:
   directories:
     - $HOME/astyle
 
-stages:
-  - build
-  - deploy
+#stages:
+#  - build
+#  - deploy
 
 jobs:
   include:
