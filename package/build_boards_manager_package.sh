@@ -127,19 +127,23 @@ cat $srcdir/package/package_esp8266com_index.template.json | \
 # Use Github API token, must be available
 curl_gh_token_arg=()
 if [ -z "$CI_GITHUB_API_KEY" ]; then
-    echo "curl: API key not present, exit with error"
-    exit 1
+    echo "curl: API key not present"
+else
+    echo "curl: API key is present"
+    curl_gh_token_arg=(-H "Authorization: token $CI_GITHUB_API_KEY")
 fi
-curl_gh_token_arg=(-H "Authorization: token $CI_GITHUB_API_KEY")
-
-# test
-#echo "key was '$CI_GITHUB_API_KEY'"
-# this key (below) is working, the overwritten key is not empty
-#CI_GITHUB_API_KEY="vt6StBC+ghqnh8YrreNo3wAzGGddJ2S4YpVZkz4S84xLEGWkIEghQhTrjlhzjBsrnHfLNko4tz9EsNx0yQ8yBlPOdReETGAkqnAU7PSPFss0qGcCRUXYtozNjbFQq6TWIxECK4xq40R9tE6NyeOpm9AYJtwF/v18u2T+T9qSgGQ="
 
 # Get previous release name
 echo "======== curl dumped header"
-curl --silent -D /dev/stderr ${curl_gh_token_arg[@]} https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+if ! curl --silent -D /dev/stderr ${curl_gh_token_arg[@]} https://api.github.com/repos/esp8266/Arduino/releases > releases.json; then
+    if [ -z "$CI_GITHUB_API_KEY" ]; then
+        echo "---- Bad moon phase, in a PR, exit successfully"
+        exit 0
+    else
+        echo "---- Please debug curl request, exit with error"
+        exit 1
+    fi
+fi
 echo "======== curl"
 
 # Previous final release (prerelase == false)
