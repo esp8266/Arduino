@@ -38,6 +38,9 @@ def main():
 # and they can check for the positive acknowledgement above.
 #            sys.stderr.write("Not enabling binary signing\n")
             val += "#define ARDUINO_SIGNING 0\n"
+        outdir = os.path.dirname(args.out)
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
         with open(args.out, "w") as f:
             f.write(val)
         return 0
