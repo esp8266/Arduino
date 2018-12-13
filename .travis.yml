@@ -78,8 +78,7 @@ jobs:
     # Deploy stage.
     # Here we build the package JSON (always) and do the deployments
     - name: "Package / deploy"
-      # require the branch name to NOT be master (note for PRs this is the base branch name)
-      if: branch != master
+      if: type != pull_request
       stage: deploy
       script: $TRAVIS_BUILD_DIR/tests/common.sh
       env: BUILD_TYPE=package
