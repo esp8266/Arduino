@@ -85,7 +85,8 @@ jobs:
       stage: deploy
       script: $TRAVIS_BUILD_DIR/tests/common.sh
       env: BUILD_TYPE=package
-      if: env(CI_GITHUB_API_KEY) IS present
+      # TRAVIS_PULL_REQUEST is set to the pull request number if the current job is a pull request build, or false if it’s not.
+      if: env(TRAVIS_PULL_REQUEST) != "false"
       deploy:
       # Create Github release, upload artifacts
       - provider: releases

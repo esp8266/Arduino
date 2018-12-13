@@ -124,14 +124,14 @@ fi
 cat $srcdir/package/package_esp8266com_index.template.json | \
     jq "$jq_arg" > package_esp8266com_index.json
 
-# Use Github API token, if available
+# Use Github API token, must be available
 curl_gh_token_arg=()
 if [ -z "$CI_GITHUB_API_KEY" ]; then
-    echo "curl: API key not present, exit with no error"
-    exit 0
-else
-    curl_gh_token_arg=(-H "Authorization: token $CI_GITHUB_API_KEY")
+    echo "curl: API key not present, exit with error"
+    exit 1
 fi
+curl_gh_token_arg=(-H "Authorization: token $CI_GITHUB_API_KEY")
+
 # Get previous release name
 curl --silent -D /dev/stderr ${curl_gh_token_arg[@]} https://api.github.com/repos/esp8266/Arduino/releases > releases.json
 
