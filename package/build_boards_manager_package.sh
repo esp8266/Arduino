@@ -126,11 +126,11 @@ cat $srcdir/package/package_esp8266com_index.template.json | \
 # Use Github API token, must be available
 if [ -z "$CI_GITHUB_API_KEY" ]; then
     echo "curl: API key not present"
-    echo "running: 'curl --silent -D curl-headers.txt https://api.github.com/repos/esp8266/Arduino/releases > releases.json'"
+    echo "running: 'curl --silent -D curl-headers.txt https://api.github.com/repos/esp8266/Arduino/releases'"
     curl --silent -D curl-headers.txt https://api.github.com/repos/esp8266/Arduino/releases > releases.json
 else
     echo "curl: API key is present"
-    echo "running: 'curl --silent -D curl-headers.txt -H \"Authorization: token $CI_GITHUB_API_KEY\" https://api.github.com/repos/esp8266/Arduino/releases > releases.json'"
+    echo "running: 'curl --silent -D curl-headers.txt -H \"Authorization: token $CI_GITHUB_API_KEY\" https://api.github.com/repos/esp8266/Arduino/releases'"
     curl --silent -D curl-headers.txt -H "Authorization: token $CI_GITHUB_API_KEY" https://api.github.com/repos/esp8266/Arduino/releases > releases.json
 fi
 
@@ -138,7 +138,7 @@ fi
 echo "======== >>> curl dumped header >>>"
 cat curl-headers.txt
 echo "======== <<< curl dumped header <<<"
-if ! grep "200 OK$" curl-headers.txt > /dev/null; then
+if ! grep "HTTP.*200 OK" curl-headers.txt > /dev/null; then
     if [ -z "$CI_GITHUB_API_KEY" ]; then
         echo "---- Bad moon phase, in a PR, exit successfully"
         exit 0
