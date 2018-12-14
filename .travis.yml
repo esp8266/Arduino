@@ -63,22 +63,25 @@ jobs:
         - BUILD_TYPE=style_check
       install:
         - >
-            [ "$BUILD_TYPE" = "style_check" ] && {
-              [ -f $HOME/astyle/build/gcc/bin/astyle ] || {
-                wget -O astyle_3.1_linux.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz/download;
-                tar -xf astyle_3.1_linux.tar.gz -C $HOME;
-                make -C $HOME/astyle/build/gcc;
-              }
-              make -C $HOME/astyle/build/gcc prefix=$HOME install;
-            } || true
+            if [ ! -f $HOME/astyle/build/gcc/bin/astyle ]; then
+              wget -O astyle_3.1_linux.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz/download;
+              tar -xf astyle_3.1_linux.tar.gz -C $HOME;
+              make -C $HOME/astyle/build/gcc;
+            fi
+            make -C $HOME/astyle/build/gcc prefix=$HOME install;
 
     # Deploy stage.
     # Here we build the package JSON (always) and do the deployments
     - name: "Package / deploy"
       stage: deploy
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script:
+        - >
+            if [ -n "$CI_GITHUB_API_KEY" ]; then
+              $TRAVIS_BUILD_DIR/tests/common.sh
+            else
+              echo "Not building the package."
+            fi
       env: BUILD_TYPE=package
-      if: env(CI_GITHUB_API_KEY) IS present
       deploy:
       # Create Github release, upload artifacts
       - provider: releases
