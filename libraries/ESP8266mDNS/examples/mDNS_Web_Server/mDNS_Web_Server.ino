@@ -72,6 +72,9 @@ void setup(void) {
 }
 
 void loop(void) {
+
+  MDNS.update();
+
   // Check if a client has connected
   WiFiClient client = server.available();
   if (!client) {
