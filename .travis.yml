@@ -13,6 +13,10 @@ cache:
   directories:
     - $HOME/astyle
 
+stages:
+  - build
+  - deploy
+
 jobs:
   include:
     # Build stage. To save time, run all kinds of builds and tests in parallel.
