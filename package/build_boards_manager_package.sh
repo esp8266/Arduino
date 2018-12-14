@@ -123,23 +123,24 @@ fi
 cat $srcdir/package/package_esp8266com_index.template.json | \
     jq "$jq_arg" > package_esp8266com_index.json
 
-# Use Github API token, must be available
+# Use Github API token, when available
+curl_gh_token_arg=()
 if [ -z "$CI_GITHUB_API_KEY" ]; then
     echo "curl: API key not present"
-    echo "running: 'curl --silent -D curl-headers.txt https://api.github.com/repos/esp8266/Arduino/releases'"
-    curl --silent -D curl-headers.txt https://api.github.com/repos/esp8266/Arduino/releases > releases.json
 else
     echo "curl: API key is present"
-    echo "running: 'curl --silent -D curl-headers.txt -H \"Authorization: token $CI_GITHUB_API_KEY\" https://api.github.com/repos/esp8266/Arduino/releases'"
-    curl --silent -D curl-headers.txt -H "Authorization: token $CI_GITHUB_API_KEY" https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+    curl_gh_token_arg=(-H "Authorization: token $CI_GITHUB_API_KEY")
 fi
 
 # Get previous release name
+curl --silent -D curl-headers.txt "${curl_gh_token_arg[@]}" https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+
 echo "======== >>> curl dumped header >>>"
 cat curl-headers.txt
 echo "======== <<< curl dumped header <<<"
 if ! grep "HTTP.*200 OK" curl-headers.txt > /dev/null; then
     if [ -z "$CI_GITHUB_API_KEY" ]; then
+        # github api is rate-limiting
         echo "---- Bad moon phase, in a PR, exit successfully"
         exit 0
     else
