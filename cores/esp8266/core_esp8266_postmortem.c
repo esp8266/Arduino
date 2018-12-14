@@ -110,7 +110,7 @@ void __wrap_system_restart_local() {
         ets_putc('\n');
     }
     else if (s_unhandled_exception) {
-        ets_printf_P(PSTR("\nUnhandled exception: %S\n"), s_unhandled_exception);
+        ets_printf_P(PSTR("\nUnhandled C++ exception: %S\n"), s_unhandled_exception);
     }
     else if (s_abort_called) {
         ets_printf_P(PSTR("\nAbort called\n"));
