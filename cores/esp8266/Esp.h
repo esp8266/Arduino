@@ -24,6 +24,12 @@
 #include <Arduino.h>
 
 #define PUYASUPPORT
+#ifndef PUYA_BUFFER_SIZE
+  // Good alternative for buffer size is: SPI_FLASH_SEC_SIZE
+  // 512 bytes is a reasonable trade-off between memory use and write cycles.
+  // Always use a multiple of flash page size (256 bytes)
+  #define PUYA_BUFFER_SIZE 512
+#endif
 
 /**
  * AVR macros for WDT managment

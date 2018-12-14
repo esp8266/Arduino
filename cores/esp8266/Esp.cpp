@@ -269,8 +269,6 @@ uint32_t EspClass::getFlashChipId(void)
     static uint32_t flash_chip_id = 0;
 	if (flash_chip_id == 0) {
 		flash_chip_id = spi_flash_get_id();
-		// Check for PUYA chip and allocate buffer as soon as possible.
-		flashIsPuya();
 	}
     return flash_chip_id;
 }
@@ -575,7 +573,7 @@ bool EspClass::flashEraseSector(uint32_t sector) {
     return rc == 0;
 }
 
-// PUYA flash chips need to read entire sector, update in memory and write sector again.
+// PUYA flash chips need to read existing data, update in memory and write modified data again.
 static uint32_t *flash_write_puya_buf = 0;
 
 bool EspClass::flashIsPuya(){
@@ -583,35 +581,48 @@ bool EspClass::flashIsPuya(){
 		// Already detected PUYA and allocated buffer.
 		return true;
 	}
-	bool isPuya = ((getFlashChipId() & 0x000000ff) == 0x85); // 0x146085 PUYA
-	if (isPuya) {
-		flash_write_puya_buf = (uint32_t*) malloc((SPI_FLASH_SEC_SIZE / 4) * sizeof(uint32_t));
-		// No need to ever free this, since the flash chip will never change at runtime.
-	}
-	return isPuya;
+	return ((getFlashChipId() & 0x000000ff) == 0x85); // 0x146085 PUYA
 }
 
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
 	ets_isr_mask(FLASH_INT_MASK);
-	int rc;
+	int rc = 0;
 	uint32_t* ptr = data;
 	
 	if (flashIsPuya()) {
 		if (flash_write_puya_buf == 0) {
-			// Memory could not be allocated.
-			return false;
+            flash_write_puya_buf = (uint32_t*) malloc(PUYA_BUFFER_SIZE);
+		    // No need to ever free this, since the flash chip will never change at runtime.
+			if (flash_write_puya_buf == 0) {
+				// Memory could not be allocated.
+				return false;
+			}
 		}
-		rc = spi_flash_read(offset, flash_write_puya_buf, size);
-		if (rc != 0) {
-			ets_isr_unmask(FLASH_INT_MASK);
-			return false;
+		size_t bytesLeft = size;
+		uint32_t pos = offset;
+		while (bytesLeft > 0 && rc == 0) {
+			size_t bytes_now = bytesLeft;
+			if (bytes_now > PUYA_BUFFER_SIZE) {
+				bytes_now = PUYA_BUFFER_SIZE;
+				bytesLeft -= PUYA_BUFFER_SIZE;
+			} else {
+				bytesLeft = 0;
+			}
+			rc = spi_flash_read(pos, flash_write_puya_buf, bytes_now);
+			if (rc != 0) {
+				ets_isr_unmask(FLASH_INT_MASK);
+				return false;
+			}
+			for (size_t i = 0; i < bytes_now / 4; ++i) {
+				flash_write_puya_buf[i] &= *ptr;
+				++ptr;
+			}
+			rc = spi_flash_write(pos, flash_write_puya_buf, bytes_now);
+			pos += bytes_now;
 		}
-		for (size_t i = 0; i < size / 4; ++i) {
-			flash_write_puya_buf[i] &= data[i];
-		}
-		ptr = flash_write_puya_buf;
+	} else {
+	  rc = spi_flash_write(offset, ptr, size);
 	}
-	rc = spi_flash_write(offset, ptr, size);
 	ets_isr_unmask(FLASH_INT_MASK);
 	return rc == 0;
 }
