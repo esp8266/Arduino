@@ -33,6 +33,7 @@ ArduinoOTAClass::ArduinoOTAClass()
 , _udp_ota(0)
 , _initialized(false)
 , _rebootOnSuccess(true)
+, _useMDNS(true)
 , _state(OTA_IDLE)
 , _size(0)
 , _cmd(0)
@@ -103,9 +104,11 @@ void ArduinoOTAClass::setRebootOnSuccess(bool reboot){
   _rebootOnSuccess = reboot;
 }
 
-void ArduinoOTAClass::begin() {
+void ArduinoOTAClass::begin(bool useMDNS) {
   if (_initialized)
     return;
+
+  _useMDNS = useMDNS;
 
   if (!_hostname.length()) {
     char tmp[15];
@@ -127,12 +130,15 @@ void ArduinoOTAClass::begin() {
   if(!_udp_ota->listen(IP_ADDR_ANY, _port))
     return;
   _udp_ota->onRx(std::bind(&ArduinoOTAClass::_onRx, this));
-  MDNS.begin(_hostname.c_str());
 
-  if (_password.length()) {
-    MDNS.enableArduino(_port, true);
-  } else {
-    MDNS.enableArduino(_port);
+  if(_useMDNS) {
+    MDNS.begin(_hostname.c_str());
+
+    if (_password.length()) {
+      MDNS.enableArduino(_port, true);
+    } else {
+      MDNS.enableArduino(_port);
+    }
   }
   _initialized = true;
   _state = OTA_IDLE;
@@ -348,11 +354,15 @@ void ArduinoOTAClass::_runUpdate() {
   }
 }
 
+//this needs to be called in the loop()
 void ArduinoOTAClass::handle() {
   if (_state == OTA_RUNUPDATE) {
     _runUpdate();
     _state = OTA_IDLE;
   }
+
+  if(_useMDNS)
+    MDNS.update(); //handle MDNS update as well, given that ArduinoOTA relies on it anyways
 }
 
 int ArduinoOTAClass::getCommand() {
