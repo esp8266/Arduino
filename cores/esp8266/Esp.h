@@ -23,6 +23,8 @@
 
 #include <Arduino.h>
 
+#define PUYASUPPORT
+
 /**
  * AVR macros for WDT managment
  */
@@ -141,6 +143,7 @@ class EspClass {
         bool flashWrite(uint32_t offset, uint32_t *data, size_t size);
         bool flashRead(uint32_t offset, uint32_t *data, size_t size);
 
+        bool flashIsPuya();
         uint32_t getSketchSize();
         String getSketchMD5();
         uint32_t getFreeSketchSpace();
