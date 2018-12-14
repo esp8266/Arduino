@@ -80,6 +80,7 @@ static void ets_printf_P(const char *str, ...) {
 
 void __wrap_system_restart_local() {
     register uint32_t sp asm("a1");
+    uint32_t sp_dump = sp;
 
     if (gdb_present()) {
         /* When GDBStub is present, exceptions are handled by GDBStub,
@@ -142,15 +143,15 @@ void __wrap_system_restart_local() {
 
     ets_printf_P(PSTR("\n>>>stack>>>\n"));
 
-    if (sp > stack_thunk_get_stack_bot() && sp <= stack_thunk_get_stack_top()) {
+    if (sp_dump > stack_thunk_get_stack_bot() && sp_dump <= stack_thunk_get_stack_top()) {
         // BearSSL we dump the BSSL second stack and then reset SP back to the main cont stack
-        ets_printf_P(PSTR("\nctx: bearssl\nsp: %08x end: %08x offset: %04x\n"), sp, stack_thunk_get_stack_top(), offset);
-        print_stack(sp + offset, stack_thunk_get_stack_top());
+        ets_printf_P(PSTR("\nctx: bearssl\nsp: %08x end: %08x offset: %04x\n"), sp_dump, stack_thunk_get_stack_top(), offset);
+        print_stack(sp_dump + offset, stack_thunk_get_stack_top());
         offset = 0; // No offset needed anymore, the exception info was stored in the bssl stack
-        sp = stack_thunk_get_cont_sp();
+        sp_dump = stack_thunk_get_cont_sp();
     }
 
-    if (sp > cont_stack_start && sp < cont_stack_end) {
+    if (sp_dump > cont_stack_start && sp_dump < cont_stack_end) {
         ets_printf_P(PSTR("\nctx: cont\n"));
         stack_end = cont_stack_end;
     }
@@ -161,9 +162,9 @@ void __wrap_system_restart_local() {
         // is likely not really relevant to the crash
     }
 
-    ets_printf_P(PSTR("sp: %08x end: %08x offset: %04x\n"), sp, stack_end, offset);
+    ets_printf_P(PSTR("sp: %08x end: %08x offset: %04x\n"), sp_dump, stack_end, offset);
 
-    print_stack(sp + offset, stack_end);
+    print_stack(sp_dump + offset, stack_end);
 
     ets_printf_P(PSTR("<<<stack<<<\n"));
 
@@ -172,7 +173,7 @@ void __wrap_system_restart_local() {
       ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
     }
 
-    custom_crash_callback( &rst_info, sp + offset, stack_end );
+    custom_crash_callback( &rst_info, sp_dump + offset, stack_end );
 
     delayMicroseconds(10000);
     __real_system_restart_local();
