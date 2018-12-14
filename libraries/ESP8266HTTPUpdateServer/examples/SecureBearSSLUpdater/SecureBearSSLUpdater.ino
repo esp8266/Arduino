@@ -119,4 +119,5 @@ void setup()
 void loop()
 {
   httpServer.handleClient();
+  MDNS.update();
 }

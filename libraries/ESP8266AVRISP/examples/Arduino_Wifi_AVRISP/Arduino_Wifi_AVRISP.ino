@@ -70,4 +70,8 @@ void loop() {
   if (last_state != AVRISP_STATE_IDLE) {
     avrprog.serve();
   }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    MDNS.update();
+  }
 }
