@@ -266,7 +266,13 @@ uint8_t EspClass::getCpuFreqMHz(void)
 
 uint32_t EspClass::getFlashChipId(void)
 {
-    return spi_flash_get_id();
+    static uint32_t flash_chip_id = 0;
+	if (flash_chip_id == 0) {
+		flash_chip_id = spi_flash_get_id();
+		// Check for PUYA chip and allocate buffer as soon as possible.
+		flashIsPuya();
+	}
+    return flash_chip_id;
 }
 
 uint32_t EspClass::getFlashChipRealSize(void)
@@ -569,8 +575,6 @@ bool EspClass::flashEraseSector(uint32_t sector) {
     return rc == 0;
 }
 
-static uint32_t flash_chip_id = 0;
-
 // PUYA flash chips need to read entire sector, update in memory and write sector again.
 static uint32_t *flash_write_puya_buf = 0;
 
@@ -579,7 +583,7 @@ bool EspClass::flashIsPuya(){
 		// Already detected PUYA and allocated buffer.
 		return true;
 	}
-	bool isPuya = ((flash_chip_id & 0x000000ff) == 0x85); // 0x146085 PUYA
+	bool isPuya = ((getFlashChipId() & 0x000000ff) == 0x85); // 0x146085 PUYA
 	if (isPuya) {
 		flash_write_puya_buf = (uint32_t*) malloc((SPI_FLASH_SEC_SIZE / 4) * sizeof(uint32_t));
 		// No need to ever free this, since the flash chip will never change at runtime.
@@ -588,8 +592,6 @@ bool EspClass::flashIsPuya(){
 }
 
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
-	if (flash_chip_id == 0)
-		flash_chip_id = getFlashChipId();
 	ets_isr_mask(FLASH_INT_MASK);
 	int rc;
 	uint32_t* ptr = data;
