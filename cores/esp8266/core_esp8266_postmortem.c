@@ -62,28 +62,18 @@ extern void __custom_crash_callback( struct rst_info * rst_info, uint32_t stack,
 
 extern void custom_crash_callback( struct rst_info * rst_info, uint32_t stack, uint32_t stack_end ) __attribute__ ((weak, alias("__custom_crash_callback")));
 
-// Single, non-inlined copy of pgm_read_byte to save IRAM space (as this is not timing critical)
-static __attribute__ ((noinline)) char ICACHE_RAM_ATTR iram_read_byte (const char *addr) {
-    return pgm_read_byte(addr);
-}
 
-// Required to output the s_panic_file, it's stored in PMEM
-#define ets_puts_P(pstr) \
-{ \
-    char c; \
-    do { \
-        c = iram_read_byte(pstr++); \
-        if (c) ets_putc(c); \
-    } while (c); \
-}
-
-// Place these strings in .text because the SPI interface may be in bad shape during an exception.
+// Prints need to use our library function to allow for file and function
+// to be safely accessed from flash. This macro encapsulates the snprintf()
+// [which by definition will 0-terminate] and dumping to the UART
 #define ets_printf_P(str, ...) \
 { \
-    static const char istr[] ICACHE_RAM_ATTR = (str); \
-    char mstr[sizeof(str)]; \
-    for (size_t i=0; i < sizeof(str); i++) mstr[i] = iram_read_byte(&istr[i]); \
-    ets_printf(mstr, ##__VA_ARGS__); \
+    char destStr[160]; \
+    snprintf(destStr, sizeof(destStr), PSTR(str), ##__VA_ARGS__); \
+    char *c = destStr; \
+    while (*c) { \
+        ets_putc(*(c++)); \
+    } \
 }
 
 void __wrap_system_restart_local() {
@@ -110,18 +100,14 @@ void __wrap_system_restart_local() {
     ets_install_putc1(&uart_write_char_d);
 
     if (s_panic_line) {
-        ets_printf_P("\nPanic ");
-        ets_puts_P(s_panic_file); // This is in PROGMEM, need special output because ets_printf can't handle ROM parameters
-        ets_printf_P(":%d %s", s_panic_line, s_panic_func);
+        ets_printf_P("\nPanic %S:%d %S", s_panic_file, s_panic_line, s_panic_func);
         if (s_panic_what) {
-            ets_printf_P(": Assertion '");
-            ets_puts_P(s_panic_what); // This is also in PMEM
-            ets_printf_P("' failed.");
+            ets_printf_P(": Assertion '%S' failed.", s_panic_what);
         }
         ets_putc('\n');
     }
     else if (s_unhandled_exception) {
-        ets_printf_P("\nUnhandled exception: %s\n", s_unhandled_exception);
+        ets_printf_P("\nUnhandled exception: %S\n", s_unhandled_exception);
     }
     else if (s_abort_called) {
         ets_printf_P("\nAbort called\n");
@@ -156,7 +142,7 @@ void __wrap_system_restart_local() {
 
     if (sp > stack_thunk_get_stack_bot() && sp <= stack_thunk_get_stack_top()) {
         // BearSSL we dump the BSSL second stack and then reset SP back to the main cont stack
-        ets_printf_P("\nctx: bearssl \n");
+        ets_printf_P("\nctx: bearssl\n");
         ets_printf_P("sp: %08x end: %08x offset: %04x\n", sp, stack_thunk_get_stack_top(), offset);
         print_stack(sp + offset, stack_thunk_get_stack_top());
         offset = 0; // No offset needed anymore, the exception info was stored in the bssl stack
@@ -164,11 +150,11 @@ void __wrap_system_restart_local() {
     }
 
     if (sp > cont_stack_start && sp < cont_stack_end) {
-        ets_printf_P("\nctx: cont \n");
+        ets_printf_P("\nctx: cont\n");
         stack_end = cont_stack_end;
     }
     else {
-        ets_printf_P("\nctx: sys \n");
+        ets_printf_P("\nctx: sys\n");
         stack_end = 0x3fffffb0;
         // it's actually 0x3ffffff0, but the stuff below ets_run
         // is likely not really relevant to the crash
@@ -192,7 +178,7 @@ void __wrap_system_restart_local() {
 }
 
 
-static void ICACHE_RAM_ATTR print_stack(uint32_t start, uint32_t end) {
+static void print_stack(uint32_t start, uint32_t end) {
     for (uint32_t pos = start; pos < end; pos += 0x10) {
         uint32_t* values = (uint32_t*)(pos);
 
