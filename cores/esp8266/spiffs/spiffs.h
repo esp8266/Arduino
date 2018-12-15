@@ -84,7 +84,7 @@ struct spiffs_t;
 /* spi read call function type */
 typedef s32_t (*spiffs_read)(struct spiffs_t *fs, u32_t addr, u32_t size, u8_t *dst);
 /* spi write call function type */
-typedef s32_t (*spiffs_write)(struct spiffs_t *fs, u32_t addr, u32_t size, u8_t *src);
+typedef s32_t (*spiffs_write)(struct spiffs_t *fs, u32_t addr, u32_t size, const u8_t *src);
 /* spi erase call function type */
 typedef s32_t (*spiffs_erase)(struct spiffs_t *fs, u32_t addr, u32_t size);
 
@@ -93,7 +93,7 @@ typedef s32_t (*spiffs_erase)(struct spiffs_t *fs, u32_t addr, u32_t size);
 /* spi read call function type */
 typedef s32_t (*spiffs_read)(u32_t addr, u32_t size, u8_t *dst);
 /* spi write call function type */
-typedef s32_t (*spiffs_write)(u32_t addr, u32_t size, u8_t *src);
+typedef s32_t (*spiffs_write)(u32_t addr, u32_t size, const u8_t *src);
 /* spi erase call function type */
 typedef s32_t (*spiffs_erase)(u32_t addr, u32_t size);
 #endif // SPIFFS_HAL_CALLBACK_EXTRA

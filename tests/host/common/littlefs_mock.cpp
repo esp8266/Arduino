@@ -1,5 +1,8 @@
 /*
- spiffs_mock.cpp - SPIFFS HAL mock for host side testing
+ littlefs_mock.cpp - SPIFFS HAL mock for host side testing
+ Copyright © 2019 Earle F. Philhower, III
+
+ Based off spiffs_mock.cpp:
  Copyright © 2016 Ivan Grokhotkov
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -14,11 +17,13 @@
 */
 
 
+#include "littlefs_mock.h"
 #include "spiffs_mock.h"
 #include "spiffs/spiffs.h"
 #include "debug.h"
 #include <flash_utils.h>
 #include <stdlib.h>
+#include <LittleFS.h>
 
 #include <spiffs_api.h>
 
@@ -27,21 +32,26 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "flash_hal_mock.h"
+#define LITTLEFS_FILE_NAME "littlefs.bin"
 
-#define SPIFFS_FILE_NAME "spiffs.bin"
-
-FS SPIFFS(nullptr);
-
-SpiffsMock::SpiffsMock(size_t fs_size, size_t fs_block, size_t fs_page, bool storage)
+extern "C"
 {
-    fprintf(stderr, "SPIFFS: %zd bytes\n", fs_size);
+    extern uint32_t s_phys_size;
+    extern uint32_t s_phys_page;
+    extern uint32_t s_phys_block;
+    extern uint8_t* s_phys_data;
+}
+
+FS LittleFS(nullptr);
+
+LittleFSMock::LittleFSMock(size_t fs_size, size_t fs_block, size_t fs_page, bool storage)
+{
+    fprintf(stderr, "LittleFS: %zd bytes\n", fs_size);
 
     m_storage = storage;
     m_fs = new uint8_t[m_fs_size = fs_size];
     memset(&m_fs[0], 0xff, m_fs_size);
 
-    s_phys_addr  = 0;
     s_phys_size  = static_cast<uint32_t>(fs_size);
     s_phys_page  = static_cast<uint32_t>(fs_page);
     s_phys_block = static_cast<uint32_t>(fs_block);
@@ -49,18 +59,17 @@ SpiffsMock::SpiffsMock(size_t fs_size, size_t fs_block, size_t fs_page, bool sto
     reset();
 }
 
-void SpiffsMock::reset()
+void LittleFSMock::reset()
 {
-    SPIFFS = FS(FSImplPtr(new spiffs_impl::SPIFFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
+    LittleFS = FS(FSImplPtr(new littlefs_impl::LittleFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
     if (m_storage)
         load();
 }
 
-SpiffsMock::~SpiffsMock()
+LittleFSMock::~LittleFSMock()
 {
     if (m_storage)
         save();
-    s_phys_addr  = 0;
     s_phys_size  = 0;
     s_phys_page  = 0;
     s_phys_block = 0;
@@ -68,50 +77,50 @@ SpiffsMock::~SpiffsMock()
     delete [] m_fs;
     m_fs = nullptr;
     m_fs_size = 0;
-    SPIFFS = FS(FSImplPtr(nullptr));
+    LittleFS = FS(FSImplPtr(nullptr));
 }
 
-void SpiffsMock::load ()
+void LittleFSMock::load ()
 {
     if (!m_fs_size)
         return;
 
-    const char* fname = getenv("SPIFFS_PATH");
+    const char* fname = getenv("LITTLEFS_PATH");
     if (!fname)
-        fname = DEFAULT_SPIFFS_FILE_NAME;
-    int fs = ::open(SPIFFS_FILE_NAME, O_RDONLY);
+        fname = DEFAULT_LITTLEFS_FILE_NAME;
+    int fs = ::open(LITTLEFS_FILE_NAME, O_RDONLY);
     if (fs == -1)
     {
-        fprintf(stderr, "SPIFFS: loading '%s': %s\n", fname, strerror(errno));
+        fprintf(stderr, "LittleFS: loading '%s': %s\n", fname, strerror(errno));
         return;
     }
-    fprintf(stderr, "SPIFFS: loading %zi bytes from '%s'\n", m_fs_size, fname);
+    fprintf(stderr, "LittleFS: loading %zi bytes from '%s'\n", m_fs_size, fname);
     if (::read(fs, &m_fs[0], m_fs_size) != (ssize_t)m_fs_size)
-        fprintf(stderr, "SPIFFS: reading %zi bytes: %s\n", m_fs_size, strerror(errno));
+        fprintf(stderr, "LittleFS: reading %zi bytes: %s\n", m_fs_size, strerror(errno));
     ::close(fs);
 }
 
-void SpiffsMock::save ()
+void LittleFSMock::save ()
 {
     if (!m_fs_size)
         return;
 
-    const char* fname = getenv("SPIFFS_PATH");
+    const char* fname = getenv("LITTLEFS_PATH");
     if (!fname)
-        fname = DEFAULT_SPIFFS_FILE_NAME;
-    int fs = ::open(SPIFFS_FILE_NAME, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+        fname = DEFAULT_LITTLEFS_FILE_NAME;
+    int fs = ::open(LITTLEFS_FILE_NAME, O_CREAT | O_TRUNC | O_WRONLY, 0644);
     if (fs == -1)
     {
-        fprintf(stderr, "SPIFFS: saving '%s': %s\n", fname, strerror(errno));
+        fprintf(stderr, "LittleFS: saving '%s': %s\n", fname, strerror(errno));
         return;
     }
-    fprintf(stderr, "SPIFFS: saving %zi bytes to '%s'\n", m_fs_size, fname);
+    fprintf(stderr, "LittleFS: saving %zi bytes to '%s'\n", m_fs_size, fname);
 
 // this can be a valgrind error, I don't understand how it happens
 //for (size_t i = 0; i < m_fs_size; i++) printf("\r%zd:%d   ", i, (int)m_fs[i]);
 
     if (::write(fs, &m_fs[0], m_fs_size) != (ssize_t)m_fs_size)
-        fprintf(stderr, "SPIFFS: writing %zi bytes: %s\n", m_fs_size, strerror(errno));
+        fprintf(stderr, "LittleFS: writing %zi bytes: %s\n", m_fs_size, strerror(errno));
     if (::close(fs) == -1)
-        fprintf(stderr, "SPIFFS: closing %s: %s\n", fname, strerror(errno));
+        fprintf(stderr, "LittleFS: closing %s: %s\n", fname, strerror(errno));
 }

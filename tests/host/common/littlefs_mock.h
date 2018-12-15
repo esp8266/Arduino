@@ -1,5 +1,8 @@
 /*
- spiffs_mock.h - SPIFFS HAL mock for host side testing
+ littlefs_mock.h - LittleFS HAL mock for host side testing
+ Copyright © 2019 Earle F. Philhower, III
+
+ Based on spiffs_mock:
  Copyright © 2016 Ivan Grokhotkov
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -13,8 +16,8 @@
  all copies or substantial portions of the Software.
 */
 
-#ifndef spiffs_mock_hpp
-#define spiffs_mock_hpp
+#ifndef littlefs_mock_hpp
+#define littlefs_mock_hpp
 
 #include <stdint.h>
 #include <stddef.h>
@@ -22,13 +25,13 @@
 #include <FS.h>
 #include "flash_hal_mock.h"
 
-#define DEFAULT_SPIFFS_FILE_NAME "spiffs.bin"
+#define DEFAULT_LITTLEFS_FILE_NAME "littlefs.bin"
 
-class SpiffsMock {
+class LittleFSMock {
 public:
-    SpiffsMock(size_t fs_size, size_t fs_block, size_t fs_page, bool storage = true);
+    LittleFSMock(size_t fs_size, size_t fs_block, size_t fs_page, bool storage = true);
     void reset();
-    ~SpiffsMock();
+    ~LittleFSMock();
     
 protected:
     void load ();
@@ -36,7 +39,7 @@ protected:
 
     // it was a vector, but CI tests & valgrind complain with:
     // Syscall param write(buf) points to uninitialised byte(s)
-    //    by 0x43E9FF: SpiffsMock::save() (spiffs_mock.cpp:116)
+    //    by 0x43E9FF: SpiffsMock::save() (littlefs_mock.cpp:116)
     //    = if (::write(fs, &m_fs[0], m_fs_size) != (ssize_t)m_fs_size)
     // so switched to a regular array
     // and that bug is still here
@@ -47,7 +50,7 @@ protected:
     bool m_storage;
 };
 
-#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SpiffsMock spiffs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
-#define SPIFFS_MOCK_RESET() spiffs_mock.reset()
+#define LITTLEFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) LittleFSMock littlefs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
+#define LITTLEFS_MOCK_RESET() littlefs_mock.reset()
 
-#endif /* spiffs_mock_hpp */
+#endif /* littlefs_mock_hpp */

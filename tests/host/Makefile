@@ -56,6 +56,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	FS.cpp \
 	spiffs_api.cpp \
 	MD5Builder.cpp \
+	../../libraries/LittleFS/src/LittleFS.cpp \
 )
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
@@ -66,11 +67,15 @@ CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
 	spiffs/spiffs_hydrogen.c \
 	spiffs/spiffs_nucleus.c \
 	libb64/cencode.c \
+	../../libraries/LittleFS/src/lfs.c \
+	../../libraries/LittleFS/src/lfs_util.c \
 )
 
 MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	Arduino.cpp \
+	flash_hal_mock.cpp \
 	spiffs_mock.cpp \
+	littlefs_mock.cpp \
 	WMath.cpp \
 	MockSerial.cpp \
 	MockTools.cpp \

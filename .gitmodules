@@ -7,3 +7,6 @@
 [submodule "libraries/SoftwareSerial"]
 	path = libraries/SoftwareSerial
 	url = https://github.com/plerup/espsoftwareserial.git
+[submodule "libraries/LittleFS/lib/littlefs"]
+	path = libraries/LittleFS/lib/littlefs
+	url = https://github.com/ARMmbed/littlefs

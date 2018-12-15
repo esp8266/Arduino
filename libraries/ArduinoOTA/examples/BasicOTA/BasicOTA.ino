@@ -39,11 +39,11 @@ void setup() {
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH) {
       type = "sketch";
-    } else { // U_SPIFFS
+    } else { // U_FS
       type = "filesystem";
     }
 
-    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+    // NOTE: if updating FS this would be the place to unmount FS using FS.end()
     Serial.println("Start updating " + type);
   });
   ArduinoOTA.onEnd([]() {

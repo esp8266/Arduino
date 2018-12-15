@@ -32,24 +32,11 @@
 #include "spiffs/spiffs.h"
 #include "debug.h"
 #include "flash_utils.h"
+#include "flash_hal.h"
 
 using namespace fs;
 
-#ifdef ARDUINO
-extern "C" uint32_t _SPIFFS_start;
-extern "C" uint32_t _SPIFFS_end;
-extern "C" uint32_t _SPIFFS_page;
-extern "C" uint32_t _SPIFFS_block;
-
-#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
-#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
-#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
-#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
-#endif
-
-extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
-extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size);
-extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst);
+namespace spiffs_impl {
 
 int getSpiffsMode(OpenMode openMode, AccessMode accessMode);
 bool isSpiffsFilenameValid(const char* name);
@@ -124,10 +111,22 @@ public:
         return true;
     }
 
+    bool mkdir(const char* path) override
+    {
+        (void)path;
+        return false;
+    }
+
+    bool rmdir(const char* path) override
+    {
+        (void)path;
+        return false;
+    }
+
     bool begin() override
     {
 #if defined(ARDUINO) && !defined(CORE_MOCK)
-        if (&_SPIFFS_end <= &_SPIFFS_start)
+        if (&_FS_end <= &_FS_start)
             return false;
 #endif
         if (SPIFFS_mounted(&_fs) != 0) {
@@ -271,6 +270,17 @@ protected:
 
     spiffs _fs;
 
+    // Flash hal wrapper functions to get proper SPIFFS error codes
+    static int32_t spiffs_hal_write(uint32_t addr, uint32_t size, const uint8_t *src) {
+        return flash_hal_write(addr, size, src) == FLASH_HAL_OK ? SPIFFS_OK : SPIFFS_ERR_INTERNAL;
+    }
+    static int32_t spiffs_hal_erase(uint32_t addr, uint32_t size) {
+        return flash_hal_erase(addr, size) == FLASH_HAL_OK ? SPIFFS_OK : SPIFFS_ERR_INTERNAL;
+    }
+    static int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst) {
+        return flash_hal_read(addr, size, dst) == FLASH_HAL_OK ? SPIFFS_OK : SPIFFS_ERR_INTERNAL;
+    }
+
     uint32_t _start;
     uint32_t _size;
     uint32_t _pageSize;
@@ -376,6 +386,18 @@ public:
         return _stat.size;
     }
 
+    bool isFile() const override
+    {
+        // No such thing as directories on SPIFFS
+        return _fd ? true : false;
+    }
+
+    bool isDirectory() const override
+    {
+        // No such thing as directories on SPIFFS
+        return false;
+    }
+
     void close() override
     {
         CHECKFD();
@@ -389,6 +411,11 @@ public:
         CHECKFD();
 
         return (const char*) _stat.name;
+    }
+
+    const char* fullName() const override
+    {
+        return name(); // No dirs, they're the same on SPIFFS
     }
 
 protected:
@@ -416,6 +443,7 @@ public:
         : _pattern(pattern)
         , _fs(fs)
         , _dir(dir)
+        , _dirHead(dir)
         , _valid(false)
     {
     }
@@ -459,6 +487,18 @@ public:
         return _dirent.size;
     }
 
+    bool isFile() const override
+    {
+        // No such thing as directories on SPIFFS
+        return _valid;
+    }
+
+    bool isDirectory() const override
+    {
+        // No such thing as directories on SPIFFS
+        return false;
+    }
+
     bool next() override
     {
         const int n = _pattern.length();
@@ -469,13 +509,22 @@ public:
         return _valid;
     }
 
+    bool rewind() override
+    {
+        _dir = _dirHead;
+        _valid = false;
+        return true;
+    }
+
 protected:
     String _pattern;
     SPIFFSImpl* _fs;
     spiffs_DIR  _dir;
+    spiffs_DIR  _dirHead; // The pointer to the start of this dir
     spiffs_dirent _dirent;
     bool _valid;
 };
 
+}; // namespace
 
 #endif//spiffs_api_h

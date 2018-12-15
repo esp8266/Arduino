@@ -25,6 +25,8 @@
 
 using namespace fs;
 
+namespace spiffs_impl {
+
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
 {
     if (!isSpiffsFilenameValid(path)) {
@@ -108,6 +110,8 @@ bool isSpiffsFilenameValid(const char* name)
     return len > 0 && len < SPIFFS_OBJ_NAME_LEN;
 }
 
+}; // namespace
+
 // these symbols should be defined in the linker script for each flash layout
 #ifndef CORE_MOCK
 #ifdef ARDUINO
@@ -116,11 +120,11 @@ bool isSpiffsFilenameValid(const char* name)
 #endif
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)
-FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(
-                             SPIFFS_PHYS_ADDR,
-                             SPIFFS_PHYS_SIZE,
-                             SPIFFS_PHYS_PAGE,
-                             SPIFFS_PHYS_BLOCK,
+FS SPIFFS = FS(FSImplPtr(new spiffs_impl::SPIFFSImpl(
+                             FS_PHYS_ADDR,
+                             FS_PHYS_SIZE,
+                             FS_PHYS_PAGE,
+                             FS_PHYS_BLOCK,
                              SPIFFS_MAX_OPEN_FILES)));
 #endif // ARDUINO
 #endif // !CORE_MOCK
