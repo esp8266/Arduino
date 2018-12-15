@@ -48,7 +48,7 @@ jobs:
 
     - name: "Docs"
       script: $TRAVIS_BUILD_DIR/tests/ci/build_docs.sh
-      install: pip install --user -r doc/requirements.txt;
+      install: pip3 install --user -r doc/requirements.txt;
 
     - name: "Style check"
       script: $TRAVIS_BUILD_DIR/tests/ci/style_check.sh
