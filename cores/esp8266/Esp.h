@@ -161,6 +161,9 @@ class EspClass {
         bool eraseConfig();
 
         inline uint32_t getCycleCount();
+
+    private:
+        int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size);
 };
 
 uint32_t EspClass::getCycleCount()
