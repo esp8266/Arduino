@@ -267,9 +267,9 @@ uint8_t EspClass::getCpuFreqMHz(void)
 uint32_t EspClass::getFlashChipId(void)
 {
     static uint32_t flash_chip_id = 0;
-	if (flash_chip_id == 0) {
-		flash_chip_id = spi_flash_get_id();
-	}
+    if (flash_chip_id == 0) {
+        flash_chip_id = spi_flash_get_id();
+    }
     return flash_chip_id;
 }
 
@@ -577,54 +577,55 @@ bool EspClass::flashEraseSector(uint32_t sector) {
 static uint32_t *flash_write_puya_buf = 0;
 
 bool EspClass::flashIsPuya(){
-	if (flash_write_puya_buf != 0) {
-		// Already detected PUYA and allocated buffer.
-		return true;
-	}
-	return ((getFlashChipId() & 0x000000ff) == 0x85); // 0x146085 PUYA
+    if (flash_write_puya_buf != 0) {
+        // Already detected PUYA and allocated buffer.
+        return true;
+    }
+    return ((getFlashChipId() & 0x000000ff) == 0x85); // 0x146085 PUYA
 }
 
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
-	ets_isr_mask(FLASH_INT_MASK);
-	int rc = 0;
-	uint32_t* ptr = data;
-	
-	if (flashIsPuya()) {
-		if (flash_write_puya_buf == 0) {
+    ets_isr_mask(FLASH_INT_MASK);
+    int rc = 0;
+    uint32_t* ptr = data;
+
+    if (flashIsPuya()) {
+        if (flash_write_puya_buf == 0) {
             flash_write_puya_buf = (uint32_t*) malloc(PUYA_BUFFER_SIZE);
-		    // No need to ever free this, since the flash chip will never change at runtime.
-			if (flash_write_puya_buf == 0) {
-				// Memory could not be allocated.
-				return false;
-			}
-		}
-		size_t bytesLeft = size;
-		uint32_t pos = offset;
-		while (bytesLeft > 0 && rc == 0) {
-			size_t bytes_now = bytesLeft;
-			if (bytes_now > PUYA_BUFFER_SIZE) {
-				bytes_now = PUYA_BUFFER_SIZE;
-				bytesLeft -= PUYA_BUFFER_SIZE;
-			} else {
-				bytesLeft = 0;
-			}
-			rc = spi_flash_read(pos, flash_write_puya_buf, bytes_now);
-			if (rc != 0) {
-				ets_isr_unmask(FLASH_INT_MASK);
-				return false;
-			}
-			for (size_t i = 0; i < bytes_now / 4; ++i) {
-				flash_write_puya_buf[i] &= *ptr;
-				++ptr;
-			}
-			rc = spi_flash_write(pos, flash_write_puya_buf, bytes_now);
-			pos += bytes_now;
-		}
-	} else {
-	  rc = spi_flash_write(offset, ptr, size);
-	}
-	ets_isr_unmask(FLASH_INT_MASK);
-	return rc == 0;
+            // No need to ever free this, since the flash chip will never change at runtime.
+            if (flash_write_puya_buf == 0) {
+              // Memory could not be allocated.
+              ets_isr_unmask(FLASH_INT_MASK);
+              return false;
+            }
+        }
+        size_t bytesLeft = size;
+        uint32_t pos = offset;
+        while (bytesLeft > 0 && rc == 0) {
+            size_t bytesNow = bytesLeft;
+            if (bytesNow > PUYA_BUFFER_SIZE) {
+                bytesNow = PUYA_BUFFER_SIZE;
+                bytesLeft -= PUYA_BUFFER_SIZE;
+            } else {
+                bytesLeft = 0;
+            }
+            rc = spi_flash_read(pos, flash_write_puya_buf, bytesNow);
+            if (rc != 0) {
+                ets_isr_unmask(FLASH_INT_MASK);
+                return false;
+            }
+            for (size_t i = 0; i < bytesNow / 4; ++i) {
+                flash_write_puya_buf[i] &= *ptr;
+                ++ptr;
+            }
+            rc = spi_flash_write(pos, flash_write_puya_buf, bytesNow);
+            pos += bytesNow;
+        }
+    } else {
+      rc = spi_flash_write(offset, ptr, size);
+    }
+    ets_isr_unmask(FLASH_INT_MASK);
+    return rc == 0;
 }
 
 bool EspClass::flashRead(uint32_t offset, uint32_t *data, size_t size) {
