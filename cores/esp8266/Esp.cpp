@@ -273,6 +273,11 @@ uint32_t EspClass::getFlashChipId(void)
     return flash_chip_id;
 }
 
+uint8_t EspClass::getFlashChipVendorId(void)
+{
+    return (getFlashChipId() & 0x000000ff);
+}
+
 uint32_t EspClass::getFlashChipRealSize(void)
 {
     return (1 << ((spi_flash_get_id() >> 16) & 0xFF));
@@ -573,11 +578,8 @@ bool EspClass::flashEraseSector(uint32_t sector) {
     return rc == 0;
 }
 
-bool EspClass::flashIsPuya(){
-    return ((getFlashChipId() & 0x000000ff) == 0x85); // 0x146085 PUYA
-}
-
-int EspClass::spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
+#if PUYA_SUPPORT
+static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
     // PUYA flash chips need to read existing data, update in memory and write modified data again.
     static uint32_t *flash_write_puya_buf = 0;
     int rc = 0;
@@ -614,14 +616,18 @@ int EspClass::spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size)
     }
     return rc;
 }
+#endif
 
 bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
     ets_isr_mask(FLASH_INT_MASK);
     int rc = 0;
-
-    if (flashIsPuya()) {
+#if PUYA_SUPPORT
+    if (getFlashChipVendorId() == 0x85) { // 0x146085 PUYA
         rc = spi_flash_write_puya(offset, data, size);
-    } else {
+    }
+    else
+#endif
+    {
         rc = spi_flash_write(offset, data, size);
     }
     ets_isr_unmask(FLASH_INT_MASK);

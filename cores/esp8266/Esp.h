@@ -23,7 +23,9 @@
 
 #include <Arduino.h>
 
-#define PUYASUPPORT
+#ifndef PUYA_SUPPORT
+  #define PUYA_SUPPORT 1
+#endif
 #ifndef PUYA_BUFFER_SIZE
   // Good alternative for buffer size is: SPI_FLASH_SEC_SIZE (= 4k)
   // Always use a multiple of flash page size (256 bytes)
@@ -130,6 +132,8 @@ class EspClass {
         uint8_t getCpuFreqMHz();
 
         uint32_t getFlashChipId();
+        uint8_t getFlashChipVendorId();
+
         //gets the actual chip size based on the flash id
         uint32_t getFlashChipRealSize();
         //gets the size of the flash as set by the compiler
@@ -148,7 +152,6 @@ class EspClass {
         bool flashWrite(uint32_t offset, uint32_t *data, size_t size);
         bool flashRead(uint32_t offset, uint32_t *data, size_t size);
 
-        bool flashIsPuya();
         uint32_t getSketchSize();
         String getSketchMD5();
         uint32_t getFreeSketchSpace();
@@ -161,9 +164,6 @@ class EspClass {
         bool eraseConfig();
 
         inline uint32_t getCycleCount();
-
-    private:
-        int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size);
 };
 
 uint32_t EspClass::getCycleCount()
