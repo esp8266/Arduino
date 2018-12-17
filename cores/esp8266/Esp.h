@@ -32,6 +32,39 @@
   #define PUYA_BUFFER_SIZE 256
 #endif
 
+// Vendor IDs taken from Flashrom project
+// https://review.coreboot.org/cgit/flashrom.git/tree/flashchips.h?h=1.0.x
+#define SPI_FLASH_VENDOR_ALLIANCE    0x52    /* Alliance Semiconductor */
+#define SPI_FLASH_VENDOR_AMD         0x01    /* AMD */
+#define SPI_FLASH_VENDOR_AMIC        0x37    /* AMIC */
+#define SPI_FLASH_VENDOR_ATMEL       0x1F    /* Atmel (now used by Adesto) */
+#define SPI_FLASH_VENDOR_BRIGHT      0xAD    /* Bright Microelectronics */
+#define SPI_FLASH_VENDOR_CATALYST    0x31    /* Catalyst */
+#define SPI_FLASH_VENDOR_EON         0x1C    /* EON Silicon Devices, missing 0x7F prefix */
+#define SPI_FLASH_VENDOR_ESMT        0x8C    /* Elite Semiconductor Memory Technology (ESMT) / EFST Elite Flash Storage */
+#define SPI_FLASH_VENDOR_EXCEL       0x4A    /* ESI, missing 0x7F prefix */
+#define SPI_FLASH_VENDOR_FIDELIX     0xF8    /* Fidelix */
+#define SPI_FLASH_VENDOR_FUJITSU     0x04    /* Fujitsu */
+#define SPI_FLASH_VENDOR_GIGADEVICE  0xC8    /* GigaDevice */
+#define SPI_FLASH_VENDOR_HYUNDAI     0xAD    /* Hyundai */
+#define SPI_FLASH_VENDOR_INTEL       0x89    /* Intel */
+#define SPI_FLASH_VENDOR_ISSI        0xD5    /* ISSI Integrated Silicon Solutions, see also PMC. */
+#define SPI_FLASH_VENDOR_MACRONIX    0xC2    /* Macronix (MX) */
+#define SPI_FLASH_VENDOR_NANTRONICS  0xD5    /* Nantronics, missing prefix */
+#define SPI_FLASH_VENDOR_PMC         0x9D    /* PMC, missing 0x7F prefix */
+#define SPI_FLASH_VENDOR_PUYA        0x85    /* Puya semiconductor (shanghai) co. ltd */
+#define SPI_FLASH_VENDOR_SANYO       0x62    /* Sanyo */
+#define SPI_FLASH_VENDOR_SHARP       0xB0    /* Sharp */
+#define SPI_FLASH_VENDOR_SPANSION    0x01    /* Spansion, same ID as AMD */
+#define SPI_FLASH_VENDOR_SST         0xBF    /* SST */
+#define SPI_FLASH_VENDOR_ST          0x20    /* ST / SGS/Thomson / Numonyx (later acquired by Micron) */
+#define SPI_FLASH_VENDOR_SYNCMOS_MVC 0x40    /* SyncMOS (SM) and Mosel Vitelic Corporation (MVC) */
+#define SPI_FLASH_VENDOR_TENX        0x5E    /* Tenx Technologies */
+#define SPI_FLASH_VENDOR_TI          0x97    /* Texas Instruments */
+#define SPI_FLASH_VENDOR_TI_OLD      0x01    /* TI chips from last century */
+#define SPI_FLASH_VENDOR_WINBOND     0xDA    /* Winbond */
+#define SPI_FLASH_VENDOR_WINBOND_NEX 0xEF    /* Winbond (ex Nexcom) serial flashes */
+
 /**
  * AVR macros for WDT managment
  */

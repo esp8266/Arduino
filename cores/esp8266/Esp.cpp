@@ -132,18 +132,18 @@ uint64_t EspClass::deepSleepMax()
 
 }
 
-/* 
+/*
 Layout of RTC Memory is as follows:
 Ref: Espressif doc 2C-ESP8266_Non_OS_SDK_API_Reference, section 3.3.23 (system_rtc_mem_write)
 
 |<------system data (256 bytes)------->|<-----------------user data (512 bytes)--------------->|
 
-SDK function signature:   
+SDK function signature:
 bool	system_rtc_mem_read	(
-				uint32	des_addr,	
-				void	*	src_addr,	
+				uint32	des_addr,
+				void	*	src_addr,
 				uint32	save_size
-)   
+)
 
 The system data section can't be used by the user, so:
 des_addr must be >=64 (i.e.: 256/4) and <192 (i.e.: 768/4)
@@ -160,7 +160,7 @@ Same for write
 Note: If the Updater class is in play, e.g.: the application uses OTA, the eboot
 command will be stored into the first 128 bytes of user data, then it will be
 retrieved by eboot on boot. That means that user data present there will be lost.
-Ref: 
+Ref:
 - discussion in PR #5330.
 - https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map#memmory-mapped-io-registers
 - Arduino/bootloaders/eboot/eboot_command.h RTC_MEM definition
@@ -622,7 +622,7 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size) {
     ets_isr_mask(FLASH_INT_MASK);
     int rc = 0;
 #if PUYA_SUPPORT
-    if (getFlashChipVendorId() == 0x85) { // 0x146085 PUYA
+    if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA) {
         rc = spi_flash_write_puya(offset, data, size);
     }
     else
