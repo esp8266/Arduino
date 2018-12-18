@@ -190,6 +190,10 @@ wl_status_t ESP8266WiFiSTAClass::begin(char* ssid, char *passphrase, int32_t cha
     return begin((const char*) ssid, (const char*) passphrase, channel, bssid, connect);
 }
 
+wl_status_t ESP8266WiFiSTAClass::begin(const String& ssid, const String& passphrase, int32_t channel, const uint8_t* bssid, bool connect) {
+    return begin(ssid.c_str(), passphrase.c_str(), channel, bssid, connect);
+}
+
 /**
  * Use to connect to SDK config.
  * @return wl_status_t
