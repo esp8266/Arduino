@@ -113,21 +113,22 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         return WL_CONNECT_FAILED;
     }
 
-    if(passphrase && strlen(passphrase) > 64) {
+    int passphraseLen = passphrase == nullptr ? 0 : strlen(passphrase);
+    if(passphraseLen > 64) {
         // fail passphrase too long!
         return WL_CONNECT_FAILED;
     }
 
     struct station_config conf;
+    conf.threshold.authmode = (passphraseLen == 0) ? AUTH_OPEN : (_useInsecureWEP ? AUTH_WEP : AUTH_WPA_PSK);
+
     if(strlen(ssid) == 32)
         memcpy(reinterpret_cast<char*>(conf.ssid), ssid, 32); //copied in without null term
     else
         strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
 
-    conf.threshold.authmode = AUTH_OPEN;
     if(passphrase) {
-        conf.threshold.authmode = _useInsecureWEP ? AUTH_WEP : AUTH_WPA_PSK;
-        if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
+        if (passphraseLen == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
             memcpy(reinterpret_cast<char*>(conf.password), passphrase, 64);
         else
             strcpy(reinterpret_cast<char*>(conf.password), passphrase);
