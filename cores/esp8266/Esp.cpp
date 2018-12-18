@@ -580,15 +580,18 @@ bool EspClass::flashEraseSector(uint32_t sector) {
 
 #if PUYA_SUPPORT
 static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size) {
+    if (data == nullptr) {
+      return 1; // SPI_FLASH_RESULT_ERR
+    }
     // PUYA flash chips need to read existing data, update in memory and write modified data again.
-    static uint32_t *flash_write_puya_buf = 0;
+    static uint32_t *flash_write_puya_buf = nullptr;
     int rc = 0;
     uint32_t* ptr = data;
 
-    if (flash_write_puya_buf == 0) {
+    if (flash_write_puya_buf == nullptr) {
         flash_write_puya_buf = (uint32_t*) malloc(PUYA_BUFFER_SIZE);
         // No need to ever free this, since the flash chip will never change at runtime.
-        if (flash_write_puya_buf == 0) {
+        if (flash_write_puya_buf == nullptr) {
             // Memory could not be allocated.
             return 1; // SPI_FLASH_RESULT_ERR
         }
