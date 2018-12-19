@@ -1206,6 +1206,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
             sys.stdout = open(lddir + ld, 'w')
 
         if spiffs_kb == 0:
+            spiffs_start = spiffs_end
             page = 0
             block = 0
         elif spiffs_kb < 0x80000 / 1024:
