@@ -124,6 +124,18 @@ public:
         return true;
     }
 
+    bool mkdir(const char* path) override
+    {
+        (void)path;
+        return false;
+    }
+
+    bool rmdir(const char* path) override
+    {
+        (void)path;
+        return false;
+    }
+
     bool begin() override
     {
 #if defined(ARDUINO) && !defined(CORE_MOCK)
@@ -376,6 +388,18 @@ public:
         return _stat.size;
     }
 
+    bool isFile() const override
+    {
+        // No such thing as directories on SPIFFS
+        return _fd ? true : false;
+    }
+
+    bool isDirectory() const override
+    {
+        // No such thing as directories on SPIFFS
+        return false;
+    }
+
     void close() override
     {
         CHECKFD();
@@ -389,6 +413,11 @@ public:
         CHECKFD();
 
         return (const char*) _stat.name;
+    }
+
+    const char* fullName() const override
+    {
+        return name(); // No dirs, they're the same on SPIFFS
     }
 
 protected:
@@ -416,6 +445,7 @@ public:
         : _pattern(pattern)
         , _fs(fs)
         , _dir(dir)
+        , _dirHead(dir)
         , _valid(false)
     {
     }
@@ -459,6 +489,18 @@ public:
         return _dirent.size;
     }
 
+    bool isFile() const override
+    {
+        // No such thing as directories on SPIFFS
+        return _valid;
+    }
+
+    bool isDirectory() const override
+    {
+        // No such thing as directories on SPIFFS
+        return false;
+    }
+
     bool next() override
     {
         const int n = _pattern.length();
@@ -469,10 +511,18 @@ public:
         return _valid;
     }
 
+    bool rewind() override
+    {
+        _dir = _dirHead;
+        _valid = false;
+        return true;
+    }
+
 protected:
     String _pattern;
     SPIFFSImpl* _fs;
     spiffs_DIR  _dir;
+    spiffs_DIR  _dirHead; // The pointer to the start of this dir
     spiffs_dirent _dirent;
     bool _valid;
 };

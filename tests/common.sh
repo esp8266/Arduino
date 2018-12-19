@@ -1,5 +1,27 @@
 #!/usr/bin/env bash
 
+# return 1 if this test should not be built in CI (for other archs, not needed, etc.)
+function skip_ino()
+{
+    local ino=$1
+    local skiplist=""
+    # Add items to the following list with "\n" netween them to skip running.  No spaces, tabs, etc. allowed
+    read -d '' skiplist << EOL || true
+/#attic/
+/AnalogBinLogger/
+/LowLatencyLogger/
+/LowLatencyLoggerADXL345/
+/LowLatencyLoggerMPU6050/
+/PrintBenchmark/
+/TeensySdioDemo/
+/SoftwareSpi/
+/STM32Test/
+/extras/
+EOL
+    echo $ino | grep -q -F "$skiplist"
+    echo $(( 1 - $? ))
+}
+
 function print_size_info()
 {
     elf_file=$1
@@ -61,6 +83,10 @@ function build_sketches()
             continue
         fi;
         if [[ -f "$sketchdir/.test.skip" ]]; then
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
+            continue
+        fi
+        if [[ $(skip_ino $sketch) = 1 ]]; then
             echo -e "\n ------------ Skipping $sketch ------------ \n";
             continue
         fi
@@ -159,6 +185,10 @@ function build_sketches_with_platformio()
             continue
         fi;
         if [[ -f "$sketchdir/.test.skip" ]]; then
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
+            continue
+        fi
+        if [[ $(skip_ino $sketch) = 1 ]]; then
             echo -e "\n ------------ Skipping $sketch ------------ \n";
             continue
         fi

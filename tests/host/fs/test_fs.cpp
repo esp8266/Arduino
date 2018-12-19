@@ -17,7 +17,10 @@
 #include <map>
 #include <FS.h>
 #include "../common/spiffs_mock.h"
+#include "../common/sdfs_mock.h"
 #include <spiffs/spiffs.h>
+#include "../../../libraries/SDFS/src/SDFS.h"
+#include "../../../libraries/SD/src/SD.h"
 
 static void createFile (const char* name, const char* content)
 {
@@ -183,4 +186,104 @@ TEST_CASE("#1819 Can list all files with openDir(\"\")", "[fs][bugreport]")
     createFile("sorta-dir/file4", "\n");
     auto files = listDir("");
     REQUIRE(files.size() == 4);
+}
+
+TEST_CASE("SDFS", "[sdfs]")
+{
+    SDFS_MOCK_DECLARE();
+    setSDFSConfig(0);
+    SDFS.end();
+    REQUIRE(SDFS.format());
+    REQUIRE(SDFS.begin());
+    REQUIRE(SDFS.mkdir("/happy/face"));
+    REQUIRE(SDFS.mkdir("/happy/nose"));
+    REQUIRE(SDFS.rmdir("/happy/face"));
+    auto f = SDFS.open("/this/is/a/long/name.txt", "w");
+    f.printf("Hello\n");
+    f.close();
+    SDFS.end();
+}
+
+TEST_CASE("Files.ino example", "[sd]")
+{
+    SDFS_MOCK_DECLARE();
+    setSDFSConfig(0);
+    SDFS.end();
+    REQUIRE(SDFS.format());
+    REQUIRE(SD.begin(4));
+    REQUIRE_FALSE(SD.exists("example.txt"));
+    File myFile = SD.open("example.txt", FILE_WRITE);
+    REQUIRE(myFile);
+    myFile.close();
+    REQUIRE(SD.exists("example.txt"));
+    REQUIRE(SD.remove("example.txt"));
+    REQUIRE_FALSE(SD.exists("example.txt"));
+    SDFS.end();
+}
+
+
+static void createFileSD(const char* name, const char* content)
+{
+    auto f = SD.open(name, FILE_WRITE);
+    REQUIRE(f);
+    if (content) {
+        f.print(content);
+    }
+}
+
+static String readFileSD(const char* name)
+{
+    auto f = SD.open(name, FILE_READ);
+    if (f) {
+        return f.readString();
+    }
+    return String();
+}
+
+TEST_CASE("Listfiles.ino example", "[sd]")
+{
+    SDFS_MOCK_DECLARE();
+    setSDFSConfig(0);
+    SDFS.end();
+    REQUIRE(SDFS.format());
+    REQUIRE(SD.begin(4));
+
+    createFileSD("file1", "hello");
+    createFileSD("file2", "hola");
+    createFileSD("dir1/file3", "nihao");
+    createFileSD("dir2/dir3/file4", "bonjour");
+
+    File root = SD.open("/");
+    File file1 = root.openNextFile();
+    File file2 = root.openNextFile();
+    File dir1 = root.openNextFile();
+    File dir1_file3 = dir1.openNextFile();
+    File dir2 = root.openNextFile();
+    File dir2_dir3 = dir2.openNextFile();
+    File dir2_dir3_file4 = dir2_dir3.openNextFile();
+
+    bool ok;
+    ok = root.isDirectory() && !root.isFile() && !strcmp(root.name(), "/");
+    REQUIRE(ok);
+    ok = !file1.isDirectory() && file1.isFile() && !strcmp(file1.name(), "file1");
+    REQUIRE(ok);
+    ok = !file2.isDirectory() && file2.isFile() && !strcmp(file2.name(), "file2");
+    REQUIRE(ok);
+    ok = dir1.isDirectory() && !dir1.isFile() && !strcmp(dir1.name(), "dir1");
+    REQUIRE(ok);
+    ok = !dir1_file3.isDirectory() && dir1_file3.isFile() && !strcmp(dir1_file3.name(), "file3") &&
+         !strcmp(dir1_file3.fullName(), "dir1/file3");
+    REQUIRE(ok);
+    ok = dir2.isDirectory() && !dir2.isFile() && !strcmp(dir2.name(), "dir2");
+    REQUIRE(ok);
+    ok = dir2_dir3.isDirectory() && !dir2_dir3.isFile() && !strcmp(dir2_dir3.name(), "dir3");
+    REQUIRE(ok);
+    ok = !dir2_dir3_file4.isDirectory() && dir2_dir3_file4.isFile() && !strcmp(dir2_dir3_file4.name(), "file4") &&
+         !strcmp(dir2_dir3_file4.fullName(), "dir2/dir3/file4");
+    REQUIRE(ok);
+
+    REQUIRE(readFileSD("/file1") == "hello");
+    REQUIRE(readFileSD("file2") == "hola");
+    REQUIRE(readFileSD("dir1/file3") == "nihao");
+    REQUIRE(readFileSD("/dir2/dir3/file4") == "bonjour");
 }
