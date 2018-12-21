@@ -42,7 +42,7 @@ function build_sketches()
     local build_mod=$4
     local build_rem=$5
     mkdir -p $build_dir
-    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k -p $PWD/$build_dir $build_arg "
+    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir $build_arg "
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
@@ -219,6 +219,8 @@ if [ -z "$TRAVIS_BUILD_DIR" ]; then
     echo "TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR"
 fi
 
+cache_dir=$(mktemp -d)
+
 if [ "$BUILD_TYPE" = "build" ]; then
     install_arduino nodebug
     build_sketches_with_arduino 1 0
@@ -248,6 +250,8 @@ elif [ "$BUILD_TYPE" = "platformio_odd" ]; then
     build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 2 1
 else
     echo "BUILD_TYPE not set or invalid"
+    rm -rf $cache_dir
     exit 1
 fi
 
+rm -rf $cache_dir
