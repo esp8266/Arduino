@@ -52,6 +52,14 @@ function build_sketches()
         if [ $testcnt -ne $build_rem ]; then
             continue  # Not ours to do
         fi
+
+        # Uber hack warning - setting the cached core.a file to the future to
+        # ensure it is accepted as unmodified during build process.  Problem is
+        # the git version header is rewritten after each compile, so the
+        # builder sees it is new and says "rebuild the whole thing!"
+
+        if [ -e $cache_dir/core/*.a ]; then touch -t 203712310000 $cache_dir/core/*.a; fi
+
         rm -rf $build_dir/*
         local sketchdir=$(dirname $sketch)
         local sketchdirname=$(basename $sketchdir)
