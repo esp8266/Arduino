@@ -881,12 +881,12 @@ macros = {
         ]),
 
     'exception_menu': collections.OrderedDict([
-        ( '.menu.exception.enabled', 'Enabled' ),
-        ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
-        ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.disabled', 'Disabled' ),
         ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
-        ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++-nox' ),
+        ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
+        ( '.menu.exception.enabled', 'Enabled' ),
+        ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
+        ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++-exc' ),
         ]),
 
     'crystalfreq_menu': collections.OrderedDict([
