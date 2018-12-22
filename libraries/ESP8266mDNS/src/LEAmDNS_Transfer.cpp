@@ -1005,7 +1005,7 @@ bool MDNSResponder::_udpRead16(uint16_t& p_ru16Value) {
     bool    bResult = false;
 
     if (_udpReadBuffer((unsigned char*)&p_ru16Value, sizeof(p_ru16Value))) {
-        p_ru16Value = ntohs(p_ru16Value);
+        p_ru16Value = lwip_ntohs(p_ru16Value);
         bResult = true;
     }
     return bResult;
@@ -1019,7 +1019,7 @@ bool MDNSResponder::_udpRead32(uint32_t& p_ru32Value) {
     bool    bResult = false;
 
     if (_udpReadBuffer((unsigned char*)&p_ru32Value, sizeof(p_ru32Value))) {
-        p_ru32Value = ntohl(p_ru32Value);
+        p_ru32Value = lwip_ntohl(p_ru32Value);
         bResult = true;
     }
     return bResult;
@@ -1052,7 +1052,7 @@ bool MDNSResponder::_udpAppend8(uint8_t p_u8Value) {
  */
 bool MDNSResponder::_udpAppend16(uint16_t p_u16Value) {
     
-    p_u16Value = htons(p_u16Value);
+    p_u16Value = lwip_htons(p_u16Value);
     return (_udpAppendBuffer((unsigned char*)&p_u16Value, sizeof(p_u16Value)));
 }
 
@@ -1061,7 +1061,7 @@ bool MDNSResponder::_udpAppend16(uint16_t p_u16Value) {
  */
 bool MDNSResponder::_udpAppend32(uint32_t p_u32Value) {
     
-    p_u32Value = htonl(p_u32Value);
+    p_u32Value = lwip_htonl(p_u32Value);
     return (_udpAppendBuffer((unsigned char*)&p_u32Value, sizeof(p_u32Value)));
 }
 
