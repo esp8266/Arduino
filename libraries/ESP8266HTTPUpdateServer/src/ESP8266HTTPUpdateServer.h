@@ -10,12 +10,12 @@ class ESP8266HTTPUpdateServer
 
     void setup(ESP8266WebServer *server)
     {
-      setup(server, emptyString, emptyString);
+      setup(server, String::empty(), String::empty());
     }
 
     void setup(ESP8266WebServer *server, const String& path)
     {
-      setup(server, path, emptyString, emptyString);
+      setup(server, path, String::empty(), String::empty());
     }
 
     void setup(ESP8266WebServer *server, const String& username, const String& password)

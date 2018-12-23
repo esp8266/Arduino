@@ -108,7 +108,7 @@ void ESP8266WebServer::begin(uint16_t port) {
 String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit) const {
   int _begin = authReq.indexOf(param);
   if (_begin == -1)
-    return emptyString;
+    return String::empty();
   return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
 
@@ -486,7 +486,7 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
       contentType != String(FPSTR(mimeTable[none].mimeType))) {
     sendHeader(F("Content-Encoding"), F("gzip"));
   }
-  send(200, contentType, emptyString);
+  send(200, contentType, String::empty());
 }
 
 
@@ -499,19 +499,19 @@ const String& ESP8266WebServer::arg(String name) const {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
   }
-  return emptyString;
+  return String::empty();
 }
 
 const String& ESP8266WebServer::arg(int i) const {
   if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].value;
-  return emptyString;
+  return String::empty();
 }
 
 const String& ESP8266WebServer::argName(int i) const {
   if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].key;
-  return emptyString;
+  return String::empty();
 }
 
 int ESP8266WebServer::args() const {
@@ -536,7 +536,7 @@ const String& ESP8266WebServer::header(String name) const {
     if (_currentHeaders[i].key.equalsIgnoreCase(name))
       return _currentHeaders[i].value;
   }
-  return emptyString;
+  return String::empty();
 }
 
 void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
@@ -553,13 +553,13 @@ void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t hea
 const String& ESP8266WebServer::header(int i) const {
   if (i < _headerKeysCount)
     return _currentHeaders[i].value;
-  return emptyString;
+  return String::empty();
 }
 
 const String& ESP8266WebServer::headerName(int i) const {
   if (i < _headerKeysCount)
     return _currentHeaders[i].key;
-  return emptyString;
+  return String::empty();
 }
 
 int ESP8266WebServer::headers() const {
@@ -619,7 +619,7 @@ void ESP8266WebServer::_handleRequest() {
 
 void ESP8266WebServer::_finalizeResponse() {
   if (_chunked) {
-    sendContent(emptyString);
+    sendContent(String::empty());
   }
 }
 

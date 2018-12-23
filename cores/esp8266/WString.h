@@ -70,6 +70,13 @@ class String {
         explicit String(double, unsigned char decimalPlaces = 2);
         ~String(void);
 
+        // empty string singleton
+        // return the reference to the constant empty string.
+        static inline const String &empty() {
+            extern const String emptyString;
+            return emptyString;
+        }
+
         // memory management
         // return true on success, false on failure (in which case, the string
         // is left unchanged).  reserve(0), if successful, will validate an
@@ -294,7 +301,8 @@ class StringSumHelper: public String {
         }
 };
 
-extern const String emptyString;
+// only for backward compatibility
+extern const String emptyString __attribute__((deprecated("Use String::empty() instead.")));
 
 #endif  // __cplusplus
 #endif  // String_class_h

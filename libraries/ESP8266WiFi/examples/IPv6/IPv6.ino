@@ -98,7 +98,7 @@ void setup() {
   Serial.println();
   Serial.println(ESP.getFullVersion());
 
-  Serial.printf("IPV6 is%s enabled\n", LWIP_IPV6 ? emptyString.c_str() : " NOT");
+  Serial.printf("IPV6 is%s enabled\n", LWIP_IPV6 ? String::empty().c_str() : " NOT");
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);

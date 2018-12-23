@@ -20,8 +20,8 @@ ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
 {
   _serial_output = serial_debug;
   _server = NULL;
-  _username = emptyString;
-  _password = emptyString;
+  _username = String::empty();
+  _password = String::empty();
   _authenticated = false;
 }
 
@@ -33,7 +33,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path
 
     // handler for the /update form page
     _server->on(path.c_str(), HTTP_GET, [&](){
-      if(_username != emptyString && _password != emptyString && !_server->authenticate(_username.c_str(), _password.c_str()))
+      if(_username != String::empty() && _password != String::empty() && !_server->authenticate(_username.c_str(), _password.c_str()))
         return _server->requestAuthentication();
       _server->send_P(200, PSTR("text/html"), serverIndex);
     });
@@ -61,7 +61,7 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path
         if (_serial_output)
           Serial.setDebugOutput(true);
 
-        _authenticated = (_username == emptyString || _password == emptyString || _server->authenticate(_username.c_str(), _password.c_str()));
+        _authenticated = (_username == String::empty() || _password == String::empty() || _server->authenticate(_username.c_str(), _password.c_str()));
         if(!_authenticated){
           if (_serial_output)
             Serial.printf("Unauthenticated Update\n");
