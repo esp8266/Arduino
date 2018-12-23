@@ -66,11 +66,17 @@ public:
   MDNSResponder();
   ~MDNSResponder();
   bool begin(const char* hostName);
+  bool begin(const String& hostName) {
+    return begin(hostName.c_str());
+  }
   //for compatibility
   bool begin(const char* hostName, IPAddress ip, uint32_t ttl=120){
     (void) ip;
     (void) ttl;
     return begin(hostName);
+  }
+  bool begin(const String& hostName, IPAddress ip, uint32_t ttl=120) {
+    return begin(hostName.c_str(), ip, ttl);
   }
   /* Application should call this whenever AP is configured/disabled */
   void notifyAPChange();
