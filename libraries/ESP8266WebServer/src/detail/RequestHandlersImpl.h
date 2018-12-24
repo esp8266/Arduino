@@ -2,6 +2,8 @@
 #define REQUESTHANDLERSIMPL_H
 
 #include <ESP8266WebServer.h>
+#include <string>
+#include <regex>
 #include "RequestHandler.h"
 #include "mimetable.h"
 #include "WString.h"
@@ -18,15 +20,16 @@ public:
     , _uri(uri)
     , _method(method)
     {
-        int numParams = 0, start = 0;
-        do {
-            start = _uri.indexOf("{}", start);
-            if (start > 0) {
-                numParams++;
-                start += 2;
-            }
-        } while (start > 0);
-        pathArgs.resize(numParams);
+        _isRegex = uri.startsWith("^") && uri.endsWith("$");
+        if (_isRegex) {
+            std::regex rgx((_uri + "|").c_str());
+            std::smatch matches;
+            std::string s{""};
+            std::regex_search(s, matches, rgx);
+            pathArgs.resize(matches.size() - 1);
+        } else {
+            pathArgs.resize(0);
+        }
     }
 
     bool canHandle(HTTPMethod requestMethod, String requestUri) override  {
@@ -36,37 +39,21 @@ public:
         if (_uri == requestUri)
             return true;
 
-        size_t uriLength = _uri.length();
-        unsigned int pathArgIndex = 0;
-        unsigned int requestUriIndex = 0;
-        for (unsigned int i = 0; i < uriLength; i++, requestUriIndex++) {
-            char uriChar = _uri[i];
-            char requestUriChar = requestUri[requestUriIndex];
-
-            if (uriChar == requestUriChar)
-                continue;
-            if (uriChar != '{')
-                return false;
-
-            i += 2; // index of char after '}'
-            if (i >= uriLength) {
-                // there is no char after '}'
-                pathArgs[pathArgIndex] = requestUri.substring(requestUriIndex);
-                return pathArgs[pathArgIndex].indexOf("/") == -1; // path argument may not contain a '/'
+        if (_isRegex) {
+            unsigned int pathArgIndex = 0;
+            std::regex rgx(_uri.c_str());
+            std::smatch matches;
+            std::string s(requestUri.c_str());
+            if (std::regex_search(s, matches, rgx)) {
+                for (size_t i = 1; i < matches.size(); ++i) {  // skip first
+                    pathArgs[pathArgIndex] = String(matches[i].str().c_str());
+                    pathArgIndex++;
+                }
+                return true;
             }
-            else
-            {
-                char charEnd = _uri[i];
-                int uriIndex = requestUri.indexOf(charEnd, requestUriIndex);
-                if (uriIndex < 0)
-                    return false;
-                pathArgs[pathArgIndex] = requestUri.substring(requestUriIndex, uriIndex);
-                requestUriIndex = (unsigned int) uriIndex;
-            }
-            pathArgIndex++;
         }
 
-        return requestUriIndex >= requestUri.length();
+        return false;
     }
 
     bool canUpload(String requestUri) override  {

@@ -38,7 +38,7 @@ void setup(void) {
     server.send(200, "text/plain", "User: '" + user + "'");
   });
 
-  server.on("/users/{}/devices/{}", []() {
+  server.on("^\\/users\\/([0-9]+)\\/devices\\/([0-9]+)$", []() {
     String user = server.pathArg(0);
     String device = server.pathArg(1);
     server.send(200, "text/plain", "User: '" + user + "' and Device: '" + device + "'");

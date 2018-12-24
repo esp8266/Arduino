@@ -23,6 +23,7 @@ private:
 	
 protected:
     std::vector<String> pathArgs;
+    bool _isRegex = false;
 
 public:
     const String& pathArg(unsigned int i) { 
