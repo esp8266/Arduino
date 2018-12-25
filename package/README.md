@@ -1,5 +1,35 @@
 # Release tools
 
+## Release model
+
+The release model is linear. That means that there is only one main code branch, and releases are snapshots of that branch at specific points in the sequence of commits.
+The advantage of this model is that the maintenance effort is greately reduced compared to other release models, such as a branched model.
+The disadvantage is that progress is ever only forward, and fixes can't be backported to prior releases. this means there is no such thing as a "stable" release (however, see Sub releases below).
+
+There are 4 types of releases:
+
+*Major releases*
+
+These contain breaking changes, such as big API changes, both in function signature and data representation. When this happens, user apps will require changes to continue to work, and those changes could be significant.
+Major releases happen seldom, e.g.: every few years.
+In addition, a Major can contain changes from Minor releases.
+
+*Minor releases*
+
+These contain new features and bug fixes. Breaking changes should not be included here. The one exception is breaking changes for a feature that is too broken and is not worth fixing, especially if that feature is causing maintenance overhead.
+Minor releases happen maybe 1-3 times per year.
+In addition, a Minor release can contain changes from Sub releases.
+
+*Sub releases*
+
+Sub releases are mostly meant for stabilization purposes. Once a Major or Minor release is out, it is possible that critical bugs or issues are found. Given that fixes can't be backported, a sub release is made that includes such critical bug fixes.
+Sub releases happen a few weeks after a Major or Minor release.
+
+*Beta releases*
+
+Depending on the number of changes that have been merged since the last release, and on how big and disruptive those changes are, a beta release could be done prior to a Major or Minor. Beta releases are meant to provide an outlook of what the upcoming release will look like, in order to allow users to do early testing and provide feedback. This helps in identifying big issues early on, thereby allowing time to fix them before the final Major or Minor release.
+Beta releases should not be done for Sub releases.
+
 ## Overview
 
 This directory contains scripts used to automate the release process of esp8266/Arduino project.
@@ -57,35 +87,40 @@ Here is an overview of the release process. See the section below for detailed i
 
    * When done, put release notes into a private Gist and send the link to other maintainers for review.
 
-   * Update `version` to the release in platform.txt and commit. E.g. `2.5.0`.
+The following points assume work in a direct clone of the repository, and not in a personal fork.
 
-2. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-rcN` for release versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
+2. Update `version` to the release in platform.txt and commit. E.g. `2.5.0`. Then git push origin to get the commit merged to master.
 
-   ```
-   git tag -a -m "Release 2.4.0" 2.4.0
-   ```
-
-3. Push the tag created in step 2 to esp8266/Arduino Github repository:
+3. Tag the latest commit on the master branch. In this project, tags have form `X.Y.Z`, e.g. `2.4.0`, or `X.Y.Z-betaN` for release candiate versions. Notice that there's no `v`at the beginning of the tag. Tags must be annotated, not lightweight tags. To create a tag, use git command (assuming that the master branch is checked out):
 
    ```
-   git push origin 2.4.0
+   git tag -a -m "Release 2.5.0" 2.5.0
    ```
 
-4. Wait for Travis CI build for the tag to pass. Check that the new (draft) release has been created. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
+4. Push the tag created in step 2 to esp8266/Arduino Github repository:
 
-5. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266_index.json contains an entry for the new version (it may not be the first one).
+   ```
+   git push origin 2.5.0
+   ```
 
-6. Navigate to release list in Github, press "Edit" button to edit release description, paste release notes. Remove "draft" status of the release and publish it.
+5. Wait for Travis CI build for the tag to pass, see https://travis-ci.org/esp8266/Arduino/builds. Check that the new (draft) release has been created, see https://github.com/esp8266/Arduino/releases. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
 
-7. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version.
+6. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
 
-8. Create a commit to the master branch, updating:
+7. Navigate to release list in Github here https://github.com/esp8266/Arduino/releases, press "Edit" button to edit release description, paste release notes, and publish it.
+
+8. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version.
+
+9. Check that https://arduino-esp8266.readthedocs.io/en/latest/ has a new doc build for the new tag, and that "stable" points to that build. If a new build did not trigger, log into readthedoc's home here https://readthedocs.org/ (account must have been added to project as maintainer) and trigger it manually.
+
+
+10. Create a commit to the master branch, updating:
 
    * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `2.5.0-dev`.
 
    * In main README.md:
 
-     - in "Contributing" section, update the "easy issues" link to point to the next milestone.
-
-     - in "Latest release" section, change version number in the readthedocs link to the version which was just released.
-
+     - in "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
+   * In doc/conf.py
+   
+     - update version and release to the *next* milestone

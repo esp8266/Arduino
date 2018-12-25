@@ -40,8 +40,8 @@ License (MIT license):
   THE SOFTWARE.
 
 */
-#ifndef ESP8266MDNS_H
-#define ESP8266MDNS_H
+#ifndef ESP8266MDNS_LEGACY_H
+#define ESP8266MDNS_LEGACY_H
 
 #include "ESP8266WiFi.h"
 #include "WiFiUdp.h"
@@ -66,11 +66,17 @@ public:
   MDNSResponder();
   ~MDNSResponder();
   bool begin(const char* hostName);
+  bool begin(const String& hostName) {
+    return begin(hostName.c_str());
+  }
   //for compatibility
   bool begin(const char* hostName, IPAddress ip, uint32_t ttl=120){
     (void) ip;
     (void) ttl;
     return begin(hostName);
+  }
+  bool begin(const String& hostName, IPAddress ip, uint32_t ttl=120) {
+    return begin(hostName.c_str(), ip, ttl);
   }
   /* Application should call this whenever AP is configured/disabled */
   void notifyAPChange();
@@ -138,10 +144,6 @@ private:
   bool _listen();
   void _restart();
 };
-
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
-extern MDNSResponder MDNS;
-#endif
 
 }	// namespace Legacy_MDNSResponder
 

@@ -79,14 +79,24 @@ public:
         _sock = -1;
     }
 
+#if 0
     void setMulticastInterface(const ip_addr_t& addr)
     {
+        (void)addr;
+        // user multicast, and this is how it works with posix: send to multicast address:
+        _dst.addr = staticMCastAddr;
+    }
+#endif
+    void setMulticastInterface(const ip_addr_t* addr)
+    {
+        (void)addr;
         // user multicast, and this is how it works with posix: send to multicast address:
         _dst.addr = staticMCastAddr;
     }
 
     void setMulticastTTL(int ttl)
     {
+        (void)ttl;
         //fprintf(stderr, MOCK "TODO: UdpContext::setMulticastTTL\n");
     }
 
