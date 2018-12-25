@@ -104,6 +104,7 @@ function install_ide()
     local ide_path=$1
     local core_path=$2
     local debug=$3
+    local ipv6=$4
     test -r arduino.tar.xz || wget -O arduino.tar.xz https://www.arduino.cc/download.php?f=/arduino-nightly-linux64.tar.xz
     tar xf arduino.tar.xz
     mv arduino-nightly $ide_path
@@ -115,9 +116,13 @@ function install_ide()
     if [ "$debug" = "debug" ]; then
         debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
     fi
+    local ipv6_flags="-DLWIP_IPV6=0"
+    if [ "$ipv6" = "ipv6" ]; then
+        ipv6_flags="-DLWIP_IPV6=1"
+    fi
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
-    echo "compiler.c.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=1 $debug_flags" > esp8266/platform.local.txt
-    echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=1 $debug_flags" >> esp8266/platform.local.txt
+    echo "compiler.c.extra_flags=-Wall -Wextra -Werror $ipv6_flags $debug_flags" > esp8266/platform.local.txt
+    echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror $ipv6_flags $debug_flags" >> esp8266/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
@@ -182,10 +187,11 @@ function build_sketches_with_platformio()
 function install_arduino()
 {
     local debug=$1
+    local ipv6=$2
     # Install Arduino IDE and required libraries
     echo -e "travis_fold:start:sketch_test_env_prepare"
     cd $TRAVIS_BUILD_DIR
-    install_ide $HOME/arduino_ide $TRAVIS_BUILD_DIR $debug
+    install_ide $HOME/arduino_ide $TRAVIS_BUILD_DIR $debug $ipv6
     which arduino
     cd $TRAVIS_BUILD_DIR
     install_libraries
@@ -220,19 +226,28 @@ if [ -z "$TRAVIS_BUILD_DIR" ]; then
 fi
 
 if [ "$BUILD_TYPE" = "build" ]; then
-    install_arduino nodebug
+    install_arduino nodebug ipv4
+    build_sketches_with_arduino 1 0
+if [ "$BUILD_TYPE" = "build6" ]; then
+    install_arduino nodebug ipv6
     build_sketches_with_arduino 1 0
 elif [ "$BUILD_TYPE" = "build_even" ]; then
-    install_arduino nodebug
+    install_arduino nodebug ipv4
     build_sketches_with_arduino 2 0
 elif [ "$BUILD_TYPE" = "build_odd" ]; then
-    install_arduino nodebug
+    install_arduino nodebug ipv4
     build_sketches_with_arduino 2 1
 elif [ "$BUILD_TYPE" = "debug_even" ]; then
-    install_arduino debug
+    install_arduino debug ipv4
     build_sketches_with_arduino 2 0
 elif [ "$BUILD_TYPE" = "debug_odd" ]; then
-    install_arduino debug
+    install_arduino debug ipv4
+    build_sketches_with_arduino 2 1
+elif [ "$BUILD_TYPE" = "build6_even" ]; then
+    install_arduino nodebug ipv6
+    build_sketches_with_arduino 2 0
+elif [ "$BUILD_TYPE" = "build6_odd" ]; then
+    install_arduino nodebug ipv6
     build_sketches_with_arduino 2 1
 elif [ "$BUILD_TYPE" = "platformio" ]; then
     # PlatformIO
