@@ -226,7 +226,7 @@ if [ "$BUILD_TYPE" = "build" ]; then
     build_sketches_with_arduino 1 0 lm2f
 elif [ "$BUILD_TYPE" = "build6" ]; then
     install_arduino nodebug
-    build_sketches_with_arduino 1 0 lm2f
+    build_sketches_with_arduino 1 0 lm6f
 elif [ "$BUILD_TYPE" = "build_even" ]; then
     install_arduino nodebug
     build_sketches_with_arduino 2 0 lm2f
