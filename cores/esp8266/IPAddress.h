@@ -73,7 +73,6 @@ class IPAddress: public Printable {
         // Constructors
         IPAddress();
         IPAddress(const IPAddress& from);
-        IPAddress(const ip_addr_t* from);
         IPAddress(uint8_t first_octet, uint8_t second_octet, uint8_t third_octet, uint8_t fourth_octet);
         IPAddress(uint32_t address) { ctor32(address); }
         IPAddress(u32_t address) { ctor32(address); }
@@ -163,6 +162,8 @@ class IPAddress: public Printable {
         bool isLocal () const { return ip_addr_islinklocal(&_ip); }
 
 #if LWIP_IPV6
+
+        IPAddress(const ip_addr_t* from);
 
         uint16_t* raw6()
         {
