@@ -228,7 +228,7 @@ fi
 if [ "$BUILD_TYPE" = "build" ]; then
     install_arduino nodebug ipv4
     build_sketches_with_arduino 1 0
-if [ "$BUILD_TYPE" = "build6" ]; then
+elif [ "$BUILD_TYPE" = "build6" ]; then
     install_arduino nodebug ipv6
     build_sketches_with_arduino 1 0
 elif [ "$BUILD_TYPE" = "build_even" ]; then
