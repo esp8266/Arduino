@@ -42,7 +42,7 @@ function build_sketches()
     local build_mod=$4
     local build_rem=$5
     mkdir -p $build_dir
-    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k -p $PWD/$build_dir $build_arg "
+    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k -p $PWD/$build_dir -n lm6f $build_arg "
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
@@ -116,8 +116,8 @@ function install_ide()
         debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
     fi
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
-    echo "compiler.c.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=0 $debug_flags" > esp8266/platform.local.txt
-    echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=0 $debug_flags" >> esp8266/platform.local.txt
+    echo "compiler.c.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=1 $debug_flags" > esp8266/platform.local.txt
+    echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=1 $debug_flags" >> esp8266/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
