@@ -104,7 +104,7 @@ namespace MDNSImplementation {
             char*         pEnd = 0;
             unsigned long ulIndex = strtoul((pFoundDivider + strlen(pcDivider)), &pEnd, 10);
             if ((ulIndex) &&
-                ((pEnd - p_rpcDomain) == strlen(p_rpcDomain)) &&
+                ((pEnd - p_rpcDomain) == (ptrdiff_t)strlen(p_rpcDomain)) &&
                 (!*pEnd)) {       // Valid (old) index found
 
                 char    acIndexBuffer[16];
