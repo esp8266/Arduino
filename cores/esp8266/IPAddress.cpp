@@ -187,6 +187,11 @@ const IPAddress INADDR_NONE(255,255,255,255);
 
 #if LWIP_IPV6
 
+IPAddress::IPAddress(const ip_addr_t* from)
+{
+    ip_addr_copy(_ip, *from);
+}
+
 bool IPAddress::fromString6(const char *address) {
     // TODO: test test test
 
