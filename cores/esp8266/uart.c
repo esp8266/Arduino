@@ -636,13 +636,6 @@ uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx
         }
     }
 
-    uart_flush(uart);
-    USC1(uart->uart_nr) = 0;
-    USIC(uart->uart_nr) = 0xffff;
-    USIE(uart->uart_nr) = 0;
-    if(uart->uart_nr == UART0 && uart->rx_enabled)
-        uart_start_isr(uart);
-
     return uart;
 }
 

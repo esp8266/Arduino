@@ -369,7 +369,7 @@ void ATTR_GDBEXTERNFN gdbstub_write(const char* buf, size_t size) {
 	size_t i;
 	if (gdb_attached) {
 		ETS_UART_INTR_DISABLE();
-		gdbSendOutputPacketStr(buf, size);
+		gdbSendOutputPacketStr((const unsigned char *)buf, size);
 		ETS_UART_INTR_ENABLE();
 	} else {
 		for (i = 0; i < size; i++) {
