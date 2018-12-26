@@ -163,6 +163,8 @@ class IPAddress: public Printable {
 
 #if LWIP_IPV6
 
+        IPAddress(const ip_addr_t* from);
+
         uint16_t* raw6()
         {
             setV6();
