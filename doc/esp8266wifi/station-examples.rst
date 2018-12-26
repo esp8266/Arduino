@@ -19,7 +19,7 @@ Table of Contents
 Introduction
 ~~~~~~~~~~~~
 
-Following the example in\ `Quick Start <readme.rst#quick-start>`__, we would like to go one step further and made ESP connect to next available access point if current connection is lost. This functionality is provided with 'ESP8266WiFiMulti' class and demonstrated in sketch below.
+Following the example in `Quick Start <readme.rst#quick-start>`__, we would like to go one step further and made ESP connect to next available access point if current connection is lost. This functionality is provided with 'ESP8266WiFiMulti' class and demonstrated in sketch below.
 
 .. code:: cpp
 
@@ -202,4 +202,4 @@ I believe the minimalist sketch with ``ESP8266WiFiMulti`` class is a cool exampl
 
 As shown in above example, reconnecting between access points takes time and is not seamless. Therefore, in practical applications, you will likely need to monitor connection status to decide e.g. if you can send the data to external system or should wait until connection is back.
 
-For detailed review of functions provided to manage station mode please refer to the :doc:`Station Class <station-class>` documentation.
+For detailed review of functions provided to manage station mode please refer to the `Station Class <station-class.rst>`__ documentation.

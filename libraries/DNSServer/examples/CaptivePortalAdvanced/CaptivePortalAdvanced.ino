@@ -18,8 +18,13 @@
 */
 
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
-const char *softAP_ssid = "ESP_ap";
-const char *softAP_password = "12345678";
+#ifndef APSSID
+#define APSSID "ESP_ap"
+#define APPSK  "12345678"
+#endif
+
+const char *softAP_ssid = APSSID;
+const char *softAP_password = APPSK;
 
 /* hostname for mDNS. Should work at least on windows. Try http://esp8266.local */
 const char *myHostname = "esp8266";
@@ -53,7 +58,7 @@ void setup() {
   delay(1000);
   Serial.begin(9600);
   Serial.println();
-  Serial.print("Configuring access point...");
+  Serial.println("Configuring access point...");
   /* You can remove the password parameter if you want the AP to be open. */
   WiFi.softAPConfig(apIP, apIP, netMsk);
   WiFi.softAP(softAP_ssid, softAP_password);
@@ -124,6 +129,9 @@ void loop() {
       } else if (s == WL_NO_SSID_AVAIL) {
         WiFi.disconnect();
       }
+    }
+    if (s == WL_CONNECTED) {
+      MDNS.update();
     }
   }
   // Do work:

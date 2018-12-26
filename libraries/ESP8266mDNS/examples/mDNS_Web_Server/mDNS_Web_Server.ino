@@ -20,8 +20,13 @@
 #include <ESP8266mDNS.h>
 #include <WiFiClient.h>
 
-const char* ssid = "............";
-const char* password = "..............";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 // TCP server at port 80 will respond to HTTP requests
 WiFiServer server(80);
@@ -67,6 +72,9 @@ void setup(void) {
 }
 
 void loop(void) {
+
+  MDNS.update();
+
   // Check if a client has connected
   WiFiClient client = server.available();
   if (!client) {

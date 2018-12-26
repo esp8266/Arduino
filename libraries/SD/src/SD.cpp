@@ -350,6 +350,17 @@ boolean SDClass::begin(uint8_t csPin, uint32_t speed) {
          root.openRoot(volume);
 }
 
+//Warning: see comment in SD.h about possible card corruption.
+void SDClass::end(bool endSPI)
+{
+  if(card.errorCode() == 0 && root.isOpen()) {
+    root.close(); //Warning: this calls sync(), see above comment about corruption.
+  }
+  
+  card.end(endSPI);
+}
+
+
 // this little helper is used to traverse paths
 SdFile SDClass::getParentDir(const char *filepath, int *index) {
   // get parent directory

@@ -74,7 +74,7 @@ Debug Level
 All defines for the different levels starts with ``DEBUG_ESP_``
 
 a full list can be found here in the
-`boards.txt <https://github.com/esp8266/Arduino/blob/master/boards.txt#L180>`__
+`boards.txt <https://github.com/esp8266/Arduino/blob/master/tools/boards.txt.py#L1045-L1047>`__
 
 Example for own debug messages
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

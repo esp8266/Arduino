@@ -1,6 +1,14 @@
 Arduino core for ESP8266 WiFi chip
 ===========================================
 
+# Quick links
+
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.5.0-beta2/)
+- [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
+- [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
+
+# Arduino on ESP8266
+
 This project brings support for ESP8266 chip to the Arduino environment. It lets you write sketches using familiar Arduino functions and libraries, and run them directly on ESP8266, no external microcontroller required.
 
 ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, work with SD cards, servos, SPI and I2C peripherals.
@@ -8,7 +16,7 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 # Contents
 - Installing options:
   - [Using Boards Manager](#installing-with-boards-manager)
-  - [Using git version](#using-git-version)
+  - [Using git version](#using-git-version-basic-instructions)
   - [Using PlatformIO](#using-platformio)
   - [Building with make](#building-with-make)
 - [Documentation](#documentation)
@@ -28,13 +36,22 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.1/](https://arduino-esp8266.readthedocs.io/en/2.4.1/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.0-beta2/](https://arduino-esp8266.readthedocs.io/en/2.5.0-beta2/)
 
-### Using git version
+### Using git version (basic instructions)
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
-- Install Arduino 1.8.2 from the [Arduino website](http://www.arduino.cc/en/main/software).
+- Install the current upstream Arduino IDE at the 1.8 level or later. The current version is at the [Arduino website](http://www.arduino.cc/en/main/software).
 - Go to Arduino directory
+  - For Mac OS X, it is `Arduino.app` showing as the Arduino icon.  
+    This location may be your `~/Downloads`, `~/Desktop` or even `/Applications`.
+    ```bash
+    cd <application-directory>/Arduino.app/Contents/Java
+    ```
+  - For Linux, it is ~/arduino by default.
+    ```bash
+    cd ~arduino
+    ```
 - Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
 ```bash
 cd hardware
@@ -96,7 +113,7 @@ Please provide as much context as possible:
 
 For minor fixes of code and documentation, please go ahead and submit a pull request.
 
-Check out the list of issues which are easy to fix — [easy issues for 2.5.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.5.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
+Check out the list of issues which are easy to fix — [easy issues pending](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
 
 Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed by opening an issue first.
 
@@ -119,3 +136,5 @@ ESP8266 core files are licensed under LGPL.
 [umm_malloc](https://github.com/rhempel/umm_malloc) memory management library written by Ralph Hempel is used in this project. It is distributed under MIT license.
 
 [axTLS](http://axtls.sourceforge.net/) library written by Cameron Rich, built from https://github.com/igrr/axtls-8266, is used in this project. It is distributed under [BSD license](https://github.com/igrr/axtls-8266/blob/master/LICENSE).
+
+[BearSSL](https://bearssl.org) library written by Thomas Pornin, built from https://github.com/earlephilhower/bearssl-esp8266, is used in this project.  It is distributed under the [MIT License](https://bearssl.org/#legal-details).
