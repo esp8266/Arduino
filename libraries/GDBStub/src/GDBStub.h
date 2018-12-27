@@ -1,6 +1,6 @@
 #ifndef GDBSTUB_H
 #define GDBSTUB_H
 
-// this header is intentionally left blank
+extern "C" void gdbstub_init();
 
 #endif //GDBSTUB_H
