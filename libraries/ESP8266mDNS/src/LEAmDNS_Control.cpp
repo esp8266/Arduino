@@ -244,9 +244,9 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                     ip_info IPInfo_Remote;
                     if (((IPInfo_Remote.ip.addr = m_pUDPContext->getRemoteAddress())) &&
                         (((wifi_get_ip_info(SOFTAP_IF, &IPInfo_Local)) &&
-                          (ip_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))) ||  // Remote IP in SOFTAP's subnet OR
+                          (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))) ||  // Remote IP in SOFTAP's subnet OR
                          ((wifi_get_ip_info(STATION_IF, &IPInfo_Local)) &&
-                          (ip_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))))) { // Remote IP in STATION's subnet
+                          (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))))) { // Remote IP in STATION's subnet
 
                         DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Legacy query from local host %s!\n"), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str()););
 
