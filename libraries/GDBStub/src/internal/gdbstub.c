@@ -115,7 +115,6 @@ bool gdbstub_has_uart_isr_control() {
 #endif
 }
 
-
 //Small function to feed the hardware watchdog. Needed to stop the ESP from resetting
 //due to a watchdog timeout while reading a command.
 static void ATTR_GDBFN keepWDTalive() {
@@ -138,7 +137,7 @@ static void ATTR_GDBFN keepWDTalive() {
 //of the hex string, as far as the routine has read into it. Bits/4 indicates
 //the max amount of hex chars it gobbles up. Bits can be -1 to eat up as much
 //hex chars as possible.
-static long ATTR_GDBFN gdbGetHexVal(unsigned char **ptr, int bits) {
+static long /*ATTR_GDBFN*/ gdbGetHexVal(unsigned char **ptr, int bits) {
 	int i;
 	int no;
 	unsigned int v = 0;
@@ -176,7 +175,7 @@ static long ATTR_GDBFN gdbGetHexVal(unsigned char **ptr, int bits) {
 }
 
 //Swap an int into the form gdb wants it
-static int ATTR_GDBFN iswap(int i) {
+static int /*ATTR_GDBFN*/ iswap(int i) {
 	return ((i >> 24) & 0xff)
 		| (((i >> 16) & 0xff) << 8)
 		| (((i >> 8) & 0xff) << 16)
@@ -184,14 +183,14 @@ static int ATTR_GDBFN iswap(int i) {
 }
 
 //Read a byte from the ESP8266 memory.
-static unsigned char ATTR_GDBFN readbyte(unsigned int p) {
+static unsigned char /*ATTR_GDBFN*/ readbyte(unsigned int p) {
 	if (p < 0x20000000 || p >= 0x60000000) return -1;
 	int *i = (int*)(p & ~3);
 	return *i >> ((p & 3) * 8);
 }
 
 //Write a byte to the ESP8266 memory.
-static void ATTR_GDBFN writeByte(unsigned int p, unsigned char d) {
+static void /*ATTR_GDBFN*/ writeByte(unsigned int p, unsigned char d) {
 	if (p < 0x20000000 || p >= 0x60000000) return;
 	int *i = (int*)(p & ~3);
 	if ((p & 3) == 0) *i = (*i & 0xffffff00) | (d << 0);
@@ -201,7 +200,7 @@ static void ATTR_GDBFN writeByte(unsigned int p, unsigned char d) {
 }
 
 //Returns 1 if it makes sense to write to addr p
-static int ATTR_GDBFN validWrAddr(int p) {
+static int /*ATTR_GDBFN*/ validWrAddr(int p) {
 	return (p >= 0x3ff00000 && p < 0x40000000)
 		|| (p >= 0x40100000 && p < 0x40140000)
 		|| (p >= 0x60000000 && p < 0x60002000);
@@ -217,7 +216,7 @@ static inline bool ATTR_GDBFN gdbTxFifoIsFull() {
 }
 
 //Receive a char from the uart. Uses polling and feeds the watchdog.
-static inline int ATTR_GDBFN gdbRecvChar() {
+static inline int /*ATTR_GDBFN*/ gdbRecvChar() {
 	while (gdbRxFifoIsEmpty()) {
 		keepWDTalive();
 	}
@@ -225,7 +224,7 @@ static inline int ATTR_GDBFN gdbRecvChar() {
 }
 
 //Send a char to the uart.
-static void ATTR_GDBFN gdbSendChar(char c) {
+static void /*ATTR_GDBFN*/ gdbSendChar(char c) {
 	while (gdbTxFifoIsFull())
 		;
 	WRITE_PERI_REG(UART_FIFO(0), c);
@@ -233,13 +232,13 @@ static void ATTR_GDBFN gdbSendChar(char c) {
 
 
 //Send the start of a packet; reset checksum calculation.
-static void ATTR_GDBFN gdbPacketStart() {
+static void /*ATTR_GDBFN*/ gdbPacketStart() {
 	chsum = 0;
 	gdbSendChar('$');
 }
 
 //Send a char as part of a packet
-static void ATTR_GDBFN gdbPacketChar(char c) {
+static void /*ATTR_GDBFN*/ gdbPacketChar(char c) {
 	if (c == '#' || c == '$' || c == '}' || c == '*') {
 		gdbSendChar('}');
 		chsum += '}';
@@ -250,7 +249,7 @@ static void ATTR_GDBFN gdbPacketChar(char c) {
 }
 
 //Send a hex val as part of a packet. 'bits'/4 dictates the number of hex chars sent.
-static void ATTR_GDBFN gdbPacketHex(int val, int bits) {
+static void /*ATTR_GDBFN*/ gdbPacketHex(int val, int bits) {
 	static const char hexChars[] = "0123456789abcdef";
 	int i;
 	for (i = bits; i > 0; i -= 4) {
@@ -259,16 +258,16 @@ static void ATTR_GDBFN gdbPacketHex(int val, int bits) {
 }
 
 //Send a hex val as part of a packet. 'bits'/4 dictates the number of hex chars sent.
-static void ATTR_GDBFN gdbPacketSwappedHexInt(int val) {
+static void /*ATTR_GDBFN*/ gdbPacketSwappedHexInt(int val) {
 	gdbPacketHex(iswap(val), 32);
 }
 
-static void ATTR_GDBFN gdbPacketXXXXInt() {
+static void /*ATTR_GDBFN*/ gdbPacketXXXXInt() {
 	for (int i=0; i<8; i++) gdbPacketChar('x');
 }
 
 //Finish sending a packet.
-static void ATTR_GDBFN gdbPacketEnd() {
+static void /*ATTR_GDBFN*/ gdbPacketEnd() {
 	gdbSendChar('#');
 	//Ok to use packet version here since hex char can never be an
 	//excape-requiring character
@@ -276,7 +275,7 @@ static void ATTR_GDBFN gdbPacketEnd() {
 }
 
 // Send a complete packet containing str
-static void ATTR_GDBFN gdbSendPacketStr(const char *c) {
+static void /*ATTR_GDBFN*/ gdbSendPacketStr(const char *c) {
 	gdbPacketStart();
 	while (*c != 0) {
 		gdbPacketChar(*c);
@@ -303,13 +302,13 @@ static inline void ATTR_GDBEXTERNFN gdbSendOutputPacketChar(unsigned char c) {
 	gdbPacketEnd();
 }
 
-static long ATTR_GDBFN gdbGetSwappedHexInt(unsigned char **ptr) {
+static long /*ATTR_GDBFN*/ gdbGetSwappedHexInt(unsigned char **ptr) {
 	return iswap(gdbGetHexVal(ptr, 32));
 }
 
 
 //Send the reason execution is stopped to GDB.
-static void ATTR_GDBFN sendReason() {
+static void /*ATTR_GDBFN*/ sendReason() {
 	static const char exceptionSignal[] = {4,31,11,11,2,6,8,0,6,7,0,0,7,7,7,7};
 #if 0
 	char *reason=""; //default
@@ -400,7 +399,7 @@ struct regfile {
 */
 
 //Handle a command as received from GDB.
-static inline int ATTR_GDBFN gdbHandleCommand() {
+static inline int /*ATTR_GDBFN*/ gdbHandleCommand() {
 	//Handle a command
 	int i, j, k;
 	unsigned char *data = cmd + 1;
@@ -537,7 +536,7 @@ static inline int ATTR_GDBFN gdbHandleCommand() {
 //It is not necessary for gdb to be attached for it to be paused
 //For example, during an exception break, the program is
 // paused but gdb might not be attached yet
-static int ATTR_GDBFN gdbReadCommand() {
+static int /*ATTR_GDBFN*/ gdbReadCommand() {
 	unsigned char chsum;
 	unsigned char sentchs[2];
 	size_t p;
@@ -606,7 +605,7 @@ static inline void ATTR_GDBFN setaregval(int reg, unsigned int val) {
 }
 
 //Emulate the l32i/s32i instruction we're stopped at.
-static inline void ATTR_GDBFN emulLdSt() {
+static inline void /*ATTR_GDBFN*/ emulLdSt() {
 	unsigned char i0 = readbyte(gdbstub_savedRegs.pc);
 	unsigned char i1 = readbyte(gdbstub_savedRegs.pc + 1);
 	unsigned char i2;
@@ -639,7 +638,13 @@ static inline void ATTR_GDBFN emulLdSt() {
 
 //We just caught a debug exception and need to handle it. This is called from an assembly
 //routine in gdbstub-entry.S
+static void gdbstub_handle_debug_exception_flash();
 void ATTR_GDBFN gdbstub_handle_debug_exception() {
+	Cache_Read_Enable_New();
+	gdbstub_handle_debug_exception_flash();
+}
+
+static void __attribute__((noinline)) gdbstub_handle_debug_exception_flash() {
 	if (singleStepPs != -1) {
 		//We come here after single-stepping an instruction. Interrupts are disabled
 		//for the single step. Re-enable them here.
@@ -676,7 +681,7 @@ void ATTR_GDBFN gdbstub_handle_debug_exception() {
 #if GDBSTUB_BREAK_ON_EXCEPTION || GDBSTUB_CTRLC_BREAK
 
 #if !GDBSTUB_FREERTOS
-static inline int ATTR_GDBFN gdbReadCommandWithFrame(void* frame) {
+static inline int /*ATTR_GDBFN*/ gdbReadCommandWithFrame(void* frame) {
 	//Copy registers the Xtensa HAL did save to gdbstub_savedRegs
 	os_memcpy(&gdbstub_savedRegs, frame, 5 * 4);
 	os_memcpy(&gdbstub_savedRegs.a[2], ((uint32_t*)frame) + 5, 14 * 4);
@@ -720,9 +725,15 @@ static void ATTR_GDBINIT install_exceptions() {
 }
 #else
 //Non-OS exception handler. Gets called by the Xtensa HAL.
+static void gdbstub_exception_handler_flash(struct XTensa_exception_frame_s *frame);
 static void ATTR_GDBFN gdbstub_exception_handler(struct XTensa_exception_frame_s *frame) {
 	//Save the extra registers the Xtensa HAL doesn't save
 	gdbstub_save_extra_sfrs_for_exception();
+	Cache_Read_Enable_New();
+	gdbstub_exception_handler_flash(frame);
+}
+
+static void __attribute__((noinline)) gdbstub_exception_handler_flash(struct XTensa_exception_frame_s *frame) {
 	gdbstub_savedRegs.reason |= 0x80; //mark as an exception reason
 	while (gdbReadCommandWithFrame((void*)frame) != ST_CONT)
 		;
