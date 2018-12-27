@@ -30,6 +30,7 @@
 */
 
 #include <Arduino.h>
+#include <PolledTimeout.h>
 
 #include <unistd.h> // write
 
@@ -62,6 +63,22 @@ void HardwareSerial::flush ()
 {
 	//XXXTODO
 	fflush(stdout);
+}
+
+size_t HardwareSerial::readBytes(char* buffer, size_t size)
+{
+    size_t got = 0;
+
+    while (got < size)
+    {
+        esp8266::polledTimeout::oneShot timeOut(_timeout);
+        size_t avail;
+        while ((avail = available()) == 0 && !timeOut);
+        if (avail == 0)
+            break;
+        got += read(buffer + got, std::min(size - got, avail));
+    }
+    return got;
 }
 
 // uart.c
