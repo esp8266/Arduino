@@ -263,6 +263,10 @@ static void ATTR_GDBFN gdbPacketSwappedHexInt(int val) {
 	gdbPacketHex(iswap(val), 32);
 }
 
+static void ATTR_GDBFN gdbPacketXXXXInt() {
+	for (int i=0; i<8; i++) gdbPacketChar('x');
+}
+
 //Finish sending a packet.
 static void ATTR_GDBFN gdbPacketEnd() {
 	gdbSendChar('#');
@@ -400,26 +404,30 @@ static inline int ATTR_GDBFN gdbHandleCommand() {
 	//Handle a command
 	int i, j, k;
 	unsigned char *data = cmd + 1;
-	if (cmd[0] == 'g') {		//send all registers to gdb
-		gdbPacketStart();
-		for (i = 0; i < 16; i++)
-			gdbPacketSwappedHexInt(gdbstub_savedRegs.a[i]);
-		gdbPacketSwappedHexInt(gdbstub_savedRegs.pc);
-		gdbPacketSwappedHexInt(gdbstub_savedRegs.sar);
-		gdbPacketSwappedHexInt(gdbstub_savedRegs.litbase);
-		gdbPacketSwappedHexInt(gdbstub_savedRegs.sr176);
-		gdbPacketHex(0, 32);
-		gdbPacketSwappedHexInt(gdbstub_savedRegs.ps);
-		gdbPacketEnd();
-	} else if (cmd[0] == 'G') {	//receive content for all registers from gdb
-		for (i = 0; i < 16; i++)
-			gdbstub_savedRegs.a[i] = gdbGetSwappedHexInt(&data);
-		gdbstub_savedRegs.pc = gdbGetSwappedHexInt(&data);
-		gdbstub_savedRegs.sar = gdbGetSwappedHexInt(&data);
-		gdbstub_savedRegs.litbase = gdbGetSwappedHexInt(&data);
-		gdbstub_savedRegs.sr176 = gdbGetSwappedHexInt(&data);
-		gdbGetHexVal(&data, 32);
-		gdbstub_savedRegs.ps = gdbGetSwappedHexInt(&data);
+        if (cmd[0]=='g') {              //send all registers to gdb
+                gdbPacketStart();
+                gdbPacketSwappedHexInt(gdbstub_savedRegs.pc);
+                for (int i=1; i<=35; i++) gdbPacketXXXXInt();
+                gdbPacketSwappedHexInt(gdbstub_savedRegs.sar);
+                gdbPacketSwappedHexInt(gdbstub_savedRegs.litbase);
+                for (int i=38; i<=39; i++) gdbPacketXXXXInt();
+                gdbPacketSwappedHexInt(gdbstub_savedRegs.sr176);
+                for (int i=41; i<=41; i++) gdbPacketXXXXInt();
+                gdbPacketSwappedHexInt(gdbstub_savedRegs.ps);
+                for (int i=43; i<=96; i++) gdbPacketXXXXInt();
+                for (i=0; i<16; i++) gdbPacketSwappedHexInt(gdbstub_savedRegs.a[i]);
+                gdbPacketEnd();
+        } else if (cmd[0]=='G') {       //receive content for all registers from gdb
+                gdbstub_savedRegs.pc=gdbGetSwappedHexInt(&data);
+                for (int i=1; i<=35; i++) gdbGetHexVal(&data, 32);
+                gdbstub_savedRegs.sar=gdbGetSwappedHexInt(&data);
+                gdbstub_savedRegs.litbase=gdbGetSwappedHexInt(&data);
+                for (int i=38; i<=39; i++) gdbGetHexVal(&data, 32);
+                gdbstub_savedRegs.sr176=gdbGetSwappedHexInt(&data);
+                for (int i=41; i<=41; i++) gdbGetHexVal(&data, 32);
+                gdbstub_savedRegs.ps=gdbGetSwappedHexInt(&data);
+                for (int i=43; i<=96; i++) gdbGetHexVal(&data, 32);
+                for (i=0; i<16; i++) gdbstub_savedRegs.a[i]=gdbGetSwappedHexInt(&data);
 		gdbSendPacketOK();
 	} else if ((cmd[0] | 0x20) == 'm') {	//read/write memory to gdb
 		i = gdbGetHexVal(&data, -1); //addr
