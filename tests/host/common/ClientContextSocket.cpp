@@ -135,7 +135,8 @@ size_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 	}
 	if (ret)
 	{
-		ret = ::write(sock, data, size);
+		//ret = ::write(sock, data, size);
+		ret = ::send(sock, data, size, MSG_NOSIGNAL);
 		if (ret == -1)
 		{
 			fprintf(stderr, MOCK "ClientContext::read: write(%d): %s\n", sock, strerror(errno));

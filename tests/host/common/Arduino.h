@@ -218,6 +218,7 @@ extern "C" {
     void loop(void);
     
     void yield(void);
+    void esp_yield(void);
     void optimistic_yield(uint32_t interval_us);
     
 #define digitalPinToPort(pin)       (0)

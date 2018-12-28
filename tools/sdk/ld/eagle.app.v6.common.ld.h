@@ -111,7 +111,7 @@ SECTIONS
     *libgcc.a:_umoddi3.o(.literal .text)
     *libgcc.a:_udivdi3.o(.literal .text)
     *libstdc++.a:( .literal .text .literal.* .text.*)
-    *libstdc++-nox.a:( .literal .text .literal.* .text.*)
+    *libstdc++-exc.a:( .literal .text .literal.* .text.*)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)
     *liblwip_gcc.a:(.literal .text .literal.* .text.*)
     *liblwip_src.a:(.literal .text .literal.* .text.*)
