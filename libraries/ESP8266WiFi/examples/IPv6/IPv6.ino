@@ -54,8 +54,6 @@ void status(Print& out) {
   out.println(F("------------------------------"));
   out.println(ESP.getFullVersion());
 
-  dns_setserver(DNS_MAX_SERVERS - 1, IPAddress(8, 8, 8, 8));
-
   for (int i = 0; i < DNS_MAX_SERVERS; i++) {
     IPAddress dns = WiFi.dnsIP(i);
     if (dns.isSet()) {
