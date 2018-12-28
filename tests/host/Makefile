@@ -237,6 +237,7 @@ ARDUINO_LIBS := \
 		ESP8266mDNS/src/LEAmDNS_Helpers.cpp \
 		ESP8266mDNS/src/LEAmDNS_Structs.cpp \
 		ESP8266mDNS/src/LEAmDNS_Transfer.cpp \
+		ESP8266mDNS/src/ESP8266mDNS.cpp \
 		ArduinoOTA/ArduinoOTA.cpp \
 		DNSServer/src/DNSServer.cpp \
 		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
