@@ -44,6 +44,14 @@ jobs:
       script: $TRAVIS_BUILD_DIR/tests/common.sh
       env:
         - BUILD_TYPE=debug_odd
+    - name: "Build IPv6 (1)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=build6_even
+    - name: "Build IPv6 (2)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=build6_odd
     - name: "Platformio (1)"
       script: $TRAVIS_BUILD_DIR/tests/common.sh
       env:
