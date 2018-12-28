@@ -203,7 +203,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                 u8HostOrServiceReplies |= (pService->m_u8ReplyMask |= u8ReplyMaskForQuestion);
                 DEBUG_EX_INFO(if (u8ReplyMaskForQuestion) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Service reply needed for (%s.%s.%s): %u (%s)\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, u8ReplyMaskForQuestion, IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str()); } );
                 /*if ((u8ReplyMaskForQuestion) &&
-                    (0 == os_strcmp("hap", pService->m_pcService))) {
+                    (0 == strcmp("hap", pService->m_pcService))) {
                     DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Service reply needed for (%s.%s.%s): %u (%s)\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, u8ReplyMaskForQuestion, IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str());
                 }*/
 
@@ -244,9 +244,9 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                     ip_info IPInfo_Remote;
                     if (((IPInfo_Remote.ip.addr = m_pUDPContext->getRemoteAddress())) &&
                         (((wifi_get_ip_info(SOFTAP_IF, &IPInfo_Local)) &&
-                          (ip_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))) ||  // Remote IP in SOFTAP's subnet OR
+                          (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))) ||  // Remote IP in SOFTAP's subnet OR
                          ((wifi_get_ip_info(STATION_IF, &IPInfo_Local)) &&
-                          (ip_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))))) { // Remote IP in STATION's subnet
+                          (ip4_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))))) { // Remote IP in STATION's subnet
 
                         DEBUG_EX_RX(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Legacy query from local host %s!\n"), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str()););
 
@@ -386,7 +386,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                     if ((u8ServiceMatchMask) &&                                 // The RR in the known answer matches an RR we are planning to send, AND
                         ((MDNS_SERVICE_TTL / 2) <= pKnownRRAnswer->m_u32TTL)) { // The TTL of the known answer is longer than half of the new service TTL (4500s)
 
-                        /*if ((0 == os_strcmp("hap", pService->m_pcService))) {
+                        /*if ((0 == strcmp("hap", pService->m_pcService))) {
                             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Known answer for (%s.%s.%s): %u (%s) %u\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, pKnownRRAnswer->answerType(), IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str(), pKnownRRAnswer->m_u32TTL);
                         }*/
                         
@@ -484,7 +484,7 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
             u8ReplyNeeded |= pService->m_u8ReplyMask;
 
             if ((u8ReplyNeeded) &&
-                (0 == os_strcmp("hap", pService->m_pcService))) {
+                (0 == strcmp("hap", pService->m_pcService))) {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Sending service reply for (%s.%s.%s): %u (%s)\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, u8ReplyNeeded, IPAddress(m_pUDPContext->getRemoteAddress()).toString().c_str()););
             }
         }
