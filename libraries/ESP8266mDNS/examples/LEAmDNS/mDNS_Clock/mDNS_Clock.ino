@@ -191,13 +191,13 @@ bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
         }
       }
     } else {
-        // Change hostname, use '-' as divider between base name and index
-        if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-          p_pMDNSResponder->setHostname(pcHostDomain);
-        } else {
-          Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-        }
-      }
+       // Change hostname, use '-' as divider between base name and index
+       if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+         p_pMDNSResponder->setHostname(pcHostDomain);
+       } else {
+         Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
+       }
+     }
   }
   return true;
 }
