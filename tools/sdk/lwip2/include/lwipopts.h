@@ -3555,6 +3555,17 @@
 #define SNTP_MAX_SERVERS                3
 #endif
 
+// turn off random delay before sntp request
+// when SNTP_STARTUP_DELAY is not defined,
+// LWIP_RAND is used to set a delay
+// from sntp_opts.h:
+/** According to the RFC, this shall be a random delay
+ * between 1 and 5 minutes (in milliseconds) to prevent load peaks.
+ * This can be defined to a random generation function,
+ * which must return the delay in milliseconds as u32_t.
+ */
+#define SNTP_STARTUP_DELAY              0
+
 /*
    --------------------------------------------------
    ------------------- LOCAL FIXES ------------------
