@@ -169,7 +169,7 @@ extern const ip_addr_t ip_addr_any_type;
   ip6_addr_set_zero(ip_2_ip6(ipaddr)); IP_SET_TYPE(ipaddr, IPADDR_TYPE_V4); }while(0)
 /** @ingroup ip6addr */
 #define ip_addr_set_zero_ip6(ipaddr)     do{ \
-  ip6_addr_set_zero(ip_2_ip6(ipaddr)); IP_SET_TYPE(ipaddr, IPADDR_TYPE_V6); }while(0)
+  ip6_addr_set_zero(ip_2_ip6(ipaddr)); IP_SET_TYPE_VAL(*ipaddr, IPADDR_TYPE_V6); }while(0)
 /** @ingroup ipaddr */
 #define ip_addr_set_any(is_ipv6, ipaddr)      do{if(is_ipv6){ \
   ip6_addr_set_any(ip_2_ip6(ipaddr)); IP_SET_TYPE(ipaddr, IPADDR_TYPE_V6); }else{ \
