@@ -257,9 +257,9 @@ Now, connect to the running ESP8266:
 
 Don't worry that GDB doesn't know what is at our present address, we broke
 into the code at a random spot and we could be in an interrupt, in the
-ROM, or elsewhere.  The important bit is that we're not connected and
+ROM, or elsewhere.  The important bit is that we're now connected and
 two things will now happen: we can debug, and the app's regular serial
-output will be displayed.
+output will be displayed on the GDB console..
 
 Continue the running app to see the serial output:
 

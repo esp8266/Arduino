@@ -7,7 +7,7 @@
  * License: ESPRESSIF MIT License
  *******************************************************************************/
 
-#include "gdbstub.h"
+#include <GDBStub.h>
 #include <stddef.h>
 #include "ets_sys.h"
 #include "eagle_soc.h"
