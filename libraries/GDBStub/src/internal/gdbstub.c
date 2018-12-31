@@ -9,6 +9,7 @@
 
 #include <GDBStub.h>
 #include <stddef.h>
+#include <Arduino.h>
 #include "ets_sys.h"
 #include "eagle_soc.h"
 #include "c_types.h"
@@ -781,8 +782,9 @@ static void ATTR_GDBINIT configure_uart() {}
 static void ATTR_GDBINIT configure_uart() {
 
 #ifdef ARDUINO
-    uart0_enable_tx_pin(1);
-    uart0_enable_rx_pin(3);
+	// Set the UART input/output pins to TX=1, RX=3
+	pinMode(3, SPECIAL);
+	pinMode(1, FUNCTION_0);
 #endif
 
 	WRITE_PERI_REG(UART_CONF0(0), 0b00011100); //8N1
@@ -875,7 +877,7 @@ static void ATTR_GDBINIT install_uart_hdlr() {
 	configure_uart();
 
 	WRITE_PERI_REG(UART_CONF1(0),
-		((100 & UART_RXFIFO_FULL_THRHD) << UART_RXFIFO_FULL_THRHD_S) |
+		((16 & UART_RXFIFO_FULL_THRHD) << UART_RXFIFO_FULL_THRHD_S) |
 		((0x02 & UART_RX_TOUT_THRHD) << UART_RX_TOUT_THRHD_S) |
 		UART_RX_TOUT_EN);
 
