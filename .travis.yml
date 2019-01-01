@@ -20,49 +20,50 @@ stages:
 jobs:
   include:
     # Build stage. To save time, run all kinds of builds and tests in parallel.
-    # TODO: since we can now call different script for each job,
-    # split the do-it-all common.sh into separate scripts responsible
-    # for different types of jobs below:
+
     - name: "Platformio (1)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
       env:
-        - BUILD_TYPE=platformio_even
+        - BUILD_PARITY=even
     - name: "Platformio (2)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
       env:
-        - BUILD_TYPE=platformio_odd
+        - BUILD_PARITY=odd
+
     - name: "Build (1)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
       env:
-        - BUILD_TYPE=build_even
+        - BUILD_PARITY=even
     - name: "Build (2)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
       env:
-        - BUILD_TYPE=build_odd
+        - BUILD_PARITY=odd
+
     - name: "Debug (1)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: $TRAVIS_BUILD_DIR/tests/debug.sh
       env:
-        - BUILD_TYPE=debug_even
+        - BUILD_PARITY=even
     - name: "Debug (2)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: $TRAVIS_BUILD_DIR/tests/debug.sh
       env:
-        - BUILD_TYPE=debug_odd
+        - BUILD_PARITY=odd
+
     - name: "Build IPv6 (1)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: $TRAVIS_BUILD_DIR/tests/build6.sh
       env:
-        - BUILD_TYPE=build6_even
+        - BUILD_PARITY=even
     - name: "Build IPv6 (2)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: $TRAVIS_BUILD_DIR/tests/build6.sh
       env:
-        - BUILD_TYPE=build6_odd
+        - BUILD_PARITY=odd
 
     - name: "Host tests"
       stage: build
