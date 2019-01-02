@@ -46,7 +46,8 @@ void DNSServer::stop()
 void DNSServer::downcaseAndRemoveWwwPrefix(String &domainName)
 {
   domainName.toLowerCase();
-  domainName.replace("www.", "");
+  if (domainName.startsWith("www."))
+      domainName.remove(0, 4);
 }
 
 void DNSServer::processNextRequest()
