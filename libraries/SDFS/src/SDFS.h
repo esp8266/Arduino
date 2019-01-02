@@ -41,6 +41,18 @@ namespace sdfs {
 
 class SDFSFileImpl;
 class SDFSDirImpl;
+class SDFSConfig : public FSConfig
+{
+public:
+    SDFSConfig(uint8_t cs, SPISettings spi) {
+        _autoFormat = false;
+        _cs = cs;
+        _spi = spi;
+    }
+
+    uint8_t _cs;
+    SPISettings _spi;
+};
 
 class SDFSImpl : public FSImpl
 {
@@ -86,14 +98,20 @@ public:
         return _mounted ?_fs.rmdir(path) : false;
     }
 
-    bool begin() override {
+    bool begin(const FSConfig *cfg) override {
         if (_mounted) {
             end();
         }
-        if (_csPin >= 0) {
+        if (!cfg) {
+            return false; // You need to tell me the CS and SPI setup or I can't do anything!
+        }
+        const SDFSConfig *myCfg = static_cast<const SDFSConfig *>(cfg);
+        _csPin = myCfg->_cs;
+        _spiSettings = myCfg->_spi;
+        _mounted = _fs.begin(_csPin, _spiSettings);
+        if (!_mounted && myCfg->_autoFormat) {
+            format();
             _mounted = _fs.begin(_csPin, _spiSettings);
-        } else {
-            _mounted = _fs.begin();
         }
         return _mounted;
     }
@@ -347,7 +365,7 @@ protected:
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SDFS)
 extern FS SDFS;
-extern void setSDFSConfig(int8_t csPin, SPISettings spiConfig = SD_SCK_MHZ(10));
+using sdfs::SDFSConfig;
 #endif
 
 #endif // SDFS.h

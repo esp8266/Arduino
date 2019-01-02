@@ -119,12 +119,22 @@ struct FSInfo {
     size_t maxPathLength;
 };
 
+class FSConfig
+{
+public:
+    FSConfig(bool autoFormat = true) {
+        _autoFormat = autoFormat;
+    }
+
+    bool _autoFormat;
+};
+
 class FS
 {
 public:
     FS(FSImplPtr impl) : _impl(impl) { }
 
-    bool begin();
+    bool begin(const FSConfig *cfg = nullptr);
     void end();
     
     bool format();
@@ -166,6 +176,7 @@ using fs::SeekSet;
 using fs::SeekCur;
 using fs::SeekEnd;
 using fs::FSInfo;
+using fs::FSConfig;
 #endif //FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)

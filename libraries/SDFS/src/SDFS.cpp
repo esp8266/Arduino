@@ -34,11 +34,6 @@ using namespace fs;
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SDFS)
 static sdfs::SDFSImpl *_SDFSImpl = new sdfs::SDFSImpl();
 FS SDFS = FS(FSImplPtr(_SDFSImpl));
-
-// Global configuration functions
-void setSDFSConfig(int8_t csPin, SPISettings spiConfig) {
-    _SDFSImpl->setSDFSIOConfig(csPin, spiConfig);
-}
 #endif
 
 namespace sdfs {

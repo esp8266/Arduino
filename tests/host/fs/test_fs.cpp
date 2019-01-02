@@ -191,10 +191,11 @@ TEST_CASE("#1819 Can list all files with openDir(\"\")", "[fs][bugreport]")
 TEST_CASE("SDFS", "[sdfs]")
 {
     SDFS_MOCK_DECLARE();
-    setSDFSConfig(0);
     SDFS.end();
+    auto cfg = SDFSConfig(0, SD_SCK_MHZ(1));
+    SDFS.begin(&cfg);
     REQUIRE(SDFS.format());
-    REQUIRE(SDFS.begin());
+    REQUIRE(SDFS.begin(&cfg));
     REQUIRE(SDFS.mkdir("/happy/face"));
     REQUIRE(SDFS.mkdir("/happy/nose"));
     REQUIRE(SDFS.rmdir("/happy/face"));
@@ -207,7 +208,9 @@ TEST_CASE("SDFS", "[sdfs]")
 TEST_CASE("Files.ino example", "[sd]")
 {
     SDFS_MOCK_DECLARE();
-    setSDFSConfig(0);
+    SDFS.end();
+    auto cfg = SDFSConfig(0, SD_SCK_MHZ(1));
+    SDFS.begin(&cfg);
     SDFS.end();
     REQUIRE(SDFS.format());
     REQUIRE(SD.begin(4));
@@ -243,7 +246,9 @@ static String readFileSD(const char* name)
 TEST_CASE("Listfiles.ino example", "[sd]")
 {
     SDFS_MOCK_DECLARE();
-    setSDFSConfig(0);
+    SDFS.end();
+    auto cfg = SDFSConfig(0, SD_SCK_MHZ(1));
+    SDFS.begin(&cfg);
     SDFS.end();
     REQUIRE(SDFS.format());
     REQUIRE(SD.begin(4));

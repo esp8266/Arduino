@@ -136,7 +136,7 @@ public:
         return false;
     }
 
-    bool begin() override
+    bool begin(const FSConfig *cfg) override
     {
 #if defined(ARDUINO) && !defined(CORE_MOCK)
         if (&_SPIFFS_end <= &_SPIFFS_start)
@@ -152,12 +152,16 @@ public:
         if (_tryMount()) {
             return true;
         }
-        auto rc = SPIFFS_format(&_fs);
-        if (rc != SPIFFS_OK) {
-            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+	if (!cfg || cfg->_autoFormat) {
+            auto rc = SPIFFS_format(&_fs);
+            if (rc != SPIFFS_OK) {
+                DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+                return false;
+            }
+            return _tryMount();
+        } else {
             return false;
         }
-        return _tryMount();
     }
 
     void end() override

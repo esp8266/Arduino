@@ -69,7 +69,7 @@ public:
 class FSImpl {
 public:
     virtual ~FSImpl () { }
-    virtual bool begin() = 0;
+    virtual bool begin(const FSConfig *cfg) = 0;
     virtual void end() = 0;
     virtual bool format() = 0;
     virtual bool info(FSInfo& info) = 0;

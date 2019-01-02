@@ -134,7 +134,17 @@ begin
 
 This method mounts SPIFFS file system. It must be called before any
 other FS APIs are used. Returns *true* if file system was mounted
-successfully, false otherwise.
+successfully, false otherwise.  With no options it will format SPIFFS
+if it is unable to mount it on the first try.
+
+.. code:: cpp
+
+    auto cfg = FSConfig(false);
+    SPIFFS.begin(&cfg);
+
+If a ``FSConfig`` object is passed in, with the autoFormat parameter
+set to ``false``, then if the filesystem is unable to be mounted it
+will return an error code instead of trying to format it.
 
 end
 ~~~
