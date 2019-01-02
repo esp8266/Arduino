@@ -307,6 +307,17 @@ static void ICACHE_RAM_ATTR uart_isr_handle_data(void* arg, uint8_t data)
     }
     rx_buffer->buffer[rx_buffer->wpos] = data;
     rx_buffer->wpos = nextPos;
+
+    // Check the UART flags and note hardware overflow/etc.
+    uint32_t usis = USIS(uart->uart_nr);
+
+    if(usis & (1 << UIOF))
+        uart->rx_overrun = true;
+
+    if (usis & ((1 << UIFR) | (1 << UIPE) | (1 << UITO)))
+        uart->rx_error = true;
+
+    USIC(uart->uart_nr) = usis;
 }
 
 size_t 
@@ -362,7 +373,7 @@ uart_isr(void * arg)
     if(usis & (1 << UIFF))
         uart_rx_copy_fifo_to_buffer_unsafe(uart);
 
-    if((usis & (1 << UIOF)) && !uart->rx_overrun)
+    if(usis & (1 << UIOF))
     {
         uart->rx_overrun = true;
         //os_printf_plus(overrun_str);
