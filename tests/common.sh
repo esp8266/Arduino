@@ -65,7 +65,7 @@ function build_sketches()
             tail -2 $build_dir/build.options.json >> $build_dir/../build.options.json
         fi
 
-        rm -rf $build_dir/sketch
+        rm -rf $build_dir/sketch $build_dir/*.bin $build_dir/*.map $build_dir/*.elf
 
         if [ -e $cache_dir/core/*.a ]; then
             mv $build_dir/../build.options.json $build_dir/build.options.json
@@ -101,7 +101,6 @@ function build_sketches()
                 cat build.log
             fi
         fi
-        cp build.log /tmp/build.log.1
         rm build.log
         print_size_info $build_dir/*.elf >>size.log
     done
