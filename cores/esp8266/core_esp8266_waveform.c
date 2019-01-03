@@ -38,6 +38,7 @@
 */
 
 #include <Arduino.h>
+#include "ets_sys.h"
 #include "core_esp8266_waveform.h"
 
 // Need speed, not size, here
@@ -130,15 +131,15 @@ static uint32_t lastCycleCount = 0; // Last ESP cycle counter on running the int
 
 static void initTimer() {
   timer1_disable();
-  timer1_isr_init();
-  timer1_attachInterrupt(timer1Interrupt);
+  ETS_FRC_TIMER1_INTR_ATTACH(NULL, NULL);
+  ETS_FRC_TIMER1_NMI_INTR_ATTACH(timer1Interrupt);
   lastCycleCount = GetCycleCount();
   timer1_enable(TIM_DIV1, TIM_EDGE, TIM_SINGLE);
   timerRunning = true;
 }
 
 static void ICACHE_RAM_ATTR deinitTimer() {
-  timer1_attachInterrupt(NULL);
+  ETS_FRC_TIMER1_NMI_INTR_ATTACH(NULL);
   timer1_disable();
   timer1_isr_init();
   timerRunning = false;
