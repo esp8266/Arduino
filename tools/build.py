@@ -52,6 +52,7 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
             'FlashMode={flash_mode},' \
             'baud=921600,' \
             'eesz={flash_size},' \
+            'ip={lwIP},' \
             'ResetMethod=nodemcu'.format(**vars(args))
     if args.debug_port and args.debug_level:
         cmd += 'dbg={debug_port},lvl={debug_level}'.format(**vars(args))
@@ -88,6 +89,8 @@ def parse_args():
                         choices=[80, 160], type=int)
     parser.add_argument('-m', '--flash_mode', help='Flash mode', default='qio',
                         choices=['dio', 'qio'])
+    parser.add_argument('-n', '--lwIP', help='lwIP version', default='lm2f',
+                        choices=['lm2f', 'hb2f', 'lm6f', 'hb6f', 'hb1'])
     parser.add_argument('-w', '--warnings', help='Compilation warnings level',
                         default='none', choices=['none', 'all', 'more'])
     parser.add_argument('-o', '--output_binary', help='File name for output binary')
