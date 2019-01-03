@@ -44,20 +44,50 @@ class SDFSDirImpl;
 class SDFSConfig : public FSConfig
 {
 public:
-    SDFSConfig(uint8_t cs, SPISettings spi) {
+    SDFSConfig() {
+        _type = SDFSConfig::fsid::FSId;
         _autoFormat = false;
-        _cs = cs;
-        _spi = spi;
+        _csPin = 4;
+        _spiSettings = SD_SCK_MHZ(10);
+	_part = 0;
+    }
+    SDFSConfig(uint8_t csPin, SPISettings spi) {
+        _type = SDFSConfig::fsid::FSId;
+        _autoFormat = false;
+        _csPin = csPin;
+        _spiSettings = spi;
+	_part = 0;
     }
 
-    uint8_t _cs;
-    SPISettings _spi;
+    enum fsid { FSId = 0x53444653 };
+
+    SDFSConfig setAutoFormat(bool val = true) {
+        _autoFormat = val;
+        return *this;
+    }
+    SDFSConfig setCSPin(uint8_t pin) {
+        _csPin = pin;
+        return *this;
+    }
+    SDFSConfig setSPI(SPISettings spi) {
+        _spiSettings = spi;
+        return *this;
+    }
+    SDFSConfig setPart(uint8_t part) {
+        _part = part;
+        return *this;
+    }
+
+    // Inherit _type and _autoFormat
+    uint8_t     _csPin;
+    uint8_t     _part;
+    SPISettings _spiSettings;
 };
 
 class SDFSImpl : public FSImpl
 {
 public:
-    SDFSImpl() : _part(0), _csPin(-1), _spiSettings(SPI_FULL_SPEED), _mounted(false)
+    SDFSImpl() : _mounted(false)
     {
     }
 
@@ -98,20 +128,23 @@ public:
         return _mounted ?_fs.rmdir(path) : false;
     }
 
-    bool begin(const FSConfig *cfg) override {
+    bool setConfig(const FSConfig *cfg) override
+    {
+        if ((cfg->_type != SDFSConfig::fsid::FSId) || _mounted) {
+            return false;
+        }
+	_cfg = *static_cast<const SDFSConfig *>(cfg);
+        return true;
+    }
+
+    bool begin() override {
         if (_mounted) {
             end();
         }
-        if (!cfg) {
-            return false; // You need to tell me the CS and SPI setup or I can't do anything!
-        }
-        const SDFSConfig *myCfg = static_cast<const SDFSConfig *>(cfg);
-        _csPin = myCfg->_cs;
-        _spiSettings = myCfg->_spi;
-        _mounted = _fs.begin(_csPin, _spiSettings);
-        if (!_mounted && myCfg->_autoFormat) {
+        _mounted = _fs.begin(_cfg._csPin, _cfg._spiSettings);
+        if (!_mounted && _cfg._autoFormat) {
             format();
-            _mounted = _fs.begin(_csPin, _spiSettings);
+            _mounted = _fs.begin(_cfg._csPin, _cfg._spiSettings);
         }
         return _mounted;
     }
@@ -122,12 +155,6 @@ public:
     }
 
     bool format() override;
-
-    // SDFS-only configuration calls
-    void setSDFSIOConfig(int8_t csPin, SPISettings spiConfig) {
-        _csPin = csPin;
-        _spiSettings = spiConfig;
-    }
 
 protected:
     friend class SDFileImpl;
@@ -159,9 +186,7 @@ protected:
     }
 
     sdfat::SdFat _fs;
-    uint8_t      _part;
-    int8_t       _csPin;
-    SPISettings  _spiSettings;
+    SDFSConfig   _cfg;
     bool         _mounted;
 };
 

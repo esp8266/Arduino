@@ -123,10 +123,28 @@ class FSConfig
 {
 public:
     FSConfig(bool autoFormat = true) {
-        _autoFormat = autoFormat;
+        _type = FSConfig::fsid::FSId;
+	_autoFormat = autoFormat;
     }
 
-    bool _autoFormat;
+    enum fsid { FSId = 0x00000000 };
+    FSConfig setAutoFormat(bool val = true) {
+        _autoFormat = val;
+        return *this;
+    }
+
+    uint32_t _type;
+    bool     _autoFormat;
+};
+
+class SPIFFSConfig : public FSConfig
+{
+public:
+    SPIFFSConfig(bool autoFormat = true) {
+        _type = SPIFFSConfig::fsid::FSId;
+	_autoFormat = autoFormat;
+    }
+    enum fsid { FSId = 0x53504946 };
 };
 
 class FS
@@ -134,7 +152,9 @@ class FS
 public:
     FS(FSImplPtr impl) : _impl(impl) { }
 
-    bool begin(const FSConfig *cfg = nullptr);
+    bool setConfig(const FSConfig *cfg);
+
+    bool begin();
     void end();
     
     bool format();

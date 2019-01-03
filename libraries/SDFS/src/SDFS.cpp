@@ -146,7 +146,7 @@ bool SDFSImpl::format() {
         return false;
     }
     SDFSFormatter formatter;
-    bool ret = formatter.format(&_fs, _csPin, _spiSettings);
+    bool ret = formatter.format(&_fs, _cfg._csPin, _cfg._spiSettings);
     return ret;
 }
 

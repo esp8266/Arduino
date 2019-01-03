@@ -51,10 +51,41 @@ static std::set<String> listDir (const char* path)
     return result;
 }
 
+TEST_CASE("SPIFFS checks the config object passed in", "[fs]")
+{
+    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    FSConfig f;
+    SPIFFSConfig s;
+    SDFSConfig d;
+
+    REQUIRE_FALSE(SPIFFS.setConfig(&f));
+    REQUIRE(SPIFFS.setConfig(&s));
+    REQUIRE_FALSE(SPIFFS.setConfig(&d));
+}
+
+TEST_CASE("SDFS checks the config object passed in", "[fs]")
+{
+    SDFS_MOCK_DECLARE();
+    FSConfig f;
+    SPIFFSConfig s;
+    SDFSConfig d;
+
+    REQUIRE_FALSE(SDFS.setConfig(&f));
+    REQUIRE_FALSE(SDFS.setConfig(&s));
+    REQUIRE(SDFS.setConfig(&d));
+}
+
 TEST_CASE("FS can begin","[fs]")
 {
     SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFSConfig cfg;
+    cfg.setAutoFormat(false);
+    SPIFFS.setConfig(&cfg);
+    REQUIRE_FALSE(SPIFFS.begin());
+    cfg.setAutoFormat(true);
+    SPIFFS.setConfig(&cfg);
     REQUIRE(SPIFFS.begin());
+    REQUIRE_FALSE(SPIFFS.setConfig(&cfg)); // Can't change config of mounted FS
 }
 
 TEST_CASE("FS can't begin with zero size","[fs]")
@@ -191,11 +222,11 @@ TEST_CASE("#1819 Can list all files with openDir(\"\")", "[fs][bugreport]")
 TEST_CASE("SDFS", "[sdfs]")
 {
     SDFS_MOCK_DECLARE();
-    SDFS.end();
     auto cfg = SDFSConfig(0, SD_SCK_MHZ(1));
-    SDFS.begin(&cfg);
+    SDFS.setConfig(&cfg);
     REQUIRE(SDFS.format());
-    REQUIRE(SDFS.begin(&cfg));
+    REQUIRE(SDFS.begin());
+    REQUIRE_FALSE(SDFS.setConfig(&cfg)); // Can't change config of mounted fs
     REQUIRE(SDFS.mkdir("/happy/face"));
     REQUIRE(SDFS.mkdir("/happy/nose"));
     REQUIRE(SDFS.rmdir("/happy/face"));
@@ -210,8 +241,7 @@ TEST_CASE("Files.ino example", "[sd]")
     SDFS_MOCK_DECLARE();
     SDFS.end();
     auto cfg = SDFSConfig(0, SD_SCK_MHZ(1));
-    SDFS.begin(&cfg);
-    SDFS.end();
+    SDFS.setConfig(&cfg);
     REQUIRE(SDFS.format());
     REQUIRE(SD.begin(4));
     REQUIRE_FALSE(SD.exists("example.txt"));
@@ -246,10 +276,8 @@ static String readFileSD(const char* name)
 TEST_CASE("Listfiles.ino example", "[sd]")
 {
     SDFS_MOCK_DECLARE();
-    SDFS.end();
     auto cfg = SDFSConfig(0, SD_SCK_MHZ(1));
-    SDFS.begin(&cfg);
-    SDFS.end();
+    SDFS.setConfig(&cfg);
     REQUIRE(SDFS.format());
     REQUIRE(SD.begin(4));
 

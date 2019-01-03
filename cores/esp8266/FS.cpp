@@ -220,11 +220,19 @@ bool Dir::rewind() {
     return _impl->rewind();
 }
 
-bool FS::begin(const FSConfig *cfg) {
+bool FS::setConfig(const FSConfig *cfg) {
+    if (!_impl || !cfg) {
+        return false;
+    }
+
+    return _impl->setConfig(cfg);
+}
+
+bool FS::begin() {
     if (!_impl) {
         return false;
     }
-    return _impl->begin(cfg);
+    return _impl->begin();
 }
 
 void FS::end() {
