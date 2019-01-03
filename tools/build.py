@@ -57,6 +57,7 @@ def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
         cmd += 'dbg={debug_port},lvl={debug_level}'.format(**vars(args))
     cmd += ' '
     cmd += '-ide-version=10607 '
+    cmd += '-debug-level=10 '
     cmd += '-warnings={warnings} '.format(**vars(args))
     if args.verbose:
         cmd += '-verbose '
