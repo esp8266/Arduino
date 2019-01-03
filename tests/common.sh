@@ -58,9 +58,19 @@ function build_sketches()
         # the git version header is rewritten after each compile, so the
         # builder sees it is new and says "rebuild the whole thing!"
 
-        if [ -e $cache_dir/core/*.a ]; then touch -t 203712310000 $cache_dir/core/*.a; fi
+        if [ -e $cache_dir/core/*.a ]; then
+            head -8 $build_dir/build.options.json > $build_dir/../build.options.json
+            echo '  "sketchLocation" : "'$sketch'",' >> $build_dir/../build.options.json
+            tail -2 $build_dir/build.options.json >> $build_dir/../build.options.json
+        fi
 
-        rm -rf $build_dir/*
+        rm -rf $build_dir/sketch
+
+        if [ -e $cache_dir/core/*.a ]; then
+            mv $build_dir/../build.options.json $build_dir/build.options.json
+            touch -t 203712310000 $cache_dir/core/*.a
+        fi
+
         local sketchdir=$(dirname $sketch)
         local sketchdirname=$(basename $sketchdir)
         local sketchname=$(basename $sketch)
