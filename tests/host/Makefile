@@ -148,10 +148,10 @@ COVERAGE_FILES = $(OBJECTS:.o=.gc*)
 
 all: help
 
-CI:
+CI:					# run CI
 	$(MAKE) -f $(MAKEFILE) MKFLAGS=-Werror FORCE32=0 OPTZ=-O0 doCI
 
-doCI: build-info $(OUTPUT_BINARY) valgrind test gcov	# run CI
+doCI: build-info $(OUTPUT_BINARY) valgrind test gcov
 
 test: $(OUTPUT_BINARY)			# run host test for CI
 	$(OUTPUT_BINARY)
@@ -232,7 +232,12 @@ ARDUINO_LIBS := \
 			Parsing.cpp \
 			detail/mimetable.cpp \
 		) \
-		ESP8266mDNS/ESP8266mDNS.cpp \
+		ESP8266mDNS/src/LEAmDNS.cpp \
+		ESP8266mDNS/src/LEAmDNS_Control.cpp \
+		ESP8266mDNS/src/LEAmDNS_Helpers.cpp \
+		ESP8266mDNS/src/LEAmDNS_Structs.cpp \
+		ESP8266mDNS/src/LEAmDNS_Transfer.cpp \
+		ESP8266mDNS/src/ESP8266mDNS.cpp \
 		ArduinoOTA/ArduinoOTA.cpp \
 		DNSServer/src/DNSServer.cpp \
 		ESP8266AVRISP/src/ESP8266AVRISP.cpp \

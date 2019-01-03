@@ -41,8 +41,9 @@ function build_sketches()
     local build_dir=build.tmp
     local build_mod=$4
     local build_rem=$5
+    local lwip=$6
     mkdir -p $build_dir
-    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir $build_arg "
+    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
@@ -134,8 +135,8 @@ function install_ide()
         debug_flags="-DDEBUG_ESP_PORT=Serial -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM"
     fi
     # Set custom warnings for all builds (i.e. could add -Wextra at some point)
-    echo "compiler.c.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=0 $debug_flags" > esp8266/platform.local.txt
-    echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror -DLWIP_IPV6=0 $debug_flags" >> esp8266/platform.local.txt
+    echo "compiler.c.extra_flags=-Wall -Wextra -Werror $debug_flags" > esp8266/platform.local.txt
+    echo "compiler.cpp.extra_flags=-Wall -Wextra -Werror $debug_flags" >> esp8266/platform.local.txt
     echo -e "\n----platform.local.txt----"
     cat esp8266/platform.local.txt
     echo -e "\n----\n"
@@ -214,10 +215,11 @@ function build_sketches_with_arduino()
 {
     local build_mod=$1
     local build_rem=$2
+    local lwip=$3
 
     # Compile sketches
     echo -e "travis_fold:start:sketch_test"
-    build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries" $1 $2
+    build_sketches $HOME/arduino_ide $TRAVIS_BUILD_DIR/libraries "-l $HOME/Arduino/libraries" $build_mod $build_rem $lwip
     echo -e "travis_fold:end:sketch_test"
 
     # Generate size report
@@ -241,19 +243,28 @@ cache_dir=$(mktemp -d)
 
 if [ "$BUILD_TYPE" = "build" ]; then
     install_arduino nodebug
-    build_sketches_with_arduino 1 0
+    build_sketches_with_arduino 1 0 lm2f
+elif [ "$BUILD_TYPE" = "build6" ]; then
+    install_arduino nodebug
+    build_sketches_with_arduino 1 0 lm6f
 elif [ "$BUILD_TYPE" = "build_even" ]; then
     install_arduino nodebug
-    build_sketches_with_arduino 2 0
+    build_sketches_with_arduino 2 0 lm2f
 elif [ "$BUILD_TYPE" = "build_odd" ]; then
     install_arduino nodebug
-    build_sketches_with_arduino 2 1
+    build_sketches_with_arduino 2 1 lm2f
 elif [ "$BUILD_TYPE" = "debug_even" ]; then
     install_arduino debug
-    build_sketches_with_arduino 2 0
+    build_sketches_with_arduino 2 0 lm2f
 elif [ "$BUILD_TYPE" = "debug_odd" ]; then
     install_arduino debug
-    build_sketches_with_arduino 2 1
+    build_sketches_with_arduino 2 1 lm2f
+elif [ "$BUILD_TYPE" = "build6_even" ]; then
+    install_arduino nodebug
+    build_sketches_with_arduino 2 0 lm6f
+elif [ "$BUILD_TYPE" = "build6_odd" ]; then
+    install_arduino nodebug
+    build_sketches_with_arduino 2 1 lm6f
 elif [ "$BUILD_TYPE" = "platformio" ]; then
     # PlatformIO
     install_platformio

@@ -173,10 +173,16 @@ public:
     // Later call MDNS::update() in every 'loop' to run the process loop
     // (probing, announcing, responding, ...)
     bool begin(const char* p_pcHostname);
+    bool begin(const String& p_strHostname) {return begin(p_strHostname.c_str());}
         // for compatibility
         bool begin(const char* p_pcHostname,
                    IPAddress p_IPAddress,       // ignored
                    uint32_t p_u32TTL = 120);    // ignored
+        bool begin(const String& p_strHostname,
+                   IPAddress p_IPAddress,       // ignored
+                   uint32_t p_u32TTL = 120) {   // ignored
+            return begin(p_strHostname.c_str(), p_IPAddress, p_u32TTL);
+        }
     // Finish MDNS processing
     bool close(void);
 
