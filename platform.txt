@@ -76,12 +76,9 @@ compiler.elf2hex.extra_flags=
 
 ## generate file with git version number
 ## needs bash, git, and echo
-recipe.hooks.core.prebuild.1.pattern=
-recipe.hooks.core.prebuild.2.pattern=
-recipe.hooks.core.prebuild.3.pattern=
-#recipe.hooks.core.prebuild.1.pattern=python "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
-#recipe.hooks.core.prebuild.2.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_VER 0x`git --git-dir {runtime.platform.path}/.git rev-parse --short=8 HEAD 2>/dev/null || echo ffffffff` >{build.path}/core/core_version.h"
-#recipe.hooks.core.prebuild.3.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_DESC `cd "{runtime.platform.path}"; git describe --tags 2>/dev/null || echo unix-{version}` >>{build.path}/core/core_version.h"
+recipe.hooks.core.prebuild.1.pattern=python "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
+recipe.hooks.core.prebuild.2.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_VER 0x`git --git-dir {runtime.platform.path}/.git rev-parse --short=8 HEAD 2>/dev/null || echo ffffffff` >{build.path}/core/core_version.h"
+recipe.hooks.core.prebuild.3.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_DESC `cd "{runtime.platform.path}"; git describe --tags 2>/dev/null || echo unix-{version}` >>{build.path}/core/core_version.h"
 
 ## windows-compatible version without git
 recipe.hooks.core.prebuild.1.pattern.windows=cmd.exe /c rem cannot sign on windows
