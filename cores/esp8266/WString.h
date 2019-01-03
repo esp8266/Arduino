@@ -39,6 +39,8 @@ class __FlashStringHelper;
 #define F(string_literal) (FPSTR(PSTR(string_literal)))
 
 // The string class
+class String;
+extern const String __emptyString;
 class String {
         // use a function pointer to allow for "if (s)" without the
         // complications of an operator bool(). for more information, see:
@@ -71,11 +73,7 @@ class String {
         ~String(void);
 
         // empty string singleton
-        // return the reference to the constant empty string.
-        static inline const String &empty() {
-            extern const String emptyString;
-            return emptyString;
-        }
+        static constexpr const String& empty = ::__emptyString;
 
         // memory management
         // return true on success, false on failure (in which case, the string
@@ -302,7 +300,7 @@ class StringSumHelper: public String {
 };
 
 // only for backward compatibility
-extern const String emptyString __attribute__((deprecated("Use String::empty() instead.")));
+extern const String emptyString __attribute__((deprecated("Use String::empty instead.")));
 
 #endif  // __cplusplus
 #endif  // String_class_h
