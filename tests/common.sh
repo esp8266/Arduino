@@ -101,6 +101,7 @@ function build_sketches()
                 cat build.log
             fi
         fi
+        cp build.log /tmp/build.log.1
         rm build.log
         print_size_info $build_dir/*.elf >>size.log
     done
