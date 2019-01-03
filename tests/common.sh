@@ -56,26 +56,17 @@ function build_sketches()
 
         if [ -e $cache_dir/core/*.a ]; then
             # We need to preserve the build.options.json file and replace the last .ino
-            # with this sketch's ino file, or builder will throw everything away.  This
-            # head/tail easier than a complicated SED script to replace the 1 line we need.
-            head -8 $build_dir/build.options.json > $build_dir/../build.options.json
-            echo '  "sketchLocation" : "'$sketch'",' >> $build_dir/../build.options.json
-            tail -2 $build_dir/build.options.json >> $build_dir/../build.options.json
+            # with this sketch's ino file, or builder will throw everything away.
+	    sed -i "s,^.*sketchLocation.*$, \"sketchLocation\": \"$sketch\"\,,g" $build_dir/build.options.json
+            # Set the time of the cached core.a file to the future so the GIT header
+            # we regen won't cause the builder to throw it out and rebuild from scratch.
+            touch -d 'now + 1 day' $cache_dir/core/*.a
         fi
 
         # Clear out the last built sketch, map, elf, bin files, but leave the compiled
         # objects in the core and libraries available for use so we don't need to rebuild
         # them each sketch.
         rm -rf $build_dir/sketch $build_dir/*.bin $build_dir/*.map $build_dir/*.elf
-
-        if [ -e $cache_dir/core/*.a ]; then
-            # Restore the new build.options.json file
-            mv $build_dir/../build.options.json $build_dir/build.options.json
-            # Set the time of the cached core.a file to year 2037 so the GIT header
-            # we regen won't cause the builder to throw it out and rebuild from
-            # scratch.
-            touch -t 203712310000 $cache_dir/core/*.a
-        fi
 
         local sketchdir=$(dirname $sketch)
         local sketchdirname=$(basename $sketchdir)
