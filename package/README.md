@@ -67,12 +67,28 @@ Here is an overview of the release process. See the section below for detailed i
 
 1. Assemble release notes.
 
-   * Since most changes are integrated into master using squash-rebase policy (i.e. one commit per PR), `git log --oneline` gives a good overview of changes in the release.
+    * Since most changes are integrated into master using squash-rebase policy (i.e. one commit per PR), `git log --oneline` gives a good overview of changes in the release.
 
-   * Prepare release notes in Markdown format.
+    * Prepare release notes in Markdown format.
 
-   * Combine related changes into the following categories, in that order:
+    * For changes that are breaking, duplicate those changes and put the duplicate lines into a separate group called Breaking Changes. That group should go at the top of the Changelog. The original lines for the breaking changes should be marked by appending "(Breaking change)" to the line. Example:
+   
+    ```
+    Breaking Changes
+    ================
+    API xyz changed #1234
+    ...
 
+    Library - xyz
+    =============
+    API xyz changed #1234 (Breaking change)
+    ...
+    ```
+
+
+    * Combine related changes into the following categories, in that order, including breaking changes with the appended mark:
+
+      - Breaking Changes
       - Core
       - *Libraries* — one section per library that received changes. If library only had a single change or a few changes, it is also okay to combine changes to a few such libraries under single "Other Libraries" entry.
       - Upstream dependencies
@@ -116,11 +132,12 @@ The following points assume work in a direct clone of the repository, and not in
 
 10. Create a commit to the master branch, updating:
 
-   * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `2.5.0-dev`.
+    * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `2.5.0-dev`.
 
-   * In main README.md:
+    * In main README.md:
 
-     - in "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
-   * In doc/conf.py
+        - in "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
+        
+    * In doc/conf.py
    
-     - update version and release to the *next* milestone
+        - update version and release to the *next* milestone
