@@ -41,82 +41,41 @@
 #include "ets_sys.h"
 #include "core_esp8266_waveform.h"
 
-// Need speed, not size, here
-#pragma GCC optimize ("O2")
-
 // Maximum delay between IRQs
 #define MAXIRQUS (10000)
 
 // If the cycles from now to an event are below this value, perform it anyway since IRQs take longer than this
 #define CYCLES_FLUFF (100)
 
-// Macro to get count of predefined array elements
-#define countof(a) ((size_t)(sizeof(a)/sizeof(a[0])))
-
-// Set/clear *any* GPIO
-#define SetGPIOPin(a) do { if (a < 16) { GPOS |= (1<<a); } else { GP16O |= 1; } } while (0)
-#define ClearGPIOPin(a) do { if (a < 16) { GPOC |= (1<<a); } else { GP16O &= ~1; } } while (0)
-// Set/clear GPIO 0-15
+// Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
 #define ClearGPIO(a) do { GPOC = a; } while (0)
 
+// Convert from us to ESP8266 clocks
+#define MicrosecondsToCycles(m) (clockCyclesPerMicrosecond() * (m))
+
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
-  uint32_t nextServiceCycle;        // ESP cycle timer when a transition required
-  uint32_t timeLeftCycles;          // For time-limited waveform, how many ESP cycles left
-  const uint16_t gpioMask;          // Mask instead of value to speed IRQ loop
-  const uint16_t gpio16Mask;        // Mask instead of value to speed IRQ loop
-  unsigned state              : 1;  // Current state of this pin
-  unsigned nextTimeHighCycles : 31; // Copy over low->high to keep smooth waveform
-  unsigned enabled            : 1;  // Is this GPIO generating a waveform?
-  unsigned nextTimeLowCycles  : 31; // Copy over high->low to keep smooth waveform
+  uint32_t nextServiceCycle;   // ESP cycle timer when a transition required
+  uint32_t timeLeftCycles;     // For time-limited waveform, how many ESP cycles left
+  uint32_t nextTimeHighCycles; // Copy over low->high to keep smooth waveform
+  uint32_t nextTimeLowCycles;  // Copy over high->low to keep smooth waveform
 } Waveform;
 
 // These can be accessed in interrupts, so ensure to bracket access with SEI/CLI
-static Waveform waveform[] = {
-  {0, 0, 1<<0, 0, 0, 0, 0, 0}, // GPIO0
-  {0, 0, 1<<1, 0, 0, 0, 0, 0}, // GPIO1
-  {0, 0, 1<<2, 0, 0, 0, 0, 0},
-  {0, 0, 1<<3, 0, 0, 0, 0, 0},
-  {0, 0, 1<<4, 0, 0, 0, 0, 0},
-  {0, 0, 1<<5, 0, 0, 0, 0, 0},
-  // GPIOS 6-8 not allowed, used for flash
-  // GPIO 9 and 10 only allowed in 2-bit flash mode
-#if !isFlashInterfacePin(9)
-  {0, 0, 1<<9, 0, 0, 0, 0, 0},
-  {0, 0, 1<<10, 0, 0, 0, 0, 0},
-#endif
-  // GPIO 11 not allowed, used for flash
-  {0, 0, 1<<12, 0, 0, 0, 0, 0},
-  {0, 0, 1<<13, 0, 0, 0, 0, 0},
-  {0, 0, 1<<14, 0, 0, 0, 0, 0},
-  {0, 0, 1<<15, 0, 0, 0, 0, 0},
-  {0, 0, 0, 1, 0, 0, 0, 0}  // GPIO16
-};
+static Waveform waveform[17];        // State of all possible pins
+static volatile uint32_t waveformState = 0;   // Is the pin high or low
+static volatile uint32_t waveformEnabled = 0; // Is it actively running
 
-static uint32_t (*timer1CB)() = NULL;;
+// Enable lock-free by only allowing updates to waveformState and waveformEnabled from IRQ service routine
+static volatile uint32_t waveformToEnable = 0; // Message from startWaveform to IRQ to actuall begin a wvf
+static volatile uint32_t waveformToDisable = 0; // Message from startWaveform to IRQ to actuall begin a wvf
+
+static uint32_t (*timer1CB)() = NULL;
 
 
-// Helper functions
-static inline ICACHE_RAM_ATTR uint32_t MicrosecondsToCycles(uint32_t microseconds) {
-  return clockCyclesPerMicrosecond() * microseconds;
-}
-
-static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
-  if (a < b) {
-    return a;
-  }
-  return b;
-}
-
-static inline ICACHE_RAM_ATTR void ReloadTimer(uint32_t a) {
-  // Below a threshold you actually miss the edge IRQ, so ensure enough time
-  if (a > 32) {
-    timer1_write(a);
-  } else {
-    timer1_write(32);
-  }
-}
+// Non-speed critical bits
+#pragma GCC optimize ("Os")
 
 static inline ICACHE_RAM_ATTR uint32_t GetCycleCount() {
   uint32_t ccount;
@@ -126,7 +85,7 @@ static inline ICACHE_RAM_ATTR uint32_t GetCycleCount() {
 
 // Interrupt on/off control
 static ICACHE_RAM_ATTR void timer1Interrupt();
-static uint8_t timerRunning = false;
+static bool timerRunning = false;
 static uint32_t lastCycleCount = 0; // Last ESP cycle counter on running the interrupt routine
 
 static void initTimer() {
@@ -150,56 +109,62 @@ void setTimer1Callback(uint32_t (*fn)()) {
   timer1CB = fn;
   if (!timerRunning && fn) {
     initTimer();
-  } else if (timerRunning && !fn) {
-    int cnt = 0;
-    for (size_t i = 0; i < countof(waveform); i++) {
-      cnt += waveform[i].enabled ? 1 : 0;
-    }
-    if (!cnt) {
-      deinitTimer();
-    }
+    timer1_write(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
+  } else if (timerRunning && !fn && !waveformEnabled) {
+    deinitTimer();
   }
-  ReloadTimer(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
 }
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
 // waveform smoothly on next low->high transition.  For immediate change, stopWaveform()
 // first, then it will immediately begin.
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS) {
-  Waveform *wave = NULL;
-  for (size_t i = 0; i < countof(waveform); i++) {
-    if (((pin == 16) && waveform[i].gpio16Mask==1) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
-      wave = (Waveform*) & (waveform[i]);
-      break;
-    }
-  }
-  if (!wave) {
+  if ((pin > 16) || isFlashInterfacePin(pin)) {
     return false;
   }
-
-  // To safely update the packed bitfields we need to stop interrupts while setting them as we could
-  // get an IRQ in the middle of a multi-instruction mask-and-set required to change them which would
-  // then cause an IRQ update of these values (.enabled only, for now) to be lost.
-  ets_intr_lock();
-
-  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) - 70;  // Take out some time for IRQ codepath
-  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) - 70;  // Take out some time for IRQ codepath
+  Waveform *wave = &waveform[pin];
+#if F_CPU == 160000000
+  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) - 140;  // Take out some time for IRQ codepath
+  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) - 140;  // Take out some time for IRQ codepath
+#else
+  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) > 280 ? MicrosecondsToCycles(timeHighUS) - 280 : MicrosecondsToCycles(timeHighUS);  // Take out some time for IRQ codepath
+  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) > 280 ? MicrosecondsToCycles(timeLowUS)- 280 : MicrosecondsToCycles(timeLowUS);  // Take out some time for IRQ codepath
+#endif
   wave->timeLeftCycles = MicrosecondsToCycles(runTimeUS);
-  if (!wave->enabled) {
-    wave->state = 0;
+  uint32_t mask = 1<<pin;
+  if (!waveformEnabled && mask) {
     // Actually set the pin high or low in the IRQ service to guarantee times
     wave->nextServiceCycle = GetCycleCount() + MicrosecondsToCycles(1);
-    wave->enabled = 1;
+    waveformToEnable |= mask;
     if (!timerRunning) {
       initTimer();
     }
-    ReloadTimer(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
+    timer1_write(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
+    while (waveformToEnable) {
+      delay(1); // Wait for waveform to update
+    }
   }
 
-  // Re-enable interrupts here since we're done with the update
-  ets_intr_unlock();
-
   return true;
+}
+
+// Speed critical bits
+#pragma GCC optimize ("O2")
+// Normally would not want two copies like this, but due to different
+// optimization levels the inline attribute gets lost if we try the
+// other version.
+
+static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ() {
+  uint32_t ccount;
+  __asm__ __volatile__("esync; rsr %0,ccount":"=a"(ccount));
+  return ccount;
+}
+
+static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b) {
+  if (a < b) {
+    return a;
+  }
+  return b;
 }
 
 // Stops a waveform on a pin
@@ -208,64 +173,65 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   if (!timerRunning) {
     return false;
   }
-
-  for (size_t i = 0; i < countof(waveform); i++) {
-    if (!waveform[i].enabled) {
-      continue; // Skip fast to next one, can't need to stop this one since it's not running
-    }
-    if (((pin == 16) && waveform[i].gpio16Mask) || ((pin != 16) && (waveform[i].gpioMask == 1<<pin))) {
-      // Note that there is no interrupt unsafety here.  The IRQ can only ever change .enabled from 1->0
-      // We're also doing that, so even if an IRQ occurred it would still stay as 0.
-      waveform[i].enabled = 0;
-      int cnt = timer1CB ? 1 : 0;
-      for (size_t i = 0; (cnt == 0) && (i < countof(waveform)); i++) {
-        cnt += waveform[i].enabled ? 1 : 0;
-      }
-      if (!cnt) {
-        deinitTimer();
-      }
-      return true;
-    }
+  // If user sends in a pin >16 but <32, this will always point to a 0 bit
+  // If they send >=32, then the shift will result in 0 and it will also return false
+  uint32_t mask = 1<<pin;
+  if (!(waveformEnabled & mask)) {
+    return false; //It's not running, nothing to do here
   }
-  return false;
+  waveformToDisable |= mask;
+  timer1_write(MicrosecondsToCycles(1));
+  while (waveformToDisable) {
+    delay(1); // Wait for IRQ to update
+  }
+  if (!waveformEnabled && !timer1CB) {
+    deinitTimer();
+  }
+  return true;
 }
 
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   uint32_t nextEventCycles;
-  #if F_CPU == 160000000
+#if F_CPU == 160000000
   uint8_t cnt = 20;
-  #else
-  uint8_t cnt = 10;
-  #endif
+#else
+  uint8_t cnt = 5;
+#endif
+
+  // Handle enable/disable requests from main app.
+  waveformEnabled = (waveformEnabled & ~waveformToDisable) | waveformToEnable; // Set the requested waveforms on/off
+  waveformState &= ~waveformToEnable;  // And clear the state of any just started
+  waveformToEnable = 0;
+  waveformToDisable = 0;
 
   do {
     nextEventCycles = MicrosecondsToCycles(MAXIRQUS);
-    for (size_t i = 0; i < countof(waveform); i++) {
-      Waveform *wave = &waveform[i];
-      uint32_t now;
+    for (size_t i = 0; i <= 16; i++) {
+      uint32_t mask = 1<<i;
 
       // If it's not on, ignore!
-      if (!wave->enabled) {
+      if (!(waveformEnabled & mask)) {
         continue;
       }
 
+      Waveform *wave = &waveform[i];
+      uint32_t now;
+
       // Check for toggles
-      now = GetCycleCount();
+      now = GetCycleCountIRQ();
       int32_t cyclesToGo = wave->nextServiceCycle - now;
       if (cyclesToGo < 0) {
-        wave->state = !wave->state;
-        if (wave->state) {
-          SetGPIO(wave->gpioMask);
-          if (wave->gpio16Mask) {
-            GP16O |= wave->gpio16Mask; // GPIO16 write slow as it's RMW
-          }
+        waveformState ^= mask;
+        if (waveformState & mask) {
+          if (i==16) GP16O |= 1; // GPIO16 write slow as it's RMW
+          else SetGPIO(mask);
+
           wave->nextServiceCycle = now + wave->nextTimeHighCycles;
           nextEventCycles = min_u32(nextEventCycles, wave->nextTimeHighCycles);
         } else {
-          ClearGPIO(wave->gpioMask);
-          if (wave->gpio16Mask) {
-            GP16O &= ~wave->gpio16Mask;
-          }
+          if (i==16) GP16O &= ~1; // GPIO16 write slow as it's RMW
+          else ClearGPIO(mask);
+
           wave->nextServiceCycle = now + wave->nextTimeLowCycles;
           nextEventCycles = min_u32(nextEventCycles, wave->nextTimeLowCycles);
         }
@@ -276,20 +242,21 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     }
   } while (--cnt && (nextEventCycles < MicrosecondsToCycles(4)));
 
-  uint32_t curCycleCount = GetCycleCount();
+  uint32_t curCycleCount = GetCycleCountIRQ();
   uint32_t deltaCycles = curCycleCount - lastCycleCount;
   lastCycleCount = curCycleCount;
 
   // Check for timed-out waveforms out of the high-frequency toggle loop
-  for (size_t i = 0; i < countof(waveform); i++) {
+  for (size_t i = 0; i <= 16; i++) {
     Waveform *wave = &waveform[i];
-    if (wave->enabled && wave->timeLeftCycles) {
+    uint32_t mask = 1<<i;
+    if ((waveformEnabled & mask) && wave->timeLeftCycles) {
       // Check for unsigned underflow with new > old
       if (deltaCycles >= wave->timeLeftCycles) {
         // Done, remove!
-        wave->enabled = false;
-        ClearGPIO(wave->gpioMask);
-        GP16O &= ~wave->gpio16Mask;
+        waveformEnabled &= ~mask;
+        if (i==16) GP16O &= ~1;
+        else ClearGPIO(mask);
       } else {
         uint32_t newTimeLeftCycles = wave->timeLeftCycles - deltaCycles;
         wave->timeLeftCycles = newTimeLeftCycles;
@@ -301,20 +268,22 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     nextEventCycles = min_u32(nextEventCycles, timer1CB());
   }
 
-  #if F_CPU == 160000000
-  if (nextEventCycles <= 5 * MicrosecondsToCycles(1)) {
-    nextEventCycles = MicrosecondsToCycles(1) / 2;
+#if F_CPU == 160000000
+  if (nextEventCycles < MicrosecondsToCycles(5)) {
+    nextEventCycles = MicrosecondsToCycles(1);
   } else {
-    nextEventCycles -= 5 * MicrosecondsToCycles(1);
+    nextEventCycles -= MicrosecondsToCycles(4) + MicrosecondsToCycles(1)/2;
   }
   nextEventCycles = nextEventCycles >> 1;
-  #else
-  if (nextEventCycles <= 6 * MicrosecondsToCycles(1)) {
-    nextEventCycles = MicrosecondsToCycles(1) / 2;
+#else
+  if (nextEventCycles < MicrosecondsToCycles(8)) {
+    nextEventCycles = MicrosecondsToCycles(2);
   } else {
-    nextEventCycles -= 6 * MicrosecondsToCycles(1);
+    nextEventCycles -= MicrosecondsToCycles(6);
   }
-  #endif
+#endif
 
-  ReloadTimer(nextEventCycles);
+  // Do it here instead of global function to save time and because we know it's edge-IRQ
+  T1L = nextEventCycles; // Already know we're in range by MAXIRQUS
+  TEIE |= TEIE1; //edge int enable
 }
