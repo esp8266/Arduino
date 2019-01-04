@@ -186,36 +186,43 @@ void DNSServer::processNextRequest()
   respondToRequest(buffer.get(), currentPacketSize);
 }
 
+void DNSServer::writeNBOShort(uint16_t value)
+{
+   _udp.write((unsigned char *)&value, 2);
+}
+
 void DNSServer::replyWithIP(DNSHeader *dnsHeader,
 			    unsigned char * query,
 			    size_t queryLength)
 {
+  uint16_t value;
+
   dnsHeader->QR = DNS_QR_RESPONSE;
   dnsHeader->QDCount = lwip_htons(1);
   dnsHeader->ANCount = lwip_htons(1);
   dnsHeader->NSCount = 0;
   dnsHeader->ARCount = 0;
 
-  //_dnsHeader->RA = 1;
-
   _udp.beginPacket(_udp.remoteIP(), _udp.remotePort());
   _udp.write((unsigned char *) dnsHeader, sizeof(DNSHeader));
   _udp.write(query, queryLength);
 
-  _udp.write((uint8_t)192); //  answer name is a pointer
-  _udp.write((uint8_t)12);  // pointer to offset at 0x00c
+  // Rather than restate the name here, we use a pointer to the name contained
+  // in the query section. Pointers have the top two bits set.
+  value = 0xC000 | DNS_HEADER_SIZE;
+  writeNBOShort(lwip_htons(value));
 
-  _udp.write((uint8_t)0);   // 0x0001  answer is type A query (host address)
-  _udp.write((uint8_t)1);
+  // Answer is type A (an IPv4 address)
+  writeNBOShort(lwip_htons(DNS_QTYPE_A));
 
-  _udp.write((uint8_t)0);   //0x0001 answer is class IN (internet address)
-  _udp.write((uint8_t)1);
- 
+  // Answer is in the Internet Class
+  writeNBOShort(lwip_htons(DNS_QCLASS_IN));
+
+  // Output TTL (already NBO)
   _udp.write((unsigned char*)&_ttl, 4);
 
   // Length of RData is 4 bytes (because, in this case, RData is IPv4)
-  _udp.write((uint8_t)0);
-  _udp.write((uint8_t)4);
+  writeNBOShort(lwip_htons(sizeof(_resolvedIP)));
   _udp.write(_resolvedIP, sizeof(_resolvedIP));
   _udp.endPacket();
 }

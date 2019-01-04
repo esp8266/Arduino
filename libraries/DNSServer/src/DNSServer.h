@@ -82,5 +82,6 @@ class DNSServer
     void replyWithError(DNSHeader *dnsHeader,
 			DNSReplyCode rcode);
     void respondToRequest(uint8_t *buffer, size_t length);
+    void writeNBOShort(uint16_t value);
 };
 #endif
