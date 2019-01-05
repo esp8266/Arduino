@@ -134,7 +134,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
   }
 
   uint32_t mask = 1<<pin;
-  if (!waveformEnabled && mask) {
+  if (!(waveformEnabled & mask)) {
     // Actually set the pin high or low in the IRQ service to guarantee times
     wave->nextServiceCycle = GetCycleCount() + MicrosecondsToCycles(1);
     waveformToEnable |= mask;
@@ -143,7 +143,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
     }
     timer1_write(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
     while (waveformToEnable) {
-      delay(1); // Wait for waveform to update
+      delay(0); // Wait for waveform to update
     }
   }
 
