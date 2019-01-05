@@ -29,11 +29,13 @@ import subprocess
 import tempfile
 import shutil
 
-def compile(tmp_dir, sketch, tools_dir, hardware_dir, ide_path, f, args):
+def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
     cmd = ide_path + '/arduino-builder '
     cmd += '-compile -logger=human '
     cmd += '-build-path "' + tmp_dir + '" '
     cmd += '-tools "' +  ide_path + '/tools-builder" '
+    if cache != "":
+        cmd += '-build-cache "' + cache + '" '
     if args.library_path:
         for lib_dir in args.library_path:
             cmd += '-libraries "' + lib_dir + '" '
@@ -98,6 +100,7 @@ def parse_args():
     parser.add_argument('--debug_port', help='Debug port',
                         choices=['Serial', 'Serial1'])
     parser.add_argument('--debug_level', help='Debug level')
+    parser.add_argument('--build_cache', help='Build directory to cache core.a', default='')
     parser.add_argument('sketch_path', help='Sketch file path')
     return parser.parse_args()
 
@@ -127,6 +130,7 @@ def main():
     if args.verbose:
         print("Sketch: ", sketch_path)
         print("Build dir: ", tmp_dir)
+        print("Cache dir: ", args.build_cache)
         print("Output: ", output_name)
 
     if args.verbose:
@@ -134,7 +138,7 @@ def main():
     else:
         f = open(tmp_dir + '/build.log', 'w')
 
-    res = compile(tmp_dir, sketch_path, tools_dir, hardware_dir, ide_path, f, args)
+    res = compile(tmp_dir, sketch_path, args.build_cache, tools_dir, hardware_dir, ide_path, f, args)
     if res != 0:
         return res
 
