@@ -57,7 +57,7 @@
 // Waveform generator can create tones, PWM, and servos
 typedef struct {
   uint32_t nextServiceCycle;   // ESP cycle timer when a transition required
-  uint32_t timeLeftCycles;     // For time-limited waveform, how many ESP cycles left
+  uint32_t expiryCycle;        // For time-limited waveform, the cycle when this waveform must stop
   uint32_t nextTimeHighCycles; // Copy over low->high to keep smooth waveform
   uint32_t nextTimeLowCycles;  // Copy over high->low to keep smooth waveform
 } Waveform;
@@ -86,13 +86,11 @@ static inline ICACHE_RAM_ATTR uint32_t GetCycleCount() {
 // Interrupt on/off control
 static ICACHE_RAM_ATTR void timer1Interrupt();
 static bool timerRunning = false;
-static uint32_t lastCycleCount = 0; // Last ESP cycle counter on running the interrupt routine
 
 static void initTimer() {
   timer1_disable();
   ETS_FRC_TIMER1_INTR_ATTACH(NULL, NULL);
   ETS_FRC_TIMER1_NMI_INTR_ATTACH(timer1Interrupt);
-  lastCycleCount = GetCycleCount();
   timer1_enable(TIM_DIV1, TIM_EDGE, TIM_SINGLE);
   timerRunning = true;
 }
@@ -130,7 +128,11 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
   wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) > 280 ? MicrosecondsToCycles(timeHighUS) - 280 : MicrosecondsToCycles(timeHighUS);  // Take out some time for IRQ codepath
   wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) > 280 ? MicrosecondsToCycles(timeLowUS)- 280 : MicrosecondsToCycles(timeLowUS);  // Take out some time for IRQ codepath
 #endif
-  wave->timeLeftCycles = MicrosecondsToCycles(runTimeUS);
+  wave->expiryCycle = runTimeUS ? GetCycleCount() + MicrosecondsToCycles(runTimeUS) : 0;
+  if (runTimeUS && !wave->expiryCycle) {
+    wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
+  }
+
   uint32_t mask = 1<<pin;
   if (!waveformEnabled && mask) {
     // Actually set the pin high or low in the IRQ service to guarantee times
@@ -193,9 +195,9 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   uint32_t nextEventCycles;
 #if F_CPU == 160000000
-  uint8_t cnt = 20;
+  int cnt = 20;
 #else
-  uint8_t cnt = 5;
+  int cnt = 10;
 #endif
 
   // Handle enable/disable requests from main app.
@@ -215,10 +217,21 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
       }
 
       Waveform *wave = &waveform[i];
-      uint32_t now;
+      uint32_t now = GetCycleCountIRQ();
+
+      // Disable any waveforms that are done
+      if (wave->expiryCycle) {
+        int32_t expiryToGo = wave->expiryCycle - now;
+        if (expiryToGo < 0) {
+            // Done, remove!
+            waveformEnabled &= ~mask;
+            if (i==16) GP16O &= ~1;
+            else ClearGPIO(mask);
+            continue;
+          }
+      }
 
       // Check for toggles
-      now = GetCycleCountIRQ();
       int32_t cyclesToGo = wave->nextServiceCycle - now;
       if (cyclesToGo < 0) {
         waveformState ^= mask;
@@ -242,28 +255,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
     }
   } while (--cnt && (nextEventCycles < MicrosecondsToCycles(4)));
 
-  uint32_t curCycleCount = GetCycleCountIRQ();
-  uint32_t deltaCycles = curCycleCount - lastCycleCount;
-  lastCycleCount = curCycleCount;
-
-  // Check for timed-out waveforms out of the high-frequency toggle loop
-  for (size_t i = 0; i <= 16; i++) {
-    Waveform *wave = &waveform[i];
-    uint32_t mask = 1<<i;
-    if ((waveformEnabled & mask) && wave->timeLeftCycles) {
-      // Check for unsigned underflow with new > old
-      if (deltaCycles >= wave->timeLeftCycles) {
-        // Done, remove!
-        waveformEnabled &= ~mask;
-        if (i==16) GP16O &= ~1;
-        else ClearGPIO(mask);
-      } else {
-        uint32_t newTimeLeftCycles = wave->timeLeftCycles - deltaCycles;
-        wave->timeLeftCycles = newTimeLeftCycles;
-      }
-    }
-  }
-
   if (timer1CB) {
     nextEventCycles = min_u32(nextEventCycles, timer1CB());
   }
@@ -284,6 +275,6 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
 #endif
 
   // Do it here instead of global function to save time and because we know it's edge-IRQ
-  T1L = nextEventCycles; // Already know we're in range by MAXIRQUS
   TEIE |= TEIE1; //edge int enable
+  T1L = nextEventCycles; // Already know we're in range by MAXIRQUS
 }
