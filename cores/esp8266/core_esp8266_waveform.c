@@ -44,9 +44,6 @@
 // Maximum delay between IRQs
 #define MAXIRQUS (10000)
 
-// If the cycles from now to an event are below this value, perform it anyway since IRQs take longer than this
-#define CYCLES_FLUFF (100)
-
 // Set/clear GPIO 0-15 by bitmask
 #define SetGPIO(a) do { GPOS = a; } while (0)
 #define ClearGPIO(a) do { GPOC = a; } while (0)
@@ -121,13 +118,17 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
     return false;
   }
   Waveform *wave = &waveform[pin];
-#if F_CPU == 160000000
-  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) - 140;  // Take out some time for IRQ codepath
-  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) - 140;  // Take out some time for IRQ codepath
-#else
-  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) > 280 ? MicrosecondsToCycles(timeHighUS) - 280 : MicrosecondsToCycles(timeHighUS);  // Take out some time for IRQ codepath
-  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) > 280 ? MicrosecondsToCycles(timeLowUS)- 280 : MicrosecondsToCycles(timeLowUS);  // Take out some time for IRQ codepath
+  // Adjust to shave off some of the IRQ time, approximately
+  uint32_t delta = 0;
+#if F_CPU == 80000000
+  if (timeHighUS > 2) {
+    delta = MicrosecondsToCycles(1) + MicrosecondsToCycles(2)/3;
+  }
+#else // 160000000
+  delta = MicrosecondsToCycles(1) >> 1; // 0.5 us off each edge
 #endif
+  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) - delta;
+  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) - delta;
   wave->expiryCycle = runTimeUS ? GetCycleCount() + MicrosecondsToCycles(runTimeUS) : 0;
   if (runTimeUS && !wave->expiryCycle) {
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
@@ -192,13 +193,16 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
   return true;
 }
 
+#if F_CPU == 80000000
+  #define MINCYCLE MicrosecondsToCycles(6)
+  #define DELTAIRQ MicrosecondsToCycles(5)
+#else
+  #define MINCYCLE MicrosecondsToCycles(4)
+  #define DELTAIRQ (MicrosecondsToCycles(2) + MicrosecondsToCycles(3)/4)
+#endif
+
 static ICACHE_RAM_ATTR void timer1Interrupt() {
   uint32_t nextEventCycles;
-#if F_CPU == 160000000
-  int cnt = 20;
-#else
-  int cnt = 10;
-#endif
 
   // Handle enable/disable requests from main app.
   waveformEnabled = (waveformEnabled & ~waveformToDisable) | waveformToEnable; // Set the requested waveforms on/off
@@ -253,28 +257,21 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         nextEventCycles = min_u32(nextEventCycles, deltaCycles);
       }
     }
-  } while (--cnt && (nextEventCycles < MicrosecondsToCycles(4)));
+  } while (nextEventCycles < MINCYCLE);
 
   if (timer1CB) {
     nextEventCycles = min_u32(nextEventCycles, timer1CB());
+    if (nextEventCycles < MINCYCLE) {
+      nextEventCycles = MINCYCLE;
+    }
   }
-
-#if F_CPU == 160000000
-  if (nextEventCycles < MicrosecondsToCycles(5)) {
-    nextEventCycles = MicrosecondsToCycles(1);
-  } else {
-    nextEventCycles -= MicrosecondsToCycles(4) + MicrosecondsToCycles(1)/2;
-  }
-  nextEventCycles = nextEventCycles >> 1;
-#else
-  if (nextEventCycles < MicrosecondsToCycles(8)) {
-    nextEventCycles = MicrosecondsToCycles(2);
-  } else {
-    nextEventCycles -= MicrosecondsToCycles(6);
-  }
-#endif
+  nextEventCycles -= DELTAIRQ;
 
   // Do it here instead of global function to save time and because we know it's edge-IRQ
   TEIE |= TEIE1; //edge int enable
+#if F_CPU == 160000000
+  T1L = nextEventCycles >> 1; // Already know we're in range by MAXIRQUS
+#else
   T1L = nextEventCycles; // Already know we're in range by MAXIRQUS
+#endif
 }
