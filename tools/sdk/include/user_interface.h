@@ -385,6 +385,7 @@ bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
 uint32 wifi_softap_get_dhcps_lease_time(void);
 bool wifi_softap_set_dhcps_lease_time(uint32 minute);
 bool wifi_softap_reset_dhcps_lease_time(void);
+bool wifi_softap_add_dhcps_lease(uint8 *macaddr);
 
 enum dhcp_status wifi_softap_dhcps_status(void);
 bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg);
