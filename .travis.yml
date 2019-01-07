@@ -20,14 +20,17 @@ stages:
 jobs:
   include:
     # Build stage. To save time, run all kinds of builds and tests in parallel.
-    - name: "Host tests"
-      stage: build
-      script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
-      install: sudo apt-get install valgrind lcov
-
     # TODO: since we can now call different script for each job,
     # split the do-it-all common.sh into separate scripts responsible
     # for different types of jobs below:
+    - name: "Platformio (1)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=platformio_even
+    - name: "Platformio (2)"
+      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      env:
+        - BUILD_TYPE=platformio_odd
     - name: "Build (1)"
       script: $TRAVIS_BUILD_DIR/tests/common.sh
       env:
@@ -52,14 +55,11 @@ jobs:
       script: $TRAVIS_BUILD_DIR/tests/common.sh
       env:
         - BUILD_TYPE=build6_odd
-    - name: "Platformio (1)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=platformio_even
-    - name: "Platformio (2)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=platformio_odd
+
+    - name: "Host tests"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
+      install: sudo apt-get install valgrind lcov
 
     - name: "Docs"
       script: $TRAVIS_BUILD_DIR/tests/ci/build_docs.sh
