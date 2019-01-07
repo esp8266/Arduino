@@ -515,7 +515,7 @@ struct arg_callback {
     bool called = false;
 };
 
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
 
 /**
  * Resolve the given hostname to an IP address.
@@ -578,7 +578,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
 {
     (reinterpret_cast<struct arg_callback*>(callback_arg))->called = true;
     if(ipaddr) {
