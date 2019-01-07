@@ -510,55 +510,66 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
+struct arg_callback {
+    IPAddress addr;
+    bool called = false;
+};
 
-static bool _dns_lookup_pending = false;
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg);
 
 /**
  * Resolve the given hostname to an IP address.
  * @param aHostname     Name to be resolved
  * @param aResult       IPAddress structure to store the returned IP address
- * @return 1 if aIPAddrString was successfully converted to an IP address,
- *          else 0
+ * @return 1 if a String was successfully converted to an IP address,
+ *          else error code
  */
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
 {
     return hostByName(aHostname, aResult, 10000);
 }
 
-
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
 {
     ip_addr_t addr;
-    aResult = static_cast<uint32_t>(0);
+    static struct arg_callback addr2;
+    static bool pending = false;  // If waiting for the callback function call
 
-    if(aResult.fromString(aHostname)) {
-        // Host name is a IP address use it!
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s is a IP!\n", aHostname);
-        return 1;
-    }
-
-    DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
-    err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
-    if(err == ERR_OK) {
-        aResult = IPAddress(&addr);
-    } else if(err == ERR_INPROGRESS) {
-        _dns_lookup_pending = true;
-        delay(timeout_ms);
-        _dns_lookup_pending = false;
-        // will return here when dns_found_callback fires
-        if(aResult.isSet()) {
-            err = ERR_OK;
+    if(addr2.called) {  // If the callback function has been called
+        addr2.called = false;
+        pending = false;
+        if(addr2.addr != IPADDR_ANY) {  // If IP found
+            DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP found %s\n", aHostname, addr2.addr.toString().c_str());
+            aResult = addr2.addr;
+            addr2.addr = (uint32_t)IPADDR_ANY;
+            return 1;
+        } else {
+            DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP NOT found. Please re-try\n", aHostname);
+            return 0;
         }
     }
-
-    if(err != 0) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
-    } else {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
+    if(pending) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host %s: Waiting for callback call\n", aHostname);
+        return 0;
     }
-
-    return (err == ERR_OK) ? 1 : 0;
+    if(aResult.fromString(aHostname)) {
+        // Host name is a IP address, use it!
+        return 1;
+    }
+    err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &addr2);
+    DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP requested\n", aHostname);
+    if(err == ERR_OK) {
+        aResult = addr.addr;
+        DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP found %s\n", aHostname, aResult.toString().c_str());
+        return 1;
+    }
+    if(err == ERR_INPROGRESS) {
+        DEBUG_WIFI_GENERIC("[hostByName] Host %s: Query registered\n", aHostname);
+        pending = true;
+    } else {
+        DEBUG_WIFI_GENERIC("[hostByName] Host %s: Lookup error: %d!\n", aHostname, err);
+    }
+    return 0;
 }
 
 /**
@@ -567,15 +578,13 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
+void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, void *callback_arg)
 {
-    (void) name;
-    if (!_dns_lookup_pending) {
-        return;
-    }
+    (reinterpret_cast<struct arg_callback*>(callback_arg))->called = true;
     if(ipaddr) {
-        (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
+        (reinterpret_cast<struct arg_callback*>(callback_arg))->addr = ipaddr->addr;
     }
+    DEBUG_WIFI_GENERIC("[hostByName] Host %s: Callback function called", name);
     esp_schedule(); // resume the hostByName function
 }
 
