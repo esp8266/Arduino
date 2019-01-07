@@ -582,7 +582,7 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
 {
     (reinterpret_cast<struct arg_callback*>(callback_arg))->called = true;
     if(ipaddr) {
-        (reinterpret_cast<struct arg_callback*>(callback_arg))->addr = ipaddr->addr;
+        (reinterpret_cast<struct arg_callback*>(callback_arg))->addr = IPAddress(ip_addr_t);
     }
     esp_schedule(); // resume the hostByName function
 }
