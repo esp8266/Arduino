@@ -119,10 +119,40 @@ struct FSInfo {
     size_t maxPathLength;
 };
 
+class FSConfig
+{
+public:
+    FSConfig(bool autoFormat = true) {
+        _type = FSConfig::fsid::FSId;
+	_autoFormat = autoFormat;
+    }
+
+    enum fsid { FSId = 0x00000000 };
+    FSConfig setAutoFormat(bool val = true) {
+        _autoFormat = val;
+        return *this;
+    }
+
+    uint32_t _type;
+    bool     _autoFormat;
+};
+
+class SPIFFSConfig : public FSConfig
+{
+public:
+    SPIFFSConfig(bool autoFormat = true) {
+        _type = SPIFFSConfig::fsid::FSId;
+	_autoFormat = autoFormat;
+    }
+    enum fsid { FSId = 0x53504946 };
+};
+
 class FS
 {
 public:
     FS(FSImplPtr impl) : _impl(impl) { }
+
+    bool setConfig(const FSConfig *cfg);
 
     bool begin();
     void end();
@@ -166,6 +196,7 @@ using fs::SeekSet;
 using fs::SeekCur;
 using fs::SeekEnd;
 using fs::FSInfo;
+using fs::FSConfig;
 #endif //FS_NO_GLOBALS
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPIFFS)

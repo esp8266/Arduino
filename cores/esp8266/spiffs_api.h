@@ -123,6 +123,15 @@ public:
         return false;
     }
 
+    bool setConfig(const FSConfig *cfg) override
+    {
+        if ((cfg->_type != SPIFFSConfig::fsid::FSId) || (SPIFFS_mounted(&_fs) != 0)) {
+            return false;
+        }
+        _cfg = *static_cast<const SPIFFSConfig *>(cfg);
+       return true;
+    }
+
     bool begin() override
     {
 #if defined(ARDUINO) && !defined(CORE_MOCK)
@@ -139,12 +148,15 @@ public:
         if (_tryMount()) {
             return true;
         }
-        auto rc = SPIFFS_format(&_fs);
-        if (rc != SPIFFS_OK) {
-            DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
-            return false;
+        if (_cfg._autoFormat) {
+            auto rc = SPIFFS_format(&_fs);
+            if (rc != SPIFFS_OK) {
+                DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
+                return false;
+            }
+            return _tryMount();
         }
-        return _tryMount();
+        return false;
     }
 
     void end() override
@@ -290,6 +302,8 @@ protected:
     std::unique_ptr<uint8_t[]> _workBuf;
     std::unique_ptr<uint8_t[]> _fdsBuf;
     std::unique_ptr<uint8_t[]> _cacheBuf;
+
+    SPIFFSConfig _cfg;
 };
 
 #define CHECKFD() while (_fd == 0) { panic(); }

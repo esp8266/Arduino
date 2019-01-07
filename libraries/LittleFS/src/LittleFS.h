@@ -44,6 +44,16 @@ namespace littlefs_impl {
 class LittleFSFileImpl;
 class LittleFSDirImpl;
 
+class LittleFSConfig : public FSConfig
+{
+public:
+    LittleFSConfig(bool autoFormat = true) {
+        _type = LittleFSConfig::fsid::FSId;
+        _autoFormat = autoFormat;
+    }
+    enum fsid { FSId = 0x4c495454 };
+};
+
 class LittleFSImpl : public FSImpl
 {
 public:
@@ -147,6 +157,14 @@ public:
         return remove(path);  // Same call on LittleFS
     }
 
+    bool setConfig(const FSConfig *cfg) override {
+        if ((cfg->_type != LittleFSConfig::fsid::FSId) || _mounted) {
+            return false;
+        }
+        _cfg = *static_cast<const LittleFSConfig *>(cfg);
+       return true;
+    }
+
     bool begin() override {
         if (_size <= 0) {
             DEBUGV("LittleFS size is <= zero");
@@ -155,7 +173,7 @@ public:
         if (_tryMount()) {
             return true;
         }
-        if (!format()) {
+        if (!_cfg._autoFormat || !format()) {
             return false;
         }
         return _tryMount();
@@ -281,6 +299,8 @@ protected:
 
     lfs_t       _lfs;
     lfs_config  _lfs_cfg;
+
+    LittleFSConfig _cfg;
 
     uint32_t _start;
     uint32_t _size;
@@ -521,6 +541,7 @@ protected:
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_LITTLEFS)
 extern FS LittleFS;
+using littlefs_impl::LittleFSConfig;
 #endif // ARDUINO
 
 
