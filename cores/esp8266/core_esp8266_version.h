@@ -24,8 +24,8 @@
 
 #include <core_version.h>
 
-#define STRHELPER(x) #x
-#define STR(x) STRHELPER(x)
+#define __STRHELPER(x) #x
+#define __STR(x) __STRHELPER(x)
 
 #ifdef __cplusplus
 extern "C++"
@@ -111,7 +111,7 @@ namespace esp8266 {
 constexpr
 int coreVersionMajor ()
 {
-    return conststr::parseNthInteger(STR(ARDUINO_ESP8266_GIT_DESC), 0);
+    return conststr::parseNthInteger(__STR(ARDUINO_ESP8266_GIT_DESC), 0);
 }
 
 /*
@@ -120,7 +120,7 @@ int coreVersionMajor ()
 constexpr
 int coreVersionMinor ()
 {
-    return conststr::parseNthInteger(STR(ARDUINO_ESP8266_GIT_DESC), 1);
+    return conststr::parseNthInteger(__STR(ARDUINO_ESP8266_GIT_DESC), 1);
 }
 
 /*
@@ -129,7 +129,7 @@ int coreVersionMinor ()
 constexpr
 int coreVersionRevision ()
 {
-    return conststr::parseNthInteger(STR(ARDUINO_ESP8266_GIT_DESC), 2);
+    return conststr::parseNthInteger(__STR(ARDUINO_ESP8266_GIT_DESC), 2);
 }
 
 /*
@@ -139,7 +139,7 @@ int coreVersionRevision ()
 constexpr
 int coreVersionSubRevision ()
 {
-    return conststr::parseNthInteger(STR(ARDUINO_ESP8266_GIT_DESC), 3);
+    return conststr::parseNthInteger(__STR(ARDUINO_ESP8266_GIT_DESC), 3);
 }
 
 /*

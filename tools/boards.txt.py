@@ -881,12 +881,12 @@ macros = {
         ]),
 
     'exception_menu': collections.OrderedDict([
-        ( '.menu.exception.enabled', 'Enabled' ),
-        ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
-        ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++' ),
         ( '.menu.exception.disabled', 'Disabled' ),
         ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
-        ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++-nox' ),
+        ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
+        ( '.menu.exception.enabled', 'Enabled' ),
+        ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
+        ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++-exc' ),
         ]),
 
     'crystalfreq_menu': collections.OrderedDict([
@@ -1206,6 +1206,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
             sys.stdout = open(lddir + ld, 'w')
 
         if spiffs_kb == 0:
+            spiffs_start = spiffs_end
             page = 0
             block = 0
         elif spiffs_kb < 0x80000 / 1024:

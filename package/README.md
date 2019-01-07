@@ -67,12 +67,28 @@ Here is an overview of the release process. See the section below for detailed i
 
 1. Assemble release notes.
 
-   * Since most changes are integrated into master using squash-rebase policy (i.e. one commit per PR), `git log --oneline` gives a good overview of changes in the release.
+    * Since most changes are integrated into master using squash-rebase policy (i.e. one commit per PR), `git log --oneline` gives a good overview of changes in the release.
 
-   * Prepare release notes in Markdown format.
+    * Prepare release notes in Markdown format.
 
-   * Combine related changes into the following categories, in that order:
+    * For changes that are breaking, duplicate those changes and put the duplicate lines into a separate group called Breaking Changes. That group should go at the top of the Changelog. The original lines for the breaking changes should be marked by appending "(Breaking change)" to the line. Example:
+   
+    ```
+    Breaking Changes
+    ================
+    API xyz changed #1234
+    ...
 
+    Library - xyz
+    =============
+    API xyz changed #1234 (Breaking change)
+    ...
+    ```
+
+
+    * Combine related changes into the following categories, in that order, including breaking changes with the appended mark:
+
+      - Breaking Changes
       - Core
       - *Libraries* — one section per library that received changes. If library only had a single change or a few changes, it is also okay to combine changes to a few such libraries under single "Other Libraries" entry.
       - Upstream dependencies
@@ -103,21 +119,25 @@ The following points assume work in a direct clone of the repository, and not in
    git push origin 2.5.0
    ```
 
-5. Wait for Travis CI build for the tag to pass. Check that the new (draft) release has been created. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
+5. Wait for Travis CI build for the tag to pass, see https://travis-ci.org/esp8266/Arduino/builds. Check that the new (draft) release has been created, see https://github.com/esp8266/Arduino/releases. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
 
 6. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
 
-7. Navigate to release list in Github, press "Edit" button to edit release description, paste release notes, and publish it.
+7. Navigate to release list in Github here https://github.com/esp8266/Arduino/releases, press "Edit" button to edit release description, paste release notes, and publish it.
 
 8. In the issue tracker, remove "staged-for-release" label for all issues which have it, and close them. Close the milestone associated with the released version.
 
-9. Check that https://arduino-esp8266.readthedocs.io/en/latest/ has a new doc build for the new tag, and that "stable" points to that build. If a new build did not trigger, log into readthedoc's home and trigger it manually.
+9. Check that https://arduino-esp8266.readthedocs.io/en/latest/ has a new doc build for the new tag, and that "stable" points to that build. If a new build did not trigger, log into readthedoc's home here https://readthedocs.org/ (account must have been added to project as maintainer) and trigger it manually.
 
 
 10. Create a commit to the master branch, updating:
 
-   * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `2.5.0-dev`.
+    * The version in platform.txt file. This should correspond to the version of the *next* milestone, plus `-dev` suffix. E.g. `2.5.0-dev`.
 
-   * In main README.md:
+    * In main README.md:
 
-     - in "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
+        - in "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
+        
+    * In doc/conf.py
+   
+        - update version and release to the *next* milestone
