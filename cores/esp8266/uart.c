@@ -72,13 +72,15 @@ struct uart_
     struct uart_rx_buffer_ * rx_buffer;
 };
 
-struct uartIntContext_t
+struct uartIsrContext_t
 {
     uartInterruptHandler callback;
     void* arg;
 };
 
-static volatile struct uartIntContext_t s_uartInterruptContext[2];
+// NOTE: GCC will generated an invalid warning for the following line
+// see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
+static volatile struct uartIsrContext_t s_uartInterruptContext[2] = { 0 };
 
 /*
    In the context of the naming conventions in this file, "_unsafe" means two things:
@@ -91,15 +93,12 @@ static volatile struct uartIntContext_t s_uartInterruptContext[2];
    wrap the unsafe ones with disabling/enabling of the uart interrupt for safe public use.
 */
 
-
-
 // called by ISR
 inline size_t ICACHE_RAM_ATTR
 uart_rx_fifo_available(const int uart_nr)
 {
     return (USS(uart_nr) >> USRXC) & 0xFF;
 }
-
 
 /**********************************************************/
 /************ UNSAFE FUNCTIONS ****************************/
@@ -312,7 +311,8 @@ uart_isr(void* arg)
                 }
                 else
                 {
-                    // Clear all interrupts flags (just in case)
+                    // No registered handler, so
+                    // clear all interrupts flags (just in case)
                     USIE(uartNum) = 0;
                     USIC(uartNum) = 0xffff;
                 }
@@ -355,11 +355,9 @@ uart_subscribeInterrupt(int uart_nr, uartInterruptHandler callback, void* param)
     }
 }
 
-void
+bool
 uart_unsubscribeInterrupt(int uart_nr, uartInterruptHandler callback)
 {
-    ETS_UART_INTR_DISABLE();
-
     if (s_uartInterruptContext[uart_nr].callback == callback)
     {
         // turn off uart
@@ -376,12 +374,13 @@ uart_unsubscribeInterrupt(int uart_nr, uartInterruptHandler callback)
             // detach our ISR
             ETS_UART_INTR_ATTACH(NULL, NULL);
 
-            // return so we don't enable interrupts since there is no ISR anymore
-            return;
+            // return false so we don't enable interrupts 
+            // since there is no need for the ISR anymore
+            return false;
         }
     }
 
-    ETS_UART_INTR_ENABLE();
+    return true;
 }
 
 
@@ -485,7 +484,6 @@ uart_wait_tx_empty(uart_t* uart)
 
     while (uart_tx_fifo_available(uart->uart_nr) > 0)
         delay(0);
-
 }
 
 void
@@ -652,7 +650,11 @@ uart_uninit(uart_t* uart)
 
     if (uart->rx_enabled)
     {
-        uart_unsubscribeInterrupt(uart->uart_nr, uart_isrDefault);
+        ETS_UART_INTR_DISABLE();
+        if (uart_unsubscribeInterrupt(uart->uart_nr, uart_isrDefault))
+        {
+            ETS_UART_INTR_ENABLE();
+        }
         free(uart->rx_buffer->buffer);
         free(uart->rx_buffer);
     }

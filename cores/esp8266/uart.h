@@ -149,10 +149,13 @@ extern "C" {
     void uart_start_detect_baudrate(int uart_nr);
     int uart_detect_baudrate(int uart_nr);
 
-    // attach MUST be called within a 
-    // ETS_UART_INTR_DISABLE()/ETS_UART_INTR_ENABLE() sandwich
+    // uart_subscribeInterrupt & uart_unsubscribeInterrupt are not safe and must
+    // be called within ETS_UART_INTR_DISABLE()/ETS_UART_INTR_ENABLE() protection
+    //
     void uart_subscribeInterrupt(int uart_nr, uartInterruptHandler callback, void* param);
-    void uart_unsubscribeInterrupt(int uart_nr, uartInterruptHandler callback);
+    // if uart_unsubscribeInterrupt returns false, then ETS_UART_INTR_ENABLE() doesn't
+    // need to be called after it
+    bool uart_unsubscribeInterrupt(int uart_nr, uartInterruptHandler callback);
 
 #if defined (__cplusplus)
 } // extern "C"
