@@ -510,18 +510,18 @@ bool ESP8266WiFiGenericClass::isSleepLevelMax () {
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
+
 struct arg_callback {
     IPAddress addr;
     bool called = false;
 };
 
-void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
-
 /**
  * Resolve the given hostname to an IP address.
  * @param aHostname     Name to be resolved
  * @param aResult       IPAddress structure to store the returned IP address
- * @return aIPString if a String was successfully converted to an IP address,
+ * @return 1 if aIPAddrString was successfully converted to an IP address,
  *          else 0
  */
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
