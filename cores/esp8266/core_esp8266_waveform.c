@@ -119,16 +119,8 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
   }
   Waveform *wave = &waveform[pin];
   // Adjust to shave off some of the IRQ time, approximately
-  uint32_t delta = 0;
-#if F_CPU == 80000000
-  if (timeHighUS > 2) {
-    delta = MicrosecondsToCycles(1) + MicrosecondsToCycles(2)/3;
-  }
-#else // 160000000
-  delta = MicrosecondsToCycles(1) >> 1; // 0.5 us off each edge
-#endif
-  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS) - delta;
-  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS) - delta;
+  wave->nextTimeHighCycles = MicrosecondsToCycles(timeHighUS);
+  wave->nextTimeLowCycles = MicrosecondsToCycles(timeLowUS);
   wave->expiryCycle = runTimeUS ? GetCycleCount() + MicrosecondsToCycles(runTimeUS) : 0;
   if (runTimeUS && !wave->expiryCycle) {
     wave->expiryCycle = 1; // expiryCycle==0 means no timeout, so avoid setting it
@@ -142,7 +134,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
     if (!timerRunning) {
       initTimer();
     }
-    timer1_write(MicrosecondsToCycles(1)); // Cause an interrupt post-haste
+    timer1_write(MicrosecondsToCycles(10)); // Cause an interrupt post-haste
     while (waveformToEnable) {
       delay(0); // Wait for waveform to update
     }
@@ -159,7 +151,7 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
 
 static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ() {
   uint32_t ccount;
-  __asm__ __volatile__("esync; rsr %0,ccount":"=a"(ccount));
+  __asm__ __volatile__("rsr %0,ccount":"=a"(ccount));
   return ccount;
 }
 
@@ -183,7 +175,10 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
     return false; //It's not running, nothing to do here
   }
   waveformToDisable |= mask;
-  timer1_write(MicrosecondsToCycles(1));
+  // Ensure tiomely service....
+  if (T1L > MicrosecondsToCycles(10)) {
+    timer1_write(MicrosecondsToCycles(10));
+  }
   while (waveformToDisable) {
     delay(1); // Wait for IRQ to update
   }
@@ -194,25 +189,32 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin) {
 }
 
 #if F_CPU == 80000000
-  #define MINCYCLE MicrosecondsToCycles(6)
-  #define DELTAIRQ MicrosecondsToCycles(5)
+  #define DELTAIRQ (MicrosecondsToCycles(3))
 #else
-  #define MINCYCLE MicrosecondsToCycles(4)
-  #define DELTAIRQ (MicrosecondsToCycles(2) + MicrosecondsToCycles(3)/4)
+  #define DELTAIRQ (MicrosecondsToCycles(2))
 #endif
 
+static int startPin = 0;
+static int endPin = 0;
+
 static ICACHE_RAM_ATTR void timer1Interrupt() {
-  uint32_t nextEventCycles;
+  uint32_t nextEventCycles = MicrosecondsToCycles(MAXIRQUS);
+  uint32_t timeoutCycle = GetCycleCountIRQ() + MicrosecondsToCycles(14);
 
-  // Handle enable/disable requests from main app.
-  waveformEnabled = (waveformEnabled & ~waveformToDisable) | waveformToEnable; // Set the requested waveforms on/off
-  waveformState &= ~waveformToEnable;  // And clear the state of any just started
-  waveformToEnable = 0;
-  waveformToDisable = 0;
+  if (waveformToEnable || waveformToDisable) {
+    // Handle enable/disable requests from main app.
+    waveformEnabled = (waveformEnabled & ~waveformToDisable) | waveformToEnable; // Set the requested waveforms on/off
+    waveformState &= ~waveformToEnable;  // And clear the state of any just started
+    waveformToEnable = 0;
+    waveformToDisable = 0;
+    startPin = __builtin_ffs(waveformEnabled) - 1;
+    endPin = 32 - __builtin_clz(waveformEnabled);
+  }
 
-  do {
+  bool done = false;
+  if (waveformEnabled) do {
     nextEventCycles = MicrosecondsToCycles(MAXIRQUS);
-    for (size_t i = 0; i <= 16; i++) {
+    for (int i = startPin; i <= endPin; i++) {
       uint32_t mask = 1<<i;
 
       // If it's not on, ignore!
@@ -257,21 +259,27 @@ static ICACHE_RAM_ATTR void timer1Interrupt() {
         nextEventCycles = min_u32(nextEventCycles, deltaCycles);
       }
     }
-  } while (nextEventCycles < MINCYCLE);
+    uint32_t now = GetCycleCountIRQ();
+    done = false;
+    int32_t cycleDeltaNextEvent = timeoutCycle - (now + nextEventCycles);
+    if (cycleDeltaNextEvent < 0) done = true;
+    int32_t cyclesLeftTimeout = timeoutCycle - now;
+    if (cyclesLeftTimeout < 0) done = true; 
+  } while (!done);
 
   if (timer1CB) {
     nextEventCycles = min_u32(nextEventCycles, timer1CB());
-    if (nextEventCycles < MINCYCLE) {
-      nextEventCycles = MINCYCLE;
-    }
+  }
+  if (nextEventCycles < MicrosecondsToCycles(10)) {
+    nextEventCycles = MicrosecondsToCycles(10);
   }
   nextEventCycles -= DELTAIRQ;
 
   // Do it here instead of global function to save time and because we know it's edge-IRQ
-  TEIE |= TEIE1; //edge int enable
 #if F_CPU == 160000000
   T1L = nextEventCycles >> 1; // Already know we're in range by MAXIRQUS
 #else
   T1L = nextEventCycles; // Already know we're in range by MAXIRQUS
 #endif
+  TEIE |= TEIE1; //edge int enable
 }
