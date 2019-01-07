@@ -43,7 +43,7 @@ function build_sketches()
     local build_rem=$5
     local lwip=$6
     mkdir -p $build_dir
-    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k -p $PWD/$build_dir -n $lwip $build_arg "
+    local build_cmd="python tools/build.py -b generic -v -w all -s 4M1M -v -k --build_cache $cache_dir -p $PWD/$build_dir -n $lwip $build_arg "
     local sketches=$(find $srcpath -name *.ino | sort)
     print_size_info >size.log
     export ARDUINO_IDE_PATH=$arduino
@@ -53,7 +53,21 @@ function build_sketches()
         if [ $testcnt -ne $build_rem ]; then
             continue  # Not ours to do
         fi
-        rm -rf $build_dir/*
+
+        if [ -e $cache_dir/core/*.a ]; then
+            # We need to preserve the build.options.json file and replace the last .ino
+            # with this sketch's ino file, or builder will throw everything away.
+	    sed -i "s,^.*sketchLocation.*$, \"sketchLocation\": \"$sketch\"\,,g" $build_dir/build.options.json
+            # Set the time of the cached core.a file to the future so the GIT header
+            # we regen won't cause the builder to throw it out and rebuild from scratch.
+            touch -d 'now + 1 day' $cache_dir/core/*.a
+        fi
+
+        # Clear out the last built sketch, map, elf, bin files, but leave the compiled
+        # objects in the core and libraries available for use so we don't need to rebuild
+        # them each sketch.
+        rm -rf $build_dir/sketch $build_dir/*.bin $build_dir/*.map $build_dir/*.elf
+
         local sketchdir=$(dirname $sketch)
         local sketchdirname=$(basename $sketchdir)
         local sketchname=$(basename $sketch)
@@ -221,6 +235,8 @@ if [ -z "$TRAVIS_BUILD_DIR" ]; then
     echo "TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR"
 fi
 
+cache_dir=$(mktemp -d)
+
 if [ "$BUILD_TYPE" = "build" ]; then
     install_arduino nodebug
     build_sketches_with_arduino 1 0 lm2f
@@ -259,6 +275,8 @@ elif [ "$BUILD_TYPE" = "platformio_odd" ]; then
     build_sketches_with_platformio $TRAVIS_BUILD_DIR/libraries "--board nodemcuv2 --verbose" 2 1
 else
     echo "BUILD_TYPE not set or invalid"
+    rm -rf $cache_dir
     exit 1
 fi
 
+rm -rf $cache_dir
