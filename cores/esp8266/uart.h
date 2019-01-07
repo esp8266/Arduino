@@ -33,7 +33,7 @@ extern "C" {
 #define UART1    1
 #define UART_NO -1
 
-// Options for `config` argument of uart_init
+    // Options for `config` argument of uart_init
 #define UART_NB_BIT_MASK      0B00001100
 #define UART_NB_BIT_5         0B00000000
 #define UART_NB_BIT_6         0B00000100
@@ -110,43 +110,49 @@ extern "C" {
 
 #define UART_TX_FIFO_SIZE 0x80
 
-struct uart_;
-typedef struct uart_ uart_t;
+    typedef void(*uartInterruptHandler)(void* arg); // ICACHE_RAM_ATTR required
 
-uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size);
-void uart_uninit(uart_t* uart);
+    struct uart_;
+    typedef struct uart_ uart_t;
 
-void uart_swap(uart_t* uart, int tx_pin);
-void uart_set_tx(uart_t* uart, int tx_pin);
-void uart_set_pins(uart_t* uart, int tx, int rx);
-bool uart_tx_enabled(uart_t* uart);
-bool uart_rx_enabled(uart_t* uart);
+    uart_t* uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx_size);
+    void uart_uninit(uart_t* uart);
 
-void uart_set_baudrate(uart_t* uart, int baud_rate);
-int uart_get_baudrate(uart_t* uart);
+    void uart_swap(uart_t* uart, int tx_pin);
+    void uart_set_tx(uart_t* uart, int tx_pin);
+    void uart_set_pins(uart_t* uart, int tx, int rx);
+    bool uart_tx_enabled(uart_t* uart);
+    bool uart_rx_enabled(uart_t* uart);
 
-size_t uart_resize_rx_buffer(uart_t* uart, size_t new_size);
-size_t uart_get_rx_buffer_size(uart_t* uart);
+    void uart_set_baudrate(uart_t* uart, int baud_rate);
+    int uart_get_baudrate(uart_t* uart);
 
-size_t uart_write_char(uart_t* uart, char c);
-size_t uart_write(uart_t* uart, const char* buf, size_t size);
-int uart_read_char(uart_t* uart);
-int uart_peek_char(uart_t* uart);
-size_t uart_read(uart_t* uart, char* buffer, size_t size);
-size_t uart_rx_available(uart_t* uart);
-size_t uart_tx_free(uart_t* uart);
-void uart_wait_tx_empty(uart_t* uart);
-void uart_flush(uart_t* uart);
+    size_t uart_resize_rx_buffer(uart_t* uart, size_t new_size);
+    size_t uart_get_rx_buffer_size(uart_t* uart);
 
-bool uart_has_overrun (uart_t* uart); // returns then clear overrun flag
-bool uart_has_rx_error (uart_t* uart); // returns then clear rxerror flag
+    size_t uart_write_char(uart_t* uart, char c);
+    size_t uart_write(uart_t* uart, const char* buf, size_t size);
+    int uart_read_char(uart_t* uart);
+    int uart_peek_char(uart_t* uart);
+    size_t uart_read(uart_t* uart, char* buffer, size_t size);
+    size_t uart_rx_available(uart_t* uart);
+    size_t uart_tx_free(uart_t* uart);
+    void uart_wait_tx_empty(uart_t* uart);
+    void uart_flush(uart_t* uart);
 
-void uart_set_debug(int uart_nr);
-int uart_get_debug();
+    bool uart_has_overrun(uart_t* uart); // returns then clear overrun flag
+    bool uart_has_rx_error(uart_t* uart); // returns then clear rxerror flag
 
-void uart_start_detect_baudrate(int uart_nr);
-int uart_detect_baudrate(int uart_nr);
+    void uart_set_debug(int uart_nr);
+    int uart_get_debug();
 
+    void uart_start_detect_baudrate(int uart_nr);
+    int uart_detect_baudrate(int uart_nr);
+
+    // attach MUST be called within a 
+    // ETS_UART_INTR_DISABLE()/ETS_UART_INTR_ENABLE() sandwich
+    void uart_subscribeInterrupt(int uart_nr, uartInterruptHandler callback, void* param);
+    void uart_unsubscribeInterrupt(int uart_nr, uartInterruptHandler callback);
 
 #if defined (__cplusplus)
 } // extern "C"
