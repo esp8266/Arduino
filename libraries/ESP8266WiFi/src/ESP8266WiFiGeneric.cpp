@@ -521,8 +521,8 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
  * Resolve the given hostname to an IP address.
  * @param aHostname     Name to be resolved
  * @param aResult       IPAddress structure to store the returned IP address
- * @return 1 if a String was successfully converted to an IP address,
- *          else error code
+ * @return aIPString if a String was successfully converted to an IP address,
+ *          else 0
  */
 int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
 {
@@ -584,7 +584,6 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
     if(ipaddr) {
         (reinterpret_cast<struct arg_callback*>(callback_arg))->addr = ipaddr->addr;
     }
-    DEBUG_WIFI_GENERIC("[hostByName] Host %s: Callback function called", name);
     esp_schedule(); // resume the hostByName function
 }
 
