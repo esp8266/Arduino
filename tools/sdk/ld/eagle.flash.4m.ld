@@ -14,7 +14,6 @@ MEMORY
   irom0_0_seg :                         org = 0x40201010, len = 0xfeff0
 }
 
-
 PROVIDE ( _FS_start = 0x405FB000 );
 PROVIDE ( _FS_end = 0x405FB000 );
 PROVIDE ( _FS_page = 0x0 );
