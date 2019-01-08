@@ -80,7 +80,10 @@ struct uartIsrContext_t
 
 // NOTE: GCC will generated an invalid warning for the following line
 // see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-braces"
 static volatile struct uartIsrContext_t s_uartInterruptContext[2] = { 0 };
+#pragma GCC diagnostic pop
 
 /*
    In the context of the naming conventions in this file, "_unsafe" means two things:
@@ -343,11 +346,13 @@ uart_isrDefault(void * arg)
 }
 
 void
-uart_subscribeInterrupt(int uart_nr, uartInterruptHandler callback, void* param)
+uart_subscribeInterrupt_unsafe(int uart_nr, uartInterruptHandler callback, void* param)
 {
     s_uartInterruptContext[uart_nr].callback = callback;
     s_uartInterruptContext[uart_nr].arg = param;
 
+    // check if we are already attached to the interrupt for
+    // the other uart and only attach if not
     int other_nr = (uart_nr + 1) % 2;
     if (s_uartInterruptContext[other_nr].callback == NULL)
     {
@@ -356,7 +361,7 @@ uart_subscribeInterrupt(int uart_nr, uartInterruptHandler callback, void* param)
 }
 
 bool
-uart_unsubscribeInterrupt(int uart_nr, uartInterruptHandler callback)
+uart_unsubscribeInterrupt_unsafe(int uart_nr, uartInterruptHandler callback)
 {
     if (s_uartInterruptContext[uart_nr].callback == callback)
     {
@@ -368,6 +373,8 @@ uart_unsubscribeInterrupt(int uart_nr, uartInterruptHandler callback)
         s_uartInterruptContext[uart_nr].callback = NULL;
         s_uartInterruptContext[uart_nr].arg = NULL;
 
+        // check if we are also attached to the interrupt for
+        // the other uart and only deattach if not
         int other_nr = (uart_nr + 1) % 2;
         if (s_uartInterruptContext[other_nr].callback == NULL)
         {
@@ -410,7 +417,7 @@ uart_start_isr(uart_t* uart)
     // UIPE: parity error
     // UITO: rx fifo timeout
     USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIOF) | (1 << UIFR) | (1 << UIPE) | (1 << UITO);
-    uart_subscribeInterrupt(uart->uart_nr, uart_isrDefault, (void *)uart);
+    uart_subscribeInterrupt_unsafe(uart->uart_nr, uart_isrDefault, (void *)uart);
 
 }
 
@@ -651,7 +658,7 @@ uart_uninit(uart_t* uart)
     if (uart->rx_enabled)
     {
         ETS_UART_INTR_DISABLE();
-        if (uart_unsubscribeInterrupt(uart->uart_nr, uart_isrDefault))
+        if (uart_unsubscribeInterrupt_unsafe(uart->uart_nr, uart_isrDefault))
         {
             ETS_UART_INTR_ENABLE();
         }
