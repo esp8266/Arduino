@@ -112,6 +112,16 @@ Instructions - Windows 10
 
 - If using the Arduino IDE for Visual Studio (https://www.visualmicro.com/), be sure to click Tools - Visual Micro - Rescan Toolchains and Libraries 
 
+-  You may see some error messages about missing files related to the
+   ``SoftwareSerial`` library. These are because the ESP8266 version
+   of this library has been moved to a separate git submodule. In
+   order to get rid of these messages, initialize the submodule:
+
+   .. code:: bash
+
+       cd %USERPROFILE%\Documents\hardware\esp8266com\esp8266
+       git submodules update --init   
+  
 -  When later updating your local library, goto the esp8266 directory and do a git pull
 
    .. code:: bash
@@ -174,3 +184,13 @@ Instructions - Other OS
        python get.py
 
 -  Restart Arduino
+
+-  You may see some error messages about missing files related to the
+   ``SoftwareSerial`` library. These are because the ESP8266 version
+   of this library has been moved to a separate git submodule. In
+   order to get rid of these messages, initialize the submodule:
+
+   .. code:: bash
+
+       cd esp8266
+       git submodules update --init   
