@@ -91,7 +91,7 @@ extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
 #ifdef __cplusplus
 
 #ifndef CCBUFSIZE
-#define CCBUFSIZE 8192
+#define CCBUFSIZE 65536
 #endif
 
 // tcp
@@ -109,6 +109,7 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
 size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize);
 size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms, uint32_t ipv4, uint16_t port);
+void mockUDPSwallow (size_t copied, char* ccinbuf, size_t& ccinbufsize);
 
 class UdpContext;
 void register_udp (int sock, UdpContext* udp = nullptr);
@@ -139,6 +140,10 @@ class InterruptLock { };
 #define D6 6
 #define D7 7
 #define D8 8
+
+//
+
+#include <common/esp8266_peri.h>
 
 //
 
