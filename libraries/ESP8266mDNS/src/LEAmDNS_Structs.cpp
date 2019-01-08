@@ -126,7 +126,7 @@ bool MDNSResponder::stcMDNSServiceTxt::setKey(const char* p_pcKey,
     releaseKey();
     if (p_stLength) {
         if (allocKey(p_stLength)) {
-            os_strncpy(m_pcKey, p_pcKey, p_stLength);
+            strncpy(m_pcKey, p_pcKey, p_stLength);
             m_pcKey[p_stLength] = 0;
             bResult = true;
         }
@@ -139,7 +139,7 @@ bool MDNSResponder::stcMDNSServiceTxt::setKey(const char* p_pcKey,
  */
 bool MDNSResponder::stcMDNSServiceTxt::setKey(const char* p_pcKey) {
     
-    return setKey(p_pcKey, (p_pcKey ? os_strlen(p_pcKey) : 0));
+    return setKey(p_pcKey, (p_pcKey ? strlen(p_pcKey) : 0));
 }
 
 /*
@@ -177,7 +177,7 @@ bool MDNSResponder::stcMDNSServiceTxt::setValue(const char* p_pcValue,
     releaseValue();
     if (p_stLength) {
         if (allocValue(p_stLength)) {
-            os_strncpy(m_pcValue, p_pcValue, p_stLength);
+            strncpy(m_pcValue, p_pcValue, p_stLength);
             m_pcValue[p_stLength] = 0;
             bResult = true;
         }
@@ -193,7 +193,7 @@ bool MDNSResponder::stcMDNSServiceTxt::setValue(const char* p_pcValue,
  */
 bool MDNSResponder::stcMDNSServiceTxt::setValue(const char* p_pcValue) {
     
-    return setValue(p_pcValue, (p_pcValue ? os_strlen(p_pcValue) : 0));
+    return setValue(p_pcValue, (p_pcValue ? strlen(p_pcValue) : 0));
 }
 
 /*
@@ -237,9 +237,9 @@ size_t MDNSResponder::stcMDNSServiceTxt::length(void) const {
 
     size_t  stLength = 0;
     if (m_pcKey) {
-        stLength += os_strlen(m_pcKey);                     // Key
+        stLength += strlen(m_pcKey);                     // Key
         stLength += 1;                                      // '='
-        stLength += (m_pcValue ? os_strlen(m_pcValue) : 0); // Value
+        stLength += (m_pcValue ? strlen(m_pcValue) : 0); // Value
     }
     return stLength;
 }
@@ -461,15 +461,15 @@ bool MDNSResponder::stcMDNSServiceTxts::c_str(char* p_pcBuffer) {
         *p_pcBuffer = 0;
         for (stcMDNSServiceTxt* pTxt=m_pTxts; ((bResult) && (pTxt)); pTxt = pTxt->m_pNext) {
             size_t  stLength;
-            if ((bResult = (0 != (stLength = (pTxt->m_pcKey ? os_strlen(pTxt->m_pcKey) : 0))))) {
+            if ((bResult = (0 != (stLength = (pTxt->m_pcKey ? strlen(pTxt->m_pcKey) : 0))))) {
                 if (pTxt != m_pTxts) {
                     *p_pcBuffer++ = ';';
                 }
-                os_strncpy(p_pcBuffer, pTxt->m_pcKey, stLength); p_pcBuffer[stLength] = 0;
+                strncpy(p_pcBuffer, pTxt->m_pcKey, stLength); p_pcBuffer[stLength] = 0;
                 p_pcBuffer += stLength;
                 *p_pcBuffer++ = '=';
-                if ((stLength = (pTxt->m_pcValue ? os_strlen(pTxt->m_pcValue) : 0))) {
-                    os_strncpy(p_pcBuffer, pTxt->m_pcValue, stLength); p_pcBuffer[stLength] = 0;
+                if ((stLength = (pTxt->m_pcValue ? strlen(pTxt->m_pcValue) : 0))) {
+                    strncpy(p_pcBuffer, pTxt->m_pcValue, stLength); p_pcBuffer[stLength] = 0;
                     p_pcBuffer += stLength;
                 }
             }
@@ -503,12 +503,12 @@ bool MDNSResponder::stcMDNSServiceTxts::buffer(char* p_pcBuffer) {
         for (stcMDNSServiceTxt* pTxt=m_pTxts; ((bResult) && (pTxt)); pTxt = pTxt->m_pNext) {
             *(unsigned char*)p_pcBuffer++ = pTxt->length();
             size_t  stLength;
-            if ((bResult = (0 != (stLength = (pTxt->m_pcKey ? os_strlen(pTxt->m_pcKey) : 0))))) {
-                os_memcpy(p_pcBuffer, pTxt->m_pcKey, stLength);
+            if ((bResult = (0 != (stLength = (pTxt->m_pcKey ? strlen(pTxt->m_pcKey) : 0))))) {
+                memcpy(p_pcBuffer, pTxt->m_pcKey, stLength);
                 p_pcBuffer += stLength;
                 *p_pcBuffer++ = '=';
-                if ((stLength = (pTxt->m_pcValue ? os_strlen(pTxt->m_pcValue) : 0))) {
-                    os_memcpy(p_pcBuffer, pTxt->m_pcValue, stLength);
+                if ((stLength = (pTxt->m_pcValue ? strlen(pTxt->m_pcValue) : 0))) {
+                    memcpy(p_pcBuffer, pTxt->m_pcValue, stLength);
                     p_pcBuffer += stLength;
                 }
             }
@@ -532,7 +532,7 @@ bool MDNSResponder::stcMDNSServiceTxts::compare(const MDNSResponder::stcMDNSServ
             bResult = ((pOtherTxt) &&
                        (pTxt->m_pcValue) &&
                        (pOtherTxt->m_pcValue) &&
-                       (os_strlen(pTxt->m_pcValue) == os_strlen(pOtherTxt->m_pcValue)) &&
+                       (strlen(pTxt->m_pcValue) == strlen(pOtherTxt->m_pcValue)) &&
                        (0 == strcmp(pTxt->m_pcValue, pOtherTxt->m_pcValue)));
         }
         // Compare B->A
@@ -541,7 +541,7 @@ bool MDNSResponder::stcMDNSServiceTxts::compare(const MDNSResponder::stcMDNSServ
             bResult = ((pTxt) &&
                        (pOtherTxt->m_pcValue) &&
                        (pTxt->m_pcValue) &&
-                       (os_strlen(pOtherTxt->m_pcValue) == os_strlen(pTxt->m_pcValue)) &&
+                       (strlen(pOtherTxt->m_pcValue) == strlen(pTxt->m_pcValue)) &&
                        (0 == strcmp(pOtherTxt->m_pcValue, pTxt->m_pcValue)));
         }
     }
@@ -660,7 +660,7 @@ bool MDNSResponder::stcMDNS_RRDomain::addLabel(const char* p_pcLabel,
     bool    bResult = false;    
     
     size_t  stLength = (p_pcLabel
-                        ? (os_strlen(p_pcLabel) + (p_bPrependUnderline ? 1 : 0))
+                        ? (strlen(p_pcLabel) + (p_bPrependUnderline ? 1 : 0))
                         : 0);
     if ((MDNS_DOMAIN_LABEL_MAXLENGTH >= stLength) &&
         (MDNS_DOMAIN_MAXLENGTH >= (m_u16NameLength + (1 + stLength)))) {
@@ -673,7 +673,7 @@ bool MDNSResponder::stcMDNS_RRDomain::addLabel(const char* p_pcLabel,
                 m_acName[m_u16NameLength++] = '_';
                 --stLength;
             }
-            os_strncpy(&(m_acName[m_u16NameLength]), p_pcLabel, stLength); m_acName[m_u16NameLength + stLength] = 0;
+            strncpy(&(m_acName[m_u16NameLength]), p_pcLabel, stLength); m_acName[m_u16NameLength + stLength] = 0;
             m_u16NameLength += stLength;
         }
         bResult = true;
@@ -1235,10 +1235,10 @@ bool MDNSResponder::stcMDNSService::setName(const char* p_pcName) {
     bool bResult = false;
     
     releaseName();
-    size_t stLength = (p_pcName ? os_strlen(p_pcName) : 0);
+    size_t stLength = (p_pcName ? strlen(p_pcName) : 0);
     if (stLength) {
         if ((bResult = (0 != (m_pcName = new char[stLength + 1])))) {
-            os_strncpy(m_pcName, p_pcName, stLength);
+            strncpy(m_pcName, p_pcName, stLength);
             m_pcName[stLength] = 0;
         }
     }
@@ -1268,10 +1268,10 @@ bool MDNSResponder::stcMDNSService::setService(const char* p_pcService) {
     bool bResult = false;
     
     releaseService();
-    size_t stLength = (p_pcService ? os_strlen(p_pcService) : 0);
+    size_t stLength = (p_pcService ? strlen(p_pcService) : 0);
     if (stLength) {
         if ((bResult = (0 != (m_pcService = new char[stLength + 1])))) {
-            os_strncpy(m_pcService, p_pcService, stLength);
+            strncpy(m_pcService, p_pcService, stLength);
             m_pcService[stLength] = 0;
         }
     }
@@ -1301,10 +1301,10 @@ bool MDNSResponder::stcMDNSService::setProtocol(const char* p_pcProtocol) {
     bool bResult = false;
     
     releaseProtocol();
-    size_t stLength = (p_pcProtocol ? os_strlen(p_pcProtocol) : 0);
+    size_t stLength = (p_pcProtocol ? strlen(p_pcProtocol) : 0);
     if (stLength) {
         if ((bResult = (0 != (m_pcProtocol = new char[stLength + 1])))) {
-            os_strncpy(m_pcProtocol, p_pcProtocol, stLength);
+            strncpy(m_pcProtocol, p_pcProtocol, stLength);
             m_pcProtocol[stLength] = 0;
         }
     }

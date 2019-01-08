@@ -149,8 +149,8 @@ class IPAddress: public Printable {
         /*
                lwIP address compatibility
         */
+        IPAddress(const ipv4_addr& fw_addr)   { setV4(); v4() = fw_addr.addr; }
         IPAddress(const ipv4_addr* fw_addr)   { setV4(); v4() = fw_addr->addr; }
-        IPAddress(const ip_addr_t& lwip_addr) { _ip = lwip_addr; }
 
         operator       ip_addr_t () const { return  _ip; }
         operator const ip_addr_t*() const { return &_ip; }
@@ -162,6 +162,9 @@ class IPAddress: public Printable {
         bool isLocal () const { return ip_addr_islinklocal(&_ip); }
 
 #if LWIP_IPV6
+
+        IPAddress(const ip_addr_t& lwip_addr) { ip_addr_copy(_ip, lwip_addr); }
+        IPAddress(const ip_addr_t* lwip_addr) { ip_addr_copy(_ip, *lwip_addr); }
 
         uint16_t* raw6()
         {
