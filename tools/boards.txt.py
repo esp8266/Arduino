@@ -947,14 +947,14 @@ macros = {
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
+        ( '.menu.FlashMode.dout', 'DOUT' ),
+        ( '.menu.FlashMode.dout.build.flash_mode', 'dout' ),
         ( '.menu.FlashMode.qio', 'QIO' ),
         ( '.menu.FlashMode.qio.build.flash_mode', 'qio' ),
         ( '.menu.FlashMode.qout', 'QOUT' ),
         ( '.menu.FlashMode.qout.build.flash_mode', 'qout' ),
         ( '.menu.FlashMode.dio', 'DIO' ),
         ( '.menu.FlashMode.dio.build.flash_mode', 'dio' ),
-        ( '.menu.FlashMode.dout', 'DOUT' ),
-        ( '.menu.FlashMode.dout.build.flash_mode', 'dout' ),
         ]),
 
     ####################### default flash_mode
