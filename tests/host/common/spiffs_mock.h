@@ -47,7 +47,7 @@ protected:
     bool m_overwrite;
 };
 
-//#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SpiffsMock spiffs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
-//#define SPIFFS_MOCK_RESET() spiffs_mock.reset()
+#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SpiffsMock spiffs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
+#define SPIFFS_MOCK_RESET() spiffs_mock.reset()
 
 #endif /* spiffs_mock_hpp */
