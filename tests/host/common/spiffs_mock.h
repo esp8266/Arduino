@@ -25,7 +25,7 @@
 
 class SpiffsMock {
 public:
-    SpiffsMock(size_t fs_size, size_t fs_block, size_t fs_page, bool storage = true);
+    SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, bool storage = true);
     void reset();
     ~SpiffsMock();
     
@@ -44,10 +44,10 @@ protected:
     uint8_t* m_fs;
     size_t m_fs_size;
     bool m_storage;
+    bool m_overwrite;
 };
 
-#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SpiffsMock spiffs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
-#define SPIFFS_MOCK_RESET() spiffs_mock.reset()
-
+//#define SPIFFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SpiffsMock spiffs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
+//#define SPIFFS_MOCK_RESET() spiffs_mock.reset()
 
 #endif /* spiffs_mock_hpp */

@@ -103,6 +103,7 @@ size_t mockWrite     (int sock, const uint8_t* data, size_t size, int timeout_ms
 int serverAccept (int sock);
 
 // udp
+void check_incoming_udp ();
 int mockUDPSocket ();
 bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast = 0);
 size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& addrsize, uint8_t addr[16], uint16_t& port);
@@ -115,6 +116,11 @@ class UdpContext;
 void register_udp (int sock, UdpContext* udp = nullptr);
 
 class InterruptLock { };
+
+//
+
+void mock_start_spiffs (size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
+void mock_stop_spiffs ();
 
 //
 
