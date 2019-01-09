@@ -185,6 +185,9 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     return ret;
 }
 
+bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& passphrase, int channel, int ssid_hidden, int max_connection) {
+    return softAP(ssid.c_str(), passphrase.c_str(), channel, ssid_hidden, max_connection);
+}
 
 /**
  * Configure access point
