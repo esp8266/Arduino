@@ -155,6 +155,13 @@
                      "size": "16466"
                   },
                   {
+                     "host": "i686-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/i686-linux-gnu.esptool-f80ae31.tar.gz",
+                     "archiveFileName": "i686-linux-gnu.esptool-f80ae31.tar.gz",
+                     "checksum": "SHA-256:fe632f4602d02b6a9425c5bf95074095cb6d3c57912168a0f6b796fddd8ce991",
+                     "size": "16543"
+                  },
+                  {
                      "host": "x86_64-apple-darwin",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/x86_64-apple-darwin14.esptool-f80ae31.tar.gz",
                      "archiveFileName": "x86_64-apple-darwin14.esptool-f80ae31.tar.gz",
@@ -203,6 +210,13 @@
                      "size": "44935132"
                   },
                   {
+                     "host": "i686-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/i686-linux-gnu.xtensa-lx106-elf-1f24aeae.tar.gz",
+                     "archiveFileName": "i686-linux-gnu.xtensa-lx106-elf-1f24aeae.tar.gz",
+                     "checksum": "SHA-256:96b106fbc814155e92d1805d3227d36096b88d3d54cfcd885804a0e9cf5631d7",
+                     "size": "42500158"
+                  },
+                  {
                      "host": "x86_64-apple-darwin",
                      "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/x86_64-apple-darwin14.xtensa-lx106-elf-20ed2b9c.tar.gz",
                      "archiveFileName": "x86_64-apple-darwin14.xtensa-lx106-elf-20ed2b9c.tar.gz",
@@ -249,6 +263,13 @@
                      "archiveFileName": "i686-w64-mingw32.mkspiffs-7fefeac.zip",
                      "checksum": "SHA-256:ec661fb02c2635ac722eaaedf0a0c35474c43c72008f0ceefffb19af2f739d15",
                      "size": "337874"
+                  },
+                  {
+                     "host": "i686-pc-linux-gnu",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/i686-linux-gnu.mkspiffs-7fefeac.tar.gz",
+                     "archiveFileName": "i686-linux-gnu.mkspiffs-7fefeac.tar.gz",
+                     "checksum": "SHA-256:d080b3b50ee00ac56b7204f8d08b95cd53872a2e09da590775ee631bcb279cad",
+                     "size": "54276"
                   },
                   {
                      "host": "x86_64-apple-darwin",
