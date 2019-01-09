@@ -63,7 +63,7 @@ static uint32_t s_micros_at_task_start;
 
 extern "C" {
 extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
-const char* core_release = 
+const char* core_release =
 #ifdef ARDUINO_ESP8266_RELEASE
     ARDUINO_ESP8266_RELEASE;
 #else
@@ -134,16 +134,51 @@ static void loop_task(os_event_t *events) {
         panic();
     }
 }
+extern "C" {
+
+struct object { long placeholder[ 10 ]; };
+void __register_frame_info (const void *begin, struct object *ob);
+extern char __eh_frame[];
+}
 
 static void do_global_ctors(void) {
+    static struct object ob;
+    __register_frame_info( __eh_frame, &ob );
+
     void (**p)(void) = &__init_array_end;
     while (p != &__init_array_start)
         (*--p)();
 }
 
+extern "C" {
+extern void __unhandled_exception(const char *str);
+
+static void  __unhandled_exception_cpp()
+{
+#ifndef __EXCEPTIONS
+	abort();
+#else
+    static bool terminating;
+    if (terminating)
+        abort();
+    terminating = true;
+    /* Use a trick from vterminate.cc to get any std::exception what() */
+    try {
+        __throw_exception_again;
+    } catch (const std::exception& e) {
+        __unhandled_exception( e.what() );
+    } catch (...) {
+        __unhandled_exception( "" );
+    }
+#endif
+}
+
+}
+
 void init_done() {
     system_set_os_print(1);
     gdb_init();
+    std::set_terminate(__unhandled_exception_cpp);
     do_global_ctors();
     esp_schedule();
 }
@@ -212,17 +247,25 @@ extern "C" void ICACHE_RAM_ATTR app_entry (void)
     return app_entry_custom();
 }
 
+extern "C" void preinit (void) __attribute__((weak));
+extern "C" void preinit (void)
+{
+    /* do nothing by default */
+}
+
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
 
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 
-    init();
+    init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
 
     cont_init(g_pcont);
+
+    preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 
     ets_task(loop_task,
         LOOP_TASK_PRIORITY, s_loop_queue,

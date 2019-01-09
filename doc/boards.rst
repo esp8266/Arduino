@@ -219,6 +219,13 @@ The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development b
 
 Product page: https://www.adafruit.com/product/2821
 
+Invent One
+----------
+
+The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng
+
+Product page: https://inventone.ng
+
 XinaBox CW01
 ------------
 
@@ -431,4 +438,13 @@ Wio Link is designed to simplify your IoT development. It is an ESP8266 based op
 Please DO NOTICE that you MUST pull up pin 15 to enable the power for Grove ports, the board is designed like this for the purpose of peripherals power management.
 
 Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html
+
+ESPectro Core
+-------------
+
+ESPectro Core is ESP8266 development board as the culmination of our 3+ year experience in exploring and developing products with ESP8266 MCU.
+
+Initially designed for kids in mind, everybody should be able to use it. Yet it's still hacker-friendly as we break out all ESP8266 ESP-12F pins.
+
+More details at https://shop.makestro.com/product/espectrocore/
 

@@ -7,9 +7,14 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
 const char* host = "esp8266-webupdate";
-const char* ssid = "........";
-const char* password = "........";
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 ESP8266WebServer server(80);
 const char* serverIndex = "<form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>";
@@ -65,5 +70,5 @@ void setup(void) {
 
 void loop(void) {
   server.handleClient();
-  delay(1);
+  MDNS.update();
 }

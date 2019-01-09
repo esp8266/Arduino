@@ -47,7 +47,7 @@ class TwoWire : public Stream
     static void (*user_onRequest)(void);
     static void (*user_onReceive)(int);
     static void onRequestService(void);
-    static void onReceiveService(uint8_t*, int);
+    static void onReceiveService(uint8_t*, size_t);
   public:
     TwoWire();
     void begin(int sda, int scl);

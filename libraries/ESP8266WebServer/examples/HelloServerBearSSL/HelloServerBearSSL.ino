@@ -14,8 +14,13 @@
 #include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
 
-const char* ssid = "....";
-const char* password = "....";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 BearSSL::ESP8266WebServerSecure server(443);
 
@@ -123,7 +128,7 @@ void setup(void){
     Serial.println("MDNS responder started");
   }
 
-  server.setRSACert(new BearSSLX509List(serverCert), new BearSSLPrivateKey(serverKey));
+  server.setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
 
   server.on("/", handleRoot);
 
@@ -139,4 +144,5 @@ void setup(void){
 
 void loop(void){
   server.handleClient();
+  MDNS.update();
 }

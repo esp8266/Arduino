@@ -26,6 +26,7 @@ extern "C" {
 #include "ets_sys.h"
 }
 
+#include <StackThunk.h>
 #include "debug.h"
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"
@@ -33,21 +34,24 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
-#include "include/ClientContext.h"
+#include <include/ClientContext.h>
 #include "WiFiServerSecureBearSSL.h"
 
 namespace BearSSL {
 
 // Only need to call the standard server constructor
 WiFiServerSecure::WiFiServerSecure(IPAddress addr, uint16_t port) : WiFiServer(addr, port) {
+  stack_thunk_add_ref();
 }
 
 // Only need to call the standard server constructor
 WiFiServerSecure::WiFiServerSecure(uint16_t port) : WiFiServer(port) {
+  stack_thunk_add_ref();
 }
 
 // Destructor only checks if we need to delete compatibilty cert/key
 WiFiServerSecure::~WiFiServerSecure() {
+  stack_thunk_del_ref();
   if (_deleteChainAndKey) {
     delete _chain;
     delete _sk;
@@ -56,14 +60,14 @@ WiFiServerSecure::~WiFiServerSecure() {
 
 // Specify a RSA-signed certificate and key for the server.  Only copies the pointer, the
 // caller needs to preserve this chain and key for the life of the object.
-void WiFiServerSecure::setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk) {
+void WiFiServerSecure::setRSACert(const X509List *chain, const PrivateKey *sk) {
   _chain = chain;
   _sk = sk;
 }
 
 // Specify a EC-signed certificate and key for the server.  Only copies the pointer, the
 // caller needs to preserve this chain and key for the life of the object.
-void WiFiServerSecure::setECCert(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk) {
+void WiFiServerSecure::setECCert(const X509List *chain, unsigned cert_issuer_key_type, const PrivateKey *sk) {
   _chain = chain;
   _cert_issuer_key_type = cert_issuer_key_type;
   _sk = sk;
@@ -99,8 +103,8 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
 
 
 void WiFiServerSecure::setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) {
-  BearSSLX509List *chain = new BearSSLX509List(cert, certLen);
-  BearSSLPrivateKey *sk = new BearSSLPrivateKey(key, keyLen);
+  X509List *chain = new X509List(cert, certLen);
+  PrivateKey *sk = new PrivateKey(key, keyLen);
   if (!chain || !key) {
     // OOM, fail gracefully
     delete chain;

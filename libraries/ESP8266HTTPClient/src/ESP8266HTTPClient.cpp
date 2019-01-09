@@ -25,15 +25,15 @@
 
 #include "ESP8266HTTPClient.h"
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
 #include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
+#include <WiFiClientSecureAxTLS.h>
 #endif
 
 #include <StreamString.h>
 #include <base64.h>
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
 class TransportTraits
 {
 public:
@@ -64,7 +64,10 @@ public:
 
     std::unique_ptr<WiFiClient> create() override
     {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
         return std::unique_ptr<WiFiClient>(new axTLS::WiFiClientSecure());
+#pragma GCC diagnostic pop
     }
 
     bool verify(WiFiClient& client, const char* host) override
@@ -112,7 +115,7 @@ protected:
 HTTPClient::HTTPClient()
 {
     _client = nullptr;
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
     _tcpDeprecated.reset(nullptr);
 #endif
 }
@@ -147,7 +150,13 @@ void HTTPClient::clear()
  * @return success bool
  */
 bool HTTPClient::begin(WiFiClient &client, String url) {
-    end();
+#if HTTPCLIENT_1_1_COMPATIBLE
+    if(_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
+#endif
 
     _client = &client;
 
@@ -180,7 +189,13 @@ bool HTTPClient::begin(WiFiClient &client, String url) {
  */
 bool HTTPClient::begin(WiFiClient &client, String host, uint16_t port, String uri, bool https)
 {
-    end();
+#if HTTPCLIENT_1_1_COMPATIBLE
+    if(_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
+#endif
 
     _client = &client;
 
@@ -193,11 +208,14 @@ bool HTTPClient::begin(WiFiClient &client, String host, uint16_t port, String ur
 }
 
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
 bool HTTPClient::begin(String url, String httpsFingerprint)
 {
-    if(_client) _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     _port = 443;
     if (httpsFingerprint.length() == 0) {
@@ -214,8 +232,11 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
 
 bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
 {
-    if(_client) _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     _port = 443;
     if (!beginInternal(url, "https")) {
@@ -237,8 +258,11 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
  */
 bool HTTPClient::begin(String url)
 {
-    if(_client) _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     _port = 80;
     if (!beginInternal(url, "http")) {
@@ -296,11 +320,14 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
     return true;
 }
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
 bool HTTPClient::begin(String host, uint16_t port, String uri)
 {
-    if(_client) _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     clear();
     _host = host;
@@ -325,8 +352,11 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, bool https, Strin
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFingerprint)
 {
-    if(_client) _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     clear();
     _host = host;
@@ -343,8 +373,11 @@ bool HTTPClient::begin(String host, uint16_t port, String uri, String httpsFinge
 
 bool HTTPClient::begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])
 {
-    if(_client) _canReuse = false;
-    end();
+    if(_client && !_tcpDeprecated) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] mix up of new and deprecated api\n");
+        _canReuse = false;
+        end();
+    }
 
     clear();
     _host = host;
@@ -378,15 +411,13 @@ void HTTPClient::end(void)
 void HTTPClient::disconnect()
 {
     if(connected()) {
-        if(_client) {
-            if(_client->available() > 0) {
-                DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _client->available());
-                while(_client->available() > 0) {
-                    _client->read();
-                }
+        if(_client->available() > 0) {
+            DEBUG_HTTPCLIENT("[HTTP-Client][end] still data in buffer (%d), clean up.\n", _client->available());
+            while(_client->available() > 0) {
+                _client->read();
             }
-
         }
+
         if(_reuse && _canReuse) {
             DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp keep open for reuse\n");
         } else {
@@ -395,7 +426,7 @@ void HTTPClient::disconnect()
                 _client->stop();
                 _client = nullptr;
             }
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
             if(_tcpDeprecated) {
                 _transportTraits.reset(nullptr);
                 _tcpDeprecated.reset(nullptr);
@@ -706,7 +737,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
         free(buff);
 
         if(size && (int) size != bytesWritten) {
-            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.\n", bytesWritten, size);
+            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %zd mismatch!.\n", bytesWritten, size);
             DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!");
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
         } else {
@@ -1007,8 +1038,8 @@ bool HTTPClient::connect(void)
         return true;
     }
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
-    if(!_client) {
+#if HTTPCLIENT_1_1_COMPATIBLE
+    if(!_client && _transportTraits) {
         _tcpDeprecated = _transportTraits->create();
         _client = _tcpDeprecated.get();
     }
@@ -1028,7 +1059,7 @@ bool HTTPClient::connect(void)
 
     DEBUG_HTTPCLIENT("[HTTP-Client] connected to %s:%u\n", _host.c_str(), _port);
 
-#ifdef HTTPCLIENT_1_1_COMPATIBLE
+#if HTTPCLIENT_1_1_COMPATIBLE
     if (_tcpDeprecated && !_transportTraits->verify(*_tcpDeprecated, _host.c_str())) {
         DEBUG_HTTPCLIENT("[HTTP-Client] transport level verify failed\n");
         _client->stop();

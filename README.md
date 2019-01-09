@@ -1,6 +1,14 @@
 Arduino core for ESP8266 WiFi chip
 ===========================================
 
+# Quick links
+
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.5.0-beta2/)
+- [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
+- [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
+
+# Arduino on ESP8266
+
 This project brings support for ESP8266 chip to the Arduino environment. It lets you write sketches using familiar Arduino functions and libraries, and run them directly on ESP8266, no external microcontroller required.
 
 ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and UDP, set up HTTP, mDNS, SSDP, and DNS servers, do OTA updates, use a file system in flash memory, work with SD cards, servos, SPI and I2C peripherals.
@@ -28,7 +36,7 @@ Starting with 1.6.4, Arduino allows installation of third-party platform package
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
 Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.4.2/](https://arduino-esp8266.readthedocs.io/en/2.4.2/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.0-beta2/](https://arduino-esp8266.readthedocs.io/en/2.5.0-beta2/)
 
 ### Using git version (basic instructions)
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
@@ -105,7 +113,7 @@ Please provide as much context as possible:
 
 For minor fixes of code and documentation, please go ahead and submit a pull request.
 
-Check out the list of issues which are easy to fix — [easy issues for 2.5.0](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.5.0+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
+Check out the list of issues which are easy to fix — [easy issues pending](https://github.com/esp8266/Arduino/issues?q=is%3Aopen+is%3Aissue+label%3A%22level%3A+easy%22). Working on them is a great way to move the project forward.
 
 Larger changes (rewriting parts of existing code from scratch, adding new functions to the core, adding new libraries) should generally be discussed by opening an issue first.
 

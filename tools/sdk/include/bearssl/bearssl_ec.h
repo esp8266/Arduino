@@ -508,6 +508,30 @@ extern const br_ec_impl br_ec_c25519_m15;
 extern const br_ec_impl br_ec_c25519_m31;
 
 /**
+ * \brief EC implementation "m62" (specialised code) for Curve25519.
+ *
+ * This implementation uses custom code relying on multiplication of
+ * integers up to 62 bits, with a 124-bit result. This implementation is
+ * defined only on platforms that offer the 64x64->128 multiplication
+ * support; use `br_ec_c25519_m62_get()` to dynamically obtain a pointer
+ * to that implementation. Due to the specificities of the curve
+ * definition, the following applies:
+ *
+ *   - `muladd()` is not implemented (the function returns 0 systematically).
+ *   - `order()` returns 2^255-1, since the point multiplication algorithm
+ *     accepts any 32-bit integer as input (it clears the top bit and low
+ *     three bits systematically).
+ */
+extern const br_ec_impl br_ec_c25519_m62;
+
+/**
+ * \brief Get the "m62" implementation of Curve25519, if available.
+ *
+ * \return  the implementation, or 0.
+ */
+const br_ec_impl *br_ec_c25519_m62_get(void);
+
+/**
  * \brief Aggregate EC implementation "m15".
  *
  * This implementation is a wrapper for:
