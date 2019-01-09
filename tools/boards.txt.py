@@ -949,30 +949,38 @@ macros = {
     'flashmode_menu': collections.OrderedDict([
         ( '.menu.FlashMode.dout', 'DOUT (compatible)' ),
         ( '.menu.FlashMode.dout.build.flash_mode', 'dout' ),
+        ( '.menu.FlashMode.dout.build.flash_flags', '-DFLASHMODE_DOUT' ),
         ( '.menu.FlashMode.dio', 'DIO' ),
         ( '.menu.FlashMode.dio.build.flash_mode', 'dio' ),
+        ( '.menu.FlashMode.dio.build.flash_flags', '-DFLASHMODE_DIO' ),
         ( '.menu.FlashMode.qout', 'QOUT' ),
         ( '.menu.FlashMode.qout.build.flash_mode', 'qout' ),
+        ( '.menu.FlashMode.qout.build.flash_flags', '-DFLASHMODE_QOUT' ),
         ( '.menu.FlashMode.qio', 'QIO (fast)' ),
         ( '.menu.FlashMode.qio.build.flash_mode', 'qio' ),
+        ( '.menu.FlashMode.qio.build.flash_flags', '-DFLASHMODE_QIO' ),
         ]),
 
     ####################### default flash_mode
 
     'flashmode_dio': collections.OrderedDict([
         ( '.build.flash_mode', 'dio' ),
+        ( '.build.flash_flags', '-DFLASHMODE_DIO' ),
         ]),
 
     'flashmode_qio': collections.OrderedDict([
         ( '.build.flash_mode', 'qio' ),
+        ( '.build.flash_flags', '-DFLASHMODE_QIO' ),
         ]),
 
     'flashmode_dout': collections.OrderedDict([
         ( '.build.flash_mode', 'dout' ),
+        ( '.build.flash_flags', '-DFLASHMODE_DOUT' ),
         ]),
 
     'flashmode_qout': collections.OrderedDict([
         ( '.build.flash_mode', 'qout' ),
+        ( '.build.flash_flags', '-DFLASHMODE_QOUT' ),
         ]),
 
     ####################### lwip
