@@ -167,7 +167,13 @@ public:
 
     size_t read (char* dst, size_t size)
     {
-        return mockRead(_sock, dst, size, 0, _inbuf, _inbufsize);
+        ssize_t ret = mockRead(_sock, dst, size, 0, _inbuf, _inbufsize);
+        if (ret < 0)
+        {
+            abort(); // close, CLOSED
+            return 0;
+        }
+        return ret;
     }
 
     int peek()
@@ -198,7 +204,13 @@ public:
 
     size_t write(const uint8_t* data, size_t size)
     {
-        return mockWrite(_sock, data, size, _timeout_ms);
+	ssize_t ret = mockWrite(_sock, data, size, _timeout_ms);
+	if (ret < 0)
+	{
+	    abort(); // close, CLOSED
+	    return 0;
+	}
+	return ret;
     }
 
     size_t write(Stream& stream)
@@ -208,7 +220,7 @@ public:
         avail = stream.readBytes(buf, avail);
         size_t totwrote = 0;
         uint8_t* w = buf;
-        while (avail)
+        while (avail && _sock >= 0)
         {
             size_t wrote = write(w, avail);
             w += wrote;

@@ -66,20 +66,24 @@ int mockConnect (uint32_t ipv4, int& sock, int port)
 	return 1;
 }
 
-size_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
+ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 {
 	size_t maxread = CCBUFSIZE - ccinbufsize;
 	ssize_t ret = ::read(sock, ccinbuf + ccinbufsize, maxread);
 	if (ret == -1)
 	{
 		if (errno != EAGAIN)
+		{
 			fprintf(stderr, MOCK "ClientContext::(read/peek): filling buffer for %zd bytes: %s\n", maxread, strerror(errno));
+			return -1;
+		}
 		ret = 0;
 	}
-	return ccinbufsize += ret;
+	ccinbufsize += ret;
+	return ret;
 }
 
-size_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
+ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
 	if (usersize > CCBUFSIZE)
 		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
@@ -96,7 +100,8 @@ size_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char
 		}
 		
 		// check incoming data data
-		mockFillInBuf(sock, ccinbuf, ccinbufsize);
+		if (mockFillInBuf(sock, ccinbuf, ccinbufsize) < 0)
+			return -1;
 		if (usersize <= ccinbufsize)
 		{
 			// data just received
@@ -113,16 +118,18 @@ size_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char
 	return retsize;
 }
 
-size_t mockRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
+ssize_t mockRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
-	size_t copied = mockPeekBytes(sock, dst, size, timeout_ms, ccinbuf, ccinbufsize);
+	ssize_t copied = mockPeekBytes(sock, dst, size, timeout_ms, ccinbuf, ccinbufsize);
+	if (copied < 0)
+		return -1;
 	// swallow (XXX use a circular buffer)
 	memmove(ccinbuf, ccinbuf + copied, ccinbufsize - copied);
 	ccinbufsize -= copied;
 	return copied;
 }
 	
-size_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
+ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 {
 	struct pollfd p;
 	p.fd = sock;
@@ -140,7 +147,7 @@ size_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 		if (ret == -1)
 		{
 			fprintf(stderr, MOCK "ClientContext::read: write(%d): %s\n", sock, strerror(errno));
-			return 0;
+			return -1;
 		}
 		if (ret != (int)size)
 		{

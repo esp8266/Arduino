@@ -95,11 +95,11 @@ extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
 #endif
 
 // tcp
-int    mockConnect   (uint32_t addr, int& sock, int port);
-size_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize);
-size_t mockPeekBytes (int sock, char* dst, size_t size, int timeout_ms, char* buf, size_t& bufsize);
-size_t mockRead      (int sock, char* dst, size_t size, int timeout_ms, char* buf, size_t& bufsize);
-size_t mockWrite     (int sock, const uint8_t* data, size_t size, int timeout_ms);
+int    mockConnect    (uint32_t addr, int& sock, int port);
+ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize);
+ssize_t mockPeekBytes (int sock, char* dst, size_t size, int timeout_ms, char* buf, size_t& bufsize);
+ssize_t mockRead      (int sock, char* dst, size_t size, int timeout_ms, char* buf, size_t& bufsize);
+ssize_t mockWrite     (int sock, const uint8_t* data, size_t size, int timeout_ms);
 int serverAccept (int sock);
 
 // udp
