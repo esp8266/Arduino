@@ -150,7 +150,32 @@ SSDPClass::SSDPClass() :
 }
 
 SSDPClass::~SSDPClass() {
-  delete _timer;
+#ifdef DEBUG_SSDP
+  DEBUG_SSDP.printf("SSDP end ... ");
+#endif
+  if(_timer) {
+    ETSTimer* tm = &(_timer->timer);
+    os_timer_disarm(tm);
+    delete _timer;
+  }
+
+  if (_server) {
+    _server->unref();
+    _server = 0;
+  }
+
+  ip_addr_t ifaddr;
+  ifaddr.addr = WiFi.localIP();
+  ip_addr_t multicast_addr;
+  multicast_addr.addr = (uint32_t) SSDP_MULTICAST_ADDR;
+  if (igmp_leavegroup(&ifaddr, &multicast_addr) != ERR_OK ) {
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf("SSDP failed to leave igmp group\n");
+#endif
+  }
+#ifdef DEBUG_SSDP
+  DEBUG_SSDP.printf("ok\n");
+#endif
 }
 
 bool SSDPClass::begin() {
