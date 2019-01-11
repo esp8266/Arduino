@@ -99,7 +99,7 @@ void SpiffsMock::load ()
         if (!m_overwrite)
         {
             fprintf(stderr, "SPIFFS: aborting at user request\n");
-            abort();
+            exit(1);
         }
         fprintf(stderr, "SPIFFS: continuing without loading at user request, '%s' will be overwritten\n", m_storage.c_str());
     }
