@@ -79,10 +79,10 @@ bool MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSen
     if (p_rSendParameter.m_bResponse) {
         if (p_rSendParameter.m_bUnicast) {  // Unicast response  -> Send to querier
             DEBUG_EX_ERR(if (!m_pUDPContext->getRemoteAddress()) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage: MISSING remote address for response!\n")); });
-            ip_addr_t   ipRemote;
-            ipRemote.addr = m_pUDPContext->getRemoteAddress();
+            IPAddress   ipRemote;
+            ipRemote = m_pUDPContext->getRemoteAddress();
             bResult = ((_prepareMDNSMessage(p_rSendParameter, _getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE))) &&
-                       (m_pUDPContext->send(&ipRemote, m_pUDPContext->getRemotePort())));
+                       (m_pUDPContext->send(ipRemote, m_pUDPContext->getRemotePort())));
         }
         else {                              // Multicast response -> Send via the same network interface, that received the query
             bResult = _sendMDNSMessage_Multicast(p_rSendParameter, (SOFTAP_MODE | STATION_MODE));
@@ -116,26 +116,20 @@ bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParamet
                                                int p_iWiFiOpMode) {
     bool    bResult = false;
 
-    ip_addr_t   ifFromAddress;
-    ifFromAddress.addr = _getResponseMulticastInterface(p_iWiFiOpMode);
-    IPAddress   fromIPAddress(ifFromAddress.addr);
-#if LWIP_VERSION_MAJOR == 1
-    m_pUDPContext->setMulticastInterface(ifFromAddress);
-#else
-    m_pUDPContext->setMulticastInterface(&ifFromAddress);
-#endif
+    IPAddress   fromIPAddress;
+    fromIPAddress = _getResponseMulticastInterface(p_iWiFiOpMode);
+    m_pUDPContext->setMulticastInterface(fromIPAddress);
 
-    ip_addr_t   toMulticastAddress;
 #ifdef MDNS_IP4_SUPPORT
-    toMulticastAddress.addr = DNS_MQUERY_IPV4_GROUP_INIT;
+    IPAddress   toMulticastAddress(DNS_MQUERY_IPV4_GROUP_INIT);
 #endif
 #ifdef MDNS_IP6_SUPPORT
     //TODO: set multicast address
-    toMulticastAddress.addr = DNS_MQUERY_IPV6_GROUP_INIT;
+    IPAddress   toMulticastAddress(DNS_MQUERY_IPV6_GROUP_INIT);
 #endif
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage_Multicast: Will send to '%s'.\n"), IPAddress(toMulticastAddress.addr).toString().c_str()););
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage_Multicast: Will send to '%s'.\n"), toMulticastAddress.toString().c_str()););
     bResult = ((_prepareMDNSMessage(p_rSendParameter, fromIPAddress)) &&
-               (m_pUDPContext->send(&toMulticastAddress, DNS_MQUERY_PORT)));
+               (m_pUDPContext->send(toMulticastAddress, DNS_MQUERY_PORT)));
 
     DEBUG_EX_ERR(if (!bResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage_Multicast: FAILED!\n")); });
     return bResult;
@@ -385,13 +379,13 @@ IPAddress MDNSResponder::_getResponseMulticastInterface(int p_iWiFiOpModes) cons
         (wifi_get_opmode() & SOFTAP_MODE)) {
         //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface: SOFTAP_MODE\n")););
         // Get remote IP address
-        ip_info IPInfo_Remote;
-        IPInfo_Remote.ip.addr = m_pUDPContext->getRemoteAddress();
+        IPAddress IP_Remote;
+        IP_Remote = m_pUDPContext->getRemoteAddress();
         // Get local (AP) IP address
         wifi_get_ip_info(SOFTAP_IF, &IPInfo_Local);
         
         if ((IPInfo_Local.ip.addr) &&                                                       // Has local AP IP address AND
-            (ip_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))) { // Remote address is in the same subnet as the AP
+            (ip4_addr_netcmp(ip_2_ip4((const ip_addr_t*)IP_Remote), &IPInfo_Local.ip, &IPInfo_Local.netmask))) { // Remote address is in the same subnet as the AP
             bFoundMatch = true;
         }
     }
@@ -402,8 +396,8 @@ IPAddress MDNSResponder::_getResponseMulticastInterface(int p_iWiFiOpModes) cons
         // Get local (STATION) IP address
         wifi_get_ip_info(STATION_IF, &IPInfo_Local);
     }
-    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface(%i): %s\n"), p_iWiFiOpModes, IPAddress(IPInfo_Local.ip.addr).toString().c_str()););
-    return IPAddress(IPInfo_Local.ip.addr);
+    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface(%i): %s\n"), p_iWiFiOpModes, IPAddress(IPInfo_Local.ip).toString().c_str()););
+    return IPAddress(IPInfo_Local.ip);
 }
 
 

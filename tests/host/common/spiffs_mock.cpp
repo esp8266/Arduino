@@ -27,8 +27,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#define SPIFFS_FILE_NAME "spiffs.bin"
-
 extern "C"
 {
     static uint32_t s_phys_addr = 0;
@@ -40,11 +38,14 @@ extern "C"
 
 FS SPIFFS(nullptr);
 
-SpiffsMock::SpiffsMock(size_t fs_size, size_t fs_block, size_t fs_page, bool storage)
+SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, bool storage)
 {
+    m_storage = storage;
+    if ((m_overwrite = (fs_size < 0)))
+        fs_size = -fs_size;
+
     fprintf(stderr, "SPIFFS: %zd bytes\n", fs_size);
 
-    m_storage = storage;
     m_fs = new uint8_t[m_fs_size = fs_size];
     memset(&m_fs[0], 0xff, m_fs_size);
 
@@ -82,19 +83,42 @@ void SpiffsMock::load ()
 {
     if (!m_fs_size)
         return;
-
+    
     const char* fname = getenv("SPIFFS_PATH");
     if (!fname)
         fname = DEFAULT_SPIFFS_FILE_NAME;
-    int fs = ::open(SPIFFS_FILE_NAME, O_RDONLY);
+    int fs = ::open(fname, O_RDONLY);
     if (fs == -1)
     {
         fprintf(stderr, "SPIFFS: loading '%s': %s\n", fname, strerror(errno));
         return;
     }
-    fprintf(stderr, "SPIFFS: loading %zi bytes from '%s'\n", m_fs_size, fname);
-    if (::read(fs, &m_fs[0], m_fs_size) != (ssize_t)m_fs_size)
-        fprintf(stderr, "SPIFFS: reading %zi bytes: %s\n", m_fs_size, strerror(errno));
+    
+    off_t flen = lseek(fs, 0, SEEK_END);
+    if (flen == (off_t)-1)
+    {
+        fprintf(stderr, "SPIFFS: checking size of '%s': %s\n", fname, strerror(errno));
+        return;
+    }
+    lseek(fs, 0, SEEK_SET);
+    
+    if (flen != (off_t)m_fs_size)
+    {
+        fprintf(stderr, "SPIFFS: size of '%s': %d does not match requested size %zd\n", fname, (int)flen, m_fs_size);
+        if (!m_overwrite)
+        {
+            fprintf(stderr, "SPIFFS: aborting at user request\n");
+            abort();
+        }
+        fprintf(stderr, "SPIFFS: continuing without loading at user request, '%s' will be overwritten\n", fname);
+    }
+    else
+    {
+        fprintf(stderr, "SPIFFS: loading %zi bytes from '%s'\n", m_fs_size, fname);
+        ssize_t r = ::read(fs, &m_fs[0], m_fs_size);
+        if (r != (ssize_t)m_fs_size)
+            fprintf(stderr, "SPIFFS: reading %zi bytes: returned %zd: %s\n", m_fs_size, r, strerror(errno));
+    }
     ::close(fs);
 }
 
@@ -106,7 +130,7 @@ void SpiffsMock::save ()
     const char* fname = getenv("SPIFFS_PATH");
     if (!fname)
         fname = DEFAULT_SPIFFS_FILE_NAME;
-    int fs = ::open(SPIFFS_FILE_NAME, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+    int fs = ::open(fname, O_CREAT | O_TRUNC | O_WRONLY, 0644);
     if (fs == -1)
     {
         fprintf(stderr, "SPIFFS: saving '%s': %s\n", fname, strerror(errno));

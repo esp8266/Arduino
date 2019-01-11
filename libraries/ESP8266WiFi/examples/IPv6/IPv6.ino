@@ -54,8 +54,6 @@ void status(Print& out) {
   out.println(F("------------------------------"));
   out.println(ESP.getFullVersion());
 
-  dns_setserver(DNS_MAX_SERVERS - 1, IPAddress(8, 8, 8, 8));
-
   for (int i = 0; i < DNS_MAX_SERVERS; i++) {
     IPAddress dns = WiFi.dnsIP(i);
     if (dns.isSet()) {
@@ -98,7 +96,11 @@ void setup() {
   Serial.println();
   Serial.println(ESP.getFullVersion());
 
-  Serial.printf("IPV6 is%s enabled\n", LWIP_IPV6 ? emptyString.c_str() : " NOT");
+#if LWIP_IPV6
+  Serial.printf("IPV6 is enabled\n");
+#else
+  Serial.printf("IPV6 is not enabled\n");
+#endif
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(STASSID, STAPSK);

@@ -107,17 +107,14 @@ public:
         udp_disconnect(_pcb);
     }
 
+    void setMulticastInterface(const IPAddress& addr)
+    {
 #if LWIP_VERSION_MAJOR == 1
-    void setMulticastInterface(const ip_addr_t addr)
-    {
-        udp_set_multicast_netif_addr(_pcb, addr);
-    }
+        udp_set_multicast_netif_addr(_pcb, (ip_addr_t)addr);
 #else
-    void setMulticastInterface(const ip_addr_t* addr)
-    {
-        udp_set_multicast_netif_addr(_pcb, ip_2_ip4(addr));
-    }
+        udp_set_multicast_netif_addr(_pcb, ip_2_ip4((const ip_addr_t*)addr));
 #endif
+    }
 
     void setMulticastTTL(int ttl)
     {
