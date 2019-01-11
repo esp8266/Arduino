@@ -24,8 +24,8 @@
 
 #if ULWIPDEBUG
 //#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT)
-//#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH)
-#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON)
+#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH)
+//#define LWIP_DBG_TYPES_ON	(LWIP_DBG_ON)
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -39,6 +39,7 @@ extern "C"
 void (*phy_capture) (int netif_idx, const char* data, size_t len, int out, int success);
 
 /////////////////////////////////////////////////////////////////////////////
+#include <sys/pgmspace.h>
 
 #if UDEBUG && UDEBUGSTORE
 #warning use 'doprint_allow=1' right after Serial is enabled

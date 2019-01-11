@@ -27,9 +27,11 @@
 
 #include "os_type.h"
 #ifdef LWIP_OPEN_SRC
-#include "lwip/ip_addr.h"
+
+#include "ipv4_addr.h"
+
 #else
-#include "ip_addr.h"
+#error LWIP_OPEN_SRC must be defined
 #endif
 
 #include "queue.h"
@@ -356,13 +358,13 @@ struct station_info {
     STAILQ_ENTRY(station_info)    next;
 
     uint8 bssid[6];
-    struct ip_addr ip;
+    struct ipv4_addr ip;
 };
 
 struct dhcps_lease {
     bool enable;
-    struct ip_addr start_ip;
-    struct ip_addr end_ip;
+    struct ipv4_addr start_ip;
+    struct ipv4_addr end_ip;
 };
 
 enum dhcps_offer_option{
@@ -519,9 +521,9 @@ typedef struct {
 } Event_StaMode_AuthMode_Change_t;
 
 typedef struct {
-    struct ip_addr ip;
-    struct ip_addr mask;
-    struct ip_addr gw;
+    struct ipv4_addr ip;
+    struct ipv4_addr mask;
+    struct ipv4_addr gw;
 } Event_StaMode_Got_IP_t;
 
 typedef struct {
@@ -531,7 +533,7 @@ typedef struct {
 
 typedef struct {
     uint8 mac[6];
-    struct ip_addr ip;
+    struct ipv4_addr ip;
     uint8 aid;
 } Event_SoftAPMode_Distribute_Sta_IP_t;
 

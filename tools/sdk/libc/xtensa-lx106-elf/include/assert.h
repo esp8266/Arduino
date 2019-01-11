@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 #include "_ansi.h"
-#include <pgmspace.h>
+#include <sys/pgmspace.h>
 
 #undef assert
 

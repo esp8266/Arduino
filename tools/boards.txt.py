@@ -37,6 +37,7 @@ import sys
 import collections
 import getopt
 import re
+import json
 
 # serial upload speed order in menu
 # default is 115 for every board unless specified with 'serial' in board
@@ -324,6 +325,23 @@ boards = collections.OrderedDict([
         'desc': [ 'The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12S, clocked at 80 MHz at 3.3V logic. A high-quality SiLabs CP2104 USB-Serial chip is included so that you can upload code at a blistering 921600 baud for fast development time. It also has auto-reset so no noodling with pins and reset button pressings. A 3.7V Lithium polymer battery connector is included, making it ideal for portable projects. The Adafruit Feather HUZZAH ESP8266 will automatically recharge a connected battery when USB power is available.',
                   '',
                   'Product page: https://www.adafruit.com/product/2821'
+                  ],
+    }),
+	( 'inventone', {
+        'name': 'Invent One',
+        'opts': {
+            '.build.board': 'ESP8266_GENERIC',
+            '.build.variant': 'inventone',
+            },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+            ],
+        'desc': [ 'The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng',
+                  '',
+                  'Product page: https://inventone.ng'
                   ],
     }),
     ( 'cw01', {
@@ -803,6 +821,26 @@ boards = collections.OrderedDict([
                   '',
                   'Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html'
                 ],
+    }),
+    ('espectro', {
+        'name': 'ESPectro Core',
+        'opts': {
+            '.build.board': 'ESP8266_ESPECTRO_CORE',
+            '.build.variant': 'espectro',
+        },
+        'macro': [
+            'resetmethod_nodemcu',
+            'flashmode_dio',
+            'flashfreq_40',
+            '4M',
+        ],
+        'desc': [
+            'ESPectro Core is ESP8266 development board as the culmination of our 3+ year experience in exploring and developing products with ESP8266 MCU.',
+            '',
+            'Initially designed for kids in mind, everybody should be able to use it. Yet it\'s still hacker-friendly as we break out all ESP8266 ESP-12F pins.',
+            '',
+            'More details at https://shop.makestro.com/product/espectrocore/',
+        ],
     })
     ])
 
@@ -840,6 +878,15 @@ macros = {
         ( '.menu.vt.heap.build.vtable_flags', '-DVTABLES_IN_DRAM'),
         ( '.menu.vt.iram', 'IRAM'),
         ( '.menu.vt.iram.build.vtable_flags', '-DVTABLES_IN_IRAM'),
+        ]),
+
+    'exception_menu': collections.OrderedDict([
+        ( '.menu.exception.disabled', 'Disabled' ),
+        ( '.menu.exception.disabled.build.exception_flags', '-fno-exceptions' ),
+        ( '.menu.exception.disabled.build.stdcpp_lib', '-lstdc++' ),
+        ( '.menu.exception.enabled', 'Enabled' ),
+        ( '.menu.exception.enabled.build.exception_flags', '-fexceptions' ),
+        ( '.menu.exception.enabled.build.stdcpp_lib', '-lstdc++-exc' ),
         ]),
 
     'crystalfreq_menu': collections.OrderedDict([
@@ -934,19 +981,27 @@ macros = {
         ( '.menu.ip.lm2f', 'v2 Lower Memory' ),
         ( '.menu.ip.lm2f.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.lm2f.build.lwip_lib', '-llwip2-536-feat' ),
-        ( '.menu.ip.lm2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1' ),
+        ( '.menu.ip.lm2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0' ),
         ( '.menu.ip.hb2f', 'v2 Higher Bandwidth' ),
         ( '.menu.ip.hb2f.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.hb2f.build.lwip_lib', '-llwip2-1460-feat' ),
-        ( '.menu.ip.hb2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1' ),
+        ( '.menu.ip.hb2f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0' ),
         ( '.menu.ip.lm2n', 'v2 Lower Memory (no features)' ),
         ( '.menu.ip.lm2n.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.lm2n.build.lwip_lib', '-llwip2-536' ),
-        ( '.menu.ip.lm2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0' ),
+        ( '.menu.ip.lm2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0' ),
         ( '.menu.ip.hb2n', 'v2 Higher Bandwidth (no features)' ),
         ( '.menu.ip.hb2n.build.lwip_include', 'lwip2/include' ),
         ( '.menu.ip.hb2n.build.lwip_lib', '-llwip2-1460' ),
-        ( '.menu.ip.hb2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0' ),
+        ( '.menu.ip.hb2n.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0' ),
+        ( '.menu.ip.lm6f', 'v2 IPv6 Lower Memory' ),
+        ( '.menu.ip.lm6f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.lm6f.build.lwip_lib', '-llwip6-536-feat' ),
+        ( '.menu.ip.lm6f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1' ),
+        ( '.menu.ip.hb6f', 'v2 IPv6 Higher Bandwidth' ),
+        ( '.menu.ip.hb6f.build.lwip_include', 'lwip2/include' ),
+        ( '.menu.ip.hb6f.build.lwip_lib', '-llwip6-1460-feat' ),
+        ( '.menu.ip.hb6f.build.lwip_flags', '-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1' ),
         ]),
 
     'lwip': collections.OrderedDict([
@@ -1108,7 +1163,10 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
     else:
         max_upload_size = 1024 * 1024 - reserved
         spiffs_start = (flashsize_kb - spiffs_kb) * 1024
-        spiffs_blocksize = 8192
+        if spiffs_kb < 512:
+            spiffs_blocksize = 4096
+        else:
+            spiffs_blocksize = 8192
 
     strsize = str(flashsize_kb / 1024) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
     strspiffs = str(spiffs_kb / 1024) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
@@ -1148,6 +1206,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
             sys.stdout = open(lddir + ld, 'w')
 
         if spiffs_kb == 0:
+            spiffs_start = spiffs_end
             page = 0
             block = 0
         elif spiffs_kb < 0x80000 / 1024:
@@ -1214,6 +1273,8 @@ def all_flash_map ():
     f1m.update( flash_map(    1024,     512 ))
 
     f2m.update( flash_map(  2*1024))
+    f2m.update( flash_map(  2*1024,     128 ))
+    f2m.update( flash_map(  2*1024,     256 ))
     f2m.update( flash_map(  2*1024,     512 ))
     f2m.update( flash_map(  2*1024,    1024 ))
 
@@ -1295,6 +1356,7 @@ def all_boards ():
     print('menu.lvl=Debug Level')
     print('menu.ip=lwIP Variant')
     print('menu.vt=VTables')
+    print('menu.exception=Exceptions')
     print('menu.led=Builtin Led')
     print('menu.wipe=Erase Flash')
     print('')
@@ -1310,7 +1372,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:
@@ -1369,9 +1431,11 @@ def package ():
 
     newfilestr = re.sub(r'"boards":[^\]]*\],', substitution, filestr, re.MULTILINE)
 
+    # To get consistent indent/formatting read the JSON and write it out programattically
     if packagegen:
         with open(pkgfname, 'w') as package_file:
-            package_file.write(newfilestr)
+            filejson = json.loads(filestr, object_pairs_hook=collections.OrderedDict)
+            package_file.write(json.dumps(filejson, indent=3, separators=(',',': ')))
         print("updated:   %s" % pkgfname)
     else:
         sys.stdout.write(newfilestr)

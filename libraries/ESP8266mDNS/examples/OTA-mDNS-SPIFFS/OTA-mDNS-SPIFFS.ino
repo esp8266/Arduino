@@ -12,6 +12,11 @@
 
 */
 
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
 // includes
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -31,8 +36,8 @@
    @brief Default WiFi connection information.
    @{
 */
-const char* ap_default_ssid = "esp8266"; ///< Default SSID.
-const char* ap_default_psk = "esp8266esp8266"; ///< Default PSK.
+const char* ap_default_ssid = STASSID; ///< Default SSID.
+const char* ap_default_psk = STAPSK; ///< Default PSK.
 /// @}
 
 /// Uncomment the next line for verbose output over UART.
@@ -90,13 +95,13 @@ bool loadConfig(String *ssid, String *pass) {
   ssid->trim();
   pass->trim();
 
-  #ifdef SERIAL_VERBOSE
+#ifdef SERIAL_VERBOSE
   Serial.println("----- file content -----");
   Serial.println(content);
   Serial.println("----- file content -----");
   Serial.println("ssid: " + *ssid);
   Serial.println("psk:  " + *pass);
-  #endif
+#endif
 
   return true;
 } // loadConfig
@@ -233,6 +238,5 @@ void setup() {
 void loop() {
   // Handle OTA server.
   ArduinoOTA.handle();
-  yield();
 }
 

@@ -3,9 +3,14 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266AVRISP.h>
 
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
 const char* host = "esp8266-avrisp";
-const char* ssid = "**********";
-const char* pass = "**********";
+const char* ssid = STASSID;
+const char* pass = STAPSK;
 const uint16_t port = 328;
 const uint8_t reset_pin = 5;
 
@@ -64,5 +69,9 @@ void loop() {
   // Serve the client
   if (last_state != AVRISP_STATE_IDLE) {
     avrprog.serve();
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    MDNS.update();
   }
 }

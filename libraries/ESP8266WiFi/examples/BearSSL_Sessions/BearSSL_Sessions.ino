@@ -6,8 +6,13 @@
 #include <ESP8266WiFi.h>
 #include <time.h>
 
-const char *ssid = "....";
-const char *pass = "....";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char *ssid = STASSID;
+const char *pass = STAPSK;
 
 const char *   host = "api.github.com";
 const uint16_t port = 443;
@@ -119,7 +124,7 @@ vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep
 )EOF";
   uint32_t start, finish;
   BearSSL::WiFiClientSecure client;
-  BearSSLX509List cert(digicert);
+  BearSSL::X509List cert(digicert);
 
   Serial.printf("Connecting without sessions...");
   start = millis();
@@ -128,7 +133,7 @@ vEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep
   finish = millis();
   Serial.printf("Total time: %dms\n", finish - start);
 
-  BearSSLSession session;
+  BearSSL::Session session;
   client.setSession(&session);
   Serial.printf("Connecting with an unitialized session...");
   start = millis();

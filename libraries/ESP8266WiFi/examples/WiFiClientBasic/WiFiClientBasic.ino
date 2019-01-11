@@ -7,8 +7,13 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 
-const char* ssid     = "your-ssid";
-const char* password = "your-password";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid     = STASSID;
+const char* password = STAPSK;
 
 const char* host = "192.168.1.1";
 const uint16_t port = 3000;
@@ -17,7 +22,6 @@ ESP8266WiFiMulti WiFiMulti;
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
 
   // We start by connecting to a WiFi network
   WiFi.mode(WIFI_STA);

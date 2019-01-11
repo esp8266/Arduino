@@ -88,6 +88,10 @@ public:
     void end();
 
     size_t setRxBufferSize(size_t size);
+    size_t getRxBufferSize()
+    {
+        return uart_get_rx_buffer_size(_uart);
+    }
 
     void swap()
     {
@@ -120,13 +124,23 @@ public:
 
     int peek(void) override
     {
-        // this may return -1, but that's okay
+        // return -1 when data is unvailable (arduino api)
         return uart_peek_char(_uart);
     }
     int read(void) override
     {
-        // this may return -1, but that's okay
+        // return -1 when data is unvailable (arduino api)
         return uart_read_char(_uart);
+    }
+    // ::read(buffer, size): same as readBytes without timeout
+    size_t read(char* buffer, size_t size)
+    {
+        return uart_read(_uart, buffer, size);
+    }
+    size_t readBytes(char* buffer, size_t size) override;
+    size_t readBytes(uint8_t* buffer, size_t size) override
+    {
+        return readBytes((char*)buffer, size);
     }
     int availableForWrite(void)
     {
@@ -182,6 +196,11 @@ public:
     bool hasOverrun(void)
     {
         return uart_has_overrun(_uart);
+    }
+
+    bool hasRxError(void)
+    {
+        return uart_has_rx_error(_uart);
     }
 
     void startDetectBaudrate();

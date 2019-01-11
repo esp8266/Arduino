@@ -6,8 +6,13 @@
 
 #include <ESP8266WiFi.h>
 
-const char *ssid = "....";
-const char *pass = "....";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char *ssid = STASSID;
+const char *pass = STAPSK;
 
 void fetch(BearSSL::WiFiClientSecure *client) {
   client->write("GET / HTTP/1.0\r\nHost: tls.mbed.org\r\nUser-Agent: ESP8266\r\n\r\n");
