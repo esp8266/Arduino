@@ -119,7 +119,7 @@ class InterruptLock { };
 
 //
 
-void mock_start_spiffs (size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
+void mock_start_spiffs (const String& fname, size_t size_kb, size_t block_kb = 8, size_t page_b = 512);
 void mock_stop_spiffs ();
 
 //

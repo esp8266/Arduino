@@ -69,7 +69,6 @@ void save ()
 	mock_stop_spiffs();
 }
 
-
 void control_c (int sig)
 {
 	(void)sig;
@@ -78,7 +77,7 @@ void control_c (int sig)
 	{
 		fprintf(stderr, MOCK "stuck, killing\n");
 		save();
-		abort();
+		exit(1);
 	}
 	user_exit = true;
 }
@@ -88,7 +87,6 @@ int main (int argc, char* const argv [])
 	signal(SIGINT, control_c);
 
 	bool fast = false;
-
 
 	for (;;)
 	{
@@ -118,7 +116,14 @@ int main (int argc, char* const argv [])
 		}
 	}
 
-	mock_start_spiffs(spiffs_kb);
+	if (spiffs_kb)
+	{
+		String name = argv[0];
+		name += "-spiffs";
+		name += String(spiffs_kb > 0? spiffs_kb: -spiffs_kb, DEC);
+		name += "KB";
+		mock_start_spiffs(name, spiffs_kb);
+	}
 
 	// setup global global_ipv4_netfmt
 	wifi_get_ip_info(0, nullptr);
@@ -128,9 +133,7 @@ int main (int argc, char* const argv [])
 	{
 		if (!fast)
 			usleep(10000); // not 100% cpu
-
 		loop();
-
 		check_incoming_udp();
 	}
 

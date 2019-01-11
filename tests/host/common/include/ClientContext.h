@@ -162,7 +162,7 @@ public:
     int read()
     {
         char c;
-        return read(&c, 1)? c: -1;
+        return read(&c, 1)? (unsigned char)c: -1;
     }
 
     size_t read (char* dst, size_t size)
