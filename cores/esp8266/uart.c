@@ -78,12 +78,7 @@ struct uartIsrContext_t
     void* arg;
 };
 
-// NOTE: GCC will generated an invalid warning for the following line
-// see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-braces"
-static volatile struct uartIsrContext_t s_uartInterruptContext[2] = { 0 };
-#pragma GCC diagnostic pop
+static struct uartIsrContext_t s_uartInterruptContext[2];
 
 /*
    In the context of the naming conventions in this file, "_unsafe" means two things:
