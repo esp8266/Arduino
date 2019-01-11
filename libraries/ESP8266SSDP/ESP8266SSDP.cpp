@@ -164,11 +164,9 @@ SSDPClass::~SSDPClass() {
     _server = 0;
   }
 
-  ip_addr_t ifaddr;
-  ifaddr.addr = WiFi.localIP();
-  ip_addr_t multicast_addr;
-  multicast_addr.addr = (uint32_t) SSDP_MULTICAST_ADDR;
-  if (igmp_leavegroup(&ifaddr, &multicast_addr) != ERR_OK ) {
+  IPAddress local = WiFi.localIP();
+  IPAddress mcast(SSDP_MULTICAST_ADDR);
+  if (igmp_leavegroup(local, mcast) != ERR_OK ) {
 #ifdef DEBUG_SSDP
     DEBUG_SSDP.printf("SSDP failed to leave igmp group\n");
 #endif
