@@ -156,7 +156,11 @@ public:
 
     size_t getSize()
     {
-    	return _inbufsize?: mockFillInBuf(_sock, _inbuf, _inbufsize);
+        if (_sock < 0)
+            return 0;
+        if (_inbufsize)
+            return _inbufsize;
+        return mockFillInBuf(_sock, _inbuf, _inbufsize);
     }
 
     int read()
