@@ -1,4 +1,9 @@
 /*
+Changes:
+30.10.2018: Ack: Timing for MISO corrected, some comments added.
+                 hspi_slave_setStatus in RAM
+13.01.2019: Ack: Comments added
+
   SPISlave library for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
@@ -85,36 +90,25 @@ void hspi_slave_begin(uint8_t status_len, void * arg)
     pinMode(MISO, SPECIAL);
     pinMode(MOSI, SPECIAL);
 
-    SPI1S = SPISE | SPISBE | 0x3E0;
-    SPI1U = SPIUMISOH | SPIUCOMMAND | SPIUSSE;
+    SPI1S = SPISE | SPISBE | 0x3E0; // SPI_SLAVE_REG
+    SPI1U = SPIUMISOH | SPIUCOMMAND | SPIUSSE;  //SPI_USER_REG
     SPI1CLK = 0;
-    SPI1U2 = (7 << SPILCOMMAND);
-    SPI1S1 = (((status_len * 8) - 1) << SPIS1LSTA) | (0xff << SPIS1LBUF) | (7 << SPIS1LWBA) | (7 << SPIS1LRBA) | SPIS1RSTA;
-    SPI1P = (1 << 19);
-    SPI1CMD = SPIBUSY;
-    SPI1C2=(0x2<<SPIC2MOSIDN_S) | (0x1<<SPIC2MISODM_S); // GuaAck. 30.10.2018; timing of MISO 
+    SPI1U2 = (7 << SPILCOMMAND); // SPI_USER2_REG
+    SPI1S1 = (((status_len * 8) - 1) << SPIS1LSTA) | (0xff << SPIS1LBUF) | (7 << SPIS1LWBA) | (7 << SPIS1LRBA) | SPIS1RSTA; //SPI_SLAVE1_REG
+    SPI1P = (1 << 19); // not described in ESP32-reference
+    SPI1CMD = SPIBUSY; // not described in ESP32-reference
+//  (no settings in SPI1C2 in the original version.)
+    SPI1C2=(0x2<<SPIC2MOSIDN_S) | (0x1<<SPIC2MISODM_S); // Ack. 30.10.2018; timing of MISO//
+//	SPIC2MISODM_S (SPI_MISO_DELAY_MODE) = 1, makes slave to change MISO value on falling edge on CLK signal
+//  es it should for SPI-Mode = 1
+//	SPIC2MOSIDN_S (SPI_MOSI_DELAY_NUM) = 2: Probably not required, but all tests are done with this setting
     ETS_SPI_INTR_ATTACH(_hspi_slave_isr_handler,arg);
     ETS_SPI_INTR_ENABLE();
 }
 
-void hspi_slave_end()
-{
-  ETS_SPI_INTR_DISABLE();
-  ETS_SPI_INTR_ATTACH(NULL, NULL);
+void ICACHE_RAM_ATTR hspi_slave_setStatus(uint32_t status) 
+// put in RAM as setStatus is often called from an interrupt routine
 
-  pinMode(SS, INPUT);
-  pinMode(SCK, INPUT);
-  pinMode(MISO, INPUT);
-  pinMode(MOSI, INPUT);
-
-  // defaults
-  SPI1S = 0;
-  SPI1U = SPIUSSE | SPIUCOMMAND;
-  SPI1S1 = 0;
-  SPI1P = B110;
-}
-
-void ICACHE_RAM_ATTR hspi_slave_setStatus(uint32_t status) // GuaAck. 30.10.2018
 {
     SPI1WS = status;
 }
