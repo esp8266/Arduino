@@ -2,6 +2,13 @@ language: bash
 os: linux
 dist: trusty
 
+git:
+  depth: 1
+  submodules: false
+
+before_install:
+  - git submodule update --init  # no recursive update
+
 cache:
   directories:
     - $HOME/astyle
@@ -13,72 +20,78 @@ stages:
 jobs:
   include:
     # Build stage. To save time, run all kinds of builds and tests in parallel.
-    #
-    # TODO: since we can now call different script for each job,
-    # split the do-it-all common.sh into separate scripts responsible
-    # for different types of jobs below:
-    - name: "Host tests"
+
+    - name: "Platformio (1)"
       stage: build
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
       env:
-        - BUILD_TYPE=host_tests
-      install:
-        - sudo apt-get install valgrind lcov
+        - BUILD_PARITY=even
+    - name: "Platformio (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      env:
+        - BUILD_PARITY=odd
 
     - name: "Build (1)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
       env:
-        - BUILD_TYPE=build_even
+        - BUILD_PARITY=even
     - name: "Build (2)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
       env:
-        - BUILD_TYPE=build_odd
+        - BUILD_PARITY=odd
+
     - name: "Debug (1)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/debug.sh
       env:
-        - BUILD_TYPE=debug_even
+        - BUILD_PARITY=even
     - name: "Debug (2)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/debug.sh
       env:
-        - BUILD_TYPE=debug_odd
-    - name: "Platformio (1)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+        - BUILD_PARITY=odd
+
+    - name: "Build IPv6 (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build6.sh
       env:
-        - BUILD_TYPE=platformio_even
-    - name: "Platformio (2)"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+        - BUILD_PARITY=even
+    - name: "Build IPv6 (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build6.sh
       env:
-        - BUILD_TYPE=platformio_odd
+        - BUILD_PARITY=odd
+
+    - name: "Host tests"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
+      install: sudo apt-get install valgrind lcov
 
     - name: "Docs"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=docs
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/build_docs.sh
       install:
-        - pip install --user -r doc/requirements.txt;
+          - sudo apt-get install python3-pip
+          - pip3 install --user -r doc/requirements.txt;
 
     - name: "Style check"
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
-      env:
-        - BUILD_TYPE=style_check
-      install:
-        - >
-            [ "$BUILD_TYPE" = "style_check" ] && {
-              [ -f $HOME/astyle/build/gcc/bin/astyle ] || {
-                wget -O astyle_3.1_linux.tar.gz https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/astyle_3.1_linux.tar.gz/download;
-                tar -xf astyle_3.1_linux.tar.gz -C $HOME;
-                make -C $HOME/astyle/build/gcc;
-              }
-              make -C $HOME/astyle/build/gcc prefix=$HOME install;
-            } || true
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/style_check.sh
+      install: tests/ci/install_astyle.sh
+
+    - name: "Boards"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/build_boards.sh
 
     # Deploy stage.
     # Here we build the package JSON (always) and do the deployments
     - name: "Package / deploy"
       stage: deploy
-      script: $TRAVIS_BUILD_DIR/tests/common.sh
+      script: tests/ci/build_package.sh
       env: BUILD_TYPE=package
-      if: env(CI_GITHUB_API_KEY) IS present
       deploy:
       # Create Github release, upload artifacts
       - provider: releases

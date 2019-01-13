@@ -48,15 +48,6 @@ srcdir=$PWD
 rm -rf package/versions/$ver
 mkdir -p $outdir
 
-# Get submodules
-modules=libraries/SoftwareSerial
-for mod in $modules; do
-    echo "refreshing submodule: $mod"
-    git submodule update --init -- $mod
-    (cd $mod && git reset --hard)
-done
-echo "done with submodules"
-
 # Some files should be excluded from the package
 cat << EOF > exclude.txt
 .git
@@ -86,7 +77,6 @@ $SED 's/runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}\/tools\/
 $SED 's/runtime.tools.esptool.path={runtime.platform.path}\/tools\/esptool//g' | \
 $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool.path=\{runtime.tools.esptool.path\}/g' | \
 $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
-$SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' |\
 $SED 's/recipe.hooks.core.prebuild.2.pattern.*//g' |\
 $SED 's/recipe.hooks.core.prebuild.3.pattern.*//g' |\
 $SED "s/version=.*/version=$ver/g" |\
