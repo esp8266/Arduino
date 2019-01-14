@@ -37,6 +37,7 @@ class ESP8266WiFiAPClass {
     public:
 
         bool softAP(const char* ssid, const char* passphrase = NULL, int channel = 1, int ssid_hidden = 0, int max_connection = 4);
+        bool softAP(const String& ssid,const String& passphrase = emptyString,int channel = 1,int ssid_hidden = 0,int max_connection = 4);
         bool softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet);
         bool softAPdisconnect(bool wifioff = false);
 
@@ -46,6 +47,9 @@ class ESP8266WiFiAPClass {
 
         uint8_t* softAPmacAddress(uint8_t* mac);
         String softAPmacAddress(void);
+
+	String softAPSSID() const;
+	String softAPPSK() const;
 
     protected:
 

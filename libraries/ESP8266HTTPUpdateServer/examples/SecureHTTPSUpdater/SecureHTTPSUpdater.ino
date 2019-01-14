@@ -48,17 +48,22 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
 
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
 const char* host = "esp8266-webupdate";
 const char* update_path = "/firmware";
 const char* update_username = "admin";
 const char* update_password = "admin";
-const char* ssid = "........";
-const char* password = "........";
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 ESP8266WebServerSecure httpServer(443);
 ESP8266HTTPUpdateServer httpUpdater;
 
-// The certificate is stored in PMEM 
+// The certificate is stored in PMEM
 static const uint8_t x509[] PROGMEM = {
   0x30, 0x82, 0x01, 0xc9, 0x30, 0x82, 0x01, 0x32, 0x02, 0x09, 0x00, 0xe6,
   0x60, 0x8d, 0xa3, 0x47, 0x8f, 0x57, 0x7a, 0x30, 0x0d, 0x06, 0x09, 0x2a,
@@ -156,8 +161,7 @@ static const uint8_t rsakey[] PROGMEM = {
   0xe1, 0x40, 0x2b, 0xe3, 0xbd, 0x98, 0x44, 0xad
 };
 
-void setup()
-{
+void setup() {
 
   Serial.begin(115200);
   Serial.println();
@@ -165,7 +169,7 @@ void setup()
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, password);
 
-  while(WiFi.waitForConnectResult() != WL_CONNECTED){
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
     WiFi.begin(ssid, password);
     Serial.println("WiFi failed, retrying.");
   }
@@ -182,7 +186,7 @@ void setup()
                 "'%s'\n", host, update_path, update_username, update_password);
 }
 
-void loop()
-{
+void loop() {
   httpServer.handleClient();
+  MDNS.update();
 }

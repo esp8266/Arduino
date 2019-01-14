@@ -20,6 +20,8 @@
 #ifndef Arduino_h
 #define Arduino_h
 
+#define MOCK "mock: "
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -216,6 +218,7 @@ extern "C" {
     void loop(void);
     
     void yield(void);
+    void esp_yield(void);
     void optimistic_yield(uint32_t interval_us);
     
 #define digitalPinToPort(pin)       (0)
@@ -236,7 +239,7 @@ extern "C" {
 
 #ifdef __cplusplus
 
-#include "pgmspace.h"
+#include <pgmspace.h>
 
 #include "WCharacter.h"
 #include "WString.h"

@@ -78,11 +78,11 @@ class UDP: public Stream {
         virtual void flush() =0;	// Finish reading the current packet
 
         // Return the IP address of the host who sent the current incoming packet
-        virtual IPAddress remoteIP() =0;
+        virtual IPAddress remoteIP() const =0;
         // Return the port of the host who sent the current incoming packet
-        virtual uint16_t remotePort() =0;
+        virtual uint16_t remotePort() const =0;
     protected:
-        uint8_t* rawIPAddress(IPAddress& addr) {
+        CONST uint8_t* rawIPAddress(CONST IPAddress& addr) {
             return addr.raw_address();
         }
 };
