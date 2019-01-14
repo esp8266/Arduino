@@ -105,53 +105,6 @@ void ICACHE_FLASH_ATTR node_remove_from_list(list_node **phead, list_node* pdele
     }
 }
 
-/******************************************************************************
- * FunctionName : wifi_softap_add_dhcps_lease
- * Description  : add static lease on the list, this will be the next available @
- * Parameters   : mac address
- * Returns      : true if ok and false if this mac already exist or if all ip are already reserved
-*******************************************************************************/
-bool ICACHE_FLASH_ATTR wifi_softap_add_dhcps_lease(uint8 *macaddr)
-{
-
-	struct dhcps_pool *pdhcps_pool = NULL;
-	list_node *pback_node = NULL;
-
-	uint32 start_ip = dhcps_lease.start_ip.addr;
-	uint32 end_ip = dhcps_lease.end_ip.addr;
-
-	for (pback_node = plist; pback_node != NULL;pback_node = pback_node->pnext) {
-	pdhcps_pool = pback_node->pnode;
-	if (os_memcmp(pdhcps_pool->mac, macaddr, sizeof(pdhcps_pool->mac)) == 0){
-#if DHCPS_DEBUG
-		os_printf("this mac already exist");
-#endif
-		return false;
-	}
-	else start_ip = htonl((ntohl(start_ip) + 1));
-	}
-
-	if (start_ip>end_ip) {
-#if DHCPS_DEBUG
-		os_printf("no more ip available");
-#endif
-		return false;
-	}
-
-	pdhcps_pool = (struct dhcps_pool *)os_zalloc(sizeof(struct dhcps_pool));
-	pdhcps_pool->ip.addr = start_ip;
-	os_memcpy(pdhcps_pool->mac, macaddr, sizeof(pdhcps_pool->mac));
-	pdhcps_pool->lease_timer = DHCPS_LEASE_TIMER;
-	pdhcps_pool->type = DHCPS_TYPE_STATIC;
-	pdhcps_pool->state = DHCPS_STATE_ONLINE;
-	pback_node = (list_node *)os_zalloc(sizeof(list_node ));
-	pback_node->pnode = pdhcps_pool;
-	pback_node->pnext = NULL;
-	node_insert_to_list(&plist,pback_node);
-
-	return true;
-}
-
 ///////////////////////////////////////////////////////////////////////////////////
 /*
  * ��DHCP msg��Ϣ�ṹ����������
