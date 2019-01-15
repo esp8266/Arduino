@@ -112,6 +112,12 @@ elif [ "$BUILD_TYPE" = "platformio_even" ]; then
 elif [ "$BUILD_TYPE" = "platformio_odd" ]; then
     BUILD_PARITY=odd tests/platformio-custom.sh
 
+elif [ "$BUILD_TYPE" = host ]; then
+    tests/ci/host_test.sh
+
+elif [ "$BUILD_TYPE" = style ]; then
+    tests/ci/install_astyle.sh
+
 else
     echo "BUILD_TYPE not set or invalid"
     exit 1

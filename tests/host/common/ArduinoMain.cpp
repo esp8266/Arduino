@@ -32,37 +32,13 @@
 #include <Arduino.h>
 #include <user_interface.h> // wifi_get_ip_info()
 
-#include <functional>
-#include "lwip/opt.h"
-#include "lwip/udp.h"
-#include "lwip/inet.h"
-#include "lwip/igmp.h"
-#include "lwip/mem.h"
-#include <include/UdpContext.h>
-#include <poll.h>
-
+#include <signal.h>
 #include <unistd.h> // usleep
 #include <getopt.h>
 
-#include <map>
-
-#if 0
-#include "../common/spiffs_mock.h"
-#include <spiffs/spiffs.h>
-SPIFFS_MOCK_DECLARE(/*size_kb*/1024, /(blovk_kb*/8, /*page_b*/512);
-#endif
-
-std::map<int,UdpContext*> udps;
-
-void register_udp (int sock, UdpContext* udp)
-{
-	if (udp)
-		udps[sock] = udp;
-	else
-		udps.erase(sock);
-}
-
+bool user_exit = false;
 const char* host_interface = nullptr;
+size_t spiffs_kb = 1024;
 
 void help (const char* argv0, int exitcode)
 {
@@ -73,7 +49,9 @@ void help (const char* argv0, int exitcode)
 		"	-i <interface> - use this interface for IP address\n"
 		"	-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
 		"	-f             - no throttle (possibly 100%%CPU)\n"
-		, argv0);
+		"	-S             - spiffs size in KBytes (default: %zd)\n"
+		"	                 (negative value will force mismatched size)\n"
+		, argv0, spiffs_kb);
 	exit(exitcode);
 }
 
@@ -83,15 +61,36 @@ static struct option options[] =
 	{ "fast",		no_argument,		NULL, 'f' },
 	{ "local",		no_argument,		NULL, 'l' },
 	{ "interface",		required_argument,	NULL, 'i' },
+	{ "spiffskb",		required_argument,	NULL, 'S' },
 };
+
+void save ()
+{
+	mock_stop_spiffs();
+}
+
+void control_c (int sig)
+{
+	(void)sig;
+
+	if (user_exit)
+	{
+		fprintf(stderr, MOCK "stuck, killing\n");
+		save();
+		exit(1);
+	}
+	user_exit = true;
+}
 
 int main (int argc, char* const argv [])
 {
+	signal(SIGINT, control_c);
+
 	bool fast = false;
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlfi:", options, NULL);
+		int n = getopt_long(argc, argv, "hlfi:S:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -108,36 +107,37 @@ int main (int argc, char* const argv [])
 		case 'f':
 			fast = true;
 			break;
+		case 'S':
+			spiffs_kb = atoi(optarg);
+			break;
 		default:
 			fprintf(stderr, MOCK "bad option '%c'\n", n);
 			exit(EXIT_FAILURE);
 		}
 	}
 
+	if (spiffs_kb)
+	{
+		String name = argv[0];
+		name += "-spiffs";
+		name += String(spiffs_kb > 0? spiffs_kb: -spiffs_kb, DEC);
+		name += "KB";
+		mock_start_spiffs(name, spiffs_kb);
+	}
+
 	// setup global global_ipv4_netfmt
 	wifi_get_ip_info(0, nullptr);
 
 	setup();
-	while (true)
+	while (!user_exit)
 	{
 		if (!fast)
 			usleep(10000); // not 100% cpu
-
 		loop();
-
-		// check incoming udp
-		for (auto& udp: udps)
-		{
-			pollfd p;
-			p.fd = udp.first;
-			p.events = POLLIN;
-			if (poll(&p, 1, 0) && p.revents == POLLIN)
-			{
-				fprintf(stderr, MOCK "UDP poll(%d) -> cb\r", p.fd);
-				udp.second->mock_cb();
-			}
-		}
+		check_incoming_udp();
 	}
+
+	save();
+
 	return 0;
 }
-
