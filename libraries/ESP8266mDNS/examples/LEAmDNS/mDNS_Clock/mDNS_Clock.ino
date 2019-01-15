@@ -190,11 +190,13 @@ bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
           }
         }
       }
-    } else {
+    }
+    else {
       // Change hostname, use '-' as divider between base name and index
       if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
         p_pMDNSResponder->setHostname(pcHostDomain);
-      } else {
+      }
+      else {
         Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
       }
     }
@@ -249,7 +251,8 @@ void handleHTTPClient(WiFiClient& client) {
     // done :-)
     s += "</html>\r\n\r\n";
     Serial.println("Sending 200");
-  } else {
+  }
+  else {
     s = "HTTP/1.1 404 Not Found\r\n\r\n";
     Serial.println("Sending 404");
   }
@@ -316,17 +319,14 @@ void loop(void) {
   MDNS.update();
 
   // Update time (if needed)
-  //static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
-  static clsMDNSTimeFlag timeFlag(UPDATE_CYCLE);
-  if (timeFlag.flagged()/*ulNextTimeUpdate < millis()*/) {
+  static esp8266::polledTimeout::periodic timeout(UPDATE_CYCLE);
+  if (timeout.expired()) {
 
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
       MDNS.announce();
     }
-    //ulNextTimeUpdate = (millis() + UPDATE_CYCLE);   // Set update 'timer'
-    timeFlag.restart();
   }
 }
 
