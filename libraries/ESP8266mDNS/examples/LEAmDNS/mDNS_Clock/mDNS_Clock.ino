@@ -190,13 +190,11 @@ bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
           }
         }
       }
-    }
-    else {
+    } else {
       // Change hostname, use '-' as divider between base name and index
       if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
         p_pMDNSResponder->setHostname(pcHostDomain);
-      }
-      else {
+      } else {
         Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
       }
     }
@@ -251,8 +249,7 @@ void handleHTTPClient(WiFiClient& client) {
     // done :-)
     s += "</html>\r\n\r\n";
     Serial.println("Sending 200");
-  }
-  else {
+  } else {
     s = "HTTP/1.1 404 Not Found\r\n\r\n";
     Serial.println("Sending 404");
   }
