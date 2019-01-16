@@ -559,7 +559,7 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &addr2);
     DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP requested\n", aHostname);
     if(err == ERR_OK) {
-        aResult = addr.addr;
+        aResult = addr;
         DEBUG_WIFI_GENERIC("[hostByName] Host %s: IP found %s\n", aHostname, aResult.toString().c_str());
         return 1;
     }
