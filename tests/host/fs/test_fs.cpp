@@ -77,7 +77,7 @@ TEST_CASE("SDFS checks the config object passed in", "[fs]")
 
 TEST_CASE("FS can begin","[fs]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     SPIFFSConfig cfg;
     cfg.setAutoFormat(false);
     SPIFFS.setConfig(&cfg);
@@ -90,19 +90,19 @@ TEST_CASE("FS can begin","[fs]")
 
 TEST_CASE("FS can't begin with zero size","[fs]")
 {
-    SPIFFS_MOCK_DECLARE(0, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(0, 8, 512, "");
     REQUIRE_FALSE(SPIFFS.begin());
 }
 
 TEST_CASE("Before begin is called, open will fail","[fs]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE_FALSE(SPIFFS.open("/foo", "w"));
 }
 
 TEST_CASE("FS can create file","[fs]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(SPIFFS.begin());
     createFile("/test", "");
     REQUIRE(SPIFFS.exists("/test"));
@@ -110,7 +110,7 @@ TEST_CASE("FS can create file","[fs]")
 
 TEST_CASE("Files can be written and appended to","[fs]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(SPIFFS.begin());
     {
         File f = SPIFFS.open("config1.txt", "w");
@@ -134,7 +134,7 @@ TEST_CASE("Files can be written and appended to","[fs]")
 
 TEST_CASE("Files persist after reset", "[fs]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(SPIFFS.begin());
     createFile("config1.txt", "file 1");
 
@@ -146,7 +146,7 @@ TEST_CASE("Files persist after reset", "[fs]")
 
 TEST_CASE("Filesystem is empty after format", "[fs]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(SPIFFS.format());
     REQUIRE(SPIFFS.begin());
     createFile("/1", "first");
@@ -162,7 +162,7 @@ TEST_CASE("Filesystem is empty after format", "[fs]")
 
 TEST_CASE("Dir lists all files", "[fs]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(SPIFFS.begin());
     createFile("/empty", "");
     createFile("/not_empty", "some text");
@@ -180,7 +180,7 @@ TEST_CASE("Dir lists all files", "[fs]")
 
 TEST_CASE("File names which are too long are rejected", "[fs]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(SPIFFS.begin());
     const char* emptyName = "";
     const char* longName_31 = "/234567890123456789012345678901";
@@ -198,7 +198,7 @@ TEST_CASE("File names which are too long are rejected", "[fs]")
 
 TEST_CASE("#1685 Duplicate files", "[fs][bugreport]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(SPIFFS.begin());
     createFile("/config", "some text");
     createFile("/data", "");
@@ -209,7 +209,7 @@ TEST_CASE("#1685 Duplicate files", "[fs][bugreport]")
 
 TEST_CASE("#1819 Can list all files with openDir(\"\")", "[fs][bugreport]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(SPIFFS.begin());
     createFile("/file1", "some text");
     createFile("/file2", "other text");

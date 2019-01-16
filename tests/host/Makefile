@@ -20,8 +20,8 @@ LCOV ?= lcov
 GENHTML ?= genhtml
 
 ifeq ($(FORCE32),1)
-ABILITY32 = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
-ifneq ($(ABILITY32),4)
+SIZEOFLONG = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
+ifneq ($(SIZEOFLONG),4)
 $(warning Cannot compile in 32 bit mode, switching to native mode)
 else
 N32 = 32
@@ -95,6 +95,8 @@ MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 
 MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 	ArduinoMain.cpp \
+	ArduinoMainUdp.cpp \
+	ArduinoMainSpiffs.cpp \
 	user_interface.cpp \
 )
 
