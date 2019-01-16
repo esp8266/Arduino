@@ -17,7 +17,7 @@
 
   upload the contents of the data folder with MkSPIFFS Tool ("ESP8266 Sketch Data Upload" in Tools menu in Arduino IDE)
   or you can upload the contents of a folder if you CD in that folder and run the following command:
-  for file in `ls -A1`; do curl -F "file=@$PWD/$file" esp8266fs.local/edit; done
+  for file in `\ls -A1`; do curl -F "file=@$PWD/$file" esp8266fs.local/edit; done
 
   access the sample web page at http://esp8266fs.local
   edit the page by going to http://esp8266fs.local/edit
