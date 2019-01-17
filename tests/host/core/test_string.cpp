@@ -115,6 +115,15 @@ TEST_CASE("String concantenation", "[core][String]")
     str = "clean";
     REQUIRE(str.concat(str) == true);
     REQUIRE(str == "cleanclean");
+    // non-decimal negative #s should be as if they were unsigned
+    str = String((int)-100, 16);
+    REQUIRE(str == "ffffff9c");
+    str = String((long)-101, 16);
+    REQUIRE(str == "ffffff9b");
+    str = String((int)-100, 10);
+    REQUIRE(str == "-100");
+    str = String((long)-100, 10);
+    REQUIRE(str == "-100");
 }
 
 TEST_CASE("String comparison", "[core][String]")
