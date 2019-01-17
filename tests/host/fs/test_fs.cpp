@@ -53,7 +53,7 @@ static std::set<String> listDir (const char* path)
 
 TEST_CASE("SPIFFS checks the config object passed in", "[fs]")
 {
-    SPIFFS_MOCK_DECLARE(64, 8, 512, false);
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
     FSConfig f;
     SPIFFSConfig s;
     SDFSConfig d;
