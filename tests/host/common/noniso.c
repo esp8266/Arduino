@@ -60,6 +60,9 @@ char* itoa(int value, char* result, int base) {
         *result = 0;
         return result;
     }
+    if (base != 10) {
+	return utoa((unsigned)value, result, base);
+   }
 
     char* out = result;
     int quotient = abs(value);
