@@ -150,12 +150,17 @@ size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, c
 	return retsize;
 }
 
+void mockUDPSwallow (size_t copied, char* ccinbuf, size_t& ccinbufsize)
+{
+	// poor man buffer
+	memmove(ccinbuf, ccinbuf + copied, ccinbufsize - copied);
+	ccinbufsize -= copied;
+}
+
 size_t mockUDPRead (int sock, char* dst, size_t size, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
 	size_t copied = mockUDPPeekBytes(sock, dst, size, timeout_ms, ccinbuf, ccinbufsize);
-	// swallow (XXX use a circular buffer?)
-	memmove(ccinbuf, ccinbuf + copied, ccinbufsize - copied);
-	ccinbufsize -= copied;
+	mockUDPSwallow(copied, ccinbuf, ccinbufsize);
 	return copied;
 }
 
