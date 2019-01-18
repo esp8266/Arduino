@@ -121,6 +121,21 @@
                      "packager": "esp8266",
                      "version": "2.5.0-3-20ed2b9",
                      "name": "mkspiffs"
+                  },
+                  {
+                    "packager": "esp8266",
+                    "version": "2.6",
+                    "name": "esptool.py"
+                  },
+                  {
+                    "packager": "esp8266",
+                    "version": "3.7.2-post1",
+                    "name": "python"
+                  },
+                  {
+                    "packager": "esp8266",
+                    "version": "3.4",
+                    "name": "pyserial"
                   }
                ],
                "help": {
@@ -129,6 +144,122 @@
             }
          ],
          "tools": [
+            {
+               "version": "3.7.2-post1",
+               "name": "python",
+               "systems": [
+                  {
+                     "host": "x86_64-mingw32",
+                     "url": "https://www.python.org/ftp/python/3.7.2/python-3.7.2.post1-embed-win32.zip",
+                     "archiveFileName": "python-3.7.2.post1-embed-win32.zip",
+                     "checksum": "SHA-256:ceb06a5244e93e7e7523e26e1354447b79a9e6fd8c45891d81df9c7da1e02d05",
+                     "size": "6533256"
+                  },
+                  {
+                     "host": "i686-mingw32",
+                     "url": "https://www.python.org/ftp/python/3.7.2/python-3.7.2.post1-embed-win32.zip",
+                     "archiveFileName": "python-3.7.2.post1-embed-win32.zip",
+                     "checksum": "SHA-256:ceb06a5244e93e7e7523e26e1354447b79a9e6fd8c45891d81df9c7da1e02d05",
+                     "size": "6533256"
+                  }
+              ]
+            },
+            {
+               "version": "3.4",
+               "name": "pyserial",
+               "systems": [
+                  {
+                     "host": "aarch64-linux-gnu",
+                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
+                     "archiveFileName": "pyserial-3.4.tar.gz",
+                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
+                     "size": "151657"
+                  },
+                  {
+                     "host": "arm-linux-gnueabihf",
+                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
+                     "archiveFileName": "pyserial-3.4.tar.gz",
+                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
+                     "size": "151657"
+                  },
+                  {
+                     "host": "i686-mingw32",
+                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
+                     "archiveFileName": "pyserial-3.4.tar.gz",
+                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
+                     "size": "151657"
+                  },
+                  {
+                     "host": "x86_64-apple-darwin",
+                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
+                     "archiveFileName": "pyserial-3.4.tar.gz",
+                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
+                     "size": "151657"
+                  },
+                  {
+                     "host": "x86_64-pc-linux-gnu",
+                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
+                     "archiveFileName": "pyserial-3.4.tar.gz",
+                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
+                     "size": "151657"
+                  },
+                  {
+                     "host": "x86_64-mingw32",
+                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
+                     "archiveFileName": "pyserial-3.4.tar.gz",
+                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
+                     "size": "151657"
+                  }
+              ]
+            },
+            {
+               "version": "2.6",
+               "name": "esptool.py",
+               "systems": [
+                  {
+                     "host": "aarch64-linux-gnu",
+                     "url": "https://github.com/espressif/esptool/archive/v2.6.tar.gz",
+                     "archiveFileName": "esptool-v2.6.tar.gz",
+                     "checksum": "SHA-256:51ebe169cade538c986e92eb65562b8ff3a1293baf14b9ad977df888061ed78e",
+                     "size": "4336261"
+                  },
+                  {
+                     "host": "arm-linux-gnueabihf",
+                     "url": "https://github.com/espressif/esptool/archive/v2.6.tar.gz",
+                     "archiveFileName": "esptool-v2.6.tar.gz",
+                     "checksum": "SHA-256:51ebe169cade538c986e92eb65562b8ff3a1293baf14b9ad977df888061ed78e",
+                     "size": "4336261"
+                  },
+                  {
+                     "host": "i686-mingw32",
+                     "url": "https://github.com/espressif/esptool/archive/v2.6.tar.gz",
+                     "archiveFileName": "esptool-v2.6.tar.gz",
+                     "checksum": "SHA-256:51ebe169cade538c986e92eb65562b8ff3a1293baf14b9ad977df888061ed78e",
+                     "size": "4336261"
+                  },
+                  {
+                     "host": "x86_64-apple-darwin",
+                     "url": "https://github.com/espressif/esptool/archive/v2.6.tar.gz",
+                     "archiveFileName": "esptool-v2.6.tar.gz",
+                     "checksum": "SHA-256:51ebe169cade538c986e92eb65562b8ff3a1293baf14b9ad977df888061ed78e",
+                     "size": "4336261"
+                  },
+                  {
+                     "host": "x86_64-pc-linux-gnu",
+                     "url": "https://github.com/espressif/esptool/archive/v2.6.tar.gz",
+                     "archiveFileName": "esptool-v2.6.tar.gz",
+                     "checksum": "SHA-256:51ebe169cade538c986e92eb65562b8ff3a1293baf14b9ad977df888061ed78e",
+                     "size": "4336261"
+                  },
+                  {
+                     "host": "x86_64-mingw32",
+                     "url": "https://github.com/espressif/esptool/archive/v2.6.zip",
+                     "archiveFileName": "esptool-v2.6.zip",
+                     "checksum": "SHA-256:fb37a5608375f903a7716c2fb1a6382e16debbc9b675ca0f84081a03dcef0b02",
+                     "size": "4381040"
+                  }
+              ]
+            },
             {
                "version": "2.5.0-3-20ed2b9",
                "name": "esptool",
