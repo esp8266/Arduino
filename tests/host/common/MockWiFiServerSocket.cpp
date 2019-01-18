@@ -39,6 +39,10 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
+
 #define int2pcb(x) ((tcp_pcb*)(intptr_t)(x))
 #define pcb2int(x) ((int)(intptr_t)(x))
 
@@ -55,13 +59,7 @@ int serverAccept (int srvsock)
 		perror(MOCK "accept()");
 		exit(EXIT_FAILURE);
 	}
-	if (fcntl(clisock, F_SETFL, O_NONBLOCK) == -1)
-	{
-		fprintf(stderr, MOCK "ClientContext::accept: fcntl(O_NONBLOCK): %s\n", strerror(errno));
-		close(clisock);
-		exit(EXIT_FAILURE);
-	}
-	return clisock;
+	return mockSockSetup(clisock);
 }
 
 void WiFiServer::begin (uint16_t port)
