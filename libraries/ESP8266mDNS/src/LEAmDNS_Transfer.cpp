@@ -343,7 +343,8 @@ bool MDNSResponder::_sendMDNSServiceQuery(const MDNSResponder::stcMDNSServiceQue
  *
  */
 bool MDNSResponder::_sendMDNSQuery(const MDNSResponder::stcMDNS_RRDomain& p_QueryDomain,
-                                   uint16_t p_u16QueryType) {
+                                   uint16_t p_u16QueryType,
+                                   stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers /*= 0*/) {
 
     bool                    bResult = false;
     
@@ -351,9 +352,12 @@ bool MDNSResponder::_sendMDNSQuery(const MDNSResponder::stcMDNS_RRDomain& p_Quer
     if (0 != ((sendParameter.m_pQuestions = new stcMDNS_RRQuestion))) {
         sendParameter.m_pQuestions->m_Header.m_Domain = p_QueryDomain;
 
-        sendParameter.m_pQuestions->m_bUnicast = true;
         sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = p_u16QueryType;
-        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);   // Unicast & INternet
+        // It seems, that some mDNS implementations don't support 'unicast response' questions...
+        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (/*0x8000 |*/ DNS_RRCLASS_IN);   // /*Unicast &*/ INternet
+
+        // TODO: Add knwon answer to the query
+        (void)p_pKnownAnswers;
 
         bResult = _sendMDNSMessage(sendParameter);
     }   // else: FAILED to alloc question
@@ -447,7 +451,7 @@ bool MDNSResponder::_readRRQuestion(MDNSResponder::stcMDNS_RRQuestion& p_rRRQues
  *
  */
 bool MDNSResponder::_readRRAnswer(MDNSResponder::stcMDNS_RRAnswer*& p_rpRRAnswer) {
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer\n")););
+    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer\n")););
     
     bool    bResult = false;
     
@@ -458,11 +462,11 @@ bool MDNSResponder::_readRRAnswer(MDNSResponder::stcMDNS_RRAnswer*& p_rpRRAnswer
         (_udpRead32(u32TTL)) &&
         (_udpRead16(u16RDLength))) {
 
-        DEBUG_EX_INFO(
+        /*DEBUG_EX_INFO(
                 DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer: Reading 0x%04X answer (class:0x%04X, TTL:%u, RDLength:%u) for "), header.m_Attributes.m_u16Type, header.m_Attributes.m_u16Class, u32TTL, u16RDLength);
                 _printRRDomain(header.m_Domain);
                 DEBUG_OUTPUT.printf_P(PSTR("\n"));
-                );
+                );*/
         
         switch (header.m_Attributes.m_u16Type & (~0x8000)) {    // Topmost bit might carry 'cache flush' flag
 #ifdef MDNS_IP4_SUPPORT
