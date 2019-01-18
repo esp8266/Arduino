@@ -101,6 +101,15 @@ Instructions - Windows 10
                    --- boards.txt
                    --- LICENSE
 
+-  Initialize the submodules
+
+   .. code:: bash
+
+       cd %USERPROFILE%\Documents\hardware\esp8266com\esp8266
+       git submodules update --init   
+  
+  If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
+  
 -  Download binary tools
 
    .. code:: bash
@@ -166,6 +175,15 @@ Instructions - Other OS
                    --- boards.txt
                    --- LICENSE
 
+-  Initialize the submodules
+
+   .. code:: bash
+
+       cd esp8266
+       git submodules update --init   
+  
+  If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
+
 -  Download binary tools
 
    .. code:: bash
@@ -174,3 +192,11 @@ Instructions - Other OS
        python get.py
 
 -  Restart Arduino
+
+- When later updating your local library, goto the esp8266 directory and do a git pull
+
+   .. code:: bash
+
+       cd hardware\esp8266com\esp8266
+       git status
+       git pull
