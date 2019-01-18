@@ -1085,7 +1085,7 @@ bool HTTPClient::sendHeader(const char * type)
         return false;
     }
 
-    String header = String(type) + " " + (_uri.length() ? _uri : F("/")) + F(" HTTP/1.");
+    String header = String(type) + F(" ") + (_uri.length() ? _uri : F("/")) + F(" HTTP/1.");
 
     if(_useHTTP10) {
         header += "0";
