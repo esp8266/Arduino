@@ -230,9 +230,15 @@ ARDUINO_LIBS := \
 			CertStoreBearSSL.cpp \
 		) \
 		$(addprefix ESP8266WebServer/src/,\
-			ESP8266WebServer.cpp \
-			Parsing.cpp \
+			ESP8266WebServerLegacy.cpp \
+			ParsingLegacy.cpp \
+			\
 			detail/mimetable.cpp \
+			\
+			ESP8266WebServerNew.cpp \
+			HTTPHeader.cpp \
+			HTTPParam.cpp \
+			ParsingNew.cpp \
 		) \
 		ESP8266mDNS/src/LEAmDNS.cpp \
 		ESP8266mDNS/src/LEAmDNS_Control.cpp \
