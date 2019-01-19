@@ -135,10 +135,11 @@ tools.esptool.network_cmd=python
 tools.esptool.network_cmd.windows=python.exe
 
 tools.esptool.upload.protocol=esp
-tools.esptool.upload.params.verbose=-vv
+tools.esptool.upload.params.verbose=--trace
 tools.esptool.upload.params.quiet=
-#tools.esptool.upload.pattern="{path}/{cmd}" {upload.verbose} -cd {upload.resetmethod} -cb {upload.speed} -cp "{serial.port}" {upload.erase_cmd} -ca 0x00000 -cf "{build.path}/{build.project_name}.bin"
-tools.esptool.upload.pattern="python" "{runtime.tools.esptool.path}" -c "import sys; sys.path.append('{runtime.tools.pyserial.path}'); execfile('{runtime.tools.esptool.path}/esptool.py')" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" write_flash 00flash_mode keep --flash_freq keep 0x0 "{build.path}/{build.project_name}.bin}"
+
+tools.esptool.upload.pattern="python" -c "import sys; sys.path.append('{runtime.platform.path}/tools/pyserial'); execfile('{runtime.platform.path}/tools/esptool/esptool.py')" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" write_flash 0x0 "{build.path}/{build.project_name}.bin"
+
 tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
 
 tools.mkspiffs.cmd=mkspiffs

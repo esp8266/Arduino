@@ -123,19 +123,19 @@
                      "name": "mkspiffs"
                   },
                   {
-                    "packager": "esp8266",
-                    "version": "2.6",
-                    "name": "esptool.py"
+                     "packager": "esp8266",
+                     "version": "2.6",
+                     "name": "esptool.py"
                   },
                   {
-                    "packager": "esp8266",
-                    "version": "3.7.2-post1",
-                    "name": "python"
+                     "packager": "esp8266",
+                     "version": "3.7.2-post1",
+                     "name": "python"
                   },
                   {
-                    "packager": "esp8266",
-                    "version": "3.4",
-                    "name": "pyserial"
+                     "packager": "esp8266",
+                     "version": "3.4",
+                     "name": "pyserial"
                   }
                ],
                "help": {
@@ -162,7 +162,7 @@
                      "checksum": "SHA-256:ceb06a5244e93e7e7523e26e1354447b79a9e6fd8c45891d81df9c7da1e02d05",
                      "size": "6533256"
                   }
-              ]
+               ]
             },
             {
                "version": "3.4",
@@ -210,7 +210,7 @@
                      "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
                      "size": "151657"
                   }
-              ]
+               ]
             },
             {
                "version": "2.6",
@@ -258,7 +258,7 @@
                      "checksum": "SHA-256:fb37a5608375f903a7716c2fb1a6382e16debbc9b675ca0f84081a03dcef0b02",
                      "size": "4381040"
                   }
-              ]
+               ]
             },
             {
                "version": "2.5.0-3-20ed2b9",
