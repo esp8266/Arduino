@@ -175,6 +175,7 @@ uint8 wifi_get_listen_interval (void)
 
 bool wifi_get_macaddr(uint8 if_index, uint8 *macaddr)
 {
+	(void)if_index;
 	macaddr[0] = 0xde;
 	macaddr[1] = 0xba;
 	macaddr[2] = 0x7a;
@@ -237,6 +238,7 @@ bool wifi_set_opmode_current (uint8 opmode)
 
 bool wifi_set_phy_mode (phy_mode_t mode)
 {
+	(void)mode;
 	return true;
 }
 
@@ -398,6 +400,7 @@ bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg)
 
 bool wifi_station_scan(struct scan_config *config, scan_done_cb_t cb)
 {
+	(void)config;
 	cb(nullptr, FAIL);
 	return false;
 }
@@ -434,6 +437,7 @@ void dns_setserver (u8_t numdns, ip_addr_t *dnsserver)
 
 ip_addr_t dns_getserver (u8_t numdns)
 {
+	(void)numdns;
 	ip_addr_t addr = { 0x7f000001 };
 	return addr;
 }
