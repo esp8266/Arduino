@@ -36,6 +36,8 @@
 #define WEBSERVER_MAX_POST_ARGS 32
 #endif
 
+namespace WebServerLegacy {
+
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
@@ -623,3 +625,5 @@ bool ESP8266WebServer::_parseFormUploadAborted(){
     _currentHandler->upload(*this, _currentUri, *_currentUpload);
   return false;
 }
+
+}; // namespace WebServerLegacy

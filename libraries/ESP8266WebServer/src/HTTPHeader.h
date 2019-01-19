@@ -1,0 +1,35 @@
+#ifndef __HTTP_HEADER_H__
+#define __HTTP_HEADER_H__
+
+
+
+
+#include "HTTPValue.h"
+
+
+namespace WebServerDarkain {
+
+class HTTPHeader : public HTTPValue {
+
+
+	////////////////////////////////////////////////////////////////////////////
+	// CALCULATE THE TOTAL NUMBER OF HEADER ROWS
+	////////////////////////////////////////////////////////////////////////////
+	protected:
+	virtual int _count(const char *buffer) const;
+
+
+
+
+	////////////////////////////////////////////////////////////////////////////
+	// PARSE AND TOKENIZE THE BUFFER
+	////////////////////////////////////////////////////////////////////////////
+	protected:
+	virtual char *_parse(char *buffer, int id=0);
+
+
+};
+
+}; // namespace WebServerDarkain
+
+#endif //__HTTP_HEADER_H__

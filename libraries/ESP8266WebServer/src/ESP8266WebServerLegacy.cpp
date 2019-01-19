@@ -27,7 +27,7 @@
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
 #include "FS.h"
-#include "detail/RequestHandlersImpl.h"
+#include "detail/mimetable.h"
 
 //#define DEBUG_ESP_HTTP_SERVER
 #ifdef DEBUG_ESP_PORT
@@ -35,6 +35,10 @@
 #else
 #define DEBUG_OUTPUT Serial
 #endif
+
+namespace WebServerLegacy {
+
+#include "detail/RequestHandlersImpl.h"
 
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
 static const char qop_auth[] PROGMEM = "qop=auth";
@@ -668,3 +672,5 @@ const String ESP8266WebServer::_responseCodeToString(int code) {
     default:  return F("");
   }
 }
+
+}; // namespace WebServerLegacy

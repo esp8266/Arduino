@@ -1,8 +1,8 @@
 #ifndef REQUESTHANDLERSIMPL_H
 #define REQUESTHANDLERSIMPL_H
 
-#include "RequestHandler.h"
-#include "mimetable.h"
+//#include "RequestHandler.h"
+//#include "mimetable.h"
 #include "WString.h"
 
 using namespace mime;

@@ -1,5 +1,5 @@
-#ifndef REQUESTHANDLER_H
-#define REQUESTHANDLER_H
+//#ifndef REQUESTHANDLER_H
+//#define REQUESTHANDLER_H
 
 class RequestHandler {
 public:
@@ -16,4 +16,4 @@ private:
     RequestHandler* _next = nullptr;
 };
 
-#endif //REQUESTHANDLER_H
+//#endif //REQUESTHANDLER_H
