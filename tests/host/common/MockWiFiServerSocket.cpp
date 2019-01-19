@@ -39,10 +39,6 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#ifndef MSG_NOSIGNAL
-#define MSG_NOSIGNAL 0
-#endif
-
 #define int2pcb(x) ((tcp_pcb*)(intptr_t)(x))
 #define pcb2int(x) ((int)(intptr_t)(x))
 
