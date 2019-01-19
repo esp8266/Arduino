@@ -19,7 +19,7 @@ void handleRoot() {
   char wifiClientMac[18];
   unsigned char number_client;
   struct station_info *stat_info;
-  struct ip_addr *IPaddress;
+  struct ip4_addr *IPaddress;
 
   IPAddress address;
   int i = 1;
