@@ -11,6 +11,10 @@ version=2.5.0-dev
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
 runtime.tools.esptool.path={runtime.platform.path}/tools/esptool
 runtime.tools.signing={runtime.platform.path}/tools/signing.py
+runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
+runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
+runtime.tools.python=python
+runtime.tools.python.windows={runtime.platform.path}/tools/python/python.exe
 
 compiler.warning_flags=-w
 compiler.warning_flags.none=-w
@@ -76,7 +80,7 @@ compiler.elf2hex.extra_flags=
 
 ## generate file with git version number
 ## needs bash, git, and echo
-recipe.hooks.core.prebuild.1.pattern=python "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
+recipe.hooks.core.prebuild.1.pattern="{runtime.tools.python}" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
 recipe.hooks.core.prebuild.2.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_VER 0x`git --git-dir {runtime.platform.path}/.git rev-parse --short=8 HEAD 2>/dev/null || echo ffffffff` >{build.path}/core/core_version.h"
 recipe.hooks.core.prebuild.3.pattern=bash -c "mkdir -p {build.path}/core && echo \#define ARDUINO_ESP8266_GIT_DESC `cd "{runtime.platform.path}"; git describe --tags 2>/dev/null || echo unix-{version}` >>{build.path}/core/core_version.h"
 
@@ -107,14 +111,8 @@ recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_
 recipe.objcopy.eep.pattern=
 
 ## Create hex
-#recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
-
-recipe.objcopy.hex.1.pattern="{runtime.tools.esptool.path}/{compiler.esptool.cmd}" -eo "{runtime.platform.path}/bootloaders/eboot/eboot.elf" -bo "{build.path}/{build.project_name}.bin" -bm {build.flash_mode} -bf {build.flash_freq} -bz {build.flash_size} -bs .text -bp 4096 -ec -eo "{build.path}/{build.project_name}.elf" -bs .irom0.text -bs .text -bs .data -bs .rodata -bc -ec
-recipe.objcopy.hex.2.pattern=python "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed"
-
-# No signing on Windows
-recipe.objcopy.hex.1.pattern.windows="{runtime.tools.esptool.path}/{compiler.esptool.cmd}" -eo "{runtime.platform.path}/bootloaders/eboot/eboot.elf" -bo "{build.path}/{build.project_name}.bin" -bm {build.flash_mode} -bf {build.flash_freq} -bz {build.flash_size} -bs .text -bp 4096 -ec -eo "{build.path}/{build.project_name}.elf" -bs .irom0.text -bs .text -bs .data -bs .rodata -bc -ec
-recipe.objcopy.hex.2.pattern.windows=
+recipe.objcopy.hex.1.pattern="{runtime.tools.python}" "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
+recipe.objcopy.hex.2.pattern="{runtime.tools.python}" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed"
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.bin
@@ -128,17 +126,18 @@ recipe.size.regex.data=^(?:\.data|\.rodata|\.bss)\s+([0-9]+).*
 
 # ------------------------------
 
-tools.esptool.cmd=esptool
-tools.esptool.cmd.windows=esptool.exe
-tools.esptool.path={runtime.platform.path}/tools/esptool
+# Need to duplicate the python path because Arduino does not replace properly in this stage
+tools.esptool.cmd=python
+tools.esptool.cmd.windows={runtime.platform.path}/tools/python/python.exe
+tools.esptool.path=
 tools.esptool.network_cmd=python
-tools.esptool.network_cmd.windows=python.exe
+tools.esptool.network_cmd.windows={runtime.platform.path}/tools/python/python.exe
 
 tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=--trace
 tools.esptool.upload.params.quiet=
 
-tools.esptool.upload.pattern="python" -c "import sys; sys.path.append('{runtime.platform.path}/tools/pyserial'); execfile('{runtime.platform.path}/tools/esptool/esptool.py')" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" write_flash 0x0 "{build.path}/{build.project_name}.bin"
+tools.esptool.upload.pattern="{cmd}" -c "import sys; sys.path.append('{runtime.platform.path}/tools/pyserial'); execfile('{runtime.platform.path}/tools/esptool/esptool.py')" --chip esp8266 --port "{serial.port}" --baud "{upload.speed}" "{upload.verbose}" write_flash 0x0 "{build.path}/{build.project_name}.bin"
 
 tools.esptool.upload.network_pattern="{network_cmd}" "{runtime.platform.path}/tools/espota.py" -i "{serial.port}" -p "{network.port}" "--auth={network.password}" -f "{build.path}/{build.project_name}.bin"
 

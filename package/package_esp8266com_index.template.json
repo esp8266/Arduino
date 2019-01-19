@@ -110,11 +110,6 @@
                   {
                      "packager": "esp8266",
                      "version": "2.5.0-3-20ed2b9",
-                     "name": "esptool"
-                  },
-                  {
-                     "packager": "esp8266",
-                     "version": "2.5.0-3-20ed2b9",
                      "name": "xtensa-lx106-elf-gcc"
                   },
                   {
@@ -257,54 +252,6 @@
                      "archiveFileName": "esptool-v2.6.zip",
                      "checksum": "SHA-256:fb37a5608375f903a7716c2fb1a6382e16debbc9b675ca0f84081a03dcef0b02",
                      "size": "4381040"
-                  }
-               ]
-            },
-            {
-               "version": "2.5.0-3-20ed2b9",
-               "name": "esptool",
-               "systems": [
-                  {
-                     "host": "aarch64-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/aarch64-linux-gnu.esptool-f80ae31.tar.gz",
-                     "archiveFileName": "aarch64-linux-gnu.esptool-f80ae31.tar.gz",
-                     "checksum": "SHA-256:888425ff1e33a97ea155b6f128de6b578c34468895ba9b4acd1e4f28608d917a",
-                     "size": "14681"
-                  },
-                  {
-                     "host": "arm-linux-gnueabihf",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/arm-linux-gnueabihf.esptool-f80ae31.tar.gz",
-                     "archiveFileName": "arm-linux-gnueabihf.esptool-f80ae31.tar.gz",
-                     "checksum": "SHA-256:71c878ac6a21ee69dcd615cd28f2dccd29a87079e0b3069eba625089d89e5058",
-                     "size": "13873"
-                  },
-                  {
-                     "host": "i686-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/i686-w64-mingw32.esptool-f80ae31.zip",
-                     "archiveFileName": "i686-w64-mingw32.esptool-f80ae31.zip",
-                     "checksum": "SHA-256:e30f25a19a78635000401b083b479e111d591bac20cfd89b1bfdf36a60e9ee20",
-                     "size": "16466"
-                  },
-                  {
-                     "host": "x86_64-apple-darwin",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/x86_64-apple-darwin14.esptool-f80ae31.tar.gz",
-                     "archiveFileName": "x86_64-apple-darwin14.esptool-f80ae31.tar.gz",
-                     "checksum": "SHA-256:0f51e487706a476b0b87299a769282ad65623774770655168a79d1748d2506e7",
-                     "size": "15003"
-                  },
-                  {
-                     "host": "x86_64-pc-linux-gnu",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/x86_64-linux-gnu.esptool-f80ae31.tar.gz",
-                     "archiveFileName": "x86_64-linux-gnu.esptool-f80ae31.tar.gz",
-                     "checksum": "SHA-256:bded1dca953377838b6086a9bcd40a1dc5286ba5f69f2372c22a1d1819baad24",
-                     "size": "16526"
-                  },
-                  {
-                     "host": "x86_64-mingw32",
-                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/x86_64-w64-mingw32.esptool-f80ae31.zip",
-                     "archiveFileName": "x86_64-w64-mingw32.esptool-f80ae31.zip",
-                     "checksum": "SHA-256:d6d5976fde82d07e93d5a01f38bbb4f84a7796187ff0541ee62650041791d0e8",
-                     "size": "19724"
                   }
                ]
             },

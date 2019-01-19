@@ -22,9 +22,10 @@ import argparse
 import re
 import os
 import subprocess
+import sys
 import tempfile
 
-fmodeb = { 'DOUT': 3, 'DIO': 2, 'QOUT': 1, 'QIO': 0 }
+fmodeb = { 'dout': 3, 'dio': 2, 'quot': 1, 'qio': 0 }
 ffreqb = { '40': 0, '26': 1, '20': 2, '80': 15 }
 fsizeb = { '512K': 0, '256K': 1, '1M': 2, '2M': 3, '4M': 4, '8M': 8, '16M': 9 }
 
@@ -87,21 +88,27 @@ def write_bin(out, elf, segments, to_addr, flash_mode, flash_size, flash_freq, p
         while total_size < to_addr:
             out.write(bytearray([0xaa]))
             total_size += 1
+def main():
+    parser = argparse.ArgumentParser(description='Create a BIN file from eboot.elf and Arduino sketch.elf for upload by esptool.py')
+    parser.add_argument('-e', '--eboot', action='store', required=True, help='Path to the Arduino eboot.elf bootloader')
+    parser.add_argument('-a', '--app', action='store', required=True, help='Path to the Arduino sketch ELF')
+    parser.add_argument('-m', '--flash_mode', action='store', required=True, choices=['dout', 'dio', 'qout', 'qio'], help='SPI flash mode')
+    parser.add_argument('-f', '--flash_freq', action='store', required=True, choices=['20', '26', '40', '80'], help='SPI flash speed')
+    parser.add_argument('-s', '--flash_size', action='store', required=True, choices=['256K', '512K', '1M', '2M', '4M', '8M', '16M'], help='SPI flash size')
+    parser.add_argument('-o', '--out', action='store', required=True, help='Output BIN filename')
+    parser.add_argument('-p', '--path', action='store', required=True, help='Path to Xtensa toolchain binaries')
 
-parser = argparse.ArgumentParser(description='Create a BIN file from eboot.elf and Arduino sketch.elf for upload by esptool.py')
-parser.add_argument('-e', '--eboot', action='store', required=True, help='Path to the Arduino eboot.elf bootloader')
-parser.add_argument('-a', '--app', action='store', required=True, help='Path to the Arduino sketch ELF')
-parser.add_argument('-m', '--flash_mode', action='store', required=True, choices=['DOUT', 'DIO', 'QOUT', 'QIO'], help='SPI flash mode')
-parser.add_argument('-f', '--flash_freq', action='store', required=True, choices=['20', '26', '40', '80'], help='SPI flash speed')
-parser.add_argument('-s', '--flash_size', action='store', required=True, choices=['256K', '512K', '1M', '2M', '4M', '8M', '16M'], help='SPI flash size')
-parser.add_argument('-o', '--out', action='store', required=True, help='Output BIN filename')
-parser.add_argument('-p', '--path', action='store', required=True, help='Path to Xtensa toolchain binaries')
+    args = parser.parse_args()
 
-args = parser.parse_args()
+    print 'Creating BIN file "' + args.out + '" using "' + args.app + '"'
 
-print 'Creating BIN file "' + args.out + '" using "' + args.app + '"'
+    out = open(args.out, "wb")
+    write_bin(out, args.eboot, ['.text'], 4096, args.flash_mode, args.flash_size, args.flash_freq, args.path)
+    write_bin(out, args.app, ['.irom0.text', '.text', '.data', '.rodata'], 0, args.flash_mode, args.flash_size, args.flash_freq, args.path)
+    out.close()
 
-out = open(args.out, "wb")
-write_bin(out, args.eboot, ['.text'], 4096, args.flash_mode, args.flash_size, args.flash_freq, args.path)
-write_bin(out, args.app, ['.irom0.text', '.text', '.data', '.rodata'], 0, args.flash_mode, args.flash_size, args.flash_freq, args.path)
-out.close()
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
