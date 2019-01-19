@@ -198,6 +198,7 @@ public:
 
     bool wait_until_sent(int max_wait_ms = WIFICLIENT_MAX_FLUSH_WAIT_MS)
     {
+        (void)max_wait_ms;
         return true;
     }
 

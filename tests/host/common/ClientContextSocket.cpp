@@ -39,6 +39,27 @@
 #include <fcntl.h>
 #include <errno.h>
 
+int mockSockSetup (int sock)
+{
+	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
+	{
+		fprintf(stderr, MOCK "socket fcntl(O_NONBLOCK): %s\n", strerror(errno));
+		close(sock);
+		return -1;
+	}
+
+#ifndef MSG_NOSIGNAL
+	int i = 1;
+	if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &i, sizeof i) == -1)
+	{
+		fprintf(stderr, MOCK "sockopt( SO_NOSIGPIPE)(macOS): %s\n", strerror(errno));
+		return -1;
+	}
+#endif
+
+	return sock;
+}
+
 int mockConnect (uint32_t ipv4, int& sock, int port)
 {
 	struct sockaddr_in server;
@@ -56,14 +77,7 @@ int mockConnect (uint32_t ipv4, int& sock, int port)
 		return 0;
 	}
 
-	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
-	{
-		fprintf(stderr, MOCK "ClientContext::connect: fcntl(O_NONBLOCK): %s\n", strerror(errno));
-		close(sock);
-		return 0;
-	}
-	
-	return 1;
+	return mockSockSetup(sock) == -1? 0: 1;
 }
 
 ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
@@ -142,8 +156,11 @@ ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 	}
 	if (ret)
 	{
-		//ret = ::write(sock, data, size);
+#ifndef MSG_NOSIGNAL
+		ret = ::write(sock, data, size);
+#else
 		ret = ::send(sock, data, size, MSG_NOSIGNAL);
+#endif
 		if (ret == -1)
 		{
 			fprintf(stderr, MOCK "ClientContext::read: write(%d): %s\n", sock, strerror(errno));
