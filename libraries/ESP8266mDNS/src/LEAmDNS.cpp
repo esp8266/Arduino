@@ -50,8 +50,7 @@ namespace MDNSImplementation {
  * MDNSResponder::MDNSResponder
  */
 MDNSResponder::MDNSResponder(void)
-:   m_bInitialized(false),
-    m_pServices(0),
+:   m_pServices(0),
     m_pUDPContext(0),
     m_pcHostname(0),
     m_pServiceQueries(0),
@@ -88,9 +87,9 @@ MDNSResponder::~MDNSResponder(void) {
  */
 bool MDNSResponder::begin(const char* p_pcHostname) {
     
-    bool    bResult = m_bInitialized;
+    bool    bResult = (0 != m_pcHostname);
     
-    if (!m_bInitialized) {
+    if (0 == m_pcHostname) {
         if (_setHostname(p_pcHostname)) {
             
             m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
@@ -141,7 +140,6 @@ bool MDNSResponder::close(void) {
     _releaseServiceQueries();
     _releaseUDPContext();
     _releaseHostname();
-    m_bInitialized = false;
     
     return true;
 }
