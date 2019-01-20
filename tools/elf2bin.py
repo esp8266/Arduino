@@ -88,6 +88,7 @@ def write_bin(out, elf, segments, to_addr, flash_mode, flash_size, flash_freq, p
         while total_size < to_addr:
             out.write(bytearray([0xaa]))
             total_size += 1
+
 def main():
     parser = argparse.ArgumentParser(description='Create a BIN file from eboot.elf and Arduino sketch.elf for upload by esptool.py')
     parser.add_argument('-e', '--eboot', action='store', required=True, help='Path to the Arduino eboot.elf bootloader')
