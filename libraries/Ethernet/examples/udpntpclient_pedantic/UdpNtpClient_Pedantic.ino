@@ -1,22 +1,22 @@
 /*
 
- Udp NTP Client
+  Udp NTP Client
 
- Get the time from a Network Time Protocol (NTP) time server
- Demonstrates use of UDP sendPacket and ReceivePacket
- For more on NTP time servers and the messages needed to communicate with them,
- see http://en.wikipedia.org/wiki/Network_Time_Protocol
+  Get the time from a Network Time Protocol (NTP) time server
+  Demonstrates use of UDP sendPacket and ReceivePacket
+  For more on NTP time servers and the messages needed to communicate with them,
+  see http://en.wikipedia.org/wiki/Network_Time_Protocol
 
- created 4 Sep 2010
- by Michael Margolis
- modified 9 Apr 2012
- by Tom Igoe
+  created 4 Sep 2010
+  by Michael Margolis
+  modified 9 Apr 2012
+  by Tom Igoe
 
- This code is in the public domain.
+  This code is in the public domain.
 
- Modified by David Henry to show where all the 'magic numbers' come from.
- You need to read the RFC-1305 spec to understand https://tools.ietf.org/html/rfc1305
- mgadriver@gmail.com
+  Modified by David Henry to show where all the 'magic numbers' come from.
+  You need to read the RFC-1305 spec to understand https://tools.ietf.org/html/rfc1305
+  mgadriver@gmail.com
 
 */
 
@@ -42,8 +42,7 @@ struct sRFC1305 packetBuffer; //buffer to hold incoming and outgoing packets
 // A UDP instance to let us send and receive packets over UDP
 EthernetUDP Udp;
 
-void setup()
-{
+void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
   while (!Serial) {
@@ -62,34 +61,33 @@ void setup()
   Udp.begin(localPort);
 }
 
-void loop()
-{
+void loop() {
   sendNTPpacket(timeServer); // send an NTP packet to a time server
 
   // wait to see if a reply is available
   delay(1000);
-  if ( Udp.parsePacket() ) {
+  if (Udp.parsePacket()) {
     // We've received a packet, read the data from it
     Udp.read((byte *)&packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
 #if 0 // just for debugging
-    Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdelay_main),HEX);
-    Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdelay_fraction),HEX);
-    Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdispersion_main),HEX);
-    Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdispersion_fraction),HEX);
-    Serial.println(ENDIAN_SWAP_32(packetBuffer.referencetimestamp_main),HEX);
-    Serial.println(ENDIAN_SWAP_32(packetBuffer.referencetimestamp_fraction),HEX);
-    Serial.println(ENDIAN_SWAP_32(packetBuffer.origintimestamp_main),HEX);
-    Serial.println(ENDIAN_SWAP_32(packetBuffer.origintimestamp_fraction),HEX);
-    Serial.println(ENDIAN_SWAP_32(packetBuffer.receivetimestamp_main),HEX);
-    Serial.println(ENDIAN_SWAP_32(packetBuffer.receivetimestamp_fraction),HEX);
-    Serial.println(ENDIAN_SWAP_32(packetBuffer.transmittimestamp_main),HEX);
-    Serial.println(ENDIAN_SWAP_32(packetBuffer.transmittimestamp_fraction),HEX);
+    Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdelay_main), HEX);
+    Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdelay_fraction), HEX);
+    Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdispersion_main), HEX);
+    Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdispersion_fraction), HEX);
+    Serial.println(ENDIAN_SWAP_32(packetBuffer.referencetimestamp_main), HEX);
+    Serial.println(ENDIAN_SWAP_32(packetBuffer.referencetimestamp_fraction), HEX);
+    Serial.println(ENDIAN_SWAP_32(packetBuffer.origintimestamp_main), HEX);
+    Serial.println(ENDIAN_SWAP_32(packetBuffer.origintimestamp_fraction), HEX);
+    Serial.println(ENDIAN_SWAP_32(packetBuffer.receivetimestamp_main), HEX);
+    Serial.println(ENDIAN_SWAP_32(packetBuffer.receivetimestamp_fraction), HEX);
+    Serial.println(ENDIAN_SWAP_32(packetBuffer.transmittimestamp_main), HEX);
+    Serial.println(ENDIAN_SWAP_32(packetBuffer.transmittimestamp_fraction), HEX);
 #endif
     Serial.print("Delay ");
-    Serial.print(ENDIAN_SWAP_16(packetBuffer.rootdelay_main));Serial.print(".");Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdelay_fraction));
-    Serial.print("Seconds since Jan 1 1900 = " );
+    Serial.print(ENDIAN_SWAP_16(packetBuffer.rootdelay_main)); Serial.print("."); Serial.println(ENDIAN_SWAP_16(packetBuffer.rootdelay_fraction));
+    Serial.print("Seconds since Jan 1 1900 = ");
     unsigned long secsSince1900 = ENDIAN_SWAP_32(packetBuffer.transmittimestamp_main);
-    Serial.print(secsSince1900);Serial.print(".");Serial.println(ENDIAN_SWAP_32(packetBuffer.transmittimestamp_fraction));
+    Serial.print(secsSince1900); Serial.print("."); Serial.println(ENDIAN_SWAP_32(packetBuffer.transmittimestamp_fraction));
 
     // now convert NTP time into everyday time:
     Serial.print("Unix time = ");
@@ -99,34 +97,33 @@ void loop()
     unsigned long epoch = secsSince1900 - seventyYears;
     // print Unix time:
     Serial.println(epoch);
-    
+
 #define SECS_PER_MINUTE 60
 #define SECS_PER_HOUR 3600
 #define SECS_PER_DAY  86400L
 
     // print the hour, minute and second:
     Serial.print("The UTC time is ");       // UTC is the time at Greenwich Meridian (GMT)
-    Serial.print((epoch  % SECS_PER_DAY) / SECS_PER_HOUR); 
+    Serial.print((epoch  % SECS_PER_DAY) / SECS_PER_HOUR);
     Serial.print(':');
-    if ( ((epoch % SECS_PER_HOUR) / SECS_PER_MINUTE) < 10 ) {
+    if (((epoch % SECS_PER_HOUR) / SECS_PER_MINUTE) < 10) {
       // In the first 10 minutes of each hour, we'll want a leading '0'
       Serial.print('0');
     }
-    Serial.print((epoch  % SECS_PER_HOUR) / SECS_PER_MINUTE); 
+    Serial.print((epoch  % SECS_PER_HOUR) / SECS_PER_MINUTE);
     Serial.print(':');
-    if ( (epoch % SECS_PER_MINUTE) < 10 ) {
+    if ((epoch % SECS_PER_MINUTE) < 10) {
       // In the first 10 seconds of each minute, we'll want a leading '0'
       Serial.print('0');
     }
     Serial.println(epoch % SECS_PER_MINUTE); // print the second
-}
+  }
   // wait ten seconds before asking for the time again
   delay(10000);
 }
 
 // send an NTP request to the time server at the given address
-unsigned long sendNTPpacket(char* address)
-{
+unsigned long sendNTPpacket(char* address) {
   // set all bytes in the buffer to 0
   memset((char *)&packetBuffer, 0, NTP_PACKET_SIZE);
   // Initialize values needed to form NTP request
@@ -141,7 +138,7 @@ unsigned long sendNTPpacket(char* address)
   packetBuffer.identifier[1] = 'N';
   packetBuffer.identifier[2] = '1';
   packetBuffer.identifier[3] = '4';
-//  Serial.println(*(uint8_t *)&packetBuffer,HEX);
+  //  Serial.println(*(uint8_t *)&packetBuffer,HEX);
   // all NTP fields have been given values, now
   // you can send a packet requesting a timestamp:
   Udp.beginPacket(address, 123); //NTP requests are to port 123

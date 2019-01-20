@@ -1,19 +1,36 @@
+/*
+ * ESPRESSIF MIT License
+ *
+ * Copyright (c) 2016 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
+ *
+ * Permission is hereby granted for use on ESPRESSIF SYSTEMS ESP8266 only, in which case,
+ * it is free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
 #ifndef __IP_ADDR_H__
 #define __IP_ADDR_H__
 
 #include "c_types.h"
+#include "ipv4_addr.h"
 
-struct ip_addr {
-    uint32 addr;
-};
-
-typedef struct ip_addr ip_addr_t;
-
-struct ip_info {
-    struct ip_addr ip;
-    struct ip_addr netmask;
-    struct ip_addr gw;
-};
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Determine if two address are on the same network.
@@ -23,7 +40,7 @@ struct ip_info {
  * @arg mask network identifier mask
  * @return !0 if the network identifiers of both address match
  */
-#define ip_addr_netcmp(addr1, addr2, mask) (((addr1)->addr & \
+#define ipv4_addr_netcmp(addr1, addr2, mask) (((addr1)->addr & \
         (mask)->addr) == \
         ((addr2)->addr & \
          (mask)->addr))
@@ -36,15 +53,15 @@ struct ip_info {
                          ((uint32)((b) & 0xff) << 8)  | \
                           (uint32)((a) & 0xff)
 
-#define ip4_addr1(ipaddr) (((uint8*)(ipaddr))[0])
-#define ip4_addr2(ipaddr) (((uint8*)(ipaddr))[1])
-#define ip4_addr3(ipaddr) (((uint8*)(ipaddr))[2])
-#define ip4_addr4(ipaddr) (((uint8*)(ipaddr))[3])
+#define ipv4_addr1(ipaddr) (((uint8*)(ipaddr))[0])
+#define ipv4_addr2(ipaddr) (((uint8*)(ipaddr))[1])
+#define ipv4_addr3(ipaddr) (((uint8*)(ipaddr))[2])
+#define ipv4_addr4(ipaddr) (((uint8*)(ipaddr))[3])
 
-#define ip4_addr1_16(ipaddr) ((uint16)ip4_addr1(ipaddr))
-#define ip4_addr2_16(ipaddr) ((uint16)ip4_addr2(ipaddr))
-#define ip4_addr3_16(ipaddr) ((uint16)ip4_addr3(ipaddr))
-#define ip4_addr4_16(ipaddr) ((uint16)ip4_addr4(ipaddr))
+#define ipv4_addr1_16(ipaddr) ((uint16)ipv4_addr1(ipaddr))
+#define ipv4_addr2_16(ipaddr) ((uint16)ipv4_addr2(ipaddr))
+#define ipv4_addr3_16(ipaddr) ((uint16)ipv4_addr3(ipaddr))
+#define ipv4_addr4_16(ipaddr) ((uint16)ipv4_addr4(ipaddr))
 
 
 /** 255.255.255.255 */
@@ -53,10 +70,16 @@ struct ip_info {
 #define IPADDR_ANY          ((uint32)0x00000000UL)
 uint32 ipaddr_addr(const char *cp);
 
-#define IP2STR(addr) (uint8_t)(addr & 0xFF), (uint8_t)((addr >> 8) & 0xFF), (uint8_t)((addr >> 16) & 0xFF), (uint8_t)((addr >> 24) & 0xFF)
+#define IP2STR(ipaddr) ipv4_addr1_16(ipaddr), \
+    ipv4_addr2_16(ipaddr), \
+    ipv4_addr3_16(ipaddr), \
+    ipv4_addr4_16(ipaddr)
+
 #define IPSTR "%d.%d.%d.%d"
 
-#define MAC2STR(mac) (uint8_t)mac[0], (uint8_t)mac[1], (uint8_t)mac[2], (uint8_t)mac[3], (uint8_t)mac[4], (uint8_t)mac[5]
-#define MACSTR "%02x:%02x:%02x:%02x:%02x:%02x"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __IP_ADDR_H__ */

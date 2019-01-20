@@ -26,7 +26,22 @@ http://arduino.cc/en/Reference/HomePage
 
 from os.path import isdir, join
 
+from SCons import Builder, Util
 from SCons.Script import DefaultEnvironment
+
+
+def scons_patched_match_splitext(path, suffixes=None):
+    """
+    Patch SCons Builder, append $OBJSUFFIX to the end of each target
+    """
+    tokens = Util.splitext(path)
+    if suffixes and tokens[1] and tokens[1] in suffixes:
+        return (path, tokens[1])
+    return tokens
+
+
+Builder.match_splitext = scons_patched_match_splitext
+
 
 env = DefaultEnvironment()
 platform = env.PioPlatform()
@@ -35,39 +50,155 @@ FRAMEWORK_DIR = platform.get_package_dir("framework-arduinoespressif8266")
 assert isdir(FRAMEWORK_DIR)
 
 
-env.Prepend(
+env.Append(
+    ASFLAGS=["-x", "assembler-with-cpp"],
+
+    CFLAGS=[
+        "-std=gnu99",
+        "-Wpointer-arith",
+        "-Wno-implicit-function-declaration",
+        "-Wl,-EL",
+        "-fno-inline-functions",
+        "-nostdlib"
+    ],
+
+    CCFLAGS=[
+        "-Os",  # optimize for size
+        "-mlongcalls",
+        "-mtext-section-literals",
+        "-falign-functions=4",
+        "-U__STRICT_ANSI__",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-Wall"
+    ],
+
+    CXXFLAGS=[
+        "-fno-rtti",
+        "-std=c++11"
+    ],
+
+    LINKFLAGS=[
+        "-Os",
+        "-nostdlib",
+        "-Wl,--no-check-sections",
+        "-Wl,-static",
+        "-Wl,--gc-sections",
+        "-Wl,-wrap,system_restart_local",
+        "-Wl,-wrap,spi_flash_read",
+        "-u", "app_entry",
+        "-u", "_printf_float",
+        "-u", "_scanf_float"
+    ],
+
     CPPDEFINES=[
-        ("ARDUINO", 10600),
+        ("F_CPU", "$BOARD_F_CPU"),
+        "__ets__",
+        "ICACHE_FLASH",
+        ("ARDUINO", 10805),
+        ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"'
+            % env.BoardConfig().id.upper()),
         "LWIP_OPEN_SRC"
     ],
+
     CPPPATH=[
         join(FRAMEWORK_DIR, "tools", "sdk", "include"),
-        join(FRAMEWORK_DIR, "tools", "sdk", "lwip", "include"),
         join(FRAMEWORK_DIR, "tools", "sdk", "libc",
              "xtensa-lx106-elf", "include"),
         join(FRAMEWORK_DIR, "cores", env.BoardConfig().get("build.core"))
     ],
+
     LIBPATH=[
+        join("$BUILD_DIR", "ld"),  # eagle.app.v6.common.ld
         join(FRAMEWORK_DIR, "tools", "sdk", "lib"),
         join(FRAMEWORK_DIR, "tools", "sdk", "ld"),
         join(FRAMEWORK_DIR, "tools", "sdk", "libc", "xtensa-lx106-elf", "lib")
     ],
+
     LIBS=[
-        "mesh", "wpa2", "smartconfig", "espnow", "pp", "main", "wpa", "lwip_gcc",
-        "net80211", "wps", "crypto", "phy", "hal", "axtls", "gcc",
-        "m", "c", "stdc++"
+        "hal", "phy", "pp", "net80211", "wpa", "crypto", "main",
+        "wps", "bearssl", "axtls", "espnow", "smartconfig", "airkiss", "wpa2",
+        "stdc++", "m", "c", "gcc"
+    ],
+
+    LIBSOURCE_DIRS=[
+        join(FRAMEWORK_DIR, "libraries")
     ]
 )
 
-env.Append(
-    LIBSOURCE_DIRS=[
-        join(FRAMEWORK_DIR, "libraries")
-    ],
-    LINKFLAGS=[
-        "-Wl,-wrap,system_restart_local",
-        "-Wl,-wrap,spi_flash_read"
-    ]
-)
+# copy CCFLAGS to ASFLAGS (-x assembler-with-cpp mode)
+env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
+
+flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
+
+#
+# lwIP
+#
+if "PIO_FRAMEWORK_ARDUINO_LWIP_HIGHER_BANDWIDTH" in flatten_cppdefines:
+    env.Append(
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip", "include")],
+        LIBS=["lwip_gcc"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_LOW_MEMORY" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip6-536-feat"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_IPV6_HIGHER_BANDWIDTH" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 1)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip6-1460-feat"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-1460-feat"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY_LOW_FLASH" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-536"]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_LWIP2_HIGHER_BANDWIDTH_LOW_FLASH" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 1460), ("LWIP_FEATURES", 0), ("LWIP_IPV6", 0)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-1460"]
+    )
+# PIO_FRAMEWORK_ARDUINO_LWIP2_LOW_MEMORY (default)
+else:
+    env.Append(
+        CPPDEFINES=[("TCP_MSS", 536), ("LWIP_FEATURES", 1), ("LWIP_IPV6", 0)],
+        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lwip2", "include")],
+        LIBS=["lwip2-536-feat"]
+    )
+
+#
+# VTables
+#
+
+current_vtables = None
+for d in flatten_cppdefines:
+    if str(d).startswith("VTABLES_IN_"):
+        current_vtables = d
+if not current_vtables:
+    current_vtables = "VTABLES_IN_FLASH"
+    env.Append(CPPDEFINES=[current_vtables])
+assert current_vtables
+
+# Build the eagle.app.v6.common.ld linker file
+app_ld = env.Command(
+    join("$BUILD_DIR", "ld", "local.eagle.app.v6.common.ld"),
+    join(FRAMEWORK_DIR, "tools", "sdk", "ld", "eagle.app.v6.common.ld.h"),
+    env.VerboseAction(
+        "$CC -CC -E -P -D%s $SOURCE -o $TARGET" % current_vtables,
+        "Generating LD script $TARGET"))
+env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", app_ld)
+
 
 #
 # Target: Build Core Library

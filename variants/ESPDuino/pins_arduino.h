@@ -25,15 +25,29 @@
 #ifndef Pins_Arduino_h
 #define Pins_Arduino_h
 
-#include "../generic/common.h"
-
 #define PIN_WIRE_SDA (4)
 #define PIN_WIRE_SCL (5)
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
 
-static const uint8_t LED_BUILTIN = 16;
-static const uint8_t BUILTIN_LED = 16;
+// All digital pins are PWM capable
+static const uint8_t D0   = 0;
+static const uint8_t D1   = 1; //TX0
+static const uint8_t D2   = 2;
+static const uint8_t D3   = 3; //RX0
+static const uint8_t D4   = 4;
+static const uint8_t D5   = 5;
+static const uint8_t D12   = 12; // MISO
+static const uint8_t D13   = 13; // MOSI
+static const uint8_t D14   = 14; // SCK
+static const uint8_t D15   = 15; // SS(SDA)
+static const uint8_t D16   = 16; // LED_BUILTIN
+static const uint8_t RX0   = 3;
+static const uint8_t TX0   = 1;
+
+#define LED_BUILTIN 16
+
+#include "../generic/common.h"
 
 #endif /* Pins_Arduino_h */

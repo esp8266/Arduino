@@ -2,18 +2,23 @@
   ESP8266 mDNS-SD responder and query sample
 
   This is an example of announcing and finding services.
-  
+
   Instructions:
   - Update WiFi SSID and password as necessary.
   - Flash the sketch to two ESP8266 boards
   - The last one powered on should now find the other.
- */
+*/
 
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 
-const char* ssid     = "...";
-const char* password = "...";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid     = STASSID;
+const char* password = STAPSK;
 char hostString[16] = {0};
 
 void setup() {
@@ -26,6 +31,7 @@ void setup() {
   Serial.println(hostString);
   WiFi.hostname(hostString);
 
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(250);
@@ -37,7 +43,7 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
- if (!MDNS.begin(hostString)) {
+  if (!MDNS.begin(hostString)) {
     Serial.println("Error setting up MDNS responder!");
   }
   Serial.println("mDNS responder started");
@@ -48,8 +54,7 @@ void setup() {
   Serial.println("mDNS query done");
   if (n == 0) {
     Serial.println("no services found");
-  }
-  else {
+  } else {
     Serial.print(n);
     Serial.println(" service(s) found");
     for (int i = 0; i < n; ++i) {
@@ -65,11 +70,11 @@ void setup() {
     }
   }
   Serial.println();
-  
+
   Serial.println("loop() next");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+  MDNS.update();
 }

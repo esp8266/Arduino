@@ -35,6 +35,18 @@
 
 using namespace fs;
 
+#ifdef ARDUINO
+extern "C" uint32_t _SPIFFS_start;
+extern "C" uint32_t _SPIFFS_end;
+extern "C" uint32_t _SPIFFS_page;
+extern "C" uint32_t _SPIFFS_block;
+
+#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
+#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
+#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
+#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
+#endif
+
 extern int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src);
 extern int32_t spiffs_hal_erase(uint32_t addr, uint32_t size);
 extern int32_t spiffs_hal_read(uint32_t addr, uint32_t size, uint8_t *dst);
@@ -114,6 +126,10 @@ public:
 
     bool begin() override
     {
+#if defined(ARDUINO) && !defined(CORE_MOCK)
+        if (&_SPIFFS_end <= &_SPIFFS_start)
+            return false;
+#endif
         if (SPIFFS_mounted(&_fs) != 0) {
             return true;
         }
@@ -220,7 +236,7 @@ protected:
         size_t cacheBufSize = SPIFFS_buffer_bytes_for_cache(&_fs, _maxOpenFds);
 
         if (!_workBuf) {
-            DEBUGV("SPIFFSImpl: allocating %d+%d+%d=%d bytes\r\n",
+            DEBUGV("SPIFFSImpl: allocating %zd+%zd+%zd=%zd bytes\r\n",
                    workBufSize, fdsBufSize, cacheBufSize,
                    workBufSize + fdsBufSize + cacheBufSize);
             _workBuf.reset(new uint8_t[workBufSize]);
@@ -329,7 +345,7 @@ public:
         if (mode == SeekEnd) {
             offset = -offset;
         }
-        auto rc = SPIFFS_lseek(_fs->getFs(), _fd, pos, (int) mode);
+        auto rc = SPIFFS_lseek(_fs->getFs(), _fd, offset, (int) mode);
         if (rc < 0) {
             DEBUGV("SPIFFS_lseek rc=%d\r\n", rc);
             return false;

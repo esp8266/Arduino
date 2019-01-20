@@ -36,8 +36,13 @@
 
 #define DBG_OUTPUT_PORT Serial
 
-const char* ssid = "**********";
-const char* password = "**********";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 const char* host = "esp8266sd";
 
 ESP8266WebServer server(80);
@@ -54,33 +59,50 @@ void returnFail(String msg) {
   server.send(500, "text/plain", msg + "\r\n");
 }
 
-bool loadFromSdCard(String path){
+bool loadFromSdCard(String path) {
   String dataType = "text/plain";
-  if(path.endsWith("/")) path += "index.htm";
+  if (path.endsWith("/")) {
+    path += "index.htm";
+  }
 
-  if(path.endsWith(".src")) path = path.substring(0, path.lastIndexOf("."));
-  else if(path.endsWith(".htm")) dataType = "text/html";
-  else if(path.endsWith(".css")) dataType = "text/css";
-  else if(path.endsWith(".js")) dataType = "application/javascript";
-  else if(path.endsWith(".png")) dataType = "image/png";
-  else if(path.endsWith(".gif")) dataType = "image/gif";
-  else if(path.endsWith(".jpg")) dataType = "image/jpeg";
-  else if(path.endsWith(".ico")) dataType = "image/x-icon";
-  else if(path.endsWith(".xml")) dataType = "text/xml";
-  else if(path.endsWith(".pdf")) dataType = "application/pdf";
-  else if(path.endsWith(".zip")) dataType = "application/zip";
+  if (path.endsWith(".src")) {
+    path = path.substring(0, path.lastIndexOf("."));
+  } else if (path.endsWith(".htm")) {
+    dataType = "text/html";
+  } else if (path.endsWith(".css")) {
+    dataType = "text/css";
+  } else if (path.endsWith(".js")) {
+    dataType = "application/javascript";
+  } else if (path.endsWith(".png")) {
+    dataType = "image/png";
+  } else if (path.endsWith(".gif")) {
+    dataType = "image/gif";
+  } else if (path.endsWith(".jpg")) {
+    dataType = "image/jpeg";
+  } else if (path.endsWith(".ico")) {
+    dataType = "image/x-icon";
+  } else if (path.endsWith(".xml")) {
+    dataType = "text/xml";
+  } else if (path.endsWith(".pdf")) {
+    dataType = "application/pdf";
+  } else if (path.endsWith(".zip")) {
+    dataType = "application/zip";
+  }
 
   File dataFile = SD.open(path.c_str());
-  if(dataFile.isDirectory()){
+  if (dataFile.isDirectory()) {
     path += "/index.htm";
     dataType = "text/html";
     dataFile = SD.open(path.c_str());
   }
 
-  if (!dataFile)
+  if (!dataFile) {
     return false;
+  }
 
-  if (server.hasArg("download")) dataType = "application/octet-stream";
+  if (server.hasArg("download")) {
+    dataType = "application/octet-stream";
+  }
 
   if (server.streamFile(dataFile, dataType) != dataFile.size()) {
     DBG_OUTPUT_PORT.println("Sent less data than expected!");
@@ -90,36 +112,46 @@ bool loadFromSdCard(String path){
   return true;
 }
 
-void handleFileUpload(){
-  if(server.uri() != "/edit") return;
+void handleFileUpload() {
+  if (server.uri() != "/edit") {
+    return;
+  }
   HTTPUpload& upload = server.upload();
-  if(upload.status == UPLOAD_FILE_START){
-    if(SD.exists((char *)upload.filename.c_str())) SD.remove((char *)upload.filename.c_str());
+  if (upload.status == UPLOAD_FILE_START) {
+    if (SD.exists((char *)upload.filename.c_str())) {
+      SD.remove((char *)upload.filename.c_str());
+    }
     uploadFile = SD.open(upload.filename.c_str(), FILE_WRITE);
     DBG_OUTPUT_PORT.print("Upload: START, filename: "); DBG_OUTPUT_PORT.println(upload.filename);
-  } else if(upload.status == UPLOAD_FILE_WRITE){
-    if(uploadFile) uploadFile.write(upload.buf, upload.currentSize);
+  } else if (upload.status == UPLOAD_FILE_WRITE) {
+    if (uploadFile) {
+      uploadFile.write(upload.buf, upload.currentSize);
+    }
     DBG_OUTPUT_PORT.print("Upload: WRITE, Bytes: "); DBG_OUTPUT_PORT.println(upload.currentSize);
-  } else if(upload.status == UPLOAD_FILE_END){
-    if(uploadFile) uploadFile.close();
+  } else if (upload.status == UPLOAD_FILE_END) {
+    if (uploadFile) {
+      uploadFile.close();
+    }
     DBG_OUTPUT_PORT.print("Upload: END, Size: "); DBG_OUTPUT_PORT.println(upload.totalSize);
   }
 }
 
-void deleteRecursive(String path){
+void deleteRecursive(String path) {
   File file = SD.open((char *)path.c_str());
-  if(!file.isDirectory()){
+  if (!file.isDirectory()) {
     file.close();
     SD.remove((char *)path.c_str());
     return;
   }
 
   file.rewindDirectory();
-  while(true) {
+  while (true) {
     File entry = file.openNextFile();
-    if (!entry) break;
-    String entryPath = path + "/" +entry.name();
-    if(entry.isDirectory()){
+    if (!entry) {
+      break;
+    }
+    String entryPath = path + "/" + entry.name();
+    if (entry.isDirectory()) {
       entry.close();
       deleteRecursive(entryPath);
     } else {
@@ -133,10 +165,12 @@ void deleteRecursive(String path){
   file.close();
 }
 
-void handleDelete(){
-  if(server.args() == 0) return returnFail("BAD ARGS");
+void handleDelete() {
+  if (server.args() == 0) {
+    return returnFail("BAD ARGS");
+  }
   String path = server.arg(0);
-  if(path == "/" || !SD.exists((char *)path.c_str())) {
+  if (path == "/" || !SD.exists((char *)path.c_str())) {
     returnFail("BAD PATH");
     return;
   }
@@ -144,17 +178,19 @@ void handleDelete(){
   returnOK();
 }
 
-void handleCreate(){
-  if(server.args() == 0) return returnFail("BAD ARGS");
+void handleCreate() {
+  if (server.args() == 0) {
+    return returnFail("BAD ARGS");
+  }
   String path = server.arg(0);
-  if(path == "/" || SD.exists((char *)path.c_str())) {
+  if (path == "/" || SD.exists((char *)path.c_str())) {
     returnFail("BAD PATH");
     return;
   }
 
-  if(path.indexOf('.') > 0){
+  if (path.indexOf('.') > 0) {
     File file = SD.open((char *)path.c_str(), FILE_WRITE);
-    if(file){
+    if (file) {
       file.write((const char *)0);
       file.close();
     }
@@ -165,12 +201,16 @@ void handleCreate(){
 }
 
 void printDirectory() {
-  if(!server.hasArg("dir")) return returnFail("BAD ARGS");
+  if (!server.hasArg("dir")) {
+    return returnFail("BAD ARGS");
+  }
   String path = server.arg("dir");
-  if(path != "/" && !SD.exists((char *)path.c_str())) return returnFail("BAD PATH");
+  if (path != "/" && !SD.exists((char *)path.c_str())) {
+    return returnFail("BAD PATH");
+  }
   File dir = SD.open((char *)path.c_str());
   path = String();
-  if(!dir.isDirectory()){
+  if (!dir.isDirectory()) {
     dir.close();
     return returnFail("NOT DIR");
   }
@@ -182,12 +222,14 @@ void printDirectory() {
   server.sendContent("[");
   for (int cnt = 0; true; ++cnt) {
     File entry = dir.openNextFile();
-    if (!entry)
-    break;
+    if (!entry) {
+      break;
+    }
 
     String output;
-    if (cnt > 0)
+    if (cnt > 0) {
       output = ',';
+    }
 
     output += "{\"type\":\"";
     output += (entry.isDirectory()) ? "dir" : "file";
@@ -197,32 +239,35 @@ void printDirectory() {
     output += "}";
     server.sendContent(output);
     entry.close();
- }
- server.sendContent("]");
- dir.close();
+  }
+  server.sendContent("]");
+  dir.close();
 }
 
-void handleNotFound(){
-  if(hasSD && loadFromSdCard(server.uri())) return;
+void handleNotFound() {
+  if (hasSD && loadFromSdCard(server.uri())) {
+    return;
+  }
   String message = "SDCARD Not Detected\n\n";
   message += "URI: ";
   message += server.uri();
   message += "\nMethod: ";
-  message += (server.method() == HTTP_GET)?"GET":"POST";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
   message += "\nArguments: ";
   message += server.args();
   message += "\n";
-  for (uint8_t i=0; i<server.args(); i++){
-    message += " NAME:"+server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
   DBG_OUTPUT_PORT.print(message);
 }
 
-void setup(void){
+void setup(void) {
   DBG_OUTPUT_PORT.begin(115200);
   DBG_OUTPUT_PORT.setDebugOutput(true);
   DBG_OUTPUT_PORT.print("\n");
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   DBG_OUTPUT_PORT.print("Connecting to ");
   DBG_OUTPUT_PORT.println(ssid);
@@ -232,10 +277,12 @@ void setup(void){
   while (WiFi.status() != WL_CONNECTED && i++ < 20) {//wait 10 seconds
     delay(500);
   }
-  if(i == 21){
+  if (i == 21) {
     DBG_OUTPUT_PORT.print("Could not connect to");
     DBG_OUTPUT_PORT.println(ssid);
-    while(1) delay(500);
+    while (1) {
+      delay(500);
+    }
   }
   DBG_OUTPUT_PORT.print("Connected! IP address: ");
   DBG_OUTPUT_PORT.println(WiFi.localIP());
@@ -252,18 +299,21 @@ void setup(void){
   server.on("/list", HTTP_GET, printDirectory);
   server.on("/edit", HTTP_DELETE, handleDelete);
   server.on("/edit", HTTP_PUT, handleCreate);
-  server.on("/edit", HTTP_POST, [](){ returnOK(); }, handleFileUpload);
+  server.on("/edit", HTTP_POST, []() {
+    returnOK();
+  }, handleFileUpload);
   server.onNotFound(handleNotFound);
 
   server.begin();
   DBG_OUTPUT_PORT.println("HTTP server started");
 
-  if (SD.begin(SS)){
-     DBG_OUTPUT_PORT.println("SD Card initialized.");
-     hasSD = true;
+  if (SD.begin(SS)) {
+    DBG_OUTPUT_PORT.println("SD Card initialized.");
+    hasSD = true;
   }
 }
 
-void loop(void){
+void loop(void) {
   server.handleClient();
+  MDNS.update();
 }

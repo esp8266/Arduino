@@ -75,7 +75,11 @@ String::String(unsigned char value, unsigned char base) {
 String::String(int value, unsigned char base) {
     init();
     char buf[2 + 8 * sizeof(int)];
-    itoa(value, buf, base);
+    if (base == 10) {
+        sprintf(buf, "%d", value);
+    } else {
+        itoa(value, buf, base);
+    }
     *this = buf;
 }
 
@@ -89,7 +93,11 @@ String::String(unsigned int value, unsigned char base) {
 String::String(long value, unsigned char base) {
     init();
     char buf[2 + 8 * sizeof(long)];
-    ltoa(value, buf, base);
+    if (base==10) {
+        sprintf(buf, "%ld", value);
+    } else {
+        ltoa(value, buf, base);
+    }
     *this = buf;
 }
 
@@ -113,10 +121,7 @@ String::String(double value, unsigned char decimalPlaces) {
 }
 
 String::~String() {
-    if(buffer) {
-        free(buffer);
-    }
-    init();
+    invalidate();
 }
 
 // /*********************************************/
@@ -159,7 +164,6 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
         buffer = newbuffer;
         return 1;
     }
-    buffer = newbuffer;
     return 0;
 }
 
@@ -256,7 +260,23 @@ String & String::operator = (const __FlashStringHelper *pstr)
 // /*********************************************/
 
 unsigned char String::concat(const String &s) {
-    return concat(s.buffer, s.len);
+    // Special case if we're concatting ourself (s += s;) since we may end up
+    // realloc'ing the buffer and moving s.buffer in the method called
+    if (&s == this) {
+        unsigned int newlen = 2 * len;
+        if (!s.buffer)
+            return 0;
+        if (s.len == 0)
+            return 1;
+        if (!reserve(newlen))
+            return 0;
+        memcpy(buffer + len, buffer, len);
+        len = newlen;
+        buffer[len] = 0;
+        return 1;
+    } else {
+        return concat(s.buffer, s.len);
+    }
 }
 
 unsigned char String::concat(const char *cstr, unsigned int length) {
@@ -287,13 +307,13 @@ unsigned char String::concat(char c) {
 
 unsigned char String::concat(unsigned char num) {
     char buf[1 + 3 * sizeof(unsigned char)];
-    itoa(num, buf, 10);
+    sprintf(buf, "%d", num);
     return concat(buf, strlen(buf));
 }
 
 unsigned char String::concat(int num) {
     char buf[2 + 3 * sizeof(int)];
-    itoa(num, buf, 10);
+    sprintf(buf, "%d", num);
     return concat(buf, strlen(buf));
 }
 
@@ -305,7 +325,7 @@ unsigned char String::concat(unsigned int num) {
 
 unsigned char String::concat(long num) {
     char buf[2 + 3 * sizeof(long)];
-    ltoa(num, buf, 10);
+    sprintf(buf, "%ld", num);
     return concat(buf, strlen(buf));
 }
 
@@ -476,6 +496,33 @@ unsigned char String::equalsIgnoreCase(const String &s2) const {
             return 0;
     }
     return 1;
+}
+
+unsigned char String::equalsConstantTime(const String &s2) const {
+    // To avoid possible time-based attacks present function
+    // compares given strings in a constant time.
+    if(len != s2.len)
+        return 0;
+    //at this point lengths are the same
+    if(len == 0)
+        return 1;
+    //at this point lenghts are the same and non-zero
+    const char *p1 = buffer;
+    const char *p2 = s2.buffer;
+    unsigned int equalchars = 0;
+    unsigned int diffchars = 0;
+    while(*p1) {
+        if(*p1 == *p2)
+            ++equalchars;
+        else
+            ++diffchars;
+        ++p1;
+        ++p2;
+    }
+    //the following should force a constant time eval of the condition without a compiler "logical shortcut"
+    unsigned char equalcond = (equalchars == len);
+    unsigned char diffcond = (diffchars == 0);
+    return (equalcond & diffcond); //bitwise AND
 }
 
 unsigned char String::startsWith(const String &s2) const {
@@ -699,7 +746,7 @@ void String::remove(unsigned int index, unsigned int count) {
     }
     char *writeTo = buffer + index;
     len = len - count;
-    strncpy(writeTo, buffer + index + count, len - index);
+    memmove(writeTo, buffer + index + count, len - index);
     buffer[len] = 0;
 }
 
@@ -730,7 +777,7 @@ void String::trim(void) {
         end--;
     len = end + 1 - begin;
     if(begin > buffer)
-        memcpy(buffer, begin, len);
+        memmove(buffer, begin, len);
     buffer[len] = 0;
 }
 
@@ -749,3 +796,7 @@ float String::toFloat(void) const {
         return atof(buffer);
     return 0;
 }
+
+// global empty string to allow returning const String& with nothing
+
+const String emptyString;

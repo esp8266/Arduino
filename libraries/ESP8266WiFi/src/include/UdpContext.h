@@ -27,11 +27,10 @@ extern "C" {
 void esp_yield();
 void esp_schedule();
 #include "lwip/init.h" // LWIP_VERSION_
+#include <assert.h>
 }
 
-
-#define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);
-#define GET_UDP_HDR(pb) reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN);
+#define GET_UDP_HDR(pb) (reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN))
 
 class UdpContext
 {
@@ -89,17 +88,17 @@ public:
         }
     }
 
-    bool connect(ip_addr_t addr, uint16_t port)
+    bool connect(const ip_addr_t* addr, uint16_t port)
     {
-        ip_addr_copy(_pcb->remote_ip, addr);
+        _pcb->remote_ip = *addr;
         _pcb->remote_port = port;
         return true;
     }
 
-    bool listen(ip_addr_t addr, uint16_t port)
+    bool listen(CONST ip_addr_t* addr, uint16_t port)
     {
         udp_recv(_pcb, &_s_recv, (void *) this);
-        err_t err = udp_bind(_pcb, &addr, port);
+        err_t err = udp_bind(_pcb, addr, port);
         return err == ERR_OK;
     }
 
@@ -108,17 +107,14 @@ public:
         udp_disconnect(_pcb);
     }
 
+    void setMulticastInterface(const IPAddress& addr)
+    {
 #if LWIP_VERSION_MAJOR == 1
-    void setMulticastInterface(ip_addr_t addr)
-    {
-        udp_set_multicast_netif_addr(_pcb, addr);
-    }
+        udp_set_multicast_netif_addr(_pcb, (ip_addr_t)addr);
 #else
-    void setMulticastInterface(const ip_addr_t& addr)
-    {
-        udp_set_multicast_netif_addr(_pcb, &addr);
-    }
+        udp_set_multicast_netif_addr(_pcb, ip_2_ip4((const ip_addr_t*)addr));
 #endif
+    }
 
     void setMulticastTTL(int ttl)
     {
@@ -143,35 +139,44 @@ public:
         return _rx_buf->len - _rx_buf_offset;
     }
 
-    uint32_t getRemoteAddress()
+    size_t tell() const
     {
-        if (!_rx_buf)
-            return 0;
-
-        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return iphdr->src.addr;
+        return _rx_buf_offset;
     }
 
-    uint16_t getRemotePort()
+    void seek(const size_t pos)
+    {
+        assert(isValidOffset(pos));
+        _rx_buf_offset = pos;
+    }
+
+    bool isValidOffset(const size_t pos) const {
+        return (pos <= _rx_buf->len);
+    }
+
+    CONST IPAddress& getRemoteAddress() CONST
+    {
+        return _src_addr;
+    }
+
+    uint16_t getRemotePort() const
     {
         if (!_rx_buf)
             return 0;
 
         udp_hdr* udphdr = GET_UDP_HDR(_rx_buf);
-        return ntohs(udphdr->src);
+        return lwip_ntohs(udphdr->src);
     }
 
-    uint32_t getDestAddress()
+    const IPAddress& getDestAddress() const
     {
-        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return iphdr->dest.addr;
+        return _dst_addr;
     }
 
-    uint16_t getLocalPort()
+    uint16_t getLocalPort() const
     {
         if (!_pcb)
             return 0;
-
         return _pcb->local_port;
     }
 
@@ -200,7 +205,7 @@ public:
 
     int read()
     {
-        if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
+        if (!_rx_buf || _rx_buf_offset >= _rx_buf->len)
             return -1;
 
         char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
@@ -223,7 +228,7 @@ public:
         return size;
     }
 
-    int peek()
+    int peek() const
     {
         if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
             return -1;
@@ -233,18 +238,23 @@ public:
 
     void flush()
     {
+        //XXX this does not follow Arduino's flush definition
         if (!_rx_buf)
             return;
 
         _consume(_rx_buf->len - _rx_buf_offset);
     }
 
-
     size_t append(const char* data, size_t size)
     {
         if (!_tx_buf_head || _tx_buf_head->tot_len < _tx_buf_offset + size)
         {
             _reserve(_tx_buf_offset + size);
+        }
+        if (!_tx_buf_head || _tx_buf_head->tot_len < _tx_buf_offset + size)
+        {
+            DEBUGV("failed _reserve");
+            return 0;
         }
 
         size_t left_to_copy = size;
@@ -267,21 +277,30 @@ public:
         return size;
     }
 
-    bool send(ip_addr_t* addr = 0, uint16_t port = 0)
+    bool send(CONST ip_addr_t* addr = 0, uint16_t port = 0)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
-        uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
-        for (pbuf* p = _tx_buf_head; p; p = p->next) {
-            size_t will_copy = (data_size < p->len) ? data_size : p->len;
-            memcpy(dst, p->payload, will_copy);
-            dst += will_copy;
-            data_size -= will_copy;
+        if(!tx_copy){
+            DEBUGV("failed pbuf_alloc");
         }
-        pbuf_free(_tx_buf_head);
+        else{
+            uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
+            for (pbuf* p = _tx_buf_head; p; p = p->next) {
+                size_t will_copy = (data_size < p->len) ? data_size : p->len;
+                memcpy(dst, p->payload, will_copy);
+                dst += will_copy;
+                data_size -= will_copy;
+            }
+        }
+        if (_tx_buf_head)
+            pbuf_free(_tx_buf_head);
         _tx_buf_head = 0;
         _tx_buf_cur = 0;
         _tx_buf_offset = 0;
+        if(!tx_copy){
+            return false;
+        }
 
 
         if (!addr) {
@@ -296,7 +315,7 @@ public:
 #endif
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK) {
-            DEBUGV(":ust rc=%d\r\n", err);
+            DEBUGV(":ust rc=%d\r\n", (int) err);
         }
 #ifdef LWIP_MAYBE_XCC
         _pcb->ttl = old_ttl;
@@ -313,6 +332,10 @@ private:
         if (!_tx_buf_head)
         {
             _tx_buf_head = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
+            if (!_tx_buf_head)
+            {
+                return;
+            }
             _tx_buf_cur = _tx_buf_head;
             _tx_buf_offset = 0;
         }
@@ -326,6 +349,10 @@ private:
         while(grow_size)
         {
             pbuf* pb = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
+            if (!pb)
+            {
+                return;
+            }
             pbuf_cat(_tx_buf_head, pb);
             if (grow_size < pbuf_unit_size)
                 return;
@@ -336,6 +363,9 @@ private:
     void _consume(size_t size)
     {
         _rx_buf_offset += size;
+        if (_rx_buf_offset > _rx_buf->len) {
+            _rx_buf_offset = _rx_buf->len;
+        }
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
@@ -358,21 +388,33 @@ private:
             _rx_buf = pb;
             _rx_buf_offset = 0;
         }
+
+        // --> Arduino's UDP is a stream but UDP is not <--
+        // When IPv6 is enabled, we store addresses from here
+        // because lwIP's macro are valid only in this callback
+        // (there's no easy way to safely guess whether packet
+        //  is from v4 or v6 when we have only access to payload)
+        // Because of this stream-ed way this is inacurate when
+        // user does not swallow data quickly enough (the former
+        // IPv4-only way suffers from the exact same issue.
+
+#if LWIP_VERSION_MAJOR == 1
+        _src_addr = current_iphdr_src;
+        _dst_addr = current_iphdr_dest;
+#else
+        _src_addr = ip_data.current_iphdr_src;
+        _dst_addr = ip_data.current_iphdr_dest;
+#endif
+
         if (_on_rx) {
             _on_rx();
         }
     }
 
 
-#if LWIP_VERSION_MAJOR == 1
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            ip_addr_t *addr, u16_t port)
-#else
-    static void _s_recv(void *arg,
-            udp_pcb *upcb, pbuf *p,
-            const ip_addr_t *addr, u16_t port)
-#endif
+            CONST ip_addr_t *addr, u16_t port)
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, addr, port);
     }
@@ -390,8 +432,9 @@ private:
 #ifdef LWIP_MAYBE_XCC
     uint16_t _mcast_ttl;
 #endif
+    IPAddress _src_addr, _dst_addr;
 };
 
 
 
-#endif//CLIENTCONTEXT_H
+#endif//UDPCONTEXT_H

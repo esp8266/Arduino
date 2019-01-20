@@ -49,6 +49,9 @@ private:
   uint16_t _remotePort; // remote port for the incoming packet whilst it's being processed
   uint16_t _offset; // offset into the packet being sent
   uint16_t _remaining; // remaining bytes of incoming packet yet to be processed
+  
+protected:
+  void clear_remaining();
 
 public:
   EthernetUDP();  // Constructor
@@ -91,9 +94,9 @@ public:
   virtual void flush();	// Finish reading the current packet
 
   // Return the IP address of the host who sent the current incoming packet
-  virtual IPAddress remoteIP() { return _remoteIP; };
+  virtual IPAddress remoteIP() const { return _remoteIP; };
   // Return the port of the host who sent the current incoming packet
-  virtual uint16_t remotePort() { return _remotePort; };
+  virtual uint16_t remotePort() const { return _remotePort; };
 };
 
 #endif

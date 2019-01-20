@@ -34,6 +34,7 @@ public:
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);
   virtual int read();
+  virtual size_t readBytes(char *buffer, size_t length);
   virtual int peek();
   virtual int available();
   virtual void flush();
@@ -88,6 +89,24 @@ public:
   // This needs to be called to set up the connection to the SD card
   // before other methods are used.
   boolean begin(uint8_t csPin = SD_CHIP_SELECT_PIN, uint32_t speed = SPI_HALF_SPEED);
+
+/*
+  In the following sequence:
+  //Insert SD Card A
+  SD.begin()
+  //do operations
+  //remove card A
+  //insert SD card B
+  SD.end()
+
+  It is possible that card A becomes corrupted due to removal before calling SD.end().
+  It is possible that card B becomes corrupted if there were ops pending for card A at the time SD.end() is called.
+
+  Call SD.end() or SD.end(true) to shut everything down.
+  Call SD.end(false) to shut everything but the SPI object down.
+ */
+  void end(bool endSPI = true);
+
 
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Returns a File object for interacting with the file.
