@@ -29,62 +29,12 @@
 #include <math.h>
 #include "stdlib_noniso.h"
 
-void reverse(char* begin, char* end) {
-    char *is = begin;
-    char *ie = end - 1;
-    while(is < ie) {
-        char tmp = *ie;
-        *ie = *is;
-        *is = tmp;
-        ++is;
-        --ie;
-    }
-}
-
 char* ltoa(long value, char* result, int base) {
-    if(base < 2 || base > 16) {
-        *result = 0;
-        return result;
-    }
-
-    char* out = result;
-    long quotient = abs(value);
-
-    do {
-        const long tmp = quotient / base;
-        *out = "0123456789abcdef"[quotient - (tmp * base)];
-        ++out;
-        quotient = tmp;
-    } while(quotient);
-
-    // Apply negative sign
-    if(value < 0)
-        *out++ = '-';
-
-    reverse(result, out);
-    *out = 0;
-    return result;
+    return itoa((int)value, result, base);
 }
 
 char* ultoa(unsigned long value, char* result, int base) {
-    if(base < 2 || base > 16) {
-        *result = 0;
-        return result;
-    }
-
-    char* out = result;
-    unsigned long quotient = value;
-
-    do {
-        const unsigned long tmp = quotient / base;
-        *out = "0123456789abcdef"[quotient - (tmp * base)];
-        ++out;
-        quotient = tmp;
-    } while(quotient);
-
-    reverse(result, out);
-    *out = 0;
-    return result;
+    return utoa((unsigned int)value, result, base);
 }
 
 char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
