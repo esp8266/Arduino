@@ -165,45 +165,45 @@
                "systems": [
                   {
                      "host": "aarch64-linux-gnu",
-                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
-                     "archiveFileName": "pyserial-3.4.tar.gz",
-                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
-                     "size": "151657"
+                     "url": "https://github.com/pyserial/pyserial/archive/v3.4.tar.gz",
+                     "archiveFileName": "v3.4.tar.gz",
+                     "checksum": "SHA-256:ca25c777d06ad0b4b129910642aaa75f724157c80e2898a8e3219adc5599a2a1",
+                     "size": "148388"
                   },
                   {
                      "host": "arm-linux-gnueabihf",
-                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
-                     "archiveFileName": "pyserial-3.4.tar.gz",
-                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
-                     "size": "151657"
+                     "url": "https://github.com/pyserial/pyserial/archive/v3.4.tar.gz",
+                     "archiveFileName": "v3.4.tar.gz",
+                     "checksum": "SHA-256:ca25c777d06ad0b4b129910642aaa75f724157c80e2898a8e3219adc5599a2a1",
+                     "size": "148388"
                   },
                   {
                      "host": "i686-mingw32",
-                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
-                     "archiveFileName": "pyserial-3.4.tar.gz",
-                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
-                     "size": "151657"
+                     "url": "https://github.com/pyserial/pyserial/archive/v3.4.zip",
+                     "archiveFileName": "v3.4.zip",
+                     "checksum": "SHA-256:0a85cb567b2322ae4859a6996695d733fd3369f95d869bab4cc04e3e78606ca8",
+                     "size": "191128"
                   },
                   {
                      "host": "x86_64-apple-darwin",
-                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
-                     "archiveFileName": "pyserial-3.4.tar.gz",
-                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
-                     "size": "151657"
+                     "url": "https://github.com/pyserial/pyserial/archive/v3.4.tar.gz",
+                     "archiveFileName": "v3.4.tar.gz",
+                     "checksum": "SHA-256:ca25c777d06ad0b4b129910642aaa75f724157c80e2898a8e3219adc5599a2a1",
+                     "size": "148388"
                   },
                   {
                      "host": "x86_64-pc-linux-gnu",
-                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
-                     "archiveFileName": "pyserial-3.4.tar.gz",
-                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
-                     "size": "151657"
+                     "url": "https://github.com/pyserial/pyserial/archive/v3.4.tar.gz",
+                     "archiveFileName": "v3.4.tar.gz",
+                     "checksum": "SHA-256:ca25c777d06ad0b4b129910642aaa75f724157c80e2898a8e3219adc5599a2a1",
+                     "size": "148388"
                   },
                   {
                      "host": "x86_64-mingw32",
-                     "url": "https://files.pythonhosted.org/packages/cc/74/11b04703ec416717b247d789103277269d567db575d2fd88f25d9767fe3d/pyserial-3.4.tar.gz",
-                     "archiveFileName": "pyserial-3.4.tar.gz",
-                     "checksum": "SHA-256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
-                     "size": "151657"
+                     "url": "https://github.com/pyserial/pyserial/archive/v3.4.zip",
+                     "archiveFileName": "v3.4.zip",
+                     "checksum": "SHA-256:0a85cb567b2322ae4859a6996695d733fd3369f95d869bab4cc04e3e78606ca8",
+                     "size": "191128"
                   }
                ]
             },
