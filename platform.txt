@@ -12,7 +12,7 @@ runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx1
 runtime.tools.esptool.path={runtime.platform.path}/tools/esptool
 runtime.tools.signing={runtime.platform.path}/tools/signing.py
 runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
-runtime.tools.makeversion={runtime.platform.path}/tools/makeversion.py
+runtime.tools.makecorever={runtime.platform.path}/tools/makecorever.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
 runtime.tools.python=python
 runtime.tools.python.windows={runtime.platform.path}/tools/python/python.exe
@@ -82,7 +82,7 @@ compiler.elf2hex.extra_flags=
 ## generate file with git version number
 ## needs bash, git, and echo
 recipe.hooks.core.prebuild.1.pattern="{runtime.tools.python}" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
-recipe.hooks.core.prebuild.2.pattern="{runtime.tools.python}" "{runtime.tools.makeversion}" --build_path "{build.path}' --platform_path "{runtime.platform.path}" --version "unix-{version}"
+recipe.hooks.core.prebuild.2.pattern="{runtime.tools.python}" "{runtime.tools.makecorever}" --build_path "{build.path}' --platform_path "{runtime.platform.path}" --version "unix-{version}"
 
 ## Build the app.ld linker file
 recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/local.eagle.app.v6.common.ld"
