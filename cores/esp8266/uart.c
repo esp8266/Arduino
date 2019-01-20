@@ -387,7 +387,7 @@ uart_unsubscribeInterrupt_unsafe(int uart_nr, uartInterruptHandler callback)
 
 
 static void
-uart_start_isr(uart_t* uart)
+uart_init_default_isr(uart_t* uart)
 {
     if (uart == NULL || !uart->rx_enabled)
         return;
@@ -413,7 +413,6 @@ uart_start_isr(uart_t* uart)
     // UITO: rx fifo timeout
     USIE(uart->uart_nr) = (1 << UIFF) | (1 << UIOF) | (1 << UIFR) | (1 << UIPE) | (1 << UITO);
     uart_subscribeInterrupt_unsafe(uart->uart_nr, uart_isrDefault, (void *)uart);
-
 }
 
 /*
@@ -614,7 +613,7 @@ uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx
     USIC(uart->uart_nr) = 0xffff;
     USIE(uart->uart_nr) = 0;
     if (uart->uart_nr == UART0 && uart->rx_enabled)
-        uart_start_isr(uart);
+        uart_init_default_isr(uart);
 
     ETS_UART_INTR_ENABLE();
 
