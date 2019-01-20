@@ -480,7 +480,6 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
 
             sendParameter.m_bResponse = true;
             sendParameter.m_bAuthorative = true;
-            //sendParameter.m_bCacheFlush = false;
 
             bResult = _sendMDNSMessage(sendParameter);
         }
@@ -1214,7 +1213,7 @@ bool MDNSResponder::_sendHostProbe(void) {
 
         //sendParameter.m_pQuestions->m_bUnicast = true;
         sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = DNS_RRTYPE_ANY;
-        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);   // UNICAST & INternet
+        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);   // Unicast & INternet
     
         // Add known answers
 #ifdef MDNS_IP4_SUPPORT

@@ -50,7 +50,8 @@ namespace MDNSImplementation {
  * MDNSResponder::MDNSResponder
  */
 MDNSResponder::MDNSResponder(void)
-:   m_pServices(0),
+:   m_bInitialized(false),
+    m_pServices(0),
     m_pUDPContext(0),
     m_pcHostname(0),
     m_pServiceQueries(0),
@@ -87,21 +88,27 @@ MDNSResponder::~MDNSResponder(void) {
  */
 bool MDNSResponder::begin(const char* p_pcHostname) {
     
-    bool    bResult = false;
+    bool    bResult = m_bInitialized;
     
-    if (_setHostname(p_pcHostname)) {
-        
-        m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
-            (void) pEvent;
-            _restart();
-        });
-
-        m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
-            (void) pEvent;
-            _restart();
-        });
+    if (!m_bInitialized) {
+        if (_setHostname(p_pcHostname)) {
             
-        bResult = _restart();
+            m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
+                (void) pEvent;
+                _restart();
+            });
+
+            m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
+                (void) pEvent;
+                _restart();
+            });
+
+            m_bInitialized =
+                bResult = _restart();
+        }
+    }
+    else {
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: Ignoring multiple calls (Ignored host domain: '%s')!\n"), (p_pcHostname ?: "-")););
     }
     DEBUG_EX_ERR(if (!bResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: FAILED for '%s'!\n"), (p_pcHostname ?: "-")); } );
     return bResult;
@@ -134,6 +141,7 @@ bool MDNSResponder::close(void) {
     _releaseServiceQueries();
     _releaseUDPContext();
     _releaseHostname();
+    m_bInitialized = false;
     
     return true;
 }

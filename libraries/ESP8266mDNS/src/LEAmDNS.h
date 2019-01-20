@@ -1029,6 +1029,7 @@ protected:
     };
     
     // Instance variables
+    bool                            m_bInitialized;
     stcMDNSService*                 m_pServices;
     UdpContext*                     m_pUDPContext;
     char*                           m_pcHostname;
