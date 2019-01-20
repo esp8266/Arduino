@@ -30,7 +30,7 @@ ffreqb = { '40': 0, '26': 1, '20': 2, '80': 15 }
 fsizeb = { '512K': 0, '256K': 1, '1M': 2, '2M': 3, '4M': 4, '8M': 8, '16M': 9 }
 
 def get_elf_entry(elf, path):
-    p = subprocess.Popen([path + "/xtensa-lx106-elf-readelf", '-h', elf], stdout=subprocess.PIPE)
+    p = subprocess.Popen([path + "/xtensa-lx106-elf-readelf", '-h', elf], stdout=subprocess.PIPE, universal_newlines=True )
     lines = p.stdout.readlines()
     for line in lines:
         if 'Entry point address' in line:
@@ -40,7 +40,7 @@ def get_elf_entry(elf, path):
     raise Exception('Unable to find entry point in file "' + elf + '"')
 
 def get_segment_size_addr(elf, segment, path):
-    p = subprocess.Popen([path + '/xtensa-lx106-elf-objdump', '-h', '-j', segment,  elf], stdout=subprocess.PIPE)
+    p = subprocess.Popen([path + '/xtensa-lx106-elf-objdump', '-h', '-j', segment,  elf], stdout=subprocess.PIPE, universal_newlines=True )
     lines = p.stdout.readlines()
     for line in lines:
         if segment in line:
@@ -77,8 +77,12 @@ def write_bin(out, elf, segments, to_addr, flash_mode, flash_size, flash_freq, p
             raise Exception('Segment size doesn\'t match read data for "' + segment + '" in "' + elf + '"')
         out.write(raw)
         total_size += len(raw)
-        for data in raw:
-            checksum = checksum ^ ord(data)
+        try:
+            for data in raw:
+                checksum = checksum ^ ord(data)
+        except:
+            for data in raw:
+                checksum = checksum ^ data
     total_size += 1
     while total_size & 15:
         total_size += 1
@@ -101,7 +105,7 @@ def main():
 
     args = parser.parse_args()
 
-    print 'Creating BIN file "' + args.out + '" using "' + args.app + '"'
+    print('Creating BIN file "' + args.out + '" using "' + args.app + '"')
 
     out = open(args.out, "wb")
     write_bin(out, args.eboot, ['.text'], 4096, args.flash_mode, args.flash_size, args.flash_freq, args.path)
