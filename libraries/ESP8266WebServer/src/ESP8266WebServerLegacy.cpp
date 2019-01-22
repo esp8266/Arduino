@@ -673,4 +673,10 @@ const String ESP8266WebServer::_responseCodeToString(int code) {
   }
 }
 
+void ESP8266WebServer::_resetRequest () {
+  // code moved from SSL::begin()
+  if(!_headerKeysCount)
+    collectHeaders(0, 0);
+}
+
 }; // namespace WebServerLegacy

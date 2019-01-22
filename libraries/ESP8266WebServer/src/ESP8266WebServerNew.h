@@ -71,7 +71,7 @@ public:
 
 	const char *uri() const				{ return _requestPath; }
 	HTTPMethod method() const			{ return _method; }
-	virtual WiFiClient client() const	{ return _currentClient; }
+	virtual WiFiClient client() 			{ return _currentClient; }
 	HTTPUpload& upload() const			{ return *_currentUpload; }
 
 
@@ -240,7 +240,7 @@ protected:
 
 
 
-	void resetRequest();
+	void _resetRequest();
 
 
 

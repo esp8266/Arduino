@@ -77,8 +77,7 @@ ESP8266WebServerSecure::~ESP8266WebServerSecure() {
 void ESP8266WebServerSecure::begin() {
   _currentStatus = HC_NONE;
   _serverSecure.begin();
-  if(!_headerKeysCount)
-    collectHeaders(0, 0);
+  _resetRequest();
 }
 
 void ESP8266WebServerSecure::handleClient() {

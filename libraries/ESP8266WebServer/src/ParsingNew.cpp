@@ -70,7 +70,7 @@ static inline T *vealloc(T *ptr, size_t size) {
 ////////////////////////////////////////////////////////////////////////////////
 // RESET ALL REQUEST VARIABLES TO DEFAULT FOR NEW INCOMING CONNECTION
 ////////////////////////////////////////////////////////////////////////////////
-void ESP8266WebServer::resetRequest() {
+void ESP8266WebServer::_resetRequest() {
 	// CLEAR ALL HEADERS
 	_headers.reset();
 
@@ -222,7 +222,7 @@ HTTPMethod ESP8266WebServer::_parseMethod(const char *method) {
 HTTPStatus ESP8266WebServer::_parseRequest(WiFiClient &client) {
 
 	//RESET ALL REQUEST VARIABLES
-	resetRequest();
+	_resetRequest();
 
 
 	//READ FROM STREAM UNTIL WE HAVE ALL HEADERS

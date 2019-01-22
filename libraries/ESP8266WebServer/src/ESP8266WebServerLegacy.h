@@ -160,6 +160,8 @@ protected:
   // for extracting Auth parameters
   String _extractParam(String& authReq,const String& param,const char delimit = '"') const;
 
+  void _resetRequest ();
+
   struct RequestArgument {
     String key;
     String value;

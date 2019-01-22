@@ -61,7 +61,7 @@ void ESP8266WebServer::_init() {
 	_contentLength		= 0;
 	_chunked			= false;
 
-	resetRequest();
+	_resetRequest();
 }
 
 
@@ -418,7 +418,7 @@ void ESP8266WebServer::handleClient() {
 					}
 				} else {
 					//SEND ERROR RESPONSE TO CLIENT
-					resetRequest();
+					_resetRequest();
 					send(status);
 				}
 
@@ -459,7 +459,7 @@ void ESP8266WebServer::handleClient() {
 void ESP8266WebServer::close() {
 	_server.close();
 	_currentStatus = HC_NONE;
-	resetRequest();
+	_resetRequest();
 }
 
 
