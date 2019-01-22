@@ -61,6 +61,7 @@ class SSDPClass{
     SSDPClass();
     ~SSDPClass();
     bool begin();
+    void end();
     void schema(WiFiClient client);
     void setDeviceType(const String& deviceType) { setDeviceType(deviceType.c_str()); }
     void setDeviceType(const char *deviceType);
@@ -95,6 +96,7 @@ class SSDPClass{
     void _send(ssdp_method_t method);
     void _update();
     void _startTimer();
+    void _stopTimer();
     static void _onTimerStatic(SSDPClass* self);
 
     UdpContext* _server;
