@@ -251,10 +251,8 @@ void handleHTTPRequest() {
   Serial.println("");
   Serial.println("HTTP Request");
 
-  IPAddress ip = WiFi.localIP();
-  String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
   String s = "<!DOCTYPE HTML>\r\n<html><h3><head>Hello from ";
-  s += WiFi.hostname() + ".local at " + ipStr + "</h3></head>";
+  s += WiFi.hostname() + ".local at " + WiFi.localIP().toString() + "</h3></head>";
   s += "<br/><h4>Local HTTP services are :</h4><ol>";
   s += strHTTPServices;
   // done :-)
