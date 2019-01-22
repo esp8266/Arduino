@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/DNSServer/examples/CaptivePortalAdvanced/tools.ino
+
 /** Is this an IP? */
 boolean isIp(String str) {
   for (size_t i = 0; i < str.length(); i++) {

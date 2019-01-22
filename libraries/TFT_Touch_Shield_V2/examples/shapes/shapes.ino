@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/TFT_Touch_Shield_V2/examples/shapes/shapes.ino
+
 // Draw Boxes - Demonstrate drawRectangle and fillRectangle
 
 #include <stdint.h>

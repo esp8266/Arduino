@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/TFT_Touch_Shield_V2/examples/drawNumber/drawNumber.ino
+
 /*  draw number's APP
     drawNumber(long long_num,INT16U poX, INT16U poY,INT16U size,INT16U fgcolor);
     drawFloat(float floatNumber,INT8U decimal,INT16U poX, INT16U poY,INT16U size,INT16U fgcolor);

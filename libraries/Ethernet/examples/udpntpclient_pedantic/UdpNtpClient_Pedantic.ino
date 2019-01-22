@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/Ethernet/examples/udpntpclient_pedantic/UdpNtpClient_Pedantic.ino
+
 /*
 
   Udp NTP Client

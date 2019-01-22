@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/Ethernet/examples/TelnetClient/TelnetClient.ino
+
 /*
   Telnet client
 

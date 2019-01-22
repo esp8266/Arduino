@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/I2STransmit/I2STransmit.ino
+
 /*
    I2S stereo microphone (input) UDP transmitter
    Needs a UDP listener (netcat/etc.) on port 8266 on the PC

@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/SerialDetectBaudrate/SerialDetectBaudrate.ino
+
 #define TIMEOUT (10000UL)     // Maximum time to wait for serial activity to start
 
 void setup() {

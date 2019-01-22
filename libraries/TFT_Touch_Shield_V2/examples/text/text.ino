@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/TFT_Touch_Shield_V2/examples/text/text.ino
+
 /*  draw text's APP
     drawChar(INT8U ascii,INT16U poX, INT16U poY,INT16U size, INT16U fgcolor);
     drawString(char *string,INT16U poX, INT16U poY,INT16U size,INT16U fgcolor);

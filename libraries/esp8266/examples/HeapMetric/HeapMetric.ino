@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/HeapMetric/HeapMetric.ino
+
 
 // nothing else than showing heap metric usage
 // released to public domain

@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266httpUpdate/examples/httpUpdateSigned/httpUpdateSigned.ino
+
 /*
    httpUpdateSigned.ino - Earle F. Philhower, III
    Released into the Public Domain

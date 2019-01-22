@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266mDNS/examples/mDNS-SD_Extended/mDNS-SD_Extended.ino
+
 /*
   ESP8266 mDNS-SD responder and query sample
 

@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/BearSSL_MaxFragmentLength/BearSSL_MaxFragmentLength.ino
+
 // Shows how to use the Maximum Fragment Length option in
 // BearSSL to reduce SSL memory needs.
 //

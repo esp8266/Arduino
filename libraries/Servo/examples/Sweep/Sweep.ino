@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/Servo/examples/Sweep/Sweep.ino
+
 /* Sweep
   by BARRAGAN <http://barraganstudio.com>
   This example code is in the public domain.

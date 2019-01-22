@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/DNSServer/examples/CaptivePortalAdvanced/handleHttp.ino
+
 /** Handle root or redirect to captive portal */
 void handleRoot() {
   if (captivePortal()) { // If caprive portal redirect instead of displaying the page.

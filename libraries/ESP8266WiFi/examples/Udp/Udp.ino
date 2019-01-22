@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/Udp/Udp.ino
+
 /*
   UDPSendReceive.pde:
   This sketch receives UDP message strings, prints them to the serial port

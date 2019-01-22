@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/TFT_Touch_Shield_V2/examples/drawLines/drawLines.ino
+
 /*  Demo of draw line's APP
     drawLine(unsigned int x0,unsigned int y0,unsigned int x1,unsigned int y1,unsigned int color);
     drawVerticalLine(unsigned int poX, unsigned int poY,unsigned int length,unsigned int color);

@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/BearSSL_Server/BearSSL_Server.ino
+
 /*
   Demonstrate the usage of WiFiServerBearSSL.
   By Earle F. Philhower, III

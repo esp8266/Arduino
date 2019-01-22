@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/I2SInput/I2SInput.ino
+
 /*
    I2S stereo microphone (input) example
    Run using the Arduion Serial Plotter to see waveform.

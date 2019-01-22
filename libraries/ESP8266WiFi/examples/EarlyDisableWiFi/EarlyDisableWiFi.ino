@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/EarlyDisableWiFi/EarlyDisableWiFi.ino
+
 
 #include <ESP8266WiFi.h>
 #include <AddrList.h>

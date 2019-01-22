@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/SD/examples/ReadWrite/ReadWrite.ino
+
 /*
   SD card read/write
 

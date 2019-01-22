@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/RTCUserMemory/RTCUserMemory.ino
+
 // Example: Storing struct data in RTC user rtcDataory
 //
 // Struct data with the maximum size of 512 bytes can be stored

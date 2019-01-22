@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266mDNS/examples/OTA-mDNS-SPIFFS/OTA-mDNS-SPIFFS.ino
+
 /**
    @file OTA-mDNS-SPIFFS.ino
 

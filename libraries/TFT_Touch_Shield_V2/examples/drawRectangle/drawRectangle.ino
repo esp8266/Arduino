@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/TFT_Touch_Shield_V2/examples/drawRectangle/drawRectangle.ino
+
 /*  Draw Boxes - Demonstrate drawRectangle and fillRectangle
     fillScreen(INT16U XL,INT16U XR,INT16U YU,INT16U YD,INT16U color);
     fillRectangle(INT16U poX, INT16U poY, INT16U length, INT16U width, INT16U color);

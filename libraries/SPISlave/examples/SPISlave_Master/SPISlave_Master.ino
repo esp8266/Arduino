@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/SPISlave/examples/SPISlave_Master/SPISlave_Master.ino
+
 /*
     SPI Master Demo Sketch
     Connect the SPI Master device to the following pins on the esp8266:

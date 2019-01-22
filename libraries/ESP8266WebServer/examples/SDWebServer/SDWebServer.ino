@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WebServer/examples/SDWebServer/SDWebServer.ino
+
 /*
   SDWebServer - Example WebServer with SD Card backend for esp8266
 

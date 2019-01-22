@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiTelnetToSerial/WiFiTelnetToSerial.ino
+
 /*
   WiFiTelnetToSerial - Example Transparent UART to Telnet Server for esp8266
 

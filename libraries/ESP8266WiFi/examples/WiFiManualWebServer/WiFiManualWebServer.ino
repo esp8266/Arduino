@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiManualWebServer/WiFiManualWebServer.ino
+
 /*
     This sketch demonstrates how to set up a simple HTTP-like server.
     The server will set a GPIO pin depending on the request

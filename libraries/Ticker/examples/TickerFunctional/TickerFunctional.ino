@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/Ticker/examples/TickerFunctional/TickerFunctional.ino
+
 #include "Arduino.h"
 #include "Ticker.h"
 

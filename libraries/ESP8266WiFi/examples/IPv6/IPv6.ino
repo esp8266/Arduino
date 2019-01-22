@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/IPv6/IPv6.ino
+
 
 /*
   arduino IPv6 example

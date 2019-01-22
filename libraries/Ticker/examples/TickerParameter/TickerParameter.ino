@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/Ticker/examples/TickerParameter/TickerParameter.ino
+
 /*
   Passing paramters to Ticker callbacks
 

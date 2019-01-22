@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/TFT_Touch_Shield_V2/examples/paint/paint.ino
+
 // Paint application - Demonstate both TFT and Touch Screen
 #include <stdint.h>
 #include <SeeedTouchScreen.h>

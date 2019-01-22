@@ -1,3 +1,5 @@
+// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/TestEspApi/TestEspApi.ino
+
 /**
    TestEspApi by Max Vilimpoc
    This code is released to the public domain.
