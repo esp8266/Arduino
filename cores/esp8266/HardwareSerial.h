@@ -28,6 +28,7 @@
 #define HardwareSerial_h
 
 #include <inttypes.h>
+#include <time.h>
 #include "Stream.h"
 #include "uart.h"
 
@@ -132,13 +133,15 @@ public:
         // return -1 when data is unvailable (arduino api)
         return uart_read_char(_uart);
     }
-    size_t readBytes(char* buffer, size_t size) override
+    // ::read(buffer, size): same as readBytes without timeout
+    size_t read(char* buffer, size_t size)
     {
         return uart_read(_uart, buffer, size);
     }
+    size_t readBytes(char* buffer, size_t size) override;
     size_t readBytes(uint8_t* buffer, size_t size) override
     {
-        return uart_read(_uart, (char*)buffer, size);
+        return readBytes((char*)buffer, size);
     }
     int availableForWrite(void)
     {
@@ -165,7 +168,7 @@ public:
     {
         return write((uint8_t) n);
     }
-    size_t write(const uint8_t *buffer, size_t size)
+    size_t write(const uint8_t *buffer, size_t size) override
     {
         return uart_write(_uart, (const char*)buffer, size);
     }
