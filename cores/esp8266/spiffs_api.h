@@ -154,6 +154,9 @@ public:
             return;
         }
         SPIFFS_unmount(&_fs);
+        delete[] _workBuf.release();
+        delete[] _fdsBuf.release();
+        delete[] _cacheBuf.release();
     }
 
     bool format() override
