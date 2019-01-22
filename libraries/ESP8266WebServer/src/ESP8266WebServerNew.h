@@ -179,13 +179,14 @@ public:
 	// EX: CONTENT TYPE = "text/html"
 	////////////////////////////////////////////////////////////////////////////
 
-	#define HTTPDEPRECATE(sndfn,...) __attribute__((deprecated("use HTTPStatus type code"))) { sndfn((HTTPStatus)code, content_type, content, ##__VA_ARGS__); }
-	void send(int code, const char* content_type = NULL, const String& content = String("")) HTTPDEPRECATE(send)
-	void send(int code, char* content_type, const String& content)                           HTTPDEPRECATE(send)
-	void send(int code, const String& content_type, const String& content)                   HTTPDEPRECATE(send)
-	void send_P(int code, PGM_P content_type, PGM_P content)                                 HTTPDEPRECATE(send_P)
-	void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength)           HTTPDEPRECATE(send_P,contentLength)
-	#undef HTTPDEPRECATE
+	//#define KEEPSTATUSCOMPATIBILITY(sndfn,...) __attribute__((deprecated("use HTTPStatus type code"))) { sndfn((HTTPStatus)code, content_type, content, ##__VA_ARGS__); }
+	#define KEEPSTATUSCOMPATIBILITY(sndfn,...) { sndfn((HTTPStatus)code, content_type, content, ##__VA_ARGS__); }
+	void send(int code, const char* content_type = NULL, const String& content = String("")) KEEPSTATUSCOMPATIBILITY(send)
+	void send(int code, char* content_type, const String& content)                           KEEPSTATUSCOMPATIBILITY(send)
+	void send(int code, const String& content_type, const String& content)                   KEEPSTATUSCOMPATIBILITY(send)
+	void send_P(int code, PGM_P content_type, PGM_P content)                                 KEEPSTATUSCOMPATIBILITY(send_P)
+	void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength)           KEEPSTATUSCOMPATIBILITY(send_P,contentLength)
+	#undef KEEPSTATUSCOMPATIBILITY
 
 	void send(HTTPStatus code, const char* content_type = NULL, const String& content = String(""));
 	void send(HTTPStatus code, char* content_type, const String& content);

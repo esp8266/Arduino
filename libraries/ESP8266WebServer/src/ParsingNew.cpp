@@ -298,7 +298,8 @@ HTTPStatus ESP8266WebServer::_parseRequest(WiFiClient &client) {
 				//TODO: THIS IS BASED ON ENCODING METHOD, CHECK THAT FIRST
 				_params.process(_requestPayload, false);
 			}
-		break;
+		default:
+			break;
 	}
 
 
