@@ -21,7 +21,7 @@
 #include "ESP8266WebServerLegacy.h"
 #include "ESP8266WebServerNew.h"
 
-//#define USING_NEW_WEBSERVER
+#define USING_NEW_WEBSERVER
 
 #ifdef USING_NEW_WEBSERVER
 using namespace WebServerDarkain;
