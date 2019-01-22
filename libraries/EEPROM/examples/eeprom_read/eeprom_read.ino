@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/EEPROM/examples/eeprom_read/eeprom_read.ino
-
 /*
    EEPROM Read
 

@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/Ethernet/examples/BarometricPressureWebServer/BarometricPressureWebServer.ino
-
 /*
   SCP1000 Barometric Pressure Sensor Display
 

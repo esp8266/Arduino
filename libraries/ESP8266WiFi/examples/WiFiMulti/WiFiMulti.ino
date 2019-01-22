@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiMulti/WiFiMulti.ino
-
 /*
     This sketch trys to Connect to the best AP based on a given list
 

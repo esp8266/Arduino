@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/BearSSL_Sessions/BearSSL_Sessions.ino
-
 // Example of using SSL sessions to speed up SSL connection initiation
 //
 // September 2018 by Earle F. Philhower, III

@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266HTTPUpdateServer/examples/SecureWebUpdater/SecureWebUpdater.ino
-
 /*
   To upload through terminal you can use: curl -u admin:admin -F "image=@firmware.bin" esp8266-webupdate.local/firmware
 */

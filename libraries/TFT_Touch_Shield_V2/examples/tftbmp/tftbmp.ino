@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/TFT_Touch_Shield_V2/examples/tftbmp/tftbmp.ino
-
 /*
   TFT Touch Shield 2.0 examples - tftbmp
 

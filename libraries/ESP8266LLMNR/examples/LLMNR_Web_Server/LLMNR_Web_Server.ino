@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266LLMNR/examples/LLMNR_Web_Server/LLMNR_Web_Server.ino
-
 /*
    ESP8266 LLMNR responder sample
    Copyright (C) 2017 Stephen Warren <swarren@wwwdotorg.org>

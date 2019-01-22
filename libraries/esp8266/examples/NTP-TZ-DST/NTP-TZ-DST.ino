@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/NTP-TZ-DST/NTP-TZ-DST.ino
-
 /*
   NTP-TZ-DST
   NetWork Time Protocol - Time Zone - Daylight Saving Time

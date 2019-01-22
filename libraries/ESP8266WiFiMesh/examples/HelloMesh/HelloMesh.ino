@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFiMesh/examples/HelloMesh/HelloMesh.ino
-
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMesh.h>
 #include <TypeConversionFunctions.h>

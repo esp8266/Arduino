@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/SigmaDeltaDemo/SigmaDeltaDemo.ino
-
 /* Any copyright is dedicated to the Public Domain. */
 
 #include "sigma_delta.h"

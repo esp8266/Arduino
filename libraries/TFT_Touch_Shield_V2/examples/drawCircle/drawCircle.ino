@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/TFT_Touch_Shield_V2/examples/drawCircle/drawCircle.ino
-
 /*  Demo of draw circle's APP
     drawCircle(int poX, int poY, int r,INT16U color);
     fillCircle(int poX, int poY, int r,INT16U color);

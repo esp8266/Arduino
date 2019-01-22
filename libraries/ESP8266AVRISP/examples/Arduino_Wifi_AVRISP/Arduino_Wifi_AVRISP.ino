@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266AVRISP/examples/Arduino_Wifi_AVRISP/Arduino_Wifi_AVRISP.ino
-
 #include <SPI.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>

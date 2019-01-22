@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/Blink/Blink.ino
-
 /*
   ESP8266 Blink by Simon Peter
   Blink the blue LED on the ESP-01 module

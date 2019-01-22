@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266HTTPUpdateServer/examples/SecureHTTPSUpdater/SecureHTTPSUpdater.ino
-
 /*
   SecureHTTPSUpdater - SSL encrypted, password-protected firmware update
 

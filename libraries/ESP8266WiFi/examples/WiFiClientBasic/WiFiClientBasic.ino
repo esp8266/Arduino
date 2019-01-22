@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiClientBasic/WiFiClientBasic.ino
-
 /*
     This sketch sends a string to a TCP server, and prints a one-line response.
     You must run a TCP server in your local network.

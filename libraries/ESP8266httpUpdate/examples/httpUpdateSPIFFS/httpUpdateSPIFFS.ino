@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266httpUpdate/examples/httpUpdateSPIFFS/httpUpdateSPIFFS.ino
-
 /**
    httpUpdateSPIFFS.ino
 

@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WebServer/examples/HttpAdvancedAuth/HttpAdvancedAuth.ino
-
 /*
   HTTP Advanced Authentication example
   Created Mar 16, 2017 by Ahmed El-Sharnoby.

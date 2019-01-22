@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WebServer/examples/AdvancedWebServer/AdvancedWebServer.ino
-
 /*
    Copyright (c) 2015, Majenko Technologies
    All rights reserved.

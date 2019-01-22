@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/BearSSL_CertStore/BearSSL_CertStore.ino
-
 // Demonstrate the CertStore object with WiFiClientBearSSL
 //
 // Before running, you must download the set of certs using

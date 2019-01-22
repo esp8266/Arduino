@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/examples/WiFiScan/WiFiScan.ino
-
 /*
     This sketch demonstrates how to scan WiFi networks.
     The API is almost the same as with the WiFi Shield library,

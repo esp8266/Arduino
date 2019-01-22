@@ -1,5 +1,3 @@
-// check for updates at: https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/ConfigFile/ConfigFile.ino
-
 // Example: storing JSON configuration file in flash file system
 //
 // Uses ArduinoJson library by Benoit Blanchon.
