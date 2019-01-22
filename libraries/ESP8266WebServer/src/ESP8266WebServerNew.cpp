@@ -136,7 +136,7 @@ void ESP8266WebServer::begin(uint16_t port) {
 String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit) {
 	int _begin = authReq.indexOf(param);
 	if (_begin == -1) {
-		return "";
+		return emptyString;
 	}
 	return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
@@ -156,18 +156,18 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
 			char toencodeLen = strlen(username)+strlen(password)+1;
 			char *toencode = new char[toencodeLen + 1];
 			if(toencode == NULL){
-				authReq = "";
+				//authReq = emptyString;
 				return false;
 			}
 			char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
 			if(encoded == NULL){
-				authReq = "";
+				//authReq = emptyString;
 				delete[] toencode;
 				return false;
 			}
 			sprintf(toencode, "%s:%s", username, password);
 			if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
-				authReq = "";
+				//authReq = emptyString;
 				delete[] toencode;
 				delete[] encoded;
 				return true;
@@ -181,7 +181,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
 #			endif
 			String _username = _extractParam(authReq,F("username=\""));
 			if (!_username.length() || _username != String(username)) {
-				authReq = "";
+				//authReq = emptyString;
 				return false;
 			}
 			// extracting required parameters for RFC 2069 simpler Digest
@@ -192,11 +192,11 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
 			String _opaque   = _extractParam(authReq, F("opaque=\""));
 
 			if ((!_realm.length()) || (!_nonce.length()) || (!_uri.length()) || (!_response.length()) || (!_opaque.length())) {
-				authReq = "";
+				//authReq = emptyString;
 				return false;
 			}
 			if ((_opaque != _sopaque) || (_nonce != _snonce) || (_realm != _srealm)) {
-				authReq = "";
+				//authReq = emptyString;
 				return false;
 			}
 			// parameters for the RFC 2617 newer Digest
@@ -242,11 +242,11 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
 				DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
 #			endif
 			if(_response == _responsecheck){
-				authReq = "";
+				//authReq = emptyString;
 				return true;
 			}
 		}
-		authReq = "";
+		//authReq = emptyString;
 	}
 	return false;
 }
@@ -538,7 +538,7 @@ void ESP8266WebServer::_prepareHeader(String& response, HTTPStatus code, const c
 
 	response += _responseHeaders;
 	response += "\r\n";
-	_responseHeaders = "";
+	_responseHeaders = emptyString;
 }
 
 
@@ -691,7 +691,7 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
 			contentType != String(FPSTR(mimeTable[none].mimeType))) {
 		sendHeader(F("Content-Encoding"), F("gzip"));
 	}
-	send(HTTP_OK, contentType, "");
+	send(HTTP_OK, contentType, emptyString);
 }
 
 
@@ -747,7 +747,7 @@ void ESP8266WebServer::_handleRequest() {
 	if (handled) {
 		_finalizeResponse();
 	}
-	_requestPath = "";
+	_requestPath = emptyString.c_str();
 }
 
 
@@ -758,7 +758,7 @@ void ESP8266WebServer::_handleRequest() {
 ////////////////////////////////////////////////////////////////////////////////
 void ESP8266WebServer::_finalizeResponse() {
 	if (_chunked) {
-		sendContent("");
+		sendContent(emptyString);
 	}
 }
 
@@ -819,7 +819,7 @@ String ESP8266WebServer::_responseCodeToString(HTTPStatus code) {
 		case HTTP_VERSION_UNSUPPORTED:	return F("HTTP Version not supported");
 	}
 
-	return F("");
+	return emptyString;
 }
 
 }; // namespace WebServerDarkain

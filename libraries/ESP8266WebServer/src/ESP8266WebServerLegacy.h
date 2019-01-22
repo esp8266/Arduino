@@ -84,7 +84,7 @@ public:
   void stop();
 
   bool authenticate(const char * username, const char * password);
-  void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = String("") );
+  void requestAuthentication(HTTPAuthMethod mode = BASIC_AUTH, const char* realm = NULL, const String& authFailMsg = emptyString );
 
   typedef std::function<void(void)> THandlerFunction;
   void on(const String &uri, THandlerFunction handler);
@@ -117,7 +117,7 @@ public:
   // code - HTTP response code, can be 200 or 404
   // content_type - HTTP content type, like "text/plain" or "image/png"
   // content - actual content body
-  void send(int code, const char* content_type = NULL, const String& content = String(""));
+  void send(int code, const char* content_type = NULL, const String& content = emptyString);
   void send(int code, char* content_type, const String& content);
   void send(int code, const String& content_type, const String& content);
   void send_P(int code, PGM_P content_type, PGM_P content);

@@ -58,7 +58,7 @@ public:
 
 	void requestAuthentication(	HTTPAuthMethod mode=BASIC_AUTH,
 								const char* realm = NULL,
-								const String& authFailMsg = String("") );
+								const String& authFailMsg = emptyString );
 
 	typedef std::function<void(void)> THandlerFunction;
 	void on(const String &uri, THandlerFunction handler);
@@ -181,14 +181,14 @@ public:
 
 	//#define KEEPSTATUSCOMPATIBILITY(sndfn,...) __attribute__((deprecated("use HTTPStatus type code"))) { sndfn((HTTPStatus)code, content_type, content, ##__VA_ARGS__); }
 	#define KEEPSTATUSCOMPATIBILITY(sndfn,...) { sndfn((HTTPStatus)code, content_type, content, ##__VA_ARGS__); }
-	void send(int code, const char* content_type = NULL, const String& content = String("")) KEEPSTATUSCOMPATIBILITY(send)
+	void send(int code, const char* content_type = NULL, const String& content = emptyString) KEEPSTATUSCOMPATIBILITY(send)
 	void send(int code, char* content_type, const String& content)                           KEEPSTATUSCOMPATIBILITY(send)
 	void send(int code, const String& content_type, const String& content)                   KEEPSTATUSCOMPATIBILITY(send)
 	void send_P(int code, PGM_P content_type, PGM_P content)                                 KEEPSTATUSCOMPATIBILITY(send_P)
 	void send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength)           KEEPSTATUSCOMPATIBILITY(send_P,contentLength)
 	#undef KEEPSTATUSCOMPATIBILITY
 
-	void send(HTTPStatus code, const char* content_type = NULL, const String& content = String(""));
+	void send(HTTPStatus code, const char* content_type = NULL, const String& content = emptyString);
 	void send(HTTPStatus code, char* content_type, const String& content);
 	void send(HTTPStatus code, const String& content_type, const String& content);
 	void send_P(HTTPStatus code, PGM_P content_type, PGM_P content);
@@ -259,10 +259,10 @@ protected:
 
 	// BUFFER IS THE SINGLE ALLOCATED BUFFER _request
 	// METHOD, PATH, AND VERSIONS ARE ALL POINTERS WITHIN THE SINGLE ALLOCATED BUFFER
-	char *_requestMethod;
-	char *_requestPath;
+	const char *_requestMethod;
+	const char *_requestPath;
+	const char *_requestVersion;
 	char *_requestParams;
-	char *_requestVersion;
 	char *_requestPayload;
 
 

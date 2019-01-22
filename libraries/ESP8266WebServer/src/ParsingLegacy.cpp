@@ -89,7 +89,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   String url = req.substring(addr_start + 1, addr_end);
   String versionEnd = req.substring(addr_end + 8);
   _currentVersion = atoi(versionEnd.c_str());
-  String searchStr = "";
+  String searchStr = emptyString;
   int hasSearch = url.indexOf('?');
   if (hasSearch != -1){
     searchStr = url.substring(hasSearch + 1);
@@ -142,7 +142,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     while(1){
       req = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (req == "") break;//no moar headers
+      if (req == emptyString) break;//no moar headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
         break;
@@ -168,7 +168,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
           isEncoded = true;
         } else if (headerValue.startsWith(F("multipart/"))){
           boundaryStr = headerValue.substring(headerValue.indexOf('=') + 1);
-          boundaryStr.replace("\"","");
+          boundaryStr.replace("\"",emptyString);
           isForm = true;
         }
       } else if (headerName.equalsIgnoreCase(F("Content-Length"))){
@@ -220,7 +220,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     while(1){
       req = client.readStringUntil('\r');
       client.readStringUntil('\n');
-      if (req == "") break;//no moar headers
+      if (req == emptyString) break;//no moar headers
       int headerDiv = req.indexOf(':');
       if (headerDiv == -1){
         break;
@@ -590,7 +590,7 @@ readfile:
 
 String ESP8266WebServer::urlDecode(const String& text)
 {
-  String decoded = "";
+  String decoded;
   char temp[] = "0x00";
   unsigned int len = text.length();
   unsigned int i = 0;
