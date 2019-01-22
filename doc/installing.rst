@@ -35,7 +35,7 @@ might be broken.
 
 For more information on the Arduino Board Manager, see:
 
-- https://www.arduino.cc/en/Guide/Libraries
+- https://www.arduino.cc/en/guide/cores
 
 Using git version
 -----------------
