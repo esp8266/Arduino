@@ -133,7 +133,7 @@ void ESP8266WebServer::begin(uint16_t port) {
 ////////////////////////////////////////////////////////////////////////////////
 // ??
 ////////////////////////////////////////////////////////////////////////////////
-String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit) {
+String ESP8266WebServer::_extractParam(const String& authReq,const String& param,const char delimit) {
 	int _begin = authReq.indexOf(param);
 	if (_begin == -1) {
 		return emptyString;

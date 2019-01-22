@@ -92,7 +92,7 @@ public:
 		return _params.value(name);
 	}
 
-	inline String arg(String name) const {
+	inline String arg(const String& name) const {
 		return _params.value(name);
 	}
 
@@ -117,7 +117,7 @@ public:
 		return _params.has(name);
 	}
 
-	inline bool hasArg(String name) const {
+	inline bool hasArg(const String& name) const {
 		return _params.has(name);
 	}
 
@@ -140,7 +140,7 @@ public:
 		return _headers.value(name);
 	}
 
-	inline String header(String name) const {
+	inline String header(const String& name) const {
 		return _headers.value(name);
 	}
 
@@ -165,7 +165,7 @@ public:
 		return _headers.has(name);
 	}
 
-	inline bool hasHeader(String name) const {
+	inline bool hasHeader(const String& name) const {
 		return _headers.has(name);
 	}
 
@@ -236,7 +236,7 @@ protected:
 
 	String _getRandomHexString();
 	// for extracting Auth parameters
-	String _extractParam(String& authReq, const String& param, const char delimit='"');
+	String _extractParam(const String& authReq, const String& param, const char delimit='"');
 
 
 
