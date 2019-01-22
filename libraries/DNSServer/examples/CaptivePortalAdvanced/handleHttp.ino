@@ -95,8 +95,8 @@ void handleWifi() {
 /** Handle the WLAN save form and redirect to WLAN config page again */
 void handleWifiSave() {
   Serial.println("wifi save");
-  server.arg("n").toCharArray(ssid, sizeof(ssid) - 1);
-  server.arg("p").toCharArray(password, sizeof(password) - 1);
+  String(server.arg("n")).toCharArray(ssid, sizeof(ssid) - 1);
+  String(server.arg("p")).toCharArray(password, sizeof(password) - 1);
   server.sendHeader("Location", "wifi", true);
   server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   server.sendHeader("Pragma", "no-cache");
@@ -121,7 +121,11 @@ void handleNotFound() {
   message += "\n";
 
   for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    message += " ";
+    message += server.argName(i);
+    message += ": ";
+    message += server.arg(i);
+    message += "\n";
   }
   server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   server.sendHeader("Pragma", "no-cache");
