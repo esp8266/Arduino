@@ -102,8 +102,7 @@ bool MDNSResponder::begin(const char* p_pcHostname) {
                 _restart();
             });
 
-            m_bInitialized =
-                bResult = _restart();
+            bResult = _restart();
         }
     }
     else {
