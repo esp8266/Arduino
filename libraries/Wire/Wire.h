@@ -29,7 +29,7 @@
 
 
 
-#define BUFFER_LENGTH 32
+#define BUFFER_LENGTH 128
 
 class TwoWire : public Stream
 {
