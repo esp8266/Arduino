@@ -85,8 +85,6 @@ bool setStationHostname(const char* p_pcHostname) {
   }
   return true;
 }
-
-
 /*
    MDNSServiceQueryCallback
 */
@@ -97,7 +95,7 @@ bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                  
                               bool p_bSetContent,                                        // true: Component set, false: component deleted
                               void* p_pUserdata) {                                       // pUserdata; here '0', as none set via 'installServiceQuery'
   (void) p_pUserdata;
-  Serial.printf("MDNSServiceQueryCallback\n");
+  Serial.printf("MDNSServiceQueryCallback %8d\n",millis());
 
   if ((p_pMDNSResponder) &&
       (hMDNSServiceQuery == p_hServiceQuery)) {
@@ -119,11 +117,12 @@ bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                  
       }
     } else if (MDNSResponder::ServiceQueryAnswerType_IP4Address & p_u32ServiceQueryAnswerMask) {
       if (p_bSetContent) {
-        Serial.printf("MDNSServiceQueryCallback: IP4 address added/updated for service '%s':\n",
+        Serial.printf("MDNSServiceQueryCallback: IP4 address added/updated for service '%s': ",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex));
         for (uint32_t u = 0; u < p_pMDNSResponder->answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex); ++u) {
-          Serial.printf("- %s\n", p_pMDNSResponder->answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u).toString().c_str());
+          Serial.printf("- %s ", p_pMDNSResponder->answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u).toString().c_str());
         }
+        Serial.printf("\n");
       } else {
         Serial.printf("MDNSServiceQueryCallback: IP4 address removed from service '%s'\n",
                       p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex));
@@ -181,7 +180,22 @@ bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                  
 }
 
 /*
-   MDNSProbeResultCallback
+   MDNSServiceProbeResultCallback
+   Probe result callback for Services
+*/
+
+bool serviceProbeResult (String p_pcServiceName,
+                         const MDNSResponder::hMDNSService p_hMDNSService,
+                         bool p_bProbeResult)
+{
+    Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
+
+}
+
+
+
+/*
+   MDNSHostProbeResultCallback
 
    Probe result callback for the host domain.
    If the domain is free, the host domain is set and the http service is
@@ -190,17 +204,10 @@ bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                  
    restarted via p_pMDNSResponder->setHostname().
 
 */
-bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
-                             const char* p_pcDomainName,
-                             const MDNSResponder::hMDNSService p_hService,
-                             bool p_bProbeResult,
-                             void* p_pUserdata) {
-  (void) p_pUserdata;
 
-  if ((p_pMDNSResponder) &&
-      (0 == p_hService)) {  // Called for host domain
+bool hostProbeResult (String p_pcDomainName, bool p_bProbeResult) {
 
-    Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName, (p_bProbeResult ? "free" : "already USED!"));
+    Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
 
     if (true == p_bProbeResult) {
       // Set station hostname
@@ -212,18 +219,20 @@ bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
 
         if (!hMDNSService) {
           // Add a 'http.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
-          hMDNSService = p_pMDNSResponder->addService(0, "http", "tcp", SERVICE_PORT);
+          hMDNSService = MDNS.addService(0, "http", "tcp", SERVICE_PORT);
           if (hMDNSService) {
+            MDNS.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
+
             // Add some '_http._tcp' protocol specific MDNS service TXT items
             // See: http://www.dns-sd.org/txtrecords.html#http
-            p_pMDNSResponder->addServiceTxt(hMDNSService, "user", "");
-            p_pMDNSResponder->addServiceTxt(hMDNSService, "password", "");
-            p_pMDNSResponder->addServiceTxt(hMDNSService, "path", "/");
+            MDNS.addServiceTxt(hMDNSService, "user", "");
+            MDNS.addServiceTxt(hMDNSService, "password", "");
+            MDNS.addServiceTxt(hMDNSService, "path", "/");
           }
 
           // Install dynamic 'http.tcp' service query
           if (!hMDNSServiceQuery) {
-            hMDNSServiceQuery = p_pMDNSResponder->installServiceQuery("http", "tcp", MDNSServiceQueryCallback, 0);
+            hMDNSServiceQuery = MDNS.installServiceQuery("http", "tcp", MDNSServiceQueryCallback, 0);
             if (hMDNSServiceQuery) {
               Serial.printf("MDNSProbeResultCallback: Service query for 'http.tcp' services installed.\n");
             } else {
@@ -233,14 +242,14 @@ bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
         }
       }
     } else {
-      // Change hostname, use '-' as divider between base name and index
-      if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-        p_pMDNSResponder->setHostname(pcHostDomain);
-      } else {
-        Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
+        // Change hostname, use '-' as divider between base name and index
+        if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+          MDNS.setHostname(pcHostDomain);
+        } else {
+          Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
+        }
       }
-    }
-  }
+
   return true;
 }
 
@@ -251,15 +260,19 @@ void handleHTTPRequest() {
   Serial.println("");
   Serial.println("HTTP Request");
 
+  IPAddress ip = WiFi.localIP();
+  String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
   String s = "<!DOCTYPE HTML>\r\n<html><h3><head>Hello from ";
-  s += WiFi.hostname() + ".local at " + WiFi.localIP().toString() + "</h3></head>";
+  s += WiFi.hostname() + ".local at " + ipStr + "</h3></head>";
   s += "<br/><h4>Local HTTP services are :</h4><ol>";
   s += strHTTPServices;
   // done :-)
-  s += "</ol></html>";
+  s += "</ol><br/>";
+
   Serial.println("Sending 200");
   server.send(200, "text/html", s);
   Serial.println("Done with request");
+  Serial.printf("FM %d\n",ESP.getFreeHeap());
 }
 
 /*
@@ -288,8 +301,10 @@ void setup(void) {
   // Setup HTTP server
   server.on("/", handleHTTPRequest);
 
-  // Setup MDNS responder
-  MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
+  // Setup MDNS responders
+  MDNS.setHostProbeResultCallback(hostProbeResult);
+
+
   // Init the (currently empty) host domain string with 'esp8266'
   if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
       (!MDNS.begin(pcHostDomain))) {
@@ -305,13 +320,11 @@ void setup(void) {
   Serial.println("HTTP server started");
 }
 
-
-/*
-   loop
-*/
 void loop(void) {
   // Check if a request has come in
   server.handleClient();
   // Allow MDNS processing
   MDNS.update();
+
 }
+

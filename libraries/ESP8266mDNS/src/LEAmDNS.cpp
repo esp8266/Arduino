@@ -1030,11 +1030,11 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
  * When succeeded, the host or service domain will be announced by the MDNS responder.
  *
  */
-bool MDNSResponder::setProbeResultCallback(MDNSResponder::MDNSProbeResultCallbackFn p_fnCallback,
-                                           void* p_pUserdata) {
-    
-    m_HostProbeInformation.m_fnProbeResultCallback = p_fnCallback;
-    m_HostProbeInformation.m_pProbeResultCallbackUserdata = p_pUserdata;
+//Functional
+bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeResultCallbackFn p_fnCallback) {
+
+	m_HostProbeInformation.m_fnHostProbeResultCallback = p_fnCallback;
+    m_HostProbeInformation.m_pProbeResultCallbackUserdata = 0;
     
     return true;
 }
@@ -1049,14 +1049,14 @@ bool MDNSResponder::setProbeResultCallback(MDNSResponder::MDNSProbeResultCallbac
  *
  */
 bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
-                                                  MDNSResponder::MDNSProbeResultCallbackFn p_fnCallback,
-                                                  void* p_pUserdata) {
+                                                  MDNSResponder::MDNSServiceProbeResultCallbackFn p_fnCallback) {
+
     bool    bResult = false;
 
     stcMDNSService* pService = _findService(p_hService);
     if (pService) {
-        pService->m_ProbeInformation.m_fnProbeResultCallback = p_fnCallback;
-        pService->m_ProbeInformation.m_pProbeResultCallbackUserdata = p_pUserdata;
+        pService->m_ProbeInformation.m_fnServiceProbeResultCallback = p_fnCallback;
+        pService->m_ProbeInformation.m_pProbeResultCallbackUserdata = 0;
 
         bResult = true;
     }

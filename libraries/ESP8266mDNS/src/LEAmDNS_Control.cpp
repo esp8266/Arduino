@@ -1060,9 +1060,9 @@ bool MDNSResponder::_updateProbeStatus(void) {
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done host probing.\n")););
             m_HostProbeInformation.m_ProbingStatus = ProbingStatus_Done;
             m_HostProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
-
-            if (m_HostProbeInformation.m_fnProbeResultCallback) {
-                m_HostProbeInformation.m_fnProbeResultCallback(this, m_pcHostname, 0, true, m_HostProbeInformation.m_pProbeResultCallbackUserdata);
+// Functional
+            if (m_HostProbeInformation.m_fnHostProbeResultCallback) {
+                m_HostProbeInformation.m_fnHostProbeResultCallback(m_pcHostname, true);
             }
 
             // Prepare to announce host
@@ -1110,21 +1110,10 @@ bool MDNSResponder::_updateProbeStatus(void) {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done service probing %s.%s.%s\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
                 pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_Done;
                 pService->m_ProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
-
-                MDNSProbeResultCallbackFn   fnProbeResultCallback = 0;
-                void*                       pProbeResultCallbackUserdata = 0;
-                if (pService->m_ProbeInformation.m_fnProbeResultCallback) {
-                    fnProbeResultCallback = pService->m_ProbeInformation.m_fnProbeResultCallback;
-                    pProbeResultCallbackUserdata = pService->m_ProbeInformation.m_pProbeResultCallbackUserdata;
+// Functional Update
+                if (pService->m_ProbeInformation.m_fnServiceProbeResultCallback) {
+                	pService->m_ProbeInformation.m_fnServiceProbeResultCallback(pService->m_pcName, pService, true);
                 }
-                else {
-                    fnProbeResultCallback = m_HostProbeInformation.m_fnProbeResultCallback;
-                    pProbeResultCallbackUserdata = m_HostProbeInformation.m_pProbeResultCallbackUserdata;
-                }
-                if (fnProbeResultCallback) {
-                    fnProbeResultCallback(this, (pService->m_pcName ?: m_pcHostname), pService, true, pProbeResultCallbackUserdata);
-                }
-
                 // Prepare to announce service
                 pService->m_ProbeInformation.m_u8SentCount = 0;
                 pService->m_ProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY);
@@ -1287,10 +1276,10 @@ bool MDNSResponder::_cancelProbingForHost(void) {
     bool    bResult = false;
 
     m_HostProbeInformation.clear(false);
-
+// Functional
     // Send host notification
-    if (m_HostProbeInformation.m_fnProbeResultCallback) {
-        m_HostProbeInformation.m_fnProbeResultCallback(this, m_pcHostname, 0, false, m_HostProbeInformation.m_pProbeResultCallbackUserdata);
+    if (m_HostProbeInformation.m_fnHostProbeResultCallback) {
+        m_HostProbeInformation.m_fnHostProbeResultCallback(m_pcHostname, false);
 
         bResult = true;
     }
@@ -1309,21 +1298,11 @@ bool MDNSResponder::_cancelProbingForService(stcMDNSService& p_rService) {
     bool    bResult = false;
 
     p_rService.m_ProbeInformation.clear(false);
-
+// Functional
     // Send notification
-    MDNSProbeResultCallbackFn   fnProbeResultCallback = 0;
-    void*                       pProbeResultCallbackUserdata = 0;
-    if (p_rService.m_ProbeInformation.m_fnProbeResultCallback) {
-        fnProbeResultCallback = p_rService.m_ProbeInformation.m_fnProbeResultCallback;
-        pProbeResultCallbackUserdata = p_rService.m_ProbeInformation.m_pProbeResultCallbackUserdata;
-    }
-    else {
-        fnProbeResultCallback = m_HostProbeInformation.m_fnProbeResultCallback;
-        pProbeResultCallbackUserdata = m_HostProbeInformation.m_pProbeResultCallbackUserdata;
-    }
-    if (fnProbeResultCallback) {
-        fnProbeResultCallback(this, (p_rService.m_pcName ?: m_pcHostname), &p_rService, false, pProbeResultCallbackUserdata);
-        bResult = true;
+    if (p_rService.m_ProbeInformation.m_fnServiceProbeResultCallback) {
+    	p_rService.m_ProbeInformation.m_fnServiceProbeResultCallback(p_rService.m_pcName,&p_rService,false);
+    	bResult = true;
     }
     return bResult;
 }

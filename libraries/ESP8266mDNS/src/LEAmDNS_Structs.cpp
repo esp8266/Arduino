@@ -1162,7 +1162,9 @@ MDNSResponder::stcProbeInformation::stcProbeInformation(void)
     m_Timeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
     m_bConflict(false),
     m_bTiebreakNeeded(false),
-    m_fnProbeResultCallback(0),
+// Functional
+    m_fnHostProbeResultCallback(0),
+	m_fnServiceProbeResultCallback(0),
     m_pProbeResultCallbackUserdata(0) {
 }
 
@@ -1176,8 +1178,10 @@ bool MDNSResponder::stcProbeInformation::clear(bool p_bClearUserdata /*= false*/
     m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
     m_bConflict = false;
     m_bTiebreakNeeded = false;
+// Functional
     if (p_bClearUserdata) {
-        m_fnProbeResultCallback = 0;
+        m_fnHostProbeResultCallback = 0;
+        m_fnServiceProbeResultCallback = 0;
         m_pProbeResultCallbackUserdata = 0;
     }
     return true;

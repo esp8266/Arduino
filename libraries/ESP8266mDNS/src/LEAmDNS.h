@@ -422,24 +422,26 @@ public:
     /**
      * MDNSProbeResultCallbackFn
      * Callback function for (host and service domain) probe results
-     */
-    typedef bool (*MDNSProbeResultCallbackFn)(MDNSResponder* p_pMDNSResponder,
-                                              const char* p_pcDomainName,
-                                              const hMDNSService p_hMDNSService,    // 0 for host domain
-                                              bool p_bProbeResult,
-                                              void* p_pUserdata);
+    */
+// Functional
+    typedef std::function<bool (String p_pcDomainName,
+                                bool p_bProbeResult)> MDNSHostProbeResultCallbackFn;
+
+    typedef std::function<bool (String p_pcServiceName,
+                                const hMDNSService p_hMDNSService,
+                                bool p_bProbeResult)> MDNSServiceProbeResultCallbackFn;
 
     // Set a global callback function for host and service probe results
-    // The callback function is called, when the probeing for the host domain
+    // The callback function is called, when the probing for the host domain
     // (or a service domain, which hasn't got a service specific callback)
-    // Succeededs or fails.
+    // Succeeds or fails.
     // In case of failure, the failed domain name should be changed.
-    bool setProbeResultCallback(MDNSProbeResultCallbackFn p_fnCallback,
-                                void* p_pUserdata);
-    // Set a service specific probe result callcack
-    bool setServiceProbeResultCallback(const hMDNSService p_hService,
-                                       MDNSProbeResultCallbackFn p_fnCallback,
-                                       void* p_pUserdata);
+// Functional
+    bool setHostProbeResultCallback(MDNSHostProbeResultCallbackFn p_fnCallback);
+
+    // Set a service specific probe result callback
+    bool setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
+                                       MDNSServiceProbeResultCallbackFn p_fnCallback);
     
     // Application should call this whenever AP is configured/disabled
     bool notifyAPChange(void);
@@ -462,6 +464,45 @@ public:
     
 protected:
     /** STRUCTS **/
+// Functional
+    /**
+     * MDNSServiceInfo, used in application callbacks
+     */
+    struct MDNSServiceInfo
+    {
+    	MDNSServiceInfo(MDNSResponder* p_pM,MDNSResponder::hMDNSServiceQuery p_hS,uint32_t p_u32A)
+    	: p_pMDNSResponder(p_pM),
+    	  p_hServiceQuery(p_hS),
+		  p_u32AnswerIndex(p_u32A)
+    	{};
+    	MDNSResponder* p_pMDNSResponder;
+    	MDNSResponder::hMDNSServiceQuery p_hServiceQuery;
+    	uint32_t p_u32AnswerIndex;
+    	const char* serviceDomain(){
+    		return p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex);
+    	};
+    	const char* hostDomain(){
+    		return (p_pMDNSResponder->hasAnswerHostDomain(p_hServiceQuery, p_u32AnswerIndex)) ?
+    		   p_pMDNSResponder->answerHostDomain(p_hServiceQuery, p_u32AnswerIndex) : 0;
+    	};
+    	uint16_t hostPort(){
+    		return (p_pMDNSResponder->hasAnswerPort(p_hServiceQuery, p_u32AnswerIndex)) ?
+    		  p_pMDNSResponder->answerPort(p_hServiceQuery, p_u32AnswerIndex) : 0;
+    	};
+    	std::vector<IPAddress> IPAdresses(){
+    		std::vector<IPAddress> internalIP;
+    		if (p_pMDNSResponder->hasAnswerIP4Address(p_hServiceQuery,p_u32AnswerIndex )) {
+    			for (uint32_t u2 = 0; u2 < p_pMDNSResponder->answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex); ++u2) {
+                  internalIP.push_back(p_pMDNSResponder->answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u2));
+    			}
+    		}
+    		return internalIP;
+    	};
+    	const char* txtValue (){
+    		return  (p_pMDNSResponder->hasAnswerTxts(p_hServiceQuery, p_u32AnswerIndex)) ?
+    		  p_pMDNSResponder->answerTxts(p_hServiceQuery, p_u32AnswerIndex) : 0;
+    	};
+    };
     /**
      * stcMDNSServiceTxt
      */
@@ -792,7 +833,9 @@ protected:
         //clsMDNSTimeFlag                 m_TimeFlag;     // Used for probes and announcements
         bool                            m_bConflict;
         bool                            m_bTiebreakNeeded;
-        MDNSProbeResultCallbackFn       m_fnProbeResultCallback;
+// Functional
+        MDNSHostProbeResultCallbackFn   m_fnHostProbeResultCallback;
+        MDNSServiceProbeResultCallbackFn m_fnServiceProbeResultCallback;
         void*                           m_pProbeResultCallbackUserdata;
 
         stcProbeInformation(void);
