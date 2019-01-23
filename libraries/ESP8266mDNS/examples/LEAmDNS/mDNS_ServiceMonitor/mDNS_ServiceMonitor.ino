@@ -95,7 +95,7 @@ bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                  
                               bool p_bSetContent,                                        // true: Component set, false: component deleted
                               void* p_pUserdata) {                                       // pUserdata; here '0', as none set via 'installServiceQuery'
   (void) p_pUserdata;
-  Serial.printf("MDNSServiceQueryCallback %8d\n",millis());
+  Serial.printf("MDNSServiceQueryCallback\n");
 
   if ((p_pMDNSResponder) &&
       (hMDNSServiceQuery == p_hServiceQuery)) {
@@ -188,8 +188,9 @@ bool serviceProbeResult (String p_pcServiceName,
                          const MDNSResponder::hMDNSService p_hMDNSService,
                          bool p_bProbeResult)
 {
-    Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
-
+  (void) p_hMDNSService;
+  Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
+  return true;
 }
 
 
