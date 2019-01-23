@@ -69,7 +69,7 @@ class ESP8266WiFiSTAClass {
         IPAddress gatewayIP();
         IPAddress dnsIP(uint8_t dns_no = 0);
 
-        const char* hostname();
+        String hostname();
         bool hostname(String aHostname);
 
         // STA WiFi info

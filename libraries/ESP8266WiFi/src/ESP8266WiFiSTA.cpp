@@ -467,7 +467,7 @@ IPAddress ESP8266WiFiSTAClass::dnsIP(uint8_t dns_no) {
  * Get ESP8266 station DHCP hostname
  * @return hostname
  */
-const char* ESP8266WiFiSTAClass::hostname(void) {
+String ESP8266WiFiSTAClass::hostname(void) {
     return wifi_station_get_hostname();
 }
 
