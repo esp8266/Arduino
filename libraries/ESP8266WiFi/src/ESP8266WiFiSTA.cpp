@@ -37,6 +37,7 @@
 extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
+#include "lwip/dhcp.h"
 #include "lwip/init.h" // LWIP_VERSION_
 #if LWIP_IPV6
 #include "lwip/netif.h" // struct netif
@@ -466,39 +467,92 @@ IPAddress ESP8266WiFiSTAClass::dnsIP(uint8_t dns_no) {
  * Get ESP8266 station DHCP hostname
  * @return hostname
  */
-String ESP8266WiFiSTAClass::hostname(void) {
-    return String(wifi_station_get_hostname());
+const char* ESP8266WiFiSTAClass::hostname(void) {
+    return wifi_station_get_hostname();
 }
-
 
 /**
  * Set ESP8266 station DHCP hostname
- * @param aHostname max length:32
+ * @param aHostname max length:24
  * @return ok
  */
-bool ESP8266WiFiSTAClass::hostname(char* aHostname) {
-    if(strlen(aHostname) > 32) {
+bool ESP8266WiFiSTAClass::hostname(String aHostname) {
+  /*
+  vvvv RFC952 vvvv
+  1. A "name" (Net, Host, Gateway, or Domain name) is a text string up
+   to 24 characters drawn from the alphabet (A-Z), digits (0-9), minus
+   sign (-), and period (.).  Note that periods are only allowed when
+   they serve to delimit components of "domain style names". (See
+   RFC-921, "Domain Name System Implementation Schedule", for
+   background).  No blank or space characters are permitted as part of a
+   name. No distinction is made between upper and lower case.  The first
+   character must be an alpha character.  The last character must not be
+   a minus sign or period.  A host which serves as a GATEWAY should have
+   "-GATEWAY" or "-GW" as part of its name.  Hosts which do not serve as
+   Internet gateways should not use "-GATEWAY" and "-GW" as part of
+   their names. A host which is a TAC should have "-TAC" as the last
+   part of its host name, if it is a DoD host.  Single character names
+   or nicknames are not allowed.
+  ^^^^ RFC952 ^^^^
+
+  - 24 chars max
+  - only a..z A..Z 0..9 -]
+  - no '-' as last char
+  */
+
+    if (aHostname.length() == 0) {
+        DEBUGV("WiFi.(set)hostname(): empty name\n");
         return false;
     }
-    return wifi_station_set_hostname(aHostname);
-}
 
-/**
- * Set ESP8266 station DHCP hostname
- * @param aHostname max length:32
- * @return ok
- */
-bool ESP8266WiFiSTAClass::hostname(const char* aHostname) {
-    return hostname((char*) aHostname);
-}
+    // rework hostname to be RFC compliant
 
-/**
- * Set ESP8266 station DHCP hostname
- * @param aHostname max length:32
- * @return ok
- */
-bool ESP8266WiFiSTAClass::hostname(const String& aHostname) {
-    return hostname((char*) aHostname.c_str());
+    if (aHostname.length() > 24) {
+        // nonos-sdk allows 32, but
+        // dhcp server may require RFC compliance
+        aHostname.remove(24);
+    }
+    for (size_t i = 0; i < aHostname.length(); i++)
+        // replace unallowed chars by dashes
+        if (!isalnum(aHostname[i]) && aHostname[i] != '-')
+            aHostname[i] = '-';
+    if (aHostname[aHostname.length() - 1] == '-') {
+        // check for ending dash
+        aHostname[aHostname.length() - 1] = 'x';
+    }
+
+    bool ret = wifi_station_set_hostname(aHostname.c_str());
+
+    if (!ret) {
+#ifdef DEBUG_ESP_CORE
+        static const char fmt[] PROGMEM = "WiFi.hostname(%s): wifi_station_set_hostname() failed\n";
+        DEBUGV(fmt, aHostname.c_str());
+#endif
+        return false;
+    }
+
+    // now we should inform dhcp server for this change, using lwip_renew()
+    // looping through all existing interface
+    // harmless for AP, also compatible with ethernet adapters (to come)
+    for (netif* intf = netif_list; intf; intf = intf->next) {
+
+        // unconditionally update all known interfaces
+        intf->hostname = wifi_station_get_hostname();
+
+        if (netif_dhcp_data(intf) != nullptr) {
+            // renew already started DHCP leases
+            err_t lwipret = dhcp_renew(intf);
+            if (lwipret != ERR_OK) {
+#ifdef DEBUG_ESP_CORE
+                static const char fmt[] PROGMEM = "WiFi.hostname(%s): lwIP error %d on interface %c%c (index %d)\n";
+                DEBUGV(fmt, intf->hostname, (int)lwipret, intf->name[0], intf->name[1], intf->num);
+#endif
+                ret = false;
+            }
+        }
+    }
+
+    return ret;
 }
 
 /**
