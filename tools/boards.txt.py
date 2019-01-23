@@ -850,7 +850,7 @@ macros = {
         ( '.upload.tool', 'esptool' ),
         ( '.upload.maximum_data_size', '81920' ),
         ( '.upload.wait_for_upload_port', 'true' ),
-        ( '.upload.erase_cmd', ''),
+        ( '.upload.erase_cmd', 'version'),
         ( '.serial.disableDTR', 'true' ),
         ( '.serial.disableRTS', 'true' ),
         ( '.build.mcu', 'esp8266' ),
@@ -1053,7 +1053,7 @@ macros = {
 
     'flash_erase_menu': collections.OrderedDict([
         ( '.menu.wipe.none', 'Only Sketch' ),
-        ( '.menu.wipe.none.upload.erase_cmd', '' ),
+        ( '.menu.wipe.none.upload.erase_cmd', 'version' ),
         ( '.menu.wipe.sdk', 'Sketch + WiFi Settings' ),
         ( '.menu.wipe.sdk.upload.erase_cmd', 'erase_region "{build.rfcal_addr}" 0x4000' ),
         ( '.menu.wipe.all', 'All Flash Contents' ),
