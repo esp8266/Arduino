@@ -88,7 +88,36 @@ bool setStationHostname(const char* p_pcHostname) {
 /*
    MDNSServiceQueryCallback
 */
-bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                           // The MDNS responder object
+
+bool MDNSServiceQueryCallback (MDNSResponder::MDNSServiceInfo serviceInfo, uint32_t p_u32ServiceQueryAnswerMask, bool p_bSetContent)
+{
+	String answerInfo;
+	switch (p_u32ServiceQueryAnswerMask){
+	  case MDNSResponder::ServiceQueryAnswerType_ServiceDomain :
+		  	  	  answerInfo = "ServiceDomain " + serviceInfo.serviceDomain();
+		          break;
+	  case MDNSResponder::MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort :
+		  	  	  answerInfo = "HostDomainAndPort " + serviceInfo.hostDomain() + ":" + String(serviceInfo.hostPort());
+		          break;
+	  case MDNSResponder::MDNSResponder::MDNSResponder::ServiceQueryAnswerType_IP4Address :
+		  	  	  answerInfo = "IP4Address ";
+		  	  	  for (IPAddress ip : serviceInfo.IPAdresses()){
+		  	  		  answerInfo += "- " + ip.toString();
+		  	  	  };
+		          break;
+	  case MDNSResponder::MDNSResponder::MDNSResponder::ServiceQueryAnswerType_Txts :
+		  	  	  answerInfo = "TXT " + serviceInfo.txtValue();
+
+		          break;
+	  default :
+		          answerInfo = "Unknown";
+	}
+	Serial.printf("Answer %s %s\n",answerInfo.c_str(),p_bSetContent ? "Modified" : "Deleted");
+
+	return true;
+}
+
+bool MDNSServiceQueryCallback1(MDNSResponder* p_pMDNSResponder,                           // The MDNS responder object
                               const MDNSResponder::hMDNSServiceQuery p_hServiceQuery,    // Handle to the service query
                               uint32_t p_u32AnswerIndex,                                 // Index of the updated answer
                               uint32_t p_u32ServiceQueryAnswerMask,                      // Mask for the updated component
@@ -188,9 +217,9 @@ bool serviceProbeResult (String p_pcServiceName,
                          const MDNSResponder::hMDNSService p_hMDNSService,
                          bool p_bProbeResult)
 {
-  (void) p_hMDNSService;
-  Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
-  return true;
+	(void) p_hMDNSService;
+    Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
+    return true;
 }
 
 
@@ -233,7 +262,7 @@ bool hostProbeResult (String p_pcDomainName, bool p_bProbeResult) {
 
           // Install dynamic 'http.tcp' service query
           if (!hMDNSServiceQuery) {
-            hMDNSServiceQuery = MDNS.installServiceQuery("http", "tcp", MDNSServiceQueryCallback, 0);
+            hMDNSServiceQuery = MDNS.installServiceQuery("http", "tcp", MDNSServiceQueryCallback);
             if (hMDNSServiceQuery) {
               Serial.printf("MDNSProbeResultCallback: Service query for 'http.tcp' services installed.\n");
             } else {
@@ -309,7 +338,7 @@ void setup(void) {
   // Init the (currently empty) host domain string with 'esp8266'
   if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
       (!MDNS.begin(pcHostDomain))) {
-    Serial.println("Error setting up MDNS responder!");
+    Serial.println(" Error setting up MDNS responder!");
     while (1) { // STOP
       delay(1000);
     }

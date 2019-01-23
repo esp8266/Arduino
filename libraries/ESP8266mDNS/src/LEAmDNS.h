@@ -359,12 +359,21 @@ public:
      * MDNSServiceQueryCallbackFn
      * Callback function for received answers for dynamic service queries
      */
+/*
     typedef bool (*MDNSServiceQueryCallbackFn)(MDNSResponder* p_pMDNSResponder,
                                                const hMDNSServiceQuery p_hServiceQuery, // dynamic service query handle
                                                uint32_t p_u32AnswerIndex,               // index of the updated answer
                                                uint32_t p_u32ServiceQueryAnswerMask,    // flag for the updated answer item
                                                bool p_bSetContent,                      // true: Answer component set, false: component deleted
-                                               void* p_pUserdata);                      // pUserdata set via 'installServiceQuery'
+
+											   void* p_pUserdata);                      // pUserdata set via 'installServiceQuery'
+*/
+// Functional
+    struct MDNSServiceInfo; // forward declaration
+    typedef std::function<bool(const MDNSServiceInfo& mdnsServiceInfo,
+                               uint32_t p_u32ServiceQueryAnswerMask,    // flag for the updated answer item
+                               bool p_bSetContent                      // true: Answer component set, false: component deleted
+                              )> MDNSServiceQueryCallbackFunc;
 
     // Install a dynamic service query. For every received answer (part) the given callback
     // function is called. The query will be updated every time, the TTL for an answer
@@ -379,8 +388,7 @@ public:
     // - hasAnswerTxts/answerTxts
     hMDNSServiceQuery installServiceQuery(const char* p_pcService,
                                           const char* p_pcProtocol,
-                                          MDNSServiceQueryCallbackFn p_fnCallback,
-                                          void* p_pUserdata);
+                                          MDNSServiceQueryCallbackFunc p_fnCallback);
     // Remove a dynamic service query
     bool removeServiceQuery(hMDNSServiceQuery p_hServiceQuery);
 
@@ -468,6 +476,7 @@ protected:
     /**
      * MDNSServiceInfo, used in application callbacks
      */
+public:
     struct MDNSServiceInfo
     {
     	MDNSServiceInfo(MDNSResponder* p_pM,MDNSResponder::hMDNSServiceQuery p_hS,uint32_t p_u32A)
@@ -478,10 +487,10 @@ protected:
     	MDNSResponder* p_pMDNSResponder;
     	MDNSResponder::hMDNSServiceQuery p_hServiceQuery;
     	uint32_t p_u32AnswerIndex;
-    	const char* serviceDomain(){
+    	String serviceDomain(){
     		return p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex);
     	};
-    	const char* hostDomain(){
+    	String hostDomain(){
     		return (p_pMDNSResponder->hasAnswerHostDomain(p_hServiceQuery, p_u32AnswerIndex)) ?
     		   p_pMDNSResponder->answerHostDomain(p_hServiceQuery, p_u32AnswerIndex) : 0;
     	};
@@ -498,11 +507,12 @@ protected:
     		}
     		return internalIP;
     	};
-    	const char* txtValue (){
+    	String txtValue (){
     		return  (p_pMDNSResponder->hasAnswerTxts(p_hServiceQuery, p_u32AnswerIndex)) ?
     		  p_pMDNSResponder->answerTxts(p_hServiceQuery, p_u32AnswerIndex) : 0;
     	};
     };
+protected:
     /**
      * stcMDNSServiceTxt
      */
@@ -1000,7 +1010,7 @@ protected:
 
         stcMDNSServiceQuery*            m_pNext;
         stcMDNS_RRDomain                m_ServiceTypeDomain;    // eg. _http._tcp.local
-        MDNSServiceQueryCallbackFn      m_fnCallback;
+        MDNSServiceQueryCallbackFunc    m_fnCallback;
         void*                           m_pUserdata;
         bool                            m_bLegacyQuery;
         uint8_t                         m_u8SentCount;

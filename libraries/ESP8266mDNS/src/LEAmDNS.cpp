@@ -759,10 +759,10 @@ uint16_t MDNSResponder::port(const uint32_t p_u32AnswerIndex) {
  *  - answerTxts
  *
  */
+//Functional
 MDNSResponder::hMDNSServiceQuery MDNSResponder::installServiceQuery(const char* p_pcService,
                                                                     const char* p_pcProtocol,
-                                                                    MDNSResponder::MDNSServiceQueryCallbackFn p_fnCallback,
-                                                                    void* p_pUserdata) {
+                                                                    MDNSResponder::MDNSServiceQueryCallbackFunc p_fnCallback) {
     hMDNSServiceQuery       hResult = 0;
     
     stcMDNSServiceQuery*    pServiceQuery = 0;
@@ -775,7 +775,7 @@ MDNSResponder::hMDNSServiceQuery MDNSResponder::installServiceQuery(const char* 
         (_buildDomainForService(p_pcService, p_pcProtocol, pServiceQuery->m_ServiceTypeDomain))) {
 
         pServiceQuery->m_fnCallback = p_fnCallback;
-        pServiceQuery->m_pUserdata = p_pUserdata;
+        pServiceQuery->m_pUserdata = 0;
         pServiceQuery->m_bLegacyQuery = false;
         
         if (_sendMDNSServiceQuery(*pServiceQuery)) {
