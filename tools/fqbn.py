@@ -71,19 +71,43 @@ while line:
 
   line = boardstxt.readline()
 
-
-for p in menuentries:
-  for q in menuentries[p]:
-    menuentries[p][q] = menudescs[p] + ': ' + menuentries[p][q]
+# end parsing
+# now formatting
 
 for h in hide:
   del menuentries[h]
 
-all = collections.OrderedDict([
-  ( 'boards', boards ),
-  ( 'options', menudescs ),
-  ( 'values', menuentries )
-])
+all = { }
+
+all["options"] = [ ]
+for entry in menuentries:
+  list = [ ]
+  for value in menuentries[entry]:
+    subdict = { }
+    subdict["value"] = value
+    subdict["description"] = menuentries[entry][value]
+    list.append(subdict)
+  dict = { }
+  dict["values"] = list
+  dict["ID"] = entry
+  dict["description"] = menudescs[entry]
+  all["options"].append(dict)
+
+all["menus"] = [ ]
+for desc in menudescs:
+  dict = { }
+  dict["description"] = menudescs[desc]
+  dict["ID"] = desc
+  all["menus"].append(dict)
+
+all["boards"] = [ ]
+for board in boards:
+  dict = { }
+  dict["description"] = boards[board]
+  dict["ID"] = board
+  all["boards"].append(dict)
+
+# display
 
 if args.machine:
   print(json.dumps(all))
