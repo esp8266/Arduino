@@ -90,14 +90,23 @@ Open a Command Prompt and Start GDB
 Open a terminal or ``CMD`` prompt and navigate to the proper ESP8266 toolchain
 directory.
 
+Linux
+
 .. code:: cpp
 
     ~/.arduino15/packages/esp8266/hardware/xtensa-lx106-elf/bin/xtensa-lx106-elf-gdb
 
+Windows (Using Board Manager version)
+
 .. code:: cpp
 
-    cd TODO WINDOWS
-    xtensa-lx106-elf-gdb.exe
+    %userprofile%\AppData\Local\Arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\2.5.0-3-20ed2b9\bin\xtensa-lx106-elf-gdb.exe
+
+Windows (Using Git version)
+
+.. code:: cpp
+
+    %userprofile%\Documents\Arduino\hardware\esp8266com\esp8266\tools\xtensa-lx106-elf\bin\xtensa-lx106-elf-gdb.exe
 
 Please note the proper GDB name is "xtensa-lx106-elf-gdb".  If you accidentally
 run "gdb" you may start your own operating system's GDB, which will not know how
