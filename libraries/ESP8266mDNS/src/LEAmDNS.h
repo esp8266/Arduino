@@ -536,6 +536,7 @@ public:
 		}
     	String value(String key)
     	{
+    	    (void) key;
     		return String();
     	}
     };
