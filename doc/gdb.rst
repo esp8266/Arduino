@@ -80,7 +80,7 @@ Under Linux these files are stored in ``/tmp/arduino_build_*`` and the following
 
     find /tmp -name "*.elf" -print
 
-Under Windows these files are stored in `%userprofile%\AppData\Local\Temp\arduino_build_*`` and the following command will help locate the right file for your app:
+Under Windows these files are stored in ``%userprofile%\AppData\Local\Temp\arduino_build_*`` and the following command will help locate the right file for your app:
 
 .. code:: cpp
 
@@ -239,6 +239,7 @@ We're now at the GDB prompt, but nothing has been set up for the ESP8266
 and no debug information has been loaded.  Cut-and-paste the setup options:
 
 .. code:: cpp
+
     (gdb) set remote hardware-breakpoint-limit 1
     (gdb) set remote hardware-watchpoint-limit 1
     (gdb) set remote interrupt-on-connect on
