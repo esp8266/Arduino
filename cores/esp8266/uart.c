@@ -47,7 +47,29 @@
 #include "user_interface.h"
 #include "uart_register.h"
 
-//const char overrun_str [] PROGMEM STORE_ATTR = "uart input full!\r\n";
+/*
+  Some general architecture for GDB integration with the UART to enable
+  serial debugging.
+
+  UART1 is transmit only and can never be used by GDB.
+
+  When gdbstub_has_uart_isr_control() (only true in the case GDB is enabled),
+  UART0 needs to be under the control of the GDB stub for enable/disable/irq
+  (but speed, parity, etc. still alllowable).  Basically, GDB needs to make
+  sure that UART0 is never really disabled.
+
+  GDB sets up UART0 with a fifo and a 2-character timeout during init.  This
+  is required to ensure that GDBStub can check every character coming in, even
+  if it is not read by the user app or if the commands don't hit the FIFO
+  interrupt level.  It checks every character that comes in, and if GDB isn't
+  active just passes them to the user RAM FIFO unless it's a Ctrl-C (0x03).
+
+  GDBStub doesn't care about the struct uart_*, and allocating it or freeing
+  it has no effect (so you can do Serial.end() and free the uart...but as
+  mentioned above even if you Serial.end, the actual UART0 HW will still be
+  kept running to enable GDB to do commands.
+*/
+
 static int s_uart_debug_nr = UART0;
 
 
@@ -250,6 +272,54 @@ uart_read(uart_t* uart, char* userbuffer, size_t usersize)
     return ret;
 }
 
+// When GDB is running, this is called one byte at a time to stuff the user FIFO
+// instead of the uart_isr...uart_rx_copy_fifo_to_buffer_unsafe()
+// Since we've already read the bytes from the FIFO, can't use that
+// function directly and need to implement it bytewise here
+static void ICACHE_RAM_ATTR uart_isr_handle_data(void* arg, uint8_t data)
+{
+    uart_t* uart = (uart_t*)arg;
+    if(uart == NULL || !uart->rx_enabled) {
+        return;
+    }
+
+// Copy all the rx fifo bytes that fit into the rx buffer
+// called by ISR
+    struct uart_rx_buffer_ *rx_buffer = uart->rx_buffer;
+
+    size_t nextPos = (rx_buffer->wpos + 1) % rx_buffer->size;
+    if(nextPos == rx_buffer->rpos)
+    {
+        uart->rx_overrun = true;
+        //os_printf_plus(overrun_str);
+
+        // a choice has to be made here,
+        // do we discard newest or oldest data?
+#ifdef UART_DISCARD_NEWEST
+        // discard newest data
+        // Stop copying if rx buffer is full
+        return;
+#else
+        // discard oldest data
+        if (++rx_buffer->rpos == rx_buffer->size)
+            rx_buffer->rpos = 0;
+#endif
+    }
+    rx_buffer->buffer[rx_buffer->wpos] = data;
+    rx_buffer->wpos = nextPos;
+
+    // Check the UART flags and note hardware overflow/etc.
+    uint32_t usis = USIS(uart->uart_nr);
+
+    if(usis & (1 << UIOF))
+        uart->rx_overrun = true;
+
+    if (usis & ((1 << UIFR) | (1 << UIPE) | (1 << UITO)))
+        uart->rx_error = true;
+
+    USIC(uart->uart_nr) = usis;
+}
+
 size_t 
 uart_resize_rx_buffer(uart_t* uart, size_t new_size)
 {
@@ -286,7 +356,7 @@ uart_get_rx_buffer_size(uart_t* uart)
     return uart && uart->rx_enabled? uart->rx_buffer->size: 0;
 }
 
-
+// The default ISR handler called when GDB is not enabled
 void ICACHE_RAM_ATTR 
 uart_isr(void * arg)
 {
@@ -303,7 +373,7 @@ uart_isr(void * arg)
     if(usis & (1 << UIFF))
         uart_rx_copy_fifo_to_buffer_unsafe(uart);
 
-    if((usis & (1 << UIOF)) && !uart->rx_overrun)
+    if(usis & (1 << UIOF))
     {
         uart->rx_overrun = true;
         //os_printf_plus(overrun_str);
@@ -320,6 +390,11 @@ uart_start_isr(uart_t* uart)
 {
     if(uart == NULL || !uart->rx_enabled)
         return;
+
+    if(gdbstub_has_uart_isr_control()) {
+        gdbstub_set_uart_isr_callback(uart_isr_handle_data,  (void *)uart);
+        return;
+    }
 
     // UCFFT value is when the RX fifo full interrupt triggers.  A value of 1
     // triggers the IRS very often.  A value of 127 would not leave much time
@@ -351,14 +426,17 @@ uart_stop_isr(uart_t* uart)
     if(uart == NULL || !uart->rx_enabled)
         return;
 
+    if(gdbstub_has_uart_isr_control()) {
+        gdbstub_set_uart_isr_callback(NULL, NULL);
+        return;
+    }
+
     ETS_UART_INTR_DISABLE();
     USC1(uart->uart_nr) = 0;
     USIC(uart->uart_nr) = 0xffff;
     USIE(uart->uart_nr) = 0;
     ETS_UART_INTR_ATTACH(NULL, NULL);
 }
-
-
 
 /*
   Reference for uart_tx_fifo_available() and uart_tx_fifo_full():
@@ -393,6 +471,10 @@ uart_write_char(uart_t* uart, char c)
     if(uart == NULL || !uart->tx_enabled)
         return 0;
 
+    if(gdbstub_has_uart_isr_control() && uart->uart_nr == UART0) {
+        gdbstub_write_char(c);
+        return 1;
+    }
     uart_do_write_char(uart->uart_nr, c);
     return 1;
 }
@@ -403,6 +485,11 @@ uart_write(uart_t* uart, const char* buf, size_t size)
     if(uart == NULL || !uart->tx_enabled)
         return 0;
 
+    if(gdbstub_has_uart_isr_control() && uart->uart_nr == UART0) {
+        gdbstub_write(buf, size);
+        return 0;
+    }
+
     size_t ret = size;
     const int uart_nr = uart->uart_nr;
     while (size--)
@@ -410,7 +497,6 @@ uart_write(uart_t* uart, const char* buf, size_t size)
 
     return ret;
 }
-
 
 
 size_t 
@@ -452,8 +538,10 @@ uart_flush(uart_t* uart)
     if(uart->tx_enabled)
         tmp |= (1 << UCTXRST);
 
-    USC0(uart->uart_nr) |= (tmp);
-    USC0(uart->uart_nr) &= ~(tmp);
+    if(!gdbstub_has_uart_isr_control() || uart->uart_nr != UART0) {
+        USC0(uart->uart_nr) |= (tmp);
+        USC0(uart->uart_nr) &= ~(tmp);
+    }
 }
 
 void 
@@ -490,7 +578,9 @@ uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx
     {
     case UART0:
         ETS_UART_INTR_DISABLE();
-        ETS_UART_INTR_ATTACH(NULL, NULL);
+        if(!gdbstub_has_uart_isr_control()) {
+            ETS_UART_INTR_ATTACH(NULL, NULL);
+        }
         uart->rx_enabled = (mode != UART_TX_ONLY);
         uart->tx_enabled = (mode != UART_RX_ONLY);
         uart->rx_pin = (uart->rx_enabled)?3:255;
@@ -555,12 +645,21 @@ uart_init(int uart_nr, int baudrate, int config, int mode, int tx_pin, size_t rx
 
     uart_set_baudrate(uart, baudrate);
     USC0(uart->uart_nr) = config;
-    uart_flush(uart);
-    USC1(uart->uart_nr) = 0;
-    USIC(uart->uart_nr) = 0xffff;
-    USIE(uart->uart_nr) = 0;
-    if(uart->uart_nr == UART0 && uart->rx_enabled)
-        uart_start_isr(uart);
+
+    if(!gdbstub_has_uart_isr_control() || uart->uart_nr != UART0) {
+        uart_flush(uart);
+        USC1(uart->uart_nr) = 0;
+        USIC(uart->uart_nr) = 0xffff;
+        USIE(uart->uart_nr) = 0;
+    }
+    if(uart->uart_nr == UART0) {
+        if(uart->rx_enabled) {
+            uart_start_isr(uart);
+        }
+        if(gdbstub_has_uart_isr_control()) {
+            ETS_UART_INTR_ENABLE(); // Undo the disable in the switch() above
+        }
+    }
 
     return uart;
 }
@@ -573,34 +672,35 @@ uart_uninit(uart_t* uart)
 
     uart_stop_isr(uart);
 
-    switch(uart->rx_pin) 
-    {
-    case 3:
-        pinMode(3, INPUT);
-        break;
-    case 13:
-        pinMode(13, INPUT);
-        break;
+    if(uart->tx_enabled && (!gdbstub_has_uart_isr_control() || uart->uart_nr != UART0)) {
+        switch(uart->tx_pin) 
+        {
+        case 1:
+            pinMode(1, INPUT);
+            break;
+        case 2:
+            pinMode(2, INPUT);
+            break;
+        case 15:
+            pinMode(15, INPUT);
+            break;
+        }
     }
 
-    switch(uart->tx_pin) 
-    {
-    case 1:
-        pinMode(1, INPUT);
-        break;
-    case 2:
-        pinMode(2, INPUT);
-        break;
-    case 15:
-        pinMode(15, INPUT);
-        break;
-    }
-
-    if(uart->rx_enabled)
-    {
-        uart_stop_isr(uart);
+    if(uart->rx_enabled) {
         free(uart->rx_buffer->buffer);
         free(uart->rx_buffer);
+        if(!gdbstub_has_uart_isr_control()) {
+            switch(uart->rx_pin) 
+            {
+            case 3:
+                pinMode(3, INPUT);
+                break;
+            case 13:
+                pinMode(13, INPUT);
+                break;
+            }
+        }
     }
     free(uart);
 }
@@ -654,7 +754,6 @@ uart_swap(uart_t* uart, int tx_pin)
 
             IOSWAP &= ~(1 << IOSWAPU0);
         }
-
         break;
     case UART1:
         // Currently no swap possible! See GPIO pins used by UART
@@ -798,21 +897,29 @@ void
 uart_set_debug(int uart_nr)
 {
     s_uart_debug_nr = uart_nr;
+    void (*func)(char) = NULL;
     switch(s_uart_debug_nr) 
     {
     case UART0:
-        system_set_os_print(1);
-        ets_install_putc1((void *) &uart0_write_char);
+        func = &uart0_write_char;
         break;
     case UART1:
-        system_set_os_print(1);
-        ets_install_putc1((void *) &uart1_write_char);
+        func = &uart1_write_char;
         break;
     case UART_NO:
     default:
-        system_set_os_print(0);
-        ets_install_putc1((void *) &uart_ignore_char);
+        func = &uart_ignore_char;
         break;
+    }
+    if(gdbstub_has_putc1_control()) {
+        gdbstub_set_putc1_callback(func);
+    } else {
+        if (uart_nr == UART0 || uart_nr == UART1) {
+            system_set_os_print(1);
+        } else {
+            system_set_os_print(0);
+        }
+        ets_install_putc1((void *) func);
     }
 }
 
