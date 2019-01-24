@@ -156,37 +156,37 @@ bool MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService)
    restarted via p_pMDNSResponder->setHostname().
 
 */
-bool hostProbeResult (String p_pcDomainName, bool p_bProbeResult) {
+bool hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
 
   Serial.println("MDNSProbeResultCallback");
-    Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
-    if (true == p_bProbeResult) {
-      // Set station hostname
-      setStationHostname(pcHostDomain);
+  Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
+  if (true == p_bProbeResult) {
+    // Set station hostname
+    setStationHostname(pcHostDomain);
 
-      if (!bHostDomainConfirmed) {
-        // Hostname free -> setup clock service
-        bHostDomainConfirmed = true;
+    if (!bHostDomainConfirmed) {
+      // Hostname free -> setup clock service
+      bHostDomainConfirmed = true;
 
-        if (!hMDNSService) {
-          // Add a 'clock.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
-          hMDNSService = MDNS.addService(0, "espclk", "tcp", SERVICE_PORT);
-          if (hMDNSService) {
-            // Add a simple static MDNS service TXT item
-            MDNS.addServiceTxt(hMDNSService, "port#", SERVICE_PORT);
-            // Set the callback function for dynamic service TXTs
-            MDNS.setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
-          }
+      if (!hMDNSService) {
+        // Add a 'clock.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
+        hMDNSService = MDNS.addService(0, "espclk", "tcp", SERVICE_PORT);
+        if (hMDNSService) {
+          // Add a simple static MDNS service TXT item
+          MDNS.addServiceTxt(hMDNSService, "port#", SERVICE_PORT);
+          // Set the callback function for dynamic service TXTs
+          MDNS.setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
         }
       }
+    }
+  } else {
+    // Change hostname, use '-' as divider between base name and index
+    if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+      MDNS.setHostname(pcHostDomain);
     } else {
-        // Change hostname, use '-' as divider between base name and index
-        if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-          MDNS.setHostname(pcHostDomain);
-        } else {
-          Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-        }
-      }
+      Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
+    }
+  }
   return true;
 }
 
@@ -306,7 +306,7 @@ void loop(void) {
   // Update time (if needed)
   //static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
   static esp8266::polledTimeout::periodic timeout(UPDATE_CYCLE);
-  if (timeout.expired()){
+  if (timeout.expired()) {
 
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
