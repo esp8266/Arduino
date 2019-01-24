@@ -239,6 +239,7 @@ We're now at the GDB prompt, but nothing has been set up for the ESP8266
 and no debug information has been loaded.  Cut-and-paste the setup options:
 
 .. code:: cpp
+
     (gdb) set remote hardware-breakpoint-limit 1
     (gdb) set remote hardware-watchpoint-limit 1
     (gdb) set remote interrupt-on-connect on
