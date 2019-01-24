@@ -87,21 +87,26 @@ MDNSResponder::~MDNSResponder(void) {
  */
 bool MDNSResponder::begin(const char* p_pcHostname) {
     
-    bool    bResult = false;
+    bool    bResult = (0 != m_pcHostname);
     
-    if (_setHostname(p_pcHostname)) {
-        
-        m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
-            (void) pEvent;
-            _restart();
-        });
-
-        m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
-            (void) pEvent;
-            _restart();
-        });
+    if (0 == m_pcHostname) {
+        if (_setHostname(p_pcHostname)) {
             
-        bResult = _restart();
+            m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
+                (void) pEvent;
+                _restart();
+            });
+
+            m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
+                (void) pEvent;
+                _restart();
+            });
+
+            bResult = _restart();
+        }
+    }
+    else {
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: Ignoring multiple calls (Ignored host domain: '%s')!\n"), (p_pcHostname ?: "-")););
     }
     DEBUG_EX_ERR(if (!bResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: FAILED for '%s'!\n"), (p_pcHostname ?: "-")); } );
     return bResult;

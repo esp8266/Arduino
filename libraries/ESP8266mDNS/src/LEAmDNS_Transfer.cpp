@@ -1439,8 +1439,7 @@ bool MDNSResponder::_writeMDNSAnswer_PTR_TYPE(MDNSResponder::stcMDNSService& p_r
     
     stcMDNS_RRDomain        dnssdDomain;
     stcMDNS_RRDomain        serviceDomain;
-    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR,
-                                       ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));   // Cache flush? & INternet
+    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR, DNS_RRCLASS_IN);	// No cache flush! only INternet
     bool    bResult = ((_buildDomainForDNSSD(dnssdDomain)) &&                                   // _services._dns-sd._udp.local
                        (_writeMDNSRRDomain(dnssdDomain, p_rSendParameter)) &&
                        (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&                // TYPE & CLASS
@@ -1465,8 +1464,7 @@ bool MDNSResponder::_writeMDNSAnswer_PTR_NAME(MDNSResponder::stcMDNSService& p_r
                                               MDNSResponder::stcMDNSSendParameter& p_rSendParameter) {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _writeMDNSAnswer_PTR_NAME\n")););
 
-    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR,
-                                       ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));   // Cache flush? & INternet
+    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR, DNS_RRCLASS_IN);	// No cache flush! only INternet
     bool    bResult = ((_writeMDNSServiceDomain(p_rService, false, false, p_rSendParameter)) && // _http._tcp.local
                        (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&                    // TYPE & CLASS
                        (_write32((p_rSendParameter.m_bUnannounce ? 0 : MDNS_SERVICE_TTL), p_rSendParameter)) && // TTL

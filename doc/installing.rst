@@ -35,7 +35,7 @@ might be broken.
 
 For more information on the Arduino Board Manager, see:
 
-- https://www.arduino.cc/en/Guide/Libraries
+- https://www.arduino.cc/en/guide/cores
 
 Using git version
 -----------------
@@ -106,7 +106,7 @@ Instructions - Windows 10
    .. code:: bash
 
        cd %USERPROFILE%\Documents\hardware\esp8266com\esp8266
-       git submodules update --init   
+       git submodule update --init   
   
   If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
   
@@ -180,7 +180,7 @@ Instructions - Other OS
    .. code:: bash
 
        cd esp8266
-       git submodules update --init   
+       git submodule update --init   
   
   If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
 
