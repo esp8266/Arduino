@@ -96,8 +96,7 @@ directory.
 
 .. code:: cpp
 
-    cd TODO WINDOWS
-    xtensa-lx106-elf-gdb.exe
+    %userprofile%\AppData\Local\Arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\2.5.0-3-20ed2b9\bin\xtensa-lx106-elf-gdb.exe
 
 Please note the proper GDB name is "xtensa-lx106-elf-gdb".  If you accidentally
 run "gdb" you may start your own operating system's GDB, which will not know how
