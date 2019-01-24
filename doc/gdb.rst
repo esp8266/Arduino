@@ -72,13 +72,19 @@ Locate Application.ino.elf File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order for GDB to debug your application, you need to locate the compiled
-ELF format version of it (which includes needed debug symbols).  Under Linux
-these files are stored in ``/tmp/arduino_build_*`` and the following command
-will help locate the right file for your app
+ELF format version of it (which includes needed debug symbols). 
+
+Under Linux these files are stored in ``/tmp/arduino_build_*`` and the following command will help locate the right file for your app:
 
 .. code:: cpp
 
     find /tmp -name "*.elf" -print
+
+Under Windows these files are stored in `%userprofile%\AppData\Local\Temp\arduino_build_*`` and the following command will help locate the right file for your app:
+
+.. code:: cpp
+
+    dir %userprofile%\appdata\*.elf /s/b
 
 Note the full path of ELF file that corresponds to your sketch name, it will
 be needed later once GDB is started.
