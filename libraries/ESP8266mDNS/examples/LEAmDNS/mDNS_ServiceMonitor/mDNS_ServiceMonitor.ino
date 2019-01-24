@@ -96,17 +96,17 @@ bool MDNSServiceQueryCallback (MDNSResponder::MDNSServiceInfo serviceInfo, uint3
 	  case MDNSResponder::ServiceQueryAnswerType_ServiceDomain :
 		  	  	  answerInfo = "ServiceDomain " + serviceInfo.serviceDomain();
 		          break;
-	  case MDNSResponder::MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort :
+	  case MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort :
 		  	  	  answerInfo = "HostDomainAndPort " + serviceInfo.hostDomain() + ":" + String(serviceInfo.hostPort());
 		          break;
-	  case MDNSResponder::MDNSResponder::MDNSResponder::ServiceQueryAnswerType_IP4Address :
+	  case MDNSResponder::ServiceQueryAnswerType_IP4Address :
 		  	  	  answerInfo = "IP4Address ";
 		  	  	  for (IPAddress ip : serviceInfo.IPAdresses()){
 		  	  		  answerInfo += "- " + ip.toString();
 		  	  	  };
 		          break;
-	  case MDNSResponder::MDNSResponder::MDNSResponder::ServiceQueryAnswerType_Txts :
-		  	  	  answerInfo = "TXT " + serviceInfo.txtValue();
+	  case MDNSResponder::ServiceQueryAnswerType_Txts :
+		  	  	  answerInfo = "TXT " + serviceInfo.strKeyValue();
 
 		          break;
 	  default :
