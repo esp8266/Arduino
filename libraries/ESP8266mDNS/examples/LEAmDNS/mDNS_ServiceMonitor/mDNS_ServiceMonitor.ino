@@ -89,40 +89,39 @@ bool setStationHostname(const char* p_pcHostname) {
    MDNSServiceQueryCallback
 */
 
-bool MDNSServiceQueryCallback (MDNSResponder::MDNSServiceInfo serviceInfo, uint32_t p_u32ServiceQueryAnswerMask, bool p_bSetContent)
-{
-	String answerInfo;
-	switch (p_u32ServiceQueryAnswerMask){
-	  case MDNSResponder::ServiceQueryAnswerType_ServiceDomain :
-		  	  	  answerInfo = "ServiceDomain " + serviceInfo.serviceDomain();
-		          break;
-	  case MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort :
-		  	  	  answerInfo = "HostDomainAndPort " + serviceInfo.hostDomain() + ":" + String(serviceInfo.hostPort());
-		          break;
-	  case MDNSResponder::ServiceQueryAnswerType_IP4Address :
-		  	  	  answerInfo = "IP4Address ";
-		  	  	  for (IPAddress ip : serviceInfo.IPAdresses()){
-		  	  		  answerInfo += "- " + ip.toString();
-		  	  	  };
-		          break;
-	  case MDNSResponder::ServiceQueryAnswerType_Txts :
-		  	  	  answerInfo = "TXT " + serviceInfo.strKeyValue();
+bool MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, uint32_t p_u32ServiceQueryAnswerMask, bool p_bSetContent) {
+  String answerInfo;
+  switch (p_u32ServiceQueryAnswerMask) {
+    case MDNSResponder::ServiceQueryAnswerType_ServiceDomain :
+      answerInfo = "ServiceDomain " + serviceInfo.serviceDomain();
+      break;
+    case MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort :
+      answerInfo = "HostDomainAndPort " + serviceInfo.hostDomain() + ":" + String(serviceInfo.hostPort());
+      break;
+    case MDNSResponder::ServiceQueryAnswerType_IP4Address :
+      answerInfo = "IP4Address ";
+      for (IPAddress ip : serviceInfo.IPAdresses()) {
+        answerInfo += "- " + ip.toString();
+      };
+      break;
+    case MDNSResponder::ServiceQueryAnswerType_Txts :
+      answerInfo = "TXT " + serviceInfo.strKeyValue();
 
-		          break;
-	  default :
-		          answerInfo = "Unknown";
-	}
-	Serial.printf("Answer %s %s\n",answerInfo.c_str(),p_bSetContent ? "Modified" : "Deleted");
+      break;
+    default :
+      answerInfo = "Unknown";
+  }
+  Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
 
-	return true;
+  return true;
 }
 
 bool MDNSServiceQueryCallback1(MDNSResponder* p_pMDNSResponder,                           // The MDNS responder object
-                              const MDNSResponder::hMDNSServiceQuery p_hServiceQuery,    // Handle to the service query
-                              uint32_t p_u32AnswerIndex,                                 // Index of the updated answer
-                              uint32_t p_u32ServiceQueryAnswerMask,                      // Mask for the updated component
-                              bool p_bSetContent,                                        // true: Component set, false: component deleted
-                              void* p_pUserdata) {                                       // pUserdata; here '0', as none set via 'installServiceQuery'
+                               const MDNSResponder::hMDNSServiceQuery p_hServiceQuery,    // Handle to the service query
+                               uint32_t p_u32AnswerIndex,                                 // Index of the updated answer
+                               uint32_t p_u32ServiceQueryAnswerMask,                      // Mask for the updated component
+                               bool p_bSetContent,                                        // true: Component set, false: component deleted
+                               void* p_pUserdata) {                                       // pUserdata; here '0', as none set via 'installServiceQuery'
   (void) p_pUserdata;
   Serial.printf("MDNSServiceQueryCallback\n");
 
@@ -213,13 +212,12 @@ bool MDNSServiceQueryCallback1(MDNSResponder* p_pMDNSResponder,                 
    Probe result callback for Services
 */
 
-bool serviceProbeResult (String p_pcServiceName,
-                         const MDNSResponder::hMDNSService p_hMDNSService,
-                         bool p_bProbeResult)
-{
-	(void) p_hMDNSService;
-    Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
-    return true;
+bool serviceProbeResult(String p_pcServiceName,
+                        const MDNSResponder::hMDNSService p_hMDNSService,
+                        bool p_bProbeResult) {
+  (void) p_hMDNSService;
+  Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
+  return true;
 }
 
 
@@ -235,50 +233,50 @@ bool serviceProbeResult (String p_pcServiceName,
 
 */
 
-bool hostProbeResult (String p_pcDomainName, bool p_bProbeResult) {
+bool hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
 
-    Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
+  Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
 
-    if (true == p_bProbeResult) {
-      // Set station hostname
-      setStationHostname(pcHostDomain);
+  if (true == p_bProbeResult) {
+    // Set station hostname
+    setStationHostname(pcHostDomain);
 
-      if (!bHostDomainConfirmed) {
-        // Hostname free -> setup clock service
-        bHostDomainConfirmed = true;
+    if (!bHostDomainConfirmed) {
+      // Hostname free -> setup clock service
+      bHostDomainConfirmed = true;
 
-        if (!hMDNSService) {
-          // Add a 'http.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
-          hMDNSService = MDNS.addService(0, "http", "tcp", SERVICE_PORT);
-          if (hMDNSService) {
-            MDNS.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
+      if (!hMDNSService) {
+        // Add a 'http.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
+        hMDNSService = MDNS.addService(0, "http", "tcp", SERVICE_PORT);
+        if (hMDNSService) {
+          MDNS.setServiceProbeResultCallback(hMDNSService, serviceProbeResult);
 
-            // Add some '_http._tcp' protocol specific MDNS service TXT items
-            // See: http://www.dns-sd.org/txtrecords.html#http
-            MDNS.addServiceTxt(hMDNSService, "user", "");
-            MDNS.addServiceTxt(hMDNSService, "password", "");
-            MDNS.addServiceTxt(hMDNSService, "path", "/");
-          }
+          // Add some '_http._tcp' protocol specific MDNS service TXT items
+          // See: http://www.dns-sd.org/txtrecords.html#http
+          MDNS.addServiceTxt(hMDNSService, "user", "");
+          MDNS.addServiceTxt(hMDNSService, "password", "");
+          MDNS.addServiceTxt(hMDNSService, "path", "/");
+        }
 
-          // Install dynamic 'http.tcp' service query
-          if (!hMDNSServiceQuery) {
-            hMDNSServiceQuery = MDNS.installServiceQuery("http", "tcp", MDNSServiceQueryCallback);
-            if (hMDNSServiceQuery) {
-              Serial.printf("MDNSProbeResultCallback: Service query for 'http.tcp' services installed.\n");
-            } else {
-              Serial.printf("MDNSProbeResultCallback: FAILED to install service query for 'http.tcp' services!\n");
-            }
+        // Install dynamic 'http.tcp' service query
+        if (!hMDNSServiceQuery) {
+          hMDNSServiceQuery = MDNS.installServiceQuery("http", "tcp", MDNSServiceQueryCallback);
+          if (hMDNSServiceQuery) {
+            Serial.printf("MDNSProbeResultCallback: Service query for 'http.tcp' services installed.\n");
+          } else {
+            Serial.printf("MDNSProbeResultCallback: FAILED to install service query for 'http.tcp' services!\n");
           }
         }
       }
+    }
+  } else {
+    // Change hostname, use '-' as divider between base name and index
+    if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+      MDNS.setHostname(pcHostDomain);
     } else {
-        // Change hostname, use '-' as divider between base name and index
-        if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-          MDNS.setHostname(pcHostDomain);
-        } else {
-          Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-        }
-      }
+      Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
+    }
+  }
 
   return true;
 }
@@ -302,7 +300,7 @@ void handleHTTPRequest() {
   Serial.println("Sending 200");
   server.send(200, "text/html", s);
   Serial.println("Done with request");
-  Serial.printf("FM %d\n",ESP.getFreeHeap());
+  Serial.printf("FM %d\n", ESP.getFreeHeap());
 }
 
 /*
