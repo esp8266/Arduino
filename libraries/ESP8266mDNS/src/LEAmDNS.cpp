@@ -459,11 +459,9 @@ bool MDNSResponder::addServiceTxt(String p_strService,
  * service TXT items are needed.
  *
  */
-bool MDNSResponder::setDynamicServiceTxtCallback(MDNSResponder::MDNSDynamicServiceTxtCallbackFn p_fnCallback,
-                                                 void* p_pUserdata) {
+bool MDNSResponder::setDynamicServiceTxtCallback(MDNSResponder::MDNSDynamicServiceTxtCallbackFunc p_fnCallback) {
     
     m_fnServiceTxtCallback = p_fnCallback;
-    m_pServiceTxtCallbackUserdata = p_pUserdata;
     
     return true;
 }
@@ -476,15 +474,13 @@ bool MDNSResponder::setDynamicServiceTxtCallback(MDNSResponder::MDNSDynamicServi
  *
  */
 bool MDNSResponder::setDynamicServiceTxtCallback(MDNSResponder::hMDNSService p_hService,
-                                                 MDNSResponder::MDNSDynamicServiceTxtCallbackFn p_fnCallback,
-                                                 void* p_pUserdata) {
+                                                 MDNSResponder::MDNSDynamicServiceTxtCallbackFunc p_fnCallback) {
 
     bool    bResult = false;
     
     stcMDNSService* pService = _findService(p_hService);
     if (pService) {
         pService->m_fnTxtCallback = p_fnCallback;
-        pService->m_pTxtCallbackUserdata = p_pUserdata;
         
         bResult = true;
     }   

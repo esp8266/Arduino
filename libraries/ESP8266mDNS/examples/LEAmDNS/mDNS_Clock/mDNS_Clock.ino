@@ -65,9 +65,6 @@
 #define STAPSK  "your-password"
 #endif
 
-const char*                   ssid                    = STASSID;
-const char*                   password                = STAPSK;
-
 char*                         pcHostDomain            = 0;        // Negociated host domain
 bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
 MDNSResponder::hMDNSService   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
@@ -135,16 +132,12 @@ bool setStationHostname(const char* p_pcHostname) {
    This can be triggered by calling MDNS.announce().
 
 */
-bool MDNSDynamicServiceTxtCallback(MDNSResponder* p_pMDNSResponder,
-                                   const MDNSResponder::hMDNSService p_hService,
-                                   void* p_pUserdata) {
+bool MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService) {
   Serial.println("MDNSDynamicServiceTxtCallback");
-  (void) p_pUserdata;
 
-  if ((p_pMDNSResponder) &&
-      (hMDNSService == p_hService)) {
+  if (hMDNSService == p_hService) {
     Serial.printf("Updating curtime TXT item to: %s\n", getTimeString());
-    p_pMDNSResponder->addDynamicServiceTxt(p_hService, "curtime", getTimeString());
+    MDNS.addDynamicServiceTxt(p_hService, "curtime", getTimeString());
   }
   return true;
 }
@@ -160,17 +153,10 @@ bool MDNSDynamicServiceTxtCallback(MDNSResponder* p_pMDNSResponder,
    restarted via p_pMDNSResponder->setHostname().
 
 */
-bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
-                             const char* p_pcDomainName,
-                             const MDNSResponder::hMDNSService p_hService,
-                             bool p_bProbeResult,
-                             void* p_pUserdata) {
-  Serial.println("MDNSProbeResultCallback");
-  (void) p_pUserdata;
+bool hostProbeResult (String p_pcDomainName, bool p_bProbeResult) {
 
-  if ((p_pMDNSResponder) &&
-      (0 == p_hService)) {  // Called for host domain
-    Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName, (p_bProbeResult ? "free" : "already USED!"));
+  Serial.println("MDNSProbeResultCallback");
+    Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
     if (true == p_bProbeResult) {
       // Set station hostname
       setStationHostname(pcHostDomain);
@@ -181,24 +167,23 @@ bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
 
         if (!hMDNSService) {
           // Add a 'clock.tcp' service to port 'SERVICE_PORT', using the host domain as instance domain
-          hMDNSService = p_pMDNSResponder->addService(0, "espclk", "tcp", SERVICE_PORT);
+          hMDNSService = MDNS.addService(0, "espclk", "tcp", SERVICE_PORT);
           if (hMDNSService) {
             // Add a simple static MDNS service TXT item
-            p_pMDNSResponder->addServiceTxt(hMDNSService, "port#", SERVICE_PORT);
+            MDNS.addServiceTxt(hMDNSService, "port#", SERVICE_PORT);
             // Set the callback function for dynamic service TXTs
-            p_pMDNSResponder->setDynamicServiceTxtCallback(hMDNSService, MDNSDynamicServiceTxtCallback, 0);
+            MDNS.setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallback);
           }
         }
       }
     } else {
-      // Change hostname, use '-' as divider between base name and index
-      if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-        p_pMDNSResponder->setHostname(pcHostDomain);
-      } else {
-        Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
+        // Change hostname, use '-' as divider between base name and index
+        if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+          MDNS.setHostname(pcHostDomain);
+        } else {
+          Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
+        }
       }
-    }
-  }
   return true;
 }
 
@@ -285,7 +270,7 @@ void setup(void) {
   setClock();
 
   // Setup MDNS responder
-  MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
+  MDNS.setHostProbeResultCallback(hostProbeResult);
   // Init the (currently empty) host domain string with 'esp8266'
   if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
       (!MDNS.begin(pcHostDomain))) {
@@ -316,8 +301,9 @@ void loop(void) {
   MDNS.update();
 
   // Update time (if needed)
+  //static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
   static esp8266::polledTimeout::periodic timeout(UPDATE_CYCLE);
-  if (timeout.expired()) {
+  if (timeout.expired()){
 
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to

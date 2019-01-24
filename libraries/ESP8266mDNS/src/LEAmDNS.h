@@ -109,6 +109,8 @@
 #include "include/UdpContext.h"
 #include <limits>
 #include <PolledTimeout.h>
+#include <map>
+
 
 #include "ESP8266WiFi.h"
 
@@ -275,19 +277,20 @@ public:
      * MDNSDynamicServiceTxtCallbackFn
      * Callback function for dynamic MDNS TXT items
      */
-    typedef bool (*MDNSDynamicServiceTxtCallbackFn)(MDNSResponder* p_pMDNSResponder,
-                                                    const hMDNSService p_hService,
-                                                    void* p_pUserdata);
+// Functional
+//        typedef bool (*MDNSDynamicServiceTxtCallbackFn)(MDNSResponder* p_pMDNSResponder,
+//                                                    const hMDNSService p_hService,
+//                                                    void* p_pUserdata);
+
+        typedef std::function<bool(const hMDNSService p_hService)> MDNSDynamicServiceTxtCallbackFunc;
 
     // Set a global callback for dynamic MDNS TXT items. The callback function is called
     // every time, a TXT item is needed for one of the installed services.
-    bool setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallbackFn p_fnCallback,
-                                      void* p_pUserdata);
+    bool setDynamicServiceTxtCallback(MDNSDynamicServiceTxtCallbackFunc p_fnCallback);
     // Set a service specific callback for dynamic MDNS TXT items. The callback function
     // is called every time, a TXT item is needed for the given service.
     bool setDynamicServiceTxtCallback(const hMDNSService p_hService,
-                                      MDNSDynamicServiceTxtCallbackFn p_fnCallback,
-                                      void* p_pUserdata);
+                                      MDNSDynamicServiceTxtCallbackFunc p_fnCallback);
     
     // Add a (dynamic) MDNS TXT item ('key' = 'value') to the service
     // Dynamic TXT items are removed right after one-time use. So they need to be added
@@ -490,27 +493,51 @@ public:
     	String serviceDomain(){
     		return p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex);
     	};
+    	bool hostDomainAvailable()
+    	{
+          return (p_pMDNSResponder->hasAnswerHostDomain(p_hServiceQuery, p_u32AnswerIndex));
+    	}
     	String hostDomain(){
-    		return (p_pMDNSResponder->hasAnswerHostDomain(p_hServiceQuery, p_u32AnswerIndex)) ?
-    		   p_pMDNSResponder->answerHostDomain(p_hServiceQuery, p_u32AnswerIndex) : 0;
+    		return (hostDomainAvailable()) ?
+    		   p_pMDNSResponder->answerHostDomain(p_hServiceQuery, p_u32AnswerIndex) : String();
     	};
+    	bool hostPortAvailable()
+    	{
+    		return (p_pMDNSResponder->hasAnswerPort(p_hServiceQuery, p_u32AnswerIndex));
+    	}
     	uint16_t hostPort(){
-    		return (p_pMDNSResponder->hasAnswerPort(p_hServiceQuery, p_u32AnswerIndex)) ?
+    		return (hostPortAvailable()) ?
     		  p_pMDNSResponder->answerPort(p_hServiceQuery, p_u32AnswerIndex) : 0;
     	};
+    	bool IPAddressAvailable()
+    	{
+    		return (p_pMDNSResponder->hasAnswerIP4Address(p_hServiceQuery,p_u32AnswerIndex ));
+    	}
     	std::vector<IPAddress> IPAdresses(){
     		std::vector<IPAddress> internalIP;
-    		if (p_pMDNSResponder->hasAnswerIP4Address(p_hServiceQuery,p_u32AnswerIndex )) {
+    		if (IPAddressAvailable()) {
     			for (uint32_t u2 = 0; u2 < p_pMDNSResponder->answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex); ++u2) {
                   internalIP.push_back(p_pMDNSResponder->answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u2));
     			}
     		}
     		return internalIP;
     	};
-    	String txtValue (){
-    		return  (p_pMDNSResponder->hasAnswerTxts(p_hServiceQuery, p_u32AnswerIndex)) ?
-    		  p_pMDNSResponder->answerTxts(p_hServiceQuery, p_u32AnswerIndex) : 0;
+    	bool txtAvailable()
+    	{
+    		return (p_pMDNSResponder->hasAnswerTxts(p_hServiceQuery, p_u32AnswerIndex));
+    	}
+    	String strKeyValue (){
+    		return (txtAvailable()) ?
+    		  p_pMDNSResponder->answerTxts(p_hServiceQuery, p_u32AnswerIndex) : String();
     	};
+    	std::map<String,String> keyValues()
+		{
+    		return std::map<String,String>();
+		}
+    	String value(String key)
+    	{
+    		return String();
+    	}
     };
 protected:
     /**
@@ -866,7 +893,7 @@ protected:
         uint16_t                        m_u16Port;
         uint8_t                         m_u8ReplyMask;
         stcMDNSServiceTxts              m_Txts;
-        MDNSDynamicServiceTxtCallbackFn m_fnTxtCallback;
+        MDNSDynamicServiceTxtCallbackFunc m_fnTxtCallback;
         void*                           m_pTxtCallbackUserdata;
         stcProbeInformation             m_ProbeInformation;
 
@@ -1088,7 +1115,7 @@ protected:
     stcMDNSServiceQuery*            m_pServiceQueries;
     WiFiEventHandler                m_DisconnectedHandler;
     WiFiEventHandler                m_GotIPHandler;
-    MDNSDynamicServiceTxtCallbackFn m_fnServiceTxtCallback;
+    MDNSDynamicServiceTxtCallbackFunc m_fnServiceTxtCallback;
     void*                           m_pServiceTxtCallbackUserdata;
     bool                            m_bPassivModeEnabled;
     stcProbeInformation             m_HostProbeInformation;

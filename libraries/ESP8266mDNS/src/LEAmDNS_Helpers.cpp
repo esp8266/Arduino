@@ -635,12 +635,12 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_addServiceTxt(MDNSResponder::s
 bool MDNSResponder::_collectServiceTxts(MDNSResponder::stcMDNSService& p_rService) {
     
     bool    bResult = (m_fnServiceTxtCallback
-                        ? m_fnServiceTxtCallback(this, (hMDNSService)&p_rService, m_pServiceTxtCallbackUserdata)
+                        ? m_fnServiceTxtCallback((hMDNSService)&p_rService)
                         : true);
     
     if ((bResult) &&
         (p_rService.m_fnTxtCallback)) {
-        bResult = p_rService.m_fnTxtCallback(this, (hMDNSService)&p_rService, p_rService.m_pTxtCallbackUserdata);
+        bResult = p_rService.m_fnTxtCallback((hMDNSService)&p_rService);
     }
     return bResult;
 }
