@@ -90,9 +90,13 @@ Open a Command Prompt and Start GDB
 Open a terminal or ``CMD`` prompt and navigate to the proper ESP8266 toolchain
 directory.
 
+Linux
+
 .. code:: cpp
 
     ~/.arduino15/packages/esp8266/hardware/xtensa-lx106-elf/bin/xtensa-lx106-elf-gdb
+
+Windows
 
 .. code:: cpp
 
