@@ -476,9 +476,10 @@ String ESP8266WiFiSTAClass::hostname(void) {
  * @param aHostname max length:24
  * @return ok
  */
-bool ESP8266WiFiSTAClass::hostname(String aHostname) {
+bool ESP8266WiFiSTAClass::hostname(const char* aHostname) {
   /*
   vvvv RFC952 vvvv
+  ASSUMPTIONS
   1. A "name" (Net, Host, Gateway, or Domain name) is a text string up
    to 24 characters drawn from the alphabet (A-Z), digits (0-9), minus
    sign (-), and period (.).  Note that periods are only allowed when
@@ -496,38 +497,34 @@ bool ESP8266WiFiSTAClass::hostname(String aHostname) {
   ^^^^ RFC952 ^^^^
 
   - 24 chars max
-  - only a..z A..Z 0..9 -]
+  - only a..z A..Z 0..9 '-'
   - no '-' as last char
   */
 
-    if (aHostname.length() == 0) {
-        DEBUGV("WiFi.(set)hostname(): empty name\n");
+    size_t len = strlen(aHostname);
+
+    if (len == 0 || len > 32) {
+        // nonos-sdk limit is 32
+        // (dhcp hostname option minimum size is ~60)
+        DEBUG_WIFI_GENERIC("WiFi.(set)hostname(): empty or large(>32) name\n");
         return false;
     }
 
-    // rework hostname to be RFC compliant
-
-    if (aHostname.length() > 24) {
-        // nonos-sdk allows 32, but
-        // dhcp server may require RFC compliance
-        aHostname.remove(24);
-    }
-    for (size_t i = 0; i < aHostname.length(); i++)
-        // replace unallowed chars by dashes
+    // check RFC compliance
+    bool compliant = (len <= 24);
+    for (size_t i = 0; compliant && i < len; i++)
         if (!isalnum(aHostname[i]) && aHostname[i] != '-')
-            aHostname[i] = '-';
-    if (aHostname[aHostname.length() - 1] == '-') {
-        // check for ending dash
-        aHostname[aHostname.length() - 1] = 'x';
+            compliant = false;
+    if (aHostname[len - 1] == '-')
+        compliant = false;
+
+    if (!compliant) {
+        DEBUG_WIFI_GENERIC("hostname '%s' is not compliant with RFC952\n", aHostname);
     }
 
-    bool ret = wifi_station_set_hostname(aHostname.c_str());
-
+    bool ret = wifi_station_set_hostname(aHostname);
     if (!ret) {
-#ifdef DEBUG_ESP_CORE
-        static const char fmt[] PROGMEM = "WiFi.hostname(%s): wifi_station_set_hostname() failed\n";
-        DEBUGV(fmt, aHostname.c_str());
-#endif
+        DEBUG_WIFI_GENERIC("WiFi.hostname(%s): wifi_station_set_hostname() failed\n", aHostname);
         return false;
     }
 
@@ -543,16 +540,14 @@ bool ESP8266WiFiSTAClass::hostname(String aHostname) {
             // renew already started DHCP leases
             err_t lwipret = dhcp_renew(intf);
             if (lwipret != ERR_OK) {
-#ifdef DEBUG_ESP_CORE
-                static const char fmt[] PROGMEM = "WiFi.hostname(%s): lwIP error %d on interface %c%c (index %d)\n";
-                DEBUGV(fmt, intf->hostname, (int)lwipret, intf->name[0], intf->name[1], intf->num);
-#endif
+                DEBUG_WIFI_GENERIC("WiFi.hostname(%s): lwIP error %d on interface %c%c (index %d)\n",
+                                   intf->hostname, (int)lwipret, intf->name[0], intf->name[1], intf->num);
                 ret = false;
             }
         }
     }
 
-    return ret;
+    return ret && compliant;
 }
 
 /**
