@@ -65,6 +65,9 @@
 #define STAPSK  "your-password"
 #endif
 
+const char*                   ssid                    = STASSID;
+const char*                   password                = STAPSK;
+
 char*                         pcHostDomain            = 0;        // Negociated host domain
 bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
 MDNSResponder::hMDNSService   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
