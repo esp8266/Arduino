@@ -127,7 +127,7 @@ struct SSDPTimer {
 
 SSDPClass::SSDPClass() :
   _server(0),
-  _timer(new SSDPTimer),
+  _timer(0),
   _port(80),
   _ttl(SSDP_MULTICAST_TTL),
   _respondToPort(0),
@@ -150,27 +150,26 @@ SSDPClass::SSDPClass() :
 }
 
 SSDPClass::~SSDPClass() {
-  delete _timer;
+  end();
 }
 
 bool SSDPClass::begin() {
+  end();
+
   _pending = false;
   if (strcmp(_uuid,"") == 0) {
 	uint32_t chipId = ESP.getChipId();
 	sprintf(_uuid, "38323636-4558-4dda-9188-cda0e6%02x%02x%02x",
     (uint16_t) ((chipId >> 16) & 0xff),
 	(uint16_t) ((chipId >>  8) & 0xff),
-	(uint16_t)   chipId        & 0xff  );
+	(uint16_t)   chipId        & 0xff);
   }
   
 #ifdef DEBUG_SSDP
   DEBUG_SSDP.printf("SSDP UUID: %s\n", (char *)_uuid);
 #endif
 
-  if (_server) {
-    _server->unref();
-    _server = 0;
-  }
+  assert(NULL == _server);
 
   _server = new UdpContext;
   _server->ref();
@@ -199,6 +198,34 @@ bool SSDPClass::begin() {
   return true;
 }
 
+void SSDPClass::end() {
+  if(!_server)
+    return; // object is zeroed already, nothing to do
+
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf_P(PSTR("SSDP end ... "));
+#endif
+  // undo all initializations done in begin(), in reverse order
+  _stopTimer();
+
+  _server->disconnect();
+
+  IPAddress local = WiFi.localIP();
+  IPAddress mcast(SSDP_MULTICAST_ADDR);
+
+  if (igmp_leavegroup(local, mcast) != ERR_OK ) {
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf_P(PSTR("SSDP failed to leave igmp group\n"));
+#endif
+  }
+
+  _server->unref();
+  _server = 0;
+
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf_P(PSTR("ok\n"));
+#endif
+}
 void SSDPClass::_send(ssdp_method_t method) {
   char buffer[1460];
   IPAddress ip = WiFi.localIP();
@@ -461,11 +488,23 @@ void SSDPClass::_onTimerStatic(SSDPClass* self) {
 }
 
 void SSDPClass::_startTimer() {
+  _stopTimer();
+  _timer = new SSDPTimer();
   ETSTimer* tm = &(_timer->timer);
   const int interval = 1000;
   os_timer_disarm(tm);
   os_timer_setfn(tm, reinterpret_cast<ETSTimerFunc*>(&SSDPClass::_onTimerStatic), reinterpret_cast<void*>(this));
   os_timer_arm(tm, interval, 1 /* repeat */);
+}
+
+void SSDPClass::_stopTimer() {
+  if(!_timer)
+    return;
+
+  ETSTimer* tm = &(_timer->timer);
+  os_timer_disarm(tm);
+  delete _timer;
+  _timer = NULL;
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SSDP)

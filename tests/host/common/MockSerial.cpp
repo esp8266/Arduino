@@ -30,6 +30,7 @@
 */
 
 #include <Arduino.h>
+#include <PolledTimeout.h>
 
 #include <unistd.h> // write
 
@@ -39,6 +40,7 @@ HardwareSerial::HardwareSerial (int uart_nr)
 {
 	if (uart_nr != 0)
 		fprintf(stderr, MOCK "FIXME HardwareSerial::HardwareSerial(%d)\n", uart_nr);
+	_uart = (decltype(_uart))1; // not used, for 'while (!Serial);' to pass
 }
 
 void HardwareSerial::begin (unsigned long baud, SerialConfig config, SerialMode mode, uint8_t tx_pin)
@@ -62,6 +64,22 @@ void HardwareSerial::flush ()
 {
 	//XXXTODO
 	fflush(stdout);
+}
+
+size_t HardwareSerial::readBytes(char* buffer, size_t size)
+{
+    size_t got = 0;
+
+    while (got < size)
+    {
+        esp8266::polledTimeout::oneShot timeOut(_timeout);
+        size_t avail;
+        while ((avail = available()) == 0 && !timeOut);
+        if (avail == 0)
+            break;
+        got += read(buffer + got, std::min(size - got, avail));
+    }
+    return got;
 }
 
 // uart.c

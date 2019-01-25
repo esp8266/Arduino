@@ -189,13 +189,13 @@ bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
             p_pMDNSResponder->setDynamicServiceTxtCallback(hMDNSService, MDNSDynamicServiceTxtCallback, 0);
           }
         }
+      }
+    } else {
+      // Change hostname, use '-' as divider between base name and index
+      if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+        p_pMDNSResponder->setHostname(pcHostDomain);
       } else {
-        // Change hostname, use '-' as divider between base name and index
-        if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-          p_pMDNSResponder->setHostname(pcHostDomain);
-        } else {
-          Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-        }
+        Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
       }
     }
   }
@@ -241,8 +241,8 @@ void handleHTTPClient(WiFiClient& client) {
   if (req == "/") {
     IPAddress ip = WiFi.localIP();
     String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-    s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ESP8266 at ";
-    s += ipStr;
+    s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ";
+    s += WiFi.hostname() + " at " + ipStr;
     // Simple addition of the current time
     s += "\r\nCurrent time is: ";
     s += getTimeString();
@@ -316,17 +316,14 @@ void loop(void) {
   MDNS.update();
 
   // Update time (if needed)
-  //static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
-  static clsMDNSTimeFlag timeFlag(UPDATE_CYCLE);
-  if (timeFlag.flagged()/*ulNextTimeUpdate < millis()*/) {
+  static esp8266::polledTimeout::periodic timeout(UPDATE_CYCLE);
+  if (timeout.expired()) {
 
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
       MDNS.announce();
     }
-    //ulNextTimeUpdate = (millis() + UPDATE_CYCLE);   // Set update 'timer'
-    timeFlag.restart();
   }
 }
 
