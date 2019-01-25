@@ -79,10 +79,10 @@ bool MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSen
     if (p_rSendParameter.m_bResponse) {
         if (p_rSendParameter.m_bUnicast) {  // Unicast response  -> Send to querier
             DEBUG_EX_ERR(if (!m_pUDPContext->getRemoteAddress()) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage: MISSING remote address for response!\n")); });
-            ip_addr_t   ipRemote;
-            ipRemote.addr = m_pUDPContext->getRemoteAddress();
+            IPAddress   ipRemote;
+            ipRemote = m_pUDPContext->getRemoteAddress();
             bResult = ((_prepareMDNSMessage(p_rSendParameter, _getResponseMulticastInterface(SOFTAP_MODE | STATION_MODE))) &&
-                       (m_pUDPContext->send(&ipRemote, m_pUDPContext->getRemotePort())));
+                       (m_pUDPContext->send(ipRemote, m_pUDPContext->getRemotePort())));
         }
         else {                              // Multicast response -> Send via the same network interface, that received the query
             bResult = _sendMDNSMessage_Multicast(p_rSendParameter, (SOFTAP_MODE | STATION_MODE));
@@ -116,26 +116,20 @@ bool MDNSResponder::_sendMDNSMessage_Multicast(MDNSResponder::stcMDNSSendParamet
                                                int p_iWiFiOpMode) {
     bool    bResult = false;
 
-    ip_addr_t   ifFromAddress;
-    ifFromAddress.addr = _getResponseMulticastInterface(p_iWiFiOpMode);
-    IPAddress   fromIPAddress(ifFromAddress.addr);
-#if LWIP_VERSION_MAJOR == 1
-    m_pUDPContext->setMulticastInterface(ifFromAddress);
-#else
-    m_pUDPContext->setMulticastInterface(&ifFromAddress);
-#endif
+    IPAddress   fromIPAddress;
+    fromIPAddress = _getResponseMulticastInterface(p_iWiFiOpMode);
+    m_pUDPContext->setMulticastInterface(fromIPAddress);
 
-    ip_addr_t   toMulticastAddress;
 #ifdef MDNS_IP4_SUPPORT
-    toMulticastAddress.addr = DNS_MQUERY_IPV4_GROUP_INIT;
+    IPAddress   toMulticastAddress(DNS_MQUERY_IPV4_GROUP_INIT);
 #endif
 #ifdef MDNS_IP6_SUPPORT
     //TODO: set multicast address
-    toMulticastAddress.addr = DNS_MQUERY_IPV6_GROUP_INIT;
+    IPAddress   toMulticastAddress(DNS_MQUERY_IPV6_GROUP_INIT);
 #endif
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage_Multicast: Will send to '%s'.\n"), IPAddress(toMulticastAddress.addr).toString().c_str()););
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage_Multicast: Will send to '%s'.\n"), toMulticastAddress.toString().c_str()););
     bResult = ((_prepareMDNSMessage(p_rSendParameter, fromIPAddress)) &&
-               (m_pUDPContext->send(&toMulticastAddress, DNS_MQUERY_PORT)));
+               (m_pUDPContext->send(toMulticastAddress, DNS_MQUERY_PORT)));
 
     DEBUG_EX_ERR(if (!bResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _sendMDNSMessage_Multicast: FAILED!\n")); });
     return bResult;
@@ -349,7 +343,8 @@ bool MDNSResponder::_sendMDNSServiceQuery(const MDNSResponder::stcMDNSServiceQue
  *
  */
 bool MDNSResponder::_sendMDNSQuery(const MDNSResponder::stcMDNS_RRDomain& p_QueryDomain,
-                                   uint16_t p_u16QueryType) {
+                                   uint16_t p_u16QueryType,
+                                   stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers /*= 0*/) {
 
     bool                    bResult = false;
     
@@ -357,9 +352,12 @@ bool MDNSResponder::_sendMDNSQuery(const MDNSResponder::stcMDNS_RRDomain& p_Quer
     if (0 != ((sendParameter.m_pQuestions = new stcMDNS_RRQuestion))) {
         sendParameter.m_pQuestions->m_Header.m_Domain = p_QueryDomain;
 
-        sendParameter.m_pQuestions->m_bUnicast = true;
         sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Type = p_u16QueryType;
-        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (0x8000 | DNS_RRCLASS_IN);   // Unicast & INternet
+        // It seems, that some mDNS implementations don't support 'unicast response' questions...
+        sendParameter.m_pQuestions->m_Header.m_Attributes.m_u16Class = (/*0x8000 |*/ DNS_RRCLASS_IN);   // /*Unicast &*/ INternet
+
+        // TODO: Add knwon answer to the query
+        (void)p_pKnownAnswers;
 
         bResult = _sendMDNSMessage(sendParameter);
     }   // else: FAILED to alloc question
@@ -385,13 +383,13 @@ IPAddress MDNSResponder::_getResponseMulticastInterface(int p_iWiFiOpModes) cons
         (wifi_get_opmode() & SOFTAP_MODE)) {
         //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface: SOFTAP_MODE\n")););
         // Get remote IP address
-        ip_info IPInfo_Remote;
-        IPInfo_Remote.ip.addr = m_pUDPContext->getRemoteAddress();
+        IPAddress IP_Remote;
+        IP_Remote = m_pUDPContext->getRemoteAddress();
         // Get local (AP) IP address
         wifi_get_ip_info(SOFTAP_IF, &IPInfo_Local);
         
         if ((IPInfo_Local.ip.addr) &&                                                       // Has local AP IP address AND
-            (ip_addr_netcmp(&IPInfo_Remote.ip, &IPInfo_Local.ip, &IPInfo_Local.netmask))) { // Remote address is in the same subnet as the AP
+            (ip4_addr_netcmp(ip_2_ip4((const ip_addr_t*)IP_Remote), &IPInfo_Local.ip, &IPInfo_Local.netmask))) { // Remote address is in the same subnet as the AP
             bFoundMatch = true;
         }
     }
@@ -402,8 +400,8 @@ IPAddress MDNSResponder::_getResponseMulticastInterface(int p_iWiFiOpModes) cons
         // Get local (STATION) IP address
         wifi_get_ip_info(STATION_IF, &IPInfo_Local);
     }
-    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface(%i): %s\n"), p_iWiFiOpModes, IPAddress(IPInfo_Local.ip.addr).toString().c_str()););
-    return IPAddress(IPInfo_Local.ip.addr);
+    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _getResponseMulticastInterface(%i): %s\n"), p_iWiFiOpModes, IPAddress(IPInfo_Local.ip).toString().c_str()););
+    return IPAddress(IPInfo_Local.ip);
 }
 
 
@@ -453,7 +451,7 @@ bool MDNSResponder::_readRRQuestion(MDNSResponder::stcMDNS_RRQuestion& p_rRRQues
  *
  */
 bool MDNSResponder::_readRRAnswer(MDNSResponder::stcMDNS_RRAnswer*& p_rpRRAnswer) {
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer\n")););
+    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer\n")););
     
     bool    bResult = false;
     
@@ -464,11 +462,11 @@ bool MDNSResponder::_readRRAnswer(MDNSResponder::stcMDNS_RRAnswer*& p_rpRRAnswer
         (_udpRead32(u32TTL)) &&
         (_udpRead16(u16RDLength))) {
 
-        DEBUG_EX_INFO(
+        /*DEBUG_EX_INFO(
                 DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer: Reading 0x%04X answer (class:0x%04X, TTL:%u, RDLength:%u) for "), header.m_Attributes.m_u16Type, header.m_Attributes.m_u16Class, u32TTL, u16RDLength);
                 _printRRDomain(header.m_Domain);
                 DEBUG_OUTPUT.printf_P(PSTR("\n"));
-                );
+                );*/
         
         switch (header.m_Attributes.m_u16Type & (~0x8000)) {    // Topmost bit might carry 'cache flush' flag
 #ifdef MDNS_IP4_SUPPORT
@@ -1005,7 +1003,7 @@ bool MDNSResponder::_udpRead16(uint16_t& p_ru16Value) {
     bool    bResult = false;
 
     if (_udpReadBuffer((unsigned char*)&p_ru16Value, sizeof(p_ru16Value))) {
-        p_ru16Value = ntohs(p_ru16Value);
+        p_ru16Value = lwip_ntohs(p_ru16Value);
         bResult = true;
     }
     return bResult;
@@ -1019,7 +1017,7 @@ bool MDNSResponder::_udpRead32(uint32_t& p_ru32Value) {
     bool    bResult = false;
 
     if (_udpReadBuffer((unsigned char*)&p_ru32Value, sizeof(p_ru32Value))) {
-        p_ru32Value = ntohl(p_ru32Value);
+        p_ru32Value = lwip_ntohl(p_ru32Value);
         bResult = true;
     }
     return bResult;
@@ -1052,7 +1050,7 @@ bool MDNSResponder::_udpAppend8(uint8_t p_u8Value) {
  */
 bool MDNSResponder::_udpAppend16(uint16_t p_u16Value) {
     
-    p_u16Value = htons(p_u16Value);
+    p_u16Value = lwip_htons(p_u16Value);
     return (_udpAppendBuffer((unsigned char*)&p_u16Value, sizeof(p_u16Value)));
 }
 
@@ -1061,7 +1059,7 @@ bool MDNSResponder::_udpAppend16(uint16_t p_u16Value) {
  */
 bool MDNSResponder::_udpAppend32(uint32_t p_u32Value) {
     
-    p_u32Value = htonl(p_u32Value);
+    p_u32Value = lwip_htonl(p_u32Value);
     return (_udpAppendBuffer((unsigned char*)&p_u32Value, sizeof(p_u32Value)));
 }
 
@@ -1441,8 +1439,7 @@ bool MDNSResponder::_writeMDNSAnswer_PTR_TYPE(MDNSResponder::stcMDNSService& p_r
     
     stcMDNS_RRDomain        dnssdDomain;
     stcMDNS_RRDomain        serviceDomain;
-    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR,
-                                       ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));   // Cache flush? & INternet
+    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR, DNS_RRCLASS_IN);	// No cache flush! only INternet
     bool    bResult = ((_buildDomainForDNSSD(dnssdDomain)) &&                                   // _services._dns-sd._udp.local
                        (_writeMDNSRRDomain(dnssdDomain, p_rSendParameter)) &&
                        (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&                // TYPE & CLASS
@@ -1467,8 +1464,7 @@ bool MDNSResponder::_writeMDNSAnswer_PTR_NAME(MDNSResponder::stcMDNSService& p_r
                                               MDNSResponder::stcMDNSSendParameter& p_rSendParameter) {
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _writeMDNSAnswer_PTR_NAME\n")););
 
-    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR,
-                                       ((p_rSendParameter.m_bCacheFlush ? 0x8000 : 0) | DNS_RRCLASS_IN));   // Cache flush? & INternet
+    stcMDNS_RRAttributes    attributes(DNS_RRTYPE_PTR, DNS_RRCLASS_IN);	// No cache flush! only INternet
     bool    bResult = ((_writeMDNSServiceDomain(p_rService, false, false, p_rSendParameter)) && // _http._tcp.local
                        (_writeMDNSRRAttributes(attributes, p_rSendParameter)) &&                    // TYPE & CLASS
                        (_write32((p_rSendParameter.m_bUnannounce ? 0 : MDNS_SERVICE_TTL), p_rSendParameter)) && // TTL

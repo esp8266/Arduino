@@ -65,7 +65,7 @@
  *  Reference:
  *  Used mDNS messages:
  *  A (0x01):               eg. esp8266.local A OP TTL 123.456.789.012
- *  AAAA (01Cx):            eg. esp8266.local AAAA OP TTL 1234:5678::90
+ *  AAAA (0x1C):            eg. esp8266.local AAAA OP TTL 1234:5678::90
  *  PTR (0x0C, srv name):   eg. _http._tcp.local PTR OP TTL MyESP._http._tcp.local
  *  PTR (0x0C, srv type):   eg. _services._dns-sd._udp.local PTR OP TTL _http._tcp.local
  *  PTR (0x0C, IP4):        eg. 012.789.456.123.in-addr.arpa PTR OP TTL esp8266.local
@@ -107,7 +107,8 @@
 #include "lwip/udp.h"
 #include "debug.h"
 #include "include/UdpContext.h"
-#include "LEATimeFlag.h"
+#include <limits>
+#include <PolledTimeout.h>
 
 #include "ESP8266WiFi.h"
 
@@ -173,10 +174,16 @@ public:
     // Later call MDNS::update() in every 'loop' to run the process loop
     // (probing, announcing, responding, ...)
     bool begin(const char* p_pcHostname);
+    bool begin(const String& p_strHostname) {return begin(p_strHostname.c_str());}
         // for compatibility
         bool begin(const char* p_pcHostname,
                    IPAddress p_IPAddress,       // ignored
                    uint32_t p_u32TTL = 120);    // ignored
+        bool begin(const String& p_strHostname,
+                   IPAddress p_IPAddress,       // ignored
+                   uint32_t p_u32TTL = 120) {   // ignored
+            return begin(p_strHostname.c_str(), p_IPAddress, p_u32TTL);
+        }
     // Finish MDNS processing
     bool close(void);
 
@@ -780,8 +787,9 @@ protected:
      */
     struct stcProbeInformation {
         enuProbingStatus                m_ProbingStatus;
-        uint8_t                         m_u8ProbesSent;
-        clsMDNSTimeFlag                  m_NextProbeTimeFlag;
+        uint8_t                         m_u8SentCount;  // Used for probes and announcements
+        esp8266::polledTimeout::oneShot m_Timeout;      // Used for probes and announcements
+        //clsMDNSTimeFlag                 m_TimeFlag;     // Used for probes and announcements
         bool                            m_bConflict;
         bool                            m_bTiebreakNeeded;
         MDNSProbeResultCallbackFn       m_fnProbeResultCallback;
@@ -836,14 +844,32 @@ protected:
              * stcTTL
              */
             struct stcTTL {
-                clsMDNSTimeFlag  m_TTLTimeFlag;
-                bool            m_bUpdateScheduled;
+                /**
+                 * timeoutLevel_t
+                 */
+                typedef uint8_t timeoutLevel_t;
+                /**
+                 * TIMEOUTLEVELs
+                 */
+                const timeoutLevel_t    TIMEOUTLEVEL_UNSET      = 0;
+                const timeoutLevel_t    TIMEOUTLEVEL_BASE       = 80;
+                const timeoutLevel_t    TIMEOUTLEVEL_INTERVAL   = 5;
+                const timeoutLevel_t    TIMEOUTLEVEL_FINAL      = 100;
 
-                stcTTL(uint32_t p_u32TTL = 0);
+                uint32_t                        m_u32TTL;
+                esp8266::polledTimeout::oneShot m_TTLTimeout;
+                timeoutLevel_t                  m_timeoutLevel;
+
+                stcTTL(void);
                 bool set(uint32_t p_u32TTL);
 
-                bool has80Percent(void) const;
-                bool isOutdated(void) const;
+                bool flagged(void) const;
+                bool restart(void);
+
+                bool prepareDeletion(void);
+                bool finalTimeoutLevel(void) const;
+
+                unsigned long timeout(void) const;
             };
 #ifdef MDNS_IP4_SUPPORT
             /**
@@ -855,7 +881,7 @@ protected:
                 stcTTL          m_TTL;
                 
                 stcIP4Address(IPAddress p_IPAddress,
-                               uint32_t p_u32TTL = 0);
+                              uint32_t p_u32TTL = 0);
             };
 #endif
 #ifdef MDNS_IP6_SUPPORT
@@ -866,6 +892,9 @@ protected:
                 stcIP6Address*  m_pNext;
                 IP6Address      m_IPAddress;
                 stcTTL          m_TTL;
+
+                stcIP6Address(IPAddress p_IPAddress,
+                              uint32_t p_u32TTL = 0);
             };
 #endif
 
@@ -926,13 +955,15 @@ protected:
 #endif
         };
 
-        stcMDNSServiceQuery*        m_pNext;
-        stcMDNS_RRDomain            m_ServiceTypeDomain;    // eg. _http._tcp.local
-        MDNSServiceQueryCallbackFn  m_fnCallback;
-        void*                       m_pUserdata;
-        bool                        m_bLegacyQuery;
-        bool                        m_bAwaitingAnswers;
-        stcAnswer*                  m_pAnswers;
+        stcMDNSServiceQuery*            m_pNext;
+        stcMDNS_RRDomain                m_ServiceTypeDomain;    // eg. _http._tcp.local
+        MDNSServiceQueryCallbackFn      m_fnCallback;
+        void*                           m_pUserdata;
+        bool                            m_bLegacyQuery;
+        uint8_t                         m_u8SentCount;
+        esp8266::polledTimeout::oneShot m_ResendTimeout;
+        bool                            m_bAwaitingAnswers;
+        stcAnswer*                      m_pAnswers;
 
         stcMDNSServiceQuery(void);
         ~stcMDNSServiceQuery(void);
@@ -1006,6 +1037,7 @@ protected:
     WiFiEventHandler                m_GotIPHandler;
     MDNSDynamicServiceTxtCallbackFn m_fnServiceTxtCallback;
     void*                           m_pServiceTxtCallbackUserdata;
+    bool                            m_bPassivModeEnabled;
     stcProbeInformation             m_HostProbeInformation;
 
     /** CONTROL **/
@@ -1041,7 +1073,8 @@ protected:
     bool _cancelProbingForService(stcMDNSService& p_rService);
     
     /* ANNOUNCE */
-    bool _announce(bool p_bAnnounce = true);
+    bool _announce(bool p_bAnnounce,
+                   bool p_bIncludeServices);
     bool _announceService(stcMDNSService& p_rService,
                           bool p_bAnnounce = true);
     
@@ -1058,7 +1091,8 @@ protected:
                              IPAddress p_IPAddress);
     bool _sendMDNSServiceQuery(const stcMDNSServiceQuery& p_ServiceQuery);
     bool _sendMDNSQuery(const stcMDNS_RRDomain& p_QueryDomain,
-                        uint16_t p_u16QueryType);
+                        uint16_t p_u16QueryType,
+                        stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers = 0);
                         
     IPAddress _getResponseMulticastInterface(int p_iWiFiOpModes) const;
 

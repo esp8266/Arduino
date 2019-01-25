@@ -36,6 +36,8 @@
 #include <sys/socket.h>
 #include <poll.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #define int2pcb(x) ((tcp_pcb*)(intptr_t)(x))
 #define pcb2int(x) ((int)(intptr_t)(x))
@@ -50,10 +52,10 @@ int serverAccept (int srvsock)
 	n = sizeof(client);
 	if ((clisock = accept(srvsock, (struct sockaddr*)&client, &n)) == -1)
 	{
-		perror("accept()");
+		perror(MOCK "accept()");
 		exit(EXIT_FAILURE);
 	}
-	return clisock;
+	return mockSockSetup(clisock);
 }
 
 void WiFiServer::begin (uint16_t port)

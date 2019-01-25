@@ -1,7 +1,7 @@
 /* Flash Split for 4M chips */
 /* sketch @0x40200000 (~1019KB) (1044464B) */
-/* empty  @0x402FEFF0 (~3076KB) (3149840B) */
-/* spiffs @0x40600000 (~-20KB) (-20480B) */
+/* empty  @0x402FEFF0 (~3056KB) (3129360B) */
+/* spiffs @0x405FB000 (~0KB) (0B) */
 /* eeprom @0x405FB000 (4KB) */
 /* rfcal  @0x405FC000 (4KB) */
 /* wifi   @0x405FD000 (12KB) */
@@ -14,7 +14,7 @@ MEMORY
   irom0_0_seg :                         org = 0x40201010, len = 0xfeff0
 }
 
-PROVIDE ( _SPIFFS_start = 0x40600000 );
+PROVIDE ( _SPIFFS_start = 0x405FB000 );
 PROVIDE ( _SPIFFS_end = 0x405FB000 );
 PROVIDE ( _SPIFFS_page = 0x0 );
 PROVIDE ( _SPIFFS_block = 0x0 );

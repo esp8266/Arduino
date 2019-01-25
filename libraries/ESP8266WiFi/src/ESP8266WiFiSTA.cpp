@@ -37,6 +37,7 @@
 extern "C" {
 #include "lwip/err.h"
 #include "lwip/dns.h"
+#include "lwip/dhcp.h"
 #include "lwip/init.h" // LWIP_VERSION_
 #if LWIP_IPV6
 #include "lwip/netif.h" // struct netif
@@ -113,21 +114,22 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         return WL_CONNECT_FAILED;
     }
 
-    if(passphrase && strlen(passphrase) > 64) {
+    int passphraseLen = passphrase == nullptr ? 0 : strlen(passphrase);
+    if(passphraseLen > 64) {
         // fail passphrase too long!
         return WL_CONNECT_FAILED;
     }
 
     struct station_config conf;
+    conf.threshold.authmode = (passphraseLen == 0) ? AUTH_OPEN : (_useInsecureWEP ? AUTH_WEP : AUTH_WPA_PSK);
+
     if(strlen(ssid) == 32)
         memcpy(reinterpret_cast<char*>(conf.ssid), ssid, 32); //copied in without null term
     else
         strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
 
-    conf.threshold.authmode = AUTH_OPEN;
     if(passphrase) {
-        conf.threshold.authmode = _useInsecureWEP ? AUTH_WEP : AUTH_WPA_PSK;
-        if (strlen(passphrase) == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
+        if (passphraseLen == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
             memcpy(reinterpret_cast<char*>(conf.password), passphrase, 64);
         else
             strcpy(reinterpret_cast<char*>(conf.password), passphrase);
@@ -187,6 +189,10 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
 
 wl_status_t ESP8266WiFiSTAClass::begin(char* ssid, char *passphrase, int32_t channel, const uint8_t* bssid, bool connect) {
     return begin((const char*) ssid, (const char*) passphrase, channel, bssid, connect);
+}
+
+wl_status_t ESP8266WiFiSTAClass::begin(const String& ssid, const String& passphrase, int32_t channel, const uint8_t* bssid, bool connect) {
+    return begin(ssid.c_str(), passphrase.c_str(), channel, bssid, connect);
 }
 
 /**
@@ -462,38 +468,86 @@ IPAddress ESP8266WiFiSTAClass::dnsIP(uint8_t dns_no) {
  * @return hostname
  */
 String ESP8266WiFiSTAClass::hostname(void) {
-    return String(wifi_station_get_hostname());
-}
-
-
-/**
- * Set ESP8266 station DHCP hostname
- * @param aHostname max length:32
- * @return ok
- */
-bool ESP8266WiFiSTAClass::hostname(char* aHostname) {
-    if(strlen(aHostname) > 32) {
-        return false;
-    }
-    return wifi_station_set_hostname(aHostname);
+    return wifi_station_get_hostname();
 }
 
 /**
  * Set ESP8266 station DHCP hostname
- * @param aHostname max length:32
+ * @param aHostname max length:24
  * @return ok
  */
 bool ESP8266WiFiSTAClass::hostname(const char* aHostname) {
-    return hostname((char*) aHostname);
-}
+  /*
+  vvvv RFC952 vvvv
+  ASSUMPTIONS
+  1. A "name" (Net, Host, Gateway, or Domain name) is a text string up
+   to 24 characters drawn from the alphabet (A-Z), digits (0-9), minus
+   sign (-), and period (.).  Note that periods are only allowed when
+   they serve to delimit components of "domain style names". (See
+   RFC-921, "Domain Name System Implementation Schedule", for
+   background).  No blank or space characters are permitted as part of a
+   name. No distinction is made between upper and lower case.  The first
+   character must be an alpha character.  The last character must not be
+   a minus sign or period.  A host which serves as a GATEWAY should have
+   "-GATEWAY" or "-GW" as part of its name.  Hosts which do not serve as
+   Internet gateways should not use "-GATEWAY" and "-GW" as part of
+   their names. A host which is a TAC should have "-TAC" as the last
+   part of its host name, if it is a DoD host.  Single character names
+   or nicknames are not allowed.
+  ^^^^ RFC952 ^^^^
 
-/**
- * Set ESP8266 station DHCP hostname
- * @param aHostname max length:32
- * @return ok
- */
-bool ESP8266WiFiSTAClass::hostname(const String& aHostname) {
-    return hostname((char*) aHostname.c_str());
+  - 24 chars max
+  - only a..z A..Z 0..9 '-'
+  - no '-' as last char
+  */
+
+    size_t len = strlen(aHostname);
+
+    if (len == 0 || len > 32) {
+        // nonos-sdk limit is 32
+        // (dhcp hostname option minimum size is ~60)
+        DEBUG_WIFI_GENERIC("WiFi.(set)hostname(): empty or large(>32) name\n");
+        return false;
+    }
+
+    // check RFC compliance
+    bool compliant = (len <= 24);
+    for (size_t i = 0; compliant && i < len; i++)
+        if (!isalnum(aHostname[i]) && aHostname[i] != '-')
+            compliant = false;
+    if (aHostname[len - 1] == '-')
+        compliant = false;
+
+    if (!compliant) {
+        DEBUG_WIFI_GENERIC("hostname '%s' is not compliant with RFC952\n", aHostname);
+    }
+
+    bool ret = wifi_station_set_hostname(aHostname);
+    if (!ret) {
+        DEBUG_WIFI_GENERIC("WiFi.hostname(%s): wifi_station_set_hostname() failed\n", aHostname);
+        return false;
+    }
+
+    // now we should inform dhcp server for this change, using lwip_renew()
+    // looping through all existing interface
+    // harmless for AP, also compatible with ethernet adapters (to come)
+    for (netif* intf = netif_list; intf; intf = intf->next) {
+
+        // unconditionally update all known interfaces
+        intf->hostname = wifi_station_get_hostname();
+
+        if (netif_dhcp_data(intf) != nullptr) {
+            // renew already started DHCP leases
+            err_t lwipret = dhcp_renew(intf);
+            if (lwipret != ERR_OK) {
+                DEBUG_WIFI_GENERIC("WiFi.hostname(%s): lwIP error %d on interface %c%c (index %d)\n",
+                                   intf->hostname, (int)lwipret, intf->name[0], intf->name[1], intf->num);
+                ret = false;
+            }
+        }
+    }
+
+    return ret && compliant;
 }
 
 /**

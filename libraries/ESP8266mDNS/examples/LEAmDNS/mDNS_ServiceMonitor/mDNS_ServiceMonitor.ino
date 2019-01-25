@@ -32,6 +32,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
+#include <ESP8266WebServer.h>
 
 /*
    Include the MDNSResponder (the library needs to be included also)
@@ -69,8 +70,8 @@ MDNSResponder::hMDNSServiceQuery               hMDNSServiceQuery       = 0;     
 const String                                   cstrNoHTTPServices      = "Currently no 'http.tcp' services in the local network!<br/>";
 String                                         strHTTPServices         = cstrNoHTTPServices;
 
-// TCP server at port 'SERVICE_PORT' will respond to HTTP requests
-WiFiServer                                     server(SERVICE_PORT);
+// HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
+ESP8266WebServer                                     server(SERVICE_PORT);
 
 
 /*
@@ -145,21 +146,19 @@ bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                  
       strHTTPServices = "";
       for (uint32_t u = 0; u < u32Answers; ++u) {
         // Index and service domain
-        strHTTPServices += u;
-        strHTTPServices += ": ";
+        strHTTPServices += "<li>";
         strHTTPServices += p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, u);
         // Host domain and port
         if ((p_pMDNSResponder->hasAnswerHostDomain(p_hServiceQuery, u)) &&
             (p_pMDNSResponder->hasAnswerPort(p_hServiceQuery, u))) {
-
-          strHTTPServices += " at ";
+          strHTTPServices += "<br/>Hostname: ";
           strHTTPServices += p_pMDNSResponder->answerHostDomain(p_hServiceQuery, u);
           strHTTPServices += ":";
           strHTTPServices += p_pMDNSResponder->answerPort(p_hServiceQuery, u);
         }
         // IP4 address
         if (p_pMDNSResponder->hasAnswerIP4Address(p_hServiceQuery, u)) {
-          strHTTPServices += " IP4: ";
+          strHTTPServices += "<br/>IP4: ";
           for (uint32_t u2 = 0; u2 < p_pMDNSResponder->answerIP4AddressCount(p_hServiceQuery, u); ++u2) {
             if (0 != u2) {
               strHTTPServices += ", ";
@@ -169,10 +168,10 @@ bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                  
         }
         // MDNS TXT items
         if (p_pMDNSResponder->hasAnswerTxts(p_hServiceQuery, u)) {
-          strHTTPServices += " TXT: ";
+          strHTTPServices += "<br/>TXT: ";
           strHTTPServices += p_pMDNSResponder->answerTxts(p_hServiceQuery, u);
         }
-        strHTTPServices += "<br/>";
+        strHTTPServices += "</li>";
       }
     } else {
       strHTTPServices = cstrNoHTTPServices;
@@ -180,7 +179,6 @@ bool MDNSServiceQueryCallback(MDNSResponder* p_pMDNSResponder,                  
   }
   return true;
 }
-
 
 /*
    MDNSProbeResultCallback
@@ -233,70 +231,36 @@ bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
             }
           }
         }
+      }
+    } else {
+      // Change hostname, use '-' as divider between base name and index
+      if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+        p_pMDNSResponder->setHostname(pcHostDomain);
       } else {
-        // Change hostname, use '-' as divider between base name and index
-        if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-          p_pMDNSResponder->setHostname(pcHostDomain);
-        } else {
-          Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-        }
+        Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
       }
     }
   }
   return true;
 }
 
-
 /*
-   handleHTTPClient
+   HTTP request function (not found is handled by server)
 */
-void handleHTTPClient(WiFiClient& client) {
+void handleHTTPRequest() {
   Serial.println("");
-  Serial.println("New client");
+  Serial.println("HTTP Request");
 
-  // Wait for data from client to become available
-  while (client.connected() && !client.available()) {
-    delay(1);
-  }
-
-  // Read the first line of HTTP request
-  String req = client.readStringUntil('\r');
-
-  // First line of HTTP request looks like "GET /path HTTP/1.1"
-  // Retrieve the "/path" part by finding the spaces
-  int addr_start = req.indexOf(' ');
-  int addr_end = req.indexOf(' ', addr_start + 1);
-  if (addr_start == -1 || addr_end == -1) {
-    Serial.print("Invalid request: ");
-    Serial.println(req);
-    return;
-  }
-  req = req.substring(addr_start + 1, addr_end);
-  Serial.print("Request: ");
-  Serial.println(req);
-  client.flush();
-
-  String s;
-  if (req == "/") {
-    IPAddress ip = WiFi.localIP();
-    String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-    s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ESP8266 at ";
-    s += ipStr;
-    // Simple addition of the current time
-    s += "<br/>Local HTTP services:<br/>";
-    s += strHTTPServices;
-    // done :-)
-    s += "</html>\r\n\r\n";
-    Serial.println("Sending 200");
-  } else {
-    s = "HTTP/1.1 404 Not Found\r\n\r\n";
-    Serial.println("Sending 404");
-  }
-  client.print(s);
-
-  Serial.println("Done with client");
+  String s = "<!DOCTYPE HTML>\r\n<html><h3><head>Hello from ";
+  s += WiFi.hostname() + ".local at " + WiFi.localIP().toString() + "</h3></head>";
+  s += "<br/><h4>Local HTTP services are :</h4><ol>";
+  s += strHTTPServices;
+  // done :-)
+  s += "</ol></html>";
+  Serial.println("Sending 200");
+  server.send(200, "text/html", s);
+  Serial.println("Done with request");
 }
-
 
 /*
    setup
@@ -321,6 +285,9 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
+  // Setup HTTP server
+  server.on("/", handleHTTPRequest);
+
   // Setup MDNS responder
   MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
   // Init the (currently empty) host domain string with 'esp8266'
@@ -333,9 +300,9 @@ void setup(void) {
   }
   Serial.println("MDNS responder started");
 
-  // Start TCP (HTTP) server
+  // Start HTTP server
   server.begin();
-  Serial.println("TCP server started");
+  Serial.println("HTTP server started");
 }
 
 
@@ -343,14 +310,8 @@ void setup(void) {
    loop
 */
 void loop(void) {
-  // Check if a client has connected
-  WiFiClient    client = server.available();
-  if (client) {
-    handleHTTPClient(client);
-  }
-
+  // Check if a request has come in
+  server.handleClient();
   // Allow MDNS processing
   MDNS.update();
 }
-
-

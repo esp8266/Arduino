@@ -34,6 +34,7 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
     
 #include "binary.h"
 #include "twi.h"
@@ -218,6 +219,7 @@ extern "C" {
     void loop(void);
     
     void yield(void);
+    void esp_yield(void);
     void optimistic_yield(uint32_t interval_us);
     
 #define digitalPinToPort(pin)       (0)
@@ -248,10 +250,12 @@ extern "C" {
 #include "Updater.h"
 #include "debug.h"
 
+#if 0
 #ifndef _GLIBCXX_VECTOR
 // arduino is not compatible with std::vector
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
+#endif
 #endif
 
 #define _min(a,b) ((a)<(b)?(a):(b))
