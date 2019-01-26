@@ -484,58 +484,60 @@ protected:
 public:
     struct MDNSServiceInfo
     {
-    	MDNSServiceInfo(MDNSResponder* p_pM,MDNSResponder::hMDNSServiceQuery p_hS,uint32_t p_u32A)
+    	MDNSServiceInfo(MDNSResponder& p_pM,MDNSResponder::hMDNSServiceQuery p_hS,uint32_t p_u32A)
     	: p_pMDNSResponder(p_pM),
     	  p_hServiceQuery(p_hS),
 		  p_u32AnswerIndex(p_u32A)
     	{};
-    	MDNSResponder* p_pMDNSResponder;
+    protected:
+    	MDNSResponder& p_pMDNSResponder;
     	MDNSResponder::hMDNSServiceQuery p_hServiceQuery;
     	uint32_t p_u32AnswerIndex;
+    public:
     	String serviceDomain(){
-    		return p_pMDNSResponder->answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex);
+    		return p_pMDNSResponder.answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex);
     	};
     	bool hostDomainAvailable()
     	{
-          return (p_pMDNSResponder->hasAnswerHostDomain(p_hServiceQuery, p_u32AnswerIndex));
+          return (p_pMDNSResponder.hasAnswerHostDomain(p_hServiceQuery, p_u32AnswerIndex));
     	}
     	String hostDomain(){
     		return (hostDomainAvailable()) ?
-    		   p_pMDNSResponder->answerHostDomain(p_hServiceQuery, p_u32AnswerIndex) : String();
+    		   p_pMDNSResponder.answerHostDomain(p_hServiceQuery, p_u32AnswerIndex) : String();
     	};
     	bool hostPortAvailable()
     	{
-    		return (p_pMDNSResponder->hasAnswerPort(p_hServiceQuery, p_u32AnswerIndex));
+    		return (p_pMDNSResponder.hasAnswerPort(p_hServiceQuery, p_u32AnswerIndex));
     	}
     	uint16_t hostPort(){
     		return (hostPortAvailable()) ?
-    		  p_pMDNSResponder->answerPort(p_hServiceQuery, p_u32AnswerIndex) : 0;
+    		  p_pMDNSResponder.answerPort(p_hServiceQuery, p_u32AnswerIndex) : 0;
     	};
     	bool IPAddressAvailable()
     	{
-    		return (p_pMDNSResponder->hasAnswerIP4Address(p_hServiceQuery,p_u32AnswerIndex ));
+    		return (p_pMDNSResponder.hasAnswerIP4Address(p_hServiceQuery,p_u32AnswerIndex ));
     	}
     	std::vector<IPAddress> IPAdresses(){
     		std::vector<IPAddress> internalIP;
     		if (IPAddressAvailable()) {
-    			for (uint32_t u2 = 0; u2 < p_pMDNSResponder->answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex); ++u2) {
-                  internalIP.push_back(p_pMDNSResponder->answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u2));
+    			for (uint32_t u2 = 0; u2 < p_pMDNSResponder.answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex); ++u2) {
+                  internalIP.push_back(p_pMDNSResponder.answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u2));
     			}
     		}
     		return internalIP;
     	};
     	bool txtAvailable()
     	{
-    		return (p_pMDNSResponder->hasAnswerTxts(p_hServiceQuery, p_u32AnswerIndex));
+    		return (p_pMDNSResponder.hasAnswerTxts(p_hServiceQuery, p_u32AnswerIndex));
     	}
     	String strKeyValue (){
     		return (txtAvailable()) ?
-    		  p_pMDNSResponder->answerTxts(p_hServiceQuery, p_u32AnswerIndex) : String();
+    		  p_pMDNSResponder.answerTxts(p_hServiceQuery, p_u32AnswerIndex) : String();
     	};
     	std::map<String,String> keyValues()
 		{
     		std::map<String,String> tempKV;
-    		for (auto kv = p_pMDNSResponder->_answerKeyvalue(p_hServiceQuery, p_u32AnswerIndex);kv != nullptr;kv = kv->m_pNext) {
+    		for (auto kv = p_pMDNSResponder._answerKeyvalue(p_hServiceQuery, p_u32AnswerIndex);kv != nullptr;kv = kv->m_pNext) {
     			tempKV.insert(std::pair<String,String>(String(kv->m_pcKey),String(kv->m_pcValue)));
     		}
     		return tempKV;
@@ -544,7 +546,7 @@ public:
     	{
     		String result;
 
-    		for (stcMDNSServiceTxt* pTxt=p_pMDNSResponder->_answerKeyvalue(p_hServiceQuery, p_u32AnswerIndex); pTxt; pTxt=pTxt->m_pNext) {
+    		for (stcMDNSServiceTxt* pTxt=p_pMDNSResponder._answerKeyvalue(p_hServiceQuery, p_u32AnswerIndex); pTxt; pTxt=pTxt->m_pNext) {
     	        if ((key.c_str()) &&
     	            (0 == strcmp(pTxt->m_pcKey, key.c_str()))) {
     	            result = String(pTxt->m_pcValue);
