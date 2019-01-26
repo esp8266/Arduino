@@ -119,9 +119,11 @@ The following points assume work in a direct clone of the repository, and not in
    git push origin 2.5.0
    ```
 
-5. Wait for Travis CI build for the tag to pass, see https://travis-ci.org/esp8266/Arduino/builds. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases. Wait for CI (travis-ci.org). Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
+5. Wait for Travis CI build for the tag to pass, see https://travis-ci.org/esp8266/Arduino/builds. 
 
-6. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
+6. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
+
+7. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
 
 7. Navigate to release list in Github here https://github.com/esp8266/Arduino/releases, press "Edit" button to edit release description, paste release notes, and publish it.
 
