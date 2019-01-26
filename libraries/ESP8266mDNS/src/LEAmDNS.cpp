@@ -813,6 +813,15 @@ uint32_t MDNSResponder::answerCount(const MDNSResponder::hMDNSServiceQuery p_hSe
     return (pServiceQuery ? pServiceQuery->answerCount() : 0);
 }
 
+std::vector<MDNSResponder::MDNSServiceInfo>  MDNSResponder::answerInfo (const MDNSResponder::hMDNSServiceQuery p_hServiceQuery) {
+    std::vector<MDNSResponder::MDNSServiceInfo> tempVector;
+	for (int i=0;i<answerCount(p_hServiceQuery);i++)
+    {
+		tempVector.push_back(MDNSServiceInfo(this,p_hServiceQuery,i));
+    }
+	return tempVector;
+}
+
 /*
  * MDNSResponder::answerServiceDomain
  *
@@ -1002,7 +1011,7 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
     if ((pSQAnswer) &&
         (pSQAnswer->m_Txts.m_pTxts) &&
         (!pSQAnswer->m_pcTxts)) {
-        
+
         pSQAnswer->m_pcTxts = pSQAnswer->allocTxts(pSQAnswer->m_Txts.c_strLength());
         if (pSQAnswer->m_pcTxts) {
             pSQAnswer->m_Txts.c_str(pSQAnswer->m_pcTxts);
@@ -1010,7 +1019,6 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
     }
     return (pSQAnswer ? pSQAnswer->m_pcTxts : 0);
 }
-
 
 /*
  * PROBING

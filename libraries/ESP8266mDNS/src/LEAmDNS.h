@@ -396,6 +396,8 @@ public:
     bool removeServiceQuery(hMDNSServiceQuery p_hServiceQuery);
 
     uint32_t answerCount(const hMDNSServiceQuery p_hServiceQuery);
+    std::vector<MDNSResponder::MDNSServiceInfo> answerInfo (const MDNSResponder::hMDNSServiceQuery p_hServiceQuery);
+
     const char* answerServiceDomain(const hMDNSServiceQuery p_hServiceQuery,
                                     const uint32_t p_u32AnswerIndex);
     bool hasAnswerHostDomain(const hMDNSServiceQuery p_hServiceQuery,
@@ -429,7 +431,7 @@ public:
     // Get the TXT items as a ';'-separated string
     const char* answerTxts(const hMDNSServiceQuery p_hServiceQuery,
                            const uint32_t p_u32AnswerIndex);
-    
+
     /**
      * MDNSProbeResultCallbackFn
      * Callback function for (host and service domain) probe results
@@ -532,15 +534,28 @@ public:
     	};
     	std::map<String,String> keyValues()
 		{
-    		return std::map<String,String>();
+    		std::map<String,String> tempKV;
+    		for (auto kv = p_pMDNSResponder->_answerKeyvalue(p_hServiceQuery, p_u32AnswerIndex);kv != nullptr;kv = kv->m_pNext) {
+    			tempKV.insert(std::pair<String,String>(String(kv->m_pcKey),String(kv->m_pcValue)));
+    		}
+    		return tempKV;
 		}
     	String value(String key)
     	{
-    	    (void) key;
-    		return String();
+    		String result;
+
+    		for (stcMDNSServiceTxt* pTxt=p_pMDNSResponder->_answerKeyvalue(p_hServiceQuery, p_u32AnswerIndex); pTxt; pTxt=pTxt->m_pNext) {
+    	        if ((key.c_str()) &&
+    	            (0 == strcmp(pTxt->m_pcKey, key.c_str()))) {
+    	            result = String(pTxt->m_pcValue);
+    	            break;
+    	        }
+    	    }
+    	    return result;
     	}
     };
 protected:
+
     /**
      * stcMDNSServiceTxt
      */
@@ -1351,6 +1366,9 @@ protected:
                                       const char* p_pcKey,
                                       const char* p_pcValue,
                                       bool p_bTemp);
+
+    stcMDNSServiceTxt* _answerKeyvalue(const hMDNSServiceQuery p_hServiceQuery,
+            		                   const uint32_t p_u32AnswerIndex);
 
     bool _collectServiceTxts(stcMDNSService& p_rService);
     bool _releaseTempServiceTxts(stcMDNSService& p_rService);
