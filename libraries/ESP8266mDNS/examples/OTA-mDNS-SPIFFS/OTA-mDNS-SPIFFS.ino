@@ -238,6 +238,5 @@ void setup() {
 void loop() {
   // Handle OTA server.
   ArduinoOTA.handle();
-  yield();
 }
 

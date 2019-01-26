@@ -22,26 +22,34 @@
  *
  */
 
-#ifndef LEAMDNS_PRIV_H
-#define LEAMDNS_PRIV_H
+#ifndef MDNS_PRIV_H
+#define MDNS_PRIV_H
+
+namespace esp8266 {
 
 /*
- * namespace LEAmDNS
+ * LEAmDNS
  */
-namespace LEAmDNS {
+
+namespace MDNSImplementation {
 
 // Enable class debug functions
 #define ESP_8266_MDNS_INCLUDE
-// #define DEBUG_ESP_MDNS_RESPONDER
+//#define DEBUG_ESP_MDNS_RESPONDER
 
 
 #ifndef LWIP_OPEN_SRC
     #define LWIP_OPEN_SRC
 #endif
 
+//
+// If ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE is defined, the mDNS responder ignores a successful probing
+// This allows to drive the responder in a environment, where 'update()' isn't called in the loop
+//#define ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
+
 // Enable/disable debug trace macros
 #ifdef DEBUG_ESP_MDNS_RESPONDER
-//#define DEBUG_ESP_MDNS_INFO
+#define DEBUG_ESP_MDNS_INFO
 #define DEBUG_ESP_MDNS_ERR
 #define DEBUG_ESP_MDNS_TX
 #define DEBUG_ESP_MDNS_RX
@@ -96,8 +104,10 @@ namespace LEAmDNS {
  * subnet level distance MDNS records should travel.
  * 1 sets the subnet distance to 'local', which is default for MDNS.
  * (Btw.: 255 would set it to 'as far as possible' -> internet)
+ *
+ * However, RFC 3171 seems to force 255 instead
  */
-#define MDNS_MULTICAST_TTL              1
+#define MDNS_MULTICAST_TTL              255/*1*/
 
 /*
  * This is the MDNS record TTL
@@ -124,9 +134,15 @@ namespace LEAmDNS {
 
 /*
  * Delay between and number of probes for host and service domains
+ * Delay between and number of announces for host and service domains
+ * Delay between and number of service queries; the delay is multiplied by the resent number in '_checkServiceQueryCache'
  */
 #define MDNS_PROBE_DELAY                250
 #define MDNS_PROBE_COUNT                3
+#define MDNS_ANNOUNCE_DELAY             1000
+#define MDNS_ANNOUNCE_COUNT             8
+#define MDNS_DYNAMIC_QUERY_RESEND_COUNT 5
+#define MDNS_DYNAMIC_QUERY_RESEND_DELAY 5000
 
 
 /*
@@ -143,9 +159,6 @@ namespace LEAmDNS {
 #define USE_PGM_PRINTF
 
 #ifdef USE_PGM_PRINTF
-// See: https://github.com/esp8266/Arduino/issues/3369
-#define PROGMEM_LEA __attribute__((section(".irom.text.LEA")))
-#define PSTR_LEA(s) (__extension__({static const char __c[] PROGMEM_LEA = (s); &__c[0];}))
 #else
     #ifdef F
         #undef F
@@ -153,16 +166,12 @@ namespace LEAmDNS {
     #define F(A)    A
 #endif
 
-}   // namespace LEAmDNS
+}   // namespace MDNSImplementation
 
+} // namespace esp8266
 
 // Include the main header, so the submodlues only need to include this header
 #include "LEAmDNS.h"
 
 
-#endif  // LEAMDNS_PRIV_H
-
-
-
-
-
+#endif  // MDNS_PRIV_H

@@ -49,8 +49,7 @@
 
 */
 #include <ESP8266mDNS.h>
-#include <LEATimeFlag.h>
-
+#include <PolledTimeout.h>
 /*
    Global defines and vars
 */
@@ -66,15 +65,15 @@
 #define STAPSK  "your-password"
 #endif
 
-const char*                                     ssid                    = STASSID;
-const char*                                     password                = STAPSK;
+const char*                   ssid                    = STASSID;
+const char*                   password                = STAPSK;
 
-char*                                           pcHostDomain            = 0;        // Negociated host domain
-bool                                            bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
-LEAmDNS::MDNSResponder::hMDNSService            hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
+char*                         pcHostDomain            = 0;        // Negociated host domain
+bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
+MDNSResponder::hMDNSService   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
 // TCP server at port 'SERVICE_PORT' will respond to HTTP requests
-WiFiServer                                      server(SERVICE_PORT);
+WiFiServer                    server(SERVICE_PORT);
 
 
 /*
@@ -86,7 +85,7 @@ const char* getTimeString(void) {
   time_t now = time(nullptr);
   ctime_r(&now, acTimeString);
   size_t    stLength;
-  while (((stLength = os_strlen(acTimeString))) &&
+  while (((stLength = strlen(acTimeString))) &&
          ('\n' == acTimeString[stLength - 1])) {
     acTimeString[stLength - 1] = 0; // Remove trailing line break...
   }
@@ -136,8 +135,8 @@ bool setStationHostname(const char* p_pcHostname) {
    This can be triggered by calling MDNS.announce().
 
 */
-bool MDNSDynamicServiceTxtCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
-                                   const LEAmDNS::MDNSResponder::hMDNSService p_hService,
+bool MDNSDynamicServiceTxtCallback(MDNSResponder* p_pMDNSResponder,
+                                   const MDNSResponder::hMDNSService p_hService,
                                    void* p_pUserdata) {
   Serial.println("MDNSDynamicServiceTxtCallback");
   (void) p_pUserdata;
@@ -161,9 +160,9 @@ bool MDNSDynamicServiceTxtCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
    restarted via p_pMDNSResponder->setHostname().
 
 */
-bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
+bool MDNSProbeResultCallback(MDNSResponder* p_pMDNSResponder,
                              const char* p_pcDomainName,
-                             const LEAmDNS::MDNSResponder::hMDNSService p_hService,
+                             const MDNSResponder::hMDNSService p_hService,
                              bool p_bProbeResult,
                              void* p_pUserdata) {
   Serial.println("MDNSProbeResultCallback");
@@ -190,13 +189,13 @@ bool MDNSProbeResultCallback(LEAmDNS::MDNSResponder* p_pMDNSResponder,
             p_pMDNSResponder->setDynamicServiceTxtCallback(hMDNSService, MDNSDynamicServiceTxtCallback, 0);
           }
         }
+      }
+    } else {
+      // Change hostname, use '-' as divider between base name and index
+      if (MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
+        p_pMDNSResponder->setHostname(pcHostDomain);
       } else {
-        // Change hostname, use '-' as divider between base name and index
-        if (LEAmDNS::MDNSResponder::indexDomain(pcHostDomain, "-", 0)) {
-          p_pMDNSResponder->setHostname(pcHostDomain);
-        } else {
-          Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
-        }
+        Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
       }
     }
   }
@@ -242,8 +241,8 @@ void handleHTTPClient(WiFiClient& client) {
   if (req == "/") {
     IPAddress ip = WiFi.localIP();
     String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-    s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ESP8266 at ";
-    s += ipStr;
+    s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ";
+    s += WiFi.hostname() + " at " + ipStr;
     // Simple addition of the current time
     s += "\r\nCurrent time is: ";
     s += getTimeString();
@@ -286,10 +285,10 @@ void setup(void) {
   setClock();
 
   // Setup MDNS responder
-  LEAmDNS::MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
+  MDNS.setProbeResultCallback(MDNSProbeResultCallback, 0);
   // Init the (currently empty) host domain string with 'esp8266'
-  if ((!LEAmDNS::MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
-      (!LEAmDNS::MDNS.begin(pcHostDomain))) {
+  if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
+      (!MDNS.begin(pcHostDomain))) {
     Serial.println("Error setting up MDNS responder!");
     while (1) { // STOP
       delay(1000);
@@ -314,20 +313,17 @@ void loop(void) {
   }
 
   // Allow MDNS processing
-  LEAmDNS::MDNS.update();
+  MDNS.update();
 
   // Update time (if needed)
-  //static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
-  static clsLEATimeFlag timeFlag(UPDATE_CYCLE);
-  if (timeFlag.flagged()/*ulNextTimeUpdate < millis()*/) {
+  static esp8266::polledTimeout::periodic timeout(UPDATE_CYCLE);
+  if (timeout.expired()) {
 
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
-      LEAmDNS::MDNS.announce();
+      MDNS.announce();
     }
-    //ulNextTimeUpdate = (millis() + UPDATE_CYCLE);   // Set update 'timer'
-    timeFlag.restart();
   }
 }
 

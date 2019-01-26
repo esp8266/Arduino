@@ -43,6 +43,9 @@ extern "C" void esp_yield()
 
 
 extern "C" void __panic_func(const char* file, int line, const char* func) {
+    (void)file;
+    (void)line;
+    (void)func;
     abort();
 }
 

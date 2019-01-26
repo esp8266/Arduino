@@ -65,7 +65,7 @@
  *  Reference:
  *  Used mDNS messages:
  *  A (0x01):               eg. esp8266.local A OP TTL 123.456.789.012
- *  AAAA (01Cx):            eg. esp8266.local AAAA OP TTL 1234:5678::90
+ *  AAAA (0x1C):            eg. esp8266.local AAAA OP TTL 1234:5678::90
  *  PTR (0x0C, srv name):   eg. _http._tcp.local PTR OP TTL MyESP._http._tcp.local
  *  PTR (0x0C, srv type):   eg. _services._dns-sd._udp.local PTR OP TTL _http._tcp.local
  *  PTR (0x0C, IP4):        eg. 012.789.456.123.in-addr.arpa PTR OP TTL esp8266.local
@@ -99,22 +99,26 @@
  *
  */
 
-#ifndef LEAMDNS_H
-#define LEAMDNS_H
+#ifndef MDNS_H
+#define MDNS_H
 
 #include <functional>   // for UdpContext.h
 #include "WiFiUdp.h"
 #include "lwip/udp.h"
 #include "debug.h"
 #include "include/UdpContext.h"
-#include "LEATimeFlag.h"
+#include <limits>
+#include <PolledTimeout.h>
 
 #include "ESP8266WiFi.h"
+
+
+namespace esp8266 {
 
 /**
  * LEAmDNS
  */
-namespace LEAmDNS {
+namespace MDNSImplementation {
 
 //this should be defined at build time
 #ifndef ARDUINO_BOARD
@@ -170,10 +174,16 @@ public:
     // Later call MDNS::update() in every 'loop' to run the process loop
     // (probing, announcing, responding, ...)
     bool begin(const char* p_pcHostname);
+    bool begin(const String& p_strHostname) {return begin(p_strHostname.c_str());}
         // for compatibility
         bool begin(const char* p_pcHostname,
                    IPAddress p_IPAddress,       // ignored
                    uint32_t p_u32TTL = 120);    // ignored
+        bool begin(const String& p_strHostname,
+                   IPAddress p_IPAddress,       // ignored
+                   uint32_t p_u32TTL = 120) {   // ignored
+            return begin(p_strHostname.c_str(), p_IPAddress, p_u32TTL);
+        }
     // Finish MDNS processing
     bool close(void);
 
@@ -455,19 +465,19 @@ protected:
     /**
      * stcMDNSServiceTxt
      */
-    typedef struct _stcMDNSServiceTxt {
-        _stcMDNSServiceTxt* m_pNext;
-        char*               m_pcKey;
-        char*               m_pcValue;
-        bool                m_bTemp;
+    struct stcMDNSServiceTxt {
+        stcMDNSServiceTxt* m_pNext;
+        char*              m_pcKey;
+        char*              m_pcValue;
+        bool               m_bTemp;
         
-        _stcMDNSServiceTxt(const char* p_pcKey = 0,
+        stcMDNSServiceTxt(const char* p_pcKey = 0,
                            const char* p_pcValue = 0,
                            bool p_bTemp = false);
-        _stcMDNSServiceTxt(const _stcMDNSServiceTxt& p_Other);
-        ~_stcMDNSServiceTxt(void);
+        stcMDNSServiceTxt(const stcMDNSServiceTxt& p_Other);
+        ~stcMDNSServiceTxt(void);
         
-        _stcMDNSServiceTxt& operator=(const _stcMDNSServiceTxt& p_Other);
+        stcMDNSServiceTxt& operator=(const stcMDNSServiceTxt& p_Other);
         bool clear(void);
         
         char* allocKey(size_t p_stLength);
@@ -489,19 +499,19 @@ protected:
         bool update(const char* p_pcValue);
         
         size_t length(void) const;
-    } stcMDNSServiceTxt;
+    };
     
     /**
      * stcMDNSTxts
      */
-    typedef struct _stcMDNSServiceTxts {
+    struct stcMDNSServiceTxts {
         stcMDNSServiceTxt*  m_pTxts;
         
-        _stcMDNSServiceTxts(void);
-        _stcMDNSServiceTxts(const _stcMDNSServiceTxts& p_Other);
-        ~_stcMDNSServiceTxts(void);
+        stcMDNSServiceTxts(void);
+        stcMDNSServiceTxts(const stcMDNSServiceTxts& p_Other);
+        ~stcMDNSServiceTxts(void);
         
-        _stcMDNSServiceTxts& operator=(const _stcMDNSServiceTxts& p_Other);
+        stcMDNSServiceTxts& operator=(const stcMDNSServiceTxts& p_Other);
         
         bool clear(void);
         
@@ -522,10 +532,10 @@ protected:
         size_t bufferLength(void) const;
         bool buffer(char* p_pcBuffer);
         
-        bool compare(const _stcMDNSServiceTxts& p_Other) const;
-        bool operator==(const _stcMDNSServiceTxts& p_Other) const;
-        bool operator!=(const _stcMDNSServiceTxts& p_Other) const;
-    } stcMDNSServiceTxts;
+        bool compare(const stcMDNSServiceTxts& p_Other) const;
+        bool operator==(const stcMDNSServiceTxts& p_Other) const;
+        bool operator!=(const stcMDNSServiceTxts& p_Other) const;
+    };
     
     /**
      * enuContentFlags
@@ -546,7 +556,7 @@ protected:
     /**
      * stcMDNS_MsgHeader
      */
-    typedef struct _stcMDNS_MsgHeader {
+    struct stcMDNS_MsgHeader {
         uint16_t        m_u16ID;            // Identifier
         bool            m_1bQR      : 1;    // Query/Response flag
         unsigned char   m_4bOpcode  : 4;    // Operation code
@@ -561,7 +571,7 @@ protected:
         uint16_t        m_u16NSCount;       // Authority Record count
         uint16_t        m_u16ARCount;       // Additional Record count
         
-        _stcMDNS_MsgHeader(uint16_t p_u16ID = 0,
+        stcMDNS_MsgHeader(uint16_t p_u16ID = 0,
                            bool p_bQR = false,
                            unsigned char p_ucOpcode = 0,
                            bool p_bAA = false,
@@ -573,73 +583,73 @@ protected:
                            uint16_t p_u16ANCount = 0,
                            uint16_t p_u16NSCount = 0,
                            uint16_t p_u16ARCount = 0);
-    } stcMDNS_MsgHeader;
+    };
         
     /**
      * stcMDNS_RRDomain
      */
-    typedef struct _stcMDNS_RRDomain {
+    struct stcMDNS_RRDomain {
         char            m_acName[MDNS_DOMAIN_MAXLENGTH];    // Encoded domain name
         uint16_t        m_u16NameLength;                    // Length (incl. '\0')
         
-        _stcMDNS_RRDomain(void);
-        _stcMDNS_RRDomain(const _stcMDNS_RRDomain& p_Other);
+        stcMDNS_RRDomain(void);
+        stcMDNS_RRDomain(const stcMDNS_RRDomain& p_Other);
         
-        _stcMDNS_RRDomain& operator=(const _stcMDNS_RRDomain& p_Other);
+        stcMDNS_RRDomain& operator=(const stcMDNS_RRDomain& p_Other);
         
         bool clear(void);
         
         bool addLabel(const char* p_pcLabel,
                       bool p_bPrependUnderline = false);
         
-        bool compare(const _stcMDNS_RRDomain& p_Other) const;
-        bool operator==(const _stcMDNS_RRDomain& p_Other) const;
-        bool operator!=(const _stcMDNS_RRDomain& p_Other) const;
-        bool operator>(const _stcMDNS_RRDomain& p_Other) const;
+        bool compare(const stcMDNS_RRDomain& p_Other) const;
+        bool operator==(const stcMDNS_RRDomain& p_Other) const;
+        bool operator!=(const stcMDNS_RRDomain& p_Other) const;
+        bool operator>(const stcMDNS_RRDomain& p_Other) const;
         
         size_t c_strLength(void) const;
         bool c_str(char* p_pcBuffer);
-    } stcMDNS_RRDomain;
+    };
     
     /**
      * stcMDNS_RRAttributes
      */
-    typedef struct _stcMDNS_RRAttributes {
+    struct stcMDNS_RRAttributes {
         uint16_t            m_u16Type;      // Type
         uint16_t            m_u16Class;     // Class, nearly always 'IN'
         
-        _stcMDNS_RRAttributes(uint16_t p_u16Type = 0,
+        stcMDNS_RRAttributes(uint16_t p_u16Type = 0,
                               uint16_t p_u16Class = 1 /*DNS_RRCLASS_IN Internet*/);
-        _stcMDNS_RRAttributes(const _stcMDNS_RRAttributes& p_Other);
+        stcMDNS_RRAttributes(const stcMDNS_RRAttributes& p_Other);
         
-        _stcMDNS_RRAttributes& operator=(const _stcMDNS_RRAttributes& p_Other);
-    } stcMDNS_RRAttributes;
+        stcMDNS_RRAttributes& operator=(const stcMDNS_RRAttributes& p_Other);
+    };
     
     /**
      * stcMDNS_RRHeader
      */
-    typedef struct _stcMDNS_RRHeader {
+    struct stcMDNS_RRHeader {
         stcMDNS_RRDomain        m_Domain;
         stcMDNS_RRAttributes    m_Attributes;
         
-        _stcMDNS_RRHeader(void);
-        _stcMDNS_RRHeader(const _stcMDNS_RRHeader& p_Other);
+        stcMDNS_RRHeader(void);
+        stcMDNS_RRHeader(const stcMDNS_RRHeader& p_Other);
         
-        _stcMDNS_RRHeader& operator=(const _stcMDNS_RRHeader& p_Other);
+        stcMDNS_RRHeader& operator=(const stcMDNS_RRHeader& p_Other);
 
         bool clear(void);
-    } stcMDNS_RRHeader;
+    };
     
     /**
      * stcMDNS_RRQuestion
      */
-    typedef struct _stcMDNS_RRQuestion {
-        _stcMDNS_RRQuestion*    m_pNext;
-        _stcMDNS_RRHeader       m_Header;
+    struct stcMDNS_RRQuestion {
+        stcMDNS_RRQuestion*     m_pNext;
+        stcMDNS_RRHeader        m_Header;
         bool                    m_bUnicast;     // Unicast reply requested
         
-        _stcMDNS_RRQuestion(void);
-    } stcMDNS_RRQuestion;
+        stcMDNS_RRQuestion(void);
+    };
     
     /**
      * enuAnswerType
@@ -656,110 +666,110 @@ protected:
     /**
      * stcMDNS_RRAnswer
      */
-    typedef struct _stcMDNS_RRAnswer {
-        _stcMDNS_RRAnswer*  m_pNext;
+    struct stcMDNS_RRAnswer {
+        stcMDNS_RRAnswer*   m_pNext;
         const enuAnswerType m_AnswerType;
-        _stcMDNS_RRHeader   m_Header;
+        stcMDNS_RRHeader    m_Header;
         bool                m_bCacheFlush;  // Cache flush command bit
         uint32_t            m_u32TTL;       // Validity time in seconds
         
-        virtual ~_stcMDNS_RRAnswer(void);
+        virtual ~stcMDNS_RRAnswer(void);
         
         enuAnswerType answerType(void) const;
         
         bool clear(void);
         
     protected:
-        _stcMDNS_RRAnswer(enuAnswerType p_AnswerType,
+        stcMDNS_RRAnswer(enuAnswerType p_AnswerType,
                           const stcMDNS_RRHeader& p_Header,
                           uint32_t p_u32TTL);
-    } stcMDNS_RRAnswer;
+    };
     
 #ifdef MDNS_IP4_SUPPORT
     /**
      * stcMDNS_RRAnswerA
      */
-    typedef struct _stcMDNS_RRAnswerA : public stcMDNS_RRAnswer {
+    struct stcMDNS_RRAnswerA : public stcMDNS_RRAnswer {
         IPAddress           m_IPAddress;
         
-        _stcMDNS_RRAnswerA(const stcMDNS_RRHeader& p_Header,
+        stcMDNS_RRAnswerA(const stcMDNS_RRHeader& p_Header,
                            uint32_t p_u32TTL);
-        ~_stcMDNS_RRAnswerA(void);
+        ~stcMDNS_RRAnswerA(void);
         
         bool clear(void);
-    } stcMDNS_RRAnswerA;
+    };
 #endif
 
     /**
      * stcMDNS_RRAnswerPTR
      */
-    typedef struct _stcMDNS_RRAnswerPTR : public stcMDNS_RRAnswer {
+    struct stcMDNS_RRAnswerPTR : public stcMDNS_RRAnswer {
         stcMDNS_RRDomain    m_PTRDomain;
         
-        _stcMDNS_RRAnswerPTR(const stcMDNS_RRHeader& p_Header,
+        stcMDNS_RRAnswerPTR(const stcMDNS_RRHeader& p_Header,
                              uint32_t p_u32TTL);
-        ~_stcMDNS_RRAnswerPTR(void);
+        ~stcMDNS_RRAnswerPTR(void);
         
         bool clear(void);
-    } stcMDNS_RRAnswerPTR;
+    };
     
     /**
      * stcMDNS_RRAnswerTXT
      */
-    typedef struct _stcMDNS_RRAnswerTXT : public stcMDNS_RRAnswer {
+    struct stcMDNS_RRAnswerTXT : public stcMDNS_RRAnswer {
         stcMDNSServiceTxts  m_Txts;
         
-        _stcMDNS_RRAnswerTXT(const stcMDNS_RRHeader& p_Header,
+        stcMDNS_RRAnswerTXT(const stcMDNS_RRHeader& p_Header,
                              uint32_t p_u32TTL);
-        ~_stcMDNS_RRAnswerTXT(void);
+        ~stcMDNS_RRAnswerTXT(void);
         
         bool clear(void);
-    } stcMDNS_RRAnswerTXT;
+    };
     
 #ifdef MDNS_IP6_SUPPORT
     /**
      * stcMDNS_RRAnswerAAAA
      */
-    typedef struct _stcMDNS_RRAnswerAAAA : public stcMDNS_RRAnswer {
+    struct stcMDNS_RRAnswerAAAA : public stcMDNS_RRAnswer {
         //TODO: IP6Address          m_IPAddress;
         
-        _stcMDNS_RRAnswerAAAA(const stcMDNS_RRHeader& p_Header,
+        stcMDNS_RRAnswerAAAA(const stcMDNS_RRHeader& p_Header,
                               uint32_t p_u32TTL);
-        ~_stcMDNS_RRAnswerAAAA(void);
+        ~stcMDNS_RRAnswerAAAA(void);
         
         bool clear(void);
-    } stcMDNS_RRAnswerAAAA;
+    };
 #endif
 
     /**
      * stcMDNS_RRAnswerSRV
      */
-    typedef struct _stcMDNS_RRAnswerSRV : public stcMDNS_RRAnswer {
+    struct stcMDNS_RRAnswerSRV : public stcMDNS_RRAnswer {
         uint16_t            m_u16Priority;
         uint16_t            m_u16Weight;
         uint16_t            m_u16Port;
         stcMDNS_RRDomain    m_SRVDomain;
         
-        _stcMDNS_RRAnswerSRV(const stcMDNS_RRHeader& p_Header,
+        stcMDNS_RRAnswerSRV(const stcMDNS_RRHeader& p_Header,
                              uint32_t p_u32TTL);
-        ~_stcMDNS_RRAnswerSRV(void);
+        ~stcMDNS_RRAnswerSRV(void);
         
         bool clear(void);
-    } stcMDNS_RRAnswerSRV;
+    };
     
     /**
      * stcMDNS_RRAnswerGeneric
      */
-    typedef struct _stcMDNS_RRAnswerGeneric : public stcMDNS_RRAnswer {
+    struct stcMDNS_RRAnswerGeneric : public stcMDNS_RRAnswer {
         uint16_t            m_u16RDLength;  // Length of variable answer
         uint8_t*            m_pu8RDData;    // Offset of start of variable answer in packet
         
-        _stcMDNS_RRAnswerGeneric(const stcMDNS_RRHeader& p_Header,
+        stcMDNS_RRAnswerGeneric(const stcMDNS_RRHeader& p_Header,
                                  uint32_t p_u32TTL);
-        ~_stcMDNS_RRAnswerGeneric(void);
+        ~stcMDNS_RRAnswerGeneric(void);
         
         bool clear(void);
-    } stcMDNS_RRAnswerGeneric;
+    };
 
 
     /**
@@ -775,26 +785,27 @@ protected:
     /**
      * stcProbeInformation
      */
-    typedef struct _stcProbeInformation {
+    struct stcProbeInformation {
         enuProbingStatus                m_ProbingStatus;
-        uint8_t                         m_u8ProbesSent;
-        clsLEATimeFlag                  m_NextProbeTimeFlag;
+        uint8_t                         m_u8SentCount;  // Used for probes and announcements
+        esp8266::polledTimeout::oneShot m_Timeout;      // Used for probes and announcements
+        //clsMDNSTimeFlag                 m_TimeFlag;     // Used for probes and announcements
         bool                            m_bConflict;
         bool                            m_bTiebreakNeeded;
         MDNSProbeResultCallbackFn       m_fnProbeResultCallback;
         void*                           m_pProbeResultCallbackUserdata;
 
-        _stcProbeInformation(void);
+        stcProbeInformation(void);
 
         bool clear(bool p_bClearUserdata = false);
-    } stcProbeInformation;
+    };
 
 
     /**
      * stcMDNSService
      */
-    typedef struct _stcMDNSService {
-        _stcMDNSService*                m_pNext;
+    struct stcMDNSService {
+        stcMDNSService*                 m_pNext;
         char*                           m_pcName;
         bool                            m_bAutoName;    // Name was set automatically to hostname (if no name was supplied)
         char*                           m_pcService;
@@ -806,10 +817,10 @@ protected:
         void*                           m_pTxtCallbackUserdata;
         stcProbeInformation             m_ProbeInformation;
 
-        _stcMDNSService(const char* p_pcName = 0,
+        stcMDNSService(const char* p_pcName = 0,
                         const char* p_pcService = 0,
                         const char* p_pcProtocol = 0);
-        ~_stcMDNSService(void);
+        ~stcMDNSService(void);
 
         bool setName(const char* p_pcName);
         bool releaseName(void);
@@ -819,54 +830,75 @@ protected:
         
         bool setProtocol(const char* p_pcProtocol);
         bool releaseProtocol(void);
-    } stcMDNSService;
+    };
 
     /**
      * stcMDNSServiceQuery
      */
-    typedef struct _stcMDNSServiceQuery {
+    struct stcMDNSServiceQuery {
         /**
          * stcAnswer
          */
-        typedef struct _stcAnswer {
+        struct stcAnswer {
             /**
              * stcTTL
              */
-            typedef struct _stcTTL {
-                clsLEATimeFlag  m_TTLTimeFlag;
-                bool            m_bUpdateScheduled;
+            struct stcTTL {
+                /**
+                 * timeoutLevel_t
+                 */
+                typedef uint8_t timeoutLevel_t;
+                /**
+                 * TIMEOUTLEVELs
+                 */
+                const timeoutLevel_t    TIMEOUTLEVEL_UNSET      = 0;
+                const timeoutLevel_t    TIMEOUTLEVEL_BASE       = 80;
+                const timeoutLevel_t    TIMEOUTLEVEL_INTERVAL   = 5;
+                const timeoutLevel_t    TIMEOUTLEVEL_FINAL      = 100;
 
-                _stcTTL(uint32_t p_u32TTL = 0);
+                uint32_t                        m_u32TTL;
+                esp8266::polledTimeout::oneShot m_TTLTimeout;
+                timeoutLevel_t                  m_timeoutLevel;
+
+                stcTTL(void);
                 bool set(uint32_t p_u32TTL);
 
-                bool has80Percent(void) const;
-                bool isOutdated(void) const;
-            } stcTTL;
+                bool flagged(void) const;
+                bool restart(void);
+
+                bool prepareDeletion(void);
+                bool finalTimeoutLevel(void) const;
+
+                unsigned long timeout(void) const;
+            };
 #ifdef MDNS_IP4_SUPPORT
             /**
              * stcIP4Address
              */
-            typedef struct _stcIP4Address {
-                _stcIP4Address* m_pNext;
+            struct stcIP4Address {
+                stcIP4Address*  m_pNext;
                 IPAddress       m_IPAddress;
                 stcTTL          m_TTL;
                 
-                _stcIP4Address(IPAddress p_IPAddress,
-                               uint32_t p_u32TTL = 0);
-            } stcIP4Address;
+                stcIP4Address(IPAddress p_IPAddress,
+                              uint32_t p_u32TTL = 0);
+            };
 #endif
 #ifdef MDNS_IP6_SUPPORT
             /**
              * stcIP6Address
              */
-            typedef struct _stcIP6Address {
-                _stcIP6Address* m_pNext;
+            struct stcIP6Address {
+                stcIP6Address*  m_pNext;
                 IP6Address      m_IPAddress;
                 stcTTL          m_TTL;
-            } stcIP6Address;
+
+                stcIP6Address(IPAddress p_IPAddress,
+                              uint32_t p_u32TTL = 0);
+            };
 #endif
 
-            _stcAnswer*         m_pNext;
+            stcAnswer*          m_pNext;
             // The service domain is the first 'answer' (from PTR answer, using service and protocol) to be set
             // Defines the key for additional answer, like host domain, etc.
             stcMDNS_RRDomain    m_ServiceDomain;    // 1. level answer (PTR), eg. MyESP._http._tcp.local
@@ -887,8 +919,8 @@ protected:
 #endif
             uint32_t            m_u32ContentFlags;
 
-            _stcAnswer(void);
-            ~_stcAnswer(void);
+            stcAnswer(void);
+            ~stcAnswer(void);
 
             bool clear(void);
             
@@ -903,8 +935,8 @@ protected:
             
 #ifdef MDNS_IP4_SUPPORT
             bool releaseIP4Addresses(void);
-            bool addIP4Address(_stcIP4Address* p_pIP4Address);
-            bool removeIP4Address(_stcIP4Address* p_pIP4Address);
+            bool addIP4Address(stcIP4Address* p_pIP4Address);
+            bool removeIP4Address(stcIP4Address* p_pIP4Address);
             const stcIP4Address* findIP4Address(const IPAddress& p_IPAddress) const;
             stcIP4Address* findIP4Address(const IPAddress& p_IPAddress);
             uint32_t IP4AddressCount(void) const;
@@ -913,26 +945,28 @@ protected:
 #endif
 #ifdef MDNS_IP6_SUPPORT
             bool releaseIP6Addresses(void);
-            bool addIP6Address(_stcIP6Address* p_pIP6Address);
-            bool removeIP6Address(_stcIP6Address* p_pIP6Address);
+            bool addIP6Address(stcIP6Address* p_pIP6Address);
+            bool removeIP6Address(stcIP6Address* p_pIP6Address);
             const stcIP6Address* findIP6Address(const IPAddress& p_IPAddress) const;
             stcIP6Address* findIP6Address(const IPAddress& p_IPAddress);
             uint32_t IP6AddressCount(void) const;
             const stcIP6Address* IP6AddressAtIndex(uint32_t p_u32Index) const;
             stcIP6Address* IP6AddressAtIndex(uint32_t p_u32Index);
 #endif
-        } stcAnswer;
+        };
 
-        _stcMDNSServiceQuery*       m_pNext;
-        stcMDNS_RRDomain            m_ServiceTypeDomain;    // eg. _http._tcp.local
-        MDNSServiceQueryCallbackFn  m_fnCallback;
-        void*                       m_pUserdata;
-        bool                        m_bLegacyQuery;
-        bool                        m_bAwaitingAnswers;
-        stcAnswer*                  m_pAnswers;
+        stcMDNSServiceQuery*            m_pNext;
+        stcMDNS_RRDomain                m_ServiceTypeDomain;    // eg. _http._tcp.local
+        MDNSServiceQueryCallbackFn      m_fnCallback;
+        void*                           m_pUserdata;
+        bool                            m_bLegacyQuery;
+        uint8_t                         m_u8SentCount;
+        esp8266::polledTimeout::oneShot m_ResendTimeout;
+        bool                            m_bAwaitingAnswers;
+        stcAnswer*                      m_pAnswers;
 
-        _stcMDNSServiceQuery(void);
-        ~_stcMDNSServiceQuery(void);
+        stcMDNSServiceQuery(void);
+        ~stcMDNSServiceQuery(void);
 
         bool clear(void);
         
@@ -946,26 +980,26 @@ protected:
         
         stcAnswer* findAnswerForServiceDomain(const stcMDNS_RRDomain& p_ServiceDomain);
         stcAnswer* findAnswerForHostDomain(const stcMDNS_RRDomain& p_HostDomain);
-    } stcMDNSServiceQuery;
+    };
 
     /**
      * stcMDNSSendParameter
      */
-    typedef struct _stcMDNSSendParameter {
+    struct stcMDNSSendParameter {
     protected:
         /**
          * stcDomainCacheItem
          */
-        typedef struct _stcDomainCacheItem {
-            _stcDomainCacheItem*    m_pNext;
+        struct stcDomainCacheItem {
+            stcDomainCacheItem*     m_pNext;
             const void*             m_pHostnameOrService;   // Opaque id for host or service domain (pointer)
             bool                    m_bAdditionalData;      // Opaque flag for special info (service domain included)
             uint16_t                m_u16Offset;            // Offset in UDP output buffer
             
-            _stcDomainCacheItem(const void* p_pHostnameOrService,
-                                bool p_bAdditionalData,
-                                uint32_t p_u16Offset);
-        } stcDomainCacheItem;
+            stcDomainCacheItem(const void* p_pHostnameOrService,
+                               bool p_bAdditionalData,
+                               uint32_t p_u16Offset);
+        };
     
     public: 
         uint16_t                m_u16ID;                    // Query ID (used only in lagacy queries)
@@ -980,8 +1014,8 @@ protected:
         uint16_t                m_u16Offset;                // Current offset in UDP write buffer (mainly for domain cache)
         stcDomainCacheItem*     m_pDomainCacheItems;        // Cached host and service domains
         
-        _stcMDNSSendParameter(void);
-        ~_stcMDNSSendParameter(void);
+        stcMDNSSendParameter(void);
+        ~stcMDNSSendParameter(void);
         
         bool clear(void);
         
@@ -992,7 +1026,7 @@ protected:
                                 uint16_t p_u16Offset);
         uint16_t findCachedDomainOffset(const void* p_pHostnameOrService,
                                         bool p_bAdditionalData) const;
-    } stcMDNSSendParameter;
+    };
     
     // Instance variables
     stcMDNSService*                 m_pServices;
@@ -1003,6 +1037,7 @@ protected:
     WiFiEventHandler                m_GotIPHandler;
     MDNSDynamicServiceTxtCallbackFn m_fnServiceTxtCallback;
     void*                           m_pServiceTxtCallbackUserdata;
+    bool                            m_bPassivModeEnabled;
     stcProbeInformation             m_HostProbeInformation;
 
     /** CONTROL **/
@@ -1038,7 +1073,8 @@ protected:
     bool _cancelProbingForService(stcMDNSService& p_rService);
     
     /* ANNOUNCE */
-    bool _announce(bool p_bAnnounce = true);
+    bool _announce(bool p_bAnnounce,
+                   bool p_bIncludeServices);
     bool _announceService(stcMDNSService& p_rService,
                           bool p_bAnnounce = true);
     
@@ -1055,7 +1091,8 @@ protected:
                              IPAddress p_IPAddress);
     bool _sendMDNSServiceQuery(const stcMDNSServiceQuery& p_ServiceQuery);
     bool _sendMDNSQuery(const stcMDNS_RRDomain& p_QueryDomain,
-                        uint16_t p_u16QueryType);
+                        uint16_t p_u16QueryType,
+                        stcMDNSServiceQuery::stcAnswer* p_pKnownAnswers = 0);
                         
     IPAddress _getResponseMulticastInterface(int p_iWiFiOpModes) const;
 
@@ -1247,17 +1284,8 @@ protected:
 #endif
 };
 
-#if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
-    extern MDNSResponder MDNS;
-#endif
+}// namespace MDNSImplementation
 
-}   // namespace LEAmDNS
+}// namespace esp8266
 
-#endif // LEAMDNS_H
-
-
-
-
-
-
-
+#endif // MDNS_H

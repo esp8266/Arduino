@@ -27,14 +27,8 @@
 #include "LEAmDNS_lwIPdefs.h"
 #include "LEAmDNS_Priv.h"
 
-/*
- * namespace LEAmDNS
- */
-namespace LEAmDNS {
 
-/**
- * HELPERS
- */
+namespace {
 
 /*
  * strrstr (static)
@@ -43,7 +37,7 @@ namespace LEAmDNS {
  * Based on: https://stackoverflow.com/a/1634398/2778898
  *
  */
-static const char* strrstr(const char*__restrict p_pcString, const char*__restrict p_pcPattern) {
+const char* strrstr(const char*__restrict p_pcString, const char*__restrict p_pcPattern) {
     
     const char* pcResult = 0;
     
@@ -64,6 +58,24 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
     }
     return pcResult;
 }
+
+
+} // anonymous
+
+
+
+
+
+namespace esp8266 {
+
+/*
+ * LEAmDNS
+ */
+namespace MDNSImplementation {
+
+/**
+ * HELPERS
+ */
 
 /*
  * MDNSResponder::indexDomain (static)
@@ -90,19 +102,19 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
         const char* pFoundDivider = strrstr(p_rpcDomain, pcDivider);
         if (pFoundDivider) {    // maybe already extended
             char*         pEnd = 0;
-            unsigned long ulIndex = strtoul((pFoundDivider + os_strlen(pcDivider)), &pEnd, 10);
+            unsigned long ulIndex = strtoul((pFoundDivider + strlen(pcDivider)), &pEnd, 10);
             if ((ulIndex) &&
-                ((pEnd - p_rpcDomain) == os_strlen(p_rpcDomain)) &&
+                ((pEnd - p_rpcDomain) == (ptrdiff_t)strlen(p_rpcDomain)) &&
                 (!*pEnd)) {       // Valid (old) index found
 
                 char    acIndexBuffer[16];
                 sprintf(acIndexBuffer, "%lu", (++ulIndex));
-                size_t  stLength = ((pFoundDivider - p_rpcDomain + os_strlen(pcDivider)) + os_strlen(acIndexBuffer) + 1);
+                size_t  stLength = ((pFoundDivider - p_rpcDomain + strlen(pcDivider)) + strlen(acIndexBuffer) + 1);
                 char*   pNewHostname = new char[stLength];
                 if (pNewHostname) {
-                    memcpy(pNewHostname, p_rpcDomain, (pFoundDivider - p_rpcDomain + os_strlen(pcDivider)));
-                    pNewHostname[pFoundDivider - p_rpcDomain + os_strlen(pcDivider)] = 0;
-                    os_strcat(pNewHostname, acIndexBuffer);
+                    memcpy(pNewHostname, p_rpcDomain, (pFoundDivider - p_rpcDomain + strlen(pcDivider)));
+                    pNewHostname[pFoundDivider - p_rpcDomain + strlen(pcDivider)] = 0;
+                    strcat(pNewHostname, acIndexBuffer);
 
                     delete[] p_rpcDomain;
                     p_rpcDomain = pNewHostname;
@@ -119,7 +131,7 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
         }
 
         if (!pFoundDivider) {   // not yet extended (or failed to increment extension) -> start indexing
-            size_t    stLength = os_strlen(p_rpcDomain) + (os_strlen(pcDivider) + 1 + 1);   // Name + Divider + '2' + '\0'
+            size_t    stLength = strlen(p_rpcDomain) + (strlen(pcDivider) + 1 + 1);   // Name + Divider + '2' + '\0'
             char*     pNewHostname = new char[stLength];
             if (pNewHostname) {
                 sprintf(pNewHostname, "%s%s2", p_rpcDomain, pcDivider);
@@ -138,17 +150,17 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
         // No given host domain, use base or default
         const char* cpcDefaultName = (p_pcDefaultDomain ?: "esp8266");
 
-        size_t      stLength = os_strlen(cpcDefaultName) + 1;   // '\0'
+        size_t      stLength = strlen(cpcDefaultName) + 1;   // '\0'
         p_rpcDomain = new char[stLength];
         if (p_rpcDomain) {
-            os_strncpy(p_rpcDomain, cpcDefaultName, stLength);
+            strncpy(p_rpcDomain, cpcDefaultName, stLength);
             bResult = true;
         }
         else {
             DEBUG_EX_ERR(DEBUG_OUTPUT.println(F("[MDNSResponder] indexDomain: FAILED to alloc new hostname!")););
         }
     }
-    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] indexDomain: %s\n"), p_rpcDomain););
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] indexDomain: %s\n"), p_rpcDomain););
     return bResult;
 }
 
@@ -158,6 +170,7 @@ static const char* strrstr(const char*__restrict p_pcString, const char*__restri
  */
 
 bool MDNSResponder::_callProcess(void) {
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf("[MDNSResponder] _callProcess (%lu, triggered by: %s)\n", millis(), m_pUDPContext->getRemoteAddress().toString().c_str()););
 
     return _process(false);
 }
@@ -179,19 +192,18 @@ bool MDNSResponder::_allocUDPContext(void) {
     
     _releaseUDPContext();
 
-    ip_addr_t   multicast_addr;
 #ifdef MDNS_IP4_SUPPORT
-    multicast_addr.addr = DNS_MQUERY_IPV4_GROUP_INIT;
+    ip_addr_t   multicast_addr = DNS_MQUERY_IPV4_GROUP_INIT;
 #endif
 #ifdef MDNS_IP6_SUPPORT
-    //TODO: set multicast address
+    //TODO: set multicast address (lwip_joingroup() is IPv4 only at the time of writing)
     multicast_addr.addr = DNS_MQUERY_IPV6_GROUP_INIT;
 #endif
-    if (ERR_OK == igmp_joingroup(IP_ADDR_ANY, &multicast_addr)) {
+    if (ERR_OK == igmp_joingroup(IP4_ADDR_ANY4, ip_2_ip4(&multicast_addr))) {
         m_pUDPContext = new UdpContext;
         m_pUDPContext->ref();
 
-        if (m_pUDPContext->listen(IP_ADDR_ANY, DNS_MQUERY_PORT)) {
+        if (m_pUDPContext->listen(IP4_ADDR_ANY, DNS_MQUERY_PORT)) {
             m_pUDPContext->setMulticastTTL(MDNS_MULTICAST_TTL);
             m_pUDPContext->onRx(std::bind(&MDNSResponder::_callProcess, this));
             
@@ -345,7 +357,7 @@ MDNSResponder::stcMDNSServiceQuery* MDNSResponder::_findNextServiceQueryByServic
  * MDNSResponder::_setHostname
  */
 bool MDNSResponder::_setHostname(const char* p_pcHostname) {
-    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] _allocHostname (%s)\n"), p_pcHostname););
+    //DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _allocHostname (%s)\n"), p_pcHostname););
     
     bool    bResult = false;
     
@@ -353,7 +365,7 @@ bool MDNSResponder::_setHostname(const char* p_pcHostname) {
     
     size_t  stLength = 0;
     if ((p_pcHostname) &&
-        (MDNS_DOMAIN_LABEL_MAXLENGTH >= (stLength = os_strlen(p_pcHostname)))) { // char max size for a single label
+        (MDNS_DOMAIN_LABEL_MAXLENGTH >= (stLength = strlen(p_pcHostname)))) { // char max size for a single label
         // Copy in hostname characters as lowercase
         if ((bResult = (0 != (m_pcHostname = new char[stLength + 1])))) {
 #ifdef MDNS_FORCE_LOWERCASE_HOSTNAME
@@ -363,7 +375,7 @@ bool MDNSResponder::_setHostname(const char* p_pcHostname) {
             }
             m_pcHostname[i] = 0;
 #else
-            os_strncpy(m_pcHostname, p_pcHostname, (stLength + 1));
+            strncpy(m_pcHostname, p_pcHostname, (stLength + 1));
 #endif
         }
     }
@@ -397,11 +409,11 @@ MDNSResponder::stcMDNSService* MDNSResponder::_allocService(const char* p_pcName
     
     stcMDNSService* pService = 0;
     if (((!p_pcName) ||
-         (MDNS_DOMAIN_LABEL_MAXLENGTH >= os_strlen(p_pcName))) &&
+         (MDNS_DOMAIN_LABEL_MAXLENGTH >= strlen(p_pcName))) &&
         (p_pcService) &&
-        (MDNS_SERVICE_NAME_LENGTH >= os_strlen(p_pcService)) &&
+        (MDNS_SERVICE_NAME_LENGTH >= strlen(p_pcService)) &&
         (p_pcProtocol) &&
-        (MDNS_SERVICE_PROTOCOL_LENGTH >= os_strlen(p_pcProtocol)) &&
+        (MDNS_SERVICE_PROTOCOL_LENGTH >= strlen(p_pcProtocol)) &&
         (p_u16Port) &&
         (0 != (pService = new stcMDNSService)) &&
         (pService->setName(p_pcName ?: m_pcHostname)) &&
@@ -517,23 +529,23 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_allocServiceTxt(MDNSResponder:
         (p_pcKey) &&
         (MDNS_SERVICE_TXT_MAXLENGTH > (p_pService->m_Txts.length() +
                                         1 +                                 // Length byte
-                                        (p_pcKey ? os_strlen(p_pcKey) : 0) +
+                                        (p_pcKey ? strlen(p_pcKey) : 0) +
                                         1 +                                 // '='
-                                        (p_pcValue ? os_strlen(p_pcValue) : 0)))) {
+                                        (p_pcValue ? strlen(p_pcValue) : 0)))) {
         
         pTxt = new stcMDNSServiceTxt;
         if (pTxt) {
-            size_t  stLength = (p_pcKey ? os_strlen(p_pcKey) : 0);
+            size_t  stLength = (p_pcKey ? strlen(p_pcKey) : 0);
             pTxt->m_pcKey = new char[stLength + 1];
             if (pTxt->m_pcKey) {
-                os_strncpy(pTxt->m_pcKey, p_pcKey, stLength); pTxt->m_pcKey[stLength] = 0;
+                strncpy(pTxt->m_pcKey, p_pcKey, stLength); pTxt->m_pcKey[stLength] = 0;
             }
             
             if (p_pcValue) {
-                stLength = (p_pcValue ? os_strlen(p_pcValue) : 0);
+                stLength = (p_pcValue ? strlen(p_pcValue) : 0);
                 pTxt->m_pcValue = new char[stLength + 1];
                 if (pTxt->m_pcValue) {
-                    os_strncpy(pTxt->m_pcValue, p_pcValue, stLength); pTxt->m_pcValue[stLength] = 0;
+                    strncpy(pTxt->m_pcValue, p_pcValue, stLength); pTxt->m_pcValue[stLength] = 0;
                 }
             }
             pTxt->m_bTemp = p_bTemp;
@@ -567,8 +579,8 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_updateServiceTxt(MDNSResponder
     if ((p_pService) &&
         (p_pTxt) &&
         (MDNS_SERVICE_TXT_MAXLENGTH > (p_pService->m_Txts.length() -
-                                        (p_pTxt->m_pcValue ? os_strlen(p_pTxt->m_pcValue) : 0) +
-                                        (p_pcValue ? os_strlen(p_pcValue) : 0)))) {
+                                        (p_pTxt->m_pcValue ? strlen(p_pTxt->m_pcValue) : 0) +
+                                        (p_pcValue ? strlen(p_pcValue) : 0)))) {
         p_pTxt->update(p_pcValue);
         p_pTxt->m_bTemp = p_bTemp;
     }
@@ -604,7 +616,7 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_addServiceTxt(MDNSResponder::s
     
     if ((p_pService) &&
         (p_pcKey) &&
-        (os_strlen(p_pcKey))) {
+        (strlen(p_pcKey))) {
         
         stcMDNSServiceTxt*  pTxt = p_pService->m_Txts.find(p_pcKey);
         if (pTxt) {
@@ -652,25 +664,25 @@ bool MDNSResponder::_releaseTempServiceTxts(MDNSResponder::stcMDNSService& p_rSe
      */
     bool MDNSResponder::_printRRDomain(const MDNSResponder::stcMDNS_RRDomain& p_RRDomain) const {
 
-        //DEBUG_OUTPUT.printf_P(PSTR_LEA("Domain: "));
+        //DEBUG_OUTPUT.printf_P(PSTR("Domain: "));
 
         const char* pCursor = p_RRDomain.m_acName;
         uint8_t     u8Length = *pCursor++;
         if (u8Length) {
             while (u8Length) {
                 for (uint8_t u=0; u<u8Length; ++u) {
-                    DEBUG_OUTPUT.printf_P(PSTR_LEA("%c"), *(pCursor++));
+                    DEBUG_OUTPUT.printf_P(PSTR("%c"), *(pCursor++));
                 }
                 u8Length = *pCursor++;
                 if (u8Length) {
-                    DEBUG_OUTPUT.printf_P(PSTR_LEA("."));
+                    DEBUG_OUTPUT.printf_P(PSTR("."));
                 }
             }
         }
         else {  // empty domain
-            DEBUG_OUTPUT.printf_P(PSTR_LEA("-empty-"));
+            DEBUG_OUTPUT.printf_P(PSTR("-empty-"));
         }
-        //DEBUG_OUTPUT.printf_P(PSTR_LEA("\n"));
+        //DEBUG_OUTPUT.printf_P(PSTR("\n"));
 
         return true;
     }
@@ -680,17 +692,17 @@ bool MDNSResponder::_releaseTempServiceTxts(MDNSResponder::stcMDNSService& p_rSe
      */
     bool MDNSResponder::_printRRAnswer(const MDNSResponder::stcMDNS_RRAnswer& p_RRAnswer) const {
 
-        DEBUG_OUTPUT.printf_P(PSTR_LEA("[MDNSResponder] RRAnswer: "));
+        DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] RRAnswer: "));
         _printRRDomain(p_RRAnswer.m_Header.m_Domain);
-        DEBUG_OUTPUT.printf_P(PSTR_LEA(" Type:0x%04X Class:0x%04X TTL:%u, "), p_RRAnswer.m_Header.m_Attributes.m_u16Type, p_RRAnswer.m_Header.m_Attributes.m_u16Class, p_RRAnswer.m_u32TTL);
+        DEBUG_OUTPUT.printf_P(PSTR(" Type:0x%04X Class:0x%04X TTL:%u, "), p_RRAnswer.m_Header.m_Attributes.m_u16Type, p_RRAnswer.m_Header.m_Attributes.m_u16Class, p_RRAnswer.m_u32TTL);
         switch (p_RRAnswer.m_Header.m_Attributes.m_u16Type & (~0x8000)) {   // Topmost bit might carry 'cache flush' flag
 #ifdef MDNS_IP4_SUPPORT
         case DNS_RRTYPE_A:
-            DEBUG_OUTPUT.printf_P(PSTR_LEA("A IP:%s"), ((const stcMDNS_RRAnswerA*)&p_RRAnswer)->m_IPAddress.toString().c_str());
+            DEBUG_OUTPUT.printf_P(PSTR("A IP:%s"), ((const stcMDNS_RRAnswerA*)&p_RRAnswer)->m_IPAddress.toString().c_str());
             break;
 #endif
         case DNS_RRTYPE_PTR:
-            DEBUG_OUTPUT.printf_P(PSTR_LEA("PTR "));
+            DEBUG_OUTPUT.printf_P(PSTR("PTR "));
             _printRRDomain(((const stcMDNS_RRAnswerPTR*)&p_RRAnswer)->m_PTRDomain);
             break;
         case DNS_RRTYPE_TXT: {
@@ -698,31 +710,33 @@ bool MDNSResponder::_releaseTempServiceTxts(MDNSResponder::stcMDNSService& p_rSe
             char*   pTxts = new char[stTxtLength];
             if (pTxts) {
                 ((/*const c_str()!!*/stcMDNS_RRAnswerTXT*)&p_RRAnswer)->m_Txts.c_str(pTxts);
-                DEBUG_OUTPUT.printf_P(PSTR_LEA("TXT(%u) %s"), stTxtLength, pTxts);
+                DEBUG_OUTPUT.printf_P(PSTR("TXT(%u) %s"), stTxtLength, pTxts);
                 delete[] pTxts;
             }
             break;
         }
 #ifdef MDNS_IP6_SUPPORT
         case DNS_RRTYPE_AAAA:
-            DEBUG_OUTPUT.printf_P(PSTR_LEA("AAAA IP:%s"), ((stcMDNS_RRAnswerA*&)p_rpRRAnswer)->m_IPAddress.toString().c_str());
+            DEBUG_OUTPUT.printf_P(PSTR("AAAA IP:%s"), ((stcMDNS_RRAnswerA*&)p_rpRRAnswer)->m_IPAddress.toString().c_str());
             break;
 #endif
         case DNS_RRTYPE_SRV:
-            DEBUG_OUTPUT.printf_P(PSTR_LEA("SRV Port:%u "), ((const stcMDNS_RRAnswerSRV*)&p_RRAnswer)->m_u16Port);
+            DEBUG_OUTPUT.printf_P(PSTR("SRV Port:%u "), ((const stcMDNS_RRAnswerSRV*)&p_RRAnswer)->m_u16Port);
             _printRRDomain(((const stcMDNS_RRAnswerSRV*)&p_RRAnswer)->m_SRVDomain);
             break;
         default:
-            DEBUG_OUTPUT.printf_P(PSTR_LEA("generic "));
+            DEBUG_OUTPUT.printf_P(PSTR("generic "));
             break;
         }
-        DEBUG_OUTPUT.printf_P(PSTR_LEA("\n"));
+        DEBUG_OUTPUT.printf_P(PSTR("\n"));
 
         return true;
     }
 #endif
 
-}   // namespace LEAmDNS
+}   // namespace MDNSImplementation
+
+} // namespace esp8266
 
 
 

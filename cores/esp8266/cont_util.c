@@ -47,7 +47,8 @@ int ICACHE_RAM_ATTR cont_check(cont_t* cont) {
     return 0;
 }
 
-int ICACHE_RAM_ATTR cont_get_free_stack(cont_t* cont) {
+// No need for this to be in IRAM, not expected to be IRQ called
+int cont_get_free_stack(cont_t* cont) {
     uint32_t *head = cont->stack;
     int freeWords = 0;
 

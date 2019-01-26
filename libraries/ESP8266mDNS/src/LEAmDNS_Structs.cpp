@@ -25,10 +25,12 @@
 #include "LEAmDNS_Priv.h"
 #include "LEAmDNS_lwIPdefs.h"
 
+namespace esp8266 {
+
 /*
- * namespace LEAmDNS
+ * LEAmDNS
  */
-namespace LEAmDNS {
+namespace MDNSImplementation {
 
 /**
  * STRUCTS
@@ -45,9 +47,9 @@ namespace LEAmDNS {
  */
 
 /*
- * MDNSResponder::stcMDNSServiceTxt::_stcMDNSServiceTxt constructor
+ * MDNSResponder::stcMDNSServiceTxt::stcMDNSServiceTxt constructor
  */
-MDNSResponder::_stcMDNSServiceTxt::_stcMDNSServiceTxt(const char* p_pcKey /*= 0*/,
+MDNSResponder::stcMDNSServiceTxt::stcMDNSServiceTxt(const char* p_pcKey /*= 0*/,
                                   const char* p_pcValue /*= 0*/,
                                   bool p_bTemp /*= false*/)
 :   m_pNext(0),
@@ -60,9 +62,9 @@ MDNSResponder::_stcMDNSServiceTxt::_stcMDNSServiceTxt(const char* p_pcKey /*= 0*
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::_stcMDNSServiceTxt copy-constructor
+ * MDNSResponder::stcMDNSServiceTxt::stcMDNSServiceTxt copy-constructor
  */
-MDNSResponder::_stcMDNSServiceTxt::_stcMDNSServiceTxt(const MDNSResponder::_stcMDNSServiceTxt& p_Other)
+MDNSResponder::stcMDNSServiceTxt::stcMDNSServiceTxt(const MDNSResponder::stcMDNSServiceTxt& p_Other)
 :   m_pNext(0),
     m_pcKey(0),
     m_pcValue(0),
@@ -72,17 +74,17 @@ MDNSResponder::_stcMDNSServiceTxt::_stcMDNSServiceTxt(const MDNSResponder::_stcM
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::~_stcMDNSServiceTxt destructor
+ * MDNSResponder::stcMDNSServiceTxt::~stcMDNSServiceTxt destructor
  */
-MDNSResponder::_stcMDNSServiceTxt::~_stcMDNSServiceTxt(void) {
+MDNSResponder::stcMDNSServiceTxt::~stcMDNSServiceTxt(void) {
     
     clear();
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::operator=
+ * MDNSResponder::stcMDNSServiceTxt::operator=
  */
-MDNSResponder::_stcMDNSServiceTxt& MDNSResponder::_stcMDNSServiceTxt::operator=(const MDNSResponder::_stcMDNSServiceTxt& p_Other) {
+MDNSResponder::stcMDNSServiceTxt& MDNSResponder::stcMDNSServiceTxt::operator=(const MDNSResponder::stcMDNSServiceTxt& p_Other) {
 
     if (&p_Other != this) {
         clear();
@@ -92,9 +94,9 @@ MDNSResponder::_stcMDNSServiceTxt& MDNSResponder::_stcMDNSServiceTxt::operator=(
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::clear
+ * MDNSResponder::stcMDNSServiceTxt::clear
  */
-bool MDNSResponder::_stcMDNSServiceTxt::clear(void) {
+bool MDNSResponder::stcMDNSServiceTxt::clear(void) {
     
     releaseKey();
     releaseValue();
@@ -102,9 +104,9 @@ bool MDNSResponder::_stcMDNSServiceTxt::clear(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::allocKey
+ * MDNSResponder::stcMDNSServiceTxt::allocKey
  */
-char* MDNSResponder::_stcMDNSServiceTxt::allocKey(size_t p_stLength) {
+char* MDNSResponder::stcMDNSServiceTxt::allocKey(size_t p_stLength) {
     
     releaseKey();
     if (p_stLength) {
@@ -114,9 +116,9 @@ char* MDNSResponder::_stcMDNSServiceTxt::allocKey(size_t p_stLength) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::setKey
+ * MDNSResponder::stcMDNSServiceTxt::setKey
  */
-bool MDNSResponder::_stcMDNSServiceTxt::setKey(const char* p_pcKey,
+bool MDNSResponder::stcMDNSServiceTxt::setKey(const char* p_pcKey,
                                                size_t p_stLength) {
     
     bool bResult = false;
@@ -124,7 +126,7 @@ bool MDNSResponder::_stcMDNSServiceTxt::setKey(const char* p_pcKey,
     releaseKey();
     if (p_stLength) {
         if (allocKey(p_stLength)) {
-            os_strncpy(m_pcKey, p_pcKey, p_stLength);
+            strncpy(m_pcKey, p_pcKey, p_stLength);
             m_pcKey[p_stLength] = 0;
             bResult = true;
         }
@@ -133,17 +135,17 @@ bool MDNSResponder::_stcMDNSServiceTxt::setKey(const char* p_pcKey,
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::setKey
+ * MDNSResponder::stcMDNSServiceTxt::setKey
  */
-bool MDNSResponder::_stcMDNSServiceTxt::setKey(const char* p_pcKey) {
+bool MDNSResponder::stcMDNSServiceTxt::setKey(const char* p_pcKey) {
     
-    return setKey(p_pcKey, (p_pcKey ? os_strlen(p_pcKey) : 0));
+    return setKey(p_pcKey, (p_pcKey ? strlen(p_pcKey) : 0));
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::releaseKey
+ * MDNSResponder::stcMDNSServiceTxt::releaseKey
  */
-bool MDNSResponder::_stcMDNSServiceTxt::releaseKey(void) {
+bool MDNSResponder::stcMDNSServiceTxt::releaseKey(void) {
     
     if (m_pcKey) {
         delete[] m_pcKey;
@@ -153,9 +155,9 @@ bool MDNSResponder::_stcMDNSServiceTxt::releaseKey(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::allocValue
+ * MDNSResponder::stcMDNSServiceTxt::allocValue
  */
-char* MDNSResponder::_stcMDNSServiceTxt::allocValue(size_t p_stLength) {
+char* MDNSResponder::stcMDNSServiceTxt::allocValue(size_t p_stLength) {
     
     releaseValue();
     if (p_stLength) {
@@ -165,9 +167,9 @@ char* MDNSResponder::_stcMDNSServiceTxt::allocValue(size_t p_stLength) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::setValue
+ * MDNSResponder::stcMDNSServiceTxt::setValue
  */
-bool MDNSResponder::_stcMDNSServiceTxt::setValue(const char* p_pcValue,
+bool MDNSResponder::stcMDNSServiceTxt::setValue(const char* p_pcValue,
                                                  size_t p_stLength) {
     
     bool bResult = false;
@@ -175,7 +177,7 @@ bool MDNSResponder::_stcMDNSServiceTxt::setValue(const char* p_pcValue,
     releaseValue();
     if (p_stLength) {
         if (allocValue(p_stLength)) {
-            os_strncpy(m_pcValue, p_pcValue, p_stLength);
+            strncpy(m_pcValue, p_pcValue, p_stLength);
             m_pcValue[p_stLength] = 0;
             bResult = true;
         }
@@ -187,17 +189,17 @@ bool MDNSResponder::_stcMDNSServiceTxt::setValue(const char* p_pcValue,
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::setValue
+ * MDNSResponder::stcMDNSServiceTxt::setValue
  */
-bool MDNSResponder::_stcMDNSServiceTxt::setValue(const char* p_pcValue) {
+bool MDNSResponder::stcMDNSServiceTxt::setValue(const char* p_pcValue) {
     
-    return setValue(p_pcValue, (p_pcValue ? os_strlen(p_pcValue) : 0));
+    return setValue(p_pcValue, (p_pcValue ? strlen(p_pcValue) : 0));
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::releaseValue
+ * MDNSResponder::stcMDNSServiceTxt::releaseValue
  */
-bool MDNSResponder::_stcMDNSServiceTxt::releaseValue(void) {
+bool MDNSResponder::stcMDNSServiceTxt::releaseValue(void) {
     
     if (m_pcValue) {
         delete[] m_pcValue;
@@ -207,9 +209,9 @@ bool MDNSResponder::_stcMDNSServiceTxt::releaseValue(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::set
+ * MDNSResponder::stcMDNSServiceTxt::set
  */
-bool MDNSResponder::_stcMDNSServiceTxt::set(const char* p_pcKey,
+bool MDNSResponder::stcMDNSServiceTxt::set(const char* p_pcKey,
                                             const char* p_pcValue,
                                             bool p_bTemp /*= false*/) {
     
@@ -219,25 +221,25 @@ bool MDNSResponder::_stcMDNSServiceTxt::set(const char* p_pcKey,
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::update
+ * MDNSResponder::stcMDNSServiceTxt::update
  */
-bool MDNSResponder::_stcMDNSServiceTxt::update(const char* p_pcValue) {
+bool MDNSResponder::stcMDNSServiceTxt::update(const char* p_pcValue) {
     
     return setValue(p_pcValue);
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxt::length
+ * MDNSResponder::stcMDNSServiceTxt::length
  *
  * length of eg. 'c#=1' without any closing '\0'
  */
-size_t MDNSResponder::_stcMDNSServiceTxt::length(void) const {
+size_t MDNSResponder::stcMDNSServiceTxt::length(void) const {
 
     size_t  stLength = 0;
     if (m_pcKey) {
-        stLength += os_strlen(m_pcKey);                     // Key
+        stLength += strlen(m_pcKey);                     // Key
         stLength += 1;                                      // '='
-        stLength += (m_pcValue ? os_strlen(m_pcValue) : 0); // Value
+        stLength += (m_pcValue ? strlen(m_pcValue) : 0); // Value
     }
     return stLength;
 }
@@ -256,34 +258,34 @@ size_t MDNSResponder::_stcMDNSServiceTxt::length(void) const {
  */
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::_stcMDNSServiceTxts contructor
+ * MDNSResponder::stcMDNSServiceTxts::stcMDNSServiceTxts contructor
  */
-MDNSResponder::_stcMDNSServiceTxts::_stcMDNSServiceTxts(void)
+MDNSResponder::stcMDNSServiceTxts::stcMDNSServiceTxts(void)
 :   m_pTxts(0) {
     
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::_stcMDNSServiceTxts copy-constructor
+ * MDNSResponder::stcMDNSServiceTxts::stcMDNSServiceTxts copy-constructor
  */
-MDNSResponder::_stcMDNSServiceTxts::_stcMDNSServiceTxts(const _stcMDNSServiceTxts& p_Other)
+MDNSResponder::stcMDNSServiceTxts::stcMDNSServiceTxts(const stcMDNSServiceTxts& p_Other)
 :   m_pTxts(0) {
     
     operator=(p_Other);
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::~_stcMDNSServiceTxts destructor
+ * MDNSResponder::stcMDNSServiceTxts::~stcMDNSServiceTxts destructor
  */
-MDNSResponder::_stcMDNSServiceTxts::~_stcMDNSServiceTxts(void) {
+MDNSResponder::stcMDNSServiceTxts::~stcMDNSServiceTxts(void) {
     
     clear();
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::operator=
+ * MDNSResponder::stcMDNSServiceTxts::operator=
  */
-MDNSResponder::_stcMDNSServiceTxts& MDNSResponder::_stcMDNSServiceTxts::operator=(const _stcMDNSServiceTxts& p_Other) {
+MDNSResponder::stcMDNSServiceTxts& MDNSResponder::stcMDNSServiceTxts::operator=(const stcMDNSServiceTxts& p_Other) {
 
     if (this != &p_Other) {
         clear();
@@ -296,9 +298,9 @@ MDNSResponder::_stcMDNSServiceTxts& MDNSResponder::_stcMDNSServiceTxts::operator
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::clear
+ * MDNSResponder::stcMDNSServiceTxts::clear
  */
-bool MDNSResponder::_stcMDNSServiceTxts::clear(void) {
+bool MDNSResponder::stcMDNSServiceTxts::clear(void) {
     
     while (m_pTxts) {
         stcMDNSServiceTxt* pNext = m_pTxts->m_pNext;
@@ -309,9 +311,9 @@ bool MDNSResponder::_stcMDNSServiceTxts::clear(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::add
+ * MDNSResponder::stcMDNSServiceTxts::add
  */
-bool MDNSResponder::_stcMDNSServiceTxts::add(MDNSResponder::stcMDNSServiceTxt* p_pTxt) {
+bool MDNSResponder::stcMDNSServiceTxts::add(MDNSResponder::stcMDNSServiceTxt* p_pTxt) {
     
     bool bResult = false;
     
@@ -324,9 +326,9 @@ bool MDNSResponder::_stcMDNSServiceTxts::add(MDNSResponder::stcMDNSServiceTxt* p
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::remove
+ * MDNSResponder::stcMDNSServiceTxts::remove
  */
-bool MDNSResponder::_stcMDNSServiceTxts::remove(stcMDNSServiceTxt* p_pTxt) {
+bool MDNSResponder::stcMDNSServiceTxts::remove(stcMDNSServiceTxt* p_pTxt) {
     
     bool    bResult = false;
     
@@ -351,9 +353,9 @@ bool MDNSResponder::_stcMDNSServiceTxts::remove(stcMDNSServiceTxt* p_pTxt) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::removeTempTxts
+ * MDNSResponder::stcMDNSServiceTxts::removeTempTxts
  */
-bool MDNSResponder::_stcMDNSServiceTxts::removeTempTxts(void) {
+bool MDNSResponder::stcMDNSServiceTxts::removeTempTxts(void) {
 
     bool    bResult = true;
     
@@ -370,11 +372,11 @@ bool MDNSResponder::_stcMDNSServiceTxts::removeTempTxts(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::find
+ * MDNSResponder::stcMDNSServiceTxts::find
  */
-MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_stcMDNSServiceTxts::find(const char* p_pcKey) {
+MDNSResponder::stcMDNSServiceTxt* MDNSResponder::stcMDNSServiceTxts::find(const char* p_pcKey) {
     
-    _stcMDNSServiceTxt* pResult = 0;
+    stcMDNSServiceTxt* pResult = 0;
     
     for (stcMDNSServiceTxt* pTxt=m_pTxts; pTxt; pTxt=pTxt->m_pNext) {
         if ((p_pcKey) &&
@@ -387,11 +389,11 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_stcMDNSServiceTxts::find(const
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::find
+ * MDNSResponder::stcMDNSServiceTxts::find
  */
-const MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_stcMDNSServiceTxts::find(const char* p_pcKey) const {
+const MDNSResponder::stcMDNSServiceTxt* MDNSResponder::stcMDNSServiceTxts::find(const char* p_pcKey) const {
     
-    const _stcMDNSServiceTxt*   pResult = 0;
+    const stcMDNSServiceTxt*   pResult = 0;
     
     for (const stcMDNSServiceTxt* pTxt=m_pTxts; pTxt; pTxt=pTxt->m_pNext) {
         if ((p_pcKey) &&
@@ -405,11 +407,11 @@ const MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_stcMDNSServiceTxts::find
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::find
+ * MDNSResponder::stcMDNSServiceTxts::find
  */
-MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_stcMDNSServiceTxts::find(const stcMDNSServiceTxt* p_pTxt) {
+MDNSResponder::stcMDNSServiceTxt* MDNSResponder::stcMDNSServiceTxts::find(const stcMDNSServiceTxt* p_pTxt) {
     
-    _stcMDNSServiceTxt* pResult = 0;
+    stcMDNSServiceTxt* pResult = 0;
     
     for (stcMDNSServiceTxt* pTxt=m_pTxts; pTxt; pTxt=pTxt->m_pNext) {
         if (p_pTxt == pTxt) {
@@ -421,9 +423,9 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_stcMDNSServiceTxts::find(const
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::length
+ * MDNSResponder::stcMDNSServiceTxts::length
  */
-uint16_t MDNSResponder::_stcMDNSServiceTxts::length(void) const {
+uint16_t MDNSResponder::stcMDNSServiceTxts::length(void) const {
     
     uint16_t    u16Length = 0;
 
@@ -437,19 +439,19 @@ uint16_t MDNSResponder::_stcMDNSServiceTxts::length(void) const {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::c_strLength
+ * MDNSResponder::stcMDNSServiceTxts::c_strLength
  *
  * (incl. closing '\0'). Length bytes place is used for delimiting ';' and closing '\0'
  */
-size_t MDNSResponder::_stcMDNSServiceTxts::c_strLength(void) const {
+size_t MDNSResponder::stcMDNSServiceTxts::c_strLength(void) const {
     
     return length();
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::c_str
+ * MDNSResponder::stcMDNSServiceTxts::c_str
  */
-bool MDNSResponder::_stcMDNSServiceTxts::c_str(char* p_pcBuffer) {
+bool MDNSResponder::stcMDNSServiceTxts::c_str(char* p_pcBuffer) {
     
     bool bResult = false;
     
@@ -459,15 +461,15 @@ bool MDNSResponder::_stcMDNSServiceTxts::c_str(char* p_pcBuffer) {
         *p_pcBuffer = 0;
         for (stcMDNSServiceTxt* pTxt=m_pTxts; ((bResult) && (pTxt)); pTxt = pTxt->m_pNext) {
             size_t  stLength;
-            if ((bResult = (0 != (stLength = (pTxt->m_pcKey ? os_strlen(pTxt->m_pcKey) : 0))))) {
+            if ((bResult = (0 != (stLength = (pTxt->m_pcKey ? strlen(pTxt->m_pcKey) : 0))))) {
                 if (pTxt != m_pTxts) {
                     *p_pcBuffer++ = ';';
                 }
-                os_strncpy(p_pcBuffer, pTxt->m_pcKey, stLength); p_pcBuffer[stLength] = 0;
+                strncpy(p_pcBuffer, pTxt->m_pcKey, stLength); p_pcBuffer[stLength] = 0;
                 p_pcBuffer += stLength;
                 *p_pcBuffer++ = '=';
-                if ((stLength = (pTxt->m_pcValue ? os_strlen(pTxt->m_pcValue) : 0))) {
-                    os_strncpy(p_pcBuffer, pTxt->m_pcValue, stLength); p_pcBuffer[stLength] = 0;
+                if ((stLength = (pTxt->m_pcValue ? strlen(pTxt->m_pcValue) : 0))) {
+                    strncpy(p_pcBuffer, pTxt->m_pcValue, stLength); p_pcBuffer[stLength] = 0;
                     p_pcBuffer += stLength;
                 }
             }
@@ -478,19 +480,19 @@ bool MDNSResponder::_stcMDNSServiceTxts::c_str(char* p_pcBuffer) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::bufferLength
+ * MDNSResponder::stcMDNSServiceTxts::bufferLength
  *
  * (incl. closing '\0').
  */
-size_t MDNSResponder::_stcMDNSServiceTxts::bufferLength(void) const {
+size_t MDNSResponder::stcMDNSServiceTxts::bufferLength(void) const {
     
     return (length() + 1);
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::toBuffer
+ * MDNSResponder::stcMDNSServiceTxts::toBuffer
  */
-bool MDNSResponder::_stcMDNSServiceTxts::buffer(char* p_pcBuffer) {
+bool MDNSResponder::stcMDNSServiceTxts::buffer(char* p_pcBuffer) {
     
     bool bResult = false;
 
@@ -501,12 +503,12 @@ bool MDNSResponder::_stcMDNSServiceTxts::buffer(char* p_pcBuffer) {
         for (stcMDNSServiceTxt* pTxt=m_pTxts; ((bResult) && (pTxt)); pTxt = pTxt->m_pNext) {
             *(unsigned char*)p_pcBuffer++ = pTxt->length();
             size_t  stLength;
-            if ((bResult = (0 != (stLength = (pTxt->m_pcKey ? os_strlen(pTxt->m_pcKey) : 0))))) {
-                os_memcpy(p_pcBuffer, pTxt->m_pcKey, stLength);
+            if ((bResult = (0 != (stLength = (pTxt->m_pcKey ? strlen(pTxt->m_pcKey) : 0))))) {
+                memcpy(p_pcBuffer, pTxt->m_pcKey, stLength);
                 p_pcBuffer += stLength;
                 *p_pcBuffer++ = '=';
-                if ((stLength = (pTxt->m_pcValue ? os_strlen(pTxt->m_pcValue) : 0))) {
-                    os_memcpy(p_pcBuffer, pTxt->m_pcValue, stLength);
+                if ((stLength = (pTxt->m_pcValue ? strlen(pTxt->m_pcValue) : 0))) {
+                    memcpy(p_pcBuffer, pTxt->m_pcValue, stLength);
                     p_pcBuffer += stLength;
                 }
             }
@@ -517,9 +519,9 @@ bool MDNSResponder::_stcMDNSServiceTxts::buffer(char* p_pcBuffer) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::compare
+ * MDNSResponder::stcMDNSServiceTxts::compare
  */
-bool MDNSResponder::_stcMDNSServiceTxts::compare(const MDNSResponder::_stcMDNSServiceTxts& p_Other) const {
+bool MDNSResponder::stcMDNSServiceTxts::compare(const MDNSResponder::stcMDNSServiceTxts& p_Other) const {
 
     bool    bResult = false;
 
@@ -530,7 +532,7 @@ bool MDNSResponder::_stcMDNSServiceTxts::compare(const MDNSResponder::_stcMDNSSe
             bResult = ((pOtherTxt) &&
                        (pTxt->m_pcValue) &&
                        (pOtherTxt->m_pcValue) &&
-                       (os_strlen(pTxt->m_pcValue) == os_strlen(pOtherTxt->m_pcValue)) &&
+                       (strlen(pTxt->m_pcValue) == strlen(pOtherTxt->m_pcValue)) &&
                        (0 == strcmp(pTxt->m_pcValue, pOtherTxt->m_pcValue)));
         }
         // Compare B->A
@@ -539,7 +541,7 @@ bool MDNSResponder::_stcMDNSServiceTxts::compare(const MDNSResponder::_stcMDNSSe
             bResult = ((pTxt) &&
                        (pOtherTxt->m_pcValue) &&
                        (pTxt->m_pcValue) &&
-                       (os_strlen(pOtherTxt->m_pcValue) == os_strlen(pTxt->m_pcValue)) &&
+                       (strlen(pOtherTxt->m_pcValue) == strlen(pTxt->m_pcValue)) &&
                        (0 == strcmp(pOtherTxt->m_pcValue, pTxt->m_pcValue)));
         }
     }
@@ -547,17 +549,17 @@ bool MDNSResponder::_stcMDNSServiceTxts::compare(const MDNSResponder::_stcMDNSSe
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::operator==
+ * MDNSResponder::stcMDNSServiceTxts::operator==
  */
-bool MDNSResponder::_stcMDNSServiceTxts::operator==(const _stcMDNSServiceTxts& p_Other) const {
+bool MDNSResponder::stcMDNSServiceTxts::operator==(const stcMDNSServiceTxts& p_Other) const {
     
     return compare(p_Other);
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceTxts::operator!=
+ * MDNSResponder::stcMDNSServiceTxts::operator!=
  */
-bool MDNSResponder::_stcMDNSServiceTxts::operator!=(const _stcMDNSServiceTxts& p_Other) const {
+bool MDNSResponder::stcMDNSServiceTxts::operator!=(const stcMDNSServiceTxts& p_Other) const {
     
     return !compare(p_Other);
 }
@@ -571,9 +573,9 @@ bool MDNSResponder::_stcMDNSServiceTxts::operator!=(const _stcMDNSServiceTxts& p
  */
 
 /*
- * MDNSResponder::_stcMDNS_MsgHeader::_stcMDNS_MsgHeader
+ * MDNSResponder::stcMDNS_MsgHeader::stcMDNS_MsgHeader
  */
-MDNSResponder::_stcMDNS_MsgHeader::_stcMDNS_MsgHeader(uint16_t p_u16ID /*= 0*/,
+MDNSResponder::stcMDNS_MsgHeader::stcMDNS_MsgHeader(uint16_t p_u16ID /*= 0*/,
                                                       bool p_bQR /*= false*/,
                                                       unsigned char p_ucOpcode /*= 0*/,
                                                       bool p_bAA /*= false*/,
@@ -610,27 +612,27 @@ MDNSResponder::_stcMDNS_MsgHeader::_stcMDNS_MsgHeader(uint16_t p_u16ID /*= 0*/,
  */
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::_stcMDNS_RRDomain constructor
+ * MDNSResponder::stcMDNS_RRDomain::stcMDNS_RRDomain constructor
  */
-MDNSResponder::_stcMDNS_RRDomain::_stcMDNS_RRDomain(void)
+MDNSResponder::stcMDNS_RRDomain::stcMDNS_RRDomain(void)
 :   m_u16NameLength(0) {
     
     clear();
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::_stcMDNS_RRDomain copy-constructor
+ * MDNSResponder::stcMDNS_RRDomain::stcMDNS_RRDomain copy-constructor
  */
-MDNSResponder::_stcMDNS_RRDomain::_stcMDNS_RRDomain(const _stcMDNS_RRDomain& p_Other)
+MDNSResponder::stcMDNS_RRDomain::stcMDNS_RRDomain(const stcMDNS_RRDomain& p_Other)
 :   m_u16NameLength(0) {
     
     operator=(p_Other);
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::operator =
+ * MDNSResponder::stcMDNS_RRDomain::operator =
  */
-MDNSResponder::_stcMDNS_RRDomain& MDNSResponder::_stcMDNS_RRDomain::operator=(const _stcMDNS_RRDomain& p_Other) {
+MDNSResponder::stcMDNS_RRDomain& MDNSResponder::stcMDNS_RRDomain::operator=(const stcMDNS_RRDomain& p_Other) {
     
     if (&p_Other != this) {
         memcpy(m_acName, p_Other.m_acName, sizeof(m_acName));
@@ -640,9 +642,9 @@ MDNSResponder::_stcMDNS_RRDomain& MDNSResponder::_stcMDNS_RRDomain::operator=(co
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::clear
+ * MDNSResponder::stcMDNS_RRDomain::clear
  */
-bool MDNSResponder::_stcMDNS_RRDomain::clear(void) {
+bool MDNSResponder::stcMDNS_RRDomain::clear(void) {
     
     memset(m_acName, 0, sizeof(m_acName));
     m_u16NameLength = 0;
@@ -650,15 +652,15 @@ bool MDNSResponder::_stcMDNS_RRDomain::clear(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::addLabel
+ * MDNSResponder::stcMDNS_RRDomain::addLabel
  */
-bool MDNSResponder::_stcMDNS_RRDomain::addLabel(const char* p_pcLabel,
+bool MDNSResponder::stcMDNS_RRDomain::addLabel(const char* p_pcLabel,
                                                 bool p_bPrependUnderline /*= false*/) {
     
     bool    bResult = false;    
     
     size_t  stLength = (p_pcLabel
-                        ? (os_strlen(p_pcLabel) + (p_bPrependUnderline ? 1 : 0))
+                        ? (strlen(p_pcLabel) + (p_bPrependUnderline ? 1 : 0))
                         : 0);
     if ((MDNS_DOMAIN_LABEL_MAXLENGTH >= stLength) &&
         (MDNS_DOMAIN_MAXLENGTH >= (m_u16NameLength + (1 + stLength)))) {
@@ -671,7 +673,7 @@ bool MDNSResponder::_stcMDNS_RRDomain::addLabel(const char* p_pcLabel,
                 m_acName[m_u16NameLength++] = '_';
                 --stLength;
             }
-            os_strncpy(&(m_acName[m_u16NameLength]), p_pcLabel, stLength); m_acName[m_u16NameLength + stLength] = 0;
+            strncpy(&(m_acName[m_u16NameLength]), p_pcLabel, stLength); m_acName[m_u16NameLength + stLength] = 0;
             m_u16NameLength += stLength;
         }
         bResult = true;
@@ -680,9 +682,9 @@ bool MDNSResponder::_stcMDNS_RRDomain::addLabel(const char* p_pcLabel,
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::compare
+ * MDNSResponder::stcMDNS_RRDomain::compare
  */
-bool MDNSResponder::_stcMDNS_RRDomain::compare(const _stcMDNS_RRDomain& p_Other) const {
+bool MDNSResponder::stcMDNS_RRDomain::compare(const stcMDNS_RRDomain& p_Other) const {
     
     bool    bResult = false;
     
@@ -707,34 +709,34 @@ bool MDNSResponder::_stcMDNS_RRDomain::compare(const _stcMDNS_RRDomain& p_Other)
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::operator ==
+ * MDNSResponder::stcMDNS_RRDomain::operator ==
  */
-bool MDNSResponder::_stcMDNS_RRDomain::operator==(const _stcMDNS_RRDomain& p_Other) const {
+bool MDNSResponder::stcMDNS_RRDomain::operator==(const stcMDNS_RRDomain& p_Other) const {
     
     return compare(p_Other);
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::operator !=
+ * MDNSResponder::stcMDNS_RRDomain::operator !=
  */
-bool MDNSResponder::_stcMDNS_RRDomain::operator!=(const _stcMDNS_RRDomain& p_Other) const {
+bool MDNSResponder::stcMDNS_RRDomain::operator!=(const stcMDNS_RRDomain& p_Other) const {
     
     return !compare(p_Other);
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::operator >
+ * MDNSResponder::stcMDNS_RRDomain::operator >
  */
-bool MDNSResponder::_stcMDNS_RRDomain::operator>(const _stcMDNS_RRDomain& p_Other) const {
+bool MDNSResponder::stcMDNS_RRDomain::operator>(const stcMDNS_RRDomain& p_Other) const {
 
     // TODO: Check, if this is a good idea...
     return !compare(p_Other);
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::c_strLength
+ * MDNSResponder::stcMDNS_RRDomain::c_strLength
  */
-size_t MDNSResponder::_stcMDNS_RRDomain::c_strLength(void) const {
+size_t MDNSResponder::stcMDNS_RRDomain::c_strLength(void) const {
     
     size_t          stLength = 0;
     
@@ -747,9 +749,9 @@ size_t MDNSResponder::_stcMDNS_RRDomain::c_strLength(void) const {
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRDomain::c_str
+ * MDNSResponder::stcMDNS_RRDomain::c_str
  */
-bool MDNSResponder::_stcMDNS_RRDomain::c_str(char* p_pcBuffer) {
+bool MDNSResponder::stcMDNS_RRDomain::c_str(char* p_pcBuffer) {
     
     bool bResult = false;
     
@@ -776,9 +778,9 @@ bool MDNSResponder::_stcMDNS_RRDomain::c_str(char* p_pcBuffer) {
  */
 
 /*
- * MDNSResponder::_stcMDNS_RRAttributes::_stcMDNS_RRAttributes constructor
+ * MDNSResponder::stcMDNS_RRAttributes::stcMDNS_RRAttributes constructor
  */
-MDNSResponder::_stcMDNS_RRAttributes::_stcMDNS_RRAttributes(uint16_t p_u16Type /*= 0*/,
+MDNSResponder::stcMDNS_RRAttributes::stcMDNS_RRAttributes(uint16_t p_u16Type /*= 0*/,
                                                             uint16_t p_u16Class /*= 1 DNS_RRCLASS_IN Internet*/)
 :   m_u16Type(p_u16Type),
     m_u16Class(p_u16Class) {
@@ -786,17 +788,17 @@ MDNSResponder::_stcMDNS_RRAttributes::_stcMDNS_RRAttributes(uint16_t p_u16Type /
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAttributes::_stcMDNS_RRAttributes copy-constructor
+ * MDNSResponder::stcMDNS_RRAttributes::stcMDNS_RRAttributes copy-constructor
  */
-MDNSResponder::_stcMDNS_RRAttributes::_stcMDNS_RRAttributes(const MDNSResponder::_stcMDNS_RRAttributes& p_Other) {
+MDNSResponder::stcMDNS_RRAttributes::stcMDNS_RRAttributes(const MDNSResponder::stcMDNS_RRAttributes& p_Other) {
     
     operator=(p_Other);
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAttributes::operator =
+ * MDNSResponder::stcMDNS_RRAttributes::operator =
  */
-MDNSResponder::_stcMDNS_RRAttributes& MDNSResponder::_stcMDNS_RRAttributes::operator=(const MDNSResponder::_stcMDNS_RRAttributes& p_Other) {
+MDNSResponder::stcMDNS_RRAttributes& MDNSResponder::stcMDNS_RRAttributes::operator=(const MDNSResponder::stcMDNS_RRAttributes& p_Other) {
     
     if (&p_Other != this) {
         m_u16Type = p_Other.m_u16Type;
@@ -814,24 +816,24 @@ MDNSResponder::_stcMDNS_RRAttributes& MDNSResponder::_stcMDNS_RRAttributes::oper
  */
 
 /*
- * MDNSResponder::_stcMDNS_RRHeader::_stcMDNS_RRHeader constructor
+ * MDNSResponder::stcMDNS_RRHeader::stcMDNS_RRHeader constructor
  */
-MDNSResponder::_stcMDNS_RRHeader::_stcMDNS_RRHeader(void) {
+MDNSResponder::stcMDNS_RRHeader::stcMDNS_RRHeader(void) {
     
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRHeader::_stcMDNS_RRHeader copy-constructor
+ * MDNSResponder::stcMDNS_RRHeader::stcMDNS_RRHeader copy-constructor
  */
-MDNSResponder::_stcMDNS_RRHeader::_stcMDNS_RRHeader(const _stcMDNS_RRHeader& p_Other) {
+MDNSResponder::stcMDNS_RRHeader::stcMDNS_RRHeader(const stcMDNS_RRHeader& p_Other) {
     
     operator=(p_Other);
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRHeader::operator =
+ * MDNSResponder::stcMDNS_RRHeader::operator =
  */
-MDNSResponder::_stcMDNS_RRHeader& MDNSResponder::_stcMDNS_RRHeader::operator=(const MDNSResponder::_stcMDNS_RRHeader& p_Other) {
+MDNSResponder::stcMDNS_RRHeader& MDNSResponder::stcMDNS_RRHeader::operator=(const MDNSResponder::stcMDNS_RRHeader& p_Other) {
     
     if (&p_Other != this) {
         m_Domain = p_Other.m_Domain;
@@ -841,9 +843,9 @@ MDNSResponder::_stcMDNS_RRHeader& MDNSResponder::_stcMDNS_RRHeader::operator=(co
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRHeader::clear
+ * MDNSResponder::stcMDNS_RRHeader::clear
  */
-bool MDNSResponder::_stcMDNS_RRHeader::clear(void) {
+bool MDNSResponder::stcMDNS_RRHeader::clear(void) {
     
     m_Domain.clear();
     return true;
@@ -858,9 +860,9 @@ bool MDNSResponder::_stcMDNS_RRHeader::clear(void) {
  */
  
 /*
- * MDNSResponder::_stcMDNS_RRQuestion::_stcMDNS_RRQuestion constructor
+ * MDNSResponder::stcMDNS_RRQuestion::stcMDNS_RRQuestion constructor
  */
-MDNSResponder::_stcMDNS_RRQuestion::_stcMDNS_RRQuestion(void)
+MDNSResponder::stcMDNS_RRQuestion::stcMDNS_RRQuestion(void)
 :   m_pNext(0),
     m_bUnicast(false) {
     
@@ -876,9 +878,9 @@ MDNSResponder::_stcMDNS_RRQuestion::_stcMDNS_RRQuestion(void)
  */
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswer::_stcMDNS_RRAnswer constructor
+ * MDNSResponder::stcMDNS_RRAnswer::stcMDNS_RRAnswer constructor
  */
-MDNSResponder::_stcMDNS_RRAnswer::_stcMDNS_RRAnswer(enuAnswerType p_AnswerType,
+MDNSResponder::stcMDNS_RRAnswer::stcMDNS_RRAnswer(enuAnswerType p_AnswerType,
                                                     const MDNSResponder::stcMDNS_RRHeader& p_Header,
                                                     uint32_t p_u32TTL)
 :   m_pNext(0),
@@ -892,24 +894,24 @@ MDNSResponder::_stcMDNS_RRAnswer::_stcMDNS_RRAnswer(enuAnswerType p_AnswerType,
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswer::~_stcMDNS_RRAnswer destructor
+ * MDNSResponder::stcMDNS_RRAnswer::~stcMDNS_RRAnswer destructor
  */
-MDNSResponder::_stcMDNS_RRAnswer::~_stcMDNS_RRAnswer(void) {
+MDNSResponder::stcMDNS_RRAnswer::~stcMDNS_RRAnswer(void) {
     
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswer::answerType
+ * MDNSResponder::stcMDNS_RRAnswer::answerType
  */
-MDNSResponder::enuAnswerType MDNSResponder::_stcMDNS_RRAnswer::answerType(void) const {
+MDNSResponder::enuAnswerType MDNSResponder::stcMDNS_RRAnswer::answerType(void) const {
     
     return m_AnswerType;
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswer::clear
+ * MDNSResponder::stcMDNS_RRAnswer::clear
  */
-bool MDNSResponder::_stcMDNS_RRAnswer::clear(void) {
+bool MDNSResponder::stcMDNS_RRAnswer::clear(void) {
     
     m_pNext = 0;
     m_Header.clear(); 
@@ -927,9 +929,9 @@ bool MDNSResponder::_stcMDNS_RRAnswer::clear(void) {
 
 #ifdef MDNS_IP4_SUPPORT
     /*
-     * MDNSResponder::_stcMDNS_RRAnswerA::stcMDNS_RRAnswerA constructor
+     * MDNSResponder::stcMDNS_RRAnswerA::stcMDNS_RRAnswerA constructor
      */
-    MDNSResponder::_stcMDNS_RRAnswerA::_stcMDNS_RRAnswerA(const MDNSResponder::stcMDNS_RRHeader& p_Header,
+    MDNSResponder::stcMDNS_RRAnswerA::stcMDNS_RRAnswerA(const MDNSResponder::stcMDNS_RRHeader& p_Header,
                                                           uint32_t p_u32TTL)
     :   stcMDNS_RRAnswer(AnswerType_A, p_Header, p_u32TTL),
         m_IPAddress(0, 0, 0, 0) {
@@ -937,17 +939,17 @@ bool MDNSResponder::_stcMDNS_RRAnswer::clear(void) {
     }
 
     /*
-     * MDNSResponder::_stcMDNS_RRAnswerA::_stcMDNS_RRAnswerA destructor
+     * MDNSResponder::stcMDNS_RRAnswerA::stcMDNS_RRAnswerA destructor
      */
-    MDNSResponder::_stcMDNS_RRAnswerA::~_stcMDNS_RRAnswerA(void) {
+    MDNSResponder::stcMDNS_RRAnswerA::~stcMDNS_RRAnswerA(void) {
         
         clear();
     }
 
     /*
-     * MDNSResponder::_stcMDNS_RRAnswerA::clear
+     * MDNSResponder::stcMDNS_RRAnswerA::clear
      */
-    bool MDNSResponder::_stcMDNS_RRAnswerA::clear(void) {
+    bool MDNSResponder::stcMDNS_RRAnswerA::clear(void) {
         
         m_IPAddress = IPAddress(0, 0, 0, 0);
         return true;
@@ -964,26 +966,26 @@ bool MDNSResponder::_stcMDNS_RRAnswer::clear(void) {
  */
     
 /*
- * MDNSResponder::_stcMDNS_RRAnswerPTR::_stcMDNS_RRAnswerPTR constructor
+ * MDNSResponder::stcMDNS_RRAnswerPTR::stcMDNS_RRAnswerPTR constructor
  */
-MDNSResponder::_stcMDNS_RRAnswerPTR::_stcMDNS_RRAnswerPTR(const MDNSResponder::stcMDNS_RRHeader& p_Header,
+MDNSResponder::stcMDNS_RRAnswerPTR::stcMDNS_RRAnswerPTR(const MDNSResponder::stcMDNS_RRHeader& p_Header,
                                                           uint32_t p_u32TTL)
 :   stcMDNS_RRAnswer(AnswerType_PTR, p_Header, p_u32TTL) {
 
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswerPTR::~_stcMDNS_RRAnswerPTR destructor
+ * MDNSResponder::stcMDNS_RRAnswerPTR::~stcMDNS_RRAnswerPTR destructor
  */
-MDNSResponder::_stcMDNS_RRAnswerPTR::~_stcMDNS_RRAnswerPTR(void) {
+MDNSResponder::stcMDNS_RRAnswerPTR::~stcMDNS_RRAnswerPTR(void) {
     
     clear();
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswerPTR::clear
+ * MDNSResponder::stcMDNS_RRAnswerPTR::clear
  */
-bool MDNSResponder::_stcMDNS_RRAnswerPTR::clear(void) {
+bool MDNSResponder::stcMDNS_RRAnswerPTR::clear(void) {
     
     m_PTRDomain.clear();
     return true;
@@ -991,7 +993,7 @@ bool MDNSResponder::_stcMDNS_RRAnswerPTR::clear(void) {
 
 
 /**
- * MDNSResponder::_stcMDNS_RRAnswerTXT
+ * MDNSResponder::stcMDNS_RRAnswerTXT
  *
  * A MDNS TXT answer object.
  * Extends the base class by a MDNS TXT items list member.
@@ -999,26 +1001,26 @@ bool MDNSResponder::_stcMDNS_RRAnswerPTR::clear(void) {
  */
     
 /*
- * MDNSResponder::_stcMDNS_RRAnswerTXT::_stcMDNS_RRAnswerTXT constructor
+ * MDNSResponder::stcMDNS_RRAnswerTXT::stcMDNS_RRAnswerTXT constructor
  */
-MDNSResponder::_stcMDNS_RRAnswerTXT::_stcMDNS_RRAnswerTXT(const MDNSResponder::stcMDNS_RRHeader& p_Header,
+MDNSResponder::stcMDNS_RRAnswerTXT::stcMDNS_RRAnswerTXT(const MDNSResponder::stcMDNS_RRHeader& p_Header,
                                                           uint32_t p_u32TTL)
 :   stcMDNS_RRAnswer(AnswerType_TXT, p_Header, p_u32TTL) {
     
 }
     
 /*
- * MDNSResponder::_stcMDNS_RRAnswerTXT::~_stcMDNS_RRAnswerTXT destructor
+ * MDNSResponder::stcMDNS_RRAnswerTXT::~stcMDNS_RRAnswerTXT destructor
  */
-MDNSResponder::_stcMDNS_RRAnswerTXT::~_stcMDNS_RRAnswerTXT(void) {
+MDNSResponder::stcMDNS_RRAnswerTXT::~stcMDNS_RRAnswerTXT(void) {
     
     clear();
 }
     
 /*
- * MDNSResponder::_stcMDNS_RRAnswerTXT::clear
+ * MDNSResponder::stcMDNS_RRAnswerTXT::clear
  */
-bool MDNSResponder::_stcMDNS_RRAnswerTXT::clear(void) {
+bool MDNSResponder::stcMDNS_RRAnswerTXT::clear(void) {
     
     m_Txts.clear();
     return true;
@@ -1035,26 +1037,26 @@ bool MDNSResponder::_stcMDNS_RRAnswerTXT::clear(void) {
 
 #ifdef MDNS_IP6_SUPPORT
     /*
-     * MDNSResponder::_stcMDNS_RRAnswerAAAA::_stcMDNS_RRAnswerAAAA constructor
+     * MDNSResponder::stcMDNS_RRAnswerAAAA::stcMDNS_RRAnswerAAAA constructor
      */
-    MDNSResponder::_stcMDNS_RRAnswerAAAA::_stcMDNS_RRAnswerAAAA(const MDNSResponder::stcMDNS_RRHeader& p_Header,
+    MDNSResponder::stcMDNS_RRAnswerAAAA::stcMDNS_RRAnswerAAAA(const MDNSResponder::stcMDNS_RRHeader& p_Header,
                                                                 uint32_t p_u32TTL)
     :   stcMDNS_RRAnswer(AnswerType_AAAA, p_Header, p_u32TTL) {
         
     }
 
     /*
-     * MDNSResponder::_stcMDNS_RRAnswerAAAA::~_stcMDNS_RRAnswerAAAA destructor
+     * MDNSResponder::stcMDNS_RRAnswerAAAA::~stcMDNS_RRAnswerAAAA destructor
      */
-    MDNSResponder::_stcMDNS_RRAnswerAAAA::~_stcMDNS_RRAnswerAAAA(void) {
+    MDNSResponder::stcMDNS_RRAnswerAAAA::~stcMDNS_RRAnswerAAAA(void) {
         
         clear();
     }
 
     /*
-     * MDNSResponder::_stcMDNS_RRAnswerAAAA::clear
+     * MDNSResponder::stcMDNS_RRAnswerAAAA::clear
      */
-    bool MDNSResponder::_stcMDNS_RRAnswerAAAA::clear(void) {
+    bool MDNSResponder::stcMDNS_RRAnswerAAAA::clear(void) {
         
         return true;
     }
@@ -1070,9 +1072,9 @@ bool MDNSResponder::_stcMDNS_RRAnswerTXT::clear(void) {
  */
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswerSRV::_stcMDNS_RRAnswerSRV constructor
+ * MDNSResponder::stcMDNS_RRAnswerSRV::stcMDNS_RRAnswerSRV constructor
  */
-MDNSResponder::_stcMDNS_RRAnswerSRV::_stcMDNS_RRAnswerSRV(const MDNSResponder::stcMDNS_RRHeader& p_Header,
+MDNSResponder::stcMDNS_RRAnswerSRV::stcMDNS_RRAnswerSRV(const MDNSResponder::stcMDNS_RRHeader& p_Header,
                                                           uint32_t p_u32TTL)
 :   stcMDNS_RRAnswer(AnswerType_SRV, p_Header, p_u32TTL),
     m_u16Priority(0),
@@ -1082,17 +1084,17 @@ MDNSResponder::_stcMDNS_RRAnswerSRV::_stcMDNS_RRAnswerSRV(const MDNSResponder::s
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswerSRV::~_stcMDNS_RRAnswerSRV destructor
+ * MDNSResponder::stcMDNS_RRAnswerSRV::~stcMDNS_RRAnswerSRV destructor
  */
-MDNSResponder::_stcMDNS_RRAnswerSRV::~_stcMDNS_RRAnswerSRV(void) {
+MDNSResponder::stcMDNS_RRAnswerSRV::~stcMDNS_RRAnswerSRV(void) {
     
     clear();
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswerSRV::clear
+ * MDNSResponder::stcMDNS_RRAnswerSRV::clear
  */
-bool MDNSResponder::_stcMDNS_RRAnswerSRV::clear(void) {
+bool MDNSResponder::stcMDNS_RRAnswerSRV::clear(void) {
     
     m_u16Priority = 0;
     m_u16Weight = 0;
@@ -1111,9 +1113,9 @@ bool MDNSResponder::_stcMDNS_RRAnswerSRV::clear(void) {
  */
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswerGeneric::_stcMDNS_RRAnswerGeneric constructor
+ * MDNSResponder::stcMDNS_RRAnswerGeneric::stcMDNS_RRAnswerGeneric constructor
  */
-MDNSResponder::_stcMDNS_RRAnswerGeneric::_stcMDNS_RRAnswerGeneric(const stcMDNS_RRHeader& p_Header,
+MDNSResponder::stcMDNS_RRAnswerGeneric::stcMDNS_RRAnswerGeneric(const stcMDNS_RRHeader& p_Header,
                                                                   uint32_t p_u32TTL)
 :   stcMDNS_RRAnswer(AnswerType_Generic, p_Header, p_u32TTL),
     m_u16RDLength(0),
@@ -1122,17 +1124,17 @@ MDNSResponder::_stcMDNS_RRAnswerGeneric::_stcMDNS_RRAnswerGeneric(const stcMDNS_
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswerGeneric::~_stcMDNS_RRAnswerGeneric destructor
+ * MDNSResponder::stcMDNS_RRAnswerGeneric::~stcMDNS_RRAnswerGeneric destructor
  */
-MDNSResponder::_stcMDNS_RRAnswerGeneric::~_stcMDNS_RRAnswerGeneric(void) {
+MDNSResponder::stcMDNS_RRAnswerGeneric::~stcMDNS_RRAnswerGeneric(void) {
     
     clear();
 }
 
 /*
- * MDNSResponder::_stcMDNS_RRAnswerGeneric::clear
+ * MDNSResponder::stcMDNS_RRAnswerGeneric::clear
  */
-bool MDNSResponder::_stcMDNS_RRAnswerGeneric::clear(void) {
+bool MDNSResponder::stcMDNS_RRAnswerGeneric::clear(void) {
     
     if (m_pu8RDData) {
         delete[] m_pu8RDData;
@@ -1152,13 +1154,12 @@ bool MDNSResponder::_stcMDNS_RRAnswerGeneric::clear(void) {
  */
 
 /*
- * MDNSResponder::_stcProbeInformation::_stcProbeInformation constructor
+ * MDNSResponder::stcProbeInformation::stcProbeInformation constructor
  */
-MDNSResponder::_stcProbeInformation::_stcProbeInformation(void)
+MDNSResponder::stcProbeInformation::stcProbeInformation(void)
 :   m_ProbingStatus(ProbingStatus_WaitingForData),
-    m_u8ProbesSent(0),
-    //m_ulNextProbeTimeout(0),
-    m_NextProbeTimeFlag(),
+    m_u8SentCount(0),
+    m_Timeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
     m_bConflict(false),
     m_bTiebreakNeeded(false),
     m_fnProbeResultCallback(0),
@@ -1166,14 +1167,13 @@ MDNSResponder::_stcProbeInformation::_stcProbeInformation(void)
 }
 
 /*
- * MDNSResponder::_stcProbeInformation::clear
+ * MDNSResponder::stcProbeInformation::clear
  */
-bool MDNSResponder::_stcProbeInformation::clear(bool p_bClearUserdata /*= false*/) {
+bool MDNSResponder::stcProbeInformation::clear(bool p_bClearUserdata /*= false*/) {
 
     m_ProbingStatus = ProbingStatus_WaitingForData;
-    m_u8ProbesSent = 0;
-    //m_ulNextProbeTimeout = 0;
-    m_NextProbeTimeFlag.reset();
+    m_u8SentCount = 0;
+    m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
     m_bConflict = false;
     m_bTiebreakNeeded = false;
     if (p_bClearUserdata) {
@@ -1195,11 +1195,11 @@ bool MDNSResponder::_stcProbeInformation::clear(bool p_bClearUserdata /*= false*
  */
 
 /*
- * MDNSResponder::_stcMDNSService::_stcMDNSService constructor
+ * MDNSResponder::stcMDNSService::stcMDNSService constructor
  */
-MDNSResponder::_stcMDNSService::_stcMDNSService(const char* p_pcName /*= 0*/,
-                                                const char* p_pcService /*= 0*/,
-                                                const char* p_pcProtocol /*= 0*/)
+MDNSResponder::stcMDNSService::stcMDNSService(const char* p_pcName /*= 0*/,
+                                              const char* p_pcService /*= 0*/,
+                                              const char* p_pcProtocol /*= 0*/)
 :   m_pNext(0),
     m_pcName(0),
     m_bAutoName(false),
@@ -1216,9 +1216,9 @@ MDNSResponder::_stcMDNSService::_stcMDNSService(const char* p_pcName /*= 0*/,
 }
 
 /*
- * MDNSResponder::_stcMDNSService::~_stcMDNSService destructor
+ * MDNSResponder::stcMDNSService::~stcMDNSService destructor
  */
-MDNSResponder::_stcMDNSService::~_stcMDNSService(void) {
+MDNSResponder::stcMDNSService::~stcMDNSService(void) {
     
     releaseName();
     releaseService();
@@ -1226,17 +1226,17 @@ MDNSResponder::_stcMDNSService::~_stcMDNSService(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSService::setName
+ * MDNSResponder::stcMDNSService::setName
  */
-bool MDNSResponder::_stcMDNSService::setName(const char* p_pcName) {
+bool MDNSResponder::stcMDNSService::setName(const char* p_pcName) {
     
     bool bResult = false;
     
     releaseName();
-    size_t stLength = (p_pcName ? os_strlen(p_pcName) : 0);
+    size_t stLength = (p_pcName ? strlen(p_pcName) : 0);
     if (stLength) {
         if ((bResult = (0 != (m_pcName = new char[stLength + 1])))) {
-            os_strncpy(m_pcName, p_pcName, stLength);
+            strncpy(m_pcName, p_pcName, stLength);
             m_pcName[stLength] = 0;
         }
     }
@@ -1247,9 +1247,9 @@ bool MDNSResponder::_stcMDNSService::setName(const char* p_pcName) {
 }
 
 /*
- * MDNSResponder::_stcMDNSService::releaseName
+ * MDNSResponder::stcMDNSService::releaseName
  */
-bool MDNSResponder::_stcMDNSService::releaseName(void) {
+bool MDNSResponder::stcMDNSService::releaseName(void) {
     
     if (m_pcName) {
         delete[] m_pcName;
@@ -1259,17 +1259,17 @@ bool MDNSResponder::_stcMDNSService::releaseName(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSService::setService
+ * MDNSResponder::stcMDNSService::setService
  */
-bool MDNSResponder::_stcMDNSService::setService(const char* p_pcService) {
+bool MDNSResponder::stcMDNSService::setService(const char* p_pcService) {
     
     bool bResult = false;
     
     releaseService();
-    size_t stLength = (p_pcService ? os_strlen(p_pcService) : 0);
+    size_t stLength = (p_pcService ? strlen(p_pcService) : 0);
     if (stLength) {
         if ((bResult = (0 != (m_pcService = new char[stLength + 1])))) {
-            os_strncpy(m_pcService, p_pcService, stLength);
+            strncpy(m_pcService, p_pcService, stLength);
             m_pcService[stLength] = 0;
         }
     }
@@ -1280,9 +1280,9 @@ bool MDNSResponder::_stcMDNSService::setService(const char* p_pcService) {
 }
 
 /*
- * MDNSResponder::_stcMDNSService::releaseService
+ * MDNSResponder::stcMDNSService::releaseService
  */
-bool MDNSResponder::_stcMDNSService::releaseService(void) {
+bool MDNSResponder::stcMDNSService::releaseService(void) {
 
     if (m_pcService) {
         delete[] m_pcService;
@@ -1292,17 +1292,17 @@ bool MDNSResponder::_stcMDNSService::releaseService(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSService::setProtocol
+ * MDNSResponder::stcMDNSService::setProtocol
  */
-bool MDNSResponder::_stcMDNSService::setProtocol(const char* p_pcProtocol) {
+bool MDNSResponder::stcMDNSService::setProtocol(const char* p_pcProtocol) {
 
     bool bResult = false;
     
     releaseProtocol();
-    size_t stLength = (p_pcProtocol ? os_strlen(p_pcProtocol) : 0);
+    size_t stLength = (p_pcProtocol ? strlen(p_pcProtocol) : 0);
     if (stLength) {
         if ((bResult = (0 != (m_pcProtocol = new char[stLength + 1])))) {
-            os_strncpy(m_pcProtocol, p_pcProtocol, stLength);
+            strncpy(m_pcProtocol, p_pcProtocol, stLength);
             m_pcProtocol[stLength] = 0;
         }
     }
@@ -1313,9 +1313,9 @@ bool MDNSResponder::_stcMDNSService::setProtocol(const char* p_pcProtocol) {
 }
 
 /*
- * MDNSResponder::_stcMDNSService::releaseProtocol
+ * MDNSResponder::stcMDNSService::releaseProtocol
  */
-bool MDNSResponder::_stcMDNSService::releaseProtocol(void) {
+bool MDNSResponder::stcMDNSService::releaseProtocol(void) {
 
     if (m_pcProtocol) {
         delete[] m_pcProtocol;
@@ -1365,21 +1365,21 @@ bool MDNSResponder::_stcMDNSService::releaseProtocol(void) {
  * and the 'set' time (also millis).
  * If the answer is scheduled for an update, the corresponding flag should be set.
  *
- */
+ * /
 
-/*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::_stcTTL constructor
- */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::_stcTTL(uint32_t p_u32TTL /*= 0*/)
+/ *
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL constructor
+ * /
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL(uint32_t p_u32TTL / *= 0* /)
 :   m_bUpdateScheduled(false) {
     
     set(p_u32TTL * 1000);
 }
 
-/*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::set
- */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::set(uint32_t p_u32TTL) {
+/ *
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set
+ * /
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set(uint32_t p_u32TTL) {
     
     m_TTLTimeFlag.restart(p_u32TTL * 1000);
     m_bUpdateScheduled = false;
@@ -1387,23 +1387,129 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::set(uint32_t p_u3
     return true;
 }
 
-/*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::has80Percent
- */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::has80Percent(void) const {
+/ *
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::has80Percent
+ * /
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::has80Percent(void) const {
     
-    return ((m_TTLTimeFlag.timeout()) &&
+    return ((m_TTLTimeFlag.getTimeout()) &&
             (!m_bUpdateScheduled) &&
-            (m_TTLTimeFlag.hypotheticalTimeout((m_TTLTimeFlag.timeout() * 800) / 1000)));
+            (m_TTLTimeFlag.hypotheticalTimeout((m_TTLTimeFlag.getTimeout() * 800) / 1000)));
+}
+
+/ *
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::isOutdated
+ * /
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::isOutdated(void) const {
+    
+    return ((m_TTLTimeFlag.getTimeout()) &&
+            (m_TTLTimeFlag.flagged()));
+}*/
+
+
+/**
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL
+ *
+ * The TTL (Time-To-Live) for an specific answer content.
+ * The 80% and outdated states are calculated based on the current time (millis)
+ * and the 'set' time (also millis).
+ * If the answer is scheduled for an update, the corresponding flag should be set.
+ *
+ */
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL constructor
+ */
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL(void)
+:   m_u32TTL(0),
+    m_TTLTimeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
+    m_timeoutLevel(TIMEOUTLEVEL_UNSET) {
+
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::isOutdated
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::isOutdated(void) const {
-    
-    return ((m_TTLTimeFlag.timeout()) &&
-            (m_TTLTimeFlag.flagged()));
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set(uint32_t p_u32TTL) {
+
+    m_u32TTL = p_u32TTL;
+    if (m_u32TTL) {
+        m_timeoutLevel = TIMEOUTLEVEL_BASE;             // Set to 80%
+        m_TTLTimeout.reset(timeout());
+    }
+    else {
+        m_timeoutLevel = TIMEOUTLEVEL_UNSET;            // undef
+        m_TTLTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+    }
+    return true;
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::flagged
+ */
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::flagged(void) const {
+
+    return ((m_u32TTL) &&
+            (TIMEOUTLEVEL_UNSET != m_timeoutLevel) &&
+            (m_TTLTimeout.checkExpired(millis())));
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::restart
+ */
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::restart(void) {
+
+    bool    bResult = true;
+
+    if ((TIMEOUTLEVEL_BASE <= m_timeoutLevel) &&    // >= 80% AND
+        (TIMEOUTLEVEL_FINAL > m_timeoutLevel)) {    // < 100%
+
+        m_timeoutLevel += TIMEOUTLEVEL_INTERVAL;    // increment by 5%
+        m_TTLTimeout.reset(timeout());
+    }
+    else {
+        bResult = false;
+        m_TTLTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+        m_timeoutLevel = TIMEOUTLEVEL_UNSET;
+    }
+    return bResult;
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::prepareDeletion
+ */
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::prepareDeletion(void) {
+
+    m_timeoutLevel = TIMEOUTLEVEL_FINAL;
+    m_TTLTimeout.reset(1 * 1000);   // See RFC 6762, 10.1
+
+    return true;
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::finalTimeoutLevel
+ */
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::finalTimeoutLevel(void) const {
+
+    return (TIMEOUTLEVEL_FINAL == m_timeoutLevel);
+}
+
+/*
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::timeout
+ */
+unsigned long MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::timeout(void) const {
+
+    uint32_t    u32Timeout = std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max();
+
+    if (TIMEOUTLEVEL_BASE == m_timeoutLevel) {          // 80%
+        u32Timeout = (m_u32TTL * 800);                  // to milliseconds
+    }
+    else if ((TIMEOUTLEVEL_BASE < m_timeoutLevel) &&    // >80% AND
+             (TIMEOUTLEVEL_FINAL >= m_timeoutLevel)) {  // <= 100%
+
+        u32Timeout = (m_u32TTL * 50);
+    }   // else: invalid
+    return u32Timeout;
 }
 
 
@@ -1414,13 +1520,14 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcTTL::isOutdated(void) 
  */
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address::_stcIP4Address constructor
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address::stcIP4Address constructor
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address::_stcIP4Address(IPAddress p_IPAddress,
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address::stcIP4Address(IPAddress p_IPAddress,
                                                                                 uint32_t p_u32TTL /*= 0*/)
 :   m_pNext(0),
-    m_IPAddress(p_IPAddress),
-    m_TTL(p_u32TTL) {
+    m_IPAddress(p_IPAddress) {
+
+    m_TTL.set(p_u32TTL);
 }
 #endif
 
@@ -1430,9 +1537,9 @@ MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address::_stcIP4Address(
  */
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcAnswer constructor
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcAnswer constructor
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcAnswer(void)
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcAnswer(void)
 :   m_pNext(0),
     m_pcServiceDomain(0),
     m_pcHostDomain(0),
@@ -1448,17 +1555,17 @@ MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcAnswer(void)
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::~_stcAnswer destructor
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::~stcAnswer destructor
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::~_stcAnswer(void) {
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::~stcAnswer(void) {
     
     clear();
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::clear
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::clear
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::clear(void) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::clear(void) {
     
     return ((releaseTxts()) &&
 #ifdef MDNS_IP4_SUPPORT
@@ -1472,12 +1579,12 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::clear(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::allocServiceDomain
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::allocServiceDomain
  *
  * Alloc memory for the char array representation of the service domain.
  *
  */
-char* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::allocServiceDomain(size_t p_stLength) {
+char* MDNSResponder::stcMDNSServiceQuery::stcAnswer::allocServiceDomain(size_t p_stLength) {
     
     releaseServiceDomain();
     if (p_stLength) {
@@ -1487,9 +1594,9 @@ char* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::allocServiceDomain(size_t
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseServiceDomain
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseServiceDomain
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseServiceDomain(void) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseServiceDomain(void) {
 
     if (m_pcServiceDomain) {
         delete[] m_pcServiceDomain;
@@ -1499,12 +1606,12 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseServiceDomain(void)
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::allocHostDomain
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::allocHostDomain
  *
  * Alloc memory for the char array representation of the host domain.
  *
  */
-char* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::allocHostDomain(size_t p_stLength) {
+char* MDNSResponder::stcMDNSServiceQuery::stcAnswer::allocHostDomain(size_t p_stLength) {
 
     releaseHostDomain();
     if (p_stLength) {
@@ -1514,9 +1621,9 @@ char* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::allocHostDomain(size_t p_
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseHostDomain
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseHostDomain
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseHostDomain(void) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseHostDomain(void) {
 
     if (m_pcHostDomain) {
         delete[] m_pcHostDomain;
@@ -1526,12 +1633,12 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseHostDomain(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::allocTxts
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::allocTxts
  *
  * Alloc memory for the char array representation of the TXT items.
  *
  */
-char* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::allocTxts(size_t p_stLength) {
+char* MDNSResponder::stcMDNSServiceQuery::stcAnswer::allocTxts(size_t p_stLength) {
 
     releaseTxts();
     if (p_stLength) {
@@ -1541,9 +1648,9 @@ char* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::allocTxts(size_t p_stLeng
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseTxts
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseTxts
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseTxts(void) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseTxts(void) {
     
     if (m_pcTxts) {
         delete[] m_pcTxts;
@@ -1554,9 +1661,9 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseTxts(void) {
 
 #ifdef MDNS_IP4_SUPPORT
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseIP4Addresses
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseIP4Addresses
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseIP4Addresses(void) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseIP4Addresses(void) {
     
     while (m_pIP4Addresses) {
         stcIP4Address*  pNext = m_pIP4Addresses->m_pNext;
@@ -1567,9 +1674,9 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseIP4Addresses(void) 
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::addIP4Address
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::addIP4Address
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::addIP4Address(MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address* p_pIP4Address) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::addIP4Address(MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address* p_pIP4Address) {
     
     bool bResult = false;
     
@@ -1582,9 +1689,9 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::addIP4Address(MDNSResponde
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::removeIP4Address
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::removeIP4Address
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::removeIP4Address(MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address* p_pIP4Address) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::removeIP4Address(MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address* p_pIP4Address) {
     
     bool    bResult = false;
     
@@ -1609,17 +1716,17 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::removeIP4Address(MDNSRespo
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::findIP4Address (const)
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address (const)
  */
-const MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::findIP4Address(const IPAddress& p_IPAddress) const {
+const MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address* MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address(const IPAddress& p_IPAddress) const {
 
-    return (stcIP4Address*)(((const _stcAnswer*)this)->findIP4Address(p_IPAddress));
+    return (stcIP4Address*)(((const stcAnswer*)this)->findIP4Address(p_IPAddress));
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::findIP4Address
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::findIP4Address(const IPAddress& p_IPAddress) {
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address* MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP4Address(const IPAddress& p_IPAddress) {
     
     stcIP4Address*  pIP4Address = m_pIP4Addresses;
     while (pIP4Address) {
@@ -1632,9 +1739,9 @@ MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address* MDNSResponder::
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP4AddressCount
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP4AddressCount
  */
-uint32_t MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP4AddressCount(void) const {
+uint32_t MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP4AddressCount(void) const {
     
     uint32_t    u32Count = 0;
     
@@ -1647,17 +1754,17 @@ uint32_t MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP4AddressCount(void) 
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP4AddressAtIndex
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP4AddressAtIndex
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP4AddressAtIndex(uint32_t p_u32Index) {
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address* MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP4AddressAtIndex(uint32_t p_u32Index) {
 
-    return (stcIP4Address*)(((const _stcAnswer*)this)->IP4AddressAtIndex(p_u32Index));
+    return (stcIP4Address*)(((const stcAnswer*)this)->IP4AddressAtIndex(p_u32Index));
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP4AddressAtIndex (const)
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP4AddressAtIndex (const)
  */
-const MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP4AddressAtIndex(uint32_t p_u32Index) const {
+const MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP4Address* MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP4AddressAtIndex(uint32_t p_u32Index) const {
     
     const stcIP4Address*    pIP4Address = 0;
     
@@ -1673,9 +1780,9 @@ const MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP4Address* MDNSRespo
 
 #ifdef MDNS_IP6_SUPPORT
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseIP6Addresses
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseIP6Addresses
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseIP6Addresses(void) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::releaseIP6Addresses(void) {
     
     while (m_pIP6Addresses) {
         stcIP6Address*  pNext = m_pIP6Addresses->m_pNext;
@@ -1686,9 +1793,9 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::releaseIP6Addresses(void) 
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::addIP6Address
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::addIP6Address
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::addIP6Address(MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP6Address* p_pIP6Address) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::addIP6Address(MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP6Address* p_pIP6Address) {
     
     bool bResult = false;
     
@@ -1701,9 +1808,9 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::addIP6Address(MDNSResponde
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::removeIP6Address
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::removeIP6Address
  */
-bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::removeIP6Address(MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP6Address* p_pIP6Address) {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::removeIP6Address(MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP6Address* p_pIP6Address) {
     
     bool    bResult = false;
     
@@ -1728,17 +1835,17 @@ bool MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::removeIP6Address(MDNSRespo
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::findIP6Address
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP6Address
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP6Address* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::findIP6Address(const IP6Address& p_IPAddress) {
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP6Address* MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP6Address(const IP6Address& p_IPAddress) {
 
-    return (stcIP6Address*)(((const _stcAnswer*)this)->findIP6Address(p_IPAddress));
+    return (stcIP6Address*)(((const stcAnswer*)this)->findIP6Address(p_IPAddress));
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::findIP6Address (const)
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP6Address (const)
  */
-const MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP6Address* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::findIP6Address(const IPAddress& p_IPAddress) const {
+const MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP6Address* MDNSResponder::stcMDNSServiceQuery::stcAnswer::findIP6Address(const IPAddress& p_IPAddress) const {
     
     const stcIP6Address*    pIP6Address = m_pIP6Addresses;
     while (pIP6Address) {
@@ -1751,9 +1858,9 @@ const MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP6Address* MDNSRespo
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP6AddressCount
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP6AddressCount
  */
-uint32_t MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP6AddressCount(void) const {
+uint32_t MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP6AddressCount(void) const {
     
     uint32_t    u32Count = 0;
     
@@ -1766,17 +1873,17 @@ uint32_t MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP6AddressCount(void) 
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP6AddressAtIndex (const)
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP6AddressAtIndex (const)
  */
-const MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP6Address* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP6AddressAtIndex(uint32_t p_u32Index) const {
+const MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP6Address* MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP6AddressAtIndex(uint32_t p_u32Index) const {
 
-    return (stcIP6Address*)(((const _stcAnswer*)this)->IP6AddressAtIndex(p_u32Index));
+    return (stcIP6Address*)(((const stcAnswer*)this)->IP6AddressAtIndex(p_u32Index));
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP6AddressAtIndex
+ * MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP6AddressAtIndex
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP6Address* MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::IP6AddressAtIndex(uint32_t p_u32Index) {
+MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP6Address* MDNSResponder::stcMDNSServiceQuery::stcAnswer::IP6AddressAtIndex(uint32_t p_u32Index) {
     
     stcIP6Address*    pIP6Address = 0;
     
@@ -1809,13 +1916,15 @@ MDNSResponder::_stcMDNSServiceQuery::_stcAnswer::_stcIP6Address* MDNSResponder::
  */
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::_stcMDNSServiceQuery constructor
+ * MDNSResponder::stcMDNSServiceQuery::stcMDNSServiceQuery constructor
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcMDNSServiceQuery(void)
+MDNSResponder::stcMDNSServiceQuery::stcMDNSServiceQuery(void)
 :   m_pNext(0),
     m_fnCallback(0),
     m_pUserdata(0),
     m_bLegacyQuery(false),
+    m_u8SentCount(0),
+    m_ResendTimeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
     m_bAwaitingAnswers(true),
     m_pAnswers(0) {
 
@@ -1823,21 +1932,23 @@ MDNSResponder::_stcMDNSServiceQuery::_stcMDNSServiceQuery(void)
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::~_stcMDNSServiceQuery destructor
+ * MDNSResponder::stcMDNSServiceQuery::~stcMDNSServiceQuery destructor
  */
-MDNSResponder::_stcMDNSServiceQuery::~_stcMDNSServiceQuery(void) {
+MDNSResponder::stcMDNSServiceQuery::~stcMDNSServiceQuery(void) {
     
     clear();
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::clear
+ * MDNSResponder::stcMDNSServiceQuery::clear
  */
-bool MDNSResponder::_stcMDNSServiceQuery::clear(void) {
+bool MDNSResponder::stcMDNSServiceQuery::clear(void) {
     
     m_fnCallback = 0;
     m_pUserdata = 0;
     m_bLegacyQuery = false;
+    m_u8SentCount = 0;
+    m_ResendTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
     m_bAwaitingAnswers = true;
     while (m_pAnswers) {
         stcAnswer*  pNext = m_pAnswers->m_pNext;
@@ -1848,9 +1959,9 @@ bool MDNSResponder::_stcMDNSServiceQuery::clear(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::answerCount
+ * MDNSResponder::stcMDNSServiceQuery::answerCount
  */
-uint32_t MDNSResponder::_stcMDNSServiceQuery::answerCount(void) const {
+uint32_t MDNSResponder::stcMDNSServiceQuery::answerCount(void) const {
     
     uint32_t    u32Count = 0;
     
@@ -1863,9 +1974,9 @@ uint32_t MDNSResponder::_stcMDNSServiceQuery::answerCount(void) const {
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::answerAtIndex
+ * MDNSResponder::stcMDNSServiceQuery::answerAtIndex
  */
-const MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* MDNSResponder::_stcMDNSServiceQuery::answerAtIndex(uint32_t p_u32Index) const {
+const MDNSResponder::stcMDNSServiceQuery::stcAnswer* MDNSResponder::stcMDNSServiceQuery::answerAtIndex(uint32_t p_u32Index) const {
     
     const stcAnswer*    pAnswer = 0;
     
@@ -1879,17 +1990,17 @@ const MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* MDNSResponder::_stcMDNSSe
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::answerAtIndex
+ * MDNSResponder::stcMDNSServiceQuery::answerAtIndex
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* MDNSResponder::_stcMDNSServiceQuery::answerAtIndex(uint32_t p_u32Index) {
+MDNSResponder::stcMDNSServiceQuery::stcAnswer* MDNSResponder::stcMDNSServiceQuery::answerAtIndex(uint32_t p_u32Index) {
     
-    return (stcAnswer*)(((const _stcMDNSServiceQuery*)this)->answerAtIndex(p_u32Index));
+    return (stcAnswer*)(((const stcMDNSServiceQuery*)this)->answerAtIndex(p_u32Index));
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::indexOfAnswer
+ * MDNSResponder::stcMDNSServiceQuery::indexOfAnswer
  */
-uint32_t MDNSResponder::_stcMDNSServiceQuery::indexOfAnswer(const MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* p_pAnswer) const {
+uint32_t MDNSResponder::stcMDNSServiceQuery::indexOfAnswer(const MDNSResponder::stcMDNSServiceQuery::stcAnswer* p_pAnswer) const {
     
     uint32_t    u32Index = 0;
     
@@ -1902,9 +2013,9 @@ uint32_t MDNSResponder::_stcMDNSServiceQuery::indexOfAnswer(const MDNSResponder:
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::addAnswer
+ * MDNSResponder::stcMDNSServiceQuery::addAnswer
  */
-bool MDNSResponder::_stcMDNSServiceQuery::addAnswer(MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* p_pAnswer) {
+bool MDNSResponder::stcMDNSServiceQuery::addAnswer(MDNSResponder::stcMDNSServiceQuery::stcAnswer* p_pAnswer) {
     
     bool    bResult = false;
     
@@ -1917,9 +2028,9 @@ bool MDNSResponder::_stcMDNSServiceQuery::addAnswer(MDNSResponder::_stcMDNSServi
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::removeAnswer
+ * MDNSResponder::stcMDNSServiceQuery::removeAnswer
  */
-bool MDNSResponder::_stcMDNSServiceQuery::removeAnswer(MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* p_pAnswer) {
+bool MDNSResponder::stcMDNSServiceQuery::removeAnswer(MDNSResponder::stcMDNSServiceQuery::stcAnswer* p_pAnswer) {
     
     bool    bResult = false;
     
@@ -1944,9 +2055,9 @@ bool MDNSResponder::_stcMDNSServiceQuery::removeAnswer(MDNSResponder::_stcMDNSSe
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::findAnswerForServiceDomain
+ * MDNSResponder::stcMDNSServiceQuery::findAnswerForServiceDomain
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* MDNSResponder::_stcMDNSServiceQuery::findAnswerForServiceDomain(const MDNSResponder::stcMDNS_RRDomain& p_ServiceDomain) {
+MDNSResponder::stcMDNSServiceQuery::stcAnswer* MDNSResponder::stcMDNSServiceQuery::findAnswerForServiceDomain(const MDNSResponder::stcMDNS_RRDomain& p_ServiceDomain) {
     
     stcAnswer*  pAnswer = m_pAnswers;
     while (pAnswer) {
@@ -1959,9 +2070,9 @@ MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* MDNSResponder::_stcMDNSServiceQ
 }
 
 /*
- * MDNSResponder::_stcMDNSServiceQuery::findAnswerForHostDomain
+ * MDNSResponder::stcMDNSServiceQuery::findAnswerForHostDomain
  */
-MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* MDNSResponder::_stcMDNSServiceQuery::findAnswerForHostDomain(const MDNSResponder::stcMDNS_RRDomain& p_HostDomain) {
+MDNSResponder::stcMDNSServiceQuery::stcAnswer* MDNSResponder::stcMDNSServiceQuery::findAnswerForHostDomain(const MDNSResponder::stcMDNS_RRDomain& p_HostDomain) {
 
     stcAnswer*  pAnswer = m_pAnswers;
     while (pAnswer) {
@@ -1992,9 +2103,9 @@ MDNSResponder::_stcMDNSServiceQuery::_stcAnswer* MDNSResponder::_stcMDNSServiceQ
  */
 
 /*
- * MDNSResponder::stcMDNSSendParameter::_stcDomainCacheItem::_stcDomainCacheItem constructor
+ * MDNSResponder::stcMDNSSendParameter::stcDomainCacheItem::stcDomainCacheItem constructor
  */
-MDNSResponder::stcMDNSSendParameter::_stcDomainCacheItem::_stcDomainCacheItem(const void* p_pHostnameOrService,
+MDNSResponder::stcMDNSSendParameter::stcDomainCacheItem::stcDomainCacheItem(const void* p_pHostnameOrService,
                                                                               bool p_bAdditionalData,
                                                                               uint32_t p_u16Offset)
 :   m_pNext(0),
@@ -2009,9 +2120,9 @@ MDNSResponder::stcMDNSSendParameter::_stcDomainCacheItem::_stcDomainCacheItem(co
  */
 
 /*
- * MDNSResponder::_stcMDNSSendParameter::_stcMDNSSendParameter constructor
+ * MDNSResponder::stcMDNSSendParameter::stcMDNSSendParameter constructor
  */
-MDNSResponder::_stcMDNSSendParameter::_stcMDNSSendParameter(void)
+MDNSResponder::stcMDNSSendParameter::stcMDNSSendParameter(void)
 :   m_pQuestions(0),
     m_pDomainCacheItems(0) {
     
@@ -2019,17 +2130,17 @@ MDNSResponder::_stcMDNSSendParameter::_stcMDNSSendParameter(void)
 }
 
 /*
- * MDNSResponder::_stcMDNSSendParameter::~_stcMDNSSendParameter destructor
+ * MDNSResponder::stcMDNSSendParameter::~stcMDNSSendParameter destructor
  */
-MDNSResponder::_stcMDNSSendParameter::~_stcMDNSSendParameter(void) {
+MDNSResponder::stcMDNSSendParameter::~stcMDNSSendParameter(void) {
     
     clear();
 }
 
 /*
- * MDNSResponder::_stcMDNSSendParameter::clear
+ * MDNSResponder::stcMDNSSendParameter::clear
  */
-bool MDNSResponder::_stcMDNSSendParameter::clear(void) {
+bool MDNSResponder::stcMDNSSendParameter::clear(void) {
 
     m_u16ID = 0;
     m_u8HostReplyMask = 0;
@@ -2057,18 +2168,18 @@ bool MDNSResponder::_stcMDNSSendParameter::clear(void) {
 }
 
 /*
- * MDNSResponder::_stcMDNSSendParameter::shiftOffset
+ * MDNSResponder::stcMDNSSendParameter::shiftOffset
  */
-bool MDNSResponder::_stcMDNSSendParameter::shiftOffset(uint16_t p_u16Shift) {
+bool MDNSResponder::stcMDNSSendParameter::shiftOffset(uint16_t p_u16Shift) {
 
     m_u16Offset += p_u16Shift;
     return true;
 }
 
 /*
- * MDNSResponder::_stcMDNSSendParameter::addDomainCacheItem
+ * MDNSResponder::stcMDNSSendParameter::addDomainCacheItem
  */
-bool MDNSResponder::_stcMDNSSendParameter::addDomainCacheItem(const void* p_pHostnameOrService,
+bool MDNSResponder::stcMDNSSendParameter::addDomainCacheItem(const void* p_pHostnameOrService,
                                                               bool p_bAdditionalData,
                                                               uint16_t p_u16Offset) {
     
@@ -2086,9 +2197,9 @@ bool MDNSResponder::_stcMDNSSendParameter::addDomainCacheItem(const void* p_pHos
 }
 
 /*
- * MDNSResponder::_stcMDNSSendParameter::findCachedDomainOffset
+ * MDNSResponder::stcMDNSSendParameter::findCachedDomainOffset
  */
-uint16_t MDNSResponder::_stcMDNSSendParameter::findCachedDomainOffset(const void* p_pHostnameOrService,
+uint16_t MDNSResponder::stcMDNSSendParameter::findCachedDomainOffset(const void* p_pHostnameOrService,
                                                                       bool p_bAdditionalData) const {
     
     const stcDomainCacheItem*   pCacheItem = m_pDomainCacheItems;
@@ -2102,8 +2213,9 @@ uint16_t MDNSResponder::_stcMDNSSendParameter::findCachedDomainOffset(const void
     return (pCacheItem ? pCacheItem->m_u16Offset : 0);
 }
 
-}   // namespace LEAmDNS
+}   // namespace MDNSImplementation
 
+} // namespace esp8266
 
 
 

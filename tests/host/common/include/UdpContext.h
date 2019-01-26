@@ -81,12 +81,14 @@ public:
 
     void setMulticastInterface(const ip_addr_t& addr)
     {
+        (void)addr;
         // user multicast, and this is how it works with posix: send to multicast address:
         _dst.addr = staticMCastAddr;
     }
 
     void setMulticastTTL(int ttl)
     {
+        (void)ttl;
         //fprintf(stderr, MOCK "TODO: UdpContext::setMulticastTTL\n");
     }
 
@@ -108,12 +110,12 @@ public:
 
     void seek(const size_t pos)
     {
-        fprintf(stderr, MOCK "TODO: implement UDP offset\n");
         if (!isValidOffset(pos))
         {
             fprintf(stderr, MOCK "UDPContext::seek too far (%zd >= %zd)\n", pos, _inbufsize);
             exit(EXIT_FAILURE);
         }
+        mockUDPSwallow(pos, _inbuf, _inbufsize);
     }
 
     bool isValidOffset(const size_t pos) const {
