@@ -815,7 +815,7 @@ uint32_t MDNSResponder::answerCount(const MDNSResponder::hMDNSServiceQuery p_hSe
 
 std::vector<MDNSResponder::MDNSServiceInfo>  MDNSResponder::answerInfo (const MDNSResponder::hMDNSServiceQuery p_hServiceQuery) {
     std::vector<MDNSResponder::MDNSServiceInfo> tempVector;
-	for (int i=0;i<answerCount(p_hServiceQuery);i++)
+	for (uint32_t i=0;i<answerCount(p_hServiceQuery);i++)
     {
 		tempVector.push_back(MDNSServiceInfo(this,p_hServiceQuery,i));
     }
