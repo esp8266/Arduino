@@ -129,6 +129,8 @@ String File::readString()
     int countRead = readBytes(temp, sizeof(temp));
     while (countRead > 0)
     {
+        if (countRead<sizeof(temp))
+            temp[countRead] = 0;
         ret += temp;
         countRead = readBytes(temp, sizeof(temp));
     }
