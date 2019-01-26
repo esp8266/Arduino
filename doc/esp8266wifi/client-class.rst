@@ -18,6 +18,17 @@ Methods documented for `Client <https://www.arduino.cc/en/Reference/WiFiClientCo
 
 Methods and properties described further down are specific to ESP8266. They are not covered in `Arduino WiFi library <https://www.arduino.cc/en/Reference/WiFi>`__ documentation. Before they are fully documented please refer to information below.
 
+flush and stop
+~~~~~~~~~~~~~~
+
+``flush(timeoutMs)`` and ``stop(timeoutMs)`` both have now an optional argument: ``timeout`` in millisecond, and both return a boolean.
+
+Default input value 0 means that effective value is left at the discretion of the implementer.
+
+``flush()`` returning ``true`` indicates that output data have effectively been sent, and ``false`` that a timeout has occurred.
+
+``stop()`` returns ``false`` in case of an issue when closing the client (for instance a timed-out ``flush``). Depending on implementation, its parameter can be passed to ``flush()``.
+
 setNoDelay
 ~~~~~~~~~~
 
@@ -34,6 +45,47 @@ This algorithm is intended to reduce TCP/IP traffic of small packets sent over t
 .. code:: cpp
 
     client.setNoDelay(true);
+
+getNoDelay
+~~~~~~~~~~
+
+Returns whether NoDelay is enabled or not for the current connection.
+
+setSync
+~~~~~~~
+
+This is an experimental API that will set the client in synchronized mode.
+In this mode, every ``write()`` is flushed.  It means that after a call to
+``write()``, data are ensured to be received where they went sent to (that is
+``flush`` semantic).
+
+When set to ``true`` in ``WiFiClient`` implementation,
+
+- It slows down transfers, and implicitely disable the Nagle algorithm.
+
+- It also allows to avoid a temporary copy of data that otherwise consumes
+  at most ``TCP_SND_BUF`` = (2 * ``MSS``) bytes per connection,
+
+getSync
+~~~~~~~
+
+Returns whether Sync is enabled or not for the current connection.
+
+setDefaultNoDelay and setDefaultSync
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These set the default value for both ``setSync`` and ``setNoDelay`` for
+every future instance of ``WiFiClient`` (including those coming from
+``WiFiServer.available()`` by default).
+
+Default values are false for both ``NoDelay`` and ``Sync``.
+
+This means that Nagle is enabled by default *for all new connections*.
+
+getDefaultNoDelay and getDefaultSync
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Return the values to be used as default for NoDelay and Sync for all future connections.
 
 Other Function Calls
 ~~~~~~~~~~~~~~~~~~~~
@@ -54,9 +106,8 @@ Other Function Calls
     uint16_t  remotePort () 
     IPAddress  localIP () 
     uint16_t  localPort () 
-    bool  getNoDelay () 
 
 Documentation for the above functions is not yet prepared.
 
 For code samples please refer to separate section with `examples
-:arrow\_right: <client-examples.md>`__ dedicated specifically to the Client Class.
+:arrow\_right: <client-examples.rst>`__ dedicated specifically to the Client Class.

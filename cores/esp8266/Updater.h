@@ -17,6 +17,7 @@
 #define UPDATE_ERROR_NEW_FLASH_CONFIG   (9)
 #define UPDATE_ERROR_MAGIC_BYTE         (10)
 #define UPDATE_ERROR_BOOTSTRAP          (11)
+#define UPDATE_ERROR_SIGN               (12)
 
 #define U_FLASH   0
 #define U_SPIFFS  100
@@ -28,14 +29,35 @@
 #endif
 #endif
 
+// Abstract class to implement whatever signing hash desired
+class UpdaterHashClass {
+  public:
+    virtual void begin() = 0;
+    virtual void add(const void *data, uint32_t len) = 0;
+    virtual void end() = 0;
+    virtual int len() = 0;
+    virtual const void *hash() = 0;
+};
+
+// Abstract class to implement a signature verifier
+class UpdaterVerifyClass {
+  public:
+    virtual uint32_t length() = 0; // How many bytes of signature are expected
+    virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) = 0; // Verify, return "true" on success
+};
+
 class UpdaterClass {
   public:
     UpdaterClass();
+
+    /* Optionally add a cryptographic signature verification hash and method */
+    void installSignature(UpdaterHashClass *hash, UpdaterVerifyClass *verify) {  _hash = hash;  _verify = verify; }
+
     /*
       Call this to check the space needed for the update
       Will return false if there is not enough space
     */
-    bool begin(size_t size, int command = U_FLASH);
+    bool begin(size_t size, int command = U_FLASH, int ledPin = -1, uint8_t ledOn = LOW);
 
     /*
       Run Updater from asynchronous callbacs
@@ -61,18 +83,18 @@ class UpdaterClass {
       If all bytes are written
       this call will write the config to eboot
       and return true
-      If there is already an update running but is not finished and !evenIfRemainanig
+      If there is already an update running but is not finished and !evenIfRemaining
       or there is an error
       this will clear everything and return false
       the last error is available through getError()
-      evenIfRemaining is helpfull when you update without knowing the final size first
+      evenIfRemaining is helpful when you update without knowing the final size first
     */
     bool end(bool evenIfRemaining = false);
 
     /*
       Prints the last error to an output stream
     */
-    void printError(Stream &out);
+    void printError(Print &out);
 
     /*
       sets the expected MD5 for the firmware (hexString)
@@ -148,6 +170,8 @@ class UpdaterClass {
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
 
+    void _setError(int error);    
+
     bool _async;
     uint8_t _error;
     uint8_t *_buffer;
@@ -160,6 +184,13 @@ class UpdaterClass {
 
     String _target_md5;
     MD5Builder _md5;
+
+    int _ledPin;
+    uint8_t _ledOn;
+
+    // Optional signed binary verification
+    UpdaterHashClass *_hash;
+    UpdaterVerifyClass *_verify;
 };
 
 extern UpdaterClass Update;

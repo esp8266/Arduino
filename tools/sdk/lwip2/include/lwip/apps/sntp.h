@@ -58,9 +58,13 @@ u8_t sntp_enabled(void);
 void sntp_setserver(u8_t idx, const ip_addr_t *addr);
 const ip_addr_t* sntp_getserver(u8_t idx);
 
+#if SNTP_MONITOR_SERVER_REACHABILITY
+u8_t sntp_getreachability(u8_t idx);
+#endif /* SNTP_MONITOR_SERVER_REACHABILITY */
+
 #if SNTP_SERVER_DNS
-void sntp_setservername(u8_t idx, char *server);
-char *sntp_getservername(u8_t idx);
+void sntp_setservername(u8_t idx, const char *server);
+const char *sntp_getservername(u8_t idx);
 #endif /* SNTP_SERVER_DNS */
 
 #if SNTP_GET_SERVERS_FROM_DHCP
