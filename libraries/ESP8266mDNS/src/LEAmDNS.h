@@ -358,6 +358,19 @@ public:
 #endif
     } enuServiceQueryAnswerType;
 
+    enum class AnswerType : uint32_t {
+    	Unknown                             = 0,
+    	ServiceDomain                       = (1 << 0),
+		HostDomainAndPort                   = (1 << 1),
+		Txt                                 = (1 << 2),
+#ifdef MDNS_IP4_SUPPORT
+		IP4Address                          = (1 << 3),
+#endif
+#ifdef MDNS_IP6_SUPPORT
+		IP6Address                          = (1 << 4),
+#endif
+    };
+
     /**
      * MDNSServiceQueryCallbackFn
      * Callback function for received answers for dynamic service queries
@@ -374,7 +387,7 @@ public:
 // Functional
     struct MDNSServiceInfo; // forward declaration
     typedef std::function<bool(const MDNSServiceInfo& mdnsServiceInfo,
-                               uint32_t p_u32ServiceQueryAnswerMask,    // flag for the updated answer item
+                               AnswerType answerType ,    // flag for the updated answer item
                                bool p_bSetContent                      // true: Answer component set, false: component deleted
                               )> MDNSServiceQueryCallbackFunc;
 

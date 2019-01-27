@@ -780,7 +780,7 @@ bool MDNSResponder::_processPTRAnswer(const MDNSResponder::stcMDNS_RRAnswerPTR* 
                     p_rbFoundNewKeyAnswer = true;
                     if (pServiceQuery->m_fnCallback) {
                     	MDNSServiceInfo serviceInfo(*this,(hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
-                        pServiceQuery->m_fnCallback(serviceInfo, ServiceQueryAnswerType_ServiceDomain, true);
+                        pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_ServiceDomain), true);
                     }
                 }
             }
@@ -825,7 +825,7 @@ bool MDNSResponder::_processSRVAnswer(const MDNSResponder::stcMDNS_RRAnswerSRV* 
                         p_rbFoundNewKeyAnswer = true;
                         if (pServiceQuery->m_fnCallback) {
                         	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
-                            pServiceQuery->m_fnCallback(serviceInfo, ServiceQueryAnswerType_HostDomainAndPort, true);
+                            pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_HostDomainAndPort), true);
                         }
                     }
                 }
@@ -873,7 +873,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                         
                         if (pServiceQuery->m_fnCallback) {
                         	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
-                            pServiceQuery->m_fnCallback(serviceInfo , ServiceQueryAnswerType_Txts, true);
+                            pServiceQuery->m_fnCallback(serviceInfo , static_cast<AnswerType>(ServiceQueryAnswerType_Txts), true);
                         }
                     }
                 }
@@ -939,7 +939,7 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
 // Functional
                                 if (pServiceQuery->m_fnCallback) {
                                 	MDNSServiceInfo serviceInfo (*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
-                                    pServiceQuery->m_fnCallback(serviceInfo, ServiceQueryAnswerType_IP4Address, true);
+                                    pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_IP4Address), true);
                                 }
                             }
                             else {   
@@ -1490,7 +1490,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                         // Timed out! -> Delete
                         if (pServiceQuery->m_fnCallback) {
                         	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
-                            pServiceQuery->m_fnCallback(serviceInfo, ServiceQueryAnswerType_ServiceDomain, false);
+                            pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_ServiceDomain), false);
                         }
                         DEBUG_EX_INFO(
                                 DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _checkServiceQueryCache: Will remove PTR answer for "));
@@ -1550,7 +1550,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
 //Functional
                         if (pServiceQuery->m_fnCallback) {
                         	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
-                            pServiceQuery->m_fnCallback(serviceInfo, u32ContentFlags, false);
+                            pServiceQuery->m_fnCallback(serviceInfo,static_cast<AnswerType>(u32ContentFlags), false);
                         }
                     }
                 }   // HostDomainAndPort flagged
@@ -1587,7 +1587,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
 
                         if (pServiceQuery->m_fnCallback) {
                         	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
-                            pServiceQuery->m_fnCallback(serviceInfo, ServiceQueryAnswerType_Txts, false);
+                            pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_Txts), false);
                         }
                     }
                 }   // TXTs flagged
@@ -1636,7 +1636,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                             if (pServiceQuery->m_fnCallback) {
 // Functional
                                 MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
-                                pServiceQuery->m_fnCallback(serviceInfo, ServiceQueryAnswerType_IP4Address, false);
+                                pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_IP4Address), false);
                             }
                         }
                     }   // IP4 flagged
