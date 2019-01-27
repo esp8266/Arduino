@@ -84,9 +84,11 @@ class IPAddress: public Printable {
 
         // Overloaded cast operator to allow IPAddress objects to be used where a pointer
         // to a four-byte uint8_t array is expected
-        operator uint32_t() const {
-            return isV4()? v4(): (uint32_t)0;
-        }
+        operator uint32_t() const { return isV4()? v4(): (uint32_t)0; }
+        operator uint32_t()       { return isV4()? v4(): (uint32_t)0; }
+
+        operator bool () const { return isSet(); } // <-
+        operator bool ()       { return isSet(); } // <- both are needed
 
         // the above uint32_t() cast can be ambiguous
         // if gcc complains, use instead isSet() or v4() according to what's relevant
@@ -152,6 +154,9 @@ class IPAddress: public Printable {
         IPAddress(const ipv4_addr& fw_addr)   { setV4(); v4() = fw_addr.addr; }
         IPAddress(const ipv4_addr* fw_addr)   { setV4(); v4() = fw_addr->addr; }
 
+        IPAddress& operator=(const ipv4_addr& fw_addr)   { setV4(); v4() = fw_addr.addr;  return *this; }
+        IPAddress& operator=(const ipv4_addr* fw_addr)   { setV4(); v4() = fw_addr->addr; return *this; }
+
         operator       ip_addr_t () const { return  _ip; }
         operator const ip_addr_t*() const { return &_ip; }
         operator       ip_addr_t*()       { return &_ip; }
@@ -165,6 +170,9 @@ class IPAddress: public Printable {
 
         IPAddress(const ip_addr_t& lwip_addr) { ip_addr_copy(_ip, lwip_addr); }
         IPAddress(const ip_addr_t* lwip_addr) { ip_addr_copy(_ip, *lwip_addr); }
+
+        IPAddress& operator=(const ip_addr_t& lwip_addr) { ip_addr_copy(_ip, lwip_addr); return *this; }
+        IPAddress& operator=(const ip_addr_t* lwip_addr) { ip_addr_copy(_ip, *lwip_addr); return *this; }
 
         uint16_t* raw6()
         {
