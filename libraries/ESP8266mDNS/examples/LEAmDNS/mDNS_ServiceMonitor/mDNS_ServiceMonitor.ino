@@ -89,34 +89,37 @@ bool setStationHostname(const char* p_pcHostname) {
    MDNSServiceQueryCallback
 */
 
-bool MDNSServiceQueryCallback (MDNSResponder::MDNSServiceInfo serviceInfo, uint32_t p_u32ServiceQueryAnswerMask, bool p_bSetContent) {
-  String answerInfo;
-  switch (p_u32ServiceQueryAnswerMask){
-	case MDNSResponder::ServiceQueryAnswerType_ServiceDomain :
-	  answerInfo = "ServiceDomain " + serviceInfo.serviceDomain();
-	  break;
-	case MDNSResponder::ServiceQueryAnswerType_HostDomainAndPort :
-	  answerInfo = "HostDomainAndPort " + serviceInfo.hostDomain() + ":" + String(serviceInfo.hostPort());
-	  break;
-	case MDNSResponder::ServiceQueryAnswerType_IP4Address :
-	  answerInfo = "IP4Address ";
-	  for (IPAddress ip : serviceInfo.IPAdresses()){
-	    answerInfo += "- " + ip.toString();
-	  };
-	  break;
-    case MDNSResponder::ServiceQueryAnswerType_Txts :
-	  answerInfo = "TXT " + serviceInfo.strKeyValue();
-	  for (auto kv : serviceInfo.keyValues()) {
-		answerInfo += "\nkv : " + kv.first + " : "+ kv.second;
-	  }
-	  break;
-	default :
-	  answerInfo = "Unknown";
-  }
-  Serial.printf("Answer %s %s\n",answerInfo.c_str(),p_bSetContent ? "Modified" : "Deleted");
+bool MDNSServiceQueryCallback (MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent)
+{
+	String answerInfo;
+	switch (answerType){
+	  case MDNSResponder::AnswerType::ServiceDomain :
+		  	  	  answerInfo = "ServiceDomain " + serviceInfo.serviceDomain();
+		          break;
+	  case MDNSResponder::AnswerType::HostDomainAndPort :
+		  	  	  answerInfo = "HostDomainAndPort " + serviceInfo.hostDomain() + ":" + String(serviceInfo.hostPort());
+		          break;
+	  case MDNSResponder::AnswerType::IP4Address :
+		  	  	  answerInfo = "IP4Address ";
+		  	  	  for (IPAddress ip : serviceInfo.IPAdresses()){
+		  	  		  answerInfo += "- " + ip.toString();
+		  	  	  };
+		          break;
+	  case MDNSResponder::AnswerType::Txt :
+		  	  	  answerInfo = "TXT " + serviceInfo.strKeyValue();
+		  		  for (auto kv : serviceInfo.keyValues())
+		  		  {
+		  		    answerInfo += "\nkv : " + kv.first + " : "+ kv.second;
+		  		  }
+		  	  	  break;
+	  default :
+		          answerInfo = "Unknown Answertype";
+	}
+	Serial.printf("Answer %s %s\n",answerInfo.c_str(),p_bSetContent ? "Modified" : "Deleted");
 
-  return true;
+	return true;
 }
+
 
 
 /*
