@@ -356,14 +356,14 @@ public:
 
     enum class AnswerType : uint32_t {
     	Unknown                             = 0,
-    	ServiceDomain                       = (1 << 0),
-		HostDomainAndPort                   = (1 << 1),
-		Txt                                 = (1 << 2),
+    	ServiceDomain                       = ServiceQueryAnswerType_ServiceDomain,
+		HostDomainAndPort                   = ServiceQueryAnswerType_HostDomainAndPort,
+		Txt                                 = ServiceQueryAnswerType_Txts,
 #ifdef MDNS_IP4_SUPPORT
-		IP4Address                          = (1 << 3),
+		IP4Address                          = ServiceQueryAnswerType_IP4Address,
 #endif
 #ifdef MDNS_IP6_SUPPORT
-		IP6Address                          = (1 << 4),
+		IP6Address                          = ServiceQueryAnswerType_IP6Address,
 #endif
     };
 
