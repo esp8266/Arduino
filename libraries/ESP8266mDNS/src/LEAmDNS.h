@@ -277,12 +277,8 @@ public:
      * MDNSDynamicServiceTxtCallbackFn
      * Callback function for dynamic MDNS TXT items
      */
-// Functional
-//        typedef bool (*MDNSDynamicServiceTxtCallbackFn)(MDNSResponder* p_pMDNSResponder,
-//                                                    const hMDNSService p_hService,
-//                                                    void* p_pUserdata);
 
-        typedef std::function<bool(const hMDNSService p_hService)> MDNSDynamicServiceTxtCallbackFunc;
+    typedef std::function<bool(const hMDNSService p_hService)> MDNSDynamicServiceTxtCallbackFunc;
 
     // Set a global callback for dynamic MDNS TXT items. The callback function is called
     // every time, a TXT item is needed for one of the installed services.
@@ -375,16 +371,6 @@ public:
      * MDNSServiceQueryCallbackFn
      * Callback function for received answers for dynamic service queries
      */
-/*
-    typedef bool (*MDNSServiceQueryCallbackFn)(MDNSResponder* p_pMDNSResponder,
-                                               const hMDNSServiceQuery p_hServiceQuery, // dynamic service query handle
-                                               uint32_t p_u32AnswerIndex,               // index of the updated answer
-                                               uint32_t p_u32ServiceQueryAnswerMask,    // flag for the updated answer item
-                                               bool p_bSetContent,                      // true: Answer component set, false: component deleted
-
-											   void* p_pUserdata);                      // pUserdata set via 'installServiceQuery'
-*/
-// Functional
     struct MDNSServiceInfo; // forward declaration
     typedef std::function<bool(const MDNSServiceInfo& mdnsServiceInfo,
                                AnswerType answerType ,    // flag for the updated answer item
@@ -449,7 +435,6 @@ public:
      * MDNSProbeResultCallbackFn
      * Callback function for (host and service domain) probe results
     */
-// Functional
     typedef std::function<bool (String p_pcDomainName,
                                 bool p_bProbeResult)> MDNSHostProbeResultCallbackFn;
 
@@ -462,7 +447,6 @@ public:
     // (or a service domain, which hasn't got a service specific callback)
     // Succeeds or fails.
     // In case of failure, the failed domain name should be changed.
-// Functional
     bool setHostProbeResultCallback(MDNSHostProbeResultCallbackFn p_fnCallback);
 
     // Set a service specific probe result callback
@@ -490,7 +474,6 @@ public:
     
 protected:
     /** STRUCTS **/
-// Functional
     /**
      * MDNSServiceInfo, used in application callbacks
      */
@@ -901,10 +884,8 @@ protected:
         //clsMDNSTimeFlag                 m_TimeFlag;     // Used for probes and announcements
         bool                            m_bConflict;
         bool                            m_bTiebreakNeeded;
-// Functional
         MDNSHostProbeResultCallbackFn   m_fnHostProbeResultCallback;
         MDNSServiceProbeResultCallbackFn m_fnServiceProbeResultCallback;
-        void*                           m_pProbeResultCallbackUserdata;
 
         stcProbeInformation(void);
 
@@ -925,7 +906,6 @@ protected:
         uint8_t                         m_u8ReplyMask;
         stcMDNSServiceTxts              m_Txts;
         MDNSDynamicServiceTxtCallbackFunc m_fnTxtCallback;
-        void*                           m_pTxtCallbackUserdata;
         stcProbeInformation             m_ProbeInformation;
 
         stcMDNSService(const char* p_pcName = 0,
@@ -1069,7 +1049,6 @@ protected:
         stcMDNSServiceQuery*            m_pNext;
         stcMDNS_RRDomain                m_ServiceTypeDomain;    // eg. _http._tcp.local
         MDNSServiceQueryCallbackFunc    m_fnCallback;
-        void*                           m_pUserdata;
         bool                            m_bLegacyQuery;
         uint8_t                         m_u8SentCount;
         esp8266::polledTimeout::oneShot m_ResendTimeout;
@@ -1147,7 +1126,6 @@ protected:
     WiFiEventHandler                m_DisconnectedHandler;
     WiFiEventHandler                m_GotIPHandler;
     MDNSDynamicServiceTxtCallbackFunc m_fnServiceTxtCallback;
-    void*                           m_pServiceTxtCallbackUserdata;
     bool                            m_bPassivModeEnabled;
     stcProbeInformation             m_HostProbeInformation;
 

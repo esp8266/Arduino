@@ -1162,10 +1162,8 @@ MDNSResponder::stcProbeInformation::stcProbeInformation(void)
     m_Timeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
     m_bConflict(false),
     m_bTiebreakNeeded(false),
-// Functional
     m_fnHostProbeResultCallback(0),
-	m_fnServiceProbeResultCallback(0),
-    m_pProbeResultCallbackUserdata(0) {
+	m_fnServiceProbeResultCallback(0) {
 }
 
 /*
@@ -1178,11 +1176,9 @@ bool MDNSResponder::stcProbeInformation::clear(bool p_bClearUserdata /*= false*/
     m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
     m_bConflict = false;
     m_bTiebreakNeeded = false;
-// Functional
     if (p_bClearUserdata) {
         m_fnHostProbeResultCallback = 0;
         m_fnServiceProbeResultCallback = 0;
-        m_pProbeResultCallbackUserdata = 0;
     }
     return true;
 }
@@ -1211,8 +1207,7 @@ MDNSResponder::stcMDNSService::stcMDNSService(const char* p_pcName /*= 0*/,
     m_pcProtocol(0),
     m_u16Port(0),
     m_u8ReplyMask(0),
-    m_fnTxtCallback(0),
-    m_pTxtCallbackUserdata(0) {
+    m_fnTxtCallback(0) {
     
     setName(p_pcName);
     setService(p_pcService);
@@ -1925,7 +1920,6 @@ MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcIP6Address* MDNSResponder::stc
 MDNSResponder::stcMDNSServiceQuery::stcMDNSServiceQuery(void)
 :   m_pNext(0),
     m_fnCallback(0),
-    m_pUserdata(0),
     m_bLegacyQuery(false),
     m_u8SentCount(0),
     m_ResendTimeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
@@ -1949,7 +1943,6 @@ MDNSResponder::stcMDNSServiceQuery::~stcMDNSServiceQuery(void) {
 bool MDNSResponder::stcMDNSServiceQuery::clear(void) {
     
     m_fnCallback = 0;
-    m_pUserdata = 0;
     m_bLegacyQuery = false;
     m_u8SentCount = 0;
     m_ResendTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());

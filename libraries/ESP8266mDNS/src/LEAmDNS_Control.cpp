@@ -776,7 +776,6 @@ bool MDNSResponder::_processPTRAnswer(const MDNSResponder::stcMDNS_RRAnswerPTR* 
                     pSQAnswer->releaseServiceDomain();
                     
                     bResult = pServiceQuery->addAnswer(pSQAnswer);
- //Functional
                     p_rbFoundNewKeyAnswer = true;
                     if (pServiceQuery->m_fnCallback) {
                     	MDNSServiceInfo serviceInfo(*this,(hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
@@ -936,7 +935,6 @@ bool MDNSResponder::_processTXTAnswer(const MDNSResponder::stcMDNS_RRAnswerTXT* 
                                 (pSQAnswer->addIP4Address(pIP4Address))) {
                                 
                                 pSQAnswer->m_u32ContentFlags |= ServiceQueryAnswerType_IP4Address;
-// Functional
                                 if (pServiceQuery->m_fnCallback) {
                                 	MDNSServiceInfo serviceInfo (*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
                                     pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_IP4Address), true);
@@ -1064,7 +1062,6 @@ bool MDNSResponder::_updateProbeStatus(void) {
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done host probing.\n")););
             m_HostProbeInformation.m_ProbingStatus = ProbingStatus_Done;
             m_HostProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
-// Functional
             if (m_HostProbeInformation.m_fnHostProbeResultCallback) {
                 m_HostProbeInformation.m_fnHostProbeResultCallback(m_pcHostname, true);
             }
@@ -1114,7 +1111,6 @@ bool MDNSResponder::_updateProbeStatus(void) {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done service probing %s.%s.%s\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
                 pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_Done;
                 pService->m_ProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
-// Functional Update
                 if (pService->m_ProbeInformation.m_fnServiceProbeResultCallback) {
                 	pService->m_ProbeInformation.m_fnServiceProbeResultCallback(pService->m_pcName, pService, true);
                 }
@@ -1280,7 +1276,6 @@ bool MDNSResponder::_cancelProbingForHost(void) {
     bool    bResult = false;
 
     m_HostProbeInformation.clear(false);
-// Functional
     // Send host notification
     if (m_HostProbeInformation.m_fnHostProbeResultCallback) {
         m_HostProbeInformation.m_fnHostProbeResultCallback(m_pcHostname, false);
@@ -1302,7 +1297,6 @@ bool MDNSResponder::_cancelProbingForService(stcMDNSService& p_rService) {
     bool    bResult = false;
 
     p_rService.m_ProbeInformation.clear(false);
-// Functional
     // Send notification
     if (p_rService.m_ProbeInformation.m_fnServiceProbeResultCallback) {
     	p_rService.m_ProbeInformation.m_fnServiceProbeResultCallback(p_rService.m_pcName,&p_rService,false);
@@ -1547,7 +1541,6 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
 
                         // Remove content flags for deleted answer parts
                         pSQAnswer->m_u32ContentFlags &= ~u32ContentFlags;
-//Functional
                         if (pServiceQuery->m_fnCallback) {
                         	MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
                             pServiceQuery->m_fnCallback(serviceInfo,static_cast<AnswerType>(u32ContentFlags), false);
@@ -1634,7 +1627,6 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
                             }
                             // Notify client
                             if (pServiceQuery->m_fnCallback) {
-// Functional
                                 MDNSServiceInfo serviceInfo(*this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer));
                                 pServiceQuery->m_fnCallback(serviceInfo, static_cast<AnswerType>(ServiceQueryAnswerType_IP4Address), false);
                             }

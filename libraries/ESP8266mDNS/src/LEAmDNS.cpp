@@ -55,7 +55,6 @@ MDNSResponder::MDNSResponder(void)
     m_pcHostname(0),
     m_pServiceQueries(0),
     m_fnServiceTxtCallback(0),
-    m_pServiceTxtCallbackUserdata(0),
 #ifdef ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
     m_bPassivModeEnabled(true) {
 #else
@@ -755,7 +754,6 @@ uint16_t MDNSResponder::port(const uint32_t p_u32AnswerIndex) {
  *  - answerTxts
  *
  */
-//Functional
 MDNSResponder::hMDNSServiceQuery MDNSResponder::installServiceQuery(const char* p_pcService,
                                                                     const char* p_pcProtocol,
                                                                     MDNSResponder::MDNSServiceQueryCallbackFunc p_fnCallback) {
@@ -771,7 +769,6 @@ MDNSResponder::hMDNSServiceQuery MDNSResponder::installServiceQuery(const char* 
         (_buildDomainForService(p_pcService, p_pcProtocol, pServiceQuery->m_ServiceTypeDomain))) {
 
         pServiceQuery->m_fnCallback = p_fnCallback;
-        pServiceQuery->m_pUserdata = 0;
         pServiceQuery->m_bLegacyQuery = false;
         
         if (_sendMDNSServiceQuery(*pServiceQuery)) {
@@ -1034,11 +1031,9 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
  * When succeeded, the host or service domain will be announced by the MDNS responder.
  *
  */
-//Functional
 bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeResultCallbackFn p_fnCallback) {
 
 	m_HostProbeInformation.m_fnHostProbeResultCallback = p_fnCallback;
-    m_HostProbeInformation.m_pProbeResultCallbackUserdata = 0;
     
     return true;
 }
@@ -1060,7 +1055,6 @@ bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSServ
     stcMDNSService* pService = _findService(p_hService);
     if (pService) {
         pService->m_ProbeInformation.m_fnServiceProbeResultCallback = p_fnCallback;
-        pService->m_ProbeInformation.m_pProbeResultCallbackUserdata = 0;
 
         bResult = true;
     }
