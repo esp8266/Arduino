@@ -501,10 +501,6 @@ bool ESP8266WiFiSTAClass::hostname(const char* aHostname) {
   - no '-' as last char
   */
 
-#if LWIP_VERSION_MAJOR == 1
-#define netif_dhcp_data(netif) ((netif)->dhcp)
-#endif
-
     size_t len = strlen(aHostname);
 
     if (len == 0 || len > 32) {
