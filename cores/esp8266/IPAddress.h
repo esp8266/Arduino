@@ -35,9 +35,11 @@
 #define IP_IS_V4_VAL(x) (1)
 #define IP_SET_TYPE_VAL(x,y) do { (void)0; } while (0)
 #define IP_ANY_TYPE (&ip_addr_any)
+#define IP4_ADDR_ANY IPADDR_ANY
 #define IP4_ADDR_ANY4 IPADDR_ANY
 #define IPADDR4_INIT(x) { x }
 #define CONST /* nothing: lwIP-v1 does not use const */
+#define ip4_addr_netcmp ip_addr_netcmp
 #else // lwIP-v2+
 #define CONST const
 #if !LWIP_IPV6
