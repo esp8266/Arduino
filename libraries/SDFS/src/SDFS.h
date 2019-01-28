@@ -251,6 +251,14 @@ public:
         return _opened ? _fd->fileSize() : 0;
     }
 
+    bool truncate(uint32_t size) override
+    {
+        if (!_opened) {
+            return false;
+        }
+        return _fd->truncate(size);
+    }
+
     void close() override
     {
         if (_opened) {

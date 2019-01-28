@@ -114,6 +114,13 @@ File::operator bool() const {
     return !!_p;
 }
 
+bool File::truncate(uint32_t size) {
+    if (!_p)
+        return false;
+
+    return _p->truncate(size);
+}
+
 const char* File::name() const {
     if (!_p)
         return nullptr;

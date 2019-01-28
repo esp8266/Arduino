@@ -29,7 +29,10 @@
 #undef max
 #undef min
 #include "FSImpl.h"
-#include "spiffs/spiffs.h"
+extern "C" {
+    #include "spiffs/spiffs.h"
+    #include "spiffs/spiffs_nucleus.h"
+};
 #include "debug.h"
 #include "flash_utils.h"
 
@@ -404,6 +407,17 @@ public:
             _getStat();
         }
         return _stat.size;
+    }
+
+    bool truncate(uint32_t size) override
+    {
+        CHECKFD();
+        spiffs_fd *sfd;
+        if (spiffs_fd_get(_fs->getFs(), _fd, &sfd) == SPIFFS_OK) {
+            return SPIFFS_OK == spiffs_object_truncate(sfd, size, 0);
+        } else {
+          return false;
+        }
     }
 
     bool isFile() const override

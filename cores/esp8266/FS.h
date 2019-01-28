@@ -74,6 +74,7 @@ public:
     operator bool() const;
     const char* name() const;
     const char* fullName() const; // Includes path
+    bool truncate(uint32_t size);
 
     bool isFile() const;
     bool isDirectory() const;

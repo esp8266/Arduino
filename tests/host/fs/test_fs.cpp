@@ -219,6 +219,18 @@ TEST_CASE("#1819 Can list all files with openDir(\"\")", "[fs][bugreport]")
     REQUIRE(files.size() == 4);
 }
 
+TEST_CASE("truncate", "[fs][spiffs]")
+{
+    SPIFFS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(SPIFFS.begin());
+    createFile("/file1", "some text");
+    auto f = SPIFFS.open("/file1", "r");
+    f.truncate(4);
+    f.close();
+    String s = readFile("/file1");
+    REQUIRE( s == "some" );
+}
+
 TEST_CASE("SDFS", "[sdfs]")
 {
     SDFS_MOCK_DECLARE();
@@ -320,3 +332,4 @@ TEST_CASE("Listfiles.ino example", "[sd]")
     REQUIRE(readFileSD("dir1/file3") == "nihao");
     REQUIRE(readFileSD("/dir2/dir3/file4") == "bonjour");
 }
+
