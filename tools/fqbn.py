@@ -9,14 +9,13 @@ import json
 import argparse
 import collections
 
-# tweaks per historically malformed entries
-hide = ('ESPModule', 'BoardModel')
-
 desc = 'Arduino boards.txt parser for FQBN details'
 
 parser = argparse.ArgumentParser(description=desc)
 parser.add_argument('--machine', action='store_true',
-                    help='machine version')
+                    help='machine json')
+parser.add_argument('--json', action='store_true',
+                    help='json')
 args = parser.parse_args()
 
 if not args.machine:
@@ -74,9 +73,6 @@ while line:
 # end parsing
 # now formatting
 
-for h in hide:
-  del menuentries[h]
-
 all = { }
 
 all["options"] = [ ]
@@ -111,6 +107,17 @@ for board in boards:
 
 if args.machine:
   print(json.dumps(all))
-else:
+elif args.json:
   print(json.dumps(all, indent=2))
   print()
+else:
+  print('FQBN parameters:')
+  #for entry in menuentries:
+  for desc in menudescs:
+    entry = desc
+    print()
+    print('    ' + entry + ':  (' + menudescs[entry] + ')')
+    for value in menuentries[entry]:
+      print('%20s'%value + '    => ' + menuentries[entry][value])
+  print()
+
