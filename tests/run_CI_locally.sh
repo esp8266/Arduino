@@ -107,6 +107,13 @@ elif [ "$BUILD_TYPE" = "build6_even" ]; then
 elif [ "$BUILD_TYPE" = "build6_odd" ]; then
     BUILD_PARITY=odd tests/build6.sh
 
+elif [ "$BUILD_TYPE" = "build1" ]; then
+    tests/build1.sh
+elif [ "$BUILD_TYPE" = "build1_even" ]; then
+    BUILD_PARITY=even tests/build1.sh
+elif [ "$BUILD_TYPE" = "build1_odd" ]; then
+    BUILD_PARITY=odd tests/build1.sh
+
 elif [ "$BUILD_TYPE" = "platformio" ]; then
     tests/platformio-custom.sh
 elif [ "$BUILD_TYPE" = "platformio_even" ]; then
