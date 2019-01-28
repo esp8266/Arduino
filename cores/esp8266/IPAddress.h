@@ -86,6 +86,8 @@ class IPAddress: public Printable {
         // to a four-byte uint8_t array is expected
         operator uint32_t() const { return isV4()? v4(): (uint32_t)0; }
         operator uint32_t()       { return isV4()? v4(): (uint32_t)0; }
+        operator u32_t()    const { return isV4()? v4():    (u32_t)0; }
+        operator u32_t()          { return isV4()? v4():    (u32_t)0; }
 
         operator bool () const { return isSet(); } // <-
         operator bool ()       { return isSet(); } // <- both are needed
