@@ -328,8 +328,8 @@ bool wifi_station_dhcpc_stop(void);
 enum dhcp_status wifi_station_dhcpc_status(void);
 bool wifi_station_dhcpc_set_maxtry(uint8 num);
 
-char* wifi_station_get_hostname(void);
-bool wifi_station_set_hostname(char *name);
+const char* wifi_station_get_hostname(void);
+bool wifi_station_set_hostname(const char *name);
 
 int wifi_station_set_cert_key(uint8 *client_cert, int client_cert_len,
     uint8 *private_key, int private_key_len,
@@ -385,6 +385,8 @@ bool wifi_softap_get_dhcps_lease(struct dhcps_lease *please);
 uint32 wifi_softap_get_dhcps_lease_time(void);
 bool wifi_softap_set_dhcps_lease_time(uint32 minute);
 bool wifi_softap_reset_dhcps_lease_time(void);
+
+bool wifi_softap_add_dhcps_lease(uint8 *macaddr);	// add static lease on the list, this will be the next available @
 
 enum dhcp_status wifi_softap_dhcps_status(void);
 bool wifi_softap_set_dhcps_offer_option(uint8 level, void* optarg);
