@@ -89,7 +89,7 @@ bool MDNSResponder::begin(const char* p_pcHostname) {
     
     bool    bResult = (0 != m_pcHostname);
     
-    if (0 == m_pcHostname) {
+    if (0 == m_pUDPContext) {
         if (_setHostname(p_pcHostname)) {
             
             m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
