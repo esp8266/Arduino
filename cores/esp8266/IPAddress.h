@@ -88,6 +88,8 @@ class IPAddress: public Printable {
         operator uint32_t()       { return isV4()? v4(): (uint32_t)0; }
         operator u32_t()    const { return isV4()? v4():    (u32_t)0; }
         operator u32_t()          { return isV4()? v4():    (u32_t)0; }
+        operator int()      const { return isV4()? v4():      (int)0; }
+        operator int()            { return isV4()? v4():      (int)0; }
 
         operator bool () const { return isSet(); } // <-
         operator bool ()       { return isSet(); } // <- both are needed
