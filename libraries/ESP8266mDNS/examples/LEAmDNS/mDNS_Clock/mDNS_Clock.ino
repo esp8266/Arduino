@@ -34,6 +34,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
+#include <ESP8266WebServer.h>
 #include <time.h>
 
 /*
@@ -72,9 +73,8 @@ char*                         pcHostDomain            = 0;        // Negociated 
 bool                          bHostDomainConfirmed    = false;    // Flags the confirmation of the host domain
 MDNSResponder::hMDNSService   hMDNSService            = 0;        // The handle of the clock service in the MDNS responder
 
-// TCP server at port 'SERVICE_PORT' will respond to HTTP requests
-WiFiServer                    server(SERVICE_PORT);
-
+// HTTP server at port 'SERVICE_PORT' will respond to HTTP requests
+ESP8266WebServer              server(SERVICE_PORT);
 
 /*
    getTimeString
@@ -194,31 +194,10 @@ bool hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
 /*
    handleHTTPClient
 */
-void handleHTTPClient(WiFiClient& client) {
+
+void handleHTTPRequest() {
   Serial.println("");
-  Serial.println("New client");
-
-  // Wait for data from client to become available
-  while (client.connected() && !client.available()) {
-    delay(1);
-  }
-
-  // Read the first line of HTTP request
-  String req = client.readStringUntil('\r');
-
-  // First line of HTTP request looks like "GET /path HTTP/1.1"
-  // Retrieve the "/path" part by finding the spaces
-  int addr_start = req.indexOf(' ');
-  int addr_end = req.indexOf(' ', addr_start + 1);
-  if (addr_start == -1 || addr_end == -1) {
-    Serial.print("Invalid request: ");
-    Serial.println(req);
-    return;
-  }
-  req = req.substring(addr_start + 1, addr_end);
-  Serial.print("Request: ");
-  Serial.println(req);
-  client.flush();
+  Serial.println("HTTP Request");
 
   // Get current time
   time_t now = time(nullptr);;
@@ -226,26 +205,17 @@ void handleHTTPClient(WiFiClient& client) {
   gmtime_r(&now, &timeinfo);
 
   String s;
-  if (req == "/") {
-    IPAddress ip = WiFi.localIP();
-    String ipStr = String(ip[0]) + '.' + String(ip[1]) + '.' + String(ip[2]) + '.' + String(ip[3]);
-    s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>Hello from ";
-    s += WiFi.hostname() + " at " + ipStr;
-    // Simple addition of the current time
-    s += "\r\nCurrent time is: ";
-    s += getTimeString();
-    // done :-)
-    s += "</html>\r\n\r\n";
-    Serial.println("Sending 200");
-  } else {
-    s = "HTTP/1.1 404 Not Found\r\n\r\n";
-    Serial.println("Sending 404");
-  }
-  client.print(s);
 
-  Serial.println("Done with client");
+  s = "<!DOCTYPE HTML>\r\n<html>Hello from ";
+  s += WiFi.hostname() + " at " + WiFi.localIP().toString();
+  // Simple addition of the current time
+  s += "\r\nCurrent time is: ";
+  s += getTimeString();
+  // done :-)
+  s += "</html>\r\n\r\n";
+  Serial.println("Sending 200");
+  server.send(200, "text/html", s);
 }
-
 
 /*
    setup
@@ -284,27 +254,22 @@ void setup(void) {
   }
   Serial.println("MDNS responder started");
 
-  // Start TCP (HTTP) server
+  // Setup HTTP server
+  server.on("/", handleHTTPRequest);
   server.begin();
-  Serial.println("TCP server started");
+  Serial.println("HTTP server started");
 }
-
 
 /*
    loop
 */
 void loop(void) {
-  // Check if a client has connected
-  WiFiClient    client = server.available();
-  if (client) {
-    handleHTTPClient(client);
-  }
 
+  // Check if a request has come in
+  server.handleClient();
   // Allow MDNS processing
   MDNS.update();
 
-  // Update time (if needed)
-  //static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
   static esp8266::polledTimeout::periodic timeout(UPDATE_CYCLE);
   if (timeout.expired()) {
 
