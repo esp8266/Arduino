@@ -153,8 +153,8 @@ unsigned char String::reserve(unsigned int size) {
 }
 
 unsigned char String::changeBuffer(unsigned int maxStrLen) {
-    if (maxStrLen > 0xffff) {
-        // Sanity check len can fit in 16-bits
+    if (maxStrLen > 0x7fff) {
+        // Sanity check len can fit in 15-bits
         return 0;
     }
     // Can we use SSO here to avoid allocation?
