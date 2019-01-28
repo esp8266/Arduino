@@ -76,7 +76,7 @@ class String {
         // invalid string (i.e., "if (s)" will be true afterwards)
         unsigned char reserve(unsigned int size);
         inline unsigned int length(void) const {
-            if(buffer) {
+            if(buffer()) {
                 return len;
             } else {
                 return 0;
@@ -172,7 +172,7 @@ class String {
 
         // comparison (only works w/ Strings and "strings")
         operator StringIfHelperType() const {
-            return buffer ? &String::StringIfHelper : 0;
+            return buffer() ? &String::StringIfHelper : 0;
         }
         int compareTo(const String &s) const;
         unsigned char equals(const String &s) const;
@@ -208,9 +208,9 @@ class String {
         void toCharArray(char *buf, unsigned int bufsize, unsigned int index = 0) const {
             getBytes((unsigned char *) buf, bufsize, index);
         }
-        const char* c_str() const { return buffer; }
-        char* begin() { return buffer; }
-        char* end() { return buffer + length(); }
+        const char* c_str() const { return buffer(); }
+        char* begin() { return wbuffer(); }
+        char* end() { return wbuffer() + length(); }
         const char* begin() const { return c_str(); }
         const char* end() const { return c_str() + length(); }
 
@@ -243,9 +243,17 @@ class String {
         float toFloat(void) const;
 
     protected:
-        char *buffer;	        // the actual char array
-        unsigned int capacity;  // the array length minus one (for the '\0')
-        unsigned int len;       // the String length (not counting the '\0')
+	union {
+          char *bufptr;     // the actual char array
+          char sso_buff[4]; // Overwrite the ptr with actual string for < 4 chars
+        };
+	unsigned sso      : 1;
+        unsigned capacity : 15;  // the array length minus one (for the '\0')
+	unsigned unused   : 1;
+        unsigned len      : 15;       // the String length (not counting the '\0')
+        // Buffer accessor functions
+        inline const char *buffer() const { return (const char *)(sso ? sso_buff : bufptr); }
+        inline char *wbuffer() const { return sso ? const_cast<char *>(&sso_buff[0]) : bufptr; } // Writable version of buffer
     protected:
         void init(void);
         void invalidate(void);
