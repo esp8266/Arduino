@@ -91,12 +91,10 @@ class IPAddress: public Printable {
         operator int()      const { return isV4()? v4():      (int)0; }
         operator int()            { return isV4()? v4():      (int)0; }
 
+        bool isSet () const;
         operator bool () const { return isSet(); } // <-
         operator bool ()       { return isSet(); } // <- both are needed
 
-        // the above uint32_t() cast can be ambiguous
-        // if gcc complains, use instead isSet() or v4() according to what's relevant
-        bool isSet () const;
         // generic IPv4 wrapper to uint32-view like arduino loves to see it
         const u32_t& v4() const { return ip_2_ip4(&_ip)->addr; } // for raw_address(const)
               u32_t& v4()       { return ip_2_ip4(&_ip)->addr; }
@@ -120,6 +118,10 @@ class IPAddress: public Printable {
             return !(isV4() && v4() == addr);
         }
         bool operator==(const uint8_t* addr) const;
+
+        int operator>>(int n) const {
+            return isV4()? v4() >> n: 0;
+        }
 
         // Overloaded index operator to allow getting and setting individual octets of the address
         uint8_t operator[](int index) const {
