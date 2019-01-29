@@ -280,7 +280,7 @@ bool wifi_station_get_config_default (struct station_config *config)
 }
 
 char wifi_station_get_hostname_str [128];
-char* wifi_station_get_hostname (void)
+const char* wifi_station_get_hostname (void)
 {
 	return strcpy(wifi_station_get_hostname_str, "esposix");
 }
@@ -312,7 +312,7 @@ bool wifi_station_set_config_current (struct station_config *config)
 	return true;
 }
 
-bool wifi_station_set_hostname (char *name)
+bool wifi_station_set_hostname (const char *name)
 {
 	(void)name;
 	return true;
