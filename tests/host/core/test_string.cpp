@@ -268,3 +268,39 @@ TEST_CASE("String sizes near 8b", "[core][String]")
     REQUIRE(!strcmp(s16.c_str(),"123456789012345_"));
     REQUIRE(!strcmp(s17.c_str(),"1234567890123456_"));
 }
+
+TEST_CASE("String SSO works", "[core][String]")
+{
+  // This test assumes that SSO_SIZE==8, if that changes the test must as well
+  String s;
+  s += "0";
+  REQUIRE(s == "0");
+  const char *savesso = s.c_str();
+  s += 1;
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "01");
+  s += "2";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "012");
+  s += 3;
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "0123");
+  s += "4";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "01234");
+  s += "5";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "012345");
+  s += "6";
+  REQUIRE(s.c_str() == savesso);
+  REQUIRE(s == "0123456");
+  s += "7";
+  REQUIRE(s.c_str() != savesso);
+  REQUIRE(s == "01234567");
+  s += "8";
+  REQUIRE(s.c_str() != savesso);
+  REQUIRE(s == "012345678");
+  s += "9";
+  REQUIRE(s.c_str() != savesso);
+  REQUIRE(s == "0123456789");
+}

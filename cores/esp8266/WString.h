@@ -242,14 +242,17 @@ class String {
         long toInt(void) const;
         float toFloat(void) const;
 
+        enum { SSOSIZE = 8 }; // Characters to allocate space for SSO
+
     protected:
 	union {
-          char *bufptr;     // the actual char array
-          char sso_buff[4]; // Overwrite the ptr with actual string for < 4 chars
+          char *bufptr;           // the actual char array
+          char sso_buff[SSOSIZE]; // Overwrite the ptr with actual string for < SSOSIZE chars
         };
 	unsigned sso      : 1;
+	enum { CAPACITY_MAX = 32767 }; // If size of capacity changed, be sure to update this enum
         unsigned capacity : 15;  // the array length minus one (for the '\0')
-	unsigned unused   : 1;
+        unsigned unused   : 1;
         unsigned len      : 15;       // the String length (not counting the '\0')
         // Buffer accessor functions
         inline const char *buffer() const { return (const char *)(sso ? sso_buff : bufptr); }

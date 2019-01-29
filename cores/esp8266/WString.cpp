@@ -153,12 +153,8 @@ unsigned char String::reserve(unsigned int size) {
 }
 
 unsigned char String::changeBuffer(unsigned int maxStrLen) {
-    if (maxStrLen > 0x7fff) {
-        // Sanity check len can fit in 15-bits
-        return 0;
-    }
     // Can we use SSO here to avoid allocation?
-    if (maxStrLen < 4) {
+    if (maxStrLen < sizeof(sso_buff)) {
         if (sso || !bufptr) {
             // Already using SSO, nothing to do but set xap properly
             sso = true;
@@ -166,7 +162,7 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
             return 1;
         } else { // if bufptr
             // Using bufptr, need to shrink into sso_buff
-            char temp[4];
+            char temp[sizeof(sso_buff)];
             memcpy(temp, buffer(), maxStrLen);
             free(bufptr);
             sso = true;
@@ -177,18 +173,22 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
     }
     // Fallthrough to normal allocator
     size_t newSize = (maxStrLen + 16) & (~0xf);
-    char temp[4];
+    // Make sure we can fit newsize in the buffer
+    if (newSize > CAPACITY_MAX) {
+        return false;
+    }
+    char temp[sizeof(sso_buff)];
     if (buffer()) {
-        memcpy(temp, buffer(), 4); // Just in case SSO was on
+        memcpy(temp, buffer(), sizeof(sso_buff)); // Just in case SSO was on
     } else {
-        memset(temp, 0, 0);
+        memset(temp, 0, sizeof(sso_buff));
     }
     char *newbuffer = (char *) realloc(sso ? nullptr : bufptr, newSize);
     if(newbuffer) {
         size_t oldSize = capacity + 1; // include NULL.
         if (sso) {
             // Copy the SSO buffer into allocated space
-            memcpy(newbuffer, temp, 4);
+            memcpy(newbuffer, temp, sizeof(sso_buff));
             sso = false;
         }
         if (newSize > oldSize)
