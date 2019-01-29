@@ -435,23 +435,35 @@ public:
      * MDNSProbeResultCallbackFn
      * Callback function for (host and service domain) probe results
     */
-    typedef std::function<bool (String p_pcDomainName,
-                                bool p_bProbeResult)> MDNSHostProbeResultCallbackFn;
+		typedef std::function<bool (const char* p_pcDomainName,
+									bool p_bProbeResult)> MDNSHostProbeFn;
 
-    typedef std::function<bool (String p_pcServiceName,
-                                const hMDNSService p_hMDNSService,
-                                bool p_bProbeResult)> MDNSServiceProbeResultCallbackFn;
+		typedef std::function<bool (MDNSResponder& resp,
+									const char* p_pcDomainName,
+									bool p_bProbeResult)> MDNSHostProbeFn1;
+
+		typedef std::function<bool (const char* p_pcServiceName,
+									const hMDNSService p_hMDNSService,
+									bool p_bProbeResult)> MDNSServiceProbeFn;
+
+		typedef std::function<bool (MDNSResponder& resp,
+									const char* p_pcServiceName,
+									const hMDNSService p_hMDNSService,
+									bool p_bProbeResult)> MDNSServiceProbeFn1;
 
     // Set a global callback function for host and service probe results
     // The callback function is called, when the probing for the host domain
     // (or a service domain, which hasn't got a service specific callback)
     // Succeeds or fails.
     // In case of failure, the failed domain name should be changed.
-    bool setHostProbeResultCallback(MDNSHostProbeResultCallbackFn p_fnCallback);
+    bool setHostProbeResultCallback(MDNSHostProbeFn p_fnCallback);
+    bool setHostProbeResultCallback(MDNSHostProbeFn1 p_fnCallback);
 
     // Set a service specific probe result callback
     bool setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
-                                       MDNSServiceProbeResultCallbackFn p_fnCallback);
+                                       MDNSServiceProbeFn p_fnCallback);
+    bool setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
+                                       MDNSServiceProbeFn1 p_fnCallback);
     
     // Application should call this whenever AP is configured/disabled
     bool notifyAPChange(void);
@@ -490,16 +502,16 @@ public:
     	MDNSResponder::hMDNSServiceQuery p_hServiceQuery;
     	uint32_t p_u32AnswerIndex;
     public:
-    	String serviceDomain(){
+    	const char* serviceDomain(){
     		return p_pMDNSResponder.answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex);
     	};
     	bool hostDomainAvailable()
     	{
           return (p_pMDNSResponder.hasAnswerHostDomain(p_hServiceQuery, p_u32AnswerIndex));
     	}
-    	String hostDomain(){
+    	const char* hostDomain(){
     		return (hostDomainAvailable()) ?
-    		   p_pMDNSResponder.answerHostDomain(p_hServiceQuery, p_u32AnswerIndex) : String();
+    		   p_pMDNSResponder.answerHostDomain(p_hServiceQuery, p_u32AnswerIndex) : nullptr;
     	};
     	bool hostPortAvailable()
     	{
@@ -509,13 +521,13 @@ public:
     		return (hostPortAvailable()) ?
     		  p_pMDNSResponder.answerPort(p_hServiceQuery, p_u32AnswerIndex) : 0;
     	};
-    	bool IPAddressAvailable()
+    	bool IP4AddressAvailable()
     	{
     		return (p_pMDNSResponder.hasAnswerIP4Address(p_hServiceQuery,p_u32AnswerIndex ));
     	}
-    	std::vector<IPAddress> IPAdresses(){
+    	std::vector<IPAddress> IP4Adresses(){
     		std::vector<IPAddress> internalIP;
-    		if (IPAddressAvailable()) {
+    		if (IP4AddressAvailable()) {
     			for (uint32_t u2 = 0; u2 < p_pMDNSResponder.answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex); ++u2) {
                   internalIP.push_back(p_pMDNSResponder.answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u2));
     			}
@@ -526,9 +538,9 @@ public:
     	{
     		return (p_pMDNSResponder.hasAnswerTxts(p_hServiceQuery, p_u32AnswerIndex));
     	}
-    	String strKeyValue (){
+    	const char* strKeyValue (){
     		return (txtAvailable()) ?
-    		  p_pMDNSResponder.answerTxts(p_hServiceQuery, p_u32AnswerIndex) : String();
+    		  p_pMDNSResponder.answerTxts(p_hServiceQuery, p_u32AnswerIndex) : nullptr;
     	};
     	std::map<String,String> keyValues()
 		{
@@ -538,14 +550,14 @@ public:
     		}
     		return tempKV;
 		}
-    	String value(String key)
+    	const char* value(String key)
     	{
-    		String result;
+    		char* result = nullptr;
 
     		for (stcMDNSServiceTxt* pTxt=p_pMDNSResponder._answerKeyvalue(p_hServiceQuery, p_u32AnswerIndex); pTxt; pTxt=pTxt->m_pNext) {
     	        if ((key.c_str()) &&
     	            (0 == strcmp(pTxt->m_pcKey, key.c_str()))) {
-    	            result = String(pTxt->m_pcValue);
+    	            result = pTxt->m_pcValue;
     	            break;
     	        }
     	    }
@@ -884,8 +896,8 @@ protected:
         //clsMDNSTimeFlag                 m_TimeFlag;     // Used for probes and announcements
         bool                            m_bConflict;
         bool                            m_bTiebreakNeeded;
-        MDNSHostProbeResultCallbackFn   m_fnHostProbeResultCallback;
-        MDNSServiceProbeResultCallbackFn m_fnServiceProbeResultCallback;
+        MDNSHostProbeFn   				m_fnHostProbeResultCallback;
+        MDNSServiceProbeFn 				m_fnServiceProbeResultCallback;
 
         stcProbeInformation(void);
 

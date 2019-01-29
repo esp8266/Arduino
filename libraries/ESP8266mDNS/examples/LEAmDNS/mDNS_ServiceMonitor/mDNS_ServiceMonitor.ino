@@ -93,19 +93,19 @@ bool MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSRe
   String answerInfo;
   switch (answerType) {
     case MDNSResponder::AnswerType::ServiceDomain :
-      answerInfo = "ServiceDomain " + serviceInfo.serviceDomain();
+      answerInfo = "ServiceDomain " + String(serviceInfo.serviceDomain());
       break;
     case MDNSResponder::AnswerType::HostDomainAndPort :
-      answerInfo = "HostDomainAndPort " + serviceInfo.hostDomain() + ":" + String(serviceInfo.hostPort());
+      answerInfo = "HostDomainAndPort " + String(serviceInfo.hostDomain()) + ":" + String(serviceInfo.hostPort());
       break;
     case MDNSResponder::AnswerType::IP4Address :
       answerInfo = "IP4Address ";
-      for (IPAddress ip : serviceInfo.IPAdresses()) {
+      for (IPAddress ip : serviceInfo.IP4Adresses()) {
         answerInfo += "- " + ip.toString();
       };
       break;
     case MDNSResponder::AnswerType::Txt :
-      answerInfo = "TXT " + serviceInfo.strKeyValue();
+      answerInfo = "TXT " + String(serviceInfo.strKeyValue());
       for (auto kv : serviceInfo.keyValues()) {
         answerInfo += "\nkv : " + kv.first + " : " + kv.second;
       }
@@ -117,8 +117,6 @@ bool MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSRe
 
   return true;
 }
-
-
 
 /*
    MDNSServiceProbeResultCallback
@@ -132,8 +130,6 @@ bool serviceProbeResult(String p_pcServiceName,
   Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
   return true;
 }
-
-
 
 /*
    MDNSHostProbeResultCallback
@@ -212,11 +208,12 @@ void handleHTTPRequest() {
     s += info.serviceDomain();
     if (info.hostDomainAvailable()) {
       s += "<br/>Hostname: ";
-      s += info.hostDomain() + (info.hostPortAvailable()) ? (":" + String(info.hostPort())) : "";
+      s += String(info.hostDomain());
+      s += (info.hostPortAvailable()) ? (":" + String(info.hostPort())) : "";
     }
-    if (info.IPAddressAvailable()) {
+    if (info.IP4AddressAvailable()) {
       s += "<br/>IP4:";
-      for (auto ip : info.IPAdresses()) {
+      for (auto ip : info.IP4Adresses()) {
         s += " " + ip.toString();
       }
     }
@@ -287,4 +284,3 @@ void loop(void) {
   MDNS.update();
 
 }
-

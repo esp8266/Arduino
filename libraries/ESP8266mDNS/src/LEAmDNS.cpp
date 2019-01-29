@@ -1031,11 +1031,18 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
  * When succeeded, the host or service domain will be announced by the MDNS responder.
  *
  */
-bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeResultCallbackFn p_fnCallback) {
+bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeFn p_fnCallback) {
 
 	m_HostProbeInformation.m_fnHostProbeResultCallback = p_fnCallback;
     
     return true;
+}
+
+bool MDNSResponder::setHostProbeResultCallback(MDNSHostProbeFn1 pfn) {
+
+	return setHostProbeResultCallback(std::bind(pfn,*this,
+			                                    std::placeholders::_1,
+												std::placeholders::_2));
 }
 
 /*
@@ -1048,7 +1055,7 @@ bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeResul
  *
  */
 bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
-                                                  MDNSResponder::MDNSServiceProbeResultCallbackFn p_fnCallback) {
+                                                  MDNSResponder::MDNSServiceProbeFn p_fnCallback) {
 
     bool    bResult = false;
 
@@ -1059,6 +1066,15 @@ bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSServ
         bResult = true;
     }
     return bResult;
+}
+
+bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
+                                                  MDNSResponder::MDNSServiceProbeFn1 p_fnCallback) {
+    return setServiceProbeResultCallback(p_hService,
+    									 std::bind(p_fnCallback, *this,
+    											   std::placeholders::_1,
+												   std::placeholders::_2,
+												   std::placeholders::_3));
 }
 
 
