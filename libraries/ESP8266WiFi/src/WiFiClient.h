@@ -66,7 +66,7 @@ public:
 
   virtual int available();
   virtual int read();
-  virtual int read(uint8_t *buf, size_t size);
+  virtual int read(uint8_t *buf, size_t size) override;
   virtual int peek();
   virtual size_t peekBytes(uint8_t *buffer, size_t length);
   size_t peekBytes(char *buffer, size_t length) {
@@ -84,7 +84,7 @@ public:
 
   static void setLocalPortStart(uint16_t port) { _localPort = port; }
 
-  size_t availableForWrite();
+  int availableForWrite() override;
 
   friend class WiFiServer;
 

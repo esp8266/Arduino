@@ -134,4 +134,10 @@ size_t uart_read(uart_t* uart, char* userbuffer, size_t usersize)
 	return read(0, userbuffer, usersize);
 }
 
+size_t uart_tx_free(uart_t* uart) // availableForWrite()
+{
+	(void)uart;
+	return 1;
+}
+
 } // extern "C"

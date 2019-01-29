@@ -91,6 +91,10 @@ class Print {
         size_t println(void);
 
         virtual void flush() { /* Empty implementation for backward compatibility */ }
+
+        // availableForWrite() must be overridden when possible !
+        // overridden by HardwareSerial and WiFiClient when added in Print::
+        virtual int availableForWrite() { return 1; }
 };
 
 #endif

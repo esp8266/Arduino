@@ -134,7 +134,7 @@ public:
         return uart_read_char(_uart);
     }
     // ::read(buffer, size): same as readBytes without timeout
-    size_t read(char* buffer, size_t size)
+    size_t read(char* buffer, size_t size) override
     {
         return uart_read(_uart, buffer, size);
     }
@@ -143,7 +143,7 @@ public:
     {
         return readBytes((char*)buffer, size);
     }
-    int availableForWrite(void)
+    int availableForWrite(void) override
     {
         return static_cast<int>(uart_tx_free(_uart));
     }

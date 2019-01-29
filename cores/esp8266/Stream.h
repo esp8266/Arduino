@@ -104,6 +104,17 @@ class Stream: public Print {
         virtual String readString();
         String readStringUntil(char terminator);
 
+        // read at most maxLen bytes
+        // returns effectively transfered bytes (can be less than maxLen)
+        // immediate return when no more data are available (no timeout)
+        virtual size_t read(char* buffer, size_t maxLen);
+
+        // transfer at most maxlen bytes
+        // returns effectively transfered bytes (can be less than maxLen)
+        // maxlen==0 means transfer until nothing more can be read
+        // immediate return when no more data are available (no timeout)
+        virtual size_t streamTo (Print& to, size_t maxLen = 0);
+
     protected:
         long parseInt(char skipChar); // as above but the given skipChar is ignored
         // as above but the given skipChar is ignored

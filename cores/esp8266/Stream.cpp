@@ -22,6 +22,8 @@
 
 #include <Arduino.h>
 #include <Stream.h>
+#include <assert.h>
+
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 #define NO_SKIP_CHAR  1  // a magic char not found in a valid ASCII numeric field
 
@@ -255,3 +257,43 @@ String Stream::readStringUntil(char terminator) {
     return ret;
 }
 
+size_t Stream::read (char* buffer, size_t maxLen)
+{
+#ifdef DEBUG_ESP_CORE
+    static bool once = false;
+    if (!once) {
+        once = true;
+        printf((PGM_P)PSTR("Stream::read(data,len) should be overridden for better efficiency\r\n");
+    }
+#endif
+
+    size_t written = 0;
+    while (written < maxLen && available())
+        buffer[written++] = read();
+    return written;
+}
+
+#define MAXTRANSFERBLOCK 128 // allocated in stack, be nice
+
+size_t Stream::streamTo (Print& to, size_t maxLen)
+{
+    size_t afw;
+    size_t written = 0;
+
+    while ((!maxLen || written < maxLen) && (afw = to.availableForWrite()))
+    {
+        size_t afr = available();
+        if (afw > afr)
+            afw = afr;
+        if (!afw)
+            return written;
+        if (afw > MAXTRANSFERBLOCK)
+            afw = MAXTRANSFERBLOCK;
+        char temp[afw];
+        size_t r = read(temp, afw);
+        size_t w = write(temp, afw);
+        assert(r == w);
+        written += w;
+    }
+    return written;
+}

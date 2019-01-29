@@ -206,9 +206,9 @@ bool WiFiClient::getSync() const
     return _client->getSync();
 }
 
-size_t WiFiClient::availableForWrite ()
+int WiFiClient::availableForWrite ()
 {
-    return _client? _client->availableForWrite(): 0;
+    return _client? (int)_client->availableForWrite(): 0;
 }
 
 size_t WiFiClient::write(uint8_t b)
@@ -276,7 +276,7 @@ int WiFiClient::read()
 
 int WiFiClient::read(uint8_t* buf, size_t size)
 {
-    return (int) _client->read(reinterpret_cast<char*>(buf), size);
+    return (int)_client->read(reinterpret_cast<char*>(buf), size);
 }
 
 int WiFiClient::peek()
