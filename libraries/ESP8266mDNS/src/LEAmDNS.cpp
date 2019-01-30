@@ -22,7 +22,10 @@
  *
  */
 
+#include <Schedule.h>
+
 #include "LEAmDNS_Priv.h"
+
 
 namespace esp8266 {
 
@@ -87,28 +90,30 @@ MDNSResponder::~MDNSResponder(void) {
  */
 bool MDNSResponder::begin(const char* p_pcHostname) {
     
-    bool    bResult = (0 != m_pcHostname);
+    bool    bResult = false;
     
-    if (0 == m_pcHostname) {
+    if (0 == m_pUDPContext) {
         if (_setHostname(p_pcHostname)) {
             
             m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
                 (void) pEvent;
-                _restart();
+                // Ensure that _restart() runs in USER context
+                schedule_function(std::bind(&MDNSResponder::_restart, this));
             });
 
             m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
                 (void) pEvent;
-                _restart();
+                // Ensure that _restart() runs in USER context
+                schedule_function(std::bind(&MDNSResponder::_restart, this));
             });
 
             bResult = _restart();
         }
+        DEBUG_EX_ERR(if (!bResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: FAILED for '%s'!\n"), (p_pcHostname ?: "-")); } );
     }
     else {
-        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: Ignoring multiple calls (Ignored host domain: '%s')!\n"), (p_pcHostname ?: "-")););
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: Ignoring multiple calls to begin (Ignored host domain: '%s')!\n"), (p_pcHostname ?: "-")););
     }
-    DEBUG_EX_ERR(if (!bResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: FAILED for '%s'!\n"), (p_pcHostname ?: "-")); } );
     return bResult;
 }
 
