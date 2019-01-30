@@ -259,40 +259,33 @@ String Stream::readStringUntil(char terminator) {
 
 size_t Stream::read (char* buffer, size_t maxLen)
 {
-#ifdef DEBUG_ESP_CORE
-    static bool once = false;
-    if (!once) {
-        once = true;
-        printf((PGM_P)PSTR("Stream::read(data,len) should be overridden for better efficiency\r\n");
-    }
-#endif
+    IAMSLOW("Stream::read(buffer,len)");
 
-    size_t written = 0;
-    while (written < maxLen && available())
-        buffer[written++] = read();
-    return written;
+    size_t nbread = 0;
+    while (nbread < maxLen && available())
+        buffer[nbread++] = read();
+    return nbread;
 }
 
 #define MAXTRANSFERBLOCK 128 // allocated in stack, be nice
 
 size_t Stream::streamTo (Print& to, size_t maxLen)
 {
-    size_t afw;
+    size_t w;
     size_t written = 0;
-
-    while ((!maxLen || written < maxLen) && (afw = to.availableForWrite()))
+    while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
     {
-        size_t afr = available();
-        if (afw > afr)
-            afw = afr;
-        if (!afw)
+        size_t r = available();
+        if (w > r)
+            w = r;
+        if (!w)
             return written;
-        if (afw > MAXTRANSFERBLOCK)
-            afw = MAXTRANSFERBLOCK;
-        char temp[afw];
-        size_t r = read(temp, afw);
-        size_t w = write(temp, afw);
-        assert(r == w);
+        if (w > MAXTRANSFERBLOCK)
+            w = MAXTRANSFERBLOCK;
+        char temp[w];
+        r = read(temp, w);
+        w = to.write(temp, r);
+        assert(w == r);
         written += w;
     }
     return written;

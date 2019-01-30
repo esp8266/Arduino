@@ -94,7 +94,7 @@ class Print {
 
         // availableForWrite() must be overridden when possible !
         // overridden by HardwareSerial and WiFiClient when added in Print::
-        virtual int availableForWrite() { return 1; }
+        virtual int availableForWrite();
 };
 
 #endif
