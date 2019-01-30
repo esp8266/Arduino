@@ -2705,7 +2705,7 @@
  * void dhcp6_set_ntp_servers(u8_t num_ntp_servers, ip_addr_t* ntp_server_addrs);
 */
 #if !defined LWIP_DHCP6_GET_NTP_SRV || defined __DOXYGEN__
-#define LWIP_DHCP6_GET_NTP_SRV          0 // with 1: dhcp6_set_ntp_servers() must be implemented
+#define LWIP_DHCP6_GET_NTP_SRV          1 // with 1: dhcp6_set_ntp_servers() must be implemented
 #endif
 
 /**
