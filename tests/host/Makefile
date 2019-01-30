@@ -56,16 +56,16 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	FS.cpp \
 	spiffs_api.cpp \
 	MD5Builder.cpp \
+	core_esp8266_noniso.cpp \
+	spiffs/spiffs_cache.cpp \
+	spiffs/spiffs_check.cpp \
+	spiffs/spiffs_gc.cpp \
+	spiffs/spiffs_hydrogen.cpp \
+	spiffs/spiffs_nucleus.cpp \
+	libb64/cencode.cpp \
 )
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
-	core_esp8266_noniso.c \
-	spiffs/spiffs_cache.c \
-	spiffs/spiffs_check.c \
-	spiffs/spiffs_gc.c \
-	spiffs/spiffs_hydrogen.c \
-	spiffs/spiffs_nucleus.c \
-	libb64/cencode.c \
 )
 
 MOCK_CPP_FILES_COMMON := $(addprefix common/,\
