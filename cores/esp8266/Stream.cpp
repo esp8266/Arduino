@@ -18,11 +18,14 @@
 
  Created July 2011
  parsing functions based on TextFinder library by Michael Margolis
+
+ streamTo additions 2019/01 - David Gauchard
  */
 
 #include <Arduino.h>
 #include <Stream.h>
 #include <assert.h>
+#include <PolledTimeout.h>
 
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 #define NO_SKIP_CHAR  1  // a magic char not found in a valid ASCII numeric field
@@ -271,6 +274,7 @@ size_t Stream::read (char* buffer, size_t maxLen)
 
 size_t Stream::streamTo (Print& to, size_t maxLen)
 {
+    esp8266::polledTimeout::periodicCycle yieldNow(100);
     size_t w;
     size_t written = 0;
     while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
@@ -287,6 +291,9 @@ size_t Stream::streamTo (Print& to, size_t maxLen)
         w = to.write(temp, r);
         assert(w == r);
         written += w;
+
+        if (yieldNow)
+            yield();
     }
     return written;
 }
