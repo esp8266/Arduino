@@ -56,11 +56,18 @@ struct TimeMillis
   static constexpr decltype(millis()) toMillis = 1;
 };
 
+#ifdef CORE_MOCK
+struct TimeCycle: public TimeMillis {};
+#else
+
 struct TimeCycle
 {
   static decltype(ESP.getCycleCount()) time() {return ESP.getCycleCount();}
   static constexpr decltype(ESP.getCycleCount()) toMillis = F_CPU / 1000;
 };
+
+#endif // cpu cycles
+
 
 } //TimePolicy
 
