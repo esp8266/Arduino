@@ -1,3 +1,18 @@
+
+#include <lwip/init.h>
+
+#if LWIP_VERSION_MAJOR == 1
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("wifi_softap_add_dhcps_lease() is not implemented with lwIP-v1");
+}
+
+void loop() {
+}
+
+#else
+
 /* Create a WiFi access point and provide static lease */
 
 #include <ESP8266WiFi.h>
@@ -19,9 +34,7 @@ void handleRoot() {
   char wifiClientMac[18];
   unsigned char number_client;
   struct station_info *stat_info;
-  struct ip4_addr *IPaddress;
 
-  IPAddress address;
   int i = 1;
 
   number_client = wifi_softap_get_station_num();
@@ -31,13 +44,11 @@ void handleRoot() {
   result += String(number_client);
   result += "</h1></br>";
   while (stat_info != NULL) {
-    IPaddress = &stat_info->ip;
-    address = IPaddress->addr;
 
     result += "Client ";
     result += String(i);
     result += " = ";
-    result += String(address.toString());
+    result += IPAddress(stat_info->ip).toString();
     result += " - ";
     sprintf(wifiClientMac, "%02X:%02X:%02X:%02X:%02X:%02X", MAC2STR(stat_info->bssid));
     result += wifiClientMac;
@@ -93,3 +104,5 @@ void setup() {
 void loop() {
   server.handleClient();
 }
+
+#endif // lwIP-v2
