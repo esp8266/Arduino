@@ -249,12 +249,12 @@ class String {
         enum { SSOSIZE = 12 }; // Characters to allocate space for SSO, must be 12 or more
         enum { CAPACITY_MAX = 65535 }; // If size of capacity changed, be sure to update this enum
         union {
-          struct {
-            uint16_t cap;
-            uint16_t len;
-            char *   buf;
-          } ptr;
-          char sso_buf[SSOSIZE];
+            struct {
+                uint16_t cap;
+                uint16_t len;
+                char *   buf;
+            } ptr;
+            char sso_buf[SSOSIZE];
         };
         // Accessor functions
         inline bool sso() const { return sso_buf[SSOSIZE - 1] == 0; }

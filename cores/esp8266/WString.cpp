@@ -226,11 +226,7 @@ void String::move(String &rhs) {
         if(capacity() >= rhs.len()) {
             strcpy(wbuffer(), rhs.buffer());
             setLen(rhs.len());
-            if (!rhs.sso()) free(rhs.ptr.buf);
-	    rhs.setSSO(false);
-	    rhs.setCapacity(0);
-            rhs.setLen(0);
-	    rhs.ptr.buf = nullptr;
+	    rhs.invalidate();
             return;
         } else {
             if (!sso()) {
@@ -478,7 +474,8 @@ StringSumHelper & operator +(const StringSumHelper &lhs, double num) {
 StringSumHelper & operator + (const StringSumHelper &lhs, const __FlashStringHelper *rhs)
 {
     StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-    if (!a.concat(rhs))	a.invalidate();
+    if (!a.concat(rhs))
+        a.invalidate();
     return a;
 }
 
