@@ -132,12 +132,12 @@ inline void String::init(void) {
     setSSO(false);
     setCapacity(0);
     setLen(0);
-    ptr.buf = NULL;
+    setBuffer(nullptr);
 }
 
 void String::invalidate(void) {
-    if(!sso() && ptr.buf)
-        free(ptr.buf);
+    if(!sso() && wbuffer())
+        free(wbuffer());
     init();
 }
 
@@ -155,7 +155,7 @@ unsigned char String::reserve(unsigned int size) {
 unsigned char String::changeBuffer(unsigned int maxStrLen) {
     // Can we use SSO here to avoid allocation?
     if (maxStrLen < sizeof(sso_buf)) {
-        if (sso() || !ptr.buf) {
+        if (sso() || !buffer()) {
             // Already using SSO, nothing to do
             setSSO(true);
             return 1;
@@ -163,7 +163,7 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
             // Using bufptr, need to shrink into sso_buff
             char temp[sizeof(sso_buf)];
             memcpy(temp, buffer(), maxStrLen);
-            free(ptr.buf);
+            free(wbuffer());
             setSSO(true);
             memcpy(wbuffer(), temp, maxStrLen);
             return 1;
@@ -176,7 +176,7 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
         return false;
     }
     uint16_t oldLen = len();
-    char *newbuffer = (char *) realloc(sso() ? nullptr : ptr.buf, newSize);
+    char *newbuffer = (char *) realloc(sso() ? nullptr : wbuffer(), newSize);
     if(newbuffer) {
         size_t oldSize = capacity() + 1; // include NULL.
         if (sso()) {
@@ -190,7 +190,7 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
         setSSO(false);
         setCapacity(newSize - 1);
         setLen(oldLen); // Needed in case of SSO where len() never existed
-        ptr.buf = newbuffer;
+        setBuffer(newbuffer);
         return 1;
     }
     return 0;
@@ -230,8 +230,8 @@ void String::move(String &rhs) {
             return;
         } else {
             if (!sso()) {
-                free(ptr.buf);
-                ptr.buf = nullptr;
+                free(wbuffer());
+                setBuffer(nullptr);
             }
         }
     }
@@ -240,14 +240,14 @@ void String::move(String &rhs) {
         memcpy(sso_buf, rhs.sso_buf, sizeof(sso_buf));
     } else {
         setSSO(false);
-        ptr.buf = rhs.ptr.buf;
+        setBuffer(rhs.wbuffer());
     }
     setCapacity(rhs.capacity());
     setLen(rhs.len());
     rhs.setSSO(false);
     rhs.setCapacity(0);
     rhs.setLen(0);
-    rhs.ptr.buf = nullptr;
+    rhs.setBuffer(nullptr);
 }
 #endif
 
@@ -785,9 +785,10 @@ void String::remove(unsigned int index, unsigned int count) {
         count = len() - index;
     }
     char *writeTo = wbuffer() + index;
-    setLen(len() - count);
-    memmove(writeTo, wbuffer() + index + count, len() - index);
-    wbuffer()[len()] = 0;
+    unsigned int newlen = len() - count;
+    setLen(newlen);
+    memmove(writeTo, wbuffer() + index + count, newlen - index);
+    wbuffer()[newlen] = 0;
 }
 
 void String::toLowerCase(void) {
@@ -815,10 +816,11 @@ void String::trim(void) {
     char *end = wbuffer() + len() - 1;
     while(isspace(*end) && end >= begin)
         end--;
-    setLen(end + 1 - begin);
+    unsigned int newlen = end + 1 - begin;
+    setLen(newlen);
     if(begin > buffer())
-        memmove(wbuffer(), begin, len());
-    wbuffer()[len()] = 0;
+        memmove(wbuffer(), begin, newlen);
+    wbuffer()[newlen] = 0;
 }
 
 // /*********************************************/
