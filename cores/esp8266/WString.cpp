@@ -223,11 +223,14 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length) {
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 void String::move(String &rhs) {
     if(buffer()) {
-        if(capacity() > rhs.len()) {
+        if(capacity() >= rhs.len()) {
             strcpy(wbuffer(), rhs.buffer());
             setLen(rhs.len());
+            if (!rhs.sso()) free(rhs.ptr.buf);
+	    rhs.setSSO(false);
+	    rhs.setCapacity(0);
             rhs.setLen(0);
-	    // TODO - does this leak rhs.ptr.buf??
+	    rhs.ptr.buf = nullptr;
             return;
         } else {
             if (!sso()) {
