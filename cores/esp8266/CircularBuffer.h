@@ -24,112 +24,112 @@
 // Stream&Print should be updated accordingly (or Ardui-not).
 #define CONSTst //const
 
-template <int _len, typename idx_t = uint16_t>
+template <int m_len, typename idx_t = uint16_t>
 class CircularBuffer: public Stream
 {
 protected:
 
-    idx_t _posr, _posw;
-    uint8_t _buffer[_len];
-    bool _full;
-    
+    idx_t m_posr, m_posw;
+    uint8_t m_buffer[m_len];
+    bool m_full;
+
     void inc_posr (idx_t contig = 1)
     {
-        if ((_posr += contig) == _len)
-            _posr = 0;
-        _full = false;
+        if ((m_posr += contig) == m_len)
+            m_posr = 0;
+        m_full = false;
     }
 
     void inc_posw (idx_t contig = 1)
     {
-        if ((_posw += contig) == _len)
-            _posw = 0;
-        if (_posw == _posr)
-            _full = true;
+        if ((m_posw += contig) == m_len)
+            m_posw = 0;
+        if (m_posw == m_posr)
+            m_full = true;
     }
 
     idx_t availableForWriteContig () const
     {
         if (full())
             return 0;
-        if (_posr > _posw)
-            return _posr - _posw;
-        return _len - _posw;
+        if (m_posr > m_posw)
+            return m_posr - m_posw;
+        return m_len - m_posw;
     }
 
     idx_t availableForReadContig () const
     {
         if (full())
-            return _len;
-        if (_posr > _posw)
-            return _len - _posr;
-        return _posw - _posr;
+            return m_len;
+        if (m_posr > m_posw)
+            return m_len - m_posr;
+        return m_posw - m_posr;
     }
 
 public:
 
-    CircularBuffer (): _posr(0), _posw(0), _full(false) { }
+    CircularBuffer (): m_posr(0), m_posw(0), m_full(false) { }
 
     size_t length () const
     {
-    	return _len;
+        return m_len;
     }
 
     bool full () const
     {
-        return _full;
+        return m_full;
     }
 
     bool empty () const
     {
-        return _posw == _posr && !_full;
+        return m_posw == m_posr && !m_full;
     }
 
     int availableForWrite () CONSTst override
     {
         if (empty())
-            return _len;
-        if (_posw > _posr)
-            return (_len - _posw) + (_posr - 0);
-        return _posr - _posw;
+            return m_len;
+        if (m_posw > m_posr)
+            return (m_len - m_posw) + (m_posr - 0);
+        return m_posr - m_posw;
     }
-    
+
     int available () CONSTst override
     {
         if (full())
-            return _len;
-        if (_posr > _posw)
-            return (_len - _posr) + (_posw - 0);
-        return _posw - _posr;
+            return m_len;
+        if (m_posr > m_posw)
+            return (m_len - m_posr) + (m_posw - 0);
+        return m_posw - m_posr;
     }
 
     // char/byte oriented
 
     int peek () CONSTst override
     {
-        return empty()? -1 : _buffer[_posr];
+        return empty()? -1 : m_buffer[m_posr];
     }
 
     int read () override
     {
         if (empty())
             return -1;
-        int c = _buffer[_posr];
+        int c = m_buffer[m_posr];
         inc_posr();
         return c;
     }
-    
+
     size_t write (uint8_t c) override
     {
         if (full())
             return 0;
-        _buffer[_posw] = c;
+        m_buffer[m_posw] = c;
         inc_posw();
         return 1;
     }
 
     // buffer oriented
-    
+
     size_t peek (uint8_t* buffer, size_t len) const /*override*/
     {
         if (empty())
@@ -137,18 +137,18 @@ public:
         idx_t chunk1 = availableForReadContig();
         if (chunk1 > len)
             chunk1 = len;
-        memcpy(buffer, &_buffer[_posr], chunk1);
+        memcpy(buffer, &m_buffer[m_posr], chunk1);
         return chunk1;
     }
-    
+
     size_t peekMaxSize () const
     {
         return availableForReadContig();
     }
-    
+
     const uint8_t* peekPtr () const
     {
-        return &_buffer[_posr];
+        return &m_buffer[m_posr];
     }
 
     size_t read (char* buffer, size_t maxLen) override
@@ -161,7 +161,7 @@ public:
                 break;
             if (contig > maxLen - copied)
                 contig = maxLen - copied;
-            memcpy(buffer + copied, &_buffer[_posr], contig);
+            memcpy(buffer + copied, &m_buffer[m_posr], contig);
             copied += contig;
             inc_posr(contig);
         }
@@ -178,7 +178,7 @@ public:
                 break;
             if (contig > maxLen - copied)
                 contig = maxLen - copied;
-            memcpy(&_buffer[_posw], buffer + copied, contig);
+            memcpy(&m_buffer[m_posw], buffer + copied, contig);
             copied += contig;
             inc_posw(contig);
         }
