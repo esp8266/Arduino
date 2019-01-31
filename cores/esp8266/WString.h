@@ -77,7 +77,7 @@ class String {
         unsigned char reserve(unsigned int size);
         inline unsigned int length(void) const {
             if(buffer()) {
-                return len;
+                return len();
             } else {
                 return 0;
             }
@@ -224,7 +224,7 @@ class String {
         int lastIndexOf(const String &str) const;
         int lastIndexOf(const String &str, unsigned int fromIndex) const;
         String substring(unsigned int beginIndex) const {
-            return substring(beginIndex, len);
+            return substring(beginIndex, len());
         }
         ;
         String substring(unsigned int beginIndex, unsigned int endIndex) const;
@@ -242,21 +242,31 @@ class String {
         long toInt(void) const;
         float toFloat(void) const;
 
-        enum { SSOSIZE = 8 }; // Characters to allocate space for SSO
-
     protected:
-	union {
-          char *bufptr;           // the actual char array
-          char sso_buff[SSOSIZE]; // Overwrite the ptr with actual string for < SSOSIZE chars
+        // SSO is handled by checking the last byte of sso_buff.
+        // When not in SSO mode, that byte is set to 0xff, while when in SSO mode it is always 0x00 (so it can serve as the string terminator as well as a flag)
+        // This allows strings up up to 12 (11 + \0 termination) without any extra space.
+        enum { SSOSIZE = 12 }; // Characters to allocate space for SSO, must be 12 or more
+        enum { CAPACITY_MAX = 65535 }; // If size of capacity changed, be sure to update this enum
+        union {
+          struct {
+            uint16_t cap;
+            uint16_t len;
+            char *   buf;
+          } ptr;
+          char sso_buf[SSOSIZE];
         };
-	unsigned sso      : 1;
-	enum { CAPACITY_MAX = 32767 }; // If size of capacity changed, be sure to update this enum
-        unsigned capacity : 15;  // the array length minus one (for the '\0')
-        unsigned unused   : 1;
-        unsigned len      : 15;       // the String length (not counting the '\0')
+        // Accessor functions
+        inline bool sso() const { return sso_buf[SSOSIZE - 1] == 0; }
+        inline unsigned int len() const { return sso() ? strlen(sso_buf) : ptr.len; }
+        inline unsigned int capacity() const { return sso() ? SSOSIZE - 1 : ptr.cap; }
+        inline void setSSO(bool sso) { sso_buf[SSOSIZE - 1] = sso ? 0x00 : 0xff; }
+        inline void setLen(int len) { if (!sso()) ptr.len = len; }
+        inline void setCapacity(int cap) { if (!sso()) ptr.cap = cap; }
         // Buffer accessor functions
-        inline const char *buffer() const { return (const char *)(sso ? sso_buff : bufptr); }
-        inline char *wbuffer() const { return sso ? const_cast<char *>(&sso_buff[0]) : bufptr; } // Writable version of buffer
+        inline const char *buffer() const { return (const char *)(sso() ? sso_buf : ptr.buf); }
+        inline char *wbuffer() const { return sso() ? const_cast<char *>(sso_buf) : ptr.buf; } // Writable version of buffer
+
     protected:
         void init(void);
         void invalidate(void);
