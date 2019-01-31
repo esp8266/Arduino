@@ -130,9 +130,9 @@ String::~String() {
 
 inline void String::init(void) {
     setSSO(false);
-    ptr.buf = NULL;
     setCapacity(0);
     setLen(0);
+    ptr.buf = NULL;
 }
 
 void String::invalidate(void) {
@@ -183,13 +183,13 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
             // Copy the SSO buffer into allocated space
             memcpy(newbuffer, sso_buf, sizeof(sso_buf));
         }
-        setSSO(false);
         if (newSize > oldSize)
         {
             memset(newbuffer + oldSize, 0, newSize - oldSize);
         }
+        setSSO(false);
         setCapacity(newSize - 1);
-	setLen(oldLen); // Needed in case of SSO where len() never existed
+        setLen(oldLen); // Needed in case of SSO where len() never existed
         ptr.buf = newbuffer;
         return 1;
     }
@@ -245,10 +245,10 @@ void String::move(String &rhs) {
     }
     setCapacity(rhs.capacity());
     setLen(rhs.len());
-    rhs.ptr.buf = nullptr;
     rhs.setSSO(false);
     rhs.setCapacity(0);
     rhs.setLen(0);
+    rhs.ptr.buf = nullptr;
 }
 #endif
 
