@@ -629,7 +629,7 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_addServiceTxt(MDNSResponder::s
     return pResult;
 }
 
-MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_answerKeyvalue(const hMDNSServiceQuery p_hServiceQuery,
+MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
                                                                  const uint32_t p_u32AnswerIndex) {
     stcMDNSServiceQuery*            pServiceQuery = _findServiceQuery(p_hServiceQuery);
     stcMDNSServiceQuery::stcAnswer* pSQAnswer = (pServiceQuery ? pServiceQuery->answerAtIndex(p_u32AnswerIndex) : 0);

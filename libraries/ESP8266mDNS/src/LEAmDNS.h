@@ -528,8 +528,9 @@ public:
     	std::vector<IPAddress> IP4Adresses(){
     		std::vector<IPAddress> internalIP;
     		if (IP4AddressAvailable()) {
-    			for (uint32_t u2 = 0; u2 < p_pMDNSResponder.answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex); ++u2) {
-                  internalIP.push_back(p_pMDNSResponder.answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u2));
+    			uint16_t cntIP4Adress = p_pMDNSResponder.answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex);
+    			for (uint32_t u2 = 0; u2 < cntIP4Adress; ++u2) {
+                  internalIP.emplace_back(p_pMDNSResponder.answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u2));
     			}
     		}
     		return internalIP;
@@ -545,18 +546,18 @@ public:
     	std::map<String,String> keyValues()
 		{
     		std::map<String,String> tempKV;
-    		for (auto kv = p_pMDNSResponder._answerKeyvalue(p_hServiceQuery, p_u32AnswerIndex);kv != nullptr;kv = kv->m_pNext) {
+    		for (auto kv = p_pMDNSResponder._answerKeyValue(p_hServiceQuery, p_u32AnswerIndex);kv != nullptr;kv = kv->m_pNext) {
     			tempKV.insert(std::pair<String,String>(String(kv->m_pcKey),String(kv->m_pcValue)));
     		}
     		return tempKV;
 		}
-    	const char* value(String key)
+    	const char* value(const char* key)
     	{
     		char* result = nullptr;
 
-    		for (stcMDNSServiceTxt* pTxt=p_pMDNSResponder._answerKeyvalue(p_hServiceQuery, p_u32AnswerIndex); pTxt; pTxt=pTxt->m_pNext) {
-    	        if ((key.c_str()) &&
-    	            (0 == strcmp(pTxt->m_pcKey, key.c_str()))) {
+    		for (stcMDNSServiceTxt* pTxt=p_pMDNSResponder._answerKeyValue(p_hServiceQuery, p_u32AnswerIndex); pTxt; pTxt=pTxt->m_pNext) {
+    	        if ((key) &&
+    	            (0 == strcmp(pTxt->m_pcKey, key))) {
     	            result = pTxt->m_pcValue;
     	            break;
     	        }
@@ -1372,7 +1373,7 @@ protected:
                                       const char* p_pcValue,
                                       bool p_bTemp);
 
-    stcMDNSServiceTxt* _answerKeyvalue(const hMDNSServiceQuery p_hServiceQuery,
+    stcMDNSServiceTxt* _answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
             		                   const uint32_t p_u32AnswerIndex);
 
     bool _collectServiceTxts(stcMDNSService& p_rService);

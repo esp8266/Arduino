@@ -819,7 +819,7 @@ std::vector<MDNSResponder::MDNSServiceInfo>  MDNSResponder::answerInfo (const MD
     std::vector<MDNSResponder::MDNSServiceInfo> tempVector;
 	for (uint32_t i=0;i<answerCount(p_hServiceQuery);i++)
     {
-		tempVector.push_back(MDNSServiceInfo(*this,p_hServiceQuery,i));
+		tempVector.emplace_back(MDNSServiceInfo(*this,p_hServiceQuery,i));
     }
 	return tempVector;
 }
@@ -1044,10 +1044,8 @@ bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeFn p_
 }
 
 bool MDNSResponder::setHostProbeResultCallback(MDNSHostProbeFn1 pfn) {
-
-	return setHostProbeResultCallback(std::bind(pfn,*this,
-			                                    std::placeholders::_1,
-												std::placeholders::_2));
+	using namespace std::placeholders;
+	return setHostProbeResultCallback(std::bind(pfn, *this, _1, _2));
 }
 
 /*
@@ -1075,11 +1073,8 @@ bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSServ
 
 bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
                                                   MDNSResponder::MDNSServiceProbeFn1 p_fnCallback) {
-    return setServiceProbeResultCallback(p_hService,
-    									 std::bind(p_fnCallback, *this,
-    											   std::placeholders::_1,
-												   std::placeholders::_2,
-												   std::placeholders::_3));
+	using namespace std::placeholders;
+	return setServiceProbeResultCallback(p_hService, std::bind(p_fnCallback, *this, _1, _2, _3));
 }
 
 
