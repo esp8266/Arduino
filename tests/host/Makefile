@@ -87,6 +87,7 @@ MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	WMath.cpp \
 	MockSerial.cpp \
 	MockTools.cpp \
+	MocklwIP.cpp \
 )
 
 MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
