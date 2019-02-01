@@ -188,7 +188,8 @@ public:
         }
     // Finish MDNS processing
     bool close(void);
-
+    // for esp32 compatability
+    bool end(void);
     // Change hostname (probing is restarted)
     bool setHostname(const char* p_pcHostname);
         // for compatibility...
@@ -225,6 +226,8 @@ public:
         //Warning: this has the side effect of changing the hostname.
         //TODO: implement instancename different from hostname
         void setInstanceName(const char* p_pcHostname) {setHostname(p_pcHostname);}
+        // for esp32 compatibilty
+        void setInstanceName(const String& s_pcHostname) {setInstanceName(s_pcHostname.c_str());}
     
     /**
      * hMDNSTxt (opaque handle to access the TXT items)

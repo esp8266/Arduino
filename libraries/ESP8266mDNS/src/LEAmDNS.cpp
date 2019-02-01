@@ -148,6 +148,18 @@ bool MDNSResponder::close(void) {
 }
 
 /*
+ * MDNSResponder::end
+ *
+ * Ends the MDNS responder.
+ * for compatibility with esp32
+ *
+ */
+
+bool MDNSResponder::end(void) {
+	return close();
+}
+
+/*
  * MDNSResponder::setHostname
  *
  * Replaces the current hostname and restarts probing.
