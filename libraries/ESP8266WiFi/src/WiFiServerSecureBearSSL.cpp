@@ -76,6 +76,8 @@ void WiFiServerSecure::setECCert(const X509List *chain, unsigned cert_issuer_key
 // Return a client if there's an available connection waiting.  If one is returned,
 // then any validation (i.e. client cert checking) will have succeeded.
 WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
+  WiFiClientSecure client;
+
   (void) status; // Unused
   if (_unclaimed) {
     if (_sk && _sk->isRSA()) {
@@ -83,22 +85,21 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
-      return result;
+      client = result;
     } else if (_sk && _sk->isEC()) {
       WiFiClientSecure result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
-      return result;
+      client = result;
     } else {
       // No key was defined, so we can't actually accept and attempt accept() and SSL handshake.
       DEBUGV("WS:nokey\r\n");
     }
+  } else {
+    optimistic_yield(1000);
   }
-
-  // Something weird, return a no-op object
-  optimistic_yield(1000);
-  return WiFiClientSecure();
+  return client;
 }
 
 
