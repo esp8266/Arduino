@@ -389,6 +389,11 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
 
     bool ret = false;
 
+    if (m == WIFI_OFF)
+        // calls lwIP's dhcp_stop(),
+        // safe to call even if not started
+        wifi_station_dhcpc_stop();
+
     ETS_UART_INTR_DISABLE();
     if(_persistent) {
         ret = wifi_set_opmode(m);
