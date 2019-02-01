@@ -156,7 +156,7 @@ bool MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService)
    restarted via p_pMDNSResponder->setHostname().
 
 */
-bool hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
+void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
 
   Serial.println("MDNSProbeResultCallback");
   Serial.printf("MDNSProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
@@ -187,7 +187,6 @@ bool hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
       Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
     }
   }
-  return true;
 }
 
 
@@ -280,5 +279,3 @@ void loop(void) {
     }
   }
 }
-
-

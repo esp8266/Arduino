@@ -372,7 +372,7 @@ public:
      * Callback function for received answers for dynamic service queries
      */
     struct MDNSServiceInfo; // forward declaration
-    typedef std::function<bool(const MDNSServiceInfo& mdnsServiceInfo,
+    typedef std::function<void(const MDNSServiceInfo& mdnsServiceInfo,
                                AnswerType answerType ,    // flag for the updated answer item
                                bool p_bSetContent                      // true: Answer component set, false: component deleted
                               )> MDNSServiceQueryCallbackFunc;
@@ -435,21 +435,21 @@ public:
      * MDNSProbeResultCallbackFn
      * Callback function for (host and service domain) probe results
     */
-		typedef std::function<bool (const char* p_pcDomainName,
-									bool p_bProbeResult)> MDNSHostProbeFn;
+		typedef std::function<void(const char* p_pcDomainName,
+								   bool p_bProbeResult)> MDNSHostProbeFn;
 
-		typedef std::function<bool (MDNSResponder& resp,
-									const char* p_pcDomainName,
-									bool p_bProbeResult)> MDNSHostProbeFn1;
+		typedef std::function<void(MDNSResponder& resp,
+								   const char* p_pcDomainName,
+								   bool p_bProbeResult)> MDNSHostProbeFn1;
 
-		typedef std::function<bool (const char* p_pcServiceName,
-									const hMDNSService p_hMDNSService,
-									bool p_bProbeResult)> MDNSServiceProbeFn;
+		typedef std::function<void(const char* p_pcServiceName,
+								   const hMDNSService p_hMDNSService,
+								   bool p_bProbeResult)> MDNSServiceProbeFn;
 
-		typedef std::function<bool (MDNSResponder& resp,
-									const char* p_pcServiceName,
-									const hMDNSService p_hMDNSService,
-									bool p_bProbeResult)> MDNSServiceProbeFn1;
+		typedef std::function<void(MDNSResponder& resp,
+								   const char* p_pcServiceName,
+								   const hMDNSService p_hMDNSService,
+								   bool p_bProbeResult)> MDNSServiceProbeFn1;
 
     // Set a global callback function for host and service probe results
     // The callback function is called, when the probing for the host domain

@@ -82,14 +82,15 @@ bool setStationHostname(const char* p_pcHostname) {
   if (p_pcHostname) {
     WiFi.hostname(p_pcHostname);
     Serial.printf("setStationHostname: Station hostname is set to '%s'\n", p_pcHostname);
+    return true;
   }
-  return true;
+  return false;
 }
 /*
    MDNSServiceQueryCallback
 */
 
-bool MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent) {
+void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSResponder::AnswerType answerType, bool p_bSetContent) {
   String answerInfo;
   switch (answerType) {
     case MDNSResponder::AnswerType::ServiceDomain :
@@ -114,21 +115,20 @@ bool MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSRe
       answerInfo = "Unknown Answertype";
   }
   Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
-
-  return true;
 }
+
+
 
 /*
    MDNSServiceProbeResultCallback
    Probe result callback for Services
 */
 
-bool serviceProbeResult(String p_pcServiceName,
+void serviceProbeResult(String p_pcServiceName,
                         const MDNSResponder::hMDNSService p_hMDNSService,
                         bool p_bProbeResult) {
   (void) p_hMDNSService;
   Serial.printf("MDNSServiceProbeResultCallback: Service %s probe %s\n", p_pcServiceName.c_str(), (p_bProbeResult ? "succeeded." : "failed!"));
-  return true;
 }
 
 /*
@@ -142,7 +142,7 @@ bool serviceProbeResult(String p_pcServiceName,
 
 */
 
-bool hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
+void hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
 
   Serial.printf("MDNSHostProbeResultCallback: Host domain '%s.local' is %s\n", p_pcDomainName.c_str(), (p_bProbeResult ? "free" : "already USED!"));
 
@@ -186,8 +186,6 @@ bool hostProbeResult(String p_pcDomainName, bool p_bProbeResult) {
       Serial.println("MDNSProbeResultCallback: FAILED to update hostname!");
     }
   }
-
-  return true;
 }
 
 /*
@@ -282,5 +280,6 @@ void loop(void) {
   server.handleClient();
   // Allow MDNS processing
   MDNS.update();
-
 }
+
+
