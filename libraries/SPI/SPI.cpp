@@ -528,93 +528,95 @@ void SPIClass::transferBytes(const uint8_t * out, uint8_t * in, uint32_t size) {
 }
 
 /**
+ * Note:
+ *  in and out need to be aligned to 32Bit
+ *  or you get an Fatal exception (9)
  * @param out uint8_t *
  * @param in  uint8_t *
  * @param size uint8_t (max 64)
  */
-void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
-    while(SPI1CMD & SPIBUSY) {} // Make sure we're IDLE on the SPI
 
-    int bytesToTransfer = size; // How much to read/write from the FIFO in bytes
-
-    if (out && !in) {
-        int bytesLeft = size;
-
-        // Only transmitting, get out 32b aligned
-        while (bytesLeft && ((uint32_t)out & 3)) {
-            SPI.transfer(*(out++));
-            bytesLeft--;
-        }
-
-        if (!bytesLeft) return;
-        bytesToTransfer = bytesLeft;
-
-        // Now do 32b writes until we have 0 or fewer bytes left
-        // Note we can read and store past the end of string because it will not be sent (setDataBits)
-        uint32_t *dataPtr = (uint32_t*)out;
-        volatile uint32_t *fifoPtr = &SPI1W0;
-        while (bytesLeft > 0) {
-            *(fifoPtr++) = *(dataPtr++);
-            bytesLeft -= 4;
-        }
-        // Remainder will be sent out of loaded FIFO below
-    } else if (in && !out) {
-        int bytesLeft = size;
-
-        // Only receiving, get in 32b aligned
-        while (bytesLeft && ((uint32_t)in & 3)) {
-            *(in++) = SPI.transfer(0xff);
-            bytesLeft--;
-        }
-
-        if (!bytesLeft) return;
-        bytesToTransfer = bytesLeft;
-
-        // Now send 32b writes of all 0xff, actual read will be done below
-        // Note we can write add'l 0xffs and they won't be sent thanks to setDataBits below
-        volatile uint32_t *fifoPtr = &SPI1W0;
-        while (bytesLeft > 0) {
-            *(fifoPtr++) = 0xffffffff;
-            bytesLeft -= 4;
-        }
-    } else if (in && out && (((uint32_t)in & 3) || ((uint32_t)out & 3))) {
-        // Bidirectional and we have one or both pointers misaligned
-        while (size) {
-            *(in++) = SPI.transfer(*(out++));
-            size--;
-        }
-        // All the data was transferred byte-wise, we're done
+void SPIClass::transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t size) {
+    if (!size)
         return;
+
+    while(SPI1CMD & SPIBUSY) {}
+    // Set in/out Bits to transfer
+
+    setDataBits(size * 8);
+
+    volatile uint32_t *fifoPtr = &SPI1W0;
+    uint8_t dataSize = ((size + 3) / 4);
+
+    if (out) {
+        uint32_t *dataPtr = (uint32_t*) out;
+        while (dataSize--) {
+            *fifoPtr = *dataPtr;
+            dataPtr++;
+            fifoPtr++;
+        }
+    } else {
+        // no out data only read fill with dummy data!
+        while (dataSize--) {
+            *fifoPtr = 0xFFFFFFFF;
+            fifoPtr++;
+        }
     }
 
-    // At this point we've got aligned (or null) in and out and the FIFO is filled
-    // with whatever data we're going to transmit as aligned
-
-    // Set in/out bits to transfer
-    while (SPI1CMD & SPIBUSY) {} // Paranoia, make sure SPI is idle
-    setDataBits(bytesToTransfer * 8);
-
-    // Start the transfer and wait for done
     SPI1CMD |= SPIBUSY;
-    while (SPI1CMD & SPIBUSY) { /* noop, waiting */ }
+    while(SPI1CMD & SPIBUSY) {}
 
     if (in) {
-        // Bulk read out by 4 until we have 0..3 left
-        uint32_t *dataPtr = (uint32_t*)in;
-        volatile uint32_t *fifoPtr = &SPI1W0;
-        while (bytesToTransfer >= 4) {
+        uint32_t *dataPtr = (uint32_t*) in;
+        fifoPtr = &SPI1W0;
+        dataSize = size;
+        while (dataSize >= 4) {
             *(dataPtr++) = *(fifoPtr++);
-            bytesToTransfer -= 4;
-            in += 4; // Keep track of the in ptr for any stragglers
+	    dataSize -= 4;
+            in += 4;
         }
-
-        // Bytewise read out the remainder
-        volatile uint8_t *fifoPtrB = (uint8_t*)fifoPtr;
-        while (bytesToTransfer--) {
+        volatile uint8_t *fifoPtrB = (volatile uint8_t *)fifoPtr;
+        while (dataSize--) {
             *(in++) = *(fifoPtrB++);
         }
     }
 }
+
+
+void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
+    if (!((uint32_t)out & 3) && !((uint32_t)in & 3)) {
+        // Input and output are both 32b aligned or NULL
+        transferBytesAligned_(out, in, size);
+    } else if (!out && ((uint32_t)in & 3)) {
+        // Input only and misaligned, do bytewise until in aligned
+        while (size && ((uint32_t)in & 3)) {
+            *(in++) = transfer(0xff);
+	    size--;
+        }
+        transferBytesAligned_(out, in, size);
+    } else if (!in && ((uint32_t)out & 3)) {
+        // Output only and misaligned, bytewise xmit until aligned
+        while (size && ((uint32_t)out & 3)) {
+            transfer(*(out++));
+	    size--;
+        }
+        transferBytesAligned_(out, in, size);
+    } else {
+        // HW FIFO has 64b limit, so just align in RAM and then send to FIFO aligned
+        uint8_t outAligned[64]; // Stack vars will be 32b aligned
+        uint8_t inAligned[64]; // Stack vars will be 32b aligned
+        if (out) {
+            memcpy(outAligned, out, size);
+        } else {
+            memset(outAligned, 0xff, size); // 0xff = no xmit data
+        }
+        transferBytesAligned_(outAligned, inAligned, size);
+        if (in) {
+            memcpy(in, inAligned, size);
+        }
+    }
+}
+
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SPI)
 SPIClass SPI;
