@@ -49,13 +49,15 @@ WiFiServerSecure::WiFiServerSecure(uint16_t port) : WiFiServer(port) {
   stack_thunk_add_ref();
 }
 
-// Destructor only checks if we need to delete compatibilty cert/key
+WiFiServerSecure::WiFiServerSecure(const WiFiServerSecure &rhs) : WiFiServer(rhs) {
+  *this = rhs;
+  stack_thunk_add_ref();
+}
+
 WiFiServerSecure::~WiFiServerSecure() {
   stack_thunk_del_ref();
-  if (_deleteChainAndKey) {
-    delete _chain;
-    delete _sk;
-  }
+  _axtls_chain = nullptr;
+  _axtls_sk = nullptr;
 }
 
 // Specify a RSA-signed certificate and key for the server.  Only copies the pointer, the
@@ -76,8 +78,6 @@ void WiFiServerSecure::setECCert(const X509List *chain, unsigned cert_issuer_key
 // Return a client if there's an available connection waiting.  If one is returned,
 // then any validation (i.e. client cert checking) will have succeeded.
 WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
-  WiFiClientSecure client;
-
   (void) status; // Unused
   if (_unclaimed) {
     if (_sk && _sk->isRSA()) {
@@ -85,35 +85,31 @@ WiFiClientSecure WiFiServerSecure::available(uint8_t* status) {
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
-      client = result;
+      return result;
     } else if (_sk && _sk->isEC()) {
       WiFiClientSecure result(_unclaimed, _chain, _cert_issuer_key_type, _sk, _iobuf_in_size, _iobuf_out_size, _client_CA_ta);
       _unclaimed = _unclaimed->next();
       result.setNoDelay(_noDelay);
       DEBUGV("WS:av\r\n");
-      client = result;
+      return result;
     } else {
       // No key was defined, so we can't actually accept and attempt accept() and SSL handshake.
       DEBUGV("WS:nokey\r\n");
     }
-  } else {
-    optimistic_yield(1000);
   }
-  return client;
+
+  // Something weird, return a no-op object
+  optimistic_yield(1000);
+  return WiFiClientSecure();
 }
 
 
 void WiFiServerSecure::setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) {
-  X509List *chain = new X509List(cert, certLen);
-  PrivateKey *sk = new PrivateKey(key, keyLen);
-  if (!chain || !key) {
-    // OOM, fail gracefully
-    delete chain;
-    delete sk;
-    return;
-  }
-  _deleteChainAndKey = true;
-  setRSACert(chain, sk);
+  _axtls_chain = nullptr;
+  _axtls_sk = nullptr;
+  _axtls_chain = std::shared_ptr<X509List>(new X509List(cert, certLen));
+  _axtls_sk = std::shared_ptr<PrivateKey>(new PrivateKey(key, keyLen));
+  setRSACert(_axtls_chain.get(), _axtls_sk.get());
 }
 
 void WiFiServerSecure::setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) {
