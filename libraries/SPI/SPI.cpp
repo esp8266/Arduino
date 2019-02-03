@@ -586,28 +586,18 @@ void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
     if (!((uint32_t)out & 3) && !((uint32_t)in & 3)) {
         // Input and output are both 32b aligned or NULL
         transferBytesAligned_(out, in, size);
-    } else if (!out) {
-        // Input only and misaligned, do bytewise until in aligned
-        while (size && ((uint32_t)in & 3)) {
-            *(in++) = transfer(0xff);
-            size--;
-        }
-        transferBytesAligned_(out, in, size);
-    } else if (!in) {
-        // Output only and misaligned, bytewise xmit until aligned
-        while (size && ((uint32_t)out & 3)) {
-            transfer(*(out++));
-            size--;
-        }
-        transferBytesAligned_(out, in, size);
     } else {
         // HW FIFO has 64b limit and ::transferBytes breaks up large xfers into 64byte chunks before calling this function
-        // We know at this point it is a bidirectional transfer
-        uint8_t aligned[64]; // Stack vars will be 32b aligned
+        // We know at this point at least one direction is misaligned, so use temporary buffer to align everything
         // No need for separate out and in aligned copies, we can overwrite our out copy with the input data safely
-        memcpy(aligned, out, size);
-        transferBytesAligned_(aligned, aligned, size);
-        memcpy(in, aligned, size);
+        uint8_t aligned[64]; // Stack vars will be 32b aligned
+        if (out) {
+            memcpy(aligned, out, size);
+        }
+        transferBytesAligned_(out ? aligned : nullptr, in ? aligned : nullptr, size);
+        if (in) {
+            memcpy(in, aligned, size);
+        }
     }
 }
 
