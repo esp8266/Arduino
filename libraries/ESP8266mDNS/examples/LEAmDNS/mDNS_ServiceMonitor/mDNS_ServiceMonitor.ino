@@ -108,7 +108,7 @@ void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSRe
     case MDNSResponder::AnswerType::Txt :
       answerInfo = "TXT " + String(serviceInfo.strKeyValue());
       for (auto kv : serviceInfo.keyValues()) {
-        answerInfo += "\nkv : " + kv.first + " : " + kv.second;
+        answerInfo += "\nkv : " + String(kv.first) + " : " + String(kv.second);
       }
       break;
     default :
@@ -116,8 +116,6 @@ void MDNSServiceQueryCallback(MDNSResponder::MDNSServiceInfo serviceInfo, MDNSRe
   }
   Serial.printf("Answer %s %s\n", answerInfo.c_str(), p_bSetContent ? "Modified" : "Deleted");
 }
-
-
 
 /*
    MDNSServiceProbeResultCallback
@@ -218,7 +216,7 @@ void handleHTTPRequest() {
     if (info.txtAvailable()) {
       s += "<br/>TXT:<br/>";
       for (auto kv : info.keyValues()) {
-        s += "\t" + kv.first + " : " + kv.second + "<br/>";
+        s += "\t" + String(kv.first) + " : " + String(kv.second) + "<br/>";
       }
     }
     s += "</li>";
@@ -259,7 +257,6 @@ void setup(void) {
   // Setup MDNS responders
   MDNS.setHostProbeResultCallback(hostProbeResult);
 
-
   // Init the (currently empty) host domain string with 'esp8266'
   if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
       (!MDNS.begin(pcHostDomain))) {
@@ -281,5 +278,6 @@ void loop(void) {
   // Allow MDNS processing
   MDNS.update();
 }
+
 
 

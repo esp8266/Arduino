@@ -500,10 +500,19 @@ public:
     	  p_hServiceQuery(p_hS),
 		  p_u32AnswerIndex(p_u32A)
     	{};
+    	struct CompareKey
+    	{
+    	   bool operator()(char const *a, char const *b) const
+    	   {
+    	      return strcmp(a, b) < 0;
+    	   }
+    	};
+    	using KeyValueMap = std::map<const char*, const char*, CompareKey>;
     protected:
     	MDNSResponder& p_pMDNSResponder;
     	MDNSResponder::hMDNSServiceQuery p_hServiceQuery;
     	uint32_t p_u32AnswerIndex;
+    	KeyValueMap keyValueMap;
     public:
     	const char* serviceDomain(){
     		return p_pMDNSResponder.answerServiceDomain(p_hServiceQuery, p_u32AnswerIndex);
@@ -546,13 +555,15 @@ public:
     		return (txtAvailable()) ?
     		  p_pMDNSResponder.answerTxts(p_hServiceQuery, p_u32AnswerIndex) : nullptr;
     	};
-    	std::map<String,String> keyValues()
+    	const KeyValueMap& keyValues()
 		{
-    		std::map<String,String> tempKV;
-    		for (auto kv = p_pMDNSResponder._answerKeyValue(p_hServiceQuery, p_u32AnswerIndex);kv != nullptr;kv = kv->m_pNext) {
-    			tempKV.insert(std::pair<String,String>(String(kv->m_pcKey),String(kv->m_pcValue)));
+    		if (txtAvailable() && keyValueMap.size() == 0)
+    		{
+    			for (auto kv = p_pMDNSResponder._answerKeyValue(p_hServiceQuery, p_u32AnswerIndex);kv != nullptr;kv = kv->m_pNext) {
+    			keyValueMap.emplace(std::pair<const char*,const char*>(kv->m_pcKey,kv->m_pcValue));
+    			}
     		}
-    		return tempKV;
+    		return keyValueMap;
 		}
     	const char* value(const char* key)
     	{
