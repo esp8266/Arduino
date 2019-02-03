@@ -140,7 +140,6 @@ void HTTPClient::clear()
     _headers = "";
     _payload.reset();
     _location = "";
-    _redirectCount = 0;
 }
 
 
@@ -412,6 +411,7 @@ void HTTPClient::end(void)
 {
     disconnect();
     clear();
+    _redirectCount = 0;
 }
 
 /**
@@ -525,14 +525,12 @@ void HTTPClient::setTimeout(uint16_t timeout)
  */
 bool HTTPClient::setURL(String url)
 {
-    // TBD: handle redirect with only the path component....
     // if the new location is only a path then only update the URI
-    // TBD: If reuse is not set then we need to close the connection
-    //if (_location.startsWith("/")) {
-    //    _uri = _location;
-    //    clear();
-    //    return true;
-    //}
+    if (_location.startsWith("/")) {
+        _uri = _location;
+        clear();
+        return true;
+    }
 
     if (!url.startsWith(_protocol + ":")) {
         DEBUG_HTTPCLIENT("[HTTP-Client][setURL] new URL not the same protocol, expected '%s', URL: '%s'\n", _protocol.c_str(), url.c_str());
