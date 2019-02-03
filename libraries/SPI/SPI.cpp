@@ -546,20 +546,18 @@ void SPIClass::transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t 
     setDataBits(size * 8);
 
     volatile uint32_t *fifoPtr = &SPI1W0;
-    uint8_t dataSize = ((size + 3) / 4);
 
     if (out) {
+        uint8_t outSize = ((size + 3) / 4);
         uint32_t *dataPtr = (uint32_t*) out;
-        while (dataSize--) {
-            *fifoPtr = *dataPtr;
-            dataPtr++;
-            fifoPtr++;
+        while (outSize--) {
+            *(fifoPtr++) = *(dataPtr++);
         }
     } else {
+        uint8_t outSize = ((size + 3) / 4);
         // no out data only read fill with dummy data!
-        while (dataSize--) {
-            *fifoPtr = 0xFFFFFFFF;
-            fifoPtr++;
+        while (outSize--) {
+            *(fifoPtr++) = 0xFFFFFFFF;
         }
     }
 
@@ -569,14 +567,15 @@ void SPIClass::transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t 
     if (in) {
         uint32_t *dataPtr = (uint32_t*) in;
         fifoPtr = &SPI1W0;
-        dataSize = size;
-        while (dataSize >= 4) {
+        int inSize = size;
+        // Unlike outSize above, inSize tracks *bytes* since we must transfer only the requested bytes to the app to avoid overwriting other vars.
+        while (inSize >= 4) {
             *(dataPtr++) = *(fifoPtr++);
-	    dataSize -= 4;
+            inSize -= 4;
             in += 4;
         }
         volatile uint8_t *fifoPtrB = (volatile uint8_t *)fifoPtr;
-        while (dataSize--) {
+        while (inSize--) {
             *(in++) = *(fifoPtrB++);
         }
     }
@@ -587,33 +586,28 @@ void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size) {
     if (!((uint32_t)out & 3) && !((uint32_t)in & 3)) {
         // Input and output are both 32b aligned or NULL
         transferBytesAligned_(out, in, size);
-    } else if (!out && ((uint32_t)in & 3)) {
+    } else if (!out) {
         // Input only and misaligned, do bytewise until in aligned
         while (size && ((uint32_t)in & 3)) {
             *(in++) = transfer(0xff);
-	    size--;
+            size--;
         }
         transferBytesAligned_(out, in, size);
-    } else if (!in && ((uint32_t)out & 3)) {
+    } else if (!in) {
         // Output only and misaligned, bytewise xmit until aligned
         while (size && ((uint32_t)out & 3)) {
             transfer(*(out++));
-	    size--;
+            size--;
         }
         transferBytesAligned_(out, in, size);
     } else {
-        // HW FIFO has 64b limit, so just align in RAM and then send to FIFO aligned
-        uint8_t outAligned[64]; // Stack vars will be 32b aligned
-        uint8_t inAligned[64]; // Stack vars will be 32b aligned
-        if (out) {
-            memcpy(outAligned, out, size);
-        } else {
-            memset(outAligned, 0xff, size); // 0xff = no xmit data
-        }
-        transferBytesAligned_(outAligned, inAligned, size);
-        if (in) {
-            memcpy(in, inAligned, size);
-        }
+        // HW FIFO has 64b limit and ::transferBytes breaks up large xfers into 64byte chunks before calling this function
+        // We know at this point it is a bidirectional transfer
+        uint8_t aligned[64]; // Stack vars will be 32b aligned
+        // No need for separate out and in aligned copies, we can overwrite our out copy with the input data safely
+        memcpy(aligned, out, size);
+        transferBytesAligned_(aligned, aligned, size);
+        memcpy(in, aligned, size);
     }
 }
 
