@@ -831,7 +831,7 @@ std::vector<MDNSResponder::MDNSServiceInfo>  MDNSResponder::answerInfo (const MD
     std::vector<MDNSResponder::MDNSServiceInfo> tempVector;
 	for (uint32_t i=0;i<answerCount(p_hServiceQuery);i++)
     {
-		tempVector.emplace_back(MDNSServiceInfo(*this,p_hServiceQuery,i));
+		tempVector.emplace_back(*this,p_hServiceQuery,i);
     }
 	return tempVector;
 }
