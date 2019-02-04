@@ -19,8 +19,8 @@ LCOV ?= lcov
 GENHTML ?= genhtml
 
 ifeq ($(FORCE32),1)
-ABILITY32 = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
-ifneq ($(ABILITY32),4)
+SIZEOFLONG = $(shell echo 'int main(){return sizeof(long);}'|$(CXX) -m32 -x c++ - -o sizeoflong 2>/dev/null && ./sizeoflong; echo $$?; rm -f sizeoflong;)
+ifneq ($(SIZEOFLONG),4)
 $(warning Cannot compile in 32 bit mode, switching to native mode)
 else
 N32 = 32
@@ -56,6 +56,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	FS.cpp \
 	spiffs_api.cpp \
 	MD5Builder.cpp \
+	Schedule.cpp \
 )
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
@@ -74,6 +75,7 @@ MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	WMath.cpp \
 	MockSerial.cpp \
 	MockTools.cpp \
+	MocklwIP.cpp \
 )
 
 MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
@@ -82,6 +84,8 @@ MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 
 MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 	ArduinoMain.cpp \
+	ArduinoMainUdp.cpp \
+	ArduinoMainSpiffs.cpp \
 	user_interface.cpp \
 )
 
@@ -316,14 +320,13 @@ endif # recursive
 
 .PHONY: list
 list:							# show core example list
-	@for dir in ../../libraries/*/examples; do \
-		exampledir=$${dir%/*}; \
-		exampledirname=$${exampledir##*/}; \
-		for subdir in $$dir/*; do \
-			exname=$${subdir##*/}; \
-			echo "$$subdir/$$exname"; \
-		done; \
-	done; \
+	@for dir in ../../libraries/*/examples/* \
+	            ../../libraries/*/examples/*/*; do \
+		test -d $$dir || continue; \
+		examplename=$${dir##*/}; \
+		test -f $${dir}/$${examplename}.ino || continue; \
+		echo $${dir}/$${examplename}; \
+	done | sort; \
 
 #################################################
 # help
