@@ -589,7 +589,7 @@ boards = collections.OrderedDict([
         'serial': '921',
         'desc': [ 
 			'Parameters in Arduino IDE:',
-			'~~~~~~~~~~~~~~~~~~~~~~~~~',
+			'~~~~~~~~~~~~~~~~~~~~~~~~~~',
 			'',
 			'- Card: "WEMOS D1 Mini Lite"',
 			'- Flash Size: "1M (512K SPIFFS)"',
@@ -597,14 +597,14 @@ boards = collections.OrderedDict([
 			'- Upload Speed: "230400"',
 			'',
 			'Power:',
-			'~~~~~',
+			'~~~~~~',
 			'',
 			'- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input',
 			'- 3V3 pin : 3.3V 500mA regulated output',
 			'- Digital pins : 3.3V 30mA.',
 			'',
 			'links:',
-			'~~~~~',
+			'~~~~~~',
 			'',
 			'- Product page: https://www.wemos.cc/',
 			'- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf',
@@ -947,32 +947,40 @@ macros = {
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
-        ( '.menu.FlashMode.qio', 'QIO' ),
-        ( '.menu.FlashMode.qio.build.flash_mode', 'qio' ),
-        ( '.menu.FlashMode.qout', 'QOUT' ),
-        ( '.menu.FlashMode.qout.build.flash_mode', 'qout' ),
+        ( '.menu.FlashMode.dout', 'DOUT (compatible)' ),
+        ( '.menu.FlashMode.dout.build.flash_mode', 'dout' ),
+        ( '.menu.FlashMode.dout.build.flash_flags', '-DFLASHMODE_DOUT' ),
         ( '.menu.FlashMode.dio', 'DIO' ),
         ( '.menu.FlashMode.dio.build.flash_mode', 'dio' ),
-        ( '.menu.FlashMode.dout', 'DOUT' ),
-        ( '.menu.FlashMode.dout.build.flash_mode', 'dout' ),
+        ( '.menu.FlashMode.dio.build.flash_flags', '-DFLASHMODE_DIO' ),
+        ( '.menu.FlashMode.qout', 'QOUT' ),
+        ( '.menu.FlashMode.qout.build.flash_mode', 'qout' ),
+        ( '.menu.FlashMode.qout.build.flash_flags', '-DFLASHMODE_QOUT' ),
+        ( '.menu.FlashMode.qio', 'QIO (fast)' ),
+        ( '.menu.FlashMode.qio.build.flash_mode', 'qio' ),
+        ( '.menu.FlashMode.qio.build.flash_flags', '-DFLASHMODE_QIO' ),
         ]),
 
     ####################### default flash_mode
 
     'flashmode_dio': collections.OrderedDict([
         ( '.build.flash_mode', 'dio' ),
+        ( '.build.flash_flags', '-DFLASHMODE_DIO' ),
         ]),
 
     'flashmode_qio': collections.OrderedDict([
         ( '.build.flash_mode', 'qio' ),
+        ( '.build.flash_flags', '-DFLASHMODE_QIO' ),
         ]),
 
     'flashmode_dout': collections.OrderedDict([
         ( '.build.flash_mode', 'dout' ),
+        ( '.build.flash_flags', '-DFLASHMODE_DOUT' ),
         ]),
 
     'flashmode_qout': collections.OrderedDict([
         ( '.build.flash_mode', 'qout' ),
+        ( '.build.flash_flags', '-DFLASHMODE_QOUT' ),
         ]),
 
     ####################### lwip

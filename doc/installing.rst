@@ -35,7 +35,7 @@ might be broken.
 
 For more information on the Arduino Board Manager, see:
 
-- https://www.arduino.cc/en/Guide/Libraries
+- https://www.arduino.cc/en/guide/cores
 
 Using git version
 -----------------
@@ -48,12 +48,12 @@ Prerequisites
 
 -  Arduino 1.6.8 (or newer, current working version is 1.8.5)
 -  git
--  Python_ 2.7 (http://python.org)
+-  Python 2.7 (http://python.org)
 -  terminal, console, or command prompt (depending on your OS)
 -  Internet connection
 
 Instructions - Windows 10
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 - First, make sure you don't already have the ESP8266 library installed using the Board Manager (see above)
 
 - Install git for Windows (if not already; see https://git-scm.com/download/win)
@@ -101,6 +101,15 @@ Instructions - Windows 10
                    --- boards.txt
                    --- LICENSE
 
+-  Initialize the submodules
+
+   .. code:: bash
+
+       cd %USERPROFILE%\Documents\hardware\esp8266com\esp8266
+       git submodule update --init   
+  
+  If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
+  
 -  Download binary tools
 
    .. code:: bash
@@ -124,7 +133,7 @@ Note that you could, in theory install in ``C:\Program Files (x86)\Arduino\hardw
 
 
 Instructions - Other OS
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 -  Open the console and go to Arduino directory. This can be either your
    *sketchbook* directory (usually ``<Documents>/Arduino``), or the
@@ -166,6 +175,15 @@ Instructions - Other OS
                    --- boards.txt
                    --- LICENSE
 
+-  Initialize the submodules
+
+   .. code:: bash
+
+       cd esp8266
+       git submodule update --init   
+  
+  If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
+
 -  Download binary tools
 
    .. code:: bash
@@ -174,3 +192,11 @@ Instructions - Other OS
        python get.py
 
 -  Restart Arduino
+
+- When later updating your local library, goto the esp8266 directory and do a git pull
+
+   .. code:: bash
+
+       cd hardware\esp8266com\esp8266
+       git status
+       git pull

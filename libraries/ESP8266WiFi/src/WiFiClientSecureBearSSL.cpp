@@ -79,9 +79,8 @@ void WiFiClientSecure::_clear() {
   _recvapp_buf = nullptr;
   _recvapp_len = 0;
   _oom_err = false;
-  _deleteChainKeyTA = false;
   _session = nullptr;
-  _cipher_list = NULL;
+  _cipher_list = nullptr;
   _cipher_cnt = 0;
 }
 
@@ -92,6 +91,9 @@ void WiFiClientSecure::_clearAuthenticationSettings() {
   _knownkey = nullptr;
   _sk = nullptr;
   _ta = nullptr;
+  _axtls_ta = nullptr;
+  _axtls_chain = nullptr;
+  _axtls_sk = nullptr;
 }
 
 
@@ -102,20 +104,23 @@ WiFiClientSecure::WiFiClientSecure() : WiFiClient() {
   stack_thunk_add_ref();
 }
 
+WiFiClientSecure::WiFiClientSecure(const WiFiClientSecure &rhs) : WiFiClient(rhs) {
+  *this = rhs;
+  stack_thunk_add_ref();
+}
+
 WiFiClientSecure::~WiFiClientSecure() {
   if (_client) {
     _client->unref();
     _client = nullptr;
   }
-  free(_cipher_list);
+  _cipher_list = nullptr; // std::shared will free if last reference
   _freeSSL();
-  // Serial.printf("Max stack usage: %d bytes\n", br_thunk_get_max_usage());
   stack_thunk_del_ref();
-  if (_deleteChainKeyTA) {
-    delete _ta;
-    delete _chain;
-    delete _sk;
-  }
+  // Clean up any dangling axtls compat structures, if needed
+  _axtls_ta = nullptr;
+  _axtls_chain = nullptr;
+  _axtls_sk = nullptr;
 }
 
 WiFiClientSecure::WiFiClientSecure(ClientContext* client,
@@ -808,12 +813,12 @@ extern "C" {
 
 // Set custom list of ciphers
 bool WiFiClientSecure::setCiphers(const uint16_t *cipherAry, int cipherCount) {
-  free(_cipher_list);
-  _cipher_list = (uint16_t *)malloc(cipherCount * sizeof(uint16_t));
-  if (!_cipher_list) {
+  _cipher_list = nullptr;
+  _cipher_list = std::shared_ptr<uint16_t>(new uint16_t[cipherCount], std::default_delete<uint16_t[]>());
+  if (!_cipher_list.get()) {
     return false;
   }
-  memcpy_P(_cipher_list, cipherAry, cipherCount * sizeof(uint16_t));
+  memcpy_P(_cipher_list.get(), cipherAry, cipherCount * sizeof(uint16_t));
   _cipher_cnt = cipherCount;
   return true;
 }
@@ -895,10 +900,10 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
   }
 
   // If no cipher list yet set, use defaults
-  if (_cipher_list == NULL) {
+  if (_cipher_list.get() == nullptr) {
     br_ssl_client_base_init(_sc.get(), suites_P, sizeof(suites_P) / sizeof(suites_P[0]));
   } else {
-    br_ssl_client_base_init(_sc.get(), _cipher_list, _cipher_cnt);
+    br_ssl_client_base_init(_sc.get(), _cipher_list.get(), _cipher_cnt);
   }
   // Only failure possible in the installation is OOM
   if (!_installClientX509Validator()) {
@@ -1300,32 +1305,23 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
 
 // AXTLS compatibility interfaces
 bool WiFiClientSecure::setCACert(const uint8_t* pk, size_t size) {
-  if (_ta && _deleteChainKeyTA) {
-    delete _ta;
-    _ta = nullptr;
-  }
-  _ta = new X509List(pk, size);
-  _deleteChainKeyTA = true;
+  _axtls_ta = nullptr;
+  _axtls_ta = std::shared_ptr<X509List>(new X509List(pk, size));
+  _ta = _axtls_ta.get();
   return _ta ? true : false;
 }
 
 bool WiFiClientSecure::setCertificate(const uint8_t* pk, size_t size) {
-  if (_chain && _deleteChainKeyTA) {
-    delete _chain;
-    _chain = nullptr;
-  }
-  _chain = new X509List(pk, size);
-  _deleteChainKeyTA = true;
+  _axtls_chain = nullptr;
+  _axtls_chain = std::shared_ptr<X509List>(new X509List(pk, size));
+  _chain = _axtls_chain.get();
   return _chain ? true : false;
 }
 
 bool WiFiClientSecure::setPrivateKey(const uint8_t* pk, size_t size) {
-  if (_sk && _deleteChainKeyTA) {
-    delete _sk;
-    _sk = nullptr;
-  }
-  _sk = new PrivateKey(pk, size);
-  _deleteChainKeyTA = true;
+  _axtls_sk = nullptr;
+  _axtls_sk = std::shared_ptr<PrivateKey>(new PrivateKey(pk, size));
+  _sk = _axtls_sk.get();
   return _sk ? true : false;
 
 }

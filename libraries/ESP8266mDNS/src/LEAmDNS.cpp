@@ -22,7 +22,10 @@
  *
  */
 
+#include <Schedule.h>
+
 #include "LEAmDNS_Priv.h"
+
 
 namespace esp8266 {
 
@@ -55,7 +58,12 @@ MDNSResponder::MDNSResponder(void)
     m_pcHostname(0),
     m_pServiceQueries(0),
     m_fnServiceTxtCallback(0),
-    m_pServiceTxtCallbackUserdata(0) {
+    m_pServiceTxtCallbackUserdata(0),
+#ifdef ENABLE_ESP_MDNS_RESPONDER_PASSIV_MODE
+    m_bPassivModeEnabled(true) {
+#else
+    m_bPassivModeEnabled(false) {
+#endif
     
 }
 
@@ -84,21 +92,28 @@ bool MDNSResponder::begin(const char* p_pcHostname) {
     
     bool    bResult = false;
     
-    if (_setHostname(p_pcHostname)) {
-        
-        m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
-            (void) pEvent;
-            _restart();
-        });
-
-        m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
-            (void) pEvent;
-            _restart();
-        });
+    if (0 == m_pUDPContext) {
+        if (_setHostname(p_pcHostname)) {
             
-        bResult = _restart();
+            m_GotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& pEvent) {
+                (void) pEvent;
+                // Ensure that _restart() runs in USER context
+                schedule_function(std::bind(&MDNSResponder::_restart, this));
+            });
+
+            m_DisconnectedHandler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& pEvent) {
+                (void) pEvent;
+                // Ensure that _restart() runs in USER context
+                schedule_function(std::bind(&MDNSResponder::_restart, this));
+            });
+
+            bResult = _restart();
+        }
+        DEBUG_EX_ERR(if (!bResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: FAILED for '%s'!\n"), (p_pcHostname ?: "-")); } );
     }
-    DEBUG_EX_ERR(if (!bResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: FAILED for '%s'!\n"), (p_pcHostname ?: "-")); } );
+    else {
+        DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] begin: Ignoring multiple calls to begin (Ignored host domain: '%s')!\n"), (p_pcHostname ?: "-")););
+    }
     return bResult;
 }
 
@@ -123,7 +138,7 @@ bool MDNSResponder::begin(const char* p_pcHostname,
  */
 bool MDNSResponder::close(void) {
     
-    _announce(false);
+    _announce(false, true);
     _resetProbeStatus(false);   // Stop probing
 
     _releaseServiceQueries();
@@ -205,6 +220,7 @@ MDNSResponder::hMDNSService MDNSResponder::addService(const char* p_pcName,
           }
         }
     }   // else: bad arguments
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] addService: %s to add '%s.%s.%s'!\n"), (hResult ? "Succeeded" : "FAILED"), (p_pcName ?: "-"), p_pcService, p_pcProtocol); );
     DEBUG_EX_ERR(if (!hResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] addService: FAILED to add '%s.%s.%s'!\n"), (p_pcName ?: "-"), p_pcService, p_pcProtocol); } );
     return hResult;
 }
@@ -768,13 +784,17 @@ MDNSResponder::hMDNSServiceQuery MDNSResponder::installServiceQuery(const char* 
         pServiceQuery->m_bLegacyQuery = false;
         
         if (_sendMDNSServiceQuery(*pServiceQuery)) {
+            pServiceQuery->m_u8SentCount = 1;
+            pServiceQuery->m_ResendTimeout.reset(MDNS_DYNAMIC_QUERY_RESEND_DELAY);
+
             hResult = (hMDNSServiceQuery)pServiceQuery;
         }
         else {
             _removeServiceQuery(pServiceQuery);
         }
     }
-    DEBUG_EX_ERR(if (!hResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] installServiceQuery: FAILED for '%s.%s'!\n"), (p_pcService ?: "-"), (p_pcProtocol ?: "-")); } );
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] installServiceQuery: %s for '%s.%s'!\n\n"), (hResult ? "Succeeded" : "FAILED"), (p_pcService ?: "-"), (p_pcProtocol ?: "-")););
+    DEBUG_EX_ERR(if (!hResult) { DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] installServiceQuery: FAILED for '%s.%s'!\n\n"), (p_pcService ?: "-"), (p_pcProtocol ?: "-")); } );
     return hResult;
 }
 
@@ -1073,6 +1093,9 @@ bool MDNSResponder::notifyAPChange(void) {
  */
 bool MDNSResponder::update(void) {
     
+    if (m_bPassivModeEnabled) {
+        m_bPassivModeEnabled = false;
+    }
     return _process(true);
 }
 
@@ -1083,7 +1106,7 @@ bool MDNSResponder::update(void) {
  */
 bool MDNSResponder::announce(void) {
     
-    return (_announce());
+    return (_announce(true, true));
 }       
 
 /*

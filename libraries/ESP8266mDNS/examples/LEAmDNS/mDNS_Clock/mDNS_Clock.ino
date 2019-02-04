@@ -316,17 +316,14 @@ void loop(void) {
   MDNS.update();
 
   // Update time (if needed)
-  //static    unsigned long ulNextTimeUpdate = UPDATE_CYCLE;
-  static clsMDNSTimeFlag timeFlag(UPDATE_CYCLE);
-  if (timeFlag.flagged()/*ulNextTimeUpdate < millis()*/) {
+  static esp8266::polledTimeout::periodic timeout(UPDATE_CYCLE);
+  if (timeout.expired()) {
 
     if (hMDNSService) {
       // Just trigger a new MDNS announcement, this will lead to a call to
       // 'MDNSDynamicServiceTxtCallback', which will update the time TXT item
       MDNS.announce();
     }
-    //ulNextTimeUpdate = (millis() + UPDATE_CYCLE);   // Set update 'timer'
-    timeFlag.restart();
   }
 }
 
