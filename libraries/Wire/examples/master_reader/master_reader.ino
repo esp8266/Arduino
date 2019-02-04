@@ -26,7 +26,7 @@ void loop() {
   using periodic = esp8266::polledTimeout::periodic;
   static periodic nextPing(1000);
 
-  if(nextPing) {
+  if (nextPing) {
     Wire.requestFrom(I2C_SLAVE, 6);    // request 6 bytes from slave device #8
 
     while (Wire.available()) { // slave may send less than requested
