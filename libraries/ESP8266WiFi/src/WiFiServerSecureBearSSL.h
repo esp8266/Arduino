@@ -33,6 +33,7 @@ class WiFiServerSecure : public WiFiServer {
   public:
     WiFiServerSecure(IPAddress addr, uint16_t port);
     WiFiServerSecure(uint16_t port);
+    WiFiServerSecure(const WiFiServerSecure &rhs);
     virtual ~WiFiServerSecure();
 
     // Override the default buffer sizes, if you know what you're doing...
@@ -68,7 +69,11 @@ class WiFiServerSecure : public WiFiServer {
     int _iobuf_in_size = BR_SSL_BUFSIZE_INPUT;
     int _iobuf_out_size = 837;
     const X509List *_client_CA_ta = nullptr;
-    bool _deleteChainAndKey = false;
+
+    // axTLS compat
+    std::shared_ptr<X509List>   _axtls_chain;
+    std::shared_ptr<PrivateKey> _axtls_sk;
+
 };
 
 };
