@@ -72,7 +72,8 @@ public:
     void close();
     operator bool() const;
     const char* name() const;
-
+    String readString() override;
+	
 protected:
     FileImplPtr _p;
 };
