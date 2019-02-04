@@ -336,7 +336,7 @@ LOLIN(WEMOS) D1 mini Lite
 -------------------------
 
 Parameters in Arduino IDE:
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Card: "WEMOS D1 Mini Lite"
 - Flash Size: "1M (512K SPIFFS)"
@@ -344,14 +344,14 @@ Parameters in Arduino IDE:
 - Upload Speed: "230400"
 
 Power:
-~~~~~
+~~~~~~
 
 - 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input
 - 3V3 pin : 3.3V 500mA regulated output
 - Digital pins : 3.3V 30mA.
 
 links:
-~~~~~
+~~~~~~
 
 - Product page: https://www.wemos.cc/
 - Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf
