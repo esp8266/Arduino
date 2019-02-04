@@ -274,7 +274,7 @@ size_t Stream::read (char* buffer, size_t maxLen)
 
 size_t Stream::streamTo (Print& to, size_t maxLen)
 {
-    esp8266::polledTimeout::periodicCycle yieldNow(100);
+    esp8266::polledTimeout::periodic yieldNow(100);
     size_t w;
     size_t written = 0;
     while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
@@ -286,14 +286,31 @@ size_t Stream::streamTo (Print& to, size_t maxLen)
             return written;
         if (w > MAXTRANSFERBLOCK)
             w = MAXTRANSFERBLOCK;
-        char temp[w];
-        r = read(temp, w);
-        w = to.write(temp, r);
-        assert(w == r);
+
+        const char* pb = peekBuffer();
+        if (pb)
+        {
+            w = to.write(pb, w);
+            peekConsume(w);
+        }
+        else
+        {
+            char temp[w];
+            r = read(temp, w);
+            w = to.write(temp, r);
+            assert(w == r);
+        }
+
         written += w;
 
         if (yieldNow)
             yield();
     }
     return written;
+}
+
+void Stream::peekConsume (size_t consume)
+{
+    (void)consume;
+    panic(); // invalid use (peekBuffer() is nullptr)
 }

@@ -9,7 +9,7 @@
 #endif
 
 #ifndef DEBUGV
-#define DEBUGV(...)
+#define DEBUGV(...) do { (void)0; } while (0)
 #endif
 
 #ifdef __cplusplus

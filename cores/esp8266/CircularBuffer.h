@@ -48,24 +48,6 @@ protected:
             m_full = true;
     }
 
-    idx_t availableForWriteContig () const
-    {
-        if (full())
-            return 0;
-        if (m_posr > m_posw)
-            return m_posr - m_posw;
-        return m_len - m_posw;
-    }
-
-    idx_t availableForReadContig () const
-    {
-        if (full())
-            return m_len;
-        if (m_posr > m_posw)
-            return m_len - m_posr;
-        return m_posw - m_posr;
-    }
-
 public:
 
     CircularBuffer (): m_posr(0), m_posw(0), m_full(false) { }
@@ -83,24 +65,6 @@ public:
     bool empty () const
     {
         return m_posw == m_posr && !m_full;
-    }
-
-    int availableForWrite () CONSTst override
-    {
-        if (empty())
-            return m_len;
-        if (m_posw > m_posr)
-            return (m_len - m_posw) + (m_posr - 0);
-        return m_posr - m_posw;
-    }
-
-    int available () CONSTst override
-    {
-        if (full())
-            return m_len;
-        if (m_posr > m_posw)
-            return (m_len - m_posr) + (m_posw - 0);
-        return m_posw - m_posr;
     }
 
     // char/byte oriented
@@ -128,27 +92,35 @@ public:
         return 1;
     }
 
+    idx_t availableForWrite () CONSTst override
+    {
+        if (full())
+            return 0;
+        if (m_posr > m_posw)
+            return m_posr - m_posw;
+        return m_len - m_posw;
+    }
+
+    idx_t available () CONSTst override
+    {
+        if (full())
+            return m_len;
+        if (m_posr > m_posw)
+            return m_len - m_posr;
+        return m_posw - m_posr;
+    }
+
     // buffer oriented
 
     size_t peek (uint8_t* buffer, size_t len) const /*override*/
     {
         if (empty())
             return 0;
-        idx_t chunk1 = availableForReadContig();
+        idx_t chunk1 = availableForRead();
         if (chunk1 > len)
             chunk1 = len;
         memcpy(buffer, &m_buffer[m_posr], chunk1);
         return chunk1;
-    }
-
-    size_t peekMaxSize () const
-    {
-        return availableForReadContig();
-    }
-
-    const uint8_t* peekPtr () const
-    {
-        return &m_buffer[m_posr];
     }
 
     size_t read (char* buffer, size_t maxLen) override
@@ -156,7 +128,7 @@ public:
         idx_t copied = 0;
         while (copied < maxLen)
         {
-            idx_t contig = availableForReadContig();
+            idx_t contig = availableForRead();
             if (!contig)
                 break;
             if (contig > maxLen - copied)
@@ -173,7 +145,7 @@ public:
         idx_t copied = 0;
         while (copied < maxLen)
         {
-            idx_t contig = availableForWriteContig();
+            idx_t contig = availableForWrite();
             if (!contig)
                 break;
             if (contig > maxLen - copied)
@@ -184,4 +156,19 @@ public:
         }
         return copied;
     }
+
+    virtual const char* peekBuffer () override
+    {
+        return &m_buffer[m_posr];
+    }
+
+    virtual void peekConsume (size_t consume) override
+    {
+#ifdef DEBUG_ESP_CORE
+        if (consume > available())
+            DEBUGV("consume overflow\r\n");
+#endif
+        inc_posr(consume);
+    }
+
 };

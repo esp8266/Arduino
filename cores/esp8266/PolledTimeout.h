@@ -138,9 +138,13 @@ protected:
   timeType _start;
 };
 
-using oneShot = polledTimeout::timeoutTemplate<false>;
-using periodic = polledTimeout::timeoutTemplate<true>;
-using periodicCycle = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeCycle>;
+using oneShotMs =  polledTimeout::timeoutTemplate<false>;
+using periodicMs = polledTimeout::timeoutTemplate<true>;
+
+using oneShot =       polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing,   TimePolicy::TimeCycle>;
+using periodic =      polledTimeout::timeoutTemplate<true,  YieldPolicy::DoNothing,   TimePolicy::TimeCycle>;
+using oneShotYield =  polledTimeout::timeoutTemplate<false, YieldPolicy::YieldOrSkip, TimePolicy::TimeCycle>;
+using periodicYield = polledTimeout::timeoutTemplate<true,  YieldPolicy::YieldOrSkip, TimePolicy::TimeCycle>;
 
 } //polledTimeout
 
