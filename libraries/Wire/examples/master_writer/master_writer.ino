@@ -27,7 +27,7 @@ void loop() {
   using periodic = esp8266::polledTimeout::periodic;
   static periodic nextPing(1000);
 
-  if(nextPing) {
+  if (nextPing) {
     Wire.beginTransmission(I2C_SLAVE); // transmit to device #8
     Wire.write("x is ");        // sends five bytes
     Wire.write(x);              // sends one byte
