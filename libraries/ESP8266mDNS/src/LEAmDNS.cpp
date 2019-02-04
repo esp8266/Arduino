@@ -137,7 +137,10 @@ bool MDNSResponder::begin(const char* p_pcHostname,
  */
 bool MDNSResponder::close(void) {
     
-    _announce(false, true);
+	m_GotIPHandler.reset();			// reset WiFi event callbacks.
+	m_DisconnectedHandler.reset();
+
+	_announce(false, true);
     _resetProbeStatus(false);   // Stop probing
 
     _releaseServiceQueries();
