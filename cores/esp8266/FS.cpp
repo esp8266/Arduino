@@ -121,6 +121,21 @@ const char* File::name() const {
     return _p->name();
 }
 
+String File::readString()
+{
+    String ret;
+    ret.reserve(size() - position());
+    char temp[256+1];
+    int countRead = readBytes(temp, sizeof(temp)-1);
+    while (countRead > 0)
+    {
+        temp[countRead] = 0;
+        ret += temp;
+        countRead = readBytes(temp, sizeof(temp)-1);
+    }
+    return ret;
+}
+
 File Dir::openFile(const char* mode) {
     if (!_impl) {
         return File();
