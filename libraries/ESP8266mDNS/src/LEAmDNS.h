@@ -281,7 +281,7 @@ public:
      * Callback function for dynamic MDNS TXT items
      */
 
-    typedef std::function<bool(const hMDNSService p_hService)> MDNSDynamicServiceTxtCallbackFunc;
+    typedef std::function<void(const hMDNSService p_hService)> MDNSDynamicServiceTxtCallbackFunc;
 
     // Set a global callback for dynamic MDNS TXT items. The callback function is called
     // every time, a TXT item is needed for one of the installed services.

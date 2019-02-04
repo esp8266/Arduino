@@ -135,14 +135,13 @@ bool setStationHostname(const char* p_pcHostname) {
    This can be triggered by calling MDNS.announce().
 
 */
-bool MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService) {
+void MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService) {
   Serial.println("MDNSDynamicServiceTxtCallback");
 
   if (hMDNSService == p_hService) {
     Serial.printf("Updating curtime TXT item to: %s\n", getTimeString());
     MDNS.addDynamicServiceTxt(p_hService, "curtime", getTimeString());
   }
-  return true;
 }
 
 

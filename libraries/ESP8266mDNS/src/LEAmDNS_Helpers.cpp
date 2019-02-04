@@ -642,15 +642,14 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_answerKeyValue(const hMDNSServ
  */
 bool MDNSResponder::_collectServiceTxts(MDNSResponder::stcMDNSService& p_rService) {
     
-    bool    bResult = (m_fnServiceTxtCallback
-                        ? m_fnServiceTxtCallback((hMDNSService)&p_rService)
-                        : true);
-    
-    if ((bResult) &&
-        (p_rService.m_fnTxtCallback)) {
-        bResult = p_rService.m_fnTxtCallback((hMDNSService)&p_rService);
+	// Call Dynamic service callbacks
+    if (m_fnServiceTxtCallback) {
+    	m_fnServiceTxtCallback((hMDNSService)&p_rService);
     }
-    return bResult;
+    if (p_rService.m_fnTxtCallback) {
+        p_rService.m_fnTxtCallback((hMDNSService)&p_rService);
+    }
+    return true;
 }
 
 /*
