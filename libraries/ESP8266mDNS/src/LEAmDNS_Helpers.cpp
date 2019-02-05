@@ -629,20 +629,27 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_addServiceTxt(MDNSResponder::s
     return pResult;
 }
 
+MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
+                                                                 const uint32_t p_u32AnswerIndex) {
+    stcMDNSServiceQuery*            pServiceQuery = _findServiceQuery(p_hServiceQuery);
+    stcMDNSServiceQuery::stcAnswer* pSQAnswer = (pServiceQuery ? pServiceQuery->answerAtIndex(p_u32AnswerIndex) : 0);
+    // Fill m_pcTxts (if not already done)
+    return (pSQAnswer) ?  pSQAnswer->m_Txts.m_pTxts : 0;
+}
+
 /*
  * MDNSResponder::_collectServiceTxts
  */
 bool MDNSResponder::_collectServiceTxts(MDNSResponder::stcMDNSService& p_rService) {
     
-    bool    bResult = (m_fnServiceTxtCallback
-                        ? m_fnServiceTxtCallback(this, (hMDNSService)&p_rService, m_pServiceTxtCallbackUserdata)
-                        : true);
-    
-    if ((bResult) &&
-        (p_rService.m_fnTxtCallback)) {
-        bResult = p_rService.m_fnTxtCallback(this, (hMDNSService)&p_rService, p_rService.m_pTxtCallbackUserdata);
+	// Call Dynamic service callbacks
+    if (m_fnServiceTxtCallback) {
+    	m_fnServiceTxtCallback((hMDNSService)&p_rService);
     }
-    return bResult;
+    if (p_rService.m_fnTxtCallback) {
+        p_rService.m_fnTxtCallback((hMDNSService)&p_rService);
+    }
+    return true;
 }
 
 /*
