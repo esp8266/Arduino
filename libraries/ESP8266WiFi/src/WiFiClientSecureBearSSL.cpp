@@ -969,7 +969,17 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
     return false;
   }
 
-  return _wait_for_handshake();
+  auto ret = _wait_for_handshake();
+#ifdef DEBUG_ESP_SSL
+  if (!ret) {
+    char err[256];
+    getLastSSLError(err, sizeof(err));
+    DEBUG_BSSL("Couldn't connect. Error = '%s'\n", err);
+  } else {
+    DEBUG_BSSL("Connected!\n");
+  }
+#endif
+  return ret;
 }
 
 // Slightly different X509 setup for servers who want to validate client
