@@ -138,7 +138,3 @@ The following points assume work in a direct clone of the repository, and not in
     * In main README.md:
 
         - in "Latest release" section, change version number in the readthedocs link to the version which was just released, and verify that all links work.
-        
-    * In doc/conf.py
-   
-        - update version and release to the *next* milestone
