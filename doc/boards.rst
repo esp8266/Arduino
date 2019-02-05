@@ -229,7 +229,7 @@ Product page: https://inventone.ng
 XinaBox CW01
 ------------
 
-The XinaBox CW01 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard RGB led.
+The XinaBox CW01(ESP8266) is an Arduino-compatible Wi-Fi development board powered by an ESP-12F, clocked at 80 MHz at 3.3V logic. The CW01 has an onboard RGB LED and 3 xBUS connection ports.
 
 Product page: https://xinabox.cc/products/CW01
 
