@@ -1,8 +1,8 @@
 /*
-AVR In-System Programming over WiFi for ESP8266
-Copyright (c) Kiril Zyapkov <kiril@robotev.com>
+    AVR In-System Programming over WiFi for ESP8266
+    Copyright (c) Kiril Zyapkov <kiril@robotev.com>
 
-Original version:
+    Original version:
     ArduinoISP version 04m3
     Copyright (c) 2008-2011 Randall Bohn
     If you require a license, see
@@ -21,14 +21,16 @@ Original version:
 #define AVRISP_SPI_FREQ   300e3
 
 // programmer states
-typedef enum {
+typedef enum
+{
     AVRISP_STATE_IDLE = 0,    // no active TCP session
     AVRISP_STATE_PENDING,     // TCP connected, pending SPI activation
     AVRISP_STATE_ACTIVE       // programmer is active and owns the SPI bus
 } AVRISPState_t;
 
 // stk500 parameters
-typedef struct {
+typedef struct
+{
     uint8_t devicecode;
     uint8_t revision;
     uint8_t progtype;
@@ -45,9 +47,10 @@ typedef struct {
 } AVRISP_parameter_t;
 
 
-class ESP8266AVRISP {
+class ESP8266AVRISP
+{
 public:
-    ESP8266AVRISP(uint16_t port, uint8_t reset_pin, uint32_t spi_freq=AVRISP_SPI_FREQ, bool reset_state=false, bool reset_activehigh=false);
+    ESP8266AVRISP(uint16_t port, uint8_t reset_pin, uint32_t spi_freq = AVRISP_SPI_FREQ, bool reset_state = false, bool reset_activehigh = false);
 
     void begin();
 
@@ -100,7 +103,10 @@ protected:
     void start_pmode(void);     // enter program mode
     void end_pmode(void);       // exit program mode
 
-    inline bool _resetLevel(bool reset_state) { return reset_state == _reset_activehigh; }
+    inline bool _resetLevel(bool reset_state)
+    {
+        return reset_state == _reset_activehigh;
+    }
 
     uint32_t _spi_freq;
     WiFiServer _server;

@@ -1,32 +1,32 @@
 /*
- phy.c - ESP8266 PHY initialization data
+    phy.c - ESP8266 PHY initialization data
 
- Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
- This file is part of the esp8266 core for Arduino environment.
+    Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 
- #include <stdint.h>
- #include <stddef.h>
- #include <stdbool.h>
- #include <string.h>
- #include "c_types.h"
- #include "ets_sys.h"
- #include "spi_flash.h"
+#include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <string.h>
+#include "c_types.h"
+#include "ets_sys.h"
+#include "spi_flash.h"
 
 static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
 {
@@ -88,11 +88,11 @@ static const uint8_t ICACHE_FLASH_ATTR phy_init_data[128] =
     // 0: 40MHz
     // 1: 26MHz
     // 2: 24MHz
-    #if F_CRYSTAL == 40000000
-      [48] = 0,
-    #else
-      [48] = 1,
-    #endif
+#if F_CRYSTAL == 40000000
+    [48] = 0,
+#else
+    [48] = 1,
+#endif
 
 
 
@@ -263,9 +263,8 @@ extern int ICACHE_RAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, s
 
 extern int ICACHE_RAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size)
 {
-    if (!spoof_init_data || size != 128) {
+    if (!spoof_init_data || size != 128)
         return __real_spi_flash_read(addr, dst, size);
-    }
 
     memcpy(dst, phy_init_data, sizeof(phy_init_data));
     ((uint8_t*)dst)[107] = __get_adc_mode();
@@ -293,7 +292,7 @@ extern void __run_user_rf_pre_init(void)
 uint32_t user_rf_cal_sector_set(void)
 {
     spoof_init_data = true;
-    return flashchip->chip_size/SPI_FLASH_SEC_SIZE - 4;
+    return flashchip->chip_size / SPI_FLASH_SEC_SIZE - 4;
 }
 
 void user_rf_pre_init()
@@ -305,9 +304,8 @@ void user_rf_pre_init()
 
     system_set_os_print(0);
     int rf_mode = __get_rf_mode();
-    if (rf_mode >= 0) {
+    if (rf_mode >= 0)
         system_phy_set_rfoption(rf_mode);
-    }
     __run_user_rf_pre_init();
 }
 

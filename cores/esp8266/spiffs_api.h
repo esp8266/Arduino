@@ -2,28 +2,28 @@
 #define spiffs_api_h
 
 /*
- spiffs_api.h - file system wrapper for SPIFFS
- Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+    spiffs_api.h - file system wrapper for SPIFFS
+    Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
 
- This code was influenced by NodeMCU and Sming libraries, and first version of
- Arduino wrapper written by Hristo Gochkov.
+    This code was influenced by NodeMCU and Sming libraries, and first version of
+    Arduino wrapper written by Hristo Gochkov.
 
- This file is part of the esp8266 core for Arduino environment.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 #include <limits>
 #include "FS.h"
 #undef max
@@ -62,10 +62,10 @@ class SPIFFSImpl : public FSImpl
 public:
     SPIFFSImpl(uint32_t start, uint32_t size, uint32_t pageSize, uint32_t blockSize, uint32_t maxOpenFds)
         : _start(start)
-    , _size(size)
-    , _pageSize(pageSize)
-    , _blockSize(blockSize)
-    , _maxOpenFds(maxOpenFds)
+        , _size(size)
+        , _pageSize(pageSize)
+        , _blockSize(blockSize)
+        , _maxOpenFds(maxOpenFds)
     {
         memset(&_fs, 0, sizeof(_fs));
     }
@@ -76,16 +76,19 @@ public:
 
     bool rename(const char* pathFrom, const char* pathTo) override
     {
-        if (!isSpiffsFilenameValid(pathFrom)) {
+        if (!isSpiffsFilenameValid(pathFrom))
+        {
             DEBUGV("SPIFFSImpl::rename: invalid pathFrom=`%s`\r\n", pathFrom);
             return false;
         }
-        if (!isSpiffsFilenameValid(pathTo)) {
+        if (!isSpiffsFilenameValid(pathTo))
+        {
             DEBUGV("SPIFFSImpl::rename: invalid pathTo=`%s` \r\n", pathTo);
             return false;
         }
         auto rc = SPIFFS_rename(&_fs, pathFrom, pathTo);
-        if (rc != SPIFFS_OK) {
+        if (rc != SPIFFS_OK)
+        {
             DEBUGV("SPIFFS_rename: rc=%d, from=`%s`, to=`%s`\r\n", rc,
                    pathFrom, pathTo);
             return false;
@@ -101,7 +104,8 @@ public:
         info.maxPathLength = SPIFFS_OBJ_NAME_LEN;
         uint32_t totalBytes, usedBytes;
         auto rc = SPIFFS_info(&_fs, &totalBytes, &usedBytes);
-        if (rc != SPIFFS_OK) {
+        if (rc != SPIFFS_OK)
+        {
             DEBUGV("SPIFFS_info: rc=%d, err=%d\r\n", rc, _fs.err_code);
             return false;
         }
@@ -112,12 +116,14 @@ public:
 
     bool remove(const char* path) override
     {
-        if (!isSpiffsFilenameValid(path)) {
+        if (!isSpiffsFilenameValid(path))
+        {
             DEBUGV("SPIFFSImpl::remove: invalid path=`%s`\r\n", path);
             return false;
         }
         auto rc = SPIFFS_remove(&_fs, path);
-        if (rc != SPIFFS_OK) {
+        if (rc != SPIFFS_OK)
+        {
             DEBUGV("SPIFFS_remove: rc=%d path=`%s`\r\n", rc, path);
             return false;
         }
@@ -130,18 +136,18 @@ public:
         if (&_SPIFFS_end <= &_SPIFFS_start)
             return false;
 #endif
-        if (SPIFFS_mounted(&_fs) != 0) {
+        if (SPIFFS_mounted(&_fs) != 0)
             return true;
-        }
-        if (_size == 0) {
+        if (_size == 0)
+        {
             DEBUGV("SPIFFS size is zero");
             return false;
         }
-        if (_tryMount()) {
+        if (_tryMount())
             return true;
-        }
         auto rc = SPIFFS_format(&_fs);
-        if (rc != SPIFFS_OK) {
+        if (rc != SPIFFS_OK)
+        {
             DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
             return false;
         }
@@ -150,9 +156,8 @@ public:
 
     void end() override
     {
-        if (SPIFFS_mounted(&_fs) == 0) {
+        if (SPIFFS_mounted(&_fs) == 0)
             return;
-        }
         SPIFFS_unmount(&_fs);
         _workBuf.reset(nullptr);
         _fdsBuf.reset(nullptr);
@@ -161,25 +166,25 @@ public:
 
     bool format() override
     {
-        if (_size == 0) {
+        if (_size == 0)
+        {
             DEBUGV("SPIFFS size is zero");
             return false;
         }
 
         bool wasMounted = (SPIFFS_mounted(&_fs) != 0);
 
-        if (_tryMount()) {
+        if (_tryMount())
             SPIFFS_unmount(&_fs);
-        }
         auto rc = SPIFFS_format(&_fs);
-        if (rc != SPIFFS_OK) {
+        if (rc != SPIFFS_OK)
+        {
             DEBUGV("SPIFFS_format: rc=%d, err=%d\r\n", rc, _fs.err_code);
             return false;
         }
 
-        if (wasMounted) {
+        if (wasMounted)
             return _tryMount();
-        }
 
         return true;
     }
@@ -208,22 +213,26 @@ protected:
         config.log_page_size    = _pageSize;
 
 
-        if (((uint32_t) std::numeric_limits<spiffs_block_ix>::max()) < (_size / _blockSize)) {
+        if (((uint32_t) std::numeric_limits<spiffs_block_ix>::max()) < (_size / _blockSize))
+        {
             DEBUGV("spiffs_block_ix type too small");
             abort();
         }
 
-        if (((uint32_t) std::numeric_limits<spiffs_page_ix>::max()) < (_size / _pageSize)) {
+        if (((uint32_t) std::numeric_limits<spiffs_page_ix>::max()) < (_size / _pageSize))
+        {
             DEBUGV("spiffs_page_ix type too small");
             abort();
         }
 
-        if (((uint32_t) std::numeric_limits<spiffs_obj_id>::max()) < (2 + (_size / (2*_pageSize))*2)) {
+        if (((uint32_t) std::numeric_limits<spiffs_obj_id>::max()) < (2 + (_size / (2 * _pageSize)) * 2))
+        {
             DEBUGV("spiffs_obj_id type too small");
             abort();
         }
 
-        if (((uint32_t) std::numeric_limits<spiffs_span_ix>::max()) < (_size / _pageSize - 1)) {
+        if (((uint32_t) std::numeric_limits<spiffs_span_ix>::max()) < (_size / _pageSize - 1))
+        {
             DEBUGV("spiffs_span_ix type too small");
             abort();
         }
@@ -238,7 +247,8 @@ protected:
         size_t fdsBufSize = SPIFFS_buffer_bytes_for_filedescs(&_fs, _maxOpenFds);
         size_t cacheBufSize = SPIFFS_buffer_bytes_for_cache(&_fs, _maxOpenFds);
 
-        if (!_workBuf) {
+        if (!_workBuf)
+        {
             DEBUGV("SPIFFSImpl: allocating %zd+%zd+%zd=%zd bytes\r\n",
                    workBufSize, fdsBufSize, cacheBufSize,
                    workBufSize + fdsBufSize + cacheBufSize);
@@ -266,7 +276,7 @@ protected:
         (void) report;
         (void) arg1;
         (void) arg2;
-        
+
         // TODO: spiffs doesn't pass any context pointer along with _check_cb,
         // so we can't do anything useful here other than perhaps
         // feeding the watchdog
@@ -293,7 +303,7 @@ public:
     SPIFFSFileImpl(SPIFFSImpl* fs, spiffs_file fd)
         : _fs(fs)
         , _fd(fd)
-    , _written(false)
+        , _written(false)
     {
         memset(&_stat, 0, sizeof(_stat));
         _getStat();
@@ -309,7 +319,8 @@ public:
         CHECKFD();
 
         auto result = SPIFFS_write(_fs->getFs(), _fd, (void*) buf, size);
-        if (result < 0) {
+        if (result < 0)
+        {
             DEBUGV("SPIFFS_write rc=%d\r\n", result);
             return 0;
         }
@@ -321,7 +332,8 @@ public:
     {
         CHECKFD();
         auto result = SPIFFS_read(_fs->getFs(), _fd, (void*) buf, size);
-        if (result < 0) {
+        if (result < 0)
+        {
             DEBUGV("SPIFFS_read rc=%d\r\n", result);
             return 0;
         }
@@ -334,9 +346,8 @@ public:
         CHECKFD();
 
         auto rc = SPIFFS_fflush(_fs->getFs(), _fd);
-        if (rc < 0) {
+        if (rc < 0)
             DEBUGV("SPIFFS_fflush rc=%d\r\n", rc);
-        }
         _written = true;
     }
 
@@ -345,11 +356,11 @@ public:
         CHECKFD();
 
         int32_t offset = static_cast<int32_t>(pos);
-        if (mode == SeekEnd) {
+        if (mode == SeekEnd)
             offset = -offset;
-        }
         auto rc = SPIFFS_lseek(_fs->getFs(), _fd, offset, (int) mode);
-        if (rc < 0) {
+        if (rc < 0)
+        {
             DEBUGV("SPIFFS_lseek rc=%d\r\n", rc);
             return false;
         }
@@ -362,7 +373,8 @@ public:
         CHECKFD();
 
         auto result = SPIFFS_lseek(_fs->getFs(), _fd, 0, SPIFFS_SEEK_CUR);
-        if (result < 0) {
+        if (result < 0)
+        {
             DEBUGV("SPIFFS_tell rc=%d\r\n", result);
             return 0;
         }
@@ -373,9 +385,8 @@ public:
     size_t size() const override
     {
         CHECKFD();
-        if (_written) {
+        if (_written)
             _getStat();
-        }
         return _stat.size;
     }
 
@@ -399,7 +410,8 @@ protected:
     {
         CHECKFD();
         auto rc = SPIFFS_fstat(_fs->getFs(), _fd, &_stat);
-        if (rc != SPIFFS_OK) {
+        if (rc != SPIFFS_OK)
+        {
             DEBUGV("SPIFFS_fstat rc=%d\r\n", rc);
             memset(&_stat, 0, sizeof(_stat));
         }
@@ -430,13 +442,13 @@ public:
 
     FileImplPtr openFile(OpenMode openMode, AccessMode accessMode) override
     {
-        if (!_valid) {
+        if (!_valid)
             return FileImplPtr();
-        }
         int mode = getSpiffsMode(openMode, accessMode);
         auto fs = _fs->getFs();
         spiffs_file fd = SPIFFS_open_by_dirent(fs, &_dirent, mode, 0);
-        if (fd < 0) {
+        if (fd < 0)
+        {
             DEBUGV("SPIFFSDirImpl::openFile: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n",
                    fd, _dirent.name, openMode, accessMode, fs->err_code);
             return FileImplPtr();
@@ -446,18 +458,16 @@ public:
 
     const char* fileName() override
     {
-        if (!_valid) {
+        if (!_valid)
             return nullptr;
-        }
 
         return (const char*) _dirent.name;
     }
 
     size_t fileSize() override
     {
-        if (!_valid) {
+        if (!_valid)
             return 0;
-        }
 
         return _dirent.size;
     }
@@ -465,10 +475,11 @@ public:
     bool next() override
     {
         const int n = _pattern.length();
-        do {
+        do
+        {
             spiffs_dirent* result = SPIFFS_readdir(&_dir, &_dirent);
             _valid = (result != nullptr);
-        } while(_valid && strncmp((const char*) _dirent.name, _pattern.c_str(), n) != 0);
+        } while (_valid && strncmp((const char*) _dirent.name, _pattern.c_str(), n) != 0);
         return _valid;
     }
 

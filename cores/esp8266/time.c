@@ -1,20 +1,20 @@
 /*
- * time.c - ESP8266-specific functions for SNTP
- * Copyright (c) 2015 Peter Dobler. All rights reserved.
- * This file is part of the esp8266 core for Arduino environment.
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- *
- */
+    time.c - ESP8266-specific functions for SNTP
+    Copyright (c) 2015 Peter Dobler. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+*/
 
 #include <time.h>
 #include <sys/time.h>
@@ -24,9 +24,10 @@
 
 #ifndef _TIMEVAL_DEFINED
 #define _TIMEVAL_DEFINED
-struct timeval {
-  time_t      tv_sec;
-  suseconds_t tv_usec;
+struct timeval
+{
+    time_t      tv_sec;
+    suseconds_t tv_usec;
 };
 #endif
 
@@ -40,10 +41,10 @@ extern uint64_t micros64();
 bool timeshift64_is_set = false;
 static uint64_t timeshift64 = 0;
 
-void tune_timeshift64 (uint64_t now_us)
+void tune_timeshift64(uint64_t now_us)
 {
-     timeshift64 = now_us - micros64();
-     timeshift64_is_set = true;
+    timeshift64 = now_us - micros64();
+    timeshift64_is_set = true;
 }
 
 static void setServer(int id, const char* name_or_ip)
@@ -63,7 +64,7 @@ void configTime(int timezone, int daylightOffset_sec, const char* server1, const
     setServer(1, server2);
     setServer(2, server3);
 
-    sntp_set_timezone(timezone/3600);
+    sntp_set_timezone(timezone / 3600);
     sntp_set_daylight(daylightOffset_sec);
     sntp_init();
 }
@@ -81,9 +82,7 @@ time_t time(time_t * t)
 {
     time_t seconds = sntp_get_current_timestamp();
     if (t)
-    {
         *t = seconds;
-    }
     return seconds;
 }
 

@@ -1,32 +1,32 @@
-/* 
- * xtensa/config/core-isa.h -- HAL definitions that are dependent on Xtensa
- *				processor CORE configuration
- *
- *  See <xtensa/config/core.h>, which includes this file, for more details.
- */
+/*
+    xtensa/config/core-isa.h -- HAL definitions that are dependent on Xtensa
+ 				processor CORE configuration
 
-/* Xtensa processor core configuration information.
+    See <xtensa/config/core.h>, which includes this file, for more details.
+*/
 
-   Customer ID=7011; Build=0x2b6f6; Copyright (c) 1999-2010 Tensilica Inc.
+/*  Xtensa processor core configuration information.
 
-   Permission is hereby granted, free of charge, to any person obtaining
-   a copy of this software and associated documentation files (the
-   "Software"), to deal in the Software without restriction, including
-   without limitation the rights to use, copy, modify, merge, publish,
-   distribute, sublicense, and/or sell copies of the Software, and to
-   permit persons to whom the Software is furnished to do so, subject to
-   the following conditions:
+    Customer ID=7011; Build=0x2b6f6; Copyright (c) 1999-2010 Tensilica Inc.
 
-   The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
 
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-   CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-   TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
 
 #ifndef _XTENSA_CORE_CONFIGURATION_H
 #define _XTENSA_CORE_CONFIGURATION_H
@@ -37,14 +37,14 @@
  ****************************************************************************/
 
 /*
- *  Note:  Macros of the form XCHAL_HAVE_*** have a value of 1 if the option is
- *  configured, and a value of 0 otherwise.  These macros are always defined.
- */
+    Note:  Macros of the form XCHAL_HAVE_*** have a value of 1 if the option is
+    configured, and a value of 0 otherwise.  These macros are always defined.
+*/
 
 
-/*----------------------------------------------------------------------
+/*  ----------------------------------------------------------------------
 				ISA
-  ----------------------------------------------------------------------*/
+    ----------------------------------------------------------------------*/
 
 #define XCHAL_HAVE_BE			0	/* big-endian byte ordering */
 #define XCHAL_HAVE_WINDOWED		0	/* windowed registers option */
@@ -99,9 +99,9 @@
 #define XCHAL_HAVE_CONNXD2		0	/* ConnX D2 pkg */
 
 
-/*----------------------------------------------------------------------
+/*  ----------------------------------------------------------------------
 				MISC
-  ----------------------------------------------------------------------*/
+    ----------------------------------------------------------------------*/
 
 #define XCHAL_NUM_WRITEBUFFER_ENTRIES	1	/* size of write buffer */
 #define XCHAL_INST_FETCH_WIDTH		4	/* instr-fetch width in bytes */
@@ -121,8 +121,8 @@
 #define XCHAL_BUILD_UNIQUE_ID		0x0002B6F6	/* 22-bit sw build ID */
 
 /*
- *  These definitions describe the hardware targeted by this software.
- */
+    These definitions describe the hardware targeted by this software.
+*/
 #define XCHAL_HW_CONFIGID0		0xC28CDAFA	/* ConfigID hi 32 bits*/
 #define XCHAL_HW_CONFIGID1		0x1082B6F6	/* ConfigID lo 32 bits*/
 #define XCHAL_HW_VERSION_NAME		"LX3.0.1"	/* full version name */
@@ -142,9 +142,9 @@
 #define XCHAL_HW_MAX_VERSION		230001	/* latest targeted hw */
 
 
-/*----------------------------------------------------------------------
+/*  ----------------------------------------------------------------------
 				CACHE
-  ----------------------------------------------------------------------*/
+    ----------------------------------------------------------------------*/
 
 #define XCHAL_ICACHE_LINESIZE		4	/* I-cache line size in bytes */
 #define XCHAL_DCACHE_LINESIZE		4	/* D-cache line size in bytes */
@@ -169,9 +169,9 @@
 
 #ifndef XTENSA_HAL_NON_PRIVILEGED_ONLY
 
-/*----------------------------------------------------------------------
+/*  ----------------------------------------------------------------------
 				CACHE
-  ----------------------------------------------------------------------*/
+    ----------------------------------------------------------------------*/
 
 #define XCHAL_HAVE_PIF			1	/* any outbound PIF present */
 
@@ -199,9 +199,9 @@
 #define XCHAL_CA_BITS			4
 
 
-/*----------------------------------------------------------------------
+/*  ----------------------------------------------------------------------
 			INTERNAL I/D RAM/ROMs and XLMI
-  ----------------------------------------------------------------------*/
+    ----------------------------------------------------------------------*/
 
 #define XCHAL_NUM_INSTROM		1	/* number of core instr. ROMs */
 #define XCHAL_NUM_INSTRAM		2	/* number of core instr. RAMs */
@@ -253,9 +253,9 @@
 #define XCHAL_XLMI0_ECC_PARITY	0
 
 
-/*----------------------------------------------------------------------
+/*  ----------------------------------------------------------------------
 			INTERRUPTS and TIMERS
-  ----------------------------------------------------------------------*/
+    ----------------------------------------------------------------------*/
 
 #define XCHAL_HAVE_INTERRUPTS		1	/* interrupt option */
 #define XCHAL_HAVE_HIGHPRI_INTERRUPTS	1	/* med/high-pri. interrupts */
@@ -268,7 +268,7 @@
 #define XCHAL_NUM_INTLEVELS		2	/* number of interrupt levels
 						   (not including level zero) */
 #define XCHAL_EXCM_LEVEL		1	/* level masked by PS.EXCM */
-	/* (always 1 in XEA1; levels 2 .. EXCM_LEVEL are "medium priority") */
+/* (always 1 in XEA1; levels 2 .. EXCM_LEVEL are "medium priority") */
 
 /*  Masks of interrupts at each interrupt level:  */
 #define XCHAL_INTLEVEL1_MASK		0x00003FFF
@@ -348,13 +348,13 @@
 
 
 /*
- *  External interrupt vectors/levels.
- *  These macros describe how Xtensa processor interrupt numbers
- *  (as numbered internally, eg. in INTERRUPT and INTENABLE registers)
- *  map to external BInterrupt<n> pins, for those interrupts
- *  configured as external (level-triggered, edge-triggered, or NMI).
- *  See the Xtensa processor databook for more details.
- */
+    External interrupt vectors/levels.
+    These macros describe how Xtensa processor interrupt numbers
+    (as numbered internally, eg. in INTERRUPT and INTENABLE registers)
+    map to external BInterrupt<n> pins, for those interrupts
+    configured as external (level-triggered, edge-triggered, or NMI).
+    See the Xtensa processor databook for more details.
+*/
 
 /*  Core interrupt numbers mapped to each EXTERNAL interrupt number:  */
 #define XCHAL_EXTINT0_NUM		0	/* (intlevel 1) */
@@ -372,9 +372,9 @@
 #define XCHAL_EXTINT12_NUM		14	/* (intlevel 3) */
 
 
-/*----------------------------------------------------------------------
+/*  ----------------------------------------------------------------------
 			EXCEPTIONS and VECTORS
-  ----------------------------------------------------------------------*/
+    ----------------------------------------------------------------------*/
 
 #define XCHAL_XEA_VERSION		2	/* Xtensa Exception Architecture
 						   number: 1 == XEA1 (old)
@@ -420,9 +420,9 @@
 #define XCHAL_INTLEVEL3_VECTOR_PADDR	XCHAL_NMI_VECTOR_PADDR
 
 
-/*----------------------------------------------------------------------
+/*  ----------------------------------------------------------------------
 				DEBUG
-  ----------------------------------------------------------------------*/
+    ----------------------------------------------------------------------*/
 
 #define XCHAL_HAVE_OCD			1	/* OnChipDebug option */
 #define XCHAL_NUM_IBREAK		1	/* number of IBREAKn regs */
@@ -430,9 +430,9 @@
 #define XCHAL_HAVE_OCD_DIR_ARRAY	0	/* faster OCD option */
 
 
-/*----------------------------------------------------------------------
+/*  ----------------------------------------------------------------------
 				MMU
-  ----------------------------------------------------------------------*/
+    ----------------------------------------------------------------------*/
 
 /*  See core-matmap.h header file for more details.  */
 

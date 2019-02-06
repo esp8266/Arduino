@@ -1,22 +1,22 @@
 /*
- FS.h - file system wrapper
- Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
- This file is part of the esp8266 core for Arduino environment.
+    FS.h - file system wrapper
+    Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #ifndef FS_H
 #define FS_H
@@ -24,7 +24,8 @@
 #include <memory>
 #include <Arduino.h>
 
-namespace fs {
+namespace fs
+{
 
 class File;
 class Dir;
@@ -39,7 +40,8 @@ typedef std::shared_ptr<DirImpl> DirImplPtr;
 template <typename Tfs>
 bool mount(Tfs& fs, const char* mountPoint);
 
-enum SeekMode {
+enum SeekMode
+{
     SeekSet = 0,
     SeekCur = 1,
     SeekEnd = 2
@@ -59,12 +61,14 @@ public:
     int read() override;
     int peek() override;
     void flush() override;
-    size_t readBytes(char *buffer, size_t length)  override {
+    size_t readBytes(char *buffer, size_t length)  override
+    {
         return read((uint8_t*)buffer, length);
     }
     size_t read(uint8_t* buf, size_t size);
     bool seek(uint32_t pos, SeekMode mode);
-    bool seek(uint32_t pos) {
+    bool seek(uint32_t pos)
+    {
         return seek(pos, SeekSet);
     }
     size_t position() const;
@@ -73,12 +77,13 @@ public:
     operator bool() const;
     const char* name() const;
     String readString() override;
-	
+
 protected:
     FileImplPtr _p;
 };
 
-class Dir {
+class Dir
+{
 public:
     Dir(DirImplPtr impl = DirImplPtr()): _impl(impl) { }
 
@@ -91,7 +96,8 @@ protected:
     DirImplPtr _impl;
 };
 
-struct FSInfo {
+struct FSInfo
+{
     size_t totalBytes;
     size_t usedBytes;
     size_t blockSize;
@@ -107,7 +113,7 @@ public:
 
     bool begin();
     void end();
-    
+
     bool format();
     bool info(FSInfo& info);
 

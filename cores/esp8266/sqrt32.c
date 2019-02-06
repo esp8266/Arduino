@@ -2,7 +2,7 @@
 #include <coredecls.h>
 #include <stdint.h>
 
-uint32_t sqrt32 (uint32_t n)
+uint32_t sqrt32(uint32_t n)
 {
     // http://www.codecodex.com/wiki/Calculate_an_integer_square_root#C
     // Another very fast algorithm donated by Tristan.Muntsinger@gmail.com
@@ -13,9 +13,9 @@ uint32_t sqrt32 (uint32_t n)
     unsigned int c = 0x8000;
     unsigned int g = 0x8000;
 
-    for(;;)
+    for (;;)
     {
-        if (g*g > n)
+        if (g * g > n)
             g ^= c;
         c >>= 1;
         if (!c)
@@ -25,15 +25,15 @@ uint32_t sqrt32 (uint32_t n)
 }
 
 /*
- * tested with:
- *
+    tested with:
 
-#include <stdio.h>
-#include <stdint.h>
-#include <math.h>
 
-int main (void)
-{
+    #include <stdio.h>
+    #include <stdint.h>
+    #include <math.h>
+
+    int main (void)
+    {
     for (uint32_t i = 0; ++i; )
     {
         uint32_t sr = sqrt32(i);
@@ -50,7 +50,7 @@ int main (void)
     }
 
     printf("\n");
-}
+    }
 
- *
- */
+
+*/

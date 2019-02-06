@@ -1,7 +1,7 @@
-/* heap.c - overrides of SDK heap handling functions
- * Copyright (c) 2016 Ivan Grokhotkov. All rights reserved.
- * This file is distributed under MIT license.
- */
+/*  heap.c - overrides of SDK heap handling functions
+    Copyright (c) 2016 Ivan Grokhotkov. All rights reserved.
+    This file is distributed under MIT license.
+*/
 
 #include <stdlib.h>
 #include "umm_malloc/umm_malloc.h"
@@ -16,7 +16,8 @@ void* _malloc_r(struct _reent* unused, size_t size)
 {
     (void) unused;
     void *ret = malloc(size);
-    if (0 != size && 0 == ret) {
+    if (0 != size && 0 == ret)
+    {
         umm_last_fail_alloc_addr = __builtin_return_address(0);
         umm_last_fail_alloc_size = size;
     }
@@ -33,7 +34,8 @@ void* _realloc_r(struct _reent* unused, void* ptr, size_t size)
 {
     (void) unused;
     void *ret = realloc(ptr, size);
-    if (0 != size && 0 == ret) {
+    if (0 != size && 0 == ret)
+    {
         umm_last_fail_alloc_addr = __builtin_return_address(0);
         umm_last_fail_alloc_size = size;
     }
@@ -44,7 +46,8 @@ void* _calloc_r(struct _reent* unused, size_t count, size_t size)
 {
     (void) unused;
     void *ret = calloc(count, size);
-    if (0 != (count * size) && 0 == ret) {
+    if (0 != (count * size) && 0 == ret)
+    {
         umm_last_fail_alloc_addr = __builtin_return_address(0);
         umm_last_fail_alloc_size = count * size;
     }
@@ -88,7 +91,7 @@ static const char oom_fmt[]   PROGMEM STORE_ATTR = ":oom(%d)@?\n";
 static const char oom_fmt_1[] PROGMEM STORE_ATTR = ":oom(%d)@";
 static const char oom_fmt_2[] PROGMEM STORE_ATTR = ":%d\n";
 
-void* malloc (size_t s)
+void* malloc(size_t s)
 {
     void* ret = umm_malloc(s);
     if (!ret)
@@ -96,7 +99,7 @@ void* malloc (size_t s)
     return ret;
 }
 
-void* calloc (size_t n, size_t s)
+void* calloc(size_t n, size_t s)
 {
     void* ret = umm_calloc(n, s);
     if (!ret)
@@ -104,7 +107,7 @@ void* calloc (size_t n, size_t s)
     return ret;
 }
 
-void* realloc (void* p, size_t s)
+void* realloc(void* p, size_t s)
 {
     void* ret = umm_realloc(p, s);
     if (!ret)
@@ -112,14 +115,14 @@ void* realloc (void* p, size_t s)
     return ret;
 }
 
-void print_loc (size_t s, const char* file, int line)
+void print_loc(size_t s, const char* file, int line)
 {
-        os_printf(oom_fmt_1, (int)s);
-        os_printf(file);
-        os_printf(oom_fmt_2, line);
+    os_printf(oom_fmt_1, (int)s);
+    os_printf(file);
+    os_printf(oom_fmt_2, line);
 }
 
-void* malloc_loc (size_t s, const char* file, int line)
+void* malloc_loc(size_t s, const char* file, int line)
 {
     void* ret = umm_malloc(s);
     if (!ret)
@@ -127,7 +130,7 @@ void* malloc_loc (size_t s, const char* file, int line)
     return ret;
 }
 
-void* calloc_loc (size_t n, size_t s, const char* file, int line)
+void* calloc_loc(size_t n, size_t s, const char* file, int line)
 {
     void* ret = umm_calloc(n, s);
     if (!ret)
@@ -135,7 +138,7 @@ void* calloc_loc (size_t n, size_t s, const char* file, int line)
     return ret;
 }
 
-void* realloc_loc (void* p, size_t s, const char* file, int line)
+void* realloc_loc(void* p, size_t s, const char* file, int line)
 {
     void* ret = umm_realloc(p, s);
     if (!ret)

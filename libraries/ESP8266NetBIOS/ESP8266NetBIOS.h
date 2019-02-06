@@ -10,10 +10,10 @@ extern "C" {
 
 #define NBNS_PORT 137
 /**
-* @def NBNS_MAX_HOSTNAME_LEN
-* @brief maximalni delka NBNS jmena zarizeni
-* @remarks
-* Jmeno zarizeni musi byt uvedeno VELKYMI pismenami a nesmi obsahovat mezery (whitespaces).
+    @def NBNS_MAX_HOSTNAME_LEN
+    @brief maximalni delka NBNS jmena zarizeni
+    @remarks
+    Jmeno zarizeni musi byt uvedeno VELKYMI pismenami a nesmi obsahovat mezery (whitespaces).
 */
 #define NBNS_MAX_HOSTNAME_LEN 16
 
@@ -27,7 +27,7 @@ protected:
     char _name[NBNS_MAX_HOSTNAME_LEN + 1];
     void _getnbname(char *nbname, char *name, uint8_t maxlen);
     void _makenbname(char *name, char *nbname, uint8_t outlen);
-   
+
     void _recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint16_t port);
     static void _s_recv(void *arg, udp_pcb *upcb, pbuf *p, CONST ip_addr_t *addr, uint16_t port);
 

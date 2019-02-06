@@ -1,39 +1,39 @@
 /*
- * ESP8266 LLMNR responder
- * Copyright (C) 2017 Stephen Warren <swarren@wwwdotorg.org>
- *
- * Based on:
- * ESP8266 Multicast DNS (port of CC3000 Multicast DNS library)
- * Version 1.1
- * Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
- * ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
- * MDNS-SD Suport 2015 Hristo Gochkov
- * Extended MDNS-SD support 2016 Lars Englund (lars.englund@gmail.com)
- *
- * License (MIT license):
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * Reference:
- * https://tools.ietf.org/html/rfc4795 (LLMNR)
- * https://tools.ietf.org/html/rfc1035 (DNS)
- */
+    ESP8266 LLMNR responder
+    Copyright (C) 2017 Stephen Warren <swarren@wwwdotorg.org>
+
+    Based on:
+    ESP8266 Multicast DNS (port of CC3000 Multicast DNS library)
+    Version 1.1
+    Copyright (c) 2013 Tony DiCola (tony@tonydicola.com)
+    ESP8266 port (c) 2015 Ivan Grokhotkov (ivan@esp8266.com)
+    MDNS-SD Suport 2015 Hristo Gochkov
+    Extended MDNS-SD support 2016 Lars Englund (lars.englund@gmail.com)
+
+    License (MIT license):
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+    Reference:
+    https://tools.ietf.org/html/rfc4795 (LLMNR)
+    https://tools.ietf.org/html/rfc1035 (DNS)
+*/
 
 #include <debug.h>
 #include <functional>
@@ -72,15 +72,18 @@ static const int LLMNR_MULTICAST_TTL = 1;
 static const int LLMNR_PORT = 5355;
 
 LLMNRResponder::LLMNRResponder() :
-    _conn(0) {
+    _conn(0)
+{
 }
 
-LLMNRResponder::~LLMNRResponder() {
+LLMNRResponder::~LLMNRResponder()
+{
     if (_conn)
         _conn->unref();
 }
 
-bool LLMNRResponder::begin(const char* hostname) {
+bool LLMNRResponder::begin(const char* hostname)
+{
     // Max length for a single label in DNS
     if (strlen(hostname) > 63)
         return false;
@@ -88,12 +91,14 @@ bool LLMNRResponder::begin(const char* hostname) {
     _hostname = hostname;
     _hostname.toLowerCase();
 
-    _sta_got_ip_handler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP& event){
+    _sta_got_ip_handler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP & event)
+    {
         (void) event;
         _restart();
     });
 
-    _sta_disconnected_handler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected& event) {
+    _sta_disconnected_handler = WiFi.onStationModeDisconnected([this](const WiFiEventStationModeDisconnected & event)
+    {
         (void) event;
         _restart();
     });
@@ -101,12 +106,15 @@ bool LLMNRResponder::begin(const char* hostname) {
     return _restart();
 }
 
-void LLMNRResponder::notify_ap_change() {
+void LLMNRResponder::notify_ap_change()
+{
     _restart();
 }
 
-bool LLMNRResponder::_restart() {
-    if (_conn) {
+bool LLMNRResponder::_restart()
+{
+    if (_conn)
+    {
         _conn->unref();
         _conn = 0;
     }
@@ -128,7 +136,8 @@ bool LLMNRResponder::_restart() {
     return true;
 }
 
-void LLMNRResponder::_process_packet() {
+void LLMNRResponder::_process_packet()
+{
     if (!_conn || !_conn->next())
         return;
 
@@ -159,21 +168,24 @@ void LLMNRResponder::_process_packet() {
 #endif
 
 #define BAD_FLAGS (FLAGS_QR | (FLAGS_OP_MASK << FLAGS_OP_SHIFT) | FLAGS_C)
-    if (flags & BAD_FLAGS) {
+    if (flags & BAD_FLAGS)
+    {
 #ifdef LLMNR_DEBUG
         Serial.println("Bad flags");
 #endif
         return;
     }
 
-    if (qdcount != 1) {
+    if (qdcount != 1)
+    {
 #ifdef LLMNR_DEBUG
         Serial.println("QDCOUNT != 1");
 #endif
         return;
     }
 
-    if (ancount || nscount || arcount) {
+    if (ancount || nscount || arcount)
+    {
 #ifdef LLMNR_DEBUG
         Serial.println("AN/NS/AR-COUNT != 0");
 #endif
@@ -185,7 +197,8 @@ void LLMNRResponder::_process_packet() {
     Serial.print("QNAME len ");
     Serial.println(namelen);
 #endif
-    if (namelen != _hostname.length()) {
+    if (namelen != _hostname.length())
+    {
 #ifdef LLMNR_DEBUG
         Serial.println("QNAME len mismatch");
 #endif
@@ -201,7 +214,8 @@ void LLMNRResponder::_process_packet() {
     Serial.println(qname);
 #endif
 
-    if (strcmp(_hostname.c_str(), qname)) {
+    if (strcmp(_hostname.c_str(), qname))
+    {
 #ifdef LLMNR_DEBUG
         Serial.println("QNAME mismatch");
 #endif
@@ -234,7 +248,8 @@ void LLMNRResponder::_process_packet() {
 
     struct ip_info ip_info;
     bool match_ap = false;
-    if (wifi_get_opmode() & SOFTAP_MODE) {
+    if (wifi_get_opmode() & SOFTAP_MODE)
+    {
         wifi_get_ip_info(SOFTAP_IF, &ip_info);
         IPAddress infoIp(ip_info.ip);
         IPAddress infoMask(ip_info.netmask);
@@ -246,7 +261,8 @@ void LLMNRResponder::_process_packet() {
     uint32_t ip = ip_info.ip.addr;
 
     // Header
-    uint8_t header[] = {
+    uint8_t header[] =
+    {
         (uint8_t)(id >> 8), (uint8_t)(id & 0xff), // ID
         (uint8_t)(FLAGS_QR >> 8), 0, // FLAGS
         0, 1, // QDCOUNT
@@ -258,17 +274,20 @@ void LLMNRResponder::_process_packet() {
     // Question
     _conn->append(reinterpret_cast<const char*>(&namelen), 1);
     _conn->append(qname, namelen);
-    uint8_t q[] = {
+    uint8_t q[] =
+    {
         0, // Name terminator
         0, 1, // TYPE (A)
         0, 1, // CLASS (IN)
     };
     _conn->append(reinterpret_cast<const char*>(q), sizeof(q));
     // Answer, if we have one
-    if (have_rr) {
+    if (have_rr)
+    {
         _conn->append(reinterpret_cast<const char*>(&namelen), 1);
         _conn->append(qname, namelen);
-        uint8_t rr[] = {
+        uint8_t rr[] =
+        {
             0, // Name terminator
             0, 1, // TYPE (A)
             0, 1, // CLASS (IN)

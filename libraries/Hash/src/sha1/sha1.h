@@ -1,10 +1,10 @@
 /**
- * @file sha1.h
- * @date 20.05.2015
- * @author Steve Reid <steve@edmweb.com>
- *
- * from: http://www.virtualbox.org/svn/vbox/trunk/src/recompiler/tests/sha1.c
- */
+    @file sha1.h
+    @date 20.05.2015
+    @author Steve Reid <steve@edmweb.com>
+
+    from: http://www.virtualbox.org/svn/vbox/trunk/src/recompiler/tests/sha1.c
+*/
 
 /* ================ sha1.h ================ */
 /*
@@ -16,7 +16,8 @@
 #ifndef SHA1_H_
 #define SHA1_H_
 
-typedef struct {
+typedef struct
+{
     uint32_t state[5];
     uint32_t count[2];
     unsigned char buffer[64];

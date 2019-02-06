@@ -1,23 +1,23 @@
 /*
-  WiFiUdp.cpp - UDP client/server for esp8266, mostly compatible
+    WiFiUdp.cpp - UDP client/server for esp8266, mostly compatible
                    with Arduino WiFi shield library
 
-  Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
-  This file is part of the esp8266 core for Arduino environment.
+    Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #define LWIP_INTERNAL
@@ -25,9 +25,9 @@
 
 extern "C"
 {
-    #include "include/wl_definitions.h"
-    #include "osapi.h"
-    #include "ets_sys.h"
+#include "include/wl_definitions.h"
+#include "osapi.h"
+#include "ets_sys.h"
 }
 
 #include "debug.h"
@@ -75,7 +75,8 @@ WiFiUDP::~WiFiUDP()
 /* Start WiFiUDP socket, listening at local port */
 uint8_t WiFiUDP::begin(uint16_t port)
 {
-    if (_ctx) {
+    if (_ctx)
+    {
         _ctx->unref();
         _ctx = 0;
     }
@@ -87,35 +88,35 @@ uint8_t WiFiUDP::begin(uint16_t port)
 
 uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, uint16_t port)
 {
-    if (_ctx) {
+    if (_ctx)
+    {
         _ctx->unref();
         _ctx = 0;
     }
 
-    if (igmp_joingroup(interfaceAddr, multicast)!= ERR_OK) {
+    if (igmp_joingroup(interfaceAddr, multicast) != ERR_OK)
         return 0;
-    }
 
     _ctx = new UdpContext;
     _ctx->ref();
     ip_addr_t addr = IPADDR4_INIT(INADDR_ANY);
-    if (!_ctx->listen(&addr, port)) {
+    if (!_ctx->listen(&addr, port))
         return 0;
-    }
 
     return 1;
 }
 
-/* return number of bytes available in the current packet,
-   will return zero if parsePacket hasn't been called yet */
-int WiFiUDP::available() {
+/*  return number of bytes available in the current packet,
+    will return zero if parsePacket hasn't been called yet */
+int WiFiUDP::available()
+{
     int result = 0;
 
-    if (_ctx) {
+    if (_ctx)
         result = static_cast<int>(_ctx->getSize());
-    }
 
-    if (!result) {
+    if (!result)
+    {
         // yielding here will not make more data "available",
         // but it will prevent the system from going into WDT reset
         optimistic_yield(1000);
@@ -127,7 +128,8 @@ int WiFiUDP::available() {
 /* Release any resources being used by this WiFiUDP instance */
 void WiFiUDP::stop()
 {
-    if (_ctx) {
+    if (_ctx)
+    {
         _ctx->disconnect();
         _ctx->unref();
     }
@@ -138,15 +140,14 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port)
 {
     IPAddress remote_addr;
     if (WiFi.hostByName(host, remote_addr))
-    {
         return beginPacket(remote_addr, port);
-    }
     return 0;
 }
 
 int WiFiUDP::beginPacket(IPAddress ip, uint16_t port)
 {
-    if (!_ctx) {
+    if (!_ctx)
+    {
         _ctx = new UdpContext;
         _ctx->ref();
     }
@@ -154,15 +155,15 @@ int WiFiUDP::beginPacket(IPAddress ip, uint16_t port)
 }
 
 int WiFiUDP::beginPacketMulticast(IPAddress multicastAddress, uint16_t port,
-    IPAddress interfaceAddress, int ttl)
+                                  IPAddress interfaceAddress, int ttl)
 {
-    if (!_ctx) {
+    if (!_ctx)
+    {
         _ctx = new UdpContext;
         _ctx->ref();
     }
-    if (!_ctx->connect(multicastAddress, port)) {
+    if (!_ctx->connect(multicastAddress, port))
         return 0;
-    }
     _ctx->setMulticastInterface(interfaceAddress);
     _ctx->setMulticastTTL(ttl);
     return 1;
@@ -194,7 +195,8 @@ int WiFiUDP::parsePacket()
     if (!_ctx)
         return 0;
 
-    if (!_ctx->next()) {
+    if (!_ctx->next())
+    {
         optimistic_yield(100);
         return 0;
     }
@@ -265,15 +267,19 @@ uint16_t WiFiUDP::localPort() const
 
 void WiFiUDP::stopAll()
 {
-    for (WiFiUDP* it = _s_first; it; it = it->_next) {
+    for (WiFiUDP* it = _s_first; it; it = it->_next)
+    {
         DEBUGV("%s %p %p\n", __func__, it, _s_first);
         it->stop();
     }
 }
 
-void WiFiUDP::stopAllExcept(WiFiUDP * exC) {
-    for (WiFiUDP* it = _s_first; it; it = it->_next) {
-        if (it->_ctx != exC->_ctx) {
+void WiFiUDP::stopAllExcept(WiFiUDP * exC)
+{
+    for (WiFiUDP* it = _s_first; it; it = it->_next)
+    {
+        if (it->_ctx != exC->_ctx)
+        {
             DEBUGV("%s %p %p\n", __func__, it, _s_first);
             it->stop();
         }

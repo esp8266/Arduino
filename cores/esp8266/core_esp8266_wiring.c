@@ -1,23 +1,23 @@
-/* 
- core_esp8266_wiring.c - implementation of Wiring API for esp8266
+/*
+    core_esp8266_wiring.c - implementation of Wiring API for esp8266
 
- Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
- This file is part of the esp8266 core for Arduino environment.
- 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #include "wiring_private.h"
 #include "ets_sys.h"
@@ -35,28 +35,31 @@ static uint32_t micros_overflow_count = 0;
 #define ONCE 0
 #define REPEAT 1
 
-void delay_end(void* arg) {
+void delay_end(void* arg)
+{
     (void) arg;
     esp_schedule();
 }
 
-void delay(unsigned long ms) {
-    if(ms) {
+void delay(unsigned long ms)
+{
+    if (ms)
+    {
         os_timer_setfn(&delay_timer, (os_timer_func_t*) &delay_end, 0);
         os_timer_arm(&delay_timer, ms, ONCE);
-    } else {
+    }
+    else
         esp_schedule();
-    }
     esp_yield();
-    if(ms) {
+    if (ms)
         os_timer_disarm(&delay_timer);
-    }
 }
 
-void micros_overflow_tick(void* arg) {
+void micros_overflow_tick(void* arg)
+{
     (void) arg;
     uint32_t m = system_get_time();
-    if(m < micros_at_last_overflow_tick)
+    if (m < micros_at_last_overflow_tick)
         ++micros_overflow_count;
     micros_at_last_overflow_tick = m;
 }
@@ -87,7 +90,7 @@ void micros_overflow_tick(void* arg) {
 //    The precision difference between multiplier and divisor sets the
 //    upper-bound of the dividend which can be successfully divided.
 //
-//    For this application, n = 64, and the divisor (1000) has 10-bits of 
+//    For this application, n = 64, and the divisor (1000) has 10-bits of
 //    precision. This sets the dividend upper-bound to (64 - 10) = 54 bits,
 //    and that of 'c' to (54 - 32) = 22 bits. This corresponds to a value
 //    for 'c' = 0x0040,0000 , or +570 years of usec counter overflows.
@@ -160,51 +163,56 @@ void micros_overflow_tick(void* arg) {
 
 unsigned long ICACHE_RAM_ATTR millis()
 {
-  union {
-     uint64_t  q;     // Accumulator, 64-bit, little endian
-     uint32_t  a[2];  // ..........., 32-bit  segments
-  } acc;
-  acc.a[1] = 0;       // Zero high-acc
-  
-  // Get usec system time, usec overflow counter
-  uint32_t  m = system_get_time();
-  uint32_t  c = micros_overflow_count +
-                   ((m < micros_at_last_overflow_tick) ? 1 : 0);
+    union
+    {
+        uint64_t  q;     // Accumulator, 64-bit, little endian
+        uint32_t  a[2];  // ..........., 32-bit  segments
+    } acc;
+    acc.a[1] = 0;       // Zero high-acc
 
-  // (a) Init. low-acc with high-word of 1st product. The right-shift
-  //     falls on a byte boundary, hence is relatively quick.
-  
-  acc.q  = ( (uint64_t)( m * (uint64_t)MAGIC_1E3_wLO ) >> 32 );
+    // Get usec system time, usec overflow counter
+    uint32_t  m = system_get_time();
+    uint32_t  c = micros_overflow_count +
+                  ((m < micros_at_last_overflow_tick) ? 1 : 0);
 
-  // (b) Offset sum, low-acc
-  acc.q += ( m * (uint64_t)MAGIC_1E3_wHI );
+    // (a) Init. low-acc with high-word of 1st product. The right-shift
+    //     falls on a byte boundary, hence is relatively quick.
 
-  // (c) Offset sum, low-acc
-  acc.q += ( c * (uint64_t)MAGIC_1E3_wLO );
+    acc.q  = ((uint64_t)(m * (uint64_t)MAGIC_1E3_wLO) >> 32);
 
-  // (d) Truncated sum, high-acc
-  acc.a[1] += (uint32_t)( c * (uint64_t)MAGIC_1E3_wHI );
+    // (b) Offset sum, low-acc
+    acc.q += (m * (uint64_t)MAGIC_1E3_wHI);
 
-  return ( acc.a[1] );  // Extract result, high-acc
+    // (c) Offset sum, low-acc
+    acc.q += (c * (uint64_t)MAGIC_1E3_wLO);
+
+    // (d) Truncated sum, high-acc
+    acc.a[1] += (uint32_t)(c * (uint64_t)MAGIC_1E3_wHI);
+
+    return (acc.a[1]);    // Extract result, high-acc
 
 } //millis
 
-unsigned long ICACHE_RAM_ATTR micros() {
+unsigned long ICACHE_RAM_ATTR micros()
+{
     return system_get_time();
 }
 
-uint64_t ICACHE_RAM_ATTR micros64() {
+uint64_t ICACHE_RAM_ATTR micros64()
+{
     uint32_t low32_us = system_get_time();
     uint32_t high32_us = micros_overflow_count + ((low32_us < micros_at_last_overflow_tick) ? 1 : 0);
     uint64_t duration64_us = (uint64_t)high32_us << 32 | low32_us;
     return duration64_us;
 }
 
-void ICACHE_RAM_ATTR delayMicroseconds(unsigned int us) {
+void ICACHE_RAM_ATTR delayMicroseconds(unsigned int us)
+{
     os_delay_us(us);
 }
 
-void init() {
+void init()
+{
     initPins();
     timer1_isr_init();
     os_timer_setfn(&micros_overflow_timer, (os_timer_func_t*) &micros_overflow_tick, 0);
