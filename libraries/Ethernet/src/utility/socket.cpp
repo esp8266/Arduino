@@ -15,7 +15,9 @@ uint8_t socket(SOCKET s, uint8_t protocol, uint16_t port, uint8_t flag)
         SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
         W5100.writeSnMR(s, protocol | flag);
         if (port != 0)
+        {
             W5100.writeSnPORT(s, port);
+        }
         else
         {
             local_port++; // if don't set the source port, set local_port number.
@@ -84,7 +86,9 @@ uint8_t connect(SOCKET s, const uint8_t * addr, uint16_t port)
         ((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) && (addr[3] == 0x00)) ||
         (port == 0x00)
     )
+    {
         return 0;
+    }
 
     // set destination IP
     SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
@@ -121,9 +125,13 @@ uint16_t send(SOCKET s, const uint8_t * buf, uint16_t len)
     uint16_t freesize = 0;
 
     if (len > W5100.SSIZE)
-        ret = W5100.SSIZE; // check size not to exceed MAX size.
+    {
+        ret = W5100.SSIZE;    // check size not to exceed MAX size.
+    }
     else
+    {
         ret = len;
+    }
 
     // if freebuf is available, start.
     do
@@ -193,7 +201,9 @@ int16_t recv(SOCKET s, uint8_t *buf, int16_t len)
         }
     }
     else if (ret > len)
+    {
         ret = len;
+    }
 
     if (ret > 0)
     {
@@ -238,8 +248,14 @@ uint16_t sendto(SOCKET s, const uint8_t *buf, uint16_t len, uint8_t *addr, uint1
 {
     uint16_t ret = 0;
 
-    if (len > W5100.SSIZE) ret = W5100.SSIZE; // check size not to exceed MAX size.
-    else ret = len;
+    if (len > W5100.SSIZE)
+    {
+        ret = W5100.SSIZE;    // check size not to exceed MAX size.
+    }
+    else
+    {
+        ret = len;
+    }
 
     if
     (
@@ -371,12 +387,18 @@ uint16_t igmpsend(SOCKET s, const uint8_t * buf, uint16_t len)
     uint16_t ret = 0;
 
     if (len > W5100.SSIZE)
-        ret = W5100.SSIZE; // check size not to exceed MAX size.
+    {
+        ret = W5100.SSIZE;    // check size not to exceed MAX size.
+    }
     else
+    {
         ret = len;
+    }
 
     if (ret == 0)
+    {
         return 0;
+    }
 
     SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
     W5100.send_data_processing(s, (uint8_t *)buf, ret);
@@ -411,7 +433,9 @@ uint16_t bufferData(SOCKET s, uint16_t offset, const uint8_t* buf, uint16_t len)
         ret = W5100.getTXFreeSize(s); // check size not to exceed MAX size.
     }
     else
+    {
         ret = len;
+    }
     W5100.send_data_processing_offset(s, offset, buf, ret);
     SPI.endTransaction();
     return ret;
@@ -424,7 +448,9 @@ int startUDP(SOCKET s, const uint8_t* addr, uint16_t port)
         ((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) && (addr[3] == 0x00)) ||
         ((port == 0x00))
     )
+    {
         return 0;
+    }
     else
     {
         SPI.beginTransaction(SPI_ETHERNET_SETTINGS);

@@ -39,14 +39,20 @@ void EthernetServer::accept()
         if (EthernetClass::_server_port[sock] == _port)
         {
             if (client.status() == SnSR::LISTEN)
+            {
                 listening = 1;
+            }
             else if (client.status() == SnSR::CLOSE_WAIT && !client.available())
+            {
                 client.stop();
+            }
         }
     }
 
     if (!listening)
+    {
         begin();
+    }
 }
 
 EthernetClient EthernetServer::available()
@@ -90,7 +96,9 @@ size_t EthernetServer::write(const uint8_t *buffer, size_t size)
 
         if (EthernetClass::_server_port[sock] == _port &&
                 client.status() == SnSR::ESTABLISHED)
+        {
             n += client.write(buffer, size);
+        }
     }
 
     return n;

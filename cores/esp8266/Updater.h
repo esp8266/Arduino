@@ -172,20 +172,26 @@ public:
     {
         size_t written = 0;
         if (hasError() || !isRunning())
+        {
             return 0;
+        }
 
         size_t available = data.available();
         while (available)
         {
             if (_bufferLen + available > remaining())
+            {
                 available = remaining() - _bufferLen;
+            }
             if (_bufferLen + available > _bufferSize)
             {
                 size_t toBuff = _bufferSize - _bufferLen;
                 data.read(_buffer + _bufferLen, toBuff);
                 _bufferLen += toBuff;
                 if (!_writeBuffer())
+                {
                     return written;
+                }
                 written += toBuff;
             }
             else
@@ -196,11 +202,15 @@ public:
                 if (_bufferLen == remaining())
                 {
                     if (!_writeBuffer())
+                    {
                         return written;
+                    }
                 }
             }
             if (remaining() == 0)
+            {
                 return written;
+            }
             delay(1);
             available = data.available();
         }

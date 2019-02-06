@@ -51,9 +51,13 @@ EEPROMClass::EEPROMClass(void)
 void EEPROMClass::begin(size_t size)
 {
     if (size <= 0)
+    {
         return;
+    }
     if (size > SPI_FLASH_SEC_SIZE)
+    {
         size = SPI_FLASH_SEC_SIZE;
+    }
 
     size = (size + 3) & (~3);
 
@@ -64,7 +68,9 @@ void EEPROMClass::begin(size_t size)
         _data = new uint8_t[size];
     }
     else if (!_data)
+    {
         _data = new uint8_t[size];
+    }
 
     _size = size;
 
@@ -78,11 +84,15 @@ void EEPROMClass::begin(size_t size)
 void EEPROMClass::end()
 {
     if (!_size)
+    {
         return;
+    }
 
     commit();
     if (_data)
+    {
         delete[] _data;
+    }
     _data = 0;
     _size = 0;
     _dirty = false;
@@ -92,9 +102,13 @@ void EEPROMClass::end()
 uint8_t EEPROMClass::read(int const address)
 {
     if (address < 0 || (size_t)address >= _size)
+    {
         return 0;
+    }
     if (!_data)
+    {
         return 0;
+    }
 
     return _data[address];
 }
@@ -102,9 +116,13 @@ uint8_t EEPROMClass::read(int const address)
 void EEPROMClass::write(int const address, uint8_t const value)
 {
     if (address < 0 || (size_t)address >= _size)
+    {
         return;
+    }
     if (!_data)
+    {
         return;
+    }
 
     // Optimise _dirty. Only flagged if data written is different.
     uint8_t* pData = &_data[address];
@@ -119,11 +137,17 @@ bool EEPROMClass::commit()
 {
     bool ret = false;
     if (!_size)
+    {
         return false;
+    }
     if (!_dirty)
+    {
         return true;
+    }
     if (!_data)
+    {
         return false;
+    }
 
     noInterrupts();
     if (spi_flash_erase_sector(_sector) == SPI_FLASH_RESULT_OK)

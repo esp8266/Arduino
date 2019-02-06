@@ -71,14 +71,18 @@ size_t Print::printf(const char *format, ...)
     {
         buffer = new char[len + 1];
         if (!buffer)
+        {
             return 0;
+        }
         va_start(arg, format);
         vsnprintf(buffer, len + 1, format, arg);
         va_end(arg);
     }
     len = write((const uint8_t*) buffer, len);
     if (buffer != temp)
+    {
         delete[] buffer;
+    }
     return len;
 }
 
@@ -94,14 +98,18 @@ size_t Print::printf_P(PGM_P format, ...)
     {
         buffer = new char[len + 1];
         if (!buffer)
+        {
             return 0;
+        }
         va_start(arg, format);
         vsnprintf_P(buffer, len + 1, format, arg);
         va_end(arg);
     }
     len = write((const uint8_t*) buffer, len);
     if (buffer != temp)
+    {
         delete[] buffer;
+    }
     return len;
 }
 
@@ -113,7 +121,10 @@ size_t Print::print(const __FlashStringHelper *ifsh)
     while (1)
     {
         uint8_t c = pgm_read_byte(p++);
-        if (c == 0) break;
+        if (c == 0)
+        {
+            break;
+        }
         n += write(c);
     }
     return n;
@@ -152,7 +163,9 @@ size_t Print::print(unsigned int n, int base)
 size_t Print::print(long n, int base)
 {
     if (base == 0)
+    {
         return write(n);
+    }
     else if (base == 10)
     {
         if (n < 0)
@@ -164,15 +177,21 @@ size_t Print::print(long n, int base)
         return printNumber(n, 10);
     }
     else
+    {
         return printNumber(n, base);
+    }
 }
 
 size_t Print::print(unsigned long n, int base)
 {
     if (base == 0)
+    {
         return write(n);
+    }
     else
+    {
         return printNumber(n, base);
+    }
 }
 
 size_t Print::print(double n, int digits)
@@ -278,7 +297,9 @@ size_t Print::printNumber(unsigned long n, uint8_t base)
 
     // prevent crash if called with base == 1
     if (base < 2)
+    {
         base = 10;
+    }
 
     do
     {
@@ -296,13 +317,21 @@ size_t Print::printFloat(double number, uint8_t digits)
     size_t n = 0;
 
     if (isnan(number))
+    {
         return print("nan");
+    }
     if (isinf(number))
+    {
         return print("inf");
+    }
     if (number > 4294967040.0)
-        return print("ovf");  // constant determined empirically
+    {
+        return print("ovf");    // constant determined empirically
+    }
     if (number < -4294967040.0)
-        return print("ovf");  // constant determined empirically
+    {
+        return print("ovf");    // constant determined empirically
+    }
 
     // Handle negative numbers
     if (number < 0.0)
@@ -314,7 +343,9 @@ size_t Print::printFloat(double number, uint8_t digits)
     // Round correctly so that print(1.999, 2) prints as "2.00"
     double rounding = 0.5;
     for (uint8_t i = 0; i < digits; ++i)
+    {
         rounding /= 10.0;
+    }
 
     number += rounding;
 
@@ -325,7 +356,9 @@ size_t Print::printFloat(double number, uint8_t digits)
 
     // Print the decimal point, but only if there are digits beyond
     if (digits > 0)
+    {
         n += print(".");
+    }
 
     // Extract digits from the remainder one at a time
     while (digits-- > 0)

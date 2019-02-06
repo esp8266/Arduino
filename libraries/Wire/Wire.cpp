@@ -123,7 +123,9 @@ void TwoWire::setClockStretchLimit(uint32_t limit)
 size_t TwoWire::requestFrom(uint8_t address, size_t size, bool sendStop)
 {
     if (size > BUFFER_LENGTH)
+    {
         size = BUFFER_LENGTH;
+    }
     size_t read = (twi_readFrom(address, rxBuffer, size, sendStop) == 0) ? size : 0;
     rxBufferIndex = 0;
     rxBufferLength = read;
@@ -191,7 +193,9 @@ size_t TwoWire::write(uint8_t data)
         txBufferLength = txBufferIndex;
     }
     else
+    {
         twi_transmit(&data, 1);
+    }
     return 1;
 }
 
@@ -201,11 +205,16 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity)
     {
         for (size_t i = 0; i < quantity; ++i)
         {
-            if (!write(data[i])) return i;
+            if (!write(data[i]))
+            {
+                return i;
+            }
         }
     }
     else
+    {
         twi_transmit(data, quantity);
+    }
     return quantity;
 }
 
@@ -238,7 +247,9 @@ int TwoWire::peek(void)
 {
     int value = -1;
     if (rxBufferIndex < rxBufferLength)
+    {
         value = rxBuffer[rxBufferIndex];
+    }
     return value;
 }
 
@@ -254,7 +265,9 @@ void TwoWire::onReceiveService(uint8_t* inBytes, size_t numBytes)
 {
     // don't bother if user hasn't registered a callback
     if (!user_onReceive)
+    {
         return;
+    }
     // // don't bother if rx buffer is in use by a master requestFrom() op
     // // i know this drops data, but it allows for slight stupidity
     // // meaning, they may not have read all the master requestFrom() data yet
@@ -265,7 +278,9 @@ void TwoWire::onReceiveService(uint8_t* inBytes, size_t numBytes)
     // copy twi rx buffer into local read buffer
     // this enables new reads to happen in parallel
     for (uint8_t i = 0; i < numBytes; ++i)
+    {
         rxBuffer[i] = inBytes[i];
+    }
 
     // set rx iterator vars
     rxBufferIndex = 0;
@@ -279,7 +294,9 @@ void TwoWire::onRequestService(void)
 {
     // don't bother if user hasn't registered a callback
     if (!user_onRequest)
+    {
         return;
+    }
 
     // reset tx buffer iterator vars
     // !!! this will kill any pending pre-master sendTo() activity

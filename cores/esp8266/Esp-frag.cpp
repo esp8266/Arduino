@@ -33,11 +33,17 @@ void EspClass::getHeapStats(uint32_t* hfree, uint16_t* hmax, uint8_t* hfrag)
     uint8_t block_size = umm_block_size();
     uint32_t fh = ummHeapInfo.freeBlocks * block_size;
     if (hfree)
+    {
         *hfree = fh;
+    }
     if (hmax)
+    {
         *hmax = ummHeapInfo.maxFreeContiguousBlocks * block_size;
+    }
     if (hfrag)
+    {
         *hfrag = 100 - (sqrt32(ummHeapInfo.freeSize2) * 100) / fh;
+    }
 }
 
 uint8_t EspClass::getHeapFragmentation()

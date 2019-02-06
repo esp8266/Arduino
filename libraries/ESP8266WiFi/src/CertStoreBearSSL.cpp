@@ -70,10 +70,14 @@ int CertStore::initCertStore(CertStoreFile *index, CertStoreFile *data)
     _data = data;
 
     if (!_index || !data)
+    {
         return 0;
+    }
 
     if (!_index->open(true))
+    {
         return 0;
+    }
 
     if (!_data->open(false))
     {
@@ -98,15 +102,21 @@ int CertStore::initCertStore(CertStoreFile *index, CertStoreFile *data)
         // 48...57 = length in decimal ASCII
         uint32_t length;
         if (data->read(fileHeader, sizeof(fileHeader)) != sizeof(fileHeader))
+        {
             break;
+        }
         offset += sizeof(fileHeader);
         fileHeader[58] = 0;
         if (1 != sscanf(fileHeader + 48, "%d", &length) || !length)
+        {
             break;
+        }
 
         void *raw = malloc(length);
         if (!raw)
+        {
             break;
+        }
         if (_data->read(raw, length) != (ssize_t)length)
         {
             free(raw);
@@ -150,10 +160,14 @@ const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, 
     CertStore::CertInfo ci;
 
     if (!cs || len != sizeof(ci.sha256) || !cs->_index || !cs->_data)
+    {
         return nullptr;
+    }
 
     if (!cs->_index->open(false))
+    {
         return nullptr;
+    }
 
     while (cs->_index->read(&ci, sizeof(ci)) == sizeof(ci))
     {
@@ -162,7 +176,9 @@ const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, 
             cs->_index->close();
             uint8_t *der = (uint8_t*)malloc(ci.length);
             if (!der)
+            {
                 return nullptr;
+            }
             if (!cs->_data->open(false))
             {
                 free(der);

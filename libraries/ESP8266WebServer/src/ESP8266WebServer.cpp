@@ -87,7 +87,9 @@ ESP8266WebServer::~ESP8266WebServer()
 {
     _server.close();
     if (_currentHeaders)
+    {
         delete[]_currentHeaders;
+    }
     RequestHandler* handler = _firstHandler;
     while (handler)
     {
@@ -113,7 +115,9 @@ String ESP8266WebServer::_extractParam(String& authReq, const String& param, con
 {
     int _begin = authReq.indexOf(param);
     if (_begin == -1)
+    {
         return emptyString;
+    }
     return authReq.substring(_begin + param.length(), authReq.indexOf(delimit, _begin + param.length()));
 }
 
@@ -197,15 +201,25 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
 #endif
             md5.begin();
             if (_currentMethod == HTTP_GET)
+            {
                 md5.add(String(F("GET:")) + _uri);
+            }
             else if (_currentMethod == HTTP_POST)
+            {
                 md5.add(String(F("POST:")) + _uri);
+            }
             else if (_currentMethod == HTTP_PUT)
+            {
                 md5.add(String(F("PUT:")) + _uri);
+            }
             else if (_currentMethod == HTTP_DELETE)
+            {
                 md5.add(String(F("DELETE:")) + _uri);
+            }
             else
+            {
                 md5.add(String(F("GET:")) + _uri);
+            }
             md5.calculate();
             String _H2 = md5.toString();
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -213,9 +227,13 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
 #endif
             md5.begin();
             if (authReq.indexOf(FPSTR(qop_auth)) != -1 || authReq.indexOf(FPSTR(qop_auth_quoted)) != -1)
+            {
                 md5.add(_H1 + ':' + _nonce + ':' + _nc + ':' + _cnonce + F(":auth:") + _H2);
+            }
             else
+            {
                 md5.add(_H1 + ':' + _nonce + ':' + _H2);
+            }
             md5.calculate();
             String _responsecheck = md5.toString();
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -237,18 +255,26 @@ String ESP8266WebServer::_getRandomHexString()
     char buffer[33];  // buffer to hold 32 Hex Digit + /0
     int i;
     for (i = 0; i < 4; i++)
+    {
         sprintf(buffer + (i * 8), "%08x", RANDOM_REG32);
+    }
     return String(buffer);
 }
 
 void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* realm, const String& authFailMsg)
 {
     if (realm == NULL)
+    {
         _srealm = String(F("Login Required"));
+    }
     else
+    {
         _srealm = String(realm);
+    }
     if (mode == BASIC_AUTH)
+    {
         sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Basic realm=\"")) + _srealm + String(F("\"")));
+    }
     else
     {
         _snonce = _getRandomHexString();
@@ -304,7 +330,9 @@ void ESP8266WebServer::handleClient()
     {
         WiFiClient client = _server.available();
         if (!client)
+        {
             return;
+        }
 
 #ifdef DEBUG_ESP_HTTP_SERVER
         DEBUG_OUTPUT.println("New client");
@@ -346,7 +374,9 @@ void ESP8266WebServer::handleClient()
             else     // !_currentClient.available()
             {
                 if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT)
+                {
                     keepCurrentClient = true;
+                }
                 callYield = true;
             }
             break;
@@ -368,7 +398,9 @@ void ESP8266WebServer::handleClient()
     }
 
     if (callYield)
+    {
         yield();
+    }
 }
 
 void ESP8266WebServer::close()
@@ -376,7 +408,9 @@ void ESP8266WebServer::close()
     _server.close();
     _currentStatus = HC_NONE;
     if (!_headerKeysCount)
+    {
         collectHeaders(0, 0);
+    }
 }
 
 void ESP8266WebServer::stop()
@@ -392,9 +426,13 @@ void ESP8266WebServer::sendHeader(const String& name, const String& value, bool 
     headerLine += "\r\n";
 
     if (first)
+    {
         _responseHeaders = headerLine + _responseHeaders;
+    }
     else
+    {
         _responseHeaders += headerLine;
+    }
 }
 
 void ESP8266WebServer::setContentLength(const size_t contentLength)
@@ -412,13 +450,19 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
 
     using namespace mime;
     if (!content_type)
+    {
         content_type = mimeTable[html].mimeType;
+    }
 
     sendHeader(String(F("Content-Type")), String(FPSTR(content_type)), true);
     if (_contentLength == CONTENT_LENGTH_NOT_SET)
+    {
         sendHeader(String(FPSTR(Content_Length)), String(contentLength));
+    }
     else if (_contentLength != CONTENT_LENGTH_UNKNOWN)
+    {
         sendHeader(String(FPSTR(Content_Length)), String(_contentLength));
+    }
     else if (_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion) //HTTP/1.1 or above client
     {
         //let's do chunked
@@ -442,7 +486,9 @@ void ESP8266WebServer::send(int code, const char* content_type, const String& co
     _prepareHeader(header, code, content_type, content.length());
     _currentClientWrite(header.c_str(), header.length());
     if (content.length())
+    {
         sendContent(content);
+    }
 }
 
 void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content)
@@ -450,7 +496,9 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content)
     size_t contentLength = 0;
 
     if (content != NULL)
+    {
         contentLength = strlen_P(content);
+    }
 
     String header;
     char type[64];
@@ -495,7 +543,9 @@ void ESP8266WebServer::sendContent(const String& content)
     {
         _currentClient.write(footer, 2);
         if (len == 0)
+        {
             _chunked = false;
+        }
     }
 }
 
@@ -518,7 +568,9 @@ void ESP8266WebServer::sendContent_P(PGM_P content, size_t size)
     {
         _currentClient.write(footer, 2);
         if (size == 0)
+        {
             _chunked = false;
+        }
     }
 }
 
@@ -530,7 +582,9 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
     if (fileName.endsWith(String(FPSTR(mimeTable[gz].endsWith))) &&
             contentType != String(FPSTR(mimeTable[gz].mimeType)) &&
             contentType != String(FPSTR(mimeTable[none].mimeType)))
+    {
         sendHeader(F("Content-Encoding"), F("gzip"));
+    }
     send(200, contentType, emptyString);
 }
 
@@ -540,12 +594,16 @@ const String& ESP8266WebServer::arg(String name) const
     for (int j = 0; j < _postArgsLen; ++j)
     {
         if (_postArgs[j].key == name)
+        {
             return _postArgs[j].value;
+        }
     }
     for (int i = 0; i < _currentArgCount; ++i)
     {
         if (_currentArgs[i].key == name)
+        {
             return _currentArgs[i].value;
+        }
     }
     return emptyString;
 }
@@ -553,14 +611,18 @@ const String& ESP8266WebServer::arg(String name) const
 const String& ESP8266WebServer::arg(int i) const
 {
     if (i >= 0 && i < _currentArgCount)
+    {
         return _currentArgs[i].value;
+    }
     return emptyString;
 }
 
 const String& ESP8266WebServer::argName(int i) const
 {
     if (i >= 0 && i < _currentArgCount)
+    {
         return _currentArgs[i].key;
+    }
     return emptyString;
 }
 
@@ -574,12 +636,16 @@ bool ESP8266WebServer::hasArg(const String& name) const
     for (int j = 0; j < _postArgsLen; ++j)
     {
         if (_postArgs[j].key == name)
+        {
             return true;
+        }
     }
     for (int i = 0; i < _currentArgCount; ++i)
     {
         if (_currentArgs[i].key == name)
+        {
             return true;
+        }
     }
     return false;
 }
@@ -590,7 +656,9 @@ const String& ESP8266WebServer::header(String name) const
     for (int i = 0; i < _headerKeysCount; ++i)
     {
         if (_currentHeaders[i].key.equalsIgnoreCase(name))
+        {
             return _currentHeaders[i].value;
+        }
     }
     return emptyString;
 }
@@ -599,24 +667,32 @@ void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t hea
 {
     _headerKeysCount = headerKeysCount + 1;
     if (_currentHeaders)
+    {
         delete[]_currentHeaders;
+    }
     _currentHeaders = new RequestArgument[_headerKeysCount];
     _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
     for (int i = 1; i < _headerKeysCount; i++)
+    {
         _currentHeaders[i].key = headerKeys[i - 1];
+    }
 }
 
 const String& ESP8266WebServer::header(int i) const
 {
     if (i < _headerKeysCount)
+    {
         return _currentHeaders[i].value;
+    }
     return emptyString;
 }
 
 const String& ESP8266WebServer::headerName(int i) const
 {
     if (i < _headerKeysCount)
+    {
         return _currentHeaders[i].key;
+    }
     return emptyString;
 }
 
@@ -630,7 +706,9 @@ bool ESP8266WebServer::hasHeader(String name) const
     for (int i = 0; i < _headerKeysCount; ++i)
     {
         if ((_currentHeaders[i].key.equalsIgnoreCase(name)) && (_currentHeaders[i].value.length() > 0))
+        {
             return true;
+        }
     }
     return false;
 }
@@ -664,7 +742,9 @@ void ESP8266WebServer::_handleRequest()
         handled = _currentHandler->handle(*this, _currentMethod, _currentUri);
 #ifdef DEBUG_ESP_HTTP_SERVER
         if (!handled)
+        {
             DEBUG_OUTPUT.println("request handler failed to handle request");
+        }
 #endif
     }
     if (!handled && _notFoundHandler)
@@ -679,7 +759,9 @@ void ESP8266WebServer::_handleRequest()
         handled = true;
     }
     if (handled)
+    {
         _finalizeResponse();
+    }
     _currentUri = "";
 }
 
@@ -687,7 +769,9 @@ void ESP8266WebServer::_handleRequest()
 void ESP8266WebServer::_finalizeResponse()
 {
     if (_chunked)
+    {
         sendContent(emptyString);
+    }
 }
 
 const String ESP8266WebServer::_responseCodeToString(int code)

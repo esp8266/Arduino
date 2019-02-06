@@ -30,7 +30,9 @@ extern int __analogRead(uint8_t pin)
 {
     // accept both A0 constant and ADC channel number
     if (pin == 17 || pin == 0)
+    {
         return system_adc_read();
+    }
     return digitalRead(pin) * 1023;
 }
 

@@ -37,20 +37,29 @@ extern void __pinMode(uint8_t pin, uint8_t mode)
             GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
             GPEC = (1 << pin); //Disable
             GPF(pin) = GPFFS(GPFFS_BUS(pin));//Set mode to BUS (RX0, TX0, TX1, SPI, HSPI or CLK depending in the pin)
-            if (pin == 3) GPF(pin) |= (1 << GPFPU); //enable pullup on RX
+            if (pin == 3)
+            {
+                GPF(pin) |= (1 << GPFPU);    //enable pullup on RX
+            }
         }
         else if (mode & FUNCTION_0)
         {
             GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
             GPEC = (1 << pin); //Disable
             GPF(pin) = GPFFS((mode >> 4) & 0x07);
-            if (pin == 13 && mode == FUNCTION_4) GPF(pin) |= (1 << GPFPU); //enable pullup on RX
+            if (pin == 13 && mode == FUNCTION_4)
+            {
+                GPF(pin) |= (1 << GPFPU);    //enable pullup on RX
+            }
         }
         else if (mode == OUTPUT || mode == OUTPUT_OPEN_DRAIN)
         {
             GPF(pin) = GPFFS(GPFFS_GPIO(pin));//Set mode to GPIO
             GPC(pin) = (GPC(pin) & (0xF << GPCI)); //SOURCE(GPIO) | DRIVER(NORMAL) | INT_TYPE(UNCHANGED) | WAKEUP_ENABLE(DISABLED)
-            if (mode == OUTPUT_OPEN_DRAIN) GPC(pin) |= (1 << GPCD);
+            if (mode == OUTPUT_OPEN_DRAIN)
+            {
+                GPC(pin) |= (1 << GPCD);
+            }
             GPES = (1 << pin); //Enable
         }
         else if (mode == INPUT || mode == INPUT_PULLUP)
@@ -92,7 +101,9 @@ extern void __pinMode(uint8_t pin, uint8_t mode)
             GP16E &= ~1;
         }
         else if (mode == OUTPUT)
+        {
             GP16E |= 1;
+        }
     }
 }
 
@@ -101,22 +112,38 @@ extern void ICACHE_RAM_ATTR __digitalWrite(uint8_t pin, uint8_t val)
     stopWaveform(pin);
     if (pin < 16)
     {
-        if (val) GPOS = (1 << pin);
-        else GPOC = (1 << pin);
+        if (val)
+        {
+            GPOS = (1 << pin);
+        }
+        else
+        {
+            GPOC = (1 << pin);
+        }
     }
     else if (pin == 16)
     {
-        if (val) GP16O |= 1;
-        else GP16O &= ~1;
+        if (val)
+        {
+            GP16O |= 1;
+        }
+        else
+        {
+            GP16O &= ~1;
+        }
     }
 }
 
 extern int ICACHE_RAM_ATTR __digitalRead(uint8_t pin)
 {
     if (pin < 16)
+    {
         return GPIP(pin);
+    }
     else if (pin == 16)
+    {
         return GP16I & 0x01;
+    }
     return 0;
 }
 
@@ -157,13 +184,19 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg)
     uint32_t status = GPIE;
     GPIEC = status;//clear them interrupts
     uint32_t levels = GPI;
-    if (status == 0 || interrupt_reg == 0) return;
+    if (status == 0 || interrupt_reg == 0)
+    {
+        return;
+    }
     ETS_GPIO_INTR_DISABLE();
     int i = 0;
     uint32_t changedbits = status & interrupt_reg;
     while (changedbits)
     {
-        while (!(changedbits & (1 << i))) i++;
+        while (!(changedbits & (1 << i)))
+        {
+            i++;
+        }
         changedbits &= ~(1 << i);
         interrupt_handler_t *handler = &interrupt_handlers[i];
         if (handler->fn &&
@@ -181,9 +214,13 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg)
                 localArg->interruptInfo->micro = micros();
             }
             if (handler->arg)
+            {
                 ((voidFuncPtrArg)handler->fn)(handler->arg);
+            }
             else
+            {
                 handler->fn();
+            }
             xt_wsr_ps(savedPS);
         }
     }
@@ -201,7 +238,9 @@ extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFu
         handler->mode = mode;
         handler->fn = userFunc;
         if (handler->arg)  // Clean when new attach without detach
+        {
             cleanupFunctional(handler->arg);
+        }
         handler->arg = arg;
         interrupt_reg |= (1 << pin);
         GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
@@ -229,10 +268,14 @@ extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin)
         handler->mode = 0;
         handler->fn = 0;
         if (handler->arg)
+        {
             cleanupFunctional(handler->arg);
+        }
         handler->arg = 0;
         if (interrupt_reg)
+        {
             ETS_GPIO_INTR_ENABLE();
+        }
     }
 }
 
@@ -244,10 +287,14 @@ void initPins()
     U1IE = 0;
 
     for (int i = 0; i <= 5; ++i)
+    {
         pinMode(i, INPUT);
+    }
     // pins 6-11 are used for the SPI flash interface
     for (int i = 12; i <= 16; ++i)
+    {
         pinMode(i, INPUT);
+    }
 }
 
 extern void pinMode(uint8_t pin, uint8_t mode) __attribute__((weak, alias("__pinMode")));

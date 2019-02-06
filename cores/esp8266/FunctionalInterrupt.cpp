@@ -20,7 +20,9 @@ void interruptFunctional(void* arg)
         //      scheduledInterrupts->scheduleFunctionReg(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))), false, true);
     }
     if (localArg->functionInfo->reqFunction)
+    {
         localArg->functionInfo->reqFunction();
+    }
 }
 
 extern "C"
@@ -53,7 +55,9 @@ void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode
 void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode)
 {
     if (!scheduledInterrupts)
+    {
         scheduledInterrupts = new ScheduledFunctions(32);
+    }
     InterruptInfo* ii = new InterruptInfo;
 
     FunctionInfo* fi = new FunctionInfo;

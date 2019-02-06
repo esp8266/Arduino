@@ -562,7 +562,9 @@ public:
             {
                 uint16_t cntIP4Adress = p_pMDNSResponder.answerIP4AddressCount(p_hServiceQuery, p_u32AnswerIndex);
                 for (uint32_t u2 = 0; u2 < cntIP4Adress; ++u2)
+                {
                     internalIP.emplace_back(p_pMDNSResponder.answerIP4Address(p_hServiceQuery, p_u32AnswerIndex, u2));
+                }
             }
             return internalIP;
         };
@@ -580,7 +582,9 @@ public:
             if (txtAvailable() && keyValueMap.size() == 0)
             {
                 for (auto kv = p_pMDNSResponder._answerKeyValue(p_hServiceQuery, p_u32AnswerIndex); kv != nullptr; kv = kv->m_pNext)
+                {
                     keyValueMap.emplace(std::pair<const char*, const char*>(kv->m_pcKey, kv->m_pcValue));
+                }
             }
             return keyValueMap;
         }

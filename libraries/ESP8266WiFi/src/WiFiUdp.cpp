@@ -53,7 +53,9 @@ WiFiUDP::WiFiUDP(const WiFiUDP& other)
 {
     _ctx = other._ctx;
     if (_ctx)
+    {
         _ctx->ref();
+    }
     WiFiUDP::_add(this);
 }
 
@@ -61,7 +63,9 @@ WiFiUDP& WiFiUDP::operator=(const WiFiUDP& rhs)
 {
     _ctx = rhs._ctx;
     if (_ctx)
+    {
         _ctx->ref();
+    }
     return *this;
 }
 
@@ -69,7 +73,9 @@ WiFiUDP::~WiFiUDP()
 {
     WiFiUDP::_remove(this);
     if (_ctx)
+    {
         _ctx->unref();
+    }
 }
 
 /* Start WiFiUDP socket, listening at local port */
@@ -95,13 +101,17 @@ uint8_t WiFiUDP::beginMulticast(IPAddress interfaceAddr, IPAddress multicast, ui
     }
 
     if (igmp_joingroup(interfaceAddr, multicast) != ERR_OK)
+    {
         return 0;
+    }
 
     _ctx = new UdpContext;
     _ctx->ref();
     ip_addr_t addr = IPADDR4_INIT(INADDR_ANY);
     if (!_ctx->listen(&addr, port))
+    {
         return 0;
+    }
 
     return 1;
 }
@@ -113,7 +123,9 @@ int WiFiUDP::available()
     int result = 0;
 
     if (_ctx)
+    {
         result = static_cast<int>(_ctx->getSize());
+    }
 
     if (!result)
     {
@@ -140,7 +152,9 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port)
 {
     IPAddress remote_addr;
     if (WiFi.hostByName(host, remote_addr))
+    {
         return beginPacket(remote_addr, port);
+    }
     return 0;
 }
 
@@ -163,7 +177,9 @@ int WiFiUDP::beginPacketMulticast(IPAddress multicastAddress, uint16_t port,
         _ctx->ref();
     }
     if (!_ctx->connect(multicastAddress, port))
+    {
         return 0;
+    }
     _ctx->setMulticastInterface(interfaceAddress);
     _ctx->setMulticastTTL(ttl);
     return 1;
@@ -172,7 +188,9 @@ int WiFiUDP::beginPacketMulticast(IPAddress multicastAddress, uint16_t port,
 int WiFiUDP::endPacket()
 {
     if (!_ctx)
+    {
         return 0;
+    }
 
     return (_ctx->send()) ? 1 : 0;
 }
@@ -185,7 +203,9 @@ size_t WiFiUDP::write(uint8_t byte)
 size_t WiFiUDP::write(const uint8_t *buffer, size_t size)
 {
     if (!_ctx)
+    {
         return 0;
+    }
 
     return _ctx->append(reinterpret_cast<const char*>(buffer), size);
 }
@@ -193,7 +213,9 @@ size_t WiFiUDP::write(const uint8_t *buffer, size_t size)
 int WiFiUDP::parsePacket()
 {
     if (!_ctx)
+    {
         return 0;
+    }
 
     if (!_ctx->next())
     {
@@ -207,7 +229,9 @@ int WiFiUDP::parsePacket()
 int WiFiUDP::read()
 {
     if (!_ctx)
+    {
         return -1;
+    }
 
     return _ctx->read();
 }
@@ -215,7 +239,9 @@ int WiFiUDP::read()
 int WiFiUDP::read(unsigned char* buffer, size_t len)
 {
     if (!_ctx)
+    {
         return 0;
+    }
 
     return _ctx->read(reinterpret_cast<char*>(buffer), len);
 }
@@ -223,7 +249,9 @@ int WiFiUDP::read(unsigned char* buffer, size_t len)
 int WiFiUDP::peek()
 {
     if (!_ctx)
+    {
         return -1;
+    }
 
     return _ctx->peek();
 }
@@ -236,7 +264,9 @@ void WiFiUDP::flush()
 IPAddress WiFiUDP::remoteIP() const
 {
     if (!_ctx)
+    {
         return INADDR_ANY;
+    }
 
     return _ctx->getRemoteAddress();
 }
@@ -244,7 +274,9 @@ IPAddress WiFiUDP::remoteIP() const
 uint16_t WiFiUDP::remotePort() const
 {
     if (!_ctx)
+    {
         return 0;
+    }
 
     return _ctx->getRemotePort();
 }
@@ -252,7 +284,9 @@ uint16_t WiFiUDP::remotePort() const
 IPAddress WiFiUDP::destinationIP() const
 {
     if (!_ctx)
+    {
         return INADDR_ANY;
+    }
 
     return _ctx->getDestAddress();
 }
@@ -260,7 +294,9 @@ IPAddress WiFiUDP::destinationIP() const
 uint16_t WiFiUDP::localPort() const
 {
     if (!_ctx)
+    {
         return 0;
+    }
 
     return _ctx->getLocalPort();
 }

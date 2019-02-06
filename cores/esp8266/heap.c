@@ -95,7 +95,9 @@ void* malloc(size_t s)
 {
     void* ret = umm_malloc(s);
     if (!ret)
+    {
         os_printf(oom_fmt, (int)s);
+    }
     return ret;
 }
 
@@ -103,7 +105,9 @@ void* calloc(size_t n, size_t s)
 {
     void* ret = umm_calloc(n, s);
     if (!ret)
+    {
         os_printf(oom_fmt, (int)s);
+    }
     return ret;
 }
 
@@ -111,7 +115,9 @@ void* realloc(void* p, size_t s)
 {
     void* ret = umm_realloc(p, s);
     if (!ret)
+    {
         os_printf(oom_fmt, (int)s);
+    }
     return ret;
 }
 
@@ -126,7 +132,9 @@ void* malloc_loc(size_t s, const char* file, int line)
 {
     void* ret = umm_malloc(s);
     if (!ret)
+    {
         print_loc(s, file, line);
+    }
     return ret;
 }
 
@@ -134,7 +142,9 @@ void* calloc_loc(size_t n, size_t s, const char* file, int line)
 {
     void* ret = umm_calloc(n, s);
     if (!ret)
+    {
         print_loc(s, file, line);
+    }
     return ret;
 }
 
@@ -142,7 +152,9 @@ void* realloc_loc(void* p, size_t s, const char* file, int line)
 {
     void* ret = umm_realloc(p, s);
     if (!ret)
+    {
         print_loc(s, file, line);
+    }
     return ret;
 }
 

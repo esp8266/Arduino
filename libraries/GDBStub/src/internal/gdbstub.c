@@ -151,7 +151,9 @@ static long  gdbGetHexVal(unsigned char **ptr, int bits)
     char c;
     no = bits / 4;
     if (bits == -1)
+    {
         no = 64;
+    }
     for (i = 0; i < no; i++)
     {
         c = **ptr;
@@ -205,7 +207,10 @@ static int iswap(int i)
 //Read a byte from the ESP8266 memory.
 static unsigned char readbyte(unsigned int p)
 {
-    if (p < 0x20000000 || p >= 0x60000000) return -1;
+    if (p < 0x20000000 || p >= 0x60000000)
+    {
+        return -1;
+    }
     int *i = (int*)(p & ~3);
     return *i >> ((p & 3) * 8);
 }
@@ -213,12 +218,27 @@ static unsigned char readbyte(unsigned int p)
 //Write a byte to the ESP8266 memory.
 static void writeByte(unsigned int p, unsigned char d)
 {
-    if (p < 0x20000000 || p >= 0x60000000) return;
+    if (p < 0x20000000 || p >= 0x60000000)
+    {
+        return;
+    }
     int *i = (int*)(p & ~3);
-    if ((p & 3) == 0) *i = (*i & 0xffffff00) | (d << 0);
-    else if ((p & 3) == 1) *i = (*i & 0xffff00ff) | (d << 8);
-    else if ((p & 3) == 2) *i = (*i & 0xff00ffff) | (d << 16);
-    else if ((p & 3) == 3) *i = (*i & 0x00ffffff) | (d << 24);
+    if ((p & 3) == 0)
+    {
+        *i = (*i & 0xffffff00) | (d << 0);
+    }
+    else if ((p & 3) == 1)
+    {
+        *i = (*i & 0xffff00ff) | (d << 8);
+    }
+    else if ((p & 3) == 2)
+    {
+        *i = (*i & 0xff00ffff) | (d << 16);
+    }
+    else if ((p & 3) == 3)
+    {
+        *i = (*i & 0x00ffffff) | (d << 24);
+    }
 }
 
 //Returns 1 if it makes sense to write to addr p
@@ -244,7 +264,9 @@ static inline bool ATTR_GDBFN gdbTxFifoIsFull()
 static inline int gdbRecvChar()
 {
     while (gdbRxFifoIsEmpty())
+    {
         keepWDTalive();
+    }
     return READ_PERI_REG(UART_FIFO(0));
 }
 
@@ -283,7 +305,9 @@ static void gdbPacketHex(int val, int bits)
     static const char hexChars[] = "0123456789abcdef";
     int i;
     for (i = bits; i > 0; i -= 4)
+    {
         gdbPacketChar(hexChars[(val >> (i - 4)) & 0xf]);
+    }
 }
 
 //Send a hex val as part of a packet. 'bits'/4 dictates the number of hex chars sent.
@@ -294,7 +318,10 @@ static void gdbPacketSwappedHexInt(int val)
 
 static void gdbPacketXXXXInt()
 {
-    for (int i = 0; i < 8; i++) gdbPacketChar('x');
+    for (int i = 0; i < 8; i++)
+    {
+        gdbPacketChar('x');
+    }
 }
 
 //Finish sending a packet.
@@ -325,7 +352,9 @@ static inline void ATTR_GDBEXTERNFN gdbSendOutputPacketStr(const unsigned char* 
     gdbPacketStart();
     gdbPacketChar('O');
     for (i = 0; i < size; i++)
+    {
         gdbPacketHex(buf[i], 8);
+    }
     gdbPacketEnd();
 }
 
@@ -364,9 +393,13 @@ static void sendReason()
         //We stopped because of an exception. Convert exception code to a signal number and send it.
         i = gdbstub_savedRegs.reason & 0x7f;
         if (i < sizeof(exceptionSignal))
+        {
             gdbPacketHex(exceptionSignal[i], 8);
+        }
         else
+        {
             gdbPacketHex(11, 8);
+        }
     }
     else
     {
@@ -374,11 +407,26 @@ static void sendReason()
         gdbPacketHex(5, 8); //sigtrap
         //Current Xtensa GDB versions don't seem to request this, so let's leave it off.
 #if 0
-        if (gdbstub_savedRegs.reason & (1 << 0)) reason = "break";
-        if (gdbstub_savedRegs.reason & (1 << 1)) reason = "hwbreak";
-        if (gdbstub_savedRegs.reason & (1 << 2)) reason = "watch";
-        if (gdbstub_savedRegs.reason & (1 << 3)) reason = "swbreak";
-        if (gdbstub_savedRegs.reason & (1 << 4)) reason = "swbreak";
+        if (gdbstub_savedRegs.reason & (1 << 0))
+        {
+            reason = "break";
+        }
+        if (gdbstub_savedRegs.reason & (1 << 1))
+        {
+            reason = "hwbreak";
+        }
+        if (gdbstub_savedRegs.reason & (1 << 2))
+        {
+            reason = "watch";
+        }
+        if (gdbstub_savedRegs.reason & (1 << 3))
+        {
+            reason = "swbreak";
+        }
+        if (gdbstub_savedRegs.reason & (1 << 4))
+        {
+            reason = "swbreak";
+        }
 
         gdbPacketStr(reason);
         gdbPacketChar(':');
@@ -413,7 +461,9 @@ void ATTR_GDBEXTERNFN gdbstub_write_char(char c)
         ETS_UART_INTR_ENABLE();
     }
     else
+    {
         gdbSendChar(c);
+    }
 }
 
 void ATTR_GDBEXTERNFN gdbstub_write(const char* buf, size_t size)
@@ -428,7 +478,9 @@ void ATTR_GDBEXTERNFN gdbstub_write(const char* buf, size_t size)
     else
     {
         for (i = 0; i < size; i++)
+        {
             gdbSendChar(buf[i]);
+        }
     }
 }
 
@@ -459,29 +511,59 @@ static inline int gdbHandleCommand()
     {
         gdbPacketStart();
         gdbPacketSwappedHexInt(gdbstub_savedRegs.pc);
-        for (int i = 1; i <= 35; i++) gdbPacketXXXXInt();
+        for (int i = 1; i <= 35; i++)
+        {
+            gdbPacketXXXXInt();
+        }
         gdbPacketSwappedHexInt(gdbstub_savedRegs.sar);
         gdbPacketSwappedHexInt(gdbstub_savedRegs.litbase);
-        for (int i = 38; i <= 39; i++) gdbPacketXXXXInt();
+        for (int i = 38; i <= 39; i++)
+        {
+            gdbPacketXXXXInt();
+        }
         gdbPacketSwappedHexInt(gdbstub_savedRegs.sr176);
-        for (int i = 41; i <= 41; i++) gdbPacketXXXXInt();
+        for (int i = 41; i <= 41; i++)
+        {
+            gdbPacketXXXXInt();
+        }
         gdbPacketSwappedHexInt(gdbstub_savedRegs.ps);
-        for (int i = 43; i <= 96; i++) gdbPacketXXXXInt();
-        for (i = 0; i < 16; i++) gdbPacketSwappedHexInt(gdbstub_savedRegs.a[i]);
+        for (int i = 43; i <= 96; i++)
+        {
+            gdbPacketXXXXInt();
+        }
+        for (i = 0; i < 16; i++)
+        {
+            gdbPacketSwappedHexInt(gdbstub_savedRegs.a[i]);
+        }
         gdbPacketEnd();
     }
     else if (cmd[0] == 'G')         //receive content for all registers from gdb
     {
         gdbstub_savedRegs.pc = gdbGetSwappedHexInt(&data);
-        for (int i = 1; i <= 35; i++) gdbGetHexVal(&data, 32);
+        for (int i = 1; i <= 35; i++)
+        {
+            gdbGetHexVal(&data, 32);
+        }
         gdbstub_savedRegs.sar = gdbGetSwappedHexInt(&data);
         gdbstub_savedRegs.litbase = gdbGetSwappedHexInt(&data);
-        for (int i = 38; i <= 39; i++) gdbGetHexVal(&data, 32);
+        for (int i = 38; i <= 39; i++)
+        {
+            gdbGetHexVal(&data, 32);
+        }
         gdbstub_savedRegs.sr176 = gdbGetSwappedHexInt(&data);
-        for (int i = 41; i <= 41; i++) gdbGetHexVal(&data, 32);
+        for (int i = 41; i <= 41; i++)
+        {
+            gdbGetHexVal(&data, 32);
+        }
         gdbstub_savedRegs.ps = gdbGetSwappedHexInt(&data);
-        for (int i = 43; i <= 96; i++) gdbGetHexVal(&data, 32);
-        for (i = 0; i < 16; i++) gdbstub_savedRegs.a[i] = gdbGetSwappedHexInt(&data);
+        for (int i = 43; i <= 96; i++)
+        {
+            gdbGetHexVal(&data, 32);
+        }
+        for (i = 0; i < 16; i++)
+        {
+            gdbstub_savedRegs.a[i] = gdbGetSwappedHexInt(&data);
+        }
         gdbSendPacketOK();
     }
     else if ((cmd[0] | 0x20) == 'm')  	//read/write memory to gdb
@@ -493,7 +575,9 @@ static inline int gdbHandleCommand()
         {
             gdbPacketStart();
             for (k = 0; k < j; k++)
+            {
                 gdbPacketHex(readbyte(i++), 8);
+            }
             gdbPacketEnd();
         }
         else  	//write memory from gdb
@@ -502,7 +586,9 @@ static inline int gdbHandleCommand()
             {
                 data++; //skip :
                 for (k = 0; k < j; k++, i++)
+                {
                     writeByte(i, gdbGetHexVal(&data, 8));
+                }
                 //Make sure caches are up-to-date. Procedure according to Xtensa ISA document, ISYNC inst desc.
                 asm volatile("ISYNC\nISYNC\n");
                 gdbSendPacketOK();
@@ -515,9 +601,13 @@ static inline int gdbHandleCommand()
         }
     }
     else if (cmd[0] == '?') 	//Reply with stop reason
+    {
         sendReason();
+    }
     else if (cmd[0] == 'c') 	//continue execution
+    {
         return ST_CONT;
+    }
     else if (cmd[0] == 's')  	//single-step instruction
     {
         //Single-stepping can go wrong if an interrupt is pending, especially when it is e.g. a task switch:
@@ -534,7 +624,9 @@ static inline int gdbHandleCommand()
         return ST_DETACH;
     }
     else if (cmd[0] == 'k') 	//kill
+    {
         system_restart_core();
+    }
     else if (cmd[0] == 'q')  	//Extended query
     {
         if (os_strncmp((char*)&cmd[1], "Supported", 9) == 0)   //Capabilities query
@@ -564,34 +656,71 @@ static inline int gdbHandleCommand()
         if (cmd[0] == 'Z')  	//Set hardware break/watchpoint
         {
             if (cmd[1] == '1') 	//Set breakpoint
+            {
                 result = gdbstub_set_hw_breakpoint(i, j);
+            }
             else  	//Set watchpoint
             {
                 int access;
                 unsigned int mask = 0;
-                if (cmd[1] == '2') access = 2; //write
-                if (cmd[1] == '3') access = 1; //read
-                if (cmd[1] == '4') access = 3; //access
-                if (j == 1) mask = 0x3F;
-                if (j == 2) mask = 0x3E;
-                if (j == 4) mask = 0x3C;
-                if (j == 8) mask = 0x38;
-                if (j == 16) mask = 0x30;
-                if (j == 32) mask = 0x20;
+                if (cmd[1] == '2')
+                {
+                    access = 2;    //write
+                }
+                if (cmd[1] == '3')
+                {
+                    access = 1;    //read
+                }
+                if (cmd[1] == '4')
+                {
+                    access = 3;    //access
+                }
+                if (j == 1)
+                {
+                    mask = 0x3F;
+                }
+                if (j == 2)
+                {
+                    mask = 0x3E;
+                }
+                if (j == 4)
+                {
+                    mask = 0x3C;
+                }
+                if (j == 8)
+                {
+                    mask = 0x38;
+                }
+                if (j == 16)
+                {
+                    mask = 0x30;
+                }
+                if (j == 32)
+                {
+                    mask = 0x20;
+                }
                 result = mask != 0 && gdbstub_set_hw_watchpoint(i, mask, access);
             }
         }
         else  	//Clear hardware break/watchpoint
         {
             if (cmd[1] == '1') 	//hardware breakpoint
+            {
                 result = gdbstub_del_hw_breakpoint(i);
+            }
             else 	//hardware watchpoint
+            {
                 result = gdbstub_del_hw_watchpoint(i);
+            }
         }
         if (result)
+        {
             gdbSendPacketOK();
+        }
         else
+        {
             gdbSendPacketE01();
+        }
     }
     else
     {
@@ -641,7 +770,9 @@ gdbReadCommand_packetBegin:
                 goto gdbReadCommand_packetBegin;
             }
             if (c == '}') 	//escape the next char
+            {
                 c = gdbRecvChar() ^ 0x20;
+            }
             chsum += c;
             cmd[p++] = c;
             if (p >= PBUFLEN)
@@ -660,13 +791,19 @@ gdbReadCommand_packetBegin:
             gdbSendChar('+');
             result = gdbHandleCommand();
             if (result != ST_OK)
+            {
                 break;
+            }
         }
         else
+        {
             gdbSendChar('-');
+        }
     }
     if (result == ST_DETACH)
+    {
         gdb_attached = false;
+    }
     ets_wdt_enable();
     ETS_UART_INTR_ENABLE();
     return result;
@@ -702,9 +839,13 @@ static inline void emulLdSt()
         p = (int*)getaregval(i1 & 0xf) + (i2 * 4);
         i0 >>= 4;
         if ((i1 & 0xf0) == 0x20)   //l32i
+        {
             setaregval(i0, *p);
+        }
         else   //s32i
+        {
             *p = getaregval(i0);
+        }
         gdbstub_savedRegs.pc += 3;
     }
     else if ((i0 & 0xe) == 0x8)
@@ -712,9 +853,13 @@ static inline void emulLdSt()
         //l32i.n or s32i.n
         p = (int*)getaregval(i1 & 0xf) + ((i1 >> 4) * 4);
         if ((i0 & 0xf) == 0x8)   //l32i.n
+        {
             setaregval(i0 >> 4, *p);
+        }
         else
+        {
             *p = getaregval(i0 >> 4);
+        }
         gdbstub_savedRegs.pc += 2;
         // } else {
         // 	os_printf("GDBSTUB: No l32i/s32i instruction: %x %x. Huh?", i1, i0);
@@ -762,7 +907,9 @@ static void __attribute__((noinline)) gdbstub_handle_debug_exception_flash()
                      //actually is a BREAK.N
                      && (readbyte(gdbstub_savedRegs.pc + 1) & 0xf0) == 0xf0
                      && readbyte(gdbstub_savedRegs.pc) == 0x2d))
+        {
             gdbstub_savedRegs.pc += 3;
+        }
     }
 }
 
@@ -845,7 +992,9 @@ static void ATTR_GDBINIT install_exceptions()
                         };
     unsigned int i;
     for (i = 0; i < (sizeof(exno) / sizeof(exno[0])); i++)
+    {
         _xtos_set_exception_handler(exno[i], gdbstub_exception_handler);
+    }
 }
 #endif
 
@@ -859,9 +1008,13 @@ static void ATTR_GDBINIT install_exceptions()
 static void ATTR_GDBEXTERNFN gdbstub_semihost_putchar1(char c)
 {
     if (!gdb_attached && uart_putc1_callback != NULL)
+    {
         uart_putc1_callback(c);
+    }
     else
+    {
         gdbstub_write_char(c);
+    }
 }
 
 void ATTR_GDBINIT gdbstub_set_putc1_callback(void (*func)(char))
@@ -904,7 +1057,9 @@ void ATTR_GDBFN gdbstub_handle_uart_int(struct XTensa_rtos_int_frame_s *frame)
     {
         //Check if any of the chars is control-C. Throw away rest.
         if ((READ_PERI_REG(UART_FIFO(0)) & 0xFF) == 0x3)
+        {
             doDebug = 1;
+        }
         fifolen--;
     }
     WRITE_PERI_REG(UART_INT_CLR(0), UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);
@@ -916,7 +1071,9 @@ void ATTR_GDBFN gdbstub_handle_uart_int(struct XTensa_rtos_int_frame_s *frame)
         gdbstub_savedRegs.ps = frame->ps;
         gdbstub_savedRegs.sar = frame->sar;
         for (x = 0; x < 16; x++)
+        {
             gdbstub_savedRegs.a[x] = frame->a[x];
+        }
         //		gdbstub_savedRegs.a1=(uint32_t)frame+EXCEPTION_GDB_SP_OFFSET;
         gdbstub_savedRegs.reason = 0xff; //mark as user break reason
 
@@ -926,7 +1083,9 @@ void ATTR_GDBFN gdbstub_handle_uart_int(struct XTensa_rtos_int_frame_s *frame)
         frame->ps = gdbstub_savedRegs.ps;
         frame->sar = gdbstub_savedRegs.sar;
         for (x = 0; x < 16; x++)
+        {
             frame->a[x] = gdbstub_savedRegs.a[x];
+        }
     }
 }
 
@@ -960,10 +1119,14 @@ static void ATTR_GDBFN gdbstub_uart_hdlr(void* arg, void* frame)
         c = READ_PERI_REG(UART_FIFO(0)) & 0xFF;
         //Check if any of the chars is control-C
         if (c == 0x3)
+        {
             break;
+        }
 #if GDBSTUB_CTRLC_BREAK
         if (!gdb_attached && uart_isr_callback != NULL)
+        {
             uart_isr_callback(uart_isr_arg, c);
+        }
 #endif
         fifolen--;
     }

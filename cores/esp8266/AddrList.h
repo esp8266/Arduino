@@ -239,7 +239,9 @@ public:
             }
             if (!ip_addr_isany(netIf.ipFromNetifNum()))
                 // found an initialized address
+            {
                 break;
+            }
         }
         return *this;
     }

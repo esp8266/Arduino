@@ -28,7 +28,9 @@ static bool sflags(const char* mode, OpenMode& om, AccessMode& am);
 size_t File::write(uint8_t c)
 {
     if (!_p)
+    {
         return 0;
+    }
 
     return _p->write(&c, 1);
 }
@@ -36,7 +38,9 @@ size_t File::write(uint8_t c)
 size_t File::write(const uint8_t *buf, size_t size)
 {
     if (!_p)
+    {
         return 0;
+    }
 
     return _p->write(buf, size);
 }
@@ -44,7 +48,9 @@ size_t File::write(const uint8_t *buf, size_t size)
 int File::available()
 {
     if (!_p)
+    {
         return false;
+    }
 
     return _p->size() - _p->position();
 }
@@ -52,11 +58,15 @@ int File::available()
 int File::read()
 {
     if (!_p)
+    {
         return -1;
+    }
 
     uint8_t result;
     if (_p->read(&result, 1) != 1)
+    {
         return -1;
+    }
 
     return result;
 }
@@ -64,7 +74,9 @@ int File::read()
 size_t File::read(uint8_t* buf, size_t size)
 {
     if (!_p)
+    {
         return -1;
+    }
 
     return _p->read(buf, size);
 }
@@ -72,7 +84,9 @@ size_t File::read(uint8_t* buf, size_t size)
 int File::peek()
 {
     if (!_p)
+    {
         return -1;
+    }
 
     size_t curPos = _p->position();
     int result = read();
@@ -83,7 +97,9 @@ int File::peek()
 void File::flush()
 {
     if (!_p)
+    {
         return;
+    }
 
     _p->flush();
 }
@@ -91,7 +107,9 @@ void File::flush()
 bool File::seek(uint32_t pos, SeekMode mode)
 {
     if (!_p)
+    {
         return false;
+    }
 
     return _p->seek(pos, mode);
 }
@@ -99,7 +117,9 @@ bool File::seek(uint32_t pos, SeekMode mode)
 size_t File::position() const
 {
     if (!_p)
+    {
         return 0;
+    }
 
     return _p->position();
 }
@@ -107,7 +127,9 @@ size_t File::position() const
 size_t File::size() const
 {
     if (!_p)
+    {
         return 0;
+    }
 
     return _p->size();
 }
@@ -129,7 +151,9 @@ File::operator bool() const
 const char* File::name() const
 {
     if (!_p)
+    {
         return nullptr;
+    }
 
     return _p->name();
 }
@@ -152,7 +176,9 @@ String File::readString()
 File Dir::openFile(const char* mode)
 {
     if (!_impl)
+    {
         return File();
+    }
 
     OpenMode om;
     AccessMode am;
@@ -168,7 +194,9 @@ File Dir::openFile(const char* mode)
 String Dir::fileName()
 {
     if (!_impl)
+    {
         return String();
+    }
 
     return _impl->fileName();
 }
@@ -176,7 +204,9 @@ String Dir::fileName()
 size_t Dir::fileSize()
 {
     if (!_impl)
+    {
         return 0;
+    }
 
     return _impl->fileSize();
 }
@@ -184,7 +214,9 @@ size_t Dir::fileSize()
 bool Dir::next()
 {
     if (!_impl)
+    {
         return false;
+    }
 
     return _impl->next();
 }
@@ -192,27 +224,35 @@ bool Dir::next()
 bool FS::begin()
 {
     if (!_impl)
+    {
         return false;
+    }
     return _impl->begin();
 }
 
 void FS::end()
 {
     if (_impl)
+    {
         _impl->end();
+    }
 }
 
 bool FS::format()
 {
     if (!_impl)
+    {
         return false;
+    }
     return _impl->format();
 }
 
 bool FS::info(FSInfo& info)
 {
     if (!_impl)
+    {
         return false;
+    }
     return _impl->info(info);
 }
 
@@ -224,7 +264,9 @@ File FS::open(const String& path, const char* mode)
 File FS::open(const char* path, const char* mode)
 {
     if (!_impl)
+    {
         return File();
+    }
 
     OpenMode om;
     AccessMode am;
@@ -240,7 +282,9 @@ File FS::open(const char* path, const char* mode)
 bool FS::exists(const char* path)
 {
     if (!_impl)
+    {
         return false;
+    }
     return _impl->exists(path);
 }
 
@@ -252,7 +296,9 @@ bool FS::exists(const String& path)
 Dir FS::openDir(const char* path)
 {
     if (!_impl)
+    {
         return Dir();
+    }
     return Dir(_impl->openDir(path));
 }
 
@@ -264,7 +310,9 @@ Dir FS::openDir(const String& path)
 bool FS::remove(const char* path)
 {
     if (!_impl)
+    {
         return false;
+    }
     return _impl->remove(path);
 }
 
@@ -276,7 +324,9 @@ bool FS::remove(const String& path)
 bool FS::rename(const char* pathFrom, const char* pathTo)
 {
     if (!_impl)
+    {
         return false;
+    }
     return _impl->rename(pathFrom, pathTo);
 }
 
@@ -386,7 +436,9 @@ File open(const char* path, const char* mode)
         {
             File result = entry->fs->open(path + offset);
             if (result)
+            {
                 return result;
+            }
         }
     }
 

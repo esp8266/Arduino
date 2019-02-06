@@ -42,7 +42,9 @@ void randomSeed(unsigned long seed)
 long random(long howbig)
 {
     if (howbig == 0)
+    {
         return 0;
+    }
     // if randomSeed was called, fall back to software PRNG
     uint32_t val = (s_randomSeedCalled) ? rand() : RANDOM_REG32;
     return val % howbig;
@@ -51,7 +53,9 @@ long random(long howbig)
 long random(long howsmall, long howbig)
 {
     if (howsmall >= howbig)
+    {
         return howsmall;
+    }
     long diff = howbig - howsmall;
     return random(diff) + howsmall;
 }
@@ -59,14 +63,18 @@ long random(long howsmall, long howbig)
 long secureRandom(long howbig)
 {
     if (howbig == 0)
+    {
         return 0;
+    }
     return RANDOM_REG32 % howbig;
 }
 
 long secureRandom(long howsmall, long howbig)
 {
     if (howsmall >= howbig)
+    {
         return howsmall;
+    }
     long diff = howbig - howsmall;
     return secureRandom(diff) + howsmall;
 }

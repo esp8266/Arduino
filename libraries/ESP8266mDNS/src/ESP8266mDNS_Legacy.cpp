@@ -156,21 +156,28 @@ MDNSResponder::~MDNSResponder()
     _answers = 0;
 
     if (_conn)
+    {
         _conn->unref();
+    }
 }
 
 bool MDNSResponder::begin(const char* hostname)
 {
     size_t n = strlen(hostname);
     if (n > 63)   // max size for a single label.
+    {
         return false;
+    }
 
     // Copy in hostname characters as lowercase
     _hostName = hostname;
     _hostName.toLowerCase();
 
     // If instance name is not already set copy hostname to instance name
-    if (_instanceName.equals("")) _instanceName = hostname;
+    if (_instanceName.equals(""))
+    {
+        _instanceName = hostname;
+    }
 
     _gotIPHandler = WiFi.onStationModeGotIP([this](const WiFiEventStationModeGotIP & event)
     {
@@ -214,13 +221,17 @@ bool MDNSResponder::_listen()
         IPAddress mdns(MDNS_MULTICAST_ADDR);
 
         if (igmp_joingroup(IP4_ADDR_ANY4, mdns) != ERR_OK)
+        {
             return false;
+        }
 
         _conn = new UdpContext;
         _conn->ref();
 
         if (!_conn->listen(IP_ADDR_ANY, MDNS_PORT))
+        {
             return false;
+        }
         _conn->setMulticastTTL(MDNS_MULTICAST_TTL);
         _conn->onRx(std::bind(&MDNSResponder::update, this));
         _conn->connect(mdns, MDNS_PORT);
@@ -231,7 +242,9 @@ bool MDNSResponder::_listen()
 void MDNSResponder::update()
 {
     if (!_conn || !_conn->next())
+    {
         return;
+    }
     _parsePacket();
 }
 
@@ -239,7 +252,9 @@ void MDNSResponder::update()
 void MDNSResponder::setInstanceName(String name)
 {
     if (name.length() > 63)
+    {
         return;
+    }
     _instanceName = name;
 }
 
@@ -258,7 +273,9 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
         {
             //found a service name match
             if (servicePtr->_txtLen + txtLen > 1300)
-                return false;  //max txt record size
+            {
+                return false;    //max txt record size
+            }
             MDNSTxt *newtxt = new MDNSTxt;
             newtxt->_txt = String(key) + "=" + String(value);
             newtxt->_next = 0;
@@ -273,7 +290,9 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
             {
                 MDNSTxt * txtPtr = servicePtr->_txts;
                 while (txtPtr->_next != 0)
+                {
                     txtPtr = txtPtr->_next;
+                }
                 //adding another TXT to service
                 txtPtr->_next = newtxt;
                 servicePtr->_txtLen += txtLen;
@@ -287,9 +306,13 @@ bool MDNSResponder::addServiceTxt(char *name, char *proto, char *key, char *valu
 void MDNSResponder::addService(char *name, char *proto, uint16_t port)
 {
     if (_getServicePort(name, proto) != 0)
+    {
         return;
+    }
     if (os_strlen(name) > 32 || os_strlen(proto) != 3)
-        return; //bad arguments
+    {
+        return;    //bad arguments
+    }
     struct MDNSService *srv = (struct MDNSService*)(os_malloc(sizeof(struct MDNSService)));
     os_strcpy(srv->_name, name);
     os_strcpy(srv->_proto, proto);
@@ -299,12 +322,16 @@ void MDNSResponder::addService(char *name, char *proto, uint16_t port)
     srv->_txtLen = 0;
 
     if (_services == 0)
+    {
         _services = srv;
+    }
     else
     {
         MDNSService* servicePtr = _services;
         while (servicePtr->_next != 0)
+        {
             servicePtr = servicePtr->_next;
+        }
         servicePtr->_next = srv;
     }
 
@@ -364,7 +391,9 @@ int MDNSResponder::queryService(char *service, char *proto)
 
         wifi_get_ip_info((!itfn) ? SOFTAP_IF : STATION_IF, &ip_info);
         if (!ip_info.ip.addr)
+        {
             continue;
+        }
         _conn->setMulticastInterface(IPAddress(ip_info.ip.addr));
 
         // Write the header
@@ -414,7 +443,9 @@ String MDNSResponder::hostname(int idx)
 {
     MDNSAnswer *answer = _getAnswerFromIdx(idx);
     if (answer == 0)
+    {
         return String();
+    }
     return answer->hostname;
 }
 
@@ -422,7 +453,9 @@ IPAddress MDNSResponder::IP(int idx)
 {
     MDNSAnswer *answer = _getAnswerFromIdx(idx);
     if (answer == 0)
+    {
         return IPAddress();
+    }
     return IPAddress(answer->ip);
 }
 
@@ -430,7 +463,9 @@ uint16_t MDNSResponder::port(int idx)
 {
     MDNSAnswer *answer = _getAnswerFromIdx(idx);
     if (answer == 0)
+    {
         return 0;
+    }
     return answer->port;
 }
 
@@ -438,9 +473,13 @@ MDNSAnswer* MDNSResponder::_getAnswerFromIdx(int idx)
 {
     MDNSAnswer *answer = _answers;
     while (answer != 0 && idx-- > 0)
+    {
         answer = answer->next;
+    }
     if (idx > 0)
+    {
         return 0;
+    }
     return answer;
 }
 
@@ -464,7 +503,9 @@ MDNSTxt * MDNSResponder::_getServiceTxt(char *name, char *proto)
         if (servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0)
         {
             if (servicePtr->_txts == 0)
+            {
                 return nullptr;
+            }
             return servicePtr->_txts;
         }
     }
@@ -479,7 +520,9 @@ uint16_t MDNSResponder::_getServiceTxtLen(char *name, char *proto)
         if (servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0)
         {
             if (servicePtr->_txts == 0)
+            {
                 return false;
+            }
             return servicePtr->_txtLen;
         }
     }
@@ -492,7 +535,9 @@ uint16_t MDNSResponder::_getServicePort(char *name, char *proto)
     for (servicePtr = _services; servicePtr; servicePtr = servicePtr->_next)
     {
         if (servicePtr->_port > 0 && strcmp(servicePtr->_name, name) == 0 && strcmp(servicePtr->_proto, proto) == 0)
+        {
             return servicePtr->_port;
+        }
     }
     return 0;
 }
@@ -508,10 +553,14 @@ IPAddress MDNSResponder::_getRequestMulticastInterface()
         IPAddress infoIp(ip_info.ip);
         IPAddress infoMask(ip_info.netmask);
         if (ip_info.ip.addr && ip_addr_netcmp((const ip_addr_t*)remote_ip, (const ip_addr_t*)infoIp, ip_2_ip4((const ip_addr_t*)infoMask)))
+        {
             match_ap = true;
+        }
     }
     if (!match_ap)
+    {
         wifi_get_ip_info(STATION_IF, &ip_info);
+    }
     return IPAddress(ip_info.ip.addr);
 }
 
@@ -537,7 +586,9 @@ void MDNSResponder::_parsePacket()
     uint16_t packetHeader[6];
 
     for (i = 0; i < 6; i++)
+    {
         packetHeader[i] = _conn_read16();
+    }
 
     if ((packetHeader[1] & 0x8000) != 0)   // Read answers
     {
@@ -600,14 +651,18 @@ void MDNSResponder::_parsePacket()
             {
                 tmp8 = _conn_read8();
                 if (tmp8 == 0x00)   // End of name
+                {
                     break;
+                }
                 if (tmp8 & 0xC0)   // Compressed pointer
                 {
                     uint16_t offset = ((((uint16_t)tmp8) & ~0xC0) << 8) | _conn_read8();
                     if (_conn->isValidOffset(offset))
                     {
                         if (0 == last_bufferpos)
+                        {
                             last_bufferpos  = _conn->tell();
+                        }
 #ifdef DEBUG_ESP_MDNS_RX
                         DEBUG_ESP_PORT.print("Compressed pointer, jumping from ");
                         DEBUG_ESP_PORT.print(last_bufferpos);
@@ -639,7 +694,9 @@ void MDNSResponder::_parsePacket()
 #ifdef DEBUG_ESP_MDNS_RX
                 DEBUG_ESP_PORT.printf(" %d ", tmp8);
                 for (int n = 0; n < tmp8; n++)
+                {
                     DEBUG_ESP_PORT.printf("%c", serviceName[n]);
+                }
                 DEBUG_ESP_PORT.println();
 #endif
                 if (serviceName[0] == '_')
@@ -675,7 +732,10 @@ void MDNSResponder::_parsePacket()
             {
                 if (answerType == MDNS_TYPE_TXT && answerRdlength < 1460)
                 {
-                    while (--answerRdlength) _conn->read();
+                    while (--answerRdlength)
+                    {
+                        _conn->read();
+                    }
                 }
                 else
                 {
@@ -703,7 +763,9 @@ void MDNSResponder::_parsePacket()
 #ifdef DEBUG_ESP_MDNS_RX
                 DEBUG_ESP_PORT.printf("PTR %d ", answerRdlength);
                 for (int n = 0; n < answerRdlength; n++)
+                {
                     DEBUG_ESP_PORT.printf("%c", hostName[n]);
+                }
                 DEBUG_ESP_PORT.println();
 #endif
             }
@@ -715,7 +777,9 @@ void MDNSResponder::_parsePacket()
 #ifdef DEBUG_ESP_MDNS_RX
                 DEBUG_ESP_PORT.printf("TXT %d ", answerRdlength);
                 for (int n = 0; n < answerRdlength; n++)
+                {
                     DEBUG_ESP_PORT.printf("%c", hostName[n]);
+                }
                 DEBUG_ESP_PORT.println();
 #endif
             }
@@ -762,7 +826,9 @@ void MDNSResponder::_parsePacket()
 #ifdef DEBUG_ESP_MDNS_RX
                 DEBUG_ESP_PORT.printf("SRV %d ", tmp8);
                 for (int n = 0; n < tmp8; n++)
+                {
                     DEBUG_ESP_PORT.printf("%02x ", answerHostName[n]);
+                }
                 DEBUG_ESP_PORT.printf("\n%s\n", answerHostName);
 #endif
                 if (last_bufferpos > 0)
@@ -775,14 +841,18 @@ void MDNSResponder::_parsePacket()
 #endif
                 }
                 if (answerRdlength - (6 + 1 + tmp8) > 0)   // Skip any remaining rdata
+                {
                     _conn_readS(hostName, answerRdlength - (6 + 1 + tmp8));
+                }
             }
 
             else if (answerType == MDNS_TYPE_A)
             {
                 partsCollected |= 0x08;
                 for (int i = 0; i < 4; i++)
+                {
                     answerIp[i] = _conn_read8();
+                }
             }
             else
             {
@@ -790,7 +860,9 @@ void MDNSResponder::_parsePacket()
                 DEBUG_ESP_PORT.printf("Ignoring unsupported type %02x\n", tmp8);
 #endif
                 for (int n = 0; n < answerRdlength; n++)
+                {
                     (void)_conn_read8();
+                }
             }
 
             if ((partsCollected == 0x0F) && serviceMatch)
@@ -808,7 +880,9 @@ void MDNSResponder::_parsePacket()
                 {
                     answer = _answers;
                     while (answer->next != 0)
+                    {
                         answer = answer->next;
+                    }
                     answer->next = (struct MDNSAnswer*)(os_malloc(sizeof(struct MDNSAnswer)));
                     answer = answer->next;
                 }
@@ -818,7 +892,9 @@ void MDNSResponder::_parsePacket()
                 // Populate new answer
                 answer->port = answerPort;
                 for (int i = 0; i < 4; i++)
+                {
                     answer->ip[i] = answerIp[i];
+                }
                 answer->hostname = (char *)os_malloc(strlen(answerHostName) + 1);
                 os_strcpy(answer->hostname, answerHostName);
                 _conn->flush();
@@ -933,7 +1009,9 @@ void MDNSResponder::_parsePacket()
         localName[localNameLen] = '\0';
         tmp = _conn_read8();
         if (localNameLen == 5 && strcmp("local", localName) == 0 && tmp == 0)
+        {
             localParsed = true;
+        }
         else
         {
 #ifdef DEBUG_ESP_MDNS_ERR
@@ -975,7 +1053,10 @@ void MDNSResponder::_parsePacket()
     uint16_t currentClass;
 
     int numQuestions = packetHeader[2];
-    if (numQuestions > 4) numQuestions = 4;
+    if (numQuestions > 4)
+    {
+        numQuestions = 4;
+    }
     uint16_t questions[4];
     int question = 0;
 
@@ -983,9 +1064,14 @@ void MDNSResponder::_parsePacket()
     {
         currentType = _conn_read16();
         if (currentType & MDNS_NAME_REF) //new header handle it better!
+        {
             currentType = _conn_read16();
+        }
         currentClass = _conn_read16();
-        if (currentClass & MDNS_CLASS_IN) questions[question++] = currentType;
+        if (currentClass & MDNS_CLASS_IN)
+        {
+            questions[question++] = currentType;
+        }
 
         if (numQuestions > 0)
         {
@@ -999,32 +1085,56 @@ void MDNSResponder::_parsePacket()
 #ifdef DEBUG_ESP_MDNS_RX
         DEBUG_ESP_PORT.printf("REQ: ");
         if (hostNameLen > 0)
+        {
             DEBUG_ESP_PORT.printf("%s.", hostName);
+        }
         if (serviceNameLen > 0)
+        {
             DEBUG_ESP_PORT.printf("_%s.", serviceName);
+        }
         if (protoNameLen > 0)
+        {
             DEBUG_ESP_PORT.printf("_%s.", protoName);
+        }
         DEBUG_ESP_PORT.printf("local. ");
 
         if (currentType == MDNS_TYPE_AAAA)
+        {
             DEBUG_ESP_PORT.printf("  AAAA ");
+        }
         else if (currentType == MDNS_TYPE_A)
+        {
             DEBUG_ESP_PORT.printf("  A ");
+        }
         else if (currentType == MDNS_TYPE_PTR)
+        {
             DEBUG_ESP_PORT.printf("  PTR ");
+        }
         else if (currentType == MDNS_TYPE_SRV)
+        {
             DEBUG_ESP_PORT.printf("  SRV ");
+        }
         else if (currentType == MDNS_TYPE_TXT)
+        {
             DEBUG_ESP_PORT.printf("  TXT ");
+        }
         else
+        {
             DEBUG_ESP_PORT.printf("  0x%04X ", currentType);
+        }
 
         if (currentClass == MDNS_CLASS_IN)
+        {
             DEBUG_ESP_PORT.printf("  IN ");
+        }
         else if (currentClass == MDNS_CLASS_IN_FLUSH_CACHE)
+        {
             DEBUG_ESP_PORT.printf("  IN[F] ");
+        }
         else
+        {
             DEBUG_ESP_PORT.printf("  0x%04X ", currentClass);
+        }
 
         DEBUG_ESP_PORT.printf("\n");
 #endif
@@ -1177,8 +1287,14 @@ void MDNSResponder::_replyToTypeEnumRequest(IPAddress multicastInterface)
 void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t responseMask, char * service, char *proto, uint16_t port, IPAddress multicastInterface)
 {
     int i;
-    if (questionMask == 0) return;
-    if (responseMask == 0) return;
+    if (questionMask == 0)
+    {
+        return;
+    }
+    if (responseMask == 0)
+    {
+        return;
+    }
 
 #ifdef DEBUG_ESP_MDNS_TX
     DEBUG_ESP_PORT.printf("TX: qmask:%01X, rmask:%01X, service:%s, proto:%s, port:%u\n", questionMask, responseMask, service, proto, port);
@@ -1219,9 +1335,13 @@ void MDNSResponder::_replyToInstanceRequest(uint8_t questionMask, uint8_t respon
     for (i = 0; i < 4; i++)
     {
         if (answerMask & (1 << i))
+        {
             answerCount++;
+        }
         if (additionalMask & (1 << i))
+        {
             additionalCount++;
+        }
     }
 
 

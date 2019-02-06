@@ -348,9 +348,13 @@ static inline __attribute__((always_inline))
 uint8_t getPinMode(uint8_t pin)
 {
     if (__builtin_constant_p(pin) && pin < digitalPinCount)
+    {
         return (*digitalPinMap[pin].ddr >> digitalPinMap[pin].bit) & 1;
+    }
     else
+    {
         return badPinNumber();
+    }
 }
 static inline __attribute__((always_inline))
 void setPinMode(uint8_t pin, uint8_t mode)
@@ -358,20 +362,30 @@ void setPinMode(uint8_t pin, uint8_t mode)
     if (__builtin_constant_p(pin) && pin < digitalPinCount)
     {
         if (mode)
+        {
             *digitalPinMap[pin].ddr |= 1 << digitalPinMap[pin].bit;
+        }
         else
+        {
             *digitalPinMap[pin].ddr &= ~(1 << digitalPinMap[pin].bit);
+        }
     }
     else
+    {
         badPinNumber();
+    }
 }
 static inline __attribute__((always_inline))
 uint8_t fastDigitalRead(uint8_t pin)
 {
     if (__builtin_constant_p(pin) && pin < digitalPinCount)
+    {
         return (*digitalPinMap[pin].pin >> digitalPinMap[pin].bit) & 1;
+    }
     else
+    {
         return badPinNumber();
+    }
 }
 static inline __attribute__((always_inline))
 void fastDigitalWrite(uint8_t pin, uint8_t value)
@@ -379,12 +393,18 @@ void fastDigitalWrite(uint8_t pin, uint8_t value)
     if (__builtin_constant_p(pin) && pin < digitalPinCount)
     {
         if (value)
+        {
             *digitalPinMap[pin].port |= 1 << digitalPinMap[pin].bit;
+        }
         else
+        {
             *digitalPinMap[pin].port &= ~(1 << digitalPinMap[pin].bit);
+        }
     }
     else
+    {
         badPinNumber();
+    }
 }
 #endif  // Sd2PinMap_h
 

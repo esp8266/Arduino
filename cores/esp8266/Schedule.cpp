@@ -23,7 +23,9 @@ static scheduled_fn_t* get_fn()
         result = sFirstUnused;
         sFirstUnused = result->mNext;
         if (sFirstUnused == NULL)
+        {
             sLastUnused = NULL;
+        }
     }
     // if no unused items, and count not too high, allocate a new one
     else if (sCount != SCHEDULED_FN_MAX_COUNT)
@@ -38,9 +40,13 @@ static scheduled_fn_t* get_fn()
 static void recycle_fn(scheduled_fn_t* fn)
 {
     if (!sLastUnused)
+    {
         sFirstUnused = fn;
+    }
     else
+    {
         sLastUnused->mNext = fn;
+    }
     fn->mNext = NULL;
     sLastUnused = fn;
 }
@@ -49,13 +55,19 @@ bool schedule_function(std::function<void(void)> fn)
 {
     scheduled_fn_t* item = get_fn();
     if (!item)
+    {
         return false;
+    }
     item->mFunc = fn;
     item->mNext = NULL;
     if (!sFirst)
+    {
         sFirst = item;
+    }
     else
+    {
         sLast->mNext = item;
+    }
     sLast = item;
     return true;
 }

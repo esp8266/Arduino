@@ -96,7 +96,9 @@ int DhcpClass::request_DHCP_lease()
                 result = 1;
                 //use default lease time if we didn't get it
                 if (_dhcpLeaseTime == 0)
+                {
                     _dhcpLeaseTime = DEFAULT_LEASE;
+                }
                 //calculate T1 & T2 if we didn't get it
                 if (_dhcpT1 == 0)
                 {
@@ -112,7 +114,9 @@ int DhcpClass::request_DHCP_lease()
                 _rebindInSec = _dhcpT2;
             }
             else if (messageType == DHCP_NAK)
+            {
                 _dhcp_state = STATE_DHCP_START;
+            }
         }
 
         if (messageType == 255)
@@ -122,7 +126,9 @@ int DhcpClass::request_DHCP_lease()
         }
 
         if (result != 1 && ((millis() - startTime) > _timeout))
+        {
             break;
+        }
     }
 
     // We're done with the socket now
@@ -186,7 +192,9 @@ void DhcpClass::send_DHCP_MESSAGE(uint8_t messageType, uint16_t secondsElapsed)
     // put in W5100 transmit buffer x 6 (192 bytes)
 
     for (int i = 0; i < 6; i++)
+    {
         _dhcpUdpSocket.write(buffer, 32);
+    }
 
     // OPT - Magic Cookie
     buffer[0] = (uint8_t)((MAGIC_COOKIE >> 24) & 0xFF);
@@ -263,7 +271,9 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t& tr
     while (_dhcpUdpSocket.parsePacket() <= 0)
     {
         if ((millis() - startTime) > responseTimeout)
+        {
             return 255;
+        }
         delay(50);
     }
     // start reading in the packet
@@ -314,14 +324,18 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t& tr
                 opt_len = _dhcpUdpSocket.read();
                 _dhcpUdpSocket.read(_dhcpGatewayIp, 4);
                 for (int i = 0; i < opt_len - 4; i++)
+                {
                     _dhcpUdpSocket.read();
+                }
                 break;
 
             case dns :
                 opt_len = _dhcpUdpSocket.read();
                 _dhcpUdpSocket.read(_dhcpDnsServerIp, 4);
                 for (int i = 0; i < opt_len - 4; i++)
+                {
                     _dhcpUdpSocket.read();
+                }
                 break;
 
             case dhcpServerIdentifier :
@@ -329,12 +343,16 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t& tr
                 if ((_dhcpDhcpServerIp[0] == 0 && _dhcpDhcpServerIp[1] == 0 &&
                         _dhcpDhcpServerIp[2] == 0 && _dhcpDhcpServerIp[3] == 0) ||
                         IPAddress(_dhcpDhcpServerIp) == _dhcpUdpSocket.remoteIP())
+                {
                     _dhcpUdpSocket.read(_dhcpDhcpServerIp, sizeof(_dhcpDhcpServerIp));
+                }
                 else
                 {
                     // Skip over the rest of this option
                     while (opt_len--)
+                    {
                         _dhcpUdpSocket.read();
+                    }
                 }
                 break;
 
@@ -361,7 +379,9 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t& tr
                 opt_len = _dhcpUdpSocket.read();
                 // Skip over the rest of this option
                 while (opt_len--)
+                {
                     _dhcpUdpSocket.read();
+                }
                 break;
             }
         }
@@ -406,14 +426,22 @@ int DhcpClass::checkLease()
             //and if the remainder is less than cycle time * 2
             //do it early instead of late
             if (_renewInSec < factor * 2)
+            {
                 _renewInSec = 0;
+            }
             else
+            {
                 _renewInSec -= factor;
+            }
 
             if (_rebindInSec < factor * 2)
+            {
                 _rebindInSec = 0;
+            }
             else
+            {
                 _rebindInSec -= factor;
+            }
         }
 
         //if we have a lease but should renew, do it
@@ -433,7 +461,9 @@ int DhcpClass::checkLease()
         }
     }
     else
+    {
         _secTimeout = snow + 1000;
+    }
 
     _lastCheck = now;
     return rc;

@@ -46,7 +46,9 @@ UpdaterClass::UpdaterClass()
 void UpdaterClass::_reset()
 {
     if (_buffer)
+    {
         delete[] _buffer;
+    }
     _buffer = 0;
     _bufferLen = 0;
     _startAddress = 0;
@@ -87,7 +89,9 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn)
 
 #ifdef DEBUG_UPDATER
     if (command == U_SPIFFS)
+    {
         DEBUG_UPDATER.println(F("[begin] Update SPIFFS."));
+    }
 #endif
 
     if (size == 0)
@@ -133,7 +137,9 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn)
         }
     }
     else if (command == U_SPIFFS)
+    {
         updateStartAddress = (uintptr_t)&_SPIFFS_start - 0x40200000;
+    }
     else
     {
         // unknown command
@@ -148,9 +154,13 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn)
     _currentAddress = _startAddress;
     _size = size;
     if (ESP.getFreeHeap() > 2 * FLASH_SECTOR_SIZE)
+    {
         _bufferSize = FLASH_SECTOR_SIZE;
+    }
     else
+    {
         _bufferSize = 256;
+    }
     _buffer = new uint8_t[_bufferSize];
     _command = command;
 
@@ -161,14 +171,18 @@ bool UpdaterClass::begin(size_t size, int command, int ledPin, uint8_t ledOn)
 #endif
 
     if (!_verify)
+    {
         _md5.begin();
+    }
     return true;
 }
 
 bool UpdaterClass::setMD5(const char * expected_md5)
 {
     if (strlen(expected_md5) != 32)
+    {
         return false;
+    }
     _target_md5 = expected_md5;
     return true;
 }
@@ -196,7 +210,9 @@ bool UpdaterClass::end(bool evenIfRemaining)
     if (evenIfRemaining)
     {
         if (_bufferLen > 0)
+        {
             _writeBuffer();
+        }
         _size = progress();
     }
 
@@ -231,7 +247,10 @@ bool UpdaterClass::end(bool evenIfRemaining)
 #ifdef DEBUG_UPDATER
         unsigned char *ret = (unsigned char *)_hash->hash();
         DEBUG_UPDATER.printf_P(PSTR("[Updater] Computed Hash:"));
-        for (int i = 0; i < _hash->len(); i++) DEBUG_UPDATER.printf(" %02x", ret[i]);
+        for (int i = 0; i < _hash->len(); i++)
+        {
+            DEBUG_UPDATER.printf(" %02x", ret[i]);
+        }
         DEBUG_UPDATER.printf("\n");
 #endif
         uint8_t *sig = (uint8_t*)malloc(sigLen);
@@ -245,7 +264,9 @@ bool UpdaterClass::end(bool evenIfRemaining)
 #ifdef DEBUG_UPDATER
         DEBUG_UPDATER.printf_P(PSTR("[Updater] Received Signature:"));
         for (size_t i = 0; i < sigLen; i++)
+        {
             DEBUG_UPDATER.printf(" %02x", sig[i]);
+        }
         DEBUG_UPDATER.printf("\n");
 #endif
         if (!_verify->verify(_hash, (void *)sig, sigLen))
@@ -268,7 +289,10 @@ bool UpdaterClass::end(bool evenIfRemaining)
             return false;
         }
 #ifdef DEBUG_UPDATER
-        else DEBUG_UPDATER.printf_P(PSTR("MD5 Success: %s\n"), _target_md5.c_str());
+        else
+        {
+            DEBUG_UPDATER.printf_P(PSTR("MD5 Success: %s\n"), _target_md5.c_str());
+        }
 #endif
     }
 
@@ -308,7 +332,10 @@ bool UpdaterClass::_writeBuffer()
     bool eraseResult = true, writeResult = true;
     if (_currentAddress % FLASH_SECTOR_SIZE == 0)
     {
-        if (!_async) yield();
+        if (!_async)
+        {
+            yield();
+        }
         eraseResult = ESP.flashEraseSector(_currentAddress / FLASH_SECTOR_SIZE);
     }
 
@@ -338,7 +365,10 @@ bool UpdaterClass::_writeBuffer()
 
     if (eraseResult)
     {
-        if (!_async) yield();
+        if (!_async)
+        {
+            yield();
+        }
         writeResult = ESP.flashWrite(_currentAddress, (uint32_t*) _buffer, _bufferLen);
     }
     else     // if erase was unsuccessful
@@ -351,7 +381,9 @@ bool UpdaterClass::_writeBuffer()
     // Restore the old flash mode, if we modified it.
     // Ensures that the MD5 hash will still match what was sent.
     if (modifyFlashMode)
+    {
         _buffer[FLASH_MODE_OFFSET] = bufferFlashMode;
+    }
 
     if (!writeResult)
     {
@@ -360,7 +392,9 @@ bool UpdaterClass::_writeBuffer()
         return false;
     }
     if (!_verify)
+    {
         _md5.add(_buffer, _bufferLen);
+    }
     _currentAddress += _bufferLen;
     _bufferLen = 0;
     return true;
@@ -369,7 +403,9 @@ bool UpdaterClass::_writeBuffer()
 size_t UpdaterClass::write(uint8_t *data, size_t len)
 {
     if (hasError() || !isRunning())
+    {
         return 0;
+    }
 
     if (len > remaining())
     {
@@ -387,9 +423,14 @@ size_t UpdaterClass::write(uint8_t *data, size_t len)
         memcpy(_buffer + _bufferLen, data + (len - left), toBuff);
         _bufferLen += toBuff;
         if (!_writeBuffer())
+        {
             return len - left;
+        }
         left -= toBuff;
-        if (!_async) yield();
+        if (!_async)
+        {
+            yield();
+        }
     }
     //lets see whats left
     memcpy(_buffer + _bufferLen, data + (len - left), left);
@@ -398,7 +439,9 @@ size_t UpdaterClass::write(uint8_t *data, size_t len)
     {
         //we are at the end of the update, so should write what's left to flash
         if (!_writeBuffer())
+        {
             return len - left;
+        }
     }
     return len;
 }
@@ -470,7 +513,9 @@ size_t UpdaterClass::writeStream(Stream &data)
     size_t written = 0;
     size_t toRead = 0;
     if (hasError() || !isRunning())
+    {
         return 0;
+    }
 
     if (!_verifyHeader(data.peek()))
     {
@@ -482,7 +527,9 @@ size_t UpdaterClass::writeStream(Stream &data)
     }
 
     if (_ledPin != -1)
+    {
         pinMode(_ledPin, OUTPUT);
+    }
 
     while (remaining())
     {
@@ -492,7 +539,9 @@ size_t UpdaterClass::writeStream(Stream &data)
         }
         size_t bytesToRead = _bufferSize - _bufferLen;
         if (bytesToRead > remaining())
+        {
             bytesToRead = remaining();
+        }
         toRead = data.readBytes(_buffer + _bufferLen,  bytesToRead);
         if (toRead == 0)  //Timeout
         {
@@ -512,7 +561,9 @@ size_t UpdaterClass::writeStream(Stream &data)
         }
         _bufferLen += toRead;
         if ((_bufferLen == remaining() || _bufferLen == _bufferSize) && !_writeBuffer())
+        {
             return written;
+        }
         written += toRead;
         yield();
     }
@@ -531,33 +582,61 @@ void UpdaterClass::printError(Print &out)
 {
     out.printf_P(PSTR("ERROR[%u]: "), _error);
     if (_error == UPDATE_ERROR_OK)
+    {
         out.println(F("No Error"));
+    }
     else if (_error == UPDATE_ERROR_WRITE)
+    {
         out.println(F("Flash Write Failed"));
+    }
     else if (_error == UPDATE_ERROR_ERASE)
+    {
         out.println(F("Flash Erase Failed"));
+    }
     else if (_error == UPDATE_ERROR_READ)
+    {
         out.println(F("Flash Read Failed"));
+    }
     else if (_error == UPDATE_ERROR_SPACE)
+    {
         out.println(F("Not Enough Space"));
+    }
     else if (_error == UPDATE_ERROR_SIZE)
+    {
         out.println(F("Bad Size Given"));
+    }
     else if (_error == UPDATE_ERROR_STREAM)
+    {
         out.println(F("Stream Read Timeout"));
+    }
     else if (_error == UPDATE_ERROR_MD5)
+    {
         out.printf_P(PSTR("MD5 Failed: expected:%s, calculated:%s\n"), _target_md5.c_str(), _md5.toString().c_str());
+    }
     else if (_error == UPDATE_ERROR_SIGN)
+    {
         out.println(F("Signature verification failed"));
+    }
     else if (_error == UPDATE_ERROR_FLASH_CONFIG)
+    {
         out.printf_P(PSTR("Flash config wrong real: %d IDE: %d\n"), ESP.getFlashChipRealSize(), ESP.getFlashChipSize());
+    }
     else if (_error == UPDATE_ERROR_NEW_FLASH_CONFIG)
+    {
         out.printf_P(PSTR("new Flash config wrong real: %d\n"), ESP.getFlashChipRealSize());
+    }
     else if (_error == UPDATE_ERROR_MAGIC_BYTE)
+    {
         out.println(F("Magic byte is wrong, not 0xE9"));
+    }
     else if (_error == UPDATE_ERROR_BOOTSTRAP)
+    {
         out.println(F("Invalid bootstrapping state, reset ESP8266 before updating"));
+    }
     else
+    {
         out.println(F("UNKNOWN"));
+    }
 }
 
 UpdaterClass Update;

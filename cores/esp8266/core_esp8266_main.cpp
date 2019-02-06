@@ -89,7 +89,9 @@ void preloop_update_frequency()
 extern "C" void esp_yield()
 {
     if (cont_can_yield(g_pcont))
+    {
         cont_yield(g_pcont);
+    }
 }
 
 extern "C" void esp_schedule()
@@ -105,7 +107,9 @@ extern "C" void __yield()
         esp_yield();
     }
     else
+    {
         panic();
+    }
 }
 
 extern "C" void yield(void) __attribute__((weak, alias("__yield")));
@@ -114,7 +118,9 @@ extern "C" void optimistic_yield(uint32_t interval_us)
 {
     if (cont_can_yield(g_pcont) &&
             (system_get_time() - s_micros_at_task_start) > interval_us)
+    {
         yield();
+    }
 }
 
 static void loop_wrapper()
@@ -137,7 +143,9 @@ static void loop_task(os_event_t *events)
     s_micros_at_task_start = system_get_time();
     cont_run(g_pcont, &loop_wrapper);
     if (cont_check(g_pcont) != 0)
+    {
         panic();
+    }
 }
 extern "C" {
 
@@ -156,7 +164,9 @@ static void do_global_ctors(void)
 
     void (**p)(void) = &__init_array_end;
     while (p != &__init_array_start)
+    {
         (*--p)();
+    }
 }
 
 extern "C" {
@@ -169,7 +179,9 @@ extern "C" {
 #else
         static bool terminating;
         if (terminating)
+        {
             abort();
+        }
         terminating = true;
         /* Use a trick from vterminate.cc to get any std::exception what() */
         try

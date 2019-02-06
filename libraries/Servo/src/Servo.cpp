@@ -109,7 +109,9 @@ void Servo::writeMicroseconds(int value)
 {
     _valueUs = value;
     if (_attached)
+    {
         startWaveform(_pin, _valueUs, REFRESH_INTERVAL - _valueUs, 0);
+    }
 }
 
 int Servo::read() // return the value as degrees

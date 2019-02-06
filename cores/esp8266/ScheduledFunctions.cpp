@@ -25,7 +25,9 @@ ScheduledFunctions::~ScheduledFunctions()
 ScheduledRegistration ScheduledFunctions::insertElement(ScheduledElement se, bool front)
 {
     if (countElements >= maxElements)
+    {
         return nullptr;
+    }
     else
     {
         countElements++;
@@ -71,18 +73,28 @@ void ScheduledFunctions::runScheduledFunctions()
     {
         bool erase = false;
         if (it->registration == nullptr)
+        {
             it->function();
+        }
         else
         {
             if (it->registration.use_count() > 1)
+            {
                 it->function();
+            }
             else
+            {
                 erase = true;
+            }
         }
         if ((!it->continuous) || (erase))
+        {
             it = it->_this->eraseElement(it);
+        }
         else
+        {
             it++;
+        }
     }
 }
 
@@ -98,7 +110,9 @@ void ScheduledFunctions::removeFunction(ScheduledRegistration sr)
             removed = true;
         }
         else
+        {
             it++;
+        }
     }
 }
 

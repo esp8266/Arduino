@@ -56,19 +56,33 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
 static bool softap_config_equal(const softap_config& lhs, const softap_config& rhs)
 {
     if (strcmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid)) != 0)
+    {
         return false;
+    }
     if (strcmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password)) != 0)
+    {
         return false;
+    }
     if (lhs.channel != rhs.channel)
+    {
         return false;
+    }
     if (lhs.ssid_hidden != rhs.ssid_hidden)
+    {
         return false;
+    }
     if (lhs.max_connection != rhs.max_connection)
+    {
         return false;
+    }
     if (lhs.beacon_interval != rhs.beacon_interval)
+    {
         return false;
+    }
     if (lhs.authmode != rhs.authmode)
+    {
         return false;
+    }
     return true;
 }
 
@@ -132,18 +146,26 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
 
     struct softap_config conf_compare;
     if (WiFi._persistent)
+    {
         wifi_softap_get_config_default(&conf_compare);
+    }
     else
+    {
         wifi_softap_get_config(&conf_compare);
+    }
 
     if (!softap_config_equal(conf, conf_compare))
     {
 
         ETS_UART_INTR_DISABLE();
         if (WiFi._persistent)
+        {
             ret = wifi_softap_set_config(&conf);
+        }
         else
+        {
             ret = wifi_softap_set_config_current(&conf);
+        }
         ETS_UART_INTR_ENABLE();
 
         if (!ret)
@@ -154,7 +176,9 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
 
     }
     else
+    {
         DEBUG_WIFI("[AP] softap config unchanged\n");
+    }
 
     if (wifi_softap_dhcps_status() != DHCP_STARTED)
     {
@@ -221,14 +245,18 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
             || gateway.isV6()
 #endif
        )
+    {
         return false;
+    }
     struct ip_info info;
     info.ip.addr = local_ip.v4();
     info.gw.addr = gateway.v4();
     info.netmask.addr = subnet.v4();
 
     if (!wifi_softap_dhcps_stop())
+    {
         DEBUG_WIFI("[APConfig] wifi_softap_dhcps_stop failed!\n");
+    }
 
     if (!wifi_set_ip_info(SOFTAP_IF, &info))
     {
@@ -312,16 +340,24 @@ bool ESP8266WiFiAPClass::softAPdisconnect(bool wifioff)
     conf.authmode = AUTH_OPEN;
     ETS_UART_INTR_DISABLE();
     if (WiFi._persistent)
+    {
         ret = wifi_softap_set_config(&conf);
+    }
     else
+    {
         ret = wifi_softap_set_config_current(&conf);
+    }
     ETS_UART_INTR_ENABLE();
 
     if (!ret)
+    {
         DEBUG_WIFI("[APdisconnect] set_config failed!\n");
+    }
 
     if (ret && wifioff)
+    {
         ret = WiFi.enableAP(false);
+    }
 
     return ret;
 }

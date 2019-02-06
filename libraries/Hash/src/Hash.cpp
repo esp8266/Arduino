@@ -44,11 +44,15 @@ void sha1(uint8_t * data, uint32_t size, uint8_t hash[20])
 #ifdef DEBUG_SHA1
     os_printf("DATA:");
     for (uint16_t i = 0; i < size; i++)
+    {
         os_printf("%02X", data[i]);
+    }
     os_printf("\n");
     os_printf("DATA:");
     for (uint16_t i = 0; i < size; i++)
+    {
         os_printf("%c", data[i]);
+    }
     os_printf("\n");
 #endif
 
@@ -59,7 +63,9 @@ void sha1(uint8_t * data, uint32_t size, uint8_t hash[20])
 #ifdef DEBUG_SHA1
     os_printf("SHA1:");
     for (uint16_t i = 0; i < 20; i++)
+    {
         os_printf("%02X", hash[i]);
+    }
     os_printf("\n\n");
 #endif
 }
@@ -95,7 +101,9 @@ String sha1(uint8_t* data, uint32_t size)
     {
         String hex = String(hash[i], HEX);
         if (hex.length() < 2)
+        {
             hex = "0" + hex;
+        }
         hashStr += hex;
     }
 

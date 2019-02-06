@@ -98,7 +98,9 @@ bool ICACHE_FLASH_ATTR sigmaDeltaIsPinAttached(uint8_t pin)
         return (GPC(pin) & (1 << GPCS)); //SOURCE 0:GPIO_DATA,1:SigmaDelta
     }
     else
+    {
         return false;
+    }
 }
 
 /******************************************************************************
@@ -115,7 +117,9 @@ uint32_t ICACHE_FLASH_ATTR sigmaDeltaSetup(uint8_t channel, uint32_t freq)
     uint32_t prescaler = ((uint32_t)10000000 / (freq * 32)) - 1;
 
     if (prescaler > 0xFF)
+    {
         prescaler = 0xFF;
+    }
     sigmaDeltaEnable();
     sigmaDeltaSetPrescaler((uint8_t) prescaler);
 

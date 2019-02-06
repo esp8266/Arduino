@@ -108,7 +108,9 @@ int ICACHE_RAM_ATTR _putc_r(struct _reent* r, int c, FILE* file)
 {
     (void) r;
     if (file->_file == STDOUT_FILENO)
+    {
         return ets_putc(c);
+    }
     return EOF;
 }
 

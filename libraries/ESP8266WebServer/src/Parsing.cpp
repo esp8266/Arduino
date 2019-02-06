@@ -42,20 +42,30 @@ static const char filename[] PROGMEM = "filename";
 static bool readBytesWithTimeout(WiFiClient& client, size_t maxLength, String& data, int timeout_ms)
 {
     if (!data.reserve(maxLength + 1))
+    {
         return false;
+    }
     data[0] = 0;  // data.clear()??
     while (data.length() < maxLength)
     {
         int tries = timeout_ms;
         size_t avail;
         while (!(avail = client.available()) && tries--)
+        {
             delay(1);
+        }
         if (!avail)
+        {
             break;
+        }
         if (data.length() + avail > maxLength)
+        {
             avail = maxLength - data.length();
+        }
         while (avail--)
+        {
             data += (char)client.read();
+        }
     }
     return data.length() == maxLength;
 }
@@ -71,7 +81,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
     client.readStringUntil('\n');
     //reset header value
     for (int i = 0; i < _headerKeysCount; ++i)
+    {
         _currentHeaders[i].value = String();
+    }
 
     // First line of HTTP request looks like "GET /path HTTP/1.1"
     // Retrieve the "/path" part by finding the spaces
@@ -101,15 +113,25 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
 
     HTTPMethod method = HTTP_GET;
     if (methodStr == F("POST"))
+    {
         method = HTTP_POST;
+    }
     else if (methodStr == F("DELETE"))
+    {
         method = HTTP_DELETE;
+    }
     else if (methodStr == F("OPTIONS"))
+    {
         method = HTTP_OPTIONS;
+    }
     else if (methodStr == F("PUT"))
+    {
         method = HTTP_PUT;
+    }
     else if (methodStr == F("PATCH"))
+    {
         method = HTTP_PATCH;
+    }
     _currentMethod = method;
 
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -126,7 +148,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
     for (handler = _firstHandler; handler; handler = handler->next())
     {
         if (handler->canHandle(_currentMethod, _currentUri))
+        {
             break;
+        }
     }
     _currentHandler = handler;
 
@@ -145,10 +169,15 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
         {
             req = client.readStringUntil('\r');
             client.readStringUntil('\n');
-            if (req == "") break;//no moar headers
+            if (req == "")
+            {
+                break;    //no moar headers
+            }
             int headerDiv = req.indexOf(':');
             if (headerDiv == -1)
+            {
                 break;
+            }
             headerName = req.substring(0, headerDiv);
             headerValue = req.substring(headerDiv + 1);
             headerValue.trim();
@@ -165,7 +194,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
             {
                 using namespace mime;
                 if (headerValue.startsWith(FPSTR(mimeTable[txt].mimeType)))
+                {
                     isForm = false;
+                }
                 else if (headerValue.startsWith(F("application/x-www-form-urlencoded")))
                 {
                     isForm = false;
@@ -179,9 +210,13 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
                 }
             }
             else if (headerName.equalsIgnoreCase(F("Content-Length")))
+            {
                 contentLength = headerValue.toInt();
+            }
             else if (headerName.equalsIgnoreCase(F("Host")))
+            {
                 _hostHeader = headerValue;
+            }
         }
 
         String plainBuf;
@@ -191,14 +226,18 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
                  || (plainBuf.length() < contentLength)
                 )
            )
+        {
             return false;
+        }
 
         if (isEncoded)
         {
             // isEncoded => !isForm => plainBuf is not empty
             // add plainBuf in search str
             if (searchStr.length())
+            {
                 searchStr += '&';
+            }
             searchStr += plainBuf;
         }
 
@@ -219,7 +258,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
         {
             // here: content is not yet read (plainBuf is still empty)
             if (!_parseForm(client, boundaryStr, contentLength))
+            {
                 return false;
+            }
         }
     }
     else
@@ -231,10 +272,15 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
         {
             req = client.readStringUntil('\r');
             client.readStringUntil('\n');
-            if (req == "") break;//no moar headers
+            if (req == "")
+            {
+                break;    //no moar headers
+            }
             int headerDiv = req.indexOf(':');
             if (headerDiv == -1)
+            {
                 break;
+            }
             headerName = req.substring(0, headerDiv);
             headerValue = req.substring(headerDiv + 2);
             _collectHeader(headerName.c_str(), headerValue.c_str());
@@ -247,7 +293,9 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client)
 #endif
 
             if (headerName.equalsIgnoreCase("Host"))
+            {
                 _hostHeader = headerValue;
+            }
         }
         _parseArguments(searchStr);
     }
@@ -288,7 +336,9 @@ struct storeArgHandler
     {
         key = ESP8266WebServer::urlDecode(data.substring(pos, key_end_pos));
         if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
+        {
             value = ESP8266WebServer::urlDecode(data.substring(equal_index + 1, next_index));
+        }
     }
 };
 
@@ -304,7 +354,9 @@ struct nullArgHandler
 void ESP8266WebServer::_parseArguments(const String& data)
 {
     if (_currentArgs)
+    {
         delete[] _currentArgs;
+    }
 
     _currentArgCount = _parseArgumentsPrivate(data, nullArgHandler());
 
@@ -331,7 +383,9 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, std::function<v
         // skip empty expression
         while (data[pos] == '&' || data[pos] == ';')
             if (++pos >= data.length())
+            {
                 break;
+            }
 
         // locate separators
         int equal_index = data.indexOf('=', pos);
@@ -339,11 +393,17 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, std::function<v
         int next_index = data.indexOf('&', pos);
         int next_index2 = data.indexOf(';', pos);
         if ((next_index == -1) || (next_index2 != -1 && next_index2 < next_index))
+        {
             next_index = next_index2;
+        }
         if ((key_end_pos == -1) || ((key_end_pos > next_index) && (next_index != -1)))
+        {
             key_end_pos = next_index;
+        }
         if (key_end_pos == -1)
+        {
             key_end_pos = data.length();
+        }
 
         // handle key/value
         if ((int)pos < key_end_pos)
@@ -357,7 +417,9 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, std::function<v
         }
 
         if (next_index == -1)
+        {
             break;
+        }
     }
 
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -373,7 +435,9 @@ void ESP8266WebServer::_uploadWriteByte(uint8_t b)
     if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN)
     {
         if (_currentHandler && _currentHandler->canUpload(_currentUri))
+        {
             _currentHandler->upload(*this, _currentUri, *_currentUpload);
+        }
         _currentUpload->totalSize += _currentUpload->currentSize;
         _currentUpload->currentSize = 0;
     }
@@ -386,7 +450,9 @@ uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client)
     if (res == -1)
     {
         while (!client.available() && client.connected())
+        {
             yield();
+        }
         res = client.read();
     }
     return (uint8_t)res;
@@ -413,7 +479,10 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, const String& boundary, ui
     //start reading the form
     if (line == ("--" + boundary))
     {
-        if (_postArgs) delete[] _postArgs;
+        if (_postArgs)
+        {
+            delete[] _postArgs;
+        }
         _postArgs = new RequestArgument[WEBSERVER_MAX_POST_ARGS];
         _postArgsLen = 0;
         while (1)
@@ -434,7 +503,9 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, const String& boundary, ui
                     argName = line.substring(nameStart + 2);
                     nameStart = argName.indexOf('=');
                     if (nameStart == -1)
+                    {
                         argName = argName.substring(0, argName.length() - 1);
+                    }
                     else
                     {
                         argFilename = argName.substring(nameStart + 2, argName.length() - 1);
@@ -446,7 +517,9 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, const String& boundary, ui
 #endif
                         //use GET to set the filename if uploading using blob
                         if (argFilename == F("blob") && hasArg(FPSTR(filename)))
+                        {
                             argFilename = arg(FPSTR(filename));
+                        }
                     }
 #ifdef DEBUG_ESP_HTTP_SERVER
                     DEBUG_OUTPUT.print("PostArg Name: ");
@@ -473,8 +546,14 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, const String& boundary, ui
                         {
                             line = client.readStringUntil('\r');
                             client.readStringUntil('\n');
-                            if (line.startsWith("--" + boundary)) break;
-                            if (argValue.length() > 0) argValue += "\n";
+                            if (line.startsWith("--" + boundary))
+                            {
+                                break;
+                            }
+                            if (argValue.length() > 0)
+                            {
+                                argValue += "\n";
+                            }
                             argValue += line;
                         }
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -512,23 +591,34 @@ bool ESP8266WebServer::_parseForm(WiFiClient& client, const String& boundary, ui
                         DEBUG_OUTPUT.println(_currentUpload->type);
 #endif
                         if (_currentHandler && _currentHandler->canUpload(_currentUri))
+                        {
                             _currentHandler->upload(*this, _currentUri, *_currentUpload);
+                        }
                         _currentUpload->status = UPLOAD_FILE_WRITE;
                         uint8_t argByte = _uploadReadByte(client);
 readfile:
                         while (argByte != 0x0D)
                         {
-                            if (!client.connected()) return _parseFormUploadAborted();
+                            if (!client.connected())
+                            {
+                                return _parseFormUploadAborted();
+                            }
                             _uploadWriteByte(argByte);
                             argByte = _uploadReadByte(client);
                         }
 
                         argByte = _uploadReadByte(client);
-                        if (!client.connected()) return _parseFormUploadAborted();
+                        if (!client.connected())
+                        {
+                            return _parseFormUploadAborted();
+                        }
                         if (argByte == 0x0A)
                         {
                             argByte = _uploadReadByte(client);
-                            if (!client.connected()) return _parseFormUploadAborted();
+                            if (!client.connected())
+                            {
+                                return _parseFormUploadAborted();
+                            }
                             if ((char)argByte != '-')
                             {
                                 //continue reading the file
@@ -539,7 +629,10 @@ readfile:
                             else
                             {
                                 argByte = _uploadReadByte(client);
-                                if (!client.connected()) return _parseFormUploadAborted();
+                                if (!client.connected())
+                                {
+                                    return _parseFormUploadAborted();
+                                }
                                 if ((char)argByte != '-')
                                 {
                                     //continue reading the file
@@ -556,11 +649,15 @@ readfile:
                             if (strstr((const char*)endBuf, boundary.c_str()) != NULL)
                             {
                                 if (_currentHandler && _currentHandler->canUpload(_currentUri))
+                                {
                                     _currentHandler->upload(*this, _currentUri, *_currentUpload);
+                                }
                                 _currentUpload->totalSize += _currentUpload->currentSize;
                                 _currentUpload->status = UPLOAD_FILE_END;
                                 if (_currentHandler && _currentHandler->canUpload(_currentUri))
+                                {
                                     _currentHandler->upload(*this, _currentUri, *_currentUpload);
+                                }
 #ifdef DEBUG_ESP_HTTP_SERVER
                                 DEBUG_OUTPUT.print("End File: ");
                                 DEBUG_OUTPUT.print(_currentUpload->filename);
@@ -588,7 +685,9 @@ readfile:
                                 _uploadWriteByte((uint8_t)('-'));
                                 uint32_t i = 0;
                                 while (i < boundary.length())
+                                {
                                     _uploadWriteByte(endBuf[i++]);
+                                }
                                 argByte = _uploadReadByte(client);
                                 goto readfile;
                             }
@@ -612,7 +711,10 @@ readfile:
             arg.key = _currentArgs[iarg].key;
             arg.value = _currentArgs[iarg].value;
         }
-        if (_currentArgs) delete[] _currentArgs;
+        if (_currentArgs)
+        {
+            delete[] _currentArgs;
+        }
         _currentArgs = new RequestArgument[_postArgsLen];
         for (iarg = 0; iarg < _postArgsLen; iarg++)
         {
@@ -656,7 +758,9 @@ String ESP8266WebServer::urlDecode(const String& text)
         else
         {
             if (encodedChar == '+')
+            {
                 decodedChar = ' ';
+            }
             else
             {
                 decodedChar = encodedChar;  // normal ascii char
@@ -671,6 +775,8 @@ bool ESP8266WebServer::_parseFormUploadAborted()
 {
     _currentUpload->status = UPLOAD_FILE_ABORTED;
     if (_currentHandler && _currentHandler->canUpload(_currentUri))
+    {
         _currentHandler->upload(*this, _currentUri, *_currentUpload);
+    }
     return false;
 }

@@ -285,7 +285,9 @@ bool MDNSResponder::_removeServiceQuery(MDNSResponder::stcMDNSServiceQuery* p_pS
         stcMDNSServiceQuery*    pPred = m_pServiceQueries;
         while ((pPred) &&
                 (pPred->m_pNext != p_pServiceQuery))
+        {
             pPred = pPred->m_pNext;
+        }
         if (pPred)
         {
             pPred->m_pNext = p_pServiceQuery->m_pNext;
@@ -332,7 +334,9 @@ MDNSResponder::stcMDNSServiceQuery* MDNSResponder::_findServiceQuery(MDNSRespond
     while (pServiceQuery)
     {
         if ((hMDNSServiceQuery)pServiceQuery == p_hServiceQuery)
+        {
             break;
+        }
         pServiceQuery = pServiceQuery->m_pNext;
     }
     return pServiceQuery;
@@ -348,7 +352,9 @@ MDNSResponder::stcMDNSServiceQuery* MDNSResponder::_findLegacyServiceQuery(void)
     while (pServiceQuery)
     {
         if (pServiceQuery->m_bLegacyQuery)
+        {
             break;
+        }
         pServiceQuery = pServiceQuery->m_pNext;
     }
     return pServiceQuery;
@@ -415,7 +421,9 @@ bool MDNSResponder::_setHostname(const char* p_pcHostname)
 #ifdef MDNS_FORCE_LOWERCASE_HOSTNAME
             size_t i = 0;
             for (; i < stLength; ++i)
+            {
                 m_pcHostname[i] = (isupper(p_pcHostname[i]) ? tolower(p_pcHostname[i]) : p_pcHostname[i]);
+            }
             m_pcHostname[i] = 0;
 #else
             strncpy(m_pcHostname, p_pcHostname, (stLength + 1));
@@ -490,7 +498,9 @@ bool MDNSResponder::_releaseService(MDNSResponder::stcMDNSService* p_pService)
         stcMDNSService* pPred = m_pServices;
         while ((pPred) &&
                 (pPred->m_pNext != p_pService))
+        {
             pPred = pPred->m_pNext;
+        }
         if (pPred)
         {
             pPred->m_pNext = p_pService->m_pNext;
@@ -544,7 +554,9 @@ MDNSResponder::stcMDNSService* MDNSResponder::_findService(const char* p_pcName,
                 (0 == strcmp(pService->m_pcService, p_pcService)) &&
                 (0 == strcmp(pService->m_pcProtocol, p_pcProtocol)))
 
+        {
             break;
+        }
         pService = pService->m_pNext;
     }
     return pService;
@@ -560,7 +572,9 @@ MDNSResponder::stcMDNSService* MDNSResponder::_findService(const MDNSResponder::
     while (pService)
     {
         if (p_hService == (hMDNSService)pService)
+        {
             break;
+        }
         pService = pService->m_pNext;
     }
     return pService;
@@ -689,9 +703,13 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_addServiceTxt(MDNSResponder::s
 
         stcMDNSServiceTxt*  pTxt = p_pService->m_Txts.find(p_pcKey);
         if (pTxt)
+        {
             pResult = _updateServiceTxt(p_pService, pTxt, p_pcValue, p_bTemp);
+        }
         else
+        {
             pResult = _allocServiceTxt(p_pService, p_pcKey, p_pcValue, p_bTemp);
+        }
     }
     return pResult;
 }
@@ -713,9 +731,13 @@ bool MDNSResponder::_collectServiceTxts(MDNSResponder::stcMDNSService& p_rServic
 
     // Call Dynamic service callbacks
     if (m_fnServiceTxtCallback)
+    {
         m_fnServiceTxtCallback((hMDNSService)&p_rService);
+    }
     if (p_rService.m_fnTxtCallback)
+    {
         p_rService.m_fnTxtCallback((hMDNSService)&p_rService);
+    }
     return true;
 }
 
@@ -749,14 +771,20 @@ bool MDNSResponder::_printRRDomain(const MDNSResponder::stcMDNS_RRDomain& p_RRDo
         while (u8Length)
         {
             for (uint8_t u = 0; u < u8Length; ++u)
+            {
                 DEBUG_OUTPUT.printf_P(PSTR("%c"), *(pCursor++));
+            }
             u8Length = *pCursor++;
             if (u8Length)
+            {
                 DEBUG_OUTPUT.printf_P(PSTR("."));
+            }
         }
     }
     else    // empty domain
+    {
         DEBUG_OUTPUT.printf_P(PSTR("-empty-"));
+    }
     //DEBUG_OUTPUT.printf_P(PSTR("\n"));
 
     return true;

@@ -31,9 +31,13 @@ void ESP8266WiFiMesh::verboseModePrint(const String &stringToPrint, bool newline
     if (_verboseMode)
     {
         if (newline)
+        {
             Serial.println(stringToPrint);
+        }
         else
+        {
             Serial.print(stringToPrint);
+        }
     }
 }
 
@@ -53,7 +57,9 @@ void ESP8266WiFiMesh::storeLwipVersion()
     for (int versionPart = 0; versionPart < 3; versionPart++)
     {
         while (!isdigit(currentChar))
+        {
             currentChar = fullVersion.charAt(++i);
+        }
         while (isdigit(currentChar))
         {
             _lwipVersion[versionPart] = 10 * _lwipVersion[versionPart] + (currentChar - '0'); // Left shift and add digit value, in base 10.
@@ -70,9 +76,13 @@ bool ESP8266WiFiMesh::atLeastLwipVersion(const uint32_t minLwipVersion[3])
     for (int versionPart = 0; versionPart < 3; versionPart++)
     {
         if (_lwipVersion[versionPart] > minLwipVersion[versionPart])
+        {
             return true;
+        }
         else if (_lwipVersion[versionPart] < minLwipVersion[versionPart])
+        {
             return false;
+        }
     }
 
     return true;

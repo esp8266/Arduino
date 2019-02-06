@@ -14,7 +14,10 @@
 static spiffs_cache_page *spiffs_cache_page_get(spiffs *fs, spiffs_page_ix pix)
 {
     spiffs_cache *cache = spiffs_get_cache(fs);
-    if ((cache->cpage_use_map & cache->cpage_use_mask) == 0) return 0;
+    if ((cache->cpage_use_map & cache->cpage_use_mask) == 0)
+    {
+        return 0;
+    }
     int i;
     for (i = 0; i < cache->cpage_count; i++)
     {
@@ -51,7 +54,9 @@ static s32_t spiffs_cache_page_free(spiffs *fs, int ix, u8_t write_back)
 
 #if SPIFFS_CACHE_WR
         if (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR)
+        {
             SPIFFS_CACHE_DBG("CACHE_FREE: free cache page "_SPIPRIi" objid "_SPIPRIid"\n", ix, cp->obj_id);
+        }
         else
 #endif
         {
@@ -92,7 +97,9 @@ static s32_t spiffs_cache_page_remove_oldest(spiffs *fs, u8_t flag_mask, u8_t fl
     }
 
     if (cand_ix >= 0)
+    {
         res = spiffs_cache_page_free(fs, cand_ix, 1);
+    }
 
     return res;
 }
@@ -127,7 +134,9 @@ void spiffs_cache_drop_page(spiffs *fs, spiffs_page_ix pix)
 {
     spiffs_cache_page *cp =  spiffs_cache_page_get(fs, pix);
     if (cp)
+    {
         spiffs_cache_page_free(fs, cp->ix, 0);
+    }
 }
 
 // ------------------------------
@@ -242,7 +251,9 @@ s32_t spiffs_phys_wr(
             return SPIFFS_HAL_WRITE(fs, addr, len, src);
         }
         else
+        {
             return SPIFFS_OK;
+        }
     }
     else
     {
@@ -270,7 +281,9 @@ spiffs_cache_page *spiffs_cache_page_get_by_fd(spiffs *fs, spiffs_fd *fd)
         if ((cache->cpage_use_map & (1 << i)) &&
                 (cp->flags & SPIFFS_CACHE_FLAG_TYPE_WR) &&
                 cp->obj_id == fd->obj_id)
+        {
             return cp;
+        }
     }
 
     return 0;
@@ -300,14 +313,19 @@ spiffs_cache_page *spiffs_cache_page_allocate_by_fd(spiffs *fs, spiffs_fd *fd)
 // unrefers all fds that this cache page refers to and releases the cache page
 void spiffs_cache_fd_release(spiffs *fs, spiffs_cache_page *cp)
 {
-    if (cp == 0) return;
+    if (cp == 0)
+    {
+        return;
+    }
     u32_t i;
     spiffs_fd *fds = (spiffs_fd *)fs->fd_space;
     for (i = 0; i < fs->fd_count; i++)
     {
         spiffs_fd *cur_fd = &fds[i];
         if (cur_fd->file_nbr != 0 && cur_fd->cache_page == cp)
+        {
             cur_fd->cache_page = 0;
+        }
     }
     spiffs_cache_page_free(fs, cp->ix, 0);
 
@@ -319,13 +337,19 @@ void spiffs_cache_fd_release(spiffs *fs, spiffs_cache_page *cp)
 // initializes the cache
 void spiffs_cache_init(spiffs *fs)
 {
-    if (fs->cache == 0) return;
+    if (fs->cache == 0)
+    {
+        return;
+    }
     u32_t sz = fs->cache_size;
     u32_t cache_mask = 0;
     int i;
     int cache_entries =
         (sz - sizeof(spiffs_cache)) / (SPIFFS_CACHE_PAGE_SIZE(fs));
-    if (cache_entries <= 0) return;
+    if (cache_entries <= 0)
+    {
+        return;
+    }
 
     for (i = 0; i < cache_entries; i++)
     {
@@ -348,7 +372,9 @@ void spiffs_cache_init(spiffs *fs)
 
     c->cpage_use_map &= ~(c->cpage_use_mask);
     for (i = 0; i < cache.cpage_count; i++)
+    {
         spiffs_get_cache_page_hdr(fs, c, i)->ix = i;
+    }
 }
 
 #endif // SPIFFS_CACHE

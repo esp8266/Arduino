@@ -550,7 +550,9 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
         // Check, if a reply is needed
         uint8_t u8ReplyNeeded = sendParameter.m_u8HostReplyMask;
         for (stcMDNSService* pService = m_pServices; pService; pService = pService->m_pNext)
+        {
             u8ReplyNeeded |= pService->m_u8ReplyMask;
+        }
 
         if (u8ReplyNeeded)
         {
@@ -563,8 +565,10 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
         }
         DEBUG_EX_INFO(
             else
-                DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: No reply needed\n"));
-            );
+        {
+            DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: No reply needed\n"));
+        }
+        );
     }
     else
     {
@@ -1173,7 +1177,9 @@ bool MDNSResponder::_processAAAAAnswer(const MDNSResponder::stcMDNS_RRAnswerAAAA
                             pSQAnswer->m_u32ContentFlags |= ServiceQueryAnswerType_IP6Address;
 
                             if (pServiceQuery->m_fnCallback)
+                            {
                                 pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), ServiceQueryAnswerType_IP6Address, true, pServiceQuery->m_pUserdata);
+                            }
                         }
                         else
                         {
@@ -1243,7 +1249,9 @@ bool MDNSResponder::_updateProbeStatus(void)
             m_HostProbeInformation.m_ProbingStatus = ProbingStatus_Done;
             m_HostProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
             if (m_HostProbeInformation.m_fnHostProbeResultCallback)
+            {
                 m_HostProbeInformation.m_fnHostProbeResultCallback(m_pcHostname, true);
+            }
 
             // Prepare to announce host
             m_HostProbeInformation.m_u8SentCount = 0;
@@ -1301,7 +1309,9 @@ bool MDNSResponder::_updateProbeStatus(void)
                 pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_Done;
                 pService->m_ProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
                 if (pService->m_ProbeInformation.m_fnServiceProbeResultCallback)
+                {
                     pService->m_ProbeInformation.m_fnServiceProbeResultCallback(pService->m_pcName, pService, true);
+                }
                 // Prepare to announce service
                 pService->m_ProbeInformation.m_u8SentCount = 0;
                 pService->m_ProbeInformation.m_Timeout.reset(MDNS_ANNOUNCE_DELAY);
@@ -1499,7 +1509,9 @@ bool MDNSResponder::_cancelProbingForHost(void)
     }
 
     for (stcMDNSService* pService = m_pServices; ((!bResult) && (pService)); pService = pService->m_pNext)
+    {
         bResult = _cancelProbingForService(*pService);
+    }
     return bResult;
 }
 
@@ -1878,7 +1890,9 @@ bool MDNSResponder::_checkServiceQueryCache(void)
                             );
                             pSQAnswer->removeIP4Address(pIP4Address);
                             if (!pSQAnswer->m_pIP4Addresses)    // NO IP4 address left -> remove content flag
+                            {
                                 pSQAnswer->m_u32ContentFlags &= ~ServiceQueryAnswerType_IP4Address;
+                            }
                             // Notify client
                             if (pServiceQuery->m_fnCallback)
                             {
@@ -1933,10 +1947,14 @@ bool MDNSResponder::_checkServiceQueryCache(void)
                             );
                             pSQAnswer->removeIP6Address(pIP6Address);
                             if (!pSQAnswer->m_pIP6Addresses)    // NO IP6 address left -> remove content flag
+                            {
                                 pSQAnswer->m_u32ContentFlags &= ~ServiceQueryAnswerType_IP6Address;
+                            }
                             // Notify client
                             if (pServiceQuery->m_fnCallback)
+                            {
                                 pServiceQuery->m_fnCallback(this, (hMDNSServiceQuery)pServiceQuery, pServiceQuery->indexOfAnswer(pSQAnswer), ServiceQueryAnswerType_IP6Address, false, pServiceQuery->m_pUserdata);
+                            }
                         }
                     }   // IP6 flagged
 

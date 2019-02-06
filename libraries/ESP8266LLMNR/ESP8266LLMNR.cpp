@@ -79,14 +79,18 @@ LLMNRResponder::LLMNRResponder() :
 LLMNRResponder::~LLMNRResponder()
 {
     if (_conn)
+    {
         _conn->unref();
+    }
 }
 
 bool LLMNRResponder::begin(const char* hostname)
 {
     // Max length for a single label in DNS
     if (strlen(hostname) > 63)
+    {
         return false;
+    }
 
     _hostname = hostname;
     _hostname.toLowerCase();
@@ -122,13 +126,17 @@ bool LLMNRResponder::_restart()
     IPAddress llmnr(LLMNR_MULTICAST_ADDR);
 
     if (igmp_joingroup(IP4_ADDR_ANY4, llmnr) != ERR_OK)
+    {
         return false;
+    }
 
     _conn = new UdpContext;
     _conn->ref();
 
     if (!_conn->listen(IP_ADDR_ANY, LLMNR_PORT))
+    {
         return false;
+    }
 
     _conn->setMulticastTTL(LLMNR_MULTICAST_TTL);
     _conn->onRx(std::bind(&LLMNRResponder::_process_packet, this));
@@ -139,7 +147,9 @@ bool LLMNRResponder::_restart()
 void LLMNRResponder::_process_packet()
 {
     if (!_conn || !_conn->next())
+    {
         return;
+    }
 
 #ifdef LLMNR_DEBUG
     Serial.println("LLMNR: RX'd packet");
@@ -241,7 +251,9 @@ void LLMNRResponder::_process_packet()
 #ifdef LLMNR_DEBUG
     Serial.println("Match; responding");
     if (!have_rr)
+    {
         Serial.println("(no matching RRs)");
+    }
 #endif
 
     IPAddress remote_ip = _conn->getRemoteAddress();
@@ -254,10 +266,14 @@ void LLMNRResponder::_process_packet()
         IPAddress infoIp(ip_info.ip);
         IPAddress infoMask(ip_info.netmask);
         if (ip_info.ip.addr && ip_addr_netcmp((const ip_addr_t*)remote_ip, (const ip_addr_t*)infoIp, ip_2_ip4((const ip_addr_t*)infoMask)))
+        {
             match_ap = true;
+        }
     }
     if (!match_ap)
+    {
         wifi_get_ip_info(STATION_IF, &ip_info);
+    }
     uint32_t ip = ip_info.ip.addr;
 
     // Header

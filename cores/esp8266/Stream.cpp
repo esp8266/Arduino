@@ -34,7 +34,9 @@ int Stream::timedRead()
     {
         c = read();
         if (c >= 0)
+        {
             return c;
+        }
         yield();
     } while (millis() - _startMillis < _timeout);
     return -1;     // -1 indicates timeout
@@ -49,7 +51,9 @@ int Stream::timedPeek()
     {
         c = peek();
         if (c >= 0)
+        {
             return c;
+        }
         yield();
     } while (millis() - _startMillis < _timeout);
     return -1;     // -1 indicates timeout
@@ -64,11 +68,17 @@ int Stream::peekNextDigit()
     {
         c = timedPeek();
         if (c < 0)
-            return c;  // timeout
+        {
+            return c;    // timeout
+        }
         if (c == '-')
+        {
             return c;
+        }
         if (c >= '0' && c <= '9')
+        {
             return c;
+        }
         read();  // discard non-numeric
     }
 }
@@ -110,27 +120,37 @@ bool Stream::findUntil(const char *target, size_t targetLen, const char *termina
     int c;
 
     if (*target == 0)
-        return true;   // return true if target is a null string
+    {
+        return true;    // return true if target is a null string
+    }
     while ((c = timedRead()) > 0)
     {
 
         if (c != target[index])
-            index = 0; // reset index if any char does not match
+        {
+            index = 0;    // reset index if any char does not match
+        }
 
         if (c == target[index])
         {
             //////Serial.print("found "); Serial.write(c); Serial.print("index now"); Serial.println(index+1);
             if (++index >= targetLen)  // return true if all chars in the target match
+            {
                 return true;
+            }
         }
 
         if (termLen > 0 && c == terminator[termIndex])
         {
             if (++termIndex >= termLen)
-                return false;       // return false if terminate string found before target string
+            {
+                return false;    // return false if terminate string found before target string
+            }
         }
         else
+        {
             termIndex = 0;
+        }
     }
     return false;
 }
@@ -154,22 +174,30 @@ long Stream::parseInt(char skipChar)
     c = peekNextDigit();
     // ignore non numeric leading characters
     if (c < 0)
-        return 0; // zero returned if timeout
+    {
+        return 0;    // zero returned if timeout
+    }
 
     do
     {
         if (c == skipChar)
             ; // ignore this charactor
         else if (c == '-')
+        {
             isNegative = true;
+        }
         else if (c >= '0' && c <= '9')       // is c a digit?
+        {
             value = value * 10 + c - '0';
+        }
         read();  // consume the character we got with peek
         c = timedPeek();
     } while ((c >= '0' && c <= '9') || c == skipChar);
 
     if (isNegative)
+    {
         value = -value;
+    }
     return value;
 }
 
@@ -192,32 +220,46 @@ float Stream::parseFloat(char skipChar)
     c = peekNextDigit();
     // ignore non numeric leading characters
     if (c < 0)
-        return 0; // zero returned if timeout
+    {
+        return 0;    // zero returned if timeout
+    }
 
     do
     {
         if (c == skipChar)
             ; // ignore
         else if (c == '-')
+        {
             isNegative = true;
+        }
         else if (c == '.')
+        {
             isFraction = true;
+        }
         else if (c >= '0' && c <= '9')       // is c a digit?
         {
             value = value * 10 + c - '0';
             if (isFraction)
+            {
                 fraction *= 0.1;
+            }
         }
         read();  // consume the character we got with peek
         c = timedPeek();
     } while ((c >= '0' && c <= '9') || c == '.' || c == skipChar);
 
     if (isNegative)
+    {
         value = -value;
+    }
     if (isFraction)
+    {
         return value * fraction;
+    }
     else
+    {
         return value;
+    }
 }
 
 // read characters from stream into buffer
@@ -232,7 +274,9 @@ size_t Stream::readBytes(char *buffer, size_t length)
     {
         int c = timedRead();
         if (c < 0)
+        {
             break;
+        }
         *buffer++ = (char) c;
         count++;
     }
@@ -246,13 +290,17 @@ size_t Stream::readBytes(char *buffer, size_t length)
 size_t Stream::readBytesUntil(char terminator, char *buffer, size_t length)
 {
     if (length < 1)
+    {
         return 0;
+    }
     size_t index = 0;
     while (index < length)
     {
         int c = timedRead();
         if (c < 0 || c == terminator)
+        {
             break;
+        }
         *buffer++ = (char) c;
         index++;
     }

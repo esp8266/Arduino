@@ -50,7 +50,9 @@ void DNSServer::downcaseAndRemoveWwwPrefix(String &domainName)
 {
     domainName.toLowerCase();
     if (domainName.startsWith("www."))
+    {
         domainName.remove(0, 4);
+    }
 }
 
 void DNSServer::respondToRequest(uint8_t *buffer, size_t length)
@@ -65,22 +67,30 @@ void DNSServer::respondToRequest(uint8_t *buffer, size_t length)
 
     // Must be a query for us to do anything with it
     if (dnsHeader->QR != DNS_QR_QUERY)
+    {
         return;
+    }
 
     // If operation is anything other than query, we don't do it
     if (dnsHeader->OPCode != DNS_OPCODE_QUERY)
+    {
         return replyWithError(dnsHeader, DNSReplyCode::NotImplemented);
+    }
 
     // Only support requests containing single queries - everything else
     // is badly defined
     if (dnsHeader->QDCount != lwip_htons(1))
+    {
         return replyWithError(dnsHeader, DNSReplyCode::FormError);
+    }
 
     // We must return a FormError in the case of a non-zero ARCount to
     // be minimally compatible with EDNS resolvers
     if (dnsHeader->ANCount != 0 || dnsHeader->NSCount != 0
             || dnsHeader->ARCount != 0)
+    {
         return replyWithError(dnsHeader, DNSReplyCode::FormError);
+    }
 
     // Even if we're not going to use the query, we need to parse it
     // so we can check the address type that's being queried
@@ -91,14 +101,18 @@ void DNSServer::respondToRequest(uint8_t *buffer, size_t length)
     {
         labelLength = *start;
         if (labelLength + 1 > remaining)
+        {
             return replyWithError(dnsHeader, DNSReplyCode::FormError);
+        }
         remaining -= (labelLength + 1);
         start += (labelLength + 1);
     }
 
     // 1 octet labelLength, 2 octet qtype, 2 octet qclass
     if (remaining < 5)
+    {
         return replyWithError(dnsHeader, DNSReplyCode::FormError);
+    }
 
     start += 1; // Skip the 0 length label that we found above
 
@@ -126,7 +140,9 @@ void DNSServer::respondToRequest(uint8_t *buffer, size_t length)
 
     // If we're running with a wildcard we can just return a result now
     if (_domainName == "*")
+    {
         return replyWithIP(dnsHeader, query, queryLength);
+    }
 
     matchString = _domainName.c_str();
 
@@ -134,7 +150,9 @@ void DNSServer::respondToRequest(uint8_t *buffer, size_t length)
 
     // If there's a leading 'www', skip it
     if (*start == 3 && strncasecmp("www", (char *) start + 1, 3) == 0)
+    {
         start += 4;
+    }
 
     while (*start != 0)
     {
@@ -150,7 +168,9 @@ void DNSServer::respondToRequest(uint8_t *buffer, size_t length)
             --labelLength;
         }
         if (*start == 0 && *matchString == '\0')
+        {
             return replyWithIP(dnsHeader, query, queryLength);
+        }
 
         if (*matchString != '.')
             return replyWithError(dnsHeader, _errorReplyCode,
@@ -168,22 +188,30 @@ void DNSServer::processNextRequest()
 
     currentPacketSize = _udp.parsePacket();
     if (currentPacketSize == 0)
+    {
         return;
+    }
 
     // The DNS RFC requires that DNS packets be less than 512 bytes in size,
     // so just discard them if they are larger
     if (currentPacketSize > MAX_DNS_PACKETSIZE)
+    {
         return;
+    }
 
     // If the packet size is smaller than the DNS header, then someone is
     // messing with us
     if (currentPacketSize < DNS_HEADER_SIZE)
+    {
         return;
+    }
 
     std::unique_ptr<uint8_t[]> buffer(new (std::nothrow) uint8_t[currentPacketSize]);
 
     if (buffer == NULL)
+    {
         return;
+    }
 
     _udp.read(buffer.get(), currentPacketSize);
     respondToRequest(buffer.get(), currentPacketSize);
@@ -238,9 +266,13 @@ void DNSServer::replyWithError(DNSHeader *dnsHeader,
     dnsHeader->QR = DNS_QR_RESPONSE;
     dnsHeader->RCode = (unsigned char) rcode;
     if (query)
+    {
         dnsHeader->QDCount = lwip_htons(1);
+    }
     else
+    {
         dnsHeader->QDCount = 0;
+    }
     dnsHeader->ANCount = 0;
     dnsHeader->NSCount = 0;
     dnsHeader->ARCount = 0;
@@ -248,7 +280,9 @@ void DNSServer::replyWithError(DNSHeader *dnsHeader,
     _udp.beginPacket(_udp.remoteIP(), _udp.remotePort());
     _udp.write((unsigned char *)dnsHeader, sizeof(DNSHeader));
     if (query != NULL)
+    {
         _udp.write(query, queryLength);
+    }
     _udp.endPacket();
 }
 

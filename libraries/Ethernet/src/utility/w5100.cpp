@@ -55,7 +55,9 @@ uint16_t W5100Class::getTXFreeSize(SOCKET s)
     {
         val1 = readSnTX_FSR(s);
         if (val1 != 0)
+        {
             val = readSnTX_FSR(s);
+        }
     } while (val != val1);
     return val;
 }
@@ -67,7 +69,9 @@ uint16_t W5100Class::getRXReceivedSize(SOCKET s)
     {
         val1 = readSnRX_RSR(s);
         if (val1 != 0)
+        {
             val = readSnRX_RSR(s);
+        }
     } while (val != val1);
     return val;
 }
@@ -94,7 +98,9 @@ void W5100Class::send_data_processing_offset(SOCKET s, uint16_t data_offset, con
         write(SBASE[s], data + size, len - size);
     }
     else
+    {
         write(dstAddr, data, len);
+    }
 
     ptr += len;
     writeSnTX_WR(s, ptr);
@@ -130,7 +136,9 @@ void W5100Class::read_data(SOCKET s, volatile uint16_t src, volatile uint8_t *ds
         read(RBASE[s], (uint8_t *) dst, len - size);
     }
     else
+    {
         read(src_ptr, (uint8_t *) dst, len);
+    }
 }
 
 

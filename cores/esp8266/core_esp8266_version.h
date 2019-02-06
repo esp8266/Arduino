@@ -94,7 +94,9 @@ extern "C++"
             while (f && arr[i])
             {
                 if (isMinus(arr, i))
+                {
                     i++;
+                }
                 for (; isDecimal(arr[i]); i++);
                 f--;
                 for (; arr[i] && !isMinus(arr, i) && !isDecimal(arr[i]); i++);

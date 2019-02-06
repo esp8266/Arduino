@@ -93,7 +93,9 @@ void wifi_wps_status_cb(wps_cb_status status)
     {
     case WPS_CB_ST_SUCCESS:
         if (!wifi_wps_disable())
+        {
             DEBUGV("wps disable failed\n");
+        }
         wifi_station_connect();
         break;
     case WPS_CB_ST_FAILED:
@@ -108,7 +110,9 @@ void wifi_wps_status_cb(wps_cb_status status)
     case WPS_CB_ST_UNK:
         DEBUGV("wps UNKNOWN\n");
         if (!wifi_wps_disable())
+        {
             DEBUGV("wps disable failed\n");
+        }
         break;
     }
     // TODO user function to get status

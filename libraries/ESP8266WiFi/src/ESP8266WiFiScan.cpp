@@ -71,7 +71,9 @@ std::function<void(int)> ESP8266WiFiScanClass::_onComplete;
 int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 channel, uint8* ssid)
 {
     if (ESP8266WiFiScanClass::_scanStarted)
+    {
         return WIFI_SCAN_RUNNING;
+    }
 
     ESP8266WiFiScanClass::_scanAsync = async;
 
@@ -79,7 +81,9 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 ch
 
     int status = wifi_station_get_connect_status();
     if (status != STATION_GOT_IP && status != STATION_IDLE)
+    {
         wifi_station_disconnect();
+    }
 
     scanDelete();
 
@@ -103,7 +107,9 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 ch
         return ESP8266WiFiScanClass::_scanCount;
     }
     else
+    {
         return WIFI_SCAN_FAILED;
+    }
 
 }
 
@@ -128,10 +134,14 @@ int8_t ESP8266WiFiScanClass::scanComplete()
 {
 
     if (_scanStarted)
+    {
         return WIFI_SCAN_RUNNING;
+    }
 
     if (_scanComplete)
+    {
         return ESP8266WiFiScanClass::_scanCount;
+    }
 
     return WIFI_SCAN_FAILED;
 }
@@ -166,7 +176,9 @@ bool ESP8266WiFiScanClass::getNetworkInfo(uint8_t i, String &ssid, uint8_t &encT
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
+    {
         return false;
+    }
 
     ssid = (const char*) it->ssid;
     encType = encryptionType(i);
@@ -188,7 +200,9 @@ String ESP8266WiFiScanClass::SSID(uint8_t i)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
+    {
         return "";
+    }
     char tmp[33]; //ssid can be up to 32chars, => plus null term
     memcpy(tmp, it->ssid, sizeof(it->ssid));
     tmp[32] = 0; //nullterm in case of 32 char ssid
@@ -206,7 +220,9 @@ uint8_t ESP8266WiFiScanClass::encryptionType(uint8_t i)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
+    {
         return -1;
+    }
 
     switch (it->authmode)
     {
@@ -234,7 +250,9 @@ int32_t ESP8266WiFiScanClass::RSSI(uint8_t i)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
+    {
         return 0;
+    }
     return it->rssi;
 }
 
@@ -248,7 +266,9 @@ uint8_t * ESP8266WiFiScanClass::BSSID(uint8_t i)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
+    {
         return 0;
+    }
     return it->bssid;
 }
 
@@ -262,7 +282,9 @@ String ESP8266WiFiScanClass::BSSIDstr(uint8_t i)
     char mac[18] = { 0 };
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
+    {
         return String("");
+    }
     sprintf(mac, "%02X:%02X:%02X:%02X:%02X:%02X", it->bssid[0], it->bssid[1], it->bssid[2], it->bssid[3], it->bssid[4], it->bssid[5]);
     return String(mac);
 }
@@ -271,7 +293,9 @@ int32_t ESP8266WiFiScanClass::channel(uint8_t i)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
+    {
         return 0;
+    }
     return it->channel;
 }
 
@@ -284,7 +308,9 @@ bool ESP8266WiFiScanClass::isHidden(uint8_t i)
 {
     struct bss_info* it = reinterpret_cast<struct bss_info*>(_getScanInfoByIndex(i));
     if (!it)
+    {
         return false;
+    }
     return (it->is_hidden != 0);
 }
 
@@ -311,13 +337,17 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status)
             ;
         ESP8266WiFiScanClass::_scanCount = i;
         if (i == 0)
+        {
             ESP8266WiFiScanClass::_scanResult = 0;
+        }
         else
         {
             bss_info* copied_info = new bss_info[i];
             i = 0;
             for (bss_info* it = head; it; it = STAILQ_NEXT(it, next), ++i)
+            {
                 memcpy(copied_info + i, it, sizeof(bss_info));
+            }
 
             ESP8266WiFiScanClass::_scanResult = copied_info;
         }
@@ -328,7 +358,9 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status)
     ESP8266WiFiScanClass::_scanComplete = true;
 
     if (!ESP8266WiFiScanClass::_scanAsync)
+    {
         esp_schedule();
+    }
     else if (ESP8266WiFiScanClass::_onComplete)
     {
         ESP8266WiFiScanClass::_onComplete(ESP8266WiFiScanClass::_scanCount);
@@ -344,6 +376,8 @@ void ESP8266WiFiScanClass::_scanDone(void* result, int status)
 void * ESP8266WiFiScanClass::_getScanInfoByIndex(int i)
 {
     if (!ESP8266WiFiScanClass::_scanResult || (size_t) i > ESP8266WiFiScanClass::_scanCount)
+    {
         return 0;
+    }
     return reinterpret_cast<bss_info*>(ESP8266WiFiScanClass::_scanResult) + i;
 }

@@ -68,9 +68,13 @@ ESP8266WiFiMesh::ESP8266WiFiMesh(ESP8266WiFiMesh::requestHandlerType requestHand
 void ESP8266WiFiMesh::updateNetworkNames(const String &newMeshName, const String &newNodeID)
 {
     if (newMeshName != "")
+    {
         _meshName = newMeshName;
+    }
     if (newNodeID != "")
+    {
         _nodeID = newNodeID;
+    }
 
     String newSSID = _meshName + _nodeID;
 
@@ -80,7 +84,9 @@ void ESP8266WiFiMesh::updateNetworkNames(const String &newMeshName, const String
 
         // Apply SSID changes to active AP.
         if (isAPController())
+        {
             restartAP();
+        }
     }
 }
 
@@ -97,13 +103,19 @@ void ESP8266WiFiMesh::begin()
     {
         ////////////////////////////</DEPRECATED> TODO: REMOVE IN 2.5.0////////////////////////////
         if (!ESP8266WiFiMesh::getAPController()) // If there is no active AP controller
-            WiFi.mode(WIFI_STA); // WIFI_AP_STA mode automatically sets up an AP, so we can't use that as default.
+        {
+            WiFi.mode(WIFI_STA);    // WIFI_AP_STA mode automatically sets up an AP, so we can't use that as default.
+        }
 
 #ifdef ENABLE_STATIC_IP_OPTIMIZATION
         if (atLeastLwipVersion(lwipVersion203Signature))
+        {
             verboseModePrint(F("lwIP version is at least 2.0.3. Static ip optimizations enabled.\n"));
+        }
         else
+        {
             verboseModePrint(F("lwIP version is less than 2.0.3. Static ip optimizations DISABLED.\n"));
+        }
 #endif
     }
 }
@@ -122,7 +134,9 @@ void ESP8266WiFiMesh::setStaticIP(const IPAddress &newIP)
 IPAddress ESP8266WiFiMesh::getStaticIP()
 {
     if (staticIPActivated)
+    {
         return staticIP;
+    }
 
     return emptyIP;
 }
@@ -138,7 +152,9 @@ void ESP8266WiFiMesh::activateAP()
 {
     // Deactivate active AP to avoid two servers using the same port, which can lead to crashes.
     if (ESP8266WiFiMesh *currentAPController = ESP8266WiFiMesh::getAPController())
+    {
         currentAPController->deactivateAP();
+    }
 
     WiFi.softAP(_SSID.c_str(), _meshPassword.c_str(), _meshWiFiChannel, _apHidden, _maxAPStations);   // Note that a maximum of 8 stations can be connected at a time to each AP
     WiFi.mode(WIFI_AP_STA);
@@ -193,7 +209,9 @@ void ESP8266WiFiMesh::setWiFiChannel(uint8 newWiFiChannel)
     {
         // Apply changes to active AP.
         if (isAPController())
+        {
             restartAP();
+        }
     }
 }
 
@@ -286,7 +304,9 @@ void ESP8266WiFiMesh::setAPHidden(bool apHidden)
 
         // Apply changes to active AP.
         if (isAPController())
+        {
             restartAP();
+        }
     }
 }
 
@@ -305,7 +325,9 @@ void ESP8266WiFiMesh::setMaxAPStations(uint8_t maxAPStations)
 
         // Apply changes to active AP.
         if (isAPController())
+        {
             restartAP();
+        }
     }
 }
 
@@ -347,11 +369,15 @@ uint32_t ESP8266WiFiMesh::getAPModeTimeout()
 bool ESP8266WiFiMesh::latestTransmissionSuccessful()
 {
     if (ESP8266WiFiMesh::latestTransmissionOutcomes.empty())
+    {
         return false;
+    }
     else
         for (TransmissionResult &transmissionResult : ESP8266WiFiMesh::latestTransmissionOutcomes)
             if (transmissionResult.transmissionStatus != TS_TRANSMISSION_COMPLETE)
+            {
                 return false;
+            }
 
     return true;
 }
@@ -482,11 +508,17 @@ transmission_status_t ESP8266WiFiMesh::attemptDataTransferKernel()
 void ESP8266WiFiMesh::initiateConnectionToAP(const String &targetSSID, int targetChannel, uint8_t *targetBSSID)
 {
     if (targetChannel == NETWORK_INFO_DEFAULT_INT)
-        WiFi.begin(targetSSID.c_str(), _meshPassword.c_str());   // Without giving channel and BSSID, connection time is longer.
+    {
+        WiFi.begin(targetSSID.c_str(), _meshPassword.c_str());    // Without giving channel and BSSID, connection time is longer.
+    }
     else if (targetBSSID == NULL)
-        WiFi.begin(targetSSID.c_str(), _meshPassword.c_str(), targetChannel);   // Without giving channel and BSSID, connection time is longer.
+    {
+        WiFi.begin(targetSSID.c_str(), _meshPassword.c_str(), targetChannel);    // Without giving channel and BSSID, connection time is longer.
+    }
     else
+    {
         WiFi.begin(targetSSID.c_str(), _meshPassword.c_str(), targetChannel, targetBSSID);
+    }
 }
 
 /**
@@ -589,7 +621,9 @@ void ESP8266WiFiMesh::attemptTransmission(const String &message, bool concluding
             int n = 0;
 #ifdef ENABLE_WIFI_SCAN_OPTIMIZATION
             if (scanAllWiFiChannels)
+            {
                 n = WiFi.scanNetworks(false, _scanHidden);
+            }
             else
             {
                 // Scan function argument overview: scanNetworks(bool async = false, bool show_hidden = false, uint8 channel = 0, uint8* ssid = NULL)
@@ -667,10 +701,14 @@ void ESP8266WiFiMesh::acceptRequest()
         {
             _client = _server.available();
             if (!_client)
+            {
                 break;
+            }
 
             if (!waitForClient(_client, _apModeTimeoutMs))
+            {
                 continue;
+            }
 
             /* Read in request and pass it to the supplied handler */
             String request = _client.readStringUntil('\r');
@@ -680,7 +718,9 @@ void ESP8266WiFiMesh::acceptRequest()
 
             /* Send the response back to the client */
             if (_client.connected())
+            {
                 _client.println(response);
+            }
         }
     }
     else
@@ -691,10 +731,14 @@ void ESP8266WiFiMesh::acceptRequest()
             WiFiClient _client = _server.available();
 
             if (!_client)
+            {
                 break;
+            }
 
             if (!waitForClientTransmission(_client, _apModeTimeoutMs) || !_client.available())
+            {
                 continue;
+            }
 
             /* Read in request and pass it to the supplied requestHandler */
             String request = _client.readStringUntil('\r');

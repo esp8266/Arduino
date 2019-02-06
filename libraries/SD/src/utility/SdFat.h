@@ -317,7 +317,10 @@ public:
     */
     void setUnbufferedRead(void)
     {
-        if (isFile()) flags_ |= F_FILE_UNBUFFERED_READ;
+        if (isFile())
+        {
+            flags_ |= F_FILE_UNBUFFERED_READ;
+        }
     }
     uint8_t timestamp(uint8_t flag, uint16_t year, uint8_t month, uint8_t day,
                       uint8_t hour, uint8_t minute, uint8_t second);

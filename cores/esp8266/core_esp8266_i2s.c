@@ -88,7 +88,9 @@ static uint32_t _i2s_sample_rate;
 static bool _i2s_is_full(const i2s_state_t *ch)
 {
     if (!ch)
+    {
         return false;
+    }
     return (ch->curr_slc_buf_pos == SLC_BUF_LEN || ch->curr_slc_buf == NULL) && (ch->slc_queue_len == 0);
 }
 
@@ -105,7 +107,9 @@ bool i2s_rx_is_full()
 static bool _i2s_is_empty(const i2s_state_t *ch)
 {
     if (!ch)
+    {
         return false;
+    }
     return (ch->slc_queue_len >= SLC_BUF_CNT - 1);
 }
 
@@ -122,7 +126,9 @@ bool i2s_rx_is_empty()
 static uint16_t _i2s_available(const i2s_state_t *ch)
 {
     if (!ch)
+    {
         return 0;
+    }
     return (SLC_BUF_CNT - ch->slc_queue_len) * SLC_BUF_LEN;
 }
 
@@ -143,7 +149,9 @@ static uint32_t * ICACHE_RAM_ATTR i2s_slc_queue_next_item(i2s_state_t *ch)
     uint32_t *item = ch->slc_queue[0];
     ch->slc_queue_len--;
     for (i = 0; i < ch->slc_queue_len; i++)
+    {
         ch->slc_queue[i] = ch->slc_queue[i + 1];
+    }
     return item;
 }
 
@@ -154,12 +162,18 @@ static void ICACHE_RAM_ATTR i2s_slc_queue_append_item(i2s_state_t *ch, uint32_t 
     for (int i = 0, dest = 0; i < ch->slc_queue_len; i++)
     {
         if (ch->slc_queue[i] != item)
+        {
             ch->slc_queue[dest++] = ch->slc_queue[i];
+        }
     }
     if (ch->slc_queue_len < SLC_BUF_CNT - 1)
+    {
         ch->slc_queue[ch->slc_queue_len++] = item;
+    }
     else
+    {
         ch->slc_queue[ch->slc_queue_len] = item;
+    }
 }
 
 static void ICACHE_RAM_ATTR i2s_slc_isr(void)
@@ -179,7 +193,9 @@ static void ICACHE_RAM_ATTR i2s_slc_isr(void)
         }
         tx->slc_queue[tx->slc_queue_len++] = finished_item->buf_ptr;
         if (tx->callback)
+        {
             tx->callback();
+        }
     }
     if (slc_intr_status & SLCITXEOF)
     {
@@ -188,7 +204,9 @@ static void ICACHE_RAM_ATTR i2s_slc_isr(void)
         finished_item->owner = 1;
         i2s_slc_queue_append_item(rx, finished_item->buf_ptr);
         if (rx->callback)
+        {
             rx->callback();
+        }
     }
     ETS_SLC_INTR_ENABLE();
 }
@@ -233,12 +251,16 @@ static bool i2s_slc_begin()
     if (tx)
     {
         if (!_alloc_channel(tx))
+        {
             return false;
+        }
     }
     if (rx)
     {
         if (!_alloc_channel(rx))
+        {
             return false;
+        }
     }
 
     ETS_SLC_INTR_DISABLE();
@@ -283,7 +305,9 @@ static bool i2s_slc_begin()
     // Start transmission ("TX" DMA always needed to be enabled)
     SLCTXL |= SLCTXLS;
     if (tx)
+    {
         SLCRXL |= SLCRXLS;
+    }
 
     return true;
 }
@@ -316,7 +340,9 @@ static void i2s_slc_end()
 static bool _i2s_write_sample(uint32_t sample, bool nb)
 {
     if (!tx)
+    {
         return false;
+    }
 
     if (tx->curr_slc_buf_pos == SLC_BUF_LEN || tx->curr_slc_buf == NULL)
     {
@@ -330,9 +356,13 @@ static bool _i2s_write_sample(uint32_t sample, bool nb)
             while (1)
             {
                 if (tx->slc_queue_len > 0)
+                {
                     break;
+                }
                 else
+                {
                     optimistic_yield(10000);
+                }
             }
         }
         ETS_SLC_INTR_DISABLE();
@@ -387,9 +417,13 @@ static uint16_t _i2s_write_buffer(int16_t *frames, uint16_t frame_count, bool mo
                     while (1)
                     {
                         if (tx->slc_queue_len > 0)
+                        {
                             break;
+                        }
                         else
+                        {
                             optimistic_yield(10000);
+                        }
                     }
                 }
             }
@@ -453,19 +487,27 @@ uint16_t i2s_write_buffer(int16_t *frames, uint16_t frame_count)
 bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking)
 {
     if (!rx)
+    {
         return false;
+    }
     if (rx->curr_slc_buf_pos == SLC_BUF_LEN || rx->curr_slc_buf == NULL)
     {
         if (rx->slc_queue_len == 0)
         {
             if (!blocking)
+            {
                 return false;
+            }
             while (1)
             {
                 if (rx->slc_queue_len > 0)
+                {
                     break;
+                }
                 else
+                {
                     optimistic_yield(10000);
+                }
             }
         }
         ETS_SLC_INTR_DISABLE();
@@ -476,9 +518,13 @@ bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking)
 
     uint32_t sample = rx->curr_slc_buf[rx->curr_slc_buf_pos++];
     if (left)
+    {
         *left  = sample & 0xffff;
+    }
     if (right)
+    {
         *right = sample >> 16;
+    }
 
     return true;
 }
@@ -487,7 +533,9 @@ bool i2s_read_sample(int16_t *left, int16_t *right, bool blocking)
 void i2s_set_rate(uint32_t rate)   //Rate in HZ
 {
     if (rate == _i2s_sample_rate)
+    {
         return;
+    }
     _i2s_sample_rate = rate;
 
     uint32_t scaled_base_freq = I2SBASEFREQ / 32;

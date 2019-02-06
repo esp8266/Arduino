@@ -29,7 +29,9 @@
 int SPIEraseAreaEx(const uint32_t start, const uint32_t size)
 {
     if ((start & (FLASH_SECTOR_SIZE - 1)) != 0)
+    {
         return 1;
+    }
 
     const uint32_t sectors_per_block = FLASH_BLOCK_SIZE / FLASH_SECTOR_SIZE;
     uint32_t current_sector = start / FLASH_SECTOR_SIZE;
@@ -40,7 +42,9 @@ int SPIEraseAreaEx(const uint32_t start, const uint32_t size)
             ++current_sector, --sector_count)
     {
         if (SPIEraseSector(current_sector))
+        {
             return 2;
+        }
     }
 
     for (; current_sector + sectors_per_block <= end;
@@ -48,14 +52,18 @@ int SPIEraseAreaEx(const uint32_t start, const uint32_t size)
             sector_count -= sectors_per_block)
     {
         if (SPIEraseBlock(current_sector / sectors_per_block))
+        {
             return 3;
+        }
     }
 
     for (; current_sector < end;
             ++current_sector, --sector_count)
     {
         if (SPIEraseSector(current_sector))
+        {
             return 4;
+        }
     }
 
     return 0;

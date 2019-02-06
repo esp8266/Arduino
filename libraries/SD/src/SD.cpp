@@ -91,20 +91,26 @@ bool getNextPathComponent(const char *path, unsigned int *p_offset,
 
     // Skip root or other separator
     if (path[offset] == '/')
+    {
         offset++;
+    }
 
     // Copy the next next path segment
     while (bufferOffset < MAX_COMPONENT_LEN
             && (path[offset] != '/')
             && (path[offset] != '\0'))
+    {
         buffer[bufferOffset++] = path[offset++];
+    }
 
     buffer[bufferOffset] = '\0';
 
     // Skip trailing separator so we can determine if this
     // is the last component in the path or not.
     if (path[offset] == '/')
+    {
         offset++;
+    }
 
     *p_offset = offset;
 
@@ -178,19 +184,25 @@ boolean walkPath(const char *filepath, SdFile& parentDir,
             // If it's one we've created then we
             // don't need the parent handle anymore.
             if (p_parent != &parentDir)
+            {
                 (*p_parent).close();
+            }
             return false;
         }
 
         if (!moreComponents)
+        {
             break;
+        }
 
         boolean exists = (*p_child).open(*p_parent, buffer, O_RDONLY);
 
         // If it's one we've created then we
         // don't need the parent handle anymore.
         if (p_parent != &parentDir)
+        {
             (*p_parent).close();
+        }
 
         // Handle case when it doesn't exist and we can't continue...
         if (exists)
@@ -198,14 +210,18 @@ boolean walkPath(const char *filepath, SdFile& parentDir,
             // We alternate between two file handles as we go down
             // the path.
             if (p_parent == &parentDir)
+            {
                 p_parent = &subfile2;
+            }
 
             p_tmp_sdfile = p_parent;
             p_parent = p_child;
             p_child = p_tmp_sdfile;
         }
         else
+        {
             return false;
+        }
     }
 
     if (p_parent != &parentDir)
@@ -247,7 +263,9 @@ boolean callback_pathExists(SdFile& parentDir, char *filePathComponent,
     boolean exists = child.open(parentDir, filePathComponent, O_RDONLY);
 
     if (exists)
+    {
         child.close();
+    }
 
     return exists;
 }
@@ -270,7 +288,9 @@ boolean callback_makeDirPath(SdFile& parentDir, char *filePathComponent,
 
     result = callback_pathExists(parentDir, filePathComponent, isLastComponent, object);
     if (!result)
+    {
         result = child.makeDir(parentDir, filePathComponent);
+    }
 
     return result;
 }
@@ -315,7 +335,9 @@ boolean callback_remove(SdFile& parentDir, char *filePathComponent,
     (void) object;
 
     if (isLastComponent)
+    {
         return SdFile::remove(parentDir, filePathComponent);
+    }
     return true;
 }
 
@@ -326,7 +348,10 @@ boolean callback_rmdir(SdFile& parentDir, char *filePathComponent,
     if (isLastComponent)
     {
         SdFile f;
-        if (!f.open(parentDir, filePathComponent, O_READ)) return false;
+        if (!f.open(parentDir, filePathComponent, O_READ))
+        {
+            return false;
+        }
         return f.rmDir();
     }
     return true;
@@ -396,7 +421,9 @@ SdFile SDClass::getParentDir(const char *filepath, int *index)
         // extract just the name of the next subdirectory
         uint8_t idx = strchr(filepath, '/') - filepath;
         if (idx > 12)
+        {
             idx = 12;    // dont let them specify long names
+        }
         char subdirname[13];
         strncpy(subdirname, filepath, idx);
         subdirname[idx] = 0;
@@ -470,7 +497,9 @@ File SDClass::open(const char *filepath, uint8_t mode)
 
     // failed to open a subdir!
     if (!parentdir.isOpen())
+    {
         return File();
+    }
 
     // there is a special case for the Root directory since its a static dir
     if (parentdir.isRoot())
@@ -485,13 +514,17 @@ File SDClass::open(const char *filepath, uint8_t mode)
     else
     {
         if (! file.open(parentdir, filepath, mode))
+        {
             return File();
+        }
         // close the parent
         parentdir.close();
     }
 
     if (mode & (O_APPEND | O_WRITE))
+    {
         file.seekSet(file.fileSize());
+    }
     return File(file, filepath);
 }
 
@@ -650,7 +683,9 @@ File File::openNextFile(uint8_t mode)
 void File::rewindDirectory(void)
 {
     if (isDirectory())
+    {
         _file->rewind();
+    }
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SD)

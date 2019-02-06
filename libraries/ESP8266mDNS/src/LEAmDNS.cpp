@@ -352,7 +352,9 @@ MDNSResponder::hMDNSTxt MDNSResponder::addServiceTxt(const MDNSResponder::hMDNSS
     hMDNSTxt    hTxt = 0;
     stcMDNSService* pService = _findService(p_hService);
     if (pService)
+    {
         hTxt = (hMDNSTxt)_addServiceTxt(pService, p_pcKey, p_pcValue, false);
+    }
     DEBUG_EX_ERR(if (!hTxt)
 {
     DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] addServiceTxt: FAILED for '%s=%s'!\n"), (p_pcKey ? : "-"), (p_pcValue ? : "-"));
@@ -456,7 +458,9 @@ bool MDNSResponder::removeServiceTxt(const MDNSResponder::hMDNSService p_hServic
     {
         stcMDNSServiceTxt*  pTxt = _findServiceTxt(pService, p_hTxt);
         if (pTxt)
+        {
             bResult = _releaseServiceTxt(pService, pTxt);
+        }
     }
     DEBUG_EX_ERR(if (!bResult)
 {
@@ -479,7 +483,9 @@ bool MDNSResponder::removeServiceTxt(const MDNSResponder::hMDNSService p_hServic
     {
         stcMDNSServiceTxt*  pTxt = _findServiceTxt(pService, p_pcKey);
         if (pTxt)
+        {
             bResult = _releaseServiceTxt(pService, pTxt);
+        }
     }
     DEBUG_EX_ERR(if (!bResult)
 {
@@ -504,7 +510,9 @@ bool MDNSResponder::removeServiceTxt(const char* p_pcName,
     {
         stcMDNSServiceTxt*  pTxt = _findServiceTxt(pService, p_pcKey);
         if (pTxt)
+        {
             bResult = _releaseServiceTxt(pService, pTxt);
+        }
     }
     return bResult;
 }
@@ -588,7 +596,9 @@ MDNSResponder::hMDNSTxt MDNSResponder::addDynamicServiceTxt(MDNSResponder::hMDNS
 
     stcMDNSService* pService = _findService(p_hService);
     if (pService)
+    {
         hTxt = _addServiceTxt(pService, p_pcKey, p_pcValue, true);
+    }
     DEBUG_EX_ERR(if (!hTxt)
 {
     DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] addDynamicServiceTxt: FAILED for '%s=%s'!\n"), (p_pcKey ? : "-"), (p_pcValue ? : "-"));
@@ -727,7 +737,9 @@ uint32_t MDNSResponder::queryService(const char* p_pcService,
             u32Result = pServiceQuery->answerCount();
         }
         else    // FAILED to send query
+        {
             _removeServiceQuery(pServiceQuery);
+        }
     }
     else
     {
@@ -774,7 +786,9 @@ const char* MDNSResponder::answerHostname(const uint32_t p_u32AnswerIndex)
 
         char*   pcHostDomain = pSQAnswer->allocHostDomain(pSQAnswer->m_HostDomain.c_strLength());
         if (pcHostDomain)
+        {
             pSQAnswer->m_HostDomain.c_str(pcHostDomain);
+        }
     }
     return (pSQAnswer ? pSQAnswer->m_pcHostDomain : 0);
 }
@@ -890,7 +904,9 @@ MDNSResponder::hMDNSServiceQuery MDNSResponder::installServiceQuery(const char* 
             hResult = (hMDNSServiceQuery)pServiceQuery;
         }
         else
+        {
             _removeServiceQuery(pServiceQuery);
+        }
     }
     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] installServiceQuery: %s for '%s.%s'!\n\n"), (hResult ? "Succeeded" : "FAILED"), (p_pcService ? : "-"), (p_pcProtocol ? : "-")););
     DEBUG_EX_ERR(if (!hResult)
@@ -933,7 +949,9 @@ std::vector<MDNSResponder::MDNSServiceInfo>  MDNSResponder::answerInfo(const MDN
 {
     std::vector<MDNSResponder::MDNSServiceInfo> tempVector;
     for (uint32_t i = 0; i < answerCount(p_hServiceQuery); i++)
+    {
         tempVector.emplace_back(*this, p_hServiceQuery, i);
+    }
     return tempVector;
 }
 
@@ -958,7 +976,9 @@ const char* MDNSResponder::answerServiceDomain(const MDNSResponder::hMDNSService
 
         pSQAnswer->m_pcServiceDomain = pSQAnswer->allocServiceDomain(pSQAnswer->m_ServiceDomain.c_strLength());
         if (pSQAnswer->m_pcServiceDomain)
+        {
             pSQAnswer->m_ServiceDomain.c_str(pSQAnswer->m_pcServiceDomain);
+        }
     }
     return (pSQAnswer ? pSQAnswer->m_pcServiceDomain : 0);
 }
@@ -997,7 +1017,9 @@ const char* MDNSResponder::answerHostDomain(const MDNSResponder::hMDNSServiceQue
 
         pSQAnswer->m_pcHostDomain = pSQAnswer->allocHostDomain(pSQAnswer->m_HostDomain.c_strLength());
         if (pSQAnswer->m_pcHostDomain)
+        {
             pSQAnswer->m_HostDomain.c_str(pSQAnswer->m_pcHostDomain);
+        }
     }
     return (pSQAnswer ? pSQAnswer->m_pcHostDomain : 0);
 }
@@ -1143,7 +1165,9 @@ const char* MDNSResponder::answerTxts(const MDNSResponder::hMDNSServiceQuery p_h
 
         pSQAnswer->m_pcTxts = pSQAnswer->allocTxts(pSQAnswer->m_Txts.c_strLength());
         if (pSQAnswer->m_pcTxts)
+        {
             pSQAnswer->m_Txts.c_str(pSQAnswer->m_pcTxts);
+        }
     }
     return (pSQAnswer ? pSQAnswer->m_pcTxts : 0);
 }
@@ -1236,7 +1260,9 @@ bool MDNSResponder::update(void)
 {
 
     if (m_bPassivModeEnabled)
+    {
         m_bPassivModeEnabled = false;
+    }
     return _process(true);
 }
 

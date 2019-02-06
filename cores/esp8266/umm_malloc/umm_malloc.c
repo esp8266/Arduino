@@ -679,7 +679,9 @@ static int integrity_check(void)
     unsigned short int cur;
 
     if (umm_heap == NULL)
+    {
         umm_init();
+    }
 
     /* Iterate through all free blocks */
     prev = 0;
@@ -769,7 +771,9 @@ static int integrity_check(void)
 
 clean:
     if (!ok)
+    {
         UMM_HEAP_CORRUPTION_CB();
+    }
     return ok;
 }
 
@@ -803,7 +807,9 @@ clean:
 static void dump_mem(const unsigned char *ptr, size_t len)
 {
     while (len--)
+    {
         printf(" 0x%.2x", (unsigned int)(*ptr++));
+    }
 }
 
 /*
@@ -900,7 +906,9 @@ static int check_poison_all_blocks(void)
     unsigned short int blockNo = 0;
 
     if (umm_heap == NULL)
+    {
         umm_init();
+    }
 
     /* Now iterate through the blocks list */
     blockNo = UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK;
@@ -912,7 +920,9 @@ static int check_poison_all_blocks(void)
             /* This is a used block (not free), so, check its poison */
             ok = check_poison_block(&UMM_BLOCK(blockNo));
             if (!ok)
+            {
                 break;
+            }
         }
 
         blockNo = UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK;
@@ -946,7 +956,9 @@ static void *get_poisoned(unsigned char *ptr, size_t size_w_poison)
         return ptr + sizeof(UMM_POISONED_BLOCK_LEN_TYPE) + UMM_POISON_SIZE_BEFORE;
     }
     else
+    {
         return ptr;
+    }
 }
 
 /*
@@ -1010,7 +1022,9 @@ void ICACHE_FLASH_ATTR *umm_info(void *ptr, int force)
     unsigned short int blockNo = 0;
 
     if (umm_heap == NULL)
+    {
         umm_init();
+    }
 
     /* Protect the critical section... */
     UMM_CRITICAL_ENTRY();
@@ -1059,7 +1073,9 @@ void ICACHE_FLASH_ATTR *umm_info(void *ptr, int force)
                                      * (unsigned int)sizeof(umm_block);
 
             if (ummHeapInfo.maxFreeContiguousBlocks < curBlocks)
+            {
                 ummHeapInfo.maxFreeContiguousBlocks = curBlocks;
+            }
 
             DBG_LOG_FORCE(force, "|0x%08lx|B %5d|NB %5d|PB %5d|Z %5u|NF %5d|PF %5d|\n",
                           (unsigned long)(&UMM_BLOCK(blockNo)),
@@ -1108,7 +1124,9 @@ void ICACHE_FLASH_ATTR *umm_info(void *ptr, int force)
         ummHeapInfo.totalBlocks += curBlocks;
 
         if (ummHeapInfo.maxFreeContiguousBlocks < curBlocks)
+        {
             ummHeapInfo.maxFreeContiguousBlocks = curBlocks;
+        }
     }
 
     DBG_LOG_FORCE(force, "|0x%08lx|B %5d|NB %5d|PB %5d|Z %5d|NF %5d|PF %5d|\n",
@@ -1151,7 +1169,9 @@ static unsigned short int umm_blocks(size_t size)
     */
 
     if (size <= (sizeof(((umm_block *)0)->body)))
+    {
         return (1);
+    }
 
     /*
         If it's for more than that, then we need to figure out the number of
@@ -1402,7 +1422,9 @@ static void *_umm_malloc(size_t size)
     unsigned short int cf;
 
     if (umm_heap == NULL)
+    {
         umm_init();
+    }
 
     /*
         the very first thing we do is figure out if we're being asked to allocate
@@ -1445,7 +1467,9 @@ static void *_umm_malloc(size_t size)
 #if defined UMM_FIRST_FIT
         /* This is the first block that fits! */
         if ((blockSize >= blocks))
+        {
             break;
+        }
 #elif defined UMM_BEST_FIT
         if ((blockSize >= blocks) && (blockSize < bestSize))
         {
@@ -1542,7 +1566,9 @@ static void *_umm_realloc(void *ptr, size_t size)
     size_t curSize;
 
     if (umm_heap == NULL)
+    {
         umm_init();
+    }
 
     /*
         This code looks after the case of a NULL value for ptr. The ANSI C
@@ -1724,11 +1750,15 @@ void *umm_malloc(size_t size)
 
     /* check poison of each blocks, if poisoning is enabled */
     if (!CHECK_POISON_ALL_BLOCKS())
+    {
         return NULL;
+    }
 
     /* check full integrity of the heap, if this check is enabled */
     if (!INTEGRITY_CHECK())
+    {
         return NULL;
+    }
 
     size += POISON_SIZE(size);
 
@@ -1753,16 +1783,22 @@ void *umm_calloc(size_t num, size_t item_size)
 
     /* check poison of each blocks, if poisoning is enabled */
     if (!CHECK_POISON_ALL_BLOCKS())
+    {
         return NULL;
+    }
 
     /* check full integrity of the heap, if this check is enabled */
     if (!INTEGRITY_CHECK())
+    {
         return NULL;
+    }
 
     size += POISON_SIZE(size);
     ret = _umm_malloc(size);
     if (ret)
+    {
         memset(ret, 0x00, size);
+    }
     if (0 != size && 0 == ret)
     {
         umm_last_fail_alloc_addr = __builtin_return_address(0);
@@ -1784,11 +1820,15 @@ void *umm_realloc(void *ptr, size_t size)
 
     /* check poison of each blocks, if poisoning is enabled */
     if (!CHECK_POISON_ALL_BLOCKS())
+    {
         return NULL;
+    }
 
     /* check full integrity of the heap, if this check is enabled */
     if (!INTEGRITY_CHECK())
+    {
         return NULL;
+    }
 
     size += POISON_SIZE(size);
     ret = _umm_realloc(ptr, size);
@@ -1812,11 +1852,15 @@ void umm_free(void *ptr)
 
     /* check poison of each blocks, if poisoning is enabled */
     if (!CHECK_POISON_ALL_BLOCKS())
+    {
         return;
+    }
 
     /* check full integrity of the heap, if this check is enabled */
     if (!INTEGRITY_CHECK())
+    {
         return;
+    }
 
     _umm_free(ptr);
 }

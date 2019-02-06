@@ -45,7 +45,9 @@ public:
     T &get(int const address, T &t)
     {
         if (address < 0 || address + sizeof(T) > _size)
+        {
             return t;
+        }
 
         memcpy((uint8_t*) &t, _data + address, sizeof(T));
         return t;
@@ -55,7 +57,9 @@ public:
     const T &put(int const address, const T &t)
     {
         if (address < 0 || address + sizeof(T) > _size)
+        {
             return t;
+        }
         if (memcmp(_data + address, (const uint8_t*)&t, sizeof(T)) != 0)
         {
             _dirty = true;

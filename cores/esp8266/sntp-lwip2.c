@@ -179,7 +179,9 @@ sntp_mktm_r(const time_t * tim_p, struct tm *res, int is_gmtime)
 
     /* compute day of week */
     if ((res->tm_wday = ((EPOCH_WDAY + days) % DAYSPERWEEK)) < 0)
+    {
         res->tm_wday += DAYSPERWEEK;
+    }
 
     /* compute year & day of year */
     y = EPOCH_YEAR;
@@ -189,7 +191,9 @@ sntp_mktm_r(const time_t * tim_p, struct tm *res, int is_gmtime)
         {
             yleap = isleap(y);
             if (days < year_lengths[yleap])
+            {
                 break;
+            }
             y++;
             days -= year_lengths[yleap];
         }
@@ -208,7 +212,9 @@ sntp_mktm_r(const time_t * tim_p, struct tm *res, int is_gmtime)
     res->tm_yday = days;
     ip = mon_lengths[yleap];
     for (res->tm_mon = 0; days >= ip[res->tm_mon]; ++res->tm_mon)
+    {
         days -= ip[res->tm_mon];
+    }
     res->tm_mday = days + 1;
 
     if (!is_gmtime)
@@ -266,7 +272,9 @@ sntp_mktm_r(const time_t * tim_p, struct tm *res, int is_gmtime)
             ++res->tm_yday;
             ++res->tm_wday;
             if (res->tm_wday > 6)
+            {
                 res->tm_wday = 0;
+            }
             ++res->tm_mday;
             res->tm_hour -= HOURSPERDAY;
             if (res->tm_mday > ip[res->tm_mon])
@@ -286,7 +294,9 @@ sntp_mktm_r(const time_t * tim_p, struct tm *res, int is_gmtime)
             res->tm_yday -= 1;
             res->tm_wday -= 1;
             if (res->tm_wday < 0)
+            {
                 res->tm_wday = 6;
+            }
             res->tm_mday -= 1;
             res->tm_hour += 24;
             if (res->tm_mday == 0)
@@ -304,7 +314,9 @@ sntp_mktm_r(const time_t * tim_p, struct tm *res, int is_gmtime)
         //      TZ_UNLOCK;
     }
     else
+    {
         res->tm_isdst = 0;
+    }
     //  os_printf("res %d %d %d %d %d\n",res->tm_year,res->tm_mon,res->tm_mday,res->tm_yday,res->tm_hour);
     return (res);
 }
@@ -327,7 +339,9 @@ int sntp__tzcalc_limits(int year)
     int i, j;
 
     if (year < EPOCH_YEAR)
+    {
         return 0;
+    }
 
     __tzyear = year;
 
@@ -340,9 +354,13 @@ int sntp__tzcalc_limits(int year)
     for (i = 0; i < 2; ++i)
     {
         if (sntp__tzrule[i].ch == 'J')
+        {
             days = year_days + sntp__tzrule[i].d + (isleap(year) && sntp__tzrule[i].d >= 60);
+        }
         else if (sntp__tzrule[i].ch == 'D')
+        {
             days = year_days + sntp__tzrule[i].d;
+        }
         else
         {
             int yleap = isleap(year);
@@ -352,17 +370,23 @@ int sntp__tzcalc_limits(int year)
             days = year_days;
 
             for (j = 1; j < sntp__tzrule[i].m; ++j)
+            {
                 days += ip[j - 1];
+            }
 
             m_wday = (EPOCH_WDAY + days) % DAYSPERWEEK;
 
             wday_diff = sntp__tzrule[i].d - m_wday;
             if (wday_diff < 0)
+            {
                 wday_diff += DAYSPERWEEK;
+            }
             m_day = (sntp__tzrule[i].n - 1) * DAYSPERWEEK + wday_diff;
 
             while (m_day >= ip[j - 1])
+            {
                 m_day -= DAYSPERWEEK;
+            }
 
             days += m_day;
         }
@@ -423,7 +447,9 @@ bool sntp_set_timezone(sint8 timezone)
         return true;
     }
     else
+    {
         return false;
+    }
 }
 
 void sntp_set_daylight(int daylight)
@@ -460,7 +486,9 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
         sntp_set_system_time(tv->tv_sec);
 
         if (_settimeofday_cb)
+        {
             _settimeofday_cb();
+        }
     }
     return 0;
 }

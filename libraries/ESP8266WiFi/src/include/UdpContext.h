@@ -84,7 +84,9 @@ public:
         {
             DEBUGV(":ur %d\r\n", _refcnt);
             if (--_refcnt == 0)
+            {
                 delete this;
+            }
         }
     }
 
@@ -135,7 +137,9 @@ public:
     size_t getSize() const
     {
         if (!_rx_buf)
+        {
             return 0;
+        }
 
         return _rx_buf->len - _rx_buf_offset;
     }
@@ -164,7 +168,9 @@ public:
     uint16_t getRemotePort() const
     {
         if (!_rx_buf)
+        {
             return 0;
+        }
 
         udp_hdr* udphdr = GET_UDP_HDR(_rx_buf);
         return lwip_ntohs(udphdr->src);
@@ -178,14 +184,18 @@ public:
     uint16_t getLocalPort() const
     {
         if (!_pcb)
+        {
             return 0;
+        }
         return _pcb->local_port;
     }
 
     bool next()
     {
         if (!_rx_buf)
+        {
             return false;
+        }
 
         if (!_first_buf_taken)
         {
@@ -198,7 +208,9 @@ public:
         _rx_buf_offset = 0;
 
         if (_rx_buf)
+        {
             pbuf_ref(_rx_buf);
+        }
         pbuf_free(head);
         return _rx_buf != 0;
     }
@@ -206,7 +218,9 @@ public:
     int read()
     {
         if (!_rx_buf || _rx_buf_offset >= _rx_buf->len)
+        {
             return -1;
+        }
 
         char c = reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
         _consume(1);
@@ -216,7 +230,9 @@ public:
     size_t read(char* dst, size_t size)
     {
         if (!_rx_buf)
+        {
             return 0;
+        }
 
         size_t max_size = _rx_buf->len - _rx_buf_offset;
         size = (size < max_size) ? size : max_size;
@@ -231,7 +247,9 @@ public:
     int peek() const
     {
         if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
+        {
             return -1;
+        }
 
         return reinterpret_cast<char*>(_rx_buf->payload)[_rx_buf_offset];
     }
@@ -240,7 +258,9 @@ public:
     {
         //XXX this does not follow Arduino's flush definition
         if (!_rx_buf)
+        {
             return;
+        }
 
         _consume(_rx_buf->len - _rx_buf_offset);
     }
@@ -248,7 +268,9 @@ public:
     size_t append(const char* data, size_t size)
     {
         if (!_tx_buf_head || _tx_buf_head->tot_len < _tx_buf_offset + size)
+        {
             _reserve(_tx_buf_offset + size);
+        }
         if (!_tx_buf_head || _tx_buf_head->tot_len < _tx_buf_offset + size)
         {
             DEBUGV("failed _reserve");
@@ -280,7 +302,9 @@ public:
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
         if (!tx_copy)
+        {
             DEBUGV("failed pbuf_alloc");
+        }
         else
         {
             uint8_t* dst = reinterpret_cast<uint8_t*>(tx_copy->payload);
@@ -293,12 +317,16 @@ public:
             }
         }
         if (_tx_buf_head)
+        {
             pbuf_free(_tx_buf_head);
+        }
         _tx_buf_head = 0;
         _tx_buf_cur = 0;
         _tx_buf_offset = 0;
         if (!tx_copy)
+        {
             return false;
+        }
 
 
         if (!addr)
@@ -309,11 +337,15 @@ public:
 #ifdef LWIP_MAYBE_XCC
         uint16_t old_ttl = _pcb->ttl;
         if (ip_addr_ismulticast(addr))
+        {
             _pcb->ttl = _mcast_ttl;
+        }
 #endif
         err_t err = udp_sendto(_pcb, tx_copy, addr, port);
         if (err != ERR_OK)
+        {
             DEBUGV(":ust rc=%d\r\n", (int) err);
+        }
 #ifdef LWIP_MAYBE_XCC
         _pcb->ttl = old_ttl;
 #endif
@@ -330,14 +362,18 @@ private:
         {
             _tx_buf_head = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
             if (!_tx_buf_head)
+            {
                 return;
+            }
             _tx_buf_cur = _tx_buf_head;
             _tx_buf_offset = 0;
         }
 
         size_t cur_size = _tx_buf_head->tot_len;
         if (size < cur_size)
+        {
             return;
+        }
 
         size_t grow_size = size - cur_size;
 
@@ -345,10 +381,14 @@ private:
         {
             pbuf* pb = pbuf_alloc(PBUF_TRANSPORT, pbuf_unit_size, PBUF_RAM);
             if (!pb)
+            {
                 return;
+            }
             pbuf_cat(_tx_buf_head, pb);
             if (grow_size < pbuf_unit_size)
+            {
                 return;
+            }
             grow_size -= pbuf_unit_size;
         }
     }
@@ -357,7 +397,9 @@ private:
     {
         _rx_buf_offset += size;
         if (_rx_buf_offset > _rx_buf->len)
+        {
             _rx_buf_offset = _rx_buf->len;
+        }
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
@@ -399,7 +441,9 @@ private:
 #endif
 
         if (_on_rx)
+        {
             _on_rx();
+        }
     }
 
 

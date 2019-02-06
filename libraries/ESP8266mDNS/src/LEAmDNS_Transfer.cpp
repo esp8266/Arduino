@@ -93,7 +93,9 @@ bool MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSen
                        (m_pUDPContext->send(ipRemote, m_pUDPContext->getRemotePort())));
         }
         else                                // Multicast response -> Send via the same network interface, that received the query
+        {
             bResult = _sendMDNSMessage_Multicast(p_rSendParameter, (SOFTAP_MODE | STATION_MODE));
+        }
     }
     else                                    // Multicast query -> Send by all available network interfaces
     {
@@ -101,13 +103,17 @@ bool MDNSResponder::_sendMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_rSen
         for (int iInterfaceId = 0; ((bResult) && (iInterfaceId <= 1)); ++iInterfaceId)
         {
             if (wifi_get_opmode() & caiWiFiOpModes[iInterfaceId])
+            {
                 bResult = _sendMDNSMessage_Multicast(p_rSendParameter, caiWiFiOpModes[iInterfaceId]);
+            }
         }
     }
 
     // Finally clear service reply masks
     for (stcMDNSService* pService = m_pServices; pService; pService = pService->m_pNext)
+    {
         pService->m_u8ReplyMask = 0;
+    }
 
     DEBUG_EX_ERR(if (!bResult)
 {
@@ -319,12 +325,16 @@ bool MDNSResponder::_prepareMDNSMessage(MDNSResponder::stcMDNSSendParameter& p_r
 #ifdef MDNS_IP4_SUPPORT
                 if ((bResult) &&
                         (!(p_rSendParameter.m_u8HostReplyMask & ContentFlag_A)))            // Add IP4 address
+                {
                     bNeedsAdditionalAnswerA = true;
+                }
 #endif
 #ifdef MDNS_IP6_SUPPORT
                 if ((bResult) &&
                         (!(p_rSendParameter.m_u8HostReplyMask & ContentFlag_AAAA)))         // Add IP6 address
+                {
                     bNeedsAdditionalAnswerAAAA = true;
+                }
 #endif
             }
         }   // for services
@@ -427,7 +437,9 @@ IPAddress MDNSResponder::_getResponseMulticastInterface(int p_iWiFiOpModes) cons
 
         if ((IPInfo_Local.ip.addr) &&                                                       // Has local AP IP address AND
                 (ip4_addr_netcmp(ip_2_ip4((const ip_addr_t*)IP_Remote), &IPInfo_Local.ip, &IPInfo_Local.netmask)))   // Remote address is in the same subnet as the AP
+        {
             bFoundMatch = true;
+        }
     }
     if ((!bFoundMatch) &&
             (p_iWiFiOpModes & STATION_MODE) &&
@@ -589,8 +601,10 @@ bool MDNSResponder::_readRRAnswer(MDNSResponder::stcMDNS_RRAnswer*& p_rpRRAnswer
             DEBUG_OUTPUT.printf_P(PSTR("\n"));
         }
         else
+        {
             DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer: FAILED to read specific answer of type 0x%04X!\n"), p_rpRRAnswer->m_Header.m_Attributes.m_u16Type);
-            );  // DEBUG_EX_INFO
+        }
+        );  // DEBUG_EX_INFO
     }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswer: FAILED!\n")););
     return bResult;
@@ -782,7 +796,9 @@ bool MDNSResponder::_readRRAnswerGeneric(MDNSResponder::stcMDNS_RRAnswerGeneric&
     if (((p_rRRAnswerGeneric.m_u16RDLength = p_u16RDLength)) &&
             ((p_rRRAnswerGeneric.m_pu8RDData = new unsigned char[p_rRRAnswerGeneric.m_u16RDLength])))
 
+    {
         bResult = _udpReadBuffer(p_rRRAnswerGeneric.m_pu8RDData, p_rRRAnswerGeneric.m_u16RDLength);
+    }
     DEBUG_EX_ERR(if (!bResult) DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _readRRAnswerGeneric: FAILED!\n")););
     return bResult;
 }
@@ -1187,11 +1203,15 @@ bool MDNSResponder::_udpDump(bool p_bMovePointer /*= false*/)
     uint8_t     u8Byte = 0;
 
     while (_udpRead8(u8Byte))
+    {
         DEBUG_OUTPUT.printf_P(PSTR("%02x %s"), u8Byte, ((++u32Counter % cu8BytesPerLine) ? "" : "\n"));
+    }
     DEBUG_OUTPUT.printf_P(PSTR("%sDone: %u bytes\n"), (((u32Counter) && (u32Counter % cu8BytesPerLine)) ? "\n" : ""), u32Counter);
 
     if (!p_bMovePointer)    // Restore
+    {
         m_pUDPContext->seek(u32StartPosition);
+    }
     return true;
 }
 
@@ -1210,7 +1230,9 @@ bool MDNSResponder::_udpDump(unsigned p_uOffset,
         m_pUDPContext->seek(p_uOffset);
         uint8_t u8Byte;
         for (unsigned u = 0; ((u < p_uLength) && (_udpRead8(u8Byte))); ++u)
+        {
             DEBUG_OUTPUT.printf_P(PSTR("%02x "), u8Byte);
+        }
         // Return to start position
         m_pUDPContext->seek(uCurrentPosition);
     }

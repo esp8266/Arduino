@@ -89,22 +89,34 @@ int getSpiffsMode(OpenMode openMode, AccessMode accessMode)
 {
     int mode = 0;
     if (openMode & OM_CREATE)
+    {
         mode |= SPIFFS_CREAT;
+    }
     if (openMode & OM_APPEND)
+    {
         mode |= SPIFFS_APPEND;
+    }
     if (openMode & OM_TRUNCATE)
+    {
         mode |= SPIFFS_TRUNC;
+    }
     if (accessMode & AM_READ)
+    {
         mode |= SPIFFS_RDONLY;
+    }
     if (accessMode & AM_WRITE)
+    {
         mode |= SPIFFS_WRONLY;
+    }
     return mode;
 }
 
 bool isSpiffsFilenameValid(const char* name)
 {
     if (name == nullptr)
+    {
         return false;
+    }
     auto len = strlen(name);
     return len > 0 && len < SPIFFS_OBJ_NAME_LEN;
 }

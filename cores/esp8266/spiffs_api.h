@@ -134,17 +134,23 @@ public:
     {
 #if defined(ARDUINO) && !defined(CORE_MOCK)
         if (&_SPIFFS_end <= &_SPIFFS_start)
+        {
             return false;
+        }
 #endif
         if (SPIFFS_mounted(&_fs) != 0)
+        {
             return true;
+        }
         if (_size == 0)
         {
             DEBUGV("SPIFFS size is zero");
             return false;
         }
         if (_tryMount())
+        {
             return true;
+        }
         auto rc = SPIFFS_format(&_fs);
         if (rc != SPIFFS_OK)
         {
@@ -157,7 +163,9 @@ public:
     void end() override
     {
         if (SPIFFS_mounted(&_fs) == 0)
+        {
             return;
+        }
         SPIFFS_unmount(&_fs);
         _workBuf.reset(nullptr);
         _fdsBuf.reset(nullptr);
@@ -175,7 +183,9 @@ public:
         bool wasMounted = (SPIFFS_mounted(&_fs) != 0);
 
         if (_tryMount())
+        {
             SPIFFS_unmount(&_fs);
+        }
         auto rc = SPIFFS_format(&_fs);
         if (rc != SPIFFS_OK)
         {
@@ -184,7 +194,9 @@ public:
         }
 
         if (wasMounted)
+        {
             return _tryMount();
+        }
 
         return true;
     }
@@ -347,7 +359,9 @@ public:
 
         auto rc = SPIFFS_fflush(_fs->getFs(), _fd);
         if (rc < 0)
+        {
             DEBUGV("SPIFFS_fflush rc=%d\r\n", rc);
+        }
         _written = true;
     }
 
@@ -357,7 +371,9 @@ public:
 
         int32_t offset = static_cast<int32_t>(pos);
         if (mode == SeekEnd)
+        {
             offset = -offset;
+        }
         auto rc = SPIFFS_lseek(_fs->getFs(), _fd, offset, (int) mode);
         if (rc < 0)
         {
@@ -386,7 +402,9 @@ public:
     {
         CHECKFD();
         if (_written)
+        {
             _getStat();
+        }
         return _stat.size;
     }
 
@@ -443,7 +461,9 @@ public:
     FileImplPtr openFile(OpenMode openMode, AccessMode accessMode) override
     {
         if (!_valid)
+        {
             return FileImplPtr();
+        }
         int mode = getSpiffsMode(openMode, accessMode);
         auto fs = _fs->getFs();
         spiffs_file fd = SPIFFS_open_by_dirent(fs, &_dirent, mode, 0);
@@ -459,7 +479,9 @@ public:
     const char* fileName() override
     {
         if (!_valid)
+        {
             return nullptr;
+        }
 
         return (const char*) _dirent.name;
     }
@@ -467,7 +489,9 @@ public:
     size_t fileSize() override
     {
         if (!_valid)
+        {
             return 0;
+        }
 
         return _dirent.size;
     }

@@ -65,19 +65,27 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
 static bool sta_config_equal(const station_config& lhs, const station_config& rhs)
 {
     if (strncmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid), sizeof(lhs.ssid)) != 0)
+    {
         return false;
+    }
 
     //in case of password, use strncmp with size 64 to cover 64byte psk case (no null term)
     if (strncmp(reinterpret_cast<const char*>(lhs.password), reinterpret_cast<const char*>(rhs.password), sizeof(lhs.password)) != 0)
+    {
         return false;
+    }
 
     if (lhs.bssid_set != rhs.bssid_set)
+    {
         return false;
+    }
 
     if (lhs.bssid_set)
     {
         if (memcmp(lhs.bssid, rhs.bssid, 6) != 0)
+        {
             return false;
+        }
     }
 
     return true;
@@ -126,19 +134,29 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     conf.threshold.authmode = (passphraseLen == 0) ? AUTH_OPEN : (_useInsecureWEP ? AUTH_WEP : AUTH_WPA_PSK);
 
     if (strlen(ssid) == 32)
-        memcpy(reinterpret_cast<char*>(conf.ssid), ssid, 32); //copied in without null term
+    {
+        memcpy(reinterpret_cast<char*>(conf.ssid), ssid, 32);    //copied in without null term
+    }
     else
+    {
         strcpy(reinterpret_cast<char*>(conf.ssid), ssid);
+    }
 
     if (passphrase)
     {
         if (passphraseLen == 64) // it's not a passphrase, is the PSK, which is copied into conf.password without null term
+        {
             memcpy(reinterpret_cast<char*>(conf.password), passphrase, 64);
+        }
         else
+        {
             strcpy(reinterpret_cast<char*>(conf.password), passphrase);
+        }
     }
     else
+    {
         *conf.password = 0;
+    }
 
     conf.threshold.rssi = -127;
     conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
@@ -149,38 +167,56 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
         memcpy((void *) &conf.bssid[0], (void *) bssid, 6);
     }
     else
+    {
         conf.bssid_set = 0;
+    }
 
     struct station_config conf_compare;
     if (WiFi._persistent)
+    {
         wifi_station_get_config_default(&conf_compare);
+    }
     else
+    {
         wifi_station_get_config(&conf_compare);
+    }
 
     if (sta_config_equal(conf_compare, conf))
+    {
         DEBUGV("sta config unchanged");
+    }
     else
     {
         ETS_UART_INTR_DISABLE();
 
         if (WiFi._persistent)
+        {
             wifi_station_set_config(&conf);
+        }
         else
+        {
             wifi_station_set_config_current(&conf);
+        }
 
         ETS_UART_INTR_ENABLE();
     }
 
     ETS_UART_INTR_DISABLE();
     if (connect)
+    {
         wifi_station_connect();
+    }
     ETS_UART_INTR_ENABLE();
 
     if (channel > 0 && channel <= 13)
+    {
         wifi_set_channel(channel);
+    }
 
     if (!_useStaticIp)
+    {
         wifi_station_dhcpc_start();
+    }
 
     return status();
 }
@@ -213,7 +249,9 @@ wl_status_t ESP8266WiFiSTAClass::begin()
     ETS_UART_INTR_ENABLE();
 
     if (!_useStaticIp)
+    {
         wifi_station_dhcpc_start();
+    }
     return status();
 }
 
@@ -229,7 +267,9 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
 {
 
     if (!WiFi.enableSTA(true))
+    {
         return false;
+    }
 
     //ESP argument order is: ip, gateway, subnet, dns1
     //Arduino arg order is:  ip, dns, gateway, subnet.
@@ -259,11 +299,15 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
 
     // check whether all is IPv4 (or gateway not set)
     if (!(local_ip.isV4() && subnet.isV4() && (!gateway.isSet() || gateway.isV4())))
+    {
         return false;
+    }
 
     //ip and gateway must be in the same subnet
     if ((local_ip.v4() & subnet.v4()) != (gateway.v4() & subnet.v4()))
+    {
         return false;
+    }
 
     struct ip_info info;
     info.ip.addr = local_ip.v4();
@@ -272,9 +316,13 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
 
     wifi_station_dhcpc_stop();
     if (wifi_set_ip_info(STATION_IF, &info))
+    {
         _useStaticIp = true;
+    }
     else
+    {
         return false;
+    }
 
     if (dns1.isSet())
     {
@@ -300,7 +348,9 @@ bool ESP8266WiFiSTAClass::reconnect()
     if ((WiFi.getMode() & WIFI_STA) != 0)
     {
         if (wifi_station_disconnect())
+        {
             return wifi_station_connect();
+        }
     }
     return false;
 }
@@ -319,14 +369,20 @@ bool ESP8266WiFiSTAClass::disconnect(bool wifioff)
 
     ETS_UART_INTR_DISABLE();
     if (WiFi._persistent)
+    {
         wifi_station_set_config(&conf);
+    }
     else
+    {
         wifi_station_set_config_current(&conf);
+    }
     ret = wifi_station_disconnect();
     ETS_UART_INTR_ENABLE();
 
     if (wifioff)
+    {
         WiFi.enableSTA(false);
+    }
 
     return ret;
 }
@@ -394,9 +450,13 @@ uint8_t ESP8266WiFiSTAClass::waitForConnectResult()
 {
     //1 and 3 have STA enabled
     if ((wifi_get_opmode() & 1) == 0)
+    {
         return WL_DISCONNECTED;
+    }
     while (status() == WL_DISCONNECTED)
+    {
         delay(100);
+    }
     return status();
 }
 
@@ -528,12 +588,18 @@ bool ESP8266WiFiSTAClass::hostname(const char* aHostname)
     bool compliant = (len <= 24);
     for (size_t i = 0; compliant && i < len; i++)
         if (!isalnum(aHostname[i]) && aHostname[i] != '-')
+        {
             compliant = false;
+        }
     if (aHostname[len - 1] == '-')
+    {
         compliant = false;
+    }
 
     if (!compliant)
+    {
         DEBUG_WIFI_GENERIC("hostname '%s' is not compliant with RFC952\n", aHostname);
+    }
 
     bool ret = wifi_station_set_hostname(aHostname);
     if (!ret)
@@ -672,7 +738,9 @@ bool ESP8266WiFiSTAClass::_smartConfigDone = false;
 bool ESP8266WiFiSTAClass::beginSmartConfig()
 {
     if (_smartConfigStarted)
+    {
         return false;
+    }
 
     if (!WiFi.enableSTA(true))
     {
@@ -696,7 +764,9 @@ bool ESP8266WiFiSTAClass::beginSmartConfig()
 bool ESP8266WiFiSTAClass::stopSmartConfig()
 {
     if (!_smartConfigStarted)
+    {
         return true;
+    }
 
     if (smartconfig_stop())
     {
@@ -713,7 +783,9 @@ bool ESP8266WiFiSTAClass::stopSmartConfig()
 bool ESP8266WiFiSTAClass::smartConfigDone()
 {
     if (!_smartConfigStarted)
+    {
         return false;
+    }
 
     return _smartConfigDone;
 }
@@ -738,5 +810,7 @@ void ESP8266WiFiSTAClass::_smartConfigCallback(uint32_t st, void* result)
         _smartConfigDone = true;
     }
     else if (status == SC_STATUS_LINK_OVER)
+    {
         WiFi.stopSmartConfig();
+    }
 }

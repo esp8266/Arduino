@@ -32,15 +32,21 @@ int EthernetClient::connect(const char* host, uint16_t port)
     dns.begin(Ethernet.dnsServerIP());
     ret = dns.getHostByName(host, remote_addr);
     if (ret == 1)
+    {
         return connect(remote_addr, port);
+    }
     else
+    {
         return ret;
+    }
 }
 
 int EthernetClient::connect(CONST IPAddress& ip, uint16_t port)
 {
     if (_sock != MAX_SOCK_NUM)
+    {
         return 0;
+    }
 
     for (int i = 0; i < MAX_SOCK_NUM; i++)
     {
@@ -53,10 +59,15 @@ int EthernetClient::connect(CONST IPAddress& ip, uint16_t port)
     }
 
     if (_sock == MAX_SOCK_NUM)
+    {
         return 0;
+    }
 
     _srcport++;
-    if (_srcport == 0) _srcport = 49152;          //Use IANA recommended ephemeral port range 49152-65535
+    if (_srcport == 0)
+    {
+        _srcport = 49152;    //Use IANA recommended ephemeral port range 49152-65535
+    }
     socket(_sock, SnMR::TCP, _srcport, 0);
 
     if (!::connect(_sock, rawIPAddress(ip), port))
@@ -101,7 +112,9 @@ size_t EthernetClient::write(const uint8_t *buf, size_t size)
 int EthernetClient::available()
 {
     if (_sock != MAX_SOCK_NUM)
+    {
         return recvAvailable(_sock);
+    }
     return 0;
 }
 
@@ -130,7 +143,9 @@ int EthernetClient::peek()
     uint8_t b;
     // Unlike recv, peek doesn't check to see if there's any data available, so we must
     if (!available())
+    {
         return -1;
+    }
     ::peek(_sock, &b);
     return b;
 }
@@ -145,7 +160,9 @@ bool EthernetClient::flush(unsigned int maxWaitMs)
 bool EthernetClient::stop(unsigned int maxWaitMs)
 {
     if (_sock == MAX_SOCK_NUM)
+    {
         return true;
+    }
 
     // attempt to close the connection gracefully (send a FIN to other side)
     disconnect(_sock);
@@ -154,12 +171,16 @@ bool EthernetClient::stop(unsigned int maxWaitMs)
     // wait up to a second for the connection to close
     uint8_t s;
     if (maxWaitMs == 0)
+    {
         maxWaitMs = 1000;
+    }
     do
     {
         s = status();
         if (s == SnSR::CLOSED)
-            break; // exit the loop
+        {
+            break;    // exit the loop
+        }
         delay(1);
     } while (millis() - start < maxWaitMs);
 
@@ -180,7 +201,10 @@ bool EthernetClient::stop(unsigned int maxWaitMs)
 
 uint8_t EthernetClient::connected()
 {
-    if (_sock == MAX_SOCK_NUM) return 0;
+    if (_sock == MAX_SOCK_NUM)
+    {
+        return 0;
+    }
 
     uint8_t s = status();
     return !(s == SnSR::LISTEN || s == SnSR::CLOSED || s == SnSR::FIN_WAIT ||
@@ -189,7 +213,10 @@ uint8_t EthernetClient::connected()
 
 uint8_t EthernetClient::status()
 {
-    if (_sock == MAX_SOCK_NUM) return SnSR::CLOSED;
+    if (_sock == MAX_SOCK_NUM)
+    {
+        return SnSR::CLOSED;
+    }
     return socketStatus(_sock);
 }
 

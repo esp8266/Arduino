@@ -25,7 +25,10 @@ void base64_init_encodestate_nonewlines(base64_encodestate* state_in)
 char base64_encode_value(char value_in)
 {
     static const char* encoding = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    if (value_in > 63) return '=';
+    if (value_in > 63)
+    {
+        return '=';
+    }
     return encoding[(int)value_in];
 }
 

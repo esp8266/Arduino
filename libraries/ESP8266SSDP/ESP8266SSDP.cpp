@@ -188,13 +188,17 @@ bool SSDPClass::begin()
     }
 
     if (!_server->listen(IP_ADDR_ANY, SSDP_PORT))
+    {
         return false;
+    }
 
     _server->setMulticastInterface(local);
     _server->setMulticastTTL(_ttl);
     _server->onRx(std::bind(&SSDPClass::_update, this));
     if (!_server->connect(mcast, SSDP_PORT))
+    {
         return false;
+    }
 
     _startTimer();
 
@@ -204,7 +208,9 @@ bool SSDPClass::begin()
 void SSDPClass::end()
 {
     if (!_server)
-        return; // object is zeroed already, nothing to do
+    {
+        return;    // object is zeroed already, nothing to do
+    }
 
 #ifdef DEBUG_SSDP
     DEBUG_SSDP.printf_P(PSTR("SSDP end ... "));
@@ -331,10 +337,19 @@ void SSDPClass::_update()
             case METHOD:
                 if (c == ' ')
                 {
-                    if (strcmp(buffer, "M-SEARCH") == 0) method = SEARCH;
+                    if (strcmp(buffer, "M-SEARCH") == 0)
+                    {
+                        method = SEARCH;
+                    }
 
-                    if (method == NONE) state = ABORT;
-                    else state = URI;
+                    if (method == NONE)
+                    {
+                        state = ABORT;
+                    }
+                    else
+                    {
+                        state = URI;
+                    }
                     cursor = 0;
 
                 }
@@ -347,8 +362,14 @@ void SSDPClass::_update()
             case URI:
                 if (c == ' ')
                 {
-                    if (strcmp(buffer, "*")) state = ABORT;
-                    else state = PROTO;
+                    if (strcmp(buffer, "*"))
+                    {
+                        state = ABORT;
+                    }
+                    else
+                    {
+                        state = PROTO;
+                    }
                     cursor = 0;
                 }
                 else if (cursor < SSDP_URI_SIZE - 1)
@@ -425,9 +446,18 @@ void SSDPClass::_update()
                 {
                     if (header == START)
                     {
-                        if (strncmp(buffer, "MA", 2) == 0) header = MAN;
-                        else if (strcmp(buffer, "ST") == 0) header = ST;
-                        else if (strcmp(buffer, "MX") == 0) header = MX;
+                        if (strncmp(buffer, "MA", 2) == 0)
+                        {
+                            header = MAN;
+                        }
+                        else if (strcmp(buffer, "ST") == 0)
+                        {
+                            header = ST;
+                        }
+                        else if (strcmp(buffer, "MX") == 0)
+                        {
+                            header = MX;
+                        }
                     }
 
                     if (cursor < SSDP_BUFFER_SIZE - 1)
@@ -458,7 +488,9 @@ void SSDPClass::_update()
     if (_pending)
     {
         while (_server->next())
+        {
             _server->flush();
+        }
     }
 
 }
@@ -553,7 +585,9 @@ void SSDPClass::_startTimer()
 void SSDPClass::_stopTimer()
 {
     if (!_timer)
+    {
         return;
+    }
 
     ETSTimer* tm = &(_timer->timer);
     os_timer_disarm(tm);

@@ -82,7 +82,9 @@ time_t time(time_t * t)
 {
     time_t seconds = sntp_get_current_timestamp();
     if (t)
+    {
         *t = seconds;
+    }
     return seconds;
 }
 
@@ -93,7 +95,9 @@ int _gettimeofday_r(struct _reent* unused, struct timeval *tp, void *tzp)
     if (tp)
     {
         if (!timeshift64_is_set)
+        {
             tune_timeshift64(sntp_get_current_timestamp() * 1000000ULL);
+        }
         uint64_t currentTime_us = timeshift64 + micros64();
         tp->tv_sec = currentTime_us / 1000000ULL;
         tp->tv_usec = currentTime_us % 1000000ULL;

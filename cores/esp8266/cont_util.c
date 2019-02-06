@@ -37,12 +37,17 @@ void cont_init(cont_t* cont)
 
     // fill stack with magic values to check high water mark
     for (int pos = 0; pos < (int)(sizeof(cont->stack) / 4); pos++)
+    {
         cont->stack[pos] = CONT_STACKGUARD;
+    }
 }
 
 int ICACHE_RAM_ATTR cont_check(cont_t* cont)
 {
-    if (cont->stack_guard1 != CONT_STACKGUARD || cont->stack_guard2 != CONT_STACKGUARD) return 1;
+    if (cont->stack_guard1 != CONT_STACKGUARD || cont->stack_guard2 != CONT_STACKGUARD)
+    {
+        return 1;
+    }
 
     return 0;
 }
@@ -78,5 +83,7 @@ void cont_repaint_stack(cont_t *cont)
 
     // Fill stack with magic values
     for (uint32_t pos = 0; pos < sp_safe; pos++)
+    {
         cont->stack[pos] = CONT_STACKGUARD;
+    }
 }

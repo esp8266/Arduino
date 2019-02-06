@@ -21,10 +21,14 @@ public:
     bool canHandle(HTTPMethod requestMethod, String requestUri) override
     {
         if (_method != HTTP_ANY && _method != requestMethod)
+        {
             return false;
+        }
 
         if (requestUri != _uri)
+        {
             return false;
+        }
 
         return true;
     }
@@ -32,7 +36,9 @@ public:
     bool canUpload(String requestUri) override
     {
         if (!_ufn || !canHandle(HTTP_POST, requestUri))
+        {
             return false;
+        }
 
         return true;
     }
@@ -41,7 +47,9 @@ public:
     {
         (void) server;
         if (!canHandle(requestMethod, requestUri))
+        {
             return false;
+        }
 
         _fn();
         return true;
@@ -52,7 +60,9 @@ public:
         (void) server;
         (void) upload;
         if (canUpload(requestUri))
+        {
             _ufn();
+        }
     }
 
 protected:
@@ -79,10 +89,14 @@ public:
     bool canHandle(HTTPMethod requestMethod, String requestUri) override
     {
         if (requestMethod != HTTP_GET)
+        {
             return false;
+        }
 
         if ((_isFile && requestUri != _uri) || !requestUri.startsWith(_uri))
+        {
             return false;
+        }
 
         return true;
     }
@@ -90,7 +104,9 @@ public:
     bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override
     {
         if (!canHandle(requestMethod, requestUri))
+        {
             return false;
+        }
 
         DEBUGV("StaticRequestHandler::handle: request=%s _uri=%s\r\n", requestUri.c_str(), _uri.c_str());
 
@@ -101,7 +117,9 @@ public:
             // Base URI doesn't point to a file.
             // If a directory is requested, look for index file.
             if (requestUri.endsWith("/"))
+            {
                 requestUri += "index.htm";
+            }
 
             // Append whatever follows this URI in request to get the file path.
             path += requestUri.substring(_baseUriLength);
@@ -116,15 +134,21 @@ public:
         {
             String pathWithGz = path + FPSTR(mimeTable[gz].endsWith);
             if (_fs.exists(pathWithGz))
+            {
                 path += FPSTR(mimeTable[gz].endsWith);
+            }
         }
 
         File f = _fs.open(path, "r");
         if (!f)
+        {
             return false;
+        }
 
         if (_cache_header.length() != 0)
+        {
             server.sendHeader("Cache-Control", _cache_header);
+        }
 
         server.streamFile(f, contentType);
         return true;

@@ -146,9 +146,13 @@ static s32_t spiffs_rewrite_index(spiffs *fs, spiffs_obj_id obj_id, spiffs_span_
 
     // rewrite in mem
     if (objix_spix == 0)
+    {
         ((spiffs_page_ix*)((u8_t *)fs->lu_work + sizeof(spiffs_page_object_ix_header)))[data_spix] = new_data_pix;
+    }
     else
+    {
         ((spiffs_page_ix*)((u8_t *)fs->lu_work + sizeof(spiffs_page_object_ix)))[SPIFFS_OBJ_IX_ENTRY(fs, data_spix)] = new_data_pix;
+    }
 
     res = _spiffs_wr(fs, SPIFFS_OP_T_OBJ_DA | SPIFFS_OP_C_UPDT,
                      0, SPIFFS_PAGE_TO_PADDR(fs, free_pix), SPIFFS_CFG_LOG_PAGE_SZ(fs), fs->lu_work);
@@ -170,7 +174,9 @@ static s32_t spiffs_delete_obj_lazy(spiffs *fs, spiffs_obj_id obj_id)
     s32_t res;
     res = spiffs_obj_lu_find_id_and_span(fs, obj_id, 0, 0, &objix_hdr_pix);
     if (res == SPIFFS_ERR_NOT_FOUND)
+    {
         return SPIFFS_OK;
+    }
     SPIFFS_CHECK_RES(res);
     u8_t flags = 0xff & ~SPIFFS_PH_FLAG_IXDELE;
     res = _spiffs_wr(fs, SPIFFS_OP_T_OBJ_LU | SPIFFS_OP_C_UPDT,
@@ -232,7 +238,9 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
                         CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_DELETE_BAD_FILE, p_hdr->obj_id, 0);
                     }
                     else
+                    {
                         CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_FIX_INDEX, p_hdr->obj_id, p_hdr->span_ix);
+                    }
                     SPIFFS_CHECK_RES(res);
                 }
             }
@@ -259,7 +267,9 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
                 }
             }
             else
+            {
                 SPIFFS_CHECK_RES(res);
+            }
         }
     }
     if (lu_obj_id != SPIFFS_OBJ_ID_FREE && lu_obj_id != SPIFFS_OBJ_ID_DELETED)
@@ -414,7 +424,9 @@ static s32_t spiffs_lookup_check_validate(spiffs *fs, spiffs_obj_id lu_obj_id, s
             delete_page = 1;
             // if other data page exists and object index exists, just delete page
             if (data_pix && objix_pix_d)
+            {
                 SPIFFS_CHECK_DBG("LU: FIXUP: other index and data page exists, simply remove\n");
+            }
             else
                 // if only data page exists, make this page index
                 if (data_pix && objix_pix_d == 0)
@@ -530,7 +542,9 @@ static s32_t spiffs_lookup_check_v(spiffs *fs, spiffs_obj_id obj_id, spiffs_bloc
     SPIFFS_CHECK_RES(res);
 
     if (res == SPIFFS_OK)
+    {
         return reload_lu ? SPIFFS_VIS_COUNTINUE_RELOAD : SPIFFS_VIS_COUNTINUE;
+    }
     return res;
 }
 
@@ -547,10 +561,14 @@ s32_t spiffs_lookup_consistency_check(spiffs *fs, u8_t check_all_objects)
     res = spiffs_obj_lu_find_entry_visitor(fs, 0, 0, 0, 0, spiffs_lookup_check_v, 0, 0, 0, 0);
 
     if (res == SPIFFS_VIS_END)
+    {
         res = SPIFFS_OK;
+    }
 
     if (res != SPIFFS_OK)
+    {
         CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_ERROR, res, 0);
+    }
 
     CHECK_CB(fs, SPIFFS_CHECK_LOOKUP, SPIFFS_CHECK_PROGRESS, 256, 0);
 
@@ -623,7 +641,9 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs)
                 {
                     // found non-deleted index
                     if (within_range)
+                    {
                         fs->work[pix_byte_ix] |= (1 << (pix_bit_ix + 2));
+                    }
 
                     // load non-deleted index
                     res = _spiffs_rd(fs, SPIFFS_OP_T_OBJ_LU2 | SPIFFS_OP_C_READ,
@@ -699,7 +719,9 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs)
                                 res = spiffs_page_delete(fs, cur_pix);
                             }
                             else
+                            {
                                 CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_FIX_INDEX, objix_p_hdr->obj_id, objix_p_hdr->span_ix);
+                            }
                             SPIFFS_CHECK_RES(res);
                             restart = 1;
 
@@ -756,7 +778,9 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs)
                                         res = spiffs_delete_obj_lazy(fs, p_hdr.obj_id);
                                     }
                                     else
+                                    {
                                         CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_FIX_INDEX, p_hdr.obj_id, p_hdr.span_ix);
+                                    }
                                     SPIFFS_CHECK_RES(res);
                                     restart = 1;
                                 }
@@ -894,7 +918,9 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs)
                                 res = spiffs_delete_obj_lazy(fs, p_hdr.obj_id);
                             }
                             else
+                            {
                                 CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_FIX_INDEX, p_hdr.obj_id, p_hdr.span_ix);
+                            }
                             SPIFFS_CHECK_RES(res);
                             restart = 1;
                             continue;
@@ -952,7 +978,9 @@ static s32_t spiffs_page_consistency_check_i(spiffs *fs)
         SPIFFS_CHECK_DBG("PA: processed "_SPIPRIpg", restart "_SPIPRIi"\n", pix_offset, restart);
         // next page range
         if (!restart)
+        {
             pix_offset += pages_per_scan;
+        }
     } // while page range not reached end
     return res;
 }
@@ -963,7 +991,9 @@ s32_t spiffs_page_consistency_check(spiffs *fs)
     CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_PROGRESS, 0, 0);
     s32_t res = spiffs_page_consistency_check_i(fs);
     if (res != SPIFFS_OK)
+    {
         CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_ERROR, res, 0);
+    }
     CHECK_CB(fs, SPIFFS_CHECK_PAGE, SPIFFS_CHECK_PROGRESS, 256, 0);
     return res;
 }
@@ -981,7 +1011,9 @@ static int spiffs_object_index_search(spiffs *fs, spiffs_obj_id obj_id)
     for (i = 0; i < SPIFFS_CFG_LOG_PAGE_SZ(fs) / sizeof(spiffs_obj_id); i++)
     {
         if ((obj_table[i] & ~SPIFFS_OBJ_ID_IX_FLAG) == obj_id)
+        {
             return i;
+        }
     }
     return -1;
 }
@@ -1022,7 +1054,9 @@ static s32_t spiffs_object_index_consistency_check_v(spiffs *fs, spiffs_obj_id o
 
         if ((p_hdr.flags & (SPIFFS_PH_FLAG_INDEX | SPIFFS_PH_FLAG_FINAL | SPIFFS_PH_FLAG_DELET | SPIFFS_PH_FLAG_IXDELE)) ==
                 (SPIFFS_PH_FLAG_DELET | SPIFFS_PH_FLAG_IXDELE))
+        {
             return res_c;
+        }
 
         if (p_hdr.span_ix == 0)
         {
@@ -1034,7 +1068,9 @@ static s32_t spiffs_object_index_consistency_check_v(spiffs *fs, spiffs_obj_id o
                 obj_table[*log_ix] = obj_id & ~SPIFFS_OBJ_ID_IX_FLAG;
                 (*log_ix)++;
                 if (*log_ix >= SPIFFS_CFG_LOG_PAGE_SZ(fs) / sizeof(spiffs_obj_id))
+                {
                     *log_ix = 0;
+                }
             }
         }
         else     // span index
@@ -1060,10 +1096,14 @@ static s32_t spiffs_object_index_consistency_check_v(spiffs *fs, spiffs_obj_id o
                     obj_table[*log_ix] = obj_id | SPIFFS_OBJ_ID_IX_FLAG;
                 }
                 else
+                {
                     SPIFFS_CHECK_RES(res);
+                }
                 (*log_ix)++;
                 if (*log_ix >= SPIFFS_CFG_LOG_PAGE_SZ(fs) / sizeof(spiffs_obj_id))
+                {
                     *log_ix = 0;
+                }
             }
             else
             {
@@ -1107,9 +1147,13 @@ s32_t spiffs_object_index_consistency_check(spiffs *fs)
     res = spiffs_obj_lu_find_entry_visitor(fs, 0, 0, 0, 0, spiffs_object_index_consistency_check_v, 0, &obj_id_log_ix,
                                            0, 0);
     if (res == SPIFFS_VIS_END)
+    {
         res = SPIFFS_OK;
+    }
     if (res != SPIFFS_OK)
+    {
         CHECK_CB(fs, SPIFFS_CHECK_INDEX, SPIFFS_CHECK_ERROR, res, 0);
+    }
     CHECK_CB(fs, SPIFFS_CHECK_INDEX, SPIFFS_CHECK_PROGRESS, 256, 0);
     return res;
 }

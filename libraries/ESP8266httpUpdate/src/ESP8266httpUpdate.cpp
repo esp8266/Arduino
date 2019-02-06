@@ -226,7 +226,9 @@ String ESP8266HTTPUpdate::getLastErrorString(void)
 
     // error from http client
     if (_lastError > -100)
+    {
         return String(F("HTTP error: ")) + HTTPClient::errorToString(_lastError);
+    }
 
     switch (_lastError)
     {
@@ -276,12 +278,18 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     http.addHeader(F("x-ESP8266-sdk-version"), ESP.getSdkVersion());
 
     if (spiffs)
+    {
         http.addHeader(F("x-ESP8266-mode"), F("spiffs"));
+    }
     else
+    {
         http.addHeader(F("x-ESP8266-mode"), F("sketch"));
+    }
 
     if (currentVersion && currentVersion[0] != 0x00)
+    {
         http.addHeader(F("x-ESP8266-version"), currentVersion);
+    }
 
     const char * headerkeys[] = { "x-MD5" };
     size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
@@ -308,14 +316,18 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     DEBUG_HTTP_UPDATE("[httpUpdate]  - len: %d\n", len);
 
     if (http.hasHeader("x-MD5"))
+    {
         DEBUG_HTTP_UPDATE("[httpUpdate]  - MD5: %s\n", http.header("x-MD5").c_str());
+    }
 
     DEBUG_HTTP_UPDATE("[httpUpdate] ESP8266 info:\n");
     DEBUG_HTTP_UPDATE("[httpUpdate]  - free Space: %d\n", ESP.getFreeSketchSpace());
     DEBUG_HTTP_UPDATE("[httpUpdate]  - current Sketch Size: %d\n", ESP.getSketchSize());
 
     if (currentVersion && currentVersion[0] != 0x00)
+    {
         DEBUG_HTTP_UPDATE("[httpUpdate]  - current version: %s\n", currentVersion.c_str());
+    }
 
     switch (code)
     {
@@ -408,7 +420,9 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
                     http.end();
 
                     if (_rebootOnUpdate && !spiffs)
+                    {
                         ESP.restart();
+                    }
 
                 }
                 else

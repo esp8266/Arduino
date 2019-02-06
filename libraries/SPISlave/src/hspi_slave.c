@@ -44,9 +44,13 @@ void ICACHE_RAM_ATTR _hspi_slave_isr_handler(void *arg)
         SPI1S |= (0x3E0);//enable interrupts
 
         if ((status & SPISRBIS) != 0 && (_hspi_slave_tx_data_cb))
+        {
             _hspi_slave_tx_data_cb(arg);
+        }
         if ((status & SPISRSIS) != 0 && (_hspi_slave_tx_status_cb))
+        {
             _hspi_slave_tx_status_cb(arg);
+        }
         if ((status & SPISWSIS) != 0 && (_hspi_slave_rx_status_cb))
         {
             uint32_t s = SPI1WS;

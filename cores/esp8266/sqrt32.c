@@ -16,10 +16,14 @@ uint32_t sqrt32(uint32_t n)
     for (;;)
     {
         if (g * g > n)
+        {
             g ^= c;
+        }
         c >>= 1;
         if (!c)
+        {
             return g;
+        }
         g |= c;
     }
 }

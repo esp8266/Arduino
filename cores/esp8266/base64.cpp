@@ -45,9 +45,13 @@ String base64::encode(uint8_t * data, size_t length, bool doNewLines)
     {
         base64_encodestate _state;
         if (doNewLines)
+        {
             base64_init_encodestate(&_state);
+        }
         else
+        {
             base64_init_encodestate_nonewlines(&_state);
+        }
         int len = base64_encode_block((const char *) &data[0], length, &buffer[0], &_state);
         len = base64_encode_blockend((buffer + len), &_state);
 

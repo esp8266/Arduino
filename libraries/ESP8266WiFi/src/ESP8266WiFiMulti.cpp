@@ -122,9 +122,13 @@ wl_status_t ESP8266WiFiMulti::run(void)
                 }
 
                 if (known)
+                {
                     DEBUG_WIFI_MULTI(" ---> ");
+                }
                 else
+                {
                     DEBUG_WIFI_MULTI("      ");
+                }
 
                 DEBUG_WIFI_MULTI(" %d: [%d][%02X:%02X:%02X:%02X:%02X:%02X] %s (%d) %c\n", i, chan_scan, BSSID_scan[0], BSSID_scan[1], BSSID_scan[2], BSSID_scan[3], BSSID_scan[4], BSSID_scan[5], ssid_scan.c_str(), rssi_scan, (sec_scan == ENC_TYPE_NONE) ? ' ' : '*');
                 delay(0);
@@ -180,7 +184,9 @@ wl_status_t ESP8266WiFiMulti::run(void)
 #endif
             }
             else
+            {
                 DEBUG_WIFI_MULTI("[WIFI] no matching wifi found!\n");
+            }
 
             return status;
         }
@@ -234,9 +240,13 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase)
     }
 
     if (passphrase)
+    {
         newAP.passphrase = strdup(passphrase);
+    }
     else
+    {
         newAP.passphrase = strdup("");
+    }
 
     if (!newAP.passphrase)
     {
@@ -265,12 +275,16 @@ bool ESP8266WiFiMulti::APlistExists(const char* ssid, const char *passphrase)
             if (!passphrase)
             {
                 if (!strcmp(entry.passphrase, ""))
+                {
                     return true;
+                }
             }
             else
             {
                 if (!strcmp(entry.passphrase, passphrase))
+                {
                     return true;
+                }
             }
         }
     }
@@ -282,9 +296,13 @@ void ESP8266WiFiMulti::APlistClean(void)
     for (auto entry : APlist)
     {
         if (entry.ssid)
+        {
             free(entry.ssid);
+        }
         if (entry.passphrase)
+        {
             free(entry.passphrase);
+        }
     }
     APlist.clear();
 }

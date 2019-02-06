@@ -64,7 +64,9 @@ public:
             sentLen = write(obuf, 512);
             doneLen = doneLen + sentLen;
             if (sentLen != 512)
+            {
                 return doneLen;
+            }
         }
 
         size_t leftLen = src.available();

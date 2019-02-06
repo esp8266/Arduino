@@ -58,7 +58,9 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s)
 
     int fillme = width; // how many cells to fill for the integer part
     if (prec > 0)
+    {
         fillme -= (prec + 1);
+    }
 
     // Handle negative numbers
     if (number < 0.0)
@@ -72,7 +74,9 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s)
     // I optimized out most of the divisions
     double rounding = 2.0;
     for (uint8_t i = 0; i < prec; ++i)
+    {
         rounding *= 10.0;
+    }
     rounding = 1.0 / rounding;
 
     number += rounding;
@@ -91,10 +95,15 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s)
 
     // Pad unused cells with spaces
     while (fillme-- > 0)
+    {
         *out++ = ' ';
+    }
 
     // Handle negative sign
-    if (negative) *out++ = '-';
+    if (negative)
+    {
+        *out++ = '-';
+    }
 
     // Print the digits, and if necessary, the decimal point
     digitcount += prec;
@@ -102,10 +111,15 @@ char * dtostrf(double number, signed char width, unsigned char prec, char *s)
     while (digitcount-- > 0)
     {
         digit = (int8_t)number;
-        if (digit > 9) digit = 9; // insurance
+        if (digit > 9)
+        {
+            digit = 9;    // insurance
+        }
         *out++ = (char)('0' | digit);
         if ((digitcount == prec) && (prec > 0))
+        {
             *out++ = '.';
+        }
         number -= digit;
         number *= 10.0;
     }

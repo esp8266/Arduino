@@ -64,7 +64,10 @@ static UNUSEDOK int FreeRam(void)
 */
 static NOINLINE void SerialPrint_P(PGM_P str)
 {
-    for (uint8_t c; (c = pgm_read_byte(str)); str++) Serial.write(c);
+    for (uint8_t c; (c = pgm_read_byte(str)); str++)
+    {
+        Serial.write(c);
+    }
 }
 //------------------------------------------------------------------------------
 /**

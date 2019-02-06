@@ -36,7 +36,9 @@ void TFT::TFTinit(void)
     TFT_DC_HIGH;
     INT8U i = 0;
     for (i = 0; i < 3; i++)
+    {
         readID();
+    }
     delay(500);
     sendCMD(0x01);
     delay(200);
@@ -155,13 +157,17 @@ INT8U TFT::readID(void)
     {
         data[i] = Read_Register(0xd3, i + 1);
         if (data[i] != ID[i])
+        {
             ToF = 0;
+        }
     }
     if (!ToF)                                                           /* data!=ID                     */
     {
         Serial.print("Read TFT ID failed, ID should be 0x09341, but read ID = 0x");
         for (i = 0; i < 3; i++)
+        {
             Serial.print(data[i], HEX);
+        }
         Serial.println();
     }
     return ToF;
@@ -271,14 +277,18 @@ void TFT::drawChar(INT8U ascii, INT16U poX, INT16U poY, INT16U size, INT16U fgco
     if ((ascii >= 32) && (ascii <= 127))
         ;
     else
+    {
         ascii = '?' - 32;
+    }
     for (int i = 0; i < FONT_X; i++)
     {
         INT8U temp = pgm_read_byte(&simpleFont[ascii - 0x20][i]);
         for (INT8U f = 0; f < 8; f++)
         {
             if ((temp >> f) & 0x01)
+            {
                 fillRectangle(poX + i * size, poY + f * size, size, size, fgcolor);
+            }
         }
 
     }
@@ -311,7 +321,9 @@ void  TFT::drawHorizontalLine(INT16U poX, INT16U poY,
     setPage(poY, poY);
     sendCMD(0x2c);
     for (INT16U i = 0; i < length; i++)
+    {
         sendData(color);
+    }
 }
 
 void TFT::drawLine(INT16U x0, INT16U y0, INT16U x1, INT16U y1, INT16U color)
@@ -329,12 +341,18 @@ void TFT::drawLine(INT16U x0, INT16U y0, INT16U x1, INT16U y1, INT16U color)
         e2 = 2 * err;
         if (e2 >= dy)                                                   /* e_xy+e_x > 0                 */
         {
-            if (x0 == x1) break;
+            if (x0 == x1)
+            {
+                break;
+            }
             err += dy; x0 += sx;
         }
         if (e2 <= dx)                                                   /* e_xy+e_y < 0                 */
         {
-            if (y0 == y1) break;
+            if (y0 == y1)
+            {
+                break;
+            }
             err += dx; y0 += sy;
         }
     }
@@ -346,7 +364,9 @@ void TFT::drawVerticalLine(INT16U poX, INT16U poY, INT16U length, INT16U color)
     setPage(poY, poY + length);
     sendCMD(0x2c);
     for (INT16U i = 0; i < length; i++)
+    {
         sendData(color);
+    }
 }
 
 void TFT::drawRectangle(INT16U poX, INT16U poY, INT16U length, INT16U width, INT16U color)
@@ -370,9 +390,15 @@ void TFT::drawCircle(int poX, int poY, int r, INT16U color)
         if (e2 <= y)
         {
             err += ++y * 2 + 1;
-            if (-x == y && e2 <= x) e2 = 0;
+            if (-x == y && e2 <= x)
+            {
+                e2 = 0;
+            }
         }
-        if (e2 > x) err += ++x * 2 + 1;
+        if (e2 > x)
+        {
+            err += ++x * 2 + 1;
+        }
     } while (x <= 0);
 }
 
@@ -389,9 +415,15 @@ void TFT::fillCircle(int poX, int poY, int r, INT16U color)
         if (e2 <= y)
         {
             err += ++y * 2 + 1;
-            if (-x == y && e2 <= x) e2 = 0;
+            if (-x == y && e2 <= x)
+            {
+                e2 = 0;
+            }
         }
-        if (e2 > x) err += ++x * 2 + 1;
+        if (e2 > x)
+        {
+            err += ++x * 2 + 1;
+        }
     } while (x <= 0);
 
 }
@@ -466,7 +498,9 @@ INT8U TFT::drawFloat(float floatNumber, INT8U decimal, INT16U poX, INT16U poY, I
         f = 1;
     }
     for (INT8U i = 0; i < decimal; ++i)
+    {
         rounding /= 10.0;
+    }
     floatNumber += rounding;
 
     temp = (INT16U)floatNumber;
@@ -521,7 +555,9 @@ INT8U TFT::drawFloat(float floatNumber, INT16U poX, INT16U poY, INT16U size, INT
         f = 1;
     }
     for (INT8U i = 0; i < decimal; ++i)
+    {
         rounding /= 10.0;
+    }
     floatNumber += rounding;
 
     temp = (INT16U)floatNumber;

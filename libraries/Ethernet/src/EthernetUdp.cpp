@@ -39,7 +39,9 @@ EthernetUDP::EthernetUDP() : _sock(MAX_SOCK_NUM) {}
 uint8_t EthernetUDP::begin(uint16_t port)
 {
     if (_sock != MAX_SOCK_NUM)
+    {
         return 0;
+    }
 
     for (int i = 0; i < MAX_SOCK_NUM; i++)
     {
@@ -52,7 +54,9 @@ uint8_t EthernetUDP::begin(uint16_t port)
     }
 
     if (_sock == MAX_SOCK_NUM)
+    {
         return 0;
+    }
 
     _port = port;
     _remaining = 0;
@@ -72,7 +76,9 @@ int EthernetUDP::available()
 void EthernetUDP::stop()
 {
     if (_sock == MAX_SOCK_NUM)
+    {
         return;
+    }
 
     close(_sock);
 
@@ -90,9 +96,13 @@ int EthernetUDP::beginPacket(const char *host, uint16_t port)
     dns.begin(Ethernet.dnsServerIP());
     ret = dns.getHostByName(host, remote_addr);
     if (ret == 1)
+    {
         return beginPacket(remote_addr, port);
+    }
     else
+    {
         return ret;
+    }
 }
 
 int EthernetUDP::beginPacket(IPAddress ip, uint16_t port)
@@ -202,7 +212,9 @@ int EthernetUDP::peek()
     // If the user hasn't called parsePacket yet then return nothing otherwise they
     // may get the UDP header
     if (!_remaining)
+    {
         return -1;
+    }
     ::peek(_sock, &b);
     return b;
 }
@@ -214,7 +226,9 @@ void EthernetUDP::clear_remaining()
     // hope the w5100 always behaves :)
 
     while (_remaining)
+    {
         read();
+    }
 }
 
 void EthernetUDP::flush()

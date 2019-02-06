@@ -53,13 +53,19 @@ bool SPIClass::pins(int8_t sck, int8_t miso, int8_t mosi, int8_t ss)
             miso == 7 &&
             mosi == 8 &&
             ss == 0)
+    {
         pinSet = SPI_PINS_HSPI_OVERLAP;
+    }
     else if (sck == 14 &&
              miso == 12 &&
              mosi == 13)
+    {
         pinSet = SPI_PINS_HSPI;
+    }
     else
+    {
         return false;
+    }
 
     return true;
 }
@@ -99,7 +105,9 @@ void SPIClass::end()
         pinMode(MISO, INPUT);
         pinMode(MOSI, INPUT);
         if (useHwCs)
+        {
             pinMode(SS, INPUT);
+        }
         break;
     case SPI_PINS_HSPI_OVERLAP:
         IOSWAP &= ~(1 << IOSWAP2CS);
@@ -180,12 +188,18 @@ void SPIClass::setDataMode(uint8_t dataMode)
     bool CPHA = (dataMode & 0x01); ///< CPHA (Clock Phase)
 
     if (CPHA)
+    {
         SPI1U |= (SPIUSME);
+    }
     else
+    {
         SPI1U &= ~(SPIUSME);
+    }
 
     if (CPOL)
+    {
         SPI1P |= 1 << 29;
+    }
     else
     {
         SPI1P &= ~(1 << 29);
@@ -197,9 +211,13 @@ void SPIClass::setDataMode(uint8_t dataMode)
 void SPIClass::setBitOrder(uint8_t bitOrder)
 {
     if (bitOrder == MSBFIRST)
+    {
         SPI1C &= ~(SPICWBO | SPICRBO);
+    }
     else
+    {
         SPI1C |= (SPICWBO | SPICRBO);
+    }
 }
 
 /**
@@ -264,9 +282,13 @@ void SPIClass::setFrequency(uint32_t freq)
                 reg.regPre = 0x1FFF; // 8191
             }
             else if (calPre <= 0)
+            {
                 reg.regPre = 0;
+            }
             else
+            {
                 reg.regPre = calPre;
+            }
 
             reg.regL = ((reg.regN + 1) / 2);
             // reg.regH = (reg.regN - reg.regL);
@@ -314,7 +336,9 @@ void SPIClass::setClockDivider(uint32_t clockDiv)
         GPMUX |= (1 << 9); // Set bit 9 if sysclock required
     }
     else
+    {
         GPMUX &= ~(1 << 9);
+    }
     SPI1CLK = clockDiv;
 }
 
@@ -370,7 +394,9 @@ void SPIClass::transfer(void *buf, uint16_t count)
 
     // cbuf may not be 32bits-aligned
     for (; (((unsigned long)cbuf) & 3) && count; cbuf++, count--)
+    {
         *cbuf = transfer(*cbuf);
+    }
 
     // cbuf is now aligned
     // count may not be a multiple of 4
@@ -381,7 +407,9 @@ void SPIClass::transfer(void *buf, uint16_t count)
     cbuf += count4;
     count -= count4;
     for (; count; cbuf++, count--)
+    {
         *cbuf = transfer(*cbuf);
+    }
 }
 
 void SPIClass::write(uint8_t data)
@@ -498,7 +526,10 @@ void SPIClass::writeBytes_(const uint8_t * data, uint8_t size)
 */
 void SPIClass::writePattern(const uint8_t * data, uint8_t size, uint32_t repeat)
 {
-    if (size > 64) return; //max Hardware FIFO
+    if (size > 64)
+    {
+        return;    //max Hardware FIFO
+    }
 
     while (SPI1CMD & SPIBUSY) {}
 
@@ -526,8 +557,14 @@ void SPIClass::writePattern(const uint8_t * data, uint8_t size, uint32_t repeat)
         }
 
         r = repeatRem;
-        if (r & 3) r = r / 4 + 1;
-        else r = r / 4;
+        if (r & 3)
+        {
+            r = r / 4 + 1;
+        }
+        else
+        {
+            r = r / 4;
+        }
         for (i = 0; i < r; i++)
         {
             *fifoPtr = buffer[i];
@@ -591,8 +628,14 @@ void SPIClass::transferBytes(const uint8_t * out, uint8_t * in, uint32_t size)
         {
             transferBytes_(out, in, 64);
             size -= 64;
-            if (out) out += 64;
-            if (in) in += 64;
+            if (out)
+            {
+                out += 64;
+            }
+            if (in)
+            {
+                in += 64;
+            }
         }
         else
         {
@@ -614,7 +657,9 @@ void SPIClass::transferBytes(const uint8_t * out, uint8_t * in, uint32_t size)
 void SPIClass::transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t size)
 {
     if (!size)
+    {
         return;
+    }
 
     while (SPI1CMD & SPIBUSY) {}
     // Set in/out Bits to transfer
@@ -628,14 +673,18 @@ void SPIClass::transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t 
         uint8_t outSize = ((size + 3) / 4);
         uint32_t *dataPtr = (uint32_t*) out;
         while (outSize--)
+        {
             *(fifoPtr++) = *(dataPtr++);
+        }
     }
     else
     {
         uint8_t outSize = ((size + 3) / 4);
         // no out data only read fill with dummy data!
         while (outSize--)
+        {
             *(fifoPtr++) = 0xFFFFFFFF;
+        }
     }
 
     SPI1CMD |= SPIBUSY;
@@ -655,7 +704,9 @@ void SPIClass::transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t 
         }
         volatile uint8_t *fifoPtrB = (volatile uint8_t *)fifoPtr;
         while (inSize--)
+        {
             *(in++) = *(fifoPtrB++);
+        }
     }
 }
 
@@ -674,10 +725,14 @@ void SPIClass::transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size)
         // No need for separate out and in aligned copies, we can overwrite our out copy with the input data safely
         uint8_t aligned[64]; // Stack vars will be 32b aligned
         if (out)
+        {
             memcpy(aligned, out, size);
+        }
         transferBytesAligned_(out ? aligned : nullptr, in ? aligned : nullptr, size);
         if (in)
+        {
             memcpy(in, aligned, size);
+        }
     }
 }
 

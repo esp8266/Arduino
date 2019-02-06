@@ -24,7 +24,9 @@ void MD5Builder::addHexString(const char * data)
     uint16_t i, len = strlen(data);
     uint8_t * tmp = (uint8_t*)malloc(len / 2);
     if (tmp == NULL)
+    {
         return;
+    }
     for (i = 0; i < len; i += 2)
     {
         uint8_t high = hex_char_to_byte(data[i]);
@@ -42,7 +44,9 @@ bool MD5Builder::addStream(Stream & stream, const size_t maxLen)
     uint8_t * buf = (uint8_t*) malloc(buf_size);
 
     if (!buf)
+    {
         return false;
+    }
 
     int bytesAvailable = stream.available();
     while ((bytesAvailable > 0) && (maxLengthLeft > 0))
@@ -62,7 +66,9 @@ bool MD5Builder::addStream(Stream & stream, const size_t maxLen)
         // read data and check if we got something
         int numBytesRead = stream.readBytes(buf, readBytes);
         if (numBytesRead < 1)
+        {
             return false;
+        }
 
         // Update MD5 with buffer payload
         MD5Update(&_ctx, buf, numBytesRead);
@@ -90,7 +96,9 @@ void MD5Builder::getBytes(uint8_t * output)
 void MD5Builder::getChars(char * output)
 {
     for (uint8_t i = 0; i < 16; i++)
+    {
         sprintf(output + (i * 2), "%02x", _buf[i]);
+    }
 }
 
 String MD5Builder::toString(void)

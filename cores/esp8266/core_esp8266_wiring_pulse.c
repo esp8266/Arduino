@@ -38,7 +38,9 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
 {
     const uint32_t max_timeout_us = clockCyclesToMicroseconds(UINT_MAX);
     if (timeout > max_timeout_us)
+    {
         timeout = max_timeout_us;
+    }
     const uint32_t timeout_cycles = microsecondsToClockCycles(timeout);
     const uint32_t start_cycle_count = xthal_get_ccount();
     WAIT_FOR_PIN_STATE(!state);

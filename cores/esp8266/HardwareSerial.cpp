@@ -53,7 +53,9 @@ void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode m
 void HardwareSerial::end()
 {
     if (uart_get_debug() == _uart_nr)
+    {
         uart_set_debug(UART_NO);
+    }
 
     uart_uninit(_uart);
     _uart = NULL;
@@ -62,28 +64,40 @@ void HardwareSerial::end()
 size_t HardwareSerial::setRxBufferSize(size_t size)
 {
     if (_uart)
+    {
         _rx_size = uart_resize_rx_buffer(_uart, size);
+    }
     else
+    {
         _rx_size = size;
+    }
     return _rx_size;
 }
 
 void HardwareSerial::setDebugOutput(bool en)
 {
     if (!_uart)
+    {
         return;
+    }
     if (en)
     {
         if (uart_tx_enabled(_uart))
+        {
             uart_set_debug(_uart_nr);
+        }
         else
+        {
             uart_set_debug(UART_NO);
+        }
     }
     else
     {
         // disable debug for this interface
         if (uart_get_debug() == _uart_nr)
+        {
             uart_set_debug(UART_NO);
+        }
     }
 }
 
@@ -91,14 +105,18 @@ int HardwareSerial::available(void)
 {
     int result = static_cast<int>(uart_rx_available(_uart));
     if (!result)
+    {
         optimistic_yield(10000);
+    }
     return result;
 }
 
 void HardwareSerial::flush()
 {
     if (!_uart || !uart_tx_enabled(_uart))
+    {
         return;
+    }
 
     uart_wait_tx_empty(_uart);
     //Workaround for a bug in serial not actually being finished yet
@@ -123,7 +141,9 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
     while ((time_t) millis() - startMillis < timeoutMillis)
     {
         if ((detectedBaudrate = testBaudrate()))
+        {
             break;
+        }
         yield();
         delay(100);
     }
@@ -140,7 +160,9 @@ size_t HardwareSerial::readBytes(char* buffer, size_t size)
         size_t avail;
         while ((avail = available()) == 0 && !timeOut);
         if (avail == 0)
+        {
             break;
+        }
         got += read(buffer + got, std::min(size - got, avail));
     }
     return got;

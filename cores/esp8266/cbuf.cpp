@@ -44,13 +44,17 @@ size_t cbuf::resize(size_t newSize)
     // not lose any data
     // if data can be lost use remove or flush before resize
     if ((newSize <= bytes_available) || (newSize == _size))
+    {
         return _size;
+    }
 
     char *newbuf = new char[newSize];
     char *oldbuf = _buf;
 
     if (!newbuf)
+    {
         return _size;
+    }
 
     if (_buf)
     {
@@ -72,7 +76,9 @@ size_t cbuf::resize(size_t newSize)
 size_t ICACHE_RAM_ATTR cbuf::available() const
 {
     if (_end >= _begin)
+    {
         return _end - _begin;
+    }
     return _size - (_begin - _end);
 }
 
@@ -84,14 +90,18 @@ size_t cbuf::size()
 size_t cbuf::room() const
 {
     if (_end >= _begin)
+    {
         return _size - (_end - _begin) - 1;
+    }
     return _begin - _end - 1;
 }
 
 int cbuf::peek()
 {
     if (empty())
+    {
         return -1;
+    }
 
     return static_cast<int>(*_begin);
 }
@@ -117,7 +127,9 @@ size_t cbuf::peek(char *dst, size_t size)
 int ICACHE_RAM_ATTR cbuf::read()
 {
     if (empty())
+    {
         return -1;
+    }
 
     char result = *_begin;
     _begin = wrap_if_bufend(_begin + 1);
@@ -145,7 +157,9 @@ size_t cbuf::read(char* dst, size_t size)
 size_t ICACHE_RAM_ATTR cbuf::write(char c)
 {
     if (full())
+    {
         return 0;
+    }
 
     *_end = c;
     _end = wrap_if_bufend(_end + 1);

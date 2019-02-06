@@ -65,7 +65,9 @@ public:
     {
         YieldPolicyT::execute(); //in case of DoNothing: gets optimized away
         if (PeriodicT)          //in case of false: gets optimized away
+        {
             return expiredRetrigger();
+        }
         return expiredOneShot();
     }
 

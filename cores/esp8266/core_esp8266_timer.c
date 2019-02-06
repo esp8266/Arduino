@@ -32,7 +32,10 @@ static volatile timercallback timer1_user_cb = NULL;
 void ICACHE_RAM_ATTR timer1_isr_handler(void *para)
 {
     (void) para;
-    if ((T1C & ((1 << TCAR) | (1 << TCIT))) == 0) TEIE &= ~TEIE1;//edge int disable
+    if ((T1C & ((1 << TCAR) | (1 << TCIT))) == 0)
+    {
+        TEIE &= ~TEIE1;    //edge int disable
+    }
     T1I = 0;
     if (timer1_user_cb)
     {
@@ -71,7 +74,10 @@ void timer1_enable(uint8_t divider, uint8_t int_type, uint8_t reload)
 void ICACHE_RAM_ATTR timer1_write(uint32_t ticks)
 {
     T1L = ((ticks) & 0x7FFFFF);
-    if ((T1C & (1 << TCIT)) == 0) TEIE |= TEIE1;//edge int enable
+    if ((T1C & (1 << TCIT)) == 0)
+    {
+        TEIE |= TEIE1;    //edge int enable
+    }
 }
 
 void ICACHE_RAM_ATTR timer1_disable()

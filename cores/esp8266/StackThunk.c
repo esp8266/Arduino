@@ -70,7 +70,9 @@ void stack_thunk_del_ref()
 void stack_thunk_repaint()
 {
     for (int i = 0; i < _stackSize; i++)
+    {
         stack_thunk_ptr[i] = _stackPaint;
+    }
 }
 
 /* Simple accessor functions used by postmortem */
@@ -101,7 +103,9 @@ uint32_t stack_thunk_get_max_usage()
 
     /* No stack == no usage by definition! */
     if (!stack_thunk_ptr)
+    {
         return 0;
+    }
 
     for (cnt = 0; (cnt < _stackSize) && (stack_thunk_ptr[cnt] == _stackPaint); cnt++)
     {
@@ -117,7 +121,9 @@ void stack_thunk_dump_stack()
     while (pos < stack_thunk_ptr)
     {
         if ((pos[0] != _stackPaint) || (pos[1] != _stackPaint) || (pos[2] != _stackPaint) || (pos[3] != _stackPaint))
+        {
             break;
+        }
         pos += 4;
     }
     ets_printf(">>>stack>>>\n");

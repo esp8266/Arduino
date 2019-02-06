@@ -157,11 +157,15 @@ bool ESP8266NetBIOS::begin(const char *name)
 
     // presuneme jmeno zarizeni se soucasnou upravou na UPPER case
     for (size_t  i = 0; i < n; ++i)
+    {
         _name[i] = toupper(name[i]);
+    }
     _name[n] = '\0';
 
     if (_pcb != NULL)
+    {
         return true;
+    }
     _pcb = udp_new();
     udp_recv(_pcb, &_s_recv, (void *) this);
     err_t err = udp_bind(_pcb, INADDR_ANY, NBNS_PORT);

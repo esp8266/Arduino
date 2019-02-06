@@ -67,7 +67,9 @@ void WiFiServer::begin(uint16_t port)
     err_t err;
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
+    {
         return;
+    }
 
     pcb->so_options |= SOF_REUSEADDR;
 
@@ -109,7 +111,9 @@ bool WiFiServer::getNoDelay()
 bool WiFiServer::hasClient()
 {
     if (_unclaimed)
+    {
         return true;
+    }
     return false;
 }
 
@@ -132,14 +136,18 @@ WiFiClient WiFiServer::available(byte* status)
 uint8_t WiFiServer::status()
 {
     if (!_pcb)
+    {
         return CLOSED;
+    }
     return _pcb->state;
 }
 
 void WiFiServer::close()
 {
     if (!_pcb)
+    {
         return;
+    }
     tcp_close(_pcb);
     _pcb = nullptr;
 }
@@ -167,10 +175,14 @@ template<typename T>
 T* slist_append_tail(T* head, T* item)
 {
     if (!head)
+    {
         return item;
+    }
     T* last = head;
     while (last->next())
+    {
         last = last->next();
+    }
     last->next(item);
     return head;
 }

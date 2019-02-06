@@ -50,7 +50,9 @@ typedef struct BufferItem
         : size(size_), data(new uint8_t[size])
     {
         if (data.get() != nullptr)
+        {
             memcpy(data.get(), data_, size);
+        }
         else
         {
             DEBUGV(":wcs alloc %d failed\r\n", size_);
@@ -73,13 +75,17 @@ public:
         if (!_isServer)
         {
             if (_ssl_client_ctx_refcnt == 0)
+            {
                 _ssl_client_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
+            }
             ++_ssl_client_ctx_refcnt;
         }
         else
         {
             if (_ssl_svr_ctx_refcnt == 0)
+            {
                 _ssl_svr_ctx = ssl_ctx_new(SSL_SERVER_VERIFY_LATER | SSL_DEBUG_OPTS | SSL_CONNECT_IN_PARTS | SSL_READ_BLOCKING | SSL_NO_DEFAULT_KEY, 0);
+            }
             ++_ssl_svr_ctx_refcnt;
         }
     }
@@ -180,16 +186,22 @@ public:
     void stop()
     {
         if (io_ctx)
+        {
             io_ctx->unref();
+        }
         io_ctx = nullptr;
     }
 
     bool connected()
     {
         if (_isServer)
+        {
             return _ssl != nullptr;
+        }
         else
+        {
             return _ssl != nullptr && ssl_handshake_status(_ssl.get()) == SSL_OK;
+        }
     }
 
     int read(uint8_t* dst, size_t size)
@@ -197,7 +209,9 @@ public:
         if (!_available)
         {
             if (!_readAll())
+            {
                 return 0;
+            }
         }
         size_t will_copy = (_available < size) ? _available : size;
         memcpy(dst, _read_ptr, will_copy);
@@ -208,7 +222,9 @@ public:
             _read_ptr = nullptr;
             /* Send pending outgoing data, if any */
             if (_hasWriteBuffers())
+            {
                 _writeBuffersSend();
+            }
         }
         return will_copy;
     }
@@ -218,7 +234,9 @@ public:
         if (!_available)
         {
             if (!_readAll())
+            {
                 return -1;
+            }
         }
         int result = _read_ptr[0];
         ++_read_ptr;
@@ -228,7 +246,9 @@ public:
             _read_ptr = nullptr;
             /* Send pending outgoing data, if any */
             if (_hasWriteBuffers())
+            {
                 _writeBuffersSend();
+            }
         }
         return result;
     }
@@ -236,14 +256,18 @@ public:
     int write(const uint8_t* src, size_t size)
     {
         if (_isServer)
+        {
             return _write(src, size);
+        }
         else if (!_available)
         {
             if (_hasWriteBuffers())
             {
                 int rc = _writeBuffersSend();
                 if (rc < 0)
+                {
                     return rc;
+                }
             }
             return _write(src, size);
         }
@@ -261,7 +285,9 @@ public:
         if (!_available)
         {
             if (!_readAll())
+            {
                 return -1;
+            }
         }
         return _read_ptr[0];
     }
@@ -271,7 +297,9 @@ public:
         if (!_available)
         {
             if (!_readAll())
+            {
                 return -1;
+            }
         }
 
         size_t will_copy = (_available < size) ? _available : size;
@@ -283,9 +311,13 @@ public:
     {
         auto cb = _available;
         if (cb == 0)
+        {
             cb = _readAll();
+        }
         else
+        {
             optimistic_yield(100);
+        }
         return cb;
     }
 
@@ -373,7 +405,9 @@ protected:
     int _readAll()
     {
         if (!_ssl)
+        {
             return 0;
+        }
 
         optimistic_yield(100);
 
@@ -382,7 +416,9 @@ protected:
         if (rc <= 0)
         {
             if (rc < SSL_OK && rc != SSL_CLOSE_NOTIFY && rc != SSL_ERROR_CONN_LOST)
+            {
                 _ssl = nullptr;
+            }
             return 0;
         }
         DEBUGV(":wcs ra %d\r\n", rc);
@@ -394,11 +430,15 @@ protected:
     int _write(const uint8_t* src, size_t size)
     {
         if (!_ssl)
+        {
             return 0;
+        }
 
         int rc = ssl_write(_ssl.get(), src, size);
         if (rc >= 0)
+        {
             return rc;
+        }
         DEBUGV(":wcs write rc=%d\r\n", rc);
         return rc;
     }
@@ -406,7 +446,9 @@ protected:
     int _writeBufferAdd(const uint8_t* data, size_t size)
     {
         if (!_ssl)
+        {
             return 0;
+        }
 
         _writeBuffers.emplace_back(data, size);
         if (_writeBuffers.back().data.get() == nullptr)

@@ -107,7 +107,9 @@ static void byte_vector_append(void *ctx, const void *buff, size_t len)
     std::vector<uint8_t> *vec = static_cast<std::vector<uint8_t>*>(ctx);
     vec->reserve(vec->size() + len); // Allocate extra space all at once
     for (size_t i = 0; i < len; i++)
+    {
         vec->push_back(((uint8_t*)buff)[i]);
+    }
 }
 
 static bool certificate_to_trust_anchor_inner(br_x509_trust_anchor *ta, const br_x509_certificate *xc)
@@ -137,7 +139,9 @@ static bool certificate_to_trust_anchor_inner(br_x509_trust_anchor *ta, const br
     ta->dn.len = vdn.size();
     ta->flags = 0;
     if (br_x509_decoder_isCA(dc.get()))
+    {
         ta->flags |= BR_X509_TA_CA;
+    }
 
     // Extract the public key
     switch (pk->key_type)
@@ -181,7 +185,9 @@ br_x509_trust_anchor *certificate_to_trust_anchor(const br_x509_certificate *xc)
 {
     br_x509_trust_anchor *ta = (br_x509_trust_anchor*)malloc(sizeof(br_x509_trust_anchor));
     if (!ta)
+    {
         return nullptr;
+    }
 
     if (!certificate_to_trust_anchor_inner(ta, xc))
     {
@@ -202,7 +208,9 @@ void free_ta_contents(br_x509_trust_anchor *ta)
             free(ta->pkey.key.rsa.e);
         }
         else if (ta->pkey.key_type == BR_KEYTYPE_EC)
+        {
             free(ta->pkey.key.ec.q);
+        }
         memset(ta, 0, sizeof(*ta));
     }
 }
@@ -214,26 +222,38 @@ void free_ta_contents(br_x509_trust_anchor *ta)
 bool looks_like_DER(const unsigned char *buff, size_t len)
 {
     if (len < 2)
+    {
         return false;
+    }
     if (pgm_read_byte(buff++) != 0x30)
+    {
         return false;
+    }
     int fb = pgm_read_byte(buff++);
     len -= 2;
     if (fb < 0x80)
+    {
         return (size_t)fb == len;
+    }
     else if (fb == 0x80)
+    {
         return false;
+    }
     else
     {
         fb -= 0x80;
         if (len < (size_t)fb + 2)
+        {
             return false;
+        }
         len -= (size_t)fb;
         size_t dlen = 0;
         while (fb -- > 0)
         {
             if (dlen > (len >> 8))
+            {
                 return false;
+            }
             dlen = (dlen << 8) + (size_t)pgm_read_byte(buff++);
         }
         return dlen == len;
@@ -257,7 +277,9 @@ pem_object *decode_pem(const void *src, size_t len, size_t *num)
     std::vector<pem_object> pem_list;
     std::unique_ptr<br_pem_decoder_context> pc(new br_pem_decoder_context); // auto-delete on exit
     if (!pc.get())
+    {
         return nullptr;
+    }
     pem_object po, *pos;
     const unsigned char *buff;
     std::vector<uint8_t> bv;
@@ -309,7 +331,9 @@ pem_object *decode_pem(const void *src, size_t len, size_t *num)
         case BR_PEM_ERROR:
             free(po.name);
             for (size_t i = 0; i < pem_list.size(); i++)
+            {
                 free_pem_object_contents(&pem_list[i]);
+            }
             return nullptr;
 
         default:
@@ -329,7 +353,9 @@ pem_object *decode_pem(const void *src, size_t len, size_t *num)
     {
         free(po.name);
         for (size_t i = 0; i < pem_list.size(); i++)
+        {
             free_pem_object_contents(&pem_list[i]);
+        }
         return nullptr;
     }
 
@@ -359,7 +385,9 @@ br_x509_certificate *read_certificates(const char *buff, size_t len, size_t *num
     {
         xcs = (br_x509_certificate*)malloc(2 * sizeof(*xcs));
         if (!xcs)
+        {
             return nullptr;
+        }
         xcs[0].data = (uint8_t*)malloc(len);
         if (!xcs[0].data)
         {
@@ -376,7 +404,9 @@ br_x509_certificate *read_certificates(const char *buff, size_t len, size_t *num
 
     pos = decode_pem(buff, len, &num_pos);
     if (!pos)
+    {
         return nullptr;
+    }
     for (u = 0; u < num_pos; u ++)
     {
         if (!strcmp_P(pos[u].name, PSTR("CERTIFICATE")) || !strcmp_P(pos[u].name, PSTR("X509 CERTIFICATE")))
@@ -389,11 +419,15 @@ br_x509_certificate *read_certificates(const char *buff, size_t len, size_t *num
         }
     }
     for (u = 0; u < num_pos; u ++)
+    {
         free_pem_object_contents(&pos[u]);
+    }
     free(pos);
 
     if (cert_list.size() == 0)
+    {
         return nullptr;
+    }
     *num = cert_list.size();
     dummy.data = nullptr;
     dummy.data_len = 0;
@@ -418,7 +452,9 @@ void free_certificates(br_x509_certificate *certs, size_t num)
     if (certs)
     {
         for (size_t u = 0; u < num; u ++)
+        {
             free(certs[u].data);
+        }
         free(certs);
     }
 }
@@ -427,7 +463,9 @@ static public_key *decode_public_key(const unsigned char *buff, size_t len)
 {
     std::unique_ptr<br_pkey_decoder_context> dc(new br_pkey_decoder_context); // auto-delete on exit
     if (!dc.get())
+    {
         return nullptr;
+    }
 
     public_key *pk = nullptr;
 
@@ -435,7 +473,9 @@ static public_key *decode_public_key(const unsigned char *buff, size_t len)
     br_pkey_decoder_push(dc.get(), buff, len);
     int err = br_pkey_decoder_last_error(dc.get());
     if (err != 0)
+    {
         return nullptr;
+    }
 
     const br_rsa_public_key *rk = nullptr;
     const br_ec_public_key *ek = nullptr;
@@ -445,7 +485,9 @@ static public_key *decode_public_key(const unsigned char *buff, size_t len)
         rk = br_pkey_decoder_get_rsa(dc.get());
         pk = (public_key*)malloc(sizeof * pk);
         if (!pk)
+        {
             return nullptr;
+        }
         pk->key_type = BR_KEYTYPE_RSA;
         pk->key.rsa.n = (uint8_t*)malloc(rk->nlen);
         pk->key.rsa.e = (uint8_t*)malloc(rk->elen);
@@ -466,7 +508,9 @@ static public_key *decode_public_key(const unsigned char *buff, size_t len)
         ek = br_pkey_decoder_get_ec(dc.get());
         pk = (public_key*)malloc(sizeof * pk);
         if (!pk)
+        {
             return nullptr;
+        }
         pk->key_type = BR_KEYTYPE_EC;
         pk->key.ec.q = (uint8_t*)malloc(ek->qlen);
         if (!pk->key.ec.q)
@@ -493,7 +537,9 @@ void free_public_key(public_key *pk)
             free(pk->key.rsa.e);
         }
         else if (pk->key_type == BR_KEYTYPE_EC)
+        {
             free(pk->key.ec.q);
+        }
         free(pk);
     }
 }
@@ -502,7 +548,9 @@ static private_key *decode_private_key(const unsigned char *buff, size_t len)
 {
     std::unique_ptr<br_skey_decoder_context> dc(new br_skey_decoder_context); // auto-delete on exit
     if (!dc.get())
+    {
         return nullptr;
+    }
 
     private_key *sk = nullptr;
 
@@ -510,7 +558,9 @@ static private_key *decode_private_key(const unsigned char *buff, size_t len)
     br_skey_decoder_push(dc.get(), buff, len);
     int err = br_skey_decoder_last_error(dc.get());
     if (err != 0)
+    {
         return nullptr;
+    }
 
     const br_rsa_private_key *rk = nullptr;
     const br_ec_private_key *ek = nullptr;
@@ -520,7 +570,9 @@ static private_key *decode_private_key(const unsigned char *buff, size_t len)
         rk = br_skey_decoder_get_rsa(dc.get());
         sk = (private_key*)malloc(sizeof * sk);
         if (!sk)
+        {
             return nullptr;
+        }
         sk->key_type = BR_KEYTYPE_RSA;
         sk->key.rsa.p = (uint8_t*)malloc(rk->plen);
         sk->key.rsa.q = (uint8_t*)malloc(rk->qlen);
@@ -594,7 +646,9 @@ void free_pem_object(pem_object *pos)
     if (pos != nullptr)
     {
         for (size_t u = 0; pos[u].name; u ++)
+        {
             free_pem_object_contents(&pos[u]);
+        }
         free(pos);
     }
 }
@@ -692,7 +746,9 @@ PublicKey::PublicKey(const uint8_t *derKey, size_t derLen)
 PublicKey::~PublicKey()
 {
     if (_key)
+    {
         brssl::free_public_key(_key);
+    }
 }
 
 bool PublicKey::parse(const char *pemKey)
@@ -714,28 +770,36 @@ bool PublicKey::parse(const uint8_t *derKey, size_t derLen)
 bool PublicKey::isRSA() const
 {
     if (!_key || _key->key_type != BR_KEYTYPE_RSA)
+    {
         return false;
+    }
     return true;
 }
 
 bool PublicKey::isEC() const
 {
     if (!_key || _key->key_type != BR_KEYTYPE_EC)
+    {
         return false;
+    }
     return true;
 }
 
 const br_rsa_public_key *PublicKey::getRSA() const
 {
     if (!_key || _key->key_type != BR_KEYTYPE_RSA)
+    {
         return nullptr;
+    }
     return &_key->key.rsa;
 }
 
 const br_ec_public_key *PublicKey::getEC() const
 {
     if (!_key || _key->key_type != BR_KEYTYPE_EC)
+    {
         return nullptr;
+    }
     return &_key->key.ec;
 }
 
@@ -761,7 +825,9 @@ PrivateKey::PrivateKey(const uint8_t *derKey, size_t derLen)
 PrivateKey::~PrivateKey()
 {
     if (_key)
+    {
         brssl::free_private_key(_key);
+    }
 }
 
 bool PrivateKey::parse(const char *pemKey)
@@ -783,28 +849,36 @@ bool PrivateKey::parse(const uint8_t *derKey, size_t derLen)
 bool PrivateKey::isRSA() const
 {
     if (!_key || _key->key_type != BR_KEYTYPE_RSA)
+    {
         return false;
+    }
     return true;
 }
 
 bool PrivateKey::isEC() const
 {
     if (!_key || _key->key_type != BR_KEYTYPE_EC)
+    {
         return false;
+    }
     return true;
 }
 
 const br_rsa_private_key *PrivateKey::getRSA() const
 {
     if (!_key || _key->key_type != BR_KEYTYPE_RSA)
+    {
         return nullptr;
+    }
     return &_key->key.rsa;
 }
 
 const br_ec_private_key *PrivateKey::getEC() const
 {
     if (!_key || _key->key_type != BR_KEYTYPE_EC)
+    {
         return nullptr;
+    }
     return &_key->key.ec;
 }
 
@@ -838,7 +912,9 @@ X509List::~X509List()
 {
     brssl::free_certificates(_cert, _count); // also frees cert
     for (size_t i = 0; i < _count; i++)
+    {
         brssl::free_ta_contents(&_ta[i]);
+    }
     free(_ta);
 }
 
@@ -852,7 +928,9 @@ bool X509List::append(const uint8_t *derCert, size_t derLen)
     size_t numCerts;
     br_x509_certificate *newCerts = brssl::read_certificates((const char *)derCert, derLen, &numCerts);
     if (!newCerts)
+    {
         return false;
+    }
 
     // Add in the certificates
     br_x509_certificate *saveCert = _cert;
@@ -923,18 +1001,29 @@ const void *HashSHA256::hash()
 uint32_t SigningVerifier::length()
 {
     if (!_pubKey)
+    {
         return 0;
+    }
     else if (_pubKey->isRSA())
+    {
         return _pubKey->getRSA()->nlen;
+    }
     else if (_pubKey->isEC())
+    {
         return _pubKey->getEC()->qlen;
+    }
     else
+    {
         return 0;
+    }
 }
 
 bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen)
 {
-    if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
+    if (!_pubKey || !hash || !signature || signatureLen != length())
+    {
+        return false;
+    }
 
     if (_pubKey->isRSA())
     {
@@ -943,9 +1032,13 @@ bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint
         br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
         ret = vrfy((const unsigned char *)signature, signatureLen, NULL, sizeof(vrf), _pubKey->getRSA(), vrf);
         if (!ret || memcmp(vrf, hash->hash(), sizeof(vrf)))
+        {
             return false;
+        }
         else
+        {
             return true;
+        }
     }
     else
     {

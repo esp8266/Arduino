@@ -81,7 +81,9 @@ void ESP8266WebServerSecure::begin()
     _currentStatus = HC_NONE;
     _serverSecure.begin();
     if (!_headerKeysCount)
+    {
         collectHeaders(0, 0);
+    }
 }
 
 void ESP8266WebServerSecure::handleClient()
@@ -90,7 +92,9 @@ void ESP8266WebServerSecure::handleClient()
     {
         WiFiClientSecure client = _serverSecure.available();
         if (!client)
+        {
             return;
+        }
 
 #ifdef DEBUG_ESP_HTTP_SERVER
         DEBUG_OUTPUT.println("New secure client");
@@ -132,7 +136,9 @@ void ESP8266WebServerSecure::handleClient()
             else     // !_currentClient.available()
             {
                 if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT)
+                {
                     keepCurrentClient = true;
+                }
                 callYield = true;
             }
             break;
@@ -154,7 +160,9 @@ void ESP8266WebServerSecure::handleClient()
     }
 
     if (callYield)
+    {
         yield();
+    }
 }
 
 void ESP8266WebServerSecure::close()

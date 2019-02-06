@@ -30,13 +30,19 @@ void NetworkInfo::copyBSSID(uint8_t newBSSID[6])
     if (newBSSID != NULL)
     {
         if (BSSID == NULL)
+        {
             BSSID = _bssidArray;
+        }
 
         for (int i = 0; i < 6; i++)
+        {
             BSSID[i] = newBSSID[i];
+        }
     }
     else
+    {
         BSSID = NULL;
+    }
 }
 
 NetworkInfo::NetworkInfo(int newNetworkIndex, bool autofill) : networkIndex(newNetworkIndex)

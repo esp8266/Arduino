@@ -80,9 +80,13 @@ public:
     inline unsigned int length(void) const
     {
         if (buffer)
+        {
             return len;
+        }
         else
+        {
             return 0;
+        }
     }
 
     // creates a copy of the assigned value.  if the value is null or

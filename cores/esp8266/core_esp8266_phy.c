@@ -264,7 +264,9 @@ extern int ICACHE_RAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, s
 extern int ICACHE_RAM_ATTR __wrap_spi_flash_read(uint32_t addr, uint32_t* dst, size_t size)
 {
     if (!spoof_init_data || size != 128)
+    {
         return __real_spi_flash_read(addr, dst, size);
+    }
 
     memcpy(dst, phy_init_data, sizeof(phy_init_data));
     ((uint8_t*)dst)[107] = __get_adc_mode();
@@ -305,7 +307,9 @@ void user_rf_pre_init()
     system_set_os_print(0);
     int rf_mode = __get_rf_mode();
     if (rf_mode >= 0)
+    {
         system_phy_set_rfoption(rf_mode);
+    }
     __run_user_rf_pre_init();
 }
 

@@ -178,17 +178,25 @@ uint64_t EspClass::deepSleepMax()
 bool EspClass::rtcUserMemoryRead(uint32_t offset, uint32_t *data, size_t size)
 {
     if (offset * 4 + size > 512 || size == 0)
+    {
         return false;
+    }
     else
+    {
         return system_rtc_mem_read(64 + offset, data, size);
+    }
 }
 
 bool EspClass::rtcUserMemoryWrite(uint32_t offset, uint32_t *data, size_t size)
 {
     if (offset * 4 + size > 512 || size == 0)
+    {
         return false;
+    }
     else
+    {
         return system_rtc_mem_write(64 + offset, data, size);
+    }
 }
 
 
@@ -243,7 +251,9 @@ extern "C" const char* core_release;
 String EspClass::getCoreVersion()
 {
     if (core_release != NULL)
+    {
         return String(core_release);
+    }
     char buf[12];
     snprintf(buf, sizeof(buf), "%08x", core_version);
     return String(buf);
@@ -274,7 +284,9 @@ uint32_t EspClass::getFlashChipId(void)
 {
     static uint32_t flash_chip_id = 0;
     if (flash_chip_id == 0)
+    {
         flash_chip_id = spi_flash_get_id();
+    }
     return flash_chip_id;
 }
 
@@ -294,7 +306,9 @@ uint32_t EspClass::getFlashChipSize(void)
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
     if (spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK)
+    {
         return magicFlashChipSize((bytes[3] & 0xf0) >> 4);
+    }
     return 0;
 }
 
@@ -304,7 +318,9 @@ uint32_t EspClass::getFlashChipSpeed(void)
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
     if (spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK)
+    {
         return magicFlashChipSpeed(bytes[3] & 0x0F);
+    }
     return 0;
 }
 
@@ -315,7 +331,9 @@ FlashMode_t EspClass::getFlashChipMode(void)
     uint8_t * bytes = (uint8_t *) &data;
     // read first 4 byte (magic byte + flash config)
     if (spi_flash_read(0x0000, &data, 4) == SPI_FLASH_RESULT_OK)
+    {
         mode = magicFlashChipMode(bytes[2]);
+    }
     return mode;
 }
 
@@ -363,7 +381,9 @@ FlashMode_t EspClass::magicFlashChipMode(uint8_t byte)
 {
     FlashMode_t mode = (FlashMode_t) byte;
     if (mode > FM_DOUT)
+    {
         mode = FM_UNKNOWN;
+    }
     return mode;
 }
 
@@ -439,12 +459,16 @@ bool EspClass::checkFlashConfig(bool needsEquals)
     if (needsEquals)
     {
         if (getFlashChipRealSize() == getFlashChipSize())
+        {
             return true;
+        }
     }
     else
     {
         if (getFlashChipRealSize() >= getFlashChipSize())
+        {
             return true;
+        }
     }
     return false;
 }
@@ -453,21 +477,37 @@ String EspClass::getResetReason(void)
 {
     char buff[32];
     if (resetInfo.reason == REASON_DEFAULT_RST)   // normal startup by power on
+    {
         strcpy_P(buff, PSTR("Power on"));
+    }
     else if (resetInfo.reason == REASON_WDT_RST)   // hardware watch dog reset
+    {
         strcpy_P(buff, PSTR("Hardware Watchdog"));
+    }
     else if (resetInfo.reason == REASON_EXCEPTION_RST)   // exception reset, GPIO status won’t change
+    {
         strcpy_P(buff, PSTR("Exception"));
+    }
     else if (resetInfo.reason == REASON_SOFT_WDT_RST)   // software watch dog reset, GPIO status won’t change
+    {
         strcpy_P(buff, PSTR("Software Watchdog"));
+    }
     else if (resetInfo.reason == REASON_SOFT_RESTART)   // software restart ,system_restart , GPIO status won’t change
+    {
         strcpy_P(buff, PSTR("Software/System restart"));
+    }
     else if (resetInfo.reason == REASON_DEEP_SLEEP_AWAKE)   // wake up from deep-sleep
+    {
         strcpy_P(buff, PSTR("Deep-Sleep Wake"));
+    }
     else if (resetInfo.reason == REASON_EXT_SYS_RST)   // external system reset
+    {
         strcpy_P(buff, PSTR("External System"));
+    }
     else
+    {
         strcpy_P(buff, PSTR("Unknown"));
+    }
     return String(buff);
 }
 
@@ -495,7 +535,9 @@ bool EspClass::eraseConfig(void)
     for (size_t offset = 0; offset < cfgSize; offset += SPI_FLASH_SEC_SIZE)
     {
         if (!flashEraseSector((cfgAddr + offset) / SPI_FLASH_SEC_SIZE))
+        {
             return false;
+        }
     }
 
     return true;
@@ -505,12 +547,16 @@ uint32_t EspClass::getSketchSize()
 {
     static uint32_t result = 0;
     if (result)
+    {
         return result;
+    }
 
     image_header_t image_header;
     uint32_t pos = APP_START_OFFSET;
     if (spi_flash_read(pos, (uint32_t*) &image_header, sizeof(image_header)))
+    {
         return 0;
+    }
     pos += sizeof(image_header);
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.printf("num_segments=%u\r\n", image_header.num_segments);
@@ -521,7 +567,9 @@ uint32_t EspClass::getSketchSize()
     {
         section_header_t section_header = {0, 0};
         if (spi_flash_read(pos, (uint32_t*) &section_header, sizeof(section_header)))
+        {
             return 0;
+        }
         pos += sizeof(section_header);
         pos += section_header.size;
 #ifdef DEBUG_SERIAL
@@ -556,7 +604,10 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
         DEBUG_SERIAL.print("Update ");
         Update.printError(DEBUG_SERIAL);
 #endif
-        if (restartOnFail) ESP.restart();
+        if (restartOnFail)
+        {
+            ESP.restart();
+        }
         return false;
     }
 
@@ -566,7 +617,10 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
         DEBUG_SERIAL.print("Update ");
         Update.printError(DEBUG_SERIAL);
 #endif
-        if (restartOnFail) ESP.restart();
+        if (restartOnFail)
+        {
+            ESP.restart();
+        }
         return false;
     }
 
@@ -576,14 +630,20 @@ bool EspClass::updateSketch(Stream& in, uint32_t size, bool restartOnFail, bool 
         DEBUG_SERIAL.print("Update ");
         Update.printError(DEBUG_SERIAL);
 #endif
-        if (restartOnFail) ESP.restart();
+        if (restartOnFail)
+        {
+            ESP.restart();
+        }
         return false;
     }
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println("Update SUCCESS");
 #endif
-    if (restartOnSuccess) ESP.restart();
+    if (restartOnSuccess)
+    {
+        ESP.restart();
+    }
     return true;
 }
 
@@ -628,10 +688,14 @@ static int spi_flash_write_puya(uint32_t offset, uint32_t *data, size_t size)
             bytesLeft -= PUYA_BUFFER_SIZE;
         }
         else
+        {
             bytesLeft = 0;
+        }
         rc = spi_flash_read(pos, flash_write_puya_buf, bytesNow);
         if (rc != 0)
+        {
             return rc;
+        }
         for (size_t i = 0; i < bytesNow / 4; ++i)
         {
             flash_write_puya_buf[i] &= *ptr;
@@ -649,7 +713,9 @@ bool EspClass::flashWrite(uint32_t offset, uint32_t *data, size_t size)
     int rc = 0;
 #if PUYA_SUPPORT
     if (getFlashChipVendorId() == SPI_FLASH_VENDOR_PUYA)
+    {
         rc = spi_flash_write_puya(offset, data, size);
+    }
     else
 #endif
     {
@@ -668,20 +734,26 @@ String EspClass::getSketchMD5()
 {
     static String result;
     if (result.length())
+    {
         return result;
+    }
     uint32_t lengthLeft = getSketchSize();
     const size_t bufSize = 512;
     std::unique_ptr<uint8_t[]> buf(new uint8_t[bufSize]);
     uint32_t offset = 0;
     if (!buf.get())
+    {
         return String();
+    }
     MD5Builder md5;
     md5.begin();
     while (lengthLeft > 0)
     {
         size_t readBytes = (lengthLeft < bufSize) ? lengthLeft : bufSize;
         if (!flashRead(offset, reinterpret_cast<uint32_t*>(buf.get()), (readBytes + 3) & ~3))
+        {
             return String();
+        }
         md5.add(buf.get(), readBytes);
         lengthLeft -= readBytes;
         offset += readBytes;

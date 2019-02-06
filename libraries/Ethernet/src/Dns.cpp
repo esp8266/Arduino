@@ -61,7 +61,9 @@ int DNSClient::inet_aton_ethlib(const char* aIPAddrString, IPAddress& aResult)
     const char* p = aIPAddrString;
     while (*p &&
             ((*p == '.') || (*p >= '0') || (*p <= '9')))
+    {
         p++;
+    }
 
     if (*p == '\0')
     {
@@ -108,7 +110,9 @@ int DNSClient::inet_aton_ethlib(const char* aIPAddrString, IPAddress& aResult)
         }
     }
     else
+    {
         return 0;
+    }
 }
 
 int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult)
@@ -124,7 +128,9 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult)
 
     // Check we've got a valid DNS server to use
     if (iDNSServer == INADDR_NONE || iDNSServer == INADDR_ANY)
+    {
         return INVALID_SERVER;
+    }
 
     // Find a socket to use
     if (iUdp.begin(1024 + (millis() & 0xF)) == 1)
@@ -216,7 +222,9 @@ uint16_t DNSClient::BuildRequest(const char* aName)
         // Find out how long this section of the name is
         end = start;
         while (*end && (*end != '.'))
+        {
             end++;
+        }
 
         if (end - start > 0)
         {
@@ -252,7 +260,9 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
     while (iUdp.parsePacket() <= 0)
     {
         if ((millis() - startTime) > aTimeout)
+        {
             return TIMED_OUT;
+        }
         delay(50);
     }
 
@@ -269,7 +279,9 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
 
     // Read through the rest of the response
     if (iUdp.available() < DNS_HEADER_SIZE)
+    {
         return TRUNCATED;
+    }
     iUdp.read(header, DNS_HEADER_SIZE);
 
     uint16_t staging; // Staging used to avoid type-punning warnings

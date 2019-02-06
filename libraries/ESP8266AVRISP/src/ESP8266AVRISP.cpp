@@ -61,7 +61,9 @@ void ESP8266AVRISP::setSpiFrequency(uint32_t freq)
 {
     _spi_freq = freq;
     if (_state == AVRISP_STATE_ACTIVE)
+    {
         SPI.setFrequency(freq);
+    }
 }
 
 void ESP8266AVRISP::setReset(bool rst)
@@ -104,7 +106,9 @@ AVRISPState_t ESP8266AVRISP::update()
             _state = AVRISP_STATE_IDLE;
         }
         else
+        {
             _reject_incoming();
+        }
         break;
     }
     }
@@ -126,7 +130,9 @@ AVRISPState_t ESP8266AVRISP::serve()
     case AVRISP_STATE_ACTIVE:
     {
         while (_client.available())
+        {
             avrisp();
+        }
         return update();
     }
     }
@@ -135,12 +141,18 @@ AVRISPState_t ESP8266AVRISP::serve()
 
 inline void ESP8266AVRISP::_reject_incoming(void)
 {
-    while (_server.hasClient()) _server.available().stop();
+    while (_server.hasClient())
+    {
+        _server.available().stop();
+    }
 }
 
 uint8_t ESP8266AVRISP::getch()
 {
-    while (!_client.available()) yield();
+    while (!_client.available())
+    {
+        yield();
+    }
     uint8_t b = (uint8_t)_client.read();
     // AVRISP_DEBUG("< %02x", b);
     return b;
@@ -150,7 +162,9 @@ void ESP8266AVRISP::fill(int n)
 {
     // AVRISP_DEBUG("fill(%u)", n);
     for (int x = 0; x < n; x++)
+    {
         buff[x] = getch();
+    }
 }
 
 uint8_t ESP8266AVRISP::spi_transaction(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
@@ -289,10 +303,22 @@ void ESP8266AVRISP::commit(int addr)
 //#define _addr_page(x) (here & 0xFFFFE0)
 int ESP8266AVRISP::addr_page(int addr)
 {
-    if (param.pagesize == 32)  return addr & 0xFFFFFFF0;
-    if (param.pagesize == 64)  return addr & 0xFFFFFFE0;
-    if (param.pagesize == 128) return addr & 0xFFFFFFC0;
-    if (param.pagesize == 256) return addr & 0xFFFFFF80;
+    if (param.pagesize == 32)
+    {
+        return addr & 0xFFFFFFF0;
+    }
+    if (param.pagesize == 64)
+    {
+        return addr & 0xFFFFFFE0;
+    }
+    if (param.pagesize == 128)
+    {
+        return addr & 0xFFFFFFC0;
+    }
+    if (param.pagesize == 256)
+    {
+        return addr & 0xFFFFFF80;
+    }
     AVRISP_DEBUG("unknown page size: %d", param.pagesize);
     return addr;
 }
@@ -455,8 +481,14 @@ void ESP8266AVRISP::read_page()
         return;
     }
     _client.print((char) Resp_STK_INSYNC);
-    if (memtype == 'F') flash_read_page(length);
-    if (memtype == 'E') eeprom_read_page(length);
+    if (memtype == 'F')
+    {
+        flash_read_page(length);
+    }
+    if (memtype == 'E')
+    {
+        eeprom_read_page(length);
+    }
     return;
 }
 
@@ -584,8 +616,12 @@ void ESP8266AVRISP::avrisp()
         AVRISP_DEBUG("?!?");
         error++;
         if (Sync_CRC_EOP == getch())
+        {
             _client.print((char)Resp_STK_UNKNOWN);
+        }
         else
+        {
             _client.print((char)Resp_STK_NOSYNC);
+        }
     }
 }

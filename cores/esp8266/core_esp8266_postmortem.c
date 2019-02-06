@@ -76,7 +76,9 @@ static void ets_printf_P(const char *str, ...)
     vsnprintf(destStr, sizeof(destStr), str, argPtr);
     va_end(argPtr);
     while (*c)
+    {
         ets_putc(*(c++));
+    }
 }
 
 void __wrap_system_restart_local()
@@ -99,7 +101,9 @@ void __wrap_system_restart_local()
     if (rst_info.reason != REASON_SOFT_WDT_RST &&
             rst_info.reason != REASON_EXCEPTION_RST &&
             rst_info.reason != REASON_WDT_RST)
+    {
         return;
+    }
 
     ets_install_putc1(&uart_write_char_d);
 
@@ -107,20 +111,28 @@ void __wrap_system_restart_local()
     {
         ets_printf_P(PSTR("\nPanic %S:%d %S"), s_panic_file, s_panic_line, s_panic_func);
         if (s_panic_what)
+        {
             ets_printf_P(PSTR(": Assertion '%S' failed."), s_panic_what);
+        }
         ets_putc('\n');
     }
     else if (s_unhandled_exception)
+    {
         ets_printf_P(PSTR("\nUnhandled C++ exception: %S\n"), s_unhandled_exception);
+    }
     else if (s_abort_called)
+    {
         ets_printf_P(PSTR("\nAbort called\n"));
+    }
     else if (rst_info.reason == REASON_EXCEPTION_RST)
     {
         ets_printf_P(PSTR("\nException (%d):\nepc1=0x%08x epc2=0x%08x epc3=0x%08x excvaddr=0x%08x depc=0x%08x\n"),
                      rst_info.exccause, rst_info.epc1, rst_info.epc2, rst_info.epc3, rst_info.excvaddr, rst_info.depc);
     }
     else if (rst_info.reason == REASON_SOFT_WDT_RST)
+    {
         ets_printf_P(PSTR("\nSoft WDT reset\n"));
+    }
 
     uint32_t cont_stack_start = (uint32_t) & (g_pcont->stack);
     uint32_t cont_stack_end = (uint32_t) g_pcont->stack_end;
@@ -131,11 +143,17 @@ void __wrap_system_restart_local()
     // (determined empirically, might break)
     uint32_t offset = 0;
     if (rst_info.reason == REASON_SOFT_WDT_RST)
+    {
         offset = 0x1b0;
+    }
     else if (rst_info.reason == REASON_EXCEPTION_RST)
+    {
         offset = 0x1a0;
+    }
     else if (rst_info.reason == REASON_WDT_RST)
+    {
         offset = 0x10;
+    }
 
     ets_printf_P(PSTR("\n>>>stack>>>\n"));
 
@@ -169,7 +187,9 @@ void __wrap_system_restart_local()
 
     // Use cap-X formatting to ensure the standard EspExceptionDecoder doesn't match the address
     if (umm_last_fail_alloc_addr)
+    {
         ets_printf_P(PSTR("\nlast failed alloc call: %08X(%d)\n"), (uint32_t)umm_last_fail_alloc_addr, umm_last_fail_alloc_size);
+    }
 
     custom_crash_callback(&rst_info, sp_dump + offset, stack_end);
 
@@ -203,7 +223,9 @@ static void uart0_write_char_d(char c)
     while (((USS(0) >> USTXC) & 0xff)) { }
 
     if (c == '\n')
+    {
         USF(0) = '\r';
+    }
     USF(0) = c;
 }
 
@@ -212,7 +234,9 @@ static void uart1_write_char_d(char c)
     while (((USS(1) >> USTXC) & 0xff) >= 0x7e) { }
 
     if (c == '\n')
+    {
         USF(1) = '\r';
+    }
     USF(1) = c;
 }
 

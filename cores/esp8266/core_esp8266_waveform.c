@@ -109,7 +109,9 @@ void setTimer1Callback(uint32_t (*fn)())
         timer1_write(microsecondsToClockCycles(1)); // Cause an interrupt post-haste
     }
     else if (timerRunning && !fn && !waveformEnabled)
+    {
         deinitTimer();
+    }
 }
 
 // Start up a waveform on a pin, or change the current one.  Will change to the new
@@ -118,7 +120,9 @@ void setTimer1Callback(uint32_t (*fn)())
 int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t runTimeUS)
 {
     if ((pin > 16) || isFlashInterfacePin(pin))
+    {
         return false;
+    }
     Waveform *wave = &waveform[pin];
     // Adjust to shave off some of the IRQ time, approximately
     wave->nextTimeHighCycles = microsecondsToClockCycles(timeHighUS);
@@ -144,7 +148,9 @@ int startWaveform(uint8_t pin, uint32_t timeHighUS, uint32_t timeLowUS, uint32_t
         {
             // Ensure timely service....
             if (T1L > microsecondsToClockCycles(10))
+            {
                 timer1_write(microsecondsToClockCycles(10));
+            }
         }
         while (waveformToEnable)
         {
@@ -171,7 +177,9 @@ static inline ICACHE_RAM_ATTR uint32_t GetCycleCountIRQ()
 static inline ICACHE_RAM_ATTR uint32_t min_u32(uint32_t a, uint32_t b)
 {
     if (a < b)
+    {
         return a;
+    }
     return b;
 }
 
@@ -180,7 +188,9 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin)
 {
     // Can't possibly need to stop anything if there is no timer active
     if (!timerRunning)
+    {
         return false;
+    }
     // If user sends in a pin >16 but <32, this will always point to a 0 bit
     // If they send >=32, then the shift will result in 0 and it will also return false
     uint32_t mask = 1 << pin;
@@ -191,13 +201,17 @@ int ICACHE_RAM_ATTR stopWaveform(uint8_t pin)
     waveformToDisable |= mask;
     // Ensure timely service....
     if (T1L > microsecondsToClockCycles(10))
+    {
         timer1_write(microsecondsToClockCycles(10));
+    }
     while (waveformToDisable)
     {
         /* no-op */ // Can't delay() since stopWaveform may be called from an IRQ
     }
     if (!waveformEnabled && !timer1CB)
+    {
         deinitTimer();
+    }
     return true;
 }
 
@@ -247,7 +261,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt()
 
                 // If it's not on, ignore!
                 if (!(waveformEnabled & mask))
+                {
                     continue;
+                }
 
                 Waveform *wave = &waveform[i];
                 uint32_t now = GetCycleCountIRQ();
@@ -261,9 +277,13 @@ static ICACHE_RAM_ATTR void timer1Interrupt()
                         // Done, remove!
                         waveformEnabled &= ~mask;
                         if (i == 16)
+                        {
                             GP16O &= ~1;
+                        }
                         else
+                        {
                             ClearGPIO(mask);
+                        }
                         continue;
                     }
                 }
@@ -280,7 +300,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt()
                             GP16O |= 1; // GPIO16 write slow as it's RMW
                         }
                         else
+                        {
                             SetGPIO(mask);
+                        }
                         wave->nextServiceCycle = now + wave->nextTimeHighCycles;
                         nextEventCycles = min_u32(nextEventCycles, wave->nextTimeHighCycles);
                     }
@@ -291,7 +313,9 @@ static ICACHE_RAM_ATTR void timer1Interrupt()
                             GP16O &= ~1; // GPIO16 write slow as it's RMW
                         }
                         else
+                        {
                             ClearGPIO(mask);
+                        }
                         wave->nextServiceCycle = now + wave->nextTimeLowCycles;
                         nextEventCycles = min_u32(nextEventCycles, wave->nextTimeLowCycles);
                     }
@@ -312,10 +336,14 @@ static ICACHE_RAM_ATTR void timer1Interrupt()
     } // if (waveformEnabled)
 
     if (timer1CB)
+    {
         nextEventCycles = min_u32(nextEventCycles, timer1CB());
+    }
 
     if (nextEventCycles < microsecondsToClockCycles(10))
+    {
         nextEventCycles = microsecondsToClockCycles(10);
+    }
     nextEventCycles -= DELTAIRQ;
 
     // Do it here instead of global function to save time and because we know it's edge-IRQ

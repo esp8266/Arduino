@@ -82,7 +82,9 @@ public:
             uint8_t *new_buffer = new uint8_t[min_buffer_size];
             //If stream reading is ahead, than some data is already in the old buffer and needs to be copied to new resized buffer
             if (_buffer && stream_read > 0)
+            {
                 memcpy(new_buffer, _buffer.get(), stream_read);
+            }
             _buffer.reset(new_buffer);
             _bufferSize = min_buffer_size;
         }
@@ -105,7 +107,9 @@ public:
     void release_buffer(const uint8_t* buffer, size_t size) override
     {
         if (size == 0)
+        {
             return;
+        }
 
         (void)buffer;
         _pos += size;

@@ -145,7 +145,9 @@ size_t IPAddress::printTo(Print& p) const
     size_t n = 0;
 
     if (!isSet())
+    {
         return p.print(F("(IP unset)"));
+    }
 
 #if LWIP_IPV6
     if (isV6())
@@ -159,12 +161,18 @@ size_t IPAddress::printTo(Print& p) const
                 n += p.printf("%x", bit);
                 if (count0 > 0)
                     // no more hiding 0
+                {
                     count0 = -8;
+                }
             }
             else
+            {
                 count0++;
+            }
             if ((i != 7 && count0 < 2) || count0 == 7)
+            {
                 n += p.print(':');
+            }
         }
         return n;
     }
@@ -174,7 +182,9 @@ size_t IPAddress::printTo(Print& p) const
     {
         n += p.print((*this)[i], DEC);
         if (i != 3)
+        {
             n += p.print('.');
+        }
     }
     return n;
 }
@@ -184,7 +194,9 @@ String IPAddress::toString() const
     StreamString sstr;
 #if LWIP_IPV6
     if (isV6())
-        sstr.reserve(40); // 8 shorts x 4 chars each + 7 colons + nullterm
+    {
+        sstr.reserve(40);    // 8 shorts x 4 chars each + 7 colons + nullterm
+    }
     else
 #endif
         sstr.reserve(16); // 4 bytes with 3 chars max + 3 dots + nullterm, or '(IP unset)'
@@ -222,11 +234,15 @@ bool IPAddress::fromString6(const char *address)
         if (isalnum(c))
         {
             if (c >= 'a')
+            {
                 c -= 'a' - '0' - 10;
+            }
             acc = acc * 16 + (c - '0');
             if (acc > 0xffff)
                 // Value out of range
+            {
                 return false;
+            }
         }
         else if (c == ':')
         {
@@ -234,33 +250,45 @@ bool IPAddress::fromString6(const char *address)
             {
                 if (doubledots >= 0)
                     // :: allowed once
+                {
                     return false;
+                }
                 // remember location
                 doubledots = dots + !!acc;
                 address++;
             }
             if (dots == 7)
                 // too many separators
+            {
                 return false;
+            }
             raw6()[dots++] = PP_HTONS(acc);
             acc = 0;
         }
         else
             // Invalid char
+        {
             return false;
+        }
     }
 
     if (doubledots == -1 && dots != 7)
         // Too few separators
+    {
         return false;
+    }
     raw6()[dots++] = PP_HTONS(acc);
 
     if (doubledots != -1)
     {
         for (int i = dots - doubledots - 1; i >= 0; i--)
+        {
             raw6()[8 - dots + doubledots + i] = raw6()[doubledots + i];
+        }
         for (int i = doubledots; i < 8 - dots + doubledots; i++)
+        {
             raw6()[i] = 0;
+        }
     }
 
     setV6();

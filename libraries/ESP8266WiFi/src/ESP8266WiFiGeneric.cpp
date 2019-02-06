@@ -63,7 +63,9 @@ struct WiFiEventHandlerOpaque
     void operator()(System_Event_t* e)
     {
         if (static_cast<WiFiEvent>(e->event) == mEvent || mEvent == WIFI_EVENT_ANY)
+        {
             mHandler(e);
+        }
     }
 
     bool canExpire()
@@ -237,7 +239,9 @@ void ESP8266WiFiGenericClass::_eventCallback(void* arg)
     {
         WiFiEventHandler &handler = *it;
         if (handler->canExpire() && handler.unique())
+        {
             it = sCbEventList.erase(it);
+        }
         else
         {
             (*handler)(event);
@@ -294,7 +298,9 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
 
 #ifdef DEBUG_ESP_WIFI
     if (listenInterval && type == WIFI_NONE_SLEEP)
+    {
         DEBUG_WIFI_GENERIC("listenInterval not usable with WIFI_NONE_SLEEP\n");
+    }
 #endif
 
     if (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP)
@@ -331,7 +337,9 @@ bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenI
     }
     bool ret = wifi_set_sleep_type((sleep_type_t) type);
     if (!ret)
+    {
         DEBUG_WIFI_GENERIC("wifi_set_sleep_type(%d): error\n", (int)type);
+    }
     return ret;
 }
 
@@ -371,9 +379,13 @@ void ESP8266WiFiGenericClass::setOutputPower(float dBm)
 {
 
     if (dBm > 20.5)
+    {
         dBm = 20.5;
+    }
     else if (dBm < 0)
+    {
         dBm = 0;
+    }
 
     uint8_t val = (dBm * 4.0f);
     system_phy_set_max_tpw(val);
@@ -407,23 +419,33 @@ bool ESP8266WiFiGenericClass::mode(WiFiMode_t m)
     if (_persistent)
     {
         if (wifi_get_opmode() == (uint8) m && wifi_get_opmode_default() == (uint8) m)
+        {
             return true;
+        }
     }
     else if (wifi_get_opmode() == (uint8) m)
+    {
         return true;
+    }
 
     bool ret = false;
 
     if (m != WIFI_STA && m != WIFI_AP_STA)
         // calls lwIP's dhcp_stop(),
         // safe to call even if not started
+    {
         wifi_station_dhcpc_stop();
+    }
 
     ETS_UART_INTR_DISABLE();
     if (_persistent)
+    {
         ret = wifi_set_opmode(m);
+    }
     else
+    {
         ret = wifi_set_opmode_current(m);
+    }
     ETS_UART_INTR_ENABLE();
 
     return ret;
@@ -452,12 +474,18 @@ bool ESP8266WiFiGenericClass::enableSTA(bool enable)
     if (isEnabled != enable)
     {
         if (enable)
+        {
             return mode((WiFiMode_t)(currentMode | WIFI_STA));
+        }
         else
+        {
             return mode((WiFiMode_t)(currentMode & (~WIFI_STA)));
+        }
     }
     else
+    {
         return true;
+    }
 }
 
 /**
@@ -474,12 +502,18 @@ bool ESP8266WiFiGenericClass::enableAP(bool enable)
     if (isEnabled != enable)
     {
         if (enable)
+        {
             return mode((WiFiMode_t)(currentMode | WIFI_AP));
+        }
         else
+        {
             return mode((WiFiMode_t)(currentMode & (~WIFI_AP)));
+        }
     }
     else
+    {
         return true;
+    }
 }
 
 
@@ -492,10 +526,14 @@ bool ESP8266WiFiGenericClass::forceSleepBegin(uint32 sleepUs)
 {
     _forceSleepLastMode = getMode();
     if (!mode(WIFI_OFF))
+    {
         return false;
+    }
 
     if (sleepUs == 0)
+    {
         sleepUs = 0xFFFFFFF;
+    }
 
     wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
     wifi_fpm_open();
@@ -515,7 +553,9 @@ bool ESP8266WiFiGenericClass::forceSleepWake()
     if (mode(_forceSleepLastMode))
     {
         if ((_forceSleepLastMode & WIFI_STA) != 0)
+        {
             wifi_station_connect();
+        }
         return true;
     }
     return false;
@@ -576,7 +616,9 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
     if (err == ERR_OK)
+    {
         aResult = IPAddress(&addr);
+    }
     else if (err == ERR_INPROGRESS)
     {
         _dns_lookup_pending = true;
@@ -584,13 +626,19 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
         _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
         if (aResult.isSet())
+        {
             err = ERR_OK;
+        }
     }
 
     if (err != 0)
+    {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
+    }
     else
+    {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
+    }
 
     return (err == ERR_OK) ? 1 : 0;
 }
@@ -605,9 +653,13 @@ void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *ca
 {
     (void) name;
     if (!_dns_lookup_pending)
+    {
         return;
+    }
     if (ipaddr)
+    {
         (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
+    }
     esp_schedule(); // resume the hostByName function
 }
 

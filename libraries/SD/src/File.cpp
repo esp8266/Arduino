@@ -85,17 +85,24 @@ size_t File::write(const uint8_t *buf, size_t size)
 int File::peek()
 {
     if (! _file)
+    {
         return 0;
+    }
 
     int c = _file->read();
-    if (c != -1) _file->seekCur(-1);
+    if (c != -1)
+    {
+        _file->seekCur(-1);
+    }
     return c;
 }
 
 int File::read()
 {
     if (_file)
+    {
         return _file->read();
+    }
     return -1;
 }
 
@@ -103,7 +110,9 @@ int File::read()
 int File::read(void *buf, uint16_t nbyte)
 {
     if (_file)
+    {
         return _file->read(buf, nbyte);
+    }
     return 0;
 }
 
@@ -115,7 +124,10 @@ size_t File::readBytes(char *buffer, size_t length)
 
 int File::available()
 {
-    if (! _file) return 0;
+    if (! _file)
+    {
+        return 0;
+    }
 
     return size() - position();
 }
@@ -123,25 +135,36 @@ int File::available()
 void File::flush()
 {
     if (_file)
+    {
         _file->sync();
+    }
 }
 
 boolean File::seek(uint32_t pos)
 {
-    if (! _file) return false;
+    if (! _file)
+    {
+        return false;
+    }
 
     return _file->seekSet(pos);
 }
 
 uint32_t File::position()
 {
-    if (! _file) return -1;
+    if (! _file)
+    {
+        return -1;
+    }
     return _file->curPosition();
 }
 
 uint32_t File::size()
 {
-    if (! _file) return 0;
+    if (! _file)
+    {
+        return 0;
+    }
     return _file->fileSize();
 }
 
@@ -164,7 +187,9 @@ void File::close()
 File::operator bool()
 {
     if (_file)
+    {
         return  _file->isOpen();
+    }
     return false;
 }
 

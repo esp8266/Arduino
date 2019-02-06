@@ -32,28 +32,42 @@ static uint16_t analogFreq = 1000;
 extern void __analogWriteRange(uint32_t range)
 {
     if (range > 0)
+    {
         analogScale = range;
+    }
 }
 
 extern void __analogWriteFreq(uint32_t freq)
 {
     if (freq < 100)
+    {
         analogFreq = 100;
+    }
     else if (freq > 40000)
+    {
         analogFreq = 40000;
+    }
     else
+    {
         analogFreq = freq;
+    }
 }
 
 extern void __analogWrite(uint8_t pin, int val)
 {
     if (pin > 16)
+    {
         return;
+    }
     uint32_t analogPeriod = 1000000L / analogFreq;
     if (val < 0)
+    {
         val = 0;
+    }
     else if (val > analogScale)
+    {
         val = analogScale;
+    }
 
     analogMap &= ~(1 << pin);
     uint32_t high = (analogPeriod * val) / analogScale;
@@ -72,7 +86,9 @@ extern void __analogWrite(uint8_t pin, int val)
     else
     {
         if (startWaveform(pin, high, low, 0))
+        {
             analogMap |= (1 << pin);
+        }
     }
 }
 

@@ -26,22 +26,30 @@ extern "C" {
 void SPISlaveClass::_data_rx(uint8_t * data, uint8_t len)
 {
     if (_data_cb)
+    {
         _data_cb(data, len);
+    }
 }
 void SPISlaveClass::_status_rx(uint32_t data)
 {
     if (_status_cb)
+    {
         _status_cb(data);
+    }
 }
 void SPISlaveClass::_data_tx(void)
 {
     if (_data_sent_cb)
+    {
         _data_sent_cb();
+    }
 }
 void SPISlaveClass::_status_tx(void)
 {
     if (_status_sent_cb)
+    {
         _status_sent_cb();
+    }
 }
 void SPISlaveClass::_s_data_rx(void *arg, uint8_t * data, uint8_t len)
 {
@@ -79,7 +87,9 @@ void SPISlaveClass::end()
 void SPISlaveClass::setData(uint8_t * data, size_t len)
 {
     if (len > 32)
+    {
         len = 32;
+    }
     hspi_slave_setData(data, len);
 }
 void SPISlaveClass::setStatus(uint32_t status)

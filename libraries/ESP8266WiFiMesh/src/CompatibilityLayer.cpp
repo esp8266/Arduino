@@ -70,11 +70,15 @@ bool ESP8266WiFiMesh::waitForClient(WiFiClient &currClient, int maxWait)
 {
     int wait = maxWait;
     while (currClient.connected() && !currClient.available() && wait--)
+    {
         delay(3);
+    }
 
     /* Return false if the client isn't ready to communicate */
     if (WiFi.status() == WL_DISCONNECTED || !currClient.connected())
+    {
         return false;
+    }
 
     return true;
 }
@@ -93,13 +97,17 @@ bool ESP8266WiFiMesh::exchangeInfo(const char *message, WiFiClient &currClient)
     currClient.println(message);
 
     if (!waitForClient(currClient, 1000))
+    {
         return false;
+    }
 
     String response = currClient.readStringUntil('\r');
     currClient.readStringUntil('\n');
 
     if (response.length() <= 2)
+    {
         return false;
+    }
 
     /* Pass data to user callback */
     _handler(response);
@@ -121,18 +129,26 @@ void ESP8266WiFiMesh::connectToNode(const String &targetSSID, const char *messag
 
     int wait = 1500;
     while ((WiFi.status() == WL_DISCONNECTED) && wait--)
+    {
         delay(3);
+    }
 
     /* If the connection timed out */
     if (WiFi.status() != 3)
+    {
         return;
+    }
 
     /* Connect to the node's server */
     if (!currClient.connect(SERVER_IP_ADDR, SERVER_PORT))
+    {
         return;
+    }
 
     if (!exchangeInfo(message, currClient))
+    {
         return;
+    }
 
     currClient.stop();
     WiFi.disconnect();
