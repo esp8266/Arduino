@@ -4,7 +4,8 @@
 
 set -ev
 
-../restyle.sh
+org=$(cd ${0%/*}; pwd)
+${org}/../restyle.sh
 
 # Revert changes which astyle might have done to the submodules,
 # as we don't want to fail the build because of the 3rd party libraries
