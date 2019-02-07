@@ -22,9 +22,18 @@ public:
         return result;
     }
 
-    bool read_int(int& result)
+    size_t read_line(char* dest, size_t dest_size)
     {
-        return scanf("%d", &result) == 1;
+        char* res = fgets(dest, dest_size, stdin);
+        if (res == NULL) {
+            return 0;
+        }
+        size_t len = strlen(dest);
+        if (dest[len - 1] == '\n') {
+            dest[len - 1] = 0;
+            len--;
+        }
+        return len;
     }
 };
 

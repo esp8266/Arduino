@@ -34,10 +34,10 @@ void TFT::TFTinit (void)
     
     TFT_CS_HIGH;
     TFT_DC_HIGH;
-    INT8U i=0, TFTDriver=0;
+    INT8U i=0;
     for(i=0;i<3;i++)
     {
-        TFTDriver = readID();
+        readID();
     }
     delay(500);
     sendCMD(0x01);
@@ -204,10 +204,10 @@ void TFT::fillScreen(INT16U XL, INT16U XR, INT16U YU, INT16U YD, INT16U color)
         YD = YU^YD;
         YU = YU^YD;
     }
-    XL = constrain(XL, MIN_X,MAX_X);
-    XR = constrain(XR, MIN_X,MAX_X);
-    YU = constrain(YU, MIN_Y,MAX_Y);
-    YD = constrain(YD, MIN_Y,MAX_Y);
+    XL = constrain((int)XL, (int)MIN_X, (int)MAX_X);
+    XR = constrain((int)XR, (int)MIN_X, (int)MAX_X);
+    YU = constrain((int)YU, (int)MIN_Y, (int)MAX_Y);
+    YD = constrain((int)YD, (int)MIN_Y, (int)MAX_Y);
 
     XY = (XR-XL+1);
     XY = XY*(YD-YU+1);
@@ -295,12 +295,12 @@ void TFT::drawChar( INT8U ascii, INT16U poX, INT16U poY,INT16U size, INT16U fgco
     }
 }
 
-void TFT::drawString(char *string,INT16U poX, INT16U poY, INT16U size,INT16U fgcolor)
+void TFT::drawString(const char *string,INT16U poX, INT16U poY, INT16U size,INT16U fgcolor)
 {
     while(*string)
     {
         drawChar(*string, poX, poY, size, fgcolor);
-        *string++;
+        string++;
 
         if(poX < MAX_X)
         {
@@ -321,7 +321,7 @@ INT16U length,INT16U color)
     setCol(poX,poX + length);
     setPage(poY,poY);
     sendCMD(0x2c);
-    for(int i=0; i<length; i++)
+    for(INT16U i=0; i<length; i++)
     sendData(color);
 }
 
@@ -353,7 +353,7 @@ void TFT::drawVerticalLine( INT16U poX, INT16U poY, INT16U length,INT16U color)
     setCol(poX,poX);
     setPage(poY,poY+length);
     sendCMD(0x2c);
-    for(int i=0; i<length; i++)
+    for(INT16U i=0; i<length; i++)
     sendData(color);
 }
 

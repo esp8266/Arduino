@@ -55,7 +55,7 @@ void DNSClient::begin(const IPAddress& aDNSServer)
 }
 
 
-int DNSClient::inet_aton(const char* aIPAddrString, IPAddress& aResult)
+int DNSClient::inet_aton_ethlib(const char* aIPAddrString, IPAddress& aResult)
 {
     // See if we've been given a valid IP address
     const char* p =aIPAddrString;
@@ -120,14 +120,14 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult)
     int ret =0;
 
     // See if it's a numeric IP address
-    if (inet_aton(aHostname, aResult))
+    if (inet_aton_ethlib(aHostname, aResult))
     {
         // It is, our work here is done
         return 1;
     }
 
     // Check we've got a valid DNS server to use
-    if (iDNSServer == INADDR_NONE)
+    if (iDNSServer == INADDR_NONE || iDNSServer == INADDR_ANY)
     {
         return INVALID_SERVER;
     }
@@ -282,9 +282,12 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
     }
     iUdp.read(header, DNS_HEADER_SIZE);
 
-    uint16_t header_flags = htons(*((uint16_t*)&header[2]));
+    uint16_t staging; // Staging used to avoid type-punning warnings
+    memcpy(&staging, &header[2], sizeof(uint16_t));
+    uint16_t header_flags = htons(staging);
+    memcpy(&staging, &header[0], sizeof(uint16_t));
     // Check that it's a response to this request
-    if ( ( iRequestId != (*((uint16_t*)&header[0])) ) ||
+    if ( ( iRequestId != staging ) ||
         ((header_flags & QUERY_RESPONSE_MASK) != (uint16_t)RESPONSE_FLAG) )
     {
         // Mark the entire packet as read
@@ -301,7 +304,8 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
     }
 
     // And make sure we've got (at least) one answer
-    uint16_t answerCount = htons(*((uint16_t*)&header[6]));
+    memcpy(&staging, &header[6], sizeof(uint16_t));
+    uint16_t answerCount = htons(staging);
     if (answerCount == 0 )
     {
         // Mark the entire packet as read
@@ -310,7 +314,8 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
     }
 
     // Skip over any questions
-    for (uint16_t i =0; i < htons(*((uint16_t*)&header[4])); i++)
+    memcpy(&staging, &header[4], sizeof(uint16_t));
+    for (uint16_t i =0; i < htons(staging); i++)
     {
         // Skip over the name
         uint8_t len;
