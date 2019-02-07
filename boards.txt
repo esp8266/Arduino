@@ -1322,8 +1322,8 @@ cw01.upload.resetmethod=nodemcu
 cw01.menu.CrystalFreq.26=26 MHz
 cw01.menu.CrystalFreq.40=40 MHz
 cw01.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-cw01.build.flash_mode=qio
-cw01.build.flash_flags=-DFLASHMODE_QIO
+cw01.build.flash_mode=dio
+cw01.build.flash_flags=-DFLASHMODE_DIO
 cw01.build.flash_freq=40
 cw01.menu.eesz.4M=4M (no SPIFFS)
 cw01.menu.eesz.4M.build.flash_size=4M

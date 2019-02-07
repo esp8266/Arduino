@@ -229,7 +229,7 @@ Product page: https://inventone.ng
 XinaBox CW01
 ------------
 
-The XinaBox CW01 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard RGB led.
+The XinaBox CW01(ESP8266) is an Arduino-compatible Wi-Fi development board powered by an ESP-12F, clocked at 80 MHz at 3.3V logic. The CW01 has an onboard RGB LED and 3 xBUS connection ports.
 
 Product page: https://xinabox.cc/products/CW01
 
@@ -336,7 +336,7 @@ LOLIN(WEMOS) D1 mini Lite
 -------------------------
 
 Parameters in Arduino IDE:
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Card: "WEMOS D1 Mini Lite"
 - Flash Size: "1M (512K SPIFFS)"
@@ -344,14 +344,14 @@ Parameters in Arduino IDE:
 - Upload Speed: "230400"
 
 Power:
-~~~~~
+~~~~~~
 
 - 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input
 - 3V3 pin : 3.3V 500mA regulated output
 - Digital pins : 3.3V 30mA.
 
 links:
-~~~~~
+~~~~~~
 
 - Product page: https://www.wemos.cc/
 - Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf

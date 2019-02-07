@@ -63,6 +63,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	spiffs/spiffs_hydrogen.cpp \
 	spiffs/spiffs_nucleus.cpp \
 	libb64/cencode.cpp \
+	Schedule.cpp \
 )
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
@@ -319,14 +320,13 @@ endif # recursive
 
 .PHONY: list
 list:							# show core example list
-	@for dir in ../../libraries/*/examples; do \
-		exampledir=$${dir%/*}; \
-		exampledirname=$${exampledir##*/}; \
-		for subdir in $$dir/*; do \
-			exname=$${subdir##*/}; \
-			echo "$$subdir/$$exname"; \
-		done; \
-	done; \
+	@for dir in ../../libraries/*/examples/* \
+	            ../../libraries/*/examples/*/*; do \
+		test -d $$dir || continue; \
+		examplename=$${dir##*/}; \
+		test -f $${dir}/$${examplename}.ino || continue; \
+		echo $${dir}/$${examplename}; \
+	done | sort; \
 
 #################################################
 # help

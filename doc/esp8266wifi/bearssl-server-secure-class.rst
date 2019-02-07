@@ -17,19 +17,19 @@ TLS servers require a certificate identifying itself and containing its public k
 
 This example command will generate a RSA 2048-bit key and certificate:
 
-.. code::
+.. code:: bash
 
     openssl req -x509 -nodes -newkey rsa:2048 -keyout key.pem -out cert.pem -days 4096
 
 Again, it is up to the application author to generate this certificate and key and keep the private key safe and **private.**
 
-setRSACert(const BearSSL::X509List *chain, const BearSSL::PrivateKey *sk)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+setRSACert(const BearSSL::X509List \*chain, const BearSSL::PrivateKey \*sk)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets a RSA certificate and key to be used by the server when connections are received.  Needs to be called before `begin()`
 
-setECCert(const BearSSL::X509List *chain, unsigned cert_issuer_key_type, const BearSSL::PrivateKey *sk)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+setECCert(const BearSSL::X509List \*chain, unsigned cert_issuer_key_type, const BearSSL::PrivateKey \*sk)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets an elliptic curve certificate and key for the server.  Needs to be called before `begin()`.
 
@@ -38,7 +38,7 @@ Requiring Client Certificates
 
 TLS servers can request the client to identify itself by transmitting a certificate during handshake.  If the client cannot transmit the certificate, the connection will be dropped by the server.
 
-setClientTrustAnchor(const BearSSL::X509List *client_CA_ta)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+setClientTrustAnchor(const BearSSL::X509List \*client_CA_ta)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sets the trust anchor (normally a self-signing CA) that all received certificates will be verified against.  Needs to be called before `begin()`.
