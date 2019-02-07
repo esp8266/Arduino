@@ -75,11 +75,11 @@ static inline uint16_t pgm_read_word_inlined(const void* addr) {
 #ifdef __cplusplus
     #define pgm_read_dword_aligned(addr)   (*reinterpret_cast<const uint32_t*>(addr))
     #define pgm_read_float_aligned(addr)   (*reinterpret_cast<const float*>(addr))
-    #define pgm_read_ptr_aligned(addr)     (*reinterpret_cast<const void*>(addr))
+    #define pgm_read_ptr_aligned(addr)     (*reinterpret_cast<const void* const*>(addr))
 #else
     #define pgm_read_dword_aligned(addr)   (*(const uint32_t*)(addr))
     #define pgm_read_float_aligned(addr)   (*(const float*)(addr))
-    #define pgm_read_ptr_aligned(addr)     (*(const void*)(addr))
+    #define pgm_read_ptr_aligned(addr)     (*(const void* const*)(addr))
 #endif
 
 __attribute__((optimize("-O3"), always_inline)) static inline uint32_t pgm_read_dword_unaligned(const void *addr) {
