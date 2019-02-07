@@ -110,6 +110,10 @@
 #ifndef SPIFFS_NUCLEUS_H_
 #define SPIFFS_NUCLEUS_H_
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #define _SPIFFS_ERR_CHECK_FIRST         (SPIFFS_ERR_INTERNAL - 1)
 #define SPIFFS_ERR_CHECK_OBJ_ID_MISM    (SPIFFS_ERR_INTERNAL - 1)
 #define SPIFFS_ERR_CHECK_SPIX_MISM      (SPIFFS_ERR_INTERNAL - 2)
@@ -838,5 +842,9 @@ s32_t spiffs_object_index_consistency_check(
 #define _SPIFFS_MEMCPY(__d, __s, __l) do{memcpy((__d),(__s),(__l));}while(0)
 #endif
 #endif //_SPIFFS_TEST
+
+#if defined(__cplusplus)
+};
+#endif
 
 #endif /* SPIFFS_NUCLEUS_H_ */
