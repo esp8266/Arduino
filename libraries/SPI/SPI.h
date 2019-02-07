@@ -79,6 +79,7 @@ private:
   uint8_t pinSet;
   void writeBytes_(const uint8_t * data, uint8_t size);
   void transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size);
+  void transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t size);
   inline void setDataBits(uint16_t bits);
 };
 
