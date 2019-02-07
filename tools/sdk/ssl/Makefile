@@ -3,7 +3,7 @@
 VER_H=../include/bearssl/bearssl_git.h
 
 all T0 clean: bearssl/README.txt
-	PATH=$(PATH):$(PWD)/../../xtensa-lx106-elf/bin/ && cd bearssl && make CONF=esp8266 $@
+	PATH="$(PATH):$(PWD)/../../xtensa-lx106-elf/bin/" && cd bearssl && make CONF=esp8266 $@
 
 install: all version-header
 	cp bearssl/esp8266/libbearssl.a ../lib/.
