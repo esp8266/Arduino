@@ -58,6 +58,12 @@ extern "C" {
 
 #endif
 
+#ifdef DEBUG_ESP_SSL
+#define DEBUG_BSSL(fmt, ...)  DEBUG_ESP_PORT.printf_P((PGM_P)PSTR( "BSSL:" fmt), ## __VA_ARGS__)
+#else
+#define DEBUG_BSSL(...)
+#endif
+
 namespace BearSSL {
 
 void WiFiClientSecure::_clear() {
@@ -214,9 +220,11 @@ int WiFiClientSecure::connect(CONST IPAddress& ip, uint16_t port) {
 int WiFiClientSecure::connect(const char* name, uint16_t port) {
   IPAddress remote_addr;
   if (!WiFi.hostByName(name, remote_addr)) {
+    DEBUG_BSSL("connect: Name loopup failure\n");
     return 0;
   }
   if (!WiFiClient::connect(remote_addr, port)) {
+    DEBUG_BSSL("connect: Unable to connect TCP socket\n");
     return 0;
   }
   return _connectSSL(name);
@@ -309,6 +317,7 @@ size_t WiFiClientSecure::write(Stream& stream) {
   size_t countSent;
 
   if (!connected() || !_handshake_done) {
+    DEBUG_BSSL("write: Connect/handshake not completed yet\n");
     return 0;
   }
 
@@ -336,6 +345,7 @@ int WiFiClientSecure::read(uint8_t *buf, size_t size) {
     return 0;  // We're still connected, but nothing to read
   }
   if (!avail && !conn) {
+    DEBUG_BSSL("read: Not connected, none left available\n");
     return -1;
   }
 
@@ -349,7 +359,11 @@ int WiFiClientSecure::read(uint8_t *buf, size_t size) {
     return to_copy;
   }
 
-  return conn ? 0 : -1; // If we're connected, no error but no read. OTW error
+  if (!conn) {
+    DEBUG_BSSL("read: Not connected\n");
+    return -1;
+  }
+  return 0; // If we're connected, no error but no read.
 }
 
 int WiFiClientSecure::read() {
@@ -357,6 +371,7 @@ int WiFiClientSecure::read() {
   if (1 == read(&c, 1)) {
     return c;
   }
+  DEBUG_BSSL("read: failed\n");
   return -1;
 }
 
@@ -383,17 +398,20 @@ int WiFiClientSecure::available() {
 
 int WiFiClientSecure::peek() {
   if (!ctx_present() || !available()) {
+    DEBUG_BSSL("peek: Not connected, none left available\n");
     return -1;
   }
   if (_recvapp_buf && _recvapp_len) {
     return _recvapp_buf[0];
   }
+  DEBUG_BSSL("peek: No data left\n");
   return -1;
 }
 
 size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length) {
   size_t to_copy = 0;
   if (!ctx_present()) {
+    DEBUG_BSSL("peekBytes: Not connected\n");
     return 0;
   }
 
@@ -415,6 +433,7 @@ size_t WiFiClientSecure::peekBytes(uint8_t *buffer, size_t length) {
 */
 int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
   if (!ctx_present()) {
+    DEBUG_BSSL("_run_until: Not connected\n");
     return -1;
   }
   for (int no_work = 0; blocking || no_work < 2;) {
@@ -477,6 +496,7 @@ int WiFiClientSecure::_run_until(unsigned target, bool blocking) {
        This is unrecoverable here, so we report an error.
     */
     if (state & BR_SSL_RECVAPP) {
+      DEBUG_BSSL("_run_until: Fatal protocol state\n");
       return -1;
     }
 
@@ -524,6 +544,7 @@ bool WiFiClientSecure::_wait_for_handshake() {
   while (!_handshake_done && _clientConnected()) {
     int ret = _run_until(BR_SSL_SENDAPP);
     if (ret < 0) {
+      DEBUG_BSSL("_wait_for_handshake: failed\n");
       break;
     }
     if (br_ssl_engine_current_state(_eng) & BR_SSL_SENDAPP) {
@@ -552,10 +573,14 @@ bool WiFiClientSecure::setFingerprint(const char *fpStr) {
     c = pgm_read_byte(fpStr++);
     if (!c) break; // String ended, done processing
     d = pgm_read_byte(fpStr++);
-    if (!d) return false; // Only half of the last hex digit, error
+    if (!d) {
+      DEBUG_BSSL("setFingerprint: FP too short\n");
+      return false; // Only half of the last hex digit, error
+    }
     c = htoi(c);
     d = htoi(d);
     if ((c>15) || (d>15)) {
+      DEBUG_BSSL("setFingerprint: Invalid char\n");
       return false; // Error in one of the hex characters
     }
     fp[idx++] = (c<<4)|d;
@@ -566,6 +591,7 @@ bool WiFiClientSecure::setFingerprint(const char *fpStr) {
     }
   }
   if ((idx != 20) || pgm_read_byte(fpStr)) {
+    DEBUG_BSSL("setFingerprint: Garbage at end of fp\n");
     return false; // Garbage at EOL or we didn't have enough hex digits
   }
   return setFingerprint(fp);
@@ -641,6 +667,7 @@ extern "C" {
   static unsigned insecure_end_chain(const br_x509_class **ctx) {
     const br_x509_insecure_context *xc = (const br_x509_insecure_context *)ctx;
     if (!xc->done_cert) {
+      DEBUG_BSSL("insecure_end_chain: No cert seen\n");
       return 1; // error
     }
 
@@ -648,6 +675,7 @@ extern "C" {
     char res[20];
     br_sha1_out(&xc->sha1_cert, res);
     if (xc->match_fingerprint && memcmp(res, xc->match_fingerprint, sizeof(res))) {
+      DEBUG_BSSL("insecure_end_chain: Received cert FP doesn't match\n");
       return BR_ERR_X509_NOT_TRUSTED;
     }
 
@@ -657,6 +685,7 @@ extern "C" {
     br_sha256_out(&xc->sha256_issuer, res_issuer);
     br_sha256_out(&xc->sha256_subject, res_subject);
     if (xc->allow_self_signed && memcmp(res_subject, res_issuer, sizeof(res_issuer))) {
+      DEBUG_BSSL("insecure_end_chain: Didn't get self-signed cert\n");
       return BR_ERR_X509_NOT_TRUSTED;
     }
 
@@ -816,6 +845,7 @@ bool WiFiClientSecure::setCiphers(const uint16_t *cipherAry, int cipherCount) {
   _cipher_list = nullptr;
   _cipher_list = std::shared_ptr<uint16_t>(new uint16_t[cipherCount], std::default_delete<uint16_t[]>());
   if (!_cipher_list.get()) {
+    DEBUG_BSSL("setCiphers: list empty\n");
     return false;
   }
   memcpy_P(_cipher_list.get(), cipherAry, cipherCount * sizeof(uint16_t));
@@ -837,6 +867,7 @@ bool WiFiClientSecure::_installClientX509Validator() {
     // Use common insecure x509 authenticator
     _x509_insecure = std::make_shared<struct br_x509_insecure_context>();
     if (!_x509_insecure) {
+      DEBUG_BSSL("_installClientX509Validator: OOM for _x509_insecure\n");
       return false;
     }
     br_x509_insecure_init(_x509_insecure.get(), _use_fingerprint, _fingerprint, _use_self_signed);
@@ -845,6 +876,7 @@ bool WiFiClientSecure::_installClientX509Validator() {
     // Simple, pre-known public key authenticator, ignores cert completely.
     _x509_knownkey = std::make_shared<br_x509_knownkey_context>();
     if (!_x509_knownkey) {
+      DEBUG_BSSL("_installClientX509Validator: OOM for _x509_knownkey\n");
       return false;
     }
     if (_knownkey->isRSA()) {
@@ -857,6 +889,7 @@ bool WiFiClientSecure::_installClientX509Validator() {
     // X509 minimal validator.  Checks dates, cert chain for trusted CA, etc.
     _x509_minimal = std::make_shared<br_x509_minimal_context>();
     if (!_x509_minimal) {
+      DEBUG_BSSL("_installClientX509Validator: OOM for _x509_minimal\n");
       return false;
     }
     br_x509_minimal_init(_x509_minimal.get(), &br_sha256_vtable, _ta ? _ta->getTrustAnchors() : nullptr, _ta ? _ta->getCount() : 0);
@@ -878,13 +911,14 @@ bool WiFiClientSecure::_installClientX509Validator() {
 // Called by connect() to do the actual SSL setup and handshake.
 // Returns if the SSL handshake succeeded.
 bool WiFiClientSecure::_connectSSL(const char* hostName) {
+  DEBUG_BSSL("_connectSSL: start connection\n");
   _freeSSL();
   _oom_err = false;
 
 #ifdef DEBUG_ESP_SSL
   // BearSSL will reject all connections unless an authentication option is set, warn in DEBUG builds
   if (!_use_insecure && !_use_fingerprint && !_use_self_signed && !_knownkey && !_certStore && !_ta) {
-    DEBUGV("BSSL: Connection *will* fail, no authentication method is setup");
+    DEBUG_BSSL("Connection *will* fail, no authentication method is setup\n");
   }
 #endif
 
@@ -896,6 +930,7 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
   if (!_sc || !_iobuf_in || !_iobuf_out) {
     _freeSSL(); // Frees _sc, _iobuf*
     _oom_err = true;
+    DEBUG_BSSL("_connectSSL: OOM error\n");
     return false;
   }
 
@@ -909,6 +944,7 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
   if (!_installClientX509Validator()) {
     _freeSSL();
     _oom_err = true;
+    DEBUG_BSSL("_connectSSL: Can't install x509 validator\n");
     return false;
   }
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
@@ -929,10 +965,21 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
 
   if (!br_ssl_client_reset(_sc.get(), hostName, _session?1:0)) {
     _freeSSL();
+    DEBUG_BSSL("_connectSSL: Can't reset client\n");
     return false;
   }
 
-  return _wait_for_handshake();
+  auto ret = _wait_for_handshake();
+#ifdef DEBUG_ESP_SSL
+  if (!ret) {
+    char err[256];
+    getLastSSLError(err, sizeof(err));
+    DEBUG_BSSL("Couldn't connect. Error = '%s'\n", err);
+  } else {
+    DEBUG_BSSL("Connected!\n");
+  }
+#endif
+  return ret;
 }
 
 // Slightly different X509 setup for servers who want to validate client
@@ -945,6 +992,7 @@ bool WiFiClientSecure::_installServerX509Validator(const X509List *client_CA_ta)
     if (!_x509_minimal) {
       _freeSSL();
       _oom_err = true;
+      DEBUG_BSSL("_installServerX509Validator: OOM for _x509_minimal\n");
       return false;
     }
     br_x509_minimal_init(_x509_minimal.get(), &br_sha256_vtable, _ta->getTrustAnchors(), _ta->getCount());
@@ -977,16 +1025,19 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();
     _oom_err = true;
+    DEBUG_BSSL("_connectSSLServerRSA: OOM error\n");
     return false;
   }
 
   br_ssl_server_init_full_rsa(_sc_svr.get(), chain ? chain->getX509Certs() : nullptr, chain ? chain->getCount() : 0, sk ? sk->getRSA() : nullptr);
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
   if (client_CA_ta && !_installServerX509Validator(client_CA_ta)) {
+    DEBUG_BSSL("_connectSSLServerRSA: Can't install serverX509check\n");
     return false;
   }
   if (!br_ssl_server_reset(_sc_svr.get())) {
     _freeSSL();
+    DEBUG_BSSL("_connectSSLServerRSA: Can't reset server ctx\n");
     return false;
   }
 
@@ -1007,6 +1058,7 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
   if (!_sc_svr || !_iobuf_in || !_iobuf_out) {
     _freeSSL();
     _oom_err = true;
+    DEBUG_BSSL("_connectSSLServerEC: OOM error\n");
     return false;
   }
 
@@ -1014,10 +1066,12 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
                              cert_issuer_key_type, sk ? sk->getEC() : nullptr);
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
   if (client_CA_ta && !_installServerX509Validator(client_CA_ta)) {
+    DEBUG_BSSL("_connectSSLServerEC: Can't install serverX509check\n");
     return false;
   }
   if (!br_ssl_server_reset(_sc_svr.get())) {
     _freeSSL();
+    DEBUG_BSSL("_connectSSLServerEC: Can't reset server ctx\n");
     return false;
   }
 
@@ -1107,6 +1161,7 @@ int WiFiClientSecure::getLastSSLError(char *dest, size_t len) {
 bool WiFiClientSecure::probeMaxFragmentLength(const char* name, uint16_t port, uint16_t len) {
   IPAddress remote_addr;
   if (!WiFi.hostByName(name, remote_addr)) {
+    DEBUG_BSSL("probeMaxFragmentLength: Can't resolve host\n");
     return false;
   }
   return WiFiClientSecure::probeMaxFragmentLength(remote_addr, port, len);
@@ -1184,6 +1239,7 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
   int ttlLen = sizeof(clientHelloHead_P) + (2 + sizeof(suites_P)) + (sizeof(clientHelloTail_P) + 1);
   uint8_t *clientHello = new uint8_t[ttlLen];
   if (!clientHello) {
+    DEBUG_BSSL("probeMaxFragmentLength: OOM\n");
     return false;
   }
   memcpy_P(clientHello, clientHelloHead_P, sizeof(clientHelloHead_P));
@@ -1209,12 +1265,14 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
   probe.connect(ip, port);
   if (!probe.connected()) {
     delete[] clientHello;
+    DEBUG_BSSL("probeMaxFragmentLength: Can't connect\n");
     return false;
   }
 
   int ret = probe.write(clientHello, ttlLen);
   delete[] clientHello; // We're done w/the hello message
   if (!probe.connected() || (ret != ttlLen)) {
+    DEBUG_BSSL("probeMaxFragmentLength: Protocol error\n");
     return false;
   }
 
