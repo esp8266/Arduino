@@ -54,56 +54,60 @@ void loop() {
 
     client->setFingerprint(fingerprint);
 
-    HTTPClient https;
+    /* in order to ensure the client object lives the entire time of the HTTPClient
+       the HTTPClient is in its own nested code block */
+    {
+      HTTPClient https;
 
-    if (https.begin(*client, "https://tls.mbed.org/")) {
+      if (https.begin(*client, "https://tls.mbed.org/")) {
 
-      Serial.print("[HTTPS] GET...\n");
-      // start connection and send HTTP header
-      int httpCode = https.GET();
-      if (httpCode > 0) {
-        // HTTP header has been send and Server response header has been handled
-        Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+        Serial.print("[HTTPS] GET...\n");
+        // start connection and send HTTP header
+        int httpCode = https.GET();
+        if (httpCode > 0) {
+          // HTTP header has been send and Server response header has been handled
+          Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
 
-        // file found at server
-        if (httpCode == HTTP_CODE_OK) {
+          // file found at server
+          if (httpCode == HTTP_CODE_OK) {
 
-          // get lenght of document (is -1 when Server sends no Content-Length header)
-          int len = https.getSize();
+            // get lenght of document (is -1 when Server sends no Content-Length header)
+            int len = https.getSize();
 
-          // create buffer for read
-          static uint8_t buff[128] = { 0 };
+            // create buffer for read
+            static uint8_t buff[128] = { 0 };
 
-          // read all data from server
-          while (https.connected() && (len > 0 || len == -1)) {
-            // get available data size
-            size_t size = client->available();
+            // read all data from server
+            while (https.connected() && (len > 0 || len == -1)) {
+              // get available data size
+              size_t size = client->available();
 
-            if (size) {
-              // read up to 128 byte
-              int c = client->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+              if (size) {
+                // read up to 128 byte
+                int c = client->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
 
-              // write it to Serial
-              Serial.write(buff, c);
+                // write it to Serial
+                Serial.write(buff, c);
 
-              if (len > 0) {
-                len -= c;
+                if (len > 0) {
+                  len -= c;
+                }
               }
+              delay(1);
             }
-            delay(1);
+
+            Serial.println();
+            Serial.print("[HTTPS] connection closed or file end.\n");
+
           }
-
-          Serial.println();
-          Serial.print("[HTTPS] connection closed or file end.\n");
-
+        } else {
+          Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
         }
-      } else {
-        Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
-      }
 
-      https.end();
-    } else {
-      Serial.printf("Unable to connect\n");
+        https.end();
+      } else {
+        Serial.printf("Unable to connect\n");
+      }
     }
   }
 
