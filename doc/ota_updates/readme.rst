@@ -59,7 +59,7 @@ The format of a signed binary is compatible with the standard binary format, and
 
 As shown below, the signed hash is appended to the unsigned binary followed by the total length of the signed hash (i.e. if the signed hash was 64 bytes, then this uint32 will contain 64).  This format allows for extensibility (such as adding in a CA-based validation scheme allowing multiple signing keys all based off of a trust anchor), and pull requests are always welcome.
 
-.. code::
+.. code:: bash
 
     NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS> 
 
@@ -84,19 +84,19 @@ To enable this mode, just include `private.key` and `public.key` in the sketch `
 
 When the signing process starts, the message:
 
-.. code::
+.. code:: bash
 
     Enabling binary signing
 
 Will appear in the IDE window before a compile is launched, and at the completion of the build the signed binary file well be displayed in the IDE build window as:
 
-.. code::
+.. code:: bash
 
     Signed binary: /full/path/to/sketch.bin.signed
 
 If you receive either of the following messages in the IDE window, the signing was not completed and you will need to verify the `public.key` and `private.key`:
 
-.. code::
+.. code:: bash
 
     Not enabling binary signing
     ... or ...
