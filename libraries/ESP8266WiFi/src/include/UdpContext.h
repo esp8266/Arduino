@@ -51,6 +51,12 @@ public:
     , _tx_buf_offset(0)
     {
         _pcb = udp_new();
+// Defaults to IPADDR_TYPE_V4 (_pcb initialized with all zeroes)
+#if LWIP_IPV4 && LWIP_IPV6
+        _pcb->local_ip.type = IPADDR_TYPE_ANY;
+#elif LWIP_IPV6
+        _pcb->local_ip.type = IPADDR_TYPE_V6;
+#endif
 #ifdef LWIP_MAYBE_XCC
         _mcast_ttl = 1;
 #endif
