@@ -95,12 +95,21 @@ public:
         return true;
     }
 
-    bool listen(CONST IPAddress& addr, uint16_t port)
+#if LWIP_VERSION_MAJOR == 1
+    bool listen(IPAddress addr, uint16_t port)
     {
         udp_recv(_pcb, &_s_recv, (void *) this);
         err_t err = udp_bind(_pcb, addr, port);
         return err == ERR_OK;
     }
+#else
+    bool listen(const IPAddress& addr, uint16_t port)
+    {
+        udp_recv(_pcb, &_s_recv, (void *) this);
+        err_t err = udp_bind(_pcb, addr, port);
+        return err == ERR_OK;
+    }
+#endif
 
     void disconnect()
     {
