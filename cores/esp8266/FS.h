@@ -84,6 +84,8 @@ public:
     void rewindDirectory();
     File openNextFile();
 
+    String readString() override;
+	
 protected:
     FileImplPtr _p;
 
