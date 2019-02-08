@@ -95,7 +95,7 @@ public:
         return true;
     }
 
-    bool listen(CONST ip_addr_t* addr, uint16_t port)
+    bool listen(CONST IPAddress& addr, uint16_t port)
     {
         udp_recv(_pcb, &_s_recv, (void *) this);
         err_t err = udp_bind(_pcb, addr, port);
