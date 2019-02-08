@@ -30,6 +30,8 @@ void esp_schedule();
 #include <assert.h>
 }
 
+#include <AddrList.h>
+
 #define GET_UDP_HDR(pb) (reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN))
 
 class UdpContext
@@ -116,6 +118,33 @@ public:
         udp_disconnect(_pcb);
     }
 
+#if LWIP_IPV6
+
+    void setMulticastInterface(IPAddress addr)
+    {
+        // Per 'udp_set_multicast_netif_addr()' signature and comments
+        // in lwIP sources:
+        // An IPv4 address designating a specific interface must be used.
+        // When an IPv6 address is given, the matching IPv4 in the same
+        // interface must be selected.
+
+        if (!addr.isV4())
+        {
+            for (auto a: addrList)
+                if (a.addr() == addr)
+                {
+                    // found the IPv6 address,
+                    // redirect parameter to IPv4 address in this interface
+                    addr = a.ipv4();
+                    break;
+                }
+            assert(addr.isV4());
+        }
+        udp_set_multicast_netif_addr(_pcb, ip_2_ip4((const ip_addr_t*)addr));
+    }
+
+#else // !LWIP_IPV6
+
     void setMulticastInterface(const IPAddress& addr)
     {
 #if LWIP_VERSION_MAJOR == 1
@@ -124,6 +153,8 @@ public:
         udp_set_multicast_netif_addr(_pcb, ip_2_ip4((const ip_addr_t*)addr));
 #endif
     }
+
+#endif // !LWIP_IPV6
 
     void setMulticastTTL(int ttl)
     {
