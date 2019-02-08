@@ -45,7 +45,8 @@ static const uint8_t D8   = 12;
 static const uint8_t D9   = 16;
 static const uint8_t RX  = 3;
 static const uint8_t TX = 1;
-static const uint8_t A0 = 0;
+
+#define PIN_A0 0
 /*Analog pins for Onboard ADC*/
 static const uint8_t A1 = 1;
 static const uint8_t A2 = 2;
