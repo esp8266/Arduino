@@ -443,7 +443,6 @@ Return the status of Wi-Fi connection.
 .. code:: cpp
 
     WiFi.status()
-::
 
 Function returns one of the following connection statuses:
 
