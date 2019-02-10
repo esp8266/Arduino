@@ -12,6 +12,7 @@ Welcome to ESP8266 Arduino Core's documentation!
    ESP8266WiFi <esp8266wifi/readme>
    OTA Updates <ota_updates/readme>
    PROGMEM <PROGMEM>
+   Using GDB to debug <gdb>
 
    Boards <boards>
    FAQ <faq/readme>
@@ -20,4 +21,3 @@ Welcome to ESP8266 Arduino Core's documentation!
    Debugging <Troubleshooting/debugging>
    Stack Dump <Troubleshooting/stack_dump>
    Using with Eclipse <eclipse/eclipse>
-   Changelog <changes>

@@ -1,28 +1,38 @@
 /*
- *  HTTP over TLS (HTTPS) example sketch
- *
- *  This example demonstrates how to use
- *  WiFiClientSecure class to access HTTPS API.
- *  We fetch and display the status of
- *  esp8266/Arduino project continuous integration
- *  build.
- *
- *  Created by Ivan Grokhotkov, 2015.
- *  This example is in public domain.
- */
+    HTTP over TLS (HTTPS) example sketch
+
+    This example demonstrates how to use
+    WiFiClientSecure class to access HTTPS API.
+    We fetch and display the status of
+    esp8266/Arduino project continuous integration
+    build.
+
+    Limitations:
+      only RSA certificates
+      no support of Perfect Forward Secrecy (PFS)
+      TLSv1.2 is supported since version 2.4.0-rc1
+
+    Created by Ivan Grokhotkov, 2015.
+    This example is in public domain.
+*/
 
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 
-const char* ssid = "........";
-const char* password = "........";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 const char* host = "api.github.com";
 const int httpsPort = 443;
 
 // Use web browser to view and copy
 // SHA1 fingerprint of the certificate
-const char* fingerprint = "CF 05 98 89 CA FF 8E D8 5E 5C E0 C2 E4 F7 E6 C3 C7 50 DD 5C";
+const char fingerprint[] PROGMEM = "5F F1 60 31 09 04 3E F2 90 D2 B0 8A 50 38 04 E8 37 9F BC 76";
 
 void setup() {
   Serial.begin(115200);
@@ -44,15 +54,13 @@ void setup() {
   WiFiClientSecure client;
   Serial.print("connecting to ");
   Serial.println(host);
+
+  Serial.printf("Using fingerprint '%s'\n", fingerprint);
+  client.setFingerprint(fingerprint);
+
   if (!client.connect(host, httpsPort)) {
     Serial.println("connection failed");
     return;
-  }
-
-  if (client.verify(fingerprint, host)) {
-    Serial.println("certificate matches");
-  } else {
-    Serial.println("certificate doesn't match");
   }
 
   String url = "/repos/esp8266/Arduino/commits/master/status";

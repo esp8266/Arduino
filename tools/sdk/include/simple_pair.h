@@ -25,6 +25,10 @@
 #ifndef __SIMPLE_PAIR_H__
 #define __SIMPLE_PAIR_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
 	SP_ST_STA_FINISH = 0,
 	SP_ST_AP_FINISH = 0,
@@ -60,5 +64,9 @@ int simple_pair_ap_refuse_negotiate(void);
 int simple_pair_set_peer_ref(u8 *peer_mac, u8 *tmp_key, u8 *ex_key);
 int simple_pair_get_peer_ref(u8 *peer_mac, u8 *tmp_key, u8 *ex_key);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __SIMPLE_PAIR_H__ */

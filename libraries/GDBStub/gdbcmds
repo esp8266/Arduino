@@ -1,3 +1,20 @@
+# ESP8266 HW limits the number of breakpoints/watchpoints
 set remote hardware-breakpoint-limit 1
 set remote hardware-watchpoint-limit 1
-target remote :9980
+# Some GDBstub settings
+set remote interrupt-on-connect on
+set remote kill-packet off
+set remote symbol-lookup-packet off
+set remote verbose-resume-packet off
+# The memory map, so GDB knows where it can install SW breakpoints
+mem 0x20000000 0x3fefffff ro cache
+mem 0x3ff00000 0x3fffffff rw
+mem 0x40000000 0x400fffff ro cache
+mem 0x40100000 0x4013ffff rw cache
+mem 0x40140000 0x5fffffff ro cache
+mem 0x60000000 0x60001fff rw
+# Change the following to your sketch's ELF file
+file /path/to/sketch.ino.elf
+# Change the following to your serial port and baud
+set serial baud 115200
+target remote /dev/ttyUSB0
