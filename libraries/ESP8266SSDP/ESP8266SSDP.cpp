@@ -454,7 +454,7 @@ void SSDPClass::setDeviceType(const char *deviceType) {
 }
 
 void SSDPClass::setUUID(const char *uuid) {
-  snprintf_P(_uuid, sizeof(_uuid), PSTR("%S%s"), F("uuid:"), uuid);  
+  snprintf_P(_uuid, sizeof(_uuid), PSTR("uuid:%s"), uuid);  
 }
 
 void SSDPClass::setName(const char *name) {
