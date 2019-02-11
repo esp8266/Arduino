@@ -130,6 +130,7 @@ SSDPClass::SSDPClass() :
   _timer(0),
   _port(80),
   _ttl(SSDP_MULTICAST_TTL),
+  _respondToAddr(0,0,0,0),
   _respondToPort(0),
   _pending(false),
   _st_is_uuid(false),
@@ -161,8 +162,7 @@ bool SSDPClass::begin() {
   _st_is_uuid = false;
   if (strcmp(_uuid,"") == 0) {
 	uint32_t chipId = ESP.getChipId();
-	sprintf(_uuid, "%s38323636-4558-4dda-9188-cda0e6%02x%02x%02x",
-  "uuid:",
+	sprintf_P(_uuid, PSTR("uuid:38323636-4558-4dda-9188-cda0e6%02x%02x%02x"),
   (uint16_t) ((chipId >> 16) & 0xff),
 	(uint16_t) ((chipId >>  8) & 0xff),
 	(uint16_t)   chipId        & 0xff);
@@ -181,7 +181,9 @@ bool SSDPClass::begin() {
   IPAddress mcast(SSDP_MULTICAST_ADDR);
 
   if (igmp_joingroup(local, mcast) != ERR_OK ) {
-    DEBUGV("SSDP failed to join igmp group");
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf_P(PSTR("SSDP failed to join igmp group\n"));
+#endif
     return false;
   }
 
@@ -452,7 +454,7 @@ void SSDPClass::setDeviceType(const char *deviceType) {
 }
 
 void SSDPClass::setUUID(const char *uuid) {
-  snprintf(_uuid, sizeof(_uuid), "%s%s", "uuid:", uuid);  
+  snprintf_P(_uuid, sizeof(_uuid), PSTR("%S%s"), F("uuid:"), uuid);  
 }
 
 void SSDPClass::setName(const char *name) {
