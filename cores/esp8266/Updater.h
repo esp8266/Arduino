@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <flash_utils.h>
 #include <MD5Builder.h>
+#include <functional>
 
 #define UPDATE_ERROR_OK                 (0)
 #define UPDATE_ERROR_WRITE              (1)
