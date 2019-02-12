@@ -185,7 +185,6 @@ class UpdaterClass {
     size_t _bufferLen; // amount of data written into _buffer
     size_t _bufferSize; // total size of _buffer
     size_t _size;
-    THandlerFunction_Progress _progress_callback;
     uint32_t _startAddress;
     uint32_t _currentAddress;
     uint32_t _command;
@@ -199,6 +198,8 @@ class UpdaterClass {
     // Optional signed binary verification
     UpdaterHashClass *_hash;
     UpdaterVerifyClass *_verify;
+    // Optional progress callback function
+    THandlerFunction_Progress _progress_callback;
 };
 
 extern UpdaterClass Update;
