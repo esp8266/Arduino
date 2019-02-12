@@ -111,6 +111,11 @@ class UpdaterClass {
     */
     void md5(uint8_t * result){ return _md5.getBytes(result); }
 
+    /*
+      This callback will be called when Updater is receiving data
+    */
+    UpdateClass& onProgress(THandlerFunction_Progress fn);
+
     //Helpers
     uint8_t getError(){ return _error; }
     void clearError(){ _error = UPDATE_ERROR_OK; }
@@ -178,6 +183,7 @@ class UpdaterClass {
     size_t _bufferLen; // amount of data written into _buffer
     size_t _bufferSize; // total size of _buffer
     size_t _size;
+    THandlerFunction_Progress _progress_callback;
     uint32_t _startAddress;
     uint32_t _currentAddress;
     uint32_t _command;
