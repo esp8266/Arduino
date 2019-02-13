@@ -140,6 +140,8 @@ SECTIONS
 
     /* __FUNCTION__ locals */
     *(.rodata._ZZ*__FUNCTION__)
+    *(.rodata._ZZ*__PRETTY_FUNCTION__)
+    *(.rodata._ZZ*__func__)
 
     /* std::* exception strings, in their own section to allow string coalescing */
     *(.irom.exceptiontext)
