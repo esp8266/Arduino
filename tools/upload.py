@@ -11,8 +11,12 @@ import os
 import sys
 
 sys.argv.pop(0) # Remove executable name
-sys.path.append(sys.argv.pop(0).replace('\\', '/')) # Add pyserial dir to search path, in UNIX format
-esptool = sys.argv.pop(0).replace('\\', '/') # Full path to esptool.py, in UNIX format
+try:
+    sys.path.append(sys.argv.pop(0).replace('\\', '/')) # Add pyserial dir to search path, in UNIX format
+    esptool = sys.argv.pop(0).replace('\\', '/') # Full path to esptool.py, in UNIX format
+except:
+    sys.stderr.write("Error in command line, need pyserial path as 1st arg and esptool path as 2nd.\n")
+    sys.exit(1)
 
 fakeargs = [];
 while len(sys.argv):
@@ -28,4 +32,10 @@ while len(sys.argv):
         sys.argv.pop(0) # Remove --end
         fakeargs = []
     else:
-        fakeargs = fakeargs + [sys.argv.pop(0)]
+        # We silently replace the 921kbaud setting with 460k to enable backward
+        # compatibility with the old esptool-ck.exe.  Esptool.py doesn't seem
+        # work reliably at 921k, but is still significantly faster at 460kbaud.
+        thisarg = sys.argv.pop(0)
+        if thisarg == "921600":
+            thisarg = "460800"
+        fakeargs = fakeargs + [thisarg]

@@ -458,6 +458,8 @@ generic.menu.baud.460800.macosx=460800
 generic.menu.baud.460800.upload.speed=460800
 generic.menu.baud.512000.windows=512000
 generic.menu.baud.512000.upload.speed=512000
+generic.menu.baud.921600=921600
+generic.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 esp8285.name=Generic ESP8285 Module
@@ -722,6 +724,8 @@ esp8285.menu.baud.460800.macosx=460800
 esp8285.menu.baud.460800.upload.speed=460800
 esp8285.menu.baud.512000.windows=512000
 esp8285.menu.baud.512000.upload.speed=512000
+esp8285.menu.baud.921600=921600
+esp8285.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 espduino.name=ESPDuino (ESP-13 Module)
@@ -912,6 +916,8 @@ espduino.menu.baud.460800.macosx=460800
 espduino.menu.baud.460800.upload.speed=460800
 espduino.menu.baud.512000.windows=512000
 espduino.menu.baud.512000.upload.speed=512000
+espduino.menu.baud.921600=921600
+espduino.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 huzzah.name=Adafruit Feather HUZZAH ESP8266
@@ -1094,6 +1100,8 @@ huzzah.menu.baud.460800.macosx=460800
 huzzah.menu.baud.460800.upload.speed=460800
 huzzah.menu.baud.512000.windows=512000
 huzzah.menu.baud.512000.upload.speed=512000
+huzzah.menu.baud.921600=921600
+huzzah.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 inventone.name=Invent One
@@ -1276,6 +1284,8 @@ inventone.menu.baud.460800.macosx=460800
 inventone.menu.baud.460800.upload.speed=460800
 inventone.menu.baud.512000.windows=512000
 inventone.menu.baud.512000.upload.speed=512000
+inventone.menu.baud.921600=921600
+inventone.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 cw01.name=XinaBox CW01
@@ -1461,6 +1471,8 @@ cw01.menu.baud.460800.macosx=460800
 cw01.menu.baud.460800.upload.speed=460800
 cw01.menu.baud.512000.windows=512000
 cw01.menu.baud.512000.upload.speed=512000
+cw01.menu.baud.921600=921600
+cw01.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 espresso_lite_v1.name=ESPresso Lite 1.0
@@ -1646,6 +1658,8 @@ espresso_lite_v1.menu.baud.460800.macosx=460800
 espresso_lite_v1.menu.baud.460800.upload.speed=460800
 espresso_lite_v1.menu.baud.512000.windows=512000
 espresso_lite_v1.menu.baud.512000.upload.speed=512000
+espresso_lite_v1.menu.baud.921600=921600
+espresso_lite_v1.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 espresso_lite_v2.name=ESPresso Lite 2.0
@@ -1831,6 +1845,8 @@ espresso_lite_v2.menu.baud.460800.macosx=460800
 espresso_lite_v2.menu.baud.460800.upload.speed=460800
 espresso_lite_v2.menu.baud.512000.windows=512000
 espresso_lite_v2.menu.baud.512000.upload.speed=512000
+espresso_lite_v2.menu.baud.921600=921600
+espresso_lite_v2.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 phoenix_v1.name=Phoenix 1.0
@@ -2016,6 +2032,8 @@ phoenix_v1.menu.baud.460800.macosx=460800
 phoenix_v1.menu.baud.460800.upload.speed=460800
 phoenix_v1.menu.baud.512000.windows=512000
 phoenix_v1.menu.baud.512000.upload.speed=512000
+phoenix_v1.menu.baud.921600=921600
+phoenix_v1.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 phoenix_v2.name=Phoenix 2.0
@@ -2201,6 +2219,8 @@ phoenix_v2.menu.baud.460800.macosx=460800
 phoenix_v2.menu.baud.460800.upload.speed=460800
 phoenix_v2.menu.baud.512000.windows=512000
 phoenix_v2.menu.baud.512000.upload.speed=512000
+phoenix_v2.menu.baud.921600=921600
+phoenix_v2.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 nodemcu.name=NodeMCU 0.9 (ESP-12 Module)
@@ -2383,6 +2403,8 @@ nodemcu.menu.baud.460800.macosx=460800
 nodemcu.menu.baud.460800.upload.speed=460800
 nodemcu.menu.baud.512000.windows=512000
 nodemcu.menu.baud.512000.upload.speed=512000
+nodemcu.menu.baud.921600=921600
+nodemcu.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 nodemcuv2.name=NodeMCU 1.0 (ESP-12E Module)
@@ -2565,6 +2587,8 @@ nodemcuv2.menu.baud.460800.macosx=460800
 nodemcuv2.menu.baud.460800.upload.speed=460800
 nodemcuv2.menu.baud.512000.windows=512000
 nodemcuv2.menu.baud.512000.upload.speed=512000
+nodemcuv2.menu.baud.921600=921600
+nodemcuv2.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 modwifi.name=Olimex MOD-WIFI-ESP8266(-DEV)
@@ -2757,6 +2781,8 @@ modwifi.menu.baud.460800.macosx=460800
 modwifi.menu.baud.460800.upload.speed=460800
 modwifi.menu.baud.512000.windows=512000
 modwifi.menu.baud.512000.upload.speed=512000
+modwifi.menu.baud.921600=921600
+modwifi.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 thing.name=SparkFun ESP8266 Thing
@@ -2939,6 +2965,8 @@ thing.menu.baud.460800.macosx=460800
 thing.menu.baud.460800.upload.speed=460800
 thing.menu.baud.512000.windows=512000
 thing.menu.baud.512000.upload.speed=512000
+thing.menu.baud.921600=921600
+thing.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 thingdev.name=SparkFun ESP8266 Thing Dev
@@ -3121,6 +3149,8 @@ thingdev.menu.baud.460800.macosx=460800
 thingdev.menu.baud.460800.upload.speed=460800
 thingdev.menu.baud.512000.windows=512000
 thingdev.menu.baud.512000.upload.speed=512000
+thingdev.menu.baud.921600=921600
+thingdev.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 esp210.name=SweetPea ESP-210
@@ -3303,6 +3333,8 @@ esp210.menu.baud.460800.macosx=460800
 esp210.menu.baud.460800.upload.speed=460800
 esp210.menu.baud.512000.windows=512000
 esp210.menu.baud.512000.upload.speed=512000
+esp210.menu.baud.921600=921600
+esp210.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 d1_mini.name=LOLIN(WEMOS) D1 R2 & mini
@@ -3469,9 +3501,8 @@ d1_mini.menu.wipe.sdk=Sketch + WiFi Settings
 d1_mini.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 d1_mini.menu.wipe.all=All Flash Contents
 d1_mini.menu.wipe.all.upload.erase_cmd=erase_flash
-d1_mini.menu.baud.460800.linux=460800
-d1_mini.menu.baud.460800.macosx=460800
-d1_mini.menu.baud.460800.upload.speed=460800
+d1_mini.menu.baud.921600=921600
+d1_mini.menu.baud.921600.upload.speed=921600
 d1_mini.menu.baud.9600=9600
 d1_mini.menu.baud.9600.upload.speed=9600
 d1_mini.menu.baud.57600=57600
@@ -3483,6 +3514,9 @@ d1_mini.menu.baud.230400.macosx=230400
 d1_mini.menu.baud.230400.upload.speed=230400
 d1_mini.menu.baud.256000.windows=256000
 d1_mini.menu.baud.256000.upload.speed=256000
+d1_mini.menu.baud.460800.linux=460800
+d1_mini.menu.baud.460800.macosx=460800
+d1_mini.menu.baud.460800.upload.speed=460800
 d1_mini.menu.baud.512000.windows=512000
 d1_mini.menu.baud.512000.upload.speed=512000
 
@@ -3634,9 +3668,8 @@ d1_mini_pro.menu.wipe.sdk=Sketch + WiFi Settings
 d1_mini_pro.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 d1_mini_pro.menu.wipe.all=All Flash Contents
 d1_mini_pro.menu.wipe.all.upload.erase_cmd=erase_flash
-d1_mini_pro.menu.baud.460800.linux=460800
-d1_mini_pro.menu.baud.460800.macosx=460800
-d1_mini_pro.menu.baud.460800.upload.speed=460800
+d1_mini_pro.menu.baud.921600=921600
+d1_mini_pro.menu.baud.921600.upload.speed=921600
 d1_mini_pro.menu.baud.9600=9600
 d1_mini_pro.menu.baud.9600.upload.speed=9600
 d1_mini_pro.menu.baud.57600=57600
@@ -3648,6 +3681,9 @@ d1_mini_pro.menu.baud.230400.macosx=230400
 d1_mini_pro.menu.baud.230400.upload.speed=230400
 d1_mini_pro.menu.baud.256000.windows=256000
 d1_mini_pro.menu.baud.256000.upload.speed=256000
+d1_mini_pro.menu.baud.460800.linux=460800
+d1_mini_pro.menu.baud.460800.macosx=460800
+d1_mini_pro.menu.baud.460800.upload.speed=460800
 d1_mini_pro.menu.baud.512000.windows=512000
 d1_mini_pro.menu.baud.512000.upload.speed=512000
 
@@ -3856,9 +3892,8 @@ d1_mini_lite.menu.wipe.sdk=Sketch + WiFi Settings
 d1_mini_lite.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 d1_mini_lite.menu.wipe.all=All Flash Contents
 d1_mini_lite.menu.wipe.all.upload.erase_cmd=erase_flash
-d1_mini_lite.menu.baud.460800.linux=460800
-d1_mini_lite.menu.baud.460800.macosx=460800
-d1_mini_lite.menu.baud.460800.upload.speed=460800
+d1_mini_lite.menu.baud.921600=921600
+d1_mini_lite.menu.baud.921600.upload.speed=921600
 d1_mini_lite.menu.baud.9600=9600
 d1_mini_lite.menu.baud.9600.upload.speed=9600
 d1_mini_lite.menu.baud.57600=57600
@@ -3870,6 +3905,9 @@ d1_mini_lite.menu.baud.230400.macosx=230400
 d1_mini_lite.menu.baud.230400.upload.speed=230400
 d1_mini_lite.menu.baud.256000.windows=256000
 d1_mini_lite.menu.baud.256000.upload.speed=256000
+d1_mini_lite.menu.baud.460800.linux=460800
+d1_mini_lite.menu.baud.460800.macosx=460800
+d1_mini_lite.menu.baud.460800.upload.speed=460800
 d1_mini_lite.menu.baud.512000.windows=512000
 d1_mini_lite.menu.baud.512000.upload.speed=512000
 
@@ -4038,9 +4076,8 @@ d1.menu.wipe.sdk=Sketch + WiFi Settings
 d1.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 d1.menu.wipe.all=All Flash Contents
 d1.menu.wipe.all.upload.erase_cmd=erase_flash
-d1.menu.baud.460800.linux=460800
-d1.menu.baud.460800.macosx=460800
-d1.menu.baud.460800.upload.speed=460800
+d1.menu.baud.921600=921600
+d1.menu.baud.921600.upload.speed=921600
 d1.menu.baud.9600=9600
 d1.menu.baud.9600.upload.speed=9600
 d1.menu.baud.57600=57600
@@ -4052,6 +4089,9 @@ d1.menu.baud.230400.macosx=230400
 d1.menu.baud.230400.upload.speed=230400
 d1.menu.baud.256000.windows=256000
 d1.menu.baud.256000.upload.speed=256000
+d1.menu.baud.460800.linux=460800
+d1.menu.baud.460800.macosx=460800
+d1.menu.baud.460800.upload.speed=460800
 d1.menu.baud.512000.windows=512000
 d1.menu.baud.512000.upload.speed=512000
 
@@ -4239,6 +4279,8 @@ espino.menu.baud.460800.macosx=460800
 espino.menu.baud.460800.upload.speed=460800
 espino.menu.baud.512000.windows=512000
 espino.menu.baud.512000.upload.speed=512000
+espino.menu.baud.921600=921600
+espino.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 espinotee.name=ThaiEasyElec's ESPino
@@ -4421,6 +4463,8 @@ espinotee.menu.baud.460800.macosx=460800
 espinotee.menu.baud.460800.upload.speed=460800
 espinotee.menu.baud.512000.windows=512000
 espinotee.menu.baud.512000.upload.speed=512000
+espinotee.menu.baud.921600=921600
+espinotee.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 wifinfo.name=WifInfo
@@ -4663,6 +4707,8 @@ wifinfo.menu.baud.460800.macosx=460800
 wifinfo.menu.baud.460800.upload.speed=460800
 wifinfo.menu.baud.512000.windows=512000
 wifinfo.menu.baud.512000.upload.speed=512000
+wifinfo.menu.baud.921600=921600
+wifinfo.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 arduino-esp8266.name=Arduino
@@ -4857,6 +4903,8 @@ arduino-esp8266.menu.baud.460800.macosx=460800
 arduino-esp8266.menu.baud.460800.upload.speed=460800
 arduino-esp8266.menu.baud.512000.windows=512000
 arduino-esp8266.menu.baud.512000.upload.speed=512000
+arduino-esp8266.menu.baud.921600=921600
+arduino-esp8266.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 gen4iod.name=4D Systems gen4 IoD Range
@@ -5040,6 +5088,8 @@ gen4iod.menu.baud.460800.macosx=460800
 gen4iod.menu.baud.460800.upload.speed=460800
 gen4iod.menu.baud.512000.windows=512000
 gen4iod.menu.baud.512000.upload.speed=512000
+gen4iod.menu.baud.921600=921600
+gen4iod.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 oak.name=Digistump Oak
@@ -5207,9 +5257,8 @@ oak.menu.wipe.sdk=Sketch + WiFi Settings
 oak.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 oak.menu.wipe.all=All Flash Contents
 oak.menu.wipe.all.upload.erase_cmd=erase_flash
-oak.menu.baud.460800.linux=460800
-oak.menu.baud.460800.macosx=460800
-oak.menu.baud.460800.upload.speed=460800
+oak.menu.baud.921600=921600
+oak.menu.baud.921600.upload.speed=921600
 oak.menu.baud.9600=9600
 oak.menu.baud.9600.upload.speed=9600
 oak.menu.baud.57600=57600
@@ -5221,6 +5270,9 @@ oak.menu.baud.230400.macosx=230400
 oak.menu.baud.230400.upload.speed=230400
 oak.menu.baud.256000.windows=256000
 oak.menu.baud.256000.upload.speed=256000
+oak.menu.baud.460800.linux=460800
+oak.menu.baud.460800.macosx=460800
+oak.menu.baud.460800.upload.speed=460800
 oak.menu.baud.512000.windows=512000
 oak.menu.baud.512000.upload.speed=512000
 
@@ -5389,9 +5441,8 @@ wifiduino.menu.wipe.sdk=Sketch + WiFi Settings
 wifiduino.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 wifiduino.menu.wipe.all=All Flash Contents
 wifiduino.menu.wipe.all.upload.erase_cmd=erase_flash
-wifiduino.menu.baud.460800.linux=460800
-wifiduino.menu.baud.460800.macosx=460800
-wifiduino.menu.baud.460800.upload.speed=460800
+wifiduino.menu.baud.921600=921600
+wifiduino.menu.baud.921600.upload.speed=921600
 wifiduino.menu.baud.9600=9600
 wifiduino.menu.baud.9600.upload.speed=9600
 wifiduino.menu.baud.57600=57600
@@ -5403,6 +5454,9 @@ wifiduino.menu.baud.230400.macosx=230400
 wifiduino.menu.baud.230400.upload.speed=230400
 wifiduino.menu.baud.256000.windows=256000
 wifiduino.menu.baud.256000.upload.speed=256000
+wifiduino.menu.baud.460800.linux=460800
+wifiduino.menu.baud.460800.macosx=460800
+wifiduino.menu.baud.460800.upload.speed=460800
 wifiduino.menu.baud.512000.windows=512000
 wifiduino.menu.baud.512000.upload.speed=512000
 
@@ -5687,6 +5741,8 @@ wifi_slot.menu.baud.460800.macosx=460800
 wifi_slot.menu.baud.460800.upload.speed=460800
 wifi_slot.menu.baud.512000.windows=512000
 wifi_slot.menu.baud.512000.upload.speed=512000
+wifi_slot.menu.baud.921600=921600
+wifi_slot.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 wiolink.name=Seeed Wio Link
@@ -5869,6 +5925,8 @@ wiolink.menu.baud.460800.macosx=460800
 wiolink.menu.baud.460800.upload.speed=460800
 wiolink.menu.baud.512000.windows=512000
 wiolink.menu.baud.512000.upload.speed=512000
+wiolink.menu.baud.921600=921600
+wiolink.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 espectro.name=ESPectro Core
@@ -6051,4 +6109,6 @@ espectro.menu.baud.460800.macosx=460800
 espectro.menu.baud.460800.upload.speed=460800
 espectro.menu.baud.512000.windows=512000
 espectro.menu.baud.512000.upload.speed=512000
+espectro.menu.baud.921600=921600
+espectro.menu.baud.921600.upload.speed=921600
 

@@ -44,13 +44,14 @@ import json
 # or by user command line
 
 speeds = collections.OrderedDict([
-    (   '9', [ 's9', 's57', 's115', 's230', 's256', 's460', 's512' ]),
-    (  '57', [ 's57', 's9', 's115', 's230', 's256', 's460', 's512' ]),
-    ( '115', [ 's115', 's9', 's57', 's230', 's256', 's460', 's512' ]),
-    ( '230', [ 's230', 's9', 's57', 's115', 's256', 's460', 's512' ]),
-    ( '256', [ 's256', 's9', 's57', 's115', 's230', 's460', 's512' ]),
-    ( '460', [ 's460', 's9', 's57', 's115', 's230', 's256', 's512' ]),
-    ( '512', [ 's512', 's9', 's57', 's115', 's230', 's256', 's460' ]),
+    (   '9', [ 's9', 's57', 's115', 's230', 's256', 's460', 's512', 's921' ]),
+    (  '57', [ 's57', 's9', 's115', 's230', 's256', 's460', 's512', 's921' ]),
+    ( '115', [ 's115', 's9', 's57', 's230', 's256', 's460', 's512', 's921' ]),
+    ( '230', [ 's230', 's9', 's57', 's115', 's256', 's460', 's512', 's921' ]),
+    ( '256', [ 's256', 's9', 's57', 's115', 's230', 's460', 's512', 's921' ]),
+    ( '460', [ 's460', 's9', 's57', 's115', 's230', 's256', 's512', 's921' ]),
+    ( '512', [ 's512', 's9', 's57', 's115', 's230', 's256', 's460', 's921' ]),
+    ( '921', [ 's921', 's9', 's57', 's115', 's230', 's256', 's460', 's512' ]),
     ])
 
 # boards list
@@ -555,7 +556,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-        'serial': '460',
+        'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_pro', {
@@ -570,7 +571,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '16M',
             ],
-        'serial': '460',
+        'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'd1_mini_lite', {
@@ -585,7 +586,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '1M',
             ],
-        'serial': '460',
+        'serial': '921',
         'desc': [ 
 			'Parameters in Arduino IDE:',
 			'~~~~~~~~~~~~~~~~~~~~~~~~~~',
@@ -623,7 +624,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-        'serial': '460',
+        'serial': '921',
         'desc': [ 'Product page: https://www.wemos.cc/' ],
     }),
     ( 'espino', {
@@ -765,7 +766,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-        'serial': '460',
+        'serial': '921',
         'desc': [ 'The Oak requires an `Serial Adapter`_ for a serial connection or flashing; its micro USB port is only for power.',
                   '',
                   'To make a serial connection, wire the adapter\'s **TX to P3**, **RX to P4**, and **GND** to **GND**.  Supply 3.3v from the serial adapter if not already powered via USB.',
@@ -785,7 +786,7 @@ boards = collections.OrderedDict([
             'flashfreq_40',
             '4M',
             ],
-        'serial': '460',
+        'serial': '921',
         'desc': [ 'Product page: https://wifiduino.com/esp8266' ],
     }),
     ( 'wifi_slot', {
@@ -1055,6 +1056,10 @@ macros = {
     's512': collections.OrderedDict([
         ( '.menu.baud.512000.windows', '512000' ),
         ( '.menu.baud.512000.upload.speed', '512000' ),
+        ]),
+    's921': collections.OrderedDict([
+        ( '.menu.baud.921600', '921600' ),
+        ( '.menu.baud.921600.upload.speed', '921600' ),
         ]),
 
     ####################### flash erase
