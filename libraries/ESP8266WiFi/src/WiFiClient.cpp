@@ -351,10 +351,10 @@ WiFiClient::operator bool()
 
 IPAddress WiFiClient::remoteIP()
 {
-    if (!_client)
+    if (!_client || !_client->getRemoteAddress())
         return IPAddress(0U);
 
-    return IPAddress(_client->getRemoteAddress());
+    return _client->getRemoteAddress();
 }
 
 uint16_t WiFiClient::remotePort()

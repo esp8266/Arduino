@@ -102,19 +102,19 @@ namespace MDNSImplementation {
         const char* pFoundDivider = strrstr(p_rpcDomain, pcDivider);
         if (pFoundDivider) {    // maybe already extended
             char*         pEnd = 0;
-            unsigned long ulIndex = strtoul((pFoundDivider + os_strlen(pcDivider)), &pEnd, 10);
+            unsigned long ulIndex = strtoul((pFoundDivider + strlen(pcDivider)), &pEnd, 10);
             if ((ulIndex) &&
-                ((pEnd - p_rpcDomain) == os_strlen(p_rpcDomain)) &&
+                ((pEnd - p_rpcDomain) == (ptrdiff_t)strlen(p_rpcDomain)) &&
                 (!*pEnd)) {       // Valid (old) index found
 
                 char    acIndexBuffer[16];
                 sprintf(acIndexBuffer, "%lu", (++ulIndex));
-                size_t  stLength = ((pFoundDivider - p_rpcDomain + os_strlen(pcDivider)) + os_strlen(acIndexBuffer) + 1);
+                size_t  stLength = ((pFoundDivider - p_rpcDomain + strlen(pcDivider)) + strlen(acIndexBuffer) + 1);
                 char*   pNewHostname = new char[stLength];
                 if (pNewHostname) {
-                    memcpy(pNewHostname, p_rpcDomain, (pFoundDivider - p_rpcDomain + os_strlen(pcDivider)));
-                    pNewHostname[pFoundDivider - p_rpcDomain + os_strlen(pcDivider)] = 0;
-                    os_strcat(pNewHostname, acIndexBuffer);
+                    memcpy(pNewHostname, p_rpcDomain, (pFoundDivider - p_rpcDomain + strlen(pcDivider)));
+                    pNewHostname[pFoundDivider - p_rpcDomain + strlen(pcDivider)] = 0;
+                    strcat(pNewHostname, acIndexBuffer);
 
                     delete[] p_rpcDomain;
                     p_rpcDomain = pNewHostname;
@@ -131,7 +131,7 @@ namespace MDNSImplementation {
         }
 
         if (!pFoundDivider) {   // not yet extended (or failed to increment extension) -> start indexing
-            size_t    stLength = os_strlen(p_rpcDomain) + (os_strlen(pcDivider) + 1 + 1);   // Name + Divider + '2' + '\0'
+            size_t    stLength = strlen(p_rpcDomain) + (strlen(pcDivider) + 1 + 1);   // Name + Divider + '2' + '\0'
             char*     pNewHostname = new char[stLength];
             if (pNewHostname) {
                 sprintf(pNewHostname, "%s%s2", p_rpcDomain, pcDivider);
@@ -150,10 +150,10 @@ namespace MDNSImplementation {
         // No given host domain, use base or default
         const char* cpcDefaultName = (p_pcDefaultDomain ?: "esp8266");
 
-        size_t      stLength = os_strlen(cpcDefaultName) + 1;   // '\0'
+        size_t      stLength = strlen(cpcDefaultName) + 1;   // '\0'
         p_rpcDomain = new char[stLength];
         if (p_rpcDomain) {
-            os_strncpy(p_rpcDomain, cpcDefaultName, stLength);
+            strncpy(p_rpcDomain, cpcDefaultName, stLength);
             bResult = true;
         }
         else {
@@ -170,6 +170,7 @@ namespace MDNSImplementation {
  */
 
 bool MDNSResponder::_callProcess(void) {
+    DEBUG_EX_INFO(DEBUG_OUTPUT.printf("[MDNSResponder] _callProcess (%lu, triggered by: %s)\n", millis(), m_pUDPContext->getRemoteAddress().toString().c_str()););
 
     return _process(false);
 }
@@ -191,19 +192,18 @@ bool MDNSResponder::_allocUDPContext(void) {
     
     _releaseUDPContext();
 
-    ip_addr_t   multicast_addr;
 #ifdef MDNS_IP4_SUPPORT
-    multicast_addr.addr = DNS_MQUERY_IPV4_GROUP_INIT;
+    ip_addr_t   multicast_addr = DNS_MQUERY_IPV4_GROUP_INIT;
 #endif
 #ifdef MDNS_IP6_SUPPORT
-    //TODO: set multicast address
+    //TODO: set multicast address (lwip_joingroup() is IPv4 only at the time of writing)
     multicast_addr.addr = DNS_MQUERY_IPV6_GROUP_INIT;
 #endif
-    if (ERR_OK == igmp_joingroup(IP_ADDR_ANY, &multicast_addr)) {
+    if (ERR_OK == igmp_joingroup(IP4_ADDR_ANY4, ip_2_ip4(&multicast_addr))) {
         m_pUDPContext = new UdpContext;
         m_pUDPContext->ref();
 
-        if (m_pUDPContext->listen(IP_ADDR_ANY, DNS_MQUERY_PORT)) {
+        if (m_pUDPContext->listen(IP4_ADDR_ANY, DNS_MQUERY_PORT)) {
             m_pUDPContext->setMulticastTTL(MDNS_MULTICAST_TTL);
             m_pUDPContext->onRx(std::bind(&MDNSResponder::_callProcess, this));
             
@@ -365,7 +365,7 @@ bool MDNSResponder::_setHostname(const char* p_pcHostname) {
     
     size_t  stLength = 0;
     if ((p_pcHostname) &&
-        (MDNS_DOMAIN_LABEL_MAXLENGTH >= (stLength = os_strlen(p_pcHostname)))) { // char max size for a single label
+        (MDNS_DOMAIN_LABEL_MAXLENGTH >= (stLength = strlen(p_pcHostname)))) { // char max size for a single label
         // Copy in hostname characters as lowercase
         if ((bResult = (0 != (m_pcHostname = new char[stLength + 1])))) {
 #ifdef MDNS_FORCE_LOWERCASE_HOSTNAME
@@ -375,7 +375,7 @@ bool MDNSResponder::_setHostname(const char* p_pcHostname) {
             }
             m_pcHostname[i] = 0;
 #else
-            os_strncpy(m_pcHostname, p_pcHostname, (stLength + 1));
+            strncpy(m_pcHostname, p_pcHostname, (stLength + 1));
 #endif
         }
     }
@@ -409,11 +409,11 @@ MDNSResponder::stcMDNSService* MDNSResponder::_allocService(const char* p_pcName
     
     stcMDNSService* pService = 0;
     if (((!p_pcName) ||
-         (MDNS_DOMAIN_LABEL_MAXLENGTH >= os_strlen(p_pcName))) &&
+         (MDNS_DOMAIN_LABEL_MAXLENGTH >= strlen(p_pcName))) &&
         (p_pcService) &&
-        (MDNS_SERVICE_NAME_LENGTH >= os_strlen(p_pcService)) &&
+        (MDNS_SERVICE_NAME_LENGTH >= strlen(p_pcService)) &&
         (p_pcProtocol) &&
-        (MDNS_SERVICE_PROTOCOL_LENGTH >= os_strlen(p_pcProtocol)) &&
+        (MDNS_SERVICE_PROTOCOL_LENGTH >= strlen(p_pcProtocol)) &&
         (p_u16Port) &&
         (0 != (pService = new stcMDNSService)) &&
         (pService->setName(p_pcName ?: m_pcHostname)) &&
@@ -529,23 +529,23 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_allocServiceTxt(MDNSResponder:
         (p_pcKey) &&
         (MDNS_SERVICE_TXT_MAXLENGTH > (p_pService->m_Txts.length() +
                                         1 +                                 // Length byte
-                                        (p_pcKey ? os_strlen(p_pcKey) : 0) +
+                                        (p_pcKey ? strlen(p_pcKey) : 0) +
                                         1 +                                 // '='
-                                        (p_pcValue ? os_strlen(p_pcValue) : 0)))) {
+                                        (p_pcValue ? strlen(p_pcValue) : 0)))) {
         
         pTxt = new stcMDNSServiceTxt;
         if (pTxt) {
-            size_t  stLength = (p_pcKey ? os_strlen(p_pcKey) : 0);
+            size_t  stLength = (p_pcKey ? strlen(p_pcKey) : 0);
             pTxt->m_pcKey = new char[stLength + 1];
             if (pTxt->m_pcKey) {
-                os_strncpy(pTxt->m_pcKey, p_pcKey, stLength); pTxt->m_pcKey[stLength] = 0;
+                strncpy(pTxt->m_pcKey, p_pcKey, stLength); pTxt->m_pcKey[stLength] = 0;
             }
             
             if (p_pcValue) {
-                stLength = (p_pcValue ? os_strlen(p_pcValue) : 0);
+                stLength = (p_pcValue ? strlen(p_pcValue) : 0);
                 pTxt->m_pcValue = new char[stLength + 1];
                 if (pTxt->m_pcValue) {
-                    os_strncpy(pTxt->m_pcValue, p_pcValue, stLength); pTxt->m_pcValue[stLength] = 0;
+                    strncpy(pTxt->m_pcValue, p_pcValue, stLength); pTxt->m_pcValue[stLength] = 0;
                 }
             }
             pTxt->m_bTemp = p_bTemp;
@@ -579,8 +579,8 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_updateServiceTxt(MDNSResponder
     if ((p_pService) &&
         (p_pTxt) &&
         (MDNS_SERVICE_TXT_MAXLENGTH > (p_pService->m_Txts.length() -
-                                        (p_pTxt->m_pcValue ? os_strlen(p_pTxt->m_pcValue) : 0) +
-                                        (p_pcValue ? os_strlen(p_pcValue) : 0)))) {
+                                        (p_pTxt->m_pcValue ? strlen(p_pTxt->m_pcValue) : 0) +
+                                        (p_pcValue ? strlen(p_pcValue) : 0)))) {
         p_pTxt->update(p_pcValue);
         p_pTxt->m_bTemp = p_bTemp;
     }
@@ -616,7 +616,7 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_addServiceTxt(MDNSResponder::s
     
     if ((p_pService) &&
         (p_pcKey) &&
-        (os_strlen(p_pcKey))) {
+        (strlen(p_pcKey))) {
         
         stcMDNSServiceTxt*  pTxt = p_pService->m_Txts.find(p_pcKey);
         if (pTxt) {
@@ -629,20 +629,27 @@ MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_addServiceTxt(MDNSResponder::s
     return pResult;
 }
 
+MDNSResponder::stcMDNSServiceTxt* MDNSResponder::_answerKeyValue(const hMDNSServiceQuery p_hServiceQuery,
+                                                                 const uint32_t p_u32AnswerIndex) {
+    stcMDNSServiceQuery*            pServiceQuery = _findServiceQuery(p_hServiceQuery);
+    stcMDNSServiceQuery::stcAnswer* pSQAnswer = (pServiceQuery ? pServiceQuery->answerAtIndex(p_u32AnswerIndex) : 0);
+    // Fill m_pcTxts (if not already done)
+    return (pSQAnswer) ?  pSQAnswer->m_Txts.m_pTxts : 0;
+}
+
 /*
  * MDNSResponder::_collectServiceTxts
  */
 bool MDNSResponder::_collectServiceTxts(MDNSResponder::stcMDNSService& p_rService) {
     
-    bool    bResult = (m_fnServiceTxtCallback
-                        ? m_fnServiceTxtCallback(this, (hMDNSService)&p_rService, m_pServiceTxtCallbackUserdata)
-                        : true);
-    
-    if ((bResult) &&
-        (p_rService.m_fnTxtCallback)) {
-        bResult = p_rService.m_fnTxtCallback(this, (hMDNSService)&p_rService, p_rService.m_pTxtCallbackUserdata);
+	// Call Dynamic service callbacks
+    if (m_fnServiceTxtCallback) {
+    	m_fnServiceTxtCallback((hMDNSService)&p_rService);
     }
-    return bResult;
+    if (p_rService.m_fnTxtCallback) {
+        p_rService.m_fnTxtCallback((hMDNSService)&p_rService);
+    }
+    return true;
 }
 
 /*

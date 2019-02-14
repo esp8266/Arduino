@@ -2705,7 +2705,7 @@
  * void dhcp6_set_ntp_servers(u8_t num_ntp_servers, ip_addr_t* ntp_server_addrs);
 */
 #if !defined LWIP_DHCP6_GET_NTP_SRV || defined __DOXYGEN__
-#define LWIP_DHCP6_GET_NTP_SRV          0 // with 1: dhcp6_set_ntp_servers() must be implemented
+#define LWIP_DHCP6_GET_NTP_SRV          1 // with 1: dhcp6_set_ntp_servers() must be implemented
 #endif
 
 /**
@@ -3554,6 +3554,17 @@
 // lwip-1.4 had 3 possible SNTP servers (constant was harcoded)
 #define SNTP_MAX_SERVERS                3
 #endif
+
+// turn off random delay before sntp request
+// when SNTP_STARTUP_DELAY is not defined,
+// LWIP_RAND is used to set a delay
+// from sntp_opts.h:
+/** According to the RFC, this shall be a random delay
+ * between 1 and 5 minutes (in milliseconds) to prevent load peaks.
+ * This can be defined to a random generation function,
+ * which must return the delay in milliseconds as u32_t.
+ */
+#define SNTP_STARTUP_DELAY              0
 
 /*
    --------------------------------------------------
