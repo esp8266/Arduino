@@ -105,6 +105,7 @@ INC_PATHS += $(addprefix -I,\
 	$(shell echo ../../libraries/*/src) \
 	$(shell echo ../../libraries/*) \
 	../../tools/sdk/include \
+	../../tools/sdk/lib/NONOSDK3V0/include \
 	../../tools/sdk/lwip2/include \
 )
 
