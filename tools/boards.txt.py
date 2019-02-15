@@ -1404,6 +1404,8 @@ def all_boards ():
 
         if nofloat:
             print(id + '.build.float=')
+        if not sdk == sdkdefault:
+            print(id + '.build.sdk=' + sdk)
 
         print('')
 
@@ -1498,12 +1500,13 @@ def usage (name,ret):
     print("usage: %s [options]" % name)
     print("")
     print(" -h, --help")
-    print(" --lwip          - preferred default lwIP version (default %d)" % lwip)
-    print(" --led           - preferred default builtin led for generic boards (default %d)" % led_default)
-    print(" --board b       - board to modify:")
-    print(" --speed s       - change default serial speed")
-    print(" --customspeed s - new serial speed for all boards")
-    print(" --nofloat       - disable float support in printf/scanf")
+    print(" --lwip            - preferred default lwIP version (default %d)" % lwip)
+    print(" --led             - preferred default builtin led for generic boards (default %d)" % led_default)
+    print(" --board <b>       - board to modify:")
+    print(" --speed <s>       - change default serial speed")
+    print(" --customspeed <s> - new serial speed for all boards")
+    print(" --nofloat         - disable float support in printf/scanf")
+    print(" --sdk <sdkdir>    - default: %s" % sdkdefault)
     print("")
     print(" mandatory option (at least one):")
     print("")
@@ -1542,6 +1545,8 @@ def usage (name,ret):
 ################################################################
 # entry point
 
+sdkdefault = 'NONOSDK3V0'
+sdk = sdkdefault
 lwip = 2
 default_speed = '115'
 led_default = 2
@@ -1563,6 +1568,7 @@ lddir = "tools/sdk/ld/"
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
+          "sdk=",
           "noextra4kheap", "allowWPS",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
           "allgen"] )
@@ -1607,10 +1613,16 @@ for o, a in opts:
     elif o in ("--nofloat"):
         nofloat=True
 
+    elif o in ("--sdk"):
+        if not os.path.isdir('tools/sdk/lib/' + a):
+            print('cannot find sdk directory tools/sdk/lib/' + a + '/')
+            sys.exit(1)
+        sdk = a
+
     elif o in ("--noextra4kheap", "--allowWPS"):
         print('option ' + o + ' is now deprecated, without effect, and will be removed')
 
-    elif o in ("--ldshow"):
+    elif o in ("--ld"):
         ldshow = True
 
     elif o in ("--ldgen"):
