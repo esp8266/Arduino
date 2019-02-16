@@ -34,6 +34,7 @@ namespace BearSSL {
 class WiFiClientSecure : public WiFiClient {
   public:
     WiFiClientSecure();
+    WiFiClientSecure(const WiFiClientSecure &rhs);
     ~WiFiClientSecure() override;
 
     int connect(CONST IPAddress& ip, uint16_t port) override;
@@ -206,6 +207,14 @@ class WiFiClientSecure : public WiFiClient {
     bool _handshake_done;
     bool _oom_err;
 
+    // AXTLS compatibility shim elements:
+    // AXTLS managed memory for certs and keys, while BearSSL assumes
+    // the app manages these.  Use this local storage for holding the
+    // BearSSL created objects in a shared form.
+    std::shared_ptr<X509List>   _axtls_ta;
+    std::shared_ptr<X509List>   _axtls_chain;
+    std::shared_ptr<PrivateKey> _axtls_sk;
+
     // Optional storage space pointer for session parameters
     // Will be used on connect and updated on close
     Session *_session;
@@ -218,7 +227,7 @@ class WiFiClientSecure : public WiFiClient {
     unsigned _knownkey_usages;
 
     // Custom cipher list pointer or NULL if default
-    uint16_t *_cipher_list;
+    std::shared_ptr<uint16_t> _cipher_list;
     uint8_t _cipher_cnt;
 
     unsigned char *_recvapp_buf;
@@ -255,9 +264,6 @@ class WiFiClientSecure : public WiFiClient {
     bool _installServerX509Validator(const X509List *client_CA_ta); // Setup X509 client cert validation, if supplied
 
     uint8_t *_streamLoad(Stream& stream, size_t size);
-
-    // AXTLS compatible mode needs to delete the stored certs and keys on destruction
-    bool _deleteChainKeyTA;
 };
 
 };
