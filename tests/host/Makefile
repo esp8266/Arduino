@@ -63,6 +63,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	spiffs/spiffs_hydrogen.cpp \
 	spiffs/spiffs_nucleus.cpp \
 	libb64/cencode.cpp \
+	libb64/cdecode.cpp \
 	Schedule.cpp \
 )
 
