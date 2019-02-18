@@ -11,7 +11,7 @@ typedef void (*voidFuncPtrArg)(void*);
 extern "C" void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void*fp , int mode);
 
 
-void interruptFunctional(void* arg)
+void ICACHE_RAM_ATTR interruptFunctional(void* arg)
 {
     ArgStructure* localArg = (ArgStructure*)arg;
 	if (localArg->functionInfo->reqScheduledFunction)
@@ -36,7 +36,7 @@ extern "C"
    }
 }
 
-void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode)
+void ICACHE_RAM_ATTR attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode)
 {
 	// use the local interrupt routine which takes the ArgStructure as argument
 
@@ -52,7 +52,7 @@ void attachInterrupt(uint8_t pin, std::function<void(void)> intRoutine, int mode
 	__attachInterruptArg (pin, (voidFuncPtr)interruptFunctional, as, mode);
 }
 
-void attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode)
+void ICACHE_RAM_ATTR attachScheduledInterrupt(uint8_t pin, std::function<void(InterruptInfo)> scheduledIntRoutine, int mode)
 {
 	if (!scheduledInterrupts)
 	{
