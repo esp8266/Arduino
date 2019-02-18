@@ -424,9 +424,9 @@ void esp_schedule (void)
 {
 }
 
-void optimistic_yield (uint32_t ms)
+void optimistic_yield (uint32_t interval_us)
 {
-	usleep(ms * 1000);
+	usleep(interval_us);
 }
 
 void dns_setserver (u8_t numdns, ip_addr_t *dnsserver)
