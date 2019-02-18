@@ -90,19 +90,39 @@ public:
         }
     }
 
-    bool connect(const ip_addr_t* addr, uint16_t port)
+#if LWIP_VERSION_MAJOR == 1
+
+    bool connect(IPAddress addr, uint16_t port)
     {
-        _pcb->remote_ip = *addr;
+        _pcb->remote_ip = addr;
         _pcb->remote_port = port;
         return true;
     }
 
-    bool listen(CONST ip_addr_t* addr, uint16_t port)
+    bool listen(IPAddress addr, uint16_t port)
     {
         udp_recv(_pcb, &_s_recv, (void *) this);
         err_t err = udp_bind(_pcb, addr, port);
         return err == ERR_OK;
     }
+
+#else // lwIP-v2
+
+    bool connect(const IPAddress& addr, uint16_t port)
+    {
+        _pcb->remote_ip = addr;
+        _pcb->remote_port = port;
+        return true;
+    }
+
+    bool listen(const IPAddress& addr, uint16_t port)
+    {
+        udp_recv(_pcb, &_s_recv, (void *) this);
+        err_t err = udp_bind(_pcb, addr, port);
+        return err == ERR_OK;
+    }
+
+#endif // lwIP-v2
 
     void disconnect()
     {

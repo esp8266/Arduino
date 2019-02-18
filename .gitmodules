@@ -10,3 +10,9 @@
 [submodule "libraries/ESP8266SdFat"]
 	path = libraries/ESP8266SdFat
 	url = https://github.com/earlephilhower/ESP8266SdFat.git
+[submodule "tools/pyserial"]
+	path = tools/pyserial
+	url = https://github.com/pyserial/pyserial.git
+[submodule "tools/esptool"]
+	path = tools/esptool
+	url = https://github.com/espressif/esptool.git
