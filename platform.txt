@@ -34,9 +34,7 @@ build.stdcpp_lib=-lstdc++
 
 build.float=-u _printf_float -u _scanf_float
 build.led=
-
-# build.sdk: available: NONOSDK221 NONOSDK3V0 NONOSDK3V1
-build.sdk=NONOSDK3V0
+build.sdk=NONOSDK221
 
 compiler.path={runtime.tools.xtensa-lx106-elf-gcc.path}/bin/
 compiler.sdk.path={runtime.platform.path}/tools/sdk

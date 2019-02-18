@@ -70,6 +70,7 @@ boards = collections.OrderedDict([
             'flashmode_menu',
             '512K', '1M', '2M', '4M', '8M', '16M',
             'led',
+            'sdk',
             ],
         'desc': [ 'These modules come in different form factors and pinouts. See the page at ESP8266 community wiki for more info: `ESP8266 Module Family <http://www.esp8266.com/wiki/doku.php?id=esp8266-module-family>`__.',
                   '',
@@ -1327,6 +1328,18 @@ def led (default,max):
     return { 'led': led }
 
 ################################################################
+# sdk selection
+
+def sdk ():
+    return { 'sdk': collections.OrderedDict([
+                        ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1'),
+                        ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
+                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3'),
+                        ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
+                    ])
+           }
+
+################################################################
 
 def all_boards ():
 
@@ -1344,6 +1357,7 @@ def all_boards ():
     macros.update(all_flash_map())
     macros.update(all_debug())
     macros.update(led(led_default, led_max))
+    macros.update(sdk())
 
     print('#')
     print('# Do not create pull-requests for this file only, CI will not accept them.')
@@ -1367,6 +1381,7 @@ def all_boards ():
     print('menu.exception=Exceptions')
     print('menu.led=Builtin Led')
     print('menu.wipe=Erase Flash')
+    print('menu.sdk=Espressif FW')
     print('')
 
     for id in boards:
@@ -1404,8 +1419,6 @@ def all_boards ():
 
         if nofloat:
             print(id + '.build.float=')
-        if not sdk == sdkdefault:
-            print(id + '.build.sdk=' + sdk)
 
         print('')
 
@@ -1506,7 +1519,6 @@ def usage (name,ret):
     print(" --speed <s>       - change default serial speed")
     print(" --customspeed <s> - new serial speed for all boards")
     print(" --nofloat         - disable float support in printf/scanf")
-    print(" --sdk <sdkdir>    - default: %s" % sdkdefault)
     print("")
     print(" mandatory option (at least one):")
     print("")
@@ -1545,8 +1557,6 @@ def usage (name,ret):
 ################################################################
 # entry point
 
-sdkdefault = 'NONOSDK3V0'
-sdk = sdkdefault
 lwip = 2
 default_speed = '115'
 led_default = 2
@@ -1568,7 +1578,6 @@ lddir = "tools/sdk/ld/"
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h",
         [ "help", "lwip=", "led=", "speed=", "board=", "customspeed=", "nofloat",
-          "sdk=",
           "noextra4kheap", "allowWPS",
           "ld", "ldgen", "boards", "boardsgen", "package", "packagegen", "doc", "docgen",
           "allgen"] )
@@ -1612,12 +1621,6 @@ for o, a in opts:
 
     elif o in ("--nofloat"):
         nofloat=True
-
-    elif o in ("--sdk"):
-        if not os.path.isdir('tools/sdk/lib/' + a):
-            print('cannot find sdk directory tools/sdk/lib/' + a + '/')
-            sys.exit(1)
-        sdk = a
 
     elif o in ("--noextra4kheap", "--allowWPS"):
         print('option ' + o + ' is now deprecated, without effect, and will be removed')
