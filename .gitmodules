@@ -7,3 +7,9 @@
 [submodule "libraries/SoftwareSerial"]
 	path = libraries/SoftwareSerial
 	url = https://github.com/plerup/espsoftwareserial.git
+[submodule "tools/pyserial"]
+	path = tools/pyserial
+	url = https://github.com/pyserial/pyserial.git
+[submodule "tools/esptool"]
+	path = tools/esptool
+	url = https://github.com/espressif/esptool.git
