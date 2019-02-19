@@ -27,7 +27,7 @@ void ICACHE_RAM_ATTR interruptFunctional(void* arg)
 
 extern "C"
 {
-   void cleanupFunctional(void* arg)
+   void ICACHE_RAM_ATTR cleanupFunctional(void* arg)
    {
 	 ArgStructure* localArg = (ArgStructure*)arg;
 	 delete (FunctionInfo*)localArg->functionInfo;
