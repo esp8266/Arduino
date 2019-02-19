@@ -65,6 +65,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	libb64/cencode.cpp \
 	libb64/cdecode.cpp \
 	Schedule.cpp \
+	HardwareSerial.cpp \
 )
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
@@ -74,7 +75,7 @@ MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	Arduino.cpp \
 	spiffs_mock.cpp \
 	WMath.cpp \
-	MockSerial.cpp \
+	MockUART.cpp \
 	MockTools.cpp \
 	MocklwIP.cpp \
 )

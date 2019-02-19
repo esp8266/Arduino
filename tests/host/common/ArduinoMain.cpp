@@ -33,12 +33,49 @@
 #include <user_interface.h> // wifi_get_ip_info()
 
 #include <signal.h>
-#include <unistd.h> // usleep
+#include <unistd.h>
 #include <getopt.h>
+#include <termios.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 bool user_exit = false;
 const char* host_interface = nullptr;
 size_t spiffs_kb = 1024;
+bool ignore_sigint = false;
+
+#define STDIN 0
+
+static struct termios initial_settings;
+
+static int mock_start_uart(void)
+{
+	struct termios settings;
+
+	if (tcgetattr(STDIN, &initial_settings) < 0) return (-1);
+	settings = initial_settings;
+	if (ignore_sigint) settings.c_lflag &= ~(ISIG);
+	settings.c_oflag  = 0;
+	settings.c_lflag &= ~(ECHO   | ECHONL | ICANON | IEXTEN);
+	settings.c_iflag &= ~(IGNBRK | BRKINT | ICRNL  | INLCR |
+	                      PARMRK | INPCK  | ISTRIP | IXON  );
+	settings.c_cc[VMIN]  = 0;
+	settings.c_cc[VTIME] = 0;
+	if (tcsetattr(STDIN, TCSANOW, &settings) < 0) return (-2);
+	return (0);
+}
+
+static int mock_stop_uart(void)
+{
+	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0) return (-1);
+	return (0);
+}
+
+static uint8_t mock_read_uart(void)
+{
+	uint8_t ch = 0;
+	return (read(STDIN, &ch, 1) == 1) ? ch : 0;
+}
 
 void help (const char* argv0, int exitcode)
 {
@@ -48,6 +85,7 @@ void help (const char* argv0, int exitcode)
 		"	-h\n"
 		"	-i <interface> - use this interface for IP address\n"
 		"	-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
+		"	-c             - ignore CTRL-C (send it via Serial)\n"
 		"	-f             - no throttle (possibly 100%%CPU)\n"
 		"	-S             - spiffs size in KBytes (default: %zd)\n"
 		"	                 (negative value will force mismatched size)\n"
@@ -60,13 +98,15 @@ static struct option options[] =
 	{ "help",		no_argument,		NULL, 'h' },
 	{ "fast",		no_argument,		NULL, 'f' },
 	{ "local",		no_argument,		NULL, 'l' },
+	{ "sigint",		no_argument,		NULL, 'c' },
 	{ "interface",		required_argument,	NULL, 'i' },
 	{ "spiffskb",		required_argument,	NULL, 'S' },
 };
 
-void save ()
+void cleanup ()
 {
 	mock_stop_spiffs();
+	mock_stop_uart();
 }
 
 void control_c (int sig)
@@ -76,7 +116,7 @@ void control_c (int sig)
 	if (user_exit)
 	{
 		fprintf(stderr, MOCK "stuck, killing\n");
-		save();
+		cleanup();
 		exit(1);
 	}
 	user_exit = true;
@@ -90,7 +130,7 @@ int main (int argc, char* const argv [])
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlfi:S:", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfi:S:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -103,6 +143,9 @@ int main (int argc, char* const argv [])
 			break;
 		case 'l':
 			global_ipv4_netfmt = NO_GLOBAL_BINDING;
+			break;
+		case 'c':
+			ignore_sigint = true;
 			break;
 		case 'f':
 			fast = true;
@@ -128,16 +171,22 @@ int main (int argc, char* const argv [])
 	// setup global global_ipv4_netfmt
 	wifi_get_ip_info(0, nullptr);
 
+	// set stdin to non blocking mode
+	mock_start_uart();
+
 	setup();
 	while (!user_exit)
 	{
+		uint8_t data = mock_read_uart();
+
+		if (data)
+			uart_new_data(UART0, data);
 		if (!fast)
-			usleep(10000); // not 100% cpu
+			usleep(1000); // not 100% cpu, ~1000 loops per second
 		loop();
 		check_incoming_udp();
 	}
-
-	save();
+	cleanup();
 
 	return 0;
 }
