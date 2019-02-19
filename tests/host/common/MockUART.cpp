@@ -428,6 +428,10 @@ uart1_write_char(char c)
 void
 uart_set_debug(int uart_nr)
 {
+	(void)uart_nr;
+/*
+  TODO after there are debug log functions in the host emu
+
 	s_uart_debug_nr = uart_nr;
 	void (*func)(char) = NULL;
 	switch(s_uart_debug_nr)
@@ -443,6 +447,14 @@ uart_set_debug(int uart_nr)
 		func = &uart_ignore_char;
 		break;
 	}
+
+	if (uart_nr == UART0 || uart_nr == UART1) {
+		system_set_os_print(1);
+	} else {
+		system_set_os_print(0);
+	}
+	ets_install_putc1((void *) func);
+*/
 }
 
 int
