@@ -132,6 +132,21 @@ env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
 
 #
+# SDK
+#
+if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK3" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK3V0", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK3V0"),]
+    )
+# PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK221 (default)
+else:
+    env.Append(
+        CPPDEFINES=[("NONOSDK221", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK221"),]
+    )
+
+#
 # lwIP
 #
 if "PIO_FRAMEWORK_ARDUINO_LWIP_HIGHER_BANDWIDTH" in flatten_cppdefines:
