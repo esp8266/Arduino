@@ -25,8 +25,6 @@
 #ifndef __USER_INTERFACE_H__
 #define __USER_INTERFACE_H__
 
-#define NONOSDK221 1
-
 #include "os_type.h"
 #ifdef LWIP_OPEN_SRC
 
@@ -255,8 +253,9 @@ struct station_config {
                         // with both ssid[] and bssid[] matched. Please check about this.
     uint8 bssid[6];
     wifi_fast_scan_threshold_t threshold;
-    // not in NONOSDK221
-    //bool open_and_wep_mode_disable; // Can connect to open/wep router by default.
+#ifndef NONOSDK221
+    bool open_and_wep_mode_disable; // Can connect to open/wep router by default.
+#endif
 };
 
 bool wifi_station_get_config(struct station_config *config);
@@ -435,9 +434,7 @@ typedef enum {
     MODEM_SLEEP_T
 } sleep_type_t;
 
-#if 0
-
-not in NONOSDK221
+#ifndef NONOSDK221
 
 typedef enum {
     MIN_SLEEP_T,

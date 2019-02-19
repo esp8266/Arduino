@@ -136,13 +136,13 @@ flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
 #
 if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK3" in flatten_cppdefines:
     env.Append(
-        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK3V0", "include")],
+        CPPDEFINES=[("NONOSDK3V0", 1)],
         LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK3V0"),]
     )
 # PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK221 (default)
 else:
     env.Append(
-        CPPPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK221", "include")],
+        CPPDEFINES=[("NONOSDK221", 1)],
         LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK221"),]
     )
 
