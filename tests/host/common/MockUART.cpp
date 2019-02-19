@@ -407,54 +407,10 @@ uart_has_rx_error(uart_t* uart)
 	return false;
 }
 
-static void
-uart_ignore_char(char c)
-{
-	(void) c;
-}
-
-static void
-uart0_write_char(char c)
-{
-	uart_do_write_char(UART0, c);
-}
-
-static void
-uart1_write_char(char c)
-{
-	uart_do_write_char(UART1, c);
-}
-
 void
 uart_set_debug(int uart_nr)
 {
 	(void)uart_nr;
-/*
-  TODO after there are debug log functions in the host emu
-
-	s_uart_debug_nr = uart_nr;
-	void (*func)(char) = NULL;
-	switch(s_uart_debug_nr)
-	{
-	case UART0:
-		func = &uart0_write_char;
-		break;
-	case UART1:
-		func = &uart1_write_char;
-		break;
-	case UART_NO:
-	default:
-		func = &uart_ignore_char;
-		break;
-	}
-
-	if (uart_nr == UART0 || uart_nr == UART1) {
-		system_set_os_print(1);
-	} else {
-		system_set_os_print(0);
-	}
-	ets_install_putc1((void *) func);
-*/
 }
 
 int
