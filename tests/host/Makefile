@@ -129,6 +129,7 @@ endif
 FLAGS += $(DEBUG) -Wall -coverage $(OPTZ) -fno-common -g $(M32)
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
+FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
 CXXFLAGS += -std=c++11 $(FLAGS)
 CFLAGS += -std=c99 $(FLAGS)
