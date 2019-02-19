@@ -82,20 +82,19 @@ MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 
 MOCK_CPP_FILES := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 	ArduinoCatch.cpp \
+	user_interface.cpp \
 )
 
 MOCK_CPP_FILES_EMU := $(MOCK_CPP_FILES_COMMON) $(addprefix common/,\
 	ArduinoMain.cpp \
 	ArduinoMainUdp.cpp \
 	ArduinoMainSpiffs.cpp \
-	user_interface.cpp \
 )
 
 MOCK_C_FILES := $(addprefix common/,\
 	md5.c \
 	noniso.c \
 )
-
 
 INC_PATHS += $(addprefix -I, \
 	. \
@@ -232,7 +231,7 @@ ARDUINO_LIBS := \
 		WiFiServerSecureBearSSL.cpp \
 		BearSSLHelpers.cpp \
 		CertStoreBearSSL.cpp \
-	) \
+	)
 
 OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 	$(addprefix ESP8266WebServer/src/,\
@@ -252,7 +251,7 @@ OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 	DNSServer/src/DNSServer.cpp \
 	ESP8266AVRISP/src/ESP8266AVRISP.cpp \
 	ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
-) \
+)
 
 MOCK_ARDUINO_LIBS := $(addprefix common/,\
 	ClientContextSocket.cpp \
@@ -264,7 +263,7 @@ MOCK_ARDUINO_LIBS := $(addprefix common/,\
 	MockEsp.cpp \
 	MockEEPROM.cpp \
 	MockSPI.cpp \
-) \
+)
 
 CPP_SOURCES_CORE_EMU = \
 	$(MOCK_CPP_FILES_EMU) \
