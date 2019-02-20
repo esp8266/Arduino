@@ -81,7 +81,10 @@ def get_tool(tool):
     if local_hash != real_hash:
         print('Hash mismatch for {0}, delete the file and try again'.format(local_path))
         raise RuntimeError()
-    unpack(local_path, '.')
+    if tool['name'] == 'python':
+        unpack(local_path, 'python')
+    else:
+        unpack(local_path, '.')
 
 def load_tools_list(filename, platform):
     tools_info = json.load(open(filename))['packages'][0]['tools']
@@ -90,6 +93,7 @@ def load_tools_list(filename, platform):
         tool_platform = [p for p in t['systems'] if p['host'] == platform]
         if len(tool_platform) == 0:
             continue
+        tool_platform[0]['name'] = t['name']
         tools_to_download.append(tool_platform[0])
     return tools_to_download
 
