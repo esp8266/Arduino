@@ -137,17 +137,17 @@
                "systems": [
                   {
                      "host": "x86_64-mingw32",
-                     "url": "https://www.python.org/ftp/python/3.7.2/python-3.7.2.post1-embed-win32.zip",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/python-3.7.2.post1-embed-win32.zip",
                      "archiveFileName": "python-3.7.2.post1-embed-win32.zip",
-                     "checksum": "SHA-256:ceb06a5244e93e7e7523e26e1354447b79a9e6fd8c45891d81df9c7da1e02d05",
-                     "size": "6533256"
+                     "checksum": "SHA-256:8136937ac00c28549893d1241011054a0e90517e0a193c2986323fa9f6501ed9",
+                     "size": "6612720"
                   },
                   {
                      "host": "i686-mingw32",
-                     "url": "https://www.python.org/ftp/python/3.7.2/python-3.7.2.post1-embed-win32.zip",
+                     "url": "https://github.com/earlephilhower/esp-quick-toolchain/releases/download/2.5.0-3/python-3.7.2.post1-embed-win32.zip",
                      "archiveFileName": "python-3.7.2.post1-embed-win32.zip",
-                     "checksum": "SHA-256:ceb06a5244e93e7e7523e26e1354447b79a9e6fd8c45891d81df9c7da1e02d05",
-                     "size": "6533256"
+                     "checksum": "SHA-256:8136937ac00c28549893d1241011054a0e90517e0a193c2986323fa9f6501ed9",
+                     "size": "6612720"
                   }
                ]
             },
