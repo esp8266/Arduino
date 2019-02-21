@@ -84,7 +84,9 @@ bool wifi_station_get_config (struct station_config *config)
 		config->bssid[i] = i;
 	config->threshold.rssi = 1;
 	config->threshold.authmode = AUTH_WPA_PSK;
+#ifndef NONOSDK221
 	config->open_and_wep_mode_disable = true;
+#endif
 	return true;
 }
 
@@ -190,10 +192,14 @@ uint8 wifi_get_opmode_default (void)
 	return STATION_MODE;
 }
 
+#ifndef NONOSDK221
+
 sleep_level_t wifi_get_sleep_level (void)
 {
 	return MIN_SLEEP_T;
 }
+
+#endif // nonos-sdk-pre-3
 
 sleep_type_t wifi_get_sleep_type (void)
 {
@@ -242,6 +248,8 @@ bool wifi_set_phy_mode (phy_mode_t mode)
 	return true;
 }
 
+#ifndef NONOSDK221
+
 bool wifi_set_sleep_level (sleep_level_t level)
 {
 	(void)level;
@@ -253,6 +261,8 @@ bool wifi_set_sleep_type (sleep_type_t type)
 	(void)type;
 	return true;
 }
+
+#endif
 
 bool wifi_station_connect (void)
 {
