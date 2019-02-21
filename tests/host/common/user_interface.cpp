@@ -256,13 +256,13 @@ bool wifi_set_sleep_level (sleep_level_t level)
 	return true;
 }
 
+#endif
+
 bool wifi_set_sleep_type (sleep_type_t type)
 {
 	(void)type;
 	return true;
 }
-
-#endif
 
 bool wifi_station_connect (void)
 {
