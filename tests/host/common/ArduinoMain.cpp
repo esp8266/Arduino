@@ -44,7 +44,7 @@ const char* host_interface = nullptr;
 size_t spiffs_kb = 1024;
 bool ignore_sigint = false;
 
-#define STDIN 0
+#define STDIN STDIN_FILENO
 
 static struct termios initial_settings;
 
@@ -52,22 +52,24 @@ static int mock_start_uart(void)
 {
 	struct termios settings;
 
-	if (tcgetattr(STDIN, &initial_settings) < 0) return (-1);
+	if (!isatty(STDIN)) return 0;
+	if (tcgetattr(STDIN, &initial_settings) < 0) return -1;
 	settings = initial_settings;
-	if (ignore_sigint) settings.c_lflag &= ~(ISIG);
-	settings.c_oflag  = 0;
-	settings.c_lflag &= ~(ECHO   | ECHONL | ICANON | IEXTEN);
-	settings.c_iflag &= ~(IGNBRK | BRKINT | ICRNL  | INLCR |
-	                      PARMRK | INPCK  | ISTRIP | IXON  );
-	settings.c_cc[VMIN]  = 0;
+	settings.c_lflag &= ~(ignore_sigint ? ISIG : 0);
+	settings.c_lflag &= ~(ECHO	| ICANON);
+	settings.c_iflag &= ~(ICRNL | INLCR | ISTRIP | IXON );
+	settings.c_oflag |=	(ONLCR);
+	settings.c_cc[VMIN]	= 0;
 	settings.c_cc[VTIME] = 0;
-	if (tcsetattr(STDIN, TCSANOW, &settings) < 0) return (-2);
-	return (0);
+	if (tcsetattr(STDIN, TCSANOW, &settings) < 0) return -2;
+	return 0;
 }
 
 static int mock_stop_uart(void)
 {
-	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0) return (-1);
+	if (!isatty(STDIN)) return 0;
+	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0) return -1;
+	printf("\e[?25h"); // show cursor
 	return (0);
 }
 
@@ -88,7 +90,7 @@ void help (const char* argv0, int exitcode)
 		"	-c             - ignore CTRL-C (send it via Serial)\n"
 		"	-f             - no throttle (possibly 100%%CPU)\n"
 		"	-S             - spiffs size in KBytes (default: %zd)\n"
-		"	                 (negative value will force mismatched size)\n"
+		"                  (negative value will force mismatched size)\n"
 		, argv0, spiffs_kb);
 	exit(exitcode);
 }
@@ -173,6 +175,9 @@ int main (int argc, char* const argv [])
 
 	// set stdin to non blocking mode
 	mock_start_uart();
+
+	// install exit handler in case Esp.restart() is called
+	atexit(cleanup);
 
 	setup();
 	while (!user_exit)
