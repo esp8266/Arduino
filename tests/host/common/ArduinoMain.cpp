@@ -43,6 +43,7 @@ bool user_exit = false;
 const char* host_interface = nullptr;
 size_t spiffs_kb = 1024;
 bool ignore_sigint = false;
+bool restore_tty = false;
 
 #define STDIN STDIN_FILENO
 
@@ -57,17 +58,23 @@ static int mock_start_uart(void)
 	settings = initial_settings;
 	settings.c_lflag &= ~(ignore_sigint ? ISIG : 0);
 	settings.c_lflag &= ~(ECHO	| ICANON);
-	settings.c_iflag &= ~(ICRNL | INLCR | ISTRIP | IXON );
+	settings.c_iflag &= ~(ICRNL | INLCR | ISTRIP | IXON);
 	settings.c_oflag |=	(ONLCR);
 	settings.c_cc[VMIN]	= 0;
 	settings.c_cc[VTIME] = 0;
 	if (tcsetattr(STDIN, TCSANOW, &settings) < 0) return -2;
+	tty_restore = true;
 	return 0;
 }
 
 static int mock_stop_uart(void)
 {
-	if (!isatty(STDIN)) return 0;
+	if (!restore_tty) return 0;
+	if (!isatty(STDIN)) {
+		perror("isatty(STDIN)");
+		//system("stty sane"); <- same error message "Inappropriate ioctl for device"
+		return 0;
+	}
 	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0) return -1;
 	printf("\e[?25h"); // show cursor
 	return (0);
