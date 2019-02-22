@@ -46,17 +46,23 @@ void pinMode (uint8_t pin, uint8_t mode)
 	case WAKEUP_PULLDOWN: m="WAKEUP_PULLDOWN"; break;
 	default: m="(special)";
 	}
+#ifdef DEBUG_ESP_CORE
 	fprintf(stderr, MOCK "gpio%d: mode='%s'\n", pin, m);
+#endif
 }
 
 void digitalWrite(uint8_t pin, uint8_t val)
 {
+#ifdef DEBUG_ESP_CORE
 	fprintf(stderr, MOCK "digitalWrite(pin=%d val=%d)\n", pin, val);
+#endif
 }
 
 void analogWrite(uint8_t pin, int val)
 {
+#ifdef DEBUG_ESP_CORE
 	fprintf(stderr, MOCK "analogWrite(pin=%d, val=%d\n", pin, val);
+#endif
 }
 
 int analogRead(uint8_t pin)
@@ -67,11 +73,17 @@ int analogRead(uint8_t pin)
 
 void analogWriteRange(uint32_t range)
 {
+#ifdef DEBUG_ESP_CORE
 	fprintf(stderr, MOCK "analogWriteRange(range=%d)\n", range);
+#endif
 }
 
 int digitalRead(uint8_t pin)
 {
+#ifdef DEBUG_ESP_CORE
 	fprintf(stderr, MOCK "digitalRead(%d)\n", pin);
-	return 0;
+#endif
+
+	// pin 0 is most likely a low active input
+	return pin ? 0 : 1;
 }
