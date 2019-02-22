@@ -20,6 +20,7 @@ menu.vt=VTables
 menu.exception=Exceptions
 menu.led=Builtin Led
 menu.wipe=Erase Flash
+menu.sdk=Espressif FW
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -349,6 +350,10 @@ generic.menu.led.14=14
 generic.menu.led.14.build.led=-DLED_BUILTIN=14
 generic.menu.led.15=15
 generic.menu.led.15.build.led=-DLED_BUILTIN=15
+generic.menu.sdk.nonosdk221=nonos-sdk 2.2.1
+generic.menu.sdk.nonosdk221.build.sdk=NONOSDK221
+generic.menu.sdk.nonosdk3v0=nonos-sdk pre-3
+generic.menu.sdk.nonosdk3v0.build.sdk=NONOSDK3V0
 generic.menu.ip.lm2f=v2 Lower Memory
 generic.menu.ip.lm2f.build.lwip_include=lwip2/include
 generic.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
