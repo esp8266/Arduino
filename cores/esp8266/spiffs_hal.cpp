@@ -122,7 +122,7 @@ int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
 
     if (alignedEnd != alignedBegin) {
         uint32_t* srcLeftover = (uint32_t*) (src + alignedBegin - addr);
-        uint32_t srcAlign = ((uint32_t) srcLeftover) & 3;
+        uint32_t srcAlign = ((uintptr_t) srcLeftover) & 3;
         if (!srcAlign) {
             if (!ESP.flashWrite(alignedBegin, (uint32_t*) srcLeftover,
                     alignedEnd - alignedBegin)) {
@@ -134,7 +134,7 @@ int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
         else {
             uint8_t buf[UNALIGNED_WRITE_BUFFER_SIZE];
             for (uint32_t sizeLeft = alignedEnd - alignedBegin; sizeLeft; ) {
-                size_t willCopy = std::min(sizeLeft, sizeof(buf));
+                size_t willCopy = std::min(sizeLeft, (uint32_t) sizeof(buf));
                 memcpy(buf, srcLeftover, willCopy);
 
                 if (!ESP.flashWrite(alignedBegin, (uint32_t*) buf, willCopy)) {
