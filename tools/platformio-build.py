@@ -96,8 +96,8 @@ env.Append(
         "__ets__",
         "ICACHE_FLASH",
         ("ARDUINO", 10805),
-        ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"'
-            % env.BoardConfig().id.upper()),
+        ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"' % env.BoardConfig().id.upper()),
+        "FLASHMODE_${BOARD_FLASH_MODE.upper()}",
         "LWIP_OPEN_SRC"
     ],
 
