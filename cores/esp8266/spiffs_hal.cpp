@@ -122,7 +122,7 @@ int32_t spiffs_hal_write(uint32_t addr, uint32_t size, uint8_t *src) {
 
     if (alignedEnd != alignedBegin) {
         uint32_t* srcLeftover = (uint32_t*) (src + alignedBegin - addr);
-        if (!(srcLeftover & 3)) { // source is already aligned
+        if (!((uintptr_t) srcLeftover & 3)) { // source is already aligned
             if (!ESP.flashWrite(alignedBegin, (uint32_t*) srcLeftover,
                     alignedEnd - alignedBegin)) {
                 DEBUGV("_spif_write(%d) addr=%x size=%x ab=%x ae=%x\r\n",
