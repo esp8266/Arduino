@@ -63,7 +63,7 @@ static int mock_start_uart(void)
 	settings.c_cc[VMIN]	= 0;
 	settings.c_cc[VTIME] = 0;
 	if (tcsetattr(STDIN, TCSANOW, &settings) < 0) return -2;
-	tty_restore = true;
+	restore_tty = true;
 	return 0;
 }
 
