@@ -22,7 +22,7 @@ def main():
     if args.mode == "header":
         val = ""
         try:
-            with open(args.publickey, "rb") as f:
+            with open(args.publickey, "r") as f:
                 pub = f.read()
                 val += "#include <pgmspace.h>\n"
                 val += "#define ARDUINO_SIGNING 1\n"
@@ -32,7 +32,7 @@ def main():
                 val = val[:-3]
                 val +="\n};\n"
                 sys.stderr.write("Enabling binary signing\n")
-        except:
+        except IOError:
 # Silence the default case to avoid people thinking something is wrong.
 # Only people who care about signing will know what it means, anyway,
 # and they can check for the positive acknowledgement above.
