@@ -70,6 +70,7 @@ env.Append(
         "-U__STRICT_ANSI__",
         "-ffunction-sections",
         "-fdata-sections",
+        "-fno-exceptions",
         "-Wall"
     ],
 
