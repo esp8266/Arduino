@@ -22,13 +22,13 @@ def main():
     if args.mode == "header":
         val = ""
         try:
-            with open(args.publickey, "r") as f:
+            with open(args.publickey, "rb") as f:
                 pub = f.read()
                 val += "#include <pgmspace.h>\n"
                 val += "#define ARDUINO_SIGNING 1\n"
                 val += "static const char signing_pubkey[] PROGMEM = {\n"
-                for i in pub:
-                    val += "0x%02x, \n" % ord(i)
+                for i in bytearray(pub):
+                    val += "0x%02x, \n" % i
                 val = val[:-3]
                 val +="\n};\n"
                 sys.stderr.write("Enabling binary signing\n")
