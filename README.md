@@ -42,29 +42,34 @@ Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.0/](https://arduin
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
 - Install the current upstream Arduino IDE at the 1.8 level or later. The current version is at the [Arduino website](http://www.arduino.cc/en/main/software).
-- Go to Arduino directory
+- Go to your Arduino sketchbook directory
   - For Mac OS X, it is `Arduino.app` showing as the Arduino icon.  
     This location may be your `~/Downloads`, `~/Desktop` or even `/Applications`.
     ```bash
     cd <application-directory>/Arduino.app/Contents/Java
     ```
-  - For Linux, it is ~/arduino by default.
+  - For Linux, it is `~/arduino/` by default.
     ```bash
-    cd ~arduino
+    cd ~/arduino/
     ```
-- Clone this repository into hardware/esp8266com/esp8266 directory (or clone it elsewhere and create a symlink)
+
+- Clone this repository into `hardware/esp8266com/esp8266/` (or clone it elsewhere and create a symlink)
 ```bash
-cd hardware
-mkdir esp8266com
-cd esp8266com
-git clone https://github.com/esp8266/Arduino.git esp8266
+git clone https://github.com/esp8266/Arduino.git hardware/esp8266com/esp8266/
 ```
-- Download binary tools (you need Python 2.7)
+
+- This repo requires other tools (sub-modules) that we need to fetch
+```bash
+cd hardware/esp8266com/esp8266/
+git submodule update --init --recursive
+```
+
+- Download binary tools (requires Python 2.7)
 ```bash
 cd esp8266/tools
 python get.py
 ```
-- Restart Arduino
+- Restart the Arduino IDE
 
 ### Using PlatformIO
 
