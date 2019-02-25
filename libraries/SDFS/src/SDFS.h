@@ -274,6 +274,10 @@ public:
         } else {
             const char *p = _name.get();
             const char *slash = strrchr(p, '/');
+            // For names w/o any path elements, return directly
+            // If there are slashes, return name after the last slash
+            // (note that strrchr will return the address of the slash,
+            // so need to increment to ckip it)
             return (slash && slash[1]) ? slash + 1 : p;
         }
     }
@@ -323,8 +327,9 @@ public:
         if (!_valid) {
             return FileImplPtr();
         }
-	char tmpName[128];
-	snprintf(tmpName, sizeof(tmpName), "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _lfn);
+        // MAX_PATH on FAT32 is potentially 260 bytes per most implementations
+        char tmpName[260];
+        snprintf(tmpName, sizeof(tmpName), "%s%s%s", _dirPath.get() ? _dirPath.get() : "", _dirPath.get()&&_dirPath.get()[0]?"/":"", _lfn);
         return _fs->open((const char *)tmpName, openMode, accessMode);
     }
 
