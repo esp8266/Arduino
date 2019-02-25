@@ -66,7 +66,7 @@ git submodule update --init --recursive
 
 - Download binary tools (requires Python 2.7)
 ```bash
-cd esp8266/tools
+cd tools/
 python get.py
 ```
 - Restart the Arduino IDE
