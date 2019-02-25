@@ -37,6 +37,11 @@ extern "C" void yield()
 {
 }
 
+extern "C" void optimistic_yield (uint32_t interval_us)
+{
+    usleep(interval_us);
+}
+
 extern "C" void esp_yield()
 {
 }

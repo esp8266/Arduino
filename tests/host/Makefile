@@ -66,6 +66,7 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	libb64/cencode.cpp \
 	libb64/cdecode.cpp \
 	Schedule.cpp \
+	HardwareSerial.cpp \
 	) \
 	$(addprefix $(LIBRARIES_PATH)/ESP8266SdFat/src/, \
 		FatLib/FatFile.cpp \
@@ -87,7 +88,7 @@ MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	spiffs_mock.cpp \
 	sdfs_mock.cpp \
 	WMath.cpp \
-	MockSerial.cpp \
+	MockUART.cpp \
 	MockTools.cpp \
 	MocklwIP.cpp \
 )
@@ -107,7 +108,6 @@ MOCK_C_FILES := $(addprefix common/,\
 	md5.c \
 	noniso.c \
 )
-
 
 INC_PATHS += $(addprefix -I, \
 	. \
@@ -245,7 +245,7 @@ ARDUINO_LIBS := \
 		WiFiServerSecureBearSSL.cpp \
 		BearSSLHelpers.cpp \
 		CertStoreBearSSL.cpp \
-	) \
+	)
 
 OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 	$(addprefix ESP8266WebServer/src/,\
@@ -265,7 +265,7 @@ OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
 	DNSServer/src/DNSServer.cpp \
 	ESP8266AVRISP/src/ESP8266AVRISP.cpp \
 	ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
-) \
+)
 
 MOCK_ARDUINO_LIBS := $(addprefix common/,\
 	ClientContextSocket.cpp \
@@ -277,7 +277,7 @@ MOCK_ARDUINO_LIBS := $(addprefix common/,\
 	MockEsp.cpp \
 	MockEEPROM.cpp \
 	MockSPI.cpp \
-) \
+)
 
 CPP_SOURCES_CORE_EMU = \
 	$(MOCK_CPP_FILES_EMU) \
