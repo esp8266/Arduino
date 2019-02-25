@@ -103,9 +103,13 @@ __attribute__((optimize("-O3"), always_inline)) static inline uint16_t pgm_read_
     return pgm_read_dword_unaligned(addr) & 0xffff;
 }
 
-// Allow manual selection of _aligned or _unaligned, but default to _unaligned for Arduino compatibility
-#define PGM_READ_UNALIGNED_DEFAULT
-#ifdef PGM_READ_UNALIGNED_DEFAULT
+// Allow selection of _aligned or _unaligned, but default to _unaligned for Arduino compatibility
+// Add -DPGM_READ_UNALIGNED=0 or "#define PGM_READ_UNALIGNED 0" to code to use aligned-only (faster) macros by default
+#ifndef PGM_READ_UNALIGNED
+    #define PGM_READ_UNALIGNED 1
+#endif
+
+#if PGM_READ_UNALIGNED
     #define pgm_read_word(a)   pgm_read_word_unaligned(a)
     #define pgm_read_dword(a)  pgm_read_dword_unaligned(a)
     #define pgm_read_float(a)  pgm_read_float_unaligned(a)
