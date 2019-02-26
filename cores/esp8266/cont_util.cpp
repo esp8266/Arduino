@@ -74,7 +74,7 @@ void cont_repaint_stack(cont_t *cont)
     // Ensure 64 bytes adjacent to the current SP don't get touched to endure
     // we don't accidentally trounce over locals or IRQ temps.
     // Fill stack with magic values
-    for ( uint32_t *pos = sp - 16;  pos != &cont->stack[0]; pos-- ) 
+    for ( uint32_t *pos = sp - 16; pos >= &cont->stack[0]; pos-- )
     {
        *pos = CONT_STACKGUARD;
     }
