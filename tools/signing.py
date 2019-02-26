@@ -27,12 +27,12 @@ def main():
                 val += "#include <pgmspace.h>\n"
                 val += "#define ARDUINO_SIGNING 1\n"
                 val += "static const char signing_pubkey[] PROGMEM = {\n"
-                for i in pub:
-                    val += "0x%02x, \n" % ord(i)
+                for i in bytearray(pub):
+                    val += "0x%02x, \n" % i
                 val = val[:-3]
                 val +="\n};\n"
                 sys.stderr.write("Enabling binary signing\n")
-        except:
+        except IOError:
 # Silence the default case to avoid people thinking something is wrong.
 # Only people who care about signing will know what it means, anyway,
 # and they can check for the positive acknowledgement above.
