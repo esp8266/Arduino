@@ -28,6 +28,7 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include <limits>
+#include <assert.h>
 #include "FS.h"
 #include "FSImpl.h"
 #include "debug.h"
@@ -242,7 +243,8 @@ public:
             default:
                 // Should not be hit, we've got an invalid seek mode
                 DEBUGV("SDFSFileImpl::seek: invalid seek mode %d\n", mode);
-                return false;
+		assert((mode==SeekSet) || (mode==SeekEnd) || (mode==SeekCur)); // Will fail and give meaningful assert message
+		return false;
         }
     }
 
