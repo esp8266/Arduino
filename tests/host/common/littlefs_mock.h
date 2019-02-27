@@ -29,7 +29,7 @@
 
 class LittleFSMock {
 public:
-    LittleFSMock(size_t fs_size, size_t fs_block, size_t fs_page, bool storage = true);
+    LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const String& storage = emptyString);
     void reset();
     ~LittleFSMock();
     
@@ -37,17 +37,9 @@ protected:
     void load ();
     void save ();
 
-    // it was a vector, but CI tests & valgrind complain with:
-    // Syscall param write(buf) points to uninitialised byte(s)
-    //    by 0x43E9FF: SpiffsMock::save() (littlefs_mock.cpp:116)
-    //    = if (::write(fs, &m_fs[0], m_fs_size) != (ssize_t)m_fs_size)
-    // so switched to a regular array
-    // and that bug is still here
-    // XXXWIPTODO
-
-    uint8_t* m_fs;
-    size_t m_fs_size;
-    bool m_storage;
+    std::vector<uint8_t> m_fs;
+    String m_storage;
+    bool m_overwrite;
 };
 
 #define LITTLEFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) LittleFSMock littlefs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)

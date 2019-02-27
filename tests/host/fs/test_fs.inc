@@ -29,25 +29,25 @@ static std::set<String> listDir (const char* path)
 
 TEST_CASE(TESTPRE "FS can begin",TESTPAT)
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
 }
 
 TEST_CASE(TESTPRE "FS can't begin with zero size",TESTPAT)
 {
-    FS_MOCK_DECLARE(0, 8, 512, false);
+    FS_MOCK_DECLARE(0, 8, 512, "");
     REQUIRE_FALSE(FSTYPE.begin());
 }
 
 TEST_CASE(TESTPRE "Before begin is called, open will fail",TESTPAT)
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE_FALSE(FSTYPE.open("/foo", "w"));
 }
 
 TEST_CASE(TESTPRE "FS can create file",TESTPAT)
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     createFile("/test", "");
     REQUIRE(FSTYPE.exists("/test"));
@@ -55,7 +55,7 @@ TEST_CASE(TESTPRE "FS can create file",TESTPAT)
 
 TEST_CASE(TESTPRE "Files can be written and appended to",TESTPAT)
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     {
         File f = FSTYPE.open("config1.txt", "w");
@@ -79,7 +79,7 @@ TEST_CASE(TESTPRE "Files can be written and appended to",TESTPAT)
 
 TEST_CASE(TESTPRE "Files persist after reset", TESTPAT)
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     createFile("config1.txt", "file 1");
 
@@ -91,7 +91,7 @@ TEST_CASE(TESTPRE "Files persist after reset", TESTPAT)
 
 TEST_CASE(TESTPRE "Filesystem is empty after format", TESTPAT)
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.format());
     REQUIRE(FSTYPE.begin());
     createFile("/1", "first");
@@ -107,7 +107,7 @@ TEST_CASE(TESTPRE "Filesystem is empty after format", TESTPAT)
 
 TEST_CASE(TESTPRE "File names which are too long are rejected", TESTPAT)
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     const char* emptyName = "";
     const char* longName_31 = "/234567890123456789012345678901";
@@ -125,7 +125,7 @@ TEST_CASE(TESTPRE "File names which are too long are rejected", TESTPAT)
 
 TEST_CASE(TESTPRE "#1685 Duplicate files", "[fs][bugreport]")
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     createFile("/config", "some text");
     createFile("/data", "");
@@ -137,7 +137,7 @@ TEST_CASE(TESTPRE "#1685 Duplicate files", "[fs][bugreport]")
 
 TEST_CASE(TESTPRE "#1819 Can list all files with openDir(\"\")", "[fs][bugreport]")
 {
-    FS_MOCK_DECLARE(96, 8, 512, false);
+    FS_MOCK_DECLARE(96, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     createFile("/file1", "some text");
     createFile("/file2", "other text");
@@ -155,7 +155,7 @@ TEST_CASE(TESTPRE "#1819 Can list all files with openDir(\"\")", "[fs][bugreport
 // behavior and expose the FS::mkdir() method, but for now this works OK.
 TEST_CASE(TESTPRE "Removing all files in a subdir removes that subdir", TESTPAT)
 {
-    FS_MOCK_DECLARE(128, 8, 512, false);
+    FS_MOCK_DECLARE(128, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     createFile("/empty", "");
     createFile("/not_empty", "some text");
@@ -191,7 +191,7 @@ TEST_CASE(TESTPRE "Removing all files in a subdir removes that subdir", TESTPAT)
 // f.name == "c" and not "/a/b/c" as you would see in SPIFFS.
 TEST_CASE(TESTPRE "Dir lists all files", TESTPAT)
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     createFile("/empty", "");
     createFile("/not_empty", "some text");
@@ -217,7 +217,7 @@ TEST_CASE(TESTPRE "Dir lists all files", TESTPAT)
 
 TEST_CASE(TESTPRE "Listfiles.ino example", TESTPAT)
 {
-    FS_MOCK_DECLARE(128, 8, 512, false);
+    FS_MOCK_DECLARE(128, 8, 512, "");
     REQUIRE(FSTYPE.format());
     REQUIRE(FSTYPE.begin());
 
@@ -265,7 +265,7 @@ TEST_CASE(TESTPRE "Listfiles.ino example", TESTPAT)
 
 TEST_CASE(TESTPRE "Dir lists all files", TESTPAT)
 {
-    FS_MOCK_DECLARE(64, 8, 512, false);
+    FS_MOCK_DECLARE(64, 8, 512, "");
     REQUIRE(FSTYPE.begin());
     createFile("/empty", "");
     createFile("/not_empty", "some text");
