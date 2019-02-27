@@ -105,6 +105,7 @@ public:
 
     bool info(FSInfo& info) override {
         if (!_mounted) {
+            DEBUGV("SDFS::info: FS not mounted\n");
             return false;
         }
         info.maxOpenFiles = 999; // TODO - not valid
@@ -131,6 +132,7 @@ public:
     bool setConfig(const FSConfig *cfg) override
     {
         if ((cfg->_type != SDFSConfig::fsid::FSId) || _mounted) {
+            DEBUGV("SDFS::setConfig: invalid config or already mounted\n");
             return false;
         }
 	_cfg = *static_cast<const SDFSConfig *>(cfg);
@@ -237,8 +239,11 @@ public:
                 return _fd->seekEnd(-pos); // TODO again, odd from POSIX
             case SeekCur:
                 return _fd->seekCur(pos);
+            default:
+                // Should not be hit, we've got an invalid seek mode
+                DEBUGV("SDFSFileImpl::seek: invalid seek mode %d\n", mode);
+                return false;
         }
-        return false;
     }
 
     size_t position() const override
@@ -254,6 +259,7 @@ public:
     bool truncate(uint32_t size) override
     {
         if (!_opened) {
+            DEBUGV("SDFSFileImpl::truncate: file not opened\n");
             return false;
         }
         return _fd->truncate(size);
@@ -270,6 +276,7 @@ public:
     const char* name() const override
     {
         if (!_opened) {
+            DEBUGV("SDFSFileImpl::name: file not opened\n");
             return nullptr;
         } else {
             const char *p = _name.get();
@@ -336,6 +343,7 @@ public:
     const char* fileName() override
     {
         if (!_valid) {
+            DEBUGV("SDFSDirImpl::fileName: directory not valid\n");
             return nullptr;
         }
         return (const char*) _lfn; //_dirent.name;

@@ -25,6 +25,7 @@
 
 #include "SDFS.h"
 #include <FS.h>
+#include <PolledTimeout.h>
 
 namespace sdfs {
 
@@ -72,8 +73,9 @@ private:
             DEBUGV("SDFS: Clear FAT/DIR writeStart failed");
             return false;
         }
+	esp8266::polledTimeout::periodic timeToYield(5); // Yield every 5ms of runtime
         for (uint32_t i = 0; i < count; i++) {
-            if ((i & 0XFF) == 0) {
+            if (timeToYield) {
                 delay(0); // WDT feed
             }
             if (!card->writeData(cache->data)) {
