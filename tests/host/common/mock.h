@@ -94,6 +94,15 @@ extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
 #define CCBUFSIZE 65536
 #endif
 
+// uart
+#ifdef __cplusplus
+extern "C" {
+#endif
+void uart_new_data(const int uart_nr, uint8_t data);
+#ifdef __cplusplus
+}
+#endif
+
 // tcp
 int    mockSockSetup  (int sock);
 int    mockConnect    (uint32_t addr, int& sock, int port);
