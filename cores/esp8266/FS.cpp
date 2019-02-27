@@ -241,8 +241,8 @@ bool Dir::rewind() {
     return _impl->rewind();
 }
 
-bool FS::setConfig(const FSConfig *cfg) {
-    if (!_impl || !cfg) {
+bool FS::setConfig(const FSConfig &cfg) {
+    if (!_impl) {
         return false;
     }
 

@@ -32,8 +32,7 @@ using namespace fs;
 
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SDFS)
-static sdfs::SDFSImpl *_SDFSImpl = new sdfs::SDFSImpl();
-FS SDFS = FS(FSImplPtr(_SDFSImpl));
+FS SDFS = FS(FSImplPtr(new sdfs::SDFSImpl()));
 #endif
 
 namespace sdfs {

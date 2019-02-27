@@ -130,13 +130,13 @@ public:
         return _mounted ?_fs.rmdir(path) : false;
     }
 
-    bool setConfig(const FSConfig *cfg) override
+    bool setConfig(const FSConfig &cfg) override
     {
-        if ((cfg->_type != SDFSConfig::fsid::FSId) || _mounted) {
+        if ((cfg._type != SDFSConfig::fsid::FSId) || _mounted) {
             DEBUGV("SDFS::setConfig: invalid config or already mounted\n");
             return false;
         }
-	_cfg = *static_cast<const SDFSConfig *>(cfg);
+	_cfg = *static_cast<const SDFSConfig *>(&cfg);
         return true;
     }
 

@@ -132,7 +132,7 @@ setConfig
 
     SPIFFSConfig cfg;
     cfg.setAutoFormat(false);
-    SPIFFS.setConfig(&cfg);
+    SPIFFS.setConfig(cfg);
 
 This method allows you to configure the parameters of a filesystem
 before mounting.  All filesystems have their own ``*Config`` (i.e.

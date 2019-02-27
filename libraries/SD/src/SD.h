@@ -32,8 +32,7 @@
 class SDClass {
 public:
     boolean begin(uint8_t csPin, SPISettings cfg = SPI_HALF_SPEED) {
-        auto fsCfg = SDFSConfig(csPin, cfg);
-	SDFS.setConfig(&fsCfg);
+	SDFS.setConfig(SDFSConfig(csPin, cfg));
         return (boolean)SDFS.begin();
     }
 

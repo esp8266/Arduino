@@ -155,7 +155,7 @@ class FS
 public:
     FS(FSImplPtr impl) : _impl(impl) { }
 
-    bool setConfig(const FSConfig *cfg);
+    bool setConfig(const FSConfig &cfg);
 
     bool begin();
     void end();

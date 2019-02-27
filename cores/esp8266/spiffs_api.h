@@ -139,12 +139,12 @@ public:
         return false;
     }
 
-    bool setConfig(const FSConfig *cfg) override
+    bool setConfig(const FSConfig &cfg) override
     {
-        if ((cfg->_type != SPIFFSConfig::fsid::FSId) || (SPIFFS_mounted(&_fs) != 0)) {
+        if ((cfg._type != SPIFFSConfig::fsid::FSId) || (SPIFFS_mounted(&_fs) != 0)) {
             return false;
         }
-        _cfg = *static_cast<const SPIFFSConfig *>(cfg);
+        _cfg = *static_cast<const SPIFFSConfig *>(&cfg);
 	return true;
     }
 
