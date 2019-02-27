@@ -58,6 +58,7 @@ public:
     // Stream methods:
     int available() override;
     int read() override;
+    String readString() override;
     int peek() override;
     void flush() override;
     size_t readBytes(char *buffer, size_t length)  override {

@@ -140,6 +140,8 @@ SECTIONS
 
     /* __FUNCTION__ locals */
     *(.rodata._ZZ*__FUNCTION__)
+    *(.rodata._ZZ*__PRETTY_FUNCTION__)
+    *(.rodata._ZZ*__func__)
 
     /* std::* exception strings, in their own section to allow string coalescing */
     *(.irom.exceptiontext)
@@ -192,7 +194,7 @@ SECTIONS
     *(.entry.text)
     *(.init.literal)
     *(.init)
-    *(.literal .text .iram.text .iram.text.* .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+    *(.literal .text .iram.literal .iram.text .iram.text.* .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
 #ifdef VTABLES_IN_IRAM
     *(.rodata._ZTV*) /* C++ vtables */
 #endif

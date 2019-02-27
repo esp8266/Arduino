@@ -9,4 +9,10 @@
 	url = https://github.com/plerup/espsoftwareserial.git
 [submodule "libraries/LittleFS/lib/littlefs"]
 	path = libraries/LittleFS/lib/littlefs
-	url = https://github.com/ARMmbed/littlefs
+	url = https://github.com/ARMmbed/littlefs.git
+[submodule "tools/pyserial"]
+	path = tools/pyserial
+	url = https://github.com/pyserial/pyserial.git
+[submodule "tools/esptool"]
+	path = tools/esptool
+	url = https://github.com/espressif/esptool.git

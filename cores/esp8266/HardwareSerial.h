@@ -28,6 +28,7 @@
 #define HardwareSerial_h
 
 #include <inttypes.h>
+#include <time.h>
 #include "Stream.h"
 #include "uart.h"
 
@@ -167,7 +168,7 @@ public:
     {
         return write((uint8_t) n);
     }
-    size_t write(const uint8_t *buffer, size_t size)
+    size_t write(const uint8_t *buffer, size_t size) override
     {
         return uart_write(_uart, (const char*)buffer, size);
     }

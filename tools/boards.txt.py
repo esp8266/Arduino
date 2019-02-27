@@ -70,6 +70,7 @@ boards = collections.OrderedDict([
             'flashmode_menu',
             '512K', '1M', '2M', '4M', '8M', '16M',
             'led',
+            'sdk',
             ],
         'desc': [ 'These modules come in different form factors and pinouts. See the page at ESP8266 community wiki for more info: `ESP8266 Module Family <http://www.esp8266.com/wiki/doku.php?id=esp8266-module-family>`__.',
                   '',
@@ -353,11 +354,11 @@ boards = collections.OrderedDict([
         'macro': [
             'resetmethod_nodemcu',
             'crystalfreq_menu',
-            'flashmode_qio',
+            'flashmode_dio',
             'flashfreq_40',
             '4M',
             ],
-        'desc': [ 'The XinaBox CW01 is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker\'s ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard RGB led.',
+        'desc': [ 'The XinaBox CW01(ESP8266) is an Arduino-compatible Wi-Fi development board powered by an ESP-12F, clocked at 80 MHz at 3.3V logic. The CW01 has an onboard RGB LED and 3 xBUS connection ports.',
                   '',
                   'Product page: https://xinabox.cc/products/CW01'
                   ],
@@ -589,7 +590,7 @@ boards = collections.OrderedDict([
         'serial': '921',
         'desc': [ 
 			'Parameters in Arduino IDE:',
-			'~~~~~~~~~~~~~~~~~~~~~~~~~',
+			'~~~~~~~~~~~~~~~~~~~~~~~~~~',
 			'',
 			'- Card: "WEMOS D1 Mini Lite"',
 			'- Flash Size: "1M (512K SPIFFS)"',
@@ -597,14 +598,14 @@ boards = collections.OrderedDict([
 			'- Upload Speed: "230400"',
 			'',
 			'Power:',
-			'~~~~~',
+			'~~~~~~',
 			'',
 			'- 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input',
 			'- 3V3 pin : 3.3V 500mA regulated output',
 			'- Digital pins : 3.3V 30mA.',
 			'',
 			'links:',
-			'~~~~~',
+			'~~~~~~',
 			'',
 			'- Product page: https://www.wemos.cc/',
 			'- Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf',
@@ -851,7 +852,7 @@ macros = {
         ( '.upload.tool', 'esptool' ),
         ( '.upload.maximum_data_size', '81920' ),
         ( '.upload.wait_for_upload_port', 'true' ),
-        ( '.upload.erase_cmd', ''),
+        ( '.upload.erase_cmd', 'version'),
         ( '.serial.disableDTR', 'true' ),
         ( '.serial.disableRTS', 'true' ),
         ( '.build.mcu', 'esp8266' ),
@@ -947,32 +948,40 @@ macros = {
     ####################### menu.FlashMode
 
     'flashmode_menu': collections.OrderedDict([
-        ( '.menu.FlashMode.qio', 'QIO' ),
-        ( '.menu.FlashMode.qio.build.flash_mode', 'qio' ),
-        ( '.menu.FlashMode.qout', 'QOUT' ),
-        ( '.menu.FlashMode.qout.build.flash_mode', 'qout' ),
+        ( '.menu.FlashMode.dout', 'DOUT (compatible)' ),
+        ( '.menu.FlashMode.dout.build.flash_mode', 'dout' ),
+        ( '.menu.FlashMode.dout.build.flash_flags', '-DFLASHMODE_DOUT' ),
         ( '.menu.FlashMode.dio', 'DIO' ),
         ( '.menu.FlashMode.dio.build.flash_mode', 'dio' ),
-        ( '.menu.FlashMode.dout', 'DOUT' ),
-        ( '.menu.FlashMode.dout.build.flash_mode', 'dout' ),
+        ( '.menu.FlashMode.dio.build.flash_flags', '-DFLASHMODE_DIO' ),
+        ( '.menu.FlashMode.qout', 'QOUT' ),
+        ( '.menu.FlashMode.qout.build.flash_mode', 'qout' ),
+        ( '.menu.FlashMode.qout.build.flash_flags', '-DFLASHMODE_QOUT' ),
+        ( '.menu.FlashMode.qio', 'QIO (fast)' ),
+        ( '.menu.FlashMode.qio.build.flash_mode', 'qio' ),
+        ( '.menu.FlashMode.qio.build.flash_flags', '-DFLASHMODE_QIO' ),
         ]),
 
     ####################### default flash_mode
 
     'flashmode_dio': collections.OrderedDict([
         ( '.build.flash_mode', 'dio' ),
+        ( '.build.flash_flags', '-DFLASHMODE_DIO' ),
         ]),
 
     'flashmode_qio': collections.OrderedDict([
         ( '.build.flash_mode', 'qio' ),
+        ( '.build.flash_flags', '-DFLASHMODE_QIO' ),
         ]),
 
     'flashmode_dout': collections.OrderedDict([
         ( '.build.flash_mode', 'dout' ),
+        ( '.build.flash_flags', '-DFLASHMODE_DOUT' ),
         ]),
 
     'flashmode_qout': collections.OrderedDict([
         ( '.build.flash_mode', 'qout' ),
+        ( '.build.flash_flags', '-DFLASHMODE_QOUT' ),
         ]),
 
     ####################### lwip
@@ -1058,11 +1067,11 @@ macros = {
 
     'flash_erase_menu': collections.OrderedDict([
         ( '.menu.wipe.none', 'Only Sketch' ),
-        ( '.menu.wipe.none.upload.erase_cmd', '' ),
+        ( '.menu.wipe.none.upload.erase_cmd', 'version' ),
         ( '.menu.wipe.sdk', 'Sketch + WiFi Settings' ),
-        ( '.menu.wipe.sdk.upload.erase_cmd', '-ca "{build.rfcal_addr}" -cz 0x4000' ),
+        ( '.menu.wipe.sdk.upload.erase_cmd', 'erase_region "{build.rfcal_addr}" 0x4000' ),
         ( '.menu.wipe.all', 'All Flash Contents' ),
-        ( '.menu.wipe.all.upload.erase_cmd', '-ca 0x0 -cz "{build.flash_size_bytes}"' ),
+        ( '.menu.wipe.all.upload.erase_cmd', 'erase_flash' ),
         ]),
 
     }
@@ -1319,6 +1328,18 @@ def led (default,max):
     return { 'led': led }
 
 ################################################################
+# sdk selection
+
+def sdk ():
+    return { 'sdk': collections.OrderedDict([
+                        ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1'),
+                        ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
+                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3'),
+                        ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
+                    ])
+           }
+
+################################################################
 
 def all_boards ():
 
@@ -1336,6 +1357,7 @@ def all_boards ():
     macros.update(all_flash_map())
     macros.update(all_debug())
     macros.update(led(led_default, led_max))
+    macros.update(sdk())
 
     print('#')
     print('# Do not create pull-requests for this file only, CI will not accept them.')
@@ -1359,6 +1381,7 @@ def all_boards ():
     print('menu.exception=Exceptions')
     print('menu.led=Builtin Led')
     print('menu.wipe=Erase Flash')
+    print('menu.sdk=Espressif FW')
     print('')
 
     for id in boards:
@@ -1490,12 +1513,12 @@ def usage (name,ret):
     print("usage: %s [options]" % name)
     print("")
     print(" -h, --help")
-    print(" --lwip          - preferred default lwIP version (default %d)" % lwip)
-    print(" --led           - preferred default builtin led for generic boards (default %d)" % led_default)
-    print(" --board b       - board to modify:")
-    print(" --speed s       - change default serial speed")
-    print(" --customspeed s - new serial speed for all boards")
-    print(" --nofloat       - disable float support in printf/scanf")
+    print(" --lwip            - preferred default lwIP version (default %d)" % lwip)
+    print(" --led             - preferred default builtin led for generic boards (default %d)" % led_default)
+    print(" --board <b>       - board to modify:")
+    print(" --speed <s>       - change default serial speed")
+    print(" --customspeed <s> - new serial speed for all boards")
+    print(" --nofloat         - disable float support in printf/scanf")
     print("")
     print(" mandatory option (at least one):")
     print("")
@@ -1602,7 +1625,7 @@ for o, a in opts:
     elif o in ("--noextra4kheap", "--allowWPS"):
         print('option ' + o + ' is now deprecated, without effect, and will be removed')
 
-    elif o in ("--ldshow"):
+    elif o in ("--ld"):
         ldshow = True
 
     elif o in ("--ldgen"):

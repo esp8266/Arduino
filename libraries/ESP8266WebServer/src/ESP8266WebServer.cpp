@@ -419,7 +419,9 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
     _prepareHeader(header, code, (const char* )type, contentLength);
     _currentClientWrite(header.c_str(), header.length());
-    sendContent_P(content);
+    if (contentLength) {
+        sendContent_P(content);
+    }
 }
 
 void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {

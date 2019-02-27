@@ -158,6 +158,20 @@ File File::openNextFile() {
     return _fakeDir->openFile("r");
 }
 
+String File::readString()
+{
+    String ret;
+    ret.reserve(size() - position());
+    char temp[256+1];
+    int countRead = readBytes(temp, sizeof(temp)-1);
+    while (countRead > 0)
+    {
+        temp[countRead] = 0;
+        ret += temp;
+        countRead = readBytes(temp, sizeof(temp)-1);
+    }
+    return ret;
+}
 
 File Dir::openFile(const char* mode) {
     if (!_impl) {
