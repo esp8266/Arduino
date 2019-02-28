@@ -57,7 +57,12 @@ void settimeofday_cb (void (*cb)(void))
 #include <pgmspace.h>
 
 static const char stod14[] PROGMEM = "settimeofday() can't set time!\n";
-bool sntp_set_timezone_in_seconds(sint32 timezone);
+bool sntp_set_timezone(sint8 timezone);
+bool sntp_set_timezone_in_seconds(sint32 timezone)
+{
+    return sntp_set_timezone((sint8)(timezone/(60*60))); //TODO: move this to the same file as sntp_set_timezone() in lwip1.4, and implement correctly over there.	
+}
+	
 void sntp_set_daylight(int daylight);
 
 int settimeofday(const struct timeval* tv, const struct timezone* tz)
