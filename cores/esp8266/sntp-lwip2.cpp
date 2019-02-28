@@ -436,7 +436,7 @@ bool sntp_set_timezone_in_seconds(sint32 timezone)
 /* Sets the timezone in hours. Internally, the timezone is converted to seconds. */
 bool sntp_set_timezone(sint8 timezone)
 {
-    return sntp_set_time_zone_in_seconds((sint32)timezone * 60 * 60);
+    return sntp_set_timezone_in_seconds((sint32)timezone * 60 * 60);
 }
 
 		   
