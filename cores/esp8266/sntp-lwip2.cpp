@@ -419,7 +419,7 @@ sint32 sntp_get_timezone_in_seconds(void)
 /* Returns the set timezone in hours. If the timezone was set as seconds, the fractional part is floored. */
 sint8 sntp_get_timezone(void)
 {
-    return (sint8)(time_zone / (60 * 60);
+    return (sint8)(time_zone / (60 * 60));
 }
 
 /* Sets the timezone in hours. Internally, the timezone is converted to seconds. */
