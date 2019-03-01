@@ -71,11 +71,15 @@ public:
         _lfs_cfg.prog_size = _pageSize;
         _lfs_cfg.block_size =  _blockSize;
         _lfs_cfg.block_count = _size / _blockSize;
-        _lfs_cfg.lookahead = 256;
+	_lfs_cfg.block_cycles = 16; // TODO - need better explanation
+	_lfs_cfg.cache_size = _blockSize;
+        _lfs_cfg.lookahead_size = 256;
         _lfs_cfg.read_buffer = nullptr;
         _lfs_cfg.prog_buffer = nullptr;
         _lfs_cfg.lookahead_buffer = nullptr;
-        _lfs_cfg.file_buffer = nullptr;
+        _lfs_cfg.name_max = 0;
+        _lfs_cfg.file_max = 0;
+        _lfs_cfg.attr_max = 0;
     }
 
     ~LittleFSImpl() {
@@ -234,19 +238,11 @@ protected:
         return _mounted;
     }
 
-    static int _lfs_traverse_cb(void *p, lfs_block_t b) {
-        (void) b;
-        *(lfs_size_t *)p += 1;
-        return 0;
-    }
-
     int _getUsedBlocks() {
-        lfs_size_t in_use = 0;
         if (!_mounted) {
             return 0;
         }
-        int err = lfs_traverse(&_lfs, _lfs_traverse_cb, &in_use);
-        return err ? 0 : in_use;
+        return lfs_fs_size(&_lfs);
     }
 
     static int _getFlags(OpenMode openMode, AccessMode accessMode) {
