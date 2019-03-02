@@ -58,13 +58,18 @@ void settimeofday_cb (void (*cb)(void))
 
 static const char stod14[] PROGMEM = "settimeofday() can't set time!\n";
 bool sntp_set_timezone(sint8 timezone);
+bool sntp_set_timezone_in_seconds(sint32 timezone)
+{
+    return sntp_set_timezone((sint8)(timezone/(60*60))); //TODO: move this to the same file as sntp_set_timezone() in lwip1.4, and implement correctly over there.	
+}
+	
 void sntp_set_daylight(int daylight);
 
 int settimeofday(const struct timeval* tv, const struct timezone* tz)
 {
     if (tz) /*before*/
     {
-        sntp_set_timezone(tz->tz_minuteswest / 60);
+        sntp_set_timezone_in_seconds(tz->tz_minuteswest * 60);
         // apparently tz->tz_dsttime is a bitfield and should not be further used (cf man)
         sntp_set_daylight(0);
     }
@@ -89,7 +94,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
 
 static uint32 realtime_stamp = 0;
 static uint16 dst = 0;
-static sint8 time_zone = 8; // espressif HQ's default timezone
+static sint32 time_zone = 8 * (60 * 60); // espressif HQ's default timezone
 LOCAL os_timer_t sntp_timer;
 
 /*****************************************/
@@ -410,14 +415,22 @@ char* sntp_get_real_time(time_t t)
     return sntp_asctime(sntp_localtime (&t));
 }
 
-sint8 sntp_get_timezone(void)
+/* Returns the set timezone in seconds. If the timezone was set as seconds, the fractional part is floored. */
+sint32 sntp_get_timezone_in_seconds(void)
 {
     return time_zone;
 }
 
-bool sntp_set_timezone(sint8 timezone)
+/* Returns the set timezone in hours. If the timezone was set as seconds, the fractional part is floored. */
+sint8 sntp_get_timezone(void)
 {
-    if(timezone >= -11 || timezone <= 13) {
+    return (sint8)(time_zone / (60 * 60));
+}
+
+/* Sets the timezone in hours. Internally, the timezone is converted to seconds. */
+bool sntp_set_timezone_in_seconds(sint32 timezone)
+{
+    if(timezone >= (-11 * (60 * 60)) || timezone <= (13 * (60 * 60))) {
         time_zone = timezone;
         return true;
     } else {
@@ -425,6 +438,13 @@ bool sntp_set_timezone(sint8 timezone)
     }
 }
 
+/* Sets the timezone in hours. Internally, the timezone is converted to seconds. */
+bool sntp_set_timezone(sint8 timezone)
+{
+    return sntp_set_timezone_in_seconds((sint32)timezone * 60 * 60);
+}
+
+		   
 void sntp_set_daylight(int daylight)
 {
     dst = daylight;
@@ -437,7 +457,7 @@ void ICACHE_RAM_ATTR sntp_time_inc (void)
 
 static void sntp_set_system_time (uint32_t t)
 {
-    realtime_stamp = t + time_zone * 60 * 60 + dst;
+    realtime_stamp = t + time_zone + dst;
     os_timer_disarm(&sntp_timer);
     os_timer_setfn(&sntp_timer, (os_timer_func_t *)sntp_time_inc, NULL);
     os_timer_arm(&sntp_timer, 1000, 1);
@@ -447,7 +467,7 @@ int settimeofday(const struct timeval* tv, const struct timezone* tz)
 {
     if (tz) /*before*/
     {
-        sntp_set_timezone(tz->tz_minuteswest / 60);
+        sntp_set_timezone_in_seconds(tz->tz_minuteswest * 60);
         // apparently tz->tz_dsttime is a bitfield and should not be further used (cf man)
         sntp_set_daylight(0);
     }
