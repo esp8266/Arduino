@@ -64,7 +64,8 @@ static void
 uart_do_write_char(const int uart_nr, char c)
 {
 	if (uart_nr >= UART0 && uart_nr <= UART1)
-		write(uart_nr + 1, &c, 1);
+		if (1 != write(uart_nr + 1, &c, 1))
+			fprintf(stderr, "Unable to write character to emulated UART stream: %d\n", c);
 }
 
 // write a new byte into the RX FIFO buffer
