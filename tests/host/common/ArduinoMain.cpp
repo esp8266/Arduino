@@ -55,7 +55,7 @@ int mockverbose (const char* fmt, ...)
 	va_list ap;
 	va_start(ap, fmt);
 	if (mockdebug)
-		return fprintf(stderr, "MOCK: ") + vfprintf(stderr, fmt, ap);
+		return fprintf(stderr, MOCK) + vfprintf(stderr, fmt, ap);
 	return 0;
 }
 
