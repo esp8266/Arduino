@@ -216,7 +216,7 @@ wifi_event_handler_cb_t wifi_event_handler_cb_emu = nullptr;
 void wifi_set_event_handler_cb (wifi_event_handler_cb_t cb)
 {
 	wifi_event_handler_cb_emu = cb;
-	fprintf(stderr, MOCK "TODO: wifi_set_event_handler_cb set\n");
+	mockverbose("TODO: wifi_set_event_handler_cb set\n");
 }
 
 bool wifi_set_ip_info (uint8 if_index, struct ip_info *info)

@@ -50,7 +50,7 @@ WiFiServer::WiFiServer (const IPAddress& addr, uint16_t port)
 	if (port < 1024)
 	{
 		int newport = port + 9000;
-		fprintf(stderr, MOCK "WiFiServer port: %d -> %d\n", port, newport);
+		mockverbose("WiFiServer port: %d -> %d\n", port, newport);
 		port = newport;
 	}
 	_port = port;
@@ -61,7 +61,7 @@ WiFiServer::WiFiServer (uint16_t port)
 	if (port < 1024)
 	{
 		int newport = port + 9000;
-		fprintf(stderr, MOCK "WiFiServer port: %d -> %d\n", port, newport);
+		mockverbose("WiFiServer port: %d -> %d\n", port, newport);
 		port = newport;
 	}
 	_port = port;

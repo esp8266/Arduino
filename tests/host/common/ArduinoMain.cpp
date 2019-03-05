@@ -44,10 +44,20 @@ const char* host_interface = nullptr;
 size_t spiffs_kb = 1024;
 bool ignore_sigint = false;
 bool restore_tty = false;
+bool mockdebug = false;
 
 #define STDIN STDIN_FILENO
 
 static struct termios initial_settings;
+
+int mockverbose (const char* fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	if (mockdebug)
+		return fprintf(stderr, "MOCK: ") + vfprintf(stderr, fmt, ap);
+	return 0;
+}
 
 static int mock_start_uart(void)
 {
@@ -98,6 +108,7 @@ void help (const char* argv0, int exitcode)
 		"	-f             - no throttle (possibly 100%%CPU)\n"
 		"	-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
 		"	-S             - spiffs size in KBytes (default: %zd)\n"
+		"	-v             - mock verbose\n"
 		"                  (negative value will force mismatched size)\n"
 		, argv0, spiffs_kb);
 	exit(exitcode);
@@ -110,6 +121,7 @@ static struct option options[] =
 	{ "local",		no_argument,		NULL, 'l' },
 	{ "sigint",		no_argument,		NULL, 'c' },
 	{ "blockinguart",	no_argument,		NULL, 'b' },
+	{ "verbose",		no_argument,		NULL, 'v' },
 	{ "interface",		required_argument,	NULL, 'i' },
 	{ "spiffskb",		required_argument,	NULL, 'S' },
 };
@@ -126,7 +138,7 @@ void control_c (int sig)
 
 	if (user_exit)
 	{
-		fprintf(stderr, MOCK "stuck, killing\n");
+		mockverbose("stuck, killing\n");
 		cleanup();
 		exit(1);
 	}
@@ -142,7 +154,7 @@ int main (int argc, char* const argv [])
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlcfbi:S:", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfbvi:S:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -167,6 +179,9 @@ int main (int argc, char* const argv [])
 			break;
 		case 'b':
 			blocking_uart = true;
+			break;
+		case 'v':
+			mockdebug = true;
 			break;
 		default:
 			help(argv[0], EXIT_FAILURE);

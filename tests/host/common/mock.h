@@ -77,6 +77,8 @@ extern "C" {
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
 
+int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
+
 extern const char* host_interface; // cmdline parameter
 
 #define NO_GLOBAL_BINDING 0xffffffff
