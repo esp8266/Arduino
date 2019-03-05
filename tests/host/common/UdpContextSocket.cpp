@@ -52,7 +52,19 @@ int mockUDPSocket ()
 
 bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 {
-	int optval = 1;
+	int optval;
+	int mockport;
+
+	mockport = port;
+	if (mockport < 1024 && mock_port_shifter)
+	{
+		mockport += mock_port_shifter;
+		fprintf(stderr, MOCK "=====> UdpServer port: %d shifted to %d (use option -s) <=====\n", port, mockport);
+	}
+	else
+		fprintf(stderr, MOCK "=====> UdpServer port: %d <=====\n", mockport);
+
+	optval = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1)
 		mockverbose("SO_REUSEPORT failed\n");
 	optval = 1;

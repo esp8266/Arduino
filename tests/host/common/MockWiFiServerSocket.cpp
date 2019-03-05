@@ -67,7 +67,17 @@ void WiFiServer::begin (uint16_t port)
 void WiFiServer::begin ()
 {
 	int sock;
+	int mockport;
 	struct sockaddr_in server;
+
+	mockport = _port;
+	if (mockport < 1024 && mock_port_shifter)
+	{
+		mockport += mock_port_shifter;
+		fprintf(stderr, MOCK "=====> WiFiServer port: %d shifted to %d (use option -s) <=====\n", _port, mockport);
+	}
+	else
+		fprintf(stderr, MOCK "=====> WiFiServer port: %d <=====\n", mockport);
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -83,7 +93,7 @@ void WiFiServer::begin ()
 	}
 
     	server.sin_family = AF_INET;
-	server.sin_port = htons(_port);
+	server.sin_port = htons(mockport);
 	server.sin_addr.s_addr = htonl(INADDR_ANY);
 	if (bind(sock, (struct sockaddr*)&server, sizeof(server)) == -1)
 	{

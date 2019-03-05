@@ -39,12 +39,15 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#define MOCK_PORT_SHIFTER 9000
+
 bool user_exit = false;
 const char* host_interface = nullptr;
 size_t spiffs_kb = 1024;
 bool ignore_sigint = false;
 bool restore_tty = false;
 bool mockdebug = false;
+int mock_port_shifter = MOCK_PORT_SHIFTER;
 
 #define STDIN STDIN_FILENO
 
@@ -119,13 +122,14 @@ void help (const char* argv0, int exitcode)
 		"	-h\n"
 		"	-i <interface> - use this interface for IP address\n"
 		"	-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
+		"	-s             - port shifter (default: %d, when root: 0)\n"
 		"	-c             - ignore CTRL-C (send it via Serial)\n"
 		"	-f             - no throttle (possibly 100%%CPU)\n"
 		"	-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
 		"	-S             - spiffs size in KBytes (default: %zd)\n"
 		"	-v             - mock verbose\n"
 		"                  (negative value will force mismatched size)\n"
-		, argv0, spiffs_kb);
+		, argv0, MOCK_PORT_SHIFTER, spiffs_kb);
 	exit(exitcode);
 }
 
@@ -139,6 +143,7 @@ static struct option options[] =
 	{ "verbose",		no_argument,		NULL, 'v' },
 	{ "interface",		required_argument,	NULL, 'i' },
 	{ "spiffskb",		required_argument,	NULL, 'S' },
+	{ "portshifter",	required_argument,	NULL, 's' },
 };
 
 void cleanup ()
@@ -162,14 +167,18 @@ void control_c (int sig)
 
 int main (int argc, char* const argv [])
 {
-	signal(SIGINT, control_c);
-
 	bool fast = false;
 	bool blocking_uart = false;
 
+	signal(SIGINT, control_c);
+	if (geteuid() == 0)
+		mock_port_shifter = 0;
+	else
+		mock_port_shifter = MOCK_PORT_SHIFTER;
+
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlcfbvi:S:", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfbvi:S:s:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -182,6 +191,9 @@ int main (int argc, char* const argv [])
 			break;
 		case 'l':
 			global_ipv4_netfmt = NO_GLOBAL_BINDING;
+			break;
+		case 's':
+			mock_port_shifter = atoi(optarg);
 			break;
 		case 'c':
 			ignore_sigint = true;
@@ -202,6 +214,8 @@ int main (int argc, char* const argv [])
 			help(argv[0], EXIT_FAILURE);
 		}
 	}
+
+	mockverbose("server port shifter: %d\n", mock_port_shifter);
 
 	if (spiffs_kb)
 	{
