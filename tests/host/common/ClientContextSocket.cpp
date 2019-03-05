@@ -43,7 +43,7 @@ int mockSockSetup (int sock)
 {
 	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
 	{
-		mockverbose("socket fcntl(O_NONBLOCK): %s\n", strerror(errno));
+		perror("socket fcntl(O_NONBLOCK)");
 		close(sock);
 		return -1;
 	}
@@ -52,7 +52,7 @@ int mockSockSetup (int sock)
 	int i = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &i, sizeof i) == -1)
 	{
-		mockverbose("sockopt(SO_NOSIGPIPE)(macOS): %s\n", strerror(errno));
+		perror("sockopt(SO_NOSIGPIPE)(macOS)");
 		close(sock);
 		return -1;
 	}
@@ -96,7 +96,7 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 	{
 		if (errno != EAGAIN)
 		{
-			mockverbose("ClientContext::(read/peek fd=%i): filling buffer for %zd bytes: %s\n", sock, maxread, strerror(errno));
+			fprintf(stderr, MOCK "ClientContext::(read/peek fd=%i): filling buffer for %zd bytes: %s\n", sock, maxread, strerror(errno));
 			return -1;
 		}
 		ret = 0;
@@ -159,7 +159,7 @@ ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 	int ret = poll(&p, 1, timeout_ms);
 	if (ret == -1)
 	{
-		mockverbose("ClientContext::write: poll(%d): %s\n", sock, strerror(errno));
+		fprintf(stderr, MOCK "ClientContext::write: poll(%d): %s\n", sock, strerror(errno));
 		return 0;
 	}
 	if (ret)
@@ -171,12 +171,12 @@ ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 #endif
 		if (ret == -1)
 		{
-			mockverbose("ClientContext::write(%d): %s\n", sock, strerror(errno));
+			fprintf(stderr, MOCK "ClientContext::write(%d): %s\n", sock, strerror(errno));
 			return -1;
 		}
 		if (ret != (int)size)
 		{
-			mockverbose("ClientContext::write: short write (%d < %zd) (TODO)\n", ret, size);
+			fprintf(stderr, MOCK "ClientContext::write: short write (%d < %zd) (FIXME poll loop TODO)\n", ret, size);
 			exit(EXIT_FAILURE);
 		}
 	}

@@ -44,7 +44,7 @@ int mockUDPSocket ()
 	int s;
 	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1 || fcntl(s, F_SETFL, O_NONBLOCK) == -1)
 	{
-		mockverbose("UDP socket: %s", strerror(errno));
+		fprintf(stderr, MOCK "UDP socket: %s", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	return s;
@@ -66,10 +66,10 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 
 	optval = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1)
-		mockverbose("SO_REUSEPORT failed\n");
+		fprintf(stderr, MOCK "SO_REUSEPORT failed\n");
 	optval = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
-		mockverbose("SO_REUSEADDR failed\n");
+		fprintf(stderr, MOCK "SO_REUSEADDR failed\n");
 
 	struct sockaddr_in servaddr;
 	memset(&servaddr, 0, sizeof(servaddr));
@@ -78,16 +78,16 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	servaddr.sin_family = AF_INET;
 	//servaddr.sin_addr.s_addr = global_ipv4_netfmt?: dstaddr;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(port);
+	servaddr.sin_port = htons(mockport);
 
 	// Bind the socket with the server address
 	if (bind(sock, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
 	{
-		mockverbose("UDP bind on port %d failed: %s\n", port, strerror(errno));
+		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", mockport, strerror(errno));
 		return false;
 	}
 	else
-		mockverbose("UDP server on port %d (sock=%d)\n", (int)port, sock);
+		mockverbose("UDP server on port %d (sock=%d)\n", mockport, sock);
 
 	if (mcast)
 	{
@@ -106,14 +106,14 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 #else
 			if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, host_interface, strlen(host_interface)) == -1)
 #endif
-				mockverbose("UDP multicast: can't setup bind/output on interface %s: %s\n", host_interface, strerror(errno));
+				fprintf(stderr, MOCK "UDP multicast: can't setup bind/output on interface %s: %s\n", host_interface, strerror(errno));
 			if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF, &mreq.imr_interface, sizeof(struct in_addr)) == -1)
-				mockverbose("UDP multicast: can't setup bind/input on interface %s: %s\n", host_interface, strerror(errno));
+				fprintf(stderr, MOCK "UDP multicast: can't setup bind/input on interface %s: %s\n", host_interface, strerror(errno));
 		}
 
 		if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0)
 		{
-			mockverbose("can't join multicast group addr %08x\n", (int)mcast);
+			fprintf(stderr, MOCK "can't join multicast group addr %08x\n", (int)mcast);
 			return false;
 		}
 	}
@@ -132,7 +132,7 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 	if (ret == -1)
 	{
 		if (errno != EAGAIN)
-			mockverbose("UDPContext::(read/peek): filling buffer for %zd bytes: %s\n", maxread, strerror(errno));
+			fprintf(stderr, MOCK "UDPContext::(read/peek): filling buffer for %zd bytes: %s\n", maxread, strerror(errno));
 		ret = 0;
 	}
 
@@ -143,7 +143,7 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 			memcpy(&addr[0], &(((sockaddr_in*)&addrbuf)->sin_addr.s_addr), addrsize = 4);
 		else
 		{
-			mockverbose("TODO UDP+IPv6\n");
+			fprintf(stderr, MOCK "TODO UDP+IPv6\n");
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -154,7 +154,7 @@ size_t mockUDPFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize, uint8_t& 
 size_t mockUDPPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
 	if (usersize > CCBUFSIZE)
-		mockverbose("CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
+		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
 	size_t retsize = 0;
 	if (ccinbufsize)
@@ -192,12 +192,12 @@ size_t mockUDPWrite (int sock, const uint8_t* data, size_t size, int timeout_ms,
 	int ret = ::sendto(sock, data, size, 0/*flags*/, (const sockaddr*)&peer, sizeof(peer));
 	if (ret == -1)
 	{
-		mockverbose("UDPContext::write: write(%d): %s\n", sock, strerror(errno));
+		fprintf(stderr, MOCK "UDPContext::write: write(%d): %s\n", sock, strerror(errno));
 		return 0;
 	}
 	if (ret != (int)size)
 	{
-		mockverbose("UDPContext::write: short write (%d < %zd) (TODO)\n", ret, size);
+		fprintf(stderr, MOCK "UDPContext::write: short write (%d < %zd) (TODO)\n", ret, size);
 		exit(EXIT_FAILURE);
 	}
 

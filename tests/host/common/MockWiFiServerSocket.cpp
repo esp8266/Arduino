@@ -127,7 +127,8 @@ size_t WiFiServer::write (uint8_t c)
 
 size_t WiFiServer::write (const uint8_t *buf, size_t size)
 {
-	mockverbose("todo: WiFiServer::write(%p, %zd)\n", buf, size);
+	fprintf(stderr, MOCK "todo: WiFiServer::write(%p, %zd)\n", buf, size);
+	exit(EXIT_FAILURE);
 	return 0;
 }
 

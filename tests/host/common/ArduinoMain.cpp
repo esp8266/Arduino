@@ -68,12 +68,12 @@ static int mock_start_uart(void)
 
 	if (!isatty(STDIN))
 	{
-		perror("isatty(STDIN)");
+		perror("setting tty in raw mode: isatty(STDIN)");
 		return -1;
 	}
 	if (tcgetattr(STDIN, &initial_settings) < 0)
 	{
-		perror("tcgetattr(STDIN)");
+		perror("setting tty in raw mode: tcgetattr(STDIN)");
 		return -1;
 	}
 	settings = initial_settings;
@@ -85,7 +85,7 @@ static int mock_start_uart(void)
 	settings.c_cc[VTIME] = 0;
 	if (tcsetattr(STDIN, TCSANOW, &settings) < 0)
 	{
-		perror("tcsetattr(STDIN)");
+		perror("setting tty in raw mode: tcsetattr(STDIN)");
 		return -1;
 	}
 	restore_tty = true;
@@ -96,12 +96,12 @@ static int mock_stop_uart(void)
 {
 	if (!restore_tty) return 0;
 	if (!isatty(STDIN)) {
-		perror("isatty(STDIN)");
+		perror("restoring tty: isatty(STDIN)");
 		return -1;
 	}
 	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0)
 	{
-		perror("tcsetattr(STDIN)");
+		perror("restoring tty: tcsetattr(STDIN)");
 		return -1;
 	}
 	printf("\e[?25h"); // show cursor
@@ -158,7 +158,7 @@ void control_c (int sig)
 
 	if (user_exit)
 	{
-		mockverbose("stuck, killing\n");
+		fprintf(stderr, MOCK "stuck, killing\n");
 		cleanup();
 		exit(1);
 	}
