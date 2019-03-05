@@ -63,8 +63,16 @@ static int mock_start_uart(void)
 {
 	struct termios settings;
 
-	if (!isatty(STDIN)) return 0;
-	if (tcgetattr(STDIN, &initial_settings) < 0) return -1;
+	if (!isatty(STDIN))
+	{
+		perror("isatty(STDIN)");
+		return -1;
+	}
+	if (tcgetattr(STDIN, &initial_settings) < 0)
+	{
+		perror("tcgetattr(STDIN)");
+		return -1;
+	}
 	settings = initial_settings;
 	settings.c_lflag &= ~(ignore_sigint ? ISIG : 0);
 	settings.c_lflag &= ~(ECHO	| ICANON);
@@ -72,7 +80,11 @@ static int mock_start_uart(void)
 	settings.c_oflag |=	(ONLCR);
 	settings.c_cc[VMIN]	= 0;
 	settings.c_cc[VTIME] = 0;
-	if (tcsetattr(STDIN, TCSANOW, &settings) < 0) return -2;
+	if (tcsetattr(STDIN, TCSANOW, &settings) < 0)
+	{
+		perror("tcsetattr(STDIN)");
+		return -1;
+	}
 	restore_tty = true;
 	return 0;
 }
@@ -82,10 +94,13 @@ static int mock_stop_uart(void)
 	if (!restore_tty) return 0;
 	if (!isatty(STDIN)) {
 		perror("isatty(STDIN)");
-		//system("stty sane"); <- same error message "Inappropriate ioctl for device"
-		return 0;
+		return -1;
 	}
-	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0) return -1;
+	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0)
+	{
+		perror("tcsetattr(STDIN)");
+		return -1;
+	}
 	printf("\e[?25h"); // show cursor
 	return (0);
 }
