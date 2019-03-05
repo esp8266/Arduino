@@ -96,6 +96,7 @@ void help (const char* argv0, int exitcode)
 		"	-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
 		"	-c             - ignore CTRL-C (send it via Serial)\n"
 		"	-f             - no throttle (possibly 100%%CPU)\n"
+		"	-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
 		"	-S             - spiffs size in KBytes (default: %zd)\n"
 		"                  (negative value will force mismatched size)\n"
 		, argv0, spiffs_kb);
@@ -108,6 +109,7 @@ static struct option options[] =
 	{ "fast",		no_argument,		NULL, 'f' },
 	{ "local",		no_argument,		NULL, 'l' },
 	{ "sigint",		no_argument,		NULL, 'c' },
+	{ "blockinguart",	no_argument,		NULL, 'b' },
 	{ "interface",		required_argument,	NULL, 'i' },
 	{ "spiffskb",		required_argument,	NULL, 'S' },
 };
@@ -136,10 +138,11 @@ int main (int argc, char* const argv [])
 	signal(SIGINT, control_c);
 
 	bool fast = false;
+	bool blocking_uart = false;
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlcfi:S:", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfbi:S:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -162,9 +165,11 @@ int main (int argc, char* const argv [])
 		case 'S':
 			spiffs_kb = atoi(optarg);
 			break;
+		case 'b':
+			blocking_uart = true;
+			break;
 		default:
-			fprintf(stderr, MOCK "bad option '%c'\n", n);
-			exit(EXIT_FAILURE);
+			help(argv[0], EXIT_FAILURE);
 		}
 	}
 
@@ -180,8 +185,11 @@ int main (int argc, char* const argv [])
 	// setup global global_ipv4_netfmt
 	wifi_get_ip_info(0, nullptr);
 
-	// set stdin to non blocking mode
-	mock_start_uart();
+	if (!blocking_uart)
+	{
+		// set stdin to non blocking mode
+		mock_start_uart();
+	}
 
 	// install exit handler in case Esp.restart() is called
 	atexit(cleanup);
