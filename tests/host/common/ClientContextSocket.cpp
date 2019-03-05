@@ -52,7 +52,8 @@ int mockSockSetup (int sock)
 	int i = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &i, sizeof i) == -1)
 	{
-		fprintf(stderr, MOCK "sockopt( SO_NOSIGPIPE)(macOS): %s\n", strerror(errno));
+		fprintf(stderr, MOCK "sockopt(SO_NOSIGPIPE)(macOS): %s\n", strerror(errno));
+		close(sock);
 		return -1;
 	}
 #endif
@@ -84,6 +85,13 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 {
 	size_t maxread = CCBUFSIZE - ccinbufsize;
 	ssize_t ret = ::read(sock, ccinbuf + ccinbufsize, maxread);
+
+	if (ret == 0)
+	{
+		// connection closed
+		return -1;
+	}
+
 	if (ret == -1)
 	{
 		if (errno != EAGAIN)
@@ -163,7 +171,7 @@ ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 #endif
 		if (ret == -1)
 		{
-			fprintf(stderr, MOCK "ClientContext::read: write(%d): %s\n", sock, strerror(errno));
+			fprintf(stderr, MOCK "ClientContext::write(%d): %s\n", sock, strerror(errno));
 			return -1;
 		}
 		if (ret != (int)size)

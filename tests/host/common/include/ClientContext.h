@@ -52,7 +52,10 @@ public:
     err_t abort()
     {
         if (_sock >= 0)
+        {
             ::close(_sock);
+	    printf(MOCK "socket %d closed\n", _sock);
+        }
         _sock = -1;
         return ERR_ABRT;
     }
@@ -160,7 +163,13 @@ public:
             return 0;
         if (_inbufsize)
             return _inbufsize;
-        return mockFillInBuf(_sock, _inbuf, _inbufsize);
+        ssize_t ret = mockFillInBuf(_sock, _inbuf, _inbufsize);
+        if (ret < 0)
+        {
+            abort();
+            return 0;
+        }
+        return ret;
     }
 
     int read()
@@ -174,7 +183,7 @@ public:
         ssize_t ret = mockRead(_sock, dst, size, 0, _inbuf, _inbufsize);
         if (ret < 0)
         {
-            abort(); // close, CLOSED
+            abort();
             return 0;
         }
         return ret;
@@ -188,7 +197,13 @@ public:
 
     size_t peekBytes(char *dst, size_t size)
     {
-        return mockPeekBytes(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
+        ssize_t ret = mockPeekBytes(_sock, dst, size, _timeout_ms, _inbuf, _inbufsize);
+        if (ret < 0)
+        {
+            abort();
+            return 0;
+        }
+        return ret;
     }
 
     void discard_received()
@@ -202,8 +217,9 @@ public:
         return true;
     }
 
-    uint8_t state() const
+    uint8_t state()
     {
+	(void)getSize(); // read on socket to force detect closed peer
         return _sock >= 0? ESTABLISHED: CLOSED;
     }
 
@@ -212,7 +228,7 @@ public:
 	ssize_t ret = mockWrite(_sock, data, size, _timeout_ms);
 	if (ret < 0)
 	{
-	    abort(); // close, CLOSED
+	    abort();
 	    return 0;
 	}
 	return ret;
