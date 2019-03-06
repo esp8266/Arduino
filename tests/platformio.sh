@@ -40,6 +40,10 @@ function build_sketches_with_platformio()
             echo -e "\n ------------ Skipping $sketch ------------ \n";
             continue
         fi
+        if [[ $(skip_ino $sketch) = 1 ]]; then
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
+            continue
+        fi
         local build_cmd="pio ci $sketchdir $build_arg"
         echo -e "\n ------------ Building $sketch ------------ \n";
         echo "$build_cmd"
