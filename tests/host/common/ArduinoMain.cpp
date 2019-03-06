@@ -39,22 +39,43 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#define MOCK_PORT_SHIFTER 9000
+
 bool user_exit = false;
 const char* host_interface = nullptr;
 size_t spiffs_kb = 1024;
 bool ignore_sigint = false;
 bool restore_tty = false;
+bool mockdebug = false;
+int mock_port_shifter = MOCK_PORT_SHIFTER;
 
 #define STDIN STDIN_FILENO
 
 static struct termios initial_settings;
 
+int mockverbose (const char* fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	if (mockdebug)
+		return fprintf(stderr, MOCK) + vfprintf(stderr, fmt, ap);
+	return 0;
+}
+
 static int mock_start_uart(void)
 {
 	struct termios settings;
 
-	if (!isatty(STDIN)) return 0;
-	if (tcgetattr(STDIN, &initial_settings) < 0) return -1;
+	if (!isatty(STDIN))
+	{
+		perror("setting tty in raw mode: isatty(STDIN)");
+		return -1;
+	}
+	if (tcgetattr(STDIN, &initial_settings) < 0)
+	{
+		perror("setting tty in raw mode: tcgetattr(STDIN)");
+		return -1;
+	}
 	settings = initial_settings;
 	settings.c_lflag &= ~(ignore_sigint ? ISIG : 0);
 	settings.c_lflag &= ~(ECHO	| ICANON);
@@ -62,7 +83,11 @@ static int mock_start_uart(void)
 	settings.c_oflag |=	(ONLCR);
 	settings.c_cc[VMIN]	= 0;
 	settings.c_cc[VTIME] = 0;
-	if (tcsetattr(STDIN, TCSANOW, &settings) < 0) return -2;
+	if (tcsetattr(STDIN, TCSANOW, &settings) < 0)
+	{
+		perror("setting tty in raw mode: tcsetattr(STDIN)");
+		return -1;
+	}
 	restore_tty = true;
 	return 0;
 }
@@ -71,11 +96,14 @@ static int mock_stop_uart(void)
 {
 	if (!restore_tty) return 0;
 	if (!isatty(STDIN)) {
-		perror("isatty(STDIN)");
-		//system("stty sane"); <- same error message "Inappropriate ioctl for device"
-		return 0;
+		perror("restoring tty: isatty(STDIN)");
+		return -1;
 	}
-	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0) return -1;
+	if (tcsetattr(STDIN, TCSANOW, &initial_settings) < 0)
+	{
+		perror("restoring tty: tcsetattr(STDIN)");
+		return -1;
+	}
 	printf("\e[?25h"); // show cursor
 	return (0);
 }
@@ -94,11 +122,14 @@ void help (const char* argv0, int exitcode)
 		"	-h\n"
 		"	-i <interface> - use this interface for IP address\n"
 		"	-l             - bind tcp/udp servers to interface only (not 0.0.0.0)\n"
+		"	-s             - port shifter (default: %d, when root: 0)\n"
 		"	-c             - ignore CTRL-C (send it via Serial)\n"
 		"	-f             - no throttle (possibly 100%%CPU)\n"
+		"	-b             - blocking tty/mocked-uart (default: not blocking tty)\n"
 		"	-S             - spiffs size in KBytes (default: %zd)\n"
+		"	-v             - mock verbose\n"
 		"                  (negative value will force mismatched size)\n"
-		, argv0, spiffs_kb);
+		, argv0, MOCK_PORT_SHIFTER, spiffs_kb);
 	exit(exitcode);
 }
 
@@ -108,8 +139,11 @@ static struct option options[] =
 	{ "fast",		no_argument,		NULL, 'f' },
 	{ "local",		no_argument,		NULL, 'l' },
 	{ "sigint",		no_argument,		NULL, 'c' },
+	{ "blockinguart",	no_argument,		NULL, 'b' },
+	{ "verbose",		no_argument,		NULL, 'v' },
 	{ "interface",		required_argument,	NULL, 'i' },
 	{ "spiffskb",		required_argument,	NULL, 'S' },
+	{ "portshifter",	required_argument,	NULL, 's' },
 };
 
 void cleanup ()
@@ -133,13 +167,18 @@ void control_c (int sig)
 
 int main (int argc, char* const argv [])
 {
-	signal(SIGINT, control_c);
-
 	bool fast = false;
+	bool blocking_uart = false;
+
+	signal(SIGINT, control_c);
+	if (geteuid() == 0)
+		mock_port_shifter = 0;
+	else
+		mock_port_shifter = MOCK_PORT_SHIFTER;
 
 	for (;;)
 	{
-		int n = getopt_long(argc, argv, "hlcfi:S:", options, NULL);
+		int n = getopt_long(argc, argv, "hlcfbvi:S:s:", options, NULL);
 		if (n < 0)
 			break;
 		switch (n)
@@ -153,6 +192,9 @@ int main (int argc, char* const argv [])
 		case 'l':
 			global_ipv4_netfmt = NO_GLOBAL_BINDING;
 			break;
+		case 's':
+			mock_port_shifter = atoi(optarg);
+			break;
 		case 'c':
 			ignore_sigint = true;
 			break;
@@ -162,11 +204,18 @@ int main (int argc, char* const argv [])
 		case 'S':
 			spiffs_kb = atoi(optarg);
 			break;
+		case 'b':
+			blocking_uart = true;
+			break;
+		case 'v':
+			mockdebug = true;
+			break;
 		default:
-			fprintf(stderr, MOCK "bad option '%c'\n", n);
-			exit(EXIT_FAILURE);
+			help(argv[0], EXIT_FAILURE);
 		}
 	}
+
+	mockverbose("server port shifter: %d\n", mock_port_shifter);
 
 	if (spiffs_kb)
 	{
@@ -180,8 +229,11 @@ int main (int argc, char* const argv [])
 	// setup global global_ipv4_netfmt
 	wifi_get_ip_info(0, nullptr);
 
-	// set stdin to non blocking mode
-	mock_start_uart();
+	if (!blocking_uart)
+	{
+		// set stdin to non blocking mode
+		mock_start_uart();
+	}
 
 	// install exit handler in case Esp.restart() is called
 	atexit(cleanup);
