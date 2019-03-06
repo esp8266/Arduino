@@ -2,6 +2,7 @@ BINDIR := bin
 LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := ../../cores/esp8266
+LIBRARIES_PATH := ../../libraries
 FORCE32 ?= 1
 OPTZ ?= -Os
 V ?= 0
@@ -66,7 +67,18 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	libb64/cdecode.cpp \
 	Schedule.cpp \
 	HardwareSerial.cpp \
-)
+	) \
+	$(addprefix $(LIBRARIES_PATH)/ESP8266SdFat/src/, \
+		FatLib/FatFile.cpp \
+		FatLib/FatFileLFN.cpp \
+		FatLib/FatFilePrint.cpp \
+		FatLib/FatFileSFN.cpp \
+		FatLib/FatVolume.cpp \
+		FatLib/FmtNumber.cpp \
+		FatLib/StdioStream.cpp \
+	) \
+	$(LIBRARIES_PATH)/SDFS/src/SDFS.cpp \
+	$(LIBRARIES_PATH)/SD/src/SD.cpp
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
 )
@@ -74,6 +86,7 @@ CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
 MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	Arduino.cpp \
 	spiffs_mock.cpp \
+	sdfs_mock.cpp \
 	WMath.cpp \
 	MockUART.cpp \
 	MockTools.cpp \
@@ -129,6 +142,7 @@ endif
 FLAGS += $(DEBUG) -Wall -coverage $(OPTZ) -fno-common -g $(M32)
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
+FLAGS += -DHOST_MOCK=1
 FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
 CXXFLAGS += -std=c++11 $(FLAGS)
