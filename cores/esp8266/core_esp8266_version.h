@@ -54,6 +54,20 @@ extern "C++"
 //     esp8266CoreVersionSubRevision() is 3   Numeric is: 20499903
 // case 2.5.0:
 //     esp8266CoreVersionSubRevision() is 0   Numeric is: 20500000
+//
+// Using esp8266::coreVersionNumeric() in a portable way:
+//
+//   #if HAS_ESP8266_VERSION_NUMERIC
+//       if (esp8266::coreVersionNumeric() >= 20500042)
+//       {
+//           // modern api can be used
+//       }
+//       else
+//   #endif
+//       {
+//           // code using older api
+//           // (will not be compiled in when newer api is usable)
+//       }
 
 namespace conststr {
 
