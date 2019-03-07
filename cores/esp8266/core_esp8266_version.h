@@ -22,6 +22,8 @@
 #ifndef __CORE_ESP8266_VERSION_H
 #define __CORE_ESP8266_VERSION_H
 
+#define HAS_ESP8266_VERSION_NUMERIC 1
+
 #include <core_version.h>
 
 #define __STRHELPER(x) #x
