@@ -135,7 +135,7 @@ public:
     return _currentClient.write(file);
   }
 
-  static const String responseCodeToString(int code);
+  static const String responseCodeToString(const int code);
 
 protected:
   virtual size_t _currentClientWrite(const char* b, size_t l) { return _currentClient.write( b, l ); }

@@ -625,7 +625,7 @@ void ESP8266WebServer::_finalizeResponse() {
   }
 }
 
-const String ESP8266WebServer::responseCodeToString(int code) {
+const String ESP8266WebServer::responseCodeToString(const int code) {
   switch (code) {
     case 100: return F("Continue");
     case 101: return F("Switching Protocols");
