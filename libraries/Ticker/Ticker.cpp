@@ -68,7 +68,7 @@ void Ticker::detach()
 	_callback_function = nullptr;
 }
 
-bool Ticker::active()
+bool Ticker::active() const
 {
 	return (bool)_timer;
 }
