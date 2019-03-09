@@ -12,8 +12,8 @@ import os
 sys.argv.pop(0) # Remove executable name
 toolspath = os.path.dirname(os.path.realpath(__file__)).replace('\\', '/') # CWD in UNIX format
 try:
-    sys.path.append(toolspath + "/pyserial") # Add pyserial dir to search path
-    sys.path.append(toolspath + "/esptool") # Add esptool dir to search path
+    sys.path.insert(0, toolspath + "/pyserial") # Add pyserial dir to search path
+    sys.path.insert(0, toolspath + "/esptool") # Add esptool dir to search path
     import esptool # If this fails, we can't continue and will bomb below
 except:
     sys.stderr.write("Error in command line, need pyserial path as 1st arg and esptool path as 2nd.\n")
