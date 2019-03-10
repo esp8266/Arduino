@@ -343,6 +343,11 @@ TEST_CASE("Multisplendored File::writes", "[fs]")
     f.write('a');
     f.write(65);
     f.write("bbcc");
+    f.write("theend", 6);
+    char block[3]={'x','y','z'};
+    f.write(block, 3);
+    uint32_t bigone = 0x40404040;
+    f.write((const uint8_t*)&bigone, 4);
     f.close();
-    REQUIRE(readFileSD("/file.txt") == "aAbbcc");
+    REQUIRE(readFileSD("/file.txt") == "aAbbcctheendxyz@@@@");
 }
