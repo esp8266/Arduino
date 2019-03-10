@@ -331,3 +331,18 @@ TEST_CASE("Listfiles.ino example", "[sd]")
     REQUIRE(readFileSD("/dir2/dir3/file4") == "bonjour");
 }
 
+TEST_CASE("Multisplendored File::writes", "[fs]")
+{
+    SDFS_MOCK_DECLARE();
+    SDFS.end();
+    SDFS.setConfig(SDFSConfig(0, SD_SCK_MHZ(1)));
+    REQUIRE(SDFS.format());
+    REQUIRE(SD.begin(4));
+
+    File f = SD.open("/file.txt", FILE_WRITE);
+    f.write('a');
+    f.write(65);
+    f.write("bbcc");
+    f.close();
+    REQUIRE(readFileSD("/file.txt") == "aAbbcc");
+}
