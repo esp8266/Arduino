@@ -54,6 +54,11 @@ public:
     // Print methods:
     size_t write(uint8_t) override;
     size_t write(const uint8_t *buf, size_t size) override;
+    size_t write(int8_t t) { return write((uint8_t)t); }
+    size_t write(int16_t t) { return write((uint8_t)(t & 0xff)); }
+    size_t write(int32_t t) { return write((uint8_t)(t & 0xff)); }
+    size_t write(uint16_t t) { return write((uint8_t)(t & 0xff)); }
+    size_t write(uint32_t t) { return write((uint8_t)(t & 0xff)); }
 
     // Stream methods:
     int available() override;
