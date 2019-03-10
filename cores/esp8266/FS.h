@@ -54,6 +54,7 @@ public:
     // Print methods:
     size_t write(uint8_t) override;
     size_t write(const uint8_t *buf, size_t size) override;
+    // These handle ambiguity for write(0) case
     size_t write(int8_t t) { return write((uint8_t)t); }
     size_t write(int16_t t) { return write((uint8_t)(t & 0xff)); }
     size_t write(int32_t t) { return write((uint8_t)(t & 0xff)); }
@@ -86,16 +87,16 @@ public:
 
     // Arduino "class SD" methods for compatibility
     template<typename T> size_t write(T &src){
-      uint8_t obuf[512];
+      uint8_t obuf[256];
       size_t doneLen = 0;
       size_t sentLen;
       int i;
 
-      while (src.available() > 512){
-        src.read(obuf, 512);
-        sentLen = write(obuf, 512);
+      while (src.available() > sizeof(obuf)){
+        src.read(obuf, sizeof(obuf));
+        sentLen = write(obuf, sizeof(obuf));
         doneLen = doneLen + sentLen;
-        if(sentLen != 512){
+        if(sentLen != sizeof(obuf)){
           return doneLen;
         }
       }
