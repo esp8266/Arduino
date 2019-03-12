@@ -2,3 +2,5 @@
 .hardware
 test_report.xml
 test_report.html
+test_env.cfg
+test_BearSSL/data

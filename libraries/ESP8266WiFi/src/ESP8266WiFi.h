@@ -40,10 +40,12 @@ extern "C" {
 #include "WiFiServer.h"
 #include "WiFiServerSecure.h"
 #include "WiFiClientSecure.h"
+#include "BearSSLHelpers.h"
+#include "CertStoreBearSSL.h"
 
 #ifdef DEBUG_ESP_WIFI
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_WIFI(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_WIFI(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ##__VA_ARGS__ )
 #endif
 #endif
 

@@ -23,7 +23,13 @@ extern "C" {
     #include "mem.h"
 }
 
+#ifdef malloc
+  #undef malloc
+#endif
 #define malloc      os_malloc
+#ifdef free
+  #undef free
+#endif
 #define free        os_free
 
 // #define AVRISP_DEBUG(fmt, ...)     os_printf("[AVRP] " fmt "\r\n", ##__VA_ARGS__ )
@@ -68,10 +74,7 @@ AVRISPState_t ESP8266AVRISP::update() {
             if (_server.hasClient()) {
                 _client = _server.available();
                 _client.setNoDelay(true);
-                ip_addr_t lip;
-                lip.addr = _client.remoteIP();
-                AVRISP_DEBUG("client connect %d.%d.%d.%d:%d", IP2STR(&lip), _client.remotePort());
-                (void) lip; // Avoid unused warning when not in debug mode
+                AVRISP_DEBUG("client connect %s:%d", _client.remoteIP().toString().c_str(), _client.remotePort());
                 _client.setTimeout(100); // for getch()
                 _state = AVRISP_STATE_PENDING;
                 _reject_incoming();

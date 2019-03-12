@@ -1,6 +1,6 @@
 /*
   Servo.h - Interrupt driven Servo library for Esp8266 using timers
-  Copyright (c) 2015 Michael C. Miller. All right reserved.
+  Original Copyright (c) 2015 Michael C. Miller. All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,6 @@
 //   the desired pin to the attach() method.
 //   The servos are pulsed in the background using the value most recently
 //   written using the write() method.
-//
-//   This library uses timer0 and timer1.
-//   Note that timer0 may be repurposed when the first servo is attached.
-//
-//   Timers are seized as needed in groups of 12 servos - 24 servos use two
-//   timers, there are only two timers for the esp8266 so the support stops here
-//   The sequence used to sieze timers is defined in timers.h
 //
 //   The methods are:
 //
@@ -58,15 +51,7 @@
 #define DEFAULT_PULSE_WIDTH  1500     // default pulse width when servo is attached
 #define REFRESH_INTERVAL    20000     // minumim time to refresh servos in microseconds 
 
-// NOTE: to maintain a strict refresh interval the user needs to not exceede 8 servos 
-#define SERVOS_PER_TIMER       12     // the maximum number of servos controlled by one timer 
-#define MAX_SERVOS   (ServoTimerSequence_COUNT  * SERVOS_PER_TIMER)
-
-#if defined(ESP8266)
-
-#include "esp8266/ServoTimers.h"
-
-#else
+#if !defined(ESP8266)
 
 #error "This library only supports esp8266 boards."
 
@@ -76,6 +61,7 @@ class Servo
 {
 public:
     Servo();
+    ~Servo();
     uint8_t attach(int pin);           // attach the given pin to the next free channel, sets pinMode, returns channel number or 0 if failure
     uint8_t attach(int pin, uint16_t min, uint16_t max); // as above but also sets min and max values for writes. 
     void detach();
@@ -85,9 +71,11 @@ public:
     int readMicroseconds();            // returns current pulse width in microseconds for this servo (was read_us() in first release)
     bool attached();                   // return true if this servo is attached, otherwise false 
 private:
-    uint8_t _servoIndex;               // index into the channel data for this servo
+    bool     _attached;
+    uint8_t  _pin;
     uint16_t _minUs;                   
     uint16_t _maxUs;                   
+    uint16_t _valueUs;
 };
 
 #endif

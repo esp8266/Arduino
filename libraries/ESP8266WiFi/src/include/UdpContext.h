@@ -30,9 +30,9 @@ void esp_schedule();
 #include <assert.h>
 }
 
+#include <AddrList.h>
 
-#define GET_IP_HDR(pb) reinterpret_cast<ip_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN - IP_HLEN);
-#define GET_UDP_HDR(pb) reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN);
+#define GET_UDP_HDR(pb) (reinterpret_cast<udp_hdr*>(((uint8_t*)((pb)->payload)) - UDP_HLEN))
 
 class UdpContext
 {
@@ -90,36 +90,82 @@ public:
         }
     }
 
-    bool connect(ip_addr_t addr, uint16_t port)
+#if LWIP_VERSION_MAJOR == 1
+
+    bool connect(IPAddress addr, uint16_t port)
     {
-        ip_addr_copy(_pcb->remote_ip, addr);
+        _pcb->remote_ip = addr;
         _pcb->remote_port = port;
         return true;
     }
 
-    bool listen(ip_addr_t addr, uint16_t port)
+    bool listen(IPAddress addr, uint16_t port)
     {
         udp_recv(_pcb, &_s_recv, (void *) this);
-        err_t err = udp_bind(_pcb, &addr, port);
+        err_t err = udp_bind(_pcb, addr, port);
         return err == ERR_OK;
     }
+
+#else // lwIP-v2
+
+    bool connect(const IPAddress& addr, uint16_t port)
+    {
+        _pcb->remote_ip = addr;
+        _pcb->remote_port = port;
+        return true;
+    }
+
+    bool listen(const IPAddress& addr, uint16_t port)
+    {
+        udp_recv(_pcb, &_s_recv, (void *) this);
+        err_t err = udp_bind(_pcb, addr, port);
+        return err == ERR_OK;
+    }
+
+#endif // lwIP-v2
 
     void disconnect()
     {
         udp_disconnect(_pcb);
     }
 
+#if LWIP_IPV6
+
+    void setMulticastInterface(IPAddress addr)
+    {
+        // Per 'udp_set_multicast_netif_addr()' signature and comments
+        // in lwIP sources:
+        // An IPv4 address designating a specific interface must be used.
+        // When an IPv6 address is given, the matching IPv4 in the same
+        // interface must be selected.
+
+        if (!addr.isV4())
+        {
+            for (auto a: addrList)
+                if (a.addr() == addr)
+                {
+                    // found the IPv6 address,
+                    // redirect parameter to IPv4 address in this interface
+                    addr = a.ipv4();
+                    break;
+                }
+            assert(addr.isV4());
+        }
+        udp_set_multicast_netif_addr(_pcb, ip_2_ip4((const ip_addr_t*)addr));
+    }
+
+#else // !LWIP_IPV6
+
+    void setMulticastInterface(const IPAddress& addr)
+    {
 #if LWIP_VERSION_MAJOR == 1
-    void setMulticastInterface(ip_addr_t addr)
-    {
-        udp_set_multicast_netif_addr(_pcb, addr);
-    }
+        udp_set_multicast_netif_addr(_pcb, (ip_addr_t)addr);
 #else
-    void setMulticastInterface(const ip_addr_t& addr)
-    {
-        udp_set_multicast_netif_addr(_pcb, &addr);
-    }
+        udp_set_multicast_netif_addr(_pcb, ip_2_ip4((const ip_addr_t*)addr));
 #endif
+    }
+
+#endif // !LWIP_IPV6
 
     void setMulticastTTL(int ttl)
     {
@@ -159,38 +205,29 @@ public:
         return (pos <= _rx_buf->len);
     }
 
-    uint32_t getRemoteAddress()
+    CONST IPAddress& getRemoteAddress() CONST
     {
-        if (!_rx_buf)
-            return 0;
-
-        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return iphdr->src.addr;
+        return _src_addr;
     }
 
-    uint16_t getRemotePort()
+    uint16_t getRemotePort() const
     {
         if (!_rx_buf)
             return 0;
 
         udp_hdr* udphdr = GET_UDP_HDR(_rx_buf);
-        return ntohs(udphdr->src);
+        return lwip_ntohs(udphdr->src);
     }
 
-    uint32_t getDestAddress()
+    const IPAddress& getDestAddress() const
     {
-        if (!_rx_buf)
-            return 0;
-
-        ip_hdr* iphdr = GET_IP_HDR(_rx_buf);
-        return iphdr->dest.addr;
+        return _dst_addr;
     }
 
-    uint16_t getLocalPort()
+    uint16_t getLocalPort() const
     {
         if (!_pcb)
             return 0;
-
         return _pcb->local_port;
     }
 
@@ -242,7 +279,7 @@ public:
         return size;
     }
 
-    int peek()
+    int peek() const
     {
         if (!_rx_buf || _rx_buf_offset == _rx_buf->len)
             return -1;
@@ -252,12 +289,12 @@ public:
 
     void flush()
     {
+        //XXX this does not follow Arduino's flush definition
         if (!_rx_buf)
             return;
 
         _consume(_rx_buf->len - _rx_buf_offset);
     }
-
 
     size_t append(const char* data, size_t size)
     {
@@ -291,7 +328,7 @@ public:
         return size;
     }
 
-    bool send(ip_addr_t* addr = 0, uint16_t port = 0)
+    bool send(CONST ip_addr_t* addr = 0, uint16_t port = 0)
     {
         size_t data_size = _tx_buf_offset;
         pbuf* tx_copy = pbuf_alloc(PBUF_TRANSPORT, data_size, PBUF_RAM);
@@ -402,21 +439,33 @@ private:
             _rx_buf = pb;
             _rx_buf_offset = 0;
         }
+
+        // --> Arduino's UDP is a stream but UDP is not <--
+        // When IPv6 is enabled, we store addresses from here
+        // because lwIP's macro are valid only in this callback
+        // (there's no easy way to safely guess whether packet
+        //  is from v4 or v6 when we have only access to payload)
+        // Because of this stream-ed way this is inacurate when
+        // user does not swallow data quickly enough (the former
+        // IPv4-only way suffers from the exact same issue.
+
+#if LWIP_VERSION_MAJOR == 1
+        _src_addr = current_iphdr_src;
+        _dst_addr = current_iphdr_dest;
+#else
+        _src_addr = ip_data.current_iphdr_src;
+        _dst_addr = ip_data.current_iphdr_dest;
+#endif
+
         if (_on_rx) {
             _on_rx();
         }
     }
 
 
-#if LWIP_VERSION_MAJOR == 1
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            ip_addr_t *addr, u16_t port)
-#else
-    static void _s_recv(void *arg,
-            udp_pcb *upcb, pbuf *p,
-            const ip_addr_t *addr, u16_t port)
-#endif
+            CONST ip_addr_t *addr, u16_t port)
     {
         reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, addr, port);
     }
@@ -434,6 +483,7 @@ private:
 #ifdef LWIP_MAYBE_XCC
     uint16_t _mcast_ttl;
 #endif
+    IPAddress _src_addr, _dst_addr;
 };
 
 
