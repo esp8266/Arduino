@@ -331,3 +331,31 @@ TEST_CASE("Listfiles.ino example", "[sd]")
     REQUIRE(readFileSD("/dir2/dir3/file4") == "bonjour");
 }
 
+TEST_CASE("Multisplendored File::writes", "[fs]")
+{
+    SDFS_MOCK_DECLARE();
+    SDFS.end();
+    SDFS.setConfig(SDFSConfig(0, SD_SCK_MHZ(1)));
+    REQUIRE(SDFS.format());
+    REQUIRE(SD.begin(4));
+
+    File f = SD.open("/file.txt", FILE_WRITE);
+    f.write('a');
+    f.write(65);
+    f.write("bbcc");
+    f.write("theend", 6);
+    char block[3]={'x','y','z'};
+    f.write(block, 3);
+    uint32_t bigone = 0x40404040;
+    f.write((const uint8_t*)&bigone, 4);
+    f.close();
+    REQUIRE(readFileSD("/file.txt") == "aAbbcctheendxyz@@@@");
+    File g = SD.open("/file.txt", FILE_WRITE);
+    g.write(0);
+    g.close();
+    g = SD.open("/file.txt", FILE_READ);
+    uint8_t u = 0x66;
+    g.read(&u, 1);
+    g.close();
+    REQUIRE(u == 0);
+}
