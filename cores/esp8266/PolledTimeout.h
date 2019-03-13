@@ -47,15 +47,38 @@ struct YieldOrSkip
 
 } //YieldPolicy
 
+namespace TimePolicy
+{
 
-template <bool PeriodicT, typename YieldPolicyT = YieldPolicy::DoNothing>  
+struct TimeMillis
+{
+  static decltype(millis()) time() {return millis();}
+  static constexpr decltype(millis()) toMillis = 1;
+};
+
+#ifdef CORE_MOCK
+struct TimeCycle: public TimeMillis {};
+#else
+
+struct TimeCycle
+{
+  static decltype(ESP.getCycleCount()) time() {return ESP.getCycleCount();}
+  static constexpr decltype(ESP.getCycleCount()) toMillis = F_CPU / 1000;
+};
+
+#endif // cpu cycles
+
+
+} //TimePolicy
+
+template <bool PeriodicT, typename YieldPolicyT = YieldPolicy::DoNothing, typename TimePolicyT = TimePolicy::TimeMillis>
 class timeoutTemplate
 {
 public:
-  using timeType = decltype(millis());
+  using timeType = decltype(TimePolicyT::time());
   
   timeoutTemplate(timeType timeout) 
-    : _timeout(timeout), _start(millis())  
+    : _timeout(timeout * TimePolicyT::toMillis), _start(TimePolicyT::time())
   {} 
 
   bool expired()
@@ -79,7 +102,7 @@ public:
 
   void reset()
   {
-    _start = millis(); 
+    _start = TimePolicyT::time();
   }
 
   timeType getTimeout() const
@@ -96,7 +119,7 @@ protected:
   
   bool expiredRetrigger()
   {
-    timeType current = millis();
+    timeType current = TimePolicyT::time();
     if(checkExpired(current))
     {
       unsigned long n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
@@ -108,15 +131,25 @@ protected:
   
   bool expiredOneShot() const
   {
-    return checkExpired(millis());
+    return checkExpired(TimePolicyT::time());
   }
   
   timeType _timeout;
   timeType _start;
 };
 
-using oneShot = polledTimeout::timeoutTemplate<false>;
-using periodic = polledTimeout::timeoutTemplate<true>;
+using oneShotMs        = polledTimeout::timeoutTemplate<false>;
+using periodicMs       = polledTimeout::timeoutTemplate<true>;
+using oneShotMsYield   = polledTimeout::timeoutTemplate<false, YieldPolicy::YieldOrSkip>;
+using periodicMsYield  = polledTimeout::timeoutTemplate<true,  YieldPolicy::YieldOrSkip>;
+using oneShotCpu       = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing,   TimePolicy::TimeCycle>;
+using periodicCpu      = polledTimeout::timeoutTemplate<true,  YieldPolicy::DoNothing,   TimePolicy::TimeCycle>;
+using oneShotCpuYield  = polledTimeout::timeoutTemplate<false, YieldPolicy::YieldOrSkip, TimePolicy::TimeCycle>;
+using periodicCpuYield = polledTimeout::timeoutTemplate<true,  YieldPolicy::YieldOrSkip, TimePolicy::TimeCycle>;
+
+// default / generic / backward compatibility
+using oneShot = oneShotMs;
+using periodic = periodicMs;
 
 } //polledTimeout
 
