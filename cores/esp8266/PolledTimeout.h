@@ -52,8 +52,9 @@ namespace TimePolicy
 
 struct TimeMillis
 {
-  static decltype(millis()) time() {return millis();}
-  static constexpr decltype(millis()) toMillis = 1;
+  using timeType = decltype(millis());
+  static timeType time() {return millis();}
+  static constexpr timeType toMillis = 1;
 };
 
 #ifdef CORE_MOCK
@@ -62,8 +63,9 @@ struct TimeCycle: public TimeMillis {};
 
 struct TimeCycle
 {
-  static decltype(ESP.getCycleCount()) time() {return ESP.getCycleCount();}
-  static constexpr decltype(ESP.getCycleCount()) toMillis = F_CPU / 1000;
+  using timeType = decltype(ESP.getCycleCount());
+  static timeType time() {return ESP.getCycleCount();}
+  static constexpr timeType toMillis = F_CPU / 1000;
 };
 
 #endif // cpu cycles
