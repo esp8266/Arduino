@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #ifdef DEBUG_ESP_CORE
-#define DEBUGV(fmt, ...) ::putprintf(ets_putc, (PGM_P)PSTR(fmt), ## __VA_ARGS__)
+#define DEBUGV(fmt, ...) ::printf((PGM_P)PSTR(fmt), ## __VA_ARGS__)
 #endif
 
 #ifndef DEBUGV
@@ -24,8 +24,6 @@ extern "C" {
 
 void __panic_func(const char* file, int line, const char* func) __attribute__((noreturn));
 #define panic() __panic_func(PSTR(__FILE__), __LINE__, __func__)
-
-int putprintf (int (*put)(int), const char* fmt, ...);
 
 #ifdef __cplusplus
 }
