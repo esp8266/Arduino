@@ -87,3 +87,27 @@ coreVersionMinor	LITERAL1
 coreVersionRevision	LITERAL1
 coreVersionSubRevision	LITERAL1
 coreVersionNumeric	LITERAL1
+
+# Filesystem objects
+SPIFFS	KEYWORD1
+SDFS	KEYWORD1
+File	KEYWORD1
+Dir	KEYWORD1
+SPIFFSConfig	KEYWORD1
+
+# Seek enums
+SeekSet	LITERAL1
+SeekCur	LITERAL1
+SeekEnd	LITERAL1
+
+# Filesystem methods (not covered by Stream or Print)
+format	KEYWORD2
+info	KEYWORD2
+exists	KEYWORD2
+openDir	KEYWORD2
+remove	KEYWORD2
+rename	KEYWORD2
+mkdir	KEYWORD2
+rmdir	KEYWORD2
+isFile	KEYWORD2
+isDirectory	KEYWORD2

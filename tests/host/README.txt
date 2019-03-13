@@ -19,6 +19,13 @@ WiFiClient+WiFiServer/ClientContext and WifiUdp/UdpContext using socket
 posix API.  Further work will optionally propose native lwIP library
 instead.
 
+Serial UART0 and UART1 are emulated via stdin/stdout/stderr.  Therefor
+stdin is connected to UART0(RX) and stdout is connected to UART0(TX).
+UART1(TX) writes to stderr.  Reading from stdin happens in non-blocking
+raw mode, that means each character is directly injected into the UART
+FIFO without any buffering in the console.  The command line switch -c
+can be used to stop the emulation from intersepting CTRL-C (SIGINT).
+
 How to compile and run a sketch
 -------------------------------
 
@@ -73,7 +80,10 @@ Options are available:
 	-h
 	-i eth0		bind servers to this interface (WIP)
 	-l		bind Multicast to the above interface (WIP)
-	-f              no throttle (possibly 100%CPU)
+	-c		ignore CTRL-C (send it over serial device)
+	-f		no throttle (possibly 100%CPU)
+	-S		spiffs size in KBytes (default: 1024)
+			(negative value will force mismatched size)
 
 TODO
 ----

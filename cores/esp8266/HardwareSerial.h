@@ -152,22 +152,6 @@ public:
     {
         return uart_write_char(_uart, c);
     }
-    inline size_t write(unsigned long n)
-    {
-        return write((uint8_t) n);
-    }
-    inline size_t write(long n)
-    {
-        return write((uint8_t) n);
-    }
-    inline size_t write(unsigned int n)
-    {
-        return write((uint8_t) n);
-    }
-    inline size_t write(int n)
-    {
-        return write((uint8_t) n);
-    }
     size_t write(const uint8_t *buffer, size_t size) override
     {
         return uart_write(_uart, (const char*)buffer, size);

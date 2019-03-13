@@ -192,7 +192,7 @@ bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& passphrase, in
 /**
  * Configure access point
  * @param local_ip      access point IP
- * @param gateway       gateway IP
+ * @param gateway       gateway IP (0.0.0.0 to disable)
  * @param subnet        subnet mask
  */
 bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
@@ -248,7 +248,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
         ret = false;
     }
 
-    uint8 mode = 1;
+    uint8 mode = info.gw.addr ? 1 : 0;
     if(!wifi_softap_set_dhcps_offer_option(OFFER_ROUTER, &mode)) {
         DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_offer_option failed!\n");
         ret = false;
