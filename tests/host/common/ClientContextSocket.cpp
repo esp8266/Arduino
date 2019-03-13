@@ -43,7 +43,7 @@ int mockSockSetup (int sock)
 {
 	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
 	{
-		fprintf(stderr, MOCK "socket fcntl(O_NONBLOCK): %s\n", strerror(errno));
+		perror("socket fcntl(O_NONBLOCK)");
 		close(sock);
 		return -1;
 	}
@@ -52,7 +52,8 @@ int mockSockSetup (int sock)
 	int i = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &i, sizeof i) == -1)
 	{
-		fprintf(stderr, MOCK "sockopt( SO_NOSIGPIPE)(macOS): %s\n", strerror(errno));
+		perror("sockopt(SO_NOSIGPIPE)(macOS)");
+		close(sock);
 		return -1;
 	}
 #endif
@@ -84,6 +85,13 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 {
 	size_t maxread = CCBUFSIZE - ccinbufsize;
 	ssize_t ret = ::read(sock, ccinbuf + ccinbufsize, maxread);
+
+	if (ret == 0)
+	{
+		// connection closed
+		return -1;
+	}
+
 	if (ret == -1)
 	{
 		if (errno != EAGAIN)
@@ -100,7 +108,7 @@ ssize_t mockFillInBuf (int sock, char* ccinbuf, size_t& ccinbufsize)
 ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, char* ccinbuf, size_t& ccinbufsize)
 {
 	if (usersize > CCBUFSIZE)
-		fprintf(stderr, MOCK "CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
+		mockverbose("CCBUFSIZE(%d) should be increased by %zd bytes (-> %zd)\n", CCBUFSIZE, usersize - CCBUFSIZE, usersize);
 
 	struct pollfd p;
 	size_t retsize = 0;
@@ -163,12 +171,12 @@ ssize_t mockWrite (int sock, const uint8_t* data, size_t size, int timeout_ms)
 #endif
 		if (ret == -1)
 		{
-			fprintf(stderr, MOCK "ClientContext::read: write(%d): %s\n", sock, strerror(errno));
+			fprintf(stderr, MOCK "ClientContext::write(%d): %s\n", sock, strerror(errno));
 			return -1;
 		}
 		if (ret != (int)size)
 		{
-			fprintf(stderr, MOCK "ClientContext::write: short write (%d < %zd) (TODO)\n", ret, size);
+			fprintf(stderr, MOCK "ClientContext::write: short write (%d < %zd) (FIXME poll loop TODO)\n", ret, size);
 			exit(EXIT_FAILURE);
 		}
 	}

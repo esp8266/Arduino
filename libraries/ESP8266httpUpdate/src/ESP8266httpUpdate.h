@@ -74,6 +74,11 @@ public:
         _rebootOnUpdate = reboot;
     }
 
+    void followRedirects(bool follow)
+    {
+        _followRedirects = follow;
+    }
+
     void setLedPin(int ledPin = -1, uint8_t ledOn = HIGH)
     {
         _ledPin = ledPin;
@@ -129,6 +134,7 @@ protected:
     bool _rebootOnUpdate = true;
 private:
     int _httpClientTimeout;
+    bool _followRedirects;
 
     int _ledPin;
     uint8_t _ledOn;
