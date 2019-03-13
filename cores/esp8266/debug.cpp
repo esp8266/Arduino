@@ -35,3 +35,13 @@ void ICACHE_RAM_ATTR hexdump(const void *mem, uint32_t len, uint8_t cols) {
     os_printf("\n");
 }
 
+int putprintf (int (*put)(int), const char* fmt, ...) {
+        char buf[128];
+        va_list ap;
+        va_start(ap, fmt);
+        int len = ::vsnprintf(buf, sizeof(buf), fmt, ap);
+        for (int i = 0; i < len; i++)
+                put(buf[i]);
+        va_end(ap);
+        return len;
+}
