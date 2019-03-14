@@ -34,4 +34,3 @@ void ICACHE_RAM_ATTR hexdump(const void *mem, uint32_t len, uint8_t cols) {
     }
     os_printf("\n");
 }
-
