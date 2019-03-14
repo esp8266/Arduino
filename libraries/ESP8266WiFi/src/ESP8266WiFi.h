@@ -50,7 +50,7 @@ extern "C" {
 #endif
 
 #ifndef DEBUG_WIFI
-#define DEBUG_WIFI(...)
+#define DEBUG_WIFI(...) do { (void)0; } while (0)
 #endif
 
 

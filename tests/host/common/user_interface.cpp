@@ -84,7 +84,7 @@ bool wifi_station_get_config (struct station_config *config)
 		config->bssid[i] = i;
 	config->threshold.rssi = 1;
 	config->threshold.authmode = AUTH_WPA_PSK;
-#ifndef NONOSDK221
+#ifdef NONOSDK3V0
 	config->open_and_wep_mode_disable = true;
 #endif
 	return true;
@@ -192,7 +192,7 @@ uint8 wifi_get_opmode_default (void)
 	return STATION_MODE;
 }
 
-#ifndef NONOSDK221
+#ifdef NONOSDK3V0
 
 sleep_level_t wifi_get_sleep_level (void)
 {
@@ -248,7 +248,7 @@ bool wifi_set_phy_mode (phy_mode_t mode)
 	return true;
 }
 
-#ifndef NONOSDK221
+#ifdef NONOSDK3V0
 
 bool wifi_set_sleep_level (sleep_level_t level)
 {

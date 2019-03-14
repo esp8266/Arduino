@@ -42,7 +42,7 @@
 #endif
 
 #ifndef DEBUG_HTTPCLIENT
-#define DEBUG_HTTPCLIENT(...)
+#define DEBUG_HTTPCLIENT(...) do { (void)0; } while (0)
 #endif
 
 #define HTTPCLIENT_DEFAULT_TCP_TIMEOUT (5000)
