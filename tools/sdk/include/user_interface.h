@@ -253,7 +253,7 @@ struct station_config {
                         // with both ssid[] and bssid[] matched. Please check about this.
     uint8 bssid[6];
     wifi_fast_scan_threshold_t threshold;
-#ifndef NONOSDK221
+#ifdef NONOSDK3V0
     bool open_and_wep_mode_disable; // Can connect to open/wep router by default.
 #endif
 };
@@ -434,7 +434,7 @@ typedef enum {
     MODEM_SLEEP_T
 } sleep_type_t;
 
-#ifndef NONOSDK221
+#ifdef NONOSDK3V0
 
 typedef enum {
     MIN_SLEEP_T,
