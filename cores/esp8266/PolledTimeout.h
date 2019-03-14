@@ -77,7 +77,7 @@ template <bool PeriodicT, typename YieldPolicyT = YieldPolicy::DoNothing, typena
 class timeoutTemplate
 {
 public:
-  using timeType = decltype(TimePolicyT::time());
+  using timeType = typename TimePolicyT::timeType;
   
   timeoutTemplate(timeType timeout) 
     : _timeout(timeout * TimePolicyT::toMillis), _start(TimePolicyT::time())
