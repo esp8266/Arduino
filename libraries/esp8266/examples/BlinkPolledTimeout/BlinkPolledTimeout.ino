@@ -38,8 +38,9 @@ void ledToggle() {
 }
 
 
+esp8266::polledTimeout::periodic halfPeriod(500); //use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
-esp8266::polledTimeout::periodicCpu halfPeriod(500); //use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
+// also available: lighter esp8266::polledTimeout::periodicCycleMs for durations shorter than 13000 ms
 
 // the setup function runs only once at start
 void setup() {

@@ -24,6 +24,7 @@
  */
 
 #include <Arduino.h>
+#include <assert.h>
 
 namespace esp8266
 {
@@ -50,22 +51,44 @@ struct YieldOrSkip
 namespace TimePolicy
 {
 
+#ifndef MAXSCALAR
+#define MAXSCALAR(type,sz_bit)  ((type)((((((type)1)<<((sz_bit)-1))-1)<<1)+1))
+#define MAXUSCALAR(type)        MAXSCALAR(type,(sizeof(type)<<3))
+#define MAXSSCALAR(type)        MAXSCALAR(type,(sizeof(type)<<3)-1)
+#define MINSSCALAR(type)        ((type)((type)1<<((sizeof(type)<<3)-1)))
+#endif
+
+
 struct TimeMillis
 {
+  // time policy in milli-seconds based on millis()
+
   using timeType = decltype(millis());
   static timeType time() {return millis();}
   static constexpr timeType toMillis = 1;
+
+  // rollover: 48 days, setting max to 24 days to fit in signed scalar (below is = 2^31 - 1)
+  static constexpr timeType timeMax() { return (((((timeType)1) << ((sizeof(timeType) * 8) - 2)) - 1) << 1) + 1; }
 };
 
 #ifdef CORE_MOCK
-struct TimeCycle: public TimeMillis {};
+struct TimeCycleMs: public TimeMillis {};
 #else
 
-struct TimeCycle
+struct TimeCycleMs
 {
+  // time policy in milli-seconds based on ESP.getCycleCount()
+
   using timeType = decltype(ESP.getCycleCount());
   static timeType time() {return ESP.getCycleCount();}
   static constexpr timeType toMillis = F_CPU / 1000;
+
+  // rollover: @80Mhz:53.6s @160Mhz:26.8s
+  // setting max to half of it to ensure full range is never reached
+  // - this particular time measurement is intended to be called very often
+  //   (every loop, every yield)
+  // - this max is larger than internal watchdogs
+  static constexpr timeType timeMax() { return ((((uint64_t)1000) << (sizeof(timeType) * 8)) / F_CPU) / 2; }
 };
 
 #endif // cpu cycles
@@ -81,7 +104,9 @@ public:
   
   timeoutTemplate(timeType timeout) 
     : _timeout(timeout * TimePolicyT::toMillis), _start(TimePolicyT::time())
-  {} 
+  {
+    assert(timeout < TimePolicyT::timeMax());
+  }
 
   bool expired()
   {
@@ -140,18 +165,10 @@ protected:
   timeType _start;
 };
 
-using oneShotMs        = polledTimeout::timeoutTemplate<false>;
-using periodicMs       = polledTimeout::timeoutTemplate<true>;
-using oneShotMsYield   = polledTimeout::timeoutTemplate<false, YieldPolicy::YieldOrSkip>;
-using periodicMsYield  = polledTimeout::timeoutTemplate<true,  YieldPolicy::YieldOrSkip>;
-using oneShotCpu       = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing,   TimePolicy::TimeCycle>;
-using periodicCpu      = polledTimeout::timeoutTemplate<true,  YieldPolicy::DoNothing,   TimePolicy::TimeCycle>;
-using oneShotCpuYield  = polledTimeout::timeoutTemplate<false, YieldPolicy::YieldOrSkip, TimePolicy::TimeCycle>;
-using periodicCpuYield = polledTimeout::timeoutTemplate<true,  YieldPolicy::YieldOrSkip, TimePolicy::TimeCycle>;
-
-// default / generic / backward compatibility
-using oneShot = oneShotMs;
-using periodic = periodicMs;
+using oneShot = polledTimeout::timeoutTemplate<false>;
+using periodic = polledTimeout::timeoutTemplate<true>;
+using oneShotCycleMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeCycleMs>;
+using periodicCycleMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeCycleMs>;
 
 } //polledTimeout
 
