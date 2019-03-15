@@ -51,14 +51,6 @@ struct YieldOrSkip
 namespace TimePolicy
 {
 
-#ifndef MAXSCALAR
-#define MAXSCALAR(type,sz_bit)  ((type)((((((type)1)<<((sz_bit)-1))-1)<<1)+1))
-#define MAXUSCALAR(type)        MAXSCALAR(type,(sizeof(type)<<3))
-#define MAXSSCALAR(type)        MAXSCALAR(type,(sizeof(type)<<3)-1)
-#define MINSSCALAR(type)        ((type)((type)1<<((sizeof(type)<<3)-1)))
-#endif
-
-
 struct TimeMillis
 {
   // time policy in milli-seconds based on millis()
