@@ -57,7 +57,7 @@ struct TimeMillis
 
   using timeType = decltype(millis());
   static timeType time() {return millis();}
-  static constexpr timeType toMillis = 1;
+  static constexpr timeType toUnit = 1;
 
   // rollover: 48 days, setting max to 24 days to fit in signed scalar (below is = 2^31 - 1)
   static constexpr timeType timeMax() { return (((((timeType)1) << ((sizeof(timeType) * 8) - 2)) - 1) << 1) + 1; }
@@ -67,23 +67,39 @@ struct TimeMillis
 struct TimeCycleMs: public TimeMillis {};
 #else
 
-struct TimeCycleMs
+struct TimeFastMillis
 {
   // time policy in milli-seconds based on ESP.getCycleCount()
 
   using timeType = decltype(ESP.getCycleCount());
   static timeType time() {return ESP.getCycleCount();}
-  static constexpr timeType toMillis = F_CPU / 1000;
+  static constexpr timeType toUnit = F_CPU / 1000;
 
   // rollover: @80Mhz:53.6s @160Mhz:26.8s
   // setting max to half of it to ensure full range is never reached
   // - this particular time measurement is intended to be called very often
   //   (every loop, every yield)
   // - this max is larger than internal watchdogs
-  static constexpr timeType timeMax() { return ((((uint64_t)1000) << (sizeof(timeType) * 8)) / F_CPU) / 2; }
+  static constexpr timeType timeMax() { return (((timeType)1) << ((sizeof(timeType) * 8) - 2)) / (F_CPU / 2 / 1000); }
 };
 
-#endif // cpu cycles
+struct TimeFastMicros
+{
+  // time policy in micro-seconds based on ESP.getCycleCount()
+
+  using timeType = decltype(ESP.getCycleCount());
+  static timeType time() {return ESP.getCycleCount();}
+  static constexpr timeType toUnit = F_CPU / 1000000;
+
+  // rollover: @80Mhz:53.6s @160Mhz:26.8s
+  // setting max to half of it to ensure full range is never reached
+  // - this particular time measurement is intended to be called very often
+  //   (every loop, every yield)
+  // - this max is larger than internal watchdogs
+  static constexpr timeType timeMax() { return (((timeType)1) << ((sizeof(timeType) * 8) - 2)) / (F_CPU / 2 / 1000000); }
+};
+
+#endif // !MOCK
 
 
 } //TimePolicy
@@ -95,7 +111,7 @@ public:
   using timeType = typename TimePolicyT::timeType;
   
   timeoutTemplate(timeType timeout) 
-    : _timeout(timeout * TimePolicyT::toMillis), _start(TimePolicyT::time())
+    : _timeout(timeout * TimePolicyT::toUnit), _start(TimePolicyT::time())
   {
     assert(timeout < TimePolicyT::timeMax());
   }
@@ -133,7 +149,12 @@ public:
   {
     return (t - _start) >=  _timeout;
   }
- 
+
+  static constexpr timeType getTimeMax()
+  {
+    return TimePolicyT::timeMax();
+  }
+
 protected:
   
   bool expiredRetrigger()
@@ -157,10 +178,15 @@ protected:
   timeType _start;
 };
 
-using oneShot = polledTimeout::timeoutTemplate<false>;
-using periodic = polledTimeout::timeoutTemplate<true>;
-using oneShotCycleMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeCycleMs>;
-using periodicCycleMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeCycleMs>;
+using oneShot = polledTimeout::timeoutTemplate<false>;    // legacy, same as oneShotMs
+using periodic = polledTimeout::timeoutTemplate<true>;    // legacy, same as periodicMs
+
+using oneShotMs = polledTimeout::timeoutTemplate<false>;
+using periodicMs = polledTimeout::timeoutTemplate<true>;
+using oneShotFastMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
+using periodicFastMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
+using oneShotFastUs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMicros>;
+using periodicFastUs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMicros>;
 
 } //polledTimeout
 
