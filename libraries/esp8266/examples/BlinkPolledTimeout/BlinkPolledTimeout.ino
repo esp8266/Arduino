@@ -38,21 +38,19 @@ void ledToggle() {
 }
 
 
-esp8266::polledTimeout::periodic halfPeriod(500); //use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
-
-// also available: lighter esp8266::polledTimeout::periodicCycleMs for durations shorter than 13000 ms
+esp8266::polledTimeout::periodicFastUs halfPeriod(500000); //use fully qualified type and avoid importing all ::esp8266 namespace to the global namespace
 
 // the setup function runs only once at start
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
 
-  using esp8266::polledTimeout::oneShot; //import the type to the local namespace
+  using esp8266::polledTimeout::oneShotMs; //import the type to the local namespace
 
   //STEP1; turn the led ON
   ledOn();
 
   //STEP2: wait for ON timeout
-  oneShot timeoutOn(2000);
+  oneShotMs timeoutOn(2000);
   while (!timeoutOn) {
     yield();
   }
@@ -61,7 +59,7 @@ void setup() {
   ledOff();
 
   //STEP4: wait for OFF timeout to assure the led is kept off for this time before exiting setup
-  oneShot timeoutOff(2000);
+  oneShotMs timeoutOff(2000);
   while (!timeoutOff) {
     yield();
   }
