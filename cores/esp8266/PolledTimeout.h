@@ -63,10 +63,6 @@ struct TimeMillis
   static constexpr timeType timeMax() { return (((((timeType)1) << ((sizeof(timeType) * 8) - 2)) - 1) << 1) + 1; }
 };
 
-#ifdef CORE_MOCK
-struct TimeCycleMs: public TimeMillis {};
-#else
-
 struct TimeFastMillis
 {
   // time policy in milli-seconds based on ESP.getCycleCount()
@@ -98,9 +94,6 @@ struct TimeFastMicros
   // - this max is larger than internal watchdogs
   static constexpr timeType timeMax() { return (((timeType)1) << ((sizeof(timeType) * 8) - 2)) / (F_CPU / 2 / 1000000); }
 };
-
-#endif // !MOCK
-
 
 } //TimePolicy
 

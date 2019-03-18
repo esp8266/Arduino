@@ -29,6 +29,8 @@
  DEALINGS WITH THE SOFTWARE.
 */
 
+#define CORE_MOCK 1
+
 // include host's STL before any other include file
 // because core definition like max() is in the way
 
@@ -137,8 +139,6 @@ void mock_start_spiffs (const String& fname, size_t size_kb, size_t block_kb = 8
 void mock_stop_spiffs ();
 
 //
-
-#define CORE_MOCK 1
 
 #define ARDUINO 267
 #define ESP8266 1

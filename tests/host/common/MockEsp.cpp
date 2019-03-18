@@ -32,6 +32,8 @@
 #include <Esp.h>
 #include <eboot_command.h>
 
+#include <sys/time.h>
+
 #include <stdlib.h>
 
 unsigned long long operator"" _kHz(unsigned long long x) {
@@ -215,3 +217,9 @@ void EspClass::resetFreeContStack()
 {
 }
 
+uint32_t EspClass::getCycleCount()
+{
+    timeval t;
+    gettimeofday(&t, NULL);
+    return (((uint64_t)t.tv_sec) * 1000000 + t.tv_usec) * (F_CPU / 1000000);
+}
