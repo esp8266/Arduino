@@ -83,6 +83,12 @@ TEST_CASE("String constructors", "[core][String]")
     REQUIRE(ssh == "3.14159_abcd");
     String flash = (F("hello from flash"));
     REQUIRE(flash == "hello from flash");
+    const char textarray[6] = {'h', 'e', 'l', 'l', 'o', 0};
+    String hello(textarray);
+    REQUIRE(hello == "hello");
+    String hello2;
+    hello2 = textarray;
+    REQUIRE(hello2 == "hello");
 }
 
 TEST_CASE("String concantenation", "[core][String]")
@@ -360,4 +366,8 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s == "0123456789abcdefghijklmnopqrstu");
     REQUIRE(s.length() == 31);
   }
+  s = "0123456789abcde";
+  s = s.substring(s.indexOf('a'));
+  REQUIRE(s == "abcde");
+  REQUIRE(s.length() == 5);
 }

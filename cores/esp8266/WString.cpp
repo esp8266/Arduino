@@ -129,6 +129,7 @@ String::~String() {
 // /*********************************************/
 
 inline void String::init(void) {
+    memset(sso_buf, 0, sizeof(sso_buf));
     setSSO(false);
     setCapacity(0);
     setLen(0);
@@ -161,11 +162,11 @@ unsigned char String::changeBuffer(unsigned int maxStrLen) {
             return 1;
         } else { // if bufptr && !sso()
             // Using bufptr, need to shrink into sso_buff
-            char temp[sizeof(sso_buf)];
+            char temp[sizeof(sso_buf)] = {0};
             memcpy(temp, buffer(), maxStrLen);
             free(wbuffer());
             setSSO(true);
-            memcpy(wbuffer(), temp, maxStrLen);
+            memcpy(wbuffer(), temp, sizeof(sso_buf));
             return 1;
         }
     }
