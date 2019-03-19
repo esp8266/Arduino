@@ -29,5 +29,6 @@ void __panic_func(const char* file, int line, const char* func) __attribute__((n
 }
 #endif
 
+extern const char* polledTimeoutOverflowMessage;
 
 #endif//ARD_DEBUG_H

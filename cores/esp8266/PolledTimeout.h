@@ -24,6 +24,7 @@
  */
 
 #include <Arduino.h>
+#include <debug.h> // polledTimeoutOverflowMessage
 
 namespace esp8266
 {
@@ -123,13 +124,16 @@ public:
     return TimePolicyT::timeMax();
   }
 
-  timeoutTemplate(timeType timeout) 
+  timeoutTemplate(const timeType timeout)
     : _timeout((timeout * TimePolicyT::toUnitMul) / TimePolicyT::toUnitDiv), _start(TimePolicyT::time())
   {
     if (timeout > timeMax())
     {
       _timeout = timeMax();
-      ::printf((PGM_P)F("polledTimeout: overflow\r\n"));
+#ifndef NDEBUG
+      // not displayed when NoAssert-NDEBUG is enabled
+      ::printf(polledTimeoutOverflowMessage);
+#endif
     }
   }
 
