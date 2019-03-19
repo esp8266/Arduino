@@ -24,7 +24,6 @@
  */
 
 #include <Arduino.h>
-#include <debug.h> // polledTimeoutOverflowMessage
 
 namespace esp8266
 {
