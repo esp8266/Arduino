@@ -13,6 +13,40 @@ fuzzycomp(argT a, argT b)
   return (std::max(a,b) - std::min(a,b) <= epsilon);
 }
 
+TEST_CASE("OneShot Timeout 500000000ns (0.5s)", "[polledTimeout]")
+{
+  using esp8266::polledTimeout::oneShotFastNs;
+  using timeType = oneShotFastNs::timeType;
+  timeType before, after, delta;
+
+  Serial.println("OneShot Timeout 500000000ns (0.5s)");
+
+  oneShotFastNs timeout(500000000);
+  before = micros();
+  while(!timeout.expired())
+    yield();
+  after = micros();
+
+  delta = after - before;
+  Serial.printf("delta = %u\n", delta);
+
+  REQUIRE(fuzzycomp(delta/1000, (timeType)500));
+
+
+  Serial.print("reset\n");
+
+  timeout.reset();
+  before = micros();
+  while(!timeout)
+    yield();
+  after = micros();
+
+  delta = after - before;
+  Serial.printf("delta = %u\n", delta);
+
+  REQUIRE(fuzzycomp(delta/1000, (timeType)500));
+}
+
 TEST_CASE("OneShot Timeout 3000000us", "[polledTimeout]")
 {
   using esp8266::polledTimeout::oneShotFastUs;

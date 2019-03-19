@@ -24,7 +24,6 @@
  */
 
 #include <Arduino.h>
-#include <assert.h>
 
 namespace esp8266
 {
@@ -57,7 +56,8 @@ struct TimeMillis
 
   using timeType = decltype(millis());
   static timeType time() {return millis();}
-  static constexpr timeType toUnit = 1;
+  static constexpr timeType toUnitMul = 1;
+  static constexpr timeType toUnitDiv = 1;
 
   // rollover: 48 days, setting max to 24 days to fit in signed scalar (below is = 2^31 - 1)
   static constexpr timeType timeMax() { return (((((timeType)1) << ((sizeof(timeType) * 8) - 2)) - 1) << 1) + 1; }
@@ -69,14 +69,15 @@ struct TimeFastMillis
 
   using timeType = decltype(ESP.getCycleCount());
   static timeType time() {return ESP.getCycleCount();}
-  static constexpr timeType toUnit = F_CPU / 1000;
+  static constexpr timeType toUnitMul = F_CPU / 1000;
+  static constexpr timeType toUnitDiv = 1;
 
   // rollover: @80Mhz:53.6s @160Mhz:26.8s
   // setting max to half of it to ensure full range is never reached
   // - this particular time measurement is intended to be called very often
   //   (every loop, every yield)
   // - this max is larger than internal watchdogs
-  static constexpr timeType timeMax() { return (((timeType)1) << ((sizeof(timeType) * 8) - 2)) / (F_CPU / 2 / 1000); }
+  static constexpr timeType timeMax() { return (((timeType)1) << ((sizeof(timeType) * 8) - 2)) / (toUnitMul / 2); }
 };
 
 struct TimeFastMicros
@@ -85,14 +86,28 @@ struct TimeFastMicros
 
   using timeType = decltype(ESP.getCycleCount());
   static timeType time() {return ESP.getCycleCount();}
-  static constexpr timeType toUnit = F_CPU / 1000000;
+  static constexpr timeType toUnitMul = F_CPU / 1000000;
+  static constexpr timeType toUnitDiv = 1;
 
   // rollover: @80Mhz:53.6s @160Mhz:26.8s
   // setting max to half of it to ensure full range is never reached
   // - this particular time measurement is intended to be called very often
   //   (every loop, every yield)
   // - this max is larger than internal watchdogs
-  static constexpr timeType timeMax() { return (((timeType)1) << ((sizeof(timeType) * 8) - 2)) / (F_CPU / 2 / 1000000); }
+  static constexpr timeType timeMax() { return (((timeType)1) << ((sizeof(timeType) * 8) - 2)) / (toUnitMul / 2); }
+};
+
+struct TimeFastNanos
+{
+  // time policy in nano-seconds based on ESP.getCycleCount()
+
+  using timeType = decltype(ESP.getCycleCount());
+  static timeType time() {return ESP.getCycleCount();}
+  static constexpr timeType toUnitMul = F_CPU / 40000000;
+  static constexpr timeType toUnitDiv = 25;
+
+  // timeMax is max (signed 32 bits) / toUnitMul = (2^31 / 4(@160MHz)) = 0.536 seconds
+  static constexpr timeType timeMax() { return (((((timeType)1) << ((sizeof(timeType) * 8) - 2 - 2)) - 1) << 1) + 1; }
 };
 
 } //TimePolicy
@@ -103,10 +118,19 @@ class timeoutTemplate
 public:
   using timeType = typename TimePolicyT::timeType;
   
-  timeoutTemplate(timeType timeout) 
-    : _timeout(timeout * TimePolicyT::toUnit), _start(TimePolicyT::time())
+  static constexpr timeType timeMax ()
   {
-    assert(timeout < TimePolicyT::timeMax());
+    return TimePolicyT::timeMax();
+  }
+
+  timeoutTemplate(timeType timeout) 
+    : _timeout((timeout * TimePolicyT::toUnitMul) / TimePolicyT::toUnitDiv), _start(TimePolicyT::time())
+  {
+    if (timeout > timeMax())
+    {
+      timeout = timeMax();
+      ::printf((PGM_P)F("polledTimeout: overflow\r\n"));
+    }
   }
 
   bool expired()
@@ -171,15 +195,29 @@ protected:
   timeType _start;
 };
 
-using oneShot = polledTimeout::timeoutTemplate<false>;    // legacy, same as oneShotMs
-using periodic = polledTimeout::timeoutTemplate<true>;    // legacy, same as periodicMs
+// legacy type names, deprecated (unit is milliseconds)
+
+using oneShot = polledTimeout::timeoutTemplate<false> /*__attribute__((deprecated("use oneShotMs")))*/;
+using periodic = polledTimeout::timeoutTemplate<true> /*__attribute__((deprecated("use periodicMs")))*/;
+
+// standard versions (based on millis())
+// timeMax() is 24 days (~ 2000000000 ms)
 
 using oneShotMs = polledTimeout::timeoutTemplate<false>;
 using periodicMs = polledTimeout::timeoutTemplate<true>;
+
+// "Fast" versions sacrifices time range for improved precision and reduced code size (factor ~100)
+// timeMax() values:
+// Ms: max is 13421       ms (13.4   s)
+// Us: max is 13421772    us (13.4   s)
+// Ns: max is   536870911 ns ( 0.536 s)
+
 using oneShotFastMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
 using periodicFastMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
 using oneShotFastUs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMicros>;
 using periodicFastUs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMicros>;
+using oneShotFastNs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastNanos>;
+using periodicFastNs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastNanos>;
 
 } //polledTimeout
 

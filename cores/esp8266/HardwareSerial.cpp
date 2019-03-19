@@ -139,7 +139,7 @@ size_t HardwareSerial::readBytes(char* buffer, size_t size)
 
     while (got < size)
     {
-        esp8266::polledTimeout::oneShot timeOut(_timeout);
+        esp8266::polledTimeout::oneShotFastMs timeOut(_timeout);
         size_t avail;
         while ((avail = available()) == 0 && !timeOut);
         if (avail == 0)

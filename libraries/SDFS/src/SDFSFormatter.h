@@ -73,7 +73,7 @@ private:
             DEBUGV("SDFS: Clear FAT/DIR writeStart failed");
             return false;
         }
-	esp8266::polledTimeout::periodic timeToYield(5); // Yield every 5ms of runtime
+	esp8266::polledTimeout::periodicFastMs timeToYield(5); // Yield every 5ms of runtime
         for (uint32_t i = 0; i < count; i++) {
             if (timeToYield) {
                 delay(0); // WDT feed

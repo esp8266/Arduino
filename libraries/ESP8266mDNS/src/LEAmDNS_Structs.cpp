@@ -1159,7 +1159,7 @@ bool MDNSResponder::stcMDNS_RRAnswerGeneric::clear(void) {
 MDNSResponder::stcProbeInformation::stcProbeInformation(void)
 :   m_ProbingStatus(ProbingStatus_WaitingForData),
     m_u8SentCount(0),
-    m_Timeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
+    m_Timeout(std::numeric_limits<esp8266::polledTimeout::oneShotMs::timeType>::max()),
     m_bConflict(false),
     m_bTiebreakNeeded(false),
     m_fnHostProbeResultCallback(0),
@@ -1173,7 +1173,7 @@ bool MDNSResponder::stcProbeInformation::clear(bool p_bClearUserdata /*= false*/
 
     m_ProbingStatus = ProbingStatus_WaitingForData;
     m_u8SentCount = 0;
-    m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+    m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShotMs::timeType>::max());
     m_bConflict = false;
     m_bTiebreakNeeded = false;
     if (p_bClearUserdata) {
@@ -1421,7 +1421,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::isOutdated(void) con
  */
 MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::stcTTL(void)
 :   m_u32TTL(0),
-    m_TTLTimeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
+    m_TTLTimeout(std::numeric_limits<esp8266::polledTimeout::oneShotMs::timeType>::max()),
     m_timeoutLevel(TIMEOUTLEVEL_UNSET) {
 
 }
@@ -1438,7 +1438,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set(uint32_t p_u32TT
     }
     else {
         m_timeoutLevel = TIMEOUTLEVEL_UNSET;            // undef
-        m_TTLTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+        m_TTLTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShotMs::timeType>::max());
     }
     return true;
 }
@@ -1468,7 +1468,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::restart(void) {
     }
     else {
         bResult = false;
-        m_TTLTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+        m_TTLTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShotMs::timeType>::max());
         m_timeoutLevel = TIMEOUTLEVEL_UNSET;
     }
     return bResult;
@@ -1498,7 +1498,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::finalTimeoutLevel(vo
  */
 unsigned long MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::timeout(void) const {
 
-    uint32_t    u32Timeout = std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max();
+    uint32_t    u32Timeout = std::numeric_limits<esp8266::polledTimeout::oneShotMs::timeType>::max();
 
     if (TIMEOUTLEVEL_BASE == m_timeoutLevel) {          // 80%
         u32Timeout = (m_u32TTL * 800);                  // to milliseconds
@@ -1922,7 +1922,7 @@ MDNSResponder::stcMDNSServiceQuery::stcMDNSServiceQuery(void)
     m_fnCallback(0),
     m_bLegacyQuery(false),
     m_u8SentCount(0),
-    m_ResendTimeout(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()),
+    m_ResendTimeout(std::numeric_limits<esp8266::polledTimeout::oneShotMs::timeType>::max()),
     m_bAwaitingAnswers(true),
     m_pAnswers(0) {
 
@@ -1945,7 +1945,7 @@ bool MDNSResponder::stcMDNSServiceQuery::clear(void) {
     m_fnCallback = 0;
     m_bLegacyQuery = false;
     m_u8SentCount = 0;
-    m_ResendTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+    m_ResendTimeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShotMs::timeType>::max());
     m_bAwaitingAnswers = true;
     while (m_pAnswers) {
         stcAnswer*  pNext = m_pAnswers->m_pNext;
