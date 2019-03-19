@@ -176,6 +176,8 @@ protected:
   
   bool expiredRetrigger()
   {
+    if (!_timeout)
+      return true;
     timeType current = TimePolicyT::time();
     if(checkExpired(current))
     {
