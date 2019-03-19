@@ -30,7 +30,7 @@ csvData = response.read()
 csvReader = csv.reader(StringIO(csvData))
 for row in csvReader:
     names.append(row[0]+":"+row[1]+":"+row[2])
-    pems.append(row[28])
+    pems.append(row[30])
 del names[0] # Remove headers
 del pems[0] # Remove headers
 
