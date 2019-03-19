@@ -128,7 +128,7 @@ public:
   {
     if (timeout > timeMax())
     {
-      timeout = timeMax();
+      _timeout = timeMax();
       ::printf((PGM_P)F("polledTimeout: overflow\r\n"));
     }
   }
