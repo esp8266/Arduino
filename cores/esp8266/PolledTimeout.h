@@ -174,15 +174,18 @@ public:
     return TimePolicyT::timeMax();
   }
 
-protected:
+private:
 
-  // internal time unit not exposed to user
-  
   bool checkExpired(const timeType t) const
   {
-    bool ongoing = _neverExpires || ((t - _start) < _timeout);
+    // internal time unit API not exposed to user
+    // (_timeout == 0) is not checked here
+
+    bool ongoing = (_neverExpires || ((t - _start) < _timeout));
     return !ongoing;
   }
+
+protected:
 
   bool expiredRetrigger()
   {
@@ -202,7 +205,7 @@ protected:
   
   bool expiredOneShot() const
   {
-    return checkExpired(TimePolicyT::time());
+    return _timeout == 0 || checkExpired(TimePolicyT::time());
   }
   
   timeType _timeout;
