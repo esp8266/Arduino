@@ -1061,7 +1061,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
         else {                                                                                      // Probing finished
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done host probing.\n")););
             m_HostProbeInformation.m_ProbingStatus = ProbingStatus_Done;
-            m_HostProbeInformation.m_Timeout.reset(esp8266::polledTimeout::oneShotMs::neverExpires);
+            m_HostProbeInformation.m_Timeout.resetToNeverExpires();
             if (m_HostProbeInformation.m_fnHostProbeResultCallback) {
                 m_HostProbeInformation.m_fnHostProbeResultCallback(m_pcHostname, true);
             }
@@ -1083,7 +1083,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing host (%lu).\n\n"), m_HostProbeInformation.m_u8SentCount););
             }
             else {
-                m_HostProbeInformation.m_Timeout.reset(esp8266::polledTimeout::oneShotMs::neverExpires);
+                m_HostProbeInformation.m_Timeout.resetToNeverExpires();
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done host announcing.\n\n")););
             }
         }
@@ -1110,7 +1110,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
             else {                                                                                      // Probing finished
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done service probing %s.%s.%s\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
                 pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_Done;
-                pService->m_ProbeInformation.m_Timeout.reset(esp8266::polledTimeout::oneShotMs::neverExpires);
+                pService->m_ProbeInformation.m_Timeout.resetToNeverExpires();
                 if (pService->m_ProbeInformation.m_fnServiceProbeResultCallback) {
                 	pService->m_ProbeInformation.m_fnServiceProbeResultCallback(pService->m_pcName, pService, true);
                 }
@@ -1131,7 +1131,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing service %s.%s.%s (%lu)\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, pService->m_ProbeInformation.m_u8SentCount););
                 }
                 else {
-                    pService->m_ProbeInformation.m_Timeout.reset(esp8266::polledTimeout::oneShotMs::neverExpires);
+                    pService->m_ProbeInformation.m_Timeout.resetToNeverExpires();
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done service announcing for %s.%s.%s\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
                 }
             }

@@ -168,6 +168,12 @@ public:
     _start = TimePolicyT::time();
   }
 
+  void resetToNeverExpires ()
+  {
+    _timeout = 1; // because _timeout==0 has precedence
+    _neverExpires = true;
+  }
+
   timeType getTimeout() const
   {
     return TimePolicyT::toUserUnit(_timeout);
@@ -181,9 +187,8 @@ public:
 private:
 
   ICACHE_RAM_ATTR
-  bool internalCheckExpired(const timeType internalUnit) const
+  bool checkExpired(const timeType internalUnit) const
   {
-    // internal time unit API not exposed to user
     // (_timeout == 0) is not checked here
 
     // returns "can expire" and "time expired"
@@ -200,7 +205,7 @@ protected:
       return true;
 
     timeType current = TimePolicyT::time();
-    if(internalCheckExpired(current))
+    if(checkExpired(current))
     {
       unsigned long n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
       _start += n  * _timeout;
@@ -213,7 +218,7 @@ protected:
   bool expiredOneShot() const
   {
     // returns "always expired" or "has expired"
-    return (_timeout == 0) || internalCheckExpired(TimePolicyT::time());
+    return (_timeout == 0) || checkExpired(TimePolicyT::time());
   }
   
   timeType _timeout;

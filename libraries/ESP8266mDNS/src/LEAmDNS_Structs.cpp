@@ -1173,7 +1173,7 @@ bool MDNSResponder::stcProbeInformation::clear(bool p_bClearUserdata /*= false*/
 
     m_ProbingStatus = ProbingStatus_WaitingForData;
     m_u8SentCount = 0;
-    m_Timeout.reset(esp8266::polledTimeout::oneShotMs::neverExpires);
+    m_Timeout.resetToNeverExpires();
     m_bConflict = false;
     m_bTiebreakNeeded = false;
     if (p_bClearUserdata) {
@@ -1438,7 +1438,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set(uint32_t p_u32TT
     }
     else {
         m_timeoutLevel = TIMEOUTLEVEL_UNSET;            // undef
-        m_TTLTimeout.reset(esp8266::polledTimeout::oneShotMs::neverExpires);
+        m_TTLTimeout.resetToNeverExpires();
     }
     return true;
 }
@@ -1468,7 +1468,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::restart(void) {
     }
     else {
         bResult = false;
-        m_TTLTimeout.reset(esp8266::polledTimeout::oneShotMs::neverExpires);
+        m_TTLTimeout.resetToNeverExpires();
         m_timeoutLevel = TIMEOUTLEVEL_UNSET;
     }
     return bResult;
@@ -1945,7 +1945,7 @@ bool MDNSResponder::stcMDNSServiceQuery::clear(void) {
     m_fnCallback = 0;
     m_bLegacyQuery = false;
     m_u8SentCount = 0;
-    m_ResendTimeout.reset(esp8266::polledTimeout::oneShotMs::neverExpires);
+    m_ResendTimeout.resetToNeverExpires();
     m_bAwaitingAnswers = true;
     while (m_pAnswers) {
         stcAnswer*  pNext = m_pAnswers->m_pNext;
