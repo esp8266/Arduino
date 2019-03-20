@@ -36,12 +36,12 @@
 
 #ifdef DEBUG_ESP_HTTP_UPDATE
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_HTTP_UPDATE(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_HTTP_UPDATE(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ## __VA_ARGS__ )
 #endif
 #endif
 
 #ifndef DEBUG_HTTP_UPDATE
-#define DEBUG_HTTP_UPDATE(...)
+#define DEBUG_HTTP_UPDATE(...) do { (void)0; } while(0)
 #endif
 
 /// note we use HTTP client errors too so we start at 100
@@ -72,6 +72,11 @@ public:
     void rebootOnUpdate(bool reboot)
     {
         _rebootOnUpdate = reboot;
+    }
+
+    void followRedirects(bool follow)
+    {
+        _followRedirects = follow;
     }
 
     void setLedPin(int ledPin = -1, uint8_t ledOn = HIGH)
@@ -129,6 +134,7 @@ protected:
     bool _rebootOnUpdate = true;
 private:
     int _httpClientTimeout;
+    bool _followRedirects;
 
     int _ledPin;
     uint8_t _ledOn;

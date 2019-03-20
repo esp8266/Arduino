@@ -350,9 +350,11 @@ generic.menu.led.14=14
 generic.menu.led.14.build.led=-DLED_BUILTIN=14
 generic.menu.led.15=15
 generic.menu.led.15.build.led=-DLED_BUILTIN=15
-generic.menu.sdk.nonosdk221=nonos-sdk 2.2.1
+generic.menu.sdk.nonosdk221=nonos-sdk 2.2.1 (legacy)
 generic.menu.sdk.nonosdk221.build.sdk=NONOSDK221
-generic.menu.sdk.nonosdk3v0=nonos-sdk pre-3
+generic.menu.sdk.nonosdk222=nonos-sdk 2.2.2-190313 (testing)
+generic.menu.sdk.nonosdk222.build.sdk=NONOSDK22x
+generic.menu.sdk.nonosdk3v0=nonos-sdk pre-3 (known issues)
 generic.menu.sdk.nonosdk3v0.build.sdk=NONOSDK3V0
 generic.menu.ip.lm2f=v2 Lower Memory
 generic.menu.ip.lm2f.build.lwip_include=lwip2/include
@@ -4473,25 +4475,25 @@ espinotee.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 wifinfo.name=WifInfo
-wifinfo.menu.ESPModule.ESP12.build.board=ESP8266_ESP12
-wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
-wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
-wifinfo.menu.ESPModule.ESP12.build.flash_ld=eagle.flash.4m1m.ld
-wifinfo.menu.ESPModule.ESP07192.build.spiffs_blocksize=4096
-wifinfo.menu.ESPModule.ESP07192.build.spiffs_end=0xFB000
-wifinfo.menu.ESPModule.ESP12=ESP12 (4M/1M SPIFFS)
-wifinfo.menu.ESPModule.ESP12.build.spiffs_start=0x300000
-wifinfo.menu.ESPModule.ESP12.build.spiffs_end=0x3FB000
-wifinfo.menu.ESPModule.ESP07192.build.spiffs_start=0xCB000
-wifinfo.menu.ESPModule.ESP07192.build.board=ESP8266_ESP07
-wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
-wifinfo.menu.ESPModule.ESP12.build.flash_size=4M
 wifinfo.build.board=WIFINFO
 wifinfo.build.variant=wifinfo
-wifinfo.menu.ESPModule.ESP07192.build.flash_ld=eagle.flash.1m192.ld
-wifinfo.menu.ESPModule.ESP07192.build.flash_size=1M
 wifinfo.menu.ESPModule.ESP07192=ESP07 (1M/192K SPIFFS)
+wifinfo.menu.ESPModule.ESP07192.build.board=ESP8266_ESP07
+wifinfo.menu.ESPModule.ESP07192.build.flash_size=1M
+wifinfo.menu.ESPModule.ESP07192.build.flash_ld=eagle.flash.1m192.ld
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_start=0xCB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_end=0xFB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_blocksize=4096
 wifinfo.menu.ESPModule.ESP07192.upload.maximum_size=827376
+wifinfo.menu.ESPModule.ESP12=ESP12 (4M/1M SPIFFS)
+wifinfo.menu.ESPModule.ESP12.build.board=ESP8266_ESP12
+wifinfo.menu.ESPModule.ESP12.build.flash_size=4M
+wifinfo.menu.ESPModule.ESP12.build.flash_ld=eagle.flash.4m1m.ld
+wifinfo.menu.ESPModule.ESP12.build.spiffs_start=0x300000
+wifinfo.menu.ESPModule.ESP12.build.spiffs_end=0x3FB000
+wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
+wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
+wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
 wifinfo.upload.tool=esptool
 wifinfo.upload.maximum_data_size=81920
 wifinfo.upload.wait_for_upload_port=true
@@ -4717,19 +4719,19 @@ wifinfo.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 arduino-esp8266.name=Arduino
-arduino-esp8266.menu.BoardModel.starottodeved.build.board=ESP8266_ARDUINO_STAR_OTTO
-arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-arduino-esp8266.menu.BoardModel.starottodeved.build.variant=arduino_uart
-arduino-esp8266.menu.BoardModel.unowifideved.build.board=ESP8266_ARDUINO_UNOWIFI
-arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-arduino-esp8266.menu.BoardModel.primo=Primo
-arduino-esp8266.menu.BoardModel.unowifideved.build.variant=arduino_uart
-arduino-esp8266.menu.BoardModel.primo.build.variant=arduino_spi
-arduino-esp8266.menu.BoardModel.starottodeved=Star OTTO
 arduino-esp8266.build.board=ESP8266_ARDUINO
+arduino-esp8266.menu.BoardModel.primo=Primo
 arduino-esp8266.menu.BoardModel.primo.build.board=ESP8266_ARDUINO_PRIMO
+arduino-esp8266.menu.BoardModel.primo.build.variant=arduino_spi
+arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
 arduino-esp8266.menu.BoardModel.unowifideved=Uno WiFi
+arduino-esp8266.menu.BoardModel.unowifideved.build.board=ESP8266_ARDUINO_UNOWIFI
+arduino-esp8266.menu.BoardModel.unowifideved.build.variant=arduino_uart
+arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+arduino-esp8266.menu.BoardModel.starottodeved=Star OTTO
+arduino-esp8266.menu.BoardModel.starottodeved.build.variant=arduino_uart
+arduino-esp8266.menu.BoardModel.starottodeved.build.board=ESP8266_ARDUINO_STAR_OTTO
+arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
 arduino-esp8266.upload.tool=esptool
 arduino-esp8266.upload.maximum_data_size=81920
 arduino-esp8266.upload.wait_for_upload_port=true
