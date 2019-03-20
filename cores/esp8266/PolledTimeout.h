@@ -67,6 +67,7 @@ struct TimeMillis
 
   // millis to millis
   static timeType toTimeTypeUnit (const timeType t) { return t; }
+  static timeType toUserUnit (const timeType t) { return t; }
 
   // rollover on 32 bits: 49.7 days (::max() is a "never expires"-reserved value)
   static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() - 1; }
@@ -81,7 +82,8 @@ struct TimeFastMillis
   static constexpr timeType toTimeTypeUnitMul = F_CPU / 1000;
 
   // millis to CPU cycles:
-  static timeType toTimeTypeUnit (const timeType t) { return t * toTimeTypeUnitMul; }
+  static timeType toTimeTypeUnit (const timeType user) { return user * toTimeTypeUnitMul; }
+  static timeType toUserUnit (const timeType internal) { return internal / toTimeTypeUnitMul; }
 
   // rollover: @80Mhz:53.6s @160Mhz:26.8s
   // setting max to half of min to ensure full range is never reached
@@ -100,7 +102,8 @@ struct TimeFastMicros
   static constexpr timeType toTimeTypeUnitMul = F_CPU / 1000000;
 
   // micros to CPU cycles:
-  static timeType toTimeTypeUnit (const timeType t) { return t * toTimeTypeUnitMul; }
+  static timeType toTimeTypeUnit (const timeType user) { return user * toTimeTypeUnitMul; }
+  static timeType toUserUnit (const timeType internal) { return internal / toTimeTypeUnitMul; }
 
   // rollover: @80Mhz:53.6s @160Mhz:26.8s
   // setting max to half of min to ensure full range is never reached
@@ -118,7 +121,8 @@ struct TimeFastNanos
   static timeType time() {return ESP.getCycleCount();}
 
   // nanos to CPU cycles (best, within 32bits range)
-  static timeType toTimeTypeUnit (const timeType t) { return (t * (F_CPU / 40000000)) / 25; }
+  static timeType toTimeTypeUnit (const timeType user) { return (user * (F_CPU / 40000000)) / 25; }
+  static timeType toUserUnit (const timeType internal) { return (internal * 25) / (F_CPU / 40000000); }
 
   // given toTimeTypeUnit(), timeMax is (2^31 / 4(@160MHz)) = 0.536 seconds
   static constexpr timeType timeMax() { return (((((timeType)1) << ((sizeof(timeType) * 8) - 2 - 2)) - 1) << 1) + 1; }
@@ -152,8 +156,8 @@ public:
   
   void reset(const timeType newUserTimeout)
   {
-    _timeout = TimePolicyT::toTimeTypeUnit(newUserTimeout);
     reset();
+    _timeout = TimePolicyT::toTimeTypeUnit(newUserTimeout);
     _neverExpires = (newUserTimeout < 0) || (newUserTimeout > timeMax());
   }
 
@@ -162,12 +166,10 @@ public:
     _start = TimePolicyT::time();
   }
 
-#if 0
   timeType getTimeout() const
   {
-    return _timeout;
+    return TimePolicyT::toUserUnit(_timeout);
   }
-#endif
   
   static constexpr timeType timeMax()
   {
