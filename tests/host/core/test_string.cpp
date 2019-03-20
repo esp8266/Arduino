@@ -388,6 +388,7 @@ TEST_CASE("String SSO handles junk in memory", "[core][String]")
   memset(space, 0xff, 64);
   new(s) String;
   REQUIRE(*s == "");
+  s->~String();
 
   // Tests from #5883
   bool useURLencode = false;
@@ -398,26 +399,32 @@ TEST_CASE("String SSO handles junk in memory", "[core][String]")
   new(s) String("%ssid%");
   repl(("%ssid%"), "MikroTik", *s, useURLencode);
   REQUIRE(*s == "MikroTik");
+  s->~String();
 
   memset(space, 0xff, 64);
   new(s) String("{E}");
   repl(("{E}"), euro, *s, useURLencode);
   REQUIRE(*s == "€");
+  s->~String();
   memset(space, 0xff, 64);
   new(s) String("&euro;");
   repl(("&euro;"), euro, *s, useURLencode);
   REQUIRE(*s == "€");
+  s->~String();
   memset(space, 0xff, 64);
   new(s) String("{Y}");
   repl(("{Y}"), yen, *s, useURLencode);
   REQUIRE(*s == "¥");
+  s->~String();
   memset(space, 0xff, 64);
   new(s) String("&yen;");
   repl(("&yen;"), yen, *s, useURLencode);
   REQUIRE(*s == "¥");
+  s->~String();
 
   memset(space, 0xff, 64);
   new(s) String("%sysname%");
   repl(("%sysname%"), "CO2_defect", *s, useURLencode);
   REQUIRE(*s == "CO2_defect");
+  s->~String();
 }
