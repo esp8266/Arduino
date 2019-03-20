@@ -135,7 +135,9 @@ class timeoutTemplate
 {
 public:
   using timeType = typename TimePolicyT::timeType;
-  
+
+  static constexpr timeType neverExpires = std::numeric_limits<timeType>::max();
+
   timeoutTemplate(const timeType userTimeout)
   {
     reset(userTimeout);
