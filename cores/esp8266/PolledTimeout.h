@@ -191,8 +191,8 @@ private:
     // internal time unit API not exposed to user
     // (_timeout == 0) is not checked here
 
-    bool ongoing = (_neverExpires || ((internalUnit - _start) < _timeout));
-    return !ongoing;
+    // returns "can expire" and "time expired"
+    return (!_neverExpires) && ((internalUnit - _start) >= _timeout);
   }
 
 protected:
