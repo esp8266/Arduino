@@ -183,6 +183,7 @@ public:
 
 private:
 
+  ICACHE_RAM_ATTR
   bool internalCheckExpired(const timeType internalUnit) const
   {
     // internal time unit API not exposed to user
@@ -194,6 +195,7 @@ private:
 
 protected:
 
+  ICACHE_RAM_ATTR
   bool expiredRetrigger()
   {
     if (_timeout == 0)
@@ -210,6 +212,7 @@ protected:
     return false;
   }
   
+  ICACHE_RAM_ATTR
   bool expiredOneShot() const
   {
     return (/*always expired*/ _timeout == 0) || internalCheckExpired(TimePolicyT::time());
@@ -231,12 +234,12 @@ using periodic = polledTimeout::timeoutTemplate<true> /*__attribute__((deprecate
 using oneShotMs = polledTimeout::timeoutTemplate<false>;
 using periodicMs = polledTimeout::timeoutTemplate<true>;
 
-// "Fast" versions sacrifices time range for improved precision and reduced code execution (by 30%)
+// "Fast" versions sacrifices time range for improved precision and reduced execution time (by 86%)
+// (cpu cycles for ::expired(): 372 (millis()) vs 52 (getCycleCount))
 // timeMax() values:
 // Ms: max is 13421       ms (13.4   s)
 // Us: max is 13421772    us (13.4   s)
 // Ns: max is   536870911 ns ( 0.536 s)
-// cpu cycles for ::expired(): 1069 (w/millis()) vs 736 (w/Fast/getCycleCount)
 
 using oneShotFastMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
 using periodicFastMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
