@@ -383,9 +383,9 @@ TEST_CASE("String SSO handles junk in memory", "[core][String]")
 {
   // We fill the SSO space with garbage then construct an object in it and check consistency
   // This is NOT how you want to use Strings outside of this testing!
-  unsigned char space[16];
+  unsigned char space[64];
   String *s = (String*)space;
-  memset(space, 0xff, 16);
+  memset(space, 0xff, 64);
   new(s) String;
   REQUIRE(*s == "");
 
@@ -394,29 +394,29 @@ TEST_CASE("String SSO handles junk in memory", "[core][String]")
   const char euro[4] = {(char)0xe2, (char)0x82, (char)0xac, 0}; // Unicode euro symbol
   const char yen[3]   = {(char)0xc2, (char)0xa5, 0}; // Unicode yen symbol
 
-  memset(space, 0xff, 16);
+  memset(space, 0xff, 64);
   new(s) String("%ssid%");
   repl(("%ssid%"), "MikroTik", *s, useURLencode);
   REQUIRE(*s == "MikroTik");
 
-  memset(space, 0xff, 16);
+  memset(space, 0xff, 64);
   new(s) String("{E}");
   repl(("{E}"), euro, *s, useURLencode);
   REQUIRE(*s == "€");
-  memset(space, 0xff, 16);
+  memset(space, 0xff, 64);
   new(s) String("&euro;");
   repl(("&euro;"), euro, *s, useURLencode);
   REQUIRE(*s == "€");
-  memset(space, 0xff, 16);
+  memset(space, 0xff, 64);
   new(s) String("{Y}");
   repl(("{Y}"), yen, *s, useURLencode);
   REQUIRE(*s == "¥");
-  memset(space, 0xff, 16);
+  memset(space, 0xff, 64);
   new(s) String("&yen;");
   repl(("&yen;"), yen, *s, useURLencode);
   REQUIRE(*s == "¥");
 
-  memset(space, 0xff, 16);
+  memset(space, 0xff, 64);
   new(s) String("%sysname%");
   repl(("%sysname%"), "CO2_defect", *s, useURLencode);
   REQUIRE(*s == "CO2_defect");
