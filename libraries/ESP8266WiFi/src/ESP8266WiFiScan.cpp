@@ -165,7 +165,10 @@ bool ESP8266WiFiScanClass::getNetworkInfo(uint8_t i, String &ssid, uint8_t &encT
         return false;
     }
 
-    ssid = (const char*) it->ssid;
+    char ssid_copy[33]; // Ensure space for maximum len SSID (32) plus trailing 0
+    memcpy(ssid_copy, it->ssid, sizeof(it->ssid));
+    ssid_copy[32] = 0; // Potentially add 0-termination if none present earlier
+    ssid = (const char*) ssid_copy;
     encType = encryptionType(i);
     rssi = it->rssi;
     bssid = it->bssid; // move ptr
