@@ -759,9 +759,10 @@ void String::replace(const String& find, const String& replace) {
         while(index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
             readFrom = wbuffer() + index + find.len();
             memmove(readFrom + diff, readFrom, len() - (readFrom - buffer()));
-            setLen(len() + diff);
-            wbuffer()[len()] = 0;
+	    int newLen = len() + diff;
             memcpy(wbuffer() + index, replace.buffer(), replace.len());
+            setLen(newLen);
+            wbuffer()[newLen] = 0;
             index--;
         }
     }
