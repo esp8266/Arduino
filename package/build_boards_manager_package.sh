@@ -74,6 +74,7 @@ fi
 # handles tool paths differently when package is installed in hardware folder
 cat $srcdir/platform.txt | \
 $SED 's/runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}\/tools\/xtensa-lx106-elf//g' | \
+$SED 's/runtime.tools.python.windows.path=.*//g' | \
 $SED 's/runtime.tools.esptool.path={runtime.platform.path}\/tools\/esptool//g' | \
 $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool.path=\{runtime.tools.esptool.path\}/g' | \
 $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
