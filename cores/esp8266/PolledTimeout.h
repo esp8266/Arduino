@@ -178,11 +178,6 @@ public:
     return TimePolicyT::timeMax();
   }
 
-  bool checkExpired(const timeType userUnit) const
-  {
-    return (/*always expired*/ _timeout == 0) || internalCheckExpired(TimePolicyT::toTimeTypeUnit(userUnit));
-  }
-
 private:
 
   ICACHE_RAM_ATTR
@@ -217,7 +212,8 @@ protected:
   ICACHE_RAM_ATTR
   bool expiredOneShot() const
   {
-    return (/*always expired*/ _timeout == 0) || internalCheckExpired(TimePolicyT::time());
+    // returns "always expired" or "has expired"
+    return (_timeout == 0) || internalCheckExpired(TimePolicyT::time());
   }
   
   timeType _timeout;

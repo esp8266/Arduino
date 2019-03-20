@@ -1450,7 +1450,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::flagged(void) const 
 
     return ((m_u32TTL) &&
             (TIMEOUTLEVEL_UNSET != m_timeoutLevel) &&
-            (m_TTLTimeout.checkExpired(millis())));
+            (m_TTLTimeout.expired()));
 }
 
 /*

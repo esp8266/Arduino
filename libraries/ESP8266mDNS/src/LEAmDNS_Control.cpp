@@ -1049,7 +1049,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
         m_HostProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
     }
     else if ((ProbingStatus_InProgress == m_HostProbeInformation.m_ProbingStatus) &&                // Probing AND
-             (m_HostProbeInformation.m_Timeout.checkExpired(millis()))) {                           // Time for next probe
+             (m_HostProbeInformation.m_Timeout.expired())) {                                        // Time for next probe
 
         if (MDNS_PROBE_COUNT > m_HostProbeInformation.m_u8SentCount) {                              // Send next probe
             if ((bResult = _sendHostProbe())) {
@@ -1073,7 +1073,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
         }
     }   // else: Probing already finished OR waiting for next time slot
     else if ((ProbingStatus_Done == m_HostProbeInformation.m_ProbingStatus) &&
-             (m_HostProbeInformation.m_Timeout.checkExpired(esp8266::polledTimeout::oneShotMs::neverExpires))) {
+             (m_HostProbeInformation.m_Timeout.expired())) {
 
         if ((bResult = _announce(true, false))) {   // Don't announce services here
             ++m_HostProbeInformation.m_u8SentCount;
@@ -1098,7 +1098,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
             pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
         }
         else if ((ProbingStatus_InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&  // Probing AND
-                 (pService->m_ProbeInformation.m_Timeout.checkExpired(millis()))) {             // Time for next probe
+                 (pService->m_ProbeInformation.m_Timeout.expired())) {             // Time for next probe
 
             if (MDNS_PROBE_COUNT > pService->m_ProbeInformation.m_u8SentCount) {                // Send next probe
                 if ((bResult = _sendServiceProbe(*pService))) {
@@ -1121,7 +1121,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
             }
         }   // else: Probing already finished OR waiting for next time slot
         else if ((ProbingStatus_Done == pService->m_ProbeInformation.m_ProbingStatus) &&
-                 (pService->m_ProbeInformation.m_Timeout.checkExpired(millis()))) {
+                 (pService->m_ProbeInformation.m_Timeout.expired())) {
 
             if ((bResult = _announceService(*pService))) {   // Announce service
                 ++pService->m_ProbeInformation.m_u8SentCount;
@@ -1443,7 +1443,7 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
         // Resend dynamic service queries, if not already done often enough
         if ((!pServiceQuery->m_bLegacyQuery) &&
             (MDNS_DYNAMIC_QUERY_RESEND_COUNT > pServiceQuery->m_u8SentCount) &&
-            (pServiceQuery->m_ResendTimeout.checkExpired(millis()))) {
+            (pServiceQuery->m_ResendTimeout.expired())) {
 
             if ((bResult = _sendMDNSServiceQuery(*pServiceQuery))) {
                 ++pServiceQuery->m_u8SentCount;
