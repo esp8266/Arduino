@@ -132,14 +132,9 @@ class timeoutTemplate
 public:
   using timeType = typename TimePolicyT::timeType;
   
-  timeoutTemplate(const timeType timeout)
-    : _timeout(TimePolicyT::toTimeTypeUnit(timeout)), _start(TimePolicyT::time())
+  timeoutTemplate(const timeType userTimeout)
   {
-    if (timeout > timeMax())
-    {
-      // "never expires"  (checkExpired() condition "(t - _start) > _timeout;" is never reached)
-      _timeout = std::numeric_limits<timeType>::max();
-    }
+    reset(userTimeout);
   }
 
   bool expired()
@@ -155,10 +150,11 @@ public:
     return expired(); 
   }
   
-  void reset(const timeType newTimeout)
+  void reset(const timeType newUserTimeout)
   {
-    _timeout = newTimeout;
+    _timeout = TimePolicyT::toTimeTypeUnit(newUserTimeout);
     reset();
+    _neverExpires = (newUserTimeout < 0) || (newUserTimeout > timeMax());
   }
 
   void reset()
@@ -166,24 +162,28 @@ public:
     _start = TimePolicyT::time();
   }
 
+#if 0
   timeType getTimeout() const
   {
     return _timeout;
   }
+#endif
   
-  bool checkExpired(const timeType t) const
-  {
-    // always returns false when _timeout is ::max()
-    return (t - _start) > _timeout;
-  }
-
   static constexpr timeType timeMax()
   {
     return TimePolicyT::timeMax();
   }
 
 protected:
+
+  // internal time unit not exposed to user
   
+  bool checkExpired(const timeType t) const
+  {
+    bool ongoing = _neverExpires || ((t - _start) < _timeout);
+    return !ongoing;
+  }
+
   bool expiredRetrigger()
   {
     if (_timeout == 0)
@@ -207,6 +207,7 @@ protected:
   
   timeType _timeout;
   timeType _start;
+  bool _neverExpires;
 };
 
 // legacy type names, deprecated (unit is milliseconds)
