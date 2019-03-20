@@ -176,14 +176,19 @@ public:
     return TimePolicyT::timeMax();
   }
 
+  bool checkExpired(const timeType userUnit) const
+  {
+    return (/*always expired*/ _timeout == 0) || internalCheckExpired(TimePolicyT::toTimeTypeUnit(userUnit));
+  }
+
 private:
 
-  bool checkExpired(const timeType t) const
+  bool internalCheckExpired(const timeType internalUnit) const
   {
     // internal time unit API not exposed to user
     // (_timeout == 0) is not checked here
 
-    bool ongoing = (_neverExpires || ((t - _start) < _timeout));
+    bool ongoing = (_neverExpires || ((internalUnit - _start) < _timeout));
     return !ongoing;
   }
 
@@ -196,7 +201,7 @@ protected:
       return true;
 
     timeType current = TimePolicyT::time();
-    if(checkExpired(current))
+    if(internalCheckExpired(current))
     {
       unsigned long n = (current - _start) / _timeout; //how many _timeouts periods have elapsed, will usually be 1 (current - _start >= _timeout)
       _start += n  * _timeout;
@@ -207,7 +212,7 @@ protected:
   
   bool expiredOneShot() const
   {
-    return _timeout == 0 || checkExpired(TimePolicyT::time());
+    return (/*always expired*/ _timeout == 0) || internalCheckExpired(TimePolicyT::time());
   }
   
   timeType _timeout;
@@ -226,11 +231,12 @@ using periodic = polledTimeout::timeoutTemplate<true> /*__attribute__((deprecate
 using oneShotMs = polledTimeout::timeoutTemplate<false>;
 using periodicMs = polledTimeout::timeoutTemplate<true>;
 
-// "Fast" versions sacrifices time range for improved precision and reduced code size (factor ~100)
+// "Fast" versions sacrifices time range for improved precision and reduced code execution (by 30%)
 // timeMax() values:
 // Ms: max is 13421       ms (13.4   s)
 // Us: max is 13421772    us (13.4   s)
 // Ns: max is   536870911 ns ( 0.536 s)
+// cpu cycles for ::expired(): 1069 (w/millis()) vs 736 (w/Fast/getCycleCount)
 
 using oneShotFastMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
 using periodicFastMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
