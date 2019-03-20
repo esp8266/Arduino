@@ -264,7 +264,7 @@ class String {
         inline unsigned int len() const { return sso() ? strlen(sso_buf) : ptr.len; }
         inline unsigned int capacity() const { return sso() ? SSOSIZE - 1 : ptr.cap; }
         inline void setSSO(bool sso) { sso_buf[SSOSIZE - 1] = sso ? 0x00 : 0xff; }
-        inline void setLen(int len) { if (!sso()) ptr.len = len; }
+        inline void setLen(int len) { if (!sso()) ptr.len = len; else sso_buf[len] = 0; }
         inline void setCapacity(int cap) { if (!sso()) ptr.cap = cap; }
 	inline void setBuffer(char *buff) { if (!sso()) ptr.buff = buff; }
         // Buffer accessor functions
