@@ -125,10 +125,10 @@ recipe.size.regex.data=^(?:\.data|\.rodata|\.bss)\s+([0-9]+).*
 
 # Need to duplicate the python path because Arduino does not replace properly in this stage
 tools.esptool.cmd=python
-tools.esptool.cmd.windows={runtime.tools.python.windows.path}/python.exe
+tools.esptool.cmd.windows={runtime.tools.python.path}/python.exe
 tools.esptool.path=
 tools.esptool.network_cmd=python
-tools.esptool.network_cmd.windows={runtime.tools.python.windows.path}/python.exe
+tools.esptool.network_cmd.windows={runtime.tools.python.path}/python.exe
 
 tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=--trace
