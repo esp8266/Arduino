@@ -123,12 +123,12 @@ recipe.size.regex.data=^(?:\.data|\.rodata|\.bss)\s+([0-9]+).*
 
 tools.esptool.path=
 # Because the variable expansion doesn't allow one tool to find another, the following lines
-# will point to "{runtime.platform.path}/python/python" in GIT and "{runtime.tools.python.path}/python"
-# for JSON board manager releases.
+# will point to "{runtime.platform.path}/tools/python/python" in GIT and
+# "{runtime.tools.python.path}/python" for JSON board manager releases.
 #tools.esptool.cmd={runtime.tools.python.path}/python
 #tools.esptool.network_cmd={runtime.tools.python.path}/python
-tools.esptool.cmd={runtime.platform.path}/python/python
-tools.esptool.network_cmd={runtime.platform.path}/python/python
+tools.esptool.cmd={runtime.platform.path}/tools/python/python
+tools.esptool.network_cmd={runtime.platform.path}/tools/python/python
 
 tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=--trace
