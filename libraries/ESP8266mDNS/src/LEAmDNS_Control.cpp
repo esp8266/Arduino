@@ -24,7 +24,6 @@
 
 #include <arch/cc.h>
 #include <sys/time.h>
-#include <HardwareSerial.h>
 #include <IPAddress.h>
 #include <lwip/ip_addr.h>
 #include <WString.h>
@@ -188,7 +187,6 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                     // See: RFC 6762, 8.2 (Tiebraking)
                     // However, we're using a max. reduced approach for tiebreaking here: The higher IP-address wins!
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Possible race-condition for host domain detected while probing.\n")););
-                    Serial.printf_P(PSTR("[MDNSResponder] _parseQuery: Possible race-condition for host domain detected while probing.\n"));
 
                     m_HostProbeInformation.m_bTiebreakNeeded = true;
                 }
@@ -214,7 +212,6 @@ bool MDNSResponder::_parseQuery(const MDNSResponder::stcMDNS_MsgHeader& p_MsgHea
                         // See: RFC 6762, 8.2 (Tiebraking)
                         // However, we're using a max. reduced approach for tiebreaking here: The 'higher' SRV host wins!
                         DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _parseQuery: Possible race-condition for service domain %s.%s.%s detected while probing.\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
-                        Serial.printf_P(PSTR("[MDNSResponder] _parseQuery: Possible race-condition for service domain %s.%s.%s detected while probing.\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol);
 
                         pService->m_ProbeInformation.m_bTiebreakNeeded = true;
                     }
