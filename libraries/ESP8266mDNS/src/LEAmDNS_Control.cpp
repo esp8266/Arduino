@@ -78,9 +78,10 @@ bool MDNSResponder::_process(bool p_bUserContext) {
         }
     }
     else {
-        bResult = ((WiFi.isConnected()) &&          // Has connection?
-                   (_updateProbeStatus()) &&        // Probing
-                   (_checkServiceQueryCache()));    // Service query cache check
+        bResult = ((WiFi.isConnected() ||               // Either station is connected
+                    WiFi.softAPgetStationNum()>0) &&    // Or AP has stations connected
+                   (_updateProbeStatus()) &&            // Probing
+                   (_checkServiceQueryCache()));        // Service query cache check
     }
     return bResult;
 }
