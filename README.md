@@ -58,6 +58,8 @@ cd hardware
 mkdir esp8266com
 cd esp8266com
 git clone https://github.com/esp8266/Arduino.git esp8266
+cd esp8266
+git submodule update --init
 ```
 - Download binary tools (you need Python 2.7)
 ```bash
