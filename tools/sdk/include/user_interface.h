@@ -253,7 +253,9 @@ struct station_config {
                         // with both ssid[] and bssid[] matched. Please check about this.
     uint8 bssid[6];
     wifi_fast_scan_threshold_t threshold;
+#ifdef NONOSDK3V0
     bool open_and_wep_mode_disable; // Can connect to open/wep router by default.
+#endif
 };
 
 bool wifi_station_get_config(struct station_config *config);
@@ -432,6 +434,8 @@ typedef enum {
     MODEM_SLEEP_T
 } sleep_type_t;
 
+#ifdef NONOSDK3V0
+
 typedef enum {
     MIN_SLEEP_T,
     MAX_SLEEP_T
@@ -442,6 +446,8 @@ sleep_level_t wifi_get_sleep_level(void);
 
 bool wifi_set_listen_interval(uint8 interval);
 uint8 wifi_get_listen_interval(void);
+
+#endif
 
 bool wifi_set_sleep_type(sleep_type_t type);
 sleep_type_t wifi_get_sleep_type(void);

@@ -78,7 +78,6 @@ $SED 's/runtime.tools.esptool.path={runtime.platform.path}\/tools\/esptool//g' |
 $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool.path=\{runtime.tools.esptool.path\}/g' | \
 $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
 $SED 's/recipe.hooks.core.prebuild.2.pattern.*//g' |\
-$SED 's/recipe.hooks.core.prebuild.3.pattern.*//g' |\
 $SED "s/version=.*/version=$ver/g" |\
 $SED -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1($ver)/g"\
  > $outdir/platform.txt

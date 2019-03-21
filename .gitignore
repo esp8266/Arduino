@@ -1,7 +1,6 @@
 .DS_Store
 tools/dist/
 tools/xtensa-lx106-elf/
-tools/esptool/
 tools/mkspiffs/
 package/versions/
 exclude.txt

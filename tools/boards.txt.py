@@ -70,6 +70,7 @@ boards = collections.OrderedDict([
             'flashmode_menu',
             '512K', '1M', '2M', '4M', '8M', '16M',
             'led',
+            'sdk',
             ],
         'desc': [ 'These modules come in different form factors and pinouts. See the page at ESP8266 community wiki for more info: `ESP8266 Module Family <http://www.esp8266.com/wiki/doku.php?id=esp8266-module-family>`__.',
                   '',
@@ -672,27 +673,27 @@ boards = collections.OrderedDict([
     }),
     ( 'wifinfo', {
         'name': 'WifInfo',
-        'opts': {
-            '.build.board': 'WIFINFO',
-            '.build.variant': 'wifinfo',
-            '.menu.ESPModule.ESP07192': 'ESP07 (1M/192K SPIFFS)',
-            '.menu.ESPModule.ESP07192.build.board': 'ESP8266_ESP07',
-            '.menu.ESPModule.ESP07192.build.flash_size': '1M',
-            '.menu.ESPModule.ESP07192.build.flash_ld': 'eagle.flash.1m192.ld',
-            '.menu.ESPModule.ESP07192.build.spiffs_start': '0xCB000',
-            '.menu.ESPModule.ESP07192.build.spiffs_end': '0xFB000',
-            '.menu.ESPModule.ESP07192.build.spiffs_blocksize': '4096',
-            '.menu.ESPModule.ESP07192.upload.maximum_size': '827376',
-            '.menu.ESPModule.ESP12': 'ESP12 (4M/1M SPIFFS)',
-            '.menu.ESPModule.ESP12.build.board': 'ESP8266_ESP12',
-            '.menu.ESPModule.ESP12.build.flash_size': '4M',
-            '.menu.ESPModule.ESP12.build.flash_ld': 'eagle.flash.4m1m.ld',
-            '.menu.ESPModule.ESP12.build.spiffs_start': '0x300000',
-            '.menu.ESPModule.ESP12.build.spiffs_end': '0x3FB000',
-            '.menu.ESPModule.ESP12.build.spiffs_blocksize': '8192',
-            '.menu.ESPModule.ESP12.build.spiffs_pagesize': '256',
-            '.menu.ESPModule.ESP12.upload.maximum_size': '1044464',
-            },
+        'opts': collections.OrderedDict([
+            ( '.build.board', 'WIFINFO' ),
+            ( '.build.variant', 'wifinfo' ),
+            ( '.menu.ESPModule.ESP07192', 'ESP07 (1M/192K SPIFFS)' ),
+            ( '.menu.ESPModule.ESP07192.build.board', 'ESP8266_ESP07' ),
+            ( '.menu.ESPModule.ESP07192.build.flash_size', '1M' ),
+            ( '.menu.ESPModule.ESP07192.build.flash_ld', 'eagle.flash.1m192.ld' ),
+            ( '.menu.ESPModule.ESP07192.build.spiffs_start', '0xCB000' ),
+            ( '.menu.ESPModule.ESP07192.build.spiffs_end', '0xFB000' ),
+            ( '.menu.ESPModule.ESP07192.build.spiffs_blocksize', '4096' ),
+            ( '.menu.ESPModule.ESP07192.upload.maximum_size', '827376' ),
+            ( '.menu.ESPModule.ESP12', 'ESP12 (4M/1M SPIFFS)' ),
+            ( '.menu.ESPModule.ESP12.build.board', 'ESP8266_ESP12' ),
+            ( '.menu.ESPModule.ESP12.build.flash_size', '4M' ),
+            ( '.menu.ESPModule.ESP12.build.flash_ld', 'eagle.flash.4m1m.ld' ),
+            ( '.menu.ESPModule.ESP12.build.spiffs_start', '0x300000' ),
+            ( '.menu.ESPModule.ESP12.build.spiffs_end', '0x3FB000' ),
+            ( '.menu.ESPModule.ESP12.build.spiffs_blocksize', '8192' ),
+            ( '.menu.ESPModule.ESP12.build.spiffs_pagesize', '256' ),
+            ( '.menu.ESPModule.ESP12.upload.maximum_size', '1044464' ),
+        ]),
         'macro': [
             'resetmethod_nodemcu',
             'flashmode_qio',
@@ -706,21 +707,21 @@ boards = collections.OrderedDict([
     }),
     ( 'arduino-esp8266', {
         'name': 'Arduino',
-        'opts': {
-            '.build.board': 'ESP8266_ARDUINO',
-            '.menu.BoardModel.primo': 'Primo',
-            '.menu.BoardModel.primo.build.board': 'ESP8266_ARDUINO_PRIMO',
-            '.menu.BoardModel.primo.build.variant': 'arduino_spi',
-            '.menu.BoardModel.primo.build.extra_flags': '-DF_CRYSTAL=40000000 -DESP8266',
-            '.menu.BoardModel.unowifideved': 'Uno WiFi',
-            '.menu.BoardModel.unowifideved.build.board': 'ESP8266_ARDUINO_UNOWIFI',
-            '.menu.BoardModel.unowifideved.build.variant': 'arduino_uart',
-            '.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL': '40000000 -DESP8266',
-            '.menu.BoardModel.starottodeved': 'Star OTTO',
-            '.menu.BoardModel.starottodeved.build.variant': 'arduino_uart',
-            '.menu.BoardModel.starottodeved.build.board': 'ESP8266_ARDUINO_STAR_OTTO',
-            '.menu.BoardModel.starottodeved.build.extra_flags': '-DF_CRYSTAL=40000000 -DESP8266',
-            },
+        'opts': collections.OrderedDict([
+            ( '.build.board', 'ESP8266_ARDUINO' ),
+            ( '.menu.BoardModel.primo', 'Primo' ),
+            ( '.menu.BoardModel.primo.build.board', 'ESP8266_ARDUINO_PRIMO' ),
+            ( '.menu.BoardModel.primo.build.variant', 'arduino_spi' ),
+            ( '.menu.BoardModel.primo.build.extra_flags', '-DF_CRYSTAL=40000000 -DESP8266' ),
+            ( '.menu.BoardModel.unowifideved', 'Uno WiFi' ),
+            ( '.menu.BoardModel.unowifideved.build.board', 'ESP8266_ARDUINO_UNOWIFI' ),
+            ( '.menu.BoardModel.unowifideved.build.variant', 'arduino_uart' ),
+            ( '.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL', '40000000 -DESP8266' ),
+            ( '.menu.BoardModel.starottodeved', 'Star OTTO' ),
+            ( '.menu.BoardModel.starottodeved.build.variant', 'arduino_uart' ),
+            ( '.menu.BoardModel.starottodeved.build.board', 'ESP8266_ARDUINO_STAR_OTTO' ),
+            ( '.menu.BoardModel.starottodeved.build.extra_flags', '-DF_CRYSTAL=40000000 -DESP8266' ),
+        ]),
         'macro': [
             'resetmethod_ck',
             'flashmode_qio',
@@ -851,7 +852,7 @@ macros = {
         ( '.upload.tool', 'esptool' ),
         ( '.upload.maximum_data_size', '81920' ),
         ( '.upload.wait_for_upload_port', 'true' ),
-        ( '.upload.erase_cmd', ''),
+        ( '.upload.erase_cmd', 'version'),
         ( '.serial.disableDTR', 'true' ),
         ( '.serial.disableRTS', 'true' ),
         ( '.build.mcu', 'esp8266' ),
@@ -1066,11 +1067,11 @@ macros = {
 
     'flash_erase_menu': collections.OrderedDict([
         ( '.menu.wipe.none', 'Only Sketch' ),
-        ( '.menu.wipe.none.upload.erase_cmd', '' ),
+        ( '.menu.wipe.none.upload.erase_cmd', 'version' ),
         ( '.menu.wipe.sdk', 'Sketch + WiFi Settings' ),
-        ( '.menu.wipe.sdk.upload.erase_cmd', '-ca "{build.rfcal_addr}" -cz 0x4000' ),
+        ( '.menu.wipe.sdk.upload.erase_cmd', 'erase_region "{build.rfcal_addr}" 0x4000' ),
         ( '.menu.wipe.all', 'All Flash Contents' ),
-        ( '.menu.wipe.all.upload.erase_cmd', '-ca 0x0 -cz "{build.flash_size_bytes}"' ),
+        ( '.menu.wipe.all.upload.erase_cmd', 'erase_flash' ),
         ]),
 
     }
@@ -1176,9 +1177,9 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         else:
             spiffs_blocksize = 8192
 
-    strsize = str(flashsize_kb / 1024) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
-    strspiffs = str(spiffs_kb / 1024) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
-    strspiffs_strip = str(spiffs_kb / 1024) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) if (spiffs_kb > 0) else ''
+    strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
+    strspiffs = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
+    strspiffs_strip = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) if (spiffs_kb > 0) else ''
 
     ld = 'eagle.flash.' + strsize.lower() + strspiffs_strip.lower() + '.ld'
     menu = '.menu.eesz.' + strsize + strspiffs_strip
@@ -1327,6 +1328,20 @@ def led (default,max):
     return { 'led': led }
 
 ################################################################
+# sdk selection
+
+def sdk ():
+    return { 'sdk': collections.OrderedDict([
+                        ('.menu.sdk.nonosdk221', 'nonos-sdk 2.2.1 (legacy)'),
+                        ('.menu.sdk.nonosdk221.build.sdk', 'NONOSDK221'),
+                        ('.menu.sdk.nonosdk222', 'nonos-sdk 2.2.2-190313 (testing)'),
+                        ('.menu.sdk.nonosdk222.build.sdk', 'NONOSDK22x'),
+                        ('.menu.sdk.nonosdk3v0', 'nonos-sdk pre-3 (known issues)'),
+                        ('.menu.sdk.nonosdk3v0.build.sdk', 'NONOSDK3V0'),
+                    ])
+           }
+
+################################################################
 
 def all_boards ():
 
@@ -1344,6 +1359,7 @@ def all_boards ():
     macros.update(all_flash_map())
     macros.update(all_debug())
     macros.update(led(led_default, led_max))
+    macros.update(sdk())
 
     print('#')
     print('# Do not create pull-requests for this file only, CI will not accept them.')
@@ -1367,6 +1383,7 @@ def all_boards ():
     print('menu.exception=Exceptions')
     print('menu.led=Builtin Led')
     print('menu.wipe=Erase Flash')
+    print('menu.sdk=Espressif FW')
     print('')
 
     for id in boards:
@@ -1498,12 +1515,12 @@ def usage (name,ret):
     print("usage: %s [options]" % name)
     print("")
     print(" -h, --help")
-    print(" --lwip          - preferred default lwIP version (default %d)" % lwip)
-    print(" --led           - preferred default builtin led for generic boards (default %d)" % led_default)
-    print(" --board b       - board to modify:")
-    print(" --speed s       - change default serial speed")
-    print(" --customspeed s - new serial speed for all boards")
-    print(" --nofloat       - disable float support in printf/scanf")
+    print(" --lwip            - preferred default lwIP version (default %d)" % lwip)
+    print(" --led             - preferred default builtin led for generic boards (default %d)" % led_default)
+    print(" --board <b>       - board to modify:")
+    print(" --speed <s>       - change default serial speed")
+    print(" --customspeed <s> - new serial speed for all boards")
+    print(" --nofloat         - disable float support in printf/scanf")
     print("")
     print(" mandatory option (at least one):")
     print("")
@@ -1610,7 +1627,7 @@ for o, a in opts:
     elif o in ("--noextra4kheap", "--allowWPS"):
         print('option ' + o + ' is now deprecated, without effect, and will be removed')
 
-    elif o in ("--ldshow"):
+    elif o in ("--ld"):
         ldshow = True
 
     elif o in ("--ldgen"):
