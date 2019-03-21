@@ -121,7 +121,7 @@ public:
 	}
 
 	void detach();
-	bool active();
+	bool active() const;
 
 protected:	
 	void _attach_ms(uint32_t milliseconds, bool repeat, callback_with_arg_t callback, uint32_t arg);
