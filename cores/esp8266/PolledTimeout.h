@@ -73,59 +73,44 @@ struct TimeMillis
   static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() - 1; }
 };
 
-struct TimeFastMillis
+struct TimeFastCyclesBase
 {
-  // time policy in milli-seconds based on ESP.getCycleCount()
+  // time policy based on ESP.getCycleCount()
 
   using timeType = decltype(ESP.getCycleCount());
   static timeType time() {return ESP.getCycleCount();}
-  static constexpr timeType toTimeTypeUnitMul = F_CPU / 1000;
 
-  // millis to CPU cycles:
-  static timeType toTimeTypeUnit (const timeType user) { return user * toTimeTypeUnitMul; }
-  static timeType toUserUnit (const timeType internal) { return internal / toTimeTypeUnitMul; }
-
-  // rollover: @80Mhz:53.6s @160Mhz:26.8s
-  // setting max to half of min to ensure full range is never reached
-  // - this particular time measurement is intended to be called very often
-  //   (every loop, every yield)
-  // - this max is larger than internal watchdogs
-  static constexpr timeType timeMax() { return (((timeType)1) << ((sizeof(timeType) * 8) - 2)) / (toTimeTypeUnitMul / 2); }
+  // this particular time measurement is intended to be called very often
+  // (every loop, every yield)
 };
 
-struct TimeFastMicros
+template <const TimeFastCyclesBase::timeType second_th> struct TimeFastCycles: TimeFastCyclesBase
 {
-  // time policy in micro-seconds based on ESP.getCycleCount()
+  static constexpr timeType toTimeTypeUnitMulMax = 160000000 / second_th;
+  static constexpr timeType toTimeTypeUnitMul = F_CPU / second_th;
 
-  using timeType = decltype(ESP.getCycleCount());
-  static timeType time() {return ESP.getCycleCount();}
-  static constexpr timeType toTimeTypeUnitMul = F_CPU / 1000000;
-
-  // micros to CPU cycles:
   static timeType toTimeTypeUnit (const timeType user) { return user * toTimeTypeUnitMul; }
   static timeType toUserUnit (const timeType internal) { return internal / toTimeTypeUnitMul; }
-
-  // rollover: @80Mhz:53.6s @160Mhz:26.8s
-  // setting max to half of min to ensure full range is never reached
-  // - this particular time measurement is intended to be called very often
-  //   (every loop, every yield)
-  // - this max is larger than internal watchdogs
-  static constexpr timeType timeMax() { return (((timeType)1) << ((sizeof(timeType) * 8) - 2)) / (toTimeTypeUnitMul / 2); }
+  static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() / toTimeTypeUnitMulMax; }
 };
 
-struct TimeFastNanos
+struct TimeFastMillis: TimeFastCycles<1000>
 {
-  // time policy in nano-seconds based on ESP.getCycleCount()
+};
 
-  using timeType = decltype(ESP.getCycleCount());
-  static timeType time() {return ESP.getCycleCount();}
+struct TimeFastMicros: TimeFastCycles<1000000>
+{
+};
 
-  // nanos to CPU cycles (best, within 32bits range)
-  static timeType toTimeTypeUnit (const timeType user) { return (user * (F_CPU / 40000000)) / 25; }
-  static timeType toUserUnit (const timeType internal) { return (internal * 25) / (F_CPU / 40000000); }
+struct TimeFastNanos: TimeFastCyclesBase
+{
+  static constexpr timeType toTimeTypeUnitMulMax = 160000000 / 40000000; // 4
+  static constexpr timeType toTimeTypeUnitMul =        F_CPU / 40000000; // 2 or 4 (smallest possible)
+  static constexpr timeType toTimeTypeUnitDiv =                      25; // (mul/div=F_CPU/10^9)
 
-  // given toTimeTypeUnit(), timeMax is (2^31 / 4(@160MHz)) = 0.536 seconds
-  static constexpr timeType timeMax() { return (((((timeType)1) << ((sizeof(timeType) * 8) - 2 - 2)) - 1) << 1) + 1; }
+  static timeType toTimeTypeUnit (const timeType user) { return (user * toTimeTypeUnitMul) / toTimeTypeUnitDiv; }
+  static timeType toUserUnit (const timeType internal) { return (internal * toTimeTypeUnitDiv) / toTimeTypeUnitMul; }
+  static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() / toTimeTypeUnitMulMax; }
 };
 
 } //TimePolicy
@@ -156,6 +141,11 @@ public:
     return expired(); 
   }
   
+  bool canExpire ()
+  {
+    return !_neverExpires;
+  }
+
   void reset(const timeType newUserTimeout)
   {
     reset();
@@ -232,7 +222,7 @@ using oneShot = polledTimeout::timeoutTemplate<false> /*__attribute__((deprecate
 using periodic = polledTimeout::timeoutTemplate<true> /*__attribute__((deprecated("use periodicMs")))*/;
 
 // standard versions (based on millis())
-// timeMax() is 49.7 days (2^32 ms)
+// timeMax() is 49.7 days ((2^32)-2 ms)
 
 using oneShotMs = polledTimeout::timeoutTemplate<false>;
 using periodicMs = polledTimeout::timeoutTemplate<true>;
@@ -240,9 +230,9 @@ using periodicMs = polledTimeout::timeoutTemplate<true>;
 // "Fast" versions sacrifices time range for improved precision and reduced execution time (by 86%)
 // (cpu cycles for ::expired(): 372 (millis()) vs 52 (getCycleCount))
 // timeMax() values:
-// Ms: max is 13421       ms (13.4   s)
-// Us: max is 13421772    us (13.4   s)
-// Ns: max is   536870911 ns ( 0.536 s)
+// Ms: max is 26843       ms (26.8  s)
+// Us: max is 26843545    us (26.8  s)
+// Ns: max is  1073741823 ns ( 1.07 s)
 
 using oneShotFastMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
 using periodicFastMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
