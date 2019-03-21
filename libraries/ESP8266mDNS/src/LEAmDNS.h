@@ -981,7 +981,7 @@ protected:
                 stcTTL(void);
                 bool set(uint32_t p_u32TTL);
 
-                bool flagged(void) const;
+                bool flagged(void);
                 bool restart(void);
 
                 bool prepareDeletion(void);

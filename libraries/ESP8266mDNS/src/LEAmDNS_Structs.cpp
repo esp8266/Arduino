@@ -1446,7 +1446,7 @@ bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::set(uint32_t p_u32TT
 /*
  * MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::flagged
  */
-bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::flagged(void) const {
+bool MDNSResponder::stcMDNSServiceQuery::stcAnswer::stcTTL::flagged(void) {
 
     return ((m_u32TTL) &&
             (TIMEOUTLEVEL_UNSET != m_timeoutLevel) &&
