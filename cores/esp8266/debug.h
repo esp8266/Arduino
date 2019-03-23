@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #ifdef DEBUG_ESP_CORE
-#define DEBUGV(...) ::printf(__VA_ARGS__)
+#define DEBUGV(fmt, ...) ::printf((PGM_P)PSTR(fmt), ## __VA_ARGS__)
 #endif
 
 #ifndef DEBUGV

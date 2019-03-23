@@ -138,7 +138,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     conf.threshold.rssi = -127;
-#ifndef NONOSDK221
+#ifdef NONOSDK3V0
     conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
 #endif
 
