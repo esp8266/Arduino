@@ -21,6 +21,8 @@
 #include "Arduino.h"
 #include "debug.h"
 
+const char* overrideme PROGMEM = " should be overridden for better efficiency\r\n";
+
 void ICACHE_RAM_ATTR hexdump(const void *mem, uint32_t len, uint8_t cols) {
     const uint8_t* src = (const uint8_t*) mem;
     os_printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);

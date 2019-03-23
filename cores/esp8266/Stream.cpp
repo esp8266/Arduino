@@ -18,8 +18,6 @@
 
  Created July 2011
  parsing functions based on TextFinder library by Michael Margolis
-
- streamTo additions 2019/01 - David Gauchard
  */
 
 #include <Arduino.h>
@@ -284,9 +282,6 @@ size_t Stream::streamTo (Print& to, size_t maxLen)
             w = r;
         if (!w)
             return written;
-        if (w > MAXTRANSFERBLOCK)
-            w = MAXTRANSFERBLOCK;
-
         const char* pb = peekBuffer();
         if (pb)
         {
@@ -295,6 +290,9 @@ size_t Stream::streamTo (Print& to, size_t maxLen)
         }
         else
         {
+            if (w > MAXTRANSFERBLOCK)
+                w = MAXTRANSFERBLOCK;
+
             char temp[w];
             r = read(temp, w);
             w = to.write(temp, r);

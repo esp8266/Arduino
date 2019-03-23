@@ -115,9 +115,12 @@ class Stream: public Print {
         // immediate return when no more data are available (no timeout)
         virtual size_t streamTo (Print& to, size_t maxLen = 0);
 
-        // return a pointer to available data buffer (size = available())
+        // return a pointer to available data buffer (size = peekAvailable())
         // semantic forbids any kind of read() before calling peekConsume()
         virtual const char* peekBuffer () { return nullptr; }
+
+        // return number of byte accessible by peekBuffer()
+        virtual size_t peekAvailable () { return 0; }
 
         // consume bytes after use (see peekBuffer)
         virtual void peekConsume (size_t consume);

@@ -128,6 +128,26 @@ public:
         // return -1 when data is unvailable (arduino api)
         return uart_peek_char(_uart);
     }
+
+    // return number of byte accessible by peekBuffer()
+    size_t peekAvailable () override
+    {
+        return uart_peek_available(_uart);
+    }
+
+    // return a pointer to available data buffer (size = available())
+    // semantic forbids any kind of read() before calling peekConsume()
+    const char* peekBuffer () override
+    {
+        return uart_peek_buffer(_uart);
+    }
+
+    // consume bytes after use (see peekBuffer)
+    void peekConsume (size_t consume) override;
+    {
+        return uart_peek_consume(_uart, consume);
+    }
+
     int read(void) override
     {
         // return -1 when data is unvailable (arduino api)
