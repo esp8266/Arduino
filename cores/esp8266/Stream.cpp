@@ -306,9 +306,3 @@ size_t Stream::streamTo (Print& to, size_t maxLen)
     }
     return written;
 }
-
-void Stream::peekConsume (size_t consume)
-{
-    (void)consume;
-    panic(); // invalid use (peekBuffer() is nullptr)
-}

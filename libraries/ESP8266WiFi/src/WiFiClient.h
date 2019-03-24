@@ -118,6 +118,16 @@ public:
   bool getSync() const;
   void setSync(bool sync);
 
+  // return number of byte accessible by peekBuffer()
+  virtual size_t peekAvailable () override;
+
+  // return a pointer to available data buffer (size = peekAvailable())
+  // semantic forbids any kind of read() before calling peekConsume()
+  virtual const char* peekBuffer () override;
+
+  // consume bytes after use (see peekBuffer)
+  virtual void peekConsume (size_t consume) override;
+
 protected:
 
   static int8_t _s_connected(void* arg, void* tpcb, int8_t err);
