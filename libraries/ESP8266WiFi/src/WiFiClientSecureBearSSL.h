@@ -132,7 +132,7 @@ class WiFiClientSecure : public WiFiClient {
     virtual size_t peekAvailable () { return 0; }
 
     // consume bytes after use (see peekBuffer)
-    virtual void peekConsume (size_t consume) {}
+    virtual void peekConsume (size_t consume) { (void)consume; }
 
     ////////////////////////////////////////////////////
     // AxTLS API deprecated warnings to help upgrading

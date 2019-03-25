@@ -143,7 +143,7 @@ public:
     }
 
     // consume bytes after use (see peekBuffer)
-    void peekConsume (size_t consume) override;
+    void peekConsume (size_t consume) override
     {
         return uart_peek_consume(_uart, consume);
     }

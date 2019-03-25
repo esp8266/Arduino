@@ -277,22 +277,26 @@ size_t Stream::streamTo (Print& to, size_t maxLen)
     size_t written = 0;
     while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
     {
-        size_t r = available();
-        if (w > r)
-            w = r;
-        if (!w)
-            return written;
         const char* pb = peekBuffer();
         if (pb)
         {
+            size_t r = peekAvailable();
+            if (w > r)
+                w = r;
+            if (!w)
+                return written;
             w = to.write(pb, w);
             peekConsume(w);
         }
         else
         {
+            size_t r = available();
+            if (w > r)
+                w = r;
+            if (!w)
+                return written;
             if (w > MAXTRANSFERBLOCK)
                 w = MAXTRANSFERBLOCK;
-
             char temp[w];
             r = read(temp, w);
             w = to.write(temp, r);

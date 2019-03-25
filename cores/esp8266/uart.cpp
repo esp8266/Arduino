@@ -235,25 +235,25 @@ size_t uart_peek_available (uart_t* uart)
     ETS_UART_INTR_DISABLE();
     uart_rx_copy_fifo_to_buffer_unsafe(uart);
     ETS_UART_INTR_ENABLE();
-    if(rx_buffer->wpos < rx_buffer->rpos) 
-        return rx_buffer->size - rx_buffer->rpos;
-    return rx_buffer->wpos - rx_buffer->rpos;
+    if(uart->rx_buffer->wpos < uart->rx_buffer->rpos) 
+        return uart->rx_buffer->size - uart->rx_buffer->rpos;
+    return uart->rx_buffer->wpos - uart->rx_buffer->rpos;
 }
 
 // return a pointer to available data buffer (size = available())
 // semantic forbids any kind of read() before calling peekConsume()
 const char* uart_peek_buffer (uart_t* uart)
 {
-    return &uart->rx_buffer->buffer[uart->rx_buffer->rpos];
+    return (const char*)&uart->rx_buffer->buffer[uart->rx_buffer->rpos];
 }
 
 // consume bytes after use (see uart_peek_buffer)
 void uart_peek_consume (uart_t* uart, size_t consume)
 {
     ETS_UART_INTR_DISABLE();
-    rx_buffer->rpos += consume;
-    if (rx_buffer->rpos >= rx_buffer->size)
-    	rx_buffer->rpos -= rx_buffer->size;
+    uart->rx_buffer->rpos += consume;
+    if (uart->rx_buffer->rpos >= uart->rx_buffer->size)
+    	uart->rx_buffer->rpos -= uart->rx_buffer->size;
     ETS_UART_INTR_ENABLE();
 }
 

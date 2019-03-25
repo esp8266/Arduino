@@ -424,12 +424,16 @@ public:
     // semantic forbids any kind of read() before calling peekConsume()
     const char* peekBuffer ()
     {
-        return _rx_buf->payload + _rx_buf_offset
+        if (!_rx_buf)
+            return nullptr;
+        return (const char*)_rx_buf->payload + _rx_buf_offset;
     }
 
     // return number of byte accessible by peekBuffer()
     size_t peekAvailable ()
     {
+        if (!_rx_buf)
+            return 0;
         return _rx_buf->tot_len - _rx_buf_offset;
     }
 

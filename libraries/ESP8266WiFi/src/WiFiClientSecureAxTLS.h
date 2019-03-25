@@ -90,7 +90,7 @@ public:
   virtual size_t peekAvailable () { return 0; }
 
   // consume bytes after use (see peekBuffer)
-  virtual void peekConsume (size_t consume) {}
+  virtual void peekConsume (size_t consume) { (void)consume; }
 
 friend class WiFiServerSecure; // Needs access to custom constructor below
 protected:
