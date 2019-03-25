@@ -66,8 +66,8 @@ struct TimeMillis
   static timeType time() {return millis();}
 
   // millis to millis
-  static timeType toTimeTypeUnit (const timeType t) { return t; }
-  static timeType toUserUnit (const timeType t) { return t; }
+  static timeType toTimeTypeUnit (const timeType ms) { return ms; }
+  static timeType toUserUnit (const timeType ms) { return ms; }
 
   // rollover on 32 bits: 49.7 days (::max() is a "never expires"-reserved value)
   static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() - 1; }
@@ -89,8 +89,8 @@ template <const TimeFastCyclesBase::timeType second_th> struct TimeFastCycles: T
   static constexpr timeType toTimeTypeUnitMulMax = 160000000 / second_th;
   static constexpr timeType toTimeTypeUnitMul = F_CPU / second_th;
 
-  static timeType toTimeTypeUnit (const timeType user) { return user * toTimeTypeUnitMul; }
-  static timeType toUserUnit (const timeType internal) { return internal / toTimeTypeUnitMul; }
+  static timeType toTimeTypeUnit (const timeType userUnit) { return userUnit * toTimeTypeUnitMul; }
+  static timeType toUserUnit (const timeType cycles) { return cycles / toTimeTypeUnitMul; }
   static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() / toTimeTypeUnitMulMax; }
 };
 
@@ -108,8 +108,8 @@ struct TimeFastNanos: TimeFastCyclesBase
   static constexpr timeType toTimeTypeUnitMul =        F_CPU / 40000000; // 2 or 4 (smallest possible)
   static constexpr timeType toTimeTypeUnitDiv =                      25; // (mul/div=F_CPU/10^9)
 
-  static timeType toTimeTypeUnit (const timeType user) { return (user * toTimeTypeUnitMul) / toTimeTypeUnitDiv; }
-  static timeType toUserUnit (const timeType internal) { return (internal * toTimeTypeUnitDiv) / toTimeTypeUnitMul; }
+  static timeType toTimeTypeUnit (const timeType nanos) { return (nanos * toTimeTypeUnitMul) / toTimeTypeUnitDiv; }
+  static timeType toUserUnit (const timeType cycles) { return (cycles * toTimeTypeUnitDiv) / toTimeTypeUnitMul; }
   static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() / toTimeTypeUnitMulMax; }
 };
 
