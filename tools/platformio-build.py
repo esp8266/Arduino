@@ -106,7 +106,6 @@ env.Append(
     ],
 
     CPPPATH=[
-        join("$BUILD_DIR", "core"),
         join(FRAMEWORK_DIR, "tools", "sdk", "include"),
         join(FRAMEWORK_DIR, "tools", "sdk", "libc",
              "xtensa-lx106-elf", "include"),
@@ -249,6 +248,9 @@ if isdir(join(FRAMEWORK_DIR, ".git")):
         "version": platform_txt_version("unspecified")
     }
 
+    env.Prepend(CPPPATH=[
+        join("$BUILD_DIR", "core")
+    ])
     core_version = env.Command(
         join("$BUILD_DIR", "core", "core_version.h"),
         join(FRAMEWORK_DIR, ".git"),
