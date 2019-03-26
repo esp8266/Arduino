@@ -82,12 +82,12 @@ public:
     return loadCACert(file, file.size());
   }
 
-  // return a pointer to available data buffer (size = peekAvailable())
+  // return a pointer to available data buffer (size = availableForPeek())
   // semantic forbids any kind of read() before calling peekConsume()
   virtual const char* peekBuffer () { return nullptr; }
 
   // return number of byte accessible by peekBuffer()
-  virtual size_t peekAvailable () { return 0; }
+  virtual size_t availableForPeek () { return 0; }
 
   // consume bytes after use (see peekBuffer)
   virtual void peekConsume (size_t consume) { (void)consume; }

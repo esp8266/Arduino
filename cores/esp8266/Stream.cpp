@@ -268,6 +268,7 @@ size_t Stream::read (char* buffer, size_t maxLen)
     return nbread;
 }
 
+#if 0
 #define MAXTRANSFERBLOCK 128 // allocated in stack, be nice
 
 size_t Stream::streamTo (Print& to, size_t maxLen)
@@ -280,7 +281,7 @@ size_t Stream::streamTo (Print& to, size_t maxLen)
         const char* pb = peekBuffer();
         if (pb)
         {
-            size_t r = peekAvailable();
+            size_t r = availableForPeek();
             if (w > r)
                 w = r;
             if (!w)
@@ -310,3 +311,5 @@ size_t Stream::streamTo (Print& to, size_t maxLen)
     }
     return written;
 }
+
+#endif

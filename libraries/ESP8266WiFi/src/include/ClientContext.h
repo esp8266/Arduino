@@ -420,7 +420,7 @@ public:
         _sync = sync;
     }
 
-    // return a pointer to available data buffer (size = peekAvailable())
+    // return a pointer to available data buffer (size = availableForPeek())
     // semantic forbids any kind of read() before calling peekConsume()
     const char* peekBuffer ()
     {
@@ -430,7 +430,7 @@ public:
     }
 
     // return number of byte accessible by peekBuffer()
-    size_t peekAvailable ()
+    size_t availableForPeek ()
     {
         if (!_rx_buf)
             return 0;

@@ -119,9 +119,9 @@ public:
   void setSync(bool sync);
 
   // return number of byte accessible by peekBuffer()
-  virtual size_t peekAvailable () override;
+  virtual size_t availableForPeek () override;
 
-  // return a pointer to available data buffer (size = peekAvailable())
+  // return a pointer to available data buffer (size = availableForPeek())
   // semantic forbids any kind of read() before calling peekConsume()
   virtual const char* peekBuffer () override;
 

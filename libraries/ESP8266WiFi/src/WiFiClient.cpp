@@ -425,7 +425,7 @@ uint8_t WiFiClient::getKeepAliveCount () const
 }
 
 
-// return a pointer to available data buffer (size = peekAvailable())
+// return a pointer to available data buffer (size = availableForPeek())
 // semantic forbids any kind of read() before calling peekConsume()
 const char* WiFiClient::peekBuffer ()
 {
@@ -433,9 +433,9 @@ const char* WiFiClient::peekBuffer ()
 }
 
 // return number of byte accessible by peekBuffer()
-size_t WiFiClient::peekAvailable ()
+size_t WiFiClient::availableForPeek ()
 {
-    return _client->peekAvailable();
+    return _client->availableForPeek();
 }
 
 // consume bytes after use (see peekBuffer)
