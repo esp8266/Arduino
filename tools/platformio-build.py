@@ -242,7 +242,7 @@ def platform_txt_version(default):
     return default
 
 if isdir(join(FRAMEWORK_DIR, ".git")):
-    cmd = "$PYTHONEXE {script} -b $BUILD_DIR -p {framework_dir} -v {version}"
+    cmd = '"$PYTHONEXE" "{script}" -b "$BUILD_DIR" -p "{framework_dir}" -v {version}'
     fmt = {
         "script": join(FRAMEWORK_DIR, "tools", "makecorever.py"),
         "framework_dir": FRAMEWORK_DIR,
