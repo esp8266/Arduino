@@ -35,7 +35,8 @@
  readBytesBetween( pre_string, terminator, buffer, length)
  */
 
-template <typename Tfrom, typename Tto> size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0);
+template <typename Tfrom, typename Tto>
+size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0);
 
 class Stream: public Print {
     protected:
@@ -160,7 +161,7 @@ class Stream: public Print {
 #define STREAM_MOVE(from,to,...) (streamMove<decltype(from),decltype(to)>(from, to, ## __VA_ARGS__))
 
 template <typename Tfrom, typename Tto>
-size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0)
+size_t streamMove (Tfrom& from, Tto& to, size_t maxLen)
 {
 //    static constexpr auto yield_ms = 100;
     static constexpr auto maxStreamToOnHeap = 128;
