@@ -258,7 +258,7 @@ String Stream::readStringUntil(char terminator) {
     return ret;
 }
 
-size_t Stream::read (char* buffer, size_t maxLen)
+int Stream::read (char* buffer, size_t maxLen)
 {
     IAMSLOW("Stream::read(buffer,len)");
 

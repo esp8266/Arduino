@@ -66,9 +66,10 @@ public:
 
   virtual int available();
   virtual int read();
-  virtual int read(uint8_t *buf, size_t size) override;
+  virtual int read(char *buf, size_t size) override;
+  virtual int read(uint8_t *buf, size_t size) override { return read((char*)buf, size); }
   virtual int peek();
-  virtual size_t peekBytes(uint8_t *buffer, size_t length);
+  virtual size_t peekBytes(uint8_t *buffer, size_t length); // timeout
   size_t peekBytes(char *buffer, size_t length) {
     return peekBytes((uint8_t *) buffer, length);
   }
@@ -117,6 +118,9 @@ public:
   static bool getDefaultSync ();
   bool getSync() const;
   void setSync(bool sync);
+
+  // allow optimization for streamMove/STREAM_MOVE
+  static constexpr bool peekBufferAvailableAPI () { return true; }
 
   // return number of byte accessible by peekBuffer()
   virtual size_t availableForPeek () override;

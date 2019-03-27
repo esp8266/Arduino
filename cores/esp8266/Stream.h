@@ -88,6 +88,7 @@ class Stream: public Print {
 
         float parseFloat();               // float version of parseInt
 
+        // both arduino's "size_t Stream::readBytes(char*/uint8_t*, size_t):
         virtual size_t readBytes(char *buffer, size_t length); // read chars from stream into buffer
         virtual size_t readBytes(uint8_t *buffer, size_t length) {
             return readBytes((char *) buffer, length);
@@ -106,27 +107,43 @@ class Stream: public Print {
         virtual String readString();
         String readStringUntil(char terminator);
 
-        // read at most maxLen bytes
+        // additions: Client:: read() definitions moved here, because HardwareSerial have them too
+
+        // read at most maxLen bytes:
         // returns effectively transfered bytes (can be less than maxLen)
         // immediate return when no more data are available (no timeout)
-        virtual size_t read(char* buffer, size_t maxLen);
+        virtual int read(char* buffer, size_t maxLen);
+        // arduino's "int Client::read(uint8_t*,size_t)":
+        virtual int read(uint8_t* buffer, size_t maxLen) { return read((char*)buffer, maxLen); }
 
-        // transfer at most maxlen bytes (maxlen==0 means transfer until starvation)
-        // immediate return number of transfered bytes (no timeout)
-        virtual size_t streamTo (Print& to, size_t maxLen = 0)
-        {
-            return streamMove<Stream,Print>(*this, to, maxLen);
-        }
+        // addition: directly access to read buffer
+        // (currently implemented in HardwareSerial:: and WiFiClient::)
 
         // return a pointer to available data buffer (size = availableForPeek())
+        // api availability when return value is not nullptr
         // semantic forbids any kind of read() before calling peekConsume()
         virtual const char* peekBuffer () { return nullptr; }
+
+        // should be reimplemented as constexpr where relevant
+        // for streamMove<> / STREAM_MOVE optimization
+        bool peekBufferAvailableAPI () { return !!peekBuffer(); }
 
         // return number of byte accessible by peekBuffer()
         virtual size_t availableForPeek () { return 0; }
 
         // consume bytes after use (see peekBuffer)
         virtual void peekConsume (size_t consume) { (void)consume; }
+
+        // additions: streamTo
+
+        // transfer at most maxlen bytes (maxlen==0 means transfer until starvation)
+        // immediate return number of transfered bytes (no timeout)
+        // generic implementation using arduino virtual API
+        // (also available: virtual-less template streamMove(from,to))
+        virtual size_t streamTo (Print& to, size_t maxLen = 0)
+        {
+            return streamMove<Stream,Print>(*this, to, maxLen);
+        }
 
     protected:
         long parseInt(char skipChar); // as above but the given skipChar is ignored
@@ -139,7 +156,11 @@ class Stream: public Print {
 #include <assert.h>
 //#include "Esp.h"
 //#include "PolledTimeout.h"
-template <typename Tfrom, typename Tto> size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0)
+
+#define STREAM_MOVE(from,to,...) (streamMove<decltype(from),decltype(to)>(from, to, ## __VA_ARGS__))
+
+template <typename Tfrom, typename Tto>
+size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0)
 {
 //    static constexpr auto yield_ms = 100;
     static constexpr auto maxStreamToOnHeap = 128;
@@ -147,8 +168,8 @@ template <typename Tfrom, typename Tto> size_t streamMove (Tfrom& from, Tto& to,
     size_t written = 0;
     size_t w;
 
-    if (from.peekBuffer())
-        // direct write API available, avoid one copy
+    if (from.peekBufferAvailableAPI())
+        // direct buffer read API available, avoid one copy
         while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
         {
             const char* pb = from.peekBuffer();

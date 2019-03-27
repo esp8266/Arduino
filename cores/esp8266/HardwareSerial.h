@@ -129,6 +129,9 @@ public:
         return uart_peek_char(_uart);
     }
 
+    // allow optimization for streamMove/STREAM_MOVE
+    static constexpr bool peekBufferAvailableAPI () { return true; }
+
     // return a pointer to available data buffer (size = available())
     // semantic forbids any kind of read() before calling peekConsume()
     const char* peekBuffer () override
@@ -154,9 +157,13 @@ public:
         return uart_read_char(_uart);
     }
     // ::read(buffer, size): same as readBytes without timeout
-    size_t read(char* buffer, size_t size) override
+    int read(char* buffer, size_t size) override
     {
         return uart_read(_uart, buffer, size);
+    }
+    int read(uint8_t* buffer, size_t size) override
+    {
+        return uart_read(_uart, (char*)buffer, size);
     }
     size_t readBytes(char* buffer, size_t size) override;
     size_t readBytes(uint8_t* buffer, size_t size) override

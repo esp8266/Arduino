@@ -89,7 +89,7 @@ public:
   int read(unsigned char* buffer, size_t len) override;
   // Read up to len characters from the current packet and place them into buffer
   // Returns the number of characters read, or 0 if none are available
-  size_t read(char* buffer, size_t len) override { return read((unsigned char*)buffer, len); };
+  int read(char* buffer, size_t len) override { return read((unsigned char*)buffer, len); };
   // Return the next byte from the current packet without moving on to the next byte
   int peek() override;
   void flush() override;	// Finish reading the current packet

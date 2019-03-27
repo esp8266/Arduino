@@ -82,6 +82,9 @@ public:
     return loadCACert(file, file.size());
   }
 
+  // disallow optimization for streamMove/STREAM_MOVE
+  static constexpr bool peekBufferAvailableAPI () { return false; }
+
   // return a pointer to available data buffer (size = availableForPeek())
   // semantic forbids any kind of read() before calling peekConsume()
   virtual const char* peekBuffer () { return nullptr; }

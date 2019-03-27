@@ -73,7 +73,7 @@ class UDP: public Stream {
         virtual int read(unsigned char* buffer, size_t len) =0;
         // Read up to len characters from the current packet and place them into buffer
         // Returns the number of characters read, or 0 if none are available
-        virtual size_t read(char* buffer, size_t len) =0;
+        virtual int read(char* buffer, size_t len) =0;
         // Return the next byte from the current packet without moving on to the next byte
         virtual int peek() =0;
         virtual void flush() =0;	// Finish reading the current packet

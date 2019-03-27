@@ -274,9 +274,9 @@ int WiFiClient::read()
 }
 
 
-int WiFiClient::read(uint8_t* buf, size_t size)
+int WiFiClient::read(char* buf, size_t size)
 {
-    return (int)_client->read(reinterpret_cast<char*>(buf), size);
+    return (int)_client->read(buf, size);
 }
 
 int WiFiClient::peek()
