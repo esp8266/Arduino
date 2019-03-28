@@ -35,7 +35,7 @@ Once we have libraries in place we need to create a ``WiFiUDP`` object. Then we 
 
     WiFiUDP Udp;
     unsigned int localUdpPort = 4210;
-    char incomingPacket[255];
+    char incomingPacket[256];
     char replyPacket[] = "Hi there! Got the message :-)";
 
 Wi-Fi Connection
@@ -68,7 +68,7 @@ Waiting for incoming UDP packed is done by the following code:
       int len = Udp.read(incomingPacket, 255);
       if (len > 0)
       {
-        incomingPacket[len] = 0;
+        incomingPacket[len] = '\0';
       }
       Serial.printf("UDP packet contents: %s\n", incomingPacket);
 
