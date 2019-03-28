@@ -245,7 +245,7 @@ using periodicFastNs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothi
 
 
 /* A 1-shot timeout that auto-yields when in CONT can be built as follows:
- * using oneShotYield = esp8266::polledTimeout::timeoutTemplate<false, esp8266::polledTimeout::YieldPolicy::YieldOrSkip>;
+ * using oneShotYieldMs = esp8266::polledTimeout::timeoutTemplate<false, esp8266::polledTimeout::YieldPolicy::YieldOrSkip>;
  *
  * Other policies can be implemented by the user, e.g.: simple yield that panics in SYS, and the polledTimeout types built as needed as shown above, without modifying this file.
  */
