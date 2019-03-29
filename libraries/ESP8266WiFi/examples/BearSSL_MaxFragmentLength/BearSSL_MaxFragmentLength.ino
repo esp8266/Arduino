@@ -20,13 +20,13 @@ void fetch(BearSSL::WiFiClientSecure *client) {
   uint32_t startMillis = millis();
   do {
     char tmp[32];
-//    memset(tmp, 0, 32);
+    //    memset(tmp, 0, 32);
     int rlen = client->read((uint8_t*)tmp, sizeof(tmp) - 1);
     yield();
     if (rlen < 0) {
       break;
     }
-    if(rlen == 0) {
+    if (rlen == 0) {
       delay(10); // Give background processes some time
       continue;
     }
