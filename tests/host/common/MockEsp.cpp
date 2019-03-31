@@ -81,7 +81,7 @@ EspClass ESP;
 
 void EspClass::restart ()
 {
-	fprintf(stderr, MOCK "Esp.restart(): exiting\n");
+	mockverbose("Esp.restart(): exiting\n");
 	exit(EXIT_SUCCESS);
 }
 
