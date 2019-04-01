@@ -81,6 +81,20 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
             return false;
         }
     }
+    
+    if(lhs.threshold.rssi != rhs.threshold.rssi) {
+        return false;
+    }
+
+    if(lhs.threshold.authmode != rhs.threshold.authmode) {
+        return false;
+    }
+
+#ifdef NONOSDK3V0
+    if (lhs.open_and_wep_mode_disable != rhs.open_and_wep_mode_disable) {
+        return false;
+    }
+#endif
 
     return true;
 }
