@@ -125,6 +125,24 @@ directory into ESP8266 flash file system.
 File system object (SPIFFS)
 ---------------------------
 
+setConfig
+~~~~~~~~~
+
+.. code:: cpp
+
+    SPIFFSConfig cfg;
+    cfg.setAutoFormat(false);
+    SPIFFS.setConfig(cfg);
+
+This method allows you to configure the parameters of a filesystem
+before mounting.  All filesystems have their own ``*Config`` (i.e.
+``SDFSConfig`` or ``SPIFFSConfig`` with their custom set of options.
+All filesystems allow explicitly enabling/disabling formatting when
+mounts fail.  If you do not call this ``setConfig`` method before
+perforing ``begin()``, you will get the filesystem's default
+behavior and configuration. By default, SPIFFS will autoformat the
+filesystem if it cannot mount it, while SDFS will not.
+
 begin
 ~~~~~
 
@@ -134,7 +152,8 @@ begin
 
 This method mounts SPIFFS file system. It must be called before any
 other FS APIs are used. Returns *true* if file system was mounted
-successfully, false otherwise.
+successfully, false otherwise.  With no options it will format SPIFFS
+if it is unable to mount it on the first try.
 
 end
 ~~~

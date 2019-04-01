@@ -70,6 +70,7 @@ env.Append(
         "-U__STRICT_ANSI__",
         "-ffunction-sections",
         "-fdata-sections",
+        "-fno-exceptions",
         "-Wall"
     ],
 
@@ -96,8 +97,8 @@ env.Append(
         "__ets__",
         "ICACHE_FLASH",
         ("ARDUINO", 10805),
-        ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"'
-            % env.BoardConfig().id.upper()),
+        ("ARDUINO_BOARD", '\\"PLATFORMIO_%s\\"' % env.BoardConfig().id.upper()),
+        "FLASHMODE_${BOARD_FLASH_MODE.upper()}",
         "LWIP_OPEN_SRC"
     ],
 
@@ -130,6 +131,26 @@ env.Append(
 env.Append(ASFLAGS=env.get("CCFLAGS", [])[:])
 
 flatten_cppdefines = env.Flatten(env['CPPDEFINES'])
+
+#
+# SDK
+#
+if "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK3" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK3V0", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK3V0"),]
+    )
+elif "PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x" in flatten_cppdefines:
+    env.Append(
+        CPPDEFINES=[("NONOSDK22x", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK22x"),]
+    )
+# PIO_FRAMEWORK_ARDUINO_ESPRESSIF_SDK22x (default)
+else:
+    env.Append(
+        CPPDEFINES=[("NONOSDK221", 1)],
+        LIBPATH=[join(FRAMEWORK_DIR, "tools", "sdk", "lib", "NONOSDK221"),]
+    )
 
 #
 # lwIP

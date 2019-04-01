@@ -5,11 +5,11 @@
 #include <stdint.h>
 
 #ifdef DEBUG_ESP_CORE
-#define DEBUGV(...) ets_printf(__VA_ARGS__)
+#define DEBUGV(fmt, ...) ::printf((PGM_P)PSTR(fmt), ## __VA_ARGS__)
 #endif
 
 #ifndef DEBUGV
-#define DEBUGV(...)
+#define DEBUGV(...) do { (void)0; } while (0)
 #endif
 
 #ifdef __cplusplus

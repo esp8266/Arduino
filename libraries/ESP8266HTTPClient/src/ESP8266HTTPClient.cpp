@@ -139,6 +139,7 @@ void HTTPClient::clear()
     _size = -1;
     _headers = "";
     _payload.reset();
+    _location = "";
 }
 
 
@@ -217,7 +218,6 @@ bool HTTPClient::begin(String url, String httpsFingerprint)
         end();
     }
 
-    _port = 443;
     if (httpsFingerprint.length() == 0) {
         return false;
     }
@@ -238,7 +238,6 @@ bool HTTPClient::begin(String url, const uint8_t httpsFingerprint[20])
         end();
     }
 
-    _port = 443;
     if (!beginInternal(url, "https")) {
         return false;
     }
@@ -264,7 +263,6 @@ bool HTTPClient::begin(String url)
         end();
     }
 
-    _port = 80;
     if (!beginInternal(url, "http")) {
         return false;
     }
@@ -287,6 +285,17 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 
     _protocol = url.substring(0, index);
     url.remove(0, (index + 3)); // remove http:// or https://
+
+    if (_protocol == "http") {
+        // set default port for 'http'
+        _port = 80;
+    } else if (_protocol == "https") {
+        // set default port for 'https'
+        _port = 443;
+    } else {
+        DEBUG_HTTPCLIENT("[HTTP-Client][begin] unsupported protocol: %s\n", _protocol.c_str());
+        return false;
+    }
 
     index = url.indexOf('/');
     String host = url.substring(0, index);
@@ -312,7 +321,7 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
     }
     _uri = url;
 
-    if (_protocol != expectedProtocol) {
+    if ( expectedProtocol != nullptr && _protocol != expectedProtocol) {
         DEBUG_HTTPCLIENT("[HTTP-Client][begin] unexpected protocol: %s, expected %s\n", _protocol.c_str(), expectedProtocol);
         return false;
     }
@@ -402,13 +411,14 @@ void HTTPClient::end(void)
 {
     disconnect();
     clear();
+    _redirectCount = 0;
 }
 
 /**
  * disconnect
  * close the TCP socket
  */
-void HTTPClient::disconnect()
+void HTTPClient::disconnect(bool preserveClient)
 {
     if(connected()) {
         if(_client->available() > 0) {
@@ -424,7 +434,9 @@ void HTTPClient::disconnect()
             DEBUG_HTTPCLIENT("[HTTP-Client][end] tcp stop\n");
             if(_client) {
                 _client->stop();
-                _client = nullptr;
+                if (!preserveClient) {
+                    _client = nullptr;
+                }
             }
 #if HTTPCLIENT_1_1_COMPATIBLE
             if(_tcpDeprecated) {
@@ -505,6 +517,43 @@ void HTTPClient::setTimeout(uint16_t timeout)
     if(connected()) {
         _client->setTimeout(timeout);
     }
+}
+
+/**
+ * set the URL to a new value. Handy for following redirects.
+ * @param url
+ */
+bool HTTPClient::setURL(String url)
+{
+    // if the new location is only a path then only update the URI
+    if (_location.startsWith("/")) {
+        _uri = _location;
+        clear();
+        return true;
+    }
+
+    if (!url.startsWith(_protocol + ":")) {
+        DEBUG_HTTPCLIENT("[HTTP-Client][setURL] new URL not the same protocol, expected '%s', URL: '%s'\n", _protocol.c_str(), url.c_str());
+        return false;
+    }
+    // disconnect but preserve _client
+    disconnect(true);
+    clear();
+    return beginInternal(url, nullptr);
+}
+
+/**
+ * set true to follow redirects.
+ * @param follow
+ */
+void HTTPClient::setFollowRedirects(bool follow)
+{
+    _followRedirects = follow;
+}
+
+void HTTPClient::setRedirectLimit(uint16_t limit)
+{
+    _redirectLimit = limit;
 }
 
 /**
@@ -589,29 +638,82 @@ int HTTPClient::sendRequest(const char * type, String payload)
  */
 int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
 {
-    // connect to server
-    if(!connect()) {
-        return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
-    }
+    bool redirect = false;
+    int code = 0;
+    do {
+        // wipe out any existing headers from previous request
+        for(size_t i = 0; i < _headerKeysCount; i++) {
+            if (_currentHeaders[i].value.length() > 0) {
+                _currentHeaders[i].value = "";
+            }
+        }
 
-    if(payload && size > 0) {
-        addHeader(F("Content-Length"), String(size));
-    }
+        redirect = false;
+        DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] type: '%s' redirCount: %d\n", type, _redirectCount);
 
-    // send Header
-    if(!sendHeader(type)) {
-        return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
-    }
+        // connect to server
+        if(!connect()) {
+            return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
+        }
 
-    // send Payload if needed
-    if(payload && size > 0) {
-        if(_client->write(&payload[0], size) != size) {
-            return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+        if(payload && size > 0) {
+            addHeader(F("Content-Length"), String(size));
+        }
+
+        // send Header
+        if(!sendHeader(type)) {
+            return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
+        }
+
+        // send Payload if needed
+        if(payload && size > 0) {
+            if(_client->write(&payload[0], size) != size) {
+                return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
+            }
+        }
+
+        // handle Server Response (Header)
+        code = handleHeaderResponse();
+
+        //
+        // We can follow redirects for 301/302/307 for GET and HEAD requests and
+        // and we have not exceeded the redirect limit preventing an infinite
+        // redirect loop.
+        //
+        // https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+        //
+        if (_followRedirects &&
+                (_redirectCount < _redirectLimit) &&
+                (_location.length() > 0) &&
+                (code == 301 || code == 302 || code == 307) &&
+                (!strcmp(type, "GET") || !strcmp(type, "HEAD"))
+                ) {
+            _redirectCount += 1; // increment the count for redirect.
+            redirect = true;
+            DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] following redirect:: '%s' redirCount: %d\n", _location.c_str(), _redirectCount);
+            if (!setURL(_location)) {
+                // return the redirect instead of handling on failure of setURL()
+                redirect = false;
+            }
+        }
+
+    } while (redirect);
+
+    // handle 303 redirect for non GET/HEAD by changing to GET and requesting new url
+    if (_followRedirects &&
+            (_redirectCount < _redirectLimit) &&
+            (_location.length() > 0) &&
+            (code == 303) &&
+            strcmp(type, "GET") && strcmp(type, "HEAD")
+            ) {
+        _redirectCount += 1;
+        if (setURL(_location)) {
+            code = sendRequest("GET");
         }
     }
 
     // handle Server Response (Header)
-    return returnError(handleHeaderResponse());
+    return returnError(code);
 }
 
 /**
@@ -760,6 +862,14 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 int HTTPClient::getSize(void)
 {
     return _size;
+}
+
+/**
+ * Location if redirect
+ */
+const String& HTTPClient::getLocation(void)
+{
+    return _location;
 }
 
 /**
@@ -1171,6 +1281,10 @@ int HTTPClient::handleHeaderResponse()
 
                 if(headerName.equalsIgnoreCase("Transfer-Encoding")) {
                     transferEncoding = headerValue;
+                }
+
+                if(headerName.equalsIgnoreCase("Location")) {
+                    _location = headerValue;
                 }
 
                 for(size_t i = 0; i < _headerKeysCount; i++) {

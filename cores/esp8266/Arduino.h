@@ -188,7 +188,7 @@ typedef uint16_t word;
 #define bit(b) (1UL << (b))
 #define _BV(b) (1UL << (b))
 
-typedef uint8_t boolean;
+typedef bool boolean;
 typedef uint8_t byte;
 
 void init(void);

@@ -77,7 +77,11 @@ extern "C" {
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
 
+int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
+
 extern const char* host_interface; // cmdline parameter
+
+extern int mock_port_shifter;
 
 #define NO_GLOBAL_BINDING 0xffffffff
 extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
@@ -92,6 +96,15 @@ extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
 
 #ifndef CCBUFSIZE
 #define CCBUFSIZE 65536
+#endif
+
+// uart
+#ifdef __cplusplus
+extern "C" {
+#endif
+void uart_new_data(const int uart_nr, uint8_t data);
+#ifdef __cplusplus
+}
 #endif
 
 // tcp

@@ -76,8 +76,8 @@ class String {
         // invalid string (i.e., "if (s)" will be true afterwards)
         unsigned char reserve(unsigned int size);
         inline unsigned int length(void) const {
-            if(buffer) {
-                return len;
+            if(buffer()) {
+                return len();
             } else {
                 return 0;
             }
@@ -172,7 +172,7 @@ class String {
 
         // comparison (only works w/ Strings and "strings")
         operator StringIfHelperType() const {
-            return buffer ? &String::StringIfHelper : 0;
+            return buffer() ? &String::StringIfHelper : 0;
         }
         int compareTo(const String &s) const;
         unsigned char equals(const String &s) const;
@@ -208,9 +208,9 @@ class String {
         void toCharArray(char *buf, unsigned int bufsize, unsigned int index = 0) const {
             getBytes((unsigned char *) buf, bufsize, index);
         }
-        const char* c_str() const { return buffer; }
-        char* begin() { return buffer; }
-        char* end() { return buffer + length(); }
+        const char* c_str() const { return buffer(); }
+        char* begin() { return wbuffer(); }
+        char* end() { return wbuffer() + length(); }
         const char* begin() const { return c_str(); }
         const char* end() const { return c_str() + length(); }
 
@@ -224,7 +224,7 @@ class String {
         int lastIndexOf(const String &str) const;
         int lastIndexOf(const String &str, unsigned int fromIndex) const;
         String substring(unsigned int beginIndex) const {
-            return substring(beginIndex, len);
+            return substring(beginIndex, len());
         }
         ;
         String substring(unsigned int beginIndex, unsigned int endIndex) const;
@@ -243,9 +243,34 @@ class String {
         float toFloat(void) const;
 
     protected:
-        char *buffer;	        // the actual char array
-        unsigned int capacity;  // the array length minus one (for the '\0')
-        unsigned int len;       // the String length (not counting the '\0')
+        // Contains the string info when we're not in SSO mode
+        struct _ptr { 
+            char *   buff;
+            uint16_t cap;
+            uint16_t len;
+        };
+
+        // SSO is handled by checking the last byte of sso_buff.
+        // When not in SSO mode, that byte is set to 0xff, while when in SSO mode it is always 0x00 (so it can serve as the string terminator as well as a flag)
+        // This allows strings up up to 12 (11 + \0 termination) without any extra space.
+        enum { SSOSIZE = sizeof(struct _ptr) + 4 }; // Characters to allocate space for SSO, must be 12 or more
+        enum { CAPACITY_MAX = 65535 }; // If size of capacity changed, be sure to update this enum
+        union {
+            struct _ptr ptr;
+            char sso_buf[SSOSIZE];
+        };
+        // Accessor functions
+        inline bool sso() const { return sso_buf[SSOSIZE - 1] == 0; }
+        inline unsigned int len() const { return sso() ? strlen(sso_buf) : ptr.len; }
+        inline unsigned int capacity() const { return sso() ? SSOSIZE - 1 : ptr.cap; }
+        inline void setSSO(bool sso) { sso_buf[SSOSIZE - 1] = sso ? 0x00 : 0xff; }
+        inline void setLen(int len) { if (!sso()) ptr.len = len; }
+        inline void setCapacity(int cap) { if (!sso()) ptr.cap = cap; }
+	inline void setBuffer(char *buff) { if (!sso()) ptr.buff = buff; }
+        // Buffer accessor functions
+        inline const char *buffer() const { return (const char *)(sso() ? sso_buf : ptr.buff); }
+        inline char *wbuffer() const { return sso() ? const_cast<char *>(sso_buf) : ptr.buff; } // Writable version of buffer
+
     protected:
         void init(void);
         void invalidate(void);

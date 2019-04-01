@@ -34,8 +34,12 @@ public:
     virtual bool seek(uint32_t pos, SeekMode mode) = 0;
     virtual size_t position() const = 0;
     virtual size_t size() const = 0;
+    virtual bool truncate(uint32_t size) = 0;
     virtual void close() = 0;
     virtual const char* name() const = 0;
+    virtual const char* fullName() const = 0;
+    virtual bool isFile() const = 0;
+    virtual bool isDirectory() const = 0;
 };
 
 enum OpenMode {
@@ -57,12 +61,16 @@ public:
     virtual FileImplPtr openFile(OpenMode openMode, AccessMode accessMode) = 0;
     virtual const char* fileName() = 0;
     virtual size_t fileSize() = 0;
+    virtual bool isFile() const = 0;
+    virtual bool isDirectory() const = 0;
     virtual bool next() = 0;
+    virtual bool rewind() = 0;
 };
 
 class FSImpl {
 public:
     virtual ~FSImpl () { }
+    virtual bool setConfig(const FSConfig &cfg) = 0;
     virtual bool begin() = 0;
     virtual void end() = 0;
     virtual bool format() = 0;
@@ -72,7 +80,8 @@ public:
     virtual DirImplPtr openDir(const char* path) = 0;
     virtual bool rename(const char* pathFrom, const char* pathTo) = 0;
     virtual bool remove(const char* path) = 0;
-
+    virtual bool mkdir(const char* path) = 0;
+    virtual bool rmdir(const char* path) = 0;
 };
 
 } // namespace fs

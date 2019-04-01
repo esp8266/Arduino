@@ -2,6 +2,7 @@ BINDIR := bin
 LCOV_DIRECTORY := lcov
 OUTPUT_BINARY := $(BINDIR)/host_tests
 CORE_PATH := ../../cores/esp8266
+LIBRARIES_PATH := ../../libraries
 FORCE32 ?= 1
 OPTZ ?= -Os
 V ?= 0
@@ -56,24 +57,38 @@ CORE_CPP_FILES := $(addprefix $(CORE_PATH)/,\
 	FS.cpp \
 	spiffs_api.cpp \
 	MD5Builder.cpp \
+	core_esp8266_noniso.cpp \
+	spiffs/spiffs_cache.cpp \
+	spiffs/spiffs_check.cpp \
+	spiffs/spiffs_gc.cpp \
+	spiffs/spiffs_hydrogen.cpp \
+	spiffs/spiffs_nucleus.cpp \
+	libb64/cencode.cpp \
+	libb64/cdecode.cpp \
 	Schedule.cpp \
-)
+	HardwareSerial.cpp \
+	) \
+	$(addprefix $(LIBRARIES_PATH)/ESP8266SdFat/src/, \
+		FatLib/FatFile.cpp \
+		FatLib/FatFileLFN.cpp \
+		FatLib/FatFilePrint.cpp \
+		FatLib/FatFileSFN.cpp \
+		FatLib/FatVolume.cpp \
+		FatLib/FmtNumber.cpp \
+		FatLib/StdioStream.cpp \
+	) \
+	$(LIBRARIES_PATH)/SDFS/src/SDFS.cpp \
+	$(LIBRARIES_PATH)/SD/src/SD.cpp
 
 CORE_C_FILES := $(addprefix $(CORE_PATH)/,\
-	core_esp8266_noniso.c \
-	spiffs/spiffs_cache.c \
-	spiffs/spiffs_check.c \
-	spiffs/spiffs_gc.c \
-	spiffs/spiffs_hydrogen.c \
-	spiffs/spiffs_nucleus.c \
-	libb64/cencode.c \
 )
 
 MOCK_CPP_FILES_COMMON := $(addprefix common/,\
 	Arduino.cpp \
 	spiffs_mock.cpp \
+	sdfs_mock.cpp \
 	WMath.cpp \
-	MockSerial.cpp \
+	MockUART.cpp \
 	MockTools.cpp \
 	MocklwIP.cpp \
 )
@@ -93,7 +108,6 @@ MOCK_C_FILES := $(addprefix common/,\
 	md5.c \
 	noniso.c \
 )
-
 
 INC_PATHS += $(addprefix -I, \
 	. \
@@ -128,6 +142,8 @@ endif
 FLAGS += $(DEBUG) -Wall -coverage $(OPTZ) -fno-common -g $(M32)
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
+FLAGS += -DHOST_MOCK=1
+FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
 CXXFLAGS += -std=c++11 $(FLAGS)
 CFLAGS += -std=c99 $(FLAGS)
@@ -215,56 +231,60 @@ ARDUINO_LIBS := \
 		Updater.cpp \
 		base64.cpp \
 	) \
-	$(addprefix ../../libraries/,\
-		$(addprefix ESP8266WiFi/src/,\
-			ESP8266WiFi.cpp \
-			ESP8266WiFiAP.cpp \
-			ESP8266WiFiGeneric.cpp \
-			ESP8266WiFiMulti.cpp \
-			ESP8266WiFiSTA-WPS.cpp \
-			ESP8266WiFiSTA.cpp \
-			ESP8266WiFiScan.cpp \
-			WiFiClient.cpp \
-			WiFiUdp.cpp \
-			WiFiClientSecureBearSSL.cpp \
-			WiFiServerSecureBearSSL.cpp \
-			BearSSLHelpers.cpp \
-			CertStoreBearSSL.cpp \
-		) \
-		$(addprefix ESP8266WebServer/src/,\
-			ESP8266WebServer.cpp \
-			Parsing.cpp \
-			detail/mimetable.cpp \
-		) \
-		ESP8266mDNS/src/LEAmDNS.cpp \
-		ESP8266mDNS/src/LEAmDNS_Control.cpp \
-		ESP8266mDNS/src/LEAmDNS_Helpers.cpp \
-		ESP8266mDNS/src/LEAmDNS_Structs.cpp \
-		ESP8266mDNS/src/LEAmDNS_Transfer.cpp \
-		ESP8266mDNS/src/ESP8266mDNS.cpp \
-		ArduinoOTA/ArduinoOTA.cpp \
-		DNSServer/src/DNSServer.cpp \
-		ESP8266AVRISP/src/ESP8266AVRISP.cpp \
-		ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
-	) \
+	$(addprefix ../../libraries/ESP8266WiFi/src/,\
+		ESP8266WiFi.cpp \
+		ESP8266WiFiAP.cpp \
+		ESP8266WiFiGeneric.cpp \
+		ESP8266WiFiMulti.cpp \
+		ESP8266WiFiSTA-WPS.cpp \
+		ESP8266WiFiSTA.cpp \
+		ESP8266WiFiScan.cpp \
+		WiFiClient.cpp \
+		WiFiUdp.cpp \
+		WiFiClientSecureBearSSL.cpp \
+		WiFiServerSecureBearSSL.cpp \
+		BearSSLHelpers.cpp \
+		CertStoreBearSSL.cpp \
+	)
 
-MOCK_ARDUINO_LIBS := \
-	common/ClientContextSocket.cpp \
-	common/ClientContextTools.cpp \
-	common/MockWiFiServerSocket.cpp \
-	common/MockWiFiServer.cpp \
-	common/UdpContextSocket.cpp \
-	common/HostWiring.cpp \
-	common/MockEsp.cpp \
-	common/MockEEPROM.cpp \
-	common/MockSPI.cpp \
+OPT_ARDUINO_LIBS ?= $(addprefix ../../libraries/,\
+	$(addprefix ESP8266WebServer/src/,\
+		ESP8266WebServer.cpp \
+		Parsing.cpp \
+		detail/mimetable.cpp \
+	) \
+	$(addprefix ESP8266mDNS/src/,\
+		LEAmDNS.cpp \
+		LEAmDNS_Control.cpp \
+		LEAmDNS_Helpers.cpp \
+		LEAmDNS_Structs.cpp \
+		LEAmDNS_Transfer.cpp \
+		ESP8266mDNS.cpp \
+	) \
+	ArduinoOTA/ArduinoOTA.cpp \
+	DNSServer/src/DNSServer.cpp \
+	ESP8266AVRISP/src/ESP8266AVRISP.cpp \
+	ESP8266HTTPClient/src/ESP8266HTTPClient.cpp \
+)
+
+MOCK_ARDUINO_LIBS := $(addprefix common/,\
+	ClientContextSocket.cpp \
+	ClientContextTools.cpp \
+	MockWiFiServerSocket.cpp \
+	MockWiFiServer.cpp \
+	UdpContextSocket.cpp \
+	HostWiring.cpp \
+	MockEsp.cpp \
+	MockEEPROM.cpp \
+	MockSPI.cpp \
+)
 
 CPP_SOURCES_CORE_EMU = \
 	$(MOCK_CPP_FILES_EMU) \
 	$(CORE_CPP_FILES) \
 	$(MOCK_ARDUINO_LIBS) \
+	$(OPT_ARDUINO_LIBS) \
 	$(ARDUINO_LIBS) \
-
 
 LIBSSLFILE = ../../tools/sdk/ssl/bearssl/build$(N32)/libbearssl.a
 ifeq (,$(wildcard $(LIBSSLFILE)))
@@ -339,3 +359,4 @@ help:
 	@echo ""
 	@sed -rne 's,([^: \t]*):[^=#]*#[\t ]*(.*),\1 - \2,p' $(MAKEFILE)
 	@echo ""
+	
