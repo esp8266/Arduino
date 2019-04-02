@@ -58,60 +58,48 @@ struct YieldAndDelayMs
 namespace TimePolicy
 {
 
-struct TimeMillis
+struct TimeSourceMillis
 {
   // time policy in milli-seconds based on millis()
 
   using timeType = decltype(millis());
   static timeType time() {return millis();}
-
-  // millis to millis
-  static timeType toTimeTypeUnit (const timeType ms) { return ms; }
-  static timeType toUserUnit (const timeType ms) { return ms; }
-
-  // rollover on 32 bits: 49.7 days (::max() is a "never expires"-reserved value)
-  static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() - 1; }
+  static constexpr timeType ticksPerSecond    = 1000;
+  static constexpr timeType ticksPerSecondMax = 1000;
 };
 
-struct TimeFastCyclesBase
+struct TimeSourceCycles
 {
   // time policy based on ESP.getCycleCount()
+  // this particular time measurement is intended to be called very often
+  // (every loop, every yield)
 
   using timeType = decltype(ESP.getCycleCount());
   static timeType time() {return ESP.getCycleCount();}
-
-  // this particular time measurement is intended to be called very often
-  // (every loop, every yield)
+  static constexpr timeType ticksPerSecond    = F_CPU;
+  static constexpr timeType ticksPerSecondMax = 160000000; // Mhz
 };
 
-template <const TimeFastCyclesBase::timeType second_th> struct TimeFastCycles: TimeFastCyclesBase
+template <typename TimeSourceType, unsigned long long second_th, unsigned long long rangeCompensate = 1>
+struct TimeUnit
 {
-  static constexpr timeType toTimeTypeUnitMulMax = 160000000 / second_th;
-  static constexpr timeType toTimeTypeUnitMul = F_CPU / second_th;
+  using timeType = typename TimeSourceType::timeType;
 
-  static timeType toTimeTypeUnit (const timeType userUnit) { return userUnit * toTimeTypeUnitMul; }
-  static timeType toUserUnit (const timeType cycles) { return cycles / toTimeTypeUnitMul; }
-  static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() / toTimeTypeUnitMulMax; }
+  static constexpr timeType user2UnitMultiplierMax = (TimeSourceType::ticksPerSecondMax * rangeCompensate) / second_th;
+  static constexpr timeType user2UnitMultiplier    = (TimeSourceType::ticksPerSecond    * rangeCompensate) / second_th;
+  static constexpr timeType user2UnitDivider       = rangeCompensate;
+  static constexpr timeType timeMax                = (std::numeric_limits<timeType>::max() - 1) / user2UnitMultiplierMax;
+  static constexpr timeType neverExpires           = std::numeric_limits<timeType>::max();
+
+  static timeType toTimeTypeUnit (const timeType userUnit) { return (userUnit * user2UnitMultiplier) / user2UnitDivider; }
+  static timeType toUserUnit (const timeType internalUnit) { return (internalUnit * user2UnitDivider) / user2UnitMultiplier; }
+  static timeType time () {return TimeSourceType::time(); }
 };
 
-struct TimeFastMillis: TimeFastCycles<1000>
-{
-};
-
-struct TimeFastMicros: TimeFastCycles<1000000>
-{
-};
-
-struct TimeFastNanos: TimeFastCyclesBase
-{
-  static constexpr timeType toTimeTypeUnitMulMax = 160000000 / 40000000; // 4
-  static constexpr timeType toTimeTypeUnitMul =        F_CPU / 40000000; // 2 or 4 (smallest possible)
-  static constexpr timeType toTimeTypeUnitDiv =                      25; // (mul/div=F_CPU/10^9)
-
-  static timeType toTimeTypeUnit (const timeType nanos) { return (nanos * toTimeTypeUnitMul) / toTimeTypeUnitDiv; }
-  static timeType toUserUnit (const timeType cycles) { return (cycles * toTimeTypeUnitDiv) / toTimeTypeUnitMul; }
-  static constexpr timeType timeMax() { return std::numeric_limits<timeType>::max() / toTimeTypeUnitMulMax; }
-};
+using TimeMillis     = TimeUnit< TimeSourceMillis,       1000 >;
+using TimeFastMillis = TimeUnit< TimeSourceCycles,       1000 >;
+using TimeFastMicros = TimeUnit< TimeSourceCycles,    1000000 >;
+using TimeFastNanos  = TimeUnit< TimeSourceCycles, 1000000000, 25>;
 
 } //TimePolicy
 
@@ -121,7 +109,7 @@ class timeoutTemplate
 public:
   using timeType = typename TimePolicyT::timeType;
 
-  static constexpr timeType neverExpires = std::numeric_limits<timeType>::max();
+  static constexpr timeType neverExpires = TimePolicyT::neverExpires;
 
   timeoutTemplate(const timeType userTimeout)
   {
@@ -171,7 +159,7 @@ public:
   
   static constexpr timeType timeMax()
   {
-    return TimePolicyT::timeMax();
+    return TimePolicyT::timeMax;
   }
 
 private:
@@ -245,7 +233,7 @@ using periodicFastNs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothi
 
 
 /* A 1-shot timeout that auto-yields when in CONT can be built as follows:
- * using oneShotYieldMs = esp8266::polledTimeout::timeoutTemplate<false, esp8266::polledTimeout::YieldPolicy::YieldOrSkip>;
+ * using oneShotYield = esp8266::polledTimeout::timeoutTemplate<false, esp8266::polledTimeout::YieldPolicy::YieldOrSkip>;
  *
  * Other policies can be implemented by the user, e.g.: simple yield that panics in SYS, and the polledTimeout types built as needed as shown above, without modifying this file.
  */

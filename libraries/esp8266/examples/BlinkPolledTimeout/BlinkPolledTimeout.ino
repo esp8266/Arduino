@@ -42,6 +42,14 @@ esp8266::polledTimeout::periodicFastUs halfPeriod(500000); //use fully qualified
 
 // the setup function runs only once at start
 void setup() {
+  Serial.begin(115200);
+
+  Serial.println();
+  Serial.printf("periodic/oneShotMs::timeMax()     = %u ms\n", (uint32_t)esp8266::polledTimeout::periodicMs::timeMax());
+  Serial.printf("periodic/oneShotFastMs::timeMax() = %u ms\n", (uint32_t)esp8266::polledTimeout::periodicFastMs::timeMax());
+  Serial.printf("periodic/oneShotFastUs::timeMax() = %u us\n", (uint32_t)esp8266::polledTimeout::periodicFastUs::timeMax());
+  Serial.printf("periodic/oneShotFastNs::timeMax() = %u ns\n", (uint32_t)esp8266::polledTimeout::periodicFastNs::timeMax());
+
   pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
 
   using esp8266::polledTimeout::oneShotMs; //import the type to the local namespace
