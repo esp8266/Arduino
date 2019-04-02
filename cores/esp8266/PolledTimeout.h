@@ -90,6 +90,7 @@ struct TimeUnit
   static constexpr timeType user2UnitDivider       = rangeCompensate;
   static constexpr timeType timeMax                = (std::numeric_limits<timeType>::max() - 1) / user2UnitMultiplierMax;
   static constexpr timeType neverExpires           = std::numeric_limits<timeType>::max();
+  static constexpr timeType alwaysExpired          = 0;
 
   static timeType toTimeTypeUnit (const timeType userUnit) { return (userUnit * user2UnitMultiplier) / user2UnitDivider; }
   static timeType toUserUnit (const timeType internalUnit) { return (internalUnit * user2UnitDivider) / user2UnitMultiplier; }
@@ -110,6 +111,7 @@ public:
   using timeType = typename TimePolicyT::timeType;
 
   static constexpr timeType neverExpires = TimePolicyT::neverExpires;
+  static constexpr timeType alwaysExpired = TimePolicyT::alwaysExpired;
 
   timeoutTemplate(const timeType userTimeout)
   {
@@ -134,6 +136,11 @@ public:
     return !_neverExpires;
   }
 
+  bool canWait ()
+  {
+    return _timeout != alwaysExpired;
+  }
+
   void reset(const timeType newUserTimeout)
   {
     reset();
@@ -148,7 +155,7 @@ public:
 
   void resetToNeverExpires ()
   {
-    _timeout = 1; // because _timeout==0 has precedence
+    _timeout = alwaysExpired + 1; // because canWait() has precedence
     _neverExpires = true;
   }
 
@@ -167,8 +174,7 @@ private:
   ICACHE_RAM_ATTR
   bool checkExpired(const timeType internalUnit) const
   {
-    // (_timeout == 0) is not checked here
-
+    // canWait() is not checked here
     // returns "can expire" and "time expired"
     return (!_neverExpires) && ((internalUnit - _start) >= _timeout);
   }
@@ -178,8 +184,7 @@ protected:
   ICACHE_RAM_ATTR
   bool expiredRetrigger()
   {
-    if (_timeout == 0)
-      // "always expired"
+    if (!canWait())
       return true;
 
     timeType current = TimePolicyT::time();
@@ -196,7 +201,7 @@ protected:
   bool expiredOneShot() const
   {
     // returns "always expired" or "has expired"
-    return (_timeout == 0) || checkExpired(TimePolicyT::time());
+    return !canWait() || checkExpired(TimePolicyT::time());
   }
   
   timeType _timeout;
@@ -216,7 +221,7 @@ using oneShotMs = polledTimeout::timeoutTemplate<false>;
 using periodicMs = polledTimeout::timeoutTemplate<true>;
 
 // "Fast" versions sacrifices time range for improved precision and reduced execution time (by 86%)
-// (cpu cycles for ::expired(): 372 (millis()) vs 52 (getCycleCount))
+// (cpu cycles for ::expired(): 372 (millis()) vs 52 (ESP.getCycleCount()))
 // timeMax() values:
 // Ms: max is 26843       ms (26.8  s)
 // Us: max is 26843545    us (26.8  s)
