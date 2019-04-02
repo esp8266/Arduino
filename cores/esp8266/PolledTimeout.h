@@ -118,6 +118,7 @@ public:
     reset(userTimeout);
   }
 
+  ICACHE_RAM_ATTR
   bool expired()
   {
     YieldPolicyT::execute(); //in case of DoNothing: gets optimized away
@@ -126,6 +127,7 @@ public:
     return expiredOneShot();
   }
   
+  ICACHE_RAM_ATTR
   operator bool()
   {
     return expired(); 
