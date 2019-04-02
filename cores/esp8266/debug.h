@@ -29,5 +29,11 @@ void __panic_func(const char* file, int line, const char* func) __attribute__((n
 }
 #endif
 
+#ifdef NDEBUG
+void assert_iram (uintptr_t iram_function_addr) { }
+#else
+void assert_iram (uintptr_t iram_function_addr);
+#endif
+#define check_function_is_in_iram(f) do { assert_iram((intptr_t)f); } while (0)
 
 #endif//ARD_DEBUG_H

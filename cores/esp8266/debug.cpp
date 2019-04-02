@@ -23,14 +23,23 @@
 
 void ICACHE_RAM_ATTR hexdump(const void *mem, uint32_t len, uint8_t cols) {
     const uint8_t* src = (const uint8_t*) mem;
-    os_printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
+    ::printf((PGM_P)F("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)"), (ptrdiff_t)src, len, len);
     for(uint32_t i = 0; i < len; i++) {
         if(i % cols == 0) {
-            os_printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
+            ::printf((PGM_P)F("\n[0x%08X] 0x%08X: "), (ptrdiff_t)src, i);
         	yield();
         }
-        os_printf("%02X ", *src);
+        ::printf((PGM_P)F("%02X "), *src);
         src++;
     }
     os_printf("\n");
 }
+
+#ifndef NDEBUG
+void assert_iram (uintptr_t address) {
+    if (address < 0x40100000 || address >= 0x40110000) {
+        ::printf((PGM_P)F("all ISR must be in IRAM with ICACHE_RAM_ATTR\r\n"));
+        panic();
+    }
+}
+#endif

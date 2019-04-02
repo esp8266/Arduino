@@ -93,18 +93,22 @@ void SPISlaveClass::setStatus(uint32_t status)
 }
 void SPISlaveClass::onData(SpiSlaveDataHandler cb)
 {
+    check_function_is_in_iram(cb);
     _data_cb = cb;
 }
 void SPISlaveClass::onDataSent(SpiSlaveSentHandler cb)
 {
+    check_function_is_in_iram(cb);
     _data_sent_cb = cb;
 }
 void SPISlaveClass::onStatus(SpiSlaveStatusHandler cb)
 {
+    check_function_is_in_iram(cb);
     _status_cb = cb;
 }
 void SPISlaveClass::onStatusSent(SpiSlaveSentHandler cb)
 {
+    check_function_is_in_iram(cb);
     _status_sent_cb = cb;
 }
 
