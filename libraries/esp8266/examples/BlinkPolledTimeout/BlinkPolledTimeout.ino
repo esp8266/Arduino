@@ -50,6 +50,13 @@ void setup() {
   Serial.printf("periodic/oneShotFastUs::timeMax() = %u us\n", (uint32_t)esp8266::polledTimeout::periodicFastUs::timeMax());
   Serial.printf("periodic/oneShotFastNs::timeMax() = %u ns\n", (uint32_t)esp8266::polledTimeout::periodicFastNs::timeMax());
 
+#if 0 // 1 for debugging polledTimeout
+  Serial.printf("periodic/oneShotMs::rangeCompensate     = %u\n", (uint32_t)esp8266::polledTimeout::periodicMs::rangeCompensate);
+  Serial.printf("periodic/oneShotFastMs::rangeCompensate = %u\n", (uint32_t)esp8266::polledTimeout::periodicFastMs::rangeCompensate);
+  Serial.printf("periodic/oneShotFastUs::rangeCompensate = %u\n", (uint32_t)esp8266::polledTimeout::periodicFastUs::rangeCompensate);
+  Serial.printf("periodic/oneShotFastNs::rangeCompensate = %u\n", (uint32_t)esp8266::polledTimeout::periodicFastNs::rangeCompensate);
+#endif
+
   pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
 
   using esp8266::polledTimeout::oneShotMs; //import the type to the local namespace

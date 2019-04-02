@@ -76,31 +76,61 @@ struct TimeSourceCycles
 
   using timeType = decltype(ESP.getCycleCount());
   static timeType time() {return ESP.getCycleCount();}
-  static constexpr timeType ticksPerSecond    = F_CPU;
-  static constexpr timeType ticksPerSecondMax = 160000000; // Mhz
+  static constexpr timeType ticksPerSecond    = F_CPU;     // 80'000'000 or 160'000'000 Hz
+  static constexpr timeType ticksPerSecondMax = 160000000; // 160MHz
 };
 
-template <typename TimeSourceType, unsigned long long second_th, unsigned long long rangeCompensate = 1>
+template <typename TimeSourceType, unsigned long second_th>
+    // "second_th" units of time for one second
 struct TimeUnit
 {
   using timeType = typename TimeSourceType::timeType;
 
-  static constexpr timeType user2UnitMultiplierMax = (TimeSourceType::ticksPerSecondMax * rangeCompensate) / second_th;
-  static constexpr timeType user2UnitMultiplier    = (TimeSourceType::ticksPerSecond    * rangeCompensate) / second_th;
-  static constexpr timeType user2UnitDivider       = rangeCompensate;
-  static constexpr timeType timeMax                = (std::numeric_limits<timeType>::max() - 1) / user2UnitMultiplierMax;
-  static constexpr timeType neverExpires           = std::numeric_limits<timeType>::max();
-  static constexpr timeType alwaysExpired          = 0;
+#if __GNUC__ < 5
+  static constexpr timeType computeRangeCompensation ()
+  {
+    return ({
+      #define number_of_secondTh_in_one_tick ((1.0 * second_th) / ticksPerSecond)
+      #define fractional (number_of_secondTh_in_one_tick - (long)number_of_secondTh_in_one_tick)
+      fractional == 0?
+        1: // no need for compensation
+        (number_of_secondTh_in_one_tick / fractional) + 0.5; // scalar multiplier allowing exact division
+      #undef number_of_secondTh_in_one_tick
+      #undef fractional
+    });
+  }
+#else
+  static constexpr timeType computeRangeCompensation ()
+  {
+    return ({
+      constexpr double number_of_secondTh_in_one_tick = (1.0 * second_th) / ticksPerSecond;
+      constexpr double fractional = number_of_secondTh_in_one_tick - (long)number_of_secondTh_in_one_tick;
+      fractional == 0?
+        1: // no need for compensation
+        (number_of_secondTh_in_one_tick / fractional) + 0.5; // scalar multiplier allowing exact division
+    });
+  }
+#endif
 
-  static timeType toTimeTypeUnit (const timeType userUnit) { return (userUnit * user2UnitMultiplier) / user2UnitDivider; }
-  static timeType toUserUnit (const timeType internalUnit) { return (internalUnit * user2UnitDivider) / user2UnitMultiplier; }
-  static timeType time () {return TimeSourceType::time(); }
+  static constexpr timeType ticksPerSecond         = TimeSourceType::ticksPerSecond;
+  static constexpr timeType ticksPerSecondMax      = TimeSourceType::ticksPerSecondMax;
+  static constexpr timeType rangeCompensate        = computeRangeCompensation();
+  static constexpr timeType user2UnitMultiplierMax = (ticksPerSecondMax * rangeCompensate) / second_th;
+  static constexpr timeType user2UnitMultiplier    = (ticksPerSecond    * rangeCompensate) / second_th;
+  static constexpr timeType user2UnitDivider       = rangeCompensate;
+  static constexpr timeType alwaysExpired          = 0;
+  static constexpr timeType neverExpires           = std::numeric_limits<timeType>::max();
+  static constexpr timeType timeMax                = (neverExpires - 1) / user2UnitMultiplierMax;
+
+  static timeType toTimeTypeUnit (const timeType userUnit) {return (userUnit * user2UnitMultiplier) / user2UnitDivider;}
+  static timeType toUserUnit (const timeType internalUnit) {return (internalUnit * user2UnitDivider) / user2UnitMultiplier;}
+  static timeType time () {return TimeSourceType::time();}
 };
 
 using TimeMillis     = TimeUnit< TimeSourceMillis,       1000 >;
 using TimeFastMillis = TimeUnit< TimeSourceCycles,       1000 >;
 using TimeFastMicros = TimeUnit< TimeSourceCycles,    1000000 >;
-using TimeFastNanos  = TimeUnit< TimeSourceCycles, 1000000000, 25>;
+using TimeFastNanos  = TimeUnit< TimeSourceCycles, 1000000000 >;
 
 } //TimePolicy
 
@@ -112,6 +142,7 @@ public:
 
   static constexpr timeType neverExpires = TimePolicyT::neverExpires;
   static constexpr timeType alwaysExpired = TimePolicyT::alwaysExpired;
+  static constexpr timeType rangeCompensate = TimePolicyT::rangeCompensate; //debug
 
   timeoutTemplate(const timeType userTimeout)
   {
