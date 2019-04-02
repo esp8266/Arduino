@@ -131,12 +131,12 @@ public:
     return expired(); 
   }
   
-  bool canExpire ()
+  bool canExpire () const
   {
     return !_neverExpires;
   }
 
-  bool canWait ()
+  bool canWait () const
   {
     return _timeout != alwaysExpired;
   }
