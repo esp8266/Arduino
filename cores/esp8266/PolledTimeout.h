@@ -80,24 +80,28 @@ struct TimeSourceCycles
   static constexpr timeType ticksPerSecondMax = 160000000; // 160MHz
 };
 
-template <typename TimeSourceType, unsigned long second_th>
-    // "second_th" units of time for one second
+template <typename TimeSourceType, unsigned long long second_th>
+    // "second_th" units of timeType for one second
 struct TimeUnit
 {
   using timeType = typename TimeSourceType::timeType;
 
 #if __GNUC__ < 5
+  // gcc-4.8 cannot compile the constexpr-only version of this function
+  // using #defines instead luckily works
   static constexpr timeType computeRangeCompensation ()
   {
+    #define number_of_secondTh_in_one_tick ((1.0 * second_th) / ticksPerSecond)
+    #define fractional (number_of_secondTh_in_one_tick - (long)number_of_secondTh_in_one_tick)
+
     return ({
-      #define number_of_secondTh_in_one_tick ((1.0 * second_th) / ticksPerSecond)
-      #define fractional (number_of_secondTh_in_one_tick - (long)number_of_secondTh_in_one_tick)
       fractional == 0?
         1: // no need for compensation
         (number_of_secondTh_in_one_tick / fractional) + 0.5; // scalar multiplier allowing exact division
-      #undef number_of_secondTh_in_one_tick
-      #undef fractional
     });
+
+    #undef number_of_secondTh_in_one_tick
+    #undef fractional
   }
 #else
   static constexpr timeType computeRangeCompensation ()
@@ -121,6 +125,7 @@ struct TimeUnit
   static constexpr timeType alwaysExpired          = 0;
   static constexpr timeType neverExpires           = std::numeric_limits<timeType>::max();
   static constexpr timeType timeMax                = (neverExpires - 1) / user2UnitMultiplierMax;
+  // timeMax is defined by neverExpires
 
   static timeType toTimeTypeUnit (const timeType userUnit) {return (userUnit * user2UnitMultiplier) / user2UnitDivider;}
   static timeType toUserUnit (const timeType internalUnit) {return (internalUnit * user2UnitDivider) / user2UnitMultiplier;}
@@ -253,12 +258,14 @@ using periodic = polledTimeout::timeoutTemplate<true> /*__attribute__((deprecate
 using oneShotMs = polledTimeout::timeoutTemplate<false>;
 using periodicMs = polledTimeout::timeoutTemplate<true>;
 
+// Time policy based on ESP.getCycleCount(), and intended to be called very often:
 // "Fast" versions sacrifices time range for improved precision and reduced execution time (by 86%)
 // (cpu cycles for ::expired(): 372 (millis()) vs 52 (ESP.getCycleCount()))
 // timeMax() values:
 // Ms: max is 26843       ms (26.8  s)
 // Us: max is 26843545    us (26.8  s)
 // Ns: max is  1073741823 ns ( 1.07 s)
+// (time policy based on ESP.getCycleCount() is intended to be called very often)
 
 using oneShotFastMs = polledTimeout::timeoutTemplate<false, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
 using periodicFastMs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothing, TimePolicy::TimeFastMillis>;
@@ -271,7 +278,7 @@ using periodicFastNs = polledTimeout::timeoutTemplate<true, YieldPolicy::DoNothi
 
 
 /* A 1-shot timeout that auto-yields when in CONT can be built as follows:
- * using oneShotYield = esp8266::polledTimeout::timeoutTemplate<false, esp8266::polledTimeout::YieldPolicy::YieldOrSkip>;
+ * using oneShotYieldMs = esp8266::polledTimeout::timeoutTemplate<false, esp8266::polledTimeout::YieldPolicy::YieldOrSkip>;
  *
  * Other policies can be implemented by the user, e.g.: simple yield that panics in SYS, and the polledTimeout types built as needed as shown above, without modifying this file.
  */
