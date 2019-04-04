@@ -122,10 +122,8 @@ struct TimeUnit
   static constexpr timeType user2UnitMultiplierMax = (ticksPerSecondMax * rangeCompensate) / second_th;
   static constexpr timeType user2UnitMultiplier    = (ticksPerSecond    * rangeCompensate) / second_th;
   static constexpr timeType user2UnitDivider       = rangeCompensate;
-  static constexpr timeType alwaysExpired          = 0;
-  static constexpr timeType neverExpires           = std::numeric_limits<timeType>::max();
-  static constexpr timeType timeMax                = (neverExpires - 1) / user2UnitMultiplierMax;
-  // timeMax is defined by neverExpires
+  // std::numeric_limits<timeType>::max() is reserved
+  static constexpr timeType timeMax                = (std::numeric_limits<timeType>::max() - 1) / user2UnitMultiplierMax;
 
   static timeType toTimeTypeUnit (const timeType userUnit) {return (userUnit * user2UnitMultiplier) / user2UnitDivider;}
   static timeType toUserUnit (const timeType internalUnit) {return (internalUnit * user2UnitDivider) / user2UnitMultiplier;}
@@ -145,8 +143,8 @@ class timeoutTemplate
 public:
   using timeType = typename TimePolicyT::timeType;
 
-  static constexpr timeType neverExpires = TimePolicyT::neverExpires;
-  static constexpr timeType alwaysExpired = TimePolicyT::alwaysExpired;
+  static constexpr timeType alwaysExpired   = 0;
+  static constexpr timeType neverExpires    = std::numeric_limits<timeType>::max();
   static constexpr timeType rangeCompensate = TimePolicyT::rangeCompensate; //debug
 
   timeoutTemplate(const timeType userTimeout)
