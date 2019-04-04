@@ -58,6 +58,7 @@ public:
   void end();
   void setHwCs(bool use);
   void setBitOrder(uint8_t bitOrder);  
+  void restoreEsp8266LegacyMode2And3(); // must be called *before* setDataMode()
   void setDataMode(uint8_t dataMode);
   void setFrequency(uint32_t freq);
   void setClockDivider(uint32_t clockDiv);
@@ -77,6 +78,7 @@ public:
 private:
   bool useHwCs;
   uint8_t pinSet;
+  bool legacyMode2and3;
   void writeBytes_(const uint8_t * data, uint8_t size);
   void transferBytes_(const uint8_t * out, uint8_t * in, uint8_t size);
   void transferBytesAligned_(const uint8_t * out, uint8_t * in, uint8_t size);

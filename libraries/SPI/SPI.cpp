@@ -42,6 +42,7 @@ typedef union {
 SPIClass::SPIClass() {
     useHwCs = false;
     pinSet = SPI_PINS_HSPI;
+    legacyMode2and3 = false;
 }
 
 bool SPIClass::pins(int8_t sck, int8_t miso, int8_t mosi, int8_t ss)
@@ -160,6 +161,13 @@ void SPIClass::setDataMode(uint8_t dataMode) {
 
     bool CPOL = (dataMode & 0x10); ///< CPOL (Clock Polarity)
     bool CPHA = (dataMode & 0x01); ///< CPHA (Clock Phase)
+
+    if(!legacyMode2and3) {
+        // https://github.com/esp8266/Arduino/issues/2416
+        // https://github.com/esp8266/Arduino/pull/2418
+        if(CPOL)          // Ensure same behavior as
+            CPHA ^= 1;    // SAM, AVR and Intel Boards
+    }
 
     if(CPHA) {
         SPI1U |= (SPIUSME);
