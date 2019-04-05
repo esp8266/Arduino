@@ -1,6 +1,9 @@
 #include <catch.hpp>
 #include "PolledTimeout.h"
 
+#define mockverbose printf
+#include "common/MockEsp.cpp" // getCycleCount
+
 //This won't work for
 template<typename argT>
 inline bool
@@ -10,15 +13,83 @@ fuzzycomp(argT a, argT b)
   return (std::max(a,b) - std::min(a,b) <= epsilon);
 }
 
+TEST_CASE("OneShot Timeout 500000000ns (0.5s)", "[polledTimeout]")
+{
+  using esp8266::polledTimeout::oneShotFastNs;
+  using timeType = oneShotFastNs::timeType;
+  timeType before, after, delta;
+
+  Serial.println("OneShot Timeout 500000000ns (0.5s)");
+
+  oneShotFastNs timeout(500000000);
+  before = micros();
+  while(!timeout.expired())
+    yield();
+  after = micros();
+
+  delta = after - before;
+  Serial.printf("delta = %u\n", delta);
+
+  REQUIRE(fuzzycomp(delta/1000, (timeType)500));
+
+
+  Serial.print("reset\n");
+
+  timeout.reset();
+  before = micros();
+  while(!timeout)
+    yield();
+  after = micros();
+
+  delta = after - before;
+  Serial.printf("delta = %u\n", delta);
+
+  REQUIRE(fuzzycomp(delta/1000, (timeType)500));
+}
+
+TEST_CASE("OneShot Timeout 3000000us", "[polledTimeout]")
+{
+  using esp8266::polledTimeout::oneShotFastUs;
+  using timeType = oneShotFastUs::timeType;
+  timeType before, after, delta;
+
+  Serial.println("OneShot Timeout 3000000us");
+
+  oneShotFastUs timeout(3000000);
+  before = micros();
+  while(!timeout.expired())
+    yield();
+  after = micros();
+
+  delta = after - before;
+  Serial.printf("delta = %u\n", delta);
+
+  REQUIRE(fuzzycomp(delta/1000, (timeType)3000));
+
+
+  Serial.print("reset\n");
+
+  timeout.reset();
+  before = micros();
+  while(!timeout)
+    yield();
+  after = micros();
+
+  delta = after - before;
+  Serial.printf("delta = %u\n", delta);
+
+  REQUIRE(fuzzycomp(delta/1000, (timeType)3000));
+}
+
 TEST_CASE("OneShot Timeout 3000ms", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::oneShot;
-  using timeType = oneShot::timeType;
+  using esp8266::polledTimeout::oneShotMs;
+  using timeType = oneShotMs::timeType;
   timeType before, after, delta;
 
   Serial.println("OneShot Timeout 3000ms");
 
-  oneShot timeout(3000);
+  oneShotMs timeout(3000);
   before = millis();
   while(!timeout.expired())
     yield();
@@ -46,13 +117,13 @@ TEST_CASE("OneShot Timeout 3000ms", "[polledTimeout]")
 
 TEST_CASE("OneShot Timeout 3000ms reset to 1000ms", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::oneShot;
-  using timeType = oneShot::timeType;
+  using esp8266::polledTimeout::oneShotMs;
+  using timeType = oneShotMs::timeType;
   timeType before, after, delta;
 
   Serial.println("OneShot Timeout 3000ms");
 
-  oneShot timeout(3000);
+  oneShotMs timeout(3000);
   before = millis();
   while(!timeout.expired())
     yield();
@@ -80,13 +151,13 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms", "[polledTimeout]")
 
 TEST_CASE("Periodic Timeout 1T 3000ms", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::periodic;
-  using timeType = periodic::timeType;
+  using esp8266::polledTimeout::periodicMs;
+  using timeType = periodicMs::timeType;
   timeType before, after, delta;
 
   Serial.println("Periodic Timeout 1T 3000ms");
 
-  periodic timeout(3000);
+  periodicMs timeout(3000);
   before = millis();
   while(!timeout)
     yield();
@@ -103,7 +174,7 @@ TEST_CASE("Periodic Timeout 1T 3000ms", "[polledTimeout]")
   while(!timeout)
     yield();
   after = millis();
-  
+
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
@@ -112,15 +183,15 @@ TEST_CASE("Periodic Timeout 1T 3000ms", "[polledTimeout]")
 
 TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
 {
-  using esp8266::polledTimeout::periodic;
-  using timeType = periodic::timeType;
+  using esp8266::polledTimeout::periodicMs;
+  using timeType = periodicMs::timeType;
   timeType before, after, delta;
 
   Serial.println("Periodic 10T Timeout 1000ms");
 
   int counter = 10;
 
-  periodic timeout(1000); 
+  periodicMs timeout(1000);
   before = millis();
   while(1)
   {
@@ -133,7 +204,7 @@ TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
     }
   }
   after = millis();
-  
+
   delta = after - before;
   Serial.printf("\ndelta = %lu\n", delta);
   REQUIRE(fuzzycomp(delta, (timeType)10000));
@@ -142,18 +213,18 @@ TEST_CASE("Periodic Timeout 10T 1000ms", "[polledTimeout]")
 TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout]")
 {
   using YieldOrSkipPolicy = esp8266::polledTimeout::YieldPolicy::YieldOrSkip;
-  using oneShotYield = esp8266::polledTimeout::timeoutTemplate<false, YieldOrSkipPolicy>;
-  using timeType = oneShotYield::timeType;
+  using oneShotMsYield = esp8266::polledTimeout::timeoutTemplate<false, YieldOrSkipPolicy>;
+  using timeType = oneShotMsYield::timeType;
   timeType before, after, delta;
 
   Serial.println("OneShot Timeout 3000ms");
 
 
-  oneShotYield timeout(3000);
+  oneShotMsYield timeout(3000);
   before = millis();
   while(!timeout.expired());
   after = millis();
-  
+
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
@@ -166,7 +237,7 @@ TEST_CASE("OneShot Timeout 3000ms reset to 1000ms custom yield", "[polledTimeout
   before = millis();
   while(!timeout);
   after = millis();
-  
+
   delta = after - before;
   Serial.printf("delta = %lu\n", delta);
 
