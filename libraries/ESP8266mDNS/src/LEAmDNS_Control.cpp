@@ -1047,7 +1047,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
         m_HostProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
     }
     else if ((ProbingStatus_InProgress == m_HostProbeInformation.m_ProbingStatus) &&                // Probing AND
-             (m_HostProbeInformation.m_Timeout.checkExpired(millis()))) {                           // Time for next probe
+             (m_HostProbeInformation.m_Timeout.expired())) {                                        // Time for next probe
 
         if (MDNS_PROBE_COUNT > m_HostProbeInformation.m_u8SentCount) {                              // Send next probe
             if ((bResult = _sendHostProbe())) {
@@ -1059,7 +1059,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
         else {                                                                                      // Probing finished
             DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done host probing.\n")););
             m_HostProbeInformation.m_ProbingStatus = ProbingStatus_Done;
-            m_HostProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+            m_HostProbeInformation.m_Timeout.resetToNeverExpires();
             if (m_HostProbeInformation.m_fnHostProbeResultCallback) {
                 m_HostProbeInformation.m_fnHostProbeResultCallback(m_pcHostname, true);
             }
@@ -1071,7 +1071,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
         }
     }   // else: Probing already finished OR waiting for next time slot
     else if ((ProbingStatus_Done == m_HostProbeInformation.m_ProbingStatus) &&
-             (m_HostProbeInformation.m_Timeout.checkExpired(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max()))) {
+             (m_HostProbeInformation.m_Timeout.expired())) {
 
         if ((bResult = _announce(true, false))) {   // Don't announce services here
             ++m_HostProbeInformation.m_u8SentCount;
@@ -1081,7 +1081,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing host (%lu).\n\n"), m_HostProbeInformation.m_u8SentCount););
             }
             else {
-                m_HostProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                m_HostProbeInformation.m_Timeout.resetToNeverExpires();
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done host announcing.\n\n")););
             }
         }
@@ -1096,7 +1096,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
             pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_InProgress;
         }
         else if ((ProbingStatus_InProgress == pService->m_ProbeInformation.m_ProbingStatus) &&  // Probing AND
-                 (pService->m_ProbeInformation.m_Timeout.checkExpired(millis()))) {             // Time for next probe
+                 (pService->m_ProbeInformation.m_Timeout.expired())) {             // Time for next probe
 
             if (MDNS_PROBE_COUNT > pService->m_ProbeInformation.m_u8SentCount) {                // Send next probe
                 if ((bResult = _sendServiceProbe(*pService))) {
@@ -1108,7 +1108,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
             else {                                                                                      // Probing finished
                 DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done service probing %s.%s.%s\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
                 pService->m_ProbeInformation.m_ProbingStatus = ProbingStatus_Done;
-                pService->m_ProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                pService->m_ProbeInformation.m_Timeout.resetToNeverExpires();
                 if (pService->m_ProbeInformation.m_fnServiceProbeResultCallback) {
                 	pService->m_ProbeInformation.m_fnServiceProbeResultCallback(pService->m_pcName, pService, true);
                 }
@@ -1119,7 +1119,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
             }
         }   // else: Probing already finished OR waiting for next time slot
         else if ((ProbingStatus_Done == pService->m_ProbeInformation.m_ProbingStatus) &&
-                 (pService->m_ProbeInformation.m_Timeout.checkExpired(millis()))) {
+                 (pService->m_ProbeInformation.m_Timeout.expired())) {
 
             if ((bResult = _announceService(*pService))) {   // Announce service
                 ++pService->m_ProbeInformation.m_u8SentCount;
@@ -1129,7 +1129,7 @@ bool MDNSResponder::_updateProbeStatus(void) {
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Announcing service %s.%s.%s (%lu)\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol, pService->m_ProbeInformation.m_u8SentCount););
                 }
                 else {
-                    pService->m_ProbeInformation.m_Timeout.reset(std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                    pService->m_ProbeInformation.m_Timeout.resetToNeverExpires();
                     DEBUG_EX_INFO(DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _updateProbeStatus: Done service announcing for %s.%s.%s\n\n"), (pService->m_pcName ?: m_pcHostname), pService->m_pcService, pService->m_pcProtocol););
                 }
             }
@@ -1441,13 +1441,13 @@ bool MDNSResponder::_checkServiceQueryCache(void) {
         // Resend dynamic service queries, if not already done often enough
         if ((!pServiceQuery->m_bLegacyQuery) &&
             (MDNS_DYNAMIC_QUERY_RESEND_COUNT > pServiceQuery->m_u8SentCount) &&
-            (pServiceQuery->m_ResendTimeout.checkExpired(millis()))) {
+            (pServiceQuery->m_ResendTimeout.expired())) {
 
             if ((bResult = _sendMDNSServiceQuery(*pServiceQuery))) {
                 ++pServiceQuery->m_u8SentCount;
                 pServiceQuery->m_ResendTimeout.reset((MDNS_DYNAMIC_QUERY_RESEND_COUNT > pServiceQuery->m_u8SentCount)
                                                         ? (MDNS_DYNAMIC_QUERY_RESEND_DELAY * (pServiceQuery->m_u8SentCount - 1))
-                                                        : std::numeric_limits<esp8266::polledTimeout::oneShot::timeType>::max());
+                                                        : esp8266::polledTimeout::oneShotMs::neverExpires);
             }
             DEBUG_EX_INFO(
                     DEBUG_OUTPUT.printf_P(PSTR("[MDNSResponder] _checkServiceQueryCache: %s to resend service query!"), (bResult ? "Succeeded" : "FAILED"));
