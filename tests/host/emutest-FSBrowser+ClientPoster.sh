@@ -22,8 +22,8 @@ sleep=5
 sizeb=$(($sizekb * 1024))
 fileb=$(($sizeb / 3))
 
-make $DEBUG ../../libraries/ESP8266WebServer/examples/FSBrowser/FSBrowser
-make $DEBUG otherexamples/HttpClientPost/HttpClientPost
+make -j $DEBUG ../../libraries/ESP8266WebServer/examples/FSBrowser/FSBrowser
+make -j $DEBUG otherexamples/HttpClientPost/HttpClientPost
 
 killall -9 FSBrowser HttpClientPost || true
 

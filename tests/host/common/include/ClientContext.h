@@ -297,6 +297,33 @@ public:
         _sync = sync;
     }
 
+    // return a pointer to available data buffer (size = availableForPeek())
+    // semantic forbids any kind of read() before calling peekConsume()
+    const char* peekBuffer ()
+    {
+    XXX
+    }
+
+    // return number of byte accessible by peekBuffer()
+    size_t availableForPeek ()
+    {
+    XXX
+        ssize_t ret = mockPeekBytes(_sock, dst, size, 0, _inbuf, _inbufsize);
+        if (ret < 0)
+        {
+            abort();
+            return 0;
+        }
+        return ret;
+    }
+
+    // consume bytes after use (see peekBuffer)
+    void peekConsume (size_t consume)
+    {
+    XXX
+        mockConsume(_sock, consume);
+    }
+
 private:
 
     discard_cb_t _discard_cb = nullptr;
