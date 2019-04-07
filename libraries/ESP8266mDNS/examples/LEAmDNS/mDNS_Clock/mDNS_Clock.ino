@@ -268,7 +268,7 @@ void loop(void) {
   // Allow MDNS processing
   MDNS.update();
 
-  static esp8266::polledTimeout::periodic timeout(UPDATE_CYCLE);
+  static esp8266::polledTimeout::periodicMs timeout(UPDATE_CYCLE);
   if (timeout.expired()) {
 
     if (hMDNSService) {
