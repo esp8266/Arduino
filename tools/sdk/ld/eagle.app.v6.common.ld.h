@@ -127,8 +127,8 @@ SECTIONS
     *(.init.literal)
     *(.init)
 
-    /* Special functions/templates that need to be in IRAM (SPI/IRQ callbacks/etc. here */
-    *(.text._ZNKSt8functionIFvvEEclEv)  /* std::function<void ()>::operator()() const */
+    /* all functional callers are placed in IRAM (including SPI/IRQ callbacks/etc) here */
+    *(.text._ZNKSt8functionIF*EE*)  /* std::function<any(...)>::operator()() const */
   } >iram1_0_seg :iram1_0_phdr
 
   .irom0.text : ALIGN(4)
