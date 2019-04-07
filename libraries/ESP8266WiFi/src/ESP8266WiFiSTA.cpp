@@ -63,6 +63,13 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
  * @return equal
  */
 static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
+
+#ifdef NONOSDK3V0
+    static_assert(sizeof(station_config) == 116, "struct station_config has changed, please update comparison function");
+#else
+    static_assert(sizeof(station_config) == 112, "struct station_config has changed, please update comparison function");
+#endif
+
     if(strncmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid), sizeof(lhs.ssid)) != 0) {
         return false;
     }
