@@ -132,7 +132,7 @@ void ArduinoOTAClass::begin(bool useMDNS) {
   if(!_udp_ota->listen(IP_ADDR_ANY, _port))
     return;
   _udp_ota->onRx(std::bind(&ArduinoOTAClass::_onRx, this));
-  
+
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_MDNS)
   if(_useMDNS) {
     MDNS.begin(_hostname.c_str());
@@ -150,6 +150,40 @@ void ArduinoOTAClass::begin(bool useMDNS) {
   OTA_DEBUG.printf("OTA server at: %s.local:%u\n", _hostname.c_str(), _port);
 #endif
 }
+
+/**
+ * Generates nonce using PRNG / TRNG if available
+ * @return  Random MD5 string (nonce)
+ */
+String ArduinoOTAClass::generateNonce(void) {
+
+  MD5Builder nonce_md5;
+  nonce_md5.begin();
+
+  // Use ESP8266 PRNG via RANDOM_REG32 register
+  #if defined(ESP8266)
+    uint32_t rnd = RANDOM_REG32;
+    uint8_t nonceBuffer[4];
+    memcpy(nonceBuffer, &rnd, 4);
+    nonce_md5.add(nonceBuffer, 4);
+
+  // Use ESP32 TRNG / PRNG via SDK function
+  #elif defined(ESP32)
+    uint32_t rnd = esp_random();
+    uint8_t nonceBuffer[4];
+    memcpy(nonceBuffer, &rnd, 4);
+    nonce_md5.add(nonceBuffer, 4);
+
+  // Relatively insecure fallback, just in case
+  #else
+    nonce_md5.add(String(micros()));
+  #endif
+
+  nonce_md5.calculate();
+  return nonce_md5.toString();
+
+}
+
 
 int ArduinoOTAClass::parseInt(){
   char data[16];
@@ -202,11 +236,7 @@ void ArduinoOTAClass::_onRx(){
     ota_ip = _ota_ip;
 
     if (_password.length()){
-      MD5Builder nonce_md5;
-      nonce_md5.begin();
-      nonce_md5.add(String(micros()));
-      nonce_md5.calculate();
-      _nonce = nonce_md5.toString();
+      _nonce = this->generateNonce();
 
       char auth_req[38];
       sprintf(auth_req, "AUTH %s", _nonce.c_str());
@@ -262,7 +292,7 @@ void ArduinoOTAClass::_runUpdate() {
     if (_error_callback) {
       _error_callback(OTA_BEGIN_ERROR);
     }
-    
+
     StreamString ss;
     Update.printError(ss);
     _udp_ota->append("ERR: ", 5);

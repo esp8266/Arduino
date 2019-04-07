@@ -94,6 +94,7 @@ class ArduinoOTAClass
     void _onRx(void);
     int parseInt(void);
     String readStringUntil(char end);
+    String generateNonce(void);
 };
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_ARDUINOOTA)
