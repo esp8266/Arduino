@@ -119,15 +119,13 @@ int EthernetClient::peek() {
   return b;
 }
 
-bool EthernetClient::flush(unsigned int maxWaitMs) {
-  (void)maxWaitMs;
+void EthernetClient::flush() {
   ::flush(_sock);
-  return true;
 }
 
-bool EthernetClient::stop(unsigned int maxWaitMs) {
+void EthernetClient::stop() {
   if (_sock == MAX_SOCK_NUM)
-    return true;
+    return;
 
   // attempt to close the connection gracefully (send a FIN to other side)
   disconnect(_sock);
@@ -135,27 +133,20 @@ bool EthernetClient::stop(unsigned int maxWaitMs) {
 
   // wait up to a second for the connection to close
   uint8_t s;
-  if (maxWaitMs == 0)
-    maxWaitMs = 1000;
   do {
     s = status();
     if (s == SnSR::CLOSED)
       break; // exit the loop
     delay(1);
-  } while (millis() - start < maxWaitMs);
-
-  bool ret = true;
+  } while (millis() - start < 1000);
 
   // if it hasn't closed, close it forcefully
   if (s != SnSR::CLOSED) {
-    ret = false;
     close(_sock);
   }
 
   EthernetClass::_server_port[_sock] = 0;
   _sock = MAX_SOCK_NUM;
-
-  return ret;
 }
 
 uint8_t EthernetClient::connected() {

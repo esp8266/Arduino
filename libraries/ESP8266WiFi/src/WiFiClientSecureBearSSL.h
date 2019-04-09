@@ -56,8 +56,10 @@ class WiFiClientSecure : public WiFiClient {
     int read() override;
     int peek() override;
     size_t peekBytes(uint8_t *buffer, size_t length) override;
-    bool flush(unsigned int maxWaitMs = 0) override;
-    bool stop(unsigned int maxWaitMs = 0) override;
+    bool flush(unsigned int maxWaitMs);
+    bool stop(unsigned int maxWaitMs);
+    void flush() override { (void)flush(0); }
+    void stop() override { (void)stop(0); }
 
     // Allow sessions to be saved/restored automatically to a memory area
     void setSession(Session *session) { _session = session; }

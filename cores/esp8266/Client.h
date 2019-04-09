@@ -34,8 +34,8 @@ class Client: public Stream {
         virtual int read() = 0;
         virtual int read(uint8_t *buf, size_t size) = 0;
         virtual int peek() = 0;
-        virtual bool flush(unsigned int maxWaitMs = 0) = 0;
-        virtual bool stop(unsigned int maxWaitMs = 0) = 0;
+        virtual void flush() = 0;
+        virtual void stop() = 0;
         virtual uint8_t connected() = 0;
         virtual operator bool() = 0;
     protected:
