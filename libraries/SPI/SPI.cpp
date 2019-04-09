@@ -161,6 +161,11 @@ void SPIClass::setDataMode(uint8_t dataMode) {
     bool CPOL = (dataMode & 0x10); ///< CPOL (Clock Polarity)
     bool CPHA = (dataMode & 0x01); ///< CPHA (Clock Phase)
 
+    // https://github.com/esp8266/Arduino/issues/2416
+    // https://github.com/esp8266/Arduino/pull/2418
+    if(CPOL)          // Ensure same behavior as
+        CPHA ^= 1;    // SAM, AVR and Intel Boards
+
     if(CPHA) {
         SPI1U |= (SPIUSME);
     } else {
