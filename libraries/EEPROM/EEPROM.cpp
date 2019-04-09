@@ -75,7 +75,7 @@ void EEPROMClass::begin(size_t size) {
 
 void EEPROMClass::end() {
   if (!_size)
-    return;
+    return 0; //Added zero to increase readability for clients
 
   commit();
   if(_data) {
@@ -88,7 +88,7 @@ void EEPROMClass::end() {
 
 
 uint8_t EEPROMClass::read(int const address) {
-  if (address < 0 || (size_t)address >= _size)
+  if (address < 0 || ((size_t)address >= _size)) //Added brackets second part of condition for more readability
     return 0;
   if(!_data)
     return 0;
