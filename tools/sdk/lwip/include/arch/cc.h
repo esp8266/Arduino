@@ -39,6 +39,7 @@
 #include "ets_sys.h"
 #include "osapi.h"
 #define EFAULT 14
+#include <sys/pgmspace.h>
 
 //#define LWIP_PROVIDE_ERRNO
 
