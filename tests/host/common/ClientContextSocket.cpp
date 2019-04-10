@@ -136,7 +136,11 @@ ssize_t mockPeekBytes (int sock, char* dst, size_t usersize, int timeout_ms, cha
 		p.events = POLLIN;
 	} while (poll(&p, 1, timeout_ms) == 1);
 	
-	memcpy(dst, ccinbuf, retsize);
+    if (dst)
+    {
+        memcpy(dst, ccinbuf, retsize);
+    }
+
 	return retsize;
 }
 

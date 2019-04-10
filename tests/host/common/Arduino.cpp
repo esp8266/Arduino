@@ -71,3 +71,5 @@ extern "C" void delayMicroseconds(unsigned int us)
 {
     usleep(us);
 }
+
+const char* overrideme PROGMEM = " should be overridden for better efficiency\r\n";

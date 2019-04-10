@@ -54,13 +54,12 @@ void setup() {
     Serial.printf("\r\n\r\nCLIENT: ----> time-keep: %lums  sent: %d\r\n\r\n", (millis() - A), (int)client.write(f));
     client.println();
     client.println("--glark--");
-    A = millis();
     Serial.println("CLIENT waiting for server ack...");
     while (!client.available())
          yield();
     A = millis() - A;
     Serial.printf("\r\n\r\n##########################\r\n");
-    Serial.printf("\r\n\r\nCLIENT: ----> server response: +%lums\r\n", A);
+    Serial.printf("\r\n\r\nCLIENT: ----> upload duration: +%lums\r\n", A);
     Serial.printf("\r\n\r\n##########################\r\n");
 
     Serial.println("CLIENT: server response:");
