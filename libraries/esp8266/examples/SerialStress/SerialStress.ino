@@ -74,6 +74,7 @@ void setup() {
   // so we can still log to the regular usbserial chips
   SoftwareSerial* ss = new SoftwareSerial(3, 1);
   ss->begin(SSBAUD);
+  ss->enableIntTx(false);
   logger = ss;
   logger->println();
   logger->printf("\n\nOn Software Serial for logging\n");
