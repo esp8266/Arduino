@@ -8,14 +8,15 @@
 name=ESP8266 Boards (2.6.0-dev)
 version=2.6.0-dev
 
+# These will be removed by the packager script when doing a JSON release
 runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}/tools/xtensa-lx106-elf
+runtime.tools.python.path={runtime.platform.path}/tools/python
+
 runtime.tools.esptool.path={runtime.platform.path}/tools/esptool
 runtime.tools.signing={runtime.platform.path}/tools/signing.py
 runtime.tools.elf2bin={runtime.platform.path}/tools/elf2bin.py
 runtime.tools.makecorever={runtime.platform.path}/tools/makecorever.py
 runtime.tools.eboot={runtime.platform.path}/bootloaders/eboot/eboot.elf
-runtime.tools.python=python
-runtime.tools.python.windows={runtime.platform.path}/tools/python/python.exe
 
 compiler.warning_flags=-w
 compiler.warning_flags.none=-w
@@ -66,9 +67,6 @@ compiler.elf2hex.flags=
 
 compiler.size.cmd=xtensa-lx106-elf-size
 
-compiler.esptool.cmd=esptool
-compiler.esptool.cmd.windows=esptool.exe
-
 # This can be overriden in boards.txt
 build.extra_flags=-DESP8266
 
@@ -83,8 +81,8 @@ compiler.elf2hex.extra_flags=
 
 ## generate file with git version number
 ## needs bash, git, and echo
-recipe.hooks.core.prebuild.1.pattern="{runtime.tools.python}" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
-recipe.hooks.core.prebuild.2.pattern="{runtime.tools.python}" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "unix-{version}"
+recipe.hooks.core.prebuild.1.pattern="{runtime.tools.python.path}/python" "{runtime.tools.signing}" --mode header --publickey "{build.source.path}/public.key" --out "{build.path}/core/Updater_Signing.h"
+recipe.hooks.core.prebuild.2.pattern="{runtime.tools.python.path}/python" "{runtime.tools.makecorever}" --build_path "{build.path}" --platform_path "{runtime.platform.path}" --version "unix-{version}"
 
 ## Build the app.ld linker file
 recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.cmd}" -CC -E -P {build.vtable_flags} "{runtime.platform.path}/tools/sdk/ld/eagle.app.v6.common.ld.h" -o "{build.path}/local.eagle.app.v6.common.ld"
@@ -108,8 +106,8 @@ recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_
 recipe.objcopy.eep.pattern=
 
 ## Create hex
-recipe.objcopy.hex.1.pattern="{runtime.tools.python}" "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
-recipe.objcopy.hex.2.pattern="{runtime.tools.python}" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed"
+recipe.objcopy.hex.1.pattern="{runtime.tools.python.path}/python" "{runtime.tools.elf2bin}" --eboot "{runtime.tools.eboot}" --app "{build.path}/{build.project_name}.elf" --flash_mode {build.flash_mode} --flash_freq {build.flash_freq} --flash_size {build.flash_size} --path "{runtime.tools.xtensa-lx106-elf-gcc.path}/bin" --out "{build.path}/{build.project_name}.bin"
+recipe.objcopy.hex.2.pattern="{runtime.tools.python.path}/python" "{runtime.tools.signing}" --mode sign --privatekey "{build.source.path}/private.key" --bin "{build.path}/{build.project_name}.bin" --out "{build.path}/{build.project_name}.bin.signed"
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.bin
@@ -123,12 +121,14 @@ recipe.size.regex.data=^(?:\.data|\.rodata|\.bss)\s+([0-9]+).*
 
 # ------------------------------
 
-# Need to duplicate the python path because Arduino does not replace properly in this stage
-tools.esptool.cmd=python
-tools.esptool.cmd.windows={runtime.platform.path}/tools/python/python.exe
 tools.esptool.path=
-tools.esptool.network_cmd=python
-tools.esptool.network_cmd.windows={runtime.platform.path}/tools/python/python.exe
+# Because the variable expansion doesn't allow one tool to find another, the following lines
+# will point to "{runtime.platform.path}/tools/python/python" in GIT and
+# "{runtime.tools.python.path}/python" for JSON board manager releases.
+#tools.esptool.cmd={runtime.tools.python.path}/python
+#tools.esptool.network_cmd={runtime.tools.python.path}/python
+tools.esptool.cmd={runtime.platform.path}/tools/python/python
+tools.esptool.network_cmd={runtime.platform.path}/tools/python/python
 
 tools.esptool.upload.protocol=esp
 tools.esptool.upload.params.verbose=--trace
