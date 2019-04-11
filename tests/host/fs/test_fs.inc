@@ -215,6 +215,14 @@ TEST_CASE(TESTPRE "Dir lists all files", TESTPAT)
     REQUIRE(sub_not_empty);
 }
 
+File FindFileByName(const File f[], int count, const char *name)
+{
+    for (int i=0; i<count; i++) {
+      if (!strcmp(name, f[i].name())) return f[i];
+    }
+    return f[0];
+}
+
 TEST_CASE(TESTPRE "Listfiles.ino example", TESTPAT)
 {
     FS_MOCK_DECLARE(128, 8, 512, "");
@@ -227,11 +235,18 @@ TEST_CASE(TESTPRE "Listfiles.ino example", TESTPAT)
     createFile("dir2/dir3/file4", "bonjour");
 
     File root = FSTYPE.open("/", "r");
-    File file1 = root.openNextFile();
-    File file2 = root.openNextFile();
-    File dir1 = root.openNextFile();
+    // LittleFS and SDFS are not guaranteed to put the names in order of creation, so
+    // manually look for them...
+    File f[4];
+    f[0] = root.openNextFile();
+    f[1] = root.openNextFile();
+    f[2] = root.openNextFile();
+    f[3] = root.openNextFile();
+    File file1 = FindFileByName(f, 4, "file1");
+    File file2 = FindFileByName(f, 4, "file2");
+    File dir1 = FindFileByName(f, 4, "dir1");
     File dir1_file3 = dir1.openNextFile();
-    File dir2 = root.openNextFile();
+    File dir2 = FindFileByName(f, 4, "dir2");
     File dir2_dir3 = dir2.openNextFile();
     File dir2_dir3_file4 = dir2_dir3.openNextFile();
 
