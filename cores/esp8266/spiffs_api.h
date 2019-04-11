@@ -208,6 +208,11 @@ public:
         return true;
     }
 
+    bool gc() override
+    {
+        return SPIFFS_gc_quick( &_fs, 0 ) == SPIFFS_OK;
+    }
+
 protected:
     friend class SPIFFSFileImpl;
     friend class SPIFFSDirImpl;
@@ -290,7 +295,7 @@ protected:
         (void) report;
         (void) arg1;
         (void) arg2;
-        
+
         // TODO: spiffs doesn't pass any context pointer along with _check_cb,
         // so we can't do anything useful here other than perhaps
         // feeding the watchdog
