@@ -20,8 +20,8 @@ public:
   virtual int read();
   virtual int read(uint8_t *buf, size_t size);
   virtual int peek();
-  virtual bool flush(unsigned int maxWaitMs = 0);
-  virtual bool stop(unsigned int maxWaitMs = 0);
+  virtual void flush();
+  virtual void stop();
   virtual uint8_t connected();
   virtual operator bool();
   virtual bool operator==(const bool value) { return bool() == value; }
