@@ -392,7 +392,7 @@ public:
     }
 
     bool truncate(uint32_t size) override {
-        if (_opened || !_fd) {
+        if (!_opened || !_fd) {
             return false;
         }
         int rc = lfs_file_truncate(_fs->getFS(), _getFD(), size);

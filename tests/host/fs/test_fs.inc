@@ -147,6 +147,18 @@ TEST_CASE(TESTPRE "#1819 Can list all files with openDir(\"\")", "[fs][bugreport
     REQUIRE(files.size() == 4);
 }
 
+TEST_CASE(TESTPRE "truncate", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+    createFile("/file1", "some text");
+    auto f = FSTYPE.open("/file1", "r+");
+    REQUIRE(f.truncate(4));
+    f.close();
+    String s = readFile("/file1");
+    REQUIRE( s == "some" );
+}
+
 #ifdef FS_HAS_DIRS
 
 // We silently make subdirectories if they do not exist and silently remove
@@ -214,19 +226,6 @@ TEST_CASE(TESTPRE "Dir lists all files", TESTPAT)
     bool sub_not_empty = (files.find("/not_empty") != std::end(files)) || (files.find("not_empty") != std::end(files));
     REQUIRE(sub_not_empty);
 }
-
-TEST_CASE(TESTPRE "truncate", TESTPAT)
-{
-    FS_MOCK_DECLARE(64, 8, 512, "");
-    REQUIRE(FSTYPE.begin());
-    createFile("/file1", "some text");
-    auto f = FSTYPE.open("/file1", "r");
-    f.truncate(4);
-    f.close();
-    String s = readFile("/file1");
-    REQUIRE( s == "some" );
-}
-
 
 File FindFileByName(const File f[], int count, const char *name)
 {

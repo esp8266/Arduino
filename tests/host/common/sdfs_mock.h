@@ -28,7 +28,7 @@ public:
     ~SDFSMock() { }
 };
 
-#define SDFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SDFSMock sdfs_mock(size_kb * 1024, block_kb * 1024, page_b, storage)
+#define SDFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SDFSMock sdfs_mock(size_kb * 1024, block_kb * 1024, page_b, storage); SDFS.format();
 #define SDFS_MOCK_RESET() sdfs_mock.reset()
 
 #endif /* spiffs_mock_hpp */

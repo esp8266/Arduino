@@ -115,7 +115,7 @@ DirImplPtr LittleFSImpl::openDir(const char *path) {
 		filter = pathStr;
             } else {
                 // We've got slashes, open the dir one up
-                *ptr = 0; // Remove slash, truncare string
+                *ptr = 0; // Remove slash, truncate string
                 rc = lfs_dir_open(&_lfs, dir.get(), pathStr);
 		filter = ptr + 1;
             }
@@ -130,7 +130,7 @@ DirImplPtr LittleFSImpl::openDir(const char *path) {
 	    filter = pathStr;
         } else {
             // We've got slashes, open the dir one up
-            *ptr = 0; // Remove slash, truncare string
+            *ptr = 0; // Remove slash, truncate string
             rc = lfs_dir_open(&_lfs, dir.get(), pathStr);
 	    filter = ptr + 1;
         }

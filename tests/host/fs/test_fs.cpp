@@ -91,7 +91,7 @@ TEST_CASE("LittleFS checks the config object passed in", "[fs]")
 };
 
 namespace sdfs_test {
-#define FSTYPE LittleFS
+#define FSTYPE SDFS
 #define TESTPRE "SDFS - "
 #define TESTPAT "[sdfs]"
 // SDFS routines strip leading slashes before doing anything, so up to 31 char names are allowable
