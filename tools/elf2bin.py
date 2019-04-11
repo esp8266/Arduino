@@ -109,7 +109,7 @@ def main():
 
     out = open(args.out, "wb")
     write_bin(out, args.eboot, ['.text'], 4096, args.flash_mode, args.flash_size, args.flash_freq, args.path)
-    write_bin(out, args.app, ['.irom0.text', '.text', '.data', '.rodata'], 0, args.flash_mode, args.flash_size, args.flash_freq, args.path)
+    write_bin(out, args.app, ['.irom0.text', '.text', '.text1', '.data', '.rodata'], 0, args.flash_mode, args.flash_size, args.flash_freq, args.path)
     out.close()
 
     return 0
