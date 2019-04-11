@@ -301,6 +301,17 @@ extern "C" void configTime(long timezone, int daylightOffset_sec,
 
 #include "pins_arduino.h"
 
+#ifdef CORE_MOCK
+uint32_t espGetCycleCount();
+#else
+inline uint32_t espGetCycleCount() __attribute__((always_inline))
+{
+    uint32_t ccount;
+    __asm__ __volatile__("esync; rsr %0,ccount":"=a" (ccount));
+    return ccount;
+}
+#endif
+
 #endif
 
 #ifdef DEBUG_ESP_OOM

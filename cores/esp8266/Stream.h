@@ -35,8 +35,11 @@
  readBytesBetween( pre_string, terminator, buffer, length)
  */
 
+#include <PolledTimeout.h>
+using OneShotFastMs  = esp8266::polledTimeout::oneShotFastMs;
+using PeriodicFastMs = esp8266::polledTimeout::periodicFastMs;
 template <typename Tfrom, typename Tto>
-size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0);
+size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0, OneShotFastMs timeout = OneShotFastMs::alwaysExpired);
 
 class Stream: public Print {
     protected:
@@ -141,10 +144,7 @@ class Stream: public Print {
         // immediate return number of transfered bytes (no timeout)
         // generic implementation using arduino virtual API
         // (also available: virtual-less template streamMove(from,to))
-        virtual size_t streamTo (Print& to, size_t maxLen = 0)
-        {
-            return streamMove<Stream,Print>(*this, to, maxLen);
-        }
+        virtual size_t streamTo (Print& to, size_t maxLen = 0);
 
     protected:
         long parseInt(char skipChar); // as above but the given skipChar is ignored
@@ -155,20 +155,18 @@ class Stream: public Print {
 };
 
 #include <assert.h>
-//#include "Esp.h"
-//#include "PolledTimeout.h"
 
 #define STREAM_MOVE(from,to,...) (streamMove<decltype(from),decltype(to)>(from, to, ## __VA_ARGS__))
 
 template <typename Tfrom, typename Tto>
-size_t streamMove (Tfrom& from, Tto& to, size_t maxLen)
+size_t streamMove (Tfrom& from, Tto& to, size_t maxLen, OneShotFastMs timeout)
 {
-//    static constexpr auto yield_ms = 100;
+    static constexpr auto yield_ms = 100;
     static constexpr auto maxStreamToOnHeap = 128;
-//    esp8266::polledTimeout::periodic yieldNow(yield_ms);
+    PeriodicFastMs yieldNow(yield_ms);
     size_t written = 0;
     size_t w;
-
+//////////////XXX use timeout
     if (from.peekBufferAvailableAPI())
         // direct buffer read API available, avoid one copy
         while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
@@ -184,8 +182,8 @@ size_t streamMove (Tfrom& from, Tto& to, size_t maxLen)
 
             written += w;
 
-//            if (yieldNow)
-//                yield();
+            if (yieldNow)
+                yield();
         }
     else
         // use Stream blck-read/write API
@@ -205,8 +203,8 @@ size_t streamMove (Tfrom& from, Tto& to, size_t maxLen)
 
             written += w;
 
-//            if (yieldNow)
-//                yield();
+            if (yieldNow)
+                yield();
         }
 
     return written;

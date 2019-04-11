@@ -268,48 +268,7 @@ int Stream::read (char* buffer, size_t maxLen)
     return nbread;
 }
 
-#if 0
-#define MAXTRANSFERBLOCK 128 // allocated in stack, be nice
-
 size_t Stream::streamTo (Print& to, size_t maxLen)
 {
-    esp8266::polledTimeout::periodic yieldNow(100);
-    size_t w;
-    size_t written = 0;
-    while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
-    {
-        const char* pb = peekBuffer();
-        if (pb)
-        {
-            size_t r = availableForPeek();
-            if (w > r)
-                w = r;
-            if (!w)
-                return written;
-            w = to.write(pb, w);
-            peekConsume(w);
-        }
-        else
-        {
-            size_t r = available();
-            if (w > r)
-                w = r;
-            if (!w)
-                return written;
-            if (w > MAXTRANSFERBLOCK)
-                w = MAXTRANSFERBLOCK;
-            char temp[w];
-            r = read(temp, w);
-            w = to.write(temp, r);
-            assert(w == r);
-        }
-
-        written += w;
-
-        if (yieldNow)
-            yield();
-    }
-    return written;
+    return streamMove<Stream,Print>(*this, to, maxLen);
 }
-
-#endif
