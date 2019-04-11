@@ -82,6 +82,19 @@ public:
     return loadCACert(file, file.size());
   }
 
+  // disallow optimization for streamMove/STREAM_MOVE
+  static constexpr bool peekBufferAvailableAPI () { return false; }
+
+  // return a pointer to available data buffer (size = availableForPeek())
+  // semantic forbids any kind of read() before calling peekConsume()
+  virtual const char* peekBuffer () { return nullptr; }
+
+  // return number of byte accessible by peekBuffer()
+  virtual size_t availableForPeek () { return 0; }
+
+  // consume bytes after use (see peekBuffer)
+  virtual void peekConsume (size_t consume) { (void)consume; }
+
 friend class WiFiServerSecure; // Needs access to custom constructor below
 protected:
   // Only called by WiFiServerSecure

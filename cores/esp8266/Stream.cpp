@@ -22,6 +22,9 @@
 
 #include <Arduino.h>
 #include <Stream.h>
+#include <assert.h>
+#include <PolledTimeout.h>
+
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 #define NO_SKIP_CHAR  1  // a magic char not found in a valid ASCII numeric field
 
@@ -255,3 +258,17 @@ String Stream::readStringUntil(char terminator) {
     return ret;
 }
 
+int Stream::read (char* buffer, size_t maxLen)
+{
+    IAMSLOW("Stream::read(buffer,len)");
+
+    size_t nbread = 0;
+    while (nbread < maxLen && available())
+        buffer[nbread++] = read();
+    return nbread;
+}
+
+size_t Stream::streamTo (Print& to, size_t maxLen)
+{
+    return streamMove<Stream,Print>(*this, to, maxLen);
+}

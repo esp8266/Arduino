@@ -18,18 +18,26 @@
 
 #include <unistd.h>
 
+unsigned long millis0 = 0, micros0 = 0;
+
+extern "C" void init_milliscros ()
+{
+    millis0 = millis();
+    micros0 = micros();
+}
+
 extern "C" unsigned long millis()
 {
     timeval time;
     gettimeofday(&time, NULL);
-    return (time.tv_sec * 1000) + (time.tv_usec / 1000);
+    return (time.tv_sec * 1000) + (time.tv_usec / 1000) - millis0;
 }
 
 extern "C" unsigned long micros()
 {
     timeval time;
     gettimeofday(&time, NULL);
-    return (time.tv_sec * 1000000) + time.tv_usec;
+    return (time.tv_sec * 1000000) + time.tv_usec - micros0;
 }
 
 
@@ -63,3 +71,5 @@ extern "C" void delayMicroseconds(unsigned int us)
 {
     usleep(us);
 }
+
+const char* overrideme PROGMEM = " should be overridden for better efficiency\r\n";

@@ -128,22 +128,49 @@ public:
         // return -1 when data is unvailable (arduino api)
         return uart_peek_char(_uart);
     }
+
+    // allow optimization for streamMove/STREAM_MOVE
+    static constexpr bool peekBufferAvailableAPI () { return true; }
+
+    // return a pointer to available data buffer (size = available())
+    // semantic forbids any kind of read() before calling peekConsume()
+    const char* peekBuffer () override
+    {
+        return uart_peek_buffer(_uart);
+    }
+
+    // return number of byte accessible by peekBuffer()
+    size_t availableForPeek () override
+    {
+        return uart_peek_available(_uart);
+    }
+
+    // consume bytes after use (see peekBuffer)
+    void peekConsume (size_t consume) override
+    {
+        return uart_peek_consume(_uart, consume);
+    }
+
     int read(void) override
     {
         // return -1 when data is unvailable (arduino api)
         return uart_read_char(_uart);
     }
     // ::read(buffer, size): same as readBytes without timeout
-    size_t read(char* buffer, size_t size)
+    int read(char* buffer, size_t size) override
     {
         return uart_read(_uart, buffer, size);
+    }
+    int read(uint8_t* buffer, size_t size) override
+    {
+        return uart_read(_uart, (char*)buffer, size);
     }
     size_t readBytes(char* buffer, size_t size) override;
     size_t readBytes(uint8_t* buffer, size_t size) override
     {
         return readBytes((char*)buffer, size);
     }
-    int availableForWrite(void)
+    int availableForWrite(void) override
     {
         return static_cast<int>(uart_tx_free(_uart));
     }

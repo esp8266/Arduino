@@ -744,6 +744,17 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
         return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
     }
 
+#if 1
+
+    size_t transferred = 0;
+    while (connected() && transferred < size)
+    {
+        transferred += stream->streamTo(*_client, size - transferred);
+    }
+
+#else
+
+
     int buff_size = HTTP_TCP_BUFFER_SIZE;
 
     int len = size;
@@ -850,6 +861,8 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
         DEBUG_HTTPCLIENT("[HTTP-Client][sendRequest] too less ram! need %d\n", HTTP_TCP_BUFFER_SIZE);
         return returnError(HTTPC_ERROR_TOO_LESS_RAM);
     }
+
+#endif
 
     // handle Server Response (Header)
     return returnError(handleHeaderResponse());

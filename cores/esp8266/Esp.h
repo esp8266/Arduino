@@ -200,20 +200,12 @@ class EspClass {
 
         bool eraseConfig();
 
-#ifndef CORE_MOCK
-        inline
-#endif
+#ifdef CORE_MOCK
         uint32_t getCycleCount();
-};
-
-#ifndef CORE_MOCK
-uint32_t EspClass::getCycleCount()
-{
-    uint32_t ccount;
-    __asm__ __volatile__("esync; rsr %0,ccount":"=a" (ccount));
-    return ccount;
-}
+#else
+        inline uint32_t getCycleCount() { return espGetCycleCount(); }
 #endif
+};
 
 extern EspClass ESP;
 

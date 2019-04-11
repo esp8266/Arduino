@@ -420,6 +420,29 @@ public:
         _sync = sync;
     }
 
+    // return a pointer to available data buffer (size = availableForPeek())
+    // semantic forbids any kind of read() before calling peekConsume()
+    const char* peekBuffer ()
+    {
+        if (!_rx_buf)
+            return nullptr;
+        return (const char*)_rx_buf->payload + _rx_buf_offset;
+    }
+
+    // return number of byte accessible by peekBuffer()
+    size_t availableForPeek ()
+    {
+        if (!_rx_buf)
+            return 0;
+        return _rx_buf->tot_len - _rx_buf_offset;
+    }
+
+    // consume bytes after use (see peekBuffer)
+    void peekConsume (size_t consume)
+    {
+        _consume(consume);
+    }
+
 protected:
 
     bool _is_timeout()

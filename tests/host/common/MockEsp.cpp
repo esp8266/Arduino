@@ -217,9 +217,14 @@ void EspClass::resetFreeContStack()
 {
 }
 
-uint32_t EspClass::getCycleCount()
+uint32_t espGetCycleCount()
 {
     timeval t;
     gettimeofday(&t, NULL);
     return (((uint64_t)t.tv_sec) * 1000000 + t.tv_usec) * (F_CPU / 1000000);
+}
+
+uint32_t EspClass::getCycleCount()
+{
+    return espGetCycleCount();
 }
