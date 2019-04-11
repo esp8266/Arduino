@@ -161,11 +161,11 @@ public:
         return remove(path);  // Same call on LittleFS
     }
 
-    bool setConfig(const FSConfig *cfg) override {
-        if ((cfg->_type != LittleFSConfig::fsid::FSId) || _mounted) {
+    bool setConfig(const FSConfig &cfg) override {
+        if ((cfg._type != LittleFSConfig::fsid::FSId) || _mounted) {
             return false;
         }
-        _cfg = *static_cast<const LittleFSConfig *>(cfg);
+        _cfg = *static_cast<const LittleFSConfig *>(&cfg);
        return true;
     }
 
@@ -216,6 +216,7 @@ public:
 
         return true;
     }
+
 
 protected:
     friend class LittleFSFileImpl;
@@ -388,6 +389,18 @@ public:
 
     size_t size() const override {
         return (_opened && _fd)? lfs_file_size(_fs->getFS(), _getFD()) : 0;
+    }
+
+    bool truncate(uint32_t size) override {
+        if (_opened || !_fd) {
+            return false;
+        }
+        int rc = lfs_file_truncate(_fs->getFS(), _getFD(), size);
+        if (rc < 0) {
+            DEBUGV("lfs_file_truncate rc=%d\n", rc);
+            return false;
+        }
+        return true;
     }
 
     void close() override {

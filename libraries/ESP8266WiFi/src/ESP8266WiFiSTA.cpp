@@ -63,6 +63,13 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
  * @return equal
  */
 static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
+
+#ifdef NONOSDK3V0
+    static_assert(sizeof(station_config) == 116, "struct station_config has changed, please update comparison function");
+#else
+    static_assert(sizeof(station_config) == 112, "struct station_config has changed, please update comparison function");
+#endif
+
     if(strncmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid), sizeof(lhs.ssid)) != 0) {
         return false;
     }
@@ -81,6 +88,20 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
             return false;
         }
     }
+    
+    if(lhs.threshold.rssi != rhs.threshold.rssi) {
+        return false;
+    }
+
+    if(lhs.threshold.authmode != rhs.threshold.authmode) {
+        return false;
+    }
+
+#ifdef NONOSDK3V0
+    if (lhs.open_and_wep_mode_disable != rhs.open_and_wep_mode_disable) {
+        return false;
+    }
+#endif
 
     return true;
 }
@@ -138,7 +159,7 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     conf.threshold.rssi = -127;
-#ifndef NONOSDK221
+#ifdef NONOSDK3V0
     conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
 #endif
 

@@ -34,6 +34,7 @@ public:
     virtual bool seek(uint32_t pos, SeekMode mode) = 0;
     virtual size_t position() const = 0;
     virtual size_t size() const = 0;
+    virtual bool truncate(uint32_t size) = 0;
     virtual void close() = 0;
     virtual const char* name() const = 0;
     virtual const char* fullName() const = 0;
@@ -69,7 +70,7 @@ public:
 class FSImpl {
 public:
     virtual ~FSImpl () { }
-    virtual bool setConfig(const FSConfig *cfg) = 0;
+    virtual bool setConfig(const FSConfig &cfg) = 0;
     virtual bool begin() = 0;
     virtual void end() = 0;
     virtual bool format() = 0;
@@ -81,6 +82,7 @@ public:
     virtual bool remove(const char* path) = 0;
     virtual bool mkdir(const char* path) = 0;
     virtual bool rmdir(const char* path) = 0;
+    virtual bool gc() { return true; } // May not be implemented in all file systems.
 };
 
 } // namespace fs

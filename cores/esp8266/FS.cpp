@@ -114,6 +114,13 @@ File::operator bool() const {
     return !!_p;
 }
 
+bool File::truncate(uint32_t size) {
+    if (!_p)
+        return false;
+
+    return _p->truncate(size);
+}
+
 const char* File::name() const {
     if (!_p)
         return nullptr;
@@ -234,8 +241,8 @@ bool Dir::rewind() {
     return _impl->rewind();
 }
 
-bool FS::setConfig(const FSConfig *cfg) {
-    if (!_impl || !cfg) {
+bool FS::setConfig(const FSConfig &cfg) {
+    if (!_impl) {
         return false;
     }
 
@@ -253,6 +260,13 @@ void FS::end() {
     if (_impl) {
         _impl->end();
     }
+}
+
+bool FS::gc() {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->gc();
 }
 
 bool FS::format() {

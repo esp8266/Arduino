@@ -215,6 +215,19 @@ TEST_CASE(TESTPRE "Dir lists all files", TESTPAT)
     REQUIRE(sub_not_empty);
 }
 
+TEST_CASE(TESTPRE "truncate", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+    createFile("/file1", "some text");
+    auto f = FSTYPE.open("/file1", "r");
+    f.truncate(4);
+    f.close();
+    String s = readFile("/file1");
+    REQUIRE( s == "some" );
+}
+
+
 File FindFileByName(const File f[], int count, const char *name)
 {
     for (int i=0; i<count; i++) {
@@ -299,6 +312,32 @@ TEST_CASE(TESTPRE "Dir lists all files", TESTPAT)
     REQUIRE(sub_empty);
     bool sub_not_empty = (files.find("/subdir/not_empty") != std::end(files)) || (files.find("subdir/not_empty") != std::end(files));
     REQUIRE(sub_not_empty);
+}
+
+TEST_CASE(TESTPRE "Multisplendored File::writes", TESTPAT)
+{
+    FS_MOCK_DECLARE(64, 8, 512, "");
+    REQUIRE(FSTYPE.begin());
+
+    File f = FSTYPE.open("/file.txt", "w");
+    f.write('a');
+    f.write(65);
+    f.write("bbcc");
+    f.write("theend", 6);
+    char block[3]={'x','y','z'};
+    f.write(block, 3);
+    uint32_t bigone = 0x40404040;
+    f.write((const uint8_t*)&bigone, 4);
+    f.close();
+    REQUIRE(readFile("/file.txt") == "aAbbcctheendxyz@@@@");
+    File g = FSTYPE.open("/file.txt", "w");
+    g.write(0);
+    g.close();
+    g = FSTYPE.open("/file.txt", "r");
+    uint8_t u = 0x66;
+    g.read(&u, 1);
+    g.close();
+    REQUIRE(u == 0);
 }
 
 #endif

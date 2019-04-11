@@ -47,23 +47,11 @@ extern "C" const ip_addr_t ip_addr_any = IPADDR4_INIT(IPADDR_ANY);
 WiFiServer::WiFiServer (const IPAddress& addr, uint16_t port)
 {
 	(void)addr;
-	if (port < 1024)
-	{
-		int newport = port + 9000;
-		fprintf(stderr, MOCK "WiFiServer port: %d -> %d\n", port, newport);
-		port = newport;
-	}
 	_port = port;
 }
 
 WiFiServer::WiFiServer (uint16_t port)
 {
-	if (port < 1024)
-	{
-		int newport = port + 9000;
-		fprintf(stderr, MOCK "WiFiServer port: %d -> %d\n", port, newport);
-		port = newport;
-	}
 	_port = port;
 }
 

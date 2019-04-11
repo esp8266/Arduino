@@ -29,7 +29,10 @@
 #undef max
 #undef min
 #include "FSImpl.h"
-#include "spiffs/spiffs.h"
+extern "C" {
+    #include "spiffs/spiffs.h"
+    #include "spiffs/spiffs_nucleus.h"
+};
 #include "debug.h"
 #include "flash_utils.h"
 #include "flash_hal.h"
@@ -79,6 +82,7 @@ public:
         }
         return true;
     }
+
     bool info(FSInfo& info) override
     {
         info.maxOpenFiles = _maxOpenFds;
@@ -123,13 +127,13 @@ public:
         return false;
     }
 
-    bool setConfig(const FSConfig *cfg) override
+    bool setConfig(const FSConfig &cfg) override
     {
-        if ((cfg->_type != SPIFFSConfig::fsid::FSId) || (SPIFFS_mounted(&_fs) != 0)) {
+        if ((cfg._type != SPIFFSConfig::fsid::FSId) || (SPIFFS_mounted(&_fs) != 0)) {
             return false;
         }
-        _cfg = *static_cast<const SPIFFSConfig *>(cfg);
-       return true;
+        _cfg = *static_cast<const SPIFFSConfig *>(&cfg);
+	return true;
     }
 
     bool begin() override
@@ -138,6 +142,7 @@ public:
         if (&_FS_end <= &_FS_start)
             return false;
 #endif
+
         if (SPIFFS_mounted(&_fs) != 0) {
             return true;
         }
@@ -156,6 +161,7 @@ public:
             }
             return _tryMount();
         }
+
         return false;
     }
 
@@ -193,6 +199,11 @@ public:
         }
 
         return true;
+    }
+
+    bool gc() override
+    {
+        return SPIFFS_gc_quick( &_fs, 0 ) == SPIFFS_OK;
     }
 
 protected:
@@ -277,7 +288,7 @@ protected:
         (void) report;
         (void) arg1;
         (void) arg2;
-        
+
         // TODO: spiffs doesn't pass any context pointer along with _check_cb,
         // so we can't do anything useful here other than perhaps
         // feeding the watchdog
@@ -401,6 +412,17 @@ public:
             _getStat();
         }
         return _stat.size;
+    }
+
+    bool truncate(uint32_t size) override
+    {
+        CHECKFD();
+        spiffs_fd *sfd;
+        if (spiffs_fd_get(_fs->getFs(), _fd, &sfd) == SPIFFS_OK) {
+            return SPIFFS_OK == spiffs_object_truncate(sfd, size, 0);
+        } else {
+          return false;
+        }
     }
 
     bool isFile() const override
@@ -544,4 +566,4 @@ protected:
 
 }; // namespace
 
-#endif//spiffs_api_h
+#endif //spiffs_api_h

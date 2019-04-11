@@ -35,7 +35,7 @@
 
 WiFiServer statusServer(TCP_PORT);
 WiFiUDP udp;
-esp8266::polledTimeout::periodic statusPeriod(STATUSDELAY_MS);
+esp8266::polledTimeout::periodicMs showStatusOnSerialNow(STATUSDELAY_MS);
 
 void fqdn(Print& out, const String& fqdn) {
   out.print(F("resolving "));
@@ -149,7 +149,7 @@ void setup() {
   Serial.print(F(" - UDP server on port "));
   Serial.println(UDP_PORT);
 
-  statusPeriod.reset();
+  showStatusOnSerialNow.reset();
 }
 
 unsigned long statusTimeMs = 0;
@@ -182,7 +182,7 @@ void loop() {
   }
 
 
-  if (statusPeriod) {
+  if (showStatusOnSerialNow) {
     status(Serial);
   }
 

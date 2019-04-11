@@ -30,12 +30,12 @@ extern "C" uint32_t _FS_start;
 extern "C" uint32_t _FS_end;
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
-        : _httpClientTimeout(8000), _ledPin(-1)
+        : _httpClientTimeout(8000), _followRedirects(false), _ledPin(-1)
 {
 }
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
-        : _httpClientTimeout(httpClientTimeout), _ledPin(-1)
+        : _httpClientTimeout(httpClientTimeout), _followRedirects(false), _ledPin(-1)
 {
 }
 
@@ -261,6 +261,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
     // use HTTP/1.0 for update since the update handler not support any transfer Encoding
     http.useHTTP10(true);
     http.setTimeout(_httpClientTimeout);
+    http.setFollowRedirects(_followRedirects);
     http.setUserAgent(F("ESP8266-http-Update"));
     http.addHeader(F("x-ESP8266-STA-MAC"), WiFi.macAddress());
     http.addHeader(F("x-ESP8266-AP-MAC"), WiFi.softAPmacAddress());
