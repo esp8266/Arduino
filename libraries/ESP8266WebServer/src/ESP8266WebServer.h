@@ -27,6 +27,7 @@
 #include <functional>
 #include <memory>
 #include <ESP8266WiFi.h>
+#include <FS.h>
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
@@ -63,10 +64,6 @@ typedef struct {
 } HTTPUpload;
 
 #include "detail/RequestHandler.h"
-
-namespace fs {
-class FS;
-}
 
 template<typename ServerType>
 class ESP8266WebServerTemplate
