@@ -81,7 +81,6 @@ public:
     bool isDirectory() const;
 
     // Arduino "class SD" methods for compatibility
-    size_t write(const char *str) { return write((const uint8_t*)str, strlen(str)); }
     void rewindDirectory();
     File openNextFile();
 
