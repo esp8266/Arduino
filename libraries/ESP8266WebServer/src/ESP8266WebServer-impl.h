@@ -441,7 +441,7 @@ void ESP8266WebServerTemplate<ServerType, ClientType>::send_P(int code, PGM_P co
     char type[64];
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
     _prepareHeader(header, code, (const char* )type, contentLength);
-    _currentClient.write(header.c_str(), header.length());
+    _currentClient.write((const uint8_t *)header.c_str(), header.length());
     if (contentLength) {
         sendContent_P(content);
     }
@@ -496,11 +496,11 @@ void ESP8266WebServerTemplate<ServerType, ClientType>::sendContent_P(PGM_P conte
   if(_chunked) {
     char chunkSize[11];
     sprintf(chunkSize, "%zx\r\n", size);
-    _currentClient.write(chunkSize, strlen(chunkSize));
+    _currentClient.write((const uint8_t *)chunkSize, strlen(chunkSize));
   }
   _currentClient.write_P(content, size);
   if(_chunked){
-    _currentClient.write(footer, 2);
+    _currentClient.write((const uint8_t *)footer, 2);
     if (size == 0) {
       _chunked = false;
     }

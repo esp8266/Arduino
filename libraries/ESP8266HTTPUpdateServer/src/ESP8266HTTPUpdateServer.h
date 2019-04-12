@@ -3,7 +3,7 @@
 
 #include <ESP8266WebServer.h>
 
-temnplate <typename ServerType, typename ClientType>
+template <typename ServerType, typename ClientType>
 class ESP8266HTTPUpdateServerTemplate
 {
   public:

@@ -17,7 +17,7 @@ static const char successResponse[] PROGMEM =
   "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
 
 template <typename ServerType, typename ClientType>
-ESP8266HTTPUpdateServerTemplate<ServerType, ClientType>::ESP8266HTTPUpdateServer(bool serial_debug)
+ESP8266HTTPUpdateServerTemplate<ServerType, ClientType>::ESP8266HTTPUpdateServerTemplate(bool serial_debug)
 {
   _serial_output = serial_debug;
   _server = NULL;
