@@ -70,8 +70,8 @@ const char* update_password = "admin";
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-ESP8266WebServerTemplate<axTLS::WiFiServerSecure, axTLS::WiFiClientSecure> httpServer(443);
-ESP8266HTTPUpdateServerTemplate<axTLS::WiFiServerSecure, axTLS::WiFiClientSecure> httpUpdater;
+axTLS::ESP8266WebServerSecure httpServer(443);
+axTLS::ESP8266HTTPUpdateServerSecure httpUpdater;
 
 // The certificate is stored in PMEM
 static const uint8_t x509[] PROGMEM = {
