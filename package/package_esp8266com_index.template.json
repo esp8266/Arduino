@@ -121,7 +121,7 @@
                   },
                   {
                      "packager": "esp8266",
-                     "version": "2.5.0-3-4a23057",
+                     "version": "2.5.1-1",
                      "name": "mklittlefs"
                   },
                   {
@@ -302,50 +302,50 @@
                ]
             },
             {
-               "version": "2.5.0-3-4a23057",
+               "version": "2.5.1-1",
                "name": "mklittlefs",
                "systems": [
                   {
                     "host": "aarch64-linux-gnu",
-                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.0-3/aarch64-linux-gnu-mklittlefs-4a23057.tar.gz",
-                    "archiveFileName": "aarch64-linux-gnu-mklittlefs-4a23057.tar.gz",
-                    "checksum": "SHA-256:436f1593c4075bd023e66fcb266532d910c07298d4dfde58a56ea78e57feb5a6",
-                    "size": "39151"
+                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.1-1/aarch64-linux-gnu-mklittlefs-47e8167.tar.gz",
+                    "archiveFileName": "aarch64-linux-gnu-mklittlefs-47e8167.tar.gz",
+                    "checksum": "SHA-256:f5951f0f5c0649992cccbed0146e5ec91dd0a2294f391956bf65c32404a98e96",
+                    "size": "44128"
                   },
                   {
                     "host": "arm-linux-gnueabihf",
-                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.0-3/arm-linux-gnueabihf-mklittlefs-4a23057.tar.gz",
-                    "archiveFileName": "arm-linux-gnueabihf-mklittlefs-4a23057.tar.gz",
-                    "checksum": "SHA-256:f20cb21aebda0db732c337d92ddd628d7f6d7e7110a19d39107ed2bdb357b193",
-                    "size": "31561"
+                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.1-1/arm-linux-gnueabihf-mklittlefs-47e8167.tar.gz",
+                    "archiveFileName": "arm-linux-gnueabihf-mklittlefs-47e8167.tar.gz",
+                    "checksum": "SHA-256:c5252ce0ae177238efecfa6835950ae12b3cb9dbb7f6d04caedf90afcf0b27b6",
+                    "size": "36590"
                   },
                   {
                     "host": "i686-mingw32",
-                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.0-3/i686-w64-mingw32-mklittlefs-4a23057.zip",
-                    "archiveFileName": "i686-w64-mingw32-mklittlefs-4a23057.zip",
-                    "checksum": "SHA-256:64e038c5fc172341247b3ebcb9f5ea190b6fc2f046948b668dbc588a38572f9e",
-                    "size": "327466"
+                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.1-1/i686-w64-mingw32-mklittlefs-47e8167.zip",
+                    "archiveFileName": "i686-w64-mingw32-mklittlefs-47e8167.zip",
+                    "checksum": "SHA-256:85b2dccc9c00ab2747ffbcee8b949c2dc88747f7a7e14cd0bac5b8a8afe19a4b",
+                    "size": "332150"
                   },
                   {
                     "host": "x86_64-apple-darwin",
-                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.0-3/x86_64-apple-darwin14-mklittlefs-4a23057.tar.gz",
-                    "archiveFileName": "x86_64-apple-darwin14-mklittlefs-4a23057.tar.gz",
-                    "checksum": "SHA-256:b8e08f21e433375fe7cef406bf80924e56b8cbb2b89722e018926e2ffb06d533",
-                    "size": "356900"
+                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.1-1/x86_64-apple-darwin14-mklittlefs-47e8167.tar.gz",
+                    "archiveFileName": "x86_64-apple-darwin14-mklittlefs-47e8167.tar.gz",
+                    "checksum": "SHA-256:47ba021a929d62b1f5f85f61c935b23fdc3a07bdf01eb3d5f36f064ff4e42154",
+                    "size": "362031"
                   },
                   {
                     "host": "x86_64-pc-linux-gnu",
-                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.0-3/x86_64-linux-gnu-mklittlefs-4a23057.tar.gz",
-                    "archiveFileName": "x86_64-linux-gnu-mklittlefs-4a23057.tar.gz",
-                    "checksum": "SHA-256:add92ff1d71a1fdadfd8132c48d6bdc00c88d1f2a80b8843af7a5a08205f9490",
-                    "size": "40450"
+                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.1-1/x86_64-linux-gnu-mklittlefs-47e8167.tar.gz",
+                    "archiveFileName": "x86_64-linux-gnu-mklittlefs-47e8167.tar.gz",
+                    "checksum": "SHA-256:1e93a62cd550aa2fdb874820ead827880b964bea845a6fa053d12ddb8e39f8f0",
+                    "size": "46226"
                   },
                   {
                     "host": "x86_64-mingw32",
-                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.0-3/x86_64-w64-mingw32-mklittlefs-4a23057.zip",
-                    "archiveFileName": "x86_64-w64-mingw32-mklittlefs-4a23057.zip",
-                    "checksum": "SHA-256:944493f35dfdf01cbc628f99f5b2649843f827d8bafbeb11160c72ef6822356e",
-                    "size": "339768"
+                    "url": "https://github.com/earlephilhower/mklittlefs/releases/download/2.5.1-1/x86_64-w64-mingw32-mklittlefs-47e8167.zip",
+                    "archiveFileName": "x86_64-w64-mingw32-mklittlefs-47e8167.zip",
+                    "checksum": "SHA-256:0136c76a710c90b0f47d9f01ab4bf46e93daba9935dd498eb9d8b52f23550626",
+                    "size": "344669"
                   }
                ]
             }
