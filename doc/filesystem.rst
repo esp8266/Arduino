@@ -167,11 +167,18 @@ Uploading files to file system
 menu item to *Tools* menu for uploading the contents of sketch data
 directory into ESP8266 flash file system.
 
--  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.3.0/ESP8266FS-0.3.0.zip.
+**Warning**: Due to the move from the obsolete esptool-ck.exe to the
+supported esptool.py upload tool, upgraders from pre 2.5.1 will need to
+update the ESP8266FS tool referenced below to 0.4.0 or later.  Prior versions
+will fail with a "esptool not found" error because they don't know how to
+use esptool.py.
+
+-  Download the tool: https://github.com/esp8266/arduino-esp8266fs-plugin/releases/download/0.4.0/ESP8266FS-0.4.0.zip
 -  In your Arduino sketchbook directory, create ``tools`` directory if
    it doesn't exist yet
 -  Unpack the tool into ``tools`` directory (the path will look like
    ``<home_dir>/Arduino/tools/ESP8266FS/tool/esp8266fs.jar``)
+   If upgrading, overwrite the existing JAR file with the newer version.
 -  Restart Arduino IDE
 -  Open a sketch (or create a new one and save it)
 -  Go to sketch directory (choose Sketch > Show Sketch Folder)
