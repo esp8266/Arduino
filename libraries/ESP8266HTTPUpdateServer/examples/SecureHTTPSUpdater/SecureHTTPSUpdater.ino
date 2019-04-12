@@ -42,11 +42,21 @@
   This example is released into the public domain.
 */
 
+// AXTLS is deprecated, do not use in new code.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
+#include <WiFiServerSecure.h>
+#include <WiFiServerSecureAxTLS.h>
+#include <WiFiClientSecure.h>
+#include <WiFiClientSecureAxTLS.h>
+
+#pragma GCC diagnostic pop
 
 #ifndef STASSID
 #define STASSID "your-ssid"
@@ -60,7 +70,7 @@ const char* update_password = "admin";
 const char* ssid = STASSID;
 const char* password = STAPSK;
 
-ESP8266WebServerSecure httpServer(443);
+ESP8266WebServerTemplate<axTLS::WiFiServerSecure, axTLS::WiFiClientSecure> httpServer(443);
 ESP8266HTTPUpdateServerTemplate<axTLS::WiFiServerSecure, axTLS::WiFiClientSecure> httpUpdater;
 
 // The certificate is stored in PMEM
