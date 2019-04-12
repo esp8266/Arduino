@@ -47,26 +47,44 @@ void setup() {
     client.printf("Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n", FILE "copy", FILE "copy");
     client.println("Content-Type: application/octet-stream");
     client.println("");
-    
+
+
     Serial.printf("\r\n\r\n");
     Serial.printf("\r\n\r\n##########################\r\n");
+
+
+#define TESTSTREAM 0
+
+printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\r\n");
+
     auto A = millis();
-    Serial.printf("\r\n\r\nCLIENT: ----> time-keep: %lums  sent: %d\r\n\r\n", (millis() - A), (int)client.write(f));
-    client.println();
-    client.println("--glark--");
+    Serial.printf("\r\n\r\nCLIENT: ----> upload duration: %lums  sent: %d\r\n\r\n",
+        millis() - A,
+#if TESTSTREAM
+        (int)f.streamTo(client, 0)
+#else
+        (int)client.write(f)
+#endif
+        );
+    A = millis() - A;
+
+printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\r\n");
+
     Serial.println("CLIENT waiting for server ack...");
+    client.println("\r\n--glark--");
     while (!client.available())
          yield();
-    A = millis() - A;
-    Serial.printf("\r\n\r\n##########################\r\n");
-    Serial.printf("\r\n\r\nCLIENT: ----> upload duration: +%lums\r\n", A);
-    Serial.printf("\r\n\r\n##########################\r\n");
 
-    Serial.println("CLIENT: server response:");
+    Serial.println("@@@@@@@@@@@@@ CLIENT: server response:");
+#if TESTSTREAM
+    client.setTimeout(10000);
+    client.streamTo(Serial, 0);
+#else
     while (client.available())
         Serial.write(client.read());
+#endif
 
-    Serial.println("CLIENT: end");
+    Serial.println("@@@@@@@@@@@@@ CLIENT: end");
     client.stop();
     f.close();
 }

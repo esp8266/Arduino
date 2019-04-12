@@ -22,6 +22,7 @@
 #ifndef Stream_h
 #define Stream_h
 
+#include <debug.h>
 #include <inttypes.h>
 #include "Print.h"
 
@@ -36,10 +37,12 @@
  */
 
 #include <PolledTimeout.h>
-using OneShotFastMs  = esp8266::polledTimeout::oneShotFastMs;
-using PeriodicFastMs = esp8266::polledTimeout::periodicFastMs;
-template <typename Tfrom, typename Tto>
-size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0, OneShotFastMs timeout = OneShotFastMs::alwaysExpired);
+
+template <typename Tfrom, typename Tto,
+          typename PeriodicMs = esp8266::polledTimeout::periodicFastMs,
+          typename TimeoutMs  = esp8266::polledTimeout::oneShotFastMs>
+size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0, TimeoutMs timeout = TimeoutMs::alwaysExpired);
+// by default: TimeoutMs::alwaysExpired: will use Stream::_timeout
 
 class Stream: public Print {
     protected:
@@ -61,6 +64,7 @@ class Stream: public Print {
 // parsing methods
 
         void setTimeout(unsigned long timeout);  // sets maximum milliseconds to wait for stream data, default is 1 second
+        unsigned long getTimeout () { return _timeout; }
 
         bool find(const char *target);   // reads data from the stream until the target string is found
         bool find(uint8_t *target) {
@@ -120,6 +124,8 @@ class Stream: public Print {
         // arduino's "int Client::read(uint8_t*,size_t)":
         virtual int read(uint8_t* buffer, size_t maxLen) { return read((char*)buffer, maxLen); }
 
+        //////////////////// extensions:
+
         // addition: directly access to read buffer
         // (currently implemented in HardwareSerial:: and WiFiClient::)
 
@@ -141,10 +147,12 @@ class Stream: public Print {
         // additions: streamTo
 
         // transfer at most maxlen bytes (maxlen==0 means transfer until starvation)
-        // immediate return number of transfered bytes (no timeout)
+        // immediate return number of transfered bytes (no timeout) XXXXXXFIXME
         // generic implementation using arduino virtual API
         // (also available: virtual-less template streamMove(from,to))
         virtual size_t streamTo (Print& to, size_t maxLen = 0);
+
+        //////////////////// end of extensions
 
     protected:
         long parseInt(char skipChar); // as above but the given skipChar is ignored
@@ -158,18 +166,30 @@ class Stream: public Print {
 
 #define STREAM_MOVE(from,to,...) (streamMove<decltype(from),decltype(to)>(from, to, ## __VA_ARGS__))
 
-template <typename Tfrom, typename Tto>
-size_t streamMove (Tfrom& from, Tto& to, size_t maxLen, OneShotFastMs timeout)
+template <typename Tfrom, typename Tto, typename PeriodicMs, typename TimeoutMs>
+size_t streamMove (Tfrom& from, Tto& to, size_t maxLen, TimeoutMs timeout)
 {
     static constexpr auto yield_ms = 100;
     static constexpr auto maxStreamToOnHeap = 128;
-    PeriodicFastMs yieldNow(yield_ms);
+    PeriodicMs yieldNow(yield_ms);
     size_t written = 0;
     size_t w;
-//////////////XXX use timeout
+
+    if (timeout == TimeoutMs::alwaysExpired)
+        // default value => take Stream (source) value
+        // TODO: check for to::getTimeout() existence (w/ SFINAE or equiv.)
+        // and use in that case std::min(from.getTimeout(), to.getTimeout())
+        timeout.reset(from.getTimeout());
+    else
+        timeout.reset();
+
+DEBUGV("---------------------------------------- %d\n", timeout.getTimeout());
+
     if (from.peekBufferAvailableAPI())
+    {
+        DEBUGV(":pkbf %s:%d\r\n", __FILE__, __LINE__);
         // direct buffer read API available, avoid one copy
-        while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
+        while (!timeout && (!maxLen || written < maxLen) && (w = to.availableForWrite()))
         {
             const char* pb = from.peekBuffer();
             size_t r = from.availableForPeek();
@@ -184,10 +204,14 @@ size_t streamMove (Tfrom& from, Tto& to, size_t maxLen, OneShotFastMs timeout)
 
             if (yieldNow)
                 yield();
+            timeout.reset();
         }
+    }
     else
-        // use Stream blck-read/write API
-        while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
+    {
+        DEBUGV(":cpbf %s:%d\r\n", __FILE__, __LINE__);
+        // use Stream block-read/write API
+        while (!timeout && (!maxLen || written < maxLen) && (w = to.availableForWrite()))
         {
             size_t r = from.available();
             if (w > r)
@@ -205,7 +229,9 @@ size_t streamMove (Tfrom& from, Tto& to, size_t maxLen, OneShotFastMs timeout)
 
             if (yieldNow)
                 yield();
+            timeout.reset();
         }
+    }
 
     return written;
 }
