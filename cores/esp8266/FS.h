@@ -58,7 +58,6 @@ public:
     // Stream methods:
     int available() override;
     int read() override;
-    String readString() override;
     int peek() override;
     void flush() override;
     size_t readBytes(char *buffer, size_t length) override {
@@ -81,9 +80,6 @@ public:
     bool isDirectory() const;
 
     // Arduino "class SD" methods for compatibility
-    void rewindDirectory();
-    File openNextFile();
-
     template<typename T> size_t write(T &src){
       uint8_t obuf[256];
       size_t doneLen = 0;
@@ -106,6 +102,11 @@ public:
       return doneLen;
     }
     using Print::write;
+
+    void rewindDirectory();
+    File openNextFile();
+
+    String readString() override;
 
 protected:
     FileImplPtr _p;

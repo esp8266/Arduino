@@ -1,5 +1,5 @@
 /*
- littlefs_mock.cpp - SPIFFS HAL mock for host side testing
+ littlefs_mock.cpp - LittleFS mock for host side testing
  Copyright © 2019 Earle F. Philhower, III
 
  Based off spiffs_mock.cpp:
@@ -57,8 +57,7 @@ LittleFSMock::LittleFSMock(ssize_t fs_size, size_t fs_block, size_t fs_page, con
 void LittleFSMock::reset()
 {
     LittleFS = FS(FSImplPtr(new littlefs_impl::LittleFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
-    if (m_storage)
-        load();
+    load();
 }
 
 LittleFSMock::~LittleFSMock()

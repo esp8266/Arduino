@@ -53,8 +53,7 @@ SpiffsMock::SpiffsMock(ssize_t fs_size, size_t fs_block, size_t fs_page, const S
 void SpiffsMock::reset()
 {
     SPIFFS = FS(FSImplPtr(new spiffs_impl::SPIFFSImpl(0, s_phys_size, s_phys_page, s_phys_block, 5)));
-    if (m_storage)
-        load();
+    load();
 }
 
 SpiffsMock::~SpiffsMock()

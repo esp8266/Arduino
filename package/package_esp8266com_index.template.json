@@ -3,8 +3,8 @@
       {
          "name": "esp8266",
          "maintainer": "ESP8266 Community",
-         "email": "ivan@esp8266.com",
          "websiteURL": "https://github.com/esp8266/Arduino",
+         "email": "ivan@esp8266.com",
          "help": {
             "online": "http://esp8266.com/arduino"
          },
