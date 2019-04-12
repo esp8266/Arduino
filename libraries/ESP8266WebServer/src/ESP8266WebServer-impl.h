@@ -43,7 +43,8 @@ static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
 
 
-ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
+template <typename ServerType, typename ClientType>
+ESP8266WebServerTemplate<ServerType, ClientType>::ESP8266WebServerTemplate(IPAddress addr, int port)
 : _server(addr, port)
 , _currentMethod(HTTP_ANY)
 , _currentVersion(0)
@@ -63,7 +64,8 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 {
 }
 
-ESP8266WebServer::ESP8266WebServer(int port)
+template <typename ServerType, typename ClientType>
+ESP8266WebServerTemplate<ServerType, ClientType>::ESP8266WebServerTemplate(int port)
 : _server(port)
 , _currentMethod(HTTP_ANY)
 , _currentVersion(0)
@@ -83,36 +85,41 @@ ESP8266WebServer::ESP8266WebServer(int port)
 {
 }
 
-ESP8266WebServer::~ESP8266WebServer() {
+template <typename ServerType, typename ClientType>
+ESP8266WebServerTemplate<ServerType, ClientType>::~ESP8266WebServerTemplate() {
   _server.close();
   if (_currentHeaders)
     delete[]_currentHeaders;
-  RequestHandler* handler = _firstHandler;
+  RequestHandlerType* handler = _firstHandler;
   while (handler) {
-    RequestHandler* next = handler->next();
+    RequestHandlerType* next = handler->next();
     delete handler;
     handler = next;
   }
 }
 
-void ESP8266WebServer::begin() {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::begin() {
   close();
   _server.begin();
 }
 
-void ESP8266WebServer::begin(uint16_t port) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::begin(uint16_t port) {
   close();
   _server.begin(port);
 }
 
-String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit) const {
+template <typename ServerType, typename ClientType>
+String ESP8266WebServerTemplate<ServerType, ClientType>::_extractParam(String& authReq,const String& param,const char delimit) const {
   int _begin = authReq.indexOf(param);
   if (_begin == -1)
     return emptyString;
   return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
 
-bool ESP8266WebServer::authenticate(const char * username, const char * password){
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::authenticate(const char * username, const char * password){
   if(hasHeader(FPSTR(AUTHORIZATION_HEADER))) {
     String authReq = header(FPSTR(AUTHORIZATION_HEADER));
     if(authReq.startsWith(F("Basic"))){
@@ -216,7 +223,8 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
   return false;
 }
 
-String ESP8266WebServer::_getRandomHexString() {
+template <typename ServerType, typename ClientType>
+String ESP8266WebServerTemplate<ServerType, ClientType>::_getRandomHexString() {
   char buffer[33];  // buffer to hold 32 Hex Digit + /0
   int i;
   for(i = 0; i < 4; i++) {
@@ -225,7 +233,8 @@ String ESP8266WebServer::_getRandomHexString() {
   return String(buffer);
 }
 
-void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* realm, const String& authFailMsg) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::requestAuthentication(HTTPAuthMethod mode, const char* realm, const String& authFailMsg) {
   if(realm == NULL) {
     _srealm = String(F("Login Required"));
   } else {
@@ -242,23 +251,28 @@ void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* re
   send(401, String(FPSTR(mimeTable[html].mimeType)), authFailMsg);
 }
 
-void ESP8266WebServer::on(const String &uri, ESP8266WebServer::THandlerFunction handler) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::on(const String &uri, ESP8266WebServerTemplate<ServerType, ClientType>::THandlerFunction handler) {
   on(uri, HTTP_ANY, handler);
 }
 
-void ESP8266WebServer::on(const String &uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::on(const String &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType, ClientType>::THandlerFunction fn) {
   on(uri, method, fn, _fileUploadHandler);
 }
 
-void ESP8266WebServer::on(const String &uri, HTTPMethod method, ESP8266WebServer::THandlerFunction fn, ESP8266WebServer::THandlerFunction ufn) {
-  _addRequestHandler(new FunctionRequestHandler(fn, ufn, uri, method));
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::on(const String &uri, HTTPMethod method, ESP8266WebServerTemplate<ServerType, ClientType>::THandlerFunction fn, ESP8266WebServerTemplate<ServerType, ClientType>::THandlerFunction ufn) {
+  _addRequestHandler(new FunctionRequestHandler<ServerType, ClientType>(fn, ufn, uri, method));
 }
 
-void ESP8266WebServer::addHandler(RequestHandler* handler) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::addHandler(RequestHandlerType* handler) {
     _addRequestHandler(handler);
 }
 
-void ESP8266WebServer::_addRequestHandler(RequestHandler* handler) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::_addRequestHandler(RequestHandlerType* handler) {
     if (!_lastHandler) {
       _firstHandler = handler;
       _lastHandler = handler;
@@ -269,13 +283,15 @@ void ESP8266WebServer::_addRequestHandler(RequestHandler* handler) {
     }
 }
 
-void ESP8266WebServer::serveStatic(const char* uri, FS& fs, const char* path, const char* cache_header) {
-    _addRequestHandler(new StaticRequestHandler(fs, path, uri, cache_header));
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::serveStatic(const char* uri, FS& fs, const char* path, const char* cache_header) {
+    _addRequestHandler(new StaticRequestHandler<ServerType, ClientType>(fs, path, uri, cache_header));
 }
 
-void ESP8266WebServer::handleClient() {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::handleClient() {
   if (_currentStatus == HC_NONE) {
-    WiFiClient client = _server.available();
+    ClientType client = _server.available();
     if (!client) {
       return;
     }
@@ -328,7 +344,7 @@ void ESP8266WebServer::handleClient() {
   }
 
   if (!keepCurrentClient) {
-    _currentClient = WiFiClient();
+    _currentClient = ClientType();
     _currentStatus = HC_NONE;
     _currentUpload.reset();
   }
@@ -338,18 +354,21 @@ void ESP8266WebServer::handleClient() {
   }
 }
 
-void ESP8266WebServer::close() {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::close() {
   _server.close();
   _currentStatus = HC_NONE;
   if(!_headerKeysCount)
     collectHeaders(0, 0);
 }
 
-void ESP8266WebServer::stop() {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::stop() {
   close();
 }
 
-void ESP8266WebServer::sendHeader(const String& name, const String& value, bool first) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::sendHeader(const String& name, const String& value, bool first) {
   String headerLine = name;
   headerLine += F(": ");
   headerLine += value;
@@ -363,11 +382,13 @@ void ESP8266WebServer::sendHeader(const String& name, const String& value, bool 
   }
 }
 
-void ESP8266WebServer::setContentLength(const size_t contentLength) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::setContentLength(const size_t contentLength) {
     _contentLength = contentLength;
 }
 
-void ESP8266WebServer::_prepareHeader(String& response, int code, const char* content_type, size_t contentLength) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::_prepareHeader(String& response, int code, const char* content_type, size_t contentLength) {
     response = String(F("HTTP/1.")) + String(_currentVersion) + ' ';
     response += String(code);
     response += ' ';
@@ -396,18 +417,20 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
     _responseHeaders = "";
 }
 
-void ESP8266WebServer::send(int code, const char* content_type, const String& content) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::send(int code, const char* content_type, const String& content) {
     String header;
     // Can we asume the following?
     //if(code == 200 && content.length() == 0 && _contentLength == CONTENT_LENGTH_NOT_SET)
     //  _contentLength = CONTENT_LENGTH_UNKNOWN;
     _prepareHeader(header, code, content_type, content.length());
-    _currentClientWrite(header.c_str(), header.length());
+    _currentClient.write((const uint8_t *)header.c_str(), header.length());
     if(content.length())
       sendContent(content);
 }
 
-void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::send_P(int code, PGM_P content_type, PGM_P content) {
     size_t contentLength = 0;
 
     if (content != NULL) {
@@ -418,13 +441,14 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     char type[64];
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
     _prepareHeader(header, code, (const char* )type, contentLength);
-    _currentClientWrite(header.c_str(), header.length());
+    _currentClient.write(header.c_str(), header.length());
     if (contentLength) {
         sendContent_P(content);
     }
 }
 
-void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
     String header;
     char type[64];
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
@@ -433,43 +457,48 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_
     sendContent_P(content, contentLength);
 }
 
-void ESP8266WebServer::send(int code, char* content_type, const String& content) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::send(int code, char* content_type, const String& content) {
   send(code, (const char*)content_type, content);
 }
 
-void ESP8266WebServer::send(int code, const String& content_type, const String& content) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::send(int code, const String& content_type, const String& content) {
   send(code, (const char*)content_type.c_str(), content);
 }
 
-void ESP8266WebServer::sendContent(const String& content) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::sendContent(const String& content) {
   const char * footer = "\r\n";
   size_t len = content.length();
   if(_chunked) {
     char chunkSize[11];
     sprintf(chunkSize, "%zx\r\n", len);
-    _currentClientWrite(chunkSize, strlen(chunkSize));
+    _currentClient.write((const uint8_t *)chunkSize, strlen(chunkSize));
   }
-  _currentClientWrite(content.c_str(), len);
+  _currentClient.write((const uint8_t *)content.c_str(), len);
   if(_chunked){
-    _currentClient.write(footer, 2);
+    _currentClient.write((const uint8_t *)footer, 2);
     if (len == 0) {
       _chunked = false;
     }
   }
 }
 
-void ESP8266WebServer::sendContent_P(PGM_P content) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::sendContent_P(PGM_P content) {
   sendContent_P(content, strlen_P(content));
 }
 
-void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::sendContent_P(PGM_P content, size_t size) {
   const char * footer = "\r\n";
   if(_chunked) {
     char chunkSize[11];
     sprintf(chunkSize, "%zx\r\n", size);
-    _currentClientWrite(chunkSize, strlen(chunkSize));
+    _currentClient.write(chunkSize, strlen(chunkSize));
   }
-  _currentClientWrite_P(content, size);
+  _currentClient.write_P(content, size);
   if(_chunked){
     _currentClient.write(footer, 2);
     if (size == 0) {
@@ -479,7 +508,8 @@ void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
 }
 
 
-void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fileName, const String & contentType)
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::_streamFileCore(const size_t fileSize, const String & fileName, const String & contentType)
 {
   using namespace mime;
   setContentLength(fileSize);
@@ -492,7 +522,8 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
 }
 
 
-const String& ESP8266WebServer::arg(String name) const {
+template <typename ServerType, typename ClientType>
+const String& ESP8266WebServerTemplate<ServerType, ClientType>::arg(String name) const {
   for (int j = 0; j < _postArgsLen; ++j) {
     if ( _postArgs[j].key == name )
       return _postArgs[j].value;
@@ -504,23 +535,27 @@ const String& ESP8266WebServer::arg(String name) const {
   return emptyString;
 }
 
-const String& ESP8266WebServer::arg(int i) const {
+template <typename ServerType, typename ClientType>
+const String& ESP8266WebServerTemplate<ServerType, ClientType>::arg(int i) const {
   if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].value;
   return emptyString;
 }
 
-const String& ESP8266WebServer::argName(int i) const {
+template <typename ServerType, typename ClientType>
+const String& ESP8266WebServerTemplate<ServerType, ClientType>::argName(int i) const {
   if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].key;
   return emptyString;
 }
 
-int ESP8266WebServer::args() const {
+template <typename ServerType, typename ClientType>
+int ESP8266WebServerTemplate<ServerType, ClientType>::args() const {
   return _currentArgCount;
 }
 
-bool ESP8266WebServer::hasArg(const String& name) const {
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::hasArg(const String& name) const {
   for (int j = 0; j < _postArgsLen; ++j) {
     if (_postArgs[j].key == name)
       return true;
@@ -533,7 +568,8 @@ bool ESP8266WebServer::hasArg(const String& name) const {
 }
 
 
-const String& ESP8266WebServer::header(String name) const {
+template <typename ServerType, typename ClientType>
+const String& ESP8266WebServerTemplate<ServerType, ClientType>::header(String name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if (_currentHeaders[i].key.equalsIgnoreCase(name))
       return _currentHeaders[i].value;
@@ -541,7 +577,8 @@ const String& ESP8266WebServer::header(String name) const {
   return emptyString;
 }
 
-void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
   _headerKeysCount = headerKeysCount + 1;
   if (_currentHeaders)
      delete[]_currentHeaders;
@@ -552,23 +589,27 @@ void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t hea
   }
 }
 
-const String& ESP8266WebServer::header(int i) const {
+template <typename ServerType, typename ClientType>
+const String& ESP8266WebServerTemplate<ServerType, ClientType>::header(int i) const {
   if (i < _headerKeysCount)
     return _currentHeaders[i].value;
   return emptyString;
 }
 
-const String& ESP8266WebServer::headerName(int i) const {
+template <typename ServerType, typename ClientType>
+const String& ESP8266WebServerTemplate<ServerType, ClientType>::headerName(int i) const {
   if (i < _headerKeysCount)
     return _currentHeaders[i].key;
   return emptyString;
 }
 
-int ESP8266WebServer::headers() const {
+template <typename ServerType, typename ClientType>
+int ESP8266WebServerTemplate<ServerType, ClientType>::headers() const {
   return _headerKeysCount;
 }
 
-bool ESP8266WebServer::hasHeader(String name) const {
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::hasHeader(String name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if ((_currentHeaders[i].key.equalsIgnoreCase(name)) &&  (_currentHeaders[i].value.length() > 0))
       return true;
@@ -576,19 +617,23 @@ bool ESP8266WebServer::hasHeader(String name) const {
   return false;
 }
 
-const String& ESP8266WebServer::hostHeader() const {
+template <typename ServerType, typename ClientType>
+const String& ESP8266WebServerTemplate<ServerType, ClientType>::hostHeader() const {
   return _hostHeader;
 }
 
-void ESP8266WebServer::onFileUpload(THandlerFunction fn) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::onFileUpload(THandlerFunction fn) {
   _fileUploadHandler = fn;
 }
 
-void ESP8266WebServer::onNotFound(THandlerFunction fn) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::onNotFound(THandlerFunction fn) {
   _notFoundHandler = fn;
 }
 
-void ESP8266WebServer::_handleRequest() {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::_handleRequest() {
   bool handled = false;
   if (!_currentHandler){
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -619,13 +664,15 @@ void ESP8266WebServer::_handleRequest() {
 }
 
 
-void ESP8266WebServer::_finalizeResponse() {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::_finalizeResponse() {
   if (_chunked) {
     sendContent(emptyString);
   }
 }
 
-const String ESP8266WebServer::responseCodeToString(const int code) {
+template <typename ServerType, typename ClientType>
+const String ESP8266WebServerTemplate<ServerType, ClientType>::responseCodeToString(const int code) {
   switch (code) {
     case 100: return F("Continue");
     case 101: return F("Switching Protocols");

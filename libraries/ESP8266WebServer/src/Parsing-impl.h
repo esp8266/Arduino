@@ -39,7 +39,8 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
-static bool readBytesWithTimeout(WiFiClient& client, size_t maxLength, String& data, int timeout_ms)
+template <typename ServerType, typename ClientType>
+static bool readBytesWithTimeout(ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
   if (!data.reserve(maxLength + 1))
     return false;
@@ -59,7 +60,8 @@ static bool readBytesWithTimeout(WiFiClient& client, size_t maxLength, String& d
   return data.length() == maxLength;
 }
 
-bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseRequest(ClientType& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -120,7 +122,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
 #endif
 
   //attach handler
-  RequestHandler* handler;
+  RequestHandlerType* handler;
   for (handler = _firstHandler; handler; handler = handler->next()) {
     if (handler->canHandle(_currentMethod, _currentUri))
       break;
@@ -179,7 +181,7 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
     String plainBuf;
     if (   !isForm
         && // read content into plainBuf
-           (   !readBytesWithTimeout(client, contentLength, plainBuf, HTTP_MAX_POST_WAIT)
+           (   !readBytesWithTimeout<ServerType, ClientType>(client, contentLength, plainBuf, HTTP_MAX_POST_WAIT)
             || (plainBuf.length() < contentLength)
            )
        )
@@ -258,7 +260,8 @@ bool ESP8266WebServer::_parseRequest(WiFiClient& client) {
   return true;
 }
 
-bool ESP8266WebServer::_collectHeader(const char* headerName, const char* headerValue) {
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::_collectHeader(const char* headerName, const char* headerValue) {
   for (int i = 0; i < _headerKeysCount; i++) {
     if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
             _currentHeaders[i].value=headerValue;
@@ -268,13 +271,14 @@ bool ESP8266WebServer::_collectHeader(const char* headerName, const char* header
   return false;
 }
 
+template <typename ServerType, typename ClientType>
 struct storeArgHandler
 {
   void operator() (String& key, String& value, const String& data, int equal_index, int pos, int key_end_pos, int next_index)
   {
-    key = ESP8266WebServer::urlDecode(data.substring(pos, key_end_pos));
+    key = ESP8266WebServerTemplate<ServerType, ClientType>::urlDecode(data.substring(pos, key_end_pos));
     if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
-      value = ESP8266WebServer::urlDecode(data.substring(equal_index + 1, next_index));
+      value = ESP8266WebServerTemplate<ServerType, ClientType>::urlDecode(data.substring(equal_index + 1, next_index));
   }
 };
 
@@ -286,7 +290,8 @@ struct nullArgHandler
   }
 };
 
-void ESP8266WebServer::_parseArguments(const String& data) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::_parseArguments(const String& data) {
   if (_currentArgs)
     delete[] _currentArgs;
 
@@ -295,10 +300,11 @@ void ESP8266WebServer::_parseArguments(const String& data) {
   // allocate one more, this is needed because {"plain": plainBuf} is always added
   _currentArgs = new RequestArgument[_currentArgCount + 1];
 
-  (void)_parseArgumentsPrivate(data, storeArgHandler());
+  (void)_parseArgumentsPrivate(data, storeArgHandler<ServerType, ClientType>());
 }
 
-int ESP8266WebServer::_parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler) {
+template <typename ServerType, typename ClientType>
+int ESP8266WebServerTemplate<ServerType, ClientType>::_parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler) {
 
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("args: ");
@@ -349,7 +355,8 @@ int ESP8266WebServer::_parseArgumentsPrivate(const String& data, std::function<v
   return arg_total;
 }
 
-void ESP8266WebServer::_uploadWriteByte(uint8_t b){
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::_uploadWriteByte(uint8_t b){
   if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN){
     if(_currentHandler && _currentHandler->canUpload(_currentUri))
       _currentHandler->upload(*this, _currentUri, *_currentUpload);
@@ -359,7 +366,8 @@ void ESP8266WebServer::_uploadWriteByte(uint8_t b){
   _currentUpload->buf[_currentUpload->currentSize++] = b;
 }
 
-uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
+template <typename ServerType, typename ClientType>
+uint8_t ESP8266WebServerTemplate<ServerType, ClientType>::_uploadReadByte(ClientType& client){
   int res = client.read();
   if(res == -1){
     while(!client.available() && client.connected())
@@ -369,7 +377,8 @@ uint8_t ESP8266WebServer::_uploadReadByte(WiFiClient& client){
   return (uint8_t)res;
 }
 
-bool ESP8266WebServer::_parseForm(WiFiClient& client, const String& boundary, uint32_t len){
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseForm(ClientType& client, const String& boundary, uint32_t len){
   (void) len;
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");
@@ -586,7 +595,8 @@ readfile:
   return false;
 }
 
-String ESP8266WebServer::urlDecode(const String& text)
+template <typename ServerType, typename ClientType>
+String ESP8266WebServerTemplate<ServerType, ClientType>::urlDecode(const String& text)
 {
   String decoded = "";
   char temp[] = "0x00";
@@ -617,7 +627,8 @@ String ESP8266WebServer::urlDecode(const String& text)
   return decoded;
 }
 
-bool ESP8266WebServer::_parseFormUploadAborted(){
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseFormUploadAborted(){
   _currentUpload->status = UPLOAD_FILE_ABORTED;
   if(_currentHandler && _currentHandler->canUpload(_currentUri))
     _currentHandler->upload(*this, _currentUri, *_currentUpload);

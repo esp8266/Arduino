@@ -16,7 +16,8 @@ static const char serverIndex[] PROGMEM =
 static const char successResponse[] PROGMEM = 
   "<META http-equiv=\"refresh\" content=\"15;URL=/\">Update Success! Rebooting...\n";
 
-ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
+template <typename ServerType, typename ClientType>
+ESP8266HTTPUpdateServerTemplate<ServerType, ClientType>::ESP8266HTTPUpdateServer(bool serial_debug)
 {
   _serial_output = serial_debug;
   _server = NULL;
@@ -25,7 +26,8 @@ ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug)
   _authenticated = false;
 }
 
-void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path, const String& username, const String& password)
+template <typename ServerType, typename ClientType>
+void ESP8266HTTPUpdateServerTemplate<ServerType, ClientType>::setup(ESP8266WebServerTemplate<ServerType, ClientType> *server, const String& path, const String& username, const String& password)
 {
     _server = server;
     _username = username;
@@ -95,7 +97,8 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const String& path
     });
 }
 
-void ESP8266HTTPUpdateServer::_setUpdaterError()
+template <typename ServerType, typename ClientType>
+void ESP8266HTTPUpdateServerTemplate<ServerType, ClientType>::_setUpdaterError()
 {
   if (_serial_output) Update.printError(Serial);
   StreamString str;

@@ -32,7 +32,7 @@ const char* ssid = STASSID;
 const char* password = STAPSK;
 
 BearSSL::ESP8266WebServerSecure httpServer(443);
-ESP8266HTTPUpdateServer httpUpdater;
+ESP8266HTTPUpdateServerTemplate<BearSSL::WiFiServerSecure, BearSSL::WiFiClientSecure> httpUpdater;
 
 static const char serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
