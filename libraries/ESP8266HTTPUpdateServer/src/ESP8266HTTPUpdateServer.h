@@ -3,28 +3,28 @@
 
 #include <ESP8266WebServer.h>
 
-template <typename ServerType, typename ClientType>
+template <typename ServerType>
 class ESP8266HTTPUpdateServerTemplate
 {
   public:
     ESP8266HTTPUpdateServerTemplate(bool serial_debug=false);
 
-    void setup(ESP8266WebServerTemplate<ServerType, ClientType> *server)
+    void setup(ESP8266WebServerTemplate<ServerType> *server)
     {
       setup(server, emptyString, emptyString);
     }
 
-    void setup(ESP8266WebServerTemplate<ServerType, ClientType> *server, const String& path)
+    void setup(ESP8266WebServerTemplate<ServerType> *server, const String& path)
     {
       setup(server, path, emptyString, emptyString);
     }
 
-    void setup(ESP8266WebServerTemplate<ServerType, ClientType> *server, const String& username, const String& password)
+    void setup(ESP8266WebServerTemplate<ServerType> *server, const String& username, const String& password)
     {
       setup(server, "/update", username, password);
     }
 
-    void setup(ESP8266WebServerTemplate<ServerType, ClientType> *server, const String& path, const String& username, const String& password);
+    void setup(ESP8266WebServerTemplate<ServerType> *server, const String& path, const String& username, const String& password);
 
     void updateCredentials(const String& username, const String& password)
     {
@@ -37,7 +37,7 @@ class ESP8266HTTPUpdateServerTemplate
 
   private:
     bool _serial_output;
-    ESP8266WebServerTemplate<ServerType, ClientType> *_server;
+    ESP8266WebServerTemplate<ServerType> *_server;
     String _username;
     String _password;
     bool _authenticated;
@@ -47,14 +47,14 @@ class ESP8266HTTPUpdateServerTemplate
 #include "ESP8266HTTPUpdateServer-impl.h"
 
 
-using ESP8266HTTPUpdateServer = ESP8266HTTPUpdateServerTemplate<WiFiServer, WiFiClient>;
+using ESP8266HTTPUpdateServer = ESP8266HTTPUpdateServerTemplate<WiFiServer>;
 
 namespace BearSSL {
-using ESP8266HTTPUpdateServerSecure = ESP8266HTTPUpdateServerTemplate<WiFiServerSecure, WiFiClientSecure>;
+using ESP8266HTTPUpdateServerSecure = ESP8266HTTPUpdateServerTemplate<WiFiServerSecure>;
 };
 
 namespace axTLS {
-using ESP8266HTTPUpdateServerSecure = ESP8266HTTPUpdateServerTemplate<WiFiServerSecure, WiFiClientSecure>;
+using ESP8266HTTPUpdateServerSecure = ESP8266HTTPUpdateServerTemplate<WiFiServerSecure>;
 };
 
 #endif

@@ -7,10 +7,10 @@
 
 using namespace mime;
 
-template<typename ServerType, typename ClientType>
-class FunctionRequestHandler : public RequestHandler<ServerType, ClientType> {
+template<typename ServerType>
+class FunctionRequestHandler : public RequestHandler<ServerType> {
 public:
-    FunctionRequestHandler(typename ESP8266WebServerTemplate<ServerType, ClientType>::THandlerFunction fn, typename ESP8266WebServerTemplate<ServerType, ClientType>::THandlerFunction ufn, const String &uri, HTTPMethod method)
+    FunctionRequestHandler(typename ESP8266WebServerTemplate<ServerType>::THandlerFunction fn, typename ESP8266WebServerTemplate<ServerType>::THandlerFunction ufn, const String &uri, HTTPMethod method)
     : _fn(fn)
     , _ufn(ufn)
     , _uri(uri)
@@ -35,7 +35,7 @@ public:
         return true;
     }
 
-    bool handle(ESP8266WebServerTemplate<ServerType, ClientType>& server, HTTPMethod requestMethod, String requestUri) override {
+    bool handle(ESP8266WebServerTemplate<ServerType>& server, HTTPMethod requestMethod, String requestUri) override {
         (void) server;
         if (!canHandle(requestMethod, requestUri))
             return false;
@@ -44,7 +44,7 @@ public:
         return true;
     }
 
-    void upload(ESP8266WebServerTemplate<ServerType, ClientType>& server, String requestUri, HTTPUpload& upload) override {
+    void upload(ESP8266WebServerTemplate<ServerType>& server, String requestUri, HTTPUpload& upload) override {
         (void) server;
         (void) upload;
         if (canUpload(requestUri))
@@ -52,14 +52,14 @@ public:
     }
 
 protected:
-    typename ESP8266WebServerTemplate<ServerType, ClientType>::THandlerFunction _fn;
-    typename ESP8266WebServerTemplate<ServerType, ClientType>::THandlerFunction _ufn;
+    typename ESP8266WebServerTemplate<ServerType>::THandlerFunction _fn;
+    typename ESP8266WebServerTemplate<ServerType>::THandlerFunction _ufn;
     String _uri;
     HTTPMethod _method;
 };
 
-template<typename ServerType, typename ClientType>
-class StaticRequestHandler : public RequestHandler<ServerType, ClientType> {
+template<typename ServerType>
+class StaticRequestHandler : public RequestHandler<ServerType> {
 public:
     StaticRequestHandler(FS& fs, const char* path, const char* uri, const char* cache_header)
     : _fs(fs)
@@ -82,7 +82,7 @@ public:
         return true;
     }
 
-    bool handle(ESP8266WebServerTemplate<ServerType, ClientType>& server, HTTPMethod requestMethod, String requestUri) override {
+    bool handle(ESP8266WebServerTemplate<ServerType>& server, HTTPMethod requestMethod, String requestUri) override {
         if (!canHandle(requestMethod, requestUri))
             return false;
 

@@ -39,8 +39,8 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
-template <typename ServerType, typename ClientType>
-static bool readBytesWithTimeout(ClientType& client, size_t maxLength, String& data, int timeout_ms)
+template <typename ServerType>
+static bool readBytesWithTimeout(typename ServerType::ClientType& client, size_t maxLength, String& data, int timeout_ms)
 {
   if (!data.reserve(maxLength + 1))
     return false;
@@ -60,8 +60,8 @@ static bool readBytesWithTimeout(ClientType& client, size_t maxLength, String& d
   return data.length() == maxLength;
 }
 
-template <typename ServerType, typename ClientType>
-bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseRequest(ClientType& client) {
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::_parseRequest(ClientType& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
 #ifdef DEBUG_ESP_HTTP_SERVER
@@ -181,7 +181,7 @@ bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseRequest(ClientType&
     String plainBuf;
     if (   !isForm
         && // read content into plainBuf
-           (   !readBytesWithTimeout<ServerType, ClientType>(client, contentLength, plainBuf, HTTP_MAX_POST_WAIT)
+           (   !readBytesWithTimeout<ServerType>(client, contentLength, plainBuf, HTTP_MAX_POST_WAIT)
             || (plainBuf.length() < contentLength)
            )
        )
@@ -260,8 +260,8 @@ bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseRequest(ClientType&
   return true;
 }
 
-template <typename ServerType, typename ClientType>
-bool ESP8266WebServerTemplate<ServerType, ClientType>::_collectHeader(const char* headerName, const char* headerValue) {
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::_collectHeader(const char* headerName, const char* headerValue) {
   for (int i = 0; i < _headerKeysCount; i++) {
     if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
             _currentHeaders[i].value=headerValue;
@@ -271,14 +271,14 @@ bool ESP8266WebServerTemplate<ServerType, ClientType>::_collectHeader(const char
   return false;
 }
 
-template <typename ServerType, typename ClientType>
+template <typename ServerType>
 struct storeArgHandler
 {
   void operator() (String& key, String& value, const String& data, int equal_index, int pos, int key_end_pos, int next_index)
   {
-    key = ESP8266WebServerTemplate<ServerType, ClientType>::urlDecode(data.substring(pos, key_end_pos));
+    key = ESP8266WebServerTemplate<ServerType>::urlDecode(data.substring(pos, key_end_pos));
     if ((equal_index != -1) && ((equal_index < next_index - 1) || (next_index == -1)))
-      value = ESP8266WebServerTemplate<ServerType, ClientType>::urlDecode(data.substring(equal_index + 1, next_index));
+      value = ESP8266WebServerTemplate<ServerType>::urlDecode(data.substring(equal_index + 1, next_index));
   }
 };
 
@@ -290,8 +290,8 @@ struct nullArgHandler
   }
 };
 
-template <typename ServerType, typename ClientType>
-void ESP8266WebServerTemplate<ServerType, ClientType>::_parseArguments(const String& data) {
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::_parseArguments(const String& data) {
   if (_currentArgs)
     delete[] _currentArgs;
 
@@ -300,11 +300,11 @@ void ESP8266WebServerTemplate<ServerType, ClientType>::_parseArguments(const Str
   // allocate one more, this is needed because {"plain": plainBuf} is always added
   _currentArgs = new RequestArgument[_currentArgCount + 1];
 
-  (void)_parseArgumentsPrivate(data, storeArgHandler<ServerType, ClientType>());
+  (void)_parseArgumentsPrivate(data, storeArgHandler<ServerType>());
 }
 
-template <typename ServerType, typename ClientType>
-int ESP8266WebServerTemplate<ServerType, ClientType>::_parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler) {
+template <typename ServerType>
+int ESP8266WebServerTemplate<ServerType>::_parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler) {
 
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("args: ");
@@ -355,8 +355,8 @@ int ESP8266WebServerTemplate<ServerType, ClientType>::_parseArgumentsPrivate(con
   return arg_total;
 }
 
-template <typename ServerType, typename ClientType>
-void ESP8266WebServerTemplate<ServerType, ClientType>::_uploadWriteByte(uint8_t b){
+template <typename ServerType>
+void ESP8266WebServerTemplate<ServerType>::_uploadWriteByte(uint8_t b){
   if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN){
     if(_currentHandler && _currentHandler->canUpload(_currentUri))
       _currentHandler->upload(*this, _currentUri, *_currentUpload);
@@ -366,8 +366,8 @@ void ESP8266WebServerTemplate<ServerType, ClientType>::_uploadWriteByte(uint8_t 
   _currentUpload->buf[_currentUpload->currentSize++] = b;
 }
 
-template <typename ServerType, typename ClientType>
-uint8_t ESP8266WebServerTemplate<ServerType, ClientType>::_uploadReadByte(ClientType& client){
+template <typename ServerType>
+uint8_t ESP8266WebServerTemplate<ServerType>::_uploadReadByte(ClientType& client){
   int res = client.read();
   if(res == -1){
     while(!client.available() && client.connected())
@@ -377,8 +377,8 @@ uint8_t ESP8266WebServerTemplate<ServerType, ClientType>::_uploadReadByte(Client
   return (uint8_t)res;
 }
 
-template <typename ServerType, typename ClientType>
-bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseForm(ClientType& client, const String& boundary, uint32_t len){
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::_parseForm(ClientType& client, const String& boundary, uint32_t len){
   (void) len;
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");
@@ -595,8 +595,8 @@ readfile:
   return false;
 }
 
-template <typename ServerType, typename ClientType>
-String ESP8266WebServerTemplate<ServerType, ClientType>::urlDecode(const String& text)
+template <typename ServerType>
+String ESP8266WebServerTemplate<ServerType>::urlDecode(const String& text)
 {
   String decoded = "";
   char temp[] = "0x00";
@@ -627,8 +627,8 @@ String ESP8266WebServerTemplate<ServerType, ClientType>::urlDecode(const String&
   return decoded;
 }
 
-template <typename ServerType, typename ClientType>
-bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseFormUploadAborted(){
+template <typename ServerType>
+bool ESP8266WebServerTemplate<ServerType>::_parseFormUploadAborted(){
   _currentUpload->status = UPLOAD_FILE_ABORTED;
   if(_currentHandler && _currentHandler->canUpload(_currentUri))
     _currentHandler->upload(*this, _currentUri, *_currentUpload);

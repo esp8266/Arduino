@@ -48,7 +48,7 @@ enum HTTPAuthMethod { BASIC_AUTH, DIGEST_AUTH };
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
 
-template<typename ServerType, typename ClientType>
+template<typename ServerType>
 class ESP8266WebServerTemplate;
 
 typedef struct {
@@ -68,7 +68,7 @@ namespace fs {
 class FS;
 }
 
-template<typename ServerType, typename ClientType>
+template<typename ServerType>
 class ESP8266WebServerTemplate
 {
 public:
@@ -76,7 +76,8 @@ public:
   ESP8266WebServerTemplate(int port = 80);
   ~ESP8266WebServerTemplate();
 
-  using RequestHandlerType = RequestHandler<ServerType, ClientType>;
+  using ClientType = typename ServerType::ClientType;
+  using RequestHandlerType = RequestHandler<ServerType>;
 
   void begin();
   void begin(uint16_t port);
@@ -207,7 +208,7 @@ protected:
 #include "ESP8266WebServer-impl.h"
 #include "Parsing-impl.h"
 
-using ESP8266WebServer = ESP8266WebServerTemplate<WiFiServer, WiFiClient>;
+using ESP8266WebServer = ESP8266WebServerTemplate<WiFiServer>;
 
 
 #endif //ESP8266WEBSERVER_H
