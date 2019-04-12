@@ -24,6 +24,7 @@
 #include "../../../libraries/SDFS/src/SDFS.h"
 #include "../../../libraries/SD/src/SD.h"
 
+#if 1
 namespace spiffs_test {
 #define FSTYPE SPIFFS
 #define TESTPRE "SPIFFS - "
@@ -89,13 +90,16 @@ TEST_CASE("LittleFS checks the config object passed in", "[fs]")
 }
 
 };
-
+#endif
 namespace sdfs_test {
 #define FSTYPE SDFS
 #define TESTPRE "SDFS - "
 #define TESTPAT "[sdfs]"
-// SDFS routines strip leading slashes before doing anything, so up to 31 char names are allowable
-#define TOOLONGFILENAME "/12345678901234567890123456789012"
+// SDFS supports long paths (MAXPATH)
+#define TOOLONGFILENAME "/" \
+	"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" \
+	"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890" \
+	"12345678901234567890123456789012345678901234567890123456"
 #define FS_MOCK_DECLARE SDFS_MOCK_DECLARE
 #define FS_MOCK_RESET SDFS_MOCK_RESET
 #define FS_HAS_DIRS
@@ -118,7 +122,7 @@ TEST_CASE("SDFS checks the config object passed in", "[fs]")
     REQUIRE_FALSE(SDFS.setConfig(f));
     REQUIRE_FALSE(SDFS.setConfig(s));
     REQUIRE(SDFS.setConfig(d));
-    REQUIRE_FALSE(LittleFS.setConfig(l));
+    REQUIRE_FALSE(SDFS.setConfig(l));
 }
 
 };

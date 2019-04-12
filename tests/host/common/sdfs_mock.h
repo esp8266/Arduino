@@ -28,7 +28,16 @@ public:
     ~SDFSMock() { }
 };
 
-#define SDFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) SDFSMock sdfs_mock(size_kb * 1024, block_kb * 1024, page_b, storage); SDFS.format();
+extern uint64_t _sdCardSizeB;
+extern uint8_t *_sdCard;
+
+#define SDFS_MOCK_DECLARE(size_kb, block_kb, page_b, storage) \
+    SDFS.end(); \
+    SDFSMock sdfs_mock(size_kb * 1024, block_kb * 1024, page_b, storage); free(_sdCard); \
+    _sdCardSizeB = size_kb ? 16 * 1024 * 1024 : 0; \
+    if (_sdCardSizeB) _sdCard = (uint8_t*)calloc(_sdCardSizeB, 1); \
+    else _sdCard = nullptr; \
+    SDFS.setConfig(SDFSConfig().setAutoFormat(true));
 #define SDFS_MOCK_RESET() sdfs_mock.reset()
 
 #endif /* spiffs_mock_hpp */

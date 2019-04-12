@@ -96,7 +96,9 @@ TEST_CASE(TESTPRE "Filesystem is empty after format", TESTPAT)
     REQUIRE(FSTYPE.begin());
     createFile("/1", "first");
     createFile("/2", "second");
+    FSTYPE.end();
     REQUIRE(FSTYPE.format());
+    REQUIRE(FSTYPE.begin());
     Dir root = FSTYPE.openDir("/");
     size_t count = 0;
     while (root.next()) {
@@ -161,6 +163,7 @@ TEST_CASE(TESTPRE "truncate", TESTPAT)
 
 #ifdef FS_HAS_DIRS
 
+#if FSTYPE != SDFS
 // We silently make subdirectories if they do not exist and silently remove
 // them when they're no longer needed, so make sure we can clean up after
 // ourselves.  At some point we may drop this and go to normal POSIX mkdir
@@ -189,6 +192,7 @@ TEST_CASE(TESTPRE "Removing all files in a subdir removes that subdir", TESTPAT)
     REQUIRE(files.size() == 3);
     REQUIRE(files.find("subdir") == std::end(files));
 }
+#endif
 
 // LittleFS openDir is slightly different than SPIFFS.  In SPIFFS there
 // are no directories and "/" is just another character, so "/a/b/c" is a
