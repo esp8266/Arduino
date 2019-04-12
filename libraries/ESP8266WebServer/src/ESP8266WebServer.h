@@ -48,7 +48,8 @@ enum HTTPAuthMethod { BASIC_AUTH, DIGEST_AUTH };
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
 
-template<class ServerClass, class ClientClass> class ESP8266WebServerTemplate;
+template<typename ServerType, typename ClientType>
+class ESP8266WebServerTemplate;
 
 typedef struct {
   HTTPUploadStatus status;
@@ -66,13 +67,15 @@ namespace fs {
 class FS;
 }
 
-template<class ServerClass, class ClientClass>
+template<typename ServerType, typename ClientType>
 class ESP8266WebServerTemplate
 {
 public:
   ESP8266WebServerTemplate(IPAddress addr, int port = 80);
   ESP8266WebServerTemplate(int port = 80);
   ~ESP8266WebServerTemplate();
+
+  using RequestHandlerType = RequestHandler<ServerType, ClientType>;
 
   void begin();
   void begin(uint16_t port);
@@ -88,14 +91,14 @@ public:
   void on(const String &uri, THandlerFunction handler);
   void on(const String &uri, HTTPMethod method, THandlerFunction fn);
   void on(const String &uri, HTTPMethod method, THandlerFunction fn, THandlerFunction ufn);
-  void addHandler(RequestHandler<ServerClass, ClientClass>* handler);
+  void addHandler(RequestHandlerType* handler);
   void serveStatic(const char* uri, fs::FS& fs, const char* path, const char* cache_header = NULL );
   void onNotFound(THandlerFunction fn);  //called when handler is not assigned
   void onFileUpload(THandlerFunction fn); //handle file uploads
 
   String uri() { return _currentUri; }
   HTTPMethod method() { return _currentMethod; }
-  ClientClass client() { return _currentClient; }
+  ClientType client() { return _currentClient; }
   HTTPUpload& upload() { return *_currentUpload; }
 
   String arg(String name);        // get request argument value by name
@@ -136,25 +139,20 @@ public:
     return _currentClient.write(file);
   }
 
-  // AXTLS and BearSSL only
-  void setServerKeyAndCert(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) { }
-  void setServerKeyAndCert_P(const uint8_t *key, int keyLen, const uint8_t *cert, int certLen) { }
-  // BearSSL only
-  void setBufferSizes(int recv, int xmit) { };
-  void setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk) { };
-  void setECCert(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk) { };
+  // Allows setting server options (i.e. SSL keys) by the instantiator
+  ServerType &getServer() { return _server; }
 
 protected:
-  void _addRequestHandler(RequestHandler<ServerClass, ClientClass>* handler);
+  void _addRequestHandler(RequestHandlerType* handler);
   void _handleRequest();
   void _finalizeResponse();
-  bool _parseRequest(ClientClass& client);
+  bool _parseRequest(ClientType& client);
   void _parseArguments(String data);
   static String _responseCodeToString(int code);
-  bool _parseForm(ClientClass& client, String boundary, uint32_t len);
+  bool _parseForm(ClientType& client, String boundary, uint32_t len);
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
-  uint8_t _uploadReadByte(ClientClass& client);
+  uint8_t _uploadReadByte(ClientType& client);
   void _prepareHeader(String& response, int code, const char* content_type, size_t contentLength);
   bool _collectHeader(const char* headerName, const char* headerValue);
  
@@ -169,18 +167,18 @@ protected:
     String value;
   };
 
-  ServerClass _server;
+  ServerType  _server;
 
-  ClientClass _currentClient;
+  ClientType  _currentClient;
   HTTPMethod  _currentMethod;
   String      _currentUri;
   uint8_t     _currentVersion;
   HTTPClientStatus _currentStatus;
   unsigned long _statusChange;
 
-  RequestHandler<ServerClass, ClientClass>*  _currentHandler;
-  RequestHandler<ServerClass, ClientClass>*  _firstHandler;
-  RequestHandler<ServerClass, ClientClass>*  _lastHandler;
+  RequestHandlerType* _currentHandler;
+  RequestHandlerType* _firstHandler;
+  RequestHandlerType* _lastHandler;
   THandlerFunction _notFoundHandler;
   THandlerFunction _fileUploadHandler;
 
@@ -205,6 +203,6 @@ protected:
 #include "ESP8266WebServer-impl.h"
 #include "Parsing-impl.h"
 
-typedef ESP8266WebServerTemplate<WiFiServer, WiFiClient> ESP8266WebServer;
+using ESP8266WebServer = ESP8266WebServerTemplate<WiFiServer, WiFiClient>;
 
 #endif //ESP8266WEBSERVER_H

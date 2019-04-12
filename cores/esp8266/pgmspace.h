@@ -10,10 +10,35 @@
 #include "ets_sys.h"
 #include "osapi.h"
 
-#define PROGMEM     ICACHE_RODATA_ATTR
-#define PGM_P  		const char *
-#define PGM_VOID_P  const void *
-#define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
+
+#ifndef ICACHE_RODATA_ATTR
+  #define ICACHE_RODATA_ATTR __attribute__((section(".irom.text")))
+#endif
+#ifndef PROGMEM
+  // The following two macros cause a parameter to be enclosed in quotes
+  // by the preopressor (i.e. for concatenating ints to strings)
+  #define __STRINGIZE_NX(A) #A
+  #define __STRINGIZE(A) __STRINGIZE_NX(A)
+  // Since __section__ is supposed to be only use for global variables,
+  // there could be conflicts when a static/inlined function has them in the
+  // same file as a non-static PROGMEM object.
+  // Ref: https://gcc.gnu.org/onlinedocs/gcc-3.2/gcc/Variable-Attributes.html
+  // Place each progmem object into its own named section, avoiding conflicts
+  #define PROGMEM __attribute__((section( "\".irom.text." __FILE__ "." __STRINGIZE(__LINE__) "."  __STRINGIZE(__COUNTER__) "\"")))
+#endif
+#ifndef PGM_P
+  #define PGM_P              const char *
+#endif
+#ifndef PGM_VOID_P
+  #define PGM_VOID_P         const void *
+#endif
+
+// PSTR() macro modified to start on a 32-bit boundary.  This adds on average
+// 1.5 bytes/string, but in return memcpy_P and strcpy_P will work 4~8x faster
+#ifndef PSTR
+  #define PSTR(s)            (__extension__({static const char __c[] __attribute__((__aligned__(4))) PROGMEM = (s); &__c[0];}))
+#endif
+
 #else //__ets__
 #define PROGMEM
 #define PGM_P  		const char *

@@ -35,8 +35,8 @@
 static const char Content_Type[] PROGMEM = "Content-Type";
 static const char filename[] PROGMEM = "filename";
 
-template <class ServerClass, class ClientClass>
-static char* readBytesWithTimeout(ClientClass& client, size_t maxLength, size_t& dataLength, int timeout_ms)
+template <typename ServerType, typename ClientType>
+static char* readBytesWithTimeout(ClientType& client, size_t maxLength, size_t& dataLength, int timeout_ms)
 {
   char *buf = nullptr;
   dataLength = 0;
@@ -68,8 +68,8 @@ static char* readBytesWithTimeout(ClientClass& client, size_t maxLength, size_t&
   return buf;
 }
 
-template <class ServerClass, class ClientClass>
-bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseRequest(ClientClass& client) {
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseRequest(ClientType& client) {
   // Read the first line of HTTP request
   String req = client.readStringUntil('\r');
   client.readStringUntil('\n');
@@ -104,15 +104,15 @@ bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseRequest(ClientCla
   _chunked = false;
 
   HTTPMethod method = HTTP_GET;
-  if (methodStr == ("POST")) {
+  if (methodStr == F("POST")) {
     method = HTTP_POST;
-  } else if (methodStr == ("DELETE")) {
+  } else if (methodStr == F("DELETE")) {
     method = HTTP_DELETE;
-  } else if (methodStr == ("OPTIONS")) {
+  } else if (methodStr == F("OPTIONS")) {
     method = HTTP_OPTIONS;
-  } else if (methodStr == ("PUT")) {
+  } else if (methodStr == F("PUT")) {
     method = HTTP_PUT;
-  } else if (methodStr == ("PATCH")) {
+  } else if (methodStr == F("PATCH")) {
     method = HTTP_PATCH;
   }
   _currentMethod = method;
@@ -127,7 +127,7 @@ bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseRequest(ClientCla
 #endif
 
   //attach handler
-  RequestHandler<ServerClass, ClientClass>* handler;
+  RequestHandlerType* handler;
   for (handler = _firstHandler; handler; handler = handler->next()) {
     if (handler->canHandle(_currentMethod, _currentUri))
       break;
@@ -185,7 +185,7 @@ bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseRequest(ClientCla
 
     if (!isForm){
       size_t plainLength;
-      char* plainBuf = readBytesWithTimeout<ServerClass, ClientClass>(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
+      char* plainBuf = readBytesWithTimeout<ServerType, ClientType>(client, contentLength, plainLength, HTTP_MAX_POST_WAIT);
       if (plainLength < contentLength) {
       	free(plainBuf);
       	return false;
@@ -262,8 +262,8 @@ bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseRequest(ClientCla
   return true;
 }
 
-template <class ServerClass, class ClientClass>
-bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_collectHeader(const char* headerName, const char* headerValue) {
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::_collectHeader(const char* headerName, const char* headerValue) {
   for (int i = 0; i < _headerKeysCount; i++) {
     if (_currentHeaders[i].key.equalsIgnoreCase(headerName)) {
             _currentHeaders[i].value=headerValue;
@@ -273,8 +273,8 @@ bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_collectHeader(const ch
   return false;
 }
 
-template <class ServerClass, class ClientClass>
-void ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseArguments(String data) {
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::_parseArguments(String data) {
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("args: ");
   DEBUG_OUTPUT.println(data);
@@ -349,8 +349,8 @@ void ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseArguments(String 
 
 }
 
-template <class ServerClass, class ClientClass>
-void ESP8266WebServerTemplate<ServerClass, ClientClass>::_uploadWriteByte(uint8_t b){
+template <typename ServerType, typename ClientType>
+void ESP8266WebServerTemplate<ServerType, ClientType>::_uploadWriteByte(uint8_t b){
   if (_currentUpload->currentSize == HTTP_UPLOAD_BUFLEN){
     if(_currentHandler && _currentHandler->canUpload(_currentUri))
       _currentHandler->upload(*this, _currentUri, *_currentUpload);
@@ -360,8 +360,8 @@ void ESP8266WebServerTemplate<ServerClass, ClientClass>::_uploadWriteByte(uint8_
   _currentUpload->buf[_currentUpload->currentSize++] = b;
 }
 
-template <class ServerClass, class ClientClass>
-uint8_t ESP8266WebServerTemplate<ServerClass, ClientClass>::_uploadReadByte(ClientClass& client){
+template <typename ServerType, typename ClientType>
+uint8_t ESP8266WebServerTemplate<ServerType, ClientType>::_uploadReadByte(ClientType& client){
   int res = client.read();
   if(res == -1){
     while(!client.available() && client.connected())
@@ -371,8 +371,8 @@ uint8_t ESP8266WebServerTemplate<ServerClass, ClientClass>::_uploadReadByte(Clie
   return (uint8_t)res;
 }
 
-template <class ServerClass, class ClientClass>
-bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseForm(ClientClass& client, String boundary, uint32_t len){
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseForm(ClientType& client, String boundary, uint32_t len){
   (void) len;
 #ifdef DEBUG_ESP_HTTP_SERVER
   DEBUG_OUTPUT.print("Parse Form: Boundary: ");
@@ -584,8 +584,8 @@ readfile:
   return false;
 }
 
-template <class ServerClass, class ClientClass>
-String ESP8266WebServerTemplate<ServerClass, ClientClass>::urlDecode(const String& text)
+template <typename ServerType, typename ClientType>
+String ESP8266WebServerTemplate<ServerType, ClientType>::urlDecode(const String& text)
 {
 	String decoded = "";
 	char temp[] = "0x00";
@@ -616,8 +616,8 @@ String ESP8266WebServerTemplate<ServerClass, ClientClass>::urlDecode(const Strin
 	return decoded;
 }
 
-template <class ServerClass, class ClientClass>
-bool ESP8266WebServerTemplate<ServerClass, ClientClass>::_parseFormUploadAborted(){
+template <typename ServerType, typename ClientType>
+bool ESP8266WebServerTemplate<ServerType, ClientType>::_parseFormUploadAborted(){
   _currentUpload->status = UPLOAD_FILE_ABORTED;
   if(_currentHandler && _currentHandler->canUpload(_currentUri))
     _currentHandler->upload(*this, _currentUri, *_currentUpload);
