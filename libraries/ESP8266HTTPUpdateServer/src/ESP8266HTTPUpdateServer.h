@@ -3,6 +3,9 @@
 
 #include <ESP8266WebServer.h>
 
+namespace esp8266httpupdateserver {
+using namespace esp8266webserver;
+
 template <typename ServerType>
 class ESP8266HTTPUpdateServerTemplate
 {
@@ -44,17 +47,19 @@ class ESP8266HTTPUpdateServerTemplate
     String _updaterError;
 };
 
+};
+
 #include "ESP8266HTTPUpdateServer-impl.h"
 
 
-using ESP8266HTTPUpdateServer = ESP8266HTTPUpdateServerTemplate<WiFiServer>;
+using ESP8266HTTPUpdateServer = esp8266httpupdateserver::ESP8266HTTPUpdateServerTemplate<WiFiServer>;
 
 namespace BearSSL {
-using ESP8266HTTPUpdateServerSecure = ESP8266HTTPUpdateServerTemplate<WiFiServerSecure>;
+using ESP8266HTTPUpdateServerSecure = esp8266httpupdateserver::ESP8266HTTPUpdateServerTemplate<WiFiServerSecure>;
 };
 
 namespace axTLS {
-using ESP8266HTTPUpdateServerSecure = ESP8266HTTPUpdateServerTemplate<WiFiServerSecure>;
+using ESP8266HTTPUpdateServerSecure = esp8266httpupdateserver::ESP8266HTTPUpdateServerTemplate<WiFiServerSecure>;
 };
 
 #endif

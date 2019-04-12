@@ -6,6 +6,8 @@
 #include "StreamString.h"
 #include "ESP8266HTTPUpdateServer.h"
 
+namespace esp8266httpupdateserver {
+using namespace esp8266webserver;
 
 static const char serverIndex[] PROGMEM =
   R"(<html><body><form method='POST' action='' enctype='multipart/form-data'>
@@ -105,3 +107,5 @@ void ESP8266HTTPUpdateServerTemplate<ServerType>::_setUpdaterError()
   Update.printError(str);
   _updaterError = str.c_str();
 }
+
+};

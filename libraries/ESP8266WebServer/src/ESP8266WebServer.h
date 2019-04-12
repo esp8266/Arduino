@@ -28,6 +28,7 @@
 #include <memory>
 #include <ESP8266WiFi.h>
 #include <FS.h>
+#include "detail/mimetable.h"
 
 enum HTTPMethod { HTTP_ANY, HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_PATCH, HTTP_DELETE, HTTP_OPTIONS };
 enum HTTPUploadStatus { UPLOAD_FILE_START, UPLOAD_FILE_WRITE, UPLOAD_FILE_END,
@@ -49,9 +50,6 @@ enum HTTPAuthMethod { BASIC_AUTH, DIGEST_AUTH };
 #define CONTENT_LENGTH_UNKNOWN ((size_t) -1)
 #define CONTENT_LENGTH_NOT_SET ((size_t) -2)
 
-template<typename ServerType>
-class ESP8266WebServerTemplate;
-
 typedef struct {
   HTTPUploadStatus status;
   String  filename;
@@ -62,6 +60,11 @@ typedef struct {
   size_t  contentLength; // size of entire post request, file size + headers and other request data.
   uint8_t buf[HTTP_UPLOAD_BUFLEN];
 } HTTPUpload;
+
+namespace esp8266webserver {
+
+template<typename ServerType>
+class ESP8266WebServerTemplate;
 
 #include "detail/RequestHandler.h"
 
@@ -201,11 +204,13 @@ protected:
 
 };
 
-
 #include "ESP8266WebServer-impl.h"
 #include "Parsing-impl.h"
 
-using ESP8266WebServer = ESP8266WebServerTemplate<WiFiServer>;
+};
+
+
+using ESP8266WebServer = esp8266webserver::ESP8266WebServerTemplate<WiFiServer>;
 
 
 #endif //ESP8266WEBSERVER_H
