@@ -105,7 +105,7 @@ Instructions - Windows 10
 
    .. code:: bash
 
-       cd %USERPROFILE%\Documents\hardware\esp8266com\esp8266
+       cd %USERPROFILE%\Documents\Arduino\hardware\esp8266com\esp8266
        git submodule update --init   
   
   If error messages about missing files related to ``SoftwareSerial`` are encountered during the build process, it should be because this step was missed and is required.
@@ -125,7 +125,7 @@ Instructions - Windows 10
 
    .. code:: bash
 
-       cd %USERPROFILE%\Documents\hardware\esp8266com\esp8266
+       cd %USERPROFILE%\Documents\Arduino\hardware\esp8266com\esp8266
        git status
        git pull
 
