@@ -67,13 +67,13 @@ public:
         _lfs_cfg.prog = lfs_flash_prog;
         _lfs_cfg.erase = lfs_flash_erase;
         _lfs_cfg.sync = lfs_flash_sync;
-        _lfs_cfg.read_size = _pageSize;
-        _lfs_cfg.prog_size = _pageSize;
+        _lfs_cfg.read_size = 64;
+        _lfs_cfg.prog_size = 64;
         _lfs_cfg.block_size =  _blockSize;
         _lfs_cfg.block_count = _size / _blockSize;
 	_lfs_cfg.block_cycles = 16; // TODO - need better explanation
-	_lfs_cfg.cache_size = _blockSize;
-        _lfs_cfg.lookahead_size = 256;
+	_lfs_cfg.cache_size = 64;
+        _lfs_cfg.lookahead_size = 64;
         _lfs_cfg.read_buffer = nullptr;
         _lfs_cfg.prog_buffer = nullptr;
         _lfs_cfg.lookahead_buffer = nullptr;
