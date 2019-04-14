@@ -829,15 +829,22 @@ void String::trim(void) {
 // /*********************************************/
 
 long String::toInt(void) const {
-    if(buffer())
+    if (buffer())
         return atol(buffer());
     return 0;
 }
 
 float String::toFloat(void) const {
-    if(buffer())
+    if (buffer())
         return atof(buffer());
     return 0;
+}
+
+double String::toDouble(void) const
+{
+    if (buffer())
+        return atof(buffer());
+    return 0.0;
 }
 
 // global empty string to allow returning const String& with nothing
