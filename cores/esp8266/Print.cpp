@@ -33,7 +33,7 @@
 
 /* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size) {
-    IAMSLOW("Print::write(buffer,len)");
+    IAMSLOW();
 
     size_t n = 0;
     while (size--) {
@@ -298,6 +298,6 @@ size_t Print::printFloat(double number, uint8_t digits) {
 }
 
 int Print::availableForWrite() {
-    IAMSLOW("Print::availableForWrite()");
+    IAMSLOW();
     return 1;
 }

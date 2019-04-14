@@ -268,7 +268,7 @@ int Stream::read (char* buffer, size_t maxLen)
     return nbread;
 }
 
-size_t Stream::streamTo (Print& to, size_t maxLen)
+size_t Stream::streamTo (Print& to, size_t maxLen = 0, int readUntilChar = -1, unsigned long timeout_ms = 0)
 {
-    return streamMove<Stream,Print>(*this, to, maxLen);
+    return streamMove<Stream,Print>(*this, to, maxLen, readUntilChar, timeout_ms);
 }

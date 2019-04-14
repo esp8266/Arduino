@@ -27,16 +27,16 @@ void __panic_func(const char* file, int line, const char* func) __attribute__((n
 
 #ifdef DEBUG_ESP_CORE
 extern const char* overrideme PROGMEM;
-#define IAMSLOW(str) \
+#define IAMSLOW() \
     do { \
         static bool once = false;\
         if (!once) { \
             once = true; \
-            DEBUGV((PGM_P)PSTR(str "%s", overrideme)); \
+            DEBUGV((PGM_P)PSTR(__FUNCTION__ "%s", overrideme)); \
         } \
     } while (0)
 #else
-#define IAMSLOW(str) do { (void)0; } while (0)
+#define IAMSLOW() do { (void)0; } while (0)
 #endif
 
 #ifdef __cplusplus

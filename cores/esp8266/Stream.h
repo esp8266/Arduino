@@ -26,7 +26,7 @@
 #include <inttypes.h>
 #include "Print.h"
 
-// compatability macros for testing
+// compatibility macros for testing
 /*
  #define   getInt()            parseInt()
  #define   getInt(skipChar)    parseInt(skipchar)
@@ -43,6 +43,7 @@ class Stream: public Print {
         int timedRead();    // private method to read stream with timeout
         int timedPeek();    // private method to peek stream with timeout
         int peekNextDigit(); // returns the next numeric digit in the stream or -1 if timeout
+        char oneChar;        // used by direct access extension
 
     public:
         virtual int available() = 0;
@@ -122,22 +123,26 @@ class Stream: public Print {
         // (currently implemented in HardwareSerial:: and WiFiClient::)
 
         // return number of byte accessible by peekBuffer()
-        virtual size_t availableForPeek () { return read(&oneChar, 1) != -1; }
+        virtual size_t availableForPeek () { IAMSLOW(); return (oneChar = peek()) == -1? 0: 1; }
 
         // return a pointer to available data buffer (size = availableForPeek())
         // semantic forbids any kind of read() before calling peekConsume()
         virtual const char* peekBuffer () { return &oneChar; }
 
         // consume bytes after peekBuffer use
-        virtual void peekConsume (size_t consume) { (void)consume; }
+        virtual void peekConsume (size_t consume) { (void)read(); }
 
         // additions: streamTo
 
-        // transfer at most maxlen bytes (maxlen==0 means transfer until starvation)
+        // transfer at most maxlen bytes
         // return number of transfered bytes
         // generic implementation using arduino virtual API
         // (also available: virtual-less template streamMove(from,to))
-        virtual size_t streamTo (Print& to, size_t maxLen = 0);
+        // - maxLen==0 will transfer until read starvation or destination temporarily full
+        // - readUntilChar: using anything in 0..255 will stop transfer when this char is read
+        // - timeout_ms==0: means immediate exit if nothing more can be read even if maxLen is not reached
+        
+        virtual size_t streamTo (Print& to, size_t maxLen = 0, int readUntilChar = -1, unsigned long timeout_ms = 0);
 
         //////////////////// end of extensions
 
@@ -147,51 +152,50 @@ class Stream: public Print {
         // this allows format characters (typically commas) in values to be ignored
 
         float parseFloat(char skipChar);  // as above but the given skipChar is ignored
-        
-        char oneChar;
 };
 
 #define STREAM_MOVE(from,to,...) (streamMove<decltype(from),decltype(to)>(from, to, ## __VA_ARGS__))
 
-#include <assert.h>
 #include <PolledTimeout.h>
 
 template <typename Tfrom, typename Tto,
           typename PeriodicMs = esp8266::polledTimeout::periodicFastMs,
-          typename TimeoutMs  = esp8266::polledTimeout::oneShotFastMs>
-size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0, int readUntilChar = -1, TimeoutMs::timeType timeout = TimeoutMs::alwaysExpired)
+          typename TimeoutMs  = esp8266::polledTimeout::oneShotMs>
+size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0, int readUntilChar = -1, TimeoutMs::timeType timeout = TimeoutMs::alwayExpired)
 {
     PeriodicMs yieldNow(100);
     size_t written = 0;
     size_t w;
 
-    if (timeout == TimeoutMs::alwaysExpired)
-        // default value => take Stream (source) value
+    if (timeout == TimeoutMs::neverExpires)
+        // neverExpires forbidden value => take Stream (source) value
         // TODO: check for to::getTimeout() existence (w/ SFINAE or equiv.)
-        // and use in that case std::min(from.getTimeout(), to.getTimeout())
+        // and use std::min(from.getTimeout(), to.getTimeout())
         timeout.reset(from.getTimeout());
     else
         timeout.reset();
 
-    while (!timeout && (!maxLen || written < maxLen) && (w = to.availableForWrite()))
+    while ((!maxLen || written < maxLen) && ((w = to.availableForWrite()) || !timeout)
     {
-        const char* directbuf = from.peekBuffer();
         size_t r = from.availableForPeek();
         if (w > r)
             w = r;
-        if (readUntilChar != -1)
+        if (w)
         {
-            const char* last = memchr(directbuf, readUntilChar, w);
-            if (last)
-                w = last - directbuf + 1;
+            const char* directbuf = from.peekBuffer();
+            if (readUntilChar >= 0)
+            {
+                const char* last = memchr(directbuf, readUntilChar, w);
+                if (last)
+                    w = last - directbuf + 1;
+            }
+            if (w && ((w = to.write(directbuf, w)))
+            {
+                from.peekConsume(w);
+                written += w;
+                timeout.reset();
+            }
         }
-        if (w && ((w = to.write(directbuf, w)))
-        {
-            from.peekConsume(w);
-            written += w;
-            timeout.reset();
-        }
-
         if (yieldNow)
             yield();
     }
