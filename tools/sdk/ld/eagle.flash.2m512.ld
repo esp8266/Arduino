@@ -17,6 +17,6 @@ MEMORY
 PROVIDE ( _SPIFFS_start = 0x40380000 );
 PROVIDE ( _SPIFFS_end = 0x403FB000 );
 PROVIDE ( _SPIFFS_page = 0x100 );
-PROVIDE ( _SPIFFS_block = 0x2000 );
+PROVIDE ( _SPIFFS_block = 0x1000 );
 
 INCLUDE "local.eagle.app.v6.common.ld"

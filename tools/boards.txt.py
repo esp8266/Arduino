@@ -1172,10 +1172,13 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
     else:
         max_upload_size = 1024 * 1024 - reserved
         spiffs_start = (flashsize_kb - spiffs_kb) * 1024
-        if spiffs_kb < 512:
+        if spiffs_kb <= 512:
             spiffs_blocksize = 4096
         else:
             spiffs_blocksize = 8192
+
+    # Adjust SPIFFS_end to be a multiple of the block size
+    spiffs_end = spiffs_blocksize * (int)((spiffs_end - spiffs_start)/spiffs_blocksize) + spiffs_start;
 
     strsize = str(int(flashsize_kb / 1024)) + 'M' if (flashsize_kb >= 1024) else str(flashsize_kb) + 'K'
     strspiffs = str(int(spiffs_kb / 1024)) + 'M' if (spiffs_kb >= 1024) else str(spiffs_kb) + 'K'
@@ -1217,13 +1220,11 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         if spiffs_kb == 0:
             spiffs_start = spiffs_end
             page = 0
-            block = 0
+            spiffs_blocksize = 0
         elif spiffs_kb < 0x80000 / 1024:
             page = 0x100
-            block = 0x1000
         else:
             page = 0x100
-            block = 0x2000
 
         print("/* Flash Split for %s chips */" % strsize)
         print("/* sketch @0x%X (~%dKB) (%dB) */" % (spi, (max_upload_size / 1024), max_upload_size))
@@ -1246,7 +1247,7 @@ def flash_map (flashsize_kb, spiffs_kb = 0):
         print("PROVIDE ( _SPIFFS_start = 0x%08X );" % (0x40200000 + spiffs_start))
         print("PROVIDE ( _SPIFFS_end = 0x%08X );" % (0x40200000 + spiffs_end))
         print("PROVIDE ( _SPIFFS_page = 0x%X );" % page)
-        print("PROVIDE ( _SPIFFS_block = 0x%X );" % block)
+        print("PROVIDE ( _SPIFFS_block = 0x%X );" % spiffs_blocksize)
         print("")
         print('INCLUDE "local.eagle.app.v6.common.ld"')
 
