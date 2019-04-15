@@ -31,6 +31,12 @@
 
 #include <Arduino.h>
 
+#ifdef DEBUG_ESP_CORE
+#define VERBOSE(x...) fprintf(stderr, MOCK x)
+#else
+#define VERBOSE(x...) mockverbose(x)
+#endif
+
 void pinMode (uint8_t pin, uint8_t mode)
 {
 	#define xxx(mode) case mode: m=STRHELPER(mode); break
@@ -46,23 +52,17 @@ void pinMode (uint8_t pin, uint8_t mode)
 	case WAKEUP_PULLDOWN: m="WAKEUP_PULLDOWN"; break;
 	default: m="(special)";
 	}
-#ifdef DEBUG_ESP_CORE
-	fprintf(stderr, MOCK "gpio%d: mode='%s'\n", pin, m);
-#endif
+	VERBOSE("gpio%d: mode='%s'\n", pin, m);
 }
 
 void digitalWrite(uint8_t pin, uint8_t val)
 {
-#ifdef DEBUG_ESP_CORE
-	fprintf(stderr, MOCK "digitalWrite(pin=%d val=%d)\n", pin, val);
-#endif
+	VERBOSE("digitalWrite(pin=%d val=%d)\n", pin, val);
 }
 
 void analogWrite(uint8_t pin, int val)
 {
-#ifdef DEBUG_ESP_CORE
-	fprintf(stderr, MOCK "analogWrite(pin=%d, val=%d\n", pin, val);
-#endif
+	VERBOSE("analogWrite(pin=%d, val=%d\n", pin, val);
 }
 
 int analogRead(uint8_t pin)
@@ -73,16 +73,12 @@ int analogRead(uint8_t pin)
 
 void analogWriteRange(uint32_t range)
 {
-#ifdef DEBUG_ESP_CORE
-	fprintf(stderr, MOCK "analogWriteRange(range=%d)\n", range);
-#endif
+	VERBOSE("analogWriteRange(range=%d)\n", range);
 }
 
 int digitalRead(uint8_t pin)
 {
-#ifdef DEBUG_ESP_CORE
-	fprintf(stderr, MOCK "digitalRead(%d)\n", pin);
-#endif
+	VERBOSE("digitalRead(%d)\n", pin);
 
 	// pin 0 is most likely a low active input
 	return pin ? 0 : 1;

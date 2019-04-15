@@ -71,7 +71,7 @@ static const char _ssdp_packet_template[] PROGMEM =
   "%s" // _ssdp_response_template / _ssdp_notify_template
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
-  "USN: uuid:%s\r\n" // _uuid
+  "USN: %s\r\n" // _uuid
   "%s: %s\r\n"  // "NT" or "ST", _deviceType
   "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
@@ -99,7 +99,7 @@ static const char _ssdp_schema_template[] PROGMEM =
   "<modelURL>%s</modelURL>"
   "<manufacturer>%s</manufacturer>"
   "<manufacturerURL>%s</manufacturerURL>"
-  "<UDN>uuid:%s</UDN>"
+  "<UDN>%s</UDN>"
   "</device>"
  //"<iconList>"	
  //"<icon>"	
@@ -130,8 +130,10 @@ SSDPClass::SSDPClass() :
   _timer(0),
   _port(80),
   _ttl(SSDP_MULTICAST_TTL),
+  _respondToAddr(0,0,0,0),
   _respondToPort(0),
   _pending(false),
+  _st_is_uuid(false),
   _delay(0),
   _process_time(0),
   _notify_time(0)
@@ -155,12 +157,13 @@ SSDPClass::~SSDPClass() {
 
 bool SSDPClass::begin() {
   end();
-
+  
   _pending = false;
+  _st_is_uuid = false;
   if (strcmp(_uuid,"") == 0) {
 	uint32_t chipId = ESP.getChipId();
-	sprintf(_uuid, "38323636-4558-4dda-9188-cda0e6%02x%02x%02x",
-    (uint16_t) ((chipId >> 16) & 0xff),
+	sprintf_P(_uuid, PSTR("uuid:38323636-4558-4dda-9188-cda0e6%02x%02x%02x"),
+  (uint16_t) ((chipId >> 16) & 0xff),
 	(uint16_t) ((chipId >>  8) & 0xff),
 	(uint16_t)   chipId        & 0xff);
   }
@@ -178,7 +181,9 @@ bool SSDPClass::begin() {
   IPAddress mcast(SSDP_MULTICAST_ADDR);
 
   if (igmp_joingroup(local, mcast) != ERR_OK ) {
-    DEBUGV("SSDP failed to join igmp group");
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf_P(PSTR("SSDP failed to join igmp group\n"));
+#endif
     return false;
   }
 
@@ -241,7 +246,7 @@ void SSDPClass::_send(ssdp_method_t method) {
                        _modelNumber,
                        _uuid,
                        (method == NONE) ? "ST" : "NT",
-                       _deviceType,
+                       (_st_is_uuid) ? _uuid : _deviceType,
                        ip[0], ip[1], ip[2], ip[3], _port, _schemaURL
                       );
 
@@ -373,10 +378,19 @@ void SSDPClass::_update() {
 #ifdef DEBUG_SSDP
                   DEBUG_SSDP.printf("REJECT: %s\n", (char *)buffer);
 #endif
+                }else{
+                  _st_is_uuid = false;
                 }
                 // if the search type matches our type, we should respond instead of ABORT
                 if (strcasecmp(buffer, _deviceType) == 0) {
                   _pending = true;
+                  _st_is_uuid = false;
+                  _process_time = millis();
+                  state = KEY;
+                }
+                if (strcasecmp(buffer, _uuid) == 0) {
+                  _pending = true;
+                  _st_is_uuid = true;
                   _process_time = millis();
                   state = KEY;
                 }
@@ -416,6 +430,7 @@ void SSDPClass::_update() {
     _send(NONE);
   } else if(_notify_time == 0 || (millis() - _notify_time) > (SSDP_INTERVAL * 1000L)){
     _notify_time = millis();
+    _st_is_uuid = false;
     _send(NOTIFY);
   }
 
@@ -439,7 +454,7 @@ void SSDPClass::setDeviceType(const char *deviceType) {
 }
 
 void SSDPClass::setUUID(const char *uuid) {
-  strlcpy(_uuid, uuid, sizeof(_uuid));  
+  snprintf_P(_uuid, sizeof(_uuid), PSTR("uuid:%s"), uuid);  
 }
 
 void SSDPClass::setName(const char *name) {
