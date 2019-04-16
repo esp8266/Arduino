@@ -18,7 +18,7 @@ Instructions
 
 -  Start Arduino and open Preferences window.
 -  Enter
-   ``http://arduino.esp8266.com/stable/package_esp8266com_index.json``
+   ``https://arduino.esp8266.com/stable/package_esp8266com_index.json``
    into *Additional Board Manager URLs* field. You can add multiple
    URLs, separating them with commas.
 -  Open Boards Manager from Tools > Board menu and find *esp8266*
@@ -29,7 +29,7 @@ Instructions
    after installation.
 
 You may optionally use *staging* boards manager package link:
-``http://arduino.esp8266.com/staging/package_esp8266com_index.json``.
+``https://arduino.esp8266.com/staging/package_esp8266com_index.json``.
 This may contain some new features, but at the same time, some things
 might be broken.
 
@@ -48,7 +48,7 @@ Prerequisites
 
 -  Arduino 1.6.8 (or newer, current working version is 1.8.5)
 -  git
--  Python 2.7 (http://python.org)
+-  Python 2.7 (https://python.org)
 -  terminal, console, or command prompt (depending on your OS)
 -  Internet connection
 
