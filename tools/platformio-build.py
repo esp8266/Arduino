@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#    http://www.apache.org/licenses/LICENSE-2.0
+#    https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,7 @@ Arduino Wiring-based Framework allows writing cross-platform software to
 control devices attached to a wide range of Arduino boards to create all
 kinds of creative coding, interactive objects, spaces or physical experiences.
 
-http://arduino.cc/en/Reference/HomePage
+https://arduino.cc/en/Reference/HomePage
 """
 
 # Extends: https://github.com/platformio/platform-espressif8266/blob/develop/builder/main.py

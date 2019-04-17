@@ -28,11 +28,6 @@ Instructions
 -  Don't forget to select your ESP8266 board from Tools > Board menu
    after installation.
 
-You may optionally use *staging* boards manager package link:
-``https://arduino.esp8266.com/staging/package_esp8266com_index.json``.
-This may contain some new features, but at the same time, some things
-might be broken.
-
 For more information on the Arduino Board Manager, see:
 
 - https://www.arduino.cc/en/guide/cores
