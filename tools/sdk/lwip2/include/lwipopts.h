@@ -660,7 +660,7 @@
  * packet in a row to an IP address that is not in the ARP cache.
  */
 #if !defined ARP_QUEUEING || defined __DOXYGEN__
-#define ARP_QUEUEING                    0
+#define ARP_QUEUEING                    1
 #endif
 
 /** The maximum number of packets which may be queued for each

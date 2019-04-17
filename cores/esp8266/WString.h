@@ -241,6 +241,7 @@ class String {
         // parsing/conversion
         long toInt(void) const;
         float toFloat(void) const;
+	double toDouble(void) const;
 
     protected:
         // Contains the string info when we're not in SSO mode
