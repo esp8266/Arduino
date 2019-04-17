@@ -139,13 +139,13 @@ DEBUG += -DDEBUG_ESP_PORT=Serial
 DEBUG += -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_MDNS
 endif
 
-FLAGS += $(DEBUG) -Wall -coverage $(OPTZ) -fno-common -g $(M32) -fno-rtti
+FLAGS += $(DEBUG) -Wall -coverage $(OPTZ) -fno-common -g $(M32)
 FLAGS += -DHTTPCLIENT_1_1_COMPATIBLE=0
 FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
 FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
-CXXFLAGS += -std=c++11 $(FLAGS)
+CXXFLAGS += -std=c++11 -fno-rtti $(FLAGS)
 CFLAGS += -std=c99 $(FLAGS)
 LDFLAGS += -coverage $(OPTZ) -g $(M32)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
