@@ -122,7 +122,7 @@ public:
         info.maxOpenFiles = _maxOpenFds;
         info.maxPathLength = LFS_NAME_MAX;
         info.totalBytes = _size;
-        info.usedBytes = _size - _getUsedBlocks() * _blockSize;
+        info.usedBytes = _getUsedBlocks() * _blockSize;
         return true;
     }
 
