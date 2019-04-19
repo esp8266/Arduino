@@ -86,6 +86,9 @@ class UDP: public Stream {
         CONST uint8_t* rawIPAddress(CONST IPAddress& addr) {
             return addr.raw_address();
         }
+        uint8_t* rawIPAddress(IPAddress& addr) {
+            return addr.raw_address();
+        }
 };
 
 #endif

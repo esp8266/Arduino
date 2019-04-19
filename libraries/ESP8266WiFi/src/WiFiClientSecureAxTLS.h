@@ -35,7 +35,7 @@ public:
   WiFiClientSecure() __attribute__((deprecated("Upgrade to BearSSL is advised, check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99")));
   ~WiFiClientSecure() override;
 
-  int connect(CONST IPAddress& ip, uint16_t port) override;
+  int connect(IPAddress ip, uint16_t port) override;
   int connect(const String& host, uint16_t port) override;
   int connect(const char* name, uint16_t port) override;
 
