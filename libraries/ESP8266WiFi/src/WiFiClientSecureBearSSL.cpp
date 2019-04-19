@@ -1292,6 +1292,8 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
   uint8_t sessionLen;
   uint8_t cipher[2];
   uint8_t comp;
+  uint8_t extBytes[2];
+  uint16_t extLen;
 
   ret = probe.readBytes(fragResp, 5);
   if (!probe.connected() || (ret != 5) || (fragResp[0] != 0x16) || (fragResp[1] != 0x03) || (fragResp[2] != 0x03)) {
@@ -1358,10 +1360,40 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
     // short read or invalid compression
     return _SendAbort(probe, supportsLen);
   }
-  if (handLen > 0) {
-    // At this point, having an extension present means that the extension we
-    // sent was accepted.
-    supportsLen = true;
+
+  ret = probe.readBytes(extBytes, 2);
+  handLen -= ret;
+  extLen = extBytes[1] || (extBytes[0]<<8);
+  if ((extLen == 0) || (ret != 2)) {
+    return _SendAbort(probe, supportsLen);
+  }
+
+  while (handLen > 0) {
+    // Parse each extension and look for MFLN
+    uint8_t typeBytes[2];
+    ret = probe.readBytes(typeBytes, 2);
+    handLen -= 2;
+    if ((ret != 2) || (handLen <= 0) ) {
+      return _SendAbort(probe, supportsLen);
+    }
+    uint8_t lenBytes[2];
+    ret = probe.readBytes(lenBytes, 2);
+    handLen -= 2;
+    uint16_t extLen = lenBytes[1] | (lenBytes[0]<<8);
+    if ((ret != 2) || (handLen <= 0) || (extLen > 32) || (extLen > handLen) ) {
+      return _SendAbort(probe, supportsLen);
+    }
+    if ((typeBytes[0]==0x00) && (typeBytes[1]==0x01)) { // MFLN extension!
+      // If present and 1-byte in length, it's supported
+      return _SendAbort(probe, extLen==1 ? true : false);
+    }
+    // Skip the extension, move to next one
+    uint8_t junk[32];
+    ret = probe.readBytes(junk, extLen);
+    handLen -= extLen;
+    if (ret != extLen) {
+      return _SendAbort(probe, supportsLen);
+    }
   }
   return _SendAbort(probe, supportsLen);
 }
