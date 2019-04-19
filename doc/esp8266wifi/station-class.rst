@@ -535,7 +535,7 @@ Function returns value of the ``String`` type.
 BSSID
 ^^^^^
 
-Return the mac address the access point where ESP module is connected to. This address is formally called `Basic Service Set Identification (BSSID) <http://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e47>`__.
+Return the mac address of the access point to which the ESP module was directed to connect to. This address is formally called `Basic Service Set Identification (BSSID) <http://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e47>`__. The returned pointer is what the user configured when calling begin() with a bssid argument. It does _not_ necessarily reflect the mac address of the access point to which the ESP module's station interface is currently connected to.
 
 .. code:: cpp
 
