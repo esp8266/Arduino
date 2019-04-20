@@ -11,7 +11,7 @@ typedef void (*voidFuncPtrArg)(void*);
 extern "C" void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void*fp , int mode);
 
 
-void interruptFunctional(void* arg)
+void ICACHE_RAM_ATTR interruptFunctional(void* arg)
 {
     ArgStructure* localArg = (ArgStructure*)arg;
 	if (localArg->functionInfo->reqScheduledFunction)
