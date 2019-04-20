@@ -39,12 +39,14 @@ class Client: public Stream {
         virtual uint8_t connected() = 0;
         virtual operator bool() = 0;
     protected:
-        CONST uint8_t* rawIPAddress(CONST IPAddress& addr) {
-            return addr.raw_address();
-        }
         uint8_t* rawIPAddress(IPAddress& addr) {
             return addr.raw_address();
         }
+#if LWIP_VERSION_MAJOR != 1
+        const uint8_t* rawIPAddress(const IPAddress& addr) {
+            return addr.raw_address();
+        }
+#endif
 };
 
 #endif
