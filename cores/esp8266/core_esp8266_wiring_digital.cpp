@@ -109,8 +109,9 @@ typedef void (*voidFuncPtrArg)(void*);
 
 typedef struct {
   uint8_t mode;
-  void (*fn)(void);
-  void * arg;
+  voidFuncPtr fn;
+  void* arg;
+  bool functional;
 } interrupt_handler_t;
 
 //duplicate from functionalInterrupt.h keep in sync
@@ -125,11 +126,10 @@ typedef struct {
 	void* functionInfo;
 } ArgStructure;
 
-static interrupt_handler_t interrupt_handlers[16];
+static interrupt_handler_t interrupt_handlers[16] = {0,};
 static uint32_t interrupt_reg = 0;
 
 void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
-  (void) arg;
   uint32_t status = GPIE;
   GPIEC = status;//clear them interrupts
   uint32_t levels = GPI;
@@ -147,13 +147,16 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
       // to make ISR compatible to Arduino AVR model where interrupts are disabled
       // we disable them before we call the client ISR
       uint32_t savedPS = xt_rsil(15); // stop other interrupts
-      ArgStructure* localArg = (ArgStructure*)handler->arg;
-      if (localArg && localArg->interruptInfo)
-      {
-         localArg->interruptInfo->pin = i;
-         localArg->interruptInfo->value = __digitalRead(i);
-         localArg->interruptInfo->micro = micros();
-      }
+	  if (handler->functional)
+	  {
+    	  ArgStructure* localArg = (ArgStructure*)handler->arg;
+    	  if (localArg && localArg->interruptInfo)
+    	  {
+			localArg->interruptInfo->pin = i;
+			localArg->interruptInfo->value = __digitalRead(i);
+			localArg->interruptInfo->micro = micros();
+    	  }
+	  }
       if (handler->arg)
       {
     	  ((voidFuncPtrArg)handler->fn)(handler->arg);
@@ -170,8 +173,7 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
 
 extern void cleanupFunctional(void* arg);
 
-extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void *arg, int mode) {
-
+extern void __attachInterruptFunctionalArg(uint8_t pin, voidFuncPtrArg userFunc, void *arg, int mode, bool functional) {
   // #5780
   // https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map
   if ((uint32_t)userFunc >= 0x40200000)
@@ -185,12 +187,13 @@ extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFu
     ETS_GPIO_INTR_DISABLE();
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = mode;
-    handler->fn = userFunc;
-    if (handler->arg)  // Clean when new attach without detach
+    handler->fn = (voidFuncPtr)userFunc;
+    if (handler->functional && handler->arg)  // Clean when new attach without detach
 	{
 	  cleanupFunctional(handler->arg);
 	}
     handler->arg = arg;
+    handler->functional = functional;
     interrupt_reg |= (1 << pin);
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
     GPIEC = (1 << pin); //Clear Interrupt for this pin
@@ -200,12 +203,16 @@ extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFu
   }
 }
 
-extern void ICACHE_RAM_ATTR __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode )
+extern void __attachInterruptArg(uint8_t pin, voidFuncPtrArg userFunc, void * arg, int mode)
 {
-	__attachInterruptArg (pin, userFunc, 0, mode);
+	__attachInterruptFunctionalArg(pin, userFunc, arg, mode, false);
 }
 
-extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
+extern void __attachInterrupt(uint8_t pin, voidFuncPtr userFunc, int mode ) {
+    __attachInterruptFunctionalArg(pin, (voidFuncPtrArg)userFunc, 0, mode, false);
+}
+
+extern void __detachInterrupt(uint8_t pin) {
   if(pin < 16) {
     ETS_GPIO_INTR_DISABLE();
     GPC(pin) &= ~(0xF << GPCI);//INT mode disabled
@@ -214,11 +221,12 @@ extern void ICACHE_RAM_ATTR __detachInterrupt(uint8_t pin) {
     interrupt_handler_t *handler = &interrupt_handlers[pin];
     handler->mode = 0;
     handler->fn = 0;
-    if (handler->arg)
+    if (handler->functional && handler->arg)
 		{
 		  cleanupFunctional(handler->arg);
 		}
     handler->arg = 0;
+    handler->functional = false;
     if (interrupt_reg)
       ETS_GPIO_INTR_ENABLE();
   }
@@ -243,6 +251,7 @@ extern void pinMode(uint8_t pin, uint8_t mode) __attribute__ ((weak, alias("__pi
 extern void digitalWrite(uint8_t pin, uint8_t val) __attribute__ ((weak, alias("__digitalWrite")));
 extern int digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead")));
 extern void attachInterrupt(uint8_t pin, voidFuncPtr handler, int mode) __attribute__ ((weak, alias("__attachInterrupt")));
+extern void attachInterruptArg(uint8_t pin, voidFuncPtrArg handler, void * arg, int mode) __attribute__ ((weak, alias("__attachInterruptArg")));
 extern void detachInterrupt(uint8_t pin) __attribute__ ((weak, alias("__detachInterrupt")));
 
 };
