@@ -948,6 +948,7 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
     return false;
   }
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
+
   // Apply any client certificates, if supplied.
   if (_sk && _sk->isRSA()) {
     br_ssl_client_set_single_rsa(_sc.get(), _chain ? _chain->getX509Certs() : nullptr, _chain ? _chain->getCount() : 0,

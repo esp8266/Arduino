@@ -87,6 +87,7 @@ int fetchMaxFragmentLength() {
   }
   client.connect("tls.mbed.org", 443);
   if (client.connected()) {
+    Serial.printf("MFLN status: %s\n", client.getMFLNStatus()?"true":"false");
     Serial.printf("Memory used: %d\n", ret - ESP.getFreeHeap());
     ret -= ESP.getFreeHeap();
     fetch(&client);
