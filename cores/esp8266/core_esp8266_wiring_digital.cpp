@@ -126,7 +126,7 @@ typedef struct {
 	void* functionInfo;
 } ArgStructure;
 
-static interrupt_handler_t interrupt_handlers[16] = {0};
+static interrupt_handler_t interrupt_handlers[16] = { {0, 0, 0, 0}, };
 static uint32_t interrupt_reg = 0;
 
 void ICACHE_RAM_ATTR interrupt_handler(void *) {
