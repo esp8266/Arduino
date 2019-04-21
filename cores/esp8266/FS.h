@@ -80,12 +80,34 @@ public:
     bool isDirectory() const;
 
     // Arduino "class SD" methods for compatibility
-    size_t write(const char *str) { return write((const uint8_t*)str, strlen(str)); }
+    template<typename T> size_t write(T &src){
+      uint8_t obuf[256];
+      size_t doneLen = 0;
+      size_t sentLen;
+      int i;
+
+      while (src.available() > sizeof(obuf)){
+        src.read(obuf, sizeof(obuf));
+        sentLen = write(obuf, sizeof(obuf));
+        doneLen = doneLen + sentLen;
+        if(sentLen != sizeof(obuf)){
+          return doneLen;
+        }
+      }
+
+      size_t leftLen = src.available();
+      src.read(obuf, leftLen);
+      sentLen = write(obuf, leftLen);
+      doneLen = doneLen + sentLen;
+      return doneLen;
+    }
+    using Print::write;
+
     void rewindDirectory();
     File openNextFile();
 
     String readString() override;
-	
+
 protected:
     FileImplPtr _p;
 
@@ -159,7 +181,7 @@ public:
 
     bool begin();
     void end();
-    
+
     bool format();
     bool info(FSInfo& info);
 
@@ -183,6 +205,8 @@ public:
 
     bool rmdir(const char* path);
     bool rmdir(const String& path);
+
+    bool gc();
 
 protected:
     FSImplPtr _impl;

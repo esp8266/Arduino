@@ -171,6 +171,16 @@ void ICACHE_RAM_ATTR interrupt_handler(void *arg) {
 extern void cleanupFunctional(void* arg);
 
 extern void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void *arg, int mode) {
+
+  // #5780
+  // https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map
+  if ((uint32_t)userFunc >= 0x40200000)
+  {
+    // ISR not in IRAM
+    ::printf((PGM_P)F("ISR not in IRAM!\r\n"));
+    abort();
+  }
+
   if(pin < 16) {
     ETS_GPIO_INTR_DISABLE();
     interrupt_handler_t *handler = &interrupt_handlers[pin];
