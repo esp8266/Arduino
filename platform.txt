@@ -30,6 +30,8 @@ build.lwip_flags=-DLWIP_OPEN_SRC
 
 build.vtable_flags=-DVTABLES_IN_FLASH
 
+build.sslflags=
+
 build.exception_flags=-fno-exceptions
 build.stdcpp_lib=-lstdc++
 
