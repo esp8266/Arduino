@@ -107,7 +107,7 @@ public:
     File openNextFile();
 
     String readString() override;
-	
+
 protected:
     FileImplPtr _p;
 
@@ -181,7 +181,7 @@ public:
 
     bool begin();
     void end();
-    
+
     bool format();
     bool info(FSInfo& info);
 
@@ -205,6 +205,8 @@ public:
 
     bool rmdir(const char* path);
     bool rmdir(const String& path);
+
+    bool gc();
 
 protected:
     FSImplPtr _impl;
