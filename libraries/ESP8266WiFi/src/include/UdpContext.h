@@ -231,10 +231,24 @@ public:
         return _pcb->local_port;
     }
 
+    void current_addresses_setup ()
+    {
+        // _rx_buf is an address helper
+        current_addresses = *((addresshelper_s*)_rx_buf->payload);
+
+        // swallow helper pbuf
+        auto head = _rx_buf;
+        _rx_buf = _rx_buf->next;
+        _rx_buf_offset = 0;
+        pbuf_free(head);
+    }
+
     bool next()
     {
         if (!_rx_buf)
             return false;
+
+        current_addresses_setup();
 
         if (!_first_buf_taken)
         {
@@ -425,20 +439,6 @@ private:
         (void) upcb;
         (void) addr;
         (void) port;
-        if (_rx_buf)
-        {
-            // there is some unread data
-            // chain the new pbuf to the existing one
-            DEBUGV(":urch %d, %d\r\n", _rx_buf->tot_len, pb->tot_len);
-            pbuf_cat(_rx_buf, pb);
-        }
-        else
-        {
-            DEBUGV(":urn %d\r\n", pb->tot_len);
-            _first_buf_taken = false;
-            _rx_buf = pb;
-            _rx_buf_offset = 0;
-        }
 
         // --> Arduino's UDP is a stream but UDP is not <--
         // When IPv6 is enabled, we store addresses from here
@@ -446,16 +446,50 @@ private:
         // (there's no easy way to safely guess whether packet
         //  is from v4 or v6 when we have only access to payload)
         // Because of this stream-ed way this is inacurate when
-        // user does not swallow data quickly enough (the former
-        // IPv4-only way suffers from the exact same issue.
+        // user does not swallow data quickly enough
+        //
+        // fixing this by an intermediate chained pbuf containing
+        // addrhelper_s
 
+        // allocate new pbuf to store addresses/ports
+        pbuf* helper = pbuf_alloc(PBUF_RAW, sizeof(addrhelper_s), PBUF_RAM);
+        if (!helper)
+        {
+            // memory issue - discard received data
+            pbuf_free(pb);
+            return;
+        }
+        // construct in place
+        IPAddress* srcaddr = &((addrhelper_s*)(pbuf->payload()))->srcaddr;
+        IPAddress* dstaddr = &((addrhelper_s*)(pbuf->payload()))->dstaddr;
 #if LWIP_VERSION_MAJOR == 1
-        _src_addr = current_iphdr_src;
-        _dst_addr = current_iphdr_dest;
+        new(srcaddr) IPAddress(current_iphdr_src);
+        new(dstaddr) IPAddress(current_iphdr_dest);
 #else
-        _src_addr = ip_data.current_iphdr_src;
-        _dst_addr = ip_data.current_iphdr_dest;
+        new(srcaddr) IPAddress(ip_data.current_iphdr_src);
+        new(dstaddr) IPAddress(ip_data.current_iphdr_dest);
 #endif
+        ((addrhelper_s*)(pbuf->payload()))->srcport = upcb->remote_port;
+        ((addrhelper_s*)(pbuf->payload()))->dstport = upcb->local_port;
+        // chain this helper pbuf first
+        if (_rx_buf)
+        {
+            // there is some unread data
+            // chain the new pbuf to the existing one
+            DEBUGV(":urch %d, %d\r\n", _rx_buf->tot_len, pb->tot_len);
+            pbuf_cat(_rx_buf, helper);
+        }
+        else
+        {
+            DEBUGV(":urn %d\r\n", pb->tot_len);
+            _first_buf_taken = false;
+            _rx_buf = helper;
+            _rx_buf_offset = 0;
+        }
+
+        // now chain data
+        // chain the new pbuf to the existing one
+        pbuf_cat(_rx_buf, pb);
 
         if (_on_rx) {
             _on_rx();
@@ -483,7 +517,11 @@ private:
 #ifdef LWIP_MAYBE_XCC
     uint16_t _mcast_ttl;
 #endif
-    IPAddress _src_addr, _dst_addr;
+    struct addrhelper_s
+    {
+        IPAddress srcaddr, dstaddr;
+        int16_t srcport, dstport;
+    } current_addr;
 };
 
 
