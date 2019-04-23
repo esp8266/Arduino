@@ -428,3 +428,15 @@ TEST_CASE("String SSO handles junk in memory", "[core][String]")
   REQUIRE(*s == "CO2_defect");
   s->~String();
 }
+
+
+TEST_CASE("Issue #5949 - Overlapping src/dest in replace", "[core][String]")
+{
+  String blah = "blah";
+  blah.replace("xx", "y");
+  REQUIRE(blah == "blah");
+  blah.replace("x", "yy");
+  REQUIRE(blah == "blah");
+  blah.replace(blah, blah);
+  REQUIRE(blah == "blah");
+}
