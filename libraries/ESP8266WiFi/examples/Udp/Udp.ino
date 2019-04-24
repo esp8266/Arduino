@@ -26,7 +26,7 @@
 unsigned int localPort = 8888;      // local port to listen on
 
 // buffers for receiving and sending data
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE+1]; //buffer to hold incoming packet,
+char packetBuffer[UDP_TX_PACKET_MAX_SIZE + 1]; //buffer to hold incoming packet,
 char  ReplyBuffer[] = "acknowledged\r\n";       // a string to send back
 
 WiFiUDP Udp;
