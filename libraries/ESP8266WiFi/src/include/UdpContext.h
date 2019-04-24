@@ -227,17 +227,6 @@ public:
         return _pcb->local_port;
     }
 
-    void current_addresses_setup ()
-    {
-        // _rx_buf is an address helper
-        current_addr = *((addrhelper_s*)ALIGNER(_rx_buf->payload));
-
-        // swallow helper pbuf
-        auto head = _rx_buf;
-        _rx_buf = _rx_buf->next;
-        pbuf_free(head);
-    }
-
     bool next()
     {
         if (!_rx_buf)
@@ -255,7 +244,16 @@ public:
 
         if (_rx_buf)
         {
-            current_addresses_setup();
+            pbuf_ref(_rx_buf);
+
+            // _rx_buf is an address helper
+            current_addr = *((addrhelper_s*)ALIGNER(_rx_buf->payload));
+
+            // swallow helper pbuf
+            auto head = _rx_buf;
+            _rx_buf = _rx_buf->next;
+            pbuf_free(head);
+
             pbuf_ref(_rx_buf);
         }
         pbuf_free(head);
