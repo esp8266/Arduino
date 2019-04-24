@@ -482,11 +482,11 @@ private:
 
         // fill addresses and port
 #if LWIP_VERSION_MAJOR == 1
-        *helper->srcaddr = current_iphdr_src;
-        *helper->dstaddr = current_iphdr_dest;
+        helper->srcaddr = current_iphdr_src;
+        helper->dstaddr = current_iphdr_dest;
 #else
-        *helper->srcaddr = *ip_current_src_addr();
-        *helper->dstaddr = *ip_current_dest_addr();
+        helper->srcaddr = *ip_current_src_addr();
+        helper->dstaddr = *ip_current_dest_addr();
 #endif
         helper->srcport = port;
 
