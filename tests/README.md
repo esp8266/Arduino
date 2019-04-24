@@ -19,6 +19,8 @@ If you want to add emulation of a certain feature, add it into tests/host/common
 
 ### Running test cases
 
+**NOTE!** The test-on-host environment is dependent on some submodules. Make sure to run `git submodule update --init` before running any test.
+
 To run test cases, go to tests/host/ directory and run `make`. This will compile and run the tests. 
 
 If all tests pass, you will see "All tests passed" message and the exit code will be 0.
