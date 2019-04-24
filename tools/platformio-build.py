@@ -24,6 +24,9 @@ http://arduino.cc/en/Reference/HomePage
 
 # Extends: https://github.com/platformio/platform-espressif8266/blob/develop/builder/main.py
 
+import os
+import subprocess
+
 from os.path import isdir, join
 
 from SCons import Builder, Util
@@ -219,6 +222,41 @@ app_ld = env.Command(
         "$CC -CC -E -P -D%s $SOURCE -o $TARGET" % current_vtables,
         "Generating LD script $TARGET"))
 env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", app_ld)
+
+#
+# Dynamic core_version.h for staging builds
+#
+
+def platform_txt_version(default):
+    with open(join(FRAMEWORK_DIR, "platform.txt"), "r") as platform_txt:
+        for line in platform_txt:
+            if not line:
+                continue
+            k, delim, v = line.partition("=")
+            if not delim:
+                continue
+            if k == "version":
+                return v.strip()
+
+    return default
+
+if isdir(join(FRAMEWORK_DIR, ".git")):
+    cmd = '"$PYTHONEXE" "{script}" -b "$BUILD_DIR" -p "{framework_dir}" -v {version}'
+    fmt = {
+        "script": join(FRAMEWORK_DIR, "tools", "makecorever.py"),
+        "framework_dir": FRAMEWORK_DIR,
+        "version": platform_txt_version("unspecified")
+    }
+
+    env.Prepend(CPPPATH=[
+        join("$BUILD_DIR", "core")
+    ])
+    core_version = env.Command(
+        join("$BUILD_DIR", "core", "core_version.h"),
+        join(FRAMEWORK_DIR, ".git"),
+        env.VerboseAction(cmd.format(**fmt), "Generating $TARGET")
+    )
+    env.Depends("$BUILD_DIR/$PROGNAME$PROGSUFFIX", core_version)
 
 
 #
