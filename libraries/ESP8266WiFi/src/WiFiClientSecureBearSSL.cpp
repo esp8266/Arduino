@@ -744,6 +744,7 @@ extern "C" {
    *    strong enough, and AES-256 is 40% more expensive).
    */
   static const uint16_t suites_P[] PROGMEM = {
+#ifndef BEARSSL_SSL_BASIC
     BR_TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
     BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
     BR_TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
@@ -780,15 +781,18 @@ extern "C" {
     BR_TLS_RSA_WITH_AES_256_CCM,
     BR_TLS_RSA_WITH_AES_128_CCM_8,
     BR_TLS_RSA_WITH_AES_256_CCM_8,
+#endif
     BR_TLS_RSA_WITH_AES_128_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_256_CBC_SHA256,
     BR_TLS_RSA_WITH_AES_128_CBC_SHA,
     BR_TLS_RSA_WITH_AES_256_CBC_SHA,
+#ifndef BEARSSL_SSL_BASIC
     BR_TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA,
     BR_TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
     BR_TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA,
     BR_TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA,
     BR_TLS_RSA_WITH_3DES_EDE_CBC_SHA
+#endif
   };
 
   // For apps which want to use less secure but faster ciphers, only
@@ -826,16 +830,20 @@ extern "C" {
     br_ssl_engine_set_suites(&cc->eng, suites, (sizeof suites) / (sizeof suites[0]));
     br_ssl_client_set_default_rsapub(cc);
     br_ssl_engine_set_default_rsavrfy(&cc->eng);
+#ifndef BEARSSL_SSL_BASIC
     br_ssl_engine_set_default_ecdsa(&cc->eng);
+#endif
     br_ssl_client_install_hashes(&cc->eng);
     br_ssl_engine_set_prf10(&cc->eng, &br_tls10_prf);
     br_ssl_engine_set_prf_sha256(&cc->eng, &br_tls12_sha256_prf);
     br_ssl_engine_set_prf_sha384(&cc->eng, &br_tls12_sha384_prf);
     br_ssl_engine_set_default_aes_cbc(&cc->eng);
+#ifndef BEARSSL_SSL_BASIC
     br_ssl_engine_set_default_aes_gcm(&cc->eng);
     br_ssl_engine_set_default_aes_ccm(&cc->eng);
     br_ssl_engine_set_default_des_cbc(&cc->eng);
     br_ssl_engine_set_default_chapol(&cc->eng);
+#endif
   }
 
 }
@@ -882,7 +890,14 @@ bool WiFiClientSecure::_installClientX509Validator() {
     if (_knownkey->isRSA()) {
       br_x509_knownkey_init_rsa(_x509_knownkey.get(), _knownkey->getRSA(), _knownkey_usages);
     } else if (_knownkey->isEC()) {
+#ifndef BEARSSL_SSL_BASIC
       br_x509_knownkey_init_ec(_x509_knownkey.get(), _knownkey->getEC(), _knownkey_usages);
+#else
+      (void) _knownkey;
+      (void) _knownkey_usages;
+      DEBUG_BSSL("_installClientX509Validator: Attempting to use EC keys in minimal cipher mode (no EC)\n");
+      return false;
+#endif
     }
     br_ssl_engine_set_x509(_eng, &_x509_knownkey->vtable);
   } else {
@@ -894,7 +909,9 @@ bool WiFiClientSecure::_installClientX509Validator() {
     }
     br_x509_minimal_init(_x509_minimal.get(), &br_sha256_vtable, _ta ? _ta->getTrustAnchors() : nullptr, _ta ? _ta->getCount() : 0);
     br_x509_minimal_set_rsa(_x509_minimal.get(), br_ssl_engine_get_rsavrfy(_eng));
+#ifndef BEARSSL_SSL_BASIC
     br_x509_minimal_set_ecdsa(_x509_minimal.get(), br_ssl_engine_get_ec(_eng), br_ssl_engine_get_ecdsa(_eng));
+#endif
     br_x509_minimal_install_hashes(_x509_minimal.get());
     if (_now) {
       // Magic constants convert to x509 times
@@ -953,9 +970,15 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
     br_ssl_client_set_single_rsa(_sc.get(), _chain ? _chain->getX509Certs() : nullptr, _chain ? _chain->getCount() : 0,
                                  _sk->getRSA(), br_rsa_pkcs1_sign_get_default());
   } else if (_sk && _sk->isEC()) {
+#ifndef BEARSSL_SSL_BASIC
     br_ssl_client_set_single_ec(_sc.get(), _chain ? _chain->getX509Certs() : nullptr, _chain ? _chain->getCount() : 0,
                                 _sk->getEC(), _allowed_usages,
                                 _cert_issuer_key_type, br_ec_get_default(), br_ecdsa_sign_asn1_get_default());
+#else
+    _freeSSL();
+    DEBUG_BSSL("_connectSSL: Attempting to use EC cert in minimal cipher mode (no EC)\n");
+    return false;
+#endif
   }
 
   // Restore session from the storage spot, if present
@@ -997,9 +1020,13 @@ bool WiFiClientSecure::_installServerX509Validator(const X509List *client_CA_ta)
     }
     br_x509_minimal_init(_x509_minimal.get(), &br_sha256_vtable, _ta->getTrustAnchors(), _ta->getCount());
     br_ssl_engine_set_default_rsavrfy(_eng);
+#ifndef BEARSSL_SSL_BASIC
     br_ssl_engine_set_default_ecdsa(_eng);
+#endif
     br_x509_minimal_set_rsa(_x509_minimal.get(), br_ssl_engine_get_rsavrfy(_eng));
+#ifndef BEARSSL_SSL_BASIC
     br_x509_minimal_set_ecdsa(_x509_minimal.get(), br_ssl_engine_get_ec(_eng), br_ssl_engine_get_ecdsa(_eng));
+#endif
     br_x509_minimal_install_hashes(_x509_minimal.get());
     if (_now) {
       // Magic constants convert to x509 times
@@ -1048,6 +1075,7 @@ bool WiFiClientSecure::_connectSSLServerRSA(const X509List *chain,
 bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
     unsigned cert_issuer_key_type, const PrivateKey *sk,
     const X509List *client_CA_ta) {
+#ifndef BEARSSL_SSL_BASIC
   _freeSSL();
   _oom_err = false;
   _sc_svr = std::make_shared<br_ssl_server_context>();
@@ -1076,6 +1104,14 @@ bool WiFiClientSecure::_connectSSLServerEC(const X509List *chain,
   }
 
   return _wait_for_handshake();
+#else
+  (void) chain;
+  (void) cert_issuer_key_type;
+  (void) sk;
+  (void) client_CA_ta;
+  DEBUG_BSSL("_connectSSLServerEC: Attempting to use EC cert in minimal cipher mode (no EC)\n");
+  return false;
+#endif
 }
 
 // Returns an error ID and possibly a string (if dest != null) of the last
