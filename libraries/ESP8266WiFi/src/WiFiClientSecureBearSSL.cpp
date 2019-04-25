@@ -965,6 +965,7 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
     return false;
   }
   br_ssl_engine_set_buffers_bidi(_eng, _iobuf_in.get(), _iobuf_in_size, _iobuf_out.get(), _iobuf_out_size);
+
   // Apply any client certificates, if supplied.
   if (_sk && _sk->isRSA()) {
     br_ssl_client_set_single_rsa(_sc.get(), _chain ? _chain->getX509Certs() : nullptr, _chain ? _chain->getCount() : 0,
@@ -1257,7 +1258,13 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
   //      0xc0, 0x13, // BR_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
   static const uint8_t clientHelloTail_P[] PROGMEM = {
     0x01, 0x00, // No compression
-    0x00, 0x05, // Extension length
+    0x00, 26 + 14 + 6 +  5, // Extension length
+    0x00, 0x0d, 0x00, 0x16, 0x00, 0x14, 0x04, 0x03, 0x03, 0x03, 0x05, 0x03,
+          0x06, 0x03, 0x02, 0x03, 0x04, 0x01, 0x03, 0x01, 0x05, 0x01, 0x06,
+	  0x01, 0x02, 0x01, // Supported signature algorithms
+    0x00, 0x0a, 0x00, 0x0a, 0x00, 0x08, 0x00, 0x17, 0x00, 0x18, 0x00, 0x19,
+          0x00, 0x1d, // Supported groups
+    0x00, 0x0b, 0x00, 0x02, 0x01, 0x00, // Supported EC formats
     0x00, 0x01, // Max Frag Len
     0x00, 0x01, // len of MaxFragLen
   };
@@ -1322,6 +1329,8 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
   uint8_t sessionLen;
   uint8_t cipher[2];
   uint8_t comp;
+  uint8_t extBytes[2];
+  uint16_t extLen;
 
   ret = probe.readBytes(fragResp, 5);
   if (!probe.connected() || (ret != 5) || (fragResp[0] != 0x16) || (fragResp[1] != 0x03) || (fragResp[2] != 0x03)) {
@@ -1388,10 +1397,40 @@ bool WiFiClientSecure::probeMaxFragmentLength(IPAddress ip, uint16_t port, uint1
     // short read or invalid compression
     return _SendAbort(probe, supportsLen);
   }
-  if (handLen > 0) {
-    // At this point, having an extension present means that the extension we
-    // sent was accepted.
-    supportsLen = true;
+
+  ret = probe.readBytes(extBytes, 2);
+  handLen -= ret;
+  extLen = extBytes[1] || (extBytes[0]<<8);
+  if ((extLen == 0) || (ret != 2)) {
+    return _SendAbort(probe, supportsLen);
+  }
+
+  while (handLen > 0) {
+    // Parse each extension and look for MFLN
+    uint8_t typeBytes[2];
+    ret = probe.readBytes(typeBytes, 2);
+    handLen -= 2;
+    if ((ret != 2) || (handLen <= 0) ) {
+      return _SendAbort(probe, supportsLen);
+    }
+    uint8_t lenBytes[2];
+    ret = probe.readBytes(lenBytes, 2);
+    handLen -= 2;
+    uint16_t extLen = lenBytes[1] | (lenBytes[0]<<8);
+    if ((ret != 2) || (handLen <= 0) || (extLen > 32) || (extLen > handLen) ) {
+      return _SendAbort(probe, supportsLen);
+    }
+    if ((typeBytes[0]==0x00) && (typeBytes[1]==0x01)) { // MFLN extension!
+      // If present and 1-byte in length, it's supported
+      return _SendAbort(probe, extLen==1 ? true : false);
+    }
+    // Skip the extension, move to next one
+    uint8_t junk[32];
+    ret = probe.readBytes(junk, extLen);
+    handLen -= extLen;
+    if (ret != extLen) {
+      return _SendAbort(probe, supportsLen);
+    }
   }
   return _SendAbort(probe, supportsLen);
 }
