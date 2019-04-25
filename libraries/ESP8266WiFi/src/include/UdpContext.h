@@ -207,17 +207,17 @@ public:
 
     CONST IPAddress& getRemoteAddress() CONST
     {
-        return current_addr.srcaddr;
+        return _currentAddr.srcaddr;
     }
 
     uint16_t getRemotePort() const
     {
-        return current_addr.srcport;
+        return _currentAddr.srcport;
     }
 
     const IPAddress& getDestAddress() const
     {
-        return current_addr.dstaddr;
+        return _currentAddr.dstaddr;
     }
 
     uint16_t getLocalPort() const
@@ -231,33 +231,41 @@ public:
     {
         if (!_rx_buf)
             return false;
-
         if (!_first_buf_taken)
         {
             _first_buf_taken = true;
             return true;
         }
 
-        auto head = _rx_buf;
+        auto deleteme = _rx_buf;
         _rx_buf = _rx_buf->next;
-        _rx_buf_offset = 0;
 
         if (_rx_buf)
         {
-            pbuf_ref(_rx_buf);
+            // first rx_buf contains an address helper,
+            // copy it to "current address"
+            auto helper = (AddrHelper*)ALIGNER(_rx_buf->payload);
+            _currentAddr = *helper;
 
-            // _rx_buf is an address helper
-            current_addr = *((addrhelper_s*)ALIGNER(_rx_buf->payload));
-
-            // swallow helper pbuf
-            auto head = _rx_buf;
+            // destroy helper
+#if 0 // constructor not called in _recv, see #if
+            helper->~AddrHelper();
+#else
+            helper->srcaddr.~IPAddress();
+            helper->dstaddr.~IPAddress();
+#endif
+            // forwarding in rx_buf list, next one is effective data
+            // current (not ref'ed) one will be pbuf_free'd with deleteme
             _rx_buf = _rx_buf->next;
-            pbuf_free(head);
 
+            // this rx_buf is not nullptr by construction
+            // ref'ing it to prevent release from the below pbuf_free(deleteme)
             pbuf_ref(_rx_buf);
         }
-        pbuf_free(head);
-        return _rx_buf != 0;
+        pbuf_free(deleteme);
+
+        _rx_buf_offset = 0;
+        return _rx_buf != nullptr;
     }
 
     int read()
@@ -426,13 +434,15 @@ private:
     }
 
     void _recv(udp_pcb *upcb, pbuf *pb,
-            const ip_addr_t *addr, u16_t port)
+            const ip_addr_t *srcaddr, u16_t srcport)
     {
         (void) upcb;
-        (void) addr;
-        (void) port;
 
-        addrhelper_s* helper;
+#if LWIP_VERSION_MAJOR == 1
+    #define TEMPDSTADDR (&current_iphdr_dest)
+#else
+    #define TEMPDSTADDR (ip_current_dest_addr())
+#endif
 
         // chain this helper pbuf first
         if (_rx_buf)
@@ -448,31 +458,37 @@ private:
             // packet is from v4 or v6.
             //
             // Now storing data in an intermediate chained pbuf containing
-            // addrhelper_s
+            // AddrHelper
 
             // allocate new pbuf to store addresses/ports
-            pbuf* pb_helper = pbuf_alloc(PBUF_RAW, sizeof(addrhelper_s) + /*alignment shift*/4, PBUF_RAM);
+            pbuf* pb_helper = pbuf_alloc(PBUF_RAW, sizeof(AddrHelper) + /*alignment shift*/4, PBUF_RAM);
             if (!pb_helper)
             {
                 // memory issue - discard received data
                 pbuf_free(pb);
                 return;
             }
-
-            helper = (addrhelper_s*)ALIGNER(pb_helper->payload);
             // construct in place
-            new(&helper->srcaddr) IPAddress();
-            new(&helper->dstaddr) IPAddress();
+            AddrHelper* helper = (AddrHelper*)ALIGNER(pb_helper->payload);
+#if 0 // should work but does not
+            new(&helper) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
+#else
+            new(&helper->srcaddr) IPAddress(srcaddr);
+            new(&helper->dstaddr) IPAddress(TEMPDSTADDR);
+            helper->srcport = srcport;
+#endif
+            // chain it
             pbuf_cat(_rx_buf, pb_helper);
 
-            // now chain effective data
-            // chain the new pbuf to the existing one
+            // now chain the new data pbuf
             DEBUGV(":urch %d, %d\r\n", _rx_buf->tot_len, pb->tot_len);
             pbuf_cat(_rx_buf, pb);
         }
         else
         {
-            helper = &current_addr;
+            _currentAddr.srcaddr = srcaddr;
+            _currentAddr.dstaddr = TEMPDSTADDR;
+            _currentAddr.srcport = srcport;
 
             DEBUGV(":urn %d\r\n", pb->tot_len);
             _first_buf_taken = false;
@@ -480,27 +496,19 @@ private:
             _rx_buf_offset = 0;
         }
 
-        // fill addresses and port
-#if LWIP_VERSION_MAJOR == 1
-        helper->srcaddr = current_iphdr_src;
-        helper->dstaddr = current_iphdr_dest;
-#else
-        helper->srcaddr = *ip_current_src_addr();
-        helper->dstaddr = *ip_current_dest_addr();
-#endif
-        helper->srcport = port;
-
         if (_on_rx) {
             _on_rx();
         }
-    }
 
+    #undef TEMPDSTADDR
+
+    }
 
     static void _s_recv(void *arg,
             udp_pcb *upcb, pbuf *p,
-            CONST ip_addr_t *addr, u16_t port)
+            CONST ip_addr_t *srcaddr, u16_t srcport)
     {
-        reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, addr, port);
+        reinterpret_cast<UdpContext*>(arg)->_recv(upcb, p, srcaddr, srcport);
     }
 
 private:
@@ -516,11 +524,16 @@ private:
 #ifdef LWIP_MAYBE_XCC
     uint16_t _mcast_ttl;
 #endif
-    struct addrhelper_s
+    struct AddrHelper
     {
         IPAddress srcaddr, dstaddr;
         int16_t srcport;
-    } current_addr;
+
+        AddrHelper() { }
+        AddrHelper(const ip_addr_t* src, const ip_addr_t* dst, uint16_t srcport):
+            srcaddr(src), dstaddr(dst), srcport(srcport) { }
+    };
+    AddrHelper _currentAddr;
 };
 
 
