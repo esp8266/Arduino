@@ -105,7 +105,7 @@ class WiFiClientSecure : public WiFiClient {
 
     // Returns whether MFLN negotiation for the above buffer sizes succeeded (after connection)
     int getMFLNStatus() {
-      return connected() ? br_ssl_engine_get_mfln_negotiated(_eng) : false;
+      return connected() && br_ssl_engine_get_mfln_negotiated(_eng);
     }
 
     // Return an error code and possibly a text string in a passed-in buffer with last SSL failure
