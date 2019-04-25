@@ -247,13 +247,9 @@ public:
             auto helper = (AddrHelper*)ALIGNER(_rx_buf->payload);
             _currentAddr = *helper;
 
-            // destroy helper
-#if 0 // constructor not called in _recv, see #if
+            // destroy the helper
             helper->~AddrHelper();
-#else
-            helper->srcaddr.~IPAddress();
-            helper->dstaddr.~IPAddress();
-#endif
+
             // forwarding in rx_buf list, next one is effective data
             // current (not ref'ed) one will be pbuf_free'd with deleteme
             _rx_buf = _rx_buf->next;
@@ -469,14 +465,7 @@ private:
                 return;
             }
             // construct in place
-            AddrHelper* helper = (AddrHelper*)ALIGNER(pb_helper->payload);
-#if 0 // should work but does not
-            new(&helper) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
-#else
-            new(&helper->srcaddr) IPAddress(srcaddr);
-            new(&helper->dstaddr) IPAddress(TEMPDSTADDR);
-            helper->srcport = srcport;
-#endif
+            new(ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
             // chain it
             pbuf_cat(_rx_buf, pb_helper);
 
