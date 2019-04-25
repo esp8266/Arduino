@@ -1077,9 +1077,9 @@ macros = {
     ######################## SSL supported protocols
 
     'ssl_cipher_menu': collections.OrderedDict([
-        ( '.menu.ssl.all', 'All SSL ciphers' ),
+        ( '.menu.ssl.all', 'All SSL ciphers (most compatible)' ),
         ( '.menu.ssl.all.build.sslflags', ''),
-        ( '.menu.ssl.basic', 'Basic SSL ciphers' ),
+        ( '.menu.ssl.basic', 'Basic SSL ciphers (lower ROM use)' ),
         ( '.menu.ssl.basic.build.sslflags', '-DBEARSSL_SSL_BASIC'),
         ]),
 
