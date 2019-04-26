@@ -103,6 +103,11 @@ class WiFiClientSecure : public WiFiClient {
     // Sets the requested buffer size for transmit and receive
     void setBufferSizes(int recv, int xmit);
 
+    // Returns whether MFLN negotiation for the above buffer sizes succeeded (after connection)
+    int getMFLNStatus() {
+      return connected() && br_ssl_engine_get_mfln_negotiated(_eng);
+    }
+
     // Return an error code and possibly a text string in a passed-in buffer with last SSL failure
     int getLastSSLError(char *dest = NULL, size_t len = 0);
 
@@ -117,7 +122,7 @@ class WiFiClientSecure : public WiFiClient {
     bool setCiphers(std::vector<uint16_t> list);
     bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
 
-    // Check for Maximum Fragment Length support for given len
+    // Check for Maximum Fragment Length support for given len before connection (possibly insecure)
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
