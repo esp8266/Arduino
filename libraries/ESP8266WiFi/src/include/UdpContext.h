@@ -32,7 +32,8 @@ void esp_schedule();
 
 #include <AddrList.h>
 
-#define ALIGNER(x) ((void*)((((intptr_t)(x))+3)&~3))
+#define PBUF_ALIGNER_ADJUST 4
+#define PBUF_ALIGNER(x) ((void*)((((intptr_t)(x))+3)&~3))
 
 class UdpContext
 {
@@ -242,19 +243,23 @@ public:
 
         if (_rx_buf)
         {
-            // first rx_buf contains an address helper,
+            // we have interleaved informations on addresses within reception pbuf chain:
+            // before: (data-pbuf) -> (data-pbuf) -> (data-pbuf) -> ... in the receiving order
+            // now: (address-info-pbuf -> data-pbuf) -> (address-info-pbuf -> data-pbuf) -> ...
+
+            // so the first rx_buf contains an address helper,
             // copy it to "current address"
-            auto helper = (AddrHelper*)ALIGNER(_rx_buf->payload);
+            auto helper = (AddrHelper*)PBUF_ALIGNER(_rx_buf->payload);
             _currentAddr = *helper;
 
-            // destroy the helper
+            // destroy the helper in the about-to-be-released pbuf
             helper->~AddrHelper();
 
-            // forwarding in rx_buf list, next one is effective data
+            // forward in rx_buf list, next one is effective data
             // current (not ref'ed) one will be pbuf_free'd with deleteme
             _rx_buf = _rx_buf->next;
 
-            // this rx_buf is not nullptr by construction
+            // this rx_buf is not nullptr by construction,
             // ref'ing it to prevent release from the below pbuf_free(deleteme)
             pbuf_ref(_rx_buf);
         }
@@ -457,7 +462,7 @@ private:
             // AddrHelper
 
             // allocate new pbuf to store addresses/ports
-            pbuf* pb_helper = pbuf_alloc(PBUF_RAW, sizeof(AddrHelper) + /*alignment shift*/4, PBUF_RAM);
+            pbuf* pb_helper = pbuf_alloc(PBUF_RAW, sizeof(AddrHelper) + PBUF_ALIGNER_ADJUST, PBUF_RAM);
             if (!pb_helper)
             {
                 // memory issue - discard received data
@@ -465,7 +470,7 @@ private:
                 return;
             }
             // construct in place
-            new(ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
+            new(PBUF_ALIGNER(pb_helper->payload)) AddrHelper(srcaddr, TEMPDSTADDR, srcport);
             // chain it
             pbuf_cat(_rx_buf, pb_helper);
 
