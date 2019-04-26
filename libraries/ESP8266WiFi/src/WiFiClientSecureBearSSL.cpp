@@ -210,7 +210,7 @@ bool WiFiClientSecure::flush(unsigned int maxWaitMs) {
   return WiFiClient::flush(maxWaitMs);
 }
 
-int WiFiClientSecure::connect(CONST IPAddress& ip, uint16_t port) {
+int WiFiClientSecure::connect(IPAddress ip, uint16_t port) {
   if (!WiFiClient::connect(ip, port)) {
     return 0;
   }
