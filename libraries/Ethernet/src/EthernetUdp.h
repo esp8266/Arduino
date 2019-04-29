@@ -94,9 +94,9 @@ public:
   virtual void flush();	// Finish reading the current packet
 
   // Return the IP address of the host who sent the current incoming packet
-  virtual IPAddress remoteIP() const { return _remoteIP; };
+  virtual IPAddress remoteIP() { return _remoteIP; };
   // Return the port of the host who sent the current incoming packet
-  virtual uint16_t remotePort() const { return _remotePort; };
+  virtual uint16_t remotePort() { return _remotePort; };
 };
 
 #endif
