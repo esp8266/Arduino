@@ -93,7 +93,7 @@ void hspi_slave_begin(uint8_t status_len, void * arg)
     SPI1P = (1 << 19);
     SPI1CMD = SPIBUSY;
 
-    // Timing of MISO makes slave to change MISO value on falling edge on CLK signal as is reuired for SPIMode 1
+    // Setting SPIC2MISODM_S makes slave to change MISO value on falling edge on CLK signal as is required for SPIMode 1
     // Setting SPIC2MOSIDN_S is probably not critical, all tests run fine with this setting
     SPI1C2 = (0x2 << SPIC2MOSIDN_S) | (0x1 << SPIC2MISODM_S);
 
