@@ -249,7 +249,21 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
  */
 
 #if LWIP_VERSION_MAJOR != 1
-#undef netif_set_addr // need to call lwip-v1.4 netif_set_addr()
+/*
+  About the following call in the end of ESP8266WiFiSTAClass::config():
+      netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
+
+  With lwip2, it is needed to trigger IP address change.
+      Recall: when lwip2 is enabled, lwip1 api is still used by espressif firmware
+          https://github.com/d-a-v/esp82xx-nonos-linklayer/tree/25d5e8186f710a230221021cba97727dbfdfd953#how-it-works
+
+  We need first to disable the lwIP API redirection for netif_set_addr() so lwip1's call will be linked:
+      https://github.com/d-a-v/esp82xx-nonos-linklayer/blob/25d5e8186f710a230221021cba97727dbfdfd953/glue-lwip/arch/cc.h#L122
+
+  We also need to declare its prototype using ip4_addr_t instead of ip_addr_t because lwIP-1.x never has IPv6.
+  No need to worry about this #undef, this call is only needed in lwip2, and never used in arduino core code.
+ */
+#undef netif_set_addr // need to call lwIP-v1.4 netif_set_addr()
 extern "C" struct netif* eagle_lwip_getif (int netif_index);
 extern "C" void netif_set_addr (struct netif* netif, ip4_addr_t* ip, ip4_addr_t* netmask, ip4_addr_t* gw);
 #endif
@@ -318,7 +332,8 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
   }
 
 #if LWIP_VERSION_MAJOR != 1
-  // trigger address change by calling lwip-v1.4 api
+  // trigger address change by calling lwIP-v1.4 api
+  // (see explanation above)
   netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
 #endif
 
