@@ -206,7 +206,7 @@ String & String::copy(const char *cstr, unsigned int length) {
         return *this;
     }
     setLen(length);
-    strcpy(wbuffer(), cstr);
+    memcpy(wbuffer(), cstr, length + 1);
     return *this;
 }
 
@@ -216,7 +216,7 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length) {
         return *this;
     }
     setLen(length);
-    strcpy_P(wbuffer(), (PGM_P)pstr);
+    memcpy_P(wbuffer(), (PGM_P)pstr, length + 1);
     return *this;
 }
 
@@ -224,7 +224,7 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length) {
 void String::move(String &rhs) {
     if(buffer()) {
         if(capacity() >= rhs.len()) {
-            strcpy(wbuffer(), rhs.buffer());
+            memcpy(wbuffer(), rhs.buffer(), rhs.length() + 1);
             setLen(rhs.len());
 	    rhs.invalidate();
             return;
@@ -326,7 +326,7 @@ unsigned char String::concat(const char *cstr, unsigned int length) {
         return 1;
     if(!reserve(newlen))
         return 0;
-    strcpy(wbuffer() + len(), cstr);
+    memcpy(wbuffer() + len(), cstr, length + 1);
     setLen(newlen);
     return 1;
 }
