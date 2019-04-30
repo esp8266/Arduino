@@ -135,8 +135,8 @@ The following IP configuration may be provided:
       Serial.println();
 
       Serial.printf("Connecting to %s\n", ssid);
-      WiFi.begin(ssid, password);
       WiFi.config(staticIP, gateway, subnet);
+      WiFi.begin(ssid, password);
       while (WiFi.status() != WL_CONNECTED)
       {
         delay(500);
