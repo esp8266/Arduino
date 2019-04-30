@@ -38,9 +38,8 @@ void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) {
 
-    HTTPClient http;
-
     WiFiClient client;
+    HTTPClient http; //must be declared after WiFiClient for correct destruction order, because used by http.begin(client,...)
 
     Serial.print("[HTTP] begin...\n");
 
