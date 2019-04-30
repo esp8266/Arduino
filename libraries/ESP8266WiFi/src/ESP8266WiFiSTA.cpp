@@ -247,6 +247,13 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
  * @param dns1       Static DNS server 1
  * @param dns2       Static DNS server 2
  */
+
+#if LWIP_VERSION_MAJOR != 1
+#undef netif_set_addr // need to call lwip-v1.4 netif_set_addr()
+extern "C" struct netif* eagle_lwip_getif (int netif_index);
+extern "C" void netif_set_addr (struct netif* netif, ip4_addr_t* ip, ip4_addr_t* netmask, ip4_addr_t* gw);
+#endif
+
 bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress arg2, IPAddress arg3, IPAddress dns2) {
 
   if(!WiFi.enableSTA(true)) {
@@ -309,6 +316,11 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
       // Set DNS2-Server
       dns_setserver(1, dns2);
   }
+
+#if LWIP_VERSION_MAJOR != 1
+  // trigger address change by calling lwip-v1.4 api
+  netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
+#endif
 
   return true;
 }
