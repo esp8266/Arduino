@@ -95,9 +95,9 @@ public:
   void flush() override;	// Finish reading the current packet
 
   // Return the IP address of the host who sent the current incoming packet
-  IPAddress remoteIP() const override;
+  IPAddress remoteIP() override;
   // Return the port of the host who sent the current incoming packet
-  uint16_t remotePort() const override;
+  uint16_t remotePort() override;
   // Return the destination address for incoming packets,
   // useful to distinguish multicast and ordinary packets
   IPAddress destinationIP() const;

@@ -15,37 +15,59 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
 import os
 import subprocess
 
-parser = argparse.ArgumentParser(description='Generate core_version.h')
-parser.add_argument('-b', '--build_path', action='store', required=True, help='build.path variable')
-parser.add_argument('-p', '--platform_path', action='store', required=True, help='platform.path variable')
-parser.add_argument('-v', '--version', action='store', required=True, help='version variable')
 
-args = parser.parse_args()
+def generate(path, platform_path, git_ver="0xffffffff", git_desc="unspecified"):
+    def git(*args):
+        cmd = ["git", "-C", platform_path]
+        cmd.extend(args)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+        return proc.stdout.readlines()[0].strip()
 
-core = args.build_path + '/core'
-try:
-    os.makedirs(core)
-except:
-    pass
+    try:
+        git_ver = git("rev-parse", "--short=8", "HEAD")
+        git_desc = git("describe", "--tags")
+    except:
+        pass
 
-out = open(core + '/core_version.h', "w")
+    with open(path, "w") as out:
+        out.write("#define ARDUINO_ESP8266_GIT_VER 0x{}\n".format(git_ver))
+        out.write("#define ARDUINO_ESP8266_GIT_DESC {}\n".format(git_desc))
 
-try:
-    p = subprocess.Popen(['git', '--git-dir', args.platform_path + '/.git', 'rev-parse', '--short=8', 'HEAD'], stdout = subprocess.PIPE )
-    git_ver = '0x' + p.stdout.readlines()[0].strip()
-    p = subprocess.Popen(['git', '--git-dir', args.platform_path + '/.git', 'describe', '--tags'], stdout = subprocess.PIPE )
-    git_desc = p.stdout.readlines()[0].strip()
-except:
-    git_ver = '0xffffffff'
-    git_desc = args.version
 
-out.write('#define ARDUINO_ESP8266_GIT_VER  ' + git_ver + '\n')
-out.write('#define ARDUINO_ESP8266_GIT_DESC ' + git_desc + '\n')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate core_version.h")
 
-out.close()
+    parser.add_argument(
+        "-b", "--build_path", action="store", required=True, help="build.path variable"
+    )
+    parser.add_argument(
+        "-p",
+        "--platform_path",
+        action="store",
+        required=True,
+        help="platform.path variable",
+    )
+    parser.add_argument(
+        "-v", "--version", action="store", required=True, help="version variable"
+    )
+    parser.add_argument("-i", "--include_dir", default="core")
+
+    args = parser.parse_args()
+
+    include_dir = os.path.join(args.build_path, args.include_dir)
+    try:
+        os.makedirs(include_dir)
+    except:
+        pass
+
+    generate(
+        os.path.join(include_dir, "core_version.h"),
+        args.platform_path,
+        git_desc=args.version,
+    )
