@@ -264,7 +264,7 @@ by user [@mytrain](https://github.com/mytrain) and discussed in
 
 If you prefer external terminal program, then for Windows users we can
 recommend free and handy
-`Termite <http://www.compuphase.com/software_termite.htm>`__.
+`Termite <https://www.compuphase.com/software_termite.htm>`__.
 
 Nodemcu
 ^^^^^^^
@@ -370,7 +370,7 @@ If this is still not the case, then review once more all discussed steps in the 
 
 * [ ] What is the name and version of your IDE and O/S?
 
-If you are stuck at certain step, then post this list on `ESP8266 Community Forum <http://www.esp8266.com/>`__ asking for support.
+If you are stuck at certain step, then post this list on `ESP8266 Community Forum <https://www.esp8266.com/>`__ asking for support.
 
 Conclusion
 ~~~~~~~~~~
@@ -389,7 +389,7 @@ detailed upload log for inconsistencies with IDE settings.
 Verify your connection diagram and wave-form for consistency with
 selected reset method.
 
-If you get stuck, then ask `community <http://www.esp8266.com/>`__ for
+If you get stuck, then ask `community <https://www.esp8266.com/>`__ for
 support providing summary of all completed checks.
 
 .. figure:: pictures/a01-test-stand.jpg
