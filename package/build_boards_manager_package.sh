@@ -155,7 +155,8 @@ curl -L -o $old_json "https://github.com/esp8266/Arduino/releases/download/${bas
 new_json=package_esp8266com_index.json
 
 set +e
-python ../../merge_packages.py $new_json $old_json >tmp && mv tmp $new_json && rm $old_json
+# Merge the old and new, then drop any obsolete package versions
+python ../../merge_packages.py $new_json $old_json | python ../../drop_versions.py - platforms 1.6.5-947-g39819f0 2.5.0-beta1 2.5.0-beta2 2.5.0-beta3 2.4.0-rc1 2.4.0-rc2 >tmp && mv tmp $new_json && rm $old_json
 
 popd
 popd

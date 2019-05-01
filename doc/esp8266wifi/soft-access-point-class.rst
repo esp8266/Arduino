@@ -61,7 +61,7 @@ Function will return ``true`` or ``false`` depending on result of setting the so
 Notes:
 
 - The network established by softAP will have default IP address of 192.168.4.1. This address may be changed using ``softAPConfig`` (see below). 
-- Even though ESP8266 can operate in soft-AP + station mode, it actually has only one hardware channel. Therefore in soft-AP + station mode, the soft-AP channel will default to the number used by station. For more information how this may affect operation of stations connected to ESP8266's soft-AP, please check `this FAQ entry <http://bbs.espressif.com/viewtopic.php?f=10&t=324>`__ on Espressif forum.
+- Even though ESP8266 can operate in soft-AP + station mode, it actually has only one hardware channel. Therefore in soft-AP + station mode, the soft-AP channel will default to the number used by station. For more information how this may affect operation of stations connected to ESP8266's soft-AP, please check `this FAQ entry <https://bbs.espressif.com/viewtopic.php?f=10&t=324>`__ on Espressif forum.
 
 softAPConfig
 ^^^^^^^^^^^^

@@ -56,7 +56,7 @@ Here is an overview of the release process. See the section below for detailed i
 
 4. Travis CI uploads boards manager package (.zip file) and package index (.json file) to Github Releases, creating a draft release at the same time.
 
-5. Travis CI also uploads package index .json file to `http://arduino.esp8266.com/stable/package_esp8266_index.json`, i.e. well-known URL used by most users. 
+5. Travis CI also uploads package index .json file to `https://arduino.esp8266.com/stable/package_esp8266_index.json`, i.e. well-known URL used by most users.
 
 6. When the draft release is created, maintainer edits release description and inserts changelog into the description field, unmarks the release as draft, and publishes the release.
 
@@ -123,7 +123,7 @@ The following points assume work in a direct clone of the repository, and not in
 
 6. Check that the new (draft) release has been created (no editing at this point!), see https://github.com/esp8266/Arduino/releases. Check that the boards manager package .zip file has been successfully uploaded as a release artifact.
 
-7. Check that the package index downloaded from http://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
+7. Check that the package index downloaded from https://arduino.esp8266.com/stable/package_esp8266com_index.json contains an entry for the new version (it may not be the first one).
 
 8. Navigate to release list in Github here https://github.com/esp8266/Arduino/releases, press "Edit" button to edit release description, paste release notes, and publish it.
 
