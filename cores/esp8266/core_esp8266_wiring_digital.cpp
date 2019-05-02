@@ -185,11 +185,15 @@ extern void __detachInterrupt(uint8_t pin) {
     interrupt_reg &= ~(1 << pin);
     interrupt_handler_t* handler = &interrupt_handlers[pin];
     handler->mode = 0;
-    handler->fn = 0;
-    handler->arg = 0;
+    handler->fn = nullptr;
+    handler->arg = nullptr;
     if (interrupt_reg)
       ETS_GPIO_INTR_ENABLE();
   }
+}
+
+extern interrupt_handler_t* __getInterruptHandler(uint8_t pin) {
+	return (pin < 16) ? &interrupt_handlers[pin] : nullptr;
 }
 
 void initPins() {
