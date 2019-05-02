@@ -26,7 +26,7 @@
 size_t StreamString::write(const uint8_t *data, size_t size) {
     if(size && data) {
         const unsigned int newlen = length() + size;
-        if(reserve(newlen)) {
+        if(reserve(newlen + 1)) {
             memcpy((void *) (wbuffer() + len()), (const void *) data, size);
             setLen(newlen);
             *(wbuffer() + newlen) = 0x00; // add null for string end
