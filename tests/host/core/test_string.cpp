@@ -17,6 +17,7 @@
 #include <string.h>
 #include <WString.h>
 #include <limits.h>
+#include <StreamString.h>
 
 TEST_CASE("String::trim", "[core][String]")
 {
@@ -439,4 +440,15 @@ TEST_CASE("Issue #5949 - Overlapping src/dest in replace", "[core][String]")
   REQUIRE(blah == "blah");
   blah.replace(blah, blah);
   REQUIRE(blah == "blah");
+}
+
+
+TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
+{
+    StreamString s;
+    s.print('{');
+    s.print('\"');
+    s.print(String("message"));
+    s.print('\"');
+    REQUIRE(blah == "{\"message\"");
 }
