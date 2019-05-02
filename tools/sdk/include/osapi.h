@@ -1,5 +1,25 @@
 /*
- * Copyright (c) 2010 Espressif System
+ * ESPRESSIF MIT License
+ *
+ * Copyright (c) 2016 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
+ *
+ * Permission is hereby granted for use on ESPRESSIF SYSTEMS ESP8266 only, in which case,
+ * it is free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 
 #ifndef _OSAPI_H_
@@ -7,6 +27,10 @@
 
 #include <string.h>
 #include "user_config.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define os_bzero ets_bzero
 #define os_delay_us ets_delay_us
@@ -44,18 +68,23 @@
 #define os_sprintf  ets_sprintf
 #define os_update_cpu_frequency ets_update_cpu_frequency
 
+extern int os_printf_plus(const char * format, ...) __attribute__ ((format (printf, 1, 2)));
 #ifdef USE_OPTIMIZE_PRINTF
 #define os_printf(fmt, ...) do {	\
 	static const char flash_str[] ICACHE_RODATA_ATTR STORE_ATTR = fmt;	\
 	os_printf_plus(flash_str, ##__VA_ARGS__);	\
 	} while(0)
 #else
-extern int os_printf_plus(const char * format, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf	os_printf_plus
 #endif
 
 unsigned long os_random(void);
 int os_get_random(unsigned char *buf, size_t len);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

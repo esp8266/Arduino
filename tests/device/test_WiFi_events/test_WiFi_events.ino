@@ -3,7 +3,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <BSTest.h>
-#include <test_config.h>
 #include <pgmspace.h>
 
 BS_ENV_DECLARE();
@@ -36,7 +35,7 @@ TEST_CASE("WiFi.onEvent is called for specific events", "[wifi][events]")
     WiFi.onEvent(onWiFiEvent, WIFI_EVENT_ANY);
 
     WiFi.mode(WIFI_STA);
-    WiFi.begin(STA_SSID, STA_PASS);
+    WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     unsigned long start = millis();
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
@@ -68,7 +67,7 @@ TEST_CASE("STA mode events are called both when using DHCP and static config", "
 
     // run the test with DHCP
     WiFi.mode(WIFI_STA);
-    WiFi.begin(STA_SSID, STA_PASS);
+    WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     unsigned long start = millis();
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
@@ -88,7 +87,7 @@ TEST_CASE("STA mode events are called both when using DHCP and static config", "
 
     WiFi.mode(WIFI_STA);
     WiFi.config(localIP, gatewayIP, subnetMask);
-    WiFi.begin(STA_SSID, STA_PASS);
+    WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     start = millis();
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
@@ -115,7 +114,7 @@ TEST_CASE("Events are not called if handler is deleted", "[wifi][events]")
     });
 
     WiFi.mode(WIFI_STA);
-    WiFi.begin(STA_SSID, STA_PASS);
+    WiFi.begin(getenv("STA_SSID"), getenv("STA_PASS"));
     unsigned long start = millis();
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);

@@ -110,19 +110,33 @@
 #ifndef SPIFFS_NUCLEUS_H_
 #define SPIFFS_NUCLEUS_H_
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #define _SPIFFS_ERR_CHECK_FIRST         (SPIFFS_ERR_INTERNAL - 1)
 #define SPIFFS_ERR_CHECK_OBJ_ID_MISM    (SPIFFS_ERR_INTERNAL - 1)
 #define SPIFFS_ERR_CHECK_SPIX_MISM      (SPIFFS_ERR_INTERNAL - 2)
 #define SPIFFS_ERR_CHECK_FLAGS_BAD      (SPIFFS_ERR_INTERNAL - 3)
 #define _SPIFFS_ERR_CHECK_LAST          (SPIFFS_ERR_INTERNAL - 4)
 
+// visitor result, continue searching
 #define SPIFFS_VIS_COUNTINUE            (SPIFFS_ERR_INTERNAL - 20)
+// visitor result, continue searching after reloading lu buffer
 #define SPIFFS_VIS_COUNTINUE_RELOAD     (SPIFFS_ERR_INTERNAL - 21)
+// visitor result, stop searching
 #define SPIFFS_VIS_END                  (SPIFFS_ERR_INTERNAL - 22)
 
-#define SPIFFS_EV_IX_UPD                0
-#define SPIFFS_EV_IX_NEW                1
-#define SPIFFS_EV_IX_DEL                2
+// updating an object index contents
+#define SPIFFS_EV_IX_UPD                (0)
+// creating a new object index
+#define SPIFFS_EV_IX_NEW                (1)
+// deleting an object index
+#define SPIFFS_EV_IX_DEL                (2)
+// moving an object index without updating contents
+#define SPIFFS_EV_IX_MOV                (3)
+// updating an object index header data only, not the table itself
+#define SPIFFS_EV_IX_UPD_HDR            (4)
 
 #define SPIFFS_OBJ_ID_IX_FLAG           ((spiffs_obj_id)(1<<(8*sizeof(spiffs_obj_id)-1)))
 
@@ -130,6 +144,22 @@
 
 #define SPIFFS_OBJ_ID_DELETED           ((spiffs_obj_id)0)
 #define SPIFFS_OBJ_ID_FREE              ((spiffs_obj_id)-1)
+
+
+
+#if defined(__GNUC__) || defined(__clang__)
+    /* For GCC and clang */
+#define SPIFFS_PACKED __attribute__((packed))
+#elif defined(__ICCARM__) || defined(__CC_ARM)
+    /* For IAR ARM and Keil MDK-ARM compilers */
+#define SPIFFS_PACKED 
+
+#else
+    /* Unknown compiler */
+#define SPIFFS_PACKED 
+#endif
+
+
 
 #if SPIFFS_USE_MAGIC
 #if !SPIFFS_USE_MAGIC_LENGTH
@@ -228,6 +258,17 @@
 // object index span index number for given data span index or entry
 #define SPIFFS_OBJ_IX_ENTRY_SPAN_IX(fs, spix) \
   ((spix) < SPIFFS_OBJ_HDR_IX_LEN(fs) ? 0 : (1+((spix)-SPIFFS_OBJ_HDR_IX_LEN(fs))/SPIFFS_OBJ_IX_LEN(fs)))
+// get data span index for object index span index
+#define SPIFFS_DATA_SPAN_IX_FOR_OBJ_IX_SPAN_IX(fs, spix) \
+  ( (spix) == 0 ? 0 : (SPIFFS_OBJ_HDR_IX_LEN(fs) + (((spix)-1) * SPIFFS_OBJ_IX_LEN(fs))) )
+
+#if SPIFFS_FILEHDL_OFFSET
+#define SPIFFS_FH_OFFS(fs, fh)   ((fh) != 0 ? ((fh) + (fs)->cfg.fh_ix_offset) : 0)
+#define SPIFFS_FH_UNOFFS(fs, fh) ((fh) != 0 ? ((fh) - (fs)->cfg.fh_ix_offset) : 0)
+#else
+#define SPIFFS_FH_OFFS(fs, fh)   (fh)
+#define SPIFFS_FH_UNOFFS(fs, fh) (fh)
+#endif
 
 
 #define SPIFFS_OP_T_OBJ_LU    (0<<0)
@@ -272,26 +313,26 @@
 #define SPIFFS_API_CHECK_MOUNT(fs) \
   if (!SPIFFS_CHECK_MOUNT((fs))) { \
     (fs)->err_code = SPIFFS_ERR_NOT_MOUNTED; \
-    return -1; \
+    return SPIFFS_ERR_NOT_MOUNTED; \
   }
 
 #define SPIFFS_API_CHECK_CFG(fs) \
   if (!SPIFFS_CHECK_CFG((fs))) { \
     (fs)->err_code = SPIFFS_ERR_NOT_CONFIGURED; \
-    return -1; \
+    return SPIFFS_ERR_NOT_CONFIGURED; \
   }
 
 #define SPIFFS_API_CHECK_RES(fs, res) \
   if ((res) < SPIFFS_OK) { \
     (fs)->err_code = (res); \
-    return -1; \
+    return (res); \
   }
 
 #define SPIFFS_API_CHECK_RES_UNLOCK(fs, res) \
   if ((res) < SPIFFS_OK) { \
     (fs)->err_code = (res); \
     SPIFFS_UNLOCK(fs); \
-    return -1; \
+    return (res); \
   }
 
 #define SPIFFS_VALIDATE_OBJIX(ph, objid, spix) \
@@ -312,7 +353,7 @@
     if ((ph).span_ix != (spix)) return SPIFFS_ERR_DATA_SPAN_MISMATCH;
 
 
-// check id
+// check id, only visit matching objec ids
 #define SPIFFS_VIS_CHECK_ID     (1<<0)
 // report argument object id to visitor - else object lookup id is reported
 #define SPIFFS_VIS_CHECK_PH     (1<<1)
@@ -418,12 +459,22 @@ typedef struct {
   spiffs_span_ix cursor_objix_spix;
   // current absolute offset
   u32_t offset;
-  // current file descriptor offset
+  // current file descriptor offset (cached)
   u32_t fdoffset;
   // fd flags
   spiffs_flags flags;
 #if SPIFFS_CACHE_WR
   spiffs_cache_page *cache_page;
+#endif
+#if SPIFFS_TEMPORAL_FD_CACHE
+  // djb2 hash of filename
+  u32_t name_hash;
+  // hit score (score == 0 indicates never used fd)
+  u16_t score;
+#endif
+#if SPIFFS_IX_MAP
+  // spiffs index map, if 0 it means unmapped
+  spiffs_ix_map *ix_map;
 #endif
 } spiffs_fd;
 
@@ -433,7 +484,7 @@ typedef struct {
 // page header, part of each page except object lookup pages
 // NB: this is always aligned when the data page is an object index,
 // as in this case struct spiffs_page_object_ix is used
-typedef struct __attribute(( packed )) {
+typedef struct SPIFFS_PACKED {
   // object id
   spiffs_obj_id obj_id;
   // object span index
@@ -443,7 +494,7 @@ typedef struct __attribute(( packed )) {
 } spiffs_page_header;
 
 // object index header page header
-typedef struct __attribute(( packed ))
+typedef struct SPIFFS_PACKED
 #if SPIFFS_ALIGNED_OBJECT_INDEX_TABLES
                 __attribute(( aligned(sizeof(spiffs_page_ix)) ))
 #endif
@@ -458,10 +509,14 @@ typedef struct __attribute(( packed ))
   spiffs_obj_type type;
   // name of object
   u8_t name[SPIFFS_OBJ_NAME_LEN];
+#if SPIFFS_OBJ_META_LEN
+  // metadata. not interpreted by SPIFFS in any way.
+  u8_t meta[SPIFFS_OBJ_META_LEN];
+#endif
 } spiffs_page_object_ix_header;
 
 // object index page header
-typedef struct __attribute(( packed )) {
+typedef struct SPIFFS_PACKED {
  spiffs_page_header p_hdr;
  u8_t _align[4 - ((sizeof(spiffs_page_header)&3)==0 ? 4 : (sizeof(spiffs_page_header)&3))];
 } spiffs_page_object_ix;
@@ -612,7 +667,8 @@ s32_t spiffs_page_delete(
 s32_t spiffs_object_create(
     spiffs *fs,
     spiffs_obj_id obj_id,
-    const u8_t name[SPIFFS_OBJ_NAME_LEN],
+    const u8_t name[],
+    const u8_t meta[],
     spiffs_obj_type type,
     spiffs_page_ix *objix_hdr_pix);
 
@@ -622,13 +678,24 @@ s32_t spiffs_object_update_index_hdr(
     spiffs_obj_id obj_id,
     spiffs_page_ix objix_hdr_pix,
     u8_t *new_objix_hdr_data,
-    const u8_t name[SPIFFS_OBJ_NAME_LEN],
+    const u8_t name[],
+    const u8_t meta[],
     u32_t size,
     spiffs_page_ix *new_pix);
 
-void spiffs_cb_object_event(
+#if SPIFFS_IX_MAP
+
+s32_t spiffs_populate_ix_map(
     spiffs *fs,
     spiffs_fd *fd,
+    u32_t vec_entry_start,
+    u32_t vec_entry_end);
+
+#endif
+
+void spiffs_cb_object_event(
+    spiffs *fs,
+    spiffs_page_object_ix *objix,
     int ev,
     spiffs_obj_id obj_id,
     spiffs_span_ix spix,
@@ -704,7 +771,8 @@ s32_t spiffs_gc_quick(
 
 s32_t spiffs_fd_find_new(
     spiffs *fs,
-    spiffs_fd **fd);
+    spiffs_fd **fd,
+    const char *name);
 
 s32_t spiffs_fd_return(
     spiffs *fs,
@@ -714,6 +782,13 @@ s32_t spiffs_fd_get(
     spiffs *fs,
     spiffs_file f,
     spiffs_fd **fd);
+
+#if SPIFFS_TEMPORAL_FD_CACHE
+void spiffs_fd_temporal_cache_rehash(
+    spiffs *fs,
+    const char *old_path,
+    const char *new_path);
+#endif
 
 #if SPIFFS_CACHE
 void spiffs_cache_init(
@@ -747,5 +822,29 @@ s32_t spiffs_page_consistency_check(
 
 s32_t spiffs_object_index_consistency_check(
     spiffs *fs);
+
+// memcpy macro,
+// checked in test builds, otherwise plain memcpy (unless already defined)
+#ifdef _SPIFFS_TEST
+#define _SPIFFS_MEMCPY(__d, __s, __l) do { \
+    intptr_t __a1 = (intptr_t)((u8_t*)(__s)); \
+    intptr_t __a2 = (intptr_t)((u8_t*)(__s)+(__l)); \
+    intptr_t __b1 = (intptr_t)((u8_t*)(__d)); \
+    intptr_t __b2 = (intptr_t)((u8_t*)(__d)+(__l)); \
+    if (__a1 <= __b2 && __b1 <= __a2) { \
+      printf("FATAL OVERLAP: memcpy from %lx..%lx to %lx..%lx\n", __a1, __a2, __b1, __b2); \
+      ERREXIT(); \
+    } \
+    memcpy((__d),(__s),(__l)); \
+} while (0)
+#else
+#ifndef _SPIFFS_MEMCPY
+#define _SPIFFS_MEMCPY(__d, __s, __l) do{memcpy((__d),(__s),(__l));}while(0)
+#endif
+#endif //_SPIFFS_TEST
+
+#if defined(__cplusplus)
+};
+#endif
 
 #endif /* SPIFFS_NUCLEUS_H_ */
