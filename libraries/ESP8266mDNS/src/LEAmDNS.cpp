@@ -1060,7 +1060,7 @@ bool MDNSResponder::setHostProbeResultCallback(MDNSResponder::MDNSHostProbeFn p_
 
 bool MDNSResponder::setHostProbeResultCallback(MDNSHostProbeFn1 pfn) {
 	using namespace std::placeholders;
-	return setHostProbeResultCallback(std::bind(pfn, *this, _1, _2));
+	return setHostProbeResultCallback(std::bind(pfn, std::ref(*this), _1, _2));
 }
 
 /*
@@ -1089,7 +1089,7 @@ bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSServ
 bool MDNSResponder::setServiceProbeResultCallback(const MDNSResponder::hMDNSService p_hService,
                                                   MDNSResponder::MDNSServiceProbeFn1 p_fnCallback) {
 	using namespace std::placeholders;
-	return setServiceProbeResultCallback(p_hService, std::bind(p_fnCallback, *this, _1, _2, _3));
+	return setServiceProbeResultCallback(p_hService, std::bind(p_fnCallback, std::ref(*this), _1, _2, _3));
 }
 
 
