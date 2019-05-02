@@ -3,6 +3,8 @@
 #include "Arduino.h"
 #include <ScheduledFunctions.h>
 
+static ScheduledFunctions* scheduledInterrupts;
+
 // Duplicate typedefs from core_esp8266_wiring_digital_c
 typedef void (*voidFuncPtr)(void);
 typedef void (*voidFuncPtrArg)(void*);
