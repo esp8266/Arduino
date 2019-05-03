@@ -93,6 +93,9 @@ typedef enum {
 #define ICACHE_RAM_ATTR
 #endif /* ICACHE_FLASH */
 
+// counterpart https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp8266-compat.h
+#define IRAM_ATTR ICACHE_RAM_ATTR
+
 #define STORE_ATTR __attribute__((aligned(4)))
 
 #ifndef __cplusplus
