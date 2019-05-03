@@ -46,8 +46,12 @@ bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
         return false;
     }
     item->mFunc = fn;
+
+    noInterrupts();
     item->mNext = sFirst;
     sFirst = item;
+    interrupts();
+
     if (repeat_us)
         item->callNow.reset(repeat_us);
     return true;
@@ -64,9 +68,13 @@ void run_scheduled_functions()
     while (toCall) {
         scheduled_fn_t* item = toCall;
         toCall = item->mNext;
-        if (item->callNow && !item->mFunc()) {
+        if (item->callNow && !item->mFunc())
+        {
+            noInterrupts();
             if (sFirst == item)
                 sFirst = item->mNext;
+            interrupts();
+
             item->mFunc = mFuncT();
             recycle_fn(item);
         }
