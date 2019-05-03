@@ -22,6 +22,8 @@
 #include "sntp.h"
 #include "coredecls.h"
 
+#include "sntp-lwip2.h"
+
 extern "C" {
 
 #ifndef _TIMEVAL_DEFINED
