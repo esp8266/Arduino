@@ -120,7 +120,7 @@ ESP provides two watchdog timers (wdt) that observe application for lock
 up.
 
 -  **Software Watchdog** - provided by
-   `SDK <http://bbs.espressif.com/viewforum.php?f=46>`__, that is part
+   `SDK <https://bbs.espressif.com/viewforum.php?f=46>`__, that is part
    of `esp8266 / arduino <https://github.com/esp8266/Arduino>`__ core
    loaded to module together with your application.
 -  **Hardware Watchdog** - build in ESP8266 hardware and acting if

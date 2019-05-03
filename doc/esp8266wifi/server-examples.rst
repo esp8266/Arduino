@@ -53,7 +53,7 @@ Then let's write a short function ``prepareHtmlPage()``, that will return a ``St
       return htmlPage;
     }
 
-The function does nothing fancy but just puts together a text header and `HTML <http://www.w3schools.com/html/>`__ contents of the page.
+The function does nothing fancy but just puts together a text header and `HTML <https://www.w3schools.com/html/>`__ contents of the page.
 
 Header First
 ~~~~~~~~~~~~
@@ -75,7 +75,7 @@ In our example the content type is ``text/html``, the connection will be closed 
     Analog input:  [Value]
     </html>
 
-The content contains two basic `HTML <http://www.w3schools.com/html/>`__ tags, one to denote HTML document type ``<!DOCTYPE HTML>`` and another to mark beginning ``<html>`` and end ``</html>`` of the document. Inside there is a raw value read from ESP's analog input ``analogRead(A0)`` converted to the ``String`` type.
+The content contains two basic `HTML <https://www.w3schools.com/html/>`__ tags, one to denote HTML document type ``<!DOCTYPE HTML>`` and another to mark beginning ``<html>`` and end ``</html>`` of the document. Inside there is a raw value read from ESP's analog input ``analogRead(A0)`` converted to the ``String`` type.
 
 .. code:: cpp
 

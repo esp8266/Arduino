@@ -220,16 +220,16 @@ Open up the proper ESP8266-specific GDB
     earle@server:~$ ~/.arduino15/packages/esp8266/hardware/xtensa-lx106-elf/bin/xtensa-lx106-elf-gdb
     GNU gdb (GDB) 8.2.50.20180723-git
     Copyright (C) 2018 Free Software Foundation, Inc.
-    License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+    License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
     This is free software: you are free to change and redistribute it.
     There is NO WARRANTY, to the extent permitted by law.
     Type "show copying" and "show warranty" for details.
     This GDB was configured as "--host=x86_64-linux-gnu --target=xtensa-lx106-elf".
     Type "show configuration" for configuration details.
     For bug reporting instructions, please see:
-        <http://www.gnu.org/software/gdb/bugs/>.
+        <https://www.gnu.org/software/gdb/bugs/>.
     Find the GDB manual and other documentation resources online at:
-        <http://www.gnu.org/software/gdb/documentation/>.
+        <https://www.gnu.org/software/gdb/documentation/>.
 
     For help, type "help".
     Type "apropos word" to search for commands related to "word".
