@@ -192,8 +192,10 @@ extern void __detachInterrupt(uint8_t pin) {
   }
 }
 
-extern interrupt_handler_t* __getInterruptHandler(uint8_t pin) {
-	return (pin < 16) ? &interrupt_handlers[pin] : nullptr;
+extern void* __detachInterruptArg(uint8_t pin) {
+	void* arg = (pin < 16) ? interrupt_handlers[pin].arg : nullptr;
+	__detachInterrupt(pin);
+	return arg;
 }
 
 void initPins() {
@@ -215,7 +217,8 @@ extern void pinMode(uint8_t pin, uint8_t mode) __attribute__ ((weak, alias("__pi
 extern void digitalWrite(uint8_t pin, uint8_t val) __attribute__ ((weak, alias("__digitalWrite")));
 extern int digitalRead(uint8_t pin) __attribute__ ((weak, alias("__digitalRead")));
 extern void attachInterrupt(uint8_t pin, voidFuncPtr handler, int mode) __attribute__ ((weak, alias("__attachInterrupt")));
-extern void attachInterruptArg(uint8_t pin, voidFuncPtrArg handler, void* arg, int mode) __attribute__ ((weak, alias("__attachInterruptArg")));
-extern void detachInterrupt(uint8_t pin) __attribute__ ((weak, alias("__detachInterrupt")));
+extern void detachInterrupt(uint8_t pin) __attribute__((weak, alias("__detachInterrupt")));
+extern void attachInterruptArg(uint8_t pin, voidFuncPtrArg handler, void* arg, int mode) __attribute__((weak, alias("__attachInterruptArg")));
+extern void* detachInterruptArg(uint8_t pin) __attribute__((weak, alias("__detachInterruptArg")));
 
 };
