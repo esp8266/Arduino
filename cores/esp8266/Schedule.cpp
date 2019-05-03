@@ -17,7 +17,7 @@ static scheduled_fn_t* sFirstUnused = 0;
 
 static int sCount = 0;
 
-IRAM_ATTR
+IRAM_ATTR // called from ISR
 static scheduled_fn_t* get_fn() {
     scheduled_fn_t* result = NULL;
     // try to get an item from unused items list
@@ -40,7 +40,7 @@ static void recycle_fn(scheduled_fn_t* fn)
     sFirstUnused = fn;
 }
 
-IRAM_ATTR
+IRAM_ATTR // called from ISR
 bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
 {
     lockEnter();
@@ -61,7 +61,7 @@ bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
     return true;
 }
 
-IRAM_ATTR
+IRAM_ATTR // called from ISR
 bool schedule_function(std::function<void(void)> fn)
 {
     return schedule_function_us([&fn](){ fn(); return false; }, 0);
