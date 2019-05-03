@@ -47,10 +47,10 @@ bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
     }
     item->mFunc = fn;
 
-    noInterrupts();
+    uint32_t savedPS = xt_rsil(0); // noInterrupts();
     item->mNext = sFirst;
     sFirst = item;
-    interrupts();
+    xt_wsr_ps(savedPS); // interrupts();
 
     if (repeat_us)
         item->callNow.reset(repeat_us);
@@ -70,10 +70,10 @@ void run_scheduled_functions()
         toCall = item->mNext;
         if (item->callNow && !item->mFunc())
         {
-            noInterrupts();
+            uint32_t savedPS = xt_rsil(0); // noInterrupts();
             if (sFirst == item)
                 sFirst = item->mNext;
-            interrupts();
+            xt_wsr_ps(savedPS); // interrupts();
 
             item->mFunc = mFuncT();
             recycle_fn(item);

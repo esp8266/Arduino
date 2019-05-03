@@ -146,6 +146,16 @@ void ets_intr_unlock();
 #define __STRINGIFY(a) #a
 #endif
 
+#if CORE_MOCK
+
+#define xt_rsil(level) (level)
+#define xt_wsr_ps(state) do { (void)(state); } while (0)
+
+#define interrupts() do { (void)0; } while (0)
+#define noInterrupts() do { (void)0; } while (0)
+
+#else // !CORE_MOCK
+
 // these low level routines provide a replacement for SREG interrupt save that AVR uses
 // but are esp8266 specific. A normal use pattern is like
 //
@@ -165,6 +175,7 @@ void ets_intr_unlock();
 #define interrupts() xt_rsil(0)
 #define noInterrupts() xt_rsil(15)
 
+#endif // !CORE_MOCK
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
