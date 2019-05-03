@@ -145,9 +145,18 @@ extern "C" {
     
 #define xt_rsil(level) (level)
 #define xt_wsr_ps(state) do { (void)(state); } while (0)
+
 #define interrupts() xt_rsil(0)
 #define noInterrupts() xt_rsil(15)
-    
+
+#define lockEnterVar(varSave, level) do { (void)(varSave); (void)(level); } while (0)
+#define lockLeaveVar(varSave)        do { (void)0; } while (0)
+#define lockDeclM()                  do { (void)0; } while (0)
+#define lockEnterM()                 do { (void)0; } while (0)
+#define lockLeaveM()                 do { (void)0; } while (0)
+#define lockEnter()                  do { (void)0; } while (0)
+#define lockLeave()                  do { (void)0; } while (0)
+
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
 #define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
