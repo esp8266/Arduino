@@ -450,5 +450,5 @@ TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
     s.print('\"');
     s.print(String("message"));
     s.print('\"');
-    REQUIRE(blah == "{\"message\"");
+    REQUIRE(s == "{\"message\"");
 }
