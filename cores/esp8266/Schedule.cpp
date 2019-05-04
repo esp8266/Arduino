@@ -54,10 +54,11 @@ bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
     item->mNext = sFirst;
     sFirst = item;
 
+    lockLeave();
+
     if (repeat_us)
         item->callNow.reset(repeat_us);
 
-    lockLeave();
     return true;
 }
 

@@ -169,7 +169,7 @@ void ets_intr_unlock();
 #define lockLeaveVar(varSave)        __asm__ __volatile__("wsr %0,ps; isync" :: "a" (varSave) : "memory")
 
 #define lockDeclM()  uint32_t intrState
-#define lockEnterM() lockEnterVar(intrState, 0)
+#define lockEnterM() lockEnterVar(intrState, 15)
 #define lockLeaveM() lockLeaveVar(intrState)
 
 #define lockEnter() lockDeclM(); lockEnterM()
