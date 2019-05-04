@@ -331,7 +331,7 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
       dns_setserver(1, dns2);
   }
 
-#if LWIP_VERSION_MAJOR != 1
+#if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
   // trigger address change by calling lwIP-v1.4 api
   // (see explanation above)
   netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
