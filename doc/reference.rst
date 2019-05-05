@@ -70,7 +70,9 @@ equal to 1023 by default. PWM range may be changed by calling
 ``analogWriteRange(new_range)``.
 
 PWM frequency is 1kHz by default. Call
-``analogWriteFreq(new_frequency)`` to change the frequency.
+``analogWriteFreq(new_frequency)`` to change the frequency. Valid values are from 100Hz up to 40000Hz.
+
+The ESP doesn't have hardware PWM, so the implementation is by software. With one PWM output at 40KHz, the cpu is already rather loaded. The more PWM outputs used, and the higher their frequency, the closer you get to the CPU limits. 
 
 Timing and delays
 -----------------
