@@ -145,8 +145,8 @@ FLAGS += -DLWIP_IPV6=0
 FLAGS += -DHOST_MOCK=1
 FLAGS += -DNONOSDK221=1
 FLAGS += $(MKFLAGS)
-CXXFLAGS += -std=c++11 $(FLAGS)
-CFLAGS += -std=c99 $(FLAGS)
+CXXFLAGS += -std=c++11 -fno-rtti $(FLAGS) -funsigned-char
+CFLAGS += -std=c99 $(FLAGS) -funsigned-char
 LDFLAGS += -coverage $(OPTZ) -g $(M32)
 VALGRINDFLAGS += --leak-check=full --track-origins=yes --error-limit=no --show-leak-kinds=all --error-exitcode=999
 CXXFLAGS += -Wno-error=format-security # cores/esp8266/Print.cpp:42:24:   error: format not a string literal and no format arguments [-Werror=format-security] -- (os_printf_plus(not_the_best_way))

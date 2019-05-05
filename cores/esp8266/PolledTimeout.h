@@ -142,6 +142,7 @@ class timeoutTemplate
 {
 public:
   using timeType = typename TimePolicyT::timeType;
+  static_assert(std::is_unsigned<timeType>::value == true, "timeType must be unsigned");
 
   static constexpr timeType alwaysExpired   = 0;
   static constexpr timeType neverExpires    = std::numeric_limits<timeType>::max();

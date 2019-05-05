@@ -137,7 +137,7 @@ int WiFiClient::connect(const String& host, uint16_t port)
     return connect(host.c_str(), port);
 }
 
-int WiFiClient::connect(CONST IPAddress& ip, uint16_t port)
+int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
     if (_client) {
         stop();
