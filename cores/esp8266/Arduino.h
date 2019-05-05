@@ -165,15 +165,6 @@ void ets_intr_unlock();
 #define interrupts() xt_rsil(0)
 #define noInterrupts() xt_rsil(15)
 
-#define lockEnterVar(varSave, level) __asm__ __volatile__("rsil %0," __STRINGIFY(level) : "=a" (varSave))
-#define lockLeaveVar(varSave)        __asm__ __volatile__("wsr %0,ps; isync" :: "a" (varSave) : "memory")
-
-#define lockDeclM()  uint32_t intrState
-#define lockEnterM() lockEnterVar(intrState, 15)
-#define lockLeaveM() lockLeaveVar(intrState)
-
-#define lockEnter() lockDeclM(); lockEnterM()
-#define lockLeave() lockLeaveM()
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )

@@ -167,4 +167,13 @@ void mock_stop_spiffs ();
 
 //
 
+class EspLockInterrupts
+{
+public:
+    EspLockInterrupts () { }
+    ~EspLockInterrupts () { }
+};
+
+//
+
 #endif // __cplusplus

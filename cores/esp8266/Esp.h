@@ -213,7 +213,18 @@ uint32_t EspClass::getCycleCount()
     __asm__ __volatile__("esync; rsr %0,ccount":"=a" (ccount));
     return ccount;
 }
-#endif
+
+class EspLockInterrupts
+{
+public:
+    // implement automatic x=xt_rsil(15);xt_wsr_ps(x)
+    EspLockInterrupts () { __asm__ __volatile__("rsil %0,15" : "=a" (saveStatus)); }
+    ~EspLockInterrupts () { __asm__ __volatile__("wsr %0,ps; isync" :: "a" (saveStatus) : "memory"); }
+private:
+    volatile uint32_t saveStatus;
+};
+
+#endif // !defined(CORE_MOCK)
 
 extern EspClass ESP;
 

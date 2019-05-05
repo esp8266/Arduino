@@ -43,18 +43,15 @@ static void recycle_fn(scheduled_fn_t* fn)
 IRAM_ATTR // called from ISR
 bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
 {
-    lockEnter();
+    EspLockInterrupts lockAllInterruptsInThisBlock;
 
     scheduled_fn_t* item = get_fn();
-    if (!item) {
-        lockLeave();
+    if (!item)
         return false;
-    }
+
     item->mFunc = fn;
     item->mNext = sFirst;
     sFirst = item;
-
-    lockLeave();
 
     if (repeat_us)
         item->callNow.reset(repeat_us);
@@ -76,10 +73,11 @@ void run_scheduled_functions()
         toCall = item->mNext;
         if (item->callNow && !item->mFunc())
         {
-            lockEnter();
-            if (sFirst == item)
-                sFirst = item->mNext;
-            lockLeave();
+            {
+                EspLockInterrupts lockAllInterruptsInThisBlock;
+                if (sFirst == item)
+                    sFirst = item->mNext;
+            }
 
             item->mFunc = mFuncT();
             recycle_fn(item);
