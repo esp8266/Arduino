@@ -77,8 +77,9 @@ void loop() {
           // read up to 128 byte
           int c = stream->readBytes(buff, std::min((size_t)len, sizeof(buff)));
           Serial.printf("readBytes: %d\n", c);
-          if (!c)
+          if (!c) {
             Serial.println("read timeout");
+          }
 
           // write it to Serial
           Serial.write(buff, c);
