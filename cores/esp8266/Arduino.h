@@ -1,21 +1,21 @@
 /*
- Arduino.h - Main include file for the Arduino SDK
- Copyright (c) 2005-2013 Arduino Team.  All right reserved.
+    Arduino.h - Main include file for the Arduino SDK
+    Copyright (c) 2005-2013 Arduino Team.  All right reserved.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #ifndef Arduino_h
 #define Arduino_h
@@ -86,10 +86,11 @@ extern "C" {
 #define EXTERNAL 0
 
 //timer dividers
-enum TIM_DIV_ENUM {
-  TIM_DIV1 = 0,   //80MHz (80 ticks/us - 104857.588 us max)
-  TIM_DIV16 = 1,  //5MHz (5 ticks/us - 1677721.4 us max)
-  TIM_DIV256 = 3 //312.5Khz (1 tick = 3.2us - 26843542.4 us max)
+enum TIM_DIV_ENUM
+{
+    TIM_DIV1 = 0,   //80MHz (80 ticks/us - 104857.588 us max)
+    TIM_DIV16 = 1,  //5MHz (5 ticks/us - 1677721.4 us max)
+    TIM_DIV256 = 3 //312.5Khz (1 tick = 3.2us - 26843542.4 us max)
 };
 
 
@@ -297,7 +298,7 @@ long secureRandom(long, long);
 long map(long, long, long, long, long);
 
 extern "C" void configTime(long timezone, int daylightOffset_sec,
-    const char* server1, const char* server2 = nullptr, const char* server3 = nullptr);
+                           const char* server1, const char* server2 = nullptr, const char* server3 = nullptr);
 
 #endif
 
