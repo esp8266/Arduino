@@ -1,5 +1,6 @@
 #include "Schedule.h"
 #include "PolledTimeout.h"
+#include "interrupts.h"
 
 typedef std::function<bool(void)> mFuncT;
 
@@ -43,7 +44,7 @@ static void recycle_fn(scheduled_fn_t* fn)
 IRAM_ATTR // called from ISR
 bool schedule_function_us(mFuncT fn, uint32_t repeat_us)
 {
-    EspLockInterrupts lockAllInterruptsInThisBlock;
+    InterruptLock lockAllInterruptsInThisScope;
 
     scheduled_fn_t* item = get_fn();
     if (!item)
@@ -74,7 +75,7 @@ void run_scheduled_functions()
         if (item->callNow && !item->mFunc())
         {
             {
-                EspLockInterrupts lockAllInterruptsInThisBlock;
+                InterruptLock lockAllInterruptsInThisScope;
                 if (sFirst == item)
                     sFirst = item->mNext;
             }

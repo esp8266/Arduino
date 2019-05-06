@@ -131,7 +131,7 @@ void mockUDPSwallow (size_t copied, char* ccinbuf, size_t& ccinbufsize);
 class UdpContext;
 void register_udp (int sock, UdpContext* udp = nullptr);
 
-class InterruptLock { };
+//class InterruptLock { };
 
 //
 
@@ -164,15 +164,6 @@ void mock_stop_spiffs ();
 //
 
 #include <common/esp8266_peri.h>
-
-//
-
-class EspLockInterrupts
-{
-public:
-    EspLockInterrupts () { }
-    ~EspLockInterrupts () { }
-};
 
 //
 
