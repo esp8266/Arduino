@@ -1346,7 +1346,7 @@ int HTTPClient::handleHeaderResponse()
 int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 {
     int buff_size = HTTP_TCP_BUFFER_SIZE;
-    int len = size;
+    int len = size; // left size to read
     int bytesWritten = 0;
 
     // if possible create smaller buffer then HTTP_TCP_BUFFER_SIZE
@@ -1361,17 +1361,8 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
         // read all data from server
         while(connected() && (len > 0 || len == -1)) {
 
-            // get available data size
-            size_t sizeAvailable = _client->available();
-
-            if(sizeAvailable) {
-
-                int readBytes = sizeAvailable;
-
-                // read only the asked bytes
-                if(len > 0 && readBytes > len) {
-                    readBytes = len;
-                }
+            {
+                int readBytes = len;
 
                 // not read more the buffer can handle
                 if(readBytes > buff_size) {
@@ -1405,7 +1396,7 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
                     // some time for the stream
                     delay(1);
 
-                    int leftBytes = (readBytes - bytesWrite);
+                    int leftBytes = (bytesRead - bytesWrite);
 
                     // retry to send the missed bytes
                     bytesWrite = stream->write((buff + bytesWrite), leftBytes);
@@ -1428,12 +1419,10 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 
                 // count bytes to read left
                 if(len > 0) {
-                    len -= readBytes;
+                    len -= bytesRead;
                 }
 
                 delay(0);
-            } else {
-                delay(1);
             }
         }
 

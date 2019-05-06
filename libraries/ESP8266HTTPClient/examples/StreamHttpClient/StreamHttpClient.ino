@@ -63,31 +63,34 @@ void loop() {
         // create buffer for read
         uint8_t buff[128] = { 0 };
 
+#if 0
+        // with API
+        Serial.println(http.getString());
+#else
+        // or "by hand"
+
         // get tcp stream
         WiFiClient * stream = &client;
 
         // read all data from server
         while (http.connected() && (len > 0 || len == -1)) {
-          // get available data size
-          size_t size = stream->available();
+          // read up to 128 byte
+          int c = stream->readBytes(buff, std::min((size_t)len, sizeof(buff)));
+          Serial.printf("readBytes: %d\n", c);
+          if (!c)
+            Serial.println("read timeout");
 
-          if (size) {
-            // read up to 128 byte
-            int c = stream->readBytes(buff, ((size > sizeof(buff)) ? sizeof(buff) : size));
+          // write it to Serial
+          Serial.write(buff, c);
 
-            // write it to Serial
-            Serial.write(buff, c);
-
-            if (len > 0) {
-              len -= c;
-            }
+          if (len > 0) {
+            len -= c;
           }
-          delay(1);
         }
+#endif
 
         Serial.println();
         Serial.print("[HTTP] connection closed or file end.\n");
-
       }
     } else {
       Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
@@ -96,5 +99,5 @@ void loop() {
     http.end();
   }
 
-  delay(10000);
+  delay(60000);
 }
