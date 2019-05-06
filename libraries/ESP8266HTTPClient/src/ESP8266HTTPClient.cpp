@@ -1380,6 +1380,11 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 
                 // read data
                 int bytesRead = _client->readBytes(buff, readBytes);
+                if (!bytesRead)
+                {
+                    DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] input stream timeout\n");
+                    return HTTPC_ERROR_READ_TIMEOUT;
+                }
 
                 // write it to Stream
                 int bytesWrite = stream->write(buff, bytesRead);
