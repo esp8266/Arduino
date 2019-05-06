@@ -204,6 +204,18 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     if(!_useStaticIp) {
+
+        // This is a lighter workaround for
+        //   https://github.com/esp8266/Arduino/issues/5527#issuecomment-489324157
+        // Stopping dhcp client allows restarting it again without needing
+        // to disconnect WiFi as a workaround
+        // XXXTODO: properly detect a previously connected network and
+        //          behave nicely when waking up from deepsleep with
+        //          persistence enabled, wifi started and dhcp called before
+        //          actual user call to ::begin()
+        wifi_station_dhcpc_stop();
+        // workaround end
+
         wifi_station_dhcpc_start();
     }
 
