@@ -1033,7 +1033,7 @@ String HTTPClient::errorToString(int error)
     case HTTPC_ERROR_NO_HTTP_SERVER:
         return F("no HTTP server");
     case HTTPC_ERROR_TOO_LESS_RAM:
-        return F("too less ram");
+        return F("not enough ram");
     case HTTPC_ERROR_ENCODING:
         return F("Transfer-Encoding not supported");
     case HTTPC_ERROR_STREAM_WRITE:
@@ -1358,7 +1358,7 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
     uint8_t * buff = (uint8_t *) malloc(buff_size);
 
     if(!buff) {
-        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] too less ram! need %d\n", HTTP_TCP_BUFFER_SIZE);
+        DEBUG_HTTPCLIENT("[HTTP-Client][writeToStreamDataBlock] not enough ram! need %d\n", HTTP_TCP_BUFFER_SIZE);
         return HTTPC_ERROR_TOO_LESS_RAM;
     }
 
