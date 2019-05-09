@@ -22,7 +22,7 @@ pushd esp8266.github.io
 
 # Update the package index
 cp ../versions/$tag/package_esp8266com_index.json stable/package_esp8266com_index.json
-git add esp8266.github.io/stable/package_esp8266com_index.json
+git add stable/package_esp8266com_index.json
 
 # Commit and push the changes
 git config user.email "travis@travis-ci.org"
