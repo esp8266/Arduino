@@ -1003,6 +1003,12 @@ bool WiFiClientSecure::_connectSSL(const char* hostName) {
     DEBUG_BSSL("Connected!\n");
   }
 #endif
+
+  // Session is already validated here, there is no need to keep following
+  _x509_minimal = nullptr;
+  _x509_insecure = nullptr;
+  _x509_knownkey = nullptr;
+
   return ret;
 }
 
