@@ -255,7 +255,7 @@ bool WiFiClientSecure::_clientConnected() {
 }
 
 uint8_t WiFiClientSecure::connected() {
-  if (available() || (_clientConnected() && _handshake_done)) {
+  if (available() || (_clientConnected() && _handshake_done && (br_ssl_engine_current_state(_eng) != BR_SSL_CLOSED))) {
     return true;
   }
   return false;
