@@ -20,7 +20,10 @@ def drop_version(todrop, obj):
     for o in obj:
         version = o['version'].encode('ascii')
         if version == todrop:
-            print("Dropping version {0}".format(todrop))
+            # removing the print, as it is writing to stdout, which in turn writes to json, which makes it invalid
+            # thus shifting to error stream
+            # alternatively, it can be removed
+            print("Dropping version {0}".format(todrop), file=sys.stderr)
         else:
             out.append(o)
     return out
