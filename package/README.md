@@ -65,6 +65,12 @@ Here is an overview of the release process. See the section below for detailed i
 
 ## Creating a release (for maintainers)
 
+0. In case something goes wrong, release can be canceled:
+
+    * tag must be removed (`git tag -d x.y.z; git push --delete origin x.y.z`)
+
+    * release must be deleted: github > releases > edit x.y.z > remove all files > delete button appears
+
 1. Assemble release notes.
 
     * Since most changes are integrated into master using squash-rebase policy (i.e. one commit per PR), `git log --oneline` gives a good overview of changes in the release.
