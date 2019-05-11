@@ -120,13 +120,13 @@ class Stream: public Print {
         //////////////////// extensions:
 
         // addition: directly access to read buffer
-        // (currently implemented in HardwareSerial:: and WiFiClient::)
+        // (primarily implemented in HardwareSerial:: and WiFiClient::)
 
         // return number of byte accessible by peekBuffer()
-        virtual size_t availableForPeek () { IAMSLOW(); return (oneChar = peek()) == -1? 0: 1; }
+        virtual size_t availableForPeek () { IAMSLOW(); int test = peek(); oneChar = test; return test == -1? 0: 1; }
 
         // return a pointer to available data buffer (size = availableForPeek())
-        // semantic forbids any kind of read() before calling peekConsume()
+        // semantic forbids any kind of read() after calling peekBuffer() and before calling peekConsume()
         virtual const char* peekBuffer () { return &oneChar; }
 
         // consume bytes after peekBuffer use
@@ -158,24 +158,22 @@ class Stream: public Print {
 
 #include <PolledTimeout.h>
 
-template <typename Tfrom, typename Tto,
+template <typename streamT, typename printT,
           typename PeriodicMs = esp8266::polledTimeout::periodicFastMs,
-          typename TimeoutMs  = esp8266::polledTimeout::oneShotMs>
-size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0, int readUntilChar = -1, TimeoutMs::timeType timeout = TimeoutMs::alwayExpired)
+          typename TimeoutMs  = esp8266::polledTimeout::oneShotFastMs>
+size_t streamMove (streamT& from, printT& to, size_t maxLen = 0, int readUntilChar = -1, TimeoutMs::timeType timeout = TimeoutMs::alwaysExpired)
 {
     PeriodicMs yieldNow(100);
+    TimeoutMS timedOut(timeout);
     size_t written = 0;
     size_t w;
 
     if (timeout == TimeoutMs::neverExpires)
-        // neverExpires forbidden value => take Stream (source) value
-        // TODO: check for to::getTimeout() existence (w/ SFINAE or equiv.)
-        // and use std::min(from.getTimeout(), to.getTimeout())
-        timeout.reset(from.getTimeout());
+        timedOut.reset(from.getTimeout());
     else
-        timeout.reset();
+        timedOut.reset();
 
-    while ((!maxLen || written < maxLen) && ((w = to.availableForWrite()) || !timeout)
+    while ((!maxLen || written < maxLen) && (w = to.availableForWrite()))
     {
         size_t r = from.availableForPeek();
         if (w > r)
@@ -187,15 +185,23 @@ size_t streamMove (Tfrom& from, Tto& to, size_t maxLen = 0, int readUntilChar = 
             {
                 const char* last = memchr(directbuf, readUntilChar, w);
                 if (last)
-                    w = last - directbuf + 1;
+                {
+                    size_t remain = last - directbuf + 1;
+                    if (w > remain)
+                        w = remain;
+                    if (maxlen && written + w > maxlen)
+                        w = maxlen - written;
+                }
             }
             if (w && ((w = to.write(directbuf, w)))
             {
                 from.peekConsume(w);
                 written += w;
-                timeout.reset();
+                timedOut.reset();
             }
         }
+        if (w == 0 && timedOut)
+            break;
         if (yieldNow)
             yield();
     }
