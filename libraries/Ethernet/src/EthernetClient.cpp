@@ -141,8 +141,9 @@ void EthernetClient::stop() {
   } while (millis() - start < 1000);
 
   // if it hasn't closed, close it forcefully
-  if (s != SnSR::CLOSED)
+  if (s != SnSR::CLOSED) {
     close(_sock);
+  }
 
   EthernetClass::_server_port[_sock] = 0;
   _sock = MAX_SOCK_NUM;

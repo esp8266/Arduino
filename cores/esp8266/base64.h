@@ -27,8 +27,11 @@
 
 class base64 {
     public:
-        static String encode(uint8_t * data, size_t length);
-        static String encode(String text);
+        // NOTE: The default behaviour of backend (lib64)
+        // is to add a newline every 72 (encoded) characters output.
+        // This may 'break' longer uris and json variables
+        static String encode(uint8_t * data, size_t length, bool doNewLines = true);
+        static String encode(String text, bool doNewLines = true);
     private:
 };
 

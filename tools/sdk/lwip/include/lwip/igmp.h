@@ -96,7 +96,7 @@ void   igmp_input(struct pbuf *p, struct netif *inp, ip_addr_t *dest)ICACHE_FLAS
 err_t  igmp_joingroup(ip_addr_t *ifaddr, ip_addr_t *groupaddr)ICACHE_FLASH_ATTR;
 err_t  igmp_leavegroup(ip_addr_t *ifaddr, ip_addr_t *groupaddr)ICACHE_FLASH_ATTR;
 void   igmp_tmr(void)ICACHE_FLASH_ATTR;
-#define LWIP_RAND()  r_rand()
+#define LWIP_RAND()  os_random()
 #ifdef __cplusplus
 }
 #endif
