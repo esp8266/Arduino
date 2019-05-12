@@ -60,9 +60,9 @@ class ArduinoOTAClass
     void onProgress(THandlerFunction_Progress fn);
 
     //Starts the ArduinoOTA service
-    void begin();
+    void begin(bool useMDNS = true);
 
-    //Call this in loop() to run the service
+    //Call this in loop() to run the service. Also calls MDNS.update() when begin() or begin(true) is used.
     void handle();
 
     //Gets update command type after OTA has started. Either U_FLASH or U_SPIFFS
@@ -76,10 +76,12 @@ class ArduinoOTAClass
     UdpContext *_udp_ota;
     bool _initialized;
     bool _rebootOnSuccess;
+    bool _useMDNS;
     ota_state_t _state;
     int _size;
     int _cmd;
-    int _ota_port;
+    uint16_t _ota_port;
+    uint16_t _ota_udp_port;
     IPAddress _ota_ip;
     String _md5;
 

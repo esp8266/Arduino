@@ -3,7 +3,7 @@
 
   A Tone Generator Library for the ESP8266
 
-  Copyright (c) 2016 Ben Pirt. All rights reserved.
+  Original Copyright (c) 2016 Ben Pirt. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
 
   This library is free software; you can redistribute it and/or
@@ -22,108 +22,66 @@
 */
 
 #include "Arduino.h"
-#include "pins_arduino.h"
+#include "core_esp8266_waveform.h"
 
-#define AVAILABLE_TONE_PINS 1
-const uint8_t tone_timers[] = { 1 };
-static uint8_t tone_pins[AVAILABLE_TONE_PINS] = { 255, };
-static long toggle_counts[AVAILABLE_TONE_PINS] = { 0, };
-#define T1INDEX 0
+// Which pins have a tone running on them?
+static uint32_t _toneMap = 0;
 
-void t1IntHandler();
 
-static int8_t toneBegin(uint8_t _pin) {
-  int8_t _index = -1;
-
-  // if we're already using the pin, reuse it.
-  for (int i = 0; i < AVAILABLE_TONE_PINS; i++) {
-    if (tone_pins[i] == _pin) {
-      return i;
-    }
+static void _startTone(uint8_t _pin, uint32_t high, uint32_t low, unsigned long duration) {
+  if (_pin > 16) {
+    return;
   }
 
-  // search for an unused timer.
-  for (int i = 0; i < AVAILABLE_TONE_PINS; i++) {
-    if (tone_pins[i] == 255) {
-      tone_pins[i] = _pin;
-      _index = i;
-      break;
-    }
-  }
+  pinMode(_pin, OUTPUT);
 
-  return _index;
+  high = std::max(high, (uint32_t)100);
+  low = std::max(low, (uint32_t)100);
+
+  if (startWaveform(_pin, high, low, (uint32_t) duration * 1000)) {
+    _toneMap |= 1 << _pin;
+  }
 }
 
-// frequency (in hertz) and duration (in milliseconds).
+
 void tone(uint8_t _pin, unsigned int frequency, unsigned long duration) {
-  int8_t _index;
-
-  _index = toneBegin(_pin);
-
-  if (_index >= 0) {
-    // Set the pinMode as OUTPUT
-    pinMode(_pin, OUTPUT);
-
-    // Calculate the toggle count
-    if (duration > 0) {
-      toggle_counts[_index] = 2 * frequency * duration / 1000;
-    } else {
-      toggle_counts[_index] = -1;
-    }
-
-    // set up the interrupt frequency
-    switch (tone_timers[_index]) {
-      case 0:
-        // Not currently supported
-        break;
-
-      case 1:
-        timer1_disable();
-        timer1_isr_init();
-        timer1_attachInterrupt(t1IntHandler);
-        timer1_enable(TIM_DIV1, TIM_EDGE, TIM_LOOP);
-        timer1_write((clockCyclesPerMicrosecond() * 500000) / frequency);
-        break;
-    }
+  if (frequency == 0) {
+    noTone(_pin);
+  } else {
+    uint32_t period = 1000000L / frequency;
+    uint32_t high = period / 2;
+    uint32_t low = period - high;
+    _startTone(_pin, high, low, duration);
   }
 }
 
-void disableTimer(uint8_t _index) {
-  tone_pins[_index] = 255;
 
-  switch (tone_timers[_index]) {
-    case 0:
-      // Not currently supported
-      break;
-
-    case 1:
-      timer1_disable();
-      break;
+// Separate tone(float) to hopefully not pull in floating point libs unless
+// it's called with a float.
+void tone(uint8_t _pin, double frequency, unsigned long duration) {
+  if (frequency < 1.0) { // FP means no exact comparisons
+    noTone(_pin);
+  } else {
+    double period = 1000000.0 / frequency;
+    uint32_t high = (uint32_t)((period / 2.0) + 0.5);
+    uint32_t low = (uint32_t)(period + 0.5) - high;
+    _startTone(_pin, high, low, duration);
   }
 }
+
+
+// Fix ambiguous tone() binding when adding in a duration
+void tone(uint8_t _pin, int frequency, unsigned long duration) {
+  // Call the unsigned int version of the function explicitly
+  tone(_pin, (unsigned int)frequency, duration);
+}
+
 
 void noTone(uint8_t _pin) {
-  for (int i = 0; i < AVAILABLE_TONE_PINS; i++) {
-    if (tone_pins[i] == _pin) {
-      tone_pins[i] = 255;
-      disableTimer(i);
-      break;
-    }
+  if (_pin > 16) {
+    return;
   }
-  digitalWrite(_pin, LOW);
-}
-
-ICACHE_RAM_ATTR void t1IntHandler() {
-  if (toggle_counts[T1INDEX] != 0){
-    // toggle the pin
-    digitalWrite(tone_pins[T1INDEX], toggle_counts[T1INDEX] % 2);
-    toggle_counts[T1INDEX]--;
-    // handle the case of indefinite duration
-    if (toggle_counts[T1INDEX] < -2){
-      toggle_counts[T1INDEX] = -1;
-    }
-  }else{
-    disableTimer(T1INDEX);
-    digitalWrite(tone_pins[T1INDEX], LOW);
-  }
+  stopWaveform(_pin);
+  _toneMap &= ~(1 << _pin);
+  digitalWrite(_pin, 0);
 }

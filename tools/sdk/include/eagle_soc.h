@@ -1,5 +1,24 @@
 /*
- *  Copyright (c) Espressif System 2010 - 2012
+ * ESPRESSIF MIT License
+ *
+ * Copyright (c) 2016 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
+ *
+ * Permission is hereby granted for use on ESPRESSIF SYSTEMS ESP8266 only, in which case,
+ * it is free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -46,19 +65,19 @@
 #define ETS_CACHED_ADDR(addr) (addr)
 
 
-#define READ_PERI_REG(addr) (*((volatile uint32_t *)ETS_UNCACHED_ADDR(addr)))
-#define WRITE_PERI_REG(addr, val) (*((volatile uint32_t *)ETS_UNCACHED_ADDR(addr))) = (uint32_t)(val)
-#define CLEAR_PERI_REG_MASK(reg, mask) WRITE_PERI_REG((reg), (READ_PERI_REG(reg)&(~(mask))))
-#define SET_PERI_REG_MASK(reg, mask)   WRITE_PERI_REG((reg), (READ_PERI_REG(reg)|(mask)))
-#define GET_PERI_REG_BITS(reg, hipos,lowpos)      ((READ_PERI_REG(reg)>>(lowpos))&((1<<((hipos)-(lowpos)+1))-1))
+#define READ_PERI_REG(addr)                        (*((volatile uint32_t *)ETS_UNCACHED_ADDR(addr)))
+#define WRITE_PERI_REG(addr, val)                  (*((volatile uint32_t *)ETS_UNCACHED_ADDR(addr))) = (uint32_t)(val)
+#define CLEAR_PERI_REG_MASK(reg, mask)             WRITE_PERI_REG((reg), (READ_PERI_REG(reg)&(~(mask))))
+#define SET_PERI_REG_MASK(reg, mask)               WRITE_PERI_REG((reg), (READ_PERI_REG(reg)|(mask)))
+#define GET_PERI_REG_BITS(reg, hipos,lowpos)       ((READ_PERI_REG(reg)>>(lowpos))&((1<<((hipos)-(lowpos)+1))-1))
 #define SET_PERI_REG_BITS(reg,bit_map,value,shift) (WRITE_PERI_REG((reg),(READ_PERI_REG(reg)&(~((bit_map)<<(shift))))|((value)<<(shift)) ))
 //}}
 
 //Periheral Clock {{
-#define  CPU_CLK_FREQ                                80*1000000       //unit: Hz
-#define  APB_CLK_FREQ                                CPU_CLK_FREQ
-#define  UART_CLK_FREQ                               APB_CLK_FREQ
-#define  TIMER_CLK_FREQ                              (APB_CLK_FREQ>>8) //divided by 256
+#define  CPU_CLK_FREQ                       80*1000000       //unit: Hz
+#define  APB_CLK_FREQ                       CPU_CLK_FREQ
+#define  UART_CLK_FREQ                      APB_CLK_FREQ
+#define  TIMER_CLK_FREQ                     (APB_CLK_FREQ>>8) //divided by 256
 //}}
 
 //Peripheral device base address define{{
@@ -66,112 +85,126 @@
 #define PERIPHS_GPIO_BASEADDR               0x60000300
 #define PERIPHS_TIMER_BASEDDR               0x60000600
 #define PERIPHS_RTC_BASEADDR                0x60000700
-#define PERIPHS_IO_MUX						0x60000800
+#define PERIPHS_IO_MUX                      0x60000800
 //}}
 
 //Interrupt remap control registers define{{
-#define EDGE_INT_ENABLE_REG                 (PERIPHS_DPORT_BASEADDR+0x04)
-#define TM1_EDGE_INT_ENABLE()             SET_PERI_REG_MASK(EDGE_INT_ENABLE_REG, BIT1)
-#define TM1_EDGE_INT_DISABLE()            CLEAR_PERI_REG_MASK(EDGE_INT_ENABLE_REG, BIT1)
+#define EDGE_INT_ENABLE_REG                (PERIPHS_DPORT_BASEADDR+0x04)
+#define TM1_EDGE_INT_ENABLE()              SET_PERI_REG_MASK(EDGE_INT_ENABLE_REG, BIT1)
+#define TM1_EDGE_INT_DISABLE()             CLEAR_PERI_REG_MASK(EDGE_INT_ENABLE_REG, BIT1)
 //}}
 
 //GPIO reg {{
-#define GPIO_REG_READ(reg)                         READ_PERI_REG(PERIPHS_GPIO_BASEADDR + reg)
-#define GPIO_REG_WRITE(reg, val)                 WRITE_PERI_REG(PERIPHS_GPIO_BASEADDR + reg, val)
-#define GPIO_OUT_ADDRESS                         0x00
-#define GPIO_OUT_W1TS_ADDRESS             0x04
-#define GPIO_OUT_W1TC_ADDRESS             0x08
+#define GPIO_REG_READ(reg)                 READ_PERI_REG(PERIPHS_GPIO_BASEADDR + (reg))
+#define GPIO_REG_WRITE(reg, val)           WRITE_PERI_REG(PERIPHS_GPIO_BASEADDR + (reg), val)
+#define GPIO_OUT_ADDRESS                   0x00
+#define GPIO_OUT_W1TS_ADDRESS              0x04
+#define GPIO_OUT_W1TC_ADDRESS              0x08
 
-#define GPIO_ENABLE_ADDRESS                  0x0c
-#define GPIO_ENABLE_W1TS_ADDRESS      0x10
-#define GPIO_ENABLE_W1TC_ADDRESS      0x14
-#define GPIO_OUT_W1TC_DATA_MASK      0x0000ffff
+#define GPIO_ENABLE_ADDRESS                0x0c
+#define GPIO_ENABLE_W1TS_ADDRESS           0x10
+#define GPIO_ENABLE_W1TC_ADDRESS           0x14
+#define GPIO_OUT_W1TC_DATA_MASK            0x0000ffff
 
-#define GPIO_IN_ADDRESS                            0x18
+#define GPIO_IN_ADDRESS                    0x18
 
-#define GPIO_STATUS_ADDRESS                  0x1c
-#define GPIO_STATUS_W1TS_ADDRESS       0x20
-#define GPIO_STATUS_W1TC_ADDRESS      0x24
-#define GPIO_STATUS_INTERRUPT_MASK 0x0000ffff
+#define GPIO_STATUS_ADDRESS                0x1c
+#define GPIO_STATUS_W1TS_ADDRESS           0x20
+#define GPIO_STATUS_W1TC_ADDRESS           0x24
+#define GPIO_STATUS_INTERRUPT_MASK         0x0000ffff
 
-#define GPIO_RTC_CALIB_SYNC                  PERIPHS_GPIO_BASEADDR+0x6c
-#define RTC_CALIB_START                           BIT31  //first write to zero, then to one to start
-#define RTC_PERIOD_NUM_MASK              0x3ff   //max 8ms
+#define GPIO_RTC_CALIB_SYNC                PERIPHS_GPIO_BASEADDR+0x6c
+#define RTC_CALIB_START                    BIT31  //first write to zero, then to one to start
+#define RTC_PERIOD_NUM_MASK                0x3ff   //max 8ms
 #define GPIO_RTC_CALIB_VALUE               PERIPHS_GPIO_BASEADDR+0x70
-#define RTC_CALIB_RDY_S                           31  //after measure, flag to one, when start from zero to one, turn to zero
-#define RTC_CALIB_VALUE_MASK             0xfffff
+#define RTC_CALIB_RDY_S                    31  //after measure, flag to one, when start from zero to one, turn to zero
+#define RTC_CALIB_VALUE_MASK               0xfffff
 
-#define GPIO_PIN0_ADDRESS                        0x28
+#define GPIO_PIN0_ADDRESS                  0x28
 
-#define GPIO_ID_PIN0                                     0
-#define GPIO_ID_PIN(n)                                   (GPIO_ID_PIN0+(n))
-#define GPIO_LAST_REGISTER_ID                GPIO_ID_PIN(15)
-#define GPIO_ID_NONE                                  0xffffffff
+#define GPIO_ID_PIN0                       0
+#define GPIO_ID_PIN(n)                     (GPIO_ID_PIN0+(n))
+#define GPIO_LAST_REGISTER_ID              GPIO_ID_PIN(15)
+#define GPIO_ID_NONE                       0xffffffff
 
-#define GPIO_PIN_COUNT                              16
+#define GPIO_PIN_COUNT                     16
 
-#define GPIO_PIN_CONFIG_MSB                    12
-#define GPIO_PIN_CONFIG_LSB                     11
-#define GPIO_PIN_CONFIG_MASK                 0x00001800
-#define GPIO_PIN_CONFIG_GET(x)                 (((x) & GPIO_PIN_CONFIG_MASK) >> GPIO_PIN_CONFIG_LSB)
-#define GPIO_PIN_CONFIG_SET(x)                  (((x) << GPIO_PIN_CONFIG_LSB) & GPIO_PIN_CONFIG_MASK)
+#define GPIO_PIN_CONFIG_MSB                12
+#define GPIO_PIN_CONFIG_LSB                11
+#define GPIO_PIN_CONFIG_MASK               0x00001800
+#define GPIO_PIN_CONFIG_GET(x)             (((x) & GPIO_PIN_CONFIG_MASK) >> GPIO_PIN_CONFIG_LSB)
+#define GPIO_PIN_CONFIG_SET(x)             (((x) << GPIO_PIN_CONFIG_LSB) & GPIO_PIN_CONFIG_MASK)
 
-#define GPIO_WAKEUP_ENABLE                               1
-#define GPIO_WAKEUP_DISABLE                              (~GPIO_WAKEUP_ENABLE)
-#define GPIO_PIN_WAKEUP_ENABLE_MSB             10
-#define GPIO_PIN_WAKEUP_ENABLE_LSB              10
-#define GPIO_PIN_WAKEUP_ENABLE_MASK          0x00000400
-#define GPIO_PIN_WAKEUP_ENABLE_GET(x)          (((x) & GPIO_PIN_WAKEUP_ENABLE_MASK) >> GPIO_PIN_WAKEUP_ENABLE_LSB)
-#define GPIO_PIN_WAKEUP_ENABLE_SET(x)           (((x) << GPIO_PIN_WAKEUP_ENABLE_LSB) & GPIO_PIN_WAKEUP_ENABLE_MASK)
+#define GPIO_WAKEUP_ENABLE                 1
+#define GPIO_WAKEUP_DISABLE                (~GPIO_WAKEUP_ENABLE)
+#define GPIO_PIN_WAKEUP_ENABLE_MSB         10
+#define GPIO_PIN_WAKEUP_ENABLE_LSB         10
+#define GPIO_PIN_WAKEUP_ENABLE_MASK        0x00000400
+#define GPIO_PIN_WAKEUP_ENABLE_GET(x)      (((x) & GPIO_PIN_WAKEUP_ENABLE_MASK) >> GPIO_PIN_WAKEUP_ENABLE_LSB)
+#define GPIO_PIN_WAKEUP_ENABLE_SET(x)      (((x) << GPIO_PIN_WAKEUP_ENABLE_LSB) & GPIO_PIN_WAKEUP_ENABLE_MASK)
 
 #define GPIO_PIN_INT_TYPE_MASK             0x380
-#define GPIO_PIN_INT_TYPE_MSB                9
-#define GPIO_PIN_INT_TYPE_LSB                 7
-#define GPIO_PIN_INT_TYPE_GET(x)             (((x) & GPIO_PIN_INT_TYPE_MASK) >> GPIO_PIN_INT_TYPE_LSB)
-#define GPIO_PIN_INT_TYPE_SET(x)             (((x) << GPIO_PIN_INT_TYPE_LSB) & GPIO_PIN_INT_TYPE_MASK)
+#define GPIO_PIN_INT_TYPE_MSB              9
+#define GPIO_PIN_INT_TYPE_LSB              7
+#define GPIO_PIN_INT_TYPE_GET(x)           (((x) & GPIO_PIN_INT_TYPE_MASK) >> GPIO_PIN_INT_TYPE_LSB)
+#define GPIO_PIN_INT_TYPE_SET(x)           (((x) << GPIO_PIN_INT_TYPE_LSB) & GPIO_PIN_INT_TYPE_MASK)
 
 #define GPIO_PAD_DRIVER_ENABLE             1
 #define GPIO_PAD_DRIVER_DISABLE            (~GPIO_PAD_DRIVER_ENABLE)
 #define GPIO_PIN_PAD_DRIVER_MSB            2
-#define GPIO_PIN_PAD_DRIVER_LSB             2
-#define GPIO_PIN_PAD_DRIVER_MASK         0x00000004
+#define GPIO_PIN_PAD_DRIVER_LSB            2
+#define GPIO_PIN_PAD_DRIVER_MASK           0x00000004
 #define GPIO_PIN_PAD_DRIVER_GET(x)         (((x) & GPIO_PIN_PAD_DRIVER_MASK) >> GPIO_PIN_PAD_DRIVER_LSB)
-#define GPIO_PIN_PAD_DRIVER_SET(x)          (((x) << GPIO_PIN_PAD_DRIVER_LSB) & GPIO_PIN_PAD_DRIVER_MASK)
+#define GPIO_PIN_PAD_DRIVER_SET(x)         (((x) << GPIO_PIN_PAD_DRIVER_LSB) & GPIO_PIN_PAD_DRIVER_MASK)
 
-#define GPIO_AS_PIN_SOURCE                        0
-#define SIGMA_AS_PIN_SOURCE                     (~GPIO_AS_PIN_SOURCE)
-#define GPIO_PIN_SOURCE_MSB                     0
-#define GPIO_PIN_SOURCE_LSB                      0
-#define GPIO_PIN_SOURCE_MASK                  0x00000001
-#define GPIO_PIN_SOURCE_GET(x)                 (((x) & GPIO_PIN_SOURCE_MASK) >> GPIO_PIN_SOURCE_LSB)
-#define GPIO_PIN_SOURCE_SET(x)                  (((x) << GPIO_PIN_SOURCE_LSB) & GPIO_PIN_SOURCE_MASK)
+#define GPIO_AS_PIN_SOURCE                 0
+#define SIGMA_AS_PIN_SOURCE                (~GPIO_AS_PIN_SOURCE)
+#define GPIO_PIN_SOURCE_MSB                0
+#define GPIO_PIN_SOURCE_LSB                0
+#define GPIO_PIN_SOURCE_MASK               0x00000001
+#define GPIO_PIN_SOURCE_GET(x)             (((x) & GPIO_PIN_SOURCE_MASK) >> GPIO_PIN_SOURCE_LSB)
+#define GPIO_PIN_SOURCE_SET(x)             (((x) << GPIO_PIN_SOURCE_LSB) & GPIO_PIN_SOURCE_MASK)
 // }}
 
 // TIMER reg {{
-#define RTC_REG_READ(addr)                        READ_PERI_REG(PERIPHS_TIMER_BASEDDR + addr)
-#define RTC_REG_WRITE(addr, val)                WRITE_PERI_REG(PERIPHS_TIMER_BASEDDR + addr, val)
-#define RTC_CLR_REG_MASK(reg, mask)      CLEAR_PERI_REG_MASK(PERIPHS_TIMER_BASEDDR +reg, mask)
-/* Returns the current time according to the timer timer. */
-#define NOW()                                                 RTC_REG_READ(FRC2_COUNT_ADDRESS)
+#define TIMER_REG_READ(addr)               READ_PERI_REG(PERIPHS_TIMER_BASEDDR + addr)
+#define TIMER_REG_WRITE(addr, val)         WRITE_PERI_REG(PERIPHS_TIMER_BASEDDR + addr, val)
+#define TIMER_CLR_REG_MASK(reg, mask)      CLEAR_PERI_REG_MASK(PERIPHS_TIMER_BASEDDR +reg, mask)
+
+
+//Previous definitions of the above, kept for a while for possible compatibility, but deprecated
+#define RTC_REG_READ(addr)                 _Pragma("GCC warning \"'RTC_REG_READ' macro is deprecated\"")     TIMER_REG_READ(addr)
+#define RTC_REG_WRITE(addr, val)           _Pragma("GCC warning \"'RTC_REG_WRITE' macro is deprecated\"")    TIMER_REG_WRITE(addr, val)
+#define RTC_CLR_REG_MASK(reg, mask)        _Pragma("GCC warning \"'RTC_CLR_REG_MASK' macro is deprecated\"") TIMER_CLR_REG_MASK(reg, mask)
+
+
 
 //load initial_value to timer1
-#define FRC1_LOAD_ADDRESS                    0x00
+#define FRC1_LOAD_ADDRESS                  0x00
 
 //timer1's counter value(count from initial_value to 0)
 #define FRC1_COUNT_ADDRESS                 0x04
 
-#define FRC1_CTRL_ADDRESS                    0x08
+#define FRC1_CTRL_ADDRESS                  0x08
 
 //clear timer1's interrupt when write this address
-#define FRC1_INT_ADDRESS                      0x0c
-#define FRC1_INT_CLR_MASK                   0x00000001
+#define FRC1_INT_ADDRESS                   0x0c
+#define FRC1_INT_CLR_MASK                  0x00000001
 
 //timer2's counter value(count from initial_value to 0)
-#define FRC2_COUNT_ADDRESS                0x24
+#define FRC2_COUNT_ADDRESS                 0x24
 // }}
+
+/* Returns the current time according to the timer timer. */
+#define NOW()                              TIMER_REG_READ(FRC2_COUNT_ADDRESS)
 
 //RTC reg {{
 #define REG_RTC_BASE  PERIPHS_RTC_BASEADDR
+
+#define RTC_STORE0                              (REG_RTC_BASE + 0x030)
+#define RTC_STORE1                              (REG_RTC_BASE + 0x034)
+#define RTC_STORE2                              (REG_RTC_BASE + 0x038)
+#define RTC_STORE3                              (REG_RTC_BASE + 0x03C)
 
 #define RTC_GPIO_OUT                            (REG_RTC_BASE + 0x068)
 #define RTC_GPIO_ENABLE                         (REG_RTC_BASE + 0x074)
@@ -202,11 +235,11 @@
 #define FUNC_UART0_DTR                      4
 
 #define PERIPHS_IO_MUX_MTCK_U           (PERIPHS_IO_MUX + 0x08)
-#define FUNC_MTCK                            0
-#define FUNC_I2SI_BCK                        1
-#define FUNC_HSPID_MOSI                      2
-#define FUNC_GPIO13                          3
-#define FUNC_UART0_CTS                       4
+#define FUNC_MTCK                           0
+#define FUNC_I2SI_BCK                       1
+#define FUNC_HSPID_MOSI                     2
+#define FUNC_GPIO13                         3
+#define FUNC_UART0_CTS                      4
 
 #define PERIPHS_IO_MUX_MTMS_U           (PERIPHS_IO_MUX + 0x0C)
 #define FUNC_MTMS                           0
@@ -300,10 +333,11 @@
 
 #define PIN_PULLUP_DIS(PIN_NAME)                 CLEAR_PERI_REG_MASK(PIN_NAME, PERIPHS_IO_MUX_PULLUP)
 #define PIN_PULLUP_EN(PIN_NAME)                  SET_PERI_REG_MASK(PIN_NAME, PERIPHS_IO_MUX_PULLUP)
+
 #define PIN_FUNC_SELECT(PIN_NAME, FUNC)  do { \
     WRITE_PERI_REG(PIN_NAME,   \
-                                READ_PERI_REG(PIN_NAME) \
-                                     &  (~(PERIPHS_IO_MUX_FUNC<<PERIPHS_IO_MUX_FUNC_S))  \
+                                (READ_PERI_REG(PIN_NAME) \
+                                     &  (~(PERIPHS_IO_MUX_FUNC<<PERIPHS_IO_MUX_FUNC_S)))  \
                                      |( (((FUNC&BIT2)<<2)|(FUNC&0x3))<<PERIPHS_IO_MUX_FUNC_S) );  \
     } while (0)
 

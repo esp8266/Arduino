@@ -109,17 +109,8 @@ bool isSpiffsFilenameValid(const char* name)
 }
 
 // these symbols should be defined in the linker script for each flash layout
+#ifndef CORE_MOCK
 #ifdef ARDUINO
-extern "C" uint32_t _SPIFFS_start;
-extern "C" uint32_t _SPIFFS_end;
-extern "C" uint32_t _SPIFFS_page;
-extern "C" uint32_t _SPIFFS_block;
-
-#define SPIFFS_PHYS_ADDR ((uint32_t) (&_SPIFFS_start) - 0x40200000)
-#define SPIFFS_PHYS_SIZE ((uint32_t) (&_SPIFFS_end) - (uint32_t) (&_SPIFFS_start))
-#define SPIFFS_PHYS_PAGE ((uint32_t) &_SPIFFS_page)
-#define SPIFFS_PHYS_BLOCK ((uint32_t) &_SPIFFS_block)
-
 #ifndef SPIFFS_MAX_OPEN_FILES
 #define SPIFFS_MAX_OPEN_FILES 5
 #endif
@@ -131,6 +122,7 @@ FS SPIFFS = FS(FSImplPtr(new SPIFFSImpl(
                              SPIFFS_PHYS_PAGE,
                              SPIFFS_PHYS_BLOCK,
                              SPIFFS_MAX_OPEN_FILES)));
-#endif
+#endif // ARDUINO
+#endif // !CORE_MOCK
 
 #endif

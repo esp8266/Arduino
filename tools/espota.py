@@ -95,7 +95,7 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
   sent = sock2.sendto(message.encode(), remote_address)
   sock2.settimeout(10)
   try:
-    data = sock2.recv(37).decode()
+    data = sock2.recv(128).decode()
   except:
     logging.error('No Answer')
     sock2.close()
@@ -144,6 +144,8 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
     sock.close()
     return 1
 
+  received_ok = False
+
   try:
     f = open(filename, "rb")
     if (PROGRESS):
@@ -160,7 +162,9 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
       connection.settimeout(10)
       try:
         connection.sendall(chunk)
-        res = connection.recv(4)
+        if connection.recv(32).decode().find('O') >= 0:
+          # connection will receive only digits or 'OK'
+          received_ok = True;
       except:
         sys.stderr.write('\n')
         logging.error('Error Uploading')
@@ -171,10 +175,16 @@ def serve(remoteAddr, localAddr, remotePort, localPort, password, filename, comm
 
     sys.stderr.write('\n')
     logging.info('Waiting for result...')
+    # libraries/ArduinoOTA/ArduinoOTA.cpp L311 L320
+    # only sends digits or 'OK'. We must not not close
+    # the connection before receiving the 'O' of 'OK'
     try:
       connection.settimeout(60)
-      data = connection.recv(32).decode()
-      logging.info('Result: %s' ,data)
+      while not received_ok:
+        if connection.recv(32).decode().find('O') >= 0:
+          # connection will receive only digits or 'OK'
+          received_ok = True;
+      logging.info('Result: OK')
       connection.close()
       f.close()
       sock.close()

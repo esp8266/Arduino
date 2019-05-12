@@ -64,9 +64,11 @@ std::function<void(int)> ESP8266WiFiScanClass::_onComplete;
  * Start scan WiFi networks available
  * @param async         run in async mode
  * @param show_hidden   show hidden networks
+ * @param channel       scan only this channel (0 for all channels)
+ * @param ssid*         scan for only this ssid (NULL for all ssid's)
  * @return Number of discovered networks
  */
-int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden) {
+int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden, uint8 channel, uint8* ssid) {
     if(ESP8266WiFiScanClass::_scanStarted) {
         return WIFI_SCAN_RUNNING;
     }
@@ -77,15 +79,15 @@ int8_t ESP8266WiFiScanClass::scanNetworks(bool async, bool show_hidden) {
 
     int status = wifi_station_get_connect_status();
     if(status != STATION_GOT_IP && status != STATION_IDLE) {
-        WiFi.disconnect(false);
+        wifi_station_disconnect();
     }
 
     scanDelete();
 
     struct scan_config config;
-    config.ssid = 0;
-    config.bssid = 0;
-    config.channel = 0;
+    memset(&config, 0, sizeof(config));
+    config.ssid = ssid;
+    config.channel = channel;
     config.show_hidden = show_hidden;
     if(wifi_station_scan(&config, reinterpret_cast<scan_done_cb_t>(&ESP8266WiFiScanClass::_scanDone))) {
         ESP8266WiFiScanClass::_scanComplete = false;
@@ -163,7 +165,10 @@ bool ESP8266WiFiScanClass::getNetworkInfo(uint8_t i, String &ssid, uint8_t &encT
         return false;
     }
 
-    ssid = (const char*) it->ssid;
+    char ssid_copy[33]; // Ensure space for maximum len SSID (32) plus trailing 0
+    memcpy(ssid_copy, it->ssid, sizeof(it->ssid));
+    ssid_copy[32] = 0; // Potentially add 0-termination if none present earlier
+    ssid = (const char*) ssid_copy;
     encType = encryptionType(i);
     rssi = it->rssi;
     bssid = it->bssid; // move ptr
@@ -184,8 +189,11 @@ String ESP8266WiFiScanClass::SSID(uint8_t i) {
     if(!it) {
         return "";
     }
+    char tmp[33]; //ssid can be up to 32chars, => plus null term
+    memcpy(tmp, it->ssid, sizeof(it->ssid));
+    tmp[32] = 0; //nullterm in case of 32 char ssid
 
-    return String(reinterpret_cast<const char*>(it->ssid));
+    return String(reinterpret_cast<const char*>(tmp));
 }
 
 

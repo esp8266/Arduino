@@ -33,17 +33,37 @@ extern "C" {
 #include "cont.h"
 }
 #include <core_version.h>
+#include "gdb_hooks.h"
 
 #define LOOP_TASK_PRIORITY 1
 #define LOOP_QUEUE_SIZE    1
-
 #define OPTIMISTIC_YIELD_TIME_US 16000
 
+extern "C" void call_user_start();
+extern void loop();
+extern void setup();
+extern void (*__init_array_start)(void);
+extern void (*__init_array_end)(void);
+
+/* Not static, used in Esp.cpp */
 struct rst_info resetInfo;
+
+/* Not static, used in core_esp8266_postmortem.c and other places.
+ * Placed into noinit section because we assign value to this variable
+ * before .bss is zero-filled, and need to preserve the value.
+ */
+cont_t* g_pcont __attribute__((section(".noinit")));
+
+/* Event queue used by the main (arduino) task */
+static os_event_t s_loop_queue[LOOP_QUEUE_SIZE];
+
+/* Used to implement optimistic_yield */
+static uint32_t s_micros_at_task_start;
+
 
 extern "C" {
 extern const uint32_t __attribute__((section(".ver_number"))) core_version = ARDUINO_ESP8266_GIT_VER;
-const char* core_release = 
+const char* core_release =
 #ifdef ARDUINO_ESP8266_RELEASE
     ARDUINO_ESP8266_RELEASE;
 #else
@@ -51,17 +71,9 @@ const char* core_release =
 #endif
 } // extern "C"
 
-int atexit(void (*func)()) {
-    return 0;
-}
-
-extern "C" void ets_update_cpu_frequency(int freqmhz);
 void initVariant() __attribute__((weak));
 void initVariant() {
 }
-
-extern void loop();
-extern void setup();
 
 void preloop_update_frequency() __attribute__((weak));
 void preloop_update_frequency() {
@@ -71,17 +83,10 @@ void preloop_update_frequency() {
 #endif
 }
 
-extern void (*__init_array_start)(void);
-extern void (*__init_array_end)(void);
-
-cont_t g_cont __attribute__ ((aligned (16)));
-static os_event_t g_loop_queue[LOOP_QUEUE_SIZE];
-
-static uint32_t g_micros_at_task_start;
 
 extern "C" void esp_yield() {
-    if (cont_can_yield(&g_cont)) {
-        cont_yield(&g_cont);
+    if (cont_can_yield(g_pcont)) {
+        cont_yield(g_pcont);
     }
 }
 
@@ -90,7 +95,7 @@ extern "C" void esp_schedule() {
 }
 
 extern "C" void __yield() {
-    if (cont_can_yield(&g_cont)) {
+    if (cont_can_yield(g_pcont)) {
         esp_schedule();
         esp_yield();
     }
@@ -102,8 +107,8 @@ extern "C" void __yield() {
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
 extern "C" void optimistic_yield(uint32_t interval_us) {
-    if (cont_can_yield(&g_cont) &&
-        (system_get_time() - g_micros_at_task_start) > interval_us)
+    if (cont_can_yield(g_pcont) &&
+        (system_get_time() - s_micros_at_task_start) > interval_us)
     {
         yield();
     }
@@ -114,9 +119,6 @@ static void loop_wrapper() {
     preloop_update_frequency();
     if(!setup_done) {
         setup();
-#ifdef DEBUG_ESP_PORT
-        DEBUG_ESP_PORT.setDebugOutput(true);
-#endif
         setup_done = true;
     }
     loop();
@@ -125,33 +127,131 @@ static void loop_wrapper() {
 }
 
 static void loop_task(os_event_t *events) {
-    g_micros_at_task_start = system_get_time();
-    cont_run(&g_cont, &loop_wrapper);
-    if (cont_check(&g_cont) != 0) {
+    (void) events;
+    s_micros_at_task_start = system_get_time();
+    cont_run(g_pcont, &loop_wrapper);
+    if (cont_check(g_pcont) != 0) {
         panic();
     }
 }
+extern "C" {
+
+struct object { long placeholder[ 10 ]; };
+void __register_frame_info (const void *begin, struct object *ob);
+extern char __eh_frame[];
+}
 
 static void do_global_ctors(void) {
+    static struct object ob;
+    __register_frame_info( __eh_frame, &ob );
+
     void (**p)(void) = &__init_array_end;
     while (p != &__init_array_start)
         (*--p)();
 }
 
-extern "C" void __gdb_init() {}
-extern "C" void gdb_init(void) __attribute__ ((weak, alias("__gdb_init")));
+extern "C" {
+extern void __unhandled_exception(const char *str);
 
-extern "C" void __gdb_do_break(){}
-extern "C" void gdb_do_break(void) __attribute__ ((weak, alias("__gdb_do_break")));
+static void  __unhandled_exception_cpp()
+{
+#ifndef __EXCEPTIONS
+	abort();
+#else
+    static bool terminating;
+    if (terminating)
+        abort();
+    terminating = true;
+    /* Use a trick from vterminate.cc to get any std::exception what() */
+    try {
+        __throw_exception_again;
+    } catch (const std::exception& e) {
+        __unhandled_exception( e.what() );
+    } catch (...) {
+        __unhandled_exception( "" );
+    }
+#endif
+}
+
+}
 
 void init_done() {
     system_set_os_print(1);
     gdb_init();
+    std::set_terminate(__unhandled_exception_cpp);
     do_global_ctors();
-    printf("\n%08x\n", core_version);
     esp_schedule();
 }
 
+/* This is the entry point of the application.
+ * It gets called on the default stack, which grows down from the top
+ * of DRAM area.
+ * .bss has not been zeroed out yet, but .data and .rodata are in place.
+ * Cache is not enabled, so only ROM and IRAM functions can be called.
+ * Peripherals (except for SPI0 and UART0) are not initialized.
+ * This function does not return.
+ */
+/*
+   A bit of explanation for this entry point:
+
+   SYS is the SDK task/context used by the upperlying system to run its
+   administrative tasks (at least WLAN and lwip's receive callbacks and
+   Ticker).  NONOS-SDK is designed to run user's non-threaded code in
+   another specific task/context with its own stack in BSS.
+
+   Some clever fellows found that the SYS stack was a large and quite unused
+   piece of ram that we could use for the user's stack instead of using user's
+   main memory, thus saving around 4KB on ram/heap.
+
+   A problem arose later, which is that this stack can heavily be used by
+   the SDK for some features.  One of these features is WPS.  We still don't
+   know if other features are using this, or if this memory is going to be
+   used in future SDK releases.
+
+   WPS beeing flawed by its poor security, or not beeing used by lots of
+   users, it has been decided that we are still going to use that memory for
+   user's stack and disable the use of WPS.
+
+   app_entry() jumps to app_entry_custom() defined as "weakref" calling
+   itself a weak customizable function, allowing to use another one when
+   this is required (see core_esp8266_app_entry_noextra4k.cpp, used by WPS).
+
+   (note: setting app_entry() itself as "weak" is not sufficient and always
+    ends up with the other "noextra4k" one linked, maybe because it has a
+    default ENTRY(app_entry) value in linker scripts).
+
+   References:
+   https://github.com/esp8266/Arduino/pull/4553
+   https://github.com/esp8266/Arduino/pull/4622
+   https://github.com/esp8266/Arduino/issues/4779
+   https://github.com/esp8266/Arduino/pull/4889
+
+*/
+
+extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void) __attribute__((weak));
+extern "C" void ICACHE_RAM_ATTR app_entry_redefinable(void)
+{
+    /* Allocate continuation context on this SYS stack,
+       and save pointer to it. */
+    cont_t s_cont __attribute__((aligned(16)));
+    g_pcont = &s_cont;
+
+    /* Call the entry point of the SDK code. */
+    call_user_start();
+}
+
+static void ICACHE_RAM_ATTR app_entry_custom (void) __attribute__((weakref("app_entry_redefinable")));
+
+extern "C" void ICACHE_RAM_ATTR app_entry (void)
+{
+    return app_entry_custom();
+}
+
+extern "C" void preinit (void) __attribute__((weak));
+extern "C" void preinit (void)
+{
+    /* do nothing by default */
+}
 
 extern "C" void user_init(void) {
     struct rst_info *rtc_info_ptr = system_get_rst_info();
@@ -159,14 +259,16 @@ extern "C" void user_init(void) {
 
     uart_div_modify(0, UART_CLK_FREQ / (115200));
 
-    init();
+    init(); // in core_esp8266_wiring.c, inits hw regs and sdk timer
 
     initVariant();
 
-    cont_init(&g_cont);
+    cont_init(g_pcont);
+
+    preinit(); // Prior to C++ Dynamic Init (not related to above init() ). Meant to be user redefinable.
 
     ets_task(loop_task,
-        LOOP_TASK_PRIORITY, g_loop_queue,
+        LOOP_TASK_PRIORITY, s_loop_queue,
         LOOP_QUEUE_SIZE);
 
     system_init_done_cb(&init_done);

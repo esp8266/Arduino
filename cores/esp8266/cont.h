@@ -27,6 +27,10 @@
 #define CONT_STACKSIZE 4096
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct cont_ {
         void (*pc_ret)(void);
         unsigned* sp_ret;
@@ -44,6 +48,8 @@ typedef struct cont_ {
         unsigned stack_guard2;
         unsigned* struct_start;
 } cont_t;
+
+extern cont_t* g_pcont;
 
 // Initialize the cont_t structure before calling cont_run
 void cont_init(cont_t*);
@@ -67,5 +73,15 @@ int cont_get_free_stack(cont_t* cont);
 // Check if yield() may be called. Returns true if we are running inside
 // continuation stack
 bool cont_can_yield(cont_t* cont);
+
+// Repaint the stack from the current SP to the end, to allow individual
+// routines' stack usages to be calculated by re-painting, checking current
+// free, running the routine, then checking the max free
+void cont_repaint_stack(cont_t *cont);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CONT_H_ */
