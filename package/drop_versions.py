@@ -19,7 +19,9 @@ def drop_version(todrop, obj):
     out = [];
     for o in obj:
         version = o['version'].encode('ascii')
-        if version != todrop:
+        if version == todrop:
+            print("Dropping version {0}".format(todrop), file=sys.stderr)
+        else:
             out.append(o)
     return out
 
