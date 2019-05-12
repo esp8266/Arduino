@@ -165,7 +165,10 @@ bool ESP8266WiFiScanClass::getNetworkInfo(uint8_t i, String &ssid, uint8_t &encT
         return false;
     }
 
-    ssid = (const char*) it->ssid;
+    char ssid_copy[33]; // Ensure space for maximum len SSID (32) plus trailing 0
+    memcpy(ssid_copy, it->ssid, sizeof(it->ssid));
+    ssid_copy[32] = 0; // Potentially add 0-termination if none present earlier
+    ssid = (const char*) ssid_copy;
     encType = encryptionType(i);
     rssi = it->rssi;
     bssid = it->bssid; // move ptr
@@ -186,8 +189,11 @@ String ESP8266WiFiScanClass::SSID(uint8_t i) {
     if(!it) {
         return "";
     }
+    char tmp[33]; //ssid can be up to 32chars, => plus null term
+    memcpy(tmp, it->ssid, sizeof(it->ssid));
+    tmp[32] = 0; //nullterm in case of 32 char ssid
 
-    return String(reinterpret_cast<const char*>(it->ssid));
+    return String(reinterpret_cast<const char*>(tmp));
 }
 
 

@@ -3,7 +3,7 @@ FAQ
 
 The purpose of this FAQ / Troubleshooting is to respond to questions
 commonly asked in `Issues <https://github.com/esp8266/Arduino/issues>`__
-section and on `ESP8266 Community forum <http://www.esp8266.com/>`__.
+section and on `ESP8266 Community forum <https://www.esp8266.com/>`__.
 
 Where possible we are going right to the answer and provide it within
 one or two paragraphs. If it takes more than that, you will see a link

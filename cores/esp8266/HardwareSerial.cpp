@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <PolledTimeout.h>
 #include "Arduino.h"
 #include "HardwareSerial.h"
 #include "Esp.h"
@@ -130,6 +131,22 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
         delay(100);
     }    
     return detectedBaudrate;
+}
+
+size_t HardwareSerial::readBytes(char* buffer, size_t size)
+{
+    size_t got = 0;
+
+    while (got < size)
+    {
+        esp8266::polledTimeout::oneShotFastMs timeOut(_timeout);
+        size_t avail;
+        while ((avail = available()) == 0 && !timeOut);
+        if (avail == 0)
+            break;
+        got += read(buffer + got, std::min(size - got, avail));
+    }
+    return got;
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)

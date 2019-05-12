@@ -34,10 +34,11 @@ namespace BearSSL {
 class WiFiClientSecure : public WiFiClient {
   public:
     WiFiClientSecure();
+    WiFiClientSecure(const WiFiClientSecure &rhs);
     ~WiFiClientSecure() override;
 
     int connect(IPAddress ip, uint16_t port) override;
-    int connect(const String host, uint16_t port) override;
+    int connect(const String& host, uint16_t port) override;
     int connect(const char* name, uint16_t port) override;
 
     uint8_t connected() override;
@@ -55,8 +56,10 @@ class WiFiClientSecure : public WiFiClient {
     int read() override;
     int peek() override;
     size_t peekBytes(uint8_t *buffer, size_t length) override;
-    bool flush(unsigned int maxWaitMs = 0) override;
-    bool stop(unsigned int maxWaitMs = 0) override;
+    bool flush(unsigned int maxWaitMs);
+    bool stop(unsigned int maxWaitMs);
+    void flush() override { (void)flush(0); }
+    void stop() override { (void)stop(0); }
 
     // Allow sessions to be saved/restored automatically to a memory area
     void setSession(Session *session) { _session = session; }
@@ -102,6 +105,11 @@ class WiFiClientSecure : public WiFiClient {
     // Sets the requested buffer size for transmit and receive
     void setBufferSizes(int recv, int xmit);
 
+    // Returns whether MFLN negotiation for the above buffer sizes succeeded (after connection)
+    int getMFLNStatus() {
+      return connected() && br_ssl_engine_get_mfln_negotiated(_eng);
+    }
+
     // Return an error code and possibly a text string in a passed-in buffer with last SSL failure
     int getLastSSLError(char *dest = NULL, size_t len = 0);
 
@@ -116,26 +124,43 @@ class WiFiClientSecure : public WiFiClient {
     bool setCiphers(std::vector<uint16_t> list);
     bool setCiphersLessSecure(); // Only use the limited set of RSA ciphers without EC
 
-    // Check for Maximum Fragment Length support for given len
+    // Check for Maximum Fragment Length support for given len before connection (possibly insecure)
     static bool probeMaxFragmentLength(IPAddress ip, uint16_t port, uint16_t len);
     static bool probeMaxFragmentLength(const char *hostname, uint16_t port, uint16_t len);
-    static bool probeMaxFragmentLength(const String host, uint16_t port, uint16_t len);
+    static bool probeMaxFragmentLength(const String& host, uint16_t port, uint16_t len);
 
-    // AXTLS compatible wrappers
-    // Cannot implement this mode, we need FP before we can connect: bool verify(const char* fingerprint, const char* domain_name)
-    bool verifyCertChain(const char* domain_name) { (void)domain_name; return connected(); } // If we're connected, the cert passed validation during handshake
+    ////////////////////////////////////////////////////
+    // AxTLS API deprecated warnings to help upgrading
 
-    bool setCACert(const uint8_t* pk, size_t size);
-    bool setCertificate(const uint8_t* pk, size_t size);
-    bool setPrivateKey(const uint8_t* pk, size_t size);
+    #define AXTLS_DEPRECATED \
+      __attribute__((deprecated( \
+        "This is deprecated AxTLS API, " \
+        "check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99")))
 
-    bool setCACert_P(PGM_VOID_P pk, size_t size) { return setCACert((const uint8_t *)pk, size); }
-    bool setCertificate_P(PGM_VOID_P pk, size_t size) { return setCertificate((const uint8_t *)pk, size); }
-    bool setPrivateKey_P(PGM_VOID_P pk, size_t size) { return setPrivateKey((const uint8_t *)pk, size); }
+    bool setCACert(const uint8_t* pk, size_t size)      AXTLS_DEPRECATED;
+    bool setCertificate(const uint8_t* pk, size_t size) AXTLS_DEPRECATED;
+    bool setPrivateKey(const uint8_t* pk, size_t size)  AXTLS_DEPRECATED;
 
-    bool loadCACert(Stream& stream, size_t size);
-    bool loadCertificate(Stream& stream, size_t size);
-    bool loadPrivateKey(Stream& stream, size_t size);
+    bool loadCACert(Stream& stream, size_t size)        AXTLS_DEPRECATED;
+    bool loadCertificate(Stream& stream, size_t size)   AXTLS_DEPRECATED;
+    bool loadPrivateKey(Stream& stream, size_t size)    AXTLS_DEPRECATED;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
+
+    bool setCACert_P(PGM_VOID_P pk, size_t size) AXTLS_DEPRECATED {
+      return setCACert((const uint8_t *)pk, size);
+    }
+
+    bool setCertificate_P(PGM_VOID_P pk, size_t size) AXTLS_DEPRECATED {
+      return setCertificate((const uint8_t *)pk, size);
+    }
+
+    bool setPrivateKey_P(PGM_VOID_P pk, size_t size) AXTLS_DEPRECATED {
+      return setPrivateKey((const uint8_t *)pk, size);
+    }
+
+#pragma GCC diagnostic pop
 
     template<typename TFile>
     bool loadCertificate(TFile& file) {
@@ -151,6 +176,20 @@ class WiFiClientSecure : public WiFiClient {
     bool loadCACert(TFile& file) {
       return loadCACert(file, file.size());
     }
+
+    bool verify(const char* fingerprint, const char* domain_name) AXTLS_DEPRECATED {
+      (void)fingerprint;
+      (void)domain_name;
+      return connected();
+    }
+
+    bool verifyCertChain(const char* domain_name) AXTLS_DEPRECATED {
+      (void)domain_name;
+      return connected();
+    }
+
+    // AxTLS API deprecated section end
+    /////////////////////////////////////
 
   private:
     void _clear();
@@ -175,6 +214,14 @@ class WiFiClientSecure : public WiFiClient {
     bool _handshake_done;
     bool _oom_err;
 
+    // AXTLS compatibility shim elements:
+    // AXTLS managed memory for certs and keys, while BearSSL assumes
+    // the app manages these.  Use this local storage for holding the
+    // BearSSL created objects in a shared form.
+    std::shared_ptr<X509List>   _axtls_ta;
+    std::shared_ptr<X509List>   _axtls_chain;
+    std::shared_ptr<PrivateKey> _axtls_sk;
+
     // Optional storage space pointer for session parameters
     // Will be used on connect and updated on close
     Session *_session;
@@ -187,7 +234,7 @@ class WiFiClientSecure : public WiFiClient {
     unsigned _knownkey_usages;
 
     // Custom cipher list pointer or NULL if default
-    uint16_t *_cipher_list;
+    std::shared_ptr<uint16_t> _cipher_list;
     uint8_t _cipher_cnt;
 
     unsigned char *_recvapp_buf;
@@ -224,16 +271,6 @@ class WiFiClientSecure : public WiFiClient {
     bool _installServerX509Validator(const X509List *client_CA_ta); // Setup X509 client cert validation, if supplied
 
     uint8_t *_streamLoad(Stream& stream, size_t size);
-
-    // AXTLS compatible mode needs to delete the stored certs and keys on destruction
-    bool _deleteChainKeyTA;
-
-  private:
-    // Single memory buffer used for BearSSL auxilliary stack, insead of growing main Arduino stack for all apps
-    static std::shared_ptr<uint8_t> _bearssl_stack;
-    void _ensureStackAvailable(); // Allocate the stack if necessary
-    // The local copy, only used to enable a reference count
-    std::shared_ptr<uint8_t> _local_bearssl_stack;
 };
 
 };

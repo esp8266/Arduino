@@ -52,6 +52,71 @@ void gdb_do_break(void);
  */
 bool gdb_present(void);
 
+// If gdbstub has these set true, then we will disable our own
+// usage of them, but use gdbstub's callbacks for them instead
+/**
+ * @brief Check if GDB is installing a putc1 callback.
+ * 
+ * By default, this function returns false. When GDBStub library is linked,
+ * this function is overriden and returns true.
+ * 
+ * @return true if GDB is installing a putc1 callback
+ */
+bool gdbstub_has_putc1_control(void);
+
+/**
+ * @brief Register a putc1 callback with GDB.
+ * @param func function GDB will proxy putc1 data to
+ * 
+ * By default, this function is a no-op. When GDBStub library is linked,
+ * this function is overriden and sets GDB stub's secondary putc1 callback to
+ * func. When GDB stub is linked, but a GDB session is not current attached,
+ * then GDB stub will pass putc1 chars directly to this function.
+ */
+void gdbstub_set_putc1_callback(void (*func)(char));
+
+/**
+ * @brief Check if GDB is installing a uart0 isr callback.
+ * 
+ * By default, this function returns false. When GDBStub library is linked,
+ * this function is overriden and returns true.
+ * 
+ * @return true if GDB is installing a uart0 isr callback
+ */
+bool gdbstub_has_uart_isr_control(void);
+
+/**
+ * @brief Register a uart0 isr callback with GDB.
+ * @param func function GDB will proxy uart0 isr data to
+ * 
+ * By default, this function is a no-op. When GDBStub library is linked,
+ * this function is overriden and sets GDB stub's secondary uart0 isr callback
+ * to func. When GDB stub is linked, but a GDB session is not current attached,
+ * then GDB stub will pass uart0 isr data back to this function.
+ */
+void gdbstub_set_uart_isr_callback(void (*func)(void*, uint8_t), void* arg);
+
+/**
+ * @brief Write a character for output to a GDB session on uart0.
+ * @param c character to write
+ * 
+ * By default, this function is a no-op. When GDBStub library is linked,
+ * this function is overriden and writes a char to either the GDB session on
+ * uart0 or directly to uart0 if not GDB session is attached.
+ */
+void gdbstub_write_char(char c);
+
+/**
+ * @brief Write a char buffer for output to a GDB session on uart0.
+ * @param buf buffer of data to write
+ * @param size length of buffer
+ * 
+ * By default, this function is a no-op. When GDBStub library is linked,
+ * this function is overriden and writes a buffer to either the GDB session on
+ * uart0 or directly to uart0 if not GDB session is attached.
+ */
+void gdbstub_write(const char* buf, size_t size);
+
 #ifdef __cplusplus
 }
 #endif

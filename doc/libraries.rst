@@ -75,7 +75,7 @@ Some ESP-specific APIs related to deep sleep, RTC and flash memories are availab
 
 ``ESP.deepSleepInstant(microseconds, mode)`` works similarly to ``ESP.deepSleep`` but  sleeps instantly without waiting for WiFi to shutdown.
 
-``ESP.rtcUserMemoryWrite(offset, &data, sizeof(data))`` and ``ESP.rtcUserMemoryRead(offset, &data, sizeof(data))`` allow data to be stored in and retrieved from the RTC user memory of the chip respectively. Total size of RTC user memory is 512 bytes, so ``offset + sizeof(data)`` shouldn't exceed 512. Data should be 4-byte aligned. The stored data can be retained between deep sleep cycles. However, the data might be lost after power cycling the chip.
+``ESP.rtcUserMemoryWrite(offset, &data, sizeof(data))`` and ``ESP.rtcUserMemoryRead(offset, &data, sizeof(data))`` allow data to be stored in and retrieved from the RTC user memory of the chip respectively. ``offset`` is measured in blocks of 4 bytes and can range from 0 to 127 blocks (total size of RTC memory is 512 bytes). ``data`` should be 4-byte aligned. The stored data can be retained between deep sleep cycles, but might be lost after power cycling the chip. Data stored in the first 32 blocks will be lost after performing an OTA update, because they are used by the Core internals.
 
 ``ESP.restart()`` restarts the CPU.
 
@@ -158,7 +158,7 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 -  `arduinoVNC <https://github.com/Links2004/arduinoVNC>`__ - VNC Client for Arduino
 -  `arduinoWebSockets <https://github.com/Links2004/arduinoWebSockets>`__ - WebSocket Server and Client compatible with ESP8266 (RFC6455)
 -  `aREST <https://github.com/marcoschwartz/aREST>`__ - REST API handler library.
--  `Blynk <https://github.com/blynkkk/blynk-library>`__ - easy IoT framework for Makers (check out the `Kickstarter page <http://tiny.cc/blynk-kick>`__).
+-  `Blynk <https://github.com/blynkkk/blynk-library>`__ - easy IoT framework for Makers (check out the `Kickstarter page <https://tiny.cc/blynk-kick>`__).
 -  `DallasTemperature <https://github.com/milesburton/Arduino-Temperature-Control-Library.git>`__
 -  `DHT-sensor-library <https://github.com/adafruit/DHT-sensor-library>`__ - Arduino library for the DHT11/DHT22 temperature and humidity sensors. Download latest v1.1.1 library and no changes are necessary. Older versions should initialize DHT as follows: ``DHT dht(DHTPIN, DHTTYPE, 15)``
 -  `DimSwitch <https://github.com/krzychb/DimSwitch>`__ - Control electronic dimmable ballasts for fluorescent light tubes remotely as if using a wall switch.

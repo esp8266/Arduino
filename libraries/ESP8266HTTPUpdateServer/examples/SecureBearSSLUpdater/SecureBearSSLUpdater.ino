@@ -19,12 +19,17 @@
 #include <ESP8266mDNS.h>
 #include <ESP8266HTTPUpdateServer.h>
 
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
 const char* host = "esp8266-webupdate";
 const char* update_path = "/firmware";
 const char* update_username = "admin";
 const char* update_password = "admin";
-const char* ssid = "........";
-const char* password = "........";
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 BearSSL::ESP8266WebServerSecure httpServer(443);
 ESP8266HTTPUpdateServer httpUpdater;
@@ -114,4 +119,5 @@ void setup()
 void loop()
 {
   httpServer.handleClient();
+  MDNS.update();
 }

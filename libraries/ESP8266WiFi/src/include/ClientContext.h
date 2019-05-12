@@ -122,7 +122,7 @@ public:
         }
     }
 
-    int connect(ip_addr_t* addr, uint16_t port)
+    int connect(CONST ip_addr_t* addr, uint16_t port)
     {
         err_t err = tcp_connect(_pcb, addr, port, &ClientContext::_s_connected);
         if (err != ERR_OK) {
@@ -145,7 +145,7 @@ public:
         return 1;
     }
 
-    size_t availableForWrite()
+    size_t availableForWrite() const
     {
         return _pcb? tcp_sndbuf(_pcb): 0;
     }
@@ -180,13 +180,13 @@ public:
         return _timeout_ms;
     }
 
-    uint32_t getRemoteAddress() const
+    const ip_addr_t* getRemoteAddress() const
     {
         if(!_pcb) {
             return 0;
         }
 
-        return _pcb->remote_ip.addr;
+        return &_pcb->remote_ip;
     }
 
     uint16_t getRemotePort() const
@@ -198,13 +198,13 @@ public:
         return _pcb->remote_port;
     }
 
-    uint32_t getLocalAddress() const
+    const ip_addr_t* getLocalAddress() const
     {
         if(!_pcb) {
             return 0;
         }
 
-        return _pcb->local_ip.addr;
+        return &_pcb->local_ip;
     }
 
     uint16_t getLocalPort() const

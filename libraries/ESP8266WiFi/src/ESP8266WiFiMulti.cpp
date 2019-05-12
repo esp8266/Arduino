@@ -38,6 +38,10 @@ bool ESP8266WiFiMulti::addAP(const char* ssid, const char *passphrase) {
     return APlistAdd(ssid, passphrase);
 }
 
+bool ESP8266WiFiMulti::existsAP(const char* ssid, const char *passphrase) {
+    return APlistExists(ssid, passphrase);
+}
+
 wl_status_t ESP8266WiFiMulti::run(void) {
 
     wl_status_t status = WiFi.status();
@@ -183,17 +187,22 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
 
     WifiAPEntry newAP;
 
-    if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
-        // fail SSID to long or missing!
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] no ssid or ssid to long\n");
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
+        // fail SSID too long or missing!
+        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] no ssid or ssid too long\n");
         return false;
     }
 
     //for passphrase, max is 63 ascii + null. For psk, 64hex + null.
     if(passphrase && strlen(passphrase) > 64) {
-        // fail passphrase to long!
-        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] passphrase to long\n");
+        // fail passphrase too long!
+        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] passphrase too long\n");
         return false;
+    }
+
+    if(APlistExists(ssid, passphrase)) {
+        DEBUG_WIFI_MULTI("[WIFI][APlistAdd] SSID: %s already exists\n", ssid);
+        return true;
     }
 
     newAP.ssid = strdup(ssid);
@@ -218,6 +227,28 @@ bool ESP8266WiFiMulti::APlistAdd(const char* ssid, const char *passphrase) {
     APlist.push_back(newAP);
     DEBUG_WIFI_MULTI("[WIFI][APlistAdd] add SSID: %s\n", newAP.ssid);
     return true;
+}
+
+bool ESP8266WiFiMulti::APlistExists(const char* ssid, const char *passphrase) {
+    if(!ssid || *ssid == 0x00 || strlen(ssid) > 32) {
+        // fail SSID too long or missing!
+        DEBUG_WIFI_MULTI("[WIFI][APlistExists] no ssid or ssid too long\n");
+        return false;
+    }
+    for(auto entry : APlist) {
+        if(!strcmp(entry.ssid, ssid)) {
+            if(!passphrase) {
+                if(!strcmp(entry.passphrase, "")) {
+                    return true;
+                }
+            } else {
+                if(!strcmp(entry.passphrase, passphrase)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 void ESP8266WiFiMulti::APlistClean(void) {

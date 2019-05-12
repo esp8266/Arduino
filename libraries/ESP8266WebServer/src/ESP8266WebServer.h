@@ -55,8 +55,9 @@ typedef struct {
   String  filename;
   String  name;
   String  type;
-  size_t  totalSize;    // file size
+  size_t  totalSize;    // total size of uploaded file so far
   size_t  currentSize;  // size of data currently in buf
+  size_t  contentLength; // size of entire post request, file size + headers and other request data.
   uint8_t buf[HTTP_UPLOAD_BUFLEN];
 } HTTPUpload;
 
@@ -134,6 +135,8 @@ public:
     return _currentClient.write(file);
   }
 
+  static const String responseCodeToString(const int code);
+
 protected:
   virtual size_t _currentClientWrite(const char* b, size_t l) { return _currentClient.write( b, l ); }
   virtual size_t _currentClientWrite_P(PGM_P b, size_t l) { return _currentClient.write_P( b, l ); }
@@ -143,7 +146,6 @@ protected:
   bool _parseRequest(WiFiClient& client);
   void _parseArguments(const String& data);
   int _parseArgumentsPrivate(const String& data, std::function<void(String&,String&,const String&,int,int,int,int)> handler);
-  static const String _responseCodeToString(int code);
   bool _parseForm(WiFiClient& client, const String& boundary, uint32_t len);
   bool _parseFormUploadAborted();
   void _uploadWriteByte(uint8_t b);
@@ -180,9 +182,12 @@ protected:
   int              _currentArgCount;
   RequestArgument* _currentArgs;
   std::unique_ptr<HTTPUpload> _currentUpload;
-
+  int              _postArgsLen;
+  RequestArgument* _postArgs;
+    
   int              _headerKeysCount;
   RequestArgument* _currentHeaders;
+ 
   size_t           _contentLength;
   String           _responseHeaders;
 

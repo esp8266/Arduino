@@ -12,8 +12,13 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 
-const char* ssid     = "...";
-const char* password = "...";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid     = STASSID;
+const char* password = STAPSK;
 char hostString[16] = {0};
 
 void setup() {
@@ -71,5 +76,5 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+  MDNS.update();
 }

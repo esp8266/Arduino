@@ -38,6 +38,7 @@
 
 static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
 static const char qop_auth[] PROGMEM = "qop=auth";
+static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
 static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
 static const char Content_Length[] PROGMEM = "Content-Length";
 
@@ -53,6 +54,8 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _postArgsLen(0)
+, _postArgs(nullptr)
 , _headerKeysCount(0)
 , _currentHeaders(nullptr)
 , _contentLength(0)
@@ -71,6 +74,8 @@ ESP8266WebServer::ESP8266WebServer(int port)
 , _lastHandler(nullptr)
 , _currentArgCount(0)
 , _currentArgs(nullptr)
+, _postArgsLen(0)
+, _postArgs(nullptr)
 , _headerKeysCount(0)
 , _currentHeaders(nullptr)
 , _contentLength(0)
@@ -161,7 +166,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       }
       // parameters for the RFC 2617 newer Digest
       String _nc,_cnonce;
-      if(authReq.indexOf(FPSTR(qop_auth)) != -1) {
+      if(authReq.indexOf(FPSTR(qop_auth)) != -1 || authReq.indexOf(FPSTR(qop_auth_quoted)) != -1) {
         _nc = _extractParam(authReq, F("nc="), ',');
         _cnonce = _extractParam(authReq, F("cnonce=\""));
       }
@@ -191,7 +196,7 @@ bool ESP8266WebServer::authenticate(const char * username, const char * password
       DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
       #endif
       md5.begin();
-      if(authReq.indexOf(FPSTR(qop_auth)) != -1) {
+      if(authReq.indexOf(FPSTR(qop_auth)) != -1 || authReq.indexOf(FPSTR(qop_auth_quoted)) != -1) {
         md5.add(_H1 + ':' + _nonce + ':' + _nc + ':' + _cnonce + F(":auth:") + _H2);
       } else {
         md5.add(_H1 + ':' + _nonce + ':' + _H2);
@@ -366,7 +371,7 @@ void ESP8266WebServer::_prepareHeader(String& response, int code, const char* co
     response = String(F("HTTP/1.")) + String(_currentVersion) + ' ';
     response += String(code);
     response += ' ';
-    response += _responseCodeToString(code);
+    response += responseCodeToString(code);
     response += "\r\n";
 
     using namespace mime;
@@ -414,7 +419,9 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
     _prepareHeader(header, code, (const char* )type, contentLength);
     _currentClientWrite(header.c_str(), header.length());
-    sendContent_P(content);
+    if (contentLength) {
+        sendContent_P(content);
+    }
 }
 
 void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
@@ -439,12 +446,9 @@ void ESP8266WebServer::sendContent(const String& content) {
   const char * footer = "\r\n";
   size_t len = content.length();
   if(_chunked) {
-    char * chunkSize = (char *)malloc(11);
-    if(chunkSize){
-      sprintf(chunkSize, "%x%s", len, footer);
-      _currentClientWrite(chunkSize, strlen(chunkSize));
-      free(chunkSize);
-    }
+    char chunkSize[11];
+    sprintf(chunkSize, "%zx\r\n", len);
+    _currentClientWrite(chunkSize, strlen(chunkSize));
   }
   _currentClientWrite(content.c_str(), len);
   if(_chunked){
@@ -462,12 +466,9 @@ void ESP8266WebServer::sendContent_P(PGM_P content) {
 void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
   const char * footer = "\r\n";
   if(_chunked) {
-    char * chunkSize = (char *)malloc(11);
-    if(chunkSize){
-      sprintf(chunkSize, "%x%s", size, footer);
-      _currentClientWrite(chunkSize, strlen(chunkSize));
-      free(chunkSize);
-    }
+    char chunkSize[11];
+    sprintf(chunkSize, "%zx\r\n", size);
+    _currentClientWrite(chunkSize, strlen(chunkSize));
   }
   _currentClientWrite_P(content, size);
   if(_chunked){
@@ -493,6 +494,10 @@ void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fil
 
 
 const String& ESP8266WebServer::arg(String name) const {
+  for (int j = 0; j < _postArgsLen; ++j) {
+    if ( _postArgs[j].key == name )
+      return _postArgs[j].value;
+  }
   for (int i = 0; i < _currentArgCount; ++i) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
@@ -517,6 +522,10 @@ int ESP8266WebServer::args() const {
 }
 
 bool ESP8266WebServer::hasArg(const String& name) const {
+  for (int j = 0; j < _postArgsLen; ++j) {
+    if (_postArgs[j].key == name)
+      return true;
+  }
   for (int i = 0; i < _currentArgCount; ++i) {
     if (_currentArgs[i].key == name)
       return true;
@@ -617,7 +626,7 @@ void ESP8266WebServer::_finalizeResponse() {
   }
 }
 
-const String ESP8266WebServer::_responseCodeToString(int code) {
+const String ESP8266WebServer::responseCodeToString(const int code) {
   switch (code) {
     case 100: return F("Continue");
     case 101: return F("Switching Protocols");

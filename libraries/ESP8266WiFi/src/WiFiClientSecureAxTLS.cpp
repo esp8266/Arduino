@@ -116,7 +116,7 @@ int WiFiClientSecure::connect(const char* name, uint16_t port)
     return _connectSSL(name);
 }
 
-int WiFiClientSecure::connect(const String host, uint16_t port)
+int WiFiClientSecure::connect(const String& host, uint16_t port)
 {
     return connect(host.c_str(), port);
 }

@@ -2,8 +2,13 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266NetBIOS.h>
 
-const char* ssid = "............";
-const char* password = "..............";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 ESP8266WebServer wwwserver(80);
 String content;

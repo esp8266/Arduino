@@ -29,11 +29,13 @@ import subprocess
 import tempfile
 import shutil
 
-def compile(tmp_dir, sketch, tools_dir, hardware_dir, ide_path, f, args):
+def compile(tmp_dir, sketch, cache, tools_dir, hardware_dir, ide_path, f, args):
     cmd = ide_path + '/arduino-builder '
     cmd += '-compile -logger=human '
     cmd += '-build-path "' + tmp_dir + '" '
     cmd += '-tools "' +  ide_path + '/tools-builder" '
+    if cache != "":
+        cmd += '-build-cache "' + cache + '" '
     if args.library_path:
         for lib_dir in args.library_path:
             cmd += '-libraries "' + lib_dir + '" '
@@ -50,6 +52,7 @@ def compile(tmp_dir, sketch, tools_dir, hardware_dir, ide_path, f, args):
             'FlashMode={flash_mode},' \
             'baud=921600,' \
             'eesz={flash_size},' \
+            'ip={lwIP},' \
             'ResetMethod=nodemcu'.format(**vars(args))
     if args.debug_port and args.debug_level:
         cmd += 'dbg={debug_port},lvl={debug_level}'.format(**vars(args))
@@ -85,6 +88,8 @@ def parse_args():
                         choices=[80, 160], type=int)
     parser.add_argument('-m', '--flash_mode', help='Flash mode', default='qio',
                         choices=['dio', 'qio'])
+    parser.add_argument('-n', '--lwIP', help='lwIP version', default='lm2f',
+                        choices=['lm2f', 'hb2f', 'lm6f', 'hb6f', 'hb1'])
     parser.add_argument('-w', '--warnings', help='Compilation warnings level',
                         default='none', choices=['none', 'all', 'more'])
     parser.add_argument('-o', '--output_binary', help='File name for output binary')
@@ -95,6 +100,7 @@ def parse_args():
     parser.add_argument('--debug_port', help='Debug port',
                         choices=['Serial', 'Serial1'])
     parser.add_argument('--debug_level', help='Debug level')
+    parser.add_argument('--build_cache', help='Build directory to cache core.a', default='')
     parser.add_argument('sketch_path', help='Sketch file path')
     return parser.parse_args()
 
@@ -124,6 +130,7 @@ def main():
     if args.verbose:
         print("Sketch: ", sketch_path)
         print("Build dir: ", tmp_dir)
+        print("Cache dir: ", args.build_cache)
         print("Output: ", output_name)
 
     if args.verbose:
@@ -131,7 +138,7 @@ def main():
     else:
         f = open(tmp_dir + '/build.log', 'w')
 
-    res = compile(tmp_dir, sketch_path, tools_dir, hardware_dir, ide_path, f, args)
+    res = compile(tmp_dir, sketch_path, args.build_cache, tools_dir, hardware_dir, ide_path, f, args)
     if res != 0:
         return res
 

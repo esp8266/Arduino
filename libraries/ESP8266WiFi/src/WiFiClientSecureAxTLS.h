@@ -32,11 +32,11 @@ class SSLContext;
 
 class WiFiClientSecure : public WiFiClient {
 public:
-  WiFiClientSecure();
+  WiFiClientSecure() __attribute__((deprecated("Upgrade to BearSSL is advised, check https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266WiFi/src/WiFiClientSecure.h#L25-L99")));
   ~WiFiClientSecure() override;
 
   int connect(IPAddress ip, uint16_t port) override;
-  int connect(const String host, uint16_t port) override;
+  int connect(const String& host, uint16_t port) override;
   int connect(const char* name, uint16_t port) override;
 
   bool verify(const char* fingerprint, const char* domain_name);
@@ -51,7 +51,8 @@ public:
   int read() override;
   int peek() override;
   size_t peekBytes(uint8_t *buffer, size_t length) override;
-  bool stop(unsigned int maxWaitMs = 0) override;
+  void stop() override { (void)stop(0); }
+  bool stop(unsigned int maxWaitMs);
 
   bool setCACert(const uint8_t* pk, size_t size);
   bool setCertificate(const uint8_t* pk, size_t size);
