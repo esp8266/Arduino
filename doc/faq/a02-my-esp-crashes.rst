@@ -9,7 +9,8 @@ My ESP crashes running some code. How to troubleshoot it?
 -  `What is the Cause of Restart? <#what-is-the-cause-of-restart>`__
 -  `Exception <#exception>`__
 -  `Watchdog <#watchdog>`__
--  `Check Where the Code Crashes <#check-where-the-code-crashes>`__
+-  `Exception Decoder <#exception-decoder>`__
+-  `Other Common Causes for Crashes <#other-causes-for-crashes>`__
 -  `If at the Wall, Enter an Issue
    Report <#if-at-the-wall-enter-an-issue-report>`__
 -  `Conclusion <#conclusion>`__
@@ -82,7 +83,7 @@ is wrong, it restarts itself to tell you about it.
 There are two typical scenarios that trigger ESP restarts:
 
 -  **Exception** - when code is performing `illegal
-   operation <https://github.com/esp8266/Arduino/blob/master/doc/exception_causes.md>`__,
+   operation <../exception_causes.rst>`__,
    like trying to write to non-existent memory location.
 -  **Watchdog** - if code is `locked
    up <https://en.wikipedia.org/wiki/Watchdog_timer>`__ staying too long
@@ -103,7 +104,7 @@ Typical restart because of exception looks like follows:
    Exception cause decoding
 
 Start with looking up exception code in the `Exception Causes
-(EXCCAUSE) <https://github.com/esp8266/Arduino/blob/master/doc/exception_causes.md>`__
+(EXCCAUSE) <../exception_causes.rst>`__
 table to understand what kind of issue it is. If you have no clues what
 it's about and where it happens, then use `Arduino ESP8266/ESP32
 Exception Stack Trace
@@ -119,7 +120,7 @@ ESP provides two watchdog timers (wdt) that observe application for lock
 up.
 
 -  **Software Watchdog** - provided by
-   `SDK <http://bbs.espressif.com/viewforum.php?f=46>`__, that is part
+   `SDK <https://bbs.espressif.com/viewforum.php?f=46>`__, that is part
    of `esp8266 / arduino <https://github.com/esp8266/Arduino>`__ core
    loaded to module together with your application.
 -  **Hardware Watchdog** - build in ESP8266 hardware and acting if
@@ -160,8 +161,8 @@ out before restart, you should be able to narrow down part of code
 firing the h/w wdt reset. If diagnosed application or library has debug
 option then switch it on to aid this troubleshooting.
 
-Check Where the Code Crashes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Exception Decoder
+~~~~~~~~~~~~~~~~~
 
 Decoding of ESP stack trace is now easy and available to everybody
 thanks to great `Arduino ESP8266/ESP32 Exception Stack Trace
@@ -182,8 +183,10 @@ If you don't have any code for troubleshooting, use the example below:
       Serial.println();
       Serial.println("Let's provoke the s/w wdt firing...");
       //
-      // wait for s/w wdt in infinite loop below
+      // provoke an OOM, will be recorded as the last occured one
+      char* out_of_memory_failure = (char*)malloc(1000000);
       //
+      // wait for s/w wdt in infinite loop below
       while(true);
       //
       Serial.println("This line will not ever print out");
@@ -191,12 +194,14 @@ If you don't have any code for troubleshooting, use the example below:
 
     void loop(){}
 
-Upload this code to your ESP (Ctrl+U) and start Serial Monitor
-(Ctrl+Shift+M). You should shortly see ESP restarting every couple of
-seconds and ``Soft WDT reset`` message together with stack trace showing
-up on each restart. Click the Autoscroll check-box on Serial Monitor to
-stop the messages scrolling up. Select and copy the stack trace, go to
-the *Tools* and open the *ESP Exception Decoder*.
+Enable the Out-Of-Memory (*OOM*) debug option (in the *Tools > Debug Level*
+menu), compile/flash/upload this code to your ESP (Ctrl+U) and start Serial
+Monitor (Ctrl+Shift+M).  You should shortly see ESP restarting every couple
+of seconds and ``Soft WDT reset`` message together with stack trace showing
+up on each restart.  Click the Autoscroll check-box on Serial Monitor to
+stop the messages scrolling up.  Select and copy the stack trace, including
+the ``last failed alloc call: ...`` line, go to the *Tools* and open the
+*ESP Exception Decoder*.
 
 .. figure:: pictures/a02-decode-stack-tace-1-2.png
    :alt: Decode the stack trace, steps 1 and 2
@@ -228,6 +233,85 @@ dropped. The same procedure applies to crashes caused by exceptions.
     you have just loaded to the module for diagnosis. Decoder is not
     able to correctly decode the stack trace dropped by some other
     application not compiled and loaded from your Arduino IDE.
+
+
+Other Causes for Crashes
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Interrupt Service Routines
+   By default, all functions are compiled into flash, which means that the 
+   cache may kick in for that code. However, the cache currently can't be used 
+   during hardware interrupts. That means that, if you use a hardware ISR, such as 
+   attachInterrupt(gpio, myISR, CHANGE) for a GPIO change, the ISR must have the 
+   ICACHE_RAM_ATTR attribute declared. Not only that, but the entire function tree 
+   called from the ISR must also have the ICACHE_RAM_ATTR declared.
+   Be aware that every function that has this attribute reduces available memory.
+
+   In addition, it is not possible to execute delay() or yield() from an ISR, 
+   or do blocking operations, or operations that disable the interrupts, e.g.: read
+   a DHT.
+
+   Finally, an ISR has very high restrictions on timing for the executed code, meaning
+   that executed code should not take longer than a very few microseconds. It is 
+   considered best practice to set a flag within the ISR, and then from within the loop()
+   check and clear that flag, and execute code.
+
+Asynchronous Callbacks
+   Asynchronous CBs, such as for the Ticker or ESPAsync* libs, have looser restrictions
+   than ISRs, but some restrictions still apply.
+   It is not possible to execute delay() or yield() from an asynchronous callback.
+   Timing is not as tight as an ISR, but it should remain below a few milliseconds. This
+   is a guideline. The hard timing requirements depend on the WiFi configuration and 
+   amount of traffic. In general, the CPU must not be hogged by the user code, as the
+   longer it is away from servicing the WiFi stack, the more likely that memory corruption
+   can happen.
+
+Memory, memory, memory
+   Running out of heap is the **most common cause for crashes**. Because the build process for
+   the ESP leaves out exceptions (they use memory), memory allocations that fail will do
+   so silently. A typical example is when setting or concatenating a large String. If 
+   allocation has failed internally, then the internal string copy can corrupt data, and 
+   the ESP will crash.
+
+   In addition, doing many String concatenations in sequence, e.g.: using operator+()
+   multiple times, will cause memory fragmentation. When that happens, allocations may
+   silently fail even though there is enough total heap available. The reason for the
+   failure is that an allocation requires finding a single free memory block that is large
+   enough for the size being requested. A sequence of String concatenations causes many
+   allocations/deallocations/reallocations, which makes "holes" in the memory map. After
+   many such operations, it can happen that all available holes are too small to comply
+   with the requested size, even though the sum of all holes is greater than the requested
+   size.
+
+   So why do these silent failures exist? On the one hand, there are specific interfaces that
+   must be adhered to. For example, the String object methods don't allow for error handling
+   at the user application level (i.e.: no old-school error returns).
+   On the other hand, some libraries don't have the allocation code accessible for
+   modification. For example, std::vector is available for use. The standard implementations
+   rely on exceptions for error handling, which is not available for the ESP, and in any
+   case there is no access to the underlying code.
+
+   Instrumenting the code with the OOM debug option and calls to
+   ``ESP.getFreeHeap()`` / ``ESP.getHeapFragmentation()`` /
+   ``ESP.getMaxFreeBlockSize()`` will help the process of finding memory issues.
+
+   Now is time to re-read about the `exception decoder
+   <#exception-decoder>`__.
+
+
+*Some techniques for reducing memory usage*
+
+   * Don't use const char * with literals. Instead, use const char[] PROGMEM. This is particularly true if you intend to, e.g.: embed html strings.
+   * Don't use global static arrays, such as uint8_t buffer[1024]. Instead, allocate dynamically. This forces you to think about the size of the array, and its scope (lifetime), so that it gets released when it's no longer needed. If you are not certain about dynamic allocation, use std libs (e.g.: std:vector, std::string), or smart pointers. They are slightly less memory efficient than dynamically allocating yourself, but the provided memory safety is well worth it.
+   * If you use std libs like std::vector, make sure to call its ::reserve() method before filling it. This allows allocating only once, which reduces mem fragmentation, and makes sure that there are no empty unused slots left over in the container at the end.
+
+Stack
+   The amount of stack in the ESP is tiny at only 4KB. For normal developement in large systems, it 
+   is good practice to use and abuse the stack, because it is faster for allocation/deallocation, the scope of the object is well defined, and deallocation automatically happens in reverse order as allocation, which means no mem fragmentation. However, with the tiny amount of stack available in the ESP, that practice is not really viable, at least not for big objects.
+   * Large objects that have internally managed memory, such as String, std::string, std::vector, etc, are ok on the stack, because they internally allocate their buffers on the heap.
+   * Large arrays on the stack, such as uint8_t buffer[2048] should be avoided on the stack and be dynamically allocated (consider smart pointers).
+   * Objects that have large data members, such as large arrays, should be avoided on the stack, and be dynamicaly allocated (consider smart pointers).
+
 
 If at the Wall, Enter an Issue Report
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -289,4 +373,4 @@ Be specific and isolate the issue. Then ask community for support. There
 are plenty of people that like to work with ESP and willing to help with
 your problem.
 
-`FAQ list :back: <readme.md>`__
+`FAQ list :back: <readme.rst>`__

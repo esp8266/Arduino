@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 
+#set -x
+
 # Extract next version from platform.txt
 next=`sed -n -E 's/version=([0-9.]+)/\1/p' ../platform.txt`
 
@@ -15,6 +17,8 @@ if [ $? -ne 0 ]; then
 else
     plain_ver=$ver
 fi
+
+set -e
 
 package_name=esp8266-$ver
 echo "Version: $ver"
@@ -48,6 +52,7 @@ mkdir -p $outdir
 cat << EOF > exclude.txt
 .git
 .gitignore
+.gitmodules
 .travis.yml
 package
 doc
@@ -57,15 +62,6 @@ git ls-files --other --directory >> exclude.txt
 # Now copy files to $outdir
 rsync -a --exclude-from 'exclude.txt' $srcdir/ $outdir/
 rm exclude.txt
-
-# Get additional libraries (TODO: add them as git submodule or subtree?)
-
-# SoftwareSerial library
-curl -L -o SoftwareSerial.zip https://github.com/plerup/espsoftwareserial/archive/3.2.3.zip
-unzip -q SoftwareSerial.zip
-rm -rf SoftwareSerial.zip
-mv espsoftwareserial-* SoftwareSerial
-mv SoftwareSerial $outdir/libraries
 
 # For compatibility, on OS X we need GNU sed which is usually called 'gsed'
 if [ "$(uname)" == "Darwin" ]; then
@@ -78,16 +74,24 @@ fi
 # handles tool paths differently when package is installed in hardware folder
 cat $srcdir/platform.txt | \
 $SED 's/runtime.tools.xtensa-lx106-elf-gcc.path={runtime.platform.path}\/tools\/xtensa-lx106-elf//g' | \
+$SED 's/runtime.tools.python.path=.*//g' | \
 $SED 's/runtime.tools.esptool.path={runtime.platform.path}\/tools\/esptool//g' | \
 $SED 's/tools.esptool.path={runtime.platform.path}\/tools\/esptool/tools.esptool.path=\{runtime.tools.esptool.path\}/g' | \
+$SED 's/^tools.esptool.cmd=.*//g' | \
+$SED 's/^tools.esptool.network_cmd=.*//g' | \
+$SED 's/^#tools.esptool.cmd=/tools.esptool.cmd=/g' | \
+$SED 's/^#tools.esptool.network_cmd=/tools.esptool.network_cmd=/g' | \
 $SED 's/tools.mkspiffs.path={runtime.platform.path}\/tools\/mkspiffs/tools.mkspiffs.path=\{runtime.tools.mkspiffs.path\}/g' |\
-$SED 's/recipe.hooks.core.prebuild.1.pattern.*//g' \
+$SED 's/recipe.hooks.core.prebuild.2.pattern.*//g' |\
+$SED "s/version=.*/version=$ver/g" |\
+$SED -E "s/name=([a-zA-Z0-9\ -]+).*/name=\1($ver)/g"\
  > $outdir/platform.txt
 
 # Put core version and short hash of git version into core_version.h
 ver_define=`echo $plain_ver | tr "[:lower:].\055" "[:upper:]_"`
 echo Ver define: $ver_define
 echo \#define ARDUINO_ESP8266_GIT_VER 0x`git rev-parse --short=8 HEAD 2>/dev/null` >$outdir/cores/esp8266/core_version.h
+echo \#define ARDUINO_ESP8266_GIT_DESC `git describe --tags 2>/dev/null` >>$outdir/cores/esp8266/core_version.h
 echo \#define ARDUINO_ESP8266_RELEASE_$ver_define >>$outdir/cores/esp8266/core_version.h
 echo \#define ARDUINO_ESP8266_RELEASE \"$ver_define\" >>$outdir/cores/esp8266/core_version.h
 
@@ -123,8 +127,13 @@ fi
 cat $srcdir/package/package_esp8266com_index.template.json | \
     jq "$jq_arg" > package_esp8266com_index.json
 
+# Use Github API token, if available
+curl_gh_token_arg=()
+if [ ! -z "$CI_GITHUB_API_KEY" ]; then
+    curl_gh_token_arg=(-H "Authorization: token $CI_GITHUB_API_KEY")
+fi
 # Get previous release name
-curl --silent https://api.github.com/repos/esp8266/Arduino/releases > releases.json
+curl --silent "${curl_gh_token_arg[@]}" https://api.github.com/repos/esp8266/Arduino/releases > releases.json
 # Previous final release (prerelase == false)
 prev_release=$(jq -r '. | map(select(.draft == false and .prerelease == false)) | sort_by(.created_at | - fromdateiso8601) | .[0].tag_name' releases.json)
 # Previous release (possibly a pre-release)
@@ -146,7 +155,14 @@ curl -L -o $old_json "https://github.com/esp8266/Arduino/releases/download/${bas
 new_json=package_esp8266com_index.json
 
 set +e
-python ../../merge_packages.py $new_json $old_json >tmp && mv tmp $new_json && rm $old_json
+# Merge the old and new, then drop any obsolete package versions
+python ../../merge_packages.py $new_json $old_json | python ../../drop_versions.py - platforms 1.6.5-947-g39819f0 2.5.0-beta1 2.5.0-beta2 2.5.0-beta3 2.4.0-rc1 2.4.0-rc2 >tmp && mv tmp $new_json && rm $old_json
+
+# Verify the JSON file can be read, fail if it's not OK
+set -e
+cat $new_json | jq empty
 
 popd
 popd
+
+echo "All done"

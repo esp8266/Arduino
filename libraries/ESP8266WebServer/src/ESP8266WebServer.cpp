@@ -36,7 +36,12 @@
 #define DEBUG_OUTPUT Serial
 #endif
 
-const char * AUTHORIZATION_HEADER = "Authorization";
+static const char AUTHORIZATION_HEADER[] PROGMEM = "Authorization";
+static const char qop_auth[] PROGMEM = "qop=auth";
+static const char qop_auth_quoted[] PROGMEM = "qop=\"auth\"";
+static const char WWW_Authenticate[] PROGMEM = "WWW-Authenticate";
+static const char Content_Length[] PROGMEM = "Content-Length";
+
 
 ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 : _server(addr, port)
@@ -44,13 +49,15 @@ ESP8266WebServer::ESP8266WebServer(IPAddress addr, int port)
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
 , _statusChange(0)
-, _currentHandler(0)
-, _firstHandler(0)
-, _lastHandler(0)
+, _currentHandler(nullptr)
+, _firstHandler(nullptr)
+, _lastHandler(nullptr)
 , _currentArgCount(0)
-, _currentArgs(0)
+, _currentArgs(nullptr)
+, _postArgsLen(0)
+, _postArgs(nullptr)
 , _headerKeysCount(0)
-, _currentHeaders(0)
+, _currentHeaders(nullptr)
 , _contentLength(0)
 , _chunked(false)
 {
@@ -62,74 +69,177 @@ ESP8266WebServer::ESP8266WebServer(int port)
 , _currentVersion(0)
 , _currentStatus(HC_NONE)
 , _statusChange(0)
-, _currentHandler(0)
-, _firstHandler(0)
-, _lastHandler(0)
+, _currentHandler(nullptr)
+, _firstHandler(nullptr)
+, _lastHandler(nullptr)
 , _currentArgCount(0)
-, _currentArgs(0)
+, _currentArgs(nullptr)
+, _postArgsLen(0)
+, _postArgs(nullptr)
 , _headerKeysCount(0)
-, _currentHeaders(0)
+, _currentHeaders(nullptr)
 , _contentLength(0)
 , _chunked(false)
 {
 }
 
 ESP8266WebServer::~ESP8266WebServer() {
+  _server.close();
   if (_currentHeaders)
     delete[]_currentHeaders;
-  _headerKeysCount = 0;
   RequestHandler* handler = _firstHandler;
   while (handler) {
     RequestHandler* next = handler->next();
     delete handler;
     handler = next;
   }
-  close();
 }
 
 void ESP8266WebServer::begin() {
-  _currentStatus = HC_NONE;
+  close();
   _server.begin();
-  if(!_headerKeysCount)
-    collectHeaders(0, 0);
+}
+
+void ESP8266WebServer::begin(uint16_t port) {
+  close();
+  _server.begin(port);
+}
+
+String ESP8266WebServer::_extractParam(String& authReq,const String& param,const char delimit) const {
+  int _begin = authReq.indexOf(param);
+  if (_begin == -1)
+    return emptyString;
+  return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
 }
 
 bool ESP8266WebServer::authenticate(const char * username, const char * password){
-  if(hasHeader(AUTHORIZATION_HEADER)){
-    String authReq = header(AUTHORIZATION_HEADER);
-    if(authReq.startsWith("Basic")){
+  if(hasHeader(FPSTR(AUTHORIZATION_HEADER))) {
+    String authReq = header(FPSTR(AUTHORIZATION_HEADER));
+    if(authReq.startsWith(F("Basic"))){
       authReq = authReq.substring(6);
       authReq.trim();
       char toencodeLen = strlen(username)+strlen(password)+1;
       char *toencode = new char[toencodeLen + 1];
       if(toencode == NULL){
-        authReq = String();
+        authReq = "";
         return false;
       }
       char *encoded = new char[base64_encode_expected_len(toencodeLen)+1];
       if(encoded == NULL){
-        authReq = String();
+        authReq = "";
         delete[] toencode;
         return false;
       }
       sprintf(toencode, "%s:%s", username, password);
-      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equals(encoded)){
-        authReq = String();
+      if(base64_encode_chars(toencode, toencodeLen, encoded) > 0 && authReq.equalsConstantTime(encoded)) {
+        authReq = "";
         delete[] toencode;
         delete[] encoded;
         return true;
       }
       delete[] toencode;
       delete[] encoded;
+    } else if(authReq.startsWith(F("Digest"))) {
+      authReq = authReq.substring(7);
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.println(authReq);
+      #endif
+      String _username = _extractParam(authReq,F("username=\""));
+      if(!_username.length() || _username != String(username)) {
+        authReq = "";
+        return false;
+      }
+      // extracting required parameters for RFC 2069 simpler Digest
+      String _realm    = _extractParam(authReq, F("realm=\""));
+      String _nonce    = _extractParam(authReq, F("nonce=\""));
+      String _uri      = _extractParam(authReq, F("uri=\""));
+      String _response = _extractParam(authReq, F("response=\""));
+      String _opaque   = _extractParam(authReq, F("opaque=\""));
+
+      if((!_realm.length()) || (!_nonce.length()) || (!_uri.length()) || (!_response.length()) || (!_opaque.length())) {
+        authReq = "";
+        return false;
+      }
+      if((_opaque != _sopaque) || (_nonce != _snonce) || (_realm != _srealm)) {
+        authReq = "";
+        return false;
+      }
+      // parameters for the RFC 2617 newer Digest
+      String _nc,_cnonce;
+      if(authReq.indexOf(FPSTR(qop_auth)) != -1 || authReq.indexOf(FPSTR(qop_auth_quoted)) != -1) {
+        _nc = _extractParam(authReq, F("nc="), ',');
+        _cnonce = _extractParam(authReq, F("cnonce=\""));
+      }
+      MD5Builder md5;
+      md5.begin();
+      md5.add(String(username) + ':' + _realm + ':' + String(password));  // md5 of the user:realm:user
+      md5.calculate();
+      String _H1 = md5.toString();
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.println("Hash of user:realm:pass=" + _H1);
+      #endif
+      md5.begin();
+      if(_currentMethod == HTTP_GET){
+        md5.add(String(F("GET:")) + _uri);
+      }else if(_currentMethod == HTTP_POST){
+        md5.add(String(F("POST:")) + _uri);
+      }else if(_currentMethod == HTTP_PUT){
+        md5.add(String(F("PUT:")) + _uri);
+      }else if(_currentMethod == HTTP_DELETE){
+        md5.add(String(F("DELETE:")) + _uri);
+      }else{
+        md5.add(String(F("GET:")) + _uri);
+      }
+      md5.calculate();
+      String _H2 = md5.toString();
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.println("Hash of GET:uri=" + _H2);
+      #endif
+      md5.begin();
+      if(authReq.indexOf(FPSTR(qop_auth)) != -1 || authReq.indexOf(FPSTR(qop_auth_quoted)) != -1) {
+        md5.add(_H1 + ':' + _nonce + ':' + _nc + ':' + _cnonce + F(":auth:") + _H2);
+      } else {
+        md5.add(_H1 + ':' + _nonce + ':' + _H2);
+      }
+      md5.calculate();
+      String _responsecheck = md5.toString();
+      #ifdef DEBUG_ESP_HTTP_SERVER
+      DEBUG_OUTPUT.println("The Proper response=" +_responsecheck);
+      #endif
+      if(_response == _responsecheck){
+        authReq = "";
+        return true;
+      }
     }
-    authReq = String();
+    authReq = "";
   }
   return false;
 }
 
-void ESP8266WebServer::requestAuthentication(){
-  sendHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
-  send(401);
+String ESP8266WebServer::_getRandomHexString() {
+  char buffer[33];  // buffer to hold 32 Hex Digit + /0
+  int i;
+  for(i = 0; i < 4; i++) {
+    sprintf (buffer + (i*8), "%08x", RANDOM_REG32);
+  }
+  return String(buffer);
+}
+
+void ESP8266WebServer::requestAuthentication(HTTPAuthMethod mode, const char* realm, const String& authFailMsg) {
+  if(realm == NULL) {
+    _srealm = String(F("Login Required"));
+  } else {
+    _srealm = String(realm);
+  }
+  if(mode == BASIC_AUTH) {
+    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Basic realm=\"")) + _srealm + String(F("\"")));
+  } else {
+    _snonce=_getRandomHexString();
+    _sopaque=_getRandomHexString();
+    sendHeader(String(FPSTR(WWW_Authenticate)), String(F("Digest realm=\"")) +_srealm + String(F("\", qop=\"auth\", nonce=\"")) + _snonce + String(F("\", opaque=\"")) + _sopaque + String(F("\"")));
+  }
+  using namespace mime;
+  send(401, String(FPSTR(mimeTable[html].mimeType)), authFailMsg);
 }
 
 void ESP8266WebServer::on(const String &uri, ESP8266WebServer::THandlerFunction handler) {
@@ -179,56 +289,60 @@ void ESP8266WebServer::handleClient() {
     _statusChange = millis();
   }
 
-  if (!_currentClient.connected()) {
+  bool keepCurrentClient = false;
+  bool callYield = false;
+
+  if (_currentClient.connected()) {
+    switch (_currentStatus) {
+    case HC_NONE:
+      // No-op to avoid C++ compiler warning
+      break;
+    case HC_WAIT_READ:
+      // Wait for data from client to become available
+      if (_currentClient.available()) {
+        if (_parseRequest(_currentClient)) {
+          _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
+          _contentLength = CONTENT_LENGTH_NOT_SET;
+          _handleRequest();
+
+          if (_currentClient.connected()) {
+            _currentStatus = HC_WAIT_CLOSE;
+            _statusChange = millis();
+            keepCurrentClient = true;
+          }
+        }
+      } else { // !_currentClient.available()
+        if (millis() - _statusChange <= HTTP_MAX_DATA_WAIT) {
+          keepCurrentClient = true;
+        }
+        callYield = true;
+      }
+      break;
+    case HC_WAIT_CLOSE:
+      // Wait for client to close the connection
+      if (millis() - _statusChange <= HTTP_MAX_CLOSE_WAIT) {
+        keepCurrentClient = true;
+        callYield = true;
+      }
+    }
+  }
+
+  if (!keepCurrentClient) {
     _currentClient = WiFiClient();
     _currentStatus = HC_NONE;
-    return;
+    _currentUpload.reset();
   }
 
-  // Wait for data from client to become available
-  if (_currentStatus == HC_WAIT_READ) {
-    if (!_currentClient.available()) {
-      if (millis() - _statusChange > HTTP_MAX_DATA_WAIT) {
-        _currentClient = WiFiClient();
-        _currentStatus = HC_NONE;
-      }
-      yield();
-      return;
-    }
-
-    if (!_parseRequest(_currentClient)) {
-      _currentClient = WiFiClient();
-      _currentStatus = HC_NONE;
-      return;
-    }
-    _currentClient.setTimeout(HTTP_MAX_SEND_WAIT);
-    _contentLength = CONTENT_LENGTH_NOT_SET;
-    _handleRequest();
-
-    if (!_currentClient.connected()) {
-      _currentClient = WiFiClient();
-      _currentStatus = HC_NONE;
-      return;
-    } else {
-      _currentStatus = HC_WAIT_CLOSE;
-      _statusChange = millis();
-      return;
-    }
-  }
-
-  if (_currentStatus == HC_WAIT_CLOSE) {
-    if (millis() - _statusChange > HTTP_MAX_CLOSE_WAIT) {
-      _currentClient = WiFiClient();
-      _currentStatus = HC_NONE;
-    } else {
-      yield();
-      return;
-    }
+  if (callYield) {
+    yield();
   }
 }
 
 void ESP8266WebServer::close() {
   _server.close();
+  _currentStatus = HC_NONE;
+  if(!_headerKeysCount)
+    collectHeaders(0, 0);
 }
 
 void ESP8266WebServer::stop() {
@@ -237,7 +351,7 @@ void ESP8266WebServer::stop() {
 
 void ESP8266WebServer::sendHeader(const String& name, const String& value, bool first) {
   String headerLine = name;
-  headerLine += ": ";
+  headerLine += F(": ");
   headerLine += value;
   headerLine += "\r\n";
 
@@ -249,36 +363,37 @@ void ESP8266WebServer::sendHeader(const String& name, const String& value, bool 
   }
 }
 
-void ESP8266WebServer::setContentLength(size_t contentLength) {
+void ESP8266WebServer::setContentLength(const size_t contentLength) {
     _contentLength = contentLength;
 }
 
 void ESP8266WebServer::_prepareHeader(String& response, int code, const char* content_type, size_t contentLength) {
-    response = "HTTP/1."+String(_currentVersion)+" ";
+    response = String(F("HTTP/1.")) + String(_currentVersion) + ' ';
     response += String(code);
-    response += " ";
-    response += _responseCodeToString(code);
+    response += ' ';
+    response += responseCodeToString(code);
     response += "\r\n";
 
+    using namespace mime;
     if (!content_type)
-        content_type = "text/html";
+        content_type = mimeTable[html].mimeType;
 
-    sendHeader("Content-Type", content_type, true);
+    sendHeader(String(F("Content-Type")), String(FPSTR(content_type)), true);
     if (_contentLength == CONTENT_LENGTH_NOT_SET) {
-        sendHeader("Content-Length", String(contentLength));
+        sendHeader(String(FPSTR(Content_Length)), String(contentLength));
     } else if (_contentLength != CONTENT_LENGTH_UNKNOWN) {
-        sendHeader("Content-Length", String(_contentLength));
+        sendHeader(String(FPSTR(Content_Length)), String(_contentLength));
     } else if(_contentLength == CONTENT_LENGTH_UNKNOWN && _currentVersion){ //HTTP/1.1 or above client
       //let's do chunked
       _chunked = true;
-      sendHeader("Accept-Ranges","none");
-      sendHeader("Transfer-Encoding","chunked");
+      sendHeader(String(F("Accept-Ranges")),String(F("none")));
+      sendHeader(String(F("Transfer-Encoding")),String(F("chunked")));
     }
-    sendHeader("Connection", "close");
+    sendHeader(String(F("Connection")), String(F("close")));
 
     response += _responseHeaders;
     response += "\r\n";
-    _responseHeaders = String();
+    _responseHeaders = "";
 }
 
 void ESP8266WebServer::send(int code, const char* content_type, const String& content) {
@@ -287,7 +402,7 @@ void ESP8266WebServer::send(int code, const char* content_type, const String& co
     //if(code == 200 && content.length() == 0 && _contentLength == CONTENT_LENGTH_NOT_SET)
     //  _contentLength = CONTENT_LENGTH_UNKNOWN;
     _prepareHeader(header, code, content_type, content.length());
-    _currentClient.write(header.c_str(), header.length());
+    _currentClientWrite(header.c_str(), header.length());
     if(content.length())
       sendContent(content);
 }
@@ -311,8 +426,10 @@ void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content) {
     char type[64];
     memccpy_P((void*)type, (PGM_VOID_P)content_type, 0, sizeof(type));
     _prepareHeader(header, code, (const char* )type, contentLength);
-    _currentClient.write(header.c_str(), header.length());
-    sendContent_P(content);
+    _currentClientWrite(header.c_str(), header.length());
+    if (contentLength) {
+        sendContent_P(content);
+    }
 }
 
 void ESP8266WebServer::send_P(int code, PGM_P content_type, PGM_P content, size_t contentLength) {
@@ -336,16 +453,16 @@ void ESP8266WebServer::sendContent(const String& content) {
   const char * footer = "\r\n";
   size_t len = content.length();
   if(_chunked) {
-    char * chunkSize = (char *)malloc(11);
-    if(chunkSize){
-      sprintf(chunkSize, "%x%s", len, footer);
-      _currentClient.write(chunkSize, strlen(chunkSize));
-      free(chunkSize);
-    }
+    char chunkSize[11];
+    sprintf(chunkSize, "%zx\r\n", len);
+    _currentClientWrite(chunkSize, strlen(chunkSize));
   }
-  _currentClient.write(content.c_str(), len);
+  _currentClientWrite(content.c_str(), len);
   if(_chunked){
     _currentClient.write(footer, 2);
+    if (len == 0) {
+      _chunked = false;
+    }
   }
 }
 
@@ -370,45 +487,66 @@ void ESP8266WebServer::sendContent_P(PGM_P content) {
 void ESP8266WebServer::sendContent_P(PGM_P content, size_t size) {
   const char * footer = "\r\n";
   if(_chunked) {
-    char * chunkSize = (char *)malloc(11);
-    if(chunkSize){
-      sprintf(chunkSize, "%x%s", size, footer);
-      _currentClient.write(chunkSize, strlen(chunkSize));
-      free(chunkSize);
-    }
+    char chunkSize[11];
+    sprintf(chunkSize, "%zx\r\n", size);
+    _currentClientWrite(chunkSize, strlen(chunkSize));
   }
-  _currentClient.write_P(content, size);
+  _currentClientWrite_P(content, size);
   if(_chunked){
     _currentClient.write(footer, 2);
+    if (size == 0) {
+      _chunked = false;
+    }
   }
 }
 
 
-String ESP8266WebServer::arg(String name) {
+void ESP8266WebServer::_streamFileCore(const size_t fileSize, const String & fileName, const String & contentType)
+{
+  using namespace mime;
+  setContentLength(fileSize);
+  if (fileName.endsWith(String(FPSTR(mimeTable[gz].endsWith))) &&
+      contentType != String(FPSTR(mimeTable[gz].mimeType)) &&
+      contentType != String(FPSTR(mimeTable[none].mimeType))) {
+    sendHeader(F("Content-Encoding"), F("gzip"));
+  }
+  send(200, contentType, emptyString);
+}
+
+
+const String& ESP8266WebServer::arg(String name) const {
+  for (int j = 0; j < _postArgsLen; ++j) {
+    if ( _postArgs[j].key == name )
+      return _postArgs[j].value;
+  }
   for (int i = 0; i < _currentArgCount; ++i) {
     if ( _currentArgs[i].key == name )
       return _currentArgs[i].value;
   }
-  return String();
+  return emptyString;
 }
 
-String ESP8266WebServer::arg(int i) {
-  if (i < _currentArgCount)
+const String& ESP8266WebServer::arg(int i) const {
+  if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].value;
-  return String();
+  return emptyString;
 }
 
-String ESP8266WebServer::argName(int i) {
-  if (i < _currentArgCount)
+const String& ESP8266WebServer::argName(int i) const {
+  if (i >= 0 && i < _currentArgCount)
     return _currentArgs[i].key;
-  return String();
+  return emptyString;
 }
 
-int ESP8266WebServer::args() {
+int ESP8266WebServer::args() const {
   return _currentArgCount;
 }
 
-bool ESP8266WebServer::hasArg(String  name) {
+bool ESP8266WebServer::hasArg(const String& name) const {
+  for (int j = 0; j < _postArgsLen; ++j) {
+    if (_postArgs[j].key == name)
+      return true;
+  }
   for (int i = 0; i < _currentArgCount; ++i) {
     if (_currentArgs[i].key == name)
       return true;
@@ -417,12 +555,12 @@ bool ESP8266WebServer::hasArg(String  name) {
 }
 
 
-String ESP8266WebServer::header(String name) {
+const String& ESP8266WebServer::header(String name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if (_currentHeaders[i].key.equalsIgnoreCase(name))
       return _currentHeaders[i].value;
   }
-  return String();
+  return emptyString;
 }
 
 void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t headerKeysCount) {
@@ -430,29 +568,29 @@ void ESP8266WebServer::collectHeaders(const char* headerKeys[], const size_t hea
   if (_currentHeaders)
      delete[]_currentHeaders;
   _currentHeaders = new RequestArgument[_headerKeysCount];
-  _currentHeaders[0].key = AUTHORIZATION_HEADER;
+  _currentHeaders[0].key = FPSTR(AUTHORIZATION_HEADER);
   for (int i = 1; i < _headerKeysCount; i++){
     _currentHeaders[i].key = headerKeys[i-1];
   }
 }
 
-String ESP8266WebServer::header(int i) {
+const String& ESP8266WebServer::header(int i) const {
   if (i < _headerKeysCount)
     return _currentHeaders[i].value;
-  return String();
+  return emptyString;
 }
 
-String ESP8266WebServer::headerName(int i) {
+const String& ESP8266WebServer::headerName(int i) const {
   if (i < _headerKeysCount)
     return _currentHeaders[i].key;
-  return String();
+  return emptyString;
 }
 
-int ESP8266WebServer::headers() {
+int ESP8266WebServer::headers() const {
   return _headerKeysCount;
 }
 
-bool ESP8266WebServer::hasHeader(String name) {
+bool ESP8266WebServer::hasHeader(String name) const {
   for (int i = 0; i < _headerKeysCount; ++i) {
     if ((_currentHeaders[i].key.equalsIgnoreCase(name)) &&  (_currentHeaders[i].value.length() > 0))
       return true;
@@ -460,7 +598,7 @@ bool ESP8266WebServer::hasHeader(String name) {
   return false;
 }
 
-String ESP8266WebServer::hostHeader() {
+const String& ESP8266WebServer::hostHeader() const {
   return _hostHeader;
 }
 
@@ -487,20 +625,29 @@ void ESP8266WebServer::_handleRequest() {
     }
 #endif
   }
-
-  if (!handled) {
-    if(_notFoundHandler) {
-      _notFoundHandler();
-    }
-    else {
-      send(404, "text/plain", String("Not found: ") + _currentUri);
-    }
+  if (!handled && _notFoundHandler) {
+    _notFoundHandler();
+    handled = true;
   }
-
-  _currentUri = String();
+  if (!handled) {
+    using namespace mime;
+    send(404, String(FPSTR(mimeTable[html].mimeType)), String(F("Not found: ")) + _currentUri);
+    handled = true;
+  }
+  if (handled) {
+    _finalizeResponse();
+  }
+  _currentUri = "";
 }
 
-String ESP8266WebServer::_responseCodeToString(int code) {
+
+void ESP8266WebServer::_finalizeResponse() {
+  if (_chunked) {
+    sendContent(emptyString);
+  }
+}
+
+const String ESP8266WebServer::responseCodeToString(const int code) {
   switch (code) {
     case 100: return F("Continue");
     case 101: return F("Switching Protocols");
@@ -542,6 +689,6 @@ String ESP8266WebServer::_responseCodeToString(int code) {
     case 503: return F("Service Unavailable");
     case 504: return F("Gateway Time-out");
     case 505: return F("HTTP Version not supported");
-    default:  return "";
+    default:  return F("");
   }
 }

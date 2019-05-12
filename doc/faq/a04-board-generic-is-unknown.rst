@@ -11,8 +11,6 @@ This error may pop up after switching between
 .. figure:: pictures/a04-board-is-unknown-error.png
    :alt: Board nodemcu2 (platform esp8266, package esp8266) is unknown error
 
-   alt text
-
 If you face this issue, you will not be able to compile any sketch for
 any ESP8266 module type.
 
@@ -34,15 +32,11 @@ installation.
 .. figure:: pictures/a04-remove-package-yes.png
    :alt: If changing between staging and stable, remove currently installed package
 
-   alt text
-
 There is no need to remove the installed package if you are changing it
 to another version (without switching between staging and stable).
 
 .. figure:: pictures/a04-remove-package-no.png
    :alt: No need to remove installed package if changing its version
-
-   alt text
 
 Depending on selected module the error message is slightly different.
 For instance, if you choose *Generic ESP8266 Module*, it will look as
@@ -54,15 +48,15 @@ follows:
     Error compiling for board Generic ESP8266 Module.
 
 Below is an example messages for
-`WeMos <https://github.com/esp8266/Arduino/blob/master/doc/boards.md#wemos-d1>`__:
+`WeMos <../boards.rst#wemos-d1-r2-mini>`__:
 
 ::
 
     Board d1_mini (platform esp8266, package esp8266) is unknown
     Error compiling for board WeMos D1 R2 & mini.
 
-... and another one for `Adafruit
-HUZZAH <https://github.com/esp8266/Arduino/blob/master/doc/boards.md#adafruit-huzzah-esp8266-esp-12>`__:
+... and another one for `Adafruit Feather
+HUZZAH <../boards.rst#adafruit-feather-huzzah-esp8266>`__:
 
 ::
 
@@ -101,15 +95,11 @@ Example below shows the path for Windows.
 .. figure:: pictures/a04-arduino-ide-preferences.png
    :alt: Checking of Arduino IDE Preferences
 
-   alt text
-
 2. Click provided link to open the folder. For Windows 7 it will look as
    follows:
 
 .. figure:: pictures/a04-contents-of-preferences-folder.png
    :alt: Contents of Arduino IDE preferences folder
-
-   alt text
 
 3. Navigate further down to
    ``Arduino15\packages\esp8266\hardware\esp8266`` directory. Inside you
@@ -118,8 +108,6 @@ Example below shows the path for Windows.
 
 .. figure:: pictures/a04-contents-of-package-folder.png
    :alt: Checking of contents of esp8266 / Arduino package folder
-
-   alt text
 
 4. Delete the older folder. Restart Arduino IDE, select your ESP module
    and the error should be gone.

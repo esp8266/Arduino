@@ -3,7 +3,7 @@
 I am getting "espcomm\_sync failed" error when trying to upload my ESP. How to resolve this issue?
 --------------------------------------------------------------------------------------------------
 
--  `Introduction <#Introduction>`__
+-  `Introduction <#introduction>`__
 -  `Initial Checks <#initial-checks>`__
 -  `Advanced Checks <#advanced-checks>`__
 -  `Reset Methods <#reset-methods>`__
@@ -42,7 +42,7 @@ following three things right: 1. Module is provided with enough power,
 resistors, 3. Module is put into boot loader mode.
 
 For specific details please refer to section on `Generic ESP8266
-modules <../boards.md#generic-esp8266-modules>`__. Example modules
+modules <../boards.rst#generic-esp8266-modules>`__. Example modules
 without USB to serial converter on board are shown below.
 
 .. figure:: pictures/a01-example-boards-without-usb.png
@@ -128,7 +128,7 @@ follows:
 ``ets Jan  8 2013,rst cause:2, boot mode:(1,7)``
 
 If you see similar message but different values then decode them using
-`Boot Messages and Modes <../boards.md#boot-messages-and-modes>`__. The
+`Boot Messages and Modes <../boards.rst#boot-messages-and-modes>`__. The
 key information is contained in first digit / three right-most bits of
 the boot mode message as shown below.
 
@@ -140,9 +140,9 @@ the boot mode message as shown below.
 For instance message ``boot mode (3,3)`` indicates that pins GPIO2 and
 GPIO0 are set HIGH and GPIO15 is set LOW. This is configuration for
 `normal
-operation <../boards.md#minimal-hardware-setup-for-running-only>`__ of
+operation <../boards.rst#minimal-hardware-setup-for-running-only>`__ of
 module (to execute application from flash), not for `boot
-loading <../boards.md#minimal-hardware-setup-for-bootloading-only>`__
+loading <../boards.rst#minimal-hardware-setup-for-bootloading-only>`__
 (flash programming).
 
     Note: Without having this step right you will not be able to upload
@@ -258,13 +258,13 @@ REST signal and you will see nothing on the Serial Monitor.
 
 As for different serial terminal program you can check Arduino IDE
 add-on `Serial Monitor for
-ESP8266 <(https://github.com/esp8266/Arduino/issues/1360)>`__ developed
+ESP8266 <https://github.com/esp8266/Arduino/issues/1360>`__ developed
 by user [@mytrain](https://github.com/mytrain) and discussed in
 `#1360 <https://github.com/esp8266/Arduino/issues/1360>`__.
 
 If you prefer external terminal program, then for Windows users we can
 recommend free and handy
-`Termite <http://www.compuphase.com/software_termite.htm>`__.
+`Termite <https://www.compuphase.com/software_termite.htm>`__.
 
 Nodemcu
 ^^^^^^^
@@ -292,12 +292,12 @@ firmware upload is shown below.
    Reset Method: nodemcu, close up at the beginning of upload
 
 Please note that the reset sequence is about 10x shorter comparing to
-`ck <@ck>`__ reset (about 25ms vs. 250ms).
+`ck <#ck>`__ reset (about 25ms vs. 250ms).
 
 Next picture covers complete upload of
 `Blink.ino <https://github.com/esp8266/Arduino/blob/master/libraries/esp8266/examples/Blink/Blink.ino>`__
 example at 921600 baud. Except for difference of the reset signal
-sequence, the complete upload looks similar to that of `ck <@ck>`__.
+sequence, the complete upload looks similar to that of `ck <#ck>`__.
 
 .. figure:: pictures/a01-reset-nodemcu-complete.png
    :alt: Reset Method: nodemcu, complete upload
@@ -332,35 +332,45 @@ GitHub.
 I'm Stuck
 ~~~~~~~~~
 
-Hopefully at this point you were able to resolve ``espcomm_sync failed``
-issue and now enjoy quick and reliable uploads of your ESP modules.
+Hopefully at this point you were able to resolve ``espcomm_sync failed`` issue and now enjoy quick and reliable uploads of your ESP modules.
 
-If this is still not the case, then review once more all discussed steps
-in the checklist below.
+If this is still not the case, then review once more all discussed steps in the checklist below.
 
-**Initial Checks** \* [ ] Is your module connected to serial port and
-visible in IDE? \* [ ] Is connected device responding to IDE? What is
-exact message in debug window? \* [ ] Have you selected correct ESP
-module type in *Board* menu? What is the selection? \* [ ] Have you
-tried to reduce upload speed? What speeds have you tried?
+**Initial Checks**
 
-**Advanced Checks** \* [ ] What message is reported by ESP at 74880 baud
-when entering boot loading mode? \* [ ] Have you checked your USB to
-serial converter by looping it back? What is the result? \* [ ] Is your
-detailed upload log consistent with settings in IDE? What is the log?
+* [ ] Is your module connected to serial port and visible in IDE?
 
-**Reset Method** \* [ ] What reset method do you use? \* [ ] What is
-your connection diagram? Does it match diagram in this FAQ? \* [ ] What
-is your wave-form of board reset? Does it match wave-form in this FAQ?
-\* [ ] What is your wave-form of complete upload? Does it match
-wave-form in this FAQ?
+* [ ] Is connected device responding to IDE? What is exact message in debug window?
 
-**Software** \* [ ] Do you use the latest stable version of `esp8266 /
-Arduino <https://github.com/esp8266/Arduino>`__? What is it? \* [ ] What
-is the name and version of your IDE and O/S?
+* [ ] Have you selected correct ESP module type in *Board* menu? What is the selection?
 
-If you are stuck at certain step, then post this list on `ESP8266
-Community Forum <http://www.esp8266.com/>`__ asking for support.
+* [ ] Have you tried to reduce upload speed? What speeds have you tried?
+
+**Advanced Checks**
+
+* [ ] What message is reported by ESP at 74880 baud when entering boot loading mode?
+
+* [ ] Have you checked your USB to serial converter by looping it back? What is the result?
+
+* [ ] Is your detailed upload log consistent with settings in IDE? What is the log?
+
+**Reset Method**
+
+* [ ] What reset method do you use?
+
+* [ ] What is your connection diagram? Does it match diagram in this FAQ?
+
+* [ ] What is your wave-form of board reset? Does it match wave-form in this FAQ?
+
+* [ ] What is your wave-form of complete upload? Does it match wave-form in this FAQ?
+
+**Software**
+
+* [ ] Do you use the latest stable version of `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__? What is it?
+
+* [ ] What is the name and version of your IDE and O/S?
+
+If you are stuck at certain step, then post this list on `ESP8266 Community Forum <https://www.esp8266.com/>`__ asking for support.
 
 Conclusion
 ~~~~~~~~~~
@@ -379,7 +389,7 @@ detailed upload log for inconsistencies with IDE settings.
 Verify your connection diagram and wave-form for consistency with
 selected reset method.
 
-If you get stuck, then ask `community <http://www.esp8266.com/>`__ for
+If you get stuck, then ask `community <https://www.esp8266.com/>`__ for
 support providing summary of all completed checks.
 
 .. figure:: pictures/a01-test-stand.jpg
@@ -391,4 +401,4 @@ Test stand used for checking of ck reset method is shown above.
 
 No any ESP module has been harmed during preparation of this FAQ item.
 
-`FAQ list :back: <readme.md>`__
+`FAQ list :back: <readme.rst>`__

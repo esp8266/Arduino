@@ -1,6 +1,8 @@
 #ifndef BS_PROTOCOL_H
 #define BS_PROTOCOL_H
 
+#include "BSArgs.h"
+
 #define BS_LINE_PREFIX ">>>>>bs_test_"
 
 namespace bs
@@ -44,9 +46,54 @@ void output_menu_end(IO& io)
 }
 
 template<typename IO>
-bool input_menu_choice(IO& io, int& result)
+void output_setenv_result(IO& io, const char* key, const char* value)
 {
-    return io.read_int(result);
+    io.printf(BS_LINE_PREFIX "setenv key=\"%s\" value=\"%s\"\n", key, value);
+}
+
+template<typename IO>
+void output_getenv_result(IO& io, const char* key, const char* value)
+{
+    (void) key;
+    io.printf(BS_LINE_PREFIX "getenv value=\"%s\"\n", value);
+}
+
+template<typename IO>
+bool input_handle(IO& io, char* line_buf, size_t line_buf_size, int& test_num)
+{
+    int cb_read = io.read_line(line_buf, line_buf_size);
+    if (cb_read == 0 || line_buf[0] == '\n') {
+        return false;
+    }
+    char* argv[4];
+    size_t argc = split_args(line_buf, argv, sizeof(argv)/sizeof(argv[0]));
+    if (argc == 0) {
+        return false;
+    }
+    if (strcmp(argv[0], "setenv") == 0) {
+        if (argc != 3) {
+            return false;
+        }
+        setenv(argv[1], argv[2], 1);
+        output_setenv_result(io, argv[1], argv[2]);
+        test_num = -1;
+        return false;   /* we didn't get the test number yet, so return false */
+    }
+    if (strcmp(argv[0], "getenv") == 0) {
+        if (argc != 2) {
+            return false;
+        }
+        const char* value = getenv(argv[1]);
+        output_getenv_result(io, argv[1], (value != NULL) ? value : "");
+        return false;
+    }
+    /* not one of the commands, try to parse as test number */
+    char* endptr;
+    test_num = (int) strtol(argv[0], &endptr, 10);
+    if (endptr != argv[0] + strlen(argv[0])) {
+        return false;
+    }
+    return true;
 }
 
 } // ::protocol
