@@ -1074,6 +1074,15 @@ macros = {
         ( '.menu.wipe.all.upload.erase_cmd', 'erase_flash' ),
         ]),
 
+    ######################## SSL supported protocols
+
+    'ssl_cipher_menu': collections.OrderedDict([
+        ( '.menu.ssl.all', 'All SSL ciphers (most compatible)' ),
+        ( '.menu.ssl.all.build.sslflags', ''),
+        ( '.menu.ssl.basic', 'Basic SSL ciphers (lower ROM use)' ),
+        ( '.menu.ssl.basic.build.sslflags', '-DBEARSSL_SSL_BASIC'),
+        ]),
+
     }
 
 ################################################################
@@ -1383,6 +1392,7 @@ def all_boards ():
     print('menu.led=Builtin Led')
     print('menu.wipe=Erase Flash')
     print('menu.sdk=Espressif FW')
+    print('menu.ssl=SSL Support')
     print('')
 
     for id in boards:
@@ -1396,7 +1406,7 @@ def all_boards ():
                 print(id + optname + '=' + board['opts'][optname])
 
         # macros
-        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu' ]
+        macrolist = [ 'defaults', 'cpufreq_menu', 'vtable_menu', 'exception_menu', 'ssl_cipher_menu' ]
         if 'macro' in board:
             macrolist += board['macro']
         if lwip == 2:
