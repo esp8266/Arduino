@@ -63,6 +63,13 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
  * @return equal
  */
 static bool sta_config_equal(const station_config& lhs, const station_config& rhs) {
+
+#ifdef NONOSDK3V0
+    static_assert(sizeof(station_config) == 116, "struct station_config has changed, please update comparison function");
+#else
+    static_assert(sizeof(station_config) == 112, "struct station_config has changed, please update comparison function");
+#endif
+
     if(strncmp(reinterpret_cast<const char*>(lhs.ssid), reinterpret_cast<const char*>(rhs.ssid), sizeof(lhs.ssid)) != 0) {
         return false;
     }
@@ -81,6 +88,20 @@ static bool sta_config_equal(const station_config& lhs, const station_config& rh
             return false;
         }
     }
+    
+    if(lhs.threshold.rssi != rhs.threshold.rssi) {
+        return false;
+    }
+
+    if(lhs.threshold.authmode != rhs.threshold.authmode) {
+        return false;
+    }
+
+#ifdef NONOSDK3V0
+    if (lhs.open_and_wep_mode_disable != rhs.open_and_wep_mode_disable) {
+        return false;
+    }
+#endif
 
     return true;
 }
@@ -138,7 +159,9 @@ wl_status_t ESP8266WiFiSTAClass::begin(const char* ssid, const char *passphrase,
     }
 
     conf.threshold.rssi = -127;
+#ifdef NONOSDK3V0
     conf.open_and_wep_mode_disable = !(_useInsecureWEP || *conf.password == 0);
+#endif
 
     if(bssid) {
         conf.bssid_set = 1;
@@ -224,6 +247,27 @@ wl_status_t ESP8266WiFiSTAClass::begin() {
  * @param dns1       Static DNS server 1
  * @param dns2       Static DNS server 2
  */
+
+#if LWIP_VERSION_MAJOR != 1
+/*
+  About the following call in the end of ESP8266WiFiSTAClass::config():
+      netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
+
+  With lwip2, it is needed to trigger IP address change.
+      Recall: when lwip2 is enabled, lwip1 api is still used by espressif firmware
+          https://github.com/d-a-v/esp82xx-nonos-linklayer/tree/25d5e8186f710a230221021cba97727dbfdfd953#how-it-works
+
+  We need first to disable the lwIP API redirection for netif_set_addr() so lwip1's call will be linked:
+      https://github.com/d-a-v/esp82xx-nonos-linklayer/blob/25d5e8186f710a230221021cba97727dbfdfd953/glue-lwip/arch/cc.h#L122
+
+  We also need to declare its prototype using ip4_addr_t instead of ip_addr_t because lwIP-1.x never has IPv6.
+  No need to worry about this #undef, this call is only needed in lwip2, and never used in arduino core code.
+ */
+#undef netif_set_addr // need to call lwIP-v1.4 netif_set_addr()
+extern "C" struct netif* eagle_lwip_getif (int netif_index);
+extern "C" void netif_set_addr (struct netif* netif, ip4_addr_t* ip, ip4_addr_t* netmask, ip4_addr_t* gw);
+#endif
+
 bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress arg2, IPAddress arg3, IPAddress dns2) {
 
   if(!WiFi.enableSTA(true)) {
@@ -286,6 +330,12 @@ bool ESP8266WiFiSTAClass::config(IPAddress local_ip, IPAddress arg1, IPAddress a
       // Set DNS2-Server
       dns_setserver(1, dns2);
   }
+
+#if LWIP_VERSION_MAJOR != 1 && !CORE_MOCK
+  // trigger address change by calling lwIP-v1.4 api
+  // (see explanation above)
+  netif_set_addr(eagle_lwip_getif(STATION_IF), &info.ip, &info.netmask, &info.gw);
+#endif
 
   return true;
 }

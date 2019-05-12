@@ -58,7 +58,7 @@ def unpack(filename, destination):
         raise NotImplementedError('Unsupported archive type')
 
     # a little trick to rename tool directories so they don't contain version number
-    rename_to = re.match(r'^([a-z][^\-]*\-*)+', dirname).group(0).strip('-')
+    rename_to = re.match(r'^([a-zA-Z_][^\-]*\-*)+', dirname).group(0).strip('-')
     if rename_to != dirname:
         print('Renaming {0} to {1}'.format(dirname, rename_to))
         if os.path.isdir(rename_to):

@@ -17,6 +17,7 @@
 #include <string.h>
 #include <WString.h>
 #include <limits.h>
+#include <StreamString.h>
 
 TEST_CASE("String::trim", "[core][String]")
 {
@@ -83,6 +84,12 @@ TEST_CASE("String constructors", "[core][String]")
     REQUIRE(ssh == "3.14159_abcd");
     String flash = (F("hello from flash"));
     REQUIRE(flash == "hello from flash");
+    const char textarray[6] = {'h', 'e', 'l', 'l', 'o', 0};
+    String hello(textarray);
+    REQUIRE(hello == "hello");
+    String hello2;
+    hello2 = textarray;
+    REQUIRE(hello2 == "hello");
 }
 
 TEST_CASE("String concantenation", "[core][String]")
@@ -360,4 +367,88 @@ TEST_CASE("String SSO works", "[core][String]")
     REQUIRE(s == "0123456789abcdefghijklmnopqrstu");
     REQUIRE(s.length() == 31);
   }
+  s = "0123456789abcde";
+  s = s.substring(s.indexOf('a'));
+  REQUIRE(s == "abcde");
+  REQUIRE(s.length() == 5);
+}
+
+#include <new>
+void repl(const String& key, const String& val, String& s, boolean useURLencode)
+{
+    s.replace(key, val);
+}
+
+
+TEST_CASE("String SSO handles junk in memory", "[core][String]")
+{
+  // We fill the SSO space with garbage then construct an object in it and check consistency
+  // This is NOT how you want to use Strings outside of this testing!
+  unsigned char space[64];
+  String *s = (String*)space;
+  memset(space, 0xff, 64);
+  new(s) String;
+  REQUIRE(*s == "");
+  s->~String();
+
+  // Tests from #5883
+  bool useURLencode = false;
+  const char euro[4] = {(char)0xe2, (char)0x82, (char)0xac, 0}; // Unicode euro symbol
+  const char yen[3]   = {(char)0xc2, (char)0xa5, 0}; // Unicode yen symbol
+
+  memset(space, 0xff, 64);
+  new(s) String("%ssid%");
+  repl(("%ssid%"), "MikroTik", *s, useURLencode);
+  REQUIRE(*s == "MikroTik");
+  s->~String();
+
+  memset(space, 0xff, 64);
+  new(s) String("{E}");
+  repl(("{E}"), euro, *s, useURLencode);
+  REQUIRE(*s == "€");
+  s->~String();
+  memset(space, 0xff, 64);
+  new(s) String("&euro;");
+  repl(("&euro;"), euro, *s, useURLencode);
+  REQUIRE(*s == "€");
+  s->~String();
+  memset(space, 0xff, 64);
+  new(s) String("{Y}");
+  repl(("{Y}"), yen, *s, useURLencode);
+  REQUIRE(*s == "¥");
+  s->~String();
+  memset(space, 0xff, 64);
+  new(s) String("&yen;");
+  repl(("&yen;"), yen, *s, useURLencode);
+  REQUIRE(*s == "¥");
+  s->~String();
+
+  memset(space, 0xff, 64);
+  new(s) String("%sysname%");
+  repl(("%sysname%"), "CO2_defect", *s, useURLencode);
+  REQUIRE(*s == "CO2_defect");
+  s->~String();
+}
+
+
+TEST_CASE("Issue #5949 - Overlapping src/dest in replace", "[core][String]")
+{
+  String blah = "blah";
+  blah.replace("xx", "y");
+  REQUIRE(blah == "blah");
+  blah.replace("x", "yy");
+  REQUIRE(blah == "blah");
+  blah.replace(blah, blah);
+  REQUIRE(blah == "blah");
+}
+
+
+TEST_CASE("Issue #2736 - StreamString SSO fix", "[core][StreamString]")
+{
+    StreamString s;
+    s.print('{');
+    s.print('\"');
+    s.print(String("message"));
+    s.print('\"');
+    REQUIRE(s == "{\"message\"");
 }

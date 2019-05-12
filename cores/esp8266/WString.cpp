@@ -237,7 +237,7 @@ void String::move(String &rhs) {
     }
     if (rhs.sso()) {
         setSSO(true);
-        memcpy(sso_buf, rhs.sso_buf, sizeof(sso_buf));
+        memmove(sso_buf, rhs.sso_buf, sizeof(sso_buf));
     } else {
         setSSO(false);
         setBuffer(rhs.wbuffer());
@@ -730,21 +730,21 @@ void String::replace(const String& find, const String& replace) {
     char *foundAt;
     if(diff == 0) {
         while((foundAt = strstr(readFrom, find.buffer())) != NULL) {
-            memcpy(foundAt, replace.buffer(), replace.len());
+            memmove(foundAt, replace.buffer(), replace.len());
             readFrom = foundAt + replace.len();
         }
     } else if(diff < 0) {
         char *writeTo = wbuffer();
         while((foundAt = strstr(readFrom, find.buffer())) != NULL) {
             unsigned int n = foundAt - readFrom;
-            memcpy(writeTo, readFrom, n);
+            memmove(writeTo, readFrom, n);
             writeTo += n;
-            memcpy(writeTo, replace.buffer(), replace.len());
+            memmove(writeTo, replace.buffer(), replace.len());
             writeTo += replace.len();
             readFrom = foundAt + find.len();
             setLen(len() + diff);
         }
-        strcpy(writeTo, readFrom);
+        memmove(writeTo, readFrom, strlen(readFrom)+1);
     } else {
         unsigned int size = len(); // compute size needed for result
         while((foundAt = strstr(readFrom, find.buffer())) != NULL) {
@@ -759,9 +759,10 @@ void String::replace(const String& find, const String& replace) {
         while(index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
             readFrom = wbuffer() + index + find.len();
             memmove(readFrom + diff, readFrom, len() - (readFrom - buffer()));
-            setLen(len() + diff);
-            wbuffer()[len()] = 0;
-            memcpy(wbuffer() + index, replace.buffer(), replace.len());
+	    int newLen = len() + diff;
+            memmove(wbuffer() + index, replace.buffer(), replace.len());
+            setLen(newLen);
+            wbuffer()[newLen] = 0;
             index--;
         }
     }
@@ -828,15 +829,22 @@ void String::trim(void) {
 // /*********************************************/
 
 long String::toInt(void) const {
-    if(buffer())
+    if (buffer())
         return atol(buffer());
     return 0;
 }
 
 float String::toFloat(void) const {
-    if(buffer())
+    if (buffer())
         return atof(buffer());
     return 0;
+}
+
+double String::toDouble(void) const
+{
+    if (buffer())
+        return atof(buffer());
+    return 0.0;
 }
 
 // global empty string to allow returning const String& with nothing

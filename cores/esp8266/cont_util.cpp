@@ -73,12 +73,10 @@ void cont_repaint_stack(cont_t *cont)
     register uint32_t *sp asm("a1");
     // Ensure 64 bytes adjacent to the current SP don't get touched to endure
     // we don't accidentally trounce over locals or IRQ temps.
-    uint32_t sp_safe = CONT_STACKSIZE/4 - ((sp - &cont->stack[0] - 64)/4);
-
     // Fill stack with magic values
-    for(uint32_t pos = 0; pos < sp_safe; pos++)
+    for ( uint32_t *pos = sp - 16; pos >= &cont->stack[0]; pos-- )
     {
-        cont->stack[pos] = CONT_STACKGUARD;
+       *pos = CONT_STACKGUARD;
     }
 }
 

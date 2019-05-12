@@ -114,11 +114,55 @@ File::operator bool() const {
     return !!_p;
 }
 
+bool File::truncate(uint32_t size) {
+    if (!_p)
+        return false;
+
+    return _p->truncate(size);
+}
+
 const char* File::name() const {
     if (!_p)
         return nullptr;
 
     return _p->name();
+}
+
+const char* File::fullName() const {
+    if (!_p)
+        return nullptr;
+
+    return _p->fullName();
+}
+
+bool File::isFile() const {
+    if (!_p)
+        return false;
+
+    return _p->isFile();
+}
+
+bool File::isDirectory() const {
+    if (!_p)
+        return false;
+
+    return _p->isDirectory();
+}
+
+void File::rewindDirectory() {
+    if (!_fakeDir) {
+        _fakeDir = std::make_shared<Dir>(_baseFS->openDir(fullName()));
+    } else {
+        _fakeDir->rewind();
+   }
+}
+
+File File::openNextFile() {
+    if (!_fakeDir) {
+        _fakeDir = std::make_shared<Dir>(_baseFS->openDir(fullName()));
+    }
+    _fakeDir->next();
+    return _fakeDir->openFile("r");
 }
 
 String File::readString()
@@ -148,7 +192,7 @@ File Dir::openFile(const char* mode) {
         return File();
     }
 
-    return File(_impl->openFile(om, am));
+    return File(_impl->openFile(om, am), _baseFS);
 }
 
 String Dir::fileName() {
@@ -167,12 +211,42 @@ size_t Dir::fileSize() {
     return _impl->fileSize();
 }
 
+bool Dir::isFile() const {
+    if (!_impl)
+        return false;
+
+    return _impl->isFile();
+}
+
+bool Dir::isDirectory() const {
+    if (!_impl)
+        return false;
+
+    return _impl->isDirectory();
+}
+
 bool Dir::next() {
     if (!_impl) {
         return false;
     }
 
     return _impl->next();
+}
+
+bool Dir::rewind() {
+    if (!_impl) {
+        return false;
+    }
+
+    return _impl->rewind();
+}
+
+bool FS::setConfig(const FSConfig &cfg) {
+    if (!_impl) {
+        return false;
+    }
+
+    return _impl->setConfig(cfg);
 }
 
 bool FS::begin() {
@@ -186,6 +260,13 @@ void FS::end() {
     if (_impl) {
         _impl->end();
     }
+}
+
+bool FS::gc() {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->gc();
 }
 
 bool FS::format() {
@@ -217,8 +298,7 @@ File FS::open(const char* path, const char* mode) {
         DEBUGV("FS::open: invalid mode `%s`\r\n", mode);
         return File();
     }
-
-    return File(_impl->open(path, om, am));
+    return File(_impl->open(path, om, am), this);
 }
 
 bool FS::exists(const char* path) {
@@ -236,7 +316,8 @@ Dir FS::openDir(const char* path) {
     if (!_impl) {
         return Dir();
     }
-    return Dir(_impl->openDir(path));
+    DirImplPtr p = _impl->openDir(path);
+    return Dir(p, this);
 }
 
 Dir FS::openDir(const String& path) {
@@ -254,6 +335,28 @@ bool FS::remove(const String& path) {
     return remove(path.c_str());
 }
 
+bool FS::rmdir(const char* path) {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->rmdir(path);
+}
+
+bool FS::rmdir(const String& path) {
+    return rmdir(path.c_str());
+}
+
+bool FS::mkdir(const char* path) {
+    if (!_impl) {
+        return false;
+    }
+    return _impl->mkdir(path);
+}
+
+bool FS::mkdir(const String& path) {
+    return mkdir(path.c_str());
+}
+
 bool FS::rename(const char* pathFrom, const char* pathTo) {
     if (!_impl) {
         return false;
@@ -264,6 +367,7 @@ bool FS::rename(const char* pathFrom, const char* pathTo) {
 bool FS::rename(const String& pathFrom, const String& pathTo) {
     return rename(pathFrom.c_str(), pathTo.c_str());
 }
+
 
 
 static bool sflags(const char* mode, OpenMode& om, AccessMode& am) {
