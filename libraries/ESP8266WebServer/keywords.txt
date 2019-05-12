@@ -7,6 +7,7 @@
 #######################################
 
 ESP8266WebServer	KEYWORD1
+ESP8266WebServerSecure	KEYWORD1
 HTTPMethod	KEYWORD1
 
 #######################################
@@ -14,6 +15,8 @@ HTTPMethod	KEYWORD1
 #######################################
 
 begin	KEYWORD2
+close	KEYWORD2
+stop	KEYWORD2
 handleClient	KEYWORD2
 on	KEYWORD2
 addHandler	KEYWORD2
@@ -21,11 +24,18 @@ uri	KEYWORD2
 method	KEYWORD2
 client	KEYWORD2
 send	KEYWORD2
+send_P	KEYWORD2
 arg	KEYWORD2
 argName	KEYWORD2
 args	KEYWORD2
 hasArg	KEYWORD2
 onNotFound	KEYWORD2
+onFileUpload	KEYWORD2
+header	KEYWORD2
+headerName	KEYWORD2
+headers	KEYWORD2
+hasHeader	KEYWORD2
+hostHeader	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

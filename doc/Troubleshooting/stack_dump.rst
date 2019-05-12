@@ -4,7 +4,7 @@ Stack Dumps
 Introduction
 ------------
 
-If the ESP crash the Exception Cause will be shown and the current stack will be dumped.
+If the ESP crashes the Exception Cause will be shown and the current stack will be dumped.
 
 Example:
 
@@ -51,7 +51,7 @@ Example:
     <<<stack<<<
 
 The first number after ``Exception`` gives the cause of the reset. a
-full ist of all causes can be found :doc:`here <../exception_causes>`
+full ist of all causes can be found `here <../exception_causes.rst>`__
 the hex after are the stack dump.
 
 Decode

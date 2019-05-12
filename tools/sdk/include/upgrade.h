@@ -25,7 +25,12 @@
 #ifndef __UPGRADE_H__
 #define __UPGRADE_H__
 
-#define SPI_FLASH_SEC_SIZE      4096
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <spi_flash_geometry.h>
+
 #define LIMIT_ERASE_SIZE		0x10000
 
 #define USER_BIN1               0x00
@@ -71,4 +76,10 @@ bool system_upgrade_start_ssl(struct upgrade_server_info *server);	// not suppor
 #else
 bool system_upgrade_start(struct upgrade_server_info *server);
 #endif
+
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

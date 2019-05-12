@@ -38,10 +38,38 @@ extern "C"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include "lwip/netif.h"
-#include "include/ClientContext.h"
+#include <include/ClientContext.h>
 #include "c_types.h"
 
 uint16_t WiFiClient::_localPort = 0;
+
+static bool defaultNoDelay = false; // false == Nagle enabled by default
+static bool defaultSync = false;
+
+bool getDefaultPrivateGlobalSyncValue ()
+{
+    return defaultSync;
+}
+
+void WiFiClient::setDefaultNoDelay (bool noDelay)
+{
+    defaultNoDelay = noDelay;
+}
+
+void WiFiClient::setDefaultSync (bool sync)
+{
+    defaultSync = sync;
+}
+
+bool WiFiClient::getDefaultNoDelay ()
+{
+    return defaultNoDelay;
+}
+
+bool WiFiClient::getDefaultSync ()
+{
+    return defaultSync;
+}
 
 template<>
 WiFiClient* SList<WiFiClient>::_s_first = 0;
@@ -60,6 +88,9 @@ WiFiClient::WiFiClient(ClientContext* client)
     _timeout = 5000;
     _client->ref();
     WiFiClient::_add(this);
+
+    setSync(defaultSync);
+    setNoDelay(defaultNoDelay);
 }
 
 WiFiClient::~WiFiClient()
@@ -91,7 +122,6 @@ WiFiClient& WiFiClient::operator=(const WiFiClient& other)
     return *this;
 }
 
-
 int WiFiClient::connect(const char* host, uint16_t port)
 {
     IPAddress remote_addr;
@@ -102,19 +132,24 @@ int WiFiClient::connect(const char* host, uint16_t port)
     return 0;
 }
 
+int WiFiClient::connect(const String& host, uint16_t port)
+{
+    return connect(host.c_str(), port);
+}
+
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
-    ip_addr_t addr;
-    addr.addr = ip;
-
-    if (_client)
+    if (_client) {
         stop();
+        _client->unref();
+        _client = nullptr;
+    }
 
+#if LWIP_VERSION_MAJOR == 1
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
     // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
-#if LWIP_VERSION_MAJOR == 1
-    netif* interface = ip_route(&addr);
+    netif* interface = ip_route(ip);
     if (!interface) {
         DEBUGV("no route to host\r\n");
         return 0;
@@ -132,12 +167,15 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     _client = new ClientContext(pcb, nullptr, nullptr);
     _client->ref();
     _client->setTimeout(_timeout);
-    int res = _client->connect(&addr, port);
+    int res = _client->connect(ip, port);
     if (res == 0) {
         _client->unref();
         _client = nullptr;
         return 0;
     }
+
+    setSync(defaultSync);
+    setNoDelay(defaultNoDelay);
 
     return 1;
 }
@@ -148,10 +186,24 @@ void WiFiClient::setNoDelay(bool nodelay) {
     _client->setNoDelay(nodelay);
 }
 
-bool WiFiClient::getNoDelay() {
+bool WiFiClient::getNoDelay() const {
     if (!_client)
         return false;
     return _client->getNoDelay();
+}
+
+void WiFiClient::setSync(bool sync)
+{
+    if (!_client)
+        return;
+    _client->setSync(sync);
+}
+
+bool WiFiClient::getSync() const
+{
+    if (!_client)
+        return false;
+    return _client->getSync();
 }
 
 size_t WiFiClient::availableForWrite ()
@@ -256,24 +308,30 @@ size_t WiFiClient::peekBytes(uint8_t *buffer, size_t length) {
     return _client->peekBytes((char *)buffer, count);
 }
 
-void WiFiClient::flush()
-{
-    if (_client)
-        _client->wait_until_sent();
-}
-
-void WiFiClient::stop()
+bool WiFiClient::flush(unsigned int maxWaitMs)
 {
     if (!_client)
-        return;
+        return true;
 
-    _client->unref();
-    _client = 0;
+    if (maxWaitMs == 0)
+        maxWaitMs = WIFICLIENT_MAX_FLUSH_WAIT_MS;
+    return _client->wait_until_sent(maxWaitMs);
+}
+
+bool WiFiClient::stop(unsigned int maxWaitMs)
+{
+    if (!_client)
+        return true;
+
+    bool ret = flush(maxWaitMs); // virtual, may be ssl's
+    if (_client->close() != ERR_OK)
+        ret = false;
+    return ret;
 }
 
 uint8_t WiFiClient::connected()
 {
-    if (!_client)
+    if (!_client || _client->state() == CLOSED)
         return 0;
 
     return _client->state() == ESTABLISHED || available();
@@ -286,17 +344,17 @@ uint8_t WiFiClient::status()
     return _client->state();
 }
 
- WiFiClient::operator bool()
+WiFiClient::operator bool()
 {
-    return _client != 0;
+    return connected();
 }
 
 IPAddress WiFiClient::remoteIP()
 {
-    if (!_client)
+    if (!_client || !_client->getRemoteAddress())
         return IPAddress(0U);
 
-    return IPAddress(_client->getRemoteAddress());
+    return _client->getRemoteAddress();
 }
 
 uint16_t WiFiClient::remotePort()
@@ -338,4 +396,30 @@ void WiFiClient::stopAllExcept(WiFiClient* except)
             it->stop();
         }
     }
+}
+
+
+void WiFiClient::keepAlive (uint16_t idle_sec, uint16_t intv_sec, uint8_t count)
+{
+    _client->keepAlive(idle_sec, intv_sec, count);
+}
+
+bool WiFiClient::isKeepAliveEnabled () const
+{
+    return _client->isKeepAliveEnabled();
+}
+
+uint16_t WiFiClient::getKeepAliveIdle () const
+{
+    return _client->getKeepAliveIdle();
+}
+
+uint16_t WiFiClient::getKeepAliveInterval () const
+{
+    return _client->getKeepAliveInterval();
+}
+
+uint8_t WiFiClient::getKeepAliveCount () const
+{
+    return _client->getKeepAliveCount();
 }

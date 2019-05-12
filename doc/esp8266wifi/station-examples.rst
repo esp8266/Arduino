@@ -3,7 +3,7 @@
 Station
 -------
 
-Example of connecting to an access point has been shown in chapter `Quick Start <readme.md#quick-start>`__. In case connection is lost, ESP8266 will automatically reconnect to the last used access point, once it is again available.
+Example of connecting to an access point has been shown in chapter `Quick Start <readme.rst#quick-start>`__. In case connection is lost, ESP8266 will automatically reconnect to the last used access point, once it is again available.
 
 Can we provide more robust connection to Wi-Fi than that?
 
@@ -19,7 +19,7 @@ Table of Contents
 Introduction
 ~~~~~~~~~~~~
 
-Following the example in\ `Quick Start <readme.md#quick-start>`__, we would like to go one step further and made ESP connect to next available access point if current connection is lost. This functionality is provided with 'ESP8266WiFiMulti' class and demonstrated in sketch below.
+Following the example in `Quick Start <readme.rst#quick-start>`__, we would like to go one step further and made ESP connect to next available access point if current connection is lost. This functionality is provided with 'ESP8266WiFiMulti' class and demonstrated in sketch below.
 
 .. code:: cpp
 
@@ -100,7 +100,7 @@ Function ``monitorWiFi()`` is in place to show when connection is lost by displa
 Can we Make it Simpler?
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Please note that you may simplify this sketch by removing function ``monitorWiFi()`` and putting inside ``loop()`` only ``wifiMulti.run()``. ESP will still reconnect between configured access points if required. Now you won't be able to see it on serial monitor unless you add ``Serial.setDebugOutput(true)`` as described in point `Enable Wi-Fi Diagnostic <readme.md#enable-wi-fi-diagnostic>`__.
+Please note that you may simplify this sketch by removing function ``monitorWiFi()`` and putting inside ``loop()`` only ``wifiMulti.run()``. ESP will still reconnect between configured access points if required. Now you won't be able to see it on serial monitor unless you add ``Serial.setDebugOutput(true)`` as described in point `Enable Wi-Fi Diagnostic <readme.rst#enable-wi-fi-diagnostic>`__.
 
 Updated sketch for such scenario will look as follows:
 
@@ -202,4 +202,4 @@ I believe the minimalist sketch with ``ESP8266WiFiMulti`` class is a cool exampl
 
 As shown in above example, reconnecting between access points takes time and is not seamless. Therefore, in practical applications, you will likely need to monitor connection status to decide e.g. if you can send the data to external system or should wait until connection is back.
 
-For detailed review of functions provided to manage station mode please refer to the :doc:`Station Class <station-class>` documentation.
+For detailed review of functions provided to manage station mode please refer to the `Station Class <station-class.rst>`__ documentation.

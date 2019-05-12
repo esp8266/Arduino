@@ -24,7 +24,7 @@ On the ESP8266 PROGMEM is a macro:
 
     #define ICACHE_RODATA_ATTR  __attribute__((section(".irom.text")))
 
-Which places the variable in the .irom.text section ie flash.  Placing strings in
+Which places the variable in the .irom.text section in flash.  Placing strings in
 flash requires using any of the methods above.  
 
 | ### Declare a global string to be stored in flash.

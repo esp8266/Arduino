@@ -35,9 +35,9 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
-#include "include/ClientContext.h"
+#include <include/ClientContext.h>
 
-WiFiServer::WiFiServer(IPAddress addr, uint16_t port)
+WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
 : _port(port)
 , _addr(addr)
 , _pcb(nullptr)
@@ -48,7 +48,7 @@ WiFiServer::WiFiServer(IPAddress addr, uint16_t port)
 
 WiFiServer::WiFiServer(uint16_t port)
 : _port(port)
-, _addr((uint32_t) IPADDR_ANY)
+, _addr(IP_ANY_TYPE)
 , _pcb(nullptr)
 , _unclaimed(nullptr)
 , _discarded(nullptr)
@@ -56,16 +56,21 @@ WiFiServer::WiFiServer(uint16_t port)
 }
 
 void WiFiServer::begin() {
+	begin(_port);
+}
+
+void WiFiServer::begin(uint16_t port) {
     close();
+    _port = port;
     err_t err;
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
         return;
 
-    ip_addr_t local_addr;
-    local_addr.addr = (uint32_t) _addr;
     pcb->so_options |= SOF_REUSEADDR;
-    err = tcp_bind(pcb, &local_addr, _port);
+
+    // (IPAddress _addr) operator-converted to (const ip_addr_t*)
+    err = tcp_bind(pcb, _addr, _port);
 
     if (err != ERR_OK) {
         tcp_close(pcb);
@@ -83,11 +88,16 @@ void WiFiServer::begin() {
 }
 
 void WiFiServer::setNoDelay(bool nodelay) {
-    _noDelay = nodelay;
+    _noDelay = nodelay? _ndTrue: _ndFalse;
 }
 
 bool WiFiServer::getNoDelay() {
-    return _noDelay;
+    switch (_noDelay)
+    {
+    case _ndFalse: return false;
+    case _ndTrue: return true;
+    default: return WiFiClient::getDefaultNoDelay();
+    }
 }
 
 bool WiFiServer::hasClient() {
@@ -101,7 +111,7 @@ WiFiClient WiFiServer::available(byte* status) {
     if (_unclaimed) {
         WiFiClient result(_unclaimed);
         _unclaimed = _unclaimed->next();
-        result.setNoDelay(_noDelay);
+        result.setNoDelay(getNoDelay());
         DEBUGV("WS:av\r\n");
         return result;
     }

@@ -5,11 +5,11 @@
 #include <stdint.h>
 
 #ifdef DEBUG_ESP_CORE
-#define DEBUGV(...) ets_printf(__VA_ARGS__)
+#define DEBUGV(fmt, ...) ::printf((PGM_P)PSTR(fmt), ## __VA_ARGS__)
 #endif
 
 #ifndef DEBUGV
-#define DEBUGV(...)
+#define DEBUGV(...) do { (void)0; } while (0)
 #endif
 
 #ifdef __cplusplus
@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 void __panic_func(const char* file, int line, const char* func) __attribute__((noreturn));
-#define panic() __panic_func(__FILE__, __LINE__, __func__)
+#define panic() __panic_func(PSTR(__FILE__), __LINE__, __func__)
 
 #ifdef __cplusplus
 }
