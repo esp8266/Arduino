@@ -1,30 +1,133 @@
-sudo: false
 language: bash
 os: linux
 dist: trusty
 
-env:
-  - BUILD_TYPE=build
+git:
+  depth: 1
+  submodules: false
 
-install:
-  - pip install --user -r doc/requirements.txt
+before_install:
+  - git submodule update --init  # no recursive update
 
-script:
-  - $TRAVIS_BUILD_DIR/tests/common.sh
+cache:
+  directories:
+    - $HOME/astyle
 
-deploy:
-  provider: releases
-  prerelease: true
-  skip_cleanup: true
-  api_key:
-    secure: A4FBmqyhlzy33oPeZVolg2Q/A3ZcJ3WnRQqQJ3NAPy+qGM5xcboOYtwcLL9vKaHZGfUB7lUP9QVZFGou1Wrmo9DnPvAoe3+XvCaDRGzVMxeIpu7UStbBD4Knbh98tlbMvZCXYRlT4VcusI9bMLK6UWw4sMdPislBh2FEfglTiag=
-  file_glob: true
-  file:
-    - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
-    - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
-  on:
-    repo: esp8266/Arduino
-    tags: true
+stages:
+  - build
+  - deploy
+
+jobs:
+  include:
+    # Build stage. To save time, run all kinds of builds and tests in parallel.
+
+    - name: "Platformio (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Platformio (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/platformio.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Build (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Build (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Debug (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/debug.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Debug (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/debug.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Build IPv6 (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build6.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Build IPv6 (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build6.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Build lwIP-v1.4 (1)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build1.sh
+      env:
+        - BUILD_PARITY=even
+    - name: "Build lwIP-v1.4 (2)"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/build1.sh
+      env:
+        - BUILD_PARITY=odd
+
+    - name: "Host tests"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/host_test.sh
+      install: sudo apt-get install valgrind lcov
+
+    - name: "Docs"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/build_docs.sh
+      install:
+          - sudo apt-get install python3-pip
+          - pip3 install --user -r doc/requirements.txt;
+
+    - name: "Style check"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/style_check.sh
+      install: tests/ci/install_astyle.sh
+
+    - name: "Boards"
+      stage: build
+      script: $TRAVIS_BUILD_DIR/tests/ci/build_boards.sh
+
+    # Deploy stage.
+    # Here we build the package JSON (always) and do the deployments
+    - name: "Package / deploy"
+      stage: deploy
+      script: tests/ci/build_package.sh
+      env: BUILD_TYPE=package
+      before_deploy: git submodule update --init
+      deploy:
+      # Create Github release, upload artifacts
+      - provider: releases
+        draft: true
+        skip_cleanup: true
+        api_key:
+          secure: kYsxX/N21fwLSTLpbb0c96PnQHn1CIMqZstm02hfUhCX83FygWSh4vs3gzW28DMpjQMZ6vC4g+jtfosYU2tUhht/bynurDH4edpEyGeMyK+fzCI9pAr4JT0RbKQI84EC18ScpgP/UP0jTc1LJ+xl8UMwSiDE0mzHx7xJ4mMNQbA=
+        file_glob: true
+        tag_name: $TRAVIS_TAG
+        target_commitish: $TRAVIS_COMMIT
+        file:
+          - package/versions/$TRAVIS_TAG/esp8266-$TRAVIS_TAG.zip
+          - package/versions/$TRAVIS_TAG/package_esp8266com_index.json
+        on:
+          repo: esp8266/Arduino
+          tags: true
+
+      # Update the package index URL to point to the new version
+      - provider: script
+        skip_cleanup: true
+        script: bash package/deploy_package_index.sh
+        on:
+          repo: esp8266/Arduino
+          tags: true
 
 notifications:
   email:

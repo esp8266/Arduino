@@ -16,8 +16,13 @@
 #include <ESP8266WiFi.h>
 #include <stdio.h>
 
-const char* ssid     = "ap-ssid";
-const char* password = "ap-password";
+#ifndef APSSID
+#define APSSID "esp8266"
+#define APPSK  "esp8266"
+#endif
+
+const char* ssid     = APSSID;
+const char* password = APPSK;
 
 WiFiEventHandler stationConnectedHandler;
 WiFiEventHandler stationDisconnectedHandler;

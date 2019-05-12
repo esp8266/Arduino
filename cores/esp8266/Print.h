@@ -62,6 +62,13 @@ class Print {
         size_t write(const char *buffer, size_t size) {
             return write((const uint8_t *) buffer, size);
         }
+        // These handle ambiguity for write(0) case, because (0) can be a pointer or an integer
+        size_t write(short t) { return write((uint8_t)t); }
+        size_t write(unsigned short t) { return write((uint8_t)t); }
+        size_t write(int t) { return write((uint8_t)t); }
+        size_t write(unsigned int t) { return write((uint8_t)t); }
+        size_t write(long t) { return write((uint8_t)t); }
+        size_t write(unsigned long t) { return write((uint8_t)t); }
 
         size_t printf(const char * format, ...)  __attribute__ ((format (printf, 2, 3)));
         size_t printf_P(PGM_P format, ...) __attribute__((format(printf, 2, 3)));
@@ -89,6 +96,8 @@ class Print {
         size_t println(double, int = 2);
         size_t println(const Printable&);
         size_t println(void);
+
+        virtual void flush() { /* Empty implementation for backward compatibility */ }
 };
 
 #endif

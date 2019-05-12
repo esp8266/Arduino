@@ -65,12 +65,12 @@ bool schedule_function(std::function<void(void)> fn)
 
 void run_scheduled_functions()
 {
-    while (sFirst) {
-        scheduled_fn_t* item = sFirst;
-        sFirst = item->mNext;
-        if (sFirst == NULL) {
-            sLast = NULL;
-        }
+	scheduled_fn_t* rFirst = sFirst;
+	sFirst = NULL;
+	sLast  = NULL;
+    while (rFirst) {
+        scheduled_fn_t* item = rFirst;
+        rFirst = item->mNext;
         item->mFunc();
         item->mFunc = std::function<void(void)>();
         recycle_fn(item);

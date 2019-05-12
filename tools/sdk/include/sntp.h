@@ -2,11 +2,20 @@
 #define __SNTP_H__
 
 #include "os_type.h"
-#ifdef LWIP_OPEN_SRC
+
+#include "lwip/init.h"
 #include "lwip/ip_addr.h"
+
+#if LWIP_VERSION_MAJOR == 1
+#define ipv4_addr_t ip_addr_t
 #else
-#include "ip_addr.h"
+typedef struct ip4_addr ipv4_addr_t;
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * get the seconds since Jan 01, 1970, 00:00 (GMT + 8)
  */
@@ -38,15 +47,15 @@ void sntp_stop(void);
  * @param numdns the index of the NTP server to set must be < SNTP_MAX_SERVERS
  * @param dnsserver IP address of the NTP server to set
  */
-void sntp_setserver(unsigned char idx, ip_addr_t *addr);
+void sntp_setserver(unsigned char idx, ipv4_addr_t *addr);
 /**
  * Obtain one of the currently configured by IP address (or DHCP) NTP servers
  *
  * @param numdns the index of the NTP server
- * @return IP address of the indexed NTP server or "ip_addr_any" if the NTP
+ * @return IP address of the indexed NTP server or "ipv4_addr_any" if the NTP
  *         server has not been configured by address (or at all).
  */
-ip_addr_t sntp_getserver(unsigned char idx);
+ipv4_addr_t sntp_getserver(unsigned char idx);
 /**
  * Initialize one of the NTP servers by name
  *
@@ -64,5 +73,10 @@ void sntp_setservername(unsigned char idx, char *server);
 char *sntp_getservername(unsigned char idx);
 
 #define sntp_servermode_dhcp(x)
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

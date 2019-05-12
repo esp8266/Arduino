@@ -6,7 +6,7 @@ WiFi(ESP8266WiFi library)
 
 ESP8266WiFi library has been developed basing on ESP8266 SDK, using naming convention and overall functionality philosophy of the `Arduino WiFi Shield library <https://www.arduino.cc/en/Reference/WiFi>`__. Over time the wealth Wi-Fi features ported from ESP8266 SDK to this library outgrew the APIs of WiFi Shield library and it became apparent that we need to provide separate documentation on what is new and extra.
 
-:doc:`ESP8266WiFi library documentation <esp8266wifi/readme>`.
+`ESP8266WiFi library documentation <esp8266wifi/readme.rst>`__
 
 Ticker
 ------
@@ -71,15 +71,21 @@ ESP-specific APIs
 
 Some ESP-specific APIs related to deep sleep, RTC and flash memories are available in the ``ESP`` object.
 
-``ESP.deepSleep(microseconds, mode)`` will put the chip into deep sleep. ``mode`` is one of ``WAKE_RF_DEFAULT``, ``WAKE_RFCAL``, ``WAKE_NO_RFCAL``, ``WAKE_RF_DISABLED``. (GPIO16 needs to be tied to RST to wake from deepSleep.)
+``ESP.deepSleep(microseconds, mode)`` will put the chip into deep sleep. ``mode`` is one of ``WAKE_RF_DEFAULT``, ``WAKE_RFCAL``, ``WAKE_NO_RFCAL``, ``WAKE_RF_DISABLED``. (GPIO16 needs to be tied to RST to wake from deepSleep.) The chip can sleep for at most ``ESP.deepSleepMax()`` microseconds.
 
-``ESP.rtcUserMemoryWrite(offset, &data, sizeof(data))`` and ``ESP.rtcUserMemoryRead(offset, &data, sizeof(data))`` allow data to be stored in and retrieved from the RTC user memory of the chip respectively. Total size of RTC user memory is 512 bytes, so ``offset + sizeof(data)`` shouldn't exceed 512. Data should be 4-byte aligned. The stored data can be retained between deep sleep cycles. However, the data might be lost after power cycling the chip.
+``ESP.deepSleepInstant(microseconds, mode)`` works similarly to ``ESP.deepSleep`` but  sleeps instantly without waiting for WiFi to shutdown.
+
+``ESP.rtcUserMemoryWrite(offset, &data, sizeof(data))`` and ``ESP.rtcUserMemoryRead(offset, &data, sizeof(data))`` allow data to be stored in and retrieved from the RTC user memory of the chip respectively. ``offset`` is measured in blocks of 4 bytes and can range from 0 to 127 blocks (total size of RTC memory is 512 bytes). ``data`` should be 4-byte aligned. The stored data can be retained between deep sleep cycles, but might be lost after power cycling the chip. Data stored in the first 32 blocks will be lost after performing an OTA update, because they are used by the Core internals.
 
 ``ESP.restart()`` restarts the CPU.
 
 ``ESP.getResetReason()`` returns a String containing the last reset reason in human readable format.
 
 ``ESP.getFreeHeap()`` returns the free heap size.
+
+``ESP.getHeapFragmentation()`` returns the fragmentation metric (0% is clean, more than ~50% is not harmless)
+
+``ESP.getMaxFreeBlockSize()`` returns the maximum allocatable ram block regarding heap fragmentation
 
 ``ESP.getChipId()`` returns the ESP8266 chip ID as a 32-bit integer.
 
@@ -133,7 +139,15 @@ Implements a simple DNS server that can be used in both STA and AP modes. The DN
 Servo
 -----
 
-This library exposes the ability to control RC (hobby) servo motors. It will support upto 24 servos on any available output pin. By defualt the first 12 servos will use Timer0 and currently this will not interfere with any other support. Servo counts above 12 will use Timer1 and features that use it will be effected. While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most will not be able to run off 3.3v and will require another power source that matches their specifications. Make sure to connect the grounds between the ESP8266 and the servo motor power supply.
+This library exposes the ability to control RC (hobby) servo motors. It will support up to 24 servos on any available output pin. By default the first 12 servos will use Timer0 and currently this will not interfere with any other support. Servo counts above 12 will use Timer1 and features that use it will be affected. While many RC servo motors will accept the 3.3V IO data pin from a ESP8266, most will not be able to run off 3.3v and will require another power source that matches their specifications. Make sure to connect the grounds between the ESP8266 and the servo motor power supply.
+
+Improved EEPROM library for ESP (ESP_EEPROM)
+--------------------------------------------
+
+An improved EEPROM library for ESPxxxx.  Uses flash memory as per the standard ESP EEPROM library but reduces reflash - so reducing wear and improving commit() performance.  
+
+As actions on the flash need to stop the interrupts, an EEPROM reflash could noticably affect anything using PWM, etc.
+
 
 Other libraries (not included with the IDE)
 -------------------------------------------
@@ -144,12 +158,13 @@ Libraries that don't rely on low-level access to AVR registers should work well.
 -  `arduinoVNC <https://github.com/Links2004/arduinoVNC>`__ - VNC Client for Arduino
 -  `arduinoWebSockets <https://github.com/Links2004/arduinoWebSockets>`__ - WebSocket Server and Client compatible with ESP8266 (RFC6455)
 -  `aREST <https://github.com/marcoschwartz/aREST>`__ - REST API handler library.
--  `Blynk <https://github.com/blynkkk/blynk-library>`__ - easy IoT framework for Makers (check out the `Kickstarter page <http://tiny.cc/blynk-kick>`__).
+-  `Blynk <https://github.com/blynkkk/blynk-library>`__ - easy IoT framework for Makers (check out the `Kickstarter page <https://tiny.cc/blynk-kick>`__).
 -  `DallasTemperature <https://github.com/milesburton/Arduino-Temperature-Control-Library.git>`__
 -  `DHT-sensor-library <https://github.com/adafruit/DHT-sensor-library>`__ - Arduino library for the DHT11/DHT22 temperature and humidity sensors. Download latest v1.1.1 library and no changes are necessary. Older versions should initialize DHT as follows: ``DHT dht(DHTPIN, DHTTYPE, 15)``
 -  `DimSwitch <https://github.com/krzychb/DimSwitch>`__ - Control electronic dimmable ballasts for fluorescent light tubes remotely as if using a wall switch.
 -  `Encoder <https://github.com/PaulStoffregen/Encoder>`__ - Arduino library for rotary encoders. Version 1.4 supports ESP8266.
 -  `esp8266\_mdns <https://github.com/mrdunk/esp8266_mdns>`__ - mDNS queries and responses on esp8266. Or to describe it another way: An mDNS Client or Bonjour Client library for the esp8266.
+-  `ESP-NOW <https://github.com/yoursunny/WifiEspNow>`__ - Wrapper lib for ESP-NOW (See `#2227 <https://github.com/esp8266/Arduino/issues/2227>`__)
 -  `ESPAsyncTCP <https://github.com/me-no-dev/ESPAsyncTCP>`__ - Asynchronous TCP Library for ESP8266 and ESP32/31B
 -  `ESPAsyncWebServer <https://github.com/me-no-dev/ESPAsyncWebServer>`__ - Asynchronous Web Server Library for ESP8266 and ESP32/31B
 -  `Homie for ESP8266 <https://github.com/marvinroger/homie-esp8266>`__ - Arduino framework for ESP8266 implementing Homie, an MQTT convention for the IoT.

@@ -30,6 +30,12 @@ extern "C" uint32_t _SPIFFS_start;
 extern "C" uint32_t _SPIFFS_end;
 
 ESP8266HTTPUpdate::ESP8266HTTPUpdate(void)
+        : _httpClientTimeout(8000), _followRedirects(false), _ledPin(-1)
+{
+}
+
+ESP8266HTTPUpdate::ESP8266HTTPUpdate(int httpClientTimeout)
+        : _httpClientTimeout(httpClientTimeout), _followRedirects(false), _ledPin(-1)
 {
 }
 
@@ -37,17 +43,24 @@ ESP8266HTTPUpdate::~ESP8266HTTPUpdate(void)
 {
 }
 
+#ifdef HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
         const String& httpsFingerprint, bool reboot)
 {
     rebootOnUpdate(reboot);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     return update(url, currentVersion, httpsFingerprint);
+#pragma GCC diagnostic pop
 }
 
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, false);
 }
 
@@ -55,32 +68,84 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& curr
         const String& httpsFingerprint)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url, httpsFingerprint);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, false);
 }
 
+HTTPUpdateResult ESP8266HTTPUpdate::update(const String& url, const String& currentVersion,
+        const uint8_t httpsFingerprint[20])
+{
+    HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
+    http.begin(url, httpsFingerprint);
+#pragma GCC diagnostic pop
+    return handleUpdate(http, currentVersion, false);
+}
+#endif
+
+HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& url, const String& currentVersion)
+{
+    HTTPClient http;
+    http.begin(client, url);
+    return handleUpdate(http, currentVersion, false);
+}
+
+#ifdef HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const String& httpsFingerprint)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url, httpsFingerprint);
+#pragma GCC diagnostic pop
+    return handleUpdate(http, currentVersion, true);
+}
+
+HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion, const uint8_t httpsFingerprint[20])
+{
+    HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
+    http.begin(url, httpsFingerprint);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, true);
 }
 
 HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(const String& url, const String& currentVersion)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(url);
+#pragma GCC diagnostic pop
+    return handleUpdate(http, currentVersion, true);
+}
+#endif
+
+HTTPUpdateResult ESP8266HTTPUpdate::updateSpiffs(WiFiClient& client, const String& url, const String& currentVersion)
+{
+    HTTPClient http;
+    http.begin(client, url);
     return handleUpdate(http, currentVersion, true);
 }
 
+#ifdef HTTPUPDATE_1_2_COMPATIBLE
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& uri, const String& currentVersion,
         bool https, const String& httpsFingerprint, bool reboot)
 {
+    (void)https;
     rebootOnUpdate(reboot);
     if (httpsFingerprint.length() == 0) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
         return update(host, port, uri, currentVersion);
     } else {
         return update(host, port, uri, currentVersion, httpsFingerprint);
+#pragma GCC diagnostic pop
     }
 }
 
@@ -88,16 +153,42 @@ HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, co
         const String& currentVersion)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(host, port, uri);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, false);
 }
+
 HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& url,
         const String& currentVersion, const String& httpsFingerprint)
 {
     HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
     http.begin(host, port, url, httpsFingerprint);
+#pragma GCC diagnostic pop
     return handleUpdate(http, currentVersion, false);
+}
 
+HTTPUpdateResult ESP8266HTTPUpdate::update(const String& host, uint16_t port, const String& url,
+        const String& currentVersion, const uint8_t httpsFingerprint[20])
+{
+    HTTPClient http;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored  "-Wdeprecated-declarations"
+    http.begin(host, port, url, httpsFingerprint);
+#pragma GCC diagnostic pop
+    return handleUpdate(http, currentVersion, false);
+}
+#endif
+
+HTTPUpdateResult ESP8266HTTPUpdate::update(WiFiClient& client, const String& host, uint16_t port, const String& uri,
+        const String& currentVersion)
+{
+    HTTPClient http;
+    http.begin(client, host, port, uri);
+    return handleUpdate(http, currentVersion, false);
 }
 
 /**
@@ -135,21 +226,21 @@ String ESP8266HTTPUpdate::getLastErrorString(void)
 
     switch(_lastError) {
     case HTTP_UE_TOO_LESS_SPACE:
-        return F("To less space");
+        return F("Not Enough space");
     case HTTP_UE_SERVER_NOT_REPORT_SIZE:
-        return F("Server not Report Size");
+        return F("Server Did Not Report Size");
     case HTTP_UE_SERVER_FILE_NOT_FOUND:
-        return F("File not Found (404)");
+        return F("File Not Found (404)");
     case HTTP_UE_SERVER_FORBIDDEN:
         return F("Forbidden (403)");
     case HTTP_UE_SERVER_WRONG_HTTP_CODE:
-        return F("Wrong HTTP code");
+        return F("Wrong HTTP Code");
     case HTTP_UE_SERVER_FAULTY_MD5:
-        return F("Faulty MD5");
+        return F("Wrong MD5");
     case HTTP_UE_BIN_VERIFY_HEADER_FAILED:
-        return F("Verify bin header failed");
+        return F("Verify Bin Header Failed");
     case HTTP_UE_BIN_FOR_WRONG_FLASH:
-        return F("bin for wrong flash size");
+        return F("New Binary Does Not Fit Flash Size");
     }
 
     return String();
@@ -169,7 +260,8 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
     // use HTTP/1.0 for update since the update handler not support any transfer Encoding
     http.useHTTP10(true);
-    http.setTimeout(8000);
+    http.setTimeout(_httpClientTimeout);
+    http.setFollowRedirects(_followRedirects);
     http.setUserAgent(F("ESP8266-http-Update"));
     http.addHeader(F("x-ESP8266-Chip-ID"), String(ESP.getChipId()));
     http.addHeader(F("x-ESP8266-STA-MAC"), WiFi.macAddress());
@@ -275,7 +367,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
                     // check for valid first magic byte
                     if(buf[0] != 0xE9) {
-                        DEBUG_HTTP_UPDATE("[httpUpdate] magic header not starts with 0xE9\n");
+                        DEBUG_HTTP_UPDATE("[httpUpdate] Magic header does not start with 0xE9\n");
                         _lastError = HTTP_UE_BIN_VERIFY_HEADER_FAILED;
                         http.end();
                         return HTTP_UPDATE_FAILED;
@@ -286,13 +378,12 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
 
                     // check if new bin fits to SPI flash
                     if(bin_flash_size > ESP.getFlashChipRealSize()) {
-                        DEBUG_HTTP_UPDATE("[httpUpdate] magic header, new bin not fits SPI Flash\n");
+                        DEBUG_HTTP_UPDATE("[httpUpdate] New binary does not fit SPI Flash size\n");
                         _lastError = HTTP_UE_BIN_FOR_WRONG_FLASH;
                         http.end();
                         return HTTP_UPDATE_FAILED;
                     }
                 }
-
                 if(runUpdate(*tcp, len, http.header("x-MD5"), command)) {
                     ret = HTTP_UPDATE_OK;
                     DEBUG_HTTP_UPDATE("[httpUpdate] Update ok\n");
@@ -310,7 +401,7 @@ HTTPUpdateResult ESP8266HTTPUpdate::handleUpdate(HTTPClient& http, const String&
         } else {
             _lastError = HTTP_UE_SERVER_NOT_REPORT_SIZE;
             ret = HTTP_UPDATE_FAILED;
-            DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length is 0 or not set by Server?!\n");
+            DEBUG_HTTP_UPDATE("[httpUpdate] Content-Length was 0 or wasn't set by Server?!\n");
         }
         break;
     case HTTP_CODE_NOT_MODIFIED:
@@ -349,7 +440,7 @@ bool ESP8266HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int com
 
     StreamString error;
 
-    if(!Update.begin(size, command)) {
+    if(!Update.begin(size, command, _ledPin, _ledOn)) {
         _lastError = Update.getError();
         Update.printError(error);
         error.trim(); // remove line ending

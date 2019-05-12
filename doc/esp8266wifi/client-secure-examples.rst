@@ -3,7 +3,7 @@
 Client Secure
 -------------
 
-The client secure is a `client <#client>`__ but secure. Application example below will be easier to follow if you check similar and simpler `example <client-examples.md>`__ for the "ordinary" client. That being said we will concentrate on discussing the code that is specific to the client secure.
+The client secure is a `client <#client>`__ but secure. Application example below will be easier to follow if you check similar and simpler `example <client-examples.rst>`__ for the "ordinary" client. That being said we will concentrate on discussing the code that is specific to the client secure.
 
 Table of Contents
 -----------------
@@ -71,7 +71,7 @@ We can obtain the ``fingerprint`` for specific ``host`` using a web browser. For
 
    alt text
 
-Remaining steps look almost identical as for the `non-secure client example <client-examples.md>`__.
+Remaining steps look almost identical as for the `non-secure client example <client-examples.rst>`__.
 
 Connect to the Server
 ~~~~~~~~~~~~~~~~~~~~~
@@ -106,7 +106,7 @@ If this check fails, it is up to you to decide if to proceed further or abort co
 GET Response from the Server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the next steps we should execute GET command. This is done is similar way as discussed in `non-secure client example <client-examples.md>`__.
+In the next steps we should execute GET command. This is done is similar way as discussed in `non-secure client example <client-examples.rst>`__.
 
 .. code:: cpp
 
@@ -117,7 +117,7 @@ In the next steps we should execute GET command. This is done is similar way as 
 
 After sending the request we should wait for a reply and then process received information.
 
-Out of received replay we can skip response header. This can be done by reading until an empty line ``"\r"`` that marks the end of the header:
+Out of received reply we can skip response header. This can be done by reading until an empty line ``"\r"`` that marks the end of the header:
 
 .. code:: cpp
 
@@ -178,4 +178,4 @@ Conclusion
 Programming a secure client is almost identical as programming a non-secure client. The difference gets down to one extra step to verify server's identity. Keep in mind limitations due to heavy memory usage that depends on the strength of the key used by the server and whether server is willing to negotiate the `TLS buffer size <https://www.igvita.com/2013/10/24/optimizing-tls-record-size-and-buffering-latency/>`__.
 
 For the list of functions provided to manage secure clients, please refer to the `Client Secure Class
-:arrow\_right: <client-secure-class.md>`__ documentation.
+:arrow\_right: <client-secure-class.rst>`__ documentation.

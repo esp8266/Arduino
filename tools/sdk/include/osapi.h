@@ -28,6 +28,10 @@
 #include <string.h>
 #include "user_config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define os_bzero ets_bzero
 #define os_delay_us ets_delay_us
 #define os_install_putc1 ets_install_putc1
@@ -76,6 +80,11 @@ extern int os_printf_plus(const char * format, ...) __attribute__ ((format (prin
 
 unsigned long os_random(void);
 int os_get_random(unsigned char *buf, size_t len);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
