@@ -104,6 +104,7 @@ void ICACHE_FLASH_ATTR node_remove_from_list(list_node **phead, list_node* pdele
         }
     }
 }
+
 ///////////////////////////////////////////////////////////////////////////////////
 /*
  * ��DHCP msg��Ϣ�ṹ����������

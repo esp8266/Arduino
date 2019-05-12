@@ -25,9 +25,9 @@ void setup() {
 void loop() {
   // Call Espressif SDK functionality - wrapped in ifdef so that it still
   // compiles on other platforms
-  #ifdef ESP8266
+#ifdef ESP8266
   Serial.print("wifi_station_get_hostname: ");
   Serial.println(wifi_station_get_hostname());
-  #endif
+#endif
   delay(1000);
 }

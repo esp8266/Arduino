@@ -20,6 +20,13 @@
 #include "CertStoreBearSSL.h"
 #include <memory>
 
+
+#ifdef DEBUG_ESP_SSL
+#define DEBUG_BSSL(fmt, ...)  DEBUG_ESP_PORT.printf_P((PGM_P)PSTR( "BSSL:" fmt), ## __VA_ARGS__)
+#else
+#define DEBUG_BSSL(...)
+#endif
+
 namespace BearSSL {
 
 extern "C" {
@@ -39,6 +46,11 @@ CertStore::CertInfo CertStore::_preprocessCert(uint32_t length, uint32_t offset,
   // Process it using SHA256, same as the hashed_dn
   br_x509_decoder_context *ctx = new br_x509_decoder_context;
   br_sha256_context *sha256 = new br_sha256_context;
+  if (!ctx || !sha256) {
+    DEBUG_BSSL("CertStore::_preprocessCert: OOM\n");
+    return ci;
+  }
+
   br_sha256_init(sha256);
   br_x509_decoder_init(ctx, dn_append, sha256, nullptr, nullptr);
   br_x509_decoder_push(ctx, (const void*)raw, length);
@@ -170,8 +182,12 @@ const br_x509_trust_anchor *CertStore::findHashedTA(void *ctx, void *hashed_dn, 
         return nullptr;
       }
       cs->_data->close();
-      cs->_x509 = new BearSSLX509List(der, ci.length);
+      cs->_x509 = new X509List(der, ci.length);
       free(der);
+      if (!cs->_x509) {
+        DEBUG_BSSL("CertStore::findHashedTA: OOM\n");
+        return nullptr;
+      }
 
       br_x509_trust_anchor *ta = (br_x509_trust_anchor*)cs->_x509->getTrustAnchors();
       memcpy(ta->dn.data, ci.sha256, sizeof(ci.sha256));

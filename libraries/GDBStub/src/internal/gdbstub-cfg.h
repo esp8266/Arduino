@@ -1,5 +1,5 @@
 #ifndef GDBSTUB_CFG_H
-#define  GDBSTUB_CFG_H
+#define GDBSTUB_CFG_H
 
 /*
 Enable this define if you're using the RTOS SDK. It will use a custom exception handler instead of the HAL
@@ -20,13 +20,21 @@ stops when you run into an error in your code, try enabling this.
 #endif
 
 /*
+Enable this to cause the program to pause and wait for gdb to be connected when an exception is
+encountered.
+*/
+#ifndef GDBSTUB_BREAK_ON_EXCEPTION
+#define GDBSTUB_BREAK_ON_EXCEPTION 1
+#endif
+
+/*
 If this is defined, gdbstub will break the program when you press Ctrl-C in gdb. it does this by
 hooking the UART interrupt. Unfortunately, this means receiving stuff over the serial port won't
 work for your program anymore. This will fail if your program sets an UART interrupt handler after
 the gdbstub_init call.
 */
 #ifndef GDBSTUB_CTRLC_BREAK
-#define GDBSTUB_CTRLC_BREAK 0
+#define GDBSTUB_CTRLC_BREAK 1
 #endif
 
 /*
@@ -35,7 +43,7 @@ will show up in your gdb session, which is useful if you use gdb to do stuff. It
 you use a normal terminal, you can't read the printfs anymore.
 */
 #ifndef GDBSTUB_REDIRECT_CONSOLE_OUTPUT
-#define GDBSTUB_REDIRECT_CONSOLE_OUTPUT 0
+#define GDBSTUB_REDIRECT_CONSOLE_OUTPUT 1
 #endif
 
 /*
@@ -55,7 +63,25 @@ flash somehow is disabled (eg during SPI operations or flash write/erase operati
 are called when the flash is disabled (eg due to a Ctrl-C at the wrong time), the ESP8266 will most
 likely crash.
 */
-#define ATTR_GDBINIT	ICACHE_FLASH_ATTR
-#define ATTR_GDBFN		ICACHE_RAM_ATTR
+#ifndef ATTR_GDBINIT
+#define ATTR_GDBINIT		ICACHE_FLASH_ATTR
+#endif
+#ifndef ATTR_GDBFN
+#define ATTR_GDBFN			ICACHE_RAM_ATTR
+#endif
+#ifndef ATTR_GDBEXTERNFN
+#define ATTR_GDBEXTERNFN	ICACHE_FLASH_ATTR
+#endif
+
+#ifndef ASATTR_GDBINIT
+#define ASATTR_GDBINIT		.section .irom0.text
+#endif
+#ifndef ASATTR_GDBFN
+#define ASATTR_GDBFN		.section .iram.text
+#endif
+#ifndef ASATTR_GDBEXTERNFN
+#define ASATTR_GDBEXTERNFN	.section .irom0.text
+#endif
+
 
 #endif

@@ -46,12 +46,12 @@ ESP8266WebServerSecure::ESP8266WebServerSecure(int port)
 {
 }
 
-void ESP8266WebServerSecure::setRSACert(const BearSSLX509List *chain, const BearSSLPrivateKey *sk)
+void ESP8266WebServerSecure::setRSACert(const X509List *chain, const PrivateKey *sk)
 {
   _serverSecure.setRSACert(chain, sk);
 }
 
-void ESP8266WebServerSecure::setECCert(const BearSSLX509List *chain, unsigned cert_issuer_key_type, const BearSSLPrivateKey *sk)
+void ESP8266WebServerSecure::setECCert(const X509List *chain, unsigned cert_issuer_key_type, const PrivateKey *sk)
 {
   _serverSecure.setECCert(chain, cert_issuer_key_type, sk);
 }
@@ -83,7 +83,7 @@ void ESP8266WebServerSecure::begin() {
 
 void ESP8266WebServerSecure::handleClient() {
   if (_currentStatus == HC_NONE) {
-    BearSSL::WiFiClientSecure client = _serverSecure.available();
+    WiFiClientSecure client = _serverSecure.available();
     if (!client) {
       return;
     }
@@ -136,7 +136,7 @@ void ESP8266WebServerSecure::handleClient() {
   }
 
   if (!keepCurrentClient) {
-    _currentClientSecure = BearSSL::WiFiClientSecure();
+    _currentClientSecure = WiFiClientSecure();
     _currentStatus = HC_NONE;
     _currentUpload.reset();
   }

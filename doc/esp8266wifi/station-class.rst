@@ -46,7 +46,7 @@ Table of Contents
 
 Points below provide description and code snippets how to use particular methods.
 
-For more code samples please refer to separate section with :doc:`examples <station-examples>` dedicated specifically to the Station Class.
+For more code samples please refer to separate section with `examples <station-examples.rst>`__ dedicated specifically to the Station Class.
 
 Start Here
 ~~~~~~~~~~
@@ -62,7 +62,7 @@ By default, ESP will attempt to reconnect to Wi-Fi network whenever it is discon
 begin
 ^^^^^
 
-There are several versions (called *`function overloads <https://en.wikipedia.org/wiki/Function_overloading>`__* in C++) of ``begin`` function. One was presented just above:
+There are several versions (called `function overloads <https://en.wikipedia.org/wiki/Function_overloading>`__ in C++) of ``begin`` function. One was presented just above:
 ``WiFi.begin(ssid, password)``. Overloads provide flexibility in number or type of accepted parameters.
 
 The simplest overload of ``begin`` is as follows:
@@ -71,7 +71,12 @@ The simplest overload of ``begin`` is as follows:
 
     WiFi.begin()
 
-Calling it will instruct module to switch to the station mode and connect to the last used access point basing on configuration saved in flash memory.
+Calling it will enable station mode and connect to the last used access point based on configuration saved in flash memory.
+
+Notes:
+
+- It is possible that calling ``begin`` will result in the module being in STA + softAP mode if the module was previously placed into AP mode. 
+- If you notice strange behavior with DNS or other network functionality, check which mode your module is in (see ``WiFi.mode()`` in the `Generic Class Documentation <generic-class.rst#mode>`__).
 
 Below is the syntax of another overload of ``begin`` with the all possible parameters:
 
@@ -79,8 +84,13 @@ Below is the syntax of another overload of ``begin`` with the all possible param
 
     WiFi.begin(ssid, password, channel, bssid, connect)
 
-Meaning of parameters is as follows: \* ``ssid`` - a character string containing the SSID of Access Point we would like to connect to, may have up to 32 characters \* ``password`` to the access point, a character string that should be minimum 8 characters long and not longer than 64 characters \* ``channel`` of AP, if we like to operate using specific channel, otherwise this parameter may be omitted \* ``bssid`` -
-mac address of AP, this parameter is also optional \* ``connect`` - a ``boolean`` parameter that if set to ``false``, will instruct module just to save the other parameters without actually establishing connection to the access point
+Meaning of parameters is as follows:
+
+- ``ssid`` - a character string containing the SSID of Access Point we would like to connect to, may have up to 32 characters
+- ``password`` to the access point, a character string that should be minimum 8 characters long and not longer than 64 characters 
+- ``channel`` of AP, if we like to operate using specific channel, otherwise this parameter may be omitted 
+- ``bssid`` - mac address of AP, this parameter is also optional 
+- ``connect`` - a ``boolean`` parameter that if set to ``false``, will instruct module just to save the other parameters without actually establishing connection to the access point
 
 config
 ^^^^^^
@@ -89,7 +99,7 @@ Disable `DHCP <https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol
 
 .. code:: cpp
 
-    WiFi.config(local_ip, gateway, subnet, dns1, dns2) 
+    WiFi.config(local_ip, gateway, subnet, dns1, dns2)
 
 Function will return ``true`` if configuration change is applied successfully. If configuration can not be applied, because e.g. module is not in station or station + soft access point mode, then ``false`` will be returned.
 
@@ -125,8 +135,8 @@ The following IP configuration may be provided:
       Serial.println();
 
       Serial.printf("Connecting to %s\n", ssid);
-      WiFi.begin(ssid, password);
       WiFi.config(staticIP, gateway, subnet);
+      WiFi.begin(ssid, password);
       while (WiFi.status() != WL_CONNECTED)
       {
         delay(500);
@@ -160,7 +170,7 @@ Reconnect the station. This is done by disconnecting from the access point an th
 
 .. code:: cpp
 
-    WiFi.reconnect() 
+    WiFi.reconnect()
 
 Notes: 1. Station should be already connected to an access point. If this is not the case, then function will return ``false`` not performing any action. 2. If ``true`` is returned it means that connection sequence has been successfully started. User should still check for connection status, waiting until ``WL_CONNECTED`` is reported:
 
@@ -180,7 +190,7 @@ Sets currently configured SSID and password to ``null`` values and disconnects t
 
 .. code:: cpp
 
-    WiFi.disconnect(wifioff) 
+    WiFi.disconnect(wifioff)
 
 The ``wifioff`` is an optional ``boolean`` parameter. If set to ``true``, then the station mode will be turned off.
 
@@ -191,7 +201,7 @@ Returns ``true`` if Station is connected to an access point or ``false`` if not.
 
 .. code:: cpp
 
-    WiFi.isConnected() 
+    WiFi.isConnected()
 
 setAutoConnect
 ^^^^^^^^^^^^^^
@@ -200,7 +210,7 @@ Configure module to automatically connect on power on to the last used access po
 
 .. code:: cpp
 
-    WiFi.setAutoConnect(autoConnect) 
+    WiFi.setAutoConnect(autoConnect)
 
 The ``autoConnect`` is an optional parameter. If set to ``false`` then auto connection functionality up will be disabled. If omitted or set to ``true``, then auto connection will be enabled.
 
@@ -222,7 +232,7 @@ Set whether module will attempt to reconnect to an access point in case it is di
 
 .. code:: cpp
 
-    WiFi.setAutoReconnect(autoReconnect)  
+    WiFi.setAutoReconnect(autoReconnect)
 
 If parameter ``autoReconnect`` is set to ``true``, then module will try to reestablish lost connection to the AP. If set to ``false`` then module will stay disconnected.
 
@@ -235,9 +245,15 @@ Wait until module connects to the access point. This function is intended for mo
 
 .. code:: cpp
 
-    WiFi.waitForConnectResult()  
+    WiFi.waitForConnectResult()
 
-Function returns one of the following connection statuses: \* ``WL_CONNECTED`` after successful connection is established \* ``WL_NO_SSID_AVAIL``\ in case configured SSID cannot be reached \* ``WL_CONNECT_FAILED`` if password is incorrect \* ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses \* ``WL_DISCONNECTED`` if module is not configured in station mode
+Function returns one of the following connection statuses: 
+
+- ``WL_CONNECTED`` after successful connection is established 
+- ``WL_NO_SSID_AVAIL`` in case configured SSID cannot be reached 
+- ``WL_CONNECT_FAILED`` if password is incorrect 
+- ``WL_IDLE_STATUS`` when Wi-Fi is in process of changing between statuses 
+- ``WL_DISCONNECTED`` if module is not configured in station mode
 
 Configuration
 ~~~~~~~~~~~~~
@@ -249,7 +265,7 @@ Get the MAC address of the ESP station's interface.
 
 .. code:: cpp
 
-    WiFi.macAddress(mac) 
+    WiFi.macAddress(mac)
 
 Function should be provided with ``mac`` that is a pointer to memory location (an ``uint8_t`` array the size of 6 elements) to save the mac address. The same pointer value is returned by the function itself.
 
@@ -274,7 +290,7 @@ If you do not feel comfortable with pointers, then there is optional version of 
 
 .. code:: cpp
 
-    WiFi.macAddress() 
+    WiFi.macAddress()
 
 *Example code:*
 
@@ -292,7 +308,7 @@ Function used to obtain IP address of ESP station's interface.
 
 .. code:: cpp
 
-    WiFi.localIP() 
+    WiFi.localIP()
 
 The type of returned value is `IPAddress <https://github.com/esp8266/Arduino/blob/master/cores/esp8266/IPAddress.h>`__. There is a couple of methods available to display this type of data. They are presented in examples below that cover description of ``subnetMask``, ``gatewayIP`` and ``dnsIP`` that return the IPAdress as well.
 
@@ -399,7 +415,7 @@ The hostname may be changed using the following function:
 
 .. code:: cpp
 
-    WiFi.hostname(aHostname) 
+    WiFi.hostname(aHostname)
 
 Input parameter ``aHostname`` may be a type of ``char*``, ``const char*`` or ``String``. Maximum length of assigned hostname is 32 characters. Function returns either ``true`` or ``false`` depending on result. For instance, if the limit of 32 characters is exceeded, function will return ``false`` without assigning the new hostname.
 
@@ -427,7 +443,7 @@ Return the status of Wi-Fi connection.
 
     WiFi.status()
 
-Function returns one of the following connection statuses: 
+Function returns one of the following connection statuses:
 
 - ``WL_CONNECTED`` after successful connection is established
 - ``WL_NO_SSID_AVAIL`` in case configured SSID cannot be reached
@@ -485,7 +501,7 @@ Basing on this example, when running above code, module is initially disconnecte
 SSID
 ^^^^
 
-Return the name of Wi-Fi network, formally called `Service Set Identification (SSID) <http://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e34>`__.
+Return the name of Wi-Fi network, formally called `Service Set Identification (SSID) <https://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e34>`__.
 
 .. code:: cpp
 
@@ -519,7 +535,7 @@ Function returns value of the ``String`` type.
 BSSID
 ^^^^^
 
-Return the mac address the access point where ESP module is connected to. This address is formally called `Basic Service Set Identification (BSSID) <http://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e47>`__.
+Return the mac address of the access point to which the ESP module was directed to connect to. This address is formally called `Basic Service Set Identification (BSSID) <https://www.juniper.net/techpubs/en_US/network-director1.1/topics/concept/wireless-ssid-bssid-essid.html#jd0e47>`__. The returned pointer is what the user configured when calling begin() with a bssid argument. It does _not_ necessarily reflect the mac address of the access point to which the ESP module's station interface is currently connected to.
 
 .. code:: cpp
 
@@ -531,7 +547,7 @@ Below is similar function, but returning BSSID but as a ``String`` type.
 
 .. code:: cpp
 
-    WiFi.BSSIDstr()  
+    WiFi.BSSIDstr()
 
 *Example code:*
 
@@ -552,7 +568,7 @@ Return the signal strength of Wi-Fi network, that is formally called `Received S
 
 .. code:: cpp
 
-    WiFi.RSSI() 
+    WiFi.RSSI()
 
 Signal strength value is provided in dBm. The type of returned value is ``int32_t``.
 
@@ -571,12 +587,12 @@ Signal strength value is provided in dBm. The type of returned value is ``int32_
 Connect Different
 ~~~~~~~~~~~~~~~~~
 
-`ESP8266 SDK <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__ provides alternate methods to connect ESP station to an access point. Out of them `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__ core implements `WPS <#wps>`__ and `Smart Config <#smart-config>`__ as described in more details below.
+`ESP8266 SDK <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__ provides alternate methods to connect ESP station to an access point. Out of them `esp8266 / Arduino <https://github.com/esp8266/Arduino>`__ core implements `WPS <#wps>`__ and `Smart Config <#smart-config>`__ as described in more details below.
 
 WPS
 ^^^
 
-The following ``beginWPSConfig`` function allows connecting to a network using `Wi-Fi Protected Setup (WPS) <https://en.wikipedia.org/wiki/Wi-Fi_Protected_Setup>`__. Currently only `push-button configuration <http://www.wi-fi.org/knowledge-center/faq/how-does-wi-fi-protected-setup-work>`__ (``WPS_TYPE_PBC`` mode) is supported (SDK 1.5.4).
+The following ``beginWPSConfig`` function allows connecting to a network using `Wi-Fi Protected Setup (WPS) <https://en.wikipedia.org/wiki/Wi-Fi_Protected_Setup>`__. Currently only `push-button configuration <https://www.wi-fi.org/knowledge-center/faq/how-does-wi-fi-protected-setup-work>`__ (``WPS_TYPE_PBC`` mode) is supported (SDK 1.5.4).
 
 .. code:: cpp
 
@@ -615,7 +631,7 @@ Depending on connection result function returns either ``true`` or ``false`` (``
 
 ::
 
-    Wi-Fi mode set to WIFI_STA 
+    Wi-Fi mode set to WIFI_STA
     Begin WPS (press WPS button on your router) ... Success
     .........
     Connected, IP address: 192.168.1.102
@@ -631,7 +647,7 @@ Start smart configuration mode by sniffing for special packets that contain SSID
 
 .. code:: cpp
 
-    beginSmartConfig() 
+    beginSmartConfig()
 
 Query Smart Config status, to decide when stop configuration. Function returns either ``true`` or ``false of``\ boolean\` type.
 
@@ -643,6 +659,6 @@ Stop smart config, free the buffer taken by ``beginSmartConfig()``. Depending on
 
 .. code:: cpp
 
-    stopSmartConfig() 
+    stopSmartConfig()
 
-For additional details regarding Smart Config please refer to `ESP8266 API User Guide <http://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__.
+For additional details regarding Smart Config please refer to `ESP8266 API User Guide <https://bbs.espressif.com/viewtopic.php?f=51&t=1023>`__.

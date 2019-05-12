@@ -36,8 +36,13 @@
 
 #define DBG_OUTPUT_PORT Serial
 
-const char* ssid = "**********";
-const char* password = "**********";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 const char* host = "esp8266sd";
 
 ESP8266WebServer server(80);
@@ -310,4 +315,5 @@ void setup(void) {
 
 void loop(void) {
   server.handleClient();
+  MDNS.update();
 }

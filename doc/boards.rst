@@ -219,6 +219,20 @@ The Adafruit Feather HUZZAH ESP8266 is an Arduino-compatible Wi-Fi development b
 
 Product page: https://www.adafruit.com/product/2821
 
+Invent One
+----------
+
+The Invent One is an Arduino-compatible Wi-Fi development board powered by Ai-Thinker's ESP-12F, clocked at 80 MHz at 3.3V logic. It has an onboard ADC (PCF8591) so that you can have multiple analog inputs to work with. More information can be found here: https://blog.inventone.ng
+
+Product page: https://inventone.ng
+
+XinaBox CW01
+------------
+
+The XinaBox CW01(ESP8266) is an Arduino-compatible Wi-Fi development board powered by an ESP-12F, clocked at 80 MHz at 3.3V logic. The CW01 has an onboard RGB LED and 3 xBUS connection ports.
+
+Product page: https://xinabox.cc/products/CW01
+
 ESPresso Lite 1.0
 -----------------
 
@@ -274,6 +288,7 @@ According to the manufacturer, "with a micro USB cable, you can connect NodeMCU 
 RST, then releasing FLASH, then releasing RST. This forces the CP2102 device to power cycle and to be re-numbered by Linux.
 
 The board also features a NCP1117 voltage regulator, a blue LED on GPIO16 and a 220k/100k Ohm voltage divider on the ADC input pin.
+The ESP-12E usually has a led connected on GPIO2.
 
 Full pinout and PDF schematics can be found `here <https://github.com/nodemcu/nodemcu-devkit-v1.0>`__
 
@@ -307,21 +322,21 @@ SweetPea ESP-210
 
 *TODO*
 
-WeMos D1 R2 & mini
-------------------
+LOLIN(WEMOS) D1 R2 & mini
+-------------------------
 
 Product page: https://www.wemos.cc/
 
-WeMos D1 mini Pro
------------------
+LOLIN(WEMOS) D1 mini Pro
+------------------------
 
 Product page: https://www.wemos.cc/
 
-WeMos D1 mini Lite
-------------------
+LOLIN(WEMOS) D1 mini Lite
+-------------------------
 
 Parameters in Arduino IDE:
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Card: "WEMOS D1 Mini Lite"
 - Flash Size: "1M (512K SPIFFS)"
@@ -329,14 +344,14 @@ Parameters in Arduino IDE:
 - Upload Speed: "230400"
 
 Power:
-~~~~~
+~~~~~~
 
 - 5V pin : 4.7V 500mA output when the board is powered by USB ; 3.5V-6V input
 - 3V3 pin : 3.3V 500mA regulated output
 - Digital pins : 3.3V 30mA.
 
 links:
-~~~~~
+~~~~~~
 
 - Product page: https://www.wemos.cc/
 - Board schematic: https://wiki.wemos.cc/_media/products:d1:sch_d1_mini_lite_v1.0.0.pdf
@@ -414,4 +429,22 @@ Amperka WiFi Slot
 -----------------
 
 Product page: http://wiki.amperka.ru/wifi-slot
+
+Seeed Wio Link
+--------------
+
+Wio Link is designed to simplify your IoT development. It is an ESP8266 based open-source Wi-Fi development board to create IoT applications by virtualizing plug-n-play modules to RESTful APIs with mobile APPs. Wio Link is also compatible with the Arduino IDE.
+
+Please DO NOTICE that you MUST pull up pin 15 to enable the power for Grove ports, the board is designed like this for the purpose of peripherals power management.
+
+Product page: https://www.seeedstudio.com/Wio-Link-p-2604.html
+
+ESPectro Core
+-------------
+
+ESPectro Core is ESP8266 development board as the culmination of our 3+ year experience in exploring and developing products with ESP8266 MCU.
+
+Initially designed for kids in mind, everybody should be able to use it. Yet it's still hacker-friendly as we break out all ESP8266 ESP-12F pins.
+
+More details at https://shop.makestro.com/product/espectrocore/
 

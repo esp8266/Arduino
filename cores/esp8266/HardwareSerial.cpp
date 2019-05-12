@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <PolledTimeout.h>
 #include "Arduino.h"
 #include "HardwareSerial.h"
 #include "Esp.h"
@@ -106,6 +107,46 @@ void HardwareSerial::flush()
     //Workaround for a bug in serial not actually being finished yet
     //Wait for 8 data bits, 1 parity and 2 stop bits, just in case
     delayMicroseconds(11000000 / uart_get_baudrate(_uart) + 1);
+}
+
+void HardwareSerial::startDetectBaudrate()
+{
+    uart_start_detect_baudrate(_uart_nr);
+}
+
+unsigned long HardwareSerial::testBaudrate()
+{
+    return uart_detect_baudrate(_uart_nr);
+}
+
+unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
+{
+    time_t startMillis = millis();
+    unsigned long detectedBaudrate;
+    while ((time_t) millis() - startMillis < timeoutMillis) {
+        if ((detectedBaudrate = testBaudrate())) {
+          break;
+        }
+        yield();
+        delay(100);
+    }    
+    return detectedBaudrate;
+}
+
+size_t HardwareSerial::readBytes(char* buffer, size_t size)
+{
+    size_t got = 0;
+
+    while (got < size)
+    {
+        esp8266::polledTimeout::oneShotFastMs timeOut(_timeout);
+        size_t avail;
+        while ((avail = available()) == 0 && !timeOut);
+        if (avail == 0)
+            break;
+        got += read(buffer + got, std::min(size - got, avail));
+    }
+    return got;
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SERIAL)

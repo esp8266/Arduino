@@ -36,8 +36,9 @@ extern "C" {
  * @return String
  */
 String base64::encode(uint8_t * data, size_t length, bool doNewLines) {
-    // base64 needs more size then the source data
-    size_t size = ((length * 1.6f) + 1);
+    // base64 needs more size then the source data, use cencode.h macros
+    size_t size = ((doNewLines ? base64_encode_expected_len(length)
+                               : base64_encode_expected_len_nonewlines(length)) + 1);
     char * buffer = (char *) malloc(size);
     if(buffer) {
         base64_encodestate _state;

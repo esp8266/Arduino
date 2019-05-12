@@ -132,7 +132,7 @@ class BSTestRunner(object):
 
     def run_test(self, index):
         self.sp.sendline('{}'.format(index))
-        timeout = 10
+        timeout = 20 # 10
         while timeout > 0:
             res = self.sp.expect(['>>>>>bs_test_start', EOF, TIMEOUT])
             if res == 0:

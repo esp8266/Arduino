@@ -70,6 +70,13 @@ void tone(uint8_t _pin, double frequency, unsigned long duration) {
 }
 
 
+// Fix ambiguous tone() binding when adding in a duration
+void tone(uint8_t _pin, int frequency, unsigned long duration) {
+  // Call the unsigned int version of the function explicitly
+  tone(_pin, (unsigned int)frequency, duration);
+}
+
+
 void noTone(uint8_t _pin) {
   if (_pin > 16) {
     return;

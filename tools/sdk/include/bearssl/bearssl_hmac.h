@@ -84,6 +84,21 @@ typedef struct {
 void br_hmac_key_init(br_hmac_key_context *kc,
 	const br_hash_class *digest_vtable, const void *key, size_t key_len);
 
+/*
+ * \brief Get the underlying hash function.
+ *
+ * This function returns a pointer to the implementation vtable of the
+ * hash function used for this HMAC key context.
+ *
+ * \param kc   HMAC key context.
+ * \return  the hash function implementation.
+ */
+static inline const br_hash_class *br_hmac_key_get_digest(
+	const br_hmac_key_context *kc)
+{
+	return kc->dig_vtable;
+}
+
 /**
  * \brief HMAC computation context.
  *
@@ -142,6 +157,21 @@ br_hmac_size(br_hmac_context *ctx)
 	return ctx->out_len;
 }
 
+/*
+ * \brief Get the underlying hash function.
+ *
+ * This function returns a pointer to the implementation vtable of the
+ * hash function used for this HMAC context.
+ *
+ * \param hc   HMAC context.
+ * \return  the hash function implementation.
+ */
+static inline const br_hash_class *br_hmac_get_digest(
+	const br_hmac_context *hc)
+{
+	return hc->dig.vtable;
+}
+
 /**
  * \brief Inject some bytes in HMAC.
  *
@@ -155,7 +185,7 @@ void br_hmac_update(br_hmac_context *ctx, const void *data, size_t len);
 /**
  * \brief Compute the HMAC output.
  *
- * The destination buffer MUST be large enough to accomodate the result;
+ * The destination buffer MUST be large enough to accommodate the result;
  * its length is at most the "natural length" of HMAC (i.e. the output
  * length of the underlying hash function). The context is NOT modified;
  * further bytes may be processed. Thus, "partial HMAC" values can be

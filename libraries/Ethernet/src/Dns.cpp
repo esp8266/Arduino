@@ -55,7 +55,7 @@ void DNSClient::begin(const IPAddress& aDNSServer)
 }
 
 
-int DNSClient::inet_aton(const char* aIPAddrString, IPAddress& aResult)
+int DNSClient::inet_aton_ethlib(const char* aIPAddrString, IPAddress& aResult)
 {
     // See if we've been given a valid IP address
     const char* p =aIPAddrString;
@@ -120,14 +120,14 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult)
     int ret =0;
 
     // See if it's a numeric IP address
-    if (inet_aton(aHostname, aResult))
+    if (inet_aton_ethlib(aHostname, aResult))
     {
         // It is, our work here is done
         return 1;
     }
 
     // Check we've got a valid DNS server to use
-    if (iDNSServer == INADDR_NONE)
+    if (iDNSServer == INADDR_NONE || iDNSServer == INADDR_ANY)
     {
         return INVALID_SERVER;
     }

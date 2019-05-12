@@ -701,6 +701,110 @@ extern const br_sslrec_out_chapol_class br_sslrec_out_chapol_vtable;
 /* ===================================================================== */
 
 /**
+ * \brief Record decryption engine class, for CCM mode.
+ *
+ * This class type extends the decryption engine class with an
+ * initialisation method that receives the parameters needed
+ * for CCM processing: block cipher implementation, block cipher key,
+ * and 4-byte IV.
+ */
+typedef struct br_sslrec_in_ccm_class_ br_sslrec_in_ccm_class;
+struct br_sslrec_in_ccm_class_ {
+	/**
+	 * \brief Superclass, as first vtable field.
+	 */
+	br_sslrec_in_class inner;
+
+	/**
+	 * \brief Engine initialisation method.
+	 *
+	 * This method sets the vtable field in the context.
+	 *
+	 * \param ctx           context to initialise.
+	 * \param bc_impl       block cipher implementation (CTR+CBC).
+	 * \param key           block cipher key.
+	 * \param key_len       block cipher key length (in bytes).
+	 * \param iv            static IV (4 bytes).
+	 * \param tag_len       tag length (in bytes)
+	 */
+	void (*init)(const br_sslrec_in_ccm_class **ctx,
+		const br_block_ctrcbc_class *bc_impl,
+		const void *key, size_t key_len,
+		const void *iv, size_t tag_len);
+};
+
+/**
+ * \brief Record encryption engine class, for CCM mode.
+ *
+ * This class type extends the encryption engine class with an
+ * initialisation method that receives the parameters needed
+ * for CCM processing: block cipher implementation, block cipher key,
+ * and 4-byte IV.
+ */
+typedef struct br_sslrec_out_ccm_class_ br_sslrec_out_ccm_class;
+struct br_sslrec_out_ccm_class_ {
+	/**
+	 * \brief Superclass, as first vtable field.
+	 */
+	br_sslrec_out_class inner;
+
+	/**
+	 * \brief Engine initialisation method.
+	 *
+	 * This method sets the vtable field in the context.
+	 *
+	 * \param ctx           context to initialise.
+	 * \param bc_impl       block cipher implementation (CTR+CBC).
+	 * \param key           block cipher key.
+	 * \param key_len       block cipher key length (in bytes).
+	 * \param iv            static IV (4 bytes).
+	 * \param tag_len       tag length (in bytes)
+	 */
+	void (*init)(const br_sslrec_out_ccm_class **ctx,
+		const br_block_ctrcbc_class *bc_impl,
+		const void *key, size_t key_len,
+		const void *iv, size_t tag_len);
+};
+
+/**
+ * \brief Context structure for processing records with CCM.
+ *
+ * The same context structure is used for encrypting and decrypting.
+ *
+ * The first field points to the vtable. The other fields are opaque
+ * and shall not be accessed directly.
+ */
+typedef struct {
+	/** \brief Pointer to vtable. */
+	union {
+		const void *gen;
+		const br_sslrec_in_ccm_class *in;
+		const br_sslrec_out_ccm_class *out;
+	} vtable;
+#ifndef BR_DOXYGEN_IGNORE
+	uint64_t seq;
+	union {
+		const br_block_ctrcbc_class *vtable;
+		br_aes_gen_ctrcbc_keys aes;
+	} bc;
+	unsigned char iv[4];
+	size_t tag_len;
+#endif
+} br_sslrec_ccm_context;
+
+/**
+ * \brief Static, constant vtable for record decryption with CCM.
+ */
+extern const br_sslrec_in_ccm_class br_sslrec_in_ccm_vtable;
+
+/**
+ * \brief Static, constant vtable for record encryption with CCM.
+ */
+extern const br_sslrec_out_ccm_class br_sslrec_out_ccm_vtable;
+
+/* ===================================================================== */
+
+/**
  * \brief Type for session parameters, to be saved for session resumption.
  */
 typedef struct {
@@ -718,9 +822,9 @@ typedef struct {
 
 #ifndef BR_DOXYGEN_IGNORE
 /*
- * Maximum numnber of cipher suites supported by a client or server.
+ * Maximum number of cipher suites supported by a client or server.
  */
-#define BR_MAX_CIPHER_SUITES   40
+#define BR_MAX_CIPHER_SUITES   48
 #endif
 
 /**
@@ -760,6 +864,7 @@ typedef struct {
 	 */
 	uint16_t max_frag_len;
 	unsigned char log_max_frag_len;
+	unsigned char max_frag_len_negotiated;
 	unsigned char peer_log_max_frag_len;
 
 	/*
@@ -813,6 +918,7 @@ typedef struct {
 		br_sslrec_in_cbc_context cbc;
 		br_sslrec_gcm_context gcm;
 		br_sslrec_chapol_context chapol;
+		br_sslrec_ccm_context ccm;
 	} in;
 	union {
 		const br_sslrec_out_class *vtable;
@@ -820,6 +926,7 @@ typedef struct {
 		br_sslrec_out_cbc_context cbc;
 		br_sslrec_gcm_context gcm;
 		br_sslrec_chapol_context chapol;
+		br_sslrec_ccm_context ccm;
 	} out;
 
 	/*
@@ -992,6 +1099,7 @@ typedef struct {
 	const br_block_cbcenc_class *iaes_cbcenc;
 	const br_block_cbcdec_class *iaes_cbcdec;
 	const br_block_ctr_class *iaes_ctr;
+	const br_block_ctrcbc_class *iaes_ctrcbc;
 	const br_block_cbcenc_class *ides_cbcenc;
 	const br_block_cbcdec_class *ides_cbcdec;
 	br_ghash ighash;
@@ -1003,6 +1111,8 @@ typedef struct {
 	const br_sslrec_out_gcm_class *igcm_out;
 	const br_sslrec_in_chapol_class *ichapol_in;
 	const br_sslrec_out_chapol_class *ichapol_out;
+	const br_sslrec_in_ccm_class *iccm_in;
+	const br_sslrec_out_ccm_class *iccm_out;
 	const br_ec_impl *iec;
 	br_rsa_pkcs1_vrfy irsavrfy;
 	br_ecdsa_vrfy iecdsa;
@@ -1278,7 +1388,7 @@ br_ssl_engine_get_hash(br_ssl_engine_context *ctx, int id)
 /**
  * \brief Set the PRF implementation (for TLS 1.0 and 1.1).
  *
- * This function sets (or removes, if `impl` is `NULL`) the implemenation
+ * This function sets (or removes, if `impl` is `NULL`) the implementation
  * for the PRF used in TLS 1.0 and 1.1.
  *
  * \param cc     SSL engine context.
@@ -1293,7 +1403,7 @@ br_ssl_engine_set_prf10(br_ssl_engine_context *cc, br_tls_prf_impl impl)
 /**
  * \brief Set the PRF implementation with SHA-256 (for TLS 1.2).
  *
- * This function sets (or removes, if `impl` is `NULL`) the implemenation
+ * This function sets (or removes, if `impl` is `NULL`) the implementation
  * for the SHA-256 variant of the PRF used in TLS 1.2.
  *
  * \param cc     SSL engine context.
@@ -1308,7 +1418,7 @@ br_ssl_engine_set_prf_sha256(br_ssl_engine_context *cc, br_tls_prf_impl impl)
 /**
  * \brief Set the PRF implementation with SHA-384 (for TLS 1.2).
  *
- * This function sets (or removes, if `impl` is `NULL`) the implemenation
+ * This function sets (or removes, if `impl` is `NULL`) the implementation
  * for the SHA-384 variant of the PRF used in TLS 1.2.
  *
  * \param cc     SSL engine context.
@@ -1452,6 +1562,31 @@ br_ssl_engine_set_poly1305(br_ssl_engine_context *cc,
 void br_ssl_engine_set_default_chapol(br_ssl_engine_context *cc);
 
 /**
+ * \brief Set the AES/CTR+CBC implementation.
+ *
+ * \param cc     SSL engine context.
+ * \param impl   AES/CTR+CBC encryption/decryption implementation (or `NULL`).
+ */
+static inline void
+br_ssl_engine_set_aes_ctrcbc(br_ssl_engine_context *cc,
+	const br_block_ctrcbc_class *impl)
+{
+	cc->iaes_ctrcbc = impl;
+}
+
+/**
+ * \brief Set the "default" implementations for AES/CCM.
+ *
+ * This function configures in the engine the AES/CTR+CBC
+ * implementation that should provide best runtime performance on the local
+ * system, while still being safe (in particular, constant-time). It also
+ * sets the handlers for CCM records.
+ *
+ * \param cc   SSL engine context.
+ */
+void br_ssl_engine_set_default_aes_ccm(br_ssl_engine_context *cc);
+
+/**
  * \brief Set the record encryption and decryption engines for CBC + HMAC.
  *
  * \param cc         SSL engine context.
@@ -1481,6 +1616,22 @@ br_ssl_engine_set_gcm(br_ssl_engine_context *cc,
 {
 	cc->igcm_in = impl_in;
 	cc->igcm_out = impl_out;
+}
+
+/**
+ * \brief Set the record encryption and decryption engines for CCM.
+ *
+ * \param cc         SSL engine context.
+ * \param impl_in    record CCM decryption implementation (or `NULL`).
+ * \param impl_out   record CCM encryption implementation (or `NULL`).
+ */
+static inline void
+br_ssl_engine_set_ccm(br_ssl_engine_context *cc,
+	const br_sslrec_in_ccm_class *impl_in,
+	const br_sslrec_out_ccm_class *impl_out)
+{
+	cc->iccm_in = impl_in;
+	cc->iccm_out = impl_out;
 }
 
 /**
@@ -1679,6 +1830,17 @@ void br_ssl_engine_set_buffer(br_ssl_engine_context *cc,
  */
 void br_ssl_engine_set_buffers_bidi(br_ssl_engine_context *cc,
 	void *ibuf, size_t ibuf_len, void *obuf, size_t obuf_len);
+
+/**
+ * \brief Determine if MFLN negotiation was successful
+ *
+ * \param cc     SSL engine context.
+ */
+static inline uint8_t
+br_ssl_engine_get_mfln_negotiated(br_ssl_engine_context *cc)
+{
+        return cc->max_frag_len_negotiated;
+}
 
 /**
  * \brief Inject some "initial entropy" in the context.
@@ -1916,7 +2078,7 @@ br_ssl_engine_last_error(const br_ssl_engine_context *cc)
  *      Informs the engine that 'len' bytes have been read from the buffer
  *      (extract operation) or written to the buffer (inject operation).
  *      The 'len' value MUST NOT be zero. The 'len' value MUST NOT exceed
- *      that which was obtained from a preceeding br_ssl_engine_xxx_buf()
+ *      that which was obtained from a preceding br_ssl_engine_xxx_buf()
  *      call.
  */
 
@@ -2517,7 +2679,7 @@ struct br_ssl_client_context_ {
  *     then bit `x` is set (hash function ID is 0 for the special MD5+SHA-1,
  *     or 2 to 6 for the SHA family).
  *
- *   - If ECDSA is suported with hash function of ID `x`, then bit `8+x`
+ *   - If ECDSA is supported with hash function of ID `x`, then bit `8+x`
  *     is set.
  *
  *   - Newer algorithms are symbolic 16-bit identifiers that do not
@@ -3564,7 +3726,7 @@ br_ssl_server_get_client_suites(const br_ssl_server_context *cc, size_t *num)
  *     then bit `x` is set (hash function ID is 0 for the special MD5+SHA-1,
  *     or 2 to 6 for the SHA family).
  *
- *   - If ECDSA is suported with hash function of ID `x`, then bit `8+x`
+ *   - If ECDSA is supported with hash function of ID `x`, then bit `8+x`
  *     is set.
  *
  *   - Newer algorithms are symbolic 16-bit identifiers that do not
@@ -4089,6 +4251,16 @@ int br_sslio_close(br_sslio_context *cc);
 #define BR_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384     0xC030
 #define BR_TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256      0xC031
 #define BR_TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384      0xC032
+
+/* From RFC 6655 and 7251 */
+#define BR_TLS_RSA_WITH_AES_128_CCM                  0xC09C
+#define BR_TLS_RSA_WITH_AES_256_CCM                  0xC09D
+#define BR_TLS_RSA_WITH_AES_128_CCM_8                0xC0A0
+#define BR_TLS_RSA_WITH_AES_256_CCM_8                0xC0A1
+#define BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM          0xC0AC
+#define BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM          0xC0AD
+#define BR_TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8        0xC0AE
+#define BR_TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8        0xC0AF
 
 /* From RFC 7905 */
 #define BR_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256     0xCCA8

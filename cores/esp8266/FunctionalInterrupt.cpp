@@ -11,12 +11,13 @@ typedef void (*voidFuncPtrArg)(void*);
 extern "C" void ICACHE_RAM_ATTR __attachInterruptArg(uint8_t pin, voidFuncPtr userFunc, void*fp , int mode);
 
 
-void interruptFunctional(void* arg)
+void ICACHE_RAM_ATTR interruptFunctional(void* arg)
 {
     ArgStructure* localArg = (ArgStructure*)arg;
 	if (localArg->functionInfo->reqScheduledFunction)
 	{
-      scheduledInterrupts->scheduleFunctionReg(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))), false, true);
+		schedule_function(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))));
+//      scheduledInterrupts->scheduleFunctionReg(std::bind(localArg->functionInfo->reqScheduledFunction,InterruptInfo(*(localArg->interruptInfo))), false, true);
 	}
 	if (localArg->functionInfo->reqFunction)
 	{

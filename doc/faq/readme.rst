@@ -3,7 +3,7 @@ FAQ
 
 The purpose of this FAQ / Troubleshooting is to respond to questions
 commonly asked in `Issues <https://github.com/esp8266/Arduino/issues>`__
-section and on `ESP8266 Community forum <http://www.esp8266.com/>`__.
+section and on `ESP8266 Community forum <https://www.esp8266.com/>`__.
 
 Where possible we are going right to the answer and provide it within
 one or two paragraphs. If it takes more than that, you will see a link
@@ -20,7 +20,7 @@ This message indicates issue with uploading ESP module over a serial
 connection. There are couple of possible causes, that depend on the type
 of your module, if you use separate USB to serial converter.
 
-:doc:`Read more <a01-espcomm_sync-failed>`.
+`Read more <a01-espcomm_sync-failed.rst>`__.
 
 Why esptool is not listed in "Programmer" menu? How do I upload ESP without it?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,7 +38,38 @@ My ESP crashes running some code. How to troubleshoot it?
 The code may crash because of s/w bug or issue with your h/w. Before
 entering an issue report, please perform initial troubleshooting.
 
-:doc:`Read more <a02-my-esp-crashes>`.
+`Read more <a02-my-esp-crashes.rst>`__.
+
+How can I get some extra KBs in flash ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Using ``*printf()`` with floats is enabled by default.  Some KBs of flash can
+  be saved by using the option ``--nofloat`` with the boards generator:
+
+  ``./tools/boards.txt.py --nofloat --boardsgen``
+
+* Use the debug level option ``NoAssert-NDEBUG`` (in the Tools menu)
+
+`Read more <a05-board-generator.rst>`__.
+
+About WPS
+~~~~~~~~~
+
+From release 2.4.2 and ahead, not using WPS will give an exra ~4.5KB in
+heap.
+
+In release 2.4.2 only, WPS is disabled by default and the board generator is
+required to enable it:
+
+``./tools/boards.txt.py --allowWPS --boardsgen``
+
+`Read more <a05-board-generator.rst>`__.
+
+For platformIO (and maybe other build environments), you will also need to add the build flag: -D NO_EXTRA_4K_HEAP
+
+This manual selection is not needed starting from 2.5.0 (and in git
+version).  WPS is always available, and not using it will give an extra
+~4.5KB compared to releases until 2.4.1 included.
 
 This Arduino library doesn't work on ESP. How do I make it work?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,7 +77,7 @@ This Arduino library doesn't work on ESP. How do I make it work?
 You would like to use this Arduino library with ESP8266 and it does not
 perform. It is not listed among libraries verified to work with ESP8266.
 
-:doc:`Read more <a03-library-does-not-work>`.
+`Read more <a03-library-does-not-work.rst>`__.
 
 In the IDE, for ESP-12E that has 4M flash, I can choose 4M (1M SPIFFS) or 4M (3M SPIFFS). No matter what I select, the IDE tells me the maximum code space is about 1M. Where does my flash go?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,7 +118,7 @@ This error may pop up after switching between
 `staging <https://github.com/esp8266/Arduino#staging-version->`__ and
 `stable <https://github.com/esp8266/Arduino#stable-version->`__ esp8266
 / Arduino package installations, or after upgrading the package version
-:doc:`Read more <a04-board-generic-is-unknown>`.
+`Read more <a04-board-generic-is-unknown.rst>`__.
 
 
 How to clear TCP PCBs in time-wait state ?
@@ -123,3 +154,17 @@ The following lines are compatible with both lwIP versions:
     }
 
 Ref.  `#1923 <https://github.com/esp8266/Arduino/issues/1923>`__
+
+
+Why is there a board generator and what about it ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The board generator is a python script originally intended to ease the
+Arduino IDE's `boards.txt` configuration file about the multitude of
+available boards, especially when common parameters have to be updated for
+all of them.
+
+This script is also used to manage uncommon options that are currently not
+available in the IDE menu.
+
+`Read more <a05-board-generator.rst>`__.

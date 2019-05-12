@@ -117,7 +117,7 @@ In the next steps we should execute GET command. This is done is similar way as 
 
 After sending the request we should wait for a reply and then process received information.
 
-Out of received replay we can skip response header. This can be done by reading until an empty line ``"\r"`` that marks the end of the header:
+Out of received reply we can skip response header. This can be done by reading until an empty line ``"\r"`` that marks the end of the header:
 
 .. code:: cpp
 
