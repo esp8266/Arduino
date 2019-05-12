@@ -8,12 +8,6 @@ pwd
 test -d cores/esp8266
 test -d libraries
 
-# this warning question will be removed after restyle-all.sh is renamed to restyle.sh
-echo "This is dangerous if you have modified your local repository"
-echo "type iknowwhatido to continue"
-read ans
-test "$ans" = iknowwhatido || exit 1
-
 for d in cores/esp8266 libraries; do
     for e in c cpp h; do
         find $d -name "*.$e" -exec \
