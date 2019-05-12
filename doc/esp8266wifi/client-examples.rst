@@ -230,7 +230,7 @@ End of header is marked with an empty line and then you should see the HTML code
         <h1>Example Domain</h1>
         <p>This domain is established to be used for illustrative examples in documents. You may use this
         domain in examples without prior coordination or asking for permission.</p>
-        <p><a href="http://www.iana.org/domains/example">More information...</a></p>
+        <p><a href="https://www.iana.org/domains/example">More information...</a></p>
     </div>
     </body>
     </html>

@@ -15,14 +15,14 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
 import os
 import subprocess
 
 
-def generate(path, platform_path, git_ver="0xffffffff", git_desc="unspecified"):
+def generate(path, platform_path, git_ver="ffffffff", git_desc="unspecified"):
     def git(*args):
         cmd = ["git", "-C", platform_path]
         cmd.extend(args)

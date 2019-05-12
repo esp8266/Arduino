@@ -433,9 +433,8 @@ bool sntp_set_timezone_in_seconds(sint32 timezone)
     if(timezone >= (-11 * (60 * 60)) || timezone <= (13 * (60 * 60))) {
         time_zone = timezone;
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 /* Sets the timezone in hours. Internally, the timezone is converted to seconds. */
