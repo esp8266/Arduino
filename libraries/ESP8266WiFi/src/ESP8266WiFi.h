@@ -1,23 +1,23 @@
 /*
- ESP8266WiFi.h - esp8266 Wifi support.
- Based on WiFi.h from Arduino WiFi shield library.
- Copyright (c) 2011-2014 Arduino.  All right reserved.
- Modified by Ivan Grokhotkov, December 2014
+    ESP8266WiFi.h - esp8266 Wifi support.
+    Based on WiFi.h from Arduino WiFi shield library.
+    Copyright (c) 2011-2014 Arduino.  All right reserved.
+    Modified by Ivan Grokhotkov, December 2014
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #ifndef WiFi_h
 #define WiFi_h
@@ -54,35 +54,36 @@ extern "C" {
 #endif
 
 
-class ESP8266WiFiClass : public ESP8266WiFiGenericClass, public ESP8266WiFiSTAClass, public ESP8266WiFiScanClass, public ESP8266WiFiAPClass {
-    public:
+class ESP8266WiFiClass : public ESP8266WiFiGenericClass, public ESP8266WiFiSTAClass, public ESP8266WiFiScanClass, public ESP8266WiFiAPClass
+{
+public:
 
-        // workaround same function name with different signature
-        using ESP8266WiFiGenericClass::channel;
+    // workaround same function name with different signature
+    using ESP8266WiFiGenericClass::channel;
 
-        using ESP8266WiFiSTAClass::SSID;
-        using ESP8266WiFiSTAClass::RSSI;
-        using ESP8266WiFiSTAClass::BSSID;
-        using ESP8266WiFiSTAClass::BSSIDstr;
+    using ESP8266WiFiSTAClass::SSID;
+    using ESP8266WiFiSTAClass::RSSI;
+    using ESP8266WiFiSTAClass::BSSID;
+    using ESP8266WiFiSTAClass::BSSIDstr;
 
-        using ESP8266WiFiScanClass::SSID;
-        using ESP8266WiFiScanClass::encryptionType;
-        using ESP8266WiFiScanClass::RSSI;
-        using ESP8266WiFiScanClass::BSSID;
-        using ESP8266WiFiScanClass::BSSIDstr;
-        using ESP8266WiFiScanClass::channel;
-        using ESP8266WiFiScanClass::isHidden;
+    using ESP8266WiFiScanClass::SSID;
+    using ESP8266WiFiScanClass::encryptionType;
+    using ESP8266WiFiScanClass::RSSI;
+    using ESP8266WiFiScanClass::BSSID;
+    using ESP8266WiFiScanClass::BSSIDstr;
+    using ESP8266WiFiScanClass::channel;
+    using ESP8266WiFiScanClass::isHidden;
 
-        // ----------------------------------------------------------------------------------------------
-        // ------------------------------------------- Debug --------------------------------------------
-        // ----------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------
+    // ------------------------------------------- Debug --------------------------------------------
+    // ----------------------------------------------------------------------------------------------
 
-    public:
+public:
 
-        void printDiag(Print& dest);
+    void printDiag(Print& dest);
 
-        friend class WiFiClient;
-        friend class WiFiServer;
+    friend class WiFiClient;
+    friend class WiFiServer;
 
 };
 

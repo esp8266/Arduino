@@ -1,27 +1,27 @@
 /**
- * ESP8266HTTPClient.h
- *
- * Created on: 02.11.2015
- *
- * Copyright (c) 2015 Markus Sattler. All rights reserved.
- * This file is part of the ESP8266HTTPClient for Arduino.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- * Modified by Jeroen Döll, June 2018
- */
+    ESP8266HTTPClient.h
+
+    Created on: 02.11.2015
+
+    Copyright (c) 2015 Markus Sattler. All rights reserved.
+    This file is part of the ESP8266HTTPClient for Arduino.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+    Modified by Jeroen Döll, June 2018
+*/
 
 #ifndef ESP8266HTTPClient_H_
 #define ESP8266HTTPClient_H_
@@ -64,7 +64,8 @@
 #define HTTP_TCP_BUFFER_SIZE (1460)
 
 /// HTTP codes see RFC7231
-typedef enum {
+typedef enum
+{
     HTTP_CODE_CONTINUE = 100,
     HTTP_CODE_SWITCHING_PROTOCOLS = 101,
     HTTP_CODE_PROCESSING = 102,
@@ -125,7 +126,8 @@ typedef enum {
     HTTP_CODE_NETWORK_AUTHENTICATION_REQUIRED = 511
 } t_http_codes;
 
-typedef enum {
+typedef enum
+{
     HTTPC_TE_IDENTITY,
     HTTPC_TE_CHUNKED
 } transferEncoding_t;
@@ -143,25 +145,25 @@ public:
     HTTPClient();
     ~HTTPClient();
 
-/*
- * Since both begin() functions take a reference to client as a parameter, you need to 
- * ensure the client object lives the entire time of the HTTPClient
- */
+    /*
+        Since both begin() functions take a reference to client as a parameter, you need to
+        ensure the client object lives the entire time of the HTTPClient
+    */
     bool begin(WiFiClient &client, String url);
     bool begin(WiFiClient &client, String host, uint16_t port, String uri = "/", bool https = false);
 
 #if HTTPCLIENT_1_1_COMPATIBLE
     // Plain HTTP connection, unencrypted
-    bool begin(String url)  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri = "/")  __attribute__ ((deprecated));
+    bool begin(String url)  __attribute__((deprecated));
+    bool begin(String host, uint16_t port, String uri = "/")  __attribute__((deprecated));
     // Use axTLS for secure HTTPS connection
-    bool begin(String url, String httpsFingerprint)  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri, String httpsFingerprint)  __attribute__ ((deprecated));
+    bool begin(String url, String httpsFingerprint)  __attribute__((deprecated));
+    bool begin(String host, uint16_t port, String uri, String httpsFingerprint)  __attribute__((deprecated));
     // Use BearSSL for secure HTTPS connection
-    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
-    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__ ((deprecated));
+    bool begin(String url, const uint8_t httpsFingerprint[20])  __attribute__((deprecated));
+    bool begin(String host, uint16_t port, String uri, const uint8_t httpsFingerprint[20])  __attribute__((deprecated));
     // deprecated, use the overload above instead
-    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__ ((deprecated));
+    bool begin(String host, uint16_t port, String uri, bool https, String httpsFingerprint)  __attribute__((deprecated));
 #endif
 
     void end(void);
@@ -211,7 +213,8 @@ public:
     static String errorToString(int error);
 
 protected:
-    struct RequestArgument {
+    struct RequestArgument
+    {
         String key;
         String value;
     };

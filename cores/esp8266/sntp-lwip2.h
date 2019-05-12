@@ -3,7 +3,7 @@
 
 extern "C" {
 
-bool sntp_set_timezone_in_seconds(sint32 timezone);
+    bool sntp_set_timezone_in_seconds(sint32 timezone);
 
 }
 

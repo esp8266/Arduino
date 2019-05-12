@@ -1,27 +1,27 @@
 /*
- HardwareSerial.cpp - esp8266 UART support
+    HardwareSerial.cpp - esp8266 UART support
 
- Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
- This file is part of the esp8266 core for Arduino environment.
+    Copyright (c) 2014 Ivan Grokhotkov. All rights reserved.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
- Modified 31 March 2015 by Markus Sattler (rewrite the code for UART0 + UART1 support in ESP8266)
- Modified 25 April 2015 by Thomas Flayols (add configuration different from 8N1 in ESP8266)
- Modified 3 May 2015 by Hristo Gochkov (change register access methods)
- */
+    Modified 31 March 2015 by Markus Sattler (rewrite the code for UART0 + UART1 support in ESP8266)
+    Modified 25 April 2015 by Thomas Flayols (add configuration different from 8N1 in ESP8266)
+    Modified 3 May 2015 by Hristo Gochkov (change register access methods)
+*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -52,7 +52,8 @@ void HardwareSerial::begin(unsigned long baud, SerialConfig config, SerialMode m
 
 void HardwareSerial::end()
 {
-    if(uart_get_debug() == _uart_nr) {
+    if (uart_get_debug() == _uart_nr)
+    {
         uart_set_debug(UART_NO);
     }
 
@@ -60,10 +61,14 @@ void HardwareSerial::end()
     _uart = NULL;
 }
 
-size_t HardwareSerial::setRxBufferSize(size_t size){
-    if(_uart) {
+size_t HardwareSerial::setRxBufferSize(size_t size)
+{
+    if (_uart)
+    {
         _rx_size = uart_resize_rx_buffer(_uart, size);
-    } else {
+    }
+    else
+    {
         _rx_size = size;
     }
     return _rx_size;
@@ -71,18 +76,26 @@ size_t HardwareSerial::setRxBufferSize(size_t size){
 
 void HardwareSerial::setDebugOutput(bool en)
 {
-    if(!_uart) {
+    if (!_uart)
+    {
         return;
     }
-    if(en) {
-        if(uart_tx_enabled(_uart)) {
+    if (en)
+    {
+        if (uart_tx_enabled(_uart))
+        {
             uart_set_debug(_uart_nr);
-        } else {
+        }
+        else
+        {
             uart_set_debug(UART_NO);
         }
-    } else {
+    }
+    else
+    {
         // disable debug for this interface
-        if(uart_get_debug() == _uart_nr) {
+        if (uart_get_debug() == _uart_nr)
+        {
             uart_set_debug(UART_NO);
         }
     }
@@ -91,7 +104,8 @@ void HardwareSerial::setDebugOutput(bool en)
 int HardwareSerial::available(void)
 {
     int result = static_cast<int>(uart_rx_available(_uart));
-    if (!result) {
+    if (!result)
+    {
         optimistic_yield(10000);
     }
     return result;
@@ -99,7 +113,8 @@ int HardwareSerial::available(void)
 
 void HardwareSerial::flush()
 {
-    if(!_uart || !uart_tx_enabled(_uart)) {
+    if (!_uart || !uart_tx_enabled(_uart))
+    {
         return;
     }
 
@@ -123,13 +138,15 @@ unsigned long HardwareSerial::detectBaudrate(time_t timeoutMillis)
 {
     time_t startMillis = millis();
     unsigned long detectedBaudrate;
-    while ((time_t) millis() - startMillis < timeoutMillis) {
-        if ((detectedBaudrate = testBaudrate())) {
-          break;
+    while ((time_t) millis() - startMillis < timeoutMillis)
+    {
+        if ((detectedBaudrate = testBaudrate()))
+        {
+            break;
         }
         yield();
         delay(100);
-    }    
+    }
     return detectedBaudrate;
 }
 
@@ -143,7 +160,9 @@ size_t HardwareSerial::readBytes(char* buffer, size_t size)
         size_t avail;
         while ((avail = available()) == 0 && !timeOut);
         if (avail == 0)
+        {
             break;
+        }
         got += read(buffer + got, std::min(size - got, avail));
     }
     return got;

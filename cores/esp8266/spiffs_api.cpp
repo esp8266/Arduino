@@ -1,50 +1,54 @@
 /*
- spiffs_api.cpp - file system wrapper for SPIFFS
- Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
+    spiffs_api.cpp - file system wrapper for SPIFFS
+    Copyright (c) 2015 Ivan Grokhotkov. All rights reserved.
 
- This code was influenced by NodeMCU and Sming libraries, and first version of
- Arduino wrapper written by Hristo Gochkov.
+    This code was influenced by NodeMCU and Sming libraries, and first version of
+    Arduino wrapper written by Hristo Gochkov.
 
- This file is part of the esp8266 core for Arduino environment.
+    This file is part of the esp8266 core for Arduino environment.
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 #include "spiffs_api.h"
 
 using namespace fs;
 
 FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode accessMode)
 {
-    if (!isSpiffsFilenameValid(path)) {
+    if (!isSpiffsFilenameValid(path))
+    {
         DEBUGV("SPIFFSImpl::open: invalid path=`%s` \r\n", path);
         return FileImplPtr();
     }
     int mode = getSpiffsMode(openMode, accessMode);
     int fd = SPIFFS_open(&_fs, path, mode, 0);
-    if (fd < 0 && _fs.err_code == SPIFFS_ERR_DELETED && (openMode & OM_CREATE)) {
+    if (fd < 0 && _fs.err_code == SPIFFS_ERR_DELETED && (openMode & OM_CREATE))
+    {
         DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d, trying to remove\r\n",
                fd, path, openMode, accessMode, _fs.err_code);
         auto rc = SPIFFS_remove(&_fs, path);
-        if (rc != SPIFFS_OK) {
+        if (rc != SPIFFS_OK)
+        {
             DEBUGV("SPIFFSImpl::open: SPIFFS_ERR_DELETED, but failed to remove path=`%s` openMode=%d accessMode=%d err=%d\r\n",
                    path, openMode, accessMode, _fs.err_code);
             return FileImplPtr();
         }
         fd = SPIFFS_open(&_fs, path, mode, 0);
     }
-    if (fd < 0) {
+    if (fd < 0)
+    {
         DEBUGV("SPIFFSImpl::open: fd=%d path=`%s` openMode=%d accessMode=%d err=%d\r\n",
                fd, path, openMode, accessMode, _fs.err_code);
         return FileImplPtr();
@@ -54,7 +58,8 @@ FileImplPtr SPIFFSImpl::open(const char* path, OpenMode openMode, AccessMode acc
 
 bool SPIFFSImpl::exists(const char* path)
 {
-    if (!isSpiffsFilenameValid(path)) {
+    if (!isSpiffsFilenameValid(path))
+    {
         DEBUGV("SPIFFSImpl::exists: invalid path=`%s` \r\n", path);
         return false;
     }
@@ -63,15 +68,17 @@ bool SPIFFSImpl::exists(const char* path)
     return rc == SPIFFS_OK;
 }
 
-DirImplPtr SPIFFSImpl::openDir(const char* path) 
+DirImplPtr SPIFFSImpl::openDir(const char* path)
 {
-    if (strlen(path) > 0 && !isSpiffsFilenameValid(path)) {
+    if (strlen(path) > 0 && !isSpiffsFilenameValid(path))
+    {
         DEBUGV("SPIFFSImpl::openDir: invalid path=`%s` \r\n", path);
         return DirImplPtr();
     }
     spiffs_DIR dir;
     spiffs_DIR* result = SPIFFS_opendir(&_fs, path, &dir);
-    if (!result) {
+    if (!result)
+    {
         DEBUGV("SPIFFSImpl::openDir: path=`%s` err=%d\r\n", path, _fs.err_code);
         return DirImplPtr();
     }
@@ -81,19 +88,24 @@ DirImplPtr SPIFFSImpl::openDir(const char* path)
 int getSpiffsMode(OpenMode openMode, AccessMode accessMode)
 {
     int mode = 0;
-    if (openMode & OM_CREATE) {
+    if (openMode & OM_CREATE)
+    {
         mode |= SPIFFS_CREAT;
     }
-    if (openMode & OM_APPEND) {
+    if (openMode & OM_APPEND)
+    {
         mode |= SPIFFS_APPEND;
     }
-    if (openMode & OM_TRUNCATE) {
+    if (openMode & OM_TRUNCATE)
+    {
         mode |= SPIFFS_TRUNC;
     }
-    if (accessMode & AM_READ) {
+    if (accessMode & AM_READ)
+    {
         mode |= SPIFFS_RDONLY;
     }
-    if (accessMode & AM_WRITE) {
+    if (accessMode & AM_WRITE)
+    {
         mode |= SPIFFS_WRONLY;
     }
     return mode;
@@ -101,7 +113,8 @@ int getSpiffsMode(OpenMode openMode, AccessMode accessMode)
 
 bool isSpiffsFilenameValid(const char* name)
 {
-    if (name == nullptr) {
+    if (name == nullptr)
+    {
         return false;
     }
     auto len = strlen(name);
