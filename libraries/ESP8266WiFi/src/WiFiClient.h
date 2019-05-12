@@ -53,29 +53,31 @@ public:
   WiFiClient& operator=(const WiFiClient&);
 
   uint8_t status();
-  virtual int connect(IPAddress ip, uint16_t port);
-  virtual int connect(const char *host, uint16_t port);
-  virtual int connect(const String host, uint16_t port);
-  virtual size_t write(uint8_t);
-  virtual size_t write(const uint8_t *buf, size_t size);
+  virtual int connect(IPAddress ip, uint16_t port) override;
+  virtual int connect(const char *host, uint16_t port) override;
+  virtual int connect(const String& host, uint16_t port);
+  virtual size_t write(uint8_t) override;
+  virtual size_t write(const uint8_t *buf, size_t size) override;
   virtual size_t write_P(PGM_P buf, size_t size);
   size_t write(Stream& stream);
 
   // This one is deprecated, use write(Stream& instead)
   size_t write(Stream& stream, size_t unitSize) __attribute__ ((deprecated));
 
-  virtual int available();
-  virtual int read();
-  virtual int read(uint8_t *buf, size_t size);
-  virtual int peek();
+  virtual int available() override;
+  virtual int read() override;
+  virtual int read(uint8_t *buf, size_t size) override;
+  virtual int peek() override;
   virtual size_t peekBytes(uint8_t *buffer, size_t length);
   size_t peekBytes(char *buffer, size_t length) {
     return peekBytes((uint8_t *) buffer, length);
   }
-  virtual bool flush(unsigned int maxWaitMs = 0);
-  virtual bool stop(unsigned int maxWaitMs = 0);
-  virtual uint8_t connected();
-  virtual operator bool();
+  virtual void flush() override { (void)flush(0); }
+  virtual void stop() override { (void)stop(0); }
+  bool flush(unsigned int maxWaitMs);
+  bool stop(unsigned int maxWaitMs);
+  virtual uint8_t connected() override;
+  virtual operator bool() override;
 
   IPAddress remoteIP();
   uint16_t  remotePort();

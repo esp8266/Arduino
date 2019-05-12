@@ -15,6 +15,11 @@
 
 #define USE_SERIAL Serial
 
+#ifndef APSSID
+#define APSSID "APSSID"
+#define APPSK  "APPSK"
+#endif
+
 ESP8266WiFiMulti WiFiMulti;
 
 // A single, global CertStore which can be used by all
@@ -93,7 +98,7 @@ void setup() {
   }
 
   WiFi.mode(WIFI_STA);
-  WiFiMulti.addAP("SSID", "PASSWORD");
+  WiFiMulti.addAP(APSSID, APPSK);
 
   SPIFFS.begin();
 

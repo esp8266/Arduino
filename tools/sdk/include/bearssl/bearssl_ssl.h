@@ -864,6 +864,7 @@ typedef struct {
 	 */
 	uint16_t max_frag_len;
 	unsigned char log_max_frag_len;
+	unsigned char max_frag_len_negotiated;
 	unsigned char peer_log_max_frag_len;
 
 	/*
@@ -1829,6 +1830,17 @@ void br_ssl_engine_set_buffer(br_ssl_engine_context *cc,
  */
 void br_ssl_engine_set_buffers_bidi(br_ssl_engine_context *cc,
 	void *ibuf, size_t ibuf_len, void *obuf, size_t obuf_len);
+
+/**
+ * \brief Determine if MFLN negotiation was successful
+ *
+ * \param cc     SSL engine context.
+ */
+static inline uint8_t
+br_ssl_engine_get_mfln_negotiated(br_ssl_engine_context *cc)
+{
+        return cc->max_frag_len_negotiated;
+}
 
 /**
  * \brief Inject some "initial entropy" in the context.

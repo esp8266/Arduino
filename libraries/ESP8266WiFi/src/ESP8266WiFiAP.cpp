@@ -85,8 +85,8 @@ static bool softap_config_equal(const softap_config& lhs, const softap_config& r
 
 /**
  * Set up an access point
- * @param ssid              Pointer to the SSID (max 63 char).
- * @param passphrase        (for WPA2 min 8 char, for open use NULL)
+ * @param ssid              Pointer to the SSID (max 31 char).
+ * @param passphrase        For WPA2 min 8 char, for open use NULL (max 63 char).
  * @param channel           WiFi channel number, 1 - 13.
  * @param ssid_hidden       Network cloaking (0 = broadcast SSID, 1 = hide SSID)
  * @param max_connection    Max simultaneous connected clients, 0 - 8. https://bbs.espressif.com/viewtopic.php?f=46&t=481&p=1832&hilit=max_connection#p1832
@@ -185,11 +185,14 @@ bool ESP8266WiFiAPClass::softAP(const char* ssid, const char* passphrase, int ch
     return ret;
 }
 
+bool ESP8266WiFiAPClass::softAP(const String& ssid, const String& passphrase, int channel, int ssid_hidden, int max_connection) {
+    return softAP(ssid.c_str(), passphrase.c_str(), channel, ssid_hidden, max_connection);
+}
 
 /**
  * Configure access point
  * @param local_ip      access point IP
- * @param gateway       gateway IP
+ * @param gateway       gateway IP (0.0.0.0 to disable)
  * @param subnet        subnet mask
  */
 bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress subnet) {
@@ -201,10 +204,19 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     }
     bool ret = true;
 
+    if (   !local_ip.isV4()
+        || !subnet.isV4()
+#if LWIP_IPV6
+        // uninitialized gateway is valid
+        || gateway.isV6()
+#endif
+       ) {
+        return false;
+    }
     struct ip_info info;
-    info.ip.addr = static_cast<uint32_t>(local_ip);
-    info.gw.addr = static_cast<uint32_t>(gateway);
-    info.netmask.addr = static_cast<uint32_t>(subnet);
+    info.ip.addr = local_ip.v4();
+    info.gw.addr = gateway.v4();
+    info.netmask.addr = subnet.v4();
 
     if(!wifi_softap_dhcps_stop()) {
         DEBUG_WIFI("[APConfig] wifi_softap_dhcps_stop failed!\n");
@@ -218,11 +230,11 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
     struct dhcps_lease dhcp_lease;
     IPAddress ip = local_ip;
     ip[3] += 99;
-    dhcp_lease.start_ip.addr = static_cast<uint32_t>(ip);
+    dhcp_lease.start_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP start: %s\n", ip.toString().c_str());
 
     ip[3] += 100;
-    dhcp_lease.end_ip.addr = static_cast<uint32_t>(ip);
+    dhcp_lease.end_ip.addr = ip.v4();
     DEBUG_WIFI("[APConfig] DHCP IP end: %s\n", ip.toString().c_str());
 
     if(!wifi_softap_set_dhcps_lease(&dhcp_lease)) {
@@ -236,7 +248,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
         ret = false;
     }
 
-    uint8 mode = 1;
+    uint8 mode = info.gw.addr ? 1 : 0;
     if(!wifi_softap_set_dhcps_offer_option(OFFER_ROUTER, &mode)) {
         DEBUG_WIFI("[APConfig] wifi_softap_set_dhcps_offer_option failed!\n");
         ret = false;
@@ -252,7 +264,7 @@ bool ESP8266WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPA
         if(info.ip.addr == 0x00000000) {
             DEBUG_WIFI("[APConfig] IP config Invalid?!\n");
             ret = false;
-        } else if(local_ip != info.ip.addr) {
+        } else if(local_ip.v4() != info.ip.addr) {
             ip = info.ip.addr;
             DEBUG_WIFI("[APConfig] IP config not set correct?! new IP: %s\n", ip.toString().c_str());
             ret = false;
@@ -345,14 +357,14 @@ String ESP8266WiFiAPClass::softAPmacAddress(void) {
  * @return String SSID.
  */
 String ESP8266WiFiAPClass::softAPSSID() const {
-	struct softap_config config;
-	wifi_softap_get_config(&config);
-	char* name = reinterpret_cast<char*>(config.ssid);
-	char ssid[sizeof(config.ssid) + 1];
-	memcpy(ssid, name, sizeof(config.ssid));
-	ssid[sizeof(config.ssid)] = '\0';
+    struct softap_config config;
+    wifi_softap_get_config(&config);
+    char* name = reinterpret_cast<char*>(config.ssid);
+    char ssid[sizeof(config.ssid) + 1];
+    memcpy(ssid, name, sizeof(config.ssid));
+    ssid[sizeof(config.ssid)] = '\0';
 
-	return String(ssid);
+    return String(ssid);
 }
 
 /**
@@ -360,12 +372,12 @@ String ESP8266WiFiAPClass::softAPSSID() const {
  * @return String psk.
  */
 String ESP8266WiFiAPClass::softAPPSK() const {
-	struct softap_config config;
-	wifi_softap_get_config(&config);
-	char* pass = reinterpret_cast<char*>(config.password);
-	char psk[sizeof(config.password) + 1];
-	memcpy(psk, pass, sizeof(config.password));
-	psk[sizeof(config.password)] = '\0';
+    struct softap_config config;
+    wifi_softap_get_config(&config);
+    char* pass = reinterpret_cast<char*>(config.password);
+    char psk[sizeof(config.password) + 1];
+    memcpy(psk, pass, sizeof(config.password));
+    psk[sizeof(config.password)] = '\0';
 
-	return String(psk);
+    return String(psk);
 }

@@ -19,15 +19,20 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 
-const char* ssid = "........";
-const char* password = "........";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 const char* host = "api.github.com";
 const int httpsPort = 443;
 
 // Use web browser to view and copy
 // SHA1 fingerprint of the certificate
-const char* fingerprint = "5F F1 60 31 09 04 3E F2 90 D2 B0 8A 50 38 04 E8 37 9F BC 76";
+const char fingerprint[] PROGMEM = "5F F1 60 31 09 04 3E F2 90 D2 B0 8A 50 38 04 E8 37 9F BC 76";
 
 void setup() {
   Serial.begin(115200);
@@ -49,15 +54,13 @@ void setup() {
   WiFiClientSecure client;
   Serial.print("connecting to ");
   Serial.println(host);
+
+  Serial.printf("Using fingerprint '%s'\n", fingerprint);
+  client.setFingerprint(fingerprint);
+
   if (!client.connect(host, httpsPort)) {
     Serial.println("connection failed");
     return;
-  }
-
-  if (client.verify(fingerprint, host)) {
-    Serial.println("certificate matches");
-  } else {
-    Serial.println("certificate doesn't match");
   }
 
   String url = "/repos/esp8266/Arduino/commits/master/status";

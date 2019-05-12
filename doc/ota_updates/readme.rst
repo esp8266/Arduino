@@ -17,12 +17,17 @@ Arduino IDE option is intended primarily for software development phase. The two
 
 In any case, the first firmware upload has to be done over a serial port. If the OTA routines are correctly implemented in a sketch, then all subsequent uploads may be done over the air.
 
-There is no imposed security on OTA process from being hacked. It is up to developer to ensure that updates are allowed only from legitimate / trusted sources. Once the update is complete, the module restarts, and the new code is executed. The developer should ensure that the application running on the module is shut down and restarted in a safe manner. Chapters below provide additional information regarding security and safety of OTA process.
+By default there is no imposed security on OTA process.  It is up to developer to ensure that updates are allowed only from legitimate / trusted sources. Once the update is complete, the module restarts, and the new code is executed. The developer should ensure that the application running on the module is shut down and restarted in a safe manner. Chapters below provide additional information regarding security and safety of OTA process.
 
-Security
-~~~~~~~~
+Security Disclaimer
+~~~~~~~~~~~~~~~~~~~
 
-Module has to be exposed wirelessly to get it updated with a new sketch. That poses chances of module being violently hacked and loaded with some other code. To reduce likelihood of being hacked consider protecting your uploads with a password, selecting certain OTA port, etc.
+No guarantees as to the level of security provided for your application by the following methods is implied.  Please refer to the GNU LGPL license associated for this project for full disclaimers.  If you do find security weaknesses, please don't hesitate to contact the maintainers or supply pull requests with fixes.  The MD5 verification and password protection schemes are already known as supplying a very weak level of security.
+
+Basic Security
+~~~~~~~~~~~~~~
+
+The module has to be exposed wirelessly to get it updated with a new sketch. That poses chances of module being violently hacked and loaded with some other code. To reduce likelihood of being hacked consider protecting your uploads with a password, selecting certain OTA port, etc.
 
 Check functionality provided with `ArduinoOTA <https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA>`__ library that may improve security:
 
@@ -35,6 +40,90 @@ Check functionality provided with `ArduinoOTA <https://github.com/esp8266/Arduin
 Certain protection functionality is already built in and do not require any additional coding by developer. `ArduinoOTA <https://github.com/esp8266/Arduino/tree/master/libraries/ArduinoOTA>`__ and espota.py use `Digest-MD5 <https://en.wikipedia.org/wiki/Digest_access_authentication>`__ to authenticate upload. Integrity of transferred data is verified on ESP side using `MD5 <https://en.wikipedia.org/wiki/MD5>`__ checksum.
 
 Make your own risk analysis and depending on application decide what library functions to implement. If required, consider implementation of other means of protection from being hacked, e.g. exposing module for uploads only according to specific schedule, trigger OTA only be user pressing dedicated “Update” button wired to ESP, etc.
+
+Advanced Security - Signed Updates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While the above password-based security will dissuade casual hacking attempts, it is not highly secure.  For applications where a higher level of security is needed, cryptographically signed OTA updates can be required.  It uses SHA256 hashing in place of MD5 (which is known to be cryptographically broken) and RSA-2048 bit level encryption to guarantee only the holder of a cryptographic private key can generate code accepted by the OTA update mechanisms.
+
+These are updates whose compiled binary are signed with a private key (held by the developer) and verified with a public key (stored in the application and available for all to see).  The signing process computes a hash of the binary code, encrypts the hash with the developer's private key, and appends this encrypted hash to the binary that is uploaded (via OTA, web, or HTTP server).  If the code is modified or replaced in any way by anyone by the developer with the key, the hash will not match and the ESP8266 will reject the upload and not accept it.
+
+Cryptographic signing only protects against tampering of binaries delivered OTA.  If someone has physical access they will always be able to flash the device over the serial port.  Signing also does not encrypt anything but the hash (so that it can't be modified), so this does not provide protection for code inside the device.  Again, if a user has physical access they can read out your program.
+
+**Securing your private key is paramount.  The same private/public keypair needs to be used to sign binaries as the original upload.  Loss of the private key associated with a binary means that you will not be able to OTA to update any of your devices in the field.  Alternatively, if the private key is copied, then the copy can be used to sign binaries which will be accepted.**
+
+Signed Binary Format
+^^^^^^^^^^^^^^^^^^^^
+
+The format of a signed binary is compatible with the standard binary format, and can be uploaded to a non-signed ESP8266 via serial or OTA without any conditions.  Note, however, that once an unsigned OTA app is overwritten by this signed version, further updates will require signing.
+
+As shown below, the signed hash is appended to the unsigned binary followed by the total length of the signed hash (i.e. if the signed hash was 64 bytes, then this uint32 will contain 64).  This format allows for extensibility (such as adding in a CA-based validation scheme allowing multiple signing keys all based off of a trust anchor), and pull requests are always welcome.
+
+.. code:: bash
+
+    NORMAL-BINARY <SIGNED HASH> <uint32 LENGTH-OF-SIGNING-DATA-INCLUDING-THIS-32-BITS> 
+
+Signed Binary Prequisites
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+OpenSSL is required to run the standard signing steps, and should be available on any UNIX-like or Windows system.  As usual, the latest stable version of OpenSSL is recommended.
+
+Signing requires the generation of an RSA-2048 key (other bit lengths are supported as well, but 2048 is a good selection today) using any appropriate tool.  The following lines will generate a new public/private keypair.  Run them in the sketch directory:
+
+.. code:: bash
+
+    openssl genrsa -out private.key 2048
+    openssl rsa -in private.key -outform PEM -pubout -out public.key
+
+Automatic Signing -- Only available on Linux and Mac
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The simplest way of implementing signing is to use the automatic mode, which is only possible on Linux and Mac presently due to missing tools under Windows.  This mode uses the IDE to configure the source code to enable sigining verification with a given public key, and signs binaries as part of the standard build process using a given public key.
+
+To enable this mode, just include `private.key` and `public.key` in the sketch `.ino` directory.  The IDE will call a helper script (`tools/signing.py`) before the build begins to create a header to enable key validation using the given public key, and after the build process to actually do the signing, generating a `sketch.bin.signed` file.  When OTA is enabled (ArduinoOTA, Web, or HTTP) the binary will only accept signed updates automatically.
+
+When the signing process starts, the message:
+
+.. code:: bash
+
+    Enabling binary signing
+
+Will appear in the IDE window before a compile is launched, and at the completion of the build the signed binary file well be displayed in the IDE build window as:
+
+.. code:: bash
+
+    Signed binary: /full/path/to/sketch.bin.signed
+
+If you receive either of the following messages in the IDE window, the signing was not completed and you will need to verify the `public.key` and `private.key`:
+
+.. code:: bash
+
+    Not enabling binary signing
+    ... or ...
+    Not signing the generated binary
+
+Manual Signing Binaries
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Users may also manually sign executables and require the OTA process to verify their signature.  In the main code, before enabling any update methods, add the call:
+
+.. code:: cpp
+
+    <in globals>
+    BearSSL::PublicKey signPubKey( ... key contents ... );
+    BearSSL::HashSHA256 hash;
+    BearSSL::SigningVerifier sign( &signPubKey );
+    ...
+    <in setup()>
+    Update.installSignature( &hash, &sign );
+
+The above snipped creates a BearSSL public key, a SHA256 hash verifier, and tells the Update object to use them to validate any updates it receives from any method.
+
+Compile the sketch normally and, once a `.bin` file is available, sign it using the signer script:
+
+.. code:: bash
+
+    <ESP8266ArduioPath>/tools/signing.py --mode sign --privatekey <path-to-private.key> --bin <path-to-unsigned-bin> --out <path-to-signed-binary>
 
 Safety
 ~~~~~~
@@ -52,8 +141,8 @@ The following functions are provided with `ArduinoOTA <https://github.com/esp826
     void onProgress(OTA_CALLBACK_PROGRESS(fn));
     void onError(OTA_CALLBACK_ERROR (fn));
 
-Basic Requirements
-~~~~~~~~~~~~~~~~~~
+OTA Basic Requirements
+~~~~~~~~~~~~~~~~~~~~~~
 
 Flash chip size should be able to hold the old sketch (currently running) and the new sketch (OTA) at the same time.
 
@@ -202,9 +291,9 @@ If OTA update fails, first step is to check for error messages that may be shown
 
 This window is for Arduino Yún and not yet implemented for esp8266/Arduino. It shows up because IDE is attempting to open Serial Monitor using network port you have selected for OTA upload.
 
-Instead you need an external serial monitor. If you are a Windows user check out `Termite <http://www.compuphase.com/software_termite.htm>`__. This is handy, slick and simple RS232 terminal that does not impose RTS or DTR flow control. Such flow control may cause issues if you are using respective lines to toggle GPIO0 and RESET pins on ESP for upload.
+Instead you need an external serial monitor. If you are a Windows user check out `Termite <https://www.compuphase.com/software_termite.htm>`__. This is handy, slick and simple RS232 terminal that does not impose RTS or DTR flow control. Such flow control may cause issues if you are using respective lines to toggle GPIO0 and RESET pins on ESP for upload.
 
-Select COM port and baud rate on external terminal program as if you were using Arduino Serial Monitor. Please see typical settings for `Termite <http://www.compuphase.com/software_termite.htm>`__ below:
+Select COM port and baud rate on external terminal program as if you were using Arduino Serial Monitor. Please see typical settings for `Termite <https://www.compuphase.com/software_termite.htm>`__ below:
 
 .. figure:: termite-configuration.png
    :alt: Termite settings
@@ -291,8 +380,8 @@ You can use another module if it meets previously described `requirements <#basi
       https://github.com/esp8266/Arduino#installing-with-boards-manager
    -  Host software depending on O/S you use:
 
-      1. Avahi http://avahi.org/ for Linux
-      2. Bonjour http://www.apple.com/support/bonjour/ for Windows
+      1. Avahi https://avahi.org/ for Linux
+      2. Bonjour https://www.apple.com/support/bonjour/ for Windows
       3. Mac OSX and iOS - support is already built in / no any extra
          s/w is required
 
@@ -362,7 +451,7 @@ You can use another module if it meets previously described `requirements <#basi
       :alt: Serial Monitor - after OTA update
 
    Just after reboot you should see exactly the same message
-   ``HTTPUpdateServer ready! Open http:// esp8266-webupdate.local /update in your browser``
+   ``HTTPUpdateServer ready! Open http://esp8266-webupdate.local/update in your browser``
    like in step 3. This is because module has been loaded again with the
    same code – first using serial port, and then using OTA.
 
@@ -525,7 +614,9 @@ The Stream Interface is the base for all other update modes like OTA, http Serve
 Updater class
 -------------
 
-Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader to load the new firmware on the next boot.
+Updater is in the Core and deals with writing the firmware to the flash, checking its integrity and telling the bootloader (eboot) to load the new firmware on the next boot.
+
+**Note:** The bootloader command will be stored into the first 128 bytes of user RTC memory, then it will be retrieved by eboot on boot. That means that user data present there will be lost `(per discussion in #5330) <https://github.com/esp8266/Arduino/pull/5330#issuecomment-437803456>`__.
 
 Update process - memory view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -23,6 +23,52 @@
 
 #include <Arduino.h>
 
+#ifndef PUYA_SUPPORT
+  #define PUYA_SUPPORT 0
+#endif
+#ifndef PUYA_BUFFER_SIZE
+  // Good alternative for buffer size is: SPI_FLASH_SEC_SIZE (= 4k)
+  // Always use a multiple of flash page size (256 bytes)
+  #define PUYA_BUFFER_SIZE 256
+#endif
+
+// Vendor IDs taken from Flashrom project
+// https://review.coreboot.org/cgit/flashrom.git/tree/flashchips.h?h=1.0.x
+typedef enum {
+    SPI_FLASH_VENDOR_ALLIANCE    = 0x52,    /* Alliance Semiconductor */
+    SPI_FLASH_VENDOR_AMD         = 0x01,    /* AMD */
+    SPI_FLASH_VENDOR_AMIC        = 0x37,    /* AMIC */
+    SPI_FLASH_VENDOR_ATMEL       = 0x1F,    /* Atmel (now used by Adesto) */
+    SPI_FLASH_VENDOR_BRIGHT      = 0xAD,    /* Bright Microelectronics */
+    SPI_FLASH_VENDOR_CATALYST    = 0x31,    /* Catalyst */
+    SPI_FLASH_VENDOR_EON         = 0x1C,    /* EON Silicon Devices, missing 0x7F prefix */
+    SPI_FLASH_VENDOR_ESMT        = 0x8C,    /* Elite Semiconductor Memory Technology (ESMT) / EFST Elite Flash Storage */
+    SPI_FLASH_VENDOR_EXCEL       = 0x4A,    /* ESI, missing 0x7F prefix */
+    SPI_FLASH_VENDOR_FIDELIX     = 0xF8,    /* Fidelix */
+    SPI_FLASH_VENDOR_FUJITSU     = 0x04,    /* Fujitsu */
+    SPI_FLASH_VENDOR_GIGADEVICE  = 0xC8,    /* GigaDevice */
+    SPI_FLASH_VENDOR_HYUNDAI     = 0xAD,    /* Hyundai */
+    SPI_FLASH_VENDOR_INTEL       = 0x89,    /* Intel */
+    SPI_FLASH_VENDOR_ISSI        = 0xD5,    /* ISSI Integrated Silicon Solutions, see also PMC. */
+    SPI_FLASH_VENDOR_MACRONIX    = 0xC2,    /* Macronix (MX) */
+    SPI_FLASH_VENDOR_NANTRONICS  = 0xD5,    /* Nantronics, missing prefix */
+    SPI_FLASH_VENDOR_PMC         = 0x9D,    /* PMC, missing 0x7F prefix */
+    SPI_FLASH_VENDOR_PUYA        = 0x85,    /* Puya semiconductor (shanghai) co. ltd */
+    SPI_FLASH_VENDOR_SANYO       = 0x62,    /* Sanyo */
+    SPI_FLASH_VENDOR_SHARP       = 0xB0,    /* Sharp */
+    SPI_FLASH_VENDOR_SPANSION    = 0x01,    /* Spansion, same ID as AMD */
+    SPI_FLASH_VENDOR_SST         = 0xBF,    /* SST */
+    SPI_FLASH_VENDOR_ST          = 0x20,    /* ST / SGS/Thomson / Numonyx (later acquired by Micron) */
+    SPI_FLASH_VENDOR_SYNCMOS_MVC = 0x40,    /* SyncMOS (SM) and Mosel Vitelic Corporation (MVC) */
+    SPI_FLASH_VENDOR_TENX        = 0x5E,    /* Tenx Technologies */
+    SPI_FLASH_VENDOR_TI          = 0x97,    /* Texas Instruments */
+    SPI_FLASH_VENDOR_TI_OLD      = 0x01,    /* TI chips from last century */
+    SPI_FLASH_VENDOR_WINBOND     = 0xDA,    /* Winbond */
+    SPI_FLASH_VENDOR_WINBOND_NEX = 0xEF,    /* Winbond (ex Nexcom) serial flashes */
+
+    SPI_FLASH_VENDOR_UNKNOWN     = 0xFF
+} SPI_FLASH_VENDOR_t;
+
 /**
  * AVR macros for WDT managment
  */
@@ -123,6 +169,8 @@ class EspClass {
         uint8_t getCpuFreqMHz();
 
         uint32_t getFlashChipId();
+        uint8_t getFlashChipVendorId();
+
         //gets the actual chip size based on the flash id
         uint32_t getFlashChipRealSize();
         //gets the size of the flash as set by the compiler
@@ -152,15 +200,20 @@ class EspClass {
 
         bool eraseConfig();
 
-        inline uint32_t getCycleCount();
+#ifndef CORE_MOCK
+        inline
+#endif
+        uint32_t getCycleCount();
 };
 
+#ifndef CORE_MOCK
 uint32_t EspClass::getCycleCount()
 {
     uint32_t ccount;
     __asm__ __volatile__("esync; rsr %0,ccount":"=a" (ccount));
     return ccount;
 }
+#endif
 
 extern EspClass ESP;
 
