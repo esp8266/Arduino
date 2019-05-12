@@ -3,7 +3,16 @@
 	url = https://github.com/d-a-v/esp82xx-nonos-linklayer.git
 [submodule "tools/sdk/ssl/bearssl"]
 	path = tools/sdk/ssl/bearssl
-	url = https://github.com/earlephilhower/bearssl-esp8266
+	url = https://github.com/earlephilhower/bearssl-esp8266.git
 [submodule "libraries/SoftwareSerial"]
 	path = libraries/SoftwareSerial
 	url = https://github.com/plerup/espsoftwareserial.git
+[submodule "libraries/ESP8266SdFat"]
+	path = libraries/ESP8266SdFat
+	url = https://github.com/earlephilhower/ESP8266SdFat.git
+[submodule "tools/pyserial"]
+	path = tools/pyserial
+	url = https://github.com/pyserial/pyserial.git
+[submodule "tools/esptool"]
+	path = tools/esptool
+	url = https://github.com/espressif/esptool.git
