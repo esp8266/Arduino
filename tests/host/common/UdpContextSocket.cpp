@@ -52,7 +52,19 @@ int mockUDPSocket ()
 
 bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 {
-	int optval = 1;
+	int optval;
+	int mockport;
+
+	mockport = port;
+	if (mockport < 1024 && mock_port_shifter)
+	{
+		mockport += mock_port_shifter;
+		fprintf(stderr, MOCK "=====> UdpServer port: %d shifted to %d (use option -s) <=====\n", port, mockport);
+	}
+	else
+		fprintf(stderr, MOCK "=====> UdpServer port: %d <=====\n", mockport);
+
+	optval = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) == -1)
 		fprintf(stderr, MOCK "SO_REUSEPORT failed\n");
 	optval = 1;
@@ -66,16 +78,16 @@ bool mockUDPListen (int sock, uint32_t dstaddr, uint16_t port, uint32_t mcast)
 	servaddr.sin_family = AF_INET;
 	//servaddr.sin_addr.s_addr = global_ipv4_netfmt?: dstaddr;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(port);
+	servaddr.sin_port = htons(mockport);
 
 	// Bind the socket with the server address
 	if (bind(sock, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
 	{
-		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", port, strerror(errno));
+		fprintf(stderr, MOCK "UDP bind on port %d failed: %s\n", mockport, strerror(errno));
 		return false;
 	}
 	else
-		fprintf(stderr, MOCK "UDP server on port %d (sock=%d)\n", (int)port, sock);
+		mockverbose("UDP server on port %d (sock=%d)\n", mockport, sock);
 
 	if (mcast)
 	{

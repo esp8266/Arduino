@@ -182,7 +182,7 @@ void ESP8266NetBIOS::_recv(udp_pcb *upcb, pbuf *pb, CONST ip_addr_t *addr, uint1
         size_t len = pb->len;
 #if LWIP_VERSION_MAJOR == 1
         // check UdpContext.h
-        const ip_addr_t* saddr = &current_iphdr_src;
+        ip_addr_t* saddr = &current_iphdr_src;
 #else
         // check UdpContext.h
         const ip_addr_t* saddr = &ip_data.current_iphdr_src;

@@ -101,7 +101,7 @@ class Stream: public Print {
         // returns the number of characters placed in the buffer (0 means no valid data found)
 
         // Arduino String functions to be added here
-        String readString();
+        virtual String readString();
         String readStringUntil(char terminator);
 
     protected:

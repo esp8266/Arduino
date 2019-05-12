@@ -72,13 +72,19 @@ Locate Application.ino.elf File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order for GDB to debug your application, you need to locate the compiled
-ELF format version of it (which includes needed debug symbols).  Under Linux
-these files are stored in ``/tmp/arduino_build_*`` and the following command
-will help locate the right file for your app
+ELF format version of it (which includes needed debug symbols). 
 
-.. code:: cpp
+Under Linux these files are stored in ``/tmp/arduino_build_*`` and the following command will help locate the right file for your app:
+
+.. code:: bash
 
     find /tmp -name "*.elf" -print
+
+Under Windows these files are stored in ``%userprofile%\AppData\Local\Temp\arduino_build_*`` and the following command will help locate the right file for your app:
+
+.. code:: bash
+
+    dir %userprofile%\appdata\*.elf /s/b
 
 Note the full path of ELF file that corresponds to your sketch name, it will
 be needed later once GDB is started.
@@ -90,14 +96,23 @@ Open a Command Prompt and Start GDB
 Open a terminal or ``CMD`` prompt and navigate to the proper ESP8266 toolchain
 directory.
 
-.. code:: cpp
+Linux
+
+.. code:: bash
 
     ~/.arduino15/packages/esp8266/hardware/xtensa-lx106-elf/bin/xtensa-lx106-elf-gdb
 
-.. code:: cpp
+Windows (Using Board Manager version)
 
-    cd TODO WINDOWS
-    xtensa-lx106-elf-gdb.exe
+.. code:: bash
+
+    %userprofile%\AppData\Local\Arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\2.5.0-3-20ed2b9\bin\xtensa-lx106-elf-gdb.exe
+
+Windows (Using Git version)
+
+.. code:: bash
+
+    %userprofile%\Documents\Arduino\hardware\esp8266com\esp8266\tools\xtensa-lx106-elf\bin\xtensa-lx106-elf-gdb.exe
 
 Please note the proper GDB name is "xtensa-lx106-elf-gdb".  If you accidentally
 run "gdb" you may start your own operating system's GDB, which will not know how
@@ -109,7 +124,7 @@ Apply the GDB Configurations
 At the ``(gdb)`` prompt, enter the following options to configure GDB for the
 ESP8266 memory map and configuration:
 
-.. code:: cpp
+.. code:: bash
 
     set remote hardware-breakpoint-limit 1
     set remote hardware-watchpoint-limit 1
@@ -127,7 +142,7 @@ ESP8266 memory map and configuration:
 
 Now tell GDB where your compiled ELF file is located:
 
-.. code:: cpp
+.. code:: bash
 
     file /tmp/arduino_build_257110/sketch_dec26a.ino.elf
 
@@ -138,13 +153,13 @@ Once GDB has been configured properly and loaded your debugging symbols, connect
 it to the ESP with the command (replace the ttyUSB0 or COM9 with your ESP's serial
 port):
 
-.. code:: cpp
+.. code:: bash
 
     target remote /dev/ttyUSB0
 
 or
 
-.. code:: cpp
+.. code:: bash
 
     target remote \\.\COM9
 
@@ -176,7 +191,7 @@ Create a new sketch and paste the following code into it:
 Save it and then build and upload to your ESP8266.  On the Serial monitor you
 should see something like
 
-.. code:: cpp
+.. code:: bash
 
     1
     2
@@ -188,7 +203,7 @@ Now close the Serial Monitor.
 
 Open a command prompt and find the ELF file:
 
-.. code:: cpp
+.. code:: bash
 
     earle@server:~$ find /tmp -name "*.elf" -print
     /tmp/arduino_build_257110/testgdb.ino.elf
@@ -200,21 +215,21 @@ the one we just built, ``testgdb.ino.elf``.
 
 Open up the proper ESP8266-specific GDB
 
-.. code:: cpp
+.. code:: bash
 
     earle@server:~$ ~/.arduino15/packages/esp8266/hardware/xtensa-lx106-elf/bin/xtensa-lx106-elf-gdb
     GNU gdb (GDB) 8.2.50.20180723-git
     Copyright (C) 2018 Free Software Foundation, Inc.
-    License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+    License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
     This is free software: you are free to change and redistribute it.
     There is NO WARRANTY, to the extent permitted by law.
     Type "show copying" and "show warranty" for details.
     This GDB was configured as "--host=x86_64-linux-gnu --target=xtensa-lx106-elf".
     Type "show configuration" for configuration details.
     For bug reporting instructions, please see:
-        <http://www.gnu.org/software/gdb/bugs/>.
+        <https://www.gnu.org/software/gdb/bugs/>.
     Find the GDB manual and other documentation resources online at:
-        <http://www.gnu.org/software/gdb/documentation/>.
+        <https://www.gnu.org/software/gdb/documentation/>.
 
     For help, type "help".
     Type "apropos word" to search for commands related to "word".
@@ -223,7 +238,8 @@ Open up the proper ESP8266-specific GDB
 We're now at the GDB prompt, but nothing has been set up for the ESP8266
 and no debug information has been loaded.  Cut-and-paste the setup options:
 
-.. code:: cpp
+.. code:: bash
+
     (gdb) set remote hardware-breakpoint-limit 1
     (gdb) set remote hardware-watchpoint-limit 1
     (gdb) set remote interrupt-on-connect on
@@ -241,14 +257,14 @@ and no debug information has been loaded.  Cut-and-paste the setup options:
 
 And tell GDB where the debugging info ELF file is located:
 
-.. code:: cpp
+.. code:: bash
 
     (gdb) file /tmp/arduino_build_257110/testgdb.ino.elf
     Reading symbols from /tmp/arduino_build_257110/testgdb.ino.elf...done.
 
 Now, connect to the running ESP8266:
 
-.. code:: cpp
+.. code:: bash
 
     (gdb)     target remote /dev/ttyUSB0
     Remote debugging using /dev/ttyUSB0
@@ -263,7 +279,7 @@ output will be displayed on the GDB console..
 
 Continue the running app to see the serial output:
 
-.. code:: cpp
+.. code:: bash
 
     (gdb) cont
     Continuing.
@@ -275,7 +291,8 @@ Continue the running app to see the serial output:
 
 The app is back running and we can stop it at any time using ``Ctrl-C``:
 
-.. code:: cpp 
+.. code:: bash 
+
     113
     ^C
     Program received signal SIGINT, Interrupt.
@@ -285,7 +302,7 @@ The app is back running and we can stop it at any time using ``Ctrl-C``:
 At this point we can set a breakpoint on the main ``loop()`` and restart
 to get into our own code:
 
-.. code:: cpp
+.. code:: bash
 
     (gdb) break loop
     Breakpoint 1 at 0x40202e33: file /home/earle/Arduino/sketch_dec26a/sketch_dec26a.ino, line 10.
@@ -300,7 +317,8 @@ to get into our own code:
 
 Let's examine the local variable:
 
-.. code:: cpp
+.. code:: bash
+
     (gdb) next
     loop () at /home/earle/Arduino/sketch_dec26a/sketch_dec26a.ino:13
     13      Serial.printf("%d\n", cnt++);
@@ -310,7 +328,7 @@ Let's examine the local variable:
 
 And change it:
 
-.. code:: cpp
+.. code:: bash
 
     $2 = 114
     (gdb) set cnt = 2000
@@ -320,7 +338,7 @@ And change it:
 
 And restart the app and see our changes take effect:
 
-.. code:: cpp
+.. code:: bash
 
     (gdb) cont
     Continuing.
@@ -336,7 +354,7 @@ And restart the app and see our changes take effect:
 
 Looks like we left the breakpoint on loop(), let's get rid of it and try again:
 
-.. code:: cpp
+.. code:: bash
 
     (gdb) delete
     Delete all breakpoints? (y or n) y

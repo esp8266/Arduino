@@ -35,9 +35,12 @@
 #define IP_IS_V4_VAL(x) (1)
 #define IP_SET_TYPE_VAL(x,y) do { (void)0; } while (0)
 #define IP_ANY_TYPE (&ip_addr_any)
+#define IP4_ADDR_ANY IPADDR_ANY
 #define IP4_ADDR_ANY4 IPADDR_ANY
 #define IPADDR4_INIT(x) { x }
 #define CONST /* nothing: lwIP-v1 does not use const */
+#define ip4_addr_netcmp ip_addr_netcmp
+#define netif_dhcp_data(netif) ((netif)->dhcp)
 #else // lwIP-v2+
 #define CONST const
 #if !LWIP_IPV6
@@ -84,13 +87,15 @@ class IPAddress: public Printable {
 
         // Overloaded cast operator to allow IPAddress objects to be used where a pointer
         // to a four-byte uint8_t array is expected
-        operator uint32_t() const {
-            return isV4()? v4(): (uint32_t)0;
-        }
+        operator uint32_t() const { return isV4()? v4(): (uint32_t)0; }
+        operator uint32_t()       { return isV4()? v4(): (uint32_t)0; }
+        operator u32_t()    const { return isV4()? v4():    (u32_t)0; }
+        operator u32_t()          { return isV4()? v4():    (u32_t)0; }
 
-        // the above uint32_t() cast can be ambiguous
-        // if gcc complains, use instead isSet() or v4() according to what's relevant
         bool isSet () const;
+        operator bool () const { return isSet(); } // <-
+        operator bool ()       { return isSet(); } // <- both are needed
+
         // generic IPv4 wrapper to uint32-view like arduino loves to see it
         const u32_t& v4() const { return ip_2_ip4(&_ip)->addr; } // for raw_address(const)
               u32_t& v4()       { return ip_2_ip4(&_ip)->addr; }
@@ -114,6 +119,10 @@ class IPAddress: public Printable {
             return !(isV4() && v4() == addr);
         }
         bool operator==(const uint8_t* addr) const;
+
+        int operator>>(int n) const {
+            return isV4()? v4() >> n: 0;
+        }
 
         // Overloaded index operator to allow getting and setting individual octets of the address
         uint8_t operator[](int index) const {
@@ -152,6 +161,9 @@ class IPAddress: public Printable {
         IPAddress(const ipv4_addr& fw_addr)   { setV4(); v4() = fw_addr.addr; }
         IPAddress(const ipv4_addr* fw_addr)   { setV4(); v4() = fw_addr->addr; }
 
+        IPAddress& operator=(const ipv4_addr& fw_addr)   { setV4(); v4() = fw_addr.addr;  return *this; }
+        IPAddress& operator=(const ipv4_addr* fw_addr)   { setV4(); v4() = fw_addr->addr; return *this; }
+
         operator       ip_addr_t () const { return  _ip; }
         operator const ip_addr_t*() const { return &_ip; }
         operator       ip_addr_t*()       { return &_ip; }
@@ -165,6 +177,9 @@ class IPAddress: public Printable {
 
         IPAddress(const ip_addr_t& lwip_addr) { ip_addr_copy(_ip, lwip_addr); }
         IPAddress(const ip_addr_t* lwip_addr) { ip_addr_copy(_ip, *lwip_addr); }
+
+        IPAddress& operator=(const ip_addr_t& lwip_addr) { ip_addr_copy(_ip, lwip_addr); return *this; }
+        IPAddress& operator=(const ip_addr_t* lwip_addr) { ip_addr_copy(_ip, *lwip_addr); return *this; }
 
         uint16_t* raw6()
         {

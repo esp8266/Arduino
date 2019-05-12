@@ -1,8 +1,8 @@
 .DS_Store
 tools/dist/
 tools/xtensa-lx106-elf/
-tools/esptool/
 tools/mkspiffs/
+tools/python/
 package/versions/
 exclude.txt
 tools/sdk/lib/liblwip_src.a

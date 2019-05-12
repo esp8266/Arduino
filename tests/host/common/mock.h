@@ -29,6 +29,8 @@
  DEALINGS WITH THE SOFTWARE.
 */
 
+#define CORE_MOCK 1
+
 // include host's STL before any other include file
 // because core definition like max() is in the way
 
@@ -77,7 +79,11 @@ extern "C" {
 int ets_printf (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define os_printf_plus printf
 
+int mockverbose (const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
+
 extern const char* host_interface; // cmdline parameter
+
+extern int mock_port_shifter;
 
 #define NO_GLOBAL_BINDING 0xffffffff
 extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
@@ -92,6 +98,15 @@ extern uint32_t global_ipv4_netfmt; // selected interface addresse to bind to
 
 #ifndef CCBUFSIZE
 #define CCBUFSIZE 65536
+#endif
+
+// uart
+#ifdef __cplusplus
+extern "C" {
+#endif
+void uart_new_data(const int uart_nr, uint8_t data);
+#ifdef __cplusplus
+}
 #endif
 
 // tcp
@@ -124,8 +139,6 @@ void mock_start_spiffs (const String& fname, size_t size_kb, size_t block_kb = 8
 void mock_stop_spiffs ();
 
 //
-
-#define CORE_MOCK 1
 
 #define ARDUINO 267
 #define ESP8266 1
