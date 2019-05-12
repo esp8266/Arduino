@@ -22,7 +22,7 @@ import os
 import subprocess
 
 
-def generate(path, platform_path, git_ver="0xffffffff", git_desc="unspecified"):
+def generate(path, platform_path, git_ver="ffffffff", git_desc="unspecified"):
     def git(*args):
         cmd = ["git", "-C", platform_path]
         cmd.extend(args)

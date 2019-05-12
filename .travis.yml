@@ -103,6 +103,7 @@ jobs:
       stage: deploy
       script: tests/ci/build_package.sh
       env: BUILD_TYPE=package
+      before_deploy: git submodule update --init
       deploy:
       # Create Github release, upload artifacts
       - provider: releases

@@ -22,6 +22,8 @@
 #include "sntp.h"
 #include "coredecls.h"
 
+#include "sntp-lwip2.h"
+
 extern "C" {
 
 #ifndef _TIMEVAL_DEFINED
@@ -58,7 +60,8 @@ static void setServer(int id, const char* name_or_ip)
     }
 }
 
-void configTime(int timezone, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
+
+void configTime(int timezone_sec, int daylightOffset_sec, const char* server1, const char* server2, const char* server3)
 {
     sntp_stop();
 
@@ -66,7 +69,7 @@ void configTime(int timezone, int daylightOffset_sec, const char* server1, const
     setServer(1, server2);
     setServer(2, server3);
 
-    sntp_set_timezone(timezone/3600);
+    sntp_set_timezone_in_seconds(timezone_sec);
     sntp_set_daylight(daylightOffset_sec);
     sntp_init();
 }
