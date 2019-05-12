@@ -41,6 +41,7 @@
 class UDP: public Stream {
 
     public:
+        virtual ~UDP() {};
         virtual uint8_t begin(uint16_t) =0;	// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
         virtual void stop() =0;  // Finish with the UDP socket
 
@@ -85,6 +86,11 @@ class UDP: public Stream {
         uint8_t* rawIPAddress(IPAddress& addr) {
             return addr.raw_address();
         }
+#if LWIP_VERSION_MAJOR != 1
+        const uint8_t* rawIPAddress(const IPAddress& addr) {
+            return addr.raw_address();
+        }
+#endif
 };
 
 #endif

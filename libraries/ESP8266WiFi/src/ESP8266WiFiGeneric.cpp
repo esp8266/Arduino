@@ -38,6 +38,7 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/err.h"
 #include "lwip/dns.h"
+#include "lwip/init.h" // LWIP_VERSION_
 }
 
 #include "WiFiClient.h"
@@ -81,7 +82,7 @@ static std::list<WiFiEventHandler> sCbEventList;
 bool ESP8266WiFiGenericClass::_persistent = true;
 WiFiMode_t ESP8266WiFiGenericClass::_forceSleepLastMode = WIFI_OFF;
 
-ESP8266WiFiGenericClass::ESP8266WiFiGenericClass() 
+ESP8266WiFiGenericClass::ESP8266WiFiGenericClass()
 {
     wifi_set_event_handler_cb((wifi_event_handler_cb_t) &ESP8266WiFiGenericClass::_eventCallback);
 }
@@ -153,6 +154,7 @@ WiFiEventHandler ESP8266WiFiGenericClass::onStationModeGotIP(std::function<void(
 WiFiEventHandler ESP8266WiFiGenericClass::onStationModeDHCPTimeout(std::function<void(void)> f)
 {
     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_STAMODE_DHCP_TIMEOUT, [f](System_Event_t* e){
+        (void) e;
         f();
     });
     sCbEventList.push_back(handler);
@@ -185,6 +187,19 @@ WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeStationDisconnected(std::f
     return handler;
 }
 
+WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)> f)
+{
+    WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED, [f](System_Event_t* e){
+        auto& src = e->event_info.ap_probereqrecved;
+        WiFiEventSoftAPModeProbeRequestReceived dst;
+        memcpy(dst.mac, src.mac, 6);
+        dst.rssi = src.rssi;
+        f(dst);
+    });
+    sCbEventList.push_back(handler);
+    return handler;
+}
+
 // WiFiEventHandler ESP8266WiFiGenericClass::onWiFiModeChange(std::function<void(const WiFiEventModeChange&)> f)
 // {
 //     WiFiEventHandler handler = std::make_shared<WiFiEventHandlerOpaque>(WIFI_EVENT_MODE_CHANGE, [f](System_Event_t* e){
@@ -199,7 +214,7 @@ WiFiEventHandler ESP8266WiFiGenericClass::onSoftAPModeStationDisconnected(std::f
  * callback for WiFi events
  * @param arg
  */
-void ESP8266WiFiGenericClass::_eventCallback(void* arg) 
+void ESP8266WiFiGenericClass::_eventCallback(void* arg)
 {
     System_Event_t* event = reinterpret_cast<System_Event_t*>(arg);
     DEBUG_WIFI("wifi evt: %d\n", event->event);
@@ -234,8 +249,79 @@ int32_t ESP8266WiFiGenericClass::channel(void) {
  * @param type sleep_type_t
  * @return bool
  */
-bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type) {
-    return wifi_set_sleep_type((sleep_type_t) type);
+bool ESP8266WiFiGenericClass::setSleepMode(WiFiSleepType_t type, uint8_t listenInterval) {
+
+   /**
+    * datasheet:
+    *
+   wifi_set_sleep_level():
+   Set sleep level of modem sleep and light sleep
+   This configuration should be called before calling wifi_set_sleep_type
+   Modem-sleep and light sleep mode have minimum and maximum sleep levels.
+   - In minimum sleep level, station wakes up at every DTIM to receive
+     beacon.  Broadcast data will not be lost because it is transmitted after
+     DTIM.  However, it can not save much more power if DTIM period is short,
+     as specified in AP.
+   - In maximum sleep level, station wakes up at every listen interval to
+     receive beacon.  Broadcast data may be lost because station may be in sleep
+     state at DTIM time.  If listen interval is longer, more power will be saved, but
+     it’s very likely to lose more broadcast data.
+   - Default setting is minimum sleep level.
+   Further reading: https://routerguide.net/dtim-interval-period-best-setting/
+
+   wifi_set_listen_interval():
+   Set listen interval of maximum sleep level for modem sleep and light sleep
+   It only works when sleep level is set as MAX_SLEEP_T
+   forum: https://github.com/espressif/ESP8266_NONOS_SDK/issues/165#issuecomment-416121920
+   default value seems to be 3 (as recommended by https://routerguide.net/dtim-interval-period-best-setting/)
+
+   call order:
+     wifi_set_sleep_level(MAX_SLEEP_T) (SDK3)
+     wifi_set_listen_interval          (SDK3)
+     wifi_set_sleep_type               (all SDKs)
+
+    */
+
+#ifdef NONOSDK3V0
+
+#ifdef DEBUG_ESP_WIFI
+    if (listenInterval && type == WIFI_NONE_SLEEP)
+        DEBUG_WIFI_GENERIC("listenInterval not usable with WIFI_NONE_SLEEP\n");
+#endif
+
+    if (type == WIFI_LIGHT_SLEEP || type == WIFI_MODEM_SLEEP) {
+        if (listenInterval) {
+            if (!wifi_set_sleep_level(MAX_SLEEP_T)) {
+                DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MAX_SLEEP_T): error\n");
+                return false;
+            }
+            if (listenInterval > 10) {
+                DEBUG_WIFI_GENERIC("listenInterval must be in [1..10]\n");
+#ifndef DEBUG_ESP_WIFI
+                // stay within datasheet range when not in debug mode
+                listenInterval = 10;
+#endif
+            }
+            if (!wifi_set_listen_interval(listenInterval)) {
+                DEBUG_WIFI_GENERIC("wifi_set_listen_interval(%d): error\n", listenInterval);
+                return false;
+            }
+        } else {
+            if (!wifi_set_sleep_level(MIN_SLEEP_T)) {
+                DEBUG_WIFI_GENERIC("wifi_set_sleep_level(MIN_SLEEP_T): error\n");
+                return false;
+            }
+        }
+    }
+#else  // !defined(NONOSDK3V0)
+    (void)listenInterval;
+#endif // !defined(NONOSDK3V0)
+
+    bool ret = wifi_set_sleep_type((sleep_type_t) type);
+    if (!ret) {
+        DEBUG_WIFI_GENERIC("wifi_set_sleep_type(%d): error\n", (int)type);
+    }
+    return ret;
 }
 
 /**
@@ -288,17 +374,33 @@ void ESP8266WiFiGenericClass::persistent(bool persistent) {
     _persistent = persistent;
 }
 
+/**
+ * gets the persistent state
+ * @return bool
+ */
+bool ESP8266WiFiGenericClass::getPersistent(){
+    return _persistent;
+}
 
 /**
  * set new mode
  * @param m WiFiMode_t
  */
 bool ESP8266WiFiGenericClass::mode(WiFiMode_t m) {
-    if(wifi_get_opmode() == (uint8) m) {
+    if(_persistent){
+        if(wifi_get_opmode() == (uint8) m && wifi_get_opmode_default() == (uint8) m){
+            return true;
+        }
+    } else if(wifi_get_opmode() == (uint8) m){
         return true;
     }
 
     bool ret = false;
+
+    if (m != WIFI_STA && m != WIFI_AP_STA)
+        // calls lwIP's dhcp_stop(),
+        // safe to call even if not started
+        wifi_station_dhcpc_stop();
 
     ETS_UART_INTR_DISABLE();
     if(_persistent) {
@@ -400,21 +502,54 @@ bool ESP8266WiFiGenericClass::forceSleepWake() {
     return false;
 }
 
+/**
+ * Get listen interval of maximum sleep level for modem sleep and light sleep.
+ * @return interval
+ */
+uint8_t ESP8266WiFiGenericClass::getListenInterval () {
+#ifndef NONOSDK3V0
+    return 0;
+#else
+    return wifi_get_listen_interval();
+#endif
+}
+
+/**
+ * Get sleep level of modem sleep and light sleep
+ * @return true if max level
+ */
+bool ESP8266WiFiGenericClass::isSleepLevelMax () {
+#ifndef NONOSDK3V0
+    return false;
+#else
+    return wifi_get_sleep_level() == MAX_SLEEP_T;
+#endif
+}
+
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------ Generic Network function ---------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg);
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg);
+
+static bool _dns_lookup_pending = false;
 
 /**
  * Resolve the given hostname to an IP address.
  * @param aHostname     Name to be resolved
  * @param aResult       IPAddress structure to store the returned IP address
  * @return 1 if aIPAddrString was successfully converted to an IP address,
- *          else error code
+ *          else 0
  */
-int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult) {
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
+{
+    return hostByName(aHostname, aResult, 10000);
+}
+
+
+int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms)
+{
     ip_addr_t addr;
     aResult = static_cast<uint32_t>(0);
 
@@ -427,17 +562,19 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
     DEBUG_WIFI_GENERIC("[hostByName] request IP for: %s\n", aHostname);
     err_t err = dns_gethostbyname(aHostname, &addr, &wifi_dns_found_callback, &aResult);
     if(err == ERR_OK) {
-        aResult = addr.addr;
+        aResult = IPAddress(&addr);
     } else if(err == ERR_INPROGRESS) {
-        esp_yield();
+        _dns_lookup_pending = true;
+        delay(timeout_ms);
+        _dns_lookup_pending = false;
         // will return here when dns_found_callback fires
-        if(aResult != 0) {
+        if(aResult.isSet()) {
             err = ERR_OK;
         }
     }
 
     if(err != 0) {
-        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, err);
+        DEBUG_WIFI_GENERIC("[hostByName] Host: %s lookup error: %d!\n", aHostname, (int)err);
     } else {
         DEBUG_WIFI_GENERIC("[hostByName] Host: %s IP: %s\n", aHostname, aResult.toString().c_str());
     }
@@ -451,11 +588,37 @@ int ESP8266WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResul
  * @param ipaddr
  * @param callback_arg
  */
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg) {
+void wifi_dns_found_callback(const char *name, CONST ip_addr_t *ipaddr, void *callback_arg)
+{
+    (void) name;
+    if (!_dns_lookup_pending) {
+        return;
+    }
     if(ipaddr) {
-        (*reinterpret_cast<IPAddress*>(callback_arg)) = ipaddr->addr;
+        (*reinterpret_cast<IPAddress*>(callback_arg)) = IPAddress(ipaddr);
     }
     esp_schedule(); // resume the hostByName function
 }
 
+//meant to be called from user-defined preinit()
+void ESP8266WiFiGenericClass::preinitWiFiOff () {
+  // https://github.com/esp8266/Arduino/issues/2111#issuecomment-224251391
+  // WiFi.persistent(false);
+  // WiFi.mode(WIFI_OFF);
+  // WiFi.forceSleepBegin();
 
+  //WiFi.mode(WIFI_OFF) equivalent:
+  // datasheet:
+  // Set Wi-Fi working mode to Station mode, SoftAP
+  // or Station + SoftAP, and do not update flash
+  // (not persistent)
+  wifi_set_opmode_current(WIFI_OFF);
+
+  //WiFi.forceSleepBegin(/*default*/0) equivalent:
+  // sleep forever until wifi_fpm_do_wakeup() is called
+  wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
+  wifi_fpm_open();
+  wifi_fpm_do_sleep(0xFFFFFFF);
+
+  // use WiFi.forceSleepWake() to wake WiFi up
+}

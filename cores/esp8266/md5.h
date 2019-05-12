@@ -1,11 +1,11 @@
-/* 
+/*
   md5.h - exposed md5 ROM functions for esp8266
 
   Copyright (c) 2015 Hristo Gochkov. All rights reserved.
   This file is part of the esp8266 core for Arduino environment.
- 
+
   original C source from https://github.com/morrissinger/ESP8266-Websocket/raw/master/MD5.h
- 
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -34,7 +34,7 @@ typedef struct {
 } md5_context_t;
 
 extern void MD5Init (md5_context_t *);
-extern void MD5Update (md5_context_t *, uint8_t *, uint16_t);
+extern void MD5Update (md5_context_t *, const uint8_t *, const uint16_t);
 extern void MD5Final (uint8_t [16], md5_context_t *);
 
 #ifdef __cplusplus

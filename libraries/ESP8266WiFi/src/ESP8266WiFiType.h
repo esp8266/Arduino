@@ -148,9 +148,4 @@ struct WiFiEventSoftAPModeProbeRequestReceived
 };
 
 
-extern "C" {
-typedef STAILQ_HEAD(, bss_info)
-bss_info_head_t;
-}
-
 #endif /* ESP8266WIFITYPE_H_ */

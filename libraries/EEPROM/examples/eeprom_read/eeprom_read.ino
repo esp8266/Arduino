@@ -1,10 +1,10 @@
 /*
- * EEPROM Read
- *
- * Reads the value of each byte of the EEPROM and prints it
- * to the computer.
- * This example code is in the public domain.
- */
+   EEPROM Read
+
+   Reads the value of each byte of the EEPROM and prints it
+   to the computer.
+   This example code is in the public domain.
+*/
 
 #include <EEPROM.h>
 
@@ -12,8 +12,7 @@
 int address = 0;
 byte value;
 
-void setup()
-{
+void setup() {
   // initialize serial and wait for port to open:
   Serial.begin(9600);
   while (!Serial) {
@@ -22,8 +21,7 @@ void setup()
   EEPROM.begin(512);
 }
 
-void loop()
-{
+void loop() {
   // read a byte from the current address of the EEPROM
   value = EEPROM.read(address);
 
@@ -37,8 +35,9 @@ void loop()
 
   // there are only 512 bytes of EEPROM, from 0 to 511, so if we're
   // on address 512, wrap around to address 0
-  if (address == 512)
+  if (address == 512) {
     address = 0;
+  }
 
   delay(500);
 }

@@ -29,12 +29,12 @@
 
 #ifdef DEBUG_ESP_WIFI
 #ifdef DEBUG_ESP_PORT
-#define DEBUG_WIFI_GENERIC(...) DEBUG_ESP_PORT.printf( __VA_ARGS__ )
+#define DEBUG_WIFI_GENERIC(fmt, ...) DEBUG_ESP_PORT.printf_P( (PGM_P)PSTR(fmt), ##__VA_ARGS__ )
 #endif
 #endif
 
 #ifndef DEBUG_WIFI_GENERIC
-#define DEBUG_WIFI_GENERIC(...)
+#define DEBUG_WIFI_GENERIC(...) do { (void)0; } while (0)
 #endif
 
 struct WiFiEventHandlerOpaque;
@@ -61,12 +61,16 @@ class ESP8266WiFiGenericClass {
         WiFiEventHandler onStationModeDHCPTimeout(std::function<void(void)>);
         WiFiEventHandler onSoftAPModeStationConnected(std::function<void(const WiFiEventSoftAPModeStationConnected&)>);
         WiFiEventHandler onSoftAPModeStationDisconnected(std::function<void(const WiFiEventSoftAPModeStationDisconnected&)>);
+        WiFiEventHandler onSoftAPModeProbeRequestReceived(std::function<void(const WiFiEventSoftAPModeProbeRequestReceived&)>);
         // WiFiEventHandler onWiFiModeChange(std::function<void(const WiFiEventModeChange&)>);
 
         int32_t channel(void);
 
-        bool setSleepMode(WiFiSleepType_t type);
+        bool setSleepMode(WiFiSleepType_t type, uint8_t listenInterval = 0);
+
         WiFiSleepType_t getSleepMode();
+        uint8_t getListenInterval ();
+        bool isSleepLevelMax ();
 
         bool setPhyMode(WiFiPhyMode_t mode);
         WiFiPhyMode_t getPhyMode();
@@ -84,6 +88,8 @@ class ESP8266WiFiGenericClass {
         bool forceSleepBegin(uint32 sleepUs = 0);
         bool forceSleepWake();
 
+        static void preinitWiFiOff (); //meant to be called in user-defined preinit()
+
     protected:
         static bool _persistent;
         static WiFiMode_t _forceSleepLastMode;
@@ -97,7 +103,8 @@ class ESP8266WiFiGenericClass {
     public:
 
         int hostByName(const char* aHostname, IPAddress& aResult);
-
+        int hostByName(const char* aHostname, IPAddress& aResult, uint32_t timeout_ms);
+        bool getPersistent();
     protected:
 
         friend class ESP8266WiFiSTAClass;

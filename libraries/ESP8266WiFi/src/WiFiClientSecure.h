@@ -20,58 +20,27 @@
 
 */
 
-#ifndef wificlientsecure_h
-#define wificlientsecure_h
-#include "WiFiClient.h"
-#include "include/ssl.h"
+//#include "WiFiClientSecureAxTLS.h"
+//using namespace axTLS;
 
+/**********************************
+ * !! Now BearSSL is the default !!
+ *
+ * While not advised,
+ * Use legacy API without updating with:
+ *
+#define USING_AXTLS
+#include <ESP8266WiFi.h>
+//#include <WiFiClientSecure.h>
+#include "WiFiClientSecureAxTLS.h"
+using namespace axTLS;
+ *
+ *
+ **********************************/
 
-class SSLContext;
+#include "WiFiClientSecureBearSSL.h"
 
-class WiFiClientSecure : public WiFiClient {
-public:
-  WiFiClientSecure();
-  ~WiFiClientSecure() override;
-  WiFiClientSecure(const WiFiClientSecure&);
-  WiFiClientSecure& operator=(const WiFiClientSecure&);
-
-  int connect(IPAddress ip, uint16_t port) override;
-  int connect(const char* name, uint16_t port) override;
-
-  bool verify(const char* fingerprint, const char* domain_name);
-  bool verifyCertChain(const char* domain_name);
-
-  uint8_t connected() override;
-  size_t write(const uint8_t *buf, size_t size) override;
-  int read(uint8_t *buf, size_t size) override;
-  int available() override;
-  int read() override;
-  int peek() override;
-  size_t peekBytes(uint8_t *buffer, size_t length) override;
-  void stop() override;
-
-  void setCertificate(const uint8_t* cert_data, size_t size);
-  void setPrivateKey(const uint8_t* pk, size_t size);
-
-  bool loadCertificate(Stream& stream, size_t size);
-  bool loadPrivateKey(Stream& stream, size_t size);
-  bool loadCACert(Stream& stream, size_t size);
-
-  template<typename TFile>
-  bool loadCertificate(TFile& file) {
-    return loadCertificate(file, file.size());
-  }
-
-  template<typename TFile>
-  bool loadPrivateKey(TFile& file) {
-    return loadPrivateKey(file, file.size());
-  }
-
-protected:
-    int _connectSSL(const char* hostName);
-    bool _verifyDN(const char* name);
-
-    SSLContext* _ssl = nullptr;
-};
-
-#endif //wificlientsecure_h
+#ifndef USING_AXTLS
+// do not default to BearSSL API ("using" has no "unusing" counterpart)
+using namespace BearSSL;
+#endif
