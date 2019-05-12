@@ -20,7 +20,7 @@ def drop_version(todrop, obj):
     for o in obj:
         version = o['version'].encode('ascii')
         if version == todrop:
-            print("Dropping version {0}".format(todrop))
+            print("Dropping version {0}".format(todrop), file=sys.stderr)
         else:
             out.append(o)
     return out
