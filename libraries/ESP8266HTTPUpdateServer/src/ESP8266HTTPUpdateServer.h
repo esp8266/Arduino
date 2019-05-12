@@ -10,25 +10,25 @@ class ESP8266HTTPUpdateServer
 
     void setup(ESP8266WebServer *server)
     {
-      setup(server, NULL, NULL);
+      setup(server, emptyString, emptyString);
     }
 
-    void setup(ESP8266WebServer *server, const char * path)
+    void setup(ESP8266WebServer *server, const String& path)
     {
-      setup(server, path, NULL, NULL);
+      setup(server, path, emptyString, emptyString);
     }
 
-    void setup(ESP8266WebServer *server, const char * username, const char * password)
+    void setup(ESP8266WebServer *server, const String& username, const String& password)
     {
       setup(server, "/update", username, password);
     }
 
-    void setup(ESP8266WebServer *server, const char * path, const char * username, const char * password);
+    void setup(ESP8266WebServer *server, const String& path, const String& username, const String& password);
 
-    void updateCredentials(const char * username, const char * password)
+    void updateCredentials(const String& username, const String& password)
     {
-      _username = (char *)username;
-      _password = (char *)password;
+      _username = username;
+      _password = password;
     }
 
   protected:
@@ -37,8 +37,8 @@ class ESP8266HTTPUpdateServer
   private:
     bool _serial_output;
     ESP8266WebServer *_server;
-    char * _username;
-    char * _password;
+    String _username;
+    String _password;
     bool _authenticated;
     String _updaterError;
 	int _command;

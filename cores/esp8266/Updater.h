@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <flash_utils.h>
 #include <MD5Builder.h>
+#include <functional>
 
 #define UPDATE_ERROR_OK                 (0)
 #define UPDATE_ERROR_WRITE              (1)
@@ -17,6 +18,7 @@
 #define UPDATE_ERROR_NEW_FLASH_CONFIG   (9)
 #define UPDATE_ERROR_MAGIC_BYTE         (10)
 #define UPDATE_ERROR_BOOTSTRAP          (11)
+#define UPDATE_ERROR_SIGN               (12)
 
 #define U_FLASH   0
 #define U_SPIFFS  100
@@ -28,9 +30,32 @@
 #endif
 #endif
 
+// Abstract class to implement whatever signing hash desired
+class UpdaterHashClass {
+  public:
+    virtual void begin() = 0;
+    virtual void add(const void *data, uint32_t len) = 0;
+    virtual void end() = 0;
+    virtual int len() = 0;
+    virtual const void *hash() = 0;
+};
+
+// Abstract class to implement a signature verifier
+class UpdaterVerifyClass {
+  public:
+    virtual uint32_t length() = 0; // How many bytes of signature are expected
+    virtual bool verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) = 0; // Verify, return "true" on success
+};
+
 class UpdaterClass {
   public:
+    typedef std::function<void(size_t, size_t)> THandlerFunction_Progress;
+  
     UpdaterClass();
+
+    /* Optionally add a cryptographic signature verification hash and method */
+    void installSignature(UpdaterHashClass *hash, UpdaterVerifyClass *verify) {  _hash = hash;  _verify = verify; }
+
     /*
       Call this to check the space needed for the update
       Will return false if there is not enough space
@@ -88,6 +113,11 @@ class UpdaterClass {
       populated the result with the md5 bytes of the sucessfully ended firmware
     */
     void md5(uint8_t * result){ return _md5.getBytes(result); }
+
+    /*
+      This callback will be called when Updater is receiving data
+    */
+    UpdaterClass& onProgress(THandlerFunction_Progress fn);
 
     //Helpers
     uint8_t getError(){ return _error; }
@@ -165,6 +195,12 @@ class UpdaterClass {
 
     int _ledPin;
     uint8_t _ledOn;
+
+    // Optional signed binary verification
+    UpdaterHashClass *_hash;
+    UpdaterVerifyClass *_verify;
+    // Optional progress callback function
+    THandlerFunction_Progress _progress_callback;
 };
 
 extern UpdaterClass Update;

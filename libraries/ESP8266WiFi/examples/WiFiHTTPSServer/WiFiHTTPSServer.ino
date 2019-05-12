@@ -43,8 +43,13 @@
 
 #include <ESP8266WiFi.h>
 
-const char* ssid = "your-ssid";
-const char* password = "your-password";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* password = STAPSK;
 
 // The certificate is stored in PMEM
 static const uint8_t x509[] PROGMEM = {
@@ -114,7 +119,6 @@ WiFiServerSecure server(443);
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
 
   // prepare GPIO2
   pinMode(2, OUTPUT);

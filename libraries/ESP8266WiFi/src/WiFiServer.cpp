@@ -35,9 +35,9 @@ extern "C" {
 #include "lwip/opt.h"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
-#include "include/ClientContext.h"
+#include <include/ClientContext.h>
 
-WiFiServer::WiFiServer(IPAddress addr, uint16_t port)
+WiFiServer::WiFiServer(const IPAddress& addr, uint16_t port)
 : _port(port)
 , _addr(addr)
 , _pcb(nullptr)
@@ -48,7 +48,7 @@ WiFiServer::WiFiServer(IPAddress addr, uint16_t port)
 
 WiFiServer::WiFiServer(uint16_t port)
 : _port(port)
-, _addr((uint32_t) IPADDR_ANY)
+, _addr(IP_ANY_TYPE)
 , _pcb(nullptr)
 , _unclaimed(nullptr)
 , _discarded(nullptr)
@@ -61,16 +61,16 @@ void WiFiServer::begin() {
 
 void WiFiServer::begin(uint16_t port) {
     close();
-	_port = port;
+    _port = port;
     err_t err;
     tcp_pcb* pcb = tcp_new();
     if (!pcb)
         return;
 
-    ip_addr_t local_addr;
-    local_addr.addr = (uint32_t) _addr;
     pcb->so_options |= SOF_REUSEADDR;
-    err = tcp_bind(pcb, &local_addr, _port);
+
+    // (IPAddress _addr) operator-converted to (const ip_addr_t*)
+    err = tcp_bind(pcb, _addr, _port);
 
     if (err != ERR_OK) {
         tcp_close(pcb);

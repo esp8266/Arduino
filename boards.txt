@@ -17,8 +17,11 @@ menu.dbg=Debug port
 menu.lvl=Debug Level
 menu.ip=lwIP Variant
 menu.vt=VTables
+menu.exception=Exceptions
 menu.led=Builtin Led
 menu.wipe=Erase Flash
+menu.sdk=Espressif FW
+menu.ssl=SSL Support
 
 ##############################################################
 generic.name=Generic ESP8266 Module
@@ -26,7 +29,7 @@ generic.build.board=ESP8266_GENERIC
 generic.upload.tool=esptool
 generic.upload.maximum_data_size=81920
 generic.upload.wait_for_upload_port=true
-generic.upload.erase_cmd=
+generic.upload.erase_cmd=version
 generic.serial.disableDTR=true
 generic.serial.disableRTS=true
 generic.build.mcu=esp8266
@@ -45,6 +48,16 @@ generic.menu.vt.heap=Heap
 generic.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 generic.menu.vt.iram=IRAM
 generic.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+generic.menu.exception.disabled=Disabled
+generic.menu.exception.disabled.build.exception_flags=-fno-exceptions
+generic.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+generic.menu.exception.enabled=Enabled
+generic.menu.exception.enabled.build.exception_flags=-fexceptions
+generic.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+generic.menu.ssl.all=All SSL ciphers (most compatible)
+generic.menu.ssl.all.build.sslflags=
+generic.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+generic.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 generic.menu.ResetMethod.ck=ck
 generic.menu.ResetMethod.ck.upload.resetmethod=ck
 generic.menu.ResetMethod.nodemcu=nodemcu
@@ -60,14 +73,18 @@ generic.menu.FlashFreq.40=40MHz
 generic.menu.FlashFreq.40.build.flash_freq=40
 generic.menu.FlashFreq.80=80MHz
 generic.menu.FlashFreq.80.build.flash_freq=80
-generic.menu.FlashMode.qio=QIO
-generic.menu.FlashMode.qio.build.flash_mode=qio
-generic.menu.FlashMode.qout=QOUT
-generic.menu.FlashMode.qout.build.flash_mode=qout
+generic.menu.FlashMode.dout=DOUT (compatible)
+generic.menu.FlashMode.dout.build.flash_mode=dout
+generic.menu.FlashMode.dout.build.flash_flags=-DFLASHMODE_DOUT
 generic.menu.FlashMode.dio=DIO
 generic.menu.FlashMode.dio.build.flash_mode=dio
-generic.menu.FlashMode.dout=DOUT
-generic.menu.FlashMode.dout.build.flash_mode=dout
+generic.menu.FlashMode.dio.build.flash_flags=-DFLASHMODE_DIO
+generic.menu.FlashMode.qout=QOUT
+generic.menu.FlashMode.qout.build.flash_mode=qout
+generic.menu.FlashMode.qout.build.flash_flags=-DFLASHMODE_QOUT
+generic.menu.FlashMode.qio=QIO (fast)
+generic.menu.FlashMode.qio.build.flash_mode=qio
+generic.menu.FlashMode.qio.build.flash_flags=-DFLASHMODE_QIO
 generic.menu.eesz.512K=512K (no SPIFFS)
 generic.menu.eesz.512K.build.flash_size=512K
 generic.menu.eesz.512K.build.flash_size_bytes=0x80000
@@ -189,6 +206,26 @@ generic.menu.eesz.2M.build.flash_ld=eagle.flash.2m.ld
 generic.menu.eesz.2M.build.spiffs_pagesize=256
 generic.menu.eesz.2M.upload.maximum_size=1044464
 generic.menu.eesz.2M.build.rfcal_addr=0x1FC000
+generic.menu.eesz.2M128=2M (128K SPIFFS)
+generic.menu.eesz.2M128.build.flash_size=2M
+generic.menu.eesz.2M128.build.flash_size_bytes=0x200000
+generic.menu.eesz.2M128.build.flash_ld=eagle.flash.2m128.ld
+generic.menu.eesz.2M128.build.spiffs_pagesize=256
+generic.menu.eesz.2M128.upload.maximum_size=1044464
+generic.menu.eesz.2M128.build.rfcal_addr=0x1FC000
+generic.menu.eesz.2M128.build.spiffs_start=0x1E0000
+generic.menu.eesz.2M128.build.spiffs_end=0x1FB000
+generic.menu.eesz.2M128.build.spiffs_blocksize=4096
+generic.menu.eesz.2M256=2M (256K SPIFFS)
+generic.menu.eesz.2M256.build.flash_size=2M
+generic.menu.eesz.2M256.build.flash_size_bytes=0x200000
+generic.menu.eesz.2M256.build.flash_ld=eagle.flash.2m256.ld
+generic.menu.eesz.2M256.build.spiffs_pagesize=256
+generic.menu.eesz.2M256.upload.maximum_size=1044464
+generic.menu.eesz.2M256.build.rfcal_addr=0x1FC000
+generic.menu.eesz.2M256.build.spiffs_start=0x1C0000
+generic.menu.eesz.2M256.build.spiffs_end=0x1FB000
+generic.menu.eesz.2M256.build.spiffs_blocksize=4096
 generic.menu.eesz.2M512=2M (512K SPIFFS)
 generic.menu.eesz.2M512.build.flash_size=2M
 generic.menu.eesz.2M512.build.flash_size_bytes=0x200000
@@ -318,14 +355,36 @@ generic.menu.led.14=14
 generic.menu.led.14.build.led=-DLED_BUILTIN=14
 generic.menu.led.15=15
 generic.menu.led.15.build.led=-DLED_BUILTIN=15
-generic.menu.ip.lm2=v2 Lower Memory
-generic.menu.ip.lm2.build.lwip_include=lwip2/include
-generic.menu.ip.lm2.build.lwip_lib=-llwip2
-generic.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-generic.menu.ip.hb2=v2 Higher Bandwidth
-generic.menu.ip.hb2.build.lwip_include=lwip2/include
-generic.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-generic.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+generic.menu.sdk.nonosdk221=nonos-sdk 2.2.1 (legacy)
+generic.menu.sdk.nonosdk221.build.sdk=NONOSDK221
+generic.menu.sdk.nonosdk222=nonos-sdk 2.2.2-190313 (testing)
+generic.menu.sdk.nonosdk222.build.sdk=NONOSDK22x
+generic.menu.sdk.nonosdk3v0=nonos-sdk pre-3 (known issues)
+generic.menu.sdk.nonosdk3v0.build.sdk=NONOSDK3V0
+generic.menu.ip.lm2f=v2 Lower Memory
+generic.menu.ip.lm2f.build.lwip_include=lwip2/include
+generic.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+generic.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+generic.menu.ip.hb2f=v2 Higher Bandwidth
+generic.menu.ip.hb2f.build.lwip_include=lwip2/include
+generic.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+generic.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+generic.menu.ip.lm2n=v2 Lower Memory (no features)
+generic.menu.ip.lm2n.build.lwip_include=lwip2/include
+generic.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+generic.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+generic.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+generic.menu.ip.hb2n.build.lwip_include=lwip2/include
+generic.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+generic.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+generic.menu.ip.lm6f=v2 IPv6 Lower Memory
+generic.menu.ip.lm6f.build.lwip_include=lwip2/include
+generic.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+generic.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+generic.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+generic.menu.ip.hb6f.build.lwip_include=lwip2/include
+generic.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+generic.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 generic.menu.ip.hb1=v1.4 Higher Bandwidth
 generic.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 generic.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -390,11 +449,11 @@ generic.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOO
 generic.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 generic.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 generic.menu.wipe.none=Only Sketch
-generic.menu.wipe.none.upload.erase_cmd=
+generic.menu.wipe.none.upload.erase_cmd=version
 generic.menu.wipe.sdk=Sketch + WiFi Settings
-generic.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+generic.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 generic.menu.wipe.all=All Flash Contents
-generic.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+generic.menu.wipe.all.upload.erase_cmd=erase_flash
 generic.menu.baud.115200=115200
 generic.menu.baud.115200.upload.speed=115200
 generic.menu.baud.9600=9600
@@ -421,7 +480,7 @@ esp8285.build.variant=esp8285
 esp8285.upload.tool=esptool
 esp8285.upload.maximum_data_size=81920
 esp8285.upload.wait_for_upload_port=true
-esp8285.upload.erase_cmd=
+esp8285.upload.erase_cmd=version
 esp8285.serial.disableDTR=true
 esp8285.serial.disableRTS=true
 esp8285.build.mcu=esp8266
@@ -439,6 +498,16 @@ esp8285.menu.vt.heap=Heap
 esp8285.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 esp8285.menu.vt.iram=IRAM
 esp8285.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+esp8285.menu.exception.disabled=Disabled
+esp8285.menu.exception.disabled.build.exception_flags=-fno-exceptions
+esp8285.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+esp8285.menu.exception.enabled=Enabled
+esp8285.menu.exception.enabled.build.exception_flags=-fexceptions
+esp8285.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+esp8285.menu.ssl.all=All SSL ciphers (most compatible)
+esp8285.menu.ssl.all.build.sslflags=
+esp8285.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+esp8285.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 esp8285.menu.ResetMethod.ck=ck
 esp8285.menu.ResetMethod.ck.upload.resetmethod=ck
 esp8285.menu.ResetMethod.nodemcu=nodemcu
@@ -451,6 +520,7 @@ esp8285.menu.CrystalFreq.26=26 MHz
 esp8285.menu.CrystalFreq.40=40 MHz
 esp8285.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
 esp8285.build.flash_mode=dout
+esp8285.build.flash_flags=-DFLASHMODE_DOUT
 esp8285.build.flash_freq=40
 esp8285.menu.eesz.1M=1M (no SPIFFS)
 esp8285.menu.eesz.1M.build.flash_size=1M
@@ -561,14 +631,30 @@ esp8285.menu.led.14=14
 esp8285.menu.led.14.build.led=-DLED_BUILTIN=14
 esp8285.menu.led.15=15
 esp8285.menu.led.15.build.led=-DLED_BUILTIN=15
-esp8285.menu.ip.lm2=v2 Lower Memory
-esp8285.menu.ip.lm2.build.lwip_include=lwip2/include
-esp8285.menu.ip.lm2.build.lwip_lib=-llwip2
-esp8285.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-esp8285.menu.ip.hb2=v2 Higher Bandwidth
-esp8285.menu.ip.hb2.build.lwip_include=lwip2/include
-esp8285.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-esp8285.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+esp8285.menu.ip.lm2f=v2 Lower Memory
+esp8285.menu.ip.lm2f.build.lwip_include=lwip2/include
+esp8285.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+esp8285.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+esp8285.menu.ip.hb2f=v2 Higher Bandwidth
+esp8285.menu.ip.hb2f.build.lwip_include=lwip2/include
+esp8285.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+esp8285.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+esp8285.menu.ip.lm2n=v2 Lower Memory (no features)
+esp8285.menu.ip.lm2n.build.lwip_include=lwip2/include
+esp8285.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+esp8285.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+esp8285.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+esp8285.menu.ip.hb2n.build.lwip_include=lwip2/include
+esp8285.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+esp8285.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+esp8285.menu.ip.lm6f=v2 IPv6 Lower Memory
+esp8285.menu.ip.lm6f.build.lwip_include=lwip2/include
+esp8285.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+esp8285.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+esp8285.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+esp8285.menu.ip.hb6f.build.lwip_include=lwip2/include
+esp8285.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+esp8285.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 esp8285.menu.ip.hb1=v1.4 Higher Bandwidth
 esp8285.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 esp8285.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -633,11 +719,11 @@ esp8285.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOO
 esp8285.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 esp8285.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 esp8285.menu.wipe.none=Only Sketch
-esp8285.menu.wipe.none.upload.erase_cmd=
+esp8285.menu.wipe.none.upload.erase_cmd=version
 esp8285.menu.wipe.sdk=Sketch + WiFi Settings
-esp8285.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+esp8285.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 esp8285.menu.wipe.all=All Flash Contents
-esp8285.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+esp8285.menu.wipe.all.upload.erase_cmd=erase_flash
 esp8285.menu.baud.115200=115200
 esp8285.menu.baud.115200.upload.speed=115200
 esp8285.menu.baud.9600=9600
@@ -673,7 +759,7 @@ espduino.menu.UploadTool.espota.upload.tool=espota
 espduino.upload.tool=esptool
 espduino.upload.maximum_data_size=81920
 espduino.upload.wait_for_upload_port=true
-espduino.upload.erase_cmd=
+espduino.upload.erase_cmd=version
 espduino.serial.disableDTR=true
 espduino.serial.disableRTS=true
 espduino.build.mcu=esp8266
@@ -691,7 +777,18 @@ espduino.menu.vt.heap=Heap
 espduino.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 espduino.menu.vt.iram=IRAM
 espduino.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+espduino.menu.exception.disabled=Disabled
+espduino.menu.exception.disabled.build.exception_flags=-fno-exceptions
+espduino.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+espduino.menu.exception.enabled=Enabled
+espduino.menu.exception.enabled.build.exception_flags=-fexceptions
+espduino.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+espduino.menu.ssl.all=All SSL ciphers (most compatible)
+espduino.menu.ssl.all.build.sslflags=
+espduino.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+espduino.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espduino.build.flash_mode=dio
+espduino.build.flash_flags=-DFLASHMODE_DIO
 espduino.build.flash_freq=40
 espduino.menu.eesz.4M=4M (no SPIFFS)
 espduino.menu.eesz.4M.build.flash_size=4M
@@ -730,14 +827,30 @@ espduino.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 espduino.menu.eesz.4M3M.build.spiffs_start=0x100000
 espduino.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 espduino.menu.eesz.4M3M.build.spiffs_blocksize=8192
-espduino.menu.ip.lm2=v2 Lower Memory
-espduino.menu.ip.lm2.build.lwip_include=lwip2/include
-espduino.menu.ip.lm2.build.lwip_lib=-llwip2
-espduino.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espduino.menu.ip.hb2=v2 Higher Bandwidth
-espduino.menu.ip.hb2.build.lwip_include=lwip2/include
-espduino.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espduino.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espduino.menu.ip.lm2f=v2 Lower Memory
+espduino.menu.ip.lm2f.build.lwip_include=lwip2/include
+espduino.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+espduino.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espduino.menu.ip.hb2f=v2 Higher Bandwidth
+espduino.menu.ip.hb2f.build.lwip_include=lwip2/include
+espduino.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+espduino.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espduino.menu.ip.lm2n=v2 Lower Memory (no features)
+espduino.menu.ip.lm2n.build.lwip_include=lwip2/include
+espduino.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espduino.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espduino.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+espduino.menu.ip.hb2n.build.lwip_include=lwip2/include
+espduino.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espduino.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espduino.menu.ip.lm6f=v2 IPv6 Lower Memory
+espduino.menu.ip.lm6f.build.lwip_include=lwip2/include
+espduino.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+espduino.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+espduino.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+espduino.menu.ip.hb6f.build.lwip_include=lwip2/include
+espduino.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+espduino.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 espduino.menu.ip.hb1=v1.4 Higher Bandwidth
 espduino.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espduino.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -802,11 +915,11 @@ espduino.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAO
 espduino.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 espduino.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espduino.menu.wipe.none=Only Sketch
-espduino.menu.wipe.none.upload.erase_cmd=
+espduino.menu.wipe.none.upload.erase_cmd=version
 espduino.menu.wipe.sdk=Sketch + WiFi Settings
-espduino.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espduino.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 espduino.menu.wipe.all=All Flash Contents
-espduino.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+espduino.menu.wipe.all.upload.erase_cmd=erase_flash
 espduino.menu.baud.115200=115200
 espduino.menu.baud.115200.upload.speed=115200
 espduino.menu.baud.9600=9600
@@ -833,7 +946,7 @@ huzzah.build.variant=adafruit
 huzzah.upload.tool=esptool
 huzzah.upload.maximum_data_size=81920
 huzzah.upload.wait_for_upload_port=true
-huzzah.upload.erase_cmd=
+huzzah.upload.erase_cmd=version
 huzzah.serial.disableDTR=true
 huzzah.serial.disableRTS=true
 huzzah.build.mcu=esp8266
@@ -851,8 +964,19 @@ huzzah.menu.vt.heap=Heap
 huzzah.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 huzzah.menu.vt.iram=IRAM
 huzzah.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+huzzah.menu.exception.disabled=Disabled
+huzzah.menu.exception.disabled.build.exception_flags=-fno-exceptions
+huzzah.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+huzzah.menu.exception.enabled=Enabled
+huzzah.menu.exception.enabled.build.exception_flags=-fexceptions
+huzzah.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+huzzah.menu.ssl.all=All SSL ciphers (most compatible)
+huzzah.menu.ssl.all.build.sslflags=
+huzzah.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+huzzah.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 huzzah.upload.resetmethod=nodemcu
 huzzah.build.flash_mode=qio
+huzzah.build.flash_flags=-DFLASHMODE_QIO
 huzzah.build.flash_freq=40
 huzzah.menu.eesz.4M=4M (no SPIFFS)
 huzzah.menu.eesz.4M.build.flash_size=4M
@@ -891,14 +1015,30 @@ huzzah.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 huzzah.menu.eesz.4M3M.build.spiffs_start=0x100000
 huzzah.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 huzzah.menu.eesz.4M3M.build.spiffs_blocksize=8192
-huzzah.menu.ip.lm2=v2 Lower Memory
-huzzah.menu.ip.lm2.build.lwip_include=lwip2/include
-huzzah.menu.ip.lm2.build.lwip_lib=-llwip2
-huzzah.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-huzzah.menu.ip.hb2=v2 Higher Bandwidth
-huzzah.menu.ip.hb2.build.lwip_include=lwip2/include
-huzzah.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-huzzah.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+huzzah.menu.ip.lm2f=v2 Lower Memory
+huzzah.menu.ip.lm2f.build.lwip_include=lwip2/include
+huzzah.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+huzzah.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+huzzah.menu.ip.hb2f=v2 Higher Bandwidth
+huzzah.menu.ip.hb2f.build.lwip_include=lwip2/include
+huzzah.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+huzzah.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+huzzah.menu.ip.lm2n=v2 Lower Memory (no features)
+huzzah.menu.ip.lm2n.build.lwip_include=lwip2/include
+huzzah.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+huzzah.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+huzzah.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+huzzah.menu.ip.hb2n.build.lwip_include=lwip2/include
+huzzah.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+huzzah.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+huzzah.menu.ip.lm6f=v2 IPv6 Lower Memory
+huzzah.menu.ip.lm6f.build.lwip_include=lwip2/include
+huzzah.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+huzzah.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+huzzah.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+huzzah.menu.ip.hb6f.build.lwip_include=lwip2/include
+huzzah.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+huzzah.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 huzzah.menu.ip.hb1=v1.4 Higher Bandwidth
 huzzah.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 huzzah.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -963,11 +1103,11 @@ huzzah.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM
 huzzah.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 huzzah.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 huzzah.menu.wipe.none=Only Sketch
-huzzah.menu.wipe.none.upload.erase_cmd=
+huzzah.menu.wipe.none.upload.erase_cmd=version
 huzzah.menu.wipe.sdk=Sketch + WiFi Settings
-huzzah.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+huzzah.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 huzzah.menu.wipe.all=All Flash Contents
-huzzah.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+huzzah.menu.wipe.all.upload.erase_cmd=erase_flash
 huzzah.menu.baud.115200=115200
 huzzah.menu.baud.115200.upload.speed=115200
 huzzah.menu.baud.9600=9600
@@ -988,13 +1128,201 @@ huzzah.menu.baud.921600=921600
 huzzah.menu.baud.921600.upload.speed=921600
 
 ##############################################################
+inventone.name=Invent One
+inventone.build.board=ESP8266_GENERIC
+inventone.build.variant=inventone
+inventone.upload.tool=esptool
+inventone.upload.maximum_data_size=81920
+inventone.upload.wait_for_upload_port=true
+inventone.upload.erase_cmd=version
+inventone.serial.disableDTR=true
+inventone.serial.disableRTS=true
+inventone.build.mcu=esp8266
+inventone.build.core=esp8266
+inventone.build.spiffs_pagesize=256
+inventone.build.debug_port=
+inventone.build.debug_level=
+inventone.menu.xtal.80=80 MHz
+inventone.menu.xtal.80.build.f_cpu=80000000L
+inventone.menu.xtal.160=160 MHz
+inventone.menu.xtal.160.build.f_cpu=160000000L
+inventone.menu.vt.flash=Flash
+inventone.menu.vt.flash.build.vtable_flags=-DVTABLES_IN_FLASH
+inventone.menu.vt.heap=Heap
+inventone.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
+inventone.menu.vt.iram=IRAM
+inventone.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+inventone.menu.exception.disabled=Disabled
+inventone.menu.exception.disabled.build.exception_flags=-fno-exceptions
+inventone.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+inventone.menu.exception.enabled=Enabled
+inventone.menu.exception.enabled.build.exception_flags=-fexceptions
+inventone.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+inventone.menu.ssl.all=All SSL ciphers (most compatible)
+inventone.menu.ssl.all.build.sslflags=
+inventone.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+inventone.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+inventone.upload.resetmethod=nodemcu
+inventone.build.flash_mode=dio
+inventone.build.flash_flags=-DFLASHMODE_DIO
+inventone.build.flash_freq=40
+inventone.menu.eesz.4M=4M (no SPIFFS)
+inventone.menu.eesz.4M.build.flash_size=4M
+inventone.menu.eesz.4M.build.flash_size_bytes=0x400000
+inventone.menu.eesz.4M.build.flash_ld=eagle.flash.4m.ld
+inventone.menu.eesz.4M.build.spiffs_pagesize=256
+inventone.menu.eesz.4M.upload.maximum_size=1044464
+inventone.menu.eesz.4M.build.rfcal_addr=0x3FC000
+inventone.menu.eesz.4M1M=4M (1M SPIFFS)
+inventone.menu.eesz.4M1M.build.flash_size=4M
+inventone.menu.eesz.4M1M.build.flash_size_bytes=0x400000
+inventone.menu.eesz.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+inventone.menu.eesz.4M1M.build.spiffs_pagesize=256
+inventone.menu.eesz.4M1M.upload.maximum_size=1044464
+inventone.menu.eesz.4M1M.build.rfcal_addr=0x3FC000
+inventone.menu.eesz.4M1M.build.spiffs_start=0x300000
+inventone.menu.eesz.4M1M.build.spiffs_end=0x3FB000
+inventone.menu.eesz.4M1M.build.spiffs_blocksize=8192
+inventone.menu.eesz.4M2M=4M (2M SPIFFS)
+inventone.menu.eesz.4M2M.build.flash_size=4M
+inventone.menu.eesz.4M2M.build.flash_size_bytes=0x400000
+inventone.menu.eesz.4M2M.build.flash_ld=eagle.flash.4m2m.ld
+inventone.menu.eesz.4M2M.build.spiffs_pagesize=256
+inventone.menu.eesz.4M2M.upload.maximum_size=1044464
+inventone.menu.eesz.4M2M.build.rfcal_addr=0x3FC000
+inventone.menu.eesz.4M2M.build.spiffs_start=0x200000
+inventone.menu.eesz.4M2M.build.spiffs_end=0x3FB000
+inventone.menu.eesz.4M2M.build.spiffs_blocksize=8192
+inventone.menu.eesz.4M3M=4M (3M SPIFFS)
+inventone.menu.eesz.4M3M.build.flash_size=4M
+inventone.menu.eesz.4M3M.build.flash_size_bytes=0x400000
+inventone.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
+inventone.menu.eesz.4M3M.build.spiffs_pagesize=256
+inventone.menu.eesz.4M3M.upload.maximum_size=1044464
+inventone.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
+inventone.menu.eesz.4M3M.build.spiffs_start=0x100000
+inventone.menu.eesz.4M3M.build.spiffs_end=0x3FB000
+inventone.menu.eesz.4M3M.build.spiffs_blocksize=8192
+inventone.menu.ip.lm2f=v2 Lower Memory
+inventone.menu.ip.lm2f.build.lwip_include=lwip2/include
+inventone.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+inventone.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+inventone.menu.ip.hb2f=v2 Higher Bandwidth
+inventone.menu.ip.hb2f.build.lwip_include=lwip2/include
+inventone.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+inventone.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+inventone.menu.ip.lm2n=v2 Lower Memory (no features)
+inventone.menu.ip.lm2n.build.lwip_include=lwip2/include
+inventone.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+inventone.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+inventone.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+inventone.menu.ip.hb2n.build.lwip_include=lwip2/include
+inventone.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+inventone.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+inventone.menu.ip.lm6f=v2 IPv6 Lower Memory
+inventone.menu.ip.lm6f.build.lwip_include=lwip2/include
+inventone.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+inventone.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+inventone.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+inventone.menu.ip.hb6f.build.lwip_include=lwip2/include
+inventone.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+inventone.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+inventone.menu.ip.hb1=v1.4 Higher Bandwidth
+inventone.menu.ip.hb1.build.lwip_lib=-llwip_gcc
+inventone.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
+inventone.menu.ip.src=v1.4 Compile from source
+inventone.menu.ip.src.build.lwip_lib=-llwip_src
+inventone.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
+inventone.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
+inventone.menu.dbg.Disabled=Disabled
+inventone.menu.dbg.Disabled.build.debug_port=
+inventone.menu.dbg.Serial=Serial
+inventone.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+inventone.menu.dbg.Serial1=Serial1
+inventone.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+inventone.menu.lvl.None____=None
+inventone.menu.lvl.None____.build.debug_level=
+inventone.menu.lvl.SSL=SSL
+inventone.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
+inventone.menu.lvl.TLS_MEM=TLS_MEM
+inventone.menu.lvl.TLS_MEM.build.debug_level= -DDEBUG_ESP_TLS_MEM
+inventone.menu.lvl.HTTP_CLIENT=HTTP_CLIENT
+inventone.menu.lvl.HTTP_CLIENT.build.debug_level= -DDEBUG_ESP_HTTP_CLIENT
+inventone.menu.lvl.HTTP_SERVER=HTTP_SERVER
+inventone.menu.lvl.HTTP_SERVER.build.debug_level= -DDEBUG_ESP_HTTP_SERVER
+inventone.menu.lvl.SSLTLS_MEM=SSL+TLS_MEM
+inventone.menu.lvl.SSLTLS_MEM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM
+inventone.menu.lvl.SSLHTTP_CLIENT=SSL+HTTP_CLIENT
+inventone.menu.lvl.SSLHTTP_CLIENT.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_HTTP_CLIENT
+inventone.menu.lvl.SSLHTTP_SERVER=SSL+HTTP_SERVER
+inventone.menu.lvl.SSLHTTP_SERVER.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_HTTP_SERVER
+inventone.menu.lvl.TLS_MEMHTTP_CLIENT=TLS_MEM+HTTP_CLIENT
+inventone.menu.lvl.TLS_MEMHTTP_CLIENT.build.debug_level= -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT
+inventone.menu.lvl.TLS_MEMHTTP_SERVER=TLS_MEM+HTTP_SERVER
+inventone.menu.lvl.TLS_MEMHTTP_SERVER.build.debug_level= -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_SERVER
+inventone.menu.lvl.HTTP_CLIENTHTTP_SERVER=HTTP_CLIENT+HTTP_SERVER
+inventone.menu.lvl.HTTP_CLIENTHTTP_SERVER.build.debug_level= -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER
+inventone.menu.lvl.SSLTLS_MEMHTTP_CLIENT=SSL+TLS_MEM+HTTP_CLIENT
+inventone.menu.lvl.SSLTLS_MEMHTTP_CLIENT.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT
+inventone.menu.lvl.SSLTLS_MEMHTTP_SERVER=SSL+TLS_MEM+HTTP_SERVER
+inventone.menu.lvl.SSLTLS_MEMHTTP_SERVER.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_SERVER
+inventone.menu.lvl.SSLHTTP_CLIENTHTTP_SERVER=SSL+HTTP_CLIENT+HTTP_SERVER
+inventone.menu.lvl.SSLHTTP_CLIENTHTTP_SERVER.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER
+inventone.menu.lvl.TLS_MEMHTTP_CLIENTHTTP_SERVER=TLS_MEM+HTTP_CLIENT+HTTP_SERVER
+inventone.menu.lvl.TLS_MEMHTTP_CLIENTHTTP_SERVER.build.debug_level= -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER
+inventone.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVER=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER
+inventone.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVER.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER
+inventone.menu.lvl.CORE=CORE
+inventone.menu.lvl.CORE.build.debug_level= -DDEBUG_ESP_CORE
+inventone.menu.lvl.WIFI=WIFI
+inventone.menu.lvl.WIFI.build.debug_level= -DDEBUG_ESP_WIFI
+inventone.menu.lvl.HTTP_UPDATE=HTTP_UPDATE
+inventone.menu.lvl.HTTP_UPDATE.build.debug_level= -DDEBUG_ESP_HTTP_UPDATE
+inventone.menu.lvl.UPDATER=UPDATER
+inventone.menu.lvl.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
+inventone.menu.lvl.OTA=OTA
+inventone.menu.lvl.OTA.build.debug_level= -DDEBUG_ESP_OTA
+inventone.menu.lvl.OOM=OOM
+inventone.menu.lvl.OOM.build.debug_level= -DDEBUG_ESP_OOM
+inventone.menu.lvl.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+inventone.menu.lvl.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM
+inventone.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+inventone.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM
+inventone.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
+inventone.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+inventone.menu.wipe.none=Only Sketch
+inventone.menu.wipe.none.upload.erase_cmd=version
+inventone.menu.wipe.sdk=Sketch + WiFi Settings
+inventone.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
+inventone.menu.wipe.all=All Flash Contents
+inventone.menu.wipe.all.upload.erase_cmd=erase_flash
+inventone.menu.baud.115200=115200
+inventone.menu.baud.115200.upload.speed=115200
+inventone.menu.baud.9600=9600
+inventone.menu.baud.9600.upload.speed=9600
+inventone.menu.baud.57600=57600
+inventone.menu.baud.57600.upload.speed=57600
+inventone.menu.baud.230400.linux=230400
+inventone.menu.baud.230400.macosx=230400
+inventone.menu.baud.230400.upload.speed=230400
+inventone.menu.baud.256000.windows=256000
+inventone.menu.baud.256000.upload.speed=256000
+inventone.menu.baud.460800.linux=460800
+inventone.menu.baud.460800.macosx=460800
+inventone.menu.baud.460800.upload.speed=460800
+inventone.menu.baud.512000.windows=512000
+inventone.menu.baud.512000.upload.speed=512000
+inventone.menu.baud.921600=921600
+inventone.menu.baud.921600.upload.speed=921600
+
+##############################################################
 cw01.name=XinaBox CW01
 cw01.build.board=ESP8266_GENERIC
 cw01.build.variant=xinabox
 cw01.upload.tool=esptool
 cw01.upload.maximum_data_size=81920
 cw01.upload.wait_for_upload_port=true
-cw01.upload.erase_cmd=
+cw01.upload.erase_cmd=version
 cw01.serial.disableDTR=true
 cw01.serial.disableRTS=true
 cw01.build.mcu=esp8266
@@ -1012,11 +1340,22 @@ cw01.menu.vt.heap=Heap
 cw01.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 cw01.menu.vt.iram=IRAM
 cw01.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+cw01.menu.exception.disabled=Disabled
+cw01.menu.exception.disabled.build.exception_flags=-fno-exceptions
+cw01.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+cw01.menu.exception.enabled=Enabled
+cw01.menu.exception.enabled.build.exception_flags=-fexceptions
+cw01.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+cw01.menu.ssl.all=All SSL ciphers (most compatible)
+cw01.menu.ssl.all.build.sslflags=
+cw01.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+cw01.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 cw01.upload.resetmethod=nodemcu
 cw01.menu.CrystalFreq.26=26 MHz
 cw01.menu.CrystalFreq.40=40 MHz
 cw01.menu.CrystalFreq.40.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-cw01.build.flash_mode=qio
+cw01.build.flash_mode=dio
+cw01.build.flash_flags=-DFLASHMODE_DIO
 cw01.build.flash_freq=40
 cw01.menu.eesz.4M=4M (no SPIFFS)
 cw01.menu.eesz.4M.build.flash_size=4M
@@ -1055,14 +1394,30 @@ cw01.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 cw01.menu.eesz.4M3M.build.spiffs_start=0x100000
 cw01.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 cw01.menu.eesz.4M3M.build.spiffs_blocksize=8192
-cw01.menu.ip.lm2=v2 Lower Memory
-cw01.menu.ip.lm2.build.lwip_include=lwip2/include
-cw01.menu.ip.lm2.build.lwip_lib=-llwip2
-cw01.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-cw01.menu.ip.hb2=v2 Higher Bandwidth
-cw01.menu.ip.hb2.build.lwip_include=lwip2/include
-cw01.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-cw01.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+cw01.menu.ip.lm2f=v2 Lower Memory
+cw01.menu.ip.lm2f.build.lwip_include=lwip2/include
+cw01.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+cw01.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+cw01.menu.ip.hb2f=v2 Higher Bandwidth
+cw01.menu.ip.hb2f.build.lwip_include=lwip2/include
+cw01.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+cw01.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+cw01.menu.ip.lm2n=v2 Lower Memory (no features)
+cw01.menu.ip.lm2n.build.lwip_include=lwip2/include
+cw01.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+cw01.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+cw01.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+cw01.menu.ip.hb2n.build.lwip_include=lwip2/include
+cw01.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+cw01.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+cw01.menu.ip.lm6f=v2 IPv6 Lower Memory
+cw01.menu.ip.lm6f.build.lwip_include=lwip2/include
+cw01.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+cw01.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+cw01.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+cw01.menu.ip.hb6f.build.lwip_include=lwip2/include
+cw01.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+cw01.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 cw01.menu.ip.hb1=v1.4 Higher Bandwidth
 cw01.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 cw01.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1127,11 +1482,11 @@ cw01.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.b
 cw01.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 cw01.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 cw01.menu.wipe.none=Only Sketch
-cw01.menu.wipe.none.upload.erase_cmd=
+cw01.menu.wipe.none.upload.erase_cmd=version
 cw01.menu.wipe.sdk=Sketch + WiFi Settings
-cw01.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+cw01.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 cw01.menu.wipe.all=All Flash Contents
-cw01.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+cw01.menu.wipe.all.upload.erase_cmd=erase_flash
 cw01.menu.baud.115200=115200
 cw01.menu.baud.115200.upload.speed=115200
 cw01.menu.baud.9600=9600
@@ -1158,7 +1513,7 @@ espresso_lite_v1.build.variant=espresso_lite_v1
 espresso_lite_v1.upload.tool=esptool
 espresso_lite_v1.upload.maximum_data_size=81920
 espresso_lite_v1.upload.wait_for_upload_port=true
-espresso_lite_v1.upload.erase_cmd=
+espresso_lite_v1.upload.erase_cmd=version
 espresso_lite_v1.serial.disableDTR=true
 espresso_lite_v1.serial.disableRTS=true
 espresso_lite_v1.build.mcu=esp8266
@@ -1176,7 +1531,18 @@ espresso_lite_v1.menu.vt.heap=Heap
 espresso_lite_v1.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 espresso_lite_v1.menu.vt.iram=IRAM
 espresso_lite_v1.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+espresso_lite_v1.menu.exception.disabled=Disabled
+espresso_lite_v1.menu.exception.disabled.build.exception_flags=-fno-exceptions
+espresso_lite_v1.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+espresso_lite_v1.menu.exception.enabled=Enabled
+espresso_lite_v1.menu.exception.enabled.build.exception_flags=-fexceptions
+espresso_lite_v1.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+espresso_lite_v1.menu.ssl.all=All SSL ciphers (most compatible)
+espresso_lite_v1.menu.ssl.all.build.sslflags=
+espresso_lite_v1.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+espresso_lite_v1.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espresso_lite_v1.build.flash_mode=dio
+espresso_lite_v1.build.flash_flags=-DFLASHMODE_DIO
 espresso_lite_v1.build.flash_freq=40
 espresso_lite_v1.menu.eesz.4M=4M (no SPIFFS)
 espresso_lite_v1.menu.eesz.4M.build.flash_size=4M
@@ -1219,14 +1585,30 @@ espresso_lite_v1.menu.ResetMethod.ck=ck
 espresso_lite_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v1.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v1.menu.ip.lm2=v2 Lower Memory
-espresso_lite_v1.menu.ip.lm2.build.lwip_include=lwip2/include
-espresso_lite_v1.menu.ip.lm2.build.lwip_lib=-llwip2
-espresso_lite_v1.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espresso_lite_v1.menu.ip.hb2=v2 Higher Bandwidth
-espresso_lite_v1.menu.ip.hb2.build.lwip_include=lwip2/include
-espresso_lite_v1.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espresso_lite_v1.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espresso_lite_v1.menu.ip.lm2f=v2 Lower Memory
+espresso_lite_v1.menu.ip.lm2f.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+espresso_lite_v1.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espresso_lite_v1.menu.ip.hb2f=v2 Higher Bandwidth
+espresso_lite_v1.menu.ip.hb2f.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+espresso_lite_v1.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espresso_lite_v1.menu.ip.lm2n=v2 Lower Memory (no features)
+espresso_lite_v1.menu.ip.lm2n.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espresso_lite_v1.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espresso_lite_v1.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+espresso_lite_v1.menu.ip.hb2n.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espresso_lite_v1.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espresso_lite_v1.menu.ip.lm6f=v2 IPv6 Lower Memory
+espresso_lite_v1.menu.ip.lm6f.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+espresso_lite_v1.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+espresso_lite_v1.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+espresso_lite_v1.menu.ip.hb6f.build.lwip_include=lwip2/include
+espresso_lite_v1.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+espresso_lite_v1.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 espresso_lite_v1.menu.ip.hb1=v1.4 Higher Bandwidth
 espresso_lite_v1.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espresso_lite_v1.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1291,11 +1673,11 @@ espresso_lite_v1.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPD
 espresso_lite_v1.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 espresso_lite_v1.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espresso_lite_v1.menu.wipe.none=Only Sketch
-espresso_lite_v1.menu.wipe.none.upload.erase_cmd=
+espresso_lite_v1.menu.wipe.none.upload.erase_cmd=version
 espresso_lite_v1.menu.wipe.sdk=Sketch + WiFi Settings
-espresso_lite_v1.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espresso_lite_v1.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 espresso_lite_v1.menu.wipe.all=All Flash Contents
-espresso_lite_v1.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+espresso_lite_v1.menu.wipe.all.upload.erase_cmd=erase_flash
 espresso_lite_v1.menu.baud.115200=115200
 espresso_lite_v1.menu.baud.115200.upload.speed=115200
 espresso_lite_v1.menu.baud.9600=9600
@@ -1322,7 +1704,7 @@ espresso_lite_v2.build.variant=espresso_lite_v2
 espresso_lite_v2.upload.tool=esptool
 espresso_lite_v2.upload.maximum_data_size=81920
 espresso_lite_v2.upload.wait_for_upload_port=true
-espresso_lite_v2.upload.erase_cmd=
+espresso_lite_v2.upload.erase_cmd=version
 espresso_lite_v2.serial.disableDTR=true
 espresso_lite_v2.serial.disableRTS=true
 espresso_lite_v2.build.mcu=esp8266
@@ -1340,7 +1722,18 @@ espresso_lite_v2.menu.vt.heap=Heap
 espresso_lite_v2.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 espresso_lite_v2.menu.vt.iram=IRAM
 espresso_lite_v2.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+espresso_lite_v2.menu.exception.disabled=Disabled
+espresso_lite_v2.menu.exception.disabled.build.exception_flags=-fno-exceptions
+espresso_lite_v2.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+espresso_lite_v2.menu.exception.enabled=Enabled
+espresso_lite_v2.menu.exception.enabled.build.exception_flags=-fexceptions
+espresso_lite_v2.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+espresso_lite_v2.menu.ssl.all=All SSL ciphers (most compatible)
+espresso_lite_v2.menu.ssl.all.build.sslflags=
+espresso_lite_v2.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+espresso_lite_v2.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espresso_lite_v2.build.flash_mode=dio
+espresso_lite_v2.build.flash_flags=-DFLASHMODE_DIO
 espresso_lite_v2.build.flash_freq=40
 espresso_lite_v2.menu.eesz.4M=4M (no SPIFFS)
 espresso_lite_v2.menu.eesz.4M.build.flash_size=4M
@@ -1383,14 +1776,30 @@ espresso_lite_v2.menu.ResetMethod.ck=ck
 espresso_lite_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 espresso_lite_v2.menu.ResetMethod.nodemcu=nodemcu
 espresso_lite_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-espresso_lite_v2.menu.ip.lm2=v2 Lower Memory
-espresso_lite_v2.menu.ip.lm2.build.lwip_include=lwip2/include
-espresso_lite_v2.menu.ip.lm2.build.lwip_lib=-llwip2
-espresso_lite_v2.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espresso_lite_v2.menu.ip.hb2=v2 Higher Bandwidth
-espresso_lite_v2.menu.ip.hb2.build.lwip_include=lwip2/include
-espresso_lite_v2.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espresso_lite_v2.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espresso_lite_v2.menu.ip.lm2f=v2 Lower Memory
+espresso_lite_v2.menu.ip.lm2f.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+espresso_lite_v2.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espresso_lite_v2.menu.ip.hb2f=v2 Higher Bandwidth
+espresso_lite_v2.menu.ip.hb2f.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+espresso_lite_v2.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espresso_lite_v2.menu.ip.lm2n=v2 Lower Memory (no features)
+espresso_lite_v2.menu.ip.lm2n.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espresso_lite_v2.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espresso_lite_v2.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+espresso_lite_v2.menu.ip.hb2n.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espresso_lite_v2.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espresso_lite_v2.menu.ip.lm6f=v2 IPv6 Lower Memory
+espresso_lite_v2.menu.ip.lm6f.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+espresso_lite_v2.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+espresso_lite_v2.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+espresso_lite_v2.menu.ip.hb6f.build.lwip_include=lwip2/include
+espresso_lite_v2.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+espresso_lite_v2.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 espresso_lite_v2.menu.ip.hb1=v1.4 Higher Bandwidth
 espresso_lite_v2.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espresso_lite_v2.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1455,11 +1864,11 @@ espresso_lite_v2.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPD
 espresso_lite_v2.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 espresso_lite_v2.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espresso_lite_v2.menu.wipe.none=Only Sketch
-espresso_lite_v2.menu.wipe.none.upload.erase_cmd=
+espresso_lite_v2.menu.wipe.none.upload.erase_cmd=version
 espresso_lite_v2.menu.wipe.sdk=Sketch + WiFi Settings
-espresso_lite_v2.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espresso_lite_v2.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 espresso_lite_v2.menu.wipe.all=All Flash Contents
-espresso_lite_v2.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+espresso_lite_v2.menu.wipe.all.upload.erase_cmd=erase_flash
 espresso_lite_v2.menu.baud.115200=115200
 espresso_lite_v2.menu.baud.115200.upload.speed=115200
 espresso_lite_v2.menu.baud.9600=9600
@@ -1486,7 +1895,7 @@ phoenix_v1.build.variant=phoenix_v1
 phoenix_v1.upload.tool=esptool
 phoenix_v1.upload.maximum_data_size=81920
 phoenix_v1.upload.wait_for_upload_port=true
-phoenix_v1.upload.erase_cmd=
+phoenix_v1.upload.erase_cmd=version
 phoenix_v1.serial.disableDTR=true
 phoenix_v1.serial.disableRTS=true
 phoenix_v1.build.mcu=esp8266
@@ -1504,7 +1913,18 @@ phoenix_v1.menu.vt.heap=Heap
 phoenix_v1.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 phoenix_v1.menu.vt.iram=IRAM
 phoenix_v1.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+phoenix_v1.menu.exception.disabled=Disabled
+phoenix_v1.menu.exception.disabled.build.exception_flags=-fno-exceptions
+phoenix_v1.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+phoenix_v1.menu.exception.enabled=Enabled
+phoenix_v1.menu.exception.enabled.build.exception_flags=-fexceptions
+phoenix_v1.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+phoenix_v1.menu.ssl.all=All SSL ciphers (most compatible)
+phoenix_v1.menu.ssl.all.build.sslflags=
+phoenix_v1.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+phoenix_v1.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 phoenix_v1.build.flash_mode=dio
+phoenix_v1.build.flash_flags=-DFLASHMODE_DIO
 phoenix_v1.build.flash_freq=40
 phoenix_v1.menu.eesz.4M=4M (no SPIFFS)
 phoenix_v1.menu.eesz.4M.build.flash_size=4M
@@ -1547,14 +1967,30 @@ phoenix_v1.menu.ResetMethod.ck=ck
 phoenix_v1.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v1.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v1.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v1.menu.ip.lm2=v2 Lower Memory
-phoenix_v1.menu.ip.lm2.build.lwip_include=lwip2/include
-phoenix_v1.menu.ip.lm2.build.lwip_lib=-llwip2
-phoenix_v1.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-phoenix_v1.menu.ip.hb2=v2 Higher Bandwidth
-phoenix_v1.menu.ip.hb2.build.lwip_include=lwip2/include
-phoenix_v1.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-phoenix_v1.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+phoenix_v1.menu.ip.lm2f=v2 Lower Memory
+phoenix_v1.menu.ip.lm2f.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+phoenix_v1.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+phoenix_v1.menu.ip.hb2f=v2 Higher Bandwidth
+phoenix_v1.menu.ip.hb2f.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+phoenix_v1.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+phoenix_v1.menu.ip.lm2n=v2 Lower Memory (no features)
+phoenix_v1.menu.ip.lm2n.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+phoenix_v1.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+phoenix_v1.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+phoenix_v1.menu.ip.hb2n.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+phoenix_v1.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+phoenix_v1.menu.ip.lm6f=v2 IPv6 Lower Memory
+phoenix_v1.menu.ip.lm6f.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+phoenix_v1.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+phoenix_v1.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+phoenix_v1.menu.ip.hb6f.build.lwip_include=lwip2/include
+phoenix_v1.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+phoenix_v1.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 phoenix_v1.menu.ip.hb1=v1.4 Higher Bandwidth
 phoenix_v1.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 phoenix_v1.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1619,11 +2055,11 @@ phoenix_v1.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROT
 phoenix_v1.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 phoenix_v1.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 phoenix_v1.menu.wipe.none=Only Sketch
-phoenix_v1.menu.wipe.none.upload.erase_cmd=
+phoenix_v1.menu.wipe.none.upload.erase_cmd=version
 phoenix_v1.menu.wipe.sdk=Sketch + WiFi Settings
-phoenix_v1.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+phoenix_v1.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 phoenix_v1.menu.wipe.all=All Flash Contents
-phoenix_v1.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+phoenix_v1.menu.wipe.all.upload.erase_cmd=erase_flash
 phoenix_v1.menu.baud.115200=115200
 phoenix_v1.menu.baud.115200.upload.speed=115200
 phoenix_v1.menu.baud.9600=9600
@@ -1650,7 +2086,7 @@ phoenix_v2.build.variant=phoenix_v2
 phoenix_v2.upload.tool=esptool
 phoenix_v2.upload.maximum_data_size=81920
 phoenix_v2.upload.wait_for_upload_port=true
-phoenix_v2.upload.erase_cmd=
+phoenix_v2.upload.erase_cmd=version
 phoenix_v2.serial.disableDTR=true
 phoenix_v2.serial.disableRTS=true
 phoenix_v2.build.mcu=esp8266
@@ -1668,7 +2104,18 @@ phoenix_v2.menu.vt.heap=Heap
 phoenix_v2.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 phoenix_v2.menu.vt.iram=IRAM
 phoenix_v2.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+phoenix_v2.menu.exception.disabled=Disabled
+phoenix_v2.menu.exception.disabled.build.exception_flags=-fno-exceptions
+phoenix_v2.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+phoenix_v2.menu.exception.enabled=Enabled
+phoenix_v2.menu.exception.enabled.build.exception_flags=-fexceptions
+phoenix_v2.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+phoenix_v2.menu.ssl.all=All SSL ciphers (most compatible)
+phoenix_v2.menu.ssl.all.build.sslflags=
+phoenix_v2.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+phoenix_v2.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 phoenix_v2.build.flash_mode=dio
+phoenix_v2.build.flash_flags=-DFLASHMODE_DIO
 phoenix_v2.build.flash_freq=40
 phoenix_v2.menu.eesz.4M=4M (no SPIFFS)
 phoenix_v2.menu.eesz.4M.build.flash_size=4M
@@ -1711,14 +2158,30 @@ phoenix_v2.menu.ResetMethod.ck=ck
 phoenix_v2.menu.ResetMethod.ck.upload.resetmethod=ck
 phoenix_v2.menu.ResetMethod.nodemcu=nodemcu
 phoenix_v2.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
-phoenix_v2.menu.ip.lm2=v2 Lower Memory
-phoenix_v2.menu.ip.lm2.build.lwip_include=lwip2/include
-phoenix_v2.menu.ip.lm2.build.lwip_lib=-llwip2
-phoenix_v2.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-phoenix_v2.menu.ip.hb2=v2 Higher Bandwidth
-phoenix_v2.menu.ip.hb2.build.lwip_include=lwip2/include
-phoenix_v2.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-phoenix_v2.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+phoenix_v2.menu.ip.lm2f=v2 Lower Memory
+phoenix_v2.menu.ip.lm2f.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+phoenix_v2.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+phoenix_v2.menu.ip.hb2f=v2 Higher Bandwidth
+phoenix_v2.menu.ip.hb2f.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+phoenix_v2.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+phoenix_v2.menu.ip.lm2n=v2 Lower Memory (no features)
+phoenix_v2.menu.ip.lm2n.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+phoenix_v2.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+phoenix_v2.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+phoenix_v2.menu.ip.hb2n.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+phoenix_v2.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+phoenix_v2.menu.ip.lm6f=v2 IPv6 Lower Memory
+phoenix_v2.menu.ip.lm6f.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+phoenix_v2.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+phoenix_v2.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+phoenix_v2.menu.ip.hb6f.build.lwip_include=lwip2/include
+phoenix_v2.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+phoenix_v2.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 phoenix_v2.menu.ip.hb1=v1.4 Higher Bandwidth
 phoenix_v2.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 phoenix_v2.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1783,11 +2246,11 @@ phoenix_v2.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROT
 phoenix_v2.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 phoenix_v2.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 phoenix_v2.menu.wipe.none=Only Sketch
-phoenix_v2.menu.wipe.none.upload.erase_cmd=
+phoenix_v2.menu.wipe.none.upload.erase_cmd=version
 phoenix_v2.menu.wipe.sdk=Sketch + WiFi Settings
-phoenix_v2.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+phoenix_v2.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 phoenix_v2.menu.wipe.all=All Flash Contents
-phoenix_v2.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+phoenix_v2.menu.wipe.all.upload.erase_cmd=erase_flash
 phoenix_v2.menu.baud.115200=115200
 phoenix_v2.menu.baud.115200.upload.speed=115200
 phoenix_v2.menu.baud.9600=9600
@@ -1814,7 +2277,7 @@ nodemcu.build.variant=nodemcu
 nodemcu.upload.tool=esptool
 nodemcu.upload.maximum_data_size=81920
 nodemcu.upload.wait_for_upload_port=true
-nodemcu.upload.erase_cmd=
+nodemcu.upload.erase_cmd=version
 nodemcu.serial.disableDTR=true
 nodemcu.serial.disableRTS=true
 nodemcu.build.mcu=esp8266
@@ -1832,8 +2295,19 @@ nodemcu.menu.vt.heap=Heap
 nodemcu.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 nodemcu.menu.vt.iram=IRAM
 nodemcu.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+nodemcu.menu.exception.disabled=Disabled
+nodemcu.menu.exception.disabled.build.exception_flags=-fno-exceptions
+nodemcu.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+nodemcu.menu.exception.enabled=Enabled
+nodemcu.menu.exception.enabled.build.exception_flags=-fexceptions
+nodemcu.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+nodemcu.menu.ssl.all=All SSL ciphers (most compatible)
+nodemcu.menu.ssl.all.build.sslflags=
+nodemcu.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+nodemcu.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 nodemcu.upload.resetmethod=nodemcu
 nodemcu.build.flash_mode=qio
+nodemcu.build.flash_flags=-DFLASHMODE_QIO
 nodemcu.build.flash_freq=40
 nodemcu.menu.eesz.4M=4M (no SPIFFS)
 nodemcu.menu.eesz.4M.build.flash_size=4M
@@ -1872,14 +2346,30 @@ nodemcu.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 nodemcu.menu.eesz.4M3M.build.spiffs_start=0x100000
 nodemcu.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 nodemcu.menu.eesz.4M3M.build.spiffs_blocksize=8192
-nodemcu.menu.ip.lm2=v2 Lower Memory
-nodemcu.menu.ip.lm2.build.lwip_include=lwip2/include
-nodemcu.menu.ip.lm2.build.lwip_lib=-llwip2
-nodemcu.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-nodemcu.menu.ip.hb2=v2 Higher Bandwidth
-nodemcu.menu.ip.hb2.build.lwip_include=lwip2/include
-nodemcu.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-nodemcu.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+nodemcu.menu.ip.lm2f=v2 Lower Memory
+nodemcu.menu.ip.lm2f.build.lwip_include=lwip2/include
+nodemcu.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+nodemcu.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+nodemcu.menu.ip.hb2f=v2 Higher Bandwidth
+nodemcu.menu.ip.hb2f.build.lwip_include=lwip2/include
+nodemcu.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+nodemcu.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+nodemcu.menu.ip.lm2n=v2 Lower Memory (no features)
+nodemcu.menu.ip.lm2n.build.lwip_include=lwip2/include
+nodemcu.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+nodemcu.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+nodemcu.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+nodemcu.menu.ip.hb2n.build.lwip_include=lwip2/include
+nodemcu.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+nodemcu.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+nodemcu.menu.ip.lm6f=v2 IPv6 Lower Memory
+nodemcu.menu.ip.lm6f.build.lwip_include=lwip2/include
+nodemcu.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+nodemcu.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+nodemcu.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+nodemcu.menu.ip.hb6f.build.lwip_include=lwip2/include
+nodemcu.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+nodemcu.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 nodemcu.menu.ip.hb1=v1.4 Higher Bandwidth
 nodemcu.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 nodemcu.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -1944,11 +2434,11 @@ nodemcu.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOO
 nodemcu.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 nodemcu.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 nodemcu.menu.wipe.none=Only Sketch
-nodemcu.menu.wipe.none.upload.erase_cmd=
+nodemcu.menu.wipe.none.upload.erase_cmd=version
 nodemcu.menu.wipe.sdk=Sketch + WiFi Settings
-nodemcu.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+nodemcu.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 nodemcu.menu.wipe.all=All Flash Contents
-nodemcu.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+nodemcu.menu.wipe.all.upload.erase_cmd=erase_flash
 nodemcu.menu.baud.115200=115200
 nodemcu.menu.baud.115200.upload.speed=115200
 nodemcu.menu.baud.9600=9600
@@ -1975,7 +2465,7 @@ nodemcuv2.build.variant=nodemcu
 nodemcuv2.upload.tool=esptool
 nodemcuv2.upload.maximum_data_size=81920
 nodemcuv2.upload.wait_for_upload_port=true
-nodemcuv2.upload.erase_cmd=
+nodemcuv2.upload.erase_cmd=version
 nodemcuv2.serial.disableDTR=true
 nodemcuv2.serial.disableRTS=true
 nodemcuv2.build.mcu=esp8266
@@ -1993,8 +2483,19 @@ nodemcuv2.menu.vt.heap=Heap
 nodemcuv2.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 nodemcuv2.menu.vt.iram=IRAM
 nodemcuv2.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+nodemcuv2.menu.exception.disabled=Disabled
+nodemcuv2.menu.exception.disabled.build.exception_flags=-fno-exceptions
+nodemcuv2.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+nodemcuv2.menu.exception.enabled=Enabled
+nodemcuv2.menu.exception.enabled.build.exception_flags=-fexceptions
+nodemcuv2.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+nodemcuv2.menu.ssl.all=All SSL ciphers (most compatible)
+nodemcuv2.menu.ssl.all.build.sslflags=
+nodemcuv2.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+nodemcuv2.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 nodemcuv2.upload.resetmethod=nodemcu
 nodemcuv2.build.flash_mode=dio
+nodemcuv2.build.flash_flags=-DFLASHMODE_DIO
 nodemcuv2.build.flash_freq=40
 nodemcuv2.menu.eesz.4M=4M (no SPIFFS)
 nodemcuv2.menu.eesz.4M.build.flash_size=4M
@@ -2033,14 +2534,30 @@ nodemcuv2.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 nodemcuv2.menu.eesz.4M3M.build.spiffs_start=0x100000
 nodemcuv2.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 nodemcuv2.menu.eesz.4M3M.build.spiffs_blocksize=8192
-nodemcuv2.menu.ip.lm2=v2 Lower Memory
-nodemcuv2.menu.ip.lm2.build.lwip_include=lwip2/include
-nodemcuv2.menu.ip.lm2.build.lwip_lib=-llwip2
-nodemcuv2.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-nodemcuv2.menu.ip.hb2=v2 Higher Bandwidth
-nodemcuv2.menu.ip.hb2.build.lwip_include=lwip2/include
-nodemcuv2.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-nodemcuv2.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+nodemcuv2.menu.ip.lm2f=v2 Lower Memory
+nodemcuv2.menu.ip.lm2f.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+nodemcuv2.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+nodemcuv2.menu.ip.hb2f=v2 Higher Bandwidth
+nodemcuv2.menu.ip.hb2f.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+nodemcuv2.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+nodemcuv2.menu.ip.lm2n=v2 Lower Memory (no features)
+nodemcuv2.menu.ip.lm2n.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+nodemcuv2.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+nodemcuv2.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+nodemcuv2.menu.ip.hb2n.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+nodemcuv2.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+nodemcuv2.menu.ip.lm6f=v2 IPv6 Lower Memory
+nodemcuv2.menu.ip.lm6f.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+nodemcuv2.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+nodemcuv2.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+nodemcuv2.menu.ip.hb6f.build.lwip_include=lwip2/include
+nodemcuv2.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+nodemcuv2.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 nodemcuv2.menu.ip.hb1=v1.4 Higher Bandwidth
 nodemcuv2.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 nodemcuv2.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2105,11 +2622,11 @@ nodemcuv2.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA
 nodemcuv2.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 nodemcuv2.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 nodemcuv2.menu.wipe.none=Only Sketch
-nodemcuv2.menu.wipe.none.upload.erase_cmd=
+nodemcuv2.menu.wipe.none.upload.erase_cmd=version
 nodemcuv2.menu.wipe.sdk=Sketch + WiFi Settings
-nodemcuv2.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+nodemcuv2.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 nodemcuv2.menu.wipe.all=All Flash Contents
-nodemcuv2.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+nodemcuv2.menu.wipe.all.upload.erase_cmd=erase_flash
 nodemcuv2.menu.baud.115200=115200
 nodemcuv2.menu.baud.115200.upload.speed=115200
 nodemcuv2.menu.baud.9600=9600
@@ -2136,7 +2653,7 @@ modwifi.build.variant=modwifi
 modwifi.upload.tool=esptool
 modwifi.upload.maximum_data_size=81920
 modwifi.upload.wait_for_upload_port=true
-modwifi.upload.erase_cmd=
+modwifi.upload.erase_cmd=version
 modwifi.serial.disableDTR=true
 modwifi.serial.disableRTS=true
 modwifi.build.mcu=esp8266
@@ -2154,8 +2671,19 @@ modwifi.menu.vt.heap=Heap
 modwifi.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 modwifi.menu.vt.iram=IRAM
 modwifi.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+modwifi.menu.exception.disabled=Disabled
+modwifi.menu.exception.disabled.build.exception_flags=-fno-exceptions
+modwifi.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+modwifi.menu.exception.enabled=Enabled
+modwifi.menu.exception.enabled.build.exception_flags=-fexceptions
+modwifi.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+modwifi.menu.ssl.all=All SSL ciphers (most compatible)
+modwifi.menu.ssl.all.build.sslflags=
+modwifi.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+modwifi.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 modwifi.upload.resetmethod=ck
 modwifi.build.flash_mode=qio
+modwifi.build.flash_flags=-DFLASHMODE_QIO
 modwifi.build.flash_freq=40
 modwifi.menu.eesz.2M=2M (no SPIFFS)
 modwifi.menu.eesz.2M.build.flash_size=2M
@@ -2164,6 +2692,26 @@ modwifi.menu.eesz.2M.build.flash_ld=eagle.flash.2m.ld
 modwifi.menu.eesz.2M.build.spiffs_pagesize=256
 modwifi.menu.eesz.2M.upload.maximum_size=1044464
 modwifi.menu.eesz.2M.build.rfcal_addr=0x1FC000
+modwifi.menu.eesz.2M128=2M (128K SPIFFS)
+modwifi.menu.eesz.2M128.build.flash_size=2M
+modwifi.menu.eesz.2M128.build.flash_size_bytes=0x200000
+modwifi.menu.eesz.2M128.build.flash_ld=eagle.flash.2m128.ld
+modwifi.menu.eesz.2M128.build.spiffs_pagesize=256
+modwifi.menu.eesz.2M128.upload.maximum_size=1044464
+modwifi.menu.eesz.2M128.build.rfcal_addr=0x1FC000
+modwifi.menu.eesz.2M128.build.spiffs_start=0x1E0000
+modwifi.menu.eesz.2M128.build.spiffs_end=0x1FB000
+modwifi.menu.eesz.2M128.build.spiffs_blocksize=4096
+modwifi.menu.eesz.2M256=2M (256K SPIFFS)
+modwifi.menu.eesz.2M256.build.flash_size=2M
+modwifi.menu.eesz.2M256.build.flash_size_bytes=0x200000
+modwifi.menu.eesz.2M256.build.flash_ld=eagle.flash.2m256.ld
+modwifi.menu.eesz.2M256.build.spiffs_pagesize=256
+modwifi.menu.eesz.2M256.upload.maximum_size=1044464
+modwifi.menu.eesz.2M256.build.rfcal_addr=0x1FC000
+modwifi.menu.eesz.2M256.build.spiffs_start=0x1C0000
+modwifi.menu.eesz.2M256.build.spiffs_end=0x1FB000
+modwifi.menu.eesz.2M256.build.spiffs_blocksize=4096
 modwifi.menu.eesz.2M512=2M (512K SPIFFS)
 modwifi.menu.eesz.2M512.build.flash_size=2M
 modwifi.menu.eesz.2M512.build.flash_size_bytes=0x200000
@@ -2184,14 +2732,30 @@ modwifi.menu.eesz.2M1M.build.rfcal_addr=0x1FC000
 modwifi.menu.eesz.2M1M.build.spiffs_start=0x100000
 modwifi.menu.eesz.2M1M.build.spiffs_end=0x1FB000
 modwifi.menu.eesz.2M1M.build.spiffs_blocksize=8192
-modwifi.menu.ip.lm2=v2 Lower Memory
-modwifi.menu.ip.lm2.build.lwip_include=lwip2/include
-modwifi.menu.ip.lm2.build.lwip_lib=-llwip2
-modwifi.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-modwifi.menu.ip.hb2=v2 Higher Bandwidth
-modwifi.menu.ip.hb2.build.lwip_include=lwip2/include
-modwifi.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-modwifi.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+modwifi.menu.ip.lm2f=v2 Lower Memory
+modwifi.menu.ip.lm2f.build.lwip_include=lwip2/include
+modwifi.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+modwifi.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+modwifi.menu.ip.hb2f=v2 Higher Bandwidth
+modwifi.menu.ip.hb2f.build.lwip_include=lwip2/include
+modwifi.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+modwifi.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+modwifi.menu.ip.lm2n=v2 Lower Memory (no features)
+modwifi.menu.ip.lm2n.build.lwip_include=lwip2/include
+modwifi.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+modwifi.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+modwifi.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+modwifi.menu.ip.hb2n.build.lwip_include=lwip2/include
+modwifi.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+modwifi.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+modwifi.menu.ip.lm6f=v2 IPv6 Lower Memory
+modwifi.menu.ip.lm6f.build.lwip_include=lwip2/include
+modwifi.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+modwifi.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+modwifi.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+modwifi.menu.ip.hb6f.build.lwip_include=lwip2/include
+modwifi.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+modwifi.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 modwifi.menu.ip.hb1=v1.4 Higher Bandwidth
 modwifi.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 modwifi.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2256,11 +2820,11 @@ modwifi.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOO
 modwifi.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 modwifi.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 modwifi.menu.wipe.none=Only Sketch
-modwifi.menu.wipe.none.upload.erase_cmd=
+modwifi.menu.wipe.none.upload.erase_cmd=version
 modwifi.menu.wipe.sdk=Sketch + WiFi Settings
-modwifi.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+modwifi.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 modwifi.menu.wipe.all=All Flash Contents
-modwifi.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+modwifi.menu.wipe.all.upload.erase_cmd=erase_flash
 modwifi.menu.baud.115200=115200
 modwifi.menu.baud.115200.upload.speed=115200
 modwifi.menu.baud.9600=9600
@@ -2287,7 +2851,7 @@ thing.build.variant=thing
 thing.upload.tool=esptool
 thing.upload.maximum_data_size=81920
 thing.upload.wait_for_upload_port=true
-thing.upload.erase_cmd=
+thing.upload.erase_cmd=version
 thing.serial.disableDTR=true
 thing.serial.disableRTS=true
 thing.build.mcu=esp8266
@@ -2305,8 +2869,19 @@ thing.menu.vt.heap=Heap
 thing.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 thing.menu.vt.iram=IRAM
 thing.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+thing.menu.exception.disabled=Disabled
+thing.menu.exception.disabled.build.exception_flags=-fno-exceptions
+thing.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+thing.menu.exception.enabled=Enabled
+thing.menu.exception.enabled.build.exception_flags=-fexceptions
+thing.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+thing.menu.ssl.all=All SSL ciphers (most compatible)
+thing.menu.ssl.all.build.sslflags=
+thing.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+thing.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 thing.upload.resetmethod=ck
 thing.build.flash_mode=qio
+thing.build.flash_flags=-DFLASHMODE_QIO
 thing.build.flash_freq=40
 thing.menu.eesz.512K=512K (no SPIFFS)
 thing.menu.eesz.512K.build.flash_size=512K
@@ -2345,14 +2920,30 @@ thing.menu.eesz.512K128.build.rfcal_addr=0x7C000
 thing.menu.eesz.512K128.build.spiffs_start=0x5B000
 thing.menu.eesz.512K128.build.spiffs_end=0x7B000
 thing.menu.eesz.512K128.build.spiffs_blocksize=4096
-thing.menu.ip.lm2=v2 Lower Memory
-thing.menu.ip.lm2.build.lwip_include=lwip2/include
-thing.menu.ip.lm2.build.lwip_lib=-llwip2
-thing.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-thing.menu.ip.hb2=v2 Higher Bandwidth
-thing.menu.ip.hb2.build.lwip_include=lwip2/include
-thing.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-thing.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+thing.menu.ip.lm2f=v2 Lower Memory
+thing.menu.ip.lm2f.build.lwip_include=lwip2/include
+thing.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+thing.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+thing.menu.ip.hb2f=v2 Higher Bandwidth
+thing.menu.ip.hb2f.build.lwip_include=lwip2/include
+thing.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+thing.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+thing.menu.ip.lm2n=v2 Lower Memory (no features)
+thing.menu.ip.lm2n.build.lwip_include=lwip2/include
+thing.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+thing.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+thing.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+thing.menu.ip.hb2n.build.lwip_include=lwip2/include
+thing.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+thing.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+thing.menu.ip.lm6f=v2 IPv6 Lower Memory
+thing.menu.ip.lm6f.build.lwip_include=lwip2/include
+thing.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+thing.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+thing.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+thing.menu.ip.hb6f.build.lwip_include=lwip2/include
+thing.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+thing.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 thing.menu.ip.hb1=v1.4 Higher Bandwidth
 thing.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 thing.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2417,11 +3008,11 @@ thing.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.
 thing.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 thing.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 thing.menu.wipe.none=Only Sketch
-thing.menu.wipe.none.upload.erase_cmd=
+thing.menu.wipe.none.upload.erase_cmd=version
 thing.menu.wipe.sdk=Sketch + WiFi Settings
-thing.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+thing.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 thing.menu.wipe.all=All Flash Contents
-thing.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+thing.menu.wipe.all.upload.erase_cmd=erase_flash
 thing.menu.baud.115200=115200
 thing.menu.baud.115200.upload.speed=115200
 thing.menu.baud.9600=9600
@@ -2448,7 +3039,7 @@ thingdev.build.variant=thing
 thingdev.upload.tool=esptool
 thingdev.upload.maximum_data_size=81920
 thingdev.upload.wait_for_upload_port=true
-thingdev.upload.erase_cmd=
+thingdev.upload.erase_cmd=version
 thingdev.serial.disableDTR=true
 thingdev.serial.disableRTS=true
 thingdev.build.mcu=esp8266
@@ -2466,8 +3057,19 @@ thingdev.menu.vt.heap=Heap
 thingdev.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 thingdev.menu.vt.iram=IRAM
 thingdev.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+thingdev.menu.exception.disabled=Disabled
+thingdev.menu.exception.disabled.build.exception_flags=-fno-exceptions
+thingdev.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+thingdev.menu.exception.enabled=Enabled
+thingdev.menu.exception.enabled.build.exception_flags=-fexceptions
+thingdev.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+thingdev.menu.ssl.all=All SSL ciphers (most compatible)
+thingdev.menu.ssl.all.build.sslflags=
+thingdev.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+thingdev.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 thingdev.upload.resetmethod=nodemcu
 thingdev.build.flash_mode=dio
+thingdev.build.flash_flags=-DFLASHMODE_DIO
 thingdev.build.flash_freq=40
 thingdev.menu.eesz.512K=512K (no SPIFFS)
 thingdev.menu.eesz.512K.build.flash_size=512K
@@ -2506,14 +3108,30 @@ thingdev.menu.eesz.512K128.build.rfcal_addr=0x7C000
 thingdev.menu.eesz.512K128.build.spiffs_start=0x5B000
 thingdev.menu.eesz.512K128.build.spiffs_end=0x7B000
 thingdev.menu.eesz.512K128.build.spiffs_blocksize=4096
-thingdev.menu.ip.lm2=v2 Lower Memory
-thingdev.menu.ip.lm2.build.lwip_include=lwip2/include
-thingdev.menu.ip.lm2.build.lwip_lib=-llwip2
-thingdev.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-thingdev.menu.ip.hb2=v2 Higher Bandwidth
-thingdev.menu.ip.hb2.build.lwip_include=lwip2/include
-thingdev.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-thingdev.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+thingdev.menu.ip.lm2f=v2 Lower Memory
+thingdev.menu.ip.lm2f.build.lwip_include=lwip2/include
+thingdev.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+thingdev.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+thingdev.menu.ip.hb2f=v2 Higher Bandwidth
+thingdev.menu.ip.hb2f.build.lwip_include=lwip2/include
+thingdev.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+thingdev.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+thingdev.menu.ip.lm2n=v2 Lower Memory (no features)
+thingdev.menu.ip.lm2n.build.lwip_include=lwip2/include
+thingdev.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+thingdev.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+thingdev.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+thingdev.menu.ip.hb2n.build.lwip_include=lwip2/include
+thingdev.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+thingdev.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+thingdev.menu.ip.lm6f=v2 IPv6 Lower Memory
+thingdev.menu.ip.lm6f.build.lwip_include=lwip2/include
+thingdev.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+thingdev.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+thingdev.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+thingdev.menu.ip.hb6f.build.lwip_include=lwip2/include
+thingdev.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+thingdev.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 thingdev.menu.ip.hb1=v1.4 Higher Bandwidth
 thingdev.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 thingdev.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2578,11 +3196,11 @@ thingdev.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAO
 thingdev.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 thingdev.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 thingdev.menu.wipe.none=Only Sketch
-thingdev.menu.wipe.none.upload.erase_cmd=
+thingdev.menu.wipe.none.upload.erase_cmd=version
 thingdev.menu.wipe.sdk=Sketch + WiFi Settings
-thingdev.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+thingdev.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 thingdev.menu.wipe.all=All Flash Contents
-thingdev.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+thingdev.menu.wipe.all.upload.erase_cmd=erase_flash
 thingdev.menu.baud.115200=115200
 thingdev.menu.baud.115200.upload.speed=115200
 thingdev.menu.baud.9600=9600
@@ -2608,7 +3226,7 @@ esp210.build.board=ESP8266_ESP210
 esp210.upload.tool=esptool
 esp210.upload.maximum_data_size=81920
 esp210.upload.wait_for_upload_port=true
-esp210.upload.erase_cmd=
+esp210.upload.erase_cmd=version
 esp210.serial.disableDTR=true
 esp210.serial.disableRTS=true
 esp210.build.mcu=esp8266
@@ -2627,8 +3245,19 @@ esp210.menu.vt.heap=Heap
 esp210.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 esp210.menu.vt.iram=IRAM
 esp210.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+esp210.menu.exception.disabled=Disabled
+esp210.menu.exception.disabled.build.exception_flags=-fno-exceptions
+esp210.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+esp210.menu.exception.enabled=Enabled
+esp210.menu.exception.enabled.build.exception_flags=-fexceptions
+esp210.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+esp210.menu.ssl.all=All SSL ciphers (most compatible)
+esp210.menu.ssl.all.build.sslflags=
+esp210.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+esp210.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 esp210.upload.resetmethod=ck
 esp210.build.flash_mode=qio
+esp210.build.flash_flags=-DFLASHMODE_QIO
 esp210.build.flash_freq=40
 esp210.menu.eesz.4M=4M (no SPIFFS)
 esp210.menu.eesz.4M.build.flash_size=4M
@@ -2667,14 +3296,30 @@ esp210.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 esp210.menu.eesz.4M3M.build.spiffs_start=0x100000
 esp210.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 esp210.menu.eesz.4M3M.build.spiffs_blocksize=8192
-esp210.menu.ip.lm2=v2 Lower Memory
-esp210.menu.ip.lm2.build.lwip_include=lwip2/include
-esp210.menu.ip.lm2.build.lwip_lib=-llwip2
-esp210.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-esp210.menu.ip.hb2=v2 Higher Bandwidth
-esp210.menu.ip.hb2.build.lwip_include=lwip2/include
-esp210.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-esp210.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+esp210.menu.ip.lm2f=v2 Lower Memory
+esp210.menu.ip.lm2f.build.lwip_include=lwip2/include
+esp210.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+esp210.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+esp210.menu.ip.hb2f=v2 Higher Bandwidth
+esp210.menu.ip.hb2f.build.lwip_include=lwip2/include
+esp210.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+esp210.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+esp210.menu.ip.lm2n=v2 Lower Memory (no features)
+esp210.menu.ip.lm2n.build.lwip_include=lwip2/include
+esp210.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+esp210.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+esp210.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+esp210.menu.ip.hb2n.build.lwip_include=lwip2/include
+esp210.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+esp210.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+esp210.menu.ip.lm6f=v2 IPv6 Lower Memory
+esp210.menu.ip.lm6f.build.lwip_include=lwip2/include
+esp210.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+esp210.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+esp210.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+esp210.menu.ip.hb6f.build.lwip_include=lwip2/include
+esp210.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+esp210.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 esp210.menu.ip.hb1=v1.4 Higher Bandwidth
 esp210.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 esp210.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2739,11 +3384,11 @@ esp210.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM
 esp210.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 esp210.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 esp210.menu.wipe.none=Only Sketch
-esp210.menu.wipe.none.upload.erase_cmd=
+esp210.menu.wipe.none.upload.erase_cmd=version
 esp210.menu.wipe.sdk=Sketch + WiFi Settings
-esp210.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+esp210.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 esp210.menu.wipe.all=All Flash Contents
-esp210.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+esp210.menu.wipe.all.upload.erase_cmd=erase_flash
 esp210.menu.baud.57600=57600
 esp210.menu.baud.57600.upload.speed=57600
 esp210.menu.baud.9600=9600
@@ -2770,7 +3415,7 @@ d1_mini.build.variant=d1_mini
 d1_mini.upload.tool=esptool
 d1_mini.upload.maximum_data_size=81920
 d1_mini.upload.wait_for_upload_port=true
-d1_mini.upload.erase_cmd=
+d1_mini.upload.erase_cmd=version
 d1_mini.serial.disableDTR=true
 d1_mini.serial.disableRTS=true
 d1_mini.build.mcu=esp8266
@@ -2788,8 +3433,19 @@ d1_mini.menu.vt.heap=Heap
 d1_mini.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 d1_mini.menu.vt.iram=IRAM
 d1_mini.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+d1_mini.menu.exception.disabled=Disabled
+d1_mini.menu.exception.disabled.build.exception_flags=-fno-exceptions
+d1_mini.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+d1_mini.menu.exception.enabled=Enabled
+d1_mini.menu.exception.enabled.build.exception_flags=-fexceptions
+d1_mini.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+d1_mini.menu.ssl.all=All SSL ciphers (most compatible)
+d1_mini.menu.ssl.all.build.sslflags=
+d1_mini.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+d1_mini.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 d1_mini.upload.resetmethod=nodemcu
 d1_mini.build.flash_mode=dio
+d1_mini.build.flash_flags=-DFLASHMODE_DIO
 d1_mini.build.flash_freq=40
 d1_mini.menu.eesz.4M=4M (no SPIFFS)
 d1_mini.menu.eesz.4M.build.flash_size=4M
@@ -2828,14 +3484,30 @@ d1_mini.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 d1_mini.menu.eesz.4M3M.build.spiffs_start=0x100000
 d1_mini.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 d1_mini.menu.eesz.4M3M.build.spiffs_blocksize=8192
-d1_mini.menu.ip.lm2=v2 Lower Memory
-d1_mini.menu.ip.lm2.build.lwip_include=lwip2/include
-d1_mini.menu.ip.lm2.build.lwip_lib=-llwip2
-d1_mini.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini.menu.ip.hb2=v2 Higher Bandwidth
-d1_mini.menu.ip.hb2.build.lwip_include=lwip2/include
-d1_mini.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-d1_mini.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1_mini.menu.ip.lm2f=v2 Lower Memory
+d1_mini.menu.ip.lm2f.build.lwip_include=lwip2/include
+d1_mini.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+d1_mini.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+d1_mini.menu.ip.hb2f=v2 Higher Bandwidth
+d1_mini.menu.ip.hb2f.build.lwip_include=lwip2/include
+d1_mini.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+d1_mini.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+d1_mini.menu.ip.lm2n=v2 Lower Memory (no features)
+d1_mini.menu.ip.lm2n.build.lwip_include=lwip2/include
+d1_mini.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+d1_mini.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+d1_mini.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+d1_mini.menu.ip.hb2n.build.lwip_include=lwip2/include
+d1_mini.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+d1_mini.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+d1_mini.menu.ip.lm6f=v2 IPv6 Lower Memory
+d1_mini.menu.ip.lm6f.build.lwip_include=lwip2/include
+d1_mini.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+d1_mini.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+d1_mini.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+d1_mini.menu.ip.hb6f.build.lwip_include=lwip2/include
+d1_mini.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+d1_mini.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 d1_mini.menu.ip.hb1=v1.4 Higher Bandwidth
 d1_mini.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 d1_mini.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -2900,11 +3572,11 @@ d1_mini.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOO
 d1_mini.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1_mini.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 d1_mini.menu.wipe.none=Only Sketch
-d1_mini.menu.wipe.none.upload.erase_cmd=
+d1_mini.menu.wipe.none.upload.erase_cmd=version
 d1_mini.menu.wipe.sdk=Sketch + WiFi Settings
-d1_mini.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+d1_mini.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 d1_mini.menu.wipe.all=All Flash Contents
-d1_mini.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+d1_mini.menu.wipe.all.upload.erase_cmd=erase_flash
 d1_mini.menu.baud.921600=921600
 d1_mini.menu.baud.921600.upload.speed=921600
 d1_mini.menu.baud.9600=9600
@@ -2931,7 +3603,7 @@ d1_mini_pro.build.variant=d1_mini
 d1_mini_pro.upload.tool=esptool
 d1_mini_pro.upload.maximum_data_size=81920
 d1_mini_pro.upload.wait_for_upload_port=true
-d1_mini_pro.upload.erase_cmd=
+d1_mini_pro.upload.erase_cmd=version
 d1_mini_pro.serial.disableDTR=true
 d1_mini_pro.serial.disableRTS=true
 d1_mini_pro.build.mcu=esp8266
@@ -2949,8 +3621,19 @@ d1_mini_pro.menu.vt.heap=Heap
 d1_mini_pro.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 d1_mini_pro.menu.vt.iram=IRAM
 d1_mini_pro.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+d1_mini_pro.menu.exception.disabled=Disabled
+d1_mini_pro.menu.exception.disabled.build.exception_flags=-fno-exceptions
+d1_mini_pro.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+d1_mini_pro.menu.exception.enabled=Enabled
+d1_mini_pro.menu.exception.enabled.build.exception_flags=-fexceptions
+d1_mini_pro.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+d1_mini_pro.menu.ssl.all=All SSL ciphers (most compatible)
+d1_mini_pro.menu.ssl.all.build.sslflags=
+d1_mini_pro.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+d1_mini_pro.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 d1_mini_pro.upload.resetmethod=nodemcu
 d1_mini_pro.build.flash_mode=dio
+d1_mini_pro.build.flash_flags=-DFLASHMODE_DIO
 d1_mini_pro.build.flash_freq=40
 d1_mini_pro.menu.eesz.16M14M=16M (14M SPIFFS)
 d1_mini_pro.menu.eesz.16M14M.build.flash_size=16M
@@ -2972,14 +3655,30 @@ d1_mini_pro.menu.eesz.16M15M.build.rfcal_addr=0xFFC000
 d1_mini_pro.menu.eesz.16M15M.build.spiffs_start=0x100000
 d1_mini_pro.menu.eesz.16M15M.build.spiffs_end=0xFFB000
 d1_mini_pro.menu.eesz.16M15M.build.spiffs_blocksize=8192
-d1_mini_pro.menu.ip.lm2=v2 Lower Memory
-d1_mini_pro.menu.ip.lm2.build.lwip_include=lwip2/include
-d1_mini_pro.menu.ip.lm2.build.lwip_lib=-llwip2
-d1_mini_pro.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini_pro.menu.ip.hb2=v2 Higher Bandwidth
-d1_mini_pro.menu.ip.hb2.build.lwip_include=lwip2/include
-d1_mini_pro.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-d1_mini_pro.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1_mini_pro.menu.ip.lm2f=v2 Lower Memory
+d1_mini_pro.menu.ip.lm2f.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+d1_mini_pro.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+d1_mini_pro.menu.ip.hb2f=v2 Higher Bandwidth
+d1_mini_pro.menu.ip.hb2f.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+d1_mini_pro.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+d1_mini_pro.menu.ip.lm2n=v2 Lower Memory (no features)
+d1_mini_pro.menu.ip.lm2n.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+d1_mini_pro.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+d1_mini_pro.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+d1_mini_pro.menu.ip.hb2n.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+d1_mini_pro.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+d1_mini_pro.menu.ip.lm6f=v2 IPv6 Lower Memory
+d1_mini_pro.menu.ip.lm6f.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+d1_mini_pro.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+d1_mini_pro.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+d1_mini_pro.menu.ip.hb6f.build.lwip_include=lwip2/include
+d1_mini_pro.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+d1_mini_pro.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 d1_mini_pro.menu.ip.hb1=v1.4 Higher Bandwidth
 d1_mini_pro.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 d1_mini_pro.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3044,11 +3743,11 @@ d1_mini_pro.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATERO
 d1_mini_pro.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1_mini_pro.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 d1_mini_pro.menu.wipe.none=Only Sketch
-d1_mini_pro.menu.wipe.none.upload.erase_cmd=
+d1_mini_pro.menu.wipe.none.upload.erase_cmd=version
 d1_mini_pro.menu.wipe.sdk=Sketch + WiFi Settings
-d1_mini_pro.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+d1_mini_pro.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 d1_mini_pro.menu.wipe.all=All Flash Contents
-d1_mini_pro.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+d1_mini_pro.menu.wipe.all.upload.erase_cmd=erase_flash
 d1_mini_pro.menu.baud.921600=921600
 d1_mini_pro.menu.baud.921600.upload.speed=921600
 d1_mini_pro.menu.baud.9600=9600
@@ -3075,7 +3774,7 @@ d1_mini_lite.build.variant=d1_mini
 d1_mini_lite.upload.tool=esptool
 d1_mini_lite.upload.maximum_data_size=81920
 d1_mini_lite.upload.wait_for_upload_port=true
-d1_mini_lite.upload.erase_cmd=
+d1_mini_lite.upload.erase_cmd=version
 d1_mini_lite.serial.disableDTR=true
 d1_mini_lite.serial.disableRTS=true
 d1_mini_lite.build.mcu=esp8266
@@ -3093,8 +3792,19 @@ d1_mini_lite.menu.vt.heap=Heap
 d1_mini_lite.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 d1_mini_lite.menu.vt.iram=IRAM
 d1_mini_lite.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+d1_mini_lite.menu.exception.disabled=Disabled
+d1_mini_lite.menu.exception.disabled.build.exception_flags=-fno-exceptions
+d1_mini_lite.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+d1_mini_lite.menu.exception.enabled=Enabled
+d1_mini_lite.menu.exception.enabled.build.exception_flags=-fexceptions
+d1_mini_lite.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+d1_mini_lite.menu.ssl.all=All SSL ciphers (most compatible)
+d1_mini_lite.menu.ssl.all.build.sslflags=
+d1_mini_lite.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+d1_mini_lite.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 d1_mini_lite.upload.resetmethod=nodemcu
 d1_mini_lite.build.flash_mode=dout
+d1_mini_lite.build.flash_flags=-DFLASHMODE_DOUT
 d1_mini_lite.build.flash_freq=40
 d1_mini_lite.menu.eesz.1M=1M (no SPIFFS)
 d1_mini_lite.menu.eesz.1M.build.flash_size=1M
@@ -3173,14 +3883,30 @@ d1_mini_lite.menu.eesz.1M512.build.rfcal_addr=0xFC000
 d1_mini_lite.menu.eesz.1M512.build.spiffs_start=0x7B000
 d1_mini_lite.menu.eesz.1M512.build.spiffs_end=0xFB000
 d1_mini_lite.menu.eesz.1M512.build.spiffs_blocksize=4096
-d1_mini_lite.menu.ip.lm2=v2 Lower Memory
-d1_mini_lite.menu.ip.lm2.build.lwip_include=lwip2/include
-d1_mini_lite.menu.ip.lm2.build.lwip_lib=-llwip2
-d1_mini_lite.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1_mini_lite.menu.ip.hb2=v2 Higher Bandwidth
-d1_mini_lite.menu.ip.hb2.build.lwip_include=lwip2/include
-d1_mini_lite.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-d1_mini_lite.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1_mini_lite.menu.ip.lm2f=v2 Lower Memory
+d1_mini_lite.menu.ip.lm2f.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+d1_mini_lite.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+d1_mini_lite.menu.ip.hb2f=v2 Higher Bandwidth
+d1_mini_lite.menu.ip.hb2f.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+d1_mini_lite.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+d1_mini_lite.menu.ip.lm2n=v2 Lower Memory (no features)
+d1_mini_lite.menu.ip.lm2n.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+d1_mini_lite.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+d1_mini_lite.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+d1_mini_lite.menu.ip.hb2n.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+d1_mini_lite.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+d1_mini_lite.menu.ip.lm6f=v2 IPv6 Lower Memory
+d1_mini_lite.menu.ip.lm6f.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+d1_mini_lite.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+d1_mini_lite.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+d1_mini_lite.menu.ip.hb6f.build.lwip_include=lwip2/include
+d1_mini_lite.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+d1_mini_lite.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 d1_mini_lite.menu.ip.hb1=v1.4 Higher Bandwidth
 d1_mini_lite.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 d1_mini_lite.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3245,11 +3971,11 @@ d1_mini_lite.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATER
 d1_mini_lite.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1_mini_lite.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 d1_mini_lite.menu.wipe.none=Only Sketch
-d1_mini_lite.menu.wipe.none.upload.erase_cmd=
+d1_mini_lite.menu.wipe.none.upload.erase_cmd=version
 d1_mini_lite.menu.wipe.sdk=Sketch + WiFi Settings
-d1_mini_lite.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+d1_mini_lite.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 d1_mini_lite.menu.wipe.all=All Flash Contents
-d1_mini_lite.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+d1_mini_lite.menu.wipe.all.upload.erase_cmd=erase_flash
 d1_mini_lite.menu.baud.921600=921600
 d1_mini_lite.menu.baud.921600.upload.speed=921600
 d1_mini_lite.menu.baud.9600=9600
@@ -3276,7 +4002,7 @@ d1.build.variant=d1
 d1.upload.tool=esptool
 d1.upload.maximum_data_size=81920
 d1.upload.wait_for_upload_port=true
-d1.upload.erase_cmd=
+d1.upload.erase_cmd=version
 d1.serial.disableDTR=true
 d1.serial.disableRTS=true
 d1.build.mcu=esp8266
@@ -3294,8 +4020,19 @@ d1.menu.vt.heap=Heap
 d1.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 d1.menu.vt.iram=IRAM
 d1.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+d1.menu.exception.disabled=Disabled
+d1.menu.exception.disabled.build.exception_flags=-fno-exceptions
+d1.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+d1.menu.exception.enabled=Enabled
+d1.menu.exception.enabled.build.exception_flags=-fexceptions
+d1.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+d1.menu.ssl.all=All SSL ciphers (most compatible)
+d1.menu.ssl.all.build.sslflags=
+d1.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+d1.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 d1.upload.resetmethod=nodemcu
 d1.build.flash_mode=dio
+d1.build.flash_flags=-DFLASHMODE_DIO
 d1.build.flash_freq=40
 d1.menu.eesz.4M=4M (no SPIFFS)
 d1.menu.eesz.4M.build.flash_size=4M
@@ -3334,14 +4071,30 @@ d1.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 d1.menu.eesz.4M3M.build.spiffs_start=0x100000
 d1.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 d1.menu.eesz.4M3M.build.spiffs_blocksize=8192
-d1.menu.ip.lm2=v2 Lower Memory
-d1.menu.ip.lm2.build.lwip_include=lwip2/include
-d1.menu.ip.lm2.build.lwip_lib=-llwip2
-d1.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-d1.menu.ip.hb2=v2 Higher Bandwidth
-d1.menu.ip.hb2.build.lwip_include=lwip2/include
-d1.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-d1.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+d1.menu.ip.lm2f=v2 Lower Memory
+d1.menu.ip.lm2f.build.lwip_include=lwip2/include
+d1.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+d1.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+d1.menu.ip.hb2f=v2 Higher Bandwidth
+d1.menu.ip.hb2f.build.lwip_include=lwip2/include
+d1.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+d1.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+d1.menu.ip.lm2n=v2 Lower Memory (no features)
+d1.menu.ip.lm2n.build.lwip_include=lwip2/include
+d1.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+d1.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+d1.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+d1.menu.ip.hb2n.build.lwip_include=lwip2/include
+d1.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+d1.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+d1.menu.ip.lm6f=v2 IPv6 Lower Memory
+d1.menu.ip.lm6f.build.lwip_include=lwip2/include
+d1.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+d1.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+d1.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+d1.menu.ip.hb6f.build.lwip_include=lwip2/include
+d1.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+d1.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 d1.menu.ip.hb1=v1.4 Higher Bandwidth
 d1.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 d1.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3406,11 +4159,11 @@ d1.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.bui
 d1.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 d1.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 d1.menu.wipe.none=Only Sketch
-d1.menu.wipe.none.upload.erase_cmd=
+d1.menu.wipe.none.upload.erase_cmd=version
 d1.menu.wipe.sdk=Sketch + WiFi Settings
-d1.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+d1.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 d1.menu.wipe.all=All Flash Contents
-d1.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+d1.menu.wipe.all.upload.erase_cmd=erase_flash
 d1.menu.baud.921600=921600
 d1.menu.baud.921600.upload.speed=921600
 d1.menu.baud.9600=9600
@@ -3437,7 +4190,7 @@ espino.build.variant=espino
 espino.upload.tool=esptool
 espino.upload.maximum_data_size=81920
 espino.upload.wait_for_upload_port=true
-espino.upload.erase_cmd=
+espino.upload.erase_cmd=version
 espino.serial.disableDTR=true
 espino.serial.disableRTS=true
 espino.build.mcu=esp8266
@@ -3455,11 +4208,22 @@ espino.menu.vt.heap=Heap
 espino.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 espino.menu.vt.iram=IRAM
 espino.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+espino.menu.exception.disabled=Disabled
+espino.menu.exception.disabled.build.exception_flags=-fno-exceptions
+espino.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+espino.menu.exception.enabled=Enabled
+espino.menu.exception.enabled.build.exception_flags=-fexceptions
+espino.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+espino.menu.ssl.all=All SSL ciphers (most compatible)
+espino.menu.ssl.all.build.sslflags=
+espino.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+espino.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espino.menu.ResetMethod.ck=ck
 espino.menu.ResetMethod.ck.upload.resetmethod=ck
 espino.menu.ResetMethod.nodemcu=nodemcu
 espino.menu.ResetMethod.nodemcu.upload.resetmethod=nodemcu
 espino.build.flash_mode=qio
+espino.build.flash_flags=-DFLASHMODE_QIO
 espino.build.flash_freq=40
 espino.menu.eesz.4M=4M (no SPIFFS)
 espino.menu.eesz.4M.build.flash_size=4M
@@ -3498,14 +4262,30 @@ espino.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 espino.menu.eesz.4M3M.build.spiffs_start=0x100000
 espino.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 espino.menu.eesz.4M3M.build.spiffs_blocksize=8192
-espino.menu.ip.lm2=v2 Lower Memory
-espino.menu.ip.lm2.build.lwip_include=lwip2/include
-espino.menu.ip.lm2.build.lwip_lib=-llwip2
-espino.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espino.menu.ip.hb2=v2 Higher Bandwidth
-espino.menu.ip.hb2.build.lwip_include=lwip2/include
-espino.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espino.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espino.menu.ip.lm2f=v2 Lower Memory
+espino.menu.ip.lm2f.build.lwip_include=lwip2/include
+espino.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+espino.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espino.menu.ip.hb2f=v2 Higher Bandwidth
+espino.menu.ip.hb2f.build.lwip_include=lwip2/include
+espino.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+espino.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espino.menu.ip.lm2n=v2 Lower Memory (no features)
+espino.menu.ip.lm2n.build.lwip_include=lwip2/include
+espino.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espino.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espino.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+espino.menu.ip.hb2n.build.lwip_include=lwip2/include
+espino.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espino.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espino.menu.ip.lm6f=v2 IPv6 Lower Memory
+espino.menu.ip.lm6f.build.lwip_include=lwip2/include
+espino.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+espino.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+espino.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+espino.menu.ip.hb6f.build.lwip_include=lwip2/include
+espino.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+espino.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 espino.menu.ip.hb1=v1.4 Higher Bandwidth
 espino.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espino.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3570,11 +4350,11 @@ espino.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM
 espino.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 espino.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espino.menu.wipe.none=Only Sketch
-espino.menu.wipe.none.upload.erase_cmd=
+espino.menu.wipe.none.upload.erase_cmd=version
 espino.menu.wipe.sdk=Sketch + WiFi Settings
-espino.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espino.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 espino.menu.wipe.all=All Flash Contents
-espino.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+espino.menu.wipe.all.upload.erase_cmd=erase_flash
 espino.menu.baud.115200=115200
 espino.menu.baud.115200.upload.speed=115200
 espino.menu.baud.9600=9600
@@ -3601,7 +4381,7 @@ espinotee.build.variant=espinotee
 espinotee.upload.tool=esptool
 espinotee.upload.maximum_data_size=81920
 espinotee.upload.wait_for_upload_port=true
-espinotee.upload.erase_cmd=
+espinotee.upload.erase_cmd=version
 espinotee.serial.disableDTR=true
 espinotee.serial.disableRTS=true
 espinotee.build.mcu=esp8266
@@ -3619,8 +4399,19 @@ espinotee.menu.vt.heap=Heap
 espinotee.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 espinotee.menu.vt.iram=IRAM
 espinotee.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+espinotee.menu.exception.disabled=Disabled
+espinotee.menu.exception.disabled.build.exception_flags=-fno-exceptions
+espinotee.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+espinotee.menu.exception.enabled=Enabled
+espinotee.menu.exception.enabled.build.exception_flags=-fexceptions
+espinotee.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+espinotee.menu.ssl.all=All SSL ciphers (most compatible)
+espinotee.menu.ssl.all.build.sslflags=
+espinotee.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+espinotee.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 espinotee.upload.resetmethod=nodemcu
 espinotee.build.flash_mode=qio
+espinotee.build.flash_flags=-DFLASHMODE_QIO
 espinotee.build.flash_freq=40
 espinotee.menu.eesz.4M=4M (no SPIFFS)
 espinotee.menu.eesz.4M.build.flash_size=4M
@@ -3659,14 +4450,30 @@ espinotee.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 espinotee.menu.eesz.4M3M.build.spiffs_start=0x100000
 espinotee.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 espinotee.menu.eesz.4M3M.build.spiffs_blocksize=8192
-espinotee.menu.ip.lm2=v2 Lower Memory
-espinotee.menu.ip.lm2.build.lwip_include=lwip2/include
-espinotee.menu.ip.lm2.build.lwip_lib=-llwip2
-espinotee.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-espinotee.menu.ip.hb2=v2 Higher Bandwidth
-espinotee.menu.ip.hb2.build.lwip_include=lwip2/include
-espinotee.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-espinotee.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+espinotee.menu.ip.lm2f=v2 Lower Memory
+espinotee.menu.ip.lm2f.build.lwip_include=lwip2/include
+espinotee.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+espinotee.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espinotee.menu.ip.hb2f=v2 Higher Bandwidth
+espinotee.menu.ip.hb2f.build.lwip_include=lwip2/include
+espinotee.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+espinotee.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espinotee.menu.ip.lm2n=v2 Lower Memory (no features)
+espinotee.menu.ip.lm2n.build.lwip_include=lwip2/include
+espinotee.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espinotee.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espinotee.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+espinotee.menu.ip.hb2n.build.lwip_include=lwip2/include
+espinotee.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espinotee.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espinotee.menu.ip.lm6f=v2 IPv6 Lower Memory
+espinotee.menu.ip.lm6f.build.lwip_include=lwip2/include
+espinotee.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+espinotee.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+espinotee.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+espinotee.menu.ip.hb6f.build.lwip_include=lwip2/include
+espinotee.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+espinotee.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 espinotee.menu.ip.hb1=v1.4 Higher Bandwidth
 espinotee.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 espinotee.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3731,11 +4538,11 @@ espinotee.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA
 espinotee.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 espinotee.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 espinotee.menu.wipe.none=Only Sketch
-espinotee.menu.wipe.none.upload.erase_cmd=
+espinotee.menu.wipe.none.upload.erase_cmd=version
 espinotee.menu.wipe.sdk=Sketch + WiFi Settings
-espinotee.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+espinotee.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 espinotee.menu.wipe.all=All Flash Contents
-espinotee.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+espinotee.menu.wipe.all.upload.erase_cmd=erase_flash
 espinotee.menu.baud.115200=115200
 espinotee.menu.baud.115200.upload.speed=115200
 espinotee.menu.baud.9600=9600
@@ -3757,29 +4564,29 @@ espinotee.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 wifinfo.name=WifInfo
-wifinfo.menu.ESPModule.ESP12.build.board=ESP8266_ESP12
-wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
-wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
-wifinfo.menu.ESPModule.ESP12.build.flash_ld=eagle.flash.4m1m.ld
-wifinfo.menu.ESPModule.ESP07192.build.spiffs_blocksize=4096
-wifinfo.menu.ESPModule.ESP07192.build.spiffs_end=0xFB000
-wifinfo.menu.ESPModule.ESP12=ESP12 (4M/1M SPIFFS)
-wifinfo.menu.ESPModule.ESP12.build.spiffs_start=0x300000
-wifinfo.menu.ESPModule.ESP12.build.spiffs_end=0x3FB000
-wifinfo.menu.ESPModule.ESP07192.build.spiffs_start=0xCB000
-wifinfo.menu.ESPModule.ESP07192.build.board=ESP8266_ESP07
-wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
-wifinfo.menu.ESPModule.ESP12.build.flash_size=4M
 wifinfo.build.board=WIFINFO
 wifinfo.build.variant=wifinfo
-wifinfo.menu.ESPModule.ESP07192.build.flash_ld=eagle.flash.1m192.ld
-wifinfo.menu.ESPModule.ESP07192.build.flash_size=1M
 wifinfo.menu.ESPModule.ESP07192=ESP07 (1M/192K SPIFFS)
+wifinfo.menu.ESPModule.ESP07192.build.board=ESP8266_ESP07
+wifinfo.menu.ESPModule.ESP07192.build.flash_size=1M
+wifinfo.menu.ESPModule.ESP07192.build.flash_ld=eagle.flash.1m192.ld
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_start=0xCB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_end=0xFB000
+wifinfo.menu.ESPModule.ESP07192.build.spiffs_blocksize=4096
 wifinfo.menu.ESPModule.ESP07192.upload.maximum_size=827376
+wifinfo.menu.ESPModule.ESP12=ESP12 (4M/1M SPIFFS)
+wifinfo.menu.ESPModule.ESP12.build.board=ESP8266_ESP12
+wifinfo.menu.ESPModule.ESP12.build.flash_size=4M
+wifinfo.menu.ESPModule.ESP12.build.flash_ld=eagle.flash.4m1m.ld
+wifinfo.menu.ESPModule.ESP12.build.spiffs_start=0x300000
+wifinfo.menu.ESPModule.ESP12.build.spiffs_end=0x3FB000
+wifinfo.menu.ESPModule.ESP12.build.spiffs_blocksize=8192
+wifinfo.menu.ESPModule.ESP12.build.spiffs_pagesize=256
+wifinfo.menu.ESPModule.ESP12.upload.maximum_size=1044464
 wifinfo.upload.tool=esptool
 wifinfo.upload.maximum_data_size=81920
 wifinfo.upload.wait_for_upload_port=true
-wifinfo.upload.erase_cmd=
+wifinfo.upload.erase_cmd=version
 wifinfo.serial.disableDTR=true
 wifinfo.serial.disableRTS=true
 wifinfo.build.mcu=esp8266
@@ -3797,8 +4604,19 @@ wifinfo.menu.vt.heap=Heap
 wifinfo.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 wifinfo.menu.vt.iram=IRAM
 wifinfo.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+wifinfo.menu.exception.disabled=Disabled
+wifinfo.menu.exception.disabled.build.exception_flags=-fno-exceptions
+wifinfo.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+wifinfo.menu.exception.enabled=Enabled
+wifinfo.menu.exception.enabled.build.exception_flags=-fexceptions
+wifinfo.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+wifinfo.menu.ssl.all=All SSL ciphers (most compatible)
+wifinfo.menu.ssl.all.build.sslflags=
+wifinfo.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+wifinfo.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 wifinfo.upload.resetmethod=nodemcu
 wifinfo.build.flash_mode=qio
+wifinfo.build.flash_flags=-DFLASHMODE_QIO
 wifinfo.menu.FlashFreq.40=40MHz
 wifinfo.menu.FlashFreq.40.build.flash_freq=40
 wifinfo.menu.FlashFreq.80=80MHz
@@ -3880,14 +4698,30 @@ wifinfo.menu.eesz.1M512.build.rfcal_addr=0xFC000
 wifinfo.menu.eesz.1M512.build.spiffs_start=0x7B000
 wifinfo.menu.eesz.1M512.build.spiffs_end=0xFB000
 wifinfo.menu.eesz.1M512.build.spiffs_blocksize=4096
-wifinfo.menu.ip.lm2=v2 Lower Memory
-wifinfo.menu.ip.lm2.build.lwip_include=lwip2/include
-wifinfo.menu.ip.lm2.build.lwip_lib=-llwip2
-wifinfo.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wifinfo.menu.ip.hb2=v2 Higher Bandwidth
-wifinfo.menu.ip.hb2.build.lwip_include=lwip2/include
-wifinfo.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-wifinfo.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+wifinfo.menu.ip.lm2f=v2 Lower Memory
+wifinfo.menu.ip.lm2f.build.lwip_include=lwip2/include
+wifinfo.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+wifinfo.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+wifinfo.menu.ip.hb2f=v2 Higher Bandwidth
+wifinfo.menu.ip.hb2f.build.lwip_include=lwip2/include
+wifinfo.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+wifinfo.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+wifinfo.menu.ip.lm2n=v2 Lower Memory (no features)
+wifinfo.menu.ip.lm2n.build.lwip_include=lwip2/include
+wifinfo.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+wifinfo.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+wifinfo.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+wifinfo.menu.ip.hb2n.build.lwip_include=lwip2/include
+wifinfo.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+wifinfo.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+wifinfo.menu.ip.lm6f=v2 IPv6 Lower Memory
+wifinfo.menu.ip.lm6f.build.lwip_include=lwip2/include
+wifinfo.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+wifinfo.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+wifinfo.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+wifinfo.menu.ip.hb6f.build.lwip_include=lwip2/include
+wifinfo.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+wifinfo.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 wifinfo.menu.ip.hb1=v1.4 Higher Bandwidth
 wifinfo.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 wifinfo.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -3952,11 +4786,11 @@ wifinfo.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOO
 wifinfo.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 wifinfo.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 wifinfo.menu.wipe.none=Only Sketch
-wifinfo.menu.wipe.none.upload.erase_cmd=
+wifinfo.menu.wipe.none.upload.erase_cmd=version
 wifinfo.menu.wipe.sdk=Sketch + WiFi Settings
-wifinfo.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+wifinfo.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 wifinfo.menu.wipe.all=All Flash Contents
-wifinfo.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+wifinfo.menu.wipe.all.upload.erase_cmd=erase_flash
 wifinfo.menu.baud.115200=115200
 wifinfo.menu.baud.115200.upload.speed=115200
 wifinfo.menu.baud.9600=9600
@@ -3978,23 +4812,23 @@ wifinfo.menu.baud.921600.upload.speed=921600
 
 ##############################################################
 arduino-esp8266.name=Arduino
-arduino-esp8266.menu.BoardModel.starottodeved.build.board=ESP8266_ARDUINO_STAR_OTTO
-arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-arduino-esp8266.menu.BoardModel.starottodeved.build.variant=arduino_uart
-arduino-esp8266.menu.BoardModel.unowifideved.build.board=ESP8266_ARDUINO_UNOWIFI
-arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
-arduino-esp8266.menu.BoardModel.primo=Primo
-arduino-esp8266.menu.BoardModel.unowifideved.build.variant=arduino_uart
-arduino-esp8266.menu.BoardModel.primo.build.variant=arduino_spi
-arduino-esp8266.menu.BoardModel.starottodeved=Star OTTO
 arduino-esp8266.build.board=ESP8266_ARDUINO
+arduino-esp8266.menu.BoardModel.primo=Primo
 arduino-esp8266.menu.BoardModel.primo.build.board=ESP8266_ARDUINO_PRIMO
+arduino-esp8266.menu.BoardModel.primo.build.variant=arduino_spi
+arduino-esp8266.menu.BoardModel.primo.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
 arduino-esp8266.menu.BoardModel.unowifideved=Uno WiFi
+arduino-esp8266.menu.BoardModel.unowifideved.build.board=ESP8266_ARDUINO_UNOWIFI
+arduino-esp8266.menu.BoardModel.unowifideved.build.variant=arduino_uart
+arduino-esp8266.menu.BoardModel.unowifideved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
+arduino-esp8266.menu.BoardModel.starottodeved=Star OTTO
+arduino-esp8266.menu.BoardModel.starottodeved.build.variant=arduino_uart
+arduino-esp8266.menu.BoardModel.starottodeved.build.board=ESP8266_ARDUINO_STAR_OTTO
+arduino-esp8266.menu.BoardModel.starottodeved.build.extra_flags=-DF_CRYSTAL=40000000 -DESP8266
 arduino-esp8266.upload.tool=esptool
 arduino-esp8266.upload.maximum_data_size=81920
 arduino-esp8266.upload.wait_for_upload_port=true
-arduino-esp8266.upload.erase_cmd=
+arduino-esp8266.upload.erase_cmd=version
 arduino-esp8266.serial.disableDTR=true
 arduino-esp8266.serial.disableRTS=true
 arduino-esp8266.build.mcu=esp8266
@@ -4013,8 +4847,19 @@ arduino-esp8266.menu.vt.heap=Heap
 arduino-esp8266.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 arduino-esp8266.menu.vt.iram=IRAM
 arduino-esp8266.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+arduino-esp8266.menu.exception.disabled=Disabled
+arduino-esp8266.menu.exception.disabled.build.exception_flags=-fno-exceptions
+arduino-esp8266.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+arduino-esp8266.menu.exception.enabled=Enabled
+arduino-esp8266.menu.exception.enabled.build.exception_flags=-fexceptions
+arduino-esp8266.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+arduino-esp8266.menu.ssl.all=All SSL ciphers (most compatible)
+arduino-esp8266.menu.ssl.all.build.sslflags=
+arduino-esp8266.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+arduino-esp8266.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 arduino-esp8266.upload.resetmethod=ck
 arduino-esp8266.build.flash_mode=qio
+arduino-esp8266.build.flash_flags=-DFLASHMODE_QIO
 arduino-esp8266.build.flash_freq=40
 arduino-esp8266.menu.eesz.4M=4M (no SPIFFS)
 arduino-esp8266.menu.eesz.4M.build.flash_size=4M
@@ -4053,14 +4898,30 @@ arduino-esp8266.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 arduino-esp8266.menu.eesz.4M3M.build.spiffs_start=0x100000
 arduino-esp8266.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 arduino-esp8266.menu.eesz.4M3M.build.spiffs_blocksize=8192
-arduino-esp8266.menu.ip.lm2=v2 Lower Memory
-arduino-esp8266.menu.ip.lm2.build.lwip_include=lwip2/include
-arduino-esp8266.menu.ip.lm2.build.lwip_lib=-llwip2
-arduino-esp8266.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-arduino-esp8266.menu.ip.hb2=v2 Higher Bandwidth
-arduino-esp8266.menu.ip.hb2.build.lwip_include=lwip2/include
-arduino-esp8266.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-arduino-esp8266.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+arduino-esp8266.menu.ip.lm2f=v2 Lower Memory
+arduino-esp8266.menu.ip.lm2f.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+arduino-esp8266.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+arduino-esp8266.menu.ip.hb2f=v2 Higher Bandwidth
+arduino-esp8266.menu.ip.hb2f.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+arduino-esp8266.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+arduino-esp8266.menu.ip.lm2n=v2 Lower Memory (no features)
+arduino-esp8266.menu.ip.lm2n.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+arduino-esp8266.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+arduino-esp8266.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+arduino-esp8266.menu.ip.hb2n.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+arduino-esp8266.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+arduino-esp8266.menu.ip.lm6f=v2 IPv6 Lower Memory
+arduino-esp8266.menu.ip.lm6f.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+arduino-esp8266.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+arduino-esp8266.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+arduino-esp8266.menu.ip.hb6f.build.lwip_include=lwip2/include
+arduino-esp8266.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+arduino-esp8266.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 arduino-esp8266.menu.ip.hb1=v1.4 Higher Bandwidth
 arduino-esp8266.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 arduino-esp8266.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -4125,11 +4986,11 @@ arduino-esp8266.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDA
 arduino-esp8266.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 arduino-esp8266.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 arduino-esp8266.menu.wipe.none=Only Sketch
-arduino-esp8266.menu.wipe.none.upload.erase_cmd=
+arduino-esp8266.menu.wipe.none.upload.erase_cmd=version
 arduino-esp8266.menu.wipe.sdk=Sketch + WiFi Settings
-arduino-esp8266.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+arduino-esp8266.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 arduino-esp8266.menu.wipe.all=All Flash Contents
-arduino-esp8266.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+arduino-esp8266.menu.wipe.all.upload.erase_cmd=erase_flash
 arduino-esp8266.menu.baud.115200=115200
 arduino-esp8266.menu.baud.115200.upload.speed=115200
 arduino-esp8266.menu.baud.9600=9600
@@ -4157,7 +5018,7 @@ gen4iod.build.variant=generic
 gen4iod.upload.tool=esptool
 gen4iod.upload.maximum_data_size=81920
 gen4iod.upload.wait_for_upload_port=true
-gen4iod.upload.erase_cmd=
+gen4iod.upload.erase_cmd=version
 gen4iod.serial.disableDTR=true
 gen4iod.serial.disableRTS=true
 gen4iod.build.mcu=esp8266
@@ -4175,8 +5036,19 @@ gen4iod.menu.vt.heap=Heap
 gen4iod.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 gen4iod.menu.vt.iram=IRAM
 gen4iod.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+gen4iod.menu.exception.disabled=Disabled
+gen4iod.menu.exception.disabled.build.exception_flags=-fno-exceptions
+gen4iod.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+gen4iod.menu.exception.enabled=Enabled
+gen4iod.menu.exception.enabled.build.exception_flags=-fexceptions
+gen4iod.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+gen4iod.menu.ssl.all=All SSL ciphers (most compatible)
+gen4iod.menu.ssl.all.build.sslflags=
+gen4iod.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+gen4iod.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 gen4iod.upload.resetmethod=nodemcu
 gen4iod.build.flash_mode=dio
+gen4iod.build.flash_flags=-DFLASHMODE_DIO
 gen4iod.build.flash_freq=80
 gen4iod.menu.eesz.512K=512K (no SPIFFS)
 gen4iod.menu.eesz.512K.build.flash_size=512K
@@ -4215,14 +5087,30 @@ gen4iod.menu.eesz.512K128.build.rfcal_addr=0x7C000
 gen4iod.menu.eesz.512K128.build.spiffs_start=0x5B000
 gen4iod.menu.eesz.512K128.build.spiffs_end=0x7B000
 gen4iod.menu.eesz.512K128.build.spiffs_blocksize=4096
-gen4iod.menu.ip.lm2=v2 Lower Memory
-gen4iod.menu.ip.lm2.build.lwip_include=lwip2/include
-gen4iod.menu.ip.lm2.build.lwip_lib=-llwip2
-gen4iod.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-gen4iod.menu.ip.hb2=v2 Higher Bandwidth
-gen4iod.menu.ip.hb2.build.lwip_include=lwip2/include
-gen4iod.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-gen4iod.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+gen4iod.menu.ip.lm2f=v2 Lower Memory
+gen4iod.menu.ip.lm2f.build.lwip_include=lwip2/include
+gen4iod.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+gen4iod.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+gen4iod.menu.ip.hb2f=v2 Higher Bandwidth
+gen4iod.menu.ip.hb2f.build.lwip_include=lwip2/include
+gen4iod.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+gen4iod.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+gen4iod.menu.ip.lm2n=v2 Lower Memory (no features)
+gen4iod.menu.ip.lm2n.build.lwip_include=lwip2/include
+gen4iod.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+gen4iod.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+gen4iod.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+gen4iod.menu.ip.hb2n.build.lwip_include=lwip2/include
+gen4iod.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+gen4iod.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+gen4iod.menu.ip.lm6f=v2 IPv6 Lower Memory
+gen4iod.menu.ip.lm6f.build.lwip_include=lwip2/include
+gen4iod.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+gen4iod.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+gen4iod.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+gen4iod.menu.ip.hb6f.build.lwip_include=lwip2/include
+gen4iod.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+gen4iod.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 gen4iod.menu.ip.hb1=v1.4 Higher Bandwidth
 gen4iod.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 gen4iod.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -4287,11 +5175,11 @@ gen4iod.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOO
 gen4iod.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 gen4iod.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 gen4iod.menu.wipe.none=Only Sketch
-gen4iod.menu.wipe.none.upload.erase_cmd=
+gen4iod.menu.wipe.none.upload.erase_cmd=version
 gen4iod.menu.wipe.sdk=Sketch + WiFi Settings
-gen4iod.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+gen4iod.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 gen4iod.menu.wipe.all=All Flash Contents
-gen4iod.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+gen4iod.menu.wipe.all.upload.erase_cmd=erase_flash
 gen4iod.menu.baud.115200=115200
 gen4iod.menu.baud.115200.upload.speed=115200
 gen4iod.menu.baud.9600=9600
@@ -4319,7 +5207,7 @@ oak.upload.maximum_size=1040368
 oak.upload.tool=esptool
 oak.upload.maximum_data_size=81920
 oak.upload.wait_for_upload_port=true
-oak.upload.erase_cmd=
+oak.upload.erase_cmd=version
 oak.serial.disableDTR=true
 oak.serial.disableRTS=true
 oak.build.mcu=esp8266
@@ -4337,8 +5225,19 @@ oak.menu.vt.heap=Heap
 oak.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 oak.menu.vt.iram=IRAM
 oak.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+oak.menu.exception.disabled=Disabled
+oak.menu.exception.disabled.build.exception_flags=-fno-exceptions
+oak.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+oak.menu.exception.enabled=Enabled
+oak.menu.exception.enabled.build.exception_flags=-fexceptions
+oak.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+oak.menu.ssl.all=All SSL ciphers (most compatible)
+oak.menu.ssl.all.build.sslflags=
+oak.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+oak.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 oak.upload.resetmethod=none
 oak.build.flash_mode=dio
+oak.build.flash_flags=-DFLASHMODE_DIO
 oak.build.flash_freq=40
 oak.menu.eesz.4M=4M (no SPIFFS)
 oak.menu.eesz.4M.build.flash_size=4M
@@ -4377,14 +5276,30 @@ oak.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 oak.menu.eesz.4M3M.build.spiffs_start=0x100000
 oak.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 oak.menu.eesz.4M3M.build.spiffs_blocksize=8192
-oak.menu.ip.lm2=v2 Lower Memory
-oak.menu.ip.lm2.build.lwip_include=lwip2/include
-oak.menu.ip.lm2.build.lwip_lib=-llwip2
-oak.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-oak.menu.ip.hb2=v2 Higher Bandwidth
-oak.menu.ip.hb2.build.lwip_include=lwip2/include
-oak.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-oak.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+oak.menu.ip.lm2f=v2 Lower Memory
+oak.menu.ip.lm2f.build.lwip_include=lwip2/include
+oak.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+oak.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+oak.menu.ip.hb2f=v2 Higher Bandwidth
+oak.menu.ip.hb2f.build.lwip_include=lwip2/include
+oak.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+oak.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+oak.menu.ip.lm2n=v2 Lower Memory (no features)
+oak.menu.ip.lm2n.build.lwip_include=lwip2/include
+oak.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+oak.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+oak.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+oak.menu.ip.hb2n.build.lwip_include=lwip2/include
+oak.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+oak.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+oak.menu.ip.lm6f=v2 IPv6 Lower Memory
+oak.menu.ip.lm6f.build.lwip_include=lwip2/include
+oak.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+oak.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+oak.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+oak.menu.ip.hb6f.build.lwip_include=lwip2/include
+oak.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+oak.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 oak.menu.ip.hb1=v1.4 Higher Bandwidth
 oak.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 oak.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -4449,11 +5364,11 @@ oak.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.bu
 oak.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 oak.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 oak.menu.wipe.none=Only Sketch
-oak.menu.wipe.none.upload.erase_cmd=
+oak.menu.wipe.none.upload.erase_cmd=version
 oak.menu.wipe.sdk=Sketch + WiFi Settings
-oak.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+oak.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 oak.menu.wipe.all=All Flash Contents
-oak.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+oak.menu.wipe.all.upload.erase_cmd=erase_flash
 oak.menu.baud.921600=921600
 oak.menu.baud.921600.upload.speed=921600
 oak.menu.baud.9600=9600
@@ -4480,7 +5395,7 @@ wifiduino.build.variant=wifiduino
 wifiduino.upload.tool=esptool
 wifiduino.upload.maximum_data_size=81920
 wifiduino.upload.wait_for_upload_port=true
-wifiduino.upload.erase_cmd=
+wifiduino.upload.erase_cmd=version
 wifiduino.serial.disableDTR=true
 wifiduino.serial.disableRTS=true
 wifiduino.build.mcu=esp8266
@@ -4498,8 +5413,19 @@ wifiduino.menu.vt.heap=Heap
 wifiduino.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 wifiduino.menu.vt.iram=IRAM
 wifiduino.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+wifiduino.menu.exception.disabled=Disabled
+wifiduino.menu.exception.disabled.build.exception_flags=-fno-exceptions
+wifiduino.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+wifiduino.menu.exception.enabled=Enabled
+wifiduino.menu.exception.enabled.build.exception_flags=-fexceptions
+wifiduino.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+wifiduino.menu.ssl.all=All SSL ciphers (most compatible)
+wifiduino.menu.ssl.all.build.sslflags=
+wifiduino.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+wifiduino.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 wifiduino.upload.resetmethod=nodemcu
 wifiduino.build.flash_mode=dio
+wifiduino.build.flash_flags=-DFLASHMODE_DIO
 wifiduino.build.flash_freq=40
 wifiduino.menu.eesz.4M=4M (no SPIFFS)
 wifiduino.menu.eesz.4M.build.flash_size=4M
@@ -4538,14 +5464,30 @@ wifiduino.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 wifiduino.menu.eesz.4M3M.build.spiffs_start=0x100000
 wifiduino.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 wifiduino.menu.eesz.4M3M.build.spiffs_blocksize=8192
-wifiduino.menu.ip.lm2=v2 Lower Memory
-wifiduino.menu.ip.lm2.build.lwip_include=lwip2/include
-wifiduino.menu.ip.lm2.build.lwip_lib=-llwip2
-wifiduino.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wifiduino.menu.ip.hb2=v2 Higher Bandwidth
-wifiduino.menu.ip.hb2.build.lwip_include=lwip2/include
-wifiduino.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-wifiduino.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+wifiduino.menu.ip.lm2f=v2 Lower Memory
+wifiduino.menu.ip.lm2f.build.lwip_include=lwip2/include
+wifiduino.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+wifiduino.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+wifiduino.menu.ip.hb2f=v2 Higher Bandwidth
+wifiduino.menu.ip.hb2f.build.lwip_include=lwip2/include
+wifiduino.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+wifiduino.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+wifiduino.menu.ip.lm2n=v2 Lower Memory (no features)
+wifiduino.menu.ip.lm2n.build.lwip_include=lwip2/include
+wifiduino.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+wifiduino.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+wifiduino.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+wifiduino.menu.ip.hb2n.build.lwip_include=lwip2/include
+wifiduino.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+wifiduino.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+wifiduino.menu.ip.lm6f=v2 IPv6 Lower Memory
+wifiduino.menu.ip.lm6f.build.lwip_include=lwip2/include
+wifiduino.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+wifiduino.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+wifiduino.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+wifiduino.menu.ip.hb6f.build.lwip_include=lwip2/include
+wifiduino.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+wifiduino.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 wifiduino.menu.ip.hb1=v1.4 Higher Bandwidth
 wifiduino.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 wifiduino.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -4610,11 +5552,11 @@ wifiduino.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA
 wifiduino.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 wifiduino.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 wifiduino.menu.wipe.none=Only Sketch
-wifiduino.menu.wipe.none.upload.erase_cmd=
+wifiduino.menu.wipe.none.upload.erase_cmd=version
 wifiduino.menu.wipe.sdk=Sketch + WiFi Settings
-wifiduino.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+wifiduino.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 wifiduino.menu.wipe.all=All Flash Contents
-wifiduino.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+wifiduino.menu.wipe.all.upload.erase_cmd=erase_flash
 wifiduino.menu.baud.921600=921600
 wifiduino.menu.baud.921600.upload.speed=921600
 wifiduino.menu.baud.9600=9600
@@ -4641,7 +5583,7 @@ wifi_slot.build.variant=wifi_slot
 wifi_slot.upload.tool=esptool
 wifi_slot.upload.maximum_data_size=81920
 wifi_slot.upload.wait_for_upload_port=true
-wifi_slot.upload.erase_cmd=
+wifi_slot.upload.erase_cmd=version
 wifi_slot.serial.disableDTR=true
 wifi_slot.serial.disableRTS=true
 wifi_slot.build.mcu=esp8266
@@ -4659,19 +5601,33 @@ wifi_slot.menu.vt.heap=Heap
 wifi_slot.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 wifi_slot.menu.vt.iram=IRAM
 wifi_slot.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+wifi_slot.menu.exception.disabled=Disabled
+wifi_slot.menu.exception.disabled.build.exception_flags=-fno-exceptions
+wifi_slot.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+wifi_slot.menu.exception.enabled=Enabled
+wifi_slot.menu.exception.enabled.build.exception_flags=-fexceptions
+wifi_slot.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+wifi_slot.menu.ssl.all=All SSL ciphers (most compatible)
+wifi_slot.menu.ssl.all.build.sslflags=
+wifi_slot.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+wifi_slot.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 wifi_slot.upload.resetmethod=nodemcu
 wifi_slot.menu.FlashFreq.40=40MHz
 wifi_slot.menu.FlashFreq.40.build.flash_freq=40
 wifi_slot.menu.FlashFreq.80=80MHz
 wifi_slot.menu.FlashFreq.80.build.flash_freq=80
-wifi_slot.menu.FlashMode.qio=QIO
-wifi_slot.menu.FlashMode.qio.build.flash_mode=qio
-wifi_slot.menu.FlashMode.qout=QOUT
-wifi_slot.menu.FlashMode.qout.build.flash_mode=qout
+wifi_slot.menu.FlashMode.dout=DOUT (compatible)
+wifi_slot.menu.FlashMode.dout.build.flash_mode=dout
+wifi_slot.menu.FlashMode.dout.build.flash_flags=-DFLASHMODE_DOUT
 wifi_slot.menu.FlashMode.dio=DIO
 wifi_slot.menu.FlashMode.dio.build.flash_mode=dio
-wifi_slot.menu.FlashMode.dout=DOUT
-wifi_slot.menu.FlashMode.dout.build.flash_mode=dout
+wifi_slot.menu.FlashMode.dio.build.flash_flags=-DFLASHMODE_DIO
+wifi_slot.menu.FlashMode.qout=QOUT
+wifi_slot.menu.FlashMode.qout.build.flash_mode=qout
+wifi_slot.menu.FlashMode.qout.build.flash_flags=-DFLASHMODE_QOUT
+wifi_slot.menu.FlashMode.qio=QIO (fast)
+wifi_slot.menu.FlashMode.qio.build.flash_mode=qio
+wifi_slot.menu.FlashMode.qio.build.flash_flags=-DFLASHMODE_QIO
 wifi_slot.menu.eesz.1M=1M (no SPIFFS)
 wifi_slot.menu.eesz.1M.build.flash_size=1M
 wifi_slot.menu.eesz.1M.build.flash_size_bytes=0x100000
@@ -4756,6 +5712,26 @@ wifi_slot.menu.eesz.2M.build.flash_ld=eagle.flash.2m.ld
 wifi_slot.menu.eesz.2M.build.spiffs_pagesize=256
 wifi_slot.menu.eesz.2M.upload.maximum_size=1044464
 wifi_slot.menu.eesz.2M.build.rfcal_addr=0x1FC000
+wifi_slot.menu.eesz.2M128=2M (128K SPIFFS)
+wifi_slot.menu.eesz.2M128.build.flash_size=2M
+wifi_slot.menu.eesz.2M128.build.flash_size_bytes=0x200000
+wifi_slot.menu.eesz.2M128.build.flash_ld=eagle.flash.2m128.ld
+wifi_slot.menu.eesz.2M128.build.spiffs_pagesize=256
+wifi_slot.menu.eesz.2M128.upload.maximum_size=1044464
+wifi_slot.menu.eesz.2M128.build.rfcal_addr=0x1FC000
+wifi_slot.menu.eesz.2M128.build.spiffs_start=0x1E0000
+wifi_slot.menu.eesz.2M128.build.spiffs_end=0x1FB000
+wifi_slot.menu.eesz.2M128.build.spiffs_blocksize=4096
+wifi_slot.menu.eesz.2M256=2M (256K SPIFFS)
+wifi_slot.menu.eesz.2M256.build.flash_size=2M
+wifi_slot.menu.eesz.2M256.build.flash_size_bytes=0x200000
+wifi_slot.menu.eesz.2M256.build.flash_ld=eagle.flash.2m256.ld
+wifi_slot.menu.eesz.2M256.build.spiffs_pagesize=256
+wifi_slot.menu.eesz.2M256.upload.maximum_size=1044464
+wifi_slot.menu.eesz.2M256.build.rfcal_addr=0x1FC000
+wifi_slot.menu.eesz.2M256.build.spiffs_start=0x1C0000
+wifi_slot.menu.eesz.2M256.build.spiffs_end=0x1FB000
+wifi_slot.menu.eesz.2M256.build.spiffs_blocksize=4096
 wifi_slot.menu.eesz.2M512=2M (512K SPIFFS)
 wifi_slot.menu.eesz.2M512.build.flash_size=2M
 wifi_slot.menu.eesz.2M512.build.flash_size_bytes=0x200000
@@ -4776,14 +5752,30 @@ wifi_slot.menu.eesz.2M1M.build.rfcal_addr=0x1FC000
 wifi_slot.menu.eesz.2M1M.build.spiffs_start=0x100000
 wifi_slot.menu.eesz.2M1M.build.spiffs_end=0x1FB000
 wifi_slot.menu.eesz.2M1M.build.spiffs_blocksize=8192
-wifi_slot.menu.ip.lm2=v2 Lower Memory
-wifi_slot.menu.ip.lm2.build.lwip_include=lwip2/include
-wifi_slot.menu.ip.lm2.build.lwip_lib=-llwip2
-wifi_slot.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wifi_slot.menu.ip.hb2=v2 Higher Bandwidth
-wifi_slot.menu.ip.hb2.build.lwip_include=lwip2/include
-wifi_slot.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-wifi_slot.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+wifi_slot.menu.ip.lm2f=v2 Lower Memory
+wifi_slot.menu.ip.lm2f.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+wifi_slot.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+wifi_slot.menu.ip.hb2f=v2 Higher Bandwidth
+wifi_slot.menu.ip.hb2f.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+wifi_slot.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+wifi_slot.menu.ip.lm2n=v2 Lower Memory (no features)
+wifi_slot.menu.ip.lm2n.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+wifi_slot.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+wifi_slot.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+wifi_slot.menu.ip.hb2n.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+wifi_slot.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+wifi_slot.menu.ip.lm6f=v2 IPv6 Lower Memory
+wifi_slot.menu.ip.lm6f.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+wifi_slot.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+wifi_slot.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+wifi_slot.menu.ip.hb6f.build.lwip_include=lwip2/include
+wifi_slot.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+wifi_slot.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 wifi_slot.menu.ip.hb1=v1.4 Higher Bandwidth
 wifi_slot.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 wifi_slot.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -4848,11 +5840,11 @@ wifi_slot.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTA
 wifi_slot.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 wifi_slot.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 wifi_slot.menu.wipe.none=Only Sketch
-wifi_slot.menu.wipe.none.upload.erase_cmd=
+wifi_slot.menu.wipe.none.upload.erase_cmd=version
 wifi_slot.menu.wipe.sdk=Sketch + WiFi Settings
-wifi_slot.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+wifi_slot.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 wifi_slot.menu.wipe.all=All Flash Contents
-wifi_slot.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+wifi_slot.menu.wipe.all.upload.erase_cmd=erase_flash
 wifi_slot.menu.baud.115200=115200
 wifi_slot.menu.baud.115200.upload.speed=115200
 wifi_slot.menu.baud.9600=9600
@@ -4879,7 +5871,7 @@ wiolink.build.variant=wiolink
 wiolink.upload.tool=esptool
 wiolink.upload.maximum_data_size=81920
 wiolink.upload.wait_for_upload_port=true
-wiolink.upload.erase_cmd=
+wiolink.upload.erase_cmd=version
 wiolink.serial.disableDTR=true
 wiolink.serial.disableRTS=true
 wiolink.build.mcu=esp8266
@@ -4897,8 +5889,19 @@ wiolink.menu.vt.heap=Heap
 wiolink.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
 wiolink.menu.vt.iram=IRAM
 wiolink.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+wiolink.menu.exception.disabled=Disabled
+wiolink.menu.exception.disabled.build.exception_flags=-fno-exceptions
+wiolink.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+wiolink.menu.exception.enabled=Enabled
+wiolink.menu.exception.enabled.build.exception_flags=-fexceptions
+wiolink.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+wiolink.menu.ssl.all=All SSL ciphers (most compatible)
+wiolink.menu.ssl.all.build.sslflags=
+wiolink.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+wiolink.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
 wiolink.upload.resetmethod=nodemcu
 wiolink.build.flash_mode=qio
+wiolink.build.flash_flags=-DFLASHMODE_QIO
 wiolink.build.flash_freq=40
 wiolink.menu.eesz.4M=4M (no SPIFFS)
 wiolink.menu.eesz.4M.build.flash_size=4M
@@ -4937,14 +5940,30 @@ wiolink.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
 wiolink.menu.eesz.4M3M.build.spiffs_start=0x100000
 wiolink.menu.eesz.4M3M.build.spiffs_end=0x3FB000
 wiolink.menu.eesz.4M3M.build.spiffs_blocksize=8192
-wiolink.menu.ip.lm2=v2 Lower Memory
-wiolink.menu.ip.lm2.build.lwip_include=lwip2/include
-wiolink.menu.ip.lm2.build.lwip_lib=-llwip2
-wiolink.menu.ip.lm2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536
-wiolink.menu.ip.hb2=v2 Higher Bandwidth
-wiolink.menu.ip.hb2.build.lwip_include=lwip2/include
-wiolink.menu.ip.hb2.build.lwip_lib=-llwip2_1460
-wiolink.menu.ip.hb2.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460
+wiolink.menu.ip.lm2f=v2 Lower Memory
+wiolink.menu.ip.lm2f.build.lwip_include=lwip2/include
+wiolink.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+wiolink.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+wiolink.menu.ip.hb2f=v2 Higher Bandwidth
+wiolink.menu.ip.hb2f.build.lwip_include=lwip2/include
+wiolink.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+wiolink.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+wiolink.menu.ip.lm2n=v2 Lower Memory (no features)
+wiolink.menu.ip.lm2n.build.lwip_include=lwip2/include
+wiolink.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+wiolink.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+wiolink.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+wiolink.menu.ip.hb2n.build.lwip_include=lwip2/include
+wiolink.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+wiolink.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+wiolink.menu.ip.lm6f=v2 IPv6 Lower Memory
+wiolink.menu.ip.lm6f.build.lwip_include=lwip2/include
+wiolink.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+wiolink.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+wiolink.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+wiolink.menu.ip.hb6f.build.lwip_include=lwip2/include
+wiolink.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+wiolink.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
 wiolink.menu.ip.hb1=v1.4 Higher Bandwidth
 wiolink.menu.ip.hb1.build.lwip_lib=-llwip_gcc
 wiolink.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
@@ -5009,11 +6028,11 @@ wiolink.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOO
 wiolink.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
 wiolink.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
 wiolink.menu.wipe.none=Only Sketch
-wiolink.menu.wipe.none.upload.erase_cmd=
+wiolink.menu.wipe.none.upload.erase_cmd=version
 wiolink.menu.wipe.sdk=Sketch + WiFi Settings
-wiolink.menu.wipe.sdk.upload.erase_cmd=-ca "{build.rfcal_addr}" -cz 0x4000
+wiolink.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
 wiolink.menu.wipe.all=All Flash Contents
-wiolink.menu.wipe.all.upload.erase_cmd=-ca 0x0 -cz "{build.flash_size_bytes}"
+wiolink.menu.wipe.all.upload.erase_cmd=erase_flash
 wiolink.menu.baud.115200=115200
 wiolink.menu.baud.115200.upload.speed=115200
 wiolink.menu.baud.9600=9600
@@ -5032,4 +6051,192 @@ wiolink.menu.baud.512000.windows=512000
 wiolink.menu.baud.512000.upload.speed=512000
 wiolink.menu.baud.921600=921600
 wiolink.menu.baud.921600.upload.speed=921600
+
+##############################################################
+espectro.name=ESPectro Core
+espectro.build.board=ESP8266_ESPECTRO_CORE
+espectro.build.variant=espectro
+espectro.upload.tool=esptool
+espectro.upload.maximum_data_size=81920
+espectro.upload.wait_for_upload_port=true
+espectro.upload.erase_cmd=version
+espectro.serial.disableDTR=true
+espectro.serial.disableRTS=true
+espectro.build.mcu=esp8266
+espectro.build.core=esp8266
+espectro.build.spiffs_pagesize=256
+espectro.build.debug_port=
+espectro.build.debug_level=
+espectro.menu.xtal.80=80 MHz
+espectro.menu.xtal.80.build.f_cpu=80000000L
+espectro.menu.xtal.160=160 MHz
+espectro.menu.xtal.160.build.f_cpu=160000000L
+espectro.menu.vt.flash=Flash
+espectro.menu.vt.flash.build.vtable_flags=-DVTABLES_IN_FLASH
+espectro.menu.vt.heap=Heap
+espectro.menu.vt.heap.build.vtable_flags=-DVTABLES_IN_DRAM
+espectro.menu.vt.iram=IRAM
+espectro.menu.vt.iram.build.vtable_flags=-DVTABLES_IN_IRAM
+espectro.menu.exception.disabled=Disabled
+espectro.menu.exception.disabled.build.exception_flags=-fno-exceptions
+espectro.menu.exception.disabled.build.stdcpp_lib=-lstdc++
+espectro.menu.exception.enabled=Enabled
+espectro.menu.exception.enabled.build.exception_flags=-fexceptions
+espectro.menu.exception.enabled.build.stdcpp_lib=-lstdc++-exc
+espectro.menu.ssl.all=All SSL ciphers (most compatible)
+espectro.menu.ssl.all.build.sslflags=
+espectro.menu.ssl.basic=Basic SSL ciphers (lower ROM use)
+espectro.menu.ssl.basic.build.sslflags=-DBEARSSL_SSL_BASIC
+espectro.upload.resetmethod=nodemcu
+espectro.build.flash_mode=dio
+espectro.build.flash_flags=-DFLASHMODE_DIO
+espectro.build.flash_freq=40
+espectro.menu.eesz.4M=4M (no SPIFFS)
+espectro.menu.eesz.4M.build.flash_size=4M
+espectro.menu.eesz.4M.build.flash_size_bytes=0x400000
+espectro.menu.eesz.4M.build.flash_ld=eagle.flash.4m.ld
+espectro.menu.eesz.4M.build.spiffs_pagesize=256
+espectro.menu.eesz.4M.upload.maximum_size=1044464
+espectro.menu.eesz.4M.build.rfcal_addr=0x3FC000
+espectro.menu.eesz.4M1M=4M (1M SPIFFS)
+espectro.menu.eesz.4M1M.build.flash_size=4M
+espectro.menu.eesz.4M1M.build.flash_size_bytes=0x400000
+espectro.menu.eesz.4M1M.build.flash_ld=eagle.flash.4m1m.ld
+espectro.menu.eesz.4M1M.build.spiffs_pagesize=256
+espectro.menu.eesz.4M1M.upload.maximum_size=1044464
+espectro.menu.eesz.4M1M.build.rfcal_addr=0x3FC000
+espectro.menu.eesz.4M1M.build.spiffs_start=0x300000
+espectro.menu.eesz.4M1M.build.spiffs_end=0x3FB000
+espectro.menu.eesz.4M1M.build.spiffs_blocksize=8192
+espectro.menu.eesz.4M2M=4M (2M SPIFFS)
+espectro.menu.eesz.4M2M.build.flash_size=4M
+espectro.menu.eesz.4M2M.build.flash_size_bytes=0x400000
+espectro.menu.eesz.4M2M.build.flash_ld=eagle.flash.4m2m.ld
+espectro.menu.eesz.4M2M.build.spiffs_pagesize=256
+espectro.menu.eesz.4M2M.upload.maximum_size=1044464
+espectro.menu.eesz.4M2M.build.rfcal_addr=0x3FC000
+espectro.menu.eesz.4M2M.build.spiffs_start=0x200000
+espectro.menu.eesz.4M2M.build.spiffs_end=0x3FB000
+espectro.menu.eesz.4M2M.build.spiffs_blocksize=8192
+espectro.menu.eesz.4M3M=4M (3M SPIFFS)
+espectro.menu.eesz.4M3M.build.flash_size=4M
+espectro.menu.eesz.4M3M.build.flash_size_bytes=0x400000
+espectro.menu.eesz.4M3M.build.flash_ld=eagle.flash.4m3m.ld
+espectro.menu.eesz.4M3M.build.spiffs_pagesize=256
+espectro.menu.eesz.4M3M.upload.maximum_size=1044464
+espectro.menu.eesz.4M3M.build.rfcal_addr=0x3FC000
+espectro.menu.eesz.4M3M.build.spiffs_start=0x100000
+espectro.menu.eesz.4M3M.build.spiffs_end=0x3FB000
+espectro.menu.eesz.4M3M.build.spiffs_blocksize=8192
+espectro.menu.ip.lm2f=v2 Lower Memory
+espectro.menu.ip.lm2f.build.lwip_include=lwip2/include
+espectro.menu.ip.lm2f.build.lwip_lib=-llwip2-536-feat
+espectro.menu.ip.lm2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espectro.menu.ip.hb2f=v2 Higher Bandwidth
+espectro.menu.ip.hb2f.build.lwip_include=lwip2/include
+espectro.menu.ip.hb2f.build.lwip_lib=-llwip2-1460-feat
+espectro.menu.ip.hb2f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=0
+espectro.menu.ip.lm2n=v2 Lower Memory (no features)
+espectro.menu.ip.lm2n.build.lwip_include=lwip2/include
+espectro.menu.ip.lm2n.build.lwip_lib=-llwip2-536
+espectro.menu.ip.lm2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espectro.menu.ip.hb2n=v2 Higher Bandwidth (no features)
+espectro.menu.ip.hb2n.build.lwip_include=lwip2/include
+espectro.menu.ip.hb2n.build.lwip_lib=-llwip2-1460
+espectro.menu.ip.hb2n.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=0 -DLWIP_IPV6=0
+espectro.menu.ip.lm6f=v2 IPv6 Lower Memory
+espectro.menu.ip.lm6f.build.lwip_include=lwip2/include
+espectro.menu.ip.lm6f.build.lwip_lib=-llwip6-536-feat
+espectro.menu.ip.lm6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=536 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+espectro.menu.ip.hb6f=v2 IPv6 Higher Bandwidth
+espectro.menu.ip.hb6f.build.lwip_include=lwip2/include
+espectro.menu.ip.hb6f.build.lwip_lib=-llwip6-1460-feat
+espectro.menu.ip.hb6f.build.lwip_flags=-DLWIP_OPEN_SRC -DTCP_MSS=1460 -DLWIP_FEATURES=1 -DLWIP_IPV6=1
+espectro.menu.ip.hb1=v1.4 Higher Bandwidth
+espectro.menu.ip.hb1.build.lwip_lib=-llwip_gcc
+espectro.menu.ip.hb1.build.lwip_flags=-DLWIP_OPEN_SRC
+espectro.menu.ip.src=v1.4 Compile from source
+espectro.menu.ip.src.build.lwip_lib=-llwip_src
+espectro.menu.ip.src.build.lwip_flags=-DLWIP_OPEN_SRC
+espectro.menu.ip.src.recipe.hooks.sketch.prebuild.1.pattern=make -C "{runtime.platform.path}/tools/sdk/lwip/src" install TOOLS_PATH="{runtime.tools.xtensa-lx106-elf-gcc.path}/bin/xtensa-lx106-elf-"
+espectro.menu.dbg.Disabled=Disabled
+espectro.menu.dbg.Disabled.build.debug_port=
+espectro.menu.dbg.Serial=Serial
+espectro.menu.dbg.Serial.build.debug_port=-DDEBUG_ESP_PORT=Serial
+espectro.menu.dbg.Serial1=Serial1
+espectro.menu.dbg.Serial1.build.debug_port=-DDEBUG_ESP_PORT=Serial1
+espectro.menu.lvl.None____=None
+espectro.menu.lvl.None____.build.debug_level=
+espectro.menu.lvl.SSL=SSL
+espectro.menu.lvl.SSL.build.debug_level= -DDEBUG_ESP_SSL
+espectro.menu.lvl.TLS_MEM=TLS_MEM
+espectro.menu.lvl.TLS_MEM.build.debug_level= -DDEBUG_ESP_TLS_MEM
+espectro.menu.lvl.HTTP_CLIENT=HTTP_CLIENT
+espectro.menu.lvl.HTTP_CLIENT.build.debug_level= -DDEBUG_ESP_HTTP_CLIENT
+espectro.menu.lvl.HTTP_SERVER=HTTP_SERVER
+espectro.menu.lvl.HTTP_SERVER.build.debug_level= -DDEBUG_ESP_HTTP_SERVER
+espectro.menu.lvl.SSLTLS_MEM=SSL+TLS_MEM
+espectro.menu.lvl.SSLTLS_MEM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM
+espectro.menu.lvl.SSLHTTP_CLIENT=SSL+HTTP_CLIENT
+espectro.menu.lvl.SSLHTTP_CLIENT.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_HTTP_CLIENT
+espectro.menu.lvl.SSLHTTP_SERVER=SSL+HTTP_SERVER
+espectro.menu.lvl.SSLHTTP_SERVER.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_HTTP_SERVER
+espectro.menu.lvl.TLS_MEMHTTP_CLIENT=TLS_MEM+HTTP_CLIENT
+espectro.menu.lvl.TLS_MEMHTTP_CLIENT.build.debug_level= -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT
+espectro.menu.lvl.TLS_MEMHTTP_SERVER=TLS_MEM+HTTP_SERVER
+espectro.menu.lvl.TLS_MEMHTTP_SERVER.build.debug_level= -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_SERVER
+espectro.menu.lvl.HTTP_CLIENTHTTP_SERVER=HTTP_CLIENT+HTTP_SERVER
+espectro.menu.lvl.HTTP_CLIENTHTTP_SERVER.build.debug_level= -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER
+espectro.menu.lvl.SSLTLS_MEMHTTP_CLIENT=SSL+TLS_MEM+HTTP_CLIENT
+espectro.menu.lvl.SSLTLS_MEMHTTP_CLIENT.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT
+espectro.menu.lvl.SSLTLS_MEMHTTP_SERVER=SSL+TLS_MEM+HTTP_SERVER
+espectro.menu.lvl.SSLTLS_MEMHTTP_SERVER.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_SERVER
+espectro.menu.lvl.SSLHTTP_CLIENTHTTP_SERVER=SSL+HTTP_CLIENT+HTTP_SERVER
+espectro.menu.lvl.SSLHTTP_CLIENTHTTP_SERVER.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER
+espectro.menu.lvl.TLS_MEMHTTP_CLIENTHTTP_SERVER=TLS_MEM+HTTP_CLIENT+HTTP_SERVER
+espectro.menu.lvl.TLS_MEMHTTP_CLIENTHTTP_SERVER.build.debug_level= -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER
+espectro.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVER=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER
+espectro.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVER.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER
+espectro.menu.lvl.CORE=CORE
+espectro.menu.lvl.CORE.build.debug_level= -DDEBUG_ESP_CORE
+espectro.menu.lvl.WIFI=WIFI
+espectro.menu.lvl.WIFI.build.debug_level= -DDEBUG_ESP_WIFI
+espectro.menu.lvl.HTTP_UPDATE=HTTP_UPDATE
+espectro.menu.lvl.HTTP_UPDATE.build.debug_level= -DDEBUG_ESP_HTTP_UPDATE
+espectro.menu.lvl.UPDATER=UPDATER
+espectro.menu.lvl.UPDATER.build.debug_level= -DDEBUG_ESP_UPDATER
+espectro.menu.lvl.OTA=OTA
+espectro.menu.lvl.OTA.build.debug_level= -DDEBUG_ESP_OTA
+espectro.menu.lvl.OOM=OOM
+espectro.menu.lvl.OOM.build.debug_level= -DDEBUG_ESP_OOM
+espectro.menu.lvl.COREWIFIHTTP_UPDATEUPDATEROTAOOM=CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espectro.menu.lvl.COREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM
+espectro.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM=SSL+TLS_MEM+HTTP_CLIENT+HTTP_SERVER+CORE+WIFI+HTTP_UPDATE+UPDATER+OTA+OOM
+espectro.menu.lvl.SSLTLS_MEMHTTP_CLIENTHTTP_SERVERCOREWIFIHTTP_UPDATEUPDATEROTAOOM.build.debug_level= -DDEBUG_ESP_SSL -DDEBUG_ESP_TLS_MEM -DDEBUG_ESP_HTTP_CLIENT -DDEBUG_ESP_HTTP_SERVER -DDEBUG_ESP_CORE -DDEBUG_ESP_WIFI -DDEBUG_ESP_HTTP_UPDATE -DDEBUG_ESP_UPDATER -DDEBUG_ESP_OTA -DDEBUG_ESP_OOM
+espectro.menu.lvl.NoAssert-NDEBUG=NoAssert-NDEBUG
+espectro.menu.lvl.NoAssert-NDEBUG.build.debug_level= -DNDEBUG
+espectro.menu.wipe.none=Only Sketch
+espectro.menu.wipe.none.upload.erase_cmd=version
+espectro.menu.wipe.sdk=Sketch + WiFi Settings
+espectro.menu.wipe.sdk.upload.erase_cmd=erase_region "{build.rfcal_addr}" 0x4000
+espectro.menu.wipe.all=All Flash Contents
+espectro.menu.wipe.all.upload.erase_cmd=erase_flash
+espectro.menu.baud.115200=115200
+espectro.menu.baud.115200.upload.speed=115200
+espectro.menu.baud.9600=9600
+espectro.menu.baud.9600.upload.speed=9600
+espectro.menu.baud.57600=57600
+espectro.menu.baud.57600.upload.speed=57600
+espectro.menu.baud.230400.linux=230400
+espectro.menu.baud.230400.macosx=230400
+espectro.menu.baud.230400.upload.speed=230400
+espectro.menu.baud.256000.windows=256000
+espectro.menu.baud.256000.upload.speed=256000
+espectro.menu.baud.460800.linux=460800
+espectro.menu.baud.460800.macosx=460800
+espectro.menu.baud.460800.upload.speed=460800
+espectro.menu.baud.512000.windows=512000
+espectro.menu.baud.512000.upload.speed=512000
+espectro.menu.baud.921600=921600
+espectro.menu.baud.921600.upload.speed=921600
 

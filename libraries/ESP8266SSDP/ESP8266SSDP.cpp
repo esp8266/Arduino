@@ -53,7 +53,10 @@ extern "C" {
 #define SSDP_URI_SIZE     2
 #define SSDP_BUFFER_SIZE  64
 #define SSDP_MULTICAST_TTL 2
-static const IPAddress SSDP_MULTICAST_ADDR(239, 255, 255, 250);
+
+// ssdp ipv6 is FF05::C
+// lwip-v2's igmp_joingroup only supports IPv4
+#define SSDP_MULTICAST_ADDR 239, 255, 255, 250
 
 static const char _ssdp_response_template[] PROGMEM =
   "HTTP/1.1 200 OK\r\n"
@@ -68,7 +71,7 @@ static const char _ssdp_packet_template[] PROGMEM =
   "%s" // _ssdp_response_template / _ssdp_notify_template
   "CACHE-CONTROL: max-age=%u\r\n" // SSDP_INTERVAL
   "SERVER: Arduino/1.0 UPNP/1.1 %s/%s\r\n" // _modelName, _modelNumber
-  "USN: uuid:%s\r\n" // _uuid
+  "USN: %s\r\n" // _uuid
   "%s: %s\r\n"  // "NT" or "ST", _deviceType
   "LOCATION: http://%u.%u.%u.%u:%u/%s\r\n" // WiFi.localIP(), _port, _schemaURL
   "\r\n";
@@ -96,7 +99,7 @@ static const char _ssdp_schema_template[] PROGMEM =
   "<modelURL>%s</modelURL>"
   "<manufacturer>%s</manufacturer>"
   "<manufacturerURL>%s</manufacturerURL>"
-  "<UDN>UUID: %s</UDN>"
+  "<UDN>%s</UDN>"
   "</device>"
  //"<iconList>"	
  //"<icon>"	
@@ -124,11 +127,13 @@ struct SSDPTimer {
 
 SSDPClass::SSDPClass() :
   _server(0),
-  _timer(new SSDPTimer),
+  _timer(0),
   _port(80),
   _ttl(SSDP_MULTICAST_TTL),
+  _respondToAddr(0,0,0,0),
   _respondToPort(0),
   _pending(false),
+  _st_is_uuid(false),
   _delay(0),
   _process_time(0),
   _notify_time(0)
@@ -147,48 +152,49 @@ SSDPClass::SSDPClass() :
 }
 
 SSDPClass::~SSDPClass() {
-  delete _timer;
+  end();
 }
 
 bool SSDPClass::begin() {
+  end();
+  
   _pending = false;
+  _st_is_uuid = false;
   if (strcmp(_uuid,"") == 0) {
 	uint32_t chipId = ESP.getChipId();
-	sprintf(_uuid, "38323636-4558-4dda-9188-cda0e6%02x%02x%02x",
-    (uint16_t) ((chipId >> 16) & 0xff),
+	sprintf_P(_uuid, PSTR("uuid:38323636-4558-4dda-9188-cda0e6%02x%02x%02x"),
+  (uint16_t) ((chipId >> 16) & 0xff),
 	(uint16_t) ((chipId >>  8) & 0xff),
-	(uint16_t)   chipId        & 0xff  );
+	(uint16_t)   chipId        & 0xff);
   }
   
 #ifdef DEBUG_SSDP
   DEBUG_SSDP.printf("SSDP UUID: %s\n", (char *)_uuid);
 #endif
 
-  if (_server) {
-    _server->unref();
-    _server = 0;
-  }
+  assert(NULL == _server);
 
   _server = new UdpContext;
   _server->ref();
 
-  ip_addr_t ifaddr;
-  ifaddr.addr = WiFi.localIP();
-  ip_addr_t multicast_addr;
-  multicast_addr.addr = (uint32_t) SSDP_MULTICAST_ADDR;
-  if (igmp_joingroup(&ifaddr, &multicast_addr) != ERR_OK ) {
-    DEBUGV("SSDP failed to join igmp group");
+  IPAddress local = WiFi.localIP();
+  IPAddress mcast(SSDP_MULTICAST_ADDR);
+
+  if (igmp_joingroup(local, mcast) != ERR_OK ) {
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf_P(PSTR("SSDP failed to join igmp group\n"));
+#endif
     return false;
   }
 
-  if (!_server->listen(*IP_ADDR_ANY, SSDP_PORT)) {
+  if (!_server->listen(IP_ADDR_ANY, SSDP_PORT)) {
     return false;
   }
 
-  _server->setMulticastInterface(ifaddr);
+  _server->setMulticastInterface(local);
   _server->setMulticastTTL(_ttl);
   _server->onRx(std::bind(&SSDPClass::_update, this));
-  if (!_server->connect(multicast_addr, SSDP_PORT)) {
+  if (!_server->connect(mcast, SSDP_PORT)) {
     return false;
   }
 
@@ -197,6 +203,34 @@ bool SSDPClass::begin() {
   return true;
 }
 
+void SSDPClass::end() {
+  if(!_server)
+    return; // object is zeroed already, nothing to do
+
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf_P(PSTR("SSDP end ... "));
+#endif
+  // undo all initializations done in begin(), in reverse order
+  _stopTimer();
+
+  _server->disconnect();
+
+  IPAddress local = WiFi.localIP();
+  IPAddress mcast(SSDP_MULTICAST_ADDR);
+
+  if (igmp_leavegroup(local, mcast) != ERR_OK ) {
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf_P(PSTR("SSDP failed to leave igmp group\n"));
+#endif
+  }
+
+  _server->unref();
+  _server = 0;
+
+#ifdef DEBUG_SSDP
+    DEBUG_SSDP.printf_P(PSTR("ok\n"));
+#endif
+}
 void SSDPClass::_send(ssdp_method_t method) {
   char buffer[1460];
   IPAddress ip = WiFi.localIP();
@@ -209,37 +243,37 @@ void SSDPClass::_send(ssdp_method_t method) {
                        valueBuffer,
                        SSDP_INTERVAL,
                        _modelName,
-					   _modelNumber,
+                       _modelNumber,
                        _uuid,
                        (method == NONE) ? "ST" : "NT",
-                       _deviceType,
+                       (_st_is_uuid) ? _uuid : _deviceType,
                        ip[0], ip[1], ip[2], ip[3], _port, _schemaURL
                       );
 
   _server->append(buffer, len);
 
-  ip_addr_t remoteAddr;
+  IPAddress remoteAddr;
   uint16_t remotePort;
   if (method == NONE) {
-    remoteAddr.addr = _respondToAddr;
+    remoteAddr = _respondToAddr;
     remotePort = _respondToPort;
 #ifdef DEBUG_SSDP
     DEBUG_SSDP.print("Sending Response to ");
 #endif
   } else {
-    remoteAddr.addr = SSDP_MULTICAST_ADDR;
+    remoteAddr = IPAddress(SSDP_MULTICAST_ADDR);
     remotePort = SSDP_PORT;
 #ifdef DEBUG_SSDP
     DEBUG_SSDP.println("Sending Notify to ");
 #endif
   }
 #ifdef DEBUG_SSDP
-  DEBUG_SSDP.print(IPAddress(remoteAddr.addr));
+  DEBUG_SSDP.print(IPAddress(remoteAddr));
   DEBUG_SSDP.print(":");
   DEBUG_SSDP.println(remotePort);
 #endif
 
-  _server->send(&remoteAddr, remotePort);
+  _server->send(remoteAddr, remotePort);
 }
 
 void SSDPClass::schema(WiFiClient client) {
@@ -344,10 +378,19 @@ void SSDPClass::_update() {
 #ifdef DEBUG_SSDP
                   DEBUG_SSDP.printf("REJECT: %s\n", (char *)buffer);
 #endif
+                }else{
+                  _st_is_uuid = false;
                 }
                 // if the search type matches our type, we should respond instead of ABORT
                 if (strcasecmp(buffer, _deviceType) == 0) {
                   _pending = true;
+                  _st_is_uuid = false;
+                  _process_time = millis();
+                  state = KEY;
+                }
+                if (strcasecmp(buffer, _uuid) == 0) {
+                  _pending = true;
+                  _st_is_uuid = true;
                   _process_time = millis();
                   state = KEY;
                 }
@@ -387,6 +430,7 @@ void SSDPClass::_update() {
     _send(NONE);
   } else if(_notify_time == 0 || (millis() - _notify_time) > (SSDP_INTERVAL * 1000L)){
     _notify_time = millis();
+    _st_is_uuid = false;
     _send(NOTIFY);
   }
 
@@ -410,7 +454,7 @@ void SSDPClass::setDeviceType(const char *deviceType) {
 }
 
 void SSDPClass::setUUID(const char *uuid) {
-  strlcpy(_uuid, uuid, sizeof(_uuid));  
+  snprintf_P(_uuid, sizeof(_uuid), PSTR("uuid:%s"), uuid);  
 }
 
 void SSDPClass::setName(const char *name) {
@@ -459,11 +503,23 @@ void SSDPClass::_onTimerStatic(SSDPClass* self) {
 }
 
 void SSDPClass::_startTimer() {
+  _stopTimer();
+  _timer = new SSDPTimer();
   ETSTimer* tm = &(_timer->timer);
   const int interval = 1000;
   os_timer_disarm(tm);
   os_timer_setfn(tm, reinterpret_cast<ETSTimerFunc*>(&SSDPClass::_onTimerStatic), reinterpret_cast<void*>(this));
   os_timer_arm(tm, interval, 1 /* repeat */);
+}
+
+void SSDPClass::_stopTimer() {
+  if(!_timer)
+    return;
+
+  ETSTimer* tm = &(_timer->timer);
+  os_timer_disarm(tm);
+  delete _timer;
+  _timer = NULL;
 }
 
 #if !defined(NO_GLOBAL_INSTANCES) && !defined(NO_GLOBAL_SSDP)

@@ -38,7 +38,7 @@ extern "C"
 #include "lwip/tcp.h"
 #include "lwip/inet.h"
 #include "lwip/netif.h"
-#include "include/ClientContext.h"
+#include <include/ClientContext.h>
 #include "c_types.h"
 
 uint16_t WiFiClient::_localPort = 0;
@@ -132,27 +132,24 @@ int WiFiClient::connect(const char* host, uint16_t port)
     return 0;
 }
 
-int WiFiClient::connect(const String host, uint16_t port)
+int WiFiClient::connect(const String& host, uint16_t port)
 {
     return connect(host.c_str(), port);
 }
 
 int WiFiClient::connect(IPAddress ip, uint16_t port)
 {
-    ip_addr_t addr;
-    addr.addr = ip;
-
     if (_client) {
         stop();
         _client->unref();
         _client = nullptr;
     }
 
+#if LWIP_VERSION_MAJOR == 1
     // if the default interface is down, tcp_connect exits early without
     // ever calling tcp_err
     // http://lists.gnu.org/archive/html/lwip-devel/2010-05/msg00001.html
-#if LWIP_VERSION_MAJOR == 1
-    netif* interface = ip_route(&addr);
+    netif* interface = ip_route(ip);
     if (!interface) {
         DEBUGV("no route to host\r\n");
         return 0;
@@ -170,7 +167,7 @@ int WiFiClient::connect(IPAddress ip, uint16_t port)
     _client = new ClientContext(pcb, nullptr, nullptr);
     _client->ref();
     _client->setTimeout(_timeout);
-    int res = _client->connect(&addr, port);
+    int res = _client->connect(ip, port);
     if (res == 0) {
         _client->unref();
         _client = nullptr;
@@ -354,10 +351,10 @@ WiFiClient::operator bool()
 
 IPAddress WiFiClient::remoteIP()
 {
-    if (!_client)
+    if (!_client || !_client->getRemoteAddress())
         return IPAddress(0U);
 
-    return IPAddress(_client->getRemoteAddress());
+    return _client->getRemoteAddress();
 }
 
 uint16_t WiFiClient::remotePort()

@@ -37,8 +37,13 @@
 #include <CertStoreBearSSL.h>
 #include <time.h>
 
-const char *ssid = "....";
-const char *pass = "....";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char *ssid = STASSID;
+const char *pass = STAPSK;
 
 // A single, global CertStore which can be used by all
 // connections.  Needs to stay live the entire time any of
@@ -192,11 +197,11 @@ void setup() {
   Serial.println();
   Serial.println();
 
-  #ifdef USE_SDCARD
+#ifdef USE_SDCARD
   SD.begin();
-  #else
+#else
   SPIFFS.begin();
-  #endif
+#endif
 
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");

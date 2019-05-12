@@ -17,5 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "WiFiServerSecureAxTLS.h"
+#include <WiFiClientSecure.h>
+
+//#include "WiFiServerSecureAxTLS.h"
 #include "WiFiServerSecureBearSSL.h"

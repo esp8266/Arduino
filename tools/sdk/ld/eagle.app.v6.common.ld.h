@@ -93,45 +93,8 @@ SECTIONS
 #include "eagle.app.v6.common.ld.vtables.h"
 #endif
 
-  .irom0.text : ALIGN(4)
-  {
-    _irom0_text_start = ABSOLUTE(.);
-    *(.ver_number)
-    *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, EXCLUDE_FILE (umm_malloc.c.o) .text* )
-    *.cpp.o(.literal*, .text*)
-#ifdef VTABLES_IN_FLASH
-    *(.rodata._ZTV*) /* C++ vtables */
-#endif
-    *libc.a:(.literal .text .literal.* .text.*)
-    *libm.a:(.literal .text .literal.* .text.*)
-    *libgcc.a:_umoddi3.o(.literal .text)
-    *libgcc.a:_udivdi3.o(.literal .text)
-    *libsmartconfig.a:(.literal .text .literal.* .text.*)
-    *libstdc++.a:(.literal .text .literal.* .text.*)
-    *liblwip_gcc.a:(.literal .text .literal.* .text.*)
-    *liblwip_src.a:(.literal .text .literal.* .text.*)
-    *liblwip2.a:(.literal .text .literal.* .text.*)
-    *liblwip2_1460.a:(.literal .text .literal.* .text.*)
-    *libbearssl.a:(.literal .text .literal.* .text.*)
-    *libaxtls.a:(.literal .text .literal.* .text.*)
-    *libat.a:(.literal.* .text.*)
-    *libcrypto.a:(.literal.* .text.*)
-    *libespnow.a:(.literal.* .text.*)
-    *libjson.a:(.literal.* .text.*)
-    *liblwip.a:(.literal.* .text.*)
-    *libmesh.a:(.literal.* .text.*)
-    *libnet80211.a:(.literal.* .text.*)
-    *libsmartconfig.a:(.literal.* .text.*)
-    *libssl.a:(.literal.* .text.*)
-    *libupgrade.a:(.literal.* .text.*)
-    *libwpa.a:(.literal.* .text.*)
-    *libwpa2.a:(.literal.* .text.*)
-    *libwps.a:(.literal.* .text.*)
-    *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom0.text.* .irom.text .irom.text.*)
-    _irom0_text_end = ABSOLUTE(.);
-    _flash_code_end = ABSOLUTE(.);
-  } >irom0_0_seg :irom0_0_phdr
-
+  /* IRAM is split into .text and .text1 to allow for moving specific */
+  /* functions into IRAM that would be matched by the irom0.text matcher */
   .text : ALIGN(4)
   {
     _stext = .;
@@ -163,7 +126,86 @@ SECTIONS
     *(.entry.text)
     *(.init.literal)
     *(.init)
-    *(.literal .text .iram.text .iram.text.* .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
+
+    /* all functional callers are placed in IRAM (including SPI/IRQ callbacks/etc) here */
+    *(.text._ZNKSt8functionIF*EE*)  /* std::function<any(...)>::operator()() const */
+  } >iram1_0_seg :iram1_0_phdr
+
+  .irom0.text : ALIGN(4)
+  {
+    _irom0_text_start = ABSOLUTE(.);
+    *(.ver_number)
+    *.c.o( EXCLUDE_FILE (umm_malloc.c.o) .literal*, EXCLUDE_FILE (umm_malloc.c.o) .text* )
+    *.cpp.o(.literal*, .text*)
+#ifdef VTABLES_IN_FLASH
+    *(.rodata._ZTV*) /* C++ vtables */
+#endif
+
+    *libgcc.a:unwind-dw2.o(.literal .text .rodata .literal.* .text.* .rodata.*)
+    *libgcc.a:unwind-dw2-fde.o(.literal .text .rodata .literal.* .text.* .rodata.*)
+
+    *libc.a:(.literal .text .literal.* .text.*)
+    *libm.a:(.literal .text .literal.* .text.*)
+    *libgcc.a:_umoddi3.o(.literal .text)
+    *libgcc.a:_udivdi3.o(.literal .text)
+    *libstdc++.a:( .literal .text .literal.* .text.*)
+    *libstdc++-exc.a:( .literal .text .literal.* .text.*)
+    *libsmartconfig.a:(.literal .text .literal.* .text.*)
+    *liblwip_gcc.a:(.literal .text .literal.* .text.*)
+    *liblwip_src.a:(.literal .text .literal.* .text.*)
+    *liblwip2-536.a:(.literal .text .literal.* .text.*)
+    *liblwip2-1460.a:(.literal .text .literal.* .text.*)
+    *liblwip2-536-feat.a:(.literal .text .literal.* .text.*)
+    *liblwip2-1460-feat.a:(.literal .text .literal.* .text.*)
+    *liblwip6-536-feat.a:(.literal .text .literal.* .text.*)
+    *liblwip6-1460-feat.a:(.literal .text .literal.* .text.*)
+    *libbearssl.a:(.literal .text .literal.* .text.*)
+    *libaxtls.a:(.literal .text .literal.* .text.*)
+    *libat.a:(.literal.* .text.*)
+    *libcrypto.a:(.literal.* .text.*)
+    *libespnow.a:(.literal.* .text.*)
+    *libjson.a:(.literal.* .text.*)
+    *liblwip.a:(.literal.* .text.*)
+    *libmesh.a:(.literal.* .text.*)
+    *libnet80211.a:(.literal.* .text.*)
+    *libsmartconfig.a:(.literal.* .text.*)
+    *libssl.a:(.literal.* .text.*)
+    *libupgrade.a:(.literal.* .text.*)
+    *libwpa.a:(.literal.* .text.*)
+    *libwpa2.a:(.literal.* .text.*)
+    *libwps.a:(.literal.* .text.*)
+    *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom0.text.* .irom.text .irom.text.*)
+
+    /* __FUNCTION__ locals */
+    *(.rodata._ZZ*__FUNCTION__)
+    *(.rodata._ZZ*__PRETTY_FUNCTION__)
+    *(.rodata._ZZ*__func__)
+
+    /* std::* exception strings, in their own section to allow string coalescing */
+    *(.irom.exceptiontext)
+
+    /* c++ typeof IDs, etc. */
+    *(.rodata._ZTIN* .rodata._ZTSN10* .rodata._ZTISt* .rodata._ZTSSt*)
+
+    /* Fundamental type info */
+    *(.rodata._ZTIPKc .rodata._ZTIc .rodata._ZTIv .rodata._ZTSv .rodata._ZTSc .rodata._ZTSPKc .rodata._ZTSi .rodata._ZTIi)
+
+    . = ALIGN(4);
+    *(.gcc_except_table .gcc_except_table.*)
+    . = ALIGN(4);
+    __eh_frame = ABSOLUTE(.);
+    KEEP(*(.eh_frame))
+    . = (. + 7) & ~ 3;  /* Add a 0 entry to terminate the list */
+
+    _irom0_text_end = ABSOLUTE(.);
+    _flash_code_end = ABSOLUTE(.);
+  } >irom0_0_seg :irom0_0_phdr
+
+
+
+  .text1 : ALIGN(4)
+  {
+    *(.literal .text .iram.literal .iram.text .iram.text.* .literal.* .text.* .stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
 #ifdef VTABLES_IN_IRAM
     *(.rodata._ZTV*) /* C++ vtables */
 #endif

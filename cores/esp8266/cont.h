@@ -74,6 +74,12 @@ int cont_get_free_stack(cont_t* cont);
 // continuation stack
 bool cont_can_yield(cont_t* cont);
 
+// Repaint the stack from the current SP to the end, to allow individual
+// routines' stack usages to be calculated by re-painting, checking current
+// free, running the routine, then checking the max free
+void cont_repaint_stack(cont_t *cont);
+
+
 #ifdef __cplusplus
 }
 #endif

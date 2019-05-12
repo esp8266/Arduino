@@ -5,10 +5,16 @@
 // Released to the public domain
 
 #include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h>
 #include <time.h>
 
-const char *ssid = "....";
-const char *pass = "....";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char *ssid = STASSID;
+const char *pass = STAPSK;
 
 const char *   host = "api.github.com";
 const uint16_t port = 443;
@@ -38,6 +44,8 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     path = "/";
   }
 
+  ESP.resetFreeContStack();
+  uint32_t freeStackStart = ESP.getFreeContStack();
   Serial.printf("Trying: %s:443...", host);
   client->connect(host, port);
   if (!client->connected()) {
@@ -72,7 +80,8 @@ void fetchURL(BearSSL::WiFiClientSecure *client, const char *host, const uint16_
     } while (millis() < to);
   }
   client->stop();
-  Serial.printf("\n-------\n\n");
+  uint32_t freeStackEnd = ESP.getFreeContStack();
+  Serial.printf("\nCONT stack used: %d\n-------\n\n", freeStackStart - freeStackEnd);
 }
 
 void fetchNoConfig() {
@@ -141,7 +150,7 @@ wQIDAQAB
 -----END PUBLIC KEY-----
 )KEY";
   BearSSL::WiFiClientSecure client;
-  BearSSLPublicKey key(pubkey);
+  BearSSL::PublicKey key(pubkey);
   client.setKnownKey(&key);
   fetchURL(&client, host, port, path);
 }
@@ -183,7 +192,7 @@ BearSSL does verify the notValidBefore/After fields.
 )EOF");
 
   BearSSL::WiFiClientSecure client;
-  BearSSLX509List cert(digicert);
+  BearSSL::X509List cert(digicert);
   client.setTrustAnchors(&cert);
   Serial.printf("Try validating without setting the time (should fail)\n");
   fetchURL(&client, host, port, path);

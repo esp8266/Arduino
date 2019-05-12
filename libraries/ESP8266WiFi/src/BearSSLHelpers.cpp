@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Arduino.h>
+#include <StackThunk.h>
 #include "BearSSLHelpers.h"
 
 namespace brssl {
@@ -622,33 +623,36 @@ namespace brssl {
 };
 
 
+namespace BearSSL {
+
+
 // ----- Public Key -----
 
-BearSSLPublicKey::BearSSLPublicKey() {
+PublicKey::PublicKey() {
   _key = nullptr;
 }
 
-BearSSLPublicKey::BearSSLPublicKey(const char *pemKey) {
+PublicKey::PublicKey(const char *pemKey) {
   _key = nullptr;
   parse(pemKey);
 }
 
-BearSSLPublicKey::BearSSLPublicKey(const uint8_t *derKey, size_t derLen) {
+PublicKey::PublicKey(const uint8_t *derKey, size_t derLen) {
   _key = nullptr;
   parse(derKey, derLen);
 }
 
-BearSSLPublicKey::~BearSSLPublicKey() {
+PublicKey::~PublicKey() {
   if (_key) {
     brssl::free_public_key(_key);
   }
 }
 
-bool BearSSLPublicKey::parse(const char *pemKey) {
+bool PublicKey::parse(const char *pemKey) {
   return parse((const uint8_t *)pemKey, strlen_P(pemKey));
 }
 
-bool BearSSLPublicKey::parse(const uint8_t *derKey, size_t derLen) {
+bool PublicKey::parse(const uint8_t *derKey, size_t derLen) {
   if (_key) {
     brssl::free_public_key(_key);
     _key = nullptr;
@@ -657,28 +661,28 @@ bool BearSSLPublicKey::parse(const uint8_t *derKey, size_t derLen) {
   return _key ? true : false;
 }
 
-bool BearSSLPublicKey::isRSA() const {
+bool PublicKey::isRSA() const {
   if (!_key || _key->key_type != BR_KEYTYPE_RSA) {
     return false;
   }
   return true;
 }
 
-bool BearSSLPublicKey::isEC() const {
+bool PublicKey::isEC() const {
   if (!_key || _key->key_type != BR_KEYTYPE_EC) {
     return false;
   }
   return true;
 }
 
-const br_rsa_public_key *BearSSLPublicKey::getRSA() const {
+const br_rsa_public_key *PublicKey::getRSA() const {
   if (!_key || _key->key_type != BR_KEYTYPE_RSA) {
     return nullptr;
   }
   return &_key->key.rsa;
 }
 
-const br_ec_public_key *BearSSLPublicKey::getEC() const {
+const br_ec_public_key *PublicKey::getEC() const {
   if (!_key || _key->key_type != BR_KEYTYPE_EC) {
     return nullptr;
   }
@@ -687,31 +691,31 @@ const br_ec_public_key *BearSSLPublicKey::getEC() const {
 
 // ----- Private Key -----
 
-BearSSLPrivateKey::BearSSLPrivateKey() {
+PrivateKey::PrivateKey() {
   _key = nullptr;
 }
 
-BearSSLPrivateKey::BearSSLPrivateKey(const char *pemKey) {
+PrivateKey::PrivateKey(const char *pemKey) {
   _key = nullptr;
   parse(pemKey);
 }
 
-BearSSLPrivateKey::BearSSLPrivateKey(const uint8_t *derKey, size_t derLen) {
+PrivateKey::PrivateKey(const uint8_t *derKey, size_t derLen) {
   _key = nullptr;
   parse(derKey, derLen);
 }
 
-BearSSLPrivateKey::~BearSSLPrivateKey() {
+PrivateKey::~PrivateKey() {
   if (_key) {
     brssl::free_private_key(_key);
   }
 }
 
-bool BearSSLPrivateKey::parse(const char *pemKey) {
+bool PrivateKey::parse(const char *pemKey) {
   return parse((const uint8_t *)pemKey, strlen_P(pemKey));
 }
 
-bool BearSSLPrivateKey::parse(const uint8_t *derKey, size_t derLen) {
+bool PrivateKey::parse(const uint8_t *derKey, size_t derLen) {
   if (_key) {
     brssl::free_private_key(_key);
     _key = nullptr;
@@ -720,41 +724,43 @@ bool BearSSLPrivateKey::parse(const uint8_t *derKey, size_t derLen) {
   return _key ? true : false;
 }
 
-bool BearSSLPrivateKey::isRSA() const {
+bool PrivateKey::isRSA() const {
   if (!_key || _key->key_type != BR_KEYTYPE_RSA) {
     return false;
   }
   return true;
 }
 
-bool BearSSLPrivateKey::isEC() const {
+bool PrivateKey::isEC() const {
   if (!_key || _key->key_type != BR_KEYTYPE_EC) {
     return false;
   }
   return true;
 }
 
-const br_rsa_private_key *BearSSLPrivateKey::getRSA() const {
+const br_rsa_private_key *PrivateKey::getRSA() const {
   if (!_key || _key->key_type != BR_KEYTYPE_RSA) {
     return nullptr;
   }
   return &_key->key.rsa;
 }
 
-const br_ec_private_key *BearSSLPrivateKey::getEC() const {
+const br_ec_private_key *PrivateKey::getEC() const {
   if (!_key || _key->key_type != BR_KEYTYPE_EC) {
     return nullptr;
   }
   return &_key->key.ec;
 }
 
-BearSSLX509List::BearSSLX509List() {
+// ----- Certificate Lists -----
+
+X509List::X509List() {
   _count = 0;
   _cert = nullptr;
   _ta = nullptr;
 }
 
-BearSSLX509List::BearSSLX509List(const char *pemCert) {
+X509List::X509List(const char *pemCert) {
   _count = 0;
   _cert = nullptr;
   _ta = nullptr;
@@ -762,14 +768,14 @@ BearSSLX509List::BearSSLX509List(const char *pemCert) {
 }
 
 
-BearSSLX509List::BearSSLX509List(const uint8_t *derCert, size_t derLen) {
+X509List::X509List(const uint8_t *derCert, size_t derLen) {
   _count = 0;
   _cert = nullptr;
   _ta = nullptr;
   append(derCert, derLen);
 }
 
-BearSSLX509List::~BearSSLX509List() {
+X509List::~X509List() {
   brssl::free_certificates(_cert, _count); // also frees cert
   for (size_t i = 0; i < _count; i++) {
     brssl::free_ta_contents(&_ta[i]);
@@ -777,11 +783,11 @@ BearSSLX509List::~BearSSLX509List() {
   free(_ta);
 }
 
-bool BearSSLX509List::append(const char *pemCert) {
+bool X509List::append(const char *pemCert) {
   return append((const uint8_t *)pemCert, strlen_P(pemCert));
 }
 
-bool BearSSLX509List::append(const uint8_t *derCert, size_t derLen) {
+bool X509List::append(const uint8_t *derCert, size_t derLen) {
   size_t numCerts;
   br_x509_certificate *newCerts = brssl::read_certificates((const char *)derCert, derLen, &numCerts);
   if (!newCerts) {
@@ -819,3 +825,75 @@ bool BearSSLX509List::append(const uint8_t *derCert, size_t derLen) {
 
   return true;
 }
+
+// SHA256 hash for updater
+void HashSHA256::begin() {
+  br_sha256_init( &_cc );
+  memset( _sha256, 0, sizeof(_sha256) );
+}
+
+void HashSHA256::add(const void *data, uint32_t len) {
+  br_sha256_update( &_cc, data, len );
+}
+
+void HashSHA256::end() {
+  br_sha256_out( &_cc, _sha256 );
+}
+
+int HashSHA256::len() {
+  return sizeof(_sha256);
+}
+
+const void *HashSHA256::hash() {
+  return (const void*) _sha256;
+}
+
+// SHA256 verifier
+uint32_t SigningVerifier::length()
+{
+  if (!_pubKey) {
+    return 0;
+  } else if (_pubKey->isRSA()) {
+    return _pubKey->getRSA()->nlen;
+  } else if (_pubKey->isEC()) {
+    return _pubKey->getEC()->qlen;
+  } else {
+    return 0;
+  }
+}
+
+bool SigningVerifier::verify(UpdaterHashClass *hash, const void *signature, uint32_t signatureLen) {
+  if (!_pubKey || !hash || !signature || signatureLen != length()) return false;
+
+  if (_pubKey->isRSA()) {
+    bool ret;
+    unsigned char vrf[hash->len()];
+    br_rsa_pkcs1_vrfy vrfy = br_rsa_pkcs1_vrfy_get_default();
+    ret = vrfy((const unsigned char *)signature, signatureLen, NULL, sizeof(vrf), _pubKey->getRSA(), vrf);
+    if (!ret || memcmp(vrf, hash->hash(), sizeof(vrf)) ) {
+      return false;
+    } else {
+      return true;
+    }
+  } else {
+    br_ecdsa_vrfy vrfy = br_ecdsa_vrfy_raw_get_default();
+    // The EC verifier actually does the compare, unlike the RSA one
+    return vrfy(br_ec_get_default(), hash->hash(), hash->len(), _pubKey->getEC(), (const unsigned char *)signature, signatureLen);
+  }
+};
+
+#if !CORE_MOCK
+
+// Second stack thunked helpers
+make_stack_thunk(br_ssl_engine_recvapp_ack);
+make_stack_thunk(br_ssl_engine_recvapp_buf);
+make_stack_thunk(br_ssl_engine_recvrec_ack);
+make_stack_thunk(br_ssl_engine_recvrec_buf);
+make_stack_thunk(br_ssl_engine_sendapp_ack);
+make_stack_thunk(br_ssl_engine_sendapp_buf);
+make_stack_thunk(br_ssl_engine_sendrec_ack);
+make_stack_thunk(br_ssl_engine_sendrec_buf);
+
+#endif
+
+};
