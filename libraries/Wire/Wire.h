@@ -76,7 +76,8 @@ class TwoWire : public Stream
     virtual int read(void);
     virtual int peek(void);
     virtual void flush(void);
-    void onReceive( void (*)(size_t) );
+    void onReceive( void (*)(int) );    // arduino api
+    void onReceive( void (*)(size_t) ); // legacy esp8266 backward compatibility
     void onRequest( void (*)(void) );
 
     inline size_t write(unsigned long n) { return write((uint8_t)n); }

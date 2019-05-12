@@ -3,7 +3,7 @@ Arduino core for ESP8266 WiFi chip
 
 # Quick links
 
-- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.5.0/)
+- [Latest release documentation](https://arduino-esp8266.readthedocs.io/en/2.5.1/)
 - [Current "git version" documentation](https://arduino-esp8266.readthedocs.io/en/latest/)
 - [Install git version](https://arduino-esp8266.readthedocs.io/en/latest/installing.html#using-git-version) ([sources](doc/installing.rst#using-git-version))
 
@@ -28,20 +28,20 @@ ESP8266 Arduino core comes with libraries to communicate over WiFi using TCP and
 
 Starting with 1.6.4, Arduino allows installation of third-party platform packages using Boards Manager. We have packages available for Windows, Mac OS, and Linux (32 and 64 bit).
 
-- Install the current upstream Arduino IDE at the 1.8.7 level or later. The current version is at the [Arduino website](http://www.arduino.cc/en/main/software).
+- Install the current upstream Arduino IDE at the 1.8.7 level or later. The current version is at the [Arduino website](https://www.arduino.cc/en/main/software).
 - Start Arduino and open Preferences window.
-- Enter ```http://arduino.esp8266.com/stable/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
+- Enter ```https://arduino.esp8266.com/stable/package_esp8266com_index.json``` into *Additional Board Manager URLs* field. You can add multiple URLs, separating them with commas.
 - Open Boards Manager from Tools > Board menu and install *esp8266* platform (and don't forget to select your ESP8266 board from Tools > Board menu after installation).
 
 #### Latest release [![Latest release](https://img.shields.io/github/release/esp8266/Arduino.svg)](https://github.com/esp8266/Arduino/releases/latest/)
-Boards manager link: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
+Boards manager link: `https://arduino.esp8266.com/stable/package_esp8266com_index.json`
 
-Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.0/](https://arduino-esp8266.readthedocs.io/en/2.5.0/)
+Documentation: [https://arduino-esp8266.readthedocs.io/en/2.5.1/](https://arduino-esp8266.readthedocs.io/en/2.5.1/)
 
 ### Using git version (basic instructions)
 [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/esp8266/Arduino)
 
-- Install the current upstream Arduino IDE at the 1.8 level or later. The current version is at the [Arduino website](http://www.arduino.cc/en/main/software).
+- Install the current upstream Arduino IDE at the 1.8 level or later. The current version is at the [Arduino website](https://www.arduino.cc/en/main/software).
 - Go to Arduino directory
   - For Mac OS X, it is `Arduino.app` showing as the Arduino icon.  
     This location may be your `~/Downloads`, `~/Desktop` or even `/Applications`.
@@ -58,6 +58,8 @@ cd hardware
 mkdir esp8266com
 cd esp8266com
 git clone https://github.com/esp8266/Arduino.git esp8266
+cd esp8266
+git submodule update --init
 ```
 - Download binary tools (you need Python 2.7)
 ```bash
@@ -68,19 +70,19 @@ python get.py
 
 ### Using PlatformIO
 
-[PlatformIO](http://platformio.org?utm_source=github&utm_medium=arduino-esp8266) is an open source ecosystem for IoT
+[PlatformIO](https://platformio.org?utm_source=github&utm_medium=arduino-esp8266) is an open source ecosystem for IoT
 development with cross platform build system, library manager and full support
 for Espressif (ESP8266) development. It works on the popular host OS: macOS, Windows,
 Linux 32/64, Linux ARM (like Raspberry Pi, BeagleBone, CubieBoard).
 
-- [What is PlatformIO?](http://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=github&utm_medium=arduino-esp8266)
-- [PlatformIO IDE](http://platformio.org/platformio-ide?utm_source=github&utm_medium=arduino-esp8266)
-- [PlatformIO Core](http://docs.platformio.org/en/latest/core.html?utm_source=github&utm_medium=arduino-esp8266) (command line tool)
-- [Advanced usage](http://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266) -
+- [What is PlatformIO?](https://docs.platformio.org/en/latest/what-is-platformio.html?utm_source=github&utm_medium=arduino-esp8266)
+- [PlatformIO IDE](https://platformio.org/platformio-ide?utm_source=github&utm_medium=arduino-esp8266)
+- [PlatformIO Core](https://docs.platformio.org/en/latest/core.html?utm_source=github&utm_medium=arduino-esp8266) (command line tool)
+- [Advanced usage](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266) -
   custom settings, uploading to SPIFFS, Over-the-Air (OTA), staging version
-- [Integration with Cloud and Standalone IDEs](http://docs.platformio.org/en/latest/ide.html?utm_source=github&utm_medium=arduino-esp8266) -
+- [Integration with Cloud and Standalone IDEs](https://docs.platformio.org/en/latest/ide.html?utm_source=github&utm_medium=arduino-esp8266) -
   Cloud9, Codeanywhere, Eclipse Che (Codenvy), Atom, CLion, Eclipse, Emacs, NetBeans, Qt Creator, Sublime Text, VIM, Visual Studio, and VSCode
-- [Project Examples](http://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266#examples)
+- [Project Examples](https://docs.platformio.org/en/latest/platforms/espressif8266.html?utm_source=github&utm_medium=arduino-esp8266#examples)
 
 ### Building with make
 
@@ -93,7 +95,7 @@ Documentation for latest development version: https://arduino-esp8266.readthedoc
 
 ### Issues and support ###
 
-[ESP8266 Community Forum](http://www.esp8266.com/u/arduinoanswers) is a well established community for questions and answers about Arduino for ESP8266. If you need help, have a "How do I..." type question, have a problem with a 3rd party lib not hosted in this repo, or just want to discuss how to approach a problem , please ask there.
+[ESP8266 Community Forum](https://www.esp8266.com/u/arduinoanswers) is a well established community for questions and answers about Arduino for ESP8266. If you need help, have a "How do I..." type question, have a problem with a 3rd party lib not hosted in this repo, or just want to discuss how to approach a problem , please ask there.
 
 If you find the forum useful, please consider supporting it with a donation. <br />
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/webscr?cmd=_s-xclick&hosted_button_id=4M56YCWV6PX66)

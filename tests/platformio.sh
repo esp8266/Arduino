@@ -12,7 +12,7 @@ function install_platformio()
     ln -s $TRAVIS_BUILD_DIR ~/.platformio/packages/framework-arduinoespressif8266
     # Install dependencies:
     # - esp8266/examples/ConfigFile
-    pio lib install ArduinoJson
+    pio lib install "ArduinoJson@^5.13.4"
 }
 
 function build_sketches_with_platformio()
@@ -37,6 +37,10 @@ function build_sketches_with_platformio()
             continue
         fi;
         if [[ -f "$sketchdir/.test.skip" ]]; then
+            echo -e "\n ------------ Skipping $sketch ------------ \n";
+            continue
+        fi
+        if [[ $(skip_ino $sketch) = 1 ]]; then
             echo -e "\n ------------ Skipping $sketch ------------ \n";
             continue
         fi

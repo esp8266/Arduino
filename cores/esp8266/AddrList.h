@@ -118,6 +118,7 @@ struct netifWrapper
     String toString() const         { return addr().toString(); }
 
     // related to legacy address (_num=0, ipv4)
+    IPAddress ipv4 () const         { return _netif->ip_addr; }
     IPAddress netmask () const      { return _netif->netmask; }
     IPAddress gw () const           { return _netif->gw; }
 
