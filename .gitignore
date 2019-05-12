@@ -1,14 +1,17 @@
 .DS_Store
 tools/dist/
 tools/xtensa-lx106-elf/
-tools/esptool/
 tools/mkspiffs/
+tools/python/
 package/versions/
 exclude.txt
 tools/sdk/lib/liblwip_src.a
 tools/sdk/lwip/src/build
 tools/sdk/lwip/src/liblwip_src.a
 tools/sdk/ld/backup
+tools/sdk/ld/eagle.app.v6.common.ld
+
+tests/hosts/lcov/
 
 *.pyc
 *.gch
@@ -19,3 +22,4 @@ boards.local.txt
 *.gcno
 *.gcda
 *.o
+*.a

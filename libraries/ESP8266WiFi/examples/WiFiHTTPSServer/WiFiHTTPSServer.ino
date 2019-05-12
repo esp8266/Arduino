@@ -43,10 +43,15 @@
 
 #include <ESP8266WiFi.h>
 
-const char* ssid = "your-ssid";
-const char* password = "your-password";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
 
-// The certificate is stored in PMEM 
+const char* ssid = STASSID;
+const char* password = STAPSK;
+
+// The certificate is stored in PMEM
 static const uint8_t x509[] PROGMEM = {
   0x30, 0x82, 0x01, 0x3d, 0x30, 0x81, 0xe8, 0x02, 0x09, 0x00, 0xfe, 0x56,
   0x46, 0xf2, 0x78, 0xc6, 0x51, 0x17, 0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86,
@@ -107,27 +112,26 @@ static const uint8_t rsakey[] PROGMEM = {
   0x2c, 0x3a, 0xcd, 0x0a, 0x9a, 0x4d, 0x7c, 0xad, 0x29, 0xd6, 0x36, 0x57,
   0xd5, 0xdf, 0x34, 0xeb, 0x26, 0x03
 };
- 
+
 // Create an instance of the server
 // specify the port to listen on as an argument
 WiFiServerSecure server(443);
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
 
   // prepare GPIO2
   pinMode(2, OUTPUT);
   digitalWrite(2, 0);
-  
+
   // Connect to WiFi network
   Serial.println();
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
-  
+
   WiFi.begin(ssid, password);
-  
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -135,7 +139,7 @@ void setup() {
   Serial.println("");
   Serial.println("WiFi connected");
 
-  // Set the certificates from PMEM (if using DRAM remove the _P from the call)  
+  // Set the certificates from PMEM (if using DRAM remove the _P from the call)
   server.setServerKeyAndCert_P(rsakey, sizeof(rsakey), x509, sizeof(x509));
 
   // Start the server
@@ -152,11 +156,11 @@ void loop() {
   if (!client) {
     return;
   }
-  
+
   // Wait until the client sends some data
   Serial.println("new client");
   unsigned long timeout = millis() + 3000;
-  while(!client.available() && millis() < timeout){
+  while (!client.available() && millis() < timeout) {
     delay(1);
   }
   if (millis() > timeout) {
@@ -170,14 +174,14 @@ void loop() {
   String req = client.readStringUntil('\r');
   Serial.println(req);
   client.flush();
-  
+
   // Match the request
   int val;
-  if (req.indexOf("/gpio/0") != -1)
+  if (req.indexOf("/gpio/0") != -1) {
     val = 0;
-  else if (req.indexOf("/gpio/1") != -1)
+  } else if (req.indexOf("/gpio/1") != -1) {
     val = 1;
-  else {
+  } else {
     Serial.println("invalid request");
     client.print("HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html><body>Not found</body></html>");
     return;
@@ -185,12 +189,12 @@ void loop() {
 
   // Set GPIO2 according to the request
   digitalWrite(2, val);
-  
+
   client.flush();
 
   // Prepare the response
   String s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html>\r\nGPIO is now ";
-  s += (val)?"high":"low";
+  s += (val) ? "high" : "low";
   s += "</html>\n";
 
   // Send the response to the client
@@ -198,7 +202,7 @@ void loop() {
   delay(1);
   Serial.println("Client disconnected");
 
-  // The client will actually be disconnected 
+  // The client will actually be disconnected
   // when the function returns and 'client' object is detroyed
 }
 

@@ -5,14 +5,19 @@
 
    This example is released into public domain,
    or, at your option, CC0 licensed.
- */
+*/
 
 #include <ESP8266WiFi.h>
 
 #include <ESP8266HTTPClient.h>
 
-const char* ssid = "........";
-const char* ssidPassword = "........";
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+const char* ssid = STASSID;
+const char* ssidPassword = STAPSK;
 
 const char *username = "admin";
 const char *password = "admin";
@@ -20,24 +25,26 @@ const char *password = "admin";
 const char *server = "http://httpbin.org";
 const char *uri = "/digest-auth/auth/admin/admin/MD5";
 
-String exractParam(String& authReq, const String& param, const char delimit){
+String exractParam(String& authReq, const String& param, const char delimit) {
   int _begin = authReq.indexOf(param);
-  if (_begin==-1) return "";
-  return authReq.substring(_begin+param.length(),authReq.indexOf(delimit,_begin+param.length()));
+  if (_begin == -1) {
+    return "";
+  }
+  return authReq.substring(_begin + param.length(), authReq.indexOf(delimit, _begin + param.length()));
 }
 
 String getCNonce(const int len) {
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-    String s = "";
+  static const char alphanum[] =
+    "0123456789"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz";
+  String s = "";
 
-    for (int i = 0; i < len; ++i) {
-        s += alphanum[rand() % (sizeof(alphanum) - 1)];
-    }
+  for (int i = 0; i < len; ++i) {
+    s += alphanum[rand() % (sizeof(alphanum) - 1)];
+  }
 
-    return s;
+  return s;
 }
 
 String getDigestAuth(String& authReq, const String& username, const String& password, const String& uri, unsigned int counter) {
@@ -67,14 +74,14 @@ String getDigestAuth(String& authReq, const String& username, const String& pass
   String response = md5.toString();
 
   String authorization = "Digest username=\"" + username + "\", realm=\"" + realm + "\", nonce=\"" + nonce +
-    "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=" + String(nc) + ", cnonce=\"" + cNonce + "\", response=\"" + response + "\"";
+                         "\", uri=\"" + uri + "\", algorithm=\"MD5\", qop=auth, nc=" + String(nc) + ", cnonce=\"" + cNonce + "\", response=\"" + response + "\"";
   Serial.println(authorization);
 
   return authorization;
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, ssidPassword);
@@ -91,12 +98,13 @@ void setup() {
 }
 
 void loop() {
-  HTTPClient http;
+  WiFiClient client;
+  HTTPClient http; //must be declared after WiFiClient for correct destruction order, because used by http.begin(client,...)
 
   Serial.print("[HTTP] begin...\n");
 
   // configure traged server and url
-  http.begin(String(server) + String(uri));
+  http.begin(client, String(server) + String(uri));
 
 
   const char *keys[] = {"WWW-Authenticate"};
@@ -113,7 +121,7 @@ void loop() {
     String authorization = getDigestAuth(authReq, String(username), String(password), String(uri), 1);
 
     http.end();
-    http.begin(String(server) + String(uri));
+    http.begin(client, String(server) + String(uri));
 
     http.addHeader("Authorization", authorization);
 

@@ -60,6 +60,30 @@ cont_continue:
 
 ////////////////////////////////////////////////////
 
+/*
+  The purpose of cont_wrapper is to signal to xtensa-gdb
+  that we want to treat this function as the outermost one.
+
+  From: binutils-gdb-xtensa/gdb/xtensa-tdep.c:2677 <https://git.io/vA8Ps>
+    "Special case for terminating backtrace at a function that wants to
+    be seen as the outermost one.  Such a function will clear it's RA (A0)
+    register to 0 in the prologue instead of saving its original value."
+*/
+
+    .text
+    .align   4
+    .literal_position
+    .global  cont_wrapper
+    .type    cont_wrapper, @function
+cont_wrapper:
+    movi    a0, 0
+    callx0  a3
+    movi    a2, cont_norm
+    jx      a2
+    .size   cont_wrapper, . - cont_wrapper
+
+////////////////////////////////////////////////////
+
     .text
     .align   4
     .literal_position
@@ -91,8 +115,8 @@ cont_run:
     /* set new stack*/
     l32i    a1, a2, 16;
     /* goto pfn */
-    movi    a0, cont_norm
-    jx      a3
+    movi    a2, cont_wrapper
+    jx      a2
 
 cont_resume:
     /* a1 <- cont_ctx.sp_yield */

@@ -1,5 +1,9 @@
 ```make install```: download, compile, install lwip2
 
+```make latestmaster```: download latest lwip2, compile, install
+
+```make latestupstream```: download latest lwip2 and latest upstream lwIP, compile, install
+
 ```make download```: download lwIP-2 builder
 
 ```make clean```: clean builder only
@@ -10,4 +14,4 @@ MSS values are in builder/Makefile.arduino
 
 MSS values in boards.txt are only informative
 
-current lwip2 submodule repository: https://github.com/d-a-v/esp82xx-nonos-linklayer/tree/arduino-2.4.0
+current lwip2 submodule repository: https://github.com/d-a-v/esp82xx-nonos-linklayer/tree/arduino-2.4.1

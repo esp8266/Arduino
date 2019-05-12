@@ -19,8 +19,13 @@
 
 ////////////////////////////////////////////////////////
 
-#define SSID            "open"
-#define SSIDPWD         ""
+#ifndef STASSID
+#define STASSID "your-ssid"
+#define STAPSK  "your-password"
+#endif
+
+#define SSID            STASSID
+#define SSIDPWD         STAPSK
 #define TZ              1       // (utc+) TZ in hours
 #define DST_MN          60      // use 60mn for summer time in some countries
 
@@ -36,8 +41,7 @@
 timeval cbtime;			// time set in callback
 bool cbtime_set = false;
 
-void time_is_set (void)
-{
+void time_is_set(void) {
   gettimeofday(&cbtime, NULL);
   cbtime_set = true;
   Serial.println("------------------ settimeofday() was called ------------------");
@@ -73,7 +77,7 @@ extern "C" int clock_gettime(clockid_t unused, struct timespec *tp);
   Serial.print(":" #w "="); \
   Serial.print(tm->tm_##w);
 
-void printTm (const char* what, const tm* tm) {
+void printTm(const char* what, const tm* tm) {
   Serial.print(what);
   PTM(isdst); PTM(yday); PTM(wday);
   PTM(year);  PTM(mon);  PTM(mday);

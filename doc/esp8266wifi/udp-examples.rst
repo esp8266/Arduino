@@ -35,8 +35,8 @@ Once we have libraries in place we need to create a ``WiFiUDP`` object. Then we 
 
     WiFiUDP Udp;
     unsigned int localUdpPort = 4210;
-    char incomingPacket[255];
-    char  replyPacekt[] = "Hi there! Got the message :-)";
+    char incomingPacket[256];
+    char replyPacket[] = "Hi there! Got the message :-)";
 
 Wi-Fi Connection
 ~~~~~~~~~~~~~~~~
@@ -68,7 +68,7 @@ Waiting for incoming UDP packed is done by the following code:
       int len = Udp.read(incomingPacket, 255);
       if (len > 0)
       {
-        incomingPacket[len] = 0;
+        incomingPacket[len] = '\0';
       }
       Serial.printf("UDP packet contents: %s\n", incomingPacket);
 
@@ -85,7 +85,7 @@ For each received packet we are sending back an acknowledge packet:
 .. code:: cpp
 
     Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.write(replyPacekt);
+    Udp.write(replyPacket);
     Udp.endPacket();
 
 Please note we are sending reply to the IP and port of the sender by using ``Udp.remoteIP()`` and ``Udp.remotePort()``.
@@ -106,7 +106,7 @@ The sketch performing all described functionality is presented below:
     WiFiUDP Udp;
     unsigned int localUdpPort = 4210;  // local port to listen on
     char incomingPacket[255];  // buffer for incoming packets
-    char  replyPacekt[] = "Hi there! Got the message :-)";  // a reply string to send back
+    char  replyPacket[] = "Hi there! Got the message :-)";  // a reply string to send back
 
 
     void setup()
@@ -144,7 +144,7 @@ The sketch performing all described functionality is presented below:
 
         // send back a reply, to the IP address and port we got the packet from
         Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-        Udp.write(replyPacekt);
+        Udp.write(replyPacket);
         Udp.endPacket();
       }
     }
@@ -171,8 +171,6 @@ What I have entered is shown below:
 .. figure:: pictures/udp-packet-sender.png
    :alt: Testing UDP with packet sender
 
-   alt text
-
 Now click *Send*.
 
 Immediately after that you should see the following on ESP's serial monitor:
@@ -191,4 +189,4 @@ Conclusion
 
 This simple example shows how to send and receive UDP packets between ESP and an external application. Once tested in this minimal set up, you should be able to program ESP to talk to any other UDP device. In case of issues to establish communication with a new device, use the `Packet Sender <https://packetsender.com>`__ or other similar program for troubleshooting
 
-For review of functions provided to send and receive UDP packets, please refer to the :doc:`UDP Class <udp-class>` documentation.
+For review of functions provided to send and receive UDP packets, please refer to the `UDP Class <udp-class.rst>`__ documentation.

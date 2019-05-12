@@ -5,24 +5,19 @@ ESP8266_CORE_PATH ?= ../..
 BUILD_DIR ?= $(PWD)/.build
 HARDWARE_DIR ?= $(PWD)/.hardware
 ESPTOOL ?= $(ESP8266_CORE_PATH)/tools/esptool/esptool
+MKSPIFFS ?= $(ESP8266_CORE_PATH)/tools/mkspiffs/mkspiffs
 UPLOAD_PORT ?= $(shell ls /dev/tty* | grep -m 1 -i USB)
 UPLOAD_BAUD ?= 921600
 UPLOAD_BOARD ?= nodemcu
 BS_DIR ?= libraries/BSTest
 DEBUG_LEVEL ?= DebugLevel=None____
-FQBN ?= esp8266com:esp8266:generic:CpuFrequency=80,FlashFreq=40,FlashMode=dio,UploadSpeed=115200,FlashSize=4M1M,LwIPVariant=v2mss536,ResetMethod=none,Debug=Serial,$(DEBUG_LEVEL)
+#FQBN ?= esp8266com:esp8266:generic:CpuFrequency=80,FlashFreq=40,FlashMode=dio,UploadSpeed=115200,FlashSize=4M1M,LwIPVariant=v2mss536,ResetMethod=none,Debug=Serial,$(DEBUG_LEVEL)
+FQBN ?= esp8266com:esp8266:generic:xtal=80,FlashFreq=40,FlashMode=dio,baud=115200,eesz=4M1M,ip=lm2f,ResetMethod=none,dbg=Serial,$(DEBUG_LEVEL)
 BUILD_TOOL := $(ARDUINO_IDE_PATH)/arduino-builder
-TEST_CONFIG := libraries/test_config/test_config.h
+TEST_CONFIG := test_env.cfg
 TEST_REPORT_XML := test_report.xml
 TEST_REPORT_HTML := test_report.html
 
-ifeq ("$(UPLOAD_PORT)","")
-$(error "Failed to detect upload port, please export UPLOAD_PORT manually")
-endif
-
-ifeq ("$(ARDUINO_IDE_PATH)","")
-$(error "Please export ARDUINO_IDE_PATH")
-endif
 
 ifneq ("$(V)","1")
 	SILENT = @
@@ -35,16 +30,17 @@ endif
 
 all: count tests test_report
 
-count:
-	@echo Running $(words $(TEST_LIST)) tests
+$(TEST_LIST): | virtualenv $(TEST_CONFIG) $(BUILD_DIR) $(HARDWARE_DIR)
 
-tests: $(BUILD_DIR) $(HARDWARE_DIR) virtualenv $(TEST_CONFIG) $(TEST_LIST)
+tests: $(TEST_LIST)
 
 $(TEST_LIST): LOCAL_BUILD_DIR=$(BUILD_DIR)/$(notdir $@)
 
 $(TEST_LIST):
+	@echo Running $(words $(TEST_LIST)) tests
 	$(SILENT)mkdir -p $(LOCAL_BUILD_DIR)
 ifneq ("$(NO_BUILD)","1")
+	@test -n "$(ARDUINO_IDE_PATH)" || (echo "Please export ARDUINO_IDE_PATH" && exit 1)
 	@echo Compiling $(notdir $@)
 	$(SILENT)$(BUILD_TOOL) -compile -logger=human \
 		-libraries "$(PWD)/libraries" \
@@ -59,6 +55,17 @@ ifneq ("$(NO_BUILD)","1")
 		$@
 endif
 ifneq ("$(NO_UPLOAD)","1")
+	@test -n "$(UPLOAD_PORT)" || (echo "Failed to detect upload port, please export UPLOAD_PORT manually" && exit 1)
+	@test -e $(dir $@)/make_spiffs.py && (echo "Generating and uploading SPIFFS" && \
+		(cd $(dir $@) && python ./make_spiffs.py) && \
+		$(MKSPIFFS) --create $(dir $@)data/ --size 0xFB000 \
+			--block 8192 --page 256 $(LOCAL_BUILD_DIR)/spiffs.img && \
+		$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) \
+			-cp $(UPLOAD_PORT) \
+			-cb $(UPLOAD_BAUD) \
+			-cd $(UPLOAD_BOARD) \
+			-ca 0x300000 \
+			-cf $(LOCAL_BUILD_DIR)/spiffs.img ) || (echo "No SPIFFS to upload")
 	@echo Uploading binary
 	$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG)  \
 		-cp $(UPLOAD_PORT) \
@@ -67,6 +74,7 @@ ifneq ("$(NO_UPLOAD)","1")
 		-cf $(LOCAL_BUILD_DIR)/$(notdir $@).bin
 endif
 ifneq ("$(NO_RUN)","1")
+	@test -n "$(UPLOAD_PORT)" || (echo "Failed to detect upload port, please export UPLOAD_PORT manually" && exit 1)
 	@echo Running tests
 	$(SILENT)$(ESPTOOL) $(UPLOAD_VERBOSE_FLAG) -cp $(UPLOAD_PORT) -cd $(UPLOAD_BOARD) -cr
 	@source $(BS_DIR)/virtualenv/bin/activate && \
@@ -75,6 +83,7 @@ ifneq ("$(NO_RUN)","1")
 			-p $(UPLOAD_PORT) \
 			-n $(basename $(notdir $@)) \
 			-o $(LOCAL_BUILD_DIR)/test_result.xml \
+			--env-file $(TEST_CONFIG) \
 			`test -f $(addsuffix .py, $(basename $@)) && echo "-m $(addsuffix .py, $(basename $@))" || echo ""`
 endif
 
@@ -95,7 +104,7 @@ $(HARDWARE_DIR):
 	cd $(HARDWARE_DIR)/esp8266com && ln -s $(realpath $(ESP8266_CORE_PATH)) esp8266
 
 virtualenv:
-	make -C $(BS_DIR) virtualenv
+	@make -C $(BS_DIR) virtualenv
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -104,9 +113,9 @@ clean:
 
 $(TEST_CONFIG):
 	@echo "******    "
-	@echo "******    libraries/test_config/test_config.h does not exist"
-	@echo "******    Create one from libraries/test_config/test_config.h.template"
+	@echo "******    $(TEST_CONFIG) does not exist"
+	@echo "******    Create one from $(TEST_CONFIG).template"
 	@echo "******    "
-	false
+	@false
 
-.PHONY: tests all count virtualenv test_report $(BUILD_DIR) $(TEST_LIST)
+.PHONY: tests all count virtualenv test_report $(TEST_LIST)
